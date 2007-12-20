@@ -676,18 +676,18 @@ Public Class HspfUci
                 If lNewSeg Then
                     lMetSeg.Id = pMetSegs.Count + 1
                     'get met seg name from precip data set
-                    Dim lDsn As Integer = lMetSeg.MetSegRec(1).Source.VolId
-                    If lDsn > 0 Then
-                        Dim lWdmId As String = lMetSeg.MetSegRec(1).Source.VolName
-                        If pWdmCount > 0 Then
-                            lMetSeg.ExpandMetSegName(lWdmId, lDsn)
-                        Else
-                            If lComment.Length > 13 Then
-                                lMetSeg.Name = Mid(lComment, 13)
+                    If lMetSeg.MetSegRecs.Count > 0 AndAlso lMetSeg.MetSegRecs("PREC").Source.VolId > 0 Then
+                        With lMetSeg.MetSegRecs("PREC").Source
+                            If pWdmCount > 0 Then
+                                lMetSeg.ExpandMetSegName(.VolName, .VolId)
                             Else
-                                lMetSeg.Name = lComment
+                                If lComment.Length > 13 Then
+                                    lMetSeg.Name = lComment.Substring(12)
+                                Else
+                                    lMetSeg.Name = lComment
+                                End If
                             End If
-                        End If
+                        End With
                         pMetSegs.Add(lMetSeg)
                         lOperation.MetSeg = lMetSeg
                     Else 'need in case there is no prec in the met seg
@@ -704,14 +704,14 @@ Public Class HspfUci
         'set any undefined mfacts to 0
         If pMetSegs.Count > 0 Then
             For Each lMetSegExisting As HspfMetSeg In pMetSegs
-                For lIndex As Integer = 1 To 7
-                    If lMetSegExisting.MetSegRec(lIndex).MFactP = -999.0# Then
-                        lMetSegExisting.MetSegRec(lIndex).MFactP = 0
+                For Each lMetSegRecord As HspfMetSegRecord In lMetSegExisting.MetSegRecs
+                    If lMetSegRecord.MFactP = -999.0# Then
+                        lMetSegRecord.MFactP = 0
                     End If
-                    If lMetSegExisting.MetSegRec(lIndex).MFactR = -999.0# Then
-                        lMetSegExisting.MetSegRec(lIndex).MFactR = 0
+                    If lMetSegRecord.MFactR = -999.0# Then
+                        lMetSegRecord.MFactR = 0
                     End If
-                Next lIndex
+                Next lMetSegRecord
             Next lMetSegExisting
         End If
 
@@ -845,9 +845,9 @@ Public Class HspfUci
         For Each lOperationType As String In lOperationTypes
             For Each lOperation As HspfOperation In pOpnBlks.Item(lOperationType).Ids
                 If Not lOperation.MetSeg Is Nothing Then
-                    For lSegRec As Integer = 1 To 7
-                        With lOperation.MetSeg.MetSegRec(lSegRec)
-                            If .typ <> 0 Then 'type exists
+                    For Each lMetSegRecord As HspfMetSegRecord In lOperation.MetSeg.MetSegRecs
+                        With lMetSegRecord
+                            If .Typ <> 0 Then 'type exists
                                 If (lOperation.Name = "RCHRES" And .MFactR > 0.0#) Or _
                                    (lOperation.Name = "PERLND" And .MFactP > 0.0#) Or _
                                    (lOperation.Name = "IMPLND" And .MFactP > 0.0#) Then
@@ -867,7 +867,7 @@ Public Class HspfUci
                                     lConnection.Target.Group = "EXTNL"
                                     If lOperation.Name = "RCHRES" Then
                                         lConnection.MFact = .MFactR
-                                        Select Case .typ
+                                        Select Case .Typ
                                             Case 1 : lConnection.Target.Member = "PREC"
                                             Case 2 : lConnection.Target.Member = "GATMP"
                                             Case 3 : lConnection.Target.Member = "DEWTMP"
@@ -878,7 +878,7 @@ Public Class HspfUci
                                         End Select
                                     Else
                                         lConnection.MFact = .MFactP
-                                        Select Case .typ
+                                        Select Case .Typ
                                             Case 1 : lConnection.Target.Member = "PREC"
                                             Case 2 : lConnection.Target.Member = "GATMP"
                                             Case 3 : lConnection.Target.Member = "DTMPG"
@@ -887,7 +887,7 @@ Public Class HspfUci
                                             Case 6 : lConnection.Target.Member = "CLOUD"
                                             Case 7 : lConnection.Target.Member = "PETINP"
                                         End Select
-                                        If .typ = 2 Then
+                                        If .Typ = 2 Then
                                             'get right air temp member name
                                             If lOperation.MetSeg.AirType = 1 Then
                                                 lConnection.Target.Member = "GATMP"
@@ -905,7 +905,7 @@ Public Class HspfUci
                                 End If
                             End If
                         End With
-                    Next lSegRec
+                    Next lMetSegRecord
                 End If
             Next
         Next lOperationType
