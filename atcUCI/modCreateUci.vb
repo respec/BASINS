@@ -61,7 +61,7 @@ Module modCreateUci
         End If
         Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
         Dim lSJDate As Double = lDataSet.Dates.Value(0)
-        Dim lEJDate As Double = lDataSet.Dates.Value(lDataSet.numValues)
+        Dim lEJDate As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
         If Not aWatershed.MetSegments Is Nothing Then
             'also check dates of PEVT dataset
             lWdmId = aWatershed.MetSegments(0).DataTypes("PEVT").WdmID
@@ -69,7 +69,7 @@ Module modCreateUci
             lDsn = aWatershed.MetSegments(0).DataTypes("PEVT").Dsn
             lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
             Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
-            Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues)
+            Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
             If lSJDate2 > lSJDate Then
                 lSJDate = lSJDate2
             End If
@@ -88,6 +88,7 @@ Module modCreateUci
                 .SDate(lDateIndex) = lStartDate(lDateIndex)
                 .EDate(lDateIndex) = lEndDate(lDateIndex)
             Next lDateIndex
+            .EDate(3) = 24
         End With
 
         'add opn seq block
