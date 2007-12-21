@@ -1,4 +1,7 @@
 Imports System.Drawing
+
+Imports atcData
+Imports atcUtility
 Imports ZedGraph
 
 Public Module modGraph
@@ -49,15 +52,12 @@ Public Module modGraph
     End Sub
 
     <CLSCompliant(False)> _
-    Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane, _
-                                      ByVal aXAxisType As AxisType, _
-                                      ByVal aYAxisType As AxisType)
+    Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
         With aPane
             .IsAlignGrids = True
             .IsFontsScaled = False
             .IsPenWidthScaled = False
             With .XAxis
-                .Type = aXAxisType
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MajorTic.IsOpposite = True
@@ -82,7 +82,6 @@ Public Module modGraph
                 .IsVisible = False
             End With
             With .YAxis
-                .Type = aYAxisType
                 .MajorGrid.IsVisible = True
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
