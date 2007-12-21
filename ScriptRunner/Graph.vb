@@ -26,6 +26,7 @@ Module Graph
         lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
         Dim lCons As String = "Flow"
         Dim lGraphForm As atcGraph.atcGraphForm
+        Dim lGrapher As clsGraphBase
         ChDriveDir(CurDir() & "\outfiles")
         Dim lOutFileName As String
 
@@ -50,7 +51,10 @@ Module Graph
             Dim lACoef As Double
             Dim lBCoef As Double
             Dim lRSquare As Double
-            lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Linear)
+            lGraphForm = New atcGraph.atcGraphForm()
+            lGrapher = New clsGraphScatter(lDataGroup, lGraphForm.ZedGraphCtrl)
+            lGraphForm.Grapher = lGrapher
+
             With lGraphForm.Pane
                 With .XAxis
                     'TODO: figures out how to make whole title go below XAxis title
@@ -110,7 +114,10 @@ Module Graph
 
             lGraphForm.Dispose()
 
-            lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Probability)
+            lGraphForm = New atcGraph.atcGraphForm()
+            lGrapher = New clsGraphProbability(lDataGroup, lGraphForm.ZedGraphCtrl)
+            lGraphForm.Grapher = lGrapher
+
             SetGraphSpecs(lGraphForm)
             With lGraphForm.Pane
                 .YAxis.Title.Text = lCons & " (cfs)"
@@ -132,7 +139,9 @@ Module Graph
             lDataGroup.Add(SubsetByDate(lPrecTser, _
                                         lExpertSystem.SDateJ, _
                                         lExpertSystem.EDateJ, Nothing))
-            lGraphForm = New atcGraph.atcGraphForm(lDataGroup)
+            lGraphForm = New atcGraph.atcGraphForm()
+            lGrapher = New clsGraphTime(lDataGroup, lGraphForm.ZedGraphCtrl)
+            lGraphForm.Grapher = lGrapher
             With lGraphForm.Pane
                 .YAxis.Scale.Min = 0
                 .YAxis.Scale.Max = lYMax
@@ -191,9 +200,7 @@ Module Graph
                     .IsCommonScaleFactor = True
                 End With
                 Dim lPaneMain As GraphPane = lZgc.MasterPane.PaneList(0)
-                Dim lXAxisType As AxisType = AxisType.Linear
-                Dim lYAxisType As AxisType = AxisType.Linear
-                FormatPaneWithDefaults(lPaneMain, lXAxisType, lYAxisType)
+                FormatPaneWithDefaults(lPaneMain)
                 lPaneMain.Title.Text = "FTable for Reach " & lOperation.Id
                 lPaneMain.XAxis.Title.Text = "Depth (ft)"
                 lPaneMain.XAxis.MajorGrid.IsVisible = True

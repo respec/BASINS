@@ -115,7 +115,8 @@ Module HSPFOutputReports
                     lDataGroup.Add(SubsetByDate(lObsTSer, _
                                                 lExpertSystem.SDateJ, _
                                                 lExpertSystem.EDateJ, Nothing))
-                    Dim lGraphForm As New atcGraph.atcGraphForm(lDataGroup)
+                    Dim lGraphForm As New atcGraph.atcGraphForm()
+                    Dim lGrapher As New atcGraph.clsGraphTime(lDataGroup, lGraphForm.ZedGraphCtrl)
                     'lGraphForm.Size = lGraphForm.MaximumSize
                     lGraphForm.WindowState = Windows.Forms.FormWindowState.Maximized
                     With lGraphForm.Pane
