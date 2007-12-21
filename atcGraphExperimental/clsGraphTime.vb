@@ -21,21 +21,6 @@ Public Class clsGraphTime
             For Each lTimeseries As atcTimeseries In newValue
                 AddDatasetCurve(lTimeseries)
             Next
-            Dim lMin As Double = GetNaN()
-            Dim lMax As Double = GetNaN()
-            For Each lTimeseries As atcTimeseries In newValue
-                If lTimeseries.numValues > 0 Then
-                    If Double.IsNaN(lMin) OrElse lTimeseries.Attributes.GetValue("SJDay") < lMin Then
-                        lMin = lTimeseries.Attributes.GetValue("SJDay")
-                    End If
-                    If Double.IsNaN(lMax) OrElse lTimeseries.Attributes.GetValue("EJDay") > lMax Then
-                        lMax = lTimeseries.Attributes.GetValue("EJDay")
-                    End If
-                End If
-            Next
-            Dim lPane As GraphPane = MyBase.pZgc.MasterPane.PaneList(0)
-            If Not Double.IsNaN(lMin) Then lPane.XAxis.Scale.Min = lMin
-            If Not Double.IsNaN(lMax) Then lPane.XAxis.Scale.Max = lMax
             pZgc.Refresh()
         End Set
     End Property
