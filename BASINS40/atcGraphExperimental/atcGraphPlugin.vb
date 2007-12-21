@@ -42,13 +42,14 @@ Public Class atcGraphPlugin
             lChooseForm.lstChooseGraphs.Items.AddRange(pGraphTypeNames)
             lChooseForm.ShowDialog()
 
-            For Each lGraphTypeName As String In lChooseForm.lstChooseGraphs.SelectedItems
+            For Each lGraphTypeName As String In lChooseForm.lstChooseGraphs.CheckedItems
                 Dim lForm As New atcGraphForm()
                 Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lDataGroup, lForm.ZedGraphCtrl)
                 If lGrapher Is Nothing Then
                     lForm.Dispose()
                 Else
                     lForm.Grapher = lGrapher
+                    lForm.DataSets = lDataGroup
                     lForm.Show()
                 End If
             Next
