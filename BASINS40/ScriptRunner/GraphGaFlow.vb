@@ -21,6 +21,7 @@ Module GraphGaFlow
         Dim lCons As String = "Flow"
 
         Dim lGraphForm As atcGraph.atcGraphForm
+        Dim lGrapher As clsGraphBase
         ChDriveDir(CurDir() & "\outfiles")
         Dim lOutFileName As String
 
@@ -45,7 +46,8 @@ Module GraphGaFlow
         Dim lACoef As Double
         Dim lBCoef As Double
         Dim lRSquare As Double
-        lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Linear)
+        lGraphForm = New atcGraph.atcGraphForm()
+        lGrapher = New clsGraphScatter(lDataGroup, lGraphForm.ZedGraphCtrl)
         With lGraphForm.Pane
             With .XAxis
                 'TODO: figures out how to make whole title go below XAxis title
@@ -107,7 +109,8 @@ Module GraphGaFlow
 
         lGraphForm.Dispose()
 
-        lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Probability)
+        lGraphForm = New atcGraph.atcGraphForm()
+        lGrapher = New clsGraphProbability(lDataGroup, lGraphForm.ZedGraphCtrl)
         SetGraphSpecs(lGraphForm, "Buford", "Norcross")
         With lGraphForm.Pane
             .YAxis.Title.Text = lCons & " (cfs)"
@@ -123,7 +126,8 @@ Module GraphGaFlow
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
         lGraphForm.Dispose()
 
-        lGraphForm = New atcGraph.atcGraphForm(lDataGroup)
+        lGraphForm = New atcGraph.atcGraphForm()
+        lGrapher = New clsGraphTime(lDataGroup, lGraphForm.ZedGraphCtrl)
         With lGraphForm.Pane
             .YAxis.Scale.Min = 0
             .YAxis.Scale.Max = lYMax
