@@ -25,14 +25,9 @@ Public Class atcGraphForm
     Public AuxFraction As Single = 0.2
 
     'Graph editing form
-    Private WithEvents pEditor As ZedGraph.frmEdit 'frmGraphEdit
+    Private WithEvents pEditor As frmGraphEditor ' ZedGraph.frmEdit 'frmGraphEdit
 
-    'The group of atcData displayed
-    Private WithEvents pDataGroup As atcDataGroup
-    Private pNumProbabilityPoints As Integer = 200
-
-    Private pXAxisType As AxisType = AxisType.DateDual
-    Private pYAxisType As AxisType = AxisType.Linear
+    Private pGrapher As clsGraphBase
 
     Private Shared SaveImageExtension As String = ".png"
     Friend WithEvents mnuViewScatter As System.Windows.Forms.MenuItem
@@ -46,11 +41,35 @@ Public Class atcGraphForm
 
     Private WithEvents pZgc As New ZedGraphControl
 
+    Public Property Grapher() As clsGraphBase
+        Get
+            Return pGrapher
+        End Get
+        Set(ByVal newValue As clsGraphBase)
+            pGrapher = newValue
+        End Set
+    End Property
+
+    Public Property DataSets() As atcDataGroup
+        Get
+            Return pGrapher.pDataGroup
+        End Get
+        Set(ByVal newValue As atcDataGroup)
+            pGrapher.Datasets = newValue
+
+            Dim lGraphics As Graphics = Me.CreateGraphics()
+            pMaster.AxisChange(lGraphics)
+            Invalidate()
+            lGraphics.Dispose()
+            Me.Refresh()
+        End Set
+    End Property
+
     Private Sub InitMasterPane()
         InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
 
         pPaneMain = New GraphPane
-        FormatPaneWithDefaults(pPaneMain, pXAxisType, pYAxisType)
+        FormatPaneWithDefaults(pPaneMain)
 
         Me.Controls.Add(pZgc)
         With pZgc
@@ -74,10 +93,9 @@ Public Class atcGraphForm
 
         AuxAxisEnabled = False
 
-        SetDatasets(pDataGroup)
     End Sub
 
-    Private Property AuxAxisEnabled() As Boolean
+    Public Property AuxAxisEnabled() As Boolean
         Get
             Return pAuxEnabled
         End Get
@@ -95,7 +113,7 @@ Public Class atcGraphForm
                         .Margin.Bottom = 10
                     End With
                     pPaneAux = New ZedGraph.GraphPane
-                    FormatPaneWithDefaults(pPaneAux, pXAxisType, pYAxisType)
+                    FormatPaneWithDefaults(pPaneAux)
                     With pPaneAux
                         .Margin.All = 0
                         .Margin.Top = 10
@@ -131,85 +149,23 @@ Public Class atcGraphForm
         End Set
     End Property
 
-    Private Sub SetDatasets(ByVal aDataGroup As atcDataGroup)
-        Dim lGraphics As Graphics = Me.CreateGraphics()
-
-        If Not pPaneMain Is Nothing Then pPaneMain.CurveList.Clear()
-        If Not pPaneAux Is Nothing Then pPaneAux.CurveList.Clear()
-
-        If mnuViewScatter.Checked Then
-            AddDatasetsScatter(aDataGroup)
-        Else
-            For Each lTimeseries As atcTimeseries In aDataGroup
-                AddDatasetTimeseries(lTimeseries)
-            Next
-
-            If mnuViewTime.Checked Then
-                Dim lMin As Double = GetNaN()
-                Dim lMax As Double = GetNaN()
-                For Each lTimeseries As atcTimeseries In aDataGroup
-                    If lTimeseries.numValues > 0 Then
-                        If Double.IsNaN(lMin) OrElse lTimeseries.Attributes.GetValue("SJDay") < lMin Then
-                            lMin = lTimeseries.Attributes.GetValue("SJDay")
-                        End If
-                        If Double.IsNaN(lMax) OrElse lTimeseries.Attributes.GetValue("EJDay") > lMax Then
-                            lMax = lTimeseries.Attributes.GetValue("EJDay")
-                        End If
-                    End If
-                Next
-                If Not Double.IsNaN(lMin) Then Pane.XAxis.Scale.Min = lMin
-                If Not Double.IsNaN(lMax) Then Pane.XAxis.Scale.Max = lMax
-            End If
-        End If
-        pMaster.AxisChange(lGraphics)
-        Invalidate()
-        lGraphics.Dispose()
-        Me.Refresh()
-    End Sub
-
 #Region " Windows Form Designer generated code "
 
     <CLSCompliant(False)> _
-    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing, _
-                   Optional ByVal aXAxisType As ZedGraph.AxisType = AxisType.DateDual, _
-                   Optional ByVal aYAxisType As ZedGraph.AxisType = AxisType.Linear)
+    Public Sub New()
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
 
-        pXAxisType = aXAxisType
-        pYAxisType = aYAxisType
-
-        Select Case pXAxisType
-            Case AxisType.Probability
-                mnuViewProbability.Checked = True
-                mnuViewTime.Checked = False
-            Case AxisType.Date, AxisType.DateDual
-                mnuViewTime.Checked = True
-            Case AxisType.Linear
-                mnuViewScatter.Checked = True
-                mnuViewTime.Checked = False
-        End Select
-
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
 
-        Dim lTempDataGroup As atcDataGroup = aDataGroup
-        If aDataGroup Is Nothing Then lTempDataGroup = New atcDataGroup
+        InitMasterPane()
 
-        If lTempDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, lTempDataGroup, True)
-        End If
-
-        If lTempDataGroup.Count > 0 Then
-            pDataGroup = lTempDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
-            InitMasterPane()
-
-            Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-            For Each lDisp As atcDataDisplay In DisplayPlugins
-                Dim lMenuText As String = lDisp.Name
-                If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-                mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
-            Next
-        End If
+        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+        For Each lDisp As atcDataDisplay In DisplayPlugins
+            Dim lMenuText As String = lDisp.Name
+            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
+            mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
+        Next
     End Sub
 
     'Required by the Windows Form Designer
@@ -423,7 +379,7 @@ Public Class atcGraphForm
     End Property
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, DataSets, False)
     End Sub
 
     Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
@@ -514,14 +470,14 @@ Public Class atcGraphForm
         e.HasMorePages = False 'ends the print job
     End Sub
 
-    Private Sub pEditor_Apply(ByVal sender As Object, ByVal e As System.EventArgs) Handles pEditor.Apply
+    Private Sub pEditor_Apply() Handles pEditor.Apply
         pZgc.AxisChange()
         Invalidate()
         Me.Refresh()
     End Sub
 
     Private Sub mnuEditGraph_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditGraph.Click
-        pEditor = New ZedGraph.frmEdit
+        pEditor = New frmGraphEditor ' ZedGraph.frmEdit
         pEditor.Edit(Pane)
 
         'pEditor = New frmGraphEdit
@@ -529,299 +485,17 @@ Public Class atcGraphForm
         'pEditor.Show()
     End Sub
 
-    Private Sub AddDatasetsScatter(ByVal aDataGroup As atcDataGroup)
-        If aDataGroup.Count > 1 Then
-            Dim lTimeseriesX As atcTimeseries = aDataGroup.ItemByIndex(0)
-            Dim lTimeseriesY As atcTimeseries = aDataGroup.ItemByIndex(1)
-            With Pane.XAxis
-                pXAxisType = AxisType.Linear
-                .Type = pXAxisType
-                .Scale.Min = lTimeseriesX.Attributes.GetValue("Min", 0)
-                .Scale.Min = lTimeseriesX.Attributes.GetValue("Max", 1000)
-            End With
-
-            With Pane.YAxis
-                pYAxisType = AxisType.Linear
-                .Type = pYAxisType
-                .Scale.Min = lTimeseriesY.Attributes.GetValue("Min", 0)
-                .Scale.Min = lTimeseriesY.Attributes.GetValue("Max", 1000)
-            End With
-
-            With lTimeseriesY.Attributes
-                Dim lScen As String = .GetValue("scenario")
-                Dim lLoc As String = .GetValue("location")
-                Dim lCons As String = .GetValue("constituent")
-                Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
-                Dim lCurve As LineItem = Nothing
-                Dim lXValues() As Double = lTimeseriesX.Values
-                Dim lYValues() As Double = lTimeseriesY.Values
-                Dim lSymbol As SymbolType
-                Dim lNPts As Integer = lXValues.GetUpperBound(0)
-                If lNPts < 100 Then
-                    lSymbol = SymbolType.Star
-                Else
-                    lSymbol = SymbolType.Circle
-                End If
-                lCurve = Pane.AddCurve(TSCurveLabel(lTimeseriesY), lXValues, lYValues, lCurveColor, lSymbol)
-                If lNPts >= 1000 Then
-                    lCurve.Symbol.Size = 1
-                ElseIf lNPts >= 100 Then
-                    lCurve.Symbol.Size = 2
-                End If
-                lCurve.Line.IsVisible = False
-            End With
-        End If
-    End Sub
-
-    Public Sub AddDatasetTimeseries(ByVal aTimeseries As atcTimeseries)
-        If mnuViewProbability.Checked Then
-            AddToProbabilityGraph(aTimeseries)
-        ElseIf mnuViewTime.Checked Then
-            AddToTimeGraph(aTimeseries)
-        End If
-    End Sub
-
-    Private Sub AddToProbabilityGraph(ByVal aTimeseries As atcTimeseries)
-        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
-        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
-        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
-        Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
-        Dim lCurve As LineItem = Nothing
-        Dim lX(pNumProbabilityPoints) As Double
-        Dim lLastIndex As Integer = lX.GetUpperBound(0)
-        With Pane.XAxis
-            If .Type <> AxisType.Probability Then
-                '.Type = AxisType.Linear 'for debugging 
-                .Type = AxisType.Probability
-                With .MajorTic
-                    .IsInside = True
-                    .IsCrossInside = True
-                    .IsOutside = False
-                    .IsCrossOutside = False
-                End With
-                Dim lGraphics As Graphics = Me.CreateGraphics()
-                pMaster.AxisChange(lGraphics)
-                lGraphics.Dispose()
-            End If
-            For lXindex As Integer = 0 To lLastIndex
-                lX(lXindex) = 100 * .Scale.DeLinearize(lXindex / CDbl(lLastIndex))
-            Next
-        End With
-        Dim lProbScale As ZedGraph.ProbabilityScale = Pane.XAxis.Scale
-        Dim lAttributeName As String
-        Dim lIndex As Integer
-        Dim lXFracExceed() As Double
-        Dim lY() As Double
-
-        ReDim lY(lLastIndex)
-        'Dim lXSd() As Double
-        'ReDim lXSd(lLastIndex)
-        ReDim lXFracExceed(lLastIndex)
-
-        For lIndex = 0 To lLastIndex
-            'lXSd(lIndex) = Gausex(lX(lIndex) / 100)
-            lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
-            lAttributeName = "%" & Format(lX(lIndex), "00.####")
-            lY(lIndex) = aTimeseries.Attributes.GetValue(lAttributeName)
-            'Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
-            '                            " : " & lX(lIndex) & _
-            '                            " : " & lXFracExceed(lIndex))
-        Next
-        With Pane.XAxis
-            .Scale.Min = lXFracExceed(0)
-            .Scale.Max = lXFracExceed(lLastIndex)
-            'AddHandler .ScaleFormatEvent, AddressOf XScaleFormatEvent
-            .Scale.BaseTic = lXFracExceed(0)
-            .Title.Text = "Percent chance exceeded"
-        End With
-        With Pane.YAxis
-            .Type = AxisType.Log
-            .Scale.IsUseTenPower = False
-            If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                .Title.Text = aTimeseries.Attributes.GetValue("Units")
-                .Title.IsVisible = True
-            End If
-        End With
-
-        'Upper right corner of chart is better for this graph type
-        Pane.Legend.Location = New Location(0.95, 0.05, CoordType.ChartFraction, AlignH.Right, AlignV.Top)
-
-        lCurve = Pane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
-        lCurve.Line.Width = 1
-        lCurve.Line.StepType = StepType.NonStep
-        Me.Refresh()
-    End Sub
-
-    Private Sub AddToTimeGraph(ByVal aTimeseries As atcTimeseries)
-        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
-        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
-        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
-        Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
-
-        Dim lCurve As LineItem = Nothing
-        Dim lOldCons As String
-        Dim lOldCurve As LineItem
-        Dim lPane As GraphPane = pPaneMain
-        Dim lYAxis As Axis = pPaneMain.YAxis
-        Dim lYAxisName As String = aTimeseries.Attributes.GetValue("YAxis", "")
-        If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
-            'Use the same Y axis as existing curve with this constituent
-            Dim lFoundMatchingCons As Boolean = False
-            For Each lTs As atcTimeseries In pDataGroup
-                lOldCurve = pPaneMain.CurveList.Item(TSCurveLabel(lTs))
-                If Not lOldCurve Is Nothing Then
-                    lOldCons = lTs.Attributes.GetValue("constituent")
-                    If lOldCons = lCons Then
-                        If lOldCurve.IsY2Axis Then lYAxisName = "RIGHT" Else lYAxisName = "LEFT"
-                        lFoundMatchingCons = True
-                        Exit For
-                    End If
-                End If
-            Next
-            If Not lFoundMatchingCons AndAlso Pane.CurveList.Count > 0 Then
-                'Put new curve on right axis if we already have a non-matching curve
-                lYAxisName = "Right"
-            End If
-        End If
-        Select Case lYAxisName.ToUpper
-            Case "AUX"
-                AuxAxisEnabled = True
-                lPane = pPaneAux
-                lYAxis = pPaneAux.YAxis
-            Case "RIGHT"
-                lPane = pPaneMain
-                lYAxis = lPane.Y2Axis
-                With lPane.YAxis
-                    .MajorTic.IsOpposite = False
-                    .MinorTic.IsOpposite = False
-                End With
-                With lYAxis
-                    .MajorTic.IsOpposite = False
-                    .MinorTic.IsOpposite = False
-                End With
-        End Select
-
-        lYAxis.IsVisible = True
-
-        With lPane
-            If .XAxis.Type <> AxisType.DateDual Then .XAxis.Type = AxisType.DateDual
-            .XAxis.Title.Text = "" 'TODO: remove this when spacing works for title on date axis
-            If aTimeseries.Attributes.GetValue("point", False) Then
-                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
-                lCurve.Line.IsVisible = False
-            Else
-                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
-                lCurve.Line.Width = 1
-                lCurve.Line.StepType = StepType.RearwardStep
-            End If
-
-            If lYAxisName.ToUpper.Equals("RIGHT") Then
-                lCurve.IsY2Axis = True
-            End If
-
-            'Use units as Y axis title (if this data has units and Y axis title is not set)
-            If aTimeseries.Attributes.ContainsAttribute("Units") AndAlso _
-               (lYAxis.Title Is Nothing OrElse lYAxis.Title.Text Is Nothing OrElse lYAxis.Title.Text.Length = 0) Then
-                lYAxis.Title.Text = aTimeseries.Attributes.GetValue("Units")
-                lYAxis.Title.IsVisible = True
-            End If
-
-            Dim lSJDay As Double = aTimeseries.Attributes.GetValue("SJDay")
-            Dim lEJDay As Double = aTimeseries.Attributes.GetValue("EJDay")
-            If .CurveList.Count = 1 Then
-                If aTimeseries.numValues > 0 Then 'Set X axis to contain this date range
-                    .XAxis.Scale.Min = lSJDay
-                    .XAxis.Scale.Max = lEJDay
-                End If
-            ElseIf .CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
-                'Expand time scale if needed to include all dates in new curve
-                If aTimeseries.numValues > 0 Then
-                    If lSJDay < .XAxis.Scale.Min Then
-                        .XAxis.Scale.Min = lSJDay
-                    End If
-                    If lEJDay > .XAxis.Scale.Max Then
-                        .XAxis.Scale.Max = lEJDay
-                    End If
-                End If
-            End If
-        End With
-    End Sub
-
-    Private Function TSCurveLabel(ByVal aTimeseries As atcTimeseries) As String
-        With aTimeseries.Attributes
-            Return .GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
-        End With
-    End Function
-
-    Private Function Gausex(ByVal aExprob As Double) As Double
-        'GAUSSIAN PROBABILITY FUNCTIONS   W.KIRBY  JUNE 71
-        ' GAUSEX=VALUE EXCEEDED WITH PROB EXPROB
-        ' rev 8/96 by PRH for VB
-        ' rev 11/2006 by MHG for c#
-        ' rev 11/2007 by JLK for VB.NET
-        Static c0 As Double = 2.515517
-        Static c1 As Double = 0.802853
-        Static c2 As Double = 0.010328
-        Static d1 As Double = 1.432788
-        Static d2 As Double = 0.189269
-        Static d3 As Double = 0.001308
-        Static StandardDeviations As Integer = 3
-        Dim pr, rtmp, p, t, numerat, Denom As Double
-
-        Try
-            p = aExprob
-            If (p >= 1) Then
-                rtmp = -StandardDeviations 'set to minimum
-            ElseIf (p <= 0) Then
-                rtmp = StandardDeviations 'set at maximum
-            Else          'compute value
-                pr = p
-                If (p > 0.5) Then pr = 1 - pr
-                t = Math.Sqrt(-2 * Math.Log(pr))
-                numerat = (c0 + t * (c1 + t * c2))
-                Denom = (1 + t * (d1 + t * (d2 + t * d3)))
-                rtmp = t - numerat / Denom
-                If (p > 0.5) Then rtmp = -rtmp
-                If (rtmp > StandardDeviations) Then rtmp = StandardDeviations
-                If (rtmp < -StandardDeviations) Then rtmp = -StandardDeviations
-                Return rtmp
-            End If
-        Catch e As Exception
-            Return 0
-        End Try
-    End Function
-
-    Private Sub pTimeseriesGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
-        For Each ts As atcTimeseries In aAdded
-            AddDatasetTimeseries(ts)
-        Next
-        pZgc.AxisChange()
-        Invalidate()
-        Me.Refresh()
-    End Sub
-
-    Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
-        For Each lTs As atcTimeseries In aRemoved
-            Pane.CurveList.Remove(Pane.CurveList.Item(TSCurveLabel(lTs)))
-        Next
-        pZgc.AxisChange()
-        Invalidate()
-        Me.Refresh()
-    End Sub
-
     Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, DataSets)
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        'If Not pEditor Is Nothing Then
-        '    pEditor.Close()
-        '    pEditor = Nothing
-        'End If
+        If Not pEditor Is Nothing Then
+            pEditor.Close()
+            pEditor = Nothing
+        End If
         pMaster = Nothing
-        pDataGroup = Nothing
+        pGrapher = Nothing
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
@@ -833,26 +507,26 @@ Public Class atcGraphForm
         If Not Not mnuCoordinatesOnMenuBar.Checked Then mnuCoordinates.Text = "Coordinates"
     End Sub
 
-    Private Sub mnuViewTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewTime.Click
-        mnuViewTime.Checked = True
-        mnuViewProbability.Checked = False
-        mnuViewScatter.Checked = False
-        SetDatasets(pDataGroup)
-    End Sub
+    'Private Sub mnuViewTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewTime.Click
+    '    mnuViewTime.Checked = True
+    '    mnuViewProbability.Checked = False
+    '    mnuViewScatter.Checked = False
+    '    SetDatasets(pDataGroup)
+    'End Sub
 
-    Private Sub mnuViewProbability_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewProbability.Click
-        mnuViewProbability.Checked = True
-        mnuViewTime.Checked = False
-        mnuViewScatter.Checked = False
-        SetDatasets(pDataGroup)
-    End Sub
+    'Private Sub mnuViewProbability_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewProbability.Click
+    '    mnuViewProbability.Checked = True
+    '    mnuViewTime.Checked = False
+    '    mnuViewScatter.Checked = False
+    '    SetDatasets(pDataGroup)
+    'End Sub
 
-    Private Sub mnuViewScatter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewScatter.Click
-        mnuViewScatter.Checked = True
-        mnuViewTime.Checked = False
-        mnuViewProbability.Checked = False
-        SetDatasets(pDataGroup)
-    End Sub
+    'Private Sub mnuViewScatter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewScatter.Click
+    '    mnuViewScatter.Checked = True
+    '    mnuViewTime.Checked = False
+    '    mnuViewProbability.Checked = False
+    '    SetDatasets(pDataGroup)
+    'End Sub
 
     Private Sub mnuViewHorizontalZoom_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewHorizontalZoom.Click
         mnuViewHorizontalZoom.Checked = Not mnuViewHorizontalZoom.Checked
