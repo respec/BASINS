@@ -470,7 +470,8 @@ Module modModelSetup
     Friend Sub WriteRCHFile(ByVal aRchFileName As String, ByVal aUniqueSubids As Collection, ByVal aSubbasinLayerIndex As Integer, _
                             ByVal aStreamsIndex As Integer, ByVal aStreamsRIndex As Integer, ByVal aLen2Index As Integer, _
                             ByVal aSlo2Index As Integer, ByVal aWid2Index As Integer, ByVal aDep2Index As Integer, _
-                            ByVal aMinelIndex As Integer, ByVal aMaxelIndex As Integer, ByVal aSnameIndex As Integer)
+                            ByVal aMinelIndex As Integer, ByVal aMaxelIndex As Integer, ByVal aSnameIndex As Integer, _
+                            ByVal aModelSegementIds As Collection)
 
         Dim OutFile As Integer, OutFile2 As Integer
         Dim PtfFileName As String
@@ -486,7 +487,7 @@ Module modModelSetup
                   "Mnflow", "Mnvelo", "Svtnflow", "Svtnvelo", "Pslope", _
                   "Pdepth", "Pwidth", "Pmile", "Ptemp", "Pph", "Pk1", _
                   "Pk2", "Pk3", "Pmann", "Psod", "Pbgdo", _
-                  "Pbgnh3", "Pbgbod5", "Pbgbod", "Level")
+                  "Pbgnh3", "Pbgbod5", "Pbgbod", "Level", "ModelSeg")
 
         OutFile2 = FreeFile()
         PtfFileName = Mid(aRchFileName, 1, Len(aRchFileName) - 3) & "ptf"
@@ -550,7 +551,7 @@ Module modModelSetup
                            " 0 1 0 S " & Format(cLENGTH, "0.00") & " " & Format(Math.Abs(cMAXEL - cMINEL), "0.00") & " " & _
                            Format(cELEV, "0.") & " 0 0 " & cDOWN & " 0 0 0 0 0 " & _
                            Format(cSLOPE, "0.000000") & " " & Format(cDEPTH, "0.0000") & " " & Format(cWIDTH, "0.000") & _
-                           " 0 0 0 0 0 0 0 0 0 0 0 0 0")
+                           " 0 0 0 0 0 0 0 0 0 0 0 0 0 " & aModelSegementIds(j))
                     PrintLine(OutFile2, aUniqueSubids(j) & " " & Format(cLENGTH * 5280.0#, "0.") & " " & _
                            Format(cDEPTH, "0.00000") & " " & Format(cWIDTH, "0.00000") & " 0.05 " & _
                            Format(cSLOPE, "0.00000") & " " & "Trapezoidal" & " " & _
@@ -850,7 +851,7 @@ Module modModelSetup
         FileClose(OutFile)
     End Sub
 
-    Friend Sub WriteSEGFile(ByVal aSegFileName As String, ByVal aMetIndices As Collection, ByVal aMetBaseDsns As atcCollection)
+    Friend Sub WriteSEGFile(ByVal aSegFileName As String, ByVal aMetSegIds As atcCollection, ByVal aMetIndices As atcCollection, ByVal aMetBaseDsns As atcCollection)
 
         Dim lOutFile As Integer = FreeFile()
         FileOpen(lOutFile, aSegFileName, OpenMode.Output)
@@ -863,15 +864,15 @@ Module modModelSetup
                                      "ClouWdmId", "ClouDsn", "ClouTstype", "ClouMFactPI", "ClouMFactR", _
                                      "PevtWdmId", "PevtDsn", "PevtTstype", "PevtMFactPI", "PevtMFactR")
 
-        For Each lIndex As Integer In aMetIndices
-            Dim lBaseDsn As Integer = aMetBaseDsns(lIndex)
-            PrintLine(lOutFile, CStr(lIndex + 1) & " WDM2 " & CStr(lBaseDsn) & " PREC 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 2) & " ATEM 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 6) & " DEWP 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 3) & " WIND 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 4) & " SOLR 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 7) & " CLOU 0 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 5) & " PEVT 1 1")
+        For lIndex As Integer = 0 To aMetIndices.Count - 1
+            Dim lBaseDsn As Integer = aMetBaseDsns(aMetIndices(lIndex))
+            PrintLine(lOutFile, CStr(aMetSegIds(lIndex)) & " WDM2 " & CStr(lBaseDsn) & " PREC 1 1" & _
+                                                           " WDM2 " & CStr(lBaseDsn + 2) & " ATEM 1 1" & _
+                                                           " WDM2 " & CStr(lBaseDsn + 6) & " DEWP 1 1" & _
+                                                           " WDM2 " & CStr(lBaseDsn + 3) & " WIND 1 1" & _
+                                                           " WDM2 " & CStr(lBaseDsn + 4) & " SOLR 1 1" & _
+                                                           " WDM2 " & CStr(lBaseDsn + 7) & " CLOU 0 1" & _
+                                                           " WDM2 " & CStr(lBaseDsn + 5) & " PEVT 1 1")
         Next
 
         FileClose(lOutFile)

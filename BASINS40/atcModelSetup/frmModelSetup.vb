@@ -12,7 +12,10 @@ Public Class frmModelSetup
     Friend WithEvents lstMet As System.Windows.Forms.ListBox
     Friend pMetStations As atcCollection
     Friend WithEvents AtcGridMet As atcControls.atcGrid
+    Friend WithEvents Label22 As System.Windows.Forms.Label
     Friend pMetBaseDsns As atcCollection
+    Friend pUniqueModelSegmentIds As atcCollection
+    Friend pUniqueModelSegmentNames As atcCollection
 
 #Region " Windows Form Designer generated code "
 
@@ -173,6 +176,7 @@ Public Class frmModelSetup
         Me.cboYear = New System.Windows.Forms.ComboBox
         Me.Label6 = New System.Windows.Forms.Label
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.Label22 = New System.Windows.Forms.Label
         Me.AtcGridMet = New atcControls.atcGrid
         Me.lstMet = New System.Windows.Forms.ListBox
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
@@ -809,6 +813,7 @@ Public Class frmModelSetup
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.Label22)
         Me.TabPage6.Controls.Add(Me.AtcGridMet)
         Me.TabPage6.Controls.Add(Me.lstMet)
         Me.TabPage6.Controls.Add(Me.GroupBox2)
@@ -816,8 +821,18 @@ Public Class frmModelSetup
         Me.TabPage6.Name = "TabPage6"
         Me.TabPage6.Size = New System.Drawing.Size(519, 355)
         Me.TabPage6.TabIndex = 5
-        Me.TabPage6.Text = "Met Segments"
+        Me.TabPage6.Text = "Met Stations"
         Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'Label22
+        '
+        Me.Label22.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label22.AutoSize = True
+        Me.Label22.Location = New System.Drawing.Point(370, 328)
+        Me.Label22.Name = "Label22"
+        Me.Label22.Size = New System.Drawing.Size(125, 17)
+        Me.Label22.TabIndex = 20
+        Me.Label22.Text = "* Full Set Available"
         '
         'AtcGridMet
         '
@@ -830,9 +845,9 @@ Public Class frmModelSetup
         Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
         Me.AtcGridMet.LineWidth = 0.0!
-        Me.AtcGridMet.Location = New System.Drawing.Point(21, 187)
+        Me.AtcGridMet.Location = New System.Drawing.Point(21, 97)
         Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(474, 149)
+        Me.AtcGridMet.Size = New System.Drawing.Size(474, 221)
         Me.AtcGridMet.Source = Nothing
         Me.AtcGridMet.TabIndex = 19
         '
@@ -845,7 +860,7 @@ Public Class frmModelSetup
         Me.lstMet.ItemHeight = 16
         Me.lstMet.Location = New System.Drawing.Point(21, 97)
         Me.lstMet.Name = "lstMet"
-        Me.lstMet.Size = New System.Drawing.Size(474, 84)
+        Me.lstMet.Size = New System.Drawing.Size(474, 228)
         Me.lstMet.TabIndex = 1
         '
         'GroupBox2
@@ -1009,6 +1024,7 @@ Public Class frmModelSetup
         Me.TabPage5.ResumeLayout(False)
         Me.TabPage5.PerformLayout()
         Me.TabPage6.ResumeLayout(False)
+        Me.TabPage6.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
@@ -1455,57 +1471,66 @@ Public Class frmModelSetup
         Dim lSubbasinsFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
         Dim lSubbasinsFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinsLayerIndex, lSubbasinsFieldName)
 
-        Dim lUniqueModelSegments As New atcCollection
+        pUniqueModelSegmentNames = New atcCollection
+        pUniqueModelSegmentIds = New atcCollection
+        Dim lUniqueModelSegmentIntegerIds As New atcCollection
         If cboSub3.SelectedIndex > 0 Then
             'see if we have some model segments in the subbasin dbf
             Dim lModelSegmentFieldName As String = cboSub3.Items(cboSub3.SelectedIndex)
             Dim lModelSegmentFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinsLayerIndex, lModelSegmentFieldName)
+            Dim lIsInteger As Boolean = True
             For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinsLayerIndex)
                 Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinsLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
-                If lUniqueModelSegments.IndexFromKey(lModelSegment) = -1 Then
-                    lUniqueModelSegments.Add(lModelSegment)
+                If pUniqueModelSegmentNames.IndexFromKey(lModelSegment) = -1 Then
+                    pUniqueModelSegmentNames.Add(lModelSegment)
+                    lUniqueModelSegmentIntegerIds.Add(lUniqueModelSegmentIntegerIds.Count + 1)
+                    If IsInteger(lModelSegment) Then
+                        If Int(lModelSegment) > 0 Then
+                            pUniqueModelSegmentIds.Add(lModelSegment)   'can use this as the integer model segment id
+                        Else
+                            lIsInteger = False
+                        End If
+                    Else
+                        lIsInteger = False
+                    End If
                 End If
             Next
+            If Not lIsInteger Then
+                'one or more segment names are not valid integers
+                pUniqueModelSegmentIds = lUniqueModelSegmentIntegerIds
+            End If
         End If
 
-        AtcGridMet.Clear()
-        With AtcGridMet.Source
-            .Columns = 2
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            If lUniqueModelSegments.Count > 0 Then
-                .Rows = 1 + lUniqueModelSegments.Count
+        If pUniqueModelSegmentIds.Count = 0 Then
+            lstMet.Visible = True
+            AtcGridMet.Visible = False
+        Else
+            lstMet.Visible = False
+            AtcGridMet.Visible = True
+            AtcGridMet.Clear()
+            With AtcGridMet.Source
+                .Columns = 2
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellColor(0, 0) = SystemColors.ControlDark
+                .CellColor(0, 1) = SystemColors.ControlDark
+                .Rows = 1 + pUniqueModelSegmentNames.Count
                 .CellValue(0, 0) = "Model Segment"
                 .CellValue(0, 1) = "Met Station"
-                For lIndex As Integer = 1 To lUniqueModelSegments.Count
-                    .CellValue(lIndex, 0) = lUniqueModelSegments(lIndex - 1)
+                For lIndex As Integer = 1 To pUniqueModelSegmentNames.Count
+                    .CellValue(lIndex, 0) = pUniqueModelSegmentNames(lIndex - 1)
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     If pMetStations.Count > 0 Then
                         .CellValue(lIndex, 1) = pMetStations(0)
                         .CellEditable(lIndex, 1) = True
                     End If
                 Next
-            Else
-                .Rows = 1 + GisUtil.NumFeatures(lSubbasinsLayerIndex)
-                .CellValue(0, 0) = "Subbasin"
-                .CellValue(0, 1) = "Met Station"
-                For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinsLayerIndex)
-                    .CellValue(lIndex, 0) = GisUtil.FieldValue(lSubbasinsLayerIndex, lIndex - 1, lSubbasinsFieldIndex)
-                    .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    If pMetStations.Count > 0 Then
-                        .CellValue(lIndex, 1) = pMetStations(0)
-                        .CellEditable(lIndex, 1) = True
-                    End If
-                Next
-            End If
-        End With
-
-        AtcGridMet.ValidValues = pMetStations
-        AtcGridMet.SizeAllColumnsToContents()
-        AtcGridMet.Refresh()
+            End With
+            AtcGridMet.ValidValues = pMetStations
+            AtcGridMet.SizeAllColumnsToContents()
+            AtcGridMet.Refresh()
+        End If
 
     End Sub
 
@@ -1901,6 +1926,7 @@ Public Class frmModelSetup
 
         'build collection of unique subbasin ids
         Dim cUniqueSubids As New Collection
+        Dim lModelSegmentIds As New Collection
         For i = 1 To cSubid.Count
             incollection = False
             For j = 1 To cUniqueSubids.Count
@@ -1911,6 +1937,29 @@ Public Class frmModelSetup
             Next j
             If Not incollection Then
                 cUniqueSubids.Add(cSubid(i))
+
+                'store a corresponding model segment id
+                If pUniqueModelSegmentIds.Count = 0 Then
+                    'by default use 1 as the model segment id
+                    lModelSegmentIds.Add(1)
+                Else
+                    'for this subbasin, find the corresponding model segment id
+                    If cboSub3.SelectedIndex > 0 Then
+                        'see if we have some model segments in the subbasin dbf
+                        Dim lModelSegmentFieldName As String = cboSub3.Items(cboSub3.SelectedIndex)
+                        Dim lModelSegmentFieldIndex As Integer = GisUtil.FieldIndex(SubbasinLayerIndex, lModelSegmentFieldName)
+                        'Dim lIsInteger As Boolean = True
+                        For lIndex As Integer = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+                            Dim lSubid As String = GisUtil.FieldValue(SubbasinLayerIndex, lIndex - 1, SubbasinFieldIndex)
+                            Dim lModelSegment As String = GisUtil.FieldValue(SubbasinLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
+                            If cSubid(i) = lSubid Then
+                                'found a match
+                                lModelSegmentIds.Add(pUniqueModelSegmentIds(pUniqueModelSegmentNames.IndexFromKey(lModelSegment)))
+                                Exit For
+                            End If
+                        Next
+                    End If
+                End If
             End If
         Next i
 
@@ -1938,7 +1987,7 @@ Public Class frmModelSetup
         Dim MaxelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
         Dim SnameIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
         WriteRCHFile(BaseFileName & ".rch", cUniqueSubids, LayerIndex, StreamsIndex, StreamsRIndex, Len2Index, _
-                     Slo2Index, Wid2Index, Dep2Index, MinelIndex, MaxelIndex, SnameIndex)
+                     Slo2Index, Wid2Index, Dep2Index, MinelIndex, MaxelIndex, SnameIndex, lModelSegmentIds)
 
         'write psr file
         lblStatus.Text = "Writing PSR file"
@@ -1952,11 +2001,20 @@ Public Class frmModelSetup
         'write seg file
         lblStatus.Text = "Writing SEG file"
         Me.Refresh()
-        Dim lMetIndices As New Collection
-        For Each lIndex As Integer In lstMet.SelectedIndices
-            lMetIndices.Add(lIndex)
-        Next
-        WriteSEGFile(BaseFileName & ".seg", lMetIndices, pMetBaseDsns)
+        Dim lMetIndices As New atcCollection
+        Dim lUniqueModelSegmentIds As New atcCollection
+        If pUniqueModelSegmentIds.Count = 0 Then
+            'use a single met station
+            lMetIndices.Add(lstMet.SelectedIndex)
+            lUniqueModelSegmentIds.Add(1)
+        Else
+            'use the specified segmentation scheme
+            For lRow As Integer = 1 To AtcGridMet.Source.Rows - 1
+                lMetIndices.Add(pMetStations.IndexFromKey(AtcGridMet.Source.CellValue(lRow, 1)))
+            Next
+            lUniqueModelSegmentIds = pUniqueModelSegmentIds
+        End If
+        WriteSEGFile(BaseFileName & ".seg", lUniqueModelSegmentIds, lMetIndices, pMetBaseDsns)
 
         'write map file
         lblStatus.Text = "Writing MAP file"
@@ -2017,6 +2075,8 @@ ErrHand:
         'get the id of the selected stream
         Dim cUniqueStreamIds As New Collection
         cUniqueStreamIds.Add(GisUtil.FieldValue(StreamsLayerIndex, cSelectedStreams(1), StreamsFieldIndex))
+        Dim lModelSegmentIds As New Collection
+        lModelSegmentIds.Add(1)
 
         'make output folder
         MkDirPath(OutputPath)
@@ -2036,7 +2096,7 @@ ErrHand:
         Dim MaxelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
         Dim SnameIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
         WriteRCHFile(BaseFileName & ".rch", cUniqueStreamIds, LayerIndex, StreamsIndex, StreamsRIndex, Len2Index, _
-                     Slo2Index, Wid2Index, Dep2Index, MinelIndex, MaxelIndex, SnameIndex)
+                     Slo2Index, Wid2Index, Dep2Index, MinelIndex, MaxelIndex, SnameIndex, lModelSegmentIds)
 
         'write psr file
         lblStatus.Text = "Writing PSR file"
@@ -2102,6 +2162,14 @@ ErrHand:
                 End If
             End If
 
+            If pMetStations.Count = 0 Then
+                'cannot proceed if there are no met stations, need to specify a met wdm
+                MsgBox("No met stations are available.  Use the 'Met Stations' tab to specify a WDM file with valid met stations.", vbOKOnly, "BASINS HSPF Problem")
+                EnableControls(True)
+                PreProcessChecking = False
+                Exit Function
+            End If
+
             'see if these files already exist
             wsdFileName = OutputPath & "\" & BaseOutputName & ".wsd"
             If Len(Dir(wsdFileName)) > 0 Then
@@ -2153,6 +2221,7 @@ ErrHand:
             Label2.Visible = False
             Label3.Visible = False
             Label5.Visible = False
+            Label9.Visible = False
             cboLanduse.Visible = False
             cboSubbasins.Visible = False
             cboOutlets.Visible = False
