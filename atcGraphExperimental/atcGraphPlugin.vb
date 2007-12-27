@@ -49,7 +49,7 @@ Public Class atcGraphPlugin
                     lForm.Dispose()
                 Else
                     lForm.Grapher = lGrapher
-                    lForm.DataSets = lDataGroup
+                    lForm.DataSets = lGrapher.Datasets
                     lForm.Show()
                 End If
             Next
@@ -57,15 +57,65 @@ Public Class atcGraphPlugin
     End Function
 
     <CLSCompliant(False)> _
-    Public Function GetGraphType(ByVal aGraphTypeName As String, ByVal aDataGroup As atcDataGroup, ByVal aZedGraphCtrl As ZedGraph.ZedGraphControl) As clsGraphBase
+    Public Function GetGraphType(ByVal aGraphTypeName As String, _
+                                 ByVal aDataGroup As atcDataGroup, _
+                                 ByVal aZedGraphCtrl As ZedGraph.ZedGraphControl) As clsGraphBase
         Dim lIndex As Integer = Array.IndexOf(pGraphTypeNames, aGraphTypeName)
         Select Case lIndex
             Case -1 : Throw New ApplicationException("Unknown graph type requested: " & aGraphTypeName)
-            Case 0 : Return New clsGraphTime(aDataGroup, aZedGraphCtrl)
-            Case 1 'Residual (TS2 - TS1)
+            Case 0 'timeseries
+                Return New clsGraphTime(aDataGroup, aZedGraphCtrl)
+            Case 1 'Residual
+                If aDataGroup.Count = 2 Then
+                    Dim lArgsMath As New atcDataAttributes
+                    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+                    lTsMath.DataSets.Clear()
+                    lArgsMath.Clear()
+                    lArgsMath.SetValue("timeseries", aDataGroup)
+                    lArgsMath.SetValue("number", Double.NaN)  'TODO: kludge, find a better way!
+                    If lTsMath.Open("subtract", lArgsMath) Then
+                        Dim lGraphTime As New clsGraphTime(lTsMath.DataSets, aZedGraphCtrl)
+                        lGraphTime.ZedGraphCtrl.MasterPane(0).CurveList(0).Label.Text = "Residual"
+                        Return lGraphTime
+                    Else
+                        Logger.Msg("ResidualGraph Calculation Failed")
+                    End If
+                Else
+                    Logger.Msg("ResidualGraph requires 2 timeseries, " & aDataGroup.Count & " specified")
+                End If
             Case 2 'Cumulative Difference
-            Case 3 : Return New clsGraphProbability(aDataGroup, aZedGraphCtrl)
-            Case 4 : Return New clsGraphScatter(aDataGroup, aZedGraphCtrl)
+                If aDataGroup.Count = 2 Then
+                    Dim lArgsMath As New atcDataAttributes
+                    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+                    lTsMath.DataSets.Clear()
+                    lArgsMath.Clear()
+                    lArgsMath.SetValue("timeseries", aDataGroup)
+                    lArgsMath.SetValue("number", Double.NaN)  'TODO: kludge, find a better way!
+                    If lTsMath.Open("subtract", lArgsMath) Then
+                        lArgsMath.Clear()
+                        lArgsMath.SetValue("timeseries", lTsMath.DataSets)
+                        Dim lTsRunSum As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+                        If lTsRunSum.Open("running sum", lArgsMath) Then
+                            Dim lGraphTime As New clsGraphTime(lTsRunSum.DataSets, aZedGraphCtrl)
+                            lGraphTime.ZedGraphCtrl.MasterPane(0).CurveList(0).Label.Text = "Cummulative Difference"
+                            Return lGraphTime
+                        Else
+                            Logger.Msg("CumulativeDifferenceGraph Accumulation Calculation Failed")
+                        End If
+                    Else
+                        Logger.Msg("CumulativeDifferenceGraph Difference Calculation Failed")
+                    End If
+                Else
+                    Logger.Msg("Cumulative Difference requires 2 timeseries, " & aDataGroup.Count & " specified")
+                End If
+            Case 3 'Flow Duration
+                Return New clsGraphProbability(aDataGroup, aZedGraphCtrl)
+            Case 4 'Scatter
+                    If aDataGroup.Count = 2 Then
+                        Return New clsGraphScatter(aDataGroup, aZedGraphCtrl)
+                    Else
+                        Logger.Msg("ScatterGraph requires 2 timeseries, " & aDataGroup.Count & " specified")
+                    End If
         End Select
         Throw New ApplicationException("Unable to create graph: " & aGraphTypeName)
     End Function
