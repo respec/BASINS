@@ -216,6 +216,8 @@ Module Graph
                                 Case 1 : lY(lRow) = .Outflow1(lRow)
                                 Case 2 : lY(lRow) = .Outflow2(lRow)
                                 Case 3 : lY(lRow) = .Outflow3(lRow)
+                                Case 4 : lY(lRow) = .Outflow4(lRow)
+                                Case 5 : lY(lRow) = .Outflow5(lRow)
                             End Select
                         End With
                     Next

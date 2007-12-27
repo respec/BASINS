@@ -24,9 +24,7 @@ Public Class atcTimeseriesMath
 
     Public Overrides ReadOnly Property Description() As String
         Get
-
             Return Name
-
             'Dim retval As String = Name & " ("
 
             'For Each def As atcDataSet In AvailableOperations
@@ -158,15 +156,18 @@ Public Class atcTimeseriesMath
                 AddOperation("Subset by date boundary", "Choose boundary month and day", "Date", defTimeSeriesOne, defBoundaryMonth, defBoundaryDay)
 
                 AddOperation("Merge", "Choose data to merge", "Date", defTimeSeriesGroup)
+
+                AddOperation("Running Sum", "Accumulate Values", "Math", defTimeSeriesOne)
+
             End If
             Return pAvailableOperations
         End Get
     End Property
 
     Private Sub AddOperation(ByVal aName As String, _
-                                ByVal aDescription As String, _
-                                ByVal aCategory As String, _
-                                ByVal ParamArray aArgs() As atcAttributeDefinition)
+                             ByVal aDescription As String, _
+                             ByVal aCategory As String, _
+                             ByVal ParamArray aArgs() As atcAttributeDefinition)
         Dim lResult As New atcAttributeDefinition
         With lResult
             .Name = aName
@@ -186,27 +187,9 @@ Public Class atcTimeseriesMath
     End Sub
 
     'Args are each usually either Double or atcTimeseries
-    Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-        Dim newDataSource As New atcDataSource
-        newDataSource.Specification = "Computed by " & pName
-        Dim newVals() As Double
-        'Dim retval As New atcTimeseries(newDataSource)
-        Dim iTS As Integer
-        Dim curTS As atcTimeseries = Nothing
-        Dim firstTS As atcTimeseries
-        Dim needToAsk As Boolean = False
-        'Dim lSelectedOperation As atcDataSet
-        Dim lNewTS As atcTimeseries
-        Dim lNumber As Double
-        Dim lHaveNumber As Boolean = False
-        Dim nArgs As Integer = 0
-        Dim lastValueIndex As Integer = -1
-        Dim iValue As Integer
-        Dim lTSgroup As atcDataGroup
-
-        ReDim newVals(-1) ' If this gets populated, it will be turned into an atcTimeseries at the end
-
-        DataSets.Clear() 'assume we don't want any old datasets (maybe add arg to define this???)
+    Public Overrides Function Open(ByVal aOperationName As String, _
+                          Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
+        Me.DataSets.Clear() 'assume we don't want any old datasets (maybe add arg to define this???)
 
         If aOperationName Is Nothing OrElse aOperationName.Length = 0 Then
             'TODO: ask user which operation to perform
@@ -214,10 +197,11 @@ Public Class atcTimeseriesMath
         End If
         Specification = aOperationName
 
+        Dim lNeedToAsk As Boolean = False
         Dim lOperation As atcDefinedValue = AvailableOperations.GetDefinedValue(aOperationName)
         If Not lOperation Is Nothing Then
             If aArgs Is Nothing Then
-                needToAsk = True
+                lNeedToAsk = True
                 aArgs = lOperation.Arguments.Clone
             Else
                 For Each lArg As atcDefinedValue In aArgs
@@ -229,168 +213,186 @@ Public Class atcTimeseriesMath
 
         For Each lArg As atcDefinedValue In aArgs
             If lArg.Value Is Nothing Then
-                needToAsk = True
+                lNeedToAsk = True
             ElseIf lArg.Definition.Name = "Timeseries" AndAlso lArg.GetType.Name = "atcDataGroup" AndAlso lArg.Value.Count < 1 Then
-                needToAsk = True
+                lNeedToAsk = True
             End If
         Next
 
-        If needToAsk Then
-            'Ask user what to do
+        If lNeedToAsk Then 'Ask user what to do
             Dim lSpecify As New frmSpecifyComputation
             If Not lSpecify.AskUser(aArgs) Then
                 Return False 'User cancelled
             End If
         End If
 
+        Dim lArgCount As Integer = 0
+
+        Dim lNumber As Double = Double.NaN
+        Dim lHaveNumber As Boolean = False
         If aArgs.ContainsAttribute("Number") AndAlso Not aArgs.GetValue("Number") Is Nothing Then
-            lHaveNumber = True
-            nArgs += 1
-            lNumber = CDbl(aArgs.GetValue("Number", 0))
-            Specification &= " " & lNumber
+            Dim lValue As Double = aArgs.GetValue("Number")
+            If Not Double.IsNaN(lValue) Then
+                lHaveNumber = True
+                lArgCount += 1
+                lNumber = CDbl(aArgs.GetValue("Number", 0))
+                Specification &= " " & lNumber
+            End If
         End If
 
+        Dim lTSgroup As atcDataGroup
         lTSgroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries", Nothing))
         If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
             Err.Raise(vbObjectError + 512, Me, aOperationName & " did not get a Timeseries argument")
         End If
 
-        firstTS = lTSgroup.Item(0)
+        Dim lTSFirst As atcTimeseries = lTSgroup.Item(0)
+        Dim lTSOriginal As atcTimeseries = Nothing
         If lTSgroup.Count > 1 Then
-            curTS = lTSgroup.Item(1) 'default the current ts to the one after the first
+            lTSOriginal = lTSgroup.Item(1) 'default the current ts to the one after the first
         End If
 
-        lastValueIndex = firstTS.numValues
-        ReDim newVals(lastValueIndex)
-        Array.Copy(firstTS.Values, newVals, lastValueIndex + 1) 'copy values from firstTS
-        nArgs += lTSgroup.Count
+        Dim lValueIndex As Integer
+        Dim lValueIndexLast As Integer = lTSFirst.numValues
+        Dim lNewVals() As Double ' If this gets populated, it will be turned into an atcTimeseries at the end
+        ReDim lNewVals(lValueIndexLast)
+        Array.Copy(lTSFirst.Values, lNewVals, lValueIndexLast + 1) 'copy values from firstTS
+        lArgCount += lTSgroup.Count
 
         'TODO: check here for number of arguments instead of in each case?
 
+        Dim lTSIndex As Integer
         Select Case aOperationName.ToLower
             Case "add", "+"
-                For iValue = 0 To lastValueIndex
-                    If lHaveNumber Then newVals(iValue) += lNumber
-                    For iTS = 1 To lTSgroup.Count - 1
-                        curTS = lTSgroup.Item(iTS)
-                        newVals(iValue) += curTS.Value(iValue)
+                For lValueIndex = 0 To lValueIndexLast
+                    If lHaveNumber Then lNewVals(lValueIndex) += lNumber
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
+                        lNewVals(lValueIndex) += lTSOriginal.Value(lValueIndex)
                     Next
                 Next
 
             Case "subtract", "-"
-                If nArgs <> 2 Then
-                    Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & nArgs)
+                If lArgCount <> 2 Then
+                    Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & lArgCount)
                 ElseIf lHaveNumber Then
-                    For iValue = 0 To lastValueIndex
-                        newVals(iValue) -= lNumber
+                    For lValueIndex = 0 To lValueIndexLast
+                        lNewVals(lValueIndex) -= lNumber
                     Next
-                ElseIf curTS Is Nothing Then
+                ElseIf lTSOriginal Is Nothing Then
                     Err.Raise(vbObjectError + 512, Me, aOperationName & " no current Timeseries")
                 Else
-                    For iValue = 0 To lastValueIndex
-                        newVals(iValue) -= curTS.Value(iValue)
+                    For lValueIndex = 0 To lValueIndexLast
+                        lNewVals(lValueIndex) -= lTSOriginal.Value(lValueIndex)
                     Next
                 End If
 
             Case "multiply", "*"
-                For iValue = 0 To lastValueIndex
-                    If lHaveNumber Then newVals(iValue) *= lNumber
-                    For iTS = 1 To lTSgroup.Count - 1
-                        curTS = lTSgroup.Item(iTS)
-                        newVals(iValue) *= curTS.Value(iValue)
+                For lValueIndex = 0 To lValueIndexLast
+                    If lHaveNumber Then lNewVals(lValueIndex) *= lNumber
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
+                        lNewVals(lValueIndex) *= lTSOriginal.Value(lValueIndex)
                     Next
                 Next
 
             Case "divide", "/"
-                If nArgs <> 2 Then
-                    Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & nArgs)
+                If lArgCount <> 2 Then
+                    Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & lArgCount)
                 ElseIf lHaveNumber Then
                     If Math.Abs(lNumber) < 0.000001 Then
                         Err.Raise(vbObjectError + 512, Me, aOperationName & " got a divisor too close to zero (" & lNumber & ")")
                     Else
-                        For iValue = 0 To lastValueIndex
-                            newVals(iValue) /= lNumber
+                        For lValueIndex = 0 To lValueIndexLast
+                            lNewVals(lValueIndex) /= lNumber
                         Next
                     End If
                 Else
-                    For iValue = 0 To lastValueIndex
-                        newVals(iValue) /= curTS.Value(iValue)
+                    For lValueIndex = 0 To lValueIndexLast
+                        lNewVals(lValueIndex) /= lTSOriginal.Value(lValueIndex)
                     Next
                 End If
 
             Case "mean"
-                For iValue = 0 To lastValueIndex
-                    If lHaveNumber Then newVals(iValue) += lNumber
-                    For iTS = 1 To lTSgroup.Count - 1
-                        curTS = lTSgroup.Item(iTS)
-                        newVals(iValue) += curTS.Value(iValue)
+                For lValueIndex = 0 To lValueIndexLast
+                    If lHaveNumber Then lNewVals(lValueIndex) += lNumber
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
+                        lNewVals(lValueIndex) += lTSOriginal.Value(lValueIndex)
                     Next
-                    newVals(iValue) /= nArgs
+                    lNewVals(lValueIndex) /= lArgCount
                 Next
 
             Case "geometric mean"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = Math.Log10(newVals(iValue))
-                    If lHaveNumber Then newVals(iValue) += Math.Log10(lNumber)
-                    For iTS = 1 To lTSgroup.Count - 1
-                        curTS = lTSgroup.Item(iTS)
-                        newVals(iValue) += Math.Log10(curTS.Value(iValue))
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = Math.Log10(lNewVals(lValueIndex))
+                    If lHaveNumber Then lNewVals(lValueIndex) += Math.Log10(lNumber)
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
+                        lNewVals(lValueIndex) += Math.Log10(lTSOriginal.Value(lValueIndex))
                     Next
-                    newVals(iValue) = 10 ^ (newVals(iValue) / nArgs)
+                    lNewVals(lValueIndex) = 10 ^ (lNewVals(lValueIndex) / lArgCount)
                 Next
 
             Case "min"
-                For iValue = 0 To lastValueIndex
+                For lValueIndex = 0 To lValueIndexLast
                     If lHaveNumber Then
-                        If lNumber < newVals(iValue) Then newVals(iValue) = lNumber
+                        If lNumber < lNewVals(lValueIndex) Then lNewVals(lValueIndex) = lNumber
                     End If
-                    For iTS = 1 To lTSgroup.Count - 1
-                        curTS = lTSgroup.Item(iTS)
-                        If curTS.Value(iValue) < newVals(iValue) Then
-                            newVals(iValue) = curTS.Value(iValue)
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
+                        If lTSOriginal.Value(lValueIndex) < lNewVals(lValueIndex) Then
+                            lNewVals(lValueIndex) = lTSOriginal.Value(lValueIndex)
                         End If
                     Next
                 Next
+
             Case "max"
-                For iValue = 0 To lastValueIndex
+                For lValueIndex = 0 To lValueIndexLast
                     If lHaveNumber Then
-                        If lNumber > newVals(iValue) Then newVals(iValue) = lNumber
+                        If lNumber > lNewVals(lValueIndex) Then lNewVals(lValueIndex) = lNumber
                     End If
-                    For iTS = 1 To lTSgroup.Count - 1
-                        curTS = lTSgroup.Item(iTS)
-                        If curTS.Value(iValue) > newVals(iValue) Then
-                            newVals(iValue) = curTS.Value(iValue)
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
+                        If lTSOriginal.Value(lValueIndex) > lNewVals(lValueIndex) Then
+                            lNewVals(lValueIndex) = lTSOriginal.Value(lValueIndex)
                         End If
                     Next
                 Next
+
             Case "exponent", "exp", "^", "**"
-                If nArgs <> 2 Then
-                    Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & nArgs)
+                If lArgCount <> 2 Then
+                    Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & lArgCount)
                 ElseIf lHaveNumber Then
-                    For iValue = 0 To lastValueIndex
-                        newVals(iValue) ^= lNumber
+                    For lValueIndex = 0 To lValueIndexLast
+                        lNewVals(lValueIndex) ^= lNumber
                     Next
                 Else
-                    For iValue = 0 To lastValueIndex
-                        newVals(iValue) ^= curTS.Value(iValue)
+                    For lValueIndex = 0 To lValueIndexLast
+                        lNewVals(lValueIndex) ^= lTSOriginal.Value(lValueIndex)
                     Next
                 End If
+
             Case "e**", "e ^ x"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = Math.Exp(newVals(iValue))
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = Math.Exp(lNewVals(lValueIndex))
                 Next
+
             Case "10**", "10 ^ x"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = 10 ^ (newVals(iValue))
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = 10 ^ (lNewVals(lValueIndex))
                 Next
+
             Case "log 10"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = Math.Log10(newVals(iValue))
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = Math.Log10(lNewVals(lValueIndex))
                 Next
+
             Case "log e"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = Math.Log(newVals(iValue))
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = Math.Log(lNewVals(lValueIndex))
                 Next
+
                 'Case "line"
                 '  For valNum = 1 To NVALS
                 '    argNum = 1
@@ -404,17 +406,20 @@ Public Class atcTimeseriesMath
                 '    dataval(valNum) = dataval(valNum) + curArgVal
                 '  Next
             Case "abs", "absolute value"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = Math.Abs(newVals(iValue))
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = Math.Abs(lNewVals(lValueIndex))
                 Next
+
             Case "ctof", "celsiustofahrenheit", "celsius to fahrenheit", "celsius to f"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = newVals(iValue) * 9 / 5 + 32
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = lNewVals(lValueIndex) * 9 / 5 + 32
                 Next
+
             Case "ftoc", "fahrenheittocelsius", "fahrenheit to celsius", "f to celsius"
-                For iValue = 0 To lastValueIndex
-                    newVals(iValue) = (newVals(iValue) - 32) * 5 / 9
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = (lNewVals(lValueIndex) - 32) * 5 / 9
                 Next
+
             Case "subset by date"
                 If aArgs.ContainsAttribute("Start Date") AndAlso Not aArgs.GetValue("Start Date") Is Nothing _
                 AndAlso aArgs.ContainsAttribute("End Date") AndAlso Not aArgs.GetValue("End Date") Is Nothing Then
@@ -423,33 +428,31 @@ Public Class atcTimeseriesMath
                     If TypeOf (lArg) Is String Then
                         lArg = System.DateTime.Parse(lArg).ToOADate
                     End If
-                    Dim StartDate As Double = CDbl(lArg)
+                    Dim lStartDate As Double = CDbl(lArg)
                     lArg = aArgs.GetValue("End Date")
                     If TypeOf (lArg) Is String Then
                         lArg = System.DateTime.Parse(lArg).ToOADate
                     End If
                     Dim EndDate As Double = CDbl(lArg)
-                    AddDataSet(SubsetByDate(firstTS, StartDate, EndDate, Me))
+                    AddDataSet(SubsetByDate(lTSFirst, lStartDate, EndDate, Me))
                 End If
-                ReDim newVals(-1) 'Don't create new timeseries below
+                ReDim lNewVals(-1) 'Don't create new timeseries below
 
             Case "subset by date boundary"
                 Dim lBoundaryMonth As Integer = aArgs.GetValue("Boundary Month")
                 Dim lBoundaryDay As Integer = aArgs.GetValue("Boundary Day")
-                AddDataSet(SubsetByDateBoundary(firstTS, lBoundaryMonth, lBoundaryDay, Me))
-                ReDim newVals(-1) 'Don't create new timeseries below
+                AddDataSet(SubsetByDateBoundary(lTSFirst, lBoundaryMonth, lBoundaryDay, Me))
+                ReDim lNewVals(-1) 'Don't create new timeseries below
 
             Case "merge"
                 AddDataSet(MergeTimeseries(lTSgroup))
-                ReDim newVals(-1) 'Don't create new timeseries below
-                '  '      Case "running sum"
-                '  '        valNum = 1
-                '  '        GoSub SetCurArgVal
-                '  '        dataval(valNum) = curArgVal
-                '  '        For valNum = 2 To NVALS
-                '  '          GoSub SetCurArgVal
-                '  '          dataval(valNum) = dataval(valNum - 1) + curArgVal
-                '  '        Next
+                ReDim lNewVals(-1) 'Don't create new timeseries below
+
+            Case "running sum"
+                For lValueIndex = 1 To lValueIndexLast
+                    lNewVals(lValueIndex) += lNewVals(lValueIndex - 1)
+                Next
+
                 'Case "weight"
                 '  For valNum = 1 To NVALS
                 '    dataval(valNum) = 0
@@ -464,18 +467,17 @@ Public Class atcTimeseriesMath
                 '    End While
                 '  Next
                 'Case "interpolate"
-
             Case Else
-                ReDim newVals(-1) 'Don't create new timeseries
+                ReDim lNewVals(-1) 'Don't create new timeseries
                 Err.Raise(vbObjectError + 512, Me, aOperationName & " not implemented")
         End Select
 
-        If newVals.GetUpperBound(0) >= 0 Then
-            lNewTS = New atcTimeseries(Me)
-            lNewTS.Values = newVals
+        If lNewVals.GetUpperBound(0) >= 0 Then
+            Dim lNewTS As atcTimeseries = New atcTimeseries(Me)
+            lNewTS.Values = lNewVals
 
-            If Not firstTS Is Nothing Then
-                lNewTS.Dates = firstTS.Dates
+            If Not lTSFirst Is Nothing Then
+                lNewTS.Dates = lTSFirst.Dates
             Else
                 Err.Raise(vbObjectError + 512, Me, "Did not get dates for new computed timeseries " & aOperationName)
             End If
@@ -491,7 +493,8 @@ Public Class atcTimeseriesMath
                 lNewTS.Attributes.SetValue("Parent Constant", lNumber)
             End If
 
-            CopyBaseAttributes(firstTS, lNewTS, lNewTS.numValues + 1, 0, 0)
+            CopyBaseAttributes(lTSFirst, lNewTS, lNewTS.numValues + 1, 0, 0)
+            'TODO: update attributes as appropriate!
 
             Dim lDateNow As Date = Now
             lNewTS.Attributes.SetValue("Date Created", lDateNow)
