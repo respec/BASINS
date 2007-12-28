@@ -64,6 +64,10 @@ Public Class clsGraphProbability
         Dim lCurveLabel As String = clsGraphTime.TSCurveLabel(aTimeseries)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
         Dim lCurve As LineItem = Nothing
+        If pNumProbabilityPoints = 0 Then
+            'TODO: why is this needed?
+            pNumProbabilityPoints = 200
+        End If
         Dim lX(pNumProbabilityPoints) As Double
         Dim lLastIndex As Integer = lX.GetUpperBound(0)
         Dim lProbScale As ZedGraph.ProbabilityScale

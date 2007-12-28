@@ -79,11 +79,11 @@ Module Graph
                 End With
 
                 '45 degree line
-                AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot)
+                AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
                 'regression line 
                 'TODO: figure out why this seems backwards!
                 FitLine(lDataGroup.ItemByIndex(1), lDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
-                AddLine(lGraphForm.Pane, lACoef, lBCoef)
+                AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
 
                 Dim lText As New TextObj
                 Dim lFmt As String = "###,##0.###"
@@ -105,8 +105,8 @@ Module Graph
                 .XAxis.Scale.Min = 1
                 .CurveList.RemoveAt(2)
                 .CurveList.RemoveAt(1)
-                AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot)
-                AddLine(lGraphForm.Pane, lACoef, lBCoef)
+                AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "New45DegLine")
+                AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
             End With
             lOutFileName = lCons & "_" & lSite & "_scat_log"
             lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
