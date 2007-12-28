@@ -10,7 +10,6 @@ Imports MapWinUtility
 Module GraphGaFlow
     Private Const pTestPath As String = "D:\Basins\data\03130001\flow"
     Private Const pBaseName As String = "flow"
-    Private pYMax As Double = 10000
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pTestPath)
@@ -48,12 +47,11 @@ Module GraphGaFlow
         End If
     End Sub
 
-    Sub GraphTimeseriesBatch(ByVal aDataGRoup As atcDataGroup)
+    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup)
         Dim lGraphForm As New atcGraph.atcGraphForm()
         Dim lGrapher As New clsGraphTime(aDataGRoup, lGraphForm.ZedGraphCtrl)
+        ScaleYAxis(aDataGroup, lGraphForm.Pane.YAxis)
         With lGraphForm.Pane
-            .YAxis.Scale.Min = 0
-            .YAxis.Scale.Max = pYMax
             .YAxis.Title.Text = pBaseName & " (cfs)"
             .XAxis.Title.Text = "Daily Mean Flow"
             .XAxis.MajorTic.IsOutside = True
@@ -65,8 +63,9 @@ Module GraphGaFlow
 
         With lGraphForm.Pane
             .YAxis.Type = ZedGraph.AxisType.Log
-            .YAxis.Scale.Min = 100
-            .YAxis.Scale.Max = pYMax
+            ScaleYAxis(aDataGroup, lGraphForm.Pane.YAxis)
+            '.YAxis.Scale.Min = 100
+            '.YAxis.Scale.Max = pYMax
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
@@ -83,20 +82,7 @@ Module GraphGaFlow
         Dim lGraphForm As New atcGraph.atcGraphForm()
         Dim lGrapher As New clsGraphScatter(aDataGRoup, lGraphForm.ZedGraphCtrl)
         With lGraphForm.Pane
-            With .XAxis
-                'TODO: figures out how to make whole title go below XAxis title
-                .Title.Text = "Buford" & vbCrLf & vbCrLf & _
-                              "Scatter Plot" & vbCrLf & _
-                              "Chattahoochee Flow (cfs)"
-                .Scale.Min = 0
-                .Scale.Max = pYMax
-                .Scale.IsUseTenPower = False
-                .Scale.MaxAuto = False
-                .MajorGrid.IsVisible = True
-                .MinorGrid.IsVisible = True
-            End With
-            .YAxis.Scale.Max = .XAxis.Scale.Max
-            .YAxis.Scale.Min = .XAxis.Scale.Min
+            ScaleYAxis(aDataGroup, .YAxis)
             With .YAxis
                 .Title.Text = "Norcross"
                 .Scale.IsUseTenPower = False
@@ -104,14 +90,25 @@ Module GraphGaFlow
                 .MajorGrid.IsVisible = True
                 .MinorGrid.IsVisible = True
             End With
-
+            .XAxis.Scale.Max = .YAxis.Scale.Max
+            .XAxis.Scale.Min = .YAxis.Scale.Min
+            With .XAxis
+                'TODO: figures out how to make whole title go below XAxis title
+                .Title.Text = "Buford" & vbCrLf & vbCrLf & _
+                              "Scatter Plot" & vbCrLf & _
+                              "Chattahoochee Flow (cfs)"
+                .Scale.IsUseTenPower = False
+                .Scale.MaxAuto = False
+                .MajorGrid.IsVisible = True
+                .MinorGrid.IsVisible = True
+            End With
             '45 degree line
-            AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot)
+            AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
             'regression line 
             'TODO: figure out why this seems backwards!
             FitLine(aDataGRoup.ItemByIndex(1), aDataGRoup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
             Dim lCorrCoef = Math.Sqrt(lRSquare)
-            AddLine(lGraphForm.Pane, lACoef, lBCoef)
+            AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
             SaveFileString("CompareStats.txt", CompareStats(aDataGRoup.ItemByIndex(0), aDataGRoup.ItemByIndex(1)))
 
             Dim lText As New TextObj
@@ -129,13 +126,14 @@ Module GraphGaFlow
 
         With lGraphForm.Pane
             .YAxis.Type = ZedGraph.AxisType.Log
-            .YAxis.Scale.Min = 100
+            ScaleYAxis(aDataGroup, .YAxis)
             .XAxis.Type = ZedGraph.AxisType.Log
-            .XAxis.Scale.Min = 100
+            .XAxis.Scale.Min = .YAxis.Scale.Min
+            .XAxis.Scale.Max = .YAxis.Scale.Max
             .CurveList.RemoveAt(2)
             .CurveList.RemoveAt(1)
-            AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot)
-            AddLine(lGraphForm.Pane, lACoef, lBCoef)
+            AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "New45DegLine")
+            AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
         End With
         lOutFileName = pBaseName & "_scat_log"
         lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
@@ -150,8 +148,7 @@ Module GraphGaFlow
         With lGraphForm.Pane
             .YAxis.Title.Text = pBaseName & " (cfs)"
             .YAxis.Type = ZedGraph.AxisType.Log
-            .YAxis.Scale.Min = 100
-            .YAxis.Scale.Max = pYMax
+            ScaleYAxis(aDataGroup, .YAxis)
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
             .XAxis.Title.Text = "Percent of Time " & pBaseName & " exceeded"

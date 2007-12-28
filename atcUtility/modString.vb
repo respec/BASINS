@@ -490,31 +490,29 @@ Public Module modString
 
     End Sub
 
-    Public Function Rndlow(ByRef px As Single) As Single
-        ' ##SUMMARY Sets values less than 1.0E-19 to 0.0 for the _
-        'plotting routines for bug in DISSPLA/PR1ME. Otherwise returns values _
-        'rounded to lower magnitude.
-        ' ##SUMMARY   Example: Rndlow(1.0E-20) = 0
-        ' ##SUMMARY   Example: Rndlow(11000) = 10000
-        ' ##PARAM px I Single-precision datum
-        ' ##RETURNS Incoming px value, rounded to 0.0 if less than 1.0E-19.
-        Dim a As Integer
-        Dim x As Single
-        Dim sign As Single
-        ' ##LOCAL a - short integer holds absolute value of log10 rounded down to nearest magnitude
-        ' ##LOCAL X - single-precision set to absolute value of px
-        ' ##LOCAL sign - single-precision holds positive or negative sign for px
-
-        sign = 1.0#
-        If px < 0.0# Then sign = -1.0#
-        x = System.Math.Abs(px)
-        If x < 1.0E-19 Then
-            Rndlow = 0.0#
-        Else
-            a = Int(Log10(CDbl(x)))
-            Rndlow = sign * 10.0# ^ a
+    ''' <summary>
+    ''' Sets values less than 1.0E-19 to 0.0 for the plotting routines for bug in DISSPLA/PR1ME. 
+    ''' Otherwise returns values rounded to lower magnitude.
+    ''' </summary>
+    ''' <param name="aX">Single-precision value</param>
+    ''' <returns>Incoming value, rounded to 0.0 if less than 1.0E-19.</returns>
+    ''' <remarks>Example: Rndlow(1.0E-20) = 0, Rndlow(11000) = 10000</remarks>
+    Public Function Rndlow(ByRef aX As Double) As Double
+        Dim lSign As Double = 1.0#
+        If aX < 0.0# Then
+            lSign = -1.0#
         End If
 
+        Dim lX As Double = System.Math.Abs(aX)
+        Dim lRndlow As Double
+        If lX < 1.0E-19 Then
+            lRndlow = 0.0#
+        Else
+            Dim lA As Integer 'integer holds absolute value of log10 rounded down to nearest magnitude
+            lA = Int(Log10(CDbl(lX)))
+            lRndlow = lSign * 10.0# ^ lA
+        End If
+        Return lRndlow
     End Function
 
     Public Function FirstStringPos(ByVal start As Integer, ByVal Source As String, ByVal ParamArray SearchFor() As Object) As Integer

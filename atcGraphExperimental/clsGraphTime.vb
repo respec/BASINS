@@ -21,6 +21,8 @@ Public Class clsGraphTime
             For Each lTimeseries As atcTimeseries In newValue
                 AddDatasetCurve(lTimeseries)
             Next
+            'TODO: is this the spot to do this?
+            ScaleYAxis(newValue, pZgc.MasterPane.PaneList(0).YAxis)
             pZgc.Refresh()
         End Set
     End Property
