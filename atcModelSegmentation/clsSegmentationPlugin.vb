@@ -4,6 +4,7 @@ Public Class PlugIn
     Implements MapWindow.Interfaces.IPlugin
 
     Private pMapWin As MapWindow.Interfaces.IMapWin
+    Private WithEvents pFrmModelSegmentation As frmModelSegmentation
 
     'TODO: get these from BASINS4 or plugInManager?
     Private Const ModelsMenuName As String = "BasinsModels"
@@ -46,28 +47,30 @@ Public Class PlugIn
     End Property
 
     <CLSCompliant(False)> _
-    Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
-        Dim mnu As MapWindow.Interfaces.MenuItem
-
-        pMapWin = MapWin
+    Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
+                          ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+        pMapWin = aMapWin
 
         If Not pMapWin.Plugins.PluginIsLoaded(pMapWin.Plugins.GetPluginKey("BASINS 4")) Then
             pMapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, "mnuFile")
         End If
-        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_ModelsSeparator", ModelsMenuName, "-", "Model Segmentation")
-        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_Segmentation", ModelsMenuName, Nothing, "Model Segmentation")
-
+        Dim lMenuItem As MapWindow.Interfaces.MenuItem
+        lMenuItem = pMapWin.Menus.AddMenu(ModelsMenuName & "_ModelsSeparator", ModelsMenuName, "-", "Model Segmentation")
+        lMenuItem = pMapWin.Menus.AddMenu(ModelsMenuName & "_Segmentation", ModelsMenuName, Nothing, "Model Segmentation")
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
     End Sub
 
-    Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
-        If ItemName = ModelsMenuName & "_Segmentation" Then
-            Dim frmMain As New frmModelSegmentation
+    Public Sub ItemClicked(ByVal aItemName As String, _
+                           ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
+        If aItemName = ModelsMenuName & "_Segmentation" Then
             GisUtil.MappingObject = pMapWin
-            frmMain.Show()
-            Handled = True
+            If pFrmModelSegmentation Is Nothing OrElse pFrmModelSegmentation.IsDisposed Then
+                pFrmModelSegmentation = New frmModelSegmentation
+            End If
+            pFrmModelSegmentation.Show()
+            aHandled = True
         End If
     End Sub
 
@@ -124,4 +127,12 @@ Public Class PlugIn
     Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
     End Sub
 
+    Friend Sub OpenTableEditor(ByVal aSubbasinLayerName As String) Handles pFrmModelSegmentation.OpenTableEditor
+        GisUtil.CurrentLayer = GisUtil.LayerIndex(aSubbasinLayerName)
+        'TODO: make sure this layer is visible on legend
+        pMapWin.Plugins.BroadcastMessage("TableEditorStart")
+    End Sub
+    Friend Sub TableEdited() Handles pFrmModelSegmentation.TableEdited
+        pMapWin.Plugins.BroadcastMessage("TableEdited")
+    End Sub
 End Class

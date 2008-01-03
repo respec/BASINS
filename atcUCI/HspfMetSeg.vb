@@ -153,7 +153,7 @@ Public Class HspfMetSeg
         Dim lLastId As Integer = 0
         For lOpnId As Integer = 1 To Uci.OpnBlks.Item(aOperationType).Ids.Count
             Dim lOpn As HspfOperation = Uci.OpnBlks.Item(aOperationType).NthOper(lOpnId)
-            If lOpn.MetSeg.Id = Me.Id Then
+            If Not lOpn.MetSeg Is Nothing AndAlso lOpn.MetSeg.Id = Me.Id Then
                 If lFirstId = 0 Then
                     lFirstId = lOpn.Id
                 Else

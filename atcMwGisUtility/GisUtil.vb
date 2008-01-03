@@ -419,11 +419,26 @@ Public Class GisUtil
     ''' <param name="aFieldName">
     '''     <para>Name of field to add</para>
     ''' </param>
+    Public Shared Function AddField(ByVal aLayerIndex As Integer, ByVal aFieldName As String, _
+                                    ByVal aFieldType As Integer, ByVal aFieldWidth As Integer) As Integer
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        Return AddField(aLayerIndex, aFieldName, aFieldType, aFieldWidth, lSf.NumFields)
+    End Function
+
+
+    ''' <summary>Add a field in a shape file from a layer index and a field name</summary>
+    ''' <param name="aLayerIndex">
+    '''     <para>Index of layer containing shape file</para>
+    ''' </param>
+    ''' <param name="aFieldName">
+    '''     <para>Name of field to add</para>
+    ''' </param>
     ''' <exception cref="System.Exception" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="System.Exception" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function AddField(ByVal aLayerIndex As Integer, ByVal aFieldName As String, _
-                                    ByVal aFieldType As Integer, ByVal aFieldWidth As Integer) As Integer
+                                    ByVal aFieldType As Integer, ByVal aFieldWidth As Integer, _
+                                    ByVal aFieldAfter As Integer) As Integer
         Dim lField As New MapWinGIS.Field
         lField.Name = aFieldName
         lField.Type = aFieldType
@@ -433,7 +448,7 @@ Public Class GisUtil
 
         lSf.StartEditingTable()
         'TODO: error handling
-        Dim lBsuc As Boolean = lSf.EditInsertField(lField, lSf.NumFields)
+        Dim lBsuc As Boolean = lSf.EditInsertField(lField, aFieldAfter)
         lSf.StopEditingTable()
 
         Return lSf.NumFields - 1
@@ -2352,16 +2367,14 @@ Public Class GisUtil
 
     Public Shared WriteOnly Property ColoringScheme(ByVal aLayerIndex As Integer) As Object
         Set(ByVal aNewValue As Object)
-            Dim lMWlayer As MapWindow.Interfaces.Layer
-            lMWlayer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
+            Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
             lMWlayer.ColoringScheme = aNewValue
         End Set
     End Property
 
     Public Shared ReadOnly Property GetColoringScheme(ByVal aLayerIndex As Integer) As Object
         Get
-            Dim lMWlayer As MapWindow.Interfaces.Layer
-            lMWlayer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
+            Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
             Return lMWlayer.ColoringScheme
         End Get
     End Property

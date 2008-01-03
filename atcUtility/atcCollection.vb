@@ -65,8 +65,15 @@ Public Class atcCollection
         Return Add(aValue, aValue)
     End Function
     Public Shadows Function Add(ByVal aKey As Object, ByVal aValue As Object) As Integer
-        pKeys.Add(aKey)
-        Return MyBase.Add(aValue)
+        Dim lKeyIndex As Integer = IndexFromKey(aKey)
+        If lKeyIndex = -1 Then 'no key, add it
+            pKeys.Add(aKey)
+            Return MyBase.Add(aValue)
+        ElseIf aValue = MyBase.Item(lKeyIndex) Then 'key exists and values match, return its index
+            Return lKeyIndex
+        Else 'conflict with values
+            Throw New ApplicationException("Key " & aKey & " exists, new Value '" & aValue.ToString & "' <> old Value '" & MyBase.Item(lKeyIndex).ToString & "'")
+        End If
     End Function
 
     Public Sub Increment(ByVal aKey As Object, ByVal aValue As Double)
