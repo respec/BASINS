@@ -69,6 +69,11 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.0.2311.37837, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -117,18 +122,6 @@
     <Compile Include="clsSegmentationPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="frmIDs.Designer.vb">
-      <DependentUpon>frmIDs.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmIDs.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmAssignMet.Designer.vb">
-      <DependentUpon>frmAssignMet.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmAssignMet.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmModelSegmentation.Designer.vb">
       <DependentUpon>frmModelSegmentation.vb</DependentUpon>
     </Compile>
@@ -137,14 +130,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmAssignMet.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmAssignMet.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmIDs.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmIDs.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmModelSegmentation.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmModelSegmentation.vb</DependentUpon>
