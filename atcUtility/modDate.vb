@@ -122,15 +122,17 @@ Public Module modDate
         End If
     End Sub
 
+    ''' <summary>
+    ''' Convert a modified Julian date (MJD) As Double to an array of integers
+    ''' representing year, month, day, hour, minute, second
+    ''' </summary>
+    ''' <param name="aJd">modfied Julian date to convert</param>
+    ''' <param name="aDate">output array containing year, month, day, hour, minute, second</param>
+    ''' <remarks></remarks>
     Sub J2Date(ByVal aJd As Double, ByRef aDate() As Integer)
-        '##SUMMARY J2Date - convert a modified Julian date (MJD) to a long array
-        '##PARM aJd - modfied Julian date to convert
-        '##PARM d - array containing output year , month, day, hour, minute, second
-        Dim lJd As Integer
-        Dim lJhms, lFrac As Double
-        '##LOCAL lJd - date portion of date to convert
-        '##LOCAL lJhms - time portion of date to convert
-        '##LOCAL f - fraction of a second resulting from conversion
+        Dim lJd As Integer 'date portion of date to convert
+        Dim lJhms As Double 'time portion of date to convert
+        Dim lFrac As Double 'fraction of a second resulting from conversion
         If Double.IsNaN(aJd) Then
             lJd = 0
         Else

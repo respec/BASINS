@@ -211,13 +211,14 @@ Public Class atcTimeseriesMath
             End If
         End If
 
-        For Each lArg As atcDefinedValue In aArgs
-            If lArg.Value Is Nothing Then
-                lNeedToAsk = True
-            ElseIf lArg.Definition.Name = "Timeseries" AndAlso lArg.GetType.Name = "atcDataGroup" AndAlso lArg.Value.Count < 1 Then
-                lNeedToAsk = True
-            End If
-        Next
+        'This loop checks to see if any arguments are missing, but this does not take into account optional arguments so it is commented out
+        'For Each lArg As atcDefinedValue In aArgs
+        '    If lArg.Value Is Nothing Then
+        '        lNeedToAsk = True
+        '    ElseIf lArg.Definition.Name = "Timeseries" AndAlso lArg.GetType.Name = "atcDataGroup" AndAlso lArg.Value.Count < 1 Then
+        '        lNeedToAsk = True
+        '    End If
+        'Next
 
         If lNeedToAsk Then 'Ask user what to do
             Dim lSpecify As New frmSpecifyComputation

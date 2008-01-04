@@ -5,9 +5,10 @@ Public Class atcGraphPlugin
     Inherits atcData.atcDataDisplay
 
     Private pGraphTypeNames() As String = {"Timeseries", _
+                                           "Flow/Duration", _
+                                           "Running Sum", _
                                            "Residual (TS2 - TS1)", _
                                            "Cumulative Difference", _
-                                           "Flow/Duration", _
                                            "Scatter (TS2 vs TS1)"}
 
     Public Overrides ReadOnly Property Name() As String
@@ -39,20 +40,44 @@ Public Class atcGraphPlugin
 
         If lDataGroup.Count > 0 Then
             Dim lChooseForm As New frmChooseGraphs
-            lChooseForm.lstChooseGraphs.Items.AddRange(pGraphTypeNames)
-            lChooseForm.ShowDialog()
-
-            For Each lGraphTypeName As String In lChooseForm.lstChooseGraphs.CheckedItems
-                Dim lForm As New atcGraphForm()
-                Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lDataGroup, lForm.ZedGraphCtrl)
-                If lGrapher Is Nothing Then
-                    lForm.Dispose()
+            With lChooseForm.lstChooseGraphs
+                Dim lItemIndex As Integer
+                '.Items.AddRange(pGraphTypeNames)
+                If lDataGroup.Count < 1 Then
+                    .Items.Add("No data selected, cannot graph")
+                    lChooseForm.btnGenerate.Visible = False
                 Else
-                    lForm.Grapher = lGrapher
-                    lForm.DataSets = lGrapher.Datasets
-                    lForm.Show()
+                    .Items.Add(pGraphTypeNames(0))
+                    .Items.Add(pGraphTypeNames(1))
+                    .Items.Add(pGraphTypeNames(2))
+                    If lDataGroup.Count = 2 Then
+                        .Items.Add(pGraphTypeNames(3))
+                        .Items.Add(pGraphTypeNames(4))
+                        .Items.Add(pGraphTypeNames(5))
+                    End If
                 End If
-            Next
+
+                For Each lCheckedName As String In GetSetting("BASINS4", "Graph", "ChooseGraphs", "").Split(","c)
+                    lItemIndex = .Items.IndexOf(lCheckedName)
+                    If lItemIndex > -1 Then .SetItemChecked(lItemIndex, True)
+                Next
+
+                lChooseForm.ShowDialog()
+
+                Dim lAllCheckedItemNames As String = ""
+                For Each lGraphTypeName As String In .CheckedItems
+                    lAllCheckedItemNames &= lGraphTypeName & ","
+                    Dim lForm As New atcGraphForm()
+                    Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lDataGroup, lForm.ZedGraphCtrl)
+                    If lGrapher Is Nothing Then
+                        lForm.Dispose()
+                    Else
+                        lForm.Grapher = lGrapher
+                        lForm.Show()
+                    End If
+                Next
+                SaveSetting("BASINS4", "Graph", "ChooseGraphs", lAllCheckedItemNames)
+            End With
         End If
     End Function
 
@@ -65,32 +90,19 @@ Public Class atcGraphPlugin
             Case -1 : Throw New ApplicationException("Unknown graph type requested: " & aGraphTypeName)
             Case 0 'timeseries
                 Return New clsGraphTime(aDataGroup, aZedGraphCtrl)
-            Case 1 'Residual
+            Case 1 'Flow/Duration
+                Return New clsGraphProbability(aDataGroup, aZedGraphCtrl)
+            Case 2 'Running Sum
+                Return New clsGraphTime(aDataGroup, aZedGraphCtrl)
+            Case 3 'Residual
+                Return New clsGraphResidual(aDataGroup, aZedGraphCtrl)
+            Case 4 'Cumulative Difference
                 If aDataGroup.Count = 2 Then
                     Dim lArgsMath As New atcDataAttributes
                     Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
                     lTsMath.DataSets.Clear()
                     lArgsMath.Clear()
                     lArgsMath.SetValue("timeseries", aDataGroup)
-                    lArgsMath.SetValue("number", Double.NaN)  'TODO: kludge, find a better way!
-                    If lTsMath.Open("subtract", lArgsMath) Then
-                        Dim lGraphTime As New clsGraphTime(lTsMath.DataSets, aZedGraphCtrl)
-                        lGraphTime.ZedGraphCtrl.MasterPane(0).CurveList(0).Label.Text = "Residual"
-                        Return lGraphTime
-                    Else
-                        Logger.Msg("ResidualGraph Calculation Failed")
-                    End If
-                Else
-                    Logger.Msg("ResidualGraph requires 2 timeseries, " & aDataGroup.Count & " specified")
-                End If
-            Case 2 'Cumulative Difference
-                If aDataGroup.Count = 2 Then
-                    Dim lArgsMath As New atcDataAttributes
-                    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-                    lTsMath.DataSets.Clear()
-                    lArgsMath.Clear()
-                    lArgsMath.SetValue("timeseries", aDataGroup)
-                    lArgsMath.SetValue("number", Double.NaN)  'TODO: kludge, find a better way!
                     If lTsMath.Open("subtract", lArgsMath) Then
                         lArgsMath.Clear()
                         lArgsMath.SetValue("timeseries", lTsMath.DataSets)
@@ -108,14 +120,12 @@ Public Class atcGraphPlugin
                 Else
                     Logger.Msg("Cumulative Difference requires 2 timeseries, " & aDataGroup.Count & " specified")
                 End If
-            Case 3 'Flow Duration
-                Return New clsGraphProbability(aDataGroup, aZedGraphCtrl)
-            Case 4 'Scatter
-                    If aDataGroup.Count = 2 Then
-                        Return New clsGraphScatter(aDataGroup, aZedGraphCtrl)
-                    Else
-                        Logger.Msg("ScatterGraph requires 2 timeseries, " & aDataGroup.Count & " specified")
-                    End If
+            Case 5 'Scatter
+                If aDataGroup.Count = 2 Then
+                    Return New clsGraphScatter(aDataGroup, aZedGraphCtrl)
+                Else
+                    Logger.Msg("ScatterGraph requires 2 timeseries, " & aDataGroup.Count & " specified")
+                End If
         End Select
         Throw New ApplicationException("Unable to create graph: " & aGraphTypeName)
     End Function

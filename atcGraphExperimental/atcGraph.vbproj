@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="clsGraphBase.vb" />
     <Compile Include="clsGraphProbability.vb" />
+    <Compile Include="clsGraphResidual.vb" />
     <Compile Include="clsGraphScatter.vb" />
     <Compile Include="clsGraphTime.vb" />
     <Compile Include="frmChooseGraphs.Designer.vb">

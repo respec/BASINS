@@ -17,6 +17,8 @@ Public Class frmGraphEditor
     ''' <remarks></remarks>
     <CLSCompliant(False)> _
     Public Sub Edit(ByVal aPane As GraphPane)
+        Dim lAutoApply As Boolean = chkAutoApply.Checked
+        chkAutoApply.Checked = False
 
         pPane = aPane
         cboWhichCurve.Items.Clear()
@@ -25,25 +27,27 @@ Public Class frmGraphEditor
         Next
         SetControlsFromPane()
         Me.Show()
+        chkAutoApply.Checked = lAutoApply
     End Sub
 
     Private Sub SetControlsFromPane()
-        cboWhichAxis.SelectedIndex = 0
         If cboWhichCurve.Items.Count > 0 Then cboWhichCurve.SelectedIndex = 0
         SetControlsFromAxis(AxisFromCombo())
-        'If pPane.CurveList.Count > 0 Then
-        '    SetControlsFromCurve(pPane.CurveList(0))
-        'End If
     End Sub
 
     Private Function AxisFromCombo() As Axis
-        Select Case cboWhichAxis.SelectedIndex
-            Case 0 : Return pPane.XAxis
-            Case 1 : Return pPane.YAxis
-            Case 2 : Return pPane.Y2Axis
-            Case Else
-                Throw New ApplicationException("Axis type not yet supported: " + cboWhichAxis.Text)
-        End Select
+        If Not pPane Is Nothing Then
+            If radioAxisBottom.Checked Then
+                Return pPane.XAxis
+            ElseIf radioAxisLeft.Checked Then
+                Return pPane.YAxis
+            ElseIf radioAxisRight.Checked Then
+                Return pPane.Y2Axis
+            ElseIf radioAxisAux.Checked Then
+                'TODO: find aux axis
+            End If
+        End If
+        Return Nothing
     End Function
 
     Private Sub SetControlsFromAxis(ByVal aAxis As Axis)
@@ -53,52 +57,56 @@ Public Class frmGraphEditor
             txtAxisDisplayMaximum.Text = aAxis.Scale.Max.ToString()
             Select Case aAxis.Type
                 Case AxisType.DateDual
-                    cboAxisType.SelectedIndex = 0
+                    radioAxisTime.Checked = True
                     txtAxisDisplayMinimum.Text = XDate.ToString(aAxis.Scale.Min)
                     txtAxisDisplayMaximum.Text = XDate.ToString(aAxis.Scale.Max)
-                    Exit Sub
                 Case AxisType.Linear
-                    cboAxisType.SelectedIndex = 1
+                    radioAxisLinear.Checked = True
+                    radioAxisLogarithmic.Enabled = True
+                    radioAxisLinear.Enabled = True
                 Case AxisType.Log
-                    cboAxisType.SelectedIndex = 2
-                    'case AxisType.Probability: cboAxisType.SelectedIndex = 3; break;              
+                    radioAxisLogarithmic.Checked = True
+                    radioAxisLogarithmic.Enabled = True
+                    radioAxisLinear.Enabled = True
+                Case AxisType.Probability
+                    radioAxisProbability.Checked = True
             End Select
             chkAxisMajorGridVisible.Checked = aAxis.MajorGrid.IsVisible
             txtAxisMajorGridColor.BackColor = aAxis.MajorGrid.Color
+            chkAxisMajorTicsVisible.Checked = aAxis.MajorTic.IsInside
             chkAxisMinorGridVisible.Checked = aAxis.MinorGrid.IsVisible
             txtAxisMinorGridColor.BackColor = aAxis.MinorGrid.Color
+            chkAxisMinorTicsVisible.Checked = aAxis.MinorTic.IsInside
         End If
     End Sub
 
     Private Sub SetAxisFromControls(ByVal aAxis As Axis)
         If Not aAxis Is Nothing Then
-            aAxis.Title.Text = txtAxisLabel.Text
-            Dim lTemp As Double
-            If Double.TryParse(txtAxisDisplayMinimum.Text, lTemp) Then
-                aAxis.Scale.Min = lTemp
-            End If
-            If Double.TryParse(txtAxisDisplayMaximum.Text, lTemp) Then
-                aAxis.Scale.Max = lTemp
-            End If
-            Dim lNewType As AxisType = AxisType.Linear
-            Select Case cboAxisType.SelectedIndex
-                Case 0
-                    lNewType = AxisType.DateDual
+            With aAxis
+                If radioAxisTime.Checked Then
                     'TODO: parse min/max date from textboxes
-                    Exit Sub
-                Case 1
-                    lNewType = AxisType.Linear
-                Case 2
-                    lNewType = AxisType.Log
-                    'case 3: lNewType = AxisType.Probability; break;           
-            End Select
-            If aAxis.Type <> lNewType Then
-                aAxis.Type = lNewType
-            End If
-            aAxis.MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
-            aAxis.MajorGrid.Color = txtAxisMajorGridColor.BackColor
-            aAxis.MinorGrid.IsVisible = chkAxisMinorGridVisible.Checked
-            aAxis.MinorGrid.Color = txtAxisMinorGridColor.BackColor
+                ElseIf radioAxisLinear.Checked Then
+                    If aAxis.Type <> AxisType.Linear Then aAxis.Type = AxisType.Linear
+                ElseIf radioAxisLogarithmic.Checked Then
+                    If aAxis.Type <> AxisType.Log Then aAxis.Type = AxisType.Log
+                ElseIf radioAxisProbability.Checked Then
+                    'TODO:?           
+                End If
+                Dim lTemp As Double
+                If Double.TryParse(txtAxisDisplayMinimum.Text, lTemp) Then
+                    aAxis.Scale.Min = lTemp
+                End If
+                If Double.TryParse(txtAxisDisplayMaximum.Text, lTemp) Then
+                    aAxis.Scale.Max = lTemp
+                End If
+                aAxis.Title.Text = txtAxisLabel.Text
+                aAxis.MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
+                aAxis.MajorGrid.Color = txtAxisMajorGridColor.BackColor
+                aAxis.MajorTic.IsInside = chkAxisMajorTicsVisible.Checked
+                aAxis.MinorGrid.IsVisible = chkAxisMinorGridVisible.Checked
+                aAxis.MinorGrid.Color = txtAxisMinorGridColor.BackColor
+                aAxis.MinorTic.IsInside = chkAxisMinorTicsVisible.Checked
+            End With
         End If
     End Sub
 
@@ -111,7 +119,12 @@ Public Class frmGraphEditor
     Private Sub SetControlsFromCurve(ByVal aCurve As CurveItem)
         If Not aCurve Is Nothing Then
             txtCurveLabel.Text = aCurve.Label.Text
-            cboCurveAxis.SelectedIndex = IIf((aCurve.IsY2Axis), 1, 0)
+            If aCurve.IsY2Axis Then
+                radioCurveYaxisRight.Checked = True
+            Else
+                radioCurveYaxisLeft.Checked = True
+            End If
+
             txtCurveColor.BackColor = aCurve.Color
             If TypeOf aCurve Is LineItem Then
                 lblCurve.Visible = True
@@ -128,9 +141,8 @@ Public Class frmGraphEditor
     Private Sub SetCurveFromControls(ByVal aCurve As CurveItem)
         If Not aCurve Is Nothing Then
             aCurve.Label.Text = txtCurveLabel.Text
-            If aCurve.IsY2Axis <> (cboCurveAxis.SelectedIndex = 1) Then
-                'TODO: move curve to other axis
-            End If
+            aCurve.IsY2Axis = radioCurveYaxisRight.Checked
+            'TODO: If radioCurveYaxisAuxiliary.Checked then [move to aux pane]
             aCurve.Color = txtCurveColor.BackColor
             If TypeOf aCurve Is LineItem Then
                 Dim lWidth As Integer
@@ -149,7 +161,7 @@ Public Class frmGraphEditor
         RaiseEvent Apply()
     End Sub
 
-    Private Sub cboWhichAxis_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboWhichAxis.SelectedIndexChanged
+    Private Sub cboWhichAxis_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
         SetControlsFromSelectedCurve()
     End Sub
 
@@ -163,7 +175,49 @@ Public Class frmGraphEditor
         lColorDialog.Color = aTextBox.BackColor
         If lColorDialog.ShowDialog() = DialogResult.OK Then
             aTextBox.BackColor = lColorDialog.Color
+            If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
         End If
+    End Sub
+
+    Private Sub chkAny_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
+        chkAxisMajorGridVisible.CheckedChanged, _
+        chkAxisMajorTicsVisible.CheckedChanged, _
+        chkAxisMinorGridVisible.CheckedChanged, _
+        chkAxisMinorTicsVisible.CheckedChanged
+
+        If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
+    End Sub
+
+    Private Sub txtNotColor_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
+            txtAxisLabel.TextChanged, txtCurveLabel.TextChanged, txtCurveWidth.TextChanged
+        If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
+    End Sub
+
+    Private Sub radioAxisLocation_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
+            radioAxisBottom.CheckedChanged, radioAxisLeft.CheckedChanged, radioAxisRight.CheckedChanged, radioAxisAux.CheckedChanged
+        SetControlsFromAxis(AxisFromCombo())
+    End Sub
+
+    Private Sub radioGeneral_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
+            radioAxisLinear.CheckedChanged, radioAxisLogarithmic.CheckedChanged, _
+            radioCurveYaxisLeft.CheckedChanged, radioCurveYaxisRight.CheckedChanged, radioCurveYaxisAuxiliary.CheckedChanged
+
+        If chkAutoApply.Checked Then
+            Dim lRadio As RadioButton = sender
+            If lRadio.Checked Then 'Only apply for newly checked, not also for unchecked
+                btnApply_Click(Nothing, Nothing)
+            End If
+        End If
+    End Sub
+
+    Private Sub cboWhichCurve_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboWhichCurve.SelectedIndexChanged
+        If cboWhichCurve.SelectedIndex >= 0 AndAlso pPane.CurveList.Count > cboWhichCurve.SelectedIndex Then
+            SetControlsFromCurve(pPane.CurveList(cboWhichCurve.SelectedIndex))
+        End If
+    End Sub
+
+    Private Sub cboCurveAxis_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
     End Sub
 
 End Class
