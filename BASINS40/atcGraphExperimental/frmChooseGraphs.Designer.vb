@@ -31,7 +31,7 @@ Partial Class frmChooseGraphs
         Me.lstChooseGraphs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstChooseGraphs.FormattingEnabled = True
+        Me.lstChooseGraphs.CheckOnClick = True
         Me.lstChooseGraphs.IntegralHeight = False
         Me.lstChooseGraphs.Location = New System.Drawing.Point(12, 12)
         Me.lstChooseGraphs.Name = "lstChooseGraphs"

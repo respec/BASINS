@@ -141,7 +141,7 @@ Module HSPFOutputReports
                         .Legend.IsHStack = False
                     End With
                     lOutFileName = "outfiles\" & lCons & "_" & lSite & ".bmp"
-                    lGraphForm.SaveBitmapToFile(lOutFileName)
+                    lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName)
                     OpenFile(lOutFileName)
                 Next lSiteIndex
                 lExpertSystem = Nothing

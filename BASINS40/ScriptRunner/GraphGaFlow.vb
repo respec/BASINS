@@ -58,7 +58,7 @@ Module GraphGaFlow
         End With
         SetGraphSpecs(lGraphForm, "Buford", "Norcross")
         Dim lOutFileName As String = pBaseName
-        lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
 
         With lGraphForm.Pane
@@ -70,7 +70,7 @@ Module GraphGaFlow
             .YAxis.Scale.IsUseTenPower = False
         End With
         lOutFileName = pBaseName & "_log "
-        lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
         lGraphForm.Dispose()
     End Sub
@@ -80,7 +80,7 @@ Module GraphGaFlow
         Dim lBCoef As Double
         Dim lRSquare As Double
         Dim lGraphForm As New atcGraph.atcGraphForm()
-        Dim lGrapher As New clsGraphScatter(aDataGRoup, lGraphForm.ZedGraphCtrl)
+        Dim lGrapher As New clsGraphScatter(aDataGroup, lGraphForm.ZedGraphCtrl)
         With lGraphForm.Pane
             ScaleYAxis(aDataGroup, .YAxis)
             With .YAxis
@@ -106,10 +106,10 @@ Module GraphGaFlow
             AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
             'regression line 
             'TODO: figure out why this seems backwards!
-            FitLine(aDataGRoup.ItemByIndex(1), aDataGRoup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
+            FitLine(aDataGroup.ItemByIndex(1), aDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
             Dim lCorrCoef = Math.Sqrt(lRSquare)
             AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
-            SaveFileString("CompareStats.txt", CompareStats(aDataGRoup.ItemByIndex(0), aDataGRoup.ItemByIndex(1)))
+            SaveFileString("CompareStats.txt", CompareStats(aDataGroup.ItemByIndex(0), aDataGroup.ItemByIndex(1)))
 
             Dim lText As New TextObj
             Dim lFmt As String = "###,##0.###"
@@ -121,7 +121,7 @@ Module GraphGaFlow
             .CurveList(0).Label.IsVisible = False
         End With
         Dim lOutFileName As String = pBaseName & "_scat"
-        lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
 
         With lGraphForm.Pane
@@ -136,7 +136,7 @@ Module GraphGaFlow
             AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
         End With
         lOutFileName = pBaseName & "_scat_log"
-        lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
         lGraphForm.Dispose()
     End Sub
@@ -154,7 +154,7 @@ Module GraphGaFlow
             .XAxis.Title.Text = "Percent of Time " & pBaseName & " exceeded"
         End With
         Dim lOutFileName As String = pBaseName & "_dur"
-        lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
         lGraphForm.Dispose()
     End Sub
@@ -163,13 +163,12 @@ Module GraphGaFlow
         Dim lArgsMath As New atcDataAttributes
         Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
         lArgsMath.SetValue("timeseries", aDataGroup)
-        lArgsMath.SetValue("number", Double.NaN)  'TODO: kludge, find a better way!
         If lTsMath.Open("subtract", lArgsMath) Then
             Dim lGraphForm As New atcGraph.atcGraphForm()
             Dim lGrapher As New clsGraphTime(lTsMath.DataSets, lGraphForm.ZedGraphCtrl)
             lGraphForm.Pane.CurveList(0).Label.Text = "Residual"
             Dim lOutFileName As String = pBaseName & "_residual"
-            lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
             lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
             lGraphForm.Dispose()
         Else
@@ -181,7 +180,6 @@ Module GraphGaFlow
         Dim lArgsMath As New atcDataAttributes
         Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
         lArgsMath.SetValue("timeseries", aDataGroup)
-        lArgsMath.SetValue("number", Double.NaN)  'TODO: kludge, find a better way!
         If lTsMath.Open("subtract", lArgsMath) Then
             lArgsMath.Clear()
             lArgsMath.SetValue("timeseries", lTsMath.DataSets)
@@ -191,7 +189,7 @@ Module GraphGaFlow
                 Dim lGrapher As New clsGraphTime(lTsRunSum.DataSets, lGraphForm.ZedGraphCtrl)
                 lGraphForm.Pane.CurveList(0).Label.Text = "Cummulative Difference"
                 Dim lOutFileName As String = pBaseName & "_cumDif"
-                lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+                lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
                 lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
                 lGraphForm.Dispose()
             Else

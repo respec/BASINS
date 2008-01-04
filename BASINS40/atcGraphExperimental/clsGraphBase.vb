@@ -2,6 +2,7 @@ Imports atcData
 Imports ZedGraph
 
 Public Class clsGraphBase
+    Implements IDisposable
 
     Friend WithEvents pDataGroup As atcDataGroup 'The group of atcData displayed
     Friend WithEvents pZgc As ZedGraphControl    'The control used to display the data
@@ -18,7 +19,7 @@ Public Class clsGraphBase
         End Get
         Set(ByVal newValue As atcDataGroup)
             pDataGroup = newValue
-            If Not pZgc Is Nothing Then
+            If Not pZgc Is Nothing AndAlso Not pZgc.IsDisposed AndAlso Not pZgc.MasterPane Is Nothing Then
                 For Each lPane As ZedGraph.GraphPane In pZgc.MasterPane.PaneList
                     lPane.CurveList.Clear()
                 Next
@@ -43,4 +44,22 @@ Public Class clsGraphBase
     Overridable Sub pDataGroup_Removed(ByVal aRemoved As atcUtility.atcCollection) Handles pDataGroup.Removed
         Datasets = pDataGroup
     End Sub
+
+    Protected Overrides Sub Finalize()
+        pDataGroup = Nothing
+        pZgc = Nothing
+    End Sub
+
+#Region " IDisposable Support "
+    Private pDisposed As Boolean = False        ' To detect redundant calls
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        If Not Me.pDisposed Then
+            Me.pDisposed = True
+            Me.Finalize()
+            GC.SuppressFinalize(Me)
+        End If
+    End Sub
+#End Region
+
 End Class

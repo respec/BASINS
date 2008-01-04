@@ -33,6 +33,197 @@ Public Module modGraph
         End With
     End Sub
 
+    ''' <summary>
+    ''' Find a Y axis (LEFT, RIGHT, or AUX) for the given atcTimeseries
+    ''' </summary>
+    ''' <param name="aTimeseries">Timeseries data to turn into a curve</param>
+    ''' <param name="aZgc">ZedGraphControl to add the curve to</param>
+    ''' <param name="aExistingCurves">Group of other data on this graph, a hint for which Y axis to use</param>
+    <CLSCompliant(False)> _
+    Function FindYAxis(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aExistingCurves As atcDataGroup) As String
+        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
+        Dim lPane As GraphPane = aZgc.MasterPane.PaneList(0)
+        Dim lYAxisName As String = aTimeseries.Attributes.GetValue("YAxis", "")
+        If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
+            'Use the same Y axis as existing curve with this constituent
+            Dim lFoundMatchingCons As Boolean = False
+            Dim lOldCons As String
+            Dim lOldCurve As LineItem
+            If Not aExistingCurves Is Nothing Then
+                For Each lTs As atcTimeseries In aExistingCurves
+                    For Each lOldCurve In lPane.CurveList
+                        If lOldCurve.Tag = lTs.Serial Then
+                            lOldCons = lTs.Attributes.GetValue("constituent")
+                            If lOldCons = lCons Then
+                                If lOldCurve.IsY2Axis Then lYAxisName = "RIGHT" Else lYAxisName = "LEFT"
+                                lFoundMatchingCons = True
+                                Exit For
+                            End If
+                        End If
+                    Next
+                Next
+            End If
+            If Not lFoundMatchingCons AndAlso lPane.CurveList.Count > 0 Then
+                'Put new curve on right axis if we already have a non-matching curve
+                lYAxisName = "RIGHT"
+            End If
+        End If
+        Return lYAxisName
+    End Function
+
+    ''' <summary>
+    ''' Create a new curve from the given atcTimeseries and add it to the ZedGraphControl
+    ''' </summary>
+    ''' <param name="aTimeseries">Timeseries data to turn into a curve</param>
+    ''' <param name="aZgc">ZedGraphControl to add the curve to</param>
+    ''' <param name="aYAxisName">Y axis to use (LEFT, RIGHT, or AUX)</param>
+    ''' <remarks></remarks>
+    <CLSCompliant(False)> _
+    Sub AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String)
+        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
+        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
+        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
+        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
+        Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+
+        Dim lPane As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
+        Dim lYAxis As Axis = lPane.YAxis
+        Dim lCurve As LineItem = Nothing
+
+
+        Select Case aYAxisName.ToUpper
+            Case "AUX"
+                EnableAuxAxis(aZgc.MasterPane, True, 0.2)
+                lPane = aZgc.MasterPane.PaneList(0)
+                lYAxis = lPane.YAxis
+            Case "RIGHT"
+                lYAxis = lPane.Y2Axis
+                With lPane.YAxis
+                    .MajorTic.IsOpposite = False
+                    .MinorTic.IsOpposite = False
+                End With
+                With lYAxis
+                    .MajorTic.IsOpposite = False
+                    .MinorTic.IsOpposite = False
+                End With
+        End Select
+
+        lYAxis.IsVisible = True
+
+        With lPane
+            If .XAxis.Type <> AxisType.DateDual Then .XAxis.Type = AxisType.DateDual
+            If aTimeseries.Attributes.GetValue("point", False) Then
+                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
+                lCurve.Line.IsVisible = False
+            Else
+                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
+                lCurve.Line.Width = 1
+                lCurve.Line.StepType = StepType.RearwardStep
+            End If
+
+            lCurve.Tag = aTimeseries.Serial 'Make this easy to find again even if label changes
+
+            If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
+
+            'Use units as Y axis title (if this data has units and Y axis title is not set)
+            If aTimeseries.Attributes.ContainsAttribute("Units") AndAlso _
+               (lYAxis.Title Is Nothing OrElse lYAxis.Title.Text Is Nothing OrElse lYAxis.Title.Text.Length = 0) Then
+                lYAxis.Title.Text = aTimeseries.Attributes.GetValue("Units")
+                lYAxis.Title.IsVisible = True
+            End If
+
+            Dim lSJDay As Double = aTimeseries.Attributes.GetValue("SJDay")
+            Dim lEJDay As Double = aTimeseries.Attributes.GetValue("EJDay")
+            If .CurveList.Count = 1 Then
+                If aTimeseries.numValues > 0 Then 'Set X axis to contain this date range
+                    .XAxis.Scale.Min = lSJDay
+                    .XAxis.Scale.Max = lEJDay
+                End If
+            ElseIf .CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
+                'Expand time scale if needed to include all dates in new curve
+                If aTimeseries.numValues > 0 Then
+                    If lSJDay < .XAxis.Scale.Min Then
+                        .XAxis.Scale.Min = lSJDay
+                    End If
+                    If lEJDay > .XAxis.Scale.Max Then
+                        .XAxis.Scale.Max = lEJDay
+                    End If
+                End If
+            End If
+        End With
+    End Sub
+
+    Public Function TSCurveLabel(ByVal aTimeseries As atcTimeseries) As String
+        With aTimeseries.Attributes
+            Return .GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
+        End With
+    End Function
+
+    <CLSCompliant(False)> _
+    Public Function EnableAuxAxis(ByVal aMasterPane As ZedGraph.MasterPane, ByVal aEnable As Boolean, ByVal aAuxFraction As Single) As GraphPane
+        Dim lPaneMain As GraphPane = aMasterPane.PaneList(aMasterPane.PaneList.Count - 1)
+        Dim lPaneAux As GraphPane = Nothing
+        If aMasterPane.PaneList.Count > 1 Then lPaneAux = aMasterPane.PaneList(0)
+        'Dim lGraphics As Graphics = Me.CreateGraphics()
+        aMasterPane.PaneList.Clear()
+        If aEnable Then
+            ' Main pane already exists, just needs to be shifted
+            With lPaneMain
+                .YAxis.MinSpace = 80
+                .Y2Axis.MinSpace = 20
+                .Margin.All = 0
+                .Margin.Top = 10
+                .Margin.Bottom = 10
+            End With
+            ' Create, format, position aux pane
+            If lPaneAux Is Nothing Then lPaneAux = New ZedGraph.GraphPane
+            FormatPaneWithDefaults(lPaneAux)
+            With lPaneAux
+                .Margin.All = 0
+                .Margin.Top = 10
+                With .XAxis
+                    .Title.IsVisible = False
+                    .Scale.IsVisible = False
+                    .Scale.Max = lPaneMain.XAxis.Scale.Max
+                    .Scale.Min = lPaneMain.XAxis.Scale.Min
+                End With
+                .X2Axis.IsVisible = False
+                With .YAxis
+                    .Type = AxisType.Linear
+                    .MinSpace = 80
+                End With
+                .Y2Axis.MinSpace = 20
+            End With
+
+            With aMasterPane
+                .PaneList.Add(lPaneAux)
+                .PaneList.Add(lPaneMain)
+                '       .SetLayout(lGraphics, PaneLayout.SingleColumn)
+                ResizePanesWithAux(aMasterPane, aAuxFraction)
+            End With
+        Else
+            aMasterPane.PaneList.Add(lPaneMain)
+            '    aMasterPane.SetLayout(lGraphics, PaneLayout.SingleColumn)
+        End If
+        Return lPaneAux
+    End Function
+
+    <CLSCompliant(False)> _
+    Public Sub ResizePanesWithAux(ByVal aMasterPane As ZedGraph.MasterPane, ByVal aAuxFraction As Single)
+        If Not aMasterPane Is Nothing AndAlso aMasterPane.PaneList.Count > 1 Then
+            Dim lPaneAux As GraphPane = aMasterPane.PaneList(0)
+            Dim lPaneMain As GraphPane = aMasterPane.PaneList(1)
+            Dim lOrigAuxHeight As Single = lPaneAux.Rect.Height
+            Dim lTotalPaneHeight As Single = lOrigAuxHeight + lPaneMain.Rect.Height
+            lPaneAux.Rect = New System.Drawing.Rectangle( _
+                    lPaneAux.Rect.X, lPaneAux.Rect.Y, _
+                    lPaneAux.Rect.Width, lTotalPaneHeight * aAuxFraction)
+            lPaneMain.Rect = New System.Drawing.Rectangle( _
+                    lPaneMain.Rect.X, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
+                    lPaneMain.Rect.Width, lTotalPaneHeight - lPaneAux.Rect.Height)
+        End If
+    End Sub
+
     Public Sub SetGraphSpecs(ByRef aGraphForm As atcGraph.atcGraphForm, _
                              Optional ByRef aLabel1 As String = "Simulated", _
                              Optional ByRef aLabel2 As String = "Observed")

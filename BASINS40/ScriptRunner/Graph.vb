@@ -95,7 +95,7 @@ Module Graph
                 .CurveList(0).Label.IsVisible = False
             End With
             lOutFileName = lCons & "_" & lSite & "_scat"
-            lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
             lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
 
             With lGraphForm.Pane
@@ -109,7 +109,7 @@ Module Graph
                 AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
             End With
             lOutFileName = lCons & "_" & lSite & "_scat_log"
-            lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
             lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
 
             lGraphForm.Dispose()
@@ -129,7 +129,7 @@ Module Graph
                 .XAxis.Title.Text = "Percent of Time " & lCons & " exceeded at " & lSite
             End With
             lOutFileName = lCons & "_" & lSite & "_dur"
-            lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
             lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
             lGraphForm.Dispose()
 
@@ -156,7 +156,7 @@ Module Graph
             End With
             SetGraphSpecs(lGraphForm)
             lOutFileName = lCons & "_" & lSite
-            lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
             lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
 
             With lGraphForm.Pane
@@ -167,7 +167,7 @@ Module Graph
                 .YAxis.Scale.IsUseTenPower = False
             End With
             lOutFileName = lCons & "_" & lSite & "_log "
-            lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
+            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
             lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
             lGraphForm.Dispose()
 
