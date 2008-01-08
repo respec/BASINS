@@ -17244,6 +17244,141 @@
             for this <see cref="T:ZedGraph.JapaneseCandleStickItem"/>.
             </summary>
         </member>
+        <member name="T:ZedGraph.DateDualScale">
+            <summary>
+            The DateDualScale class inherits from the <see cref="T:ZedGraph.Scale"/> class, and implements
+            the features specific to <see cref="F:ZedGraph.AxisType.DateDual"/>.
+            </summary>
+            <remarks>
+            DateDualScale is a cartesian axis labeled with calendar dates / times.  The data values are
+            modified Julian days where day zero starts at midnight, 30 December 1899. Incrementing a Julian
+            day value by one means adding one day. An hour is a change of 1/24 (approximately 0.04167). 
+            Appropriate values for this scale are returned by the System.DateTime.ToOADate method and by
+            the <see cref="T:ZedGraph.XDate"/> class.
+            Labels appear in either one or two rows, depending on the date range displayed.
+            When number of days &gt;= 666, only one row is used because only year labels can fit.
+            When number of days &gt; 60, a row of month labels and a row of year labels are drawn.
+            When number of days &gt; 3, a row of day labels and a row of month + year labels are drawn.
+            Otherwise, a row of time labels and a row of year + month + day labels are drawn.
+            </remarks>
+            
+            <author> John Champion, Mark Gray </author>
+            <version> $Revision: 1.12 $ $Date: 2006/08/25 05:19:09 $ </version>
+        </member>
+        <member name="F:ZedGraph.DateDualScale.schema2">
+            <summary>
+            Current schema value that defines the version of the serialized file
+            </summary>
+        </member>
+        <member name="F:ZedGraph.DateDualScale.MonthNamesFull">
+            <summary> Full names of months for labeling when there is room </summary>
+        </member>
+        <member name="F:ZedGraph.DateDualScale.MonthNamesAbbreviated">
+            <summary> Abbreviated names of months for labeling when there is less room </summary>
+        </member>
+        <member name="F:ZedGraph.DateDualScale.roundNumbers">
+            <summary> Natural numbers of years or days to label </summary>
+        </member>
+        <member name="F:ZedGraph.DateDualScale.roundMinutes">
+            <summary> Natural numbers of minutes to label </summary>
+        </member>
+        <member name="M:ZedGraph.DateDualScale.#ctor(ZedGraph.Axis)">
+            <summary>
+            Default constructor that defines the owner <see cref="T:ZedGraph.Axis"/>
+            (containing object) for this new object.
+            </summary>
+            <param name="owner">The owner, or containing object, of this instance</param>
+        </member>
+        <member name="M:ZedGraph.DateDualScale.#ctor(ZedGraph.Scale,ZedGraph.Axis)">
+            <summary>
+            The Copy Constructor
+            </summary>
+            <param name="rhs">The <see cref="T:ZedGraph.DateScale"/> object from which to copy</param>
+            <param name="owner">The <see cref="T:ZedGraph.Axis"/> object that will own the
+            new instance of <see cref="T:ZedGraph.DateScale"/></param>
+        </member>
+        <member name="M:ZedGraph.DateDualScale.Clone(ZedGraph.Axis)">
+            <summary>
+            Create a new clone of the current item, with a new owner assignment
+            </summary>
+            <param name="owner">The new <see cref="T:ZedGraph.Axis"/> instance that will be
+            the owner of the new Scale</param>
+            <returns>A new <see cref="T:ZedGraph.Scale"/> clone.</returns>
+        </member>
+        <member name="M:ZedGraph.DateDualScale.RoundNumber(System.Int32,System.Int32[])">
+            <summary>
+            Round up to a number in the given array
+            </summary>
+            <param name="number">number to round</param>
+            <param name="roundArray">numbers to round up to</param>
+            <returns>nearest "round" number that is at least as large as given number</returns>
+        </member>
+        <member name="M:ZedGraph.DateDualScale.Draw(System.Drawing.Graphics,ZedGraph.GraphPane,System.Single,System.Single)">
+            <summary>
+            Draw the scale, including the tic marks, value labels, and grid lines as
+            required for this <see cref="T:ZedGraph.Axis"/>.
+            </summary>
+            <param name="g">
+            A graphic device object to be drawn into.  This is normally e.Graphics from the
+            PaintEventArgs argument to the Paint() method.
+            </param>
+            <param name="pane">
+            A reference to the <see cref="T:ZedGraph.GraphPane"/> object that is the parent or
+            owner of this object.
+            </param>
+            <param name="scaleFactor">
+            The scaling factor to be used for rendering objects.  This is calculated and
+            passed down by the parent <see cref="T:ZedGraph.GraphPane"/> object using the
+            <see cref="M:ZedGraph.PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
+            font sizes, etc. according to the actual size of the graph.
+            </param>
+            <param name="shiftPos">
+            The number of pixels to shift to account for non-primary axis position (e.g.,
+            the second, third, fourth, etc. <see cref="T:ZedGraph.YAxis"/> or <see cref="T:ZedGraph.Y2Axis"/>.
+            </param>
+        </member>
+        <member name="M:ZedGraph.DateDualScale.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Constructor for deserializing objects
+            </summary>
+            <param name="info">A <see cref="T:System.Runtime.Serialization.SerializationInfo"/> instance that defines the serialized data
+            </param>
+            <param name="context">A <see cref="T:System.Runtime.Serialization.StreamingContext"/> instance that contains the serialized data
+            </param>
+        </member>
+        <member name="M:ZedGraph.DateDualScale.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> instance with the data needed to serialize the target object
+            </summary>
+            <param name="info">A <see cref="T:System.Runtime.Serialization.SerializationInfo"/> instance that defines the serialized data</param>
+            <param name="context">A <see cref="T:System.Runtime.Serialization.StreamingContext"/> instance that contains the serialized data</param>
+        </member>
+        <member name="P:ZedGraph.DateDualScale.Type">
+            <summary>
+            Return the <see cref="T:ZedGraph.AxisType"/> for this <see cref="T:ZedGraph.Scale"/>, which is
+            <see cref="F:ZedGraph.AxisType.DateDual"/>.
+            </summary>
+        </member>
+        <member name="P:ZedGraph.DateDualScale.Min">
+            <summary>
+            Gets or sets the minimum value for this scale.
+            </summary>
+            <remarks>
+            The set property is specifically adapted for <see cref="F:ZedGraph.AxisType.DateDual"/> scales,
+            in that it automatically limits the value to the range of valid dates for the
+            <see cref="T:ZedGraph.XDate"/> struct.
+            </remarks>
+        </member>
+        <member name="P:ZedGraph.DateDualScale.Max">
+            <summary>
+            Gets or sets the maximum value for this scale.
+            </summary>
+            <remarks>
+            The set property is specifically adapted for <see cref="F:ZedGraph.AxisType.DateDual"/> scales,
+            in that it automatically limits the value to the range of valid dates for the
+            <see cref="T:ZedGraph.XDate"/> struct.
+            </remarks>
+        </member>
         <member name="T:ZedGraph.ScrollRange">
             <summary>
             A simple struct to store minimum and maximum <see cref="T:System.Double"/> type
@@ -18650,153 +18785,6 @@
             (<see cref="P:ZedGraph.Chart.Border"/> property). true
             to show the border border, false to omit the border
             </summary>
-        </member>
-        <member name="T:ZedGraph.DateDualScale">
-            <summary>
-            The DateDualScale class inherits from the <see cref="T:ZedGraph.Scale"/> class, and implements
-            the features specific to <see cref="F:ZedGraph.AxisType.DateDual"/>.
-            </summary>
-            <remarks>
-            DateDualScale is a cartesian axis labeled with calendar dates / times.  The data values are
-            modified Julian days where day zero starts at midnight, 30 December 1899. Incrementing a Julian
-            day value by one means adding one day. An hour is a change of 1/24 (approximately 0.04167). 
-            Appropriate values for this scale are returned by the System.DateTime.ToOADate method and by
-            the <see cref="T:ZedGraph.XDate"/> class.
-            Labels appear in either one or two rows, depending on the date range displayed.
-            When number of days &gt;= 666, only one row is used because only year labels can fit.
-            When number of days &gt; 60, a row of month labels and a row of year labels are drawn.
-            When number of days &gt; 3, a row of day labels and a row of month + year labels are drawn.
-            Otherwise, a row of time labels and a row of year + month + day labels are drawn.
-            </remarks>
-            
-            <author> John Champion, Mark Gray </author>
-            <version> $Revision: 1.12 $ $Date: 2006/08/25 05:19:09 $ </version>
-        </member>
-        <member name="F:ZedGraph.DateDualScale.schema2">
-            <summary>
-            Current schema value that defines the version of the serialized file
-            </summary>
-        </member>
-        <member name="F:ZedGraph.DateDualScale.MonthNamesFull">
-            <summary> Full names of months for labeling when there is room </summary>
-        </member>
-        <member name="F:ZedGraph.DateDualScale.MonthNamesAbbreviated">
-            <summary> Abbreviated names of months for labeling when there is less room </summary>
-        </member>
-        <member name="F:ZedGraph.DateDualScale.roundNumbers">
-            <summary> Natural numbers of years or days to label </summary>
-        </member>
-        <member name="F:ZedGraph.DateDualScale.roundMinutes">
-            <summary> Natural numbers of minutes to label </summary>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.#ctor(ZedGraph.Axis)">
-            <summary>
-            Default constructor that defines the owner <see cref="T:ZedGraph.Axis"/>
-            (containing object) for this new object.
-            </summary>
-            <param name="owner">The owner, or containing object, of this instance</param>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.#ctor(ZedGraph.Scale,ZedGraph.Axis)">
-            <summary>
-            The Copy Constructor
-            </summary>
-            <param name="rhs">The <see cref="T:ZedGraph.DateScale"/> object from which to copy</param>
-            <param name="owner">The <see cref="T:ZedGraph.Axis"/> object that will own the
-            new instance of <see cref="T:ZedGraph.DateScale"/></param>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.Clone(ZedGraph.Axis)">
-            <summary>
-            Create a new clone of the current item, with a new owner assignment
-            </summary>
-            <param name="owner">The new <see cref="T:ZedGraph.Axis"/> instance that will be
-            the owner of the new Scale</param>
-            <returns>A new <see cref="T:ZedGraph.Scale"/> clone.</returns>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.RoundNumber(System.Int32,System.Int32[])">
-            <summary>
-            Round up to a number in the given array
-            </summary>
-            <param name="number">number to round</param>
-            <param name="roundArray">numbers to round up to</param>
-            <returns>nearest "round" number that is at least as large as given number</returns>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.Draw(System.Drawing.Graphics,ZedGraph.GraphPane,System.Single,System.Single)">
-            <summary>
-            Draw the scale, including the tic marks, value labels, and grid lines as
-            required for this <see cref="T:ZedGraph.Axis"/>.
-            </summary>
-            <param name="g">
-            A graphic device object to be drawn into.  This is normally e.Graphics from the
-            PaintEventArgs argument to the Paint() method.
-            </param>
-            <param name="pane">
-            A reference to the <see cref="T:ZedGraph.GraphPane"/> object that is the parent or
-            owner of this object.
-            </param>
-            <param name="scaleFactor">
-            The scaling factor to be used for rendering objects.  This is calculated and
-            passed down by the parent <see cref="T:ZedGraph.GraphPane"/> object using the
-            <see cref="M:ZedGraph.PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-            font sizes, etc. according to the actual size of the graph.
-            </param>
-            <param name="shiftPos">
-            The number of pixels to shift to account for non-primary axis position (e.g.,
-            the second, third, fourth, etc. <see cref="T:ZedGraph.YAxis"/> or <see cref="T:ZedGraph.Y2Axis"/>.
-            </param>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.CalcMajorTicValue(System.Double,System.Double)">
-            <summary>
-            Determine the value for any major tic.
-            </summary>
-            <remarks>
-            </remarks>
-            <param name="baseVal">not used in this override</param>
-            <param name="tic">The major tic number (0 = first major tic)</param>
-            <returns>
-            The specified major tic value (double).
-            </returns>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Constructor for deserializing objects
-            </summary>
-            <param name="info">A <see cref="T:System.Runtime.Serialization.SerializationInfo"/> instance that defines the serialized data
-            </param>
-            <param name="context">A <see cref="T:System.Runtime.Serialization.StreamingContext"/> instance that contains the serialized data
-            </param>
-        </member>
-        <member name="M:ZedGraph.DateDualScale.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> instance with the data needed to serialize the target object
-            </summary>
-            <param name="info">A <see cref="T:System.Runtime.Serialization.SerializationInfo"/> instance that defines the serialized data</param>
-            <param name="context">A <see cref="T:System.Runtime.Serialization.StreamingContext"/> instance that contains the serialized data</param>
-        </member>
-        <member name="P:ZedGraph.DateDualScale.Type">
-            <summary>
-            Return the <see cref="T:ZedGraph.AxisType"/> for this <see cref="T:ZedGraph.Scale"/>, which is
-            <see cref="F:ZedGraph.AxisType.DateDual"/>.
-            </summary>
-        </member>
-        <member name="P:ZedGraph.DateDualScale.Min">
-            <summary>
-            Gets or sets the minimum value for this scale.
-            </summary>
-            <remarks>
-            The set property is specifically adapted for <see cref="F:ZedGraph.AxisType.DateDual"/> scales,
-            in that it automatically limits the value to the range of valid dates for the
-            <see cref="T:ZedGraph.XDate"/> struct.
-            </remarks>
-        </member>
-        <member name="P:ZedGraph.DateDualScale.Max">
-            <summary>
-            Gets or sets the maximum value for this scale.
-            </summary>
-            <remarks>
-            The set property is specifically adapted for <see cref="F:ZedGraph.AxisType.DateDual"/> scales,
-            in that it automatically limits the value to the range of valid dates for the
-            <see cref="T:ZedGraph.XDate"/> struct.
-            </remarks>
         </member>
         <member name="T:ZedGraph.BasicArrayPointList">
             <summary>

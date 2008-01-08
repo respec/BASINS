@@ -326,7 +326,8 @@ namespace ZedGraph
 				{
 					TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, drawGrid, shift, scaleFactor, scaledTic, 
 						ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
-					if (this.IsVisible && labelThisYear)
+
+					if (!drawGrid && this.IsVisible && labelThisYear)
 					{
 						textHorizontalCenter = (pStartInterval + pEndInterval) / 2;
 						//if label will not extend beyond left or right edge of this axis, draw it
@@ -386,9 +387,10 @@ namespace ZedGraph
 				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, drawGrid,
 					ticShift, scaleFactor, scaledTic,
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
+
 				// If the width of the interval is at least wide enough for a character,
 				// try displaying a month label
-				if (this.IsVisible && pIntervalWidth > charWidth)
+				if (!drawGrid && this.IsVisible && pIntervalWidth > charWidth)
 				{
 					labelText = "";
 					switch(MonthLabelType) 
@@ -457,6 +459,7 @@ namespace ZedGraph
 				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, false,
 					ticShift, scaleFactor, scaledTic,
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
+
 				// If the width of the interval is at least wide enough for a character
 				// and we have more than 27 days, try displaying a month label
 				if (pIntervalWidth > charWidth && (dEndInterval - dStartInterval > 27))
@@ -533,7 +536,7 @@ namespace ZedGraph
 					ticShift + (includeMonthYear ? scaledTic : 0), scaleFactor, scaledTic, 
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 
-				if (this.IsVisible && pIntervalWidth > 1)
+				if (!drawGrid && this.IsVisible && pIntervalWidth > 1)
 				{
 					if (((int)(day / daysPerLabel)) * daysPerLabel == day)
 					{
@@ -604,8 +607,8 @@ namespace ZedGraph
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 
 				//if label will not extend beyond left or right edge of this axis, draw it
-				if (this.IsVisible && (pStartInterval - labelWidthHalf > 0) &&
-						(pStartInterval + labelWidthHalf) < rightPix)
+				if (!drawGrid && this.IsVisible && (pStartInterval - labelWidthHalf > 0) &&
+						                           (pStartInterval + labelWidthHalf) < rightPix)
 				{
 					labelText = hour.ToString() + ":" + ((minute < 10) ? "0" : "") + minute.ToString();
 					_fontSpec.Draw(g, pane, labelText,
@@ -725,21 +728,27 @@ namespace ZedGraph
 			}
 		}
 
-		/// <summary>
-		/// Determine the value for any major tic.
-		/// </summary>
-		/// <remarks>
-		/// </remarks>
-		/// <param name="baseVal">not used in this override</param>
-		/// <param name="tic">The major tic number (0 = first major tic)</param>
-		/// <returns>
-		/// The specified major tic value (double).
-		/// </returns>
+		//override all the default tic arithmetic since we do it in our custom Draw
 		override internal double CalcMajorTicValue(double baseVal, double tic)
 		{
 			return 0;
 		}
-
+		internal override double CalcMinorTicValue(double baseVal, int iTic)
+		{
+			return 0;
+		}
+		internal override int CalcMinorStart(double baseVal)
+		{
+			return 0;
+		}
+		internal override double CalcBaseTic()
+		{
+			return 0;
+		}
+		internal override int CalcNumTics()
+		{
+			return 0;
+		}
 	#endregion
 
 	#region Serialization
