@@ -29,7 +29,6 @@ Public Module modGraph
             Dim lCurve As LineItem = .AddCurve("", lXValues, lYValues, Drawing.Color.Blue, SymbolType.None)
             lCurve.Line.Style = aLineStyle
             lCurve.Tag = aTag
-            '.CurveList.Add(lCurve)
         End With
     End Sub
 
@@ -396,8 +395,7 @@ Public Module modGraph
 
             If aDataMin < 0.5 * aDataMax And aDataMin >= 0.0# And aDataMin = 1 Then
                 aScaleMin = 0.0#
-            Else
-                'get next lowest mult of 10
+            Else 'get next lowest mult of 10
                 lDataRndlow = Rndlow(aDataMin)
                 If lDataRndlow >= 0.0# Then
                     lRangeInc = -1

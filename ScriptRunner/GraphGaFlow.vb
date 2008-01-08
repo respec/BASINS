@@ -39,7 +39,7 @@ Module GraphGaFlow
 
             GraphScatterBatch(lDataGroup)
             GraphDurationBatch(lDataGroup)
-            GraphTimeseriesBatch(lDataGroup)
+            GraphTimeseriesBatch(lDataGroup, "Stanam")
             GraphResidualBatch(lDataGroup)
             GraphCumDifBatch(lDataGroup)
         Else
@@ -47,16 +47,29 @@ Module GraphGaFlow
         End If
     End Sub
 
-    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup, ByVal aLabelAttribute As String)
         Dim lGraphForm As New atcGraph.atcGraphForm()
-        Dim lGrapher As New clsGraphTime(aDataGRoup, lGraphForm.ZedGraphCtrl)
+        Dim lGrapher As New clsGraphTime(aDataGroup, lGraphForm.ZedGraphCtrl)
         ScaleYAxis(aDataGroup, lGraphForm.Pane.YAxis)
         With lGraphForm.Pane
             .YAxis.Title.Text = pBaseName & " (cfs)"
+            .YAxis.MajorGrid.IsVisible = True
+            .YAxis.MinorGrid.IsVisible = False
             .XAxis.Title.Text = "Daily Mean Flow"
             .XAxis.MajorTic.IsOutside = True
+            .XAxis.MajorGrid.IsVisible = True
+            Dim lIndex As Integer = 0
+            For Each lDataSet As atcDataSet In aDataGroup
+                'TODO: need better default label, old GenScn?
+                Dim lLabel As String = lDataSet.Attributes.GetDefinedValue(aLabelAttribute).Value
+                Dim lScenario As String = lDataSet.Attributes.GetDefinedValue("Scenario").Value
+                With .CurveList(lIndex)
+                    .Label.Text = lLabel
+                    .Color = GetMatchingColor()
+                End With
+                lIndex += 1
+            Next
         End With
-        SetGraphSpecs(lGraphForm, "Buford", "Norcross")
         Dim lOutFileName As String = pBaseName
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")

@@ -1,9 +1,11 @@
 Imports atcMwGisUtility
+Imports mwTableEditor
 
 Public Class PlugIn
     Implements MapWindow.Interfaces.IPlugin
 
     Private pMapWin As MapWindow.Interfaces.IMapWin
+    Private pMapWinForm As Windows.Forms.Form
     Private WithEvents pFrmModelSegmentation As frmModelSegmentation
 
     'TODO: get these from BASINS4 or plugInManager?
@@ -50,7 +52,7 @@ Public Class PlugIn
     Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                           ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
         pMapWin = aMapWin
-
+        pMapWinForm = System.Windows.Forms.Control.FromHandle(New IntPtr(aParentHandle))
         If Not pMapWin.Plugins.PluginIsLoaded(pMapWin.Plugins.GetPluginKey("BASINS 4")) Then
             pMapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, "mnuFile")
         End If
@@ -130,7 +132,19 @@ Public Class PlugIn
     Friend Sub OpenTableEditor(ByVal aSubbasinLayerName As String) Handles pFrmModelSegmentation.OpenTableEditor
         GisUtil.CurrentLayer = GisUtil.LayerIndex(aSubbasinLayerName)
         'TODO: make sure this layer is visible on legend
-        pMapWin.Plugins.BroadcastMessage("TableEditorStart")
+        Dim pTableEditor As New frmTableEditor(CType(pMapWin.Layers(pMapWin.Layers.CurrentLayer).GetObject, MapWinGIS.Shapefile), pMapWinForm)
+        With pTableEditor
+            Dim lTableStyle As New Windows.Forms.DataGridTableStyle
+            .DataGrid1.TableStyles.Clear()
+            .DataGrid1.TableStyles.Add(lTableStyle)
+            'Dim lDataGridColumnStyle As New Windows.Forms.DataGridTextBoxColumn
+            'For lFieldIndex As Integer = 1 To 20
+            ' lDataGridColumnStyle = .DataGrid1.TableStyles(0).GridColumnStyles.Add(lDataGridColumnStyle)
+            '.FieldDisplayWidth(lFieldIndex) = 0
+            'Next
+            .Show()
+        End With
+        'pMapWin.Plugins.BroadcastMessage("TableEditorStart")
     End Sub
     Friend Sub TableEdited() Handles pFrmModelSegmentation.TableEdited
         pMapWin.Plugins.BroadcastMessage("TableEdited")

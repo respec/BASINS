@@ -162,7 +162,7 @@ Module modCreateUci
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("PERLND").Ids
             For Each lLandUse As LandUse In pWatershed.LandUses
                 If lOperation.Id = lLandUse.ModelID Then  'found a match
-                    If lLandUse.Type = "PERLND" Then
+                    If lLandUse.Type = "PERLND" Or lLandUse.Type = "COMPOSITE" Then
                         Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
                         lTable.Parms("PWATFG").Value = 1
                         lTable = lOperation.Tables.Item("GEN-INFO")
@@ -183,7 +183,7 @@ Module modCreateUci
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("IMPLND").Ids
             For Each lLandUse As LandUse In pWatershed.LandUses
                 If lOperation.Id = lLandUse.ModelID Then  'found a match
-                    If lLandUse.Type = "IMPLND" Then
+                    If lLandUse.Type = "IMPLND" Or lLandUse.Type = "COMPOSITE" Then
                         Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
                         lTable.Parms("IWATFG").Value = 1
                         lTable = lOperation.Tables.Item("GEN-INFO")
@@ -283,16 +283,32 @@ Module modCreateUci
         Dim lConnection As HspfConnection
 
         For Each lLandUse As LandUse In pWatershed.LandUses
-            lConnection = New HspfConnection
-            lConnection.Uci = aUci
-            lConnection.Typ = 3
-            lConnection.Source.VolName = lLandUse.Type
-            lConnection.Source.VolId = lLandUse.ModelID
-            lConnection.MFact = lLandUse.Area
-            lConnection.Target.VolName = "RCHRES"
-            lConnection.Target.VolId = lLandUse.Reach.Id
-            lConnection.MassLink = TypeId(lLandUse.Type)
-            aUci.Connections.Add(lConnection)
+            Dim lTypes As New atcCollection
+            Select Case lLandUse.Type
+                Case "PERLND"
+                    lTypes.Add("PERLND")
+                Case "IMPLND"
+                    lTypes.Add("IMPLND")
+                Case "COMPOSITE"
+                    lTypes.Add("PERLND")
+                    lTypes.Add("IMPLND")
+            End Select
+            For Each lType As String In lTypes
+                lConnection = New HspfConnection
+                lConnection.Uci = aUci
+                lConnection.Typ = 3
+                lConnection.Source.VolName = lType
+                lConnection.Source.VolId = lLandUse.ModelID
+                If lType = "PERLND" Then
+                    lConnection.MFact = lLandUse.Area * (1.0 - lLandUse.ImperviousFraction)
+                Else 'IMPLND
+                    lConnection.MFact = lLandUse.Area * lLandUse.ImperviousFraction
+                End If
+                lConnection.Target.VolName = "RCHRES"
+                lConnection.Target.VolId = lLandUse.Reach.Id
+                lConnection.MassLink = TypeId(lType)
+                aUci.Connections.Add(lConnection)
+            Next
         Next
 
         For Each lReachUpstream As Reach In pWatershed.Reaches
@@ -462,11 +478,11 @@ Module modCreateUci
         Dim lImplndNames As New atcCollection
         Dim lPerlndNames As New atcCollection
         For Each lLandUse As LandUse In pWatershed.LandUses
-            If lLandUse.Type = "PERLND" Then
+            If lLandUse.Type = "PERLND" Or lLandUse.Type = "COMPOSITE" Then
                 If lPerlndNames.IndexFromKey(lLandUse.Description) = -1 Then
                     lPerlndNames.Add(lLandUse.Description)
                 End If
-            ElseIf lLandUse.Type = "IMPLND" Then
+            ElseIf lLandUse.Type = "IMPLND" Or lLandUse.Type = "COMPOSITE" Then
                 If lImplndNames.IndexFromKey(lLandUse.Description) = -1 Then
                     lImplndNames.Add(lLandUse.Description)
                 End If
@@ -519,7 +535,8 @@ Module modCreateUci
         For j As Integer = 2 To 1 Step -1 'loop through perlnds then implnds
             Dim lUniqueNameCount As Integer = 0
             For Each lLandUse As LandUse In pWatershed.LandUses 'loop through each landuse record
-                If TypeId(lLandUse.Type) = j Then
+                Dim lTypeId As Integer = TypeId(lLandUse.Type)
+                If lTypeId = j Or lTypeId = 3 Then
                     If lLandUse.Reach.SegmentId = aModelSeg Then 'is this landuse part of this model segment?
                         lAddflag = True
                         For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
@@ -537,6 +554,7 @@ Module modCreateUci
                             lNewOperation.Uci = aUci
                             lNewOperation.Name = pLandName(j)
                             lNewOperation.Description = lLandUse.Description
+                            'TODO: check these calcs in light of composite types
                             If aPerlndNames.IndexFromKey(lLandUse.Description) > -1 Then
                                 lToperId = (aBase * aModelSeg) + aPerlndNames.IndexFromKey(lLandUse.Description) + 1
                             ElseIf aImplndNames.IndexFromKey(lLandUse.Description) > -1 Then
@@ -569,8 +587,12 @@ Module modCreateUci
     Private Function TypeId(ByVal aType As String) As Integer
         Dim lTypeId As Integer = 0
         Select Case aType
-            Case "PERLND" : lTypeId = 2
-            Case "IMPLND" : lTypeId = 1
+            Case "PERLND"
+                lTypeId = 2
+            Case "IMPLND"
+                lTypeId = 1
+            Case "COMPOSITE"
+                lTypeId = 3
         End Select
         Return lTypeId
     End Function
