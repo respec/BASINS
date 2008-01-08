@@ -19,7 +19,7 @@ Public Class clsGraphResidual
         End Get
         Set(ByVal aDataGroup As atcDataGroup)
             If aDataGroup.Count <> 2 Then
-                Logger.Msg("ResidualGraph requires 2 timeseries, " & aDataGroup.Count & " specified")
+                Logger.Msg("Residual Graph requires 2 timeseries, " & aDataGroup.Count & " specified")
             Else
                 Dim lArgsMath As New atcDataAttributes
                 lArgsMath.SetValue("timeseries", aDataGroup)
@@ -27,16 +27,15 @@ Public Class clsGraphResidual
                 If lTsMath.Open("subtract", lArgsMath) Then
                     MyBase.Datasets = lTsMath.DataSets
                     For Each lTimeseries As atcTimeseries In Datasets
-                        AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
+                        Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
+                        lCurve.Label.Text = "Residual"
                     Next
-                    pZgc.MasterPane(0).CurveList(0).Label.Text = "Residual"
                     ScaleYAxis(Datasets, pZgc.MasterPane.PaneList(0).YAxis)
                     pZgc.Refresh()
                 Else
-                    Logger.Msg("ResidualGraph Calculation Failed")
+                    Logger.Msg("Residual Graph Calculation Failed")
                 End If
             End If
         End Set
     End Property
-
 End Class

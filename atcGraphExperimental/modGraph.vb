@@ -79,7 +79,7 @@ Public Module modGraph
     ''' <param name="aYAxisName">Y axis to use (LEFT, RIGHT, or AUX)</param>
     ''' <remarks></remarks>
     <CLSCompliant(False)> _
-    Sub AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String)
+    Function AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String) As CurveItem
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
@@ -89,7 +89,6 @@ Public Module modGraph
         Dim lPane As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
         Dim lYAxis As Axis = lPane.YAxis
         Dim lCurve As LineItem = Nothing
-
 
         Select Case aYAxisName.ToUpper
             Case "AUX"
@@ -151,7 +150,8 @@ Public Module modGraph
                 End If
             End If
         End With
-    End Sub
+        Return lCurve
+    End Function
 
     Public Function TSCurveLabel(ByVal aTimeseries As atcTimeseries) As String
         With aTimeseries.Attributes
