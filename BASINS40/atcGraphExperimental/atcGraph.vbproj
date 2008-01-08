@@ -95,15 +95,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="atcTimeseriesPointList.vb" />
-    <Compile Include="atcTimeSpan.Designer.vb">
-      <DependentUpon>atcTimeSpan.vb</DependentUpon>
-    </Compile>
-    <Compile Include="atcTimeSpan.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="clsGraphBase.vb" />
+    <Compile Include="clsGraphCumulativeDifference.vb" />
     <Compile Include="clsGraphProbability.vb" />
     <Compile Include="clsGraphResidual.vb" />
+    <Compile Include="clsGraphRunningSum.vb" />
     <Compile Include="clsGraphScatter.vb" />
     <Compile Include="clsGraphTime.vb" />
     <Compile Include="frmChooseGraphs.Designer.vb">
@@ -132,10 +128,6 @@
     <EmbeddedResource Include="atcGraphForm.resx">
       <DependentUpon>atcGraphForm.vb</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="atcTimeSpan.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>atcTimeSpan.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmChooseGraphs.resx">
       <SubType>Designer</SubType>
