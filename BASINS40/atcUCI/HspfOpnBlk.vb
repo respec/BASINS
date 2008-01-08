@@ -332,10 +332,14 @@ Public Class HspfOpnBlk
 
         'could do something here with table status info?
         Select Case aBlockDef.Name
-            Case "PERLND" : lTableNames = PERLNDtabList
-            Case "IMPLND" : lTableNames = IMPLNDtabList
-            Case "RCHRES" : lTableNames = RCHREStabList
-            Case Else : ReDim lTableNames(-1)
+            Case "PERLND"
+                lTableNames = PERLNDtabList
+            Case "IMPLND"
+                lTableNames = IMPLNDtabList
+            Case "RCHRES"
+                lTableNames = RCHREStabList
+            Case Else
+                ReDim lTableNames(-1)
         End Select
 
         For Each lTableName As String In lTableNames

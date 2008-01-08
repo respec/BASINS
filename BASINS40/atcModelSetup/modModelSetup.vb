@@ -1,53 +1,61 @@
 Imports atcUtility
 Imports atcMwGisUtility
-Imports MapWinUtility
 Imports atcData
-Imports System.Collections.ObjectModel
 Imports atcSegmentation
+Imports MapWinUtility
+Imports System.Text
+Imports System.Collections.ObjectModel
 
 Module modModelSetup
 
     Friend Sub StartWinHSPF(ByVal aCommand As String)
-        Dim WinHSPFexe As String
+        Dim lWinHSPFexe As String
 
-        'todo:  get this from the registry
-        WinHSPFexe = "c:\basins\models\hspf\bin\winhspf.exe"
-        If Not FileExists(WinHSPFexe) Then
-            WinHSPFexe = "d:\basins\models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(WinHSPFexe) Then
-            WinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(WinHSPFexe) Then
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            WinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(WinHSPFexe) Then
-            WinHSPFexe = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
-        End If
-        If FileExists(WinHSPFexe) Then
-            Process.Start(WinHSPFexe, aCommand)
+        ''todo:  get this from the registry
+        'WinHSPFexe = "c:\basins\models\hspf\bin\winhspf.exe"
+        'If Not FileExists(WinHSPFexe) Then
+        '    WinHSPFexe = "d:\basins\models\hspf\bin\winhspf.exe"
+        'End If
+        'If Not FileExists(WinHSPFexe) Then
+        '    WinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
+        'End If
+        'If Not FileExists(WinHSPFexe) Then
+        '    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        '    WinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
+        'End If
+        'If Not FileExists(WinHSPFexe) Then
+        lWinHSPFexe = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
+        'End If
+        If FileExists(lWinHSPFexe) Then
+            Logger.Dbg("StartWinHSPF:" & lWinHSPFexe & ":" & aCommand)
+            Process.Start(lWinHSPFexe, aCommand)
+            Logger.Dbg("WinHSPFStarted")
         Else
-            MsgBox("Cannot find WinHSPF.exe", MsgBoxStyle.Critical, "BASINS HSPF Problem")
+            Logger.Msg("Cannot find WinHSPF.exe", MsgBoxStyle.Critical, "BASINS HSPF Problem")
         End If
     End Sub
 
     Friend Sub StartAQUATOX(ByVal aCommand As String)
-        Dim AQUATOXexe$
+        Dim lAQUATOXexe As String
         'Dim reg As New ATCoRegistry
 
         'todo:  get this from the registry
         'AQUATOXexe = reg.RegGetString(HKEY_LOCAL_MACHINE, "SOFTWARE\Eco Modeling\AQUATOX\ExePath", "") & "\AQUATOX.exe"
-        AQUATOXexe = "\basins\models\AQUATOX\AQUATOX.exe"
+        'lAQUATOXexe = "\basins\models\AQUATOX\AQUATOX.exe"
+        lAQUATOXexe = FindFile("Please locate AQUATOX.exe", "AQUATOX.exe")
 
-        If FileExists(AQUATOXexe) Then
-            Process.Start(AQUATOXexe, aCommand)
+        If FileExists(lAQUATOXexe) Then
+            Logger.Dbg("StartAQUATOX:" & lAQUATOXexe & ":" & aCommand)
+            Process.Start(lAQUATOXexe, aCommand)
+            Logger.Dbg("AQUATOXStarted")
         Else
-            MsgBox("Cannot find AQUATOX.exe", MsgBoxStyle.Critical, "BASINS AQUATOX Problem")
+            Logger.Msg("Cannot find AQUATOX.exe", MsgBoxStyle.Critical, "BASINS AQUATOX Problem")
         End If
     End Sub
 
-    Friend Function IsBASINSMetWDM(ByVal aDataSets As atcData.atcDataGroup, ByVal aBaseDsn As Integer, ByVal aLoc As String) As Boolean
+    Private Function IsBASINSMetWDM(ByVal aDataSets As atcData.atcDataGroup, _
+                                    ByVal aBaseDsn As Integer, _
+                                    ByVal aLoc As String) As Boolean
         Dim lCheckCount As Integer = 0
         For Each lDataSet As atcData.atcTimeseries In aDataSets
             If lDataSet.Attributes.GetValue("Location") = aLoc Then
@@ -83,15 +91,16 @@ Module modModelSetup
             End If
         Next
 
-        If lCheckCount = 7 Then
+        If lCheckCount = 7 Then 'needed datasets found
             Return True
         Else
             Return False
         End If
-
     End Function
 
-    Friend Sub BuildListofMetStationNames(ByRef aMetWDMName As String, ByVal aMetStations As atcCollection, ByVal aMetBaseDsns As atcCollection)
+    Friend Sub BuildListofMetStationNames(ByRef aMetWDMName As String, _
+                                          ByVal aMetStations As atcCollection, _
+                                          ByVal aMetBaseDsns As atcCollection)
         aMetStations.Clear()
         aMetBaseDsns.Clear()
         Dim lDataSource As New atcWDM.atcDataSourceWDM
@@ -105,12 +114,13 @@ Module modModelSetup
                     Exit For
                 End If
             Next
-            If Not lFound Then
+
+            If Not lFound Then 'need to open it here
                 If lDataSource.Open(aMetWDMName) Then
-                    'need to open it here
                     lFound = True
                 End If
             End If
+
             If lFound Then
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                     If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
@@ -153,9 +163,8 @@ Module modModelSetup
         End If
     End Sub
 
-    Friend Function CreateUCI(ByVal aUciName As String, ByVal aMetWDMName As String) As Boolean
-        CreateUCI = False
-
+    Friend Function CreateUCI(ByVal aUciName As String, _
+                              ByVal aMetWDMName As String) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
         Dim lMsg As New atcUCI.HspfMsg
@@ -164,7 +173,7 @@ Module modModelSetup
         'get starter uci ready
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lStarterUciName As String = "starter.uci"
-        Dim lStarterPath As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\starter\" & lStarterUciName
+        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter\" & lStarterUciName
         If Not FileExists(lStarterPath) Then
             lStarterPath = "\basins\models\hspf\bin\starter\" & lStarterUciName
             If Not FileExists(lStarterPath) Then
@@ -175,7 +184,7 @@ Module modModelSetup
 
         'location master pollutant list 
         Dim lPollutantListFileName As String = "poltnt_2.prn"
-        Dim lPollutantListPath As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\" & lPollutantListFileName
+        Dim lPollutantListPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\" & lPollutantListFileName
         If Not FileExists(lPollutantListPath) Then
             lPollutantListPath = "\basins\models\hspf\bin\" & lPollutantListFileName
             If Not FileExists(lPollutantListPath) Then
@@ -197,9 +206,9 @@ Module modModelSetup
                 Exit For
             End If
         Next
-        If Not lFound Then
+
+        If Not lFound Then 'need to open it here
             If lDataSource.Open(lProjectWDMName) Then
-                'need to open it here
                 lFound = True
             End If
         End If
@@ -216,9 +225,9 @@ Module modModelSetup
                 Exit For
             End If
         Next
-        If Not lFound Then
+
+        If Not lFound Then 'need to open it here
             If lDataSource.Open(aMetWDMName) Then
-                'need to open it here
                 lFound = True
             End If
         End If
@@ -228,6 +237,7 @@ Module modModelSetup
 
         Dim lWatershedName As String = FilenameOnly(aUciName)
         Dim lWatershed As New Watershed
+        Dim lCreateUCI As Boolean = False
         If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
             Dim lHspfUci As New atcUCI.HspfUci
             lHspfUci.Msg = lMsg
@@ -235,47 +245,32 @@ Module modModelSetup
                                          lDataSources, _
                                          lStarterUciName, lPollutantListFileName)
             lHspfUci.Save()
-            Return True
+            lCreateUCI = True
         End If
-
+        Return lCreateUCI
     End Function
 
-    Friend Sub WriteWSDFile(ByVal aWsdFileName As String, ByVal aArea As Collection, ByVal aLucode As Collection, _
-                            ByVal aSubid As Collection, ByVal aSubslope As Collection, ByVal aReclassifyFile As String, _
+    Friend Sub WriteWSDFile(ByVal aWsdFileName As String, _
+                            ByVal aArea As atcCollection, _
+                            ByVal aLucode As atcCollection, _
+                            ByVal aSubids As atcCollection, _
+                            ByVal aSubslope As atcCollection, _
+                            ByVal aReclassifyFile As String, _
                             ByVal aGridPervious As Object)
-
-        Dim OutFile As Integer
-        Dim i As Integer, j As Integer, k As Integer
-        Dim incollection As Boolean
-        Dim percentimperv As Double
-        Dim tarea As Double, stype As String
-        Dim tmpDbf As IatcTable
-        Dim PerArea(,) As Single
-        Dim ImpArea(,) As Single
-        Dim length() As Single
-        Dim slope() As Single
-        Dim UseSimpleGrid As Boolean
-        Dim spos As Long
-        Dim lpos As Long
-        Dim luname As String = ""
-        Dim multiplier As Single
-        Dim subbasin As String
-        Dim useit As Boolean
-
         'if simple reclassifyfile exists, read it in
-        Dim cRcode As New Collection
-        Dim cRname As New Collection
-        UseSimpleGrid = False
-        If Len(aReclassifyFile) > 0 And aGridPervious.ColumnWidth(0) = 0 Then
+        Dim lRcode As New atcCollection
+        Dim lRname As New atcCollection
+        Dim lUseSimpleGrid As Boolean = False
+        If aReclassifyFile.Length > 0 And aGridPervious.ColumnWidth(0) = 0 Then
             'have the simple percent pervious grid, need to know which 
             'lucodes correspond to which lugroups
-            UseSimpleGrid = True
+            lUseSimpleGrid = True
             'open dbf file
-            tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(aReclassifyFile)
-            For i = 1 To tmpDbf.NumRecords
-                tmpDbf.CurrentRecord = i
-                cRcode.Add(tmpDbf.Value(1))
-                cRname.Add(tmpDbf.Value(2))
+            Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aReclassifyFile)
+            For i As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = i
+                lRcode.Add(lTable.Value(1))
+                lRname.Add(lTable.Value(2))
             Next i
         End If
 
@@ -283,120 +278,104 @@ Module modModelSetup
         '  area of each land use group in each subbasin
 
         'build collection of unique subbasin ids
-        Dim cUniqueSubids As New Collection
-        For i = 1 To aSubid.Count
-            incollection = False
-            For j = 1 To cUniqueSubids.Count
-                If cUniqueSubids(j) = aSubid(i) Then
-                    incollection = True
-                    Exit For
-                End If
-            Next j
-            If Not incollection Then
-                cUniqueSubids.Add(aSubid(i))
-            End If
-        Next i
+        Dim lUniqueSubids As New atcCollection
+        For Each lSubId As String In aSubids
+            lUniqueSubids.Add(lSubId)
+        Next
 
         'build collection of unique landuse groups
-        Dim cUniqueLugroups As New Collection
-        For i = 1 To aGridPervious.Source.Rows
-            incollection = False
-            For j = 1 To cUniqueLugroups.Count
-                If cUniqueLugroups(j) = aGridPervious.Source.CellValue(i, 1) Then
-                    incollection = True
-                    Exit For
-                End If
-            Next j
-            If Not incollection Then
-                cUniqueLugroups.Add(aGridPervious.Source.CellValue(i, 1))
-            End If
+        Dim lUniqueLugroups As New atcCollection
+        For i As Integer = 1 To aGridPervious.Source.Rows
+            lUniqueLugroups.Add(aGridPervious.Source.CellValue(i, 1))
         Next i
 
-        ReDim PerArea(cUniqueSubids.Count, cUniqueLugroups.Count)
-        ReDim ImpArea(cUniqueSubids.Count, cUniqueLugroups.Count)
-        ReDim length(cUniqueSubids.Count)
-        ReDim slope(cUniqueSubids.Count)
+        Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
+        Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
+        Dim lLength(lUniqueSubids.Count) As Double
+        Dim lSlope(lUniqueSubids.Count) As Single
 
         'loop through each polygon (or grid subid/lucode combination)
         'and populate array with area values
-        If UseSimpleGrid Then
-            For i = 1 To aSubid.Count
-
+        If lUseSimpleGrid Then
+            For i As Integer = 1 To aSubids.Count
                 'find subbasin position in the area array
-                For j = 1 To cUniqueSubids.Count
-                    If aSubid(i) = cUniqueSubids(j) Then
+                Dim spos As Integer
+                For j As Integer = 1 To lUniqueSubids.Count
+                    If aSubids(i) = lUniqueSubids(j) Then
                         spos = j
                         Exit For
                     End If
                 Next j
                 'find lugroup that corresponds to this lucode
-                For j = 1 To cRcode.Count
-                    If aLucode(i) = cRcode(j) Then
-                        luname = cRname(j)
+                Dim lLandUseName As String = ""
+                For j As Integer = 1 To lRcode.Count
+                    If aLucode(i) = lRcode(j) Then
+                        lLandUseName = lRname(j)
                         Exit For
                     End If
                 Next j
                 'find percent perv that corresponds to this lugroup
-                For j = 1 To aGridPervious.Source.Rows
-                    If luname = aGridPervious.Source.CellValue(j, 1) Then
-                        percentimperv = aGridPervious.Source.CellValue(j, 2)
+                Dim lPercentImperv As Double
+                For j As Integer = 1 To aGridPervious.Source.Rows
+                    If lLandUseName = aGridPervious.Source.CellValue(j, 1) Then
+                        lPercentImperv = aGridPervious.Source.CellValue(j, 2)
                         Exit For
                     End If
                 Next j
                 'find lugroup position in the area array
-                For j = 1 To cUniqueLugroups.Count
-                    If luname = cUniqueLugroups(j) Then
+                Dim lpos As Long
+                For j As Integer = 1 To lUniqueLugroups.Count
+                    If lLandUseName = lUniqueLugroups(j) Then
                         lpos = j
                         Exit For
                     End If
                 Next j
 
-                PerArea(spos, lpos) = PerArea(spos, lpos) + (aArea(i) * (100 - percentimperv) / 100)
-                ImpArea(spos, lpos) = ImpArea(spos, lpos) + (aArea(i) * percentimperv / 100)
-                length(spos) = 0.0
-                slope(spos) = aSubslope(i) / 100.0
-
+                lPerArea(spos, lpos) += (aArea(i) * (100 - lPercentImperv) / 100)
+                lImpArea(spos, lpos) += (aArea(i) * lPercentImperv / 100)
+                lLength(spos) = 0.0
+                lSlope(spos) = aSubslope(i) / 100.0
             Next i
-
-        Else
-            'using custom table for landuse classification
-            For i = 1 To aSubid.Count
+        Else 'using custom table for landuse classification
+            For i As Integer = 1 To aSubids.Count
                 'loop through each polygon (or grid subid/lucode combination)
-
                 'find subbasin position in the area array
-                For j = 1 To cUniqueSubids.Count
-                    If aSubid(i) = cUniqueSubids(j) Then
+                Dim spos As Integer
+                For j As Integer = 1 To lUniqueSubids.Count
+                    If aSubids(i) = lUniqueSubids(j) Then
                         spos = j
                         Exit For
                     End If
                 Next j
 
                 'find lugroup that corresponds to this lucode, could be multiple matches
-                For j = 1 To aGridPervious.Source.Rows
-                    luname = ""
-                    lpos = -1
+                For j As Integer = 1 To aGridPervious.Source.Rows
+                    Dim lLandUseName As String = ""
+                    Dim lpos As Integer = -1
+                    Dim lPercentImperv As Double
                     If aGridPervious.Source.CellValue(j, 0) <> "" Then
                         If aLucode(i) = aGridPervious.Source.CellValue(j, 0) Then
                             'see if any of these are subbasin-specific
-                            percentimperv = aGridPervious.Source.CellValue(j, 2)
+                            lPercentImperv = aGridPervious.Source.CellValue(j, 2)
+                            Dim lMultiplier As Double
                             If IsNumeric(aGridPervious.Source.CellValue(j, 3)) Then
-                                multiplier = CSng(aGridPervious.Source.CellValue(j, 3))
+                                lMultiplier = CSng(aGridPervious.Source.CellValue(j, 3))
                             Else
-                                multiplier = 1.0
+                                lMultiplier = 1.0
                             End If
-                            subbasin = aGridPervious.Source.CellValue(j, 4)
-                            If Len(subbasin) > 0 And subbasin <> "Invalid Field Number" Then
+                            Dim subbasin As String = aGridPervious.Source.CellValue(j, 4)
+                            If subbasin.Length > 0 And subbasin <> "Invalid Field Number" Then
                                 'this row is subbasin-specific
-                                If subbasin = aSubid(i) Then
+                                If subbasin = aSubids(i) Then
                                     'we want this one now
-                                    luname = aGridPervious.Source.CellValue(j, 1)
+                                    lLandUseName = aGridPervious.Source.CellValue(j, 1)
                                 End If
                             Else
                                 'make sure that no other rows of this lucode are 
                                 'subbasin-specific for this subbasin and that we 
                                 'should therefore not use this row
-                                useit = True
-                                For k = 1 To aGridPervious.Source.Rows
+                                Dim lUseIt As Boolean = True
+                                For k As Integer = 1 To aGridPervious.Source.Rows
                                     If k <> j Then
                                         If aGridPervious.Source.CellValue(k, 0) = aGridPervious.Source.CellValue(j, 0) Then
                                             'this other row has same lucode
@@ -405,25 +384,23 @@ Module modModelSetup
                                                 subbasin = aGridPervious.Source.CellValue(k, 4)
                                                 If Len(subbasin) > 0 Then
                                                     'and its subbasin-specific
-                                                    If subbasin = aSubid(i) Then
+                                                    If subbasin = aSubids(i) Then
                                                         'and its specific to this subbasin
-                                                        useit = False
+                                                        lUseIt = False
                                                     End If
                                                 End If
                                             End If
                                         End If
                                     End If
                                 Next k
-                                If useit Then
-                                    'we want this one now
-                                    luname = aGridPervious.Source.CellValue(j, 1)
+                                If lUseIt Then 'we want this one now
+                                    lLandUseName = aGridPervious.Source.CellValue(j, 1)
                                 End If
                             End If
 
-                            If Len(luname) > 0 Then
-                                'find lugroup position in the area array
-                                For k = 1 To cUniqueLugroups.Count
-                                    If luname = cUniqueLugroups(k) Then
+                            If lLandUseName.Length > 0 Then 'find lugroup position in the area array
+                                For k As Integer = 1 To lUniqueLugroups.Count
+                                    If lLandUseName = lUniqueLugroups(k) Then
                                         lpos = k
                                         Exit For
                                     End If
@@ -431,47 +408,50 @@ Module modModelSetup
                             End If
 
                             If lpos > 0 Then
-                                PerArea(spos, lpos) = PerArea(spos, lpos) + (aArea(i) * multiplier * (100 - percentimperv) / 100)
-                                ImpArea(spos, lpos) = ImpArea(spos, lpos) + (aArea(i) * multiplier * percentimperv / 100)
-                                length(spos) = 0.0 'were not computing lsur since winhspf does that
-                                slope(spos) = aSubslope(i) / 100.0
+                                lPerArea(spos, lpos) += (aArea(i) * lMultiplier * (100 - lPercentImperv) / 100)
+                                lImpArea(spos, lpos) += (aArea(i) * lMultiplier * lPercentImperv / 100)
+                                lLength(spos) = 0.0 'were not computing lsur since winhspf does that
+                                lSlope(spos) = aSubslope(i) / 100.0
                             End If
-
                         End If
                     End If
                 Next j
-
             Next i
         End If
 
-        OutFile = FreeFile()
-        FileOpen(OutFile, aWsdFileName, OpenMode.Output)
-        WriteLine(OutFile, "LU Name", "Type (1=Impervious, 2=Pervious)", "Watershd-ID", "Area", "Slope", "Distance")
-
-        'now write
-        For i = 1 To cUniqueSubids.Count
-            For j = 1 To cUniqueLugroups.Count
-                stype = "2"
-                tarea = PerArea(i, j) / 4046.8564
-                If CInt(tarea) > 0 Then
-                    PrintLine(OutFile, Chr(34) & cUniqueLugroups(j) & Chr(34), " " & stype & " ", cUniqueSubids(i), Format(tarea, "0."), Format(slope(i), "0.000000"), Format(length(i), "0.0000"))
+        Dim lSB As New StringBuilder
+        lSB.AppendLine("LU Name" & Chr(32) & "Type (1=Impervious, 2=Pervious)" & Chr(32) & "Watershd-ID" & Chr(32) & "Area" & Chr(32) & "Slope" & Chr(32) & "Distance")
+        For i As Integer = 1 To lUniqueSubids.Count
+            For j As Integer = 1 To lUniqueLugroups.Count
+                Dim lType As String = "2"
+                Dim lArea As Double = lPerArea(i, j) / 4046.8564
+                If CInt(lArea) > 0 Then
+                    lSB.AppendLine(Chr(34) & lUniqueLugroups(j) & Chr(34) & Chr(32) & _
+                                   lType & Chr(32) & _
+                                   lUniqueSubids(i) & Chr(32) & _
+                                   Format(lArea, "0.") & Chr(32) & _
+                                   Format(lSlope(i), "0.000000") & Chr(32) & _
+                                   Format(lLength(i), "0.0000"))
                 End If
-                stype = "1"
-                tarea = ImpArea(i, j) / 4046.8564
-                If CInt(tarea) > 0 Then
-                    PrintLine(OutFile, Chr(34) & cUniqueLugroups(j) & Chr(34), " " & stype & " ", cUniqueSubids(i), Format(tarea, "0."), Format(slope(i), "0.000000"), Format(length(i), "0.0000"))
+                lType = "1"
+                lArea = lImpArea(i, j) / 4046.8564
+                If CInt(lArea) > 0 Then
+                    lSB.AppendLine(Chr(34) & lUniqueLugroups(j) & Chr(34) & Chr(32) & _
+                                   lType & Chr(32) & _
+                                   lUniqueSubids(i) & Format(lArea, "0.") & Chr(32) & _
+                                   Format(lSlope(i), "0.000000") & Chr(32) & _
+                                   Format(lLength(i), "0.0000"))
                 End If
             Next j
         Next i
-
-        FileClose(OutFile)
+        SaveFileString(aWsdFileName, lSB.ToString)
     End Sub
 
-    Friend Sub WriteRCHFile(ByVal aRchFileName As String, ByVal aUniqueSubids As Collection, ByVal aSubbasinLayerIndex As Integer, _
+    Friend Sub WriteRCHFile(ByVal aRchFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aSubbasinLayerIndex As Integer, _
                             ByVal aStreamsIndex As Integer, ByVal aStreamsRIndex As Integer, ByVal aLen2Index As Integer, _
                             ByVal aSlo2Index As Integer, ByVal aWid2Index As Integer, ByVal aDep2Index As Integer, _
                             ByVal aMinelIndex As Integer, ByVal aMaxelIndex As Integer, ByVal aSnameIndex As Integer, _
-                            ByVal aModelSegementIds As Collection)
+                            ByVal aModelSegementIds As atcCollection)
 
         Dim OutFile As Integer, OutFile2 As Integer
         Dim PtfFileName As String
@@ -574,7 +554,7 @@ Module modModelSetup
         FileClose(OutFile2)
     End Sub
 
-    Friend Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As Collection, ByVal aOutSubs As Collection, _
+    Friend Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As atcCollection, _
                             ByVal aLayerIndex As Integer, ByVal aPointIndex As Integer, ByVal aChkCustom As Boolean, _
                             ByVal aLblCustom As String, ByVal aChkCalculate As Boolean, ByVal aYear As String)
 
