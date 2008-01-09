@@ -19,8 +19,6 @@ Public Class atcGraphForm
 
     'Form object that contains graph(s)
     Private pMaster As ZedGraph.MasterPane
-    Private pPaneMain As ZedGraph.GraphPane
-    Private pPaneAux As ZedGraph.GraphPane
     Private pAuxEnabled As Boolean = True 'force change with value of false on init
     Public AuxFraction As Single = 0.2
 
@@ -51,8 +49,8 @@ Public Class atcGraphForm
     Private Sub InitMasterPane()
         InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
 
-        pPaneMain = New GraphPane
-        FormatPaneWithDefaults(pPaneMain)
+        Dim lPaneMain As New GraphPane
+        FormatPaneWithDefaults(lPaneMain)
 
         Me.Controls.Add(pZgc)
         With pZgc
@@ -74,7 +72,7 @@ Public Class atcGraphForm
             .IsCommonScaleFactor = True
         End With
 
-        pMaster.PaneList.Add(pPaneMain)
+        pMaster.PaneList.Add(lPaneMain)
         AuxAxisEnabled = False
 
     End Sub
@@ -86,7 +84,7 @@ Public Class atcGraphForm
         Set(ByVal aEnable As Boolean)
             If pAuxEnabled <> aEnable Then
                 pAuxEnabled = aEnable
-                pPaneAux = EnableAuxAxis(pMaster, aEnable, AuxFraction)
+                EnableAuxAxis(pMaster, aEnable, AuxFraction)
                 'pMaster.PaneList.Clear()
                 'Dim lGraphics As Graphics = Me.CreateGraphics()
                 'If pAuxEnabled Then
@@ -318,14 +316,22 @@ Public Class atcGraphForm
     <CLSCompliant(False)> _
     Public ReadOnly Property PaneAux() As GraphPane
         Get
-            Return pPaneAux
+            If pMaster.PaneList.Count > 1 Then
+                Return pMaster.PaneList(0)
+            Else
+                Return Nothing
+            End If
         End Get
     End Property
 
     <CLSCompliant(False)> _
     Public ReadOnly Property Pane() As GraphPane
         Get
-            Return pPaneMain
+            If pMaster.PaneList.Count > 1 Then
+                Return pMaster.PaneList(1)
+            Else
+                Return pMaster.PaneList(0)
+            End If
         End Get
     End Property
 
