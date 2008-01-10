@@ -1,12 +1,12 @@
 Imports atcUtility
 Imports MapWinUtility
-Imports Microsoft.VisualBasic
 
 ''' <remarks>Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 ''' <summary>GIS Utilities implemented thru MapWindow</summary>
 Public Class GisUtil
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     Private Const UseCurrent As Integer = -1
+    Private Shared pStatusShow As Boolean = True
 
     ''' <summary>Map Window Object</summary>
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
@@ -14,6 +14,15 @@ Public Class GisUtil
     Public Shared WriteOnly Property MappingObject() As MapWindow.Interfaces.IMapWin
         Set(ByVal aNewValue As MapWindow.Interfaces.IMapWin)
             pMapWin = aNewValue
+        End Set
+    End Property
+
+    Public Shared Property StatusShow() As Boolean
+        Get
+            Return pStatusShow
+        End Get
+        Set(ByVal aNewValue As Boolean)
+            pStatusShow = aNewValue
         End Set
     End Property
 
@@ -394,7 +403,7 @@ Public Class GisUtil
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
         For iFieldIndex As Integer = 0 To lSf.NumFields - 1
-            If UCase(lSf.Field(iFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
+            If lSf.Field(iFieldIndex).Name.ToUpper = aFieldName.ToUpper Then 'this is the field we want
                 Return iFieldIndex
             End If
         Next
@@ -405,11 +414,21 @@ Public Class GisUtil
                                    ByVal aFieldName As String) As Boolean
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         For lFieldIndex As Integer = 0 To lSf.NumFields - 1
-            If UCase(lSf.Field(lFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
+            If lSf.Field(lFieldIndex).Name.ToUpper = aFieldName.ToUpper Then 'this is the field we want
                 Return True
             End If
         Next
         Return False 'field name not found
+    End Function
+
+    Public Shared Function FieldIndexAddIfMissing(ByVal aLayerIndex As Integer, ByVal aFieldName As String, _
+                                                  ByVal aFieldType As Integer, ByVal aFieldWidth As Integer) As Integer
+        Dim lFieldIndex As Integer
+        If IsField(aLayerIndex, aFieldName) Then
+            lFieldIndex = GisUtil.FieldIndex(aLayerIndex, aFieldName)
+        Else 'need to add it
+            lFieldIndex = GisUtil.AddField(aLayerIndex, aFieldName, aFieldType, aFieldWidth)
+        End If
     End Function
 
     ''' <summary>Add a field in a shape file from a layer index and a field name</summary>
@@ -1275,11 +1294,11 @@ Public Class GisUtil
                     aAreaGridPoly(lGridValue, lInsideId) += lCellArea
                 End If
                 lCellCount += 1
-                Logger.Progress(lCellCount, lTotalCellCount)
+                If pStatusShow Then Logger.Progress(lCellCount, lTotalCellCount)
             Next lCol
         Next lRow
 
-        Logger.Progress(lTotalCellCount, lTotalCellCount)
+        If pStatusShow Then Logger.Progress(lTotalCellCount, lTotalCellCount)
         lPolygonSf.EndPointInShapefile()
 
     End Sub
@@ -1335,10 +1354,10 @@ Public Class GisUtil
                         End If
                     End If
                     cellcount = cellcount + 1
-                    Logger.Progress(cellcount, totalcellcount)
+                    If pStatusShow Then Logger.Progress(cellcount, totalcellcount)
                 Next lRow
             Next lCol
-            Logger.Progress(totalcellcount, totalcellcount)
+            If pStatusShow Then Logger.Progress(totalcellcount, totalcellcount)
             lPolygonSf.EndPointInShapefile()
         End If
     End Sub
@@ -1434,11 +1453,11 @@ Public Class GisUtil
                         End If
                     End If
                     cellcount = cellcount + 1
-                    Logger.Progress(cellcount, totalcellcount)
+                    If pStatusShow Then Logger.Progress(cellcount, totalcellcount)
                 Next lRow
             Next lCol
             GridSlopeInPolygon = (lSum / lSubCellCount) / lInputGrid.Header.dX
-            Logger.Progress(totalcellcount, totalcellcount)
+            If pStatusShow Then Logger.Progress(totalcellcount, totalcellcount)
             lPolygonSf.EndPointInShapefile()
         End If
         'clean up
@@ -1635,9 +1654,9 @@ Public Class GisUtil
 
             lSf1Ext = Nothing
             lShape1 = Nothing
-            Logger.Progress(lPolygonCount, lTotalPolygonCount)
+            If pStatusShow Then Logger.Progress(lPolygonCount, lTotalPolygonCount)
         Next i
-        Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
+        If pStatusShow Then Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
         If aCreateNew Then 'delete old version of this file if it exists
             If Not TryDeleteShapefile(aOutputLayerName) Then
@@ -1750,9 +1769,9 @@ Public Class GisUtil
             lSf1Ext = Nothing
             lShape1 = Nothing
 
-            Logger.Progress(lPolygonCount, lTotalPolygonCount)
+            If pStatusShow Then Logger.Progress(lPolygonCount, lTotalPolygonCount)
         Next i
-        Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
+        If pStatusShow Then Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
     End Sub
 
@@ -1803,7 +1822,7 @@ Public Class GisUtil
             lShapeClip = lSfClip.Shape(i - 1)
             For j = 1 To lSf.NumShapes
                 lCount += 1
-                Logger.Progress(lCount, lTotal)
+                If pStatusShow Then Logger.Progress(lCount, lTotal)
                 If IsLineInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
                     'at least one point of the line is in the polygon
                     If IsLineEntirelyInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
@@ -1831,7 +1850,7 @@ Public Class GisUtil
             Next j
         Next i
         lSfClip.EndPointInShapefile()
-        Logger.Progress(lTotal, lTotal)
+        If pStatusShow Then Logger.Progress(lTotal, lTotal)
         lNewShapeFile.StopEditingShapes(True, True)
 
         lRetc = lNewShapeFile.Close()
@@ -1899,7 +1918,7 @@ Public Class GisUtil
         'merge together based on common endpoints
         Dim i As Integer = 0
         Do While i < lsf.NumShapes
-            Logger.Progress(i, lsf.NumShapes)
+            If pStatusShow Then Logger.Progress(i, lsf.NumShapes)
             lFound = False
             Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
             Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -1943,7 +1962,7 @@ Public Class GisUtil
             Dim lEndY2 As Double
             i = 0
             Do While i < lsf.NumShapes
-                Logger.Progress(i, lsf.NumShapes)
+                If pStatusShow Then Logger.Progress(i, lsf.NumShapes)
                 lFound = False
                 Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
                 Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -1991,7 +2010,7 @@ Public Class GisUtil
         End If
 
         lsf.StopEditingShapes(True)
-        Logger.Progress(lsf.NumShapes, lsf.NumShapes)
+        If pStatusShow Then Logger.Progress(lsf.NumShapes, lsf.NumShapes)
     End Sub
 
     Public Shared Function AreaOverlappingPolygons(ByVal aLayer1index As Integer, _

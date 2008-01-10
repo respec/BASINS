@@ -63,7 +63,7 @@ Friend Class frmModelSegmentation
                     Dim lShortestDistance As Double = Double.MaxValue
                     Dim lClosestMetStationIndex As Integer = -1
                     Dim lDistance As Double = 0.0
-                    For lMetStationIndex As Integer = 1 To lMetStationsSelected.Count
+                    For lMetStationIndex As Integer = 0 To lMetStationsSelected.Count - 1
                         GisUtil.PointXY(lMetLayerIndex, lMetStationsSelected(lMetStationIndex), lMetSegX, lMetSegY)
                         'calculate the distance
                         lDistance = Math.Sqrt(((Math.Abs(lSubBasinX) - Math.Abs(lMetSegX)) ^ 2) + _
