@@ -443,6 +443,7 @@ namespace ZedGraph
 				Stream myStream = new System.IO.FileStream( fileName, FileMode.Create );
 				if (myStream != null)
 				{
+					this.AxisChange();
 					ImageRender().Save( myStream, format );
 					myStream.Close();
 				}
@@ -534,6 +535,7 @@ namespace ZedGraph
 				Metafile metaFile = new Metafile(fileName, hdc, EmfType.EmfPlusDual);
 				using (Graphics gMeta = Graphics.FromImage(metaFile))
 				{
+					this.AxisChange();
 					//PaneBase.SetAntiAliasMode( gMeta, IsAntiAlias );
 					//gMeta.CompositingMode = CompositingMode.SourceCopy; 
 					//gMeta.CompositingQuality = CompositingQuality.HighQuality;
