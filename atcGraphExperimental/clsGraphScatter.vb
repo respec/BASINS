@@ -51,7 +51,7 @@ Public Class clsGraphScatter
                     Else
                         lSymbol = SymbolType.Circle
                     End If
-                    lCurve = lPane.AddCurve(clsGraphTime.TSCurveLabel(lTimeseriesY), lXValues, lYValues, lCurveColor, lSymbol)
+                    lCurve = lPane.AddCurve(TSCurveLabel(lTimeseriesY), lXValues, lYValues, lCurveColor, lSymbol)
                     If lNPts >= 1000 Then
                         lCurve.Symbol.Size = 1
                     ElseIf lNPts >= 100 Then

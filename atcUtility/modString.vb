@@ -371,124 +371,124 @@ Public Module modString
     '    StrAdd = old & nst
     'End Function
 
-    Public Sub Scalit(ByVal itype As Short, ByVal mMin As Single, ByVal mMax As Single, _
-                      ByRef plmn As Single, ByRef plmx As Single)
-        ' ##SUMMARY Determines an appropriate scale based on the _
-        'minimum and maximum values and whether an arithmetic, probability, _
-        'or logarithmic scale is requested. Minimum and maximum for probability _
-        'plots must be standard deviates. For log scales, the minimum _
-        'and maximum must not be transformed.
-        ' ##PARAM itype I Integer indicating type of number scale (0-1 = arithmetic, 2 = probability, other = logarithmic)
-        ' ##PARAM mMin I Single-precision minimum incoming data value
-        ' ##PARAM mMax I Single-precision maximum incoming data value
-        ' ##PARAM plmn O Single-precision return value for scale minimum
-        ' ##PARAM plmx O Single-precision return value for scale maximum
-        Dim a As Short
-        Dim i As Short
-        Dim inc As Short
-        Dim x As Single
-        Dim m As Single
-        Dim tmax As Single
-        ' ##LOCAL a - short integer holds log10 min/max values rounded down to nearest magnitude
-        ' ##LOCAL i - short integer used as index for r()
-        ' ##LOCAL inc - short integer increments i by 1 or -1
-        ' ##LOCAL X - single-precision rounded data min/max values
-        ' ##LOCAL M - single-precision estimator of min/max values for arithmetic scale
-        ' ##LOCAL tmax - single-precision min/max values for distribution plots (+ = max, - = min)
+    'Public Sub Scalit(ByVal itype As Short, ByVal mMin As Single, ByVal mMax As Single, _
+    '                  ByRef plmn As Single, ByRef plmx As Single)
+    '    ' ##SUMMARY Determines an appropriate scale based on the _
+    '    'minimum and maximum values and whether an arithmetic, probability, _
+    '    'or logarithmic scale is requested. Minimum and maximum for probability _
+    '    'plots must be standard deviates. For log scales, the minimum _
+    '    'and maximum must not be transformed.
+    '    ' ##PARAM itype I Integer indicating type of number scale (0-1 = arithmetic, 2 = probability, other = logarithmic)
+    '    ' ##PARAM mMin I Single-precision minimum incoming data value
+    '    ' ##PARAM mMax I Single-precision maximum incoming data value
+    '    ' ##PARAM plmn O Single-precision return value for scale minimum
+    '    ' ##PARAM plmx O Single-precision return value for scale maximum
+    '    Dim a As Short
+    '    Dim i As Short
+    '    Dim inc As Short
+    '    Dim x As Single
+    '    Dim m As Single
+    '    Dim tmax As Single
+    '    ' ##LOCAL a - short integer holds log10 min/max values rounded down to nearest magnitude
+    '    ' ##LOCAL i - short integer used as index for r()
+    '    ' ##LOCAL inc - short integer increments i by 1 or -1
+    '    ' ##LOCAL X - single-precision rounded data min/max values
+    '    ' ##LOCAL M - single-precision estimator of min/max values for arithmetic scale
+    '    ' ##LOCAL tmax - single-precision min/max values for distribution plots (+ = max, - = min)
 
-        Static r(15) As Single
-        If itype = 0 Or itype = 1 Then
-            'arithmetic scale
-            'get next lowest mult of 10
+    '    Static r(15) As Single
+    '    If itype = 0 Or itype = 1 Then
+    '        'arithmetic scale
+    '        'get next lowest mult of 10
 
-            ' ##LOCAL r - holds possible values for multiplier used in determining M from X
-            If r(1) < 0.09 Then
-                r(1) = 0.1
-                r(2) = 0.15
-                r(3) = 0.2
-                r(4) = 0.4
-                r(5) = 0.5
-                r(6) = 0.6
-                r(7) = 0.8
-                r(8) = 1.0#
-                r(9) = 1.5
-                r(10) = 2.0#
-                r(11) = 4.0#
-                r(12) = 5.0#
-                r(13) = 6.0#
-                r(14) = 8.0#
-                r(15) = 10.0#
-            End If
+    '        ' ##LOCAL r - holds possible values for multiplier used in determining M from X
+    '        If r(1) < 0.09 Then
+    '            r(1) = 0.1
+    '            r(2) = 0.15
+    '            r(3) = 0.2
+    '            r(4) = 0.4
+    '            r(5) = 0.5
+    '            r(6) = 0.6
+    '            r(7) = 0.8
+    '            r(8) = 1.0#
+    '            r(9) = 1.5
+    '            r(10) = 2.0#
+    '            r(11) = 4.0#
+    '            r(12) = 5.0#
+    '            r(13) = 6.0#
+    '            r(14) = 8.0#
+    '            r(15) = 10.0#
+    '        End If
 
-            x = Rndlow(mMax)
-            If x > 0.0# Then
-                inc = 1
-                i = 1
-            Else
-                inc = -1
-                i = 15
-            End If
-            Do
-                m = r(i) * x
-                i = i + inc
-            Loop While mMax > m And i <= 15 And i >= 1
-            plmx = m
+    '        x = Rndlow(mMax)
+    '        If x > 0.0# Then
+    '            inc = 1
+    '            i = 1
+    '        Else
+    '            inc = -1
+    '            i = 15
+    '        End If
+    '        Do
+    '            m = r(i) * x
+    '            i = i + inc
+    '        Loop While mMax > m And i <= 15 And i >= 1
+    '        plmx = m
 
-            If mMin < 0.5 * mMax And mMin >= 0.0# And itype = 1 Then
-                plmn = 0.0#
-            Else
-                'get next lowest mult of 10
-                x = Rndlow(mMin)
-                If x >= 0.0# Then
-                    inc = -1
-                    i = 15
-                Else
-                    inc = 1
-                    i = 1
-                End If
-                Do
-                    m = r(i) * x
-                    i = i + inc
-                Loop While mMin < m And i >= 1 And i <= 15
-                plmn = m
-            End If
+    '        If mMin < 0.5 * mMax And mMin >= 0.0# And itype = 1 Then
+    '            plmn = 0.0#
+    '        Else
+    '            'get next lowest mult of 10
+    '            x = Rndlow(mMin)
+    '            If x >= 0.0# Then
+    '                inc = -1
+    '                i = 15
+    '            Else
+    '                inc = 1
+    '                i = 1
+    '            End If
+    '            Do
+    '                m = r(i) * x
+    '                i = i + inc
+    '            Loop While mMin < m And i >= 1 And i <= 15
+    '            plmn = m
+    '        End If
 
-        ElseIf itype = 2 Then
-            'logarithmic scale
-            If mMin > 0.000000001 Then
-                a = Fix(Log10(CDbl(mMin)))
-            Else
-                'too small or neg value, set to -9
-                a = -9
-            End If
-            If mMin < 1.0# Then a = a - 1
-            plmn = 10.0# ^ a
+    '    ElseIf itype = 2 Then
+    '        'logarithmic scale
+    '        If mMin > 0.000000001 Then
+    '            a = Fix(Log10(CDbl(mMin)))
+    '        Else
+    '            'too small or neg value, set to -9
+    '            a = -9
+    '        End If
+    '        If mMin < 1.0# Then a = a - 1
+    '        plmn = 10.0# ^ a
 
-            If mMax > 0.000000001 Then
-                a = Fix(Log10(CDbl(mMax)))
-            Else
-                'too small or neg value, set to -8
-                a = -8
-            End If
-            If mMax > 1.0# Then a = a + 1
-            plmx = 10.0# ^ a
+    '        If mMax > 0.000000001 Then
+    '            a = Fix(Log10(CDbl(mMax)))
+    '        Else
+    '            'too small or neg value, set to -8
+    '            a = -8
+    '        End If
+    '        If mMax > 1.0# Then a = a + 1
+    '        plmx = 10.0# ^ a
 
-            If plmn * 10000000.0# < plmx Then
-                'limit range to 7 cycles
-                plmn = plmx / 10000000.0#
-            End If
+    '        If plmn * 10000000.0# < plmx Then
+    '            'limit range to 7 cycles
+    '            plmn = plmx / 10000000.0#
+    '        End If
 
-        Else
-            'probability plots - assumes data transformed to normal deviates
-            tmax = System.Math.Abs(mMax)
-            If System.Math.Abs(mMin) > tmax Then tmax = System.Math.Abs(mMin)
-            tmax = CSng(Fix(tmax * 10.0#) + 1) / 10.0#
-            If tmax > 4.0# Then tmax = 4.0#
-            plmn = -tmax
-            plmx = tmax
-        End If
+    '    Else
+    '        'probability plots - assumes data transformed to normal deviates
+    '        tmax = System.Math.Abs(mMax)
+    '        If System.Math.Abs(mMin) > tmax Then tmax = System.Math.Abs(mMin)
+    '        tmax = CSng(Fix(tmax * 10.0#) + 1) / 10.0#
+    '        If tmax > 4.0# Then tmax = 4.0#
+    '        plmn = -tmax
+    '        plmx = tmax
+    '    End If
 
-    End Sub
+    'End Sub
 
     ''' <summary>
     ''' Sets values less than 1.0E-19 to 0.0 for the plotting routines for bug in DISSPLA/PR1ME. 

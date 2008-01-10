@@ -19,13 +19,13 @@ Public Class atcGraphForm
 
     'Form object that contains graph(s)
     Private pMaster As ZedGraph.MasterPane
-    Private pAuxEnabled As Boolean = True 'force change with value of false on init
+    Private pAuxEnabled As Boolean = False
     Public AuxFraction As Single = 0.2
 
     'Graph editing form
     Private WithEvents pEditor As frmGraphEditor ' ZedGraph.frmEdit 'frmGraphEdit
 
-    Private WithEvents pZgc As New ZedGraphControl
+    Private WithEvents pZgc As ZedGraphControl
 
     Private pGrapher As clsGraphBase
 
@@ -49,32 +49,17 @@ Public Class atcGraphForm
     Private Sub InitMasterPane()
         InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
 
-        Dim lPaneMain As New GraphPane
-        FormatPaneWithDefaults(lPaneMain)
-
+        pZgc = CreateZgc()
         Me.Controls.Add(pZgc)
         With pZgc
             .Dock = DockStyle.Fill
-            .Visible = True
-            .IsSynchronizeXAxes = True
             .IsEnableHZoom = mnuViewHorizontalZoom.Checked
             .IsEnableVZoom = mnuViewVerticalZoom.Checked
             '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
             pMaster = .MasterPane
         End With
 
-        With pMaster
-            .PaneList.Clear() 'remove default GraphPane
-            .Border.IsVisible = False
-            .Legend.IsVisible = False
-            .Margin.All = 10
-            .InnerPaneGap = 5
-            .IsCommonScaleFactor = True
-        End With
-
-        pMaster.PaneList.Add(lPaneMain)
-        AuxAxisEnabled = False
-
+        RefreshGraph()
     End Sub
 
     Public Property AuxAxisEnabled() As Boolean
@@ -85,47 +70,6 @@ Public Class atcGraphForm
             If pAuxEnabled <> aEnable Then
                 pAuxEnabled = aEnable
                 EnableAuxAxis(pMaster, aEnable, AuxFraction)
-                'pMaster.PaneList.Clear()
-                'Dim lGraphics As Graphics = Me.CreateGraphics()
-                'If pAuxEnabled Then
-                '    ' Main pane already exists, just needs to be shifted
-                '    With pPaneMain
-                '        .YAxis.MinSpace = 80
-                '        .Y2Axis.MinSpace = 20
-                '        .Margin.All = 0
-                '        .Margin.Top = 10
-                '        .Margin.Bottom = 10
-                '    End With
-                '    ' Create, format, position aux pane
-                '    pPaneAux = New ZedGraph.GraphPane
-                '    FormatPaneWithDefaults(pPaneAux)
-                '    With pPaneAux
-                '        .Margin.All = 0
-                '        .Margin.Top = 10
-                '        With .XAxis
-                '            .Title.IsVisible = False
-                '            .Scale.IsVisible = False
-                '            .Scale.Max = pPaneMain.XAxis.Scale.Max
-                '            .Scale.Min = pPaneMain.XAxis.Scale.Min
-                '        End With
-                '        .X2Axis.IsVisible = False
-                '        With .YAxis
-                '            .Type = AxisType.Linear
-                '            .MinSpace = 80
-                '        End With
-                '        .Y2Axis.MinSpace = 20
-                '    End With
-
-                '    With pMaster
-                '        .PaneList.Add(pPaneAux)
-                '        .PaneList.Add(pPaneMain)
-                '        .SetLayout(lGraphics, PaneLayout.SingleColumn)
-                '        ResizePanes()
-                '    End With
-                'Else
-                '    pMaster.PaneList.Add(pPaneMain)
-                '    pMaster.SetLayout(lGraphics, PaneLayout.SingleColumn)
-                'End If
                 RefreshGraph()
             End If
         End Set
@@ -453,21 +397,25 @@ Public Class atcGraphForm
             Dim lPane As GraphPane = sender.MasterPane.FindChartRect(mousePt)
             ' If pane is non-null, we have a valid location.  Otherwise, the mouse is not within any chart rect.
             If Not lPane Is Nothing Then
-                Dim x, y As Double
-                ' Convert the mouse location to X, Y scale values
-                lPane.ReverseTransform(mousePt, x, y)
-                ' Format the status label text
-                If lPane.XAxis.Type = AxisType.DateDual Then
-                    Dim lDate As Date = Date.FromOADate(x)
-                    If lPane.XAxis.Scale.Max - lPane.XAxis.Scale.Min > 10 Then
-                        lPositionText = lDate.ToString("yyyy MMM d")
+                Try
+                    Dim x, y As Double
+                    ' Convert the mouse location to X, Y scale values
+                    lPane.ReverseTransform(mousePt, x, y)
+                    ' Format the status label text
+                    If lPane.XAxis.Type = AxisType.DateDual Then
+                        Dim lDate As Date = Date.FromOADate(x)
+                        If lPane.XAxis.Scale.Max - lPane.XAxis.Scale.Min > 10 Then
+                            lPositionText = lDate.ToString("yyyy MMM d")
+                        Else
+                            lPositionText = lDate.ToString("yyyy MMM d HH:mm")
+                        End If
                     Else
-                        lPositionText = lDate.ToString("yyyy MMM d HH:mm")
+                        lPositionText = DoubleToString(x)
                     End If
-                Else
-                    lPositionText = DoubleToString(x)
-                End If
-                lPositionText = "(" & lPositionText & ", " & DoubleToString(y) & ")"
+                    lPositionText = "(" & lPositionText & ", " & DoubleToString(y) & ")"
+                Catch
+                    'Ignore any error setting coordinate text, default label is fine
+                End Try
             End If
             mnuCoordinates.Text = lPositionText
         End If
@@ -477,7 +425,18 @@ Public Class atcGraphForm
     End Function
 
     Private Sub atcGraphForm_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
-        ResizePanesWithAux(pMaster, AuxFraction)
+        If Not pMaster Is Nothing AndAlso pMaster.PaneList.Count > 1 Then
+            Dim lPaneAux As GraphPane = pMaster.PaneList(0)
+            Dim lPaneMain As GraphPane = pMaster.PaneList(1)
+            Dim lOrigAuxHeight As Single = lPaneAux.Rect.Height
+            Dim lTotalPaneHeight As Single = lOrigAuxHeight + lPaneMain.Rect.Height
+            lPaneAux.Rect = New System.Drawing.Rectangle( _
+                    lPaneAux.Rect.X, lPaneAux.Rect.Y, _
+                    lPaneAux.Rect.Width, lTotalPaneHeight * AuxFraction)
+            lPaneMain.Rect = New System.Drawing.Rectangle( _
+                    lPaneMain.Rect.X, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
+                    lPaneMain.Rect.Width, lTotalPaneHeight - lPaneAux.Rect.Height)
+        End If
     End Sub
 
     Private Sub FreeResources()
