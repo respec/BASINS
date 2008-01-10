@@ -62,9 +62,9 @@ Public Module UtilColor
         Do
             lRule = New Generic.KeyValuePair(Of String, Color)("", _
                     Color.FromArgb(255, _
-                                   64 + CInt(Rnd()) * 128, _
-                                   64 + CInt(Rnd()) * 128, _
-                                   64 + CInt(Rnd()) * 128))
+                                   64 + CInt(Rnd() * 128), _
+                                   64 + CInt(Rnd() * 128), _
+                                   64 + CInt(Rnd() * 128)))
         Loop While pColorsUsed.Contains(lRule.Value)
 
 FoundColor:
