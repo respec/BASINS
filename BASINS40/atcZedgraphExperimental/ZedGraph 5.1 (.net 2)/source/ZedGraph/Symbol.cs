@@ -570,7 +570,7 @@ namespace ZedGraph
 			int maxY = (int)pane.Chart.Rect.Bottom;
 
 			// (Dale-a-b) we'll set an element to true when it has been drawn	
-            bool[,] isPixelDrawn = new bool[maxX - minX + 1, maxY - minY + 1];
+			bool[,] isPixelDrawn = new bool[maxX - minX + 1, maxY - minY + 1];
 
 			double curX, curY, lowVal;
 			IPointList points = curve.Points;
@@ -648,7 +648,7 @@ namespace ZedGraph
 								{
 									if ( isPixelDrawn[tmpX - minX, tmpY - minY] )
 										continue;
-                                    isPixelDrawn[tmpX - minX, tmpY - minY] = true;
+									isPixelDrawn[tmpX - minX, tmpY - minY] = true;
 								}
 
 								// If the fill type for this symbol is a Gradient by value type,
