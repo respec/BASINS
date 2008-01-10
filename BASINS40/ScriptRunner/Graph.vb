@@ -229,20 +229,13 @@ Module Graph
                                                                           Drawing.Color.Black, _
                                                                           SymbolType.Star)
                 Next
-                Dim lControl As New Windows.Forms.Control
-                Dim lGraphics As System.Drawing.Graphics = lControl.CreateGraphics()
-                lZgc.MasterPane.AxisChange(lGraphics)
                 lZgc.SaveIn("Reach" & lOperation.Id & "_Ftable.emf")
 
                 lPaneMain.YAxis.Type = AxisType.Log
                 lPaneMain.YAxis.Scale.Min = 1
                 lPaneMain.YAxis.Scale.Max = 1000000.0
                 lPaneMain.YAxis.Scale.MaxAuto = False
-                lZgc.MasterPane.AxisChange(lGraphics)
                 lZgc.SaveIn("Reach" & lOperation.Id & "_Ftable_Log.emf")
-
-                lGraphics.Dispose()
-                lControl.Dispose()
             End If
         Next
     End Sub

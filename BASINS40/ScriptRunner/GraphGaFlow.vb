@@ -48,10 +48,12 @@ Module GraphGaFlow
     End Sub
 
     Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup, ByVal aLabelAttribute As String)
-        Dim lGraphForm As New atcGraph.atcGraphForm()
-        Dim lGrapher As New clsGraphTime(aDataGroup, lGraphForm.ZedGraphCtrl)
-        ScaleYAxis(aDataGroup, lGraphForm.Pane.YAxis)
-        With lGraphForm.Pane
+        Dim lOutFileName As String = pBaseName
+        Dim lZgc As ZedGraphControl = CreateZgc()
+        Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
+        Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
+        With lPane
+            ScaleYAxis(aDataGroup, .YAxis)
             .YAxis.Title.Text = pBaseName & " (cfs)"
             .YAxis.MajorGrid.IsVisible = True
             .YAxis.MinorGrid.IsVisible = False
@@ -69,32 +71,31 @@ Module GraphGaFlow
                 End With
                 lIndex += 1
             Next
-        End With
-        Dim lOutFileName As String = pBaseName
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
 
-        With lGraphForm.Pane
             .YAxis.Type = ZedGraph.AxisType.Log
-            ScaleYAxis(aDataGroup, lGraphForm.Pane.YAxis)
+            ScaleYAxis(aDataGroup, .YAxis)
             '.YAxis.Scale.Min = 100
             '.YAxis.Scale.Max = pYMax
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
         lOutFileName = pBaseName & "_log "
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
-        lGraphForm.Dispose()
+        lZgc.SaveIn(lOutFileName & ".png")
+        lZgc.SaveIn(lOutFileName & ".emf")
+        lZgc.Dispose()
     End Sub
 
     Sub GraphScatterBatch(ByVal aDataGroup As atcDataGroup)
+        Dim lOutFileName As String = pBaseName & "_scat"
         Dim lACoef As Double
         Dim lBCoef As Double
         Dim lRSquare As Double
-        Dim lGraphForm As New atcGraph.atcGraphForm()
-        Dim lGrapher As New clsGraphScatter(aDataGroup, lGraphForm.ZedGraphCtrl)
-        With lGraphForm.Pane
+        Dim lZgc As ZedGraphControl = CreateZgc()
+        Dim lGrapher As New clsGraphScatter(aDataGroup, lZgc)
+        Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
+        With lPane
             ScaleYAxis(aDataGroup, .YAxis)
             With .YAxis
                 .Title.Text = "Norcross"
@@ -116,12 +117,12 @@ Module GraphGaFlow
                 .MinorGrid.IsVisible = True
             End With
             '45 degree line
-            AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
+            AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
             'regression line 
             'TODO: figure out why this seems backwards!
             FitLine(aDataGroup.ItemByIndex(1), aDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
             Dim lCorrCoef = Math.Sqrt(lRSquare)
-            AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
+            AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
             SaveFileString("CompareStats.txt", CompareStats(aDataGroup.ItemByIndex(0), aDataGroup.ItemByIndex(1)))
 
             Dim lText As New TextObj
@@ -132,12 +133,10 @@ Module GraphGaFlow
             lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
             .GraphObjList.Add(lText)
             .CurveList(0).Label.IsVisible = False
-        End With
-        Dim lOutFileName As String = pBaseName & "_scat"
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
 
-        With lGraphForm.Pane
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
+
             .YAxis.Type = ZedGraph.AxisType.Log
             ScaleYAxis(aDataGroup, .YAxis)
             .XAxis.Type = ZedGraph.AxisType.Log
@@ -145,20 +144,22 @@ Module GraphGaFlow
             .XAxis.Scale.Max = .YAxis.Scale.Max
             .CurveList.RemoveAt(2)
             .CurveList.RemoveAt(1)
-            AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "New45DegLine")
-            AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
+            AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "New45DegLine")
+            AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
         End With
         lOutFileName = pBaseName & "_scat_log"
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
-        lGraphForm.Dispose()
+        lZgc.SaveIn(lOutFileName & ".png")
+        lZgc.SaveIn(lOutFileName & ".emf")
+        lZgc.Dispose()
     End Sub
 
     Sub GraphDurationBatch(ByVal aDataGroup As atcDataGroup)
-        Dim lGraphForm As New atcGraph.atcGraphForm()
-        Dim lGrapher As New clsGraphProbability(aDataGroup, lGraphForm.ZedGraphCtrl)
-        SetGraphSpecs(lGraphForm.ZedGraphCtrl, "Buford", "Norcross")
-        With lGraphForm.Pane
+        Dim lOutFileName As String = pBaseName & "_dur"
+        Dim lZgc As ZedGraphControl = CreateZgc()
+        Dim lGrapher As New clsGraphProbability(aDataGroup, lZgc)
+        Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
+        With lPane
+            SetGraphSpecs(lZgc, "Buford", "Norcross")
             .YAxis.Title.Text = pBaseName & " (cfs)"
             .YAxis.Type = ZedGraph.AxisType.Log
             ScaleYAxis(aDataGroup, .YAxis)
@@ -166,10 +167,9 @@ Module GraphGaFlow
             .YAxis.Scale.IsUseTenPower = False
             .XAxis.Title.Text = "Percent of Time " & pBaseName & " exceeded"
         End With
-        Dim lOutFileName As String = pBaseName & "_dur"
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-        lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
-        lGraphForm.Dispose()
+        lZgc.SaveIn(lOutFileName & ".png")
+        lZgc.SaveIn(lOutFileName & ".emf")
+        lZgc.Dispose()
     End Sub
 
     Sub GraphResidualBatch(ByVal aDataGroup As atcDataGroup)
@@ -177,13 +177,13 @@ Module GraphGaFlow
         Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
         lArgsMath.SetValue("timeseries", aDataGroup)
         If lTsMath.Open("subtract", lArgsMath) Then
-            Dim lGraphForm As New atcGraph.atcGraphForm()
-            Dim lGrapher As New clsGraphTime(lTsMath.DataSets, lGraphForm.ZedGraphCtrl)
-            lGraphForm.Pane.CurveList(0).Label.Text = "Residual"
+            Dim lZgc As ZedGraphControl = CreateZgc()
+            Dim lGrapher As New clsGraphTime(lTsMath.DataSets, lZgc)
+            lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Residual"
             Dim lOutFileName As String = pBaseName & "_residual"
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
-            lGraphForm.Dispose()
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
+            lZgc.Dispose()
         Else
             Logger.Dbg("ResidualGraph Calculation Failed")
         End If
@@ -198,13 +198,13 @@ Module GraphGaFlow
             lArgsMath.SetValue("timeseries", lTsMath.DataSets)
             Dim lTsRunSum As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
             If lTsRunSum.Open("running sum", lArgsMath) Then
-                Dim lGraphForm As New atcGraph.atcGraphForm()
-                Dim lGrapher As New clsGraphTime(lTsRunSum.DataSets, lGraphForm.ZedGraphCtrl)
-                lGraphForm.Pane.CurveList(0).Label.Text = "Cummulative Difference"
+                Dim lZgc As ZedGraphControl = CreateZgc()
+                Dim lGrapher As New clsGraphTime(lTsRunSum.DataSets, lZgc)
+                lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Cummulative Difference"
                 Dim lOutFileName As String = pBaseName & "_cumDif"
-                lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-                lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
-                lGraphForm.Dispose()
+                lZgc.SaveIn(lOutFileName & ".png")
+                lZgc.SaveIn(lOutFileName & ".emf")
+                lZgc.Dispose()
             Else
                 Logger.Dbg("CumulativeDifferenceGraph Accumulation Calculation Failed")
             End If

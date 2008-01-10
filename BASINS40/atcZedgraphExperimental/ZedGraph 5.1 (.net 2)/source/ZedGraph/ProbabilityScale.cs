@@ -491,7 +491,7 @@ namespace ZedGraph
                 if (rtmp < -standardDeviations) rtmp = -standardDeviations;
                 return rtmp;
             }
-            catch (Exception e)
+            catch 
             {
                 return 0;
             }
