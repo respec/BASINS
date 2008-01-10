@@ -50,11 +50,15 @@ Public Class atcGraphPlugin
                     .Items.Add(pGraphTypeNames(0))
                     .Items.Add(pGraphTypeNames(1))
                     .Items.Add(pGraphTypeNames(2))
+                    Dim lNeededTwoSuffix As String
                     If lDataGroup.Count = 2 Then
-                        .Items.Add(pGraphTypeNames(3))
-                        .Items.Add(pGraphTypeNames(4))
-                        .Items.Add(pGraphTypeNames(5))
+                        lNeededTwoSuffix = ""
+                    Else
+                        lNeededTwoSuffix = " (two datasets needed but " & lDataGroup.Count & " datasets selected)"
                     End If
+                    .Items.Add(pGraphTypeNames(3) & lNeededTwoSuffix)                    
+                    .Items.Add(pGraphTypeNames(4) & lNeededTwoSuffix)
+                    .Items.Add(pGraphTypeNames(5) & lNeededTwoSuffix)
                 End If
 
                 For Each lCheckedName As String In GetSetting("BASINS4", "Graph", "ChooseGraphs", "").Split(","c)
@@ -70,7 +74,7 @@ Public Class atcGraphPlugin
                     For Each lGraphTypeName As String In .CheckedItems
                         lAllCheckedItemNames &= lGraphTypeName & ","
                         Dim lForm As New atcGraphForm()
-                        Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lDataGroup, lForm.ZedGraphCtrl)
+                        Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lDataGroup, lForm)
                         If lGrapher Is Nothing Then
                             lForm.Dispose()
                         Else
@@ -85,30 +89,26 @@ Public Class atcGraphPlugin
     End Function
 
     <CLSCompliant(False)> _
-    Public Function GetGraphType(ByVal aGraphTypeName As String, _
+    Private Function GetGraphType(ByVal aGraphTypeName As String, _
                                  ByVal aDataGroup As atcDataGroup, _
-                                 ByVal aZedGraphCtrl As ZedGraph.ZedGraphControl) As clsGraphBase
+                                 ByVal aGraphForm As atcGraphForm) As clsGraphBase
         Dim lIndex As Integer = Array.IndexOf(pGraphTypeNames, aGraphTypeName)
         Select Case lIndex
-            Case -1 : Throw New ApplicationException("Unknown graph type requested: " & aGraphTypeName)
-            Case 0 'timeseries
-                Return New clsGraphTime(aDataGroup, aZedGraphCtrl)
-            Case 1 'Flow/Duration
-                Return New clsGraphProbability(aDataGroup, aZedGraphCtrl)
-            Case 2 'Running Sum
-                Return New clsGraphRunningSum(aDataGroup, aZedGraphCtrl)
-            Case 3 'Residual
-                Return New clsGraphResidual(aDataGroup, aZedGraphCtrl)
-            Case 4 'Cumulative Difference
-                Return New clsGraphCumulativeDifference(aDataGroup, aZedGraphCtrl)
-            Case 5 'Scatter
-                If aDataGroup.Count = 2 Then
-                    Return New clsGraphScatter(aDataGroup, aZedGraphCtrl)
-                Else
-                    Logger.Msg("ScatterGraph requires 2 timeseries, " & aDataGroup.Count & " specified")
-                End If
+            Case 0 : aGraphForm.Text = "Timeseries Graph"
+                Return New clsGraphTime(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case 1 : aGraphForm.Text = "Flow/Duration Graph"
+                Return New clsGraphProbability(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case 2 : aGraphForm.Text = "Running Sum Graph"
+                Return New clsGraphRunningSum(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case 3 : aGraphForm.Text = "Residual Graph"
+                Return New clsGraphResidual(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case 4 : aGraphForm.Text = "Cumulative Difference Graph"
+                Return New clsGraphCumulativeDifference(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case 5 : aGraphForm.Text = "Scatter Plot"
+                Return New clsGraphScatter(aDataGroup, aGraphForm.ZedGraphCtrl)
         End Select
-        Throw New ApplicationException("Unable to create graph: " & aGraphTypeName)
+        Logger.Dbg("Unable to create graph: " & aGraphTypeName)
+        Return Nothing
     End Function
 
 End Class

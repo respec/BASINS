@@ -163,7 +163,8 @@ Public Module modGraph
         Dim lPaneMain As GraphPane = aMasterPane.PaneList(aMasterPane.PaneList.Count - 1)
         Dim lPaneAux As GraphPane = Nothing
         If aMasterPane.PaneList.Count > 1 Then lPaneAux = aMasterPane.PaneList(0)
-        'Dim lGraphics As Graphics = Me.CreateGraphics()
+        Dim lDummyForm As New Windows.Forms.Form
+        Dim lGraphics As Graphics = lDummyForm.CreateGraphics()
         aMasterPane.PaneList.Clear()
         If aEnable Then
             ' Main pane already exists, just needs to be shifted
@@ -197,37 +198,60 @@ Public Module modGraph
             With aMasterPane
                 .PaneList.Add(lPaneAux)
                 .PaneList.Add(lPaneMain)
-                '       .SetLayout(lGraphics, PaneLayout.SingleColumn)
-                ResizePanesWithAux(aMasterPane, aAuxFraction)
+                .SetLayout(lGraphics, PaneLayout.SingleColumn)
+                Dim lOrigAuxHeight As Single = lPaneAux.Rect.Height
+                Dim lTotalPaneHeight As Single = lPaneMain.Rect.Height + lOrigAuxHeight
+                lPaneAux.Rect = New System.Drawing.Rectangle( _
+                        lPaneAux.Rect.X, lPaneAux.Rect.Y, _
+                        lPaneAux.Rect.Width, lTotalPaneHeight * aAuxFraction)
+                lPaneMain.Rect = New System.Drawing.Rectangle( _
+                        lPaneMain.Rect.X, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
+                        lPaneMain.Rect.Width, lTotalPaneHeight - lPaneAux.Rect.Height)
             End With
         Else
             aMasterPane.PaneList.Add(lPaneMain)
-            '    aMasterPane.SetLayout(lGraphics, PaneLayout.SingleColumn)
+            aMasterPane.SetLayout(lGraphics, PaneLayout.SingleColumn)
         End If
+        aMasterPane.AxisChange()
+        lGraphics.Dispose()
         Return lPaneAux
     End Function
 
     <CLSCompliant(False)> _
-    Public Sub ResizePanesWithAux(ByVal aMasterPane As ZedGraph.MasterPane, ByVal aAuxFraction As Single)
-        If Not aMasterPane Is Nothing AndAlso aMasterPane.PaneList.Count > 1 Then
-            Dim lPaneAux As GraphPane = aMasterPane.PaneList(0)
-            Dim lPaneMain As GraphPane = aMasterPane.PaneList(1)
-            Dim lOrigAuxHeight As Single = lPaneAux.Rect.Height
-            Dim lTotalPaneHeight As Single = lOrigAuxHeight + lPaneMain.Rect.Height
-            lPaneAux.Rect = New System.Drawing.Rectangle( _
-                    lPaneAux.Rect.X, lPaneAux.Rect.Y, _
-                    lPaneAux.Rect.Width, lTotalPaneHeight * aAuxFraction)
-            lPaneMain.Rect = New System.Drawing.Rectangle( _
-                    lPaneMain.Rect.X, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
-                    lPaneMain.Rect.Width, lTotalPaneHeight - lPaneAux.Rect.Height)
+    Public Function CreateZgc(Optional ByVal aZgc As ZedGraphControl = Nothing, Optional ByVal aWidth As Integer = 600, Optional ByVal aHeight As Integer = 500) As ZedGraphControl
+        If Not aZgc Is Nothing AndAlso Not aZgc.IsDisposed Then
+            aZgc.Dispose()
         End If
-    End Sub
 
-    Public Sub SetGraphSpecs(ByRef aGraphForm As atcGraph.atcGraphForm, _
+        aZgc = New ZedGraphControl
+
+        Dim lPaneMain As New GraphPane
+        FormatPaneWithDefaults(lPaneMain)
+
+        With aZgc
+            .Visible = True
+            .IsSynchronizeXAxes = True
+            .Width = aWidth
+            .Height = aHeight
+            With .MasterPane
+                .PaneList.Clear() 'remove default GraphPane
+                .Border.IsVisible = False
+                .Legend.IsVisible = False
+                .Margin.All = 10
+                .InnerPaneGap = 5
+                .IsCommonScaleFactor = True
+                .PaneList.Add(lPaneMain)
+            End With
+            EnableAuxAxis(.MasterPane, False, 0)
+        End With
+        Return aZgc
+    End Function
+
+    <CLSCompliant(False)> _
+    Public Sub SetGraphSpecs(ByRef aZgc As ZedGraphControl, _
                              Optional ByRef aLabel1 As String = "Simulated", _
                              Optional ByRef aLabel2 As String = "Observed")
-        aGraphForm.WindowState = Windows.Forms.FormWindowState.Maximized
-        With aGraphForm.Pane
+        With aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
             .YAxis.MajorGrid.IsVisible = True
             .YAxis.MinorGrid.IsVisible = False
             .XAxis.MajorGrid.IsVisible = True
@@ -325,7 +349,7 @@ Public Module modGraph
     End Sub
 
     <CLSCompliant(False)> _
-    Public Sub ScaleYAxis(ByVal aDataGroup As atcDataGroup, ByVal aYAxis As YAxis)
+    Public Sub ScaleYAxis(ByVal aDataGroup As atcDataGroup, ByVal aYAxis As Axis)
         Dim lDataMin As Double = 1.0E+30
         Dim lDataMax As Double = -1.0E+30
         Dim lLogFlag As Boolean = False
@@ -344,8 +368,7 @@ Public Module modGraph
 
     ''' <summary>
     ''' Determines an appropriate scale based on the minimum and maximum values and 
-    ''' whether an arithmetic, probability, or logarithmic scale is requested. 
-    ''' Minimum and maximum for probability plots must be standard deviates. 
+    ''' whether an arithmetic or logarithmic scale is requested. 
     ''' For log scales, the minimum and maximum must not be transformed.
     ''' </summary>
     ''' <param name="aDataMin"></param>

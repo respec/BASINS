@@ -42,10 +42,10 @@ Public Class clsGraphProbability
         End If
         Dim lCurve As ZedGraph.CurveItem
         For Each lTs As atcTimeseries In aRemoved
-            lCurve = lCurveList.Item(clsGraphTime.TSCurveLabel(lTs))
+            lCurve = lCurveList.Item(TSCurveLabel(lTs))
             If lCurve Is Nothing Then
                 If Not lCurveListAux Is Nothing Then
-                    lCurve = lCurveListAux.Item(clsGraphTime.TSCurveLabel(lTs))
+                    lCurve = lCurveListAux.Item(TSCurveLabel(lTs))
                     If Not lCurve Is Nothing Then
                         lCurveListAux.Remove(lCurve)
                     End If
@@ -61,7 +61,7 @@ Public Class clsGraphProbability
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Dim lCurveLabel As String = clsGraphTime.TSCurveLabel(aTimeseries)
+        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
         Dim lCurve As LineItem = Nothing
         If pNumProbabilityPoints = 0 Then

@@ -157,7 +157,7 @@ Module GraphGaFlow
     Sub GraphDurationBatch(ByVal aDataGroup As atcDataGroup)
         Dim lGraphForm As New atcGraph.atcGraphForm()
         Dim lGrapher As New clsGraphProbability(aDataGroup, lGraphForm.ZedGraphCtrl)
-        SetGraphSpecs(lGraphForm, "Buford", "Norcross")
+        SetGraphSpecs(lGraphForm.ZedGraphCtrl, "Buford", "Norcross")
         With lGraphForm.Pane
             .YAxis.Title.Text = pBaseName & " (cfs)"
             .YAxis.Type = ZedGraph.AxisType.Log

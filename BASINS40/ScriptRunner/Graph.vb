@@ -25,7 +25,9 @@ Module Graph
         Dim lExpertSystem As HspfSupport.ExpertSystem
         lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
         Dim lCons As String = "Flow"
-        Dim lGraphForm As atcGraph.atcGraphForm
+        'Dim lGraphForm As atcGraph.atcGraphForm
+        Dim lZgc As ZedGraphControl
+        Dim lPane As ZedGraph.GraphPane
         Dim lGrapher As clsGraphBase
         ChDriveDir(CurDir() & "\outfiles")
         Dim lOutFileName As String
@@ -51,11 +53,12 @@ Module Graph
             Dim lACoef As Double
             Dim lBCoef As Double
             Dim lRSquare As Double
-            lGraphForm = New atcGraph.atcGraphForm()
-            lGrapher = New clsGraphScatter(lDataGroup, lGraphForm.ZedGraphCtrl)
-            lGraphForm.Grapher = lGrapher
-
-            With lGraphForm.Pane
+            lZgc = CreateZgc()
+            'lZgc.Height = 496
+            'lZgc.Width = 543
+            lGrapher = New clsGraphScatter(lDataGroup, lZgc)
+            lPane = lZgc.MasterPane.PaneList(0)
+            With lPane
                 With .XAxis
                     'TODO: figures out how to make whole title go below XAxis title
                     .Title.Text = "Observed" & vbCrLf & vbCrLf & _
@@ -79,11 +82,11 @@ Module Graph
                 End With
 
                 '45 degree line
-                AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
+                AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
                 'regression line 
                 'TODO: figure out why this seems backwards!
                 FitLine(lDataGroup.ItemByIndex(1), lDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
-                AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
+                AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
 
                 Dim lText As New TextObj
                 Dim lFmt As String = "###,##0.###"
@@ -95,31 +98,29 @@ Module Graph
                 .CurveList(0).Label.IsVisible = False
             End With
             lOutFileName = lCons & "_" & lSite & "_scat"
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
 
-            With lGraphForm.Pane
+            With lPane
                 .YAxis.Type = ZedGraph.AxisType.Log
                 .YAxis.Scale.Min = 1
                 .XAxis.Type = ZedGraph.AxisType.Log
                 .XAxis.Scale.Min = 1
                 .CurveList.RemoveAt(2)
                 .CurveList.RemoveAt(1)
-                AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "New45DegLine")
-                AddLine(lGraphForm.Pane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
+                AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "New45DegLine")
+                AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
             End With
             lOutFileName = lCons & "_" & lSite & "_scat_log"
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
+            lGrapher.Dispose()
 
-            lGraphForm.Dispose()
-
-            lGraphForm = New atcGraph.atcGraphForm()
-            lGrapher = New clsGraphProbability(lDataGroup, lGraphForm.ZedGraphCtrl)
-            lGraphForm.Grapher = lGrapher
-
-            SetGraphSpecs(lGraphForm)
-            With lGraphForm.Pane
+            lZgc = CreateZgc(lZgc)
+            lGrapher = New clsGraphProbability(lDataGroup, lZgc)
+            lPane = lZgc.MasterPane.PaneList(0)
+            SetGraphSpecs(lZgc)
+            With lPane
                 .YAxis.Title.Text = lCons & " (cfs)"
                 .YAxis.Type = ZedGraph.AxisType.Log
                 .YAxis.Scale.Min = 1
@@ -129,9 +130,9 @@ Module Graph
                 .XAxis.Title.Text = "Percent of Time " & lCons & " exceeded at " & lSite
             End With
             lOutFileName = lCons & "_" & lSite & "_dur"
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
-            lGraphForm.Dispose()
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
+            lGrapher.Dispose()
 
             'add precip to aux axis
             Dim lPrecTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
@@ -139,27 +140,26 @@ Module Graph
             lDataGroup.Add(SubsetByDate(lPrecTser, _
                                         lExpertSystem.SDateJ, _
                                         lExpertSystem.EDateJ, Nothing))
-            lGraphForm = New atcGraph.atcGraphForm()
-            lGrapher = New clsGraphTime(lDataGroup, lGraphForm.ZedGraphCtrl)
-            lGraphForm.Grapher = lGrapher
-            With lGraphForm.Pane
+            lZgc = CreateZgc(lZgc)
+            lGrapher = New clsGraphTime(lDataGroup, lZgc)
+            With lZgc.MasterPane.PaneList(1)
                 .YAxis.Scale.Min = 0
                 .YAxis.Scale.Max = lYMax
                 .YAxis.Title.Text = lCons & " (cfs)"
                 .XAxis.Title.Text = "Daily Mean Flow at " & lSite
                 .XAxis.MajorTic.IsOutside = True
             End With
-            With lGraphForm.PaneAux
+            With lZgc.MasterPane.PaneList(0)
                 .CurveList.Item(0).Color = Drawing.Color.Blue
                 .CurveList.Item(0).Label.Text = "Upper Marlboro"
                 .YAxis.Title.Text = "Precip (in)"
             End With
-            SetGraphSpecs(lGraphForm)
+            SetGraphSpecs(lZgc)
             lOutFileName = lCons & "_" & lSite
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
 
-            With lGraphForm.Pane
+            With lZgc.MasterPane.PaneList(1)
                 .YAxis.Type = ZedGraph.AxisType.Log
                 .YAxis.Scale.Min = 1
                 .YAxis.Scale.Max = lYMax
@@ -167,9 +167,11 @@ Module Graph
                 .YAxis.Scale.IsUseTenPower = False
             End With
             lOutFileName = lCons & "_" & lSite & "_log "
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".png")
-            lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
-            lGraphForm.Dispose()
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.SaveIn(lOutFileName & ".emf")
+            lZgc.Dispose()
+            lZgc = Nothing
+            lGrapher.Dispose()
 
             OpenFile(lOutFileName & ".png")
         Next lSiteIndex
@@ -199,6 +201,7 @@ Module Graph
                     .InnerPaneGap = 5
                     .IsCommonScaleFactor = True
                 End With
+
                 Dim lPaneMain As GraphPane = lZgc.MasterPane.PaneList(0)
                 FormatPaneWithDefaults(lPaneMain)
                 lPaneMain.Title.Text = "FTable for Reach " & lOperation.Id
