@@ -13,22 +13,12 @@ Public Class atcChooseDataGroupDates
     Private pCommonStart As Double = GetNaN()
     Private pCommonEnd As Double = GetNaN()
 
-    Private Sub btnAllDates_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAllDates.Click
-        txtOmitBefore.Text = lblDataStart.Text
-        txtOmitAfter.Text = lblDataEnd.Text
-    End Sub
-
-    Private Sub btnCommon_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCommon.Click
-        txtOmitBefore.Text = lblCommonStart.Text
-        txtOmitAfter.Text = lblCommonEnd.Text
-    End Sub
-
     Public Property OmitBefore() As Double
         Get
             Return GetTextboxJdate(txtOmitBefore)
         End Get
         Set(ByVal aJdate As Double)
-            txtOmitBefore.Text = pDateFormat.JDateToString(aJdate)
+            If Math.Abs(aJdate) > 5 Then txtOmitBefore.Text = pDateFormat.JDateToString(aJdate)
         End Set
     End Property
 
@@ -37,7 +27,7 @@ Public Class atcChooseDataGroupDates
             Return GetTextboxJdate(txtOmitAfter)
         End Get
         Set(ByVal aJdate As Double)
-            txtOmitAfter.Text = pDateFormat.JDateToString(aJdate)
+            If Math.Abs(aJdate) > 5 Then txtOmitAfter.Text = pDateFormat.JDateToString(aJdate)
         End Set
     End Property
 
@@ -93,7 +83,11 @@ Public Class atcChooseDataGroupDates
         Set(ByVal aGroup As atcDataGroup)
             pDataGroup = aGroup
             Reset()
-            If btnAllDates.Enabled Then btnAllDates_Click(Nothing, Nothing)
+            If radioAll.Enabled Then
+                radioAll.Checked = True
+            Else
+                radioCustom.Checked = True
+            End If
         End Set
     End Property
 
@@ -136,45 +130,84 @@ Public Class atcChooseDataGroupDates
                 End If
             Next
         End If
-        If pFirstStart < GetMaxValue() AndAlso pLastEnd > GetMinValue() Then
+        If pFirstStart <= pLastEnd Then
             lblDataStart.Text = pDateFormat.JDateToString(pFirstStart)
             lblDataEnd.Text = pDateFormat.JDateToString(pLastEnd)
-            btnAllDates.Enabled = True
+            radioAll.Enabled = True
+            If radioAll.Checked Then radioAll_CheckedChanged(Nothing, Nothing)
         Else
             lblDataStart.Text = ""
             lblDataEnd.Text = ""
-            btnAllDates.Enabled = False
+            radioAll.Enabled = False
         End If
 
         If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
             lblCommonStart.Text = pDateFormat.JDateToString(pCommonStart)
             lblCommonEnd.Text = pDateFormat.JDateToString(pCommonEnd)
-            btnCommon.Enabled = True
+            radioCommon.Enabled = True
+            If radioCommon.Checked Then radioCommon_CheckedChanged(Nothing, Nothing)
         Else
             lblCommonStart.Text = pNoDatesInCommon
             lblCommonEnd.Text = pNoDatesInCommon
-            btnCommon.Enabled = False
+            radioCommon.Enabled = False
+            If radioCommon.Checked Then
+                If radioAll.Enabled Then
+                    radioAll.Checked = True
+                Else
+                    radioCustom.Checked = True
+                End If
+            End If
         End If
 
     End Sub
+
+    Public ReadOnly Property SelectedAll() As Boolean
+        Get
+            Return radioAll.Checked OrElse (txtOmitBefore.Text = lblDataStart.Text AndAlso txtOmitAfter.Text = lblDataEnd.Text)
+        End Get
+    End Property
 
     Public Function CreateSelectedDataGroupSubset() As atcDataGroup
         If pDataGroup Is Nothing Then
             'nothing to subset, return empty group
             Return New atcDataGroup
-        ElseIf txtOmitBefore.Text = lblDataStart.Text AndAlso txtOmitAfter.Text = lblDataEnd.Text Then
+        ElseIf SelectedAll Then
             'No need to subset
             Return pDataGroup
         Else
             Dim lSubsetGroup As New atcDataGroup
             Dim lStartDate As Double = OmitBefore
             Dim lEndDate As Double = OmitAfter
-            For Each lTs As atcData.atcTimeseries In pDataGroup
-                If lTs.Dates.numValues > 0 Then
-                    lSubsetGroup.Add(SubsetByDate(lTs, lStartDate, lEndDate, Nothing))
-                End If
-            Next
+            If lStartDate <= lEndDate Then
+                For Each lTs As atcData.atcTimeseries In pDataGroup
+                    If lTs.Dates.numValues > 0 Then
+                        lSubsetGroup.Add(SubsetByDate(lTs, lStartDate, lEndDate, Nothing))
+                    End If
+                Next
+            End If
             Return lSubsetGroup
         End If
     End Function
+
+    Private Sub radioAll_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioAll.CheckedChanged
+        If radioAll.Checked Then
+            txtOmitBefore.Text = lblDataStart.Text
+            txtOmitAfter.Text = lblDataEnd.Text
+        End If
+    End Sub
+
+    Private Sub radioCommon_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioCommon.CheckedChanged
+        If radioCommon.Checked Then
+            txtOmitBefore.Text = lblCommonStart.Text
+            txtOmitAfter.Text = lblCommonEnd.Text
+        End If
+    End Sub
+
+    Private Sub txtOmitAfter_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOmitAfter.Click
+        radioCustom.Checked = True
+    End Sub
+
+    Private Sub txtOmitBefore_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOmitBefore.Click
+        radioCustom.Checked = True
+    End Sub
 End Class
