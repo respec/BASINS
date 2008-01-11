@@ -60,6 +60,7 @@ Friend Class frmSelectData
     Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
     Friend WithEvents mnuOpenData As System.Windows.Forms.MenuItem
     Friend WithEvents pnlButtons As System.Windows.Forms.Panel
+    Friend WithEvents atcSelectedDates As atcData.atcChooseDataGroupDates
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -89,6 +90,7 @@ Friend Class frmSelectData
         Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.pnlButtons = New System.Windows.Forms.Panel
+        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
         Me.groupTop.SuspendLayout()
         Me.groupSelected.SuspendLayout()
         Me.pnlButtons.SuspendLayout()
@@ -240,10 +242,23 @@ Friend Class frmSelectData
         '
         'pnlButtons
         '
+        Me.pnlButtons.Controls.Add(Me.atcSelectedDates)
         Me.pnlButtons.Controls.Add(Me.btnCancel)
         Me.pnlButtons.Controls.Add(Me.btnOk)
         resources.ApplyResources(Me.pnlButtons, "pnlButtons")
         Me.pnlButtons.Name = "pnlButtons"
+        '
+        'atcSelectedDates
+        '
+        Me.atcSelectedDates.CommonEnd = 1.7976931348623157E+308
+        Me.atcSelectedDates.CommonStart = -1.7976931348623157E+308
+        Me.atcSelectedDates.DataGroup = Nothing
+        Me.atcSelectedDates.FirstStart = 1.7976931348623157E+308
+        Me.atcSelectedDates.LastEnd = -1.7976931348623157E+308
+        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
+        Me.atcSelectedDates.Name = "atcSelectedDates"
+        Me.atcSelectedDates.OmitAfter = -4
+        Me.atcSelectedDates.OmitBefore = -4
         '
         'frmSelectData
         '
@@ -259,7 +274,6 @@ Friend Class frmSelectData
         Me.groupTop.ResumeLayout(False)
         Me.groupSelected.ResumeLayout(False)
         Me.pnlButtons.ResumeLayout(False)
-        Me.pnlButtons.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -296,6 +310,8 @@ Friend Class frmSelectData
             pSelectedGroup = aGroup
         End If
 
+        atcSelectedDates.DataGroup = pSelectedGroup
+
         pMatchingGroup = New atcDataGroup
         pMatchingSource = New GridSource(pMatchingGroup)
         pMatchingSource.SelectedItems = pSelectedGroup
@@ -307,7 +323,11 @@ Friend Class frmSelectData
         Populate()
         If aModal Then
             Me.ShowDialog()
-            If Not pSelectedOK Then 'User clicked Cancel or closed dialog
+            If pSelectedOK Then
+                If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
+                    pSelectedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
+                End If
+            Else 'User clicked Cancel or closed dialog
                 If Not pRevertedToSaved Then pSelectedGroup.ChangeTo(pSaveGroup)
             End If
             Return pSelectedGroup

@@ -117,18 +117,93 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="&gt;&gt;pMatchingGrid.Name" xml:space="preserve">
+    <value>pMatchingGrid</value>
+  </data>
+  <data name="&gt;&gt;pMatchingGrid.Type" xml:space="preserve">
+    <value>atcControls.atcGrid, atcControls, Version=3.1.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;pMatchingGrid.Parent" xml:space="preserve">
+    <value>groupTop</value>
+  </data>
+  <data name="&gt;&gt;pMatchingGrid.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;lblMatching.Name" xml:space="preserve">
+    <value>lblMatching</value>
+  </data>
+  <data name="&gt;&gt;lblMatching.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblMatching.Parent" xml:space="preserve">
+    <value>groupTop</value>
+  </data>
+  <data name="&gt;&gt;lblMatching.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;splitAboveMatching.Name" xml:space="preserve">
+    <value>splitAboveMatching</value>
+  </data>
+  <data name="&gt;&gt;splitAboveMatching.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Splitter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;splitAboveMatching.Parent" xml:space="preserve">
+    <value>groupTop</value>
+  </data>
+  <data name="&gt;&gt;splitAboveMatching.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;panelCriteria.Name" xml:space="preserve">
+    <value>panelCriteria</value>
+  </data>
+  <data name="&gt;&gt;panelCriteria.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panelCriteria.Parent" xml:space="preserve">
+    <value>groupTop</value>
+  </data>
+  <data name="&gt;&gt;panelCriteria.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="groupTop.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="groupTop.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="groupTop.Size" type="System.Drawing.Size, System.Drawing">
+    <value>632, 352</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="groupTop.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="groupTop.Text" xml:space="preserve">
+    <value>Select Attribute Values to Filter Available Data</value>
+  </data>
+  <data name="&gt;&gt;groupTop.Name" xml:space="preserve">
+    <value>groupTop</value>
+  </data>
+  <data name="&gt;&gt;groupTop.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupTop.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;groupTop.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
   <data name="pMatchingGrid.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="pMatchingGrid.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 184</value>
   </data>
   <data name="pMatchingGrid.Size" type="System.Drawing.Size, System.Drawing">
     <value>626, 165</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="pMatchingGrid.TabIndex" type="System.Int32, mscorlib">
     <value>15</value>
   </data>
@@ -225,33 +300,6 @@
   <data name="&gt;&gt;panelCriteria.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <data name="groupTop.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="groupTop.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="groupTop.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 352</value>
-  </data>
-  <data name="groupTop.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="groupTop.Text" xml:space="preserve">
-    <value>Select Attribute Values to Filter Available Data</value>
-  </data>
-  <data name="&gt;&gt;groupTop.Name" xml:space="preserve">
-    <value>groupTop</value>
-  </data>
-  <data name="&gt;&gt;groupTop.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;groupTop.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;groupTop.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
   <data name="btnCancel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
@@ -259,7 +307,7 @@
     <value>NoControl</value>
   </data>
   <data name="btnCancel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>540, 8</value>
+    <value>540, 53</value>
   </data>
   <data name="btnCancel.Size" type="System.Drawing.Size, System.Drawing">
     <value>80, 24</value>
@@ -280,7 +328,7 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;btnCancel.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>1</value>
   </data>
   <data name="btnOk.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
@@ -289,7 +337,7 @@
     <value>NoControl</value>
   </data>
   <data name="btnOk.Location" type="System.Drawing.Point, System.Drawing">
-    <value>454, 8</value>
+    <value>454, 53</value>
   </data>
   <data name="btnOk.Size" type="System.Drawing.Size, System.Drawing">
     <value>80, 24</value>
@@ -310,7 +358,7 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;btnOk.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>2</value>
   </data>
   <data name="splitAboveSelected.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Top</value>
@@ -339,18 +387,6 @@
   <data name="&gt;&gt;splitAboveSelected.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="pSelectedGrid.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="pSelectedGrid.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 16</value>
-  </data>
-  <data name="pSelectedGrid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>626, 185</value>
-  </data>
-  <data name="pSelectedGrid.TabIndex" type="System.Int32, mscorlib">
-    <value>17</value>
-  </data>
   <data name="&gt;&gt;pSelectedGrid.Name" xml:space="preserve">
     <value>pSelectedGrid</value>
   </data>
@@ -370,7 +406,7 @@
     <value>0, 360</value>
   </data>
   <data name="groupSelected.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 204</value>
+    <value>632, 159</value>
   </data>
   <data name="groupSelected.TabIndex" type="System.Int32, mscorlib">
     <value>16</value>
@@ -390,17 +426,44 @@
   <data name="&gt;&gt;groupSelected.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="pSelectedGrid.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="pSelectedGrid.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 16</value>
+  </data>
+  <data name="pSelectedGrid.Size" type="System.Drawing.Size, System.Drawing">
+    <value>626, 140</value>
+  </data>
+  <data name="pSelectedGrid.TabIndex" type="System.Int32, mscorlib">
+    <value>17</value>
+  </data>
+  <data name="&gt;&gt;pSelectedGrid.Name" xml:space="preserve">
+    <value>pSelectedGrid</value>
+  </data>
+  <data name="&gt;&gt;pSelectedGrid.Type" xml:space="preserve">
+    <value>atcControls.atcGrid, atcControls, Version=3.1.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;pSelectedGrid.Parent" xml:space="preserve">
+    <value>groupSelected</value>
+  </data>
+  <data name="&gt;&gt;pSelectedGrid.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <metadata name="MainMenu1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="mnuFile.Text" xml:space="preserve">
+    <value>File</value>
+  </data>
   <data name="mnuOpenData.Text" xml:space="preserve">
     <value>Open Data</value>
   </data>
   <data name="mnuFileManage.Text" xml:space="preserve">
     <value>Manage Data Sources</value>
   </data>
-  <data name="mnuFile.Text" xml:space="preserve">
-    <value>File</value>
+  <data name="mnuAttributes.Text" xml:space="preserve">
+    <value>Attributes</value>
   </data>
   <data name="mnuAttributesAdd.Text" xml:space="preserve">
     <value>A&amp;dd</value>
@@ -411,8 +474,8 @@
   <data name="mnuAttributesMove.Text" xml:space="preserve">
     <value>&amp;Move</value>
   </data>
-  <data name="mnuAttributes.Text" xml:space="preserve">
-    <value>Attributes</value>
+  <data name="mnuSelect.Text" xml:space="preserve">
+    <value>Select</value>
   </data>
   <data name="mnuSelectAll.Shortcut" type="System.Windows.Forms.Shortcut, System.Windows.Forms">
     <value>CtrlA</value>
@@ -429,9 +492,6 @@
   <data name="mnuSelectNoMatching.Text" xml:space="preserve">
     <value>Un-select Matching</value>
   </data>
-  <data name="mnuSelect.Text" xml:space="preserve">
-    <value>Select</value>
-  </data>
   <data name="mnuHelp.Shortcut" type="System.Windows.Forms.Shortcut, System.Windows.Forms">
     <value>F1</value>
   </data>
@@ -441,89 +501,35 @@
   <data name="mnuHelp.Text" xml:space="preserve">
     <value>Help</value>
   </data>
-  <data name="lblAction.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
+  <data name="atcSelectedDates.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
   </data>
-  <data name="lblAction.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
+  <data name="atcSelectedDates.Size" type="System.Drawing.Size, System.Drawing">
+    <value>316, 85</value>
   </data>
-  <data name="lblAction.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 14</value>
-  </data>
-  <data name="lblAction.Size" type="System.Drawing.Size, System.Drawing">
-    <value>102, 13</value>
-  </data>
-  <data name="lblAction.TabIndex" type="System.Int32, mscorlib">
-    <value>22</value>
-  </data>
-  <data name="lblAction.Text" xml:space="preserve">
-    <value>With selected data, </value>
-  </data>
-  <data name="lblAction.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="&gt;&gt;lblAction.Name" xml:space="preserve">
-    <value>lblAction</value>
-  </data>
-  <data name="&gt;&gt;lblAction.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lblAction.Parent" xml:space="preserve">
-    <value>pnlButtons</value>
-  </data>
-  <data name="&gt;&gt;lblAction.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="cboAction.Items" xml:space="preserve">
-    <value>Do Nothing</value>
-  </data>
-  <data name="cboAction.Items1" xml:space="preserve">
-    <value>List</value>
-  </data>
-  <data name="cboAction.Items2" xml:space="preserve">
-    <value>Graph</value>
-  </data>
-  <data name="cboAction.Items3" xml:space="preserve">
-    <value>DataTree</value>
-  </data>
-  <data name="cboAction.Items4" xml:space="preserve">
-    <value>Save in File</value>
-  </data>
-  <data name="cboAction.Items5" xml:space="preserve">
-    <value>Discard</value>
-  </data>
-  <data name="cboAction.Location" type="System.Drawing.Point, System.Drawing">
-    <value>120, 11</value>
-  </data>
-  <data name="cboAction.Size" type="System.Drawing.Size, System.Drawing">
-    <value>156, 21</value>
-  </data>
-  <data name="cboAction.TabIndex" type="System.Int32, mscorlib">
+  <data name="atcSelectedDates.TabIndex" type="System.Int32, mscorlib">
     <value>21</value>
   </data>
-  <data name="cboAction.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
+  <data name="&gt;&gt;atcSelectedDates.Name" xml:space="preserve">
+    <value>atcSelectedDates</value>
   </data>
-  <data name="&gt;&gt;cboAction.Name" xml:space="preserve">
-    <value>cboAction</value>
+  <data name="&gt;&gt;atcSelectedDates.Type" xml:space="preserve">
+    <value>atcData.atcChooseDataGroupDates, atcData, Version=3.1.1.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
-  <data name="&gt;&gt;cboAction.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;cboAction.Parent" xml:space="preserve">
+  <data name="&gt;&gt;atcSelectedDates.Parent" xml:space="preserve">
     <value>pnlButtons</value>
   </data>
-  <data name="&gt;&gt;cboAction.ZOrder" xml:space="preserve">
-    <value>1</value>
+  <data name="&gt;&gt;atcSelectedDates.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="pnlButtons.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
   </data>
   <data name="pnlButtons.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 564</value>
+    <value>0, 519</value>
   </data>
   <data name="pnlButtons.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 40</value>
+    <value>632, 85</value>
   </data>
   <data name="pnlButtons.TabIndex" type="System.Int32, mscorlib">
     <value>18</value>
