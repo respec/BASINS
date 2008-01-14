@@ -429,6 +429,7 @@ Public Class GisUtil
         Else 'need to add it
             lFieldIndex = GisUtil.AddField(aLayerIndex, aFieldName, aFieldType, aFieldWidth)
         End If
+        Return lFieldIndex
     End Function
 
     ''' <summary>Add a field in a shape file from a layer index and a field name</summary>
