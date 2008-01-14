@@ -454,6 +454,10 @@ Public Class frmManDelin
             Dim jlen As Integer = lOutputFileName.Length
             System.IO.File.Copy(Mid(pOperatingShapefileName, 1, ilen - 3) & "dbf", Mid(lOutputFileName, 1, jlen - 3) & "dbf")
             System.IO.File.Copy(Mid(pOperatingShapefileName, 1, ilen - 3) & "shx", Mid(lOutputFileName, 1, jlen - 3) & "shx")
+            Dim lInputProjectionFileName As String = FilenameSetExt(pOperatingShapefileName, "prj")
+            If FileExists(lInputProjectionFileName) Then
+                FileCopy(lInputProjectionFileName, FilenameSetExt(lOutputFileName, "prj"))
+            End If
             pOperatingShapefileName = lOutputFileName
 
             'clear out old fields
@@ -589,6 +593,7 @@ Public Class frmManDelin
         'create the new version of this shapefile
         Dim lOutputFileIndex As Integer = 1
         Dim lOutputPath As String = PathNameOnly(pOperatingShapefileName)
+        Dim lInputProjectionFileName As String = FilenameSetExt(pOperatingShapefileName, "prj")
         pOperatingShapefileName = lOutputPath & "\subbasin" & lOutputFileIndex & ".shp"
         Do While FileExists(pOperatingShapefileName)
             lOutputFileIndex += 1
@@ -596,6 +601,10 @@ Public Class frmManDelin
         Loop
         'add shapes to the shapefile
         lSuccess = lShapefile.CreateNew(pOperatingShapefileName, MapWinGIS.ShpfileType.SHP_POLYGON)
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameSetExt(pOperatingShapefileName, "prj"))
+        End If
+
         lSuccess = lShapefile.StartEditingShapes(True)
         For Each lShape As MapWinGIS.Shape In lShapes
             lSuccess = lShapefile.EditInsertShape(lShape, 0)
