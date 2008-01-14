@@ -361,7 +361,6 @@ Public Class frmManDelin
         pMapWin = aMapWin
         pStatusShowOriginal = GisUtil.StatusShow
         GisUtil.MappingObject = aMapWin
-        GisUtil.StatusShow = False
 
         pProgressStatusOriginal = Logger.ProgressStatus
         pProgressStatus.ProgressStatusOther = Logger.ProgressStatus
