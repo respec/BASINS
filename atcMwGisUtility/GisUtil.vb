@@ -975,6 +975,10 @@ Public Class GisUtil
         Dim osf As New MapWinGIS.Shapefile
         'create new shapefile
         lRetc = osf.CreateNew(aOutputLayerName, lsf.ShapefileType)
+        Dim lInputProjectionFileName As String = FilenameSetExt(lsf.Filename, "prj")
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameSetExt(aOutputLayerName, "prj"))
+        End If
         For i = 1 To lsf.NumFields
             Dim [of] As New MapWinGIS.Field
             [of].Name = lsf.Field(i - 1).Name
@@ -1805,6 +1809,10 @@ Public Class GisUtil
         Dim lNewShapeFile As New MapWinGIS.Shapefile
         Dim rsf As New MapWinGIS.Shapefile
         lNewShapeFile.CreateNew(lNewShapeFileName, lSf.ShapefileType)
+        Dim lInputProjectionFileName As String = FilenameSetExt(lSf.Filename, "prj")
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameSetExt(lNewShapeFileName, "prj"))
+        End If
         For i = 1 To lSf.NumFields
             lRetc = lNewShapeFile.EditInsertField(lSf.Field(i - 1), i - 1)
         Next i
