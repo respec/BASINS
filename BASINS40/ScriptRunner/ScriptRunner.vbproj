@@ -83,6 +83,7 @@
     <Compile Include="HSPFOutputReports.vb" />
     <Compile Include="LineDump.vb" />
     <Compile Include="Graph.vb" />
+    <Compile Include="MetaDataBatch.vb" />
     <Compile Include="SQLiteTester.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -127,6 +128,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\MapWindow4Plugins\mwOpenMetadataManager\mwOpenMetadataManager.vbproj">
+      <Project>{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}</Project>
+      <Name>mwOpenMetadataManager</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcDataTree\atcDataTree.vbproj">
       <Project>{F4EF0925-945B-418C-9A81-8490D89985DB}</Project>
       <Name>atcDataTree</Name>
@@ -142,7 +148,7 @@
       <Name>atcGisUtiliies</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcGraph\atcGraph.vbproj">
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph.vbproj">
       <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
       <Name>atcGraph</Name>
       <Private>False</Private>

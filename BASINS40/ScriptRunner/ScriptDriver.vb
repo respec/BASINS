@@ -18,7 +18,8 @@ Public Module ScriptDriver
         'HSPFOutputReports.ScriptMain(aMapWin)
         'CreateUCITest.ScriptMain(aMapWin)
         'Graph.ScriptMain(aMapWin)
-        GraphGaFlow.ScriptMain(aMapWin)
+        MetaDataBatch.ScriptMain(aMapWin)
+        'GraphGaFlow.ScriptMain(aMapWin)
         'ScriptWdmCreateFromGrids.ScriptMain(aMapWin)
     End Sub
 End Module
