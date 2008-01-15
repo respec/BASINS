@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE metadata SYSTEM "http://www.fgdc.gov/metadata/fgdc-std-001-1998.dtd"><metadata>
+<idinfo>
+<citation>
+<citeinfo>
+<origin>U.S. Environmental Protection Agency/Office of Water/OST</origin>
+<pubdate>19980227</pubdate>
+<title>cnty</title>
+<geoform>vector digital data</geoform>
+<pubinfo>
+<pubplace>Washington DC</pubplace>
+<publish>US EPA</publish>
+</pubinfo>
+<onlink>http://www.epa.gov/OST/BASINS/</onlink>
+</citeinfo>
+</citation>
+<descript>
+<abstract>This coverage is of the county boundaries of the conterminous United
+States.  It was derived from the U.S. Geological Survey State Boundaries,
+which were derived from Digital Line Graph (DLG) files representing the
+1:2,000,000-scale map in the National Atlas of the United States.</abstract>
+<purpose>This coverage is intended as a basemap for a variety of applications.</purpose>
+<supplinf>Limitations_of_Data:
+The original files for this map were provided in 15 sections.
+Boundaries near the edges of sections have been adjusted in
+edgematching.
+
+Procedures:
+The BASINS data product was derived from the U.S. Geological Survey
+COUNTIES2M layer.  The USGS procedures for that data product are followed
+by the BASINS procedures:
+
+This series of maps was published as part of the National Atlas of
+the United States (USGS, 1970).  The maps for the conterminous
+United States were digitized in 15 sheets and published in the
+Digital Line Graph (DLG) format as described by Domeratz and others
+(1983).
+
+Each sheet was prepared by reading the DLG files of the political
+and water bodies layers, converting them to ARC/INFO, extracting
+the county boundaries and the coastline, respectively, and joining
+the two layers together.  FIPS codes were assigned to all polygons
+using available sources, and were checked manually.
+
+Boundaries with adjacent sheets of the 15-sheet set were
+edgematched manually, arbitrarily choosing one of the sheets as the
+"correct" border.  Edgematching operations adjusted the linework as
+far as was necessary so that the coverages would fit to a tolerance
+of 100 meters.  The coverage (referred to herein as Version 1.0)
+was stored as 49 separate coverages (48 states and the District of
+Columbia) because the ARC/INFO software in use at the time could
+not process the entire coverage.  Individual states could be joined
+by specifying a tolerance of 100 meters.
+
+From time to time, adjustments were made to the state coverages to
+reflect changes in U.S. counties.  It is believed the accuracy of
+these adjustments is comparable to the original linework.
+
+For Version 2.0, all state coverages were rejoined and manually
+edited to produce a perfect edgematch between all states.  For
+states on the original map sheet boundaries, this adjustment
+averaged less than 20 meters and in no case was more than 100
+meters.  The whole coverage was CLEANed to a tolerance of 20
+meters, which resulted in few, if any, effects on small offshore
+islands. The coverage also was checked to ensure that it
+represented current U.S. counties or county equivalents.
+
+The coverage in Version 1.0 stopped at the coastline.  There was no
+attempt to depict offshore areas.  The created some problems when
+the coverage was used to assign county codes to sampling stations
+located near the coast.  To help in this matter, Version 2.o
+includes offshore extensions of the county polygons.  The (water)
+boundaries of many of these polygons are arbitrary.
+
+The Canadian Great Lakes features are another new addition to
+Version 2.0.  They were added to improve the utility of the
+coverage for visual displays.  Although the Canadian Great Lakes
+are logically represented by a single polygon, practical
+considerations -- the inability of some software to plot polygons
+with a large number of vertices -- made it necessary to separate
+them into 4 polygons.  The dividing lines are located in narrow
+channels to minimize interference with plotting patterns.  Canadian
+islands within the Great Lakes also were included.
+
+All tics were relocated to places that are easily visible on maps
+of the United States, to help in registering maps that may not
+otherwise have adequate registration information.
+
+To expedite accessing parts of the coverage, certain items have
+been indexed with the procedure, index_county.aml.  See Section 3
+above.  A spatial index also was created.
+
+When using this coverage to clip or intersect other coverages, a
+tolerance as low as 2 meters can be used.
+
+The processing used to derive this coverage moved boundaries from
+their positions on the original maps.  In cases of conflicting
+lines, preference was given to forming the correct topology.
+Strictly speaking, this coverage is not identical to the source
+materials.  These changes were unavoidable in producing a
+continuous coverage of the conterminous United States.
+
+For revision 2.1, it was necessary to alter about 100 arcs.  This
+was accomplished with ARCEDIT using the 1:100,000 TIGER county
+coverage as a background.  These arcs were matched to the background
+so that they matched at least as close as other arcs that were not
+edited.
+
+For distribution with BASINS v1.0, the national coverage was split into
+a series of coverages that included the spatial extent of each of the nine
+US EPA regions, plus the hydrologic accounting units that crossed Region
+boundaries.  The nine regional coverages therefore overlapped at
+Regional boundaries.  The coverages were distributed in PC ARC/INFO
+coverage format.
+
+For distribution with Basins v2.0, the PA ARC/INFO coverages were exported
+on a PC then imported in  workstation ARC/INFO v7.0.4.  Each Regional coverage
+was then projected to geographic decimal degrees, NAD83.  The coverages
+were then converted to ESRI Shapefile format, using the ARCSHAPE command.
+
+Reviews_Applied:
+This coverage has received no formal review.  It has, however, been
+used in numerous applications where serious errors would have been
+obvious.  Some county coverages were corrected following such use.
+The offshore polygon extensions and the Canadian Great Lakes
+polygons have had no review.
+
+BASINS v2.0 reviews: projected coverages were checked for topology. The
+shapefile format features and attributes were visually inspected and
+compared with the BASINS v1.0 PC ARC/INFO coverages.
+
+Other_Related_Data_Sets:
+This coverage was derived from USGS 1:2,000,000-scale basemaps
+covering the United States.
+
+References_Cited:
+
+Negri, M.  Digital map of state boundaries of the conterminous
+United States.  1994.  U.S. Geological Survey, digital map.
+
+Domeratz, M. A., Hallam, C. A., Schmidt, W. E., and Calkins, H. W.,
+1983.  USGS Digital Cartographic Data Standards: Digital Line
+Graphs from 1:2,000,000-scale Maps.  U.S. Geological Survey
+Circular 895-D, 38p.
+
+U. S. Geological Survey, 1970.  National atlas of the United States
+of America: Washington D.C., U. S. Geological Survey, 417p.</supplinf>
+</descript>
+<timeperd>
+<timeinfo>
+<sngdate>
+<caldate>1994</caldate>
+</sngdate>
+</timeinfo>
+<current>publication date</current>
+</timeperd>
+<status>
+<progress>Complete</progress>
+<update>None planned</update>
+</status>
+<spdom>
+<bounding>
+<westbc>
+-125.0000</westbc>
+<eastbc>
+-66.0000</eastbc>
+<northbc>
+50.0000</northbc>
+<southbc>
+24.0000</southbc>
+</bounding>
+</spdom>
+<keywords>
+<theme>
+<themekt>None</themekt>
+<themekey>County boundaries</themekey>
+</theme>
+<place>
+<placekt>Geographic Names Information System</placekt>
+<placekey>Conterminous United States of America (CONUS)</placekey>
+<placekey>Alabama AL</placekey>
+<placekey>Arizona AZ</placekey>
+<placekey>Arkansas AR</placekey>
+<placekey>California CA</placekey>
+<placekey>Colorado CO</placekey>
+<placekey>Connecticut CT</placekey>
+<placekey>Delaware DE</placekey>
+<placekey>District of Columbia DC</placekey>
+<placekey>Florida FL</placekey>
+<placekey>Georgia GA</placekey>
+<placekey>Idaho ID</placekey>
+<placekey>Illinois IL</placekey>
+<placekey>Indiana IN</placekey>
+<placekey>Iowa IA</placekey>
+<placekey>Kansas KS</placekey>
+<placekey>Kentucky KY</placekey>
+<placekey>Louisiana LA</placekey>
+<placekey>Maine ME</placekey>
+<placekey>Maryland MD</placekey>
+<placekey>Massachusetts MA</placekey>
+<placekey>Michigan MI</placekey>
+<placekey>Minnesota MN</placekey>
+<placekey>Mississippi MS</placekey>
+<placekey>Missouri MO</placekey>
+<placekey>Montana MT</placekey>
+<placekey>Nebraska NE</placekey>
+<placekey>Nevada NV</placekey>
+<placekey>New Hampshire NH</placekey>
+<placekey>New Jersey NJ</placekey>
+<placekey>New Mexico NM</placekey>
+<placekey>New York NY</placekey>
+<placekey>North Carolina NC</placekey>
+<placekey>North Dakota ND</placekey>
+<placekey>Ohio OH</placekey>
+<placekey>Oklahoma OK</placekey>
+<placekey>Oregon OR</placekey>
+<placekey>Pennsylvania PA</placekey>
+<placekey>Rhode Island RI</placekey>
+<placekey>South Carolina SC</placekey>
+<placekey>South Dakota SD</placekey>
+<placekey>Tennessee TN</placekey>
+<placekey>Texas TX</placekey>
+<placekey>Utah UT</placekey>
+<placekey>Vermont VT</placekey>
+<placekey>Virginia VA</placekey>
+<placekey>Washington WA</placekey>
+<placekey>West Virginia WV</placekey>
+<placekey>Wisconsin WI</placekey>
+<placekey>Wyoming WY</placekey>
+</place>
+</keywords>
+<accconst>None</accconst>
+<useconst>None</useconst>
+<native>Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 2; ESRI ArcCatalog 9.0.0.535</native>
+</idinfo>
+<dataqual>
+<lineage>
+<procstep>
+<procdesc>Metadata imported.</procdesc>
+<srcused>C:\DOCUME~1\duda\LOCALS~1\Temp\xml3624.tmp</srcused>
+</procstep>
+</lineage>
+</dataqual>
+<spdoinfo>
+<direct>Vector</direct>
+<ptvctinf>
+<sdtsterm>
+<sdtstype>G-polygon</sdtstype>
+<ptvctcnt>11</ptvctcnt>
+</sdtsterm>
+</ptvctinf>
+</spdoinfo>
+<spref>
+<horizsys>
+<geograph>
+<latres>0.0001</latres>
+<longres>0.0001</longres>
+<geogunit>Decimal Degrees</geogunit>
+</geograph>
+<geodetic>
+<horizdn>North American Datum of 1983</horizdn>
+<ellips>Geodetic Reference System 80</ellips>
+<semiaxis>6378137</semiaxis>
+<denflat>298.257</denflat>
+</geodetic>
+</horizsys>
+</spref>
+<eainfo>
+<detailed>
+<enttyp>
+<enttypl>
+cnty</enttypl>
+<enttypd>County polygon attributes</enttypd>
+<enttypds>USGS</enttypds>
+</enttyp>
+<attr>
+<attrlabl>FID</attrlabl>
+<attrdef>Internal feature number.</attrdef>
+<attrdefs>ESRI</attrdefs>
+<attrdomv>
+<udom>Sequential unique whole numbers that are automatically generated.</udom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>Shape</attrlabl>
+<attrdef>Feature geometry.</attrdef>
+<attrdefs>ESRI</attrdefs>
+<attrdomv>
+<udom>Coordinates defining the features.</udom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>SHAPE</attrlabl>
+<attrdef>ArcView internal field</attrdef>
+<attrdefs>Computed</attrdefs>
+<attrdomv>
+<edom>
+<edomv>Polygon</edomv>
+<edomvd>ArcView internal field</edomvd>
+<edomvds>Computed</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>AREA</attrlabl>
+<attrdef>Area of polygon in square coverage units</attrdef>
+<attrdefs>Computed</attrdefs>
+<attrdomv>
+<edom>
+<edomv>-</edomv>
+<edomvd>Area of polygon</edomvd>
+<edomvds>computed</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>PERIMETER</attrlabl>
+<attrdef>Perimeter of polygon in coverage units</attrdef>
+<attrdefs>Computed</attrdefs>
+<attrdomv>
+<edom>
+<edomv>Positive real numbers</edomv>
+<edomvd>Perimeter of polygon</edomvd>
+<edomvds>computed</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>CNTY_</attrlabl>
+<attrdef>Internal feature number</attrdef>
+<attrdefs>Computed</attrdefs>
+<attrdomv>
+<edom>
+<edomv>-</edomv>
+<edomvd>Internal feature number</edomvd>
+<edomvds>computed</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>CNTY_ID</attrlabl>
+<attrdef>User-assigned feature number</attrdef>
+<attrdefs>User-defined</attrdefs>
+<attrdomv>
+<edom>
+<edomv>-</edomv>
+<edomvd>User assigned feature number</edomvd>
+<edomvds>USEPA</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>FIPS</attrlabl>
+<attrdef>County FIPS code</attrdef>
+<attrdefs>FIPS</attrdefs>
+<attrdomv>
+<edom>
+<edomv>01001-56999, none=0</edomv>
+<edomvd>County FIPS numeric code</edomvd>
+<edomvds>FIPS</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>ST</attrlabl>
+<attrdef>2 character state abbreviation</attrdef>
+<attrdefs>FIPS</attrdefs>
+<attrdomv>
+<edom>
+<edomv>Two characters</edomv>
+<edomvd>State FIPS alphabetic code</edomvd>
+<edomvds>FIPS</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>CNTYNAME</attrlabl>
+<attrdef>County name</attrdef>
+<attrdefs>USGS GNIS</attrdefs>
+<attrdomv>
+<edom>
+<edomv>alphabetical</edomv>
+<edomvd>County name</edomvd>
+<edomvds>USGS</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>PLYTYPE</attrlabl>
+<attrdef>Polygon type</attrdef>
+<attrdefs>See Procedures</attrdefs>
+<attrdomv>
+<edom>
+<edomv>0-4 and 9</edomv>
+<edomvd>Polygon type</edomvd>
+<edomvds>USGS</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>WORKB</attrlabl>
+<attrdef>Basins Internal field</attrdef>
+<attrdefs>USEPA</attrdefs>
+<attrdomv>
+<edom>
+<edomv>integer</edomv>
+<edomvd>Basins Internal Field</edomvd>
+<edomvds>USEPA</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>STCOFIPS</attrlabl>
+<attrdef>State and county FIPS code</attrdef>
+<attrdefs>FIPS</attrdefs>
+<attrdomv>
+<edom>
+<edomv>-</edomv>
+<edomvd>State and county FIPS code</edomvd>
+<edomvds>FIPS</edomvds>
+</edom>
+</attrdomv>
+</attr>
+<attr>
+<attrlabl>BEXT</attrlabl>
+<attrdef>Basins internal field</attrdef>
+<attrdefs>USEPA</attrdefs>
+<attrdomv>
+<edom>
+<edomv>-</edomv>
+<edomvd>BASINS Internal field</edomvd>
+<edomvds>USEPA</edomvds>
+</edom>
+</attrdomv>
+</attr>
+</detailed>
+</eainfo>
+<distinfo>
+<distrib>
+<cntinfo>
+<cntorgp>
+<cntorg>USEPA/Office of Water/OST</cntorg>
+</cntorgp>
+<cntaddr>
+<addrtype>Mailing Address</addrtype>
+<address>1200 Pennsylvania Ave., NW (4305T)</address>
+<city>Washington</city>
+<state>District of Columbia</state>
+<postal>20460</postal>
+<country>USA</country>
+</cntaddr>
+<cntvoice>202-260-7301</cntvoice>
+<cntfax>202-260-9830</cntfax>
+</cntinfo>
+</distrib>
+<resdesc>Downloadable Data</resdesc>
+<distliab>Although these data have been processed successfully on a computer
+system at Tetra Tech, Inc., no warranty expressed or implied is
+made regarding the accuracy or utility of the data on any other
+system or for general or scientific purposes, nor shall the act of
+distribution constitute any such warranty. This disclaimer applies
+both to individual use of the data and aggregate use with other
+data. It is also strongly recommended that careful attention be
+paid to the contents of the metadata file associated with these
+data.  The U.S. Environmental Protection Agency nor Tetra Tech,
+Inc. shall not be held liable for improper or incorrect use of the
+data described and/or contained herein.</distliab>
+<stdorder>
+<digform>
+<digtinfo>
+<formname>Environmental Systems Research Institute (ESRI)
+ArcView Shapefile</formname>
+<transize>0.054</transize>
+</digtinfo>
+<digtopt>
+<onlinopt>
+<computer>
+<networka>
+<networkr>http://www.epa.gov/OST/BASINS</networkr>
+</networka>
+</computer>
+</onlinopt>
+<offoptn>
+<offmedia>CD-ROM</offmedia>
+<recfmt>ISO 9660</recfmt>
+</offoptn>
+</digtopt>
+</digform>
+<fees>None</fees>
+<ordering>When requesting data by phone or mail, please inquire about
+spatial data sets that work with Better Assessment Science
+Integrating Point and Nonpoint Sources (BASINS).  The BASINS web
+page has instructions for downloading datasets.  It also has a
+link to The National Center for Environmental Publications and
+Information (NCEPI), from which BASINS CD-ROMs may be ordered.
+Each CD-ROM contains the BASINS v2.0 Application and this data
+set along with others covering the spatial extent of an EPA
+Region.</ordering>
+</stdorder>
+</distinfo>
+<metainfo>
+<metd>20060515</metd>
+<metc>
+<cntinfo>
+<cntorgp>
+<cntorg>USEPA/OW/OST</cntorg>
+<cntper>REQUIRED: The person responsible for the metadata information.</cntper>
+</cntorgp>
+<cntaddr>
+<addrtype>Mailing Address</addrtype>
+<address>1200 Pennsylvania Ave., NW (4305T)</address>
+<city>Washington</city>
+<state>District of Columbia</state>
+<postal>20460</postal>
+<country>USA</country>
+</cntaddr>
+<cntvoice>202 260 7301</cntvoice>
+</cntinfo>
+</metc>
+<metstdn>FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+<metstdv>FGDC-STD-001-1998</metstdv>
+<mettc>local time</mettc>
+<metextns>
+<onlink>http://www.esri.com/metadata/esriprof80.html</onlink>
+<metprof>ESRI Metadata Profile</metprof>
+</metextns>
+</metainfo>
+</metadata>
