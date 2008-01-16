@@ -10,10 +10,10 @@ Public Module modGraph
     Friend DefaultMinorGridColor As Color = Color.FromArgb(255, 245, 245, 245)
 
     <CLSCompliant(False)> _
-    Public Sub AddLine(ByRef aPane As ZedGraph.GraphPane, _
+    Public Function AddLine(ByRef aPane As ZedGraph.GraphPane, _
                        ByVal aACoef As Double, ByVal aBCoef As Double, _
                        Optional ByVal aLineStyle As Drawing.Drawing2D.DashStyle = Drawing.Drawing2D.DashStyle.Solid, _
-                       Optional ByVal aTag As String = Nothing)
+                       Optional ByVal aTag As String = Nothing) As LineItem
         With aPane
             Dim lXValues(1) As Double
             Dim lYValues(1) As Double
@@ -29,8 +29,9 @@ Public Module modGraph
             Dim lCurve As LineItem = .AddCurve("", lXValues, lYValues, Drawing.Color.Blue, SymbolType.None)
             lCurve.Line.Style = aLineStyle
             lCurve.Tag = aTag
+            Return lCurve
         End With
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Find a Y axis (LEFT, RIGHT, or AUX) for the given atcTimeseries
@@ -44,6 +45,7 @@ Public Module modGraph
         Dim lPane As GraphPane = aZgc.MasterPane.PaneList(0)
         Dim lYAxisName As String = aTimeseries.Attributes.GetValue("YAxis", "")
         If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
+            lYAxisName = "LEFT" 'Default to left Y axis
             'Use the same Y axis as existing curve with this constituent
             Dim lFoundMatchingCons As Boolean = False
             Dim lOldCons As String
@@ -68,6 +70,163 @@ Public Module modGraph
             End If
         End If
         Return lYAxisName
+    End Function
+
+    ''' <summary>
+    ''' Create a new curve for each atcTimeseries in aDataGroup and add them to aZgc
+    ''' </summary>
+    ''' <param name="aDataGroup">Group of timeseries to make into curves</param>
+    ''' <param name="aZgc">graph control to add curves to</param>
+    ''' <remarks></remarks>
+    <CLSCompliant(False)> _
+    Sub AddTimeseriesCurves(ByVal aDataGroup As atcDataGroup, ByVal aZgc As ZedGraphControl)
+        Dim lPaneMain As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
+        Dim lCommonTimeUnits As Integer = 0
+        Dim lCommonTimeStep As Integer = 0
+
+        Dim lCommonScenario As String = Nothing
+        Dim lCommonLocation As String = Nothing
+        Dim lCommonConstituent As String = Nothing
+
+        Dim lScenario As String
+        Dim lLocation As String
+        Dim lConstituent As String
+
+        Dim lYaxisNames As New atcCollection 'name for each item in aDataGroup
+
+        Dim lLeftDataSets As New atcDataGroup
+        Dim lRightDataSets As New atcDataGroup
+        Dim lAuxDataSets As New atcDataGroup
+
+        For Each lTimeseries As atcTimeseries In aDataGroup
+            With lTimeseries.Attributes
+                Dim lTu As Integer = .GetValue("Time units", -1)
+                If lTu <> lCommonTimeUnits Then
+                    If lCommonTimeUnits = 0 Then
+                        lCommonTimeUnits = lTu
+                    Else
+                        lCommonTimeUnits = -1
+                    End If
+                End If
+                Dim lTs As Integer = .GetValue("Time Step", 1)
+                If lTs <> lCommonTimeStep Then
+                    If lCommonTimeStep = 0 Then
+                        lCommonTimeStep = lTs
+                    Else
+                        lCommonTimeStep = -1
+                    End If
+                End If
+                lScenario = lTimeseries.Attributes.GetValue("Scenario", "")
+                lLocation = lTimeseries.Attributes.GetValue("Location", "")
+                lConstituent = lTimeseries.Attributes.GetValue("Constituent", "")
+                If lScenario <> lCommonScenario Then
+                    If lCommonScenario Is Nothing Then
+                        lCommonScenario = lScenario
+                    Else
+                        lCommonScenario = ""
+                    End If
+                End If
+
+                If lLocation <> lCommonLocation Then
+                    If lCommonLocation Is Nothing Then
+                        lCommonLocation = lLocation
+                    Else
+                        lCommonLocation = ""
+                    End If
+                End If
+
+                If lConstituent <> lCommonConstituent Then
+                    If lCommonConstituent Is Nothing Then
+                        lCommonConstituent = lConstituent
+                    Else
+                        lCommonConstituent = ""
+                    End If
+                End If
+            End With
+
+            Dim lYAxisName As String = lTimeseries.Attributes.GetValue("YAxis", "")
+            If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
+                lYAxisName = "LEFT" 'Default to left Y axis
+                'Use the same Y axis as existing curve with same constituent
+                Dim lFoundMatchingCons As Boolean = False
+                Dim lOldCons As String
+                Dim lOldCurve As LineItem
+                For lAssignedDatasetIndex As Integer = 0 To (lYaxisNames.Count - 1)
+                    Dim lAssignedTs As atcTimeseries = aDataGroup.ItemByIndex(lAssignedDatasetIndex)
+                    For Each lOldCurve In lPaneMain.CurveList
+                        If lOldCurve.Tag = lAssignedTs.Serial Then
+                            lOldCons = lAssignedTs.Attributes.GetValue("Constituent")
+                            If lOldCons = lConstituent Then
+                                If lOldCurve.IsY2Axis Then lYAxisName = "RIGHT" Else lYAxisName = "LEFT"
+                                lFoundMatchingCons = True
+                                Exit For
+                            End If
+                        End If
+                    Next
+                Next
+                If Not lFoundMatchingCons AndAlso lYaxisNames.Count = 1 Then
+                    'Put new curve on right axis if we already have a non-matching curve
+                    lYAxisName = "RIGHT"
+                End If
+            End If
+
+            Select Case lYAxisName.ToUpper
+                Case "AUX" : lAuxDataSets.Add(lTimeseries)
+                Case "RIGHT" : lRightDataSets.Add(lTimeseries)
+                Case Else : lLeftDataSets.Add(lTimeseries)
+            End Select
+            lYaxisNames.Add(lTimeseries.Serial, lYAxisName)
+        Next
+
+        Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
+
+        For Each lTimeseries As atcTimeseries In aDataGroup
+            Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
+            lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation)
+        Next
+
+        If lCommonTimeUnitName.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonTimeUnitName) Then
+            lPaneMain.XAxis.Title.Text &= " " & lCommonTimeUnitName
+        End If
+
+        If lCommonScenario.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonScenario) Then
+            lPaneMain.XAxis.Title.Text &= " " & lCommonScenario
+        End If
+
+        If lCommonConstituent.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonConstituent) Then
+            lPaneMain.XAxis.Title.Text &= " " & lCommonConstituent
+        End If
+
+        If lCommonLocation.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonLocation) Then
+            lPaneMain.XAxis.Title.Text &= " at " & lCommonLocation
+        End If
+
+        If lLeftDataSets.Count > 0 Then
+            ScaleYAxis(lLeftDataSets, lPaneMain.YAxis)
+        End If
+        If lRightDataSets.Count > 0 Then
+            ScaleYAxis(lRightDataSets, lPaneMain.Y2Axis)
+        End If
+        If lAuxDataSets.Count > 0 Then
+            ScaleYAxis(lAuxDataSets, aZgc.MasterPane.PaneList(0).YAxis)
+        End If
+    End Sub
+
+    Private Function TimeUnitName(ByVal aTimeUnits As Integer, Optional ByVal aTimeStep As Integer = 1) As String
+        Dim lName As String = ""
+        Select Case aTimeStep
+            Case Is > 1 : lName = aTimeStep & "-"
+            Case Else : aTimeUnits = 0 'aTimeStep <= 0 means bad time step, ignore time units and return ""
+        End Select
+        Select Case aTimeUnits
+            Case 1 : lName &= "SECONDLY"
+            Case 2 : lName &= "MINUTELY"
+            Case 3 : lName &= "HOURLY"
+            Case 4 : lName &= "DAILY"
+            Case 5 : lName &= "MONTHLY"
+            Case 6 : lName &= "YEARLY"
+        End Select
+        Return lName
     End Function
 
     ''' <summary>
@@ -152,9 +311,31 @@ Public Module modGraph
         Return lCurve
     End Function
 
-    Public Function TSCurveLabel(ByVal aTimeseries As atcTimeseries) As String
+    Public Function TSCurveLabel(ByVal aTimeseries As atcTimeseries, _
+                        Optional ByVal aCommonTimeUnitName As String = Nothing, _
+                        Optional ByVal aCommonScenario As String = Nothing, _
+                        Optional ByVal aCommonConstituent As String = Nothing, _
+                        Optional ByVal aCommonLocation As String = Nothing) As String
         With aTimeseries.Attributes
-            Return .GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
+            Dim lCurveLabel As String = ""
+
+            If (aCommonTimeUnitName Is Nothing OrElse aCommonTimeUnitName.Length = 0) _
+              AndAlso aTimeseries.Attributes.ContainsAttribute("Time Units") Then
+                lCurveLabel &= TimeUnitName(aTimeseries.Attributes.GetValue("Time Units"), _
+                                            aTimeseries.Attributes.GetValue("Time Step", 1)) & " "
+            End If
+
+            If aCommonScenario Is Nothing OrElse aCommonScenario.Length = 0 Then
+                lCurveLabel &= .GetValue("Scenario", "") & " "
+            End If
+            If aCommonConstituent Is Nothing OrElse aCommonConstituent.Length = 0 Then
+                lCurveLabel &= .GetValue("Constituent", "") & " "
+            End If
+            If aCommonLocation Is Nothing OrElse aCommonLocation.Length = 0 Then
+                lCurveLabel &= "at " & .GetValue("Location", "")
+            End If
+
+            Return lCurveLabel.TrimEnd '.GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
         End With
     End Function
 

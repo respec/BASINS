@@ -18,34 +18,7 @@ Public Class clsGraphTime
         End Get
         Set(ByVal newValue As atcDataGroup)
             MyBase.Datasets = newValue
-            Dim lYaxisName As String
-
-            Dim lYaxisDataSets As New atcDataGroup
-            Dim lY2axisDataSets As New atcDataGroup
-            Dim lAuxAxisDataSets As New atcDataGroup
-
-            For Each lTimeseries As atcTimeseries In newValue
-                'AddDatasetCurve(lTimeseries)
-                lYaxisName = FindYAxis(lTimeseries, pZgc, Datasets)
-                Select Case lYaxisName.ToUpper
-                    Case "AUX"
-                        lAuxAxisDataSets.Add(lTimeseries)
-                    Case "RIGHT"
-                        lY2axisDataSets.Add(lTimeseries)
-                    Case Else
-                        lYaxisDataSets.Add(lTimeseries)
-                End Select
-                AddTimeseriesCurve(lTimeseries, pZgc, lYaxisName)
-            Next
-            If lYaxisDataSets.Count > 0 Then
-                ScaleYAxis(lYaxisDataSets, pZgc.MasterPane.PaneList(pZgc.MasterPane.PaneList.Count - 1).YAxis)
-            End If
-            If lY2axisDataSets.Count > 0 Then
-                ScaleYAxis(lYaxisDataSets, pZgc.MasterPane.PaneList(pZgc.MasterPane.PaneList.Count - 1).Y2Axis)
-            End If
-            If lAuxAxisDataSets.Count > 0 Then
-                ScaleYAxis(lAuxAxisDataSets, pZgc.MasterPane.PaneList(0).YAxis)
-            End If
+            AddTimeseriesCurves(newValue, pZgc)
             pZgc.Refresh()
         End Set
     End Property

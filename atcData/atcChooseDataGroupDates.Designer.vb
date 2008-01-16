@@ -28,9 +28,8 @@ Partial Class atcChooseDataGroupDates
         Me.lblCommonEnd = New System.Windows.Forms.Label
         Me.lblDataStart = New System.Windows.Forms.Label
         Me.lblDataEnd = New System.Windows.Forms.Label
-        Me.radioAll = New System.Windows.Forms.RadioButton
-        Me.radioCommon = New System.Windows.Forms.RadioButton
-        Me.radioCustom = New System.Windows.Forms.RadioButton
+        Me.btnAll = New System.Windows.Forms.Button
+        Me.btnCommon = New System.Windows.Forms.Button
         Me.grpYears = New System.Windows.Forms.GroupBox
         Me.txtOmitBefore = New System.Windows.Forms.TextBox
         Me.lblOmitBefore = New System.Windows.Forms.Label
@@ -42,12 +41,11 @@ Partial Class atcChooseDataGroupDates
         'lblCommonStart
         '
         Me.lblCommonStart.AutoSize = True
-        Me.lblCommonStart.Location = New System.Drawing.Point(116, 36)
+        Me.lblCommonStart.Location = New System.Drawing.Point(116, 39)
         Me.lblCommonStart.Name = "lblCommonStart"
-        Me.lblCommonStart.Size = New System.Drawing.Size(65, 13)
+        Me.lblCommonStart.Size = New System.Drawing.Size(0, 13)
         Me.lblCommonStart.TabIndex = 48
         Me.lblCommonStart.Tag = ""
-        Me.lblCommonStart.Text = "11/22/1934"
         Me.ToolTip1.SetToolTip(Me.lblCommonStart, "First Common Date")
         '
         'lblCommonEnd
@@ -55,20 +53,19 @@ Partial Class atcChooseDataGroupDates
         Me.lblCommonEnd.AutoSize = True
         Me.lblCommonEnd.Location = New System.Drawing.Point(116, 62)
         Me.lblCommonEnd.Name = "lblCommonEnd"
-        Me.lblCommonEnd.Size = New System.Drawing.Size(65, 13)
+        Me.lblCommonEnd.Size = New System.Drawing.Size(0, 13)
         Me.lblCommonEnd.TabIndex = 47
         Me.lblCommonEnd.Tag = ""
-        Me.lblCommonEnd.Text = "11/22/1934"
         Me.ToolTip1.SetToolTip(Me.lblCommonEnd, "Last Common Date")
         '
         'lblDataStart
         '
-        Me.lblDataStart.Location = New System.Drawing.Point(38, 36)
+        Me.lblDataStart.AutoSize = True
+        Me.lblDataStart.Location = New System.Drawing.Point(38, 39)
         Me.lblDataStart.Name = "lblDataStart"
-        Me.lblDataStart.Size = New System.Drawing.Size(65, 13)
+        Me.lblDataStart.Size = New System.Drawing.Size(0, 13)
         Me.lblDataStart.TabIndex = 45
         Me.lblDataStart.Tag = "Data Starts"
-        Me.lblDataStart.Text = "11/22/1934"
         Me.ToolTip1.SetToolTip(Me.lblDataStart, "First Start Date")
         '
         'lblDataEnd
@@ -76,55 +73,36 @@ Partial Class atcChooseDataGroupDates
         Me.lblDataEnd.AutoSize = True
         Me.lblDataEnd.Location = New System.Drawing.Point(38, 62)
         Me.lblDataEnd.Name = "lblDataEnd"
-        Me.lblDataEnd.Size = New System.Drawing.Size(65, 13)
+        Me.lblDataEnd.Size = New System.Drawing.Size(0, 13)
         Me.lblDataEnd.TabIndex = 1
         Me.lblDataEnd.Tag = ""
-        Me.lblDataEnd.Text = "11/22/1934"
         Me.ToolTip1.SetToolTip(Me.lblDataEnd, "Last End Date")
         '
-        'radioAll
+        'btnAll
         '
-        Me.radioAll.AutoSize = True
-        Me.radioAll.Checked = True
-        Me.radioAll.Location = New System.Drawing.Point(41, 16)
-        Me.radioAll.Name = "radioAll"
-        Me.radioAll.Size = New System.Drawing.Size(67, 17)
-        Me.radioAll.TabIndex = 1
-        Me.radioAll.TabStop = True
-        Me.radioAll.Text = "All Dates"
-        Me.ToolTip1.SetToolTip(Me.radioAll, "Start of earliest dataset to end of latest")
-        Me.radioAll.UseVisualStyleBackColor = True
+        Me.btnAll.Location = New System.Drawing.Point(41, 16)
+        Me.btnAll.Name = "btnAll"
+        Me.btnAll.Size = New System.Drawing.Size(64, 20)
+        Me.btnAll.TabIndex = 49
+        Me.btnAll.Text = "All"
+        Me.ToolTip1.SetToolTip(Me.btnAll, "Start of earliest dataset to end of latest")
+        Me.btnAll.UseVisualStyleBackColor = True
         '
-        'radioCommon
+        'btnCommon
         '
-        Me.radioCommon.AutoSize = True
-        Me.radioCommon.Location = New System.Drawing.Point(114, 16)
-        Me.radioCommon.Name = "radioCommon"
-        Me.radioCommon.Size = New System.Drawing.Size(66, 17)
-        Me.radioCommon.TabIndex = 2
-        Me.radioCommon.Text = "Common"
-        Me.ToolTip1.SetToolTip(Me.radioCommon, "Overlapping period of all selected data")
-        Me.radioCommon.UseVisualStyleBackColor = True
-        '
-        'radioCustom
-        '
-        Me.radioCustom.AutoSize = True
-        Me.radioCustom.Location = New System.Drawing.Point(197, 16)
-        Me.radioCustom.Name = "radioCustom"
-        Me.radioCustom.Size = New System.Drawing.Size(60, 17)
-        Me.radioCustom.TabIndex = 3
-        Me.radioCustom.Text = "Custom"
-        Me.ToolTip1.SetToolTip(Me.radioCustom, "Enter custom period of interest")
-        Me.radioCustom.UseVisualStyleBackColor = True
+        Me.btnCommon.Location = New System.Drawing.Point(119, 16)
+        Me.btnCommon.Name = "btnCommon"
+        Me.btnCommon.Size = New System.Drawing.Size(64, 20)
+        Me.btnCommon.TabIndex = 50
+        Me.btnCommon.Text = "Common"
+        Me.ToolTip1.SetToolTip(Me.btnCommon, "Overlapping period of all selected data")
+        Me.btnCommon.UseVisualStyleBackColor = True
         '
         'grpYears
         '
-        Me.grpYears.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpYears.Controls.Add(Me.btnCommon)
+        Me.grpYears.Controls.Add(Me.btnAll)
         Me.grpYears.Controls.Add(Me.txtOmitBefore)
-        Me.grpYears.Controls.Add(Me.radioCustom)
-        Me.grpYears.Controls.Add(Me.radioCommon)
-        Me.grpYears.Controls.Add(Me.radioAll)
         Me.grpYears.Controls.Add(Me.lblCommonStart)
         Me.grpYears.Controls.Add(Me.lblCommonEnd)
         Me.grpYears.Controls.Add(Me.lblDataStart)
@@ -132,9 +110,10 @@ Partial Class atcChooseDataGroupDates
         Me.grpYears.Controls.Add(Me.lblOmitBefore)
         Me.grpYears.Controls.Add(Me.lblOmitAfter)
         Me.grpYears.Controls.Add(Me.txtOmitAfter)
+        Me.grpYears.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grpYears.Location = New System.Drawing.Point(0, 0)
         Me.grpYears.Name = "grpYears"
-        Me.grpYears.Size = New System.Drawing.Size(279, 85)
+        Me.grpYears.Size = New System.Drawing.Size(279, 88)
         Me.grpYears.TabIndex = 71
         Me.grpYears.TabStop = False
         Me.grpYears.Text = "Dates to Include"
@@ -143,7 +122,7 @@ Partial Class atcChooseDataGroupDates
         '
         Me.txtOmitBefore.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOmitBefore.Location = New System.Drawing.Point(197, 33)
+        Me.txtOmitBefore.Location = New System.Drawing.Point(197, 36)
         Me.txtOmitBefore.Name = "txtOmitBefore"
         Me.txtOmitBefore.Size = New System.Drawing.Size(76, 20)
         Me.txtOmitBefore.TabIndex = 5
@@ -152,7 +131,7 @@ Partial Class atcChooseDataGroupDates
         'lblOmitBefore
         '
         Me.lblOmitBefore.AutoSize = True
-        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 36)
+        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 39)
         Me.lblOmitBefore.Name = "lblOmitBefore"
         Me.lblOmitBefore.Size = New System.Drawing.Size(29, 13)
         Me.lblOmitBefore.TabIndex = 40
@@ -183,7 +162,7 @@ Partial Class atcChooseDataGroupDates
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.grpYears)
         Me.Name = "atcChooseDataGroupDates"
-        Me.Size = New System.Drawing.Size(279, 85)
+        Me.Size = New System.Drawing.Size(279, 88)
         Me.grpYears.ResumeLayout(False)
         Me.grpYears.PerformLayout()
         Me.ResumeLayout(False)
@@ -199,8 +178,7 @@ Partial Class atcChooseDataGroupDates
     Friend WithEvents lblOmitAfter As System.Windows.Forms.Label
     Friend WithEvents txtOmitAfter As System.Windows.Forms.TextBox
     Friend WithEvents txtOmitBefore As System.Windows.Forms.TextBox
-    Friend WithEvents radioAll As System.Windows.Forms.RadioButton
-    Friend WithEvents radioCustom As System.Windows.Forms.RadioButton
-    Friend WithEvents radioCommon As System.Windows.Forms.RadioButton
+    Friend WithEvents btnCommon As System.Windows.Forms.Button
+    Friend WithEvents btnAll As System.Windows.Forms.Button
 
 End Class

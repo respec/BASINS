@@ -344,12 +344,13 @@ Public Class atcGraphForm
     Public Sub RefreshGraph()
         pZgc.AxisChange()
         Invalidate()
-        Me.Refresh()
+        Refresh()
     End Sub
 
     Private Sub mnuEditGraph_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditGraph.Click
         pEditor = New frmGraphEditor ' ZedGraph.frmEdit
-        pEditor.Edit(Pane)
+        pEditor.Text = "Edit " & Me.Text
+        pEditor.Edit(pZgc)
 
         'pEditor = New frmGraphEdit
         'pEditor.Initialize(zgc.GraphPane)
