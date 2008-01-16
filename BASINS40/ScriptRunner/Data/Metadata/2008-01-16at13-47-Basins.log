@@ -1,0 +1,507 @@
+00:00:14.531	atcBasinsPlugIn:Initialize:StartToFile 2008-01-16 01:47:19
+00:00:14.546	modFile:ShowHelp:Set new help file 'D:\Basins\Docs\BASINS4.0.chm'
+00:00:14.640	modBasinsPlugin:FindBasinsDrives:Found BASINS Drive: D
+00:00:17.390	atcBasinsPlugIn:Message:atcDataPlugin loading Analysis::Synoptic
+00:00:24.046	atcBasinsPlugIn:Message:atcDataPlugin loading Analysis::Watershed Characterization Reports
+00:00:25.000	atcBasinsPlugIn:Message:atcDataPlugin loading Analysis::Seasonal Attributes
+00:00:25.921	atcBasinsPlugIn:Message:atcDataPlugin loading Analysis::Graph
+00:00:58.109	atcBasinsPlugIn:Message:atcDataPlugin loading Analysis::File Geo Reference
+00:01:03.562	atcBasinsPlugIn:Message:Welcome:Show
+00:01:27.109	atcBasinsPlugIn:ItemClicked:Test
+00:01:27.171	MetaDataBatch:ScriptMain:Start
+00:01:27.171	MetaDataBatch:ScriptMain: CurDir:C:\dev\BASINS40\ScriptRunner\data\metadata\Orig
+00:01:27.171	MetaDataBatch:ScriptMain:----Process cnty.shp.xml
+00:01:30.000	MetaDataBatch:ValidationEventHandler:ERROR: The element 'dataqual' has invalid child element 'lineage'. List of possible elements expected: 'attracc logic'.
+00:01:30.000	MetaDataBatch:ValidationEventHandler:ERROR: The element 'procstep' has incomplete content. List of possible elements expected: 'srcused procdate'.
+00:01:31.656	MetaDataBatch:ScriptMain:---Saved ..\rev\cnty.shp.xml
+00:01:32.328	MetaDataBatch:ValidationEventHandler:ERROR: The element 'timeperd' has invalid child element 'current'. List of possible elements expected: 'timeinfo'.
+00:01:32.328	MetaDataBatch:ValidationEventHandler:ERROR: The element 'bounding' has invalid child element 'eastbc'. List of possible elements expected: 'westbc'.
+00:01:32.343	MetaDataBatch:ValidationEventHandler:ERROR: The element 'dataqual' has invalid child element 'lineage'. List of possible elements expected: 'attracc logic'.
+00:01:32.343	MetaDataBatch:ValidationEventHandler:ERROR: The element 'procstep' has incomplete content. List of possible elements expected: 'srcused procdate'.
+00:01:32.343	MetaDataBatch:ValidationEventHandler:ERROR: The element 'horizsys' has invalid child element 'geodetic'. List of possible elements expected: 'geograph planar local'.
+00:01:32.359	MetaDataBatch:ValidationEventHandler:ERROR: The element 'geograph' has incomplete content. List of possible elements expected: 'geogunit'.
+00:01:32.359	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.359	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.359	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.406	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.406	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.406	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.406	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.421	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.421	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.421	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.421	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.421	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.437	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.437	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.437	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.437	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:32.453	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:32.453	MetaDataBatch:ValidationEventHandler:ERROR: The element 'cntinfo' has invalid child element 'cntvoice'. List of possible elements expected: 'cntpos cntaddr'.
+00:01:32.453	MetaDataBatch:ValidationEventHandler:ERROR: The element 'stdorder' has invalid child element 'fees'. List of possible elements expected: 'nondig digform'.
+00:01:32.453	MetaDataBatch:ValidationEventHandler:ERROR: The element 'cntinfo' has invalid child element 'cntvoice'. List of possible elements expected: 'cntpos cntaddr'.
+00:01:32.468	MetaDataBatch:ValidationEventHandler:ERROR: The element 'metextns' has invalid child element 'onlink'.
+00:01:32.468	MetaDataBatch:ScriptMain:----Process nhdflowline.shp.xml
+00:01:33.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'xml:lang' attribute is not declared.
+00:01:33.203	MetaDataBatch:ValidationEventHandler:ERROR: The element 'metadata' has invalid child element 'Esri'. List of possible elements expected: 'idinfo'.
+00:01:33.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'Esri' element is not declared.
+00:01:33.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'MetaID' element is not declared.
+00:01:33.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'CreaDate' element is not declared.
+00:01:33.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'CreaTime' element is not declared.
+00:01:33.218	MetaDataBatch:ValidationEventHandler:ERROR: The 'SyncOnce' element is not declared.
+00:01:33.218	MetaDataBatch:ValidationEventHandler:ERROR: The 'SyncDate' element is not declared.
+00:01:33.218	MetaDataBatch:ValidationEventHandler:ERROR: The 'SyncTime' element is not declared.
+00:01:33.218	MetaDataBatch:ValidationEventHandler:ERROR: The 'ModDate' element is not declared.
+00:01:33.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'ModTime' element is not declared.
+00:01:33.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'DataProperties' element is not declared.
+00:01:33.234	MetaDataBatch:ValidationEventHandler:ERROR: The element 'lineage' has invalid child element 'Process'. List of possible elements expected: 'srcinfo procstep'.
+00:01:33.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Process' element is not declared.
+00:01:33.234	MetaDataBatch:ValidationEventHandler:ERROR: The element 'idinfo' has invalid child element 'native'. List of possible elements expected: 'citation'.
+00:01:33.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.234	MetaDataBatch:ValidationEventHandler:ERROR: The element 'descript' has invalid child element 'langdata'. List of possible elements expected: 'abstract'.
+00:01:33.250	MetaDataBatch:ValidationEventHandler:ERROR: The 'langdata' element is not declared.
+00:01:33.250	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.250	MetaDataBatch:ValidationEventHandler:ERROR: The element 'citeinfo' has invalid child element 'ftname'. List of possible elements expected: 'edition geoform serinfo pubinfo othercit onlink lworkcit'.
+00:01:33.250	MetaDataBatch:ValidationEventHandler:ERROR: The 'ftname' element is not declared.
+00:01:33.265	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.265	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.281	MetaDataBatch:ValidationEventHandler:ERROR: The element 'timeperd' has invalid child element 'current'. List of possible elements expected: 'timeinfo'.
+00:01:33.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'natvform' element is not declared.
+00:01:33.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'dataIdInfo' element is not declared.
+00:01:33.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'envirDesc' element is not declared.
+00:01:33.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'dataLang' element is not declared.
+00:01:33.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'languageCode' element is not declared.
+00:01:33.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'idCitation' element is not declared.
+00:01:33.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'resTitle' element is not declared.
+00:01:33.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'presForm' element is not declared.
+00:01:33.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'PresFormCd' element is not declared.
+00:01:33.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'spatRpType' element is not declared.
+00:01:33.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'SpatRepTypCd' element is not declared.
+00:01:33.312	MetaDataBatch:ValidationEventHandler:ERROR: The element 'metainfo' has invalid child element 'langmeta'. List of possible elements expected: 'metd'.
+00:01:33.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'langmeta' element is not declared.
+00:01:33.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.343	MetaDataBatch:ValidationEventHandler:ERROR: The element 'cntorgp' has invalid child element 'cntper'. List of possible elements expected: 'cntorg'.
+00:01:33.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdLang' element is not declared.
+00:01:33.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'languageCode' element is not declared.
+00:01:33.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdStanName' element is not declared.
+00:01:33.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdStanVer' element is not declared.
+00:01:33.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdChar' element is not declared.
+00:01:33.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'CharSetCd' element is not declared.
+00:01:33.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdHrLv' element is not declared.
+00:01:33.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'ScopeCd' element is not declared.
+00:01:33.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdHrLvName' element is not declared.
+00:01:33.359	MetaDataBatch:ValidationEventHandler:ERROR: The element 'distinfo' has invalid child element 'resdesc'. List of possible elements expected: 'distrib'.
+00:01:33.375	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'digtinfo' has invalid child element 'transize'. List of possible elements expected: 'formname'.
+00:01:33.375	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.375	MetaDataBatch:ValidationEventHandler:ERROR: The 'dssize' element is not declared.
+00:01:33.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'digform' has incomplete content. List of possible elements expected: 'digtopt'.
+00:01:33.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'stdorder' has incomplete content. List of possible elements expected: 'digform fees'.
+00:01:33.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'distInfo' element is not declared.
+00:01:33.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'distributor' element is not declared.
+00:01:33.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'distorTran' element is not declared.
+00:01:33.406	MetaDataBatch:ValidationEventHandler:ERROR: The 'onLineSrc' element is not declared.
+00:01:33.406	MetaDataBatch:ValidationEventHandler:ERROR: The 'orDesc' element is not declared.
+00:01:33.406	MetaDataBatch:ValidationEventHandler:ERROR: The 'linkage' element is not declared.
+00:01:33.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'protocol' element is not declared.
+00:01:33.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'transSize' element is not declared.
+00:01:33.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'distorFormat' element is not declared.
+00:01:33.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'formatName' element is not declared.
+00:01:33.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.421	MetaDataBatch:ValidationEventHandler:ERROR: The element 'ptvctinf' has invalid child element 'esriterm'. List of possible elements expected: 'sdtsterm vpfterm'.
+00:01:33.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'esriterm' element is not declared.
+00:01:33.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'efeatyp' element is not declared.
+00:01:33.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'efeageom' element is not declared.
+00:01:33.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'esritopo' element is not declared.
+00:01:33.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'efeacnt' element is not declared.
+00:01:33.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'spindex' element is not declared.
+00:01:33.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'linrefer' element is not declared.
+00:01:33.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'Name' attribute is not declared.
+00:01:33.453	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.453	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.453	MetaDataBatch:ValidationEventHandler:ERROR: The element 'horizsys' has invalid child element 'cordsysn'. List of possible elements expected: 'geograph planar local'.
+00:01:33.453	MetaDataBatch:ValidationEventHandler:ERROR: The 'cordsysn' element is not declared.
+00:01:33.453	MetaDataBatch:ValidationEventHandler:ERROR: The 'geogcsn' element is not declared.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The element 'geograph' has invalid child element 'geogunit'. List of possible elements expected: 'latres'.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.484	MetaDataBatch:ValidationEventHandler:ERROR: The element 'altsys' has invalid child element 'altenc'. List of possible elements expected: 'altdatum'.
+00:01:33.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'refSysInfo' element is not declared.
+00:01:33.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'RefSystem' element is not declared.
+00:01:33.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'refSysID' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'identCode' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'spatRepInfo' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'VectSpatRep' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'topLvl' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'TopoLevCd' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'geometObjs' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'geoObjTyp' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'GeoObjTypCd' element is not declared.
+00:01:33.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'geoObjCnt' element is not declared.
+00:01:33.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'Name' attribute is not declared.
+00:01:33.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.515	MetaDataBatch:ValidationEventHandler:ERROR: The element 'enttyp' has invalid child element 'enttypt'. List of possible elements expected: 'enttypd'.
+00:01:33.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'enttypt' element is not declared.
+00:01:33.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'enttypc' element is not declared.
+00:01:33.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.531	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.531	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.531	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.531	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'atprecis' element is not declared.
+00:01:33.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'attscale' element is not declared.
+00:01:33.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.562	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.562	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.562	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.562	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.578	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.578	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.578	MetaDataBatch:ValidationEventHandler:ERROR: The 'atprecis' element is not declared.
+00:01:33.578	MetaDataBatch:ValidationEventHandler:ERROR: The 'attscale' element is not declared.
+00:01:33.578	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.593	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.593	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.593	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.593	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.593	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.609	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.609	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.609	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.609	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.625	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.625	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.625	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.625	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.625	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.625	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.640	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.640	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.640	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.640	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.656	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.656	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.656	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.656	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.656	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.671	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.671	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.671	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.671	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.671	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.687	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.687	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.687	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.687	MetaDataBatch:ValidationEventHandler:ERROR: The 'atnumdec' element is not declared.
+00:01:33.687	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.703	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.703	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.703	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.718	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.718	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.718	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.718	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.734	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.734	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.734	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.734	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.750	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.750	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.750	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.750	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.750	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.765	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.781	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.781	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.781	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.781	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.781	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.781	MetaDataBatch:ValidationEventHandler:ERROR: The 'atnumdec' element is not declared.
+00:01:33.796	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:33.796	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:33.812	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:33.812	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:33.812	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:33.812	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdDateSt' element is not declared.
+00:01:35.312	MetaDataBatch:ScriptMain:---Saved ..\rev\nhdflowline.shp.xml
+00:01:36.078	MetaDataBatch:ValidationEventHandler:ERROR: The element 'timeperd' has invalid child element 'current'. List of possible elements expected: 'timeinfo'.
+00:01:36.078	MetaDataBatch:ValidationEventHandler:ERROR: The element 'status' has invalid child element 'update'. List of possible elements expected: 'progress'.
+00:01:36.078	MetaDataBatch:ValidationEventHandler:ERROR: The element 'bounding' has invalid child element 'eastbc'. List of possible elements expected: 'westbc'.
+00:01:36.078	MetaDataBatch:ValidationEventHandler:ERROR: The element 'dataqual' has invalid child element 'lineage'. List of possible elements expected: 'attracc logic'.
+00:01:36.093	MetaDataBatch:ValidationEventHandler:ERROR: The element 'horizsys' has invalid child element 'geodetic'. List of possible elements expected: 'geograph planar local'.
+00:01:36.093	MetaDataBatch:ValidationEventHandler:ERROR: The element 'enttyp' has incomplete content. List of possible elements expected: 'enttypd'.
+00:01:36.093	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:36.093	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:36.093	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attrvai'. List of possible elements expected: 'attrdomv'.
+00:01:36.109	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attrvai' has incomplete content. List of possible elements expected: 'attrvae'.
+00:01:36.109	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.109	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.109	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.109	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.125	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.125	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.125	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.125	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.140	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.140	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.140	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.140	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.156	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has incomplete content. List of possible elements expected: 'attrdef'.
+00:01:36.156	MetaDataBatch:ValidationEventHandler:ERROR: The element 'distinfo' has invalid child element 'resdesc'. List of possible elements expected: 'distrib'.
+00:01:36.156	MetaDataBatch:ValidationEventHandler:ERROR: The element 'digform' has incomplete content. List of possible elements expected: 'digtinfo'.
+00:01:36.156	MetaDataBatch:ValidationEventHandler:ERROR: The element 'stdorder' has incomplete content. List of possible elements expected: 'digform fees'.
+00:01:36.156	MetaDataBatch:ValidationEventHandler:ERROR: The element 'cntinfo' has invalid child element 'cntvoice'. List of possible elements expected: 'cntpos cntaddr'.
+00:01:36.156	MetaDataBatch:ValidationEventHandler:ERROR: The element 'metextns' has invalid child element 'onlink'.
+00:01:36.171	MetaDataBatch:ScriptMain:----Process nhdflowline.shp.Orig.xml
+00:01:36.937	MetaDataBatch:ValidationEventHandler:ERROR: The 'xml:lang' attribute is not declared.
+00:01:36.937	MetaDataBatch:ValidationEventHandler:ERROR: The element 'metadata' has invalid child element 'Esri'. List of possible elements expected: 'idinfo'.
+00:01:36.937	MetaDataBatch:ValidationEventHandler:ERROR: The 'Esri' element is not declared.
+00:01:36.937	MetaDataBatch:ValidationEventHandler:ERROR: The 'MetaID' element is not declared.
+00:01:36.953	MetaDataBatch:ValidationEventHandler:ERROR: The 'CreaDate' element is not declared.
+00:01:36.953	MetaDataBatch:ValidationEventHandler:ERROR: The 'CreaTime' element is not declared.
+00:01:36.953	MetaDataBatch:ValidationEventHandler:ERROR: The 'SyncOnce' element is not declared.
+00:01:36.953	MetaDataBatch:ValidationEventHandler:ERROR: The 'SyncDate' element is not declared.
+00:01:36.953	MetaDataBatch:ValidationEventHandler:ERROR: The 'SyncTime' element is not declared.
+00:01:36.968	MetaDataBatch:ValidationEventHandler:ERROR: The 'ModDate' element is not declared.
+00:01:36.968	MetaDataBatch:ValidationEventHandler:ERROR: The 'ModTime' element is not declared.
+00:01:36.968	MetaDataBatch:ValidationEventHandler:ERROR: The 'DataProperties' element is not declared.
+00:01:36.984	MetaDataBatch:ValidationEventHandler:ERROR: The element 'lineage' has invalid child element 'Process'. List of possible elements expected: 'srcinfo procstep'.
+00:01:36.984	MetaDataBatch:ValidationEventHandler:ERROR: The 'Process' element is not declared.
+00:01:36.984	MetaDataBatch:ValidationEventHandler:ERROR: The element 'idinfo' has invalid child element 'native'. List of possible elements expected: 'citation'.
+00:01:36.984	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:36.984	MetaDataBatch:ValidationEventHandler:ERROR: The element 'descript' has invalid child element 'langdata'. List of possible elements expected: 'abstract'.
+00:01:36.984	MetaDataBatch:ValidationEventHandler:ERROR: The 'langdata' element is not declared.
+00:01:37.000	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.000	MetaDataBatch:ValidationEventHandler:ERROR: The element 'citeinfo' has invalid child element 'ftname'. List of possible elements expected: 'edition geoform serinfo pubinfo othercit onlink lworkcit'.
+00:01:37.000	MetaDataBatch:ValidationEventHandler:ERROR: The 'ftname' element is not declared.
+00:01:37.000	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.015	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.015	MetaDataBatch:ValidationEventHandler:ERROR: The element 'timeperd' has invalid child element 'current'. List of possible elements expected: 'timeinfo'.
+00:01:37.015	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.015	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.015	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.031	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.031	MetaDataBatch:ValidationEventHandler:ERROR: The 'natvform' element is not declared.
+00:01:37.031	MetaDataBatch:ValidationEventHandler:ERROR: The 'dataIdInfo' element is not declared.
+00:01:37.031	MetaDataBatch:ValidationEventHandler:ERROR: The 'envirDesc' element is not declared.
+00:01:37.046	MetaDataBatch:ValidationEventHandler:ERROR: The 'dataLang' element is not declared.
+00:01:37.046	MetaDataBatch:ValidationEventHandler:ERROR: The 'languageCode' element is not declared.
+00:01:37.046	MetaDataBatch:ValidationEventHandler:ERROR: The 'idCitation' element is not declared.
+00:01:37.046	MetaDataBatch:ValidationEventHandler:ERROR: The 'resTitle' element is not declared.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The 'presForm' element is not declared.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The 'PresFormCd' element is not declared.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The 'spatRpType' element is not declared.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The 'SpatRepTypCd' element is not declared.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The element 'metainfo' has invalid child element 'langmeta'. List of possible elements expected: 'metd'.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The 'langmeta' element is not declared.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.062	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.078	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.078	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.078	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.078	MetaDataBatch:ValidationEventHandler:ERROR: The element 'cntorgp' has invalid child element 'cntper'. List of possible elements expected: 'cntorg'.
+00:01:37.093	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.093	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdLang' element is not declared.
+00:01:37.093	MetaDataBatch:ValidationEventHandler:ERROR: The 'languageCode' element is not declared.
+00:01:37.109	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdStanName' element is not declared.
+00:01:37.109	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdStanVer' element is not declared.
+00:01:37.109	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdChar' element is not declared.
+00:01:37.109	MetaDataBatch:ValidationEventHandler:ERROR: The 'CharSetCd' element is not declared.
+00:01:37.109	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdHrLv' element is not declared.
+00:01:37.125	MetaDataBatch:ValidationEventHandler:ERROR: The 'ScopeCd' element is not declared.
+00:01:37.125	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdHrLvName' element is not declared.
+00:01:37.125	MetaDataBatch:ValidationEventHandler:ERROR: The element 'distinfo' has invalid child element 'resdesc'. List of possible elements expected: 'distrib'.
+00:01:37.125	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.125	MetaDataBatch:ValidationEventHandler:ERROR: The element 'digtinfo' has invalid child element 'transize'. List of possible elements expected: 'formname'.
+00:01:37.140	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.140	MetaDataBatch:ValidationEventHandler:ERROR: The 'dssize' element is not declared.
+00:01:37.140	MetaDataBatch:ValidationEventHandler:ERROR: The element 'digform' has incomplete content. List of possible elements expected: 'digtopt'.
+00:01:37.140	MetaDataBatch:ValidationEventHandler:ERROR: The element 'stdorder' has incomplete content. List of possible elements expected: 'digform fees'.
+00:01:37.140	MetaDataBatch:ValidationEventHandler:ERROR: The 'distInfo' element is not declared.
+00:01:37.156	MetaDataBatch:ValidationEventHandler:ERROR: The 'distributor' element is not declared.
+00:01:37.156	MetaDataBatch:ValidationEventHandler:ERROR: The 'distorTran' element is not declared.
+00:01:37.156	MetaDataBatch:ValidationEventHandler:ERROR: The 'onLineSrc' element is not declared.
+00:01:37.156	MetaDataBatch:ValidationEventHandler:ERROR: The 'orDesc' element is not declared.
+00:01:37.156	MetaDataBatch:ValidationEventHandler:ERROR: The 'linkage' element is not declared.
+00:01:37.156	MetaDataBatch:ValidationEventHandler:ERROR: The 'protocol' element is not declared.
+00:01:37.171	MetaDataBatch:ValidationEventHandler:ERROR: The 'transSize' element is not declared.
+00:01:37.171	MetaDataBatch:ValidationEventHandler:ERROR: The 'distorFormat' element is not declared.
+00:01:37.171	MetaDataBatch:ValidationEventHandler:ERROR: The 'formatName' element is not declared.
+00:01:37.171	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.171	MetaDataBatch:ValidationEventHandler:ERROR: The element 'ptvctinf' has invalid child element 'esriterm'. List of possible elements expected: 'sdtsterm vpfterm'.
+00:01:37.187	MetaDataBatch:ValidationEventHandler:ERROR: The 'esriterm' element is not declared.
+00:01:37.187	MetaDataBatch:ValidationEventHandler:ERROR: The 'efeatyp' element is not declared.
+00:01:37.187	MetaDataBatch:ValidationEventHandler:ERROR: The 'efeageom' element is not declared.
+00:01:37.187	MetaDataBatch:ValidationEventHandler:ERROR: The 'esritopo' element is not declared.
+00:01:37.187	MetaDataBatch:ValidationEventHandler:ERROR: The 'efeacnt' element is not declared.
+00:01:37.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'spindex' element is not declared.
+00:01:37.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'linrefer' element is not declared.
+00:01:37.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'Name' attribute is not declared.
+00:01:37.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.203	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.218	MetaDataBatch:ValidationEventHandler:ERROR: The element 'horizsys' has invalid child element 'cordsysn'. List of possible elements expected: 'geograph planar local'.
+00:01:37.218	MetaDataBatch:ValidationEventHandler:ERROR: The 'cordsysn' element is not declared.
+00:01:37.218	MetaDataBatch:ValidationEventHandler:ERROR: The 'geogcsn' element is not declared.
+00:01:37.234	MetaDataBatch:ValidationEventHandler:ERROR: The element 'geograph' has invalid child element 'geogunit'. List of possible elements expected: 'latres'.
+00:01:37.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.234	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.250	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.250	MetaDataBatch:ValidationEventHandler:ERROR: The element 'altsys' has invalid child element 'altenc'. List of possible elements expected: 'altdatum'.
+00:01:37.250	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.250	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.250	MetaDataBatch:ValidationEventHandler:ERROR: The 'refSysInfo' element is not declared.
+00:01:37.265	MetaDataBatch:ValidationEventHandler:ERROR: The 'RefSystem' element is not declared.
+00:01:37.265	MetaDataBatch:ValidationEventHandler:ERROR: The 'refSysID' element is not declared.
+00:01:37.265	MetaDataBatch:ValidationEventHandler:ERROR: The 'identCode' element is not declared.
+00:01:37.265	MetaDataBatch:ValidationEventHandler:ERROR: The 'spatRepInfo' element is not declared.
+00:01:37.265	MetaDataBatch:ValidationEventHandler:ERROR: The 'VectSpatRep' element is not declared.
+00:01:37.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'topLvl' element is not declared.
+00:01:37.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'TopoLevCd' element is not declared.
+00:01:37.281	MetaDataBatch:ValidationEventHandler:ERROR: The 'geometObjs' element is not declared.
+00:01:37.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'geoObjTyp' element is not declared.
+00:01:37.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'GeoObjTypCd' element is not declared.
+00:01:37.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'geoObjCnt' element is not declared.
+00:01:37.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'Name' attribute is not declared.
+00:01:37.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.296	MetaDataBatch:ValidationEventHandler:ERROR: The element 'enttyp' has invalid child element 'enttypt'. List of possible elements expected: 'enttypd'.
+00:01:37.296	MetaDataBatch:ValidationEventHandler:ERROR: The 'enttypt' element is not declared.
+00:01:37.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'enttypc' element is not declared.
+00:01:37.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.312	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.312	MetaDataBatch:ValidationEventHandler:ERROR: The 'atprecis' element is not declared.
+00:01:37.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'attscale' element is not declared.
+00:01:37.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.328	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.328	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'atprecis' element is not declared.
+00:01:37.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'attscale' element is not declared.
+00:01:37.343	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.359	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.375	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.375	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.375	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.375	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.390	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.390	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.406	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.406	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.406	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.406	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.406	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.421	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.421	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.437	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.437	MetaDataBatch:ValidationEventHandler:ERROR: The 'atnumdec' element is not declared.
+00:01:37.453	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.453	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.453	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.453	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.468	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.468	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.484	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.500	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.500	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.500	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.515	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.515	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.531	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.531	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.531	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.531	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.531	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'atnumdec' element is not declared.
+00:01:37.546	MetaDataBatch:ValidationEventHandler:ERROR: The 'Sync' attribute is not declared.
+00:01:37.546	MetaDataBatch:ValidationEventHandler:ERROR: The element 'attr' has invalid child element 'attalias'. List of possible elements expected: 'attrdef'.
+00:01:37.562	MetaDataBatch:ValidationEventHandler:ERROR: The 'attalias' element is not declared.
+00:01:37.562	MetaDataBatch:ValidationEventHandler:ERROR: The 'attrtype' element is not declared.
+00:01:37.562	MetaDataBatch:ValidationEventHandler:ERROR: The 'attwidth' element is not declared.
+00:01:37.562	MetaDataBatch:ValidationEventHandler:ERROR: The 'mdDateSt' element is not declared.
+00:01:38.375	MetaDataBatch:ScriptMain:System.Exception: The West Bounding Coordinate must be between -90.0 and 90.0
+   at mwOpenMetadataManager.FGDCMetadata.IdentificationClasses.BoundingCoordinates.set_WestBounding(String value) in C:\dev\MapWindow4Plugins\mwOpenMetadataManager\Classes\Metadata Classes\clsMetadataIdentification.vb:line 326
+   at mwOpenMetadataManager.FGDCMetadata.MetadataMain.PopulateIDSpatialDomain(XmlNode& node) in C:\dev\MapWindow4Plugins\mwOpenMetadataManager\Classes\clsFGDCMetadata.vb:line 192
+   at mwOpenMetadataManager.FGDCMetadata.MetadataMain.PopulateIdentification() in C:\dev\MapWindow4Plugins\mwOpenMetadataManager\Classes\clsFGDCMetadata.vb:line 118
+   at mwOpenMetadataManager.FGDCMetadata.MetadataMain.Load(String path) in C:\dev\MapWindow4Plugins\mwOpenMetadataManager\Classes\clsFGDCMetadata.vb:line 99
+   at ScriptRunner.MetaDataBatch.ScriptMain(IMapWin& aMapWin) in C:\dev\BASINS40\ScriptRunner\MetaDataBatch.vb:line 36
+00:01:39.187	MetaDataBatch:ScriptMain:---Saved ..\rev\nhdflowline.shp.Orig.xml
+00:01:40.046	MetaDataBatch:ValidationEventHandler:ERROR: The element 'timeperd' has invalid child element 'current'. List of possible elements expected: 'timeinfo'.
+00:01:40.046	MetaDataBatch:ValidationEventHandler:ERROR: The element 'status' has invalid child element 'update'. List of possible elements expected: 'progress'.
+00:01:40.046	MetaDataBatch:ValidationEventHandler:ERROR: The element 'idinfo' has incomplete content. List of possible elements expected: 'spdom'.
+00:01:40.062	MetaDataBatch:ValidationEventHandler:ERROR: The element 'metadata' has incomplete content. List of possible elements expected: 'dataqual spdoinfo spref eainfo distinfo metainfo'.
+00:01:40.062	MetaDataBatch:ScriptMain:Done
