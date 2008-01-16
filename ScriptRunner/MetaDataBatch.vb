@@ -45,7 +45,9 @@ Module MetaDataBatch
             lXMLReader = XmlReader.Create(lStream, lSettings)
             lXML = New XmlDocument
             lXML.Load(lXMLReader)
+            lStream.Close()
             lStream = Nothing
+            lXMLReader.Close()
             lXMLReader = Nothing
             lXML = Nothing
         Next
