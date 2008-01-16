@@ -13,9 +13,24 @@ Module MetaDataBatch
         Logger.Dbg(" CurDir:" & CurDir())
 
         Dim lMetaData As FGDCMetadata.MetadataMain
+        Dim lSettings As New XmlReaderSettings
+        lSettings.ProhibitDtd = False
+        lSettings.ValidationType = ValidationType.DTD
+        AddHandler lSettings.ValidationEventHandler, AddressOf ValidationEventHandler
 
         Dim lFileNames() As String = {"cnty.shp.xml", "nhdflowline.shp.xml", "nhdflowline.shp.Orig.xml"}
         For Each lFileName As String In lFileNames
+            Logger.Dbg("----Process " & lFileName)
+            Dim lStream As New System.IO.FileStream(lFileName, IO.FileMode.Open)
+            Dim lXMLReader As XmlReader = XmlReader.Create(lStream, lSettings)
+            Dim lXML As New XmlDocument
+            lXML.Load(lXMLReader)
+            lStream.Close()
+            lStream = Nothing
+            lXMLReader.Close()
+            lXMLReader = Nothing
+            lXML = Nothing
+
             lMetaData = New FGDCMetadata.MetadataMain
             Try
                 lMetaData.Load(lFileName)
@@ -26,15 +41,13 @@ Module MetaDataBatch
             lMetaData.Save(lFileName)
             Logger.Dbg("---Saved " & lFileName)
 
-            Dim lStream As New System.IO.FileStream(lFileName, IO.FileMode.Open)
-            Dim lSettings As New XmlReaderSettings
-            lSettings.ProhibitDtd = False
-            lSettings.ValidationType = ValidationType.DTD
-            AddHandler lSettings.ValidationEventHandler, AddressOf ValidationEventHandler
-
-            Dim lXMLReader As XmlReader = XmlReader.Create(lStream, lSettings)
-            Dim lXML As New XmlDocument
+            lStream = New System.IO.FileStream(lFileName, IO.FileMode.Open)
+            lXMLReader = XmlReader.Create(lStream, lSettings)
+            lXML = New XmlDocument
             lXML.Load(lXMLReader)
+            lStream = Nothing
+            lXMLReader = Nothing
+            lXML = Nothing
         Next
         Logger.Dbg("Done")
     End Sub
