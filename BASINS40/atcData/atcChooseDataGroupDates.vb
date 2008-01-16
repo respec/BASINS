@@ -83,11 +83,6 @@ Public Class atcChooseDataGroupDates
         Set(ByVal aGroup As atcDataGroup)
             pDataGroup = aGroup
             Reset()
-            If radioAll.Enabled Then
-                radioAll.Checked = True
-            Else
-                radioCustom.Checked = True
-            End If
         End Set
     End Property
 
@@ -133,37 +128,28 @@ Public Class atcChooseDataGroupDates
         If pFirstStart <= pLastEnd Then
             lblDataStart.Text = pDateFormat.JDateToString(pFirstStart)
             lblDataEnd.Text = pDateFormat.JDateToString(pLastEnd)
-            radioAll.Enabled = True
-            If radioAll.Checked Then radioAll_CheckedChanged(Nothing, Nothing)
+            btnAll.Enabled = True
+            btnAll_Click(Nothing, Nothing)
         Else
             lblDataStart.Text = ""
             lblDataEnd.Text = ""
-            radioAll.Enabled = False
+            btnAll.Enabled = False
         End If
 
         If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
             lblCommonStart.Text = pDateFormat.JDateToString(pCommonStart)
             lblCommonEnd.Text = pDateFormat.JDateToString(pCommonEnd)
-            radioCommon.Enabled = True
-            If radioCommon.Checked Then radioCommon_CheckedChanged(Nothing, Nothing)
+            btnCommon.Enabled = True
         Else
             lblCommonStart.Text = pNoDatesInCommon
             lblCommonEnd.Text = pNoDatesInCommon
-            radioCommon.Enabled = False
-            If radioCommon.Checked Then
-                If radioAll.Enabled Then
-                    radioAll.Checked = True
-                Else
-                    radioCustom.Checked = True
-                End If
-            End If
+            btnCommon.Enabled = False
         End If
-
     End Sub
 
     Public ReadOnly Property SelectedAll() As Boolean
         Get
-            Return radioAll.Checked OrElse (txtOmitBefore.Text = lblDataStart.Text AndAlso txtOmitAfter.Text = lblDataEnd.Text)
+            Return txtOmitBefore.Text = lblDataStart.Text AndAlso txtOmitAfter.Text = lblDataEnd.Text
         End Get
     End Property
 
@@ -189,25 +175,13 @@ Public Class atcChooseDataGroupDates
         End If
     End Function
 
-    Private Sub radioAll_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioAll.CheckedChanged
-        If radioAll.Checked Then
-            txtOmitBefore.Text = lblDataStart.Text
-            txtOmitAfter.Text = lblDataEnd.Text
-        End If
+    Private Sub btnAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAll.Click
+        txtOmitBefore.Text = lblDataStart.Text
+        txtOmitAfter.Text = lblDataEnd.Text
     End Sub
 
-    Private Sub radioCommon_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioCommon.CheckedChanged
-        If radioCommon.Checked Then
-            txtOmitBefore.Text = lblCommonStart.Text
-            txtOmitAfter.Text = lblCommonEnd.Text
-        End If
-    End Sub
-
-    Private Sub txtOmitAfter_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOmitAfter.Click
-        radioCustom.Checked = True
-    End Sub
-
-    Private Sub txtOmitBefore_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOmitBefore.Click
-        radioCustom.Checked = True
+    Private Sub btnCommon_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCommon.Click
+        txtOmitBefore.Text = lblCommonStart.Text
+        txtOmitAfter.Text = lblCommonEnd.Text
     End Sub
 End Class

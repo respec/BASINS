@@ -3,31 +3,40 @@ Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.Drawing
 Imports System.Windows.Forms
+
+Imports atcUtility
 Imports ZedGraph
 
 Public Class frmGraphEditor
 
     Public Event Apply()
+
     Private pPane As GraphPane
+    Private WithEvents pZgc As ZedGraphControl
 
     ''' <summary>
-    ''' Show this form for editing the specified GraphPane
+    ''' Show this form for customizing the specified ZedGraphControl
     ''' </summary>
-    ''' <param name="aPane">pane to edit</param>
+    ''' <param name="aZgc">graph control to edit</param>
     ''' <remarks></remarks>
     <CLSCompliant(False)> _
-    Public Sub Edit(ByVal aPane As GraphPane)
+    Public Sub Edit(ByVal aZgc As ZedGraphControl)
         Dim lAutoApply As Boolean = chkAutoApply.Checked
         chkAutoApply.Checked = False
 
-        pPane = aPane
+        pZgc = aZgc
+        pPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
+        SetComboFromCurves()
+        SetControlsFromPane()
+        Me.Show()
+        chkAutoApply.Checked = lAutoApply
+    End Sub
+
+    Private Sub SetComboFromCurves()
         cboWhichCurve.Items.Clear()
         For Each lCurve As CurveItem In pPane.CurveList
             cboWhichCurve.Items.Add(lCurve.Label.Text)
         Next
-        SetControlsFromPane()
-        Me.Show()
-        chkAutoApply.Checked = lAutoApply
     End Sub
 
     Private Sub SetControlsFromPane()
@@ -53,13 +62,9 @@ Public Class frmGraphEditor
     Private Sub SetControlsFromAxis(ByVal aAxis As Axis)
         If Not aAxis Is Nothing Then
             txtAxisLabel.Text = aAxis.Title.Text
-            txtAxisDisplayMinimum.Text = aAxis.Scale.Min.ToString()
-            txtAxisDisplayMaximum.Text = aAxis.Scale.Max.ToString()
             Select Case aAxis.Type
                 Case AxisType.DateDual
                     radioAxisTime.Checked = True
-                    txtAxisDisplayMinimum.Text = XDate.ToString(aAxis.Scale.Min)
-                    txtAxisDisplayMaximum.Text = XDate.ToString(aAxis.Scale.Max)
                 Case AxisType.Linear
                     radioAxisLinear.Checked = True
                     radioAxisLogarithmic.Enabled = True
@@ -71,6 +76,7 @@ Public Class frmGraphEditor
                 Case AxisType.Probability
                     radioAxisProbability.Checked = True
             End Select
+            SetControlsMinMax(aAxis)
             chkAxisMajorGridVisible.Checked = aAxis.MajorGrid.IsVisible
             txtAxisMajorGridColor.BackColor = aAxis.MajorGrid.Color
             chkAxisMajorTicsVisible.Checked = aAxis.MajorTic.IsInside
@@ -79,6 +85,25 @@ Public Class frmGraphEditor
             chkAxisMinorTicsVisible.Checked = aAxis.MinorTic.IsInside
         End If
     End Sub
+
+    Private Sub SetControlsMinMax(ByVal aAxis As Axis)
+        If Not aAxis Is Nothing Then
+            If radioAxisTime.Checked Then
+                txtAxisDisplayMinimum.Text = XDate.ToString(aAxis.Scale.Min)
+                txtAxisDisplayMaximum.Text = XDate.ToString(aAxis.Scale.Max)
+            ElseIf radioAxisLinear.Checked Then
+                txtAxisDisplayMinimum.Text = DoubleToString(aAxis.Scale.Min)
+                txtAxisDisplayMaximum.Text = DoubleToString(aAxis.Scale.Max)
+            ElseIf radioAxisLogarithmic.Checked Then
+                txtAxisDisplayMinimum.Text = DoubleToString(aAxis.Scale.Min)
+                txtAxisDisplayMaximum.Text = DoubleToString(aAxis.Scale.Max)
+            ElseIf radioAxisProbability.Checked Then
+                txtAxisDisplayMinimum.Text = DoubleToString(aAxis.Scale.Min)
+                txtAxisDisplayMaximum.Text = DoubleToString(aAxis.Scale.Max)
+            End If
+        End If
+    End Sub
+
 
     Private Sub SetAxisFromControls(ByVal aAxis As Axis)
         If Not aAxis Is Nothing Then
@@ -116,8 +141,9 @@ Public Class frmGraphEditor
         End If
     End Sub
 
-    Private Sub SetControlsFromCurve(ByVal aCurve As CurveItem)
+    Private Sub SetControlsFromCurve(ByVal aCurve As LineItem)
         If Not aCurve Is Nothing Then
+            On Error Resume Next
             txtCurveLabel.Text = aCurve.Label.Text
             If aCurve.IsY2Axis Then
                 radioCurveYaxisRight.Checked = True
@@ -126,30 +152,55 @@ Public Class frmGraphEditor
             End If
 
             txtCurveColor.BackColor = aCurve.Color
-            If TypeOf aCurve Is LineItem Then
-                lblCurve.Visible = True
-                txtCurveWidth.Visible = True
+            chkCurveLineVisible.Checked = aCurve.Line.IsVisible
+            txtCurveWidth.Text = aCurve.Line.Width.ToString()
 
-                txtCurveWidth.Text = (CType(aCurve, LineItem)).Line.Width.ToString()
-            Else
-                lblCurve.Visible = False
-                txtCurveWidth.Visible = False
-            End If
+            chkCurveSymbolVisible.Checked = aCurve.Symbol.IsVisible
+            txtCurveSymbolSize.Text = aCurve.Symbol.Size
+            cboCurveSymbolType.Text = System.Enum.GetName(aCurve.Symbol.GetType, aCurve.Symbol)
+            'Select Case aCurve.Symbol.Type
+            '    Case SymbolType.Square : cboCurveSymbolType.Text = "Square"
+            '    Case SymbolType.Diamond : cboCurveSymbolType.Text = "Diamond"
+            '    Case SymbolType.Triangle : cboCurveSymbolType.Text = "Triangle"
+            '    Case SymbolType.Circle : cboCurveSymbolType.Text = "3"
+            '    Case SymbolType.XCross : cboCurveSymbolType.Text = "4"
+            '    Case SymbolType.Plus : cboCurveSymbolType.Text = "5"
+            '    Case SymbolType.Star : cboCurveSymbolType.Text = "6"
+            '    Case SymbolType.TriangleDown : cboCurveSymbolType.Text = "7"
+            '    Case SymbolType.HDash : cboCurveSymbolType.Text = "8"
+            '    Case SymbolType.VDash : cboCurveSymbolType.Text = "9"
+            '    Case SymbolType.None : cboCurveSymbolType.Text = "10"
+            'End Select
         End If
     End Sub
 
-    Private Sub SetCurveFromControls(ByVal aCurve As CurveItem)
+    Private Sub SetCurveFromControls(ByVal aCurve As LineItem)
         If Not aCurve Is Nothing Then
+            On Error Resume Next
             aCurve.Label.Text = txtCurveLabel.Text
             aCurve.IsY2Axis = radioCurveYaxisRight.Checked
             'TODO: If radioCurveYaxisAuxiliary.Checked then [move to aux pane]
             aCurve.Color = txtCurveColor.BackColor
-            If TypeOf aCurve Is LineItem Then
-                Dim lWidth As Integer
-                If Integer.TryParse(txtCurveWidth.Text, lWidth) Then
-                    CType(aCurve, LineItem).Line.Width = lWidth
-                End If
-            End If
+            Dim lInt As Integer
+            If Integer.TryParse(txtCurveWidth.Text, lInt) Then aCurve.Line.Width = lInt
+
+            aCurve.Symbol.IsVisible = chkCurveSymbolVisible.Checked
+            If Integer.TryParse(txtCurveSymbolSize.Text, lInt) Then aCurve.Symbol.Size = lInt
+
+            aCurve.Symbol.Type = System.Enum.Parse(aCurve.Symbol.Type.GetType, cboCurveSymbolType.Text)
+            'Select Case cboCurveSymbolType.Text
+            '    Case "Square" : aCurve.Symbol.Type = SymbolType.Square
+            '    Case "Diamond" : aCurve.Symbol.Type = SymbolType.Diamond
+            '    Case "Triangle" : aCurve.Symbol.Type = SymbolType.Triangle
+            '    Case "Circle" : aCurve.Symbol.Type = SymbolType.Circle
+            '    Case "XCross" : aCurve.Symbol.Type = SymbolType.XCross
+            '    Case "Plus" : aCurve.Symbol.Type = SymbolType.Plus
+            '    Case "Star" : aCurve.Symbol.Type = SymbolType.Star
+            '    Case "TriangleDown" : aCurve.Symbol.Type = SymbolType.TriangleDown
+            '    Case "HDash" : aCurve.Symbol.Type = SymbolType.HDash
+            '    Case "VDash" : aCurve.Symbol.Type = SymbolType.VDash
+            '    Case "None" : aCurve.Symbol.Type = SymbolType.None
+            'End Select
         End If
     End Sub
 
@@ -189,7 +240,7 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub txtNotColor_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
-            txtAxisLabel.TextChanged, txtCurveLabel.TextChanged, txtCurveWidth.TextChanged
+            txtAxisLabel.TextChanged, txtCurveLabel.TextChanged, txtCurveWidth.TextChanged, txtCurveSymbolSize.TextChanged
         If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
     End Sub
 
@@ -220,4 +271,17 @@ Public Class frmGraphEditor
         If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
     End Sub
 
+    Private Sub pZgc_ZoomEvent(ByVal sender As ZedGraph.ZedGraphControl, ByVal oldState As ZedGraph.ZoomState, ByVal newState As ZedGraph.ZoomState) Handles pZgc.ZoomEvent
+        SetControlsMinMax(AxisFromCombo())
+    End Sub
+
+    Private Sub btnLineEquationAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLineEquationAdd.Click
+        Dim lNewLine As LineItem = AddLine(pPane, txtLineAcoef.Text, txtLineBcoef.Text, Drawing2D.DashStyle.Solid, "Y = " & txtLineAcoef.Text & " X + " & txtLineBcoef.Text)
+        SetComboFromCurves()
+    End Sub
+
+    Private Sub btnLineConstantYAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLineConstantYAdd.Click
+        Dim lNewLine As LineItem = AddLine(pPane, 0, txtLineYconstant.Text, Drawing2D.DashStyle.Solid, "Y = " & txtLineYconstant.Text)
+        SetComboFromCurves()
+    End Sub
 End Class

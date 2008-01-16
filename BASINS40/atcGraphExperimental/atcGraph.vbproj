@@ -85,9 +85,6 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcGraphEdit.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="atcGraphForm.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -108,12 +105,6 @@
     <Compile Include="frmChooseGraphs.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmGraphEdit.Designer.vb">
-      <DependentUpon>frmGraphEdit.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmGraphEdit.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmGraphEditor.Designer.vb">
       <DependentUpon>frmGraphEditor.vb</DependentUpon>
     </Compile>
@@ -121,10 +112,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="modGraph.vb" />
-    <EmbeddedResource Include="atcGraphEdit.resx">
-      <DependentUpon>atcGraphEdit.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="atcGraphForm.resx">
       <DependentUpon>atcGraphForm.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -132,10 +119,6 @@
     <EmbeddedResource Include="frmChooseGraphs.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmChooseGraphs.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmGraphEdit.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmGraphEdit.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmGraphEditor.resx">
       <DependentUpon>frmGraphEditor.vb</DependentUpon>

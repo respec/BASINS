@@ -34,6 +34,7 @@ Partial Class frmGraphEditor
         Me.txtAxisDisplayMinimum = New System.Windows.Forms.TextBox
         Me.lblAxisRange = New System.Windows.Forms.Label
         Me.txtCurveWidth = New System.Windows.Forms.TextBox
+        Me.txtCurveSymbolSize = New System.Windows.Forms.TextBox
         Me.lblAxisMinorGrid = New System.Windows.Forms.Label
         Me.lblAxisMajorGrid = New System.Windows.Forms.Label
         Me.lblAxisTo = New System.Windows.Forms.Label
@@ -64,6 +65,10 @@ Partial Class frmGraphEditor
         Me.radioAxisLinear = New System.Windows.Forms.RadioButton
         Me.radioAxisTime = New System.Windows.Forms.RadioButton
         Me.tabCurves = New System.Windows.Forms.TabPage
+        Me.cboCurveSymbolType = New System.Windows.Forms.ComboBox
+        Me.chkCurveLineVisible = New System.Windows.Forms.CheckBox
+        Me.chkCurveSymbolVisible = New System.Windows.Forms.CheckBox
+        Me.lblCurveSymbolSize = New System.Windows.Forms.Label
         Me.radioCurveYaxisAuxiliary = New System.Windows.Forms.RadioButton
         Me.radioCurveYaxisRight = New System.Windows.Forms.RadioButton
         Me.radioCurveYaxisLeft = New System.Windows.Forms.RadioButton
@@ -128,7 +133,7 @@ Partial Class frmGraphEditor
         'txtCurveColor
         '
         Me.txtCurveColor.BackColor = System.Drawing.Color.LightGray
-        Me.txtCurveColor.Location = New System.Drawing.Point(201, 89)
+        Me.txtCurveColor.Location = New System.Drawing.Point(81, 86)
         Me.txtCurveColor.Name = "txtCurveColor"
         Me.txtCurveColor.Size = New System.Drawing.Size(91, 20)
         Me.txtCurveColor.TabIndex = 28
@@ -137,7 +142,7 @@ Partial Class frmGraphEditor
         'lblCurveColor
         '
         Me.lblCurveColor.AutoSize = True
-        Me.lblCurveColor.Location = New System.Drawing.Point(164, 92)
+        Me.lblCurveColor.Location = New System.Drawing.Point(6, 89)
         Me.lblCurveColor.Name = "lblCurveColor"
         Me.lblCurveColor.Size = New System.Drawing.Size(31, 13)
         Me.lblCurveColor.TabIndex = 27
@@ -203,11 +208,19 @@ Partial Class frmGraphEditor
         '
         'txtCurveWidth
         '
-        Me.txtCurveWidth.Location = New System.Drawing.Point(81, 89)
+        Me.txtCurveWidth.Location = New System.Drawing.Point(125, 112)
         Me.txtCurveWidth.Name = "txtCurveWidth"
-        Me.txtCurveWidth.Size = New System.Drawing.Size(55, 20)
+        Me.txtCurveWidth.Size = New System.Drawing.Size(47, 20)
         Me.txtCurveWidth.TabIndex = 29
         Me.toolTip1.SetToolTip(Me.txtCurveWidth, "Width of curve")
+        '
+        'txtCurveSymbolSize
+        '
+        Me.txtCurveSymbolSize.Location = New System.Drawing.Point(125, 138)
+        Me.txtCurveSymbolSize.Name = "txtCurveSymbolSize"
+        Me.txtCurveSymbolSize.Size = New System.Drawing.Size(47, 20)
+        Me.txtCurveSymbolSize.TabIndex = 47
+        Me.toolTip1.SetToolTip(Me.txtCurveSymbolSize, "Width of curve")
         '
         'lblAxisMinorGrid
         '
@@ -350,7 +363,7 @@ Partial Class frmGraphEditor
         'lblCurveWidth
         '
         Me.lblCurveWidth.AutoSize = True
-        Me.lblCurveWidth.Location = New System.Drawing.Point(6, 92)
+        Me.lblCurveWidth.Location = New System.Drawing.Point(78, 115)
         Me.lblCurveWidth.Name = "lblCurveWidth"
         Me.lblCurveWidth.Size = New System.Drawing.Size(35, 13)
         Me.lblCurveWidth.TabIndex = 30
@@ -531,6 +544,11 @@ Partial Class frmGraphEditor
         '
         'tabCurves
         '
+        Me.tabCurves.Controls.Add(Me.cboCurveSymbolType)
+        Me.tabCurves.Controls.Add(Me.chkCurveLineVisible)
+        Me.tabCurves.Controls.Add(Me.chkCurveSymbolVisible)
+        Me.tabCurves.Controls.Add(Me.lblCurveSymbolSize)
+        Me.tabCurves.Controls.Add(Me.txtCurveSymbolSize)
         Me.tabCurves.Controls.Add(Me.radioCurveYaxisAuxiliary)
         Me.tabCurves.Controls.Add(Me.radioCurveYaxisRight)
         Me.tabCurves.Controls.Add(Me.radioCurveYaxisLeft)
@@ -550,6 +568,45 @@ Partial Class frmGraphEditor
         Me.tabCurves.TabIndex = 1
         Me.tabCurves.Text = "Curves"
         Me.tabCurves.UseVisualStyleBackColor = True
+        '
+        'cboCurveSymbolType
+        '
+        Me.cboCurveSymbolType.FormattingEnabled = True
+        Me.cboCurveSymbolType.Items.AddRange(New Object() {"Square", "Diamond", "Triangle", "Circle", "XCross", "Plus", "Star", "TriangleDown", "HDash", "VDash", "None"})
+        Me.cboCurveSymbolType.Location = New System.Drawing.Point(208, 138)
+        Me.cboCurveSymbolType.MaxDropDownItems = 11
+        Me.cboCurveSymbolType.Name = "cboCurveSymbolType"
+        Me.cboCurveSymbolType.Size = New System.Drawing.Size(121, 21)
+        Me.cboCurveSymbolType.TabIndex = 51
+        '
+        'chkCurveLineVisible
+        '
+        Me.chkCurveLineVisible.AutoSize = True
+        Me.chkCurveLineVisible.Location = New System.Drawing.Point(9, 114)
+        Me.chkCurveLineVisible.Name = "chkCurveLineVisible"
+        Me.chkCurveLineVisible.Size = New System.Drawing.Size(46, 17)
+        Me.chkCurveLineVisible.TabIndex = 50
+        Me.chkCurveLineVisible.Text = "Line"
+        Me.chkCurveLineVisible.UseVisualStyleBackColor = True
+        '
+        'chkCurveSymbolVisible
+        '
+        Me.chkCurveSymbolVisible.AutoSize = True
+        Me.chkCurveSymbolVisible.Location = New System.Drawing.Point(9, 137)
+        Me.chkCurveSymbolVisible.Name = "chkCurveSymbolVisible"
+        Me.chkCurveSymbolVisible.Size = New System.Drawing.Size(65, 17)
+        Me.chkCurveSymbolVisible.TabIndex = 49
+        Me.chkCurveSymbolVisible.Text = "Symbols"
+        Me.chkCurveSymbolVisible.UseVisualStyleBackColor = True
+        '
+        'lblCurveSymbolSize
+        '
+        Me.lblCurveSymbolSize.AutoSize = True
+        Me.lblCurveSymbolSize.Location = New System.Drawing.Point(78, 141)
+        Me.lblCurveSymbolSize.Name = "lblCurveSymbolSize"
+        Me.lblCurveSymbolSize.Size = New System.Drawing.Size(27, 13)
+        Me.lblCurveSymbolSize.TabIndex = 48
+        Me.lblCurveSymbolSize.Text = "Size"
         '
         'radioCurveYaxisAuxiliary
         '
@@ -857,4 +914,9 @@ Partial Class frmGraphEditor
     Friend WithEvents radioCurveYaxisAuxiliary As System.Windows.Forms.RadioButton
     Friend WithEvents radioCurveYaxisRight As System.Windows.Forms.RadioButton
     Friend WithEvents radioCurveYaxisLeft As System.Windows.Forms.RadioButton
+    Friend WithEvents chkCurveLineVisible As System.Windows.Forms.CheckBox
+    Friend WithEvents chkCurveSymbolVisible As System.Windows.Forms.CheckBox
+    Private WithEvents lblCurveSymbolSize As System.Windows.Forms.Label
+    Private WithEvents txtCurveSymbolSize As System.Windows.Forms.TextBox
+    Friend WithEvents cboCurveSymbolType As System.Windows.Forms.ComboBox
 End Class

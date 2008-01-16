@@ -32,7 +32,7 @@ Public Class clsGraphRunningSum
             MyBase.Datasets = lRunningSums ' = lTsMath.DataSets?
             For Each lTimeseries As atcTimeseries In Datasets
                 Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
-                lCurve.Label.Text = "Running Sum"
+                lCurve.Label.Text = "Running Sum of " & lCurve.Label.Text
             Next
         End Set
     End Property
