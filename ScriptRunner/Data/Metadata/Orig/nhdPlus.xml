@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE metadata SYSTEM "http://www.fgdc.gov/metadata/fgdc-std-001-1998.dtd"><metadata>
+<idinfo>
+<citation>
+<citeinfo>
+<origin>U.S. Environmental Protection Agency (USEPA) and the U.S. Geological Survey (USGS).</origin>
+<pubdate>2005</pubdate>
+<title>National Hydrography Dataset Plus - NHDPlus</title>
+<edition>1.0</edition>
+<geoform>vector digital data, raster digital data, tabular digital data</geoform>
+<onlink>To be provided at later date</onlink>
+</citeinfo>
+</citation>
+<descript>
+<abstract>The NHDPlus Version 1.0 is an integrated suite of application-ready geospatial data sets that incorporate many of the best features of the National Hydrography Dataset (NHD) and the National Elevation Dataset (NED). The NHDPlus includes a stream network (based on the 1:100,000-scale NHD), improved networking, naming, and "value-added attributes" (VAA's). NHDPlus also includes elevation-derived catchments (drainage areas) produced using a drainage enforcement technique first broadly applied in New England, and thus dubbed "The New-England Method". This technique involves "burning-in" the 1:100,000-scale NHD and when available  building "walls" using the national Watershed Boundary Dataset (WBD). The resulting modified digital elevation model (HydroDEM) is used to produce hydrologic derivatives that agree with the NHD and WBD. An interdisciplinary team from the U. S. Geological Survey (USGS), U.S. Environmental Protection Agency (USEPA), and contractors, over the last two years has found this method to produce the best quality NHD catchments using an automated process.
+
+The VAAs include greatly enhanced capabilities for upstream and downstream navigation, analysis and modeling. Examples include: retrieve all flowlines (predominantly confluence-to-confluence stream segments) and catchments upstream of a given flowline using queries rather than by slower flowline-by-flowline navigation; retrieve flowlines by stream order; subset a stream level path sorted in hydrologic order for stream profile mapping, analysis and plotting; and, calculate cumulative catchment attributes using streamlined VAA hydrologic sequencing routing attributes. 
+
+The VAAs include results from the use of these cumulative routing techniques, including cumulative drainage areas, precipitation, temperature, and land cover distributions. Several of these cumulative attributes are used to estimate mean annual flow and velocity as part of the VAAs. 
+
+NHDPlus contains a snapshot (2005) of the 1:100,000-scale NHD that has been extensively improved. While these updates will eventually make their way back to the central NHD repository at USGS, this will not have happened prior to distribution of NHDPlus because the update process for the central NHD repository is still in development. Consequently, the NHDPlus will contain some temporary database keys and, as a result, NHDPlus users may not make updates to the NHD portions of NHDPlus with the intent of sending these updates back to the USGS. Once the NHDPlus updates have been posted to the central NHD repository, a fresh copy of the improved data can be downloaded from the central NHD repository and that copy will be usable for data maintenance. Note that the NHDPlus products are tightly integrated and user modifications to the underlying NHD can compromise this synchronization.</abstract>
+<purpose>The geospatial data sets included in NHDPlus are intended to support a variety of water-related applications. They already have been used in an application to develop estimates of mean annual streamflow and velocity for each NHD flowline in the conterminous United States. The results of these analyses are included with the NHDPlus data. 
+
+A water-quality model developed by the U.S. Geological Survey (USGS) called SPARROW (Spatially Referenced Regressions on Watershed Attributes), can utilize the NHDPlus network functionality to track the downstream transport of nutrients, sediments, or other substances. NHDPlus water bodies and estimates of streamflow and velocity are used in SPARROW to identify reservoir retention and in-stream loss factors. NHDPlus climatic and land surface attributes can be used in SPARROW to identify potential factors in the delivery of nutrients from the land surface to streams. NHDPlus land cover information is useful for SPARROW in determining potential sources of nutrients. 
+
+NHDPlus data is also being used in select areas for a USGS Web-based application, called StreamStats. StreamStats provides tools to interactively select any point on the NHDPlus to obtain streamflow and watershed characteristics for the selected point. 
+
+NHDPlus has been designed to accommodate many users needs for future applications. NHDPlus provides the framework and tools necessary to customize the behavior of the network relationships as well as building upon the attribute database, for which the user can assign its own data to the network.</purpose>
+<supplinf>For more information, refer to the NHDPlus Users Guide.</supplinf>
+</descript>
+<timeperd>
+<timeinfo>
+<sngdate>
+<caldate>2005</caldate>
+</sngdate>
+</timeinfo>
+<current>publication date</current>
+</timeperd>
+<status>
+<progress>Complete</progress>
+<update>Irregular</update>
+</status>
+<spdom>
+<bounding>
+<westbc>
+-160.5</westbc>
+<eastbc>
+-66.5</eastbc>
+<northbc>
+49.5</northbc>
+<southbc>
+18.5</southbc>
+</bounding>
+</spdom>
+<keywords>
+<theme>
+<themekt>none</themekt>
+<themekey>Stream / River</themekey>
+<themekey>Lake / Pond</themekey>
+<themekey>Canal / Ditch</themekey>
+<themekey>Reservoir</themekey>
+<themekey>Spring / Seep</themekey>
+<themekey>Swamp / Marsh</themekey>
+<themekey>Artificial Path</themekey>
+<themekey>Reach</themekey>
+<themekey>Watershed</themekey>
+<themekey>Catchment</themekey>
+<themekey>EARTH SCIENCE</themekey>
+<themekey>Land Surface</themekey>
+<themekey>Topography</themekey>
+<themekey>Cartography</themekey>
+<themekey>GEODATA</themekey>
+<themekey>GIS</themekey>
+<themekey>USGS</themekey>
+<themekey>EPA</themekey>
+<themekey>Elevation</themekey>
+<themekey>Land Cover</themekey>
+<themekey>National Land Cover Dataset</themekey>
+<themekey>NLCD</themekey>
+<themekey>National Elevation Dataset</themekey>
+<themekey>NED</themekey>
+<themekey>National Hydrography Dataset</themekey>
+<themekey>NHD</themekey>
+<themekey>NHDPlus</themekey>
+<themekey>Stream flow</themekey>
+<themekey>Stream velocity</themekey>
+<themekey>Spatially Referenced Regressions on Watershed Attributes</themekey>
+<themekey>SPARROW</themekey>
+<themekey>StreamStats</themekey>
+<themekey>Water-quality</themekey>
+<themekey>Hydrologic modeling</themekey>
+<themekey>River Coding Systems</themekey>
+<themekey>Hydrography</themekey>
+</theme>
+<theme>
+<themekt>ISO 19115 Topic Category</themekt>
+<themekey>inlandWaters</themekey>
+</theme>
+<place>
+<placekey>United States of America</placekey>
+<placekey>United States</placekey>
+<placekey>USA</placekey>
+<placekey>Alabama</placekey>
+<placekey>Arizona</placekey>
+<placekey>Arkansas</placekey>
+<placekey>California</placekey>
+<placekey>Colorado</placekey>
+<placekey>Connecticut</placekey>
+<placekey>Deleware</placekey>
+<placekey>District of Columbia</placekey>
+<placekey>Florida</placekey>
+<placekey>Georgia</placekey>
+<placekey>Hawaii</placekey>
+<placekey>Idaho</placekey>
+<placekey>Illinois</placekey>
+<placekey>Indiana</placekey>
+<placekey>Iowa</placekey>
+<placekey>Kansas</placekey>
+<placekey>Kentucky</placekey>
+<placekey>Louisiana</placekey>
+<placekey>Maine</placekey>
+<placekey>Maryland</placekey>
+<placekey>Massachusetts</placekey>
+<placekey>Michigan</placekey>
+<placekey>Minnesota</placekey>
+<placekey>Mississippi</placekey>
+<placekey>Missouri</placekey>
+<placekey>Montana</placekey>
+<placekey>Nebraska</placekey>
+<placekey>Nevada</placekey>
+<placekey>New Hampshire</placekey>
+<placekey>New Jersey</placekey>
+<placekey>New Mexico</placekey>
+<placekey>New York</placekey>
+<placekey>North Carolina</placekey>
+<placekey>North Dakota</placekey>
+<placekey>Ohio</placekey>
+<placekey>Oklahoma</placekey>
+<placekey>Oregon</placekey>
+<placekey>Pennsylvania</placekey>
+<placekey>Rhode Island</placekey>
+<placekey>South Carolina</placekey>
+<placekey>South Dakota</placekey>
+<placekey>Tennessee</placekey>
+<placekey>Texas</placekey>
+<placekey>Utah</placekey>
+<placekey>Vermont</placekey>
+<placekey>Virginia</placekey>
+<placekey>Washington</placekey>
+<placekey>West Virginia</placekey>
+<placekey>Wisconsin</placekey>
+<placekey>Wyoming</placekey>
+</place>
+</keywords>
+<accconst>None.</accconst>
+<useconst>None.
+
+Acknowledgement of the originating agencies (USEPA and USGS) would be appreciated in products derived from these data.</useconst>
+<ptcontac>
+<cntinfo>
+<cntorgp>
+<cntorg>U.S. Environmental Protection Agency</cntorg>
+</cntorgp>
+<cntemail>waters_support@epa.gov</cntemail>
+</cntinfo>
+</ptcontac>
+<native>Microsoft Windows 2000 Version 5.0 (Build 2195) Service Pack 4; ESRI ArcCatalog 9.0.00</native>
+</idinfo>
+<dataqual>
+<lineage>
+<srcinfo>
+<srccite>
+<citeinfo>
+<origin>U.S. Geological Survey (USGS) and the U.S. Environmental Protection Agency (USEPA)</origin>
+<pubdate>none</pubdate>
+<title>National Hydrography Dataset  (NHD) Medium Resolution</title>
+<edition>none</edition>
+<geoform>vector digital data</geoform>
+<onlink>http://nhd.usgs.gov</onlink>
+</citeinfo>
+</srccite>
+<srcscale>1:100,000</srcscale>
+<srctime>
+<timeinfo>
+<sngdate>
+<caldate>2005</caldate>
+</sngdate>
+</timeinfo>
+<srccurr>The source NHD is a snapshot of the dataset accessed on 1/31/2004 and updated throughout 2004 and 2005.</srccurr>
+</srctime>
+<srccitea>NHD</srccitea>
+<srccontr>A snapshot of the NHD was used as the baseline framework from which enhancements to the network were built upon. Enhancements include feature names, network connectivity and network flow relationships. This enhanced NHD version was then used in conjunction with the NED, and WBD (where applicable) to create a HydroDEM, for generation of the catchment Grid/shapefile, and flow direction/accumulation Grids. The enhanced NHD was used to compute and assign flowline Value Added Attributes (VAAs) to this network.</srccontr>
+</srcinfo>
+<srcinfo>
+<srccite>
+<citeinfo>
+<origin>U.S. Geological Survey (USGS), EROS Data Center</origin>
+<pubdate>1999</pubdate>
+<title>National Elevation Dataset  (NED)</title>
+<geoform>raster digital data</geoform>
+<pubinfo>
+<pubplace>Sioux Falls, SD</pubplace>
+<publish>U.S. Geological Survey</publish>
+</pubinfo>
+<onlink>http://ned.usgs.gov/</onlink>
+</citeinfo>
+</srccite>
+<srctime>
+<timeinfo>
+<sngdate>
+<caldate>June 10, 2004</caldate>
+</sngdate>
+</timeinfo>
+<srccurr>Date data was accessed</srccurr>
+</srctime>
+<srccitea>NED</srccitea>
+<srccontr>NED data used in combination with NHD, WBD (where applicable) to create a HydroDEM, to generate NHDPlus Catchments, surface flow direction and accumulation Grids. Stream elevations from NED which were used to help derive stream slope and stream velocity.</srccontr>
+</srcinfo>
+<srcinfo>
+<srccite>
+<citeinfo>
+<origin>U.S. Geological Survey (USGS)</origin>
+<pubdate>19990525</pubdate>
+<title>National Land Cover Dataset 1992  (NLCD 1992)</title>
+<edition>1</edition>
+<geoform>raster digital data</geoform>
+<pubinfo>
+<pubplace>Sioux Falls, SD</pubplace>
+<publish>U.S. Geological Survey</publish>
+</pubinfo>
+<onlink>http://landcover.usgs.gov/natllandcover.php</onlink>
+</citeinfo>
+</srccite>
+<srctime>
+<timeinfo>
+<rngdates>
+<begdate>early 1990's</begdate>
+<enddate>mid 1990's</enddate>
+</rngdates>
+</timeinfo>
+<srccurr>ground condition</srccurr>
+</srctime>
+<srccitea>NLCD 1992</srccitea>
+<srccontr>Source dataset used to assign catchment and flowline land cover attributes.</srccontr>
+</srcinfo>
+<srcinfo>
+<srccite>
+<citeinfo>
+<origin>Chris Daly and George Taylor of the Spatial Climate Analysis Service at Oregon State University.</origin>
+<pubdate>200008</pubdate>
+<title>United States Average Annual Precipitation, 1961-90</title>
+<geoform>raster digital data</geoform>
+<pubinfo>
+<pubplace>Corvallis, Oregon, USA</pubplace>
+<publish>Spatial Climate Analysis Service at Oregon State University (SCAS/OSU)</publish>
+</pubinfo>
+<othercit>This dataset from the PRISM model, developed by Chris Daly of SCAS/OSU.</othercit>
+<onlink>http://www.ocs.orst.edu/prism/</onlink>
+</citeinfo>
+</srccite>
+<srctime>
+<timeinfo>
+<rngdates>
+<begdate>19610101</begdate>
+<enddate>19901231</enddate>
+</rngdates>
+</timeinfo>
+<srccurr>Climatological period from which the point observations were taken.</srccurr>
+</srctime>
+<srccontr>Source dataset used to compute mean annual precipitation for each catchment and area weighted precipitation for each flowline. Weighted precipitation values for each flowline was used as a variable in a Vogel equation for estimating mean annual streamflow. The Vogel estimates of mean annual flow were used as a source variable in a Jobson equation to compute mean annual stream velocity estimates.</srccontr>
+</srcinfo>
+<srcinfo>
+<srccite>
+<citeinfo>
+<origin>Chris Daly and George Taylor of the Spatial Climate Analysis Service at Oregon State University.</origin>
+<pubdate>200008</pubdate>
+<title>United States Annual Mean Temperature, 1961-90</title>
+<edition>1</edition>
+<geoform>raster digital data</geoform>
+<pubinfo>
+<pubplace>Corvallis, Oregon, USA</pubplace>
+<publish>Spatial Climate Analysis Service at Oregon State University (SCAS/OSU)</publish>
+</pubinfo>
+<othercit>This dataset from the PRISM model, developed by Chris Daly of SCAS/OSU.</othercit>
+<onlink>http://www.ocs.orst.edu/prism/</onlink>
+</citeinfo>
+</srccite>
+<srctime>
+<timeinfo>
+<rngdates>
+<begdate>19610101</begdate>
+<enddate>19901231</enddate>
+</rngdates>
+</timeinfo>
+<srccurr>Climatological period from which the point observations were taken.</srccurr>
+</srctime>
+<srccontr>Source dataset used to compute mean annual temperature for each catchment and area weighted mean annual temperature for each flowline. Weighted mean annual temperature values for each flowline was used as a variable in a Vogel equation for estimating mean annual streamflow. The Vogel estimates of mean annual flow were used as a source variable in a Jobson equation to compute mean annual stream velocity estimates.</srccontr>
+</srcinfo>
+<srcinfo>
+<srccite>
+<citeinfo>
+<origin>U.S. Department of Agriculture, Natural Resources Conservation Service (NRCS) and the U.S. Geological Survey (USGS)</origin>
+<pubdate>multiple dates</pubdate>
+<title>Watershed Boundary Dataset (WBD)</title>
+<geoform>vector digital data</geoform>
+<othercit>Only certified WBD was included for use in HydroDEM production. These data are tiled by U.S. State, therefore only selected states with full certification were used. The publication date for each state's WBD varies. (See Source Time Period of Content)</othercit>
+<onlink>http://www.ncgc.nrcs.usda.gov/products/datasets/watershed/</onlink>
+</citeinfo>
+</srccite>
+<srcscale>1:24,000</srcscale>
+<srctime>
+<timeinfo>
+<mdattim>
+<sngdate>
+<caldate>Alabama, 2004</caldate>
+</sngdate>
+<sngdate>
+<caldate>Connecticut, 2001</caldate>
+</sngdate>
+<sngdate>
+<caldate>Georgia, 2003</caldate>
+</sngdate>
+<sngdate>
+<caldate>Illinois, 2002</caldate>
+</sngdate>
+<sngdate>
+<caldate>Massachusetts, 2001</caldate>
+</sngdate>
+<sngdate>
+<caldate>Maryland, 2003</caldate>
+</sngdate>
+<sngdate>
+<caldate>New Hampshire, 2001</caldate>
+</sngdate>
+<sngdate>
+<caldate>Utah, 2003</caldate>
+</sngdate>
+<sngdate>
+<caldate>Vermont, 2003</caldate>
+</sngdate>
+<sngdate>
+<caldate>Wyoming, 2002</caldate>
+</sngdate>
+</mdattim>
+</timeinfo>
+<srccurr>publication dates</srccurr>
+</srctime>
+<srccitea>WBD</srccitea>
+<srccontr>12-digit subwatershed divides from the Watershed Boundary Dataset (WBD)
+were used (for states where certified WBD was available) as a ridgeline
+enforcment factor in a process called "walling" in the production of HydroDEMs. The HydroDEMs are the source data from which NHD Catchments are delineated from. Catchments with coincident boundaries with the WBD are in conformance with the WBD. NHDPlus Flow Direction and Accumulation Grids are hydrologic derivative products of the HydroDEMs.</srccontr>
+</srcinfo>
+<srcinfo>
+<srccite>
+<citeinfo>
+<origin>David W. Stewart, Alan Rea and David M. Wolock</origin>
+<pubdate>April 2006</pubdate>
+<title>USGS Streamgages Linked to the Medium Resolution NHD</title>
+<geoform>vector digital data</geoform>
+<serinfo>
+<sername>Data Series</sername>
+<issue>DS-195</issue>
+</serinfo>
+<pubinfo>
+<pubplace>Reston, Va</pubplace>
+<publish>U.S. Geological Survey</publish>
+</pubinfo>
+<onlink>http://water.usgs.gov/GIS/metadata/usgswrd/XML/streamgages.xml</onlink>
+</citeinfo>
+</srccite>
+<srctime>
+<timeinfo>
+<sngdate>
+<caldate>April 20, 2004</caldate>
+</sngdate>
+</timeinfo>
+<srccurr>Date of data extract from NWIS</srccurr>
+</srctime>
+<srccontr>Location of gages were spatially referenced to the NHDPlus flowlines to create a gaging station point event table, where for each gage in the database, the corresponding NHD Reachcode and measure are recorded. An early version of the dataset was also used for the QA/QC of NHDPlus cumulative drainage areas and estimates of mean annual stream flow.</srccontr>
+</srcinfo>
+</lineage>
+</dataqual>
+<distinfo>
+<distrib>
+<cntinfo>
+<cntorgp>
+<cntorg>U.S. Environmental Protection Agency</cntorg>
+</cntorgp>
+<cntemail>waters_support@epa.gov</cntemail>
+</cntinfo>
+</distrib>
+<distliab>Although this data set has been used by the U.S. Government, no warranty expressed or implied is made by the U.S. Government as to the accuracy of the data and related materials. The act of distribution shall not constitute any such warranty, and no responsibility is assumed by the U.S. Government in the use of this data, software, or 
+related materials.
+ 
+Any use of trade, product, or firm names is for descriptive purposes only and does not imply endorsement by the U.S. Government.</distliab>
+<stdorder>
+<digform>
+<digtinfo>
+<filedec>.zip</filedec>
+</digtinfo>
+<digtopt>
+<onlinopt>
+<accinstr>Provide website/ftp address to download data here</accinstr>
+</onlinopt>
+</digtopt>
+</digform>
+</stdorder>
+</distinfo>
+<metainfo>
+<metd>20060829</metd>
+</metainfo>
+</metadata>
