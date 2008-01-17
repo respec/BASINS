@@ -22,20 +22,15 @@ Public Module UtilColor
             If FileExists(aFilename) Then
                 pColorMatchingRules.Clear()
                 pMatchingColorsFilename = aFilename
-                Dim lReader As New IO.BinaryReader(IO.File.OpenRead(aFilename))
                 Dim lOneLine As String
                 Dim lColor As Color
-                Try
-                    Do
-                        lOneLine = NextLine(lReader).Trim
-                        If lOneLine.Length > 0 Then
-                            lColor = TextOrNumericColor(StrRetRem(lOneLine))
-                            pColorMatchingRules.Add(New Generic.KeyValuePair(Of String, Color)(lOneLine, lColor))
-                        End If
-                    Loop
-                Catch endEx As IO.EndOfStreamException
-                    lReader.Close()
-                End Try
+                For Each lOneLine In (New LinesInFile(aFilename))
+                    lOneLine = lOneLine.Trim
+                    If lOneLine.Length > 0 Then
+                        lColor = TextOrNumericColor(StrRetRem(lOneLine))
+                        pColorMatchingRules.Add(New Generic.KeyValuePair(Of String, Color)(lOneLine, lColor))
+                    End If
+                Next
             End If
         Catch e As Exception
             Logger.Dbg("InitMatchingColors:" & e.Message)

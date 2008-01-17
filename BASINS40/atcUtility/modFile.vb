@@ -953,9 +953,81 @@ TryAgain:
 
     End Sub
 
-    'Reads the next line from a text file whose lines end with carriage return and/or linefeed
-    'Advances the position of the stream to the beginning of the next line
-    'Returns Nothing if already at end of file
+    ''' <summary>
+    ''' An enumerable set of lines read from a text file (or other BinaryReader)
+    ''' lines in file end with carriage return and/or linefeed
+    ''' end of line characters are stripped from enumerated lines returned
+    ''' </summary>
+    Class LinesInFile
+        Implements IEnumerable, IEnumerator, IDisposable
+
+        Private pStreamReader As IO.BinaryReader
+        Private pCurrentLine As String
+
+        Public Sub New(ByVal aFileName As String)
+            pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read)))
+        End Sub
+
+        Public Sub New(ByVal aStreamReader As IO.BinaryReader)
+            pStreamReader = aStreamReader
+        End Sub
+
+        ReadOnly Property Current() As Object Implements IEnumerator.Current
+            Get
+                Return pCurrentLine
+            End Get
+        End Property
+
+        Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+            If pStreamReader Is Nothing Then
+                Return False
+            Else
+                Dim ch As Char
+                Dim lSb As New StringBuilder
+                Try
+ReadCharacter:
+                    ch = pStreamReader.ReadChar
+                    Select Case ch
+                        Case ControlChars.Cr 'Found carriage return, consume linefeed if it is next
+                            If pStreamReader.PeekChar = 10 Then pStreamReader.ReadChar()
+                        Case ControlChars.Lf 'Unix-style line ends without carriage return
+                        Case Else 'Found a character that does not end the line
+                            lSb.Append(ch)
+                            GoTo ReadCharacter
+                    End Select
+                    pCurrentLine = lSb.ToString
+                    Return True
+                Catch endEx As IO.EndOfStreamException
+                    Try
+                        pStreamReader.Close()
+                    Catch
+                    End Try
+                    pStreamReader = Nothing
+                    pCurrentLine = lSb.ToString
+                    Return (lSb.Length > 0)
+                End Try
+            End If
+        End Function
+
+        Public Sub Reset() Implements IEnumerator.Reset
+            Throw New NotSupportedException
+        End Sub
+
+        Public Function GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+            Return Me
+        End Function
+
+        Public Sub Dispose() Implements IDisposable.Dispose
+            If Not pStreamReader Is Nothing Then
+                Try
+                    pStreamReader.Close()
+                Catch
+                End Try
+                pStreamReader = Nothing
+            End If
+        End Sub
+
+    End Class
 
     ''' <summary>
     ''' Read the next line from a text file whose lines end with carriage return and/or linefeed
