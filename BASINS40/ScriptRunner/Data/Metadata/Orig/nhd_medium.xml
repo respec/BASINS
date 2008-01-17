@@ -1,0 +1,982 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>National Hydrography Dataset (NHD) - Medium-resolution</title>
+<link rel=schema.dc href="http://purl.org/metadata/dublin_core">
+<meta name="dc.title" content="National Hydrography Dataset (NHD) - Medium-resolution ">
+<meta name="dc.creator" content="U.S. Geological Survey in cooperation with the U.S. Environmental Protection Agency ">
+<meta name="dc.subject" content="FWHYDROGRAPHY Hydrography Stream / River Lake / Pond Canal / Ditch Reservoir Spring / Seep Swamp / Marsh Artificial Path Reach Code ">
+<meta name="dc.description" content="The National Hydrography Dataset (NHD) is a feature-based database that interconnects and uniquely identifies the sream segments or reaches that comprise the nation's surface water drainage system.  Medium resolution NHD is based on the content of the U.S. Geological Survey 1:100,000-scale Digital Line Graph (DLG) hydrography data, integrated with reach-related information from the U.S. Environmental Protection Agency Reach File Version 3.0 (RF3).  More specifically, it contains reach codes for networked features and isolated lakes, flow direction, names, stream level, and centerline representations for areal water bodies.  Reaches are also defined to represent water bodies and the approximate shorelines of the Great Lakes, the Atlantic and Pacific Oceans and the Gulf of Mexico.  The NHD also incorporates the National Spatial Data Infrastructure framework criteria established by the Federal Geographic Data Committee. ">
+<meta name="dc.publisher" content="U.S. Geological Survey">
+<meta name="dc.contributor" content="See dataset specific metadata. ">
+<meta name="dc.date" content="1999">
+<meta name="dc.type" content="data.vector digital data">
+<meta name="dc.format" content="ArcGIS Geodatabase">
+<meta name="dc.identifier" content="http://nhd.usgs.gov">
+<meta name="dc.source" content="The National Hydrography Dataset - Local-resolution">
+<meta name="dc.lang" content="en">
+<meta name="dc.coverage.x.min" scheme="DD" content="-160.997248">
+<meta name="dc.coverage.x.max" scheme="DD" content="-66.885080">
+<meta name="dc.coverage.y.min" scheme="DD" content="18.497726">
+<meta name="dc.coverage.y.max" scheme="DD" content="49.376570">
+<meta name="dc.coverage.placeName" content="US">
+<meta name="dc.rights" content="Access constraints: None; Use constraints: None.  Acknowledgment of the originating agencies would be appreciated in products derived from these data.">
+</head>
+<body>
+<h1>National Hydrography Dataset (NHD) - Medium-resolution</h1>
+Metadata also available as<p>
+<h2>Metadata:</h2>
+<ul>
+<li><A HREF="#1">Identification_Information</A></li>
+<li><A HREF="#2">Data_Quality_Information</A></li>
+<li><A HREF="#3">Spatial_Data_Organization_Information</A></li>
+<li><A HREF="#4">Spatial_Reference_Information</A></li>
+<li><A HREF="#5">Entity_and_Attribute_Information</A></li>
+<li><A HREF="#6">Distribution_Information</A></li>
+<li><A HREF="#7">Metadata_Reference_Information</A></li>
+</ul>
+<A NAME="1">
+</A>
+<hr>
+<dl>
+<dt><em>Identification_Information:</em>  
+<dd>
+<dl>
+<dt><em>Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  
+<dd>
+
+U.S. Geological Survey in cooperation with the U.S. Environmental Protection Agency
+
+</dd>
+<dt><em>Publication_Date:</em>  1999</dt>
+<dt><em>Publication_Time:</em>  Unknown</dt>
+<dt><em>Title:</em>  National Hydrography Dataset (NHD) - Medium-resolution</dt>
+<dt><em>Geospatial_Data_Presentation_Form:</em>  vector digital data</dt>
+<dt><em>Publication_Information:</em>  
+<dd>
+<dl>
+<dt><em>Publication_Place:</em>  Reston, Virginia</dt>
+<dt><em>Publisher:</em>  U.S. Geological Survey</dt>
+</dl>
+</dd>
+<dt><em>Online_Linkage:</em>  <A HREF="http://nhd.usgs.gov">&lt;http://nhd.usgs.gov&gt;</A></dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Description:</em>  
+<dd>
+<dl>
+<dt><em>Abstract:</em>  
+<dd>
+
+The National Hydrography Dataset (NHD) is a feature-based database that interconnects and uniquely identifies the sream segments or reaches that comprise the nation's surface water drainage system.  Medium resolution NHD is based on the content of the U.S. Geological Survey 1:100,000-scale Digital Line Graph (DLG) hydrography data, integrated with reach-related information from the U.S. Environmental Protection Agency Reach File Version 3.0 (RF3).  More specifically, it contains reach codes for networked features and isolated lakes, flow direction, names, stream level, and centerline representations for areal water bodies.  Reaches are also defined to represent water bodies and the approximate shorelines of the Great Lakes, the Atlantic and Pacific Oceans and the Gulf of Mexico.  The NHD also incorporates the National Spatial Data Infrastructure framework criteria established by the Federal Geographic Data Committee.
+
+</dd>
+<dt><em>Purpose:</em>  
+<dd>
+
+The National Hydrography Dataset combines elements of the DLG and RF3:  spatial accuracy and comprehensiveness from the DLG and network relationships, names, and a unique identifier (reach code) for surface water features from RF3.  The NHD supersedes DLG and RF3 by incorporating them, not by replacing them.  Users of DLG and RF3 will find the National Hydrography Dataset both familiar and greatly expanded and refined.  The NHD provides a national framework for assigning reach addresses to water-related entities such as industrial dischargers, drinking water supplies, fish habitat areas, wild and scenic rivers.  Reach addresses establish the locations of these entities relative to one another within the NHD surface water drainage network in a manner similar to street addresses.  Once linked to the NHD by their reach addresses, the  upstream/downstream relationships of these water-related entities and any associated information about them can be analyzed using software tools ranging from spreadsheets to Geographic Information Systems (GIS). GIS can also be used to combine NHD-based network analysis with other data layers, such as soils, land use, and population, to help better understand and display their respective effects upon one another.  Furthermore, because the NHD provides a nationally consistent framework for addresses and analysis, water-related information linked to reach addresses by one organization (national, state, local) can be shared with other organizations and easily integrated into many different types of applications to the benefit of all.  The National Hydrography Dataset is designed to provide comprehensive coverage of hydrologic data for the US. While initially based on 1:100,000-scale data, the NHD is designed to incorporate and encourage the development of higher-resolution data required by many users. It will facilitate the improved integration of water-related data in support of the application requirements of a growing national user community and will enable shared maintenance and enhancement.
+
+</dd>
+</dl>
+</dd>
+<dt><em>Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  </dt>
+<dt><em>Currentness_Reference:</em>  See dataset specific metadata.</dt>
+</dl>
+</dd>
+<dt><em>Status:</em>  
+<dd>
+<dl>
+<dt><em>Progress:</em>  Complete</dt>
+<dt><em>Maintenance_and_Update_Frequency:</em>  Irregular</dt>
+</dl>
+</dd>
+<dt><em>Spatial_Domain:</em>  
+<dd>
+<dl>
+<dt><em>Bounding_Coordinates:</em>  
+<dd>
+<dl>
+<dt><em>West_Bounding_Coordinate:</em>  -160.997248</dt>
+<dt><em>East_Bounding_Coordinate:</em>  -66.885080</dt>
+<dt><em>North_Bounding_Coordinate:</em>  49.376570</dt>
+<dt><em>South_Bounding_Coordinate:</em>  18.497726</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Keywords:</em>  
+<dd>
+<dl>
+<dt><em>Theme:</em>  
+<dd>
+<dl>
+<dt><em>Theme_Keyword_Thesaurus:</em>  U.S. Department of the Interior, U.S. Geological Survey</dt>
+<dt><em>Theme_Keyword:</em>  FWHYDROGRAPHY</dt>
+<dt><em>Theme_Keyword:</em>  Hydrography</dt>
+<dt><em>Theme_Keyword:</em>  Stream / River</dt>
+<dt><em>Theme_Keyword:</em>  Lake / Pond</dt>
+<dt><em>Theme_Keyword:</em>  Canal / Ditch</dt>
+<dt><em>Theme_Keyword:</em>  Reservoir</dt>
+<dt><em>Theme_Keyword:</em>  Spring / Seep</dt>
+<dt><em>Theme_Keyword:</em>  Swamp / Marsh</dt>
+<dt><em>Theme_Keyword:</em>  Artificial Path</dt>
+<dt><em>Theme_Keyword:</em>  Reach Code</dt>
+</dl>
+</dd>
+<dt><em>Place:</em>  
+<dd>
+<dl>
+<dt><em>Place_Keyword_Thesaurus:</em>  
+<dd>
+
+U.S. Department of Commerce, 1977, Countries, dependencies, areas of sovereignty, and their principal administative divisions (Federal Information Processing Standard 10-3):  Washington, D.C., National Institute of Standards and Technology.
+
+</dd>
+<dt><em>Place_Keyword:</em>  US</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Access_Constraints:</em>  None</dt>
+<dt><em>Use_Constraints:</em>  
+<dd>
+
+None.  Acknowledgment of the originating agencies would be appreciated in products derived from these data.
+
+</dd>
+<dt><em>Point_of_Contact:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Information:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Organization_Primary:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Organization:</em>  Earth Science Information Center, U.S. Geological Survey</dt>
+</dl>
+</dd>
+<dt><em>Contact_Address:</em>  
+<dd>
+<dl>
+<dt><em>Address_Type:</em>  mailing address</dt>
+<dt><em>Address:</em>  507 National Center</dt>
+<dt><em>City:</em>  Reston</dt>
+<dt><em>State_or_Province:</em>  VA</dt>
+<dt><em>Postal_Code:</em>  20192</dt>
+<dt><em>Country:</em>  USA</dt>
+</dl>
+</dd>
+<dt><em>Contact_Voice_Telephone:</em>  1 888 ASK USGS</dt>
+<dt><em>Contact_Voice_Telephone:</em>  1 888 275 8747</dt>
+<dt><em>Contact_Electronic_Mail_Address:</em>  ask@usgs.gov</dt>
+<dt><em>Hours_of_Service:</em>  0800-1600 Eastern Time</dt>
+<dt><em>Contact_Instructions:</em>  
+<dd>
+
+In addition to the address above there are other ESIC offices throughout the country. A full list of these offices is at URL:  <A HREF="http://mapping.usgs.gov/esic/esic_index.html">&lt;http://mapping.usgs.gov/esic/esic_index.html&gt;</A>
+
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Data_Set_Credit:</em>  See dataset specific metadata.</dt>
+<dt><em>Native_Data_Set_Environment:</em>  
+<dd>
+
+Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 2; ESRI ArcCatalog 9.1.0.722
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+<A NAME="2">
+</A>
+<hr>
+<dl>
+<dt><em>Data_Quality_Information:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Accuracy:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Accuracy_Report:</em>  
+<dd>
+
+The accuracy of the attributes of the Digital Line Graph data is estimated to be 98.5 percent. One or more of the following methods were used to test attribute accuracy: manual comparison of the source with hardcopy plots; symbolized display of the digital line graph on an interactive computer graphic system. Selected attributes that could not be visually verified on plots or on screen were interactively queried and verified on screen. In addition, software validated feature types and characteristics against a master set of types and characteristics, checked that combinations of types and characteristics were valid, and that types and characteristics were valid for the delineation of the feature. Feature types, characteristics, and other attributes conform to the Standards for National Hydrography Dataset (USGS, 1999) as of the date they were loaded into the database. All names on reaches were validated against a March 1999 extract from the Geographic Names Information System. The entry and identifier for the names match those in the Geographic Names Information System. The association of each name to reaches has not been  methodically checked, and so a name may be applied to the wrong reaches. Anecdotal reviews indicate that 80% or more of the named reaches have the correct name. Reaches were delineated with a batch procedure and were checked extensively during the visual pass steps of processing. Based on automated quality assurance/quality control checks performed at various intervals during the processing, approximately 99% of the reaches are delineated according to standards.
+
+</dd>
+</dl>
+</dd>
+<dt><em>Logical_Consistency_Report:</em>  
+<dd>
+
+Points, nodes, lines, and areas conform to topological rules.  Lines intersect only at nodes, and all nodes anchor the ends of lines. Lines do not overshoot or undershoot other lines where they are supposed to meet. There are no duplicate lines. Lines bound areas and lines identify the areas to the left and right of the lines. Gaps and overlaps among areas do not exist. All areas close.
+
+</dd>
+<dt><em>Completeness_Report:</em>  
+<dd>
+
+The completeness of the data reflects the content of the sources, which, in the initial release of the National Hydrography Dataset, most often are U.S. Geological Survey topographic maps. Features found on the ground may have been eliminated or generalized on the source graphic because of scale and legibility constraints. In general, streams longer than one mile (approximately 1.6 kilometers) were collected. Most streams that flow from a lake were collected regardless of their length. Only definite channels were collected, so not all swamp/marsh features have stream/rivers delineated through them. Lake/ponds having an area greater than 6 acres (approximately 2.4 hectares) were collected.  Note, however, that these general rules were applied unevenly among maps during compilation. Some map quadrangles have a much sparser pattern of hydrography than do adjoining maps, and these differences continue in the digital rendition of these features. A priority for maintenance of the National Hydrography Dataset is the rectification of these differences.  Transport reaches are defined on almost all features of type stream/river, canal/ditch, pipeline, artificial path, and connector. Water body reaches are defined on the subset of lake/pond features that were identified as water bodies during the development of Reach File Version 3.  Most attention in applying geographic names was given to transport reaches that follow stream/rivers, and Water body  reaches.  Near the international boundaries with Canada and Mexico, only the parts of features within the United States are delineated.  Detailed capture conditions are provided for every feature type in the &quot;Standards for National Hydrography Dataset&quot; (USGS, 1999), available online through <A HREF="http://mapping.usgs.gov/standards/">&lt;http://mapping.usgs.gov/standards/&gt;</A>.
+This statement is generally true for the most common sources of NHD data.  Other sources and methods may have been used to create or update NHD data.  In some cases, additional information may be found in the NHDMetadata table.
+
+</dd>
+<dt><em>Positional_Accuracy:</em>  
+<dd>
+<dl>
+<dt><em>Horizontal_Positional_Accuracy:</em>  
+<dd>
+<dl>
+<dt><em>Horizontal_Positional_Accuracy_Report:</em>  
+<dd>
+
+Statements of horizontal positional accuracy are based on accuracy statements made for U.S. Geological Survey  topographic quadrangle maps. These maps were compiled to meet National Map Accuracy Standards. For horizontal accuracy, this standard is met if at least 90 percent of points tested are within 0.02 inch (at map scale) of the true position. Additional offsets to positions may have been introduced where there are many features to improve the legibility of map symbols. In addition, the digitizing of maps is estimated to contain a horizontal positional error of less than or equal to 0.003 inch standard error (at map scale) in the two component directions relative to the source maps. Visual comparison between the map graphic (including digital scans of the graphic) and plots or digital displays of points, lines, and areas, is used as control to assess the positional accuracy of digital data. Linear features of the same type along the adjoining edges of data sets are aligned if the are within a 0.02 inch tolerance (at map scale). To align the features, the midpoint between the end of the corresponding features is computed, and the ends of features are moved to this point. Features outside the tolerance are not moved; instead, a feature of type connector was added to join the features.
+
+</dd>
+</dl>
+</dd>
+<dt><em>Vertical_Positional_Accuracy:</em>  
+<dd>
+<dl>
+<dt><em>Vertical_Positional_Accuracy_Report:</em>  
+<dd>
+
+Statements of vertical positional accuracy for elevation of water surfaces are based on accuracy statements made for U.S. Geological Survey topographic quadrangle maps. These maps were compiled to meet National Map Accuracy Standards. For vertical accuracy, this standard is met if at least 90 percent of well-defined points tested are within one-half contour interval of the correct value. Elevations of water surface printed on the published map meet this standard; the contour intervals of the maps vary. These elevations were transcribed into the digital data; the accuracy of this transcription was checked by visual comparison between the data and the map.
+
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Lineage:</em>  
+<dd>
+<dl>
+<dt><em>Source_Information:</em>  
+<dd>
+<dl>
+<dt><em>Source_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  U.S. Geological Survey</dt>
+<dt><em>Publication_Date:</em>  Unknown</dt>
+<dt><em>Publication_Time:</em>  Unknown</dt>
+<dt><em>Title:</em>  
+<dd>
+
+DLG-3 data file (see dataset specific metadata for file name and date)
+
+</dd>
+<dt><em>Geospatial_Data_Presentation_Form:</em>  map</dt>
+<dt><em>Publication_Information:</em>  
+<dd>
+<dl>
+<dt><em>Publication_Place:</em>  Reston, Virginia</dt>
+<dt><em>Publisher:</em>  U.S. Geological Survey</dt>
+</dl>
+</dd>
+<dt><em>Larger_Work_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  </dt>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Scale_Denominator:</em>  100000</dt>
+<dt><em>Type_of_Source_Media:</em>  online</dt>
+<dt><em>Source_Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  
+<dd>
+<dl>
+<dt><em>Single_Date/Time:</em>  
+<dd>
+<dl>
+<dt><em>Calendar_Date:</em>  unknown</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Currentness_Reference:</em>  publication date of source quadrangles</dt>
+</dl>
+</dd>
+<dt><em>Source_Citation_Abbreviation:</em>  DLG-3 Data File</dt>
+<dt><em>Source_Contribution:</em>  Spatial and attribute information</dt>
+</dl>
+</dd>
+<dt><em>Source_Information:</em>  
+<dd>
+<dl>
+<dt><em>Source_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  U.S. Geological Survey</dt>
+<dt><em>Publication_Date:</em>  Unpublished Material</dt>
+<dt><em>Title:</em>  NHD basic features</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Scale_Denominator:</em>  100000</dt>
+<dt><em>Type_of_Source_Media:</em>  online</dt>
+<dt><em>Source_Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  
+<dd>
+<dl>
+<dt><em>Single_Date/Time:</em>  
+<dd>
+<dl>
+<dt><em>Calendar_Date:</em>  1995</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Currentness_Reference:</em>  Date when processing was complete</dt>
+</dl>
+</dd>
+<dt><em>Source_Citation_Abbreviation:</em>  NHD basic features</dt>
+<dt><em>Source_Contribution:</em>  
+<dd>
+
+Spatial elements for basic features other than artificial paths and connectors.  Attributes for all basic features.
+
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Information:</em>  
+<dd>
+<dl>
+<dt><em>Source_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  U.S. Environmental Protection Agency</dt>
+<dt><em>Publication_Date:</em>  19970622</dt>
+<dt><em>Title:</em>  Reach File Version 3</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Scale_Denominator:</em>  100000</dt>
+<dt><em>Type_of_Source_Media:</em>  online</dt>
+<dt><em>Source_Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  
+<dd>
+<dl>
+<dt><em>Range_of_Dates/Times:</em>  
+<dd>
+<dl>
+<dt><em>Beginning_Date:</em>  19900401</dt>
+<dt><em>Ending_Date:</em>  19970622</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Currentness_Reference:</em>  Date range for completion of RF3 cataloging units</dt>
+</dl>
+</dd>
+<dt><em>Source_Citation_Abbreviation:</em>  RF3</dt>
+<dt><em>Source_Contribution:</em>  Reach codes, network flow direction, stream names.</dt>
+</dl>
+</dd>
+<dt><em>Source_Information:</em>  
+<dd>
+<dl>
+<dt><em>Source_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  U.S. Geological Survey</dt>
+<dt><em>Publication_Date:</em>  1991</dt>
+<dt><em>Title:</em>  Geographic Names Information System Oracle Database</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Scale_Denominator:</em>  Not Applicable</dt>
+<dt><em>Type_of_Source_Media:</em>  online</dt>
+<dt><em>Source_Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  
+<dd>
+<dl>
+<dt><em>Single_Date/Time:</em>  
+<dd>
+<dl>
+<dt><em>Calendar_Date:</em>  199903</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Currentness_Reference:</em>  Custom extract from the GNIS databases</dt>
+</dl>
+</dd>
+<dt><em>Source_Citation_Abbreviation:</em>  GNIS</dt>
+<dt><em>Source_Contribution:</em>  Names for reaches and areal water bodies.</dt>
+</dl>
+</dd>
+<dt><em>Source_Information:</em>  
+<dd>
+<dl>
+<dt><em>Source_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  U.S. Geological Survey</dt>
+<dt><em>Publication_Date:</em>  Unpublished Material</dt>
+<dt><em>Title:</em>  Centerlines</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Scale_Denominator:</em>  100000</dt>
+<dt><em>Type_of_Source_Media:</em>  online</dt>
+<dt><em>Source_Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  
+<dd>
+<dl>
+<dt><em>Single_Date/Time:</em>  
+<dd>
+<dl>
+<dt><em>Calendar_Date:</em>  1997</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Currentness_Reference:</em>  Date when processing was complete</dt>
+</dl>
+</dd>
+<dt><em>Source_Citation_Abbreviation:</em>  Centerlines</dt>
+<dt><em>Source_Contribution:</em>  
+<dd>
+
+Artificial paths through 2-dimensional streams and other water bodies.
+
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Information:</em>  
+<dd>
+<dl>
+<dt><em>Source_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  U.S. Geological Survey</dt>
+<dt><em>Publication_Date:</em>  Unpublished Material</dt>
+<dt><em>Title:</em>  1:250,000-scale cataloging unit boundaries</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Scale_Denominator:</em>  250000</dt>
+<dt><em>Type_of_Source_Media:</em>  online</dt>
+<dt><em>Source_Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  
+<dd>
+<dl>
+<dt><em>Single_Date/Time:</em>  
+<dd>
+<dl>
+<dt><em>Calendar_Date:</em>  unknown</dt>
+<dt><em>Time_of_Day:</em>  unknown</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Currentness_Reference:</em>  Unknown</dt>
+</dl>
+</dd>
+<dt><em>Source_Citation_Abbreviation:</em>  250K CU boundaries</dt>
+<dt><em>Source_Contribution:</em>  Updated CU boundaries</dt>
+</dl>
+</dd>
+<dt><em>Source_Information:</em>  
+<dd>
+<dl>
+<dt><em>Source_Citation:</em>  
+<dd>
+<dl>
+<dt><em>Citation_Information:</em>  
+<dd>
+<dl>
+<dt><em>Originator:</em>  
+<dd>
+
+The states of CT, DE, FL, KY, MN, NC, OK, SC, WV, WA, OR, ID and MT.
+
+</dd>
+<dt><em>Publication_Date:</em>  Unpublished Material</dt>
+<dt><em>Title:</em>  1:250,000-scale cataloging unit boundaries</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Scale_Denominator:</em>  100000</dt>
+<dt><em>Type_of_Source_Media:</em>  online</dt>
+<dt><em>Source_Time_Period_of_Content:</em>  
+<dd>
+<dl>
+<dt><em>Time_Period_Information:</em>  
+<dd>
+<dl>
+<dt><em>Range_of_Dates/Times:</em>  
+<dd>
+<dl>
+<dt><em>Beginning_Date:</em>  unknown</dt>
+<dt><em>Ending_Date:</em>  unknown</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Source_Currentness_Reference:</em>  Unknown</dt>
+</dl>
+</dd>
+<dt><em>Source_Citation_Abbreviation:</em>  State supplied CU boundaries</dt>
+<dt><em>Source_Contribution:</em>  Updated CU boundaries</dt>
+</dl>
+</dd>
+<dt><em>Process_Step:</em>  
+<dd>
+<dl>
+<dt><em>Process_Description:</em>  
+<dd>
+
+This process converted Digital Line Graph data to the features and converted the coordinate system to geographic (longitude-latitude) coordinates in the North American Datum of 1983, in five steps: 
+1. The U.S. Geological Survey's Batch DLG-3 to DLG-F Conversion System converted DLG-3 nodes, lines, areas, and associated attribute codes to temporary features and associated characteristics. Known conversion problems or uncertain conversions (for example, the DLG-3 attribute code for reservoir sometimes should convert to the feature type Reservoir and other times to feature type Lake/Pond) were flagged for later inspection. Only known conversion problems were flagged and no additional steps to detect or repair discrepancies in the original DLG-3 or the converted NHD were taken. 
+2. A default value of a characteristic was added in cases where the description was incomplete. 
+3. All instances in which problems and uncertainties were flagged were inspected and resolved interactively. 
+4. Feature delineation rules were applied to	the temporary features in a batch process to create the final version of features. 
+5. Coordinate values were converted to geographic coordinates, the North American Datum of 1983, using version 2.1 of NADCON software (National Geodetic Survey, n.d.). This process generated the features data.
+
+</dd>
+<dt><em>Source_Used_Citation_Abbreviation:</em>  DLG-3 Data File</dt>
+<dt><em>Process_Date:</em>  1994</dt>
+<dt><em>Source_Produced_Citation_Abbreviation:</em>  NHD basic features</dt>
+</dl>
+</dd>
+<dt><em>Process_Step:</em>  
+<dd>
+<dl>
+<dt><em>Process_Description:</em>  
+<dd>
+
+The basic steps for building reaches are: 
+1. Convert RF3 to R3 double prime. This batch operation processed Reach File version 3 to delete duplicate reaches,  reassign reaches to the correct cataloging unit, validate geographic names assigned to reaches against data from the Geographic Names Information System (December 1996 extract), apply updates supplied by the States of California and Arizona, redelineate reaches based on the standards used for the National Hydrography Dataset, and identify inflow/outflow points where transport reaches entered and exited water bodies. 
+2. Create artificial paths. Using waterbodies from the features data and inflow/outflow points extracted from RF3 double prime, this process automatically generated the lines used to delineate artificial paths within water bodies using the ARC/INFO GRID routine. 
+3. Blind pass. This batch step conflated RF3 double prime reaches, and transferred reach information (reach code, reach date, name, stream level, and flow relationships) to the features. It also integrated the artificial paths generated in the previous step with the other features, built reaches on the artificial paths, and assigned geographic names to water bodies (February 1995 extract). 
+4. Quadrangle-based visual pass. During this interactive step, analysts ensured that the data developed in the previous batch processes conformed to reach delineation rules and that reaches were assigned to the appropriate cataloging unit. Batch procedures identified and developed a list of possible errors. Using the list, software presented each case to analysts to make appropriate edits to the data. Analysts recorded notes where repairs could not be made; these notes are encoded in the digital update units associated with reaches. 
+5. Build superquads. After the quadrangle-based visual pass was complete, all quadrangles that cover all or part of each cataloging unit were paneled into a superquad. In this batch process, reaches that cross quad boundaries were corrected to conform to reach delineation rules. 
+6. Cataloging unit-based visual pass. Like the quadrangle-based visual pass, analysts ensured that reaches conformed to reach delineation rules.  Batch procedures identified and developed a list of possible errors. The analysts examined each error, and corrected the data.
+7. Central quality assurance/quality control. This step (1) confirmed that integrity checks were performed successfully during the visual pass activity, and (2) 	assessed statistics gathered during the earlier processes to determine if additional review was needed. A check of data from the cataloging unit-based visual pass was run in batch; any data that did not pass the procedure were reviewed interactively. If substantive changes were required, the data were reprocessed using procedures (as required) described in previous steps. The edited data then were rechecked using the central quality assurance/quality control process.
+8. Data preparation and database load. This batch procedure performs final processing to the data emerging from the quality assurance/quality control step. Some of the activities include assigning the final reach codes, building waterbody reaches, adding final artificial paths in water bodies, and implementing any recent changes in standards for the National Hydrography Dataset. The encoding of geographic names was synchronized between the National Hydrography Dataset and the Geographic Names Information System using the March 1999 geographic names extract. Following this procedure, reaches, features, characteristics, geographic names, and relations were loaded into the database that holds the National Hydrography Dataset. 
+9. Flow relation correction and validation. Using an extract from the database, a batch procedure checked flow relations for consistency and generated a list of possible errors. Software presented each case to analysts to make appropriate edits to the data. Corrections were made to the flow relations and, occasionally, to the delineation of  reaches. Changes were posted to the database. 10. Extract distribution copies of data. Data for a cataloging unit were extracted from the database, and converted into an ARC/INFO workspace containing coverages and other files related to the National Hydrography Dataset. Data available in the Spatial Data Transfer Standard format were developed from the workspaces. The workspaces, and the Spatial DataTransfer Standard-formatted files, were made available to the public.
+
+</dd>
+<dt><em>Source_Used_Citation_Abbreviation:</em>  RF3</dt>
+<dt><em>Source_Used_Citation_Abbreviation:</em>  GNIS</dt>
+<dt><em>Source_Used_Citation_Abbreviation:</em>  Centerlines</dt>
+<dt><em>Source_Used_Citation_Abbreviation:</em>  250K CU boundaries</dt>
+<dt><em>Source_Used_Citation_Abbreviation:</em>  State supplied CU boundaries</dt>
+<dt><em>Source_Used_Citation_Abbreviation:</em>  NHD basic features</dt>
+<dt><em>Process_Date:</em>  1998</dt>
+<dt><em>Source_Produced_Citation_Abbreviation:</em>  NHD Reaches</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<A NAME="3">
+</A>
+<hr>
+<dl>
+<dt><em>Spatial_Data_Organization_Information:</em>  
+<dd>
+<dl>
+<dt><em>Direct_Spatial_Reference_Method:</em>  Vector</dt>
+<dt><em>Point_and_Vector_Object_Information:</em>  
+<dd>
+<dl>
+<dt><em>SDTS_Terms_Description:</em>  
+<dd>
+<dl>
+<dt><em>SDTS_Point_and_Vector_Object_Type:</em>  G-polygon</dt>
+<dt><em>Point_and_Vector_Object_Count:</em>  17017</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<A NAME="4">
+</A>
+<hr>
+<dl>
+<dt><em>Spatial_Reference_Information:</em>  
+<dd>
+<dl>
+<dt><em>Horizontal_Coordinate_System_Definition:</em>  
+<dd>
+<dl>
+<dt><em>Geographic:</em>  
+<dd>
+<dl>
+<dt><em>Latitude_Resolution:</em>  0.000001</dt>
+<dt><em>Longitude_Resolution:</em>  0.000001</dt>
+<dt><em>Geographic_Coordinate_Units:</em>  Decimal degrees</dt>
+</dl>
+</dd>
+<dt><em>Geodetic_Model:</em>  
+<dd>
+<dl>
+<dt><em>Horizontal_Datum_Name:</em>  North American Datum of 1983</dt>
+<dt><em>Ellipsoid_Name:</em>  Geodetic Reference System 1980</dt>
+<dt><em>Semi-major_Axis:</em>  6378137.000000</dt>
+<dt><em>Denominator_of_Flattening_Ratio:</em>  298.257222</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Vertical_Coordinate_System_Definition:</em>  
+<dd>
+<dl>
+<dt><em>Altitude_System_Definition:</em>  
+<dd>
+<dl>
+<dt><em>Altitude_Datum_Name:</em>  National Geodetic Vertical Datum of 1929</dt>
+<dt><em>Altitude_Resolution:</em>  0.1</dt>
+<dt><em>Altitude_Distance_Units:</em>  meters</dt>
+<dt><em>Altitude_Encoding_Method:</em>  Attribute values</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<A NAME="5">
+</A>
+<hr>
+<dl>
+<dt><em>Entity_and_Attribute_Information:</em>  
+<dd>
+<dl>
+<dt><em>Detailed_Description:</em>  
+<dd>
+<dl>
+<dt><em>Entity_Type:</em>  
+<dd>
+<dl>
+<dt><em>Entity_Type_Label:</em>  NHD.NHDArea_Medium</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  OBJECTID</dt>
+<dt><em>Attribute_Definition:</em>  Internal feature number.</dt>
+<dt><em>Attribute_Definition_Source:</em>  ESRI</dt>
+<dt><em>Attribute_Domain_Values:</em>  
+<dd>
+<dl>
+<dt><em>Unrepresentable_Domain:</em>  
+<dd>
+
+Sequential unique whole numbers that are automatically generated.
+
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  COMID</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  FDATE</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  RESOLUTION</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  GNIS_ID</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  GNIS_NAME</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  AREASQKM</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  ELEVATION</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  FTYPE</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  FCODE</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  SHAPE</dt>
+<dt><em>Attribute_Definition:</em>  Feature geometry.</dt>
+<dt><em>Attribute_Definition_Source:</em>  ESRI</dt>
+<dt><em>Attribute_Domain_Values:</em>  
+<dd>
+<dl>
+<dt><em>Unrepresentable_Domain:</em>  Coordinates defining the features.</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  ADDED_SQM</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  SHAPE.AREA</dt>
+</dl>
+</dd>
+<dt><em>Attribute:</em>  
+<dd>
+<dl>
+<dt><em>Attribute_Label:</em>  SHAPE.LEN</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Overview_Description:</em>  
+<dd>
+<dl>
+<dt><em>Entity_and_Attribute_Overview:</em>  
+<dd>
+
+The National Hydrography Dataset is a comprehensive set of digital spatial data that encodes information about naturally occurring and constructed bodies of water, paths through which water flows, and related entities. The information encoded about features includes a unique common identifier, the date the feature was established, the resolution of the data (medium, high, local), names and their identifiers in the Geographic Names Information System, length and/or area, a reach code (if applicable), flow direction, classification by type, and other characteristics of the feature type.  The names and  definitions of all feature types, characteristics, and values are in U.S. Geological Survey, 1999, Standards for National Hydrography Dataset: Reston, Virginia, U.S. Geological Survey. The document is available online through <A HREF="http://mapping.usgs.gov/standards/">&lt;http://mapping.usgs.gov/standards/&gt;</A>.
+
+</dd>
+<dt><em>Entity_and_Attribute_Detail_Citation:</em>  
+<dd>
+
+The names and definitions of all feature types, characteristics, and values are in U.S. Geological Survey, 1999, Standards for National Hydrography Dataset: Reston, Virginia, U.S. Geological Survey. The document is available online through <A HREF="http://mapping.usgs.gov/standards/">&lt;http://mapping.usgs.gov/standards/&gt;</A>. Information about tables and fields in the data is available from the user documentation for the National Hydrography Dataset at <A HREF="http://nhd.usgs.gov">&lt;http://nhd.usgs.gov&gt;</A>. The National Map - Hydrography Fact Sheet is also available at:  <A HREF="http://erg.usgs.gov/isb/pubs/factsheets/fs06002.html">&lt;http://erg.usgs.gov/isb/pubs/factsheets/fs06002.html&gt;</A>.
+
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<A NAME="6">
+</A>
+<hr>
+<dl>
+<dt><em>Distribution_Information:</em>  
+<dd>
+<dl>
+<dt><em>Distributor:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Information:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Organization_Primary:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Organization:</em>  Earth Science Information Center, U.S. Geological Survey</dt>
+</dl>
+</dd>
+<dt><em>Contact_Address:</em>  
+<dd>
+<dl>
+<dt><em>Address_Type:</em>  mailing address</dt>
+<dt><em>Address:</em>  507 National Center</dt>
+<dt><em>City:</em>  Reston</dt>
+<dt><em>State_or_Province:</em>  VA</dt>
+<dt><em>Postal_Code:</em>  20192</dt>
+<dt><em>Country:</em>  USA</dt>
+</dl>
+</dd>
+<dt><em>Contact_Voice_Telephone:</em>  1 888 ASK USGS</dt>
+<dt><em>Contact_Voice_Telephone:</em>  1 888 275 8747</dt>
+<dt><em>Contact_Electronic_Mail_Address:</em>  ask@usgs.gov</dt>
+<dt><em>Hours_of_Service:</em>  0800-1600 Eastern Time</dt>
+<dt><em>Contact_Instructions:</em>  
+<dd>
+
+In addition to the address above there are other ESIC offices throughout the country. A full list of these offices is at URL: <A HREF="http://mapping.usgs.gov/esic/esic_index.html">&lt;http://mapping.usgs.gov/esic/esic_index.html&gt;</A>.
+
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Resource_Description:</em>  The National Hydrography Dataset - Local-resolution</dt>
+<dt><em>Distribution_Liability:</em>  
+<dd>
+
+Although these data have been processed successfully on a computer system at the U.S. Geological Survey, no warranty expressed or implied is made by the USGS regarding the utility of the data on any other system, nor shall the act of distribution constitute any such warranty.
+
+</dd>
+<dt><em>Standard_Order_Process:</em>  
+<dd>
+<dl>
+<dt><em>Digital_Form:</em>  
+<dd>
+<dl>
+<dt><em>Digital_Transfer_Information:</em>  
+<dd>
+<dl>
+<dt><em>Format_Name:</em>  ArcGIS Geodatabase</dt>
+<dt><em>Format_Version_Number:</em>  9.1</dt>
+<dt><em>File_Decompression_Technique:</em>  tar and uncompress</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<A NAME="7">
+</A>
+<hr>
+<dl>
+<dt><em>Metadata_Reference_Information:</em>  
+<dd>
+<dl>
+<dt><em>Metadata_Date:</em>  20060327</dt>
+<dt><em>Metadata_Contact:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Information:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Organization_Primary:</em>  
+<dd>
+<dl>
+<dt><em>Contact_Organization:</em>  U.S. Geological Survey</dt>
+</dl>
+</dd>
+<dt><em>Contact_Address:</em>  
+<dd>
+<dl>
+<dt><em>Address_Type:</em>  mailing address</dt>
+<dt><em>City:</em>  Reston</dt>
+<dt><em>State_or_Province:</em>  VA</dt>
+<dt><em>Postal_Code:</em>  20192</dt>
+</dl>
+</dd>
+<dt><em>Contact_Voice_Telephone:</em>  1 888 ASK USGS</dt>
+<dt><em>Contact_Voice_Telephone:</em>  1 888 275 8747</dt>
+<dt><em>Contact_Electronic_Mail_Address:</em>  ask@usgs.gov</dt>
+<dt><em>Hours_of_Service:</em>  0800-1600 Eastern Time</dt>
+<dt><em>Contact_Instructions:</em>  
+<dd>
+
+In addition to the address above there are other ESIC offices throughout the country. A full list of these offices is at URL: <A HREF="http://mapping.usgs.gov/esic/esic_index.html">&lt;http://mapping.usgs.gov/esic/esic_index.html&gt;</A>
+
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><em>Metadata_Standard_Name:</em>  FGDC Content Standards for Digital Geospatial Metadata</dt>
+<dt><em>Metadata_Standard_Version:</em>  FGDC-STD-001-1998</dt>
+<dt><em>Metadata_Time_Convention:</em>  local time</dt>
+<dt><em>Metadata_Extensions:</em>  
+<dd>
+<dl>
+<dt><em>Online_Linkage:</em>  <A HREF="http://www.esri.com/metadata/esriprof80.html">&lt;http://www.esri.com/metadata/esriprof80.html&gt;</A></dt>
+<dt><em>Profile_Name:</em>  ESRI Metadata Profile</dt>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<hr>
+Generated by <A HREF="http://geology.usgs.gov/tools/metadata/tools/doc/mp.html"><tt>mp</tt></A> version 2.8.6 on Fri Mar 31 14:51:17 2006<br>
+
+</body>
+</html>

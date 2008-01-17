@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE metadata SYSTEM "http://www.fgdc.gov/metadata/fgdc-std-001-1998.dtd">
+<metadata>
+	<idinfo>
+		<citation>
+			<citeinfo>
+				<origin>US EPA</origin>
+				<pubdate>Initially 20020401 (see Maintenance_and_Update_Frequency)</pubdate>
+				<title>NHD Indexed locations for Section 303(d) Listed Waters</title>
+				<geoform>vector digital data</geoform>
+				<serinfo>
+					<sername>303(d) Listed Waters</sername>
+					<issue>1</issue>
+				</serinfo>
+				<pubinfo>
+					<pubplace>Washington, DC</pubplace>
+					<publish>US EPA</publish>
+				</pubinfo>
+				<onlink>http://www.epa.gov/waters/data/downloads.html</onlink>
+			</citeinfo>
+		</citation>
+		<descript>
+			<abstract>River segments, lakes, and estuaries designated under Section 303(d) of the Clean Water Act. Each State will establish Total Maximum Daily Loads (TMDLs) for these waters. 303(d) Waterbodies are coded onto route.rch (Transport and Coastline Reach) feature of NHD to create Linear and Point Events.  Point events are attached to a reach in NHD to represent a TMDL for many reasons: to represent an estuary, to represent a shellfish area (if state prefered to represent the TMDL in this manner) - refer to NOAA's shellfish areas for a more accurate representation (&lt;http://state-of-coast.noaa.gov/bulletins/html/sgw_04/sgw.html&gt;). Point events represent point source dischargers, or, if there is no reach in NHD, they are used to represent the TMDL.  303(d) Waterbodies are coded onto NHD Waterbody reaches (region.rch) to create Waterbody Shapefiles.  In addition to NHD reach indexed data there may also be custom shapefiles (point, line, or polygon) that are not associated with NHD and are in an EPA standard format that is compatible with EPA's Reach Address Database.  These custom shapefiles are used to represent locations of 303(d) waterbodies that are not represented well in NHD.</abstract>
+			<purpose>To be used to identify the spatial extent of waters listed under §303(d). These waters can be linked to the §303(d) information stored in the EPA TMDL Tracking System for query and display. The ENTITY_ID field in the waterbody shapefile can be linked to the LIST_ID in the EPA's TMDL tracking system.</purpose>
+			<supplinf>Procedures Used: State Water Quality Agencies supplied EPA's Office of Water lists of waters reported under §303(d). These lists contained text which identified the locations of individual waters on their list. Many states also submitted GIS coverages and/or maps that outlined the spatial extent of their listed waters. These base materials were used by EPA to code the spatial extent onto the route.rch (Transport and Coastline Reach) feature of NHD to create NHD Point and Linear Events.  Using the EPA NHD Reach Indexing Tool (NHD-RIT), event tables were created by conflating the state's data to NHD reaches and the reaches were attributed with the §303(d) identifiers supplied by the states. Some reaches are also displayed offset from the original reach - this is done to display each TMDL on a state's list as a separate entity. So if 2 TMDLs on a state's list are actually in the same spatial location, one is shown offset from the actual reach. 
+
+These base materials were used by EPA to code the spatial extent onto NHD Waterbody Reaches (region.rch) to create NHD Waterbody shapefiles.  Using the EPA NHD Reach Indexing Tool (NHD-RIT), waterbody shapefiles were created by conflating the state's data to NHD reaches and the reaches were attributed with the §303(d) identifiers supplied by the states. 
+
+Revisions: The data were sent to each state for review and comment. The format of the reviewed data was state dependent. Formats consisted of hardcopy maps, shapefiles or coverages with events. In many cases, modifications were noted by the State and then corrections were made by RTI. 
+
+Related_Spatial_and_Tabular_Data_Sets: The EPA TMDL Tracking System contains relevant data that links to this shapefile. The ENTITY_ID field in the waterbody shapefile can be linked to the LIST_ID in the EPA's TMDL tracking system.
+
+NHD Vintage:  NHD (Flow-validated, Re-leveled) -- Current as of June, 2002 (compatible with EPA Reach Address Database Version 2.0)</supplinf>
+		</descript>
+		<timeperd>
+			<timeinfo>
+				<sngdate>
+					<caldate>2002 (varies between and sometimes within jurisdictions; see Maintenance_and_Update_Frequency)</caldate>
+				</sngdate>
+			</timeinfo>
+			<current>see Maintenance_and_Update_Frequency</current>
+		</timeperd>
+		<status>
+			<progress>In work</progress>
+			<update>Typically 3 times per year</update>
+		</status>
+		<spdom>
+			<bounding>
+				<westbc>
+-180</westbc>
+				<eastbc>
+-60</eastbc>
+				<northbc>
+80</northbc>
+				<southbc>
+0</southbc>
+			</bounding>
+		</spdom>
+		<keywords>
+			<theme>
+				<themekt>None</themekt>
+				<themekey>Impaired waters</themekey>
+				<themekey>§303(d)</themekey>
+				<themekey>TMDL</themekey>
+				<themekey>reach indexing</themekey>
+				<themekey>NHD</themekey>
+			</theme>
+			<theme>
+				<themekt>Metadata Service Theme Categories</themekt>
+				<themekey>environment</themekey>
+				<themekey>inlandWaters</themekey>
+			</theme>
+			<place>
+				<placekt>None</placekt>
+				<placekey>US</placekey>
+				<placekey>National</placekey>
+			</place>
+		</keywords>
+		<accconst>Password protected until review is complete.</accconst>
+		<useconst>The reach indexing review site is designed for state review of Clean Water Act Section 303(d) spatial data. Research Triangle Institute (RTI), under contract with EPA, georeferenced (or indexed) the states' impaired waters to the National Hydrography Dataset (NHD). EPA would like each state to have the opportunity to review the indexing work. Reviewers are asked to assess the accuracy of 303(d) reach indexing (georeferencing) efforts. More specifically, reviewers are asked to evaluate whether impaired waters are assigned to the appropriate reaches and to assess the accuracy of the locational information.
+
+When using this data in a spatial query, errors in determining the overlap can occur.  The errors can be grouped as follows: 
+(1) False Positives occur when the locational information is either incorrect or not of sufficient quality to determine its exact location. 
+(2) False Negatives occur when locational information is missing or not available.
+(3) In addition to the entity locational information, errors, although few, may also exist in the spatial network of rivers, streams, and other waterbodies that comprise the National Hydrography Dataset (NHD) jointly maintained by USGS and USEPA. Errors in the NHD may contribute both to false positive and false negative readings.</useconst>
+		<ptcontac>
+			<cntinfo>
+				<cntperp>
+					<cntper>Wendy Reid</cntper>
+					<cntorg>US EPA Headquarters</cntorg>
+				</cntperp>
+				<cntaddr>
+					<addrtype>mailing address</addrtype>
+					<address>1200 Pennsylvania Avenue, NW MC 4503T</address>
+					<city>Washington</city>
+					<state>DC</state>
+					<postal>20460</postal>
+				</cntaddr>
+				<cntvoice>202-566-1705</cntvoice>
+				<cntemail>reid.wendy@epa.gov</cntemail>
+			</cntinfo>
+		</ptcontac>
+		<secinfo>
+			<secsys>None</secsys>
+			<secclass>Unclassified</secclass>
+			<sechandl>None</sechandl>
+		</secinfo>
+		<native>ArcView 3.2 (used in conjunction with the Reach Indexing Tool (RIT) and the National Hydrography Dataset (NHD) - NHD (Flow-validated, Re-leveled) -- Current as of June, 2002 (compatible with EPA Reach Address Database Version 2.0), and/or EPA's Web-Based Reach Indexing Tool (WebRIT).</native>
+	</idinfo>
+	<dataqual>
+		<attracc>
+		</attracc>
+		<logic>Chain-node topology present</logic>
+		<posacc>
+			<horizpa>
+				<horizpar>Statements of horizontal positional accuracy are based on accuracy statements made for USGS topographic quadrangle maps. These maps were compiled to meet National Map Accuracy Standards. For horizontal accuracy, this standard is met if at least 90 percent of points tested are within 0.02 inch (at map scale) of their true positions. Additional offsets to positions may have been introduced where there are many features to improve the legibility of map symbols. In addition, the digitizing of maps is estimated to contain a horizontal positional error of less than or equal to 0.003-inch standard error (at map scale) in the two component directions relative to the source maps. Visual comparison between the map graphic (including digital scans of the graphic) and plots or digital displays of points, lines, and areas is used to assess the positional accuracy of digital data.  Linear features of the same type along the adjoining edges of data sets are aligned if they are within a 0.02-inch tolerance (at map scale). To align the features, the midpoint between the end of the corresponding features is computed, and the ends of features are moved to this point. Features outside the tolerance are not moved; instead, a feature of the type connector was added to join the features.  
+
+For more information, see the National Hydrography Dataset Concepts and
+Contents document (February 2000) available at &lt;http://nhd.usgs.gov/chapter1/index.html&gt;.</horizpar>
+			</horizpa>
+			<vertacc>
+				<vertaccr>Statements of vertical positional accuracy for elevation of water surfaces are based on accuracy statements made for USGS topographic quadrangle maps.  These maps were compiled to meet National Map Accuracy Standards. For vertical accuracy, this standard is met if at least 90 percent of well-defined points tested are within one-half contour interval of the correct value.  Elevations of water surface printed on the published map meet this standard;
+the contour intervals of the maps vary. These elevations were transcribed into the digital data; the accuracy of this transcription was checked by visual comparison between the data and the map.  
+
+For more information, see the National Hydrography Dataset Concepts and Contents document (February 2000) available at &lt;http://nhd.usgs.gov/chapter1/index.html&gt;.</vertaccr>
+			</vertacc>
+		</posacc>
+		<lineage>
+			<procstep>
+				<procdesc>Each state sent RTI a marked-up map or existing GIS coverage denoting the location and extent of each waterbody. Using the EPA's NHD Reach Indexing Tool (NHD-RIT), event tables were created by conflating the state's data to NHD. Event identifiers were populated with the §303(d) codes supplied by each states' list.</procdesc>
+				<procdate>Initially 20020401 (see Maintenance_and_Update_Frequency)</procdate>
+			</procstep>
+		</lineage>
+	</dataqual>
+	<spdoinfo>
+		<direct>Vector</direct>
+		<ptvctinf>
+			<sdtsterm>
+			</sdtsterm>
+		</ptvctinf>
+	</spdoinfo>
+	<spref>
+		<horizsys>
+			<geograph>
+				<latres>1</latres>
+				<longres>1</longres>
+				<geogunit>Decimal degrees</geogunit>
+			</geograph>
+			<geodetic>
+				<horizdn>North American Datum of 1983</horizdn>
+				<ellips>Geodetic Reference System 80</ellips>
+				<semiaxis>6378137 meters</semiaxis>
+				<denflat>298.257222101</denflat>
+			</geodetic>
+		</horizsys>
+	</spref>
+	<eainfo>
+		<detailed>
+			<enttyp>
+				<enttypl>
+Point and linear event themes, NHD waterbody shapefiles, and Custom Shapes (point, line, and polygon shapefiles that are not associated with NHD).</enttypl>
+				<enttypd>Each point event theme applies to a point along a section of the National Hydrography Dataset (NHD), which is a comprehensive set of digital spatial data that contains information about surface water features such as lakes, ponds, streams, rivers, springs and wells.  Line event themes apply to linear positions along sections of the NHD.  Each waterbody theme applies to whole or portions of NHD waterbody reaches.  All other point, line, and polygon shapefiles represent geometries that do not fall on the NHD network of streams/coastline and lakes/ponds.</enttypd>
+				<enttypds>EPA's Web-Based Reach Indexing Tool (WebRIT) and EPA's National Hydrography Dataset Reach Indexing Tool (NHD-RIT).</enttypds>
+			</enttyp>
+			<attr>
+				<attrlabl>FID</attrlabl>
+				<attrdef>Internal feature number.</attrdef>
+				<attrdefs>ESRI</attrdefs>
+				<attrdomv>
+					<udom>Sequential unique whole numbers that are automatically generated.</udom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>Shape</attrlabl>
+				<attrdef>Feature geometry.</attrdef>
+				<attrdefs>ESRI</attrdefs>
+				<attrdomv>
+					<udom>Coordinates defining the features.</udom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>EVENT_ID</attrlabl>
+				<attrdef>Unique ID for an event created based on date and time when the event was created, and a sequential number to provide uniqueness for events created at the same time.</attrdef>
+				<attrdefs>System created number (WebRIT or NHD-RIT)</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>2000010100000100001</rdommin>
+						<rdommax>9999123124000099999</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>P_MEAS</attrlabl>
+				<attrdef>Specifies the location of the point along a route.  This field is only used for point event themes.</attrdef>
+				<attrdefs>EPA's WebRIT or NHD-RIT</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>0</rdommin>
+						<rdommax>200</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>EOFFSET</attrlabl>
+				<attrdef>Offset distance of event from associated NHD route reach location.  This field is only used for point and linear event themes.</attrdef>
+				<attrdefs>User input</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>0</rdommin>
+						<rdommax>999999</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>DUU_ID</attrlabl>
+				<attrdef>Unique identifier of the digital update unit in the NHD database.  This field is only used for point and linear events and NHD waterbody shapefiles.</attrdef>
+				<attrdefs>NHD</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>0000000001</rdommin>
+						<rdommax>9999999999</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>RCH_CODE</attrlabl>
+				<attrdef>Numeric code that uniquely identifies a reach in NHD, consisting of two parts: the first eight digits are the hydrologic unit code of the cataloging unit in which the reach is located; the last six digits are a sequentially, arbitrarily-assigned number.  This field is only used for point and linear events and NHD waterbody shapefiles.</attrdef>
+				<attrdefs>NHD</attrdefs>
+				<attrdomv>
+					<codesetd>
+						<codesetn>NHD Reach codes</codesetn>
+						<codesets>USGS NHD</codesets>
+					</codesetd>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>RCH_DATE</attrlabl>
+				<attrdef>Date that the reach code (Rch_code) was assigned, displayed as YYYYMMDD.  This field is only used for point and linear events and NHD waterbody shapefiles.</attrdef>
+				<attrdefs>NHD</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>19970101</rdommin>
+						<rdommax>99991231</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>ATTR_PRG</attrlabl>
+				<attrdef>Indicates the attribute type or program being indexed.</attrdef>
+				<attrdefs>WebRIT or NHD-RIT</attrdefs>
+				<attrdomv>
+					<codesetd>
+						<codesetn>Alphanumeric</codesetn>
+						<codesets>ASCII</codesets>
+					</codesetd>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>ATTR_VAL</attrlabl>
+				<attrdef>Value associated with the attribute program in the field Attr_prg.</attrdef>
+				<attrdefs>User Input</attrdefs>
+				<attrdomv>
+					<codesetd>
+						<codesetn>Alphanumeric</codesetn>
+						<codesets>ASCII</codesets>
+					</codesetd>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>ENTITY_ID</attrlabl>
+				<attrdef>Identifier used to aggregate reaches into homogenous units. It is also used to link the event table to external data sources.</attrdef>
+				<attrdefs>TMDL Database</attrdefs>
+				<attrdomv>
+					<codesetd>
+						<codesetn>Alphanumeric</codesetn>
+						<codesets>ASCII</codesets>
+					</codesetd>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>STATE</attrlabl>
+				<attrdef>State abbreviation according to the FIPS standard.  The state used in this field is the geographic area (state) that the event is located in.</attrdef>
+				<attrdefs>User input</attrdefs>
+				<attrdomv>
+					<codesetd>
+						<codesetn>Federal Information Processing Standard</codesetn>
+						<codesets>Two digit FIPS state code (character).</codesets>
+					</codesetd>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>META_ID</attrlabl>
+				<attrdef>Link to the metadata table</attrdef>
+				<attrdefs>System created number (WebRIT or NHD-RIT)</attrdefs>
+				<attrdomv>
+					<codesetd>
+						<codesetn>Alphanumeric</codesetn>
+						<codesets>ASCII</codesets>
+					</codesetd>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>F_MEAS</attrlabl>
+				<attrdef>Specifies the start point of the event along a route.  This field is only used for linear events.</attrdef>
+				<attrdefs>EPA's WebRIT or NHD-RIT</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>0</rdommin>
+						<rdommax>200</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>T_MEAS</attrlabl>
+				<attrdef>Specifies to end point of the event along a route.  This field is only used for linear events.</attrdef>
+				<attrdefs>EPA's WebRIT or NHD-RIT</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>0</rdommin>
+						<rdommax>200</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>METERS</attrlabl>
+				<attrdef>Length along the reach (in meters).  This field is only used for linear events.</attrdef>
+				<attrdefs>EPA's WebRIT or EPA's NHD-RIT</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>0</rdommin>
+						<rdommax>40,000,000</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>SQ_KM</attrlabl>
+				<attrdef>Area of the waterbody shape (in square kilometers).  This field is only used for NHD waterbody shapefiles.</attrdef>
+				<attrdefs>EPA's WebRIT or EPA's NHD-RIT</attrdefs>
+				<attrdomv>
+					<rdom>
+						<rdommin>0</rdommin>
+						<rdommax>40,000,000</rdommax>
+					</rdom>
+				</attrdomv>
+			</attr>
+		</detailed>
+		<overview>
+			<eadetcit>The WebRIT online help and tutorial can be found at &lt;http://www.epa.gov/waters/webrit/training.htm&gt;.  The NHD Reach Indexing Tool Users's Guide - October 2002 can  be found at   &lt;http://www.epa.gov/waters/georef/UserGuide.pdf&gt;</eadetcit>
+		</overview>
+	</eainfo>
+	<distinfo>
+		<distrib>
+			<cntinfo>
+				<cntperp>
+					<cntper>Bill Painter</cntper>
+					<cntorg>US EPA Headquarters</cntorg>
+				</cntperp>
+				<cntaddr>
+					<addrtype>mailing address</addrtype>
+					<address>1200 Pennsylvania Avenue, NW MC 4503T</address>
+					<city>Washington</city>
+					<state>DC</state>
+					<postal>20460</postal>
+				</cntaddr>
+				<cntvoice>202-566-1218</cntvoice>
+				<cntemail>painter.william@epa.gov</cntemail>
+			</cntinfo>
+		</distrib>
+		<resdesc>Downloadable Data</resdesc>
+		<stdorder>
+			<digform>
+				<digtinfo>
+				</digtinfo>
+			</digform>
+		</stdorder>
+	</distinfo>
+	<metainfo>
+		<metd>20040608</metd>
+		<metc>
+			<cntinfo>
+				<cntperp>
+					<cntper>Bill Painter</cntper>
+					<cntorg>US EPA Headquarters</cntorg>
+				</cntperp>
+				<cntaddr>
+					<addrtype>mailing address</addrtype>
+					<address>1200 Pennsylvania Avenue, NW MC 4503T</address>
+					<city>Washington</city>
+					<state>DC</state>
+					<postal>20460</postal>
+				</cntaddr>
+				<cntvoice>202-566-1218</cntvoice>
+				<cntemail>painter.william@epa.gov</cntemail>
+			</cntinfo>
+		</metc>
+		<metstdn>FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+		<metstdv>FGDC-STD-001-1998</metstdv>
+		<mettc>local time</mettc>
+		<metextns>
+			<onlink>http://www.esri.com/metadata/esriprof80.html</onlink>
+			<metprof>ESRI Metadata Profile</metprof>
+		</metextns>
+	</metainfo>
+	<Esri><ModDate>20071005</ModDate><ModTime>14122500</ModTime></Esri><mdDateSt Sync="TRUE">20071005</mdDateSt></metadata>
