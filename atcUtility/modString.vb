@@ -8,6 +8,29 @@ Option Explicit On
 ''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 ''' </remarks>
 Public Module modString
+    ''' <summary>
+    ''' Assign expression to result and return result
+    ''' </summary>
+    ''' <param name="aResult">output value of expression</param>
+    ''' <param name="aExpression">input value of expression</param>
+    ''' <returns>output value of expression</returns>
+    ''' <remarks>use this like this 
+    '''    While Assign(variable,expression) > 0
+    '''       'use variable as needed
+    '''    End While
+    ''' </remarks>
+    Function Assign(ByRef aResult As Integer, ByVal aExpression As Integer) As Integer
+        aResult = aExpression
+        Return aResult
+    End Function
+    Function Assign(ByRef aResult As Double, ByVal aExpression As Double) As Double
+        aResult = aExpression
+        Return aResult
+    End Function
+    Function Assign(ByRef aResult As String, ByVal aExpression As String) As String
+        aResult = aExpression
+        Return aResult
+    End Function
 
     ''' <summary>
     ''' Log base 10
