@@ -24,7 +24,7 @@ Public Module UtilColor
                 pMatchingColorsFilename = aFilename
                 Dim lOneLine As String
                 Dim lColor As Color
-                For Each lOneLine In (New LinesInFile(aFilename))
+                For Each lOneLine In LinesInFile(aFilename)
                     lOneLine = lOneLine.Trim
                     If lOneLine.Length > 0 Then
                         lColor = TextOrNumericColor(StrRetRem(lOneLine))

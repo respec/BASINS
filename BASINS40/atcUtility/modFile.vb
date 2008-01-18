@@ -953,12 +953,16 @@ TryAgain:
 
     End Sub
 
+    Public Function LinesInFile(ByVal aFileName As String) As IEnumerable
+        Return New LinesInFileC(aFileName)
+    End Function
+
     ''' <summary>
     ''' An enumerable set of lines read from a text file (or other BinaryReader)
     ''' lines in file end with carriage return and/or linefeed
     ''' end of line characters are stripped from enumerated lines returned
     ''' </summary>
-    Class LinesInFile
+    Private Class LinesInFileC
         Implements IEnumerable, IEnumerator, IDisposable
 
         Private pStreamReader As IO.BinaryReader
