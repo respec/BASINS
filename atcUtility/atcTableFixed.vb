@@ -19,21 +19,20 @@ Public Class atcTableFixed
     Private pNumFields As Integer
     Private pNumHeaderRows As Integer = -1
     Private pData() As String
-    Private pRecords() As String
-    Private pNumRecords As Integer
+    Private pRecords As New ArrayList
     Private pCurrentRecord As Integer
     Private pCurrentRecordStart As Integer
 
     Public Overrides Property CurrentRecord() As Integer
         Get
-            CurrentRecord = pCurrentRecord
+            Return pCurrentRecord + 1
         End Get
         Set(ByVal newValue As Integer)
             Try
-                If newValue < 1 Or newValue > pNumRecords Then
-                    pCurrentRecord = 1
+                If newValue < 1 Or newValue > pRecords.Count Then
+                    pCurrentRecord = 0
                 Else
-                    pCurrentRecord = newValue
+                    pCurrentRecord = newValue - 1
                 End If
                 'parse fields values from this record
                 For i As Integer = 1 To pNumFields
@@ -191,27 +190,30 @@ ErrHand:
 
     Public Overrides Property NumRecords() As Integer
         Get
-            NumRecords = pNumRecords
+            Return pRecords.Count
         End Get
         Set(ByVal newValue As Integer)
-            If newValue > pNumRecords Then
-                pNumRecords = newValue
-                'Expand the record array capacity
-                ReDim Preserve pRecords(pNumRecords)
-            ElseIf newValue < pNumRecords Then
-                'Shrink the records array
-                pNumRecords = newValue
-                ReDim Preserve pRecords(pNumRecords)
+            If newValue > pRecords.Count Then
+                Dim lRecordWidth As Integer = 0
+                For i As Integer = 1 To pNumFields
+                    lRecordWidth += pFields(i).FieldLength
+                Next
+                Dim lBlankRecord As String = Space(lRecordWidth)
+                While newValue > pRecords.Count
+                    pRecords.Add(lBlankRecord)
+                End While
+            ElseIf newValue < pRecords.Count Then
+                pRecords.RemoveRange(newValue, pRecords.Count - newValue)
             End If
         End Set
     End Property
 
     Public Overrides Property Value(ByVal aFieldNumber As Integer) As String
         Get
-            If pCurrentRecord < 1 Then
-                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " < 1")
-            ElseIf pCurrentRecord > pNumRecords Then
-                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " > " & pNumRecords)
+            If pCurrentRecord < 0 Then
+                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord + 1 & " < 1")
+            ElseIf pCurrentRecord >= pRecords.Count Then
+                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord + 1 & " > " & pRecords.Count)
             ElseIf aFieldNumber < 1 Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " < 1")
             ElseIf aFieldNumber > pNumFields Then
@@ -222,8 +224,10 @@ ErrHand:
         End Get
         Set(ByVal newValue As String)
             On Error GoTo ErrHand
-            If pCurrentRecord < 1 Then
-                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " < 1")
+            If pCurrentRecord < 0 Then
+                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord + 1 & " < 1")
+            ElseIf pCurrentRecord >= pRecords.Count Then
+                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord + 1 & " > " & pRecords.Count)
             ElseIf aFieldNumber < 1 Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " < 1")
             ElseIf aFieldNumber > pNumFields Then
@@ -241,7 +245,7 @@ ErrHand:
             End If
             Exit Property
 ErrHand:
-            Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & newValue & "' in record #" & pCurrentRecord & vbCr & Err.Description, "Let Value")
+            Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & newValue & "' in record #" & pCurrentRecord + 1 & vbCr & Err.Description, "Let Value")
         End Set
     End Property
 
@@ -262,7 +266,7 @@ ErrHand:
         'If pHeader Is Nothing Then pHeader = New clsHeader
         'pHeader.NumRecs = 0
         'pDataBytes = 0
-        'pCurrentRecord = 1
+        'pCurrentRecord = 0
         'pCurrentRecordStart = 0
         'pNumRecsCapacity = 0
         'ReDim pData(0)
@@ -296,32 +300,24 @@ ErrHand:
 
     'Read a stream into the table
     Public Function OpenStream(ByVal aStream As Stream) As Boolean
-        Dim iRec As Integer
-        Dim curLine As String
-        Dim inReader As New BinaryReader(aStream)
-
         Try
-            For iRec = 1 To NumHeaderRows 'read header rows, ignore for now
-                pHeader.Add(NextLine(inReader))
+            Dim lLineReader As IEnumerator = LinesInFile(New BinaryReader(aStream))
+
+            For iRec As Integer = 1 To NumHeaderRows 'read header rows, ignore for now
+                lLineReader.MoveNext()
+                pHeader.Add(lLineReader.Current)
             Next
 
-            ReDim pRecords(100) 'initial record buffer size
-            iRec = 1
-            Do
-                curLine = NextLine(inReader)
-                If iRec > pRecords.GetUpperBound(0) Then
-                    ReDim Preserve pRecords(iRec * 2)
-                End If
-                pRecords(iRec) = curLine
-                iRec += 1
-            Loop
-        Catch endEx As EndOfStreamException
-            ReDim Preserve pRecords(iRec - 1)
-            pNumRecords = iRec - 1
+            pRecords = New ArrayList
+            While lLineReader.MoveNext
+                pRecords.Add(lLineReader.Current)
+            End While
             Me.CurrentRecord = 1
             Return True
+        Catch e As Exception
+            Logger.Msg("Error opening table '" & pFilename & "': " & e.Message)
+            Return False
         End Try
-        Return False
     End Function
 
     'Read a string into the table
@@ -365,7 +361,7 @@ TryAgain:
         FilePut(OutFile, Header)
         
         MoveFirst()
-        For i = 1 To pNumRecords
+        For i = 1 To pRecords.Count
             FilePut(OutFile, CurrentRecordAsDelimitedString("") & vbCrLf)
             MoveNext()
         Next

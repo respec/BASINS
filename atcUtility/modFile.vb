@@ -954,7 +954,11 @@ TryAgain:
     End Sub
 
     Public Function LinesInFile(ByVal aFileName As String) As IEnumerable
-        Return New LinesInFileC(aFileName)
+        Return New clsLinesInFile(aFileName)
+    End Function
+
+    Public Function LinesInFile(ByVal aFileReader As IO.BinaryReader) As IEnumerable
+        Return New clsLinesInFile(aFileReader)
     End Function
 
     ''' <summary>
@@ -962,7 +966,7 @@ TryAgain:
     ''' lines in file end with carriage return and/or linefeed
     ''' end of line characters are stripped from enumerated lines returned
     ''' </summary>
-    Private Class LinesInFileC
+    Private Class clsLinesInFile
         Implements IEnumerable, IEnumerator, IDisposable
 
         Private pStreamReader As IO.BinaryReader
@@ -1042,7 +1046,7 @@ ReadCharacter:
     Public Function NextLine(ByVal aReader As IO.BinaryReader) As String
         Dim ch As Char
         'TODO: test a StringBuilder in place of &= for each character
-        NextLine = Nothing
+        NextLine = ""
         Try
 ReadCharacter:
             ch = aReader.ReadChar
@@ -1051,18 +1055,14 @@ ReadCharacter:
                     If aReader.PeekChar = 10 Then aReader.ReadChar()
                 Case ControlChars.Lf 'Unix-style line ends without carriage return
                 Case Else 'Found a character that does not end the line
-                    If NextLine Is Nothing Then
-                        NextLine = ch
-                    Else
-                        NextLine &= ch
-                    End If
+                    NextLine &= ch
                     GoTo ReadCharacter
             End Select
         Catch endEx As IO.EndOfStreamException
-            If NextLine Is Nothing Then 'We had nothing to read, already finished file last time
+            If NextLine.Length = 0 Then 'We had nothing to read, already finished file last time
                 Throw endEx
             Else
-                'Reaching the end of file is fine, we have finished reading this file
+                'Reaching the end of file is fine, we are returning the last line now
             End If
         End Try
     End Function
