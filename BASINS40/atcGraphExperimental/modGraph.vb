@@ -119,7 +119,7 @@ Public Module modGraph
                 lScenario = lTimeseries.Attributes.GetValue("Scenario", "")
                 lLocation = lTimeseries.Attributes.GetValue("Location", "")
                 lConstituent = lTimeseries.Attributes.GetValue("Constituent", "")
-                If lScenario <> lCommonScenario Then
+                If String.Compare(lScenario, lCommonScenario, True) <> 0 Then
                     If lCommonScenario Is Nothing Then
                         lCommonScenario = lScenario
                     Else
@@ -127,7 +127,7 @@ Public Module modGraph
                     End If
                 End If
 
-                If lLocation <> lCommonLocation Then
+                If String.Compare(lLocation, lCommonLocation, True) <> 0 Then
                     If lCommonLocation Is Nothing Then
                         lCommonLocation = lLocation
                     Else
@@ -135,7 +135,7 @@ Public Module modGraph
                     End If
                 End If
 
-                If lConstituent <> lCommonConstituent Then
+                If String.Compare(lConstituent, lCommonConstituent, True) <> 0 Then
                     If lCommonConstituent Is Nothing Then
                         lCommonConstituent = lConstituent
                     Else
@@ -143,33 +143,42 @@ Public Module modGraph
                     End If
                 End If
             End With
+        Next
 
+        Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
+
+        For Each lTimeseries As atcTimeseries In aDataGroup
+            lConstituent = lTimeseries.Attributes.GetValue("Constituent", "").ToString.ToUpper
             Dim lYAxisName As String = lTimeseries.Attributes.GetValue("YAxis", "")
             If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
                 lYAxisName = "LEFT" 'Default to left Y axis
+
                 'Look for existing curve with same constituent and use the same Y axis
-                Dim lFoundMatchingCons As Boolean = False
-                Dim lOldCons As String
-                Dim lOldCurve As LineItem
-                For lAssignedDatasetIndex As Integer = 0 To (lYaxisNames.Count - 1)
-                    Dim lAssignedTs As atcTimeseries = aDataGroup.ItemByIndex(lAssignedDatasetIndex)
-                    For Each lOldCurve In lPaneMain.CurveList
-                        If lOldCurve.Tag = lAssignedTs.Serial Then
-                            lOldCons = lAssignedTs.Attributes.GetValue("Constituent")
-                            If lOldCons = lConstituent Then
-                                If lOldCurve.IsY2Axis Then lYAxisName = "RIGHT" Else lYAxisName = "LEFT"
-                                lFoundMatchingCons = True
-                                Exit For
-                            End If
-                        End If
-                    Next
-                Next
-                If Not lFoundMatchingCons AndAlso lYaxisNames.Count = 1 Then
-                    'Put new curve on right axis if we already have a non-matching curve
+                If GroupContainsConstituent(lLeftDataSets, lConstituent) Then
+                    GoTo FoundMatch
+                End If
+                If GroupContainsConstituent(lRightDataSets, lConstituent) Then
                     lYAxisName = "RIGHT"
+                    GoTo FoundMatch
+                End If
+                If GroupContainsConstituent(lAuxDataSets, lConstituent) Then
+                    lYAxisName = "AUX"
+                    GoTo FoundMatch
+                End If
+
+                'Precip defaults to aux when there is other data
+                If lCommonConstituent.Length = 0 AndAlso lConstituent.Contains("PREC") Then
+                    lYAxisName = "AUX"
+                    GoTo FoundMatch
+                End If
+
+                If lYaxisNames.Count = 1 Then 'Put new curve on right axis if we already have a non-matching curve
+                    lYAxisName = "RIGHT"
+                    GoTo FoundMatch
                 End If
             End If
 
+FoundMatch:
             Select Case lYAxisName.ToUpper
                 Case "AUX" : lAuxDataSets.Add(lTimeseries)
                 Case "RIGHT" : lRightDataSets.Add(lTimeseries)
@@ -177,8 +186,6 @@ Public Module modGraph
             End Select
             lYaxisNames.Add(lTimeseries.Serial, lYAxisName)
         Next
-
-        Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
 
         For Each lTimeseries As atcTimeseries In aDataGroup
             Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
@@ -212,6 +219,15 @@ Public Module modGraph
             ScaleYAxis(lAuxDataSets, aZgc.MasterPane.PaneList(0).YAxis)
         End If
     End Sub
+
+    Private Function GroupContainsConstituent(ByVal aGroup As atcDataGroup, ByVal aConstituent As String) As Boolean
+        For Each lTs As atcTimeseries In aGroup
+            If String.Compare(lTs.Attributes.GetValue("Constituent"), aConstituent, True) = 0 Then
+                Return True
+            End If
+        Next
+        Return False
+    End Function
 
     Private Function TimeUnitName(ByVal aTimeUnits As Integer, Optional ByVal aTimeStep As Integer = 1) As String
         Dim lName As String = ""
