@@ -27,7 +27,7 @@ Partial Class frmGraphEditor
         Me.lblAxisDataRange = New System.Windows.Forms.Label
         Me.txtCurveColor = New System.Windows.Forms.TextBox
         Me.lblCurveColor = New System.Windows.Forms.Label
-        Me.cboWhichCurve = New System.Windows.Forms.ComboBox
+        Me.comboWhichCurve = New System.Windows.Forms.ComboBox
         Me.txtAxisMinorGridColor = New System.Windows.Forms.TextBox
         Me.txtAxisMajorGridColor = New System.Windows.Forms.TextBox
         Me.txtAxisDisplayMaximum = New System.Windows.Forms.TextBox
@@ -88,8 +88,14 @@ Partial Class frmGraphEditor
         Me.lblLineXplus = New System.Windows.Forms.Label
         Me.txtLineBcoef = New System.Windows.Forms.TextBox
         Me.tabLegend = New System.Windows.Forms.TabPage
+        Me.lblLegendLocation = New System.Windows.Forms.Label
+        Me.comboLegendLocation = New System.Windows.Forms.ComboBox
         Me.tabText = New System.Windows.Forms.TabPage
+        Me.btnTextAdd = New System.Windows.Forms.Button
+        Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
+        Me.lblLegendClick = New System.Windows.Forms.Label
+        Me.comboWhichText = New System.Windows.Forms.ComboBox
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelAxisType.SuspendLayout()
@@ -98,6 +104,8 @@ Partial Class frmGraphEditor
         Me.grpLineXconstant.SuspendLayout()
         Me.grpLineYconstant.SuspendLayout()
         Me.grpLineEquation.SuspendLayout()
+        Me.tabLegend.SuspendLayout()
+        Me.tabText.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtAxisMaximum
@@ -109,6 +117,7 @@ Partial Class frmGraphEditor
         Me.txtAxisMaximum.Size = New System.Drawing.Size(91, 20)
         Me.txtAxisMaximum.TabIndex = 17
         Me.toolTip1.SetToolTip(Me.txtAxisMaximum, "Maximum data value in any dataset using this axis")
+        Me.txtAxisMaximum.Visible = False
         '
         'txtAxisMinimum
         '
@@ -119,6 +128,7 @@ Partial Class frmGraphEditor
         Me.txtAxisMinimum.Size = New System.Drawing.Size(91, 20)
         Me.txtAxisMinimum.TabIndex = 16
         Me.toolTip1.SetToolTip(Me.txtAxisMinimum, "Minimum data value in any dataset using this axis")
+        Me.txtAxisMinimum.Visible = False
         '
         'lblAxisDataRange
         '
@@ -129,6 +139,7 @@ Partial Class frmGraphEditor
         Me.lblAxisDataRange.TabIndex = 15
         Me.lblAxisDataRange.Text = "Data Range"
         Me.toolTip1.SetToolTip(Me.lblAxisDataRange, "Total range of all data using this axis")
+        Me.lblAxisDataRange.Visible = False
         '
         'txtCurveColor
         '
@@ -149,16 +160,16 @@ Partial Class frmGraphEditor
         Me.lblCurveColor.Text = "Color"
         Me.toolTip1.SetToolTip(Me.lblCurveColor, "Range of data currently displayed")
         '
-        'cboWhichCurve
+        'comboWhichCurve
         '
-        Me.cboWhichCurve.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.comboWhichCurve.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboWhichCurve.FormattingEnabled = True
-        Me.cboWhichCurve.Location = New System.Drawing.Point(81, 9)
-        Me.cboWhichCurve.Name = "cboWhichCurve"
-        Me.cboWhichCurve.Size = New System.Drawing.Size(373, 21)
-        Me.cboWhichCurve.TabIndex = 0
-        Me.toolTip1.SetToolTip(Me.cboWhichCurve, "Select which curve to edit")
+        Me.comboWhichCurve.FormattingEnabled = True
+        Me.comboWhichCurve.Location = New System.Drawing.Point(81, 9)
+        Me.comboWhichCurve.Name = "comboWhichCurve"
+        Me.comboWhichCurve.Size = New System.Drawing.Size(376, 21)
+        Me.comboWhichCurve.TabIndex = 0
+        Me.toolTip1.SetToolTip(Me.comboWhichCurve, "Select which curve to edit")
         '
         'txtAxisMinorGridColor
         '
@@ -248,6 +259,7 @@ Partial Class frmGraphEditor
         Me.lblAxisTo.Size = New System.Drawing.Size(16, 13)
         Me.lblAxisTo.TabIndex = 18
         Me.lblAxisTo.Text = "to"
+        Me.lblAxisTo.Visible = False
         '
         'txtCurveLabel
         '
@@ -255,7 +267,7 @@ Partial Class frmGraphEditor
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtCurveLabel.Location = New System.Drawing.Point(81, 36)
         Me.txtCurveLabel.Name = "txtCurveLabel"
-        Me.txtCurveLabel.Size = New System.Drawing.Size(373, 20)
+        Me.txtCurveLabel.Size = New System.Drawing.Size(376, 20)
         Me.txtCurveLabel.TabIndex = 16
         '
         'lblCurveLabel
@@ -553,7 +565,7 @@ Partial Class frmGraphEditor
         Me.tabCurves.Controls.Add(Me.radioCurveYaxisRight)
         Me.tabCurves.Controls.Add(Me.radioCurveYaxisLeft)
         Me.tabCurves.Controls.Add(Me.lblCurveWidth)
-        Me.tabCurves.Controls.Add(Me.cboWhichCurve)
+        Me.tabCurves.Controls.Add(Me.comboWhichCurve)
         Me.tabCurves.Controls.Add(Me.txtCurveWidth)
         Me.tabCurves.Controls.Add(Me.txtCurveColor)
         Me.tabCurves.Controls.Add(Me.lblCurve)
@@ -697,7 +709,7 @@ Partial Class frmGraphEditor
         Me.grpLineYconstant.Controls.Add(Me.lblLineYconstant)
         Me.grpLineYconstant.Controls.Add(Me.txtLineYconstant)
         Me.grpLineYconstant.Controls.Add(Me.btnLineConstantYAdd)
-        Me.grpLineYconstant.Location = New System.Drawing.Point(3, 62)
+        Me.grpLineYconstant.Location = New System.Drawing.Point(3, 3)
         Me.grpLineYconstant.Name = "grpLineYconstant"
         Me.grpLineYconstant.Size = New System.Drawing.Size(301, 53)
         Me.grpLineYconstant.TabIndex = 19
@@ -718,7 +730,7 @@ Partial Class frmGraphEditor
         Me.txtLineYconstant.Location = New System.Drawing.Point(44, 21)
         Me.txtLineYconstant.Name = "txtLineYconstant"
         Me.txtLineYconstant.Size = New System.Drawing.Size(54, 20)
-        Me.txtLineYconstant.TabIndex = 12
+        Me.txtLineYconstant.TabIndex = 0
         Me.txtLineYconstant.Text = "1"
         Me.txtLineYconstant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
@@ -728,7 +740,7 @@ Partial Class frmGraphEditor
         Me.btnLineConstantYAdd.Location = New System.Drawing.Point(220, 19)
         Me.btnLineConstantYAdd.Name = "btnLineConstantYAdd"
         Me.btnLineConstantYAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btnLineConstantYAdd.TabIndex = 14
+        Me.btnLineConstantYAdd.TabIndex = 3
         Me.btnLineConstantYAdd.Text = "Add"
         Me.btnLineConstantYAdd.UseVisualStyleBackColor = True
         '
@@ -739,7 +751,7 @@ Partial Class frmGraphEditor
         Me.grpLineEquation.Controls.Add(Me.lblLineYEquation)
         Me.grpLineEquation.Controls.Add(Me.lblLineXplus)
         Me.grpLineEquation.Controls.Add(Me.txtLineBcoef)
-        Me.grpLineEquation.Location = New System.Drawing.Point(3, 3)
+        Me.grpLineEquation.Location = New System.Drawing.Point(3, 62)
         Me.grpLineEquation.Name = "grpLineEquation"
         Me.grpLineEquation.Size = New System.Drawing.Size(301, 53)
         Me.grpLineEquation.TabIndex = 18
@@ -752,7 +764,7 @@ Partial Class frmGraphEditor
         Me.btnLineEquationAdd.Location = New System.Drawing.Point(220, 19)
         Me.btnLineEquationAdd.Name = "btnLineEquationAdd"
         Me.btnLineEquationAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btnLineEquationAdd.TabIndex = 11
+        Me.btnLineEquationAdd.TabIndex = 13
         Me.btnLineEquationAdd.Text = "Add"
         Me.btnLineEquationAdd.UseVisualStyleBackColor = True
         '
@@ -761,7 +773,7 @@ Partial Class frmGraphEditor
         Me.txtLineAcoef.Location = New System.Drawing.Point(44, 21)
         Me.txtLineAcoef.Name = "txtLineAcoef"
         Me.txtLineAcoef.Size = New System.Drawing.Size(54, 20)
-        Me.txtLineAcoef.TabIndex = 0
+        Me.txtLineAcoef.TabIndex = 11
         Me.txtLineAcoef.Text = "1"
         Me.txtLineAcoef.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
@@ -788,12 +800,15 @@ Partial Class frmGraphEditor
         Me.txtLineBcoef.Location = New System.Drawing.Point(150, 21)
         Me.txtLineBcoef.Name = "txtLineBcoef"
         Me.txtLineBcoef.Size = New System.Drawing.Size(54, 20)
-        Me.txtLineBcoef.TabIndex = 3
+        Me.txtLineBcoef.TabIndex = 12
         Me.txtLineBcoef.Text = "0"
         Me.txtLineBcoef.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'tabLegend
         '
+        Me.tabLegend.Controls.Add(Me.lblLegendClick)
+        Me.tabLegend.Controls.Add(Me.lblLegendLocation)
+        Me.tabLegend.Controls.Add(Me.comboLegendLocation)
         Me.tabLegend.Location = New System.Drawing.Point(4, 22)
         Me.tabLegend.Name = "tabLegend"
         Me.tabLegend.Size = New System.Drawing.Size(460, 186)
@@ -801,14 +816,53 @@ Partial Class frmGraphEditor
         Me.tabLegend.Text = "Legend"
         Me.tabLegend.UseVisualStyleBackColor = True
         '
+        'lblLegendLocation
+        '
+        Me.lblLegendLocation.AutoSize = True
+        Me.lblLegendLocation.Location = New System.Drawing.Point(6, 12)
+        Me.lblLegendLocation.Name = "lblLegendLocation"
+        Me.lblLegendLocation.Size = New System.Drawing.Size(48, 13)
+        Me.lblLegendLocation.TabIndex = 13
+        Me.lblLegendLocation.Text = "Location"
+        '
+        'comboLegendLocation
+        '
+        Me.comboLegendLocation.FormattingEnabled = True
+        Me.comboLegendLocation.Items.AddRange(New Object() {"None", "Bottom", "BottomCenter", "BottomFlushLeft", "Float", "InsideBotLeft", "InsideBotRight", "InsideTopLeft", "InsideTopRight", "Left", "Right", "Top", "TopCenter", "TopFlushLeft"})
+        Me.comboLegendLocation.Location = New System.Drawing.Point(81, 9)
+        Me.comboLegendLocation.Name = "comboLegendLocation"
+        Me.comboLegendLocation.Size = New System.Drawing.Size(121, 21)
+        Me.comboLegendLocation.TabIndex = 0
+        '
         'tabText
         '
+        Me.tabText.Controls.Add(Me.comboWhichText)
+        Me.tabText.Controls.Add(Me.btnTextAdd)
+        Me.tabText.Controls.Add(Me.txtText)
         Me.tabText.Location = New System.Drawing.Point(4, 22)
         Me.tabText.Name = "tabText"
         Me.tabText.Size = New System.Drawing.Size(460, 186)
         Me.tabText.TabIndex = 3
         Me.tabText.Text = "Text"
         Me.tabText.UseVisualStyleBackColor = True
+        '
+        'btnTextAdd
+        '
+        Me.btnTextAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnTextAdd.Location = New System.Drawing.Point(382, 156)
+        Me.btnTextAdd.Name = "btnTextAdd"
+        Me.btnTextAdd.Size = New System.Drawing.Size(75, 23)
+        Me.btnTextAdd.TabIndex = 11
+        Me.btnTextAdd.Text = "Add"
+        Me.btnTextAdd.UseVisualStyleBackColor = True
+        '
+        'txtText
+        '
+        Me.txtText.Location = New System.Drawing.Point(3, 36)
+        Me.txtText.Multiline = True
+        Me.txtText.Name = "txtText"
+        Me.txtText.Size = New System.Drawing.Size(454, 114)
+        Me.txtText.TabIndex = 0
         '
         'chkAutoApply
         '
@@ -820,6 +874,26 @@ Partial Class frmGraphEditor
         Me.chkAutoApply.TabIndex = 34
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
+        '
+        'lblLegendClick
+        '
+        Me.lblLegendClick.AutoSize = True
+        Me.lblLegendClick.Location = New System.Drawing.Point(208, 12)
+        Me.lblLegendClick.Name = "lblLegendClick"
+        Me.lblLegendClick.Size = New System.Drawing.Size(170, 13)
+        Me.lblLegendClick.TabIndex = 14
+        Me.lblLegendClick.Text = "(Or click on graph to place legend)"
+        '
+        'comboWhichText
+        '
+        Me.comboWhichText.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.comboWhichText.FormattingEnabled = True
+        Me.comboWhichText.Location = New System.Drawing.Point(81, 9)
+        Me.comboWhichText.Name = "comboWhichText"
+        Me.comboWhichText.Size = New System.Drawing.Size(376, 21)
+        Me.comboWhichText.TabIndex = 12
+        Me.toolTip1.SetToolTip(Me.comboWhichText, "Select which curve to edit")
         '
         'frmGraphEditor
         '
@@ -846,6 +920,10 @@ Partial Class frmGraphEditor
         Me.grpLineYconstant.PerformLayout()
         Me.grpLineEquation.ResumeLayout(False)
         Me.grpLineEquation.PerformLayout()
+        Me.tabLegend.ResumeLayout(False)
+        Me.tabLegend.PerformLayout()
+        Me.tabText.ResumeLayout(False)
+        Me.tabText.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -856,7 +934,7 @@ Partial Class frmGraphEditor
     Private WithEvents lblAxisDataRange As System.Windows.Forms.Label
     Private WithEvents txtCurveColor As System.Windows.Forms.TextBox
     Private WithEvents lblCurveColor As System.Windows.Forms.Label
-    Private WithEvents cboWhichCurve As System.Windows.Forms.ComboBox
+    Private WithEvents comboWhichCurve As System.Windows.Forms.ComboBox
     Private WithEvents txtAxisMinorGridColor As System.Windows.Forms.TextBox
     Private WithEvents lblAxisMinorGrid As System.Windows.Forms.Label
     Private WithEvents txtAxisMajorGridColor As System.Windows.Forms.TextBox
@@ -919,4 +997,10 @@ Partial Class frmGraphEditor
     Private WithEvents lblCurveSymbolSize As System.Windows.Forms.Label
     Private WithEvents txtCurveSymbolSize As System.Windows.Forms.TextBox
     Friend WithEvents cboCurveSymbolType As System.Windows.Forms.ComboBox
+    Private WithEvents lblLegendLocation As System.Windows.Forms.Label
+    Friend WithEvents comboLegendLocation As System.Windows.Forms.ComboBox
+    Private WithEvents btnTextAdd As System.Windows.Forms.Button
+    Friend WithEvents txtText As System.Windows.Forms.TextBox
+    Private WithEvents lblLegendClick As System.Windows.Forms.Label
+    Private WithEvents comboWhichText As System.Windows.Forms.ComboBox
 End Class

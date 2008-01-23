@@ -66,10 +66,10 @@ Public Class atcGraphPlugin
                     If lItemIndex > -1 Then .SetItemChecked(lItemIndex, True)
                 Next
 
-                lChooseForm.atcDataGroupDates.DataGroup = lDataGroup
+                'lChooseForm.atcDataGroupDates.DataGroup = lDataGroup
 
                 If lChooseForm.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                    lDataGroup = lChooseForm.atcDataGroupDates.CreateSelectedDataGroupSubset
+                    'lDataGroup = lChooseForm.atcDataGroupDates.CreateSelectedDataGroupSubset
                     Dim lAllCheckedItemNames As String = ""
                     For Each lGraphTypeName As String In .CheckedItems
                         lAllCheckedItemNames &= lGraphTypeName & ","
