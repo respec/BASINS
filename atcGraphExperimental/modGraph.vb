@@ -147,7 +147,7 @@ Public Module modGraph
             Dim lYAxisName As String = lTimeseries.Attributes.GetValue("YAxis", "")
             If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
                 lYAxisName = "LEFT" 'Default to left Y axis
-                'Use the same Y axis as existing curve with same constituent
+                'Look for existing curve with same constituent and use the same Y axis
                 Dim lFoundMatchingCons As Boolean = False
                 Dim lOldCons As String
                 Dim lOldCurve As LineItem
@@ -193,12 +193,13 @@ Public Module modGraph
             lPaneMain.XAxis.Title.Text &= " " & lCommonScenario
         End If
 
-        If lCommonConstituent.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonConstituent) Then
-            lPaneMain.XAxis.Title.Text &= " " & lCommonConstituent
+        If lCommonConstituent.Length > 0 AndAlso Not lPaneMain.YAxis.Title.Text.Contains(lCommonConstituent) Then
+            lPaneMain.YAxis.Title.Text &= " " & lCommonConstituent
         End If
 
         If lCommonLocation.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonLocation) Then
-            lPaneMain.XAxis.Title.Text &= " at " & lCommonLocation
+            If lPaneMain.XAxis.Title.Text.Length > 0 Then lPaneMain.XAxis.Title.Text &= " at "
+            lPaneMain.XAxis.Title.Text &= lCommonLocation
         End If
 
         If lLeftDataSets.Count > 0 Then
@@ -332,7 +333,8 @@ Public Module modGraph
                 lCurveLabel &= .GetValue("Constituent", "") & " "
             End If
             If aCommonLocation Is Nothing OrElse aCommonLocation.Length = 0 Then
-                lCurveLabel &= "at " & .GetValue("Location", "")
+                If lCurveLabel.Length > 0 Then lCurveLabel &= "at "
+                lCurveLabel &= .GetValue("Location", "")
             End If
 
             Return lCurveLabel.TrimEnd '.GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
