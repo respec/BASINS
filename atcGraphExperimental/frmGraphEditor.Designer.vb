@@ -35,6 +35,7 @@ Partial Class frmGraphEditor
         Me.lblAxisRange = New System.Windows.Forms.Label
         Me.txtCurveWidth = New System.Windows.Forms.TextBox
         Me.txtCurveSymbolSize = New System.Windows.Forms.TextBox
+        Me.comboWhichText = New System.Windows.Forms.ComboBox
         Me.lblAxisMinorGrid = New System.Windows.Forms.Label
         Me.lblAxisMajorGrid = New System.Windows.Forms.Label
         Me.lblAxisTo = New System.Windows.Forms.Label
@@ -88,14 +89,17 @@ Partial Class frmGraphEditor
         Me.lblLineXplus = New System.Windows.Forms.Label
         Me.txtLineBcoef = New System.Windows.Forms.TextBox
         Me.tabLegend = New System.Windows.Forms.TabPage
+        Me.btnLegendFont = New System.Windows.Forms.Button
+        Me.lblLegendClickToPlace = New System.Windows.Forms.Label
         Me.lblLegendLocation = New System.Windows.Forms.Label
         Me.comboLegendLocation = New System.Windows.Forms.ComboBox
         Me.tabText = New System.Windows.Forms.TabPage
+        Me.lblTextClickToPlace = New System.Windows.Forms.Label
+        Me.btnTextFont = New System.Windows.Forms.Button
+        Me.btnTextRemove = New System.Windows.Forms.Button
         Me.btnTextAdd = New System.Windows.Forms.Button
         Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
-        Me.lblLegendClick = New System.Windows.Forms.Label
-        Me.comboWhichText = New System.Windows.Forms.ComboBox
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelAxisType.SuspendLayout()
@@ -232,6 +236,17 @@ Partial Class frmGraphEditor
         Me.txtCurveSymbolSize.Size = New System.Drawing.Size(47, 20)
         Me.txtCurveSymbolSize.TabIndex = 47
         Me.toolTip1.SetToolTip(Me.txtCurveSymbolSize, "Width of curve")
+        '
+        'comboWhichText
+        '
+        Me.comboWhichText.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.comboWhichText.FormattingEnabled = True
+        Me.comboWhichText.Location = New System.Drawing.Point(81, 9)
+        Me.comboWhichText.Name = "comboWhichText"
+        Me.comboWhichText.Size = New System.Drawing.Size(376, 21)
+        Me.comboWhichText.TabIndex = 12
+        Me.toolTip1.SetToolTip(Me.comboWhichText, "Select which curve to edit")
         '
         'lblAxisMinorGrid
         '
@@ -806,7 +821,8 @@ Partial Class frmGraphEditor
         '
         'tabLegend
         '
-        Me.tabLegend.Controls.Add(Me.lblLegendClick)
+        Me.tabLegend.Controls.Add(Me.btnLegendFont)
+        Me.tabLegend.Controls.Add(Me.lblLegendClickToPlace)
         Me.tabLegend.Controls.Add(Me.lblLegendLocation)
         Me.tabLegend.Controls.Add(Me.comboLegendLocation)
         Me.tabLegend.Location = New System.Drawing.Point(4, 22)
@@ -815,6 +831,25 @@ Partial Class frmGraphEditor
         Me.tabLegend.TabIndex = 4
         Me.tabLegend.Text = "Legend"
         Me.tabLegend.UseVisualStyleBackColor = True
+        '
+        'btnLegendFont
+        '
+        Me.btnLegendFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnLegendFont.Location = New System.Drawing.Point(220, 156)
+        Me.btnLegendFont.Name = "btnLegendFont"
+        Me.btnLegendFont.Size = New System.Drawing.Size(75, 23)
+        Me.btnLegendFont.TabIndex = 15
+        Me.btnLegendFont.Text = "Font"
+        Me.btnLegendFont.UseVisualStyleBackColor = True
+        '
+        'lblLegendClickToPlace
+        '
+        Me.lblLegendClickToPlace.AutoSize = True
+        Me.lblLegendClickToPlace.Location = New System.Drawing.Point(208, 12)
+        Me.lblLegendClickToPlace.Name = "lblLegendClickToPlace"
+        Me.lblLegendClickToPlace.Size = New System.Drawing.Size(170, 13)
+        Me.lblLegendClickToPlace.TabIndex = 14
+        Me.lblLegendClickToPlace.Text = "(Or click on graph to place legend)"
         '
         'lblLegendLocation
         '
@@ -836,6 +871,9 @@ Partial Class frmGraphEditor
         '
         'tabText
         '
+        Me.tabText.Controls.Add(Me.lblTextClickToPlace)
+        Me.tabText.Controls.Add(Me.btnTextFont)
+        Me.tabText.Controls.Add(Me.btnTextRemove)
         Me.tabText.Controls.Add(Me.comboWhichText)
         Me.tabText.Controls.Add(Me.btnTextAdd)
         Me.tabText.Controls.Add(Me.txtText)
@@ -845,6 +883,35 @@ Partial Class frmGraphEditor
         Me.tabText.TabIndex = 3
         Me.tabText.Text = "Text"
         Me.tabText.UseVisualStyleBackColor = True
+        '
+        'lblTextClickToPlace
+        '
+        Me.lblTextClickToPlace.AutoSize = True
+        Me.lblTextClickToPlace.Location = New System.Drawing.Point(3, 161)
+        Me.lblTextClickToPlace.Name = "lblTextClickToPlace"
+        Me.lblTextClickToPlace.Size = New System.Drawing.Size(116, 13)
+        Me.lblTextClickToPlace.TabIndex = 15
+        Me.lblTextClickToPlace.Text = "Click on graph to place"
+        '
+        'btnTextFont
+        '
+        Me.btnTextFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnTextFont.Location = New System.Drawing.Point(220, 156)
+        Me.btnTextFont.Name = "btnTextFont"
+        Me.btnTextFont.Size = New System.Drawing.Size(75, 23)
+        Me.btnTextFont.TabIndex = 14
+        Me.btnTextFont.Text = "Font"
+        Me.btnTextFont.UseVisualStyleBackColor = True
+        '
+        'btnTextRemove
+        '
+        Me.btnTextRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnTextRemove.Location = New System.Drawing.Point(301, 156)
+        Me.btnTextRemove.Name = "btnTextRemove"
+        Me.btnTextRemove.Size = New System.Drawing.Size(75, 23)
+        Me.btnTextRemove.TabIndex = 13
+        Me.btnTextRemove.Text = "Remove"
+        Me.btnTextRemove.UseVisualStyleBackColor = True
         '
         'btnTextAdd
         '
@@ -874,26 +941,6 @@ Partial Class frmGraphEditor
         Me.chkAutoApply.TabIndex = 34
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
-        '
-        'lblLegendClick
-        '
-        Me.lblLegendClick.AutoSize = True
-        Me.lblLegendClick.Location = New System.Drawing.Point(208, 12)
-        Me.lblLegendClick.Name = "lblLegendClick"
-        Me.lblLegendClick.Size = New System.Drawing.Size(170, 13)
-        Me.lblLegendClick.TabIndex = 14
-        Me.lblLegendClick.Text = "(Or click on graph to place legend)"
-        '
-        'comboWhichText
-        '
-        Me.comboWhichText.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.comboWhichText.FormattingEnabled = True
-        Me.comboWhichText.Location = New System.Drawing.Point(81, 9)
-        Me.comboWhichText.Name = "comboWhichText"
-        Me.comboWhichText.Size = New System.Drawing.Size(376, 21)
-        Me.comboWhichText.TabIndex = 12
-        Me.toolTip1.SetToolTip(Me.comboWhichText, "Select which curve to edit")
         '
         'frmGraphEditor
         '
@@ -1001,6 +1048,10 @@ Partial Class frmGraphEditor
     Friend WithEvents comboLegendLocation As System.Windows.Forms.ComboBox
     Private WithEvents btnTextAdd As System.Windows.Forms.Button
     Friend WithEvents txtText As System.Windows.Forms.TextBox
-    Private WithEvents lblLegendClick As System.Windows.Forms.Label
+    Private WithEvents lblLegendClickToPlace As System.Windows.Forms.Label
     Private WithEvents comboWhichText As System.Windows.Forms.ComboBox
+    Private WithEvents btnTextRemove As System.Windows.Forms.Button
+    Private WithEvents btnTextFont As System.Windows.Forms.Button
+    Private WithEvents lblTextClickToPlace As System.Windows.Forms.Label
+    Private WithEvents btnLegendFont As System.Windows.Forms.Button
 End Class

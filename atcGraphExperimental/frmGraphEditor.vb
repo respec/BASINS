@@ -41,6 +41,7 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub SetComboFromTexts()
+        comboWhichText.Items.Clear()
         For Each lItem As ZedGraph.GraphObj In pPane.GraphObjList
             If lItem.GetType.Name = "TextObj" Then
                 Dim lText As TextObj = lItem
@@ -328,6 +329,18 @@ Public Class frmGraphEditor
                 End With
                 comboLegendLocation.Text = "Float"
                 RaiseEvent Apply()
+            Case "Text"
+                If txtText.Text.Length > 0 Then
+                    Dim lText As TextObj = FindTextObject(txtText.Text)
+                    If lText Is Nothing Then
+                        btnTextAdd_Click(Nothing, Nothing)
+                        lText = FindTextObject(txtText.Text)
+                    End If
+                    If Not lText Is Nothing Then
+                        lText.Location = New Location(e.X / pZgc.Width, e.Y / pZgc.Height, CoordType.PaneFraction)
+                        RaiseEvent Apply()
+                    End If
+                End If
         End Select
     End Sub
 
@@ -386,23 +399,85 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub btnTextAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextAdd.Click
-        Dim lText As New TextObj("Confidential", 0.85, -0.03)
+        Dim lText As New TextObj(txtText.Text, 0.5, 0.2)
         lText.Location.CoordinateFrame = CoordType.PaneFraction
-        '// rotate the text 15 degrees
-        'text.FontSpec.Angle = 15.0F;
-        '// Text will be red, bold, and 16 point
-        'text.FontSpec.FontColor = Color.Red;
-        'text.FontSpec.IsBold = true;
-        'text.FontSpec.Size = 16;
-        'Disable the border and background fill options for the text
+        lText.FontSpec.FontColor = Color.Black
+        lText.FontSpec.IsBold = True
+        lText.FontSpec.Size = 16
         lText.FontSpec.Border.IsVisible = False
         lText.FontSpec.Fill.IsVisible = False
         lText.Location.AlignH = AlignH.Left
         lText.Location.AlignV = AlignV.Top
         pPane.GraphObjList.Add(lText)
+        RaiseEvent Apply()
+        SetComboFromTexts()
+        comboWhichText.Text = lText.Text
     End Sub
 
     Private Sub comboWhichText_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles comboWhichText.SelectedIndexChanged
         txtText.Text = comboWhichText.Text
     End Sub
+
+    Private Function FindTextObject(ByVal aText As String) As TextObj
+        For Each lItem As ZedGraph.GraphObj In pPane.GraphObjList
+            If lItem.GetType.Name = "TextObj" Then
+                Dim lText As TextObj = lItem
+                If String.Compare(lText.Text, aText, True) = 0 Then Return lText
+            End If
+        Next
+        Return Nothing
+    End Function
+
+    Private Sub btnTextRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextRemove.Click
+        Dim lText As TextObj = FindTextObject(comboWhichText.Text)
+        If Not lText Is Nothing Then
+            pPane.GraphObjList.Remove(lText)
+            SetComboFromTexts()
+            If chkAutoApply.Checked Then RaiseEvent Apply()
+        End If
+    End Sub
+
+    Private Sub txtText_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtText.KeyUp
+        Dim lText As TextObj = FindTextObject(comboWhichText.Text)
+        If Not lText Is Nothing AndAlso lText.Text <> txtText.Text Then
+            lText.Text = txtText.Text
+            SetComboFromTexts()
+            If chkAutoApply.Checked Then RaiseEvent Apply()
+        End If
+    End Sub
+
+    Private Sub btnLegendFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLegendFont.Click
+        If UserEditFontSpec(pPane.Legend.FontSpec) Then
+            If chkAutoApply.Checked Then RaiseEvent Apply()
+        End If
+    End Sub
+
+    Private Sub btnTextFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextFont.Click
+        Dim lText As TextObj = FindTextObject(comboWhichText.Text)
+        If Not lText Is Nothing Then
+            If UserEditFontSpec(lText.FontSpec) Then
+                If chkAutoApply.Checked Then RaiseEvent Apply()
+            End If
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Use a FontDialog to edit a ZedGraph FontSpec
+    ''' </summary>
+    ''' <param name="aFontSpec"></param>
+    ''' <returns>True if font was edited, false if user cancelled</returns>
+    Private Function UserEditFontSpec(ByRef aFontSpec As FontSpec) As Boolean
+        Dim cdlg As New Windows.Forms.FontDialog
+        cdlg.Font = aFontSpec.GetFont(1)
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            With cdlg.Font
+                aFontSpec = New FontSpec( _
+                    .FontFamily.Name, .Size, aFontSpec.FontColor, _
+                    .Bold, .Italic, .Underline, _
+                    aFontSpec.Fill.Color, aFontSpec.Fill.Brush, aFontSpec.Fill.Type)
+            End With
+            Return True
+        End If
+        Return False
+    End Function
 End Class
