@@ -210,7 +210,7 @@ Public Class GisUtil
       ByVal aLayerIndex1 As Integer, ByVal aFeatureIndex1 As Integer, _
       ByVal aLayerIndex2 As Integer, ByVal aFeatureIndex2 As Integer) As Boolean
 
-        OverlappingPolygons = False
+        Dim lOverlappingPolygons As Boolean = False
 
         Dim lSf1 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex1)
         Dim lSf1Shape As MapWinGIS.Shape
@@ -233,18 +233,18 @@ Public Class GisUtil
                     For lIndex = 1 To lSf1Shape.numPoints
                         lX = lSf1Shape.Point(lIndex - 1).x
                         lY = lSf1Shape.Point(lIndex - 1).y
-                        OverlappingPolygons = lSf2.PointInShape(aFeatureIndex2, lX, lY)
-                        If OverlappingPolygons Then 'quit loop, we've found they overlap
+                        lOverlappingPolygons = lSf2.PointInShape(aFeatureIndex2, lX, lY)
+                        If lOverlappingPolygons Then 'quit loop, we've found they overlap
                             Exit For
                         End If
                     Next lIndex
 
-                    If Not OverlappingPolygons Then 'now check the opposite
+                    If Not lOverlappingPolygons Then 'now check the opposite
                         For lIndex = 1 To lSf2Shape.numPoints
                             lX = lSf2Shape.Point(lIndex - 1).x
                             lY = lSf2Shape.Point(lIndex - 1).y
-                            OverlappingPolygons = lSf1.PointInShape(aFeatureIndex1, lX, lY)
-                            If OverlappingPolygons Then 'quit loop, we've found they overlap
+                            lOverlappingPolygons = lSf1.PointInShape(aFeatureIndex1, lX, lY)
+                            If lOverlappingPolygons Then 'quit loop, we've found they overlap
                                 Exit For
                             End If
                         Next lIndex
@@ -252,6 +252,7 @@ Public Class GisUtil
                 End If
             End If
         End If
+        Return lOverlappingPolygons
     End Function
 
     ''' <summary>Given a line and a polygon, determine if any part of the line is in the polygon</summary>
@@ -278,16 +279,16 @@ Public Class GisUtil
         Dim lLineShape As MapWinGIS.Shape = lLineSf.Shape(aLineIndex - 1)
         Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
         Dim lX As Double, lY As Double
-
-        LineInPolygon = False
+        Dim lLineInPolygon As Integer = False
         For i As Integer = 1 To lLineShape.numPoints
             lX = lLineShape.Point(i - 1).x
             lY = lLineShape.Point(i - 1).y
-            LineInPolygon = lPolygonSf.PointInShape(aPolygonIndex, lX, lY)
-            If LineInPolygon Then 'point of line in polygon, true result
+            lLineInPolygon = lPolygonSf.PointInShape(aPolygonIndex, lX, lY)
+            If lLineInPolygon Then 'point of line in polygon, true result
                 Exit For
             End If
         Next i
+        Return lLineInPolygon
     End Function
 
     ''' <summary>given a polygon layer (like dem shape) and a containing layer (like subbasins), return which polygon in the containing layer each polygon lies within, determine if polygons overlap</summary>
@@ -309,8 +310,6 @@ Public Class GisUtil
         Dim lSf1 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         Dim lSf2 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndexContaining)
 
-        Dim lPointIndex As Integer
-        Dim lShapeIndex As Integer
         Dim lX As Double, lY As Double
         Dim lSf1Shape As New MapWinGIS.Shape
         Dim lNth As Integer
@@ -318,10 +317,10 @@ Public Class GisUtil
         ReDim aIndex(lSf1.NumShapes)
 
         lSf2.BeginPointInShapefile()
-        For lShapeIndex = 1 To lSf1.NumShapes
+        For lShapeIndex As Integer = 1 To lSf1.NumShapes
             aIndex(lShapeIndex) = -1
             lSf1Shape = lSf1.Shape(lShapeIndex - 1)
-            For lPointIndex = 2 To lSf1Shape.numPoints
+            For lPointIndex As Integer = 2 To lSf1Shape.numPoints
                 lX = lSf1Shape.Point(lPointIndex - 1).x
                 lY = lSf1Shape.Point(lPointIndex - 1).y
                 lNth = lSf2.PointInShapefile(lX, lY)
@@ -570,10 +569,8 @@ Public Class GisUtil
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function GroupIndex(ByVal aGroupName As String) As Integer
         GroupIndex = 0
-        Dim i As Integer
-
-        For i = 0 To GetMappingObject.Layers.Groups.Count - 1
-            If UCase(GetMappingObject.Layers.Groups(i).Text) = UCase(aGroupName) Then
+        For i As Integer = 0 To GetMappingObject.Layers.Groups.Count - 1
+            If GetMappingObject.Layers.Groups(i).Text.ToUpper = aGroupName.ToUpper Then
                 Return i
             End If
         Next
@@ -677,6 +674,24 @@ Public Class GisUtil
         Return -1
     End Function
 
+    Public Shared Sub FindNearestPointAndLoc(ByRef aX As Double, ByRef aY As Double, _
+                                             ByVal aLineLayerIndex As Integer, ByVal aLineFeatureIndex As Integer)
+        Dim lPoint As New MapWinGIS.Point
+        lPoint.x = aX
+        lPoint.y = aY
+        Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLineLayerIndex)
+        If FeatureIndexValid(aLineFeatureIndex, lsf) Then
+            Dim lShape As MapWinGIS.Shape = lsf.Shape(aLineFeatureIndex)
+            Dim lPointOut As New MapWinGIS.Point
+            Dim lLocation As Integer
+            Dim lDistance As Double
+            MapWinGeoProc.Utils.FindNearestPointAndLoc(lPoint, lShape, lPointOut, lLocation, lDistance)
+            aX = lPointOut.x
+            aY = lPointOut.y
+        Else
+            Throw New ApplicationException("TODO:")
+        End If
+    End Sub
     ''' <summary>Minimum value in a grid from a LayerIndex</summary>
     ''' <param name="aLayerIndex">
     '''     <para>Index of desired layer containing grid (defaults to Current Layer)</para>
@@ -1124,9 +1139,10 @@ Public Class GisUtil
     '''     <para>Name of layer to compare to layeres in project</para>
     ''' </param>
     Public Shared Function IsLayer(ByVal aLayerName As String) As Boolean
+        Dim lLayerName As String = aLayerName.ToUpper
         For i As Integer = 0 To GetMappingObject.Layers.NumLayers - 1
             Try
-                If aLayerName = LayerFromIndex(i).Name Then
+                If lLayerName = LayerFromIndex(i).Name.ToUpper OrElse lLayerName = LayerFromIndex(i).FileName.ToUpper Then
                     Return True
                 End If
             Catch
