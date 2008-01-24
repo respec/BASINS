@@ -34,6 +34,7 @@ Public Class atcGraphForm
     Friend WithEvents mnuViewHorizontalZoom As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditCopyMetafile As System.Windows.Forms.MenuItem
     Friend WithEvents mnuCoordinates As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuViewZoomAll As System.Windows.Forms.MenuItem
     Friend WithEvents mnuCoordinatesOnMenuBar As System.Windows.Forms.MenuItem
 
     Public Property Grapher() As clsGraphBase
@@ -132,9 +133,10 @@ Public Class atcGraphForm
         Me.mnuViewVerticalZoom = New System.Windows.Forms.MenuItem
         Me.mnuViewHorizontalZoom = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.mnuCoordinates = New System.Windows.Forms.MenuItem
         Me.mnuCoordinatesOnMenuBar = New System.Windows.Forms.MenuItem
+        Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.mnuViewZoomAll = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -198,7 +200,7 @@ Public Class atcGraphForm
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewVerticalZoom, Me.mnuViewHorizontalZoom})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewVerticalZoom, Me.mnuViewHorizontalZoom, Me.mnuViewZoomAll})
         Me.mnuView.Text = "View"
         '
         'mnuViewVerticalZoom
@@ -217,13 +219,6 @@ Public Class atcGraphForm
         Me.mnuAnalysis.Index = 3
         Me.mnuAnalysis.Text = "Analysis"
         '
-        'mnuHelp
-        '
-        Me.mnuHelp.Index = 5
-        Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
-        Me.mnuHelp.ShowShortcut = False
-        Me.mnuHelp.Text = "Help"
-        '
         'mnuCoordinates
         '
         Me.mnuCoordinates.Index = 4
@@ -235,6 +230,18 @@ Public Class atcGraphForm
         Me.mnuCoordinatesOnMenuBar.Checked = True
         Me.mnuCoordinatesOnMenuBar.Index = 0
         Me.mnuCoordinatesOnMenuBar.Text = "On Menu Bar"
+        '
+        'mnuHelp
+        '
+        Me.mnuHelp.Index = 5
+        Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
+        Me.mnuHelp.ShowShortcut = False
+        Me.mnuHelp.Text = "Help"
+        '
+        'mnuViewZoomAll
+        '
+        Me.mnuViewZoomAll.Index = 2
+        Me.mnuViewZoomAll.Text = "Zoom to All"
         '
         'atcGraphForm
         '
@@ -466,5 +473,9 @@ Public Class atcGraphForm
         FreeResources()
     End Sub
 
+    Private Sub mnuViewZoomAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewZoomAll.Click
+        pZgc.ZoomOutAll(Pane)
+        'TODO: test when Aux pane active
+    End Sub
 End Class
 

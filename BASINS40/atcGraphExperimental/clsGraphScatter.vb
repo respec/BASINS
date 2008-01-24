@@ -22,11 +22,13 @@ Public Class clsGraphScatter
                 Dim lTimeseriesX As atcTimeseries = newValue.ItemByIndex(0)
                 Dim lTimeseriesY As atcTimeseries = newValue.ItemByIndex(1)
                 Dim lPane As GraphPane = MyBase.pZgc.MasterPane.PaneList(0)
+                lPane.Legend.IsVisible = False
                 With lPane.XAxis
                     .Type = AxisType.Linear
                     .Scale.Min = lTimeseriesX.Attributes.GetValue("Min", 0)
                     .Scale.Max = lTimeseriesX.Attributes.GetValue("Max", 1000)
                     .Scale.MaxAuto = False
+                    .Title.Text = lTimeseriesX.ToString
                 End With
 
                 With lPane.YAxis
@@ -34,6 +36,7 @@ Public Class clsGraphScatter
                     .Scale.Min = lTimeseriesY.Attributes.GetValue("Min", 0)
                     .Scale.Max = lTimeseriesY.Attributes.GetValue("Max", 1000)
                     .Scale.MaxAuto = False
+                    .Title.Text = lTimeseriesY.ToString
                 End With
 
                 With lTimeseriesY.Attributes
@@ -51,7 +54,7 @@ Public Class clsGraphScatter
                     Else
                         lSymbol = SymbolType.Circle
                     End If
-                    lCurve = lPane.AddCurve(TSCurveLabel(lTimeseriesY), lXValues, lYValues, lCurveColor, lSymbol)
+                    lCurve = lPane.AddCurve("", lXValues, lYValues, lCurveColor, lSymbol)
                     If lNPts >= 1000 Then
                         lCurve.Symbol.Size = 1
                     ElseIf lNPts >= 100 Then

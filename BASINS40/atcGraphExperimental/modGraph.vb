@@ -87,10 +87,12 @@ Public Module modGraph
         Dim lCommonScenario As String = Nothing
         Dim lCommonLocation As String = Nothing
         Dim lCommonConstituent As String = Nothing
+        Dim lCommonUnits As String = Nothing
 
         Dim lScenario As String
         Dim lLocation As String
         Dim lConstituent As String
+        Dim lUnits As String
 
         Dim lYaxisNames As New atcCollection 'name for each item in aDataGroup
 
@@ -119,6 +121,7 @@ Public Module modGraph
                 lScenario = lTimeseries.Attributes.GetValue("Scenario", "")
                 lLocation = lTimeseries.Attributes.GetValue("Location", "")
                 lConstituent = lTimeseries.Attributes.GetValue("Constituent", "")
+                lUnits = lTimeseries.Attributes.GetValue("Units", "")
                 If String.Compare(lScenario, lCommonScenario, True) <> 0 Then
                     If lCommonScenario Is Nothing Then
                         lCommonScenario = lScenario
@@ -142,6 +145,15 @@ Public Module modGraph
                         lCommonConstituent = ""
                     End If
                 End If
+
+                If String.Compare(lUnits, lCommonUnits, True) <> 0 Then
+                    If lCommonUnits Is Nothing Then
+                        lCommonUnits = lUnits
+                    Else
+                        lCommonUnits = ""
+                    End If
+                End If
+
             End With
         Next
 
@@ -189,7 +201,7 @@ FoundMatch:
 
         For Each lTimeseries As atcTimeseries In aDataGroup
             Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
-            lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation)
+            lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
         Next
 
         If lCommonTimeUnitName.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonTimeUnitName) Then
@@ -197,7 +209,11 @@ FoundMatch:
         End If
 
         If lCommonScenario.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonScenario) Then
-            lPaneMain.XAxis.Title.Text &= " " & lCommonScenario
+            If lCommonConstituent.Length > 0 Then
+                lPaneMain.YAxis.Title.Text &= " " & lCommonScenario
+            Else
+                lPaneMain.XAxis.Title.Text &= " " & lCommonScenario
+            End If
         End If
 
         If lCommonConstituent.Length > 0 AndAlso Not lPaneMain.YAxis.Title.Text.Contains(lCommonConstituent) Then
@@ -207,6 +223,14 @@ FoundMatch:
         If lCommonLocation.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonLocation) Then
             If lPaneMain.XAxis.Title.Text.Length > 0 Then lPaneMain.XAxis.Title.Text &= " at "
             lPaneMain.XAxis.Title.Text &= lCommonLocation
+        End If
+
+        If lCommonUnits.Length > 0 AndAlso Not lPaneMain.YAxis.Title.Text.Contains(lCommonUnits) Then
+            If lPaneMain.YAxis.Title.Text.Length > 0 Then
+                lPaneMain.YAxis.Title.Text &= " (" & lCommonUnits & ")"
+            Else
+                lPaneMain.YAxis.Title.Text = lCommonUnits
+            End If
         End If
 
         If lLeftDataSets.Count > 0 Then
@@ -332,7 +356,8 @@ FoundMatch:
                         Optional ByVal aCommonTimeUnitName As String = Nothing, _
                         Optional ByVal aCommonScenario As String = Nothing, _
                         Optional ByVal aCommonConstituent As String = Nothing, _
-                        Optional ByVal aCommonLocation As String = Nothing) As String
+                        Optional ByVal aCommonLocation As String = Nothing, _
+                        Optional ByVal aCommonUnits As String = Nothing) As String
         With aTimeseries.Attributes
             Dim lCurveLabel As String = ""
 
@@ -351,6 +376,9 @@ FoundMatch:
             If aCommonLocation Is Nothing OrElse aCommonLocation.Length = 0 Then
                 If lCurveLabel.Length > 0 Then lCurveLabel &= "at "
                 lCurveLabel &= .GetValue("Location", "")
+            End If
+            If (aCommonUnits Is Nothing OrElse aCommonUnits.Length = 0) AndAlso .ContainsAttribute("Units") Then
+                lCurveLabel &= " (" & .GetValue("Units", "") & ")"
             End If
 
             Return lCurveLabel.TrimEnd '.GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")

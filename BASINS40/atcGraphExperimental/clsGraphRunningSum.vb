@@ -29,11 +29,9 @@ Public Class clsGraphRunningSum
                     Logger.Msg("Running Sum Calculation Failed")
                 End If
             Next
-            MyBase.Datasets = lRunningSums ' = lTsMath.DataSets?
-            For Each lTimeseries As atcTimeseries In Datasets
-                Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
-                lCurve.Label.Text = "Running Sum of " & lCurve.Label.Text
-            Next
+            MyBase.Datasets = lRunningSums
+            pZgc.MasterPane.PaneList(0).XAxis.Title.Text = "Running Sums"
+            AddTimeseriesCurves(Datasets, pZgc)
         End Set
     End Property
 End Class
