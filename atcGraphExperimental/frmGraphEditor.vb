@@ -36,18 +36,26 @@ Public Class frmGraphEditor
     Private Sub SetComboFromCurves()
         comboWhichCurve.Items.Clear()
         For Each lCurve As CurveItem In pPane.CurveList
-            comboWhichCurve.Items.Add(lCurve.Label.Text)
+            If lCurve.Label.Text.Length > 0 Then
+                comboWhichCurve.Items.Add(lCurve.Label.Text)
+            Else
+                comboWhichCurve.Items.Add(lCurve.Tag)
+            End If
         Next
     End Sub
 
     Private Sub SetComboFromTexts()
         comboWhichText.Items.Clear()
+        comboWhichText.Text = ""
         For Each lItem As ZedGraph.GraphObj In pPane.GraphObjList
             If lItem.GetType.Name = "TextObj" Then
                 Dim lText As TextObj = lItem
                 comboWhichText.Items.Add(lText.Text)
             End If
         Next
+        If comboWhichText.Items.Count > 0 Then
+            comboWhichText.SelectedIndex = comboWhichText.Items.Count - 1
+        End If
     End Sub
 
     Private Sub SetControlsFromPane()
@@ -59,6 +67,9 @@ Public Class frmGraphEditor
             Case Else
                 grpLineEquation.Visible = False
         End Select
+        chkLegendOutline.Checked = pPane.Legend.Border.IsVisible
+        txtLegendFontColor.BackColor = pPane.Legend.FontSpec.FontColor
+
     End Sub
 
     Private Function AxisFromCombo() As Axis
@@ -225,31 +236,46 @@ Public Class frmGraphEditor
 
     Private Sub SetLegendFromControls()
         With pPane.Legend
-            .IsVisible = comboLegendLocation.Text <> "None"
-            Select Case comboLegendLocation.Text
-                Case "Bottom" : .Position = LegendPos.Bottom
-                Case "BottomCenter" : .Position = LegendPos.BottomCenter
-                Case "BottomFlushLeft" : .Position = LegendPos.BottomFlushLeft
-                Case "Float" : .Position = LegendPos.Float
-                Case "InsideBotLeft" : .Position = LegendPos.InsideBotLeft
-                Case "InsideBotRight" : .Position = LegendPos.InsideBotRight
-                Case "InsideTopLeft" : .Position = LegendPos.InsideTopLeft
-                Case "InsideTopRight" : .Position = LegendPos.InsideTopRight
-                Case "Left" : .Position = LegendPos.Left
-                Case "Right" : .Position = LegendPos.Right
-                Case "Top" : .Position = LegendPos.Top
-                Case "TopCenter" : .Position = LegendPos.TopCenter
-                Case "TopFlushLeft" : .Position = LegendPos.TopFlushLeft
-            End Select
+            .Border.IsVisible = chkLegendOutline.Checked
+            .FontSpec.FontColor = txtLegendFontColor.BackColor
+            '.IsVisible = comboLegendLocation.Text <> "None"
+            'Select Case comboLegendLocation.Text
+            '    Case "Bottom" : .Position = LegendPos.Bottom
+            '    Case "BottomCenter" : .Position = LegendPos.BottomCenter
+            '    Case "BottomFlushLeft" : .Position = LegendPos.BottomFlushLeft
+            '    Case "Float" : .Position = LegendPos.Float
+            '    Case "InsideBotLeft" : .Position = LegendPos.InsideBotLeft
+            '    Case "InsideBotRight" : .Position = LegendPos.InsideBotRight
+            '    Case "InsideTopLeft" : .Position = LegendPos.InsideTopLeft
+            '    Case "InsideTopRight" : .Position = LegendPos.InsideTopRight
+            '    Case "Left" : .Position = LegendPos.Left
+            '    Case "Right" : .Position = LegendPos.Right
+            '    Case "Top" : .Position = LegendPos.Top
+            '    Case "TopCenter" : .Position = LegendPos.TopCenter
+            '    Case "TopFlushLeft" : .Position = LegendPos.TopFlushLeft
+            'End Select
         End With
     End Sub
 
     Private Sub btnApply_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnApply.Click
+        ApplyAll()
+    End Sub
+
+    Private Sub ApplyAll()
         SetAxisFromControls(AxisFromCombo())
+        SetLegendFromControls()
         If comboWhichCurve.SelectedIndex >= 0 Then
             SetCurveFromControls(pPane.CurveList(comboWhichCurve.SelectedIndex))
             SetComboFromCurves()
         End If
+
+        If txtText.Text.Length > 0 Then
+            Dim lText As TextObj = FindTextObject(txtText.Text)
+            If lText Is Nothing Then
+                AddTextFromControls
+            End If
+        End If
+
         RaiseEvent Apply()
     End Sub
 
@@ -258,7 +284,7 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub txtColor_Click(ByVal sender As Object, ByVal e As System.EventArgs) _
-        Handles txtAxisMinorGridColor.Click, txtAxisMajorGridColor.Click, txtCurveColor.Click
+        Handles txtAxisMinorGridColor.Click, txtAxisMajorGridColor.Click, txtCurveColor.Click, txtLegendFontColor.Click, txtTextColor.Click
         ChooseTextBoxBackColor(sender)
     End Sub
 
@@ -267,7 +293,7 @@ Public Class frmGraphEditor
         lColorDialog.Color = aTextBox.BackColor
         If lColorDialog.ShowDialog() = DialogResult.OK Then
             aTextBox.BackColor = lColorDialog.Color
-            If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
+            If chkAutoApply.Checked Then ApplyAll()
         End If
     End Sub
 
@@ -277,19 +303,20 @@ Public Class frmGraphEditor
         chkAxisMinorGridVisible.CheckedChanged, _
         chkAxisMinorTicsVisible.CheckedChanged, _
         chkCurveLineVisible.CheckedChanged, _
-        chkCurveSymbolVisible.CheckedChanged
+        chkCurveSymbolVisible.CheckedChanged, _
+        chkLegendOutline.CheckedChanged
 
-        If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
+        If chkAutoApply.Checked Then ApplyAll()
     End Sub
 
     Private Sub txtLabel_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
             txtAxisLabel.TextChanged, txtCurveLabel.TextChanged
-        If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
+        If chkAutoApply.Checked Then ApplyAll()
     End Sub
 
     Private Sub txtNumeric_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
               txtCurveWidth.TextChanged, txtCurveSymbolSize.TextChanged
-        If chkAutoApply.Checked AndAlso IsNumeric(sender.Text) Then btnApply_Click(Nothing, Nothing)
+        If chkAutoApply.Checked AndAlso IsNumeric(sender.Text) Then ApplyAll()
     End Sub
 
     Private Sub radioAxisLocation_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
@@ -304,7 +331,7 @@ Public Class frmGraphEditor
         If chkAutoApply.Checked Then
             Dim lRadio As RadioButton = sender
             If lRadio.Checked Then 'Only apply for newly checked, not also for unchecked
-                btnApply_Click(Nothing, Nothing)
+                ApplyAll()
             End If
         End If
     End Sub
@@ -316,7 +343,7 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub cboCurveAxis_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
+        If chkAutoApply.Checked Then ApplyAll()
     End Sub
 
     Private Sub pZgc_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pZgc.MouseClick
@@ -327,13 +354,13 @@ Public Class frmGraphEditor
                     .Location = New Location(e.X / pZgc.Width, e.Y / pZgc.Height, CoordType.PaneFraction)
                     .IsVisible = True
                 End With
-                comboLegendLocation.Text = "Float"
+                'comboLegendLocation.Text = "Float"
                 RaiseEvent Apply()
             Case "Text"
                 If txtText.Text.Length > 0 Then
                     Dim lText As TextObj = FindTextObject(txtText.Text)
                     If lText Is Nothing Then
-                        btnTextAdd_Click(Nothing, Nothing)
+                        AddTextFromControls()
                         lText = FindTextObject(txtText.Text)
                     End If
                     If Not lText Is Nothing Then
@@ -348,21 +375,25 @@ Public Class frmGraphEditor
         SetControlsMinMax(AxisFromCombo())
     End Sub
 
+    Private Sub AddedLineItem()
+        SetComboFromCurves()
+        tabsCategory.SelectTab(tabCurves)
+        comboWhichCurve.SelectedIndex = comboWhichCurve.Items.Count - 1
+        RaiseEvent Apply()
+    End Sub
+
     Private Sub btnLineEquationAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLineEquationAdd.Click
         Dim lNewLine As LineItem = AddLine(pPane, txtLineAcoef.Text, txtLineBcoef.Text, Drawing2D.DashStyle.Solid, "Y = " & txtLineAcoef.Text & " X + " & txtLineBcoef.Text)
-        SetComboFromCurves()
-        RaiseEvent Apply()
+        AddedLineItem()
     End Sub
 
     Private Sub btnLineConstantYAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLineConstantYAdd.Click
         Dim lNewLine As LineItem = AddLine(pPane, 0, txtLineYconstant.Text, Drawing2D.DashStyle.Solid, "Y = " & txtLineYconstant.Text)
-        SetComboFromCurves()
-        tabCurves.Select()
-        RaiseEvent Apply()
+        AddedLineItem()
     End Sub
 
     Private Sub cboCurveSymbolType_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboCurveSymbolType.SelectedIndexChanged
-        If chkAutoApply.Checked Then btnApply_Click(Nothing, Nothing)
+        If chkAutoApply.Checked Then ApplyAll()
     End Sub
 
     Private Sub txtAxisDisplayMinimum_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtAxisDisplayMinimum.TextChanged
@@ -391,17 +422,22 @@ Public Class frmGraphEditor
         End If
     End Sub
 
-    Private Sub comboLegendLocation_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles comboLegendLocation.SelectedIndexChanged
-        If chkAutoApply.Checked Then
-            SetLegendFromControls()
-            RaiseEvent Apply()
-        End If
-    End Sub
+    'Private Sub comboLegendLocation_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    If chkAutoApply.Checked Then
+    '        SetLegendFromControls()
+    '        RaiseEvent Apply()
+    '    End If
+    'End Sub
 
     Private Sub btnTextAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextAdd.Click
+        AddTextFromControls()
+        RaiseEvent Apply()
+    End Sub
+
+    Private Sub AddTextFromControls()
         Dim lText As New TextObj(txtText.Text, 0.5, 0.2)
         lText.Location.CoordinateFrame = CoordType.PaneFraction
-        lText.FontSpec.FontColor = Color.Black
+        lText.FontSpec.FontColor = txtTextColor.BackColor
         lText.FontSpec.IsBold = True
         lText.FontSpec.Size = 16
         lText.FontSpec.Border.IsVisible = False
@@ -409,13 +445,16 @@ Public Class frmGraphEditor
         lText.Location.AlignH = AlignH.Left
         lText.Location.AlignV = AlignV.Top
         pPane.GraphObjList.Add(lText)
-        RaiseEvent Apply()
         SetComboFromTexts()
         comboWhichText.Text = lText.Text
     End Sub
 
     Private Sub comboWhichText_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles comboWhichText.SelectedIndexChanged
         txtText.Text = comboWhichText.Text
+        Dim lText As TextObj = FindTextObject(comboWhichText.Text)
+        If Not lText Is Nothing Then
+            txtTextColor.BackColor = lText.FontSpec.FontColor
+        End If
     End Sub
 
     Private Function FindTextObject(ByVal aText As String) As TextObj
@@ -461,6 +500,7 @@ Public Class frmGraphEditor
         End If
     End Sub
 
+
     ''' <summary>
     ''' Use a FontDialog to edit a ZedGraph FontSpec
     ''' </summary>
@@ -480,4 +520,5 @@ Public Class frmGraphEditor
         End If
         Return False
     End Function
+
 End Class
