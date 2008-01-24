@@ -250,15 +250,15 @@ Friend Class frmSelectData
         '
         'atcSelectedDates
         '
+        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
         Me.atcSelectedDates.CommonEnd = 1.7976931348623157E+308
         Me.atcSelectedDates.CommonStart = -1.7976931348623157E+308
         Me.atcSelectedDates.DataGroup = Nothing
         Me.atcSelectedDates.FirstStart = 1.7976931348623157E+308
         Me.atcSelectedDates.LastEnd = -1.7976931348623157E+308
-        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
         Me.atcSelectedDates.Name = "atcSelectedDates"
-        Me.atcSelectedDates.OmitAfter = -4
-        Me.atcSelectedDates.OmitBefore = -4
+        Me.atcSelectedDates.OmitAfter = 0
+        Me.atcSelectedDates.OmitBefore = 0
         '
         'frmSelectData
         '
@@ -274,6 +274,7 @@ Friend Class frmSelectData
         Me.groupTop.ResumeLayout(False)
         Me.groupSelected.ResumeLayout(False)
         Me.pnlButtons.ResumeLayout(False)
+        Me.pnlButtons.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
