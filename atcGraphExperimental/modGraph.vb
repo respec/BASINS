@@ -406,6 +406,8 @@ FoundMatch:
 
     <CLSCompliant(False)> _
     Public Function CreateZgc(Optional ByVal aZgc As ZedGraphControl = Nothing, Optional ByVal aWidth As Integer = 600, Optional ByVal aHeight As Integer = 500) As ZedGraphControl
+        InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
+
         If Not aZgc Is Nothing AndAlso Not aZgc.IsDisposed Then
             aZgc.Dispose()
         End If

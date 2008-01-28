@@ -69,10 +69,10 @@ Public Class atcChooseDataGroupDates
 
     Private Function GetTextboxJdate(ByVal aTextbox As Windows.Forms.TextBox, ByVal aIntervalStart As Boolean) As Double
         Try
+            Dim lTextDate As String = aTextbox.Text
             Dim lDateArray(6) As Integer
-            If aTextbox.Text.Length > 3 Then
-
-                lDateArray(0) = CInt(aTextbox.Text.Substring(0, 4))
+            If lTextDate.Length > 3 Then
+                lDateArray(0) = StrFirstInt(lTextDate)
                 If aIntervalStart Then
                     lDateArray(1) = 1
                     lDateArray(2) = 1
@@ -85,16 +85,16 @@ Public Class atcChooseDataGroupDates
                 lDateArray(4) = 0
                 lDateArray(5) = 0
 
-                If aTextbox.Text.Length > 5 Then
-                    lDateArray(1) = StrFirstInt(aTextbox.Text.Substring(5))
+                If lTextDate.Length > 1 Then
+                    lTextDate = lTextDate.Substring(1)
+                    lDateArray(1) = StrFirstInt(lTextDate)
                 End If
 
-                Try
-                    Dim lDate As Date = Date.Parse(aTextbox.Text)
-                    lDateArray(1) = lDate.Month
-                    lDateArray(2) = lDate.Day
-                Catch
-                End Try
+                If lTextDate.Length > 1 Then
+                    lTextDate = lTextDate.Substring(1)
+                    lDateArray(2) = StrFirstInt(lTextDate)
+                End If
+
                 GetTextboxJdate = Date2J(lDateArray)
                 If aIntervalStart Then
                     If GetTextboxJdate < pFirstStart Then GetTextboxJdate = pFirstStart
