@@ -71,7 +71,7 @@ Public Class clsGraphProbability
         Dim lX(pNumProbabilityPoints) As Double
         Dim lLastIndex As Integer = lX.GetUpperBound(0)
         Dim lProbScale As ZedGraph.ProbabilityScale
-        Dim lPane As ZedGraph.GraphPane = MyBase.pZgc.MasterPane.PaneList(0)
+        Dim lPane As ZedGraph.GraphPane = pZgc.MasterPane.PaneList(0)
         With lPane.XAxis
             If .Type <> AxisType.Probability Then
                 .Type = AxisType.Probability
@@ -127,6 +127,18 @@ Public Class clsGraphProbability
         lCurve = lPane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
         lCurve.Line.Width = 1
         lCurve.Line.StepType = StepType.NonStep
+        SetYMax(lPane)
+    End Sub
+
+    Private Sub SetYMax(ByVal aPane As ZedGraph.GraphPane)
+        Dim lYMax As Double = 0.0001
+        For Each lCurve As ZedGraph.CurveItem In aPane.CurveList
+            For lPointIndex As Integer = 0 To lCurve.NPts - 1
+                lYMax = Math.Max(lYMax, lCurve.Points(lPointIndex).Y)
+            Next
+        Next
+        aPane.YAxis.Scale.MaxAuto = False
+        aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
     End Sub
 
     'Private Function Gausex(ByVal aExprob As Double) As Double

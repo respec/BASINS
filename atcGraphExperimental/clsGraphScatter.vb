@@ -25,16 +25,12 @@ Public Class clsGraphScatter
                 lPane.Legend.IsVisible = False
                 With lPane.XAxis
                     .Type = AxisType.Linear
-                    .Scale.Min = lTimeseriesX.Attributes.GetValue("Min", 0)
-                    .Scale.Max = lTimeseriesX.Attributes.GetValue("Max", 1000)
                     .Scale.MaxAuto = False
                     .Title.Text = lTimeseriesX.ToString
                 End With
 
                 With lPane.YAxis
                     .Type = AxisType.Linear
-                    .Scale.Min = lTimeseriesY.Attributes.GetValue("Min", 0)
-                    .Scale.Max = lTimeseriesY.Attributes.GetValue("Max", 1000)
                     .Scale.MaxAuto = False
                     .Title.Text = lTimeseriesY.ToString
                 End With
@@ -62,6 +58,9 @@ Public Class clsGraphScatter
                     End If
                     lCurve.Line.IsVisible = False
                 End With
+                ScaleAxis(newValue, lPane.YAxis)
+                lPane.XAxis.Scale.Min = lPane.YAxis.Scale.Min
+                lPane.XAxis.Scale.Max = lPane.YAxis.Scale.Max
             End If
             pZgc.Refresh()
         End Set
