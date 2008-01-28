@@ -164,11 +164,13 @@ FoundMatch:
                         Optional ByVal aCommonConstituent As String = Nothing, _
                         Optional ByVal aCommonLocation As String = Nothing, _
                         Optional ByVal aCommonUnits As String = Nothing)
-        If aCommonTimeUnitName.Length > 0 AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonTimeUnitName) Then
+        If Not aCommonTimeUnitName Is Nothing AndAlso aCommonTimeUnitName.Length > 0 _
+           AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonTimeUnitName) Then
             aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
         End If
 
-        If aCommonScenario.Length > 0 AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonScenario) Then
+        If Not aCommonScenario Is Nothing AndAlso aCommonScenario.Length > 0 _
+           AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonScenario) Then
             If aCommonConstituent.Length > 0 Then
                 aPane.YAxis.Title.Text &= " " & aCommonScenario
             Else
@@ -176,16 +178,19 @@ FoundMatch:
             End If
         End If
 
-        If aCommonConstituent.Length > 0 AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonConstituent) Then
+        If Not aCommonConstituent Is Nothing AndAlso aCommonConstituent.Length > 0 _
+           AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonConstituent) Then
             aPane.YAxis.Title.Text &= " " & aCommonConstituent
         End If
 
-        If aCommonLocation.Length > 0 AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonLocation) Then
+        If Not aCommonLocation Is Nothing AndAlso aCommonLocation.Length > 0 _
+           AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonLocation) Then
             If aPane.XAxis.Title.Text.Length > 0 Then aPane.XAxis.Title.Text &= " at "
             aPane.XAxis.Title.Text &= aCommonLocation
         End If
 
-        If aCommonUnits.Length > 0 AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonUnits) Then
+        If Not aCommonUnits Is Nothing AndAlso aCommonUnits.Length > 0 _
+           AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonUnits) Then
             If aPane.YAxis.Title.Text.Length > 0 Then
                 aPane.YAxis.Title.Text &= " (" & aCommonUnits & ")"
             Else
