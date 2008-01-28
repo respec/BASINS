@@ -103,7 +103,7 @@ Public Class atcDataGroup
         If Count > 0 Then
             Dim lRemoved As atcDataGroup = Me.Clone
             MyBase.Clear()
-            RaiseEvent Removed(lRemoved)
+            'RaiseEvent Removed(lRemoved)
         End If
     End Sub
 

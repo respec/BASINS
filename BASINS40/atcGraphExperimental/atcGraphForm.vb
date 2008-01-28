@@ -48,8 +48,6 @@ Public Class atcGraphForm
     End Property
 
     Private Sub InitMasterPane()
-        InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
-
         pZgc = CreateZgc()
         Me.Controls.Add(pZgc)
         With pZgc
