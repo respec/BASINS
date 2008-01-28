@@ -81,81 +81,21 @@ Public Module modGraph
     <CLSCompliant(False)> _
     Sub AddTimeseriesCurves(ByVal aDataGroup As atcDataGroup, ByVal aZgc As ZedGraphControl)
         Dim lPaneMain As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
-        Dim lCommonTimeUnits As Integer = 0
-        Dim lCommonTimeStep As Integer = 0
+        Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Units", -1)
+        Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
 
-        Dim lCommonScenario As String = Nothing
-        Dim lCommonLocation As String = Nothing
-        Dim lCommonConstituent As String = Nothing
-        Dim lCommonUnits As String = Nothing
+        Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")
+        Dim lCommonLocation As String = aDataGroup.CommonAttributeValue("Location", "")
+        Dim lCommonConstituent As String = aDataGroup.CommonAttributeValue("Constituent", "")
+        Dim lCommonUnits As String = aDataGroup.CommonAttributeValue("Units", "")
 
-        Dim lScenario As String
-        Dim lLocation As String
         Dim lConstituent As String
-        Dim lUnits As String
 
         Dim lYaxisNames As New atcCollection 'name for each item in aDataGroup
 
         Dim lLeftDataSets As New atcDataGroup
         Dim lRightDataSets As New atcDataGroup
         Dim lAuxDataSets As New atcDataGroup
-
-        For Each lTimeseries As atcTimeseries In aDataGroup
-            With lTimeseries.Attributes
-                Dim lTu As Integer = .GetValue("Time units", -1)
-                If lTu <> lCommonTimeUnits Then
-                    If lCommonTimeUnits = 0 Then
-                        lCommonTimeUnits = lTu
-                    Else
-                        lCommonTimeUnits = -1
-                    End If
-                End If
-                Dim lTs As Integer = .GetValue("Time Step", 1)
-                If lTs <> lCommonTimeStep Then
-                    If lCommonTimeStep = 0 Then
-                        lCommonTimeStep = lTs
-                    Else
-                        lCommonTimeStep = -1
-                    End If
-                End If
-                lScenario = lTimeseries.Attributes.GetValue("Scenario", "")
-                lLocation = lTimeseries.Attributes.GetValue("Location", "")
-                lConstituent = lTimeseries.Attributes.GetValue("Constituent", "")
-                lUnits = lTimeseries.Attributes.GetValue("Units", "")
-                If String.Compare(lScenario, lCommonScenario, True) <> 0 Then
-                    If lCommonScenario Is Nothing Then
-                        lCommonScenario = lScenario
-                    Else
-                        lCommonScenario = ""
-                    End If
-                End If
-
-                If String.Compare(lLocation, lCommonLocation, True) <> 0 Then
-                    If lCommonLocation Is Nothing Then
-                        lCommonLocation = lLocation
-                    Else
-                        lCommonLocation = ""
-                    End If
-                End If
-
-                If String.Compare(lConstituent, lCommonConstituent, True) <> 0 Then
-                    If lCommonConstituent Is Nothing Then
-                        lCommonConstituent = lConstituent
-                    Else
-                        lCommonConstituent = ""
-                    End If
-                End If
-
-                If String.Compare(lUnits, lCommonUnits, True) <> 0 Then
-                    If lCommonUnits Is Nothing Then
-                        lCommonUnits = lUnits
-                    Else
-                        lCommonUnits = ""
-                    End If
-                End If
-
-            End With
-        Next
 
         Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
 
@@ -204,43 +144,53 @@ FoundMatch:
             lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
         Next
 
-        If lCommonTimeUnitName.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonTimeUnitName) Then
-            lPaneMain.XAxis.Title.Text &= " " & lCommonTimeUnitName
-        End If
-
-        If lCommonScenario.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonScenario) Then
-            If lCommonConstituent.Length > 0 Then
-                lPaneMain.YAxis.Title.Text &= " " & lCommonScenario
-            Else
-                lPaneMain.XAxis.Title.Text &= " " & lCommonScenario
-            End If
-        End If
-
-        If lCommonConstituent.Length > 0 AndAlso Not lPaneMain.YAxis.Title.Text.Contains(lCommonConstituent) Then
-            lPaneMain.YAxis.Title.Text &= " " & lCommonConstituent
-        End If
-
-        If lCommonLocation.Length > 0 AndAlso Not lPaneMain.XAxis.Title.Text.Contains(lCommonLocation) Then
-            If lPaneMain.XAxis.Title.Text.Length > 0 Then lPaneMain.XAxis.Title.Text &= " at "
-            lPaneMain.XAxis.Title.Text &= lCommonLocation
-        End If
-
-        If lCommonUnits.Length > 0 AndAlso Not lPaneMain.YAxis.Title.Text.Contains(lCommonUnits) Then
-            If lPaneMain.YAxis.Title.Text.Length > 0 Then
-                lPaneMain.YAxis.Title.Text &= " (" & lCommonUnits & ")"
-            Else
-                lPaneMain.YAxis.Title.Text = lCommonUnits
-            End If
-        End If
-
         If lLeftDataSets.Count > 0 Then
-            ScaleYAxis(lLeftDataSets, lPaneMain.YAxis)
+            ScaleAxis(lLeftDataSets, lPaneMain.YAxis)
         End If
         If lRightDataSets.Count > 0 Then
-            ScaleYAxis(lRightDataSets, lPaneMain.Y2Axis)
+            ScaleAxis(lRightDataSets, lPaneMain.Y2Axis)
         End If
         If lAuxDataSets.Count > 0 Then
-            ScaleYAxis(lAuxDataSets, aZgc.MasterPane.PaneList(0).YAxis)
+            ScaleAxis(lAuxDataSets, aZgc.MasterPane.PaneList(0).YAxis)
+        End If
+
+        AxisTitlesFromCommonAttributes(lPaneMain, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
+    End Sub
+
+    <CLSCompliant(False)> _
+    Sub AxisTitlesFromCommonAttributes(ByVal aPane As GraphPane, _
+                        Optional ByVal aCommonTimeUnitName As String = Nothing, _
+                        Optional ByVal aCommonScenario As String = Nothing, _
+                        Optional ByVal aCommonConstituent As String = Nothing, _
+                        Optional ByVal aCommonLocation As String = Nothing, _
+                        Optional ByVal aCommonUnits As String = Nothing)
+        If aCommonTimeUnitName.Length > 0 AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonTimeUnitName) Then
+            aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
+        End If
+
+        If aCommonScenario.Length > 0 AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonScenario) Then
+            If aCommonConstituent.Length > 0 Then
+                aPane.YAxis.Title.Text &= " " & aCommonScenario
+            Else
+                aPane.XAxis.Title.Text &= " " & aCommonScenario
+            End If
+        End If
+
+        If aCommonConstituent.Length > 0 AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonConstituent) Then
+            aPane.YAxis.Title.Text &= " " & aCommonConstituent
+        End If
+
+        If aCommonLocation.Length > 0 AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonLocation) Then
+            If aPane.XAxis.Title.Text.Length > 0 Then aPane.XAxis.Title.Text &= " at "
+            aPane.XAxis.Title.Text &= aCommonLocation
+        End If
+
+        If aCommonUnits.Length > 0 AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonUnits) Then
+            If aPane.YAxis.Title.Text.Length > 0 Then
+                aPane.YAxis.Title.Text &= " (" & aCommonUnits & ")"
+            Else
+                aPane.YAxis.Title.Text = aCommonUnits
+            End If
         End If
     End Sub
 
@@ -253,7 +203,7 @@ FoundMatch:
         Return False
     End Function
 
-    Private Function TimeUnitName(ByVal aTimeUnits As Integer, Optional ByVal aTimeStep As Integer = 1) As String
+    Public Function TimeUnitName(ByVal aTimeUnits As Integer, Optional ByVal aTimeStep As Integer = 1) As String
         Dim lName As String = ""
         Select Case aTimeStep
             Case Is > 1 : lName = aTimeStep & "-"
@@ -576,11 +526,11 @@ FoundMatch:
     End Sub
 
     <CLSCompliant(False)> _
-    Public Sub ScaleYAxis(ByVal aDataGroup As atcDataGroup, ByVal aYAxis As Axis)
+    Public Sub ScaleAxis(ByVal aDataGroup As atcDataGroup, ByVal aAxis As Axis)
         Dim lDataMin As Double = 1.0E+30
         Dim lDataMax As Double = -1.0E+30
         Dim lLogFlag As Boolean = False
-        If aYAxis.Type = ZedGraph.AxisType.Log Then
+        If aAxis.Type = ZedGraph.AxisType.Log Then
             lLogFlag = True
         End If
 
@@ -590,7 +540,7 @@ FoundMatch:
             lValue = lTimeseries.Attributes.GetValue("Maximum")
             If lValue > lDataMax Then lDataMax = lValue
         Next
-        Scalit(lDataMin, lDataMax, lLogFlag, aYAxis.Scale.Min, aYAxis.Scale.Max)
+        Scalit(lDataMin, lDataMax, lLogFlag, aAxis.Scale.Min, aAxis.Scale.Max)
     End Sub
 
     ''' <summary>

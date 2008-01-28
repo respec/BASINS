@@ -281,6 +281,24 @@ Public Class atcDataGroup
         Return lSortedValues
     End Function
 
+    Public Function CommonAttributeValue(ByVal aAttributeName As String, Optional ByVal aMissingValue As Object = Nothing) As Object
+        Dim lSetValue As Boolean = False
+        CommonAttributeValue = Nothing
+        For Each ts As atcDataSet In Me
+            Dim lNewValue As Object = ts.Attributes.GetValue(aAttributeName, Nothing)
+            If Not lSetValue Then
+                CommonAttributeValue = lNewValue
+                lSetValue = True
+            Else
+                If CommonAttributeValue Is Nothing OrElse lNewValue Is Nothing Then
+                    Return aMissingValue
+                ElseIf CommonAttributeValue <> lNewValue Then
+                    Return aMissingValue
+                End If
+            End If
+        Next
+    End Function
+
     ''' <summary>Contents of this class expressed as a string.</summary>
     Public Shadows Function ToString() As String
         ToString = Count & " Data:"
