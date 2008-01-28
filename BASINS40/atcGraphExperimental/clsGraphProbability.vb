@@ -7,7 +7,7 @@ Imports ZedGraph
 Public Class clsGraphProbability
     Inherits clsGraphBase
 
-    Private pNumProbabilityPoints As Integer = 200
+    Private Const pNumProbabilityPoints As Integer = 200
 
     <CLSCompliant(False)> _
     Public Sub New(ByVal aDataGroup As atcDataGroup, ByVal aZedGraphControl As ZedGraphControl)
@@ -18,11 +18,19 @@ Public Class clsGraphProbability
         Get
             Return MyBase.Datasets
         End Get
-        Set(ByVal newValue As atcDataGroup)
-            MyBase.Datasets = newValue
-            For Each lTimeseries As atcTimeseries In newValue
-                AddDatasetCurve(lTimeseries)
+        Set(ByVal aDataGroup As atcDataGroup)
+            MyBase.Datasets = aDataGroup
+            Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Units", -1)
+            Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
+            Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")
+            Dim lCommonLocation As String = aDataGroup.CommonAttributeValue("Location", "")
+            Dim lCommonConstituent As String = aDataGroup.CommonAttributeValue("Constituent", "")
+            Dim lCommonUnits As String = aDataGroup.CommonAttributeValue("Units", "")
+            Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
+            For Each lTimeseries As atcTimeseries In aDataGroup
+                AddDatasetCurve(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
             Next
+            AxisTitlesFromCommonAttributes(pZgc.MasterPane.PaneList(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
             pZgc.Refresh()
         End Set
     End Property
@@ -57,17 +65,19 @@ Public Class clsGraphProbability
         pZgc.Refresh()
     End Sub
 
-    Private Sub AddDatasetCurve(ByVal aTimeseries As atcTimeseries)
+    Private Sub AddDatasetCurve(ByVal aTimeseries As atcTimeseries, _
+                        Optional ByVal aCommonTimeUnitName As String = Nothing, _
+                        Optional ByVal aCommonScenario As String = Nothing, _
+                        Optional ByVal aCommonConstituent As String = Nothing, _
+                        Optional ByVal aCommonLocation As String = Nothing, _
+                        Optional ByVal aCommonUnits As String = Nothing)
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
+        Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
         Dim lCurve As LineItem = Nothing
-        If pNumProbabilityPoints = 0 Then
-            'TODO: why is this needed?
-            pNumProbabilityPoints = 200
-        End If
+
         Dim lX(pNumProbabilityPoints) As Double
         Dim lLastIndex As Integer = lX.GetUpperBound(0)
         Dim lProbScale As ZedGraph.ProbabilityScale
