@@ -38,8 +38,10 @@ Public Class frmGraphEditor
         For Each lCurve As CurveItem In pPane.CurveList
             If lCurve.Label.Text.Length > 0 Then
                 comboWhichCurve.Items.Add(lCurve.Label.Text)
-            Else
+            ElseIf Not lCurve.Tag Is Nothing Then
                 comboWhichCurve.Items.Add(lCurve.Tag)
+            Else
+                comboWhichCurve.Items.Add("curve " & comboWhichCurve.Items.Count + 1)
             End If
         Next
     End Sub
