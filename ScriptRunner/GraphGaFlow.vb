@@ -39,7 +39,7 @@ Module GraphGaFlow
 
             GraphScatterBatch(lDataGroup)
             GraphDurationBatch(lDataGroup)
-            GraphTimeseriesBatch(lDataGroup, "Stanam")
+            GraphTimeseriesBatch(lDataGroup)
             GraphResidualBatch(lDataGroup)
             GraphCumDifBatch(lDataGroup)
         Else
@@ -47,37 +47,17 @@ Module GraphGaFlow
         End If
     End Sub
 
-    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup, ByVal aLabelAttribute As String)
+    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup)
         Dim lOutFileName As String = pBaseName
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
-        With lPane
-            ScaleYAxis(aDataGroup, .YAxis)
-            .YAxis.Title.Text = pBaseName & " (cfs)"
-            .YAxis.MajorGrid.IsVisible = True
-            .YAxis.MinorGrid.IsVisible = False
-            .XAxis.Title.Text = "Daily Mean Flow"
-            .XAxis.MajorTic.IsOutside = True
-            .XAxis.MajorGrid.IsVisible = True
-            Dim lIndex As Integer = 0
-            For Each lDataSet As atcDataSet In aDataGroup
-                'TODO: need better default label, old GenScn?
-                Dim lLabel As String = lDataSet.Attributes.GetDefinedValue(aLabelAttribute).Value
-                Dim lScenario As String = lDataSet.Attributes.GetDefinedValue("Scenario").Value
-                With .CurveList(lIndex)
-                    .Label.Text = lLabel
-                    .Color = GetMatchingColor()
-                End With
-                lIndex += 1
-            Next
-            lZgc.SaveIn(lOutFileName & ".png")
-            lZgc.SaveIn(lOutFileName & ".emf")
 
+        lZgc.SaveIn(lOutFileName & ".png")
+        lZgc.SaveIn(lOutFileName & ".emf")
+        With lPane
             .YAxis.Type = ZedGraph.AxisType.Log
-            ScaleYAxis(aDataGroup, .YAxis)
-            '.YAxis.Scale.Min = 100
-            '.YAxis.Scale.Max = pYMax
+            ScaleAxis(aDataGroup, .YAxis)
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
@@ -96,26 +76,7 @@ Module GraphGaFlow
         Dim lGrapher As New clsGraphScatter(aDataGroup, lZgc)
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
         With lPane
-            ScaleYAxis(aDataGroup, .YAxis)
-            With .YAxis
-                .Title.Text = "Norcross"
-                .Scale.IsUseTenPower = False
-                .Scale.MaxAuto = False
-                .MajorGrid.IsVisible = True
-                .MinorGrid.IsVisible = True
-            End With
-            .XAxis.Scale.Max = .YAxis.Scale.Max
-            .XAxis.Scale.Min = .YAxis.Scale.Min
-            With .XAxis
-                'TODO: figures out how to make whole title go below XAxis title
-                .Title.Text = "Buford" & vbCrLf & vbCrLf & _
-                              "Scatter Plot" & vbCrLf & _
-                              "Chattahoochee Flow (cfs)"
-                .Scale.IsUseTenPower = False
-                .Scale.MaxAuto = False
-                .MajorGrid.IsVisible = True
-                .MinorGrid.IsVisible = True
-            End With
+            ScaleAxis(aDataGroup, .YAxis)
             '45 degree line
             AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
             'regression line 
@@ -138,7 +99,7 @@ Module GraphGaFlow
             lZgc.SaveIn(lOutFileName & ".emf")
 
             .YAxis.Type = ZedGraph.AxisType.Log
-            ScaleYAxis(aDataGroup, .YAxis)
+            ScaleAxis(aDataGroup, .YAxis)
             .XAxis.Type = ZedGraph.AxisType.Log
             .XAxis.Scale.Min = .YAxis.Scale.Min
             .XAxis.Scale.Max = .YAxis.Scale.Max
@@ -158,58 +119,25 @@ Module GraphGaFlow
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphProbability(aDataGroup, lZgc)
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
-        With lPane
-            SetGraphSpecs(lZgc, "Buford", "Norcross")
-            .YAxis.Title.Text = pBaseName & " (cfs)"
-            .YAxis.Type = ZedGraph.AxisType.Log
-            ScaleYAxis(aDataGroup, .YAxis)
-            .YAxis.Scale.MaxAuto = False
-            .YAxis.Scale.IsUseTenPower = False
-            .XAxis.Title.Text = "Percent of Time " & pBaseName & " exceeded"
-        End With
         lZgc.SaveIn(lOutFileName & ".png")
         lZgc.SaveIn(lOutFileName & ".emf")
         lZgc.Dispose()
     End Sub
 
     Sub GraphResidualBatch(ByVal aDataGroup As atcDataGroup)
-        Dim lArgsMath As New atcDataAttributes
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-        lArgsMath.SetValue("timeseries", aDataGroup)
-        If lTsMath.Open("subtract", lArgsMath) Then
-            Dim lZgc As ZedGraphControl = CreateZgc()
-            Dim lGrapher As New clsGraphTime(lTsMath.DataSets, lZgc)
-            lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Residual"
-            Dim lOutFileName As String = pBaseName & "_residual"
-            lZgc.SaveIn(lOutFileName & ".png")
-            lZgc.SaveIn(lOutFileName & ".emf")
-            lZgc.Dispose()
-        Else
-            Logger.Dbg("ResidualGraph Calculation Failed")
-        End If
+        Dim lZgc As ZedGraphControl = CreateZgc()
+        Dim lGrapher As New clsGraphResidual(aDataGroup, lZgc)
+        Dim lOutFileName As String = pBaseName & "_residual"
+        lZgc.SaveIn(lOutFileName & ".png")
+        lZgc.SaveIn(lOutFileName & ".emf")
+        lZgc.Dispose()
     End Sub
 
     Sub GraphCumDifBatch(ByVal aDataGroup As atcDataGroup)
-        Dim lArgsMath As New atcDataAttributes
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-        lArgsMath.SetValue("timeseries", aDataGroup)
-        If lTsMath.Open("subtract", lArgsMath) Then
-            lArgsMath.Clear()
-            lArgsMath.SetValue("timeseries", lTsMath.DataSets)
-            Dim lTsRunSum As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-            If lTsRunSum.Open("running sum", lArgsMath) Then
-                Dim lZgc As ZedGraphControl = CreateZgc()
-                Dim lGrapher As New clsGraphTime(lTsRunSum.DataSets, lZgc)
-                lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Cummulative Difference"
-                Dim lOutFileName As String = pBaseName & "_cumDif"
-                lZgc.SaveIn(lOutFileName & ".png")
-                lZgc.SaveIn(lOutFileName & ".emf")
-                lZgc.Dispose()
-            Else
-                Logger.Dbg("CumulativeDifferenceGraph Accumulation Calculation Failed")
-            End If
-        Else
-            Logger.Dbg("CumulativeDifferenceGraph Difference Calculation Failed")
-        End If
+        Dim lZgc As ZedGraphControl = CreateZgc()
+        Dim lGrapher As New clsGraphCumulativeDifference(aDataGroup, lZgc)
+        Dim lOutFileName As String = pBaseName & "_cumDif"
+        lZgc.SaveIn(lOutFileName & ".png")
+        lZgc.SaveIn(lOutFileName & ".emf")
     End Sub
 End Module
