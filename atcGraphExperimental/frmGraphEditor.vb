@@ -513,10 +513,12 @@ Public Class frmGraphEditor
         cdlg.Font = aFontSpec.GetFont(1)
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             With cdlg.Font
+                Dim lBorder As ZedGraph.Border = aFontSpec.Border.Clone
                 aFontSpec = New FontSpec( _
                     .FontFamily.Name, .Size, aFontSpec.FontColor, _
                     .Bold, .Italic, .Underline, _
                     aFontSpec.Fill.Color, aFontSpec.Fill.Brush, aFontSpec.Fill.Type)
+                aFontSpec.Border = lBorder
             End With
             Return True
         End If

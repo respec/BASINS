@@ -233,11 +233,16 @@ FoundMatch:
     ''' <param name="aYAxisName">Y axis to use (LEFT, RIGHT, or AUX)</param>
     ''' <remarks></remarks>
     <CLSCompliant(False)> _
-    Function AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String) As CurveItem
+    Function AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String, _
+                        Optional ByVal aCommonTimeUnitName As String = Nothing, _
+                        Optional ByVal aCommonScenario As String = Nothing, _
+                        Optional ByVal aCommonConstituent As String = Nothing, _
+                        Optional ByVal aCommonLocation As String = Nothing, _
+                        Optional ByVal aCommonUnits As String = Nothing) As CurveItem
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
+        Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
 
         Dim lPane As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)

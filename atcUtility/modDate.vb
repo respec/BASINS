@@ -401,129 +401,129 @@ Public Module modDate
                    Format(d(5), "00")
     End Function
 
-    Public Sub DTMCMN(ByVal sdates() As Integer, ByVal edates() As Integer, _
-                      ByVal TSTEP() As Integer, ByVal TCODE() As Integer, _
-                      ByRef sdat() As Integer, ByRef edat() As Integer, _
-                      ByRef ts As Integer, ByRef tc As Integer, _
-                      ByRef retcod As Integer) 'tc As ATCTimeUnit
-        '##SUMMARY DTMCMN - determine the time period common to a number of pairs of dates. _
-        'also determines the smallest common time step and unit.
-        '##PARM sdates - input array of beginning dates
-        '##PARM edates - input array of ending dates
-        '##PARM tstep  - input array of time steps
-        '##PARM tcode  - input array of time units codes _
-        '1 - second        4 - day _
-        '2 - minute        5 - month _
-        '3 - hour          6 - year
-        '##PARM stat   - output common starting date
-        '##PARM edat   - output common ending date
-        '##PARM ts     - output smallest common time step
-        '##PARM tc     - output smallest common time units code
-        '##PARM retcod - output return code _
-        '0 - there is a common time period and time step and units _
-        '-1 - there is no common time period _
-        '-2 - there is a common time period, but the time step and _
-        'time units are not compatible
-        Dim tstepf, ndat, n, tcdcmp As Integer
-        '##LOCAL ndat   - number of dates to compare
-        '##LOCAL n      - index of date being compared
-        '##LOCAL tstepf - time step compatibility flag _
-        '0 - compatible time steps _
-        '1 - incompatible time steps
-        '##LOCAL tcdcmp - flag indicating order of time steps _
-        '0 - time steps are the same _
-        '1 - first time step is smaller _
-        '2 - second time step is smaller _
-        '-1 - time units span day-month boundry
+    'Public Sub DTMCMN(ByVal sdates() As Integer, ByVal edates() As Integer, _
+    '                  ByVal TSTEP() As Integer, ByVal TCODE() As Integer, _
+    '                  ByRef sdat() As Integer, ByRef edat() As Integer, _
+    '                  ByRef ts As Integer, ByRef tc As Integer, _
+    '                  ByRef retcod As Integer) 'tc As ATCTimeUnit
+    '    '##SUMMARY DTMCMN - determine the time period common to a number of pairs of dates. _
+    '    'also determines the smallest common time step and unit.
+    '    '##PARM sdates - input array of beginning dates
+    '    '##PARM edates - input array of ending dates
+    '    '##PARM tstep  - input array of time steps
+    '    '##PARM tcode  - input array of time units codes _
+    '    '1 - second        4 - day _
+    '    '2 - minute        5 - month _
+    '    '3 - hour          6 - year
+    '    '##PARM stat   - output common starting date
+    '    '##PARM edat   - output common ending date
+    '    '##PARM ts     - output smallest common time step
+    '    '##PARM tc     - output smallest common time units code
+    '    '##PARM retcod - output return code _
+    '    '0 - there is a common time period and time step and units _
+    '    '-1 - there is no common time period _
+    '    '-2 - there is a common time period, but the time step and _
+    '    'time units are not compatible
+    '    Dim tstepf, ndat, n, tcdcmp As Integer
+    '    '##LOCAL ndat   - number of dates to compare
+    '    '##LOCAL n      - index of date being compared
+    '    '##LOCAL tstepf - time step compatibility flag _
+    '    '0 - compatible time steps _
+    '    '1 - incompatible time steps
+    '    '##LOCAL tcdcmp - flag indicating order of time steps _
+    '    '0 - time steps are the same _
+    '    '1 - first time step is smaller _
+    '    '2 - second time step is smaller _
+    '    '-1 - time units span day-month boundry
 
-        DatCmn(sdates, edates, sdat, edat, retcod) 'get common time period
+    '    DatCmn(sdates, edates, sdat, edat, retcod) 'get common time period
 
-        If (retcod = 0) Then 'get common time step and units
-            ts = TSTEP(1)
-            tc = TCODE(1)
-            'check others
-            ndat = (UBound(sdates) / 6) '- 1 jlk 10/14/99
-            n = 1
-            Do While n < ndat And retcod = 0 'look for smallest common time step and unit
-                cmptim(TCODE(n), TSTEP(n), tc, ts, tstepf, tcdcmp)
-                If (tstepf = 0 And tcdcmp <> -1) Then 'compatible time steps, do not span day-month boundry
-                    If (tcdcmp = 2) Then 'new larger time step
-                        ts = TSTEP(n)
-                        tc = TCODE(n)
-                    End If
-                Else 'incompatible time steps or time units span day-month boundry
-                    retcod = -2
-                End If
-                n = n + 1
-            Loop
-            If (retcod = -2) Then 'time step and time units are not all compatible
-                ts = 0
-                tc = 0
-            End If
-        Else 'no common time period
-            retcod = -1
-            ts = 0
-            tc = 0
-        End If
-    End Sub
+    '    If (retcod = 0) Then 'get common time step and units
+    '        ts = TSTEP(1)
+    '        tc = TCODE(1)
+    '        'check others
+    '        ndat = (UBound(sdates) / 6) '- 1 jlk 10/14/99
+    '        n = 1
+    '        Do While n < ndat And retcod = 0 'look for smallest common time step and unit
+    '            cmptim(TCODE(n), TSTEP(n), tc, ts, tstepf, tcdcmp)
+    '            If (tstepf = 0 And tcdcmp <> -1) Then 'compatible time steps, do not span day-month boundry
+    '                If (tcdcmp = 2) Then 'new larger time step
+    '                    ts = TSTEP(n)
+    '                    tc = TCODE(n)
+    '                End If
+    '            Else 'incompatible time steps or time units span day-month boundry
+    '                retcod = -2
+    '            End If
+    '            n = n + 1
+    '        Loop
+    '        If (retcod = -2) Then 'time step and time units are not all compatible
+    '            ts = 0
+    '            tc = 0
+    '        End If
+    '    Else 'no common time period
+    '        retcod = -1
+    '        ts = 0
+    '        tc = 0
+    '    End If
+    'End Sub
 
-    Public Sub DatCmn(ByVal sd() As Integer, ByVal ed() As Integer, _
-                      ByRef SDate() As Integer, ByRef EDate() As Integer, ByRef retcod As Integer)
-        '##SUMMARY DatCmn - determine the time period common to a number of sets of dates.
-        '##PARM sd     - input array of beginning dates
-        '##PARM ed     - input array of ending dates
-        '##PARM sdate  - output common starting data
-        '##PARM edate  - output common ending date
-        '##PARM retcod - output return code _
-        '0 - there is a common time period _
-        '-1 - there is no common time period
-        Dim ljdate As Double
-        Dim ndat As Integer
-        Dim sjdate, ejdate As Double
-        Dim j, i As Integer
-        Dim d(5) As Integer
-        '##LOCAL ljdate - temp modified julian date
-        '##LOCAL ndat   - number of dates to check
-        '##LOCAL sjdate - earliest modfied julian date
-        '##LOCAL ejdate - latest modified julian date
-        '##LOCAL j      - input array pointer
-        '##LOCAL i      - loop counter thru dates arrays
-        '##LOCAL d      - temp date array
-        ndat = (UBound(sd) / 6) ' - 1 jlk 10/14/99
-        sjdate = -1.0E+30 'way in past
-        For i = 0 To ndat - 1
-            j = i * 6
-            d(0) = sd(j) : d(1) = sd(j + 1) : d(2) = sd(j + 2)
-            d(3) = sd(j + 3) : d(4) = sd(j + 4) : d(5) = sd(j + 5)
-            ljdate = Date2J(d)
-            If ljdate > sjdate Then 'new latest start
-                sjdate = ljdate
-            End If
-        Next i
+    'Public Sub DatCmn(ByVal sd() As Integer, ByVal ed() As Integer, _
+    '                  ByRef SDate() As Integer, ByRef EDate() As Integer, ByRef retcod As Integer)
+    '    '##SUMMARY DatCmn - determine the time period common to a number of sets of dates.
+    '    '##PARM sd     - input array of beginning dates
+    '    '##PARM ed     - input array of ending dates
+    '    '##PARM sdate  - output common starting data
+    '    '##PARM edate  - output common ending date
+    '    '##PARM retcod - output return code _
+    '    '0 - there is a common time period _
+    '    '-1 - there is no common time period
+    '    Dim ljdate As Double
+    '    Dim ndat As Integer
+    '    Dim sjdate, ejdate As Double
+    '    Dim j, i As Integer
+    '    Dim d(5) As Integer
+    '    '##LOCAL ljdate - temp modified julian date
+    '    '##LOCAL ndat   - number of dates to check
+    '    '##LOCAL sjdate - earliest modfied julian date
+    '    '##LOCAL ejdate - latest modified julian date
+    '    '##LOCAL j      - input array pointer
+    '    '##LOCAL i      - loop counter thru dates arrays
+    '    '##LOCAL d      - temp date array
+    '    ndat = (UBound(sd) / 6) ' - 1 jlk 10/14/99
+    '    sjdate = -1.0E+30 'way in past
+    '    For i = 0 To ndat - 1
+    '        j = i * 6
+    '        d(0) = sd(j) : d(1) = sd(j + 1) : d(2) = sd(j + 2)
+    '        d(3) = sd(j + 3) : d(4) = sd(j + 4) : d(5) = sd(j + 5)
+    '        ljdate = Date2J(d)
+    '        If ljdate > sjdate Then 'new latest start
+    '            sjdate = ljdate
+    '        End If
+    '    Next i
 
-        ejdate = 1.0E+30 'way in future
-        For i = 0 To ndat - 1
-            j = i * 6
-            d(0) = ed(j) : d(1) = ed(j + 1) : d(2) = ed(j + 2)
-            d(3) = ed(j + 3) : d(4) = ed(j + 4) : d(5) = ed(j + 5)
-            ljdate = Date2J(d)
-            If ljdate < ejdate Then 'new earliest end
-                ejdate = ljdate
-            End If
-        Next i
+    '    ejdate = 1.0E+30 'way in future
+    '    For i = 0 To ndat - 1
+    '        j = i * 6
+    '        d(0) = ed(j) : d(1) = ed(j + 1) : d(2) = ed(j + 2)
+    '        d(3) = ed(j + 3) : d(4) = ed(j + 4) : d(5) = ed(j + 5)
+    '        ljdate = Date2J(d)
+    '        If ljdate < ejdate Then 'new earliest end
+    '            ejdate = ljdate
+    '        End If
+    '    Next i
 
-        If ejdate > sjdate Then 'common start date before common end date, as hoped for
-            J2Date(sjdate, SDate)
-            J2Date(ejdate, EDate)
-            retcod = 0
-        Else
-            For i = 0 To 5
-                SDate(i) = 0
-                EDate(i) = 0
-            Next i
-            retcod = -1
-        End If
-    End Sub
+    '    If ejdate > sjdate Then 'common start date before common end date, as hoped for
+    '        J2Date(sjdate, SDate)
+    '        J2Date(ejdate, EDate)
+    '        retcod = 0
+    '    Else
+    '        For i = 0 To 5
+    '            SDate(i) = 0
+    '            EDate(i) = 0
+    '        Next i
+    '        retcod = -1
+    '    End If
+    'End Sub
 
     Private Sub cmptim(ByVal tcode1 As Integer, ByVal tstep1 As Integer, _
                        ByVal tcode2 As Integer, ByVal tstep2 As Integer, _
