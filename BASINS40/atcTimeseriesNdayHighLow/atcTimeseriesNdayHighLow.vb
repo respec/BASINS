@@ -213,76 +213,80 @@ Public Class atcTimeseriesNdayHighLow
             End If
 
             For Each lNDayNow As Double In lNDay
-                Dim newValueAttributes(nYears) As atcDataAttributes
-                Dim newTS As New atcTimeseries(Me)
-                newTS.Dates = New atcTimeseries(Me)
-                newTS.numValues = nYears
+                If lNDayNow > 0 Then
+                    Dim newValueAttributes(nYears) As atcDataAttributes
+                    Dim newTS As New atcTimeseries(Me)
+                    newTS.Dates = New atcTimeseries(Me)
+                    newTS.numValues = nYears
 
-                newTS.Dates.Value(0) = sjday
+                    newTS.Dates.Value(0) = sjday
 
-                lsjday = sjday
-                For indexNew = 1 To nYears
-                    lNextSJday = TimAddJ(lSJday, lTimeCode, 1, 1)
-                    If lHaveEndMonthDay Then
-                        Dim lEndSeason(5) As Integer
-                        J2Date(lNextSJday, lEndSeason)
-                        If aEndMonth > lEndSeason(1) OrElse (aEndMonth = lEndSeason(1) AndAlso aEndDay > lEndSeason(2)) Then
-                            'Season ends in previous calendar year
-                            lEndSeason(0) -= 1
+                    lSJday = sjday
+                    For indexNew = 1 To nYears
+                        lNextSJday = TimAddJ(lSJday, lTimeCode, 1, 1)
+                        If lHaveEndMonthDay Then
+                            Dim lEndSeason(5) As Integer
+                            J2Date(lNextSJday, lEndSeason)
+                            If aEndMonth > lEndSeason(1) OrElse (aEndMonth = lEndSeason(1) AndAlso aEndDay > lEndSeason(2)) Then
+                                'Season ends in previous calendar year
+                                lEndSeason(0) -= 1
+                            End If
+                            lEndSeason(1) = aEndMonth
+                            lEndSeason(2) = aEndDay
+                            lEndJday = Date2J(lEndSeason)
+                        Else
+                            lEndJday = lNextSJday
                         End If
-                        lEndSeason(1) = aEndMonth
-                        lEndSeason(2) = aEndDay
-                        lEndJday = Date2J(lEndSeason)
+                        lCurrentYear = SubsetByDate(aTS, lSJday, lEndJday, Me)
+                        newTS.Dates.Value(indexNew) = lEndJday
+                        Try
+                            newTS.Value(indexNew) = HighOrLowValue(lCurrentYear, CInt(lNDayNow), aHigh)
+                        Catch e As Exception
+                            newTS.Value(indexNew) = Double.NaN
+                            newTS.ValueAttributes(indexNew) = New atcDataAttributes()
+                            newTS.ValueAttributes(indexNew).SetValue("Explanation", e.Message)
+                        End Try
+                        lSJday = lNextSJday
+                    Next
+
+                    Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual
+                    If aHigh Then
+                        lDescription &= "high values "
                     Else
-                        lEndJday = lNextSJday
+                        lDescription &= "low values "
                     End If
-                    lCurrentYear = SubsetByDate(aTS, lSJday, lEndJday, Me)
-                    newTS.Dates.Value(indexNew) = lEndJday
-                    Try
-                        newTS.Value(indexNew) = HighOrLowValue(lCurrentYear, CInt(lNDayNow), aHigh)
-                    Catch e As Exception
-                        newTS.Value(indexNew) = Double.NaN
-                        newTS.ValueAttributes(indexNew) = New atcDataAttributes()
-                        newTS.ValueAttributes(indexNew).SetValue("Explanation", e.Message)
-                    End Try
-                    lSJday = lNextSJday
-                Next
 
-                Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual
-                If aHigh Then
-                    lDescription &= "high values "
+                    Dim lDateNow As Date = Now
+                    CopyBaseAttributes(aTS, newTS)
+
+                    With newTS.Attributes
+                        .SetValue("Date Created", lDateNow)
+                        .SetValue("Date Modified", lDateNow)
+                        .SetValue("Parent Timeseries", aTS)
+                        .SetValue("Tu", 6)
+                        .SetValue("Ts", 1)
+                        .SetValue("HighFlag", aHigh)
+                        .SetValue("NDay", lNDayNow)
+                        Dim ltstype As String
+                        If aHigh Then ltstype = "H" Else ltstype = "L"
+                        ltstype &= Format(lNDayNow, "000")
+                        .SetValue("tstype", ltstype)
+                        .SetValue("constituent", ltstype)
+                        .SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
+                        .AddHistory(lDescription)
+                        .SetValue("LDIST", "LP")
+                    End With
+
+                    Dim lKenTauAttributes As New atcDataAttributes
+                    ComputeTau(newTS, lNDayNow, aHigh, lKenTauAttributes)
+                    For Each lAttribute As atcDefinedValue In lKenTauAttributes
+                        aAttributesStorage.SetValue(lAttribute.Definition, lAttribute.Value, lAttribute.Arguments)
+                        newTS.Attributes.SetValue(lAttribute.Definition, lAttribute.Value, lAttribute.Arguments)
+                    Next
+                    newTsGroup.Add(newTS)
                 Else
-                    lDescription &= "low values "
+                    Logger.Dbg("Skip:NDay=" & lNDayNow)
                 End If
-
-                Dim lDateNow As Date = Now
-                CopyBaseAttributes(aTS, newTS)
-
-                With newTS.Attributes
-                    .SetValue("Date Created", lDateNow)
-                    .SetValue("Date Modified", lDateNow)
-                    .SetValue("Parent Timeseries", aTS)
-                    .SetValue("Tu", 6)
-                    .SetValue("Ts", 1)
-                    .SetValue("HighFlag", aHigh)
-                    .SetValue("NDay", lNDayNow)
-                    Dim ltstype As String
-                    If aHigh Then ltstype = "H" Else ltstype = "L"
-                    ltstype &= Format(lNDayNow, "000")
-                    .SetValue("tstype", ltstype)
-                    .SetValue("constituent", ltstype)
-                    .SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
-                    .AddHistory(lDescription)
-                    .SetValue("LDIST", "LP")
-                End With
-
-                Dim lKenTauAttributes As New atcDataAttributes
-                ComputeTau(newTS, lNDayNow, aHigh, lKenTauAttributes)
-                For Each lAttribute As atcDefinedValue In lKenTauAttributes
-                    aAttributesStorage.SetValue(lAttribute.Definition, lAttribute.Value, lAttribute.Arguments)
-                    newTS.Attributes.SetValue(lAttribute.Definition, lAttribute.Value, lAttribute.Arguments)
-                Next
-                newTsGroup.Add(newTS)
             Next
         Catch ex As Exception
             Logger.Dbg(ex.ToString)
@@ -423,7 +427,11 @@ Public Class atcTimeseriesNdayHighLow
 
                 For Each lRecurOrProbNow As Double In lRecurOrProb
                     Try
-                        lQ = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh)
+                        If lRecurOrProbNow > 0 Then
+                            lQ = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh)
+                        Else
+                            Logger.Dbg("Skip:RecurOrProb=" & lRecurOrProbNow)
+                        End If
                     Catch ex As Exception
                         lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
                         lQ = Double.NaN
@@ -597,26 +605,24 @@ Public Class atcTimeseriesNdayHighLow
             If aArgs.ContainsAttribute("LastYear") Then lLastYear = aArgs.GetValue("LastYear")
         End If
 
-        If lNDay > 0 AndAlso lReturn > 0 Then
-            If ltsGroup Is Nothing Then
-                ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
-            End If
-
-            For Each lTs In ltsGroup
-                Dim lNDayTsGroup As atcDataGroup = Nothing 'atcTimeseries
-                lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear, lEndMonth, lEndDay)
-                Select Case lOperationName
-                    Case "n-day low value", "n-day high value"
-                        ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes, lNDayTsGroup, lEndMonth, lEndDay)
-                        Me.DataSets.AddRange(lNDayTsGroup)
-                    Case "n-day low timeseries", "n-day high timeseries"
-                        lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
-                        Me.DataSets.AddRange(lNDayTsGroup)
-                    Case "kendall tau"
-                        ComputeTau(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
-                End Select
-            Next
+        If ltsGroup Is Nothing Then
+            ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
         End If
+
+        For Each lTs In ltsGroup
+            Dim lNDayTsGroup As atcDataGroup = Nothing 'atcTimeseries
+            lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear, lEndMonth, lEndDay)
+            Select Case lOperationName
+                Case "n-day low value", "n-day high value"
+                    ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes, lNDayTsGroup, lEndMonth, lEndDay)
+                    Me.DataSets.AddRange(lNDayTsGroup)
+                Case "n-day low timeseries", "n-day high timeseries"
+                    lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
+                    Me.DataSets.AddRange(lNDayTsGroup)
+                Case "kendall tau"
+                    ComputeTau(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
+            End Select
+        Next
 
         If Me.DataSets.Count > 0 Then
             Return True 'todo: error checks
