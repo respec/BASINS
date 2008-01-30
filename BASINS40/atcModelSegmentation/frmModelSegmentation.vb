@@ -105,7 +105,7 @@ Friend Class frmModelSegmentation
         If GisUtil.IsField(aSubbasinLayerIndex, "ModelSeg") Then
             lModelSegFieldIndex = GisUtil.FieldIndex(aSubbasinLayerIndex, "ModelSeg")
         Else  'need to add it
-            lModelSegFieldIndex = GisUtil.AddField(aSubbasinLayerIndex, "ModelSeg", 0, 40, 1)
+            lModelSegFieldIndex = GisUtil.AddField(aSubbasinLayerIndex, "ModelSeg", 0, 40)
         End If
         Return lModelSegFieldIndex
     End Function
@@ -168,8 +168,8 @@ Friend Class frmModelSegmentation
     Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboSubbasins.SelectedIndexChanged
         Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
         If lSubbasinLayerName <> pSubbasinLayerNameUserPrompt Then
-            RaiseEvent OpenTableEditor(lSubbasinLayerName)
-            Me.Focus()
+            'RaiseEvent OpenTableEditor(lSubbasinLayerName)   'do we really want to do this all the time?  PD
+            'Me.Focus()
         End If
     End Sub
 
