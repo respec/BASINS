@@ -2210,7 +2210,7 @@ Public Class frmModelSetup
     Private Sub cboMet_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMet.SelectedIndexChanged
         'fill in met wdm file name as appropriate
         Dim lMetLayerName As String = cboMet.Items(cboMet.SelectedIndex)
-        If lMetLayerName.IndexOf("Weather Station Sites 20") > -10 Then 'new basins met
+        If lMetLayerName.IndexOf("Weather Station Sites 20") > -1 Then 'new basins met
             Dim lMetWDMName As String = GisUtil.LayerFileName(GisUtil.LayerIndex(lMetLayerName))
             lMetWDMName = FilenameSetExt(lMetWDMName, "wdm")
             txtMetWDMName.Text = lMetWDMName
