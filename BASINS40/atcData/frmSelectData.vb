@@ -702,6 +702,15 @@ NextName:
         End If
     End Sub
 
+    Public Property SelectedOk() As Boolean
+        Get
+            Return pSelectedOK
+        End Get
+        Set(ByVal newValue As Boolean)
+            pSelectedOK = newValue
+        End Set
+    End Property
+
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         'If user didn't select anything, 
         ' but either narrowed the matching group or there are not more than 10 datasets,

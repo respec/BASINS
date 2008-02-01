@@ -20,7 +20,7 @@ Friend Module modBasinsPlugin
     Public g_Project As MapWindow.Interfaces.Project
     Public g_MapWinWindowHandle As Integer
     Public g_AppName As String = "BASINS4"
-    Public g_BasinsDrives As String = ""
+    Public g_BasinsDataDirs As New ArrayList
     Public g_BasinsDir As String = ""
     Public pBuildFrm As frmBuildNew
 
@@ -79,7 +79,7 @@ Friend Module modBasinsPlugin
     Friend Const DataMenuString As String = "Data"
     Friend pLoadedDataMenu As Boolean = False
 
-    Private Const BasinsDataPath As String = "\Basins\data\"
+    Private Const BasinsDataPath As String = "Basins\data\"
     Private Const NationalProjectFilename As String = "national.mwprj"
 
     Friend Sub OpenedData(ByVal aDataSource As atcData.atcDataSource)
@@ -105,20 +105,28 @@ Friend Module modBasinsPlugin
     ''' </summary>
     ''' <remarks></remarks>
     Friend Sub FindBasinsDrives()
-        If g_BasinsDrives.Length = 0 Then
-            Dim lAllDrives As String() = Environment.GetLogicalDrives
-            For i As Integer = 0 To lAllDrives.Length - 1
-                Dim lDrv As String = UCase(lAllDrives(i).Chars(0))
-                If (Asc(lDrv) > Asc("B")) Then
-                    If FileExists(lDrv & ":" & BasinsDataPath, True, False) Then
-                        g_BasinsDrives = g_BasinsDrives & lDrv
+        If g_BasinsDataDirs.Count = 0 Then
+            Dim lCheckDir As String = DefaultBasinsDataDir()
+            If FileExists(lCheckDir, True, False) Then g_BasinsDataDirs.Add(lCheckDir)
+
+            For Each lDrive As IO.DriveInfo In IO.DriveInfo.GetDrives()
+                With lDrive
+                    If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
+                        lCheckDir = .Name & BasinsDataPath
+                        If FileExists(lCheckDir, True, False) Then g_BasinsDataDirs.Add(lCheckDir)
                     End If
-                End If
+                End With
             Next
-            Select Case g_BasinsDrives.Length
+
+            Select Case g_BasinsDataDirs.Count
                 Case 0 : Logger.Msg("No BASINS folders found on any drives on this computer", "FindBasinsDrives")
-                Case 1 : Logger.Dbg("Found BASINS Drive: " & g_BasinsDrives)
-                Case Is > 1 : Logger.Dbg("Found BASINS Drives: " & g_BasinsDrives)
+                Case 1 : Logger.Dbg("Found BASINS Data: " & g_BasinsDataDirs(0))
+                Case Is > 1
+                    Dim lAllDirs As String = ""
+                    For Each lDir As String In g_BasinsDataDirs
+                        lAllDirs &= lDir & "  "
+                    Next
+                    Logger.Dbg("Found BASINS Data: " & lAllDirs)
             End Select
         End If
     End Sub
@@ -131,19 +139,18 @@ Friend Module modBasinsPlugin
         If Not NationalProjectIsOpen() Then
             Dim lFileName As String = g_BasinsDir & "\Data\national\" & NationalProjectFilename
             If Not FileExists(lFileName) Then
-                For lDrive As Integer = 0 To g_BasinsDrives.Length - 1
-                    lFileName = UCase(g_BasinsDrives.Chars(lDrive)) & ":" _
-                              & "\BASINS\Data\national\" & NationalProjectFilename
+                For Each lDir As String In g_BasinsDataDirs
+                    lFileName = lDir & "national\" & NationalProjectFilename
                     If FileExists(lFileName) Then 'found existing national project
                         Exit For
                     End If
-                Next lDrive
+                Next
             End If
 
             If FileExists(lFileName) Then  'load national project
                 g_Project.Load(lFileName)
             Else
-                Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives, "Open National")
+                Logger.Msg("Unable to find '" & NationalProjectFilename & "'", "Open National")
                 Exit Sub
             End If
         End If
@@ -163,7 +170,7 @@ Friend Module modBasinsPlugin
             pBuildFrm.Left = GetSetting("BASINS4", "Window Positions", "BuildLeft", "0")
             UpdateSelectedFeatures()
         Else
-            Logger.Msg("Unable to open national project on drives: " & g_BasinsDrives, "Open National")
+            Logger.Msg("Unable to open national project", "Open National")
         End If
     End Sub
 
@@ -217,7 +224,7 @@ Friend Module modBasinsPlugin
                         Next
 
                         'come up with a suggested name for the new project
-                        Dim lDataPath As String = g_BasinsDrives.Chars(0) & ":\Basins\data\"
+                        Dim lDataPath As String = DefaultBasinsDataDir()
                         Dim lDefDirName As String = FilenameOnly(GisUtil.ProjectFileName)
                         Dim lDefaultProjectFileName As String = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
                         lDefDirName = PathNameOnly(lDefaultProjectFileName)
@@ -475,7 +482,7 @@ Friend Module modBasinsPlugin
                 CreateNewProjectAndDownloadCoreDataInteractive(lThemeTag, GetSelected(lFieldMatch))
             Else
                 'build new basins project from mapwindow project
-                Dim lDataPath As String = g_BasinsDrives.Chars(0) & ":\Basins\data\"
+                Dim lDataPath As String = DefaultBasinsDataDir()
                 Dim lNewDataDir As String = PathNameOnly(pExistingMapWindowProjectName) & "\"
                 'download and project core data
                 Logger.Dbg("DownloadData:" & lThemeTag)
@@ -487,6 +494,10 @@ Friend Module modBasinsPlugin
         End If
 
     End Sub
+
+    Public Function DefaultBasinsDataDir() As String
+        Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
+    End Function
 
     Private Function GetSelected(ByVal aField As Integer) As ArrayList
         Dim lSelected As Integer

@@ -112,21 +112,16 @@ Public Class atcBasinsPlugIn
         AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
 
         Dim mnu As MapWindow.Interfaces.MenuItem
-        For lDrive As Integer = 0 To g_BasinsDrives.Length - 1
-            Dim DriveLetter As String = g_BasinsDrives.Substring(lDrive, 1)
-            'Scan folder for project data, and populate menu
-            Dim lDataDirs() As String = IO.Directory.GetDirectories( _
-                                              DriveLetter & ":\BASINS\data")
-            For lDirectory As Integer = 0 To lDataDirs.GetUpperBound(0)
-                Dim DirShortName As String = IO.Path.GetFileName(lDataDirs(lDirectory))
-                If g_BasinsDrives.Length > 0 Then DirShortName = DriveLetter & ": " & DirShortName
+        For Each lDataDir As String In g_BasinsDataDirs
+            For Each lProjectDir As String In IO.Directory.GetDirectories(lDataDir)
+                Dim DirShortName As String = IO.Path.GetFileName(lProjectDir)
+                'TODO: differentiate between projects in different data dirs If g_BasinsDrives.Length > 0 Then DirShortName = DriveLetter & ": " & DirShortName
                 mnu = AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
-                                       ProjectsMenuName, lDataDirs(lDirectory))
-                mnu.Tooltip = lDataDirs(lDirectory)
+                                       ProjectsMenuName, DirShortName)
+                mnu.Tooltip = lProjectDir
             Next
         Next
 
-        'RefreshDataMenu()
         pLoadedDataMenu = True
 
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, FileMenuName)

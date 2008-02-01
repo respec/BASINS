@@ -27,7 +27,7 @@ Module modDownload
         Dim lMyProjection As String
 
 StartOver:
-        lDataPath = g_BasinsDrives.Chars(0) & ":\Basins\data\"
+        lDataPath = DefaultBasinsDataDir()
 
         Logger.Dbg("SelectedFeatures" & aSelectedFeatures.Count)
         Select Case aSelectedFeatures.Count
