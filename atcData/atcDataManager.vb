@@ -221,7 +221,57 @@ Public Class atcDataManager
     Public Shared Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
         Dim lForm As New frmSelectData
         If aTitle.Length > 0 Then lForm.Text = aTitle
-        UserSelectData = lForm.AskUser(aGroup, aModal)
+        Dim lAutoSelected As Boolean = False
+
+        'Try automatically selecting data based on what is selected on the map
+        If aGroup Is Nothing OrElse aGroup.Count = 0 _
+           AndAlso Not pMapWin Is Nothing _
+           AndAlso pMapWin.View.SelectedShapes.NumSelected > 0 _
+           AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
+            Dim lCurrentLayerFilename As String = pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower
+            Dim lLocationField As Integer = -1
+            Dim lLayerListFilename As String = FindFile("layers.dbf") 'table containing location field for BASINS layers
+            If FileExists(lLayerListFilename) Then
+                Dim lLayersDBF As New atcTableDBF
+                If lLayersDBF.OpenFile(lLayerListFilename) Then
+                    If lLayersDBF.FindFirst(1, IO.Path.GetFileNameWithoutExtension(lCurrentLayerFilename)) Then
+                        Try
+                            lLocationField = CInt(lLayersDBF.Value(4))
+                        Catch
+                        End Try
+                        If lLocationField > 0 Then
+                            Dim lDBF As New atcTableDBF
+                            If lDBF.OpenFile(FilenameSetExt(lCurrentLayerFilename, "dbf")) Then
+                                Dim lAllDatasets As atcDataGroup = DataSets()
+                                Dim lLocation As String
+                                Dim lLocations As New ArrayList
+                                For lSelectionIndex As Integer = pMapWin.View.SelectedShapes.NumSelected - 1 To 0 Step -1
+                                    lDBF.CurrentRecord = pMapWin.View.SelectedShapes.Item(lSelectionIndex).ShapeIndex
+                                    lLocation = lDBF.Value(lLocationField)
+                                    If Not lLocations.Contains(lLocation) Then
+                                        lLocations.Add(lDBF.Value(lLocationField))
+                                    End If
+                                Next
+                                If lLocations.Count > 0 Then
+                                    For Each lDataSet As atcDataSet In lAllDatasets
+                                        If lLocations.Contains(lDataSet.Attributes.GetValue("Location", "")) Then
+                                            If aGroup Is Nothing Then aGroup = New atcDataGroup
+                                            lAutoSelected = True
+                                            aGroup.Add(lDataSet)
+                                        End If
+                                    Next
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+        aGroup = lForm.AskUser(aGroup, aModal)
+        If lAutoSelected AndAlso Not lForm.SelectedOk AndAlso Not aGroup Is Nothing Then
+            aGroup.Clear() 'We got back our location-selected data but the user didn't click Ok
+        End If
+        Return aGroup
     End Function
 
     ''' <summary>Ask user to manage data sources</summary>
