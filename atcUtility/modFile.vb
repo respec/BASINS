@@ -638,25 +638,31 @@ ErrorWriting:
             If Not FileExists(lFileName) AndAlso lBaseFileName.Length > 0 Then 'try some default locations if filename was specified, path was wrong or missing
                 lFileName = aDefaultFileName
                 If Not FileExists(lFileName) Then
-                    lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
-                    lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
 
-                    'First check in same folder or subfolder containing current .exe or .dll
-                    lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
+                    Dim lDocumentsBasins As String = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.MyDocuments, "Basins")
+                    If IO.Directory.Exists(lDocumentsBasins) Then lFileName = FindRecursive(lBaseFileName, lDocumentsBasins)
 
-                    'If we are in bin directory, also look in some other BASINS folders
-                    If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
-                        lFileName = FindRecursive(lBaseFileName, _
-                                                  ReplaceString(lExePath, "\bin\", "\etc\"), _
-                                                  ReplaceString(lExePath, "\bin\", "\models\"), _
-                                                  ReplaceString(lExePath, "\bin\", "\docs\"), _
-                                                  ReplaceString(lExePath, "\bin\", "\apr\"))
+                    If Not FileExists(lFileName) Then
+                        lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
+                        lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
+
+                        'First check in same folder or subfolder containing current .exe or .dll
+                        lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
+
+                        'If we are in bin directory, also look in some other BASINS folders
+                        If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+                            lFileName = FindRecursive(lBaseFileName, _
+                                                      ReplaceString(lExePath, "\bin\", "\etc\"), _
+                                                      ReplaceString(lExePath, "\bin\", "\models\"), _
+                                                      ReplaceString(lExePath, "\bin\", "\docs\"), _
+                                                      ReplaceString(lExePath, "\bin\", "\apr\"))
+                        End If
+
+                        'Finally, check in the Windows system folders
+                        'If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+                        '  lFileName = FindRecursive(lBaseFileName, "c:\winnt\", "c:\windows\")
+                        'End If
                     End If
-
-                    'Finally, check in the Windows system folders
-                    'If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
-                    '  lFileName = FindRecursive(lBaseFileName, "c:\winnt\", "c:\windows\")
-                    'End If
 
                     If FileExists(lFileName) Then
                         aDefaultFileName = lFileName

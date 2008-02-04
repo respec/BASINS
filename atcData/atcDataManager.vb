@@ -230,7 +230,7 @@ Public Class atcDataManager
            AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
             Dim lCurrentLayerFilename As String = pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower
             Dim lLocationField As Integer = -1
-            Dim lLayerListFilename As String = FindFile("layers.dbf") 'table containing location field for BASINS layers
+            Dim lLayerListFilename As String = FindFile("Please locate layers.dbf", "layers.dbf") 'table containing location field for BASINS layers
             If FileExists(lLayerListFilename) Then
                 Dim lLayersDBF As New atcTableDBF
                 If lLayersDBF.OpenFile(lLayerListFilename) Then
