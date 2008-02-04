@@ -1427,7 +1427,7 @@ NextIteration:
             ElseIf lstInputs.Items.Count = 0 Then 'Don't have any inputs to edit, add one
                 btnInputAdd_Click(sender, e)
             Else
-                MsgBox("An input must be selected to edit", MsgBoxStyle.Critical, "No Input Selected")
+                Logger.Msg("An input must be selected to edit", MsgBoxStyle.Critical, "No Input Selected")
             End If
         End If
     End Sub
@@ -1448,10 +1448,10 @@ NextIteration:
                 Next
                 atcDataManager.ShowDisplay("List", lData)
             Else
-                MsgBox("An input must be selected to view", MsgBoxStyle.Critical, "No Input Selected")
+                Logger.Msg("An input must be selected to view", MsgBoxStyle.Critical, "No Input Selected")
             End If
         Else
-            MsgBox("Viewing prepared inputs not available", MsgBoxStyle.Critical, "Cannot view input")
+            Logger.Msg("Viewing prepared inputs not available", MsgBoxStyle.Critical, "Cannot view input")
         End If
     End Sub
 
@@ -1482,7 +1482,7 @@ NextIteration:
             RefreshInputList()
             RefreshTotalIterations()
         Else
-            MsgBox("An input must be selected to remove it", MsgBoxStyle.Critical, "No Inputs Selected")
+            Logger.Msg("An input must be selected to remove it", MsgBoxStyle.Critical, "No Inputs Selected")
         End If
     End Sub
 
@@ -1548,7 +1548,7 @@ NextIteration:
                 aList.SelectedIndex = lMoveTo
             End If
         Else
-            MsgBox("Something must be selected to move it", MsgBoxStyle.Critical, "Nothing Selected")
+            Logger.Msg("Something must be selected to move it", MsgBoxStyle.Critical, "Nothing Selected")
         End If
     End Sub
 
@@ -1668,7 +1668,7 @@ NextIteration:
         ElseIf lstEndpoints.Items.Count = 0 Then 'Don't have any to edit, add one
             btnEndpointAdd_Click(sender, e)
         Else
-            MsgBox("An endpoint must be selected to edit", MsgBoxStyle.Critical, "No Endpoint Selected")
+            Logger.Msg("An endpoint must be selected to edit", MsgBoxStyle.Critical, "No Endpoint Selected")
         End If
     End Sub
 
@@ -1682,7 +1682,7 @@ NextIteration:
             Next
             RefreshEndpointList()
         Else
-            MsgBox("An endpoint must be selected to remove it", MsgBoxStyle.Critical, "No Endpoints Selected")
+            Logger.Msg("An endpoint must be selected to remove it", MsgBoxStyle.Critical, "No Endpoints Selected")
         End If
     End Sub
 
@@ -1905,7 +1905,7 @@ NextIteration:
             Next
             RefreshEndpointList()
         Else
-            MsgBox("An endpoint must be selected to copy it", MsgBoxStyle.Critical, "No Endpoints Selected")
+            Logger.Msg("An endpoint must be selected to copy it", MsgBoxStyle.Critical, "No Endpoints Selected")
         End If
     End Sub
 

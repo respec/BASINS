@@ -246,7 +246,7 @@ Public Class atcDataManager
                                 Dim lLocation As String
                                 Dim lLocations As New ArrayList
                                 For lSelectionIndex As Integer = pMapWin.View.SelectedShapes.NumSelected - 1 To 0 Step -1
-                                    lDBF.CurrentRecord = pMapWin.View.SelectedShapes.Item(lSelectionIndex).ShapeIndex
+                                    lDBF.CurrentRecord = pMapWin.View.SelectedShapes.Item(lSelectionIndex).ShapeIndex + 1
                                     lLocation = lDBF.Value(lLocationField)
                                     If Not lLocations.Contains(lLocation) Then
                                         lLocations.Add(lDBF.Value(lLocationField))

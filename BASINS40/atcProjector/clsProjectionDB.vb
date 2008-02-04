@@ -131,7 +131,7 @@ Public Class ProjectionDB
         If Not tmpDBF Is Nothing Then
             With tmpDBF
                 If .FindFirst(3, aName) Then
-                    If MsgBox("A projection named '" & aName & "' already exists. Replace it?", MsgBoxStyle.YesNo, "Projection") = MsgBoxResult.Yes Then
+                    If Logger.Msg("A projection named '" & aName & "' already exists. Replace it?", MsgBoxStyle.YesNo, "Projection") = MsgBoxResult.Yes Then
                         GoTo WriteProjection
                     End If
                 Else
@@ -150,7 +150,7 @@ WriteProjection:
                     .Value(11) = D6
 
                     .WriteFile(.FileName)
-                    MsgBox("Current projection added to table in Custom category as '" & aName & "'", MsgBoxStyle.OkOnly, "Projection")
+                    Logger.Msg("Current projection added to table in Custom category as '" & aName & "'", MsgBoxStyle.OkOnly, "Projection")
                 End If
             End With
         End If

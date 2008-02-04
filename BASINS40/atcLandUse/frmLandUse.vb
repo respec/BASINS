@@ -1,5 +1,6 @@
 Imports atcMwGisUtility
 Imports atcUtility
+Imports MapWinUtility
 
 Public Class frmLandUse
     Inherits System.Windows.Forms.Form
@@ -431,9 +432,8 @@ Public Class frmLandUse
 
         If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
             i = GisUtil.LayerIndex("Land Use Index")
-            If i = -1 Then
-                'cant do giras without land use index layer
-                MsgBox("When using GIRAS Landuse, the 'Land Use Index' layer must exist and be named as such.", vbOKOnly, "Reclass GIRAS Problem")
+            If i = -1 Then  'cant do giras without land use index layer
+                logger.msg("When using GIRAS Landuse, the 'Land Use Index' layer must exist and be named as such.", vbOKOnly, "Reclass GIRAS Problem")
                 Exit Sub
             End If
         End If

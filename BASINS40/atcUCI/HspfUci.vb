@@ -1241,9 +1241,8 @@ Public Class HspfUci
                 addeddsn = pWDMObj(wdmid).AddDataset(GenTs)
                 adsn(j) = ndsn
             Next j
-        Else
-            'no wdm files in this uci
-            Call MsgBox("No WDM Files are available with this UCI, so no calibration locations may be added", MsgBoxStyle.OkOnly, "Add Problem")
+        Else 'no wdm files in this uci
+            Logger.Msg("No WDM Files are available with this UCI, so no calibration locations may be added", MsgBoxStyle.OkOnly, "Add Problem")
         End If
     End Sub
 
@@ -1868,7 +1867,7 @@ Public Class HspfUci
                             pWDMObj(Ind) = lFile
                             pWdmCount += 1
                         Else
-                            MsgBox("Error in SetWDMFiles")
+                            Logger.Msg("Error in SetWDMFiles")
                         End If
                     End If
                 End If
@@ -1876,26 +1875,26 @@ Public Class HspfUci
         Next i
         Exit Sub
 x:
-        MsgBox("Error " & Err.Description & " in SetWDMFiles")
+        Logger.Msg("Error " & Err.Description & " in SetWDMFiles")
         FilesOK = False
     End Sub
 
     'TODO: use new code for WDM
-    Public Function GetWDMAttr(ByRef wdmid As String, ByRef idsn As Integer, ByRef attr As String) As String
+    Public Function GetWDMAttr(ByRef aWdmId As String, ByRef idsn As Integer, ByRef attr As String) As String
         Dim s As String
-        Dim dsnObj As atcData.atcTimeseries
+        Dim lDsn As atcData.atcTimeseries
 
-        dsnObj = GetDataSetFromDsn(WDMInd(wdmid), idsn)
-        If Not (dsnObj Is Nothing) And attr = "LOC" Then
-            s = dsnObj.Attributes.GetValue("Location")
-        ElseIf Not (dsnObj Is Nothing) And attr = "CON" Then
-            s = dsnObj.Attributes.GetValue("Constituent")
-        ElseIf Not (dsnObj Is Nothing) And attr = "DESC" Then
-            s = dsnObj.Attributes.GetValue("Description")
+        lDsn = GetDataSetFromDsn(WDMInd(aWdmId), idsn)
+        If Not (lDsn Is Nothing) And attr = "LOC" Then
+            s = lDsn.Attributes.GetValue("Location")
+        ElseIf Not (lDsn Is Nothing) And attr = "CON" Then
+            s = lDsn.Attributes.GetValue("Constituent")
+        ElseIf Not (lDsn Is Nothing) And attr = "DESC" Then
+            s = lDsn.Attributes.GetValue("Description")
         Else
             s = ""
         End If
-        GetWDMAttr = s
+        Return s
     End Function
 
     'TODO: can we get the right dataset by ID from the DataSets collection? Can if it is keyed by ID.

@@ -493,9 +493,9 @@ LeaveSub:
         RaiseEvent CommitChange()
         'Dim i&
         'If Text1.BackColor = OutsideSoftBg Then
-        '  i = MsgBox("Value is out of Normal range", vbOKCancel)
+        '  i = Logger.Msg("Value is out of Normal range", vbOKCancel)
         'ElseIf Text1.BackColor = OutsideHardBg Then
-        '  i = MsgBox("Value is out of Acceptable range", vbRetryCancel)
+        '  i = Logger.Msg("Value is out of Acceptable range", vbRetryCancel)
         'Else
         '  i = vbOK
         'End If
@@ -576,50 +576,56 @@ LeaveSub:
     '    PropBag.WriteProperty("Enabled", (text1.Enabled))
     'End Sub
 
-    Private Function Valid(ByVal newValue As Object) As Object
-        Dim msgtext As String
-        Dim sVal As Double
-
-        msgtext = ""
-        Valid = newValue
+    Private Function Valid(ByVal aValue As Object) As Object
+        Dim lMsgText As String = ""
+        Dim lValid As Object = aValue
 
         If DataType = ATCoDataType.ATCoTxt Then
-            If HardMax <> ATCoDataType.NONE And Len(newValue) > HardMax Then
-                Valid = CStr(newValue).Substring(0, HardMax)
-                msgtext = "The value '" & newValue & "' was too long." & vbCr
-                msgtext = msgtext & "Values can be at most " & HardMax & " characters long."
+            If HardMax <> ATCoDataType.NONE And aValue.ToString.Length > HardMax Then
+                lValid = CStr(aValue).Substring(0, HardMax)
+                lMsgText = "The value '" & aValue & "' was too long." & vbCr
+                lMsgText &= "Values can be at most " & HardMax & " characters long."
             End If
         ElseIf DataType = ATCoDataType.ATCoInt Or _
                DataType = ATCoDataType.ATCoSng Then
-            If IsNumeric(newValue) Then
-                sVal = CDbl(newValue)
-                newValue = sVal 'We don't want to compare 0.1 with .1 and think they are different
+            Dim lValue As Double
+            If IsNumeric(aValue) Then
+                lValue = CDbl(aValue)
+                aValue = lValue 'We don't want to compare 0.1 with .1 and think they are different
             Else
-                msgtext = "The value '" & newValue & "' is not numeric." & vbCr
-                sVal = ATCoDataType.NONE
+                lMsgText = "The value '" & aValue & "' is not numeric." & vbCr
+                lValue = ATCoDataType.NONE
             End If
             If IsNumeric(DefVal) Then
-                If DefVal <> ATCoDataType.NONE And (HardMin = ATCoDataType.NONE Or DefVal >= HardMin) And (HardMax = ATCoDataType.NONE Or DefVal <= HardMax) Then
-                    If BelowLimit(sVal, HardMin) Or AboveLimit(sVal, HardMax) Then sVal = DefVal
+                If DefVal <> ATCoDataType.NONE And _
+                  (HardMin = ATCoDataType.NONE Or DefVal >= HardMin) And _
+                  (HardMax = ATCoDataType.NONE Or DefVal <= HardMax) Then
+                    If BelowLimit(lValue, HardMin) Or AboveLimit(lValue, HardMax) Then
+                        lValue = DefVal
+                    End If
                 End If
             End If
-            If BelowLimit(sVal, HardMin) Then sVal = HardMin
-            If AboveLimit(sVal, HardMax) Then sVal = HardMax
-            If CStr(sVal) <> CStr(newValue) Then
-                If Len(msgtext) = 0 Then msgtext = "The value '" & newValue & "' is outside the valid range." & vbCr
+            If BelowLimit(lValue, HardMin) Then lValue = HardMin
+            If AboveLimit(lValue, HardMax) Then lValue = HardMax
+            If CStr(lValue) <> CStr(aValue) Then
+                If lMsgText.Length = 0 Then
+                    lMsgText = "The value '" & aValue & "' is outside the valid range." & vbCr
+                End If
                 If HardMin = ATCoDataType.NONE Then
-                    msgtext = msgtext & "Values must be less than or equal to " & HardMax & Chr(13)
+                    lMsgText &= "Values must be less than or equal to " & HardMax & Chr(13)
                 ElseIf HardMax = ATCoDataType.NONE Then
-                    msgtext = msgtext & "Values must be greater than or equal to " & HardMin & Chr(13)
-                Else : msgtext = msgtext & "Values must be between " & HardMin & " and " & HardMax & vbCr
+                    lMsgText &= "Values must be greater than or equal to " & HardMin & Chr(13)
+                Else
+                    lMsgText &= "Values must be between " & HardMin & " and " & HardMax & vbCr
                 End If
             End If
-            Valid = sVal
+            lValid = lValue
         End If
-        If Len(msgtext) > 0 Then
-            msgtext = msgtext & "Value has been reset to " & Valid
-            MsgBox(msgtext, vbOKOnly, Name)
+        If lMsgText.Length > 0 Then
+            lMsgText &= "Value has been reset to " & lValid
+            Logger.Msg(lMsgText, vbOKOnly, Name)
         End If
+        Return lValid
     End Function
 
     Private Function BelowLimit(ByVal testVal!, ByVal LimitVal!) As Boolean

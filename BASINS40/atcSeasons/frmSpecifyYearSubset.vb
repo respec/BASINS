@@ -1,3 +1,5 @@
+Imports MapWinUtility
+
 Public Class frmSpecifyYearSubset
     Inherits System.Windows.Forms.Form
 
@@ -184,16 +186,16 @@ Public Class frmSpecifyYearSubset
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         If Not IsNumeric(txtStartDay.Text) Then
-            MsgBox("Enter a number for the starting day")
+            Logger.Msg("Enter a number for the starting day")
         ElseIf Not IsNumeric(txtEndDay.Text) Then
-            MsgBox("Enter a number for the ending day")
+            Logger.Msg("Enter a number for the ending day")
         Else
             Dim lStartDay As Integer = CInt(txtStartDay.Text)
             Dim lEndDay As Integer = CInt(txtEndDay.Text)
             If lStartDay < 1 Or lStartDay > 31 Then
-                MsgBox("Enter a number between 1 and 31 for the starting day")
+                Logger.Msg("Enter a number between 1 and 31 for the starting day")
             ElseIf lEndDay < 1 Or lStartDay > 31 Then
-                MsgBox("Enter a number between 1 and 31 for the ending day")
+                Logger.Msg("Enter a number between 1 and 31 for the ending day")
             Else
                 pOk = True
                 Me.Close()

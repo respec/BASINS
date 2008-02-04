@@ -360,10 +360,10 @@ Public Class atcBasinsPlugIn
         Dim lTitle As String = g_MapWin.ApplicationInfo.ApplicationName & " Save Changes?"
 
         If aProjectFileName Is Nothing OrElse FilenameNoExt(aProjectFileName) = "" Then
-            lResult = MsgBox("Do you want to save the changes to the currently open project?", _
+            lResult = Logger.Msg("Do you want to save the changes to the currently open project?", _
                              MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, lTitle)
         Else
-            lResult = MsgBox("Do you want to save the changes to " & FilenameNoExt(aProjectFileName) & "?", _
+            lResult = Logger.Msg("Do you want to save the changes to " & FilenameNoExt(aProjectFileName) & "?", _
                              MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, lTitle)
         End If
 

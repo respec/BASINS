@@ -319,7 +319,7 @@ Public Class HspfOpnBlk
             ElseIf retcod = 10 Then
                 Exit Do
             Else
-                MsgBox(stemp)
+                Logger.Msg(stemp)
             End If
         Loop
     End Sub
