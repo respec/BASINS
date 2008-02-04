@@ -386,7 +386,7 @@ Public Class frmReclass
                 'loop thru each land use tile
                 NewFileName = PathName & "\" & cluTiles(j) & ".shp"
                 If Not GisUtil.AddLayer(NewFileName, cluTiles(j)) Then
-                    MsgBox("The GIRAS Landuse Shapefile " & NewFileName & "does not exist." & _
+                    Logger.Msg("The GIRAS Landuse Shapefile " & NewFileName & "does not exist." & _
                            vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "Reclassify Problem")
                     Exit Sub
                 End If

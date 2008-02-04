@@ -57,7 +57,7 @@ Public Module modUnits
 
 errHand:
         'If Not AlreadyReportedError Then
-        MsgBox("Error in GetParameterUnits" & vbCr & Err.Description)
+        Logger.Msg("Error in GetParameterUnits" & vbCr & Err.Description)
         'AlreadyReportedError = True
         'End If
     End Function

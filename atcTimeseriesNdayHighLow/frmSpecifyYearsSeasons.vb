@@ -97,12 +97,12 @@ Public Class frmSpecifyYearsSeasons
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
         If txtNDays.Visible Then
             If Not IsNumeric(txtNDays.Text) Then
-                MsgBox("Enter a number for the number of days")
+                Logger.Msg("Enter a number for the number of days")
                 Exit Sub
             Else
                 Dim lNDays As Integer = CInt(txtNDays.Text)
                 If lNDays < 1 Or lNDays > 366 Then
-                    MsgBox("Enter a number between 1 and 365 for the number of days")
+                    Logger.Msg("Enter a number between 1 and 365 for the number of days")
                     Exit Sub
                 End If
             End If
@@ -120,7 +120,7 @@ Public Class frmSpecifyYearsSeasons
         End If
         Dim lDay As Integer = CInt(aDay)
         If lDay < 1 Or lDay > 31 Then
-            MsgBox("Enter a number between 1 and 31 for the day", aLabel)
+            Logger.Msg("Enter a number between 1 and 31 for the day", aLabel)
             Return True
         End If
         Return False
