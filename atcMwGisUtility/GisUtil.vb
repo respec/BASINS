@@ -1312,7 +1312,10 @@ Public Class GisUtil
                     Else
                         lGridValue = lInputGrid.Value(lCol, lRow)
                     End If
-                    aAreaGridPoly(lGridValue, lInsideId) += lCellArea
+                    If lGridValue > -1 And lGridValue <= aAreaGridPoly.GetUpperBound(0) Then
+                        'make sure the grid value is not going to blow out the array
+                        aAreaGridPoly(lGridValue, lInsideId) += lCellArea
+                    End If
                 End If
                 lCellCount += 1
                 If pStatusShow Then Logger.Progress(lCellCount, lTotalCellCount)
