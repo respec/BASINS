@@ -1584,360 +1584,411 @@ Public Class frmModelSetup
     End Sub
 
     Public Function SetupHSPF(ByVal aOutputPath As String, ByVal aBaseOutputName As String) As Boolean
-        Try
-            lblStatus.Text = "Preparing to process"
-            Me.Refresh()
-            EnableControls(False)
+        'Try
+        lblStatus.Text = "Preparing to process"
+        Me.Refresh()
+        EnableControls(False)
 
-            If Not PreProcessChecking(aOutputPath, aBaseOutputName) Then 'failed early checks
-                Exit Function
-            End If
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        If Not PreProcessChecking(aOutputPath, aBaseOutputName) Then 'failed early checks
+            Exit Function
+        End If
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
-            'set subbasin indexes
-            Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-            Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(lSubbasinThemeName)
-            Dim lSubbasinFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
-            Dim lSubbasinFieldIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, lSubbasinFieldName)
-            Dim lSubbasinSlopeIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSub2.Items(cboSub2.SelectedIndex))
-            'are any subbasins selected?
-            Dim lSubbasinsSelected As New atcCollection
-            For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
-                lSubbasinsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex))
+        'set subbasin indexes
+        Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+        Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(lSubbasinThemeName)
+        Dim lSubbasinFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
+        Dim lSubbasinFieldIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, lSubbasinFieldName)
+        Dim lSubbasinSlopeIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSub2.Items(cboSub2.SelectedIndex))
+        'are any subbasins selected?
+        Dim lSubbasinsSelected As New atcCollection
+        For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
+            lSubbasinsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex))
+        Next
+        If lSubbasinsSelected.Count = 0 Then 'no subbasins selected, act as if all are selected
+            For i As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                lSubbasinsSelected.Add(i - 1)
             Next
-            If lSubbasinsSelected.Count = 0 Then 'no subbasins selected, act as if all are selected
-                For i As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                    lSubbasinsSelected.Add(i - 1)
+        End If
+
+        'for reaches in selected subbasins, populate reach class from dbf
+        Dim lReaches As New Reaches
+        Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        Dim lStreamsFieldIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
+        Dim lStreamsRIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
+        Dim lLen2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
+        Dim lSlo2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
+        Dim lWid2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
+        Dim lDep2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
+        Dim lMinelIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
+        Dim lMaxelIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
+        Dim lSnameIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
+        For Each lSubbasinFeatureIndex As Integer In lSubbasinsSelected
+            Dim lSubbasinId As Integer = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinFeatureIndex, lSubbasinFieldIndex)
+            For lStreamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+                If lSubbasinId = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lStreamsFieldIndex) Then
+                    'this is one we want
+                    Dim lReach As New Reach
+                    With lReach
+                        .Id = lSubbasinId
+                        .Name = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lSnameIndex)
+                        If Len(Trim(.Name)) = 0 Then
+                            .Name = "STREAM " + lSubbasinId
+                        End If
+                        .WsId = lSubbasinId
+                        .NExits = 1
+                        .Type = "S"
+                        .DownID = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lStreamsRIndex)
+                        .Manning = 0.05
+                        .Order = lReaches.Count + 1
+                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) Then
+                            .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) * 3.28) / 5280
+                        Else
+                            .Length = 0.0#
+                        End If
+                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) Then
+                            .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * 3.28
+                        Else
+                            .Depth = 0.0#
+                        End If
+                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) Then
+                            .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) * 3.28
+                        Else
+                            .Width = 0.0#
+                        End If
+                        Dim lMinEl As Single
+                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) Then
+                            lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) * 3.28
+                        Else
+                            lMinEl = 0.0#
+                        End If
+                        Dim lMaxEl As Single
+                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) Then
+                            lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) * 3.28
+                        Else
+                            lMaxEl = 0.0#
+                        End If
+                        .Elev = ((lMaxEl + lMinEl) / 2)
+                        .DeltH = lMaxEl - lMinEl
+                        .SegmentId = 1  'todo: used to get from aModelSegementIds
+                    End With
+                    lReaches.Add(lReach)
+                End If
+            Next
+        Next
+        
+        'set landuse layer
+        Dim lLandUseThemeName As String = ""
+        If cboLandUseLayer.SelectedIndex > -1 Then
+            lLandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+        End If
+        Dim lLanduseFieldName As String = ""
+        If cboDescription.SelectedIndex > -1 Then
+            lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
+        End If
+
+        Dim lLandUses As New LandUses
+
+        Dim lReclassifyFileName As String = ""
+        If cboLanduse.SelectedIndex = 0 Then
+            'usgs giras is the selected land use type
+            lLandUseThemeName = "Land Use Index"
+            lLanduseFieldName = "COVNAME"
+
+            lblStatus.Text = "Selecting land use tiles for overlay"
+            Me.Refresh()
+
+            'set land use index layer
+            Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
+            Dim lLandUseFieldIndex As Integer = GisUtil.FieldIndex(lLanduseLayerIndex, lLanduseFieldName)
+            Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
+            lLandUsePathName &= "\landuse"
+            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
+            If FileExists(lReclassifyFileName) Then
+                lReclassifyFileName &= "giras.dbf"
+            Else
+                lReclassifyFileName = lLandUsePathName.Substring(0, 1) & ":\basins\etc\giras.dbf"
+            End If
+
+            'figure out which land use tiles to overlay
+            Dim lLandUseTiles As New atcCollection
+            For i As Integer = 1 To GisUtil.NumFeatures(lLanduseLayerIndex)
+                'loop thru each shape of land use index shapefile
+                For j As Integer = 0 To lSubbasinsSelected.Count - 1
+                    'loop thru each selected subbasin (or all if none selected)
+                    Dim lShapeIndex As Long = lSubbasinsSelected(j)
+                    If GisUtil.OverlappingPolygons(lLanduseLayerIndex, i - 1, lSubbasinLayerIndex, lShapeIndex) Then
+                        'add this to collection of tiles we'll need
+                        lLandUseTiles.Add(GisUtil.FieldValue(lLanduseLayerIndex, i - 1, lLandUseFieldIndex))
+                    End If
+                Next j
+            Next i
+
+            'add tiles if not already on map
+            'figure out how many polygons to overlay, for status message
+            Dim lTotalPolygonCount As Integer = 0
+            Dim lTileFileNames As New atcCollection
+            For Each lLandUseTile As String In lLandUseTiles
+                Dim lNewFileName As String = lLandUsePathName & "\" & lLandUseTile & ".shp"
+                lTileFileNames.Add(lNewFileName)
+                If Not GisUtil.IsLayerByFileName(lNewFileName) Then
+                    If Not GisUtil.AddLayer(lNewFileName, lLandUseTile) Then
+                        Logger.Msg("The GIRAS Landuse Shapefile " & lNewFileName & "does not exist." & _
+                                    vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
+                        EnableControls(True)
+                        Exit Function
+                    End If
+                End If
+                lTotalPolygonCount += GisUtil.NumFeatures(GisUtil.LayerIndex(lNewFileName))
+            Next
+            lTotalPolygonCount *= lSubbasinsSelected.Count
+
+            'reset selected features since they may have become unselected
+            If lSubbasinsSelected.Count < GisUtil.NumFeatures(lSubbasinLayerIndex) Then
+                For Each lSubbasin As Integer In lSubbasinsSelected
+                    GisUtil.SetSelectedFeature(lSubbasinLayerIndex, lSubbasin)
                 Next
             End If
 
-            'set landuse layer
-            Dim lLandUseThemeName As String = ""
-            If cboLandUseLayer.SelectedIndex > -1 Then
-                lLandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-            End If
-            Dim lLanduseFieldName As String = ""
-            If cboDescription.SelectedIndex > -1 Then
-                lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-            End If
-
-            Dim lLandUses As New LandUses
-            'Dim lLandUseCodes As New atcCollection
-            'Dim lSubIds As New atcCollection
-            'Dim lAreas As New atcCollection
-            'Dim lSubSlopes As New atcCollection
-
-            Dim lReclassifyFileName As String = ""
-            If cboLanduse.SelectedIndex = 0 Then
-                'usgs giras is the selected land use type
-                lLandUseThemeName = "Land Use Index"
-                lLanduseFieldName = "COVNAME"
-
-                lblStatus.Text = "Selecting land use tiles for overlay"
+            lLanduseFieldName = "LUCODE"
+            Dim lFirst As Boolean = True
+            Dim lTileIndex As Integer = 0
+            For Each lTileFileName As String In lTileFileNames
+                lTileIndex += 1
+                lblStatus.Text = "Overlaying Land Use and Subbasins (Tile " & lTileIndex & " of " & lTileFileNames.Count & ")"
                 Me.Refresh()
+                'do overlay
+                GisUtil.Overlay(lTileFileName, lLanduseFieldName, lSubbasinThemeName, lSubbasinFieldName, _
+                                lLandUsePathName & "\overlay.shp", lFirst)
+                lFirst = False
+            Next
 
-                'set land use index layer
-                Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
-                Dim lLandUseFieldIndex As Integer = GisUtil.FieldIndex(lLanduseLayerIndex, lLanduseFieldName)
-                Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
-                lLandUsePathName &= "\landuse"
+            'compile areas, slopes and lengths
+            lblStatus.Text = "Compiling Overlay Results"
+            Me.Refresh()
+
+            Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
+            For i As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = i
+                Dim lLandUse As New LandUse
+                With lLandUse
+                    .Code = lTable.Value(1)
+                    .ModelID = lTable.Value(2)
+                    .Area = lTable.Value(3)
+                End With
+                For j As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                    Dim k As Integer = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinFieldIndex)
+                    If k = lLandUse.ModelID Then 'lSubId Then
+                        Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinSlopeIndex)
+                        lLandUse.Slope = lSubSlope
+                        Exit For
+                    End If
+                Next j
+                lLandUses.Add(lLandUse)
+            Next i
+        ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then 'nlcd grid or other grid
+            If cboLanduse.SelectedIndex = 1 Then 'nlcd grid
                 Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
                 lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
                 If FileExists(lReclassifyFileName) Then
-                    lReclassifyFileName &= "giras.dbf"
+                    lReclassifyFileName &= "nlcd.dbf"
                 Else
-                    lReclassifyFileName = lLandUsePathName.Substring(0, 1) & ":\basins\etc\giras.dbf"
+                    lReclassifyFileName = "\BASINS\etc\nlcd.dbf"
                 End If
-
-                'figure out which land use tiles to overlay
-                Dim lLandUseTiles As New atcCollection
-                For i As Integer = 1 To GisUtil.NumFeatures(lLanduseLayerIndex)
-                    'loop thru each shape of land use index shapefile
-                    For j As Integer = 1 To lSubbasinsSelected.Count
-                        'loop thru each selected subbasin (or all if none selected)
-                        Dim lShapeIndex As Long = lSubbasinsSelected(j)
-                        If GisUtil.OverlappingPolygons(lLanduseLayerIndex, i - 1, lSubbasinLayerIndex, lShapeIndex) Then
-                            'add this to collection of tiles we'll need
-                            lLandUseTiles.Add(GisUtil.FieldValue(lLanduseLayerIndex, i - 1, lLandUseFieldIndex))
-                        End If
-                    Next j
-                Next i
-
-                'add tiles if not already on map
-                'figure out how many polygons to overlay, for status message
-                Dim lTotalPolygonCount As Integer = 0
-                Dim lTileFileNames As New atcCollection
-                For Each lLandUseTile As String In lLandUseTiles
-                    Dim lNewFileName As String = lLandUsePathName & "\" & lLandUseTile & ".shp"
-                    lTileFileNames.Add(lNewFileName)
-                    If Not GisUtil.IsLayerByFileName(lNewFileName) Then
-                        If Not GisUtil.AddLayer(lNewFileName, lLandUseTile) Then
-                            Logger.Msg("The GIRAS Landuse Shapefile " & lNewFileName & "does not exist." & _
-                                        vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
-                            EnableControls(True)
-                            Exit Function
-                        End If
-                    End If
-                    lTotalPolygonCount += GisUtil.NumFeatures(GisUtil.LayerIndex(lNewFileName))
-                Next
-                lTotalPolygonCount *= lSubbasinsSelected.Count
-
-                'reset selected features since they may have become unselected
-                If lSubbasinsSelected.Count < GisUtil.NumFeatures(lSubbasinLayerIndex) Then
-                    For Each lSubbasin As Integer In lSubbasinsSelected
-                        GisUtil.SetSelectedFeature(lSubbasinLayerIndex, lSubbasin)
-                    Next
-                End If
-
-                lLanduseFieldName = "LUCODE"
-                Dim lFirst As Boolean = True
-                Dim lTileIndex As Integer = 0
-                For Each lTileFileName As String In lTileFileNames
-                    lTileIndex += 1
-                    lblStatus.Text = "Overlaying Land Use and Subbasins (Tile " & lTileIndex & " of " & lTileFileNames.Count & ")"
-                    Me.Refresh()
-                    'do overlay
-                    GisUtil.Overlay(lTileFileName, lLanduseFieldName, lSubbasinThemeName, lSubbasinFieldName, _
-                                    lLandUsePathName & "\overlay.shp", lFirst)
-                    lFirst = False
-                Next
-
-                'compile areas, slopes and lengths
-                lblStatus.Text = "Compiling Overlay Results"
-                Me.Refresh()
-
-                Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
-                For i As Integer = 1 To lTable.NumRecords
-                    lTable.CurrentRecord = i
-                    Dim lLandUse As New LandUse
-                    With lLandUse
-                        .Code = lTable.Value(1)
-                        .ModelID = lTable.Value(2)
-                        .Area = lTable.Value(3)
-                    End With
-                    For j As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                        Dim k As Integer = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinFieldIndex)
-                        If k = lLandUse.ModelID Then 'lSubId Then
-                            Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinSlopeIndex)
-                            lLandUse.Slope = lSubSlope
-                            Exit For
-                        End If
-                    Next j
-                    lLandUses.Add(lLandUse)
-                Next i
-            ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then 'nlcd grid or other grid
-                If cboLanduse.SelectedIndex = 1 Then 'nlcd grid
-                    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-                    lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
-                    If FileExists(lReclassifyFileName) Then
-                        lReclassifyFileName &= "nlcd.dbf"
-                    Else
-                        lReclassifyFileName = "\BASINS\etc\nlcd.dbf"
-                    End If
-                Else
-                    If lblClass.Text <> "<none>" Then
-                        lReclassifyFileName = lblClass.Text
-                    End If
-                End If
-
-                lblStatus.Text = "Overlaying Land Use and Subbasins"
-                Me.Refresh()
-
-                Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
-                If GisUtil.LayerType(lLanduseLayerIndex) = 4 Then
-                    'the landuse layer is a grid
-
-                    Dim k As Integer = Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
-                    Dim lAreaLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
-                    GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
-
-                    For Each lShapeIndex As Integer In lSubbasinsSelected
-                        'loop thru each selected subbasin (or all if none selected)
-                        Dim lSubId As String = GisUtil.FieldValue(lSubbasinLayerIndex, lShapeIndex, lSubbasinFieldIndex)
-                        For i As Integer = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
-                            If lAreaLS(i, lShapeIndex) > 0 Then
-                                Dim lLandUse As New LandUse
-                                With lLandUse
-                                    .Code = i
-                                    .Area = lAreaLS(i, lShapeIndex)
-                                    .ModelID = lSubId
-                                    Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, lShapeIndex, lSubbasinSlopeIndex)
-                                    .Slope = lSubSlope
-                                End With
-                                lLandUses.Add(lLandUse)
-                            End If
-                        Next i
-                    Next
-                End If
-
-            ElseIf cboLanduse.SelectedIndex = 2 Then
-                'other shape
-                lblStatus.Text = "Overlaying Land Use and Subbasins"
-                Me.Refresh()
-
+            Else
                 If lblClass.Text <> "<none>" Then
                     lReclassifyFileName = lblClass.Text
                 End If
-
-                Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
-                Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
-
-                'do overlay
-                GisUtil.Overlay(lLandUseThemeName, lLanduseFieldName, lSubbasinThemeName, lSubbasinFieldName, _
-                                lLandUsePathName & "\overlay.shp", True)
-
-                'compile areas and slopes
-                lblStatus.Text = "Compiling Overlay Results"
-                Me.Refresh()
-
-                Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
-                For i As Integer = 1 To lTable.NumRecords
-                    lTable.CurrentRecord = i
-                    Dim lLandUse As New LandUse
-                    With lLandUse
-                        .Code = lTable.Value(1)
-                        .ModelID = lTable.Value(2)
-                        .Area = lTable.Value(3)
-                    End With
-                    'Dim lLandUseCode As Integer = lTable.Value(1)
-                    'Dim lSubId As String = lTable.Value(2)
-                    'Dim lArea As Double = lTable.Value(3)
-                    'lLandUseCodes.Add(lLandUseCode)
-                    'lSubIds.Add(lSubId)
-                    'lAreas.Add(lArea)
-                    For j As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                        Dim k As Integer = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinFieldIndex)
-                        If k = lLandUse.ModelID Then
-                            Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinSlopeIndex)
-                            lLandUse.Slope = lSubSlope
-                            Exit For
-                        End If
-                    Next j
-                    lLandUses.Add(lLandUse)
-                Next i
             End If
 
-            lblStatus.Text = "Completed overlay of subbasins and land use layers"
+            lblStatus.Text = "Overlaying Land Use and Subbasins"
             Me.Refresh()
 
-            'figure out which outlets are in which subbasins
-            Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
-            Dim lOutSubs As New atcCollection
-            If lOutletsThemeName <> "<none>" Then
-                lblStatus.Text = "Joining point sources to subbasins"
-                Me.Refresh()
-                Dim i As Integer = GisUtil.LayerIndex(lOutletsThemeName)
-                For j As Integer = 1 To GisUtil.NumFeatures(i)
-                    Dim k As Integer = GisUtil.PointInPolygon(i, j, lSubbasinLayerIndex)
-                    If k > -1 Then
-                        lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
-                    Else
-                        lOutSubs.Add(-1)
+            Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
+            If GisUtil.LayerType(lLanduseLayerIndex) = 4 Then
+                'the landuse layer is a grid
+
+                Dim k As Integer = Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
+                Dim lAreaLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
+                GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
+
+                For Each lShapeIndex As Integer In lSubbasinsSelected
+                    'loop thru each selected subbasin (or all if none selected)
+                    Dim lSubId As String = GisUtil.FieldValue(lSubbasinLayerIndex, lShapeIndex, lSubbasinFieldIndex)
+                    For i As Integer = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
+                        If lAreaLS(i, lShapeIndex) > 0 Then
+                            Dim lLandUse As New LandUse
+                            With lLandUse
+                                .Code = i
+                                .Area = lAreaLS(i, lShapeIndex)
+                                .ModelID = lSubId
+                                Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, lShapeIndex, lSubbasinSlopeIndex)
+                                .Slope = lSubSlope
+                            End With
+                            lLandUses.Add(lLandUse)
+                        End If
+                    Next i
+                Next
+            End If
+
+        ElseIf cboLanduse.SelectedIndex = 2 Then
+            'other shape
+            lblStatus.Text = "Overlaying Land Use and Subbasins"
+            Me.Refresh()
+
+            If lblClass.Text <> "<none>" Then
+                lReclassifyFileName = lblClass.Text
+            End If
+
+            Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
+            Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
+
+            'do overlay
+            GisUtil.Overlay(lLandUseThemeName, lLanduseFieldName, lSubbasinThemeName, lSubbasinFieldName, _
+                            lLandUsePathName & "\overlay.shp", True)
+
+            'compile areas and slopes
+            lblStatus.Text = "Compiling Overlay Results"
+            Me.Refresh()
+
+            Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
+            For i As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = i
+                Dim lLandUse As New LandUse
+                With lLandUse
+                    .Code = lTable.Value(1)
+                    .ModelID = lTable.Value(2)
+                    .Area = lTable.Value(3)
+                End With
+                'Dim lLandUseCode As Integer = lTable.Value(1)
+                'Dim lSubId As String = lTable.Value(2)
+                'Dim lArea As Double = lTable.Value(3)
+                'lLandUseCodes.Add(lLandUseCode)
+                'lSubIds.Add(lSubId)
+                'lAreas.Add(lArea)
+                For j As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                    Dim k As Integer = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinFieldIndex)
+                    If k = lLandUse.ModelID Then
+                        Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinSlopeIndex)
+                        lLandUse.Slope = lSubSlope
+                        Exit For
                     End If
                 Next j
-            End If
+                lLandUses.Add(lLandUse)
+            Next i
+        End If
 
-            'build collection of unique subbasin ids
-            Dim lUniqueSubids As New atcCollection
-            Dim lModelSegmentIds As New atcCollection
-            For Each lLandUse As LandUse In lLandUses
-                Dim lNewSubIdIndex As Integer = lUniqueSubids.Add(lLandUse.ModelID)
-                If lNewSubIdIndex = lUniqueSubids.Count Then
-                    'store a corresponding model segment id
-                    If pUniqueModelSegmentIds.Count = 0 Then
-                        'by default use 1 as the model segment id
-                        lModelSegmentIds.Add(1)
-                    Else
-                        'for this subbasin, find the corresponding model segment id
-                        If cboSub3.SelectedIndex > 0 Then
-                            'see if we have some model segments in the subbasin dbf
-                            Dim lModelSegmentFieldName As String = cboSub3.Items(cboSub3.SelectedIndex)
-                            Dim lModelSegmentFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinLayerIndex, lModelSegmentFieldName)
-                            'Dim lIsInteger As Boolean = True
-                            For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                                Dim lSubidName As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lSubbasinFieldIndex)
-                                Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
-                                If lSubidName = lLandUse.ModelID Then
-                                    'found a match
-                                    lModelSegmentIds.Add(pUniqueModelSegmentIds(pUniqueModelSegmentNames.IndexFromKey(lModelSegment)))
-                                    Exit For
-                                End If
-                            Next
-                        End If
+        lblStatus.Text = "Completed overlay of subbasins and land use layers"
+        Me.Refresh()
+
+        'figure out which outlets are in which subbasins
+        Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
+        Dim lOutSubs As New atcCollection
+        If lOutletsThemeName <> "<none>" Then
+            lblStatus.Text = "Joining point sources to subbasins"
+            Me.Refresh()
+            Dim i As Integer = GisUtil.LayerIndex(lOutletsThemeName)
+            For j As Integer = 1 To GisUtil.NumFeatures(i)
+                Dim k As Integer = GisUtil.PointInPolygon(i, j, lSubbasinLayerIndex)
+                If k > -1 Then
+                    lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
+                Else
+                    lOutSubs.Add(-1)
+                End If
+            Next j
+        End If
+
+        'build collection of unique subbasin ids
+        Dim lUniqueSubids As New atcCollection
+        Dim lModelSegmentIds As New atcCollection
+        For Each lLandUse As LandUse In lLandUses
+            Dim lNewSubIdIndex As Integer = lUniqueSubids.Add(lLandUse.ModelID)
+            If lNewSubIdIndex = lUniqueSubids.Count Then
+                'store a corresponding model segment id
+                If pUniqueModelSegmentIds.Count = 0 Then
+                    'by default use 1 as the model segment id
+                    lModelSegmentIds.Add(1)
+                Else
+                    'for this subbasin, find the corresponding model segment id
+                    If cboSub3.SelectedIndex > 0 Then
+                        'see if we have some model segments in the subbasin dbf
+                        Dim lModelSegmentFieldName As String = cboSub3.Items(cboSub3.SelectedIndex)
+                        Dim lModelSegmentFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinLayerIndex, lModelSegmentFieldName)
+                        'Dim lIsInteger As Boolean = True
+                        For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                            Dim lSubidName As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lSubbasinFieldIndex)
+                            Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
+                            If lSubidName = lLandUse.ModelID Then
+                                'found a match
+                                lModelSegmentIds.Add(pUniqueModelSegmentIds(pUniqueModelSegmentNames.IndexFromKey(lModelSegment)))
+                                Exit For
+                            End If
+                        Next
                     End If
                 End If
-            Next
-
-            'make output folder
-            MkDirPath(aOutputPath)
-            Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
-
-            'write wsd file
-            lblStatus.Text = "Writing WSD file"
-            Me.Refresh()
-            WriteWSDFile(lBaseFileName & ".wsd", lLandUses, lReclassifyFileName, AtcGridPervious)
-
-            'write rch file (and ptf)
-            lblStatus.Text = "Writing RCH and PTF files"
-            Me.Refresh()
-            Dim LayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-            Dim StreamsIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
-            Dim StreamsRIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
-            Dim Len2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
-            Dim Slo2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
-            Dim Wid2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
-            Dim Dep2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
-            Dim MinelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
-            Dim MaxelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
-            Dim SnameIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
-            WriteRCHFile(lBaseFileName & ".rch", lUniqueSubids, LayerIndex, StreamsIndex, StreamsRIndex, Len2Index, _
-                         Slo2Index, Wid2Index, Dep2Index, MinelIndex, MaxelIndex, SnameIndex, lModelSegmentIds)
-
-            'write psr file
-            lblStatus.Text = "Writing PSR file"
-            Me.Refresh()
-            Dim lOutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-            Dim lPointLayerIndex As Integer = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
-            Dim lYear As String = cboYear.Items(cboYear.SelectedIndex)
-            WritePSRFile(lBaseFileName & ".psr", lUniqueSubids, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
-                         chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
-
-            'write seg file
-            lblStatus.Text = "Writing SEG file"
-            Me.Refresh()
-            Dim lMetIndices As New atcCollection
-            Dim lUniqueModelSegmentIds As New atcCollection
-            If pUniqueModelSegmentIds.Count = 0 Then
-                'use a single met station
-                lMetIndices.Add(lstMet.SelectedIndex)
-                lUniqueModelSegmentIds.Add(1)
-            Else
-                'use the specified segmentation scheme
-                For lRow As Integer = 1 To AtcGridMet.Source.Rows - 1
-                    lMetIndices.Add(pMetStations.IndexFromKey(AtcGridMet.Source.CellValue(lRow, 1)))
-                Next
-                lUniqueModelSegmentIds = pUniqueModelSegmentIds
             End If
-            WriteSEGFile(lBaseFileName & ".seg", lUniqueModelSegmentIds, lMetIndices, pMetBaseDsns)
+        Next
 
-            'write map file
-            lblStatus.Text = "Writing MAP file"
-            Me.Refresh()
-            WriteMAPFile(lBaseFileName & ".map")
+        'make output folder
+        MkDirPath(aOutputPath)
+        Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
 
-            'start winhspf
-            lblStatus.Text = "Starting WinHSPF"
-            Me.Refresh()
-            Me.Dispose()
-            Me.Close()
+        'write wsd file
+        lblStatus.Text = "Writing WSD file"
+        Me.Refresh()
+        WriteWSDFile(lBaseFileName & ".wsd", lLandUses, lReclassifyFileName, AtcGridPervious)
 
-            Return True
-        Catch
-            Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
-            Me.Dispose()
-            Me.Close()
-            Return False
-        End Try
+        'write rch file (and ptf)
+        lblStatus.Text = "Writing RCH and PTF files"
+        Me.Refresh()
+        WriteRCHFile(lBaseFileName & ".rch", lReaches)
+
+        'write psr file
+        lblStatus.Text = "Writing PSR file"
+        Me.Refresh()
+        Dim lOutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+        Dim lPointLayerIndex As Integer = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+        Dim lYear As String = cboYear.Items(cboYear.SelectedIndex)
+        WritePSRFile(lBaseFileName & ".psr", lUniqueSubids, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
+                     chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
+
+        'write seg file
+        lblStatus.Text = "Writing SEG file"
+        Me.Refresh()
+        Dim lMetIndices As New atcCollection
+        Dim lUniqueModelSegmentIds As New atcCollection
+        If pUniqueModelSegmentIds.Count = 0 Then
+            'use a single met station
+            lMetIndices.Add(lstMet.SelectedIndex)
+            lUniqueModelSegmentIds.Add(1)
+        Else
+            'use the specified segmentation scheme
+            For lRow As Integer = 1 To AtcGridMet.Source.Rows - 1
+                lMetIndices.Add(pMetStations.IndexFromKey(AtcGridMet.Source.CellValue(lRow, 1)))
+            Next
+            lUniqueModelSegmentIds = pUniqueModelSegmentIds
+        End If
+        WriteSEGFile(lBaseFileName & ".seg", lUniqueModelSegmentIds, lMetIndices, pMetBaseDsns)
+
+        'write map file
+        lblStatus.Text = "Writing MAP file"
+        Me.Refresh()
+        WriteMAPFile(lBaseFileName & ".map")
+
+        'start winhspf
+        lblStatus.Text = "Starting WinHSPF"
+        Me.Refresh()
+        Me.Dispose()
+        Me.Close()
+
+        Return True
+        'Catch
+        '    Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
+        '    Me.Dispose()
+        '    Me.Close()
+        '    Return False
+        'End Try
     End Function
 
     Private Function SetupAQUATOX(ByVal aOutputPath As String, ByVal aBaseOutputName As String) As Boolean
@@ -1989,8 +2040,8 @@ Public Class frmModelSetup
             Dim lMinelIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
             Dim lMaxelIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
             Dim lSnameIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
-            WriteRCHFile(lBaseFileName & ".rch", lUniqueStreamIds, lLayerIndex, lStreamsIndex, lStreamsRIndex, lLen2Index, _
-                         lSlo2Index, lWid2Index, lDep2Index, lMinelIndex, lMaxelIndex, lSnameIndex, lModelSegmentIds)
+            'WriteRCHFile(lBaseFileName & ".rch", lUniqueStreamIds, lLayerIndex, lStreamsIndex, lStreamsRIndex, lLen2Index, _
+            '             lSlo2Index, lWid2Index, lDep2Index, lMinelIndex, lMaxelIndex, lSnameIndex, lModelSegmentIds)
 
             'write psr file
             lblStatus.Text = "Writing PSR file"
@@ -2057,7 +2108,7 @@ Public Class frmModelSetup
             'see if these files already exist
             Dim lWsdFileName As String = OutputPath & "\" & BaseOutputName & ".wsd"
             If FileExists(lWsdFileName) Then  'already exists
-                If Logger.Msg("HSPF Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Ok Then
+                If Logger.Msg("HSPF Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
                     EnableControls(True)
                     Return False
                 End If
@@ -2065,7 +2116,7 @@ Public Class frmModelSetup
         Else 'in AQUATOX, see if these files already exist
             Dim lRchFileName As String = OutputPath & "\" & BaseOutputName & ".rch"
             If FileExists(lRchFileName) Then 'already exists
-                If Logger.Msg("AQUATOX Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Ok Then
+                If Logger.Msg("AQUATOX Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
                     EnableControls(True)
                     Return False
                 End If
