@@ -2,26 +2,20 @@ Option Strict Off
 Option Explicit On
 
 Imports System.IO
+Imports atcUtility
 
 Module modUCIRecords
 
     Private pUciRec As ArrayList
 
     Public Sub ReadUCIRecords(ByRef aFileName As String)
-        Dim lCurrentRecord As String
-        Dim lStreamReader As New StreamReader(aFileName)
-
         If Not pUciRec Is Nothing Then
             pUciRec = Nothing
         End If
         pUciRec = New ArrayList
-        Do
-            lCurrentRecord = lStreamReader.ReadLine
-            If lCurrentRecord Is Nothing Then
-                Exit Do
-            End If
+        For Each lCurrentRecord As String In LinesInFile(aFileName)
             pUciRec.Add(lCurrentRecord.TrimEnd)
-        Loop
+        Next
     End Sub
 
     Public Function GetUCIRecord(ByRef aIndex As Integer) As String
