@@ -256,7 +256,6 @@ Module modModelSetup
                             ByVal aGridPervious As Object)
         'if simple reclassifyfile exists, read it in
         Dim lRcode As New atcCollection
-        Dim lRname As New atcCollection
         Dim lUseSimpleGrid As Boolean = False
         If aReclassifyFile.Length > 0 And aGridPervious.ColumnWidth(0) = 0 Then
             'have the simple percent pervious grid, need to know which 
@@ -266,8 +265,7 @@ Module modModelSetup
             Dim lTable As IatcTable = atcTableOpener.OpenAnyTable(aReclassifyFile)
             For lTableRecordIndex As Integer = 1 To lTable.NumRecords
                 lTable.CurrentRecord = lTableRecordIndex
-                lRcode.Add(lTable.Value(1))
-                lRname.Add(lTable.Value(2))
+                lRcode.Add(lTable.Value(1), lTable.Value(2))
             Next lTableRecordIndex
         End If
         Logger.Dbg("ReclassifyFile:'" & aReclassifyFile & "' Count" & lRcode.Count)
@@ -307,13 +305,13 @@ Module modModelSetup
                     End If
                 Next j
                 'find lugroup that corresponds to this lucode
-                Dim lLandUseName As String = ""
-                For j As Integer = 1 To lRcode.Count
-                    If lLandUse.Code = lRcode(j) Then
-                        lLandUseName = lRname(j)
-                        Exit For
-                    End If
-                Next j
+                Dim lLandUseName As String = lRcode.ItemByKey(lLandUse.Code)
+                'For j As Integer = 1 To lRcode.Count
+                '    If aLucode(i) = lRcode(j) Then
+                '        lLandUseName = lRcode(j)
+                '        Exit For
+                '    End If
+                'Next j
                 'find percent perv that corresponds to this lugroup
                 Dim lPercentImperv As Double
                 For j As Integer = 1 To aGridPervious.Source.Rows
@@ -450,110 +448,60 @@ Module modModelSetup
         SaveFileString(aWsdFileName, lSB.ToString)
     End Sub
 
-    Friend Sub WriteRCHFile(ByVal aRchFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aSubbasinLayerIndex As Integer, _
-                            ByVal aStreamsIndex As Integer, ByVal aStreamsRIndex As Integer, ByVal aLen2Index As Integer, _
-                            ByVal aSlo2Index As Integer, ByVal aWid2Index As Integer, ByVal aDep2Index As Integer, _
-                            ByVal aMinelIndex As Integer, ByVal aMaxelIndex As Integer, ByVal aSnameIndex As Integer, _
-                            ByVal aModelSegementIds As atcCollection)
+    Friend Sub WriteRCHFile(ByVal aRchFileName As String, _
+                            ByVal aReaches As Reaches)
 
-        Dim OutFile As Integer, OutFile2 As Integer
-        Dim PtfFileName As String
-        Dim sname As String
-        Dim cDOWN$, cLENGTH#, cDEPTH#, cWIDTH#, cSLOPE#, cMINEL#, cMAXEL#, cELEV#
-        Dim i As Long, j As Long
+        Dim lSBRch As New StringBuilder
+        Dim lSBPtf As New StringBuilder
 
-        OutFile = FreeFile()
-        FileOpen(OutFile, aRchFileName, OpenMode.Output)
-        WriteLine(OutFile, "Rivrch", "Pname", "Watershed-ID", "HeadwaterFlag", _
-                  "Exits", "Milept", "Stream/Resevoir Type", "Segl", _
-                  "Delth", "Elev", "Ulcsm", "Urcsm", "Dscsm", "Ccsm", _
-                  "Mnflow", "Mnvelo", "Svtnflow", "Svtnvelo", "Pslope", _
-                  "Pdepth", "Pwidth", "Pmile", "Ptemp", "Pph", "Pk1", _
-                  "Pk2", "Pk3", "Pmann", "Psod", "Pbgdo", _
-                  "Pbgnh3", "Pbgbod5", "Pbgbod", "Level", "ModelSeg")
+        lSBRch.AppendLine("Rivrch" & Chr(32) & "Pname" & Chr(32) & "Watershed-ID" & Chr(32) & "HeadwaterFlag" & Chr(32) & _
+                  "Exits" & Chr(32) & "Milept" & Chr(32) & "Stream/Resevoir Type" & Chr(32) & "Segl" & Chr(32) & _
+                  "Delth" & Chr(32) & "Elev" & Chr(32) & "Ulcsm" & Chr(32) & "Urcsm" & Chr(32) & "Dscsm" & Chr(32) & "Ccsm" & Chr(32) & _
+                  "Mnflow" & Chr(32) & "Mnvelo" & Chr(32) & "Svtnflow" & Chr(32) & "Svtnvelo" & Chr(32) & "Pslope" & Chr(32) & _
+                  "Pdepth" & Chr(32) & "Pwidth" & Chr(32) & "Pmile" & Chr(32) & "Ptemp" & Chr(32) & "Pph" & Chr(32) & "Pk1" & Chr(32) & _
+                  "Pk2" & Chr(32) & "Pk3" & Chr(32) & "Pmann" & Chr(32) & "Psod" & Chr(32) & "Pbgdo" & Chr(32) & _
+                  "Pbgnh3" & Chr(32) & "Pbgbod5" & Chr(32) & "Pbgbod" & Chr(32) & "Level" & Chr(32) & "ModelSeg")
 
-        OutFile2 = FreeFile()
-        PtfFileName = Mid(aRchFileName, 1, Len(aRchFileName) - 3) & "ptf"
-        FileOpen(OutFile2, PtfFileName, OpenMode.Output)
-        WriteLine(OutFile2, "Reach Number", "Length(ft)", _
-            "Mean Depth(ft)", "Mean Width (ft)", _
-            "Mannings Roughness Coeff.", "Long. Slope", _
-            "Type of x-section", "Side slope of upper FP left", _
-            "Side slope of lower FP left", "Zero slope FP width left(ft)", _
-            "Side slope of channel left", "Side slope of channel right", _
-            "Zero slope FP width right(ft)", "Side slope lower FP right", _
-            "Side slope upper FP right", "Channel Depth(ft)", _
-            "Flood side slope change at depth", "Max. depth", _
-            "No. of exits", "Fraction of flow through exit 1", _
-            "Fraction of flow through exit 2", "Fraction of flow through exit 3", _
-            "Fraction of flow through exit 4", "Fraction of flow through exit 5")
+        lSBPtf.AppendLine("Reach Number" & Chr(32) & "Length(ft)" & Chr(32) & _
+            "Mean Depth(ft)" & Chr(32) & "Mean Width (ft)" & Chr(32) & _
+            "Mannings Roughness Coeff." & Chr(32) & "Long. Slope" & Chr(32) & _
+            "Type of x-section" & Chr(32) & "Side slope of upper FP left" & Chr(32) & _
+            "Side slope of lower FP left" & Chr(32) & "Zero slope FP width left(ft)" & Chr(32) & _
+            "Side slope of channel left" & Chr(32) & "Side slope of channel right" & Chr(32) & _
+            "Zero slope FP width right(ft)" & Chr(32) & "Side slope lower FP right" & Chr(32) & _
+            "Side slope upper FP right" & Chr(32) & "Channel Depth(ft)" & Chr(32) & _
+            "Flood side slope change at depth" & Chr(32) & "Max. depth" & Chr(32) & _
+            "No. of exits" & Chr(32) & "Fraction of flow through exit 1" & Chr(32) & _
+            "Fraction of flow through exit 2" & Chr(32) & "Fraction of flow through exit 3" & Chr(32) & _
+            "Fraction of flow through exit 4" & Chr(32) & "Fraction of flow through exit 5")
 
-        For i = 1 To GisUtil.NumFeatures(aSubbasinLayerIndex)
-            'is this subbasin in the list?
-            For j = 1 To aUniqueSubids.Count
-                GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aStreamsIndex)
-                If aUniqueSubids(j) = GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aStreamsIndex) Then
-                    'in list, output it
-                    sname = GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aSnameIndex)
-                    If Len(Trim(sname)) = 0 Then
-                        sname = "STREAM " + aUniqueSubids(j)
-                    End If
-                    cDOWN = GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aStreamsRIndex)
-                    If IsNumeric(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aLen2Index)) Then
-                        cLENGTH = (CSng(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aLen2Index)) * 3.28) / 5280
-                    Else
-                        cLENGTH = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aSlo2Index)) Then
-                        cSLOPE = CSng(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aSlo2Index)) / 100
-                    Else
-                        cSLOPE = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aWid2Index)) Then
-                        cWIDTH = CSng(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aWid2Index)) * 3.28
-                    Else
-                        cWIDTH = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aDep2Index)) Then
-                        cDEPTH = CSng(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aDep2Index)) * 3.28
-                    Else
-                        cDEPTH = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aMinelIndex)) Then
-                        cMINEL = CSng(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aMinelIndex)) * 3.28
-                    Else
-                        cMINEL = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aMaxelIndex)) Then
-                        cMAXEL = CSng(GisUtil.FieldValue(aSubbasinLayerIndex, i - 1, aMaxelIndex)) * 3.28
-                    Else
-                        cMAXEL = 0.0#
-                    End If
-                    cELEV = ((cMAXEL + cMINEL) / 2)
-                    PrintLine(OutFile, aUniqueSubids(j) & " " & Chr(34) & sname & Chr(34) & " " & aUniqueSubids(j) & " " & _
-                           " 0 1 0 S " & Format(cLENGTH, "0.00") & " " & Format(Math.Abs(cMAXEL - cMINEL), "0.00") & " " & _
-                           Format(cELEV, "0.") & " 0 0 " & cDOWN & " 0 0 0 0 0 " & _
-                           Format(cSLOPE, "0.000000") & " " & Format(cDEPTH, "0.0000") & " " & Format(cWIDTH, "0.000") & _
-                           " 0 0 0 0 0 0 0 0 0 0 0 0 0 " & aModelSegementIds(j))
-                    PrintLine(OutFile2, aUniqueSubids(j) & " " & Format(cLENGTH * 5280.0#, "0.") & " " & _
-                           Format(cDEPTH, "0.00000") & " " & Format(cWIDTH, "0.00000") & " 0.05 " & _
-                           Format(cSLOPE, "0.00000") & " " & "Trapezoidal" & " " & _
-                           "0.5 0.5 " & Format(cWIDTH, "0.000") & " 1 1 " & Format(cWIDTH, "0.000") & _
-                           " 0.5 0.5 " & Format(cDEPTH * 1.25, "0.0000") & " " & Format(cDEPTH * 1.875, "0.0000") & " " & _
-                           Format(cDEPTH * 62.5, "0.000") & " 1 1 0 0 0 0")
-                    If (2 * cDEPTH) > cWIDTH Then 'problem
-                        Logger.Msg("The depth and width values specified for Reach " & aUniqueSubids(j) & ", coupled with the trapezoidal" & vbCrLf & _
-                               "cross section assumptions of WinHSPF, indicate a physical imposibility." & vbCrLf & _
-                               "(Given 1:1 side slopes, the depth of the channel cannot be more than half the width.)" & vbCrLf & vbCrLf & _
-                               "This problem can be corrected in WinHSPF by revising the FTABLE or by " & vbCrLf & _
-                               "importing the ptf with modifications to the width and depth values." & vbCrLf & _
-                               "See the WinHSPF manual for more information.", vbOKOnly, "Channel Problem")
-                    End If
+        For Each lReach As Reach In aReaches
+            With lReach
+                lSBRch.AppendLine(.Id & " " & Chr(34) & .Name & Chr(34) & " " & .Id & " " & _
+                       " 0 1 0 S " & Format(.Length, "0.00") & " " & Format(Math.Abs(.DeltH), "0.00") & " " & _
+                       Format(.Elev, "0.") & " 0 0 " & .DownID & " 0 0 0 0 0 " & _
+                       Format(Math.Abs(.DeltH / .Length), "0.000000") & " " & Format(.Depth, "0.0000") & " " & Format(.Width, "0.000") & _
+                       " 0 0 0 0 0 0 0 0 0 0 0 0 0 " & .SegmentId)
+                lSBPtf.AppendLine(lReach.Id & " " & Format(.Length * 5280.0#, "0.") & " " & _
+                       Format(.Depth, "0.00000") & " " & Format(.Width, "0.00000") & " 0.05 " & _
+                       Format(Math.Abs(.DeltH / .Length), "0.00000") & " " & "Trapezoidal" & " " & _
+                       "0.5 0.5 " & Format(.Width, "0.000") & " 1 1 " & Format(.Width, "0.000") & _
+                       " 0.5 0.5 " & Format(.Depth * 1.25, "0.0000") & " " & Format(.Depth * 1.875, "0.0000") & " " & _
+                       Format(.Depth * 62.5, "0.000") & " 1 1 0 0 0 0")
+                If (2 * .Depth) > .Width Then 'problem
+                    Logger.Msg("The depth and width values specified for Reach " & lReach.Id & ", coupled with the trapezoidal" & vbCrLf & _
+                           "cross section assumptions of WinHSPF, indicate a physical imposibility." & vbCrLf & _
+                           "(Given 1:1 side slopes, the depth of the channel cannot be more than half the width.)" & vbCrLf & vbCrLf & _
+                           "This problem can be corrected in WinHSPF by revising the FTABLE or by " & vbCrLf & _
+                           "importing the ptf with modifications to the width and depth values." & vbCrLf & _
+                           "See the WinHSPF manual for more information.", vbOKOnly, "Channel Problem")
                 End If
-            Next j
-        Next i
-        FileClose(OutFile)
-        FileClose(OutFile2)
+            End With
+        Next
+
+        Dim lPtfFileName As String = Mid(aRchFileName, 1, Len(aRchFileName) - 3) & "ptf"
+        SaveFileString(aRchFileName, lSBRch.ToString)
+        SaveFileString(lptfFileName, lSBPtf.ToString)
     End Sub
 
     Friend Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As atcCollection, _
