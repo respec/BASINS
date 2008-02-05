@@ -251,10 +251,7 @@ Module modModelSetup
     End Function
 
     Friend Sub WriteWSDFile(ByVal aWsdFileName As String, _
-                            ByVal aArea As atcCollection, _
-                            ByVal aLucode As atcCollection, _
-                            ByVal aSubids As atcCollection, _
-                            ByVal aSubslope As atcCollection, _
+                            ByVal aLandUses As LandUses, _
                             ByVal aReclassifyFile As String, _
                             ByVal aGridPervious As Object)
         'if simple reclassifyfile exists, read it in
@@ -266,28 +263,31 @@ Module modModelSetup
             'lucodes correspond to which lugroups
             lUseSimpleGrid = True
             'open dbf file
-            Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aReclassifyFile)
-            For i As Integer = 1 To lTable.NumRecords
-                lTable.CurrentRecord = i
+            Dim lTable As IatcTable = atcTableOpener.OpenAnyTable(aReclassifyFile)
+            For lTableRecordIndex As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = lTableRecordIndex
                 lRcode.Add(lTable.Value(1))
                 lRname.Add(lTable.Value(2))
-            Next i
+            Next lTableRecordIndex
         End If
+        Logger.Dbg("ReclassifyFile:'" & aReclassifyFile & "' Count" & lRcode.Count)
 
         'create summary array 
         '  area of each land use group in each subbasin
 
         'build collection of unique subbasin ids
         Dim lUniqueSubids As New atcCollection
-        For Each lSubId As String In aSubids
-            lUniqueSubids.Add(lSubId)
+        For Each lLandUse As LandUse In aLandUses
+            lUniqueSubids.Add(lLandUse.ModelID)
         Next
+        Logger.Dbg("LandUseCount:" & aLandUses.Count & " UniqueSubidCount:" & lUniqueSubids.Count)
 
         'build collection of unique landuse groups
         Dim lUniqueLugroups As New atcCollection
         For i As Integer = 1 To aGridPervious.Source.Rows
             lUniqueLugroups.Add(aGridPervious.Source.CellValue(i, 1))
         Next i
+        Logger.Dbg("GridRowCount:" & aGridPervious.Source.Rows.Count & " UniqueLugroupCount:" & lUniqueLugroups.Count)
 
         Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
         Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
@@ -297,11 +297,11 @@ Module modModelSetup
         'loop through each polygon (or grid subid/lucode combination)
         'and populate array with area values
         If lUseSimpleGrid Then
-            For i As Integer = 1 To aSubids.Count
+            For Each lLandUse As LandUse In aLandUses
                 'find subbasin position in the area array
                 Dim spos As Integer
                 For j As Integer = 1 To lUniqueSubids.Count
-                    If aSubids(i) = lUniqueSubids(j) Then
+                    If lLandUse.ModelID = lUniqueSubids(j) Then
                         spos = j
                         Exit For
                     End If
@@ -309,7 +309,7 @@ Module modModelSetup
                 'find lugroup that corresponds to this lucode
                 Dim lLandUseName As String = ""
                 For j As Integer = 1 To lRcode.Count
-                    If aLucode(i) = lRcode(j) Then
+                    If lLandUse.Code = lRcode(j) Then
                         lLandUseName = lRname(j)
                         Exit For
                     End If
@@ -324,25 +324,27 @@ Module modModelSetup
                 Next j
                 'find lugroup position in the area array
                 Dim lpos As Long
-                For j As Integer = 1 To lUniqueLugroups.Count
+                For j As Integer = 0 To lUniqueLugroups.Count - 1
                     If lLandUseName = lUniqueLugroups(j) Then
                         lpos = j
                         Exit For
                     End If
                 Next j
 
-                lPerArea(spos, lpos) += (aArea(i) * (100 - lPercentImperv) / 100)
-                lImpArea(spos, lpos) += (aArea(i) * lPercentImperv / 100)
-                lLength(spos) = 0.0
-                lSlope(spos) = aSubslope(i) / 100.0
-            Next i
+                With lLandUse
+                    lPerArea(spos, lpos) += (.Area * (100 - lPercentImperv) / 100)
+                    lImpArea(spos, lpos) += (.Area * lPercentImperv / 100)
+                    lLength(spos) = 0.0
+                    lSlope(spos) = .Slope / 100.0
+                End With
+            Next lLandUse
         Else 'using custom table for landuse classification
-            For i As Integer = 1 To aSubids.Count
+            For Each lLandUse As LandUse In aLandUses
                 'loop through each polygon (or grid subid/lucode combination)
                 'find subbasin position in the area array
                 Dim spos As Integer
                 For j As Integer = 1 To lUniqueSubids.Count
-                    If aSubids(i) = lUniqueSubids(j) Then
+                    If lLandUse.ModelID = lUniqueSubids(j) Then
                         spos = j
                         Exit For
                     End If
@@ -354,7 +356,7 @@ Module modModelSetup
                     Dim lpos As Integer = -1
                     Dim lPercentImperv As Double
                     If aGridPervious.Source.CellValue(j, 0) <> "" Then
-                        If aLucode(i) = aGridPervious.Source.CellValue(j, 0) Then
+                        If lLandUse.Code = aGridPervious.Source.CellValue(j, 0) Then
                             'see if any of these are subbasin-specific
                             lPercentImperv = aGridPervious.Source.CellValue(j, 2)
                             Dim lMultiplier As Double
@@ -363,11 +365,10 @@ Module modModelSetup
                             Else
                                 lMultiplier = 1.0
                             End If
-                            Dim subbasin As String = aGridPervious.Source.CellValue(j, 4)
-                            If subbasin.Length > 0 And subbasin <> "Invalid Field Number" Then
+                            Dim lSubbasin As String = aGridPervious.Source.CellValue(j, 4)
+                            If lSubbasin.Length > 0 And lSubbasin <> "Invalid Field Number" Then
                                 'this row is subbasin-specific
-                                If subbasin = aSubids(i) Then
-                                    'we want this one now
+                                If lSubbasin = lLandUse.ModelID Then
                                     lLandUseName = aGridPervious.Source.CellValue(j, 1)
                                 End If
                             Else
@@ -381,10 +382,10 @@ Module modModelSetup
                                             'this other row has same lucode
                                             If aGridPervious.Source.CellValue(k, 1) = aGridPervious.Source.CellValue(j, 1) Then
                                                 'and the same group name
-                                                subbasin = aGridPervious.Source.CellValue(k, 4)
-                                                If Len(subbasin) > 0 Then
+                                                lSubbasin = aGridPervious.Source.CellValue(k, 4)
+                                                If lSubbasin.Length > 0 Then
                                                     'and its subbasin-specific
-                                                    If subbasin = aSubids(i) Then
+                                                    If lSubbasin = lLandUse.ModelID Then
                                                         'and its specific to this subbasin
                                                         lUseIt = False
                                                     End If
@@ -408,15 +409,17 @@ Module modModelSetup
                             End If
 
                             If lpos > 0 Then
-                                lPerArea(spos, lpos) += (aArea(i) * lMultiplier * (100 - lPercentImperv) / 100)
-                                lImpArea(spos, lpos) += (aArea(i) * lMultiplier * lPercentImperv / 100)
-                                lLength(spos) = 0.0 'were not computing lsur since winhspf does that
-                                lSlope(spos) = aSubslope(i) / 100.0
+                                With lLandUse
+                                    lPerArea(spos, lpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
+                                    lImpArea(spos, lpos) += (.Area * lMultiplier * lPercentImperv / 100)
+                                    lLength(spos) = 0.0 'were not computing lsur since winhspf does that
+                                    lSlope(spos) = .Slope / 100.0
+                                End With
                             End If
                         End If
                     End If
                 Next j
-            Next i
+            Next lLandUse
         End If
 
         Dim lSB As New StringBuilder
@@ -538,9 +541,8 @@ Module modModelSetup
                            "0.5 0.5 " & Format(cWIDTH, "0.000") & " 1 1 " & Format(cWIDTH, "0.000") & _
                            " 0.5 0.5 " & Format(cDEPTH * 1.25, "0.0000") & " " & Format(cDEPTH * 1.875, "0.0000") & " " & _
                            Format(cDEPTH * 62.5, "0.000") & " 1 1 0 0 0 0")
-                    If (2 * cDEPTH) > cWIDTH Then
-                        'problem
-                        MsgBox("The depth and width values specified for Reach " & aUniqueSubids(j) & ", coupled with the trapezoidal" & vbCrLf & _
+                    If (2 * cDEPTH) > cWIDTH Then 'problem
+                        Logger.Msg("The depth and width values specified for Reach " & aUniqueSubids(j) & ", coupled with the trapezoidal" & vbCrLf & _
                                "cross section assumptions of WinHSPF, indicate a physical imposibility." & vbCrLf & _
                                "(Given 1:1 side slopes, the depth of the channel cannot be more than half the width.)" & vbCrLf & vbCrLf & _
                                "This problem can be corrected in WinHSPF by revising the FTABLE or by " & vbCrLf & _

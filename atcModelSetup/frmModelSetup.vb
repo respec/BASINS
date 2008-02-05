@@ -1047,6 +1047,10 @@ Public Class frmModelSetup
 
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
         If lLayerIndex > -1 Then 'fill in fields 
+            'need to know all before any actually change
+            Dim lCboSub1SelectedIndex As Integer = -1
+            Dim lCboSub2SelectedIndex As Integer = -1
+            Dim lCboSub3SelectedIndex As Integer = 0
             For lFieldIndex As Integer = 0 To GisUtil.NumFields(lLayerIndex) - 1
                 Dim lFieldName As String = GisUtil.FieldName(lFieldIndex, lLayerIndex)
                 cboSub1.Items.Add(lFieldName)
@@ -1054,15 +1058,18 @@ Public Class frmModelSetup
                 cboSub3.Items.Add(lFieldName)
                 Dim lFieldNameUpper As String = lFieldName.ToUpper
                 If lFieldNameUpper = "SUBBASIN" Or lFieldNameUpper = "STREAMLINK" Then
-                    cboSub1.SelectedIndex = lFieldIndex
+                    lCboSub1SelectedIndex = lFieldIndex
                 End If
                 If lFieldNameUpper = "SLO1" Or lFieldNameUpper = "SLOPE" Or lFieldNameUpper = "AVESLOPE" Then
-                    cboSub2.SelectedIndex = lFieldIndex
+                    lCboSub2SelectedIndex = lFieldIndex
                 End If
                 If lFieldNameUpper = "MODELSEG" Then
-                    cboSub3.SelectedIndex = lFieldIndex + 1
+                    lCboSub3SelectedIndex = lFieldIndex + 1
                 End If
             Next
+            cboSub1.SelectedIndex = lCboSub1SelectedIndex
+            cboSub2.SelectedIndex = lCboSub2SelectedIndex
+            cboSub3.SelectedIndex = lCboSub3SelectedIndex
         End If
         If cboSub1.Items.Count > 0 And cboSub1.SelectedIndex < 0 Then
             cboSub1.SelectedIndex = 0
@@ -1427,7 +1434,7 @@ Public Class frmModelSetup
 
         If AtcGridMet.Source Is Nothing Then Exit Sub
 
-        If cboSubbasins.SelectedIndex = -1 Then Exit Sub
+        If cboSubbasins.SelectedIndex = -1 Or cboSub1.SelectedIndex = -1 Then Exit Sub
 
         Dim lSubbasinsLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
         Dim lSubbasinsLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinsLayerName)
@@ -1503,7 +1510,7 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
-        MsgBox("BASINS " & pModelName & " for MapWindow" & vbCrLf & vbCrLf & "Version 1.1", , "BASINS " & pModelName)
+        Logger.Msg("BASINS " & pModelName & " for MapWindow" & vbCrLf & vbCrLf & "Version 1.1", MsgBoxStyle.OkOnly, "BASINS " & pModelName)
     End Sub
 
     Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExisting.Click
@@ -1582,8 +1589,7 @@ Public Class frmModelSetup
             Me.Refresh()
             EnableControls(False)
 
-            If Not PreProcessChecking(aOutputPath, aBaseOutputName) Then
-                'failed early checks
+            If Not PreProcessChecking(aOutputPath, aBaseOutputName) Then 'failed early checks
                 Exit Function
             End If
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
@@ -1599,8 +1605,7 @@ Public Class frmModelSetup
             For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
                 lSubbasinsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex))
             Next
-            If lSubbasinsSelected.Count = 0 Then
-                'no subbasins selected, act as if all are selected
+            If lSubbasinsSelected.Count = 0 Then 'no subbasins selected, act as if all are selected
                 For i As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
                     lSubbasinsSelected.Add(i - 1)
                 Next
@@ -1616,10 +1621,11 @@ Public Class frmModelSetup
                 lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
             End If
 
-            Dim lLandUseCodes As New atcCollection
-            Dim lSubIds As New atcCollection
-            Dim lAreas As New atcCollection
-            Dim lSubSlopes As New atcCollection
+            Dim lLandUses As New LandUses
+            'Dim lLandUseCodes As New atcCollection
+            'Dim lSubIds As New atcCollection
+            'Dim lAreas As New atcCollection
+            'Dim lSubSlopes As New atcCollection
 
             Dim lReclassifyFileName As String = ""
             If cboLanduse.SelectedIndex = 0 Then
@@ -1703,24 +1709,23 @@ Public Class frmModelSetup
                 Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
                 For i As Integer = 1 To lTable.NumRecords
                     lTable.CurrentRecord = i
-                    Dim lLandUseCode As Integer = lTable.Value(1)
-                    Dim lSubId As String = lTable.Value(2)
-                    Dim lArea As Double = lTable.Value(3)
-                    lLandUseCodes.Add(lLandUseCode)
-                    lSubIds.Add(lSubId)
-                    lAreas.Add(larea)
+                    Dim lLandUse As New LandUse
+                    With lLandUse
+                        .Code = lTable.Value(1)
+                        .ModelID = lTable.Value(2)
+                        .Area = lTable.Value(3)
+                    End With
                     For j As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
                         Dim k As Integer = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinFieldIndex)
-                        If k = lSubId Then
+                        If k = lLandUse.ModelID Then 'lSubId Then
                             Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinSlopeIndex)
-                            lSubSlopes.Add(lSubSlope)
+                            lLandUse.Slope = lSubSlope
                             Exit For
                         End If
                     Next j
+                    lLandUses.Add(lLandUse)
                 Next i
-
-            ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
-                'nlcd grid or other grid
+            ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then 'nlcd grid or other grid
                 If cboLanduse.SelectedIndex = 1 Then 'nlcd grid
                     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
                     lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
@@ -1751,11 +1756,15 @@ Public Class frmModelSetup
                         Dim lSubId As String = GisUtil.FieldValue(lSubbasinLayerIndex, lShapeIndex, lSubbasinFieldIndex)
                         For i As Integer = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
                             If lAreaLS(i, lShapeIndex) > 0 Then
-                                Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, lShapeIndex, lSubbasinSlopeIndex)
-                                lLandUseCodes.Add(i)
-                                lAreas.Add(lAreaLS(i, lShapeIndex))
-                                lSubIds.Add(lSubId)
-                                lSubSlopes.Add(lSubSlope)
+                                Dim lLandUse As New LandUse
+                                With lLandUse
+                                    .Code = i
+                                    .Area = lAreaLS(i, lShapeIndex)
+                                    .ModelID = lSubId
+                                    Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, lShapeIndex, lSubbasinSlopeIndex)
+                                    .Slope = lSubSlope
+                                End With
+                                lLandUses.Add(lLandUse)
                             End If
                         Next i
                     Next
@@ -1784,20 +1793,27 @@ Public Class frmModelSetup
                 Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
                 For i As Integer = 1 To lTable.NumRecords
                     lTable.CurrentRecord = i
-                    Dim lLandUseCode As Integer = lTable.Value(1)
-                    Dim lSubId As String = lTable.Value(2)
-                    Dim lArea As Double = lTable.Value(3)
-                    lLandUseCodes.Add(lLandUseCode)
-                    lSubIds.Add(lSubId)
-                    lAreas.Add(lArea)
+                    Dim lLandUse As New LandUse
+                    With lLandUse
+                        .Code = lTable.Value(1)
+                        .ModelID = lTable.Value(2)
+                        .Area = lTable.Value(3)
+                    End With
+                    'Dim lLandUseCode As Integer = lTable.Value(1)
+                    'Dim lSubId As String = lTable.Value(2)
+                    'Dim lArea As Double = lTable.Value(3)
+                    'lLandUseCodes.Add(lLandUseCode)
+                    'lSubIds.Add(lSubId)
+                    'lAreas.Add(lArea)
                     For j As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
                         Dim k As Integer = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinFieldIndex)
-                        If k = lSubId Then
+                        If k = lLandUse.ModelID Then
                             Dim lSubSlope As Double = GisUtil.FieldValue(lSubbasinLayerIndex, j - 1, lSubbasinSlopeIndex)
-                            lSubSlopes.Add(lSubSlope)
+                            lLandUse.Slope = lSubSlope
                             Exit For
                         End If
                     Next j
+                    lLandUses.Add(lLandUse)
                 Next i
             End If
 
@@ -1824,8 +1840,8 @@ Public Class frmModelSetup
             'build collection of unique subbasin ids
             Dim lUniqueSubids As New atcCollection
             Dim lModelSegmentIds As New atcCollection
-            For Each lSubId As Integer In lSubIds
-                Dim lNewSubIdIndex As Integer = lUniqueSubids.Add(lSubId)
+            For Each lLandUse As LandUse In lLandUses
+                Dim lNewSubIdIndex As Integer = lUniqueSubids.Add(lLandUse.ModelID)
                 If lNewSubIdIndex = lUniqueSubids.Count Then
                     'store a corresponding model segment id
                     If pUniqueModelSegmentIds.Count = 0 Then
@@ -1841,7 +1857,7 @@ Public Class frmModelSetup
                             For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
                                 Dim lSubidName As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lSubbasinFieldIndex)
                                 Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
-                                If lSubidName = lSubId Then
+                                If lSubidName = lLandUse.ModelID Then
                                     'found a match
                                     lModelSegmentIds.Add(pUniqueModelSegmentIds(pUniqueModelSegmentNames.IndexFromKey(lModelSegment)))
                                     Exit For
@@ -1859,7 +1875,7 @@ Public Class frmModelSetup
             'write wsd file
             lblStatus.Text = "Writing WSD file"
             Me.Refresh()
-            WriteWSDFile(lBaseFileName & ".wsd", lAreas, lLandUseCodes, lSubIds, lSubSlopes, lReclassifyFileName, AtcGridPervious)
+            WriteWSDFile(lBaseFileName & ".wsd", lLandUses, lReclassifyFileName, AtcGridPervious)
 
             'write rch file (and ptf)
             lblStatus.Text = "Writing RCH and PTF files"

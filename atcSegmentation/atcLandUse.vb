@@ -94,7 +94,8 @@ Public Class LandUses
 End Class
 
 Public Class LandUse
-    Public Description As String  'Land use description like Urban, Forest, etc.
+    Public Description As String  'Description like Urban, Forest, etc.
+    Public Code As Integer        'Integer version of Description
     Public Type As String         'PERLND(2) or IMPLND(1)
     Public Reach As Reach         'Reach that this land use type contributes to
     Public ImperviousFraction As Double 'Fraction of Area that is Directly Connected Impervious
