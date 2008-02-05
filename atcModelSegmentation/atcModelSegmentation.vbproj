@@ -93,7 +93,7 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
-    <Reference Include="TableEditor, Version=4.5.2920.40288, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="TableEditor, Version=4.5.2956.17391, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\ApplicationPlugins\TableEditor.dll</HintPath>
       <Private>False</Private>

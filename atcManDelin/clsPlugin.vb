@@ -481,8 +481,8 @@ Module ManDelin
         Logger.Status("Merging...")
 
         'add downstream subbasin ids
-        Dim DownstreamFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASINR", 1, 10)
-        If DownstreamFieldIndex < lMinField Then lMinField = DownstreamFieldIndex
+        Dim lDownstreamFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASINR", 1, 10)
+        If lDownstreamFieldIndex < lMinField Then lMinField = lDownstreamFieldIndex
 
         Dim rval As String
         Dim dval As String
@@ -504,11 +504,11 @@ Module ManDelin
                     'if the downstream subbasin id is different that this subbasin id
                     'set it, and make the same change to all segments of this subbasin id
                     If dsubbasin <> rsubbasin Then
-                        GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, DownstreamFieldIndex, i - 1, dsubbasin)
+                        GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, i - 1, dsubbasin)
                         'make another pass to set each stream within a subbasin to the same subbasinr
                         For lStreamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
                             If GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, ReachSubbasinFieldIndex) = rsubbasin Then
-                                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, DownstreamFieldIndex, lStreamIndex - 1, dsubbasin)
+                                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, lStreamIndex - 1, dsubbasin)
                             End If
                         Next lStreamIndex
                     End If
@@ -520,9 +520,9 @@ Module ManDelin
         For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
             Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
             System.Windows.Forms.Application.DoEvents()
-            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, DownstreamFieldIndex)
+            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
             If dval = 0 Then
-                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, DownstreamFieldIndex, i - 1, -999)
+                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, i - 1, -999)
             End If
         Next i
         Logger.Progress(GisUtil.NumFeatures(lStreamsLayerIndex), GisUtil.NumFeatures(lStreamsLayerIndex))
@@ -572,7 +572,7 @@ Module ManDelin
             Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
             System.Windows.Forms.Application.DoEvents()
             'is there anything downstream of this one?
-            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, DownstreamFieldIndex)
+            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
             Do While dval > 0
                 bfound = False
                 For lStreamIndexDownstream As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
@@ -581,7 +581,7 @@ Module ManDelin
                         r = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, tAreaFieldIndex)
                         r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
                         GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, lStreamIndexDownstream - 1, r + r2)
-                        dval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, DownstreamFieldIndex)
+                        dval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lDownstreamFieldIndex)
                         Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
                         bfound = True
                         Exit For

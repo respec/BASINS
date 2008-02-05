@@ -194,7 +194,7 @@ Friend Class frmModelSegmentation
             Dim lColoringScheme As MapWinGIS.ShapefileColorScheme = GisUtil.GetColoringScheme(lSubbasinLayerIndex)
             'do the renderer
             GisUtil.UniqueValuesRenderer(lSubbasinLayerIndex, lModelSegFieldIndex)
-            If Logger.Msg("Do you want to keep this thematic map?", MsgBoxStyle.OkCancel, "View Map") = MsgBoxResult.Cancel Then
+            If Logger.Msg("Do you want to keep this thematic map?", MsgBoxStyle.YesNo, "View Map") = MsgBoxResult.No Then
                 'revert to original renderer
                 GisUtil.ColoringScheme(lSubbasinLayerIndex) = lColoringScheme
             End If
