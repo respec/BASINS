@@ -12,6 +12,10 @@ Public Class atcDataManager
     Private Shared pDisplayAttributes As ArrayList
 
     Private Const pInMemorySpecification As String = "<in memory>"
+    Private Shared pLikelyShapeLocationFieldNames() As String = { _
+        "ACC_ID", "COOP_ID", "COVNAME", "CU", "ECOREG_ID", "EPA_REG_ID", _
+        "FIPS", "GAGE_ID", "ID", "LOCATION", "MUID", "NAWQA", "NPD", "NPDES", _
+        "NSI_STAT", "RECID", "RIVRCH", "SITE_CODE", "ST", "UA_CODE", "URBAN_ID"}
 
     ''' <summary>Event raised when a data source is opened</summary>
     Shared Event OpenedData(ByVal aDataSource As atcDataSource)
@@ -224,48 +228,9 @@ Public Class atcDataManager
         Dim lAutoSelected As Boolean = False
 
         'Try automatically selecting data based on what is selected on the map
-        If aGroup Is Nothing OrElse aGroup.Count = 0 _
-           AndAlso Not pMapWin Is Nothing _
-           AndAlso pMapWin.View.SelectedShapes.NumSelected > 0 _
-           AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
-            Dim lCurrentLayerFilename As String = pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower
-            Dim lLocationField As Integer = -1
-            Dim lLayerListFilename As String = FindFile("Please locate layers.dbf", "layers.dbf") 'table containing location field for BASINS layers
-            If FileExists(lLayerListFilename) Then
-                Dim lLayersDBF As New atcTableDBF
-                If lLayersDBF.OpenFile(lLayerListFilename) Then
-                    If lLayersDBF.FindFirst(1, IO.Path.GetFileNameWithoutExtension(lCurrentLayerFilename)) Then
-                        Try
-                            lLocationField = CInt(lLayersDBF.Value(4))
-                        Catch
-                        End Try
-                        If lLocationField > 0 Then
-                            Dim lDBF As New atcTableDBF
-                            If lDBF.OpenFile(FilenameSetExt(lCurrentLayerFilename, "dbf")) Then
-                                Dim lAllDatasets As atcDataGroup = DataSets()
-                                Dim lLocation As String
-                                Dim lLocations As New ArrayList
-                                For lSelectionIndex As Integer = pMapWin.View.SelectedShapes.NumSelected - 1 To 0 Step -1
-                                    lDBF.CurrentRecord = pMapWin.View.SelectedShapes.Item(lSelectionIndex).ShapeIndex + 1
-                                    lLocation = lDBF.Value(lLocationField)
-                                    If Not lLocations.Contains(lLocation) Then
-                                        lLocations.Add(lDBF.Value(lLocationField))
-                                    End If
-                                Next
-                                If lLocations.Count > 0 Then
-                                    For Each lDataSet As atcDataSet In lAllDatasets
-                                        If lLocations.Contains(lDataSet.Attributes.GetValue("Location", "")) Then
-                                            If aGroup Is Nothing Then aGroup = New atcDataGroup
-                                            lAutoSelected = True
-                                            aGroup.Add(lDataSet)
-                                        End If
-                                    Next
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            End If
+        If aGroup Is Nothing OrElse aGroup.Count = 0 Then
+            aGroup = DatasetsAtMapSelectedLocations()
+            If aGroup.Count > 0 Then lAutoSelected = True
         End If
         aGroup = lForm.AskUser(aGroup, aModal)
         If lAutoSelected AndAlso Not lForm.SelectedOk AndAlso Not aGroup Is Nothing Then
@@ -273,6 +238,111 @@ Public Class atcDataManager
         End If
         Return aGroup
     End Function
+
+    ''' <summary>
+    ''' Return the currently loaded datasets whose Location attribute matches a currently selected shape on the map
+    ''' </summary>
+    Private Shared Function DatasetsAtMapSelectedLocations() As atcDataGroup
+        Dim lGroup As New atcDataGroup
+        Dim lLocations As ArrayList = MapSelectedLocations()
+        If lLocations.Count > 0 Then
+            For Each lDataSet As atcDataSet In DataSets()
+                If lLocations.Contains(lDataSet.Attributes.GetValue("Location", "")) Then
+                    lGroup.Add(lDataSet)
+                End If
+            Next
+        End If
+        Return lGroup
+    End Function
+
+    ''' <summary>
+    ''' Return the one-based location field index in the layer DBF
+    ''' </summary>
+    ''' <param name="aLayerDBF">Table to find a location field in. Contains one row per shape.</param>
+    ''' <remarks>
+    ''' Uses file layers.dbf to determine which field in the layer's dbf contains locations.
+    ''' Base layer file name is in first column, location field index is in fourth column.
+    ''' If layers.dbf is not found or layer is not found in it, scans aLayerDBF for a field 
+    ''' named in pLikelyShapeLocationFieldNames.
+    ''' </remarks>
+    Private Shared Function MapLayerLocationField(ByVal aLayerDBF As atcTableDBF) As Integer
+        Dim lLocationField As Integer = 0 'One-based field index. Zero indicates we have not found the index yet.
+
+        Dim lLayerListFilename As String = FindFile("Please locate layers.dbf", "layers.dbf") 'table containing location field for BASINS layers
+        If FileExists(lLayerListFilename) Then
+            Try
+                Dim lLayersDBF As New atcTableDBF
+                If lLayersDBF.OpenFile(lLayerListFilename) Then
+                    If lLayersDBF.FindFirst(1, IO.Path.GetFileNameWithoutExtension(aLayerDBF.FileName)) Then
+                        lLocationField = CInt(lLayersDBF.Value(4))
+                    End If
+                End If
+                lLayersDBF.Clear()
+            Catch
+            End Try
+        End If
+
+        If lLocationField = 0 Then 'search for a likely location field name
+            For Each lLocationFieldName As String In pLikelyShapeLocationFieldNames
+                lLocationField = aLayerDBF.FieldNumber(lLocationFieldName)
+                If lLocationField > 0 Then Exit For
+            Next
+        End If
+        Return lLocationField
+    End Function
+
+    ''' <summary>
+    ''' Returns list of locations (as string) of currently selected shapes on the map
+    ''' Returns empty list if there is no dbf for the current layer or if location field cannot be determined
+    ''' </summary>
+    Private Shared Function MapSelectedLocations() As ArrayList
+        Dim lLocations As New ArrayList
+        If Not pMapWin Is Nothing _
+           AndAlso pMapWin.View.SelectedShapes.NumSelected > 0 _
+           AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
+            Dim lCurrentLayerDBFname As String = FilenameSetExt(pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower, "dbf")
+            If IO.File.Exists(lCurrentLayerDBFname) Then
+                Dim lDBF As New atcTableDBF 'Table associated with current layer on map
+                If lDBF.OpenFile(lCurrentLayerDBFname) Then
+                    Dim lLocationField As Integer = MapLayerLocationField(lDBF) 'One-based field index. Zero indicates we have not found the index yet.
+                    If lLocationField > 0 Then
+                        Dim lLocation As String
+                        For lSelectionIndex As Integer = pMapWin.View.SelectedShapes.NumSelected - 1 To 0 Step -1
+                            lDBF.CurrentRecord = pMapWin.View.SelectedShapes.Item(lSelectionIndex).ShapeIndex + 1 ' +1 because ShapeIndex is zero based
+                            lLocation = lDBF.Value(lLocationField)
+                            If Not lLocations.Contains(lLocation) Then
+                                lLocations.Add(lDBF.Value(lLocationField))
+                            End If
+                        Next
+                    End If
+                End If
+            End If
+        End If
+        Return lLocations
+    End Function
+
+    Friend Shared Sub SelectLocationsOnMap(ByVal aLocations As ArrayList, ByVal aUnselectOthers As Boolean)
+        If Not pMapWin Is Nothing AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
+            Dim lCurrentLayerDBFname As String = FilenameSetExt(pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower, "dbf")
+            If IO.File.Exists(lCurrentLayerDBFname) Then
+                Dim lDBF As New atcTableDBF 'Table associated with current layer on map
+                If lDBF.OpenFile(lCurrentLayerDBFname) Then
+                    Dim lLocationField As Integer = MapLayerLocationField(lDBF)
+                    If lLocationField > 0 Then 'One-based field index. Zero indicates we have not found the field index.
+                        If aUnselectOthers Then pMapWin.View.SelectedShapes.ClearSelectedShapes()
+                        For Each lLocation As String In aLocations
+                            If lDBF.FindFirst(lLocationField, lLocation) Then
+                                Do
+                                    pMapWin.View.SelectedShapes.AddByIndex(lDBF.CurrentRecord - 1, Drawing.Color.Yellow) ' -1 because AddByIndex is zero based
+                                Loop While lDBF.FindNext(lLocationField, lLocation)
+                            End If
+                        Next
+                        pMapWin.View.Redraw()
+                    End If
+                End If
+            End If
+        End If
+    End Sub
 
     ''' <summary>Ask user to manage data sources</summary>
     ''' <param name="aTitle">
