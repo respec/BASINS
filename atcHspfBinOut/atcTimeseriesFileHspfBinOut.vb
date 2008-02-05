@@ -250,14 +250,14 @@ Public Class atcTimeseriesFileHspfBinOut
                     pHspfMsg = New HspfMsg
                     pHspfMsg.Open("hspfmsg.mdb")
                 End If
-                For lTsGroupIndex As Integer = 1 To pHspfMsg.TSGroupDefs.Count
+                For lTsGroupIndex As Integer = 0 To pHspfMsg.TSGroupDefs.Count - 1
                     Dim lTsGroup As atcUCI.HspfTSGroupDef = pHspfMsg.TSGroupDefs(lTsGroupIndex)
-                    For lTsMemberIndex As Integer = 1 To lTsGroup.MemberDefs.Count
+                    For lTsMemberIndex As Integer = 0 To lTsGroup.MemberDefs.Count - 1
                         Dim lTsMember As atcUCI.HspfTSMemberDef = lTsGroup.MemberDefs(lTsMemberIndex)
                         If lTsMember.Name.ToLower = aConstituent.ToLower Then
                             'todo: check english/metric flag, english assumed for now
                             pCountUnitsFound += 1
-                            lUnits = lTsMember.eunits
+                            lUnits = lTsMember.EUnits
                             'Logger.Dbg("FoundMsg " & aConstituent & " (" & lUnits & ")")
                             Exit For
                         End If

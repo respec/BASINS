@@ -4,6 +4,7 @@ Imports atcWDM
 Imports atcHspfBinOut
 Imports HspfSupport
 Imports MapWinUtility
+Imports atcGraph
 Imports ZedGraph
 
 Imports MapWindow.Interfaces
@@ -18,8 +19,8 @@ Module HSPFOutputReports
         pOutputLocations.Clear()
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
-        'Dim lTestName As String = "hyd_man"
-        Dim lTestName As String = "calleguas_cat"
+        Dim lTestName As String = "hyd_man"
+        'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
         Select Case lTestName
@@ -100,7 +101,9 @@ Module HSPFOutputReports
                     Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
                     Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
                     Dim lSimTSer As atcTimeseries = InchesToCfs(lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0)), lArea)
+                    lSimTSer.Attributes.SetValue("YAxis", "Left")
                     Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
+                    lObsTSer.Attributes.SetValue("YAxis", "Left")
                     lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                        lCons, lSite, _
                                                                        lSimTSer, lObsTSer, _
@@ -115,34 +118,32 @@ Module HSPFOutputReports
                     lDataGroup.Add(SubsetByDate(lObsTSer, _
                                                 lExpertSystem.SDateJ, _
                                                 lExpertSystem.EDateJ, Nothing))
-                    Dim lGraphForm As New atcGraph.atcGraphForm()
-                    Dim lGrapher As New atcGraph.clsGraphTime(lDataGroup, lGraphForm.ZedGraphCtrl)
-                    'lGraphForm.Size = lGraphForm.MaximumSize
-                    lGraphForm.WindowState = Windows.Forms.FormWindowState.Maximized
-                    With lGraphForm.Pane
-                        .XAxis.Title.Text = "Daily Mean Flow at " & lSite
-                        .XAxis.MajorGrid.IsVisible = True
-                        .YAxis.Title.Text = lCons & " (cfs)"
-                        .YAxis.Scale.Min = 0
-                        .YAxis.MajorGrid.IsVisible = True
-                        .YAxis.MinorGrid.IsVisible = True
-                        '.YAxis.Type = ZedGraph.AxisType.Log
-                        With .CurveList(0)
-                            .Label.Text = "Simulated"
-                            .Color = System.Drawing.Color.Red
-                        End With
-                        With .CurveList(1)
-                            .Label.Text = "Observed"
-                            .Color = System.Drawing.Color.Blue
-                        End With
-                        .Legend.Position = LegendPos.Float
-                        .Legend.Location = New Location(0.3, 0.05, CoordType.PaneFraction, AlignH.Right, AlignV.Top)
-                        .Legend.FontSpec.Size = 10
-                        .Legend.IsHStack = False
+                    Dim lOutFileBase As String = "outfiles\" & lCons & "_" & lSite
+                    'timeseries - arith
+                    Dim lZgc As ZedGraphControl = CreateZgc()
+                    Dim lGrapher As New clsGraphTime(lDataGroup, lZgc)
+                    lZgc.SaveIn(lOutFileBase & ".png")
+                    lZgc.SaveIn(lOutFileBase & ".emf")
+                    Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                    With lPane
+                        .YAxis.Type = ZedGraph.AxisType.Log
+                        ScaleAxis(lDataGroup, .YAxis)
+                        .YAxis.Scale.MaxAuto = False
+                        .YAxis.Scale.IsUseTenPower = False
                     End With
-                    lOutFileName = "outfiles\" & lCons & "_" & lSite & ".bmp"
-                    lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName)
-                    OpenFile(lOutFileName)
+                    'timeseries - log
+                    lOutFileName = lOutFileBase & "_log "
+                    lZgc.SaveIn(lOutFileName & ".png")
+                    lZgc.SaveIn(lOutFileName & ".emf")
+                    lZgc.Dispose()
+
+                    'duration plot
+                    lZgc = CreateZgc()
+                    Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
+                    lOutFileName = lOutFileBase & "_dur"
+                    lZgc.SaveIn(lOutFileName & ".png")
+                    lZgc.SaveIn(lOutFileName & ".emf")
+                    lZgc.Dispose()
                 Next lSiteIndex
                 lExpertSystem = Nothing
                 If lFileCopied Then
