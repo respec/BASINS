@@ -18,7 +18,7 @@ Module MetaDataBatch
         lSettings.ValidationType = ValidationType.DTD
         AddHandler lSettings.ValidationEventHandler, AddressOf ValidationEventHandler
 
-        Dim lFileNames() As String = {"cnty.shp.xml", "nhdplus.xml", "nhdflowline.shp.xml", "nhdflowline.shp.Orig.xml"}
+        Dim lFileNames() As String = {"nhdplus.xml", "cnty.shp.xml", "nhdflowline.shp.xml", "nhdflowline.shp.Orig.xml"}
         For Each lFileName As String In lFileNames
             Logger.Dbg("----Process " & lFileName)
             Dim lStream As New System.IO.FileStream(lFileName, IO.FileMode.Open)

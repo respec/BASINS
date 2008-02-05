@@ -16,10 +16,10 @@ Module HSPFOutputReports
 
     Private Sub Initialize()
         pOutputLocations.Clear()
-        Dim lTestName As String = "tinley"
+        'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
-        'Dim lTestName As String = "calleguas_cat"
+        Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
         Select Case lTestName
@@ -70,7 +70,7 @@ Module HSPFOutputReports
         lMsg.Open("hspfmsg.mdb")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
-        'lHspfUci.Save()
+        lHspfUci.Save()
 
         'open WDM file
         Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"

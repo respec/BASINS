@@ -77,9 +77,18 @@
     <Compile Include="CreateUCITest.vb" />
     <Compile Include="DailyMonthlyCompareStats.vb" />
     <Compile Include="ExpertSystemStatistics.vb" />
+    <Compile Include="frmSelectScript.Designer.vb">
+      <DependentUpon>frmSelectScript.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSelectScript.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GraphGaFlow.vb" />
     <Compile Include="GridAdd.vb" />
-    <Compile Include="GridValues.vb" />
+    <Compile Include="GridValues.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GridValuesPoint.vb" />
     <Compile Include="HSPFOutputReports.vb" />
     <Compile Include="LineDump.vb" />
     <Compile Include="Graph.vb" />
@@ -109,6 +118,10 @@
     <Compile Include="WdmCreateFromGrids.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmSelectScript.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSelectScript.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
@@ -128,9 +141,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\mwOpenMetadataManager\mwOpenMetadataManager.vbproj">
+    <ProjectReference Include="..\..\MapWindow4Plugins\mwOpenMetadataManager\mwOpenMetadataManagerBASINS40.vbproj">
       <Project>{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}</Project>
-      <Name>mwOpenMetadataManager</Name>
+      <Name>mwOpenMetadataManagerBASINS40</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcDataTree\atcDataTree.vbproj">
