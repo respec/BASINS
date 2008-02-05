@@ -6,6 +6,7 @@
 ''' </remarks>
 Public Class atcCollection
     Inherits ArrayList
+    Implements IDisposable
 
     Private pKeys As ArrayList = New ArrayList
 
@@ -101,7 +102,12 @@ Public Class atcCollection
     End Property
 
     Public Shadows Sub Clear()
-        pKeys.Clear()
+        If Not pKeys Is Nothing Then pKeys.Clear()
+        MyBase.Clear()
+    End Sub
+
+    Public Overridable Sub Dispose() Implements IDisposable.Dispose
+        If Not pKeys Is Nothing Then pKeys.Clear()
         MyBase.Clear()
     End Sub
 

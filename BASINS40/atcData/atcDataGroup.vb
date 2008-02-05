@@ -103,8 +103,13 @@ Public Class atcDataGroup
         If Count > 0 Then
             Dim lRemoved As atcDataGroup = Me.Clone
             MyBase.Clear()
-            'RaiseEvent Removed(lRemoved)
+            RaiseEvent Removed(lRemoved)
         End If
+    End Sub
+
+    Public Overrides Sub Dispose()
+        If Not pSelectedData Is Nothing Then pSelectedData.Clear()
+        MyBase.Dispose()
     End Sub
 
     ''' <summary>Create a copy of this data group</summary>

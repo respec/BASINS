@@ -429,6 +429,12 @@
   <data name="mnuSelectNoMatching.Text" xml:space="preserve">
     <value>Un-select Matching</value>
   </data>
+  <data name="mnuSelectSep1.Text" xml:space="preserve">
+    <value>-</value>
+  </data>
+  <data name="mnuSelectMap.Text" xml:space="preserve">
+    <value>Select Locations On Map</value>
+  </data>
   <data name="mnuSelect.Text" xml:space="preserve">
     <value>Select</value>
   </data>
@@ -631,6 +637,18 @@
     <value>mnuHelp</value>
   </data>
   <data name="&gt;&gt;mnuHelp.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectSep1.Name" xml:space="preserve">
+    <value>mnuSelectSep1</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectSep1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectMap.Name" xml:space="preserve">
+    <value>mnuSelectMap</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectMap.Type" xml:space="preserve">
     <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

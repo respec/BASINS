@@ -61,6 +61,8 @@ Friend Class frmSelectData
     Friend WithEvents mnuOpenData As System.Windows.Forms.MenuItem
     Friend WithEvents pnlButtons As System.Windows.Forms.Panel
     Friend WithEvents atcSelectedDates As atcData.atcChooseDataGroupDates
+    Friend WithEvents mnuSelectSep1 As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuSelectMap As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -91,6 +93,8 @@ Friend Class frmSelectData
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.pnlButtons = New System.Windows.Forms.Panel
         Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
+        Me.mnuSelectSep1 = New System.Windows.Forms.MenuItem
+        Me.mnuSelectMap = New System.Windows.Forms.MenuItem
         Me.groupTop.SuspendLayout()
         Me.groupSelected.SuspendLayout()
         Me.pnlButtons.SuspendLayout()
@@ -212,7 +216,7 @@ Friend Class frmSelectData
         'mnuSelect
         '
         Me.mnuSelect.Index = 2
-        Me.mnuSelect.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching})
+        Me.mnuSelect.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching, Me.mnuSelectSep1, Me.mnuSelectMap})
         resources.ApplyResources(Me.mnuSelect, "mnuSelect")
         '
         'mnuSelectAll
@@ -260,6 +264,17 @@ Friend Class frmSelectData
         Me.atcSelectedDates.OmitAfter = 0
         Me.atcSelectedDates.OmitBefore = 0
         '
+        'mnuSelectSep1
+        '
+        Me.mnuSelectSep1.Index = 4
+        resources.ApplyResources(Me.mnuSelectSep1, "mnuSelectSep1")
+        '
+        'mnuSelectMap
+        '
+        Me.mnuSelectMap.Checked = True
+        Me.mnuSelectMap.Index = 5
+        resources.ApplyResources(Me.mnuSelectMap, "mnuSelectMap")
+        '
         'frmSelectData
         '
         Me.AcceptButton = Me.btnOk
@@ -304,6 +319,8 @@ Friend Class frmSelectData
     Private pTotalTS As Integer
 
     Public Function AskUser(Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
+        mnuSelectMap.Checked = False
+
         If aGroup Is Nothing Then
             pSelectedGroup = New atcDataGroup
         Else
@@ -322,6 +339,9 @@ Friend Class frmSelectData
         pSelectedGrid.Initialize(pSelectedSource)
 
         Populate()
+
+        mnuSelectMap.Checked = GetSetting("BASINS", "Select Data", "SelectMap", "True").ToLower <> "false"
+
         If aModal Then
             Me.ShowDialog()
             If pSelectedOK Then
@@ -883,6 +903,11 @@ NextName:
         pMatchingGrid.Refresh()
         pSelectedGrid.Refresh()
         groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
+        If mnuSelectMap.Checked Then atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
+    End Sub
+
+    Private Sub mnuSelectMap_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSelectMap.Click
+        SaveSetting("BASINS", "Select Data", "SelectMap", CStr(mnuSelectMap.Checked))
     End Sub
 End Class
 

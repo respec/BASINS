@@ -238,7 +238,7 @@ Public Class frmSelectDisplay
             lDataSource = atcDataManager.DataSources.Item(iDataSource)
             If lDataSource.DataSets.Equals(pDataGroup) Then
                 If Logger.Msg("Discard " & lDataSource.ToString, MsgBoxStyle.YesNo, "Discard Data") = MsgBoxResult.Yes Then
-                    pDataGroup.Clear()
+                    pDataGroup.Dispose()
                     atcDataManager.DataSources.Remove(lDataSource)
                     Me.Close()
                 Else
