@@ -974,4 +974,40 @@ Public Module modDate
             If aTs = 0 Then aTu = aTu - 1
         End While
     End Sub
+
+    Public Function StringToJdate(ByVal aText As String, ByVal aIntervalStart As Boolean) As Double
+        Try
+            Dim lDateArray(6) As Integer
+            If aText.Length > 3 Then
+                lDateArray(0) = StrFirstInt(aText)
+                If aIntervalStart Then
+                    lDateArray(1) = 1
+                    lDateArray(2) = 1
+                    lDateArray(3) = 0
+                Else
+                    lDateArray(1) = 12
+                    lDateArray(2) = 31
+                    lDateArray(3) = 24
+                End If
+                lDateArray(4) = 0
+                lDateArray(5) = 0
+
+                If aText.Length > 1 Then
+                    aText = aText.Substring(1)
+                    lDateArray(1) = StrFirstInt(aText)
+                End If
+
+                If aText.Length > 1 Then
+                    aText = aText.Substring(1)
+                    lDateArray(2) = StrFirstInt(aText)
+                End If
+
+                Return Date2J(lDateArray)
+            Else
+                Return 0
+            End If
+        Catch e As Exception
+            Return 0
+        End Try
+    End Function
 End Module
