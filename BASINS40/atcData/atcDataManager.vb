@@ -229,7 +229,11 @@ Public Class atcDataManager
 
         'Try automatically selecting data based on what is selected on the map
         If aGroup Is Nothing OrElse aGroup.Count = 0 Then
-            aGroup = DatasetsAtMapSelectedLocations()
+            If aGroup Is Nothing Then
+                aGroup = DatasetsAtMapSelectedLocations()
+            Else
+                aGroup.AddRange(DatasetsAtMapSelectedLocations)
+            End If
             If aGroup.Count > 0 Then lAutoSelected = True
         End If
         aGroup = lForm.AskUser(aGroup, aModal)

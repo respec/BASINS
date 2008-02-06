@@ -13,6 +13,7 @@ Public Class frmGraphEditor
 
     Private pPane As GraphPane
     Private WithEvents pZgc As ZedGraphControl
+    Private pDateFormat As atcDateFormat
 
     ''' <summary>
     ''' Show this form for customizing the specified ZedGraphControl
@@ -23,6 +24,15 @@ Public Class frmGraphEditor
     Public Sub Edit(ByVal aZgc As ZedGraphControl)
         Dim lAutoApply As Boolean = chkAutoApply.Checked
         chkAutoApply.Checked = False
+
+        If pDateFormat Is Nothing Then
+            pDateFormat = New atcDateFormat
+            With pDateFormat
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+            End With
+        End If
 
         pZgc = aZgc
         pPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
@@ -71,7 +81,6 @@ Public Class frmGraphEditor
         End Select
         chkLegendOutline.Checked = pPane.Legend.Border.IsVisible
         txtLegendFontColor.BackColor = pPane.Legend.FontSpec.FontColor
-
     End Sub
 
     Private Function AxisFromCombo() As Axis
@@ -92,17 +101,21 @@ Public Class frmGraphEditor
     Private Sub SetControlsFromAxis(ByVal aAxis As Axis)
         If Not aAxis Is Nothing Then
             txtAxisLabel.Text = aAxis.Title.Text
+            radioAxisTime.Enabled = False
+            radioAxisLinear.Enabled = False
+            radioAxisLogarithmic.Enabled = False
+            radioAxisProbability.Enabled = False
             Select Case aAxis.Type
                 Case AxisType.DateDual
                     radioAxisTime.Checked = True
                 Case AxisType.Linear
+                    radioAxisLinear.Enabled = True
+                    radioAxisLogarithmic.Enabled = True
                     radioAxisLinear.Checked = True
-                    radioAxisLogarithmic.Enabled = True
-                    radioAxisLinear.Enabled = True
                 Case AxisType.Log
-                    radioAxisLogarithmic.Checked = True
-                    radioAxisLogarithmic.Enabled = True
                     radioAxisLinear.Enabled = True
+                    radioAxisLogarithmic.Enabled = True
+                    radioAxisLogarithmic.Checked = True
                 Case AxisType.Probability
                     radioAxisProbability.Checked = True
             End Select
@@ -119,8 +132,8 @@ Public Class frmGraphEditor
     Private Sub SetControlsMinMax(ByVal aAxis As Axis)
         If Not aAxis Is Nothing Then
             If radioAxisTime.Checked Then
-                txtAxisDisplayMinimum.Text = XDate.ToString(aAxis.Scale.Min)
-                txtAxisDisplayMaximum.Text = XDate.ToString(aAxis.Scale.Max)
+                txtAxisDisplayMinimum.Text = pDateFormat.JDateToString(aAxis.Scale.Min)
+                txtAxisDisplayMaximum.Text = pDateFormat.JDateToString(aAxis.Scale.Max)
             ElseIf radioAxisLinear.Checked Then
                 txtAxisDisplayMinimum.Text = DoubleToString(aAxis.Scale.Min)
                 txtAxisDisplayMaximum.Text = DoubleToString(aAxis.Scale.Max)
@@ -139,7 +152,9 @@ Public Class frmGraphEditor
         If Not aAxis Is Nothing Then
             With aAxis
                 If radioAxisTime.Checked Then
-                    'TODO: parse min/max date from textboxes
+                    'parse min/max date from textboxes
+                    aAxis.Scale.Min = StringToJdate(txtAxisDisplayMinimum.Text, True)
+                    aAxis.Scale.Max = StringToJdate(txtAxisDisplayMaximum.Text, False)
                 ElseIf radioAxisLinear.Checked Then
                     If aAxis.Type <> AxisType.Linear Then aAxis.Type = AxisType.Linear
                 ElseIf radioAxisLogarithmic.Checked Then

@@ -53,7 +53,9 @@ Public Class atcGraphForm
         With pZgc
             .Dock = DockStyle.Fill
             .IsEnableHZoom = mnuViewHorizontalZoom.Checked
+            .IsEnableHPan = mnuViewHorizontalZoom.Checked
             .IsEnableVZoom = mnuViewVerticalZoom.Checked
+            .IsEnableVPan = mnuViewVerticalZoom.Checked
             '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
             pMaster = .MasterPane
         End With
@@ -130,11 +132,11 @@ Public Class atcGraphForm
         Me.mnuView = New System.Windows.Forms.MenuItem
         Me.mnuViewVerticalZoom = New System.Windows.Forms.MenuItem
         Me.mnuViewHorizontalZoom = New System.Windows.Forms.MenuItem
+        Me.mnuViewZoomAll = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuCoordinates = New System.Windows.Forms.MenuItem
         Me.mnuCoordinatesOnMenuBar = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.mnuViewZoomAll = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -204,13 +206,18 @@ Public Class atcGraphForm
         'mnuViewVerticalZoom
         '
         Me.mnuViewVerticalZoom.Index = 0
-        Me.mnuViewVerticalZoom.Text = "Vertical Zoom"
+        Me.mnuViewVerticalZoom.Text = "Vertical Zoom/Pan"
         '
         'mnuViewHorizontalZoom
         '
         Me.mnuViewHorizontalZoom.Checked = True
         Me.mnuViewHorizontalZoom.Index = 1
-        Me.mnuViewHorizontalZoom.Text = "Horizontal Zoom"
+        Me.mnuViewHorizontalZoom.Text = "Horizontal Zoom/Pan"
+        '
+        'mnuViewZoomAll
+        '
+        Me.mnuViewZoomAll.Index = 2
+        Me.mnuViewZoomAll.Text = "Zoom to All"
         '
         'mnuAnalysis
         '
@@ -235,11 +242,6 @@ Public Class atcGraphForm
         Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
         Me.mnuHelp.ShowShortcut = False
         Me.mnuHelp.Text = "Help"
-        '
-        'mnuViewZoomAll
-        '
-        Me.mnuViewZoomAll.Index = 2
-        Me.mnuViewZoomAll.Text = "Zoom to All"
         '
         'atcGraphForm
         '
@@ -378,11 +380,13 @@ Public Class atcGraphForm
     Private Sub mnuViewHorizontalZoom_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewHorizontalZoom.Click
         mnuViewHorizontalZoom.Checked = Not mnuViewHorizontalZoom.Checked
         pZgc.IsEnableHZoom = mnuViewHorizontalZoom.Checked
+        pZgc.IsEnableHPan = mnuViewHorizontalZoom.Checked
     End Sub
 
     Private Sub mnuViewVerticalZoom_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewVerticalZoom.Click
         mnuViewVerticalZoom.Checked = Not mnuViewVerticalZoom.Checked
         pZgc.IsEnableVZoom = mnuViewVerticalZoom.Checked
+        pZgc.IsEnableVPan = mnuViewVerticalZoom.Checked
     End Sub
 
     'Private Sub mnuViewZoomMouse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewZoomMouse.Click

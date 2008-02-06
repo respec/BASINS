@@ -15,7 +15,9 @@ Public Class atcChooseDataGroupDates
 
     Public Property OmitBefore() As Double
         Get
-            Return GetTextboxJdate(txtOmitBefore, True)
+            Dim lJdate As Double = StringToJdate(txtOmitBefore.Text, True)
+            If lJdate < pFirstStart Then lJdate = pFirstStart
+            Return lJdate
         End Get
         Set(ByVal aJdate As Double)
             If Math.Abs(aJdate) > 5 Then txtOmitBefore.Text = pDateFormat.JDateToString(aJdate)
@@ -24,7 +26,9 @@ Public Class atcChooseDataGroupDates
 
     Public Property OmitAfter() As Double
         Get
-            Return GetTextboxJdate(txtOmitAfter, False)
+            Dim lJdate As Double = StringToJdate(txtOmitAfter.Text, False)
+            If lJdate > pLastEnd Then lJdate = pLastEnd
+            Return lJdate
         End Get
         Set(ByVal aJdate As Double)
             If Math.Abs(aJdate) > 5 Then txtOmitAfter.Text = pDateFormat.JDateToString(aJdate)
@@ -66,48 +70,6 @@ Public Class atcChooseDataGroupDates
             pLastEnd = aValue
         End Set
     End Property
-
-    Private Function GetTextboxJdate(ByVal aTextbox As Windows.Forms.TextBox, ByVal aIntervalStart As Boolean) As Double
-        Try
-            Dim lTextDate As String = aTextbox.Text
-            Dim lDateArray(6) As Integer
-            If lTextDate.Length > 3 Then
-                lDateArray(0) = StrFirstInt(lTextDate)
-                If aIntervalStart Then
-                    lDateArray(1) = 1
-                    lDateArray(2) = 1
-                    lDateArray(3) = 0
-                Else
-                    lDateArray(1) = 12
-                    lDateArray(2) = 31
-                    lDateArray(3) = 24
-                End If
-                lDateArray(4) = 0
-                lDateArray(5) = 0
-
-                If lTextDate.Length > 1 Then
-                    lTextDate = lTextDate.Substring(1)
-                    lDateArray(1) = StrFirstInt(lTextDate)
-                End If
-
-                If lTextDate.Length > 1 Then
-                    lTextDate = lTextDate.Substring(1)
-                    lDateArray(2) = StrFirstInt(lTextDate)
-                End If
-
-                GetTextboxJdate = Date2J(lDateArray)
-                If aIntervalStart Then
-                    If GetTextboxJdate < pFirstStart Then GetTextboxJdate = pFirstStart
-                Else
-                    If GetTextboxJdate > pLastEnd Then GetTextboxJdate = pLastEnd
-                End If
-            Else
-                Return 0
-            End If
-        Catch e As Exception
-            Return 0
-        End Try
-    End Function
 
     Public Property DataGroup() As atcDataGroup
         Get
