@@ -14,15 +14,21 @@ Module HSPFOutputReports
     Private pTestPath As String
     Private pBaseName As String
     Private pOutputLocations As New atcCollection
+    Private pGraphSaveFormat As String
 
     Private Sub Initialize()
         pOutputLocations.Clear()
+
+        pGraphSaveFormat = ".png"
+        'pGraphSaveFormat = ".emf"
+
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
         Dim lTestName As String = "hyd_man"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
+
         Select Case lTestName
             Case "tinley"
                 pTestPath = "c:\test\tinley"
@@ -101,9 +107,11 @@ Module HSPFOutputReports
                     Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
                     Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
                     Dim lSimTSer As atcTimeseries = InchesToCfs(lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0)), lArea)
+                    lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lSimTSer.Attributes.SetValue("YAxis", "Left")
                     Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
                     lObsTSer.Attributes.SetValue("YAxis", "Left")
+                    lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                        lCons, lSite, _
                                                                        lSimTSer, lObsTSer, _
@@ -119,30 +127,63 @@ Module HSPFOutputReports
                                                 lExpertSystem.SDateJ, _
                                                 lExpertSystem.EDateJ, Nothing))
                     Dim lOutFileBase As String = "outfiles\" & lCons & "_" & lSite
+                    Dim lZgc As ZedGraphControl
+                    'duration plot
+                    lZgc = CreateZgc()
+                    Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
+                    lZgc.SaveIn(lOutFileBase & "_dur" & pGraphSaveFormat)
+                    lGraphDur.Dispose()
+                    lZgc.Dispose()
+                    'cummulative difference
+                    lZgc = CreateZgc()
+                    Dim lGraphCum As New clsGraphCumulativeDifference(lDataGroup, lZgc)
+                    lZgc.SaveIn(lOutFileBase & "_cumDif" & pGraphSaveFormat)
+                    lGraphCum.Dispose()
+                    lZgc.Dispose()
+                    'scatter
+                    lZgc = CreateZgc()
+                    lZgc.MasterPane.PaneList(0).YAxis.Type = ZedGraph.AxisType.Log
+                    Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
+                    lZgc.SaveIn(lOutFileBase & "_scatDay" & pGraphSaveFormat)
+                    lGraphScatter.Dispose()
+                    lZgc.Dispose()
+                    'scatter - LZS vs Error(cfs)
+                    Dim lTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(9))
+                    lZgc = CreateZgc()
+                    If GraphScatterError(lZgc, lDataGroup, lExpertSystem.SDateJ, lExpertSystem.EDateJ, lTSer, "LZS (in)") Then
+                        lZgc.SaveIn(lOutFileBase & "_Error_LZS" & pGraphSaveFormat)
+                    End If
+                    'scatter - UZS vs Error(cfs)
+                    lTSer = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(8))
+                    lZgc = CreateZgc()
+                    If GraphScatterError(lZgc, lDataGroup, lExpertSystem.SDateJ, lExpertSystem.EDateJ, lTSer, "UZS (in)") Then
+                        lZgc.SaveIn(lOutFileBase & "_Error_UZS" & pGraphSaveFormat)
+                    End If
+                    'scatter - Observed vs Error(cfs)    
+                    lZgc = CreateZgc()
+                    If GraphScatterError(lZgc, lDataGroup, lExpertSystem.SDateJ, lExpertSystem.EDateJ, lObsTSer, "Observed (cfs)", AxisType.Log) Then
+                        lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & pGraphSaveFormat)
+                    End If
+                    'add precip to aux axis
+                    Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
+                    lPrecTSer.Attributes.SetValue("YAxis", "Aux")
+                    lDataGroup.Add(SubsetByDate(lPrecTSer, _
+                                                lExpertSystem.SDateJ, _
+                                                lExpertSystem.EDateJ, Nothing))
                     'timeseries - arith
-                    Dim lZgc As ZedGraphControl = CreateZgc()
+                    lZgc = CreateZgc()
                     Dim lGrapher As New clsGraphTime(lDataGroup, lZgc)
-                    lZgc.SaveIn(lOutFileBase & ".png")
-                    lZgc.SaveIn(lOutFileBase & ".emf")
-                    Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
-                    With lPane
+                    lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+                    lZgc.SaveIn(lOutFileBase & pGraphSaveFormat)
+                    With lZgc.MasterPane.PaneList(1) 'main pane, not aux
                         .YAxis.Type = ZedGraph.AxisType.Log
-                        ScaleAxis(lDataGroup, .YAxis)
+                        'ScaleAxis(lDataGroup, .YAxis)
+                        .YAxis.Scale.Max *= 4 'wag!
                         .YAxis.Scale.MaxAuto = False
                         .YAxis.Scale.IsUseTenPower = False
                     End With
                     'timeseries - log
-                    lOutFileName = lOutFileBase & "_log "
-                    lZgc.SaveIn(lOutFileName & ".png")
-                    lZgc.SaveIn(lOutFileName & ".emf")
-                    lZgc.Dispose()
-
-                    'duration plot
-                    lZgc = CreateZgc()
-                    Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
-                    lOutFileName = lOutFileBase & "_dur"
-                    lZgc.SaveIn(lOutFileName & ".png")
-                    lZgc.SaveIn(lOutFileName & ".emf")
+                    lZgc.SaveIn(lOutFileBase & "_log " & pGraphSaveFormat)
                     lZgc.Dispose()
                 Next lSiteIndex
                 lExpertSystem = Nothing
@@ -196,4 +237,42 @@ Module HSPFOutputReports
                 "outfiles\")
         End If
     End Sub
+
+    Function GraphScatterError(ByVal aZgc As ZedGraphControl, ByVal aDataGroup As atcDataGroup, _
+                               ByVal aSDateJ As Double, ByVal aEDateJ As Double, _
+                               ByVal aXAxisTser As atcTimeseries, ByVal aXAxisTitle As String, _
+                               Optional ByVal aXAxisType As ZedGraph.AxisType = AxisType.Linear) As Boolean
+        Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
+        Dim lMathArgs As New atcDataAttributes
+        lMathArgs.SetValue("timeseries", aDataGroup)
+        If lMath.Open("subtract", lMathArgs) Then
+            Dim lDataGroupError As New atcDataGroup
+            lDataGroupError.Add(SubsetByDate(aXAxisTser, aSDateJ, aEDateJ, Nothing))
+            lDataGroupError.Add(SubsetByDate(lMath.DataSets(0), aSDateJ, aEDateJ, Nothing))
+            Dim lGraphScatter As clsGraphScatter = New clsGraphScatter(lDataGroupError, aZgc)
+            With aZgc.MasterPane.PaneList(0)
+                .XAxis.Title.Text = aXAxisTitle
+                .XAxis.Type = aXAxisType
+                If aXAxisType = AxisType.Linear Then
+                    Scalit(aXAxisTser.Attributes.GetValue("Minimum"), _
+                           aXAxisTser.Attributes.GetValue("Maximum"), _
+                           False, .XAxis.Scale.Min, .XAxis.Scale.Max)
+                Else
+                    .XAxis.Scale.Min = 1
+                    .XAxis.Scale.Max = aXAxisTser.Attributes.GetDefinedValue("Maximum").Value * 2
+                    .XAxis.Scale.IsUseTenPower = False
+                End If
+                .YAxis.Title.Text = "Error (cfs)"
+                If Math.Abs(.YAxis.Scale.Min) > .YAxis.Scale.Max Then
+                    .YAxis.Scale.Max = -.YAxis.Scale.Min
+                Else
+                    .YAxis.Scale.Min = -.YAxis.Scale.Max
+                End If
+            End With
+            lGraphScatter.Dispose()
+            Return True
+        Else 'TODO:need error message
+            Return False
+        End If
+    End Function
 End Module
