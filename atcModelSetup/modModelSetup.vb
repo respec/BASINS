@@ -285,7 +285,7 @@ Module modModelSetup
         For i As Integer = 1 To aGridPervious.Source.Rows
             lUniqueLugroups.Add(aGridPervious.Source.CellValue(i, 1))
         Next i
-        Logger.Dbg("GridRowCount:" & aGridPervious.Source.Rows.Count & " UniqueLugroupCount:" & lUniqueLugroups.Count)
+        Logger.Dbg("GridRowCount:" & aGridPervious.Source.Rows & " UniqueLugroupCount:" & lUniqueLugroups.Count)
 
         Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
         Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
@@ -298,7 +298,7 @@ Module modModelSetup
             For Each lLandUse As LandUse In aLandUses
                 'find subbasin position in the area array
                 Dim spos As Integer
-                For j As Integer = 1 To lUniqueSubids.Count
+                For j As Integer = 0 To lUniqueSubids.Count - 1
                     If lLandUse.ModelID = lUniqueSubids(j) Then
                         spos = j
                         Exit For
@@ -452,7 +452,6 @@ Module modModelSetup
                             ByVal aReaches As Reaches)
 
         Dim lSBRch As New StringBuilder
-        Dim lSBPtf As New StringBuilder
 
         lSBRch.AppendLine("Rivrch" & Chr(32) & "Pname" & Chr(32) & "Watershed-ID" & Chr(32) & "HeadwaterFlag" & Chr(32) & _
                   "Exits" & Chr(32) & "Milept" & Chr(32) & "Stream/Resevoir Type" & Chr(32) & "Segl" & Chr(32) & _
@@ -462,32 +461,13 @@ Module modModelSetup
                   "Pk2" & Chr(32) & "Pk3" & Chr(32) & "Pmann" & Chr(32) & "Psod" & Chr(32) & "Pbgdo" & Chr(32) & _
                   "Pbgnh3" & Chr(32) & "Pbgbod5" & Chr(32) & "Pbgbod" & Chr(32) & "Level" & Chr(32) & "ModelSeg")
 
-        lSBPtf.AppendLine("Reach Number" & Chr(32) & "Length(ft)" & Chr(32) & _
-            "Mean Depth(ft)" & Chr(32) & "Mean Width (ft)" & Chr(32) & _
-            "Mannings Roughness Coeff." & Chr(32) & "Long. Slope" & Chr(32) & _
-            "Type of x-section" & Chr(32) & "Side slope of upper FP left" & Chr(32) & _
-            "Side slope of lower FP left" & Chr(32) & "Zero slope FP width left(ft)" & Chr(32) & _
-            "Side slope of channel left" & Chr(32) & "Side slope of channel right" & Chr(32) & _
-            "Zero slope FP width right(ft)" & Chr(32) & "Side slope lower FP right" & Chr(32) & _
-            "Side slope upper FP right" & Chr(32) & "Channel Depth(ft)" & Chr(32) & _
-            "Flood side slope change at depth" & Chr(32) & "Max. depth" & Chr(32) & _
-            "No. of exits" & Chr(32) & "Fraction of flow through exit 1" & Chr(32) & _
-            "Fraction of flow through exit 2" & Chr(32) & "Fraction of flow through exit 3" & Chr(32) & _
-            "Fraction of flow through exit 4" & Chr(32) & "Fraction of flow through exit 5")
-
         For Each lReach As Reach In aReaches
             With lReach
                 lSBRch.AppendLine(.Id & " " & Chr(34) & .Name & Chr(34) & " " & .Id & " " & _
                        " 0 1 0 S " & Format(.Length, "0.00") & " " & Format(Math.Abs(.DeltH), "0.00") & " " & _
                        Format(.Elev, "0.") & " 0 0 " & .DownID & " 0 0 0 0 0 " & _
-                       Format(Math.Abs(.DeltH / .Length), "0.000000") & " " & Format(.Depth, "0.0000") & " " & Format(.Width, "0.000") & _
+                       Format(Math.Abs(.DeltH / (.Length * 5280)), "0.000000") & " " & Format(.Depth, "0.0000") & " " & Format(.Width, "0.000") & _
                        " 0 0 0 0 0 0 0 0 0 0 0 0 0 " & .SegmentId)
-                lSBPtf.AppendLine(lReach.Id & " " & Format(.Length * 5280.0#, "0.") & " " & _
-                       Format(.Depth, "0.00000") & " " & Format(.Width, "0.00000") & " 0.05 " & _
-                       Format(Math.Abs(.DeltH / .Length), "0.00000") & " " & "Trapezoidal" & " " & _
-                       "0.5 0.5 " & Format(.Width, "0.000") & " 1 1 " & Format(.Width, "0.000") & _
-                       " 0.5 0.5 " & Format(.Depth * 1.25, "0.0000") & " " & Format(.Depth * 1.875, "0.0000") & " " & _
-                       Format(.Depth * 62.5, "0.000") & " 1 1 0 0 0 0")
                 If (2 * .Depth) > .Width Then 'problem
                     Logger.Msg("The depth and width values specified for Reach " & lReach.Id & ", coupled with the trapezoidal" & vbCrLf & _
                            "cross section assumptions of WinHSPF, indicate a physical imposibility." & vbCrLf & _
@@ -499,9 +479,42 @@ Module modModelSetup
             End With
         Next
 
-        Dim lPtfFileName As String = Mid(aRchFileName, 1, Len(aRchFileName) - 3) & "ptf"
         SaveFileString(aRchFileName, lSBRch.ToString)
-        SaveFileString(lptfFileName, lSBPtf.ToString)
+    End Sub
+
+    Friend Sub WritePTFFile(ByVal aPtfFileName As String, _
+                            ByVal aChannels As Channels)
+
+        Dim lSBPtf As New StringBuilder
+
+        lSBPtf.AppendLine("""Reach Number""" & "," & "Length(ft)" & "," & _
+            "Mean Depth(ft)" & "," & "Mean Width (ft)" & "," & _
+            "Mannings Roughness Coeff." & "," & "Long. Slope" & "," & _
+            "Type of x-section" & "," & "Side slope of upper FP left" & "," & _
+            "Side slope of lower FP left" & "," & "Zero slope FP width left(ft)" & "," & _
+            "Side slope of channel left" & "," & "Side slope of channel right" & "," & _
+            "Zero slope FP width right(ft)" & "," & "Side slope lower FP right" & "," & _
+            "Side slope upper FP right" & "," & "Channel Depth(ft)" & "," & _
+            "Flood side slope change at depth" & "," & "Max. depth" & "," & _
+            "No. of exits" & "," & "Fraction of flow through exit 1" & "," & _
+            "Fraction of flow through exit 2" & "," & "Fraction of flow through exit 3" & "," & _
+            "Fraction of flow through exit 4" & "," & "Fraction of flow through exit 5")
+
+        For Each lChannel As Channel In aChannels
+            With lChannel
+                lSBPtf.AppendLine(.Reach.Id & " " & Format(.Length, "0.") & " " & _
+                       Format(.DepthMean, "0.00000") & " " & Format(.WidthMean, "0.00000") & " " & _
+                       Format(.ManningN, "0.00") & " " & Format(.SlopeProfile, "0.00000") & " " & "Trapezoidal" & " " & _
+                       Format(.SlopeSideUpperFPLeft, "0.0") & Format(.SlopeSideLowerFPLeft, "0.0") & " " & _
+                       Format(.WidthZeroSlopeLeft, "0.000") & " " & .SlopeSideLeft & " " & .SlopeSideRight & " " & _
+                       Format(.WidthZeroSlopeRight, "0.000") & _
+                       Format(.SlopeSideLowerFPRight, "0.0") & Format(.SlopeSideUpperFPRight, "0.0") & " " & _
+                       Format(.DepthChannel, "0.0000") & " " & Format(.DepthSlopeChange, "0.0000") & " " & _
+                       Format(.DepthMax, "0.000") & " 1 1 0 0 0 0")
+            End With
+        Next
+
+        SaveFileString(aPtfFileName, lSBPtf.ToString)
     End Sub
 
     Friend Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As atcCollection, _
