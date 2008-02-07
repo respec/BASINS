@@ -56,12 +56,12 @@ Public Class ExpertSystem
 
     Public ReadOnly Property SDateJ() As Double
         Get
-            Return psdatej
+            Return pSDateJ
         End Get
     End Property
     Public ReadOnly Property EDateJ() As Double
         Get
-            Return pedatej
+            Return pEDateJ
         End Get
     End Property
 
