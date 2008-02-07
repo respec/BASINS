@@ -37,9 +37,9 @@ namespace ZedGraph
 	/// Appropriate values for this scale are returned by the System.DateTime.ToOADate method and by
 	/// the <see cref="ZedGraph.XDate" /> class.
 	/// Labels appear in either one or two rows, depending on the date range displayed.
-	/// When number of days >= 666, only one row is used because only year labels can fit.
-	/// When number of days > 60, a row of month labels and a row of year labels are drawn.
-	/// When number of days > 3, a row of day labels and a row of month + year labels are drawn.
+	/// When number of days >= MaxDaysMonthLabeled, only one row is used because only year labels can fit.
+	/// When number of days > MaxDaysDayLabeled, a row of month labels and a row of year labels are drawn.
+	/// When number of days > MaxDaysTimeLabeled, a row of day labels and a row of month + year labels are drawn.
 	/// Otherwise, a row of time labels and a row of year + month + day labels are drawn.
 	/// </remarks>
 	/// 
@@ -48,6 +48,10 @@ namespace ZedGraph
 	[Serializable]
 	class DateDualScale : Scale, ISerializable //, ICloneable
 	{
+		public double MaxDaysMonthLabeled = 666;
+		public double MaxDaysDayLabeled = 60;
+		public double MaxDaysTimeLabeled = 3;
+
 		/// <summary> Full names of months for labeling when there is room </summary>
 		private string[] MonthNamesFull = System.Globalization.DateTimeFormatInfo.CurrentInfo.MonthNames; //{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
@@ -147,10 +151,10 @@ namespace ZedGraph
 		private bool[] DrawWhich(double numDays)
 		{
 			bool[] drawThese = new bool[(int)DateUnit.Millisecond];
-			drawThese[(int)DateUnit.Hour] = (numDays <= 3);
-			drawThese[(int)DateUnit.Day] = (numDays <= 60);
-			drawThese[(int)DateUnit.Month] = (numDays > 3) && (numDays < 666);
-			drawThese[(int)DateUnit.Year] = (numDays > 60);
+			drawThese[(int)DateUnit.Hour] = (numDays <= MaxDaysTimeLabeled);
+			drawThese[(int)DateUnit.Day] = (numDays <= MaxDaysDayLabeled);
+			drawThese[(int)DateUnit.Month] = (numDays > MaxDaysTimeLabeled) && (numDays < MaxDaysMonthLabeled);
+			drawThese[(int)DateUnit.Year] = (numDays > MaxDaysDayLabeled);
 			return drawThese;
 		}
 
