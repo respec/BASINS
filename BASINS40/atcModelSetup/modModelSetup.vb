@@ -250,10 +250,10 @@ Module modModelSetup
         Return lCreateUCI
     End Function
 
-    Friend Sub WriteWSDFile(ByVal aWsdFileName As String, _
-                            ByVal aLandUses As LandUses, _
-                            ByVal aReclassifyFile As String, _
-                            ByVal aGridPervious As Object)
+    Friend Function ReclassifyLandUses(ByVal aReclassifyFile As String, _
+                                       ByVal aGridPervious As Object, _
+                                       ByVal aLandUses As LandUses) As LandUses
+        Dim lReclassifyLandUses As New LandUses
         'if simple reclassifyfile exists, read it in
         Dim lRcode As New atcCollection
         Dim lUseSimpleGrid As Boolean = False
@@ -305,7 +305,7 @@ Module modModelSetup
                     End If
                 Next j
                 'find lugroup that corresponds to this lucode
-                Dim lLandUseName As String = lRcode.ItemByKey(lLandUse.Code)
+                Dim lLandUseName As String = lRcode.ItemByKey(lLandUse.Code.ToString)
                 'For j As Integer = 1 To lRcode.Count
                 '    If aLucode(i) = lRcode(j) Then
                 '        lLandUseName = lRcode(j)
@@ -419,32 +419,43 @@ Module modModelSetup
                 Next j
             Next lLandUse
         End If
+        For Each lLandUseName As String In lUniqueLugroups
+            Dim lLandUse As New LandUse
+            With lLandUse
+                .Description = lLandUseName
+                x()
+            End With
+            lReclassifyLandUses.Add(lLandUse)
+        Next
+        Return lReclassifyLandUses
+    End Function
+
+    Friend Sub WriteWSDFile(ByVal aWsdFileName As String, _
+                            ByVal aLandUses As LandUses)
 
         Dim lSB As New StringBuilder
         lSB.AppendLine("LU Name" & Chr(32) & "Type (1=Impervious, 2=Pervious)" & Chr(32) & "Watershd-ID" & Chr(32) & "Area" & Chr(32) & "Slope" & Chr(32) & "Distance")
-        For i As Integer = 1 To lUniqueSubids.Count
-            For j As Integer = 1 To lUniqueLugroups.Count
-                Dim lType As String = "2"
-                Dim lArea As Double = lPerArea(i, j) / 4046.8564
-                If CInt(lArea) > 0 Then
-                    lSB.AppendLine(Chr(34) & lUniqueLugroups(j) & Chr(34) & Chr(32) & _
-                                   lType & Chr(32) & _
-                                   lUniqueSubids(i) & Chr(32) & _
-                                   Format(lArea, "0.") & Chr(32) & _
-                                   Format(lSlope(i), "0.000000") & Chr(32) & _
-                                   Format(lLength(i), "0.0000"))
-                End If
-                lType = "1"
-                lArea = lImpArea(i, j) / 4046.8564
-                If CInt(lArea) > 0 Then
-                    lSB.AppendLine(Chr(34) & lUniqueLugroups(j) & Chr(34) & Chr(32) & _
-                                   lType & Chr(32) & _
-                                   lUniqueSubids(i) & Format(lArea, "0.") & Chr(32) & _
-                                   Format(lSlope(i), "0.000000") & Chr(32) & _
-                                   Format(lLength(i), "0.0000"))
-                End If
-            Next j
-        Next i
+        For Each lLandUse As LandUse In aLandUses
+            Dim lType As String = "2"
+            Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
+            If lArea > 0 Then 'was CInt(lArea)
+                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & Chr(32) & _
+                               lType & Chr(32) & _
+                               lLandUse.ModelID & Chr(32) & _
+                               Format(lArea, "0.") & Chr(32) & _
+                               Format(lLandUse.Slope, "0.000000") & Chr(32) & _
+                               Format(lLandUse.Distance, "0.0000"))
+            End If
+            lType = "1"
+            lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
+            If lArea > 0 Then 'was CInt(lArea)
+                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & Chr(32) & _
+                               lType & Chr(32) & _
+                               lLandUse.ModelID & Format(lArea, "0.") & Chr(32) & _
+                               Format(lLandUse.Slope, "0.000000") & Chr(32) & _
+                               Format(lLandUse.Distance, "0.0000"))
+            End If
+        Next lLandUse
         SaveFileString(aWsdFileName, lSB.ToString)
     End Sub
 

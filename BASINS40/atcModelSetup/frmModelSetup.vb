@@ -1608,6 +1608,7 @@ Public Class frmModelSetup
             lSubbasinId = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinFieldIndex)
             lSubbasinSlope = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinSlopeIndex)
             lSubbasinsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex), lSubbasinId)
+            'TODO: be sure SubbasinIds are unique before this!
             lSubbasinsSlopes.Add(lSubbasinId, lSubbasinSlope)
         Next
         If lSubbasinsSelected.Count = 0 Then 'no subbasins selected, act as if all are selected
@@ -1631,6 +1632,7 @@ Public Class frmModelSetup
             CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas)
 
             If lLucodes.Count = 0 Then
+                'TODO: report problem?
                 Exit Function
             End If
             'set reclassify file name for giras
@@ -1676,16 +1678,13 @@ Public Class frmModelSetup
         Me.Refresh()
 
         'Create Reach Segments
-        Dim lReaches As New Reaches
-        lReaches = CreateReachSegments(lSubbasinsSelected)
+        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected)
 
         'Create Stream Channels
-        Dim lChannels As New Channels
-        lChannels = CreateStreamChannels(lReaches)
+        Dim lChannels As Channels = CreateStreamChannels(lReaches)
 
         'Create LandUses
-        Dim lLandUses As New LandUses
-        lLandUses = CreateLanduses(lSubbasinsSlopes)
+        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLucodes, lSubids, lAreas, lReaches)
 
         'figure out which outlets are in which subbasins
         Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
@@ -1742,7 +1741,8 @@ Public Class frmModelSetup
         'write wsd file
         lblStatus.Text = "Writing WSD file"
         Me.Refresh()
-        WriteWSDFile(lBaseFileName & ".wsd", lLandUses, lReclassifyFileName, AtcGridPervious)
+        Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, AtcGridPervious, lLandUses)
+        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses)
         'WriteWSDFile(lBaseFileName & ".wsd", lAreas, lLucodes, lSubids, cSubSlope, lReclassifyFileName, AtcGridPervious)
 
         'write rch file 
@@ -2139,22 +2139,30 @@ Public Class frmModelSetup
 
     End Sub
 
-    Private Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection) As LandUses
+    Private Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection, ByVal aLucodes As Collection, _
+                                    ByVal aSubids As Collection, ByVal aAreas As Collection, ByVal aReaches As Reaches) As LandUses
 
         Dim lLandUses As New LandUses
-        'Dim lLandUse As New LandUse
-        'With lLandUse
-        '    .Code = lTable.Value(1)
-        '    .ModelID = lTable.Value(2)
-        '    .Area = lTable.Value(3)
-        '    .Slope = 
-        '    .Description
-        '    .Distance()
-        '    .ImperviousFraction()
-        '    .Reach()
-        '    .Type = "COMPOSITE"
-        'End With
-        'lLandUses.Add(lLandUse)
+        For lIndex As Integer = 1 To aLucodes.Count
+            Dim lLandUse As New LandUse
+            With lLandUse
+                .Code = aLucodes(lIndex)
+                .ModelID = aSubids(lIndex)
+                .Area = aAreas(lIndex)
+                .Slope = aSubbasinsSlopes.ItemByKey(aSubids(lIndex))
+                .Description = .Code
+                '.Distance()
+                '.ImperviousFraction()
+                .Reach = aReaches.Item(.ModelID - 1)
+                .Type = "COMPOSITE"
+            End With
+            Dim lExistIndex As Integer = lLandUses.IndexOf(lLandUse)
+            If lLandUses.Contains(lLandUse.Description & ":" & lLandUse.Reach.Id) Then  'already have, add area
+                lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area += lLandUse.Area
+            Else 'new
+                lLandUses.Add(lLandUse)
+            End If
+        Next
 
         Return lLandUses
     End Function
