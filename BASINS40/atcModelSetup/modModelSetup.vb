@@ -306,12 +306,6 @@ Module modModelSetup
                 Next j
                 'find lugroup that corresponds to this lucode
                 Dim lLandUseName As String = lRcode.ItemByKey(lLandUse.Code.ToString)
-                'For j As Integer = 1 To lRcode.Count
-                '    If aLucode(i) = lRcode(j) Then
-                '        lLandUseName = lRcode(j)
-                '        Exit For
-                '    End If
-                'Next j
                 'find percent perv that corresponds to this lugroup
                 Dim lPercentImperv As Double
                 For j As Integer = 1 To aGridPervious.Source.Rows
@@ -419,14 +413,30 @@ Module modModelSetup
                 Next j
             Next lLandUse
         End If
-        For Each lLandUseName As String In lUniqueLugroups
-            Dim lLandUse As New LandUse
-            With lLandUse
-                .Description = lLandUseName
-                x()
-            End With
-            lReclassifyLandUses.Add(lLandUse)
+
+        For spos As Integer = 0 To lUniqueSubids.Count - 1
+            For lpos As Integer = 0 To lUniqueLugroups.Count - 1
+                Dim lLandUse As New LandUse
+                With lLandUse
+                    .Description = lUniqueLugroups(lpos)
+                    .Distance = lLength(spos)
+                    .Slope = lSlope(spos)
+                    .Area = lPerArea(spos, lpos) + lImpArea(spos, lpos)
+                    .Code = lpos
+                    .ImperviousFraction = lImpArea(spos, lpos) / .Area
+                    .ModelID = lUniqueSubids(spos)
+                    For Each lOrigLandUse As LandUse In aLandUses
+                        If lOrigLandUse.ModelID = .ModelID Then
+                            .Reach = lOrigLandUse.Reach
+                            Exit For
+                        End If
+                    Next
+                    .Type = "COMPOSITE"
+                End With
+                lReclassifyLandUses.Add(lLandUse)
+            Next
         Next
+
         Return lReclassifyLandUses
     End Function
 
@@ -434,25 +444,27 @@ Module modModelSetup
                             ByVal aLandUses As LandUses)
 
         Dim lSB As New StringBuilder
-        lSB.AppendLine("LU Name" & Chr(32) & "Type (1=Impervious, 2=Pervious)" & Chr(32) & "Watershd-ID" & Chr(32) & "Area" & Chr(32) & "Slope" & Chr(32) & "Distance")
+        lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                       """Area""" & "," & """Slope""" & "," & """Distance""")
         For Each lLandUse As LandUse In aLandUses
             Dim lType As String = "2"
             Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
             If lArea > 0 Then 'was CInt(lArea)
-                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & Chr(32) & _
-                               lType & Chr(32) & _
-                               lLandUse.ModelID & Chr(32) & _
-                               Format(lArea, "0.") & Chr(32) & _
-                               Format(lLandUse.Slope, "0.000000") & Chr(32) & _
+                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                               lType & "     " & _
+                               lLandUse.ModelID & "     " & _
+                               Format(lArea, "0.") & "     " & _
+                               Format(lLandUse.Slope, "0.000000") & "     " & _
                                Format(lLandUse.Distance, "0.0000"))
             End If
             lType = "1"
             lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
             If lArea > 0 Then 'was CInt(lArea)
-                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & Chr(32) & _
-                               lType & Chr(32) & _
-                               lLandUse.ModelID & Format(lArea, "0.") & Chr(32) & _
-                               Format(lLandUse.Slope, "0.000000") & Chr(32) & _
+                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                               lType & "     " & _
+                               lLandUse.ModelID & "     " & _
+                               Format(lArea, "0.") & "     " & _
+                               Format(lLandUse.Slope, "0.000000") & "     " & _
                                Format(lLandUse.Distance, "0.0000"))
             End If
         Next lLandUse
@@ -464,20 +476,25 @@ Module modModelSetup
 
         Dim lSBRch As New StringBuilder
 
-        lSBRch.AppendLine("Rivrch" & Chr(32) & "Pname" & Chr(32) & "Watershed-ID" & Chr(32) & "HeadwaterFlag" & Chr(32) & _
-                  "Exits" & Chr(32) & "Milept" & Chr(32) & "Stream/Resevoir Type" & Chr(32) & "Segl" & Chr(32) & _
-                  "Delth" & Chr(32) & "Elev" & Chr(32) & "Ulcsm" & Chr(32) & "Urcsm" & Chr(32) & "Dscsm" & Chr(32) & "Ccsm" & Chr(32) & _
-                  "Mnflow" & Chr(32) & "Mnvelo" & Chr(32) & "Svtnflow" & Chr(32) & "Svtnvelo" & Chr(32) & "Pslope" & Chr(32) & _
-                  "Pdepth" & Chr(32) & "Pwidth" & Chr(32) & "Pmile" & Chr(32) & "Ptemp" & Chr(32) & "Pph" & Chr(32) & "Pk1" & Chr(32) & _
-                  "Pk2" & Chr(32) & "Pk3" & Chr(32) & "Pmann" & Chr(32) & "Psod" & Chr(32) & "Pbgdo" & Chr(32) & _
-                  "Pbgnh3" & Chr(32) & "Pbgbod5" & Chr(32) & "Pbgbod" & Chr(32) & "Level" & Chr(32) & "ModelSeg")
+        lSBRch.AppendLine("""Rivrch""" & "," & """Pname""" & "," & """Watershed-ID""" & "," & """HeadwaterFlag""" & "," & _
+                  """Exits""" & "," & """Milept""" & "," & """Stream/Resevoir Type""" & "," & """Segl""" & "," & _
+                  """Delth""" & "," & """Elev""" & "," & """Ulcsm""" & "," & """Urcsm""" & "," & """Dscsm""" & "," & """Ccsm""" & "," & _
+                  """Mnflow""" & "," & """Mnvelo""" & "," & """Svtnflow""" & "," & """Svtnvelo""" & "," & """Pslope""" & "," & _
+                  """Pdepth""" & "," & """Pwidth""" & "," & """Pmile""" & "," & """Ptemp""" & "," & """Pph""" & "," & """Pk1""" & "," & _
+                  """Pk2""" & "," & """Pk3""" & "," & """Pmann""" & "," & """Psod""" & "," & """Pbgdo""" & "," & _
+                  """Pbgnh3""" & "," & """Pbgbod5""" & "," & """Pbgbod""" & "," & """Level""" & "," & """ModelSeg""")
 
+        Dim lSlope As Double
         For Each lReach As Reach In aReaches
             With lReach
+                lSlope = Math.Abs(.DeltH / (.Length * 5280))
+                If lSlope < 0.00001 Then
+                    lSlope = 0.001
+                End If
                 lSBRch.AppendLine(.Id & " " & Chr(34) & .Name & Chr(34) & " " & .Id & " " & _
                        " 0 1 0 S " & Format(.Length, "0.00") & " " & Format(Math.Abs(.DeltH), "0.00") & " " & _
                        Format(.Elev, "0.") & " 0 0 " & .DownID & " 0 0 0 0 0 " & _
-                       Format(Math.Abs(.DeltH / (.Length * 5280)), "0.000000") & " " & Format(.Depth, "0.0000") & " " & Format(.Width, "0.000") & _
+                       Format(lSlope, "0.000000") & " " & Format(.Depth, "0.0000") & " " & Format(.Width, "0.000") & _
                        " 0 0 0 0 0 0 0 0 0 0 0 0 0 " & .SegmentId)
                 If (2 * .Depth) > .Width Then 'problem
                     Logger.Msg("The depth and width values specified for Reach " & lReach.Id & ", coupled with the trapezoidal" & vbCrLf & _
@@ -498,28 +515,28 @@ Module modModelSetup
 
         Dim lSBPtf As New StringBuilder
 
-        lSBPtf.AppendLine("""Reach Number""" & "," & "Length(ft)" & "," & _
-            "Mean Depth(ft)" & "," & "Mean Width (ft)" & "," & _
-            "Mannings Roughness Coeff." & "," & "Long. Slope" & "," & _
-            "Type of x-section" & "," & "Side slope of upper FP left" & "," & _
-            "Side slope of lower FP left" & "," & "Zero slope FP width left(ft)" & "," & _
-            "Side slope of channel left" & "," & "Side slope of channel right" & "," & _
-            "Zero slope FP width right(ft)" & "," & "Side slope lower FP right" & "," & _
-            "Side slope upper FP right" & "," & "Channel Depth(ft)" & "," & _
-            "Flood side slope change at depth" & "," & "Max. depth" & "," & _
-            "No. of exits" & "," & "Fraction of flow through exit 1" & "," & _
-            "Fraction of flow through exit 2" & "," & "Fraction of flow through exit 3" & "," & _
-            "Fraction of flow through exit 4" & "," & "Fraction of flow through exit 5")
+        lSBPtf.AppendLine("""Reach Number""" & "," & """Length(ft)""" & "," & _
+            """Mean Depth(ft)""" & "," & """Mean Width (ft)""" & "," & _
+            """Mannings Roughness Coeff.""" & "," & """Long. Slope""" & "," & _
+            """Type of x-section""" & "," & """Side slope of upper FP left""" & "," & _
+            """Side slope of lower FP left""" & "," & """Zero slope FP width left(ft)""" & "," & _
+            """Side slope of channel left""" & "," & """Side slope of channel right""" & "," & _
+            """Zero slope FP width right(ft)""" & "," & """Side slope lower FP right""" & "," & _
+            """Side slope upper FP right""" & "," & """Channel Depth(ft)""" & "," & _
+            """Flood side slope change at depth""" & "," & """Max. depth""" & "," & _
+            """No. of exits""" & "," & """Fraction of flow through exit 1""" & "," & _
+            """Fraction of flow through exit 2""" & "," & """Fraction of flow through exit 3""" & "," & _
+            """Fraction of flow through exit 4""" & "," & """Fraction of flow through exit 5""")
 
         For Each lChannel As Channel In aChannels
             With lChannel
                 lSBPtf.AppendLine(.Reach.Id & " " & Format(.Length, "0.") & " " & _
                        Format(.DepthMean, "0.00000") & " " & Format(.WidthMean, "0.00000") & " " & _
                        Format(.ManningN, "0.00") & " " & Format(.SlopeProfile, "0.00000") & " " & "Trapezoidal" & " " & _
-                       Format(.SlopeSideUpperFPLeft, "0.0") & Format(.SlopeSideLowerFPLeft, "0.0") & " " & _
+                       Format(.SlopeSideUpperFPLeft, "0.0") & " " & Format(.SlopeSideLowerFPLeft, "0.0") & " " & _
                        Format(.WidthZeroSlopeLeft, "0.000") & " " & .SlopeSideLeft & " " & .SlopeSideRight & " " & _
-                       Format(.WidthZeroSlopeRight, "0.000") & _
-                       Format(.SlopeSideLowerFPRight, "0.0") & Format(.SlopeSideUpperFPRight, "0.0") & " " & _
+                       Format(.WidthZeroSlopeRight, "0.000") & " " & _
+                       Format(.SlopeSideLowerFPRight, "0.0") & " " & Format(.SlopeSideUpperFPRight, "0.0") & " " & _
                        Format(.DepthChannel, "0.0000") & " " & Format(.DepthSlopeChange, "0.0000") & " " & _
                        Format(.DepthMax, "0.000") & " 1 1 0 0 0 0")
             End With
@@ -528,7 +545,7 @@ Module modModelSetup
         SaveFileString(aPtfFileName, lSBPtf.ToString)
     End Sub
 
-    Friend Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As atcCollection, _
+    Friend Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As Collection, _
                             ByVal aLayerIndex As Integer, ByVal aPointIndex As Integer, ByVal aChkCustom As Boolean, _
                             ByVal aLblCustom As String, ByVal aChkCalculate As Boolean, ByVal aYear As String)
 
@@ -573,7 +590,7 @@ Module modModelSetup
 
             'build collection of npdes sites to output
             For i = 1 To aOutSubs.Count
-                For j = 1 To aUniqueSubids.Count
+                For j = 0 To aUniqueSubids.Count - 1
                     If aOutSubs(i) = aUniqueSubids(j) Then
                         'found this subbasin in selected list
                         If Len(GisUtil.FieldValue(aLayerIndex, i - 1, aPointIndex)) > 0 Then

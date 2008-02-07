@@ -1688,7 +1688,7 @@ Public Class frmModelSetup
 
         'figure out which outlets are in which subbasins
         Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
-        Dim lOutSubs As New atcCollection
+        Dim lOutSubs As New Collection
         If lOutletsThemeName <> "<none>" Then
             lblStatus.Text = "Joining point sources to subbasins"
             Me.Refresh()
@@ -1819,7 +1819,7 @@ Public Class frmModelSetup
             Dim lStreamsFieldIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, lStreamsFieldName)
             Dim lSelectedStreams As New atcCollection
             For i As Integer = 1 To GisUtil.NumSelectedFeatures(lStreamsLayerIndex)
-                lSelectedStreams.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lStreamsLayerIndex))
+                lSelectedStreams.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lStreamsLayerIndex))  'zero based index
             Next
             If lSelectedStreams.Count <> 1 Then
                 Logger.Msg("BASINS AQUATOX requires one and only one selected stream segment.", MsgBoxStyle.Critical, "BASINS AQUATOX Problem")
@@ -1833,34 +1833,34 @@ Public Class frmModelSetup
             Dim lModelSegmentIds As New atcCollection
             lModelSegmentIds.Add(1)
 
+            'Create Reach Segments
+            Dim lReaches As Reaches = CreateReachSegments(lUniqueStreamIds)
+
+            'Create Stream Channels
+            Dim lChannels As Channels = CreateStreamChannels(lReaches)
+
             'make output folder
             MkDirPath(aOutputPath)
             Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
 
-            'write rch file (and ptf)
-            lblStatus.Text = "Writing RCH and PTF files"
+            'write rch file 
+            lblStatus.Text = "Writing RCH file"
             Me.Refresh()
-            Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-            Dim lStreamsIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
-            Dim lStreamsRIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
-            Dim lLen2Index As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
-            Dim lSlo2Index As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
-            Dim lWid2Index As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
-            Dim lDep2Index As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
-            Dim lMinelIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
-            Dim lMaxelIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
-            Dim lSnameIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
-            'WriteRCHFile(lBaseFileName & ".rch", lUniqueStreamIds, lLayerIndex, lStreamsIndex, lStreamsRIndex, lLen2Index, _
-            '             lSlo2Index, lWid2Index, lDep2Index, lMinelIndex, lMaxelIndex, lSnameIndex, lModelSegmentIds)
+            WriteRCHFile(lBaseFileName & ".rch", lReaches)
+
+            'write ptf file
+            lblStatus.Text = "Writing PTF file"
+            Me.Refresh()
+            WritePTFFile(lBaseFileName & ".ptf", lChannels)
 
             'write psr file
             lblStatus.Text = "Writing PSR file"
             Me.Refresh()
-            Dim lOutSubs As New atcCollection
-            Dim OutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-            Dim PointLayerIndex As Integer = GisUtil.FieldIndex(lLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+            Dim lOutSubs As New Collection
+            Dim lOutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+            Dim lPointLayerIndex As Integer = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
             Dim lYear As String = cboYear.Items(cboYear.SelectedIndex)
-            WritePSRFile(lBaseFileName & ".psr", lUniqueStreamIds, lOutSubs, OutletsLayerIndex, PointLayerIndex, _
+            WritePSRFile(lBaseFileName & ".psr", lUniqueStreamIds, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
                          chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
 
             'start aquatox
@@ -1963,7 +1963,7 @@ Public Class frmModelSetup
                 .ManningN = 0.05
                 .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * 5280))
                 If .SlopeProfile < 0.0001 Then
-                    .SlopeProfile = 0.0001
+                    .SlopeProfile = 0.001
                 End If
                 .SlopeSideUpperFPLeft = 0.5
                 .SlopeSideLowerFPLeft = 0.5
@@ -2149,7 +2149,7 @@ Public Class frmModelSetup
                 .Code = aLucodes(lIndex)
                 .ModelID = aSubids(lIndex)
                 .Area = aAreas(lIndex)
-                .Slope = aSubbasinsSlopes.ItemByKey(aSubids(lIndex))
+                .Slope = aSubbasinsSlopes.ItemByKey(CInt(aSubids(lIndex)))
                 .Description = .Code
                 '.Distance()
                 '.ImperviousFraction()
