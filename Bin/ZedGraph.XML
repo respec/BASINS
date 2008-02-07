@@ -17256,9 +17256,9 @@
             Appropriate values for this scale are returned by the System.DateTime.ToOADate method and by
             the <see cref="T:ZedGraph.XDate"/> class.
             Labels appear in either one or two rows, depending on the date range displayed.
-            When number of days &gt;= 666, only one row is used because only year labels can fit.
-            When number of days &gt; 60, a row of month labels and a row of year labels are drawn.
-            When number of days &gt; 3, a row of day labels and a row of month + year labels are drawn.
+            When number of days &gt;= MaxDaysMonthLabeled, only one row is used because only year labels can fit.
+            When number of days &gt; MaxDaysDayLabeled, a row of month labels and a row of year labels are drawn.
+            When number of days &gt; MaxDaysTimeLabeled, a row of day labels and a row of month + year labels are drawn.
             Otherwise, a row of time labels and a row of year + month + day labels are drawn.
             </remarks>
             

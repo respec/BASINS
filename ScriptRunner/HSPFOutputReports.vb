@@ -110,8 +110,8 @@ Module HSPFOutputReports
                     lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lSimTSer.Attributes.SetValue("YAxis", "Left")
                     Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
-                    lObsTSer.Attributes.SetValue("YAxis", "Left")
                     lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
+                    lObsTSer.Attributes.SetValue("YAxis", "Left")
                     lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                        lCons, lSite, _
                                                                        lSimTSer, lObsTSer, _
@@ -175,6 +175,7 @@ Module HSPFOutputReports
                     Dim lGrapher As New clsGraphTime(lDataGroup, lZgc)
                     lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
                     lZgc.SaveIn(lOutFileBase & pGraphSaveFormat)
+                    'timeseries - log
                     With lZgc.MasterPane.PaneList(1) 'main pane, not aux
                         .YAxis.Type = ZedGraph.AxisType.Log
                         'ScaleAxis(lDataGroup, .YAxis)
@@ -182,9 +183,69 @@ Module HSPFOutputReports
                         .YAxis.Scale.MaxAuto = False
                         .YAxis.Scale.IsUseTenPower = False
                     End With
-                    'timeseries - log
                     lZgc.SaveIn(lOutFileBase & "_log " & pGraphSaveFormat)
                     lZgc.Dispose()
+                    lGrapher.Dispose()
+                    'monthly
+                    Dim lMonthDataGroup As New atcDataGroup
+                    lMonthDataGroup.Add(Aggregate(lDataGroup.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
+                    lMonthDataGroup.Add(Aggregate(lDataGroup.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
+                    lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+                    lZgc = CreateZgc()
+                    lZgc.Width *= 2
+                    lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
+                    lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+                    Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(0).XAxis.Scale
+                    lDualDateScale.MaxDaysMonthLabeled = 1200
+                    lZgc.SaveIn(lOutFileBase & "_month" & pGraphSaveFormat)
+                    'monthly timeseries - log
+                    With lZgc.MasterPane.PaneList(1) 'main pane, not aux
+                        .YAxis.Type = ZedGraph.AxisType.Log
+                        .YAxis.Scale.Max *= 4 'wag!
+                        .YAxis.Scale.MaxAuto = False
+                        .YAxis.Scale.IsUseTenPower = False
+                    End With
+                    lZgc.SaveIn(lOutFileBase & "_month_log " & pGraphSaveFormat)
+                    lZgc.Dispose()
+                    lGrapher.Dispose()
+                    'weekly ET - pet vs act
+                    lDataGroup.Clear()
+                    For lIndex As Integer = 6 To 7 'pet:6, act:7
+                        lTSer = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(lIndex))
+                        lTSer.Attributes.SetValue("Units", "ET (in)")
+                        lTSer.Attributes.SetValue("YAxis", "Left")
+                        If lIndex = 6 Then ' force pet to be observed
+                            lTSer.Attributes.SetValue("Scenario", "Observed")
+                        End If
+                        lDataGroup.Add(SubsetByDate(Aggregate(lTSer, atcTimeUnit.TUDay, 7, atcTran.TranSumDiv), _
+                                                    lExpertSystem.SDateJ, _
+                                                    lExpertSystem.EDateJ, Nothing))
+                    Next
+                    lZgc = CreateZgc()
+                    lGrapher = New clsGraphTime(lDataGroup, lZgc)
+                    lZgc.Width *= 2
+                    lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
+                    lDualDateScale.MaxDaysMonthLabeled = 1200
+                    lZgc.SaveIn(lOutFileBase & "_ET" & pGraphSaveFormat)
+                    lZgc.Dispose()
+                    lGrapher.Dispose()
+
+                    'flow components
+                    lDataGroup.Clear()
+                    For lIndex As Integer = 4 To 2 Step -1 'baseflow:4,interflow:3,surface:2
+                        lTSer = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(lIndex))
+                        lTSer.Attributes.SetValue("Units", "Flow (in)")
+                        lTSer.Attributes.SetValue("YAxis", "Left")
+                        lDataGroup.Add(SubsetByDate(lTSer, _
+                                                    lExpertSystem.SDateJ, _
+                                                    lExpertSystem.EDateJ, Nothing))
+                    Next
+                    lPrecTSer = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
+                    lPrecTSer.Attributes.SetValue("YAxis", "Aux")
+                    lDataGroup.Add(SubsetByDate(lPrecTSer, _
+                                                lExpertSystem.SDateJ, _
+                                                lExpertSystem.EDateJ, Nothing))
+                    GraphFlowComponents(lDataGroup, lOutFileBase)
                 Next lSiteIndex
                 lExpertSystem = Nothing
                 If lFileCopied Then
@@ -236,6 +297,83 @@ Module HSPFOutputReports
                 lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
                 "outfiles\")
         End If
+    End Sub
+
+    Sub GraphFlowComponents(ByVal aDataGroup As atcDataGroup, _
+                            ByVal aOutFileBase As String)
+        Dim lDataGroupOutput As New atcDataGroup
+
+        Dim lMathBaseInter As New atcTimeseriesMath.atcTimeseriesMath
+        Dim lMathBaseInterArgs As New atcDataAttributes
+        Dim lDataGroupBaseInter As New atcDataGroup
+        lDataGroupBaseInter.Add(aDataGroup.Item(0))
+        lDataGroupBaseInter.Add(aDataGroup.Item(1))
+        lMathBaseInterArgs.SetValue("timeseries", lDataGroupBaseInter)
+        lMathBaseInter.Open("add", lMathBaseInterArgs)
+        lMathBaseInter.DataSets(0).Attributes.SetValue("Constituent", "Interflow+baseflow")
+        lDataGroupOutput.Add(lMathBaseInter.DataSets(0)) 'baseflow + interflow
+
+        Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
+        Dim lMathArgs As New atcDataAttributes
+        Dim lDataGroup As New atcDataGroup
+        lDataGroup.Add(lMathBaseInter.DataSets(0))
+        lDataGroup.Add(aDataGroup.Item(2))
+        lMathArgs.SetValue("timeseries", lDataGroup)
+        lMath.Open("add", lMathArgs)
+        lMathBaseInter.DataSets(0).Attributes.SetValue("Constituent", "Simulated")
+        lDataGroupOutput.Add(lMath.DataSets(0)) 'baseflow + interflow
+
+        aDataGroup.Item(0).Attributes.SetValue("Constituent", "Baseflow")
+        lDataGroupOutput.Add(aDataGroup.Item(0)) 'baseflow
+
+        lDataGroupOutput.Add(aDataGroup.Item(3)) 'precip
+
+        Dim lZgc As ZedGraphControl = CreateZgc()
+        lZgc.Width *= 3
+        Dim lGrapher As New clsGraphTime(lDataGroupOutput, lZgc)
+        Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(1).XAxis.Scale
+        lDualDateScale.MaxDaysMonthLabeled = 1200
+        lZgc.MasterPane.PaneList(1).YAxis.Title.Text = "Flow (in)"
+        lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+        lZgc.SaveIn(aOutFileBase & "_Components" & pGraphSaveFormat)
+        With lZgc.MasterPane.PaneList(1) 'main pane, not aux
+            .YAxis.Type = ZedGraph.AxisType.Log
+            .YAxis.Scale.Max = 4
+            .YAxis.Scale.Min = 0.001
+            .YAxis.Scale.MaxAuto = False
+            .YAxis.Scale.IsUseTenPower = False
+        End With
+        lZgc.SaveIn(aOutFileBase & "_Components_Log" & pGraphSaveFormat)
+        lZgc.Dispose()
+        lGrapher.Dispose()
+
+        'now monthly
+        Dim lMonthDataGroup As New atcDataGroup
+        'one axis test
+        lDataGroupOutput.Item(3).Attributes.SetValue("YAxis", "Left")
+        lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+        lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+        lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+        lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(3), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+        lZgc = CreateZgc()
+        lZgc.Width *= 3
+        lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
+        lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
+        lDualDateScale.MaxDaysMonthLabeled = 1200
+        'lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+        lZgc.SaveIn(aOutFileBase & "_Components_month" & pGraphSaveFormat)
+        'monthly timeseries - log
+        With lZgc.MasterPane.PaneList(0) 'main pane, not aux
+            'With lZgc.MasterPane.PaneList(1) 'main pane, not aux
+            .YAxis.Type = ZedGraph.AxisType.Log
+            .YAxis.Scale.Max = 10
+            .YAxis.Scale.Min = 0.001
+            .YAxis.Scale.MaxAuto = False
+            .YAxis.Scale.IsUseTenPower = False
+        End With
+        lZgc.SaveIn(aOutFileBase & "_Components_month_log " & pGraphSaveFormat)
+        lZgc.Dispose()
+        lGrapher.Dispose()
     End Sub
 
     Function GraphScatterError(ByVal aZgc As ZedGraphControl, ByVal aDataGroup As atcDataGroup, _
