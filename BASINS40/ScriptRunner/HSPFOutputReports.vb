@@ -311,30 +311,26 @@ Module HSPFOutputReports
                             ByVal aOutFileBase As String)
         Dim lDataGroupOutput As New atcDataGroup
 
+        'baseflow + interflow
         Dim lMathBaseInter As New atcTimeseriesMath.atcTimeseriesMath
         Dim lMathBaseInterTSer As atcTimeseries = lMathBaseInter.Compute("add", aDataGroup.Item(0), aDataGroup.Item(1))
         lMathBaseInterTSer.Attributes.SetValue("Constituent", "Interflow+baseflow")
-        lDataGroupOutput.Add(lMathBaseInterTSer) 'baseflow + interflow
+        lDataGroupOutput.Add(lMathBaseInterTSer)
 
+        'total - add surface runoff
         Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
-        Dim lMathArgs As New atcDataAttributes
-        Dim lDataGroup As New atcDataGroup
-        lDataGroup.Add(lMathBaseInter.DataSets(0))
-        lDataGroup.Add(aDataGroup.Item(2))
-        lMathArgs.SetValue("timeseries", lDataGroup)
-        lMath.Open("add", lMathArgs)
-        lMathBaseInter.DataSets(0).Attributes.SetValue("Constituent", "Simulated")
-        lDataGroupOutput.Add(lMath.DataSets(0)) 'baseflow + interflow
+        Dim lMathTSer As atcTimeseries = lMath.Compute("add", lMathBaseInterTSer, aDataGroup.Item(2))
+        lMathTSer.Attributes.SetValue("Constituent", "Simulated")
+        lDataGroupOutput.Add(lMathTSer)
 
+        'precip - actual et
         Dim lMathPrecEt As New atcTimeseriesMath.atcTimeseriesMath
-        Dim lMathPrecEtArgs As New atcDataAttributes
-        Dim lDataGroupPrecEt As New atcDataGroup
-        lDataGroupPrecEt.Add(Aggregate(aDataGroup.Item(3), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv))
-        lDataGroupPrecEt.Add(Aggregate(aDataGroup.Item(4), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv))
-        lMathPrecEtArgs.SetValue("timeseries", lDataGroupPrecEt)
-        lMathPrecEt.Open("subtract", lMathPrecEtArgs)
-        lMathPrecEt.DataSets(0).Attributes.SetValue("Constituent", "Precip-ActET")
-        lMathPrecEt.DataSets(0).Attributes.SetValue("YAxis", "Left")
+        Dim lMathPrecEtTSer As atcTimeseries = _
+            lMathPrecEt.Compute("subtract", _
+                                Aggregate(aDataGroup.Item(3), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv), _
+                                Aggregate(aDataGroup.Item(4), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv))
+        lMathPrecEtTSer.Attributes.SetValue("Constituent", "Precip-ActET")
+        lMathPrecEtTSer.Attributes.SetValue("YAxis", "Left")
 
         aDataGroup.Item(0).Attributes.SetValue("Constituent", "Baseflow")
         lDataGroupOutput.Add(aDataGroup.Item(0)) 'baseflow
