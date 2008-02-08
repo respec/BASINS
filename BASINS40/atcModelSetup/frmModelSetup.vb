@@ -1887,7 +1887,7 @@ Public Class frmModelSetup
                         .Id = lSubbasinId
                         .Name = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lSnameIndex)
                         If Len(Trim(.Name)) = 0 Then
-                            .Name = "STREAM " + lSubbasinId
+                            .Name = "STREAM " + lSubbasinId.ToString
                         End If
                         .WsId = lSubbasinId
                         .NExits = 1
@@ -2110,7 +2110,7 @@ Public Class frmModelSetup
 
             For Each lShapeindex As String In aSubbasinsSelected.Keys
                 'loop thru each selected subbasin (or all if none selected)
-                Dim lSubid As String = aSubbasinsSelected.ItemByKey(lShapeindex)
+                Dim lSubid As String = aSubbasinsSelected.ItemByKey(CInt(lShapeindex)).ToString
                 For i As Integer = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
                     If lAreaLS(i, lShapeindex) > 0 Then
                         aLucode.Add(i)
@@ -2138,7 +2138,12 @@ Public Class frmModelSetup
                 .Description = .Code
                 '.Distance()
                 '.ImperviousFraction()
-                .Reach = aReaches.Item(.ModelID - 1)
+                For Each lReach As Reach In aReaches
+                    If lReach.Id = aSubids(lIndex) Then
+                        .Reach = lReach
+                        Exit For
+                    End If
+                Next
                 .Type = "COMPOSITE"
             End With
             Dim lExistIndex As Integer = lLandUses.IndexOf(lLandUse)
