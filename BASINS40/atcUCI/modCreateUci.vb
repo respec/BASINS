@@ -352,9 +352,9 @@ Module modCreateUci
                                     Exit For
                                 End If
                             Next
-                        Else  'PERLND or IMPLND
+                        Else  'PERLND or IMPLND (or COMPOSITE)
                             For Each lLanduse As LandUse In pWatershed.LandUses
-                                If lLanduse.Type = lOpTyp And lLanduse.ModelID = lOpn.Id Then
+                                If (lLanduse.Type = lOpTyp Or lLanduse.Type = "COMPOSITE") And lLanduse.ModelID = lOpn.Id Then
                                     For Each lMetSeg As HspfMetSeg In aUci.MetSegs
                                         If lMetSeg.Id = lLanduse.Reach.SegmentId Then
                                             lOpn.MetSeg = lMetSeg
