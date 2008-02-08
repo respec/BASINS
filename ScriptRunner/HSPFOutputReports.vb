@@ -240,11 +240,19 @@ Module HSPFOutputReports
                                                     lExpertSystem.SDateJ, _
                                                     lExpertSystem.EDateJ, Nothing))
                     Next
+                    'precip
                     lPrecTSer = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
                     lPrecTSer.Attributes.SetValue("YAxis", "Aux")
                     lDataGroup.Add(SubsetByDate(lPrecTSer, _
                                                 lExpertSystem.SDateJ, _
                                                 lExpertSystem.EDateJ, Nothing))
+                    'actual et
+                    Dim lETTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(7))
+                    lETTSer.Attributes.SetValue("YAxis", "Left")
+                    lDataGroup.Add(SubsetByDate(lETTSer, _
+                                                lExpertSystem.SDateJ, _
+                                                lExpertSystem.EDateJ, Nothing))
+                    'do the graphs
                     GraphFlowComponents(lDataGroup, lOutFileBase)
                 Next lSiteIndex
                 lExpertSystem = Nothing
@@ -304,14 +312,9 @@ Module HSPFOutputReports
         Dim lDataGroupOutput As New atcDataGroup
 
         Dim lMathBaseInter As New atcTimeseriesMath.atcTimeseriesMath
-        Dim lMathBaseInterArgs As New atcDataAttributes
-        Dim lDataGroupBaseInter As New atcDataGroup
-        lDataGroupBaseInter.Add(aDataGroup.Item(0))
-        lDataGroupBaseInter.Add(aDataGroup.Item(1))
-        lMathBaseInterArgs.SetValue("timeseries", lDataGroupBaseInter)
-        lMathBaseInter.Open("add", lMathBaseInterArgs)
-        lMathBaseInter.DataSets(0).Attributes.SetValue("Constituent", "Interflow+baseflow")
-        lDataGroupOutput.Add(lMathBaseInter.DataSets(0)) 'baseflow + interflow
+        Dim lMathBaseInterTSer As atcTimeseries = lMathBaseInter.Compute("add", aDataGroup.Item(0), aDataGroup.Item(1))
+        lMathBaseInterTSer.Attributes.SetValue("Constituent", "Interflow+baseflow")
+        lDataGroupOutput.Add(lMathBaseInterTSer) 'baseflow + interflow
 
         Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
         Dim lMathArgs As New atcDataAttributes
@@ -322,6 +325,16 @@ Module HSPFOutputReports
         lMath.Open("add", lMathArgs)
         lMathBaseInter.DataSets(0).Attributes.SetValue("Constituent", "Simulated")
         lDataGroupOutput.Add(lMath.DataSets(0)) 'baseflow + interflow
+
+        Dim lMathPrecEt As New atcTimeseriesMath.atcTimeseriesMath
+        Dim lMathPrecEtArgs As New atcDataAttributes
+        Dim lDataGroupPrecEt As New atcDataGroup
+        lDataGroupPrecEt.Add(Aggregate(aDataGroup.Item(3), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv))
+        lDataGroupPrecEt.Add(Aggregate(aDataGroup.Item(4), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv))
+        lMathPrecEtArgs.SetValue("timeseries", lDataGroupPrecEt)
+        lMathPrecEt.Open("subtract", lMathPrecEtArgs)
+        lMathPrecEt.DataSets(0).Attributes.SetValue("Constituent", "Precip-ActET")
+        lMathPrecEt.DataSets(0).Attributes.SetValue("YAxis", "Left")
 
         aDataGroup.Item(0).Attributes.SetValue("Constituent", "Baseflow")
         lDataGroupOutput.Add(aDataGroup.Item(0)) 'baseflow
@@ -354,15 +367,17 @@ Module HSPFOutputReports
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
-        lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(3), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+        lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(3), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec
+        lMonthDataGroup.Add(Aggregate(lMathPrecEt.DataSets(0), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec -act et
         lZgc = CreateZgc()
         lZgc.Width *= 3
         lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
         lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
         lDualDateScale.MaxDaysMonthLabeled = 1200
-        'lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+        lZgc.MasterPane.PaneList(0).YAxis.Scale.Max = 10
         lZgc.SaveIn(aOutFileBase & "_Components_month" & pGraphSaveFormat)
         'monthly timeseries - log
+        lGrapher.Datasets.RemoveAt(4) 'has negative values, looks wierd
         With lZgc.MasterPane.PaneList(0) 'main pane, not aux
             'With lZgc.MasterPane.PaneList(1) 'main pane, not aux
             .YAxis.Type = ZedGraph.AxisType.Log

@@ -186,6 +186,27 @@ Public Class atcTimeseriesMath
 
     End Sub
 
+    Public Function Compute(ByVal aOperationName As String, ByVal ParamArray aArgs() As Object) As atcTimeseries
+        Dim lDataAttributes As New atcDataAttributes
+        Dim lDataGroup As New atcDataGroup
+
+        For Each lArg As Object In aArgs
+            If lArg.GetType.Name = "atcTimeseries" Then
+                lDataGroup.Add(lArg)
+            Else 'TODO: other types (like constants)
+            End If
+        Next
+        If lDataGroup.Count > 0 Then
+            lDataAttributes.SetValue("timeseries", lDataGroup)
+        End If
+
+        If Open(aOperationName, lDataAttributes) Then
+            Return Me.DataSets(0)
+        Else
+            Return Nothing
+        End If
+    End Function
+
     'Args are each usually either Double or atcTimeseries
     Public Overrides Function Open(ByVal aOperationName As String, _
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
