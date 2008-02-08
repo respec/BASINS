@@ -1620,6 +1620,22 @@ Public Class frmModelSetup
             Next
         End If
 
+        'build collection of model segment ids for each subbasin
+        Dim lSubbasinsModelSegmentIds As New atcCollection    'key is subbasin id, value is model segment id
+        Dim lSubbasinSegmentFieldIndex As Integer = -1
+        If cboSub3.SelectedIndex > 0 Then 'see if we have some model segments in the subbasin dbf
+            lSubbasinSegmentFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSub3.Items(cboSub3.SelectedIndex))
+        End If
+        For Each lSubbasinIndex As Integer In lSubbasinsSelected.Keys
+            lSubbasinId = lSubbasinsSelected(lSubbasinIndex)
+            If lSubbasinSegmentFieldIndex > -1 And pUniqueModelSegmentIds.Count > 0 Then
+                Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex, lSubbasinSegmentFieldIndex)
+                lSubbasinsModelSegmentIds.Add(lSubbasinId, pUniqueModelSegmentIds(pUniqueModelSegmentNames.IndexFromKey(lModelSegment)))
+            Else
+                lSubbasinsModelSegmentIds.Add(lSubbasinId, 1)
+            End If
+        Next
+
         'todo: make into a new class 
         'each land use code, subbasin id, and area is a single land use record
         Dim lLucodes As New Collection
@@ -1678,7 +1694,7 @@ Public Class frmModelSetup
         Me.Refresh()
 
         'Create Reach Segments
-        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected)
+        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds)
 
         'Create Stream Channels
         Dim lChannels As Channels = CreateStreamChannels(lReaches)
@@ -1702,37 +1718,6 @@ Public Class frmModelSetup
                 End If
             Next j
         End If
-
-        'build collection of unique subbasin ids
-        Dim lUniqueSubids As New atcCollection
-        Dim lModelSegmentIds As New atcCollection
-        For Each lLandUse As LandUse In lLandUses
-            Dim lNewSubIdIndex As Integer = lUniqueSubids.Add(lLandUse.ModelID)
-            If lNewSubIdIndex = lUniqueSubids.Count Then
-                'store a corresponding model segment id
-                If pUniqueModelSegmentIds.Count = 0 Then
-                    'by default use 1 as the model segment id
-                    lModelSegmentIds.Add(1)
-                Else
-                    'for this subbasin, find the corresponding model segment id
-                    If cboSub3.SelectedIndex > 0 Then
-                        'see if we have some model segments in the subbasin dbf
-                        Dim lModelSegmentFieldName As String = cboSub3.Items(cboSub3.SelectedIndex)
-                        Dim lModelSegmentFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinLayerIndex, lModelSegmentFieldName)
-                        'Dim lIsInteger As Boolean = True
-                        For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                            Dim lSubidName As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lSubbasinFieldIndex)
-                            Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
-                            If lSubidName = lLandUse.ModelID Then
-                                'found a match
-                                lModelSegmentIds.Add(pUniqueModelSegmentIds(pUniqueModelSegmentNames.IndexFromKey(lModelSegment)))
-                                Exit For
-                            End If
-                        Next
-                    End If
-                End If
-            End If
-        Next
 
         'make output folder
         MkDirPath(aOutputPath)
@@ -1761,7 +1746,7 @@ Public Class frmModelSetup
         Dim lOutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
         Dim lPointLayerIndex As Integer = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
         Dim lYear As String = cboYear.Items(cboYear.SelectedIndex)
-        WritePSRFile(lBaseFileName & ".psr", lUniqueSubids, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
+        WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
                         chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
 
         'write seg file
@@ -1793,12 +1778,12 @@ Public Class frmModelSetup
         Me.Close()
 
         Return True
-            'Catch
-            '    Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
-            '    Me.Dispose()
-            '    Me.Close()
-            '    Return False
-            'End Try
+        'Catch
+        '    Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
+        '    Me.Dispose()
+        '    Me.Close()
+        '    Return False
+        'End Try
     End Function
 
     Private Function SetupAQUATOX(ByVal aOutputPath As String, ByVal aBaseOutputName As String) As Boolean
@@ -1834,7 +1819,7 @@ Public Class frmModelSetup
             lModelSegmentIds.Add(1)
 
             'Create Reach Segments
-            Dim lReaches As Reaches = CreateReachSegments(lUniqueStreamIds)
+            Dim lReaches As Reaches = CreateReachSegments(lUniqueStreamIds, lModelSegmentIds)
 
             'Create Stream Channels
             Dim lChannels As Channels = CreateStreamChannels(lReaches)
@@ -1878,7 +1863,7 @@ Public Class frmModelSetup
         End Try
     End Function
 
-    Private Function CreateReachSegments(ByVal aSubbasinsSelected As atcCollection) As Reaches
+    Private Function CreateReachSegments(ByVal aSubbasinsSelected As atcCollection, ByVal aSubbasinsModelSegmentIds As atcCollection) As Reaches
 
         'for reaches in selected subbasins, populate reach class from dbf
         Dim lReaches As New Reaches
@@ -1939,7 +1924,7 @@ Public Class frmModelSetup
                         End If
                         .Elev = ((lMaxEl + lMinEl) / 2)
                         .DeltH = lMaxEl - lMinEl
-                        .SegmentId = 1  'todo: used to get from aModelSegementIds
+                        .SegmentId = aSubbasinsModelSegmentIds.ItemByKey(lSubbasinId)
                     End With
                     lReaches.Add(lReach)
                 End If
