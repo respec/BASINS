@@ -427,9 +427,9 @@ Module modCreateUci
                 Do Until Not lOutOfOrder
                     lOutOfOrder = False
                     Dim i As Integer = 1
-                    Do Until i = pWatershed.Reaches.Count - 1
+                    Do Until i = pWatershed.Reaches.Count
                         Dim lStringToFind As String = pWatershed.Reaches(pWatershed.Reaches(i).Order).DownID
-                        Dim j As Integer = 1
+                        Dim j As Integer = 0
                         Do Until j = pWatershed.Reaches.Count - 1
                             If pWatershed.Reaches(pWatershed.Reaches(j).Order).Id = lStringToFind And j < i Then
                                 'reaches are out of order, swap places
@@ -482,7 +482,8 @@ Module modCreateUci
                 If lPerlndNames.IndexFromKey(lLandUse.Description) = -1 Then
                     lPerlndNames.Add(lLandUse.Description)
                 End If
-            ElseIf lLandUse.Type = "IMPLND" Or lLandUse.Type = "COMPOSITE" Then
+            End If
+            If lLandUse.Type = "IMPLND" Or lLandUse.Type = "COMPOSITE" Then
                 If lImplndNames.IndexFromKey(lLandUse.Description) = -1 Then
                     lImplndNames.Add(lLandUse.Description)
                 End If
@@ -542,7 +543,7 @@ Module modCreateUci
                         For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
                             If lOperation.Description = lLandUse.Description And _
                                lOperation.Name = pLandName(j) And _
-                               lLandUse.ModelID > 0 Then
+                               lOperation.Id = lLandUse.ModelID Then
                                 'have already added one of these for this model segment, so don't add again
                                 lAddflag = False
                                 lToperId = lOperation.Id
