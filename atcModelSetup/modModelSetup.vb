@@ -416,24 +416,27 @@ Module modModelSetup
 
         For spos As Integer = 0 To lUniqueSubids.Count - 1
             For lpos As Integer = 0 To lUniqueLugroups.Count - 1
-                Dim lLandUse As New LandUse
-                With lLandUse
-                    .Description = lUniqueLugroups(lpos)
-                    .Distance = lLength(spos)
-                    .Slope = lSlope(spos)
-                    .Area = lPerArea(spos, lpos) + lImpArea(spos, lpos)
-                    .Code = lpos
-                    .ImperviousFraction = lImpArea(spos, lpos) / .Area
-                    .ModelID = lUniqueSubids(spos)
-                    For Each lOrigLandUse As LandUse In aLandUses
-                        If lOrigLandUse.ModelID = .ModelID Then
-                            .Reach = lOrigLandUse.Reach
-                            Exit For
-                        End If
-                    Next
-                    .Type = "COMPOSITE"
-                End With
-                lReclassifyLandUses.Add(lLandUse)
+                Dim lArea As Double = lPerArea(spos, lpos) + lImpArea(spos, lpos)
+                If lArea > 0 Then
+                    Dim lLandUse As New LandUse
+                    With lLandUse
+                        .Description = lUniqueLugroups(lpos)
+                        .Distance = lLength(spos)
+                        .Slope = lSlope(spos)
+                        .Area = lArea
+                        .Code = lpos
+                        .ImperviousFraction = lImpArea(spos, lpos) / .Area
+                        .ModelID = lUniqueSubids(spos)
+                        For Each lOrigLandUse As LandUse In aLandUses
+                            If lOrigLandUse.ModelID = .ModelID Then
+                                .Reach = lOrigLandUse.Reach
+                                Exit For
+                            End If
+                        Next
+                        .Type = "COMPOSITE"
+                    End With
+                    lReclassifyLandUses.Add(lLandUse)
+                End If
             Next
         Next
 
@@ -449,21 +452,21 @@ Module modModelSetup
         For Each lLandUse As LandUse In aLandUses
             Dim lType As String = "2"
             Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
-            If lArea > 0 Then 'was CInt(lArea)
+            If lArea > 0 Then 'or CInt(lArea)
                 lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
                                lType & "     " & _
                                lLandUse.ModelID & "     " & _
-                               Format(lArea, "0.") & "     " & _
+                               Format(lArea, "0.0") & "     " & _
                                Format(lLandUse.Slope, "0.000000") & "     " & _
                                Format(lLandUse.Distance, "0.0000"))
             End If
             lType = "1"
             lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
-            If lArea > 0 Then 'was CInt(lArea)
+            If lArea > 0 Then 'or CInt(lArea)
                 lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
                                lType & "     " & _
                                lLandUse.ModelID & "     " & _
-                               Format(lArea, "0.") & "     " & _
+                               Format(lArea, "0.0") & "     " & _
                                Format(lLandUse.Slope, "0.000000") & "     " & _
                                Format(lLandUse.Distance, "0.0000"))
             End If
