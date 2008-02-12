@@ -24,12 +24,17 @@ Module HSPFOutputReports
 
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
-        Dim lTestName As String = "hyd_man"
+        'Dim lTestName As String = "hyd_man"
+        Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
 
         Select Case lTestName
+            Case "upatoi"
+                pTestPath = "D:\Basins\modelout\Upatoi"
+                pBaseName = "upatoi"
+                pOutputLocations.Add("R:46")
             Case "tinley"
                 pTestPath = "c:\test\tinley"
                 pBaseName = "tinley"
@@ -165,18 +170,22 @@ Module HSPFOutputReports
                         lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & pGraphSaveFormat)
                     End If
                     'add precip to aux axis
+                    Dim lPaneCount As Integer = 1
                     Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
-                    lPrecTSer.Attributes.SetValue("YAxis", "Aux")
-                    lDataGroup.Add(SubsetByDate(lPrecTSer, _
-                                                lExpertSystem.SDateJ, _
-                                                lExpertSystem.EDateJ, Nothing))
+                    If Not lPrecTSer Is Nothing Then
+                        lPrecTSer.Attributes.SetValue("YAxis", "Aux")
+                        lDataGroup.Add(SubsetByDate(lPrecTSer, _
+                                                    lExpertSystem.SDateJ, _
+                                                    lExpertSystem.EDateJ, Nothing))
+                        lPaneCount = 2
+                    End If
                     'timeseries - arith
                     lZgc = CreateZgc()
                     Dim lGrapher As New clsGraphTime(lDataGroup, lZgc)
-                    lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+                    If lPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
                     lZgc.SaveIn(lOutFileBase & pGraphSaveFormat)
                     'timeseries - log
-                    With lZgc.MasterPane.PaneList(1) 'main pane, not aux
+                    With lZgc.MasterPane.PaneList(lPaneCount - 1)
                         .YAxis.Type = ZedGraph.AxisType.Log
                         'ScaleAxis(lDataGroup, .YAxis)
                         .YAxis.Scale.Max *= 4 'wag!
@@ -190,16 +199,16 @@ Module HSPFOutputReports
                     Dim lMonthDataGroup As New atcDataGroup
                     lMonthDataGroup.Add(Aggregate(lDataGroup.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
                     lMonthDataGroup.Add(Aggregate(lDataGroup.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
-                    lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+                    If lPaneCount = 2 Then lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
                     lZgc = CreateZgc()
                     lZgc.Width *= 2
                     lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
-                    lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+                    If lPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
                     Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(0).XAxis.Scale
                     lDualDateScale.MaxDaysMonthLabeled = 1200
                     lZgc.SaveIn(lOutFileBase & "_month" & pGraphSaveFormat)
                     'monthly timeseries - log
-                    With lZgc.MasterPane.PaneList(1) 'main pane, not aux
+                    With lZgc.MasterPane.PaneList(lPaneCount - 1) 'main pane, not aux
                         .YAxis.Type = ZedGraph.AxisType.Log
                         .YAxis.Scale.Max *= 4 'wag!
                         .YAxis.Scale.MaxAuto = False
