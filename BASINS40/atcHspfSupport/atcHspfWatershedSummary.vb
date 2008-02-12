@@ -129,52 +129,59 @@ Public Module WatershedSummary
         Dim lSum As Double = 0.0
 
         For Each lOperType As String In lOperTypes
-            For Each lOper In aUci.OpnBlks(lOperType).ids
+            For Each lOper In aUci.OpnBlks(lOperType).Ids
                 'for each operation, get land use name, number of acres, and load/acre
-                lLuName = lOper.Tables("GEN-INFO").parms(1).value
-                lLuArea = LandArea(lOper.Name, lOper.Id, aUci)
-
-                Dim lTempDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
-                If lTempDataGroup.FindData("Constituent", lAgchemConstituent).Count > 0 Then
-                    'if you find the agchem constituent, use it
-                    lTempDataSet = lTempDataGroup.FindData("Constituent", lAgchemConstituent).Item(0)
-                    lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                If Not lOper.TableExists("GEN-INFO") Then
+                    Logger.Dbg("Missing:GEN-INFO:" & lOper.Name & ":" & lOper.Id)
                 Else
-                    'normal case -- don't have the agchem constituent
-                    Dim lConstituents As New Collection
-                    If lOperType = "PERLND" Then
-                        lConstituents = lPerlndConstituents
-                    Else
-                        lConstituents = lImplndConstituents
+                    lLuName = lOper.Tables("GEN-INFO").Parms(1).Value
+                    lLuArea = LandArea(lOper.Name, lOper.Id, aUci)
+
+                    Dim lTempDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
+                    If lTempDataGroup Is Nothing Then
+                        Logger.Dbg("No Data") 'TODO: for?
                     End If
-                    lValue = 0.0
-                    For Each lConstituent As String In lConstituents
-                        If lTempDataGroup.FindData("Constituent", lConstituent).Count > 0 Then
-                            lTempDataSet = lTempDataGroup.FindData("Constituent", lConstituent).Item(0)
-                            Dim lMult As Single = 1.0
-                            If lConstituent = "POQUAL-BOD" Or lConstituent = "SOQUAL-BOD" Then
-                                'might need another multiplier for bod
-                                If aSummaryType = "BOD" Then
-                                    lMult = 0.4
-                                ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
-                                    lMult = 0.048
-                                ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
-                                    lMult = 0.0023
-                                End If
-                            End If
-                            lValue = lValue + (lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * lMult)
+                    If lTempDataGroup.FindData("Constituent", lAgchemConstituent).Count > 0 Then
+                        'if you find the agchem constituent, use it
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", lAgchemConstituent).Item(0)
+                        lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                    Else
+                        'normal case -- don't have the agchem constituent
+                        Dim lConstituents As New Collection
+                        If lOperType = "PERLND" Then
+                            lConstituents = lPerlndConstituents
+                        Else
+                            lConstituents = lImplndConstituents
                         End If
-                    Next
+                        lValue = 0.0
+                        For Each lConstituent As String In lConstituents
+                            If lTempDataGroup.FindData("Constituent", lConstituent).Count > 0 Then
+                                lTempDataSet = lTempDataGroup.FindData("Constituent", lConstituent).Item(0)
+                                Dim lMult As Single = 1.0
+                                If lConstituent = "POQUAL-BOD" Or lConstituent = "SOQUAL-BOD" Then
+                                    'might need another multiplier for bod
+                                    If aSummaryType = "BOD" Then
+                                        lMult = 0.4
+                                    ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
+                                        lMult = 0.048
+                                    ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
+                                        lMult = 0.0023
+                                    End If
+                                End If
+                                lValue += (lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * lMult)
+                            End If
+                        Next
+                    End If
+                    lTotal = lLuArea * lValue
+                    If aSummaryType = "Water" Then
+                        lTotal /= 8687.6  'convert in to cfs
+                    End If
+                    lLandUses.Add(Left(lOperType, 1) & lOper.Id & ":" & lLuName.Trim)
+                    lAreas.Add(lLuArea)
+                    lLoads.Add(lValue)
+                    lTotalLoads.Add(lTotal)
+                    lSum += lTotal
                 End If
-                lTotal = lLuArea * lValue
-                If aSummaryType = "Water" Then
-                    lTotal = lTotal / 8687.6  'convert in to cfs
-                End If
-                lLandUses.Add(Left(lOperType, 1) & lOper.Id & ":" & lLuName.Trim)
-                lAreas.Add(lLuArea)
-                lLoads.Add(lValue)
-                lTotalLoads.Add(lTotal)
-                lSum = lSum + lTotal
             Next
         Next
 
