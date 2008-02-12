@@ -21,6 +21,15 @@ Public Class atcDateFormat
     'Private pDateEndInterval As Boolean = True
     Private pMidnight24 As Boolean = True
 
+    Public Property DateOrder() As DateOrderEnum
+        Get
+            Return pDateOrder
+        End Get
+        Set(ByVal newValue As DateOrderEnum)
+            pDateOrder = newValue
+        End Set
+    End Property
+
     Public Property DateSeparator() As String
         Get
             Return pDateSeparator

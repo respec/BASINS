@@ -90,6 +90,7 @@ Public Module modGraph
         Dim lCommonUnits As String = aDataGroup.CommonAttributeValue("Units", "")
 
         Dim lConstituent As String
+        Dim lUnits As String
 
         Dim lYaxisNames As New atcCollection 'name for each item in aDataGroup
 
@@ -101,19 +102,23 @@ Public Module modGraph
 
         For Each lTimeseries As atcTimeseries In aDataGroup
             lConstituent = lTimeseries.Attributes.GetValue("Constituent", "").ToString.ToUpper
+            lUnits = lTimeseries.Attributes.GetValue("Units", "").ToString.ToUpper
             Dim lYAxisName As String = lTimeseries.Attributes.GetValue("YAxis", "")
             If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
                 lYAxisName = "LEFT" 'Default to left Y axis
 
                 'Look for existing curve with same constituent and use the same Y axis
-                If GroupContainsConstituent(lLeftDataSets, lConstituent) Then
+                If GroupContainsAttribute(lLeftDataSets, "Constituent", lConstituent) OrElse _
+                   GroupContainsAttribute(lLeftDataSets, "Units", lUnits) Then
                     GoTo FoundMatch
                 End If
-                If GroupContainsConstituent(lRightDataSets, lConstituent) Then
+                If GroupContainsAttribute(lRightDataSets, "Constituent", lConstituent) OrElse _
+                   GroupContainsAttribute(lRightDataSets, "Units", lUnits) Then
                     lYAxisName = "RIGHT"
                     GoTo FoundMatch
                 End If
-                If GroupContainsConstituent(lAuxDataSets, lConstituent) Then
+                If GroupContainsAttribute(lAuxDataSets, "Constituent", lConstituent) OrElse _
+                   GroupContainsAttribute(lAuxDataSets, "Units", lUnits) Then
                     lYAxisName = "AUX"
                     GoTo FoundMatch
                 End If
@@ -159,11 +164,11 @@ FoundMatch:
 
     <CLSCompliant(False)> _
     Sub AxisTitlesFromCommonAttributes(ByVal aPane As GraphPane, _
-                        Optional ByVal aCommonTimeUnitName As String = Nothing, _
-                        Optional ByVal aCommonScenario As String = Nothing, _
-                        Optional ByVal aCommonConstituent As String = Nothing, _
-                        Optional ByVal aCommonLocation As String = Nothing, _
-                        Optional ByVal aCommonUnits As String = Nothing)
+                              Optional ByVal aCommonTimeUnitName As String = Nothing, _
+                              Optional ByVal aCommonScenario As String = Nothing, _
+                              Optional ByVal aCommonConstituent As String = Nothing, _
+                              Optional ByVal aCommonLocation As String = Nothing, _
+                              Optional ByVal aCommonUnits As String = Nothing)
         If Not aCommonTimeUnitName Is Nothing AndAlso aCommonTimeUnitName.Length > 0 _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonTimeUnitName) Then
             aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
@@ -199,9 +204,9 @@ FoundMatch:
         End If
     End Sub
 
-    Private Function GroupContainsConstituent(ByVal aGroup As atcDataGroup, ByVal aConstituent As String) As Boolean
+    Private Function GroupContainsAttribute(ByVal aGroup As atcDataGroup, ByVal aAttribute As String, ByVal aValue As String) As Boolean
         For Each lTs As atcTimeseries In aGroup
-            If String.Compare(lTs.Attributes.GetValue("Constituent"), aConstituent, True) = 0 Then
+            If String.Compare(lTs.Attributes.GetValue(aAttribute), aValue, True) = 0 Then
                 Return True
             End If
         Next
