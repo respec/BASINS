@@ -40,7 +40,7 @@ Partial Class MapWindowForm
         '
         Me.lblStatus.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblStatus.AutoSize = True
-        Me.lblStatus.Location = New System.Drawing.Point(24, 36)
+        Me.lblStatus.Location = New System.Drawing.Point(24, 64)
         Me.lblStatus.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblStatus.Name = "lblStatus"
         Me.lblStatus.Size = New System.Drawing.Size(0, 17)
@@ -50,7 +50,7 @@ Partial Class MapWindowForm
         '
         Me.lblProgress.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(387, 36)
+        Me.lblProgress.Location = New System.Drawing.Point(387, 64)
         Me.lblProgress.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblProgress.Name = "lblProgress"
         Me.lblProgress.Size = New System.Drawing.Size(0, 17)
@@ -61,13 +61,13 @@ Partial Class MapWindowForm
         '
         'StripDocker.ContentPanel
         '
-        Me.StripDocker.ContentPanel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.StripDocker.ContentPanel.Size = New System.Drawing.Size(922, 2)
+        Me.StripDocker.ContentPanel.Margin = New System.Windows.Forms.Padding(4)
+        Me.StripDocker.ContentPanel.Size = New System.Drawing.Size(922, 55)
         Me.StripDocker.Dock = System.Windows.Forms.DockStyle.Fill
         Me.StripDocker.Location = New System.Drawing.Point(0, 0)
-        Me.StripDocker.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.StripDocker.Margin = New System.Windows.Forms.Padding(4)
         Me.StripDocker.Name = "StripDocker"
-        Me.StripDocker.Size = New System.Drawing.Size(922, 76)
+        Me.StripDocker.Size = New System.Drawing.Size(922, 104)
         Me.StripDocker.TabIndex = 66
         Me.StripDocker.Text = "StripDocker"
         '
@@ -150,11 +150,11 @@ Partial Class MapWindowForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(922, 76)
+        Me.ClientSize = New System.Drawing.Size(922, 104)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.lblProgress)
         Me.Controls.Add(Me.StripDocker)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "MapWindowForm"
         Me.Text = "BASINS Light"
         Me.StripDocker.TopToolStripPanel.ResumeLayout(False)
