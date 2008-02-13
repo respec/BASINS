@@ -374,6 +374,8 @@ Module ManDelin
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "RCHID")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "COMID") Then
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "COMID")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASIN") Then
+            lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASIN")
         End If
         If GisUtil.IsField(lStreamsLayerIndex, "DSCSM") Then
             lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "DSCSM")
@@ -381,6 +383,8 @@ Module ManDelin
             lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "DSRCHID")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "TOCOMID") Then
             lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "TOCOMID")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASINR") Then
+            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASINR")
         End If
 
         'temporarily flag segments that have been clipped -- we'll want to know this later
@@ -578,8 +582,8 @@ Module ManDelin
                 For lStreamIndexDownstream As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
                     rval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, ReachSubbasinFieldIndex)
                     If rval = dval Then 'this is the one
-                        r = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, tAreaFieldIndex)
-                        r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
+                        r = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, tAreaFieldIndex)   'total area of downstream one
+                        r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)                        'local area of this one
                         GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, lStreamIndexDownstream - 1, r + r2)
                         dval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lDownstreamFieldIndex)
                         Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
