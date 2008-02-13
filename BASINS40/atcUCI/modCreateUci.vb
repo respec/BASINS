@@ -228,6 +228,11 @@ Module modCreateUci
             lTable = lOperation.Tables.Item("HYDR-PARM2")
             lTable.Parms("LEN").Value = pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Length
             lTable.Parms("DELTH").Value = System.Math.Round(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).DeltH, 0)
+            'set initial volume in reach in ac-ft to 75% of length in miles * mean width in feet * mean depth in feet
+            lTable = lOperation.Tables.Item("HYDR-INIT")
+            lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Length * 5280 * _
+                                             pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Depth * _
+                                             pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Width / 43560 * 0.75)
         Next lOperation
     End Sub
 
@@ -816,6 +821,10 @@ Module modCreateUci
                 If aParmName = "LEN" Or _
                    aParmName = "DELTH" Or _
                    aParmName = "FTBUCI" Then
+                    lDefaultThisParameter = False
+                End If
+            ElseIf aTableName = "HYDR-INIT" Then
+                If aParmName = "VOL" Then
                     lDefaultThisParameter = False
                 End If
             ElseIf aTableName = "GQ-GENDATA" Then
