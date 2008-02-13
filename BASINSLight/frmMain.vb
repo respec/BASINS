@@ -19,7 +19,9 @@ Friend Class MapWindowForm
     Friend m_Project As MapWindow.Project
     Friend CustomWindowTitle As String = ""
     Friend Title_ShowFullProjectPath As Boolean = False
-    Private resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(MapWindowForm))
+    Private resources As System.Resources.ResourceManager = _
+    New System.Resources.ResourceManager("MapWindow.GlobalResource", System.Reflection.Assembly.GetExecutingAssembly())
+
 
     Private Sub btnExecute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Cursor = Cursors.WaitCursor
