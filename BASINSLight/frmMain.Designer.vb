@@ -91,23 +91,26 @@ Partial Class MapWindowForm
         Me.tlbMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tbbNew, Me.tbbOpen, Me.tbbSave, Me.tbbBreak1})
         Me.tlbMain.Location = New System.Drawing.Point(3, 24)
         Me.tlbMain.Name = "tlbMain"
-        Me.tlbMain.Size = New System.Drawing.Size(85, 25)
+        Me.tlbMain.Size = New System.Drawing.Size(116, 25)
         Me.tlbMain.TabIndex = 5
         '
         'tbbNew
         '
+        Me.tbbNew.Image = CType(resources.GetObject("tbbNew.Image"), System.Drawing.Image)
         Me.tbbNew.Name = "tbbNew"
         Me.tbbNew.Size = New System.Drawing.Size(23, 22)
         Me.tbbNew.ToolTipText = "New Project"
         '
         'tbbOpen
         '
+        Me.tbbOpen.Image = CType(resources.GetObject("tbbOpen.Image"), System.Drawing.Image)
         Me.tbbOpen.Name = "tbbOpen"
         Me.tbbOpen.Size = New System.Drawing.Size(23, 22)
         Me.tbbOpen.ToolTipText = "Open Project"
         '
         'tbbSave
         '
+        Me.tbbSave.Image = CType(resources.GetObject("tbbSave.Image"), System.Drawing.Image)
         Me.tbbSave.Name = "tbbSave"
         Me.tbbSave.Size = New System.Drawing.Size(23, 22)
         Me.tbbSave.ToolTipText = "Save Project"

@@ -92,6 +92,11 @@
     <Compile Include="frmScript.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GlobalResource.en.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GlobalResource.en.resx</DependentUpon>
+    </Compile>
     <Compile Include="modMain.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -124,6 +129,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GlobalResource.en.resx">
       <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>GlobalResource.en.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -149,6 +156,11 @@
       <Name>atcData</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\FOLDER02.ICO" />
+    <Content Include="Resources\NewPaper16.ico" />
+    <Content Include="Resources\Save_shade_16.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
