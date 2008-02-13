@@ -126,6 +126,36 @@
   <metadata name="tlbMain.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>152, 60</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="tbbNew.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAASdAAA
+        EnQB3mYfeAAAAGlJREFUOE9jYCABLFiw5P///wz/QTQJ2iBKQZqQDUA3BGQiPswAshkdI7sCKIkJQIaC
+        AIgm6AJ8BiAbgisMcLoAi9ewhh9WA9AFYV7BZsKoAdD4JhQQgzwQCeQFeD7BmRNhaZ0YGjkhAQCaAAzN
+        PeXkuAAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="tbbOpen.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAASdAAA
+        EnQB3mYfeAAAAIVJREFUOE+9UkEOwCAI8/+f3iYKaytm7CKJ0QRaaqG1g3E9vfopBRbbe4QR6CHCpXgi
+        CSRkQWAdMKlgzJse+FKAXSKCnVRvIlAgdCBlSOIE8O+ZnkbtOqsH4W5FdqaguziGRPdraKYExslTYC9W
+        kgyIiwBKGPwFJJLN5pVW2Itw834Bzxffu39np1eADJUAAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="tbbSave.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAASdAAA
+        EnQB3mYfeAAAAQpJREFUOE+d07FKw3AQx/HrqCIuHRScHB106AOkWxYfwAfwAXwAwYxdBRc36eDSduoi
+        IsGhuHUSHBzESSdBqSLi8PN3p9dgryaQwIeE3D/fJJA0RARUZ2v4RWgdnpk0TQG80oTe6YM+6ctm7c7A
+        6E2zLEOe53bz6aAqsHM0hAoBH1QFdk8uoELAB1WBve4VVAj4oCqw37uGCgEfaKDMwXAMFQI+mN13Lm8w
+        Twj8t/B4dId5QsAXibT4eJu0Qeu0Smu0bU7HDyYEisHPQge88SNSL3auf/toQqAYbJUGzu+foUKgGJQH
+        Rk8TqBAQWf593yb3K7REC7T454mSJLGLZwOiP0Yd/jOJHtT1DTbRX5Gs1PEmAAAAAElFTkSuQmCC
+</value>
+  </data>
   <metadata name="ilsToolbar.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>258, 60</value>
   </metadata>
