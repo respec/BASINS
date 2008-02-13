@@ -161,18 +161,18 @@ Friend Class MapWindowForm
         m_Menu.AddMenu("mnuSave", "mnuFile", Nil, resources.GetString("mnuSave.Text"))
         m_Menu.AddMenu("mnuSaveAs", "mnuFile", Nil, resources.GetString("mnuSaveAs.Text"))
         m_Menu.AddMenu("mnuFileBreak2", "mnuFile", Nil, "-")
-        m_Menu.AddMenu("mnuPrint", "mnuFile", Nil, resources.GetString("mnuPrint.Text"))
-        m_Menu.AddMenu("mnuFileBreak3", "mnuFile", Nil, "-")
-        m_Menu.AddMenu("mnuProjectSettings", "mnuFile", Nil, resources.GetString("mnuProjectSettings.Text"))
+        'm_Menu.AddMenu("mnuPrint", "mnuFile", Nil, resources.GetString("mnuPrint.Text"))
+        'm_Menu.AddMenu("mnuFileBreak3", "mnuFile", Nil, "-")
+        'm_Menu.AddMenu("mnuProjectSettings", "mnuFile", Nil, resources.GetString("mnuProjectSettings.Text"))
         m_Menu.AddMenu("mnuRecentProjects", "mnuFile", Nil, resources.GetString("mnuRecentProjects.Text"))
         m_Menu.AddMenu("mnuFileBreak4", "mnuFile", Nil, "-")
-        m_Menu.AddMenu("mnuCheckForUpdates", "mnuFile", Nil, resources.GetString("mnuCheckUpdates.Text"))
+        'm_Menu.AddMenu("mnuCheckForUpdates", "mnuFile", Nil, resources.GetString("mnuCheckUpdates.Text"))
         m_Menu.AddMenu("mnuFileBreak5", "mnuFile", Nil, "-")
         m_Menu.AddMenu("mnuClose", "mnuFile", Nil, resources.GetString("mnuClose.Text"))
         m_Menu.AddMenu("mnuExit", "mnuFile", Nil, resources.GetString("mnuExit.Text"))
 
         'Set up the Edit menu
-        m_Menu.AddMenu("mnuEdit", Nil, resources.GetString("mnuEdit.Text"))
+        'm_Menu.AddMenu("mnuEdit", Nil, resources.GetString("mnuEdit.Text"))
 
 
         'Set up the Plug-ins menu
@@ -196,7 +196,7 @@ Friend Class MapWindowForm
         m_Menu.AddMenu("mnuHelpBreak2", "mnuHelp", Nil, "-")
 
         m_Menu.AddMenu("mnuWelcomeScreen", "mnuHelp", Nil, resources.GetString("mnuWelcomeScreen.Text"))
-        m_Menu.AddMenu("mnuAboutMapWindow", "mnuHelp", Nil, resources.GetString("mnuAboutMapWindow.Text"))
+        'm_Menu.AddMenu("mnuAboutMapWindow", "mnuHelp", Nil, resources.GetString("mnuAboutMapWindow.Text"))
 
     End Sub
 
