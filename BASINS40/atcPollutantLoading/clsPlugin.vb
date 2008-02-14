@@ -1,4 +1,5 @@
 Imports atcMwGisUtility
+Imports atcData
 Imports MapWinUtility
 
 Public Class PlugIn
@@ -47,19 +48,17 @@ Public Class PlugIn
 
     <CLSCompliant(False)> _
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
-        Dim mnu As MapWindow.Interfaces.MenuItem
-
         pMapWin = MapWin
 
-        If Not pMapWin.Plugins.PluginIsLoaded(pMapWin.Plugins.GetPluginKey("BASINS 4")) Then
-            pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
-        End If
+        atcDataManager.AddMenuIfMissing(ParentMenuName, "", ParentMenuString, "mnuFile")
+        Dim mnu As MapWindow.Interfaces.MenuItem
         mnu = pMapWin.Menus.AddMenu(ParentMenuName & "_PLOAD", ParentMenuName, Nothing, "PLOAD")
         mnu.Enabled = True
-
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
+        pMapWin.Menus.Remove(ParentMenuName & "_PLOAD")
+        atcDataManager.RemoveMenuIfEmpty(ParentMenuName)
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
