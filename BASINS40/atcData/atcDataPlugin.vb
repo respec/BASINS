@@ -13,6 +13,8 @@ Public Class atcDataPlugin
     Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
     Private pSerial As Integer 'Serial number of this object, assigned in order of creation at runtime
     Private pMapWin As MapWindow.Interfaces.IMapWin
+    Private pMapWinWindowHandle As Integer
+    Private pMenusAdded As New ArrayList
 
     ''' <summary>create a new atcDataPlugin</summary>
     Public Sub New()
@@ -88,7 +90,45 @@ Public Class atcDataPlugin
                                       ByVal aParentHandle As Integer) _
                               Implements MapWindow.Interfaces.IPlugin.Initialize
         pMapWin = aMapWin
-        pMapWin.Plugins.BroadcastMessage("atcDataPlugin loading " & Name)
+        pMapWinWindowHandle = aParentHandle
+        atcDataManager.MapWindow = aMapWin
+        'pMapWin.Plugins.BroadcastMessage("atcDataPlugin loading " & Name)
+
+        If Name.StartsWith("Analysis::") Then
+            atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
+            pMenusAdded.Add(atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName & "_" & Name, atcDataManager.AnalysisMenuName, Name.Substring(10), , , True))
+        ElseIf Name.StartsWith("Timeseries::") Then
+            Try
+                Dim lDataSource As atcDataSource = Me
+                If lDataSource.Category <> "File" Then
+                    Dim lCategoryMenuName As String = atcDataManager.ComputeMenuName & "_" & lDataSource.Category
+                    Dim lOperations As atcDataAttributes = lDataSource.AvailableOperations
+                    If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
+                        For Each lOperation As atcDefinedValue In lOperations
+                            Select Case lOperation.Definition.TypeString
+                                Case "atcTimeseries", "atcDataGroup"
+                                    atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
+                                    pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName, atcDataManager.ComputeMenuName, lDataSource.Category, , , True))
+                                    'Operations might have categories to further divide them
+                                    If lOperation.Definition.Category.Length > 0 Then
+                                        Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
+                                        atcDataManager.AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
+                                        atcDataManager.AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name, lSubCategoryName, lOperation.Definition.Name, , , True)
+                                    Else
+                                        atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
+                                    End If
+                            End Select
+                        Next
+                    Else
+                        atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
+                        pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lDataSource.Description, lCategoryMenuName, lDataSource.Description, , , True))
+                    End If
+                End If
+            Catch
+                'Could not add to menu, probably wasn't an atcDataSource
+            End Try
+
+        End If
     End Sub
 
     ''' <summary>Fired when the plugin is unloaded
@@ -100,10 +140,20 @@ Public Class atcDataPlugin
     ''' If you don't do this, then you will leave dangling menus and buttons that don't do
     ''' anything.
     ''' </remarks>
-    Public Overridable Sub Terminate() _
-                              Implements MapWindow.Interfaces.IPlugin.Terminate
+    Public Overridable Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         If Not pMapWin Is Nothing Then
-            pMapWin.Plugins.BroadcastMessage("atcDataPlugin unloading " & Name)
+            'pMapWin.Plugins.BroadcastMessage("atcDataPlugin unloading " & Name)
+
+            For Each lMenu As MapWindow.Interfaces.MenuItem In pMenusAdded
+                If Not lMenu Is Nothing Then pMapWin.Menus.Remove(lMenu.Name)
+            Next
+            pMenusAdded.Clear()
+
+            If Name.StartsWith("Analysis::") Then
+                atcDataManager.RemoveMenuIfEmpty(atcDataManager.AnalysisMenuName)
+            ElseIf Name.StartsWith("Compute::") Then
+                atcDataManager.RemoveMenuIfEmpty(atcDataManager.ComputeMenuName)
+            End If
         End If
     End Sub
 
@@ -113,6 +163,28 @@ Public Class atcDataPlugin
     ''' </summary>
     Public Overridable Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) _
                               Implements MapWindow.Interfaces.IPlugin.ItemClicked
+        If aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & Name) Then
+            Dim newDisplay As atcDataDisplay = Me.NewOne
+            newDisplay.Initialize(pMapWin, pMapWinWindowHandle)
+            newDisplay.Show()
+        ElseIf aItemName.StartsWith(Name & "_") Then
+            aItemName = aItemName.Replace(" ", "")
+            Dim lNewSource As atcDataSource = Me
+            lNewSource = lNewSource.NewOne
+
+            Dim lOperation As atcDefinedValue = lNewSource.AvailableOperations.ItemByKey(aItemName.Substring(Name.Length + 1))
+            If Not lOperation Is Nothing Then
+                lNewSource.Specification = lOperation.Definition.Name
+            End If
+            If Not lNewSource Is Nothing Then
+                If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                    If lNewSource.DataSets.Count > 0 Then
+                        Dim lTitle As String = lNewSource.ToString
+                        atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                    End If
+                End If
+            End If
+        End If
     End Sub
 
     ''' <summary>Fires when the user removes a layer from MapWindow.<br />

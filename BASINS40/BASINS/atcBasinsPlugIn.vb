@@ -93,30 +93,30 @@ Public Class atcBasinsPlugIn
         g_Plugins = g_MapWin.Plugins
         g_Project = g_MapWin.Project
 
-        AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, "mnuNew")
-        AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuOpen")
-        AddMenuIfMissing(DownloadMenuName, FileMenuName, DownloadMenuString, OpenDataMenuName)
-        AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, DownloadMenuName)
-        AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
-        AddMenuIfMissing(ProjectsMenuName, FileMenuName, ProjectsMenuString, "mnuRecentProjects")
+        atcDataManager.AddMenuIfMissing(NewDataMenuName, atcDataManager.FileMenuName, NewDataMenuString, "mnuNew")
+        atcDataManager.AddMenuIfMissing(OpenDataMenuName, atcDataManager.FileMenuName, OpenDataMenuString, "mnuOpen")
+        atcDataManager.AddMenuIfMissing(DownloadMenuName, atcDataManager.FileMenuName, DownloadMenuString, OpenDataMenuName)
+        atcDataManager.AddMenuIfMissing(ManageDataMenuName, atcDataManager.FileMenuName, ManageDataMenuString, DownloadMenuName)
+        atcDataManager.AddMenuIfMissing(SaveDataMenuName, atcDataManager.FileMenuName, SaveDataMenuString, "mnuSaveAs")
+        atcDataManager.AddMenuIfMissing(ProjectsMenuName, atcDataManager.FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
-        AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
-        AddMenuIfMissing(BasinsWebPageMenuName, HelpMenuName, BasinsWebPageMenuString, , "mnuOnlineDocs")
+        atcDataManager.AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
+        atcDataManager.AddMenuIfMissing(BasinsWebPageMenuName, HelpMenuName, BasinsWebPageMenuString, , "mnuOnlineDocs")
 
-        AddMenuIfMissing(RegisterMenuName, HelpMenuName, RegisterMenuString, , "mnuShortcuts")
+        atcDataManager.AddMenuIfMissing(RegisterMenuName, HelpMenuName, RegisterMenuString, , "mnuShortcuts")
 
         g_Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
         g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
 
-        AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
-        AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
+        atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
+        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
 
         Dim mnu As MapWindow.Interfaces.MenuItem
         For Each lDataDir As String In g_BasinsDataDirs
             For Each lProjectDir As String In IO.Directory.GetDirectories(lDataDir)
                 Dim DirShortName As String = IO.Path.GetFileName(lProjectDir)
                 'TODO: differentiate between projects in different data dirs If g_BasinsDrives.Length > 0 Then DirShortName = DriveLetter & ": " & DirShortName
-                mnu = AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
+                mnu = atcDataManager.AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
                                        ProjectsMenuName, DirShortName)
                 mnu.Tooltip = lProjectDir
             Next
@@ -124,25 +124,33 @@ Public Class atcBasinsPlugIn
 
         pLoadedDataMenu = True
 
-        AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, FileMenuName)
-
-        'HSPF and AQUATOX are handled in ModelSetup plugin
-
-        mnu = AddMenuIfMissing(ModelsMenuName & "_SWAT", ModelsMenuName, "SWAT")
-        mnu.Tooltip = "SWAT"
-        mnu.Enabled = False
-        mnu.Enabled = False
-        mnu = AddMenuIfMissing(ModelsMenuName & "_AGWA", ModelsMenuName, "AGWA")
-        mnu.Tooltip = "AGWA"
-        mnu.Enabled = False
-        'AddMenuIfMissing(AnalysisMenuName & "_ModelsSeparator", AnalysisMenuName, "-")
-
-        RefreshAnalysisMenu()
-        RefreshComputeMenu()
+        atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName, "", atcDataManager.LaunchMenuString, atcDataManager.FileMenuName)
+        atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_ArcView3", atcDataManager.LaunchMenuName, "ArcView 3")
+        atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_ArcGIS", atcDataManager.LaunchMenuName, "ArcGIS")
+        atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_GenScn", atcDataManager.LaunchMenuName, "GenScn")
+        atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_WDMUtil", atcDataManager.LaunchMenuName, "WDMUtil")
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         RemoveHandler atcDataManager.OpenedData, AddressOf OpenedData
+
+        g_MapWin.Menus.Remove(NewDataMenuName)
+        g_MapWin.Menus.Remove(OpenDataMenuName)
+        g_MapWin.Menus.Remove(DownloadMenuName)
+        g_MapWin.Menus.Remove(ManageDataMenuName)
+        g_MapWin.Menus.Remove(SaveDataMenuName)
+        g_MapWin.Menus.Remove(ProjectsMenuName)
+        g_MapWin.Menus.Remove(BasinsHelpMenuName)
+        g_MapWin.Menus.Remove(BasinsWebPageMenuName)
+        g_MapWin.Menus.Remove(RegisterMenuName)
+        g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
+        g_MapWin.Menus.Remove(SendFeedbackMenuName)
+
+        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcView3")
+        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcGIS")
+        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_GenScn")
+        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_WDMUtil")
+        atcDataManager.RemoveMenuIfEmpty(atcDataManager.LaunchMenuName)
 
         ShowHelp("CLOSE") 'Close any active Help window
 
@@ -184,7 +192,7 @@ Public Class atcBasinsPlugIn
                 SendFeedback()
             Case BasinsHelpMenuName
                 ShowHelp("")
-            Case AnalysisMenuName & "_ArcView3"
+            Case atcDataManager.LaunchMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
                 Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
@@ -201,7 +209,7 @@ Public Class atcBasinsPlugIn
                 Catch
                     Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "BASINS/ArcView Problem")
                 End Try
-            Case AnalysisMenuName & "_ArcGIS"
+            Case atcDataManager.LaunchMenuName & "_ArcGIS"
                 Dim buildmxdFilename As String = FindFile("Please Locate build.mxd", "\BASINS\etc\build.mxd")
                 If Len(buildmxdFilename) = 0 Then
                     Logger.Msg("Unable to locate Build.mxd", vbOKOnly, "BASINS/ArcGIS Problem")
@@ -216,47 +224,19 @@ Public Class atcBasinsPlugIn
                     End Try
                 End If
             Case Else
-                If aItemName.StartsWith(ComputeMenuName & "_") Then
-                    aItemName = aItemName.Replace(" ", "")
-                    Dim lNewSource As atcDataSource = Nothing
-                    Dim lDataSources As atcCollection = atcDataManager.GetPlugins(GetType(atcDataSource))
-                    For Each ds As atcDataSource In lDataSources
-                        If ds.Category <> "File" Then
-                            Dim lCategoryMenuName As String = ComputeMenuName & "_" & ds.Category
-                            Dim lOperations As atcDataAttributes = ds.AvailableOperations
-                            If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
-                                For Each lOperation As atcDefinedValue In lOperations
-                                    Select Case lOperation.Definition.TypeString
-                                        Case "atcTimeseries", "atcDataGroup"
-                                            'Operations might have categories to further divide them
-                                            If aItemName.Equals((lCategoryMenuName & "_" & lOperation.Definition.Name).Replace(" ", "")) OrElse _
-                                               aItemName.Equals((lCategoryMenuName & "_" & lOperation.Definition.Category & "_" & lOperation.Definition.Name).Replace(" ", "")) Then
-                                                lNewSource = ds.NewOne
-                                                lNewSource.Specification = lOperation.Definition.Name
-                                                Exit For
-                                            End If
-                                    End Select
-                                Next
-                            Else
-                                If aItemName.Equals(lCategoryMenuName & "_" & ds.Description) Then
-                                    lNewSource = ds.NewOne
-                                    Exit For
-                                End If
-                            End If
-                        End If
-                    Next
-                    If Not lNewSource Is Nothing Then
-                        If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                            If lNewSource.DataSets.Count > 0 Then
-                                Dim lTitle As String = lNewSource.ToString
-                                atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
-                            End If
-                        End If
+                If aItemName.StartsWith(atcDataManager.LaunchMenuName & "_") Then
+                    Dim lExeName As String = ""
+                    Select Case aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1).ToLower
+                        Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
+                        Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
+                    End Select
+                    If FileExists(lExeName) Then
+                        Shell("""" & lExeName & """", AppWinStyle.NormalFocus, False)
+                        aHandled = True
+                    Else
+                        Logger.Dbg("Unable to launch " & aItemName, "Launch")
+                        aHandled = False
                     End If
-                ElseIf aItemName.StartsWith(AnalysisMenuName & "_") Then
-                    aHandled = LaunchTool(aItemName.Substring(AnalysisMenuName.Length + 1))
-                ElseIf aItemName.StartsWith(ModelsMenuName & "_") Then
-                    aHandled = LaunchTool(aItemName.Substring(ModelsMenuName.Length + 1))
                 ElseIf aItemName.StartsWith(SaveDataMenuName & "_") Then
                     aHandled = UserSaveData(aItemName.Substring(SaveDataMenuName.Length + 1))
                     'TODO: add case where not save data destinations are available, ask user for destination?
@@ -427,68 +407,6 @@ Public Class atcBasinsPlugIn
         End Set
     End Property
 
-    Private Function LaunchTool(ByVal aToolName As String) As Boolean ', Optional ByVal aCmdLine As String = "") As Boolean
-        Dim exename As String = ""
-        Select Case aToolName
-            Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
-            Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
-                'Case "HSPF"
-                'If g_Plugins.PluginIsLoaded("atcModelSetup_PlugIn") Then 'defer to other plugin
-                'Return False
-                'End If
-                'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
-            Case Else
-                'If aToolName.StartsWith("RunBuiltInScript") Then
-                '  Try
-                '    BuiltInScript(True)
-                '  Catch e As Exception
-                '    Logger.Msg(e.ToString, "Error Running Built-in Script")
-                '  End Try
-                '  Return True
-
-                'ElseIf aToolName.StartsWith("RunScript") Then
-                '  aToolName = aToolName.Substring(9)
-                '  exename = StrSplit(aToolName, " ", """")
-                '  Dim args() As Object = aToolName.Split(",")
-                '  Dim errors As String
-
-                '  If exename.ToLower = "findfile" OrElse Not FileExists(exename) Then
-                '    Dim lScriptFileName As String = ScriptFolder() & "\" & exename
-                '    If FileExists(lScriptFileName) Then
-                '      exename = lScriptFileName
-                '    Else
-                '      exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
-                '    End If
-                '    If Len(args(0)) = 0 Then args = New Object() {"DataManager", "BasinsPlugIn"}
-                '  End If
-                '  If FileExists(exename) Then
-                '    RunBasinsScript(FileExt(exename), exename, errors, args)
-                '    If Not errors Is Nothing Then
-                '      Logger.Msg(errors, "Run Script Error")
-                '    End If
-                '    Return True
-                '  Else
-                '    Logger.Msg("Unable to find script " & exename, "LaunchTool")
-                '    Return False
-                '  End If
-                'Else 'Search for DisplayPlugin to launch
-                If LaunchDisplay(aToolName) Then
-                    Return True
-                Else
-                    Logger.Dbg("LaunchDisplay cannot launch " & aToolName, "Option not yet functional")
-                End If
-                'End If
-        End Select
-
-        If FileExists(exename) Then
-            Shell("""" & exename & """", AppWinStyle.NormalFocus, False)
-            Return True
-        Else
-            Logger.Dbg("Unable to launch " & aToolName, "Launch")
-            Return False
-        End If
-    End Function
-
     Private Sub SendFeedback()
         Dim lName As String = ""
         Dim lEmail As String = ""
@@ -541,31 +459,6 @@ Public Class atcBasinsPlugIn
             Logger.Msg("Feedback successfully sent", "Send Feedback")
         End If
     End Sub
-
-    Private Function LaunchDisplay(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
-        Dim searchForName As String = aToolName.ToLower
-        Dim ColonPos As Integer = searchForName.LastIndexOf(":")
-        If ColonPos > 0 Then
-            searchForName = searchForName.Substring(ColonPos + 1)
-        End If
-        searchForName = ReplaceString(searchForName, " ", "")
-        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        For Each lDisp As atcDataDisplay In DisplayPlugins
-            Dim foundName As String = lDisp.Name.ToLower
-            ColonPos = foundName.LastIndexOf(":")
-            If ColonPos > 0 Then
-                foundName = foundName.Substring(ColonPos + 1)
-            End If
-            If ReplaceString(foundName, " ", "") = searchForName Then
-                Dim typ As Type = lDisp.GetType()
-                Dim asm As Reflection.Assembly = Reflection.Assembly.GetAssembly(typ)
-                Dim newDisplay As atcDataDisplay = asm.CreateInstance(typ.FullName)
-                newDisplay.Initialize(g_MapWin, g_MapWinWindowHandle)
-                newDisplay.Show()
-                Return True
-            End If
-        Next
-    End Function
 
     Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
     End Sub
@@ -666,17 +559,6 @@ Public Class atcBasinsPlugIn
                 Logger.Dbg("Welcome:Skip")
             End If
             pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
-        ElseIf msg.StartsWith("atcDataPlugin") Then
-            If msg.IndexOf("Analysis::") > 0 Then
-                Dim lUnloading As String = ""
-                Logger.Dbg(msg)
-                If msg.StartsWith("atcDataPlugin unloading") Then
-                    lUnloading = msg.Substring(24)
-                    g_Menus.Remove(AnalysisMenuName)
-                End If
-                RefreshAnalysisMenu(lUnloading)
-            End If
-            RefreshComputeMenu()
         ElseIf msg.StartsWith("<success>") Then
             ProcessDownloadResults(msg)
         Else

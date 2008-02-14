@@ -32,8 +32,10 @@ Public Class atcDataManager
     <CLSCompliant(False)> _
     Public Shared WriteOnly Property MapWindow() As MapWindow.Interfaces.IMapWin
         Set(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
-            pmapwin = aMapWin
-            Clear()
+            If pMapWin Is Nothing AndAlso Not aMapWin Is Nothing Then
+                pMapWin = aMapWin
+                Clear()
+            End If
         End Set
     End Property
 
@@ -433,6 +435,95 @@ Public Class atcDataManager
             End If
         End Set
     End Property
+
+    Public Const FileMenuName As String = "mnuFile"
+
+    Public Const ComputeMenuName As String = "BasinsCompute"
+    Public Const ComputeMenuString As String = "Compute"
+
+    Public Const AnalysisMenuName As String = "BasinsAnalysis"
+    Public Const AnalysisMenuString As String = "Analysis"
+
+    Public Const LaunchMenuName As String = "BasinsLaunch"
+    Public Const LaunchMenuString As String = "Launch"
+
+    Public Const ModelsMenuName As String = "BasinsModels"
+    Public Const ModelsMenuString As String = "Models"
+
+    Public Shared Sub RemoveMenuIfEmpty(ByVal aMenuName As String)
+        If Not pMapWin Is Nothing Then
+            With pMapWin.Menus
+                Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
+                If Not lMenu Is Nothing Then 'This menu exists
+                    If lMenu.NumSubItems = 0 Then pMapWin.Menus.Remove(aMenuName)
+                End If
+            End With
+        End If
+    End Sub
+
+    <CLSCompliant(False)> _
+    Public Shared Function AddMenuIfMissing(ByVal aMenuName As String, _
+                                    ByVal aParent As String, _
+                                    ByVal aMenuText As String, _
+                           Optional ByVal aAfter As String = "", _
+                           Optional ByVal aBefore As String = "", _
+                           Optional ByVal aAlphabetical As Boolean = False) _
+                           As MapWindow.Interfaces.MenuItem
+        If pMapWin Is Nothing Then
+            Return Nothing
+        Else
+            With pMapWin.Menus
+                Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
+                If Not lMenu Is Nothing Then 'This item already exists
+                    Return lMenu
+                ElseIf aAlphabetical And aParent.Length > 0 Then
+                    'Need parent to do alphabetical search for position
+                    Dim lParentMenu As MapWindow.Interfaces.MenuItem = .Item(aParent)
+                    Dim lSubmenuIndex As Integer = 0
+                    Dim lExistingMenu As MapWindow.Interfaces.MenuItem
+
+                    If aAfter.Length > 0 Then
+                        'First make sure we are after a particular item
+                        While lSubmenuIndex < lParentMenu.NumSubItems
+                            lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
+                            If Not lExistingMenu Is Nothing AndAlso _
+                               Not lExistingMenu.Name Is Nothing AndAlso _
+                                   lExistingMenu.Name.Equals(aAfter) Then
+                                Exit While
+                            End If
+                            lExistingMenu = Nothing
+                            lSubmenuIndex += 1
+                        End While
+                        If lSubmenuIndex >= lParentMenu.NumSubItems Then
+                            'Did not find menu aAfter, so start at first subitem
+                            lSubmenuIndex = 0
+                        End If
+                    End If
+
+                    'Find alphabetical position for new menu item
+                    While lSubmenuIndex < lParentMenu.NumSubItems
+                        lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
+                        If Not lExistingMenu Is Nothing AndAlso _
+                           Not lExistingMenu.Name Is Nothing Then
+                            If (aBefore.Length > 0 AndAlso lExistingMenu.Text = aBefore) OrElse _
+                               lExistingMenu.Text > aMenuText Then
+                                'Add before existing menu with alphabetically later text
+                                Return .AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
+                            End If
+                        End If
+                        lSubmenuIndex += 1
+                    End While
+                    'Add at default position, after last parent subitem
+                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText)
+                ElseIf aBefore.Length > 0 Then
+                    Return .AddMenu(aMenuName, aParent, aMenuText, aBefore)
+                Else
+                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
+                End If
+            End With
+        End If
+    End Function
+
 
     Public Overrides Function ToString() As String
         Dim lString As String = "atcDataManger:"
