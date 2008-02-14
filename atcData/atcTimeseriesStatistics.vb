@@ -32,6 +32,14 @@ Public Class atcTimeseriesStatistics
         End Get
     End Property
 
+    <CLSCompliant(False)> _
+    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
+        MyBase.Initialize(aMapWin, aParentHandle)
+        For Each lOperation As atcDefinedValue In AvailableOperations
+            atcDataAttributes.AddDefinition(lOperation.Definition)
+        Next
+    End Sub
+
     ''' <summary>Definitions of statistics supported by this class.</summary>
     Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
         Get
@@ -311,7 +319,7 @@ Public Class atcTimeseriesStatistics
                     aTimeseries.Attributes.SetValue("Serial Correlation Coefficient", lScc)
                 End If
             End If
-            End If
+        End If
     End Sub
 
     'The only element of aArgs is an atcDataGroup or atcTimeseries
@@ -340,11 +348,4 @@ Public Class atcTimeseriesStatistics
             Next
         End If
     End Function
-
-    <CLSCompliant(False)> _
-    Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
-        For Each lOperation As atcDefinedValue In AvailableOperations
-            atcDataAttributes.AddDefinition(lOperation.Definition)
-        Next
-    End Sub
 End Class

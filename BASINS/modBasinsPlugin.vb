@@ -28,7 +28,6 @@ Friend Module modBasinsPlugin
     Friend pCommandLineScript As Boolean = False
 
     'File menu -- created by MapWindow
-    Friend Const FileMenuName As String = "mnuFile"
 
     Friend Const ProjectsMenuName As String = "BasinsProjects"
     Friend Const ProjectsMenuString As String = "Open BASINS Project"
@@ -47,15 +46,6 @@ Friend Module modBasinsPlugin
 
     Friend Const SaveDataMenuName As String = "BasinsSaveData"
     Friend Const SaveDataMenuString As String = "Save Data In..."
-
-    Friend Const AnalysisMenuName As String = "BasinsAnalysis"
-    Friend Const AnalysisMenuString As String = "Analysis"
-
-    Friend Const ModelsMenuName As String = "BasinsModels"
-    Friend Const ModelsMenuString As String = "Models"
-
-    Friend Const ComputeMenuName As String = "BasinsCompute"
-    Friend Const ComputeMenuString As String = "Compute"
 
     Friend pWelcomeScreenShow As Boolean = False
 
@@ -92,10 +82,10 @@ Friend Module modBasinsPlugin
     ''' <remarks></remarks>
     Friend Sub RefreshSaveDataMenu()
         g_Menus.Remove(SaveDataMenuName)
-        AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
+        atcDataManager.AddMenuIfMissing(SaveDataMenuName, atcDataManager.FileMenuName, SaveDataMenuString, "mnuSaveAs")
         For Each lDataSource As atcDataSource In atcDataManager.DataSources
             If lDataSource.CanSave Then
-                AddMenuIfMissing(SaveDataMenuName & "_" & lDataSource.Specification, SaveDataMenuName, lDataSource.Specification)
+                atcDataManager.AddMenuIfMissing(SaveDataMenuName & "_" & lDataSource.Specification, SaveDataMenuName, lDataSource.Specification)
             End If
         Next
     End Sub
@@ -113,7 +103,9 @@ Friend Module modBasinsPlugin
                 With lDrive
                     If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
                         lCheckDir = .Name & BasinsDataPath
-                        If FileExists(lCheckDir, True, False) Then g_BasinsDataDirs.Add(lCheckDir)
+                        If Not g_BasinsDataDirs.Contains(lCheckDir) AndAlso FileExists(lCheckDir, True, False) Then
+                            g_BasinsDataDirs.Add(lCheckDir)
+                        End If
                     End If
                 End With
             Next
@@ -496,7 +488,14 @@ Friend Module modBasinsPlugin
     End Sub
 
     Public Function DefaultBasinsDataDir() As String
-        Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
+        'TODO: change to using MyDocuments when the installer starts using Progra~1
+        'Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
+
+        If Not g_BasinsDataDirs Is Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
+            Return g_BasinsDataDirs(0)
+        Else
+            Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
+        End If
     End Function
 
     Private Function GetSelected(ByVal aField As Integer) As ArrayList
@@ -590,142 +589,6 @@ Friend Module modBasinsPlugin
 
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="aMenuName"></param>
-    ''' <param name="aParent"></param>
-    ''' <param name="aMenuText"></param>
-    ''' <param name="aAfter"></param>
-    ''' <param name="aBefore"></param>
-    ''' <param name="aAlphabetical"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Friend Function AddMenuIfMissing(ByVal aMenuName As String, _
-                                            ByVal aParent As String, _
-                                            ByVal aMenuText As String, _
-                                   Optional ByVal aAfter As String = "", _
-                                   Optional ByVal aBefore As String = "", _
-                                   Optional ByVal aAlphabetical As Boolean = False) _
-                                   As MapWindow.Interfaces.MenuItem
-
-        Dim lMenus As MapWindow.Interfaces.Menus = g_Menus
-        With lMenus
-            Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
-            If Not lMenu Is Nothing Then 'This item already exists
-                Return lMenu
-            ElseIf aAlphabetical And aParent.Length > 0 Then
-                'Need parent to do alphabetical search for position
-                Dim lParentMenu As MapWindow.Interfaces.MenuItem = .Item(aParent)
-                Dim lSubmenuIndex As Integer = 0
-                Dim lExistingMenu As MapWindow.Interfaces.MenuItem
-
-                If aAfter.Length > 0 Then
-                    'First make sure we are after a particular item
-                    While lSubmenuIndex < lParentMenu.NumSubItems
-                        lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
-                        If Not lExistingMenu Is Nothing AndAlso _
-                           Not lExistingMenu.Name Is Nothing AndAlso _
-                               lExistingMenu.Name.Equals(aAfter) Then
-                            Exit While
-                        End If
-                        lExistingMenu = Nothing
-                        lSubmenuIndex += 1
-                    End While
-                    If lSubmenuIndex >= lParentMenu.NumSubItems Then
-                        'Did not find menu aAfter, so start at first subitem
-                        lSubmenuIndex = 0
-                    End If
-                End If
-
-                'Find alphabetical position for new menu item
-                While lSubmenuIndex < lParentMenu.NumSubItems
-                    lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
-                    If Not lExistingMenu Is Nothing AndAlso _
-                       Not lExistingMenu.Name Is Nothing Then
-                        If (aBefore.Length > 0 AndAlso lExistingMenu.Text = aBefore) OrElse _
-                           lExistingMenu.Text > aMenuText Then
-                            'Add before existing menu with alphabetically later text
-                            Return .AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
-                        End If
-                    End If
-                    lSubmenuIndex += 1
-                End While
-                'Add at default position, after last parent subitem
-                Return .AddMenu(aMenuName, aParent, Nothing, aMenuText)
-            ElseIf aBefore.Length > 0 Then
-                Return .AddMenu(aMenuName, aParent, aMenuText, aBefore)
-            Else
-                Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
-            End If
-        End With
-    End Function
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="aIgnore"></param>
-    ''' <remarks></remarks>
-    Friend Sub RefreshAnalysisMenu(Optional ByVal aIgnore As String = "")
-        If pLoadedDataMenu Then
-            AddMenuIfMissing(AnalysisMenuName, "", AnalysisMenuString, FileMenuName)
-            AddMenuIfMissing(AnalysisMenuName & "_ArcView3", AnalysisMenuName, "ArcView 3")
-            AddMenuIfMissing(AnalysisMenuName & "_ArcGIS", AnalysisMenuName, "ArcGIS")
-            AddMenuIfMissing(AnalysisMenuName & "_GenScn", AnalysisMenuName, "GenScn")
-            AddMenuIfMissing(AnalysisMenuName & "_WDMUtil", AnalysisMenuName, "WDMUtil")
-
-            Dim lPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-            If lPlugins.Count > 0 Then
-                Dim lSeparatorName As String = AnalysisMenuName & "_Separator1"
-                AddMenuIfMissing(lSeparatorName, AnalysisMenuName, "-")
-                For Each lDisp As atcDataDisplay In lPlugins
-                    Dim lMenuText As String = lDisp.Name
-                    If Not lMenuText.Equals(aIgnore) AndAlso lMenuText.StartsWith("Analysis::") Then
-                        AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText.Substring(10), lSeparatorName, , True)
-                    End If
-                Next
-            End If
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks></remarks>
-    Friend Sub RefreshComputeMenu()
-        g_Menus.Remove(ComputeMenuName)
-        g_Menus.AddMenu(ComputeMenuName, "", Nothing, ComputeMenuString, FileMenuName)
-        Dim lDataSources As atcCollection = atcDataManager.GetPlugins(GetType(atcDataSource))
-        For Each ds As atcDataSource In lDataSources
-            If ds.Category <> "File" Then
-                Dim lCategoryMenuName As String = ComputeMenuName & "_" & ds.Category
-                Dim lOperations As atcDataAttributes = ds.AvailableOperations
-                If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
-                    For Each lOperation As atcDefinedValue In lOperations
-                        Select Case lOperation.Definition.TypeString
-                            Case "atcTimeseries", "atcDataGroup"
-                                AddMenuIfMissing(lCategoryMenuName, ComputeMenuName, ds.Category, , , True)
-                                'Operations might have categories to further divide them
-                                If lOperation.Definition.Category.Length > 0 Then
-                                    Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
-                                    AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
-                                    AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name, lSubCategoryName, lOperation.Definition.Name, , , True)
-                                Else
-                                    AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
-                                End If
-                        End Select
-                    Next
-                Else
-                    AddMenuIfMissing(lCategoryMenuName & "_" & ds.Description, lCategoryMenuName, ds.Description, , , True)
-                End If
-            End If
-        Next
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks></remarks>
     Friend Sub UpdateSelectedFeatures()
         If Not pBuildFrm Is Nothing AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
             Dim lFieldName As String = ""
