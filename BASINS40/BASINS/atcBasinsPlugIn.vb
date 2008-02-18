@@ -75,7 +75,6 @@ Public Class atcBasinsPlugIn
         CheckForUpdates(True)
 
         atcDataManager.MapWindow = g_MapWin
-        AddHandler atcDataManager.OpenedData, AddressOf OpenedData
 
         Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_BasinsDir & "docs\Basins4.0.chm")
         If FileExists(lHelpFilename) Then
@@ -93,11 +92,7 @@ Public Class atcBasinsPlugIn
         g_Plugins = g_MapWin.Plugins
         g_Project = g_MapWin.Project
 
-        atcDataManager.AddMenuIfMissing(NewDataMenuName, atcDataManager.FileMenuName, NewDataMenuString, "mnuNew")
-        atcDataManager.AddMenuIfMissing(OpenDataMenuName, atcDataManager.FileMenuName, OpenDataMenuString, "mnuOpen")
-        atcDataManager.AddMenuIfMissing(DownloadMenuName, atcDataManager.FileMenuName, DownloadMenuString, OpenDataMenuName)
-        atcDataManager.AddMenuIfMissing(ManageDataMenuName, atcDataManager.FileMenuName, ManageDataMenuString, DownloadMenuName)
-        atcDataManager.AddMenuIfMissing(SaveDataMenuName, atcDataManager.FileMenuName, SaveDataMenuString, "mnuSaveAs")
+        atcDataManager.AddMenuIfMissing(DownloadMenuName, atcDataManager.FileMenuName, DownloadMenuString, atcDataManager.OpenDataMenuName)
         atcDataManager.AddMenuIfMissing(ProjectsMenuName, atcDataManager.FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
         atcDataManager.AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
@@ -132,13 +127,7 @@ Public Class atcBasinsPlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        RemoveHandler atcDataManager.OpenedData, AddressOf OpenedData
-
-        g_MapWin.Menus.Remove(NewDataMenuName)
-        g_MapWin.Menus.Remove(OpenDataMenuName)
         g_MapWin.Menus.Remove(DownloadMenuName)
-        g_MapWin.Menus.Remove(ManageDataMenuName)
-        g_MapWin.Menus.Remove(SaveDataMenuName)
         g_MapWin.Menus.Remove(ProjectsMenuName)
         g_MapWin.Menus.Remove(BasinsHelpMenuName)
         g_MapWin.Menus.Remove(BasinsWebPageMenuName)
@@ -170,18 +159,12 @@ Public Class atcBasinsPlugIn
             Case "mnuAboutMapWindow" 'Override Help/About menu
                 Dim lAbout As New frmAbout
                 lAbout.ShowAbout()
-            Case NewDataMenuName
-                UserOpenDataFile(False, True)
-            Case OpenDataMenuName
-                UserOpenDataFile()
             Case DownloadMenuName
                 If NationalProjectIsOpen() Then
                     SpecifyAndCreateNewProject()
                 Else
                     DownloadNewData(PathNameOnly(g_Project.FileName) & "\")
                 End If
-            Case ManageDataMenuName
-                atcDataManager.UserManage()
             Case RegisterMenuName
                 OpenFile("http://hspf.com/pub/basins4/register.html")
             Case CheckForUpdatesMenuName
@@ -237,9 +220,6 @@ Public Class atcBasinsPlugIn
                         Logger.Dbg("Unable to launch " & aItemName, "Launch")
                         aHandled = False
                     End If
-                ElseIf aItemName.StartsWith(SaveDataMenuName & "_") Then
-                    aHandled = UserSaveData(aItemName.Substring(SaveDataMenuName.Length + 1))
-                    'TODO: add case where not save data destinations are available, ask user for destination?
                 ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
                     aHandled = UserOpenProject(g_Menus(aItemName).Text)
                 Else
@@ -279,35 +259,23 @@ Public Class atcBasinsPlugIn
         End Try
     End Sub
 
-    Private Function UserSaveData(ByVal aSpecification As String) As Boolean
-        Dim lSaveIn As atcDataSource = Nothing
-        Dim lSaveGroup As atcDataGroup = atcDataManager.UserSelectData("Select Data to Save")
-        If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
-            For Each lDataSource As atcDataSource In atcDataManager.DataSources
-                If lDataSource.Specification = aSpecification Then
-                    lSaveIn = lDataSource
-                    Exit For
-                End If
-            Next
-
-            If lSaveIn Is Nothing Then
-                lSaveIn = UserOpenDataFile(False, True)
-            End If
-
-            If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
-                For Each lDataSet As atcDataSet In lSaveGroup
-                    lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
-                Next
-                Return lSaveIn.Save(lSaveIn.Specification)
-            End If
-        End If
-        Return False
-    End Function
-
     Private Function UserOpenProject(ByVal aDataDirName As String) As Boolean
         Dim lPrjFileName As String
 
+        If Not FileExists(aDataDirName, True, False) Then
+            'Look for folder in BASINS dirs
+            For Each lDataDir As String In g_BasinsDataDirs
+                For Each lProjectDir As String In IO.Directory.GetDirectories(lDataDir)
+                    If IO.Path.GetFileName(lProjectDir) = aDataDirName Then
+                        aDataDirName = lProjectDir
+                        GoTo FoundDir
+                    End If
+                Next
+            Next
+        End If
+
         If FileExists(aDataDirName, True, False) Then
+FoundDir:
             If g_Project.Modified Then
                 If PromptToSaveProject(g_Project.FileName) = MsgBoxResult.Cancel Then
                     Return False
@@ -371,21 +339,6 @@ Public Class atcBasinsPlugIn
             Case MsgBoxResult.No
                 Return MsgBoxResult.No
         End Select
-    End Function
-
-    Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
-                                      Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
-        Dim lFilesOnly As New ArrayList(1)
-        lFilesOnly.Add("File")
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
-        If Not lNewSource Is Nothing Then 'user did not cancel
-            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                If Logger.LastDbgText.Length > 0 Then
-                    Logger.Msg(Logger.LastDbgText, "Data Open Problem")
-                End If
-            End If
-        End If
-        Return lNewSource
     End Function
 
     Public Property Busy() As Boolean

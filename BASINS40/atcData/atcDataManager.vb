@@ -60,6 +60,17 @@ Public Class atcDataManager
         pDisplayAttributes.Add("Min")
         pDisplayAttributes.Add("Max")
         pDisplayAttributes.Add("Mean")
+
+        AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, "mnuNew")
+        AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuOpen")
+        AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, OpenDataMenuName)
+        AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
+
+        'g_MapWin.Menus.Remove(NewDataMenuName)
+        'g_MapWin.Menus.Remove(OpenDataMenuName)
+        'g_MapWin.Menus.Remove(ManageDataMenuName)
+        'g_MapWin.Menus.Remove(SaveDataMenuName)
+
     End Sub
 
     ''' <summary>Set of atcDataSource objects representing currently open DataSources</summary>
@@ -133,7 +144,13 @@ Public Class atcDataManager
                 Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
                 pDataSources.Add(aNewSource)
                 RaiseEvent OpenedData(aNewSource)
-                If Not pMapWin Is Nothing Then pMapWin.Project.Modified = True
+                If Not pMapWin Is Nothing Then
+                    pMapWin.Project.Modified = True
+                    If aNewSource.CanSave Then
+                        AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
+                        AddMenuIfMissing(SaveDataMenuName & "_" & aNewSource.Specification, SaveDataMenuName, aNewSource.Specification)
+                    End If
+                End If
                 Return True
             Else
                 If Logger.LastDbgText.Length > 0 Then
@@ -142,7 +159,7 @@ Public Class atcDataManager
                                "Details:" & Logger.LastDbgText)
                 End If
                 Return False
-                End If
+            End If
         Catch ex As Exception
             Logger.Dbg("Exception:" & ex.Message & vbCrLf & _
                        "Traceback:" & ex.StackTrace & vbCrLf & _
@@ -437,6 +454,18 @@ Public Class atcDataManager
     End Property
 
     Public Const FileMenuName As String = "mnuFile"
+
+    Public Const NewDataMenuName As String = "BasinsNewData"
+    Public Const NewDataMenuString As String = "New Data"
+
+    Public Const OpenDataMenuName As String = "BasinsOpenData"
+    Public Const OpenDataMenuString As String = "Open Data"
+
+    Public Const ManageDataMenuName As String = "BasinsManageData"
+    Public Const ManageDataMenuString As String = "Manage Data"
+
+    Public Const SaveDataMenuName As String = "BasinsSaveData"
+    Public Const SaveDataMenuString As String = "Save Data In..."
 
     Public Const ComputeMenuName As String = "BasinsCompute"
     Public Const ComputeMenuString As String = "Compute"

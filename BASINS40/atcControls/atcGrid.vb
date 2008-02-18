@@ -23,7 +23,7 @@ Public Class atcGrid
     Private pColumnWidth As ArrayList = New ArrayList 'of Integer
     Private pVisibleWidth As Integer = 0
 
-    Private pTopRow As Integer
+    Private pRowsScrolled As Integer 'Number of rows that are scrolled up above the view area
 
     Private pRowBottom As New atcCollection
     Private pColumnRight As New atcCollection
@@ -104,7 +104,6 @@ Public Class atcGrid
         Me.CellEditBox.Name = "CellEditBox"
         Me.CellEditBox.Size = New System.Drawing.Size(104, 20)
         Me.CellEditBox.TabIndex = 4
-        Me.CellEditBox.Text = ""
         Me.CellEditBox.Visible = False
         '
         'CellComboBox
@@ -125,13 +124,14 @@ Public Class atcGrid
         Me.Controls.Add(Me.VScroller)
         Me.Name = "atcGrid"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
 #End Region
 
     Public Sub Clear()
-        Dim lRows As Integer
+        'Dim lRows As Integer
         Dim lColumns As Integer
 
         pCellBackColor = SystemColors.Window
@@ -141,7 +141,7 @@ Public Class atcGrid
         pLineWidth = 1
         pLineWidth = 1
 
-        pTopRow = 0
+        pRowsScrolled = 0
 
         pRowHeight = New ArrayList
         pColumnWidth = New ArrayList
@@ -150,10 +150,10 @@ Public Class atcGrid
         pColumnRight = New atcCollection
 
         If pSource Is Nothing Then
-            lRows = 0
+            'lRows = 0
             lColumns = 0
         Else
-            lRows = pSource.Rows
+            'lRows = pSource.Rows
             lColumns = pSource.Columns
         End If
 
@@ -367,23 +367,23 @@ Public Class atcGrid
                         .SmallChange = 1
                         .LargeChange = 1
                     End If
-                        If .Value < .Minimum Then
-                            .Value = .Minimum
-                            Return True
-                        End If
-                        If .Value > .Maximum Then
-                            .Value = .Maximum
-                            Return True
-                        End If
-                        .Visible = True
-                    Else
-                        .Visible = False
-                        If .Value <> .Minimum Then
-                            .Value = .Minimum
-                            Return True
-                        End If
+                    If .Value < .Minimum Then
+                        .Value = .Minimum
+                        Return True
                     End If
-                    Return False
+                    If .Value > .Maximum Then
+                        .Value = .Maximum
+                        Return True
+                    End If
+                    .Visible = True
+                Else
+                    .Visible = False
+                    If .Value <> .Minimum Then
+                        .Value = .Minimum
+                        Return True
+                    End If
+                End If
+                Return False
             End With
         Else
             HScroller.Visible = False
@@ -393,15 +393,16 @@ Public Class atcGrid
     Private Sub Render(ByVal g As Graphics)
         Try
             If Me.Visible And Not pSource Is Nothing Then
-                If SetHScroller() Then Exit Sub 'Changed HScroller.Value will create new Render
+                If SetHScroller() Then Exit Sub 'Changed Scroller.Value will create new Render
 
                 Dim x As Integer = 0
                 Dim y As Integer = 0
                 Dim lx As Integer
 
                 Dim lRows As Integer = pSource.Rows
-                Dim lRowsVisible As Integer = 0
+                Dim lNonFixedRowsVisible As Integer = 0
                 Dim lFixedRows As Integer = pSource.FixedRows
+                Dim lVscrollInUse As Boolean = False
 
                 Dim lColumns As Integer = pSource.Columns
                 Dim lFixedColumns As Integer = pSource.FixedColumns
@@ -418,25 +419,33 @@ Public Class atcGrid
 
                 pVisibleWidth = Me.Width
 
-                If pTopRow > 0 Then        'Scrolled down at least one row
-                    If lRows < pTopRow Then  'Scrolled past last row
-                        pTopRow = 0            'Reset scrollbar to top row
+                If pRowsScrolled > 0 Then 'Scrolled down at least one row
+                    If pRowsScrolled > lRows - lFixedRows Then 'Somehow scrolled past last row
+                        pRowsScrolled = 0        'Reset vertical scroll to top row
                         Me.VScroller.Value = 0
-                    Else                     'Check to see if all rows could fit
-                        y = 0
-                        For lRow = lRows - 1 To 0 Step -1
-                            y += RowHeight(lRow)
-                            If y > visibleHeight Then Exit For
-                        Next
-                        lRow += 2
-                        If lRow < pTopRow Then
-                            pTopRow = lRow
-                            Me.VScroller.Value = pTopRow
-                        End If
-                        'If y <= visibleHeight Then 'If all rows can fit
-                        '    pTopRow = 0              'Reset scrollbar to top row
-                        '    Me.VScroller.Value = 0
-                        'End If
+                    End If
+                End If
+
+                'Check to see if all rows could fit
+                y = 0
+                For lRow = 0 To lFixedRows - 1
+                    y += RowHeight(lRow)
+                Next
+                For lRow = lRows - 1 To lFixedRows Step -1
+                    y += RowHeight(lRow)
+                    If y > visibleHeight Then Exit For
+                Next
+
+                lNonFixedRowsVisible = lRows - lRow - 1
+
+                If lFixedRows + lNonFixedRowsVisible = lRows Then 'all rows can fit
+                    pRowsScrolled = 0            'Reset scrollbar to top row
+                    Me.VScroller.Value = 0
+                Else
+                    lVscrollInUse = True
+                    If lRow - lFixedRows + 1 < pRowsScrolled Then 'More rows are scrolled than need to be
+                        pRowsScrolled = lRow - lFixedRows + 1     'Scroll down past only as many rows as don't fit
+                        Me.VScroller.Value = pRowsScrolled
                     End If
                 End If
 
@@ -453,49 +462,46 @@ Public Class atcGrid
                 Dim lCellValue As String
                 Dim lCellAlignment As Integer
                 Dim lCellValueSize As SizeF
-                Dim lVscrollInUse As Boolean = False
+
+                With VScroller
+                    If pRowsScrolled > 0 Then lVscrollInUse = True
+                    If lVscrollInUse Then
+                        .Visible = True
+                        pVisibleWidth -= .Width
+                        If lNonFixedRowsVisible > 1 Then
+                            .LargeChange = lNonFixedRowsVisible - 1
+                        Else
+                            .LargeChange = 1
+                        End If
+                        If lRows > 1 Then .Maximum = lRows - lFixedRows - lNonFixedRowsVisible + .LargeChange - 1
+                        .Refresh()
+                    Else
+                        .Visible = False
+                    End If
+                End With
 
                 'Clear whole area to default cell background color
                 g.FillRectangle(lCellBrush, 0, 0, pVisibleWidth, visibleHeight)
 
                 'Draw Row Lines
-                pRowBottom = New atcCollection
-                If pTopRow > 0 Then
-                    lVscrollInUse = True
-                Else
-                    VScroller.Visible = False
-                End If
                 y = -1
-
+                pRowBottom = New atcCollection
                 For lRow = 0 To lRows - 1
-                    If lRow < lFixedRows OrElse lRow >= pTopRow Then
-                        lRowsVisible += 1
+                    If lRow < lFixedRows OrElse lRow >= pRowsScrolled + lFixedRows Then
                         y += RowHeight(lRow)
                         g.DrawLine(lLinePen, 0, y, pVisibleWidth, y)
                         pRowBottom.Add(lRow, y)
-                        If y > visibleHeight Then
-                            lVscrollInUse = True
-                            If lRowsVisible > 1 Then
-                                VScroller.LargeChange = lRowsVisible - 1
-                            Else
-                                VScroller.LargeChange = 1
-                            End If
-                            Exit For
-                        End If
-                    ElseIf lRow < pTopRow - 1 Then 'skip rows we can't see
-                        lRow = pTopRow - 1
+                        If y > visibleHeight Then Exit For
+                    ElseIf lRow < pRowsScrolled + lFixedRows Then 'skip rows we can't see
+                        lRow = pRowsScrolled + lFixedRows - 1
+                    Else 'finished with all visible row lines
+                        Exit For
                     End If
                 Next
 
-                If lVscrollInUse Then
-                    VScroller.Visible = True
-                    pVisibleWidth -= VScroller.Width
-                    If lRows > 1 Then VScroller.Maximum = lRows - 1
-                End If
-
                 'Fill unused space below bottom line
                 If y < visibleHeight Then
-                    g.FillRectangle(lOutsideBrush, 0, y, pVisibleWidth, visibleHeight - y)
+                    g.FillRectangle(lOutsideBrush, 0, y, Me.Width, Me.Height - y)
                 End If
 
                 'Draw Column Lines
@@ -535,10 +541,9 @@ Public Class atcGrid
                 SizeScrollers()
 
                 'Fill unused space right of rightmost column
-                If lx < pVisibleWidth Then
-                    g.FillRectangle(lOutsideBrush, lx, 0, pVisibleWidth - lx, visibleHeight)
-                End If
+                g.FillRectangle(lOutsideBrush, lx, 0, Me.Width - lx, Me.Height)
 
+                'Draw values in cells
                 Dim lCellLeft As Integer
                 Dim lCellRight As Integer
                 Dim lCellTop As Integer = 0
@@ -724,7 +729,7 @@ Public Class atcGrid
             Dim lMaxWidth As Integer = 0
 
             'TODO: would be faster to check just length of string [before/after decimal] then do width of "XXXXwidthXXXX"
-            If lastRow > pTopRow + 150 Then lastRow = pTopRow + 100 'Limit how much time we spend finding the widest cell
+            If lastRow > pRowsScrolled + 150 Then lastRow = pRowsScrolled + 100 'Limit how much time we spend finding the widest cell
             For lRow As Integer = 0 To lastRow
                 lCellValue = pSource.CellValue(lRow, aColumn)
                 If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
@@ -779,10 +784,10 @@ Public Class atcGrid
             Dim lFixedColumns As Integer = pSource.FixedColumns
 
             For lRow As Integer = 0 To aRow - 1
-                If lRow < lFixedRows OrElse lRow >= pTopRow Then
+                If lRow < lFixedRows OrElse lRow >= pRowsScrolled Then
                     lY += RowHeight(lRow)
-                ElseIf lRow < pTopRow - 1 Then 'skip rows we can't see
-                    lRow = pTopRow - 1
+                ElseIf lRow < pRowsScrolled - 1 Then 'skip rows we can't see
+                    lRow = pRowsScrolled - 1
                 End If
             Next
 
@@ -982,10 +987,18 @@ Public Class atcGrid
         scrollCorner.Visible = VScroller.Visible And HScroller.Visible
     End Sub
 
+    Private Sub VScroller_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles VScroller.KeyDown
+        If e.KeyCode = Keys.NumLock Then
+            MsgBox("VScroller.Width = " & VScroller.Width & ", .Left =" & VScroller.Left & ", Me.Width = " & Me.Width & ", Width - VS.Width = " & Me.Width - VScroller.Width & vbCrLf & _
+            "HScroller.Height = " & HScroller.Height & ", .Top =" & HScroller.Top & ", Me.Height = " & Me.Height & ", Height - HS.Height = " & Me.Height - HScroller.Height & vbCrLf & _
+            "VScroller.Value = " & VScroller.Value & ", Min = " & VScroller.Minimum & ", Max = " & VScroller.Maximum & ", LargeChange = " & VScroller.LargeChange & ", pSource.Rows = " & pSource.Rows & ", FixedRows = " & pSource.FixedRows)
+        End If
+    End Sub
+
     Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged
         VScroller.Focus()
-        If pTopRow <> VScroller.Value Then
-            pTopRow = VScroller.Value
+        If pRowsScrolled <> VScroller.Value Then
+            pRowsScrolled = VScroller.Value
             Refresh()
         End If
     End Sub
@@ -1023,15 +1036,17 @@ Public Class atcGrid
     End Sub
 
     Private Sub VScroller_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles VScroller.MouseWheel
-        Dim lNewValue As Integer = VScroller.Value
-        If e.Delta > 0 Then lNewValue -= 1 Else lNewValue += 1
-        If lNewValue < VScroller.Minimum Then
-            VScroller.Value = VScroller.Minimum
-        ElseIf lNewValue > VScroller.Maximum Then
-            VScroller.Value = VScroller.Maximum
-        Else
-            VScroller.Value = lNewValue
-        End If
+        With VScroller
+            Dim lNewValue As Integer = .Value
+            If e.Delta > 0 Then lNewValue -= 1 Else lNewValue += 1
+            If lNewValue < .Minimum Then
+                .Value = VScroller.Minimum
+            ElseIf lNewValue > .Maximum - .LargeChange + 1 Then
+                .Value = .Maximum - .LargeChange + 1
+            Else
+                .Value = lNewValue
+            End If
+        End With
     End Sub
 
     Protected Overrides Sub OnMouseWheel(ByVal e As System.Windows.Forms.MouseEventArgs)

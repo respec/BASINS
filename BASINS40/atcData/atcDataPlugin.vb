@@ -113,15 +113,15 @@ Public Class atcDataPlugin
                                     If lOperation.Definition.Category.Length > 0 Then
                                         Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
                                         atcDataManager.AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
-                                        atcDataManager.AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name, lSubCategoryName, lOperation.Definition.Name, , , True)
+                                        atcDataManager.AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name & "_" & Name, lSubCategoryName, lOperation.Definition.Name, , , True)
                                     Else
-                                        atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
+                                        atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name & "_" & Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
                                     End If
                             End Select
                         Next
                     Else
                         atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
-                        pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lDataSource.Description, lCategoryMenuName, lDataSource.Description, , , True))
+                        pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & Name, lCategoryMenuName, lDataSource.Description, , , True))
                     End If
                 End If
             Catch
@@ -163,27 +163,55 @@ Public Class atcDataPlugin
     ''' </summary>
     Public Overridable Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) _
                               Implements MapWindow.Interfaces.IPlugin.ItemClicked
-        If aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & Name) Then
+        Dim lName As String = Name
+        If aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & lName) Then
             Dim newDisplay As atcDataDisplay = Me.NewOne
             newDisplay.Initialize(pMapWin, pMapWinWindowHandle)
             newDisplay.Show()
-        ElseIf aItemName.StartsWith(Name & "_") Then
-            aItemName = aItemName.Replace(" ", "")
-            Dim lNewSource As atcDataSource = Me
-            lNewSource = lNewSource.NewOne
+        ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(lName) Then
+            Try
+                Dim ds As atcDataSource = Me
+                Dim lNewSource As atcDataSource = Nothing
+                Dim lCategoryNoSpace As String = ds.Category.Replace(" ", "")
 
-            Dim lOperation As atcDefinedValue = lNewSource.AvailableOperations.ItemByKey(aItemName.Substring(Name.Length + 1))
-            If Not lOperation Is Nothing Then
-                lNewSource.Specification = lOperation.Definition.Name
-            End If
-            If Not lNewSource Is Nothing Then
-                If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                    If lNewSource.DataSets.Count > 0 Then
-                        Dim lTitle As String = lNewSource.ToString
-                        atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                Dim lItemName As String = aItemName.Replace(" ", "")
+                lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - lName.Length - 2)
+                If lItemName.StartsWith(lCategoryNoSpace & "_") Then
+                    lItemName = lItemName.Substring(lCategoryNoSpace.Length + 1)
+                    Dim lOperation As atcDefinedValue = ds.AvailableOperations.ItemByKey(lItemName.ToLower)
+                    'If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
+                    '    For Each lOperation In lOperations
+                    '        Select Case lOperation.Definition.TypeString
+                    '            Case "atcTimeseries", "atcDataGroup"
+                    '                'Operations might have categories to further divide them
+                    '                If lItemName.Equals((lOperation.Definition.Name).Replace(" ", "")) OrElse _
+                    '                   lItemName.Equals((lOperation.Definition.Category & "_" & lOperation.Definition.Name).Replace(" ", "")) Then
+                    Dim lUnderscorePos As Integer = lItemName.IndexOf("_"c)
+                    While lUnderscorePos >= 0 AndAlso lOperation Is Nothing
+                        lOperation = ds.AvailableOperations.ItemByKey(lItemName.Substring(lUnderscorePos + 1).ToLower)
+                        lUnderscorePos = lItemName.IndexOf("_"c, lUnderscorePos + 1)
+                    End While
+
+                    If Not lOperation Is Nothing Then
+                        lNewSource = ds.NewOne
+                        lNewSource.Specification = lOperation.Definition.Name
+                    End If
+                    '    End Select
+                    'Next
+                    If lItemName.Equals(ds.Description) Then
+                        lNewSource = ds.NewOne
                     End If
                 End If
-            End If
+                If Not lNewSource Is Nothing Then
+                    If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                        If lNewSource.DataSets.Count > 0 Then
+                            Dim lTitle As String = lNewSource.ToString
+                            atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                        End If
+                    End If
+                End If
+            Catch
+            End Try
         End If
     End Sub
 
