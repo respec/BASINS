@@ -32,20 +32,8 @@ Friend Module modBasinsPlugin
     Friend Const ProjectsMenuName As String = "BasinsProjects"
     Friend Const ProjectsMenuString As String = "Open BASINS Project"
 
-    Friend Const NewDataMenuName As String = "BasinsNewData"
-    Friend Const NewDataMenuString As String = "New Data"
-
-    Friend Const OpenDataMenuName As String = "BasinsOpenData"
-    Friend Const OpenDataMenuString As String = "Open Data"
-
     Friend Const DownloadMenuName As String = "BasinsDownloadData"
     Friend Const DownloadMenuString As String = "Download Data"
-
-    Friend Const ManageDataMenuName As String = "BasinsManageData"
-    Friend Const ManageDataMenuString As String = "Manage Data"
-
-    Friend Const SaveDataMenuName As String = "BasinsSaveData"
-    Friend Const SaveDataMenuString As String = "Save Data In..."
 
     Friend pWelcomeScreenShow As Boolean = False
 
@@ -71,24 +59,6 @@ Friend Module modBasinsPlugin
 
     Private Const BasinsDataPath As String = "Basins\data\"
     Private Const NationalProjectFilename As String = "national.mwprj"
-
-    Friend Sub OpenedData(ByVal aDataSource As atcData.atcDataSource)
-        RefreshSaveDataMenu()
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks></remarks>
-    Friend Sub RefreshSaveDataMenu()
-        g_Menus.Remove(SaveDataMenuName)
-        atcDataManager.AddMenuIfMissing(SaveDataMenuName, atcDataManager.FileMenuName, SaveDataMenuString, "mnuSaveAs")
-        For Each lDataSource As atcDataSource In atcDataManager.DataSources
-            If lDataSource.CanSave Then
-                atcDataManager.AddMenuIfMissing(SaveDataMenuName & "_" & lDataSource.Specification, SaveDataMenuName, lDataSource.Specification)
-            End If
-        Next
-    End Sub
 
     ''' <summary>
     ''' 

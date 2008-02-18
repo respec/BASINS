@@ -186,7 +186,7 @@ Public Class atcTimeseriesMath
 
     End Sub
 
-    Public Function Compute(ByVal aOperationName As String, ByVal ParamArray aArgs() As Object) As atcTimeseries
+    Public Shared Function Compute(ByVal aOperationName As String, ByVal ParamArray aArgs() As Object) As atcTimeseries
         Dim lDataAttributes As New atcDataAttributes
         Dim lDataGroup As New atcDataGroup
 
@@ -200,8 +200,9 @@ Public Class atcTimeseriesMath
             lDataAttributes.SetValue("timeseries", lDataGroup)
         End If
 
-        If Open(aOperationName, lDataAttributes) Then
-            Return Me.DataSets(0)
+        Dim lInstance As New atcTimeseriesMath
+        If lInstance.Open(aOperationName, lDataAttributes) Then
+            Return lInstance.DataSets(0)
         Else
             Return Nothing
         End If
@@ -243,6 +244,7 @@ Public Class atcTimeseriesMath
 
         If lNeedToAsk Then 'Ask user what to do
             Dim lSpecify As New frmSpecifyComputation
+            lSpecify.Text = Me.Category & ": " & aOperationName
             If Not lSpecify.AskUser(aArgs) Then
                 Return False 'User cancelled
             End If

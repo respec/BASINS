@@ -249,7 +249,7 @@ Public Class atcDataGroup
             Dim lAttributeNumeric As Boolean = aAttributeDefinition.IsNumeric
             Dim lTsIndex As Integer = 0
             Dim lItemIndex As Integer = 0
-            Dim lProgressMessage As String = "Sorting Values for " & lAttributeName
+            Logger.Status("Finding Values for " & lAttributeName)
             Dim lValue As String
             For Each ts As atcDataSet In Me
                 Try
@@ -280,8 +280,9 @@ Public Class atcDataGroup
                     Logger.Dbg("Can't display value of " & lAttributeName & ": " & ex.Message)
                 End Try
                 lTsIndex += 1
-                Logger.Progress(lProgressMessage, lTsIndex, Count)
+                Logger.Progress(lTsIndex, Count)
             Next
+            Logger.Status("")
         End If
         Return lSortedValues
     End Function

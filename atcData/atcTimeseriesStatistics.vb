@@ -1,5 +1,6 @@
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
 
 Imports System.Windows.Forms
 
@@ -348,4 +349,62 @@ Public Class atcTimeseriesStatistics
             Next
         End If
     End Function
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        MyBase.ItemClicked(aItemName, aHandled)
+        Select Case aItemName
+            Case atcDataManager.NewDataMenuName
+                UserOpenDataFile(False, True)
+            Case atcDataManager.OpenDataMenuName
+                UserOpenDataFile()
+            Case atcDataManager.ManageDataMenuName
+                atcDataManager.UserManage()
+            Case Else
+                If aItemName.StartsWith(atcDataManager.SaveDataMenuName & "_") Then
+                    aHandled = UserSaveData(aItemName.Substring(atcDataManager.SaveDataMenuName.Length + 1))
+                    'TODO: add case where not save data destinations are available, ask user for destination?
+                End If
+        End Select
+    End Sub
+
+    Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
+                                  Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
+        Dim lFilesOnly As New ArrayList(1)
+        lFilesOnly.Add("File")
+        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
+        If Not lNewSource Is Nothing Then 'user did not cancel
+            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                If Logger.LastDbgText.Length > 0 Then
+                    Logger.Msg(Logger.LastDbgText, "Data Open Problem")
+                End If
+            End If
+        End If
+        Return lNewSource
+    End Function
+
+    Private Function UserSaveData(ByVal aSpecification As String) As Boolean
+        Dim lSaveIn As atcDataSource = Nothing
+        Dim lSaveGroup As atcDataGroup = atcDataManager.UserSelectData("Select Data to Save")
+        If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
+            For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                If lDataSource.Specification = aSpecification Then
+                    lSaveIn = lDataSource
+                    Exit For
+                End If
+            Next
+
+            If lSaveIn Is Nothing Then
+                lSaveIn = UserOpenDataFile(False, True)
+            End If
+
+            If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
+                For Each lDataSet As atcDataSet In lSaveGroup
+                    lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                Next
+                Return lSaveIn.Save(lSaveIn.Specification)
+            End If
+        End If
+        Return False
+    End Function
+
 End Class

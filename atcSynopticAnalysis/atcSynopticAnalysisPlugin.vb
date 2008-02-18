@@ -233,14 +233,20 @@ Public Class atcSynopticAnalysisPlugin
         End Try
 
         Dim lSource As New atcControls.atcGridSource
-        lSource.Columns = aColumnTitles.Length
-        lSource.FixedRows = 3
-        lSource.Rows = aGroups.Count + lSource.FixedRows
-        For lColumn = 0 To aColumnTitles.Length - 1
-            lSource.CellValue(0, lColumn) = aColumnTitles(lColumn)
-            lSource.CellValue(1, lColumn) = aColumnAttributes(lColumn)
-            lSource.CellValue(2, lColumn) = ColumnUnits(aColumnTitles(lColumn), aTimeUnits)
-        Next
+        With lSource
+
+            .Columns = aColumnTitles.Length
+            .FixedRows = 3
+            .Rows = aGroups.Count + lSource.FixedRows
+            For lColumn = 0 To aColumnTitles.Length - 1
+                .CellValue(0, lColumn) = aColumnTitles(lColumn)
+                .CellValue(1, lColumn) = aColumnAttributes(lColumn)
+                .CellValue(2, lColumn) = ColumnUnits(aColumnTitles(lColumn), aTimeUnits)
+                .CellColor(0, lColumn) = Drawing.Color.LightGray
+                .CellColor(1, lColumn) = Drawing.Color.LightGray
+                .CellColor(2, lColumn) = Drawing.Color.LightGray
+            Next
+        End With
 
         lGroupIndex = 0
         For Each lGroup In aGroups
@@ -307,7 +313,10 @@ Public Class atcSynopticAnalysisPlugin
                         End Try
                     End If
                 ElseIf aColumnAttributes(lColumn).Length > 0 AndAlso Not lDataset Is Nothing Then
-                    lValue = lDataset.Attributes.GetValue(aColumnAttributes(lColumn))
+                    Dim lStr As String = lDataset.Attributes.GetValue(aColumnAttributes(lColumn))
+                    If IsNumeric(lStr) Then
+                        lValue = lStr
+                    End If
                 End If
 
                 Select Case aColumnTitles(lColumn)

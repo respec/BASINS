@@ -321,21 +321,18 @@ Module HSPFOutputReports
         Dim lDataGroupOutput As New atcDataGroup
 
         'baseflow + interflow
-        Dim lMathBaseInter As New atcTimeseriesMath.atcTimeseriesMath
-        Dim lMathBaseInterTSer As atcTimeseries = lMathBaseInter.Compute("add", aDataGroup.Item(0), aDataGroup.Item(1))
+        Dim lMathBaseInterTSer As atcTimeseries = atcTimeseriesMath.atcTimeseriesMath.Compute("add", aDataGroup.Item(0), aDataGroup.Item(1))
         lMathBaseInterTSer.Attributes.SetValue("Constituent", "Interflow+baseflow")
         lDataGroupOutput.Add(lMathBaseInterTSer)
 
         'total - add surface runoff
-        Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
-        Dim lMathTSer As atcTimeseries = lMath.Compute("add", lMathBaseInterTSer, aDataGroup.Item(2))
+        Dim lMathTSer As atcTimeseries = atcTimeseriesMath.atcTimeseriesMath.Compute("add", lMathBaseInterTSer, aDataGroup.Item(2))
         lMathTSer.Attributes.SetValue("Constituent", "Simulated")
         lDataGroupOutput.Add(lMathTSer)
 
         'precip - actual et
-        Dim lMathPrecEt As New atcTimeseriesMath.atcTimeseriesMath
         Dim lMathPrecEtTSer As atcTimeseries = _
-            lMathPrecEt.Compute("subtract", _
+            atcTimeseriesMath.atcTimeseriesMath.Compute("subtract", _
                                 Aggregate(aDataGroup.Item(3), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv), _
                                 Aggregate(aDataGroup.Item(4), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv))
         lMathPrecEtTSer.Attributes.SetValue("Constituent", "Precip-ActET")
@@ -373,7 +370,7 @@ Module HSPFOutputReports
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(3), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec
-        lMonthDataGroup.Add(Aggregate(lMathPrecEt.DataSets(0), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec -act et
+        lMonthDataGroup.Add(Aggregate(lMathPrecEtTSer, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec -act et
         lZgc = CreateZgc()
         lZgc.Width *= 3
         lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
