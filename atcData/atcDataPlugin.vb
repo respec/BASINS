@@ -162,57 +162,73 @@ Public Class atcDataPlugin
     ''' this is where those events are handled.
     ''' </summary>
     Public Overridable Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) _
-                              Implements MapWindow.Interfaces.IPlugin.ItemClicked
-        Dim lName As String = Name
-        If aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & lName) Then
-            Dim newDisplay As atcDataDisplay = Me.NewOne
-            newDisplay.Initialize(pMapWin, pMapWinWindowHandle)
-            newDisplay.Show()
-        ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(lName) Then
-            Try
-                Dim ds As atcDataSource = Me
-                Dim lNewSource As atcDataSource = Nothing
-                Dim lCategoryNoSpace As String = ds.Category.Replace(" ", "")
+                                          Implements MapWindow.Interfaces.IPlugin.ItemClicked
+        'Default handling for all atcDataPlugin derivatives
+        Select Case aItemName
+            Case atcDataManager.NewDataMenuName
+                atcDataManager.UserOpenDataFile(False, True)
+                aHandled = True
+            Case atcDataManager.OpenDataMenuName
+                atcDataManager.UserOpenDataFile()
+                aHandled = True
+            Case atcDataManager.ManageDataMenuName
+                atcDataManager.UserManage()
+                aHandled = True
+            Case Else
+                Dim lName As String = Name
+                If aItemName.StartsWith(atcDataManager.SaveDataMenuName & "_") Then
+                    aHandled = atcDataManager.UserSaveData(aItemName.Substring(atcDataManager.SaveDataMenuName.Length + 1))
+                    'TODO: add case where not save data destinations are available, ask user for destination?
+                ElseIf aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & lName) Then
+                    Dim newDisplay As atcDataDisplay = Me.NewOne
+                    newDisplay.Initialize(pMapWin, pMapWinWindowHandle)
+                    newDisplay.Show()
+                ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(lName) Then
+                    Try
+                        Dim ds As atcDataSource = Me
+                        Dim lNewSource As atcDataSource = Nothing
+                        Dim lCategoryNoSpace As String = ds.Category.Replace(" ", "")
 
-                Dim lItemName As String = aItemName.Replace(" ", "")
-                lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - lName.Length - 2)
-                If lItemName.StartsWith(lCategoryNoSpace & "_") Then
-                    lItemName = lItemName.Substring(lCategoryNoSpace.Length + 1)
-                    Dim lOperation As atcDefinedValue = ds.AvailableOperations.ItemByKey(lItemName.ToLower)
-                    'If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
-                    '    For Each lOperation In lOperations
-                    '        Select Case lOperation.Definition.TypeString
-                    '            Case "atcTimeseries", "atcDataGroup"
-                    '                'Operations might have categories to further divide them
-                    '                If lItemName.Equals((lOperation.Definition.Name).Replace(" ", "")) OrElse _
-                    '                   lItemName.Equals((lOperation.Definition.Category & "_" & lOperation.Definition.Name).Replace(" ", "")) Then
-                    Dim lUnderscorePos As Integer = lItemName.IndexOf("_"c)
-                    While lUnderscorePos >= 0 AndAlso lOperation Is Nothing
-                        lOperation = ds.AvailableOperations.ItemByKey(lItemName.Substring(lUnderscorePos + 1).ToLower)
-                        lUnderscorePos = lItemName.IndexOf("_"c, lUnderscorePos + 1)
-                    End While
+                        Dim lItemName As String = aItemName.Replace(" ", "")
+                        lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - lName.Length - 2)
+                        If lItemName.StartsWith(lCategoryNoSpace & "_") Then
+                            lItemName = lItemName.Substring(lCategoryNoSpace.Length + 1)
+                            Dim lOperation As atcDefinedValue = ds.AvailableOperations.ItemByKey(lItemName.ToLower)
+                            'If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
+                            '    For Each lOperation In lOperations
+                            '        Select Case lOperation.Definition.TypeString
+                            '            Case "atcTimeseries", "atcDataGroup"
+                            '                'Operations might have categories to further divide them
+                            '                If lItemName.Equals((lOperation.Definition.Name).Replace(" ", "")) OrElse _
+                            '                   lItemName.Equals((lOperation.Definition.Category & "_" & lOperation.Definition.Name).Replace(" ", "")) Then
+                            Dim lUnderscorePos As Integer = lItemName.IndexOf("_"c)
+                            While lUnderscorePos >= 0 AndAlso lOperation Is Nothing
+                                lOperation = ds.AvailableOperations.ItemByKey(lItemName.Substring(lUnderscorePos + 1).ToLower)
+                                lUnderscorePos = lItemName.IndexOf("_"c, lUnderscorePos + 1)
+                            End While
 
-                    If Not lOperation Is Nothing Then
-                        lNewSource = ds.NewOne
-                        lNewSource.Specification = lOperation.Definition.Name
-                    End If
-                    '    End Select
-                    'Next
-                    If lItemName.Equals(ds.Description) Then
-                        lNewSource = ds.NewOne
-                    End If
-                End If
-                If Not lNewSource Is Nothing Then
-                    If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                        If lNewSource.DataSets.Count > 0 Then
-                            Dim lTitle As String = lNewSource.ToString
-                            atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                            If Not lOperation Is Nothing Then
+                                lNewSource = ds.NewOne
+                                lNewSource.Specification = lOperation.Definition.Name
+                            End If
+                            '    End Select
+                            'Next
+                            If lItemName.Equals(ds.Description) Then
+                                lNewSource = ds.NewOne
+                            End If
                         End If
-                    End If
+                        If Not lNewSource Is Nothing Then
+                            If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                                If lNewSource.DataSets.Count > 0 Then
+                                    Dim lTitle As String = lNewSource.ToString
+                                    atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                                End If
+                            End If
+                        End If
+                    Catch
+                    End Try
                 End If
-            Catch
-            End Try
-        End If
+        End Select
     End Sub
 
     ''' <summary>Fires when the user removes a layer from MapWindow.<br />

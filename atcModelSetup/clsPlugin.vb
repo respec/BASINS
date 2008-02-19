@@ -47,19 +47,16 @@ Public Class PlugIn
 
     <CLSCompliant(False)> _
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
-        Dim mnu As MapWindow.Interfaces.MenuItem
-
         pMapWin = MapWin
-
-        If Not pMapWin.Plugins.PluginIsLoaded(pMapWin.Plugins.GetPluginKey("BASINS 4")) Then
-            pMapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, "mnuFile")
-        End If
-        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_HSPF", ModelsMenuName, Nothing, "HSPF")
-        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_AQUATOX", ModelsMenuName, Nothing, "AQUATOX")
-
+        atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
+        atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName & "_HSPF", ModelsMenuName, "HSPF")
+        atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName & "_AQUATOX", ModelsMenuName, "AQUATOX")
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
+        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_HSPF")
+        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_AQUATOX")
+        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName)
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
