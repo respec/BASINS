@@ -131,9 +131,9 @@ Public Class atcTimeseriesMath
 
                 AddOperation("Geometric Mean", "Geometric Mean of values for each date", "Math", defTimeSeriesGroup)
 
-                AddOperation("Max", "Maximum value for each date", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Max Each Date", "Maximum value at each date", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Min", "Minimum value for each date", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Min Each Date", "Minimum value at each date", "Math", defTimeSeriesGroup, defDouble)
 
                 AddOperation("Exponent", "Raise each value of first timeseries to a power", "Math", defTimeSeriesGroup, defDouble)
 
@@ -358,7 +358,7 @@ Public Class atcTimeseriesMath
                     lNewVals(lValueIndex) = 10 ^ (lNewVals(lValueIndex) / lArgCount)
                 Next
 
-            Case "min"
+            Case "min each date"
                 For lValueIndex = 0 To lValueIndexLast
                     If lHaveNumber Then
                         If lNumber < lNewVals(lValueIndex) Then lNewVals(lValueIndex) = lNumber
@@ -371,7 +371,7 @@ Public Class atcTimeseriesMath
                     Next
                 Next
 
-            Case "max"
+            Case "max each date"
                 For lValueIndex = 0 To lValueIndexLast
                     If lHaveNumber Then
                         If lNumber > lNewVals(lValueIndex) Then lNewVals(lValueIndex) = lNumber
