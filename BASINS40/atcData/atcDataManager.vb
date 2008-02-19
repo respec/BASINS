@@ -170,6 +170,20 @@ Public Class atcDataManager
         End Try
     End Function
 
+    ''' <summary>Creates and returns an instance of a data source by name</summary>
+    ''' <param name="aDataSourceName">
+    '''     <para>Name of data source to create and return</para>
+    ''' </param>  
+    Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
+        For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
+            If lDataSource.Name = aDataSourceName Then
+                Return lDataSource.NewOne
+            End If
+        Next
+        Return Nothing
+    End Function
+
+#Region "User interaction"
     Public Shared Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcDataGroup)
         Dim lSelectDisplay As New frmSelectDisplay
         If Not aTitle Is Nothing AndAlso aTitle.Length > 0 Then lSelectDisplay.Text = aTitle
@@ -193,19 +207,6 @@ Public Class atcDataManager
             Next
         End If
     End Sub
-
-    ''' <summary>Creates and returns an instance of a data source by name</summary>
-    ''' <param name="aDataSourceName">
-    '''     <para>Name of data source to create and return</para>
-    ''' </param>  
-    Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
-        For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
-            If lDataSource.Name = aDataSourceName Then
-                Return lDataSource.NewOne
-            End If
-        Next
-        Return Nothing
-    End Function
 
     ''' <summary>Ask user to select a data source</summary>
     ''' <param name="aCategories">
@@ -262,6 +263,19 @@ Public Class atcDataManager
         Return aGroup
     End Function
 
+    ''' <summary>Ask user to manage data sources</summary>
+    ''' <param name="aTitle">
+    '''     <para>Optional title for dialog window, default is 'Data Sources'</para>
+    ''' </param> 
+    Public Shared Sub UserManage(Optional ByVal aTitle As String = "")
+        Dim lForm As New frmManager
+        If aTitle.Length > 0 Then lForm.Text = aTitle
+        lForm.Edit()
+    End Sub
+
+#End Region
+
+#Region "MapWindow location selection"
     ''' <summary>
     ''' Return the currently loaded datasets whose Location attribute matches a currently selected shape on the map
     ''' </summary>
@@ -367,16 +381,7 @@ Public Class atcDataManager
             End If
         End If
     End Sub
-
-    ''' <summary>Ask user to manage data sources</summary>
-    ''' <param name="aTitle">
-    '''     <para>Optional title for dialog window, default is 'Data Sources'</para>
-    ''' </param> 
-    Public Shared Sub UserManage(Optional ByVal aTitle As String = "")
-        Dim lForm As New frmManager
-        If aTitle.Length > 0 Then lForm.Text = aTitle
-        lForm.Edit()
-    End Sub
+#End Region
 
     ''' <summary>State of data manager in XML format</summary>
     ''' <value>Chilkat.Xml</value>
@@ -453,6 +458,7 @@ Public Class atcDataManager
         End Set
     End Property
 
+#Region "MapWindow menu handling"
     Public Const FileMenuName As String = "mnuFile"
 
     Public Const NewDataMenuName As String = "BasinsNewData"
@@ -552,7 +558,7 @@ Public Class atcDataManager
             End With
         End If
     End Function
-
+#End Region
 
     Public Overrides Function ToString() As String
         Dim lString As String = "atcDataManger:"
