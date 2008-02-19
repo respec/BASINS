@@ -60,17 +60,6 @@ Public Class atcDataManager
         pDisplayAttributes.Add("Min")
         pDisplayAttributes.Add("Max")
         pDisplayAttributes.Add("Mean")
-
-        AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, "mnuNew")
-        AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuOpen")
-        AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, OpenDataMenuName)
-        AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
-
-        'g_MapWin.Menus.Remove(NewDataMenuName)
-        'g_MapWin.Menus.Remove(OpenDataMenuName)
-        'g_MapWin.Menus.Remove(ManageDataMenuName)
-        'g_MapWin.Menus.Remove(SaveDataMenuName)
-
     End Sub
 
     ''' <summary>Set of atcDataSource objects representing currently open DataSources</summary>
@@ -548,10 +537,10 @@ Public Class atcDataManager
             Return Nothing
         Else
             With pMapWin.Menus
-                Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
-                If Not lMenu Is Nothing Then 'This item already exists
-                    Return lMenu
-                ElseIf aAlphabetical And aParent.Length > 0 Then
+                'Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
+                'If Not lMenu Is Nothing Then 'This item already exists
+                '    Return lMenu
+                If aAlphabetical And aParent.Length > 0 Then
                     'Need parent to do alphabetical search for position
                     Dim lParentMenu As MapWindow.Interfaces.MenuItem = .Item(aParent)
                     Dim lSubmenuIndex As Integer = 0

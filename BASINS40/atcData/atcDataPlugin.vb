@@ -1,3 +1,5 @@
+Imports atcData.atcDataManager
+
 ''' <summary>
 '''     <para>Base class for plugins that can read, write, manipulate, or display atcData</para>
 ''' </summary>
@@ -92,7 +94,16 @@ Public Class atcDataPlugin
         pMapWin = aMapWin
         pMapWinWindowHandle = aParentHandle
         atcDataManager.MapWindow = aMapWin
-        'pMapWin.Plugins.BroadcastMessage("atcDataPlugin loading " & Name)
+
+        AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, "mnuNew")
+        AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuOpen")
+        AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, OpenDataMenuName)
+        AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
+
+        'g_MapWin.Menus.Remove(NewDataMenuName)
+        'g_MapWin.Menus.Remove(OpenDataMenuName)
+        'g_MapWin.Menus.Remove(ManageDataMenuName)
+        'g_MapWin.Menus.Remove(SaveDataMenuName)
 
         If Name.StartsWith("Analysis::") Then
             atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
@@ -145,13 +156,15 @@ Public Class atcDataPlugin
             'pMapWin.Plugins.BroadcastMessage("atcDataPlugin unloading " & Name)
 
             For Each lMenu As MapWindow.Interfaces.MenuItem In pMenusAdded
-                If Not lMenu Is Nothing Then pMapWin.Menus.Remove(lMenu.Name)
+                If Not lMenu Is Nothing AndAlso Not pMapWin.Menus.Item(lMenu.Name) Is Nothing Then
+                    pMapWin.Menus.Remove(lMenu.Name)
+                End If
             Next
             pMenusAdded.Clear()
 
             If Name.StartsWith("Analysis::") Then
                 atcDataManager.RemoveMenuIfEmpty(atcDataManager.AnalysisMenuName)
-            ElseIf Name.StartsWith("Compute::") Then
+            ElseIf Name.StartsWith("Timeseries::") Then
                 atcDataManager.RemoveMenuIfEmpty(atcDataManager.ComputeMenuName)
             End If
         End If

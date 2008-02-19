@@ -154,9 +154,6 @@
     <Compile Include="atcTimeseriesBuilder.vb" />
     <Compile Include="atcTimeseriesGridSource.vb" />
     <Compile Include="atcTimeseriesGroupBuilder.vb" />
-    <Compile Include="atcTimeseriesStatistics.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="frmDataSource.vb">
       <SubType>Form</SubType>
     </Compile>
