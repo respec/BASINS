@@ -1411,6 +1411,9 @@ NextIteration:
 
     Private Sub btnInputModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputModify.Click
         If pPreparedInputs Is Nothing Then
+            If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
+                lstInputs.SelectedIndex = 0
+            End If
             Dim lIndex As Integer = lstInputs.SelectedIndex
             If lIndex >= 0 And lIndex < pInputs.Count Then
                 pUnsaved = True
@@ -1434,6 +1437,9 @@ NextIteration:
 
     Private Sub btnInputView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputView.Click
         If pPreparedInputs Is Nothing Then
+            If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
+                lstInputs.SelectedIndex = 0
+            End If
             If lstInputs.SelectedIndices.Count > 0 Then
                 Dim lData As New atcDataGroup
                 For Each lIndex As Integer In lstInputs.SelectedIndices
