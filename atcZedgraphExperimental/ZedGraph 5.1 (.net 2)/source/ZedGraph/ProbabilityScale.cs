@@ -489,7 +489,24 @@ namespace ZedGraph
         {
             if (_format == null)
                 _format = Scale.Default.Format;
-            return Percentages[index].ToString(_format);
+            if (!_formatAuto)
+                return Percentages[index].ToString(_format);
+
+            //2/21/08 LCW: modified so that if formatAuto is set, will give variable precision on formatting of labels
+            double pct = Percentages[index];
+            string fmt = "0";
+            if (pct < 0.001 || pct > 99.999)
+                fmt="0.0000";
+            else
+                if (pct < 0.01 || pct > 99.99)
+                    fmt="0.000";
+                else
+                    if (pct < 0.1 || pct > 99.9)
+                        fmt="0.00";
+                    else
+                        if (pct < 1 || pct > 99)
+                            fmt="0.0";
+            return pct.ToString(fmt);
         }
 
 	#endregion
