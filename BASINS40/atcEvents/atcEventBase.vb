@@ -100,7 +100,7 @@ Public Module atcEventBase
                                       ByVal aStartAt As Integer) As Integer
         For lCurrentIndex As Integer = aStartAt To aTS.numValues
             If (aTS.Value(lCurrentIndex) <= aThreshold) Then
-                Return lCurrentIndex
+                Return lCurrentIndex - 1
             End If
         Next
         Return aTS.numValues
@@ -111,7 +111,7 @@ Public Module atcEventBase
                                       ByVal aStartAt As Integer) As Integer
         For lCurrentIndex As Integer = aStartAt To aTS.numValues
             If (aTS.Value(lCurrentIndex) >= aThreshold) Then
-                Return lCurrentIndex
+                Return lCurrentIndex - 1
             End If
         Next
         Return aTS.numValues
