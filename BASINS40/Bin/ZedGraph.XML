@@ -7017,25 +7017,6 @@
             <see cref="F:ZedGraph.AxisType.Log"/>.
             </summary>
         </member>
-        <member name="P:ZedGraph.ProbabilityScale.Min">
-            <summary>
-            Gets or sets the minimum value for this scale.
-            </summary>
-            <remarks>
-            The set property is specifically adapted for <see cref="F:ZedGraph.AxisType.Log"/> scales,
-            in that it automatically limits the setting to values greater than zero.
-            </remarks>
-        </member>
-        <member name="P:ZedGraph.ProbabilityScale.Max">
-            <summary>
-            Gets or sets the maximum value for this scale.
-            </summary>
-            <remarks>
-            The set property is specifically adapted for <see cref="F:ZedGraph.AxisType.Log"/> scales,
-            in that it automatically limits the setting to values greater than zero.
-            <see cref="T:ZedGraph.XDate"/> struct.
-            </remarks>
-        </member>
         <member name="T:ZedGraph.PointPair4">
             <summary>
             The basic <see cref="T:ZedGraph.PointPair"/> class holds three data values (X, Y, Z).  This

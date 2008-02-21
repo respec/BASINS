@@ -9,6 +9,22 @@ Public Module modReflection
 
     Private pDontNeedTest As ArrayList
 
+    'Private Function GetEmbeddedFileAsStream(ByVal fileName As String, ByVal aAssembly As Assembly) As IO.Stream
+    '    Return aAssembly.GetManifestResourceStream(aAssembly.GetName().Name + "." + fileName)
+    'End Function
+
+    ''' <summary>
+    ''' Extracts an embedded file out of a given assembly as a string
+    ''' </summary>
+    ''' <param name="aAssembly">Assembly file is embedded in.</param>
+    ''' <param name="fileName">Name of the file to extract.</param>
+    ''' <returns>A string containing the file data.</returns>
+    Public Function GetEmbeddedFileAsString(ByVal fileName As String, Optional ByVal aAssembly As Assembly = Nothing) As String
+        If aAssembly Is Nothing Then aAssembly = Assembly.GetCallingAssembly
+        Dim lReader As New IO.StreamReader(aAssembly.GetManifestResourceStream(aAssembly.GetName().Name + "." + fileName))
+        Return lReader.ReadToEnd()
+    End Function
+
     Public Function BuildMissingTests(ByVal aSavePath As String) As String
         Dim s As String, t As String
         Dim lEntryModule As String, lEntryFunction As String
