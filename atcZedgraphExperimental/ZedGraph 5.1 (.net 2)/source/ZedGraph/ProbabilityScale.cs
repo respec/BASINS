@@ -107,33 +107,6 @@ namespace ZedGraph
             get { return AxisType.Probability; }
 		}
 
-		/// <summary>
-		/// Gets or sets the minimum value for this scale.
-		/// </summary>
-		/// <remarks>
-		/// The set property is specifically adapted for <see cref="AxisType.Log" /> scales,
-		/// in that it automatically limits the setting to values greater than zero.
-		/// </remarks>
-		public override double Min
-		{
-			get { return _min; }
-			set { if ( value > 0 ) _min = value; }
-		}
-
-		/// <summary>
-		/// Gets or sets the maximum value for this scale.
-		/// </summary>
-		/// <remarks>
-		/// The set property is specifically adapted for <see cref="AxisType.Log" /> scales,
-		/// in that it automatically limits the setting to values greater than zero.
-		/// <see cref="XDate" /> struct.
-		/// </remarks>
-		public override double Max
-		{
-			get { return _max; }
-			set { _max = value; }
-		}
-
 	#endregion
 
 	#region methods
@@ -304,9 +277,8 @@ namespace ZedGraph
 		/// <seealso cref="AxisType.Log"/>
         override public void PickScale(GraphPane pane, Graphics g, float scaleFactor)
         {
-            _mag = 0;
-            _min = 0;
-            _max = 1;
+            if ( _minAuto ) _min = 0;
+            if ( _maxAuto ) _max = 1;
         }
 
         /// <summary>

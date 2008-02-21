@@ -553,9 +553,9 @@ Imports MapWinUtility
         Me.lblVolumePercent2.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.lblVolumePercent2.Location = New System.Drawing.Point(325, 21)
         Me.lblVolumePercent2.Name = "lblVolumePercent2"
-        Me.lblVolumePercent2.Size = New System.Drawing.Size(62, 13)
+        Me.lblVolumePercent2.Size = New System.Drawing.Size(64, 13)
         Me.lblVolumePercent2.TabIndex = 26
-        Me.lblVolumePercent2.Text = "% of events"
+        Me.lblVolumePercent2.Text = "% of volume"
         Me.lblVolumePercent2.Visible = False
         '
         'grpEvents
@@ -923,6 +923,7 @@ Imports MapWinUtility
 
                 Try
                     .Min = CDbl(txtMin.Text)
+                    If lblValueUnitsMinimum.Text = "%" Then .Min /= 100
                 Catch
                     Logger.Msg("Minimum value must be a number", "Non-numeric value")
                     Return False
@@ -931,6 +932,7 @@ Imports MapWinUtility
                 If radioIterate.Checked Then
                     Try
                         .Max = CDbl(txtMax.Text)
+                        If lblValueUnitsMaximum.Text = "%" Then .Max /= 100
                     Catch
                         Logger.Msg("Maximum value must be a number", "Non-numeric value")
                         Return False
@@ -1007,8 +1009,21 @@ Imports MapWinUtility
             End If
 
             EnableIterative(.Max > .Min)
-            If Not Double.IsNaN(.Min) Then txtMin.Text = DoubleToString(.Min)
-            If Not Double.IsNaN(.Max) Then txtMax.Text = DoubleToString(.Max)
+            If Not Double.IsNaN(.Min) Then
+                If lblMinimum.Text = "%" Then
+                    txtMin.Text = DoubleToString(.Min * 100)
+                Else
+                    txtMin.Text = DoubleToString(.Min)
+                End If
+            End If
+            If Not Double.IsNaN(.Max) Then
+                If lblMaximum.Text = "%" Then
+                    txtMax.Text = DoubleToString(.Max * 100)
+                Else
+                    txtMax.Text = DoubleToString(.Max)
+                End If
+            End If
+
             If Not Double.IsNaN(.Increment) Then txtIncrement.Text = DoubleToString(.Increment)
 
             EnableEvents(.UseEvents)

@@ -247,12 +247,12 @@ Public Class atcVariation
                     Dim lEventFlashFactor As Double
                     Dim lCurrentVolume As Double = 0
                     Dim lTargetChange As Double = CurrentValue * lTotalVolume
-                    Dim lTargetVolumeToFlash As Double = lTotalVolume * FlashVolumeFraction
-                    Logger.Dbg("TargetChange " & DecimalAlign(lTargetChange) & " TargetVolumeToFlash " & DecimalAlign(lTargetVolumeToFlash))
                     Dim lNewEventTotalVolume As Double = 0.0
 
                     Try
                         If Not Double.IsNaN(FlashVolumeFraction) Then
+                            Dim lTargetVolumeToFlash As Double = lTotalVolume * FlashVolumeFraction
+                            Logger.Dbg("TargetChange " & DecimalAlign(lTargetChange) & " TargetVolumeToFlash " & DecimalAlign(lTargetVolumeToFlash))
                             'sort events by volume
                             Logger.Dbg("Flash " & DecimalAlign(FlashVolumeFraction) & " CurrentValue " & DecimalAlign(CurrentValue))
                             Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
