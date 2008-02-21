@@ -246,7 +246,7 @@ Public Class atcVariation
                     Dim lTotalVolume As Double = lSplitOriginalData.ItemByIndex(0).Attributes.GetValue("Sum")
                     Dim lEventFlashFactor As Double
                     Dim lCurrentVolume As Double = 0
-                    Dim lTargetChange As Double = CurrentValue * lTotalVolume
+                    Dim lTargetChange As Double = CurrentValue / 100 * lTotalVolume
                     Dim lNewEventTotalVolume As Double = 0.0
 
                     Try
