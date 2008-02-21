@@ -258,14 +258,11 @@ Public Class atcVariation
                             Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
                             For Each lEvent In lEvents
                                 Dim lEventVolume As Double = lEvent.Attributes.GetValue("Sum")
-tryAgain:
-                                Try
-                                    lNewEvents.Add(lEventVolume, lEvent)
-                                    lNewEventTotalVolume += lEventVolume
-                                Catch
+                                While lNewEvents.IndexOfKey(lEventVolume) >= 0
                                     lEventVolume += 0.00000001
-                                    GoTo tryAgain
-                                End Try
+                                End While
+                                lNewEvents.Add(lEventVolume, lEvent)
+                                lNewEventTotalVolume += lEventVolume
                             Next
                             lEvents.Clear()
                             Logger.Dbg(" TotalVolume " & DecimalAlign(lTotalVolume) & _
@@ -882,8 +879,14 @@ tryAgain:
     End Sub
 
     Protected Overrides Sub Finalize()
-        If Not pDataSets Is Nothing Then pDataSets.Clear()
-        If Not PETdata Is Nothing Then PETdata.Clear()
+        If Not pDataSets Is Nothing Then
+            pDataSets.Dispose()
+            pDataSets = Nothing
+        End If
+        If Not PETdata Is Nothing Then
+            PETdata.Dispose()
+            PETdata = Nothing
+        End If
         pComputationSource = Nothing
         Seasons = Nothing
         MyBase.Finalize()
