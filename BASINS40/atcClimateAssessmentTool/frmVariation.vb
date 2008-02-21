@@ -924,7 +924,6 @@ Imports MapWinUtility
 
                 Try
                     .Min = CDbl(txtMin.Text)
-                    If lblValueUnitsMinimum.Text = "%" Then .Min /= 100
                 Catch
                     Logger.Msg("Minimum value must be a number", "Non-numeric value")
                     Return False
@@ -933,7 +932,6 @@ Imports MapWinUtility
                 If radioIterate.Checked Then
                     Try
                         .Max = CDbl(txtMax.Text)
-                        If lblValueUnitsMaximum.Text = "%" Then .Max /= 100
                     Catch
                         Logger.Msg("Maximum value must be a number", "Non-numeric value")
                         Return False
@@ -1010,21 +1008,8 @@ Imports MapWinUtility
             End If
 
             EnableIterative(.Max > .Min)
-            If Not Double.IsNaN(.Min) Then
-                If lblMinimum.Text = "%" Then
-                    txtMin.Text = DoubleToString(.Min * 100)
-                Else
-                    txtMin.Text = DoubleToString(.Min)
-                End If
-            End If
-            If Not Double.IsNaN(.Max) Then
-                If lblMaximum.Text = "%" Then
-                    txtMax.Text = DoubleToString(.Max * 100)
-                Else
-                    txtMax.Text = DoubleToString(.Max)
-                End If
-            End If
-
+            If Not Double.IsNaN(.Min) Then txtMin.Text = DoubleToString(.Min)
+            If Not Double.IsNaN(.Max) Then txtMax.Text = DoubleToString(.Max)
             If Not Double.IsNaN(.Increment) Then txtIncrement.Text = DoubleToString(.Increment)
 
             EnableEvents(.UseEvents)
@@ -1123,10 +1108,6 @@ Imports MapWinUtility
 
         If chkEvents.Checked <> aEnable Then chkEvents.Checked = aEnable
 
-        lblVolumePercent.Visible = aEnable
-        txtVolumePercent.Visible = aEnable
-        lblVolumePercent2.Visible = aEnable
-
         lblThreshold.Visible = aEnable
         txtEventThreshold.Visible = aEnable
         lblThresholdUnits.Visible = aEnable
@@ -1142,6 +1123,8 @@ Imports MapWinUtility
         lblDuration.Visible = aEnable
         txtEventDuration.Visible = aEnable
         lblDurationUnits.Visible = aEnable
+
+        SetVolumePercentVisible()
     End Sub
 
     Private Sub EnableSeasons(ByVal aEnable As Boolean)
@@ -1169,21 +1152,17 @@ Imports MapWinUtility
         lblValueUnitsMinimum.Text = pFunctionUnits(cboFunction.SelectedIndex)
         lblValueUnitsMaximum.Text = lblValueUnitsMinimum.Text
         Select Case pFunctionOperations(cboFunction.SelectedIndex)
-            Case "Flash"
+            Case "Flash", "AddEvents"
                 If Not chkEvents.Checked Then chkEvents.Checked = True
-                lblVolumePercent.Visible = True
-                lblVolumePercent2.Visible = True
-                txtVolumePercent.Visible = True
-            Case "AddEvents"
-                If Not chkEvents.Checked Then chkEvents.Checked = True
-                lblVolumePercent.Visible = False
-                lblVolumePercent2.Visible = False
-                txtVolumePercent.Visible = False
-            Case Else
-                lblVolumePercent.Visible = False
-                lblVolumePercent2.Visible = False
-                txtVolumePercent.Visible = False
         End Select
+        SetVolumePercentVisible()
+    End Sub
+
+    Private Sub SetVolumePercentVisible()
+        Dim lVisible As Boolean = chkEvents.Checked AndAlso pFunctionOperations(cboFunction.SelectedIndex).Equals("Flash")
+        lblVolumePercent.Visible = lVisible
+        lblVolumePercent2.Visible = lVisible
+        txtVolumePercent.Visible = lVisible
     End Sub
 
 End Class
