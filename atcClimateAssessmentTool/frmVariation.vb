@@ -887,14 +887,15 @@ Imports MapWinUtility
 
                 .Operation = pFunctionOperations(cboFunction.SelectedIndex)
 
-                If IsNumeric(txtVolumePercent.Text) Then
-                    .FlashVolumeFraction = 1 + (CDbl(txtVolumePercent.Text) / 100)
-                Else
-                    .FlashVolumeFraction = pNaN
-                End If
-
                 .UseEvents = chkEvents.Checked
                 If .UseEvents Then
+
+                    If IsNumeric(txtVolumePercent.Text) Then
+                        .FlashVolumeFraction = 1 + (CDbl(txtVolumePercent.Text) / 100)
+                    Else
+                        .FlashVolumeFraction = pNaN
+                    End If
+
                     .EventThreshold = CDbl(txtEventThreshold.Text)
                     .EventHigh = True
                     .EventDaysGapAllowed = CDbl(txtEventGap.Text) / 24 'atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(cboEventGapUnits.SelectedIndex)
@@ -1121,6 +1122,10 @@ Imports MapWinUtility
     Private Sub EnableEvents(ByVal aEnable As Boolean)
 
         If chkEvents.Checked <> aEnable Then chkEvents.Checked = aEnable
+
+        lblVolumePercent.Visible = aEnable
+        txtVolumePercent.Visible = aEnable
+        lblVolumePercent2.Visible = aEnable
 
         lblThreshold.Visible = aEnable
         txtEventThreshold.Visible = aEnable
