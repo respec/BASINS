@@ -1442,6 +1442,7 @@ NextIteration:
             End If
             If lstInputs.SelectedIndices.Count > 0 Then
                 Dim lData As New atcDataGroup
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                 For Each lIndex As Integer In lstInputs.SelectedIndices
                     Dim lDataThisIteration As atcDataGroup
                     Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
@@ -1452,6 +1453,7 @@ NextIteration:
                         lDataThisIteration = lVariation.NextIteration
                     End While
                 Next
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
                 atcDataManager.ShowDisplay("List", lData)
             Else
                 Logger.Msg("An input must be selected to view", MsgBoxStyle.Critical, "No Input Selected")
@@ -1663,6 +1665,9 @@ NextIteration:
     End Sub
 
     Private Sub btnEndpointModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointModify.Click
+        If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
+            lstInputs.SelectedIndex = 0
+        End If
         Dim lIndex As Integer = lstEndpoints.SelectedIndex
         If lIndex >= 0 And lIndex < pEndpoints.Count Then
             Dim lVariation As atcVariation = pEndpoints.ItemByIndex(lIndex)
