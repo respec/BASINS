@@ -1973,6 +1973,7 @@ OuttaHere:
             i = i + 1
             If i > 12 Then
                 aRetCod = -1
+                Exit Sub
             End If
         Loop
 
