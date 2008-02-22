@@ -183,14 +183,18 @@ Public Class atcDataSourceNOAAISH
                                     lTSInd += 1
                                     lCurVal = CDbl(ColValue(i).Value)
                                 Else 'duplicate records for same date, see if there's an existing value
-                                    If lData.Value(lTSInd) = MissingVal AndAlso _
-                                       Not ColValue(i).Value = lMissStr AndAlso _
+                                    If Not ColValue(i).Value = lMissStr AndAlso _
                                        Not ColFlag1(i).Value.Contains("7") AndAlso _
-                                       Not ColFlag1(i).Value.Contains("3") Then
-                                        'existing value is missing, replace with current valid one
-                                        lCurVal = CDbl(ColValue(i).Value)
-                                    Else 'keep existing value
-                                        lCurVal = Double.NaN
+                                       Not ColFlag1(i).Value.Contains("3") Then 'current value is valid
+                                        If ColValue(i).Name = "HPCP1" AndAlso _
+                                           ColValue(i).Value > lCurVal Then 'use more recent larger precip value
+                                            lCurVal = CDbl(ColValue(i).Value)
+                                        ElseIf lData.Value(lTSInd) = MissingVal Then
+                                            'existing value is missing, replace with current valid one
+                                            lCurVal = CDbl(ColValue(i).Value)
+                                        Else 'keep existing value
+                                            lCurVal = Double.NaN
+                                        End If
                                     End If
                                 End If
                                 If Not Double.IsNaN(lCurVal) Then
@@ -228,11 +232,11 @@ Public Class atcDataSourceNOAAISH
                                     lData.Attributes.SetValue("Count", lTSInd)
                                 End If
                             Else 'Precip time value > 1, ignore it 
-                                'move ahead one in loop to skip ensuing precip value
-                                'Logger.Dbg("Skipping Precip value with Time > 1 for " & ColValue(i).Name & " on " & _
-                                'ColYear.Value & "/" & ColMonth.Value & "/" & ColDay.Value & " " & _
-                                'lOrigHour & ":" & ColMinute.Value)
-                                i += 1
+                                    'move ahead one in loop to skip ensuing precip value
+                                    'Logger.Dbg("Skipping Precip value with Time > 1 for " & ColValue(i).Name & " on " & _
+                                    'ColYear.Value & "/" & ColMonth.Value & "/" & ColDay.Value & " " & _
+                                    'lOrigHour & ":" & ColMinute.Value)
+                                    i += 1
                             End If
                         Next
                         'End If
@@ -257,7 +261,7 @@ Public Class atcDataSourceNOAAISH
                     lData.numValues = lData.Attributes.GetValue("Count")
                     If lData.numValues > 0 Then
                         lData.Dates.Value(0) = lData.Dates.Value(1) - JulianHour 'set 0th date to start of 1st interval
-                        lDataFilled = FillValues(lData, 3, 1, MissingVal, MissingVal, MissingAcc)
+                        lDataFilled = FillValues(lData, 3, 1, 0.0, MissingVal, MissingAcc)
                         If Not lDataFilled Is Nothing Then
                             lDataFilled.ValuesNeedToBeRead = False
                             lDataFilled.Dates.ValuesNeedToBeRead = False
