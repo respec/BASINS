@@ -18,17 +18,6 @@ Public Class atcFileGeoReferencePlugIn
         pResourceManager = New Resources.ResourceManager("atcFileGeoReference.Resources", System.Reflection.Assembly.GetExecutingAssembly())
     End Sub
 
-    <CLSCompliant(False)> _
-    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                    ByVal aParentHandle As Integer)
-        pMapWin = aMapWin
-        MappingObject = aMapWin 'in GisUtil
-        'TODO: make this consistent, be sure remove handled correctly
-        pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
-        pMapWin.Menus.AddMenu(FullMenuName, ParentMenuName, Nothing, pResourceManager.GetString("NameShort"))
-        MyBase.Initialize(aMapWin, aParentHandle)
-    End Sub
-
     Public Overrides ReadOnly Property Name() As String
         Get
             Return pResourceManager.GetString("Name")
