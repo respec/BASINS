@@ -886,6 +886,7 @@ Public Class frmCAT
             UpdateStatusLabel("Stopping Run")
         Else
             Logger.Dbg("Run")
+            If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
             ChDriveDir(PathNameOnly(aBaseFileName))
 
             If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
@@ -937,13 +938,27 @@ NextIteration:
             Else 'Need to loop through values for next variation
                 Dim lVariation As atcVariation = aVariations.ItemByIndex(aStartVariation)
                 With lVariation
-                    Dim lModifiedGroup As atcDataGroup = .StartIteration
-                    While g_running And Not lModifiedGroup Is Nothing
-                        If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
+                    Dim lOriginalDatasets As atcDataGroup = .DataSets.Clone
+                    'save version of data modified by an earlier variation if it is also modified by this one
+                    Dim lReModifiedData As New atcDataGroup
 
+                    For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
+                        Dim lSourceDataSet As atcTimeseries = .DataSets(lDataSetIndex)
+                        Dim lModifiedIndex As Integer = aModifiedData.Keys.IndexOf(lSourceDataSet)
+                        If lModifiedIndex >= 0 Then
+                            .DataSets.Item(lDataSetIndex) = aModifiedData.ItemByIndex(lModifiedIndex)
+                            lReModifiedData.Add(lSourceDataSet, aModifiedData.ItemByIndex(lModifiedIndex))
+                            aModifiedData.RemoveAt(lModifiedIndex)
+                        End If
+                    Next
+
+                    'Start varying data
+                    Dim lModifiedGroup As atcDataGroup = .StartIteration
+
+                    While g_running And Not lModifiedGroup Is Nothing
                         aModifiedData.Add(lModifiedGroup)
 
-                        'We have handled a variation, now handle more input variations or run the model
+                        'We have handled a variation, now recursively handle more input variations or run the model
                         Run(aModifiedScenarioName, _
                             aVariations, _
                             aPreparedInputs, _
@@ -953,9 +968,12 @@ NextIteration:
                             aModifiedData)
 
                         aModifiedData.Remove(lModifiedGroup)
-
                         lModifiedGroup = .NextIteration
                     End While
+
+                    aModifiedData.Add(lReModifiedData)
+
+                    .DataSets = lOriginalDatasets
                 End With
             End If
         End If
