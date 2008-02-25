@@ -93,7 +93,10 @@ Public Class atcDataGroup
 
     ''' <summary>Add items from an atcCollection or atcDataGroup to the group.</summary>
     Public Shadows Sub Add(ByVal aAddThese As atcCollection)
-        MyBase.AddRange(aAddThese)
+        Dim lLastIndex As Integer = aAddThese.Count - 1
+        For lIndex As Integer = 0 To lLastIndex
+            MyBase.Add(aAddThese.Keys(lIndex), aAddThese.ItemByIndex(lIndex))
+        Next
         RaiseEvent Added(aAddThese)
     End Sub
 

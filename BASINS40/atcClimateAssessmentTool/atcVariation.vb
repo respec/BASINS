@@ -350,7 +350,7 @@ Public Class atcVariation
                     lModifiedTS = MergeTimeseries(lModifiedSplit)
             End Select
 
-            lModifiedGroup.Add(lModifiedTS)
+            lModifiedGroup.Add(lOriginalData, lModifiedTS)
 
             If PETdata.Count > lDataSetIndex Then
                 Dim lOldPET As atcDataSet = PETdata(lDataSetIndex)
@@ -365,7 +365,7 @@ Public Class atcVariation
                     .SetValue("History 1", lOldPET.Attributes.GetValue("History 1").ToString)
                     .SetValue("Id", lOldPET.Attributes.GetValue("Id"))
                 End With
-                lModifiedGroup.Add(lNewPET)
+                lModifiedGroup.Add(lOldPET, lNewPET)
             End If
             lDataSetIndex += 1
         Next
