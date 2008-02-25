@@ -473,8 +473,14 @@ Public Class atcTimeseriesMath
                 ReDim lNewVals(-1) 'Don't create new timeseries below
 
             Case "running sum"
+                'TODO: ignore missing values - is this ok?
+                Dim lVal, lSum As Double
                 For lValueIndex = 1 To lValueIndexLast
-                    lNewVals(lValueIndex) += lNewVals(lValueIndex - 1)
+                    lVal = lNewVals(lValueIndex)
+                    If Not Double.IsNaN(lVal) Then
+                        lNewVals(lValueIndex) += lSum
+                        lSum = lNewVals(lValueIndex)
+                    End If
                 Next
 
                 'Case "weight"
