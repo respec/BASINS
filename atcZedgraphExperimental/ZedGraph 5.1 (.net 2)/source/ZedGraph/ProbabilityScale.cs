@@ -28,7 +28,7 @@ namespace ZedGraph
 {
 	/// <summary>
 	/// The ProbabilityScale class inherits from the <see cref="Scale" /> class, and implements
-	/// the features specific to <see cref="AxisType.Log" />.
+    /// the features specific to <see cref="AxisType.Probability" />.
 	/// </summary>
 	/// <remarks>
     /// ProbabilityScale is a non-linear axis in which the values are scaled using a Gaussian
@@ -179,15 +179,11 @@ namespace ZedGraph
 		/// <summary>
 		/// Determine the value for any major tic.
 		/// </summary>
-		/// <remarks>
-		/// This method properly accounts for <see cref="Scale.IsLog"/>, <see cref="Scale.IsText"/>,
-		/// and other axis format settings.
-		/// </remarks>
 		/// <param name="baseVal">
 		/// The value of the first major tic (floating point double)
 		/// </param>
 		/// <param name="tic">
-		/// The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
+		/// The major tic number (0 = first major tic).
 		/// </param>
 		/// <returns>
 		/// The specified major tic value (floating point double).
@@ -204,16 +200,12 @@ namespace ZedGraph
 		/// <summary>
 		/// Determine the value for any minor tic.
 		/// </summary>
-		/// <remarks>
-		/// This method properly accounts for <see cref="Scale.IsLog"/>, <see cref="Scale.IsText"/>,
-		/// and other axis format settings.
-		/// </remarks>
 		/// <param name="baseVal">
 		/// The value of the first major tic (floating point double).  This tic value is the base
 		/// reference for all tics (including minor ones).
 		/// </param>
 		/// <param name="iTic">
-		/// The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
+		/// The major tic number (0 = first major tic).
 		/// </param>
 		/// <returns>
 		/// The specified minor tic value (floating point double).
@@ -240,23 +232,15 @@ namespace ZedGraph
         }
 
 		/// <summary>
-		/// Select a reasonable base 10 logarithmic axis scale given a range of data values.
+		/// Select a reasonable axis scale
 		/// </summary>
 		/// <remarks>
-		/// This method only applies to <see cref="AxisType.Log"/> type axes, and it
-		/// is called by the general <see cref="PickScale"/> method.  The scale range is chosen
-		/// based always on powers of 10 (full log cycles).  This
-		/// method honors the <see cref="Scale.MinAuto"/>, <see cref="Scale.MaxAuto"/>,
-		/// and <see cref="Scale.MajorStepAuto"/> autorange settings.
-		/// In the event that any of the autorange settings are false, the
-		/// corresponding <see cref="Scale.Min"/>, <see cref="Scale.Max"/>, or <see cref="Scale.MajorStep"/>
-		/// setting is explicitly honored, and the remaining autorange settings (if any) will
-		/// be calculated to accomodate the non-autoranged values.  For log axes, the MinorStep
-		/// value is not used.
+		/// This method only applies to <see cref="AxisType.Probability"/> type axes, and it
+		/// is called by the general <see cref="PickScale"/> method.  
+        /// This method honors the <see cref="Scale.MinAuto"/> and <see cref="Scale.MaxAuto"/>.
 		/// <para>On Exit:</para>
 		/// <para><see cref="Scale.Min"/> is set to scale minimum (if <see cref="Scale.MinAuto"/> = true)</para>
 		/// <para><see cref="Scale.Max"/> is set to scale maximum (if <see cref="Scale.MaxAuto"/> = true)</para>
-		/// <para><see cref="Scale.MajorStep"/> is set to scale step size (if <see cref="Scale.MajorStepAuto"/> = true)</para>
 		/// <para><see cref="Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
 		/// <para><see cref="Scale.Format"/> is set to the display format for the values (this controls the
 		/// number of decimal places, whether there are thousands separators, currency types, etc.)</para>
@@ -274,7 +258,7 @@ namespace ZedGraph
 		/// font sizes, etc. according to the actual size of the graph.
 		/// </param>
 		/// <seealso cref="PickScale"/>
-		/// <seealso cref="AxisType.Log"/>
+		/// <seealso cref="AxisType.Probability"/>
         override public void PickScale(GraphPane pane, Graphics g, float scaleFactor)
         {
             if ( _minAuto ) _min = 0;
