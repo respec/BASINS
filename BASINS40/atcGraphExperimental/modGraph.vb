@@ -552,10 +552,14 @@ FoundMatch:
         End If
 
         For Each lTimeseries As atcTimeseries In aDataGroup
-            Dim lValue As Double = lTimeseries.Attributes.GetValue("Minimum")
-            If lValue < lDataMin Then lDataMin = lValue
-            lValue = lTimeseries.Attributes.GetValue("Maximum")
-            If lValue > lDataMax Then lDataMax = lValue
+            Try
+                Dim lValue As Double = lTimeseries.Attributes.GetValue("Minimum")
+                If lValue < lDataMin Then lDataMin = lValue
+                lValue = lTimeseries.Attributes.GetValue("Maximum")
+                If lValue > lDataMax Then lDataMax = lValue
+            Catch
+                'Could not get good Minimum or Maximum value
+            End Try
         Next
         Scalit(lDataMin, lDataMax, lLogFlag, aAxis.Scale.Min, aAxis.Scale.Max)
     End Sub

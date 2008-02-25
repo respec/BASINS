@@ -117,8 +117,8 @@ Public Class clsGraphProbability
             '                            " : " & lXFracExceed(lIndex))
         Next
         With lPane.XAxis
-            .Scale.Min = lXFracExceed(0)
-            .Scale.Max = lXFracExceed(lLastIndex)
+            '.Scale.Max = lXFracExceed(0)
+            '.Scale.Min = lXFracExceed(lLastIndex)
             .Scale.BaseTic = lXFracExceed(0)
             .Title.Text = "Percent chance exceeded"
         End With
