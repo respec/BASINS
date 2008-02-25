@@ -119,6 +119,7 @@ Public Class atcSeasonBase
         End With
         lNewGroup.Add(lSeasonIndex, lInsideTS)
 
+        lSeasonIndex += 1
         CopyBaseAttributes(aTS, lOutsideTS)
         With lOutsideTS
             .Dates = New atcTimeseries(aSource)
