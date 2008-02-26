@@ -127,9 +127,9 @@ Public Class atcTimeseriesMath
 
                 AddOperation("Divide", "Divide each value of first timeseries", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Mean", "Arithmetic Mean of values for each date", "Math", defTimeSeriesGroup)
+                AddOperation("Mean Each Date", "Arithmetic Mean of values for each date", "Math", defTimeSeriesGroup)
 
-                AddOperation("Geometric Mean", "Geometric Mean of values for each date", "Math", defTimeSeriesGroup)
+                AddOperation("Geometric Mean Each Date", "Geometric Mean of values for each date", "Math", defTimeSeriesGroup)
 
                 AddOperation("Max Each Date", "Maximum value at each date", "Math", defTimeSeriesGroup, defDouble)
 
