@@ -307,7 +307,7 @@ Public Class frmSpecifySeasonalAttributes
     Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
         lstSeasons.Items.Clear()
         Dim lSeasonSource As atcDataSource = CurrentSeason()
-        If Not lSeasonSource Is Nothing Then
+        If Not lSeasonSource Is Nothing AndAlso lstAttributes.SelectedItems.Count > 0 Then
             Dim lArguments As New atcDataAttributes
             Dim lAttributes As New atcDataAttributes
             lAttributes.SetValue(lstAttributes.SelectedItems(0), 0)
