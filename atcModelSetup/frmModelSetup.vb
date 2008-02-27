@@ -2020,6 +2020,7 @@ Public Class frmModelSetup
 
         'reset selected features since they may have become unselected
         If aSubbasinsSelected.Count < GisUtil.NumFeatures(lSubbasinLayerIndex) Then
+            GisUtil.ClearSelectedFeatures(lSubbasinLayerIndex)
             For Each lSubbasin As Integer In aSubbasinsSelected.Keys
                 GisUtil.SetSelectedFeature(lSubbasinLayerIndex, lSubbasin)
             Next
