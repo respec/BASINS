@@ -318,7 +318,7 @@ Module modCreateUci
 
         For Each lReachUpstream As Reach In pWatershed.Reaches
             'add entries for each reach to reach connection
-            If lReachUpstream.DownID > 0 Then
+            If lReachUpstream.DownID > 0 And pWatershed.Reaches.Contains(lReachUpstream.DownID) Then
                 Dim lReachDownstream As Reach = pWatershed.Reaches(lReachUpstream.DownID)
                 lConnection = New HspfConnection
                 lConnection.Uci = aUci
@@ -677,6 +677,16 @@ Module modCreateUci
                 End If
             End If
         Next lConnection
+
+        If lOutletId = 0 Then
+            'may have only 1 rchres, just set outlet id to last rchres
+            If aUci.OpnBlks.Contains("RCHRES") Then
+                Dim lOpnBlk As HspfOpnBlk = aUci.OpnBlks.Item("RCHRES")
+                If lOpnBlk.Count > 0 Then
+                    lOutletId = lOpnBlk.Ids.Item(lOpnBlk.Ids.Count - 1).Id
+                End If
+            End If
+        End If
 
         If lOutletId > 0 Then 'found watershed outlet
             Dim lWdmId, lNewDsn As Integer
