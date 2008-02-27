@@ -1605,9 +1605,10 @@ Public Class frmModelSetup
         Dim lSubbasinFieldIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, lSubbasinFieldName)
         Dim lSubbasinSlopeIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSub2.Items(cboSub2.SelectedIndex))
         For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
-            lSubbasinId = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinFieldIndex)
-            lSubbasinSlope = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinSlopeIndex)
-            lSubbasinsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex), lSubbasinId)
+            Dim lSelectedIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex)
+            lSubbasinId = GisUtil.FieldValue(lSubbasinLayerIndex, lSelectedIndex, lSubbasinFieldIndex)
+            lSubbasinSlope = GisUtil.FieldValue(lSubbasinLayerIndex, lSelectedIndex, lSubbasinSlopeIndex)
+            lSubbasinsSelected.Add(lSelectedIndex, lSubbasinId)
             'TODO: be sure SubbasinIds are unique before this!
             lSubbasinsSlopes.Add(lSubbasinId, lSubbasinSlope)
         Next
@@ -1627,7 +1628,7 @@ Public Class frmModelSetup
             lSubbasinSegmentFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSub3.Items(cboSub3.SelectedIndex))
         End If
         For Each lSubbasinIndex As Integer In lSubbasinsSelected.Keys
-            lSubbasinId = lSubbasinsSelected(lSubbasinIndex)
+            lSubbasinId = lSubbasinsSelected.ItemByKey(lSubbasinIndex)
             If lSubbasinSegmentFieldIndex > -1 And pUniqueModelSegmentIds.Count > 0 Then
                 Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex, lSubbasinSegmentFieldIndex)
                 lSubbasinsModelSegmentIds.Add(lSubbasinId, pUniqueModelSegmentIds(pUniqueModelSegmentNames.IndexFromKey(lModelSegment)))

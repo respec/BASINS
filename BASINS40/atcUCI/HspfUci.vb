@@ -332,7 +332,7 @@ Public Class HspfUci
                     If pOpnBlks.Contains("RCHRES") Then
                         Dim lOpnBlk As HspfOpnBlk = OpnBlks.Item("RCHRES")
                         If lOpnBlk.Count > 0 Then
-                            lStr = lOpnBlk.Ids.Item(1).FTable.ToString
+                            lStr = lOpnBlk.Ids.Item(0).FTable.ToString
                         End If
                     End If
                 Case "PERLND", "IMPLND", "RCHRES", "COPY", "PLTGEN", "DISPLY", _
