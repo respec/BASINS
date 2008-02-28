@@ -245,12 +245,17 @@ StartOver:
                     AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
                 Case "add_grid"
                     lOutputFileName = lProjectorNode.Content
-                    If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
-                    If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
-                        'create .prj file as work-around for bug
-                        SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
-                    End If
+                    Select Case IO.Path.GetFileName(lOutputFileName).ToLower
+                        Case "fac.tif", "fdr.tif", "cat.tif"
+                            Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
+                        Case Else
+                            If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+                            AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                            If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
+                                'create .prj file as work-around for bug
+                                SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
+                            End If
+                    End Select
                 Case "add_allshapes"
                     lOutputFileName = lProjectorNode.Content
                     AddAllShapesInDir(lOutputFileName, lProjectDir)
@@ -793,7 +798,7 @@ StartOver:
         Dim LayerName As String
         Dim Group As String = "Other"
         Dim Visible As Boolean
-        Dim Style As atcRenderStyle = New atcRenderStyle
+        'Dim Style As atcRenderStyle = New atcRenderStyle
 
         Dim MWlay As MapWindow.Interfaces.Layer
         Dim g As MapWinGIS.Grid
@@ -815,7 +820,7 @@ StartOver:
                 MWlay.Visible = True
             Else
                 LayerName = layerXml.GetAttrValue("Name")
-                Style.xml = layerXml.FirstChild
+                'Style.xml = layerXml.FirstChild
                 Group = layerXml.GetAttrValue("Group")
                 If Group Is Nothing Then Group = "Other"
                 Select Case layerXml.GetAttrValue("Visible").ToLower

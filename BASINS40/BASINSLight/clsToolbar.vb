@@ -27,6 +27,14 @@ Public Class Toolbar
     Friend m_CustomToolbars As New Hashtable
     Friend m_Buttons As New Hashtable
 
+    Public Function NumToolbarButtons(ByVal ToolbarName As String) As Integer Implements MapWindow.Interfaces.Toolbar.NumToolbarButtons
+        Try
+            Return CType(m_CustomToolbars(ToolbarName), ToolStrip).Items.Count
+        Catch
+            Return 0
+        End Try
+    End Function
+
     Public Function PressToolbarButton(ByVal Name As String) As Boolean Implements MapWindow.Interfaces.Toolbar.PressToolbarButton
         Try
             For Each c As ToolStripItem In frmMain.tlbMain.Items
