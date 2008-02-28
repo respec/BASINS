@@ -11,11 +11,11 @@ Public Class frmDownload
         pMapWin = aMapWin
 
         'The following line hot-wires the form to just do met data download
-        chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 : Me.Height = 141 ': Return Me.XML
+        chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
 
         If Not pMapWin.Project Is Nothing Then
             If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
-                txtMetWDM.Text = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "met.wdm")
+                txtWDM.Text = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "met.wdm")
             End If
         End If
 
@@ -62,6 +62,7 @@ Public Class frmDownload
     End Sub
 
     Public Function SelectedRegion() As D4EMDataManager.Region
+        Dim lRegion As D4EMDataManager.Region
         Try
             Dim lExtents As MapWinGIS.Extents = Nothing
             Select Case cboRegion.SelectedIndex
@@ -70,12 +71,16 @@ Public Class frmDownload
                 Case 2 : lExtents = pMapWin.Layers(HUC8Index).Extents
             End Select
             If Not lExtents Is Nothing Then
-                Dim lAOI As New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
-                lAOI.HUC8s = HUC8s()
-                Return lAOI.GetProjected(pGeographicProjection)
+                lRegion = New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
+                lRegion.HUC8s = HUC8s()
+                Return lRegion.GetProjected(pGeographicProjection)
             End If
         Catch ex As Exception
-            MapWinUtility.Logger.Msg(ex.Message)
+            Dim lRegionForm As New frmSpecifyRegion
+            lRegion = lRegionForm.AskUser()
+            If Not lRegion Is Nothing Then
+                Return lRegion.GetProjected(pGeographicProjection)
+            End If
         End Try
         Return Nothing
     End Function
@@ -86,7 +91,7 @@ Public Class frmDownload
             Dim lDesiredProjection As String = ""
             Dim lRegionXML As String = ""
             Dim lRegion As D4EMDataManager.Region = Me.SelectedRegion
-            Dim lMetWDM As String = txtMetWDM.Text
+            Dim lWDMfilename As String = txtWDM.Text
             If Not lRegion Is Nothing Then lRegionXML = lRegion.XML
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
@@ -105,8 +110,8 @@ Public Class frmDownload
                 End If
             End If
 
-            If lMetWDM.Length > 0 Then
-                lMetWDM = "<SaveMetWDM>" & lMetWDM & "</SaveMetWDM>" & vbCrLf
+            If lWDMfilename.Length > 0 Then
+                lWDMfilename = "<SaveWDM>" & lWDMfilename & "</SaveWDM>" & vbCrLf
             End If
 
             For Each lControl As Windows.Forms.Control In Me.Controls
@@ -123,7 +128,7 @@ Public Class frmDownload
                                      & lCacheFolder _
                                      & lDesiredProjection _
                                      & lRegionXML _
-                                     & lMetWDM _
+                                     & lWDMfilename _
                                      & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                                      & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                                      & "</arguments>" & vbCrLf _
@@ -141,7 +146,7 @@ Public Class frmDownload
                              & lCacheFolder _
                              & lDesiredProjection _
                              & lRegionXML _
-                             & lMetWDM _
+                             & lWDMfilename _
                              & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                              & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                              & "<joinattributes>true</joinattributes>" & vbCrLf _
@@ -158,32 +163,36 @@ Public Class frmDownload
     End Property
 
     Private Function HUC8Index() As Integer
-        Dim lIndex As Integer = 0
-        While lIndex < pMapWin.Layers.NumLayers
-            Try
-                If pMapWin.Layers(lIndex).FileName.ToLower.EndsWith(IO.Path.DirectorySeparatorChar & "cat.shp") Then
-                    Return lIndex
-                End If
-            Catch ex As Exception
-            End Try
-            lIndex += 1
-        End While
+        If Not pMapWin Is Nothing AndAlso Not pMapWin.Layers Is Nothing Then
+            Dim lIndex As Integer = 0
+            While lIndex < pMapWin.Layers.NumLayers
+                Try
+                    If pMapWin.Layers(lIndex).FileName.ToLower.EndsWith(IO.Path.DirectorySeparatorChar & "cat.shp") Then
+                        Return lIndex
+                    End If
+                Catch ex As Exception
+                End Try
+                lIndex += 1
+            End While
+        End If
         Return -1
     End Function
 
     Private Function HUC8s() As ArrayList
         'First check for a cat layer that contains the list of HUC-8s
         Dim lHUC8s As New ArrayList
-        Dim lCatDbfName As String = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "cat.dbf")
-        If IO.File.Exists(lCatDbfName) Then
-            Dim lCatDbf As New atcUtility.atcTableDBF
-            lCatDbf.OpenFile(lCatDbfName)
-            Dim lHucField As Integer = lCatDbf.FieldNumber("CU")
-            If lHucField > 0 Then
-                For lRecord As Integer = 1 To lCatDbf.NumRecords
-                    lCatDbf.CurrentRecord = lRecord
-                    lHUC8s.Add(lCatDbf.Value(lHucField))
-                Next
+        If Not pMapWin Is Nothing AndAlso Not pMapWin.Project Is Nothing Then
+            Dim lCatDbfName As String = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "cat.dbf")
+            If IO.File.Exists(lCatDbfName) Then
+                Dim lCatDbf As New atcUtility.atcTableDBF
+                lCatDbf.OpenFile(lCatDbfName)
+                Dim lHucField As Integer = lCatDbf.FieldNumber("CU")
+                If lHucField > 0 Then
+                    For lRecord As Integer = 1 To lCatDbf.NumRecords
+                        lCatDbf.CurrentRecord = lRecord
+                        lHUC8s.Add(lCatDbf.Value(lHucField))
+                    Next
+                End If
             End If
         End If
         Return lHUC8s
