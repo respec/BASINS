@@ -133,17 +133,8 @@ Public Class PlugIn
         GisUtil.CurrentLayer = GisUtil.LayerIndex(aSubbasinLayerName)
         'TODO: make sure this layer is visible on legend
         Dim pTableEditor As New frmTableEditor(CType(pMapWin.Layers(pMapWin.Layers.CurrentLayer).GetObject, MapWinGIS.Shapefile), pMapWinForm)
-        With pTableEditor
-            Dim lTableStyle As New Windows.Forms.DataGridTableStyle
-            .DataGrid1.TableStyles.Clear()
-            .DataGrid1.TableStyles.Add(lTableStyle)
-            'Dim lDataGridColumnStyle As New Windows.Forms.DataGridTextBoxColumn
-            'For lFieldIndex As Integer = 1 To 20
-            ' lDataGridColumnStyle = .DataGrid1.TableStyles(0).GridColumnStyles.Add(lDataGridColumnStyle)
-            '.FieldDisplayWidth(lFieldIndex) = 0
-            'Next
-            .Show()
-        End With
+        'TODO: would be nice to show only the model segment field, but requires changes to the table editor
+        pTableEditor.Show()
         'pMapWin.Plugins.BroadcastMessage("TableEditorStart")
     End Sub
     Friend Sub TableEdited() Handles pFrmModelSegmentation.TableEdited
