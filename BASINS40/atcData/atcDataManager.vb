@@ -458,6 +458,8 @@ Public Class atcDataManager
                                 'Ignore, we do not save this but we used to
                             ElseIf lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
                                 Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
+                            ElseIf lDataSourceType = "WDM" AndAlso Not FileExists(lSpecification) Then
+                                Logger.Dbg("Skipping file that does not exist: '" & lSpecification & "'")
                             Else
                                 Dim lNewDataSource As atcDataSource = DataSourceByName(lchildXML.Content)
                                 If lNewDataSource Is Nothing Then

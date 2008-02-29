@@ -11,11 +11,12 @@ Public Class frmDownload
         pMapWin = aMapWin
 
         'The following line hot-wires the form to just do met data download
-        chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
+        'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
 
         If Not pMapWin.Project Is Nothing Then
             If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
-                txtWDM.Text = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "met.wdm")
+                btnBrowseWDMmet.Tag = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "met\met.wdm")
+                btnBrowseWDMdailydischarge.Tag = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "flow.wdm")
             End If
         End If
 
@@ -91,7 +92,6 @@ Public Class frmDownload
             Dim lDesiredProjection As String = ""
             Dim lRegionXML As String = ""
             Dim lRegion As D4EMDataManager.Region = Me.SelectedRegion
-            Dim lWDMfilename As String = txtWDM.Text
             If Not lRegion Is Nothing Then lRegionXML = lRegion.XML
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
@@ -110,18 +110,19 @@ Public Class frmDownload
                 End If
             End If
 
-            If lWDMfilename.Length > 0 Then
-                lWDMfilename = "<SaveWDM>" & lWDMfilename & "</SaveWDM>" & vbCrLf
-            End If
-
             For Each lControl As Windows.Forms.Control In Me.Controls
                 If lControl.Name.StartsWith("grp") AndAlso lControl.HasChildren Then
                     Dim lCheckedChildren As String = ""
-                    For Each lChild As Windows.Forms.CheckBox In lControl.Controls
-                        If lChild.Checked Then
+                    For Each lChild As Windows.Forms.Control In lControl.Controls
+                        If lChild.GetType.Name = "CheckBox" AndAlso CType(lChild, Windows.Forms.CheckBox).Checked Then
                             Dim lChildName As String = lChild.Name.Substring(lControl.Name.Length + 1)
-                            If lChildName.ToLower.StartsWith("get") Then
-                                'this checkbox has its own function name
+                            If lChildName.ToLower.StartsWith("get") Then 'this checkbox has its own function name
+
+                                Dim lWDMfilename As String = ""
+                                If lChild Is chkNWIS_GetNWISDischarge AndAlso btnBrowseWDMdailydischarge.Tag.Length > 0 Then
+                                    lWDMfilename = "<SaveWDM>" & btnBrowseWDMdailydischarge.Tag & "</SaveWDM>" & vbCrLf
+                                End If
+
                                 lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
                                      & "<arguments>" & vbCrLf _
                                      & lSaveFolder _
@@ -139,6 +140,12 @@ Public Class frmDownload
                         End If
                     Next
                     If lCheckedChildren.Length > 0 Then
+
+                        Dim lWDMfilename As String = ""
+                        If lCheckedChildren.Contains("<DataType>Met</DataType>") AndAlso btnBrowseWDMmet.Tag.Length > 0 Then
+                            lWDMfilename = "<SaveWDM>" & btnBrowseWDMmet.Tag & "</SaveWDM>" & vbCrLf
+                        End If
+
                         lXML &= "<function name='Get" & lControl.Name.Substring(3) & "'>" & vbCrLf _
                              & "<arguments>" & vbCrLf _
                              & lCheckedChildren _
@@ -286,4 +293,11 @@ Public Class frmDownload
 
     'End Function
 
+    Private Sub btnBrowseWDMdailydischarge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseWDMdailydischarge.Click
+
+    End Sub
+
+    Private Sub btnBrowseWDMmet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseWDMmet.Click
+
+    End Sub
 End Class
