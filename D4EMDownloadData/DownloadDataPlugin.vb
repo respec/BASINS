@@ -6,8 +6,8 @@ Public Class DownloadDataPlugin
     Private g_MapWin As MapWindow.Interfaces.IMapWin
     Private g_MainForm As Integer
 
-    Private Const pMenuLabel As String = "Download Met Data"
-    Private Const pMenuName As String = "mnuDownloadMetData"
+    Private Const pMenuLabel As String = "Download Data (D4EM)"
+    Private Const pMenuName As String = "mnuDownloadDataD4EM"
 
     Public ReadOnly Property Author() As String Implements MapWindow.Interfaces.IPlugin.Author
         Get
