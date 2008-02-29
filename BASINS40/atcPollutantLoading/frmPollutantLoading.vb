@@ -1698,9 +1698,11 @@ Friend Class frmPollutantLoading
         atcGridValues.Refresh()
         SetPollutantList()
         'set selected pollutants back again
-        For i = 1 To lSelectedPollutantIndices.Count
-            lstConstituents.SelectedIndices.Add(lSelectedPollutantIndices(i))
-        Next i
+        If lstConstituents.Items.Count > 0 Then
+            For i = 1 To lSelectedPollutantIndices.Count
+                lstConstituents.SelectedIndices.Add(lSelectedPollutantIndices(i))
+            Next i
+        End If
         If lstConstituents.Items.Count > 0 And lstConstituents.SelectedItems.Count = 0 Then
             lstConstituents.SelectedItems.Add(lstConstituents.Items(0))
         End If
