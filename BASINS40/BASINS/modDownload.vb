@@ -1276,36 +1276,32 @@ StartOver:
     End Sub
 
     Public Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
-        Dim fldCFCC As Integer
-        Dim curCFCC As Integer
-        Dim iShape As Integer
-        Dim nShapes As Integer = MWlay.Shapes.NumShapes
-        Dim shp As MapWindow.Interfaces.Shape
-
         If shpFile Is Nothing Then shpFile = MWlay.GetObject
-
-        fldCFCC = ShpFieldNumFromName(shpFile, "CFCC")
 
         g_MapWin.View.LockMap() 'keep the map from updating during the loop.
 
-        For iShape = 0 To nShapes - 1
-            shp = MWlay.Shapes(iShape)
-            curCFCC = shpFile.CellValue(fldCFCC, iShape).ToString.Substring(1)
-            Select Case curCFCC
-                Case 1, 11 To 18
-                    'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(132, 0, 0)))
-                    shp.LineOrPointSize = 2
+        'NOTE: using atcTableDBF - with 80K records - processing reduced from 3.5 to 2.5 seconds
+        Dim lShapeDbf As New atcTableDBF
+        lShapeDbf.OpenFile(IO.Path.ChangeExtension(shpFile.Filename, ".dbf"))
+        Dim lFieldCFCC As Integer = lShapeDbf.FieldNumber("CFCC")
+        'Dim lFieldCFCC As Integer = ShpFieldNumFromName(shpFile, "CFCC")
+
+        Dim lCurrentCFCC As Integer
+        Dim lLastShapeIndex As Integer = shpFile.NumShapes - 1
+        For iShape As Integer = 0 To lLastShapeIndex
+            'lCurrentCFCC = shpFile.CellValue(lFieldCFCC, iShape).ToString.Substring(1)
+            lCurrentCFCC = lShapeDbf.Value(lFieldCFCC).Substring(1)
+            lShapeDbf.MoveNext()
+            Select Case lCurrentCFCC
+                Case 4, 41 To 48, 63, 64 'most likely
+                Case 1 To 3, 11 To 38
+                    MWlay.Shapes(iShape).LineOrPointSize = 2
                 Case 2, 21 To 28
-                    'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(0, 0, 0)))
-                    shp.LineOrPointSize = 2
+                    MWlay.Shapes(iShape).LineOrPointSize = 2
                 Case 3, 31 To 38
-                    'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(122, 122, 122)))
-                    shp.LineOrPointSize = 2
-                Case 4, 41 To 48, 63, 64
-                    'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(166, 166, 166)))
+                    MWlay.Shapes(iShape).LineOrPointSize = 2
                 Case Else 'A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
-                    'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(200, 200, 200)))
-                    shp.LineStipple = MapWinGIS.tkLineStipple.lsDotted
+                    MWlay.Shapes(iShape).LineStipple = MapWinGIS.tkLineStipple.lsDotted
             End Select
         Next
 
