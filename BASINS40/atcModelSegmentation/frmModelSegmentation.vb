@@ -137,6 +137,7 @@ Friend Class frmModelSegmentation
         End If
 
         'met segments
+        lDefaultLayerIndex = -1
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = 1 Then 'Point Shapefile 
