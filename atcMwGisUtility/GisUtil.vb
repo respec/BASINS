@@ -2041,6 +2041,65 @@ Public Class GisUtil
         If pStatusShow Then Logger.Progress(lsf.NumShapes, lsf.NumShapes)
     End Sub
 
+    Public Shared Function MergeSelectedShapes(ByVal aLayerIndex As Integer) As Boolean
+
+        'build collection of selected shape indexes
+        Dim lSelectedShapeIndexes As New Collection
+        For lIndex As Integer = 1 To NumSelectedFeatures(aLayerIndex)
+            lSelectedShapeIndexes.Add(IndexOfNthSelectedFeatureInLayer(lIndex - 1, aLayerIndex))
+        Next
+
+        Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        lsf.StartEditingShapes(True)
+
+        If lSelectedShapeIndexes.Count > 1 Then
+            'merge first 2 shapes
+            Dim lShape1 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(1))
+            Dim lShape2 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(2))
+            Dim lResultShape As New MapWinGIS.Shape
+            lResultShape.Create(lsf.ShapefileType)
+            Dim lSuccess As Boolean = MapWinGeoProc.SpatialOperations.MergeShapes(lShape1, lShape2, lResultShape)
+            'add this shape to the end
+            lSuccess = lsf.EditInsertShape(lResultShape, lsf.NumShapes)
+            'set the attributes of the new shape to those of the first shape
+            For lFieldIndex As Integer = 1 To lsf.NumFields
+                lSuccess = lsf.EditCellValue(lFieldIndex - 1, lsf.NumShapes - 1, lsf.CellValue(lFieldIndex - 1, lSelectedShapeIndexes(2)))
+            Next
+        End If
+
+        If lSelectedShapeIndexes.Count > 2 Then
+            'merge each additional shape to the one at the end
+            For lIndex As Integer = 3 To lSelectedShapeIndexes.Count
+                Dim lShape1 As MapWinGIS.Shape = lsf.Shape(lsf.NumShapes - 1)
+                Dim lShape2 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(lIndex))
+                'merge these 2 shapes
+                Dim lResultShape As New MapWinGIS.Shape
+                lResultShape.Create(lsf.ShapefileType)
+                Dim lSuccess As Boolean = MapWinGeoProc.SpatialOperations.MergeShapes(lShape1, lShape2, lResultShape)
+                'delete the one at the end
+                lSuccess = lsf.EditDeleteShape(lsf.NumShapes - 1)
+                'add this shape to the end
+                lSuccess = lsf.EditInsertShape(lResultShape, lsf.NumShapes)
+                'set the attributes of the new shape to those of the first shape
+                For lFieldIndex As Integer = 1 To lsf.NumFields
+                    lSuccess = lsf.EditCellValue(lFieldIndex - 1, lsf.NumShapes - 1, lsf.CellValue(lFieldIndex - 1, lSelectedShapeIndexes(lIndex)))
+                Next
+            Next
+        End If
+
+        ClearSelectedFeatures(aLayerIndex)
+
+        If lSelectedShapeIndexes.Count > 1 Then
+            'delete the original shapes
+            For lIndex As Integer = lSelectedShapeIndexes.Count To 1 Step -1
+                Dim lSuccess As Boolean = lsf.EditDeleteShape(lSelectedShapeIndexes(lIndex))
+            Next
+        End If
+
+        lsf.StopEditingShapes(True)
+        ClearSelectedFeatures(aLayerIndex)
+    End Function
+
     Public Shared Function AreaOverlappingPolygons(ByVal aLayer1index As Integer, _
                                                    ByVal aLayer1FeatureIndex As Integer, _
                                                    ByVal aLayer2index As Integer, _
