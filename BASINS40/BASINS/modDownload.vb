@@ -637,6 +637,35 @@ StartOver:
 
     End Sub
 
+    ''' <summary>
+    ''' If the named layer does not have a .mwsr (for shape) or .mwleg (for grid) then look for the default file
+    ''' and put a copy of the default renderer with the layer
+    ''' </summary>
+    Private Sub GetDefaultRenderer(ByVal aLayerFilename As String)
+        Dim lRendererExt As String
+        If IO.Path.GetExtension(aLayerFilename).ToLower = ".shp" Then
+            lRendererExt = ".mwsr"
+        Else
+            lRendererExt = ".mwleg"
+        End If
+        Dim lRendererFilename As String = IO.Path.ChangeExtension(aLayerFilename, lRendererExt)
+        If lRendererFilename.Length > 0 AndAlso Not IO.File.Exists(lRendererFilename) Then
+            Dim lRendererFilenameNoPath As String = IO.Path.GetFileName(lRendererFilename)
+            Dim lDefaultRendererFilename As String = FindFile("", lRendererFilenameNoPath)
+            If Not FileExists(lDefaultRendererFilename) Then
+                If lRendererFilenameNoPath.Contains("_") Then 'Some layers are named huc8_xxx.shp, renderer is named _xxx & lRendererExt
+                    lDefaultRendererFilename = FindFile("", lRendererFilenameNoPath.Substring(lRendererFilenameNoPath.IndexOf("_")))
+                End If
+                If Not FileExists(lDefaultRendererFilename) Then 'Try trimming off numbers before extension in layername2.mwleg
+                    lDefaultRendererFilename = FindFile("", IO.Path.GetFileNameWithoutExtension(aLayerFilename).TrimEnd("0"c, "1"c, "2"c, "3"c, "4"c, "5"c, "6"c, "7"c, "8"c, "9"c) & lRendererExt)
+                End If
+            End If
+            If FileExists(lDefaultRendererFilename) Then
+                IO.File.Copy(lDefaultRendererFilename, lRendererFilename)
+            End If
+        End If
+    End Sub
+
     'Given a file name and the XML describing how to render it, add a shape layer to MapWindow
     Private Function AddShapeToMW(ByVal aFilename As String, _
                                   ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
@@ -660,6 +689,9 @@ StartOver:
         MWlay = Nothing
 
         Try
+
+            GetDefaultRenderer(aFilename)
+
             If layerXml Is Nothing Then
                 LayerName = FilenameOnly(aFilename)
                 Visible = True
@@ -813,6 +845,8 @@ StartOver:
         MWlay = Nothing
 
         Try
+            GetDefaultRenderer(aFilename)
+
             g_StatusBar.Item(1).Text = "Opening " & aFilename
 
             If layerXml Is Nothing Then
