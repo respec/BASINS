@@ -1386,30 +1386,14 @@ Public Class GisUtil
         End If
     End Sub
 
-    Public Shared Function GridSlopeInPolygon(ByVal aGridLayerIndex As Integer, ByVal aPolygonLayerIndex As Integer, _
-                                              ByVal aPolygonFeatureIndex As Integer) As Double
-        'Given an elevation grid and a polygon layer, find the average slope value within the feature.
-
-        Dim lCol As Integer
-        Dim lRow As Integer
-        Dim lXPos As Double
-        Dim lYPos As Double
-        Dim lSubId As Integer
-        Dim lStartCol As Integer
-        Dim lEndCol As Integer
-        Dim lStartRow As Integer
-        Dim lEndRow As Integer
-        Dim lVal As Integer
-        Dim lNearVal As Integer
-        Dim totalcellcount As Integer
-        Dim cellcount As Integer
-        Dim lNeighborVal As Integer
-        Dim lNeighborCount As Integer
-        Dim lSum As Integer
-        Dim lSubCellCount As Integer
+    Public Shared Sub GridMeanInPolygon(ByVal aGridLayerName As String, ByVal aPolygonLayerIndex As Integer, _
+                                        ByVal aPolygonFeatureIndex As Integer, _
+                                        ByRef aMean As Double)
+        'Given a grid and a polygon layer, find the mean grid value within the feature.
 
         'set input grid
-        Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
+        Dim lInputGrid As New MapWinGIS.Grid
+        lInputGrid.Open(aGridLayerName)
 
         'set input polygon layer
         Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
@@ -1418,75 +1402,74 @@ Public Class GisUtil
             lShape = lPolygonSf.Shape(aPolygonFeatureIndex)
 
             'figure out what part of the grid overlays this polygon
+            Dim lStartCol As Integer
+            Dim lEndCol As Integer
+            Dim lStartRow As Integer
+            Dim lEndRow As Integer
             lInputGrid.ProjToCell(lShape.Extents.xMin, lShape.Extents.yMin, lStartCol, lEndRow)
             lInputGrid.ProjToCell(lShape.Extents.xMax, lShape.Extents.yMax, lEndCol, lStartRow)
 
-            totalcellcount = (lEndCol - lStartCol) * (lEndRow - lStartRow)
-            cellcount = 0
+            Dim lCellcount As Integer = 0
 
+            Dim lSum As Double = 0
             lPolygonSf.BeginPointInShapefile()
-            lSum = 0
-            lSubCellCount = 0
-            For lCol = lStartCol To lEndCol
-                For lRow = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                For lRow As Integer = lStartRow To lEndRow
+                    Dim lXPos As Double
+                    Dim lYPos As Double
                     lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
-                    lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                    Dim lSubId As Integer = lPolygonSf.PointInShapefile(lXPos, lYPos)
                     If lSubId = aPolygonFeatureIndex Then 'this is in the polygon we want
-                        lVal = lInputGrid.Value(lCol, lRow)
-                        If lVal > -20000000 Then 'screen out the null values
-                            lNeighborCount = 0
-                            lNeighborVal = 0
-                            'find neighboring elevations
-                            If lCol > 1 Then
-                                If lInputGrid.Value(lCol - 1, lRow) > -20000000 Then
-                                    lNearVal = lInputGrid.Value(lCol - 1, lRow)
-                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
-                                    lNeighborCount = lNeighborCount + 1
-                                End If
-                            End If
-                            If lCol < lInputGrid.Header.NumberCols Then
-                                If lInputGrid.Value(lCol + 1, lRow) > -20000000 Then
-                                    lNearVal = lInputGrid.Value(lCol + 1, lRow)
-                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
-                                    lNeighborCount = lNeighborCount + 1
-                                End If
-                            End If
-                            If lRow > 1 Then
-                                If lInputGrid.Value(lCol, lRow - 1) > -20000000 Then
-                                    lNearVal = lInputGrid.Value(lCol, lRow - 1)
-                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
-                                    lNeighborCount = lNeighborCount + 1
-                                End If
-                            End If
-                            If lRow < lInputGrid.Header.NumberRows Then
-                                If lInputGrid.Value(lCol, lRow + 1) > -20000000 Then
-                                    lNearVal = lInputGrid.Value(lCol, lRow + 1)
-                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
-                                    lNeighborCount = lNeighborCount + 1
-                                End If
-                            End If
-                            'find average difference in neighboring elevation
-                            If lNeighborCount > 0 Then
-                                lNeighborVal = lNeighborVal / lNeighborCount
-                            Else
-                                lNeighborVal = 0
-                            End If
-                            'sum the elev diff for each cell in polygon
-                            lSum = lSum + lNeighborVal
-                            lSubCellCount = lSubCellCount + 1
+                        If Not lInputGrid.Value(lCol, lRow) < 0 Then
+                            lSum = lSum + lInputGrid.Value(lCol, lRow)
+                            lCellcount = lCellcount + 1
                         End If
                     End If
-                    cellcount = cellcount + 1
-                    If pStatusShow Then Logger.Progress(cellcount, totalcellcount)
                 Next lRow
             Next lCol
-            GridSlopeInPolygon = (lSum / lSubCellCount) / lInputGrid.Header.dX
-            If pStatusShow Then Logger.Progress(totalcellcount, totalcellcount)
             lPolygonSf.EndPointInShapefile()
+
+            If lCellcount > 0 Then
+                aMean = lSum / lCellcount
+            Else
+                aMean = -999
+            End If
+        End If
+
+        lInputGrid.Close()
+        lInputGrid = Nothing
+    End Sub
+
+    Public Shared Function GridSlopeInPolygon(ByVal aGridLayerIndex As Integer, ByVal aPolygonLayerIndex As Integer, _
+                                              ByVal aPolygonFeatureIndex As Integer) As Double
+        'Given an elevation grid and a polygon layer, find the average slope value within the feature.
+
+        Dim lSlope As Double
+
+        Dim lInputGridName As String = LayerFileName(aGridLayerIndex)
+        Dim lDEMGrid As String = PathNameOnly(lInputGridName) & "\tempdem.tif"
+        Dim lSlopeGrid As String = PathNameOnly(lInputGridName) & "\slope.tif"
+
+        'set input polygon layer
+        Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
+        Dim lShape As New MapWinGIS.Shape
+        If FeatureIndexValid(aPolygonFeatureIndex, lPolygonSf) Then
+            lShape = lPolygonSf.Shape(aPolygonFeatureIndex)
+
+            'clip grid to extents
+            Dim lSuccess As Boolean = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lInputGridName, lShape, lDEMGrid, True)
+
+            'calc slope grid 
+            lSuccess = MapWinGeoProc.TerrainAnalysis.Slope(lDEMGrid, lSlopeGrid, False, Nothing)
+
+            'get average slope within polygon
+            GridMeanInPolygon(lSlopeGrid, aPolygonLayerIndex, aPolygonFeatureIndex, lSlope)
+            lSlope = lSlope / 100   'adjust so slope is not in percent
+
         End If
         'clean up
         lPolygonSf = Nothing
-        lInputGrid = Nothing
+        Return lSlope
     End Function
 
     Public Shared Function GridValueAtPoint(ByVal aGridLayerIndex As Integer, ByVal aX As Double, ByVal aY As Double) As Integer
