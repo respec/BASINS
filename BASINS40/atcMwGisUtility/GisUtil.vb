@@ -2044,18 +2044,19 @@ Public Class GisUtil
     Public Shared Function MergeSelectedShapes(ByVal aLayerIndex As Integer) As Boolean
 
         'build collection of selected shape indexes
-        Dim lSelectedShapeIndexes As New Collection
+        Dim lSelectedShapeIndexes As New atcCollection
         For lIndex As Integer = 1 To NumSelectedFeatures(aLayerIndex)
             lSelectedShapeIndexes.Add(IndexOfNthSelectedFeatureInLayer(lIndex - 1, aLayerIndex))
         Next
+        lSelectedShapeIndexes.Sort()
 
         Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         lsf.StartEditingShapes(True)
 
         If lSelectedShapeIndexes.Count > 1 Then
             'merge first 2 shapes
-            Dim lShape1 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(1))
-            Dim lShape2 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(2))
+            Dim lShape1 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(0))
+            Dim lShape2 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(1))
             Dim lResultShape As New MapWinGIS.Shape
             lResultShape.Create(lsf.ShapefileType)
             Dim lSuccess As Boolean = MapWinGeoProc.SpatialOperations.MergeShapes(lShape1, lShape2, lResultShape)
@@ -2063,13 +2064,13 @@ Public Class GisUtil
             lSuccess = lsf.EditInsertShape(lResultShape, lsf.NumShapes)
             'set the attributes of the new shape to those of the first shape
             For lFieldIndex As Integer = 1 To lsf.NumFields
-                lSuccess = lsf.EditCellValue(lFieldIndex - 1, lsf.NumShapes - 1, lsf.CellValue(lFieldIndex - 1, lSelectedShapeIndexes(2)))
+                lSuccess = lsf.EditCellValue(lFieldIndex - 1, lsf.NumShapes - 1, lsf.CellValue(lFieldIndex - 1, lSelectedShapeIndexes(1)))
             Next
         End If
 
         If lSelectedShapeIndexes.Count > 2 Then
             'merge each additional shape to the one at the end
-            For lIndex As Integer = 3 To lSelectedShapeIndexes.Count
+            For lIndex As Integer = 2 To lSelectedShapeIndexes.Count - 1
                 Dim lShape1 As MapWinGIS.Shape = lsf.Shape(lsf.NumShapes - 1)
                 Dim lShape2 As MapWinGIS.Shape = lsf.Shape(lSelectedShapeIndexes(lIndex))
                 'merge these 2 shapes
@@ -2091,7 +2092,7 @@ Public Class GisUtil
 
         If lSelectedShapeIndexes.Count > 1 Then
             'delete the original shapes
-            For lIndex As Integer = lSelectedShapeIndexes.Count To 1 Step -1
+            For lIndex As Integer = lSelectedShapeIndexes.Count - 1 To 0 Step -1
                 Dim lSuccess As Boolean = lsf.EditDeleteShape(lSelectedShapeIndexes(lIndex))
             Next
         End If
