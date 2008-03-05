@@ -58,24 +58,28 @@ Public Class atcTimeseriesRDB
             Me.Specification = aFileName
 
             Try
-                Dim lRawDataSets As New atcDataGroup
-                Dim inStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
-                Dim inBuffer As New BufferedStream(inStream)
-                Dim inReader As New BinaryReader(inBuffer)
-                Dim curLine As String
+                Dim lCurLine As String
                 Dim lAttrName As String
                 Dim lAttrValue As String
                 Dim lAttributes As New atcDataAttributes
-                Dim lParmCode As String
-                Dim lStatisticCode As String
-                Dim lConstituentDescriptions As New atcCollection
-                Dim MissingVal As Double = -999
 
-                While inReader.PeekChar = Asc("#")
-                    curLine = NextLine(inReader)
-                    If curLine.Length > 50 Then
-                        lAttrName = curLine.Substring(2, 12).Trim
-                        lAttrValue = curLine.Substring(50).Trim
+                Dim lInputStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
+                Dim lInputBuffer As New BufferedStream(lInputStream)
+                Dim lInputReader As New BinaryReader(lInputBuffer)
+
+                Dim lURL As String = NextLine(lInputReader)
+                Dim lWQData As Boolean = False
+                Dim lParmCodeIndex As Integer = 10
+                If lURL.IndexOf("qwdata") > -1 Then 'TODO: need better way - only true with BASINS download
+                    lWQData = True
+                End If
+
+                While lInputReader.PeekChar = Asc("#")
+                    lCurLine = NextLine(lInputReader)
+                    If lCurLine.Length = 1 Then Exit While
+                    If lCurLine.Length > 50 Then
+                        lAttrName = lCurLine.Substring(2, 12).Trim
+                        lAttrValue = lCurLine.Substring(50).Trim
                         Select Case lAttrName 'translate NWIS attributes to WDM/BASINS names
                             Case "agency_cd" : lAttributes.SetValue("AGENCY", lAttrValue)
                             Case "station_nm" : lAttributes.SetValue("Description", lAttrValue)
@@ -86,123 +90,15 @@ Public Class atcTimeseriesRDB
                             Case "dec_long_va" : lAttributes.SetValue("LNGDEG", -Math.Abs(CDbl(lAttrValue)))
                             Case "alt_va" : lAttributes.SetValue("ELEV", lAttrValue)
                             Case "drain_area_va" : lAttributes.SetValue("DAREA", lAttrValue)
-                            Case Else
-                                'Remember extended column labels
-                                lParmCode = curLine.Substring(10, 5)
-                                lStatisticCode = curLine.Substring(20, 5)
-                                If IsNumeric(lParmCode) AndAlso IsNumeric(lStatisticCode) Then
-                                    lConstituentDescriptions.Add(curLine.Substring(5, 2) & "_" & lParmCode & "_" & lStatisticCode, curLine.Substring(30).Trim)
-                                End If
                         End Select
                     End If
                 End While
 
-                Dim lTSIndex As Integer = 0
-                Dim lNCons As Integer = 0
-                Dim lData As atcTimeseries = Nothing
-                Dim lDateArr(6) As Integer
-                lDateArr(3) = 24 'No hours in this file format, put measurement at end of day
-                lDateArr(4) = 0 'No minutes in this file format
-                lDateArr(5) = 0 'No seconds in this file format
+                If lWQData Then
+                Else
+                    ProcessDailyValues(lInputReader, lAttributes)
+                End If
 
-                Dim lTable As New atcTableDelimited
-                With lTable
-                    Dim lDate As Double
-                    Dim lLocation As String
-                    Dim lField As Integer
-                    Dim lConstituentDescription As String
-                    Dim lDateField As Integer = -1
-                    Dim lLocationField As Integer = -1
-                    Dim lValueFields As New ArrayList
-                    Dim lValueConstituentDescriptions As New atcCollection
-                    Dim lCurValue As String
-                    .Delimiter = vbTab
-                    .OpenStream(inBuffer)
-
-                    For lField = 1 To .NumFields
-                        Select Case .FieldName(lField)
-                            Case "agency_cd"
-                            Case "site_no" : lLocationField = lField
-                            Case "datetime" : lDateField = lField
-                            Case Else
-                                If .FieldName(lField).EndsWith("_cd") Then
-                                    'skip code fields for now
-                                Else
-                                    Dim lConstituentIndex As Integer = _
-                                        lConstituentDescriptions.IndexFromKey(.FieldName(lField))
-                                    If lConstituentIndex >= 0 Then
-                                        lValueFields.Add(lField)
-                                        lValueConstituentDescriptions.Add(lField, lConstituentDescriptions.ItemByIndex(lConstituentIndex))
-                                    Else
-                                        Logger.Dbg("Found column in RDB not contained in header: " & .FieldName(lField) & " (#" & lField & ")")
-                                    End If
-                                End If
-                        End Select
-                    Next
-
-                    While lTable.CurrentRecord < lTable.NumRecords
-                        lTable.MoveNext()
-                        lDate = Date.Parse(.Value(lDateField)).ToOADate() + pJulianInterval 'add one interval to put date at end of interval
-
-                        If lDate <> 0 Then
-                            lLocation = .Value(lLocationField)
-                            For Each lField In lValueFields
-                                lCurValue = .Value(lField).Trim
-                                If lCurValue.Length = 0 Then
-                                    'Skip blank values
-                                    'If next field is code for this field, then make sure its code starts with "A" for Approved
-                                ElseIf .FieldName(lField + 1) <> .FieldName(lField) & "_cd" OrElse .Value(lField + 1).StartsWith("A") Then
-                                    lConstituentDescription = lValueConstituentDescriptions.ItemByKey(lField)
-
-                                    Dim lDataKey As String = lLocation & ":" & lConstituentDescription
-                                    If Not lData Is Nothing AndAlso lData.Attributes.GetValue("DataKey") = lDataKey Then
-                                        'Already have correct dataset to append to
-                                    ElseIf lRawDataSets.Keys.Contains(lDataKey) Then
-                                        lData = lRawDataSets.ItemByKey(lDataKey)
-                                    Else
-                                        lData = New atcTimeseries(Me)
-                                        lData.Dates = New atcTimeseries(Me)
-                                        lData.Attributes.ChangeTo(lAttributes)
-                                        lData.numValues = lTable.NumRecords - 1
-
-                                        Select Case .FieldName(lField).Substring(3, 5)
-                                            Case "00060" : lData.Attributes.SetValue("Constituent", "FLOW")
-                                            Case Else : lData.Attributes.SetValue("Constituent", .FieldName(lField).Substring(3, 5))
-                                        End Select
-
-                                        Select Case .FieldName(lField).Substring(9, 5)
-                                            Case "00001" : lData.Attributes.SetValue("TSFORM", "5") 'Maximum
-                                            Case "00002" : lData.Attributes.SetValue("TSFORM", "4") 'Minimum
-                                            Case "00003" : lData.Attributes.SetValue("TSFORM", "1") 'Mean
-                                        End Select
-                                        lData.Attributes.SetValue("Count", 0)
-                                        lData.Attributes.SetValue("Scenario", "OBSERVED")
-                                        lData.Attributes.SetValue("Location", lLocation)
-                                        lData.Attributes.SetValue("ConstituentDescription", lConstituentDescription)
-                                        lData.Attributes.SetValue("DataKey", lDataKey)
-
-                                        lRawDataSets.Add(lDataKey, lData)
-                                        lData.Dates.Value(0) = lDate - pJulianInterval
-                                    End If
-                                    lTSIndex = lData.Attributes.GetValue("Count") + 1
-                                    lData.Value(lTSIndex) = lCurValue
-                                    lData.Dates.Value(lTSIndex) = lDate
-                                    lData.Attributes.SetValue("Count", lTSIndex)
-                                End If
-                            Next
-                        End If
-                    End While
-                End With
-                '
-                For Each lData In lRawDataSets
-                    lTSIndex = lData.Attributes.GetValue("Count")
-                    If lData.numValues <> lTSIndex Then
-                        lData.numValues = lTSIndex
-                    End If
-                    lData.Attributes.RemoveByKey("DataKey")
-                    DataSets.Add(FillValues(lData, atcTimeUnit.TUDay, 1, atcUtility.GetNaN, MissingVal, , Me))
-                Next
-                lRawDataSets.Clear()
                 Return True
             Catch e As Exception
                 Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message)
@@ -210,6 +106,133 @@ Public Class atcTimeseriesRDB
             End Try
         End If
     End Function
+
+    Sub ProcessDailyValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
+        Dim lCurLine As String
+        Dim lParmCode As String
+        Dim lStatisticCode As String
+        Dim lConstituentDescriptions As New atcCollection
+
+        While aInputReader.PeekChar = Asc("#")
+            lCurLine = NextLine(aInputReader)
+            If lCurLine.Length > 50 Then
+                'Remember extended column labels
+                lParmCode = lCurLine.Substring(10, 5)
+                lStatisticCode = lCurLine.Substring(20, 5)
+                If IsNumeric(lParmCode) AndAlso IsNumeric(lStatisticCode) Then
+                    lConstituentDescriptions.Add(lCurLine.Substring(5, 2) & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(30).Trim)
+                End If
+            End If
+        End While
+        Dim lRawDataSets As New atcDataGroup
+        Dim lTSIndex As Integer = 0
+        Dim lNCons As Integer = 0
+        Dim lData As atcTimeseries = Nothing
+        Dim lDateArr(6) As Integer
+        lDateArr(3) = 24 'No hours in this file format, put measurement at end of day
+        lDateArr(4) = 0 'No minutes in this file format
+        lDateArr(5) = 0 'No seconds in this file format
+
+        Dim lTable As New atcTableDelimited
+        With lTable
+            Dim lDate As Double
+            Dim lLocation As String
+            Dim lField As Integer
+            Dim lConstituentDescription As String
+            Dim lDateField As Integer = -1
+            Dim lLocationField As Integer = -1
+            Dim lValueFields As New ArrayList
+            Dim lValueConstituentDescriptions As New atcCollection
+            Dim lCurValue As String
+            .Delimiter = vbTab
+            .OpenStream(aInputReader.BaseStream)
+
+            For lField = 1 To .NumFields
+                Select Case .FieldName(lField)
+                    Case "agency_cd"
+                    Case "site_no" : lLocationField = lField
+                    Case "datetime" : lDateField = lField
+                    Case Else
+                        If .FieldName(lField).EndsWith("_cd") Then
+                            'skip code fields for now
+                        Else
+                            Dim lConstituentIndex As Integer = _
+                                lConstituentDescriptions.IndexFromKey(.FieldName(lField))
+                            If lConstituentIndex >= 0 Then
+                                lValueFields.Add(lField)
+                                lValueConstituentDescriptions.Add(lField, lConstituentDescriptions.ItemByIndex(lConstituentIndex))
+                            Else
+                                Logger.Dbg("Found column in RDB not contained in header: " & .FieldName(lField) & " (#" & lField & ")")
+                            End If
+                        End If
+                End Select
+            Next
+
+            While lTable.CurrentRecord < lTable.NumRecords
+                lTable.MoveNext()
+                lDate = Date.Parse(.Value(lDateField)).ToOADate() + pJulianInterval 'add one interval to put date at end of interval
+
+                If lDate <> 0 Then
+                    lLocation = .Value(lLocationField)
+                    For Each lField In lValueFields
+                        lCurValue = .Value(lField).Trim
+                        If lCurValue.Length = 0 Then
+                            'Skip blank values
+                            'If next field is code for this field, then make sure its code starts with "A" for Approved
+                        ElseIf .FieldName(lField + 1) <> .FieldName(lField) & "_cd" OrElse .Value(lField + 1).StartsWith("A") Then
+                            lConstituentDescription = lValueConstituentDescriptions.ItemByKey(lField)
+
+                            Dim lDataKey As String = lLocation & ":" & lConstituentDescription
+                            If Not lData Is Nothing AndAlso lData.Attributes.GetValue("DataKey") = lDataKey Then
+                                'Already have correct dataset to append to
+                            ElseIf lRawDataSets.Keys.Contains(lDataKey) Then
+                                lData = lRawDataSets.ItemByKey(lDataKey)
+                            Else
+                                lData = New atcTimeseries(Me)
+                                lData.Dates = New atcTimeseries(Me)
+                                lData.Attributes.ChangeTo(aAttributes)
+                                lData.numValues = lTable.NumRecords - 1
+
+                                Select Case .FieldName(lField).Substring(3, 5)
+                                    Case "00060" : lData.Attributes.SetValue("Constituent", "FLOW")
+                                    Case Else : lData.Attributes.SetValue("Constituent", .FieldName(lField).Substring(3, 5))
+                                End Select
+
+                                Select Case .FieldName(lField).Substring(9, 5)
+                                    Case "00001" : lData.Attributes.SetValue("TSFORM", "5") 'Maximum
+                                    Case "00002" : lData.Attributes.SetValue("TSFORM", "4") 'Minimum
+                                    Case "00003" : lData.Attributes.SetValue("TSFORM", "1") 'Mean
+                                End Select
+                                lData.Attributes.SetValue("Count", 0)
+                                lData.Attributes.SetValue("Scenario", "OBSERVED")
+                                lData.Attributes.SetValue("Location", lLocation)
+                                lData.Attributes.SetValue("ConstituentDescription", lConstituentDescription)
+                                lData.Attributes.SetValue("DataKey", lDataKey)
+
+                                lRawDataSets.Add(lDataKey, lData)
+                                lData.Dates.Value(0) = lDate - pJulianInterval
+                            End If
+                            lTSIndex = lData.Attributes.GetValue("Count") + 1
+                            lData.Value(lTSIndex) = lCurValue
+                            lData.Dates.Value(lTSIndex) = lDate
+                            lData.Attributes.SetValue("Count", lTSIndex)
+                        End If
+                    Next
+                End If
+            End While
+        End With
+        '
+        Dim lMissingVal As Double = -999
+        For Each lData In lRawDataSets
+            lTSIndex = lData.Attributes.GetValue("Count")
+            If lData.numValues <> lTSIndex Then
+                lData.numValues = lTSIndex
+            End If
+            lData.Attributes.RemoveByKey("DataKey")
+            DataSets.Add(FillValues(lData, atcTimeUnit.TUDay, 1, atcUtility.GetNaN, lMissingVal, , Me))
+        Next
+        lRawDataSets.Clear()
+    End Sub
 
     'Private Function GetData(ByVal aSites As ArrayList, _
     '                Optional ByVal cache_dir As String = "", _
