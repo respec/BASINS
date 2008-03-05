@@ -251,25 +251,12 @@ ErrHand:
 
     Public Overrides Sub Clear()
         pHeader.Clear()
-        'ClearData()
-        'pHeader.version = 3
-        'pHeader.dbfDay = 1
-        'pHeader.dbfMonth = 1
-        'pHeader.dbfYear = 70
-        'pHeader.NumBytesHeader = 32
-        'pHeader.NumBytesRec = 0
-        'pNumFields = 0
-        'ReDim pFields(0)
+        ClearData()
     End Sub
 
     Public Overrides Sub ClearData()
-        'If pHeader Is Nothing Then pHeader = New clsHeader
-        'pHeader.NumRecs = 0
-        'pDataBytes = 0
-        'pCurrentRecord = 0
-        'pCurrentRecordStart = 0
-        'pNumRecsCapacity = 0
-        'ReDim pData(0)
+        If pHeader Is Nothing Then pHeader = New ArrayList
+        ReDim pData(0)
     End Sub
 
     Public Overrides Function Cousin() As IatcTable

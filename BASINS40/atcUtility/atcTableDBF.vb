@@ -6,19 +6,6 @@ Imports MapWinUtility
 Public Class atcTableDBF
     Inherits atcTable
 
-    'UPGRADE_ISSUE: Declaring a parameter 'As Any' is not supported. Click for more: 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="vbup1016"'
-    'Private Declare Sub CopyMemory Lib "Kernel32"  Alias "RtlMoveMemory"(ByRef Destination As Any, ByRef Source As Any, ByVal Length As Integer)
-    'Private Declare Function ArrPtr Lib "msvbvm60.dll"  Alias "VarPtr"(ByRef ptr() As Any) As Integer
-
-    'Variables for comparing bytes of a record as longs
-    'Private pLongHeader1(5) As Integer
-    'Private pLongHeader2(5) As Integer
-    'Private pCompareLongs1() As Integer
-    'Private pCompareLongs2() As Integer
-
-    'Private CountAgreeNoMatch As Integer
-    'Private CountAgreeMatch As Integer
-
     '===========================================================================
     ' Subject: READ DBASE III                    Date: 1/25/88 (00:00)
     ' Author:  David Perry                       Code: QB, PDS
@@ -66,6 +53,19 @@ Public Class atcTableDBF
             FilePut(outFile, NumBytesRec)
             FilePut(outFile, Trash)
         End Sub
+
+        Public Overrides Function ToString() As String
+            Dim lTrashString As String = ""
+            For Each lTrash As Byte In Trash
+                lTrashString &= lTrash & " "
+            Next
+            Return "Version " & version _
+            & " " & dbfYear & "/" & dbfMonth & "/" & dbfDay _
+            & " NumRecs=" & NumRecs _
+            & " NumBytesHeader=" & NumBytesHeader _
+            & " NumBytesRec=" & NumBytesRec _
+            & " Trash=" & lTrashString
+        End Function
     End Class
 
 
@@ -103,6 +103,14 @@ Public Class atcTableDBF
             FilePut(outFile, DecimalCount)
             FilePut(outFile, Trash)
         End Sub
+
+        Public Overrides Function ToString() As String
+            Dim lTrashString As String = ""
+            For Each lTrash As Byte In Trash
+                lTrashString &= lTrash & " "
+            Next
+            Return FieldName & " " & FieldType & " FieldLength=" & FieldLength & " DecimalCount=" & DecimalCount & " Trash=" & lTrashString
+        End Function
     End Class
 
     Private pHeader As clsHeader
@@ -739,9 +747,9 @@ NotEqual:
     Public Overrides Sub Clear()
         ClearData()
         pHeader.version = 3
-        pHeader.dbfDay = 1
-        pHeader.dbfMonth = 1
-        pHeader.dbfYear = 70
+        pHeader.dbfDay = CByte(Format(Now, "dd"))
+        pHeader.dbfMonth = CByte(Format(Now, "MM"))
+        pHeader.dbfYear = CInt(Format(Now, "yyyy")) - 1900
         pHeader.NumBytesHeader = 32
         pHeader.NumBytesRec = 0
         pNumFields = 0
@@ -763,7 +771,7 @@ NotEqual:
         Dim newDBF As New atcTableDBF
         With newDBF
             .Year = CInt(Format(Now, "yyyy")) - 1900
-            .Month = CByte(Format(Now, "mm"))
+            .Month = CByte(Format(Now, "MM"))
             .Day = CByte(Format(Now, "dd"))
             .NumFields = pNumFields
 
@@ -781,12 +789,11 @@ NotEqual:
         Dim retval As String
         Dim iField As Integer
 
-        retval = "Dim newDBF as clsDBF"
-        retval &= vbCrLf & "set newDBF = new clsDBF"
+        retval = "Dim newDBF as new atcTableDBF"
         retval &= vbCrLf & "With newDBF"
 
         retval &= vbCrLf & "  .Year = CInt(Format(Now, ""yyyy"")) - 1900"
-        retval &= vbCrLf & "  .Month = CByte(Format(Now, ""mm""))"
+        retval &= vbCrLf & "  .Month = CByte(Format(Now, ""MM""))"
         retval &= vbCrLf & "  .Day = CByte(Format(Now, ""dd""))"
         retval &= vbCrLf & "  .NumFields = " & pNumFields
         retval &= vbCrLf
@@ -866,7 +873,6 @@ NotEqual:
 
     Public Overrides Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String
         Dim retval As String = ""
-        Dim iTrash As Integer
         Dim iField As Integer
         Dim ShowTrash As Boolean
         Dim ShowHeaders As Boolean
@@ -896,8 +902,8 @@ NotEqual:
                     retval &= vbCrLf & "    DecimalCount: " & .DecimalCount & " "
                     If ShowTrash Then
                         retval &= vbCrLf & "    Trash: "
-                        For iTrash = 1 To 14
-                            retval &= .Trash(iTrash) & " "
+                        For Each lTrash As Byte In .Trash
+                            retval &= lTrash & " "
                         Next
                     End If
                 End With
@@ -910,11 +916,7 @@ NotEqual:
                 retval &= vbTab & "Type "
                 retval &= vbTab & "Length "
                 retval &= vbTab & "DecimalCount "
-                If ShowTrash Then
-                    For iTrash = 1 To 14
-                        retval &= vbTab & "Trash" & iTrash
-                    Next
-                End If
+                If ShowTrash Then retval &= vbTab & "Trash"
             End If
             retval &= vbCrLf
             'now field details
@@ -935,9 +937,9 @@ NotEqual:
                     retval &= vbTab & .FieldLength
                     retval &= vbTab & .DecimalCount
                     If ShowTrash Then
-                        retval &= vbCrLf & "    Trash: "
-                        For iTrash = 1 To 14
-                            retval &= vbTab & .Trash(iTrash)
+                        retval &= vbTab
+                        For Each lTrash As Byte In .Trash
+                            retval &= lTrash & " "
                         Next
                     End If
                 End With
@@ -949,14 +951,11 @@ NotEqual:
 
     Public Overrides Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String
         Dim retval As String = ""
-        Dim iTrash As Integer
-        Dim ShowTrash As Boolean
-        Dim ShowHeaders As Boolean
+        Dim lFormat As String = aFormat.ToLower
+        Dim ShowTrash As Boolean = lFormat.Contains("trash")
+        Dim ShowHeaders As Boolean = lFormat.Contains("headers")
 
-        If InStr(LCase(aFormat), "trash") > 0 Then ShowTrash = True
-        If InStr(LCase(aFormat), "headers") > 0 Then ShowHeaders = True
-
-        If LCase(aFormat) = "text" Then 'text version
+        If lFormat.Contains("text") Then 'text version
             With pHeader
                 retval = "DBF Header: "
                 retval &= vbCrLf & "    FileName: " & FileName
@@ -967,8 +966,8 @@ NotEqual:
                 retval &= vbCrLf & "    NumBytesRec: " & .NumBytesRec
                 If ShowTrash Then
                     retval &= vbCrLf & "    Trash: "
-                    For iTrash = 1 To 20
-                        retval &= pHeader.Trash(iTrash) & " "
+                    For Each lTrash As Byte In .Trash
+                        retval &= lTrash & " "
                     Next
                 End If
             End With
@@ -983,11 +982,7 @@ NotEqual:
                 retval &= vbTab & "NumBytesHeader "
                 retval &= vbTab & "NumBytesRec "
             End If
-            If ShowTrash Then
-                For iTrash = 0 To 19
-                    retval &= vbTab & "Trash" & iTrash
-                Next
-            End If
+            If ShowTrash Then retval &= vbTab & "Trash"
             retval &= vbCrLf
             With pHeader 'now header data
                 retval &= FileName
@@ -998,14 +993,41 @@ NotEqual:
                 retval &= vbTab & .NumBytesHeader
                 retval &= vbTab & .NumBytesRec
                 If ShowTrash Then
-                    For iTrash = 0 To 19
-                        retval &= vbTab & pHeader.Trash(iTrash)
+                    retval &= vbTab
+                    For Each lTrash As Byte In .Trash
+                        retval &= lTrash & " "
                     Next
                 End If
                 retval &= vbCrLf
             End With
         End If
         SummaryFile = retval
+    End Function
+
+    Public Function SummaryDataBinary() As String
+        Dim lSB As New Text.StringBuilder
+        Dim lCurrentRecordStart As Integer
+        For lCurrentRecord As Integer = 1 To Me.NumRecords
+            lCurrentRecordStart = pHeader.NumBytesRec * (lCurrentRecord - 1) + 1
+            lSB.Append(lCurrentRecord & " @ " & lCurrentRecordStart & vbCrLf)
+            For lFieldNumber As Integer = 1 To pNumFields
+                Dim lFirstByte As Integer = lCurrentRecordStart + pFields(lFieldNumber).DataAddress
+                Dim lLastByte As Integer = lFirstByte + pFields(lFieldNumber).FieldLength - 1
+                For lByte As Integer = lFirstByte To lLastByte
+                    lSB.Append(Hex(pData(lByte)) & " ")
+                Next
+                lSB.Append(" = ")
+                For lByte As Integer = lFirstByte To lLastByte
+                    If pData(lByte) > 0 Then
+                        lSB.Append(Chr(pData(lByte)))
+                    Else
+                        Exit For
+                    End If
+                Next
+                lSB.Append(vbCrLf)
+            Next
+        Next
+        Return Trim(lSB.ToString)
     End Function
 
     Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean

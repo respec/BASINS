@@ -36,6 +36,7 @@ Partial Class frmDownload
         Me.chkBASINS_DEM = New System.Windows.Forms.CheckBox
         Me.chkBASINS_Census = New System.Windows.Forms.CheckBox
         Me.grpNWIS = New System.Windows.Forms.GroupBox
+        Me.btnBrowseWDMdailydischarge = New System.Windows.Forms.Button
         Me.chkNWIS_GetNWISStations = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISDischarge = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_Urban = New System.Windows.Forms.CheckBox
@@ -64,7 +65,6 @@ Partial Class frmDownload
         Me.btnCancel = New System.Windows.Forms.Button
         Me.grpSTORET = New System.Windows.Forms.GroupBox
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
-        Me.btnBrowseWDMdailydischarge = New System.Windows.Forms.Button
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
@@ -87,7 +87,7 @@ Partial Class frmDownload
         Me.grpBASINS.Controls.Add(Me.chkBASINS_DEMG)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_DEM)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Census)
-        Me.grpBASINS.Location = New System.Drawing.Point(12, 77)
+        Me.grpBASINS.Location = New System.Drawing.Point(12, 39)
         Me.grpBASINS.Name = "grpBASINS"
         Me.grpBASINS.Size = New System.Drawing.Size(356, 96)
         Me.grpBASINS.TabIndex = 0
@@ -202,12 +202,23 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.btnBrowseWDMdailydischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISStations)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
-        Me.grpNWIS.Location = New System.Drawing.Point(12, 298)
+        Me.grpNWIS.Location = New System.Drawing.Point(12, 260)
         Me.grpNWIS.Name = "grpNWIS"
         Me.grpNWIS.Size = New System.Drawing.Size(356, 42)
         Me.grpNWIS.TabIndex = 1
         Me.grpNWIS.TabStop = False
         Me.grpNWIS.Text = "NWIS"
+        '
+        'btnBrowseWDMdailydischarge
+        '
+        Me.btnBrowseWDMdailydischarge.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnBrowseWDMdailydischarge.Image = CType(resources.GetObject("btnBrowseWDMdailydischarge.Image"), System.Drawing.Image)
+        Me.btnBrowseWDMdailydischarge.Location = New System.Drawing.Point(218, 16)
+        Me.btnBrowseWDMdailydischarge.Name = "btnBrowseWDMdailydischarge"
+        Me.btnBrowseWDMdailydischarge.Size = New System.Drawing.Size(28, 20)
+        Me.btnBrowseWDMdailydischarge.TabIndex = 44
+        Me.ToolTip1.SetToolTip(Me.btnBrowseWDMdailydischarge, "Browse to choose WDM file name")
+        Me.btnBrowseWDMdailydischarge.UseVisualStyleBackColor = True
         '
         'chkNWIS_GetNWISStations
         '
@@ -246,7 +257,7 @@ Partial Class frmDownload
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DRG)
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DOQ)
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_Urban)
-        Me.grpTerraServerWebService.Location = New System.Drawing.Point(12, 397)
+        Me.grpTerraServerWebService.Location = New System.Drawing.Point(12, 359)
         Me.grpTerraServerWebService.Name = "grpTerraServerWebService"
         Me.grpTerraServerWebService.Size = New System.Drawing.Size(356, 42)
         Me.grpTerraServerWebService.TabIndex = 9
@@ -280,7 +291,7 @@ Partial Class frmDownload
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Canopy)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Impervious)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_LandCover)
-        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 346)
+        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 308)
         Me.grpNLCD2001.Name = "grpNLCD2001"
         Me.grpNLCD2001.Size = New System.Drawing.Size(356, 42)
         Me.grpNLCD2001.TabIndex = 11
@@ -329,7 +340,7 @@ Partial Class frmDownload
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_elev_cm)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_All)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
-        Me.grpNHDplus.Location = New System.Drawing.Point(12, 179)
+        Me.grpNHDplus.Location = New System.Drawing.Point(12, 141)
         Me.grpNHDplus.Name = "grpNHDplus"
         Me.grpNHDplus.Size = New System.Drawing.Size(356, 113)
         Me.grpNHDplus.TabIndex = 12
@@ -424,7 +435,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(293, 511)
+        Me.btnDownload.Location = New System.Drawing.Point(292, 465)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 29
@@ -455,7 +466,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(82, 515)
+        Me.chkClip.Location = New System.Drawing.Point(81, 469)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 35
@@ -466,7 +477,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(18, 515)
+        Me.chkMerge.Location = New System.Drawing.Point(17, 469)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 37
@@ -477,7 +488,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(212, 511)
+        Me.btnCancel.Location = New System.Drawing.Point(211, 465)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 39
@@ -489,7 +500,7 @@ Partial Class frmDownload
         Me.grpSTORET.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
-        Me.grpSTORET.Location = New System.Drawing.Point(12, 445)
+        Me.grpSTORET.Location = New System.Drawing.Point(12, 407)
         Me.grpSTORET.Name = "grpSTORET"
         Me.grpSTORET.Size = New System.Drawing.Size(356, 44)
         Me.grpSTORET.TabIndex = 42
@@ -506,24 +517,13 @@ Partial Class frmDownload
         Me.chkSTORET_Stations.Text = "Stations"
         Me.chkSTORET_Stations.UseVisualStyleBackColor = True
         '
-        'btnBrowseWDMdailydischarge
-        '
-        Me.btnBrowseWDMdailydischarge.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnBrowseWDMdailydischarge.Image = CType(resources.GetObject("btnBrowseWDMdailydischarge.Image"), System.Drawing.Image)
-        Me.btnBrowseWDMdailydischarge.Location = New System.Drawing.Point(218, 16)
-        Me.btnBrowseWDMdailydischarge.Name = "btnBrowseWDMdailydischarge"
-        Me.btnBrowseWDMdailydischarge.Size = New System.Drawing.Size(28, 20)
-        Me.btnBrowseWDMdailydischarge.TabIndex = 44
-        Me.ToolTip1.SetToolTip(Me.btnBrowseWDMdailydischarge, "Browse to choose WDM file name")
-        Me.btnBrowseWDMdailydischarge.UseVisualStyleBackColor = True
-        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(380, 546)
+        Me.ClientSize = New System.Drawing.Size(380, 500)
         Me.Controls.Add(Me.grpNLCD2001)
         Me.Controls.Add(Me.grpSTORET)
         Me.Controls.Add(Me.grpTerraServerWebService)

@@ -293,11 +293,19 @@ Public Class frmDownload
 
     'End Function
 
-    Private Sub btnBrowseWDMdailydischarge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseWDMdailydischarge.Click
-
-    End Sub
-
-    Private Sub btnBrowseWDMmet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseWDMmet.Click
-
+    Private Sub btnBrowseWDM_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseWDMdailydischarge.Click, _
+                                                                                                       btnBrowseWDMmet.Click
+        Dim lDialog As New Windows.Forms.SaveFileDialog
+        With lDialog
+            .Title = "Save in WDM file..."
+            .FileName = sender.tag
+            .Filter = "*.wdm|*.wdm|*.*|*.*"
+            .DefaultExt = ".wdm"
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                sender.tag = .FileName
+            Else
+                sender.tag = ""
+            End If
+        End With
     End Sub
 End Class
