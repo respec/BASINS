@@ -1,7 +1,12 @@
 Imports atcData
+Imports atcUtility
+Imports MapWinUtility
 
 Module modFreq
-    Declare Sub LGPSTX Lib "usgs_swstats.dll" (ByRef N As Integer, _
+    Private pWarned As Boolean = False 'Flag to prevent duplicate warnings during session
+    Private pNan As Double = GetNaN()
+
+    Private Declare Sub LGPSTX Lib "usgs_swstats.dll" (ByRef N As Integer, _
                                                ByRef NZI As Integer, _
                                                ByRef NUMONS As Integer, _
                                                ByRef NQS As Integer, _
@@ -21,11 +26,12 @@ Module modFreq
                                                ByRef RI As Single, _
                                                ByRef RSOUT As Single, _
                                                ByRef RETCOD As Integer)
-    Declare Sub KENT Lib "usgs_swstats.dll" (ByRef X As Single, _
+    Private Declare Sub KENT Lib "usgs_swstats.dll" (ByRef X As Single, _
                                               ByRef N As Integer, _
                                               ByRef TAU As Single, _
                                               ByRef PLEVEL As Single, _
                                               ByRef SLOPE As Single)
+
 
     'Kendall Tau Calculation
     Sub KendallTau(ByVal aTs As atcTimeseries, ByRef aTau As Double, ByRef aLevel As Double, ByRef aSlope As Double)
@@ -42,7 +48,24 @@ Module modFreq
                 lQ(i - 1) = aTs.Values(i)
             End If
         Next
-        KENT(lQ(0), lN, lTau, lLevel, lSlope)
+        Try
+            KENT(lQ(0), lN, lTau, lLevel, lSlope)
+        Catch ex As Exception
+            lTau = pNan
+            lLevel = pNan
+            aSlope = pNan
+            If pWarned Then
+                Logger.Dbg("Could not compute Kendall Tau: " & ex.Message)
+            Else
+                Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
+                If IO.File.Exists(lExpectedDLL) Then
+                    Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute Kendall Tau")
+                Else
+                    Logger.Msg("Required library not found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute Kendall Tau")
+                End If
+                pWarned = True
+            End If
+        End Try
         aTau = lTau
         aLevel = lLevel
         aSlope = lSlope
@@ -57,7 +80,7 @@ Module modFreq
         Dim lSkew As Double = aTs.Attributes.GetValue("Skew")
 
         If lN = 0 OrElse lMean <= 0 Then 'no data or problem data
-            Return Double.NaN
+            Return pNan
         Else
             'Turn recurrence into probability
             If aRecurOrProb > 1 Then aRecurOrProb = 1.0 / aRecurOrProb
@@ -87,8 +110,23 @@ Module modFreq
             Dim lIlh As Integer  'stats option 1-hi, 2-low,3-month
             If aHigh Then lIlh = 1 Else lIlh = 2
 
-            LGPSTX(lN, lNzi, lNumons, (lI + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe(0), _
-                   lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
+            Try
+                LGPSTX(lN, lNzi, lNumons, (lI + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe(0), _
+                       lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
+            Catch ex As Exception
+                lQ(0) = pNan
+                If pWarned Then
+                    Logger.Dbg("Could not compute Kendall Tau: " & ex.Message)
+                Else
+                    Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
+                    If IO.File.Exists(lExpectedDLL) Then
+                        Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute PearsonType3")
+                    Else
+                        Logger.Msg("Required library not found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute PearsonType3")
+                    End If
+                    pWarned = True
+                End If
+            End Try
 
             Return lQ(0)
         End If
