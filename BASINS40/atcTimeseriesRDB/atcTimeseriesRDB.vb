@@ -62,12 +62,15 @@ Public Class atcTimeseriesRDB
                 Dim lAttrName As String
                 Dim lAttrValue As String
                 Dim lAttributes As New atcDataAttributes
+                lAttributes.SetValue("DataSource", aFileName)
 
                 Dim lInputStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
                 Dim lInputBuffer As New BufferedStream(lInputStream)
                 Dim lInputReader As New BinaryReader(lInputBuffer)
 
-                Dim lURL As String = NextLine(lInputReader)
+                Dim lURL As String = NextLine(lInputReader).Substring(2)
+                lAttributes.SetValue("URL", lURL)
+
                 Dim lWQData As Boolean = False
                 Dim lParmCodeIndex As Integer = 10
                 If lURL.IndexOf("qwdata") > -1 Then 'TODO: need better way - only true with BASINS download
@@ -82,7 +85,7 @@ Public Class atcTimeseriesRDB
                         lAttrValue = lCurLine.Substring(50).Trim
                         Select Case lAttrName 'translate NWIS attributes to WDM/BASINS names
                             Case "agency_cd" : lAttributes.SetValue("AGENCY", lAttrValue)
-                            Case "station_nm" : lAttributes.SetValue("Description", lAttrValue)
+                            Case "station_nm" : lAttributes.SetValue("StaNam", lAttrValue)
                             Case "state_cd" : lAttributes.SetValue("STFIPS", lAttrValue)
                             Case "county_cd" : lAttributes.SetValue("CNTYFIPS", lAttrValue)
                             Case "huc_cd" : lAttributes.SetValue("HUCODE", lAttrValue)
@@ -95,6 +98,7 @@ Public Class atcTimeseriesRDB
                 End While
 
                 If lWQData Then
+                    ProcessWaterQualityValues(lInputReader, lAttributes)
                 Else
                     ProcessDailyValues(lInputReader, lAttributes)
                 End If
@@ -106,6 +110,110 @@ Public Class atcTimeseriesRDB
             End Try
         End If
     End Function
+
+    Sub ProcessWaterQualityValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
+        Dim lCurLine As String
+        Dim lConstituentDescriptions As New atcCollection
+
+        While aInputReader.PeekChar = Asc("#")
+            lCurLine = NextLine(aInputReader)
+            If lCurLine.IndexOf(" The following parameters are included:") > -1 Then
+                Do
+                    lCurLine = NextLine(aInputReader)
+                    If lCurLine.Length <= 2 Then Exit Do
+                    lConstituentDescriptions.Add(lCurLine.Substring(3, 5), lCurLine.Substring(12))
+                Loop
+                Logger.Dbg("ConstituentCount:" & lConstituentDescriptions.Count)
+            End If
+            'TODO: process more header stuff
+        End While
+
+        Dim lRawDataSets As New atcCollection
+        Dim lTSIndex As Integer = 0
+        Dim lData As atcTimeseriesBuilder = Nothing
+
+        Dim lTable As New atcTableDelimited
+        With lTable
+            Dim lDateJ As Double
+            Dim lDateField As Integer = -1
+            Dim lTimeField As Integer = -1
+            Dim lLocation As String
+            Dim lConstituentField As Integer = -1
+            Dim lConstituentDescription As String
+            Dim lConstituentString As String
+            Dim lLocationField As Integer = -1
+            Dim lValueField As Integer = -1
+            Dim lValueString As String
+            .Delimiter = vbTab
+            .OpenStream(aInputReader.BaseStream)
+
+            For lField As Integer = 1 To .NumFields
+                Select Case .FieldName(lField)
+                    Case "agency_cd"
+                    Case "site_no" : lLocationField = lField
+                    Case "sample_dt" : lDateField = lField
+                    Case "sample_tm" : lTimeField = lField
+                    Case "result_va" : lValueField = lField
+                    Case "parm_cd" : lConstituentField = lField
+                End Select
+            Next
+
+            'TODO: are all required fields defined
+
+            While lTable.CurrentRecord < lTable.NumRecords
+                lTable.MoveNext()
+                lValueString = .Value(lValueField)
+                If lValueString.Length = 0 Then
+                    'Skip blank values
+                Else
+                    Dim lTime As DateTime = "#" & .Value(lTimeField) & "#"
+                    Dim lDate As DateTime = "#" & .Value(lDateField) & "#"
+                    lDateJ = lTime.ToOADate + lDate.ToOADate
+                    If lDateJ <> 0 Then
+                        lLocation = .Value(lLocationField)
+                        lConstituentString = .Value(lConstituentField)
+                        Dim lDataKey As String = lLocation & ":" & lConstituentString
+                        If Not lData Is Nothing AndAlso lData.Attributes.GetValue("DataKey") = lDataKey Then
+                            'Already have correct dataset to append to
+                        ElseIf lRawDataSets.Keys.Contains(lDataKey) Then
+                            lData = lRawDataSets.ItemByKey(lDataKey)
+                        Else
+                            lData = New atcTimeseriesBuilder(Me)
+                            lData.Attributes.ChangeTo(aAttributes)
+                            lConstituentDescription = lConstituentDescriptions.ItemByKey(lConstituentString)
+                            lData.Attributes.SetValue("ConstituentDescription", lConstituentDescription)
+                            Dim lParsed() As String = lConstituentDescription.Split(",")
+                            Dim lConstituentName As String = ""
+                            For Each lParse As String In lParsed
+                                lConstituentName &= ", " & lParse
+                                If Not IsNumeric(lParse) Then Exit For
+                            Next
+                            lConstituentName = lConstituentName.Substring(2)
+                            lData.Attributes.SetValue("Constituent", lConstituentName)
+                            lData.Attributes.SetValue("Units", lParsed(lParsed.GetUpperBound(0)))
+                            lData.Attributes.SetValue("ParmCode", lConstituentString)
+                            lData.Attributes.SetValue("Point", True)
+                            lData.Attributes.SetValue("Count", 0)
+                            lData.Attributes.SetValue("Scenario", "OBSERVED")
+                            lData.Attributes.SetValue("Location", lLocation)
+                            lData.Attributes.SetValue("DataKey", lDataKey)
+                            lRawDataSets.Add(lDataKey, lData)
+                        End If
+                        lTSIndex = lData.Attributes.GetValue("Count") + 1
+                        lData.AddValue(lDateJ, lValueString)
+                        lData.Attributes.SetValue("Count", lTSIndex)
+                    End If
+                End If
+            End While
+        End With
+
+        For Each lData In lRawDataSets
+            lData.Attributes.RemoveByKey("DataKey")
+            DataSets.Add(lData.CreateTimeseries)
+        Next
+        lRawDataSets.Clear()
+
+    End Sub
 
     Sub ProcessDailyValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
         Dim lCurLine As String
