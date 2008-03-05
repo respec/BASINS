@@ -20,11 +20,12 @@ Public Class atcTableDBF
     'modification and extensions continue through 2003
 
     'Converted to VB.NET by Mark Gray at Aqua Terra October 2004
+    'Maintainence continues in 2008
 
     'dBaseIII file header, 32 bytes
     Private Class clsHeader
         Public version As Byte
-        Public dbfYear As Byte
+        Private dbfYear As Byte
         Public dbfMonth As Byte
         Public dbfDay As Byte
         Public NumRecs As Integer
@@ -54,20 +55,38 @@ Public Class atcTableDBF
             FilePut(outFile, Trash)
         End Sub
 
+        Public Sub Clear()
+            Dim lDate As Date = Now
+            version = 3
+            dbfDay = lDate.Day
+            dbfMonth = lDate.Month
+            Year = lDate.Year
+            NumBytesHeader = 32
+            NumBytesRec = 0
+        End Sub
+
+        Public Property Year() As Integer
+            Get
+                Return dbfYear + 1900
+            End Get
+            Set(ByVal value As Integer)
+                dbfYear = value - 1900
+            End Set
+        End Property
+
         Public Overrides Function ToString() As String
             Dim lTrashString As String = ""
             For Each lTrash As Byte In Trash
                 lTrashString &= lTrash & " "
             Next
             Return "Version " & version _
-            & " " & dbfYear & "/" & dbfMonth & "/" & dbfDay _
+            & " " & Year & "/" & dbfMonth & "/" & dbfDay _
             & " NumRecs=" & NumRecs _
             & " NumBytesHeader=" & NumBytesHeader _
             & " NumBytesRec=" & NumBytesRec _
             & " Trash=" & lTrashString
         End Function
     End Class
-
 
     'Field Descriptions, 32 bytes * Number of Fields
     'Up to 128 Fields
@@ -125,12 +144,12 @@ Public Class atcTableDBF
     'and in InitData when creating a new DBF from scratch. May increase in Let Value.
     Private pNumRecsCapacity As Integer
 
-    Public Property Year() As Byte
+    Public Property Year() As Integer
         Get
-            Return pHeader.dbfYear
+            Return pHeader.Year
         End Get
-        Set(ByVal newValue As Byte)
-            pHeader.dbfYear = newValue
+        Set(ByVal newValue As Integer)
+            pHeader.Year = newValue
         End Set
     End Property
 
@@ -746,12 +765,7 @@ NotEqual:
 
     Public Overrides Sub Clear()
         ClearData()
-        pHeader.version = 3
-        pHeader.dbfDay = CByte(Format(Now, "dd"))
-        pHeader.dbfMonth = CByte(Format(Now, "MM"))
-        pHeader.dbfYear = CInt(Format(Now, "yyyy")) - 1900
-        pHeader.NumBytesHeader = 32
-        pHeader.NumBytesRec = 0
+        pHeader.Clear()
         pNumFields = 0
         ReDim pFields(0)
     End Sub
@@ -770,9 +784,6 @@ NotEqual:
         Dim iField As Integer
         Dim newDBF As New atcTableDBF
         With newDBF
-            .Year = CInt(Format(Now, "yyyy")) - 1900
-            .Month = CByte(Format(Now, "MM"))
-            .Day = CByte(Format(Now, "dd"))
             .NumFields = pNumFields
 
             For iField = 1 To pNumFields
@@ -791,13 +802,8 @@ NotEqual:
 
         retval = "Dim newDBF as new atcTableDBF"
         retval &= vbCrLf & "With newDBF"
-
-        retval &= vbCrLf & "  .Year = CInt(Format(Now, ""yyyy"")) - 1900"
-        retval &= vbCrLf & "  .Month = CByte(Format(Now, ""MM""))"
-        retval &= vbCrLf & "  .Day = CByte(Format(Now, ""dd""))"
         retval &= vbCrLf & "  .NumFields = " & pNumFields
         retval &= vbCrLf
-
         For iField = 1 To pNumFields
             With pFields(iField)
                 retval &= vbCrLf & "  .FieldName(" & iField & ") = """ & TrimNull(.FieldName) & """"
@@ -960,7 +966,7 @@ NotEqual:
                 retval = "DBF Header: "
                 retval &= vbCrLf & "    FileName: " & FileName
                 retval &= vbCrLf & "    Version: " & .version
-                retval &= vbCrLf & "    Date: " & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
+                retval &= vbCrLf & "    Date: " & Year & "/" & Month & "/" & Day
                 retval &= vbCrLf & "    NumRecs: " & .NumRecs
                 retval &= vbCrLf & "    NumBytesHeader: " & .NumBytesHeader
                 retval &= vbCrLf & "    NumBytesRec: " & .NumBytesRec
@@ -987,7 +993,7 @@ NotEqual:
             With pHeader 'now header data
                 retval &= FileName
                 retval &= vbTab & .version
-                retval &= vbTab & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
+                retval &= vbTab & Year & "/" & Month & "/" & Day
                 retval &= vbTab & pNumFields
                 retval &= vbTab & .NumRecs
                 retval &= vbTab & .NumBytesHeader
