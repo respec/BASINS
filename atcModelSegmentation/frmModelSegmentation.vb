@@ -7,8 +7,8 @@ Friend Class frmModelSegmentation
     Event OpenTableEditor(ByVal aLayerName As String)
     Event TableEdited()
 
-    Private pSubbasinLayerNameUserPrompt As String = "Select SubBasins Layer Shapefile"
-    Private pMetStationsLayerNameUserPrompt As String = "Select MetStations Layer Shapefile"
+    Private pSubbasinLayerNameUserPrompt As String = "Select Subbasins Layer Shapefile"
+    Private pMetStationsLayerNameUserPrompt As String = "Select Met Stations Layer Shapefile"
     Private pTitle As String = "BASINS Model Segmentation"
 
     Private Sub cmdAssign_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAssign.Click
@@ -176,6 +176,9 @@ Friend Class frmModelSegmentation
 
     Private Sub cmdEditTable_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEditTable.Click
         Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
+        Dim lModelSegFieldIndex As Integer = MetSegFieldIndex(lSubbasinLayerIndex)  'add field if is does not yet exist
+
         If lSubbasinLayerName <> pSubbasinLayerNameUserPrompt Then
             RaiseEvent OpenTableEditor(lSubbasinLayerName)
             Me.Focus()
@@ -201,4 +204,5 @@ Friend Class frmModelSegmentation
             End If
         End If
     End Sub
+
 End Class
