@@ -43,6 +43,8 @@ Public Class atcDataAttributes
         Dim lKey As String = AttributeNameToKey((aDefinition.Name))
         If Not pAllDefinitions.Keys.Contains(lKey) Then
             pAllDefinitions.Add(lKey, aDefinition)
+        ElseIf aDefinition.Calculated Then
+            pAllDefinitions.ItemByKey(lKey) = aDefinition
         End If
     End Sub
 
@@ -280,8 +282,8 @@ Public Class atcDataAttributes
                 .Add("datcre", "Date Created")
                 .Add("datmod", "Date Modified")
 
-                .Add("start date", "SJDay")
-                .Add("end date", "EJDay")
+                .Add("sjday", "Start Date")
+                .Add("ejday", "End Date")
 
                 .Add("latdeg", "Latitude")
                 .Add("lngdeg", "Longitude")
