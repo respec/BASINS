@@ -67,9 +67,9 @@ Public Class atcTimeseriesStatistics
 
                 AddOperation("Count Zero", "Count of values equal to zero", defTimeSeriesOne, lCategory, "Integer", 0)
 
-                AddOperation("SJDay", "Starting Julian Date", defTimeSeriesOne, lCategory)
+                AddOperation("Start Date", "Starting Julian Date", defTimeSeriesOne, lCategory)
 
-                AddOperation("EJDay", "Ending Julian Date", defTimeSeriesOne, lCategory)
+                AddOperation("End Date", "Ending Julian Date", defTimeSeriesOne, lCategory)
 
                 AddOperation("Max", "Maximum value", defTimeSeriesOne, lCategory)
 
