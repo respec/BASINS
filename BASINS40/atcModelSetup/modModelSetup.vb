@@ -11,21 +11,23 @@ Module modModelSetup
     Friend Sub StartWinHSPF(ByVal aCommand As String)
         Dim lWinHSPFexe As String
 
-        ''todo:  get this from the registry
-        'WinHSPFexe = "c:\basins\models\hspf\bin\winhspf.exe"
-        'If Not FileExists(WinHSPFexe) Then
-        '    WinHSPFexe = "d:\basins\models\hspf\bin\winhspf.exe"
-        'End If
-        'If Not FileExists(WinHSPFexe) Then
-        '    WinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
-        'End If
-        'If Not FileExists(WinHSPFexe) Then
-        '    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        '    WinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
-        'End If
-        'If Not FileExists(WinHSPFexe) Then
-        lWinHSPFexe = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
-        'End If
+        'todo:  get this from the registry
+        lWinHSPFexe = "c:\basins\models\hspf\bin\winhspf.exe"
+        If Not FileExists(lWinHSPFexe) Then
+            lWinHSPFexe = "d:\basins\models\hspf\bin\winhspf.exe"
+        End If
+        If Not FileExists(lWinHSPFexe) Then
+            lWinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
+        End If
+        If Not FileExists(lWinHSPFexe) Then
+            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            lWinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
+        End If
+        If Not FileExists(lWinHSPFexe) Then
+            'if we cant find it in any of the common places, use findfile
+            lWinHSPFexe = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
+        End If
+
         If FileExists(lWinHSPFexe) Then
             Logger.Dbg("StartWinHSPF:" & lWinHSPFexe & ":" & aCommand)
             Process.Start(lWinHSPFexe, aCommand)
@@ -37,12 +39,18 @@ Module modModelSetup
 
     Friend Sub StartAQUATOX(ByVal aCommand As String)
         Dim lAQUATOXexe As String
-        'Dim reg As New ATCoRegistry
 
         'todo:  get this from the registry
         'AQUATOXexe = reg.RegGetString(HKEY_LOCAL_MACHINE, "SOFTWARE\Eco Modeling\AQUATOX\ExePath", "") & "\AQUATOX.exe"
-        'lAQUATOXexe = "\basins\models\AQUATOX\AQUATOX.exe"
-        lAQUATOXexe = FindFile("Please locate AQUATOX.exe", "AQUATOX.exe")
+        lAQUATOXexe = "\Program Files\AQUATOX_R3\Program\AQUATOX.EXE"
+        If Not FileExists(lAQUATOXexe) Then
+            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            lAQUATOXexe = Left(lBasinsBinLoc, 2) & lAQUATOXexe
+        End If
+        If Not FileExists(lAQUATOXexe) Then
+            'if we cant find it in any of the common places, use findfile
+            lAQUATOXexe = FindFile("Please locate AQUATOX.exe", "AQUATOX.exe")
+        End If
 
         If FileExists(lAQUATOXexe) Then
             Logger.Dbg("StartAQUATOX:" & lAQUATOXexe & ":" & aCommand)
