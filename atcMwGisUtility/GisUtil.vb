@@ -971,7 +971,7 @@ Public Class GisUtil
     Public Shared Function IndexOfNthSelectedFeatureInLayer(ByVal nth As Integer, ByVal aLayerIndex As Integer) As Integer
         Dim lsi As MapWindow.Interfaces.SelectInfo = GetMappingObject.View.SelectedShapes
         Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
-        If lsi.LayerHandle = aLayerIndex Then
+        If CurrentLayer = aLayerIndex Then
             IndexOfNthSelectedFeatureInLayer = lsi.Item(nth).ShapeIndex
         End If
     End Function

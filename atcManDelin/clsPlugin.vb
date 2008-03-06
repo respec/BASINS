@@ -157,12 +157,12 @@ Public Class PlugIn
 End Class
 
 Module ManDelin
-    Public Sub CalculateSubbasinParamters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String)
+    Public Sub CalculateSubbasinParameters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String)
         Logger.Status("Calculating...")
         Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubBasinThemeName)
         Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(aElevationThemeName)
 
-        'calculate average elev
+        'calculate average elev -- this is not actually used anywhere, so why calculate it
         'does mean elev field exist on subbasin shapefile?
         'MeanElevationFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "MEANELEV")
         'If MeanElevationFieldIndex = -1 Then
@@ -247,10 +247,9 @@ Module ManDelin
             Logger.Status("Calculating Slope from Elevation Grid")
             Dim lSubbasinCount As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
             For lSubbasinIndex As Integer = 1 To lSubbasinCount
+                Logger.Status("Calculating Slope from Elevation Grid")
                 Logger.Progress(lSubbasinIndex, lSubbasinCount)
-                'GisUtil.GridMinMaxInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1, minelev, maxelev)
                 'store in slope field as percent
-                'slope = 100 * (maxelev - minelev) / ((GisUtil.FeatureArea(SubbasinLayerIndex, i - 1)) ^ 0.5)
                 If GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSlopeFieldIndex) <= 0 Then
                     lSlope = GisUtil.GridSlopeInPolygon(lElevationLayerIndex, lSubbasinLayerIndex, lSubbasinIndex - 1)
                     If Not GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\ned\") > -1 Then
