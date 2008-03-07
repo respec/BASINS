@@ -2,8 +2,7 @@ Imports atcData
 Imports atcUtility
 
 Friend Class frmBLM
-    Private Const NOTHING_VALUE As String = "~Missing~"
-    Dim pPlugIn As BasinsBLM.PlugIn
+    Private pPlugIn As BasinsBLM.PlugIn
 
     Friend Sub New(ByVal aPlugIn As BasinsBLM.PlugIn, Optional ByRef aDataGroup As atcData.atcDataGroup = Nothing)
         MyBase.New()
@@ -16,7 +15,6 @@ Friend Class frmBLM
         End If
 
         If aDataGroup.Count > 0 Then
-            'pDataGroup = aDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
             PopulateCriteriaList(aDataGroup)
             'Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
             'For Each ldisp As atcDataDisplay In DisplayPlugins
@@ -29,12 +27,11 @@ Friend Class frmBLM
         End If
     End Sub
 
-    Private WithEvents pDataGroup As atcDataGroup   'group of atcData displayed
-
     Private Sub btnRun_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRun.Click
         Dim lSource As ListSource = atcGridLocation.Source
-        For Each lLocation As String In lSource.SelectedItems
-            pPlugIn.RunBLM(lLocation)
+        For lIndex As Integer = 0 To lSource.SelectedItems.Count - 1
+            Dim lRowIndex As Integer = lSource.SelectedItems.Keys(lIndex)
+            pPlugIn.RunBLM(lSource.CellValue(lRowIndex, 0), lSource.CellValue(lRowIndex, 1))
         Next
     End Sub
 
@@ -42,15 +39,18 @@ Friend Class frmBLM
         Dim lAttributeName As String = "Location"
 
         Dim lLocationList As New atcCollection
+        Dim lLocationName As New atcCollection
         For Each lDataSet As atcDataSet In aDataGroup
             Dim lLocation As String = lDataSet.Attributes.GetValue(lAttributeName, "")
-            lLocationList.Increment(lLocation, 1)
+            If lLocationList.Increment(lLocation, 1) = 1 Then
+                lLocationName.Add(lLocation, lDataSet.Attributes.GetValue("StaNam", ""))
+            End If
         Next
 
         Dim lLocationListOK As New atcCollection
         For Each lLocation As String In lLocationList.Keys
             If lLocationList.ItemByKey(lLocation) > 8 Then 'have enough data (maybe!)
-                lLocationListOK.Add(lLocation)
+                lLocationListOK.Add(lLocation, lLocationName.ItemByKey(lLocation))
             End If
         Next
 
@@ -67,7 +67,7 @@ Friend Class frmBLM
         If lIndex >= 0 Then
             lSource.SelectedItems.RemoveAt(lIndex)
         Else
-            lSource.SelectedItems.Add(aRow, lSource.CellValue(aRow, aColumn))
+            lSource.SelectedItems.Add(aRow, lSource.CellValue(aRow, 0))  'use the location
         End If
         aGrid.Refresh()
     End Sub
@@ -99,7 +99,7 @@ Friend Class ListSource
 
     Overrides Property Columns() As Integer
         Get
-            Return 1
+            Return 2
         End Get
         Set(ByVal Value As Integer)
         End Set
@@ -117,7 +117,11 @@ Friend Class ListSource
     Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
         Get
             Try
-                Return pValues.ItemByIndex(aRow)
+                If aColumn = 0 Then
+                    Return pValues.Keys(aRow)
+                Else
+                    Return pValues.ItemByIndex(aRow)
+                End If
             Catch
                 Return ""
             End Try

@@ -77,14 +77,16 @@ Public Class atcCollection
         End If
     End Function
 
-    Public Sub Increment(ByVal aKey As Object, ByVal aValue As Double)
+    Public Function Increment(ByVal aKey As Object, ByVal aValue As Double) As Double
         Dim lKeyIndex As Integer = IndexFromKey(aKey)
         If lKeyIndex = -1 Then
             Add(aKey, aValue)
+            Return aValue
         Else
             Item(lKeyIndex) += aValue
+            Return Item(lKeyIndex)
         End If
-    End Sub
+    End Function
 
     Public Shadows Sub AddRange(ByVal aC As System.Collections.ICollection)
         pKeys.AddRange(aC)
