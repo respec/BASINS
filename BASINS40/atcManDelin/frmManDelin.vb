@@ -438,50 +438,14 @@ Public Class frmManDelin
         pXpts = New Collection
         pYPts = New Collection
         cmdDelineate.Enabled = False
+        cmdCombine.Enabled = False
         cboLayer.Enabled = False
         cmdCommit.Enabled = True
         cmdCancel.Enabled = True
         lblDelin.Visible = True
         If pOperatingShapefileName.Length = 0 Then
             'first time to delineate
-            'get name of current subbasin layer from combo box
-            For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
-                If GisUtil.LayerName(lLayerIndex).Trim = cboLayer.SelectedItem.ToString.Trim Then
-                    pOperatingShapefileName = GisUtil.LayerFileName(lLayerIndex)
-                End If
-            Next lLayerIndex
-            'now open new file for output
-            Dim pOutputPath As String = PathNameOnly(pOperatingShapefileName) & "\Watershed"
-            If Not FileExists(pOutputPath, True, False) Then
-                MkDirPath(pOutputPath)
-            End If
-            Dim lIndex As Integer = 1
-            Dim lOutputFileName As String = pOutputPath & "\subbasin" & lIndex & ".shp"
-            Do While FileExists(lOutputFileName)
-                lIndex += 1
-                lOutputFileName = pOutputPath & "\subbasin" & lIndex & ".shp"
-            Loop
-            'copy the base shapefile to the new name
-            System.IO.File.Copy(pOperatingShapefileName, lOutputFileName)
-            Dim ilen As Integer = pOperatingShapefileName.Length
-            Dim jlen As Integer = lOutputFileName.Length
-            System.IO.File.Copy(Mid(pOperatingShapefileName, 1, ilen - 3) & "dbf", Mid(lOutputFileName, 1, jlen - 3) & "dbf")
-            System.IO.File.Copy(Mid(pOperatingShapefileName, 1, ilen - 3) & "shx", Mid(lOutputFileName, 1, jlen - 3) & "shx")
-            Dim lInputProjectionFileName As String = FilenameSetExt(pOperatingShapefileName, "prj")
-            If FileExists(lInputProjectionFileName) Then
-                FileCopy(lInputProjectionFileName, FilenameSetExt(lOutputFileName, "prj"))
-            End If
-            pOperatingShapefileName = lOutputFileName
-
-            'clear out old fields
-            'Dim newOperatingShapefile As New MapWinGIS.Shapefile
-            'newOperatingShapefile.Open(OperatingShapefile)
-            'newOperatingShapefile.StartEditingTable()
-            'Do While newOperatingShapefile.NumFields > 1
-            '  newOperatingShapefile.EditDeleteField(0)
-            'Loop
-            'newOperatingShapefile.StopEditingTable(True)
-            'newOperatingShapefile.Close()
+            pOperatingShapefileName = ChangeNameCurrentOperatingShapefile(False)
         End If
     End Sub
 
@@ -516,6 +480,7 @@ Public Class frmManDelin
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         pStartDrawing = False
         cmdDelineate.Enabled = True
+        cmdCombine.Enabled = True
         'cboLayer.Enabled = True
         cmdCommit.Enabled = False
         cmdCancel.Enabled = False
@@ -537,6 +502,7 @@ Public Class frmManDelin
     Private Sub CommitLine()
         pStartDrawing = False
         cmdDelineate.Enabled = True
+        cmdCombine.Enabled = True
         'cboLayer.Enabled = True
         cmdCommit.Enabled = False
         cmdCancel.Enabled = False
@@ -647,8 +613,8 @@ Public Class frmManDelin
             'pMapWin.View.Draw.ClearDrawing(lPointIndex - 2)
             pMapWin.View.Draw.ClearDrawing(lPointIndex)
         Next lPointIndex
-        Do While pXpts.Count > 0
-            pXpts.Remove(1)
+        Do While pXPts.Count > 0
+            pXPts.Remove(1)
             pYPts.Remove(1)
         Loop
 
@@ -736,8 +702,36 @@ Public Class frmManDelin
     Private Sub cmdCombine_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCombine.Click
         'combine selected subbasins
 
-        'get index of current subbasin layer 
         Dim lMergeLayerIndex As Integer
+
+        If pOperatingShapefileName.Length = 0 Then
+            'change name of operating shapefile
+            'get index of current subbasin layer 
+            For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
+                If GisUtil.LayerName(lLayerIndex).Trim = cboLayer.SelectedItem.ToString.Trim Then
+                    lMergeLayerIndex = lLayerIndex
+                End If
+            Next lLayerIndex
+            'build collection of selected shape indexes
+            Dim lSelectedShapeIndexes As New atcCollection
+            For lIndex As Integer = 1 To GisUtil.NumSelectedFeatures(lMergeLayerIndex)
+                lSelectedShapeIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex - 1, lMergeLayerIndex))
+            Next
+            'change name of operating shapefile
+            pOperatingShapefileName = ChangeNameCurrentOperatingShapefile(True)
+            'get index of new subbasin layer 
+            For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
+                If GisUtil.LayerName(lLayerIndex).Trim = cboLayer.SelectedItem.ToString.Trim Then
+                    lMergeLayerIndex = lLayerIndex
+                End If
+            Next lLayerIndex
+            'set selected features in new shapefile
+            For lIndex As Integer = 1 To lSelectedShapeIndexes.Count
+                GisUtil.SetSelectedFeature(lMergeLayerIndex, lSelectedShapeIndexes(lIndex - 1))
+            Next
+        End If
+
+        'get index of current subbasin layer 
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
             If GisUtil.LayerName(lLayerIndex).Trim = cboLayer.SelectedItem.ToString.Trim Then
                 lMergeLayerIndex = lLayerIndex
@@ -748,4 +742,59 @@ Public Class frmManDelin
         GisUtil.MergeSelectedShapes(lMergeLayerIndex)
 
     End Sub
+
+    Private Function ChangeNameCurrentOperatingShapefile(ByVal aAddtoView As Boolean) As String
+        'get name of current subbasin layer from combo box
+        For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
+            If GisUtil.LayerName(lLayerIndex).Trim = cboLayer.SelectedItem.ToString.Trim Then
+                pOperatingShapefileName = GisUtil.LayerFileName(lLayerIndex)
+            End If
+        Next lLayerIndex
+        'now open new file for output
+        Dim pOutputPath As String = PathNameOnly(pOperatingShapefileName) & "\Watershed"
+        If Not FileExists(pOutputPath, True, False) Then
+            MkDirPath(pOutputPath)
+        End If
+        Dim lIndex As Integer = 1
+        Dim lOutputFileName As String = pOutputPath & "\subbasin" & lIndex & ".shp"
+        Do While FileExists(lOutputFileName)
+            lIndex += 1
+            lOutputFileName = pOutputPath & "\subbasin" & lIndex & ".shp"
+        Loop
+        'copy the base shapefile to the new name
+        System.IO.File.Copy(pOperatingShapefileName, lOutputFileName)
+        Dim ilen As Integer = pOperatingShapefileName.Length
+        Dim jlen As Integer = lOutputFileName.Length
+        System.IO.File.Copy(Mid(pOperatingShapefileName, 1, ilen - 3) & "dbf", Mid(lOutputFileName, 1, jlen - 3) & "dbf")
+        System.IO.File.Copy(Mid(pOperatingShapefileName, 1, ilen - 3) & "shx", Mid(lOutputFileName, 1, jlen - 3) & "shx")
+        Dim lInputProjectionFileName As String = FilenameSetExt(pOperatingShapefileName, "prj")
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameSetExt(lOutputFileName, "prj"))
+        End If
+
+        If aAddtoView Then
+            'is this layer already in the view?
+            Dim lInView As Boolean = False
+            For lLayerIndex As Integer = 1 To GisUtil.NumLayers()
+                If GisUtil.LayerFileName(lLayerIndex - 1) = lOutputFileName Then
+                    'already in the view
+                    lInView = True
+                End If
+            Next lLayerIndex
+            If Not lInView Then
+                'add it to the cbolayers
+                cboLayer.Items.Add("Subbasins")
+                cboLayer.SelectedIndex = cboLayer.Items.Count - 1
+                'add output layer to the view
+                Dim lOperatingShapeFile As New MapWinGIS.Shapefile
+                lOperatingShapeFile.Open(lOutputFileName)
+                pMapWin.Layers.Add(lOperatingShapeFile, "Subbasins")
+                pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).Color = System.Drawing.Color.Transparent
+                pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).OutlineColor = System.Drawing.Color.Red
+                pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).DrawFill = False
+            End If
+        End If
+
+        Return lOutputFileName
+    End Function
 End Class

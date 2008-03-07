@@ -657,7 +657,6 @@ Public Class frmReclass
             cmdAdd.Visible = False
             cmdDelete.Visible = False
         Else
-            AtcGridLanduse.SizeAllColumnsToContents()
             If pSubbasinsLayer = "<none>" Then
                 AtcGridLanduse.ColumnWidth(2) = 0
             End If
@@ -665,6 +664,7 @@ Public Class frmReclass
             AtcGridLanduse.ColumnWidth(6) = 10
             cmdAdd.Visible = True
             cmdDelete.Visible = True
+            AtcGridLanduse.SizeAllColumnsToContents()
         End If
         AtcGridLanduse.Refresh()
     End Sub
