@@ -7,6 +7,7 @@ Public Class atcGrid
     Event CellEdited(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
     Event MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
     Event UserResizedColumn(ByVal aGrid As atcGrid, ByVal aColumn As Integer, ByVal aWidth As Integer)
+    Event KeyDownGrid(ByVal aGrid As atcGrid, ByVal e As System.Windows.Forms.KeyEventArgs)
 
     Private WithEvents pSource As atcGridSource
 
@@ -326,6 +327,10 @@ Public Class atcGrid
         End Set
     End Property
 
+    Private Sub atcGrid_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        RaiseEvent KeyDownGrid(Me, e)
+    End Sub
+
     Private Sub ATCgrid_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles MyBase.Paint
         Me.Render(e.Graphics)
     End Sub
@@ -389,6 +394,18 @@ Public Class atcGrid
             HScroller.Visible = False
         End If
     End Function
+
+    Public Sub EnsureRowVisible(ByVal aRow As Integer)
+        If VScroller.Visible Then
+            If aRow <= pRowsScrolled Then 'Scroll back up to row
+                VScroller.Value = aRow
+                Refresh()
+            ElseIf aRow - pRowsScrolled + 1 >= pRowBottom.Count Then
+                VScroller.Value = Math.Min(aRow, VScroller.Maximum - VScroller.LargeChange + 1)
+                Refresh()
+            End If
+        End If
+    End Sub
 
     Private Sub Render(ByVal g As Graphics)
         Try
@@ -987,20 +1004,20 @@ Public Class atcGrid
         scrollCorner.Visible = VScroller.Visible And HScroller.Visible
     End Sub
 
-    Private Sub VScroller_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles VScroller.KeyDown
-        If e.KeyCode = Keys.NumLock Then
-            MsgBox("VScroller.Width = " & VScroller.Width & ", .Left =" & VScroller.Left & ", Me.Width = " & Me.Width & ", Width - VS.Width = " & Me.Width - VScroller.Width & vbCrLf & _
-            "HScroller.Height = " & HScroller.Height & ", .Top =" & HScroller.Top & ", Me.Height = " & Me.Height & ", Height - HS.Height = " & Me.Height - HScroller.Height & vbCrLf & _
-            "VScroller.Value = " & VScroller.Value & ", Min = " & VScroller.Minimum & ", Max = " & VScroller.Maximum & ", LargeChange = " & VScroller.LargeChange & ", pSource.Rows = " & pSource.Rows & ", FixedRows = " & pSource.FixedRows)
-        End If
-    End Sub
-
     Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged
         VScroller.Focus()
         If pRowsScrolled <> VScroller.Value Then
             pRowsScrolled = VScroller.Value
             Refresh()
         End If
+    End Sub
+
+    Private Sub VScroller_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles VScroller.KeyDown
+        RaiseEvent KeyDownGrid(Me, e)
+    End Sub
+
+    Private Sub HScroller_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles HScroller.KeyDown
+        RaiseEvent KeyDownGrid(Me, e)
     End Sub
 
     Private Sub HScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HScroller.ValueChanged

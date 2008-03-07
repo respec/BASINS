@@ -304,6 +304,7 @@ Friend Class frmSelectData
     Private pcboCriteria() As Windows.Forms.ComboBox
     Private plstCriteria() As atcGrid
     Private pCriteriaFraction() As Single
+    Private pCriteriaSearch As String = "" 'recently typed characters of incremental search in criteria list
 
     Private pMatchingGroup As atcDataGroup
     Private WithEvents pSelectedGroup As atcDataGroup
@@ -508,6 +509,50 @@ NextTS:
         End If
     End Sub
 
+    Private Sub lstCriteria_GotFocus(ByVal aSource As Object, ByVal e As System.EventArgs)
+        pCriteriaSearch = ""
+    End Sub
+
+    ''' <summary>
+    ''' Scroll list to show first item whose beginning matches what the user is typing
+    ''' </summary>
+    ''' <param name="aGrid">atcGrid to scroll</param>
+    ''' <param name="e">KeyDown Event Args</param>
+    ''' <remarks>Typing more than one character in a row is supported. 
+    ''' If an item is not found that starts with the multiple typed characters, 
+    ''' search is reset to find an item starting with just the most recently typed character.
+    ''' Pressing a key for a non-printable character (for example Backspace) resets search.</remarks>
+    Private Sub lstCriteria_KeyDownGrid(ByVal aGrid As atcGrid, ByVal e As System.Windows.Forms.KeyEventArgs)
+        Try
+            Select Case e.KeyCode
+                Case Keys.Space To Keys.Z
+                    Dim lSource As ListSource = aGrid.Source
+                    Dim lMatchRow As Integer = -1
+                    pCriteriaSearch &= Chr(e.KeyCode)
+                    While lMatchRow < 0 AndAlso pCriteriaSearch.Length > 0
+                        For lRow As Integer = lSource.FixedRows To lSource.Rows
+                            If lSource.CellValue(lRow, 0).ToUpper.StartsWith(pCriteriaSearch) Then
+                                lMatchRow = lRow
+                                Exit For
+                            End If
+                        Next
+                        If lMatchRow >= 0 Then
+                            aGrid.EnsureRowVisible(lMatchRow)
+                        ElseIf pCriteriaSearch.Length > 1 Then
+                            pCriteriaSearch = Chr(e.KeyCode) 'Start a new search with just most recently typed character
+                        Else
+                            pCriteriaSearch = ""
+                        End If
+                    End While
+
+                Case Else
+                    pCriteriaSearch = ""
+            End Select
+        Catch ex As Exception
+            Logger.Dbg("Exception trying to ensure criteria visible: " & ex.Message)
+        End Try
+    End Sub
+
     Private Sub lstCriteria_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
         Dim lSource As ListSource = aGrid.Source
         Dim lIndex As Integer = lSource.SelectedItems.IndexFromKey(aRow)
@@ -555,6 +600,10 @@ NextTS:
         Dim OldToNew As Single = 1 / (1 - pCriteriaFraction(iRemoving))
         RemoveHandler cbo.SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
         RemoveHandler lst.MouseDownCell, AddressOf lstCriteria_MouseDownCell
+        RemoveHandler lst.KeyDownGrid, AddressOf lstCriteria_KeyDownGrid
+        RemoveHandler lst.GotFocus, AddressOf lstCriteria_GotFocus
+
+
         panelCriteria.Controls.Remove(cbo)
         panelCriteria.Controls.Remove(lst)
 
@@ -615,6 +664,8 @@ NextTS:
 
         AddHandler pcboCriteria(iCriteria).SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
         AddHandler plstCriteria(iCriteria).MouseDownCell, AddressOf lstCriteria_MouseDownCell
+        AddHandler plstCriteria(iCriteria).KeyDownGrid, AddressOf lstCriteria_KeyDownGrid
+        AddHandler plstCriteria(iCriteria).GotFocus, AddressOf lstCriteria_GotFocus
 
         With pcboCriteria(iCriteria)
             .Name = "cboCriteria#" & iCriteria
