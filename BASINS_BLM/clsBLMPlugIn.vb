@@ -66,19 +66,30 @@ Public Class PlugIn
         lAttributes.Add("Units")
         Dim lTimeseriesGridSource As New atcTimeseriesGridSource(lConstituentData, lAttributes, True)
         With lTimeseriesGridSource
-            For lRowIndex As Integer = 0 To .Rows
+            For lRowIndex As Integer = 2 To .Rows ' skip name and units
                 Dim lDataCount As Integer = 0
+                Dim lDataColumn(12) As Integer 'a fresh copy
                 For lColumnIndex As Integer = 1 To .Columns
                     Dim lCellValue As String = .CellValue(lRowIndex, lColumnIndex)
                     If lCellValue.Length > 0 AndAlso IsNumeric(lCellValue) Then
-                        lDataCount += 1
+                        Dim lDataIndex As Integer = lConstituents.IndexFromKey(.CellValue(0, lColumnIndex))
+                        If lDataIndex > -1 AndAlso lDataColumn(lDataIndex) = 0 Then
+                            lDataColumn(lDataIndex) = lColumnIndex
+                            lDataCount += 1
+                        End If
                     End If
                 Next
-                If lDataCount > 6 Then
-                    lString = Chr(34) & "T" & Chr(34) & ", " & _
-                    Chr(34) & aLocation & Chr(34) & ", " & _
-                    Chr(34) & .CellValue(lRowIndex, 0) & Chr(34) & ", "
-                    'TODO: include the data!
+                If lDataCount > 8 Then
+                    lString = Chr(34) & "T" & Chr(34) & "," & _
+                              Chr(34) & aLocation & Chr(34) & "," & _
+                              Chr(34) & .CellValue(lRowIndex, 0).PadRight(20) & Chr(34) & ","
+                    For lDataIndex As Integer = 0 To 12
+                        If lDataColumn(lDataIndex) > 0 Then
+                            lString &= .CellValue(lRowIndex, lDataColumn(lDataIndex)).PadLeft(14)
+                        Else
+                            lString &= Space(14)
+                        End If
+                    Next
                     lOutputDataRecords.Add(lString)
                 End If
             Next
@@ -91,12 +102,18 @@ Public Class PlugIn
         'data headers
         lSB.AppendLine(lOutputDataRecords.Count)
         lSB.AppendLine(aStationName & " (USGS Station Number " & aLocation & ")")
-        lString = "Site Label             Sample Label                "
+        lString = "Site Label             Sample Label  "
         For Each lConstituent As String In lConstituents
             lString &= lConstituent.PadLeft(14)
         Next
         lSB.AppendLine(lString)
-        lSB.AppendLine("TODO:add units")
+
+        'TODO: don't hard code!!
+        lString = Space(35) & "C".PadLeft(14) & "%".PadLeft(14) & Space(14)
+        For lIndex As Integer = 0 To 8
+            lString &= "mg/L".PadLeft(14)
+        Next
+        lSB.AppendLine(lString)
         'data
         For Each lString In lOutputDataRecords
             lSB.AppendLine(lString)
@@ -107,6 +124,7 @@ Public Class PlugIn
         lSB.AppendLine("3,5,-999")
         Dim lDataPath As String = PathNameOnly(pMapWin.Project.FileName) & "\BLM\"
         SaveFileString(lDataPath & aLocation & ".blm", lSB.ToString)
+        SaveFileString(lDataPath & aLocation & ".grid", lTimeseriesGridSource.ToString)
 
         'BLM must be installed and have the file extension associated with the exe for this to work!
         OpenFile(lDataPath & aLocation & ".blm", True)
@@ -116,8 +134,8 @@ Public Class PlugIn
 
     Private Function ConstituentsNeeded() As atcCollection
         Dim lConstituents As New atcCollection
-        lConstituents.Add("Temperature", "Temperature")
-        lConstituents.Add("Humic Acid Fraction", "HA:10")
+        lConstituents.Add("Temperature", "Temp.")
+        lConstituents.Add("Humic Acid Fraction", "HA")
         lConstituents.Add("pH", "pH")
         lConstituents.Add("Copper", "Cu")
         lConstituents.Add("Organic carbon", "DOC")
