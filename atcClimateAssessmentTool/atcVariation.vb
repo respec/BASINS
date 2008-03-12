@@ -45,7 +45,7 @@ Public Class atcVariation
     Public EventDurationDays As Double
     'Public EventDurationDisplayUnits As String
 
-    Public FlashVolumeFraction As Double
+    Public IntensifyVolumeFraction As Double
 
     Public IsInput As Boolean
 
@@ -200,7 +200,7 @@ Public Class atcVariation
                     Next
                 End If
 
-                If Operation <> "Flash" Then
+                If Operation <> "Intensify" Then
                     lModifyThis = MergeTimeseries(lEvents)
                     lSplitData = New atcDataGroup(lModifyThis)
                     lSplitData.Add(lOriginalData)
@@ -235,7 +235,7 @@ Public Class atcVariation
                     End If
 
                     'TODO Case "AddVolume"
-                Case "Flash"
+                Case "Intensify"
                     'if there are seasons, modify data only from selected seasons
                     Dim lSplitOriginalData As atcDataGroup
                     If Seasons Is Nothing Then
@@ -244,17 +244,17 @@ Public Class atcVariation
                         lSplitOriginalData = Seasons.SplitBySelected(lOriginalData, Nothing)
                     End If
                     Dim lTotalVolume As Double = lSplitOriginalData.ItemByIndex(0).Attributes.GetValue("Sum")
-                    Dim lEventFlashFactor As Double
+                    Dim lEventIntensifyFactor As Double
                     Dim lCurrentVolume As Double = 0
                     Dim lTargetChange As Double = CurrentValue / 100 * lTotalVolume
                     Dim lNewEventTotalVolume As Double = 0.0
 
                     Try
-                        If Not Double.IsNaN(FlashVolumeFraction) Then
-                            Dim lTargetVolumeToFlash As Double = lTotalVolume * FlashVolumeFraction
-                            Logger.Dbg("TargetChange " & DecimalAlign(lTargetChange) & " TargetVolumeToFlash " & DecimalAlign(lTargetVolumeToFlash))
+                        If Not Double.IsNaN(IntensifyVolumeFraction) Then
+                            Dim lTargetVolumeToIntensify As Double = lTotalVolume * IntensifyVolumeFraction
+                            Logger.Dbg("TargetChange " & DecimalAlign(lTargetChange) & " TargetVolumeToIntensify " & DecimalAlign(lTargetVolumeToIntensify))
                             'sort events by volume
-                            Logger.Dbg("Flash " & DecimalAlign(FlashVolumeFraction) & " CurrentValue " & DecimalAlign(CurrentValue))
+                            Logger.Dbg("Intensify " & DecimalAlign(IntensifyVolumeFraction) & " CurrentValue " & DecimalAlign(CurrentValue))
                             Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
                             For Each lEvent In lEvents
                                 Dim lEventVolume As Double = lEvent.Attributes.GetValue("Sum")
@@ -285,8 +285,8 @@ Public Class atcVariation
                                     End If
 
                                     lEvents.Add(lEvent)
-                                    If lCurrentVolume > lTargetVolumeToFlash Then
-                                        Logger.Dbg("Flash " & lNewEvents.Count - lEventIndex & " of " & lNewEvents.Count)
+                                    If lCurrentVolume > lTargetVolumeToIntensify Then
+                                        Logger.Dbg("Intensify " & lNewEvents.Count - lEventIndex & " of " & lNewEvents.Count)
                                         Exit For
                                     End If
                                 Next lEventIndex
@@ -296,21 +296,21 @@ Public Class atcVariation
                                     lCurrentVolume += lNewEvents.GetKey(lEventIndex)
                                     ' Logger.Dbg("CurrentVolumeRemoved " & lCurrentVolumeChange)
                                     lEvents.Add(lEvent)
-                                    If lCurrentVolume > lTargetVolumeToFlash Then
-                                        Logger.Dbg("NegativeFlash " & lEventIndex & " of " & lNewEvents.Count)
+                                    If lCurrentVolume > lTargetVolumeToIntensify Then
+                                        Logger.Dbg("NegativeIntensify " & lEventIndex & " of " & lNewEvents.Count)
                                         Exit For
                                     End If
                                 Next
                             End If
                         End If
                     Catch e As Exception
-                        Logger.Dbg("VaryDataException-EventFlashFactor " & e.Message)
+                        Logger.Dbg("VaryDataException-EventIntensifyFactor " & e.Message)
                     End Try
 
                     Logger.Dbg(" CurrentVolume " & DecimalAlign(lCurrentVolume) & _
                                " TargetChange " & DecimalAlign(lTargetChange))
-                    lEventFlashFactor = lTargetChange / lCurrentVolume
-                    Logger.Dbg("EventFlashFactor " & DecimalAlign(lEventFlashFactor))
+                    lEventIntensifyFactor = lTargetChange / lCurrentVolume
+                    Logger.Dbg("EventIntensifyFactor " & DecimalAlign(lEventIntensifyFactor))
                     lModifyThis = MergeTimeseries(lEvents)
                     lSplitData = New atcDataGroup(lModifyThis)
                     lSplitData.Add(lOriginalData)
@@ -319,7 +319,7 @@ Public Class atcVariation
                     ComputationSource.DataSets.Clear()
                     lArgsMath.Clear()
                     lArgsMath.SetValue("timeseries", lSplitTS)
-                    lArgsMath.SetValue("Number", 1 + lEventFlashFactor)
+                    lArgsMath.SetValue("Number", 1 + lEventIntensifyFactor)
                     ComputationSource.Open("Multiply", lArgsMath)
                     lModifiedTS = ComputationSource.DataSets(0)
                     lModifiedSplit.Add(ComputationSource.DataSets(0))
@@ -585,7 +585,7 @@ Public Class atcVariation
         EventDaysGapAllowed = 0
         'EventGapDisplayUnits = ""
         EventHigh = True
-        FlashVolumeFraction = pNaN
+        IntensifyVolumeFraction = pNaN
         'AddRemovePer = "Entire Span"
 
         EventVolumeHigh = True
@@ -617,7 +617,7 @@ Public Class atcVariation
                 .EventVolumeThreshold = EventVolumeThreshold
                 .EventDurationHigh = EventDurationHigh
                 .EventDurationDays = EventDurationDays
-                .FlashVolumeFraction = FlashVolumeFraction
+                .IntensifyVolumeFraction = IntensifyVolumeFraction
             End If
 
             If Not DataSets Is Nothing Then .DataSets = DataSets.Clone()
@@ -647,7 +647,7 @@ Public Class atcVariation
             If UseEvents Then
                 Return "  <Events Threshold='" & EventThreshold & "' " _
                               & " High='" & EventHigh & "' " _
-                              & " FlashVolumeFraction='" & FlashVolumeFraction & "' " _
+                              & " IntensifyVolumeFraction='" & IntensifyVolumeFraction & "' " _
                               & " GapDays='" & EventDaysGapAllowed & "' " _
                               & " VolumeHigh='" & EventVolumeHigh & "' " _
                               & " VolumeThreshold='" & EventVolumeThreshold & "' " _
@@ -667,7 +667,7 @@ Public Class atcVariation
                     UseEvents = True
                     EventThreshold = lXML.GetAttrValue("Threshold")
                     EventHigh = lXML.GetAttrValue("High")
-                    FlashVolumeFraction = lXML.GetAttrValue("FlashVolumeFraction")
+                    IntensifyVolumeFraction = lXML.GetAttrValue("IntensifyVolumeFraction")
                     EventDaysGapAllowed = lXML.GetAttrValue("GapDays")
                     'EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
 

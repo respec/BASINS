@@ -41,6 +41,7 @@ Public Module modTimeseriesMath
         If numNewValues > 0 Then
             Dim newValues(numNewValues) As Double
             Dim newDates(numNewValues) As Double
+            newValues(0) = GetNaN()
 
             System.Array.Copy(aTimeseries.Dates.Values, lStart, newDates, 0, numNewValues + 1)
             System.Array.Copy(aTimeseries.Values, lStart + 1, newValues, 1, numNewValues)

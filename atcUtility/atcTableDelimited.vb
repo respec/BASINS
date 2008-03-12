@@ -9,20 +9,20 @@ Imports MapWinUtility
 ''' </summary>
 ''' <remarks>
 ''' Default field delimiter is a comma
-''' First row is read as field names
+''' First row after NumHeaderRows is read as field names
 ''' </remarks>
 Public Class atcTableDelimited
     Inherits atcTable
 
     Private pFilename As String
-    Private pFieldNames() As String
+    Friend pFieldNames() As String
     Private pFieldLengths() As Integer
-    Private pHeader As New ArrayList
+    Private pFieldTypes() As String
+    Friend pHeader As New ArrayList
     Private pNumFields As Integer
     Private pNumHeaderRows As Integer = -1
     Private pCurrentRowValues() As String
-    Private pRecords() As String
-    Private pNumRecords As Integer
+    Friend pRecords As New ArrayList
     Private pCurrentRecord As Integer
     Private pCurrentRecordStart As Integer
     Private pDelimiter As Char = Chr(44) 'default to Chr(44) = comma
@@ -33,7 +33,7 @@ Public Class atcTableDelimited
         End Get
         Set(ByVal newValue As Integer)
             Try
-                If newValue < 1 Or newValue > pNumRecords Then
+                If newValue < 1 Or newValue > NumRecords Then
                     pCurrentRecord = 1
                 Else
                     pCurrentRecord = newValue
@@ -91,22 +91,6 @@ Public Class atcTableDelimited
         End Set
     End Property
 
-    ''C = Character, D = Date, N = Numeric, L = Logical, M = Memo
-    'Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
-    '  Get
-    '    If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-    '      FieldType = pFields(aFieldNumber).FieldType
-    '    Else
-    '      FieldType = "Undefined"
-    '    End If
-    '  End Get
-    '  Set(ByVal newValue As String)
-    '    If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-    '      pFields(aFieldNumber).FieldType = newValue
-    '    End If
-    '  End Set
-    'End Property
-
     Public Overrides Property NumFields() As Integer
         Get
             NumFields = pNumFields
@@ -116,9 +100,11 @@ Public Class atcTableDelimited
             pNumFields = newValue
             ReDim pFieldNames(pNumFields)
             ReDim pFieldLengths(pNumFields)
+            ReDim pFieldTypes(pNumFields)
             For iField = 1 To pNumFields
                 pFieldNames(iField) = ""
                 pFieldLengths(iField) = 0
+                pFieldTypes(iField) = ""
             Next
         End Set
     End Property
@@ -145,21 +131,17 @@ Public Class atcTableDelimited
     Public Property Header(ByVal aHeaderRow As Integer) As String
         Get
             If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                Return "Invalid Current Record Number"
+                Return "Header row " & aHeaderRow & " outside available range (1 to " & pHeader.Count & ")"
             Else
                 Return pHeader(aHeaderRow - 1)
             End If
         End Get
         Set(ByVal newValue As String)
-            On Error GoTo ErrHand
             If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                'Value = "Invalid Field Number"
+                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeader.Count & "." & vbCr & Err.Description)
             Else
                 pHeader(aHeaderRow - 1) = newValue
             End If
-            Exit Property
-ErrHand:
-            Logger.Msg("Cannot set header record #" & aHeaderRow & ".  Record number must be between 1 and " & pHeader.Count & "." & vbCr & Err.Description, "Header")
         End Set
     End Property
 
@@ -168,10 +150,7 @@ ErrHand:
     ''' </summary>
     Public Property Header() As String
         Get
-            Header = ""
-            For Each lString As String In pHeader
-                Header &= lString & vbCrLf
-            Next
+            Return String.Join(vbCrLf, pHeader.ToArray)
         End Get
         Set(ByVal newValue As String)
             pHeader.Clear()
@@ -181,18 +160,9 @@ ErrHand:
 
     Public Overrides Property NumRecords() As Integer
         Get
-            NumRecords = pNumRecords
+            NumRecords = pRecords.Count - 1
         End Get
         Set(ByVal newValue As Integer)
-            If newValue > pNumRecords Then
-                pNumRecords = newValue
-                'Expand the record array capacity
-                ReDim Preserve pRecords(pNumRecords)
-            ElseIf newValue < pNumRecords Then
-                'Shrink the records array
-                pNumRecords = newValue
-                ReDim Preserve pRecords(pNumRecords)
-            End If
         End Set
     End Property
 
@@ -200,8 +170,8 @@ ErrHand:
         Get
             If pCurrentRecord < 1 Then
                 Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " < 1")
-            ElseIf pCurrentRecord > pNumRecords Then
-                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " > " & pNumRecords)
+            ElseIf pCurrentRecord > NumRecords Then
+                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " > " & NumRecords)
             ElseIf aFieldNumber < 1 Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " < 1")
             ElseIf aFieldNumber > pNumFields Then
@@ -235,7 +205,7 @@ ErrHand:
     End Sub
 
     Public Overrides Sub ClearData()
-        ReDim pRecords(0)
+        pRecords.Clear()
     End Sub
 
     Public Overrides Function Cousin() As IatcTable
@@ -264,38 +234,26 @@ ErrHand:
     End Function
 
     'Read a stream into the table
-    Public Function OpenStream(ByVal aStream As Stream) As Boolean
-        Dim iRec As Integer
-        Dim curLine As String
+    Public Overridable Function OpenStream(ByVal aStream As Stream) As Boolean
         Dim inReader As New BinaryReader(aStream)
-
-        Try
-            For iRec = 1 To NumHeaderRows 'read header rows, ignore for now
-                pHeader.Add(NextLine(inReader))
-            Next
-
-            curLine = NextLine(inReader)
-            NumFields = CountString(curLine, pDelimiter) + 1
-            'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
-            pFieldNames = (pDelimiter & curLine).Split(pDelimiter)
-
-            ReDim pRecords(100) 'initial record buffer size
-            iRec = 1
-            Do
-                curLine = NextLine(inReader)
-                If iRec > pRecords.GetUpperBound(0) Then
-                    ReDim Preserve pRecords(iRec * 2)
-                End If
-                pRecords(iRec) = curLine
-                iRec += 1
-            Loop
-        Catch endEx As EndOfStreamException
-            ReDim Preserve pRecords(iRec - 1)
-            pNumRecords = iRec - 1
-            Me.CurrentRecord = 1
-            Return True
-        End Try
-        Return False
+        Dim lFinishedHeader As Boolean = False
+        Dim lRecordCount As Integer = 0
+        pRecords = New ArrayList(100)
+        pRecords.Add("Unused record 0")
+        For Each lCurrentLine As String In LinesInFile(inReader)
+            lRecordCount += 1
+            If lRecordCount <= NumHeaderRows Then
+                pHeader.Add(lCurrentLine)
+            ElseIf lRecordCount = NumHeaderRows + 1 Then
+                NumFields = CountString(lCurrentLine, Delimiter) + 1
+                'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
+                pFieldNames = (Delimiter & lCurrentLine).Split(Delimiter)
+            Else
+                pRecords.Add(lCurrentLine)
+            End If
+        Next
+        Me.CurrentRecord = 1
+        Return True
     End Function
 
     'Read a string into the table
@@ -320,30 +278,22 @@ ErrHand:
         Return OpenStream(inBuffer)
     End Function
 
-    Public Overrides Function WriteFile(ByVal Filename As String) As Boolean
+    Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
 TryAgain:
         Try
-            Dim lPath As String = System.IO.Path.GetDirectoryName(Filename)
-            If lPath.Length > 0 And Not FileExists(lPath, True) Then
-                MkDirPath(lPath)
-            End If
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Filename))
 
             Dim lOutStream As StreamWriter = File.CreateText(Filename)
 
             lOutStream.Write(Header)
 
-            For i As Integer = 1 To pNumFields - 1
-                lOutStream.Write(pFieldNames(i) & pDelimiter)
-            Next
-            lOutStream.Write(pFieldNames(pNumFields) & vbCrLf)
+            lOutStream.Write(String.Join(Delimiter, pFieldNames, 1, NumFields) & vbCrLf)
 
-            For i As Integer = 1 To pNumRecords
-                lOutStream.Write(pRecords(i) & vbCrLf)
-            Next
+            lOutStream.Write(String.Join(vbCrLf, pRecords.ToArray, 1, NumRecords) & vbCrLf)
 
             lOutStream.Close()
 
-            pFilename = Filename
+            Filename = aFilename
 
             Return True
         Catch ex As Exception
@@ -356,15 +306,22 @@ TryAgain:
     End Function
 
     Public Overrides Function CreationCode() As String
-        Return ("")
+        Return ("") 'TODO: write valid CreationCode
     End Function
 
+    'on set translate to match DBF: s = string into C = Character, n = numeric into N = Numeric
     Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
         Get
-            Return ("")
+            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+                FieldType = pFieldTypes(aFieldNumber)
+            Else
+                FieldType = "Undefined"
+            End If
         End Get
         Set(ByVal newValue As String)
-
+            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+                pFieldTypes(aFieldNumber) = newValue
+            End If
         End Set
     End Property
 
