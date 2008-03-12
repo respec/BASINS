@@ -164,8 +164,9 @@ Public Class atcDataManager
     '''     <para>Name of data source to create and return</para>
     ''' </param>  
     Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
+        aDataSourceName = aDataSourceName.Replace("Timeseries::", "")
         For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
-            If lDataSource.Name = aDataSourceName Then
+            If lDataSource.Name.Replace("Timeseries::", "") = aDataSourceName Then
                 Return lDataSource.NewOne
             End If
         Next

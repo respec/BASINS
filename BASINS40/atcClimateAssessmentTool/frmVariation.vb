@@ -11,7 +11,7 @@ Imports MapWinUtility
 
     Private pFunctionLabels As String() = {"Change Temperature", "Multiply Existing Values by a Number", "Add/Remove Storm Events", "Add/Remove Volume in Extreme Events"}
     Private pFunctionGroupLabels As String() = {"Degrees to add to each existing temperature value", "Number to multiply existing data by", "Percent Change in Volume", "Percent Change in Volume"}
-    Private pFunctionOperations As String() = {"Add", "Multiply", "AddEvents", "Flash"}
+    Private pFunctionOperations As String() = {"Add", "Multiply", "AddEvents", "Intensify"}
     Private pFunctionUnits As String() = {"degrees", "multiplication factor", "%", "%"}
 
     Private pVariation As atcVariation
@@ -891,9 +891,9 @@ Imports MapWinUtility
                 If .UseEvents Then
 
                     If IsNumeric(txtVolumePercent.Text) Then
-                        .FlashVolumeFraction = 1 + (CDbl(txtVolumePercent.Text) / 100)
+                        .IntensifyVolumeFraction = 1 + (CDbl(txtVolumePercent.Text) / 100)
                     Else
-                        .FlashVolumeFraction = pNaN
+                        .IntensifyVolumeFraction = pNaN
                     End If
 
                     .EventThreshold = CDbl(txtEventThreshold.Text)
@@ -998,13 +998,13 @@ Imports MapWinUtility
                 Case "Add" : cboFunction.SelectedIndex = 0
                 Case "Multiply" : cboFunction.SelectedIndex = 1
                 Case "AddEvents" : cboFunction.SelectedIndex = 2
-                Case "Flash" : cboFunction.SelectedIndex = 3
+                Case "Intensify" : cboFunction.SelectedIndex = 3
             End Select
 
-            If Double.IsNaN(.FlashVolumeFraction) Then
+            If Double.IsNaN(.IntensifyVolumeFraction) Then
                 txtVolumePercent.Text = ""
             Else
-                txtVolumePercent.Text = DoubleToString((.FlashVolumeFraction - 1) * 100)
+                txtVolumePercent.Text = DoubleToString((.IntensifyVolumeFraction - 1) * 100)
             End If
 
             EnableIterative(.Max > .Min)
@@ -1152,14 +1152,14 @@ Imports MapWinUtility
         lblValueUnitsMinimum.Text = pFunctionUnits(cboFunction.SelectedIndex)
         lblValueUnitsMaximum.Text = lblValueUnitsMinimum.Text
         Select Case pFunctionOperations(cboFunction.SelectedIndex)
-            Case "Flash", "AddEvents"
+            Case "Intensify", "AddEvents"
                 If Not chkEvents.Checked Then chkEvents.Checked = True
         End Select
         SetVolumePercentVisible()
     End Sub
 
     Private Sub SetVolumePercentVisible()
-        Dim lVisible As Boolean = chkEvents.Checked AndAlso pFunctionOperations(cboFunction.SelectedIndex).Equals("Flash")
+        Dim lVisible As Boolean = chkEvents.Checked AndAlso pFunctionOperations(cboFunction.SelectedIndex).Equals("Intensify")
         lblVolumePercent.Visible = lVisible
         lblVolumePercent2.Visible = lVisible
         txtVolumePercent.Visible = lVisible
