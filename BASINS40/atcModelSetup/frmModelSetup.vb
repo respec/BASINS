@@ -1744,9 +1744,14 @@ Public Class frmModelSetup
         'write psr file
         lblStatus.Text = "Writing PSR file"
         Me.Refresh()
-        Dim lOutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-        Dim lPointLayerIndex As Integer = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
-        Dim lYear As String = cboYear.Items(cboYear.SelectedIndex)
+        Dim lOutletsLayerIndex As Integer
+        Dim lPointLayerIndex As Integer
+        Dim lYear As String = ""
+        If lOutSubs.Count > 0 Then
+            lOutletsLayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+            lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+            lYear = cboYear.Items(cboYear.SelectedIndex)
+        End If
         WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
                         chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
 
