@@ -428,7 +428,7 @@ Public Class atcTimeseriesNdayHighLow
                 For Each lRecurOrProbNow As Double In lRecurOrProb
                     Try
                         If lRecurOrProbNow > 0 Then
-                            lQ = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh)
+                            lQ = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh, aLogFg)
                         Else
                             Logger.Dbg("Skip:RecurOrProb=" & lRecurOrProbNow)
                         End If
@@ -448,9 +448,10 @@ Public Class atcTimeseriesNdayHighLow
                         lMsg = ""
                     End If
 
-                    If aLogFg Then 'remove log10 transform 
-                        lQ = 10 ^ lQ
-                    End If
+                    'this is now done in USGS fortran code
+                    'If aLogFg Then 'remove log10 transform 
+                    '    lQ = 10 ^ lQ
+                    'End If
 
                     Dim lS As String
                     If lNday = 7 And lRecurOrProbNow = 10 And Not aHigh Then
