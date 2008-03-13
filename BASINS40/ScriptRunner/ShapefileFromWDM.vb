@@ -36,7 +36,7 @@ Public Module ScriptShapefileFromWDM
         Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
         'populate the timeseries grid source
-        Dim lDisplayAttributes As ArrayList = atcDataManager.DisplayAttributes
+        Dim lDisplayAttributes As Collections.ArrayList = atcDataManager.DisplayAttributes
         Dim lXfieldName As String = "longitude"
         lDisplayAttributes.Add(lXfieldName)
         Dim lYfieldName As String = "latitude"
