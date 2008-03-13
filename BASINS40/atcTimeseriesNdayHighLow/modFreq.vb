@@ -72,14 +72,14 @@ Module modFreq
     End Sub
 
     'frequency analysis for specified recurrence interval or probability
-    Function PearsonType3(ByVal aTs As atcTimeseries, ByVal aRecurOrProb As Double, ByVal aHigh As Boolean) As Double
+    Function PearsonType3(ByVal aTs As atcTimeseries, ByVal aRecurOrProb As Double, ByVal aHigh As Boolean, ByVal aLogFg As Boolean) As Double
 
         Dim lN As Integer = aTs.Attributes.GetValue("Count")
         Dim lMean As Double = aTs.Attributes.GetValue("Mean")
         Dim lStd As Double = aTs.Attributes.GetValue("Standard Deviation")
         Dim lSkew As Double = aTs.Attributes.GetValue("Skew")
 
-        If lN = 0 OrElse lMean <= 0 Then 'no data or problem data
+        If lN = 0 OrElse Double.IsNaN(lMean) Then ' <= 0 Then 'no data or problem data
             Return pNan
         Else
             'Turn recurrence into probability
@@ -87,7 +87,13 @@ Module modFreq
 
             Dim lNzi As Integer = aTs.numValues - lN
             Dim lNumons As Integer = 1
-            Dim lLogarh As Integer = 2 'log trans flag 1-yes,2-no (handle earlier)
+
+            Dim lLogarh As Integer
+            If aLogFg Then
+                lLogarh = 1 'log trans flag 1-yes 
+            Else
+                lLogarh = 2 'no trans desired
+            End If
 
             Dim lSe(0) As Single
             If aHigh Then
@@ -111,7 +117,7 @@ Module modFreq
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, lNzi, lNumons, (lI + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe(0), _
+                LGPSTX(lN, lNzi, lNumons, (lI + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
                        lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
             Catch ex As Exception
                 lQ(0) = pNan
