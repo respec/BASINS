@@ -398,7 +398,7 @@ Friend Class frmSelectData
         Dim lName As String
         Dim lItemIndex As Integer
         If Not lAllDefinitions Is Nothing Then
-            For Each def As atcAttributeDefinition In lAllDefinitions
+            For Each def As atcAttributeDefinition In lAllDefinitions.Clone
                 If atcDataAttributes.IsSimple(def) Then
                     lName = def.Name
                     If def.Calculated Then
