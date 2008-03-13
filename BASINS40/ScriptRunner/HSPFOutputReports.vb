@@ -83,7 +83,7 @@ Module HSPFOutputReports
         lMsg.Open("hspfmsg.mdb")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
-        lHspfUci.Save()
+        'lHspfUci.Save()
 
         'open WDM file
         Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
