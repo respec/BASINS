@@ -5,6 +5,7 @@ Imports atcGraph
 Imports HspfSupport
 Imports MapWindow.Interfaces
 Imports ZedGraph
+Imports System
 
 Module Graph
     Private Const pTestPath As String = "C:\test\EXP_CAL\hyd_man.net"
@@ -29,7 +30,7 @@ Module Graph
         Dim lZgc As ZedGraphControl
         Dim lPane As ZedGraph.GraphPane
         Dim lGrapher As clsGraphBase
-        ChDriveDir(CurDir() & "\outfiles")
+        ChDriveDir(IO.Directory.GetCurrentDirectory & "\outfiles")
         Dim lOutFileName As String
 
         For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
@@ -61,8 +62,8 @@ Module Graph
             With lPane
                 With .XAxis
                     'TODO: figures out how to make whole title go below XAxis title
-                    .Title.Text = "Observed" & vbCrLf & vbCrLf & _
-                                  "Scatter Plot" & vbCrLf & _
+                    .Title.Text = "Observed" & Environment.NewLine & Environment.NewLine & _
+                                  "Scatter Plot" & Environment.NewLine & _
                                   "Flow at Upper Marlboro (cfs)"
                     .Scale.Min = 0
                     .Scale.Max = lYMax
@@ -90,7 +91,7 @@ Module Graph
 
                 Dim lText As New TextObj
                 Dim lFmt As String = "###,##0.###"
-                lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & vbLf & _
+                lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & Environment.NewLine & _
                              "R Squared = " & DoubleToString(lRSquare, , lFmt)
                 'TODO: turn off border
                 lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)

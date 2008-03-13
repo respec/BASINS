@@ -2,6 +2,7 @@ Imports MapWinUtility
 Imports atcUtility
 Imports MapWindow.Interfaces
 Imports mwOpenMetadataManager
+Imports System
 Imports System.Xml
 
 Module MetaDataBatch
@@ -10,7 +11,7 @@ Module MetaDataBatch
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
         ChDriveDir(pTestPath)   'change to the directory of the testdata
-        Logger.Dbg(" CurDir:" & CurDir())
+        Logger.Dbg(" CurDir:" & Io.Directory.GetCurrentDirectory)
 
         Dim lMetaData As FGDCMetadata.MetadataMain
         Dim lSettings As New XmlReaderSettings

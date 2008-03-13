@@ -6,6 +6,7 @@ Imports HspfSupport
 Imports MapWindow.Interfaces
 Imports ZedGraph
 Imports MapWinUtility
+Imports System
 
 Module GraphGaFlow
     Private Const pTestPath As String = "D:\Basins\data\03130001\flow"
@@ -18,7 +19,7 @@ Module GraphGaFlow
         Dim lWdmDataSource As New atcDataSourceWDM
         If lWdmDataSource.Open(lWdmFileName) Then
             Dim lDataGroup As New atcDataGroup
-            ChDriveDir(CurDir() & "\outfiles")
+            ChDriveDir(IO.Directory.GetCurrentDirectory & "\outfiles")
 
             Dim lSDate(5) As Integer : lSDate(0) = 2000 : lSDate(1) = 1 : lSDate(2) = 1
             Dim lSDateJ As Double = Date2J(lSDate)
@@ -82,13 +83,14 @@ Module GraphGaFlow
             'regression line 
             'TODO: figure out why this seems backwards!
             FitLine(aDataGroup.ItemByIndex(1), aDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
-            Dim lCorrCoef = Math.Sqrt(lRSquare)
+            Dim lCorrCoef As Double = Math.Sqrt(lRSquare)
             AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
             SaveFileString("CompareStats.txt", CompareStats(aDataGroup.ItemByIndex(0), aDataGroup.ItemByIndex(1)))
 
             Dim lText As New TextObj
             Dim lFmt As String = "###,##0.###"
-            lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & vbLf & _
+            lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & _
+                         Environment.NewLine & _
                          "Corr Coef = " & DoubleToString(lCorrCoef, , lFmt)
             'TODO: turn off border
             lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)

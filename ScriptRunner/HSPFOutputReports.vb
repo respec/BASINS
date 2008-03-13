@@ -1,3 +1,4 @@
+Imports System
 Imports atcUtility
 Imports atcData
 Imports atcWDM
@@ -74,7 +75,7 @@ Module HSPFOutputReports
         Initialize()
         ChDriveDir(pTestPath)
         If FileExists(pBaseName & "Orig.uci") Then
-            FileCopy(pBaseName & "Orig.uci", pBaseName & ".uci")
+            IO.File.Copy(pBaseName & "Orig.uci", pBaseName & ".uci")
         End If
 
         'open uci file
@@ -91,13 +92,13 @@ Module HSPFOutputReports
 
         Dim lOutFileName As String
         Dim lExpertSystemFileNames As New NameValueCollection
-        AddFilesInDir(lExpertSystemFileNames, CurDir, False, "*.exs")
+        AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
         Dim lExpertSystem As HspfSupport.ExpertSystem
         For Each lExpertSystemFileName As String In lExpertSystemFileNames
             Try
                 Dim lFileCopied As Boolean = False
                 If FilenameOnly(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
-                    FileCopy(lExpertSystemFileName, pBaseName & ".exs")
+                    IO.File.Copy(lExpertSystemFileName, pBaseName & ".exs")
                     lFileCopied = True
                 End If
                 lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
@@ -266,7 +267,7 @@ Module HSPFOutputReports
                 Next lSiteIndex
                 lExpertSystem = Nothing
                 If lFileCopied Then
-                    Kill(pBaseName & ".exs")
+                    IO.File.Delete(pBaseName & ".exs")
                 End If
             Catch lEx As ApplicationException
                 Logger.Dbg(lEx.Message)
