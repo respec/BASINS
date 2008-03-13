@@ -90,6 +90,7 @@
     </Compile>
     <Compile Include="GridValuesPoint.vb" />
     <Compile Include="HSPFOutputReports.vb" />
+    <Compile Include="HSPFWatershedSummaryWQReport.vb" />
     <Compile Include="LineDump.vb" />
     <Compile Include="Graph.vb" />
     <Compile Include="MetaDataBatch.vb" />
