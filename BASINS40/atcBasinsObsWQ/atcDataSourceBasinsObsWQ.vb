@@ -85,7 +85,12 @@ Public Class atcDataSourceBasinsObsWQ
                     For lRecordNumber As Integer = 1 To lDBF.NumRecords
                         lDBF.CurrentRecord = lRecordNumber
                         lLocation = lDBF.Value(lLocnCol)
-                        lConstituentCode = lDBF.Value(lConsCol)
+                        Dim lConstituentString As String = lDBF.Value(lConsCol)
+                        If lConstituentString.Length > 0 Then
+                            lConstituentCode = lDBF.Value(lConsCol)
+                        Else
+                            lConstituentCode = -1
+                        End If
                         lTSKey = lLocation & ":" & lConstituentCode
                         lData = DataSets.ItemByKey(lTSKey)
                         If lData Is Nothing Then
@@ -101,9 +106,15 @@ Public Class atcDataSourceBasinsObsWQ
                             lData.Attributes.SetValue("Point", True)
                             lData.Attributes.AddHistory("Read from " & Specification)
                             DataSets.Add(lTSKey, lData)
+                            Logger.Dbg("AddDataset:" & DataSets.Count & ":" & lTSKey)
                         End If
                         lTSIndex = lData.Attributes.GetValue("Count") + 1
-                        lData.Value(lTSIndex) = lDBF.Value(lValCol)
+                        Dim lDataValue As String = lDBF.Value(lValCol)
+                        If IsNumeric(lDataValue) Then
+                            lData.Value(lTSIndex) = lDataValue
+                        Else
+                            lData.Value(lTSIndex) = Double.NaN
+                        End If
                         lData.Dates.Value(lTSIndex) = parseWQObsDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
                         lData.Attributes.SetValue("Count", lTSIndex)
                     Next lRecordNumber
