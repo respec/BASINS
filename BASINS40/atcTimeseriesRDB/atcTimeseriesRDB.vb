@@ -81,19 +81,26 @@ Public Class atcTimeseriesRDB
                     lCurLine = NextLine(lInputReader)
                     If lCurLine.Length = 1 Then Exit While
                     If lCurLine.Length > 50 Then
-                        lAttrName = lCurLine.Substring(2, 12).Trim
+                        lAttrName = lCurLine.Substring(2, 48).Trim
                         lAttrValue = lCurLine.Substring(50).Trim
-                        Select Case lAttrName 'translate NWIS attributes to WDM/BASINS names
-                            Case "agency_cd" : lAttributes.SetValue("AGENCY", lAttrValue)
-                            Case "station_nm" : lAttributes.SetValue("StaNam", lAttrValue)
-                            Case "state_cd" : lAttributes.SetValue("STFIPS", lAttrValue)
-                            Case "county_cd" : lAttributes.SetValue("CNTYFIPS", lAttrValue)
-                            Case "huc_cd" : lAttributes.SetValue("HUCODE", lAttrValue)
-                            Case "dec_lat_va" : lAttributes.SetValue("LATDEG", CDbl(lAttrValue))
-                            Case "dec_long_va" : lAttributes.SetValue("LNGDEG", -Math.Abs(CDbl(lAttrValue)))
-                            Case "alt_va" : lAttributes.SetValue("ELEV", lAttrValue)
-                            Case "drain_area_va" : lAttributes.SetValue("DAREA", lAttrValue)
-                        End Select
+                        If lAttrName.Length > 0 AndAlso lAttrName.Length < 30 Then
+                            Select Case lAttrName 'translate NWIS attributes to WDM/BASINS names
+                                Case "agency_cd" : lAttributes.SetValue("AGENCY", lAttrValue)
+                                Case "station_nm" : lAttributes.SetValue("StaNam", lAttrValue)
+                                Case "state_cd" : lAttributes.SetValue("STFIPS", lAttrValue)
+                                Case "county_cd" : lAttributes.SetValue("CNTYFIPS", lAttrValue)
+                                Case "huc_cd" : lAttributes.SetValue("HUCODE", lAttrValue)
+                                Case "dec_lat_va" : lAttributes.SetValue("LATDEG", CDbl(lAttrValue))
+                                Case "dec_long_va" : lAttributes.SetValue("LNGDEG", -Math.Abs(CDbl(lAttrValue)))
+                                Case "alt_va" : lAttributes.SetValue("ELEV", lAttrValue)
+                                Case "drain_area_va" : lAttributes.SetValue("DAREA", lAttrValue)
+                                Case Else
+                                    If lAttrName.Length > 0 AndAlso lAttrValue.Length > 0 Then
+                                        lAttributes.SetValue(lAttrName, lAttrValue)
+                                        Logger.Dbg("Set " & lAttrName & " = " & lAttrValue)
+                                    End If
+                            End Select
+                        End If
                     End If
                 End While
 
@@ -160,7 +167,7 @@ Public Class atcTimeseriesRDB
 
             'TODO: are all required fields defined
 
-            While lTable.CurrentRecord < lTable.NumRecords
+            While .CurrentRecord < .NumRecords
                 lTable.MoveNext()
                 lValueString = .Value(lValueField)
                 If lValueString.Length = 0 Then

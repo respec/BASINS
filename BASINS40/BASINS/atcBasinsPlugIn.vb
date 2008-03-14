@@ -74,6 +74,14 @@ Public Class atcBasinsPlugIn
 
         CheckForUpdates(True)
 
+        Try
+            Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Timeseries::Statistics")
+            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
+            g_MapWin.Plugins.StartPlugin(lKey)
+        Catch e As Exception
+            Logger.Dbg("Exception loading Timeseries::Statistics - " & e.Message)
+        End Try
+
         atcDataManager.MapWindow = g_MapWin
 
         Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_BasinsDir & "docs\Basins4.0.chm")

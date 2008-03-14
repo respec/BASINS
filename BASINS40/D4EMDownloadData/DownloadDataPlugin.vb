@@ -160,9 +160,24 @@ Public Class DownloadDataPlugin
         End If
     End Function
 
+    Private Sub LoadPlugin(ByVal aPluginName As String)
+        Try
+            Dim lKey As String = g_MapWin.Plugins.GetPluginKey(aPluginName)
+            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
+            g_MapWin.Plugins.StartPlugin(lKey)
+        Catch e As Exception
+            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
+        End Try
+    End Sub
+
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         If ItemName.Equals(pMenuName) Then
             atcMwGisUtility.GisUtil.MappingObject = g_MapWin
+            LoadPlugin("D4EM Data Download::BASINS")
+            LoadPlugin("D4EM Data Download::NHDPlus")
+            LoadPlugin("D4EM Data Download::NWIS")
+            LoadPlugin("D4EM Data Download::NLCD2001")
+
             Dim lDownloadForm As New frmDownload
             Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
             'Logger.Msg(lQuery, "Query from frmDownload")
