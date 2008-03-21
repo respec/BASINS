@@ -5,7 +5,6 @@ Imports MapWinUtility
 Public Class atcFileGeoReferencePlugIn
     Inherits atcData.atcDataPlugIn
 
-    Private pMapWin As MapWindow.Interfaces.IMapWin
     Private WithEvents pForm As frmFileGeoReference
     Private pCursorSave As MapWinGIS.tkCursor
 
@@ -53,7 +52,8 @@ Public Class atcFileGeoReferencePlugIn
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-        If aItemName = FullMenuName Then
+        If aItemName = "BasinsAnalysis_Analysis::File Geo Reference" Then
+            atcMwGisUtility.GisUtil.MappingObject = pMapWin
             If pForm Is Nothing Then
                 'next line commented because we can only select on one layer at a time - therefore, only one form makes sense
                 'OrElse pForm.DocumentLayerIndex <> CurrentLayer Then
