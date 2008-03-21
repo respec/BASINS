@@ -14,8 +14,9 @@ Public Class atcDataPlugin
 
     Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
     Private pSerial As Integer 'Serial number of this object, assigned in order of creation at runtime
-    Private pMapWin As MapWindow.Interfaces.IMapWin
-    Private pMapWinWindowHandle As Integer
+    <CLSCompliant(False)> _
+    Protected pMapWin As MapWindow.Interfaces.IMapWin
+    Protected pMapWinWindowHandle As Integer
     Private pMenusAdded As New ArrayList
 
     ''' <summary>create a new atcDataPlugin</summary>
