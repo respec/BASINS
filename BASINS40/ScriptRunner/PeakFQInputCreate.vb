@@ -7,6 +7,7 @@ Imports atcData
 
 Module ScriptPeakFQInputCreate
     Private Const pFormat As String = "#,###,###,##0.00"
+    Private Const pWDMFileName As String = "SCRPeaks.wdm"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("ScriptPeakFQInputCreate:CurDir:" & CurDir())
@@ -73,6 +74,8 @@ Module ScriptPeakFQInputCreate
         Next
         SaveFileString("PeakFQInput.txt", lStringBuilder.ToString)
 
+        Dim lNewWDM As New atcWDM.atcDataSourceWDM
+        lNewWDM.Open(pWDMFileName)
         Dim lFreqStringBuilder As New Text.StringBuilder
         For Each lDS As atcDataSet In lDataSets
             Dim lConstituent As String
@@ -88,6 +91,8 @@ Module ScriptPeakFQInputCreate
                     If lTimeseries.numValues > 0 Then
                         Logger.Dbg(lTimeseries.ToString & " " & lTimeseries.Value(1))
                         Dim lStaNum As String = lDS.Attributes.GetValue("location", "?").ToString.PadLeft(8)
+                        lStringBuilder = New Text.StringBuilder
+                        lStringBuilder.AppendLine(lStaNum)
                         With lFreqStringBuilder
                             .AppendLine("*")
                             .AppendLine("Z" & Space(32) & "ATC-HSPF Results")
@@ -100,15 +105,22 @@ Module ScriptPeakFQInputCreate
                                 J2Date(lTimeseries.ValueAttributes(lIndex).GetDefinedValue("PeakDate").Value, lPeakDateArray)
                                 Dim lPeakDateString As String = lPeakDateArray(0) & lPeakDateArray(1).ToString.PadLeft(2, "0") & lPeakDateArray(2).ToString.PadLeft(2, "0")
                                 .AppendLine("3 " & lStaNum & Space(6) & lPeakDateString & DoubleToString(lTimeseries.Value(lIndex), 7, "######0").PadLeft(7))
+                                lStringBuilder.AppendLine(lPeakDateString & vbTab & DoubleToString(lTimeseries.Value(lIndex), 7, "######0").PadLeft(7))
                             Next
                         End With
+                        SaveFileString("pks_" & lStaNum & ".txt", lFreqStringBuilder.ToString)
+                        If lNewWDM.AddDataset(lTimeseries, atcDataSource.EnumExistAction.ExistRenumber) Then
+                            Logger.Dbg("Save timeseries " & lTimeseries.ToString)
+                        Else
+                            Logger.Dbg("Problem writing timeseries " & lTimeseries.ToString)
+                        End If
                     Else
                         Logger.Dbg("Skip:NoOutput")
                     End If
                 Else
                     Logger.Dbg("Skip")
                 End If
-                End If
+            End If
         Next
         SaveFileString("PeakFQInput.inp", lFreqStringBuilder.ToString)
         Logger.Dbg("PeakFQInputCreateDone")
