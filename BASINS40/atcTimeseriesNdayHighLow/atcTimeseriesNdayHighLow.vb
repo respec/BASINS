@@ -135,7 +135,8 @@ Public Class atcTimeseriesNdayHighLow
 
     Private Function HighOrLowValue(ByVal aTS As atcTimeseries, _
                      ByVal aNDay As Integer, _
-                     ByVal aHigh As Boolean) As Double
+                     ByVal aHigh As Boolean, _
+                     ByRef aDate As Double) As Double
 
         If aNDay <= 0 Then
             Return Nothing
@@ -170,10 +171,10 @@ Public Class atcTimeseriesNdayHighLow
                     If lNumSummed < aNDay Then
                         lNumSummed += 1
                     Else
-                        If aHigh Then
-                            If lRunningSum > lBestSoFar Then lBestSoFar = lRunningSum
-                        Else
-                            If lRunningSum < lBestSoFar Then lBestSoFar = lRunningSum
+                        If (aHigh AndAlso lRunningSum > lBestSoFar) OrElse _
+                          ((Not aHigh) AndAlso lRunningSum < lBestSoFar) Then
+                            lBestSoFar = lRunningSum
+                            aDate = aTS.Dates.Value(lTimeIndex)
                         End If
                         lRunningSum -= aTS.Value(lTimeIndex - aNDay + 1)
                     End If
@@ -239,8 +240,10 @@ Public Class atcTimeseriesNdayHighLow
                         End If
                         lCurrentYear = SubsetByDate(aTS, lSJday, lEndJday, Me)
                         newTS.Dates.Value(indexNew) = lEndJday
+                        Dim lDate As Double = GetNaN()
                         Try
-                            newTS.Value(indexNew) = HighOrLowValue(lCurrentYear, CInt(lNDayNow), aHigh)
+                            newTS.Value(indexNew) = HighOrLowValue(lCurrentYear, CInt(lNDayNow), aHigh, lDate)
+                            newTS.ValueAttributes(indexNew).Add("PeakDate", lDate)
                         Catch e As Exception
                             newTS.Value(indexNew) = Double.NaN
                             newTS.ValueAttributes(indexNew) = New atcDataAttributes()
