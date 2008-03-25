@@ -611,7 +611,7 @@ Public Class frmEndpoint
                 .Operation = cboAttribute.Text
                 If chkSeasons.Checked Then
                     .Seasons = pSeasons
-                    If pSeasons Is Nothing Then
+                    If Not pSeasons Is Nothing Then
                         For Each lSeasonIndex As Integer In pAllSeasons
                             pSeasons.SeasonSelected(lSeasonIndex) = lstSeasons.SelectedItems.Contains(pSeasons.SeasonName(lSeasonIndex))
                         Next
