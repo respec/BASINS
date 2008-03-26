@@ -4,20 +4,26 @@ Option Explicit On
 Imports Microsoft.VisualBasic.FileSystem
 Imports MapWinUtility
 Imports atcUtility
+Imports System.Collections.ObjectModel
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks>
+''' Copyright 2005-8 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
 Friend Class clsFtnUnfFile
-    '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
     Dim pFileName As String = ""
     Dim pFileNum As Integer = 0
     Dim pBytesInFile As Integer = 0
     Dim pErrorDescription As String = ""
     Dim pSeek As Integer
-    Dim pRecords As ArrayList 'of clsUnfRec
+    Dim pRecords As Collection(Of UnformattedRecord)
 
-    Private Class clsUnfRec
+    Private Class UnformattedRecord
         Public StartPos As Integer = 0
-        Public Len As Integer = 0
-        Public Rec() As Byte
+        Public Length As Integer = 0
+        Public Record() As Byte
     End Class
 
     Friend ReadOnly Property RecordCount() As Integer
@@ -26,15 +32,15 @@ Friend Class clsFtnUnfFile
         End Get
     End Property
 
-    Friend ReadOnly Property Reclen(ByVal index As Integer) As Integer
+    Friend ReadOnly Property Reclen(ByVal aIndex As Integer) As Integer
         Get
-            Return pRecords(index).len
+            Return pRecords(aIndex).Length
         End Get
     End Property
 
-    Friend ReadOnly Property Rec(ByVal index As Integer) As Byte()
+    Friend ReadOnly Property Rec(ByVal aIndex As Integer) As Byte()
         Get
-            Return pRecords(index).Rec
+            Return pRecords(aIndex).Record
         End Get
     End Property
 
@@ -42,22 +48,22 @@ Friend Class clsFtnUnfFile
         Get
             Return pFileName
         End Get
-        Set(ByVal newFileName As String)
-            Dim Byt As Byte
+        Set(ByVal aFileName As String)
+            Dim lByte As Byte
 
-            If Not FileExists(newFileName) Then
-                pErrorDescription = "File '" & newFileName & "' not found"
+            If Not FileExists(aFileName) Then
+                pErrorDescription = "File '" & aFileName & "' not found"
             Else
-                pFileName = newFileName
+                pFileName = aFileName
                 Open()
                 If pBytesInFile = 0 Then
-                    pErrorDescription = "File '" & newFileName & "' is empty"
+                    pErrorDescription = "File '" & aFileName & "' is empty"
                 Else
-                    FileGet(pFileNum, Byt)
-                    If Byt <> &HFD Then
-                        pErrorDescription = "File: '" & newFileName & "' is not a Fortran Unformatted Sequential File" & vbCrLf & "(does not begin with hex FD)"
+                    FileGet(pFileNum, lByte)
+                    If lByte <> &HFD Then
+                        pErrorDescription = "File: '" & aFileName & "' is not a Fortran Unformatted Sequential File" & vbCrLf & "(does not begin with hex FD)"
                     Else
-                        pRecords = New ArrayList 'of UnfRec (TODO: make initial allocation here?)
+                        pRecords = New Collection(Of UnformattedRecord)
                         ReadRestOfRecordsInFile(True)
                     End If
                 End If
@@ -66,18 +72,18 @@ Friend Class clsFtnUnfFile
         End Set
     End Property
 
-    Friend Sub ReadRestOfRecordsInFile(Optional ByVal first As Boolean = False)
+    Friend Sub ReadRestOfRecordsInFile(Optional ByVal aFirst As Boolean = False)
         Dim lNeedToClose As Boolean = Open()
         pBytesInFile = LOF(pFileNum)
         Do While Seek(pFileNum) < pBytesInFile - 2
-            Dim lUnfRec As New clsUnfRec
+            Dim lUnfRec As New UnformattedRecord
             With lUnfRec
                 .StartPos = Seek(pFileNum)
-                .Len = FtnUnfSeqRecLen(pFileNum, first)
+                .Length = FtnUnfSeqRecLen(pFileNum, aFirst)
                 'Debug.Print .StartPos, .Len
-                If .Len > 0 Then 'fill in the data
-                    ReDim .Rec(.Len - 1)
-                    FileGet(pFileNum, .Rec)
+                If .Length > 0 Then 'fill in the data
+                    ReDim .Record(.Length - 1)
+                    FileGet(pFileNum, .Record)
                 Else 'whats the problem?
                     Logger.Dbg("***** clsFtnUnfFile:ReadRestOfRecordsInFile:Len=0:Start=" & .StartPos & ":Lof=" & pBytesInFile & ":File=" & pFileName)
                 End If
@@ -87,34 +93,37 @@ Friend Class clsFtnUnfFile
         If lNeedToClose Then Close()
     End Sub
 
-    Private Function FtnUnfSeqRecLen(ByVal f As Integer, ByRef first As Boolean) As Integer
-        Dim b As Byte, reclen As Integer, bytes As Integer, c As Integer, h As Integer
-        Static LastLen As Integer
+    Private Function FtnUnfSeqRecLen(ByVal aFileUnit As Integer, ByRef aFirst As Boolean) As Integer
+        Static mLastLen As Integer
 
-        If first Then
-            LastLen = 0
-            first = False
+        Dim c As Integer
+        Dim h As Integer
+        Dim lByte As Byte
+
+        If aFirst Then
+            mLastLen = 0
+            aFirst = False
         Else
             c = 64
-            FileGet(f, b)
-            While LastLen >= c
+            FileGet(aFileUnit, lByte)
+            While mLastLen >= c
                 c = c * 256
-                FileGet(f, b)
+                FileGet(aFileUnit, lByte)
             End While
         End If
-        FileGet(f, b)
-        bytes = b And 3
-        reclen = Fix(CSng(b) / 4)
+        FileGet(aFileUnit, lByte)
+        Dim lBytes As Integer = lByte And 3
+        Dim lRecordLength As Integer = Fix(CSng(lByte) / 4)
         c = 64
-        h = bytes + 1
-        Do While bytes > 0
-            FileGet(f, b)
-            bytes = bytes - 1
-            reclen = reclen + b * c
+        h = lBytes + 1
+        Do While lBytes > 0
+            FileGet(aFileUnit, lByte)
+            lBytes = lBytes - 1
+            lRecordLength = lRecordLength + lByte * c
             c = c * 256
         Loop
-        LastLen = reclen + h
-        FtnUnfSeqRecLen = reclen
+        mLastLen = lRecordLength + h
+        Return lRecordLength
     End Function
 
     Friend ReadOnly Property ErrorDescription() As String
