@@ -15,12 +15,22 @@ Partial Class frmSelectScript
             Dim lMethod As MethodInfo = lCoClass.GetMethod("ScriptMain")
             Dim lArgs(0) As Object
             lArgs(0) = CObj(pMapWin)
-            Dim lResult As Boolean = lMethod.Invoke(Nothing, lArgs)
+            Dim lResult As Boolean
+            Try
+                lResult = lMethod.Invoke(Nothing, lArgs)
+            Catch lEx As Exception
+                Logger.Dbg("Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
+                lResult = False
+            End Try
             Logger.Dbg("  Done:Result:" & lResult)
             Windows.Forms.Cursor.Current = lOriginalCursor
             Me.Dispose()
         Else
             Logger.Msg("Select a Script to Run", vbOK, "Script Runner")
         End If
+    End Sub
+
+    Private Sub lstScripts_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstScripts.DoubleClick
+        cmdRun_Click(sender, e)
     End Sub
 End Class
