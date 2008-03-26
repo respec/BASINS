@@ -265,6 +265,9 @@ Public Class HspfTable
             If lOccur = 1 Then
                 lTableName = pDef.Name
             Else
+                If aInstance = 0 Then
+                    lSB.AppendLine() 'add a blank line before additional occurrences of this table
+                End If
                 lTableName = pDef.Name & ":" & lOccur
             End If
             lSB.AppendLine("  " & pDef.Name)

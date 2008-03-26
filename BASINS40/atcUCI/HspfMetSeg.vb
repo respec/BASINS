@@ -90,17 +90,30 @@ Public Class HspfMetSeg
     End Function
 
     Public Sub UpdateMetSeg(ByRef aMetSeg As HspfMetSeg)
-        For Each lMetSegRec As HspfMetSegRecord In pMetSegRecs
-            With aMetSeg.MetSegRecs(lMetSegRec.Name)
-                If lMetSegRec.MFactR = -999.0# And .MFactR <> -999.0# Then
-                    lMetSegRec.MFactR = .MFactR
-                    lMetSegRec.Sgapstrg = .Sgapstrg
-                    lMetSegRec.Source = .Source
-                    lMetSegRec.Ssystem = .Ssystem
-                    lMetSegRec.Tran = .Tran
+        For Each lExistingMetSegRec As HspfMetSegRecord In pMetSegRecs
+            With aMetSeg.MetSegRecs(lExistingMetSegRec.Name)
+                If lExistingMetSegRec.MFactR = -999.0# And .MFactR <> -999.0# Then
+                    lExistingMetSegRec.MFactR = .MFactR
+                    lExistingMetSegRec.Sgapstrg = .Sgapstrg
+                    lExistingMetSegRec.Source = .Source
+                    lExistingMetSegRec.Ssystem = .Ssystem
+                    lExistingMetSegRec.Tran = .Tran
                 End If
             End With
-        Next lMetSegRec
+        Next lExistingMetSegRec
+
+        For Each lNewMetSegRec As HspfMetSegRecord In aMetSeg.MetSegRecs
+            Dim lRecFound As Boolean = False
+            For Each lExistingMetSegRec As HspfMetSegRecord In pMetSegRecs
+                If lNewMetSegRec.Name = lExistingMetSegRec.Name Then
+                    lRecFound = True
+                End If
+            Next lExistingMetSegRec
+            If Not lRecFound Then
+                'add this type of rec to the existing met seg
+                pMetSegRecs.Add(lNewMetSegRec)
+            End If
+        Next lNewMetSegRec
     End Sub
 
     Public Sub New()
