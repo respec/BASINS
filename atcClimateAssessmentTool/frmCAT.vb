@@ -939,7 +939,7 @@ NextIteration:
                 Dim lVariation As atcVariation = aVariations.ItemByIndex(aStartVariation)
                 With lVariation
                     Dim lOriginalDatasets As atcDataGroup = .DataSets.Clone
-                    'save version of data modified by an earlier variation if it is also modified by this one
+                    'save version of data modified by an earlier variation if it will also be modified by this one
                     Dim lReModifiedData As New atcDataGroup
 
                     For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
@@ -956,6 +956,13 @@ NextIteration:
                     Dim lModifiedGroup As atcDataGroup = .StartIteration
 
                     While g_running And Not lModifiedGroup Is Nothing
+                        'Remove existing modified data also modified by this variation
+                        'Most cases of this were handled above when creating lReModifiedData, 
+                        'but side-effect computation like PET still needs removing here
+                        For Each lKey As Object In lModifiedGroup.Keys
+                            aModifiedData.RemoveByKey(lKey)
+                        Next
+
                         aModifiedData.Add(lModifiedGroup)
 
                         'We have handled a variation, now recursively handle more input variations or run the model
