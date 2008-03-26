@@ -585,9 +585,9 @@ Public Class HspfConnection
                                         lSB.AppendLine(lConnection.Comment)
                                     End If
                                     Dim lStr As New StringBuilder
-                                    lStr.Append(lConnection.Source.VolName.Trim)
+                                    lStr.Append(lConnection.Source.Opn.Name.Trim)
                                     lStr.Append(Space(iCol(1) - lStr.Length - 1)) 'pad prev field
-                                    lStr.Append(CStr(lConnection.Source.VolId).PadLeft(iLen(1)))
+                                    lStr.Append(CStr(lConnection.Source.Opn.Id).PadLeft(iLen(1)))
                                     lStr.Append(Space(iCol(2) - lStr.Length - 1))
                                     lStr.Append(lConnection.Source.Group)
                                     lStr.Append(Space(iCol(3) - lStr.Length - 1))
@@ -655,9 +655,9 @@ Public Class HspfConnection
                                         lSB.AppendLine(lConnection.Comment)
                                     End If
                                     Dim lStr As New StringBuilder
-                                    lStr.Append(lConnection.Source.VolName.Trim)
+                                    lStr.Append(lConnection.Source.Opn.Name.Trim)
                                     lStr.Append(Space(iCol(1) - lStr.Length - 1)) 'pad prev field
-                                    lStr.Append(CStr(lConnection.Source.VolId).PadLeft(iLen(1)))
+                                    lStr.Append(CStr(lConnection.Source.Opn.Id).PadLeft(iLen(1)))
                                     lStr.Append(Space(iCol(2) - lStr.Length - 1))
                                     If NumericallyTheSame((lConnection.MFactAsRead), (lConnection.MFact)) Then
                                         lStr.Append(lConnection.MFactAsRead)
@@ -666,9 +666,9 @@ Public Class HspfConnection
                                         lStr.Append(CStr(lConnection.MFact).PadLeft(iLen(2)))
                                     End If
                                     lStr.Append(Space(iCol(3) - lStr.Length - 1))
-                                    lStr.Append(lConnection.Target.VolName)
+                                    lStr.Append(lConnection.Target.Opn.Name)
                                     lStr.Append(Space(iCol(4) - lStr.Length - 1))
-                                    lStr.Append(CStr(lConnection.Target.VolId).PadLeft(iLen(5)))
+                                    lStr.Append(CStr(lConnection.Target.Opn.Id).PadLeft(iLen(5)))
                                     lStr.Append(Space(iCol(5) - lStr.Length - 1))
                                     lStr.Append(CStr(lConnection.MassLink).PadLeft(iLen(5)))
                                     If lConnection.Target.MemSub1 > 0 Then
@@ -701,9 +701,9 @@ Public Class HspfConnection
                                         lSB.AppendLine(lConnection.Comment)
                                     End If
                                     Dim lStr As New StringBuilder
-                                    lStr.Append(lConnection.Source.VolName.Trim)
+                                    lStr.Append(lConnection.Source.Opn.Name.Trim)
                                     lStr.Append(Space(iCol(1) - lStr.Length - 1)) 'pad prev field
-                                    lStr.Append(CStr(lConnection.Source.VolId).PadLeft(iLen(1)))
+                                    lStr.Append(CStr(lConnection.Source.Opn.Id).PadLeft(iLen(1)))
                                     lStr.Append(Space(iCol(2) - lStr.Length - 1))
                                     lStr.Append(lConnection.Source.Group)
                                     lStr.Append(Space(iCol(3) - lStr.Length - 1))
