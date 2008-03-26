@@ -7,18 +7,20 @@ Imports atcUCI
 Imports MapWinUtility
 Imports System.Xml
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks>
+'''Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
 Public Class atcTimeseriesFileHspfBinOut
     Inherits atcData.atcDataSource
-    '##MODULE_REMARKS Copyright 2005-2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
     Private pName As String = "Timeseries::HSPF Binary Output"
-    Private pDates As ArrayList 'of atcTimeseries
     Private pNvals As Integer
 
     Private pBinFile As clsHspfBinary
-    Private pHSPFNetwork As clsNetworkHspfOutput
-    Private pFileExt As String
 
     Private pUnitsTable As atcTable
     Private pUnitsTableModified As Boolean = False
@@ -29,37 +31,10 @@ Public Class atcTimeseriesFileHspfBinOut
     Private pCountUnitsHardCode As Integer
     Private pUnitsMissing As atcCollection
 
-    'todo: where should this really be?
-    Private Enum ATCTimeUnit
-        TUSecond = 1
-        TUMinute = 2
-        TUHour = 3
-        TUDay = 4
-        TUMonth = 5
-        TUYear = 6
-        TUCentury = 7
-    End Enum
-
     Public ReadOnly Property AvailableAttributes() As Collection
         Get
-            Dim retval As Collection
-            'Dim vAttribute As Variant
-            'Dim lCurTSerAttr As ATCclsAttributeDefinition
-
             'needed to edit attributes? that can't be done for this type!
-            'for now - just return nothing
-
-            retval = New Collection
-
-            'Set lCurTSerAttr = New ATCclsAttributeDefinition
-
-            'If pHSPFOutput.DataCollection.Count > 0 Then
-            '  For Each vAttribute In pHSPFOutput.DataCollection(1).Attribs
-            '    lCurTSerAttr.Name = vAttribute.Name
-            '    retval.Add lCurTSerAttr
-            '  Next
-            'End If
-            Return retval
+            Return New Collection 'empty!
         End Get
     End Property
 
@@ -89,17 +64,6 @@ Public Class atcTimeseriesFileHspfBinOut
     End Property
 
     Private Sub BuildTSers()
-        Dim lTSer As atcTimeseries
-        Dim lBaseAttributes As atcDataAttributes 'attributes related to dates common to all in ts in a header
-        Dim lBaseTSer As atcTimeseries
-        Dim lBinHeader As clsHspfBinHeader
-        Dim lData As clsHspfBinData
-        Dim lTu As Integer, lTs As Integer, lIntvl As Integer
-        Dim lTDate(5) As Integer
-        Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
-        Dim i As Integer, j As Integer
-        Dim lUnitSystem As atcUnitSystem
-
         pCountUnitsFound = 0
         pCountUnitsMissing = 0
         pCountUnitsHardCode = 0
@@ -109,29 +73,32 @@ Public Class atcTimeseriesFileHspfBinOut
         pBinFile.Filename = Specification
 
         Try
-            i = 0
-            For Each lBinHeader In pBinFile.Headers
+            Dim lHeaderIndex As Integer = 0
+            Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
+            For Each lBinHeader As clsHspfBinHeader In pBinFile.Headers
                 With lBinHeader
-                    lData = .Data.ItemByIndex(0)
+                    Dim lData As clsHspfBinData = .Data.ItemByIndex(0)
                     lSJDate = Date2J(lData.DateArray)
                     lOutLev = lData.OutLev
+                    Dim lDataIndex As Integer
                     If .Data.Count = 1 Then
-                        j = 1 'force daily
+                        lDataIndex = 1 'force daily
                     Else
-                        j = 1
-                        While lOutLev <> .Data.ItemByIndex(j).OutLev And i < .Data.Count 'looking for same outlev
-                            j = j + 1
+                        lDataIndex = 1
+                        While lOutLev <> .Data.ItemByIndex(lDataIndex).OutLev And lHeaderIndex < .Data.Count 'looking for same outlev
+                            lDataIndex += 1
                         End While
                     End If
-                    If j < .Data.Count Then
-                        lData = .Data.ItemByIndex(j)
+                    If lDataIndex < .Data.Count Then
+                        lData = .Data.ItemByIndex(lDataIndex)
                         lEJDate = Date2J(lData.DateArray)
                     Else 'only one value dont know what interval is, assume day
                         lEJDate = lSJDate + 1
                     End If
 
-                    lBaseTSer = New atcTimeseries(Me)
-                    lBaseAttributes = New atcDataAttributes
+                    'attributes related to dates common to all in ts in a header 
+                    Dim lTu As Integer, lTs As Integer, lIntvl As Integer
+                    Dim lBaseAttributes As atcDataAttributes = New atcDataAttributes
                     With lBaseAttributes
                         .SetValue("CIntvl", True)
                         .SetValue("History 1", "Read from " & pBinFile.Filename)
@@ -146,8 +113,8 @@ Public Class atcTimeseriesFileHspfBinOut
                             'Else 'undefined for monthly or annual
                             'End If
                         Else 'use minute
-                            lTu = ATCTimeUnit.TUMinute
-                            lTs = timdifJ(lSJDate, lEJDate, ATCTimeUnit.TUMinute, 1)
+                            lTu = atcTimeUnit.TUMinute
+                            lTs = timdifJ(lSJDate, lEJDate, atcTimeUnit.TUMinute, 1)
                             lIntvl = lTs / 1440
                         End If
                         If lTs < 1 Then
@@ -160,7 +127,7 @@ Public Class atcTimeseriesFileHspfBinOut
                         .SetValue("Ts", lTs)
                         .SetValue("Tu", lTu)
                         .SetValue("Intvl", lIntvl)
-                        lTDate = lBinHeader.Data.ItemByIndex(0).DateArray
+                        Dim lTDate() As Integer = lBinHeader.Data.ItemByIndex(0).DateArray
                         lSJDate = TimAddJ(Date2J(lTDate), lTu, lTs, -lIntvl)
                         .SetValue("SJDay", lSJDate)
                         lTDate = lBinHeader.Data.ItemByIndex(lBinHeader.Data.Count - 1).DateArray
@@ -169,8 +136,8 @@ Public Class atcTimeseriesFileHspfBinOut
                         pNvals = timdifJ(lSJDate, lEJDate, lTu, lTs)
                     End With
 
-                    For j = 0 To .VarNames.Count - 1
-                        lTSer = New atcTimeseries(Me)
+                    For lDataIndex = 0 To .VarNames.Count - 1
+                        Dim lTSer As atcTimeseries = New atcTimeseries(Me)
                         For Each lAttributeName As DictionaryEntry In lBaseAttributes.ValuesSortedByName
                             With lBaseAttributes
                                 lTSer.Attributes.SetValue(atcDataAttributes.GetDefinition(lAttributeName.Key), lAttributeName.Value)
@@ -181,23 +148,23 @@ Public Class atcTimeseriesFileHspfBinOut
                             .Attributes.SetValue("Section", lBinHeader.id.SectionName)
                             .Attributes.SetValue("IDSCEN", FilenameOnly(Specification))
                             .Attributes.SetValue("IDLOCN", Left(lBinHeader.id.OperationName, 1) & ":" & (lBinHeader.id.OperationNumber))
-                            Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(j)
+                            Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(lDataIndex)
                             .Attributes.SetValue("IDCONS", lConstituent)
-                            lUnitSystem = CType(CType(lBinHeader.Data(0), clsHspfBinData).UnitFlag, atcUnitSystem)
+                            Dim lUnitSystem As atcUnitSystem = CType(CType(lBinHeader.Data(0), clsHspfBinData).UnitFlag, atcUnitSystem)
                             .Attributes.SetValue("UNITS", GetUnits(lConstituent, lUnitSystem))
                             .Attributes.SetValue("ID", Me.DataSets.Count)
-                            If lBinHeader.VarNames.ItemByIndex(j) = "LZS" Then 'TODO: need better check here
+                            If lBinHeader.VarNames.ItemByIndex(lDataIndex) = "LZS" Then 'TODO: need better check here
                                 .Attributes.SetValue("Point", True)
                             End If
                             .ValuesNeedToBeRead = True
                             .Dates = New atcTimeseries(Me)
                             AddDataSet(lTSer)
                         End With
-                    Next j
+                    Next lDataIndex
                 End With
-                i += 1
+                lHeaderIndex += 1
                 'Logger.Dbg("Loop " & i)
-                Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
+                Logger.Progress(pBinFile.Headers.Count + lHeaderIndex, pBinFile.Headers.Count * 2)
             Next
         Catch ex As ApplicationException
             Logger.Dbg(ex.Message)
@@ -289,75 +256,61 @@ Public Class atcTimeseriesFileHspfBinOut
     End Function
 
     Public Overrides Sub readData(ByVal aDataSet As atcDataSet)
-        Dim lts As atcTimeseries = aDataSet
-        Dim lVind As Integer, lOutLev As Integer
-        Dim lBinHeader As clsHspfBinHeader
-        Dim lBd As clsHspfBinData
-        Dim lKey As String
-        Dim lCurJday As Double
-        Dim lSJday As Integer
-        Dim lEJday As Integer
-        Dim i As Integer
-        Dim j As Integer
         Dim v() As Double
-        Dim f() As Integer
         Dim d() As Double
         ReDim v(0)
-        ReDim f(0)
         ReDim d(0)
 
-        lKey = lts.Attributes.GetValue("Operation") & ":" & _
-               Mid(lts.Attributes.GetValue("IDLOCN"), 3) & ":" & _
-               lts.Attributes.GetValue("Section")
+        Dim lTimeseries As atcTimeseries = aDataSet
+        Dim lKey As String = lTimeseries.Attributes.GetValue("Operation") & ":" & _
+                             Mid(lTimeseries.Attributes.GetValue("IDLOCN"), 3) & ":" & _
+                             lTimeseries.Attributes.GetValue("Section")
 
         Try
-            lBinHeader = pBinFile.Headers.ItemByKey(lKey)
+            Dim lBinHeader As clsHspfBinHeader = pBinFile.Headers.ItemByKey(lKey)
             With lBinHeader
-                lVind = .VarNames.IndexFromKey(lts.Attributes.GetValue("IDCONS"))
+                Dim lVind As Integer = .VarNames.IndexFromKey(lTimeseries.Attributes.GetValue("IDCONS"))
                 If lVind >= 0 Then
                     ReDim v(pNvals)
-                    ReDim f(pNvals)
                     ReDim d(pNvals)
-                    lSJday = lts.Attributes.GetValue("SJDay")
-                    lEJday = lts.Attributes.GetValue("EJDay")
-                    lOutLev = .Data.ItemByIndex(0).OutLev
+                    Dim lSJday As Integer = lTimeseries.Attributes.GetValue("SJDay")
+                    Dim lEJday As Integer = lTimeseries.Attributes.GetValue("EJDay")
+                    Dim lOutLev As Integer = .Data.ItemByIndex(0).OutLev
                     d(0) = lSJday
-                    j = 1
-                    For i = 0 To .Data.Count - 1
-                        lBd = .Data.ItemByIndex(i)
-                        lCurJday = Date2J(lBd.DateArray)
+                    Dim j As Integer = 1
+                    For i As Integer = 0 To .Data.Count - 1
+                        Dim lBinData As clsHspfBinData = .Data.ItemByIndex(i)
+                        Dim lCurJday As Double = Date2J(lBinData.DateArray)
                         If lCurJday >= lSJday Then
                             If lCurJday > lEJday Then Exit For
                             If .Data.ItemByIndex(i).OutLev = lOutLev Then
                                 v(j) = .Data.ItemByIndex(i).value(lVind)
                                 d(j) = lCurJday
-                                j = j + 1
+                                j += 1
                             End If
                         End If
                     Next i
-                    If (lts.Attributes.GetValue("Point", False)) Then
+                    If (lTimeseries.Attributes.GetValue("Point", False)) Then
                         v(0) = Double.NaN
                     Else
                         v(0) = v(1)
                     End If
                 Else
-                    Logger.Dbg("Could not retrieve HSPF Binary data values for variable: " & lts.Attributes.GetValue("IDCONS"))
+                    Logger.Dbg("Could not retrieve HSPF Binary data values for variable: " & lTimeseries.Attributes.GetValue("IDCONS"))
                 End If
             End With
         Catch ex As Exception
             Logger.Dbg("Could not retrieve data values for HSPF Binary TSER" & "Key = " & lKey & vbCrLf & _
                        "Message:" & ex.Message)
             ReDim v(0)
-            ReDim f(0)
         End Try
         't.flags = f
-        lts.Dates.Values = d
-        lts.Values = v
+        lTimeseries.Dates.Values = d
+        lTimeseries.Values = v
         't.calcSummary()
-        ' next 2 might be automatic
+        ' next might be automatic
         ReDim v(0)
-        ReDim f(0)
-        lts.ValuesNeedToBeRead = False
+        lTimeseries.ValuesNeedToBeRead = False
     End Sub
 
     Public Sub Refresh()
@@ -422,7 +375,7 @@ Public Class atcTimeseriesFileHspfBinOut
             BuildTSers()
             Return True
         End If
-            Return False
+        Return False
     End Function
 
     Public Sub New()
