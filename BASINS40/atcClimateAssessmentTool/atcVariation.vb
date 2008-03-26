@@ -354,6 +354,13 @@ Public Class atcVariation
 
             If PETdata.Count > lDataSetIndex Then
                 Dim lOldPET As atcDataSet = PETdata(lDataSetIndex)
+
+                'Discard any already modified PET, it will be replaced below
+                Dim lOldPETmodifiedIndex As Integer = lModifiedGroup.Keys.IndexOf(lOldPET)
+                If lOldPETmodifiedIndex >= 0 Then
+                    lModifiedGroup.RemoveAt(lOldPETmodifiedIndex)
+                End If
+
                 pLatDeg = lOldPET.Attributes.GetValue("LatDeg", pLatDeg)
                 Dim lNewPET As atcDataSet = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
                 If lOldPET.Attributes.GetValue("tu") < 4 Then
