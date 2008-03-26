@@ -73,7 +73,7 @@ Public Class atcCollection
         ElseIf aValue = MyBase.Item(lKeyIndex) Then 'key exists and values match, return its index
             Return lKeyIndex
         Else 'conflict with values
-            Throw New ApplicationException("Key " & aKey & " exists, new Value '" & aValue.ToString & "' <> old Value '" & MyBase.Item(lKeyIndex).ToString & "'")
+            Throw New ApplicationException("Key " & aKey.ToString & " exists, new Value '" & aValue.ToString & "' <> old Value '" & MyBase.Item(lKeyIndex).ToString & "'")
         End If
     End Function
 
