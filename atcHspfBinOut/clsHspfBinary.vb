@@ -3,27 +3,49 @@ Option Explicit On
 
 Imports MapWinUtility
 Imports atcUtility
+Imports System.Collections.ObjectModel
 
-Friend Class clsHspfBinId
-    Public OperationName As String = ""
-    Public OperationNumber As Integer = 0
-    Public SectionName As String = ""
+Friend Class HspfBinaryId
+    Friend OperationName As String = ""
+    Friend OperationNumber As Integer = 0
+    Friend SectionName As String = ""
+    Friend ReadOnly Property AsKey() As String
+        Get
+            Return OperationName & ":" & OperationNumber & ":" & SectionName
+        End Get
+    End Property
 End Class
 
-Friend Class clsHspfBinData
+Friend Class HspfBinaryData
+    Inherits KeyedCollection(Of String, HspfBinaryDatum)
+    Protected Overrides Function GetKeyForItem(ByVal aHspfBinaryDatum As HspfBinaryDatum) As String
+        Return aHspfBinaryDatum.AsKey
+    End Function
+End Class
+
+Friend Class HspfBinaryDatum
     Public UnitFlag As Integer = 0
     Public OutLev As Integer = 0
-    Public DateArray() As Integer
+    Public DateArray(5) As Integer
     Public Value() As Double
-    Public Sub New()
-        ReDim DateArray(5)
-    End Sub
+    Friend ReadOnly Property AsKey() As String
+        Get
+            Return OutLev & ":" & Date2J(DateArray)
+        End Get
+    End Property
 End Class
 
-Friend Class clsHspfBinHeader
-    Public Id As New clsHspfBinId
+Friend Class HspfBinaryHeaders
+    Inherits KeyedCollection(Of String, HspfBinaryHeader)
+    Protected Overrides Function GetKeyForItem(ByVal aHspfBinaryHeader As HspfBinaryHeader) As String
+        Return aHspfBinaryHeader.Id.AsKey
+    End Function
+End Class
+
+Friend Class HspfBinaryHeader
+    Public Id As New HspfBinaryId
     Public VarNames As atcCollection 'of String
-    Public Data As atcCollection 'of HSPFBinaryData
+    Public Data As HspfBinaryData
 End Class
 
 ''' <summary>
@@ -32,46 +54,43 @@ End Class
 ''' <remarks>
 '''Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 '''</remarks>
-Friend Class clsHspfBinary
+Friend Class HspfBinary
     Private pFileName As String
     Private pErrorDescription As String
     Private pFile As clsFtnUnfFile
     Private pFileRecordIndex As Integer
+    Private pHeaders As HspfBinaryHeaders
 
-    Dim pHeaders As atcCollection 'of HSPFBinaryHeader
+    'Friend ReadOnly Property DateAsJulian(ByVal aHeaderIndex As Integer, ByVal aDataIndex As Integer) As Double
+    '    Get
+    '        Dim lData As HspfBinaryData = Header(aHeaderIndex).Data.ItemByIndex(aDataIndex)
+    '        Return Date2J(lData.DateArray)
+    '    End Get
+    'End Property
 
-    Friend ReadOnly Property DateAsJulian(ByVal aHeaderIndex As Integer, ByVal aDataIndex As Integer) As Double
-        Get
-            Dim lData As clsHspfBinData = Header(aHeaderIndex).Data.ItemByIndex(aDataIndex)
-            Return Date2J(lData.DateArray)
-        End Get
-    End Property
+    'Friend ReadOnly Property DateAsText(ByVal aHeaderIndex As Integer, ByVal aDataIndex As Integer) As String
+    '    Get
+    '        Dim lData As HspfBinaryData = Header(aHeaderIndex).Data.ItemByIndex(aDataIndex)
+    '        With lData
+    '            DateAsText = .DateArray(0) & "/" & .DateArray(1) & "/" & .DateArray(2) & " " & _
+    '                         .DateArray(3) & ":" & .DateArray(4) & ":" & .DateArray(5)
+    '        End With
+    '    End Get
+    'End Property
 
-    Friend ReadOnly Property DateAsText(ByVal aHeaderIndex As Integer, ByVal aDataIndex As Integer) As String
-        Get
-            Dim lData As clsHspfBinData = Header(aHeaderIndex).Data.ItemByIndex(aDataIndex)
-            With lData
-                DateAsText = .DateArray(0) & "/" & .DateArray(1) & "/" & .DateArray(2) & " " & _
-                             .DateArray(3) & ":" & .DateArray(4) & ":" & .DateArray(5)
-            End With
-        End Get
-    End Property
+    'Friend ReadOnly Property Header(ByVal aHeaderIndex As Integer) As HspfBinaryHeader
+    '    Get
+    '        If aHeaderIndex >= 0 AndAlso aHeaderIndex < pHeaders.Count Then
+    '            Return pHeaders.Item(aHeaderIndex)
+    '        Else
+    '            Return Nothing
+    '        End If
+    '    End Get
+    'End Property
 
-    Friend ReadOnly Property Header(ByVal aHeaderIndex As Integer) As clsHspfBinHeader
-        Get
-            Return pHeaders.ItemByIndex(aHeaderIndex)
-        End Get
-    End Property
-
-    Friend ReadOnly Property Headers() As atcCollection
+    Friend ReadOnly Property Headers() As HspfBinaryHeaders
         Get
             Return pHeaders
-        End Get
-    End Property
-
-    Friend ReadOnly Property HeaderIdAsText(ByVal aHeaderIndex As Integer) As String
-        Get
-            Return HspfBinaryIdAsText(Header(aHeaderIndex).id)
         End Get
     End Property
 
@@ -83,9 +102,9 @@ Friend Class clsHspfBinary
             pFile = New clsFtnUnfFile
             pFile.Filename = newFileName
             pErrorDescription = pFile.ErrorDescription
-            If Len(pErrorDescription) = 0 Then
+            If pErrorDescription.Length = 0 Then
                 pHeaders = Nothing
-                pHeaders = New atcCollection
+                pHeaders = New HspfBinaryHeaders
                 pFileRecordIndex = 0
                 ReadNewRecords()
             End If
@@ -93,16 +112,14 @@ Friend Class clsHspfBinary
     End Property
 
     Friend Sub ReadNewRecords()
-        Dim lHspfBinId As New clsHspfBinId
-
         pFile.ReadRestOfRecordsInFile()
         While pFileRecordIndex < pFile.RecordCount
-            Dim lCurrentRecord() As Byte = pFile.Rec(pFileRecordIndex)
+            Dim lCurrentRecord() As Byte = pFile.Record(pFileRecordIndex)
             Select Case BitConverter.ToInt32(lCurrentRecord, 0)
                 Case 0 'header record
-                    Dim lHspfBinHeader As clsHspfBinHeader = New clsHspfBinHeader
+                    Dim lHspfBinHeader As HspfBinaryHeader = New HspfBinaryHeader
                     With lHspfBinHeader
-                        Dim lKey As String = MakeIdAndKey(lCurrentRecord, .id)
+                        .Id = MakeId(lCurrentRecord)
                         .VarNames = New atcCollection
 
                         'Byte position within current header record     
@@ -110,47 +127,46 @@ Friend Class clsHspfBinary
                         While lBytePosition < UBound(lCurrentRecord)
                             Dim lVariableNameLength As Integer = BitConverter.ToInt32(lCurrentRecord, lBytePosition)
                             Dim lVariableName As String = Byte2String(lCurrentRecord, lBytePosition + 4, lVariableNameLength).Trim
-                            'On Error Resume Next
-                            If InStr(lVariableName, "(") Then
+                            If lVariableName.IndexOf("(") > -1 Then
                                 Logger.Dbg("***** Removing Parens From:" & lVariableName)
                                 lVariableName = lVariableName.Replace("("c, " "c).Replace(")"c, " "c)
                             End If
                             .VarNames.Add(lVariableName, lVariableName)
-                            'On Error GoTo 0
                             lBytePosition += lVariableNameLength + 4
                         End While
 
-                        .Data = New atcCollection
-                        pHeaders.Add(lKey, lHspfBinHeader)
+                        .Data = New HspfBinaryData
+                        pHeaders.Add(lHspfBinHeader)
+                        'Logger.Dbg("Header:" & lHspfBinHeader.Id.AsKey)
                     End With
-                    'Debug.Print("header:" & myKey)
                 Case 1 'data record
-                    Dim lKey As String = MakeIdAndKey(lCurrentRecord, lHspfBinId)
+                    Dim lHspfBinId As HspfBinaryId = MakeId(lCurrentRecord)
                     Try
-                        Dim lHspfBinData As clsHspfBinData = New clsHspfBinData
+                        Dim lHspfBinaryHeader As HspfBinaryHeader = pHeaders.Item(lHspfBinId.AsKey)
+                        Dim lHspfBinData As HspfBinaryDatum = New HspfBinaryDatum
                         With lHspfBinData
                             .UnitFlag = BitConverter.ToInt32(lCurrentRecord, 24)
                             .OutLev = BitConverter.ToInt32(lCurrentRecord, 28)
-                            For j As Integer = 0 To 4
-                                .DateArray(j) = BitConverter.ToInt32(lCurrentRecord, 32 + (j * 4))
-                            Next j
+                            For lDateIndex As Integer = 0 To 4
+                                .DateArray(lDateIndex) = BitConverter.ToInt32(lCurrentRecord, 32 + (lDateIndex * 4))
+                            Next lDateIndex
                             If .DateArray(4) = 60 And .DateArray(3) = 24 Then
                                 .DateArray(4) = 0 'otherwise jdate is first hour in next day
                             End If
-                            Dim lVariableCount As Integer = pHeaders.ItemByKey(lKey).VarNames.Count
-                            ReDim .value(lVariableCount - 1)
-                            For j As Integer = 0 To lVariableCount - 1
-                                .value(j) = BitConverter.ToSingle(lCurrentRecord, 52 + (j * 4))
-                            Next j
+                            Dim lVariableCount As Integer = lHspfBinaryHeader.VarNames.Count
+                            ReDim .Value(lVariableCount - 1)
+                            For lVariableIndex As Integer = 0 To lVariableCount - 1
+                                .Value(lVariableIndex) = BitConverter.ToSingle(lCurrentRecord, 52 + (lVariableIndex * 4))
+                            Next lVariableIndex
                             Dim lDataKey As String = .OutLev & ":" & Date2J(.DateArray)
                             Try
-                                pHeaders.ItemByKey(lKey).Data.Add(lDataKey, lHspfBinData) 'should this be a date string YYYY/MM/DD HH?
+                                lHspfBinaryHeader.Data.Add(lHspfBinData) 'should this be a date string YYYY/MM/DD HH?
                             Catch e As Exception
                                 Logger.Dbg("***** ReadNewRecords:Fail to add data to header " & e.ToString)
                             End Try
                         End With
                     Catch e As Exception
-                        Dim lString As String = "***** Data Without Header for Key:" & lKey & " " & e.ToString
+                        Dim lString As String = "***** Data Without Header for Key:" & lHspfBinId.AsKey & " " & e.ToString
                         Logger.Dbg(lString)
                         pErrorDescription = lString
                     End Try
@@ -164,19 +180,14 @@ Friend Class clsHspfBinary
         End While
     End Sub
 
-    Private Function MakeIdAndKey(ByVal aRecord() As Byte, ByVal aHspfBinId As clsHspfBinId) As String
-        With aHspfBinId
+    Private Function MakeId(ByVal aRecord() As Byte) As HspfBinaryId
+        Dim lHspfBinId As New HspfBinaryId
+        With lHspfBinId
             .OperationName = Trim(Byte2String(aRecord, 4, 8))
             .OperationNumber = BitConverter.ToInt32(aRecord, 12)
             .SectionName = Trim(Byte2String(aRecord, 16, 8))
         End With
-        Return HspfBinaryIdAsText(aHspfBinId)
-    End Function
-
-    Private Function HspfBinaryIdAsText(ByVal aHspfBinId As clsHspfBinId) As String
-        With aHspfBinId
-            Return .OperationName & ":" & .OperationNumber & ":" & .SectionName
-        End With
+        Return lHspfBinId
     End Function
 
     Friend ReadOnly Property ErrorDescription() As String
@@ -186,30 +197,28 @@ Friend Class clsHspfBinary
         End Get
     End Property
 
-    Public Function BinaryValue(ByVal aOperationKey As String, ByVal aVariableKey As String, ByVal aDateKey As String) As Single
-        Dim lValue As Double = Double.NaN
+    'Friend Function BinaryValue(ByVal aOperationKey As String, ByVal aVariableKey As String, ByVal aDateKey As String) As Single
+    '    Dim lValue As Double = Double.NaN
 
-        Try
-            Dim lHeaderIndex As Integer = pHeaders.ItemByKey(aOperationKey)
-            If pHeaders.ItemByIndex(lHeaderIndex).VarNames.KeyExists(aVariableKey) Then
-                Dim lVarIndex As Integer = pHeaders.ItemByIndex(lHeaderIndex).VarNames.IndexFromKey(aVariableKey)
-                Dim lDateIndex As Integer
-                If pHeaders.ItemByIndex(lHeaderIndex).Data.KeyExists(aDateKey) Then
-                    lDateIndex = pHeaders.ItemByIndex(lHeaderIndex).Data.IndexFromKey(aDateKey)
-                    lValue = pHeaders.ItemByIndex(lHeaderIndex).Data(lDateIndex).value(lVarIndex)
-                Else
-                    pErrorDescription = "Missing Datekey " & aDateKey & _
-                                        " in Date Key Collection for Header " & _
-                                       HspfBinaryIdAsText(Header(lHeaderIndex).id)
-                End If
-            Else
-                pErrorDescription = "Missing Varkey " & aVariableKey & _
-                                   " in Variable Name Collection for Header " & _
-                                   HspfBinaryIdAsText(Header(lHeaderIndex).id)
-            End If
-        Catch
-            pErrorDescription = "Missing Opkey " & aOperationKey & " in Headers Collection"
-        End Try
-        Return lValue
-    End Function
+    '    Try
+    '        Dim lHeaderKey As String = pHeaders.Item(aOperationKey).Id.AsKey
+    '        If pHeaders.Item(lHeaderKey).VarNames.IndexFromKey(aVariableKey) > -1 Then
+    '            Dim lVarIndex As Integer = pHeaders.Item(lHeaderKey).VarNames.IndexFromKey(aVariableKey)
+    '            Try
+    '                lValue = pHeaders.Item(lHeaderKey).Data(aDateKey).Value(lVarIndex)
+    '            Catch
+    '                pErrorDescription = "Missing Datekey " & aDateKey & _
+    '                                    " in Date Key Collection for Header " & _
+    '                                   pHeaders(lHeaderKey).Id.AsKey
+    '            End Try
+    '        Else
+    '            pErrorDescription = "Missing Varkey " & aVariableKey & _
+    '                               " in Variable Name Collection for Header " & _
+    '                                pHeaders(lHeaderKey).Id.AsKey
+    '        End If
+    '    Catch
+    '        pErrorDescription = "Missing Opkey " & aOperationKey & " in Headers Collection"
+    '    End Try
+    '    Return lValue
+    'End Function
 End Class
