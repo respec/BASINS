@@ -475,11 +475,12 @@ Public Class HspfOpnBlk
         Dim lLastInGroup, lLastGroupIndex, lCurrentOccurGroup As Integer
         Dim lInGroup As Boolean = False
         Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs.Item(Me.Name)
-        Dim lFirstTable As Boolean = True
         Dim lTableDefIndex As Integer = 0
-        For Each lTableDef As HspfTableDef In lBlockDef.TableDefs
+        Do While lTableDefIndex < lBlockDef.TableDefs.Count
             'must look thru all possible tables
             lTableDefIndex += 1
+            Dim lTableDef As HspfTableDef = lBlockDef.TableDefs(lTableDefIndex - 1)
+
             If lTableDef.OccurGroup = 0 And Not lInGroup Then 'the basic case
                 For Each lOperation As HspfOperation In pIds
                     If lOperation.TableExists(lTableDef.Name) Then
@@ -504,7 +505,7 @@ Public Class HspfOpnBlk
                         Else
                             lLastInGroup = lTableDefIndex - 1 'remember which was the last table in group
                             lTableDefIndex = lFirstInGroup
-                            lTableDef = lBlockDef.TableDefs.Item(lTableDefIndex)
+                            lTableDef = lBlockDef.TableDefs.Item(lTableDefIndex - 1)
                         End If
                     End If
                 Else 'start of a multiple occurence group
@@ -564,8 +565,7 @@ Public Class HspfOpnBlk
                     Next lOperation
                 End If
             End If
-            lFirstTable = False
-        Next lTableDef
+        Loop
 
         lSB.AppendLine("END " & Me.Name)
         Return lSB.ToString
