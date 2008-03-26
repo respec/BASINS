@@ -1,8 +1,6 @@
 Public Class ScriptPlugin
     Inherits atcData.atcDataPlugin
 
-    Dim pMapWin As MapWindow.Interfaces.IMapWin
-
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "ScriptPlugin"
@@ -11,7 +9,6 @@ Public Class ScriptPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        pMapWin = aMapWin
         pMapWin.Toolbar.AddButton("Test")
     End Sub
 

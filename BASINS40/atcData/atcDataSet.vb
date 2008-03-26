@@ -47,6 +47,28 @@ Public Class atcDataSet
         End Get
     End Property
 
+    ''' <summary>
+    ''' Test for equality by testing whether these datasets have the same serial number
+    ''' </summary>
+    ''' <param name="aArg1">One dataset to compare to the other</param>
+    ''' <param name="aArg2">The other dataset to compare to the one</param>
+    ''' <returns>True if datasets have same serial number</returns>
+    ''' <remarks>False even if values in datasets (other than serial number) match each other exactly</remarks>
+    Public Shared Operator =(ByVal aArg1 As atcDataSet, ByVal aArg2 As atcDataSet) As Boolean
+        If aArg1 Is Nothing Then
+            Return aArg2 Is Nothing
+        ElseIf aArg2 Is Nothing Then
+            Return False
+        Else
+            Return aArg1.Serial = aArg2.Serial
+        End If
+    End Operator
+
+    ''' <summary>Exact opposite of the operator = </summary>
+    Public Shared Operator <>(ByVal aArg1 As atcDataSet, ByVal aArg2 As atcDataSet) As Boolean
+        Return Not (aArg1 = aArg2)
+    End Operator
+
     ''' <summary>String describing this DataSet</summary>
     Public Overrides Function ToString() As String
         Try

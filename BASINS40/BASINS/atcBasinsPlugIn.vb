@@ -100,7 +100,6 @@ Public Class atcBasinsPlugIn
         g_Plugins = g_MapWin.Plugins
         g_Project = g_MapWin.Project
 
-        atcDataManager.AddMenuIfMissing(DownloadMenuName, atcDataManager.FileMenuName, DownloadMenuString, atcDataManager.OpenDataMenuName)
         atcDataManager.AddMenuIfMissing(ProjectsMenuName, atcDataManager.FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
         atcDataManager.AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
@@ -132,10 +131,12 @@ Public Class atcBasinsPlugIn
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_ArcGIS", atcDataManager.LaunchMenuName, "ArcGIS")
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_GenScn", atcDataManager.LaunchMenuName, "GenScn")
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_WDMUtil", atcDataManager.LaunchMenuName, "WDMUtil")
+
+        atcDataManager.LoadPlugin("D4EM Data Download::BASINS")
+
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        g_MapWin.Menus.Remove(DownloadMenuName)
         g_MapWin.Menus.Remove(ProjectsMenuName)
         g_MapWin.Menus.Remove(BasinsHelpMenuName)
         g_MapWin.Menus.Remove(BasinsWebPageMenuName)
@@ -167,12 +168,6 @@ Public Class atcBasinsPlugIn
             Case "mnuAboutMapWindow" 'Override Help/About menu
                 Dim lAbout As New frmAbout
                 lAbout.ShowAbout()
-            Case DownloadMenuName
-                If NationalProjectIsOpen() Then
-                    SpecifyAndCreateNewProject()
-                Else
-                    DownloadNewData(PathNameOnly(g_Project.FileName) & "\")
-                End If
             Case RegisterMenuName
                 OpenFile("http://hspf.com/pub/basins4/register.html")
             Case CheckForUpdatesMenuName

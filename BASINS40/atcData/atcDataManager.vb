@@ -114,6 +114,21 @@ Public Class atcDataManager
         Return lMatchingPlugIns
     End Function
 
+    ''' <summary>
+    ''' Activate the named plugin
+    ''' </summary>
+    ''' <param name="aPluginName">Name of plugin to activate</param>
+    ''' <remarks></remarks>
+    Public Shared Sub LoadPlugin(ByVal aPluginName As String)
+        Try
+            Dim lKey As String = pMapWin.Plugins.GetPluginKey(aPluginName)
+            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
+            pMapWin.Plugins.StartPlugin(lKey)
+        Catch e As Exception
+            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
+        End Try
+    End Sub
+
     ''' <summary>Open BASINS data source</summary>
     ''' <param name="aNewSource">
     '''     <para>Instance of data source that can open the specified data</para>

@@ -137,6 +137,11 @@
       <Name>atcUtility</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\BASINS\BASINS.vbproj">
+      <Project>{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}</Project>
+      <Name>BASINS</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
