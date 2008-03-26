@@ -6,8 +6,16 @@ Public Class DownloadDataPlugin
     Private g_MapWin As MapWindow.Interfaces.IMapWin
     Private g_MainForm As Integer
 
-    Private Const pMenuLabel As String = "Download Data (D4EM)"
+    Private Const pMenuLabel As String = "Download Data"
     Private Const pMenuName As String = "mnuDownloadDataD4EM"
+
+#Region "Plug-in Information"
+
+    Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
+        Get
+            Return Description
+        End Get
+    End Property
 
     Public ReadOnly Property Author() As String Implements MapWindow.Interfaces.IPlugin.Author
         Get
@@ -21,18 +29,20 @@ Public Class DownloadDataPlugin
         End Get
     End Property
 
+    Public ReadOnly Property Version() As String Implements MapWindow.Interfaces.IPlugin.Version
+        Get
+            Return Diagnostics.FileVersionInfo.GetVersionInfo(Me.GetType().Assembly.Location).FileVersion
+        End Get
+    End Property
+
     Public ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
         Get
             Return "D4EM Data Download::Main"
         End Get
     End Property
+#End Region
 
-    Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
-        g_MapWin = MapWin
-        g_Menus = MapWin.Menus
-        g_MainForm = ParentHandle
-        AddMenuIfMissing(pMenuName, "mnuFile", pMenuLabel, "mnuNew")
-    End Sub
+#Region "Unused Plug-in Interface Elements"
 
     Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
     End Sub
@@ -73,12 +83,6 @@ Public Class DownloadDataPlugin
     Public Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
     End Sub
 
-    Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
-        Get
-            Return Description
-        End Get
-    End Property
-
     Public Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
     End Sub
 
@@ -93,17 +97,9 @@ Public Class DownloadDataPlugin
 
     Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
     End Sub
+#End Region
 
-    Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        g_Menus.Remove(pMenuName)
-    End Sub
-
-    Public ReadOnly Property Version() As String Implements MapWindow.Interfaces.IPlugin.Version
-        Get
-            Return Diagnostics.FileVersionInfo.GetVersionInfo(Me.GetType().Assembly.Location).FileVersion
-        End Get
-    End Property
-
+#Region "Copied from atcDataManager"
     Private Function AddMenuIfMissing(ByVal aMenuName As String, _
                                   ByVal aParent As String, _
                                   ByVal aMenuText As String, _
@@ -169,36 +165,57 @@ Public Class DownloadDataPlugin
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try
     End Sub
+#End Region
 
-    Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
-        If ItemName.Equals(pMenuName) Then
-            atcMwGisUtility.GisUtil.MappingObject = g_MapWin
-            LoadPlugin("D4EM Data Download::BASINS")
-            LoadPlugin("D4EM Data Download::NHDPlus")
-            LoadPlugin("D4EM Data Download::NWIS")
-            LoadPlugin("D4EM Data Download::NLCD2001")
+    Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+        g_MapWin = MapWin
+        g_Menus = MapWin.Menus
+        g_MainForm = ParentHandle
+        AddMenuIfMissing(pMenuName, "mnuFile", pMenuLabel, "mnuNew")
+    End Sub
 
-            Dim lDownloadForm As New frmDownload
-            Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
-            'Logger.Msg(lQuery, "Query from frmDownload")
-            If lQuery.Length > 0 AndAlso Not lQuery.Equals(frmDownload.CancelString) Then
-                Dim lPlugins As New ArrayList
-                For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
-                    Try
-                        If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
-                            lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+    Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
+        g_Menus.Remove(pMenuName)
+    End Sub
+
+    Public Sub ItemClicked(ByVal aItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
+        Select Case aItemName
+            Case "mnuNew"            'Override File/New menu
+                atcMwGisUtility.GisUtil.MappingObject = g_MapWin
+                BASINS.BASINSNewMenu()
+                Handled = True
+            Case pMenuName
+                atcMwGisUtility.GisUtil.MappingObject = g_MapWin
+                LoadPlugin("D4EM Data Download::BASINS")
+                LoadPlugin("D4EM Data Download::NHDPlus")
+                LoadPlugin("D4EM Data Download::NWIS")
+                LoadPlugin("D4EM Data Download::NLCD2001")
+
+                If BASINS.NationalProjectIsOpen() Then
+                    BASINS.SpecifyAndCreateNewProject()
+                Else
+                    Dim lDownloadForm As New frmDownload
+                    Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
+                    'Logger.Msg(lQuery, "Query from frmDownload")
+                    If lQuery.Length > 0 AndAlso Not lQuery.Equals(frmDownload.CancelString) Then
+                        Dim lPlugins As New ArrayList
+                        For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
+                            Try
+                                If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                                    lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+                                End If
+                            Catch ex As Exception
+                            End Try
+                        Next
+                        Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+                        Dim lResult As String = lDownloadManager.Execute(lQuery)
+                        'Logger.Msg(lResult, "Result of Query from DataManager")
+                        If Not lResult Is Nothing AndAlso lResult.Length > 0 Then
+                            g_MapWin.Plugins.BroadcastMessage(lResult)
                         End If
-                    Catch ex As Exception
-                    End Try
-                Next
-                Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
-                Dim lResult As String = lDownloadManager.Execute(lQuery)
-                'Logger.Msg(lResult, "Result of Query from DataManager")
-                If Not lResult Is Nothing AndAlso lResult.Length > 0 Then
-                    g_MapWin.Plugins.BroadcastMessage(lResult)
+                    End If
                 End If
-            End If
-        End If
+        End Select
     End Sub
 
 End Class

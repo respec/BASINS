@@ -308,4 +308,16 @@ Public Class frmDownload
             End If
         End With
     End Sub
+
+    Private Sub btnOther_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOther.Click
+        Me.Visible = False
+        Dim lDirectory As String
+        If pMapWin.Project Is Nothing Then
+            lDirectory = CurDir()
+        Else
+            lDirectory = IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "\"
+        End If
+        BASINS.DownloadNewData(lDirectory)
+        Me.Close()
+    End Sub
 End Class

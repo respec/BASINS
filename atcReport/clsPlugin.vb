@@ -7,13 +7,8 @@ Imports System.Collections.Specialized
 Public Class PlugIn
     Inherits atcData.atcDataDisplay
 
-    Private pMapWin As MapWindow.Interfaces.IMapWin
     Private pReportsDir As String
     Private pReports As Collection
-
-    'TODO: get these from BASINS4 or plugInManager or Name?
-    'Private Const pReportsMenuName As String = "BasinsAnalysis"
-    'Private Const pReportsMenuString As String = "&Analysis"
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -30,7 +25,6 @@ Public Class PlugIn
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        pMapWin = aMapWin
 
         'AddMenuIfMissing(pReportsMenuName, "", pReportsMenuString)
         'AddMenuIfMissing(pReportsMenuName & "_Watershed", pReportsMenuName, "Watershed Characterization Reports")
