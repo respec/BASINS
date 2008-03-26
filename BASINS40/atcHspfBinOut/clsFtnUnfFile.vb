@@ -21,9 +21,9 @@ Friend Class clsFtnUnfFile
     Dim pRecords As Collection(Of UnformattedRecord)
 
     Private Class UnformattedRecord
-        Public StartPos As Integer = 0
-        Public Length As Integer = 0
-        Public Record() As Byte
+        Friend StartPosition As Integer = 0
+        Friend Length As Integer = 0
+        Friend Record() As Byte
     End Class
 
     Friend ReadOnly Property RecordCount() As Integer
@@ -32,15 +32,23 @@ Friend Class clsFtnUnfFile
         End Get
     End Property
 
-    Friend ReadOnly Property Reclen(ByVal aIndex As Integer) As Integer
+    Friend ReadOnly Property RecordLength(ByVal aIndex As Integer) As Integer
         Get
-            Return pRecords(aIndex).Length
+            If aIndex >= 0 AndAlso aIndex < pRecords.Count Then
+                Return pRecords(aIndex).Length
+            Else
+                Return Nothing
+            End If
         End Get
     End Property
 
-    Friend ReadOnly Property Rec(ByVal aIndex As Integer) As Byte()
+    Friend ReadOnly Property Record(ByVal aIndex As Integer) As Byte()
         Get
-            Return pRecords(aIndex).Record
+            If aIndex >= 0 AndAlso aIndex < pRecords.Count Then
+                Return pRecords(aIndex).Record
+            Else
+                Return Nothing
+            End If
         End Get
     End Property
 
@@ -78,14 +86,14 @@ Friend Class clsFtnUnfFile
         Do While Seek(pFileNum) < pBytesInFile - 2
             Dim lUnfRec As New UnformattedRecord
             With lUnfRec
-                .StartPos = Seek(pFileNum)
+                .StartPosition = Seek(pFileNum)
                 .Length = FtnUnfSeqRecLen(pFileNum, aFirst)
                 'Debug.Print .StartPos, .Len
                 If .Length > 0 Then 'fill in the data
                     ReDim .Record(.Length - 1)
                     FileGet(pFileNum, .Record)
                 Else 'whats the problem?
-                    Logger.Dbg("***** clsFtnUnfFile:ReadRestOfRecordsInFile:Len=0:Start=" & .StartPos & ":Lof=" & pBytesInFile & ":File=" & pFileName)
+                    Logger.Dbg("***** clsFtnUnfFile:ReadRestOfRecordsInFile:Len=0:Start=" & .StartPosition & ":Lof=" & pBytesInFile & ":File=" & pFileName)
                 End If
             End With
             pRecords.Add(lUnfRec)
@@ -94,19 +102,19 @@ Friend Class clsFtnUnfFile
     End Sub
 
     Private Function FtnUnfSeqRecLen(ByVal aFileUnit As Integer, ByRef aFirst As Boolean) As Integer
-        Static mLastLen As Integer
+        Static mLengthLast As Integer
 
         Dim c As Integer
         Dim h As Integer
         Dim lByte As Byte
 
         If aFirst Then
-            mLastLen = 0
+            mLengthLast = 0
             aFirst = False
         Else
             c = 64
             FileGet(aFileUnit, lByte)
-            While mLastLen >= c
+            While mLengthLast >= c
                 c = c * 256
                 FileGet(aFileUnit, lByte)
             End While
@@ -122,7 +130,7 @@ Friend Class clsFtnUnfFile
             lRecordLength = lRecordLength + lByte * c
             c = c * 256
         Loop
-        mLastLen = lRecordLength + h
+        mLengthLast = lRecordLength + h
         Return lRecordLength
     End Function
 
