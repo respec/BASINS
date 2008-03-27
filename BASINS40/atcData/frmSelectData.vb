@@ -954,7 +954,10 @@ NextName:
         pMatchingGrid.Refresh()
         pSelectedGrid.Refresh()
         groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
-        If mnuSelectMap.Checked Then atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
+        Try
+            If mnuSelectMap.Checked Then atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
+        Catch
+        End Try
     End Sub
 
     Private Sub mnuSelectMap_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSelectMap.Click
