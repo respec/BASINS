@@ -1107,14 +1107,18 @@ Public Class GisUtil
         If IsLayer(aLayerName) Then  'already on map 
             AddLayer = True
         Else
-            Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers.Add(aFileName, aLayerName)
-            If lLayer Is Nothing Then
+            If Not FileExists(aFileName) Then
                 AddLayer = False
             Else
-                lLayer.Name = aLayerName
-                lLayer.Visible = False
-                AddLayer = True
-                GetMappingObject.Project.Modified = True
+                Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers.Add(aFileName, aLayerName)
+                If lLayer Is Nothing Then
+                    AddLayer = False
+                Else
+                    lLayer.Name = aLayerName
+                    lLayer.Visible = False
+                    AddLayer = True
+                    GetMappingObject.Project.Modified = True
+                End If
             End If
         End If
     End Function
