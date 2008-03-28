@@ -206,9 +206,32 @@ Public Class atcDataGroup
     Public Function FindData(ByVal aAttributeName As String, ByVal aValue As String, Optional ByVal aLimit As Integer = 0) As atcDataGroup
         Dim lMatch As New atcDataGroup
         Try
-            For Each lDataset As atcDataSet In Me
+            For lIndex As Integer = 0 To Me.Count - 1
+                Dim lDataset As atcDataSet = Me.ItemByIndex(lIndex)
                 If CStr(lDataset.Attributes.GetValue(aAttributeName)).ToLower = aValue.ToLower Then
-                    lMatch.Add(lDataset)
+                    lMatch.Add(Me.Keys(lIndex), lDataset)
+                    If lMatch.Count = aLimit Then 'note default limit is 0, never match
+                        Exit For
+                    End If
+                End If
+            Next
+        Catch
+        End Try
+        Return lMatch
+    End Function
+
+    Public Function FindData(ByVal aAttributeName As String, ByVal aValues As atcCollection, Optional ByVal aLimit As Integer = 0) As atcDataGroup
+        Dim lMatch As New atcDataGroup
+        Try
+            Dim lLowerValues As New atcCollection
+            For Each lValue As String In aValues
+                lLowerValues.Add(lValue.ToLower)
+            Next
+
+            For lIndex As Integer = 0 To Me.Count - 1
+                Dim lDataset As atcDataSet = Me.ItemByIndex(lIndex)
+                If lLowerValues.Contains(CStr(lDataset.Attributes.GetValue(aAttributeName)).ToLower) Then
+                    lMatch.Add(Me.Keys(lIndex), lDataset)
                     If lMatch.Count = aLimit Then 'note default limit is 0, never match
                         Exit For
                     End If
