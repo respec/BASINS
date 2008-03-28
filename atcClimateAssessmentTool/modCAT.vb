@@ -71,7 +71,8 @@ Public Module modCAT
                            ByVal aModifiedData As atcDataGroup, _
                            ByVal aPreparedInput As String, _
                            ByVal aRunModel As Boolean, _
-                           ByVal aShowProgress As Boolean) As atcCollection 'of atcDataSource
+                           ByVal aShowProgress As Boolean, _
+                           ByVal aKeepRunning As Boolean) As atcCollection 'of atcDataSource
         'Copy base UCI and change scenario name within it
         'Copy WDM
         'Change data to be modified in new WDM
@@ -156,7 +157,9 @@ Public Module modCAT
                 Dim newProc As Diagnostics.Process
                 newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
                 While Not newProc.HasExited
-                    If Not g_running Then newProc.Kill()
+                    If Not g_running And Not aKeepRunning Then
+                        newProc.Kill()
+                    End If
                     Windows.Forms.Application.DoEvents()
                     Threading.Thread.Sleep(50)
                 End While

@@ -905,7 +905,7 @@ NextIteration:
 
                 UpdateStatusLabel(aIteration)
                 pTimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, True, chkShowEachRunProgress.Checked)
+                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, True, chkShowEachRunProgress.Checked, False)
                 If lResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
                     Exit Sub
