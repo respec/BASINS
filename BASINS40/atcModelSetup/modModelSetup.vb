@@ -131,7 +131,8 @@ Module modModelSetup
 
             If lFound Then
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                    If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
+                    If (lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" Or lDataSet.Attributes.GetValue("Scenario") = "COMPUTED") _
+                        And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
                         Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
                         Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
                         Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")

@@ -963,7 +963,10 @@ Module modCreateUci
                 End With
                 lMetSegRecord.Ssystem = "ENGL"
                 lMetSegRecord.Tran = "SAME"
-                lMetSeg.MetSegRecs.Add(lMetSegRecord)
+                'make sure this dsn exists
+                If Not aUci.GetDataSetFromDsn(lMetSegRecord.Source.VolName.Substring(3), lMetSegRecord.Source.VolId) Is Nothing Then
+                    lMetSeg.MetSegRecs.Add(lMetSegRecord)
+                End If
             Next
             With lMetSegment.DataTypes("PREC")
                 lMetSeg.ExpandMetSegName(.WdmID, .Dsn)
