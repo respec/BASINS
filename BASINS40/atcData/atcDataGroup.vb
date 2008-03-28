@@ -203,15 +203,24 @@ Public Class atcDataGroup
         Remove(lRemoveThese)
     End Sub
 
+    ''' <summary>
+    ''' Return a subset of this atcDataGroup containing only the atcDataSets where the named attribute has the given value
+    ''' </summary>
+    ''' <param name="aAttributeName">Name of Attribute to check</param>
+    ''' <param name="aValue">Value that given attribute must have to include dataset in group returned</param>
+    ''' <param name="aLimit">Optional limit of how many data sets to return, default of 0 means there is no limit</param>
+    ''' <remarks>search for value is not case sensitive</remarks>
     Public Function FindData(ByVal aAttributeName As String, ByVal aValue As String, Optional ByVal aLimit As Integer = 0) As atcDataGroup
         Dim lMatch As New atcDataGroup
+        Dim lDataset As atcDataSet
         Try
+            Dim lValue As String = aValue.ToLower
             For lIndex As Integer = 0 To Me.Count - 1
-                Dim lDataset As atcDataSet = Me.ItemByIndex(lIndex)
-                If CStr(lDataset.Attributes.GetValue(aAttributeName)).ToLower = aValue.ToLower Then
+                lDataset = Me.ItemByIndex(lIndex)
+                If CStr(lDataset.Attributes.GetValue(aAttributeName)).ToLower = lValue Then
                     lMatch.Add(Me.Keys(lIndex), lDataset)
-                    If lMatch.Count = aLimit Then 'note default limit is 0, never match
-                        Exit For
+                    If lMatch.Count = aLimit Then
+                        Exit For 'Reached requested limit, stop looking for more
                     End If
                 End If
             Next
@@ -220,8 +229,16 @@ Public Class atcDataGroup
         Return lMatch
     End Function
 
+    ''' <summary>
+    ''' Return a subset of this atcDataGroup containing only the atcDataSets where the named attribute has one of the given values
+    ''' </summary>
+    ''' <param name="aAttributeName">Name of Attribute to check</param>
+    ''' <param name="aValues">Acceptable values for the given attribute to include dataset in group returned</param>
+    ''' <param name="aLimit">Optional limit of how many data sets to return, default of 0 means there is no limit</param>
+    ''' <remarks>search for value is not case sensitive</remarks>
     Public Function FindData(ByVal aAttributeName As String, ByVal aValues As atcCollection, Optional ByVal aLimit As Integer = 0) As atcDataGroup
         Dim lMatch As New atcDataGroup
+        Dim lDataset As atcDataSet
         Try
             Dim lLowerValues As New atcCollection
             For Each lValue As String In aValues
@@ -229,11 +246,11 @@ Public Class atcDataGroup
             Next
 
             For lIndex As Integer = 0 To Me.Count - 1
-                Dim lDataset As atcDataSet = Me.ItemByIndex(lIndex)
+                lDataset = Me.ItemByIndex(lIndex)
                 If lLowerValues.Contains(CStr(lDataset.Attributes.GetValue(aAttributeName)).ToLower) Then
                     lMatch.Add(Me.Keys(lIndex), lDataset)
-                    If lMatch.Count = aLimit Then 'note default limit is 0, never match
-                        Exit For
+                    If lMatch.Count = aLimit Then
+                        Exit For 'Reached requested limit, stop looking for more
                     End If
                 End If
             Next
