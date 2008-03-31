@@ -44,13 +44,6 @@ Public Module modDownload
                     If GisUtil.LayerType(GisUtil.CurrentLayer) = 3 Then
                         'this is a polygon shapefile
 
-                        'build collection of selected shapes
-                        Dim lSelectedLayer As Integer = GisUtil.CurrentLayer
-                        Dim lSelectedShapeIndexes As New Collection
-                        For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSelectedLayer)
-                            lSelectedShapeIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSelectedLayer))
-                        Next
-
                         'come up with a suggested name for the new project
                         Dim lDataPath As String = DefaultBasinsDataDir()
                         Dim lDefDirName As String = FilenameOnly(GisUtil.ProjectFileName)
@@ -86,7 +79,7 @@ Public Module modDownload
                                     System.IO.Directory.CreateDirectory(lTarget)
                                 Next
 
-                                CopyFeaturesWithinExtent(lSelectedLayer, lSelectedShapeIndexes, lOldDataDir, lNewDataDir)
+                                CopyFeaturesWithinExtent(lOldDataDir, lNewDataDir)
 
                                 'copy all other files from the old project directory to the new one
                                 Dim lFilenames As NameValueCollection
@@ -130,7 +123,7 @@ Public Module modDownload
             'if not coming from a BASINS project,
             'ask if user wants to make this into a BASINS
             'project or create an entirely new one
-            If GisUtil.NumLayers > 0 Then
+            If Not NationalProjectIsOpen() AndAlso GisUtil.NumLayers > 0 Then
                 lResponse = Logger.Msg("Do you want to create a BASINS project based on this MapWindow project?" & vbCrLf & vbCrLf & _
                                        "(Answer 'No' to create an entirely new BASINS project)", vbYesNoCancel, "Convert MapWindow Project to BASINS Project?")
                 If lResponse = MsgBoxResult.No Then
@@ -235,27 +228,79 @@ Public Module modDownload
                     End If
                 End If
             Else
-                'there are no layers 
+                'there are no layers or national project is already open
                 LoadNationalProject()
             End If
         End If
     End Sub
 
-    Private Function GetSelected(ByVal aField As Integer) As ArrayList
-        Dim lSelected As Integer
-        Dim lShape As Integer
-        Dim lSf As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
-        Dim lRetval As New ArrayList(g_MapWin.View.SelectedShapes().NumSelected)
-        For lSelected = 0 To g_MapWin.View.SelectedShapes.NumSelected - 1
-            lShape = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
-            lRetval.Add(lSf.CellValue(aField, lShape))
-        Next
-        Return lRetval
+    Private Function GetSelectedRegion() As String
+        Try
+            Dim lNumSelected As Integer = g_MapWin.View.SelectedShapes.NumSelected
+            If lNumSelected > 0 Then
+                Dim lXML As String = ""
+                Dim lThemeTag As String = ""
+                Dim lFieldName As String = ""
+                Dim lField As Integer
+                Dim lFieldMatch As Integer = -1
+                Dim lCurLayer As MapWinGIS.Shapefile
+                lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+
+                Select Case FilenameOnly(lCurLayer.Filename).ToLower
+                    Case "cat", "huc", "huc250d3"
+                        lThemeTag = "HUC8" '"huc_cd"
+                        lFieldName = "CU"
+                    Case "cnty"
+                        lThemeTag = "county_cd"
+                        lFieldName = "FIPS"
+                    Case "st"
+                        lThemeTag = "state_abbrev"
+                        lFieldName = "ST"
+                End Select
+
+                lFieldName = lFieldName.ToLower
+                For lField = 0 To lCurLayer.NumFields - 1
+                    If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
+                        lFieldMatch = lField
+                    End If
+                Next
+
+                With g_MapWin.View.SelectedShapes.SelectBounds
+                    lXML &= "  <northbc>" & .yMax & "</northbc>" & vbCrLf
+                    lXML &= "  <southbc>" & .yMin & "</southbc>" & vbCrLf
+                    lXML &= "  <eastbc>" & .xMax & "</eastbc>" & vbCrLf
+                    lXML &= "  <westbc>" & .xMin & "</westbc>" & vbCrLf
+                    lXML &= "  <projection>" & g_Project.ProjectProjection & "</projection>" & vbCrLf
+                End With
+
+                If lFieldMatch >= 0 Then
+                    For lSelected As Integer = 0 To lNumSelected - 1
+                        Dim lShapeIndex As Integer = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
+                        lXML &= "  <" & lThemeTag & " status=""set by " & XMLappName & """>" & lCurLayer.CellValue(lFieldMatch, lShapeIndex) & "</" & lThemeTag & ">" & vbCrLf
+                    Next
+                End If
+                If lXML.Length > 0 Then
+                    Return "<region>" & vbCrLf & lXML & "</region>" & vbCrLf
+                End If
+            End If
+        Catch e As Exception
+            Logger.Dbg("Exception getting selected region: " & e.Message)
+        End Try
+        Return ""
     End Function
 
-    Private Sub CopyFeaturesWithinExtent(ByVal aSelectedLayer As Integer, ByVal aSelectedShapeIndexes As Collection, ByVal aOldFolder As String, ByVal aNewFolder As String)
+
+    Private Sub CopyFeaturesWithinExtent(ByVal aOldFolder As String, ByVal aNewFolder As String)
         'copy features that are within selected indexes of selected layer to new folder
         Dim i As Integer
+
+        'build collection of selected shapes
+        Dim lSelectedLayer As Integer = GisUtil.CurrentLayer
+        Dim lSelectedShapeIndexes As New Collection
+        For i = 1 To GisUtil.NumSelectedFeatures(lSelectedLayer)
+            lSelectedShapeIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSelectedLayer))
+        Next
+
         Dim lCurrentSf As MapWinGIS.Shapefile
         Dim lResultSf As MapWinGIS.Shapefile
         Dim lNewName As String
@@ -263,17 +308,17 @@ Public Module modDownload
         Dim lExtentShape As MapWinGIS.Shape = Nothing
         Dim lResultShape As MapWinGIS.Shape = Nothing
         Dim lExtentsSf As New MapWinGIS.Shapefile
-        Dim lExtentsFileName As String = GisUtil.LayerFileName(aSelectedLayer)
+        Dim lExtentsFileName As String = GisUtil.LayerFileName(lSelectedLayer)
         If lExtentsSf.Open(lExtentsFileName) Then
-            lExtentShape = lExtentsSf.Shape(aSelectedShapeIndexes(1))
-            For i = 2 To aSelectedShapeIndexes.Count
-                MapWinGeoProc.SpatialOperations.MergeShapes(lExtentShape, lExtentsSf.Shape(aSelectedShapeIndexes(i)), lResultShape)
+            lExtentShape = lExtentsSf.Shape(lSelectedShapeIndexes(1))
+            For i = 2 To lSelectedShapeIndexes.Count
+                MapWinGeoProc.SpatialOperations.MergeShapes(lExtentShape, lExtentsSf.Shape(lSelectedShapeIndexes(i)), lResultShape)
                 lExtentShape = lResultShape
             Next
         End If
 
         For iLayer As Integer = 0 To GisUtil.NumLayers - 1
-            If iLayer <> aSelectedLayer Then
+            If iLayer <> lSelectedLayer Then
                 If FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "wdm.shp" And FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "metpt.shp" Then
                     'want to keep met pts
                     g_StatusBar(1).Text = "Selecting " & GisUtil.LayerName(iLayer)
@@ -334,87 +379,73 @@ Public Module modDownload
     Public Sub SpecifyAndCreateNewProject()
         pBuildFrm = Nothing
 
-        Dim lThemeTag As String = ""
-        Dim lFieldName As String = ""
-        Dim lField As Integer
-        Dim lFieldMatch As Integer = -1
-        Dim lCurLayer As MapWinGIS.Shapefile
-        lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
-
-        Select Case FilenameOnly(lCurLayer.Filename).ToLower
-            Case "cat", "huc", "huc250d3"
-                lThemeTag = "huc_cd"
-                lFieldName = "CU"
-            Case "cnty"
-                lThemeTag = "county_cd"
-                lFieldName = "FIPS"
-            Case "st"
-                lThemeTag = "state_abbrev"
-                lFieldName = "ST"
-            Case Else
-                Logger.Msg("Unknown layer for selection, using lFirst field", "Area Selection")
-                lThemeTag = "huc_cd"
-                lFieldMatch = 1
-        End Select
-
-        lFieldName = lFieldName.ToLower
-        For lField = 0 To lCurLayer.NumFields - 1
-            If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
-                lFieldMatch = lField
-            End If
-        Next
-
-        If lFieldMatch >= 0 Then
+        Dim lRegion As String = GetSelectedRegion()
+        If lRegion.Length > 0 Then
             If pExistingMapWindowProjectName.Length = 0 Then
                 'This is the normal case for building a new project,
                 'Save national project as the user has zoomed it
                 g_Project.Save(g_Project.FileName)
-                CreateNewProjectAndDownloadCoreDataInteractive(lThemeTag, GetSelected(lFieldMatch))
+                CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
             Else
                 'build new basins project from mapwindow project
                 Dim lDataPath As String = DefaultBasinsDataDir()
                 Dim lNewDataDir As String = PathNameOnly(pExistingMapWindowProjectName) & "\"
                 'download and project core data
-                Logger.Dbg("DownloadData:" & lThemeTag)
-                CreateNewProjectAndDownloadCoreData(lThemeTag, GetSelected(lFieldMatch), lDataPath, lNewDataDir, pExistingMapWindowProjectName, True)
+                CreateNewProjectAndDownloadCoreData(lRegion, lDataPath, lNewDataDir, pExistingMapWindowProjectName, True)
                 pExistingMapWindowProjectName = ""
             End If
         Else
-            Logger.Msg("Could not find field " & lFieldName & " in " & lCurLayer.Filename, "Could not create project")
+            Logger.Msg("Region not specified", "Could not create project")
         End If
 
     End Sub
 
     'Returns file name of new project or "" if not built
-    Friend Function CreateNewProjectAndDownloadCoreDataInteractive(ByVal aThemeTag As String, ByVal aSelectedFeatures As ArrayList) As String
+    Friend Function CreateNewProjectAndDownloadCoreDataInteractive(ByVal aRegion As String) As String
         Dim lDataPath As String
         Dim lDefaultProjectFileName As String
         Dim lProjectFileName As String
         Dim lNoData As Boolean = False
-        Dim lDefDirName As String
+        Dim lDefDirName As String = "NewProject"
         Dim lNewDataDir As String
         Dim lMyProjection As String
 
 StartOver:
         lDataPath = DefaultBasinsDataDir()
 
-        Logger.Dbg("SelectedFeatures" & aSelectedFeatures.Count)
-        Select Case aSelectedFeatures.Count
-            Case 0
-                If lNoData Then
-                    'Already came through here, don't ask again
-                Else
-                    lNoData = True
-                    If Logger.Msg("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then
-                        Return ""
-                    End If
+        Dim lRegionXML As New Xml.XmlDocument
+
+        With lRegionXML
+            .LoadXml(aRegion)
+            For Each lChild As Xml.XmlNode In .ChildNodes(0).ChildNodes
+                If lChild.InnerText.Length > 0 Then
+                    Select Case lChild.Name.ToLower
+                        Case "northbc", "top"
+                        Case "southbc", "bottom"
+                        Case "westbc", "left"
+                        Case "eastbc", "right"
+                        Case "projection", "boxprojection"
+                        Case Else
+                            If lDefDirName = "NewProject" Then
+                                lDefDirName = lChild.InnerText
+                            Else
+                                lDefDirName = "Multiple"
+                            End If
+                    End Select
                 End If
-                lDefDirName = "NewProject"
-            Case 1
-                lDefDirName = aSelectedFeatures(0)
-            Case Else
-                lDefDirName = "Multiple"
-        End Select
+            Next
+        End With
+
+        If lDefDirName = "NewProject" Then
+            If lNoData Then
+                'Already came through here, don't ask again
+            Else
+                lNoData = True
+                If Logger.Msg("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then
+                    Return ""
+                End If
+            End If
+        End If
 
         lDefaultProjectFileName = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
         lDefDirName = PathNameOnly(lDefaultProjectFileName)
@@ -471,42 +502,88 @@ StartOver:
                     g_Project.Modified = False
                 Else
                     'download and project core data
-                    Logger.Dbg("DownloadData:" & aThemeTag)
-                    CreateNewProjectAndDownloadCoreData(aThemeTag, aSelectedFeatures, lDataPath, lNewDataDir, lProjectFileName)
+                    CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
                 End If
                 Return lProjectFileName
             End If
         End If
     End Function
 
+    Private Sub CopyFromIfNeeded(ByVal aFilename As String, ByVal aFromDir As String, ByVal aToDir As String)
+        If Not IO.File.Exists(aToDir & aFilename) Then
+            If IO.File.Exists(aFromDir & aFilename) Then
+                IO.File.Copy(aFromDir & aFilename, aToDir & aFilename)
+            Else
+                Logger.Dbg("Could not copy " & aFilename & " from " & aFromDir & " to " & aToDir)
+            End If
+        End If
+    End Sub
+
     'Returns file name of new project or "" if not built
-    Public Sub CreateNewProjectAndDownloadCoreData(ByVal aThemeTag As String, _
-                                                   ByVal aSelectedFeatures As ArrayList, _
+    Public Sub CreateNewProjectAndDownloadCoreData(ByVal aRegion As String, _
                                                    ByVal aDataPath As String, _
                                                    ByVal aNewDataDir As String, _
                                                    ByVal aProjectFileName As String, _
                                                    Optional ByVal aExistingMapWindowProject As Boolean = False)
-        Dim lDownloadXml As String
-        Dim lFeature As Integer
-        Dim lDownloadFilename As String = aDataPath & "download.xml"
-        Dim lProjectorFilename As String = aDataPath & "ATCProjector.xml"
-
-        lDownloadXml = "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <download_type status=""set by " & XMLappName & """>BasinsInitialSetup</download_type>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & aNewDataDir & "</project_dir>" & vbCrLf
-
-        For lFeature = 0 To aSelectedFeatures.Count - 1
-            lDownloadXml &= "  <" & aThemeTag & " status=""set by " & XMLappName & """>" & aSelectedFeatures(lFeature) & "</" & aThemeTag & ">" & vbCrLf
-        Next
-
-        lDownloadXml &= " </status_variables>" & vbCrLf & "</clsWebDataManager>" & vbCrLf
-
-        If FileExists(lProjectorFilename) Then
-            Kill(lProjectorFilename)
+        Dim lQuery As String
+        Dim lNationalDir As String = IO.Path.Combine(g_BasinsDir, "Data\national\")
+        If IO.Directory.Exists(lNationalDir) Then
+            CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
+            CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
+            CopyFromIfNeeded("wqcriter.dbf", lNationalDir, aNewDataDir)
+            CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
         End If
 
-        SaveFileString(lDownloadFilename, lDownloadXml)
-        Dim lDataDownLoadStatus As Boolean = DataDownload(lDownloadFilename)
-        Logger.Dbg("CreateNewProjectAndDownloadCoreData:DownLoadStatus:" & lDataDownLoadStatus)
-        If lDataDownLoadStatus Then 'Succeeded, as far as we know
+        lQuery = "<function name='GetBASINS'>" _
+               & "<arguments>" _
+               & "<DataType>core31</DataType>" _
+               & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+               & "<CacheFolder>" & IO.Path.Combine(g_BasinsDir, "cache") & "</CacheFolder>" _
+               & "<DesiredProjection>+proj=utm +zone=17 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection>" _
+               & aRegion _
+               & "<clip>False</clip>" _
+               & "<merge>True</merge>" _
+               & "<joinattributes>true</joinattributes>" _
+               & "</arguments>" _
+               & "</function>"
+
+        'Dim lDownloadFilename As String = aDataPath & "download.xml"
+        'Dim lProjectorFilename As String = aDataPath & "ATCProjector.xml"
+
+        'lDownloadXml = "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <download_type status=""set by " & XMLappName & """>BasinsInitialSetup</download_type>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & aNewDataDir & "</project_dir>" & vbCrLf
+
+        'For lFeature As Integer = 0 To aSelectedFeatures.Count - 1
+        '    lDownloadXml &= "  <" & aThemeTag & " status=""set by " & XMLappName & """>" & aSelectedFeatures(lFeature) & "</" & aThemeTag & ">" & vbCrLf
+        'Next
+
+        'lDownloadXml &= " </status_variables>" & vbCrLf & "</clsWebDataManager>" & vbCrLf
+
+        'If FileExists(lProjectorFilename) Then
+        '    Kill(lProjectorFilename)
+        'End If
+
+        'SaveFileString(lDownloadFilename, lDownloadXml)
+        'Dim lDataDownLoadStatus As Boolean = DataDownload(lDownloadFilename)
+
+        'Logger.Msg(lQuery, "Query from frmDownload")
+
+        Dim lPlugins As New ArrayList
+        For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
+            Try
+                If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                    lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+                End If
+            Catch ex As Exception
+            End Try
+        Next
+        Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+        Dim lResult As String = lDownloadManager.Execute(lQuery)
+        'Logger.Msg(lResult, "Result of Query from DataManager")
+        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+            BASINS.ProcessDownloadResults(lResult)
+        End If
+
+        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
             If Not aExistingMapWindowProject Then
                 'regular case, not coming from existing mapwindow project
                 ClearLayers()
@@ -521,7 +598,8 @@ StartOver:
                 TryDeleteShapefile(lNewShapeName)
             End If
             g_Project.Modified = True
-            ProcessDownloadResults(lProjectorFilename)
+            ProcessDownloadResults(lResult)
+
             AddAllShapesInDir(aNewDataDir, aNewDataDir)
             g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
             If Not aExistingMapWindowProject Then
@@ -813,6 +891,14 @@ StartOver:
             If Not lProjectorNode.NextSibling2 Then lProjectorNode = Nothing
 
         End While
+
+        'Remove empty groups
+        For lGroupIndex As Integer = g_MapWin.Layers.Groups.Count - 1 To 0 Step -1
+            If g_MapWin.Layers.Groups(lGroupIndex).LayerCount = 0 Then
+                g_MapWin.Layers.Groups.Remove(g_MapWin.Layers.Groups(lGroupIndex).Handle)
+            End If
+        Next
+
         g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
     End Sub
 
