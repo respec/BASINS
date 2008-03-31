@@ -93,7 +93,7 @@ Public Class frmDisTemp
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(201, 138)
+        Me.btnCancel.Location = New System.Drawing.Point(260, 138)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 12
@@ -102,7 +102,7 @@ Public Class frmDisTemp
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(131, 138)
+        Me.btnOk.Location = New System.Drawing.Point(190, 138)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 11
@@ -123,7 +123,7 @@ Public Class frmDisTemp
         Me.txtTMin.Location = New System.Drawing.Point(132, 40)
         Me.txtTMin.Name = "txtTMin"
         Me.txtTMin.ReadOnly = True
-        Me.txtTMin.Size = New System.Drawing.Size(133, 20)
+        Me.txtTMin.Size = New System.Drawing.Size(192, 20)
         Me.txtTMin.TabIndex = 5
         '
         'lblTMin
@@ -159,7 +159,7 @@ Public Class frmDisTemp
         Me.txtTMax.Location = New System.Drawing.Point(132, 72)
         Me.txtTMax.Name = "txtTMax"
         Me.txtTMax.ReadOnly = True
-        Me.txtTMax.Size = New System.Drawing.Size(133, 20)
+        Me.txtTMax.Size = New System.Drawing.Size(192, 20)
         Me.txtTMax.TabIndex = 8
         '
         'frmDisTemp
@@ -167,7 +167,7 @@ Public Class frmDisTemp
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(277, 174)
+        Me.ClientSize = New System.Drawing.Size(336, 174)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.txtTMax)

@@ -247,7 +247,7 @@ Public Class frmDownload
     '    req.CookieContainer = cookieContainer
     '    req.Method = "POST"
     '    ' create post data
-    '    Dim bytePostData As Byte() = System.Text.Encoding.GetEncoding(1252).GetBytes("myUsername=vatavian&myPassword=vageca&cookie=on&Button1=Login")
+    '    Dim bytePostData As Byte() = System.Text.Encoding.GetEncoding(1252).GetBytes("myUsername=&myPassword=&cookie=on&Button1=Login")
     '    ' create stream object
     '    Dim streamPostData As System.IO.Stream = req.GetRequestStream()
     '    ' write to the stream
