@@ -132,7 +132,8 @@ Public Class atcBasinsPlugIn
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_GenScn", atcDataManager.LaunchMenuName, "GenScn")
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_WDMUtil", atcDataManager.LaunchMenuName, "WDMUtil")
 
-        atcDataManager.LoadPlugin("D4EM Data Download::BASINS")
+        atcDataManager.LoadPlugin("Timeseries::Statistics")
+        atcDataManager.LoadPlugin("D4EM Data Download::Main")
 
     End Sub
 

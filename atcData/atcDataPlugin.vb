@@ -200,21 +200,12 @@ Public Class atcDataPlugin
                 ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(lName) Then
                     Try
                         Dim ds As atcDataSource = Me
-                        Dim lNewSource As atcDataSource = Nothing
-                        Dim lCategoryNoSpace As String = ds.Category.Replace(" ", "")
-
-                        Dim lItemName As String = aItemName.Replace(" ", "")
+                        Dim lItemName As String = aItemName '.Replace(" ", "")
                         lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - lName.Length - 2)
-                        If lItemName.StartsWith(lCategoryNoSpace & "_") Then
-                            lItemName = lItemName.Substring(lCategoryNoSpace.Length + 1)
+                        If lItemName.StartsWith(ds.Category & "_") Then
+                            Dim lNewSource As atcDataSource = Nothing
+                            lItemName = lItemName.Substring(ds.Category.Length + 1)
                             Dim lOperation As atcDefinedValue = ds.AvailableOperations.ItemByKey(lItemName.ToLower)
-                            'If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
-                            '    For Each lOperation In lOperations
-                            '        Select Case lOperation.Definition.TypeString
-                            '            Case "atcTimeseries", "atcDataGroup"
-                            '                'Operations might have categories to further divide them
-                            '                If lItemName.Equals((lOperation.Definition.Name).Replace(" ", "")) OrElse _
-                            '                   lItemName.Equals((lOperation.Definition.Category & "_" & lOperation.Definition.Name).Replace(" ", "")) Then
                             Dim lUnderscorePos As Integer = lItemName.IndexOf("_"c)
                             While lUnderscorePos >= 0 AndAlso lOperation Is Nothing
                                 lOperation = ds.AvailableOperations.ItemByKey(lItemName.Substring(lUnderscorePos + 1).ToLower)
@@ -224,18 +215,15 @@ Public Class atcDataPlugin
                             If Not lOperation Is Nothing Then
                                 lNewSource = ds.NewOne
                                 lNewSource.Specification = lOperation.Definition.Name
-                            End If
-                            '    End Select
-                            'Next
-                            If lItemName.Equals(ds.Description) Then
+                            ElseIf lItemName.Equals(ds.Description) Then
                                 lNewSource = ds.NewOne
                             End If
-                        End If
-                        If Not lNewSource Is Nothing Then
-                            If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                                If lNewSource.DataSets.Count > 0 Then
-                                    Dim lTitle As String = lNewSource.ToString
-                                    atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                            If Not lNewSource Is Nothing Then
+                                If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                                    If lNewSource.DataSets.Count > 0 Then
+                                        Dim lTitle As String = lNewSource.ToString
+                                        atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                                    End If
                                 End If
                             End If
                         End If

@@ -178,13 +178,10 @@ Public Class DownloadDataPlugin
         g_Menus.Remove(pMenuName)
     End Sub
 
-    Public Sub ItemClicked(ByVal aItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
+    Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         Select Case aItemName
-            Case "mnuNew"            'Override File/New menu
-                atcMwGisUtility.GisUtil.MappingObject = g_MapWin
-                BASINS.BASINSNewMenu()
-                Handled = True
             Case pMenuName
+                aHandled = True
                 atcMwGisUtility.GisUtil.MappingObject = g_MapWin
                 LoadPlugin("D4EM Data Download::BASINS")
                 LoadPlugin("D4EM Data Download::NHDPlus")
@@ -210,8 +207,8 @@ Public Class DownloadDataPlugin
                         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
                         Dim lResult As String = lDownloadManager.Execute(lQuery)
                         'Logger.Msg(lResult, "Result of Query from DataManager")
-                        If Not lResult Is Nothing AndAlso lResult.Length > 0 Then
-                            g_MapWin.Plugins.BroadcastMessage(lResult)
+                        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+                            BASINS.ProcessDownloadResults(lResult)
                         End If
                     End If
                 End If

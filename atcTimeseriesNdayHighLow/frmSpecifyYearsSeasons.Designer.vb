@@ -159,7 +159,7 @@ Partial Class frmSpecifyYearsSeasons
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(231, 190)
+        Me.btnCancel.Location = New System.Drawing.Point(285, 190)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 17
@@ -168,7 +168,7 @@ Partial Class frmSpecifyYearsSeasons
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(153, 190)
+        Me.btnOk.Location = New System.Drawing.Point(207, 190)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 16
@@ -186,7 +186,7 @@ Partial Class frmSpecifyYearsSeasons
         Me.grpYears.Controls.Add(Me.txtOmitBeforeYear)
         Me.grpYears.Location = New System.Drawing.Point(12, 98)
         Me.grpYears.Name = "grpYears"
-        Me.grpYears.Size = New System.Drawing.Size(291, 78)
+        Me.grpYears.Size = New System.Drawing.Size(345, 78)
         Me.grpYears.TabIndex = 44
         Me.grpYears.TabStop = False
         Me.grpYears.Text = "Years to Include in Analysis"
@@ -203,7 +203,7 @@ Partial Class frmSpecifyYearsSeasons
         Me.grpDates.Controls.Add(Me.lblYearEnd)
         Me.grpDates.Location = New System.Drawing.Point(12, 12)
         Me.grpDates.Name = "grpDates"
-        Me.grpDates.Size = New System.Drawing.Size(291, 73)
+        Me.grpDates.Size = New System.Drawing.Size(345, 73)
         Me.grpDates.TabIndex = 64
         Me.grpDates.TabStop = False
         Me.grpDates.Text = "Year or Season Boundaries"
@@ -233,7 +233,7 @@ Partial Class frmSpecifyYearsSeasons
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(315, 226)
+        Me.ClientSize = New System.Drawing.Size(369, 226)
         Me.Controls.Add(Me.txtNDays)
         Me.Controls.Add(Me.lblNDays)
         Me.Controls.Add(Me.grpDates)

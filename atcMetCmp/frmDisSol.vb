@@ -79,14 +79,14 @@ Public Class frmDisSol
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtLatitude.Location = New System.Drawing.Point(148, 85)
         Me.txtLatitude.Name = "txtLatitude"
-        Me.txtLatitude.Size = New System.Drawing.Size(116, 20)
+        Me.txtLatitude.Size = New System.Drawing.Size(238, 20)
         Me.txtLatitude.TabIndex = 4
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(200, 125)
+        Me.btnCancel.Location = New System.Drawing.Point(322, 125)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 6
@@ -95,7 +95,7 @@ Public Class frmDisSol
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(130, 125)
+        Me.btnOk.Location = New System.Drawing.Point(252, 125)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 5
@@ -116,7 +116,7 @@ Public Class frmDisSol
         Me.txtSolar.Location = New System.Drawing.Point(69, 40)
         Me.txtSolar.Name = "txtSolar"
         Me.txtSolar.ReadOnly = True
-        Me.txtSolar.Size = New System.Drawing.Size(195, 20)
+        Me.txtSolar.Size = New System.Drawing.Size(317, 20)
         Me.txtSolar.TabIndex = 2
         '
         'frmDisSol
@@ -124,7 +124,7 @@ Public Class frmDisSol
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(276, 161)
+        Me.ClientSize = New System.Drawing.Size(398, 161)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.txtSolar)
         Me.Controls.Add(Me.btnOk)

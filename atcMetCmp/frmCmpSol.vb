@@ -79,14 +79,14 @@ Public Class frmCmpSol
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtLatitude.Location = New System.Drawing.Point(159, 69)
         Me.txtLatitude.Name = "txtLatitude"
-        Me.txtLatitude.Size = New System.Drawing.Size(83, 20)
+        Me.txtLatitude.Size = New System.Drawing.Size(148, 20)
         Me.txtLatitude.TabIndex = 4
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(178, 109)
+        Me.btnCancel.Location = New System.Drawing.Point(243, 109)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 6
@@ -95,7 +95,7 @@ Public Class frmCmpSol
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(108, 109)
+        Me.btnOk.Location = New System.Drawing.Point(173, 109)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 5
@@ -116,7 +116,7 @@ Public Class frmCmpSol
         Me.txtCloudCover.Location = New System.Drawing.Point(72, 40)
         Me.txtCloudCover.Name = "txtCloudCover"
         Me.txtCloudCover.ReadOnly = True
-        Me.txtCloudCover.Size = New System.Drawing.Size(170, 20)
+        Me.txtCloudCover.Size = New System.Drawing.Size(235, 20)
         Me.txtCloudCover.TabIndex = 2
         '
         'frmCmpSol
@@ -124,7 +124,7 @@ Public Class frmCmpSol
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(254, 145)
+        Me.ClientSize = New System.Drawing.Size(319, 145)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.txtCloudCover)

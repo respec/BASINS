@@ -97,14 +97,14 @@ Public Class frmSpecifyEventAttributes
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtThreshold.Location = New System.Drawing.Point(150, 77)
         Me.txtThreshold.Name = "txtThreshold"
-        Me.txtThreshold.Size = New System.Drawing.Size(71, 20)
+        Me.txtThreshold.Size = New System.Drawing.Size(134, 20)
         Me.txtThreshold.TabIndex = 5
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(157, 160)
+        Me.btnCancel.Location = New System.Drawing.Point(220, 160)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 8
@@ -113,7 +113,7 @@ Public Class frmSpecifyEventAttributes
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(87, 160)
+        Me.btnOk.Location = New System.Drawing.Point(150, 160)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 7
@@ -136,7 +136,7 @@ Public Class frmSpecifyEventAttributes
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDaysGapAllowed.Location = New System.Drawing.Point(150, 103)
         Me.txtDaysGapAllowed.Name = "txtDaysGapAllowed"
-        Me.txtDaysGapAllowed.Size = New System.Drawing.Size(71, 20)
+        Me.txtDaysGapAllowed.Size = New System.Drawing.Size(134, 20)
         Me.txtDaysGapAllowed.TabIndex = 10
         Me.txtDaysGapAllowed.Text = "0"
         '
@@ -154,7 +154,7 @@ Public Class frmSpecifyEventAttributes
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(233, 196)
+        Me.ClientSize = New System.Drawing.Size(296, 196)
         Me.Controls.Add(Me.txtDaysGapAllowed)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.btnCancel)
