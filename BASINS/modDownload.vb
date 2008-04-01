@@ -542,7 +542,7 @@ StartOver:
                & "<DataType>core31</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & IO.Path.Combine(g_BasinsDir, "cache") & "</CacheFolder>" _
-               & "<DesiredProjection>" & IO.File.ReadAllText(aNewDataDir & "prj.proj") & "</DesiredProjection>" _
+               & "<DesiredProjection>" & CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj")) & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
                & "<merge>True</merge>" _
