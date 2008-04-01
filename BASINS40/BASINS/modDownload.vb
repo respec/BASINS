@@ -391,6 +391,9 @@ Public Module modDownload
                 Dim lDataPath As String = DefaultBasinsDataDir()
                 Dim lNewDataDir As String = PathNameOnly(pExistingMapWindowProjectName) & "\"
                 'download and project core data
+                If Not IO.File.Exists(lNewDataDir & "prj.proj") Then
+                    IO.File.WriteAllText(lNewDataDir & "prj.proj", g_Project.ProjectProjection)
+                End If
                 CreateNewProjectAndDownloadCoreData(lRegion, lDataPath, lNewDataDir, pExistingMapWindowProjectName, True)
                 pExistingMapWindowProjectName = ""
             End If
@@ -539,33 +542,13 @@ StartOver:
                & "<DataType>core31</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & IO.Path.Combine(g_BasinsDir, "cache") & "</CacheFolder>" _
-               & "<DesiredProjection>+proj=utm +zone=17 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection>" _
+               & "<DesiredProjection>" & IO.File.ReadAllText(aNewDataDir & "prj.proj") & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
                & "<merge>True</merge>" _
                & "<joinattributes>true</joinattributes>" _
                & "</arguments>" _
                & "</function>"
-
-        'Dim lDownloadFilename As String = aDataPath & "download.xml"
-        'Dim lProjectorFilename As String = aDataPath & "ATCProjector.xml"
-
-        'lDownloadXml = "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <download_type status=""set by " & XMLappName & """>BasinsInitialSetup</download_type>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & aNewDataDir & "</project_dir>" & vbCrLf
-
-        'For lFeature As Integer = 0 To aSelectedFeatures.Count - 1
-        '    lDownloadXml &= "  <" & aThemeTag & " status=""set by " & XMLappName & """>" & aSelectedFeatures(lFeature) & "</" & aThemeTag & ">" & vbCrLf
-        'Next
-
-        'lDownloadXml &= " </status_variables>" & vbCrLf & "</clsWebDataManager>" & vbCrLf
-
-        'If FileExists(lProjectorFilename) Then
-        '    Kill(lProjectorFilename)
-        'End If
-
-        'SaveFileString(lDownloadFilename, lDownloadXml)
-        'Dim lDataDownLoadStatus As Boolean = DataDownload(lDownloadFilename)
-
-        'Logger.Msg(lQuery, "Query from frmDownload")
 
         Dim lPlugins As New ArrayList
         For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
