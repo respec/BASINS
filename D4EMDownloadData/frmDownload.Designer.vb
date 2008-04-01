@@ -42,9 +42,9 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISWQ = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_Urban = New System.Windows.Forms.CheckBox
         Me.grpTerraServerWebService = New System.Windows.Forms.GroupBox
-        Me.btnOther = New System.Windows.Forms.Button
         Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_DOQ = New System.Windows.Forms.CheckBox
+        Me.btnOther = New System.Windows.Forms.Button
         Me.grpNLCD2001 = New System.Windows.Forms.GroupBox
         Me.chkNLCD_Canopy = New System.Windows.Forms.CheckBox
         Me.chkNLCD_Impervious = New System.Windows.Forms.CheckBox
@@ -67,6 +67,7 @@ Partial Class frmDownload
         Me.btnCancel = New System.Windows.Forms.Button
         Me.grpSTORET = New System.Windows.Forms.GroupBox
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
+        Me.chkNLCD_1992 = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
@@ -277,17 +278,6 @@ Partial Class frmDownload
         Me.grpTerraServerWebService.Text = "TerraServer Images"
         Me.grpTerraServerWebService.Visible = False
         '
-        'btnOther
-        '
-        Me.btnOther.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOther.Location = New System.Drawing.Point(174, 365)
-        Me.btnOther.Name = "btnOther"
-        Me.btnOther.Size = New System.Drawing.Size(75, 23)
-        Me.btnOther.TabIndex = 15
-        Me.btnOther.Text = "Other..."
-        Me.ToolTip1.SetToolTip(Me.btnOther, "Launch old data download tool")
-        Me.btnOther.UseVisualStyleBackColor = True
-        '
         'chkTerraServerWebService_DRG
         '
         Me.chkTerraServerWebService_DRG.AutoSize = True
@@ -308,10 +298,22 @@ Partial Class frmDownload
         Me.chkTerraServerWebService_DOQ.Text = "DOQ"
         Me.chkTerraServerWebService_DOQ.UseVisualStyleBackColor = True
         '
+        'btnOther
+        '
+        Me.btnOther.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOther.Location = New System.Drawing.Point(174, 365)
+        Me.btnOther.Name = "btnOther"
+        Me.btnOther.Size = New System.Drawing.Size(75, 23)
+        Me.btnOther.TabIndex = 15
+        Me.btnOther.Text = "Other..."
+        Me.ToolTip1.SetToolTip(Me.btnOther, "Launch old data download tool")
+        Me.btnOther.UseVisualStyleBackColor = True
+        '
         'grpNLCD2001
         '
         Me.grpNLCD2001.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpNLCD2001.Controls.Add(Me.chkNLCD_1992)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Canopy)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Impervious)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_LandCover)
@@ -325,7 +327,7 @@ Partial Class frmDownload
         'chkNLCD_Canopy
         '
         Me.chkNLCD_Canopy.AutoSize = True
-        Me.chkNLCD_Canopy.Location = New System.Drawing.Point(233, 19)
+        Me.chkNLCD_Canopy.Location = New System.Drawing.Point(195, 19)
         Me.chkNLCD_Canopy.Name = "chkNLCD_Canopy"
         Me.chkNLCD_Canopy.Size = New System.Drawing.Size(62, 17)
         Me.chkNLCD_Canopy.TabIndex = 18
@@ -542,6 +544,16 @@ Partial Class frmDownload
         Me.chkSTORET_Stations.Text = "Stations"
         Me.chkSTORET_Stations.UseVisualStyleBackColor = True
         '
+        'chkNLCD_1992
+        '
+        Me.chkNLCD_1992.AutoSize = True
+        Me.chkNLCD_1992.Location = New System.Drawing.Point(263, 19)
+        Me.chkNLCD_1992.Name = "chkNLCD_1992"
+        Me.chkNLCD_1992.Size = New System.Drawing.Size(108, 17)
+        Me.chkNLCD_1992.TabIndex = 19
+        Me.chkNLCD_1992.Text = "1992 Land Cover"
+        Me.chkNLCD_1992.UseVisualStyleBackColor = True
+        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
@@ -624,4 +636,5 @@ Partial Class frmDownload
     Friend WithEvents btnBrowseWDMdailydischarge As System.Windows.Forms.Button
     Friend WithEvents chkNWIS_GetNWISWQ As System.Windows.Forms.CheckBox
     Friend WithEvents btnOther As System.Windows.Forms.Button
+    Friend WithEvents chkNLCD_1992 As System.Windows.Forms.CheckBox
 End Class
