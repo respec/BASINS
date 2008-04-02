@@ -135,9 +135,9 @@ Public Class atcDataSource
             End If
         End If
         Me.Specification = aSpecification 'save regardless for messages or further processing
-        If Open Then 'looks good to try data type specific open
-            Logger.Dbg("Process:" & aSpecification)
-        End If
+        'If Open Then 'looks good to try data type specific open
+        '    Logger.Dbg("Process:" & aSpecification)
+        'End If
     End Function
 
     ''' <summary>Read all the data into an atcDataSet (which must be from this source).</summary>

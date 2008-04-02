@@ -46,7 +46,7 @@ Friend Class atcWdmHandle
         End If
 
         If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
-            Logger.Msg("Could not find " & aFileName, "atcWdmHandle")
+            'Logger.Msg("Could not find " & aFileName, "atcWdmHandle")
         Else
             Try
                 'Logger.Dbg("atcWdmHandle:New:VBOpen:" & lFileName)
@@ -77,7 +77,7 @@ Friend Class atcWdmHandle
                     F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
                     pNeedToClose = True
                 Else
-                    Logger.Dbg("atcWdmHandle:New:UsingOpenWdm:" & pUnit)
+                    'Logger.Dbg("atcWdmHandle:New:UsingOpenWdm:" & pUnit)
                     pNeedToClose = False
                 End If
             Catch e As System.BadImageFormatException
@@ -106,10 +106,10 @@ Friend Class atcWdmHandle
         If pNeedToClose AndAlso pUnit > 0 Then
             lRetcod = F90_WDFLCL(pUnit)
             If lRetcod <> 0 Then
-                Logger.Dbg("atcWdmHandle:WDFLCL:retcod:" & lRetcod)
+                'Logger.Dbg("atcWdmHandle:WDFLCL:retcod:" & lRetcod)
             End If
         Else
-            Logger.Dbg("atcWdmHandle:Dispose:DidNotNeedToClose")
+            'Logger.Dbg("atcWdmHandle:Dispose:DidNotNeedToClose")
         End If
         'Dim lMsg As String = "atcWdmHandle:Dispose:" & pUnit & ":" & lRetcod
         'F90_MSG(lMsg, Len(lMsg))
