@@ -46,6 +46,7 @@ Partial Class frmDownload
         Me.chkTerraServerWebService_DOQ = New System.Windows.Forms.CheckBox
         Me.btnOther = New System.Windows.Forms.Button
         Me.grpNLCD2001 = New System.Windows.Forms.GroupBox
+        Me.chkNLCD_1992 = New System.Windows.Forms.CheckBox
         Me.chkNLCD_Canopy = New System.Windows.Forms.CheckBox
         Me.chkNLCD_Impervious = New System.Windows.Forms.CheckBox
         Me.chkNLCD_LandCover = New System.Windows.Forms.CheckBox
@@ -67,7 +68,6 @@ Partial Class frmDownload
         Me.btnCancel = New System.Windows.Forms.Button
         Me.grpSTORET = New System.Windows.Forms.GroupBox
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
-        Me.chkNLCD_1992 = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
@@ -95,15 +95,15 @@ Partial Class frmDownload
         Me.grpBASINS.Size = New System.Drawing.Size(400, 96)
         Me.grpBASINS.TabIndex = 0
         Me.grpBASINS.TabStop = False
-        Me.grpBASINS.Text = "Basins"
+        Me.grpBASINS.Text = "BASINS"
         '
         'btnBrowseWDMmet
         '
         Me.btnBrowseWDMmet.Image = CType(resources.GetObject("btnBrowseWDMmet.Image"), System.Drawing.Image)
-        Me.btnBrowseWDMmet.Location = New System.Drawing.Point(199, 62)
+        Me.btnBrowseWDMmet.Location = New System.Drawing.Point(205, 62)
         Me.btnBrowseWDMmet.Name = "btnBrowseWDMmet"
         Me.btnBrowseWDMmet.Size = New System.Drawing.Size(20, 20)
-        Me.btnBrowseWDMmet.TabIndex = 43
+        Me.btnBrowseWDMmet.TabIndex = 7
         Me.ToolTip1.SetToolTip(Me.btnBrowseWDMmet, "Browse to choose WDM file name")
         Me.btnBrowseWDMmet.UseVisualStyleBackColor = True
         '
@@ -112,9 +112,9 @@ Partial Class frmDownload
         Me.chkBASINS_Met.AutoSize = True
         Me.chkBASINS_Met.Location = New System.Drawing.Point(112, 65)
         Me.chkBASINS_Met.Name = "chkBASINS_Met"
-        Me.chkBASINS_Met.Size = New System.Drawing.Size(81, 17)
-        Me.chkBASINS_Met.TabIndex = 5
-        Me.chkBASINS_Met.Text = "Meterologic"
+        Me.chkBASINS_Met.Size = New System.Drawing.Size(87, 17)
+        Me.chkBASINS_Met.TabIndex = 6
+        Me.chkBASINS_Met.Text = "Meteorologic"
         Me.chkBASINS_Met.UseVisualStyleBackColor = True
         '
         'chkBASINS_PCS3
@@ -123,7 +123,7 @@ Partial Class frmDownload
         Me.chkBASINS_PCS3.Location = New System.Drawing.Point(233, 65)
         Me.chkBASINS_PCS3.Name = "chkBASINS_PCS3"
         Me.chkBASINS_PCS3.Size = New System.Drawing.Size(53, 17)
-        Me.chkBASINS_PCS3.TabIndex = 8
+        Me.chkBASINS_PCS3.TabIndex = 10
         Me.chkBASINS_PCS3.Text = "PCS3"
         Me.chkBASINS_PCS3.UseVisualStyleBackColor = True
         '
@@ -133,7 +133,7 @@ Partial Class frmDownload
         Me.chkBASINS_NHD.Location = New System.Drawing.Point(233, 42)
         Me.chkBASINS_NHD.Name = "chkBASINS_NHD"
         Me.chkBASINS_NHD.Size = New System.Drawing.Size(50, 17)
-        Me.chkBASINS_NHD.TabIndex = 7
+        Me.chkBASINS_NHD.TabIndex = 9
         Me.chkBASINS_NHD.Text = "NHD"
         Me.chkBASINS_NHD.UseVisualStyleBackColor = True
         '
@@ -143,7 +143,7 @@ Partial Class frmDownload
         Me.chkBASINS_NED.Location = New System.Drawing.Point(233, 19)
         Me.chkBASINS_NED.Name = "chkBASINS_NED"
         Me.chkBASINS_NED.Size = New System.Drawing.Size(49, 17)
-        Me.chkBASINS_NED.TabIndex = 6
+        Me.chkBASINS_NED.TabIndex = 8
         Me.chkBASINS_NED.Text = "NED"
         Me.chkBASINS_NED.UseVisualStyleBackColor = True
         '
@@ -153,7 +153,7 @@ Partial Class frmDownload
         Me.chkBASINS_LSTORET.Location = New System.Drawing.Point(112, 42)
         Me.chkBASINS_LSTORET.Name = "chkBASINS_LSTORET"
         Me.chkBASINS_LSTORET.Size = New System.Drawing.Size(108, 17)
-        Me.chkBASINS_LSTORET.TabIndex = 4
+        Me.chkBASINS_LSTORET.TabIndex = 5
         Me.chkBASINS_LSTORET.Text = "Legacy STORET"
         Me.chkBASINS_LSTORET.UseVisualStyleBackColor = True
         '
@@ -163,7 +163,7 @@ Partial Class frmDownload
         Me.chkBASINS_GIRAS.Location = New System.Drawing.Point(112, 19)
         Me.chkBASINS_GIRAS.Name = "chkBASINS_GIRAS"
         Me.chkBASINS_GIRAS.Size = New System.Drawing.Size(59, 17)
-        Me.chkBASINS_GIRAS.TabIndex = 3
+        Me.chkBASINS_GIRAS.TabIndex = 4
         Me.chkBASINS_GIRAS.Text = "GIRAS"
         Me.chkBASINS_GIRAS.UseVisualStyleBackColor = True
         '
@@ -173,7 +173,7 @@ Partial Class frmDownload
         Me.chkBASINS_DEMG.Location = New System.Drawing.Point(6, 65)
         Me.chkBASINS_DEMG.Name = "chkBASINS_DEMG"
         Me.chkBASINS_DEMG.Size = New System.Drawing.Size(72, 17)
-        Me.chkBASINS_DEMG.TabIndex = 2
+        Me.chkBASINS_DEMG.TabIndex = 3
         Me.chkBASINS_DEMG.Text = "DEM Grid"
         Me.chkBASINS_DEMG.UseVisualStyleBackColor = True
         '
@@ -183,7 +183,7 @@ Partial Class frmDownload
         Me.chkBASINS_DEM.Location = New System.Drawing.Point(6, 42)
         Me.chkBASINS_DEM.Name = "chkBASINS_DEM"
         Me.chkBASINS_DEM.Size = New System.Drawing.Size(84, 17)
-        Me.chkBASINS_DEM.TabIndex = 1
+        Me.chkBASINS_DEM.TabIndex = 2
         Me.chkBASINS_DEM.Text = "DEM Shape"
         Me.chkBASINS_DEM.UseVisualStyleBackColor = True
         '
@@ -193,7 +193,7 @@ Partial Class frmDownload
         Me.chkBASINS_Census.Location = New System.Drawing.Point(6, 19)
         Me.chkBASINS_Census.Name = "chkBASINS_Census"
         Me.chkBASINS_Census.Size = New System.Drawing.Size(61, 17)
-        Me.chkBASINS_Census.TabIndex = 0
+        Me.chkBASINS_Census.TabIndex = 1
         Me.chkBASINS_Census.Text = "Census"
         Me.chkBASINS_Census.UseVisualStyleBackColor = True
         '
@@ -218,7 +218,7 @@ Partial Class frmDownload
         Me.btnBrowseWDMdailydischarge.Location = New System.Drawing.Point(112, 16)
         Me.btnBrowseWDMdailydischarge.Name = "btnBrowseWDMdailydischarge"
         Me.btnBrowseWDMdailydischarge.Size = New System.Drawing.Size(20, 20)
-        Me.btnBrowseWDMdailydischarge.TabIndex = 44
+        Me.btnBrowseWDMdailydischarge.TabIndex = 20
         Me.ToolTip1.SetToolTip(Me.btnBrowseWDMdailydischarge, "Browse to choose WDM file name")
         Me.btnBrowseWDMdailydischarge.UseVisualStyleBackColor = True
         '
@@ -228,7 +228,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISStations.Location = New System.Drawing.Point(138, 19)
         Me.chkNWIS_GetNWISStations.Name = "chkNWIS_GetNWISStations"
         Me.chkNWIS_GetNWISStations.Size = New System.Drawing.Size(64, 17)
-        Me.chkNWIS_GetNWISStations.TabIndex = 10
+        Me.chkNWIS_GetNWISStations.TabIndex = 21
         Me.chkNWIS_GetNWISStations.Text = "Stations"
         Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISStations, "Point Layer of NWIS Stations")
         Me.chkNWIS_GetNWISStations.UseVisualStyleBackColor = True
@@ -239,7 +239,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDischarge.Location = New System.Drawing.Point(6, 19)
         Me.chkNWIS_GetNWISDischarge.Name = "chkNWIS_GetNWISDischarge"
         Me.chkNWIS_GetNWISDischarge.Size = New System.Drawing.Size(100, 17)
-        Me.chkNWIS_GetNWISDischarge.TabIndex = 9
+        Me.chkNWIS_GetNWISDischarge.TabIndex = 19
         Me.chkNWIS_GetNWISDischarge.Text = "Daily Discharge"
         Me.chkNWIS_GetNWISDischarge.UseVisualStyleBackColor = True
         '
@@ -249,7 +249,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISWQ.Location = New System.Drawing.Point(233, 19)
         Me.chkNWIS_GetNWISWQ.Name = "chkNWIS_GetNWISWQ"
         Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(90, 17)
-        Me.chkNWIS_GetNWISWQ.TabIndex = 45
+        Me.chkNWIS_GetNWISWQ.TabIndex = 22
         Me.chkNWIS_GetNWISWQ.Text = "Water Quality"
         Me.chkNWIS_GetNWISWQ.UseVisualStyleBackColor = True
         '
@@ -304,8 +304,8 @@ Partial Class frmDownload
         Me.btnOther.Location = New System.Drawing.Point(174, 365)
         Me.btnOther.Name = "btnOther"
         Me.btnOther.Size = New System.Drawing.Size(75, 23)
-        Me.btnOther.TabIndex = 15
-        Me.btnOther.Text = "Other..."
+        Me.btnOther.TabIndex = 29
+        Me.btnOther.Text = "&Other..."
         Me.ToolTip1.SetToolTip(Me.btnOther, "Launch old data download tool")
         Me.btnOther.UseVisualStyleBackColor = True
         '
@@ -324,23 +324,33 @@ Partial Class frmDownload
         Me.grpNLCD2001.TabStop = False
         Me.grpNLCD2001.Text = "NLCD 2001"
         '
+        'chkNLCD_1992
+        '
+        Me.chkNLCD_1992.AutoSize = True
+        Me.chkNLCD_1992.Location = New System.Drawing.Point(273, 19)
+        Me.chkNLCD_1992.Name = "chkNLCD_1992"
+        Me.chkNLCD_1992.Size = New System.Drawing.Size(108, 17)
+        Me.chkNLCD_1992.TabIndex = 26
+        Me.chkNLCD_1992.Text = "1992 Land Cover"
+        Me.chkNLCD_1992.UseVisualStyleBackColor = True
+        '
         'chkNLCD_Canopy
         '
         Me.chkNLCD_Canopy.AutoSize = True
-        Me.chkNLCD_Canopy.Location = New System.Drawing.Point(195, 19)
+        Me.chkNLCD_Canopy.Location = New System.Drawing.Point(196, 19)
         Me.chkNLCD_Canopy.Name = "chkNLCD_Canopy"
         Me.chkNLCD_Canopy.Size = New System.Drawing.Size(62, 17)
-        Me.chkNLCD_Canopy.TabIndex = 18
+        Me.chkNLCD_Canopy.TabIndex = 25
         Me.chkNLCD_Canopy.Text = "Canopy"
         Me.chkNLCD_Canopy.UseVisualStyleBackColor = True
         '
         'chkNLCD_Impervious
         '
         Me.chkNLCD_Impervious.AutoSize = True
-        Me.chkNLCD_Impervious.Location = New System.Drawing.Point(112, 19)
+        Me.chkNLCD_Impervious.Location = New System.Drawing.Point(104, 19)
         Me.chkNLCD_Impervious.Name = "chkNLCD_Impervious"
         Me.chkNLCD_Impervious.Size = New System.Drawing.Size(77, 17)
-        Me.chkNLCD_Impervious.TabIndex = 17
+        Me.chkNLCD_Impervious.TabIndex = 24
         Me.chkNLCD_Impervious.Text = "Impervious"
         Me.chkNLCD_Impervious.UseVisualStyleBackColor = True
         '
@@ -350,7 +360,7 @@ Partial Class frmDownload
         Me.chkNLCD_LandCover.Location = New System.Drawing.Point(6, 19)
         Me.chkNLCD_LandCover.Name = "chkNLCD_LandCover"
         Me.chkNLCD_LandCover.Size = New System.Drawing.Size(81, 17)
-        Me.chkNLCD_LandCover.TabIndex = 16
+        Me.chkNLCD_LandCover.TabIndex = 23
         Me.chkNLCD_LandCover.Text = "Land Cover"
         Me.chkNLCD_LandCover.UseVisualStyleBackColor = True
         '
@@ -379,7 +389,7 @@ Partial Class frmDownload
         Me.chkNHDplus_streamgageevent.Location = New System.Drawing.Point(233, 88)
         Me.chkNHDplus_streamgageevent.Name = "chkNHDplus_streamgageevent"
         Me.chkNHDplus_streamgageevent.Size = New System.Drawing.Size(119, 17)
-        Me.chkNHDplus_streamgageevent.TabIndex = 24
+        Me.chkNHDplus_streamgageevent.TabIndex = 18
         Me.chkNHDplus_streamgageevent.Text = "Streamgage Events"
         Me.chkNHDplus_streamgageevent.UseVisualStyleBackColor = True
         '
@@ -389,7 +399,7 @@ Partial Class frmDownload
         Me.chkNHDplus_hydrologicunits.Location = New System.Drawing.Point(233, 65)
         Me.chkNHDplus_hydrologicunits.Name = "chkNHDplus_hydrologicunits"
         Me.chkNHDplus_hydrologicunits.Size = New System.Drawing.Size(103, 17)
-        Me.chkNHDplus_hydrologicunits.TabIndex = 23
+        Me.chkNHDplus_hydrologicunits.TabIndex = 17
         Me.chkNHDplus_hydrologicunits.Text = "Hydrologic Units"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_hydrologicunits, "Basin, Region, SubBasin, Subregion, Subwatershed, Watershed")
         Me.chkNHDplus_hydrologicunits.UseVisualStyleBackColor = True
@@ -400,7 +410,7 @@ Partial Class frmDownload
         Me.chkNHDplus_hydrography.Location = New System.Drawing.Point(233, 42)
         Me.chkNHDplus_hydrography.Name = "chkNHDplus_hydrography"
         Me.chkNHDplus_hydrography.Size = New System.Drawing.Size(86, 17)
-        Me.chkNHDplus_hydrography.TabIndex = 21
+        Me.chkNHDplus_hydrography.TabIndex = 16
         Me.chkNHDplus_hydrography.Text = "Hydrography"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
         Me.chkNHDplus_hydrography.UseVisualStyleBackColor = True
@@ -411,7 +421,7 @@ Partial Class frmDownload
         Me.chkNHDplus_fac.Location = New System.Drawing.Point(6, 88)
         Me.chkNHDplus_fac.Name = "chkNHDplus_fac"
         Me.chkNHDplus_fac.Size = New System.Drawing.Size(137, 17)
-        Me.chkNHDplus_fac.TabIndex = 20
+        Me.chkNHDplus_fac.TabIndex = 14
         Me.chkNHDplus_fac.Text = "Flow Accumulation Grid"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_fac, "fac grid")
         Me.chkNHDplus_fac.UseVisualStyleBackColor = True
@@ -422,7 +432,7 @@ Partial Class frmDownload
         Me.chkNHDplus_fdr.Location = New System.Drawing.Point(6, 65)
         Me.chkNHDplus_fdr.Name = "chkNHDplus_fdr"
         Me.chkNHDplus_fdr.Size = New System.Drawing.Size(115, 17)
-        Me.chkNHDplus_fdr.TabIndex = 19
+        Me.chkNHDplus_fdr.TabIndex = 13
         Me.chkNHDplus_fdr.Text = "Flow Direction Grid"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_fdr, "fdr grid")
         Me.chkNHDplus_fdr.UseVisualStyleBackColor = True
@@ -433,7 +443,7 @@ Partial Class frmDownload
         Me.chkNHDplus_elev_cm.Location = New System.Drawing.Point(6, 42)
         Me.chkNHDplus_elev_cm.Name = "chkNHDplus_elev_cm"
         Me.chkNHDplus_elev_cm.Size = New System.Drawing.Size(92, 17)
-        Me.chkNHDplus_elev_cm.TabIndex = 18
+        Me.chkNHDplus_elev_cm.TabIndex = 12
         Me.chkNHDplus_elev_cm.Text = "Elevation Grid"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_elev_cm, "elev_cm grid")
         Me.chkNHDplus_elev_cm.UseVisualStyleBackColor = True
@@ -444,7 +454,7 @@ Partial Class frmDownload
         Me.chkNHDplus_All.Location = New System.Drawing.Point(6, 19)
         Me.chkNHDplus_All.Name = "chkNHDplus_All"
         Me.chkNHDplus_All.Size = New System.Drawing.Size(37, 17)
-        Me.chkNHDplus_All.TabIndex = 17
+        Me.chkNHDplus_All.TabIndex = 11
         Me.chkNHDplus_All.Text = "All"
         Me.chkNHDplus_All.UseVisualStyleBackColor = True
         '
@@ -454,7 +464,7 @@ Partial Class frmDownload
         Me.chkNHDplus_Catchment.Location = New System.Drawing.Point(233, 19)
         Me.chkNHDplus_Catchment.Name = "chkNHDplus_Catchment"
         Me.chkNHDplus_Catchment.Size = New System.Drawing.Size(82, 17)
-        Me.chkNHDplus_Catchment.TabIndex = 22
+        Me.chkNHDplus_Catchment.TabIndex = 15
         Me.chkNHDplus_Catchment.Text = "Catchments"
         Me.chkNHDplus_Catchment.UseVisualStyleBackColor = True
         '
@@ -464,7 +474,7 @@ Partial Class frmDownload
         Me.btnDownload.Location = New System.Drawing.Point(336, 365)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
-        Me.btnDownload.TabIndex = 29
+        Me.btnDownload.TabIndex = 31
         Me.btnDownload.Text = "Download"
         Me.btnDownload.UseVisualStyleBackColor = True
         '
@@ -477,7 +487,7 @@ Partial Class frmDownload
         Me.cboRegion.Location = New System.Drawing.Point(124, 12)
         Me.cboRegion.Name = "cboRegion"
         Me.cboRegion.Size = New System.Drawing.Size(288, 21)
-        Me.cboRegion.TabIndex = 30
+        Me.cboRegion.TabIndex = 0
         '
         'lblRegion
         '
@@ -495,7 +505,7 @@ Partial Class frmDownload
         Me.chkClip.Location = New System.Drawing.Point(81, 369)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
-        Me.chkClip.TabIndex = 35
+        Me.chkClip.TabIndex = 28
         Me.chkClip.Text = "Clip to Region"
         Me.chkClip.UseVisualStyleBackColor = True
         '
@@ -506,7 +516,7 @@ Partial Class frmDownload
         Me.chkMerge.Location = New System.Drawing.Point(17, 369)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
-        Me.chkMerge.TabIndex = 37
+        Me.chkMerge.TabIndex = 27
         Me.chkMerge.Text = "Merge"
         Me.chkMerge.UseVisualStyleBackColor = True
         '
@@ -517,7 +527,7 @@ Partial Class frmDownload
         Me.btnCancel.Location = New System.Drawing.Point(255, 365)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
-        Me.btnCancel.TabIndex = 39
+        Me.btnCancel.TabIndex = 30
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
@@ -544,16 +554,6 @@ Partial Class frmDownload
         Me.chkSTORET_Stations.Text = "Stations"
         Me.chkSTORET_Stations.UseVisualStyleBackColor = True
         '
-        'chkNLCD_1992
-        '
-        Me.chkNLCD_1992.AutoSize = True
-        Me.chkNLCD_1992.Location = New System.Drawing.Point(263, 19)
-        Me.chkNLCD_1992.Name = "chkNLCD_1992"
-        Me.chkNLCD_1992.Size = New System.Drawing.Size(108, 17)
-        Me.chkNLCD_1992.TabIndex = 19
-        Me.chkNLCD_1992.Text = "1992 Land Cover"
-        Me.chkNLCD_1992.UseVisualStyleBackColor = True
-        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
@@ -576,7 +576,7 @@ Partial Class frmDownload
         Me.Controls.Add(Me.grpTerraServerWebService)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmDownload"
-        Me.Text = "Download Data with D4EM"
+        Me.Text = "Download Data"
         Me.grpBASINS.ResumeLayout(False)
         Me.grpBASINS.PerformLayout()
         Me.grpNWIS.ResumeLayout(False)
