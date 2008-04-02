@@ -1089,13 +1089,14 @@ StartOver:
         Dim lRendererFilename As String = IO.Path.ChangeExtension(aLayerFilename, lRendererExt)
         If lRendererFilename.Length > 0 AndAlso Not IO.File.Exists(lRendererFilename) Then
             Dim lRendererFilenameNoPath As String = IO.Path.GetFileName(lRendererFilename)
-            Dim lDefaultRendererFilename As String = FindFile("", lRendererFilenameNoPath)
+            Dim lRenderersPath As String = g_BasinsDir & "etc\renderers\"
+            Dim lDefaultRendererFilename As String = FindFile("", lRenderersPath & lRendererFilenameNoPath)
             If Not FileExists(lDefaultRendererFilename) Then
                 If lRendererFilenameNoPath.Contains("_") Then 'Some layers are named huc8_xxx.shp, renderer is named _xxx & lRendererExt
-                    lDefaultRendererFilename = FindFile("", lRendererFilenameNoPath.Substring(lRendererFilenameNoPath.IndexOf("_")))
+                    lDefaultRendererFilename = FindFile("", lRenderersPath & lRendererFilenameNoPath.Substring(lRendererFilenameNoPath.IndexOf("_")))
                 End If
                 If Not FileExists(lDefaultRendererFilename) Then 'Try trimming off numbers before extension in layername2.mwleg
-                    lDefaultRendererFilename = FindFile("", IO.Path.GetFileNameWithoutExtension(aLayerFilename).TrimEnd("0"c, "1"c, "2"c, "3"c, "4"c, "5"c, "6"c, "7"c, "8"c, "9"c) & lRendererExt)
+                    lDefaultRendererFilename = FindFile("", lRenderersPath & IO.Path.GetFileNameWithoutExtension(aLayerFilename).TrimEnd("0"c, "1"c, "2"c, "3"c, "4"c, "5"c, "6"c, "7"c, "8"c, "9"c) & lRendererExt)
                 End If
             End If
             If FileExists(lDefaultRendererFilename) Then
