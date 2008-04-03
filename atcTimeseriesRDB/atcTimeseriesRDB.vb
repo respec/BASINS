@@ -136,7 +136,6 @@ Public Class atcTimeseriesRDB
         End While
 
         Dim lRawDataSets As New atcCollection
-        Dim lTSIndex As Integer = 0
         Dim lData As atcTimeseriesBuilder = Nothing
 
         Dim lTable As New atcTableDelimited
@@ -204,11 +203,9 @@ Public Class atcTimeseriesRDB
                             lData.Attributes.SetValue("Scenario", "OBSERVED")
                             lData.Attributes.SetValue("Location", lLocation)
                             lData.Attributes.SetValue("DataKey", lDataKey)
-                            lRawDataSets.Add(lDataKey, lData)
+                            lRawDataSets.Add(lDataKey, lData)                            
                         End If
-                        lTSIndex = lData.Attributes.GetValue("Count") + 1
                         lData.AddValue(lDateJ, lValueString)
-                        lData.Attributes.SetValue("Count", lTSIndex)
                     End If
                 End If
             End While
@@ -269,7 +266,7 @@ Public Class atcTimeseriesRDB
                     Case "datetime" : lDateField = lField
                     Case Else
                         If .FieldName(lField).EndsWith("_cd") Then
-                            'skip code fields for now
+                            'skip code fields for now, TODO: add codes as ValueAttributes and decide how to treat Provisional values
                         Else
                             Dim lConstituentIndex As Integer = _
                                 lConstituentDescriptions.IndexFromKey(.FieldName(lField))
@@ -326,6 +323,7 @@ Public Class atcTimeseriesRDB
 
                                 lRawDataSets.Add(lDataKey, lData)
                                 lData.Dates.Value(0) = lDate - pJulianInterval
+                                lData.Value(0) = GetNaN()
                             End If
                             lTSIndex = lData.Attributes.GetValue("Count") + 1
                             lData.Value(lTSIndex) = lCurValue

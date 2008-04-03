@@ -386,6 +386,7 @@ Public Module modTimeseriesMath
                 'lNewDates(0) = lSJDay
                 lNewNumVals = lNewDates.GetUpperBound(0)
                 ReDim lNewVals(lNewNumVals)
+                lNewVals(0) = pNaN
                 lOldInd = 1
                 lDateOld = aOldTSer.Dates.Value(lOldInd)
                 lNewInd = 1
