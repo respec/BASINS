@@ -63,6 +63,8 @@ Public Class atcBasinsPlugIn
 
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
+        atcMwGisUtility.GisUtil.MappingObject = g_MapWin
+
         g_MapWinWindowHandle = aParentHandle
         g_MapWin.ApplicationInfo.WelcomePlugin = "BASINS"
         'Set g_BasinsDir to folder above the Bin folder where the app and plugins live

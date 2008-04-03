@@ -36,10 +36,10 @@ Partial Class frmDownload
         Me.chkBASINS_DEM = New System.Windows.Forms.CheckBox
         Me.chkBASINS_Census = New System.Windows.Forms.CheckBox
         Me.grpNWIS = New System.Windows.Forms.GroupBox
-        Me.btnBrowseWDMdailydischarge = New System.Windows.Forms.Button
-        Me.chkNWIS_GetNWISStations = New System.Windows.Forms.CheckBox
-        Me.chkNWIS_GetNWISDischarge = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISWQ = New System.Windows.Forms.CheckBox
+        Me.chkNWIS_GetNWISStations = New System.Windows.Forms.CheckBox
+        Me.btnBrowseWDMdailydischarge = New System.Windows.Forms.Button
+        Me.chkNWIS_GetNWISDischarge = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_Urban = New System.Windows.Forms.CheckBox
         Me.grpTerraServerWebService = New System.Windows.Forms.GroupBox
         Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
@@ -201,16 +201,37 @@ Partial Class frmDownload
         '
         Me.grpNWIS.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpNWIS.Controls.Add(Me.btnBrowseWDMdailydischarge)
-        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISStations)
-        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISWQ)
+        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISStations)
+        Me.grpNWIS.Controls.Add(Me.btnBrowseWDMdailydischarge)
+        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
         Me.grpNWIS.Location = New System.Drawing.Point(12, 260)
         Me.grpNWIS.Name = "grpNWIS"
         Me.grpNWIS.Size = New System.Drawing.Size(400, 42)
         Me.grpNWIS.TabIndex = 1
         Me.grpNWIS.TabStop = False
         Me.grpNWIS.Text = "NWIS"
+        '
+        'chkNWIS_GetNWISWQ
+        '
+        Me.chkNWIS_GetNWISWQ.AutoSize = True
+        Me.chkNWIS_GetNWISWQ.Location = New System.Drawing.Point(112, 19)
+        Me.chkNWIS_GetNWISWQ.Name = "chkNWIS_GetNWISWQ"
+        Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(90, 17)
+        Me.chkNWIS_GetNWISWQ.TabIndex = 21
+        Me.chkNWIS_GetNWISWQ.Text = "Water Quality"
+        Me.chkNWIS_GetNWISWQ.UseVisualStyleBackColor = True
+        '
+        'chkNWIS_GetNWISStations
+        '
+        Me.chkNWIS_GetNWISStations.AutoSize = True
+        Me.chkNWIS_GetNWISStations.Location = New System.Drawing.Point(233, 19)
+        Me.chkNWIS_GetNWISStations.Name = "chkNWIS_GetNWISStations"
+        Me.chkNWIS_GetNWISStations.Size = New System.Drawing.Size(64, 17)
+        Me.chkNWIS_GetNWISStations.TabIndex = 22
+        Me.chkNWIS_GetNWISStations.Text = "Stations"
+        Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISStations, "Point Layer of NWIS Stations")
+        Me.chkNWIS_GetNWISStations.UseVisualStyleBackColor = True
         '
         'btnBrowseWDMdailydischarge
         '
@@ -221,17 +242,7 @@ Partial Class frmDownload
         Me.btnBrowseWDMdailydischarge.TabIndex = 20
         Me.ToolTip1.SetToolTip(Me.btnBrowseWDMdailydischarge, "Browse to choose WDM file name")
         Me.btnBrowseWDMdailydischarge.UseVisualStyleBackColor = True
-        '
-        'chkNWIS_GetNWISStations
-        '
-        Me.chkNWIS_GetNWISStations.AutoSize = True
-        Me.chkNWIS_GetNWISStations.Location = New System.Drawing.Point(138, 19)
-        Me.chkNWIS_GetNWISStations.Name = "chkNWIS_GetNWISStations"
-        Me.chkNWIS_GetNWISStations.Size = New System.Drawing.Size(64, 17)
-        Me.chkNWIS_GetNWISStations.TabIndex = 21
-        Me.chkNWIS_GetNWISStations.Text = "Stations"
-        Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISStations, "Point Layer of NWIS Stations")
-        Me.chkNWIS_GetNWISStations.UseVisualStyleBackColor = True
+        Me.btnBrowseWDMdailydischarge.Visible = False
         '
         'chkNWIS_GetNWISDischarge
         '
@@ -242,16 +253,6 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDischarge.TabIndex = 19
         Me.chkNWIS_GetNWISDischarge.Text = "Daily Discharge"
         Me.chkNWIS_GetNWISDischarge.UseVisualStyleBackColor = True
-        '
-        'chkNWIS_GetNWISWQ
-        '
-        Me.chkNWIS_GetNWISWQ.AutoSize = True
-        Me.chkNWIS_GetNWISWQ.Location = New System.Drawing.Point(233, 19)
-        Me.chkNWIS_GetNWISWQ.Name = "chkNWIS_GetNWISWQ"
-        Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(90, 17)
-        Me.chkNWIS_GetNWISWQ.TabIndex = 22
-        Me.chkNWIS_GetNWISWQ.Text = "Water Quality"
-        Me.chkNWIS_GetNWISWQ.UseVisualStyleBackColor = True
         '
         'chkTerraServerWebService_Urban
         '

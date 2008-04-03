@@ -25,7 +25,6 @@ Public Module modDownload
         'take appropriate actions if the user selects the 'New' menu
         'with a BASINS project open, or just a MapWindow project open
 
-        GisUtil.MappingObject = g_MapWin
         Dim lResponse As Microsoft.VisualBasic.MsgBoxResult
         Dim lInputProjection As String = ""
 
@@ -529,6 +528,7 @@ StartOver:
                                                    ByVal aProjectFileName As String, _
                                                    Optional ByVal aExistingMapWindowProject As Boolean = False)
         Dim lQuery As String
+        Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
         Dim lNationalDir As String = IO.Path.Combine(g_BasinsDir, "Data\national\")
         If IO.Directory.Exists(lNationalDir) Then
             CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
@@ -542,7 +542,7 @@ StartOver:
                & "<DataType>core31</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & IO.Path.Combine(g_BasinsDir, "cache") & "</CacheFolder>" _
-               & "<DesiredProjection>" & CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj")) & "</DesiredProjection>" _
+               & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
                & "<merge>True</merge>" _
@@ -562,9 +562,6 @@ StartOver:
         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
         Dim lResult As String = lDownloadManager.Execute(lQuery)
         'Logger.Msg(lResult, "Result of Query from DataManager")
-        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
-            BASINS.ProcessDownloadResults(lResult)
-        End If
 
         If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
             If Not aExistingMapWindowProject Then
@@ -588,11 +585,7 @@ StartOver:
             If Not aExistingMapWindowProject Then
                 'regular case, not coming from existing mapwindow project
                 'set mapwindow project projection to projection of first layer
-                If g_MapWin.Layers.NumLayers > 0 Then
-                    Dim lsf As MapWinGIS.Shapefile
-                    lsf = g_MapWin.Layers(0).GetObject
-                    g_Project.ProjectProjection = lsf.Projection
-                End If
+                g_Project.ProjectProjection = lProjection
                 If Not (g_Project.Save(aProjectFileName)) Then
                     Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
                 End If
