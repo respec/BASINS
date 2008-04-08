@@ -93,6 +93,23 @@ Public Class frmDownload
             Dim lRegionXML As String = ""
             Dim lRegion As D4EMDataManager.Region = Me.SelectedRegion
             If Not lRegion Is Nothing Then lRegionXML = lRegion.XML
+            Dim lStationsXML As String = ""
+            If pMapWin.View IsNot Nothing Then
+                Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
+                If lSelected.NumSelected > 0 Then
+                    Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
+                    Dim lLayerShapefile As MapWinGIS.Shapefile = lLayer.GetObject
+                    Dim lKeyField As Integer
+                    For lKeyField = 0 To lLayerShapefile.NumFields - 1
+                        If lLayerShapefile.Field(lKeyField).Name = "site_no" Then Exit For
+                    Next
+                    If lKeyField <= lLayerShapefile.NumFields Then
+                        For lShapeIndex As Integer = 0 To lSelected.NumSelected - 1
+                            lStationsXML &= "<stationid>" & lLayerShapefile.CellValue(lKeyField, lSelected.Item(lShapeIndex).ShapeIndex) & "</stationid>" & vbCrLf
+                        Next
+                    End If
+                End If
+            End If
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
             If lCacheFolder.Length = 0 Then
@@ -129,6 +146,7 @@ Public Class frmDownload
                                      & lCacheFolder _
                                      & lDesiredProjection _
                                      & lRegionXML _
+                                     & lStationsXML _
                                      & lWDMfilename _
                                      & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                                      & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
@@ -153,6 +171,7 @@ Public Class frmDownload
                              & lCacheFolder _
                              & lDesiredProjection _
                              & lRegionXML _
+                             & lStationsXML _
                              & lWDMfilename _
                              & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                              & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
