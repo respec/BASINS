@@ -22,6 +22,7 @@ Public Module modBasinsPlugin
     Friend g_AppName As String = "BASINS4"
     Friend g_BasinsDataDirs As New ArrayList
     Friend g_BasinsDir As String = ""
+    Friend g_ProgressPanel As Windows.Forms.Panel
     Friend pBuildFrm As frmBuildNew
 
     Friend pExistingMapWindowProjectName As String = ""

@@ -308,7 +308,7 @@ Public Class frmGraphEditor
     Private Sub ChooseTextBoxBackColor(ByVal aTextBox As TextBox)
         Dim lColorDialog As ColorDialog = New ColorDialog()
         lColorDialog.Color = aTextBox.BackColor
-        If lColorDialog.ShowDialog() = DialogResult.OK Then
+        If lColorDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
             aTextBox.BackColor = lColorDialog.Color
             If chkAutoApply.Checked Then ApplyAll()
         End If
