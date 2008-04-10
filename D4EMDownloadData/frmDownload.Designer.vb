@@ -27,7 +27,6 @@ Partial Class frmDownload
         Me.grpBASINS = New System.Windows.Forms.GroupBox
         Me.btnBrowseWDMmet = New System.Windows.Forms.Button
         Me.chkBASINS_Met = New System.Windows.Forms.CheckBox
-        Me.chkBASINS_PCS3 = New System.Windows.Forms.CheckBox
         Me.chkBASINS_NHD = New System.Windows.Forms.CheckBox
         Me.chkBASINS_NED = New System.Windows.Forms.CheckBox
         Me.chkBASINS_LSTORET = New System.Windows.Forms.CheckBox
@@ -82,7 +81,6 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpBASINS.Controls.Add(Me.btnBrowseWDMmet)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Met)
-        Me.grpBASINS.Controls.Add(Me.chkBASINS_PCS3)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_NHD)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_NED)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_LSTORET)
@@ -116,16 +114,6 @@ Partial Class frmDownload
         Me.chkBASINS_Met.TabIndex = 6
         Me.chkBASINS_Met.Text = "Meteorologic"
         Me.chkBASINS_Met.UseVisualStyleBackColor = True
-        '
-        'chkBASINS_PCS3
-        '
-        Me.chkBASINS_PCS3.AutoSize = True
-        Me.chkBASINS_PCS3.Location = New System.Drawing.Point(233, 65)
-        Me.chkBASINS_PCS3.Name = "chkBASINS_PCS3"
-        Me.chkBASINS_PCS3.Size = New System.Drawing.Size(53, 17)
-        Me.chkBASINS_PCS3.TabIndex = 10
-        Me.chkBASINS_PCS3.Text = "PCS3"
-        Me.chkBASINS_PCS3.UseVisualStyleBackColor = True
         '
         'chkBASINS_NHD
         '
@@ -597,7 +585,6 @@ Partial Class frmDownload
     Friend WithEvents grpBASINS As System.Windows.Forms.GroupBox
     Friend WithEvents chkBASINS_Census As System.Windows.Forms.CheckBox
     Friend WithEvents grpNWIS As System.Windows.Forms.GroupBox
-    Friend WithEvents chkBASINS_PCS3 As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_NHD As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_NED As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_LSTORET As System.Windows.Forms.CheckBox

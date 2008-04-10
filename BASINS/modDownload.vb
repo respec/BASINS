@@ -631,6 +631,9 @@ StartOver:
         Dim lSuccess As Boolean
         Dim lInputProjection As String
         Dim lOutputProjection As String
+        Dim lMessage As String = ""
+        Dim lLayersAdded As New atcCollection
+        Dim lDataAdded As New atcCollection
 
         If Not aInstructions.StartsWith("<") Then
             If FileExists(aInstructions) Then
@@ -641,6 +644,7 @@ StartOver:
             End If
         End If
 
+        g_MapWin.View.LockLegend()
         g_MapWin.View.MapCursor = tkCursor.crsrWait
 
         lProjectorXML.LoadXml(aInstructions)
@@ -656,16 +660,25 @@ StartOver:
                     Else
                         RemoveDataSource(lOutputFileName) 'Close this data source if it is already open
                         Dim lNewDataSource As atcData.atcDataSource = atcData.atcDataManager.DataSourceByName(lDataType)
-                        If lNewDataSource Is Nothing Then
-                            Logger.Dbg("Could not add data from '" & lOutputFileName & "' - unknown type '" & lDataType & "'")
-                        Else
-                            atcData.atcDataManager.OpenDataSource(lNewDataSource, lOutputFileName, Nothing)
+                        If lNewDataSource Is Nothing Then 'Try loading needed plugin for this data type
+                            If atcData.atcDataManager.LoadPlugin("Timeseries::" & lDataType) Then
+                                'Try again with newly loaded plugin
+                                lNewDataSource = atcData.atcDataManager.DataSourceByName(lDataType)
+                                If lNewDataSource IsNot Nothing Then Logger.Dbg("Successfully loaded plugin " & lDataType & " to read " & lOutputFileName)
+                            Else
+                                Logger.Dbg("Could not add data from '" & lOutputFileName & "' - unknown type '" & lDataType & "'")
+                            End If
+                        End If
+                        If lNewDataSource IsNot Nothing Then
+                            If atcData.atcDataManager.OpenDataSource(lNewDataSource, lOutputFileName, Nothing) Then
+                                lDataAdded.Add(lOutputFileName, lNewDataSource)
+                            End If
                         End If
                     End If
                 Case "add_shape"
                     lOutputFileName = lProjectorNode.Content
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                    lLayersAdded.Add(lOutputFileName, AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
                 Case "add_grid"
                     lOutputFileName = lProjectorNode.Content
                     Select Case IO.Path.GetFileName(lOutputFileName).ToLower
@@ -673,7 +686,7 @@ StartOver:
                             Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
                         Case Else
                             If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                            AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                            lLayersAdded.Add(lOutputFileName, AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
                             If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                                 'create .prj file as work-around for bug
                                 SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
@@ -681,7 +694,7 @@ StartOver:
                     End Select
                 Case "add_allshapes"
                     lOutputFileName = lProjectorNode.Content
-                    AddAllShapesInDir(lOutputFileName, lProjectDir)
+                    lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
                 Case "remove_data"
                     RemoveDataSource(lProjectorNode.Content.ToLower)
                 Case "remove_layer", "remove_shape", "remove_grid"
@@ -875,7 +888,25 @@ StartOver:
             End If
         Next
 
+        If lLayersAdded.Count = 1 Then
+            lMessage &= lLayersAdded.Count & " Layer: " & lLayersAdded(0).ToString
+        ElseIf lLayersAdded.Count > 1 Then
+            lMessage &= lLayersAdded.Count & " Layers"
+        End If
+
+        If lDataAdded.Count = 1 Then
+            lMessage &= lDataAdded.Count & " Data file: " & lDataAdded(0).ToString
+        ElseIf lDataAdded.Count > 1 Then
+            lMessage &= lDataAdded.Count & " Data files"
+        End If
+
         g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
+        g_MapWin.View.UnlockLegend()
+
+        If lMessage.Length > 0 Then
+            Application.DoEvents()
+            Logger.Msg("Downloaded" & vbCrLf & lMessage, "Download Complete")
+        End If
     End Sub
 
     Private Sub RemoveDataSource(ByVal aSpecification As String)
@@ -1042,7 +1073,7 @@ StartOver:
     End Function
 
     'Adds all shape files found in aPath to the current MapWindow project
-    Public Sub AddAllShapesInDir(ByVal aPath As String, ByVal aProjectDir As String)
+    Public Function AddAllShapesInDir(ByVal aPath As String, ByVal aProjectDir As String) As atcCollection
         Dim lLayer As Integer
         Dim Filename As String
         Dim allFiles As New NameValueCollection
@@ -1053,9 +1084,10 @@ StartOver:
         If Right(aPath, 1) <> "\" Then aPath = aPath & "\"
         AddFilesInDir(allFiles, aPath, True, "*.shp")
 
+        AddAllShapesInDir = New atcCollection
         For lLayer = 0 To allFiles.Count - 1
             Filename = allFiles.Item(lLayer)
-            AddShapeToMW(Filename, GetDefaultsFor(Filename, aProjectDir, lDefaultsXML))
+            AddAllShapesInDir.Add(Filename, AddShapeToMW(Filename, GetDefaultsFor(Filename, aProjectDir, lDefaultsXML)))
         Next
 
         'Remove any empty groups (for example, group "Data Layers" should be empty)
@@ -1066,37 +1098,46 @@ StartOver:
         Next
         g_MapWin.PreviewMap.GetPictureFromMap()
 
-    End Sub
+    End Function
 
     ''' <summary>
     ''' If the named layer does not have a .mwsr (for shape) or .mwleg (for grid) then look for the default file
     ''' and put a copy of the default renderer with the layer
     ''' </summary>
-    Private Sub GetDefaultRenderer(ByVal aLayerFilename As String)
-        Dim lRendererExt As String
-        If IO.Path.GetExtension(aLayerFilename).ToLower = ".shp" Then
-            lRendererExt = ".mwsr"
-        Else
-            lRendererExt = ".mwleg"
-        End If
-        Dim lRendererFilename As String = IO.Path.ChangeExtension(aLayerFilename, lRendererExt)
-        If lRendererFilename.Length > 0 AndAlso Not IO.File.Exists(lRendererFilename) Then
-            Dim lRendererFilenameNoPath As String = IO.Path.GetFileName(lRendererFilename)
-            Dim lRenderersPath As String = g_BasinsDir & "etc\renderers\"
-            Dim lDefaultRendererFilename As String = FindFile("", lRenderersPath & lRendererFilenameNoPath)
-            If Not FileExists(lDefaultRendererFilename) Then
-                If lRendererFilenameNoPath.Contains("_") Then 'Some layers are named huc8_xxx.shp, renderer is named _xxx & lRendererExt
-                    lDefaultRendererFilename = FindFile("", lRenderersPath & lRendererFilenameNoPath.Substring(lRendererFilenameNoPath.IndexOf("_")))
-                End If
-                If Not FileExists(lDefaultRendererFilename) Then 'Try trimming off numbers before extension in layername2.mwleg
-                    lDefaultRendererFilename = FindFile("", lRenderersPath & IO.Path.GetFileNameWithoutExtension(aLayerFilename).TrimEnd("0"c, "1"c, "2"c, "3"c, "4"c, "5"c, "6"c, "7"c, "8"c, "9"c) & lRendererExt)
+    Private Function GetDefaultRenderer(ByVal aLayerFilename As String) As String
+        GetDefaultRenderer = ""
+
+        If aLayerFilename IsNot Nothing AndAlso aLayerFilename.Length > 0 Then
+            Dim lRendererExt As String
+            If IO.Path.GetExtension(aLayerFilename).ToLower = ".shp" Then
+                lRendererExt = ".mwsr"
+            Else
+                lRendererExt = ".mwleg"
+            End If
+
+            If lRendererExt IsNot Nothing Then
+                Dim lRendererFilename As String = IO.Path.ChangeExtension(aLayerFilename, lRendererExt)
+
+                If lRendererFilename.Length > 0 AndAlso Not IO.File.Exists(lRendererFilename) Then
+                    Dim lRendererFilenameNoPath As String = IO.Path.GetFileName(lRendererFilename)
+                    Dim lRenderersPath As String = g_BasinsDir & "etc\renderers\"
+                    Dim lDefaultRendererFilename As String = FindFile("", lRenderersPath & lRendererFilenameNoPath)
+                    If Not FileExists(lDefaultRendererFilename) Then
+                        If lRendererFilenameNoPath.Contains("_") Then 'Some layers are named huc8_xxx.shp, renderer is named _xxx & lRendererExt
+                            lDefaultRendererFilename = FindFile("", lRenderersPath & lRendererFilenameNoPath.Substring(lRendererFilenameNoPath.IndexOf("_")))
+                        End If
+                        If Not FileExists(lDefaultRendererFilename) Then 'Try trimming off numbers before extension in layername2.mwleg
+                            lDefaultRendererFilename = FindFile("", lRenderersPath & IO.Path.GetFileNameWithoutExtension(aLayerFilename).TrimEnd("0"c, "1"c, "2"c, "3"c, "4"c, "5"c, "6"c, "7"c, "8"c, "9"c) & lRendererExt)
+                        End If
+                    End If
+                    If FileExists(lDefaultRendererFilename) Then
+                        IO.File.Copy(lDefaultRendererFilename, lRendererFilename)
+                        GetDefaultRenderer = lRendererFilename
+                    End If
                 End If
             End If
-            If FileExists(lDefaultRendererFilename) Then
-                IO.File.Copy(lDefaultRendererFilename, lRendererFilename)
-            End If
         End If
-    End Sub
+    End Function
 
     'Given a file name and the XML describing how to render it, add a shape layer to MapWindow
     Private Function AddShapeToMW(ByVal aFilename As String, _
@@ -1121,13 +1162,12 @@ StartOver:
         MWlay = Nothing
 
         Try
-
-            GetDefaultRenderer(aFilename)
+            Dim lRendererName As String = GetDefaultRenderer(aFilename)
 
             If layerXml Is Nothing Then
                 LayerName = FilenameOnly(aFilename)
                 Visible = True
-                If Not IO.File.Exists(IO.Path.ChangeExtension(aFilename, ".mwsr")) Then
+                If lRendererName.Length = 0 Then
                     Group = "Other"
                 End If
             Else
@@ -1148,6 +1188,7 @@ StartOver:
             g_StatusBar.Item(1).Text = "Opening " & aFilename
             shpFile = New MapWinGIS.Shapefile
             shpFile.Open(aFilename)
+
             Select Case shpFile.ShapefileType
                 Case MapWinGIS.ShpfileType.SHP_POINT, _
                         MapWinGIS.ShpfileType.SHP_POINTM, _
@@ -1222,6 +1263,18 @@ StartOver:
             End If
 
             If Not MWlay Is Nothing Then
+                If lRendererName.Length > 0 Then
+                    MWlay.LoadShapeLayerProps(lRendererName)
+                    Dim lRendererXML As New Xml.XmlDocument
+                    lRendererXML.Load(lRendererName)
+                    Dim lLayerXML As Xml.XmlNode = lRendererXML.GetElementsByTagName("SFRendering")(0).ChildNodes(0)
+                    If lLayerXML.Attributes("GroupName") IsNot Nothing Then
+                        Group = lLayerXML.Attributes("GroupName").InnerText
+                    End If
+                    If lLayerXML.Attributes("Visible") IsNot Nothing Then
+                        Visible = CBool(lLayerXML.Attributes("Visible").InnerText)
+                    End If
+                End If
                 MWlay.Visible = Visible
 
                 'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
@@ -1240,7 +1293,9 @@ StartOver:
                 ElseIf LCase(aFilename).EndsWith("cat.shp") Then
                     MWlay.ZoomTo()
                 End If
-                If Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
+                If Group.Length > 0 Then
+                    AddLayerToGroup(MWlay, Group)
+                End If
 
                 If MWlay.Visible Then
                     g_MapWin.View.Redraw()

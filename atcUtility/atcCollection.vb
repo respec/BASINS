@@ -88,6 +88,14 @@ Public Class atcCollection
         End If
     End Function
 
+    ''' <summary>Add items from an atcCollection along with their keys</summary>
+    Public Shadows Sub Add(ByVal aAddThese As atcCollection)
+        Dim lLastIndex As Integer = aAddThese.Count - 1
+        For lIndex As Integer = 0 To lLastIndex
+            Add(aAddThese.Keys(lIndex), aAddThese.ItemByIndex(lIndex))
+        Next
+    End Sub
+
     Public Shadows Sub AddRange(ByVal aC As System.Collections.ICollection)
         pKeys.AddRange(aC)
         MyBase.AddRange(aC)

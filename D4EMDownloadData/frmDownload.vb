@@ -64,16 +64,18 @@ Public Class frmDownload
 
     Public Function SelectedRegion() As D4EMDataManager.Region
         Dim lRegion As D4EMDataManager.Region
+        Dim lPreferredFormat As String = "box"
         Try
             Dim lExtents As MapWinGIS.Extents = Nothing
             Select Case cboRegion.SelectedIndex
                 Case 0 : lExtents = pMapWin.View.Extents
                 Case 1 : lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
-                Case 2 : lExtents = pMapWin.Layers(HUC8Index).Extents
+                Case 2 : lExtents = pMapWin.Layers(HUC8Index).Extents : lPreferredFormat = "huc8"
             End Select
             If Not lExtents Is Nothing Then
                 lRegion = New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
                 lRegion.HUC8s = HUC8s()
+                lRegion.PreferredFormat = lPreferredFormat
                 Return lRegion.GetProjected(pGeographicProjection)
             End If
         Catch ex As Exception
