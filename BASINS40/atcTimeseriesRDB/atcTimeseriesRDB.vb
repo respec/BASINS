@@ -72,9 +72,12 @@ Public Class atcTimeseriesRDB
                 lAttributes.SetValue("URL", lURL)
 
                 Dim lWQData As Boolean = False
+                Dim lMeasurementsData As Boolean = False
                 Dim lParmCodeIndex As Integer = 10
                 If lURL.IndexOf("qwdata") > -1 Then 'TODO: need better way - only true with BASINS download
                     lWQData = True
+                ElseIf lURL.IndexOf("measurements") > -1 Then
+                    lMeasurementsData = True
                 End If
 
                 While lInputReader.PeekChar = Asc("#")
@@ -97,7 +100,7 @@ Public Class atcTimeseriesRDB
                                 Case Else
                                     If lAttrName.Length > 0 AndAlso lAttrValue.Length > 0 Then
                                         lAttributes.SetValue(lAttrName, lAttrValue)
-                                        Logger.Dbg("Set " & lAttrName & " = " & lAttrValue)
+                                        'Logger.Dbg("Set " & lAttrName & " = " & lAttrValue)
                                     End If
                             End Select
                         End If
@@ -106,6 +109,8 @@ Public Class atcTimeseriesRDB
 
                 If lWQData Then
                     ProcessWaterQualityValues(lInputReader, lAttributes)
+                ElseIf lMeasurementsData Then
+                    ProcessMeasurements(lInputReader, lAttributes)
                 Else
                     ProcessDailyValues(lInputReader, lAttributes)
                 End If
@@ -117,6 +122,65 @@ Public Class atcTimeseriesRDB
             End Try
         End If
     End Function
+
+    Sub ProcessMeasurements(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
+        Dim lStationsRDB As New atcTableRDB
+        With lStationsRDB
+            If .OpenStream(aInputReader.BaseStream) Then
+                Dim lDateField As Integer = .FieldNumber("measurement_dt")
+                If lDateField = 0 Then Throw New Exception("Required field missing: measurement_dt")
+                Dim lValueField As Integer = .FieldNumber("discharge_1")
+                If lValueField = 0 Then Throw New Exception("Required field missing: discharge_1")
+
+                Dim lxsec_area_Field As Integer = .FieldNumber("xsec_area_va")
+                Dim lvelocity_Field As Integer = .FieldNumber("velocity_va")
+
+
+                Dim lTsBuilder As New atcData.atcTimeseriesBuilder(Me)
+                With lTsBuilder.Attributes
+                    .ChangeTo(aAttributes)
+                    .SetValue("Constituent", "FLOW")
+                    .SetValue("Units", "cfs")
+                    .SetValue("Point", True)
+                    .SetValue("Scenario", "OBSERVED")
+                    .SetValue("Location", .GetValue("site_no"))
+                    .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
+                End With
+
+                Dim lDateString As String
+                Dim lDate As Date
+                Dim lValueString As String
+                Dim lValue As Double
+                For lRecord As Integer = 1 To .NumRecords
+                    .CurrentRecord = lRecord
+                    lDateString = .Value(lDateField)
+                    lDate = Date.Parse(lDateString)
+
+                    lValueString = .Value(lValueField)
+                    If IsNumeric(lValueString) Then
+                        lValue = Double.Parse(lValueString)
+                    ElseIf lxsec_area_Field >= 0 AndAlso lvelocity_Field >= 0 AndAlso IsNumeric(.Value(lxsec_area_Field)) AndAlso IsNumeric(.Value(lvelocity_Field)) Then
+                        lValue = .Value(lxsec_area_Field) * .Value(lvelocity_Field)
+                        Logger.Dbg("Computed flow for " & lDateString & " from xsec_area_va * velocity_va = " & DoubleToString(lValue))
+                    Else
+                        lValue = GetNaN()
+                    End If
+                    lTsBuilder.AddValue(lDate, lValue)
+                    For lField As Integer = 1 To .NumFields
+                        Select Case .FieldName(lField)
+                            Case "agency_cd", "site_no", "measurement_dt" 'don't need these as value attributes
+                            Case Else
+                                lTsBuilder.AddValueAttribute(.FieldName(lField), .Value(lField))
+                        End Select
+                    Next
+                Next
+                DataSets.Add(lTsBuilder.CreateTimeseries)
+            Else
+                Throw New Exception("Unable to open")
+            End If
+        End With
+
+    End Sub
 
     Sub ProcessWaterQualityValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
         Dim lCurLine As String
@@ -203,7 +267,7 @@ Public Class atcTimeseriesRDB
                             lData.Attributes.SetValue("Scenario", "OBSERVED")
                             lData.Attributes.SetValue("Location", lLocation)
                             lData.Attributes.SetValue("DataKey", lDataKey)
-                            lRawDataSets.Add(lDataKey, lData)                            
+                            lRawDataSets.Add(lDataKey, lData)
                         End If
                         lData.AddValue(lDateJ, lValueString)
                     End If
