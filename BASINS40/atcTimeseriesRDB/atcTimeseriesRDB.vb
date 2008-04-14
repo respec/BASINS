@@ -107,6 +107,8 @@ Public Class atcTimeseriesRDB
                     End If
                 End While
 
+                lAttributes.AddHistory("Read from " & Specification)
+
                 If lWQData Then
                     ProcessWaterQualityValues(lInputReader, lAttributes)
                 ElseIf lMeasurementsData Then
@@ -145,6 +147,7 @@ Public Class atcTimeseriesRDB
                     .SetValue("Scenario", "OBSERVED")
                     .SetValue("Location", .GetValue("site_no"))
                     .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
+                    .SetValue("ID", 1)
                 End With
 
                 Dim lDateString As String
@@ -252,6 +255,7 @@ Public Class atcTimeseriesRDB
                             lData.Attributes.ChangeTo(aAttributes)
                             lConstituentDescription = lConstituentDescriptions.ItemByKey(lConstituentString)
                             lData.Attributes.SetValue("ConstituentDescription", lConstituentDescription)
+                            lData.Attributes.SetValue("ID", lRawDataSets.Count + 1)
                             Dim lParsed() As String = lConstituentDescription.Split(",")
                             Dim lConstituentName As String = ""
                             For Each lParse As String In lParsed
@@ -367,6 +371,7 @@ Public Class atcTimeseriesRDB
                                 lData = New atcTimeseries(Me)
                                 lData.Dates = New atcTimeseries(Me)
                                 lData.Attributes.ChangeTo(aAttributes)
+                                lData.Attributes.SetValue("ID", lRawDataSets.Count + 1)
                                 lData.numValues = lTable.NumRecords - 1
 
                                 Select Case .FieldName(lField).Substring(3, 5)
