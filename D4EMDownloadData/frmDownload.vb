@@ -3,7 +3,6 @@ Imports System.Net
 Public Class frmDownload
 
     Public Const CancelString As String = "<Cancel>"
-    Private Const pGeographicProjection As String = "+proj=latlong +datum=NAD83"
     Private pMapWin As MapWindow.Interfaces.IMapWin
     Private pOk As Boolean = False
 
@@ -76,13 +75,13 @@ Public Class frmDownload
                 lRegion = New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
                 lRegion.HUC8s = HUC8s()
                 lRegion.PreferredFormat = lPreferredFormat
-                Return lRegion.GetProjected(pGeographicProjection)
+                Return lRegion.GetProjected(D4EMDataManager.SpatialOperations.GeographicProjection)
             End If
         Catch ex As Exception
             Dim lRegionForm As New frmSpecifyRegion
             lRegion = lRegionForm.AskUser()
             If Not lRegion Is Nothing Then
-                Return lRegion.GetProjected(pGeographicProjection)
+                Return lRegion.GetProjected(D4EMDataManager.SpatialOperations.GeographicProjection)
             End If
         End Try
         Return Nothing
