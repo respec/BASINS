@@ -6,6 +6,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
 Imports MapWinUtility
+Imports atcData
 Imports atcUtility
 Imports atcMwGisUtility
 
@@ -658,7 +659,6 @@ StartOver:
                     If lDataType.Length = 0 Then
                         Logger.Dbg("Could not add data from '" & lOutputFileName & "' - no type specified")
                     Else
-                        RemoveDataSource(lOutputFileName) 'Close this data source if it is already open
                         Dim lNewDataSource As atcData.atcDataSource = atcData.atcDataManager.DataSourceByName(lDataType)
                         If lNewDataSource Is Nothing Then 'Try loading needed plugin for this data type
                             If atcData.atcDataManager.LoadPlugin("Timeseries::" & lDataType) Then
@@ -696,7 +696,7 @@ StartOver:
                     lOutputFileName = lProjectorNode.Content
                     lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
                 Case "remove_data"
-                    RemoveDataSource(lProjectorNode.Content.ToLower)
+                    atcDataManager.RemoveDataSource(lProjectorNode.Content.ToLower)
                 Case "remove_layer", "remove_shape", "remove_grid"
                     Try
                         atcMwGisUtility.GisUtil.RemoveLayer(atcMwGisUtility.GisUtil.LayerIndex(lProjectorNode.Content))
@@ -907,16 +907,6 @@ StartOver:
             Application.DoEvents()
             Logger.Msg("Downloaded" & vbCrLf & lMessage, "Download Complete")
         End If
-    End Sub
-
-    Private Sub RemoveDataSource(ByVal aSpecification As String)
-        aSpecification = aSpecification.ToLower
-        For Each lDataSource As atcData.atcDataSource In atcData.atcDataManager.DataSources
-            If lDataSource.Specification.ToLower.Equals(aSpecification) Then
-                atcData.atcDataManager.DataSources.Remove(lDataSource)
-                Exit For
-            End If
-        Next
     End Sub
 
     Public Function CleanUpUserProjString(ByVal aProjString As String) As String

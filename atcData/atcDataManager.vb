@@ -10,8 +10,8 @@ Public Class atcDataManager
     Private Shared pDataSources As ArrayList 'of atcDataSource, the currently open data sources
     Private Shared pSelectionAttributes As ArrayList
     Private Shared pDisplayAttributes As ArrayList
+    Private Shared pManagerForm As frmManager
 
-    Private Const pInMemorySpecification As String = "<in memory>"
     Private Shared pLikelyShapeLocationFieldNames() As String = { _
         "ACC_ID", "COOP_ID", "COVNAME", "CU", "ECOREG_ID", "EPA_REG_ID", _
         "FIPS", "GAGE_ID", "ID", "LOCATION", "MUID", "NAWQA", "NPD", "NPDES", _
@@ -44,9 +44,6 @@ Public Class atcDataManager
     ''' </summary>
     Public Shared Sub Clear()
         pDataSources = New ArrayList
-        Dim lMemory As New atcDataSource
-        lMemory.Specification = pInMemorySpecification
-        pDataSources.Add(lMemory)
 
         pSelectionAttributes = New ArrayList
         pSelectionAttributes.Add("Scenario")
@@ -144,6 +141,7 @@ Public Class atcDataManager
                                    ByVal aSpecification As String, _
                                    ByVal aAttributes As atcDataAttributes) As Boolean
         Try
+            RemoveDataSource(aSpecification)
             If aNewSource.Open(aSpecification, aAttributes) Then
                 Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
                 pDataSources.Add(aNewSource)
@@ -174,21 +172,8 @@ Public Class atcDataManager
         End Try
     End Function
 
-    ''' <summary>Creates and returns an instance of a data source by name</summary>
-    ''' <param name="aDataSourceName">
-    '''     <para>Name of data source to create and return</para>
-    ''' </param>  
-    Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
-        aDataSourceName = aDataSourceName.Replace("Timeseries::", "")
-        For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
-            If lDataSource.Name.Replace("Timeseries::", "") = aDataSourceName Then
-                Return lDataSource.NewOne
-            End If
-        Next
-        Return Nothing
-    End Function
-
     Public Shared Function OpenDataSource(ByVal aSpecification As String) As Boolean
+        RemoveDataSource(aSpecification)
         Dim lMatchDataSource As atcDataSource = Nothing
         Dim lPossibleDataSources As New atcCollection
         Dim lFileExtension As String = IO.Path.GetExtension(aSpecification)
@@ -205,6 +190,30 @@ Public Class atcDataManager
             Logger.Msg("Data Source Ambiguous for " & aSpecification)
             'TODO: choose the source
         End If
+    End Function
+
+    Public Shared Sub RemoveDataSource(ByVal aSpecification As String)
+        aSpecification = aSpecification.ToLower
+        For Each lDataSource As atcDataSource In DataSources
+            If lDataSource.Specification.ToLower.Equals(aSpecification) Then
+                DataSources.Remove(lDataSource)
+                Exit For
+            End If
+        Next
+    End Sub
+
+    ''' <summary>Creates and returns an instance of a data source by name</summary>
+    ''' <param name="aDataSourceName">
+    '''     <para>Name of data source to create and return</para>
+    ''' </param>  
+    Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
+        aDataSourceName = aDataSourceName.Replace("Timeseries::", "")
+        For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
+            If lDataSource.Name.Replace("Timeseries::", "") = aDataSourceName Then
+                Return lDataSource.NewOne
+            End If
+        Next
+        Return Nothing
     End Function
 
 #Region "User interaction"
@@ -293,9 +302,13 @@ Public Class atcDataManager
     '''     <para>Optional title for dialog window, default is 'Data Sources'</para>
     ''' </param> 
     Public Shared Sub UserManage(Optional ByVal aTitle As String = "")
-        Dim lForm As New frmManager
-        If aTitle.Length > 0 Then lForm.Text = aTitle
-        lForm.Edit()
+        If pManagerForm Is Nothing OrElse pManagerForm.IsDisposed Then
+            pManagerForm = New frmManager
+        End If
+        pManagerForm.BringToFront()
+        pManagerForm.Focus()
+        If aTitle.Length > 0 Then pManagerForm.Text = aTitle
+        pManagerForm.Edit()
     End Sub
 
     Friend Shared Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
@@ -489,9 +502,7 @@ Public Class atcDataManager
                         Case "DataFile", "DataSource"
                             Dim lDataSourceType As String = lchildXML.Content
                             Dim lSpecification As String = lchildXML.GetAttrValue("Specification")
-                            If lSpecification.Equals(pInMemorySpecification) Then
-                                'Ignore, we do not save this but we used to
-                            ElseIf lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
+                            If lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
                                 Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
                             ElseIf lDataSourceType = "WDM" AndAlso Not FileExists(lSpecification) Then
                                 Logger.Dbg("Skipping file that does not exist: '" & lSpecification & "'")
