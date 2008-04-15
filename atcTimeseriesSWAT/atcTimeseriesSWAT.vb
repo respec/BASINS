@@ -52,22 +52,25 @@ Public Class atcTimeseriesSWAT
             Dim lTable As New atcTableFixed
             With lTable
                 .NumHeaderRows = 9
-                If .OpenFile(MyBase.Specification) Then
+                If .OpenFile(Specification) Then
                     Dim lTSBuilders As New atcData.atcTimeseriesGroupBuilder(Me)
                     Dim lTSBuilder As atcData.atcTimeseriesBuilder
                     Dim lField As Integer
                     Dim lCurrentRecord As Integer
+                    Dim lLastRecord As Integer = .NumRecords
                     Dim lFieldStart As Integer = 1
                     Dim lLocation As String
-                    Dim lConstituent As String
+                    Dim lKey As String
                     Dim lDate As Double
                     Dim lYear As Integer
                     Dim lMonth As Integer
-                    Dim lIncrementYear As Boolean = False
+                    Dim lDay As Integer = 1
+                    Dim lDaily As Boolean = False
+                    Dim lYearly As Boolean = False
                     Dim lConstituentHeader As String = .Header(9)
-                    Dim lNumConstituents As Integer = (lConstituentHeader.Length - 25) / 12
-                    .NumFields = lNumConstituents + 3
-                    For lField = 1 To .NumFields
+                    Dim lLastField As Integer = 3 + (lConstituentHeader.Length - 25) / 12
+                    .NumFields = lLastField
+                    For lField = 1 To lLastField
                         Select Case lField
                             Case 1 : .FieldLength(lField) = 10
                             Case 2 : .FieldLength(lField) = 9
@@ -80,37 +83,59 @@ Public Class atcTimeseriesSWAT
                     Next
 
                     'Scan for first record with a year instead of a month in column 3
-                    For lCurrentRecord = 1 To .NumRecords
+                    For lCurrentRecord = 1 To lLastRecord
                         .CurrentRecord = lCurrentRecord
-                        lYear = CInt(.Value(3).Trim)
+                        lYear = Integer.Parse(.Value(3).Trim)
                         If lYear > 12 Then Exit For
                     Next
 
-                    For lCurrentRecord = 1 To .NumRecords
+                    If lYear = 13 Then
+                        lDaily = True
+                        lYear = 1900
+                    End If
+
+                    Logger.Status("Reading " & Format(lLastRecord, "#,###") & " records * " & Format((lLastField - 3), "#,###") & " constituents from " & Specification)
+                    For lCurrentRecord = 1 To lLastRecord
                         .CurrentRecord = lCurrentRecord
                         lLocation = .Value(1)
-                        lMonth = CInt(.Value(3).Trim)
-                        If lMonth > 12 Then
-                            lYear = lMonth
-                            lIncrementYear = True 'Next time it is a regular month it will be next year
-                        ElseIf lIncrementYear Then
-                            lYear += 1
+
+                        'MON column may hold month or day or year
+                        lMonth = Integer.Parse(.Value(3).Trim)
+                        If lDaily Then
+                            If lMonth < lDay Then
+                                lYear += 1
+                            End If
+                            lDay = lMonth
+                            lMonth = 1
+                        Else
+                            If lMonth > 12 Then
+                                lYear = lMonth
+                                lYearly = True
+                                lMonth = 1
+                            ElseIf lYearly Then
+                                lYear += 1
+                                lYearly = False
+                            End If
+                            lDay = atcUtility.daymon(lYear, lMonth)
                         End If
-                        lDate = atcUtility.MJD(lYear, lMonth, 1)
-                        For lField = 5 To .NumFields
-                            lConstituent = .FieldName(lField)
-                            lTSBuilder = lTSBuilders.Builder(lConstituent & "::" & lLocation)
-                            'lTSBuilder.Attributes.SetValue("Constituent", lConstituent)
-                            'lTSBuilder.Attributes.SetValue("Location", lLocation)
-                            lTSBuilder.AddValue(lDate, CDbl(.Value(lField)))
+
+                        lDate = atcUtility.Jday(lYear, lMonth, lDay, 24, 0, 0)
+                        For lField = 4 To lLastField
+                            lKey = .FieldName(lField) & ":" & lLocation
+                            If lYearly Then lKey &= ":Y"
+                            lTSBuilder = lTSBuilders.Builder(lKey)
+                            lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
                         Next
+                        Logger.Progress(lCurrentRecord, lLastRecord)
                     Next
                     lTSBuilders.CreateTimeseriesAddToGroup(Me.DataSets)
-                    For Each lDataSet As atcData.atcDataSet In Me.DataSets
+                    For Each lDataSet As atcData.atcTimeseries In Me.DataSets
                         With lDataSet.Attributes
-                            Dim lKeys() As String = .GetValue("Key").Split("::")
-                            .SetValue("Constituent", lKeys(0))
-                            .SetValue("Location", lKeys(1))
+                            Dim lKeyParts() As String = .GetValue("Key").Split(":")
+                            .SetValue("Scenario", "Simulated")
+                            .SetValue("Units", SplitUnits(lKeyParts(0)))
+                            .SetValue("Constituent", lKeyParts(0))
+                            .SetValue("Location", lKeyParts(1))
                         End With
                     Next
                     Return True
@@ -122,6 +147,17 @@ Public Class atcTimeseriesSWAT
             End With
         End If
     End Function
+
+    Private Function SplitUnits(ByRef aConstituent As String) As String
+        Dim lUnitsStart As Integer = 0
+        For Each lChar As Char In aConstituent.ToCharArray
+            If Char.IsLower(lChar) Then Exit For
+            lUnitsStart += 1
+        Next
+        SplitUnits = aConstituent.Substring(lUnitsStart)
+        aConstituent = aConstituent.Substring(0, lUnitsStart)
+    End Function
+
 
     Public Sub New()
         Filter = pFilter

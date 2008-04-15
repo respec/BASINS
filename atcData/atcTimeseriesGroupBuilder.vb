@@ -61,6 +61,7 @@ Public Class atcTimeseriesGroupBuilder
                 lBuilder.Attributes.SetValue("ID", CInt(aDataSetKey))
             Else 'Default ID is 1 for first dataset, 2 for second
                 lBuilder.Attributes.SetValue("ID", pBuilders.Count)
+                lBuilder.Attributes.SetValue("Key", aDataSetKey)
             End If
         End If
         Return lBuilder
