@@ -506,6 +506,9 @@ FoundDir:
         ElseIf msg.StartsWith("FileDropEvent") Then
             Dim lMsg() As String = msg.Split("|")
             Handled = atcDataManager.OpenDataSource(lMsg(3))
+            If Handled Then
+                atcDataManager.UserManage()
+            End If
         Else
             Logger.Dbg("Ignore:" & msg)
         End If

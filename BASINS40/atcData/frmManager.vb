@@ -174,9 +174,8 @@ Friend Class frmManager
     End Sub
 
     Private Sub btnClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnClose.Click
-        'Skip In Memory data source at index zero
         Dim iSourceSelectedNext As Integer = 0
-        For iSource As Integer = atcDataManager.DataSources.Count - 1 To 1 Step -1
+        For iSource As Integer = atcDataManager.DataSources.Count - 1 To 0 Step -1
             If lstFiles.SelectedIndices.Contains(iSource) Then
                 Logger.Dbg("Close:" & CType(atcDataManager.DataSources.Item(iSource), atcDataSource).Specification)
                 atcDataManager.DataSources.RemoveAt(iSource)
@@ -184,7 +183,9 @@ Friend Class frmManager
                 iSourceSelectedNext = iSource - 1
             End If
         Next
-        lstFiles.SelectedIndex = iSourceSelectedNext
+        If lstFiles.Items.Count > iSourceSelectedNext Then
+            lstFiles.SelectedIndex = iSourceSelectedNext
+        End If
     End Sub
 
     Private Sub btnDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplay.Click
