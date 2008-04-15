@@ -495,6 +495,7 @@ FoundDir:
                OrElse (g_Project.FileName Is Nothing And Not pCommandLineScript) Then
                 Logger.Dbg("Welcome:Show")
                 Dim frmWelBsn As New frmWelcomeScreenBasins(g_Project, g_MapWin.ApplicationInfo)
+
                 frmWelBsn.ShowDialog()
             Else 'Skip displaying welcome on launch
                 Logger.Dbg("Welcome:Skip")
@@ -502,6 +503,9 @@ FoundDir:
             pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
         ElseIf msg.StartsWith("<success>") Then
             ProcessDownloadResults(msg)
+        ElseIf msg.StartsWith("FileDropEvent") Then
+            Dim lMsg() As String = msg.Split("|")
+            Handled = atcDataManager.OpenDataSource(lMsg(3))
         Else
             Logger.Dbg("Ignore:" & msg)
         End If
