@@ -56,6 +56,7 @@ Friend Class frmManager
         '
         'txtDetails
         '
+        Me.txtDetails.AllowDrop = True
         Me.txtDetails.BackColor = System.Drawing.SystemColors.ControlLight
         Me.txtDetails.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.txtDetails.Location = New System.Drawing.Point(0, 225)
@@ -66,6 +67,7 @@ Friend Class frmManager
         '
         'lstFiles
         '
+        Me.lstFiles.AllowDrop = True
         Me.lstFiles.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -115,6 +117,7 @@ Friend Class frmManager
         '
         'frmManager
         '
+        Me.AllowDrop = True
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(504, 309)
         Me.Controls.Add(Me.btnNew)
@@ -220,4 +223,28 @@ Friend Class frmManager
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
         Debug.Write("Closing frmManager")
     End Sub
+
+    Private Sub Form_DragEnter( _
+        ByVal sender As Object, ByVal e As Windows.Forms.DragEventArgs) _
+        Handles Me.DragEnter, lstFiles.DragEnter, txtDetails.DragEnter
+
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            e.Effect = Windows.Forms.DragDropEffects.All
+        End If
+    End Sub
+
+    Private Sub Form_DragDrop( _
+        ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) _
+        Handles Me.DragDrop, lstFiles.DragDrop, txtDetails.DragDrop
+
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            For Each lFileName As String In lFileNames
+                Logger.Dbg("DroppedFile:" & lFileName)
+                atcDataManager.OpenDataSource(lFileName)
+            Next
+        End If
+    End Sub
 End Class
+
+

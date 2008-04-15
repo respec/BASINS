@@ -188,6 +188,25 @@ Public Class atcDataManager
         Return Nothing
     End Function
 
+    Public Shared Function OpenDataSource(ByVal aSpecification As String) As Boolean
+        Dim lMatchDataSource As atcDataSource = Nothing
+        Dim lPossibleDataSources As New atcCollection
+        Dim lFileExtension As String = IO.Path.GetExtension(aSpecification)
+        For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
+            If lDataSource.Filter.Contains(lFileExtension) Then
+                lPossibleDataSources.Add(lDataSource.Name, lDataSource)
+            End If
+        Next
+        If lPossibleDataSources.Count = 1 Then
+            lMatchDataSource = lPossibleDataSources(0)
+            lMatchDataSource = lMatchDataSource.NewOne()
+            OpenDataSource = OpenDataSource(lMatchDataSource, aSpecification, Nothing)
+        Else
+            Logger.Msg("Data Source Ambiguous for " & aSpecification)
+            'TODO: choose the source
+        End If
+    End Function
+
 #Region "User interaction"
 
     Public Shared Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcDataGroup)

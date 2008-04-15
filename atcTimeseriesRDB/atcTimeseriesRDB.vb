@@ -18,7 +18,7 @@ Imports System.IO
 Public Class atcTimeseriesRDB
     Inherits atcDataSource
 
-    Private Shared pFileFilter As String = "USGS RDB Files (*.rdb, *.txt)|*.rdb;*.txt|All Files (*.*)|(*.*)"
+    Private Shared pFilter As String = "USGS RDB Files (*.rdb, *.txt)|*.rdb;*.txt|All Files (*.*)|(*.*)"
     Private pErrorDescription As String
     Private pJulianInterval As Double = 1 'Add one day for daily values to record date at end of interval
 
@@ -49,7 +49,7 @@ Public Class atcTimeseriesRDB
     Public Overrides Function Open(ByVal aFileName As String, _
                           Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-            aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
+            aFileName = FindFile("Select " & Name & " file to open", , , Filter, True, , 1)
         End If
 
         If Not FileExists(aFileName) Then
@@ -236,11 +236,19 @@ Public Class atcTimeseriesRDB
             While .CurrentRecord < .NumRecords
                 lTable.MoveNext()
                 lValueString = .Value(lValueField)
+                Dim lDateString As String = .Value(lDateField)
                 If lValueString.Length = 0 Then
                     'Skip blank values
+                ElseIf lDateString.Length = 0 Then
+                    Logger.Dbg("ValueSkipped:NoDate:" & lValueString) 'TODO:add more detail
                 Else
-                    Dim lTime As DateTime = "#" & .Value(lTimeField) & "#"
-                    Dim lDate As DateTime = "#" & .Value(lDateField) & "#"
+                    Dim lTimeString As String = .Value(lTimeField)
+                    If lTimeString.Length = 0 Then
+                        Logger.Dbg("MissingTimeSetTo: 0:00")
+                        lTimeString = "0:00"
+                    End If
+                    Dim lTime As DateTime = "#" & lTimeString & "#"
+                    Dim lDate As DateTime = "#" & lDateString & "#"
                     lDateJ = lTime.ToOADate + lDate.ToOADate
                     If lDateJ <> 0 Then
                         lLocation = .Value(lLocationField)
@@ -551,5 +559,8 @@ Public Class atcTimeseriesRDB
     '    End Try
     'End Function
 
+    Public Sub New()
+        Filter = pFilter
+    End Sub
 End Class
 
