@@ -18,13 +18,13 @@ Public Class atcTimeseriesSWAT
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "SWAT Output Text Files"
+            Return "SWAT Output Text"
         End Get
     End Property
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Timeseries::SWATOutputText"
+            Return "Timeseries::" & Description
         End Get
     End Property
 
@@ -94,40 +94,46 @@ Public Class atcTimeseriesSWAT
                         lYear = 1900
                     End If
 
-                    Logger.Status("Reading " & Format(lLastRecord, "#,###") & " records * " & Format((lLastField - 3), "#,###") & " constituents from " & Specification)
+                    Logger.Status("Reading " & Format(lLastRecord, "#,###") & " records * " & Format((lLastField - 3), "#,###") & " constituents from " & Specification, True)
                     For lCurrentRecord = 1 To lLastRecord
                         .CurrentRecord = lCurrentRecord
                         lLocation = .Value(1)
 
                         'MON column may hold month or day or year
-                        lMonth = Integer.Parse(.Value(3).Trim)
-                        If lDaily Then
-                            If lMonth < lDay Then
-                                lYear += 1
-                            End If
-                            lDay = lMonth
-                            lMonth = 1
-                        Else
-                            If lMonth > 12 Then
-                                lYear = lMonth
-                                lYearly = True
+                        Try
+                            lMonth = Integer.Parse(.Value(3).Trim)
+                            If lDaily Then
+                                If lMonth < lDay Then
+                                    lYear += 1
+                                End If
+                                lDay = lMonth
                                 lMonth = 1
-                            ElseIf lYearly Then
-                                lYear += 1
-                                lYearly = False
+                            Else
+                                If lMonth > 12 Then
+                                    lYear = lMonth
+                                    lYearly = True
+                                    lMonth = 1
+                                    Logger.Status("Reading year " & lYear)
+                                ElseIf lYearly Then
+                                    lYear += 1
+                                    lYearly = False
+                                End If
+                                lDay = atcUtility.daymon(lYear, lMonth)
                             End If
-                            lDay = atcUtility.daymon(lYear, lMonth)
-                        End If
 
-                        lDate = atcUtility.Jday(lYear, lMonth, lDay, 24, 0, 0)
-                        For lField = 4 To lLastField
-                            lKey = .FieldName(lField) & ":" & lLocation
-                            If lYearly Then lKey &= ":Y"
-                            lTSBuilder = lTSBuilders.Builder(lKey)
-                            lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
-                        Next
+                            lDate = atcUtility.Jday(lYear, lMonth, lDay, 24, 0, 0)
+                            For lField = 4 To lLastField
+                                lKey = .FieldName(lField) & ":" & lLocation
+                                If lYearly Then lKey &= ":Y"
+                                lTSBuilder = lTSBuilders.Builder(lKey)
+                                lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
+                            Next
+                        Catch ex As FormatException
+                        End Try
                         Logger.Progress(lCurrentRecord, lLastRecord)
                     Next
+                    'Logger.Dbg("Created Builders")
+                    Logger.Progress("Creating Timeseries", 0, 0)
                     lTSBuilders.CreateTimeseriesAddToGroup(Me.DataSets)
                     For Each lDataSet As atcData.atcTimeseries In Me.DataSets
                         With lDataSet.Attributes
@@ -138,6 +144,7 @@ Public Class atcTimeseriesSWAT
                             .SetValue("Location", lKeyParts(1))
                         End With
                     Next
+                    Logger.Status("")
                     Return True
                 Else
                     Logger.Dbg("Problem reading CliGen parameters into table in file " & aFileName & "." & vbCrLf & _
