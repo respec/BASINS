@@ -68,14 +68,14 @@ Friend Class frmManager
         Me.txtDetails.Multiline = True
         Me.txtDetails.Name = "txtDetails"
         Me.txtDetails.Size = New System.Drawing.Size(504, 84)
-        Me.txtDetails.TabIndex = 2
+        Me.txtDetails.TabIndex = 1
         '
         'btnOpen
         '
         Me.btnOpen.Location = New System.Drawing.Point(7, 7)
         Me.btnOpen.Name = "btnOpen"
         Me.btnOpen.Size = New System.Drawing.Size(90, 26)
-        Me.btnOpen.TabIndex = 4
+        Me.btnOpen.TabIndex = 2
         Me.btnOpen.Text = "Open File..."
         Me.btnOpen.UseVisualStyleBackColor = True
         '
@@ -84,7 +84,7 @@ Friend Class frmManager
         Me.btnClose.Location = New System.Drawing.Point(199, 8)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(106, 26)
-        Me.btnClose.TabIndex = 5
+        Me.btnClose.TabIndex = 4
         Me.btnClose.Text = "Close Selected"
         Me.btnClose.UseVisualStyleBackColor = True
         '
@@ -93,7 +93,7 @@ Friend Class frmManager
         Me.btnDisplay.Location = New System.Drawing.Point(311, 7)
         Me.btnDisplay.Name = "btnDisplay"
         Me.btnDisplay.Size = New System.Drawing.Size(119, 26)
-        Me.btnDisplay.TabIndex = 6
+        Me.btnDisplay.TabIndex = 5
         Me.btnDisplay.Text = "Display Selected"
         Me.btnDisplay.UseVisualStyleBackColor = True
         '
@@ -102,7 +102,7 @@ Friend Class frmManager
         Me.btnNew.Location = New System.Drawing.Point(103, 8)
         Me.btnNew.Name = "btnNew"
         Me.btnNew.Size = New System.Drawing.Size(90, 26)
-        Me.btnNew.TabIndex = 7
+        Me.btnNew.TabIndex = 3
         Me.btnNew.Text = "New File..."
         Me.btnNew.UseVisualStyleBackColor = True
         '
@@ -116,7 +116,7 @@ Friend Class frmManager
         Me.treeFiles.Location = New System.Drawing.Point(0, 40)
         Me.treeFiles.Name = "treeFiles"
         Me.treeFiles.Size = New System.Drawing.Size(504, 180)
-        Me.treeFiles.TabIndex = 3
+        Me.treeFiles.TabIndex = 0
         '
         'frmManager
         '
@@ -271,10 +271,12 @@ Friend Class frmManager
         End If
     End Sub
 
-    Private Sub treeFiles_NodeMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeNodeMouseClickEventArgs) Handles treeFiles.NodeMouseClick
+    Private Sub treeFiles_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles treeFiles.AfterSelect
         Dim lSelectedDataSourceIndex As String = e.Node.Name
         If IsNumeric(lSelectedDataSourceIndex) Then
             RefreshDetails(lSelectedDataSourceIndex)
+        Else
+            txtDetails.Text = ""
         End If
     End Sub
 
@@ -293,6 +295,8 @@ Friend Class frmManager
                 txtDetails.Text &= vbCrLf & Format(FileLen(lDataSource.Specification), "#,###") & " bytes"
                 txtDetails.Text &= vbCrLf & "Modified " & System.IO.File.GetLastWriteTime(lDataSource.Specification)
             End If
+        Else
+            txtDetails.Text = ""
         End If
     End Sub
 
