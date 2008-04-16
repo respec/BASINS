@@ -339,12 +339,15 @@ Friend Class frmSelectData
         pMatchingGrid.Initialize(pMatchingSource)
         pSelectedGrid.Initialize(pSelectedSource)
 
-        Populate()
-
         mnuSelectMap.Checked = GetSetting("BASINS", "Select Data", "SelectMap", "True").ToLower <> "false"
 
+        Me.Show()
+        Populate()
+
         If aModal Then
-            Me.ShowDialog()
+            While Me.Visible
+                Application.DoEvents()
+            End While
             If pSelectedOK Then
                 If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
                     pSelectedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
@@ -354,7 +357,6 @@ Friend Class frmSelectData
             End If
             Return pSelectedGroup
         Else
-            Me.Show()
             Return Nothing
         End If
     End Function
@@ -380,7 +382,6 @@ Friend Class frmSelectData
             AddCriteria(lAttribName)
         Next
 
-        PopulateMatching()
         pInitializing = False
         UpdatedCriteria()
         SizeCriteria()
@@ -407,32 +408,32 @@ Friend Class frmSelectData
                             lCalculatedItems.Insert(lItemIndex, lName, lName)
                         End If
                     Else
-                        Dim lAttributeValues As atcCollection = atcDataManager.DataSets.SortedAttributeValues(lName, NOTHING_VALUE)
-                        If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
-                            lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
-                            If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
-                                lNotCalculatedItems.Insert(lItemIndex, lName, lName)
-                            End If
+                        'Dim lAttributeValues As atcCollection = atcDataManager.DataSets.SortedAttributeValues(lName, NOTHING_VALUE)
+                        'If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
+                        lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
+                        If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
+                            lNotCalculatedItems.Insert(lItemIndex, lName, lName)
                         End If
+                        'End If
                     End If
                 End If
             Next
-        For Each lName In lNotCalculatedItems
-            For i = 0 To pcboCriteria.GetUpperBound(0)
-                pcboCriteria(i).Items.Add(lName)
-            Next
-        Next
-        If lCalculatedItems.Count > 0 Then
-            For i = 0 To pcboCriteria.GetUpperBound(0)
-                pcboCriteria(i).Items.Add(BLANK_LABEL)
-                pcboCriteria(i).Items.Add(CALCULATED_LABEL)
-            Next
-            For Each lName In lCalculatedItems
+            For Each lName In lNotCalculatedItems
                 For i = 0 To pcboCriteria.GetUpperBound(0)
                     pcboCriteria(i).Items.Add(lName)
                 Next
             Next
-        End If
+            If lCalculatedItems.Count > 0 Then
+                For i = 0 To pcboCriteria.GetUpperBound(0)
+                    pcboCriteria(i).Items.Add(BLANK_LABEL)
+                    pcboCriteria(i).Items.Add(CALCULATED_LABEL)
+                Next
+                For Each lName In lCalculatedItems
+                    For i = 0 To pcboCriteria.GetUpperBound(0)
+                        pcboCriteria(i).Items.Add(lName)
+                    Next
+                Next
+            End If
         End If
     End Sub
 
@@ -465,6 +466,8 @@ Friend Class frmSelectData
     End Sub
 
     Private Sub PopulateMatching()
+        Dim lSaveCursor As Cursor = Me.Cursor
+        Me.Cursor = Cursors.WaitCursor
         Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
         pMatchingGroup.Clear()
         pTotalTS = 0
@@ -496,6 +499,7 @@ NextTS:
         Next
         lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
         pMatchingGrid.Refresh()
+        Me.Cursor = lSaveCursor
     End Sub
 
     Private Function GetIndex(ByVal aName As String) As Integer
@@ -685,6 +689,7 @@ NextTS:
                 pcboCriteria(iCriteria).Items.Add(pcboCriteria(0).Items.Item(iItem))
             Next
         End If
+
         If aText.Length > 0 Then
             pcboCriteria(iCriteria).Text = aText
         Else 'Find next criteria that is not yet in use

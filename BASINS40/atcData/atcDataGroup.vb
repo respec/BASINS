@@ -93,10 +93,7 @@ Public Class atcDataGroup
 
     ''' <summary>Add items from an atcCollection or atcDataGroup to the group.</summary>
     Public Shadows Sub Add(ByVal aAddThese As atcCollection)
-        Dim lLastIndex As Integer = aAddThese.Count - 1
-        For lIndex As Integer = 0 To lLastIndex
-            MyBase.Add(aAddThese.Keys(lIndex), aAddThese.ItemByIndex(lIndex))
-        Next
+        MyBase.Add(aAddThese)
         RaiseEvent Added(aAddThese)
     End Sub
 
@@ -300,7 +297,13 @@ Public Class atcDataGroup
                         Dim lKey As Double = ts.Attributes.GetValue(lAttributeName, pNaN)
                         If Not aMissingValue Is Nothing OrElse Not Double.IsNaN(lKey) Then
                             lItemIndex = lSortedValues.BinarySearchForKey(lKey)
-                            If lItemIndex = lSortedValues.Count OrElse lKey <> lSortedValues.Keys.Item(lItemIndex) Then
+                            ' lItemIndex = lSortedValues.Count means the key was not found and it belongs at the end
+                            ' lKey <> lSortedValues.Keys.Item(lItemIndex) means that the key was not found, except that NaN <> NaN
+                            ' so we have additional checks to match NaN to NaN for this test
+                            If lItemIndex = lSortedValues.Count OrElse _
+                              (lKey <> lSortedValues.Keys.Item(lItemIndex) AndAlso _
+                               (Not Double.IsNaN(lKey) OrElse Not Double.IsNaN(lSortedValues.Keys.Item(lItemIndex)))) Then
+                                'Not a duplicate, add to the list
                                 lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
                                 If Not lValue Is Nothing Then
                                     lSortedValues.Insert(lItemIndex, lKey, lValue)
