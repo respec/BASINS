@@ -73,9 +73,7 @@ Public Class atcDataManager
     Public Shared Function DataSets() As atcDataGroup
         Dim lAllData As New atcDataGroup
         For Each lSource As atcDataSource In DataSources
-            For Each lTs As atcDataSet In lSource.DataSets
-                lAllData.Add(lTs)
-            Next
+            lAllData.AddRange(lSource.DataSets)
         Next
         Return lAllData
     End Function

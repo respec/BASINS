@@ -313,7 +313,10 @@ Friend Class frmSelectData
     Private pMatchingSource As GridSource
     Private pSelectedSource As GridSource
 
-    Private pInitializing As Boolean
+    Private pInitializing As Boolean = False
+    Private pPopulatingMatching As Boolean = False
+    Private pRestartPopulatingMatching As Boolean = False
+
     Private pSelectedOK As Boolean = False
     Private pRevertedToSaved As Boolean = False
 
@@ -343,6 +346,34 @@ Friend Class frmSelectData
 
         Me.Show()
         Populate()
+
+        Dim lCriteriaIndex As Integer = 0
+        While Me.Visible AndAlso lCriteriaIndex < pcboCriteria(0).Items.Count
+            Dim lAttributeName As String = pcboCriteria(0).Items(lCriteriaIndex)
+            Select Case lAttributeName
+                Case BLANK_LABEL, CALCULATED_LABEL
+                    lCriteriaIndex = pcboCriteria(0).Items.Count
+                Case Else
+                    Dim lHasValues As Boolean = False
+                    For Each ts As atcDataSet In atcDataManager.DataSets
+                        Application.DoEvents()
+                        If ts.Attributes.ContainsAttribute(lAttributeName) Then
+                            lHasValues = True
+                            Exit For
+                        End If
+                    Next
+
+                    If Not lHasValues Then
+                        Logger.Dbg("Removing " & lAttributeName)
+                        For lComboIndex As Integer = 0 To pcboCriteria.GetUpperBound(0)
+                            pcboCriteria(lComboIndex).Items.RemoveAt(lCriteriaIndex)
+                        Next
+                    Else
+                        Logger.Dbg("Keeping " & lAttributeName)
+                        lCriteriaIndex += 1
+                    End If
+            End Select
+        End While
 
         If aModal Then
             While Me.Visible
@@ -383,8 +414,9 @@ Friend Class frmSelectData
         Next
 
         pInitializing = False
-        UpdatedCriteria()
         SizeCriteria()
+        Application.DoEvents()
+        UpdatedCriteria()
     End Sub
 
     Private Sub PopulateCriteriaCombos()
@@ -466,40 +498,67 @@ Friend Class frmSelectData
     End Sub
 
     Private Sub PopulateMatching()
-        Dim lSaveCursor As Cursor = Me.Cursor
-        Me.Cursor = Cursors.WaitCursor
-        Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
-        pMatchingGroup.Clear()
-        pTotalTS = 0
-        Dim lCount As Integer = 0
-        Dim lLast As Integer = atcDataManager.DataSets.Count
-        For Each ts As atcDataSet In atcDataManager.DataSets
-            pTotalTS += 1
-            For iCriteria As Integer = 0 To iLastCriteria
-                Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
-                Select Case attrName
-                    Case Nothing, CALCULATED_LABEL, BLANK_LABEL
-                        'can't use this criteria
-                    Case Else
-                        Dim selectedValues As atcCollection = CType(plstCriteria(iCriteria).Source, ListSource).SelectedItems
-                        If selectedValues.Count > 0 Then 'none selected = all selected
-                            Dim attrValue As String = ts.Attributes.GetFormattedValue(attrName, NOTHING_VALUE)
-                            If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
-                                GoTo NextTS
-                            End If
-                        End If
-                End Select
-            Next
-            'Matched all criteria, add to matching table
-            pMatchingGroup.Add(ts)
-            SelectMatchingRow(pMatchingGroup.Count, pSelectedGroup.Contains(ts))
+        If pPopulatingMatching Then
+            'Already have a thread doing this, tell it to start over
+            pRestartPopulatingMatching = True
+        Else
+            Dim lSaveCursor As Cursor = Me.Cursor
+            pPopulatingMatching = True
+Restart:
+            Try
+                pRestartPopulatingMatching = False
+                'Dim lTimeStart As Date = Date.Now
+                Me.Cursor = Cursors.WaitCursor
+                Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
+                pMatchingGroup.Clear()
+                pTotalTS = 0
+                Dim lCount As Integer = 0
+                Dim lNextProgress As Integer = -1
+                Dim lLast As Integer = atcDataManager.DataSets.Count
+                'Dim selectedValues As atcCollection = CType(plstCriteria(1).Source, ListSource).SelectedItems
+                For Each ts As atcDataSet In atcDataManager.DataSets
+                    pTotalTS += 1
+                    For iCriteria As Integer = 0 To iLastCriteria
+                        Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
+                        Select Case attrName
+                            Case Nothing, CALCULATED_LABEL, BLANK_LABEL
+                                'can't use this criteria
+                            Case Else
+                                Dim selectedValues As atcCollection = CType(plstCriteria(iCriteria).Source, ListSource).SelectedItems
+                                If selectedValues.Count > 0 Then 'none selected = all selected
+                                    Dim attrValue As String = ts.Attributes.GetFormattedValue(attrName, NOTHING_VALUE)
+                                    If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
+                                        GoTo NextTS
+                                    End If
+                                End If
+                        End Select
+                    Next
+                    'Matched all criteria, add to matching table
+                    pMatchingGroup.Add(ts)
+                    SelectMatchingRow(pMatchingGroup.Count, pSelectedGroup.Contains(ts))
 NextTS:
-            lCount += 1
-            Logger.Progress(lCount, lLast)
-        Next
-        lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
-        pMatchingGrid.Refresh()
-        Me.Cursor = lSaveCursor
+                    lCount += 1
+                    If lCount > lNextProgress Then
+                        Logger.Progress(lCount, lLast)
+                        lNextProgress += 10
+                    End If
+                    If pRestartPopulatingMatching Then
+                        Logger.Dbg("Restarting PopulateMatching")
+                        GoTo Restart
+                    End If
+                Next
+                Logger.Progress(lLast, lLast)
+                lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
+                pMatchingGrid.Refresh()
+                'Logger.Dbg("PopulateMatching " & (Date.Now - lTimeStart).TotalSeconds)
+            Catch ex As Exception 'Catch anything so we are sure to clear pPopulatingMatching and restore cursor
+                Me.Cursor = lSaveCursor
+                pPopulatingMatching = False
+                Throw New ApplicationException("Exception while populating matching: " & ex.Message, ex)
+            End Try
+            Me.Cursor = lSaveCursor
+            pPopulatingMatching = False
+        End If
     End Sub
 
     Private Function GetIndex(ByVal aName As String) As Integer
