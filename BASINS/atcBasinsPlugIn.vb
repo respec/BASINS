@@ -507,7 +507,7 @@ FoundDir:
             Dim lMsg() As String = msg.Split("|")
             Handled = atcDataManager.OpenDataSource(lMsg(3))
             If Handled Then
-                atcDataManager.UserManage()
+                atcDataManager.UserManage(, atcDataManager.DataSources.Count - 1)
             End If
         Else
             Logger.Dbg("Ignore:" & msg)
