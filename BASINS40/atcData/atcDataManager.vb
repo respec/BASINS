@@ -20,6 +20,9 @@ Public Class atcDataManager
     ''' <summary>Event raised when a data source is opened</summary>
     Shared Event OpenedData(ByVal aDataSource As atcDataSource)
 
+    ''' <summary>Event raised when a data source is closed</summary>
+    Shared Event ClosedData(ByVal aDataSource As atcDataSource)
+
     ''' <summary>Create a new instance of atcDataManager</summary>
     Private Sub New()
     End Sub
@@ -192,11 +195,18 @@ Public Class atcDataManager
         End If
     End Function
 
+    Public Shared Sub RemoveDataSource(ByVal aIndex As Integer)
+        Dim lDataSource As atcDataSource = DataSources(aIndex)
+        DataSources.RemoveAt(aIndex)
+        RaiseEvent ClosedData(lDataSource)
+    End Sub
+
     Public Shared Sub RemoveDataSource(ByVal aSpecification As String)
         aSpecification = aSpecification.ToLower
         For Each lDataSource As atcDataSource In DataSources
             If lDataSource.Specification.ToLower.Equals(aSpecification) Then
                 DataSources.Remove(lDataSource)
+                RaiseEvent ClosedData(lDataSource)
                 Exit For
             End If
         Next
@@ -301,14 +311,14 @@ Public Class atcDataManager
     ''' <param name="aTitle">
     '''     <para>Optional title for dialog window, default is 'Data Sources'</para>
     ''' </param> 
-    Public Shared Sub UserManage(Optional ByVal aTitle As String = "")
+    Public Shared Sub UserManage(Optional ByVal aTitle As String = "", Optional ByVal aDefaultIndex As Integer = -1)
         If pManagerForm Is Nothing OrElse pManagerForm.IsDisposed Then
             pManagerForm = New frmManager
         End If
         pManagerForm.BringToFront()
         pManagerForm.Focus()
         If aTitle.Length > 0 Then pManagerForm.Text = aTitle
-        pManagerForm.Edit()
+        pManagerForm.Edit(aDefaultIndex)
     End Sub
 
     Friend Shared Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
