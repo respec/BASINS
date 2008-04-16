@@ -1302,8 +1302,9 @@ Public Class frmModelSetup
             Dim lPrevCode As Integer = -1
             Dim lShowMults As Boolean = False
             Dim lShowCodes As Boolean = False
-            Dim lGroupNames As New atcCollection
-            Dim lGroupPercent As New atcCollection
+            Dim lGroupNames As New Collection
+            Dim lGroupPercent As New Collection  'dont want to use atccollection because we may want to add mult times
+            Dim lGroupIndex As Integer
             For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
                 'scan to see if multiple records for the same code
                 lReclassTable.CurrentRecord = lRecordIndex
@@ -1314,16 +1315,19 @@ Public Class frmModelSetup
                 lPrevCode = lCode
                 'scan to see if perv percent varies within a group
                 Dim lInCollection As Boolean = False
-                Dim lGroupIndex As Integer = lGroupNames.IndexFromKey(lReclassTable.Value(2))
-                If lGroupIndex >= 0 Then
-                    lInCollection = True
-                    If lGroupPercent(lGroupIndex) <> lReclassTable.Value(3) Then
-                        lShowCodes = True
+                For lGroupIndex = 1 To lGroupNames.Count
+                    If lGroupNames(lGroupIndex) = lReclassTable.Value(2) Then
+                        lInCollection = True
+                        If lGroupPercent(lGroupIndex) <> lReclassTable.Value(3) Then
+                            lShowCodes = True
+                        End If
+                        Exit For
                     End If
-                End If
+                Next lGroupIndex
+
                 If Not lInCollection Then
-                    lGroupNames.Add(lCode, lReclassTable.Value(2))
-                    lGroupPercent.Add(lCode, lReclassTable.Value(3))
+                    lGroupNames.Add(lReclassTable.Value(2))
+                    lGroupPercent.Add(lReclassTable.Value(3))
                 End If
             Next lRecordIndex
 
@@ -1335,13 +1339,13 @@ Public Class frmModelSetup
             Dim llReclassTableSorted As New atcCollection
             For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
                 lReclassTable.CurrentRecord = lRecordIndex
-                llReclassTableSorted.Add(lReclassTable.Value(1), lRecordIndex)
+                llReclassTableSorted.Add(lRecordIndex, lReclassTable.Value(1))
             Next lRecordIndex
-            llReclassTableSorted.Sort()
+            llReclassTableSorted.SortByValue()
 
             'now populate grid
             With AtcGridPervious.Source
-                For Each lRow As Integer In llReclassTableSorted
+                For Each lRow As Integer In llReclassTableSorted.Keys
                     lReclassTable.CurrentRecord = lRow
                     If Not lShowCodes Then
                         'just show group desc and percent perv
@@ -1359,12 +1363,14 @@ Public Class frmModelSetup
                             .CellColor(.Rows - 1, 1) = Me.BackColor
                         End If
                     Else 'need to show whole table
-                        .Rows += 1
-                        .CellValue(.Rows - 1, 0) = lReclassTable.Value(1)
-                        .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
-                        .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
-                        .CellValue(.Rows - 1, 3) = lReclassTable.Value(4)
-                        .CellValue(.Rows - 1, 4) = lReclassTable.Value(5)
+                        If lReclassTable.Value(1) > 0 Then
+                            .Rows += 1
+                            .CellValue(.Rows - 1, 0) = lReclassTable.Value(1)
+                            .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
+                            .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
+                            .CellValue(.Rows - 1, 3) = lReclassTable.Value(4)
+                            .CellValue(.Rows - 1, 4) = lReclassTable.Value(5)
+                        End If
                     End If
                 Next
             End With
