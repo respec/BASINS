@@ -97,6 +97,12 @@ Public Class atcDataGroup
         RaiseEvent Added(aAddThese)
     End Sub
 
+    ''' <summary>Add items from an IEnumerable to the group.</summary>
+    Public Shadows Sub AddRange(ByVal aAddThese As IEnumerable)
+        MyBase.AddRange(aAddThese)
+        RaiseEvent Added(aAddThese)
+    End Sub
+
     ''' <summary>Remove all datasets and selections from this data group.</summary>
     Public Shadows Sub Clear()
         If Not pSelectedData Is Nothing Then pSelectedData.Clear()
@@ -267,6 +273,25 @@ Public Class atcDataGroup
             pSelectedData = newValue
         End Set
     End Property
+
+    'Public Function AttributesWithValues(Optional ByVal aAttributesToSearch As atcCollection = Nothing) As atcCollection
+    '    If aAttributesToSearch Is Nothing Then
+    '        aAttributesToSearch = atcDataAttributes.AllDefinitions.Clone
+    '    End If
+    '    Dim lAttributes As New atcCollection
+    '    Dim lAttributeName As String
+
+    '    For Each lAttDef As atcAttributeDefinition In aAttributesToSearch
+    '        lAttributeName = lAttDef.Name
+    '        For Each ts As atcDataSet In Me
+    '            If ts.Attributes.ContainsAttribute(lAttributeName) Then
+    '                lAttributes.Add(lAttributeName)
+    '                Exit For
+    '            End If
+    '        Next
+    '    Next
+    '    Return lAttributes
+    'End Function
 
     ''' <summary>
     ''' Return a sorted collection of unique values that data sets in this group have for the given attribute

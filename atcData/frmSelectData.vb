@@ -320,7 +320,7 @@ Friend Class frmSelectData
     Private pSelectedOK As Boolean = False
     Private pRevertedToSaved As Boolean = False
 
-    Private pTotalTS As Integer
+    Private pTotalTS As Integer = 0
 
     Public Function AskUser(Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
         mnuSelectMap.Checked = False
@@ -330,6 +330,7 @@ Friend Class frmSelectData
         Else
             pSaveGroup = aGroup.Clone
             pSelectedGroup = aGroup
+            groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & ")"
         End If
 
         atcSelectedDates.DataGroup = pSelectedGroup
@@ -504,6 +505,8 @@ Friend Class frmSelectData
         Else
             Dim lSaveCursor As Cursor = Me.Cursor
             pPopulatingMatching = True
+            Dim lAllDatasets As atcDataGroup = atcDataManager.DataSets
+            pTotalTS = lAllDatasets.Count
 Restart:
             Try
                 pRestartPopulatingMatching = False
@@ -511,13 +514,11 @@ Restart:
                 Me.Cursor = Cursors.WaitCursor
                 Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
                 pMatchingGroup.Clear()
-                pTotalTS = 0
                 Dim lCount As Integer = 0
                 Dim lNextProgress As Integer = -1
                 Dim lLast As Integer = atcDataManager.DataSets.Count
                 'Dim selectedValues As atcCollection = CType(plstCriteria(1).Source, ListSource).SelectedItems
-                For Each ts As atcDataSet In atcDataManager.DataSets
-                    pTotalTS += 1
+                For Each ts As atcDataSet In lAllDatasets
                     For iCriteria As Integer = 0 To iLastCriteria
                         Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
                         Select Case attrName
@@ -538,6 +539,8 @@ Restart:
                     SelectMatchingRow(pMatchingGroup.Count, pSelectedGroup.Contains(ts))
 NextTS:
                     lCount += 1
+                    If lCount = 20 Then pMatchingGrid.Refresh() 'Show the first few matches while finding the rest
+
                     If lCount > lNextProgress Then
                         Logger.Progress(lCount, lLast)
                         lNextProgress += 10
@@ -989,13 +992,8 @@ NextName:
     End Sub
 
     Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click
-        Dim lAdd As New atcCollection
-        For Each ts As atcDataSet In atcDataManager.DataSets
-            If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
-        Next
-        If lAdd.Count > 0 Then
-            pSelectedGroup.Add(lAdd) 'TODO: add with IDs as keys
-        End If
+        pSelectedGroup.Clear()
+        pSelectedGroup.Add(atcDataManager.DataSets)
     End Sub
 
     Private Sub frmSelectData_VisibleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.VisibleChanged
@@ -1017,7 +1015,11 @@ NextName:
     Private Sub pSelectedGroup_Changed(ByVal aAdded As atcUtility.atcCollection) Handles pSelectedGroup.Added, pSelectedGroup.Removed
         pMatchingGrid.Refresh()
         pSelectedGrid.Refresh()
-        groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
+        If pTotalTS > 0 Then
+            groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
+        Else
+            groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & ")"
+        End If
         Try
             If mnuSelectMap.Checked Then atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
         Catch
