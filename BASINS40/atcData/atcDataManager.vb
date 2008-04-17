@@ -187,8 +187,10 @@ Public Class atcDataManager
             lMatchDataSource = lPossibleDataSources(0)
             lMatchDataSource = lMatchDataSource.NewOne()
             OpenDataSource = OpenDataSource(lMatchDataSource, aSpecification, Nothing)
+        ElseIf lPossibleDataSources.Count = 0 Then
+            Logger.Msg("No Data Source Available for '" & FileExt(aSpecification) & "'", "Open Data Source Problem")
         Else
-            Logger.Msg("Data Source Ambiguous for " & aSpecification)
+            Logger.Msg("Data Source Ambiguous for " & aSpecification, "Open Data Source Problem")
             'TODO: choose the source
         End If
     End Function

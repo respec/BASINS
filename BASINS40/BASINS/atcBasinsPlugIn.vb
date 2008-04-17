@@ -432,7 +432,7 @@ FoundDir:
         Next
     End Sub
 
-    Public Sub LayerSelected(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected
+    Public Sub LayerSelected(ByVal aHandle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected
         If NationalProjectIsOpen() Then
             UpdateSelectedFeatures()
         End If
@@ -473,11 +473,8 @@ FoundDir:
     End Sub
 #End Region
 
-    Public Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
-        Dim lErrors As String = ""
-        Dim lScriptFileName As String = ""
-
-        If msg.StartsWith("WELCOME_SCREEN") Then
+    Public Sub Message(ByVal aMessage As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
+        If aMessage.StartsWith("WELCOME_SCREEN") Then
             'We always show the welcome screen when requested EXCEPT we skip it when:
             'it is the initial welcome screen AND we have loaded a project or script on the command line.
 
@@ -494,23 +491,22 @@ FoundDir:
                OrElse Not g_MapWin.ApplicationInfo.ShowWelcomeScreen _
                OrElse (g_Project.FileName Is Nothing And Not pCommandLineScript) Then
                 Logger.Dbg("Welcome:Show")
-                Dim frmWelBsn As New frmWelcomeScreenBasins(g_Project, g_MapWin.ApplicationInfo)
-
-                frmWelBsn.ShowDialog()
+                Dim lfrmWelcomeScreenBasins As New frmWelcomeScreenBasins(g_Project, g_MapWin.ApplicationInfo)
+                lfrmWelcomeScreenBasins.ShowDialog()
             Else 'Skip displaying welcome on launch
                 Logger.Dbg("Welcome:Skip")
             End If
             pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
-        ElseIf msg.StartsWith("<success>") Then
-            ProcessDownloadResults(msg)
-        ElseIf msg.StartsWith("FileDropEvent") Then
-            Dim lMsg() As String = msg.Split("|")
-            Handled = atcDataManager.OpenDataSource(lMsg(3))
-            If Handled Then
+        ElseIf aMessage.StartsWith("<success>") Then
+            ProcessDownloadResults(aMessage)
+        ElseIf aMessage.StartsWith("FileDropEvent") Then
+            Dim lMessage() As String = aMessage.Split("|")
+            aHandled = atcDataManager.OpenDataSource(lMessage(3))
+            If aHandled Then
                 atcDataManager.UserManage(, atcDataManager.DataSources.Count - 1)
             End If
         Else
-            Logger.Dbg("Ignore:" & msg)
+            Logger.Dbg("Ignore:" & aMessage)
         End If
     End Sub
 
@@ -537,7 +533,7 @@ FoundDir:
     End Sub
 
     <CLSCompliant(False)> _
-    Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
+    Public Sub ShapesSelected(ByVal aHandle As Integer, ByVal aSelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
         If NationalProjectIsOpen() Then
             UpdateSelectedFeatures()
         End If

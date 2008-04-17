@@ -936,6 +936,10 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
         Return lS.Trim
     End Function
 
+    Public Overrides Sub View()
+        Logger.Msg("No Viewer available for WDM files", "View Problem")
+    End Sub
+
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
     End Sub
