@@ -238,6 +238,23 @@ Public Class atcDataSource
         Return lName & " '" & Specification & "' " & DataSets.Count & " datasets"
     End Function
 
+    ''' <summary>
+    ''' View the native source (generally a file) 
+    ''' </summary>
+    ''' <remarks>must override for non text sources (see atcWDM for example)</remarks>
+    Public Overridable Sub View()
+        Dim lProcess As New Process
+        lProcess.StartInfo.FileName = Specification
+        Try
+            lProcess.Start()
+        Catch lException As System.SystemException
+            Dim lExtension As String = FileExt(Specification)
+            lProcess.StartInfo.FileName = "Notepad.exe"
+            lProcess.StartInfo.Arguments = Specification
+            lProcess.Start()
+        End Try
+    End Sub
+
     Protected Overrides Sub Finalize()
         If Not pAttributes Is Nothing Then pAttributes.Dispose()
         If Not pData Is Nothing Then pData.Dispose()

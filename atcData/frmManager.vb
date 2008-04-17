@@ -15,6 +15,13 @@ Friend Class frmManager
         AddHandler atcDataManager.ClosedData, AddressOf ChangedData
         'treeFiles.DrawMode = TreeViewDrawMode.Normal
         treeFiles.DrawMode = TreeViewDrawMode.OwnerDrawText
+
+        Dim lDisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+        For Each lDataDisplay As atcDataDisplay In lDisplayPlugins
+            Dim lMenuText As String = lDataDisplay.Name
+            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
+            AnalysisToolStripMenuItem.DropDownItems.Add(lMenuText, Nothing, New EventHandler(AddressOf AnalysisToolStripMenuItem_Click))
+        Next
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -35,12 +42,28 @@ Friend Class frmManager
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
     Friend WithEvents txtDetails As System.Windows.Forms.TextBox
-    Friend WithEvents btnOpen As System.Windows.Forms.Button
-    Friend WithEvents btnClose As System.Windows.Forms.Button
-    Friend WithEvents btnDisplay As System.Windows.Forms.Button
-    Friend WithEvents btnNew As System.Windows.Forms.Button
+    Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
+    Friend WithEvents FileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents NewToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents OpenToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents toolStripSeparator As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents SaveAsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents toolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents toolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents EditToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ContentsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents IndexToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SearchToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents toolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents AboutToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents CloseToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ViewToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents AnalysisToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents DisplayToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents NativeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents treeFiles As System.Windows.Forms.TreeView
     'Friend WithEvents panelOpening As System.Windows.Forms.Panel
     'Friend WithEvents lstDataSourceType As System.Windows.Forms.ListBox
@@ -48,15 +71,31 @@ Friend Class frmManager
     'Friend WithEvents btnOpen As System.Windows.Forms.Button
     'Friend WithEvents btnCancel As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmManager))
-        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.txtDetails = New System.Windows.Forms.TextBox
-        Me.btnOpen = New System.Windows.Forms.Button
-        Me.btnClose = New System.Windows.Forms.Button
-        Me.btnDisplay = New System.Windows.Forms.Button
-        Me.btnNew = New System.Windows.Forms.Button
         Me.treeFiles = New System.Windows.Forms.TreeView
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
+        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator
+        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.toolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.toolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
+        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.DisplayToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.NativeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.AnalysisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ContentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.IndexToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.SearchToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.toolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtDetails
@@ -67,44 +106,8 @@ Friend Class frmManager
         Me.txtDetails.Location = New System.Drawing.Point(0, 225)
         Me.txtDetails.Multiline = True
         Me.txtDetails.Name = "txtDetails"
-        Me.txtDetails.Size = New System.Drawing.Size(504, 84)
+        Me.txtDetails.Size = New System.Drawing.Size(658, 84)
         Me.txtDetails.TabIndex = 1
-        '
-        'btnOpen
-        '
-        Me.btnOpen.Location = New System.Drawing.Point(7, 7)
-        Me.btnOpen.Name = "btnOpen"
-        Me.btnOpen.Size = New System.Drawing.Size(90, 26)
-        Me.btnOpen.TabIndex = 2
-        Me.btnOpen.Text = "Open File..."
-        Me.btnOpen.UseVisualStyleBackColor = True
-        '
-        'btnClose
-        '
-        Me.btnClose.Location = New System.Drawing.Point(199, 8)
-        Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(106, 26)
-        Me.btnClose.TabIndex = 4
-        Me.btnClose.Text = "Close Selected"
-        Me.btnClose.UseVisualStyleBackColor = True
-        '
-        'btnDisplay
-        '
-        Me.btnDisplay.Location = New System.Drawing.Point(311, 7)
-        Me.btnDisplay.Name = "btnDisplay"
-        Me.btnDisplay.Size = New System.Drawing.Size(119, 26)
-        Me.btnDisplay.TabIndex = 5
-        Me.btnDisplay.Text = "Display Selected"
-        Me.btnDisplay.UseVisualStyleBackColor = True
-        '
-        'btnNew
-        '
-        Me.btnNew.Location = New System.Drawing.Point(103, 8)
-        Me.btnNew.Name = "btnNew"
-        Me.btnNew.Size = New System.Drawing.Size(90, 26)
-        Me.btnNew.TabIndex = 3
-        Me.btnNew.Text = "New File..."
-        Me.btnNew.UseVisualStyleBackColor = True
         '
         'treeFiles
         '
@@ -113,25 +116,162 @@ Friend Class frmManager
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.treeFiles.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.treeFiles.Location = New System.Drawing.Point(0, 40)
+        Me.treeFiles.Location = New System.Drawing.Point(0, 29)
         Me.treeFiles.Name = "treeFiles"
-        Me.treeFiles.Size = New System.Drawing.Size(504, 180)
+        Me.treeFiles.Size = New System.Drawing.Size(658, 190)
         Me.treeFiles.TabIndex = 0
+        '
+        'MenuStrip1
+        '
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.EditToolStripMenuItem, Me.ViewToolStripMenuItem, Me.AnalysisToolStripMenuItem, Me.HelpToolStripMenuItem})
+        Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.MenuStrip1.Name = "MenuStrip1"
+        Me.MenuStrip1.Size = New System.Drawing.Size(658, 26)
+        Me.MenuStrip1.TabIndex = 2
+        Me.MenuStrip1.Text = "MenuStrip1"
+        '
+        'FileToolStripMenuItem
+        '
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.SaveAsToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.toolStripSeparator2, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(40, 22)
+        Me.FileToolStripMenuItem.Text = "File"
+        '
+        'NewToolStripMenuItem
+        '
+        Me.NewToolStripMenuItem.Image = CType(resources.GetObject("NewToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.NewToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.NewToolStripMenuItem.Name = "NewToolStripMenuItem"
+        Me.NewToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.N), System.Windows.Forms.Keys)
+        Me.NewToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.NewToolStripMenuItem.Text = "New"
+        '
+        'OpenToolStripMenuItem
+        '
+        Me.OpenToolStripMenuItem.Image = CType(resources.GetObject("OpenToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.OpenToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
+        Me.OpenToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.O), System.Windows.Forms.Keys)
+        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.OpenToolStripMenuItem.Text = "Open"
+        '
+        'toolStripSeparator
+        '
+        Me.toolStripSeparator.Name = "toolStripSeparator"
+        Me.toolStripSeparator.Size = New System.Drawing.Size(189, 6)
+        '
+        'SaveAsToolStripMenuItem
+        '
+        Me.SaveAsToolStripMenuItem.Image = CType(resources.GetObject("SaveAsToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.SaveAsToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SaveAsToolStripMenuItem.Name = "SaveAsToolStripMenuItem"
+        Me.SaveAsToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
+        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.SaveAsToolStripMenuItem.Text = "Save As"
+        '
+        'toolStripSeparator1
+        '
+        Me.toolStripSeparator1.Name = "toolStripSeparator1"
+        Me.toolStripSeparator1.Size = New System.Drawing.Size(189, 6)
+        '
+        'CloseToolStripMenuItem
+        '
+        Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.CloseToolStripMenuItem.Text = "Close"
+        '
+        'toolStripSeparator2
+        '
+        Me.toolStripSeparator2.Name = "toolStripSeparator2"
+        Me.toolStripSeparator2.Size = New System.Drawing.Size(189, 6)
+        '
+        'ExitToolStripMenuItem
+        '
+        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.ExitToolStripMenuItem.Text = "Exit"
+        '
+        'EditToolStripMenuItem
+        '
+        Me.EditToolStripMenuItem.Name = "EditToolStripMenuItem"
+        Me.EditToolStripMenuItem.Size = New System.Drawing.Size(43, 22)
+        Me.EditToolStripMenuItem.Text = "Edit"
+        '
+        'ViewToolStripMenuItem
+        '
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DisplayToolStripMenuItem, Me.NativeToolStripMenuItem})
+        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(49, 22)
+        Me.ViewToolStripMenuItem.Text = "View"
+        '
+        'DisplayToolStripMenuItem
+        '
+        Me.DisplayToolStripMenuItem.Name = "DisplayToolStripMenuItem"
+        Me.DisplayToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.DisplayToolStripMenuItem.Text = "Display"
+        '
+        'NativeToolStripMenuItem
+        '
+        Me.NativeToolStripMenuItem.Name = "NativeToolStripMenuItem"
+        Me.NativeToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.NativeToolStripMenuItem.Text = "Native"
+        '
+        'AnalysisToolStripMenuItem
+        '
+        Me.AnalysisToolStripMenuItem.Name = "AnalysisToolStripMenuItem"
+        Me.AnalysisToolStripMenuItem.Size = New System.Drawing.Size(71, 22)
+        Me.AnalysisToolStripMenuItem.Text = "Analysis"
+        '
+        'HelpToolStripMenuItem
+        '
+        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ContentsToolStripMenuItem, Me.IndexToolStripMenuItem, Me.SearchToolStripMenuItem, Me.toolStripSeparator5, Me.AboutToolStripMenuItem})
+        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(48, 22)
+        Me.HelpToolStripMenuItem.Text = "Help"
+        '
+        'ContentsToolStripMenuItem
+        '
+        Me.ContentsToolStripMenuItem.Name = "ContentsToolStripMenuItem"
+        Me.ContentsToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.ContentsToolStripMenuItem.Text = "Contents"
+        '
+        'IndexToolStripMenuItem
+        '
+        Me.IndexToolStripMenuItem.Name = "IndexToolStripMenuItem"
+        Me.IndexToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.IndexToolStripMenuItem.Text = "Index"
+        '
+        'SearchToolStripMenuItem
+        '
+        Me.SearchToolStripMenuItem.Name = "SearchToolStripMenuItem"
+        Me.SearchToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.SearchToolStripMenuItem.Text = "Search"
+        '
+        'toolStripSeparator5
+        '
+        Me.toolStripSeparator5.Name = "toolStripSeparator5"
+        Me.toolStripSeparator5.Size = New System.Drawing.Size(146, 6)
+        '
+        'AboutToolStripMenuItem
+        '
+        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.AboutToolStripMenuItem.Text = "About..."
         '
         'frmManager
         '
         Me.AllowDrop = True
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(504, 309)
+        Me.ClientSize = New System.Drawing.Size(658, 309)
         Me.Controls.Add(Me.treeFiles)
-        Me.Controls.Add(Me.btnNew)
-        Me.Controls.Add(Me.btnDisplay)
-        Me.Controls.Add(Me.btnClose)
-        Me.Controls.Add(Me.btnOpen)
         Me.Controls.Add(Me.txtDetails)
+        Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmManager"
         Me.Text = "Data Sources"
+        Me.MenuStrip1.ResumeLayout(False)
+        Me.MenuStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -176,68 +316,38 @@ Friend Class frmManager
         Windows.Forms.Application.DoEvents()
     End Sub
 
-    Private Sub btnOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOpen.Click
-        Dim lCollection As New ArrayList
-        lCollection.Add("File")
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lCollection)
-        If Not lNewSource Is Nothing Then
-            If Not (atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)) Then
-                If Logger.LastDbgText.Length > 0 Then
-                    Logger.Msg(Logger.LastDbgText, "Data Open Problem")
-                End If
-            End If
-        End If
-    End Sub
-
-    Private Sub btnNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNew.Click
-        Dim lFilesOnly As New ArrayList(1)
-        lFilesOnly.Add("File")
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", False, True)
-        If Not lNewSource Is Nothing Then 'user did not cancel
-            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                If Logger.LastDbgText.Length > 0 Then
-                    Logger.Msg(Logger.LastDbgText, "Data New Problem")
-                End If
-            End If
-        End If
-    End Sub
-
-    Private Sub btnClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnClose.Click
+    Private Sub SelectionAction(ByVal aAction As String)
         If treeFiles.SelectedNode IsNot Nothing Then
             If IsNumeric(treeFiles.SelectedNode.Name) Then
                 Dim lDataSourceIndex As Integer = treeFiles.SelectedNode.Name
+                Dim lDataSource As atcDataSource = atcDataManager.DataSources.Item(lDataSourceIndex)
                 If lDataSourceIndex > -1 AndAlso _
                        lDataSourceIndex < atcDataManager.DataSources.Count Then
-                    Logger.Dbg("Close:" & CType(atcDataManager.DataSources.Item(lDataSourceIndex), atcDataSource).Specification)
-                    atcDataManager.RemoveDataSource (lDataSourceIndex)
-                    lDataSourceIndex -= 1
-                    If lDataSourceIndex = -1 And atcDataManager.DataSources.Count > 0 Then
-                        lDataSourceIndex = 0
-                    End If
-                End If
-            Else 'TODO: close all of this type?
-                Logger.Msg("Choose a specific data source to close, not a data type or file format")
-            End If
-        Else 'TODO: close all of this type?
-            Logger.Msg("Choose a specific data source to close")
-        End If
-    End Sub
-
-    Private Sub btnDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplay.Click
-        If treeFiles.SelectedNode IsNot Nothing Then
-            If IsNumeric(treeFiles.SelectedNode.Name) Then
-                Dim lDataSourceIndex As Integer = treeFiles.SelectedNode.Name
-                If lDataSourceIndex > -1 AndAlso _
-                       lDataSourceIndex < atcDataManager.DataSources.Count Then
-                    Dim lDataSource As atcDataSource = atcDataManager.DataSources.Item(lDataSourceIndex)
-                    Logger.Dbg("Display:" & lDataSource.Specification)
-                    atcDataManager.UserSelectDisplay(lDataSource.Specification, lDataSource.DataSets.Clone)
+                    Logger.Dbg(aAction & ":" & lDataSource.Specification)
+                    Dim lActionArgs() As String = aAction.Split(":")
+                    Select Case lActionArgs(0)
+                        Case "Close"
+                            atcDataManager.RemoveDataSource(lDataSourceIndex)
+                            lDataSourceIndex -= 1
+                            If lDataSourceIndex = -1 And atcDataManager.DataSources.Count > 0 Then
+                                lDataSourceIndex = 0
+                            End If
+                        Case "View"
+                            lDataSource.View()
+                        Case "Display"
+                            'TODO:  
+                            atcDataManager.UserSelectDisplay(lDataSource.Specification, lDataSource.DataSets.Clone)
+                        Case "Analysis"
+                            atcDataManager.ShowDisplay(lActionArgs(1), lDataSource.DataSets)
+                    End Select
                 End If
             Else
-                Logger.Msg("Choose a specific data source to display, not a data type or file format")
+                Logger.Msg("Choose a specific data source to " & aAction & ", not a data type or file format", "Close Problem")
             End If
+        ElseIf treeFiles.Nodes.Count = 0 Then
+            Logger.Msg("No data sources to " & aAction, aAction & " Problem")
         Else
-            Logger.Msg("Choose a specific data source to display")
+            Logger.Msg("Choose a specific data source to " & aAction, aAction & " Problem")
         End If
     End Sub
 
@@ -264,10 +374,13 @@ Friend Class frmManager
 
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
             Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            Dim lIndex As Integer = 0
             For Each lFileName As String In lFileNames
-                Logger.Dbg("DroppedFile:" & lFileName)
+                lIndex += 1
+                Logger.Progress("Opening " & lFileName, lIndex, lFileNames.Length)
                 atcDataManager.OpenDataSource(lFileName)
             Next
+            Logger.Status("")
         End If
     End Sub
 
@@ -353,6 +466,54 @@ Friend Class frmManager
     Private Function NodeBounds(ByVal e As System.Windows.Forms.TreeNode) As Rectangle
         Return New Rectangle(e.Bounds.Left, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height)
     End Function
+
+    Private Sub NewToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NewToolStripMenuItem.Click
+        Dim lFilesOnly As New ArrayList(1)
+        lFilesOnly.Add("File")
+        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", False, True)
+        If Not lNewSource Is Nothing Then 'user did not cancel
+            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                If Logger.LastDbgText.Length > 0 Then
+                    Logger.Msg(Logger.LastDbgText, "Data New Problem")
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
+        Dim lCollection As New ArrayList
+        lCollection.Add("File")
+        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lCollection)
+        If Not lNewSource Is Nothing Then
+            If Not (atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)) Then
+                If Logger.LastDbgText.Length > 0 Then
+                    Logger.Msg(Logger.LastDbgText, "Data Open Problem")
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub CloseToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles CloseToolStripMenuItem.Click
+        SelectionAction("Close")
+    End Sub
+
+    Private Sub ExitToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitToolStripMenuItem.Click
+        Me.Close()
+    End Sub
+
+    Private Sub DisplayToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DisplayToolStripMenuItem.Click
+        SelectionAction("Display")
+    End Sub
+
+    Private Sub NativeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NativeToolStripMenuItem.Click
+        SelectionAction("View")
+    End Sub
+
+    Private Sub AnalysisToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles AnalysisToolStripMenuItem.Click
+        If sender.text <> "Analysis" Then
+            SelectionAction("Analysis:" & sender.Text)
+        End If
+    End Sub
 End Class
 
 
