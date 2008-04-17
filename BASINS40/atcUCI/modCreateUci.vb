@@ -868,9 +868,11 @@ Module modCreateUci
                 ElseIf aDescriptionDefault.StartsWith(lOperation.Description) Then
                     lOperationMatch = lOperation
                     Exit For
-                ElseIf lOperation.Description.StartsWith(aDescriptionDefault.Substring(0, 4)) Then
-                    lOperationMatch = lOperation
-                    Exit For
+                ElseIf aDescriptionDefault.Length > 3 Then
+                    If lOperation.Description.StartsWith(aDescriptionDefault.Substring(0, 4)) Then
+                        lOperationMatch = lOperation
+                        Exit For
+                    End If
                 End If
             Next lOperation
         End If

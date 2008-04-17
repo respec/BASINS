@@ -345,8 +345,8 @@ Module modModelSetup
                 'find subbasin position in the area array
                 Dim spos As Integer
                 For j As Integer = 1 To lUniqueSubids.Count
-                    If lLandUse.ModelID = lUniqueSubids(j) Then
-                        spos = j
+                    If lLandUse.ModelID = lUniqueSubids(j - 1) Then
+                        spos = j - 1
                         Exit For
                     End If
                 Next j
@@ -367,7 +367,13 @@ Module modModelSetup
                                 lMultiplier = 1.0
                             End If
                             Dim lSubbasin As String = aGridPervious.Source.CellValue(j, 4)
-                            If lSubbasin.Length > 0 And lSubbasin <> "Invalid Field Number" Then
+                            Dim lSubbasinSpecific As Boolean = False
+                            If Not lSubbasin Is Nothing Then
+                                If lSubbasin.Length > 0 And lSubbasin <> "Invalid Field Number" Then
+                                    lSubbasinSpecific = True
+                                End If
+                            End If
+                            If lSubbasinSpecific Then
                                 'this row is subbasin-specific
                                 If lSubbasin = lLandUse.ModelID Then
                                     lLandUseName = aGridPervious.Source.CellValue(j, 1)
@@ -384,11 +390,13 @@ Module modModelSetup
                                             If aGridPervious.Source.CellValue(k, 1) = aGridPervious.Source.CellValue(j, 1) Then
                                                 'and the same group name
                                                 lSubbasin = aGridPervious.Source.CellValue(k, 4)
-                                                If lSubbasin.Length > 0 Then
-                                                    'and its subbasin-specific
-                                                    If lSubbasin = lLandUse.ModelID Then
-                                                        'and its specific to this subbasin
-                                                        lUseIt = False
+                                                If Not lSubbasin Is Nothing Then
+                                                    If lSubbasin.Length > 0 Then
+                                                        'and its subbasin-specific
+                                                        If lSubbasin = lLandUse.ModelID Then
+                                                            'and its specific to this subbasin
+                                                            lUseIt = False
+                                                        End If
                                                     End If
                                                 End If
                                             End If
@@ -402,14 +410,14 @@ Module modModelSetup
 
                             If lLandUseName.Length > 0 Then 'find lugroup position in the area array
                                 For k As Integer = 1 To lUniqueLugroups.Count
-                                    If lLandUseName = lUniqueLugroups(k) Then
-                                        lpos = k
+                                    If lLandUseName = lUniqueLugroups(k - 1) Then
+                                        lpos = k - 1
                                         Exit For
                                     End If
                                 Next k
                             End If
 
-                            If lpos > 0 Then
+                            If lpos > -1 Then
                                 With lLandUse
                                     lPerArea(spos, lpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
                                     lImpArea(spos, lpos) += (.Area * lMultiplier * lPercentImperv / 100)
