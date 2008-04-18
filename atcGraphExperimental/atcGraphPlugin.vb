@@ -29,7 +29,7 @@ Public Class atcGraphPlugin
         End If
     End Sub
 
-    Public Overrides Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
+    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) As Object
         Show = Nothing
 
         Dim lDataGroup As atcDataGroup = aDataGroup
@@ -56,7 +56,7 @@ Public Class atcGraphPlugin
                     Else
                         lNeededTwoSuffix = " (two datasets needed but " & lDataGroup.Count & " datasets selected)"
                     End If
-                    .Items.Add(pGraphTypeNames(3) & lNeededTwoSuffix)                    
+                    .Items.Add(pGraphTypeNames(3) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(4) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(5) & lNeededTwoSuffix)
                 End If

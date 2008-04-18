@@ -9,7 +9,7 @@ Public Class atcDataTreePlugin
         End Get
     End Property
 
-    Public Overrides Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) _
+    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) _
                      As Object 'System.Windows.Forms.Form
         Dim lDataGroup As atcDataGroup = aDataGroup
 

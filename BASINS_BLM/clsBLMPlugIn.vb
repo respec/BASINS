@@ -6,7 +6,6 @@ Imports System.Text
 Public Class PlugIn
     Inherits atcData.atcDataDisplay
 
-    Private pMapWin As MapWindow.Interfaces.IMapWin
     Private WithEvents pDataGroup As atcDataGroup   'group of atcData potentially used for analysis
 
     Public Overrides ReadOnly Property Name() As String
@@ -25,7 +24,7 @@ Public Class PlugIn
         MyBase.Initialize(aMapWin, aParentHandle)
         pMapWin = aMapWin
     End Sub
-    Public Overrides Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) _
+    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) _
                  As Object 'System.Windows.Forms.Form
         'creating an instance of the form asks user to specify some Data if none has been passed in
         Dim lfrmBLM As New frmBLM(Me, pDataGroup)

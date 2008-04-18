@@ -10,7 +10,7 @@ Public Class atcListPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
+    Public Overrides Function Show(ByVal aDataGroup As atcData.atcDataGroup) As Object
         Dim lForm As New atcListForm
         lForm.Initialize(aDataGroup)
         Return lForm

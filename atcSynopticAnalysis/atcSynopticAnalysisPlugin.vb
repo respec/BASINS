@@ -29,9 +29,8 @@ Public Class atcSynopticAnalysisPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) _
+    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) _
                                    As Object 'System.Windows.Forms.Form
-
         Dim lForm As New frmSynoptic
         lForm.Initialize(aDataGroup)
         Return lForm
