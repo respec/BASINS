@@ -5,7 +5,7 @@ Imports MapWinUtility
 Imports System.Collections.Specialized
 
 Public Class PlugIn
-    Inherits atcData.atcDataDisplay
+    Inherits atcData.atcDataTool
 
     Private pReportsDir As String
     Private pReports As Collection
@@ -131,7 +131,7 @@ Public Class PlugIn
         End Set
     End Property
 
-    Public Overrides Function Show(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
+    Public Overrides Function Show() As Object
         GisUtil.MappingObject = pMapWin
         Dim lFrmReport As New frmReport
         lFrmReport.InitializeUI(Me)
@@ -139,9 +139,8 @@ Public Class PlugIn
         Return lFrmReport
     End Function
 
-    Public Overrides Sub Save(ByVal aDataGroup As atcData.atcDataGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
-        Dim lFrmReport As frmReport = Show(aDataGroup)
-        lFrmReport.InitializeUI(Me)
+    Public Sub Save(ByVal aDataGroup As atcData.atcDataGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
+        Dim lFrmReport As frmReport = Show()
         SaveFileString(aFileName, lFrmReport.ToString)
         lFrmReport.Close()
     End Sub

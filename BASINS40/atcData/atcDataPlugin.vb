@@ -194,9 +194,9 @@ Public Class atcDataPlugin
                     aHandled = atcDataManager.UserSaveData(aItemName.Substring(atcDataManager.SaveDataMenuName.Length + 1))
                     'TODO: add case where not save data destinations are available, ask user for destination?
                 ElseIf aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & lName) Then
-                    Dim newDisplay As atcDataDisplay = Me.NewOne
-                    newDisplay.Initialize(pMapWin, pMapWinWindowHandle)
-                    newDisplay.Show()
+                    Dim lNewObject As atcDataTool = Me.NewOne
+                    lNewObject.Initialize(pMapWin, pMapWinWindowHandle)
+                    lNewObject.Show()
                 ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(lName) Then
                     Try
                         Dim ds As atcDataSource = Me

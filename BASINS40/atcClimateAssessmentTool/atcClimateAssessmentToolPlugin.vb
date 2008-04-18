@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcClimateAssessmentToolPlugin
-    Inherits atcData.atcDataDisplay
+    Inherits atcData.atcDataTool
 
     Private Shared pForm As frmCAT
     'Private Shared pXML As String
@@ -12,7 +12,7 @@ Public Class atcClimateAssessmentToolPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(Optional ByVal aGroup As atcDataGroup = Nothing) As Object
+    Public Overrides Function Show() As Object
         pForm = New frmCAT
         pForm.Initialize(Me)
         Return pForm

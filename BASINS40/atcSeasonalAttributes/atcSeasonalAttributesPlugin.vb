@@ -10,7 +10,7 @@ Public Class atcSeasonalAttributesPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
+    Public Overrides Function Show(ByVal aDataGroup As atcData.atcDataGroup) As Object
         Dim lDataGroup As atcDataGroup = aDataGroup
         If lDataGroup Is Nothing Then
             lDataGroup = New atcDataGroup

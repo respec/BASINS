@@ -1,9 +1,18 @@
+''' <summary><para>Base class for plugins that use atcData</para></summary>
+Public MustInherit Class atcDataTool
+    Inherits atcDataPlugin
+    Public MustOverride Function Show() As Object
+End Class
+
 ''' <summary><para>Base class for plugins that display atcData</para></summary>
 Public Class atcDataDisplay
-    Inherits atcDataPlugin
+    Inherits atcDataTool
 
     ''' <summary>Show the specified data interactively.</summary>
-    Public Overridable Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
+    Public Overrides Function Show() As Object
+        Return Show(Nothing)
+    End Function
+    Public Overridable Overloads Function Show(ByVal aDataGroup As atcDataGroup) As Object
         Return Nothing
     End Function
 
@@ -17,3 +26,4 @@ Public Class atcDataDisplay
                                 ByVal ParamArray aOption() As String)
     End Sub
 End Class
+
