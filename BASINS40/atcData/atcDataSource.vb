@@ -64,6 +64,14 @@ Public Class atcDataSource
         End Get
     End Property
 
+
+    ''' <summary>True if RemoveDataset is implemented</summary>
+    Public Overridable ReadOnly Property CanRemoveDataset() As Boolean
+        Get
+            Return False
+        End Get
+    End Property
+
     ''' <summary>Remove this source from memory</summary>
     Public Overridable Sub Clear()
         If Not pAttributes Is Nothing Then
@@ -223,6 +231,10 @@ Public Class atcDataSource
             Logger.Msg("Could not save in " & Specification, "Could Not Save")
             Return False
         End If
+    End Function
+
+    Public Overridable Function RemoveDataset(ByVal aDataSet As atcData.atcDataSet) As Boolean
+        Throw New Exception("RemoveDataset must be overridden to be used, atcDataSource does not implement.")
     End Function
 
     ''' <summary>Create a new data source</summary>

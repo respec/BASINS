@@ -168,6 +168,11 @@ Public Module modReflection
         Return lReturnStr
     End Function
 
+    Public Function MethodAvailable(ByRef aT As Type, ByVal aMethodName As String) As Boolean
+        Dim lMethodInfo As System.Reflection.MethodInfo = aT.GetMethod(aMethodName)
+        Return lMethodInfo IsNot Nothing
+    End Function
+
     Private Function NeedToTest(ByVal aMethodName As String) As Boolean
         If pDontNeedTest Is Nothing Then
             pDontNeedTest = New ArrayList

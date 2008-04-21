@@ -64,6 +64,9 @@ Friend Class frmManager
     Friend WithEvents AnalysisToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents DisplayToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents NativeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents AddDatasetsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents RenumberDatasetsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents RemoveDatasetsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents treeFiles As System.Windows.Forms.TreeView
     'Friend WithEvents panelOpening As System.Windows.Forms.Panel
     'Friend WithEvents lstDataSourceType As System.Windows.Forms.ListBox
@@ -95,6 +98,9 @@ Friend Class frmManager
         Me.SearchToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.toolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.AddDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.RenumberDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.RemoveDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -193,6 +199,7 @@ Friend Class frmManager
         '
         'EditToolStripMenuItem
         '
+        Me.EditToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddDatasetsToolStripMenuItem, Me.RenumberDatasetsToolStripMenuItem, Me.RemoveDatasetsToolStripMenuItem})
         Me.EditToolStripMenuItem.Name = "EditToolStripMenuItem"
         Me.EditToolStripMenuItem.Size = New System.Drawing.Size(43, 22)
         Me.EditToolStripMenuItem.Text = "Edit"
@@ -207,13 +214,13 @@ Friend Class frmManager
         'DisplayToolStripMenuItem
         '
         Me.DisplayToolStripMenuItem.Name = "DisplayToolStripMenuItem"
-        Me.DisplayToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.DisplayToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
         Me.DisplayToolStripMenuItem.Text = "Display"
         '
         'NativeToolStripMenuItem
         '
         Me.NativeToolStripMenuItem.Name = "NativeToolStripMenuItem"
-        Me.NativeToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.NativeToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
         Me.NativeToolStripMenuItem.Text = "Native"
         '
         'AnalysisToolStripMenuItem
@@ -258,6 +265,24 @@ Friend Class frmManager
         Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.AboutToolStripMenuItem.Text = "About..."
         '
+        'AddDatasetsToolStripMenuItem
+        '
+        Me.AddDatasetsToolStripMenuItem.Name = "AddDatasetsToolStripMenuItem"
+        Me.AddDatasetsToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.AddDatasetsToolStripMenuItem.Text = "Add Datasets"
+        '
+        'RenumberDatasetsToolStripMenuItem
+        '
+        Me.RenumberDatasetsToolStripMenuItem.Name = "RenumberDatasetsToolStripMenuItem"
+        Me.RenumberDatasetsToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.RenumberDatasetsToolStripMenuItem.Text = "Renumber Datasets"
+        '
+        'RemoveDatasetsToolStripMenuItem
+        '
+        Me.RemoveDatasetsToolStripMenuItem.Name = "RemoveDatasetsToolStripMenuItem"
+        Me.RemoveDatasetsToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.RemoveDatasetsToolStripMenuItem.Text = "Remove Datasets"
+        '
         'frmManager
         '
         Me.AllowDrop = True
@@ -280,6 +305,12 @@ Friend Class frmManager
 #End Region
 
     Public Sub Edit(Optional ByVal aNodeKey As Integer = -1)
+        Populate(aNodeKey)
+        Me.Show()
+        Windows.Forms.Application.DoEvents()
+    End Sub
+
+    Private Sub Populate(ByVal aNodeKey As Integer)
         treeFiles.Nodes.Clear()
         txtDetails.Text = ""
         Dim lName As String = ""
@@ -312,8 +343,6 @@ Friend Class frmManager
             lCount += 1
         Next
         treeFiles.ExpandAll()
-        Me.Show()
-        Windows.Forms.Application.DoEvents()
     End Sub
 
     Private Sub SelectionAction(ByVal aAction As String)
@@ -335,10 +364,21 @@ Friend Class frmManager
                         Case "View"
                             lDataSource.View()
                         Case "Display"
-                            'TODO:  
+                            'TODO: are we sure about clone?
                             atcDataManager.UserSelectDisplay(lDataSource.Specification, lDataSource.DataSets.Clone)
                         Case "Analysis"
                             atcDataManager.ShowDisplay(lActionArgs(1), lDataSource.DataSets)
+                        Case "RemoveDatasets"
+                            If lDataSource.CanRemoveDataset Then
+                                'TODO: want to see just datasets in lDataSource, nothing selected by default!
+                                Dim lDataGroupRemove As atcDataGroup = _
+                                   atcDataManager.UserSelectData("Select Datasets to remove from " & lDataSource.Specification, _
+                                                                 lDataSource.DataSets.Clone)
+                                For Each lDataSet As atcDataSet In lDataGroupRemove
+                                    lDataSource.RemoveDataset(lDataSet)
+                                Next
+                                Populate(treeFiles.SelectedNode.Name)
+                            End If
                     End Select
                 End If
             Else
@@ -513,6 +553,18 @@ Friend Class frmManager
         If sender.text <> "Analysis" Then
             SelectionAction("Analysis:" & sender.Text)
         End If
+    End Sub
+
+    Private Sub RemoveDatasetsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles RemoveDatasetsToolStripMenuItem.Click
+        SelectionAction("RemoveDatasets")
+    End Sub
+
+    Private Sub RenumberDatasetsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles RenumberDatasetsToolStripMenuItem.Click
+        'TODO: implement this
+    End Sub
+
+    Private Sub AddDatasetsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles AddDatasetsToolStripMenuItem.Click
+        'TODO: implement this
     End Sub
 End Class
 
