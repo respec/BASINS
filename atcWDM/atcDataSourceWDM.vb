@@ -390,7 +390,7 @@ CaseExistRenumber:
         Return aDsn
     End Function
 
-    Public Function RemoveDataset(ByVal aDataSet As atcData.atcDataSet) As Boolean
+    Public Overrides Function RemoveDataset(ByVal aDataSet As atcData.atcDataSet) As Boolean
         Dim lTimser As atcTimeseries = aDataSet
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Dim lRetcod As Integer
@@ -619,6 +619,12 @@ CaseExistRenumber:
     End Property
 
     Public Overrides ReadOnly Property CanSave() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property CanRemoveDataset() As Boolean
         Get
             Return True
         End Get
