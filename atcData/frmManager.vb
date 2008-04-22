@@ -349,40 +349,38 @@ Friend Class frmManager
         If treeFiles.SelectedNode IsNot Nothing Then
             If IsNumeric(treeFiles.SelectedNode.Name) Then
                 Dim lDataSourceIndex As Integer = treeFiles.SelectedNode.Name
-                Dim lDataSource As atcDataSource = atcDataManager.DataSources.Item(lDataSourceIndex)
                 If lDataSourceIndex > -1 AndAlso _
                        lDataSourceIndex < atcDataManager.DataSources.Count Then
-                    Logger.Dbg(aAction & ":" & lDataSource.Specification)
-                    Dim lActionArgs() As String = aAction.Split(":")
-                    Select Case lActionArgs(0)
-                        Case "Close"
-                            atcDataManager.RemoveDataSource(lDataSourceIndex)
-                            lDataSourceIndex -= 1
-                            If lDataSourceIndex = -1 And atcDataManager.DataSources.Count > 0 Then
-                                lDataSourceIndex = 0
-                            End If
-                        Case "View"
-                            lDataSource.View()
-                        Case "Display"
-                            'TODO: are we sure about clone?
-                            atcDataManager.UserSelectDisplay(lDataSource.Specification, lDataSource.DataSets.Clone)
-                        Case "Analysis"
-                            atcDataManager.ShowDisplay(lActionArgs(1), lDataSource.DataSets)
-                        Case "RemoveDatasets"
-                            If lDataSource.CanRemoveDataset Then
-                                'TODO: want to see just datasets in lDataSource, nothing selected by default!
-                                Dim lDataGroupRemove As atcDataGroup = _
-                                   atcDataManager.UserSelectData("Select Datasets to remove from " & lDataSource.Specification, _
-                                                                 lDataSource.DataSets.Clone)
-                                For Each lDataSet As atcDataSet In lDataGroupRemove
-                                    lDataSource.RemoveDataset(lDataSet)
-                                Next
-                                Populate(treeFiles.SelectedNode.Name)
-                            End If
-                    End Select
+                    Dim lDataSource As atcDataSource = atcDataManager.DataSources.Item(lDataSourceIndex)
+                    With lDataSource
+                        Logger.Dbg(aAction & ":" & .Specification)
+                        Dim lActionArgs() As String = aAction.Split(":")
+                        Select Case lActionArgs(0)
+                            Case "Close"
+                                atcDataManager.RemoveDataSource(lDataSourceIndex)
+                                lDataSourceIndex -= 1
+                                If lDataSourceIndex = -1 And atcDataManager.DataSources.Count > 0 Then
+                                    lDataSourceIndex = 0
+                                End If
+                            Case "View"
+                                .View()
+                            Case "Display"
+                                atcDataManager.UserSelectDisplay(.Specification, .DataSets.Clone)
+                            Case "Analysis"
+                                atcDataManager.ShowDisplay(lActionArgs(1), .DataSets)
+                            Case "RemoveDatasets"
+                                If .CanRemoveDataset Then
+                                    For Each lDataSet As atcDataSet In atcDataManager.UserSelectData( _
+                                      "Select Datasets to remove from " & .Specification, , .DataSets)
+                                        .RemoveDataset(lDataSet)
+                                    Next
+                                    Populate(treeFiles.SelectedNode.Name)
+                                End If
+                        End Select
+                    End With
                 End If
             Else
-                Logger.Msg("Choose a specific data source to " & aAction & ", not a data type or file format", "Close Problem")
+                Logger.Msg("Choose a specific data source to " & aAction & ", not a data type or file format", aAction & " Problem")
             End If
         ElseIf treeFiles.Nodes.Count = 0 Then
             Logger.Msg("No data sources to " & aAction, aAction & " Problem")

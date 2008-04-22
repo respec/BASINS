@@ -287,7 +287,7 @@ Public Class atcGraphForm
     End Property
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pGrapher.Datasets, False)
+        atcDataManager.UserSelectData(, pGrapher.Datasets, , False)
     End Sub
 
     Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click

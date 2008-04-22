@@ -35,7 +35,7 @@ Public Class atcGraphPlugin
         Dim lDataGroup As atcDataGroup = aDataGroup
         If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
         If lDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData("Select Data To Graph", lDataGroup, True)
+            atcDataManager.UserSelectData("Select Data To Graph", lDataGroup)
         End If
 
         If lDataGroup.Count > 0 Then

@@ -14,7 +14,7 @@ Friend Class atcDataTreeForm
         If aDataGroup Is Nothing Then aDataGroup = New atcDataGroup
 
         If aDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, aDataGroup, True)
+            atcDataManager.UserSelectData(, aDataGroup)
         End If
 
         If aDataGroup.Count > 0 Then

@@ -280,31 +280,38 @@ Public Class atcDataManager
     ''' <param name="aTitle">
     '''     <para>Optional title for dialog window, default is 'Select Data'</para>
     ''' </param>  
-    ''' <param name="aGroup">
+    ''' <param name="aSelected">
     '''     <para>Optional pre-selected group of data, default is no data already selected</para>
+    ''' </param>  
+    ''' <param name="aAvailable">
+    '''     <para>Optional group of all data available for selection, default is all open data</para>
     ''' </param>  
     ''' <param name="aModal">
     '''     <para>Optional modality specification for window, default is True</para>
     ''' </param>  
-    Public Shared Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
+    Public Shared Function UserSelectData(Optional ByVal aTitle As String = "", _
+                                          Optional ByVal aSelected As atcDataGroup = Nothing, _
+                                          Optional ByVal aAvailable As atcDataGroup = Nothing, _
+                                          Optional ByVal aModal As Boolean = True) As atcDataGroup
         Dim lForm As New frmSelectData
         If aTitle.Length > 0 Then lForm.Text = aTitle
-        Dim lAutoSelected As Boolean = False
+        If aAvailable IsNot Nothing Then lForm.AvailableData = aAvailable
 
+        Dim lAutoSelected As Boolean = False
         'Try automatically selecting data based on what is selected on the map
-        If aGroup Is Nothing OrElse aGroup.Count = 0 Then
-            If aGroup Is Nothing Then
-                aGroup = DatasetsAtMapSelectedLocations()
+        If aSelected Is Nothing OrElse aSelected.Count = 0 Then
+            If aSelected Is Nothing Then
+                aSelected = DatasetsAtMapSelectedLocations()
             Else
-                aGroup.AddRange(DatasetsAtMapSelectedLocations)
+                aSelected.AddRange(DatasetsAtMapSelectedLocations)
             End If
-            If aGroup.Count > 0 Then lAutoSelected = True
+            If aSelected.Count > 0 Then lAutoSelected = True
         End If
-        aGroup = lForm.AskUser(aGroup, aModal)
-        If lAutoSelected AndAlso Not lForm.SelectedOk AndAlso Not aGroup Is Nothing Then
-            aGroup.Clear() 'We got back our location-selected data but the user didn't click Ok
+        aSelected = lForm.AskUser(aSelected, aModal)
+        If lAutoSelected AndAlso Not lForm.SelectedOk AndAlso Not aSelected Is Nothing Then
+            aSelected.Clear() 'We got back our location-selected data but the user didn't click Ok
         End If
-        Return aGroup
+        Return aSelected
     End Function
 
     ''' <summary>Ask user to manage data sources</summary>
