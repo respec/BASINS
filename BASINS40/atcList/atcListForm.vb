@@ -235,7 +235,7 @@ Friend Class atcListForm
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            atcDataManager.UserSelectData(, pDataGroup, True)
+            atcDataManager.UserSelectData(, pDataGroup)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -344,7 +344,7 @@ Friend Class atcListForm
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, pDataGroup, , False)
     End Sub
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click

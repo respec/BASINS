@@ -52,7 +52,7 @@ Public Class frmSynoptic
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            atcDataManager.UserSelectData("Select Data for Synoptic Analysis", pDataGroup, True)
+            atcDataManager.UserSelectData("Select Data for Synoptic Analysis", pDataGroup)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -237,7 +237,7 @@ Public Class frmSynoptic
     'End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, pDataGroup, , False)
     End Sub
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click

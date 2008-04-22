@@ -322,6 +322,24 @@ Friend Class frmSelectData
 
     Private pTotalTS As Integer = 0
 
+    Private pAvailableData As atcDataGroup = Nothing
+
+    ''' <summary>
+    ''' The datasets available for selection. 
+    ''' Set this property before calling AskUser or by default all datasets in all open data sources will be available.
+    ''' </summary>
+    Public Property AvailableData() As atcDataGroup
+        Get
+            If pAvailableData Is Nothing Then
+                pAvailableData = atcDataManager.DataSets
+            End If
+            Return pAvailableData
+        End Get
+        Set(ByVal newValue As atcDataGroup)
+            pAvailableData = newValue
+        End Set
+    End Property
+
     Public Function AskUser(Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
         mnuSelectMap.Checked = False
 
@@ -356,7 +374,7 @@ Friend Class frmSelectData
                     lCriteriaIndex = pcboCriteria(0).Items.Count
                 Case Else
                     Dim lHasValues As Boolean = False
-                    For Each ts As atcDataSet In atcDataManager.DataSets
+                    For Each ts As atcDataSet In AvailableData
                         Application.DoEvents()
                         If ts.Attributes.ContainsAttribute(lAttributeName) Then
                             lHasValues = True
@@ -441,7 +459,7 @@ Friend Class frmSelectData
                             lCalculatedItems.Insert(lItemIndex, lName, lName)
                         End If
                     Else
-                        'Dim lAttributeValues As atcCollection = atcDataManager.DataSets.SortedAttributeValues(lName, NOTHING_VALUE)
+                        'Dim lAttributeValues As atcCollection = AvailableData.SortedAttributeValues(lName, NOTHING_VALUE)
                         'If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
                         lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
                         If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
@@ -481,7 +499,7 @@ Friend Class frmSelectData
             lSortedItems = New atcCollection
         Else
             aList.Visible = False
-            lSortedItems = atcDataManager.DataSets.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
+            lSortedItems = AvailableData.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
         End If
 
         With aList
@@ -505,7 +523,7 @@ Friend Class frmSelectData
         Else
             Dim lSaveCursor As Cursor = Me.Cursor
             pPopulatingMatching = True
-            Dim lAllDatasets As atcDataGroup = atcDataManager.DataSets
+            Dim lAllDatasets As atcDataGroup = AvailableData
             pTotalTS = lAllDatasets.Count
 Restart:
             Try
@@ -516,7 +534,6 @@ Restart:
                 pMatchingGroup.Clear()
                 Dim lCount As Integer = 0
                 Dim lNextProgress As Integer = -1
-                Dim lLast As Integer = atcDataManager.DataSets.Count
                 'Dim selectedValues As atcCollection = CType(plstCriteria(1).Source, ListSource).SelectedItems
                 For Each ts As atcDataSet In lAllDatasets
                     For iCriteria As Integer = 0 To iLastCriteria
@@ -542,7 +559,7 @@ NextTS:
                     If lCount = 20 Then pMatchingGrid.Refresh() 'Show the first few matches while finding the rest
 
                     If lCount > lNextProgress Then
-                        Logger.Progress(lCount, lLast)
+                        Logger.Progress(lCount, pTotalTS)
                         lNextProgress += 10
                     End If
                     If pRestartPopulatingMatching Then
@@ -550,7 +567,7 @@ NextTS:
                         GoTo Restart
                     End If
                 Next
-                Logger.Progress(lLast, lLast)
+                Logger.Progress(pTotalTS, pTotalTS)
                 lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
                 pMatchingGrid.Refresh()
                 'Logger.Dbg("PopulateMatching " & (Date.Now - lTimeStart).TotalSeconds)
@@ -854,7 +871,7 @@ NextName:
         ' but either narrowed the matching group or there are not more than 10 datasets,
         ' assume they meant to select all the matching datasets
         If pSelectedGroup.Count = 0 AndAlso _
-          (pMatchingGroup.Count < atcDataManager.DataSets.Count OrElse pMatchingGroup.Count < 11) Then
+          (pMatchingGroup.Count < AvailableData.Count OrElse pMatchingGroup.Count < 11) Then
             pSelectedGroup.ChangeTo(pMatchingGroup)
         End If
         pSelectedOK = True
@@ -993,7 +1010,7 @@ NextName:
 
     Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click
         pSelectedGroup.Clear()
-        pSelectedGroup.Add(atcDataManager.DataSets)
+        pSelectedGroup.Add(AvailableData)
     End Sub
 
     Private Sub frmSelectData_VisibleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.VisibleChanged

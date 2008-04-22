@@ -28,7 +28,7 @@ Friend Class frmDisplaySeasonalAttributes
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, pDataGroup, True)
+            atcDataManager.UserSelectData(, pDataGroup)
         End If
 
         pInitializing = False
@@ -236,7 +236,7 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, pDataGroup, , False)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added

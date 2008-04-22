@@ -27,7 +27,7 @@ Friend Class frmDisplayFrequencyGrid
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, pDataGroup, True)
+            atcDataManager.UserSelectData(, pDataGroup)
         End If
 
         If pDataGroup.Count > 0 AndAlso UserSpecifyAttributes() Then
