@@ -187,6 +187,7 @@ Public Class DownloadDataPlugin
                 LoadPlugin("D4EM Data Download::NHDPlus")
                 LoadPlugin("D4EM Data Download::NWIS")
                 LoadPlugin("D4EM Data Download::NLCD2001")
+                LoadPlugin("D4EM Data Download::STORET")
 
                 If BASINS.NationalProjectIsOpen() Then
                     BASINS.SpecifyAndCreateNewProject()
