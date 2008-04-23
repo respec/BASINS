@@ -45,7 +45,7 @@ Partial Class frmDownload
         Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_DOQ = New System.Windows.Forms.CheckBox
         Me.btnOther = New System.Windows.Forms.Button
-        Me.grpNLCD2001 = New System.Windows.Forms.GroupBox
+        Me.grpNLCD = New System.Windows.Forms.GroupBox
         Me.chkNLCD_1992 = New System.Windows.Forms.CheckBox
         Me.chkNLCD_Canopy = New System.Windows.Forms.CheckBox
         Me.chkNLCD_Impervious = New System.Windows.Forms.CheckBox
@@ -64,11 +64,11 @@ Partial Class frmDownload
         Me.chkNWISStations_measurement = New System.Windows.Forms.CheckBox
         Me.chkNWISStations_discharge = New System.Windows.Forms.CheckBox
         Me.chkNWISStations_gw = New System.Windows.Forms.CheckBox
+        Me.chkClip = New System.Windows.Forms.CheckBox
+        Me.chkMerge = New System.Windows.Forms.CheckBox
         Me.btnDownload = New System.Windows.Forms.Button
         Me.cboRegion = New System.Windows.Forms.ComboBox
         Me.lblRegion = New System.Windows.Forms.Label
-        Me.chkClip = New System.Windows.Forms.CheckBox
-        Me.chkMerge = New System.Windows.Forms.CheckBox
         Me.btnCancel = New System.Windows.Forms.Button
         Me.grpSTORET = New System.Windows.Forms.GroupBox
         Me.chkSTORET_Results = New System.Windows.Forms.CheckBox
@@ -77,7 +77,7 @@ Partial Class frmDownload
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
-        Me.grpNLCD2001.SuspendLayout()
+        Me.grpNLCD.SuspendLayout()
         Me.grpNHDplus.SuspendLayout()
         Me.grpSTORET.SuspendLayout()
         Me.grpNWISStations.SuspendLayout()
@@ -328,20 +328,20 @@ Partial Class frmDownload
         Me.btnOther.UseVisualStyleBackColor = True
         Me.btnOther.Visible = False
         '
-        'grpNLCD2001
+        'grpNLCD
         '
-        Me.grpNLCD2001.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.grpNLCD.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpNLCD2001.Controls.Add(Me.chkNLCD_1992)
-        Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Canopy)
-        Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Impervious)
-        Me.grpNLCD2001.Controls.Add(Me.chkNLCD_LandCover)
-        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 328)
-        Me.grpNLCD2001.Name = "grpNLCD2001"
-        Me.grpNLCD2001.Size = New System.Drawing.Size(424, 42)
-        Me.grpNLCD2001.TabIndex = 11
-        Me.grpNLCD2001.TabStop = False
-        Me.grpNLCD2001.Text = "National Land Cover Data 2001"
+        Me.grpNLCD.Controls.Add(Me.chkNLCD_1992)
+        Me.grpNLCD.Controls.Add(Me.chkNLCD_Canopy)
+        Me.grpNLCD.Controls.Add(Me.chkNLCD_Impervious)
+        Me.grpNLCD.Controls.Add(Me.chkNLCD_LandCover)
+        Me.grpNLCD.Location = New System.Drawing.Point(12, 328)
+        Me.grpNLCD.Name = "grpNLCD"
+        Me.grpNLCD.Size = New System.Drawing.Size(424, 42)
+        Me.grpNLCD.TabIndex = 11
+        Me.grpNLCD.TabStop = False
+        Me.grpNLCD.Text = "National Land Cover Data 2001"
         '
         'chkNLCD_1992
         '
@@ -531,6 +531,30 @@ Partial Class frmDownload
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw, "Ground Water Station Point Layer")
         Me.chkNWISStations_gw.UseVisualStyleBackColor = True
         '
+        'chkClip
+        '
+        Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkClip.AutoSize = True
+        Me.chkClip.Location = New System.Drawing.Point(124, 436)
+        Me.chkClip.Name = "chkClip"
+        Me.chkClip.Size = New System.Drawing.Size(92, 17)
+        Me.chkClip.TabIndex = 28
+        Me.chkClip.Text = "Clip to Region"
+        Me.ToolTip1.SetToolTip(Me.chkClip, "Discard additional data if a larger area was retrieved than was requested")
+        Me.chkClip.UseVisualStyleBackColor = True
+        '
+        'chkMerge
+        '
+        Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkMerge.AutoSize = True
+        Me.chkMerge.Location = New System.Drawing.Point(17, 436)
+        Me.chkMerge.Name = "chkMerge"
+        Me.chkMerge.Size = New System.Drawing.Size(56, 17)
+        Me.chkMerge.TabIndex = 27
+        Me.chkMerge.Text = "Merge"
+        Me.ToolTip1.SetToolTip(Me.chkMerge, "Merge parts of the same dataset from different areas to form one layer")
+        Me.chkMerge.UseVisualStyleBackColor = True
+        '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -560,30 +584,6 @@ Partial Class frmDownload
         Me.lblRegion.Size = New System.Drawing.Size(104, 13)
         Me.lblRegion.TabIndex = 31
         Me.lblRegion.Text = "Region to Download"
-        '
-        'chkClip
-        '
-        Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(124, 436)
-        Me.chkClip.Name = "chkClip"
-        Me.chkClip.Size = New System.Drawing.Size(92, 17)
-        Me.chkClip.TabIndex = 28
-        Me.chkClip.Text = "Clip to Region"
-        Me.ToolTip1.SetToolTip(Me.chkClip, "Discard additional data if a larger area was retrieved than was requested")
-        Me.chkClip.UseVisualStyleBackColor = True
-        '
-        'chkMerge
-        '
-        Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(17, 436)
-        Me.chkMerge.Name = "chkMerge"
-        Me.chkMerge.Size = New System.Drawing.Size(56, 17)
-        Me.chkMerge.TabIndex = 27
-        Me.chkMerge.Text = "Merge"
-        Me.ToolTip1.SetToolTip(Me.chkMerge, "Merge parts of the same dataset from different areas to form one layer")
-        Me.chkMerge.UseVisualStyleBackColor = True
         '
         'btnCancel
         '
@@ -653,7 +653,7 @@ Partial Class frmDownload
         Me.ClientSize = New System.Drawing.Size(448, 467)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.btnOther)
-        Me.Controls.Add(Me.grpNLCD2001)
+        Me.Controls.Add(Me.grpNLCD)
         Me.Controls.Add(Me.grpSTORET)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.chkMerge)
@@ -677,8 +677,8 @@ Partial Class frmDownload
         Me.grpNWIS.PerformLayout()
         Me.grpTerraServerWebService.ResumeLayout(False)
         Me.grpTerraServerWebService.PerformLayout()
-        Me.grpNLCD2001.ResumeLayout(False)
-        Me.grpNLCD2001.PerformLayout()
+        Me.grpNLCD.ResumeLayout(False)
+        Me.grpNLCD.PerformLayout()
         Me.grpNHDplus.ResumeLayout(False)
         Me.grpNHDplus.PerformLayout()
         Me.grpSTORET.ResumeLayout(False)
@@ -705,7 +705,7 @@ Partial Class frmDownload
     Friend WithEvents grpTerraServerWebService As System.Windows.Forms.GroupBox
     Friend WithEvents chkTerraServerWebService_DRG As System.Windows.Forms.CheckBox
     Friend WithEvents chkTerraServerWebService_DOQ As System.Windows.Forms.CheckBox
-    Friend WithEvents grpNLCD2001 As System.Windows.Forms.GroupBox
+    Friend WithEvents grpNLCD As System.Windows.Forms.GroupBox
     Friend WithEvents chkNLCD_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents grpNHDplus As System.Windows.Forms.GroupBox
     Friend WithEvents chkNHDplus_All As System.Windows.Forms.CheckBox
