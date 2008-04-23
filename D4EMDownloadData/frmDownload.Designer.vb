@@ -25,6 +25,7 @@ Partial Class frmDownload
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDownload))
         Me.grpBASINS = New System.Windows.Forms.GroupBox
+        Me.chkBASINS_STATSGO = New System.Windows.Forms.CheckBox
         Me.btnBrowseWDMmet = New System.Windows.Forms.Button
         Me.chkBASINS_Met = New System.Windows.Forms.CheckBox
         Me.chkBASINS_NHD = New System.Windows.Forms.CheckBox
@@ -70,9 +71,9 @@ Partial Class frmDownload
         Me.chkMerge = New System.Windows.Forms.CheckBox
         Me.btnCancel = New System.Windows.Forms.Button
         Me.grpSTORET = New System.Windows.Forms.GroupBox
+        Me.chkSTORET_Results = New System.Windows.Forms.CheckBox
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
         Me.grpNWISStations = New System.Windows.Forms.GroupBox
-        Me.chkBASINS_STATSGO = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
@@ -98,29 +99,42 @@ Partial Class frmDownload
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Census)
         Me.grpBASINS.Location = New System.Drawing.Point(12, 39)
         Me.grpBASINS.Name = "grpBASINS"
-        Me.grpBASINS.Size = New System.Drawing.Size(400, 96)
+        Me.grpBASINS.Size = New System.Drawing.Size(424, 68)
         Me.grpBASINS.TabIndex = 0
         Me.grpBASINS.TabStop = False
         Me.grpBASINS.Text = "BASINS"
         '
+        'chkBASINS_STATSGO
+        '
+        Me.chkBASINS_STATSGO.AutoSize = True
+        Me.chkBASINS_STATSGO.Location = New System.Drawing.Point(382, 19)
+        Me.chkBASINS_STATSGO.Name = "chkBASINS_STATSGO"
+        Me.chkBASINS_STATSGO.Size = New System.Drawing.Size(77, 17)
+        Me.chkBASINS_STATSGO.TabIndex = 10
+        Me.chkBASINS_STATSGO.Text = "STATSGO"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_STATSGO, "State Soil Geographic Data for SWAT")
+        Me.chkBASINS_STATSGO.UseVisualStyleBackColor = True
+        Me.chkBASINS_STATSGO.Visible = False
+        '
         'btnBrowseWDMmet
         '
         Me.btnBrowseWDMmet.Image = CType(resources.GetObject("btnBrowseWDMmet.Image"), System.Drawing.Image)
-        Me.btnBrowseWDMmet.Location = New System.Drawing.Point(205, 62)
+        Me.btnBrowseWDMmet.Location = New System.Drawing.Point(382, 39)
         Me.btnBrowseWDMmet.Name = "btnBrowseWDMmet"
         Me.btnBrowseWDMmet.Size = New System.Drawing.Size(20, 20)
-        Me.btnBrowseWDMmet.TabIndex = 7
-        Me.ToolTip1.SetToolTip(Me.btnBrowseWDMmet, "Browse to choose WDM file name")
+        Me.btnBrowseWDMmet.TabIndex = 10
+        Me.ToolTip1.SetToolTip(Me.btnBrowseWDMmet, "Browse to choose file name to save Meteorologic data in")
         Me.btnBrowseWDMmet.UseVisualStyleBackColor = True
         '
         'chkBASINS_Met
         '
         Me.chkBASINS_Met.AutoSize = True
-        Me.chkBASINS_Met.Location = New System.Drawing.Point(112, 65)
+        Me.chkBASINS_Met.Location = New System.Drawing.Point(289, 42)
         Me.chkBASINS_Met.Name = "chkBASINS_Met"
         Me.chkBASINS_Met.Size = New System.Drawing.Size(87, 17)
-        Me.chkBASINS_Met.TabIndex = 6
+        Me.chkBASINS_Met.TabIndex = 9
         Me.chkBASINS_Met.Text = "Meteorologic"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_Met, "Weather station data in WDM format")
         Me.chkBASINS_Met.UseVisualStyleBackColor = True
         '
         'chkBASINS_NHD
@@ -129,8 +143,9 @@ Partial Class frmDownload
         Me.chkBASINS_NHD.Location = New System.Drawing.Point(233, 42)
         Me.chkBASINS_NHD.Name = "chkBASINS_NHD"
         Me.chkBASINS_NHD.Size = New System.Drawing.Size(50, 17)
-        Me.chkBASINS_NHD.TabIndex = 9
+        Me.chkBASINS_NHD.TabIndex = 7
         Me.chkBASINS_NHD.Text = "NHD"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_NHD, "National Hydrography Dataset")
         Me.chkBASINS_NHD.UseVisualStyleBackColor = True
         '
         'chkBASINS_NED
@@ -139,8 +154,9 @@ Partial Class frmDownload
         Me.chkBASINS_NED.Location = New System.Drawing.Point(233, 19)
         Me.chkBASINS_NED.Name = "chkBASINS_NED"
         Me.chkBASINS_NED.Size = New System.Drawing.Size(49, 17)
-        Me.chkBASINS_NED.TabIndex = 8
+        Me.chkBASINS_NED.TabIndex = 6
         Me.chkBASINS_NED.Text = "NED"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_NED, "National Elevation Dataset")
         Me.chkBASINS_NED.UseVisualStyleBackColor = True
         '
         'chkBASINS_LSTORET
@@ -151,6 +167,7 @@ Partial Class frmDownload
         Me.chkBASINS_LSTORET.Size = New System.Drawing.Size(108, 17)
         Me.chkBASINS_LSTORET.TabIndex = 5
         Me.chkBASINS_LSTORET.Text = "Legacy STORET"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_LSTORET, "STORET data from before 1999")
         Me.chkBASINS_LSTORET.UseVisualStyleBackColor = True
         '
         'chkBASINS_GIRAS
@@ -158,39 +175,43 @@ Partial Class frmDownload
         Me.chkBASINS_GIRAS.AutoSize = True
         Me.chkBASINS_GIRAS.Location = New System.Drawing.Point(112, 19)
         Me.chkBASINS_GIRAS.Name = "chkBASINS_GIRAS"
-        Me.chkBASINS_GIRAS.Size = New System.Drawing.Size(59, 17)
+        Me.chkBASINS_GIRAS.Size = New System.Drawing.Size(108, 17)
         Me.chkBASINS_GIRAS.TabIndex = 4
-        Me.chkBASINS_GIRAS.Text = "GIRAS"
+        Me.chkBASINS_GIRAS.Text = "GIRAS Land Use"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_GIRAS, "Geographic Information Retrieval and Analysis System Land Use as Shape File")
         Me.chkBASINS_GIRAS.UseVisualStyleBackColor = True
         '
         'chkBASINS_DEMG
         '
         Me.chkBASINS_DEMG.AutoSize = True
-        Me.chkBASINS_DEMG.Location = New System.Drawing.Point(6, 65)
+        Me.chkBASINS_DEMG.Location = New System.Drawing.Point(6, 42)
         Me.chkBASINS_DEMG.Name = "chkBASINS_DEMG"
         Me.chkBASINS_DEMG.Size = New System.Drawing.Size(72, 17)
         Me.chkBASINS_DEMG.TabIndex = 3
         Me.chkBASINS_DEMG.Text = "DEM Grid"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_DEMG, "Digital Elevation Model as raster coverage")
         Me.chkBASINS_DEMG.UseVisualStyleBackColor = True
         '
         'chkBASINS_DEM
         '
         Me.chkBASINS_DEM.AutoSize = True
-        Me.chkBASINS_DEM.Location = New System.Drawing.Point(6, 42)
+        Me.chkBASINS_DEM.Location = New System.Drawing.Point(6, 19)
         Me.chkBASINS_DEM.Name = "chkBASINS_DEM"
         Me.chkBASINS_DEM.Size = New System.Drawing.Size(84, 17)
         Me.chkBASINS_DEM.TabIndex = 2
         Me.chkBASINS_DEM.Text = "DEM Shape"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_DEM, "Digital Elevation Model as shape file")
         Me.chkBASINS_DEM.UseVisualStyleBackColor = True
         '
         'chkBASINS_Census
         '
         Me.chkBASINS_Census.AutoSize = True
-        Me.chkBASINS_Census.Location = New System.Drawing.Point(6, 19)
+        Me.chkBASINS_Census.Location = New System.Drawing.Point(289, 19)
         Me.chkBASINS_Census.Name = "chkBASINS_Census"
         Me.chkBASINS_Census.Size = New System.Drawing.Size(61, 17)
-        Me.chkBASINS_Census.TabIndex = 1
+        Me.chkBASINS_Census.TabIndex = 8
         Me.chkBASINS_Census.Text = "Census"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_Census, "Selected map layers from US Census")
         Me.chkBASINS_Census.UseVisualStyleBackColor = True
         '
         'grpNWIS
@@ -201,12 +222,12 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISMeasurements)
         Me.grpNWIS.Controls.Add(Me.btnBrowseWDMdailydischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
-        Me.grpNWIS.Location = New System.Drawing.Point(12, 308)
+        Me.grpNWIS.Location = New System.Drawing.Point(12, 280)
         Me.grpNWIS.Name = "grpNWIS"
-        Me.grpNWIS.Size = New System.Drawing.Size(400, 42)
+        Me.grpNWIS.Size = New System.Drawing.Size(424, 42)
         Me.grpNWIS.TabIndex = 1
         Me.grpNWIS.TabStop = False
-        Me.grpNWIS.Text = "NWIS Data"
+        Me.grpNWIS.Text = "NWIS Data - US Geological Survey"
         '
         'chkNWIS_GetNWISWQ
         '
@@ -269,7 +290,7 @@ Partial Class frmDownload
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_Urban)
         Me.grpTerraServerWebService.Location = New System.Drawing.Point(418, 308)
         Me.grpTerraServerWebService.Name = "grpTerraServerWebService"
-        Me.grpTerraServerWebService.Size = New System.Drawing.Size(400, 42)
+        Me.grpTerraServerWebService.Size = New System.Drawing.Size(424, 42)
         Me.grpTerraServerWebService.TabIndex = 9
         Me.grpTerraServerWebService.TabStop = False
         Me.grpTerraServerWebService.Text = "TerraServer Images"
@@ -298,13 +319,14 @@ Partial Class frmDownload
         'btnOther
         '
         Me.btnOther.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOther.Location = New System.Drawing.Point(174, 408)
+        Me.btnOther.Location = New System.Drawing.Point(198, 432)
         Me.btnOther.Name = "btnOther"
         Me.btnOther.Size = New System.Drawing.Size(75, 23)
         Me.btnOther.TabIndex = 29
         Me.btnOther.Text = "&Other..."
         Me.ToolTip1.SetToolTip(Me.btnOther, "Launch old data download tool")
         Me.btnOther.UseVisualStyleBackColor = True
+        Me.btnOther.Visible = False
         '
         'grpNLCD2001
         '
@@ -314,12 +336,12 @@ Partial Class frmDownload
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Canopy)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_Impervious)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD_LandCover)
-        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 356)
+        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 328)
         Me.grpNLCD2001.Name = "grpNLCD2001"
-        Me.grpNLCD2001.Size = New System.Drawing.Size(400, 42)
+        Me.grpNLCD2001.Size = New System.Drawing.Size(424, 42)
         Me.grpNLCD2001.TabIndex = 11
         Me.grpNLCD2001.TabStop = False
-        Me.grpNLCD2001.Text = "NLCD 2001"
+        Me.grpNLCD2001.Text = "NLCD 2001 - National Land Cover Data"
         '
         'chkNLCD_1992
         '
@@ -373,12 +395,12 @@ Partial Class frmDownload
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_elev_cm)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_All)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
-        Me.grpNHDplus.Location = New System.Drawing.Point(12, 141)
+        Me.grpNHDplus.Location = New System.Drawing.Point(12, 113)
         Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(400, 113)
+        Me.grpNHDplus.Size = New System.Drawing.Size(424, 113)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
-        Me.grpNHDplus.Text = "NHD Plus"
+        Me.grpNHDplus.Text = "NHD Plus (National Hydrography Dataset)"
         '
         'chkNHDplus_streamgageevent
         '
@@ -503,16 +525,16 @@ Partial Class frmDownload
         Me.chkNWISStations_gw.AutoSize = True
         Me.chkNWISStations_gw.Location = New System.Drawing.Point(309, 19)
         Me.chkNWISStations_gw.Name = "chkNWISStations_gw"
-        Me.chkNWISStations_gw.Size = New System.Drawing.Size(47, 17)
+        Me.chkNWISStations_gw.Size = New System.Drawing.Size(93, 17)
         Me.chkNWISStations_gw.TabIndex = 23
-        Me.chkNWISStations_gw.Text = "Well"
+        Me.chkNWISStations_gw.Text = "Ground Water"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw, "Ground Water Station Point Layer")
         Me.chkNWISStations_gw.UseVisualStyleBackColor = True
         '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(336, 408)
+        Me.btnDownload.Location = New System.Drawing.Point(360, 432)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 31
@@ -527,7 +549,7 @@ Partial Class frmDownload
         Me.cboRegion.Items.AddRange(New Object() {"View Rectangle", "Extent of Selected Layer"})
         Me.cboRegion.Location = New System.Drawing.Point(124, 12)
         Me.cboRegion.Name = "cboRegion"
-        Me.cboRegion.Size = New System.Drawing.Size(288, 21)
+        Me.cboRegion.Size = New System.Drawing.Size(312, 21)
         Me.cboRegion.TabIndex = 0
         '
         'lblRegion
@@ -543,7 +565,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(81, 412)
+        Me.chkClip.Location = New System.Drawing.Point(124, 436)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 28
@@ -554,7 +576,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(17, 412)
+        Me.chkMerge.Location = New System.Drawing.Point(17, 436)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 27
@@ -565,7 +587,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(255, 408)
+        Me.btnCancel.Location = New System.Drawing.Point(279, 432)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 30
@@ -576,14 +598,24 @@ Partial Class frmDownload
         '
         Me.grpSTORET.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpSTORET.Controls.Add(Me.chkSTORET_Results)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
-        Me.grpSTORET.Location = New System.Drawing.Point(418, 252)
+        Me.grpSTORET.Location = New System.Drawing.Point(12, 376)
         Me.grpSTORET.Name = "grpSTORET"
-        Me.grpSTORET.Size = New System.Drawing.Size(400, 44)
+        Me.grpSTORET.Size = New System.Drawing.Size(424, 44)
         Me.grpSTORET.TabIndex = 42
         Me.grpSTORET.TabStop = False
         Me.grpSTORET.Text = "STORET"
-        Me.grpSTORET.Visible = False
+        '
+        'chkSTORET_Results
+        '
+        Me.chkSTORET_Results.AutoSize = True
+        Me.chkSTORET_Results.Location = New System.Drawing.Point(112, 19)
+        Me.chkSTORET_Results.Name = "chkSTORET_Results"
+        Me.chkSTORET_Results.Size = New System.Drawing.Size(61, 17)
+        Me.chkSTORET_Results.TabIndex = 18
+        Me.chkSTORET_Results.Text = "Results"
+        Me.chkSTORET_Results.UseVisualStyleBackColor = True
         '
         'chkSTORET_Stations
         '
@@ -603,23 +635,12 @@ Partial Class frmDownload
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_qw)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_measurement)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_discharge)
-        Me.grpNWISStations.Location = New System.Drawing.Point(12, 260)
+        Me.grpNWISStations.Location = New System.Drawing.Point(12, 232)
         Me.grpNWISStations.Name = "grpNWISStations"
-        Me.grpNWISStations.Size = New System.Drawing.Size(400, 42)
+        Me.grpNWISStations.Size = New System.Drawing.Size(424, 42)
         Me.grpNWISStations.TabIndex = 23
         Me.grpNWISStations.TabStop = False
-        Me.grpNWISStations.Text = "NWIS Stations"
-        '
-        'chkBASINS_STATSGO
-        '
-        Me.chkBASINS_STATSGO.AutoSize = True
-        Me.chkBASINS_STATSGO.Location = New System.Drawing.Point(233, 62)
-        Me.chkBASINS_STATSGO.Name = "chkBASINS_STATSGO"
-        Me.chkBASINS_STATSGO.Size = New System.Drawing.Size(77, 17)
-        Me.chkBASINS_STATSGO.TabIndex = 10
-        Me.chkBASINS_STATSGO.Text = "STATSGO"
-        Me.ToolTip1.SetToolTip(Me.chkBASINS_STATSGO, "State Soil Geographic Data for SWAT")
-        Me.chkBASINS_STATSGO.UseVisualStyleBackColor = True
+        Me.grpNWISStations.Text = "NWIS Stations - US Geological Survey"
         '
         'frmDownload
         '
@@ -627,7 +648,7 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(424, 443)
+        Me.ClientSize = New System.Drawing.Size(448, 467)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.btnOther)
         Me.Controls.Add(Me.grpNLCD2001)
@@ -642,7 +663,10 @@ Partial Class frmDownload
         Me.Controls.Add(Me.grpNWIS)
         Me.Controls.Add(Me.grpBASINS)
         Me.Controls.Add(Me.grpTerraServerWebService)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmDownload"
         Me.Text = "Download Data"
         Me.grpBASINS.ResumeLayout(False)
@@ -712,4 +736,5 @@ Partial Class frmDownload
     Friend WithEvents chkNWISStations_discharge As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWISStations_gw As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_STATSGO As System.Windows.Forms.CheckBox
+    Friend WithEvents chkSTORET_Results As System.Windows.Forms.CheckBox
 End Class
