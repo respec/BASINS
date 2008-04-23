@@ -12,6 +12,7 @@ Public Class frmDownload
         'The following line hot-wires the form to just do met data download
         'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
 
+        btnBrowseWDMmet.Tag = ""
         If Not pMapWin.Project Is Nothing Then
             If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
                 btnBrowseWDMmet.Tag = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "met\met.wdm")
@@ -208,7 +209,7 @@ Public Class frmDownload
     Private Function HUC8s() As ArrayList
         'First check for a cat layer that contains the list of HUC-8s
         Dim lHUC8s As New ArrayList
-        If Not pMapWin Is Nothing AndAlso Not pMapWin.Project Is Nothing Then
+        If pMapWin IsNot Nothing AndAlso pMapWin.Project IsNot Nothing AndAlso pMapWin.Project.FileName IsNot Nothing Then
             Dim lCatDbfName As String = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "cat.dbf")
             If IO.File.Exists(lCatDbfName) Then
                 Dim lCatDbf As New atcUtility.atcTableDBF
