@@ -227,7 +227,7 @@ Partial Class frmDownload
         Me.grpNWIS.Size = New System.Drawing.Size(424, 42)
         Me.grpNWIS.TabIndex = 1
         Me.grpNWIS.TabStop = False
-        Me.grpNWIS.Text = "NWIS Data - US Geological Survey"
+        Me.grpNWIS.Text = "US Geological Survey Data from  National Water Information System"
         '
         'chkNWIS_GetNWISWQ
         '
@@ -341,7 +341,7 @@ Partial Class frmDownload
         Me.grpNLCD2001.Size = New System.Drawing.Size(424, 42)
         Me.grpNLCD2001.TabIndex = 11
         Me.grpNLCD2001.TabStop = False
-        Me.grpNLCD2001.Text = "NLCD 2001 - National Land Cover Data"
+        Me.grpNLCD2001.Text = "National Land Cover Data 2001"
         '
         'chkNLCD_1992
         '
@@ -400,7 +400,7 @@ Partial Class frmDownload
         Me.grpNHDplus.Size = New System.Drawing.Size(424, 113)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
-        Me.grpNHDplus.Text = "NHD Plus (National Hydrography Dataset)"
+        Me.grpNHDplus.Text = "National Hydrography Dataset Plus"
         '
         'chkNHDplus_streamgageevent
         '
@@ -570,6 +570,7 @@ Partial Class frmDownload
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 28
         Me.chkClip.Text = "Clip to Region"
+        Me.ToolTip1.SetToolTip(Me.chkClip, "Discard additional data if a larger area was retrieved than was requested")
         Me.chkClip.UseVisualStyleBackColor = True
         '
         'chkMerge
@@ -581,6 +582,7 @@ Partial Class frmDownload
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 27
         Me.chkMerge.Text = "Merge"
+        Me.ToolTip1.SetToolTip(Me.chkMerge, "Merge parts of the same dataset from different areas to form one layer")
         Me.chkMerge.UseVisualStyleBackColor = True
         '
         'btnCancel
@@ -605,7 +607,7 @@ Partial Class frmDownload
         Me.grpSTORET.Size = New System.Drawing.Size(424, 44)
         Me.grpSTORET.TabIndex = 42
         Me.grpSTORET.TabStop = False
-        Me.grpSTORET.Text = "STORET"
+        Me.grpSTORET.Text = "EPA STORET Water Quality"
         '
         'chkSTORET_Results
         '
@@ -640,7 +642,7 @@ Partial Class frmDownload
         Me.grpNWISStations.Size = New System.Drawing.Size(424, 42)
         Me.grpNWISStations.TabIndex = 23
         Me.grpNWISStations.TabStop = False
-        Me.grpNWISStations.Text = "NWIS Stations - US Geological Survey"
+        Me.grpNWISStations.Text = "US Geological Survey Stations from National Water Information System"
         '
         'frmDownload
         '
