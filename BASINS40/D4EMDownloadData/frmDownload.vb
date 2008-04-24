@@ -25,11 +25,15 @@ Public Class frmDownload
             Dim lHUC8s As ArrayList = HUC8s()
             If lHUC8s.Count = 1 Then
                 cboRegion.Items.Add("Hydrologic Unit " & lHUC8s(0))
-            Else
+            ElseIf lHUC8s.Count > 1 Then
                 cboRegion.Items.Add("Hydrologic Units")
             End If
         End If
-        Dim lRegionIndex As Integer = GetSetting("DataDownload", "Defaults", "RegionType", 0)
+
+        Dim lRegionIndex As Integer = GetSetting("DataDownload", "Defaults", "RegionType", cboRegion.Items.Count - 1)
+        If lRegionIndex < 0 OrElse lRegionIndex >= cboRegion.Items.Count Then
+            lRegionIndex = 0
+        End If
         If lRegionIndex < cboRegion.Items.Count Then cboRegion.SelectedIndex = lRegionIndex
 
         If GetSetting("DataDownload", "Defaults", "Clip", "").ToLower.Equals("true") Then

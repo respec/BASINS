@@ -45,11 +45,11 @@ Partial Class frmDownload
         Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_DOQ = New System.Windows.Forms.CheckBox
         Me.btnOther = New System.Windows.Forms.Button
-        Me.grpNLCD = New System.Windows.Forms.GroupBox
-        Me.chkNLCD_1992 = New System.Windows.Forms.CheckBox
-        Me.chkNLCD_Canopy = New System.Windows.Forms.CheckBox
-        Me.chkNLCD_Impervious = New System.Windows.Forms.CheckBox
-        Me.chkNLCD_LandCover = New System.Windows.Forms.CheckBox
+        Me.grpNLCD2001 = New System.Windows.Forms.GroupBox
+        Me.chkNLCD2001_1992 = New System.Windows.Forms.CheckBox
+        Me.chkNLCD2001_Canopy = New System.Windows.Forms.CheckBox
+        Me.chkNLCD2001_Impervious = New System.Windows.Forms.CheckBox
+        Me.chkNLCD2001_LandCover = New System.Windows.Forms.CheckBox
         Me.grpNHDplus = New System.Windows.Forms.GroupBox
         Me.chkNHDplus_streamgageevent = New System.Windows.Forms.CheckBox
         Me.chkNHDplus_hydrologicunits = New System.Windows.Forms.CheckBox
@@ -77,7 +77,7 @@ Partial Class frmDownload
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
-        Me.grpNLCD.SuspendLayout()
+        Me.grpNLCD2001.SuspendLayout()
         Me.grpNHDplus.SuspendLayout()
         Me.grpSTORET.SuspendLayout()
         Me.grpNWISStations.SuspendLayout()
@@ -328,60 +328,60 @@ Partial Class frmDownload
         Me.btnOther.UseVisualStyleBackColor = True
         Me.btnOther.Visible = False
         '
-        'grpNLCD
+        'grpNLCD2001
         '
-        Me.grpNLCD.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.grpNLCD2001.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpNLCD.Controls.Add(Me.chkNLCD_1992)
-        Me.grpNLCD.Controls.Add(Me.chkNLCD_Canopy)
-        Me.grpNLCD.Controls.Add(Me.chkNLCD_Impervious)
-        Me.grpNLCD.Controls.Add(Me.chkNLCD_LandCover)
-        Me.grpNLCD.Location = New System.Drawing.Point(12, 328)
-        Me.grpNLCD.Name = "grpNLCD"
-        Me.grpNLCD.Size = New System.Drawing.Size(424, 42)
-        Me.grpNLCD.TabIndex = 11
-        Me.grpNLCD.TabStop = False
-        Me.grpNLCD.Text = "National Land Cover Data 2001"
+        Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_1992)
+        Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Canopy)
+        Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Impervious)
+        Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_LandCover)
+        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 328)
+        Me.grpNLCD2001.Name = "grpNLCD2001"
+        Me.grpNLCD2001.Size = New System.Drawing.Size(424, 42)
+        Me.grpNLCD2001.TabIndex = 11
+        Me.grpNLCD2001.TabStop = False
+        Me.grpNLCD2001.Text = "National Land Cover Data 2001"
         '
-        'chkNLCD_1992
+        'chkNLCD2001_1992
         '
-        Me.chkNLCD_1992.AutoSize = True
-        Me.chkNLCD_1992.Location = New System.Drawing.Point(273, 19)
-        Me.chkNLCD_1992.Name = "chkNLCD_1992"
-        Me.chkNLCD_1992.Size = New System.Drawing.Size(108, 17)
-        Me.chkNLCD_1992.TabIndex = 26
-        Me.chkNLCD_1992.Text = "1992 Land Cover"
-        Me.chkNLCD_1992.UseVisualStyleBackColor = True
+        Me.chkNLCD2001_1992.AutoSize = True
+        Me.chkNLCD2001_1992.Location = New System.Drawing.Point(273, 19)
+        Me.chkNLCD2001_1992.Name = "chkNLCD2001_1992"
+        Me.chkNLCD2001_1992.Size = New System.Drawing.Size(108, 17)
+        Me.chkNLCD2001_1992.TabIndex = 26
+        Me.chkNLCD2001_1992.Text = "1992 Land Cover"
+        Me.chkNLCD2001_1992.UseVisualStyleBackColor = True
         '
-        'chkNLCD_Canopy
+        'chkNLCD2001_Canopy
         '
-        Me.chkNLCD_Canopy.AutoSize = True
-        Me.chkNLCD_Canopy.Location = New System.Drawing.Point(205, 19)
-        Me.chkNLCD_Canopy.Name = "chkNLCD_Canopy"
-        Me.chkNLCD_Canopy.Size = New System.Drawing.Size(62, 17)
-        Me.chkNLCD_Canopy.TabIndex = 25
-        Me.chkNLCD_Canopy.Text = "Canopy"
-        Me.chkNLCD_Canopy.UseVisualStyleBackColor = True
+        Me.chkNLCD2001_Canopy.AutoSize = True
+        Me.chkNLCD2001_Canopy.Location = New System.Drawing.Point(205, 19)
+        Me.chkNLCD2001_Canopy.Name = "chkNLCD2001_Canopy"
+        Me.chkNLCD2001_Canopy.Size = New System.Drawing.Size(62, 17)
+        Me.chkNLCD2001_Canopy.TabIndex = 25
+        Me.chkNLCD2001_Canopy.Text = "Canopy"
+        Me.chkNLCD2001_Canopy.UseVisualStyleBackColor = True
         '
-        'chkNLCD_Impervious
+        'chkNLCD2001_Impervious
         '
-        Me.chkNLCD_Impervious.AutoSize = True
-        Me.chkNLCD_Impervious.Location = New System.Drawing.Point(112, 19)
-        Me.chkNLCD_Impervious.Name = "chkNLCD_Impervious"
-        Me.chkNLCD_Impervious.Size = New System.Drawing.Size(77, 17)
-        Me.chkNLCD_Impervious.TabIndex = 24
-        Me.chkNLCD_Impervious.Text = "Impervious"
-        Me.chkNLCD_Impervious.UseVisualStyleBackColor = True
+        Me.chkNLCD2001_Impervious.AutoSize = True
+        Me.chkNLCD2001_Impervious.Location = New System.Drawing.Point(112, 19)
+        Me.chkNLCD2001_Impervious.Name = "chkNLCD2001_Impervious"
+        Me.chkNLCD2001_Impervious.Size = New System.Drawing.Size(77, 17)
+        Me.chkNLCD2001_Impervious.TabIndex = 24
+        Me.chkNLCD2001_Impervious.Text = "Impervious"
+        Me.chkNLCD2001_Impervious.UseVisualStyleBackColor = True
         '
-        'chkNLCD_LandCover
+        'chkNLCD2001_LandCover
         '
-        Me.chkNLCD_LandCover.AutoSize = True
-        Me.chkNLCD_LandCover.Location = New System.Drawing.Point(6, 19)
-        Me.chkNLCD_LandCover.Name = "chkNLCD_LandCover"
-        Me.chkNLCD_LandCover.Size = New System.Drawing.Size(81, 17)
-        Me.chkNLCD_LandCover.TabIndex = 23
-        Me.chkNLCD_LandCover.Text = "Land Cover"
-        Me.chkNLCD_LandCover.UseVisualStyleBackColor = True
+        Me.chkNLCD2001_LandCover.AutoSize = True
+        Me.chkNLCD2001_LandCover.Location = New System.Drawing.Point(6, 19)
+        Me.chkNLCD2001_LandCover.Name = "chkNLCD2001_LandCover"
+        Me.chkNLCD2001_LandCover.Size = New System.Drawing.Size(81, 17)
+        Me.chkNLCD2001_LandCover.TabIndex = 23
+        Me.chkNLCD2001_LandCover.Text = "Land Cover"
+        Me.chkNLCD2001_LandCover.UseVisualStyleBackColor = True
         '
         'grpNHDplus
         '
@@ -653,7 +653,7 @@ Partial Class frmDownload
         Me.ClientSize = New System.Drawing.Size(448, 467)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.btnOther)
-        Me.Controls.Add(Me.grpNLCD)
+        Me.Controls.Add(Me.grpNLCD2001)
         Me.Controls.Add(Me.grpSTORET)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.chkMerge)
@@ -677,8 +677,8 @@ Partial Class frmDownload
         Me.grpNWIS.PerformLayout()
         Me.grpTerraServerWebService.ResumeLayout(False)
         Me.grpTerraServerWebService.PerformLayout()
-        Me.grpNLCD.ResumeLayout(False)
-        Me.grpNLCD.PerformLayout()
+        Me.grpNLCD2001.ResumeLayout(False)
+        Me.grpNLCD2001.PerformLayout()
         Me.grpNHDplus.ResumeLayout(False)
         Me.grpNHDplus.PerformLayout()
         Me.grpSTORET.ResumeLayout(False)
@@ -705,8 +705,8 @@ Partial Class frmDownload
     Friend WithEvents grpTerraServerWebService As System.Windows.Forms.GroupBox
     Friend WithEvents chkTerraServerWebService_DRG As System.Windows.Forms.CheckBox
     Friend WithEvents chkTerraServerWebService_DOQ As System.Windows.Forms.CheckBox
-    Friend WithEvents grpNLCD As System.Windows.Forms.GroupBox
-    Friend WithEvents chkNLCD_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents grpNLCD2001 As System.Windows.Forms.GroupBox
+    Friend WithEvents chkNLCD2001_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents grpNHDplus As System.Windows.Forms.GroupBox
     Friend WithEvents chkNHDplus_All As System.Windows.Forms.CheckBox
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
@@ -726,12 +726,12 @@ Partial Class frmDownload
     Friend WithEvents chkNHDplus_hydrography As System.Windows.Forms.CheckBox
     Friend WithEvents chkNHDplus_fac As System.Windows.Forms.CheckBox
     Friend WithEvents chkNHDplus_fdr As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNLCD_Impervious As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNLCD_Canopy As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNLCD2001_Impervious As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNLCD2001_Canopy As System.Windows.Forms.CheckBox
     Friend WithEvents btnBrowseWDMdailydischarge As System.Windows.Forms.Button
     Friend WithEvents chkNWIS_GetNWISWQ As System.Windows.Forms.CheckBox
     Friend WithEvents btnOther As System.Windows.Forms.Button
-    Friend WithEvents chkNLCD_1992 As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNLCD2001_1992 As System.Windows.Forms.CheckBox
     Friend WithEvents grpNWISStations As System.Windows.Forms.GroupBox
     Friend WithEvents chkNWISStations_qw As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWISStations_measurement As System.Windows.Forms.CheckBox
