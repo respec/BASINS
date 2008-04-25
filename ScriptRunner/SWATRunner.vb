@@ -79,49 +79,75 @@ End Module
 
 Module SWATArea
     Public Function Report() As String
-        Dim lFormat As String = "###,##0.0"
+        Dim lFormat As String = "###,##0.00"
         'get SubBasin info from database
         Dim lSubBasins As New atcCollection
         For Each lRow As DataRow In SwatObject.SwatInput.SubBasin.Table.Rows
             lSubBasins.Add(lRow.Item(1).ToString, lRow.Item(2)) 'id,area
         Next
 
-        'summarize areas by subbasin
-        Dim lAreaTotal As Double = 0.0
+        Dim lLandUses As New atcCollection
+        For Each lRow As DataRow In SwatObject.SwatInput.Hru.LandUses.Rows
+            lLandUses.Add(lRow.Item(0))
+        Next
+
         Dim lArea As Double = 0.0
-        Dim lSb As New Text.StringBuilder
-        lSb.AppendLine("SubBasinId" & vbTab & "Area")
-        For lSubBasinIndex As Integer = 0 To lSubBasins.Count - 1
-            lArea = lSubBasins.Item(lSubBasinIndex)
-            lAreaTotal += lArea
-            lSb.AppendLine(lSubBasins.Keys(lSubBasinIndex) & vbTab & DoubleToString(lArea, , lFormat, , , 8).PadLeft(12))
-        Next
-        lSb.AppendLine("Total" & vbTab & DoubleToString(lAreaTotal, , lFormat, , , 8).PadLeft(12))
-        lSb.AppendLine("")
+        Dim lReportTable As New DataTable
+        With lReportTable
+            .Columns.Add("SubBasinId", "".GetType)
+            .Columns.Add("Area", lArea.GetType)
+            For lLandUseIndex As Integer = 0 To lLandUses.Count - 1
+                .Columns.Add(lLandUses.ItemByIndex(lLandUseIndex), lArea.GetType)
+            Next
+            'summarize areas by subbasin
+            Dim lAreaTotal As Double = 0.0
+            For lSubBasinIndex As Integer = 0 To lSubBasins.Count - 1
+                lArea = lSubBasins.Item(lSubBasinIndex)
+                lAreaTotal += lArea
+                Dim lReportRow As DataRow = .NewRow
+                With lReportRow
+                    .Item(0) = lSubBasinIndex + 1
+                    .Item(1) = lArea
+                    For lLanduseindex As Integer = 0 To lLandUses.Count - 1
+                        .Item(lLanduseindex + 2) = 0.0
+                    Next
+                End With
+                .Rows.Add(lReportRow)
+            Next
 
-        'summarize areas by subbasin/landuse
-        Dim lLandUsePrev As String = ""
-        Dim lSubBasinPrev As Integer = 0
-        Dim lAreaLandUse As Double = 0.0
-        lAreaTotal = 0.0
+            'summarize areas by subbasin/landuse
+            For Each lHruRow As DataRow In SwatObject.SwatInput.Hru.Table.Rows
+                Dim lSubBasin As Integer = lHruRow.Item(1)
+                Dim lLandUse As String = lHruRow.Item(3)
+                Dim lReportRow As DataRow = .Rows(lSubBasin - 1)
+                lReportRow.Item(lHruRow.Item(3)) += lHruRow.Item(6) * lReportRow.Item(1)
+            Next
 
-        lSb.AppendLine("SubBasinId" & vbTab & "LandUse" & vbTab & "Area")
-        For Each lHruRow As DataRow In SwatObject.SwatInput.Hru.Table.Rows
-            Dim lSubBasin As Integer = lHruRow.Item(1)
-            Dim lLandUse As String = lHruRow.Item(3)
-            If lSubBasinPrev > 0 AndAlso _
-               (lSubBasin <> lSubBasinPrev OrElse _
-                lLandUse <> lLandUsePrev) Then
-                lSb.AppendLine(lSubBasinPrev & vbTab & lLandUsePrev & vbTab & DoubleToString(lAreaLandUse, , lFormat, , , 8).PadLeft(12))
-                lAreaTotal += lAreaLandUse
-                lAreaLandUse = 0.0
-            End If
-            lSubBasinPrev = lSubBasin
-            lLandUsePrev = lLandUse
-            lAreaLandUse += lHruRow(6) * lSubBasins.ItemByKey(lSubBasin.ToString)
-        Next
-        lSb.AppendLine("Total" & vbTab & "All" & vbTab & DoubleToString(lAreaTotal, , lFormat, , , 8).PadLeft(12))
-
-        Return lSb.ToString
+            Dim lAreaTotals(.Columns.Count)
+            Dim lSb As New Text.StringBuilder
+            Dim lStr As String = ""
+            For lColumnIndex As Integer = 0 To .Columns.Count - 1
+                lStr &= .Columns(lColumnIndex).ColumnName.PadLeft(12) & vbTab
+            Next
+            lSb.AppendLine(lStr.TrimEnd(vbTab))
+            For lRowIndex As Integer = 0 To .Rows.Count - 1
+                Dim lReportRow As DataRow = .Rows(lRowIndex)
+                With lReportRow
+                    lStr = .Item(0).ToString.PadLeft(12) & vbTab
+                    For lColumnIndex As Integer = 1 To .ItemArray.GetUpperBound(0)
+                        lStr &= DoubleToString(.Item(lColumnIndex), 12, lFormat, , , 10).PadLeft(12) & vbTab
+                        lAreaTotals(lColumnIndex) += .Item(lColumnIndex)
+                    Next
+                End With
+                lSb.AppendLine(lStr.TrimEnd(vbTab))
+            Next
+            lStr = "Totals".PadLeft(12) & vbTab
+            For lColumnIndex As Integer = 1 To .Columns.Count - 1
+                lStr &= DoubleToString(lAreaTotals(lColumnIndex), 12, lFormat, , , 10).PadLeft(12) & vbTab
+            Next
+            lSb.AppendLine(lStr.TrimEnd(vbTab))
+            Logger.Dbg("AreaTotalReportComplete " & lAreaTotals(1) & " " & lAreaTotal)
+            Return lSb.ToString
+        End With
     End Function
 End Module
