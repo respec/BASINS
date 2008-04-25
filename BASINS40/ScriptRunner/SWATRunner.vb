@@ -24,11 +24,13 @@ Module SWATRunner
         Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
         'With SwatInput - does not work???
         SwatInput.Initialize(pSWATGDB, pOutGDB, pOutputFolder)
-        Logger.Dbg("HRU RowCount:" & SwatObject.SwatInput.Hru.Table.Rows.Count)
+        Logger.Dbg("HRU RowCount:" & SwatInput.Hru.Table.Rows.Count)
         'End With
 
         Logger.Dbg("SWATSummarizeInput")
-        SaveFileString(pInputPath & "\logs\AreaReport.txt", SWATArea.Report)
+        SaveFileString(pInputPath & "\logs\AreaLandUseReport.txt", SWATArea.Report("LandUse"))
+        SaveFileString(pInputPath & "\logs\AreaSoilReport.txt", SWATArea.Report("Soil"))
+        SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", SWATArea.Report("Slope_Cd"))
 
         Logger.Dbg("SwatModelRunStartIn " & pOutputFolder)
         Try 'to run swat
@@ -78,51 +80,12 @@ Module SWATRunner
 End Module
 
 Module SWATArea
-    Public Function Report() As String
+    Public Function Report(ByVal aAggreationFieldName As String) As String
         Dim lFormat As String = "###,##0.00"
         'get SubBasin info from database
-        Dim lSubBasins As New atcCollection
-        For Each lRow As DataRow In SwatObject.SwatInput.SubBasin.Table.Rows
-            lSubBasins.Add(lRow.Item(1).ToString, lRow.Item(2)) 'id,area
-        Next
+        Dim lReportTable As DataTable = SwatInput.SubBasin.TableWithArea(aAggreationFieldName)
 
-        Dim lLandUses As New atcCollection
-        For Each lRow As DataRow In SwatObject.SwatInput.Hru.LandUses.Rows
-            lLandUses.Add(lRow.Item(0))
-        Next
-
-        Dim lArea As Double = 0.0
-        Dim lReportTable As New DataTable
         With lReportTable
-            .Columns.Add("SubBasinId", "".GetType)
-            .Columns.Add("Area", lArea.GetType)
-            For lLandUseIndex As Integer = 0 To lLandUses.Count - 1
-                .Columns.Add(lLandUses.ItemByIndex(lLandUseIndex), lArea.GetType)
-            Next
-            'summarize areas by subbasin
-            Dim lAreaTotal As Double = 0.0
-            For lSubBasinIndex As Integer = 0 To lSubBasins.Count - 1
-                lArea = lSubBasins.Item(lSubBasinIndex)
-                lAreaTotal += lArea
-                Dim lReportRow As DataRow = .NewRow
-                With lReportRow
-                    .Item(0) = lSubBasinIndex + 1
-                    .Item(1) = lArea
-                    For lLanduseindex As Integer = 0 To lLandUses.Count - 1
-                        .Item(lLanduseindex + 2) = 0.0
-                    Next
-                End With
-                .Rows.Add(lReportRow)
-            Next
-
-            'summarize areas by subbasin/landuse
-            For Each lHruRow As DataRow In SwatObject.SwatInput.Hru.Table.Rows
-                Dim lSubBasin As Integer = lHruRow.Item(1)
-                Dim lLandUse As String = lHruRow.Item(3)
-                Dim lReportRow As DataRow = .Rows(lSubBasin - 1)
-                lReportRow.Item(lHruRow.Item(3)) += lHruRow.Item(6) * lReportRow.Item(1)
-            Next
-
             Dim lAreaTotals(.Columns.Count)
             Dim lSb As New Text.StringBuilder
             Dim lStr As String = ""
@@ -146,7 +109,7 @@ Module SWATArea
                 lStr &= DoubleToString(lAreaTotals(lColumnIndex), 12, lFormat, , , 10).PadLeft(12) & vbTab
             Next
             lSb.AppendLine(lStr.TrimEnd(vbTab))
-            Logger.Dbg("AreaTotalReportComplete " & lAreaTotals(1) & " " & lAreaTotal)
+            Logger.Dbg("AreaTotalReportComplete " & lAreaTotals(1))
             Return lSb.ToString
         End With
     End Function
