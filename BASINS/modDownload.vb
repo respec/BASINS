@@ -579,7 +579,7 @@ StartOver:
                 TryDeleteShapefile(lNewShapeName)
             End If
             g_Project.Modified = True
-            ProcessDownloadResults(lResult)
+            ProcessDownloadResults(lResult) 'TODO: skip message box describing what has been downloaded?
 
             AddAllShapesInDir(aNewDataDir, aNewDataDir)
             g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
@@ -633,8 +633,8 @@ StartOver:
         Dim lInputProjection As String
         Dim lOutputProjection As String
         Dim lMessage As String = ""
-        Dim lLayersAdded As New atcCollection
-        Dim lDataAdded As New atcCollection
+        Dim lLayersAdded As New ArrayList
+        Dim lDataAdded As New ArrayList
 
         If Not aInstructions.StartsWith("<") Then
             If FileExists(aInstructions) Then
@@ -671,14 +671,14 @@ StartOver:
                         End If
                         If lNewDataSource IsNot Nothing Then
                             If atcData.atcDataManager.OpenDataSource(lNewDataSource, lOutputFileName, Nothing) Then
-                                lDataAdded.Add(lOutputFileName, lNewDataSource)
+                                lDataAdded.Add(lNewDataSource)
                             End If
                         End If
                     End If
                 Case "add_shape"
                     lOutputFileName = lProjectorNode.Content
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    lLayersAdded.Add(lOutputFileName, AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
+                    lLayersAdded.Add(AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
                 Case "add_grid"
                     lOutputFileName = lProjectorNode.Content
                     Select Case IO.Path.GetFileName(lOutputFileName).ToLower
@@ -686,7 +686,7 @@ StartOver:
                             Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
                         Case Else
                             If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                            lLayersAdded.Add(lOutputFileName, AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
+                            lLayersAdded.Add(AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
                             If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                                 'create .prj file as work-around for bug
                                 SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")

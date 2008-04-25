@@ -7,8 +7,6 @@ Imports MapWinUtility
 Public Class atcBasinsPlugIn
     Implements MapWindow.Interfaces.IPlugin
 
-    Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
-
 #Region "Plug-in Information"
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         'This is the name that appears in the Plug-ins menu
@@ -349,25 +347,6 @@ FoundDir:
                 Return MsgBoxResult.No
         End Select
     End Function
-
-    Public Property Busy() As Boolean
-        Get
-            If pBusy > 0 Then Return True Else Return False
-        End Get
-        Set(ByVal newValue As Boolean)
-            If newValue Then
-                pBusy += 1
-                If pBusy = 1 Then 'We just became busy, so set the main cursor
-                    g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
-                End If
-            Else
-                pBusy -= 1
-                If pBusy = 0 Then 'Not busy any more, set cursor back to default
-                    g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrMapDefault
-                End If
-            End If
-        End Set
-    End Property
 
     Private Sub SendFeedback()
         Dim lName As String = ""
