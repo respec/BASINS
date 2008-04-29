@@ -1,0 +1,31 @@
+<ColoringScheme SchemeType="Grid" GridName="NLCD 2001 Landcover" GroupName="Soil, Land Use/Cover">
+  <GridColoringScheme AmbientIntensity="0.7" Key="" LightSourceAzimuth="90" LightSourceElevation="45" LightSourceIntensity="0.7" NoDataColor="-16777216">
+    <Break Caption="Water-Open" LowValue="11" HighValue="11" LowColor="-16776961" HighColor="-16776961" ColoringType="1" GradientModel="1" />
+    <Break Caption="IceSnow-Perennial" LowValue="12" HighValue="12" LowColor="-2891012" HighColor="-2891012" ColoringType="1" GradientModel="1" />
+    <Break Caption="Developed-Open Space" LowValue="21" HighValue="21" LowColor="-1913652" HighColor="-1913652" ColoringType="1" GradientModel="1" />
+    <Break Caption="Developed-Low Intensity" LowValue="22" HighValue="22" LowColor="-2254462" HighColor="-2254462" ColoringType="1" GradientModel="1" />
+    <Break Caption="Developed-Medium Intensity" LowValue="23" HighValue="23" LowColor="-917504" HighColor="-917504" ColoringType="1" GradientModel="1" />
+    <Break Caption="Developed-High Intensity" LowValue="24" HighValue="24" LowColor="-5439488" HighColor="-5439488" ColoringType="1" GradientModel="1" />
+    <Break Caption="Barren Land" LowValue="31" HighValue="31" LowColor="-4738395" HighColor="-4738395" ColoringType="1" GradientModel="1" />
+    <Break Caption="Unconsolidated Shore" LowValue="32" HighValue="32" LowColor="-197380" HighColor="-197380" ColoringType="1" GradientModel="1" />
+    <Break Caption="Transitional" LowValue="33" HighValue="33" LowColor="-16777216" HighColor="-16777216" ColoringType="1" GradientModel="1" />
+    <Break Caption="Forest-Deciduous" LowValue="41" HighValue="41" LowColor="-9720474" HighColor="-9720474" ColoringType="1" GradientModel="1" />
+    <Break Caption="Forest-Evergreen" LowValue="42" HighValue="42" LowColor="-14784973" HighColor="-14784973" ColoringType="1" GradientModel="1" />
+    <Break Caption="Forest-Mixed" LowValue="43" HighValue="43" LowColor="-4535149" HighColor="-4535149" ColoringType="1" GradientModel="1" />
+    <Break Caption="Scrub-Dwarf" LowValue="51" HighValue="51" LowColor="-16711936" HighColor="-16711936" ColoringType="1" GradientModel="1" />
+    <Break Caption="Scrub-Scrub" LowValue="52" HighValue="52" LowColor="-5598925" HighColor="-5598925" ColoringType="1" GradientModel="1" />
+    <Break Caption="Grassland" LowValue="71" HighValue="71" LowColor="-1710655" HighColor="-1710655" ColoringType="1" GradientModel="1" />
+    <Break Caption="Agriculture-Pasture" LowValue="81" HighValue="81" LowColor="-2041025" HighColor="-2041025" ColoringType="1" GradientModel="1" />
+    <Break Caption="Agriculture-Cultivated Crops" LowValue="82" HighValue="82" LowColor="-5278421" HighColor="-5278421" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Woody" LowValue="90" HighValue="90" LowColor="-4400147" HighColor="-4400147" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Palustrine Forested" LowValue="91" HighValue="91" LowColor="-4531990" HighColor="-4531990" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Palustrine Scrub" LowValue="92" HighValue="92" LowColor="-4531990" HighColor="-4531990" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Estuarine Forested" LowValue="93" HighValue="93" LowColor="-4531990" HighColor="-4531990" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Estuarine Scrub" LowValue="94" HighValue="94" LowColor="-9067073" HighColor="-9067073" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Emergent Herbaceous" LowValue="95" HighValue="95" LowColor="-16711681" HighColor="-16711681" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Palustrine Emergent" LowValue="96" HighValue="96" LowColor="-1" HighColor="-1" ColoringType="1" GradientModel="1" />
+    <Break Caption="Wetlands-Estuarine Emergent" LowValue="97" HighValue="97" LowColor="-4079167" HighColor="-4079167" ColoringType="1" GradientModel="1" />
+    <Break Caption="Aquatic Bed-Paustrine" LowValue="98" HighValue="98" LowColor="-4079167" HighColor="-4079167" ColoringType="1" GradientModel="1" />
+    <Break Caption="Aquatic Bed-Esturarine" LowValue="99" HighValue="99" LowColor="-3750202" HighColor="-3750202" ColoringType="1" GradientModel="1" />
+  </GridColoringScheme>
+</ColoringScheme>

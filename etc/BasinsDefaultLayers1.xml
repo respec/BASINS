@@ -1,0 +1,140 @@
+<BasinsDefaultLayers DateCreated="3/30/2004 12:00:00 PM" DateModified="3/21/2005 12:30:00 PM">Defaults
+
+<Layer Filename="acc.shp" Name="Accounting Unit Boundaries" Group="Hydrology">
+ <RenderStyle FillStyle="None" LineColor="gray210" LineStyle="Solid">default</RenderStyle>
+</Layer>
+
+<Layer Filename="bac_stat.shp" Name="Bacteria Stations" Group="Stations">
+ <RenderStyle FillStyle="None" LineStyle="Solid" 
+  MarkColor="darkgreen" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+  MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+</Layer>
+
+<Layer Filename="cat.shp" Name="Cataloging Unit Boundaries" Group="Hydrology" Visible="yes">
+ <RenderStyle FillStyle="None" LineColor="gray120" LineStyle="Solid">default</RenderStyle>
+</Layer>
+
+<Layer Filename="catpt.shp" Name="Cataloging Unit Code" Group="Hydrology">
+ <RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+</Layer>
+
+<Layer Filename="cnty.shp" Name="County Boundaries" Group="Political">
+ <RenderStyle FillStyle="None" LineColor="gray165" LineStyle="Solid">default</RenderStyle>
+</Layer>
+
+<Layer Filename="cntypt.shp" Name="County Names" Group="Political">
+ <RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+</Layer>
+
+<Layer Filename="ecoreg.shp" Name="Ecoregions (Level III)">
+ <RenderStyle FillStyle="None" LineColor="gray165" LineStyle="Solid">default</RenderStyle>
+</Layer>
+
+<Layer Filename="epa_reg.shp" Name="EPA Region Boundaries" Group="Political">
+ <RenderStyle FillStyle="None" LineColor="gray165" LineStyle="Solid">default</RenderStyle>
+</Layer>
+
+<Layer Filename="fhards.shp" Name="Major Roads">
+ <RenderStyle FillStyle="None" LineColor="black" LineStyle="Solid">default</RenderStyle>
+</Layer>
+
+<Layer Filename="gage.shp" Name="USGS Gage Stations" Group="Stations">
+ <RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="blue" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+</Layer>
+
+<Layer Filename="huc250d3.shp" Name="Cataloging Unit Boundaries" Group="Hydrology">
+ <RenderStyle FillStyle="None" LineColor="gray120" LineStyle="Solid">default</RenderStyle>
+ <RenderStyle Value="+" FillColor="lightblue" FillStyle="Solid">Available</RenderStyle>
+</Layer>
+
+<Layer Filename="ifd.shp" Name="IFD" Group="Stations">
+<RenderStyle FillStyle="None" LineStyle="Solid" 
+ MarkColor="darkgreen" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16" 
+ MarkBits="0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000">default</RenderStyle></Layer>
+
+<Layer Filename="lulcndx.shp" Name="Land Use Index">
+<RenderStyle FillStyle="None" LineStyle="Solid">default</RenderStyle></Layer>
+
+<Layer Filename="mad.shp" Name="Managed Area Database">
+<RenderStyle FillStyle="None" LineColor="red3" LineStyle="Solid">default</RenderStyle></Layer>
+
+<Layer Filename="met_stat.shp" Name="Weather Station Area" Group="Stations">
+<RenderStyle FillStyle="None" LineColor="magenta" LineStyle="Solid">default</RenderStyle></Layer>
+
+<Layer Filename="metpt.shp" Name="Weather Station Sites" Group="Stations">
+<RenderStyle FillStyle="None" 
+ MarkColor="magenta" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16"
+ MarkBits="0000 0000 0000 0000 0000 FFFF FFFF 7FFE 03C0 07E0 0E70 1C38 381C 0000 0000 0000">default</RenderStyle></Layer>
+
+<Layer Filename="nawqa.shp" Name="NAWQA Study Area Unit Boundaries">
+<RenderStyle FillStyle="None" LineColor="green" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow">selected</RenderStyle></Layer>
+
+<Layer Filename="nsi.shp" Name="National Sediment Inventory Stations" Group="Stations">
+<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="maroon" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle></Layer>
+
+<Layer Filename="pappl.shp" Name="Place Names - Pa" Group="Political">
+<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="81 42 24 18 18 24 42 81">default</RenderStyle></Layer>
+
+<Layer Filename="pcs3.shp" Name="Permit Compliance System" Group="Stations">
+<RenderStyle FillStyle="None" LineStyle="Solid" 
+MarkColor="magenta" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16" 
+MarkBits="0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000">default</RenderStyle></Layer>
+
+<Layer Filename="rf1" Name="Reach File, V1" Group="Hydrology" Visible="yes">
+<RenderStyle FillColor="blue" FillStyle="None" LineColor="blue" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillStyle="Solid" LineColor="yellow">selected</RenderStyle></Layer>
+
+<Layer Filename="\landuse\" Name="Land Use" Group="Land Use" Visible="yes">
+<RenderStyle FillColor="blue" FillStyle="None" LineColor="blue" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillStyle="Solid" LineColor="yellow">selected</RenderStyle></Layer>
+
+<Layer Filename="\nhd\" Name="National Hydrography Dataset" Group="Hydrology" Visible="yes">
+<RenderStyle FillColor="blue" FillStyle="None" LineColor="blue" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillStyle="Solid" LineColor="yellow">selected</RenderStyle></Layer>
+
+<Layer Filename="st.shp" Name="State Boundaries" Group="Political" Visible="yes">
+<RenderStyle FillStyle="None" LineColor="gray50" LineStyle="Solid">default</RenderStyle></Layer>
+
+<Layer Filename="statsgo.shp" Name="State Soil">
+<RenderStyle FillStyle="None" LineColor="maroon" LineStyle="Solid">default</RenderStyle></Layer>
+
+<Layer Filename="tri.shp" Name="Toxic Release Inventory" Group="Stations">
+<RenderStyle FillStyle="None" LineStyle="Solid" 
+ MarkColor="maroon" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16" 
+ MarkBits="0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000">default</RenderStyle></Layer>
+
+<Layer Filename="urban.shp" Name="Urban Area Boundaries" Group="Political">
+<RenderStyle FillStyle="None" LineColor="black" LineStyle="Solid">default</RenderStyle></Layer>
+
+<Layer Filename="urban_nm.shp" Name="Urban Area Names" Group="Political">
+<RenderStyle FillStyle="None"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle></Layer>
+
+<Layer Filename="wdm.shp" Name="WDM Weather Data Stations" Group="Stations">
+<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="magenta" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="3C 42 81 99 99 81 42 3C">default</RenderStyle></Layer>
+
+<Layer Filename="wq_stat.shp" Name="Water Quality Stations" Group="Stations">
+<RenderStyle FillStyle="None" LineStyle="Solid" 
+ MarkColor="magenta" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8" 
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle></Layer>
+
+<Layer Filename="wqobs.shp" Name="Water Quality Observation Stations" Group="Stations">
+<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="red" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle></Layer>
+
+</BasinsDefaultLayers>

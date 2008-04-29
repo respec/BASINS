@@ -1,0 +1,154 @@
+<BasinsDefaultRenderers DateCreated="3/30/2004 12:00:00 PM" DateModified="3/30/2004 12:00:00 PM">Defaults
+
+<Renderer>acc<RenderStyle FillStyle="None" LineColor="gray210" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>bac_stat<RenderStyle FillStyle="None" LineStyle="Solid" 
+ MarkColor="darkgreen" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>cat<RenderStyle FillStyle="None" LineColor="gray120" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>catpt<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>cnty<RenderStyle FillStyle="None" LineColor="gray165" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>cntypt<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>ecoreg<RenderStyle FillStyle="None" LineColor="gray165" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>epa_reg<RenderStyle FillStyle="None" LineColor="gray165" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>fhards<RenderStyle FillStyle="None" LineColor="mediumpurple3" LineStyle="Solid">default</RenderStyle>
+<RenderStyle LineColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>gage<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="blue" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>huc250d3<RenderStyle FillStyle="None" LineColor="gray120" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle>
+<RenderStyle Value="+" FillColor="lightblue" FillStyle="Solid">Available</RenderStyle></Renderer>
+
+<Renderer>ifd<RenderStyle FillStyle="None" LineStyle="Solid" 
+ MarkColor="darkgreen" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16" 
+ MarkBits="0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>lulcndx<RenderStyle FillStyle="None" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>mad<RenderStyle FillStyle="None" LineColor="red3" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>met_stat<RenderStyle FillStyle="None" LineColor="magenta" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>metpt<RenderStyle FillStyle="None" 
+ MarkColor="magenta" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16"
+ MarkBits="0000 0000 0000 0000 0000 FFFF FFFF 7FFE 03C0 07E0 0E70 1C38 381C 0000 0000 0000">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>nawqa<RenderStyle FillStyle="None" LineColor="green" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>nsi<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="maroon" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>pappl<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="81 42 24 18 18 24 42 81">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>pcs3<RenderStyle FillStyle="None" LineStyle="Solid" 
+MarkColor="magenta" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16" 
+MarkBits="0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>rf1<RenderStyle FillColor="blue" FillStyle="None" LineColor="blue" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillStyle="Solid" LineColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>st<RenderStyle FillStyle="None" LineColor="gray50" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>statsgo<RenderStyle FillStyle="None" LineColor="maroon" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>tri<RenderStyle FillStyle="None" LineStyle="Solid" 
+ MarkColor="maroon" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="16" MarkBitsHeight="16" 
+ MarkBits="0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>urban<RenderStyle FillStyle="None" LineColor="black" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillColor="yellow" FillStyle="Solid">selected</RenderStyle></Renderer>
+
+<Renderer>urban_nm<RenderStyle FillStyle="None"
+ MarkColor="black" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle>
+</Renderer>
+
+<Renderer>wdm<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="magenta" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="3C 42 81 99 99 81 42 3C">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>wq_stat<RenderStyle FillStyle="None" LineStyle="Solid" 
+ MarkColor="magenta" MarkSize="4" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8" 
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle>
+</Renderer>
+
+<Renderer>wqobs<RenderStyle FillStyle="None" LineStyle="Solid"
+ MarkColor="red" MarkSize="8" MarkStyle="Bitmap" MarkBitsWidth="8" MarkBitsHeight="8"
+ MarkBits="00 7E 7E 7E 7E 7E 7E 00">default</RenderStyle>
+<RenderStyle MarkColor="yellow">selected</RenderStyle></Renderer>
+
+<Renderer>fhards<RenderStyle FillColor="black" FillStyle="None" LineColor="black" LineStyle="Solid">default</RenderStyle>
+<RenderStyle FillStyle="Solid" LineColor="yellow">selected</RenderStyle></Renderer>
+
+<MapLayer LayerData="acc" Visible="no">Accounting Unit Boundaries</MapLayer>
+<MapLayer LayerData="bac_stat" Visible="no">Bacteria Stations</MapLayer>
+<MapLayer LayerData="cat">Cataloging Unit Boundaries</MapLayer>
+<MapLayer LayerData="catpt" Visible="no">Cataloging Unit Code</MapLayer>
+<MapLayer LayerData="cnty" Visible="no">County Boundaries</MapLayer>
+<MapLayer LayerData="cntypt" Visible="no">County Names</MapLayer>
+<MapLayer LayerData="ecoreg" Visible="no">Ecoregions (Level III)</MapLayer>
+<MapLayer LayerData="epa_reg" Visible="no">EPA Region Boundaries</MapLayer>
+<MapLayer LayerData="fhards">Major Roads</MapLayer>
+<MapLayer LayerData="gage" Visible="no">USGS Gage Stations</MapLayer>
+<MapLayer LayerData="huc250d3">Cataloging Unit Boundaries</MapLayer>
+<MapLayer LayerData="ifd">Industrial Facilities Discharge Sites</MapLayer>
+<MapLayer LayerData="lulcndx" Visible="no">Land Use Index</MapLayer>
+<MapLayer LayerData="mad" Visible="no">Managed Area Database</MapLayer>
+<MapLayer LayerData="met_stat" Visible="no">Weather Station Area</MapLayer>
+<MapLayer LayerData="metpt" Visible="no">Weather Station Sites</MapLayer>
+<MapLayer LayerData="nawqa" Visible="no">NAWQA Study Area Unit Boundaries</MapLayer>
+<MapLayer LayerData="nsi" Visible="no">National Sediment Inventory Stations</MapLayer>
+<MapLayer LayerData="pappl" Visible="no" Renderer="pappl">Place Names - Pa</MapLayer>
+<MapLayer LayerData="pcs3" Visible="no">Permit Compliance System</MapLayer>
+<MapLayer LayerData="rf1">Reach File, V1</MapLayer>
+<MapLayer LayerData="st">State Boundaries</MapLayer>
+<MapLayer LayerData="statsgo" Visible="no">State Soil</MapLayer>
+<MapLayer LayerData="tri" Visible="no">Toxic Release Inventory</MapLayer>
+<MapLayer LayerData="urban" Visible="no">Urban Area Boundaries</MapLayer>
+<MapLayer LayerData="urban_nm" Visible="no">Urban Area Names</MapLayer>
+<MapLayer LayerData="wdm" Visible="no">WDM Weather Data Stations</MapLayer>
+<MapLayer LayerData="wq_stat" Visible="no">Water Quality Stations</MapLayer>
+<MapLayer LayerData="wqobs" Visible="no">Water Quality Observation Stations</MapLayer>
+
+</BasinsDefaultRenderers>

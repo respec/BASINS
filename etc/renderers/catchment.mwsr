@@ -1,0 +1,13 @@
+<SFRendering>
+  <Layer Name="Catchment" GroupName="Hydrology-NHDPlus" Type="3" Path="nhdplus\drainage\catchment.shp" Tag="" LegendPicture="" Visible="False" LabelsVisible="True" Expanded="False">
+    <Image Type="">
+    </Image>
+    <ShapeFileProperties Color="12800909" DrawFill="True" TransparencyPercent="0.2" FillStipple="0" LineOrPointSize="1" LineStipple="0" OutLineColor="10772823" PointType="0" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">
+      <CustomPointType>
+        <Image Type="">
+        </Image>
+      </CustomPointType>
+    </ShapeFileProperties>
+    <DynamicVisibility UseDynamicVisibility="False" xMin="0" yMin="0" xMax="0" yMax="0" />
+  </Layer>
+</SFRendering>

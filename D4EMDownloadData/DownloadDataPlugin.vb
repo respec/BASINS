@@ -196,6 +196,7 @@ Public Class DownloadDataPlugin
                     Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
                     'Logger.Msg(lQuery, "Query from frmDownload")
                     If lQuery.Length > 0 AndAlso Not lQuery.Equals(frmDownload.CancelString) Then
+                        Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
                         Dim lPlugins As New ArrayList
                         For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
                             Try

@@ -1,0 +1,22 @@
+<SFRendering>
+  <Layer Name="2002 Tiger Provisional" GroupName="Transportation" Type="2" Path="census\_tgr_p.shp" Tag="" LegendPicture="" Visible="False" LabelsVisible="True" Expanded="False">
+    <Image Type="">
+    </Image>
+    <ShapeFileProperties Color="2763429" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="1" LineStipple="0" OutLineColor="2763429" PointType="0" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">
+      <CustomPointType>
+        <Image Type="">
+        </Image>
+      </CustomPointType>
+      <Legend FieldIndex="9" Key="" NumberOfBreaks="5">
+        <ColorBreaks>
+          <Break StartColor="132" EndColor="132" StartValue="P1" EndValue="P18" Caption="Primary limited access" />
+          <Break StartColor="0" EndColor="0" StartValue="P2" EndValue="P28" Caption="Primary non-limited access" />
+          <Break StartColor="8026746" EndColor="8026746" StartValue="P3" EndValue="P38" Caption="Secondary" />
+          <Break StartColor="10921638" EndColor="10921638" StartValue="P4" EndValue="P48" Caption="Local" />
+          <Break StartColor="13158600" EndColor="13158600" StartValue="P5" EndValue="Z" Caption="Other" />
+        </ColorBreaks>
+      </Legend>
+    </ShapeFileProperties>
+    <DynamicVisibility UseDynamicVisibility="False" xMin="0" yMin="0" xMax="0" yMax="0" />
+  </Layer>
+</SFRendering>

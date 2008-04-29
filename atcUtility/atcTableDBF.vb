@@ -1241,4 +1241,97 @@ TryAgain:
         'Return lReturn
     End Function
 
+    '''' <summary>
+    '''' Add the non-duplicate fields from aAddFileName to aBaseFileName, save result in aBaseFileName
+    '''' Records that contain the same value in a field in each table are joined together
+    '''' </summary>
+    '''' <param name="aBaseFileName">DBF with fields that will come first in joined DBF</param>
+    '''' <param name="aAddFileName">DBF with fields that will be added</param>
+    '''' <param name="aBaseFieldName">Name of field to match in Base</param>
+    '''' <param name="aAddFieldName">Name of field to match in Add, defaults to aBaseFieldName</param>
+    '''' <remarks></remarks>
+    'Private Sub JoinAndSaveDbf(ByVal aBaseFileName As String, _
+    '                           ByVal aAddFileName As String, _
+    '                           ByVal aBaseFieldName As String, _
+    '                  Optional ByVal aAddFieldName As String = "")
+    '    If aAddFieldName.Length = 0 Then
+    '        aAddFieldName = aBaseFieldName
+    '    End If
+
+    '    Dim lBaseDbf As New atcTableDBF
+    '    If Not lBaseDbf.OpenFile(aBaseFileName) Then
+    '        Throw New ApplicationException("Cannot Open Base File " & aBaseFileName)
+    '    End If
+    '    Dim lBaseJoinField As Integer = lBaseDbf.FieldNumber(aBaseFieldName)
+    '    If lBaseJoinField = 0 Then
+    '        Throw New ApplicationException("Missing Join Field " & aBaseFieldName & " on " & aBaseFileName)
+    '    End If
+
+    '    Dim lAddDbf As New atcTableDBF
+    '    If Not lAddDbf.OpenFile(aAddFileName) Then
+    '        Throw New ApplicationException("Cannot Open Join File " & aAddFileName)
+    '    End If
+    '    Dim lAddJoinField As Integer = lAddDbf.FieldNumber(aAddFieldName)
+    '    If lAddJoinField = 0 Then
+    '        Throw New ApplicationException("Missing Join Field " & aAddFieldName & " on " & aAddFileName)
+    '    End If
+
+    '    'build the joined file
+    '    Dim lNewDbf As New atcTableDBF
+    '    Dim lAddDbfUseFields As New ArrayList 'field numbers to include from lAddDbf
+    '    Dim lOldFieldIndex As Integer
+    '    For lOldFieldIndex = 1 To lAddDbf.NumFields
+    '        'add fields from lAddDbf that are not the key and are not in lBaseDbf
+    '        If lOldFieldIndex <> lAddJoinField AndAlso lBaseDbf.FieldNumber(lAddDbf.FieldName(lOldFieldIndex)) = 0 Then
+    '            lAddDbfUseFields.Add(lOldFieldIndex)
+    '        End If
+    '    Next
+
+    '    lNewDbf.NumFields = lBaseDbf.NumFields + lAddDbfUseFields.Count
+    '    Dim lNewFieldIndex As Integer = 1
+    '    For lOldFieldIndex = 1 To lBaseDbf.NumFields
+    '        lNewDbf.FieldType(lNewFieldIndex) = lBaseDbf.FieldType(lOldFieldIndex)
+    '        lNewDbf.FieldLength(lNewFieldIndex) = lBaseDbf.FieldLength(lOldFieldIndex)
+    '        lNewDbf.FieldName(lNewFieldIndex) = lBaseDbf.FieldName(lOldFieldIndex)
+    '        lNewDbf.FieldDecimalCount(lNewFieldIndex) = lBaseDbf.FieldDecimalCount(lOldFieldIndex)
+    '        lNewFieldIndex += 1
+    '    Next
+    '    For Each lOldFieldIndex In lAddDbfUseFields
+    '        lNewDbf.FieldType(lNewFieldIndex) = lAddDbf.FieldType(lOldFieldIndex)
+    '        lNewDbf.FieldLength(lNewFieldIndex) = lAddDbf.FieldLength(lOldFieldIndex)
+    '        lNewDbf.FieldName(lNewFieldIndex) = lAddDbf.FieldName(lOldFieldIndex)
+    '        lNewDbf.FieldDecimalCount(lNewFieldIndex) = lAddDbf.FieldDecimalCount(lOldFieldIndex)
+    '        lNewFieldIndex += 1
+    '    Next
+    '    lNewDbf.NumRecords = lBaseDbf.NumRecords
+    '    lNewDbf.FileName = lBaseDbf.FileName
+    '    lNewDbf.InitData()
+
+    '    'do the join
+    '    Dim lJoinValue As String
+    '    For lRecordIndex As Integer = 1 To lNewDbf.NumRecords
+    '        lBaseDbf.CurrentRecord = lRecordIndex
+    '        lNewDbf.CurrentRecord = lRecordIndex
+    '        lNewFieldIndex = 1
+    '        For lOldFieldIndex = 1 To lBaseDbf.NumFields
+    '            lNewDbf.Value(lNewFieldIndex) = lBaseDbf.Value(lOldFieldIndex)
+    '            lNewFieldIndex += 1
+    '        Next
+    '        lJoinValue = lBaseDbf.Value(lBaseJoinField)
+    '        If lAddDbf.FindFirst(lAddJoinField, lJoinValue) Then
+    '            For Each lFieldIndex As Integer In lAddDbfUseFields
+    '                lNewDbf.Value(lNewFieldIndex) = lAddDbf.Value(lFieldIndex)
+    '                lNewFieldIndex += 1
+    '            Next
+    '        Else
+    '            Logger.Dbg("No record found to join key " & lJoinValue)
+    '        End If
+    '    Next
+    '    lBaseDbf.Clear()
+    '    lAddDbf.Clear()
+    '    lNewDbf.WriteFile(aBaseFileName)
+    '    TryDelete(aAddFileName)
+    '    Logger.Dbg("Joined " & IO.Path.GetFileName(aAddFileName) & " to " & IO.Path.GetFileName(aBaseFileName))
+    'End Sub
+
 End Class
