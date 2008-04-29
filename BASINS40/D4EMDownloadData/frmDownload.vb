@@ -1,4 +1,5 @@
 Imports System.Net
+Imports atcUtility
 
 Public Class frmDownload
 
@@ -344,5 +345,11 @@ Public Class frmDownload
         '    End If
         '    BASINS.DownloadNewData(lDirectory)
         '    Me.Close()
+    End Sub
+
+    Private Sub frmDownload_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Download.html")
+        End If
     End Sub
 End Class
