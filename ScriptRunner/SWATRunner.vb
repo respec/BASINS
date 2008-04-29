@@ -5,7 +5,7 @@ Imports atcUtility
 Imports SwatObject
 
 Module SWATRunner
-    Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline30jack"
+    Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline90jack"
     Private Const pSWATGDB As String = "SWAT2005.mdb"
     Private Const pOutGDB As String = "baseline90.mdb"
     Private Const pOutputFolder = pInputPath & "\Scenarios\Default\TxtInOut"
@@ -20,17 +20,27 @@ Module SWATRunner
 
         'log for swat runner
         Logger.StartToFile(pInputPath & "\logs\SWATRunner.log", , , True)
-
-        Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
-        'With SwatInput - does not work???
         SwatInput.Initialize(pSWATGDB, pOutGDB, pOutputFolder)
         Logger.Dbg("HRU RowCount:" & SwatInput.Hru.Table.Rows.Count)
-        'End With
+
+
+        Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
 
         Logger.Dbg("SWATSummarizeInput")
-        SaveFileString(pInputPath & "\logs\AreaLandUseReport.txt", SWATArea.Report("LandUse"))
-        SaveFileString(pInputPath & "\logs\AreaSoilReport.txt", SWATArea.Report("Soil"))
-        SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", SWATArea.Report("Slope_Cd"))
+        Dim lStreamWriter As New IO.StreamWriter(pInputPath & "\logs\LandUses.txt")
+        Dim lUniqueLandUses As DataTable = SwatInput.Hru.UniqueValues("LandUse")
+        For Each lLandUse As DataRow In lUniqueLandUses.Rows
+            lStreamWriter.WriteLine(lLandUse.Item(0).ToString)
+        Next
+        lStreamWriter.Close()
+
+        Dim lLandUSeTable As DataTable = AggregateCrops(SwatInput.SubBasin.TableWithArea("LandUse"))
+        SaveFileString(pInputPath & "\logs\AreaLandUseReport.txt", _
+                       SWATArea.Report(lLandUSeTable))
+        SaveFileString(pInputPath & "\logs\AreaSoilReport.txt", _
+                       SWATArea.Report(SwatInput.SubBasin.TableWithArea("Soil")))
+        SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", _
+                       SWATArea.Report(SwatInput.SubBasin.TableWithArea("Slope_Cd")))
 
         Logger.Dbg("SwatModelRunStartIn " & pOutputFolder)
         Try 'to run swat
@@ -51,8 +61,6 @@ Module SWATRunner
             lSwatProcess.BeginErrorReadLine()
             lSwatProcess.BeginOutputReadLine()
             lSwatProcess.WaitForExit()
-            SaveFileString(pInputPath & "\logs\SWATError.txt", pSwatError.ToString)
-            SaveFileString(pInputPath & "\logs\SWATOutput.txt", pSwatOutput.ToString)
         Catch lEx As ApplicationException
             Logger.Dbg("SwatRunProblem " & lEx.Message)
         End Try
@@ -67,26 +75,24 @@ Module SWATRunner
     Private Sub OutputDataHandler(ByVal aSendingProcess As Object, _
                                   ByVal aOutLine As DataReceivedEventArgs)
         If Not String.IsNullOrEmpty(aOutLine.Data) Then
-            pSwatOutput.Append(Environment.NewLine + "  " + aOutLine.Data)
+            Logger.Dbg(aOutLine.Data.ToString)
         End If
     End Sub
 
     Private Sub ErrorDataHandler(ByVal aSendingProcess As Object, _
                                  ByVal aErrLine As DataReceivedEventArgs)
         If Not String.IsNullOrEmpty(aErrLine.Data) Then
-            pSwatError.Append(Environment.NewLine + "  " + aErrLine.Data)
+            Logger.Dbg(aErrLine.Data.ToString)
         End If
     End Sub
 End Module
 
 Module SWATArea
-    Public Function Report(ByVal aAggreationFieldName As String) As String
+    Public Function Report(ByVal aReportTable As DataTable) As String
         Dim lFormat As String = "###,##0.00"
-        'get SubBasin info from database
-        Dim lReportTable As DataTable = SwatInput.SubBasin.TableWithArea(aAggreationFieldName)
 
-        With lReportTable
-            Dim lAreaTotals(.Columns.Count)
+        With aReportTable
+            Dim lAreaTotals(.Columns.Count) As Double
             Dim lSb As New Text.StringBuilder
             Dim lStr As String = ""
             For lColumnIndex As Integer = 0 To .Columns.Count - 1
@@ -112,5 +118,39 @@ Module SWATArea
             Logger.Dbg("AreaTotalReportComplete " & lAreaTotals(1))
             Return lSb.ToString
         End With
+    End Function
+
+    Public Function AggregateCrops(ByVal aInputTable As DataTable) As DataTable
+        Dim lArea As Double = 0.0
+        Dim lCornFraction As New atcCollection
+        lCornFraction.Add("CCCC", 1.0)
+        lCornFraction.Add("CCS1", 0.66667)
+        lCornFraction.Add("CSC1", 0.66667)
+        lCornFraction.Add("CSS1", 0.33333)
+        lCornFraction.Add("SCC1", 0.66667)
+        lCornFraction.Add("SCS1", 0.33333)
+        lCornFraction.Add("SSC1", 0.33333)
+        lCornFraction.Add("SSSC", 0.25)
+
+        Dim lOutputTable As DataTable = aInputTable.Copy
+        Dim lCornColumnIndex = lOutputTable.Columns.Count
+        lOutputTable.Columns.Add("CORN")
+        Dim lSoybColumnIndex = lOutputTable.Columns.Count
+        lOutputTable.Columns.Add("SOYB")
+
+        For Each lRow As DataRow In lOutputTable.Rows
+            lRow(lCornColumnIndex) = 0.0
+            lRow(lSoybColumnIndex) = 0.0
+            For lColumnIndex As Integer = 2 To lOutputTable.Columns.Count - 2
+                Dim lColumnName As String = lOutputTable.Columns(lColumnIndex).ColumnName
+                Dim lColumnKeyIndex As Integer = lCornFraction.IndexFromKey(lColumnName)
+                If lColumnKeyIndex >= 0 Then
+                    lArea = lRow(lColumnIndex)
+                    lRow(lCornColumnIndex) += lArea * lCornFraction(lColumnKeyIndex)
+                    lRow(lSoybColumnIndex) += lArea * (1 - lCornFraction(lColumnKeyIndex))
+                End If
+            Next
+        Next
+        Return lOutputTable
     End Function
 End Module
