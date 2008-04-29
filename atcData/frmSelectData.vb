@@ -284,6 +284,7 @@ Friend Class frmSelectData
         Me.Controls.Add(Me.splitAboveSelected)
         Me.Controls.Add(Me.pnlButtons)
         Me.Controls.Add(Me.groupTop)
+        Me.KeyPreview = True
         Me.Menu = Me.MainMenu1
         Me.Name = "frmSelectData"
         Me.groupTop.ResumeLayout(False)
@@ -1011,6 +1012,12 @@ NextName:
     Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click
         pSelectedGroup.Clear()
         pSelectedGroup.Add(AvailableData)
+    End Sub
+
+    Private Sub frmSelectData_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+        End If
     End Sub
 
     Private Sub frmSelectData_VisibleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.VisibleChanged

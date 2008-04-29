@@ -1,3 +1,4 @@
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmSelectDisplay
@@ -197,6 +198,7 @@ Public Class frmSelectDisplay
         Me.Controls.Add(Me.lblDescribeDatasets)
         Me.Controls.Add(Me.GroupBox1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Name = "frmSelectDisplay"
         Me.Text = "Display Data"
         Me.GroupBox1.ResumeLayout(False)
@@ -278,5 +280,11 @@ Public Class frmSelectDisplay
     Private Sub btnSelect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelect.Click
         pDataGroup = atcDataManager.UserSelectData("Select Data", pDataGroup)
         FormFromGroup()
+    End Sub
+
+    Private Sub frmSelectDisplay_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
+        End If
     End Sub
 End Class
