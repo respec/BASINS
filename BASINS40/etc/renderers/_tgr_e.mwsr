@@ -1,0 +1,13 @@
+<SFRendering>
+  <Layer Name="2002 Tiger Physical Feature" GroupName="Census" Type="2" Path="census\_tgr_e.shp" Tag="" LegendPicture="" Visible="False" LabelsVisible="True" Expanded="False">
+    <Image Type="">
+    </Image>
+    <ShapeFileProperties Color="2763429" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="1" LineStipple="0" OutLineColor="2763429" PointType="0" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">
+      <CustomPointType>
+        <Image Type="">
+        </Image>
+      </CustomPointType>
+    </ShapeFileProperties>
+    <DynamicVisibility UseDynamicVisibility="False" xMin="0" yMin="0" xMax="0" yMax="0" />
+  </Layer>
+</SFRendering>

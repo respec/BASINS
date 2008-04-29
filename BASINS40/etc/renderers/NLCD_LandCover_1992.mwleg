@@ -1,0 +1,16 @@
+<ColoringScheme SchemeType="Grid">
+  <GridColoringScheme AmbientIntensity="0.7" Key="" LightSourceAzimuth="90" LightSourceElevation="45" LightSourceIntensity="0.7" NoDataColor="-16777216">
+    <Break Caption="Water" LowValue="10" HighValue="12" LowColor="-16776961" HighColor="-16776961" ColoringType="2" GradientModel="1" />
+    <Break Caption="Urban" LowValue="20" HighValue="23" LowColor="-65281" HighColor="-65281" ColoringType="2" GradientModel="1" />
+    <Break Caption="Barren or Mining" LowValue="30" HighValue="32" LowColor="-65536" HighColor="-65536" ColoringType="2" GradientModel="1" />
+    <Break Caption="Transitional" LowValue="33" HighValue="33" LowColor="-32640" HighColor="-32640" ColoringType="2" GradientModel="1" />
+    <Break Caption="Forest" LowValue="40" HighValue="43" LowColor="-16744448" HighColor="-16744448" ColoringType="2" GradientModel="1" />
+    <Break Caption="Upland Shrub Land" LowValue="50" HighValue="53" LowColor="-16711936" HighColor="-16711936" ColoringType="2" GradientModel="1" />
+    <Break Caption="Agriculture - Cropland" LowValue="60" HighValue="61" LowColor="-256" HighColor="-256" ColoringType="2" GradientModel="1" />
+    <Break Caption="Grass Land" LowValue="70" HighValue="71" LowColor="-8323200" HighColor="-8323200" ColoringType="2" GradientModel="1" />
+    <Break Caption="Agriculture - Cropland" LowValue="80" HighValue="80" LowColor="-256" HighColor="-256" ColoringType="2" GradientModel="1" />
+    <Break Caption="Agriculture - Pasture" LowValue="81" HighValue="81" LowColor="-32768" HighColor="-32768" ColoringType="2" GradientModel="1" />
+    <Break Caption="Agriculture - Cropland" LowValue="82" HighValue="85" LowColor="-256" HighColor="-256" ColoringType="2" GradientModel="1" />
+    <Break Caption="Wetlands" LowValue="90" HighValue="92" LowColor="-16711681" HighColor="-16711681" ColoringType="2" GradientModel="1" />
+  </GridColoringScheme>
+</ColoringScheme>

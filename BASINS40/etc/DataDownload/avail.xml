@@ -1,0 +1,13 @@
+<ATCCompMl>
+    <Component
+        File="avail.dbf"
+        Date="07/03/2001 02:45:48 pm"
+        Size="850,129"
+        Name="avail"
+        Destination="{app}\etc\DataDownload"
+        Version="">
+        <ReleaseNote>Released with BASINS 3.1</ReleaseNote>
+
+    </Component>
+
+</ATCCompMl>

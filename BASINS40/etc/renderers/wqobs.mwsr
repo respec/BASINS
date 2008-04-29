@@ -1,0 +1,13 @@
+<SFRendering>
+  <Layer Name="Water Quality Observation" Type="1" Path="wqobs.shp" Tag="" LegendPicture="" Visible="False" LabelsVisible="True" Expanded="False">
+    <Image Type="">
+    </Image>
+    <ShapeFileProperties Color="255" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="8" LineStipple="0" OutLineColor="0" PointType="0" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">
+      <CustomPointType>
+        <Image Type="">
+        </Image>
+      </CustomPointType>
+    </ShapeFileProperties>
+    <DynamicVisibility UseDynamicVisibility="False" xMin="0" yMin="0" xMax="0" yMax="0" />
+  </Layer>
+</SFRendering>

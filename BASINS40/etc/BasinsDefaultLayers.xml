@@ -1,0 +1,82 @@
+<BasinsDefaultLayers DateCreated="3/30/2004 12:00:00 PM" DateModified="4/25/2008 5:15:00 PM">
+
+<Layer Filename="elev_cm.tif" Name="NHDPlus Elevation" Group="Elevation" Visible="yes" />
+<Layer Filename="cat.tif" Name="NHDPlus Cat" Group="NHDPlus" Visible="no" />
+<Layer Filename="fac.tif" Name="NHDPlus Flow Accumulation" Group="NHDPlus" Visible="no" />
+<Layer Filename="fdr.tif" Name="NHDPlus Flow Direction" Group="NHDPlus" Visible="no" />
+
+<Layer Filename="Basin.shp" Name="NHDPlus Basin" Group="NHDPlus" Visible="yes" />
+<Layer Filename="Catchment.shp" Name="NHDPlus Catchment" Group="NHDPlus" Visible="yes" />
+<Layer Filename="nhdarea.shp" Name="NHDPlus Area" Group="NHDPlus" Visible="yes" />
+<Layer Filename="NHDFlowline.shp" Name="NHDPlus Flowline" Group="NHDPlus" Visible="yes" />
+<Layer Filename="NHDLine.shp" Name="NHDPlus Line" Group="NHDPlus" Visible="yes" />
+<Layer Filename="NHDPoint.shp" Name="NHDPlus Point" Group="NHDPlus" Visible="yes" />
+<Layer Filename="NHDWaterbody.shp" Name="NHDPlus Waterbody" Group="NHDPlus" Visible="yes" />
+<Layer Filename="Region.shp" Name="NHDPlus Region" Group="NHDPlus" Visible="yes" />
+<Layer Filename="streamgageevent.shp" Name="NHDPlus Streamgage Event" Group="NHDPlus" Visible="yes" />
+<Layer Filename="SubBasin.shp" Name="NHDPlus SubBasin" Group="NHDPlus" Visible="yes" />
+<Layer Filename="Subregion.shp" Name="NHDPlus Subregion" Group="NHDPlus" Visible="yes" />
+<Layer Filename="Subwatershed.shp" Name="NHDPlus Subwatershed" Group="NHDPlus" Visible="yes" />
+<Layer Filename="Watershed.shp" Name="NHDPlus Watershed" Group="NHDPlus" Visible="yes" />
+
+<Layer Filename="NLCD_LandCover_2001.tif" Name="NLCD 2001 Landcover" Group="Soil, Land Use/Cover" Visible="yes" />
+<Layer Filename="NLCD_Impervious_2001.tif" Name="NLCD 2001 Impervious" Group="Soil, Land Use/Cover" Visible="yes" />
+<Layer Filename="NLCD_Canopy_2001.tif" Name="NLCD 2001 Canopy" Group="Soil, Land Use/Cover" Visible="yes" />
+
+<Layer Filename="acc.shp" Name="Accounting Unit Boundaries" Group="Hydrology" />
+<Layer Filename="bac_stat.shp" Name="Bacteria" Group="Observed Data Stations" />
+<Layer Filename="cat.shp" Name="Cataloging Unit Boundaries" Group="Hydrology" Visible="yes" />
+<Layer Filename="catpt.shp" Name="Cataloging Unit Code" Group="Hydrology" />
+<Layer Filename="cnty.shp" Name="County Boundaries" Group="Political" />
+<Layer Filename="cntypt.shp" Name="County Names" Group="Political" />
+<Layer Filename="ecoreg.shp" Name="Ecoregions (Level III)" Group="Soil, Land Use/Cover" />
+<Layer Filename="epa_reg.shp" Name="EPA Region Boundaries" Group="Political" />
+<Layer Filename="fhards.shp" Name="Major Roads" Group="Transportation" />
+<Layer Filename="gage.shp" Name="USGS Gage" Group="Observed Data Stations" />
+<Layer Filename="huc250d3.shp" Name="Cataloging Unit Boundaries" Group="Hydrology" />
+<Layer Filename="ifd.shp" Name="IFD" Group="Observed Data Stations" />
+<Layer Filename="lulcndx.shp" Name="Land Use Index" Group="Soil, Land Use/Cover" />
+<Layer Filename="mad.shp" Name="Managed Area Database" Group="Soil, Land Use/Cover" />
+<Layer Filename="met_stat.shp" Name="Weather Station Area" Group="Observed Data Stations" />
+<Layer Filename="metpt.shp" Name="Weather Station Sites" Group="Observed Data Stations" />
+<Layer Filename="met.shp" Name="Weather Station Sites 2005" Group="Observed Data Stations" Visible="yes" />
+<Layer Filename="nawqa.shp" Name="NAWQA Study Area Unit Boundaries" Group="Observed Data Stations" />
+<Layer Filename="nsi.shp" Name="National Sediment Inventory Stations" Group="Observed Data Stations" />
+<Layer Filename="pappl.shp" Name="Place Names - Pa" Group="Political" />
+<Layer Filename="pcs3.shp" Name="Permit Compliance System" Group="Point Sources and Withdrawals" />
+<Layer Filename="rf1" Name="Reach File, V1" Group="Hydrology" Visible="yes" />
+<Layer Filename="nhd\" Name="National Hydrography Dataset" Group="Hydrology" Visible="yes" />
+<Layer Filename="dem\" Name="Digital Elevation Model" Group="Elevation" Visible="yes" />
+<Layer Filename="ned\" Name="National Elevation Dataset" Group="Elevation" Visible="yes" />
+<Layer Filename="landuse\" Name="Land Use" Group="Soil, Land Use/Cover" Visible="yes" />
+<Layer Filename="st.shp" Name="State Boundaries" Group="Political" Visible="yes" />
+<Layer Filename="statsgo.shp" Name="State Soil" Group="Soil, Land Use/Cover" />
+<Layer Filename="tri.shp" Name="Toxic Release Inventory" Group="Observed Data Stations" />
+<Layer Filename="urban.shp" Name="Urban Area Boundaries" Group="Political" />
+<Layer Filename="urban_nm.shp" Name="Urban Area Names" Group="Political" />
+<Layer Filename="wdm.shp" Name="WDM Weather Data" Group="Observed Data Stations" />
+<Layer Filename="wq_stat.shp" Name="Water Quality" Group="Observed Data Stations" />
+<Layer Filename="wqobs.shp" Name="Water Quality Observation" Group="Observed Data Stations" />
+
+<Layer Filename="_bg00.shp" Name="2000 Block Group" Group="Census" />
+<Layer Filename="_bg90.shp" Name="1990 Block Group" Group="Census" />
+<Layer Filename="_co00.shp" Name="2000 County" Group="Census" />
+<Layer Filename="_co90.shp" Name="1990 County" Group="Census" />
+<Layer Filename="_pl00.shp" Name="2000 Place" Group="Census" />
+<Layer Filename="_pl90.shp" Name="1990 Place" Group="Census" />
+<Layer Filename="_tr00.shp" Name="2000 Tract" Group="Census" />
+<Layer Filename="_tr90.shp" Name="1990 Tract" Group="Census" />
+<Layer Filename="_zt00.shp" Name="2000 Zip Code" Group="Census" />
+<Layer Filename="_tgr_a.shp" Name="2002 Tiger Road" Group="Transportation" Visible="yes" />
+<Layer Filename="_tgr_b.shp" Name="2002 Tiger Railroad" Group="Transportation" />
+<Layer Filename="_tgr_c.shp" Name="2002 Tiger Misc Ground" Group="Transportation" />
+<Layer Filename="_tgr_d.shp" Name="2002 Tiger Landmark" Group="Census" />
+<Layer Filename="_tgr_e.shp" Name="2002 Tiger Physical Feature" Group="Census" />
+<Layer Filename="_tgr_f.shp" Name="2002 Tiger Nonvisible Feature" Group="Census" />
+<Layer Filename="_tgr_p.shp" Name="2002 Tiger Provisional" Group="Transportation" />
+
+<Layer Filename="_p.shp" Name="303d List - Points" Group="Regulatory" />
+<Layer Filename="_l.shp" Name="303d List - Lines" Group="Regulatory" />
+<Layer Filename="_a.shp" Name="303d List - Areas" Group="Regulatory" />
+
+</BasinsDefaultLayers>

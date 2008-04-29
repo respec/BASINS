@@ -1,0 +1,9 @@
+<ColoringScheme SchemeType="Grid">
+  <GridColoringScheme AmbientIntensity="0.7" Key="" LightSourceAzimuth="90" LightSourceElevation="45" LightSourceIntensity="0.7" NoDataColor="-16777216">
+    <Break Caption="10" LowValue="1" HighValue="10" LowColor="-16744448" HighColor="-13395661" ColoringType="1" GradientModel="1" />
+    <Break Caption="30" LowValue="10" HighValue="30" LowColor="-13395661" HighColor="-10046618" ColoringType="1" GradientModel="1" />
+    <Break Caption="100" LowValue="30" HighValue="100" LowColor="-10046618" HighColor="-6697831" ColoringType="1" GradientModel="1" />
+    <Break Caption="300" LowValue="100" HighValue="300" LowColor="-6697831" HighColor="-3348788" ColoringType="1" GradientModel="1" />
+    <Break Caption="&gt; 300" LowValue="300" HighValue="1000000" LowColor="-3348788" HighColor="-1" ColoringType="1" GradientModel="1" />
+  </GridColoringScheme>
+</ColoringScheme>
