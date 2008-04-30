@@ -5,6 +5,8 @@ Imports atcUtility
 Imports SwatObject
 
 Module SWATRunner
+    Private Const pRefreshDB As Boolean = False
+    Private Const pBasePath As String = "D:\Basins\data\SWATOutput\UM\baseline90"
     Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline90jack"
     Private Const pSWATGDB As String = "SWAT2005.mdb"
     Private Const pOutGDB As String = "baseline90.mdb"
@@ -20,11 +22,23 @@ Module SWATRunner
 
         'log for swat runner
         Logger.StartToFile(pInputPath & "\logs\SWATRunner.log", , , True)
-        SwatInput.Initialize(pSWATGDB, pOutGDB, pOutputFolder)
-        Logger.Dbg("HRU RowCount:" & SwatInput.Hru.Table.Rows.Count)
 
+        If pRefreshDB Then 'copy the entire input parameter database for this new scenario
+            If IO.File.Exists(pOutGDB) Then
+                Logger.Dbg("DeleteExisting " & pOutGDB)
+                IO.File.Delete(pOutGDB)
+            End If
+            IO.File.Copy(pBasePath & "\" & pOutGDB, pOutGDB)
+        End If
+
+        Logger.Dbg("InitializeSwatInput")
+        SwatInput.Initialize(pSWATGDB, pOutGDB, pOutputFolder)
 
         Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
+        For Each lString As String In LinesInFile("SWATParmChanges.txt")
+            Dim lParms() As String = lString.Split(";")
+            SwatInput.UpdateInputDB(lParms(0).Trim, lParms(1).Trim, lParms(2).Trim, lParms(3).Trim, lParms(4).Trim)
+        Next
 
         Logger.Dbg("SWATSummarizeInput")
         Dim lStreamWriter As New IO.StreamWriter(pInputPath & "\logs\LandUses.txt")
