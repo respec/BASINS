@@ -141,7 +141,26 @@ Friend Class CShape_IO
 	Private IndexIsOpen As Boolean 'boolean value identifies if file is open
 	
 	Private RecordCount As Integer 'variable to hold the record count. calculated from index file
-	
+
+    Public Function SwapBytes(ByVal n As Integer) As Integer
+        ' ##SUMMARY Swaps between big and little endian 32-bit integers.
+        ' ##SUMMARY   Example: SwapBytes(1) = 16777216
+        ' ##PARAM N I Any long integer
+        ' ##RETURNS Modified input parameter N.
+        Dim OrigBytes As Byte()
+        Dim NewBytes As Byte()
+        ' ##LOCAL OrigBytes - stores original bytes
+        ' ##LOCAL NewBytes - stores new bytes
+
+        OrigBytes = BitConverter.GetBytes(n)
+        ReDim NewBytes(3)
+        NewBytes(0) = OrigBytes(3)
+        NewBytes(1) = OrigBytes(2)
+        NewBytes(2) = OrigBytes(1)
+        NewBytes(3) = OrigBytes(0)
+        Return BitConverter.ToInt32(NewBytes, 0)
+    End Function
+
 	'********************************************************************************
 	'Name ShapeFileOpen
 	'Arguments :    FileName  The filename of the Shapefile to open

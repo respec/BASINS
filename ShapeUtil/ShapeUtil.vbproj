@@ -22,7 +22,7 @@
     <MyType>WindowsFormsWithCustomSubMain</MyType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>ShapeUtil.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <DefineConstants>Win32 = True</DefineConstants>
@@ -38,7 +38,7 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>ShapeUtil.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <DefineConstants>Win32 = True</DefineConstants>
@@ -54,9 +54,10 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinUtility, Version=1.0.2442.22516, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinUtility, Version=1.0.3041.26507, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\BASINS40\Bin\MapWinUtility.dll</HintPath>
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -108,9 +109,6 @@
     <Compile Include="ShapeDefines.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UTILITY.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <EmbeddedResource Include="frmShapeUtil.resX">
       <DependentUpon>frmShapeUtil.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -121,7 +119,10 @@
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
+      <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
