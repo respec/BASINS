@@ -310,7 +310,7 @@ NextSide:
 
         XYPoint.ShapeType = CShape_IO.FILETYPEENUM.typePoint 'typePoint = 1
         shp = New CShape_IO
-        shpFilename = FilenameNoExt(aDBF.FileName) & ".shp"
+        shpFilename = IO.Path.ChangeExtension(aDBF.FileName, ".shp")
         shp.CreateNewShape(shpFilename, XYPoint.ShapeType)
         For iRecord = 1 To aDBF.NumRecords
             aDBF.CurrentRecord = iRecord
@@ -320,7 +320,7 @@ NextSide:
             Else
                 XYPoint.thePoint.x = 0
                 nNonNumericLon = nNonNumericLon + 1
-                AppendFileString(FilenameNoExt(shpFilename) & ".err", "Non-numeric longitude at " & iRecord & ": " & vCoordinate & vbCrLf)
+                IO.File.AppendAllText(IO.Path.ChangeExtension(shpFilename, ".err"), "Non-numeric longitude at " & iRecord & ": " & vCoordinate & vbCrLf)
             End If
 
             vCoordinate = aDBF.Value(aLatitudeYfield)
@@ -329,7 +329,7 @@ NextSide:
             Else
                 XYPoint.thePoint.y = 0
                 nNonNumericLat = nNonNumericLat + 1
-                AppendFileString(FilenameNoExt(shpFilename) & ".err", "Non-numeric latitude at " & iRecord & ": " & vCoordinate & vbCrLf)
+                IO.File.AppendAllText(IO.Path.ChangeExtension(shpFilename, ".err"), "Non-numeric latitude at " & iRecord & ": " & vCoordinate & vbCrLf)
             End If
             shp.putXYPoint(0, XYPoint)
         Next

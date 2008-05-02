@@ -36,19 +36,15 @@ Module modMain
         Dim shpFileNames As New ArrayList
         Dim dumpFlag As Boolean
         Dim starttime As Date
-        Dim tmpLogFilename As String
 
         starttime = Now
         cmd = Environment.CommandLine
         If Len(cmd) > 0 Then
             Try
-                tmpLogFilename = GetTmpPath()
-                If Right(tmpLogFilename, 1) <> "\" Then tmpLogFilename &= "\"
-                tmpLogFilename &= "ShapeUtil.log"
-
-                Logger.StartToFile(tmpLogFilename)
-                Logger.TimeStamping = True
-
+                If Logger.FileName Is Nothing OrElse Logger.FileName.Length = 0 Then
+                    Logger.StartToFile(IO.Path.Combine(IO.Path.GetTempPath, "ShapeUtil.log"))
+                    Logger.TimeStamping = True
+                End If
                 Logger.Dbg("ShapeUtil CommandLine '" & cmd & "'")
 
                 exeFilename = StrSplit(cmd, " ", """")
@@ -62,7 +58,7 @@ Module modMain
                             TryShapePointsFromDBF(FilenameNoExt(curFilename) & ".dbf")
                         End If
                         If IO.File.Exists(curFilename) Then
-                            If LCase(FileExt(curFilename)) = "proj" Then
+                            If curFilename.ToLower.EndsWith(".proj") Then
                                 If Len(projectionDest) = 0 Then
                                     projectionDest = curFilename
                                 Else
@@ -88,7 +84,7 @@ Module modMain
                             ShapeProject(projectionDest, projectionSource, shpFileNames)
                         End If
                         'frmShapeUtil.lblStatus.Caption = "Merging into " & newBaseFilename
-                        ShapeMerge(GetKeyField(FilenameOnly(newBaseFilename)), newBaseFilename, shpFileNames)
+                        ShapeMerge(GetKeyField(IO.Path.GetFileNameWithoutExtension(newBaseFilename)), newBaseFilename, shpFileNames)
                     ElseIf Len(projectionDest) > 0 Then
                         shpFileNames(0) = newBaseFilename
                         'frmShapeUtil.lblStatus.Caption = "Projecting..."
@@ -99,15 +95,11 @@ Module modMain
                 End If
                 Logger.Dbg("Elapsed time: " & Format((Now - starttime).TotalSeconds, "0.### sec"))
                 Logger.Flush()
-                AppendFileString(GetLogFilename(IO.Path.GetDirectoryName(newBaseFilename), "shape"), WholeFileString(Logger.FileName))
-                Try
-                    Kill(tmpLogFilename)
-                Catch
-                End Try
+                'IO.File.AppendAllText(GetLogFilename(IO.Path.GetDirectoryName(newBaseFilename), "shape"), IO.File.ReadAllText(Logger.FileName))
             Catch ex As Exception
                 If Logger.Msg(ex.Message & vbCrLf & "View Trace?", MsgBoxStyle.YesNo, "ShapeUtil Main") = MsgBoxResult.Yes Then
                     Logger.Flush()
-                    MsgBox(WholeFileString(Logger.FileName))
+                    MsgBox(IO.File.ReadAllText(Logger.FileName))
                 End If
             End Try
         End If
@@ -138,20 +130,6 @@ Module modMain
         aDefaultPath = aDefaultPath & Format(Today, "log\\yyyy-mm-dd") & Format(TimeOfDay, "atHH-MM")
 		If Len(aDefaultSuffix) > 0 Then aDefaultPath = aDefaultPath & "_" & aDefaultSuffix
 		GetLogFilename = aDefaultPath & ".txt"
-	End Function
-	
-	Private Function GetTmpPath() As String
-		Dim strFolder As String
-		Dim lngResult As Integer
-		Dim MAX_PATH As Integer
-		MAX_PATH = 260
-		strFolder = New String(Chr(0), MAX_PATH)
-		lngResult = GetTempPath(MAX_PATH, strFolder)
-		If lngResult <> 0 Then
-			GetTmpPath = Left(strFolder, InStr(strFolder, Chr(0)) - 1)
-		Else
-			GetTmpPath = ""
-		End If
 	End Function
 	
 	Private Function TryShapePointsFromDBF(ByRef dbfFilename As String) As Boolean
