@@ -75,13 +75,13 @@ Public Class atcTimeseriesGroupBuilder
 
     Public Sub CreateTimeseriesAddToGroup(ByVal aGroup As atcDataGroup)
         Logger.Status("Creating Timeseries")
-        Dim lCount As Integer = 0
-        For Each lBuilder As atcTimeseriesBuilder In pBuilders
-            Dim lDataSet As atcTimeseries = lBuilder.CreateTimeseries
-            aGroup.Add(lDataSet.Attributes.GetValue("ID"), lDataSet)
-            lCount += 1
-            Logger.Progress(lCount, pBuilders.Count)
+        Dim lLastBuilder As Integer = pBuilders.Count - 1
+        For lBuilderIndex As Integer = 0 To lLastBuilder
+            Dim lDataSet As atcTimeseries = pBuilders.ItemByIndex(lBuilderIndex).CreateTimeseries
+            aGroup.Add(lDataSet.Attributes.GetValue("ID", lBuilderIndex), lDataSet)
+            Logger.Progress(lBuilderIndex, lLastBuilder)
         Next
+        Logger.Progress("", 0, 0)
     End Sub
 
 End Class

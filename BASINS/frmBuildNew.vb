@@ -130,6 +130,14 @@ Public Class frmBuildNew
         SpecifyAndCreateNewProject()
     End Sub
 
+    Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
+        Me.Opacity = 1
+    End Sub
+
+    Private Sub frmBuildNew_Deactivate(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Deactivate
+        Me.Opacity = 0.8
+    End Sub
+
     Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Welcome to BASINS 4 Window\Build BASINS Project.html")
@@ -139,4 +147,5 @@ Public Class frmBuildNew
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         Me.Close()
     End Sub
+
 End Class

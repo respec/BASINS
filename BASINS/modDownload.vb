@@ -619,22 +619,26 @@ StartOver:
     End Sub
 
     Public Sub ProcessDownloadResults(ByVal aInstructions As String)
-        Dim lProjectorXML As New Chilkat.Xml
-        Dim lProjectorNode As Chilkat.Xml
+        Dim lProjectorXML As New Xml.XmlDocument
+        Dim lProjectorNode As Xml.XmlNode
         Dim lInputDirName As String
         Dim lOutputDirName As String
         Dim lOutputFileName As String
         Dim InputFileList As New NameValueCollection
         Dim lFileObject As Object
         Dim lCurFilename As String
-        Dim lProjectDir As String = ""
-        Dim lDefaultsXML As Chilkat.Xml = Nothing
+        Dim lDefaultsXML As Xml.XmlDocument = Nothing
         Dim lSuccess As Boolean
         Dim lInputProjection As String
         Dim lOutputProjection As String
         Dim lMessage As String = ""
         Dim lLayersAdded As New ArrayList
         Dim lDataAdded As New ArrayList
+        Dim lProjectDir As String = ""
+        If g_MapWin IsNot Nothing AndAlso g_MapWin.Project IsNot Nothing AndAlso g_MapWin.Project.FileName IsNot Nothing AndAlso g_MapWin.Project.FileName.Contains("\") Then
+            lProjectDir = IO.Path.GetDirectoryName(g_MapWin.Project.FileName)
+            If lProjectDir.Length > 0 AndAlso Not lProjectDir.EndsWith("\") Then lProjectDir &= "\"
+        End If
 
         If Not aInstructions.StartsWith("<") Then
             If FileExists(aInstructions) Then
@@ -649,13 +653,12 @@ StartOver:
         g_MapWin.View.MapCursor = tkCursor.crsrWait
 
         lProjectorXML.LoadXml(aInstructions)
-        lProjectorNode = lProjectorXML.FirstChild
-        While Not lProjectorNode Is Nothing
-            Logger.Dbg("Processing XML: " & lProjectorNode.GetXml)
-            Select Case LCase(lProjectorNode.Tag.ToLower)
+        For Each lProjectorNode In lProjectorXML.FirstChild.ChildNodes
+            Logger.Dbg("Processing XML: " & lProjectorNode.OuterXml)
+            Select Case LCase(lProjectorNode.Name.ToLower)
                 Case "add_data"
-                    Dim lDataType As String = lProjectorNode.GetAttrValue("type")
-                    lOutputFileName = lProjectorNode.Content
+                    Dim lDataType As String = lProjectorNode.Attributes.GetNamedItem("type").InnerText
+                    lOutputFileName = lProjectorNode.InnerText
                     If lDataType.Length = 0 Then
                         Logger.Dbg("Could not add data from '" & lOutputFileName & "' - no type specified")
                     Else
@@ -676,11 +679,11 @@ StartOver:
                         End If
                     End If
                 Case "add_shape"
-                    lOutputFileName = lProjectorNode.Content
+                    lOutputFileName = lProjectorNode.InnerText
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
                     lLayersAdded.Add(AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
                 Case "add_grid"
-                    lOutputFileName = lProjectorNode.Content
+                    lOutputFileName = lProjectorNode.InnerText
                     Select Case IO.Path.GetFileName(lOutputFileName).ToLower
                         Case "fac.tif", "fdr.tif", "cat.tif"
                             Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
@@ -693,19 +696,19 @@ StartOver:
                             End If
                     End Select
                 Case "add_allshapes"
-                    lOutputFileName = lProjectorNode.Content
+                    lOutputFileName = lProjectorNode.InnerText
                     lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
                 Case "remove_data"
-                    atcDataManager.RemoveDataSource(lProjectorNode.Content.ToLower)
+                    atcDataManager.RemoveDataSource(lProjectorNode.InnerText.ToLower)
                 Case "remove_layer", "remove_shape", "remove_grid"
                     Try
-                        atcMwGisUtility.GisUtil.RemoveLayer(atcMwGisUtility.GisUtil.LayerIndex(lProjectorNode.Content))
+                        atcMwGisUtility.GisUtil.RemoveLayer(atcMwGisUtility.GisUtil.LayerIndex(lProjectorNode.InnerText))
                     Catch ex As Exception
-                        Logger.Dbg("Error removing layer '" & lProjectorNode.Content & "': " & ex.Message)
+                        Logger.Dbg("Error removing layer '" & lProjectorNode.InnerText & "': " & ex.Message)
                     End Try
                 Case "clip_grid"
-                    lOutputFileName = lProjectorNode.GetAttrValue("output")
-                    lCurFilename = lProjectorNode.Content
+                    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                    lCurFilename = lProjectorNode.InnerText
                     'create extents shape to clip to, at the extents of the cat unit
                     Dim lShape As New MapWinGIS.Shape
                     Dim lExtentsSf As New MapWinGIS.Shapefile
@@ -762,11 +765,11 @@ StartOver:
                     lSuccess = lExtentsSf.Close
                     g_StatusBar(1).Text = ""
                 Case "project_dir"
-                    lProjectDir = lProjectorNode.Content
-                    If Right(lProjectDir, 1) <> "\" Then lProjectDir &= "\"
+                    lProjectDir = lProjectorNode.InnerText
+                    If Not lProjectDir.EndsWith("\") Then lProjectDir &= "\"
                 Case "convert_shape"
-                    lOutputFileName = lProjectorNode.GetAttrValue("output")
-                    lCurFilename = lProjectorNode.Content
+                    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                    lCurFilename = lProjectorNode.InnerText
                     ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
                     'attempt to assign prj file
                     lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
@@ -803,8 +806,8 @@ StartOver:
                         End If
                     End If
                 Case "convert_grid"
-                    lOutputFileName = lProjectorNode.GetAttrValue("output")
-                    lCurFilename = lProjectorNode.Content
+                    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                    lCurFilename = lProjectorNode.InnerText
                     'remove output file
                     TryDelete(lOutputFileName)
                     lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
@@ -839,8 +842,8 @@ StartOver:
                     End If
                 Case "convert_dir"
                     'loop through a directory, projecting all files in it
-                    lInputDirName = lProjectorNode.Content
-                    lOutputDirName = lProjectorNode.GetAttrValue("output")
+                    lInputDirName = lProjectorNode.InnerText
+                    lOutputDirName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
                     If lOutputDirName Is Nothing OrElse lOutputDirName.Length = 0 Then
                         lOutputDirName = lInputDirName
                     End If
@@ -872,14 +875,20 @@ StartOver:
                         End If
                     Next lFileObject
                 Case "message"
-                    Logger.Msg(lProjectorNode.Content)
+                    Logger.Msg(lProjectorNode.InnerText)
+                Case "select_layer"
+                    Dim lLayerName As String = lProjectorNode.InnerText
+                    Try
+                        Dim lLayerIndex As Integer = atcMwGisUtility.GisUtil.LayerIndex(lLayerName)
+                        atcMwGisUtility.GisUtil.CurrentLayer = lLayerIndex
+                        Logger.Dbg("Selected layer '" & lLayerName & "'")
+                    Catch
+                        Logger.Dbg("Failed to select layer '" & lLayerName & "'")
+                    End Try
                 Case Else
-                    Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
+                    Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Name, "ProcessProjectorFile")
             End Select
-
-            If Not lProjectorNode.NextSibling2 Then lProjectorNode = Nothing
-
-        End While
+        Next
 
         'Remove empty groups
         For lGroupIndex As Integer = g_MapWin.Layers.Groups.Count - 1 To 0 Step -1
@@ -1050,14 +1059,13 @@ StartOver:
         '        Logger.Msg(curStep & vbCr & Err.Description, MsgBoxStyle.OKOnly, "BASINS Data Download Main")
     End Function
 
-    Private Function GetDefaultsXML() As Chilkat.Xml
-        Dim lDefaultsXML As Chilkat.Xml = Nothing
+    Private Function GetDefaultsXML() As Xml.XmlDocument
+        Dim lDefaultsXML As Xml.XmlDocument = Nothing
         Dim lDefaultsPath As String 'full file name of defaults XML
         lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", "\basins\etc\BasinsDefaultLayers.xml")
-        'lDefaultsPath = "E:\BASINS\etc\BasinsDefaultRenderers.xml"
         If FileExists(lDefaultsPath) Then
-            lDefaultsXML = New Chilkat.Xml
-            lDefaultsXML.LoadXmlFile(lDefaultsPath)
+            lDefaultsXML = New Xml.XmlDocument
+            lDefaultsXML.Load(lDefaultsPath)
         End If
         Return lDefaultsXML
     End Function
@@ -1067,7 +1075,7 @@ StartOver:
         Dim lLayer As Integer
         Dim Filename As String
         Dim allFiles As New NameValueCollection
-        Dim lDefaultsXML As Chilkat.Xml = GetDefaultsXML()
+        Dim lDefaultsXML As Xml.XmlDocument = GetDefaultsXML()
 
         Logger.Dbg("AddAllShapesInDir: '" & aPath & "'")
 
@@ -1131,16 +1139,16 @@ StartOver:
 
     'Given a file name and the XML describing how to render it, add a shape layer to MapWindow
     Private Function AddShapeToMW(ByVal aFilename As String, _
-                                  ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
+                                  ByRef layerXml As Xml.XmlNode) As MapWindow.Interfaces.Layer
         Dim LayerName As String
         Dim Group As String = ""
         Dim Visible As Boolean
-        Dim Style As atcRenderStyle = Nothing
+        'Dim Style As atcRenderStyle = Nothing
 
         Dim MWlay As MapWindow.Interfaces.Layer
         Dim shpFile As MapWinGIS.Shapefile
-        Dim RGBcolor As Int32
-        Dim RGBoutline As Int32
+        'Dim RGBcolor As Int32
+        'Dim RGBoutline As Int32
 
         'Don't add layer again if we already have it
         For lLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
@@ -1154,25 +1162,27 @@ StartOver:
         Try
             Dim lRendererName As String = GetDefaultRenderer(aFilename)
 
+            LayerName = FilenameOnly(aFilename)
             If layerXml Is Nothing Then
-                LayerName = FilenameOnly(aFilename)
                 Visible = True
                 If lRendererName.Length = 0 Then
                     Group = "Other"
                 End If
             Else
-                LayerName = layerXml.GetAttrValue("Name")
-                Group = layerXml.GetAttrValue("Group")
-                If Group Is Nothing Then Group = "Other"
-                Select Case layerXml.GetAttrValue("Visible").ToLower
-                    Case "yes" : Visible = True
-                    Case "no" : Visible = False
-                    Case Else : Visible = False
-                End Select
-                If Not layerXml.FirstChild Is Nothing Then
-                    Style = New atcRenderStyle
-                    Style.xml = layerXml.FirstChild
-                End If
+                Group = "Other"
+                Visible = False
+                For Each lAttribute As Xml.XmlAttribute In layerXml.Attributes
+                    Select Case lAttribute.Name.ToLower
+                        Case "name" : LayerName = lAttribute.InnerText
+                        Case "group" : Group = lAttribute.InnerText
+                        Case "visible" : Visible = (lAttribute.InnerText.ToLower = "yes") OrElse (lAttribute.InnerText.ToLower = "true")
+                    End Select
+                Next
+
+                'If Not layerXml.FirstChild Is Nothing Then
+                '    Style = New atcRenderStyle
+                '    Style.xml = layerXml.FirstChild
+                'End If
             End If
 
             g_StatusBar.Item(1).Text = "Opening " & aFilename
@@ -1184,73 +1194,73 @@ StartOver:
                         MapWinGIS.ShpfileType.SHP_POINTM, _
                         MapWinGIS.ShpfileType.SHP_POINTZ, _
                         MapWinGIS.ShpfileType.SHP_MULTIPOINT
-                    If Style Is Nothing Then
-                        MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
-                    Else
-                        RGBcolor = RGB(Style.MarkColor.R, Style.MarkColor.G, Style.MarkColor.B)
-                        MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.MarkSize)
-                        Select Case Style.MarkStyle                        'TODO: translate Cross, X, Bitmap properly
-                            Case "Circle" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
-                            Case "Square" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
-                            Case "Cross" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleRight
-                            Case "X" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleLeft
-                            Case "Diamond" : MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
-                            Case "Bitmap"
-                                Select Case Style.MarkBitsAsHex
-                                    Case "3C 42 81 99 99 81 42 3C" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
-                                    Case "00 7E 7E 7E 7E 7E 7E 00" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
-                                    Case "0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000"
-                                        MWlay.PointType = MapWinGIS.tkPointType.ptTriangleDown
-                                    Case Else
-                                        MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
-                                End Select
-                                'MWlay.PointType = MapWinGIS.tkPointType.ptUserDefined
-                                'mwlay.UserPointType = 'TODO: translate bitmap into Image
-                        End Select
-                    End If
+                    'If Style Is Nothing Then
+                    MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
+                    'Else
+                    'RGBcolor = RGB(Style.MarkColor.R, Style.MarkColor.G, Style.MarkColor.B)
+                    'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.MarkSize)
+                    'Select Case Style.MarkStyle                        'TODO: translate Cross, X, Bitmap properly
+                    '    Case "Circle" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
+                    '    Case "Square" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
+                    '    Case "Cross" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleRight
+                    '    Case "X" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleLeft
+                    '    Case "Diamond" : MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
+                    '    Case "Bitmap"
+                    '        Select Case Style.MarkBitsAsHex
+                    '            Case "3C 42 81 99 99 81 42 3C" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
+                    '            Case "00 7E 7E 7E 7E 7E 7E 00" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
+                    '            Case "0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000"
+                    '                MWlay.PointType = MapWinGIS.tkPointType.ptTriangleDown
+                    '            Case Else
+                    '                MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
+                    '        End Select
+                    '        'MWlay.PointType = MapWinGIS.tkPointType.ptUserDefined
+                    '        'mwlay.UserPointType = 'TODO: translate bitmap into Image
+                    'End Select
+                    'End If
 
                 Case MapWinGIS.ShpfileType.SHP_POLYLINE, MapWinGIS.ShpfileType.SHP_POLYLINEM, MapWinGIS.ShpfileType.SHP_POLYLINEZ
-                    If Style Is Nothing Then
-                        MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
-                    Else
-                        RGBcolor = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
-                        MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.LineWidth)
-                    End If
+                    'If Style Is Nothing Then
+                    MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
+                    'Else
+                    'RGBcolor = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
+                    'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.LineWidth)
+                    'End If
                 Case MapWinGIS.ShpfileType.SHP_POLYGON, MapWinGIS.ShpfileType.SHP_POLYGONM, MapWinGIS.ShpfileType.SHP_POLYGONZ
-                    If Style Is Nothing Then
-                        MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
-                    Else
-                        RGBcolor = RGB(Style.FillColor.R, Style.FillColor.G, Style.FillColor.B)
-                        RGBoutline = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
-                        MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBoutline, Style.LineWidth)
-                        Select Case LCase(Style.FillStyle)
-                            Case "none"
-                                MWlay.FillStipple = MapWinGIS.tkFillStipple.fsNone
-                                If MWlay.Color.Equals(System.Drawing.Color.Black) Then
-                                    MWlay.Color = System.Drawing.Color.White
-                                End If
-                                MWlay.DrawFill = False
-                            Case "solid" '"Solid"
-                            Case "horizontal" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsHorizontalBars
-                            Case "vertical" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsVerticalBars
-                            Case "down" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownRight
-                            Case "up" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownLeft
-                            Case "cross"
-                            Case "diagcross"
-                        End Select
-                    End If
+                    'If Style Is Nothing Then
+                    MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
+                    'Else
+                    'RGBcolor = RGB(Style.FillColor.R, Style.FillColor.G, Style.FillColor.B)
+                    'RGBoutline = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
+                    'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBoutline, Style.LineWidth)
+                    'Select Case LCase(Style.FillStyle)
+                    '    Case "none"
+                    '        MWlay.FillStipple = MapWinGIS.tkFillStipple.fsNone
+                    '        If MWlay.Color.Equals(System.Drawing.Color.Black) Then
+                    '            MWlay.Color = System.Drawing.Color.White
+                    '        End If
+                    '        MWlay.DrawFill = False
+                    '    Case "solid" '"Solid"
+                    '    Case "horizontal" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsHorizontalBars
+                    '    Case "vertical" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsVerticalBars
+                    '    Case "down" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownRight
+                    '    Case "up" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownLeft
+                    '    Case "cross"
+                    '    Case "diagcross"
+                    'End Select
+                    'End If
             End Select
-            If Not Style Is Nothing Then
-                Select Case Style.LineStyle.ToLower
-                    Case "solid" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsNone
-                    Case "dash" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashed
-                    Case "dot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDotted
-                    Case "dashdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
-                    Case "dashdotdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
-                        'Case "alternate" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsCustom
-                        '    MWlay.UserLineStipple = 
-                End Select
-            End If
+            'If Not Style Is Nothing Then
+            '    Select Case Style.LineStyle.ToLower
+            '        Case "solid" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsNone
+            '        Case "dash" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashed
+            '        Case "dot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDotted
+            '        Case "dashdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
+            '        Case "dashdotdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
+            '            'Case "alternate" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsCustom
+            '            '    MWlay.UserLineStipple = 
+            '    End Select
+            'End If
 
             If Not MWlay Is Nothing Then
                 If lRendererName.Length > 0 Then
@@ -1303,7 +1313,7 @@ StartOver:
 
     'Given a file name and the XML describing how to render it, add a grid layer to MapWindow
     Private Function AddGridToMW(ByVal aFilename As String, _
-                                 ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
+                                 ByRef layerXml As Xml.XmlNode) As MapWindow.Interfaces.Layer
         Dim LayerName As String
         Dim Group As String = "Other"
         Dim Visible As Boolean
@@ -1330,11 +1340,11 @@ StartOver:
                 MWlay = g_MapWin.Layers.Add(aFilename)
                 MWlay.Visible = True
             Else
-                LayerName = layerXml.GetAttrValue("Name")
+                LayerName = layerXml.Attributes.GetNamedItem("Name").InnerText
                 'Style.xml = layerXml.FirstChild
-                Group = layerXml.GetAttrValue("Group")
+                Group = layerXml.Attributes.GetNamedItem("Group").InnerText
                 If Group Is Nothing Then Group = "Other"
-                Select Case layerXml.GetAttrValue("Visible").ToLower
+                Select Case layerXml.Attributes.GetNamedItem("Visible").InnerText.ToLower
                     Case "yes" : Visible = True
                     Case "no" : Visible = False
                     Case Else : Visible = False
@@ -1895,17 +1905,15 @@ StartOver:
 
     Private Function GetDefaultsFor(ByVal Filename As String, _
                                     ByVal aProjectDir As String, _
-                                    ByRef aDefaultsXml As Chilkat.Xml) As Chilkat.Xml
+                                    ByRef aDefaultsXml As Xml.XmlDocument) As Xml.XmlNode
         Dim lName As String
-        Dim layerXml As Chilkat.Xml
 
         lName = LCase(Filename.Substring(aProjectDir.Length))
 
         If Not aDefaultsXml Is Nothing Then
-            For lLayer As Integer = 0 To aDefaultsXml.NumChildren - 1
-                layerXml = aDefaultsXml.GetChild(lLayer)
-                If lName Like "*" & layerXml.GetAttrValue("Filename") & "*" Then
-                    Return layerXml
+            For Each lChild As Xml.XmlNode In aDefaultsXml.FirstChild.ChildNodes
+                If lName Like "*" & lChild.Attributes.GetNamedItem("Filename").InnerText & "*" Then
+                    Return lChild
                 End If
             Next
         End If

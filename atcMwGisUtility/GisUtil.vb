@@ -538,10 +538,10 @@ Public Class GisUtil
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function LayerIndex(ByVal aLayerName As String) As Integer
         'start at topmost layer and work down looking for a match
-        aLayerName = UCase(aLayerName)
+        aLayerName = aLayerName.ToUpper
         Dim i As Integer
         For i = GetMappingObject.Layers.NumLayers - 1 To 0 Step -1
-            If UCase(LayerName(i)) = aLayerName OrElse UCase(LayerFileName(i)) = aLayerName Then
+            If LayerName(i).ToUpper = aLayerName OrElse LayerFileName(i).ToUpper = aLayerName Then
                 Return i
             End If
         Next
