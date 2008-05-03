@@ -51,6 +51,7 @@
 <Layer Filename="landuse\" Name="Land Use" Group="Soil, Land Use/Cover" Visible="yes" />
 <Layer Filename="st.shp" Name="State Boundaries" Group="Political" Visible="yes" />
 <Layer Filename="statsgo.shp" Name="State Soil" Group="Soil, Land Use/Cover" />
+<Layer Filename="storet\storet.shp" Name="STORET Stations" Group="Observed Data Stations" />
 <Layer Filename="tri.shp" Name="Toxic Release Inventory" Group="Observed Data Stations" />
 <Layer Filename="urban.shp" Name="Urban Area Boundaries" Group="Political" />
 <Layer Filename="urban_nm.shp" Name="Urban Area Names" Group="Political" />

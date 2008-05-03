@@ -478,14 +478,17 @@ FoundDir:
             pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
         ElseIf aMessage.StartsWith("<success>") Then
             ProcessDownloadResults(aMessage)
-        ElseIf aMessage.StartsWith("FileDropEvent") Then
+        ElseIf aMessage.StartsWith("FileDropEvent") Then 'Try to open dropped file as a data source
+            Dim lWasDisplayingMessageBoxes As Boolean = Logger.DisplayMessageBoxes
+            Logger.DisplayMessageBoxes = False           'Avoid message box if unable to open as a data source
             Dim lMessage() As String = aMessage.Split("|")
             aHandled = atcDataManager.OpenDataSource(lMessage(3))
             If aHandled Then
                 atcDataManager.UserManage(, atcDataManager.DataSources.Count - 1)
             End If
+            Logger.DisplayMessageBoxes = lWasDisplayingMessageBoxes
         Else
-            Logger.Dbg("Ignore:" & aMessage)
+            'Logger.Dbg("Ignore:" & aMessage)
         End If
     End Sub
 

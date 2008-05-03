@@ -20,6 +20,13 @@ Public Class atcTimeseriesBuilder
         Restart()
     End Sub
 
+    ''' <summary>
+    ''' Number of values that have been added to this builder so far
+    ''' </summary>
+    Public Function NumValues() As Integer
+        Return pValues.Count
+    End Function
+
     Public Sub Restart()
         If Not pValueAttributes Is Nothing Then pValueAttributes.Clear()
         If Not pValues Is Nothing Then pValues.Clear()
@@ -181,6 +188,26 @@ Public Class atcTimeseriesBuilder
             pValueAttributes.Add(pLastAddedIndex, lValueAttributes)
         End If
         lValueAttributes.Add(aAttributeName, aAttributeValue)
+    End Sub
+
+    ''' <summary>
+    ''' Add a set of attributes to the most recently added value
+    ''' </summary>
+    ''' <param name="aAttributes">Attributes to add</param>
+    Public Sub AddValueAttributes(ByVal aAttributes As atcDataAttributes)
+        Dim lValueAttributes As atcDataAttributes
+        Dim lIndex As Integer = pValueAttributes.Keys.IndexOf(pLastAddedIndex)
+        If lIndex >= 0 Then
+            lValueAttributes = pValueAttributes.ItemByIndex(lIndex)
+            For Each lAdv As atcDefinedValue In aAttributes
+                If lAdv.Definition.CopiesInherit Then
+                    lValueAttributes.SetValue(lAdv.Definition, lAdv.Value, lAdv.Arguments)
+                End If
+            Next
+        Else
+            lValueAttributes = aAttributes.Clone
+            pValueAttributes.Add(pLastAddedIndex, lValueAttributes)
+        End If
     End Sub
 
     Public Function CreateTimeseries() As atcTimeseries

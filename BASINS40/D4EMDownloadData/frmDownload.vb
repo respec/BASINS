@@ -108,7 +108,9 @@ Public Class frmDownload
                     Dim lLayerShapefile As MapWinGIS.Shapefile = lLayer.GetObject
                     Dim lKeyField As Integer
                     For lKeyField = 0 To lLayerShapefile.NumFields - 1
-                        If lLayerShapefile.Field(lKeyField).Name = "site_no" Then Exit For
+                        Select Case lLayerShapefile.Field(lKeyField).Name
+                            Case "site_no", "LocId" : Exit For 'TODO: use list of ID fields for layers from layers.dbf
+                        End Select
                     Next
                     If lKeyField <= lLayerShapefile.NumFields Then
                         For lShapeIndex As Integer = 0 To lSelected.NumSelected - 1
