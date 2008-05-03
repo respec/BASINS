@@ -12,25 +12,25 @@ Module ShapeDefines
 	
 	'*****************************************************************************************
 	'Main file header stucture for both the shape and index files
-	Public Structure T_MainFileHeader
-		Dim FileCode As Integer 'big
-		Dim u1 As Integer 'big
-		Dim u2 As Integer 'big
-		Dim u3 As Integer 'big
-		Dim u4 As Integer 'big
-		Dim u5 As Integer 'big
-		Dim FileLength As Integer 'big
-		Dim version As Integer 'Little
-		Dim ShapeType As Integer 'Little
-		Dim BndBoxXmin As Double 'Little
-		Dim BndBoxYmin As Double 'Little
-		Dim BndBoxXmax As Double 'Little
-		Dim BndBoxYmax As Double 'Little
-		Dim BndBoxZmin As Double 'Little
-		Dim BndBoxZmax As Double 'Little
-		Dim BndBoxMmin As Double 'Little
-		Dim BndBoxMmax As Double 'Little
-	End Structure
+    Public Structure T_MainFileHeader 'size 9*4 + 8*8= 100
+        Dim FileCode As Integer 'big
+        Dim u1 As Integer 'big
+        Dim u2 As Integer 'big
+        Dim u3 As Integer 'big
+        Dim u4 As Integer 'big
+        Dim u5 As Integer 'big
+        Dim FileLength As Integer 'big
+        Dim version As Integer 'Little
+        Dim ShapeType As Integer 'Little
+        Dim BndBoxXmin As Double 'Little
+        Dim BndBoxYmin As Double 'Little
+        Dim BndBoxXmax As Double 'Little
+        Dim BndBoxYmax As Double 'Little
+        Dim BndBoxZmin As Double 'Little
+        Dim BndBoxZmax As Double 'Little
+        Dim BndBoxMmin As Double 'Little
+        Dim BndBoxMmax As Double 'Little
+    End Structure
 	
 	'*****************************************************************************************
 	'Shape file record header structure
