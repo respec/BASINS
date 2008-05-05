@@ -14,8 +14,9 @@
     <EnableSQLServerDebugging>false</EnableSQLServerDebugging>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <StartAction>Project</StartAction>
-    <StartArguments>"C:\BASINS\data\Multiple\rf1.shp" "C:\BASINS\data\Multiple-ShapeUtilVB6\rf1.shp" dump</StartArguments>
+    <StartArguments>"l_washdc-projected.shp" "C:\temp\02060006\landuse\l_washdc.shp" "prj.proj"</StartArguments>
     <StartWithIE>true</StartWithIE>
+    <StartWorkingDirectory>C:\Temp\ShapeUtilProjectTest\</StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <EnableASPDebugging>false</EnableASPDebugging>
@@ -25,5 +26,7 @@
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <StartAction>Project</StartAction>
     <StartWithIE>true</StartWithIE>
+    <StartArguments>"l_washdc-projected.shp" "C:\temp\02060006\landuse\l_washdc.shp" "prj.proj"</StartArguments>
+    <StartWorkingDirectory>C:\Temp\ShapeUtilProjectTest\</StartWorkingDirectory>
   </PropertyGroup>
 </Project>
