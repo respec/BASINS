@@ -130,6 +130,7 @@ Partial Class frmModelSegmentation
         Me.Controls.Add(Me.fraMetStations)
         Me.Controls.Add(Me.fraSubbasins)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Name = "frmModelSegmentation"
         Me.Text = "BASINS Model Segmentation Specifier"
         Me.fraSubbasins.ResumeLayout(False)

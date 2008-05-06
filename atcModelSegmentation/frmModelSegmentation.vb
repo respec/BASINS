@@ -110,6 +110,12 @@ Friend Class frmModelSegmentation
         Return lModelSegFieldIndex
     End Function
 
+    Private Sub frmModelSegmentation_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Watershed and Instream Model Setup\Model Segmentation Specifier.html")
+        End If
+    End Sub
+
     Private Sub frmModelSegmentation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         'subwatersheds
         Dim lDefaultLayerIndex As Integer = -1
