@@ -1,5 +1,5 @@
 <SFRendering>
-  <Layer Name="2000 Zip Code" GroupName="Census" Type="3" Path="census\_zt00.shp" Tag="" LegendPicture="" Visible="True" LabelsVisible="True" Expanded="False">
+  <Layer Name="2000 Zip Code" GroupName="Census" Type="3" Path="census\_zt00.shp" Tag="" LegendPicture="" Visible="False" LabelsVisible="True" Expanded="False">
     <Image Type="">
     </Image>
     <ShapeFileProperties Color="16777215" DrawFill="False" TransparencyPercent="1" FillStipple="0" LineOrPointSize="1" LineStipple="0" OutLineColor="8421504" PointType="0" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">
