@@ -1,5 +1,5 @@
 <SFRendering>
-  <Layer Name="USGS Stream Gages" GroupName="Hydrology-NHDPlus" Type="1" Path="nhdplus\streamgageevent.shp" Tag="" LegendPicture="" Visible="True" LabelsVisible="True" Expanded="False">
+  <Layer Name="Streamgage Event" GroupName="Hydrology-NHDPlus" Type="1" Path="nhdplus\streamgageevent.shp" Tag="" LegendPicture="" Visible="True" LabelsVisible="True" Expanded="False">
     <Image Type="">
     </Image>
     <ShapeFileProperties Color="16711680" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="5" LineStipple="0" OutLineColor="0" PointType="2" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">

@@ -1,5 +1,5 @@
 <SFRendering>
-  <Layer Name="2002 Tiger Road" GroupName="Transportation" Type="2" Path="census\_tgr_a.shp" Tag="" LegendPicture="" Visible="False" LabelsVisible="True" Expanded="False">
+  <Layer Name="2002 Tiger Road" GroupName="Transportation" Type="2" Path="census\_tgr_a.shp" Tag="" LegendPicture="" Visible="True" LabelsVisible="True" Expanded="False">
     <Image Type="">
     </Image>
     <ShapeFileProperties Color="2763429" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="1" LineStipple="0" OutLineColor="2763429" PointType="0" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">
