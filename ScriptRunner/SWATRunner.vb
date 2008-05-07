@@ -6,11 +6,15 @@ Imports SwatObject
 
 Module SWATRunner
     Private Const pRefreshDB As Boolean = False
-    Private Const pBasePath As String = "D:\Basins\data\SWATOutput\UM\baseline90"
-    Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline90jack"
-    Private Const pSWATGDB As String = "SWAT2005.mdb"
+    'Private Const pBasePath As String = "D:\Basins\data\SWATOutput\UM\baseline90"
+    Private Const pBasePath As String = "C:\Project\UMRB\baseline90"
+    'Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline90jack"
+    Private Const pInputPath As String = "C:\Project\UMRB\baseline90\Scenarios\Test"
+    'Private Const pSWATGDB As String = "SWAT2005.mdb"
+    Private Const pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
+    Private Const pOutGDBPath As String = pInputPath & "\TablesIn"
     Private Const pOutGDB As String = "baseline90.mdb"
-    Private Const pOutputFolder = pInputPath & "\Scenarios\Default\TxtInOut"
+    Private Const pOutputFolder = pInputPath & "\TxtInOut"
     Private Const pSWATExe As String = pOutputFolder & "\swat2005.exe" 'local copy with input data
     'Private Const pSWATExe As String = "C:\Program Files\SWAT 2005 Editor\swat2005.exe"
     Private pSwatOutput As Text.StringBuilder
@@ -23,16 +27,17 @@ Module SWATRunner
         'log for swat runner
         Logger.StartToFile(pInputPath & "\logs\SWATRunner.log", , , True)
 
+        Dim lOutGDB = pOutGDBPath & "\" & pOutGDB
         If pRefreshDB Then 'copy the entire input parameter database for this new scenario
-            If IO.File.Exists(pOutGDB) Then
-                Logger.Dbg("DeleteExisting " & pOutGDB)
-                IO.File.Delete(pOutGDB)
+            If IO.File.Exists(lOutGDB) Then
+                Logger.Dbg("DeleteExisting " & lOutGDB)
+                IO.File.Delete(lOutGDB)
             End If
-            IO.File.Copy(pBasePath & "\" & pOutGDB, pOutGDB)
+            IO.File.Copy(pBasePath & "\" & pOutGDB, lOutGDB)
         End If
 
         Logger.Dbg("InitializeSwatInput")
-        SwatInput.Initialize(pSWATGDB, pOutGDB, pOutputFolder)
+        SwatInput.Initialize(pSWATGDB, lOutGDB, pOutputFolder)
 
         Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
         For Each lString As String In LinesInFile("SWATParmChanges.txt")
@@ -139,12 +144,12 @@ Module SWATArea
         Dim lCornFraction As New atcCollection
         lCornFraction.Add("CCCC", 1.0)
         lCornFraction.Add("CCS1", 0.66667)
-        lCornFraction.Add("CSC1", 0.66667)
+        lCornFraction.Add("CSC1", 0.5)
         lCornFraction.Add("CSS1", 0.33333)
         lCornFraction.Add("SCC1", 0.66667)
-        lCornFraction.Add("SCS1", 0.33333)
+        lCornFraction.Add("SCS1", 0.5)
         lCornFraction.Add("SSC1", 0.33333)
-        lCornFraction.Add("SSSC", 0.25)
+        lCornFraction.Add("SSSC", 0.0)
 
         Dim lOutputTable As DataTable = aInputTable.Copy
         Dim lCornColumnIndex = lOutputTable.Columns.Count
