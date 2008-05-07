@@ -196,6 +196,7 @@ Public Class DownloadDataPlugin
                     Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
                     'Logger.Msg(lQuery, "Query from frmDownload")
                     If lQuery.Length > 0 AndAlso Not lQuery.Equals(frmDownload.CancelString) Then
+                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor 'Logger.Busy = True
                         Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
                         Dim lPlugins As New ArrayList
                         For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
@@ -212,6 +213,7 @@ Public Class DownloadDataPlugin
                         If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
                             BASINS.ProcessDownloadResults(lResult)
                         End If
+                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default 'Logger.Busy = False
                     End If
                 End If
         End Select
