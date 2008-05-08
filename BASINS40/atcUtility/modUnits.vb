@@ -15,14 +15,14 @@ Public Module modUnits
     Private Const CategoryTableName As String = "Category"
     Private Const SwatTableName As String = "SwatDbfParameter"
 
-    Private pSaveUnitsDatabase As Chilkat.Xml = Nothing
+    Private pSaveUnitsDatabase As Xml.XmlDocument = Nothing
     Private pAlreadyReportedErrOpen As Boolean
 
     'Debug.Print GetParameterUnits("LAI", "SwatDbfParameter", "sbs")
     Public Function GetParameterUnits(ByVal ParameterName As String, Optional ByVal FileType As String = "") As String
         'Static AlreadyReportedError As Boolean
-        Dim table As Chilkat.Xml = GetTable(SwatTableName)
-        Dim row As Chilkat.Xml
+        Dim table As Xml.XmlNode = GetTable(SwatTableName)
+        Dim row As Xml.XmlNode = Nothing
         Dim unitsID As String = ""
 
         On Error GoTo errHand
@@ -31,23 +31,21 @@ Public Module modUnits
 
         If Not table Is Nothing Then
             If Len(FileType) = 0 Then
-                row = table.ExtractChildByName("Row", "Name", ParameterName)
+                row = ExtractChildByName(table, "Row", "Name", ParameterName)
             Else
-                row = table.FirstChild 'Find row matching both ParameterName and FileType
-                While Not row Is Nothing AndAlso _
-                  (row.GetAttrValue("Name") <> ParameterName OrElse _
-                   row.GetAttrValue("FileType") <> FileType)
-                    If Not row.NextSibling2 Then row = Nothing
-                End While
+                For Each row In table.ChildNodes 'Find row matching both ParameterName and FileType
+                    If row.Attributes.GetNamedItem("Name").InnerText = ParameterName AndAlso _
+                       row.Attributes.GetNamedItem("FileType").InnerText = FileType Then Exit For
+                Next
             End If
             If Not row Is Nothing Then 'Found a row with the correct ParameterName (and, if specified, FileType)
-                unitsID = row.GetAttrValue("UnitsID")
+                unitsID = row.Attributes.GetNamedItem("UnitsID").InnerText
                 If IsNumeric(unitsID) Then
                     table = GetTable(UnitsTableName)
                     If Not table Is Nothing Then
-                        row = table.ExtractChildByName("Row", "ID", unitsID)
+                        row = ExtractChildByName(table, "Row", "ID", unitsID)
                         If Not row Is Nothing Then
-                            Return row.GetAttrValue("Name")
+                            Return row.Attributes.GetNamedItem("Name").InnerText
                         End If
                     End If
                 End If
@@ -64,15 +62,15 @@ errHand:
 
     Public Function GetConversionFactor(ByVal fromUnits As String, ByVal toUnits As String) As Double
         'Static AlreadyReportedError As Boolean
-        Dim table As Chilkat.Xml = GetTable(UnitsTableName)
+        Dim table As Xml.XmlNode = GetTable(UnitsTableName)
         Dim ConversionFrom As String
         Dim ConversionTo As String
 
         On Error GoTo errHand
 
         If Not table Is Nothing Then
-            ConversionFrom = table.ExtractChildByName("Row", "Name", fromUnits).GetAttrValue("PerDefaultUnit")
-            ConversionTo = table.ExtractChildByName("Row", "Name", toUnits).GetAttrValue("PerDefaultUnit")
+            ConversionFrom = ExtractChildByName(table, "Row", "Name", fromUnits).Attributes.GetNamedItem("PerDefaultUnit").InnerText
+            ConversionTo = ExtractChildByName(table, "Row", "Name", toUnits).Attributes.GetNamedItem("PerDefaultUnit").InnerText
             If IsNumeric(ConversionFrom) And IsNumeric(ConversionTo) And ConversionFrom <> 0 Then
                 GetConversionFactor = CDbl(ConversionTo) / CDbl(ConversionFrom)
             End If
@@ -90,11 +88,11 @@ errHand:
     End Function
 
     Public Function GetUnitDescription(ByVal unitsName As String) As String
-        Return GetTable(UnitsTableName).ExtractChildByName("Row", "Name", unitsName).GetAttrValue("Description")
+        Return ExtractChildByName(GetTable(UnitsTableName), "Row", "Name", unitsName).Attributes.GetNamedItem("Description").InnerText
     End Function
 
     Public Function GetUnitID(ByVal unitsName As String) As Integer
-        Dim retval As String = GetTable(UnitsTableName).ExtractChildByName("Row", "Name", unitsName).GetAttrValue("ID")
+        Dim retval As String = ExtractChildByName(GetTable(UnitsTableName), "Row", "Name", unitsName).Attributes.GetNamedItem("ID").InnerText
         If IsNumeric(retval) Then
             Return CInt(retval)
         Else
@@ -103,22 +101,22 @@ errHand:
     End Function
 
     Public Function GetUnitName(ByVal unitsID As Integer) As String
-        Return GetTable(UnitsTableName).ExtractChildByName("Row", "ID", CStr(unitsID)).GetAttrValue("Name")
+        Return ExtractChildByName(GetTable(UnitsTableName), "Row", "ID", CStr(unitsID)).Attributes.GetNamedItem("Name").InnerText
     End Function
 
     Public Function GetUnitCategory(ByVal unitsName As String) As String
         'Static AlreadyReportedError As Boolean
-        Dim table As Chilkat.Xml = GetTable(UnitsTableName)
+        Dim table As Xml.XmlNode = GetTable(UnitsTableName)
         Dim CategoryID As String
 
         On Error GoTo errHand
         GetUnitCategory = "Unknown"
         If Not table Is Nothing Then
-            CategoryID = table.ExtractChildByName("Row", "Name", unitsName).GetAttrValue("CategoryID")
+            CategoryID = ExtractChildByName(table, "Row", "Name", unitsName).Attributes.GetNamedItem("CategoryID").InnerText
             If IsNumeric(CategoryID) Then
                 table = GetTable(CategoryTableName)
                 If Not table Is Nothing Then
-                    GetUnitCategory = table.ExtractChildByName("Row", "ID", CategoryID).GetAttrValue("Name")
+                    GetUnitCategory = ExtractChildByName(table, "Row", "ID", CategoryID).Attributes.GetNamedItem("Name").InnerText
                 End If
             End If
         End If
@@ -135,8 +133,8 @@ errHand:
     Public Function GetAllUnitsInCategory(ByVal Category As String) As ArrayList 'of String
         'Static AlreadyReportedError As Boolean
         Dim CategoryID As String
-        Dim unitsTable As Chilkat.Xml = GetTable(UnitsTableName)
-        Dim row As Chilkat.Xml
+        Dim unitsTable As Xml.XmlNode = GetTable(UnitsTableName)
+        Dim row As Xml.XmlNode
         Dim retval As New ArrayList
 
         On Error GoTo errHand
@@ -147,16 +145,14 @@ errHand:
             If LCase(Category) = "all" Then
                 CategoryID = -1
             Else
-                CategoryID = GetTable(CategoryTableName).ExtractChildByName("Row", "Name", Category).GetAttrValue("ID")
+                CategoryID = ExtractChildByName(GetTable(CategoryTableName), "Row", "Name", Category).Attributes.GetNamedItem("ID").InnerText
             End If
 
-            row = unitsTable.FirstChild
-            While Not row Is Nothing
-                If CategoryID = -1 OrElse row.GetAttrValue("CategoryID") = CategoryID Then
-                    retval.Add(row.GetAttrValue("Name"))
+            For Each row In unitsTable.ChildNodes
+                If CategoryID = -1 OrElse row.Attributes.GetNamedItem("CategoryID").InnerText = CategoryID Then
+                    retval.Add(row.Attributes.GetNamedItem("Name").InnerText)
                 End If
-                If Not row.NextSibling2 Then row = Nothing
-            End While
+            Next
         End If
         Exit Function
 
@@ -168,7 +164,7 @@ errHand:
     End Function
 
     Public Function GetAllUnitCategories() As ArrayList 'of String
-        Dim db As Chilkat.Xml = unitsDB()
+        Dim db As Xml.XmlNode = unitsDB()
         Dim retval As New ArrayList
 
         GetAllUnitCategoriesHelper(retval, db)
@@ -176,42 +172,37 @@ errHand:
 
     End Function
 
-    Private Sub GetAllUnitCategoriesHelper(ByRef aList As ArrayList, ByVal aXML As Chilkat.Xml)
-        Dim xmlChild As Chilkat.Xml = aXML.FirstChild
-        If Not xmlChild Is Nothing Then 'Loop through children
-            Do
-                GetAllUnitCategoriesHelper(aList, xmlChild)
-            Loop While xmlChild.NextSibling2()
-        End If
+    Private Sub GetAllUnitCategoriesHelper(ByRef aList As ArrayList, ByVal aXML As Xml.XmlNode)
+        For Each xmlChild As Xml.XmlNode In aXML.ChildNodes
+            GetAllUnitCategoriesHelper(aList, xmlChild)
+        Next
 
         'TODO: find the XML that matches, add the right names to aList
         'rs = GetRecordSet("Select Category.Name from Category ", " where Category.Name<>'Unknown'", "")
         'retval.Add((rs.Fields(0).value))
     End Sub
 
-    Private Function GetTable(ByVal aTableName As String) As Chilkat.Xml
-        Dim db As Chilkat.Xml = unitsDB()
+    Private Function GetTable(ByVal aTableName As String) As Xml.XmlNode
+        Dim db As Xml.XmlNode = unitsDB()
         If Not db Is Nothing Then
-            Return db.ExtractChildByName("Table", "Name", aTableName)
+            Return ExtractChildByName(db, "Table", "Name", aTableName)
         End If
         Return Nothing
     End Function
 
-    Private Function unitsDB() As Chilkat.Xml
+    Private Function unitsDB() As Xml.XmlNode
         unitsDB = Nothing
         Dim DBpath As String = ""
 
         Try
             If pSaveUnitsDatabase Is Nothing Then
-                pSaveUnitsDatabase = New Chilkat.Xml
                 DBpath = FindFile("Please locate ATCoUnits.xml", "ATCoUnits.xml")
                 If FileExists(DBpath) Then
-                    If Not pSaveUnitsDatabase.LoadXmlFile(DBpath) Then
-                        Logger.Msg("Could not open units database '" & DBpath & "'" & vbCrLf & pSaveUnitsDatabase.LastErrorText, "ATCutility.modUnits")
-                    End If
+                    pSaveUnitsDatabase = New Xml.XmlDocument
+                    pSaveUnitsDatabase.Load(DBpath)
                 End If
             End If
-            unitsDB = pSaveUnitsDatabase
+            unitsDB = pSaveUnitsDatabase.FirstChild
 
         Catch e As Exception
             If Not pAlreadyReportedErrOpen Then
@@ -227,6 +218,19 @@ errHand:
             Case atcUnitSystem.atcMetric : Return "Metric"
             Case Else : Return "Unknown"
         End Select
+        Return Nothing
+    End Function
+
+    Private Function ExtractChildByName(ByVal aParent As Xml.XmlNode, ByVal aTag As String, ByVal aAttName As String, ByVal aAttValue As String) As Xml.XmlNode
+        aTag = aTag.ToLower 'Make search for node name non-case-sensitive, but aValue is still case-sensitive
+        For Each lChild As Xml.XmlNode In aParent.ChildNodes
+            Try
+                If lChild.Name.ToLower = aTag AndAlso lChild.Attributes.GetNamedItem(aAttName).InnerText = aAttValue Then
+                    Return lChild
+                End If
+            Catch 'Ignore error if we can't find an attribute, just move on to next node
+            End Try
+        Next
         Return Nothing
     End Function
 End Module

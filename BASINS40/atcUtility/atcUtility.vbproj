@@ -70,11 +70,6 @@
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ChilkatDotNet">
-      <Name>ChilkatDotNet</Name>
-      <HintPath>..\Bin\ChilkatDotNet.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
@@ -89,6 +84,7 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />

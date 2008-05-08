@@ -1789,80 +1789,72 @@ NextIteration:
             'End If
         End Get
 
-        Set(ByVal aValue As String)
-            Dim lXML As New Chilkat.Xml
-            If lXML.LoadXml(aValue) AndAlso lXML.Tag.ToLower.Equals("basinscat") AndAlso lXML.FirstChild2 Then
+        Set(ByVal newValue As String)
+            Try
+                Dim lXMLdoc As New Xml.XmlDocument
+                lXMLdoc.LoadXml(newValue)
+                If lXMLdoc.Name.ToLower.Equals("basinscat") Then
+                    For Each lXML As Xml.XmlNode In lXMLdoc.ChildNodes
+                        Dim lVariation As atcVariation
+                        Dim lChild As Xml.XmlNode = lXML.FirstChild
+                        'Replace start folder in all XML if present
+                        Select Case lXML.Name.ToLower
+                            Case "startfolder"
+                                Dim lStartFolder As String = lXML.InnerText
+                                Me.XML = ReplaceString(newValue, StartFolderVariable, lStartFolder)
+                                Exit Property
+                            Case "saveall"
+                                chkSaveAll.Checked = (lXML.InnerText.ToLower = "true")
+                            Case "showeachrun"
+                                chkShowEachRunProgress.Checked = (lXML.InnerText.ToLower = "true")
+                            Case "uci"
+                                OpenUCI(AbsolutePath(lChild.InnerText, CurDir))
+                            Case "preparedinputs"
+                                If pPreparedInputs Is Nothing Then
+                                    pPreparedInputs = New atcCollection
+                                Else
+                                    pPreparedInputs.Clear()
+                                End If
+                                For Each lChild In lXML.ChildNodes
+                                    pPreparedInputs.Add(lChild.InnerText)
+                                Next
+                                RefreshInputList()
+                                RefreshTotalIterations()
 
-                'Replace start folder in all XML if present
-                If lXML.Tag.ToLower = "startfolder" Then
-                    Dim lStartFolder As String = lXML.Content
-                    aValue = ReplaceString(aValue, StartFolderVariable, lStartFolder)
-                    lXML.LoadXml(aValue)
-                    lXML.FirstChild2()
-                End If
-
-                Do
-                    Dim lVariation As atcVariation
-                    Dim lChild As Chilkat.Xml = lXML.FirstChild
-                    Select Case lXML.Tag.ToLower
-                        Case "saveall"
-                            chkSaveAll.Checked = (lXML.Content.ToLower = "true")
-                        Case "showeachrun"
-                            chkShowEachRunProgress.Checked = (lXML.Content.ToLower = "true")
-                        Case "uci"
-                            OpenUCI(AbsolutePath(lChild.Content, CurDir))
-                        Case "preparedinputs"
-                            If pPreparedInputs Is Nothing Then
-                                pPreparedInputs = New atcCollection
-                            Else
-                                pPreparedInputs.Clear()
-                            End If
-                            If Not lChild Is Nothing Then
-                                Do
-                                    pPreparedInputs.Add(lChild.Content)
-                                Loop While lChild.NextSibling2
-                            End If
-                            RefreshInputList()
-                            RefreshTotalIterations()
-
-                        Case "variations"
-                            pInputs.Clear()
-                            If Not lChild Is Nothing Then
-                                Do
-                                    If lChild.GetChildWithTag("Name").Content.IndexOf(CLIGEN_NAME) >= 0 Then
+                            Case "variations"
+                                pInputs.Clear()
+                                For Each lChild In lXML.ChildNodes
+                                    If lChild.InnerXml.IndexOf(CLIGEN_NAME) >= 0 Then
                                         lVariation = New VariationCligen
                                     Else
                                         lVariation = New atcVariation
                                     End If
-                                    lVariation.XML = lChild.GetXml
+                                    lVariation.XML = lChild.OuterXml
                                     If Not lVariation.IsInput Then
                                         lVariation.IsInput = True
                                         Logger.Dbg("Assigned IsInput to loaded variation '" & lVariation.Name & "'")
                                     End If
                                     pInputs.Add(lVariation)
-                                Loop While lChild.NextSibling2
-                            End If
-                            RefreshInputList()
-                            RefreshTotalIterations()
-                        Case "endpoints"
-                            pEndpoints.Clear()
-                            If Not lChild Is Nothing Then
-                                Do
+                                Next
+                                RefreshInputList()
+                                RefreshTotalIterations()
+                            Case "endpoints"
+                                pEndpoints.Clear()
+                                For Each lChild In lXML.ChildNodes
                                     lVariation = New atcVariation
-                                    lVariation.XML = lChild.GetXml
+                                    lVariation.XML = lChild.OuterXml
                                     'Used to keep input variations in endpoints, skip them
                                     If Not lVariation.IsInput Then
                                         pEndpoints.Add(lVariation)
                                     End If
-                                Loop While lChild.NextSibling2
-                            End If
-                            RefreshEndpointList()
-                    End Select
-                Loop While lXML.NextSibling2
-                'RefreshInputList()
-            Else
-                Logger.Msg("Could not parse variations " & vbCrLf & lXML.LastErrorText, "Load Variations")
-            End If
+                                Next
+                                RefreshEndpointList()
+                        End Select
+                    Next
+                End If
+            Catch e As Exception
+                Logger.Msg("Could not load XML:" & vbCrLf & e.Message & vbCrLf & vbCrLf & newValue, "CAT XML Problem")
+            End Try
         End Set
     End Property
 
