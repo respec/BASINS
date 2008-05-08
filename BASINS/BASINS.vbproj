@@ -69,11 +69,6 @@
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ChilkatDotNet">
-      <Name>ChilkatDotNet</Name>
-      <HintPath>..\Bin\ChilkatDotNet.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Interop.MapWinGIS">
       <Name>Interop.MapWinGIS</Name>
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
@@ -117,6 +112,7 @@
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcProjector\atcProjector.vbproj">
       <Name>atcProjector</Name>
@@ -143,9 +139,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="atcBasinsPlugIn.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="atcRenderStyle.vb">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="frmAbout.vb">

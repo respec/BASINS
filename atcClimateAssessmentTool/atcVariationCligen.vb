@@ -77,24 +77,31 @@ Public Class VariationCligen
 
     Public Overrides Property XML() As String
         Get
-            Dim lXML As New Chilkat.Xml
-            lXML.LoadXml(MyBase.XML)
-            lXML.NewChild("BaseParmFileName", BaseParmFileName)
-            lXML.NewChild("ParmToVary", ParmToVary)
-            lXML.NewChild("StartYear", StartYear)
-            lXML.NewChild("NumYears", NumYears)
-            Return lXML.GetXml
+            Return MyBase.XML.Replace("</Variation>", _
+                                      XmlNodeString("BaseParmFileName", BaseParmFileName) _
+                                    & XmlNodeString("ParmToVary", ParmToVary) _
+                                    & XmlNodeString("StartYear", StartYear) _
+                                    & XmlNodeString("NumYears", NumYears) _
+                                    & "</Variation>")
         End Get
-        Set(ByVal Value As String)
-            MyBase.XML = Value
-            Dim lXML As New Chilkat.Xml
-            lXML.LoadXml(Value)
-            BaseParmFileName = lXML.GetChildWithTag("BaseParmFileName").Content
-            ParmToVary = lXML.GetChildWithTag("ParmToVary").Content
-            StartYear = lXML.GetChildWithTag("StartYear").Content()
-            NumYears = lXML.GetChildWithTag("NumYears").Content()
+        Set(ByVal newValue As String)
+            MyBase.XML = newValue
+            Dim lXMLdoc As New Xml.XmlDocument
+            lXMLdoc.LoadXml(newValue)
+            For Each lXML As Xml.XmlNode In lXMLdoc.ChildNodes
+                Select Case lXML.Name
+                    Case "BaseParmFileName" : BaseParmFileName = lXML.InnerText
+                    Case "ParmToVary" : ParmToVary = lXML.InnerText
+                    Case "StartYear" : StartYear = lXML.InnerText
+                    Case "NumYears" : NumYears = lXML.InnerText
+                End Select
+            Next
         End Set
     End Property
+
+    Private Function XmlNodeString(ByVal aTag As String, ByVal aInnerText As String) As String
+        Return "<" & aTag & ">" & aInnerText & "</" & aTag & ">"
+    End Function
 
     Public Overrides Function Clone() As atcVariation
         Dim newVariation As New VariationCligen

@@ -484,71 +484,64 @@ Public Class atcDataManager
     ''' <a href="http://www.xml-parser.com/downloads.htm">http://www.xml-parser.com/downloads.htm</a>
     ''' </requirements>
     <CLSCompliant(False)> _
-     Public Shared Property XML() As Chilkat.Xml
+     Public Shared Property XML() As String
         Get
-            Dim lSaveXML As New Chilkat.Xml
-            Dim lChildXML As Chilkat.Xml
-            lSaveXML.Tag = "DataManager"
+            Dim lSaveXML As New Text.StringBuilder("<DataManager>")
             For Each lName As String In pSelectionAttributes
-                lSaveXML.NewChild("SelectionAttribute", lName)
+                lSaveXML.Append("<SelectionAttribute>" & lName & "</SelectionAttribute>")
             Next
             For Each lName As String In pDisplayAttributes
-                lSaveXML.NewChild("DisplayAttribute", lName)
+                lSaveXML.Append("<DisplayAttribute>" & lName & "</DisplayAttribute>")
             Next
             For Each lSource As atcDataSource In pDataSources
-                'If lSource.CanSave Then 'TODO: better test to pass only types that just need a Specification string to open
-                'If Not lSource.Specification.Equals(pInMemorySpecification) Then
                 If lSource.Category = "File" Then
-                    lChildXML = lSaveXML.NewChild("DataSource", lSource.Name)
-                    lChildXML.AddAttribute("Specification", lSource.Specification)
+                    lSaveXML.Append("<DataSource Specification='" & lSource.Specification & "'>" & lSource.Name & "</DataSource>")
                 End If
-                'End If
             Next
-            Return lSaveXML
+            lSaveXML.Append("</DataManager>")
+            Return lSaveXML.ToString
         End Get
-        Set(ByVal newValue As Chilkat.Xml)
+        Set(ByVal newXML As String)
+            Dim newValue As New Xml.XmlDocument
+            newValue.LoadXml(newXML)
             Clear()
-            If Not newValue Is Nothing Then
-                Dim clearedSelectionAttributes As Boolean = False
-                Dim clearedDisplayAttributes As Boolean = False
-                Dim lchildXML As Chilkat.Xml
-                lchildXML = newValue.FirstChild
-
-                While Not lchildXML Is Nothing
-                    Select Case lchildXML.Tag
-                        Case "DataFile", "DataSource"
-                            Dim lDataSourceType As String = lchildXML.Content
-                            Dim lSpecification As String = lchildXML.GetAttrValue("Specification")
-                            If lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
-                                Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
-                            ElseIf lDataSourceType = "WDM" AndAlso Not FileExists(lSpecification) Then
-                                Logger.Dbg("Skipping file that does not exist: '" & lSpecification & "'")
-                            Else
-                                Dim lNewDataSource As atcDataSource = DataSourceByName(lchildXML.Content)
-                                If lNewDataSource Is Nothing Then
-                                    Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
-                                ElseIf lNewDataSource.Category = "File" Then
-                                    OpenDataSource(lNewDataSource, lSpecification, Nothing)
+            Dim clearedSelectionAttributes As Boolean = False
+            Dim clearedDisplayAttributes As Boolean = False
+            For Each lchildXML As Xml.XmlNode In newValue.FirstChild.ChildNodes
+                Select Case lchildXML.Name
+                    Case "DataFile", "DataSource"
+                        Dim lDataSourceType As String = lchildXML.InnerText
+                        Dim lSpecification As String = lchildXML.Attributes.GetNamedItem("Specification").InnerText
+                        If lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
+                            Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
+                        Else
+                            Dim lNewDataSource As atcDataSource = DataSourceByName(lDataSourceType)
+                            If lNewDataSource Is Nothing Then
+                                Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
+                            ElseIf lNewDataSource.Category = "File" Then
+                                If Not FileExists(lSpecification) Then
+                                    Logger.Dbg("Skipping data file that does not exist: '" & lSpecification & "'")
                                 Else
-                                    Logger.Dbg("Skipping opening data source that is not a File: " & lSpecification)
+                                    OpenDataSource(lNewDataSource, lSpecification, Nothing)
                                 End If
+                            Else
+                                Logger.Dbg("Not yet able to open data source that is not a File: " & lSpecification)
                             End If
-                        Case "SelectionAttribute"
-                            If Not clearedSelectionAttributes Then
-                                clearedSelectionAttributes = True
-                                pSelectionAttributes.Clear()
-                            End If
-                            pSelectionAttributes.Add(lchildXML.Content)
-                        Case "DisplayAttribute"
-                            If Not clearedDisplayAttributes Then
-                                pDisplayAttributes.Clear()
-                                clearedDisplayAttributes = True
-                            End If
-                            pDisplayAttributes.Add(lchildXML.Content)
-                    End Select
-                    If Not lchildXML.NextSibling2 Then lchildXML = Nothing
-                End While
-            End If
+                        End If
+                    Case "SelectionAttribute"
+                        If Not clearedSelectionAttributes Then
+                            clearedSelectionAttributes = True
+                            pSelectionAttributes.Clear()
+                        End If
+                        pSelectionAttributes.Add(lchildXML.InnerText)
+                    Case "DisplayAttribute"
+                        If Not clearedDisplayAttributes Then
+                            pDisplayAttributes.Clear()
+                            clearedDisplayAttributes = True
+                        End If
+                        pDisplayAttributes.Add(lchildXML.InnerText)
+                End Select
+            Next
         End Set
     End Property
 

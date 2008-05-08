@@ -477,6 +477,7 @@ Public Class frmLandUse
 
         newFrm.Show()
         newFrm.FillTable()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Close()
     End Sub
 

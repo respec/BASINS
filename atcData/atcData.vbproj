@@ -70,10 +70,6 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ChilkatDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=16dba5cb7b161beb">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.0.2267.26168, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
@@ -91,6 +87,7 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.XML" />
     <ProjectReference Include="..\atcControls\atcControls.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls</Name>

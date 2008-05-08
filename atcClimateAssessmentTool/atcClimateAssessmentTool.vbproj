@@ -69,11 +69,6 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ChilkatDotNet">
-      <Name>ChilkatDotNet</Name>
-      <HintPath>..\Bin\ChilkatDotNet.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MapWinInterfaces">
       <Name>MapWinInterfaces</Name>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -92,6 +87,7 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.XML" />
     <ProjectReference Include="..\atcCligen\atcCligen.vbproj">
       <Project>{2EBD52CD-4BB4-4EC9-BE11-1101602958A2}</Project>
       <Name>atcCligen</Name>

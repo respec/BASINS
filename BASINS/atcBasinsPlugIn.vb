@@ -497,21 +497,27 @@ FoundDir:
             Try
                 ChDriveDir(IO.Path.GetDirectoryName(aProjectFile))
             Catch
-                Logger.Dbg("FailedToSetCurdirFrom:" & CurDir() & ":to:" & IO.Path.GetDirectoryName(aProjectFile))
+                Logger.Dbg("FailedToSetCurdirFrom:" & CurDir() & " to directory of " & aProjectFile)
             End Try
         End If
         If aSettingsString.Length > 0 Then
-            Dim lXML As New Chilkat.Xml
-            lXML.LoadXml(aSettingsString)
-            atcDataManager.XML = lXML.FindChild("DataManager")
+            Dim lXML As New Xml.XmlDocument
+            Try
+                lXML.LoadXml(aSettingsString)
+                Dim lDataManagerNode As Xml.XmlNode = lXML.SelectSingleNode("/BASINS/DataManager")
+                If lDataManagerNode Is Nothing Then
+                    atcDataManager.Clear()
+                Else
+                    atcDataManager.XML = lDataManagerNode.OuterXml
+                End If
+            Catch e As Exception
+                Logger.Dbg("Unable to load project settings string from '" & aProjectFile & "': " & e.Message)
+            End Try
         End If
     End Sub
 
     Public Sub ProjectSaving(ByVal aProjectFile As String, ByRef aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
-        Dim saveXML As New Chilkat.Xml
-        saveXML.Tag = "BASINS"
-        saveXML.AddChildTree(atcDataManager.XML)
-        aSettingsString = saveXML.GetXml
+        aSettingsString = "<BASINS>" & atcDataManager.XML & "</BASINS>"
     End Sub
 
     <CLSCompliant(False)> _

@@ -668,24 +668,28 @@ Public Class atcVariation
             End If
         End Get
         Set(ByVal newValue As String)
-            Dim lXML As New Chilkat.Xml
-            If lXML.LoadXml(newValue) Then
-                If lXML.Tag.ToLower.Equals("events") Then
+            Dim lXMLDoc As New Xml.XmlDocument
+            Try
+                lXMLDoc.LoadXml(newValue)
+                Dim lXML As Xml.XmlNode = lXMLDoc.FirstChild
+                If lXML.Name.ToLower.Equals("events") Then
                     UseEvents = True
-                    EventThreshold = lXML.GetAttrValue("Threshold")
-                    EventHigh = lXML.GetAttrValue("High")
-                    IntensifyVolumeFraction = lXML.GetAttrValue("IntensifyVolumeFraction")
-                    EventDaysGapAllowed = lXML.GetAttrValue("GapDays")
+                    EventThreshold = lXML.Attributes.GetNamedItem("Threshold").InnerText
+                    EventHigh = lXML.Attributes.GetNamedItem("High").InnerText
+                    IntensifyVolumeFraction = lXML.Attributes.GetNamedItem("IntensifyVolumeFraction").InnerText
+                    EventDaysGapAllowed = lXML.Attributes.GetNamedItem("GapDays").InnerText
                     'EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
 
-                    EventVolumeHigh = lXML.GetAttrValue("VolumeHigh")
-                    EventVolumeThreshold = lXML.GetAttrValue("VolumeThreshold")
+                    EventVolumeHigh = lXML.Attributes.GetNamedItem("VolumeHigh").InnerText
+                    EventVolumeThreshold = lXML.Attributes.GetNamedItem("VolumeThreshold").InnerText
 
-                    EventDurationHigh = lXML.GetAttrValue("DurationHigh")
-                    EventDurationDays = lXML.GetAttrValue("DurationDays")
+                    EventDurationHigh = lXML.Attributes.GetNamedItem("DurationHigh").InnerText
+                    EventDurationDays = lXML.Attributes.GetNamedItem("DurationDays").InnerText
                     'EventDurationDisplayUnits = lXML.GetAttrValue("DurationDisplayUnits")
                 End If
-            End If
+            Catch e As Exception
+                Logger.Msg("Could not read Events XML:" & vbCrLf & newValue, "CAT Events XML Problem")
+            End Try
         End Set
     End Property
 
@@ -699,20 +703,24 @@ Public Class atcVariation
             End If
         End Get
         Set(ByVal newValue As String)
-            Dim lXML As New Chilkat.Xml
-            If lXML.LoadXml(newValue) Then
-                If lXML.Tag.ToLower.Equals("seasons") Then
-                    Dim lSeasonTypeName As String = lXML.GetAttrValue("Type")
+            Dim lXMLdoc As New Xml.XmlDocument
+            Try
+                lXMLdoc.LoadXml(newValue)
+                Dim lXML As Xml.XmlNode = lXMLdoc.FirstChild
+                If lXML.Name.ToLower.Equals("seasons") Then
+                    Dim lSeasonTypeName As String = lXML.Attributes.GetNamedItem("Type").InnerText
                     For Each lSeasonType As Type In atcSeasons.atcSeasonPlugin.AllSeasonTypes
                         If lSeasonType.Name.Equals(lSeasonTypeName) Then
                             Seasons = lSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-                            If lXML.FirstChild2 Then
-                                Seasons.SeasonsSelectedXML = lXML.GetXml
+                            If lXML.InnerXml.Contains("<") Then
+                                Seasons.SeasonsSelectedXML = lXML.InnerXml
                             End If
                         End If
                     Next
                 End If
-            End If
+            Catch ex As Exception
+                Logger.Msg("Unable to parse:" & vbCrLf & newValue, "CAT Seasons XML Problem")
+            End Try
         End Set
     End Property
 
@@ -747,49 +755,50 @@ Public Class atcVariation
     End Function
 
     Private Sub SetDataGroupXML(ByRef aDataGroup As atcDataGroup, ByVal aTag As String, ByVal aXML As String)
-        Dim lXML As New Chilkat.Xml
-        If lXML.LoadXml(aXML) Then
+        Dim lXMLdoc As New Xml.XmlDocument
+        Try
+            lXMLdoc.LoadXml(aXML)
             aDataGroup = New atcDataGroup
-            If lXML.FirstChild2() Then
-                Do
-                    Dim lKey As String = lXML.GetAttrValue("Key")
-                    Dim lID As String = lXML.GetAttrValue("ID")
-                    Dim lHistory As String = lXML.GetAttrValue("History")
-                    If lID.Length > 0 Then
-                        Dim lDataGroup As atcDataGroup = Nothing
-                        If lHistory.Length > 10 Then
-                            Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
-                            For Each lDataSource As atcDataSource In atcDataManager.DataSources
-                                If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
-                                    lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
-                                    If lDataGroup.Count > 0 Then
-                                        Logger.Dbg("Found data set #" & lID & " in " & lSourceSpecification)
-                                        Exit For
-                                    Else
-                                        lDataGroup = Nothing
-                                    End If
+            For Each lXML As Xml.XmlNode In lXMLdoc.ChildNodes
+                Dim lKey As String = lXML.Attributes.GetNamedItem("Key").InnerText
+                Dim lID As String = lXML.Attributes.GetNamedItem("ID").InnerText
+                Dim lHistory As String = lXML.attributes.GetNamedItem("History").InnerText
+                If lID.Length > 0 Then
+                    Dim lDataGroup As atcDataGroup = Nothing
+                    If lHistory.Length > 10 Then
+                        Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
+                        For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                            If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
+                                lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
+                                If lDataGroup.Count > 0 Then
+                                    Logger.Dbg("Found data set #" & lID & " in " & lSourceSpecification)
+                                    Exit For
+                                Else
+                                    lDataGroup = Nothing
                                 End If
-                            Next
-                        End If
-                        If lDataGroup Is Nothing Then
-                            lDataGroup = atcDataManager.DataSets.FindData("ID", lID, 2)
-                        End If
-                        If lDataGroup.Count > 0 Then
-                            Logger.Dbg("Found data set #" & lID & " without a specification")
-                            If lDataGroup.Count > 1 Then Logger.Dbg("Warning: more than one data set matched ID " & lID)
-                            aDataGroup.Add(lKey, lDataGroup.ItemByIndex(0))
-                        Else
-                            Logger.Msg("No data found with ID " & lID, "Variation from XML")
-                        End If
-                    Else
-                        If lKey Is Nothing OrElse lKey.Length = 0 Then
-                            Logger.Dbg("No data set ID found in XML, skipping: ", lXML.GetXml)
-                        End If
-                        aDataGroup.Add(lKey, Nothing)
+                            End If
+                        Next
                     End If
-                Loop While lXML.NextSibling2
-            End If
-        End If
+                    If lDataGroup Is Nothing Then
+                        lDataGroup = atcDataManager.DataSets.FindData("ID", lID, 2)
+                    End If
+                    If lDataGroup.Count > 0 Then
+                        Logger.Dbg("Found data set #" & lID & " without a specification")
+                        If lDataGroup.Count > 1 Then Logger.Dbg("Warning: more than one data set matched ID " & lID)
+                        aDataGroup.Add(lKey, lDataGroup.ItemByIndex(0))
+                    Else
+                        Logger.Msg("No data found with ID " & lID, "Variation from XML")
+                    End If
+                Else
+                    If lKey Is Nothing OrElse lKey.Length = 0 Then
+                        Logger.Dbg("No data set ID found in XML, skipping: ", lXML.OuterXml)
+                    End If
+                    aDataGroup.Add(lKey, Nothing)
+                End If
+            Next
+        Catch e As Exception
+            Logger.Msg("Unable to parse:" & vbCrLf & aXML, "CAT Data Group XML Problem")
+        End Try
     End Sub
 
     Public Overridable Property XML() As String
@@ -821,33 +830,34 @@ Public Class atcVariation
                  & "</Variation>" & vbCrLf
             Return lXML
         End Get
-        Set(ByVal Value As String)
-            Dim lXML As New Chilkat.Xml
-            If lXML.LoadXml(Value) Then
-                If lXML.FirstChild2() Then
-                    Do
-                        With lXML
-                            Select Case .Tag.ToLower
-                                Case "name" : Name = .Content
-                                Case "min" : Min = CDbl(.Content)
-                                Case "max" : Max = CDbl(.Content)
-                                Case "increment" : Increment = CDbl(.Content)
-                                Case "isinput" : IsInput = CBool(.Content)
-                                Case "operation" : Operation = .Content
-                                    'Case "addremoveper" : AddRemovePer = .Content
-                                Case "computationsource"
-                                    ComputationSource = atcDataManager.DataSourceByName(.Content)
-                                Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .GetXml)
-                                Case "petdata" : SetDataGroupXML(PETdata, "PETdata", .GetXml)
-                                Case "selected"
-                                    Selected = .Content.ToLower.Equals("true")
-                                Case "seasons" : SeasonsXML = .GetXml
-                                Case "events" : EventsXML = .GetXml
-                            End Select
-                        End With
-                    Loop While lXML.NextSibling2
-                End If
-            End If
+        Set(ByVal newValue As String)
+            Dim lXMLdoc As New Xml.XmlDocument
+            Try
+                lXMLdoc.LoadXml(newValue)
+                For Each lXML As Xml.XmlNode In lXMLdoc.ChildNodes
+                    With lXML
+                        Select Case .Name.ToLower
+                            Case "name" : Name = .InnerText
+                            Case "min" : Min = CDbl(.InnerText)
+                            Case "max" : Max = CDbl(.InnerText)
+                            Case "increment" : Increment = CDbl(.InnerText)
+                            Case "isinput" : IsInput = CBool(.InnerText)
+                            Case "operation" : Operation = .InnerText
+                                'Case "addremoveper" : AddRemovePer = .Content
+                            Case "computationsource"
+                                ComputationSource = atcDataManager.DataSourceByName(.InnerText)
+                            Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .OuterXml)
+                            Case "petdata" : SetDataGroupXML(PETdata, "PETdata", .OuterXml)
+                            Case "selected"
+                                Selected = .InnerText.ToLower.Equals("true")
+                            Case "seasons" : SeasonsXML = .OuterXml
+                            Case "events" : EventsXML = .OuterXml
+                        End Select
+                    End With
+                Next
+            Catch e As Exception
+                Logger.Msg("Unable to parse:" & vbCrLf & newValue, "CAT Variation XML Problem")
+            End Try
         End Set
     End Property
 
