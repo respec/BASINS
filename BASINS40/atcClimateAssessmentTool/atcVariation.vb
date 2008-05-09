@@ -577,7 +577,7 @@ Public Class atcVariation
         pName = "<untitled>"
         pDataSets = New atcDataGroup
         pComputationSource = Nothing
-        pOperation = ""
+        pOperation = "Add"
         pSelected = False
 
         Seasons = Nothing
@@ -674,24 +674,34 @@ Public Class atcVariation
                 Dim lXML As Xml.XmlNode = lXMLDoc.FirstChild
                 If lXML.Name.ToLower.Equals("events") Then
                     UseEvents = True
-                    EventThreshold = lXML.Attributes.GetNamedItem("Threshold").InnerText
-                    EventHigh = lXML.Attributes.GetNamedItem("High").InnerText
-                    IntensifyVolumeFraction = lXML.Attributes.GetNamedItem("IntensifyVolumeFraction").InnerText
-                    EventDaysGapAllowed = lXML.Attributes.GetNamedItem("GapDays").InnerText
+                    EventThreshold = GetAtt(lXML, "Threshold", EventThreshold)
+                    EventHigh = GetAtt(lXML, "High", EventHigh)
+                    IntensifyVolumeFraction = GetAtt(lXML, "FlashVolumeFraction", IntensifyVolumeFraction) 'supports old name
+                    IntensifyVolumeFraction = GetAtt(lXML, "IntensifyVolumeFraction", IntensifyVolumeFraction)
+                    EventDaysGapAllowed = GetAtt(lXML, "GapDays", EventDaysGapAllowed)
                     'EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
 
-                    EventVolumeHigh = lXML.Attributes.GetNamedItem("VolumeHigh").InnerText
-                    EventVolumeThreshold = lXML.Attributes.GetNamedItem("VolumeThreshold").InnerText
+                    EventVolumeHigh = GetAtt(lXML, "VolumeHigh", EventVolumeHigh)
+                    EventVolumeThreshold = GetAtt(lXML, "VolumeThreshold", EventVolumeThreshold)
 
-                    EventDurationHigh = lXML.Attributes.GetNamedItem("DurationHigh").InnerText
-                    EventDurationDays = lXML.Attributes.GetNamedItem("DurationDays").InnerText
+                    EventDurationHigh = GetAtt(lXML, "DurationHigh", EventDurationHigh)
+                    EventDurationDays = GetAtt(lXML, "DurationDays", EventDurationDays)
                     'EventDurationDisplayUnits = lXML.GetAttrValue("DurationDisplayUnits")
                 End If
             Catch e As Exception
-                Logger.Msg("Could not read Events XML:" & vbCrLf & newValue, "CAT Events XML Problem")
+                Logger.Msg("Could not read Events XML:" & vbCrLf & newValue & vbCrLf & e.Message, "CAT Events XML Problem")
             End Try
         End Set
     End Property
+
+    Private Function GetAtt(ByVal aNode As Xml.XmlNode, ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As Object
+        Dim lAttribute As Xml.XmlAttribute = aNode.Attributes.GetNamedItem(aAttributeName)
+        If lAttribute IsNot Nothing Then
+            Return lAttribute.InnerText
+        Else
+            Return aDefault
+        End If
+    End Function
 
     Protected Overridable Property SeasonsXML() As String
         Get
@@ -708,7 +718,7 @@ Public Class atcVariation
                 lXMLdoc.LoadXml(newValue)
                 Dim lXML As Xml.XmlNode = lXMLdoc.FirstChild
                 If lXML.Name.ToLower.Equals("seasons") Then
-                    Dim lSeasonTypeName As String = lXML.Attributes.GetNamedItem("Type").InnerText
+                    Dim lSeasonTypeName As String = GetAtt(lXML, "Type")
                     For Each lSeasonType As Type In atcSeasons.atcSeasonPlugin.AllSeasonTypes
                         If lSeasonType.Name.Equals(lSeasonTypeName) Then
                             Seasons = lSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
@@ -725,7 +735,7 @@ Public Class atcVariation
     End Property
 
     Private Function GetDataGroupXML(ByVal aDataGroup As atcDataGroup, ByVal aTag As String) As String
-        If aDataGroup Is Nothing Then
+        If aDataGroup Is Nothing OrElse aDataGroup.Count = 0 Then
             Return ""
         Else
             Dim lXML As String = "  <" & aTag & " count='" & aDataGroup.Count & "'>" & vbCrLf
@@ -759,10 +769,10 @@ Public Class atcVariation
         Try
             lXMLdoc.LoadXml(aXML)
             aDataGroup = New atcDataGroup
-            For Each lXML As Xml.XmlNode In lXMLdoc.ChildNodes
-                Dim lKey As String = lXML.Attributes.GetNamedItem("Key").InnerText
-                Dim lID As String = lXML.Attributes.GetNamedItem("ID").InnerText
-                Dim lHistory As String = lXML.attributes.GetNamedItem("History").InnerText
+            For Each lXML As Xml.XmlNode In lXMLdoc.FirstChild.ChildNodes
+                Dim lKey As String = GetAtt(lXML, "Key")
+                Dim lID As String = GetAtt(lXML, "ID")
+                Dim lHistory As String = GetAtt(lXML, "History")
                 If lID.Length > 0 Then
                     Dim lDataGroup As atcDataGroup = Nothing
                     If lHistory.Length > 10 Then
@@ -797,7 +807,7 @@ Public Class atcVariation
                 End If
             Next
         Catch e As Exception
-            Logger.Msg("Unable to parse:" & vbCrLf & aXML, "CAT Data Group XML Problem")
+            Logger.Msg("Unable to parse:" & vbCrLf & aXML & vbCrLf & e.Message, "CAT Data Group XML Problem")
         End Try
     End Sub
 
@@ -834,7 +844,7 @@ Public Class atcVariation
             Dim lXMLdoc As New Xml.XmlDocument
             Try
                 lXMLdoc.LoadXml(newValue)
-                For Each lXML As Xml.XmlNode In lXMLdoc.ChildNodes
+                For Each lXML As Xml.XmlNode In lXMLdoc.FirstChild.ChildNodes
                     With lXML
                         Select Case .Name.ToLower
                             Case "name" : Name = .InnerText
@@ -842,7 +852,9 @@ Public Class atcVariation
                             Case "max" : Max = CDbl(.InnerText)
                             Case "increment" : Increment = CDbl(.InnerText)
                             Case "isinput" : IsInput = CBool(.InnerText)
-                            Case "operation" : Operation = .InnerText
+                            Case "operation"
+                                Operation = .InnerText
+                                If Operation = "Flash" Then Operation = "Intensify"
                                 'Case "addremoveper" : AddRemovePer = .Content
                             Case "computationsource"
                                 ComputationSource = atcDataManager.DataSourceByName(.InnerText)
