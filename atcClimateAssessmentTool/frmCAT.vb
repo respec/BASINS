@@ -1793,14 +1793,15 @@ NextIteration:
             Try
                 Dim lXMLdoc As New Xml.XmlDocument
                 lXMLdoc.LoadXml(newValue)
-                If lXMLdoc.Name.ToLower.Equals("basinscat") Then
-                    For Each lXML As Xml.XmlNode In lXMLdoc.ChildNodes
+                Dim lNode As Xml.XmlNode = lXMLdoc.FirstChild
+                If lNode.Name.ToLower.Equals("basinscat") Then
+                    For Each lXML As Xml.XmlNode In lNode.ChildNodes
                         Dim lVariation As atcVariation
                         Dim lChild As Xml.XmlNode = lXML.FirstChild
-                        'Replace start folder in all XML if present
                         Select Case lXML.Name.ToLower
-                            Case "startfolder"
+                            Case "startfolder" 'Replace start folder in all XML if present
                                 Dim lStartFolder As String = lXML.InnerText
+                                newValue = ReplaceString(newValue, lXML.OuterXml, "")
                                 Me.XML = ReplaceString(newValue, StartFolderVariable, lStartFolder)
                                 Exit Property
                             Case "saveall"

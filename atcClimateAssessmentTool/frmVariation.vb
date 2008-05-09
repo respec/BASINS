@@ -1086,7 +1086,6 @@ Imports MapWinUtility
     End Sub
 
     Private Sub EnableIterative(ByVal aEnable As Boolean)
-
         If radioIterate.Checked <> aEnable Then radioIterate.Checked = aEnable
         If radioSingle.Checked = aEnable Then radioSingle.Checked = Not aEnable
 
@@ -1105,7 +1104,6 @@ Imports MapWinUtility
     End Sub
 
     Private Sub EnableEvents(ByVal aEnable As Boolean)
-
         If chkEvents.Checked <> aEnable Then chkEvents.Checked = aEnable
 
         lblThreshold.Visible = aEnable
@@ -1128,7 +1126,6 @@ Imports MapWinUtility
     End Sub
 
     Private Sub EnableSeasons(ByVal aEnable As Boolean)
-
         If chkSeasons.Checked <> aEnable Then chkSeasons.Checked = aEnable
 
         cboSeasons.Visible = aEnable
@@ -1159,10 +1156,11 @@ Imports MapWinUtility
     End Sub
 
     Private Sub SetVolumePercentVisible()
-        Dim lVisible As Boolean = chkEvents.Checked AndAlso pFunctionOperations(cboFunction.SelectedIndex).Equals("Intensify")
+        Dim lVisible As Boolean = chkEvents.Checked AndAlso _
+                                  cboFunction.SelectedIndex > -1 AndAlso _
+                                  pFunctionOperations(cboFunction.SelectedIndex).Equals("Intensify")
         lblVolumePercent.Visible = lVisible
         lblVolumePercent2.Visible = lVisible
         txtVolumePercent.Visible = lVisible
     End Sub
-
 End Class
