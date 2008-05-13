@@ -140,7 +140,7 @@ Module modModelSetup
                         Dim lSJDay As Double = lDataSet.Dates.Value(0)
                         Dim lEJDay As Double = lDataSet.Dates.Value(lDataSet.Dates.numValues)
                         'find pevt dataset at the same location
-                        Dim lPevtFound As Boolean = False
+                        Dim lAddIt As Boolean = False
                         For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
                             If lDataSet2.Attributes.GetValue("Constituent") = "PEVT" And _
                                lDataSet2.Attributes.GetValue("Location") = lLoc Then
@@ -148,11 +148,22 @@ Module modModelSetup
                                 Dim lEJDay2 As Double = lDataSet2.Dates.Value(lDataSet2.Dates.numValues)
                                 If lSJDay2 > lSJDay Then lSJDay = lSJDay2
                                 If lEJDay2 < lEJDay Then lEJDay = lEJDay2
-                                lPevtFound = True
+                                lAddIt = True
                                 Exit For
                             End If
                         Next
-                        If lPevtFound Then
+                        'if this one is computed and observed also exists at same location, just use observed
+                        If lDataSet.Attributes.GetValue("Scenario") = "COMPUTED" Then
+                            For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
+                                If lDataSet2.Attributes.GetValue("Constituent") = "PREC" And _
+                                   lDataSet2.Attributes.GetValue("Scenario") = "OBSERVED" And _
+                                   lDataSet2.Attributes.GetValue("Location") = lLoc Then
+                                    lAddIt = False
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If lAddIt Then
                             Dim lLeadingChar As String = ""
                             If IsBASINSMetWDM(lDataSource.DataSets, lDsn, lLoc) Then
                                 'full set available here
