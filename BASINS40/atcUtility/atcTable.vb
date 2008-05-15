@@ -142,6 +142,23 @@ Public MustInherit Class atcTable
         Return SummaryFile(aFormat) & vbCrLf & SummaryFields(aFormat)
     End Function
 
+    'Find width of widest existing value in each field
+    Public Overridable Function ComputeFieldLengths() As Integer()
+        Dim lMaxWidths(Me.NumFields) As Integer
+        Dim lField As Integer
+        Dim lWidth As Integer
+        Dim lSaveCurrent As Integer = Me.CurrentRecord
+        For lRecord As Integer = 1 To Me.NumRecords
+            Me.CurrentRecord = lRecord
+            For lField = 1 To NumFields
+                lWidth = Me.Value(lField).Length
+                If lWidth > lMaxWidths(lField) Then lMaxWidths(lField) = lWidth
+            Next
+        Next
+        Me.CurrentRecord = lSaveCurrent
+        Return lMaxWidths
+    End Function
+
     'A summary of the file
     Public Overridable Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String Implements IatcTable.SummaryFile
         Dim retval As String

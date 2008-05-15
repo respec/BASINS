@@ -1792,6 +1792,7 @@ NextIteration:
         Set(ByVal newValue As String)
             Try
                 Dim lXMLdoc As New Xml.XmlDocument
+StartOver:
                 lXMLdoc.LoadXml(newValue)
                 Dim lNode As Xml.XmlNode = lXMLdoc.FirstChild
                 If lNode.Name.ToLower.Equals("basinscat") Then
@@ -1802,8 +1803,8 @@ NextIteration:
                             Case "startfolder" 'Replace start folder in all XML if present
                                 Dim lStartFolder As String = lXML.InnerText
                                 newValue = ReplaceString(newValue, lXML.OuterXml, "")
-                                Me.XML = ReplaceString(newValue, StartFolderVariable, lStartFolder)
-                                Exit Property
+                                newValue = ReplaceString(newValue, StartFolderVariable, lStartFolder)
+                                GoTo StartOver
                             Case "saveall"
                                 chkSaveAll.Checked = (lXML.InnerText.ToLower = "true")
                             Case "showeachrun"
