@@ -97,7 +97,7 @@ Public Module modBasinsPlugin
     ''' <remarks></remarks>
     Friend Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
-            Dim lFileName As String = g_BasinsDir & "\Data\national\" & NationalProjectFilename
+            Dim lFileName As String = IO.Path.Combine(g_BasinsDir, "Data\national\" & NationalProjectFilename)
             If Not FileExists(lFileName) Then
                 For Each lDir As String In g_BasinsDataDirs
                     lFileName = lDir & "national\" & NationalProjectFilename
@@ -108,7 +108,17 @@ Public Module modBasinsPlugin
             End If
 
             If FileExists(lFileName) Then  'load national project
+
                 g_Project.Load(lFileName)
+
+                'See if we need to also process and load place names
+                Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(lFileName), g_Project.ProjectProjection)
+                If lInstructions.Length > 0 Then
+                    Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
+                    Logger.DisplayMessageBoxes = False 'Don't show a message box after adding these layers
+                    ProcessDownloadResults(lInstructions)
+                    Logger.DisplayMessageBoxes = lDisplayMessageBoxes
+                End If
             Else
                 Logger.Msg("Unable to find '" & NationalProjectFilename & "'", "Open National")
                 Exit Sub
