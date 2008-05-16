@@ -49,24 +49,23 @@ Public Class atcTimeseriesSWAT
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
 
         If MyBase.Open(aFileName, aAttributes) Then
-            Dim lTable As New atcTableFixed
+            Dim lDelim As String = ";"
+            Dim lFieldsToProcess As String = ""
+            If aAttributes IsNot Nothing Then
+                lFieldsToProcess = lDelim & aAttributes.GetValue("FieldName", "") & lDelim
+            End If
+            Dim lTable As New atcTableFixedStreaming
             With lTable
                 .NumHeaderRows = 9
                 If .OpenFile(Specification) Then
                     Dim lTSBuilders As New atcData.atcTimeseriesGroupBuilder(Me)
                     Dim lTSBuilder As atcData.atcTimeseriesBuilder
                     Dim lField As Integer
-                    Dim lCurrentRecord As Integer
-                    Dim lLastRecord As Integer = .NumRecords
                     Dim lFieldStart As Integer = 1
                     Dim lLocation As String
                     Dim lKey As String
                     Dim lDate As Double
                     Dim lYear As Integer
-                    Dim lMonth As Integer
-                    Dim lDay As Integer = 1
-                    Dim lDaily As Boolean = False
-                    Dim lYearly As Boolean = False
                     Dim lConstituentHeader As String = .Header(9)
                     Dim lLastField As Integer
                     Select Case IO.Path.GetExtension(Specification)
@@ -118,61 +117,37 @@ Public Class atcTimeseriesSWAT
                             Throw New ApplicationException("Unknown file extension for " & Specification)
                     End Select
 
-                    'Scan for first record with a year instead of a month in column 3
-                    For lCurrentRecord = 1 To lLastRecord
-                        .CurrentRecord = lCurrentRecord
-                        lYear = Integer.Parse(.Value(3).Trim)
-                        If lYear > 12 Then Exit For
-                    Next
-
-                    If lYear = 13 Then
-                        lDaily = True
-                        lYear = 1900
-                    End If
-
-                    Logger.Status("Reading " & Format(lLastRecord, "#,###") & " records * " & Format((lLastField - 3), "#,###") & " constituents from " & Specification, True)
-                    For lCurrentRecord = 1 To lLastRecord
-                        .CurrentRecord = lCurrentRecord
+                    Logger.Status("Reading records for " & Format((lLastField - 3), "#,###") & " constituents from " & Specification, True)
+                    .CurrentRecord = 1
+                    Do
                         lLocation = .Value(1)
 
-                        'MON column may hold month or day or year
+                        'MON column assumed to hold year
                         Try
-                            If Integer.TryParse(.Value(3).Trim, lMonth) Then
-                                If lDaily Then
-                                    If lMonth < lDay Then
-                                        lYear += 1
-                                    End If
-                                    lDay = lMonth
-                                    lMonth = 1
-                                Else
-                                    If lMonth > 12 Then
-                                        lYear = lMonth
-                                        lYearly = True
-                                        lMonth = 12 'date is last day of year, value is for prev year
-                                        Logger.Status("Reading year " & lYear)
-                                    ElseIf lYearly Then
-                                        lYear += 1
-                                        lYearly = False
-                                    End If
-                                    lDay = atcUtility.daymon(lYear, lMonth)
-                                End If
-
-                                lDate = atcUtility.Jday(lYear, lMonth, lDay, 24, 0, 0)
+                            If Integer.TryParse(.Value(3).Trim, lYear) Then
+                                Logger.Status("Reading year " & lYear)
+                                lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
                                 For lField = 4 To lLastField
-                                    lKey = .FieldName(lField) & ":" & lLocation
-                                    If lYearly Then lKey &= ":Y"
-                                    lTSBuilder = lTSBuilders.Builder(lKey)
-                                    lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
+                                    Dim lFieldName As String = .FieldName(lField)
+                                    If lFieldsToProcess.Length = 0 OrElse lFieldsToProcess.Contains(lDelim & lFieldName & lDelim) Then
+                                        lKey = lFieldName & ":" & lLocation
+                                        lTSBuilder = lTSBuilders.Builder(lKey)
+                                        lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
+                                    End If
                                 Next
+                            Else 'got to end of run summary, value is number of years as a decimal
+                                Exit Do
                             End If
                         Catch ex As FormatException
-                            Logger.Dbg("FormatException " & lCurrentRecord & ":" & lField & ":" & .Value(lField))
+                            Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
                         End Try
-                        Logger.Progress(lCurrentRecord, lLastRecord)
-                    Next
-                    'Logger.Dbg("Created Builders")
+                        'Logger.Progress(.CurrentRecord, ?)
+                        .CurrentRecord += 1
+                    Loop
+                    Logger.Dbg("Created Builders From " & .CurrentRecord & " Records")
                     Logger.Progress("Creating Timeseries", 0, 0)
                     lTSBuilders.CreateTimeseriesAddToGroup(Me.DataSets)
+                    Logger.Dbg("Created " & Me.DataSets.Count & " DataSets")
                     For Each lDataSet As atcData.atcTimeseries In Me.DataSets
                         With lDataSet.Attributes
                             Dim lKeyParts() As String = .GetValue("Key").Split(":")

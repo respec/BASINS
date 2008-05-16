@@ -91,6 +91,13 @@ Module SWATRunner
             Logger.Dbg("SwatModelRunDone")
         End If
 
+        Dim lOutputFields As New atcData.atcDataAttributes
+        lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
+        Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        With lOutputHru
+            .Open(pOutputFolder & "\output.hru", lOutputFields)
+            Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
+        End With
         Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
         With lOutputRch
             .Open(pOutputFolder & "\output.rch")
@@ -100,11 +107,6 @@ Module SWATRunner
         With lOutputSub
             .Open(pOutputFolder & "\output.sub")
             Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
-        End With
-        Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputSub
-            .Open(pOutputFolder & "\output.hru")
-            Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
         End With
 
         Logger.Dbg("SwatPostProcessingDone")
