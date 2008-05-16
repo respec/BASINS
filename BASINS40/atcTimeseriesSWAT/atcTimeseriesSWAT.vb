@@ -12,7 +12,7 @@ Public Class atcTimeseriesSWAT
     Inherits atcDataSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private Shared pFilter As String = "SWAT Output Files (*.rch, *.sub, *.dat)|*.rch;*.sub;*.dat"
+    Private Shared pFilter As String = "SWAT Output Files (output.*)|output.*"
     Private pColDefs As Hashtable
     'Private pReadAll As Boolean = False
 
@@ -68,19 +68,55 @@ Public Class atcTimeseriesSWAT
                     Dim lDaily As Boolean = False
                     Dim lYearly As Boolean = False
                     Dim lConstituentHeader As String = .Header(9)
-                    Dim lLastField As Integer = 3 + (lConstituentHeader.Length - 25) / 12
-                    .NumFields = lLastField
-                    For lField = 1 To lLastField
-                        Select Case lField
-                            Case 1 : .FieldLength(lField) = 10
-                            Case 2 : .FieldLength(lField) = 9
-                            Case 3 : .FieldLength(lField) = 6
-                            Case Else : .FieldLength(lField) = 12
-                        End Select
-                        .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
-                        .FieldStart(lField) = lFieldStart
-                        lFieldStart += .FieldLength(lField)
-                    Next
+                    Dim lLastField As Integer
+                    Select Case IO.Path.GetExtension(Specification)
+                        Case ".rch"
+                            lLastField = 3 + (lConstituentHeader.Length - 25) / 12
+                            .NumFields = lLastField
+                            For lField = 1 To lLastField
+                                Select Case lField
+                                    Case 1 : .FieldLength(lField) = 10
+                                    Case 2 : .FieldLength(lField) = 9
+                                    Case 3 : .FieldLength(lField) = 6
+                                    Case Else : .FieldLength(lField) = 12
+                                End Select
+                                .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
+                                .FieldStart(lField) = lFieldStart
+                                lFieldStart += .FieldLength(lField)
+                            Next
+                        Case ".sub"
+                            lLastField = 3 + (lConstituentHeader.Length - 26) / 10
+                            .NumFields = lLastField
+                            For lField = 1 To lLastField
+                                Select Case lField
+                                    Case 1 : .FieldLength(lField) = 10
+                                    Case 2 : .FieldLength(lField) = 9
+                                    Case 3 : .FieldLength(lField) = 5
+                                    Case 23 : .FieldLength(lField) = 12
+                                    Case Else : .FieldLength(lField) = 10
+                                End Select
+                                .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
+                                .FieldStart(lField) = lFieldStart
+                                lFieldStart += .FieldLength(lField)
+                            Next
+                        Case ".hru", ".hruX"
+                            lLastField = 3 + (lConstituentHeader.Length - 35) / 10
+                            .NumFields = lLastField
+                            For lField = 1 To lLastField
+                                Select Case lField
+                                    Case 1 : .FieldLength(lField) = 9
+                                    Case 2 : .FieldLength(lField) = 19
+                                    Case 3 : .FieldLength(lField) = 5
+                                    Case 71, 72 : .FieldLength(lField) = 11
+                                    Case Else : .FieldLength(lField) = 10
+                                End Select
+                                .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
+                                .FieldStart(lField) = lFieldStart
+                                lFieldStart += .FieldLength(lField)
+                            Next
+                        Case Else
+                            Throw New ApplicationException("Unknown file extension for " & Specification)
+                    End Select
 
                     'Scan for first record with a year instead of a month in column 3
                     For lCurrentRecord = 1 To lLastRecord
@@ -101,34 +137,36 @@ Public Class atcTimeseriesSWAT
 
                         'MON column may hold month or day or year
                         Try
-                            lMonth = Integer.Parse(.Value(3).Trim)
-                            If lDaily Then
-                                If lMonth < lDay Then
-                                    lYear += 1
-                                End If
-                                lDay = lMonth
-                                lMonth = 1
-                            Else
-                                If lMonth > 12 Then
-                                    lYear = lMonth
-                                    lYearly = True
+                            If Integer.TryParse(.Value(3).Trim, lMonth) Then
+                                If lDaily Then
+                                    If lMonth < lDay Then
+                                        lYear += 1
+                                    End If
+                                    lDay = lMonth
                                     lMonth = 1
-                                    Logger.Status("Reading year " & lYear)
-                                ElseIf lYearly Then
-                                    lYear += 1
-                                    lYearly = False
+                                Else
+                                    If lMonth > 12 Then
+                                        lYear = lMonth
+                                        lYearly = True
+                                        lMonth = 12 'date is last day of year, value is for prev year
+                                        Logger.Status("Reading year " & lYear)
+                                    ElseIf lYearly Then
+                                        lYear += 1
+                                        lYearly = False
+                                    End If
+                                    lDay = atcUtility.daymon(lYear, lMonth)
                                 End If
-                                lDay = atcUtility.daymon(lYear, lMonth)
-                            End If
 
-                            lDate = atcUtility.Jday(lYear, lMonth, lDay, 24, 0, 0)
-                            For lField = 4 To lLastField
-                                lKey = .FieldName(lField) & ":" & lLocation
-                                If lYearly Then lKey &= ":Y"
-                                lTSBuilder = lTSBuilders.Builder(lKey)
-                                lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
-                            Next
+                                lDate = atcUtility.Jday(lYear, lMonth, lDay, 24, 0, 0)
+                                For lField = 4 To lLastField
+                                    lKey = .FieldName(lField) & ":" & lLocation
+                                    If lYearly Then lKey &= ":Y"
+                                    lTSBuilder = lTSBuilders.Builder(lKey)
+                                    lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
+                                Next
+                            End If
                         Catch ex As FormatException
+                            Logger.Dbg("FormatException " & lCurrentRecord & ":" & lField & ":" & .Value(lField))
                         End Try
                         Logger.Progress(lCurrentRecord, lLastRecord)
                     Next
@@ -147,8 +185,7 @@ Public Class atcTimeseriesSWAT
                     Logger.Status("")
                     Return True
                 Else
-                    Logger.Dbg("Problem reading CliGen parameters into table in file " & aFileName & "." & vbCrLf & _
-                               "Check format of specified CliGen file.")
+                    Logger.Dbg("Problem reading " & Specification)
                     Return False
                 End If
             End With
@@ -164,7 +201,6 @@ Public Class atcTimeseriesSWAT
         SplitUnits = aConstituent.Substring(lUnitsStart)
         aConstituent = aConstituent.Substring(0, lUnitsStart)
     End Function
-
 
     Public Sub New()
         Filter = pFilter

@@ -6,6 +6,7 @@ Imports SwatObject
 
 Module SWATRunner
     Private Const pRefreshDB As Boolean = False
+    Private Const pOutputOnly As Boolean = True
     'Private Const pBasePath As String = "D:\Basins\data\SWATOutput\UM\baseline90"
     Private Const pBasePath As String = "C:\Project\UMRB\baseline90"
     'Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline90jack"
@@ -28,62 +29,83 @@ Module SWATRunner
         Logger.StartToFile(pInputPath & "\logs\SWATRunner.log", , , True)
 
         Dim lOutGDB = pOutGDBPath & "\" & pOutGDB
-        If pRefreshDB Then 'copy the entire input parameter database for this new scenario
-            If IO.File.Exists(lOutGDB) Then
-                Logger.Dbg("DeleteExisting " & lOutGDB)
-                IO.File.Delete(lOutGDB)
+
+        If Not pOutputOnly Then
+            If pRefreshDB Then 'copy the entire input parameter database for this new scenario
+                If IO.File.Exists(lOutGDB) Then
+                    Logger.Dbg("DeleteExisting " & lOutGDB)
+                    IO.File.Delete(lOutGDB)
+                End If
+                IO.File.Copy(pBasePath & "\" & pOutGDB, lOutGDB)
             End If
-            IO.File.Copy(pBasePath & "\" & pOutGDB, lOutGDB)
+
+            Logger.Dbg("InitializeSwatInput")
+            SwatInput.Initialize(pSWATGDB, lOutGDB, pOutputFolder)
+
+            SwatInput.Hru.TableCreate()
+
+            Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
+            For Each lString As String In LinesInFile("SWATParmChanges.txt")
+                Dim lParms() As String = lString.Split(";")
+                SwatInput.UpdateInputDB(lParms(0).Trim, lParms(1).Trim, lParms(2).Trim, lParms(3).Trim, lParms(4).Trim)
+            Next
+
+            Logger.Dbg("SWATSummarizeInput")
+            Dim lStreamWriter As New IO.StreamWriter(pInputPath & "\logs\LandUses.txt")
+            Dim lUniqueLandUses As DataTable = SwatInput.Hru.UniqueValues("LandUse")
+            For Each lLandUse As DataRow In lUniqueLandUses.Rows
+                lStreamWriter.WriteLine(lLandUse.Item(0).ToString)
+            Next
+            lStreamWriter.Close()
+
+            Dim lLandUSeTable As DataTable = AggregateCrops(SwatInput.SubBasin.TableWithArea("LandUse"))
+            SaveFileString(pInputPath & "\logs\AreaLandUseReport.txt", _
+                           SWATArea.Report(lLandUSeTable))
+            SaveFileString(pInputPath & "\logs\AreaSoilReport.txt", _
+                           SWATArea.Report(SwatInput.SubBasin.TableWithArea("Soil")))
+            SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", _
+                           SWATArea.Report(SwatInput.SubBasin.TableWithArea("Slope_Cd")))
+
+            Logger.Dbg("SwatModelRunStartIn " & pOutputFolder)
+            Try 'to run swat
+                Dim lSwatProcess As New System.Diagnostics.Process
+                With lSwatProcess.StartInfo
+                    .FileName = pSWATExe
+                    .WorkingDirectory = pOutputFolder
+                    .CreateNoWindow = True
+                    .UseShellExecute = False
+                    .RedirectStandardOutput = True
+                    pSwatOutput = New Text.StringBuilder
+                    AddHandler lSwatProcess.OutputDataReceived, AddressOf OutputDataHandler
+                    .RedirectStandardError = True
+                    pSwatError = New Text.StringBuilder
+                    AddHandler lSwatProcess.ErrorDataReceived, AddressOf ErrorDataHandler
+                End With
+                lSwatProcess.Start()
+                lSwatProcess.BeginErrorReadLine()
+                lSwatProcess.BeginOutputReadLine()
+                lSwatProcess.WaitForExit()
+            Catch lEx As ApplicationException
+                Logger.Dbg("SwatRunProblem " & lEx.Message)
+            End Try
+            Logger.Dbg("SwatModelRunDone")
         End If
 
-        Logger.Dbg("InitializeSwatInput")
-        SwatInput.Initialize(pSWATGDB, lOutGDB, pOutputFolder)
-
-        Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
-        For Each lString As String In LinesInFile("SWATParmChanges.txt")
-            Dim lParms() As String = lString.Split(";")
-            SwatInput.UpdateInputDB(lParms(0).Trim, lParms(1).Trim, lParms(2).Trim, lParms(3).Trim, lParms(4).Trim)
-        Next
-
-        Logger.Dbg("SWATSummarizeInput")
-        Dim lStreamWriter As New IO.StreamWriter(pInputPath & "\logs\LandUses.txt")
-        Dim lUniqueLandUses As DataTable = SwatInput.Hru.UniqueValues("LandUse")
-        For Each lLandUse As DataRow In lUniqueLandUses.Rows
-            lStreamWriter.WriteLine(lLandUse.Item(0).ToString)
-        Next
-        lStreamWriter.Close()
-
-        Dim lLandUSeTable As DataTable = AggregateCrops(SwatInput.SubBasin.TableWithArea("LandUse"))
-        SaveFileString(pInputPath & "\logs\AreaLandUseReport.txt", _
-                       SWATArea.Report(lLandUSeTable))
-        SaveFileString(pInputPath & "\logs\AreaSoilReport.txt", _
-                       SWATArea.Report(SwatInput.SubBasin.TableWithArea("Soil")))
-        SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", _
-                       SWATArea.Report(SwatInput.SubBasin.TableWithArea("Slope_Cd")))
-
-        Logger.Dbg("SwatModelRunStartIn " & pOutputFolder)
-        Try 'to run swat
-            Dim lSwatProcess As New System.Diagnostics.Process
-            With lSwatProcess.StartInfo
-                .FileName = pSWATExe
-                .WorkingDirectory = pOutputFolder
-                .CreateNoWindow = True
-                .UseShellExecute = False
-                .RedirectStandardOutput = True
-                pSwatOutput = New Text.StringBuilder
-                AddHandler lSwatProcess.OutputDataReceived, AddressOf OutputDataHandler
-                .RedirectStandardError = True
-                pSwatError = New Text.StringBuilder
-                AddHandler lSwatProcess.ErrorDataReceived, AddressOf ErrorDataHandler
-            End With
-            lSwatProcess.Start()
-            lSwatProcess.BeginErrorReadLine()
-            lSwatProcess.BeginOutputReadLine()
-            lSwatProcess.WaitForExit()
-        Catch lEx As ApplicationException
-            Logger.Dbg("SwatRunProblem " & lEx.Message)
-        End Try
-        Logger.Dbg("SwatModelRunDone")
+        Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        With lOutputRch
+            .Open(pOutputFolder & "\output.rch")
+            Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
+        End With
+        Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        With lOutputSub
+            .Open(pOutputFolder & "\output.sub")
+            Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
+        End With
+        Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        With lOutputSub
+            .Open(pOutputFolder & "\output.hru")
+            Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
+        End With
 
         Logger.Dbg("SwatPostProcessingDone")
 
