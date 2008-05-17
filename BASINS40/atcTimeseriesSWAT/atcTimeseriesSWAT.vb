@@ -68,7 +68,7 @@ Public Class atcTimeseriesSWAT
                     Dim lYear As Integer
                     Dim lConstituentHeader As String = .Header(9)
                     Dim lLastField As Integer
-                    Select Case IO.Path.GetExtension(Specification)
+                    Select Case IO.Path.GetExtension(Specification).ToLower
                         Case ".rch"
                             lLastField = 3 + (lConstituentHeader.Length - 25) / 12
                             .NumFields = lLastField
@@ -98,7 +98,7 @@ Public Class atcTimeseriesSWAT
                                 .FieldStart(lField) = lFieldStart
                                 lFieldStart += .FieldLength(lField)
                             Next
-                        Case ".hru", ".hruX"
+                        Case ".hru", ".hrux"
                             lLastField = 3 + (lConstituentHeader.Length - 35) / 10
                             .NumFields = lLastField
                             For lField = 1 To lLastField
@@ -132,6 +132,9 @@ Public Class atcTimeseriesSWAT
                                     If lFieldsToProcess.Length = 0 OrElse lFieldsToProcess.Contains(lDelim & lFieldName & lDelim) Then
                                         lKey = lFieldName & ":" & lLocation
                                         lTSBuilder = lTSBuilders.Builder(lKey)
+                                        If lTSBuilder.NumValues = 0 Then
+                                            lTSBuilder.AddValue(atcUtility.Jday(lYear, 1, 1, 0, 0, 0), Double.NaN)
+                                        End If
                                         lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
                                     End If
                                 Next
@@ -155,6 +158,11 @@ Public Class atcTimeseriesSWAT
                             .SetValue("Units", SplitUnits(lKeyParts(0)))
                             .SetValue("Constituent", lKeyParts(0))
                             .SetValue("Location", lKeyParts(1))
+                            'TODO: next 4 are hard coded for annual wdm datasets, make more generic
+                            .SetValue("tu", 6) 'annual
+                            .SetValue("ts", 1)
+                            .SetValue("tsbyr", 1900)
+                            .SetValue("tgroup", 6)
                         End With
                     Next
                     Logger.Status("")

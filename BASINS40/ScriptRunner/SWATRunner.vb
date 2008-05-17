@@ -2,6 +2,8 @@ Imports MapWindow.Interfaces
 Imports MapWinUtility
 
 Imports atcUtility
+Imports atcData
+Imports atcWDM
 Imports SwatObject
 
 Module SWATRunner
@@ -91,28 +93,42 @@ Module SWATRunner
             Logger.Dbg("SwatModelRunDone")
         End If
 
+        Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        With lOutputRch
+            .Open(pOutputFolder & "\output.rch")
+            Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
+            WriteToWdm("\rch.wdm", .DataSets)
+        End With
+
+        Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        With lOutputSub
+            .Open(pOutputFolder & "\output.sub")
+            Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
+            WriteToWdm("\sub.wdm", .DataSets)
+        End With
+
         Dim lOutputFields As New atcData.atcDataAttributes
         lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
         Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
         With lOutputHru
             .Open(pOutputFolder & "\output.hru", lOutputFields)
             Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
-        End With
-        Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputRch
-            .Open(pOutputFolder & "\output.rch")
-            Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
-        End With
-        Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputSub
-            .Open(pOutputFolder & "\output.sub")
-            Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
+            WriteToWdm("\hru.wdm", .DataSets)
         End With
 
         Logger.Dbg("SwatPostProcessingDone")
 
         'back to basins log
         Logger.StartToFile(lLogFileName, True, False, True)
+    End Sub
+
+    Private Sub WriteToWdm(ByVal aWdmName As String, ByVal aDatasets As atcDataGroup)
+        Dim lWdm As New atcDataSourceWDM
+        If lWdm.Open(pOutputFolder & aWdmName) Then
+            For Each lDataset As atcDataSet In aDatasets
+                lWdm.AddDataset(lDataset, atcDataSource.EnumExistAction.ExistAppend)
+            Next
+        End If
     End Sub
 
     Private Sub OutputDataHandler(ByVal aSendingProcess As Object, _

@@ -160,6 +160,8 @@ Public Class atcDataSourceWDM
             Dim lTu As Integer = lTimser.Attributes.GetValue("tu", 0)
             Dim lAggr As Integer = lTimser.Attributes.GetValue("aggregation", 0)
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
+            Dim lTGroup As Integer = aDataSet.Attributes.GetValue("tgroup", 6)
+            Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
 
             If lTs = 0 Or lTu = 0 Then ' sparse dataset - fill in dummy values for write
                 If pAskAboutMissingTuTs Then
@@ -467,10 +469,10 @@ CaseExistRenumber:
         If lStr.Length > 4 Then lStr = lStr.Substring(0, 4)
         aTs.Attributes.SetValueIfMissing("TSTYPE", lStr)
         aTs.Attributes.SetValueIfMissing("TGROUP", 6)
+        aTs.Attributes.SetValueIfMissing("TSBYR", 1900)
         aTs.Attributes.SetValueIfMissing("COMPFG", 1)
         aTs.Attributes.SetValueIfMissing("TSFORM", 1)
         aTs.Attributes.SetValueIfMissing("TSFILL", -999)
-
         lStr = aTs.Attributes.GetValue("tu")
         If lStr.Length = 0 Then
             CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
