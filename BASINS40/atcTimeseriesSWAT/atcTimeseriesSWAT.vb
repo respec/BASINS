@@ -158,8 +158,7 @@ Public Class atcTimeseriesSWAT
                             .SetValue("Units", SplitUnits(lKeyParts(0)).Trim)
                             .SetValue("Constituent", lKeyParts(0).Trim)
                             .SetValue("Location", lKeyParts(1).Trim)
-                            'TODO: next 5 are hard coded for annual datasets, make more generic
-                            .SetValue("ConstantInterval", "Yes") 'TODO: handle this better!
+                            'TODO: next 4 are hard coded for annual datasets, make more generic
                             .SetValue("tu", 6) 'annual
                             .SetValue("ts", 1)
                             .SetValue("tsbyr", 1900)
