@@ -113,6 +113,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="atcTableRDB.vb" />
+    <Compile Include="atcTableFixedStreaming.vb" />
     <Compile Include="frmFeedback.vb">
       <SubType>Form</SubType>
     </Compile>

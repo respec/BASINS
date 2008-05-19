@@ -4,6 +4,7 @@ Imports MapWinUtility
 Imports atcUtility
 Imports atcData
 Imports atcWDM
+Imports atcTimeseriesBinary
 Imports SwatObject
 
 Module SWATRunner
@@ -97,14 +98,14 @@ Module SWATRunner
         With lOutputRch
             .Open(pOutputFolder & "\output.rch")
             Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
-            WriteToWdm("\rch.wdm", .DataSets)
+            WriteDatasets(pOutputFolder & "\rch", .DataSets)
         End With
 
         Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
         With lOutputSub
             .Open(pOutputFolder & "\output.sub")
             Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
-            WriteToWdm("\sub.wdm", .DataSets)
+            WriteDatasets(pOutputFolder & "\sub", .DataSets)
         End With
 
         Dim lOutputFields As New atcData.atcDataAttributes
@@ -113,7 +114,7 @@ Module SWATRunner
         With lOutputHru
             .Open(pOutputFolder & "\output.hru", lOutputFields)
             Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
-            WriteToWdm("\hru.wdm", .DataSets)
+            WriteDatasets(pOutputFolder & "\hru", .DataSets)
         End With
 
         Logger.Dbg("SwatPostProcessingDone")
@@ -122,12 +123,12 @@ Module SWATRunner
         Logger.StartToFile(lLogFileName, True, False, True)
     End Sub
 
-    Private Sub WriteToWdm(ByVal aWdmName As String, ByVal aDatasets As atcDataGroup)
-        Dim lWdm As New atcDataSourceWDM
-        If lWdm.Open(pOutputFolder & aWdmName) Then
-            For Each lDataset As atcDataSet In aDatasets
-                lWdm.AddDataset(lDataset, atcDataSource.EnumExistAction.ExistAppend)
-            Next
+    Private Sub WriteDatasets(ByVal aFileName As String, ByVal aDatasets As atcDataGroup)
+        Dim lDataTarget As New atcDataSourceTimeseriesBinary ' atcDataSourceWDM
+        Dim lFileName As String = aFileName & ".tsbin" 'lDataTarget.Filter.?) Then
+        TryDelete(lFileName)
+        If lDataTarget.Open(lFileName) Then
+            lDataTarget.AddDatasets(aDatasets)
         End If
     End Sub
 

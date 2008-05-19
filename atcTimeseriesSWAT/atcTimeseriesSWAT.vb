@@ -154,11 +154,12 @@ Public Class atcTimeseriesSWAT
                     For Each lDataSet As atcData.atcTimeseries In Me.DataSets
                         With lDataSet.Attributes
                             Dim lKeyParts() As String = .GetValue("Key").Split(":")
-                            .SetValue("Scenario", "Simulated")
-                            .SetValue("Units", SplitUnits(lKeyParts(0)))
-                            .SetValue("Constituent", lKeyParts(0))
-                            .SetValue("Location", lKeyParts(1))
-                            'TODO: next 4 are hard coded for annual wdm datasets, make more generic
+                            .SetValue("Scenario", "Simulate") 'TODO: get a name for the scenario
+                            .SetValue("Units", SplitUnits(lKeyParts(0)).Trim)
+                            .SetValue("Constituent", lKeyParts(0).Trim)
+                            .SetValue("Location", lKeyParts(1).Trim)
+                            'TODO: next 5 are hard coded for annual datasets, make more generic
+                            .SetValue("ConstantInterval", "Yes") 'TODO: handle this better!
                             .SetValue("tu", 6) 'annual
                             .SetValue("ts", 1)
                             .SetValue("tsbyr", 1900)
