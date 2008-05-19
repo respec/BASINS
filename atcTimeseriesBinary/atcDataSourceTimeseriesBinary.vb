@@ -55,15 +55,12 @@ Public Class atcDataSourceTimeseriesBinary
                     Try
                         Do
                             Dim lData As New atcTimeseries(Me)
-                            Dim lConstantInterval As Boolean = False
                             Dim lAttributeName As String
                             Dim lAttributeType As Byte
                             Do
                                 lAttributeName = lReader.ReadString
                                 If lAttributeName = "<done>" Then
                                     Exit Do
-                                ElseIf lAttributeName = "ConstantInterval" Then
-                                    lConstantInterval = True
                                 End If
                                 lAttributeType = lReader.ReadByte
                                 Select Case lAttributeType
@@ -74,25 +71,27 @@ Public Class atcDataSourceTimeseriesBinary
                                         Debug.Print(lAttributeType)
                                 End Select
                             Loop
-                            Dim lNumValues As Integer = lReader.ReadInt64
-                            Dim lDates(lNumValues) As Double
-                            If lConstantInterval Then
-                                lDates(0) = lReader.ReadDouble
-                                Dim lTimeUnits = lData.Attributes.GetValue("tu", 6)
+                            Dim lNumDates As Integer = lReader.ReadInt64
+                            Dim lDates(Math.Abs(lNumDates)) As Double
+                            If lNumDates < 0 Then 'compressed dates
+                                lNumDates = -lNumDates
+                                Dim lTimeUnits = lData.Attributes.GetValue("tu", 4)
                                 Dim lTimeStep = lData.Attributes.GetValue("ts", 1)
-                                For lIndex As Integer = 1 To lNumValues
-                                    lDates(lIndex) = TimAddJ(lDates(0), lTimeUnits, lTimeStep, lIndex)
+                                Dim lDateStart As Double = lReader.ReadDouble
+                                lDates(0) = lDateStart
+                                For lIndex As Integer = 1 To lNumDates
+                                    lDates(lIndex) = TimAddJ(lDateStart, lTimeUnits, lTimeStep, lIndex)
                                 Next
                             Else
-                                For lIndex As Integer = 0 To lNumValues
+                                For lIndex As Integer = 0 To lNumDates
                                     lDates(lIndex) = lReader.ReadDouble
                                 Next
                             End If
                             lData.Dates = New atcTimeseries(Me)
                             lData.Dates.Values = lDates
 
-                            Dim lValues(lNumValues) As Double
-                            For lIndex As Integer = 0 To lNumValues
+                            Dim lValues(lNumDates) As Double
+                            For lIndex As Integer = 0 To lNumDates
                                 lValues(lIndex) = lReader.ReadDouble
                             Next
                             lData.Values = lValues
@@ -119,7 +118,6 @@ Public Class atcDataSourceTimeseriesBinary
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
-        Dim lConstantInterval As Boolean = False
         Dim lFileStream As New IO.FileStream(Specification, IO.FileMode.Append)
         Dim lWriter As New IO.BinaryWriter(lFileStream)
         If lFileStream.Position = 0 Then
@@ -129,9 +127,6 @@ Public Class atcDataSourceTimeseriesBinary
         For Each lAttribute As atcDefinedValue In aDataSet.Attributes
             If Not lAttribute.Definition.Calculated Then
                 Dim lName As String = lAttribute.Definition.Name
-                If lName = "ConstantInterval" Then
-                    lConstantInterval = True
-                End If
                 Select Case lName
                     Case "Key", "Data Source"
                     Case Else
@@ -154,10 +149,14 @@ Public Class atcDataSourceTimeseriesBinary
         lWriter.Write("<done>")
 
         Dim lTimeseries As atcTimeseries = aDataSet
-        lWriter.Write(lTimeseries.numValues)
-        If lConstantInterval Then
+        Dim lTimeUnits As Integer = lTimeseries.Attributes.GetValue("tu", 4)
+        Dim lTimeStep As Integer = lTimeseries.Attributes.GetValue("ts", 1)
+        Dim lDateEndComputed As Double = TimAddJ(lTimeseries.Dates.Value(0), lTimeUnits, lTimeStep, lTimeseries.numValues)
+        If Math.Abs(lDateEndComputed - lTimeseries.Dates.Value(lTimeseries.numValues)) < 0.00001 Then
+            lWriter.Write(-lTimeseries.numValues)
             lWriter.Write(lTimeseries.Dates.Values(0))
         Else
+            lWriter.Write(lTimeseries.numValues)
             Dim lDates() As Double = lTimeseries.Dates.Values
             For lIndex As Integer = 0 To lTimeseries.numValues
                 lWriter.Write(lDates(lIndex))
