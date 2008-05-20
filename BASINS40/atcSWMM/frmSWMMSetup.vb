@@ -147,7 +147,19 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        StartSWMM("")
+        'hard code some things to test SWMM classes
+        Dim lSWMMProject As New SWMMProject
+        lSWMMProject.Name = "TestProject"
+        lSWMMProject.Title = "SWMM Project Written from BASINS"
+        Dim lSWMMProjectFileName As String = "\BASINS\modelout\" & lSWMMProject.Name & "\" & lSWMMProject.Name & ".inp"
+
+        'create catchments from subbasins shapefile
+        lSWMMProject.Catchments.CreateFromShapefile("C:\BASINS\Predefined Delineations\West Branch\wb_subs.shp")
+
+        'save project file and start SWMM
+        lSWMMProject.Save(lSWMMProjectFileName)
+        StartSWMM("/f " & lSWMMProjectFileName)
+        Me.Close()
     End Sub
 
     Private Sub EnableControls(ByVal aEnabled As Boolean)
