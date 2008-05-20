@@ -243,6 +243,13 @@ Public Class atcDataAttributes
             pAllDefinitions.Add(lDef.Name.ToLower, lDef)
 
             lDef = New atcAttributeDefinition
+            lDef.Name = "Time Unit"
+            lDef.TypeString = "atcTimeUnit"
+            lDef.CopiesInherit = True
+            lDef.Editable = False
+            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
+
+            lDef = New atcAttributeDefinition
             lDef.Name = "Data Source"
             lDef.TypeString = "String"
             lDef.CopiesInherit = False

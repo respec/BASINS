@@ -10,11 +10,10 @@ Imports System.IO
 
 Public Class atcTimeseriesSWAT
     Inherits atcDataSource
-    '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    '##MODULE_REMARKS Copyright 2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "SWAT Output Files (output.*)|output.*"
-    Private pColDefs As Hashtable
-    'Private pReadAll As Boolean = False
+    Private pNaN As Double = GetNaN()
 
     Public Overrides ReadOnly Property Description() As String
         Get
@@ -47,7 +46,6 @@ Public Class atcTimeseriesSWAT
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-
         If MyBase.Open(aFileName, aAttributes) Then
             Dim lDelim As String = ";"
             Dim lFieldsToProcess As String = ""
@@ -147,24 +145,22 @@ Public Class atcTimeseriesSWAT
                         'Logger.Progress(.CurrentRecord, ?)
                         .CurrentRecord += 1
                     Loop
-                    Logger.Dbg("Created Builders From " & .CurrentRecord & " Records")
-                    Logger.Progress("Creating Timeseries", 0, 0)
-                    lTSBuilders.CreateTimeseriesAddToGroup(Me.DataSets)
-                    Logger.Dbg("Created " & Me.DataSets.Count & " DataSets")
-                    For Each lDataSet As atcData.atcTimeseries In Me.DataSets
+                    Logger.Dbg("Created " & lTSBuilders.Count & " Builders From " & .CurrentRecord & " Records")
+                    Logger.Status("Creating Timeseries")
+
+                    For Each lDataSet As atcData.atcTimeseries In lTSBuilders.CreateTimeseriesGroup()
+                        lDataSet = FillValues(lDataSet, atcTimeUnit.TUYear, 1, pNaN, pNaN, pNaN)
                         With lDataSet.Attributes
                             Dim lKeyParts() As String = .GetValue("Key").Split(":")
                             .SetValue("Scenario", "Simulate") 'TODO: get a name for the scenario
                             .SetValue("Units", SplitUnits(lKeyParts(0)).Trim)
                             .SetValue("Constituent", lKeyParts(0).Trim)
                             .SetValue("Location", lKeyParts(1).Trim)
-                            'TODO: next 4 are hard coded for annual datasets, make more generic
-                            .SetValue("tu", 6) 'annual
-                            .SetValue("ts", 1)
-                            .SetValue("tsbyr", 1900)
-                            .SetValue("tgroup", 6)
                         End With
+                        Me.DataSets.Add(lDataSet)
+                        Logger.Progress(Me.DataSets.Count, lTSBuilders.Count)
                     Next
+                    Logger.Dbg("Created " & Me.DataSets.Count & " DataSets")
                     Logger.Status("")
                     Return True
                 Else

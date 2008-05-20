@@ -75,12 +75,19 @@ Public Class atcDataSourceTimeseriesBinary
                             Dim lDates(Math.Abs(lNumDates)) As Double
                             If lNumDates < 0 Then 'compressed dates
                                 lNumDates = -lNumDates
-                                Dim lTimeUnits = lData.Attributes.GetValue("tu", 4)
+                                Dim lTimeUnits As Object = lData.Attributes.GetValue("tu", 4)
+                                Dim lTU As atcUtility.atcTimeUnit
+                                If lTimeUnits.GetType.IsInstanceOfType("") Then
+                                    lTU = System.Enum.Parse(lTU.GetType, lTimeUnits) '6 'TODO: dont hard code this!!!
+                                    lData.Attributes.SetValue("tu", lTU)
+                                Else
+                                    lTU = lTimeUnits
+                                End If
                                 Dim lTimeStep = lData.Attributes.GetValue("ts", 1)
                                 Dim lDateStart As Double = lReader.ReadDouble
                                 lDates(0) = lDateStart
                                 For lIndex As Integer = 1 To lNumDates
-                                    lDates(lIndex) = TimAddJ(lDateStart, lTimeUnits, lTimeStep, lIndex)
+                                    lDates(lIndex) = TimAddJ(lDateStart, lTU, lTimeStep, lIndex)
                                 Next
                             Else
                                 For lIndex As Integer = 0 To lNumDates
@@ -135,6 +142,8 @@ Public Class atcDataSourceTimeseriesBinary
                             Case "String" : lType = 1
                             Case "Integer" : lType = 2
                             Case "Double" : lType = 3
+                            Case "atcTimeUnit"
+                                lType = 1
                             Case Else
                                 Debug.Print("AttributeTypeNotDefined:" & lAttribute.Definition.TypeString)
                         End Select
