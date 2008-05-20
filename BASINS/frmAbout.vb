@@ -338,10 +338,19 @@ Friend Class frmAbout
     Public Sub ShowAbout()
         Try
             Me.Icon = g_MapWin.ApplicationInfo.FormIcon
-            lblBasinsVersion.Text = "Version Dated:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
-            lblMapwinVersion.Text = "Version:  " & System.Reflection.Assembly.GetEntryAssembly.GetName.Version.ToString
-            lblProjFile.Text = g_Project.FileName
-            lblConfigFile.Text = g_Project.ConfigFileName
+            Try
+                lblBasinsVersion.Text = "Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+            Catch
+            End Try
+            Try
+                lblMapwinVersion.Text = System.Reflection.Assembly.GetEntryAssembly.GetName.Version.ToString
+            Catch
+            End Try
+            Try
+                lblProjFile.Text = g_Project.FileName
+                lblConfigFile.Text = g_Project.ConfigFileName
+            Catch
+            End Try
             Me.Show()
         Catch ex As System.Exception
             g_MapWin.ShowErrorDialog(ex)
