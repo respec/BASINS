@@ -44,6 +44,7 @@ Public Class atcDataSourceTimeseriesBinary
             Return False
         Else
             If IO.File.Exists(Specification) Then
+                Logger.Status("Reading " & IO.Path.GetFileName(Specification), True)
                 Dim lFileStream As New IO.FileStream(Specification, IO.FileMode.Open, IO.FileAccess.Read)
                 Dim lReader As New IO.BinaryReader(lFileStream)
                 Dim lVersion As Integer = lReader.ReadInt32
@@ -103,8 +104,10 @@ Public Class atcDataSourceTimeseriesBinary
                             Next
                             lData.Values = lValues
                             DataSets.Add(lData)
+                            Logger.Progress(lFileStream.Position, lFileStream.Length)
                         Loop
                     Catch ex As IO.EndOfStreamException
+                        Logger.Status("")
                         Logger.Dbg("Read " & DataSets.Count & " from " & Specification)
                     End Try
                     lReader.Close()
@@ -115,10 +118,14 @@ Public Class atcDataSourceTimeseriesBinary
     End Function
 
     Public Overrides Function AddDatasets(ByVal aDataGroup As atcDataGroup) As Boolean
-        Logger.Dbg("StartToWrite " & Specification)
+        Logger.Status("Writing " & IO.Path.GetFileName(Specification), True)
+        Dim lIndex As Integer = 0
         For Each lDataSet As atcData.atcDataSet In aDataGroup
             AddDataset(lDataSet)
+            lIndex += 1
+            Logger.Progress(lIndex, aDataGroup.Count)
         Next
+        Logger.Status("")
         Logger.Dbg("Wrote " & aDataGroup.Count & " Datasets")
     End Function
 

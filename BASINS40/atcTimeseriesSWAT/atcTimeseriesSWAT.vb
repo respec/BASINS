@@ -117,13 +117,17 @@ Public Class atcTimeseriesSWAT
 
                     Logger.Status("Reading records for " & Format((lLastField - 3), "#,###") & " constituents from " & Specification, True)
                     .CurrentRecord = 1
+                    Dim lYearReading As Integer = 0
                     Do
                         lLocation = .Value(1)
 
                         'MON column assumed to hold year
                         Try
                             If Integer.TryParse(.Value(3).Trim, lYear) Then
-                                Logger.Status("Reading year " & lYear)
+                                If lYear <> lYearReading Then
+                                    Logger.Status("Reading year " & lYear)
+                                    lYearReading = lYear
+                                End If
                                 lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
                                 For lField = 4 To lLastField
                                     Dim lFieldName As String = .FieldName(lField)
@@ -142,7 +146,6 @@ Public Class atcTimeseriesSWAT
                         Catch ex As FormatException
                             Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
                         End Try
-                        'Logger.Progress(.CurrentRecord, ?)
                         .CurrentRecord += 1
                     Loop
                     Logger.Dbg("Created " & lTSBuilders.Count & " Builders From " & .CurrentRecord & " Records")

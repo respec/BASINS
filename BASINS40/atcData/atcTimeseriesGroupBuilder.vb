@@ -55,18 +55,20 @@ Public Class atcTimeseriesGroupBuilder
     ''' <remarks></remarks>
     Public Function Builder(ByVal aDataSetKey As String) As atcTimeseriesBuilder
         Dim lBuilder As atcTimeseriesBuilder
-        Dim lBuilderIndex As Integer = pBuilders.IndexFromKey(aDataSetKey)
-        If lBuilderIndex >= 0 Then
-            lBuilder = pBuilders.ItemByIndex(lBuilderIndex)
-        Else
+        Dim lBuilderIndex As Integer = pBuilders.BinarySearchForKey(aDataSetKey)
+        If lBuilderIndex = pBuilders.Count OrElse _
+          (aDataSetKey <> pBuilders.Keys.Item(lBuilderIndex)) Then
+            'Not a duplicate, add to the list
             lBuilder = New atcTimeseriesBuilder(pDataSource)
-            pBuilders.Add(aDataSetKey, lBuilder)
+            pBuilders.Insert(lBuilderIndex, aDataSetKey, lBuilder)
             If IsNumeric(aDataSetKey) Then 'Use key for ID
                 lBuilder.Attributes.SetValue("ID", CInt(aDataSetKey))
             Else 'Default ID is 1 for first dataset, 2 for second
                 lBuilder.Attributes.SetValue("ID", pBuilders.Count)
                 lBuilder.Attributes.SetValue("Key", aDataSetKey)
             End If
+        Else
+            lBuilder = pBuilders.ItemByIndex(lBuilderIndex)
         End If
         Return lBuilder
     End Function
