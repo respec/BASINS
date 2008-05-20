@@ -6,9 +6,30 @@ Public Class atcTimeseriesPointList
     Private pPoint As Boolean = False
 
     Sub New(ByVal aTimeseries As atcData.atcTimeseries)
-        pValues = aTimeseries
-        pDates = aTimeseries.Dates
         pPoint = aTimeseries.Attributes.GetValue("point", False)
+        If pPoint OrElse aTimeseries.Attributes.GetValue("Count") = aTimeseries.numValues Then
+            pValues = aTimeseries
+            pDates = aTimeseries.Dates
+        Else
+            Dim lNumValuesNew As Integer = (2 * aTimeseries.numValues) - aTimeseries.Attributes.GetValue("Count")
+            pValues = New atcData.atcTimeseries(Nothing)
+            pDates = New atcData.atcTimeseries(Nothing)
+            pValues.Dates = pDates
+            pValues.numValues = lNumValuesNew
+            Dim lIndexNew As Integer = 0
+            For lIndex As Integer = 0 To aTimeseries.numValues
+                Dim lValue As Double = aTimeseries.Value(lIndex)
+                pValues.Value(lIndexNew) = lValue
+                Dim lDate As Double = aTimeseries.Dates.Value(lIndex)
+                pDates.Value(lIndexNew) = lDate
+                If lIndex > 0 AndAlso Double.IsNaN(lValue) Then
+                    lIndexNew += 1
+                    pValues.Value(lIndexNew) = aTimeseries.Value(lIndex + 1)
+                    pDates.Value(lIndexNew) = lDate
+                End If
+                lIndexNew += 1
+            Next
+        End If
     End Sub
 
     Public Function Clone() As Object Implements ZedGraph.IPointList.Clone

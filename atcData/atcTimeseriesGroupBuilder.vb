@@ -12,6 +12,10 @@ Public Class atcTimeseriesGroupBuilder
         pBuilders = New atcCollection
     End Sub
 
+    Public Function Count() As Integer
+        Return pBuilders.Count
+    End Function
+
     ''' <summary>
     ''' Add a values to the set of timeseries being built
     ''' </summary>
