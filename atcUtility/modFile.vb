@@ -979,7 +979,7 @@ TryAgain:
         Private pCurrentLine As String
 
         Public Sub New(ByVal aFileName As String)
-            pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read)))
+            pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read), 16384))
         End Sub
 
         Public Sub New(ByVal aStreamReader As IO.BinaryReader)
@@ -1010,6 +1010,7 @@ ReadCharacter:
                             GoTo ReadCharacter
                     End Select
                     pCurrentLine = lSb.ToString
+                    Logger.Progress(pStreamReader.BaseStream.Position, pStreamReader.BaseStream.Length)
                     Return True
                 Catch endEx As IO.EndOfStreamException
                     Try
