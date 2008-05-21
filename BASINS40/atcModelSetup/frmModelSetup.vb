@@ -1215,7 +1215,7 @@ Public Class frmModelSetup
             cboLandUseLayer.Items.Clear()
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
                 If GisUtil.LayerType(lLayerIndex) = 4 Then  'Grid 
-                    If InStr(GisUtil.LayerFileName(lLayerIndex), "\nlcd\") > 0 Then
+                    If InStr(UCase(GisUtil.LayerFileName(lLayerIndex)), "\NLCD\") > 0 Then
                         cboLandUseLayer.Items.Add(GisUtil.LayerName(lLayerIndex))
                     End If
                 End If
