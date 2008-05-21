@@ -149,18 +149,20 @@ Public Class frmSWMMSetup
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         'hard code some things to test SWMM classes
-        Dim lSWMMProject As New SWMMProject
-        lSWMMProject.Name = "TestProject"
-        lSWMMProject.Title = "SWMM Project Written from BASINS"
-        'TODO: still use modelout?
-        Dim lSWMMProjectFileName As String = "\BASINS\modelout\" & lSWMMProject.Name & "\" & lSWMMProject.Name & ".inp"
+        With pPlugIn.SWMMProject
+            .Name = "TestProject"
+            .Title = "SWMM Project Written from BASINS"
+            Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+            'TODO: still use modelout?
+            Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
 
-        'create catchments from subbasins shapefile
-        lSWMMProject.Catchments.CreateFromShapefile("C:\BASINS\Predefined Delineations\West Branch\wb_subs.shp")
+            'create catchments from subbasins shapefile
+            .Catchments.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp")
 
-        'save project file and start SWMM
-        lSWMMProject.Save(lSWMMProjectFileName)
-        pPlugIn.StartSWMM(lSWMMProjectFileName)
+            'save project file and start SWMM
+            .Save(lSWMMProjectFileName)
+            pPlugIn.StartSWMM(lSWMMProjectFileName)
+        End With
         Me.Close()
     End Sub
 

@@ -6,6 +6,8 @@ Public Class PlugIn
     Private Const pModelsMenuName As String = "BasinsModels"
     Private Const pModelsMenuString As String = "Models"
 
+    Private pSWMMProject As SWMMProject
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "EPA SWMM 5.0 Setup"
@@ -29,6 +31,7 @@ Public Class PlugIn
         pMapWin = aMapWin
         atcData.atcDataManager.AddMenuIfMissing(pModelsMenuName, "", pModelsMenuString, "mnuFile")
         atcData.atcDataManager.AddMenuIfMissing(pModelsMenuName & "_SWMM", pModelsMenuName, "SWMM")
+        pSWMMProject = New SWMMProject
     End Sub
 
     Public Overrides Sub Terminate()
@@ -45,6 +48,12 @@ Public Class PlugIn
             aHandled = True
         End If
     End Sub
+
+    Public ReadOnly Property SWMMProject() As SWMMProject
+        Get
+            Return pSWMMProject
+        End Get
+    End Property
 
     Public Sub StartSWMM(ByVal aInputFileName As String)
         If IO.File.Exists(aInputFileName) Then
