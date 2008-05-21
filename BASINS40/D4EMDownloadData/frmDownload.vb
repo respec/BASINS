@@ -45,6 +45,14 @@ Public Class frmDownload
             chkMerge.Checked = True
         End If
 
+        If StationsXMLfromMap.Length = 0 Then
+            panelNWISnoStations.Visible = True
+            panelNWISnoStations.BringToFront()
+            chkNWIS_GetNWISDischarge.Visible = False
+            chkNWIS_GetNWISMeasurements.Visible = False
+            chkNWIS_GetNWISWQ.Visible = False
+        End If
+
         Me.ShowDialog()
         If pOk Then
             Return Me.XML
@@ -93,6 +101,29 @@ Public Class frmDownload
         Return Nothing
     End Function
 
+    Private Function StationsXMLfromMap() As String
+        Dim lStationsXML As String = ""
+        If pMapWin.View IsNot Nothing Then
+            Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
+            If lSelected.NumSelected > 0 Then
+                Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
+                Dim lLayerShapefile As MapWinGIS.Shapefile = lLayer.GetObject
+                Dim lKeyField As Integer
+                For lKeyField = 0 To lLayerShapefile.NumFields - 1
+                    Select Case lLayerShapefile.Field(lKeyField).Name
+                        Case "site_no", "LocId" : Exit For 'TODO: use list of ID fields for layers from layers.dbf
+                    End Select
+                Next
+                If lKeyField <= lLayerShapefile.NumFields Then
+                    For lShapeIndex As Integer = 0 To lSelected.NumSelected - 1
+                        lStationsXML &= "<stationid>" & lLayerShapefile.CellValue(lKeyField, lSelected.Item(lShapeIndex).ShapeIndex) & "</stationid>" & vbCrLf
+                    Next
+                End If
+            End If
+        End If
+        Return lStationsXML
+    End Function
+
     Public Property XML() As String
         Get
             Dim lXML As String = ""
@@ -100,25 +131,7 @@ Public Class frmDownload
             Dim lRegionXML As String = ""
             Dim lRegion As D4EMDataManager.Region = Me.SelectedRegion
             If Not lRegion Is Nothing Then lRegionXML = lRegion.XML
-            Dim lStationsXML As String = ""
-            If pMapWin.View IsNot Nothing Then
-                Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
-                If lSelected.NumSelected > 0 Then
-                    Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
-                    Dim lLayerShapefile As MapWinGIS.Shapefile = lLayer.GetObject
-                    Dim lKeyField As Integer
-                    For lKeyField = 0 To lLayerShapefile.NumFields - 1
-                        Select Case lLayerShapefile.Field(lKeyField).Name
-                            Case "site_no", "LocId" : Exit For 'TODO: use list of ID fields for layers from layers.dbf
-                        End Select
-                    Next
-                    If lKeyField <= lLayerShapefile.NumFields Then
-                        For lShapeIndex As Integer = 0 To lSelected.NumSelected - 1
-                            lStationsXML &= "<stationid>" & lLayerShapefile.CellValue(lKeyField, lSelected.Item(lShapeIndex).ShapeIndex) & "</stationid>" & vbCrLf
-                        Next
-                    End If
-                End If
-            End If
+            Dim lStationsXML As String = StationsXMLfromMap()
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
             If lCacheFolder.Length = 0 Then
