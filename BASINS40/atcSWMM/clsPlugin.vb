@@ -1,5 +1,4 @@
-Imports atcMwGisUtility
-Imports atcData
+Imports MapWinUtility
 
 Public Class PlugIn
     Inherits atcData.atcDataPlugin
@@ -21,13 +20,13 @@ Public Class PlugIn
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "An interface for initializing the EPA SWMM 5.0 model."
+            Return "An interface for initializing the EPA SWMM 5.0 model with BASINS data."
         End Get
     End Property
 
     <CLSCompliant(False)> _
-    Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
-        pMapWin = MapWin
+    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
+        pMapWin = aMapWin
         atcData.atcDataManager.AddMenuIfMissing(pModelsMenuName, "", pModelsMenuString, "mnuFile")
         atcData.atcDataManager.AddMenuIfMissing(pModelsMenuName & "_SWMM", pModelsMenuName, "SWMM")
     End Sub
@@ -37,13 +36,26 @@ Public Class PlugIn
         atcData.atcDataManager.RemoveMenuIfEmpty(pModelsMenuName)
     End Sub
 
-    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef Handled As Boolean)
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = pModelsMenuName & "_SWMM" Then
-            Dim main As New frmSWMMSetup
-            GisUtil.MappingObject = pMapWin
-            main.InitializeUI()
-            main.Show()
-            Handled = True
+            atcMwGisUtility.GisUtil.MappingObject = pMapWin
+            Dim lfrmSWMMSetup As New frmSWMMSetup
+            lfrmSWMMSetup.InitializeUI(Me)
+            lfrmSWMMSetup.Show()
+            aHandled = True
+        End If
+    End Sub
+
+    Public Sub StartSWMM(ByVal aInputFileName As String)
+        If IO.File.Exists(aInputFileName) Then
+            Dim lSWMMexe As String = atcUtility.FindFile("Please locate the EPA SWMM 5.0 Executable", "\Program Files\EPA SWMM 5.0\epaswmm5.exe")
+            If IO.File.Exists(lSWMMexe) Then
+                LaunchProgram(lSWMMexe, IO.Path.GetDirectoryName(aInputFileName), "/f " & aInputFileName)
+            Else
+                Logger.Msg("Cannot find the EPA SWMM 5.0 Executable", MsgBoxStyle.Critical, "BASINS SWMM Problem")
+            End If
+        Else
+            Logger.Msg("Cannot find SWMM 5.0 Input File " & aInputFileName)
         End If
     End Sub
 End Class

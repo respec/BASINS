@@ -128,6 +128,7 @@ Public Class frmSWMMSetup
 
 #End Region
 
+    Private pPlugIn As PlugIn
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
     End Sub
@@ -138,7 +139,7 @@ Public Class frmSWMMSetup
 
     Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExisting.Click
         If ofdExisting.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            StartSWMM(ofdExisting.FileName)
+            pPlugIn.StartSWMM(ofdExisting.FileName)
         End If
     End Sub
 
@@ -151,6 +152,7 @@ Public Class frmSWMMSetup
         Dim lSWMMProject As New SWMMProject
         lSWMMProject.Name = "TestProject"
         lSWMMProject.Title = "SWMM Project Written from BASINS"
+        'TODO: still use modelout?
         Dim lSWMMProjectFileName As String = "\BASINS\modelout\" & lSWMMProject.Name & "\" & lSWMMProject.Name & ".inp"
 
         'create catchments from subbasins shapefile
@@ -158,7 +160,7 @@ Public Class frmSWMMSetup
 
         'save project file and start SWMM
         lSWMMProject.Save(lSWMMProjectFileName)
-        StartSWMM("/f " & lSWMMProjectFileName)
+        pPlugIn.StartSWMM(lSWMMProjectFileName)
         Me.Close()
     End Sub
 
@@ -170,8 +172,8 @@ Public Class frmSWMMSetup
         cmdAbout.Enabled = aEnabled
     End Sub
 
-    Public Sub InitializeUI()
-        
+    Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
+        pPlugIn = aPlugIn
     End Sub
 
     Private Sub frmSWMMSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -179,27 +181,4 @@ Public Class frmSWMMSetup
             ShowHelp("BASINS Details\Watershed and Instream Model Setup\SWMM.html")
         End If
     End Sub
-
-    Private Sub StartSWMM(ByVal aCommand As String)
-        Dim lSWMMexe As String
-
-        lSWMMexe = "\Program Files\EPA SWMM 5.0\epaswmm5.exe"
-        If Not FileExists(lSWMMexe) Then
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            lSWMMexe = lBasinsBinLoc.Substring(1, 2) & lSWMMexe
-        End If
-        If Not FileExists(lSWMMexe) Then
-            'if we cant find it in any of the common places, use findfile
-            lSWMMexe = FindFile("Please locate the EPA SWMM 5.0 Executable", "epaswmm5.exe")
-        End If
-
-        If FileExists(lSWMMexe) Then
-            Logger.Dbg("StartSWMM:" & lSWMMexe & ":" & aCommand)
-            Process.Start(lSWMMexe, aCommand)
-            Logger.Dbg("SWMMStarted")
-        Else
-            Logger.Msg("Cannot find the EPA SWMM 5.0 Executable", MsgBoxStyle.Critical, "BASINS SWMM Problem")
-        End If
-    End Sub
-
 End Class
