@@ -300,7 +300,7 @@ Public Class frmLandUse
             For lyr = 0 To GisUtil.NumLayers() - 1
                 If GisUtil.LayerType(lyr) = 4 Then
                     'Grid 
-                    If InStr(GisUtil.LayerFileName(lyr), "\nlcd\") > 0 Then
+                    If InStr(UCase(GisUtil.LayerFileName(lyr)), "\NLCD\") > 0 Then
                         cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
                     End If
                 End If

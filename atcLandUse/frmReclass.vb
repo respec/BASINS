@@ -611,10 +611,18 @@ Public Class frmReclass
 
                 lBasinsBinLoc = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
                 ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
-                If FileExists(ReclassifyFile) Then
-                    ReclassifyFile = ReclassifyFile & "mrlc.dbf"
+                If InStr(UCase(GisUtil.LayerName(LanduseGridLayerIndex)), "2001") > 0 Then
+                    If FileExists(ReclassifyFile) Then
+                        ReclassifyFile = ReclassifyFile & "mrlc2001.dbf"
+                    Else
+                        ReclassifyFile = "\BASINS\etc\mrlc2001.dbf"
+                    End If
                 Else
-                    ReclassifyFile = "\BASINS\etc\mrlc.dbf"
+                    If FileExists(ReclassifyFile) Then
+                        ReclassifyFile = ReclassifyFile & "mrlc.dbf"
+                    Else
+                        ReclassifyFile = "\BASINS\etc\mrlc.dbf"
+                    End If
                 End If
 
                 Dim tmpDbf As IatcTable
