@@ -149,9 +149,11 @@ Public Class atcTimeseriesSWAT
                         .CurrentRecord += 1
                     Loop
                     Logger.Dbg("Created " & lTSBuilders.Count & " Builders From " & .CurrentRecord & " Records")
-                    Logger.Status("Creating Timeseries")
 
-                    For Each lDataSet As atcData.atcTimeseries In lTSBuilders.CreateTimeseriesGroup()
+                    Dim lTimeseriesGroup As atcDataGroup = lTSBuilders.CreateTimeseriesGroup()
+                    Logger.Status("Updating Timeseries")
+
+                    For Each lDataSet As atcData.atcTimeseries In lTimeseriesGroup
                         lDataSet = FillValues(lDataSet, atcTimeUnit.TUYear, 1, pNaN, pNaN, pNaN)
                         With lDataSet.Attributes
                             Dim lKeyParts() As String = .GetValue("Key").Split(":")

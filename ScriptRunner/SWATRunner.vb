@@ -69,29 +69,7 @@ Module SWATRunner
             SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", _
                            SWATArea.Report(SwatInput.SubBasin.TableWithArea("Slope_Cd")))
 
-            Logger.Dbg("SwatModelRunStartIn " & pOutputFolder)
-            Try 'to run swat
-                Dim lSwatProcess As New System.Diagnostics.Process
-                With lSwatProcess.StartInfo
-                    .FileName = pSWATExe
-                    .WorkingDirectory = pOutputFolder
-                    .CreateNoWindow = True
-                    .UseShellExecute = False
-                    .RedirectStandardOutput = True
-                    pSwatOutput = New Text.StringBuilder
-                    AddHandler lSwatProcess.OutputDataReceived, AddressOf OutputDataHandler
-                    .RedirectStandardError = True
-                    pSwatError = New Text.StringBuilder
-                    AddHandler lSwatProcess.ErrorDataReceived, AddressOf ErrorDataHandler
-                End With
-                lSwatProcess.Start()
-                lSwatProcess.BeginErrorReadLine()
-                lSwatProcess.BeginOutputReadLine()
-                lSwatProcess.WaitForExit()
-            Catch lEx As ApplicationException
-                Logger.Dbg("SwatRunProblem " & lEx.Message)
-            End Try
-            Logger.Dbg("SwatModelRunDone")
+            LaunchProgram(pSWATExe, pOutputFolder)
         End If
 
         Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
@@ -129,20 +107,6 @@ Module SWATRunner
         TryDelete(lFileName)
         If lDataTarget.Open(lFileName) Then
             lDataTarget.AddDatasets(aDatasets)
-        End If
-    End Sub
-
-    Private Sub OutputDataHandler(ByVal aSendingProcess As Object, _
-                                  ByVal aOutLine As DataReceivedEventArgs)
-        If Not String.IsNullOrEmpty(aOutLine.Data) Then
-            Logger.Dbg(aOutLine.Data.ToString)
-        End If
-    End Sub
-
-    Private Sub ErrorDataHandler(ByVal aSendingProcess As Object, _
-                                 ByVal aErrLine As DataReceivedEventArgs)
-        If Not String.IsNullOrEmpty(aErrLine.Data) Then
-            Logger.Dbg(aErrLine.Data.ToString)
         End If
     End Sub
 End Module
