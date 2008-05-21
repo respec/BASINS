@@ -74,6 +74,8 @@ Partial Class frmDownload
         Me.chkSTORET_Results = New System.Windows.Forms.CheckBox
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
         Me.grpNWISStations = New System.Windows.Forms.GroupBox
+        Me.panelNWISnoStations = New System.Windows.Forms.Panel
+        Me.lblNWISnoStations = New System.Windows.Forms.Label
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
@@ -81,6 +83,7 @@ Partial Class frmDownload
         Me.grpNHDplus.SuspendLayout()
         Me.grpSTORET.SuspendLayout()
         Me.grpNWISStations.SuspendLayout()
+        Me.panelNWISnoStations.SuspendLayout()
         Me.SuspendLayout()
         '
         'grpBASINS
@@ -99,7 +102,7 @@ Partial Class frmDownload
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Census)
         Me.grpBASINS.Location = New System.Drawing.Point(12, 39)
         Me.grpBASINS.Name = "grpBASINS"
-        Me.grpBASINS.Size = New System.Drawing.Size(424, 68)
+        Me.grpBASINS.Size = New System.Drawing.Size(430, 68)
         Me.grpBASINS.TabIndex = 0
         Me.grpBASINS.TabStop = False
         Me.grpBASINS.Text = "BASINS"
@@ -222,12 +225,13 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISMeasurements)
         Me.grpNWIS.Controls.Add(Me.btnBrowseWDMdailydischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
+        Me.grpNWIS.Controls.Add(Me.panelNWISnoStations)
         Me.grpNWIS.Location = New System.Drawing.Point(12, 280)
         Me.grpNWIS.Name = "grpNWIS"
-        Me.grpNWIS.Size = New System.Drawing.Size(424, 42)
+        Me.grpNWIS.Size = New System.Drawing.Size(430, 42)
         Me.grpNWIS.TabIndex = 1
         Me.grpNWIS.TabStop = False
-        Me.grpNWIS.Text = "US Geological Survey Data from  National Water Information System"
+        Me.grpNWIS.Text = "Data Values from US Geological Survey National Water Information System"
         '
         'chkNWIS_GetNWISWQ
         '
@@ -290,7 +294,7 @@ Partial Class frmDownload
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_Urban)
         Me.grpTerraServerWebService.Location = New System.Drawing.Point(418, 308)
         Me.grpTerraServerWebService.Name = "grpTerraServerWebService"
-        Me.grpTerraServerWebService.Size = New System.Drawing.Size(424, 42)
+        Me.grpTerraServerWebService.Size = New System.Drawing.Size(430, 42)
         Me.grpTerraServerWebService.TabIndex = 9
         Me.grpTerraServerWebService.TabStop = False
         Me.grpTerraServerWebService.Text = "TerraServer Images"
@@ -319,7 +323,7 @@ Partial Class frmDownload
         'btnOther
         '
         Me.btnOther.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOther.Location = New System.Drawing.Point(198, 432)
+        Me.btnOther.Location = New System.Drawing.Point(267, 432)
         Me.btnOther.Name = "btnOther"
         Me.btnOther.Size = New System.Drawing.Size(75, 23)
         Me.btnOther.TabIndex = 29
@@ -338,7 +342,7 @@ Partial Class frmDownload
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_LandCover)
         Me.grpNLCD2001.Location = New System.Drawing.Point(12, 328)
         Me.grpNLCD2001.Name = "grpNLCD2001"
-        Me.grpNLCD2001.Size = New System.Drawing.Size(424, 42)
+        Me.grpNLCD2001.Size = New System.Drawing.Size(430, 42)
         Me.grpNLCD2001.TabIndex = 11
         Me.grpNLCD2001.TabStop = False
         Me.grpNLCD2001.Text = "National Land Cover Data 2001"
@@ -346,7 +350,7 @@ Partial Class frmDownload
         'chkNLCD2001_1992
         '
         Me.chkNLCD2001_1992.AutoSize = True
-        Me.chkNLCD2001_1992.Location = New System.Drawing.Point(273, 19)
+        Me.chkNLCD2001_1992.Location = New System.Drawing.Point(289, 19)
         Me.chkNLCD2001_1992.Name = "chkNLCD2001_1992"
         Me.chkNLCD2001_1992.Size = New System.Drawing.Size(108, 17)
         Me.chkNLCD2001_1992.TabIndex = 26
@@ -397,7 +401,7 @@ Partial Class frmDownload
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
         Me.grpNHDplus.Location = New System.Drawing.Point(12, 113)
         Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(424, 113)
+        Me.grpNHDplus.Size = New System.Drawing.Size(430, 113)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
         Me.grpNHDplus.Text = "National Hydrography Dataset Plus"
@@ -405,7 +409,7 @@ Partial Class frmDownload
         'chkNHDplus_streamgageevent
         '
         Me.chkNHDplus_streamgageevent.AutoSize = True
-        Me.chkNHDplus_streamgageevent.Location = New System.Drawing.Point(233, 88)
+        Me.chkNHDplus_streamgageevent.Location = New System.Drawing.Point(205, 88)
         Me.chkNHDplus_streamgageevent.Name = "chkNHDplus_streamgageevent"
         Me.chkNHDplus_streamgageevent.Size = New System.Drawing.Size(119, 17)
         Me.chkNHDplus_streamgageevent.TabIndex = 18
@@ -415,7 +419,7 @@ Partial Class frmDownload
         'chkNHDplus_hydrologicunits
         '
         Me.chkNHDplus_hydrologicunits.AutoSize = True
-        Me.chkNHDplus_hydrologicunits.Location = New System.Drawing.Point(233, 65)
+        Me.chkNHDplus_hydrologicunits.Location = New System.Drawing.Point(205, 65)
         Me.chkNHDplus_hydrologicunits.Name = "chkNHDplus_hydrologicunits"
         Me.chkNHDplus_hydrologicunits.Size = New System.Drawing.Size(103, 17)
         Me.chkNHDplus_hydrologicunits.TabIndex = 17
@@ -426,7 +430,7 @@ Partial Class frmDownload
         'chkNHDplus_hydrography
         '
         Me.chkNHDplus_hydrography.AutoSize = True
-        Me.chkNHDplus_hydrography.Location = New System.Drawing.Point(233, 42)
+        Me.chkNHDplus_hydrography.Location = New System.Drawing.Point(205, 42)
         Me.chkNHDplus_hydrography.Name = "chkNHDplus_hydrography"
         Me.chkNHDplus_hydrography.Size = New System.Drawing.Size(86, 17)
         Me.chkNHDplus_hydrography.TabIndex = 16
@@ -480,7 +484,7 @@ Partial Class frmDownload
         'chkNHDplus_Catchment
         '
         Me.chkNHDplus_Catchment.AutoSize = True
-        Me.chkNHDplus_Catchment.Location = New System.Drawing.Point(233, 19)
+        Me.chkNHDplus_Catchment.Location = New System.Drawing.Point(205, 19)
         Me.chkNHDplus_Catchment.Name = "chkNHDplus_Catchment"
         Me.chkNHDplus_Catchment.Size = New System.Drawing.Size(82, 17)
         Me.chkNHDplus_Catchment.TabIndex = 15
@@ -558,7 +562,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(360, 432)
+        Me.btnDownload.Location = New System.Drawing.Point(366, 432)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 31
@@ -573,7 +577,7 @@ Partial Class frmDownload
         Me.cboRegion.Items.AddRange(New Object() {"View Rectangle", "Extent of Selected Layer"})
         Me.cboRegion.Location = New System.Drawing.Point(124, 12)
         Me.cboRegion.Name = "cboRegion"
-        Me.cboRegion.Size = New System.Drawing.Size(312, 21)
+        Me.cboRegion.Size = New System.Drawing.Size(318, 21)
         Me.cboRegion.TabIndex = 0
         '
         'lblRegion
@@ -589,7 +593,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(279, 432)
+        Me.btnCancel.Location = New System.Drawing.Point(285, 432)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 30
@@ -604,7 +608,7 @@ Partial Class frmDownload
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
         Me.grpSTORET.Location = New System.Drawing.Point(12, 376)
         Me.grpSTORET.Name = "grpSTORET"
-        Me.grpSTORET.Size = New System.Drawing.Size(424, 44)
+        Me.grpSTORET.Size = New System.Drawing.Size(430, 44)
         Me.grpSTORET.TabIndex = 42
         Me.grpSTORET.TabStop = False
         Me.grpSTORET.Text = "EPA STORET Water Quality"
@@ -639,10 +643,30 @@ Partial Class frmDownload
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_discharge)
         Me.grpNWISStations.Location = New System.Drawing.Point(12, 232)
         Me.grpNWISStations.Name = "grpNWISStations"
-        Me.grpNWISStations.Size = New System.Drawing.Size(424, 42)
+        Me.grpNWISStations.Size = New System.Drawing.Size(430, 42)
         Me.grpNWISStations.TabIndex = 23
         Me.grpNWISStations.TabStop = False
-        Me.grpNWISStations.Text = "US Geological Survey Stations from National Water Information System"
+        Me.grpNWISStations.Text = "Station Locations from US Geological Survey National Water Information System"
+        '
+        'panelNWISnoStations
+        '
+        Me.panelNWISnoStations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.panelNWISnoStations.Controls.Add(Me.lblNWISnoStations)
+        Me.panelNWISnoStations.Location = New System.Drawing.Point(6, 16)
+        Me.panelNWISnoStations.Name = "panelNWISnoStations"
+        Me.panelNWISnoStations.Size = New System.Drawing.Size(418, 20)
+        Me.panelNWISnoStations.TabIndex = 28
+        Me.panelNWISnoStations.Visible = False
+        '
+        'lblNWISnoStations
+        '
+        Me.lblNWISnoStations.AutoSize = True
+        Me.lblNWISnoStations.Location = New System.Drawing.Point(3, 4)
+        Me.lblNWISnoStations.Name = "lblNWISnoStations"
+        Me.lblNWISnoStations.Size = New System.Drawing.Size(363, 13)
+        Me.lblNWISnoStations.TabIndex = 0
+        Me.lblNWISnoStations.Text = "Station Locations must be selected on the map before data value download"
         '
         'frmDownload
         '
@@ -650,12 +674,12 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(448, 467)
+        Me.ClientSize = New System.Drawing.Size(454, 467)
+        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.btnOther)
         Me.Controls.Add(Me.grpNLCD2001)
         Me.Controls.Add(Me.grpSTORET)
-        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.chkMerge)
         Me.Controls.Add(Me.chkClip)
         Me.Controls.Add(Me.lblRegion)
@@ -665,7 +689,6 @@ Partial Class frmDownload
         Me.Controls.Add(Me.grpNWIS)
         Me.Controls.Add(Me.grpBASINS)
         Me.Controls.Add(Me.grpTerraServerWebService)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.MaximizeBox = False
@@ -686,6 +709,8 @@ Partial Class frmDownload
         Me.grpSTORET.PerformLayout()
         Me.grpNWISStations.ResumeLayout(False)
         Me.grpNWISStations.PerformLayout()
+        Me.panelNWISnoStations.ResumeLayout(False)
+        Me.panelNWISnoStations.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -740,4 +765,6 @@ Partial Class frmDownload
     Friend WithEvents chkNWISStations_gw As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_STATSGO As System.Windows.Forms.CheckBox
     Friend WithEvents chkSTORET_Results As System.Windows.Forms.CheckBox
+    Friend WithEvents panelNWISnoStations As System.Windows.Forms.Panel
+    Friend WithEvents lblNWISnoStations As System.Windows.Forms.Label
 End Class

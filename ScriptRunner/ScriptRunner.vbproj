@@ -50,11 +50,6 @@
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SwatObject, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SWAT\SwatObject\bin\Debug\SwatObject.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -75,35 +70,14 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CatSummary.vb" />
-    <Compile Include="ClimateAssessmentFromScript.vb" />
     <Compile Include="clsScriptPlugin.vb" />
-    <Compile Include="ConstituentBalance.vb" />
     <Compile Include="BASINSProjectSummary.vb" />
-    <Compile Include="CreateUCITest.vb" />
-    <Compile Include="DailyMonthlyCompareStats.vb" />
-    <Compile Include="ExpertSystemStatistics.vb" />
     <Compile Include="frmSelectScript.Designer.vb">
       <DependentUpon>frmSelectScript.vb</DependentUpon>
     </Compile>
     <Compile Include="frmSelectScript.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GraphGaFlow.vb" />
-    <Compile Include="GridAdd.vb" />
-    <Compile Include="GridValues.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="GridValuesPoint.vb" />
-    <Compile Include="HSPFOutputReports.vb" />
-    <Compile Include="HSPFWatershedSummaryWQReport.vb" />
-    <Compile Include="LineDump.vb" />
-    <Compile Include="Graph.vb" />
-    <Compile Include="ListTimeseries.vb" />
-    <Compile Include="MetaDataBatch.vb" />
-    <Compile Include="PeakFQInputCreate.vb" />
-    <Compile Include="SWAT2005Tester.vb" />
-    <Compile Include="SQLiteTester.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -120,14 +94,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ScriptDriver.vb" />
-    <Compile Include="ShapefileFromWDM.vb" />
-    <Compile Include="StatTest.vb" />
     <Compile Include="SummarizeTimeseries.vb" />
-    <Compile Include="SummarizeWdms.vb" />
-    <Compile Include="SWATRunner.vb" />
-    <Compile Include="SWATRunnerSimple.vb" />
-    <Compile Include="WatershedSummary.vb" />
-    <Compile Include="WdmCreateFromGrids.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmSelectScript.resx">
@@ -153,21 +120,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\mwOpenMetadataManager\mwOpenMetadataManagerBASINS40.vbproj">
-      <Project>{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}</Project>
-      <Name>mwOpenMetadataManagerBASINS40</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\MapWindow4Plugins\OpenSWAT\mwSWATPluginBASINS40.vbproj">
-      <Project>{00E83ED2-9952-4715-893D-C7DDF4BD35B8}</Project>
-      <Name>mwSWATPluginBASINS40</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcClimateAssessmentTool\atcClimateAssessmentTool.vbproj">
-      <Project>{F40002FE-5698-4767-8198-997EE31A96A0}</Project>
-      <Name>atcClimateAssessmentTool</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcDataTree\atcDataTree.vbproj">
       <Project>{F4EF0925-945B-418C-9A81-8490D89985DB}</Project>
       <Name>atcDataTree</Name>
@@ -198,11 +150,6 @@
       <Name>atcHspfSupport</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcList\atcList.vbproj">
-      <Project>{A1A87CB8-8B9E-4C90-9549-C065357E499F}</Project>
-      <Name>atcList</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility</Name>
@@ -218,15 +165,6 @@
       <Name>atcSegmentation</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTableSQLite\atcTableSQLite.vbproj">
-      <Project>{C59D3153-2857-499C-B640-924E5ABE2E74}</Project>
-      <Name>atcTableSQLite</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesBinary\atcTimseriesBinary.vbproj">
-      <Project>{DE17DC53-80E6-45C1-839E-0BF106D914D6}</Project>
-      <Name>atcTimseriesBinary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
       <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
       <Name>atcTimeseriesMath</Name>
@@ -235,11 +173,6 @@
     <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
       <Name>atcTimeseriesNdayHighLow</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesSWAT\atcTimeseriesSWAT.vbproj">
-      <Project>{8157C92A-68A6-498D-84B7-EF2A299AB7BA}</Project>
-      <Name>atcTimeseriesSWAT</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimseriesDbf\atcTimseriesDbf.vbproj">
