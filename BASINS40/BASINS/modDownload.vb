@@ -623,7 +623,7 @@ StartOver:
         Dim lEndFunction As Integer = aInstructions.ToLower.IndexOf("</success>")
         While lEndFunction > 0
             Dim lInstructions As String = aInstructions.Substring(0, lEndFunction + 10)
-            lMessage &= ProcessDownloadResult(lInstructions)
+            lMessage &= ProcessDownloadResult(lInstructions) & vbCrLf
             aInstructions = aInstructions.Substring(lEndFunction + 10)
             lEndFunction = aInstructions.ToLower.IndexOf("</success>")
         End While
@@ -697,14 +697,14 @@ StartOver:
                         End If
                         If lNewDataSource IsNot Nothing Then
                             If atcData.atcDataManager.OpenDataSource(lNewDataSource, lOutputFileName, Nothing) Then
-                                lDataAdded.Add(lNewDataSource)
+                                lDataAdded.Add(lNewDataSource.Specification)
                             End If
                         End If
                     End If
                 Case "add_shape"
                     lOutputFileName = lProjectorNode.InnerText
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    lLayersAdded.Add(AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
+                    lLayersAdded.Add(AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)).Name)
                 Case "add_grid"
                     lOutputFileName = lProjectorNode.InnerText
                     '    Select Case IO.Path.GetFileName(lOutputFileName).ToLower
@@ -714,7 +714,7 @@ StartOver:
                     '            lMessage &= IO.Path.GetFileName(lOutputFileName) & " available, not added to map" & vbCrLf
                     '        Case Else
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    lLayersAdded.Add(AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
+                    lLayersAdded.Add(AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)).Name)
                     If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                         'create .prj file as work-around for bug
                         SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
