@@ -619,6 +619,27 @@ StartOver:
     End Sub
 
     Public Sub ProcessDownloadResults(ByVal aInstructions As String)
+        Dim lMessage As String = ""
+        Dim lEndFunction As Integer = aInstructions.ToLower.IndexOf("</success>")
+        While lEndFunction > 0
+            Dim lInstructions As String = aInstructions.Substring(0, lEndFunction + 10)
+            lMessage &= ProcessDownloadResult(lInstructions)
+            aInstructions = aInstructions.Substring(lEndFunction + 10)
+            lEndFunction = aInstructions.ToLower.IndexOf("</success>")
+        End While
+
+        If lMessage.Length > 0 Then
+            Application.DoEvents()
+            Logger.Msg(lMessage, "Download Complete")
+        End If
+
+        If Logger.DisplayMessageBoxes AndAlso lMessage.Contains("Downloaded Data") Then
+            atcDataManager.UserManage()
+        End If
+
+    End Sub
+
+    Private Function ProcessDownloadResult(ByVal aInstructions As String) As String
         Dim lProjectorXML As New Xml.XmlDocument
         Dim lProjectorNode As Xml.XmlNode
         Dim lInputDirName As String
@@ -631,10 +652,12 @@ StartOver:
         Dim lSuccess As Boolean
         Dim lInputProjection As String
         Dim lOutputProjection As String
-        Dim lMessage As String = ""
         Dim lLayersAdded As New ArrayList
         Dim lDataAdded As New ArrayList
         Dim lProjectDir As String = ""
+
+        ProcessDownloadResult = ""
+
         If g_MapWin IsNot Nothing AndAlso g_MapWin.Project IsNot Nothing AndAlso g_MapWin.Project.FileName IsNot Nothing AndAlso g_MapWin.Project.FileName.Contains("\") Then
             lProjectDir = IO.Path.GetDirectoryName(g_MapWin.Project.FileName)
             If lProjectDir.Length > 0 AndAlso Not lProjectDir.EndsWith("\") Then lProjectDir &= "\"
@@ -645,7 +668,7 @@ StartOver:
                 aInstructions = WholeFileString(aInstructions)
             Else
                 Logger.Dbg("No instructions to process")
-                Exit Sub
+                Exit Function
             End If
         End If
 
@@ -684,17 +707,19 @@ StartOver:
                     lLayersAdded.Add(AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
                 Case "add_grid"
                     lOutputFileName = lProjectorNode.InnerText
-                    Select Case IO.Path.GetFileName(lOutputFileName).ToLower
-                        Case "fac.tif", "fdr.tif", "cat.tif"
-                            Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
-                        Case Else
-                            If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                            lLayersAdded.Add(AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
-                            If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
-                                'create .prj file as work-around for bug
-                                SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
-                            End If
-                    End Select
+                    '    Select Case IO.Path.GetFileName(lOutputFileName).ToLower
+                    '        Case "fac.tif", "fdr.tif", "cat.tif"
+                    '            Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
+                    '            GetDefaultRenderer(lOutputFileName)
+                    '            lMessage &= IO.Path.GetFileName(lOutputFileName) & " available, not added to map" & vbCrLf
+                    '        Case Else
+                    If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+                    lLayersAdded.Add(AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)))
+                    If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
+                        'create .prj file as work-around for bug
+                        SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
+                    End If
+                    '    End Select
                 Case "add_allshapes"
                     lOutputFileName = lProjectorNode.InnerText
                     lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
@@ -898,25 +923,21 @@ StartOver:
         Next
 
         If lLayersAdded.Count = 1 Then
-            lMessage &= lLayersAdded.Count & " Layer: " & lLayersAdded(0).ToString
+            ProcessDownloadResult &= "Downloaded Layer: " & lLayersAdded(0).ToString
         ElseIf lLayersAdded.Count > 1 Then
-            lMessage &= lLayersAdded.Count & " Layers"
+            ProcessDownloadResult &= "Downloaded " & lLayersAdded.Count & " Layers"
         End If
 
         If lDataAdded.Count = 1 Then
-            lMessage &= lDataAdded.Count & " Data file: " & lDataAdded(0).ToString
+            ProcessDownloadResult &= "Downloaded Data file: " & lDataAdded(0).ToString
         ElseIf lDataAdded.Count > 1 Then
-            lMessage &= lDataAdded.Count & " Data files"
+            ProcessDownloadResult &= "Downloaded " & lDataAdded.Count & " Data files"
         End If
 
         g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
         g_MapWin.View.UnlockLegend()
 
-        If lMessage.Length > 0 Then
-            Application.DoEvents()
-            Logger.Msg("Downloaded" & vbCrLf & lMessage, "Download Complete")
-        End If
-    End Sub
+    End Function
 
     Public Function CleanUpUserProjString(ByVal aProjString As String) As String
         Dim lPos As Integer
@@ -1908,10 +1929,11 @@ StartOver:
                                     ByRef aDefaultsXml As Xml.XmlDocument) As Xml.XmlNode
         Dim lName As String
 
-        lName = LCase(Filename.Substring(aProjectDir.Length))
+        lName = Filename.Substring(aProjectDir.Length).ToLower
 
         If Not aDefaultsXml Is Nothing Then
             For Each lChild As Xml.XmlNode In aDefaultsXml.FirstChild.ChildNodes
+                'Debug.Print("Testing " & lName & " Like " & "*" & lChild.Attributes.GetNamedItem("Filename").InnerText & "*")
                 If lName Like "*" & lChild.Attributes.GetNamedItem("Filename").InnerText & "*" Then
                     Return lChild
                 End If
