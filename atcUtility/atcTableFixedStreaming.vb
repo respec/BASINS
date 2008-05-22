@@ -19,6 +19,7 @@ Public Class atcTableFixedStreaming
     Private pNumFields As Integer
     Private pNumHeaderRows As Integer = -1
     Private pData() As String
+    Private pDataString As String
     Private pCurrentRecord As Integer
     Private pCurrentRecordStart As Integer
     Private pLinesInFile As IEnumerator
@@ -33,11 +34,7 @@ Public Class atcTableFixedStreaming
                 pLinesInFile.MoveNext()
             End If
             If pCurrentRecord + 1 = newValue Then
-                Dim lCurrentRecord As String = pLinesInFile.Current
-                'parse fields values from this record
-                For i As Integer = 1 To pNumFields
-                    pData(i) = Mid(lCurrentRecord, pFields(i).FieldStart, pFields(i).FieldLength)
-                Next
+                pDataString = pLinesInFile.Current
                 Exit Property
             Else
                 Throw New ApplicationException("ATCTableFixed: Cannot set CurrentRecord to " & newValue)
@@ -219,7 +216,14 @@ ErrHand:
             ElseIf aFieldNumber > pNumFields Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
             Else
-                Return pData(aFieldNumber)
+                'parse fields values from this record
+                With pFields(aFieldNumber)
+                    Return Mid(pDataString, .FieldStart, .FieldLength)
+                End With
+                'TODO: is substring faster than Mid?
+                'With pFields(i)
+                '    pData(i) = lCurrentRecord.Substring(.FieldStart - 1, .FieldLength)
+                'End With
             End If
         End Get
         Set(ByVal newValue As String)

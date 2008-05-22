@@ -217,7 +217,8 @@ Public Module modString
 
     Function DecimalAlign(ByVal aValue As Double, _
                  Optional ByVal aFieldWidth As Integer = 12, _
-                 Optional ByVal aDecimalPlaces As Integer = 3) As String
+                 Optional ByVal aDecimalPlaces As Integer = 3, _
+                 Optional ByVal aSignificantDigits As Integer = 5) As String
         Dim lString As String
         If Double.IsNaN(aValue) Then
             If aFieldWidth > 5 Then
@@ -230,7 +231,7 @@ Public Module modString
             If aDecimalPlaces > 1 Then
                 lFormat &= StrDup(aDecimalPlaces - 1, "#")
             End If
-            lString = DoubleToString(aValue, aFieldWidth, lFormat)
+            lString = DoubleToString(aValue, aFieldWidth, lFormat, , , aSignificantDigits)
             Dim dp As Integer = lString.IndexOf("."c)
             If dp >= 0 Then
                 Dim lAddLeft As Integer = aFieldWidth - 5 - dp
