@@ -15,6 +15,7 @@ Public Class SWMMProject
         Name = ""
         Title = ""
         Catchments = New Catchments
+        Catchments.SWMMProject = Me
         Conduits = New Conduits
         Landuses = New Landuses
         RainGages = New RainGages
@@ -30,6 +31,7 @@ Public Class SWMMProject
 
         'lSB.AppendLine("[OPTIONS]")
         'lSB.AppendLine("[EVAPORATION]")
+        'lSB.AppendLine("[TEMPERATURE]")
         'lSB.AppendLine("[RAINGAGES]")
 
         '[SUBCATCHMENTS]
@@ -38,7 +40,10 @@ Public Class SWMMProject
         'lSB.AppendLine("[SUBAREAS]")
         'lSB.AppendLine("[JUNCTIONS]")
         'lSB.AppendLine("[OUTFALLS]")
-        'lSB.AppendLine("[CONDUITS]")
+
+        '[CONDUITS]
+        lSB.AppendLine(Conduits.ToString)
+
         'lSB.AppendLine("[XSECTIONS]")
         'lSB.AppendLine("[LANDUSES]")
         'lSB.AppendLine("[COVERAGES]")
@@ -46,7 +51,10 @@ Public Class SWMMProject
         'lSB.AppendLine("[MAP]")
         'lSB.AppendLine("[COORDINATES]")
         'lSB.AppendLine("[VERTICES]")
-        'lSB.AppendLine("[Polygons]")
+
+        '[Polygons]
+        lSB.AppendLine(Catchments.PolygonsToString)
+
         'lSB.AppendLine("[SYMBOLS]")
         'lSB.AppendLine("[BACKDROP]")
 

@@ -13,20 +13,33 @@ Public Class Catchments
     End Function
 
     Public LayerFileName As String
+    Public SWMMProject As SWMMProject
 
-    Public Function CreateFromShapefile(ByVal aShapefileName As String) As Boolean
+    Public Function CreateFromShapefile(ByVal aShapefileName As String, ByVal aSubbasinFieldName As String) As Boolean
+        Me.ClearItems()
+
         LayerFileName = aShapefileName
 
         If Not GisUtil.IsLayerByFileName(LayerFileName) Then
             GisUtil.AddLayer(LayerFileName, "Catchments")
         End If
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(LayerFileName)
+        Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aSubbasinFieldName)
 
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lCatchment As New Catchment
-            lCatchment.Name = "S" & (lFeatureIndex + 1).ToString
+            Dim lSubbasinID As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
+            lCatchment.Name = "S" & lSubbasinID
             'lCatchment.RainGage()
-            'lCatchment.Conduit()
+
+            'find associated conduit
+            For Each lConduit As Conduit In Me.SWMMProject.Conduits
+                If lConduit.Name.Substring(1) = lSubbasinID Then
+                    lCatchment.Conduit = lConduit
+                    Exit For
+                End If
+            Next
+
             lCatchment.FeatureIndex = lFeatureIndex
             lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
             'lCatchment.PercentImpervious()
@@ -73,6 +86,34 @@ Public Class Catchments
                 lString.Append(" ")
                 lString.Append(.SnowPackName)
                 lString.Append(vbCrLf)
+            End With
+        Next
+
+        Return lString.ToString
+    End Function
+
+    Public Function PolygonsToString() As String
+        Dim lString As New StringBuilder
+
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(LayerFileName)
+
+        lString.Append("[Polygons]" & vbCrLf & _
+                       ";;Subcatchment   X-Coord            Y-Coord           " & vbCrLf & _
+                       ";;-------------- ------------------ ------------------" & vbCrLf) 
+
+        Dim lX() As Double = Nothing
+        Dim lY() As Double = Nothing
+        For Each lCatchment As Catchment In Me
+            With lCatchment
+                GisUtil.PointsOfLine(lLayerIndex, .FeatureIndex, lX, lY)
+                For lIndex As Integer = 0 To lX.GetUpperBound(0) - 1
+                    lString.Append(StrPad(.Name, 16, " ", False))
+                    lString.Append(" ")
+                    lString.Append(StrPad(Format(lX(lIndex), "0.000"), 18, " ", False))
+                    lString.Append(" ")
+                    lString.Append(StrPad(Format(lY(lIndex), "0.000"), 18, " ", False))
+                    lString.Append(vbCrLf)
+                Next
             End With
         Next
 
