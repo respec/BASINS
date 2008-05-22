@@ -633,7 +633,7 @@ StartOver:
             Logger.Msg(lMessage, "Download Complete")
         End If
 
-        If Logger.DisplayMessageBoxes AndAlso lMessage.Contains("Downloaded Data") Then
+        If Logger.DisplayMessageBoxes AndAlso lMessage.Contains(" Data file") Then
             atcDataManager.UserManage()
         End If
 
