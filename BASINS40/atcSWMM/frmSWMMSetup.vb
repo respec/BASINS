@@ -156,11 +156,11 @@ Public Class frmSWMMSetup
             'TODO: still use modelout?
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
 
-            'create conduits from streams shapefile
-            .Conduits.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR")
+            'create conduits and nodes from streams shapefile
+            .Conduits.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL")
 
             'create catchments from subbasins shapefile
-            .Catchments.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp", "SUBBASIN")
+            .Catchments.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp", "SUBBASIN", "SLO1")
 
             'save project file and start SWMM
             .Save(lSWMMProjectFileName)

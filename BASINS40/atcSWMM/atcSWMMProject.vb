@@ -4,6 +4,7 @@ Imports atcUtility
 Public Class SWMMProject
     Public Catchments As Catchments
     Public Conduits As Conduits
+    Public Nodes As Nodes
     Public Landuses As Landuses
     Public RainGages As RainGages
     Public MetConstituents As MetConstituents
@@ -17,6 +18,8 @@ Public Class SWMMProject
         Catchments = New Catchments
         Catchments.SWMMProject = Me
         Conduits = New Conduits
+        Conduits.SWMMProject = Me
+        Nodes = New Nodes
         Landuses = New Landuses
         RainGages = New RainGages
         MetConstituents = New MetConstituents
@@ -38,8 +41,9 @@ Public Class SWMMProject
         lSB.AppendLine(Catchments.ToString)
 
         'lSB.AppendLine("[SUBAREAS]")
-        'lSB.AppendLine("[JUNCTIONS]")
-        'lSB.AppendLine("[OUTFALLS]")
+
+        '[JUNCTIONS] and [OUTFALLS]
+        lSB.AppendLine(Nodes.ToString)
 
         '[CONDUITS]
         lSB.AppendLine(Conduits.ToString)
@@ -49,7 +53,10 @@ Public Class SWMMProject
         'lSB.AppendLine("[COVERAGES]")
         'lSB.AppendLine("[TIMESERIES]")
         'lSB.AppendLine("[MAP]")
-        'lSB.AppendLine("[COORDINATES]")
+
+        '[COORDINATES]
+        lSB.AppendLine(Nodes.CoordinatesToString)
+
         'lSB.AppendLine("[VERTICES]")
 
         '[Polygons]

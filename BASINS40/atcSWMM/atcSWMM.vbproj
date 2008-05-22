@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -79,6 +79,7 @@
     <Compile Include="atcSWMMLanduses.vb" />
     <Compile Include="atcSWMMMetConstituents.vb" />
     <Compile Include="atcSWMMProject.vb" />
+    <Compile Include="atcSWMMNodes.vb" />
     <Compile Include="clsPlugin.vb" />
     <Compile Include="frmSWMMSetup.vb">
       <SubType>Form</SubType>

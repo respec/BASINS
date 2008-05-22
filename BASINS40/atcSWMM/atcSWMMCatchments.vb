@@ -15,7 +15,7 @@ Public Class Catchments
     Public LayerFileName As String
     Public SWMMProject As SWMMProject
 
-    Public Function CreateFromShapefile(ByVal aShapefileName As String, ByVal aSubbasinFieldName As String) As Boolean
+    Public Function CreateFromShapefile(ByVal aShapefileName As String, ByVal aSubbasinFieldName As String, ByVal aSlopeFieldName As String) As Boolean
         Me.ClearItems()
 
         LayerFileName = aShapefileName
@@ -25,6 +25,7 @@ Public Class Catchments
         End If
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(LayerFileName)
         Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aSubbasinFieldName)
+        Dim lSlopeFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aSlopeFieldName)
 
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lCatchment As New Catchment
@@ -44,7 +45,7 @@ Public Class Catchments
             lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
             'lCatchment.PercentImpervious()
             'lCatchment.Width()
-            'lCatchment.Slope()
+            lCatchment.Slope = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSlopeFieldIndex)
             Me.Add(lCatchment)
         Next
 
@@ -69,7 +70,7 @@ Public Class Catchments
                 End If
                 lString.Append(" ")
                 If Not .Conduit Is Nothing Then
-                    lString.Append(StrPad(.Conduit.OutletID, 16, " ", False))
+                    lString.Append(StrPad(.Conduit.OutletNode.Name, 16, " ", False))
                 Else
                     lString.Append(StrPad("J1", 16, " ", False))
                 End If
