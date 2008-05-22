@@ -52,9 +52,27 @@ Public Class atcTimeseriesSWAT
             If aAttributes IsNot Nothing Then
                 lFieldsToProcess = lDelim & aAttributes.GetValue("FieldName", "") & lDelim
             End If
-            Dim lTable As New atcTableFixedStreaming
+            Dim lTableDelimited As Boolean = False
+            Dim lTable As Object
+            If IO.Path.GetFileNameWithoutExtension(aFileName) = "tab" Then
+                lTable = New atcTableDelimited
+                lTableDelimited = True
+            Else
+                lTable = New atcTableFixedStreaming
+            End If
             With lTable
-                .NumHeaderRows = 9
+                Dim lBaseDataField As Integer
+                Dim lSubIdField As Integer
+                If lTableDelimited Then
+                    .NumHeaderRows = 0
+                    .Delimiter = vbTab
+                    lBaseDataField = 6
+                    lSubIdField = 3
+                Else
+                    .NumHeaderRows = 9
+                    lBaseDataField = 4
+                    lSubIdField = 2
+                End If
                 If .OpenFile(Specification) Then
                     Dim lTSBuilders As New atcData.atcTimeseriesGroupBuilder(Me)
                     Dim lTSBuilder As atcData.atcTimeseriesBuilder
@@ -64,7 +82,11 @@ Public Class atcTimeseriesSWAT
                     Dim lKey As String
                     Dim lDate As Double
                     Dim lYear As Integer
-                    Dim lConstituentHeader As String = .Header(9)
+                    Dim lSaveSubwatershedId As Boolean = False
+                    Dim lConstituentHeader As String = ""
+                    If Not lTableDelimited Then
+                        lConstituentHeader = .Header(9)
+                    End If
                     Dim lLastField As Integer
                     Select Case IO.Path.GetExtension(Specification).ToLower
                         Case ".rch"
@@ -97,45 +119,67 @@ Public Class atcTimeseriesSWAT
                                 lFieldStart += .FieldLength(lField)
                             Next
                         Case ".hru", ".hrux"
-                            lLastField = 3 + (lConstituentHeader.Length - 35) / 10
-                            .NumFields = lLastField
-                            For lField = 1 To lLastField
-                                Select Case lField
-                                    Case 1 : .FieldLength(lField) = 9
-                                    Case 2 : .FieldLength(lField) = 19
-                                    Case 3 : .FieldLength(lField) = 5
-                                    Case 71, 72 : .FieldLength(lField) = 11
-                                    Case Else : .FieldLength(lField) = 10
-                                End Select
-                                .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
-                                .FieldStart(lField) = lFieldStart
-                                lFieldStart += .FieldLength(lField)
-                            Next
+                            lSaveSubwatershedId = True
+                            If Not lTableDelimited Then
+                                lLastField = 3 + (lConstituentHeader.Length - 35) / 10
+                                .NumFields = lLastField
+                                For lField = 1 To lLastField
+                                    Select Case lField
+                                        Case 1 : .FieldLength(lField) = 9
+                                        Case 2 : .FieldLength(lField) = 5
+                                        Case 3 : .FieldLength(lField) = 5
+                                        Case 71, 72 : .FieldLength(lField) = 11
+                                        Case Else : .FieldLength(lField) = 10
+                                    End Select
+                                    .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
+                                    .FieldStart(lField) = lFieldStart
+                                    Select Case lField
+                                        Case 1 : lFieldStart = 19 'skip to sub
+                                        Case 2 : lFieldStart = 29 'skip to mon
+                                        Case Else : lFieldStart += .FieldLength(lField)
+                                    End Select
+                                Next
+                            End If
                         Case Else
                             Throw New ApplicationException("Unknown file extension for " & Specification)
                     End Select
 
-                    Logger.Status("Reading records for " & Format((lLastField - 3), "#,###") & " constituents from " & Specification, True)
+                    Logger.Status("Reading records for " & Format((.NumFields - lBaseDataField + 1), "#,###") & " constituents from " & Specification, True)
                     .CurrentRecord = 1
                     Dim lYearReading As Integer = 0
+                    Dim lYearBase As Integer = 0
                     Do
-                        lLocation = .Value(1)
+                        If lTableDelimited Then
+                            lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
+                        Else
+                            lLocation = .Value(1)
+                        End If
 
                         'MON column assumed to hold year
                         Try
-                            If Integer.TryParse(.Value(3).Trim, lYear) Then
+                            If Integer.TryParse(.Value(lBaseDataField - 1).Trim, lYear) Then
                                 If lYear <> lYearReading Then
                                     Logger.Status("Reading year " & lYear)
                                     lYearReading = lYear
+                                    If lYearBase = 0 Then lYearBase = lYear
                                 End If
                                 lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
-                                For lField = 4 To lLastField
-                                    Dim lFieldName As String = .FieldName(lField)
-                                    If lFieldsToProcess.Length = 0 OrElse lFieldsToProcess.Contains(lDelim & lFieldName & lDelim) Then
+                                For lField = lBaseDataField To .NumFields
+                                    Dim lFieldName As String = .FieldName(lField).ToString.Replace("""", "")
+                                    If lFieldsToProcess.Length = 0 OrElse lFieldsToProcess.Contains(lDelim & lFieldName.Replace("_", "/") & lDelim) Then
                                         lKey = lFieldName & ":" & lLocation
                                         lTSBuilder = lTSBuilders.Builder(lKey)
                                         If lTSBuilder.NumValues = 0 Then
-                                            lTSBuilder.AddValue(atcUtility.Jday(lYear, 1, 1, 0, 0, 0), Double.NaN)
+                                            Dim lYearFill As Integer = lYearBase
+                                            While lYear >= lYearFill
+                                                lTSBuilder.AddValue(atcUtility.Jday(lYearFill, 1, 1, 0, 0, 0), Double.NaN)
+                                                lYearFill += 1
+                                            End While
+                                            If lSaveSubwatershedId Then
+                                                lTSBuilder.Attributes.Add("SubId", .Value(lSubIdField))
+                                                lTSBuilder.Attributes.Add("CropId", lLocation.Substring(0, 4))
+                                                lTSBuilder.Attributes.Add("HruId", lLocation.Substring(4, 5))
+                                            End If
                                         End If
                                         lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
                                     End If
