@@ -2,7 +2,6 @@ Imports System.Collections.ObjectModel
 Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
-Imports atcMwGisUtility
 Imports System.Text
 
 Public Class Nodes

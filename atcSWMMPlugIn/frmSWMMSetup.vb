@@ -158,7 +158,7 @@ Public Class frmSWMMSetup
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
 
             'create conduits and nodes from streams shapefile
-            .Conduits.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL")
+            CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", pPlugIn.SWMMProject, .Conduits)
 
             'create catchments from subbasins shapefile
             CreateCatchmentsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp", "SUBBASIN", "SLO1", pPlugIn.SWMMProject, .Catchments)

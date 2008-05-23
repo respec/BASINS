@@ -35,25 +35,14 @@
       <HintPath>..\Bin\Plugins\BASINS\atcData.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="atcMwGisUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\Plugins\BASINS\atcMwGisUtility.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="atcUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Plugins\BASINS\atcUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinInterfaces, Version=4.3.3034.36587, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MapWinUtility, Version=1.0.3037.23681, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinUtility, Version=1.0.3063.19276, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
