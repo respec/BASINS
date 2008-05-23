@@ -2550,8 +2550,18 @@ x:
                         Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
                     End If
                     With lOperation.FTable
-                        .Nrows = CInt(Left(lBuff, 5))
-                        .Ncols = CInt(Mid(lBuff, 6, 5))
+                        Dim lString As String = lBuff.Substring(0, 5)
+                        If lString.Trim.Length > 0 Then
+                            .Nrows = CInt(lString)
+                        Else
+                            .Nrows = 0
+                        End If
+                        lString = lBuff.Substring(5, 5)
+                        If lString.Trim.Length > 0 Then
+                            .Ncols = CInt(lString)
+                        Else
+                            .Ncols = 0
+                        End If
                         Dim lRow As Integer = 1
                         Do While lRow <= .Nrows
                             If Me.FastFlag Then

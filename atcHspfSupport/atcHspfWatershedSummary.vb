@@ -134,7 +134,7 @@ Public Module WatershedSummary
                 If Not lOper.TableExists("GEN-INFO") Then
                     Logger.Dbg("Missing:GEN-INFO:" & lOper.Name & ":" & lOper.Id)
                 Else
-                    lLuName = lOper.Tables("GEN-INFO").Parms(1).Value
+                    lLuName = lOper.Tables("GEN-INFO").Parms(0).Value
                     lLuArea = LandArea(lOper.Name, lOper.Id, aUci)
 
                     Dim lTempDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)

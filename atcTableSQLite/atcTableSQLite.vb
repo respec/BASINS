@@ -175,6 +175,15 @@ Public Class atcTableSQLite
         End Set
     End Property
 
+    'undefined for this table type
+    Public Overrides Property NumHeaderRows() As Integer
+        Get
+            Return 0
+        End Get
+        Set(ByVal value As Integer)
+        End Set
+    End Property
+
     Public Overrides Property NumFields() As Integer
         Get
             Return pDataTable.Columns.Count

@@ -22,6 +22,7 @@ Public Interface IatcTable
     Property FieldLength(ByVal aFieldNumber As Integer) As Integer
     Property FieldName(ByVal aFieldNumber As Integer) As String
     Property FieldType(ByVal aFieldNumber As Integer) As String
+    Property NumHeaderRows() As Integer
     Property NumFields() As Integer
     Property NumRecords() As Integer
     Property Value(ByVal aFieldNumber As Integer) As String
@@ -77,11 +78,14 @@ Public MustInherit Class atcTable
     'Write the current table to the specified file
     Public MustOverride Function WriteFile(ByVal filename As String) As Boolean Implements IatcTable.WriteFile
 
-    'The number of records (rows) in the table
-    Public MustOverride Property NumRecords() As Integer Implements IatcTable.NumRecords
+    'The number of header rows in the table
+    Public MustOverride Property NumHeaderRows() As Integer Implements IatcTable.NumHeaderRows
 
     'The number of fields (columns) in the table
     Public MustOverride Property NumFields() As Integer Implements IatcTable.NumFields
+
+    'The number of records (rows) in the table
+    Public MustOverride Property NumRecords() As Integer Implements IatcTable.NumRecords
 
     'The current record index [1..NumRecords]
     Public MustOverride Property CurrentRecord() As Integer Implements IatcTable.CurrentRecord
@@ -365,5 +369,6 @@ Public MustInherit Class atcTable
         CurrentRecord = aStartRecord
         FindMatch = False
     End Function
+
 
 End Class
