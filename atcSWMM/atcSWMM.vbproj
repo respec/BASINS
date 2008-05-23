@@ -80,16 +80,6 @@
     <Compile Include="atcSWMMMetConstituents.vb" />
     <Compile Include="atcSWMMProject.vb" />
     <Compile Include="atcSWMMNodes.vb" />
-    <Compile Include="clsPlugin.vb" />
-    <Compile Include="frmSWMMSetup.vb">
-      <SubType>Form</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="frmSWMMSetup.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmSWMMSetup.vb</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />

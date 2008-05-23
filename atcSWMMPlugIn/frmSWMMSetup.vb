@@ -2,6 +2,7 @@ Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
 Imports System.Drawing
+Imports System
 
 Public Class frmSWMMSetup
     Inherits System.Windows.Forms.Form
@@ -139,7 +140,7 @@ Public Class frmSWMMSetup
 
     Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExisting.Click
         If ofdExisting.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            pPlugIn.StartSWMM(ofdExisting.FileName)
+            pPlugIn.SWMMProject.Run(ofdExisting.FileName)
         End If
     End Sub
 
@@ -160,11 +161,11 @@ Public Class frmSWMMSetup
             .Conduits.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL")
 
             'create catchments from subbasins shapefile
-            .Catchments.CreateFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp", "SUBBASIN", "SLO1")
+            CreateCatchmentsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp", "SUBBASIN", "SLO1", pPlugIn.SWMMProject, .Catchments)
 
             'save project file and start SWMM
             .Save(lSWMMProjectFileName)
-            pPlugIn.StartSWMM(lSWMMProjectFileName)
+            .Run(lSWMMProjectFileName)
         End With
         Me.Close()
     End Sub
