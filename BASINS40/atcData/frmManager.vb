@@ -371,11 +371,16 @@ Friend Class frmManager
                                 atcDataManager.ShowDisplay(lActionArgs(1), .DataSets)
                             Case "RemoveDatasets"
                                 If .CanRemoveDataset Then
-                                    For Each lDataSet As atcDataSet In atcDataManager.UserSelectData( _
-                                      "Select Datasets to remove from " & .Specification, , .DataSets)
-                                        .RemoveDataset(lDataSet)
-                                    Next
-                                    Populate(treeFiles.SelectedNode.Name)
+                                    Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
+                                        "Select Datasets to remove from " & .Specification, , .DataSets)
+                                    If lDataGroup.Count > 0 AndAlso _
+                                        Logger.Msg("Remove " & lDataGroup.Count & " datasets from " & vbCrLf & .Specification & "?", _
+                                                   MsgBoxStyle.OkCancel, "Confirm Remove") = MsgBoxResult.Ok Then
+                                        For Each lDataSet As atcDataSet In lDataGroup
+                                            .RemoveDataset(lDataSet)
+                                        Next
+                                        Populate(treeFiles.SelectedNode.Name)
+                                    End If
                                 End If
                         End Select
                     End With

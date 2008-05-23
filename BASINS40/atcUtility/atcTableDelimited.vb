@@ -109,7 +109,7 @@ Public Class atcTableDelimited
         End Set
     End Property
 
-    Public Property NumHeaderRows() As Integer
+    Public Overrides Property NumHeaderRows() As Integer
         Get
             If pNumHeaderRows >= 0 Then
                 Return pNumHeaderRows
@@ -247,6 +247,7 @@ ErrHand:
             ElseIf lRecordCount = NumHeaderRows + 1 Then
                 NumFields = CountString(lCurrentLine, Delimiter) + 1
                 'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
+                'TODO: are quoted ("") - is this correct?
                 pFieldNames = (Delimiter & lCurrentLine).Split(Delimiter)
             Else
                 pRecords.Add(lCurrentLine)

@@ -53,7 +53,7 @@ Public Class atcTimeseriesSWAT
                 lFieldsToProcess = lDelim & aAttributes.GetValue("FieldName", "") & lDelim
             End If
             Dim lTableDelimited As Boolean = False
-            Dim lTable As Object
+            Dim lTable As atcTable
             If IO.Path.GetFileNameWithoutExtension(aFileName) = "tab" Then
                 lTable = New atcTableDelimited
                 lTableDelimited = True
@@ -65,7 +65,7 @@ Public Class atcTimeseriesSWAT
                 Dim lSubIdField As Integer
                 If lTableDelimited Then
                     .NumHeaderRows = 0
-                    .Delimiter = vbTab
+                    CType(lTable, atcTableDelimited).Delimiter = vbTab
                     lBaseDataField = 6
                     lSubIdField = 3
                 Else
@@ -85,7 +85,7 @@ Public Class atcTimeseriesSWAT
                     Dim lSaveSubwatershedId As Boolean = False
                     Dim lConstituentHeader As String = ""
                     If Not lTableDelimited Then
-                        lConstituentHeader = .Header(9)
+                        lConstituentHeader = CType(lTable, atcTableFixedStreaming).Header(9)
                     End If
                     Dim lLastField As Integer
                     Select Case IO.Path.GetExtension(Specification).ToLower
@@ -100,7 +100,7 @@ Public Class atcTimeseriesSWAT
                                     Case Else : .FieldLength(lField) = 12
                                 End Select
                                 .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
-                                .FieldStart(lField) = lFieldStart
+                                CType(lTable, atcTableFixedStreaming).FieldStart(lField) = lFieldStart
                                 lFieldStart += .FieldLength(lField)
                             Next
                         Case ".sub"
@@ -115,7 +115,7 @@ Public Class atcTimeseriesSWAT
                                     Case Else : .FieldLength(lField) = 10
                                 End Select
                                 .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
-                                .FieldStart(lField) = lFieldStart
+                                CType(lTable, atcTableFixedStreaming).FieldStart(lField) = lFieldStart
                                 lFieldStart += .FieldLength(lField)
                             Next
                         Case ".hru", ".hrux"
@@ -132,7 +132,7 @@ Public Class atcTimeseriesSWAT
                                         Case Else : .FieldLength(lField) = 10
                                     End Select
                                     .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
-                                    .FieldStart(lField) = lFieldStart
+                                    CType(lTable, atcTableFixedStreaming).FieldStart(lField) = lFieldStart
                                     Select Case lField
                                         Case 1 : lFieldStart = 19 'skip to sub
                                         Case 2 : lFieldStart = 29 'skip to mon

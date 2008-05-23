@@ -12,11 +12,13 @@ Imports SwatObject
 
 Module SWATRunner
     Private Const pRefreshDB As Boolean = False
-    Private Const pOutputOnly As Boolean = True
+    Private Const pOutputSummarize As Boolean = True
+    Private Const pInputSummarize As Boolean = False
+    Private Const pRunModel As Boolean = True
     'Private Const pBasePath As String = "D:\Basins\data\SWATOutput\UM\baseline90"
     Private Const pBasePath As String = "C:\Project\UMRB\baseline90"
     'Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline90jack"
-    Private Const pInputPath As String = "C:\Project\UMRB\baseline90\Scenarios\Test"
+    Private Const pInputPath As String = "C:\Project\UMRB\baseline90\Scenarios\RevCrop"
     'Private Const pSWATGDB As String = "SWAT2005.mdb"
     Private Const pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
     Private Const pOutGDBPath As String = pInputPath & "\TablesIn"
@@ -37,7 +39,7 @@ Module SWATRunner
 
         Dim lOutGDB As String = pOutGDBPath & "\" & pOutGDB
 
-        If Not pOutputOnly Then
+        If pInputSummarize Then
             If pRefreshDB Then 'copy the entire input parameter database for this new scenario
                 If IO.File.Exists(lOutGDB) Then
                     Logger.Dbg("DeleteExisting " & lOutGDB)
@@ -72,42 +74,45 @@ Module SWATRunner
                            SWATArea.Report(SwatInput.SubBasin.TableWithArea("Soil")))
             SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", _
                            SWATArea.Report(SwatInput.SubBasin.TableWithArea("Slope_Cd")))
+        End If
 
+        If pRunModel Then
             LaunchProgram(pSWATExe, pOutputFolder)
         End If
 
-        MkDirPath(IO.Path.GetFullPath(pReportsFolder))
-        Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputRch
-            .Open(pOutputFolder & "\output.rch")
-            Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
-            WriteDatasets(pReportsFolder & "\rch", .DataSets)
-        End With
+        If pOutputSummarize Then
+            MkDirPath(IO.Path.GetFullPath(pReportsFolder))
+            Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
+            With lOutputRch
+                .Open(pOutputFolder & "\output.rch")
+                Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
+                WriteDatasets(pReportsFolder & "\rch", .DataSets)
+            End With
 
-        Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputSub
-            .Open(pOutputFolder & "\output.sub")
-            Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
-            WriteDatasets(pReportsFolder & "\sub", .DataSets)
-        End With
+            Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
+            With lOutputSub
+                .Open(pOutputFolder & "\output.sub")
+                Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
+                WriteDatasets(pReportsFolder & "\sub", .DataSets)
+            End With
 
-        Dim lOutputFields As New atcData.atcDataAttributes
-        lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
-        Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputHru
-            '.Open(pOutputFolder & "\tab.hru", lOutputFields)
-            .Open(pOutputFolder & "\output.hru", lOutputFields)
-            Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
-            WriteDatasets(pReportsFolder & "\hru", .DataSets)
-        End With
+            Dim lOutputFields As New atcData.atcDataAttributes
+            lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
+            Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
+            With lOutputHru
+                '.Open(pOutputFolder & "\tab.hru", lOutputFields)
+                .Open(pOutputFolder & "\output.hru", lOutputFields)
+                Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
+                WriteDatasets(pReportsFolder & "\hru", .DataSets)
+            End With
 
-        Logger.Dbg("SwatSummaryReport")
-        Dim lTimseriesGroup As New atcDataSourceTimeseriesBinary
-        lTimseriesGroup.Open(pReportsFolder & "\hru.tsbin")
-        WriteSummary(pReportsFolder, lTimseriesGroup.DataSets)
+            Logger.Dbg("SwatSummaryReport")
+            Dim lTimseriesGroup As New atcDataSourceTimeseriesBinary
+            lTimseriesGroup.Open(pReportsFolder & "\hru.tsbin")
+            WriteSummary(pReportsFolder, lTimseriesGroup.DataSets)
 
-        Logger.Dbg("SwatPostProcessingDone")
-
+            Logger.Dbg("SwatPostProcessingDone")
+        End If
         'back to basins log
         Logger.StartToFile(lLogFileName, True, False, True)
     End Sub

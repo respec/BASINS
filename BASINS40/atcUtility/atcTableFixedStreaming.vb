@@ -126,7 +126,7 @@ Public Class atcTableFixedStreaming
         End Set
     End Property
 
-    Public Property NumHeaderRows() As Integer
+    Public Overrides Property NumHeaderRows() As Integer
         Get
             If pNumHeaderRows >= 0 Then
                 Return pNumHeaderRows
