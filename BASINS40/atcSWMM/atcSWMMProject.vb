@@ -1,3 +1,4 @@
+Imports MapWinUtility
 Imports System.Text
 Imports atcUtility
 
@@ -68,4 +69,17 @@ Public Class SWMMProject
         SaveFileString(aFileName, lSB.ToString)
         Return True
     End Function
+
+    Public Sub Run(ByVal aInputFileName As String)
+        If IO.File.Exists(aInputFileName) Then
+            Dim lSWMMexe As String = atcUtility.FindFile("Please locate the EPA SWMM 5.0 Executable", "\Program Files\EPA SWMM 5.0\epaswmm5.exe")
+            If IO.File.Exists(lSWMMexe) Then
+                LaunchProgram(lSWMMexe, IO.Path.GetDirectoryName(aInputFileName), "/f " & aInputFileName, False)
+            Else
+                Logger.Msg("Cannot find the EPA SWMM 5.0 Executable", MsgBoxStyle.Critical, "BASINS SWMM Problem")
+            End If
+        Else
+            Logger.Msg("Cannot find SWMM 5.0 Input File " & aInputFileName)
+        End If
+    End Sub
 End Class
