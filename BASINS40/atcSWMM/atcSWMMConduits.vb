@@ -2,7 +2,6 @@ Imports System.Collections.ObjectModel
 Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
-Imports atcMwGisUtility
 Imports System.Text
 
 Public Class Conduits
@@ -12,97 +11,7 @@ Public Class Conduits
         Return lKey
     End Function
 
-    Public LayerFileName As String
     Public SWMMProject As SWMMProject
-
-    Public Function CreateFromShapefile(ByVal aShapefileName As String, _
-                                        ByVal aSubbasinFieldName As String, _
-                                        ByVal aDownSubbasinFieldName As String, _
-                                        ByVal aElevHighFieldName As String, _
-                                        ByVal aElevLowFieldName As String) As Boolean
-        Me.ClearItems()
-
-        LayerFileName = aShapefileName
-
-        If Not GisUtil.IsLayerByFileName(LayerFileName) Then
-            GisUtil.AddLayer(LayerFileName, "Conduits")
-        End If
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(LayerFileName)
-        Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aSubbasinFieldName)
-        Dim lDownSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aDownSubbasinFieldName)
-        Dim lElevHighFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aElevHighFieldName)
-        Dim lElevLowFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aElevLowFieldName)
-
-        'create all conduits
-        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lConduit As New Conduit
-            lConduit.Name = "C" & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-            lConduit.FeatureIndex = lFeatureIndex
-
-            lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex)
-            'lConduit.ManningsN()
-            'lConduit.InletOffset()
-            'lConduit.OutletOffset()
-            'lConduit.InitialFlow()
-            'lConduit.MaxFlow()
-
-            Dim lElevHigh As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevHighFieldIndex)
-            Dim lElevLow As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevLowFieldIndex)
-            If lElevHigh < lElevLow Then
-                'something is wrong, switch places
-                Dim lTemp As Double = lElevHigh
-                lElevHigh = lElevLow
-                lElevLow = lTemp
-            End If
-            Dim lXup As Double
-            Dim lYup As Double
-            Dim lXdown As Double
-            Dim lYdown As Double
-            GisUtil.EndPointsOfLine(lLayerIndex, lFeatureIndex, lXup, lYup, lXdown, lYdown)
-            'todo: may need to verify which way the line is digitized
-
-            'create node at upstream end
-            Dim lUpNode As New Node
-            Dim lSubID As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-            lUpNode.Name = "J" & lSubID
-            lUpNode.Type = "JUNCTION"
-            lUpNode.InvertElevation = lElevHigh
-            lUpNode.XPos = lXup
-            lUpNode.YPos = lYup
-            If Not Me.SWMMProject.Nodes.Contains(lUpNode.Name) Then
-                Me.SWMMProject.Nodes.Add(lUpNode)
-                lConduit.InletNode = lUpNode
-            Else
-                lConduit.InletNode = Me.SWMMProject.Nodes(lUpNode.Name)
-            End If
-
-            'create node at downstream end
-            Dim lNode As New Node
-            Dim lDownID As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDownSubbasinFieldIndex)
-            If CInt(lDownID) > 0 Then
-                lNode.Name = "J" & lDownID
-                lNode.Type = "JUNCTION"
-            Else
-                lNode.Name = "O1"
-                lNode.Type = "OUTFALL"
-            End If
-            lNode.InvertElevation = lElevLow
-            lNode.XPos = lXdown
-            lNode.YPos = lYdown
-            If Not Me.SWMMProject.Nodes.Contains(lNode.Name) Then
-                Me.SWMMProject.Nodes.Add(lNode)
-                lConduit.OutletNode = lNode
-            Else
-                lConduit.OutletNode = Me.SWMMProject.Nodes(lNode.Name)
-                'make sure coordinates correspond with downstream end
-                lConduit.OutletNode.XPos = lNode.XPos
-                lConduit.OutletNode.YPos = lNode.YPos
-            End If
-
-            Me.Add(lConduit)
-        Next
-
-    End Function
 
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
@@ -137,6 +46,28 @@ Public Class Conduits
 
         Return lString.ToString
     End Function
+
+    Public Function VerticesToString() As String
+        Dim lSB As New StringBuilder
+        lSB.Append("[VERTICES]" & vbCrLf & _
+                       ";;Link           X-Coord            Y-Coord           " & vbCrLf & _
+                       ";;-------------- ------------------ ------------------" & vbCrLf)
+
+        For Each lConduit As Conduit In Me
+            With lConduit
+                For lIndex As Integer = 0 To .X.GetUpperBound(0) - 1
+                    lSB.Append(StrPad(.Name, 16, " ", False))
+                    lSB.Append(" ")
+                    lSB.Append(StrPad(Format(.X(lIndex), "0.000"), 18, " ", False))
+                    lSB.Append(" ")
+                    lSB.Append(StrPad(Format(.Y(lIndex), "0.000"), 18, " ", False))
+                    lSB.Append(vbCrLf)
+                Next
+            End With
+        Next
+
+        Return lSB.ToString
+    End Function
 End Class
 
 Public Class Conduit
@@ -150,4 +81,6 @@ Public Class Conduit
     Public OutletOffset As Double = 0.0
     Public InitialFlow As Double = 0.0
     Public MaxFlow As Double = 0.0
+    Public X() As Double
+    Public Y() As Double
 End Class

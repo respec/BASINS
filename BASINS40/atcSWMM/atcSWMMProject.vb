@@ -58,7 +58,8 @@ Public Class SWMMProject
         '[COORDINATES]
         lSB.AppendLine(Nodes.CoordinatesToString)
 
-        'lSB.AppendLine("[VERTICES]")
+        '[VERTICES]
+        lSB.AppendLine(Conduits.VerticesToString)
 
         '[Polygons]
         lSB.AppendLine(Catchments.PolygonsToString)
