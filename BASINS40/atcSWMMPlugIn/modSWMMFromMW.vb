@@ -1,5 +1,7 @@
 Imports atcMwGisUtility
 Imports atcSWMM
+Imports atcData
+Imports MapWinUtility
 
 Friend Module modSWMMFromMW
     Public Function CreateCatchmentsFromShapefile(ByVal aShapefileName As String, ByVal aSubbasinFieldName As String, ByVal aSlopeFieldName As String, _
@@ -16,7 +18,10 @@ Friend Module modSWMMFromMW
             Dim lCatchment As New Catchment
             Dim lSubbasinID As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
             lCatchment.Name = "S" & lSubbasinID
-            'lCatchment.RainGage()
+            If aSWMMProject.RainGages.Count > 0 Then
+                'assign each catchment to the first raingage for now
+                lCatchment.RainGage = aSWMMProject.RainGages(0)
+            End If
 
             'find associated conduit
             For Each lConduit As Conduit In aSWMMProject.Conduits
@@ -26,7 +31,6 @@ Friend Module modSWMMFromMW
                 End If
             Next
 
-            lCatchment.FeatureIndex = lFeatureIndex
             lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
             'lCatchment.PercentImpervious()
             'lCatchment.Width()
@@ -58,8 +62,7 @@ Friend Module modSWMMFromMW
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lConduit As New Conduit
             lConduit.Name = "C" & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-            lConduit.FeatureIndex = lFeatureIndex
-
+            
             lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex)
             'lConduit.ManningsN()
             'lConduit.InletOffset()
@@ -125,5 +128,74 @@ Friend Module modSWMMFromMW
             aConduits.Add(lConduit)
         Next
 
+    End Function
+
+    Public Function CreateRaingageFromShapefile(ByVal aShapefileName As String, _
+                                                ByVal aGageId As String, _
+                                                ByVal aSWMMProject As SWMMProject, _
+                                                ByRef aRainGages As RainGages) As Boolean
+
+        If Not GisUtil.IsLayerByFileName(aShapefileName) Then
+            GisUtil.AddLayer(aShapefileName, "Raingages")
+        End If
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aShapefileName)
+        Dim lGageIDFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, "LOCATION")
+        Dim lWDMFileName As String = FilenameNoExt(aShapefileName) & ".wdm"
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+            If GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGageIDFieldIndex) = aGageId Then
+                Dim lRaingage As New RainGage
+                lRaingage.Name = aGageId
+                'lRaingage.Form
+                'lRaingage.Interval()
+                'lRaingage.SnowCatchFactor()
+                'lRaingage.Type
+                'lRaingage.Units
+                lRaingage.TimeSeries = GetTimeseries(lWDMFileName, "OBSERVED", aGageId, "PREC")
+                If lRaingage.TimeSeries = Nothing Then
+                    lRaingage.TimeSeries = GetTimeseries(lWDMFileName, "COMPUTED", aGageId, "PREC")
+                End If
+                GisUtil.PointXY(lLayerIndex, lFeatureIndex, lRaingage.XPos, lRaingage.YPos)
+                If Not aRainGages.Contains(lRaingage.Name) Then
+                    aRainGages.Add(lRaingage)
+                End If
+            End If
+        Next
+
+    End Function
+
+    Private Function GetTimeseries(ByRef aMetWDMName As String, _
+                                   ByVal aScenario As String, _
+                                   ByVal aLocation As String, _
+                                   ByVal aConstituent As String) As atcData.atcTimeseries
+        GetTimeseries = Nothing
+
+        Dim lDataSource As New atcWDM.atcDataSourceWDM
+        If FileExists(aMetWDMName) Then
+            Dim lFound As Boolean = False
+            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+                If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
+                    'found it in the BASINS data sources
+                    lDataSource = lBASINSDataSource
+                    lFound = True
+                    Exit For
+                End If
+            Next
+
+            If Not lFound Then 'need to open it here
+                If lDataSource.Open(aMetWDMName) Then
+                    lFound = True
+                End If
+            End If
+
+            If lFound Then
+                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                    If (lDataSet.Attributes.GetValue("Scenario") = aScenario And _
+                        lDataSet.Attributes.GetValue("Constituent") = aConstituent And _
+                        lDataSet.Attributes.GetValue("Location") = aLocation) Then
+                        GetTimeseries = lDataSet
+                    End If
+                Next
+            End If
+        End If
     End Function
 End Module
