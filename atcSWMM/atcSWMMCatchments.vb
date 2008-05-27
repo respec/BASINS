@@ -82,7 +82,6 @@ Public Class Catchment
     Public Name As String
     Public RainGage As RainGage
     Public Conduit As Conduit
-    Public FeatureIndex As Integer
     Public Area As Double = 0.0 'in acres or hectares
     Public PercentImpervious As Double = 0.0
     Public Width As Double = 0.0 'in feet or meters

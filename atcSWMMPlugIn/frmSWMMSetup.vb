@@ -157,6 +157,9 @@ Public Class frmSWMMSetup
             'TODO: still use modelout?
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
 
+            'create rain gages from shapefile and selected station
+            CreateRaingageFromShapefile(lBasinsFolder & "\data\02060006-1\met\met.shp", "MD189070", pPlugIn.SWMMProject, .RainGages)
+
             'create conduits and nodes from streams shapefile
             CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", pPlugIn.SWMMProject, .Conduits)
 

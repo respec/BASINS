@@ -72,7 +72,6 @@ End Class
 
 Public Class Conduit
     Public Name As String
-    Public FeatureIndex As Integer
     Public InletNode As Node
     Public OutletNode As Node
     Public Length As Double 'in feet or meters

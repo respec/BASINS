@@ -36,7 +36,9 @@ Public Class SWMMProject
         'lSB.AppendLine("[OPTIONS]")
         'lSB.AppendLine("[EVAPORATION]")
         'lSB.AppendLine("[TEMPERATURE]")
-        'lSB.AppendLine("[RAINGAGES]")
+
+        '[RAINGAGES]
+        lSB.AppendLine(RainGages.ToString)
 
         '[SUBCATCHMENTS]
         lSB.AppendLine(Catchments.ToString)
@@ -52,7 +54,11 @@ Public Class SWMMProject
         'lSB.AppendLine("[XSECTIONS]")
         'lSB.AppendLine("[LANDUSES]")
         'lSB.AppendLine("[COVERAGES]")
-        'lSB.AppendLine("[TIMESERIES]")
+
+        '[TIMESERIES]
+        lSB.AppendLine(RainGages.TimeSeriesHeaderToString)
+        lSB.AppendLine(RainGages.TimeSeriesToString)
+
         'lSB.AppendLine("[MAP]")
 
         '[COORDINATES]
@@ -64,7 +70,9 @@ Public Class SWMMProject
         '[Polygons]
         lSB.AppendLine(Catchments.PolygonsToString)
 
-        'lSB.AppendLine("[SYMBOLS]")
+        '[SYMBOLS]
+        lSB.AppendLine(RainGages.CoordinatesToString)
+
         'lSB.AppendLine("[BACKDROP]")
 
         SaveFileString(aFileName, lSB.ToString)
