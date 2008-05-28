@@ -123,10 +123,10 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="pMatchingGrid.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 212</value>
+    <value>3, 184</value>
   </data>
   <data name="pMatchingGrid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>626, 191</value>
+    <value>626, 165</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="pMatchingGrid.TabIndex" type="System.Int32, mscorlib">
@@ -151,10 +151,10 @@
     <value>NoControl</value>
   </data>
   <data name="lblMatching.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 193</value>
+    <value>3, 168</value>
   </data>
   <data name="lblMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>626, 19</value>
+    <value>626, 16</value>
   </data>
   <data name="lblMatching.TabIndex" type="System.Int32, mscorlib">
     <value>14</value>
@@ -181,10 +181,10 @@
     <value>NoControl</value>
   </data>
   <data name="splitAboveMatching.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 185</value>
+    <value>3, 161</value>
   </data>
   <data name="splitAboveMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>626, 8</value>
+    <value>626, 7</value>
   </data>
   <data name="splitAboveMatching.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -205,10 +205,10 @@
     <value>Top</value>
   </data>
   <data name="panelCriteria.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 18</value>
+    <value>3, 16</value>
   </data>
   <data name="panelCriteria.Size" type="System.Drawing.Size, System.Drawing">
-    <value>626, 167</value>
+    <value>626, 145</value>
   </data>
   <data name="panelCriteria.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -232,7 +232,7 @@
     <value>0, 0</value>
   </data>
   <data name="groupTop.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 406</value>
+    <value>632, 352</value>
   </data>
   <data name="groupTop.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -259,10 +259,10 @@
     <value>NoControl</value>
   </data>
   <data name="btnCancel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>522, 75</value>
+    <value>540, 65</value>
   </data>
   <data name="btnCancel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>96, 28</value>
+    <value>80, 24</value>
   </data>
   <data name="btnCancel.TabIndex" type="System.Int32, mscorlib">
     <value>20</value>
@@ -289,10 +289,10 @@
     <value>NoControl</value>
   </data>
   <data name="btnOk.Location" type="System.Drawing.Point, System.Drawing">
-    <value>419, 75</value>
+    <value>454, 65</value>
   </data>
   <data name="btnOk.Size" type="System.Drawing.Size, System.Drawing">
-    <value>96, 28</value>
+    <value>80, 24</value>
   </data>
   <data name="btnOk.TabIndex" type="System.Int32, mscorlib">
     <value>19</value>
@@ -319,10 +319,10 @@
     <value>NoControl</value>
   </data>
   <data name="splitAboveSelected.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 406</value>
+    <value>0, 352</value>
   </data>
   <data name="splitAboveSelected.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 9</value>
+    <value>632, 8</value>
   </data>
   <data name="splitAboveSelected.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -343,10 +343,10 @@
     <value>Fill</value>
   </data>
   <data name="pSelectedGrid.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 18</value>
+    <value>3, 16</value>
   </data>
   <data name="pSelectedGrid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>626, 54</value>
+    <value>626, 126</value>
   </data>
   <data name="pSelectedGrid.TabIndex" type="System.Int32, mscorlib">
     <value>17</value>
@@ -367,10 +367,10 @@
     <value>Fill</value>
   </data>
   <data name="groupSelected.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 415</value>
+    <value>0, 360</value>
   </data>
   <data name="groupSelected.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 75</value>
+    <value>632, 145</value>
   </data>
   <data name="groupSelected.TabIndex" type="System.Int32, mscorlib">
     <value>16</value>
@@ -460,7 +460,7 @@
     <value>4, 4, 4, 4</value>
   </data>
   <data name="atcSelectedDates.Size" type="System.Drawing.Size, System.Drawing">
-    <value>372, 112</value>
+    <value>310, 97</value>
   </data>
   <data name="atcSelectedDates.TabIndex" type="System.Int32, mscorlib">
     <value>21</value>
@@ -481,10 +481,10 @@
     <value>Bottom</value>
   </data>
   <data name="pnlButtons.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 490</value>
+    <value>0, 505</value>
   </data>
   <data name="pnlButtons.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 112</value>
+    <value>632, 97</value>
   </data>
   <data name="pnlButtons.TabIndex" type="System.Int32, mscorlib">
     <value>18</value>
@@ -505,7 +505,7 @@
     <value>True</value>
   </metadata>
   <data name="$this.AutoScaleBaseSize" type="System.Drawing.Size, System.Drawing">
-    <value>6, 15</value>
+    <value>5, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>632, 602</value>
@@ -633,12 +633,6 @@
   <data name="&gt;&gt;mnuSelectNoMatching.Type" xml:space="preserve">
     <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;mnuHelp.Name" xml:space="preserve">
-    <value>mnuHelp</value>
-  </data>
-  <data name="&gt;&gt;mnuHelp.Type" xml:space="preserve">
-    <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;mnuSelectSep1.Name" xml:space="preserve">
     <value>mnuSelectSep1</value>
   </data>
@@ -649,6 +643,12 @@
     <value>mnuSelectMap</value>
   </data>
   <data name="&gt;&gt;mnuSelectMap.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mnuHelp.Name" xml:space="preserve">
+    <value>mnuHelp</value>
+  </data>
+  <data name="&gt;&gt;mnuHelp.Type" xml:space="preserve">
     <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

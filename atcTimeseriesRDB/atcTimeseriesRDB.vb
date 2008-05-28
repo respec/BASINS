@@ -355,8 +355,9 @@ Public Class atcTimeseriesRDB
                     Case "site_no" : lLocationField = lField
                     Case "datetime" : lDateField = lField
                     Case Else
-                        If .FieldName(lField).EndsWith("_cd") Then
-                            'skip code fields for now, TODO: add codes as ValueAttributes and decide how to treat Provisional values
+                        If .FieldName(lField).EndsWith("_cd") Then 'code field
+                            ' TODO: add codes as ValueAttributes and decide how to treat Provisional values
+                            'Currently dropping Provisional values below by "peeking" at column next to value
                         Else
                             Dim lConstituentIndex As Integer = _
                                 lConstituentDescriptions.IndexFromKey(.FieldName(lField))
@@ -364,7 +365,7 @@ Public Class atcTimeseriesRDB
                                 lValueFields.Add(lField)
                                 lValueConstituentDescriptions.Add(lField, lConstituentDescriptions.ItemByIndex(lConstituentIndex))
                             Else
-                                Logger.Dbg("Found column in RDB not contained in header: " & .FieldName(lField) & " (#" & lField & ")")
+                                Logger.Dbg("Found value column in RDB not contained in header: " & .FieldName(lField) & " (#" & lField & ")")
                             End If
                         End If
                 End Select
