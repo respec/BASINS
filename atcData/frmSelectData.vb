@@ -90,11 +90,11 @@ Friend Class frmSelectData
         Me.mnuSelectClear = New System.Windows.Forms.MenuItem
         Me.mnuSelectAllMatching = New System.Windows.Forms.MenuItem
         Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
-        Me.mnuSelectSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuSelectMap = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.pnlButtons = New System.Windows.Forms.Panel
         Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
+        Me.mnuSelectSep1 = New System.Windows.Forms.MenuItem
+        Me.mnuSelectMap = New System.Windows.Forms.MenuItem
         Me.groupTop.SuspendLayout()
         Me.groupSelected.SuspendLayout()
         Me.pnlButtons.SuspendLayout()
@@ -239,17 +239,6 @@ Friend Class frmSelectData
         Me.mnuSelectNoMatching.Index = 3
         resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
         '
-        'mnuSelectSep1
-        '
-        Me.mnuSelectSep1.Index = 4
-        resources.ApplyResources(Me.mnuSelectSep1, "mnuSelectSep1")
-        '
-        'mnuSelectMap
-        '
-        Me.mnuSelectMap.Checked = True
-        Me.mnuSelectMap.Index = 5
-        resources.ApplyResources(Me.mnuSelectMap, "mnuSelectMap")
-        '
         'mnuHelp
         '
         Me.mnuHelp.Index = 3
@@ -272,8 +261,19 @@ Friend Class frmSelectData
         Me.atcSelectedDates.FirstStart = 1.7976931348623157E+308
         Me.atcSelectedDates.LastEnd = -1.7976931348623157E+308
         Me.atcSelectedDates.Name = "atcSelectedDates"
-        Me.atcSelectedDates.OmitAfter = -1.7976931348623157E+308
-        Me.atcSelectedDates.OmitBefore = 1.7976931348623157E+308
+        Me.atcSelectedDates.OmitAfter = 0
+        Me.atcSelectedDates.OmitBefore = 0
+        '
+        'mnuSelectSep1
+        '
+        Me.mnuSelectSep1.Index = 4
+        resources.ApplyResources(Me.mnuSelectSep1, "mnuSelectSep1")
+        '
+        'mnuSelectMap
+        '
+        Me.mnuSelectMap.Checked = True
+        Me.mnuSelectMap.Index = 5
+        resources.ApplyResources(Me.mnuSelectMap, "mnuSelectMap")
         '
         'frmSelectData
         '
