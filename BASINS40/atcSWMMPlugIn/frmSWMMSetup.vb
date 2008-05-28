@@ -156,9 +156,15 @@ Public Class frmSWMMSetup
             Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
             'TODO: still use modelout?
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
+            .SJDate = 38984
+            .EJDate = 39083
 
             'create rain gages from shapefile and selected station
-            CreateRaingageFromShapefile(lBasinsFolder & "\data\02060006-1\met\met.shp", "MD189070", pPlugIn.SWMMProject, .RainGages)
+            CreateRaingageFromShapefile(lBasinsFolder & "\data\02060006-1\met\met.shp", "MD189070", .RainGages)
+
+            'create met constituents from wdm file and selected station
+            CreateMetConstituent(lBasinsFolder & "\data\02060006-1\met\met.wdm", "MD189070", "ATEM", .MetConstituents)
+            CreateMetConstituent(lBasinsFolder & "\data\02060006-1\met\met.wdm", "MD189070", "PEVT", .MetConstituents)
 
             'create conduits and nodes from streams shapefile
             CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", pPlugIn.SWMMProject, .Conduits)

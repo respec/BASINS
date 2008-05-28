@@ -5,7 +5,9 @@ Imports MapWinUtility
 
 Friend Module modSWMMFromMW
     Public Function CreateCatchmentsFromShapefile(ByVal aShapefileName As String, ByVal aSubbasinFieldName As String, ByVal aSlopeFieldName As String, _
-                                                  ByVal aSWMMProject As SWMMProject, ByRef aCatchments As Catchments) As Boolean
+                                                  ByVal aSWMMProject As SWMMProject, _
+                                                  ByRef aCatchments As Catchments) As Boolean
+
         aCatchments.Clear()
         If Not GisUtil.IsLayerByFileName(aShapefileName) Then
             GisUtil.AddLayer(aShapefileName, "Catchments")
@@ -62,7 +64,7 @@ Friend Module modSWMMFromMW
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lConduit As New Conduit
             lConduit.Name = "C" & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-            
+
             lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex)
             'lConduit.ManningsN()
             'lConduit.InletOffset()
@@ -132,7 +134,6 @@ Friend Module modSWMMFromMW
 
     Public Function CreateRaingageFromShapefile(ByVal aShapefileName As String, _
                                                 ByVal aGageId As String, _
-                                                ByVal aSWMMProject As SWMMProject, _
                                                 ByRef aRainGages As RainGages) As Boolean
 
         If Not GisUtil.IsLayerByFileName(aShapefileName) Then
@@ -160,6 +161,23 @@ Friend Module modSWMMFromMW
                 End If
             End If
         Next
+
+    End Function
+
+    Public Function CreateMetConstituent(ByVal aWDMFileName As String, _
+                                         ByVal aGageId As String, _
+                                         ByVal aConstituentID As String, _
+                                         ByRef aMetConstituents As MetConstituents) As Boolean
+
+        Dim lMetConstituent As New MetConstituent
+        lMetConstituent.TimeSeries = GetTimeseries(aWDMFileName, "OBSERVED", aGageId, aConstituentID)
+        If lMetConstituent.TimeSeries = Nothing Then
+            lMetConstituent.TimeSeries = GetTimeseries(aWDMFileName, "COMPUTED", aGageId, aConstituentID)
+        End If
+        lMetConstituent.Type = aConstituentID
+        If Not aMetConstituents.Contains(aConstituentID) Then
+            aMetConstituents.Add(lMetConstituent)
+        End If
 
     End Function
 

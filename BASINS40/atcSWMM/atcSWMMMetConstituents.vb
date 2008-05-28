@@ -2,12 +2,88 @@ Imports System.Collections.ObjectModel
 Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
+Imports System.Text
 
 Public Class MetConstituents
     Inherits KeyedCollection(Of String, MetConstituent)
     Protected Overrides Function GetKeyForItem(ByVal aMetConstituent As MetConstituent) As String
         Dim lKey As String = aMetConstituent.Type
         Return lKey
+    End Function
+
+    Public SWMMProject As SWMMProject
+
+    Public Overrides Function ToString() As String
+        Dim lSB As New StringBuilder
+
+        Dim lFoundEvap As Boolean = False
+        For Each lMetConstituent As MetConstituent In Me
+            If lMetConstituent.Type = "EVAP" Or lMetConstituent.Type = "PEVT" Then
+
+                lSB.Append("[EVAPORATION]" & vbCrLf & _
+                           ";;Type       Parameters" & vbCrLf & _
+                           ";;---------- ----------" & vbCrLf)
+
+                With lMetConstituent
+                    lSB.Append(StrPad("TIMESERIES", 12, " ", False))
+                    lSB.Append(" ")
+                    lSB.Append(StrPad(.TimeSeries.Attributes.GetValue("Location") & ":E", 10, " ", False))
+                    lSB.Append(" ")
+                    lSB.Append(vbCrLf)
+                End With
+                lFoundEvap = True
+                Exit For
+            End If
+        Next
+
+        For Each lMetConstituent As MetConstituent In Me
+            If lMetConstituent.Type = "ATEM" Or lMetConstituent.Type = "ATMP" Then
+                If lFoundEvap Then
+                    lSB.Append(vbCrLf)
+                End If
+
+                lSB.Append("[TEMPERATURE]" & vbCrLf & _
+                           ";;Type       Parameters" & vbCrLf & _
+                           ";;---------- ----------" & vbCrLf)
+
+                With lMetConstituent
+                    lSB.Append(StrPad("TIMESERIES", 12, " ", False))
+                    lSB.Append(" ")
+                    lSB.Append(StrPad(.TimeSeries.Attributes.GetValue("Location") & ":T", 10, " ", False))
+                    lSB.Append(" ")
+                    lSB.Append(vbCrLf)
+                End With
+                Exit For
+            End If
+        Next
+
+        Return lSB.ToString
+    End Function
+
+    Public Function TimeSeriesToString() As String
+        Dim lSB As New StringBuilder
+
+        Dim lFoundEvap As Boolean = False
+        For Each lMetConstituent As MetConstituent In Me
+            If lMetConstituent.Type = "EVAP" Or lMetConstituent.Type = "PEVT" Then
+                lSB.Append(";EVAPORATION" & vbCrLf)
+                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":E"))
+                lFoundEvap = True
+                Exit For
+            End If
+        Next
+
+        For Each lMetConstituent As MetConstituent In Me
+            If lMetConstituent.Type = "ATEM" Or lMetConstituent.Type = "ATMP" Then
+                If lFoundEvap Then
+                    lSB.Append(vbCrLf)
+                End If
+                lSB.Append(";TEMPERATURE" & vbCrLf)
+                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":T"))
+            End If
+        Next
+
+        Return lSB.ToString
     End Function
 End Class
 

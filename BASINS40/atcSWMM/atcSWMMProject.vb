@@ -9,6 +9,8 @@ Public Class SWMMProject
     Public Landuses As Landuses
     Public RainGages As RainGages
     Public MetConstituents As MetConstituents
+    Public SJDate As Double = 0.0
+    Public EJDate As Double = 0.0
 
     Public Name As String = ""
     Public Title As String = ""
@@ -23,7 +25,9 @@ Public Class SWMMProject
         Nodes = New Nodes
         Landuses = New Landuses
         RainGages = New RainGages
+        RainGages.SWMMProject = Me
         MetConstituents = New MetConstituents
+        MetConstituents.SWMMProject = Me
     End Sub
 
     Public Function Save(ByVal aFileName As String) As Boolean
@@ -34,8 +38,9 @@ Public Class SWMMProject
         lSB.AppendLine("")
 
         'lSB.AppendLine("[OPTIONS]")
-        'lSB.AppendLine("[EVAPORATION]")
-        'lSB.AppendLine("[TEMPERATURE]")
+
+        '[EVAPORATION] and [TEMPERATURE]
+        lSB.AppendLine(MetConstituents.ToString)
 
         '[RAINGAGES]
         lSB.AppendLine(RainGages.ToString)
@@ -58,6 +63,7 @@ Public Class SWMMProject
         '[TIMESERIES]
         lSB.AppendLine(RainGages.TimeSeriesHeaderToString)
         lSB.AppendLine(RainGages.TimeSeriesToString)
+        lSB.AppendLine(MetConstituents.TimeSeriesToString)
 
         'lSB.AppendLine("[MAP]")
 
@@ -77,6 +83,28 @@ Public Class SWMMProject
 
         SaveFileString(aFileName, lSB.ToString)
         Return True
+    End Function
+
+    Public Function TimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String
+        Dim lSB As New StringBuilder
+
+        For lIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True) To aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
+            lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
+            lSB.Append(" ")
+            Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
+            Dim lDate(6) As Integer
+            J2Date(lJDate, lDate)
+            Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+            Dim lTimeString As String = lDate(3) & ":" & lDate(4)
+            lSB.Append(StrPad(lDateString, 10, " ", False))
+            lSB.Append(" ")
+            lSB.Append(StrPad(lTimeString, 10, " ", False))
+            lSB.Append(" ")
+            lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex), "0.000"), 10, " ", False))
+            lSB.Append(vbCrLf)
+        Next
+
+        Return lSB.ToString
     End Function
 
     Public Sub Run(ByVal aInputFileName As String)

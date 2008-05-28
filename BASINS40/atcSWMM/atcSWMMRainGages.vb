@@ -11,6 +11,8 @@ Public Class RainGages
         Return lKey
     End Function
 
+    Public SWMMProject As SWMMProject
+
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
 
@@ -68,7 +70,7 @@ Public Class RainGages
         Dim lSB As New StringBuilder
         lSB.Append("[TIMESERIES]" & vbCrLf & _
                    ";;Name           Date       Time       Value     " & vbCrLf & _
-                   ";;-------------- ---------- ---------- ----------" & vbCrLf)
+                   ";;-------------- ---------- ---------- ----------")
         Return lSB.ToString
     End Function
 
@@ -77,23 +79,7 @@ Public Class RainGages
         lSB.Append(";RAINFALL" & vbCrLf)
 
         For Each lRaingage As RainGage In Me
-            With lRaingage
-                For lIndex As Integer = 1 To .TimeSeries.numValues
-                    lSB.Append(StrPad(.Name, 16, " ", False))
-                    lSB.Append(" ")
-                    Dim lJDate As Double = .TimeSeries.Dates.Values(lIndex)
-                    Dim lDate(6) As Integer
-                    J2Date(lJDate, lDate)
-                    Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
-                    Dim lTimeString As String = lDate(3) & ":" & lDate(4)
-                    lSB.Append(StrPad(lDateString, 10, " ", False))
-                    lSB.Append(" ")
-                    lSB.Append(StrPad(lTimeString, 10, " ", False))
-                    lSB.Append(" ")
-                    lSB.Append(StrPad(Format(.TimeSeries.Values(lIndex), "0.000"), 10, " ", False))
-                    lSB.Append(vbCrLf)
-                Next
-            End With
+            lSB.Append(Me.SWMMProject.TimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name & ":P"))
         Next
 
         Return lSB.ToString
