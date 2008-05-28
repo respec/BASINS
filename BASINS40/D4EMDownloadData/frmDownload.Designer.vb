@@ -25,7 +25,7 @@ Partial Class frmDownload
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDownload))
         Me.grpBASINS = New System.Windows.Forms.GroupBox
-        Me.chkBASINS_STATSGO = New System.Windows.Forms.CheckBox
+        Me.chkBASINS_303d = New System.Windows.Forms.CheckBox
         Me.btnBrowseWDMmet = New System.Windows.Forms.Button
         Me.chkBASINS_Met = New System.Windows.Forms.CheckBox
         Me.chkBASINS_NHD = New System.Windows.Forms.CheckBox
@@ -40,6 +40,8 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISMeasurements = New System.Windows.Forms.CheckBox
         Me.btnBrowseWDMdailydischarge = New System.Windows.Forms.Button
         Me.chkNWIS_GetNWISDischarge = New System.Windows.Forms.CheckBox
+        Me.panelNWISnoStations = New System.Windows.Forms.Panel
+        Me.lblNWISnoStations = New System.Windows.Forms.Label
         Me.chkTerraServerWebService_Urban = New System.Windows.Forms.CheckBox
         Me.grpTerraServerWebService = New System.Windows.Forms.GroupBox
         Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
@@ -74,23 +76,21 @@ Partial Class frmDownload
         Me.chkSTORET_Results = New System.Windows.Forms.CheckBox
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
         Me.grpNWISStations = New System.Windows.Forms.GroupBox
-        Me.panelNWISnoStations = New System.Windows.Forms.Panel
-        Me.lblNWISnoStations = New System.Windows.Forms.Label
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
+        Me.panelNWISnoStations.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
         Me.grpNLCD2001.SuspendLayout()
         Me.grpNHDplus.SuspendLayout()
         Me.grpSTORET.SuspendLayout()
         Me.grpNWISStations.SuspendLayout()
-        Me.panelNWISnoStations.SuspendLayout()
         Me.SuspendLayout()
         '
         'grpBASINS
         '
         Me.grpBASINS.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpBASINS.Controls.Add(Me.chkBASINS_STATSGO)
+        Me.grpBASINS.Controls.Add(Me.chkBASINS_303d)
         Me.grpBASINS.Controls.Add(Me.btnBrowseWDMmet)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Met)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_NHD)
@@ -107,17 +107,16 @@ Partial Class frmDownload
         Me.grpBASINS.TabStop = False
         Me.grpBASINS.Text = "BASINS"
         '
-        'chkBASINS_STATSGO
+        'chkBASINS_303d
         '
-        Me.chkBASINS_STATSGO.AutoSize = True
-        Me.chkBASINS_STATSGO.Location = New System.Drawing.Point(382, 19)
-        Me.chkBASINS_STATSGO.Name = "chkBASINS_STATSGO"
-        Me.chkBASINS_STATSGO.Size = New System.Drawing.Size(77, 17)
-        Me.chkBASINS_STATSGO.TabIndex = 10
-        Me.chkBASINS_STATSGO.Text = "STATSGO"
-        Me.ToolTip1.SetToolTip(Me.chkBASINS_STATSGO, "State Soil Geographic Data for SWAT")
-        Me.chkBASINS_STATSGO.UseVisualStyleBackColor = True
-        Me.chkBASINS_STATSGO.Visible = False
+        Me.chkBASINS_303d.AutoSize = True
+        Me.chkBASINS_303d.Location = New System.Drawing.Point(365, 19)
+        Me.chkBASINS_303d.Name = "chkBASINS_303d"
+        Me.chkBASINS_303d.Size = New System.Drawing.Size(56, 17)
+        Me.chkBASINS_303d.TabIndex = 10
+        Me.chkBASINS_303d.Text = "303(d)"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_303d, "EPA Listed Impaired Waters")
+        Me.chkBASINS_303d.UseVisualStyleBackColor = True
         '
         'btnBrowseWDMmet
         '
@@ -274,6 +273,26 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDischarge.TabIndex = 24
         Me.chkNWIS_GetNWISDischarge.Text = "Daily Discharge"
         Me.chkNWIS_GetNWISDischarge.UseVisualStyleBackColor = True
+        '
+        'panelNWISnoStations
+        '
+        Me.panelNWISnoStations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.panelNWISnoStations.Controls.Add(Me.lblNWISnoStations)
+        Me.panelNWISnoStations.Location = New System.Drawing.Point(6, 16)
+        Me.panelNWISnoStations.Name = "panelNWISnoStations"
+        Me.panelNWISnoStations.Size = New System.Drawing.Size(418, 20)
+        Me.panelNWISnoStations.TabIndex = 28
+        Me.panelNWISnoStations.Visible = False
+        '
+        'lblNWISnoStations
+        '
+        Me.lblNWISnoStations.AutoSize = True
+        Me.lblNWISnoStations.Location = New System.Drawing.Point(3, 4)
+        Me.lblNWISnoStations.Name = "lblNWISnoStations"
+        Me.lblNWISnoStations.Size = New System.Drawing.Size(363, 13)
+        Me.lblNWISnoStations.TabIndex = 0
+        Me.lblNWISnoStations.Text = "Station Locations must be selected on the map before data value download"
         '
         'chkTerraServerWebService_Urban
         '
@@ -648,26 +667,6 @@ Partial Class frmDownload
         Me.grpNWISStations.TabStop = False
         Me.grpNWISStations.Text = "Station Locations from US Geological Survey National Water Information System"
         '
-        'panelNWISnoStations
-        '
-        Me.panelNWISnoStations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.panelNWISnoStations.Controls.Add(Me.lblNWISnoStations)
-        Me.panelNWISnoStations.Location = New System.Drawing.Point(6, 16)
-        Me.panelNWISnoStations.Name = "panelNWISnoStations"
-        Me.panelNWISnoStations.Size = New System.Drawing.Size(418, 20)
-        Me.panelNWISnoStations.TabIndex = 28
-        Me.panelNWISnoStations.Visible = False
-        '
-        'lblNWISnoStations
-        '
-        Me.lblNWISnoStations.AutoSize = True
-        Me.lblNWISnoStations.Location = New System.Drawing.Point(3, 4)
-        Me.lblNWISnoStations.Name = "lblNWISnoStations"
-        Me.lblNWISnoStations.Size = New System.Drawing.Size(363, 13)
-        Me.lblNWISnoStations.TabIndex = 0
-        Me.lblNWISnoStations.Text = "Station Locations must be selected on the map before data value download"
-        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
@@ -699,6 +698,8 @@ Partial Class frmDownload
         Me.grpBASINS.PerformLayout()
         Me.grpNWIS.ResumeLayout(False)
         Me.grpNWIS.PerformLayout()
+        Me.panelNWISnoStations.ResumeLayout(False)
+        Me.panelNWISnoStations.PerformLayout()
         Me.grpTerraServerWebService.ResumeLayout(False)
         Me.grpTerraServerWebService.PerformLayout()
         Me.grpNLCD2001.ResumeLayout(False)
@@ -709,8 +710,6 @@ Partial Class frmDownload
         Me.grpSTORET.PerformLayout()
         Me.grpNWISStations.ResumeLayout(False)
         Me.grpNWISStations.PerformLayout()
-        Me.panelNWISnoStations.ResumeLayout(False)
-        Me.panelNWISnoStations.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -763,7 +762,7 @@ Partial Class frmDownload
     Friend WithEvents chkNWISStations_measurement As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWISStations_discharge As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWISStations_gw As System.Windows.Forms.CheckBox
-    Friend WithEvents chkBASINS_STATSGO As System.Windows.Forms.CheckBox
+    Friend WithEvents chkBASINS_303d As System.Windows.Forms.CheckBox
     Friend WithEvents chkSTORET_Results As System.Windows.Forms.CheckBox
     Friend WithEvents panelNWISnoStations As System.Windows.Forms.Panel
     Friend WithEvents lblNWISnoStations As System.Windows.Forms.Label
