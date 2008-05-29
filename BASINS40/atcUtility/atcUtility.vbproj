@@ -114,6 +114,12 @@
     </Compile>
     <Compile Include="atcTableRDB.vb" />
     <Compile Include="atcTableFixedStreaming.vb" />
+    <Compile Include="frmArgs.Designer.vb">
+      <DependentUpon>frmArgs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmArgs.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmFeedback.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +143,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmArgs.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmArgs.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmFeedback.resx">
       <DependentUpon>frmFeedback.vb</DependentUpon>
       <SubType>Designer</SubType>
