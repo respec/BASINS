@@ -9,11 +9,17 @@ Public Class SWMMProject
     Public Landuses As Landuses
     Public RainGages As RainGages
     Public MetConstituents As MetConstituents
-    Public SJDate As Double = 0.0
-    Public EJDate As Double = 0.0
 
     Public Name As String = ""
     Public Title As String = ""
+    Public SJDate As Double = 0.0
+    Public EJDate As Double = 0.0
+    Public BackdropFile As String = ""
+    Public BackdropX1 As Double = 0.0
+    Public BackdropY1 As Double = 0.0
+    Public BackdropX2 As Double = 0.0
+    Public BackdropY2 As Double = 0.0
+    Public MapUnits As String = "METERS"
 
     Public Sub New()
         Name = ""
@@ -28,16 +34,32 @@ Public Class SWMMProject
         RainGages.SWMMProject = Me
         MetConstituents = New MetConstituents
         MetConstituents.SWMMProject = Me
+        BackdropFile = ""
     End Sub
 
     Public Function Save(ByVal aFileName As String) As Boolean
         Dim lSB As New StringBuilder
 
+        '[TITLE]
         lSB.AppendLine("[TITLE]")
         lSB.AppendLine(Title)
         lSB.AppendLine("")
 
-        'lSB.AppendLine("[OPTIONS]")
+        '[OPTIONS]
+        Dim lSDate(6) As Integer
+        J2Date(SJDate, lSDate)
+        Dim lEDate(6) As Integer
+        J2Date(EJDate, lEDate)
+        Dim lStartDateString As String = lSDate(1) & "/" & lSDate(2) & "/" & lSDate(0)
+        Dim lStartTimeString As String = lSDate(3) & ":" & lSDate(4)
+        lSB.AppendLine("[OPTIONS]")
+        lSB.AppendLine("START_DATE           " & lStartDateString)
+        lSB.AppendLine("START_TIME           " & lStartTimeString)
+        lSB.AppendLine("REPORT_START_DATE    " & lStartDateString)
+        lSB.AppendLine("REPORT_START_TIME    " & lStartTimeString)
+        lSB.AppendLine("END_DATE             " & lEDate(1) & "/" & lEDate(2) & "/" & lEDate(0))
+        lSB.AppendLine("END_TIME             " & lEDate(3) & ":" & lEDate(4))
+        lSB.AppendLine("")
 
         '[EVAPORATION] and [TEMPERATURE]
         lSB.AppendLine(MetConstituents.ToString)
@@ -53,10 +75,9 @@ Public Class SWMMProject
         '[JUNCTIONS] and [OUTFALLS]
         lSB.AppendLine(Nodes.ToString)
 
-        '[CONDUITS]
+        '[CONDUITS] and [XSECTIONS]
         lSB.AppendLine(Conduits.ToString)
 
-        'lSB.AppendLine("[XSECTIONS]")
         'lSB.AppendLine("[LANDUSES]")
         'lSB.AppendLine("[COVERAGES]")
 
@@ -65,7 +86,10 @@ Public Class SWMMProject
         lSB.AppendLine(RainGages.TimeSeriesToString)
         lSB.AppendLine(MetConstituents.TimeSeriesToString)
 
-        'lSB.AppendLine("[MAP]")
+        '[MAP]
+        lSB.AppendLine("[MAP]")
+        lSB.AppendLine("UNITS      " & MapUnits)
+        lSB.AppendLine("")
 
         '[COORDINATES]
         lSB.AppendLine(Nodes.CoordinatesToString)
@@ -79,7 +103,12 @@ Public Class SWMMProject
         '[SYMBOLS]
         lSB.AppendLine(RainGages.CoordinatesToString)
 
-        'lSB.AppendLine("[BACKDROP]")
+        '[BACKDROP]
+        If BackdropFile.Length > 0 Then
+            lSB.AppendLine("[BACKDROP]")
+            lSB.AppendLine("FILE       " & """" & BackdropFile & """")
+            lSB.AppendLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
+        End If
 
         SaveFileString(aFileName, lSB.ToString)
         Return True

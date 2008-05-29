@@ -44,6 +44,31 @@ Public Class Conduits
             End With
         Next
 
+        lString.Append(vbCrLf)
+        lString.Append("[XSECTIONS]" & vbCrLf & _
+                       ";;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels   " & vbCrLf & _
+                       ";;-------------- ------------ ---------------- ---------- ---------- ---------- ----------" & vbCrLf)
+
+        For Each lConduit As Conduit In Me
+            With lConduit
+                lString.Append(StrPad(.Name, 16, " ", False))
+                lString.Append(" ")
+                lString.Append(StrPad(.Shape, 12, " ", False))
+                lString.Append(" ")
+                lString.Append(StrPad(Format(.Geometry1, "0.0"), 16, " ", False))
+                lString.Append(" ")
+                lString.Append(StrPad(Format(.Geometry2, "0.0"), 10, " ", False))
+                lString.Append(" ")
+                lString.Append(StrPad(Format(.Geometry3, "0.0"), 10, " ", False))
+                lString.Append(" ")
+                lString.Append(StrPad(Format(.Geometry4, "0.0"), 10, " ", False))
+                lString.Append(" ")
+                lString.Append(StrPad(.NumBarrels, 10, " ", False))
+                lString.Append(" ")
+                lString.Append(vbCrLf)
+            End With
+        Next
+
         Return lString.ToString
     End Function
 
@@ -80,6 +105,12 @@ Public Class Conduit
     Public OutletOffset As Double = 0.0
     Public InitialFlow As Double = 0.0
     Public MaxFlow As Double = 0.0
+    Public Shape As String = "TRAPEZOIDAL"
+    Public Geometry1 As Double = 1 'full height
+    Public Geometry2 As Double = 0 'base width
+    Public Geometry3 As Double = 1 'left slope
+    Public Geometry4 As Double = 1 'right slope
+    Public NumBarrels As Integer = 1
     Public X() As Double
     Public Y() As Double
 End Class

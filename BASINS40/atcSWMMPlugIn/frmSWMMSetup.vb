@@ -156,6 +156,8 @@ Public Class frmSWMMSetup
             Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
             'TODO: still use modelout?
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
+
+            'set start and end dates
             .SJDate = 38984
             .EJDate = 39083
 
@@ -167,10 +169,17 @@ Public Class frmSWMMSetup
             CreateMetConstituent(lBasinsFolder & "\data\02060006-1\met\met.wdm", "MD189070", "PEVT", .MetConstituents)
 
             'create conduits and nodes from streams shapefile
-            CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", pPlugIn.SWMMProject, .Conduits)
+            CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", "WID2", "DEP2", pPlugIn.SWMMProject, .Conduits)
 
             'create catchments from subbasins shapefile
             CreateCatchmentsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp", "SUBBASIN", "SLO1", pPlugIn.SWMMProject, .Catchments)
+
+            'add backdrop file
+            .BackdropFile = lBasinsFolder & "\Predefined Delineations\West Branch\wbranch.bmp"
+            .BackdropX1 = 328689.908 'GisUtil.MapExtentXmin
+            .BackdropY1 = 4294938.703 'GisUtil.MapExtentYmin
+            .BackdropX2 = 357258.259 'GisUtil.MapExtentXmax
+            .BackdropY2 = 4319284.185 'GisUtil.MapExtentYmax
 
             'save project file and start SWMM
             .Save(lSWMMProjectFileName)
