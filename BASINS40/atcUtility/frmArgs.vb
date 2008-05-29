@@ -108,41 +108,43 @@ Public Class frmArgs
     End Function
 
     Private Function AddLabel(ByVal aText As String, ByVal aName As String) As Windows.Forms.Label
-        AddLabel = New Windows.Forms.Label
-        With AddLabel
+        Dim lAddLabel As New Windows.Forms.Label
+        With lAddLabel
             .Text = aText
             .Name = aName
             .Top = pTop
             pTop += pRowHeight
             .Left = pLeft
-            .Width = Me.ClientSize.Width
             .Anchor = Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
-            Me.Controls.Add(AddLabel)
+            Me.Controls.Add(lAddLabel)
         End With
+        Return lAddLabel
     End Function
 
     Private Function AddTextbox(ByVal aText As String, ByVal aName As String) As Windows.Forms.TextBox
-        AddTextbox = New Windows.Forms.TextBox
-        With AddTextbox
+        Dim lAddTextbox As New Windows.Forms.TextBox
+        With lAddTextbox
             .Text = aText
             .Name = aName
             .Top = pTop - pRowHeight
             .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
-            Me.Controls.Add(AddTextbox)
-            pRightColumnItems.Add(AddTextbox)
+            Me.Controls.Add(lAddTextbox)
+            pRightColumnItems.Add(lAddTextbox)
         End With
+        Return lAddTextbox
     End Function
 
     Private Function AddCheckbox(ByVal aChecked As Boolean, ByVal aName As String) As Windows.Forms.CheckBox
-        AddCheckbox = New Windows.Forms.CheckBox
-        With AddCheckbox
+        Dim lAddCheckbox As New Windows.Forms.CheckBox
+        With lAddCheckbox
             .Checked = aChecked
             .Name = aName
             .Top = pTop - pRowHeight
             .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
-            Me.Controls.Add(AddCheckbox)
-            pRightColumnItems.Add(AddCheckbox)
+            Me.Controls.Add(lAddCheckbox)
+            pRightColumnItems.Add(lAddCheckbox)
         End With
+        Return lAddCheckbox
     End Function
 
     'Private Sub AddButton()
