@@ -35,7 +35,7 @@ Friend Module modSWMMFromMW
 
             lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
             'lCatchment.PercentImpervious()
-            'lCatchment.Width()
+            lCatchment.Width = lCatchment.Area * 43560 / lCatchment.Conduit.Length
             lCatchment.Slope = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSlopeFieldIndex)
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lCatchment.X, lCatchment.Y)
             aCatchments.Add(lCatchment)
@@ -47,6 +47,8 @@ Friend Module modSWMMFromMW
                                                 ByVal aDownSubbasinFieldName As String, _
                                                 ByVal aElevHighFieldName As String, _
                                                 ByVal aElevLowFieldName As String, _
+                                                ByVal aMeanWidthFieldName As String, _
+                                                ByVal aMeanDepthFieldName As String, _
                                                 ByVal aSWMMProject As SWMMProject, _
                                                 ByRef aConduits As Conduits) As Boolean
         aConduits.Clear()
@@ -59,18 +61,27 @@ Friend Module modSWMMFromMW
         Dim lDownSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aDownSubbasinFieldName)
         Dim lElevHighFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aElevHighFieldName)
         Dim lElevLowFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aElevLowFieldName)
+        Dim lMeanWidthFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aMeanWidthFieldName)
+        Dim lMeanDepthFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aMeanDepthFieldName)
 
         'create all conduits
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lConduit As New Conduit
             lConduit.Name = "C" & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
 
-            lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex)
+            lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex) * 3.281 'need to convert meters to feet
             'lConduit.ManningsN()
             'lConduit.InletOffset()
             'lConduit.OutletOffset()
             'lConduit.InitialFlow()
             'lConduit.MaxFlow()
+            'lconduit.Shape
+            lConduit.Geometry3 = 1.0 'left slope
+            lConduit.Geometry4 = 1.0 'right slope
+            Dim lMeanDepth As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanDepthFieldIndex)
+            lConduit.Geometry1 = lMeanDepth * 1.25 'full height = mean depth * 1.25
+            lConduit.Geometry2 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanWidthFieldIndex) - (lMeanDepth / lConduit.Geometry3) - (lMeanDepth / lConduit.Geometry4) 'base width
+            'lConduit.NumBarrels()
 
             Dim lElevHigh As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevHighFieldIndex)
             Dim lElevLow As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevLowFieldIndex)
@@ -218,4 +229,5 @@ Friend Module modSWMMFromMW
         End If
         Return lGetTimeseries
     End Function
+
 End Module
