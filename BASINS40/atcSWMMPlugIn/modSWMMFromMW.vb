@@ -185,7 +185,7 @@ Friend Module modSWMMFromMW
                                    ByVal aScenario As String, _
                                    ByVal aLocation As String, _
                                    ByVal aConstituent As String) As atcData.atcTimeseries
-        GetTimeseries = Nothing
+        Dim lGetTimeseries As atcData.atcTimeseries = Nothing
 
         Dim lDataSource As New atcWDM.atcDataSourceWDM
         If FileExists(aMetWDMName) Then
@@ -210,10 +210,12 @@ Friend Module modSWMMFromMW
                     If (lDataSet.Attributes.GetValue("Scenario") = aScenario And _
                         lDataSet.Attributes.GetValue("Constituent") = aConstituent And _
                         lDataSet.Attributes.GetValue("Location") = aLocation) Then
-                        GetTimeseries = lDataSet
+                        lGetTimeseries = lDataSet
+                        Exit For
                     End If
                 Next
             End If
         End If
+        Return lGetTimeseries
     End Function
 End Module
