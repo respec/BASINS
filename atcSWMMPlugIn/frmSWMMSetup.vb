@@ -158,21 +158,26 @@ Public Class frmSWMMSetup
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
 
             'set start and end dates
-            .SJDate = 38984
-            .EJDate = 39083
+            .SJDate = MJD(2006, 10, 24)
+            .EJDate = MJD(2006, 10, 31)
 
             'create rain gages from shapefile and selected station
             CreateRaingageFromShapefile(lBasinsFolder & "\data\02060006-1\met\met.shp", "MD189070", .RainGages)
 
             'create met constituents from wdm file and selected station
-            CreateMetConstituent(lBasinsFolder & "\data\02060006-1\met\met.wdm", "MD189070", "ATEM", .MetConstituents)
-            CreateMetConstituent(lBasinsFolder & "\data\02060006-1\met\met.wdm", "MD189070", "PEVT", .MetConstituents)
+            Dim lMetWDMFileName As String = lBasinsFolder & "\data\02060006-1\met\met.wdm"
+            CreateMetConstituent(lMetWDMFileName, "MD189070", "ATEM", .MetConstituents)
+            CreateMetConstituent(lMetWDMFileName, "MD189070", "PEVT", .MetConstituents)
 
             'create conduits and nodes from streams shapefile
             CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", "WID2", "DEP2", pPlugIn.SWMMProject, .Conduits)
 
             'create catchments from subbasins shapefile
-            CreateCatchmentsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp", "SUBBASIN", "SLO1", pPlugIn.SWMMProject, .Catchments)
+            Dim lSubbasinsShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"
+            CreateCatchmentsFromShapefile(lSubbasinsShapefileName, "SUBBASIN", "SLO1", pPlugIn.SWMMProject, .Catchments)
+
+            'create landuses from nlcd landcover
+            CreateLandusesFromGrid("C:\BASINS\data\02060006-1\NLCD\NLCD_LandCover_2001.tif", lSubbasinsShapefileName, .Catchments, .Landuses)
 
             'add backdrop file
             .BackdropFile = lBasinsFolder & "\Predefined Delineations\West Branch\wbranch.bmp"

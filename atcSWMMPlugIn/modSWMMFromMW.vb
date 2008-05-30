@@ -175,6 +175,43 @@ Friend Module modSWMMFromMW
 
     End Function
 
+    Public Function CreateLandusesFromGrid(ByVal aLanduseGridFileName As String, _
+                                           ByVal aSubbasinShapefileName As String, _
+                                           ByVal aCatchments As Catchments, _
+                                           ByRef aLanduses As Landuses) As Boolean
+
+        aLanduses.Clear()
+
+        If Not GisUtil.IsLayerByFileName(aSubbasinShapefileName) Then
+            GisUtil.AddLayer(aSubbasinShapefileName, "Catchments")
+        End If
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinShapefileName)
+
+        If Not GisUtil.IsLayerByFileName(aLanduseGridFileName) Then
+            GisUtil.AddLayer(aLanduseGridFileName, "Landuse Grid")
+        End If
+        Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(aLanduseGridFileName)
+
+        Dim lMaxLanduseCategory As Integer = Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
+        Dim lAreaLS(lMaxLanduseCategory, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
+        GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
+
+        For lCatchmentIndex As Integer = 0 To aCatchments.Count - 1
+            For lLanduseCategory As Integer = 1 To lMaxLanduseCategory
+                If lAreaLS(lLanduseCategory, lCatchmentIndex) > 0 Then
+                    Dim lLanduse As New Landuse
+                    lLanduse.Area = lAreaLS(lLanduseCategory, lCatchmentIndex)
+                    lLanduse.Name = lLanduseCategory
+                    lLanduse.Catchment = aCatchments(lCatchmentIndex)
+                    aLanduses.Add(lLanduse)
+                End If
+            Next
+        Next
+
+        ComputeImperviousPercentage(aCatchments, aLanduses)
+
+    End Function
+
     Public Function CreateMetConstituent(ByVal aWDMFileName As String, _
                                          ByVal aGageId As String, _
                                          ByVal aConstituentID As String, _
@@ -228,6 +265,39 @@ Friend Module modSWMMFromMW
             End If
         End If
         Return lGetTimeseries
+    End Function
+
+    Private Function ComputeImperviousPercentage(ByVal aCatchments As Catchments, _
+                                                 ByVal aLanduses As Landuses) As Boolean
+
+        For Each lCatchment As Catchment In aCatchments
+            Dim lImperviousArea As Double = 0.0
+            Dim lPerviousArea As Double = 0.0
+            For Each lLanduse As Landuse In aLanduses
+                If lLanduse.Catchment.Name = lCatchment.Name Then
+                    'a match, store areas of pervious and impervious
+
+                    'TODO: use table to determine % impervious for each
+                    Dim lAddedArea As Boolean = False
+                    If IsNumeric(lLanduse.Name) Then
+                        If Int(lLanduse.Name) > 20 And Int(lLanduse.Name) < 25 Then
+                            lImperviousArea += lLanduse.Area * 0.5
+                            lPerviousArea += lLanduse.Area * 0.5
+                            lAddedArea = True
+                        End If
+                    End If
+                    If Not lAddedArea Then
+                        lPerviousArea += lLanduse.Area
+                    End If
+
+                End If
+            Next
+
+            'compute the impervious percentage for this catchment
+            lCatchment.PercentImpervious = 100.0 * lImperviousArea / (lImperviousArea + lPerviousArea)
+
+        Next
+
     End Function
 
 End Module
