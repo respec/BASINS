@@ -1,11 +1,9 @@
 Imports MapWinUtility
 Imports atcSWMM
+Imports atcData.atcDataManager
 
 Public Class PlugIn
     Inherits atcData.atcDataPlugin
-    'TODO: get these from BASINS4 or plugInManager?
-    Private Const pModelsMenuName As String = "BasinsModels"
-    Private Const pModelsMenuString As String = "Models"
 
     Private pSWMMProject As SWMMProject
 
@@ -29,20 +27,20 @@ Public Class PlugIn
 
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
-        pMapWin = aMapWin
-        atcData.atcDataManager.AddMenuIfMissing(pModelsMenuName, "", pModelsMenuString, "mnuFile")
-        atcData.atcDataManager.AddMenuIfMissing(pModelsMenuName & "_SWMM", pModelsMenuName, "SWMM")
+        MyBase.Initialize(aMapWin, aParentHandle)
+        atcMwGisUtility.GisUtil.MappingObject = aMapWin
+        AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
+        AddMenuIfMissing(ModelsMenuName & "_SWMM", ModelsMenuName, "SWMM")
         pSWMMProject = New SWMMProject
     End Sub
 
     Public Overrides Sub Terminate()
-        atcData.atcDataManager.RemoveMenuIfEmpty(pModelsMenuName & "_SWMM")
-        atcData.atcDataManager.RemoveMenuIfEmpty(pModelsMenuName)
+        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_SWMM")
+        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName)
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-        If aItemName = pModelsMenuName & "_SWMM" Then
-            atcMwGisUtility.GisUtil.MappingObject = pMapWin
+        If aItemName = ModelsMenuName & "_SWMM" Then
             Dim lfrmSWMMSetup As New frmSWMMSetup
             lfrmSWMMSetup.InitializeUI(Me)
             lfrmSWMMSetup.Show()
