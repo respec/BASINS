@@ -78,8 +78,11 @@ Public Class SWMMProject
         '[CONDUITS] and [XSECTIONS]
         lSB.AppendLine(Conduits.ToString)
 
-        'lSB.AppendLine("[LANDUSES]")
-        'lSB.AppendLine("[COVERAGES]")
+        '[LANDUSES]
+        lSB.AppendLine(Landuses.ToString)
+
+        '[COVERAGES]
+        lSB.AppendLine(Landuses.CoveragesToString)
 
         '[TIMESERIES]
         lSB.AppendLine(RainGages.TimeSeriesHeaderToString)
