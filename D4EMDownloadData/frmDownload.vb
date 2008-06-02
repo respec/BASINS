@@ -45,13 +45,7 @@ Public Class frmDownload
             chkMerge.Checked = True
         End If
 
-        If StationsXMLfromMap.Length = 0 Then
-            panelNWISnoStations.Visible = True
-            panelNWISnoStations.BringToFront()
-            chkNWIS_GetNWISDischarge.Visible = False
-            chkNWIS_GetNWISMeasurements.Visible = False
-            chkNWIS_GetNWISWQ.Visible = False
-        End If
+        Me.SetCheckboxVisibilityFromMap()
 
         Me.ShowDialog()
         If pOk Then
@@ -123,6 +117,39 @@ Public Class frmDownload
         End If
         Return lStationsXML
     End Function
+
+    Private Sub SetCheckboxVisibilityFromMap()
+        If pMapWin.View IsNot Nothing Then
+            Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
+            If lSelected.NumSelected > 0 Then
+                Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
+                Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
+                If lFilename.StartsWith("nwis_stations_") Then
+                    Select Case lFilename.Substring(14)
+                        Case "discharge"
+                            chkNWIS_GetNWISDischarge.Enabled = True
+                            chkNWIS_GetNWISDischarge.Checked = True
+                        Case "qw"
+                            chkNWIS_GetNWISWQ.Enabled = True
+                            chkNWIS_GetNWISWQ.Checked = True
+                        Case "measurements"
+                            chkNWIS_GetNWISMeasurements.Enabled = True
+                            chkNWIS_GetNWISMeasurements.Checked = True
+                        Case "gw", "peak" 'download of these data not yet implemented
+                    End Select
+                End If
+            End If
+        End If
+        If Not chkNWIS_GetNWISDischarge.Enabled AndAlso _
+           Not chkNWIS_GetNWISWQ.Enabled AndAlso _
+           Not chkNWIS_GetNWISMeasurements.Enabled Then
+            panelNWISnoStations.Visible = True
+            panelNWISnoStations.BringToFront()
+            chkNWIS_GetNWISDischarge.Visible = False
+            chkNWIS_GetNWISMeasurements.Visible = False
+            chkNWIS_GetNWISWQ.Visible = False
+        End If
+    End Sub
 
     Public Property XML() As String
         Get
