@@ -235,6 +235,7 @@ Partial Class frmDownload
         'chkNWIS_GetNWISWQ
         '
         Me.chkNWIS_GetNWISWQ.AutoSize = True
+        Me.chkNWIS_GetNWISWQ.Enabled = False
         Me.chkNWIS_GetNWISWQ.Location = New System.Drawing.Point(112, 19)
         Me.chkNWIS_GetNWISWQ.Name = "chkNWIS_GetNWISWQ"
         Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(90, 17)
@@ -245,6 +246,7 @@ Partial Class frmDownload
         'chkNWIS_GetNWISMeasurements
         '
         Me.chkNWIS_GetNWISMeasurements.AutoSize = True
+        Me.chkNWIS_GetNWISMeasurements.Enabled = False
         Me.chkNWIS_GetNWISMeasurements.Location = New System.Drawing.Point(205, 19)
         Me.chkNWIS_GetNWISMeasurements.Name = "chkNWIS_GetNWISMeasurements"
         Me.chkNWIS_GetNWISMeasurements.Size = New System.Drawing.Size(95, 17)
@@ -267,6 +269,7 @@ Partial Class frmDownload
         'chkNWIS_GetNWISDischarge
         '
         Me.chkNWIS_GetNWISDischarge.AutoSize = True
+        Me.chkNWIS_GetNWISDischarge.Enabled = False
         Me.chkNWIS_GetNWISDischarge.Location = New System.Drawing.Point(6, 19)
         Me.chkNWIS_GetNWISDischarge.Name = "chkNWIS_GetNWISDischarge"
         Me.chkNWIS_GetNWISDischarge.Size = New System.Drawing.Size(100, 17)
