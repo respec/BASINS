@@ -12,8 +12,29 @@ Public Class SWMMProject
 
     Public Name As String = ""
     Public Title As String = ""
+    Public FlowUnits As String = "CFS"
+    Public InfiltrationMethod As String = "HORTON"
+    Public FlowRouting As String = "KINWAVE"
     Public SJDate As Double = 0.0
     Public EJDate As Double = 0.0
+    Public SweepStart As String = "1/1"
+    Public SweepEnd As String = "12/31"
+    Public DryDays As Integer = 0
+    Public ReportStep As String = "00:15:00"
+    Public WetStep As String = "00:15:00"
+    Public DryStep As String = "01:00:00"
+    Public RoutingStep As String = "0:00:30"
+    Public AllowPonding As String = "NO"
+    Public InertialDamping As String = "PARTIAL"
+    Public VariableStep As Double = 0.75
+    Public LengtheningStep As Integer = 0
+    Public MinSurfArea As Integer = 0
+    Public NormalFlowLimited As String = "BOTH"
+    Public SkipSteadyState As String = "NO"
+    Public IgnoreRainfall As String = "NO"
+    Public ForceMainEquation As String = "H-W"
+    Public LinkOffsets As String = "DEPTH"
+
     Public BackdropFile As String = ""
     Public BackdropX1 As Double = 0.0
     Public BackdropY1 As Double = 0.0
@@ -51,14 +72,34 @@ Public Class SWMMProject
         Dim lEDate(6) As Integer
         J2Date(EJDate, lEDate)
         Dim lStartDateString As String = lSDate(1) & "/" & lSDate(2) & "/" & lSDate(0)
-        Dim lStartTimeString As String = lSDate(3) & ":" & lSDate(4)
+        Dim lStartTimeString As String = Format(lSDate(3), "00") & ":" & Format(lSDate(4), "00") & ":00"
         lSB.AppendLine("[OPTIONS]")
+        lSB.AppendLine("FLOW_UNITS           " & FlowUnits)
+        lSB.AppendLine("INFILTRATION         " & InfiltrationMethod)
+        lSB.AppendLine("FLOW_ROUTING         " & FlowRouting)
         lSB.AppendLine("START_DATE           " & lStartDateString)
         lSB.AppendLine("START_TIME           " & lStartTimeString)
         lSB.AppendLine("REPORT_START_DATE    " & lStartDateString)
         lSB.AppendLine("REPORT_START_TIME    " & lStartTimeString)
         lSB.AppendLine("END_DATE             " & lEDate(1) & "/" & lEDate(2) & "/" & lEDate(0))
-        lSB.AppendLine("END_TIME             " & lEDate(3) & ":" & lEDate(4))
+        lSB.AppendLine("END_TIME             " & Format(lEDate(3), "00") & ":" & Format(lEDate(4), "00") & ":00")
+        lSB.AppendLine("SWEEP_START          " & SweepStart)
+        lSB.AppendLine("SWEEP_END            " & SweepEnd)
+        lSB.AppendLine("DRY_DAYS             " & DryDays)
+        lSB.AppendLine("REPORT_STEP          " & ReportStep)
+        lSB.AppendLine("WET_STEP             " & WetStep)
+        lSB.AppendLine("DRY_STEP             " & DryStep)
+        lSB.AppendLine("ROUTING_STEP         " & RoutingStep)
+        lSB.AppendLine("ALLOW_PONDING        " & AllowPonding)
+        lSB.AppendLine("INERTIAL_DAMPING     " & InertialDamping)
+        lSB.AppendLine("VARIABLE_STEP        " & VariableStep)
+        lSB.AppendLine("LENGTHENING_STEP     " & LengtheningStep)
+        lSB.AppendLine("MIN_SURFAREA         " & MinSurfArea)
+        lSB.AppendLine("NORMAL_FLOW_LIMITED  " & NormalFlowLimited)
+        lSB.AppendLine("SKIP_STEADY_STATE    " & SkipSteadyState)
+        lSB.AppendLine("IGNORE_RAINFALL      " & IgnoreRainfall)
+        lSB.AppendLine("FORCE_MAIN_EQUATION  " & ForceMainEquation)
+        lSB.AppendLine("LINK_OFFSETS         " & LinkOffsets)
         lSB.AppendLine("")
 
         '[EVAPORATION] and [TEMPERATURE]
@@ -70,7 +111,11 @@ Public Class SWMMProject
         '[SUBCATCHMENTS]
         lSB.AppendLine(Catchments.ToString)
 
-        'lSB.AppendLine("[SUBAREAS]")
+        '[SUBAREAS]
+        lSB.AppendLine(Catchments.SubareasToString)
+
+        '[INFILTRATION]
+        lSB.AppendLine(Catchments.InfiltrationToString)
 
         '[JUNCTIONS] and [OUTFALLS]
         lSB.AppendLine(Nodes.ToString)
