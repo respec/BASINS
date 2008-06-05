@@ -17,9 +17,9 @@ Public Class RainGages
         Dim lSB As New StringBuilder
 
         lSB.Append("[RAINGAGES]" & vbCrLf & _
-                   ";;               Rain      Recd.  Snow   Data       Source           Station    Rain  Start     " & vbCrLf & _
-                   ";;Name           Type      Freq.  Catch  Source     Name             ID         Units Date      " & vbCrLf & _
-                   ";;----------------------------------------------------------------------------------------------" & vbCrLf)
+                   ";;               Rain      Recd.  Snow   Data      " & vbCrLf & _
+                   ";;Name           Type      Freq.  Catch  Source    " & vbCrLf & _
+                   ";;-------------- --------- ------ ------ ----------" & vbCrLf)
 
         For Each lRaingage As RainGage In Me
             With lRaingage
@@ -33,9 +33,9 @@ Public Class RainGages
                 lSB.Append(" ")
                 lSB.Append(StrPad(.Type, 10, " ", False))
                 lSB.Append(" ")
-                lSB.Append(StrPad(.Name & ":P", 16, " ", False))
+                lSB.Append(StrPad("""" & PathNameOnly(Me.SWMMProject.FileName) & "\" & .Name & "P.DAT" & """", 16, " ", False))
                 lSB.Append(" ")
-                lSB.Append(StrPad(" ", 10, " ", False))
+                lSB.Append(StrPad(.Name, 10, " ", False))
                 lSB.Append(" ")
                 lSB.Append(StrPad(.Units, 5, " ", False))
                 lSB.Append(" ")
@@ -66,23 +66,15 @@ Public Class RainGages
         Return lSB.ToString
     End Function
 
-    Public Function TimeSeriesHeaderToString() As String
-        Dim lSB As New StringBuilder
-        lSB.Append("[TIMESERIES]" & vbCrLf & _
-                   ";;Name           Date       Time       Value     " & vbCrLf & _
-                   ";;-------------- ---------- ---------- ----------")
-        Return lSB.ToString
-    End Function
-
-    Public Function TimeSeriesToString() As String
-        Dim lSB As New StringBuilder
-        lSB.Append(";RAINFALL" & vbCrLf)
+    Public Function TimeSeriesToFile() As Boolean
 
         For Each lRaingage As RainGage In Me
-            lSB.Append(Me.SWMMProject.TimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name & ":P"))
+            Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & "\" & lRaingage.Name & "P.DAT"
+            Dim lSB As New StringBuilder
+            lSB.Append(Me.SWMMProject.HourlyTimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
+            SaveFileString(lFileName, lSB.ToString)
         Next
 
-        Return lSB.ToString
     End Function
 End Class
 
@@ -91,7 +83,7 @@ Public Class RainGage
     Public Form As String = "INTENSITY" 'intensity (or volume or cumulative)
     Public Interval As String = "1:00"
     Public SnowCatchFactor As Double = 1.0
-    Public Type As String = "TIMESERIES" 'timeseries (or file)
+    Public Type As String = "FILE" '(timeseries) or file
     Public TimeSeries As atcData.atcTimeseries
     Public Units As String = "IN" 'in (or mm)
     Public YPos As Double = 0.0

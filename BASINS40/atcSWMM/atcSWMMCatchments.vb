@@ -78,7 +78,11 @@ Public Class Catchments
                 lSB.Append(" ")
                 lSB.Append(StrPad(.RouteTo, 10, " ", False))
                 lSB.Append(" ")
-                lSB.Append(StrPad(Format(.PercentRouted, "0.0"), 10, " ", False))
+                If .PercentRouted < 100.0 Then
+                    lSB.Append(StrPad(Format(.PercentRouted, "0.0"), 10, " ", False))
+                Else
+                    lSB.Append("          ")
+                End If
                 lSB.Append(vbCrLf)
             End With
         Next

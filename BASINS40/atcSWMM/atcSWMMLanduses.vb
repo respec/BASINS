@@ -44,8 +44,8 @@ Public Class Landuses
         Dim lSB As New StringBuilder
 
         lSB.Append("[COVERAGES]" & vbCrLf & _
-                   ";;Subcatchment   Landuse          Percent " & vbCrLf & _
-                   ";;-------------- ---------------- --------" & vbCrLf)
+                   ";;Subcatchment   Land Use         Percent   " & vbCrLf & _
+                   ";;-------------- ---------------- ----------" & vbCrLf)
 
         'need collection of unique catchments
         Dim lUniqueCatchmentNames As New atcCollection
@@ -77,7 +77,7 @@ Public Class Landuses
                     lSB.Append(StrPad(lLanduseName, 16, " ", False))
                     lSB.Append(" ")
                     Dim lArea As Double = 100.0 * lLanduse.Area / lTotalCatchmentArea
-                    lSB.Append(StrPad(Format(lArea, "0.0"), 8, " ", False))
+                    lSB.Append(StrPad(Format(lArea, "0.0"), 10, " ", False))
                     lSB.Append(" ")                   
                     lSB.Append(vbCrLf)
                 End If

@@ -42,9 +42,7 @@ Public Class MetConstituents
                     lSB.Append(vbCrLf)
                 End If
 
-                lSB.Append("[TEMPERATURE]" & vbCrLf & _
-                           ";;Type       Parameters" & vbCrLf & _
-                           ";;---------- ----------" & vbCrLf)
+                lSB.Append("[TEMPERATURE]" & vbCrLf)
 
                 With lMetConstituent
                     lSB.Append(StrPad("TIMESERIES", 12, " ", False))
@@ -57,6 +55,14 @@ Public Class MetConstituents
             End If
         Next
 
+        Return lSB.ToString
+    End Function
+
+    Public Function TimeSeriesHeaderToString() As String
+        Dim lSB As New StringBuilder
+        lSB.Append("[TIMESERIES]" & vbCrLf & _
+                   ";;Name           Date       Time       Value     " & vbCrLf & _
+                   ";;-------------- ---------- ---------- ----------")
         Return lSB.ToString
     End Function
 
