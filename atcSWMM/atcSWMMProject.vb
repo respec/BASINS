@@ -11,6 +11,7 @@ Public Class SWMMProject
     Public MetConstituents As MetConstituents
 
     Public Name As String = ""
+    Public FileName As String = ""
     Public Title As String = ""
     Public FlowUnits As String = "CFS"
     Public InfiltrationMethod As String = "HORTON"
@@ -44,6 +45,7 @@ Public Class SWMMProject
 
     Public Sub New()
         Name = ""
+        FileName = ""
         Title = ""
         Catchments = New Catchments
         Catchments.SWMMProject = Me
@@ -60,6 +62,7 @@ Public Class SWMMProject
 
     Public Function Save(ByVal aFileName As String) As Boolean
         Dim lSB As New StringBuilder
+        FileName = aFileName
 
         '[TITLE]
         lSB.AppendLine("[TITLE]")
@@ -107,6 +110,7 @@ Public Class SWMMProject
 
         '[RAINGAGES]
         lSB.AppendLine(RainGages.ToString)
+        RainGages.TimeSeriesToFile()
 
         '[SUBCATCHMENTS]
         lSB.AppendLine(Catchments.ToString)
@@ -123,6 +127,12 @@ Public Class SWMMProject
         '[CONDUITS] and [XSECTIONS]
         lSB.AppendLine(Conduits.ToString)
 
+        '[LOSSES]
+        lSB.AppendLine("[LOSSES]")
+        lSB.AppendLine(";;Link           Inlet      Outlet     Average    Flap Gate ")
+        lSB.AppendLine(";;-------------- ---------- ---------- ---------- ----------")
+        lSB.AppendLine("")
+
         '[LANDUSES]
         lSB.AppendLine(Landuses.ToString)
 
@@ -130,9 +140,18 @@ Public Class SWMMProject
         lSB.AppendLine(Landuses.CoveragesToString)
 
         '[TIMESERIES]
-        lSB.AppendLine(RainGages.TimeSeriesHeaderToString)
-        lSB.AppendLine(RainGages.TimeSeriesToString)
+        lSB.AppendLine(MetConstituents.TimeSeriesHeaderToString)
         lSB.AppendLine(MetConstituents.TimeSeriesToString)
+
+        '[REPORT]
+        lSB.AppendLine("[REPORT]")
+        lSB.AppendLine("INPUT      NO")
+        lSB.AppendLine("CONTROLS   NO")
+        lSB.AppendLine("")
+
+        '[TAGS]
+        lSB.AppendLine("[TAGS]")
+        lSB.AppendLine("")
 
         '[MAP]
         lSB.AppendLine("[MAP]")
@@ -153,13 +172,42 @@ Public Class SWMMProject
 
         '[BACKDROP]
         If BackdropFile.Length > 0 Then
+            lSB.AppendLine("")
             lSB.AppendLine("[BACKDROP]")
             lSB.AppendLine("FILE       " & """" & BackdropFile & """")
             lSB.AppendLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
         End If
 
-        SaveFileString(aFileName, lSB.ToString)
+        SaveFileString(FileName, lSB.ToString)
         Return True
+    End Function
+
+    Public Function HourlyTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String
+        Dim lSB As New StringBuilder
+
+        For lIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True) To aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
+            If aTimeSeries.Values(lIndex) > 0 Then
+                lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
+                lSB.Append(" ")
+                Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
+                Dim lDate(6) As Integer
+                J2Date(lJDate, lDate)
+                lSB.Append(StrPad(lDate(0), 10, " ", False))
+                lSB.Append(" ")
+                lSB.Append(StrPad(lDate(1), 10, " ", False))
+                lSB.Append(" ")
+                lSB.Append(StrPad(lDate(2), 10, " ", False))
+                lSB.Append(" ")
+                lSB.Append(StrPad(lDate(3), 10, " ", False))
+                lSB.Append(" ")
+                lSB.Append(StrPad(lDate(4), 10, " ", False))
+                lSB.Append(" ")
+                lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex), "0.000"), 10, " ", False))
+                lSB.Append(vbCrLf)
+            End If
+        Next
+
+        Return lSB.ToString
     End Function
 
     Public Function TimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String

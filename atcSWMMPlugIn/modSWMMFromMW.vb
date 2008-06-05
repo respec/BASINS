@@ -4,7 +4,9 @@ Imports atcData
 Imports MapWinUtility
 
 Friend Module modSWMMFromMW
-    Public Function CreateCatchmentsFromShapefile(ByVal aShapefileName As String, ByVal aSubbasinFieldName As String, ByVal aSlopeFieldName As String, _
+    Public Function CreateCatchmentsFromShapefile(ByVal aShapefileName As String, _
+                                                  ByVal aSubbasinFieldName As String, _
+                                                  ByVal aSlopeFieldName As String, _
                                                   ByVal aSWMMProject As SWMMProject, _
                                                   ByRef aCatchments As Catchments) As Boolean
 
@@ -34,7 +36,7 @@ Friend Module modSWMMFromMW
             Next
 
             lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
-            'lCatchment.PercentImpervious()
+            'lCatchment.PercentImpervious()  'this is computed later
             lCatchment.Width = lCatchment.Area * 43560 / lCatchment.Conduit.Length
             lCatchment.Slope = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSlopeFieldIndex)
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lCatchment.X, lCatchment.Y)
