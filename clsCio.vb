@@ -19,7 +19,7 @@ Partial Class SwatInput
             pSwatInput.Status("Reading CIO table from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM cio;")
         End Function
-        Public Sub Save(ByVal pSwatInput As SwatInput, ByVal aPrintHRU As Boolean)
+        Public Sub Save(ByVal aPrintHRU As Boolean)
             Dim lCIOTable As DataTable = Table()
             pSwatInput.Status("Writing CIO table ...")
             Dim lSB As New System.Text.StringBuilder
