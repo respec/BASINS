@@ -63,6 +63,7 @@
     <Compile Include="clsHru.vb" />
     <Compile Include="clsSubBsn.vb" />
     <Compile Include="modUtility.vb" />
+    <Compile Include="clsRte.vb" />
     <Compile Include="SwatInput.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
