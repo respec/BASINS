@@ -2235,6 +2235,7 @@ x:
                 .SetValue("Constituent", aConstituent.ToUpper)
                 .SetValue("Location", aLocation.ToUpper)
                 .SetValue("Description", aDescription)
+                .SetValue("STANAM", aDescription)
                 .SetValue("TU", 4)  'assume daily
                 .SetValue("TS", 1)
                 .SetValue("TSTYPE", aTstype)
