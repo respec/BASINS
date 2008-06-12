@@ -2310,7 +2310,8 @@ Public Class frmModelSetup
                 End If
                 cboMet.Items.Add(lLayerName)
                 If lLayerName.IndexOf("Weather Station Sites 20") > -1 Then
-                    cboMet.SelectedIndex = cboMet.Items.Count - 1
+                    'this takes some time, show window and then do this
+                    'cboMet.SelectedIndex = cboMet.Items.Count - 1
                 End If
             End If
         Next
@@ -2337,6 +2338,18 @@ Public Class frmModelSetup
 
         cboLanduse.SelectedIndex = 1
         cboLanduse.SelectedIndex = 0
+    End Sub
+
+    Public Sub InitializeMetStationList()
+
+        For lLayerIndex As Integer = 0 To cboMet.Items.Count - 1
+            Dim lLayerName As String = cboMet.Items(lLayerIndex)
+            If lLayerName.IndexOf("Weather Station Sites 20") > -1 Then
+                'this takes some time, show window and then do this
+                cboMet.SelectedIndex = lLayerIndex
+            End If
+        Next
+
     End Sub
 
     Private Sub cmdChange_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdChange.Click
@@ -2401,6 +2414,11 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
+
+        lblStatus.Text = "Reading Meteorologic WDM File..."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
         BuildListofMetStationNames(txtMetWDMName.Text, pMetStations, pMetBaseDsns)
         SetMetSegmentGrid()
         lstMet.Items.Clear()
@@ -2410,6 +2428,10 @@ Public Class frmModelSetup
         If lstMet.Items.Count > 0 Then
             lstMet.SelectedIndex = 0
         End If
+
+        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
     End Sub
 
     Private Sub cboSub1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSub1.SelectedIndexChanged

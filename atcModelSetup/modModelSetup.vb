@@ -130,7 +130,12 @@ Module modModelSetup
             End If
 
             If lFound Then
+                Dim lCounter As Integer = 0
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+
+                    lCounter += 1
+                    Logger.Progress(lCounter, lDataSource.DataSets.Count)
+
                     If (lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" Or lDataSet.Attributes.GetValue("Scenario") = "COMPUTED") _
                         And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
                         Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
