@@ -511,7 +511,7 @@ Module modCreateUci
         If lSegmentIds.Count < 10 Then
             'use 101, 102, 201, 202 scheme
             lBase = 100
-        ElseIf lSegmentIds.Count >= 10 And lPerlndNames.Count < 10 And lImplndNames.Count < 10 Then
+        ElseIf lSegmentIds.Count >= 10 And lPerlndNames.Count <= 10 And lImplndNames.Count <= 10 Then
             'use 11, 12, 21, 22 scheme
             lBase = 10
         Else
