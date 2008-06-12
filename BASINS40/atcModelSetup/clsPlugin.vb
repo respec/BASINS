@@ -66,6 +66,7 @@ Public Class PlugIn
             main.SetModelName("HSPF")
             main.InitializeUI()
             main.Show()
+            main.InitializeMetStationList()
             Handled = True
         ElseIf ItemName = ModelsMenuName & "_AQUATOX" Then
             Dim main As New frmModelSetup
