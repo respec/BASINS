@@ -145,6 +145,93 @@ Friend Module modSWMMFromMW
 
     End Function
 
+    Public Function CreateNodesFromShapefile(ByVal aShapefileName As String, _
+                                             ByVal aNameFieldName As String, _
+                                             ByVal aTypeFieldName As String, _
+                                             ByVal aInvertElevationFieldName As String, _
+                                             ByVal aMaxDepthFieldName As String, _
+                                             ByVal aInitDepthFieldName As String, _
+                                             ByVal aSurchargeDepthFieldName As String, _
+                                             ByVal aPondedAreaFieldName As String, _
+                                             ByVal aOutfallTypeFieldName As String, _
+                                             ByVal aStageTableFieldName As String, _
+                                             ByVal aTideGateFieldName As String, _
+                                             ByRef aNodes As Nodes) As Boolean
+
+        aNodes.Clear()
+
+        If Not GisUtil.IsLayerByFileName(aShapefileName) Then
+            GisUtil.AddLayer(aShapefileName, "Nodes")
+        End If
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aShapefileName)
+
+        Dim lNameFieldIndex As Integer = -1
+        If aNameFieldName.Length > 0 Then lNameFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNameFieldName)
+        Dim lTypeFieldIndex As Integer = -1
+        If aTypeFieldName.Length > 0 Then lTypeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aTypeFieldName)
+        Dim lInvertElevationFieldIndex As Integer = -1
+        If aInvertElevationFieldName.Length > 0 Then lInvertElevationFieldIndex = GisUtil.FieldIndex(lLayerIndex, aInvertElevationFieldName)
+        Dim lMaxDepthFieldIndex As Integer = -1
+        If aMaxDepthFieldName.Length > 0 Then lMaxDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aMaxDepthFieldName)
+        Dim lInitDepthFieldIndex As Integer = -1
+        If aInitDepthFieldName.Length > 0 Then lInitDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aInitDepthFieldName)
+        Dim lSurchargeDepthFieldIndex As Integer = -1
+        If aSurchargeDepthFieldName.Length > 0 Then lSurchargeDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aSurchargeDepthFieldName)
+        Dim lPondedAreaFieldIndex As Integer = -1
+        If aPondedAreaFieldName.Length > 0 Then lPondedAreaFieldIndex = GisUtil.FieldIndex(lLayerIndex, aPondedAreaFieldName)
+        Dim lOutfallTypeFieldIndex As Integer = -1
+        If aOutfallTypeFieldName.Length > 0 Then lOutfallTypeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aOutfallTypeFieldName)
+        Dim lStageTableFieldIndex As Integer = -1
+        If aStageTableFieldName.Length > 0 Then lStageTableFieldIndex = GisUtil.FieldIndex(lLayerIndex, aStageTableFieldName)
+        Dim lTideGateFieldIndex As Integer = -1
+        If aTideGateFieldName.Length > 0 Then lTideGateFieldIndex = GisUtil.FieldIndex(lLayerIndex, aTideGateFieldName)
+
+        'create all nodes
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+            Dim lNode As New Node
+
+            If lNameFieldIndex > -1 Then
+                lNode.Name = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lNameFieldIndex)
+            End If
+            If lNode.Name.Length = 0 Then
+                lNode.Name = "N" & CInt(lFeatureIndex)
+            End If
+
+            If lTypeFieldIndex > -1 Then
+                lNode.Type = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lTypeFieldIndex)
+            End If
+            If lInvertElevationFieldIndex > 0 Then
+                lNode.InvertElevation = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInvertElevationFieldIndex)
+            End If
+            If lMaxDepthFieldIndex > -1 Then
+                lNode.MaxDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMaxDepthFieldIndex)
+            End If
+            If lInitDepthFieldIndex > -1 Then
+                lNode.InitDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInitDepthFieldIndex)
+            End If
+            If lSurchargeDepthFieldIndex > -1 Then
+                lNode.SurchargeDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSurchargeDepthFieldIndex)
+            End If
+            If lPondedAreaFieldIndex > -1 Then
+                lNode.PondedArea = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lPondedAreaFieldIndex)
+            End If
+            If lOutfallTypeFieldIndex > -1 Then
+                lNode.OutfallType = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutfallTypeFieldIndex)
+            End If
+            If lNameFieldIndex > -1 Then
+                lNode.StageTable = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lNameFieldIndex)
+            End If
+            If lTideGateFieldIndex > -1 Then
+                lNode.TideGate = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lTideGateFieldIndex)
+            End If
+
+            GisUtil.PointXY(lLayerIndex, lFeatureIndex, lNode.XPos, lNode.YPos)
+
+            aNodes.Add(lNode)
+        Next
+
+    End Function
+
     Public Function CreateRaingageFromShapefile(ByVal aShapefileName As String, _
                                                 ByVal aGageId As String, _
                                                 ByRef aRainGages As RainGages) As Boolean
