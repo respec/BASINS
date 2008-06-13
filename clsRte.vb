@@ -7,7 +7,7 @@ Partial Class SwatInput
     End Property
 
     ''' <summary>
-    ''' (Rte) Input Section
+    ''' RTE Input Section
     ''' </summary>
     ''' <remarks></remarks>
     Public Class clsRte
@@ -16,28 +16,22 @@ Partial Class SwatInput
             pSwatInput = aSwatInput
         End Sub
         Public Function Table() As DataTable
-            pSwatInput.Status("Reading Rte tables from database ...")
+            pSwatInput.Status("Reading RTE from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM rte;")
         End Function
-        Public Sub Save()
-            pSwatInput.Status("Writing rte table ...")
+        Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
+            If aTable Is Nothing Then aTable = Table()
+            pSwatInput.Status("Writing RTE text ...")
 
-            Dim lTable As DataTable = Table()
-            For Each lRow As DataRow In lTable.Rows
+            For Each lRow As DataRow In aTable.Rows
 
-                Dim sRteName As String
                 Dim strSub As String
 
                 strSub = lRow.Item("SUBBASIN")
-                sRteName = StringFnameSubBasins(strSub)
-                If sRteName = "" Then
-                    Exit Sub
-                End If
-                sRteName &= ".rte"
 
                 Dim lSB As New System.Text.StringBuilder
                 '1st line
-                lSB.AppendLine(" .rte file Subbasin: " + strSub + " " + Date.Today.ToString + " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" .rte file Subbasin: " + strSub + " " + DateNowString + " AVSWAT2003 -SWAT INTERFACE MAVZ")
                 '---2. CHW2
                 lSB.AppendLine(Format(lRow.Item(2), "0.000").PadLeft(14) + Strings.StrDup(4, " ") + "| CHW2 : Main channel width [m]")
                 '---3. CHD
@@ -59,7 +53,7 @@ Partial Class SwatInput
                 '---11. CH_WDR
                 lSB.AppendLine(Format(lRow.Item(11), "0.000").PadLeft(14) + Strings.StrDup(4, " ") + "| ALPHA_BNK : Baseflow alpha factor for bank storage [days]")
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & sRteName, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & StringFname(strSub, "rte"), lSB.ToString)
             Next
 
         End Sub

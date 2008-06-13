@@ -60,20 +60,20 @@ Partial Class SwatInput
             End If
         End Function
         Public Function Table() As DataTable
-            pSwatInput.Status("Reading SUB tables from database ...")
+            pSwatInput.Status("Reading SUB from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM sub ORDER BY SUBBASIN;")
         End Function
-        Public Sub Save()
-            Dim lSubTable As DataTable = Table()
-            pSwatInput.Status("Writing SUB tables ...")
+        Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
+            If aTable Is Nothing Then aTable = Table()
+            pSwatInput.Status("Writing SUB text ...")
 
             Dim lLine As String
-            For Each lRow As DataRow In lSubTable.Rows
+            For Each lRow As DataRow In aTable.Rows
                 Dim lSB As New System.Text.StringBuilder
                 Dim lSubNum As String = lRow.Item("SUBBASIN")
-                Dim lSubName As String = StringFnameSubBasins(lSubNum) & ".sub"
+                Dim lSubName As String = StringFname(lSubNum, "sub")
                 '1st line
-                lSB.AppendLine(" .sub file Subbasin: " + lSubNum + " " + Date.Now.ToString + " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" .sub file Subbasin: " + lSubNum + " " + DateNowString + " AVSWAT2003 -SWAT INTERFACE MAVZ")
                 '---2. SUB_KM
                 lSB.AppendLine(Format(lRow.Item(2), "0.000000").PadLeft(16) + Strings.StrDup(4, " ") + "| SUB_KM : Subbasin area [km2]")
 

@@ -16,22 +16,23 @@ Partial Class SwatInput
             pSwatInput = aSwatInput
         End Sub
         Public Function Table1() As DataTable
-            pSwatInput.Status("Reading MGT1 tables from database ...")
+            pSwatInput.Status("Reading MGT1 from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM mgt1 ORDER BY SUBBASIN, HRU;")
         End Function
         Public Function Table2() As DataTable
-            pSwatInput.Status("Reading MGT2 tables from database ...")
+            pSwatInput.Status("Reading MGT2 from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM mgt2 ORDER BY SUBBASIN, HRU, [YEAR], [MONTH], [DAY], HUSC;")
         End Function
         ''' <summary>
         ''' Save MGT information to set of .mgt text input files
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub Save()
-            Dim lMgtTable1 As DataTable = Table1()
-            Dim lMgtTable2 As DataTable = Table2()
-            pSwatInput.Status("Writing MGT tables ...")
-            For Each lMgt1Row As DataRow In lMgtTable1.Rows
+        Public Sub Save(Optional ByVal aTable1 As DataTable = Nothing, Optional ByVal aTable2 As DataTable = Nothing)
+            If aTable1 Is Nothing Then aTable1 = Table1()
+            If aTable2 Is Nothing Then aTable2 = Table2()
+
+            pSwatInput.Status("Writing MGT text ...")
+            For Each lMgt1Row As DataRow In aTable1.Rows
                 Dim lSubNum As String = lMgt1Row.Item(1).ToString.Trim
                 Dim lHruNum As String = lMgt1Row.Item(2).ToString.Trim
                 Dim lMgtName As String = StringFnameHRUs(lSubNum, lHruNum) + ".mgt"
@@ -39,7 +40,7 @@ Partial Class SwatInput
                 Dim lSB As New System.Text.StringBuilder
                 '1st line
                 lSB.AppendLine(" .mgt file Subbasin:" + lSubNum + " HRU:" + lHruNum + " Luse:" + lMgt1Row.Item(3) + " Soil: " + lMgt1Row.Item(4) + " Slope: " + lMgt1Row.Item(5) + _
-                               " " + Date.Now.ToString + " ARCGIS-SWAT2003 interface MAVZ")
+                               " " + DateNowString + " ARCGIS-SWAT2003 interface MAVZ")
                 '2. NMGT
                 lSB.AppendLine(Format(0, "0").PadLeft(16) + Strings.StrDup(4, " ") + "| NMGT:Management code")
 
@@ -108,7 +109,7 @@ Partial Class SwatInput
                         lBlnHu = False
                     End If
 
-                    Dim lRowsMgt2() As DataRow = lMgtTable2.Select("SUBBASIN = " & lMgt1Row.Item(1) & " AND HRU = " & lMgt1Row.Item(2), "[YEAR] ASC, [MONTH] ASC, [DAY] ASC, HUSC ASC")
+                    Dim lRowsMgt2() As DataRow = aTable2.Select("SUBBASIN = " & lMgt1Row.Item(1) & " AND HRU = " & lMgt1Row.Item(2), "[YEAR] ASC, [MONTH] ASC, [DAY] ASC, HUSC ASC")
                     Dim lYear As Integer = lRowsMgt2(0).Item(("YEAR"))
 
                     Dim lLine As String = ""

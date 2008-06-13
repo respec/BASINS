@@ -86,7 +86,7 @@ Partial Class SwatInput
         End Function
 
         Public Function Table() As DataTable
-            pSwatInput.Status("Reading HRU tables from database ...")
+            pSwatInput.Status("Reading HRU from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM hru ORDER BY SUBBASIN, HRU;")
         End Function
 
@@ -94,17 +94,17 @@ Partial Class SwatInput
         ''' Save HRU information to set of .hru text input files
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub Save()
-            Dim lHruTable As DataTable = Table()
-            pSwatInput.Status("Writing HRU tables ...")
-            For Each lHruRow As DataRow In lHruTable.Rows
+        Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
+            If aTable Is Nothing Then aTable = Table()
+            pSwatInput.Status("Writing HRU text ...")
+            For Each lHruRow As DataRow In aTable.Rows
                 Dim lSubNum As String = lHruRow.Item(1).ToString.Trim
                 Dim lHruNum As String = lHruRow.Item(2).ToString.Trim
                 Dim lHruName As String = StringFnameHRUs(lSubNum, lHruNum) + ".hru"
                 Dim lSB As New System.Text.StringBuilder
                 '1st line
                 lSB.AppendLine(" .hru file Subbasin:" + lSubNum + " HRU:" + lHruNum + " Luse:" + lHruRow.Item(3) + " Soil: " + lHruRow.Item(4) + " Slope " + lHruRow.Item(5) + _
-                               " " + Date.Now.ToString + " ARCGIS-SWAT2003 interface MAVZ")
+                               " " + DateNowString + " ARCGIS-SWAT2003 interface MAVZ")
                 '2. HRU_FR
                 lSB.AppendLine(Format(lHruRow.Item(6), "0.0000000").PadLeft(16) + Space(4) + "| HRU_FR : Fraction of subbasin area contained in HRU")
                 '3. SLSUBBSN and so on....read comment

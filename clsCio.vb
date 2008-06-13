@@ -16,14 +16,14 @@ Partial Class SwatInput
             pSwatInput = aSwatInput
         End Sub
         Public Function Table() As DataTable
-            pSwatInput.Status("Reading CIO table from database ...")
+            pSwatInput.Status("Reading CIO from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM cio;")
         End Function
-        Public Sub Save(ByVal aPrintHRU As Boolean)
-            Dim lCIOTable As DataTable = Table()
-            pSwatInput.Status("Writing CIO table ...")
+        Public Sub Save(ByVal aPrintHRU As Boolean, Optional ByVal aTable As DataTable = Nothing)
+            If aTable Is Nothing Then aTable = Table()
+            pSwatInput.Status("Writing CIO text ...")
             Dim lSB As New System.Text.StringBuilder
-            Dim lCIORow As DataRow = lCIOTable.Rows(0)
+            Dim lCIORow As DataRow = aTable.Rows(0)
             If lCIORow Is Nothing Then
                 Throw New ApplicationException("Error in writing CIO file - Row Undefined")
             Else
@@ -33,7 +33,7 @@ Partial Class SwatInput
                 lSB.AppendLine("Master Watershed File: file.cio")
                 lSB.AppendLine("Project Description:")
                 lSB.AppendLine("General Input/Output section (file.cio):")
-                lSB.AppendLine(Date.Today.ToString & "ARCGIS-SWAT interface AV")
+                lSB.AppendLine(DateNowString & "ARCGIS-SWAT interface AV")
                 lSB.AppendLine("")
                 lSB.AppendLine("General Information/Watershed Configuration:")
                 lSB.AppendLine("fig.fig")

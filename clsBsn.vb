@@ -16,15 +16,16 @@ Partial Class SwatInput
             pSwatInput = aSwatInput
         End Sub
         Public Function Table() As DataTable
-            pSwatInput.Status("Reading BSN tables from database ...")
+            pSwatInput.Status("Reading BSN from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM bsn;")
         End Function
-        Public Sub Save()
-            Dim lBsnRow As DataRow = Table.Rows(0)
-            pSwatInput.Status("Writing BSN table ...")
+        Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
+            If aTable Is Nothing Then aTable = Table()
+            Dim lBsnRow As DataRow = aTable.Rows(0)
+            pSwatInput.Status("Writing BSN text ...")
 
             Dim lSB As New System.Text.StringBuilder
-            lSB.AppendLine("Basin data" + Space(10) + " .bsn file " & Date.Now.ToString & " ARCGIS-SWAT - SWAT interface")
+            lSB.AppendLine("Basin data" + Space(10) + " .bsn file " & DateNowString & " ARCGIS-SWAT - SWAT interface")
             lSB.AppendLine("Modeling Options: Land Area")
             lSB.AppendLine("Water Balance:")
             lSB.AppendLine(MakeString(lBsnRow.Item(1), 3, 4, 8) + "| SFTMP : Snowfall temperature [ºC]")
