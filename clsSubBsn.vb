@@ -67,7 +67,7 @@ Partial Class SwatInput
             If aTable Is Nothing Then aTable = Table()
             pSwatInput.Status("Writing SUB text ...")
 
-            Dim lLine As String
+            Dim lField As Integer
             For Each lRow As DataRow In aTable.Rows
                 Dim lSB As New System.Text.StringBuilder
                 Dim lSubNum As String = lRow.Item("SUBBASIN")
@@ -105,27 +105,24 @@ Partial Class SwatInput
                 lSB.AppendLine("Elevation Bands")
                 lSB.AppendLine("| ELEVB: Elevation at center of elevation bands [m]")
                 '---6.
-                lLine = ""
-                For i As Integer = 10 To 19
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 10 To 19
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---7. ELEVB_FR
                 lSB.AppendLine("| ELEVB_FR: Fraction of subbasin area within elevation band")
                 '---8.
-                lLine = ""
-                For i As Integer = 20 To 29
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 20 To 29
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---9. SNOEB
                 lSB.AppendLine("| SNOEB: Initial snow water content in elevation band [mm]")
                 '---10.
-                lLine = ""
-                For i As Integer = 30 To 39
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 30 To 39
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---11. PLAPS
                 lSB.AppendLine(Format(lRow.Item(40), "0.000").PadLeft(16) + Strings.StrDup(4, " ") + "| PLAPS : Precipitation lapse rate [mm/km]")
                 '---12. TLAPS
@@ -135,8 +132,7 @@ Partial Class SwatInput
 
                 '---14. CH_L1
                 lSB.AppendLine("Tributary Channels")
-                lLine = Format(lRow.Item(43), "0.000").PadLeft(16) + Strings.StrDup(4, " ") + "| CH_L1 : Longest tributary channel length [km]"
-                lSB.AppendLine(lLine)
+                lSB.AppendLine(Format(lRow.Item(43), "0.000").PadLeft(16) + Strings.StrDup(4, " ") + "| CH_L1 : Longest tributary channel length [km]")
                 '---15. CH_S1
                 lSB.AppendLine(Format(lRow.Item(44), "0.000").PadLeft(16) + Strings.StrDup(4, " ") + "| CH_S1 : Average slope of tributary channel [m/m]")
                 '---16. CH_W1
@@ -160,67 +156,59 @@ Partial Class SwatInput
                 '---20. RFINC
                 lSB.AppendLine("| RFINC:  Climate change monthly rainfall adjustment (January - June)")
                 '---21.
-                lLine = ""
-                For i As Integer = 49 To 54
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 49 To 54
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---22.
                 lSB.AppendLine("| RFINC:  Climate change monthly rainfall adjustment (July - December)")
                 '---23.
-                lLine = ""
-                For i As Integer = 55 To 60
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 55 To 60
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---24. TMPINC
                 lSB.AppendLine("| TMPINC: Climate change monthly temperature adjustment (January - June)")
                 '---25.
-                lLine = ""
-                For i As Integer = 61 To 66
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 61 To 66
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---26.
                 lSB.AppendLine("| TMPINC: Climate change monthly temperature adjustment (July - December)")
                 '---27.
-                lLine = ""
-                For i As Integer = 67 To 72
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 67 To 72
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---28. RADINC
                 lSB.AppendLine("| RADINC: Climate change monthly radiation adjustment (January - June)")
                 '---29.
-                lLine = ""
-                For i As Integer = 73 To 78
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 73 To 78
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---30.
                 lSB.AppendLine("| RADINC: Climate change monthly radiation adjustment (July - December)")
                 '---31.
-                lLine = ""
-                For i As Integer = 79 To 84
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 79 To 84
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---32. HUMINC
                 lSB.AppendLine("| HUMINC: Climate change monthly humidity adjustment (January - June)")
                 '---33.
-                lLine = ""
-                For i As Integer = 85 To 90
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 85 To 90
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---34.
                 lSB.AppendLine("| HUMINC: Climate change monthly humidity adjustment (July - December)")
                 '---35.
-                lLine = ""
-                For i As Integer = 91 To 96
-                    lLine = lLine + Format(lRow.Item(i), "0.000").PadLeft(8)
-                Next i
-                lSB.AppendLine(lLine)
+                For lField = 91 To 96
+                    lSB.Append(Format(lRow.Item(lField), "0.000").PadLeft(8))
+                Next
+                lSB.AppendLine()
                 '---36. HRU data files
                 lSB.AppendLine("| HRU data")
 
@@ -233,8 +221,7 @@ Partial Class SwatInput
                     lSB.AppendLine("")
                 Else
                     Dim lHruName As String = StringFnameHRUs(lSubNum, lRow.Item(98))
-                    lLine = lHruName + ".hru" + lHruName + ".mgt" + lHruName + ".sol" + lHruName + ".chm" + lHruName + ".gw"
-                    lSB.AppendLine(lLine)
+                    lSB.AppendLine(lHruName + ".hru" + lHruName + ".mgt" + lHruName + ".sol" + lHruName + ".chm" + lHruName + ".gw")
                 End If
                 lSB.AppendLine("Floodplain")
                 lSB.AppendLine("")
@@ -243,8 +230,8 @@ Partial Class SwatInput
                 lSB.AppendLine("HRU: General")
 
                 '---37.
-                For i As Integer = 1 To lRow.Item(97)
-                    Dim lHruName As String = StringFnameHRUs(lSubNum, i.ToString)
+                For lField = 1 To lRow.Item(97)
+                    Dim lHruName As String = StringFnameHRUs(lSubNum, lField.ToString)
                     lSB.AppendLine(lHruName + ".hru" + lHruName + ".mgt" + lHruName + ".sol" + lHruName + ".chm" + lHruName + ".gw")
                 Next
                 IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lSubName, lSB.ToString)

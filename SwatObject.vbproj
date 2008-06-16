@@ -62,6 +62,7 @@
     <Compile Include="clsCio.vb" />
     <Compile Include="clsHru.vb" />
     <Compile Include="clsSubBsn.vb" />
+    <Compile Include="clsSwq.vb" />
     <Compile Include="clsWgn.vb" />
     <Compile Include="clsWwq.vb" />
     <Compile Include="modUtility.vb" />
