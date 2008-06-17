@@ -66,6 +66,35 @@ Public Module modFile
     End Function
 
     ''' <summary>
+    ''' Copy a shape file (including all associated files: .shp, .shx, .dbf, .prj, .spx, .sbn, .xml, .shp.xml, .mwsr)
+    ''' Log any exceptions and return false rather than raising them
+    ''' </summary>
+    ''' <param name="aShapeFilename">full path and file name of shape file to copy (example: "C:\temp.shp")</param>
+    ''' <param name="aDestinationPath">full path of destination folder or file name 
+    ''' (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+    ''' <returns>True if all existing files were copied, False if an existing file could not be copied.</returns>
+    Public Function TryCopyShapefile(ByVal aShapeFilename As String, ByVal aDestinationPath As String) As Boolean
+        TryCopyShapefile = True
+        Dim lNewBaseName As String
+        If IO.Path.GetExtension(aDestinationPath).Length > 0 Then
+            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aDestinationPath)
+            aDestinationPath = IO.Path.GetDirectoryName(aDestinationPath)
+        Else
+            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aShapeFilename)
+        End If
+
+        aShapeFilename = IO.Path.ChangeExtension(aShapeFilename, "").TrimEnd(".")
+        aDestinationPath = IO.Path.Combine(aDestinationPath, lNewBaseName)
+
+        For Each lExtension As String In ShapeExtensions
+            Dim lFilename As String = aShapeFilename & lExtension
+            If FileExists(lFilename) AndAlso Not TryCopy(lFilename, aDestinationPath & lExtension) Then
+                TryCopyShapefile = False
+            End If
+        Next
+    End Function
+
+    ''' <summary>
     ''' Move a shape file (including all associated files: .shp, .shx, .dbf, .prj, .spx, .sbn, .xml, .shp.xml, .mwsr)
     ''' Log any exceptions and return false rather than raising them
     ''' </summary>
