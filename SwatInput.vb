@@ -1,4 +1,5 @@
 Imports System.Data.OleDb
+Imports MapWinUtility
 
 ''' <summary>
 ''' Class containing input needed for execution of SWAT2005 and methods to write text input files
@@ -56,16 +57,20 @@ Public Class SwatInput
     ''' </summary>
     ''' <param name="aSwatGDB"></param>
     ''' <param name="aOutGDB"></param>
-    ''' <param name="aOutputFolder"></param>
+    ''' <param name="aProjectFolder"></param>
     ''' <remarks>Opens database connections</remarks>
     Public Sub New(ByVal aSwatGDB As String, _
                    ByVal aOutGDB As String, _
-                   ByVal aOutputFolder As String)
+                   ByVal aProjectFolder As String)
+        If Not IO.File.Exists(aOutGDB) Then
+            BuildNewProject(aOutGDB, aProjectFolder)
+        End If
         Dim lCnSwatInput As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & aOutGDB)
         lCnSwatInput.Open()
+
         Dim lCnSwatParm As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & aSwatGDB)
         lCnSwatParm.Open()
-        Initialize(lCnSwatParm, lCnSwatInput, aOutputFolder, Nothing)
+        Initialize(lCnSwatParm, lCnSwatInput, aProjectFolder, Nothing)
         pNeedToClose = True
     End Sub
 
@@ -160,6 +165,82 @@ Public Class SwatInput
         End If
     End Sub
 #End Region
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aOutGDB"></param>
+    ''' <param name="aOutputFolder"></param>
+    ''' <returns></returns>
+    ''' <remarks>based on code from OpenSWAT</remarks>
+    Private Function BuildNewProject(ByVal aOutGDB As String, _
+                                     ByVal aOutputFolder As String) As Boolean
+
+        'SaveConFig.US_SoilsDatabasePath = System.IO.Path.GetDirectoryName(Trim(txtSWATGDB.Text)) & "\SWAT_US_Soils.mdb"
+
+        'First, try to create the project database... check if it's there first...
+        ' If Not System.IO.File.Exists(prjDBName) Then
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default") '
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\Scen")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\TablesIn")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\TablesOut")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\TxtInOut")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Grid")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Shapes")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Tables")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\text")
+        'end if
+
+        CreateAccessDatabase(aOutGDB, aOutputFolder)
+
+        'pSubWgn.TableCreate()
+        'pSubWgn.Add(1, 1, 1, 1, 1)
+
+        Return True
+    End Function
+    Private Function CreateAccessDatabase(ByVal DatabaseName As String, ByVal DatabaseFullPath As String) As Boolean
+        Dim bAns As Boolean
+        Dim conStr As String
+        Dim cat As New ADOX.Catalog()
+
+        Try
+
+            Dim DatabaseFullPathAndFile As String
+            DatabaseFullPathAndFile = DatabaseFullPath & "\" & DatabaseName
+            If IO.File.Exists(DatabaseFullPathAndFile) Then
+                IO.File.Delete(DatabaseFullPathAndFile)
+            End If
+            conStr = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & DatabaseFullPathAndFile
+            cat.Create(conStr)
+            bAns = True
+
+
+            'If DatabaseName = "RasterStore.mdb" Then
+            '    FindAndCreateFile(DatabaseFullPath, "rasterDBConfig.txt", conStr)
+            'Else
+            '    FindAndCreateFile(DatabaseFullPath, "prjDBConfig.txt", conStr)
+            'End If
+
+        Catch Excep As System.Runtime.InteropServices.COMException
+            bAns = False
+            Logger.Dbg(Excep.Message)
+        Finally
+            cat = Nothing
+        End Try
+        Return bAns
+    End Function
+    Private Function OpenADOConnection() As ADODB.Connection
+        'Open the connection
+        Dim lDataBaseName As String
+        With CnSwatInput.ConnectionString
+            lDataBaseName = .Substring(.IndexOf("Source=") + 8)
+        End With
+        Dim lConnection As New ADODB.Connection
+        lConnection.Open(lDataBaseName)
+        Return lConnection
+    End Function
 End Class
 
 

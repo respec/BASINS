@@ -11,6 +11,7 @@ Partial Class SwatInput
     ''' <remarks></remarks>
     Public Class clsHru
         Private pSwatInput As SwatInput
+        Private pTableName As String = "hru"
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
         End Sub
@@ -18,12 +19,7 @@ Partial Class SwatInput
             'based on mwSWATPlugIn:DBLayer:createHruTable
             Try
                 'Open the connection
-                Dim lDataBaseName As String
-                With pSwatInput.CnSwatInput.ConnectionString
-                    lDataBaseName = .Substring(.IndexOf("Source=") + 8)
-                End With
-                Dim lConnection As New ADODB.Connection
-                lConnection.Open(lDataBaseName)
+                Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
 
                 'Open the Catalog
                 Dim lCatalog As New ADOX.Catalog
@@ -31,7 +27,7 @@ Partial Class SwatInput
 
                 'Create the table
                 Dim lTable As New ADOX.Table
-                lTable.Name = "hru"
+                lTable.Name = pTableName
 
                 Dim lColumn As New ADOX.Column
                 With lColumn
@@ -86,8 +82,8 @@ Partial Class SwatInput
         End Function
 
         Public Function Table() As DataTable
-            pSwatInput.Status("Reading HRU from database ...")
-            Return pSwatInput.QueryInputDB("SELECT * FROM hru ORDER BY SUBBASIN, HRU;")
+            pSwatInput.Status("Reading " & pTableName & " from database ...")
+            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN, HRU;")
         End Function
 
         ''' <summary>
@@ -96,11 +92,11 @@ Partial Class SwatInput
         ''' <remarks></remarks>
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
-            pSwatInput.Status("Writing HRU text ...")
+            pSwatInput.Status("Writing " & pTableName & " text ...")
             For Each lHruRow As DataRow In aTable.Rows
                 Dim lSubNum As String = lHruRow.Item(1).ToString.Trim
                 Dim lHruNum As String = lHruRow.Item(2).ToString.Trim
-                Dim lHruName As String = StringFnameHRUs(lSubNum, lHruNum) + ".hru"
+                Dim lHruName As String = StringFnameHRUs(lSubNum, lHruNum) + "." & pTableName
                 Dim lSB As New System.Text.StringBuilder
                 '1st line
                 lSB.AppendLine(" .hru file Subbasin:" + lSubNum + " HRU:" + lHruNum + " Luse:" + lHruRow.Item(3) + " Soil: " + lHruRow.Item(4) + " Slope " + lHruRow.Item(5) + _
