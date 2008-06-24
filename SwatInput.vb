@@ -103,7 +103,21 @@ Public Class SwatInput
     ''' <returns>DataTable of query results</returns>
     ''' <remarks></remarks>
     Public Function QueryInputDB(ByVal aQuery As String) As DataTable
-        Dim lOleDbCommand As OleDbCommand = New OleDbCommand(aQuery, CnSwatInput)
+        Return QueryDB(aQuery, CnSwatInput)
+    End Function
+
+    ''' <summary>
+    ''' Generic routine to query the SWAT geodatabase
+    ''' </summary>
+    ''' <param name="aQuery">SQL query</param>
+    ''' <returns>DataTable of query results</returns>
+    ''' <remarks></remarks>
+    Public Function QueryGDB(ByVal aQuery As String) As DataTable
+        Return QueryDB(aQuery, CnSwatParm)
+    End Function
+
+    Private Function QueryDB(ByVal aQuery As String, ByVal aConnection As OleDbConnection) As DataTable
+        Dim lOleDbCommand As OleDbCommand = New OleDbCommand(aQuery, aConnection)
         lOleDbCommand.CommandTimeout = 30
         Dim lOleDbDataAdapter As New OleDbDataAdapter
         lOleDbDataAdapter.SelectCommand = lOleDbCommand
@@ -151,9 +165,9 @@ Public Class SwatInput
     Public Sub UpdateInputDB(ByVal aTableName As String, _
                              ByVal aIdFieldName As String, ByVal aId As Integer, _
                              ByVal aValueFieldName As String, ByVal aValue As String)
-        Dim lSQL As String = "UPDATE " & aTableName & _
-                             " SET " & aValueFieldName & " = " & aValue & _
-                             " WHERE " & aIdFieldName & " = " & aId
+        Dim lSQL As String = "UPDATE " & aTableName _
+                           & " SET " & aValueFieldName & " = " & aValue _
+                           & " WHERE " & aIdFieldName & " = " & aId
         Dim lUpdateCommand As OleDbCommand = New OleDbCommand(lSQL, CnSwatInput)
         lUpdateCommand.CommandTimeout = 30
         lUpdateCommand.ExecuteNonQuery()

@@ -12,9 +12,11 @@ Partial Class SwatInput
     Public Class clsHru
         Private pSwatInput As SwatInput
         Private pTableName As String = "hru"
+
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
         End Sub
+
         Public Function TableCreate() As Boolean
             'based on mwSWATPlugIn:DBLayer:createHruTable
             Try
@@ -29,8 +31,8 @@ Partial Class SwatInput
                 Dim lTable As New ADOX.Table
                 lTable.Name = pTableName
 
-                Dim lColumn As New ADOX.Column
-                With lColumn
+                Dim lKeyColumn As New ADOX.Column
+                With lKeyColumn
                     .Name = "OID"
                     .Type = ADOX.DataTypeEnum.adInteger
                     .ParentCatalog = lCatalog
@@ -38,7 +40,7 @@ Partial Class SwatInput
                 End With
 
                 With lTable.Columns
-                    .Append(lColumn)
+                    .Append(lKeyColumn)
                     .Append("SUBBASIN", ADOX.DataTypeEnum.adDouble)
                     .Append("HRU", ADOX.DataTypeEnum.adDouble)
                     .Append("LANDUSE", ADOX.DataTypeEnum.adVarWChar, 4)
@@ -68,7 +70,7 @@ Partial Class SwatInput
                     .Append("DEP_IMP", ADOX.DataTypeEnum.adInteger, 4)
                 End With
 
-                lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, "OID")
+                lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
                 lCatalog.Tables.Append(lTable)
                 lTable = Nothing
                 lCatalog = Nothing
@@ -94,38 +96,39 @@ Partial Class SwatInput
             If aTable Is Nothing Then aTable = Table()
             pSwatInput.Status("Writing " & pTableName & " text ...")
             For Each lHruRow As DataRow In aTable.Rows
-                Dim lSubNum As String = lHruRow.Item(1).ToString.Trim
+                Dim lSubBasin As String = lHruRow.Item(1).ToString.Trim
                 Dim lHruNum As String = lHruRow.Item(2).ToString.Trim
-                Dim lHruName As String = StringFnameHRUs(lSubNum, lHruNum) + "." & pTableName
+                Dim lHruName As String = StringFnameHRUs(lSubBasin, lHruNum) & "." & pTableName
                 Dim lSB As New System.Text.StringBuilder
                 '1st line
-                lSB.AppendLine(" .hru file Subbasin:" + lSubNum + " HRU:" + lHruNum + " Luse:" + lHruRow.Item(3) + " Soil: " + lHruRow.Item(4) + " Slope " + lHruRow.Item(5) + _
-                               " " + DateNowString + " ARCGIS-SWAT2003 interface MAVZ")
+                lSB.AppendLine(" .hru file Subbasin:" & lSubBasin & " HRU:" & lHruNum _
+                             & " Luse:" & lHruRow.Item(3) & " Soil: " & lHruRow.Item(4) & " Slope " & lHruRow.Item(5) _
+                             & " " & DateNowString() & " ARCGIS-SWAT2003 interface MAVZ")
                 '2. HRU_FR
-                lSB.AppendLine(Format(lHruRow.Item(6), "0.0000000").PadLeft(16) + Space(4) + "| HRU_FR : Fraction of subbasin area contained in HRU")
+                lSB.AppendLine(Format(lHruRow.Item(6), "0.0000000").PadLeft(16) & "    | HRU_FR : Fraction of subbasin area contained in HRU")
                 '3. SLSUBBSN and so on....read comment
-                lSB.AppendLine(Format(lHruRow.Item(7), "0.000").PadLeft(16) + Space(4) + "| SLSUBBSN : Average slope length [m]")
-                lSB.AppendLine(Format(lHruRow.Item(8), "0.000").PadLeft(16) + Space(4) + "| HRU_SLP : Average slope stepness [m/m]")
-                lSB.AppendLine(Format(lHruRow.Item(9), "0.000").PadLeft(16) + Space(4) + "| OV_N : Manning's ""n"" value for overland flow")
-                lSB.AppendLine(Format(lHruRow.Item(10), "0.000").PadLeft(16) + Space(4) + "| LAT_TTIME : Lateral flow travel time [days]")
-                lSB.AppendLine(Format(lHruRow.Item(11), "0.000").PadLeft(16) + Space(4) + "| LAT_SED : Sediment concentration in lateral flow and groundwater flow [mg/l]")
-                lSB.AppendLine(Format(lHruRow.Item(12), "0.000").PadLeft(16) + Space(4) + "| SLSOIL : Slope length for lateral subsurface flow [m]")
-                lSB.AppendLine(Format(lHruRow.Item(13), "0.000").PadLeft(16) + Space(4) + "| CANMX : Maximum canopy storage [mm]")
-                lSB.AppendLine(Format(lHruRow.Item(14), "0.000").PadLeft(16) + Space(4) + "| ESCO : Soil evaporation compensation factor")
-                lSB.AppendLine(Format(lHruRow.Item(15), "0.000").PadLeft(16) + Space(4) + "| EPCO : Plant uptake compensation factor")
-                lSB.AppendLine(Format(lHruRow.Item(16), "0.000").PadLeft(16) + Space(4) + "| RSDIN : Initial residue cover [kg/ha]")
-                lSB.AppendLine(Format(lHruRow.Item(17), "0.000").PadLeft(16) + Space(4) + "| ERORGN : Organic N enrichment ratio")
-                lSB.AppendLine(Format(lHruRow.Item(18), "0.000").PadLeft(16) + Space(4) + "| ERORGP : Organic P enrichment ratio")
-                lSB.AppendLine(Format(lHruRow.Item(19), "0.000").PadLeft(16) + Space(4) + "| POT_FR : Fraction of HRU are that drains into pothole")
-                lSB.AppendLine(Format(lHruRow.Item(20), "0.000").PadLeft(16) + Space(4) + "| FLD_FR : Fraction of HRU that drains into floodplain")
-                lSB.AppendLine(Format(lHruRow.Item(21), "0.000").PadLeft(16) + Space(4) + "| RIP_FR : Fraction of HRU that drains into riparian zone")
+                lSB.AppendLine(Format(lHruRow.Item(7), "0.000").PadLeft(16) & "    | SLSUBBSN : Average slope length [m]")
+                lSB.AppendLine(Format(lHruRow.Item(8), "0.000").PadLeft(16) & "    | HRU_SLP : Average slope stepness [m/m]")
+                lSB.AppendLine(Format(lHruRow.Item(9), "0.000").PadLeft(16) & "    | OV_N : Manning's ""n"" value for overland flow")
+                lSB.AppendLine(Format(lHruRow.Item(10), "0.000").PadLeft(16) & "    | LAT_TTIME : Lateral flow travel time [days]")
+                lSB.AppendLine(Format(lHruRow.Item(11), "0.000").PadLeft(16) & "    | LAT_SED : Sediment concentration in lateral flow and groundwater flow [mg/l]")
+                lSB.AppendLine(Format(lHruRow.Item(12), "0.000").PadLeft(16) & "    | SLSOIL : Slope length for lateral subsurface flow [m]")
+                lSB.AppendLine(Format(lHruRow.Item(13), "0.000").PadLeft(16) & "    | CANMX : Maximum canopy storage [mm]")
+                lSB.AppendLine(Format(lHruRow.Item(14), "0.000").PadLeft(16) & "    | ESCO : Soil evaporation compensation factor")
+                lSB.AppendLine(Format(lHruRow.Item(15), "0.000").PadLeft(16) & "    | EPCO : Plant uptake compensation factor")
+                lSB.AppendLine(Format(lHruRow.Item(16), "0.000").PadLeft(16) & "    | RSDIN : Initial residue cover [kg/ha]")
+                lSB.AppendLine(Format(lHruRow.Item(17), "0.000").PadLeft(16) & "    | ERORGN : Organic N enrichment ratio")
+                lSB.AppendLine(Format(lHruRow.Item(18), "0.000").PadLeft(16) & "    | ERORGP : Organic P enrichment ratio")
+                lSB.AppendLine(Format(lHruRow.Item(19), "0.000").PadLeft(16) & "    | POT_FR : Fraction of HRU are that drains into pothole")
+                lSB.AppendLine(Format(lHruRow.Item(20), "0.000").PadLeft(16) & "    | FLD_FR : Fraction of HRU that drains into floodplain")
+                lSB.AppendLine(Format(lHruRow.Item(21), "0.000").PadLeft(16) & "    | RIP_FR : Fraction of HRU that drains into riparian zone")
                 lSB.AppendLine("Special HRU: Pothole")
-                lSB.AppendLine(Format(lHruRow.Item(22), "0.000").PadLeft(16) + Space(4) + "| POT_TILE : Average daily outflow to main channel from tile flow [m3/s]")
-                lSB.AppendLine(Format(lHruRow.Item(23), "0.000").PadLeft(16) + Space(4) + "| POT_VOLX : Maximum volume of water stored in the pothole [104m3]")
-                lSB.AppendLine(Format(lHruRow.Item(24), "0.000").PadLeft(16) + Space(4) + "| POT_VOL : Initial volume of water stored in pothole [104m3]")
-                lSB.AppendLine(Format(lHruRow.Item(25), "0.000").PadLeft(16) + Space(4) + "| POT_NSED : Normal sediment concentration in pothole [mg/l]")
-                lSB.AppendLine(Format(lHruRow.Item(26), "0.000").PadLeft(16) + Space(4) + "| POT_NO3L : Nitrate decay rate in pothole [1/day]")
-                lSB.AppendLine(Format(lHruRow.Item(27), "0").PadLeft(16) + Space(4) + "| DEP_IMP : Depth to impervious layer in soil profile [mm]")
+                lSB.AppendLine(Format(lHruRow.Item(22), "0.000").PadLeft(16) & "    | POT_TILE : Average daily outflow to main channel from tile flow [m3/s]")
+                lSB.AppendLine(Format(lHruRow.Item(23), "0.000").PadLeft(16) & "    | POT_VOLX : Maximum volume of water stored in the pothole [104m3]")
+                lSB.AppendLine(Format(lHruRow.Item(24), "0.000").PadLeft(16) & "    | POT_VOL : Initial volume of water stored in pothole [104m3]")
+                lSB.AppendLine(Format(lHruRow.Item(25), "0.000").PadLeft(16) & "    | POT_NSED : Normal sediment concentration in pothole [mg/l]")
+                lSB.AppendLine(Format(lHruRow.Item(26), "0.000").PadLeft(16) & "    | POT_NO3L : Nitrate decay rate in pothole [1/day]")
+                lSB.AppendLine(Format(lHruRow.Item(27), "0").PadLeft(16) & "    | DEP_IMP : Depth to impervious layer in soil profile [mm]")
 
                 Dim lHruFileName As String = pSwatInput.OutputFolder & "\" & lHruName
                 IO.File.WriteAllText(lHruFileName, lSB.ToString)

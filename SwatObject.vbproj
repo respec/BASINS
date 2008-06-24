@@ -64,12 +64,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBsn.vb" />
+    <Compile Include="clsChm.vb" />
+    <Compile Include="clsGw.vb" />
     <Compile Include="clsMgt.vb" />
     <Compile Include="clsCio.vb" />
     <Compile Include="clsHru.vb" />
+    <Compile Include="clsPnd.vb" />
+    <Compile Include="clsRes.vb" />
+    <Compile Include="clsSol.vb" />
     <Compile Include="clsSubBsn.vb" />
     <Compile Include="clsSwq.vb" />
     <Compile Include="clsWgn.vb" />
+    <Compile Include="clsWus.vb" />
     <Compile Include="clsWwq.vb" />
     <Compile Include="modUtility.vb" />
     <Compile Include="clsRte.vb" />

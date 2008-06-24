@@ -13,9 +13,11 @@ Partial Class SwatInput
     Public Class clsWgn
         Private pSwatInput As SwatInput
         Private pTableName As String = "wgn"
+
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
         End Sub
+
         Public Function TableCreate() As Boolean
             'based on mwSWATPlugIn:DBLayer:createRTE
             Try
@@ -29,8 +31,8 @@ Partial Class SwatInput
                 Dim lTable As New ADOX.Table
                 lTable.Name = pTableName
 
-                Dim lColumn As New ADOX.Column
-                With lColumn
+                Dim lKeyColumn As New ADOX.Column
+                With lKeyColumn
                     .Name = "OID"
                     .Type = ADOX.DataTypeEnum.adInteger
                     .ParentCatalog = lCatalog
@@ -38,7 +40,7 @@ Partial Class SwatInput
                 End With
 
                 With lTable.Columns
-                    .Append(lColumn)
+                    .Append(lKeyColumn)
                     .Append("SUBBASIN", ADOX.DataTypeEnum.adInteger)
                     .Append("STATION", ADOX.DataTypeEnum.adVarWChar, 80)
                     .Append("WLATITUDE", ADOX.DataTypeEnum.adSingle)
@@ -229,7 +231,7 @@ Partial Class SwatInput
                     .Append("WNDAV12", ADOX.DataTypeEnum.adSingle)
                 End With
 
-                lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, "OID")
+                lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
                 lCatalog.Tables.Append(lTable)
                 lTable = Nothing
                 lCatalog = Nothing
@@ -418,14 +420,24 @@ Partial Class SwatInput
               ByVal WNDAV11 As Single, _
               ByVal WNDAV12 As Single)
 
-            ' set the SQL string
-            Dim lSQL As String = "INSERT INTO wgn( SUBBASIN , STATION , WLATITUDE , WLONGITUDE , WELEV , RAIN_YRS , TMPMX1 , TMPMX2 , TMPMX3 , TMPMX4 , TMPMX5 , TMPMX6 , TMPMX7 , TMPMX8 , TMPMX9 , TMPMX10 , TMPMX11 , TMPMX12 , TMPMN1 , TMPMN2 , TMPMN3 , TMPMN4 , TMPMN5 , TMPMN6 , TMPMN7 , TMPMN8 , TMPMN9 , TMPMN10 , TMPMN11 , TMPMN12 , TMPSTDMX1 , TMPSTDMX2 , TMPSTDMX3 , TMPSTDMX4 , TMPSTDMX5 , TMPSTDMX6 , TMPSTDMX7 , TMPSTDMX8 , TMPSTDMX9 , TMPSTDMX10 , TMPSTDMX11 , TMPSTDMX12 , TMPSTDMN1 , TMPSTDMN2 , TMPSTDMN3 , TMPSTDMN4 , TMPSTDMN5 , TMPSTDMN6 , TMPSTDMN7 , TMPSTDMN8 , TMPSTDMN9 , TMPSTDMN10 , TMPSTDMN11 , TMPSTDMN12 , PCPMM1 , PCPMM2 , PCPMM3 , PCPMM4 , PCPMM5 , PCPMM6 , PCPMM7 , PCPMM8 , PCPMM9 , PCPMM10 , PCPMM11 , PCPMM12 , PCPSTD1 , PCPSTD2 , PCPSTD3 , PCPSTD4 , PCPSTD5 , PCPSTD6 , PCPSTD7 , PCPSTD8 , PCPSTD9 , PCPSTD10 , PCPSTD11 , PCPSTD12 , PCPSKW1 , PCPSKW2 , PCPSKW3 , PCPSKW4 , PCPSKW5 , PCPSKW6 , PCPSKW7 , PCPSKW8 , PCPSKW9 , PCPSKW10 , PCPSKW11 , PCPSKW12 , PR_W1_1 , PR_W1_2 , PR_W1_3 , PR_W1_4 , PR_W1_5 , PR_W1_6 , PR_W1_7 , PR_W1_8 , PR_W1_9 , PR_W1_10 , PR_W1_11 , PR_W1_12 , PR_W2_1 , PR_W2_2 , PR_W2_3 , PR_W2_4 , PR_W2_5 , PR_W2_6 , PR_W2_7 , PR_W2_8 , PR_W2_9 , PR_W2_10 , PR_W2_11 , PR_W2_12 , PCPD1 , PCPD2 , PCPD3 , PCPD4 , PCPD5 , PCPD6 , PCPD7 , PCPD8 , PCPD9 , PCPD10 , PCPD11 , PCPD12 , RAINHHMX1 , RAINHHMX2 , RAINHHMX3 , RAINHHMX4 , RAINHHMX5 , RAINHHMX6 , RAINHHMX7 , RAINHHMX8 , RAINHHMX9 , RAINHHMX10 , RAINHHMX11 , RAINHHMX12 , SOLARAV1 , SOLARAV2 , SOLARAV3 , SOLARAV4 , SOLARAV5 , SOLARAV6 , SOLARAV7 , SOLARAV8 , SOLARAV9 , SOLARAV10 , SOLARAV11 , SOLARAV12 , DEWPT1 , DEWPT2 , DEWPT3 , DEWPT4 , DEWPT5 , DEWPT6 , DEWPT7 , DEWPT8 , DEWPT9 , DEWPT10 , DEWPT11 , DEWPT12 , WNDAV1 , WNDAV2 , WNDAV3 , WNDAV4 , WNDAV5 , WNDAV6 , WNDAV7 , WNDAV8 , WNDAV9 , WNDAV10 , WNDAV11 , WNDAV12  ) " & _
-            "Values ('" & SUBBASIN & "'  ,'" & STATION & "'  ,'" & WLATITUDE & "'  ,'" & WLONGITUDE & "'  ,'" & WELEV & "'  ,'" & RAIN_YRS & "'  ,'" & TMPMX1 & "'  ,'" & TMPMX2 & "'  ,'" & TMPMX3 & "'  ,'" & TMPMX4 & "'  ,'" & TMPMX5 & "'  ,'" & TMPMX6 & "'  ,'" & TMPMX7 & "'  ,'" & TMPMX8 & "'  ,'" & TMPMX9 & "'  ,'" & TMPMX10 & "'  ,'" & TMPMX11 & "'  ,'" & TMPMX12 & "'  ,'" & TMPMN1 & "'  ,'" & TMPMN2 & "'  ,'" & TMPMN3 & "'  ,'" & TMPMN4 & "'  ,'" & TMPMN5 & "'  ,'" & TMPMN6 & "'  ,'" & TMPMN7 & "'  ,'" & TMPMN8 & "'  ,'" & TMPMN9 & "'  ,'" & TMPMN10 & "'  ,'" & TMPMN11 & "'  ,'" & TMPMN12 & "'  ,'" & TMPSTDMX1 & "'  ,'" & TMPSTDMX2 & "'  ,'" & TMPSTDMX3 & "'  ,'" & TMPSTDMX4 & "'  ,'" & TMPSTDMX5 & "'  ,'" & TMPSTDMX6 & "'  ,'" & TMPSTDMX7 & "'  ,'" & TMPSTDMX8 & "'  ,'" & TMPSTDMX9 & "'  ,'" & TMPSTDMX10 & "'  ,'" & TMPSTDMX11 & "'  ,'" & TMPSTDMX12 & "'  ,'" & TMPSTDMN1 & "'  ,'" & TMPSTDMN2 & "'  ,'" & TMPSTDMN3 & "'  ,'" & TMPSTDMN4 & "'  ,'" & TMPSTDMN5 & "'  ,'" & TMPSTDMN6 & "'  ,'" & TMPSTDMN7 & "'  ,'" & TMPSTDMN8 & "'  ,'" & TMPSTDMN9 & "'  ,'" & TMPSTDMN10 & "'  ,'" & TMPSTDMN11 & "'  ,'" & TMPSTDMN12 & "'  ,'" & PCPMM1 & "'  ,'" & PCPMM2 & "'  ,'" & PCPMM3 & "'  ,'" & PCPMM4 & "'  ,'" & PCPMM5 & "'  ,'" & PCPMM6 & "'  ,'" & PCPMM7 & "'  ,'" & PCPMM8 & "'  ,'" & PCPMM9 & "'  ,'" & PCPMM10 & "'  ,'" & PCPMM11 & "'  ,'" & PCPMM12 & "'  ,'" & PCPSTD1 & "'  ,'" & PCPSTD2 & "'  ,'" & PCPSTD3 & "'  ,'" & PCPSTD4 & "'  ,'" & PCPSTD5 & "'  ,'" & PCPSTD6 & "'  ,'" & PCPSTD7 & "'  ,'" & PCPSTD8 & "'  ,'" & PCPSTD9 & "'  ,'" & PCPSTD10 & "'  ,'" & PCPSTD11 & "'  ,'" & PCPSTD12 & "'  ,'" & PCPSKW1 & "'  ,'" & PCPSKW2 & "'  ,'" & PCPSKW3 & "'  ,'" & PCPSKW4 & "'  ,'" & PCPSKW5 & "'  ,'" & PCPSKW6 & "'  ,'" & PCPSKW7 & "'  ,'" & PCPSKW8 & "'  ,'" & PCPSKW9 & "'  ,'" & PCPSKW10 & "'  ,'" & PCPSKW11 & "'  ,'" & PCPSKW12 & "'  ,'" & PR_W1_1 & "'  ,'" & PR_W1_2 & "'  ,'" & PR_W1_3 & "'  ,'" & PR_W1_4 & "'  ,'" & PR_W1_5 & "'  ,'" & PR_W1_6 & "'  ,'" & PR_W1_7 & "'  ,'" & PR_W1_8 & "'  ,'" & PR_W1_9 & "'  ,'" & PR_W1_10 & "'  ,'" & PR_W1_11 & "'  ,'" & PR_W1_12 & "'  ,'" & PR_W2_1 & "'  ,'" & PR_W2_2 & "'  ,'" & PR_W2_3 & "'  ,'" & PR_W2_4 & "'  ,'" & PR_W2_5 & "'  ,'" & PR_W2_6 & "'  ,'" & PR_W2_7 & "'  ,'" & PR_W2_8 & "'  ,'" & PR_W2_9 & "'  ,'" & PR_W2_10 & "'  ,'" & PR_W2_11 & "'  ,'" & PR_W2_12 & "'  ,'" & PCPD1 & "'  ,'" & PCPD2 & "'  ,'" & PCPD3 & "'  ,'" & PCPD4 & "'  ,'" & PCPD5 & "'  ,'" & PCPD6 & "'  ,'" & PCPD7 & "'  ,'" & PCPD8 & "'  ,'" & PCPD9 & "'  ,'" & PCPD10 & "'  ,'" & PCPD11 & "'  ,'" & PCPD12 & "'  ,'" & RAINHHMX1 & "'  ,'" & RAINHHMX2 & "'  ,'" & RAINHHMX3 & "'  ,'" & RAINHHMX4 & "'  ,'" & RAINHHMX5 & "'  ,'" & RAINHHMX6 & "'  ,'" & RAINHHMX7 & "'  ,'" & RAINHHMX8 & "'  ,'" & RAINHHMX9 & "'  ,'" & RAINHHMX10 & "'  ,'" & RAINHHMX11 & "'  ,'" & RAINHHMX12 & "'  ,'" & SOLARAV1 & "'  ,'" & SOLARAV2 & "'  ,'" & SOLARAV3 & "'  ,'" & SOLARAV4 & "'  ,'" & SOLARAV5 & "'  ,'" & SOLARAV6 & "'  ,'" & SOLARAV7 & "'  ,'" & SOLARAV8 & "'  ,'" & SOLARAV9 & "'  ,'" & SOLARAV10 & "'  ,'" & SOLARAV11 & "'  ,'" & SOLARAV12 & "'  ,'" & DEWPT1 & "'  ,'" & DEWPT2 & "'  ,'" & DEWPT3 & "'  ,'" & DEWPT4 & "'  ,'" & DEWPT5 & "'  ,'" & DEWPT6 & "'  ,'" & DEWPT7 & "'  ,'" & DEWPT8 & "'  ,'" & DEWPT9 & "'  ,'" & DEWPT10 & "'  ,'" & DEWPT11 & "'  ,'" & DEWPT12 & "'  ,'" & WNDAV1 & "'  ,'" & WNDAV2 & "'  ,'" & WNDAV3 & "'  ,'" & WNDAV4 & "'  ,'" & WNDAV5 & "'  ,'" & WNDAV6 & "'  ,'" & WNDAV7 & "'  ,'" & WNDAV8 & "'  ,'" & WNDAV9 & "'  ,'" & WNDAV10 & "'  ,'" & WNDAV11 & "'  ,'" & WNDAV12 & "'   )"
+            Dim lSQL As String = "INSERT INTO wgn( SUBBASIN , STATION , WLATITUDE , WLONGITUDE , WELEV , RAIN_YRS , TMPMX1 , TMPMX2 , TMPMX3 , TMPMX4 , TMPMX5 , TMPMX6 , TMPMX7 , TMPMX8 , TMPMX9 , TMPMX10 , TMPMX11 , TMPMX12 , TMPMN1 , TMPMN2 , TMPMN3 , TMPMN4 , TMPMN5 , TMPMN6 , TMPMN7 , TMPMN8 , TMPMN9 , TMPMN10 , TMPMN11 , TMPMN12 , TMPSTDMX1 , TMPSTDMX2 , TMPSTDMX3 , TMPSTDMX4 , TMPSTDMX5 , TMPSTDMX6 , TMPSTDMX7 , TMPSTDMX8 , TMPSTDMX9 , TMPSTDMX10 , TMPSTDMX11 , TMPSTDMX12 , TMPSTDMN1 , TMPSTDMN2 , TMPSTDMN3 , TMPSTDMN4 , TMPSTDMN5 , TMPSTDMN6 , TMPSTDMN7 , TMPSTDMN8 , TMPSTDMN9 , TMPSTDMN10 , TMPSTDMN11 , TMPSTDMN12 , PCPMM1 , PCPMM2 , PCPMM3 , PCPMM4 , PCPMM5 , PCPMM6 , PCPMM7 , PCPMM8 , PCPMM9 , PCPMM10 , PCPMM11 , PCPMM12 , PCPSTD1 , PCPSTD2 , PCPSTD3 , PCPSTD4 , PCPSTD5 , PCPSTD6 , PCPSTD7 , PCPSTD8 , PCPSTD9 , PCPSTD10 , PCPSTD11 , PCPSTD12 , PCPSKW1 , PCPSKW2 , PCPSKW3 , PCPSKW4 , PCPSKW5 , PCPSKW6 , PCPSKW7 , PCPSKW8 , PCPSKW9 , PCPSKW10 , PCPSKW11 , PCPSKW12 , PR_W1_1 , PR_W1_2 , PR_W1_3 , PR_W1_4 , PR_W1_5 , PR_W1_6 , PR_W1_7 , PR_W1_8 , PR_W1_9 , PR_W1_10 , PR_W1_11 , PR_W1_12 , PR_W2_1 , PR_W2_2 , PR_W2_3 , PR_W2_4 , PR_W2_5 , PR_W2_6 , PR_W2_7 , PR_W2_8 , PR_W2_9 , PR_W2_10 , PR_W2_11 , PR_W2_12 , PCPD1 , PCPD2 , PCPD3 , PCPD4 , PCPD5 , PCPD6 , PCPD7 , PCPD8 , PCPD9 , PCPD10 , PCPD11 , PCPD12 , RAINHHMX1 , RAINHHMX2 , RAINHHMX3 , RAINHHMX4 , RAINHHMX5 , RAINHHMX6 , RAINHHMX7 , RAINHHMX8 , RAINHHMX9 , RAINHHMX10 , RAINHHMX11 , RAINHHMX12 , SOLARAV1 , SOLARAV2 , SOLARAV3 , SOLARAV4 , SOLARAV5 , SOLARAV6 , SOLARAV7 , SOLARAV8 , SOLARAV9 , SOLARAV10 , SOLARAV11 , SOLARAV12 , DEWPT1 , DEWPT2 , DEWPT3 , DEWPT4 , DEWPT5 , DEWPT6 , DEWPT7 , DEWPT8 , DEWPT9 , DEWPT10 , DEWPT11 , DEWPT12 , WNDAV1 , WNDAV2 , WNDAV3 , WNDAV4 , WNDAV5 , WNDAV6 , WNDAV7 , WNDAV8 , WNDAV9 , WNDAV10 , WNDAV11 , WNDAV12  ) " _
+                & "Values ('" & SUBBASIN & "'  ,'" & STATION & "'  ,'" & WLATITUDE & "'  ,'" & WLONGITUDE & "'  ,'" & WELEV & "'  ,'" & RAIN_YRS & "'  ,'" _
+                & TMPMX1 & "'  ,'" & TMPMX2 & "'  ,'" & TMPMX3 & "'  ,'" & TMPMX4 & "'  ,'" & TMPMX5 & "'  ,'" & TMPMX6 & "'  ,'" & TMPMX7 & "'  ,'" & TMPMX8 & "'  ,'" & TMPMX9 & "'  ,'" & TMPMX10 & "'  ,'" & TMPMX11 & "'  ,'" & TMPMX12 & "'  ,'" _
+                & TMPMN1 & "'  ,'" & TMPMN2 & "'  ,'" & TMPMN3 & "'  ,'" & TMPMN4 & "'  ,'" & TMPMN5 & "'  ,'" & TMPMN6 & "'  ,'" & TMPMN7 & "'  ,'" & TMPMN8 & "'  ,'" & TMPMN9 & "'  ,'" & TMPMN10 & "'  ,'" & TMPMN11 & "'  ,'" & TMPMN12 & "'  ,'" _
+                & TMPSTDMX1 & "'  ,'" & TMPSTDMX2 & "'  ,'" & TMPSTDMX3 & "'  ,'" & TMPSTDMX4 & "'  ,'" & TMPSTDMX5 & "'  ,'" & TMPSTDMX6 & "'  ,'" & TMPSTDMX7 & "'  ,'" & TMPSTDMX8 & "'  ,'" & TMPSTDMX9 & "'  ,'" & TMPSTDMX10 & "'  ,'" & TMPSTDMX11 & "'  ,'" & TMPSTDMX12 & "'  ,'" _
+                & TMPSTDMN1 & "'  ,'" & TMPSTDMN2 & "'  ,'" & TMPSTDMN3 & "'  ,'" & TMPSTDMN4 & "'  ,'" & TMPSTDMN5 & "'  ,'" & TMPSTDMN6 & "'  ,'" & TMPSTDMN7 & "'  ,'" & TMPSTDMN8 & "'  ,'" & TMPSTDMN9 & "'  ,'" & TMPSTDMN10 & "'  ,'" & TMPSTDMN11 & "'  ,'" & TMPSTDMN12 & "'  ,'" _
+                & PCPMM1 & "'  ,'" & PCPMM2 & "'  ,'" & PCPMM3 & "'  ,'" & PCPMM4 & "'  ,'" & PCPMM5 & "'  ,'" & PCPMM6 & "'  ,'" & PCPMM7 & "'  ,'" & PCPMM8 & "'  ,'" & PCPMM9 & "'  ,'" & PCPMM10 & "'  ,'" & PCPMM11 & "'  ,'" & PCPMM12 & "'  ,'" _
+                & PCPSTD1 & "'  ,'" & PCPSTD2 & "'  ,'" & PCPSTD3 & "'  ,'" & PCPSTD4 & "'  ,'" & PCPSTD5 & "'  ,'" & PCPSTD6 & "'  ,'" & PCPSTD7 & "'  ,'" & PCPSTD8 & "'  ,'" & PCPSTD9 & "'  ,'" & PCPSTD10 & "'  ,'" & PCPSTD11 & "'  ,'" & PCPSTD12 & "'  ,'" _
+                & PCPSKW1 & "'  ,'" & PCPSKW2 & "'  ,'" & PCPSKW3 & "'  ,'" & PCPSKW4 & "'  ,'" & PCPSKW5 & "'  ,'" & PCPSKW6 & "'  ,'" & PCPSKW7 & "'  ,'" & PCPSKW8 & "'  ,'" & PCPSKW9 & "'  ,'" & PCPSKW10 & "'  ,'" & PCPSKW11 & "'  ,'" & PCPSKW12 & "'  ,'" _
+                & PR_W1_1 & "'  ,'" & PR_W1_2 & "'  ,'" & PR_W1_3 & "'  ,'" & PR_W1_4 & "'  ,'" & PR_W1_5 & "'  ,'" & PR_W1_6 & "'  ,'" & PR_W1_7 & "'  ,'" & PR_W1_8 & "'  ,'" & PR_W1_9 & "'  ,'" & PR_W1_10 & "'  ,'" & PR_W1_11 & "'  ,'" & PR_W1_12 & "'  ,'" _
+                & PR_W2_1 & "'  ,'" & PR_W2_2 & "'  ,'" & PR_W2_3 & "'  ,'" & PR_W2_4 & "'  ,'" & PR_W2_5 & "'  ,'" & PR_W2_6 & "'  ,'" & PR_W2_7 & "'  ,'" & PR_W2_8 & "'  ,'" & PR_W2_9 & "'  ,'" & PR_W2_10 & "'  ,'" & PR_W2_11 & "'  ,'" & PR_W2_12 & "'  ,'" _
+                & PCPD1 & "'  ,'" & PCPD2 & "'  ,'" & PCPD3 & "'  ,'" & PCPD4 & "'  ,'" & PCPD5 & "'  ,'" & PCPD6 & "'  ,'" & PCPD7 & "'  ,'" & PCPD8 & "'  ,'" & PCPD9 & "'  ,'" & PCPD10 & "'  ,'" & PCPD11 & "'  ,'" & PCPD12 & "'  ,'" _
+                & RAINHHMX1 & "'  ,'" & RAINHHMX2 & "'  ,'" & RAINHHMX3 & "'  ,'" & RAINHHMX4 & "'  ,'" & RAINHHMX5 & "'  ,'" & RAINHHMX6 & "'  ,'" & RAINHHMX7 & "'  ,'" & RAINHHMX8 & "'  ,'" & RAINHHMX9 & "'  ,'" & RAINHHMX10 & "'  ,'" & RAINHHMX11 & "'  ,'" & RAINHHMX12 & "'  ,'" _
+                & SOLARAV1 & "'  ,'" & SOLARAV2 & "'  ,'" & SOLARAV3 & "'  ,'" & SOLARAV4 & "'  ,'" & SOLARAV5 & "'  ,'" & SOLARAV6 & "'  ,'" & SOLARAV7 & "'  ,'" & SOLARAV8 & "'  ,'" & SOLARAV9 & "'  ,'" & SOLARAV10 & "'  ,'" & SOLARAV11 & "'  ,'" & SOLARAV12 & "'  ,'" _
+                & DEWPT1 & "'  ,'" & DEWPT2 & "'  ,'" & DEWPT3 & "'  ,'" & DEWPT4 & "'  ,'" & DEWPT5 & "'  ,'" & DEWPT6 & "'  ,'" & DEWPT7 & "'  ,'" & DEWPT8 & "'  ,'" & DEWPT9 & "'  ,'" & DEWPT10 & "'  ,'" & DEWPT11 & "'  ,'" & DEWPT12 & "'  ,'" _
+                & WNDAV1 & "'  ,'" & WNDAV2 & "'  ,'" & WNDAV3 & "'  ,'" & WNDAV4 & "'  ,'" & WNDAV5 & "'  ,'" & WNDAV6 & "'  ,'" & WNDAV7 & "'  ,'" & WNDAV8 & "'  ,'" & WNDAV9 & "'  ,'" & WNDAV10 & "'  ,'" & WNDAV11 & "'  ,'" & WNDAV12 & "'   )"
 
-            ' Create the Command and set its properties
             Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-
-            ' execute the command
             lCommand.ExecuteNonQuery()
         End Sub
 
@@ -433,101 +445,47 @@ Partial Class SwatInput
             pSwatInput.Status("Reading " & pTableName & " from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
+
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
             pSwatInput.Status("Writing " & pTableName & " text ...")
 
-            Dim i As Integer
-            Dim strSub As String
-
             For Each lRow As DataRow In aTable.Rows
-                strSub = lRow.Item("SUBBASIN")
+                Dim lSubBasin As String = lRow.Item("SUBBASIN")
 
-                Dim lSB As New System.Text.StringBuilder
-                '1st line
-                lSB.AppendLine(" .Wgn file Subbasin: " + strSub _
-                             + " STATION NAME:" + lRow.Item(("STATION")) + " " _
-                             + DateNowString() + " AVSWAT2003 -SWAT INTERFACE MAVZ")
-                lSB.AppendLine("  LATITUDE =" + Format(lRow.Item(("WLATITUDE")), "0.00").PadLeft(7) _
-                             + " LONGITUDE =" + Format(lRow.Item(("WLONGITUDE")), "0.00").PadLeft(7))
-                ' ----------------------- Line 3
-                lSB.AppendLine("  ELEV [m] =" + Format(lRow.Item(("WELEV")), "0.00").PadLeft(7))
-                ' ----------------------- Line 4
-                lSB.AppendLine("  RAIN_YRS =" + Format(lRow.Item(("RAIN_YRS")), "0.00").PadLeft(7))
-                ' ---------------------- Line 5
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("TMPMX" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next
-                ' ---------------------- Line 6
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("TMPMN" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next
-                ' ---------------------- Line 7
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("TMPSTDMX" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next
-                ' ---------------------- Line 8
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("TMPSTDMN" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next
-                ' ---------------------- Line 9
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("PCPMM" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next
-                ' ---------------------- Line 10
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("PCPSTD" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next
-                ' ---------------------- Line 11
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("PCPSKW" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                ' ---------------------- Line 12
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("PR_W1_" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                ' ---------------------- Line 13
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("PR_W2_" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                ' ---------------------- Line 14
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("PCPD" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                ' ---------------------- Line 15
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("RAINHHMX" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                ' ---------------------- Line 16
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("SOLARAV" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                ' ---------------------- Line 17
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("DEWPT" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                ' ---------------------- Line 18
-                lSB.AppendLine()
-                For i = 1 To 12
-                    lSB.Append(Format(lRow.Item(("WNDAV" & Trim(Str(i)))), "0.00").PadLeft(6))
-                Next i
-                lSB.AppendLine()
+                Dim lSB As New Text.StringBuilder
+                lSB.AppendLine(" .Wgn file Subbasin: " & lSubBasin _
+                             & " STATION NAME:" & lRow.Item(("STATION")) & " " _
+                             & DateNowString() & " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine("  LATITUDE =" & Format(lRow.Item(("WLATITUDE")), "0.00").PadLeft(7) _
+                             & " LONGITUDE =" & Format(lRow.Item(("WLONGITUDE")), "0.00").PadLeft(7))
+                lSB.AppendLine("  ELEV [m] =" & Format(lRow.Item(("WELEV")), "0.00").PadLeft(7))
+                lSB.AppendLine("  RAIN_YRS =" & Format(lRow.Item(("RAIN_YRS")), "0.00").PadLeft(7))
+                Append12(lSB, lRow, "TMPMX")
+                Append12(lSB, lRow, "TMPMN")
+                Append12(lSB, lRow, "TMPSTDMX")
+                Append12(lSB, lRow, "TMPSTDMN")
+                Append12(lSB, lRow, "PCPMM")
+                Append12(lSB, lRow, "PCPSTD")
+                Append12(lSB, lRow, "PCPSKW")
+                Append12(lSB, lRow, "PR_W1_")
+                Append12(lSB, lRow, "PR_W2_")
+                Append12(lSB, lRow, "PCPD")
+                Append12(lSB, lRow, "RAINHHMX")
+                Append12(lSB, lRow, "SOLARAV")
+                Append12(lSB, lRow, "DEWPT")
+                Append12(lSB, lRow, "WNDAV")
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & StringFname(strSub, pTableName), lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & StringFname(lSubBasin, pTableName), lSB.ToString)
             Next
-
         End Sub
+
+        Private Sub Append12(ByVal aSB As Text.StringBuilder, ByVal aRow As DataRow, ByVal aSection As String)
+            For i As Integer = 1 To 12
+                aSB.Append(Format(aRow.Item(aSection & i), "0.00").PadLeft(6))
+            Next
+            aSB.AppendLine()
+        End Sub
+
     End Class
 End Class

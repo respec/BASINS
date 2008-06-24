@@ -12,6 +12,7 @@ Partial Class SwatInput
 
     Public Class clsSwq
         Private pSwatInput As SwatInput
+        Private pTableName As String = "swq"
         Private pItemLabels() As String = {"", "", _
              "    | RS1:   Local algal settling rate in the reach at 20ºC [m/day]", _
              "    | RS2:   Benthic (sediment) source rate for dissolved phosphorus in the reach at 20ºC [mg dissolved P/[m2·day]]", _
@@ -40,39 +41,109 @@ Partial Class SwatInput
              "    | SEDPST_REA: Pesticide reaction coefficient in reach bed sediment [day-1]", _
              "    | SEDPST_BRY: Pesticide burial velocity in reach bed sediment [m/day]", _
              "    | SEDPST_ACT: Depth of active sediment layer for pesticide [m]"}
+
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
         End Sub
-        Public Function Table() As DataTable
-            pSwatInput.Status("Reading SWQ from database ...")
-            Return pSwatInput.QueryInputDB("SELECT * FROM swq ORDER BY SUBBASIN;")
+
+        Public Function TableCreate() As Boolean
+            'based on mwSWATPlugIn:DBLayer:createHruTable
+            Try
+                'Open the connection
+                Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
+
+                'Open the Catalog
+                Dim lCatalog As New ADOX.Catalog
+                lCatalog.ActiveConnection = lConnection
+
+                'Create the table
+                Dim lTable As New ADOX.Table
+                lTable.Name = pTableName
+
+                Dim lKeyColumn As New ADOX.Column
+                With lKeyColumn
+                    .Name = "OID"
+                    .Type = ADOX.DataTypeEnum.adInteger
+                    .ParentCatalog = lCatalog
+                    .Properties("AutoIncrement").Value = True
+                End With
+
+                With lTable.Columns
+                    .Append(lKeyColumn)
+                    .Append("SUBBASIN", ADOX.DataTypeEnum.adDouble)
+                    .Append("RS1", ADOX.DataTypeEnum.adSingle)
+                    .Append("RS2", ADOX.DataTypeEnum.adSingle)
+                    .Append("RS3", ADOX.DataTypeEnum.adSingle)
+                    .Append("RS4", ADOX.DataTypeEnum.adSingle)
+                    .Append("RS5", ADOX.DataTypeEnum.adSingle)
+                    .Append("RS6", ADOX.DataTypeEnum.adSingle)
+                    .Append("RS7", ADOX.DataTypeEnum.adSingle)
+                    .Append("RK1", ADOX.DataTypeEnum.adSingle)
+                    .Append("RK2", ADOX.DataTypeEnum.adSingle)
+                    .Append("RK3", ADOX.DataTypeEnum.adSingle)
+                    .Append("RK4", ADOX.DataTypeEnum.adSingle)
+                    .Append("RK5", ADOX.DataTypeEnum.adSingle)
+                    .Append("RK6", ADOX.DataTypeEnum.adSingle)
+                    .Append("BC1", ADOX.DataTypeEnum.adSingle)
+                    .Append("BC2", ADOX.DataTypeEnum.adSingle)
+                    .Append("BC3", ADOX.DataTypeEnum.adSingle)
+                    .Append("BC4", ADOX.DataTypeEnum.adSingle)
+                    .Append("CHPST_REA", ADOX.DataTypeEnum.adSingle)
+                    .Append("CHPST_VOL", ADOX.DataTypeEnum.adSingle)
+                    .Append("CHPST_KOC", ADOX.DataTypeEnum.adSingle)
+                    .Append("CHPST_STL", ADOX.DataTypeEnum.adSingle)
+                    .Append("CHPST_RSP", ADOX.DataTypeEnum.adSingle)
+                    .Append("CHPST_MIX", ADOX.DataTypeEnum.adSingle)
+                    .Append("SEDPST_CONC", ADOX.DataTypeEnum.adSingle)
+                    .Append("SEDPST_REA", ADOX.DataTypeEnum.adSingle)
+                    .Append("SEDPST_BRY", ADOX.DataTypeEnum.adSingle)
+                    .Append("SEDPST_ACT", ADOX.DataTypeEnum.adSingle)
+                End With
+
+                lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
+                lCatalog.Tables.Append(lTable)
+                lTable = Nothing
+                lCatalog = Nothing
+                lConnection.Close()
+                lConnection = Nothing
+                Return True
+            Catch lEx As ApplicationException
+                Debug.Print(lEx.Message)
+                Return False
+            End Try
         End Function
+
+        Public Function Table() As DataTable
+            pSwatInput.Status("Reading " & pTableName & " from database ...")
+            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN;")
+        End Function
+
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
-            pSwatInput.Status("Writing SWQ text ...")
+            pSwatInput.Status("Writing " & pTableName & " text ...")
             Dim lParam As Integer
 
             For Each lRow As DataRow In aTable.Rows
                 Dim lSB As New System.Text.StringBuilder
-                Dim lSubNum As String = lRow.Item("SUBBASIN")
+                Dim lSubBasin As String = lRow.Item("SUBBASIN")
 
                 '1st line
-                lSB.AppendLine(" .Swq file Subbasin: " + lSubNum + " " + DateNowString() + " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" .Swq file Subbasin: " & lSubBasin & " " & DateNowString() & " AVSWAT2003 -SWAT INTERFACE MAVZ")
                 lSB.AppendLine("Nutrient (QUAL2E parameters)")
 
                 For lParam = 2 To 18
-                    lSB.AppendLine(Format(lRow.Item(lParam), "0.000").PadLeft(16) + pItemLabels(lParam))
+                    lSB.AppendLine(Format(lRow.Item(lParam), "0.000").PadLeft(16) & pItemLabels(lParam))
                 Next
 
                 lSB.AppendLine("Pesticide Parameters:")
 
                 For lParam = 19 To 28
-                    lSB.AppendLine(Format(lRow.Item(lParam), "0.000").PadLeft(16) + pItemLabels(lParam))
+                    lSB.AppendLine(Format(lRow.Item(lParam), "0.000").PadLeft(16) & pItemLabels(lParam))
                 Next
 
-                Dim lTextfilename As String = pSwatInput.OutputFolder & "\" & StringFname(lSubNum, "swq")
-                IO.File.WriteAllText(lTextfilename, lSB.ToString)
-                ReplaceNonAscii(lTextfilename)
+                Dim lTextFilename As String = pSwatInput.OutputFolder & "\" & StringFname(lSubBasin, pTableName)
+                IO.File.WriteAllText(lTextFilename, lSB.ToString)
+                ReplaceNonAscii(lTextFilename)
             Next
         End Sub
     End Class

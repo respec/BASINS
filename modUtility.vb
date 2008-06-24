@@ -41,7 +41,7 @@ Module modUtility
         Else
             lBufthevalue = Space(lValue)
         End If
-        Return lBufthevalue + aValue.ToString + Space(aSpc)
+        Return lBufthevalue & aValue.ToString & Space(aSpc)
     End Function
 
     Friend Sub ReplaceNonAscii(ByVal aFilename As String)
