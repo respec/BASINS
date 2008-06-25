@@ -101,6 +101,122 @@ Partial Class SwatInput
             End Try
         End Function
 
+        Public Sub Add(ByVal SUBBASIN As Double, _
+                        ByVal SUB_KM As Double, _
+                        ByVal SUB_LAT As Double, _
+                        ByVal SUB_ELEV As Double, _
+                        ByVal IRGAGE As Long, _
+                        ByVal ITGAGE As Long, _
+                        ByVal ISGAGE As Long, _
+                        ByVal IHGAGE As Long, _
+                        ByVal IWGAGE As Long, _
+                        ByVal ELEVB1 As Single, _
+                        ByVal ELEVB2 As Single, _
+                        ByVal ELEVB3 As Single, _
+                        ByVal ELEVB4 As Single, _
+                        ByVal ELEVB5 As Single, _
+                        ByVal ELEVB6 As Single, _
+                        ByVal ELEVB7 As Single, _
+                        ByVal ELEVB8 As Single, _
+                        ByVal ELEVB9 As Single, _
+                        ByVal ELEVB10 As Single, _
+                        ByVal ELEVB_FR1 As Single, _
+                        ByVal ELEVB_FR2 As Single, _
+                        ByVal ELEVB_FR3 As Single, _
+                        ByVal ELEVB_FR4 As Single, _
+                        ByVal ELEVB_FR5 As Single, _
+                        ByVal ELEVB_FR6 As Single, _
+                        ByVal ELEVB_FR7 As Single, _
+                        ByVal ELEVB_FR8 As Single, _
+                        ByVal ELEVB_FR9 As Single, _
+                        ByVal ELEVB_FR10 As Single, _
+                        ByVal SNOEB1 As Single, _
+                        ByVal SNOEB2 As Single, _
+                        ByVal SNOEB3 As Single, _
+                        ByVal SNOEB4 As Single, _
+                        ByVal SNOEB5 As Single, _
+                        ByVal SNOEB6 As Single, _
+                        ByVal SNOEB7 As Single, _
+                        ByVal SNOEB8 As Single, _
+                        ByVal SNOEB9 As Single, _
+                        ByVal SNOEB10 As Single, _
+                        ByVal PLAPS As Single, _
+                        ByVal TLAPS As Single, _
+                        ByVal SNO_SUB As Single, _
+                        ByVal CH_L1 As Single, _
+                        ByVal CH_S1 As Single, _
+                        ByVal CH_W1 As Single, _
+                        ByVal CH_K1 As Single, _
+                        ByVal CH_N1 As Single, _
+                        ByVal CO2 As Single, _
+                        ByVal RFINC1 As Single, _
+                        ByVal RFINC2 As Single, _
+                        ByVal RFINC3 As Single, _
+                        ByVal RFINC4 As Single, _
+                        ByVal RFINC5 As Single, _
+                        ByVal RFINC6 As Single, _
+                        ByVal RFINC7 As Single, _
+                        ByVal RFINC8 As Single, _
+                        ByVal RFINC9 As Single, _
+                        ByVal RFINC10 As Single, _
+                        ByVal RFINC11 As Single, _
+                        ByVal RFINC12 As Single, _
+                        ByVal TMPINC1 As Single, _
+                        ByVal TMPINC2 As Single, _
+                        ByVal TMPINC3 As Single, _
+                        ByVal TMPINC4 As Single, _
+                        ByVal TMPINC5 As Single, _
+                        ByVal TMPINC6 As Single, _
+                        ByVal TMPINC7 As Single, _
+                        ByVal TMPINC8 As Single, _
+                        ByVal TMPINC9 As Single, _
+                        ByVal TMPINC10 As Single, _
+                        ByVal TMPINC11 As Single, _
+                        ByVal TMPINC12 As Single, _
+                        ByVal RADINC1 As Single, _
+                        ByVal RADINC2 As Single, _
+                        ByVal RADINC3 As Single, _
+                        ByVal RADINC4 As Single, _
+                        ByVal RADINC5 As Single, _
+                        ByVal RADINC6 As Single, _
+                        ByVal RADINC7 As Single, _
+                        ByVal RADINC8 As Single, _
+                        ByVal RADINC9 As Single, _
+                        ByVal RADINC10 As Single, _
+                        ByVal RADINC11 As Single, _
+                        ByVal RADINC12 As Single, _
+                        ByVal HUMINC1 As Single, _
+                        ByVal HUMINC2 As Single, _
+                        ByVal HUMINC3 As Single, _
+                        ByVal HUMINC4 As Single, _
+                        ByVal HUMINC5 As Single, _
+                        ByVal HUMINC6 As Single, _
+                        ByVal HUMINC7 As Single, _
+                        ByVal HUMINC8 As Single, _
+                        ByVal HUMINC9 As Single, _
+                        ByVal HUMINC10 As Single, _
+                        ByVal HUMINC11 As Single, _
+                        ByVal HUMINC12 As Single, _
+                        ByVal HRUTOT As Long, _
+                        ByVal IPOT As Long, _
+                        ByVal FCST_REG As Long)
+
+            Dim lSQL As String = "INSERT INTO sub ( SUBBASIN , SUB_KM , SUB_LAT , SUB_ELEV , IRGAGE , ITGAGE , ISGAGE , IHGAGE , IWGAGE , ELEVB1 , ELEVB2 , ELEVB3 , ELEVB4 , ELEVB5 , ELEVB6 , ELEVB7 , ELEVB8 , ELEVB9 , ELEVB10 , ELEVB_FR1 , ELEVB_FR2 , ELEVB_FR3 , ELEVB_FR4 , ELEVB_FR5 , ELEVB_FR6 , ELEVB_FR7 , ELEVB_FR8 , ELEVB_FR9 , ELEVB_FR10 , SNOEB1 , SNOEB2 , SNOEB3 , SNOEB4 , SNOEB5 , SNOEB6 , SNOEB7 , SNOEB8 , SNOEB9 , SNOEB10 , PLAPS , TLAPS , SNO_SUB , CH_L1 , CH_S1 , CH_W1 , CH_K1 , CH_N1 , CO2 , RFINC1 , RFINC2 , RFINC3 , RFINC4 , RFINC5 , RFINC6 , RFINC7 , RFINC8 , RFINC9 , RFINC10 , RFINC11 , RFINC12 , TMPINC1 , TMPINC2 , TMPINC3 , TMPINC4 , TMPINC5 , TMPINC6 , TMPINC7 , TMPINC8 , TMPINC9 , TMPINC10 , TMPINC11 , TMPINC12 , RADINC1 , RADINC2 , RADINC3 , RADINC4 , RADINC5 , RADINC6 , RADINC7 , RADINC8 , RADINC9 , RADINC10 , RADINC11 , RADINC12 , HUMINC1 , HUMINC2 , HUMINC3 , HUMINC4 , HUMINC5 , HUMINC6 , HUMINC7 , HUMINC8 , HUMINC9 , HUMINC10 , HUMINC11 , HUMINC12 , HRUTOT , IPOT , FCST_REG  ) " _
+                               & "Values ('" & SUBBASIN & "'  ,'" & SUB_KM & "'  ,'" & SUB_LAT & "'  ,'" & SUB_ELEV & "'  ,'" & IRGAGE & "'  ,'" & ITGAGE & "'  ,'" & ISGAGE & "'  ,'" & IHGAGE & "'  ,'" & IWGAGE & "'  ,'" _
+                               & ELEVB1 & "'  ,'" & ELEVB2 & "'  ,'" & ELEVB3 & "'  ,'" & ELEVB4 & "'  ,'" & ELEVB5 & "'  ,'" & ELEVB6 & "'  ,'" & ELEVB7 & "'  ,'" & ELEVB8 & "'  ,'" & ELEVB9 & "'  ,'" & ELEVB10 & "'  ,'" _
+                               & ELEVB_FR1 & "'  ,'" & ELEVB_FR2 & "'  ,'" & ELEVB_FR3 & "'  ,'" & ELEVB_FR4 & "'  ,'" & ELEVB_FR5 & "'  ,'" & ELEVB_FR6 & "'  ,'" & ELEVB_FR7 & "'  ,'" & ELEVB_FR8 & "'  ,'" & ELEVB_FR9 & "'  ,'" & ELEVB_FR10 & "'  ,'" _
+                               & SNOEB1 & "'  ,'" & SNOEB2 & "'  ,'" & SNOEB3 & "'  ,'" & SNOEB4 & "'  ,'" & SNOEB5 & "'  ,'" & SNOEB6 & "'  ,'" & SNOEB7 & "'  ,'" & SNOEB8 & "'  ,'" & SNOEB9 & "'  ,'" & SNOEB10 & "'  ,'" _
+                               & PLAPS & "'  ,'" & TLAPS & "'  ,'" & SNO_SUB & "'  ,'" & CH_L1 & "'  ,'" & CH_S1 & "'  ,'" & CH_W1 & "'  ,'" & CH_K1 & "'  ,'" & CH_N1 & "'  ,'" & CO2 & "'  ,'" _
+                               & RFINC1 & "'  ,'" & RFINC2 & "'  ,'" & RFINC3 & "'  ,'" & RFINC4 & "'  ,'" & RFINC5 & "'  ,'" & RFINC6 & "'  ,'" & RFINC7 & "'  ,'" & RFINC8 & "'  ,'" & RFINC9 & "'  ,'" & RFINC10 & "'  ,'" & RFINC11 & "'  ,'" & RFINC12 & "'  ,'" _
+                               & TMPINC1 & "'  ,'" & TMPINC2 & "'  ,'" & TMPINC3 & "'  ,'" & TMPINC4 & "'  ,'" & TMPINC5 & "'  ,'" & TMPINC6 & "'  ,'" & TMPINC7 & "'  ,'" & TMPINC8 & "'  ,'" & TMPINC9 & "'  ,'" & TMPINC10 & "'  ,'" & TMPINC11 & "'  ,'" & TMPINC12 & "'  ,'" _
+                               & RADINC1 & "'  ,'" & RADINC2 & "'  ,'" & RADINC3 & "'  ,'" & RADINC4 & "'  ,'" & RADINC5 & "'  ,'" & RADINC6 & "'  ,'" & RADINC7 & "'  ,'" & RADINC8 & "'  ,'" & RADINC9 & "'  ,'" & RADINC10 & "'  ,'" & RADINC11 & "'  ,'" & RADINC12 & "'  ,'" _
+                               & HUMINC1 & "'  ,'" & HUMINC2 & "'  ,'" & HUMINC3 & "'  ,'" & HUMINC4 & "'  ,'" & HUMINC5 & "'  ,'" & HUMINC6 & "'  ,'" & HUMINC7 & "'  ,'" & HUMINC8 & "'  ,'" & HUMINC9 & "'  ,'" & HUMINC10 & "'  ,'" & HUMINC11 & "'  ,'" & HUMINC12 & "'  ,'" _
+                               & HRUTOT & "'  ,'" & IPOT & "'  ,'" & FCST_REG & "'  )"
+
+            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+            lCommand.ExecuteNonQuery()
+        End Sub
+
         Public Function TableWithArea(ByVal aAggregationFieldName As String) As DataTable
             Dim lAggregationFromTable As DataTable
             Dim lAggregationField As Integer = pSwatInput.Hru.Table.Columns.IndexOf(aAggregationFieldName)

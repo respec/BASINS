@@ -68,27 +68,24 @@ Partial Class SwatInput
             End Try
         End Function
 
-        Sub Add(ByVal SUBBASIN As Long, _
-                ByVal CH_W2 As Single, _
-                ByVal CH_D As Single, _
-                ByVal CH_S2 As Single, _
-                ByVal CH_L2 As Single, _
-                ByVal CH_N2 As Single, _
-                ByVal CH_K2 As Single, _
-                ByVal CH_EROD As Single, _
-                ByVal CH_COV As Single, _
-                ByVal CH_WDR As Single, _
-                ByVal ALPHA_BNK As Single)
+        Public Sub Add(ByVal SUBBASIN As Long, _
+                       ByVal CH_W2 As Single, _
+                       ByVal CH_D As Single, _
+                       ByVal CH_S2 As Single, _
+                       ByVal CH_L2 As Single, _
+                       ByVal CH_N2 As Single, _
+                       ByVal CH_K2 As Single, _
+                       ByVal CH_EROD As Single, _
+                       ByVal CH_COV As Single, _
+                       ByVal CH_WDR As Single, _
+                       ByVal ALPHA_BNK As Single)
 
-            ' set the SQL string
             Dim lSQL As String = "INSERT INTO rte ( SUBBASIN , CH_W2 , CH_D , CH_S2 , CH_L2 , CH_N2 , CH_K2 , CH_EROD , CH_COV , CH_WDR , ALPHA_BNK   ) " _
                                & "Values ('" & SUBBASIN & "'  ,'" & CH_W2 & "'  ,'" & CH_D & "'  ,'" & CH_S2 & "'  ,'" _
                                & CH_L2 & "'  ,'" & CH_N2 & "'  ,'" & CH_K2 & "'  ,'" & CH_EROD & "'  ,'" & CH_COV & "'  ,'" _
                                & CH_WDR & "'  ,'" & ALPHA_BNK & "'  );"
 
-            ' Create the Command and set its properties
             Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            ' execute the command
             lCommand.ExecuteNonQuery()
         End Sub
 

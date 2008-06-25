@@ -83,6 +83,26 @@ Partial Class SwatInput
             End Try
         End Function
 
+        Public Sub Add(ByVal SUBBASIN As Double, _
+                       ByVal ARSUB As Double, _
+                       ByVal LANDUSE As String, _
+                       ByVal ARLU As Double, _
+                       ByVal SOIL As String, _
+                       ByVal ARSO As Double, _
+                       ByVal SLP As String, _
+                       ByVal ARSLP As Double, _
+                       ByVal SLOPE As Double, _
+                       ByVal UNIQUECOMB As String, _
+                       ByVal HRU_ID As Double)
+
+            Dim lSQL As String = "INSERT INTO hrus(  SUBBASIN, ARSUB , LANDUSE ,ARLU ,SOIL, ARSO, SLP ,ARSLP ,SLOPE,UNIQUECOMB, HRU_ID )" _
+                               & " VALUES ( '" & SUBBASIN & "'" & ",'" & ARSUB & "','" & LANDUSE & "','" & ARLU & "','" & SOIL & "' ,'" _
+                               & ARSO & "' ,'" & SLP & "','" & ARSLP & "','" & SLOPE & "','" & UNIQUECOMB & "' ,'" & HRU_ID & "' )"
+
+            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+            lCommand.ExecuteNonQuery()
+        End Sub
+
         Public Function Table() As DataTable
             pSwatInput.Status("Reading " & pTableName & " from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN, HRU;")
