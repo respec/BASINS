@@ -13,6 +13,49 @@ Partial Class SwatInput
     Public Class clsSubBsn
         Private pSwatInput As SwatInput
         Private pTableName As String = "sub"
+        'Private pFieldNames() As String = {"SUBBASIN", "SUB_KM", "SUB_LAT", "SUB_ELEV", "IRGAGE", "ITGAGE", "ISGAGE", "IHGAGE", "IWGAGE", _
+        '                                   "ELEVB1", "ELEVB2", "ELEVB3", "ELEVB4", "ELEVB5", "ELEVB6", "ELEVB7", "ELEVB8", "ELEVB9", "ELEVB10", _
+        '                                   "ELEVB_FR1", "ELEVB_FR2", "ELEVB_FR3", "ELEVB_FR4", "ELEVB_FR5", "ELEVB_FR6", "ELEVB_FR7", "ELEVB_FR8", "ELEVB_FR9", "ELEVB_FR10", _
+        '                                   "SNOEB1", "SNOEB2", "SNOEB3", "SNOEB4", "SNOEB5", "SNOEB6", "SNOEB7", "SNOEB8", "SNOEB9", "SNOEB10", _
+        '                                   "PLAPS", "TLAPS", "SNO_SUB", "CH_L1", "CH_S1", "CH_W1", "CH_K1", "CH_N1", "CO2", _
+        '                                   "RFINC1", "RFINC2", "RFINC3", "RFINC4", "RFINC5", "RFINC6", "RFINC7", "RFINC8", "RFINC9", "RFINC10", "RFINC11", "RFINC12", _
+        '                                   "TMPINC1", "TMPINC2", "TMPINC3", "TMPINC4", "TMPINC5", "TMPINC6", "TMPINC7", "TMPINC8", "TMPINC9", "TMPINC10", "TMPINC11", "TMPINC12", _
+        '                                   "RADINC1", "RADINC2", "RADINC3", "RADINC4", "RADINC5", "RADINC6", "RADINC7", "RADINC8", "RADINC9", "RADINC10", "RADINC11", "RADINC12", _
+        '                                   "HUMINC1", "HUMINC2", "HUMINC3", "HUMINC4", "HUMINC5", "HUMINC6", "HUMINC7", "HUMINC8", "HUMINC9", "HUMINC10", "HUMINC11", "HUMINC12", _
+        '                                   "HRUTOT", "IPOT", "FCST_REG"}
+
+        Private pFieldNames() As String = {"SUBBASIN", "SUB_KM", "SUB_LAT", "SUB_ELEV", "IRGAGE", "ITGAGE", "ISGAGE", "IHGAGE", "IWGAGE", _
+                                           "ELEVB", _
+                                           "ELEVB_FR", _
+                                           "SNOEB", _
+                                           "PLAPS", "TLAPS", "SNO_SUB", "CH_L1", "CH_S1", "CH_W1", "CH_K1", "CH_N1", "CO2", _
+                                           "RFINC", _
+                                           "TMPINC", _
+                                           "RADINC", _
+                                           "HUMINC", _
+                                           "HRUTOT", "IPOT", "FCST_REG"}
+
+        Private pFieldCounts() As Integer = {1, 1, 1, 1, 1, 1, 1, 1, 1, _
+                                   10, _
+                                   10, _
+                                   10, _
+                                   1, 1, 1, 1, 1, 1, 1, 1, 1, _
+                                   12, _
+                                   12, _
+                                   12, _
+                                   12, _
+                                   1, 1, 1}
+
+        Private pFieldTypes() As ADOX.DataTypeEnum = {ADOX.DataTypeEnum.adDouble, ADOX.DataTypeEnum.adDouble, ADOX.DataTypeEnum.adDouble, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adDouble, _
+                                   ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adSingle, _
+                                   ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger}
 
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
@@ -40,52 +83,21 @@ Partial Class SwatInput
                     .Properties("AutoIncrement").Value = True
                 End With
 
-                Dim i As Integer
-
                 With lTable.Columns
                     .Append(lKeyColumn)
-                    .Append("SUBBASIN", ADOX.DataTypeEnum.adDouble)
-                    .Append("SUB_KM", ADOX.DataTypeEnum.adDouble)
-                    .Append("SUB_LAT", ADOX.DataTypeEnum.adDouble)
-                    .Append("SUB_ELEV", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("IRGAGE", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("ITGAGE", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("ISGAGE", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("IHGAGE", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("IWGAGE", ADOX.DataTypeEnum.adDouble)
-                    For i = 1 To 10
-                        .Append("ELEVB" & i, ADOX.DataTypeEnum.adSingle)
+                    Dim lFieldNum As Integer = 0
+                    For Each lFieldName As String In pFieldNames
+                        For lSameNameFieldIndex As Integer = 1 To pFieldCounts(lFieldNum)
+                            Dim lUseName As String = lFieldName
+                            If pFieldCounts(lFieldNum) > 1 Then lUseName &= lSameNameFieldIndex
+                            If pFieldTypes(lFieldNum) = ADOX.DataTypeEnum.adInteger Then
+                                .Append(lUseName, pFieldTypes(lFieldNum), 4)
+                            Else
+                                .Append(lUseName, pFieldTypes(lFieldNum))
+                            End If
+                        Next
+                        lFieldNum += 1
                     Next
-                    For i = 1 To 10
-                        .Append("ELEVB_FR" & i, ADOX.DataTypeEnum.adSingle)
-                    Next
-                    For i = 1 To 10
-                        .Append("SNOEB" & i, ADOX.DataTypeEnum.adSingle)
-                    Next
-                    .Append("PLAPS", ADOX.DataTypeEnum.adSingle)
-                    .Append("TLAPS", ADOX.DataTypeEnum.adSingle)
-                    .Append("SNO_SUB", ADOX.DataTypeEnum.adSingle)
-                    .Append("CH_L1", ADOX.DataTypeEnum.adSingle)
-                    .Append("CH_S1", ADOX.DataTypeEnum.adSingle)
-                    .Append("CH_W1", ADOX.DataTypeEnum.adSingle)
-                    .Append("CH_K1", ADOX.DataTypeEnum.adSingle)
-                    .Append("CH_N1", ADOX.DataTypeEnum.adSingle)
-                    .Append("CO2", ADOX.DataTypeEnum.adSingle)
-                    For i = 1 To 12
-                        .Append("RFINC" & i, ADOX.DataTypeEnum.adSingle)
-                    Next
-                    For i = 1 To 12
-                        .Append("TMPINC" & i, ADOX.DataTypeEnum.adSingle)
-                    Next
-                    For i = 1 To 12
-                        .Append("RADINC" & i, ADOX.DataTypeEnum.adSingle)
-                    Next
-                    For i = 1 To 12
-                        .Append("HUMINC" & i, ADOX.DataTypeEnum.adSingle)
-                    Next
-                    .Append("HRUTOT", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("IPOT", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("FCST_REG", ADOX.DataTypeEnum.adInteger, 4)
                 End With
 
                 lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
@@ -100,6 +112,47 @@ Partial Class SwatInput
                 Return False
             End Try
         End Function
+
+        Public Sub Add(ByVal SUBBASIN As Double, _
+                        ByVal SUB_KM As Double, _
+                        ByVal SUB_LAT As Double, _
+                        ByVal SUB_ELEV As Double, _
+                        ByVal IRGAGE As Long, _
+                        ByVal ITGAGE As Long, _
+                        ByVal ISGAGE As Long, _
+                        ByVal IHGAGE As Long, _
+                        ByVal IWGAGE As Long, _
+                        ByVal ELEVB() As Single, _
+                        ByVal ELEVB_FR() As Single, _
+                        ByVal SNOEB() As Single, _
+                        ByVal PLAPS As Single, _
+                        ByVal TLAPS As Single, _
+                        ByVal SNO_SUB As Single, _
+                        ByVal CH_L1 As Single, _
+                        ByVal CH_S1 As Single, _
+                        ByVal CH_W1 As Single, _
+                        ByVal CH_K1 As Single, _
+                        ByVal CH_N1 As Single, _
+                        ByVal CO2 As Single, _
+                        ByVal RFINC() As Single, _
+                        ByVal TMPINC() As Single, _
+                        ByVal RADINC() As Single, _
+                        ByVal HUMINC() As Single, _
+                        ByVal HRUTOT As Long, _
+                        ByVal IPOT As Long, _
+                        ByVal FCST_REG As Long)
+
+            Me.Add(SUBBASIN, SUB_KM, SUB_LAT, SUB_ELEV, IRGAGE, ITGAGE, ISGAGE, IHGAGE, IWGAGE, _
+                   ELEVB(0), ELEVB(1), ELEVB(2), ELEVB(3), ELEVB(4), ELEVB(5), ELEVB(6), ELEVB(7), ELEVB(8), ELEVB(9), _
+                   ELEVB_FR(0), ELEVB_FR(1), ELEVB_FR(2), ELEVB_FR(3), ELEVB_FR(4), ELEVB_FR(5), ELEVB_FR(6), ELEVB_FR(7), ELEVB_FR(8), ELEVB_FR(9), _
+                   SNOEB(0), SNOEB(1), SNOEB(2), SNOEB(3), SNOEB(4), SNOEB(5), SNOEB(6), SNOEB(7), SNOEB(8), SNOEB(9), _
+                   PLAPS, TLAPS, SNO_SUB, CH_L1, CH_S1, CH_W1, CH_K1, CH_N1, CO2, _
+                   RFINC(0), RFINC(1), RFINC(2), RFINC(3), RFINC(4), RFINC(5), RFINC(6), RFINC(7), RFINC(8), RFINC(9), RFINC(10), RFINC(11), _
+                   TMPINC(0), TMPINC(1), TMPINC(2), TMPINC(3), TMPINC(4), TMPINC(5), TMPINC(6), TMPINC(7), TMPINC(8), TMPINC(9), TMPINC(10), TMPINC(11), _
+                   RADINC(0), RADINC(1), RADINC(2), RADINC(3), RADINC(4), RADINC(5), RADINC(6), RADINC(7), RADINC(8), RADINC(9), RADINC(10), RADINC(11), _
+                   HUMINC(0), HUMINC(1), HUMINC(2), HUMINC(3), HUMINC(4), HUMINC(5), HUMINC(6), HUMINC(7), HUMINC(8), HUMINC(9), HUMINC(10), HUMINC(11), _
+                   HRUTOT, IPOT, FCST_REG)
+        End Sub
 
         Public Sub Add(ByVal SUBBASIN As Double, _
                         ByVal SUB_KM As Double, _
@@ -201,17 +254,27 @@ Partial Class SwatInput
                         ByVal IPOT As Long, _
                         ByVal FCST_REG As Long)
 
-            Dim lSQL As String = "INSERT INTO sub ( SUBBASIN , SUB_KM , SUB_LAT , SUB_ELEV , IRGAGE , ITGAGE , ISGAGE , IHGAGE , IWGAGE , ELEVB1 , ELEVB2 , ELEVB3 , ELEVB4 , ELEVB5 , ELEVB6 , ELEVB7 , ELEVB8 , ELEVB9 , ELEVB10 , ELEVB_FR1 , ELEVB_FR2 , ELEVB_FR3 , ELEVB_FR4 , ELEVB_FR5 , ELEVB_FR6 , ELEVB_FR7 , ELEVB_FR8 , ELEVB_FR9 , ELEVB_FR10 , SNOEB1 , SNOEB2 , SNOEB3 , SNOEB4 , SNOEB5 , SNOEB6 , SNOEB7 , SNOEB8 , SNOEB9 , SNOEB10 , PLAPS , TLAPS , SNO_SUB , CH_L1 , CH_S1 , CH_W1 , CH_K1 , CH_N1 , CO2 , RFINC1 , RFINC2 , RFINC3 , RFINC4 , RFINC5 , RFINC6 , RFINC7 , RFINC8 , RFINC9 , RFINC10 , RFINC11 , RFINC12 , TMPINC1 , TMPINC2 , TMPINC3 , TMPINC4 , TMPINC5 , TMPINC6 , TMPINC7 , TMPINC8 , TMPINC9 , TMPINC10 , TMPINC11 , TMPINC12 , RADINC1 , RADINC2 , RADINC3 , RADINC4 , RADINC5 , RADINC6 , RADINC7 , RADINC8 , RADINC9 , RADINC10 , RADINC11 , RADINC12 , HUMINC1 , HUMINC2 , HUMINC3 , HUMINC4 , HUMINC5 , HUMINC6 , HUMINC7 , HUMINC8 , HUMINC9 , HUMINC10 , HUMINC11 , HUMINC12 , HRUTOT , IPOT , FCST_REG  ) " _
-                               & "Values ('" & SUBBASIN & "'  ,'" & SUB_KM & "'  ,'" & SUB_LAT & "'  ,'" & SUB_ELEV & "'  ,'" & IRGAGE & "'  ,'" & ITGAGE & "'  ,'" & ISGAGE & "'  ,'" & IHGAGE & "'  ,'" & IWGAGE & "'  ,'" _
-                               & ELEVB1 & "'  ,'" & ELEVB2 & "'  ,'" & ELEVB3 & "'  ,'" & ELEVB4 & "'  ,'" & ELEVB5 & "'  ,'" & ELEVB6 & "'  ,'" & ELEVB7 & "'  ,'" & ELEVB8 & "'  ,'" & ELEVB9 & "'  ,'" & ELEVB10 & "'  ,'" _
-                               & ELEVB_FR1 & "'  ,'" & ELEVB_FR2 & "'  ,'" & ELEVB_FR3 & "'  ,'" & ELEVB_FR4 & "'  ,'" & ELEVB_FR5 & "'  ,'" & ELEVB_FR6 & "'  ,'" & ELEVB_FR7 & "'  ,'" & ELEVB_FR8 & "'  ,'" & ELEVB_FR9 & "'  ,'" & ELEVB_FR10 & "'  ,'" _
-                               & SNOEB1 & "'  ,'" & SNOEB2 & "'  ,'" & SNOEB3 & "'  ,'" & SNOEB4 & "'  ,'" & SNOEB5 & "'  ,'" & SNOEB6 & "'  ,'" & SNOEB7 & "'  ,'" & SNOEB8 & "'  ,'" & SNOEB9 & "'  ,'" & SNOEB10 & "'  ,'" _
-                               & PLAPS & "'  ,'" & TLAPS & "'  ,'" & SNO_SUB & "'  ,'" & CH_L1 & "'  ,'" & CH_S1 & "'  ,'" & CH_W1 & "'  ,'" & CH_K1 & "'  ,'" & CH_N1 & "'  ,'" & CO2 & "'  ,'" _
-                               & RFINC1 & "'  ,'" & RFINC2 & "'  ,'" & RFINC3 & "'  ,'" & RFINC4 & "'  ,'" & RFINC5 & "'  ,'" & RFINC6 & "'  ,'" & RFINC7 & "'  ,'" & RFINC8 & "'  ,'" & RFINC9 & "'  ,'" & RFINC10 & "'  ,'" & RFINC11 & "'  ,'" & RFINC12 & "'  ,'" _
-                               & TMPINC1 & "'  ,'" & TMPINC2 & "'  ,'" & TMPINC3 & "'  ,'" & TMPINC4 & "'  ,'" & TMPINC5 & "'  ,'" & TMPINC6 & "'  ,'" & TMPINC7 & "'  ,'" & TMPINC8 & "'  ,'" & TMPINC9 & "'  ,'" & TMPINC10 & "'  ,'" & TMPINC11 & "'  ,'" & TMPINC12 & "'  ,'" _
-                               & RADINC1 & "'  ,'" & RADINC2 & "'  ,'" & RADINC3 & "'  ,'" & RADINC4 & "'  ,'" & RADINC5 & "'  ,'" & RADINC6 & "'  ,'" & RADINC7 & "'  ,'" & RADINC8 & "'  ,'" & RADINC9 & "'  ,'" & RADINC10 & "'  ,'" & RADINC11 & "'  ,'" & RADINC12 & "'  ,'" _
-                               & HUMINC1 & "'  ,'" & HUMINC2 & "'  ,'" & HUMINC3 & "'  ,'" & HUMINC4 & "'  ,'" & HUMINC5 & "'  ,'" & HUMINC6 & "'  ,'" & HUMINC7 & "'  ,'" & HUMINC8 & "'  ,'" & HUMINC9 & "'  ,'" & HUMINC10 & "'  ,'" & HUMINC11 & "'  ,'" & HUMINC12 & "'  ,'" _
-                               & HRUTOT & "'  ,'" & IPOT & "'  ,'" & FCST_REG & "'  )"
+            Dim lSQL As String = "INSERT INTO sub ( "
+            Dim lFieldNum As Integer = 0
+            For Each lFieldName As String In pFieldNames
+                For lSameNameFieldIndex As Integer = 1 To pFieldCounts(lFieldNum)
+                    Dim lUseName As String = lFieldName
+                    If pFieldCounts(lFieldNum) > 1 Then lUseName &= lSameNameFieldIndex
+                    lSQL &= lUseName & ", "
+                Next
+                lFieldNum += 1
+            Next
+            lSQL = lSQL.Substring(0, lSQL.Length - 2) & " ) Values (" _
+                 & "'" & SUBBASIN & "' ,'" & SUB_KM & "' ,'" & SUB_LAT & "' ,'" & SUB_ELEV & "' ,'" & IRGAGE & "' ,'" & ITGAGE & "' ,'" & ISGAGE & "' ,'" & IHGAGE & "' ,'" & IWGAGE & "' ,'" _
+                 & ELEVB1 & "' ,'" & ELEVB2 & "' ,'" & ELEVB3 & "' ,'" & ELEVB4 & "' ,'" & ELEVB5 & "' ,'" & ELEVB6 & "' ,'" & ELEVB7 & "' ,'" & ELEVB8 & "' ,'" & ELEVB9 & "' ,'" & ELEVB10 & "' ,'" _
+                 & ELEVB_FR1 & "' ,'" & ELEVB_FR2 & "' ,'" & ELEVB_FR3 & "' ,'" & ELEVB_FR4 & "' ,'" & ELEVB_FR5 & "' ,'" & ELEVB_FR6 & "' ,'" & ELEVB_FR7 & "' ,'" & ELEVB_FR8 & "' ,'" & ELEVB_FR9 & "' ,'" & ELEVB_FR10 & "' ,'" _
+                 & SNOEB1 & "' ,'" & SNOEB2 & "' ,'" & SNOEB3 & "' ,'" & SNOEB4 & "' ,'" & SNOEB5 & "' ,'" & SNOEB6 & "' ,'" & SNOEB7 & "' ,'" & SNOEB8 & "' ,'" & SNOEB9 & "' ,'" & SNOEB10 & "' ,'" _
+                 & PLAPS & "' ,'" & TLAPS & "' ,'" & SNO_SUB & "' ,'" & CH_L1 & "' ,'" & CH_S1 & "' ,'" & CH_W1 & "' ,'" & CH_K1 & "' ,'" & CH_N1 & "' ,'" & CO2 & "' ,'" _
+                 & RFINC1 & "' ,'" & RFINC2 & "' ,'" & RFINC3 & "' ,'" & RFINC4 & "' ,'" & RFINC5 & "' ,'" & RFINC6 & "' ,'" & RFINC7 & "' ,'" & RFINC8 & "' ,'" & RFINC9 & "' ,'" & RFINC10 & "' ,'" & RFINC11 & "' ,'" & RFINC12 & "' ,'" _
+                 & TMPINC1 & "' ,'" & TMPINC2 & "' ,'" & TMPINC3 & "' ,'" & TMPINC4 & "' ,'" & TMPINC5 & "' ,'" & TMPINC6 & "' ,'" & TMPINC7 & "' ,'" & TMPINC8 & "' ,'" & TMPINC9 & "' ,'" & TMPINC10 & "' ,'" & TMPINC11 & "' ,'" & TMPINC12 & "' ,'" _
+                 & RADINC1 & "' ,'" & RADINC2 & "' ,'" & RADINC3 & "' ,'" & RADINC4 & "' ,'" & RADINC5 & "' ,'" & RADINC6 & "' ,'" & RADINC7 & "' ,'" & RADINC8 & "' ,'" & RADINC9 & "' ,'" & RADINC10 & "' ,'" & RADINC11 & "' ,'" & RADINC12 & "' ,'" _
+                 & HUMINC1 & "' ,'" & HUMINC2 & "' ,'" & HUMINC3 & "' ,'" & HUMINC4 & "' ,'" & HUMINC5 & "' ,'" & HUMINC6 & "' ,'" & HUMINC7 & "' ,'" & HUMINC8 & "' ,'" & HUMINC9 & "' ,'" & HUMINC10 & "' ,'" & HUMINC11 & "' ,'" & HUMINC12 & "' ,'" _
+                 & HRUTOT & "' ,'" & IPOT & "' ,'" & FCST_REG & "'  )"
 
             Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
             lCommand.ExecuteNonQuery()
