@@ -1,5 +1,6 @@
 Imports System.Data.OleDb
 Imports MapWinUtility
+Imports atcUtility
 
 ''' <summary>
 ''' Class containing input needed for execution of SWAT2005 and methods to write text input files
@@ -214,45 +215,37 @@ Public Class SwatInput
 
         Return True
     End Function
-    Private Function CreateAccessDatabase(ByVal DatabaseName As String, ByVal DatabaseFullPath As String) As Boolean
-        Dim bAns As Boolean
-        Dim conStr As String
-        Dim cat As New ADOX.Catalog()
 
+    Private Function CreateAccessDatabase(ByVal aDatabaseName As String, ByVal aDatabaseFullPath As String) As Boolean
+        Dim lResult As Boolean
         Try
+            Dim lConnectionString As String
+            Dim lCatalog As New ADOX.Catalog()
 
-            Dim DatabaseFullPathAndFile As String
-            DatabaseFullPathAndFile = DatabaseFullPath & "\" & DatabaseName
-            If IO.File.Exists(DatabaseFullPathAndFile) Then
-                IO.File.Delete(DatabaseFullPathAndFile)
+            Dim lDatabaseFullPathAndFile As String = IO.Path.Combine(aDatabaseFullPath, aDatabaseName)
+            If IO.File.Exists(lDatabaseFullPathAndFile) Then
+                IO.File.Delete(lDatabaseFullPathAndFile)
             End If
-            conStr = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & DatabaseFullPathAndFile
-            cat.Create(conStr)
-            bAns = True
-
+            lConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lDatabaseFullPathAndFile
+            lCatalog.Create(lConnectionString)
+            lResult = True
 
             'If DatabaseName = "RasterStore.mdb" Then
             '    FindAndCreateFile(DatabaseFullPath, "rasterDBConfig.txt", conStr)
             'Else
             '    FindAndCreateFile(DatabaseFullPath, "prjDBConfig.txt", conStr)
             'End If
-
         Catch Excep As System.Runtime.InteropServices.COMException
-            bAns = False
+            lResult = False
             Logger.Dbg(Excep.Message)
-        Finally
-            cat = Nothing
         End Try
-        Return bAns
+        Return lResult
     End Function
+
     Private Function OpenADOConnection() As ADODB.Connection
         'Open the connection
-        Dim lDataBaseName As String
-        With CnSwatInput.ConnectionString
-            lDataBaseName = .Substring(.IndexOf("Source=") + 8)
-        End With
         Dim lConnection As New ADODB.Connection
-        lConnection.Open(lDataBaseName)
+        lConnection.Open(CnSwatInput.ConnectionString)
         Return lConnection
     End Function
 End Class

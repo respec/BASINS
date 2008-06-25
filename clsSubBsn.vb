@@ -64,6 +64,8 @@ Partial Class SwatInput
         Public Function TableCreate() As Boolean
             'based on mwSWATPlugIn:DBLayer:createHruTable
             Try
+                pSwatInput.dropTable(pTableName, pSwatInput.CnSwatInput)
+
                 'Open the connection
                 Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
 
@@ -98,6 +100,7 @@ Partial Class SwatInput
                         Next
                         lFieldNum += 1
                     Next
+                    .Append("COMID", ADOX.DataTypeEnum.adInteger)
                 End With
 
                 lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
@@ -140,7 +143,8 @@ Partial Class SwatInput
                         ByVal HUMINC() As Single, _
                         ByVal HRUTOT As Long, _
                         ByVal IPOT As Long, _
-                        ByVal FCST_REG As Long)
+                        ByVal FCST_REG As Long, _
+                        ByVal COMID As Integer)
 
             Me.Add(SUBBASIN, SUB_KM, SUB_LAT, SUB_ELEV, IRGAGE, ITGAGE, ISGAGE, IHGAGE, IWGAGE, _
                    ELEVB(0), ELEVB(1), ELEVB(2), ELEVB(3), ELEVB(4), ELEVB(5), ELEVB(6), ELEVB(7), ELEVB(8), ELEVB(9), _
@@ -151,7 +155,7 @@ Partial Class SwatInput
                    TMPINC(0), TMPINC(1), TMPINC(2), TMPINC(3), TMPINC(4), TMPINC(5), TMPINC(6), TMPINC(7), TMPINC(8), TMPINC(9), TMPINC(10), TMPINC(11), _
                    RADINC(0), RADINC(1), RADINC(2), RADINC(3), RADINC(4), RADINC(5), RADINC(6), RADINC(7), RADINC(8), RADINC(9), RADINC(10), RADINC(11), _
                    HUMINC(0), HUMINC(1), HUMINC(2), HUMINC(3), HUMINC(4), HUMINC(5), HUMINC(6), HUMINC(7), HUMINC(8), HUMINC(9), HUMINC(10), HUMINC(11), _
-                   HRUTOT, IPOT, FCST_REG)
+                   HRUTOT, IPOT, FCST_REG, COMID)
         End Sub
 
         Public Sub Add(ByVal SUBBASIN As Double, _
@@ -252,7 +256,8 @@ Partial Class SwatInput
                         ByVal HUMINC12 As Single, _
                         ByVal HRUTOT As Long, _
                         ByVal IPOT As Long, _
-                        ByVal FCST_REG As Long)
+                        ByVal FCST_REG As Long, _
+                        ByVal COMID As Integer)
 
             Dim lSQL As String = "INSERT INTO sub ( "
             Dim lFieldNum As Integer = 0
@@ -264,7 +269,7 @@ Partial Class SwatInput
                 Next
                 lFieldNum += 1
             Next
-            lSQL = lSQL.Substring(0, lSQL.Length - 2) & " ) Values (" _
+            lSQL &= "COMID ) Values (" _
                  & "'" & SUBBASIN & "' ,'" & SUB_KM & "' ,'" & SUB_LAT & "' ,'" & SUB_ELEV & "' ,'" & IRGAGE & "' ,'" & ITGAGE & "' ,'" & ISGAGE & "' ,'" & IHGAGE & "' ,'" & IWGAGE & "' ,'" _
                  & ELEVB1 & "' ,'" & ELEVB2 & "' ,'" & ELEVB3 & "' ,'" & ELEVB4 & "' ,'" & ELEVB5 & "' ,'" & ELEVB6 & "' ,'" & ELEVB7 & "' ,'" & ELEVB8 & "' ,'" & ELEVB9 & "' ,'" & ELEVB10 & "' ,'" _
                  & ELEVB_FR1 & "' ,'" & ELEVB_FR2 & "' ,'" & ELEVB_FR3 & "' ,'" & ELEVB_FR4 & "' ,'" & ELEVB_FR5 & "' ,'" & ELEVB_FR6 & "' ,'" & ELEVB_FR7 & "' ,'" & ELEVB_FR8 & "' ,'" & ELEVB_FR9 & "' ,'" & ELEVB_FR10 & "' ,'" _
@@ -274,7 +279,7 @@ Partial Class SwatInput
                  & TMPINC1 & "' ,'" & TMPINC2 & "' ,'" & TMPINC3 & "' ,'" & TMPINC4 & "' ,'" & TMPINC5 & "' ,'" & TMPINC6 & "' ,'" & TMPINC7 & "' ,'" & TMPINC8 & "' ,'" & TMPINC9 & "' ,'" & TMPINC10 & "' ,'" & TMPINC11 & "' ,'" & TMPINC12 & "' ,'" _
                  & RADINC1 & "' ,'" & RADINC2 & "' ,'" & RADINC3 & "' ,'" & RADINC4 & "' ,'" & RADINC5 & "' ,'" & RADINC6 & "' ,'" & RADINC7 & "' ,'" & RADINC8 & "' ,'" & RADINC9 & "' ,'" & RADINC10 & "' ,'" & RADINC11 & "' ,'" & RADINC12 & "' ,'" _
                  & HUMINC1 & "' ,'" & HUMINC2 & "' ,'" & HUMINC3 & "' ,'" & HUMINC4 & "' ,'" & HUMINC5 & "' ,'" & HUMINC6 & "' ,'" & HUMINC7 & "' ,'" & HUMINC8 & "' ,'" & HUMINC9 & "' ,'" & HUMINC10 & "' ,'" & HUMINC11 & "' ,'" & HUMINC12 & "' ,'" _
-                 & HRUTOT & "' ,'" & IPOT & "' ,'" & FCST_REG & "'  )"
+                 & HRUTOT & "' ,'" & IPOT & "' ,'" & FCST_REG & "' ,'" & COMID & "'  )"
 
             Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
             lCommand.ExecuteNonQuery()

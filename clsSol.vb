@@ -23,6 +23,8 @@ Partial Class SwatInput
         Public Function TableCreate() As Boolean
             'based on mwSWATPlugIn.DBLayer.createSolTable
             Try
+                pSwatInput.dropTable(pTableName, pSwatInput.CnSwatInput)
+
                 'Open the connection
                 Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
 
@@ -786,14 +788,14 @@ Partial Class SwatInput
     End Function
 
     Private Function dropTable(ByVal tableName As String, ByVal aConnection As OleDb.OleDbConnection) As Boolean
-        Dim SQL As String
-        Dim objCmd As New OleDbCommand
+        If IsTableExist(tableName, aConnection) Then
+            Dim SQL As String
+            Dim objCmd As New OleDbCommand
 
-        SQL = "DROP TABLE " + "" & tableName & ""
+            SQL = "DROP TABLE " + "" & tableName & ""
 
-        objCmd = New OleDbCommand(SQL, aConnection)
-        objCmd.ExecuteNonQuery()
-        aConnection.Close()
-
+            objCmd = New OleDbCommand(SQL, aConnection)
+            objCmd.ExecuteNonQuery()
+        End If
     End Function
 End Class
