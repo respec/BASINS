@@ -118,6 +118,41 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN;")
         End Function
 
+        Public Sub Add(ByVal SUBBASIN As Double, _
+                        ByVal RS1 As Single, _
+                        ByVal RS2 As Single, _
+                        ByVal RS3 As Single, _
+                        ByVal RS4 As Single, _
+                        ByVal RS5 As Single, _
+                        ByVal RS6 As Single, _
+                        ByVal RS7 As Single, _
+                        ByVal RK1 As Single, _
+                        ByVal RK2 As Single, _
+                        ByVal RK3 As Single, _
+                        ByVal RK4 As Single, _
+                        ByVal RK5 As Single, _
+                        ByVal RK6 As Single, _
+                        ByVal BC1 As Single, _
+                        ByVal BC2 As Single, _
+                        ByVal BC3 As Single, _
+                        ByVal BC4 As Single, _
+                        ByVal CHPST_REA As Single, _
+                        ByVal CHPST_VOL As Single, _
+                        ByVal CHPST_KOC As Single, _
+                        ByVal CHPST_STL As Single, _
+                        ByVal CHPST_RSP As Single, _
+                        ByVal CHPST_MIX As Single, _
+                        ByVal SEDPST_CONC As Single, _
+                        ByVal SEDPST_REA As Single, _
+                        ByVal SEDPST_BRY As Single, _
+                        ByVal SEDPST_ACT As Single)
+
+            Dim lSQL As String = "INSERT INTO swq ( SUBBASIN , RS1 , RS2 , RS3 , RS4 , RS5 , RS6 , RS7 , RK1 , RK2 , RK3 , RK4 , RK5 , RK6 , BC1 , BC2 , BC3 , BC4 , CHPST_REA , CHPST_VOL , CHPST_KOC , CHPST_STL , CHPST_RSP , CHPST_MIX , SEDPST_CONC , SEDPST_REA , SEDPST_BRY , SEDPST_ACT ) " _
+                               & "Values ('" & SUBBASIN & "'  ,'" & RS1 & "'  ,'" & RS2 & "'  ,'" & RS3 & "'  ,'" & RS4 & "'  ,'" & RS5 & "'  ,'" & RS6 & "'  ,'" & RS7 & "'  ,'" & RK1 & "'  ,'" & RK2 & "'  ,'" & RK3 & "'  ,'" & RK4 & "'  ,'" & RK5 & "'  ,'" & RK6 & "'  ,'" & BC1 & "'  ,'" & BC2 & "'  ,'" & BC3 & "'  ,'" & BC4 & "'  ,'" & CHPST_REA & "'  ,'" & CHPST_VOL & "'  ,'" & CHPST_KOC & "'  ,'" & CHPST_STL & "'  ,'" & CHPST_RSP & "'  ,'" & CHPST_MIX & "'  ,'" & SEDPST_CONC & "'  ,'" & SEDPST_REA & "'  ,'" & SEDPST_BRY & "'  ,'" & SEDPST_ACT & "'  );"
+            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+            lCommand.ExecuteNonQuery()
+        End Sub
+
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
             pSwatInput.Status("Writing " & pTableName & " text ...")

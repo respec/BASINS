@@ -6,6 +6,74 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsWgnItem
+        Public SUBBASIN As Integer
+        Public STATION As String
+        Public WLATITUDE As Single
+        Public WLONGITUDE As Single
+        Public WELEV As Single
+        Public RAIN_YRS As Single
+        Public TMPMX(11) As Single
+        Public TMPMN(11) As Single
+        Public TMPSTDMX(11) As Single
+        Public TMPSTDMN(11) As Single
+        Public PCPMM(11) As Single
+        Public PCPSTD(11) As Single
+        Public PCPSKW(11) As Single
+        Public PR_W1_(11) As Single
+        Public PR_W2_(11) As Single
+        Public PCPD(11) As Single
+        Public RAINHHMX(11) As Single
+        Public SOLARAV(11) As Single
+        Public DEWPT(11) As Single
+        Public WNDAV(11) As Single
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal aSUBBASIN As Integer, _
+                       ByVal aSTATION As String, _
+                       ByVal aWLATITUDE As Single, _
+                       ByVal aWLONGITUDE As Single, _
+                       ByVal aWELEV As Single, _
+                       ByVal aRAIN_YRS As Single, _
+                       ByVal aTMPMX() As Single, _
+                       ByVal aTMPMN() As Single, _
+                       ByVal aTMPSTDMX() As Single, _
+                       ByVal aTMPSTDMN() As Single, _
+                       ByVal aPCPMM() As Single, _
+                       ByVal aPCPSTD() As Single, _
+                       ByVal aPCPSKW() As Single, _
+                       ByVal aPR_W1_() As Single, _
+                       ByVal aPR_W2_() As Single, _
+                       ByVal aPCPD() As Single, _
+                       ByVal aRAINHHMX() As Single, _
+                       ByVal aSOLARAV() As Single, _
+                       ByVal aDEWPT() As Single, _
+                       ByVal aWNDAV() As Single)
+            SUBBASIN = aSUBBASIN
+            STATION = aSTATION
+            WLATITUDE = aWLATITUDE
+            WLONGITUDE = aWLONGITUDE
+            WELEV = aWELEV
+            RAIN_YRS = aRAIN_YRS
+            TMPMX = aTMPMX
+            TMPMN = aTMPMN
+            TMPSTDMX = aTMPSTDMX
+            TMPSTDMN = aTMPSTDMN
+            PCPMM = aPCPMM
+            PCPSTD = aPCPSTD
+            PCPSKW = aPCPSKW
+            PR_W1_ = aPR_W1_
+            PR_W2_ = aPR_W2_
+            PCPD = aPCPD
+            RAINHHMX = aRAINHHMX
+            SOLARAV = aSOLARAV
+            DEWPT = aDEWPT
+            WNDAV = aWNDAV
+        End Sub
+    End Class
+
     ''' <summary>
     ''' WGN Input Section
     ''' </summary>
@@ -48,187 +116,20 @@ Partial Class SwatInput
                     .Append("WELEV", ADOX.DataTypeEnum.adSingle)
                     .Append("RAIN_YRS", ADOX.DataTypeEnum.adSingle)
 
-                    .Append("TMPMX1", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX2", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX3", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX4", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX5", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX6", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX7", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX8", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX9", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX10", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX11", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMX12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("TMPMN1", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN2", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN3", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN4", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN5", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN6", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN7", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN8", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN9", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN10", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN11", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPMN12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("TMPSTDMX1", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX2", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX3", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX4", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX5", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX6", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX7", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX8", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX9", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX10", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX11", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMX12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("TMPSTDMN1", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN2", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN3", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN4", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN5", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN6", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN7", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN8", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN9", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN10", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN11", ADOX.DataTypeEnum.adSingle)
-                    .Append("TMPSTDMN12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("PCPMM1", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM2", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM3", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM4", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM5", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM6", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM7", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM8", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM9", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM10", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM11", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPMM12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("PCPSTD1", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD2", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD3", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD4", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD5", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD6", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD7", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD8", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD9", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD10", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD11", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSTD12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("PCPSKW1", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW2", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW3", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW4", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW5", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW6", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW7", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW8", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW9", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW10", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW11", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPSKW12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("PR_W1_1", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_2", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_3", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_4", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_5", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_6", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_7", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_8", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_9", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_10", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_11", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W1_12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("PR_W2_1", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_2", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_3", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_4", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_5", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_6", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_7", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_8", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_9", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_10", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_11", ADOX.DataTypeEnum.adSingle)
-                    .Append("PR_W2_12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("PCPD1", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD2", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD3", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD4", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD5", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD6", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD7", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD8", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD9", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD10", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD11", ADOX.DataTypeEnum.adSingle)
-                    .Append("PCPD12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("RAINHHMX1", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX2", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX3", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX4", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX5", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX6", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX7", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX8", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX9", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX10", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX11", ADOX.DataTypeEnum.adSingle)
-                    .Append("RAINHHMX12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("SOLARAV1", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV2", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV3", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV4", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV5", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV6", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV7", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV8", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV9", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV10", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV11", ADOX.DataTypeEnum.adSingle)
-                    .Append("SOLARAV12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("DEWPT1", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT2", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT3", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT4", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT5", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT6", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT7", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT8", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT9", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT10", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT11", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEWPT12", ADOX.DataTypeEnum.adSingle)
-
-                    .Append("WNDAV1", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV2", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV3", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV4", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV5", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV6", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV7", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV8", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV9", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV10", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV11", ADOX.DataTypeEnum.adSingle)
-                    .Append("WNDAV12", ADOX.DataTypeEnum.adSingle)
+                    Append12DBColumnsSingle(lTable.Columns, "TMPMX")
+                    Append12DBColumnsSingle(lTable.Columns, "TMPMN")
+                    Append12DBColumnsSingle(lTable.Columns, "TMPSTDMX")
+                    Append12DBColumnsSingle(lTable.Columns, "TMPSTDMN")
+                    Append12DBColumnsSingle(lTable.Columns, "PCPMM")
+                    Append12DBColumnsSingle(lTable.Columns, "PCPSTD")
+                    Append12DBColumnsSingle(lTable.Columns, "PCPSKW")
+                    Append12DBColumnsSingle(lTable.Columns, "PR_W1_")
+                    Append12DBColumnsSingle(lTable.Columns, "PR_W2_")
+                    Append12DBColumnsSingle(lTable.Columns, "PCPD")
+                    Append12DBColumnsSingle(lTable.Columns, "RAINHHMX")
+                    Append12DBColumnsSingle(lTable.Columns, "SOLARAV")
+                    Append12DBColumnsSingle(lTable.Columns, "DEWPT")
+                    Append12DBColumnsSingle(lTable.Columns, "WNDAV")
                 End With
 
                 lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
@@ -244,8 +145,75 @@ Partial Class SwatInput
             End Try
         End Function
 
-        Sub Add(ByVal ConString As String, _
-              ByVal SUBBASIN As Integer, _
+        Private Sub Append12DBColumnsSingle(ByVal aColumns As ADOX.Columns, ByVal aSection As String)
+            For i As Integer = 1 To 12
+                aColumns.Append(aSection & i, ADOX.DataTypeEnum.adSingle)
+            Next
+        End Sub
+
+        Public Function Table() As DataTable
+            pSwatInput.Status("Reading " & pTableName & " from database ...")
+            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
+        End Function
+
+        Public Sub Add(ByVal aWgnItem As clsWgnItem)
+            With aWgnItem
+                Me.add(.SUBBASIN, .STATION, .WLATITUDE, .WLONGITUDE, .WELEV, .RAIN_YRS, _
+                    .TMPMX(0), .TMPMX(1), .TMPMX(2), .TMPMX(3), .TMPMX(4), .TMPMX(5), .TMPMX(6), .TMPMX(7), .TMPMX(8), .TMPMX(9), .TMPMX(10), .TMPMX(11), _
+                    .TMPMN(0), .TMPMN(1), .TMPMN(2), .TMPMN(3), .TMPMN(4), .TMPMN(5), .TMPMN(6), .TMPMN(7), .TMPMN(8), .TMPMN(9), .TMPMN(10), .TMPMN(11), _
+                    .TMPSTDMX(0), .TMPSTDMX(1), .TMPSTDMX(2), .TMPSTDMX(3), .TMPSTDMX(4), .TMPSTDMX(5), .TMPSTDMX(6), .TMPSTDMX(7), .TMPSTDMX(8), .TMPSTDMX(9), .TMPSTDMX(10), .TMPSTDMX(11), _
+                    .TMPSTDMN(0), .TMPSTDMN(1), .TMPSTDMN(2), .TMPSTDMN(3), .TMPSTDMN(4), .TMPSTDMN(5), .TMPSTDMN(6), .TMPSTDMN(7), .TMPSTDMN(8), .TMPSTDMN(9), .TMPSTDMN(10), .TMPSTDMN(11), _
+                    .PCPMM(0), .PCPMM(1), .PCPMM(2), .PCPMM(3), .PCPMM(4), .PCPMM(5), .PCPMM(6), .PCPMM(7), .PCPMM(8), .PCPMM(9), .PCPMM(10), .PCPMM(11), _
+                    .PCPSTD(0), .PCPSTD(1), .PCPSTD(2), .PCPSTD(3), .PCPSTD(4), .PCPSTD(5), .PCPSTD(6), .PCPSTD(7), .PCPSTD(8), .PCPSTD(9), .PCPSTD(10), .PCPSTD(11), _
+                    .PCPSKW(0), .PCPSKW(1), .PCPSKW(2), .PCPSKW(3), .PCPSKW(4), .PCPSKW(5), .PCPSKW(6), .PCPSKW(7), .PCPSKW(8), .PCPSKW(9), .PCPSKW(10), .PCPSKW(11), _
+                    .PR_W1_(0), .PR_W1_(1), .PR_W1_(2), .PR_W1_(3), .PR_W1_(4), .PR_W1_(5), .PR_W1_(6), .PR_W1_(7), .PR_W1_(8), .PR_W1_(9), .PR_W1_(10), .PR_W1_(11), _
+                    .PR_W2_(0), .PR_W2_(1), .PR_W2_(2), .PR_W2_(3), .PR_W2_(4), .PR_W2_(5), .PR_W2_(6), .PR_W2_(7), .PR_W2_(8), .PR_W2_(9), .PR_W2_(10), .PR_W2_(11), _
+                    .PCPD(0), .PCPD(1), .PCPD(2), .PCPD(3), .PCPD(4), .PCPD(5), .PCPD(6), .PCPD(7), .PCPD(8), .PCPD(9), .PCPD(10), .PCPD(11), _
+                    .RAINHHMX(0), .RAINHHMX(1), .RAINHHMX(2), .RAINHHMX(3), .RAINHHMX(4), .RAINHHMX(5), .RAINHHMX(6), .RAINHHMX(7), .RAINHHMX(8), .RAINHHMX(9), .RAINHHMX(10), .RAINHHMX(11), _
+                    .SOLARAV(0), .SOLARAV(1), .SOLARAV(2), .SOLARAV(3), .SOLARAV(4), .SOLARAV(5), .SOLARAV(6), .SOLARAV(7), .SOLARAV(8), .SOLARAV(9), .SOLARAV(10), .SOLARAV(11), _
+                    .DEWPT(0), .DEWPT(1), .DEWPT(2), .DEWPT(3), .DEWPT(4), .DEWPT(5), .DEWPT(6), .DEWPT(7), .DEWPT(8), .DEWPT(9), .DEWPT(10), .DEWPT(11), _
+                    .WNDAV(0), .WNDAV(1), .WNDAV(2), .WNDAV(3), .WNDAV(4), .WNDAV(5), .WNDAV(6), .WNDAV(7), .WNDAV(8), .WNDAV(9), .WNDAV(10), .WNDAV(11))
+            End With
+        End Sub
+
+        'Public Sub Add(ByVal SUBBASIN As Integer, _
+        '               ByVal STATION As String, _
+        '               ByVal WLATITUDE As Single, _
+        '               ByVal WLONGITUDE As Single, _
+        '               ByVal WELEV As Single, _
+        '               ByVal RAIN_YRS As Single, _
+        '               ByVal TMPMX() As Single, _
+        '               ByVal TMPMN() As Single, _
+        '               ByVal TMPSTDMX() As Single, _
+        '               ByVal TMPSTDMN() As Single, _
+        '               ByVal PCPMM() As Single, _
+        '               ByVal PCPSTD() As Single, _
+        '               ByVal PCPSKW() As Single, _
+        '               ByVal PR_W1_() As Single, _
+        '               ByVal PR_W2_() As Single, _
+        '               ByVal PCPD() As Single, _
+        '               ByVal RAINHHMX() As Single, _
+        '               ByVal SOLARAV() As Single, _
+        '               ByVal DEWPT() As Single, _
+        '               ByVal WNDAV() As Single)
+        '    Me.Add(SUBBASIN, STATION, WLATITUDE, WLONGITUDE, WELEV, RAIN_YRS, _
+        '            TMPMX(0), TMPMX(1), TMPMX(2), TMPMX(3), TMPMX(4), TMPMX(5), TMPMX(6), TMPMX(7), TMPMX(8), TMPMX(9), TMPMX(10), TMPMX(11), _
+        '            TMPMN(0), TMPMN(1), TMPMN(2), TMPMN(3), TMPMN(4), TMPMN(5), TMPMN(6), TMPMN(7), TMPMN(8), TMPMN(9), TMPMN(10), TMPMN(11), _
+        '            TMPSTDMX(0), TMPSTDMX(1), TMPSTDMX(2), TMPSTDMX(3), TMPSTDMX(4), TMPSTDMX(5), TMPSTDMX(6), TMPSTDMX(7), TMPSTDMX(8), TMPSTDMX(9), TMPSTDMX(10), TMPSTDMX(11), _
+        '            TMPSTDMN(0), TMPSTDMN(1), TMPSTDMN(2), TMPSTDMN(3), TMPSTDMN(4), TMPSTDMN(5), TMPSTDMN(6), TMPSTDMN(7), TMPSTDMN(8), TMPSTDMN(9), TMPSTDMN(10), TMPSTDMN(11), _
+        '            PCPMM(0), PCPMM(1), PCPMM(2), PCPMM(3), PCPMM(4), PCPMM(5), PCPMM(6), PCPMM(7), PCPMM(8), PCPMM(9), PCPMM(10), PCPMM(11), _
+        '            PCPSTD(0), PCPSTD(1), PCPSTD(2), PCPSTD(3), PCPSTD(4), PCPSTD(5), PCPSTD(6), PCPSTD(7), PCPSTD(8), PCPSTD(9), PCPSTD(10), PCPSTD(11), _
+        '            PCPSKW(0), PCPSKW(1), PCPSKW(2), PCPSKW(3), PCPSKW(4), PCPSKW(5), PCPSKW(6), PCPSKW(7), PCPSKW(8), PCPSKW(9), PCPSKW(10), PCPSKW(11), _
+        '            PR_W1_(0), PR_W1_(1), PR_W1_(2), PR_W1_(3), PR_W1_(4), PR_W1_(5), PR_W1_(6), PR_W1_(7), PR_W1_(8), PR_W1_(9), PR_W1_(10), PR_W1_(11), _
+        '            PR_W2_(0), PR_W2_(1), PR_W2_(2), PR_W2_(3), PR_W2_(4), PR_W2_(5), PR_W2_(6), PR_W2_(7), PR_W2_(8), PR_W2_(9), PR_W2_(10), PR_W2_(11), _
+        '            PCPD(0), PCPD(1), PCPD(2), PCPD(3), PCPD(4), PCPD(5), PCPD(6), PCPD(7), PCPD(8), PCPD(9), PCPD(10), PCPD(11), _
+        '            RAINHHMX(0), RAINHHMX(1), RAINHHMX(2), RAINHHMX(3), RAINHHMX(4), RAINHHMX(5), RAINHHMX(6), RAINHHMX(7), RAINHHMX(8), RAINHHMX(9), RAINHHMX(10), RAINHHMX(11), _
+        '            SOLARAV(0), SOLARAV(1), SOLARAV(2), SOLARAV(3), SOLARAV(4), SOLARAV(5), SOLARAV(6), SOLARAV(7), SOLARAV(8), SOLARAV(9), SOLARAV(10), SOLARAV(11), _
+        '            DEWPT(0), DEWPT(1), DEWPT(2), DEWPT(3), DEWPT(4), DEWPT(5), DEWPT(6), DEWPT(7), DEWPT(8), DEWPT(9), DEWPT(10), DEWPT(11), _
+        '            WNDAV(0), WNDAV(1), WNDAV(2), WNDAV(3), WNDAV(4), WNDAV(5), WNDAV(6), WNDAV(7), WNDAV(8), WNDAV(9), WNDAV(10), WNDAV(11))
+        'End Sub
+
+        Public Sub Add(ByVal SUBBASIN As Integer, _
               ByVal STATION As String, _
               ByVal WLATITUDE As Single, _
               ByVal WLONGITUDE As Single, _
@@ -441,11 +409,6 @@ Partial Class SwatInput
             lCommand.ExecuteNonQuery()
         End Sub
 
-        Public Function Table() As DataTable
-            pSwatInput.Status("Reading " & pTableName & " from database ...")
-            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
-        End Function
-
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
             pSwatInput.Status("Writing " & pTableName & " text ...")
@@ -461,26 +424,26 @@ Partial Class SwatInput
                              & " LONGITUDE =" & Format(lRow.Item(("WLONGITUDE")), "0.00").PadLeft(7))
                 lSB.AppendLine("  ELEV [m] =" & Format(lRow.Item(("WELEV")), "0.00").PadLeft(7))
                 lSB.AppendLine("  RAIN_YRS =" & Format(lRow.Item(("RAIN_YRS")), "0.00").PadLeft(7))
-                Append12(lSB, lRow, "TMPMX")
-                Append12(lSB, lRow, "TMPMN")
-                Append12(lSB, lRow, "TMPSTDMX")
-                Append12(lSB, lRow, "TMPSTDMN")
-                Append12(lSB, lRow, "PCPMM")
-                Append12(lSB, lRow, "PCPSTD")
-                Append12(lSB, lRow, "PCPSKW")
-                Append12(lSB, lRow, "PR_W1_")
-                Append12(lSB, lRow, "PR_W2_")
-                Append12(lSB, lRow, "PCPD")
-                Append12(lSB, lRow, "RAINHHMX")
-                Append12(lSB, lRow, "SOLARAV")
-                Append12(lSB, lRow, "DEWPT")
-                Append12(lSB, lRow, "WNDAV")
+                Append12TextColumns(lSB, lRow, "TMPMX")
+                Append12TextColumns(lSB, lRow, "TMPMN")
+                Append12TextColumns(lSB, lRow, "TMPSTDMX")
+                Append12TextColumns(lSB, lRow, "TMPSTDMN")
+                Append12TextColumns(lSB, lRow, "PCPMM")
+                Append12TextColumns(lSB, lRow, "PCPSTD")
+                Append12TextColumns(lSB, lRow, "PCPSKW")
+                Append12TextColumns(lSB, lRow, "PR_W1_")
+                Append12TextColumns(lSB, lRow, "PR_W2_")
+                Append12TextColumns(lSB, lRow, "PCPD")
+                Append12TextColumns(lSB, lRow, "RAINHHMX")
+                Append12TextColumns(lSB, lRow, "SOLARAV")
+                Append12TextColumns(lSB, lRow, "DEWPT")
+                Append12TextColumns(lSB, lRow, "WNDAV")
 
                 IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & StringFname(lSubBasin, pTableName), lSB.ToString)
             Next
         End Sub
 
-        Private Sub Append12(ByVal aSB As Text.StringBuilder, ByVal aRow As DataRow, ByVal aSection As String)
+        Private Sub Append12TextColumns(ByVal aSB As Text.StringBuilder, ByVal aRow As DataRow, ByVal aSection As String)
             For i As Integer = 1 To 12
                 aSB.Append(Format(aRow.Item(aSection & i), "0.00").PadLeft(6))
             Next

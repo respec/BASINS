@@ -68,6 +68,11 @@ Partial Class SwatInput
             End Try
         End Function
 
+        Public Function Table() As DataTable
+            pSwatInput.Status("Reading " & pTableName & " from database ...")
+            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
+        End Function
+
         Public Sub Add(ByVal SUBBASIN As Long, _
                        ByVal CH_W2 As Single, _
                        ByVal CH_D As Single, _
@@ -84,15 +89,9 @@ Partial Class SwatInput
                                & "Values ('" & SUBBASIN & "'  ,'" & CH_W2 & "'  ,'" & CH_D & "'  ,'" & CH_S2 & "'  ,'" _
                                & CH_L2 & "'  ,'" & CH_N2 & "'  ,'" & CH_K2 & "'  ,'" & CH_EROD & "'  ,'" & CH_COV & "'  ,'" _
                                & CH_WDR & "'  ,'" & ALPHA_BNK & "'  );"
-
             Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
             lCommand.ExecuteNonQuery()
         End Sub
-
-        Public Function Table() As DataTable
-            pSwatInput.Status("Reading " & pTableName & " from database ...")
-            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
-        End Function
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()

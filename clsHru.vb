@@ -5,6 +5,96 @@ Partial Class SwatInput
             Return pHru
         End Get
     End Property
+
+    Public Class clsHruItem
+        Public SUBBASIN As Double
+        Public HRU As Double
+        Public LANDUSE As String
+        Public SOIL As String
+        Public SLOPE_CD As String
+        Public HRU_FR As Double
+        Public SLSUBBSN As Single
+        Public HRU_SLP As Single
+        Public OV_N As Single
+        Public LAT_TTIME As Single
+        Public LAT_SED As Single
+        Public SLSOIL As Single
+        Public CANMX As Single
+        Public ESCO As Single
+        Public EPCO As Single
+        Public RSDIN As Single
+        Public ERORGN As Single
+        Public ERORGP As Single
+        Public POT_FR As Single
+        Public FLD_FR As Single
+        Public RIP_FR As Single
+        Public POT_TILE As Single
+        Public POT_VOLX As Single
+        Public POT_VOL As Single
+        Public POT_NSED As Single
+        Public POT_NO3L As Single
+        Public DEP_IMP As Long
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                        ByVal aHRU As Double, _
+                        ByVal aLANDUSE As String, _
+                        ByVal aSOIL As String, _
+                        ByVal aSLOPE_CD As String, _
+                        ByVal aHRU_FR As Double, _
+                        ByVal aSLSUBBSN As Single, _
+                        ByVal aHRU_SLP As Single, _
+                        ByVal aOV_N As Single, _
+                        ByVal aLAT_TTIME As Single, _
+                        ByVal aLAT_SED As Single, _
+                        ByVal aSLSOIL As Single, _
+                        ByVal aCANMX As Single, _
+                        ByVal aESCO As Single, _
+                        ByVal aEPCO As Single, _
+                        ByVal aRSDIN As Single, _
+                        ByVal aERORGN As Single, _
+                        ByVal aERORGP As Single, _
+                        ByVal aPOT_FR As Single, _
+                        ByVal aFLD_FR As Single, _
+                        ByVal aRIP_FR As Single, _
+                        ByVal aPOT_TILE As Single, _
+                        ByVal aPOT_VOLX As Single, _
+                        ByVal aPOT_VOL As Single, _
+                        ByVal aPOT_NSED As Single, _
+                        ByVal aPOT_NO3L As Single, _
+                        ByVal aDEP_IMP As Long)
+            SUBBASIN = aSUBBASIN
+            HRU = aHRU
+            LANDUSE = aLANDUSE
+            SOIL = aSOIL
+            SLOPE_CD = aSLOPE_CD
+            HRU_FR = aHRU_FR
+            SLSUBBSN = aSLSUBBSN
+            HRU_SLP = aHRU_SLP
+            OV_N = aOV_N
+            LAT_TTIME = aLAT_TTIME
+            LAT_SED = aLAT_SED
+            SLSOIL = aSLSOIL
+            CANMX = aCANMX
+            ESCO = aESCO
+            EPCO = aEPCO
+            RSDIN = aRSDIN
+            ERORGN = aERORGN
+            ERORGP = aERORGP
+            POT_FR = aPOT_FR
+            FLD_FR = aFLD_FR
+            RIP_FR = aRIP_FR
+            POT_TILE = aPOT_TILE
+            POT_VOLX = aPOT_VOLX
+            POT_VOL = aPOT_VOL
+            POT_NSED = aPOT_NSED
+            POT_NO3L = aPOT_NO3L
+            DEP_IMP = aDEP_IMP
+        End Sub
+    End Class
+
     ''' <summary>
     ''' Hydrologic Response Unit (HRU) input section
     ''' </summary>
@@ -85,30 +175,56 @@ Partial Class SwatInput
             End Try
         End Function
 
-        Public Sub Add(ByVal SUBBASIN As Double, _
-                       ByVal ARSUB As Double, _
-                       ByVal LANDUSE As String, _
-                       ByVal ARLU As Double, _
-                       ByVal SOIL As String, _
-                       ByVal ARSO As Double, _
-                       ByVal SLP As String, _
-                       ByVal ARSLP As Double, _
-                       ByVal SLOPE As Double, _
-                       ByVal UNIQUECOMB As String, _
-                       ByVal HRU_ID As Double)
-
-            Dim lSQL As String = "INSERT INTO hrus(  SUBBASIN, ARSUB , LANDUSE ,ARLU ,SOIL, ARSO, SLP ,ARSLP ,SLOPE,UNIQUECOMB, HRU_ID )" _
-                               & " VALUES ( '" & SUBBASIN & "'" & ",'" & ARSUB & "','" & LANDUSE & "','" & ARLU & "','" & SOIL & "' ,'" _
-                               & ARSO & "' ,'" & SLP & "','" & ARSLP & "','" & SLOPE & "','" & UNIQUECOMB & "' ,'" & HRU_ID & "' )"
-
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
-        End Sub
-
         Public Function Table() As DataTable
             pSwatInput.Status("Reading " & pTableName & " from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN, HRU;")
         End Function
+
+        Public Sub Add(ByVal aHruItem As clsHruItem)
+            With aHruItem
+                Me.Add(.SUBBASIN, .HRU, .LANDUSE, .SOIL, .SLOPE_CD, .HRU_FR, .SLSUBBSN, .HRU_SLP, .OV_N, _
+                       .LAT_TTIME, .LAT_SED, .SLSOIL, .CANMX, .ESCO, .EPCO, .RSDIN, .ERORGN, .ERORGP, _
+                       .POT_FR, .FLD_FR, .RIP_FR, .POT_TILE, .POT_VOLX, .POT_VOL, .POT_NSED, .POT_NO3L, .DEP_IMP)
+            End With
+        End Sub
+
+        Public Sub Add(ByVal SUBBASIN As Double, _
+                        ByVal HRU As Double, _
+                        ByVal LANDUSE As String, _
+                        ByVal SOIL As String, _
+                        ByVal SLOPE_CD As String, _
+                        ByVal HRU_FR As Double, _
+                        ByVal SLSUBBSN As Single, _
+                        ByVal HRU_SLP As Single, _
+                        ByVal OV_N As Single, _
+                        ByVal LAT_TTIME As Single, _
+                        ByVal LAT_SED As Single, _
+                        ByVal SLSOIL As Single, _
+                        ByVal CANMX As Single, _
+                        ByVal ESCO As Single, _
+                        ByVal EPCO As Single, _
+                        ByVal RSDIN As Single, _
+                        ByVal ERORGN As Single, _
+                        ByVal ERORGP As Single, _
+                        ByVal POT_FR As Single, _
+                        ByVal FLD_FR As Single, _
+                        ByVal RIP_FR As Single, _
+                        ByVal POT_TILE As Single, _
+                        ByVal POT_VOLX As Single, _
+                        ByVal POT_VOL As Single, _
+                        ByVal POT_NSED As Single, _
+                        ByVal POT_NO3L As Single, _
+                        ByVal DEP_IMP As Long)
+
+            Dim lSQL As String = "INSERT INTO hru ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , HRU_FR , SLSUBBSN , HRU_SLP , OV_N , LAT_TTIME , LAT_SED , SLSOIL , CANMX , ESCO , EPCO , RSDIN , ERORGN , ERORGP , POT_FR , FLD_FR , RIP_FR , POT_TILE , POT_VOLX , POT_VOL , POT_NSED , POT_NO3L , DEP_IMP ) " _
+                               & "Values ('" & SUBBASIN & "'  ,'" & HRU & "'  ,'" & LANDUSE & "'  ,'" & SOIL & "'  ,'" & SLOPE_CD & "'  ,'" _
+                               & HRU_FR & "'  ,'" & SLSUBBSN & "'  ,'" & HRU_SLP & "'  ,'" & OV_N & "'  ,'" & LAT_TTIME & "'  ,'" & LAT_SED & "'  ,'" _
+                               & SLSOIL & "'  ,'" & CANMX & "'  ,'" & ESCO & "'  ,'" & EPCO & "'  ,'" & RSDIN & "'  ,'" _
+                               & ERORGN & "'  ,'" & ERORGP & "'  ,'" & POT_FR & "'  ,'" & FLD_FR & "'  ,'" & RIP_FR & "'  ,'" _
+                               & POT_TILE & "'  ,'" & POT_VOLX & "'  ,'" & POT_VOL & "'  ,'" & POT_NSED & "'  ,'" & POT_NO3L & "'  ,'" & DEP_IMP & "'  )"
+            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+            lCommand.ExecuteNonQuery()
+        End Sub
 
         ''' <summary>
         ''' Save HRU information to set of .hru text input files

@@ -80,6 +80,31 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
+        Public Sub Add(ByVal SUBBASIN As Double, _
+                        ByVal HRU As Double, _
+                        ByVal LANDUSE As String, _
+                        ByVal SOIL As String, _
+                        ByVal SLOPE_CD As String, _
+                        ByVal SHALLST As Double, _
+                        ByVal DEEPST As Double, _
+                        ByVal GW_DELAY As Double, _
+                        ByVal ALPHA_BF As Double, _
+                        ByVal GWQMN As Double, _
+                        ByVal GW_REVAP As Double, _
+                        ByVal REVAPMN As Double, _
+                        ByVal RCHRG_DP As Double, _
+                        ByVal GWHT As Double, _
+                        ByVal GW_SPYLD As Double, _
+                        ByVal SHALLST_N As Double, _
+                        ByVal GWSOLP As Double, _
+                        ByVal HLIFE_NGW As Double)
+
+            Dim lSQL As String = "INSERT INTO gw ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , SHALLST , DEEPST , GW_DELAY , ALPHA_BF , GWQMN , GW_REVAP , REVAPMN , RCHRG_DP , GWHT , GW_SPYLD , SHALLST_N , GWSOLP , HLIFE_NGW  ) " _
+                               & "Values ('" & SUBBASIN & "'  ,'" & HRU & "'  ,'" & LANDUSE & "'  ,'" & SOIL & "'  ,'" & SLOPE_CD & "'  ,'" & SHALLST & "'  ,'" & DEEPST & "'  ,'" & GW_DELAY & "'  ,'" & ALPHA_BF & "'  ,'" & GWQMN & "'  ,'" & GW_REVAP & "'  ,'" & REVAPMN & "'  ,'" & RCHRG_DP & "'  ,'" & GWHT & "'  ,'" & GW_SPYLD & "'  ,'" & SHALLST_N & "'  ,'" & GWSOLP & "'  ,'" & HLIFE_NGW & "'  )"
+            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+            lCommand.ExecuteNonQuery()
+        End Sub
+
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
 

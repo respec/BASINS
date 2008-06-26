@@ -81,6 +81,32 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
+        Public Sub Add(ByVal Lao As Long, _
+                       ByVal Igropt As Long, _
+                       ByVal Ai0 As Double, _
+                       ByVal Ai1 As Double, _
+                       ByVal Ai2 As Double, _
+                       ByVal Ai3 As Double, _
+                       ByVal Ai4 As Double, _
+                       ByVal Ai5 As Double, _
+                       ByVal Ai6 As Double, _
+                       ByVal Mumax As Double, _
+                       ByVal Rhoq As Double, _
+                       ByVal Tfact As Double, _
+                       ByVal K_l As Double, _
+                       ByVal K_n As Double, _
+                       ByVal K_p As Double, _
+                       ByVal Lambda0 As Double, _
+                       ByVal Lambda1 As Double, _
+                       ByVal Lambda2 As Double, _
+                       ByVal P_n As Double)
+
+            Dim lSQL As String = "INSERT INTO wwq ( Lao , Igropt , Ai0 , Ai1 , Ai2 , Ai3 , Ai4 , Ai5 , Ai6 , Mumax , Rhoq , Tfact , K_l , K_n , K_p , Lambda0 , Lambda1 , Lambda2 , P_n   )" _
+                               & "Values ('" & Lao & "'  ,'" & Igropt & "'  ,'" & Ai0 & "'  ,'" & Ai1 & "'  ,'" & Ai2 & "'  ,'" & Ai3 & "'  ,'" & Ai4 & "'  ,'" & Ai5 & "'  ,'" & Ai6 & "'  ,'" & Mumax & "'  ,'" & Rhoq & "'  ,'" & Tfact & "'  ,'" & K_l & "'  ,'" & K_n & "'  ,'" & K_p & "'  ,'" & Lambda0 & "'  ,'" & Lambda1 & "'  ,'" & Lambda2 & "'  ,'" & P_n & "'  )"
+            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+            lCommand.ExecuteNonQuery()
+        End Sub
+
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
 

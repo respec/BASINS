@@ -10,6 +10,132 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsSubBsnItem
+        Public SUBBASIN As Double
+        Public SUB_KM As Double
+        Public SUB_LAT As Double
+        Public SUB_ELEV As Double
+        Public IRGAGE As Long
+        Public ITGAGE As Long
+        Public ISGAGE As Long
+        Public IHGAGE As Long
+        Public IWGAGE As Long
+        Public ELEVB(11) As Single
+        Public ELEVB_FR(11) As Single
+        Public SNOEB(11) As Single
+        Public PLAPS As Single
+        Public TLAPS As Single
+        Public SNO_SUB As Single
+        Public CH_L1 As Single
+        Public CH_S1 As Single
+        Public CH_W1 As Single
+        Public CH_K1 As Single
+        Public CH_N1 As Single
+        Public CO2 As Single
+        Public RFINC(11) As Single
+        Public TMPINC(11) As Single
+        Public RADINC(11) As Single
+        Public HUMINC(11) As Single
+        Public HRUTOT As Long
+        Public IPOT As Long
+        Public FCST_REG As Long
+        Public COMID As Integer
+
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                        ByVal aSUB_KM As Double, _
+                        ByVal aSUB_LAT As Double, _
+                        ByVal aSUB_ELEV As Double, _
+                        ByVal aIRGAGE As Long, _
+                        ByVal aITGAGE As Long, _
+                        ByVal aISGAGE As Long, _
+                        ByVal aIHGAGE As Long, _
+                        ByVal aIWGAGE As Long, _
+                        ByVal aELEVB() As Single, _
+                        ByVal aELEVB_FR() As Single, _
+                        ByVal aSNOEB() As Single, _
+                        ByVal aPLAPS As Single, _
+                        ByVal aTLAPS As Single, _
+                        ByVal aSNO_SUB As Single, _
+                        ByVal aCH_L1 As Single, _
+                        ByVal aCH_S1 As Single, _
+                        ByVal aCH_W1 As Single, _
+                        ByVal aCH_K1 As Single, _
+                        ByVal aCH_N1 As Single, _
+                        ByVal aCO2 As Single, _
+                        ByVal aRFINC() As Single, _
+                        ByVal aTMPINC() As Single, _
+                        ByVal aRADINC() As Single, _
+                        ByVal aHUMINC() As Single, _
+                        ByVal aHRUTOT As Long, _
+                        ByVal aIPOT As Long, _
+                        ByVal aFCST_REG As Long, _
+                        ByVal aCOMID As Integer)
+            SUBBASIN = aSUBBASIN
+            SUB_KM = aSUB_KM
+            SUB_LAT = aSUB_LAT
+            SUB_ELEV = aSUB_ELEV
+            IRGAGE = aIRGAGE
+            ITGAGE = aITGAGE
+            ISGAGE = aISGAGE
+            IHGAGE = aIHGAGE
+            IWGAGE = aIWGAGE
+            ELEVB = aELEVB
+            ELEVB_FR = aELEVB_FR
+            SNOEB = aSNOEB
+            PLAPS = aPLAPS
+            TLAPS = aTLAPS
+            SNO_SUB = aSNO_SUB
+            CH_L1 = aCH_L1
+            CH_S1 = aCH_S1
+            CH_W1 = aCH_W1
+            CH_K1 = aCH_K1
+            CH_N1 = aCH_N1
+            CO2 = aCO2
+            RFINC = aRFINC
+            TMPINC = aTMPINC
+            RADINC = aRADINC
+            HUMINC = aHUMINC
+            HRUTOT = aHRUTOT
+            IPOT = aIPOT
+            FCST_REG = aFCST_REG
+            COMID = aCOMID
+        End Sub
+
+        Public Sub New(ByVal aRow As DataRow)
+            SUBBASIN = aRow.Item("SUBBASIN")
+            SUB_KM = aRow.Item("SUB_KM")
+            SUB_LAT = aRow.Item("SUB_LAT")
+            SUB_ELEV = aRow.Item("SUB_ELEV")
+            IRGAGE = aRow.Item("IRGAGE")
+            ITGAGE = aRow.Item("ITGAGE")
+            ISGAGE = aRow.Item("ISGAGE")
+            IHGAGE = aRow.Item("IHGAGE")
+            IWGAGE = aRow.Item("IWGAGE")
+            PLAPS = aRow.Item("PLAPS")
+            TLAPS = aRow.Item("TLAPS")
+            SNO_SUB = aRow.Item("SNO_SUB")
+            CH_L1 = aRow.Item("CH_L1")
+            CH_S1 = aRow.Item("CH_S1")
+            CH_W1 = aRow.Item("CH_W1")
+            CH_K1 = aRow.Item("CH_K1")
+            CH_N1 = aRow.Item("CH_N1")
+            CO2 = aRow.Item("CO2")
+            HRUTOT = aRow.Item("HRUTOT")
+            IPOT = aRow.Item("IPOT")
+            FCST_REG = aRow.Item("FCST_REG")
+
+            For i As Integer = 0 To 11
+                ELEVB(i) = aRow.Item("ELEVB" & i + 1)
+                ELEVB_FR(i) = aRow.Item("ELEVB_FR" & i + 1)
+                SNOEB(i) = aRow.Item("SNOEB" & i + 1)
+                RFINC(i) = aRow.Item("RFINC" & i + 1)
+                TMPINC(i) = aRow.Item("TMPINC" & i + 1)
+                RADINC(i) = aRow.Item("RADINC" & i + 1)
+                HUMINC(i) = aRow.Item("HUMINC" & i + 1)
+            Next
+        End Sub
+    End Class
+
     Public Class clsSubBsn
         Private pSwatInput As SwatInput
         Private pTableName As String = "sub"
@@ -116,47 +242,112 @@ Partial Class SwatInput
             End Try
         End Function
 
-        Public Sub Add(ByVal SUBBASIN As Double, _
-                        ByVal SUB_KM As Double, _
-                        ByVal SUB_LAT As Double, _
-                        ByVal SUB_ELEV As Double, _
-                        ByVal IRGAGE As Long, _
-                        ByVal ITGAGE As Long, _
-                        ByVal ISGAGE As Long, _
-                        ByVal IHGAGE As Long, _
-                        ByVal IWGAGE As Long, _
-                        ByVal ELEVB() As Single, _
-                        ByVal ELEVB_FR() As Single, _
-                        ByVal SNOEB() As Single, _
-                        ByVal PLAPS As Single, _
-                        ByVal TLAPS As Single, _
-                        ByVal SNO_SUB As Single, _
-                        ByVal CH_L1 As Single, _
-                        ByVal CH_S1 As Single, _
-                        ByVal CH_W1 As Single, _
-                        ByVal CH_K1 As Single, _
-                        ByVal CH_N1 As Single, _
-                        ByVal CO2 As Single, _
-                        ByVal RFINC() As Single, _
-                        ByVal TMPINC() As Single, _
-                        ByVal RADINC() As Single, _
-                        ByVal HUMINC() As Single, _
-                        ByVal HRUTOT As Long, _
-                        ByVal IPOT As Long, _
-                        ByVal FCST_REG As Long, _
-                        ByVal COMID As Integer)
+        Public Function Table() As DataTable
+            pSwatInput.Status("Reading " & pTableName & " from database ...")
+            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN;")
+        End Function
 
-            Me.Add(SUBBASIN, SUB_KM, SUB_LAT, SUB_ELEV, IRGAGE, ITGAGE, ISGAGE, IHGAGE, IWGAGE, _
-                   ELEVB(0), ELEVB(1), ELEVB(2), ELEVB(3), ELEVB(4), ELEVB(5), ELEVB(6), ELEVB(7), ELEVB(8), ELEVB(9), _
-                   ELEVB_FR(0), ELEVB_FR(1), ELEVB_FR(2), ELEVB_FR(3), ELEVB_FR(4), ELEVB_FR(5), ELEVB_FR(6), ELEVB_FR(7), ELEVB_FR(8), ELEVB_FR(9), _
-                   SNOEB(0), SNOEB(1), SNOEB(2), SNOEB(3), SNOEB(4), SNOEB(5), SNOEB(6), SNOEB(7), SNOEB(8), SNOEB(9), _
-                   PLAPS, TLAPS, SNO_SUB, CH_L1, CH_S1, CH_W1, CH_K1, CH_N1, CO2, _
-                   RFINC(0), RFINC(1), RFINC(2), RFINC(3), RFINC(4), RFINC(5), RFINC(6), RFINC(7), RFINC(8), RFINC(9), RFINC(10), RFINC(11), _
-                   TMPINC(0), TMPINC(1), TMPINC(2), TMPINC(3), TMPINC(4), TMPINC(5), TMPINC(6), TMPINC(7), TMPINC(8), TMPINC(9), TMPINC(10), TMPINC(11), _
-                   RADINC(0), RADINC(1), RADINC(2), RADINC(3), RADINC(4), RADINC(5), RADINC(6), RADINC(7), RADINC(8), RADINC(9), RADINC(10), RADINC(11), _
-                   HUMINC(0), HUMINC(1), HUMINC(2), HUMINC(3), HUMINC(4), HUMINC(5), HUMINC(6), HUMINC(7), HUMINC(8), HUMINC(9), HUMINC(10), HUMINC(11), _
-                   HRUTOT, IPOT, FCST_REG, COMID)
+        Public Function TableWithArea(ByVal aAggregationFieldName As String) As DataTable
+            Dim lAggregationFromTable As DataTable
+            Dim lAggregationField As Integer = pSwatInput.Hru.Table.Columns.IndexOf(aAggregationFieldName)
+            If lAggregationField > 0 Then
+                lAggregationFromTable = pSwatInput.Hru.UniqueValues(aAggregationFieldName)
+                Debug.Print("AggregationRowCount " & lAggregationFromTable.Rows.Count)
+
+                Dim lArea As Double
+                Dim lTable As New DataTable
+                With lTable
+                    .Columns.Add("SubBasinId", "".GetType)
+                    .Columns.Add("Area", lArea.GetType)
+                    For Each lAggregationRow As DataRow In lAggregationFromTable.Rows
+                        .Columns.Add(lAggregationRow.Item(0), lArea.GetType)
+                    Next
+                    'summarize areas by subbasin
+                    Dim lAreaTotal As Double = 0.0
+                    For Each lSubBasinRow As DataRow In Table().Rows
+                        lArea = lSubBasinRow.Item(2)
+                        lAreaTotal += lArea
+                        Dim lReportRow As DataRow = .NewRow
+                        With lReportRow
+                            .Item(0) = lSubBasinRow.Item(1)
+                            .Item(1) = lArea
+                            For lindex As Integer = 0 To lAggregationFromTable.Rows.Count - 1
+                                .Item(lindex + 2) = 0.0
+                            Next
+                        End With
+                        .Rows.Add(lReportRow)
+                    Next
+
+                    'summarize areas by subbasin/aggrat
+                    For Each lHruRow As DataRow In pSwatInput.Hru.Table.Rows
+                        Dim lSubBasin As Integer = lHruRow.Item(1)
+                        Dim lLandUse As String = lHruRow.Item(3)
+                        Dim lReportRow As DataRow = .Rows(lSubBasin - 1)
+                        lReportRow.Item(lHruRow.Item(lAggregationField)) += lHruRow.Item(6) * lReportRow.Item(1)
+                    Next
+                End With
+                Return lTable
+            Else 'TODO: add exception here?
+                Return Nothing
+            End If
+        End Function
+
+        Public Sub Add(ByVal aSubBsnItem As clsSubBsnItem)
+            With aSubBsnItem
+                Me.Add(.SUBBASIN, .SUB_KM, .SUB_LAT, .SUB_ELEV, .IRGAGE, .ITGAGE, .ISGAGE, .IHGAGE, .IWGAGE, _
+                   .ELEVB(0), .ELEVB(1), .ELEVB(2), .ELEVB(3), .ELEVB(4), .ELEVB(5), .ELEVB(6), .ELEVB(7), .ELEVB(8), .ELEVB(9), _
+                   .ELEVB_FR(0), .ELEVB_FR(1), .ELEVB_FR(2), .ELEVB_FR(3), .ELEVB_FR(4), .ELEVB_FR(5), .ELEVB_FR(6), .ELEVB_FR(7), .ELEVB_FR(8), .ELEVB_FR(9), _
+                   .SNOEB(0), .SNOEB(1), .SNOEB(2), .SNOEB(3), .SNOEB(4), .SNOEB(5), .SNOEB(6), .SNOEB(7), .SNOEB(8), .SNOEB(9), _
+                   .PLAPS, .TLAPS, .SNO_SUB, .CH_L1, .CH_S1, .CH_W1, .CH_K1, .CH_N1, .CO2, _
+                   .RFINC(0), .RFINC(1), .RFINC(2), .RFINC(3), .RFINC(4), .RFINC(5), .RFINC(6), .RFINC(7), .RFINC(8), .RFINC(9), .RFINC(10), .RFINC(11), _
+                   .TMPINC(0), .TMPINC(1), .TMPINC(2), .TMPINC(3), .TMPINC(4), .TMPINC(5), .TMPINC(6), .TMPINC(7), .TMPINC(8), .TMPINC(9), .TMPINC(10), .TMPINC(11), _
+                   .RADINC(0), .RADINC(1), .RADINC(2), .RADINC(3), .RADINC(4), .RADINC(5), .RADINC(6), .RADINC(7), .RADINC(8), .RADINC(9), .RADINC(10), .RADINC(11), _
+                   .HUMINC(0), .HUMINC(1), .HUMINC(2), .HUMINC(3), .HUMINC(4), .HUMINC(5), .HUMINC(6), .HUMINC(7), .HUMINC(8), .HUMINC(9), .HUMINC(10), .HUMINC(11), _
+                   .HRUTOT, .IPOT, .FCST_REG, .COMID)
+            End With
         End Sub
+
+        'Public Sub Add(ByVal SUBBASIN As Double, _
+        '                ByVal SUB_KM As Double, _
+        '                ByVal SUB_LAT As Double, _
+        '                ByVal SUB_ELEV As Double, _
+        '                ByVal IRGAGE As Long, _
+        '                ByVal ITGAGE As Long, _
+        '                ByVal ISGAGE As Long, _
+        '                ByVal IHGAGE As Long, _
+        '                ByVal IWGAGE As Long, _
+        '                ByVal ELEVB() As Single, _
+        '                ByVal ELEVB_FR() As Single, _
+        '                ByVal SNOEB() As Single, _
+        '                ByVal PLAPS As Single, _
+        '                ByVal TLAPS As Single, _
+        '                ByVal SNO_SUB As Single, _
+        '                ByVal CH_L1 As Single, _
+        '                ByVal CH_S1 As Single, _
+        '                ByVal CH_W1 As Single, _
+        '                ByVal CH_K1 As Single, _
+        '                ByVal CH_N1 As Single, _
+        '                ByVal CO2 As Single, _
+        '                ByVal RFINC() As Single, _
+        '                ByVal TMPINC() As Single, _
+        '                ByVal RADINC() As Single, _
+        '                ByVal HUMINC() As Single, _
+        '                ByVal HRUTOT As Long, _
+        '                ByVal IPOT As Long, _
+        '                ByVal FCST_REG As Long)
+        '                ByVal COMID As Integer)
+
+        '    Me.Add(SUBBASIN, SUB_KM, SUB_LAT, SUB_ELEV, IRGAGE, ITGAGE, ISGAGE, IHGAGE, IWGAGE, _
+        '           ELEVB(0), ELEVB(1), ELEVB(2), ELEVB(3), ELEVB(4), ELEVB(5), ELEVB(6), ELEVB(7), ELEVB(8), ELEVB(9), _
+        '           ELEVB_FR(0), ELEVB_FR(1), ELEVB_FR(2), ELEVB_FR(3), ELEVB_FR(4), ELEVB_FR(5), ELEVB_FR(6), ELEVB_FR(7), ELEVB_FR(8), ELEVB_FR(9), _
+        '           SNOEB(0), SNOEB(1), SNOEB(2), SNOEB(3), SNOEB(4), SNOEB(5), SNOEB(6), SNOEB(7), SNOEB(8), SNOEB(9), _
+        '           PLAPS, TLAPS, SNO_SUB, CH_L1, CH_S1, CH_W1, CH_K1, CH_N1, CO2, _
+        '           RFINC(0), RFINC(1), RFINC(2), RFINC(3), RFINC(4), RFINC(5), RFINC(6), RFINC(7), RFINC(8), RFINC(9), RFINC(10), RFINC(11), _
+        '           TMPINC(0), TMPINC(1), TMPINC(2), TMPINC(3), TMPINC(4), TMPINC(5), TMPINC(6), TMPINC(7), TMPINC(8), TMPINC(9), TMPINC(10), TMPINC(11), _
+        '           RADINC(0), RADINC(1), RADINC(2), RADINC(3), RADINC(4), RADINC(5), RADINC(6), RADINC(7), RADINC(8), RADINC(9), RADINC(10), RADINC(11), _
+        '           HUMINC(0), HUMINC(1), HUMINC(2), HUMINC(3), HUMINC(4), HUMINC(5), HUMINC(6), HUMINC(7), HUMINC(8), HUMINC(9), HUMINC(10), HUMINC(11), _
+        '           HRUTOT, IPOT, FCST_REG, COMID)
+        'End Sub
 
         Public Sub Add(ByVal SUBBASIN As Double, _
                         ByVal SUB_KM As Double, _
@@ -284,56 +475,6 @@ Partial Class SwatInput
             Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
             lCommand.ExecuteNonQuery()
         End Sub
-
-        Public Function TableWithArea(ByVal aAggregationFieldName As String) As DataTable
-            Dim lAggregationFromTable As DataTable
-            Dim lAggregationField As Integer = pSwatInput.Hru.Table.Columns.IndexOf(aAggregationFieldName)
-            If lAggregationField > 0 Then
-                lAggregationFromTable = pSwatInput.Hru.UniqueValues(aAggregationFieldName)
-                Debug.Print("AggregationRowCount " & lAggregationFromTable.Rows.Count)
-
-                Dim lArea As Double
-                Dim lTable As New DataTable
-                With lTable
-                    .Columns.Add("SubBasinId", "".GetType)
-                    .Columns.Add("Area", lArea.GetType)
-                    For Each lAggregationRow As DataRow In lAggregationFromTable.Rows
-                        .Columns.Add(lAggregationRow.Item(0), lArea.GetType)
-                    Next
-                    'summarize areas by subbasin
-                    Dim lAreaTotal As Double = 0.0
-                    For Each lSubBasinRow As DataRow In Table().Rows
-                        lArea = lSubBasinRow.Item(2)
-                        lAreaTotal += lArea
-                        Dim lReportRow As DataRow = .NewRow
-                        With lReportRow
-                            .Item(0) = lSubBasinRow.Item(1)
-                            .Item(1) = lArea
-                            For lindex As Integer = 0 To lAggregationFromTable.Rows.Count - 1
-                                .Item(lindex + 2) = 0.0
-                            Next
-                        End With
-                        .Rows.Add(lReportRow)
-                    Next
-
-                    'summarize areas by subbasin/aggrat
-                    For Each lHruRow As DataRow In pSwatInput.Hru.Table.Rows
-                        Dim lSubBasin As Integer = lHruRow.Item(1)
-                        Dim lLandUse As String = lHruRow.Item(3)
-                        Dim lReportRow As DataRow = .Rows(lSubBasin - 1)
-                        lReportRow.Item(lHruRow.Item(lAggregationField)) += lHruRow.Item(6) * lReportRow.Item(1)
-                    Next
-                End With
-                Return lTable
-            Else 'TODO: add exception here?
-                Return Nothing
-            End If
-        End Function
-
-        Public Function Table() As DataTable
-            pSwatInput.Status("Reading " & pTableName & " from database ...")
-            Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN;")
-        End Function
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
