@@ -174,6 +174,35 @@ Public Class SwatInput
         lUpdateCommand.ExecuteNonQuery()
     End Sub
 
+    Public Sub SaveAllTextInput()
+        Dim a As Reflection.Assembly = Reflection.Assembly.GetExecutingAssembly
+        Dim lNewArgs() As Object = {Me}
+        Dim lSaveArgs1() As Object = {Nothing}
+        Dim lSaveArgs2() As Object = {Nothing, Nothing}
+        Dim lSaveMethodNames() As String = {"Save", "Save1", "Save2"}
+
+        For Each lType As Type In a.GetTypes
+            Debug.Print(lType.Name)
+            For Each lMethodName As String In lSaveMethodNames
+                Dim lSaveMethod As System.Reflection.MethodInfo = lType.GetMethod(lMethodName)
+                If Not lSaveMethod Is Nothing Then
+                    Try
+                        Dim lObject As Object = lType.InvokeMember("New", Reflection.BindingFlags.CreateInstance _
+                                                                        + Reflection.BindingFlags.NonPublic _
+                                                                        + Reflection.BindingFlags.Instance, Nothing, Nothing, lNewArgs)
+                        Try
+                            lSaveMethod.Invoke(lObject, lSaveArgs1)
+                        Catch
+                            lSaveMethod.Invoke(lObject, lSaveArgs2)
+                        End Try
+                    Catch e As Exception
+                        Logger.Dbg("Could not save " & lType.Name & ": " & e.Message)
+                    End Try
+                End If
+            Next
+        Next
+    End Sub
+
     Friend Sub Status(ByVal aStatus As String)
         If StatusBar IsNot Nothing Then
             StatusBar.Text = aStatus
