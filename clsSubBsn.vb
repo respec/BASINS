@@ -41,64 +41,8 @@ Partial Class SwatInput
         Public FCST_REG As Long
         Public COMID As Integer
 
-        Public Sub New(ByVal aSUBBASIN As Double, _
-                        ByVal aSUB_KM As Double, _
-                        ByVal aSUB_LAT As Double, _
-                        ByVal aSUB_ELEV As Double, _
-                        ByVal aIRGAGE As Long, _
-                        ByVal aITGAGE As Long, _
-                        ByVal aISGAGE As Long, _
-                        ByVal aIHGAGE As Long, _
-                        ByVal aIWGAGE As Long, _
-                        ByVal aELEVB() As Single, _
-                        ByVal aELEVB_FR() As Single, _
-                        ByVal aSNOEB() As Single, _
-                        ByVal aPLAPS As Single, _
-                        ByVal aTLAPS As Single, _
-                        ByVal aSNO_SUB As Single, _
-                        ByVal aCH_L1 As Single, _
-                        ByVal aCH_S1 As Single, _
-                        ByVal aCH_W1 As Single, _
-                        ByVal aCH_K1 As Single, _
-                        ByVal aCH_N1 As Single, _
-                        ByVal aCO2 As Single, _
-                        ByVal aRFINC() As Single, _
-                        ByVal aTMPINC() As Single, _
-                        ByVal aRADINC() As Single, _
-                        ByVal aHUMINC() As Single, _
-                        ByVal aHRUTOT As Long, _
-                        ByVal aIPOT As Long, _
-                        ByVal aFCST_REG As Long, _
-                        ByVal aCOMID As Integer)
-            SUBBASIN = aSUBBASIN
-            SUB_KM = aSUB_KM
-            SUB_LAT = aSUB_LAT
-            SUB_ELEV = aSUB_ELEV
-            IRGAGE = aIRGAGE
-            ITGAGE = aITGAGE
-            ISGAGE = aISGAGE
-            IHGAGE = aIHGAGE
-            IWGAGE = aIWGAGE
-            ELEVB = aELEVB
-            ELEVB_FR = aELEVB_FR
-            SNOEB = aSNOEB
-            PLAPS = aPLAPS
-            TLAPS = aTLAPS
-            SNO_SUB = aSNO_SUB
-            CH_L1 = aCH_L1
-            CH_S1 = aCH_S1
-            CH_W1 = aCH_W1
-            CH_K1 = aCH_K1
-            CH_N1 = aCH_N1
-            CO2 = aCO2
-            RFINC = aRFINC
-            TMPINC = aTMPINC
-            RADINC = aRADINC
-            HUMINC = aHUMINC
-            HRUTOT = aHRUTOT
-            IPOT = aIPOT
-            FCST_REG = aFCST_REG
-            COMID = aCOMID
+        Public Sub New(ByVal aSubBasin As Double)
+            SUBBASIN = aSubBasin
         End Sub
 
         Public Sub New(ByVal aRow As DataRow)

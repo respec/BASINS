@@ -35,63 +35,9 @@ Partial Class SwatInput
         Public POT_NO3L As Single
         Public DEP_IMP As Long
 
-        Public Sub New()
-        End Sub
-
-        Public Sub New(ByVal aSUBBASIN As Double, _
-                        ByVal aHRU As Double, _
-                        ByVal aLANDUSE As String, _
-                        ByVal aSOIL As String, _
-                        ByVal aSLOPE_CD As String, _
-                        ByVal aHRU_FR As Double, _
-                        ByVal aSLSUBBSN As Single, _
-                        ByVal aHRU_SLP As Single, _
-                        ByVal aOV_N As Single, _
-                        ByVal aLAT_TTIME As Single, _
-                        ByVal aLAT_SED As Single, _
-                        ByVal aSLSOIL As Single, _
-                        ByVal aCANMX As Single, _
-                        ByVal aESCO As Single, _
-                        ByVal aEPCO As Single, _
-                        ByVal aRSDIN As Single, _
-                        ByVal aERORGN As Single, _
-                        ByVal aERORGP As Single, _
-                        ByVal aPOT_FR As Single, _
-                        ByVal aFLD_FR As Single, _
-                        ByVal aRIP_FR As Single, _
-                        ByVal aPOT_TILE As Single, _
-                        ByVal aPOT_VOLX As Single, _
-                        ByVal aPOT_VOL As Single, _
-                        ByVal aPOT_NSED As Single, _
-                        ByVal aPOT_NO3L As Single, _
-                        ByVal aDEP_IMP As Long)
+        Public Sub New(ByVal aSUBBASIN As Double, ByVal aHRU As Double)
             SUBBASIN = aSUBBASIN
             HRU = aHRU
-            LANDUSE = aLANDUSE
-            SOIL = aSOIL
-            SLOPE_CD = aSLOPE_CD
-            HRU_FR = aHRU_FR
-            SLSUBBSN = aSLSUBBSN
-            HRU_SLP = aHRU_SLP
-            OV_N = aOV_N
-            LAT_TTIME = aLAT_TTIME
-            LAT_SED = aLAT_SED
-            SLSOIL = aSLSOIL
-            CANMX = aCANMX
-            ESCO = aESCO
-            EPCO = aEPCO
-            RSDIN = aRSDIN
-            ERORGN = aERORGN
-            ERORGP = aERORGP
-            POT_FR = aPOT_FR
-            FLD_FR = aFLD_FR
-            RIP_FR = aRIP_FR
-            POT_TILE = aPOT_TILE
-            POT_VOLX = aPOT_VOLX
-            POT_VOL = aPOT_VOL
-            POT_NSED = aPOT_NSED
-            POT_NO3L = aPOT_NO3L
-            DEP_IMP = aDEP_IMP
         End Sub
     End Class
 
