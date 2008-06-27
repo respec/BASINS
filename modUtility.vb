@@ -63,4 +63,47 @@ Module modUtility
             IO.File.WriteAllBytes(aFilename, lBytes)
         End If
     End Sub
+
+    Friend Function GroupOfStrings(ByVal aPattern As String, ByVal aCount As Integer, ByVal aDelimiter As String) As String
+        GroupOfStrings = ""
+        For i As Integer = 1 To aCount
+            GroupOfStrings &= aPattern.Replace("#", i.ToString)
+            If i < aCount Then GroupOfStrings &= aDelimiter
+        Next
+    End Function
+
+    Friend Function ArrayToString(ByVal aArray() As Double, ByVal aDelimiter As String) As String
+        ArrayToString = ""
+        For i As Integer = 0 To aArray.GetUpperBound(0)
+            ArrayToString &= aArray(i)
+            If i < aArray.GetUpperBound(0) Then ArrayToString &= aDelimiter
+        Next
+    End Function
+
+    Friend Function ArrayToString(ByVal aArray() As String, ByVal aDelimiter As String) As String
+        ArrayToString = ""
+        For i As Integer = 0 To aArray.GetUpperBound(0)
+            ArrayToString &= aArray(i)
+            If i < aArray.GetUpperBound(0) Then ArrayToString &= aDelimiter
+        Next
+    End Function
+
+    Friend Function QueryDB(ByVal aQuery As String, ByVal aConnection As OleDbConnection) As DataTable
+        Dim lCommand As OleDbCommand = New OleDbCommand(aQuery, aConnection)
+        lCommand.CommandTimeout = 30
+        Dim lOleDbDataAdapter As New OleDbDataAdapter
+        lOleDbDataAdapter.SelectCommand = lCommand
+        Dim lDataSet As New DataSet
+        Dim lTableName As String = "lTable"
+        lOleDbDataAdapter.Fill(lDataSet, lTableName)
+        Return lDataSet.Tables(lTableName)
+    End Function
+
+    Public Sub ExecuteNonQuery(ByVal aSQL As String, ByVal aConnection As OleDbConnection)
+        'Dim lStartTime As Date = Date.Now
+        Dim lCommand As New System.Data.OleDb.OleDbCommand(aSQL, aConnection)
+        lCommand.CommandTimeout = 30
+        lCommand.ExecuteNonQuery()
+    End Sub
+
 End Module

@@ -121,17 +121,6 @@ Public Class SwatInput
         Return QueryDB(aQuery, CnSwatParm)
     End Function
 
-    Private Function QueryDB(ByVal aQuery As String, ByVal aConnection As OleDbConnection) As DataTable
-        Dim lOleDbCommand As OleDbCommand = New OleDbCommand(aQuery, aConnection)
-        lOleDbCommand.CommandTimeout = 30
-        Dim lOleDbDataAdapter As New OleDbDataAdapter
-        lOleDbDataAdapter.SelectCommand = lOleDbCommand
-        Dim lDataSet As New DataSet
-        Dim lTableName As String = "lTable"
-        lOleDbDataAdapter.Fill(lDataSet, lTableName)
-        Return lDataSet.Tables(lTableName)
-    End Function
-
     ''' <summary>
     ''' Generic routine to copy a table in the SWAT parameter input database
     ''' </summary>

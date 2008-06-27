@@ -29,6 +29,11 @@ Partial Class SwatInput
 
         Public Sub New()
         End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO wwq ( Lao , Igropt , Ai0 , Ai1 , Ai2 , Ai3 , Ai4 , Ai5 , Ai6 , Mumax , Rhoq , Tfact , K_l , K_n , K_p , Lambda0 , Lambda1 , Lambda2 , P_n   )" _
+                   & "Values ('" & Lao & "'  ,'" & Igropt & "'  ,'" & Ai0 & "'  ,'" & Ai1 & "'  ,'" & Ai2 & "'  ,'" & Ai3 & "'  ,'" & Ai4 & "'  ,'" & Ai5 & "'  ,'" & Ai6 & "'  ,'" & Mumax & "'  ,'" & Rhoq & "'  ,'" & Tfact & "'  ,'" & K_l & "'  ,'" & K_n & "'  ,'" & K_p & "'  ,'" & Lambda0 & "'  ,'" & Lambda1 & "'  ,'" & Lambda2 & "'  ,'" & P_n & "'  )"
+        End Function
     End Class
 
     ''' <summary>
@@ -107,12 +112,7 @@ Partial Class SwatInput
         End Function
 
         Public Sub Add(ByVal aItem As clsWwqItem)
-            With aItem
-                Dim lSQL As String = "INSERT INTO wwq ( Lao , Igropt , Ai0 , Ai1 , Ai2 , Ai3 , Ai4 , Ai5 , Ai6 , Mumax , Rhoq , Tfact , K_l , K_n , K_p , Lambda0 , Lambda1 , Lambda2 , P_n   )" _
-                                   & "Values ('" & .Lao & "'  ,'" & .Igropt & "'  ,'" & .Ai0 & "'  ,'" & .Ai1 & "'  ,'" & .Ai2 & "'  ,'" & .Ai3 & "'  ,'" & .Ai4 & "'  ,'" & .Ai5 & "'  ,'" & .Ai6 & "'  ,'" & .Mumax & "'  ,'" & .Rhoq & "'  ,'" & .Tfact & "'  ,'" & .K_l & "'  ,'" & .K_n & "'  ,'" & .K_p & "'  ,'" & .Lambda0 & "'  ,'" & .Lambda1 & "'  ,'" & .Lambda2 & "'  ,'" & .P_n & "'  )"
-                Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-                lCommand.ExecuteNonQuery()
-            End With
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
