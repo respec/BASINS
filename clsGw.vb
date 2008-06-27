@@ -145,7 +145,14 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal SUBBASIN As Double, _
+        Public Sub Add(ByVal aGwItem As clsGwItem)
+            With aGwItem
+                Me.Add(.SUBBASIN, .HRU, .LANDUSE, .SOIL, .SLOPE_CD, .SHALLST, .DEEPST, .GW_DELAY, .ALPHA_BF, _
+                       .GWQMN, .GW_REVAP, .REVAPMN, .RCHRG_DP, .GWHT, .GW_SPYLD, .SHALLST_N, .GWSOLP, .HLIFE_NGW)
+            End With
+        End Sub
+
+        Private Sub Add(ByVal SUBBASIN As Double, _
                         ByVal HRU As Double, _
                         ByVal LANDUSE As String, _
                         ByVal SOIL As String, _
