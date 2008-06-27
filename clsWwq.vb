@@ -32,7 +32,7 @@ Partial Class SwatInput
 
         Public Function AddSQL() As String
             Return "INSERT INTO wwq ( Lao , Igropt , Ai0 , Ai1 , Ai2 , Ai3 , Ai4 , Ai5 , Ai6 , Mumax , Rhoq , Tfact , K_l , K_n , K_p , Lambda0 , Lambda1 , Lambda2 , P_n   )" _
-                   & "Values ('" & Lao & "'  ,'" & Igropt & "'  ,'" & Ai0 & "'  ,'" & Ai1 & "'  ,'" & Ai2 & "'  ,'" & Ai3 & "'  ,'" & Ai4 & "'  ,'" & Ai5 & "'  ,'" & Ai6 & "'  ,'" & Mumax & "'  ,'" & Rhoq & "'  ,'" & Tfact & "'  ,'" & K_l & "'  ,'" & K_n & "'  ,'" & K_p & "'  ,'" & Lambda0 & "'  ,'" & Lambda1 & "'  ,'" & Lambda2 & "'  ,'" & P_n & "'  )"
+                   & "Values ('" & Lao & "', '" & Igropt & "', '" & Ai0 & "', '" & Ai1 & "', '" & Ai2 & "', '" & Ai3 & "', '" & Ai4 & "', '" & Ai5 & "', '" & Ai6 & "', '" & Mumax & "', '" & Rhoq & "', '" & Tfact & "', '" & K_l & "', '" & K_n & "', '" & K_p & "', '" & Lambda0 & "', '" & Lambda1 & "', '" & Lambda2 & "', '" & P_n & "'  )"
         End Function
     End Class
 

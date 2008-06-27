@@ -46,6 +46,15 @@ Partial Class SwatInput
             SOIL = aSOIL
             SLOPE_CD = aSLOPE_CD
         End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO hru ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , HRU_FR , SLSUBBSN , HRU_SLP , OV_N , LAT_TTIME , LAT_SED , SLSOIL , CANMX , ESCO , EPCO , RSDIN , ERORGN , ERORGP , POT_FR , FLD_FR , RIP_FR , POT_TILE , POT_VOLX , POT_VOL , POT_NSED , POT_NO3L , DEP_IMP ) " _
+                 & "Values ('" & SUBBASIN & "', '" & HRU & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" _
+                 & HRU_FR & "', '" & SLSUBBSN & "', '" & HRU_SLP & "', '" & OV_N & "', '" & LAT_TTIME & "', '" & LAT_SED & "', '" _
+                 & SLSOIL & "', '" & CANMX & "', '" & ESCO & "', '" & EPCO & "', '" & RSDIN & "', '" _
+                 & ERORGN & "', '" & ERORGP & "', '" & POT_FR & "', '" & FLD_FR & "', '" & RIP_FR & "', '" _
+                 & POT_TILE & "', '" & POT_VOLX & "', '" & POT_VOL & "', '" & POT_NSED & "', '" & POT_NO3L & "', '" & DEP_IMP & "'  )"
+        End Function
     End Class
 
     ''' <summary>
@@ -133,50 +142,8 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & " ORDER BY SUBBASIN, HRU;")
         End Function
 
-        Public Sub Add(ByVal aHruItem As clsHruItem)
-            With aHruItem
-                Me.Add(.SUBBASIN, .HRU, .LANDUSE, .SOIL, .SLOPE_CD, .HRU_FR, .SLSUBBSN, .HRU_SLP, .OV_N, _
-                       .LAT_TTIME, .LAT_SED, .SLSOIL, .CANMX, .ESCO, .EPCO, .RSDIN, .ERORGN, .ERORGP, _
-                       .POT_FR, .FLD_FR, .RIP_FR, .POT_TILE, .POT_VOLX, .POT_VOL, .POT_NSED, .POT_NO3L, .DEP_IMP)
-            End With
-        End Sub
-
-        Public Sub Add(ByVal SUBBASIN As Double, _
-                        ByVal HRU As Double, _
-                        ByVal LANDUSE As String, _
-                        ByVal SOIL As String, _
-                        ByVal SLOPE_CD As String, _
-                        ByVal HRU_FR As Double, _
-                        ByVal SLSUBBSN As Single, _
-                        ByVal HRU_SLP As Single, _
-                        ByVal OV_N As Single, _
-                        ByVal LAT_TTIME As Single, _
-                        ByVal LAT_SED As Single, _
-                        ByVal SLSOIL As Single, _
-                        ByVal CANMX As Single, _
-                        ByVal ESCO As Single, _
-                        ByVal EPCO As Single, _
-                        ByVal RSDIN As Single, _
-                        ByVal ERORGN As Single, _
-                        ByVal ERORGP As Single, _
-                        ByVal POT_FR As Single, _
-                        ByVal FLD_FR As Single, _
-                        ByVal RIP_FR As Single, _
-                        ByVal POT_TILE As Single, _
-                        ByVal POT_VOLX As Single, _
-                        ByVal POT_VOL As Single, _
-                        ByVal POT_NSED As Single, _
-                        ByVal POT_NO3L As Single, _
-                        ByVal DEP_IMP As Long)
-
-            Dim lSQL As String = "INSERT INTO hru ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , HRU_FR , SLSUBBSN , HRU_SLP , OV_N , LAT_TTIME , LAT_SED , SLSOIL , CANMX , ESCO , EPCO , RSDIN , ERORGN , ERORGP , POT_FR , FLD_FR , RIP_FR , POT_TILE , POT_VOLX , POT_VOL , POT_NSED , POT_NO3L , DEP_IMP ) " _
-                               & "Values ('" & SUBBASIN & "'  ,'" & HRU & "'  ,'" & LANDUSE & "'  ,'" & SOIL & "'  ,'" & SLOPE_CD & "'  ,'" _
-                               & HRU_FR & "'  ,'" & SLSUBBSN & "'  ,'" & HRU_SLP & "'  ,'" & OV_N & "'  ,'" & LAT_TTIME & "'  ,'" & LAT_SED & "'  ,'" _
-                               & SLSOIL & "'  ,'" & CANMX & "'  ,'" & ESCO & "'  ,'" & EPCO & "'  ,'" & RSDIN & "'  ,'" _
-                               & ERORGN & "'  ,'" & ERORGP & "'  ,'" & POT_FR & "'  ,'" & FLD_FR & "'  ,'" & RIP_FR & "'  ,'" _
-                               & POT_TILE & "'  ,'" & POT_VOLX & "'  ,'" & POT_VOL & "'  ,'" & POT_NSED & "'  ,'" & POT_NO3L & "'  ,'" & DEP_IMP & "'  )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsHruItem)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         ''' <summary>

@@ -6,8 +6,86 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsResItem
+        Public SUBBASIN As Double
+        Public MORES As Long
+        Public IYRES As Long
+        Public RES_ESA As Single
+        Public RES_EVOL As Single
+        Public RES_PSA As Single
+        Public RES_PVOL As Single
+        Public RES_VOL As Single
+        Public RES_SED As Single
+        Public RES_NSED As Single
+        Public RES_K As Single
+        Public IRESCO As Long
+        Public OFLOWMX(11) As Double
+        Public OFLOWMN(11) As Double
+        Public RES_RR As Single
+        Public RESMONO As String
+        Public IFLOOD1R As Long
+        Public IFLOOD2R As Long
+        Public NDTARGR As Long
+        Public STARG(11) As Double
+        Public RESDAYO As String
+        Public WURESN(11) As Double
+        Public WURTNF As Single
+        Public IRES1 As Long
+        Public IRES2 As Long
+        Public PSETLR1 As Single
+        Public PSETLR2 As Single
+        Public NSETLR1 As Single
+        Public NSETLR2 As Single
+        Public CHLAR As Single
+        Public SECCIR As Single
+        Public RES_ORGP As Single
+        Public RES_SOLP As Single
+        Public RES_ORGN As Single
+        Public RES_NO3 As Single
+        Public RES_NH3 As Single
+        Public RES_NO2 As Single
+        Public LKPST_CONC As Single
+        Public LKPST_REA As Single
+        Public LKPST_VOL As Single
+        Public LKPST_KOC As Single
+        Public LKPST_STL As Single
+        Public LKPST_RSP As Single
+        Public LKPST_MIX As Single
+        Public LKSPSTCONC As Single
+        Public LKSPST_REA As Single
+        Public LKSPST_BRY As Single
+        Public LKSPST_ACT As Single
+        Public RES_D50 As Single
+
+        Public Sub New(ByVal aSUBBASIN As Double)
+            SUBBASIN = aSUBBASIN
+        End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO res ( SUBBASIN, MORES, IYRES, RES_ESA, RES_EVOL, RES_PSA, RES_PVOL, RES_VOL, RES_SED, RES_NSED, RES_K, IRESCO, " _
+                 & GroupOfStrings("OFLOWMX#", 12, ", ") & ", " _
+                 & GroupOfStrings("OFLOWMN#", 12, ", ") & ", " _
+                 & "RES_RR, RESMONO, IFLOOD1R, IFLOOD2R, NDTARGR, " _
+                 & GroupOfStrings("STARG#", 12, ", ") & ", " _
+                 & "RESDAYO, " _
+                 & GroupOfStrings("WURESN#", 12, ", ") & ", " _
+                 & "WURTNF, IRES1, IRES2, PSETLR1, PSETLR2, NSETLR1, NSETLR2, CHLAR, SECCIR, RES_ORGP, RES_SOLP, RES_ORGN, RES_NO3, RES_NH3, RES_NO2, LKPST_CONC, LKPST_REA, LKPST_VOL, LKPST_KOC, LKPST_STL, LKPST_RSP, LKPST_MIX, LKSPSTCONC, LKSPST_REA, LKSPST_BRY, LKSPST_ACT, RES_D50  ) " _
+                 & "Values ('" & SUBBASIN & "', '" & MORES & "', '" & IYRES & "', '" & RES_ESA & "', '" & RES_EVOL & "', '" & RES_PSA & "', '" & RES_PVOL & "', '" & RES_VOL & "', '" & RES_SED & "', '" & RES_NSED & "', '" & RES_K & "', '" & IRESCO & "', '" _
+                 & ArrayToString(OFLOWMX, "', '") & "', '" _
+                 & ArrayToString(OFLOWMN, "', '") & "', '" _
+                 & RES_RR & "', '" & RESMONO & "', '" & IFLOOD1R & "', '" & IFLOOD2R & "', '" & NDTARGR & "', '" _
+                 & ArrayToString(STARG, "', '") & "', '" _
+                 & RESDAYO & "', '" _
+                 & ArrayToString(WURESN, "', '") & "', '" _
+                 & WURTNF & "', '" & IRES1 & "', '" & IRES2 & "', '" & PSETLR1 & "', '" & PSETLR2 & "', '" & NSETLR1 & "', '" & NSETLR2 & "', '" & CHLAR & "', '" & SECCIR & "', '" _
+                 & RES_ORGP & "', '" & RES_SOLP & "', '" & RES_ORGN & "', '" & RES_NO3 & "', '" & RES_NH3 & "', '" & RES_NO2 & "', '" _
+                 & LKPST_CONC & "', '" & LKPST_REA & "', '" & LKPST_VOL & "', '" & LKPST_KOC & "', '" & LKPST_STL & "', '" & LKPST_RSP & "', '" _
+                 & LKPST_MIX & "', '" & LKSPSTCONC & "', '" & LKSPST_REA & "', '" & LKSPST_BRY & "', '" & LKSPST_ACT & "', '" & RES_D50 & "' )"
+        End Function
+    End Class
+
     ''' <summary>
-    ''' Gw Input Section
+    ''' Res Input Section
     ''' </summary>
     ''' <remarks></remarks>
     Public Class clsRes
@@ -123,166 +201,8 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal SUBBASIN As Double, _
-                ByVal MORES As Long, _
-                ByVal IYRES As Long, _
-                ByVal RES_ESA As Single, _
-                ByVal RES_EVOL As Single, _
-                ByVal RES_PSA As Single, _
-                ByVal RES_PVOL As Single, _
-                ByVal RES_VOL As Single, _
-                ByVal RES_SED As Single, _
-                ByVal RES_NSED As Single, _
-                ByVal RES_K As Single, _
-                ByVal IRESCO As Long, _
-                ByVal OFLOWMX() As Double, _
-                ByVal OFLOWMN() As Double, _
-                ByVal RES_RR As Single, _
-                ByVal RESMONO As String, _
-                ByVal IFLOOD1R As Long, _
-                ByVal IFLOOD2R As Long, _
-                ByVal NDTARGR As Long, _
-                ByVal STARG() As Double, _
-                ByVal RESDAYO As String, _
-                ByVal WURESN() As Double, _
-                ByVal WURTNF As Single, _
-                ByVal IRES1 As Long, _
-                ByVal IRES2 As Long, _
-                ByVal PSETLR1 As Single, _
-                ByVal PSETLR2 As Single, _
-                ByVal NSETLR1 As Single, _
-                ByVal NSETLR2 As Single, _
-                ByVal CHLAR As Single, _
-                ByVal SECCIR As Single, _
-                ByVal RES_ORGP As Single, _
-                ByVal RES_SOLP As Single, _
-                ByVal RES_ORGN As Single, _
-                ByVal RES_NO3 As Single, _
-                ByVal RES_NH3 As Single, _
-                ByVal RES_NO2 As Single, _
-                ByVal LKPST_CONC As Single, _
-                ByVal LKPST_REA As Single, _
-                ByVal LKPST_VOL As Single, _
-                ByVal LKPST_KOC As Single, _
-                ByVal LKPST_STL As Single, _
-                ByVal LKPST_RSP As Single, _
-                ByVal LKPST_MIX As Single, _
-                ByVal LKSPSTCONC As Single, _
-                ByVal LKSPST_REA As Single, _
-                ByVal LKSPST_BRY As Single, _
-                ByVal LKSPST_ACT As Single, _
-                ByVal RES_D50 As Single)
-            Me.Add(SUBBASIN, MORES, IYRES, RES_ESA, RES_EVOL, RES_PSA, _
-                   RES_PVOL, RES_VOL, RES_SED, RES_NSED, RES_K, IRESCO, _
-                   OFLOWMX(0), OFLOWMX(1), OFLOWMX(2), OFLOWMX(3), OFLOWMX(4), OFLOWMX(5), OFLOWMX(6), OFLOWMX(7), OFLOWMX(8), OFLOWMX(9), OFLOWMX(10), OFLOWMX(11), _
-                   OFLOWMN(0), OFLOWMN(1), OFLOWMN(2), OFLOWMN(3), OFLOWMN(4), OFLOWMN(5), OFLOWMN(6), OFLOWMN(7), OFLOWMN(8), OFLOWMN(9), OFLOWMN(10), OFLOWMN(11), _
-                   RES_RR, RESMONO, IFLOOD1R, IFLOOD2R, NDTARGR, _
-                   STARG(0), STARG(1), STARG(2), STARG(3), STARG(4), STARG(5), STARG(6), STARG(7), STARG(8), STARG(9), STARG(10), STARG(11), _
-                   RESDAYO, _
-                   WURESN(0), WURESN(1), WURESN(2), WURESN(3), WURESN(4), WURESN(5), WURESN(6), WURESN(7), WURESN(8), WURESN(9), WURESN(10), WURESN(11), _
-                   WURTNF, IRES1, IRES2, PSETLR1, PSETLR2, NSETLR1, NSETLR2, CHLAR, SECCIR, _
-                   RES_ORGP, RES_SOLP, RES_ORGN, RES_NO3, RES_NH3, RES_NO2, _
-                   LKPST_CONC, LKPST_REA, LKPST_VOL, LKPST_KOC, LKPST_STL, LKPST_RSP, LKPST_MIX, LKSPSTCONC, LKSPST_REA, LKSPST_BRY, LKSPST_ACT, RES_D50)
-        End Sub
-
-        Public Sub Add(ByVal SUBBASIN As Double, _
-                        ByVal MORES As Long, _
-                        ByVal IYRES As Long, _
-                        ByVal RES_ESA As Single, _
-                        ByVal RES_EVOL As Single, _
-                        ByVal RES_PSA As Single, _
-                        ByVal RES_PVOL As Single, _
-                        ByVal RES_VOL As Single, _
-                        ByVal RES_SED As Single, _
-                        ByVal RES_NSED As Single, _
-                        ByVal RES_K As Single, _
-                        ByVal IRESCO As Long, _
-                        ByVal OFLOWMX1 As Double, _
-                        ByVal OFLOWMX2 As Double, _
-                        ByVal OFLOWMX3 As Double, _
-                        ByVal OFLOWMX4 As Double, _
-                        ByVal OFLOWMX5 As Double, _
-                        ByVal OFLOWMX6 As Double, _
-                        ByVal OFLOWMX7 As Double, _
-                        ByVal OFLOWMX8 As Double, _
-                        ByVal OFLOWMX9 As Double, _
-                        ByVal OFLOWMX10 As Double, _
-                        ByVal OFLOWMX11 As Double, _
-                        ByVal OFLOWMX12 As Double, _
-                        ByVal OFLOWMN1 As Double, _
-                        ByVal OFLOWMN2 As Double, _
-                        ByVal OFLOWMN3 As Double, _
-                        ByVal OFLOWMN4 As Double, _
-                        ByVal OFLOWMN5 As Double, _
-                        ByVal OFLOWMN6 As Double, _
-                        ByVal OFLOWMN7 As Double, _
-                        ByVal OFLOWMN8 As Double, _
-                        ByVal OFLOWMN9 As Double, _
-                        ByVal OFLOWMN10 As Double, _
-                        ByVal OFLOWMN11 As Double, _
-                        ByVal OFLOWMN12 As Double, _
-                        ByVal RES_RR As Single, _
-                        ByVal RESMONO As String, _
-                        ByVal IFLOOD1R As Long, _
-                        ByVal IFLOOD2R As Long, _
-                        ByVal NDTARGR As Long, _
-                        ByVal STARG1 As Double, _
-                        ByVal STARG2 As Double, _
-                        ByVal STARG3 As Double, _
-                        ByVal STARG4 As Double, _
-                        ByVal STARG5 As Double, _
-                        ByVal STARG6 As Double, _
-                        ByVal STARG7 As Double, _
-                        ByVal STARG8 As Double, _
-                        ByVal STARG9 As Double, _
-                        ByVal STARG10 As Double, _
-                        ByVal STARG11 As Double, _
-                        ByVal STARG12 As Double, _
-                        ByVal RESDAYO As String, _
-                        ByVal WURESN1 As Double, _
-                        ByVal WURESN2 As Double, _
-                        ByVal WURESN3 As Double, _
-                        ByVal WURESN4 As Double, _
-                        ByVal WURESN5 As Double, _
-                        ByVal WURESN6 As Double, _
-                        ByVal WURESN7 As Double, _
-                        ByVal WURESN8 As Double, _
-                        ByVal WURESN9 As Double, _
-                        ByVal WURESN10 As Double, _
-                        ByVal WURESN11 As Double, _
-                        ByVal WURESN12 As Double, _
-                        ByVal WURTNF As Single, _
-                        ByVal IRES1 As Long, _
-                        ByVal IRES2 As Long, _
-                        ByVal PSETLR1 As Single, _
-                        ByVal PSETLR2 As Single, _
-                        ByVal NSETLR1 As Single, _
-                        ByVal NSETLR2 As Single, _
-                        ByVal CHLAR As Single, _
-                        ByVal SECCIR As Single, _
-                        ByVal RES_ORGP As Single, _
-                        ByVal RES_SOLP As Single, _
-                        ByVal RES_ORGN As Single, _
-                        ByVal RES_NO3 As Single, _
-                        ByVal RES_NH3 As Single, _
-                        ByVal RES_NO2 As Single, _
-                        ByVal LKPST_CONC As Single, _
-                        ByVal LKPST_REA As Single, _
-                        ByVal LKPST_VOL As Single, _
-                        ByVal LKPST_KOC As Single, _
-                        ByVal LKPST_STL As Single, _
-                        ByVal LKPST_RSP As Single, _
-                        ByVal LKPST_MIX As Single, _
-                        ByVal LKSPSTCONC As Single, _
-                        ByVal LKSPST_REA As Single, _
-                        ByVal LKSPST_BRY As Single, _
-                        ByVal LKSPST_ACT As Single, _
-                        ByVal RES_D50 As Single)
-
-            Dim lSQL As String = "INSERT INTO res ( SUBBASIN , MORES , IYRES , RES_ESA , RES_EVOL , RES_PSA , RES_PVOL , RES_VOL , RES_SED , RES_NSED , RES_K , IRESCO , OFLOWMX1 , OFLOWMX2 , OFLOWMX3 , OFLOWMX4 , OFLOWMX5 , OFLOWMX6 , OFLOWMX7 , OFLOWMX8 , OFLOWMX9 , OFLOWMX10 , OFLOWMX11 , OFLOWMX12 , OFLOWMN1 , OFLOWMN2 , OFLOWMN3 , OFLOWMN4 , OFLOWMN5 , OFLOWMN6 , OFLOWMN7 , OFLOWMN8 , OFLOWMN9 , OFLOWMN10 , OFLOWMN11 , OFLOWMN12 , RES_RR , RESMONO , IFLOOD1R , IFLOOD2R , NDTARGR , STARG1 , STARG2 , STARG3 , STARG4 , STARG5 , STARG6 , STARG7 , STARG8 , STARG9 , STARG10 , STARG11 , STARG12 , RESDAYO , WURESN1 , WURESN2 , WURESN3 , WURESN4 , WURESN5 , WURESN6 , WURESN7 , WURESN8 , WURESN9 , WURESN10 , WURESN11 , WURESN12 , WURTNF , IRES1 , IRES2 , PSETLR1 , PSETLR2 , NSETLR1 , NSETLR2 , CHLAR , SECCIR , RES_ORGP , RES_SOLP , RES_ORGN , RES_NO3 , RES_NH3 , RES_NO2 , LKPST_CONC , LKPST_REA , LKPST_VOL , LKPST_KOC , LKPST_STL , LKPST_RSP , LKPST_MIX , LKSPSTCONC , LKSPST_REA , LKSPST_BRY , LKSPST_ACT , RES_D50  ) " _
-                               & "Values ('" & SUBBASIN & "'  ,'" & MORES & "'  ,'" & IYRES & "'  ,'" & RES_ESA & "'  ,'" & RES_EVOL & "'  ,'" & RES_PSA & "'  ,'" & RES_PVOL & "'  ,'" & RES_VOL & "'  ,'" & RES_SED & "'  ,'" & RES_NSED & "'  ,'" & RES_K & "'  ,'" & IRESCO & "'  ,'" & OFLOWMX1 & "'  ,'" & OFLOWMX2 & "'  ,'" & OFLOWMX3 & "'  ,'" & OFLOWMX4 & "'  ,'" & OFLOWMX5 & "'  ,'" & OFLOWMX6 & "'  ,'" & OFLOWMX7 & "'  ,'" & OFLOWMX8 & "'  ,'" & OFLOWMX9 & "'  ,'" & OFLOWMX10 & "'  ,'" & OFLOWMX11 & "'  ,'" & OFLOWMX12 & "'  ,'" & OFLOWMN1 & "'  ,'" & OFLOWMN2 & "'  ,'" & OFLOWMN3 & "'  ,'" & OFLOWMN4 & "'  ,'" & OFLOWMN5 & "'  ,'" & OFLOWMN6 & "'  ,'" & OFLOWMN7 & "'  ,'" & OFLOWMN8 & "'  ,'" & OFLOWMN9 & "'  ,'" & OFLOWMN10 & "'  ,'" & OFLOWMN11 & "'  ,'" & OFLOWMN12 & "'  ,'" & RES_RR & "'  ,'" & RESMONO & "'  ,'" & IFLOOD1R & "'  ,'" & IFLOOD2R & "'  ,'" & NDTARGR & "'  ,'" & STARG1 & "'  ,'" & STARG2 & "'  ,'" & STARG3 & "'  ,'" & STARG4 & "'  ,'" & STARG5 & "'  ,'" & STARG6 & "'  ,'" & STARG7 & "'  ,'" & STARG8 & "'  ,'" & STARG9 & "'  ,'" & STARG10 & "'  ,'" & STARG11 & "'  ,'" & STARG12 & "'  ,'" & RESDAYO & "'  ,'" & WURESN1 & "'  ,'" & WURESN2 & "'  ,'" & WURESN3 & "'  ,'" & WURESN4 & "'  ,'" & WURESN5 & "'  ,'" & WURESN6 & "'  ,'" & WURESN7 & "'  ,'" & WURESN8 & "'  ,'" & WURESN9 & "'  ,'" & WURESN10 & "'  ,'" & WURESN11 & "'  ,'" & WURESN12 & "'  ,'" & WURTNF & "'  ,'" & IRES1 & "'  ,'" & IRES2 & "'  ,'" & PSETLR1 & "'  ,'" & PSETLR2 & "'  ,'" & NSETLR1 & "'  ,'" & NSETLR2 & "'  ,'" & CHLAR & "'  ,'" & SECCIR & "'  ,'" & RES_ORGP & "'  ,'" & RES_SOLP & "'  ,'" & RES_ORGN & "'  ,'" & RES_NO3 & "'  ,'" & RES_NH3 & "'  ,'" & RES_NO2 & "'  ,'" & LKPST_CONC & "'  ,'" & LKPST_REA & "'  ,'" & LKPST_VOL & "'  ,'" & LKPST_KOC & "'  ,'" & LKPST_STL & "'  ,'" & LKPST_RSP & "'  ,'" & LKPST_MIX & "'  ,'" & LKSPSTCONC & "'  ,'" & LKSPST_REA & "'  ,'" & LKSPST_BRY & "'  ,'" & LKSPST_ACT & "'  ,'" & RES_D50 & "'  )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsResItem)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)

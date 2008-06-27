@@ -6,6 +6,122 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsMgtItem1
+        Public SUBBASIN As Double
+        Public HRU As Double
+        Public LANDUSE As String
+        Public SOIL As String
+        Public SLOPE_CD As String
+        Public IGRO As Integer
+        Public PLANT_ID As Integer
+        Public LAI_INIT As Single
+        Public BIO_INIT As Single
+        Public PHU_PLT As Single
+        Public BIOMIX As Single
+        Public CN2 As Single
+        Public USLE_P As Single
+        Public BIO_MIN As Single
+        Public FILTERW As Single
+        Public IURBAN As Long
+        Public URBLU As Long
+        Public IRRSC As Long
+        Public IRRNO As Long
+        Public FLOWMIN As Single
+        Public DIVMAX As Single
+        Public FLOWFR As Single
+        Public DDRAIN As Single
+        Public TDRAIN As Single
+        Public GDRAIN As Single
+        Public NROT As Integer
+        Public HUSC As Integer
+        Public ISCROP As Integer
+
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                       ByVal aHRU As Double, _
+                       ByVal aLANDUSE As String, _
+                       ByVal aSOIL As String, _
+                       ByVal aSLOPE_CD As String)
+            SUBBASIN = aSUBBASIN
+            HRU = aHRU
+            LANDUSE = aLANDUSE
+            SOIL = aSOIL
+            SLOPE_CD = aSLOPE_CD
+        End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO mgt1 ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , IGRO , PLANT_ID , LAI_INIT , BIO_INIT , PHU_PLT , BIOMIX , CN2 , USLE_P , BIO_MIN , FILTERW , IURBAN , URBLU , IRRSC , IRRNO , FLOWMIN , DIVMAX , FLOWFR , DDRAIN , TDRAIN , GDRAIN , NROT , HUSC , ISCROP  ) " _
+                 & "Values ('" & SUBBASIN & "', '" & HRU & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & IGRO & "', '" & PLANT_ID & "', '" & LAI_INIT & "', '" & BIO_INIT & "', '" & PHU_PLT & "', '" & BIOMIX & "', '" & CN2 & "', '" & USLE_P & "', '" & BIO_MIN & "', '" & FILTERW & "', '" & IURBAN & "', '" & URBLU & "', '" & IRRSC & "', '" & IRRNO & "', '" & FLOWMIN & "', '" & DIVMAX & "', '" & FLOWFR & "', '" & DDRAIN & "', '" & TDRAIN & "', '" & GDRAIN & "', '" & NROT & "', '" & HUSC & "', '" & ISCROP & "'  )"
+        End Function
+    End Class
+
+    Public Class clsMgtItem2
+        Public SUBBASIN As Double
+        Public HRU As Double
+        Public LANDUSE As String
+        Public SOIL As String
+        Public SLOPE_CD As String
+        Public CROP As String
+        Public YEAR As Integer
+        Public MONTH As Integer
+        Public DAY As Integer
+        Public HUSC As Single
+        Public MGT_OP As Integer
+        Public HEATUNITS As Single
+        Public PLANT_ID As Integer
+        Public CURYR_MAT As Integer
+        Public LAI_INIT As Single
+        Public BIO_INIT As Single
+        Public HI_TARG As Single
+        Public BIO_TARG As Single
+        Public CNOP As Double
+        Public IRR_AMT As Single
+        Public FERT_ID As Integer
+        Public FRT_KG As Single
+        Public FRT_SURFACE As Single
+        Public PEST_ID As Integer
+        Public PST_KG As Single
+        Public TILLAGE_ID As Integer
+        Public HARVEFF As Single
+        Public HI_OVR As Single
+        Public GRZ_DAYS As Integer
+        Public MANURE_ID As Integer
+        Public BIO_EAT As Single
+        Public BIO_TRMP As Single
+        Public MANURE_KG As Single
+        Public WSTRS_ID As Integer
+        Public AUTO_WSTRS As Single
+        Public AFERT_ID As Integer
+        Public AUTO_NSTRS As Single
+        Public AUTO_NAPP As Single
+        Public AUTO_NYR As Single
+        Public AUTO_EFF As Single
+        Public AFRT_SURFACE As Single
+        Public SWEEPEFF As Single
+        Public FR_CURB As Single
+        Public IMP_TRIG As Double
+        Public FERT_DAYS As Long
+        Public CFRT_ID As Long
+        Public IFRT_FREQ As Long
+        Public CFRT_KG As Single
+
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                       ByVal aHRU As Double, _
+                       ByVal aLANDUSE As String, _
+                       ByVal aSOIL As String, _
+                       ByVal aSLOPE_CD As String)
+            SUBBASIN = aSUBBASIN
+            HRU = aHRU
+            LANDUSE = aLANDUSE
+            SOIL = aSOIL
+            SLOPE_CD = aSLOPE_CD
+        End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO mgt2 ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , CROP , [YEAR] , [MONTH] , [DAY] , HUSC , MGT_OP , HEATUNITS , PLANT_ID , CURYR_MAT , LAI_INIT , BIO_INIT , HI_TARG , BIO_TARG , CNOP , IRR_AMT , FERT_ID , FRT_KG , FRT_SURFACE , PEST_ID , PST_KG , TILLAGE_ID , HARVEFF , HI_OVR , GRZ_DAYS , MANURE_ID , BIO_EAT , BIO_TRMP , MANURE_KG , WSTRS_ID , AUTO_WSTRS , AFERT_ID , AUTO_NSTRS , AUTO_NAPP , AUTO_NYR , AUTO_EFF , AFRT_SURFACE , SWEEPEFF , FR_CURB , IMP_TRIG , FERT_DAYS , CFRT_ID , IFRT_FREQ , CFRT_KG  ) " _
+                 & "Values (" & SUBBASIN & "  ," & HRU & "  ,'" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & CROP & "'  ," & YEAR & "  ," & MONTH & "  ," & DAY & "  ," & HUSC & "  ," & MGT_OP & "  ," & HEATUNITS & "  ," & PLANT_ID & "  ," & CURYR_MAT & "  ," & LAI_INIT & "  ," & BIO_INIT & "  ," & HI_TARG & "  ," & BIO_TARG & "  ," & CNOP & "  ," & IRR_AMT & "  ," & FERT_ID & "  ," & FRT_KG & "  ," & FRT_SURFACE & "  ," & PEST_ID & "  ," & PST_KG & "  ," & TILLAGE_ID & "  ," & HARVEFF & "  ," & HI_OVR & "  ," & GRZ_DAYS & "  ," & MANURE_ID & "  ," & BIO_EAT & "  ," & BIO_TRMP & "  ," & MANURE_KG & "  ," & WSTRS_ID & "  ," & AUTO_WSTRS & "  ," & AFERT_ID & "  ," & AUTO_NSTRS & "  ," & AUTO_NAPP & "  ," & AUTO_NYR & "  ," & AUTO_EFF & "  ," & AFRT_SURFACE & "  ," & SWEEPEFF & "  ," & FR_CURB & "  ," & IMP_TRIG & "  ," & FERT_DAYS & "  ," & CFRT_ID & "  ," & IFRT_FREQ & "  ," & CFRT_KG & ")"
+        End Function
+    End Class
+
     ''' <summary>
     ''' Management (MGT) input section
     ''' </summary>
@@ -208,94 +324,12 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM mgt2 ORDER BY SUBBASIN, HRU, [YEAR], [MONTH], [DAY], HUSC;")
         End Function
 
-        Public Sub Add1(ByVal SUBBASIN As Double, _
-                        ByVal HRU As Double, _
-                        ByVal LANDUSE As String, _
-                        ByVal SOIL As String, _
-                        ByVal SLOPE_CD As String, _
-                        ByVal IGRO As Integer, _
-                        ByVal PLANT_ID As Integer, _
-                        ByVal LAI_INIT As Single, _
-                        ByVal BIO_INIT As Single, _
-                        ByVal PHU_PLT As Single, _
-                        ByVal BIOMIX As Single, _
-                        ByVal CN2 As Single, _
-                        ByVal USLE_P As Single, _
-                        ByVal BIO_MIN As Single, _
-                        ByVal FILTERW As Single, _
-                        ByVal IURBAN As Long, _
-                        ByVal URBLU As Long, _
-                        ByVal IRRSC As Long, _
-                        ByVal IRRNO As Long, _
-                        ByVal FLOWMIN As Single, _
-                        ByVal DIVMAX As Single, _
-                        ByVal FLOWFR As Single, _
-                        ByVal DDRAIN As Single, _
-                        ByVal TDRAIN As Single, _
-                        ByVal GDRAIN As Single, _
-                        ByVal NROT As Integer, _
-                        ByVal HUSC As Integer, _
-                        ByVal ISCROP As Integer)
-
-            Dim lSQL As String = "INSERT INTO mgt1 ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , IGRO , PLANT_ID , LAI_INIT , BIO_INIT , PHU_PLT , BIOMIX , CN2 , USLE_P , BIO_MIN , FILTERW , IURBAN , URBLU , IRRSC , IRRNO , FLOWMIN , DIVMAX , FLOWFR , DDRAIN , TDRAIN , GDRAIN , NROT , HUSC , ISCROP  ) " _
-                               & "Values ('" & SUBBASIN & "'  ,'" & HRU & "'  ,'" & LANDUSE & "'  ,'" & SOIL & "'  ,'" & SLOPE_CD & "'  ,'" & IGRO & "'  ,'" & PLANT_ID & "'  ,'" & LAI_INIT & "'  ,'" & BIO_INIT & "'  ,'" & PHU_PLT & "'  ,'" & BIOMIX & "'  ,'" & CN2 & "'  ,'" & USLE_P & "'  ,'" & BIO_MIN & "'  ,'" & FILTERW & "'  ,'" & IURBAN & "'  ,'" & URBLU & "'  ,'" & IRRSC & "'  ,'" & IRRNO & "'  ,'" & FLOWMIN & "'  ,'" & DIVMAX & "'  ,'" & FLOWFR & "'  ,'" & DDRAIN & "'  ,'" & TDRAIN & "'  ,'" & GDRAIN & "'  ,'" & NROT & "'  ,'" & HUSC & "'  ,'" & ISCROP & "'  )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add1(ByVal aItem As clsMgtItem1)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
-        Public Sub Add2(ByVal SUBBASIN As Double, _
-                        ByVal HRU As Double, _
-                        ByVal LANDUSE As String, _
-                        ByVal SOIL As String, _
-                        ByVal SLOPE_CD As String, _
-                        ByVal CROP As String, _
-                        ByVal YEAR As Integer, _
-                        ByVal MONTH As Integer, _
-                        ByVal DAY As Integer, _
-                        ByVal HUSC As Single, _
-                        ByVal MGT_OP As Integer, _
-                        ByVal HEATUNITS As Single, _
-                        ByVal PLANT_ID As Integer, _
-                        ByVal CURYR_MAT As Integer, _
-                        ByVal LAI_INIT As Single, _
-                        ByVal BIO_INIT As Single, _
-                        ByVal HI_TARG As Single, _
-                        ByVal BIO_TARG As Single, _
-                        ByVal CNOP As Double, _
-                        ByVal IRR_AMT As Single, _
-                        ByVal FERT_ID As Integer, _
-                        ByVal FRT_KG As Single, _
-                        ByVal FRT_SURFACE As Single, _
-                        ByVal PEST_ID As Integer, _
-                        ByVal PST_KG As Single, _
-                        ByVal TILLAGE_ID As Integer, _
-                        ByVal HARVEFF As Single, _
-                        ByVal HI_OVR As Single, _
-                        ByVal GRZ_DAYS As Integer, _
-                        ByVal MANURE_ID As Integer, _
-                        ByVal BIO_EAT As Single, _
-                        ByVal BIO_TRMP As Single, _
-                        ByVal MANURE_KG As Single, _
-                        ByVal WSTRS_ID As Integer, _
-                        ByVal AUTO_WSTRS As Single, _
-                        ByVal AFERT_ID As Integer, _
-                        ByVal AUTO_NSTRS As Single, _
-                        ByVal AUTO_NAPP As Single, _
-                        ByVal AUTO_NYR As Single, _
-                        ByVal AUTO_EFF As Single, _
-                        ByVal AFRT_SURFACE As Single, _
-                        ByVal SWEEPEFF As Single, _
-                        ByVal FR_CURB As Single, _
-                        ByVal IMP_TRIG As Double, _
-                        ByVal FERT_DAYS As Long, _
-                        ByVal CFRT_ID As Long, _
-                        ByVal IFRT_FREQ As Long, _
-                        ByVal CFRT_KG As Single)
-
-            Dim lSQL As String = "INSERT INTO mgt2 ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , CROP , [YEAR] , [MONTH] , [DAY] , HUSC , MGT_OP , HEATUNITS , PLANT_ID , CURYR_MAT , LAI_INIT , BIO_INIT , HI_TARG , BIO_TARG , CNOP , IRR_AMT , FERT_ID , FRT_KG , FRT_SURFACE , PEST_ID , PST_KG , TILLAGE_ID , HARVEFF , HI_OVR , GRZ_DAYS , MANURE_ID , BIO_EAT , BIO_TRMP , MANURE_KG , WSTRS_ID , AUTO_WSTRS , AFERT_ID , AUTO_NSTRS , AUTO_NAPP , AUTO_NYR , AUTO_EFF , AFRT_SURFACE , SWEEPEFF , FR_CURB , IMP_TRIG , FERT_DAYS , CFRT_ID , IFRT_FREQ , CFRT_KG  ) " _
-                               & "Values (" & SUBBASIN & "  ," & HRU & "  ,'" & LANDUSE & "'  ,'" & SOIL & "'  ,'" & SLOPE_CD & "'  ,'" & CROP & "'  ," & YEAR & "  ," & MONTH & "  ," & DAY & "  ," & HUSC & "  ," & MGT_OP & "  ," & HEATUNITS & "  ," & PLANT_ID & "  ," & CURYR_MAT & "  ," & LAI_INIT & "  ," & BIO_INIT & "  ," & HI_TARG & "  ," & BIO_TARG & "  ," & CNOP & "  ," & IRR_AMT & "  ," & FERT_ID & "  ," & FRT_KG & "  ," & FRT_SURFACE & "  ," & PEST_ID & "  ," & PST_KG & "  ," & TILLAGE_ID & "  ," & HARVEFF & "  ," & HI_OVR & "  ," & GRZ_DAYS & "  ," & MANURE_ID & "  ," & BIO_EAT & "  ," & BIO_TRMP & "  ," & MANURE_KG & "  ," & WSTRS_ID & "  ," & AUTO_WSTRS & "  ," & AFERT_ID & "  ," & AUTO_NSTRS & "  ," & AUTO_NAPP & "  ," & AUTO_NYR & "  ," & AUTO_EFF & "  ," & AFRT_SURFACE & "  ," & SWEEPEFF & "  ," & FR_CURB & "  ," & IMP_TRIG & "  ," & FERT_DAYS & "  ," & CFRT_ID & "  ," & IFRT_FREQ & "  ," & CFRT_KG & ")"        ' Create the Command and set its properties
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add2(ByVal aItem As clsMgtItem2)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         ''' <summary>

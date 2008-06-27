@@ -6,6 +6,31 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsRteItem
+        Public SUBBASIN As Long
+        Public CH_W2 As Single
+        Public CH_D As Single
+        Public CH_S2 As Single
+        Public CH_L2 As Single
+        Public CH_N2 As Single
+        Public CH_K2 As Single
+        Public CH_EROD As Single
+        Public CH_COV As Single
+        Public CH_WDR As Single
+        Public ALPHA_BNK As Single
+
+        Public Sub New(ByVal aSUBBASIN As Long)
+            SUBBASIN = aSUBBASIN
+        End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO rte ( SUBBASIN , CH_W2 , CH_D , CH_S2 , CH_L2 , CH_N2 , CH_K2 , CH_EROD , CH_COV , CH_WDR , ALPHA_BNK   ) " _
+                 & "Values ('" & SUBBASIN & "', '" & CH_W2 & "', '" & CH_D & "', '" & CH_S2 & "', '" _
+                 & CH_L2 & "', '" & CH_N2 & "', '" & CH_K2 & "', '" & CH_EROD & "', '" & CH_COV & "', '" _
+                 & CH_WDR & "', '" & ALPHA_BNK & "'  );"
+        End Function
+    End Class
+
     ''' <summary>
     ''' RTE Input Section
     ''' </summary>
@@ -73,24 +98,8 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal SUBBASIN As Long, _
-                       ByVal CH_W2 As Single, _
-                       ByVal CH_D As Single, _
-                       ByVal CH_S2 As Single, _
-                       ByVal CH_L2 As Single, _
-                       ByVal CH_N2 As Single, _
-                       ByVal CH_K2 As Single, _
-                       ByVal CH_EROD As Single, _
-                       ByVal CH_COV As Single, _
-                       ByVal CH_WDR As Single, _
-                       ByVal ALPHA_BNK As Single)
-
-            Dim lSQL As String = "INSERT INTO rte ( SUBBASIN , CH_W2 , CH_D , CH_S2 , CH_L2 , CH_N2 , CH_K2 , CH_EROD , CH_COV , CH_WDR , ALPHA_BNK   ) " _
-                               & "Values ('" & SUBBASIN & "'  ,'" & CH_W2 & "'  ,'" & CH_D & "'  ,'" & CH_S2 & "'  ,'" _
-                               & CH_L2 & "'  ,'" & CH_N2 & "'  ,'" & CH_K2 & "'  ,'" & CH_EROD & "'  ,'" & CH_COV & "'  ,'" _
-                               & CH_WDR & "'  ,'" & ALPHA_BNK & "'  );"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsRteItem)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)

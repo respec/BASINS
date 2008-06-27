@@ -56,6 +56,10 @@ Partial Class SwatInput
             SUBBASIN = aSUBBASIN
         End Sub
 
+        Public Function AddSQL() As String
+            Return "INSERT INTO pnd ( SUBBASIN, PND_FR, PND_PSA, PND_PVOL, PND_ESA, PND_EVOL, PND_VOL, PND_SED, PND_NSED, PND_K, IFLOD1, IFLOD2, NDTARG, PSETLP1, PSETLP2, NSETLP1, NSETLP2, CHLAP, SECCIP, PND_NO3, PND_SOLP, PND_ORGN, PND_ORGP, IPND1, IPND2, WET_FR, WET_NSA, WET_NVOL, WET_MXSA, WET_MXVOL, WET_VOL, WET_SED, WET_NSED, WET_K, PSETLW1, PSETLW2, NSETLW1, NSETLW2, CHLAW, SECCIW, WET_NO3, WET_SOLP, WET_ORGN, WET_ORGP  ) " _
+                 & "Values ('" & SUBBASIN & "', '" & PND_FR & "', '" & PND_PSA & "', '" & PND_PVOL & "', '" & PND_ESA & "', '" & PND_EVOL & "', '" & PND_VOL & "', '" & PND_SED & "', '" & PND_NSED & "', '" & PND_K & "', '" & IFLOD1 & "', '" & IFLOD2 & "', '" & NDTARG & "', '" & PSETLP1 & "', '" & PSETLP2 & "', '" & NSETLP1 & "', '" & NSETLP2 & "', '" & CHLAP & "', '" & SECCIP & "', '" & PND_NO3 & "', '" & PND_SOLP & "', '" & PND_ORGN & "', '" & PND_ORGP & "', '" & IPND1 & "', '" & IPND2 & "', '" & WET_FR & "', '" & WET_NSA & "', '" & WET_NVOL & "', '" & WET_MXSA & "', '" & WET_MXVOL & "', '" & WET_VOL & "', '" & WET_SED & "', '" & WET_NSED & "', '" & WET_K & "', '" & PSETLW1 & "', '" & PSETLW2 & "', '" & NSETLW1 & "', '" & NSETLW2 & "', '" & CHLAW & "', '" & SECCIW & "', '" & WET_NO3 & "', '" & WET_SOLP & "', '" & WET_ORGN & "', '" & WET_ORGP & "'   )"
+        End Function
     End Class
 
     ''' <summary>
@@ -158,65 +162,8 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal aPndItem As clsPndItem)
-            With aPndItem
-                Add(.SUBBASIN, .PND_FR, .PND_PSA, .PND_PVOL, .PND_ESA, .PND_EVOL, .PND_VOL, .PND_SED, .PND_NSED, .PND_K, _
-                    .IFLOD1, .IFLOD2, .NDTARG, .PSETLP1, .PSETLP2, .NSETLP1, .NSETLP2, .CHLAP, .SECCIP, _
-                    .PND_NO3, .PND_SOLP, .PND_ORGN, .PND_ORGP, .IPND1, .IPND2, _
-                    .WET_FR, .WET_NSA, .WET_NVOL, .WET_MXSA, .WET_MXVOL, .WET_VOL, .WET_SED, .WET_NSED, .WET_K, _
-                    .PSETLW1, .PSETLW2, .NSETLW1, .NSETLW2, .CHLAW, .SECCIW, .WET_NO3, .WET_SOLP, .WET_ORGN, .WET_ORGP)
-            End With
-        End Sub
-
-        Private Sub Add(ByVal SUBBASIN As Double, _
-                       ByVal PND_FR As Single, _
-                       ByVal PND_PSA As Double, _
-                       ByVal PND_PVOL As Double, _
-                       ByVal PND_ESA As Double, _
-                       ByVal PND_EVOL As Double, _
-                       ByVal PND_VOL As Double, _
-                       ByVal PND_SED As Double, _
-                       ByVal PND_NSED As Double, _
-                       ByVal PND_K As Single, _
-                       ByVal IFLOD1 As Long, _
-                       ByVal IFLOD2 As Long, _
-                       ByVal NDTARG As Long, _
-                       ByVal PSETLP1 As Single, _
-                       ByVal PSETLP2 As Single, _
-                       ByVal NSETLP1 As Single, _
-                       ByVal NSETLP2 As Single, _
-                       ByVal CHLAP As Single, _
-                       ByVal SECCIP As Single, _
-                       ByVal PND_NO3 As Single, _
-                       ByVal PND_SOLP As Single, _
-                       ByVal PND_ORGN As Single, _
-                       ByVal PND_ORGP As Single, _
-                       ByVal IPND1 As Long, _
-                       ByVal IPND2 As Long, _
-                       ByVal WET_FR As Single, _
-                       ByVal WET_NSA As Double, _
-                       ByVal WET_NVOL As Double, _
-                       ByVal WET_MXSA As Double, _
-                       ByVal WET_MXVOL As Double, _
-                       ByVal WET_VOL As Double, _
-                       ByVal WET_SED As Double, _
-                       ByVal WET_NSED As Double, _
-                       ByVal WET_K As Single, _
-                       ByVal PSETLW1 As Single, _
-                       ByVal PSETLW2 As Single, _
-                       ByVal NSETLW1 As Single, _
-                       ByVal NSETLW2 As Single, _
-                       ByVal CHLAW As Single, _
-                       ByVal SECCIW As Single, _
-                       ByVal WET_NO3 As Single, _
-                       ByVal WET_SOLP As Single, _
-                       ByVal WET_ORGN As Single, _
-                       ByVal WET_ORGP As Single)
-
-            Dim lSQL As String = "INSERT INTO pnd ( SUBBASIN , PND_FR , PND_PSA , PND_PVOL , PND_ESA , PND_EVOL , PND_VOL , PND_SED , PND_NSED , PND_K , IFLOD1 , IFLOD2 , NDTARG , PSETLP1 , PSETLP2 , NSETLP1 , NSETLP2 , CHLAP , SECCIP , PND_NO3 , PND_SOLP , PND_ORGN , PND_ORGP , IPND1 , IPND2 , WET_FR , WET_NSA , WET_NVOL , WET_MXSA , WET_MXVOL , WET_VOL , WET_SED , WET_NSED , WET_K , PSETLW1 , PSETLW2 , NSETLW1 , NSETLW2 , CHLAW , SECCIW , WET_NO3 , WET_SOLP , WET_ORGN , WET_ORGP  ) " _
-                               & "Values ('" & SUBBASIN & "'  ,'" & PND_FR & "'  ,'" & PND_PSA & "'  ,'" & PND_PVOL & "'  ,'" & PND_ESA & "'  ,'" & PND_EVOL & "'  ,'" & PND_VOL & "'  ,'" & PND_SED & "'  ,'" & PND_NSED & "'  ,'" & PND_K & "'  ,'" & IFLOD1 & "'  ,'" & IFLOD2 & "'  ,'" & NDTARG & "'  ,'" & PSETLP1 & "'  ,'" & PSETLP2 & "'  ,'" & NSETLP1 & "'  ,'" & NSETLP2 & "'  ,'" & CHLAP & "'  ,'" & SECCIP & "'  ,'" & PND_NO3 & "'  ,'" & PND_SOLP & "'  ,'" & PND_ORGN & "'  ,'" & PND_ORGP & "'  ,'" & IPND1 & "'  ,'" & IPND2 & "'  ,'" & WET_FR & "'  ,'" & WET_NSA & "'  ,'" & WET_NVOL & "'  ,'" & WET_MXSA & "'  ,'" & WET_MXVOL & "'  ,'" & WET_VOL & "'  ,'" & WET_SED & "'  ,'" & WET_NSED & "'  ,'" & WET_K & "'  ,'" & PSETLW1 & "'  ,'" & PSETLW2 & "'  ,'" & NSETLW1 & "'  ,'" & NSETLW2 & "'  ,'" & CHLAW & "'  ,'" & SECCIW & "'  ,'" & WET_NO3 & "'  ,'" & WET_SOLP & "'  ,'" & WET_ORGN & "'  ,'" & WET_ORGP & "'   )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsPndItem)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)

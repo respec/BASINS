@@ -72,6 +72,14 @@ Module modUtility
         Next
     End Function
 
+    Friend Function ArrayToString(ByVal aArray() As Single, ByVal aDelimiter As String) As String
+        ArrayToString = ""
+        For i As Integer = 0 To aArray.GetUpperBound(0)
+            ArrayToString &= aArray(i)
+            If i < aArray.GetUpperBound(0) Then ArrayToString &= aDelimiter
+        Next
+    End Function
+
     Friend Function ArrayToString(ByVal aArray() As Double, ByVal aDelimiter As String) As String
         ArrayToString = ""
         For i As Integer = 0 To aArray.GetUpperBound(0)

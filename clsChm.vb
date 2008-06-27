@@ -44,19 +44,19 @@ Partial Class SwatInput
                                & GroupOfStrings("SOLPST#", 10, ", ") & ", " _
                                & GroupOfStrings("PSTENR#", 10, ", ") _
                                & " ) Values (" _
-                               & "'" & SUBBASIN & "'  ,'" _
-                               & HRU & "'  ,'" _
-                               & LANDUSE & "'  ,'" _
-                               & SOIL & "'  ,'" _
-                               & SLOPE_CD & "'  ,'" _
-                               & ArrayToString(SOL_NO3, "'  ,'") & "'  ,'" _
-                               & ArrayToString(SOL_ORGN, "'  ,'") & "'  ,'" _
-                               & ArrayToString(SOL_LABP, "'  ,'") & "'  ,'" _
-                               & ArrayToString(SOL_ORGP, "'  ,'") & "'  ,'" _
-                               & ArrayToString(PESTNAME, "'  ,'") & "'  ,'" _
-                               & ArrayToString(PLTPST, "'  ,'") & "'  ,'" _
-                               & ArrayToString(SOLPST, "'  ,'") & "'  ,'" _
-                               & ArrayToString(PSTENR, "'  ,'") & "' )"
+                               & "'" & SUBBASIN & "', '" _
+                               & HRU & "', '" _
+                               & LANDUSE & "', '" _
+                               & SOIL & "', '" _
+                               & SLOPE_CD & "', '" _
+                               & ArrayToString(SOL_NO3, "', '") & "', '" _
+                               & ArrayToString(SOL_ORGN, "', '") & "', '" _
+                               & ArrayToString(SOL_LABP, "', '") & "', '" _
+                               & ArrayToString(SOL_ORGP, "', '") & "', '" _
+                               & ArrayToString(PESTNAME, "', '") & "', '" _
+                               & ArrayToString(PLTPST, "', '") & "', '" _
+                               & ArrayToString(SOLPST, "', '") & "', '" _
+                               & ArrayToString(PSTENR, "', '") & "' )"
             Return lSQL
         End Function
     End Class

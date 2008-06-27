@@ -49,6 +49,11 @@ Partial Class SwatInput
 
         Public Sub New()
         End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO cio ( NBYR, IYR, IDAF, IDAL, IGEN, PCPSIM, IDT, IDIST, REXP, NRGAGE, NRTOT, NRGFIL, TMPSIM, NTGAGE, NTTOT, NTGFIL, SLRSIM, NSTOT, RHSIM, NHTOT, WNDSIM, NWTOT, FCSTYR, FCSTDAY, FCSTCYCLES, DATES, DATEF, FDATES, ISPROJ, ICLB, IPRINT, NYSKIP, ILOG, IPRP, IPRS  ) " _
+                 & "Values ('" & NBYR & "', '" & IYR & "', '" & IDAF & "', '" & IDAL & "', '" & IGEN & "', '" & PCPSIM & "', '" & IDT & "', '" & IDIST & "', '" & REXP & "', '" & NRGAGE & "', '" & NRTOT & "', '" & NRGFIL & "', '" & TMPSIM & "', '" & NTGAGE & "', '" & NTTOT & "', '" & NTGFIL & "', '" & SLRSIM & "', '" & NSTOT & "', '" & RHSIM & "', '" & NHTOT & "', '" & WNDSIM & "', '" & NWTOT & "', '" & FCSTYR & "', '" & FCSTDAY & "', '" & FCSTCYCLES & "', '" & DATES & "', '" & DATEF & "', '" & FDATES & "', '" & ISPROJ & "', '" & ICLB & "', '" & IPRINT & "', '" & NYSKIP & "', '" & ILOG & "', '" & IPRP & "', '" & IPRS & "')"
+        End Function
     End Class
 
     Public Class clsCIO
@@ -138,54 +143,8 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal aCIOItem As clsCIOItem)
-            With aCIOItem
-                Add(.NBYR, .IYR, .IDAF, .IDAL, .IGEN, .PCPSIM, .IDT, .IDIST, .REXP, .NRGAGE, .NRTOT, .NRGFIL, .TMPSIM, .NTGAGE, _
-                    .NTTOT, .NTGFIL, .SLRSIM, .NSTOT, .RHSIM, .NHTOT, .WNDSIM, .NWTOT, .FCSTYR, .FCSTDAY, .FCSTCYCLES, _
-                    .DATES, .DATEF, .FDATES, .ISPROJ, .ICLB, .IPRINT, .NYSKIP, .ILOG, .IPRP, .IPRS)
-            End With
-        End Sub
-
-        Private Sub Add(ByVal NBYR As Long, _
-                        ByVal IYR As Long, _
-                        ByVal IDAF As Long, _
-                        ByVal IDAL As Long, _
-                        ByVal IGEN As Long, _
-                        ByVal PCPSIM As Long, _
-                        ByVal IDT As Long, _
-                        ByVal IDIST As Long, _
-                        ByVal REXP As Double, _
-                        ByVal NRGAGE As Long, _
-                        ByVal NRTOT As Long, _
-                        ByVal NRGFIL As Long, _
-                        ByVal TMPSIM As Long, _
-                        ByVal NTGAGE As Long, _
-                        ByVal NTTOT As Long, _
-                        ByVal NTGFIL As Long, _
-                        ByVal SLRSIM As Long, _
-                        ByVal NSTOT As Long, _
-                        ByVal RHSIM As Long, _
-                        ByVal NHTOT As Long, _
-                        ByVal WNDSIM As Long, _
-                        ByVal NWTOT As Long, _
-                        ByVal FCSTYR As Long, _
-                        ByVal FCSTDAY As Long, _
-                        ByVal FCSTCYCLES As Long, _
-                        ByVal DATES As String, _
-                        ByVal DATEF As String, _
-                        ByVal FDATES As String, _
-                        ByVal ISPROJ As Long, _
-                        ByVal ICLB As Long, _
-                        ByVal IPRINT As Long, _
-                        ByVal NYSKIP As Long, _
-                        ByVal ILOG As Long, _
-                        ByVal IPRP As Long, _
-                        ByVal IPRS As Long)
-
-            Dim lSQL As String = "INSERT INTO cio ( NBYR , IYR , IDAF , IDAL , IGEN , PCPSIM , IDT , IDIST , REXP , NRGAGE , NRTOT , NRGFIL , TMPSIM , NTGAGE , NTTOT , NTGFIL , SLRSIM , NSTOT , RHSIM , NHTOT , WNDSIM , NWTOT , FCSTYR , FCSTDAY , FCSTCYCLES , DATES , DATEF , FDATES , ISPROJ , ICLB , IPRINT , NYSKIP , ILOG , IPRP , IPRS  ) " _
-                               & "Values ('" & NBYR & "'  ,'" & IYR & "'  ,'" & IDAF & "'  ,'" & IDAL & "'  ,'" & IGEN & "'  ,'" & PCPSIM & "'  ,'" & IDT & "'  ,'" & IDIST & "'  ,'" & REXP & "'  ,'" & NRGAGE & "'  ,'" & NRTOT & "'  ,'" & NRGFIL & "'  ,'" & TMPSIM & "'  ,'" & NTGAGE & "'  ,'" & NTTOT & "'  ,'" & NTGFIL & "'  ,'" & SLRSIM & "'  ,'" & NSTOT & "'  ,'" & RHSIM & "'  ,'" & NHTOT & "'  ,'" & WNDSIM & "'  ,'" & NWTOT & "'  ,'" & FCSTYR & "'  ,'" & FCSTDAY & "'  ,'" & FCSTCYCLES & "'  ,'" & DATES & "'  ,'" & DATEF & "'  ,'" & FDATES & "'  ,'" & ISPROJ & "'  ,'" & ICLB & "'  ,'" & IPRINT & "'  ,'" & NYSKIP & "'  ,'" & ILOG & "'  ,'" & IPRP & "'  ,'" & IPRS & "'   )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsCIOItem)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(ByVal aPrintHRU As Boolean, Optional ByVal aTable As DataTable = Nothing)

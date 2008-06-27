@@ -1,6 +1,6 @@
 Partial Class SwatInput
     ''' <summary>
-    ''' SubBasin (SUB) input section
+    ''' Swq input section
     ''' </summary>
     ''' <remarks></remarks>
     Private pSwq As clsSwq = New clsSwq(Me)
@@ -43,6 +43,11 @@ Partial Class SwatInput
         Public Sub New(ByVal aSUBBASIN As Double)
             SUBBASIN = aSUBBASIN
         End Sub
+
+        Public Function AddSQL() As String
+            Return "INSERT INTO swq ( SUBBASIN , RS1 , RS2 , RS3 , RS4 , RS5 , RS6 , RS7 , RK1 , RK2 , RK3 , RK4 , RK5 , RK6 , BC1 , BC2 , BC3 , BC4 , CHPST_REA , CHPST_VOL , CHPST_KOC , CHPST_STL , CHPST_RSP , CHPST_MIX , SEDPST_CONC , SEDPST_REA , SEDPST_BRY , SEDPST_ACT ) " _
+                 & "Values ('" & SUBBASIN & "', '" & RS1 & "', '" & RS2 & "', '" & RS3 & "', '" & RS4 & "', '" & RS5 & "', '" & RS6 & "', '" & RS7 & "', '" & RK1 & "', '" & RK2 & "', '" & RK3 & "', '" & RK4 & "', '" & RK5 & "', '" & RK6 & "', '" & BC1 & "', '" & BC2 & "', '" & BC3 & "', '" & BC4 & "', '" & CHPST_REA & "', '" & CHPST_VOL & "', '" & CHPST_KOC & "', '" & CHPST_STL & "', '" & CHPST_RSP & "', '" & CHPST_MIX & "', '" & SEDPST_CONC & "', '" & SEDPST_REA & "', '" & SEDPST_BRY & "', '" & SEDPST_ACT & "'  );"
+        End Function
     End Class
 
     Public Class clsSwq
@@ -154,12 +159,7 @@ Partial Class SwatInput
         End Function
 
         Public Sub Add(ByVal aItem As clsSwqItem)
-            With aItem
-                Dim lSQL As String = "INSERT INTO swq ( SUBBASIN , RS1 , RS2 , RS3 , RS4 , RS5 , RS6 , RS7 , RK1 , RK2 , RK3 , RK4 , RK5 , RK6 , BC1 , BC2 , BC3 , BC4 , CHPST_REA , CHPST_VOL , CHPST_KOC , CHPST_STL , CHPST_RSP , CHPST_MIX , SEDPST_CONC , SEDPST_REA , SEDPST_BRY , SEDPST_ACT ) " _
-                                   & "Values ('" & .SUBBASIN & "'  ,'" & .RS1 & "'  ,'" & .RS2 & "'  ,'" & .RS3 & "'  ,'" & .RS4 & "'  ,'" & .RS5 & "'  ,'" & .RS6 & "'  ,'" & .RS7 & "'  ,'" & .RK1 & "'  ,'" & .RK2 & "'  ,'" & .RK3 & "'  ,'" & .RK4 & "'  ,'" & .RK5 & "'  ,'" & .RK6 & "'  ,'" & .BC1 & "'  ,'" & .BC2 & "'  ,'" & .BC3 & "'  ,'" & .BC4 & "'  ,'" & .CHPST_REA & "'  ,'" & .CHPST_VOL & "'  ,'" & .CHPST_KOC & "'  ,'" & .CHPST_STL & "'  ,'" & .CHPST_RSP & "'  ,'" & .CHPST_MIX & "'  ,'" & .SEDPST_CONC & "'  ,'" & .SEDPST_REA & "'  ,'" & .SEDPST_BRY & "'  ,'" & .SEDPST_ACT & "'  );"
-                Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-                lCommand.ExecuteNonQuery()
-            End With
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)

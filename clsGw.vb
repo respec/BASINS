@@ -38,43 +38,10 @@ Partial Class SwatInput
             SLOPE_CD = aSLOPE_CD
         End Sub
 
-        Public Sub New(ByVal aSUBBASIN As Double, _
-                        ByVal aHRU As Double, _
-                        ByVal aLANDUSE As String, _
-                        ByVal aSOIL As String, _
-                        ByVal aSLOPE_CD As String, _
-                        ByVal aSHALLST As Double, _
-                        ByVal aDEEPST As Double, _
-                        ByVal aGW_DELAY As Double, _
-                        ByVal aALPHA_BF As Double, _
-                        ByVal aGWQMN As Double, _
-                        ByVal aGW_REVAP As Double, _
-                        ByVal aREVAPMN As Double, _
-                        ByVal aRCHRG_DP As Double, _
-                        ByVal aGWHT As Double, _
-                        ByVal aGW_SPYLD As Double, _
-                        ByVal aSHALLST_N As Double, _
-                        ByVal aGWSOLP As Double, _
-                        ByVal aHLIFE_NGW As Double)
-            SUBBASIN = aSUBBASIN
-            HRU = aHRU
-            LANDUSE = aLANDUSE
-            SOIL = aSOIL
-            SLOPE_CD = aSLOPE_CD
-            SHALLST = aSHALLST
-            DEEPST = aDEEPST
-            GW_DELAY = aGW_DELAY
-            ALPHA_BF = aALPHA_BF
-            GWQMN = aGWQMN
-            GW_REVAP = aGW_REVAP
-            REVAPMN = aREVAPMN
-            RCHRG_DP = aRCHRG_DP
-            GWHT = aGWHT
-            GW_SPYLD = aGW_SPYLD
-            SHALLST_N = aSHALLST_N
-            GWSOLP = aGWSOLP
-            HLIFE_NGW = aHLIFE_NGW
-        End Sub
+        Public Function AddSQL() As String
+            Return "INSERT INTO gw ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , SHALLST , DEEPST , GW_DELAY , ALPHA_BF , GWQMN , GW_REVAP , REVAPMN , RCHRG_DP , GWHT , GW_SPYLD , SHALLST_N , GWSOLP , HLIFE_NGW  ) " _
+                 & "Values ('" & SUBBASIN & "', '" & HRU & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & SHALLST & "', '" & DEEPST & "', '" & GW_DELAY & "', '" & ALPHA_BF & "', '" & GWQMN & "', '" & GW_REVAP & "', '" & REVAPMN & "', '" & RCHRG_DP & "', '" & GWHT & "', '" & GW_SPYLD & "', '" & SHALLST_N & "', '" & GWSOLP & "', '" & HLIFE_NGW & "'  )"
+        End Function
     End Class
 
     ''' <summary>
@@ -151,36 +118,8 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal aGwItem As clsGwItem)
-            With aGwItem
-                Me.Add(.SUBBASIN, .HRU, .LANDUSE, .SOIL, .SLOPE_CD, .SHALLST, .DEEPST, .GW_DELAY, .ALPHA_BF, _
-                       .GWQMN, .GW_REVAP, .REVAPMN, .RCHRG_DP, .GWHT, .GW_SPYLD, .SHALLST_N, .GWSOLP, .HLIFE_NGW)
-            End With
-        End Sub
-
-        Private Sub Add(ByVal SUBBASIN As Double, _
-                        ByVal HRU As Double, _
-                        ByVal LANDUSE As String, _
-                        ByVal SOIL As String, _
-                        ByVal SLOPE_CD As String, _
-                        ByVal SHALLST As Double, _
-                        ByVal DEEPST As Double, _
-                        ByVal GW_DELAY As Double, _
-                        ByVal ALPHA_BF As Double, _
-                        ByVal GWQMN As Double, _
-                        ByVal GW_REVAP As Double, _
-                        ByVal REVAPMN As Double, _
-                        ByVal RCHRG_DP As Double, _
-                        ByVal GWHT As Double, _
-                        ByVal GW_SPYLD As Double, _
-                        ByVal SHALLST_N As Double, _
-                        ByVal GWSOLP As Double, _
-                        ByVal HLIFE_NGW As Double)
-
-            Dim lSQL As String = "INSERT INTO gw ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , SHALLST , DEEPST , GW_DELAY , ALPHA_BF , GWQMN , GW_REVAP , REVAPMN , RCHRG_DP , GWHT , GW_SPYLD , SHALLST_N , GWSOLP , HLIFE_NGW  ) " _
-                               & "Values ('" & SUBBASIN & "'  ,'" & HRU & "'  ,'" & LANDUSE & "'  ,'" & SOIL & "'  ,'" & SLOPE_CD & "'  ,'" & SHALLST & "'  ,'" & DEEPST & "'  ,'" & GW_DELAY & "'  ,'" & ALPHA_BF & "'  ,'" & GWQMN & "'  ,'" & GW_REVAP & "'  ,'" & REVAPMN & "'  ,'" & RCHRG_DP & "'  ,'" & GWHT & "'  ,'" & GW_SPYLD & "'  ,'" & SHALLST_N & "'  ,'" & GWSOLP & "'  ,'" & HLIFE_NGW & "'  )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsGwItem)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
