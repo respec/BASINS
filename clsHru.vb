@@ -35,9 +35,16 @@ Partial Class SwatInput
         Public POT_NO3L As Single
         Public DEP_IMP As Long
 
-        Public Sub New(ByVal aSUBBASIN As Double, ByVal aHRU As Double)
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                       ByVal aHRU As Double, _
+                       ByVal aLANDUSE As String, _
+                       ByVal aSOIL As String, _
+                       ByVal aSLOPE_CD As String)
             SUBBASIN = aSUBBASIN
             HRU = aHRU
+            LANDUSE = aLANDUSE
+            SOIL = aSOIL
+            SLOPE_CD = aSLOPE_CD
         End Sub
     End Class
 

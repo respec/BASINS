@@ -13,7 +13,8 @@ Partial Class SwatInput
         Public WUSHAL(11) As Double
         Public WUDEEP(11) As Double
 
-        Public Sub New()
+        Public Sub New(ByVal aSUBBASIN As Double)
+            SUBBASIN = aSUBBASIN
         End Sub
 
         Public Sub New(ByVal aSUBBASIN As Double, _

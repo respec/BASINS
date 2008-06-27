@@ -87,8 +87,8 @@ Partial Class SwatInput
                     .Append("K_l", ADOX.DataTypeEnum.adDouble)
                     .Append("K_n", ADOX.DataTypeEnum.adDouble)
                     .Append("K_p", ADOX.DataTypeEnum.adDouble)
-                    .Append("Lambda0", ADOX.DataTypeEnum.adInteger, 4)
-                    .Append("Lambda1", ADOX.DataTypeEnum.adInteger, 4)
+                    .Append("Lambda0", ADOX.DataTypeEnum.adDouble, 4)
+                    .Append("Lambda1", ADOX.DataTypeEnum.adDouble, 4)
                     .Append("Lambda2", ADOX.DataTypeEnum.adDouble)
                     .Append("P_n", ADOX.DataTypeEnum.adDouble)
                 End With

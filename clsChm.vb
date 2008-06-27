@@ -22,9 +22,15 @@ Partial Class SwatInput
         Public PSTENR(9) As Double
 
         Public Sub New(ByVal aSUBBASIN As Double, _
-                       ByVal aHRU As Double)
+                       ByVal aHRU As Double, _
+                       ByVal aLANDUSE As String, _
+                       ByVal aSOIL As String, _
+                       ByVal aSLOPE_CD As String)
             SUBBASIN = aSUBBASIN
             HRU = aHRU
+            LANDUSE = aLANDUSE
+            SOIL = aSOIL
+            SLOPE_CD = aSLOPE_CD
         End Sub
 
         Public Function AddSQL() As String
@@ -183,7 +189,8 @@ Partial Class SwatInput
                 lSB.AppendLine(" Pesticide  Pst on plant    Pst in 1st soil layer Pst enrichment")
                 lSB.AppendLine("   #           [kg/ha]           [kg/ha]           [kg/ha]")
                 For i As Integer = 1 To 10
-                    If lRow.Item("PESTNAME" & i) Is System.DBNull.Value Then
+                    Dim lPestName As Object = lRow.Item("PESTNAME" & i)
+                    If lPestName Is System.DBNull.Value OrElse lPestName.ToString.Length = 0 Then
                         lSB.AppendLine("   0" & "0.00".PadLeft(18) & "0.00".PadLeft(18) & "0.00".PadLeft(18))
                     Else
                         lSB.AppendLine(dictPest.Item(lRow.Item("PESTNAME" & i)).PadLeft(4) _

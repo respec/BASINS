@@ -27,9 +27,15 @@ Partial Class SwatInput
         Public HLIFE_NGW As Double
 
         Public Sub New(ByVal aSUBBASIN As Double, _
-                        ByVal aHRU As Double)
+                       ByVal aHRU As Double, _
+                       ByVal aLANDUSE As String, _
+                       ByVal aSOIL As String, _
+                       ByVal aSLOPE_CD As String)
             SUBBASIN = aSUBBASIN
             HRU = aHRU
+            LANDUSE = aLANDUSE
+            SOIL = aSOIL
+            SLOPE_CD = aSLOPE_CD
         End Sub
 
         Public Sub New(ByVal aSUBBASIN As Double, _
