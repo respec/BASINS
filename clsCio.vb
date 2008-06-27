@@ -10,6 +10,47 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsCIOItem
+        Public NBYR As Long
+        Public IYR As Long
+        Public IDAF As Long
+        Public IDAL As Long
+        Public IGEN As Long
+        Public PCPSIM As Long
+        Public IDT As Long
+        Public IDIST As Long
+        Public REXP As Double
+        Public NRGAGE As Long
+        Public NRTOT As Long
+        Public NRGFIL As Long
+        Public TMPSIM As Long
+        Public NTGAGE As Long
+        Public NTTOT As Long
+        Public NTGFIL As Long
+        Public SLRSIM As Long
+        Public NSTOT As Long
+        Public RHSIM As Long
+        Public NHTOT As Long
+        Public WNDSIM As Long
+        Public NWTOT As Long
+        Public FCSTYR As Long
+        Public FCSTDAY As Long
+        Public FCSTCYCLES As Long
+        Public DATES As String
+        Public DATEF As String
+        Public FDATES As String
+        Public ISPROJ As Long
+        Public ICLB As Long
+        Public IPRINT As Long
+        Public NYSKIP As Long
+        Public ILOG As Long
+        Public IPRP As Long
+        Public IPRS As Long
+
+        Public Sub New()
+        End Sub
+    End Class
+
     Public Class clsCIO
         Private pSwatInput As SwatInput
         Private pTableName As String = "cio"
@@ -97,7 +138,15 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal NBYR As Long, _
+        Public Sub Add(ByVal aCIOItem As clsCIOItem)
+            With aCIOItem
+                Add(.NBYR, .IYR, .IDAF, .IDAL, .IGEN, .PCPSIM, .IDT, .IDIST, .REXP, .NRGAGE, .NRTOT, .NRGFIL, .TMPSIM, .NTGAGE, _
+                    .NTTOT, .NTGFIL, .SLRSIM, .NSTOT, .RHSIM, .NHTOT, .WNDSIM, .NWTOT, .FCSTYR, .FCSTDAY, .FCSTCYCLES, _
+                    .DATES, .DATEF, .FDATES, .ISPROJ, .ICLB, .IPRINT, .NYSKIP, .ILOG, .IPRP, .IPRS)
+            End With
+        End Sub
+
+        Private Sub Add(ByVal NBYR As Long, _
                         ByVal IYR As Long, _
                         ByVal IDAF As Long, _
                         ByVal IDAL As Long, _

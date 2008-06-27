@@ -6,6 +6,58 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsPndItem
+        Public SUBBASIN As Double
+        Public PND_FR As Single
+        Public PND_PSA As Double
+        Public PND_PVOL As Double
+        Public PND_ESA As Double
+        Public PND_EVOL As Double
+        Public PND_VOL As Double
+        Public PND_SED As Double
+        Public PND_NSED As Double
+        Public PND_K As Single
+        Public IFLOD1 As Long
+        Public IFLOD2 As Long
+        Public NDTARG As Long
+        Public PSETLP1 As Single
+        Public PSETLP2 As Single
+        Public NSETLP1 As Single
+        Public NSETLP2 As Single
+        Public CHLAP As Single
+        Public SECCIP As Single
+        Public PND_NO3 As Single
+        Public PND_SOLP As Single
+        Public PND_ORGN As Single
+        Public PND_ORGP As Single
+        Public IPND1 As Long
+        Public IPND2 As Long
+        Public WET_FR As Single
+        Public WET_NSA As Double
+        Public WET_NVOL As Double
+        Public WET_MXSA As Double
+        Public WET_MXVOL As Double
+        Public WET_VOL As Double
+        Public WET_SED As Double
+        Public WET_NSED As Double
+        Public WET_K As Single
+        Public PSETLW1 As Single
+        Public PSETLW2 As Single
+        Public NSETLW1 As Single
+        Public NSETLW2 As Single
+        Public CHLAW As Single
+        Public SECCIW As Single
+        Public WET_NO3 As Single
+        Public WET_SOLP As Single
+        Public WET_ORGN As Single
+        Public WET_ORGP As Single
+
+        Public Sub New(ByVal aSUBBASIN As Double)
+            SUBBASIN = aSUBBASIN
+        End Sub
+
+    End Class
+
     ''' <summary>
     ''' Gw Input Section
     ''' </summary>
@@ -106,7 +158,17 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal SUBBASIN As Double, _
+        Public Sub Add(ByVal aPndItem As clsPndItem)
+            With aPndItem
+                Add(.SUBBASIN, .PND_FR, .PND_PSA, .PND_PVOL, .PND_ESA, .PND_EVOL, .PND_VOL, .PND_SED, .PND_NSED, .PND_K, _
+                    .IFLOD1, .IFLOD2, .NDTARG, .PSETLP1, .PSETLP2, .NSETLP1, .NSETLP2, .CHLAP, .SECCIP, _
+                    .PND_NO3, .PND_SOLP, .PND_ORGN, .PND_ORGP, .IPND1, .IPND2, _
+                    .WET_FR, .WET_NSA, .WET_NVOL, .WET_MXSA, .WET_MXVOL, .WET_VOL, .WET_SED, .WET_NSED, .WET_K, _
+                    .PSETLW1, .PSETLW2, .NSETLW1, .NSETLW2, .CHLAW, .SECCIW, .WET_NO3, .WET_SOLP, .WET_ORGN, .WET_ORGP)
+            End With
+        End Sub
+
+        Private Sub Add(ByVal SUBBASIN As Double, _
                        ByVal PND_FR As Single, _
                        ByVal PND_PSA As Double, _
                        ByVal PND_PVOL As Double, _
