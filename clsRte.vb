@@ -103,7 +103,7 @@ Partial Class SwatInput
 
                 Dim lSB As New System.Text.StringBuilder
                 '1st line
-                lSB.AppendLine(" .rte file Subbasin: " & lSubBasin & " " & DateNowString() & " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" .rte file Subbasin: " & lSubBasin & " " & HeaderString())
                 '---2. CHW2
                 lSB.AppendLine(Format(lRow.Item(2), "0.000").PadLeft(14) & "    | CHW2 : Main channel width [m]")
                 '---3. CHD
@@ -125,7 +125,7 @@ Partial Class SwatInput
                 '---11. CH_WDR
                 lSB.AppendLine(Format(lRow.Item(11), "0.000").PadLeft(14) & "    | ALPHA_BNK : Baseflow alpha factor for bank storage [days]")
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & StringFname(lSubBasin, pTableName), lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & StringFname(lSubBasin, pTableName), lSB.ToString)
             Next
 
         End Sub

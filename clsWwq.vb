@@ -118,7 +118,7 @@ Partial Class SwatInput
             ' --------------------------------------------------------------------------------
             ' 1st Line
             ' --------------------------------------------------------------------------------
-            lSB.AppendLine("Watershed water quality file" & Space(10) & ".wwq file " & DateNowString() & "ARCGIS-SWAT interface AV")
+            lSB.AppendLine("Watershed water quality file" & Space(10) & ".wwq file " & HeaderString())
             ' --------------------------------------------------------------------------------
             ' 2nd Line
             ' ------2-LAO
@@ -160,7 +160,7 @@ Partial Class SwatInput
             ' ------ 20-P_N
             lSB.AppendLine(MakeString(lRow.Item(19), 3, 4, 8) & "| P_N : Algal preference factor for ammonia")
 
-            Dim lTextFilename As String = pSwatInput.OutputFolder & "\basins." & pTableName
+            Dim lTextFilename As String = pSwatInput.TxtInOutFolder & "\basins." & pTableName
             IO.File.WriteAllText(lTextFilename, lSB.ToString)
             ReplaceNonAscii(lTextFilename)
         End Sub

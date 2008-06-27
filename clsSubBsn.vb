@@ -430,7 +430,7 @@ Partial Class SwatInput
                 Dim lSubBasin As String = lRow.Item("SUBBASIN")
                 Dim lFileName As String = StringFname(lSubBasin, pTableName)
                 '1st line
-                lSB.AppendLine(" ." & pTableName & " file Subbasin: " & lSubBasin & " " & DateNowString() & " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" ." & pTableName & " file Subbasin: " & lSubBasin & " " & HeaderString())
                 '---2. SUB_KM
                 lSB.AppendLine(Format(lRow.Item(2), "0.000000").PadLeft(16) & Strings.StrDup(4, " ") & "| SUB_KM : Subbasin area [km2]")
 
@@ -591,7 +591,7 @@ Partial Class SwatInput
                     Dim lHruName As String = StringFnameHRUs(lSubBasin, lField.ToString)
                     lSB.AppendLine(lHruName & ".hru" & lHruName & ".mgt" & lHruName & ".sol" & lHruName & ".chm" & lHruName & ".gw")
                 Next
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lFileName, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lFileName, lSB.ToString)
             Next
         End Sub
     End Class

@@ -296,7 +296,7 @@ Partial Class SwatInput
                 Dim lTextFilename As String = StringFnameHRUs(lSubBasin, lHruNum) & "." & pTableName
 
                 Dim lSB As New Text.StringBuilder
-                lSB.AppendLine("Reservoir data:" & Space(10) & " .res file " & "Subbasin " & lSubBasin & " " & DateNowString() & " ARCGIS-SWAT - SWAT interface AV")
+                lSB.AppendLine("Reservoir data:" & Space(10) & " .res file " & "Subbasin " & lSubBasin & " " & HeaderString())
 
                 lSB.AppendLine(lSubBasin.Substring(0, 8).PadLeft(16) & "    | RES_SUB : Number of the subbasin the reservoir is in")
                 lSB.AppendLine(CStr(lRow.Item(2)).PadLeft(16) & "    | MORES : Month the reservoir became operational (1-12)")
@@ -357,14 +357,14 @@ Partial Class SwatInput
 
                 lSB.AppendLine(lRow.Item(67).PadLeft(16) & "    | WURTNF : Fraction of water removed from the reservoir via WURESN that is returned and becomes flow out of reservoir [m3/m3]")
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lTextFilename, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lTextFilename, lSB.ToString)
                 'ReplaceNonAscii(lTextFilename)
 
                 'Write lwq file ==================================================================================================================================
                 lSB = New Text.StringBuilder
                 lTextFilename = IO.Path.ChangeExtension(lTextFilename, "lwq")
 
-                lSB.AppendLine("Reservoir water quality data:" & Space(10) & " .lwq file " & "Subbasin " & lSubBasin & " " & DateNowString() & " ARCGIS-SWAT - SWAT interface AV")
+                lSB.AppendLine("Reservoir water quality data:" & Space(10) & " .lwq file " & "Subbasin " & lSubBasin & " " & HeaderString())
                 lSB.AppendLine("Nutrient information:")
                 lSB.AppendLine(lRow.Item(68).PadLeft(16) & "    | IRES1 : Beginning month of mid-year nutrient settling period")
                 lSB.AppendLine(lRow.Item(69).PadLeft(16) & "    | IRES2 : Ending month of mid-year nutrient settling period")
@@ -393,7 +393,7 @@ Partial Class SwatInput
                 lSB.AppendLine(FormatNumber(lRow.Item(91), 3).PadLeft(16) & "    | LKPST_BRY : Burial velocity of pesticide in lake bottom sediment [m/day]")
                 lSB.AppendLine(FormatNumber(lRow.Item(92), 3).PadLeft(16) & "    | LKPST_ACT : Depth of active sediment layer in lake [m]")
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lTextFilename, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lTextFilename, lSB.ToString)
                 'ReplaceNonAscii(lTextFilename)
             Next
         End Sub

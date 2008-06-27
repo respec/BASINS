@@ -226,7 +226,7 @@ Partial Class SwatInput
             pSwatInput.Status("Writing " & pTableName & " text ...")
 
             Dim lSB As New System.Text.StringBuilder
-            lSB.AppendLine("Basin data" & Space(10) & " ." & pTableName & " file " & DateNowString() & " ARCGIS-SWAT - SWAT interface")
+            lSB.AppendLine("Basin data" & Space(10) & " ." & pTableName & " file " & HeaderString())
             lSB.AppendLine("Modeling Options: Land Area")
             lSB.AppendLine("Water Balance:")
             lSB.AppendLine(MakeString(lRow.Item(1), 3, 4, 8) & "| SFTMP : Snowfall temperature [ºC]")
@@ -312,7 +312,7 @@ Partial Class SwatInput
             lSB.AppendLine(MakeString(lRow.Item(72), 3, 4, 8) & "| GDRAIN_BSN")
             lSB.AppendLine(MakeString(lRow.Item(73), 3, 4, 8) & "| CN_FROZ")
 
-            IO.File.WriteAllText(pSwatInput.OutputFolder & "\basins.bsn", lSB.ToString)
+            IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\basins.bsn", lSB.ToString)
         End Sub
     End Class
 End Class

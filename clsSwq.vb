@@ -163,7 +163,7 @@ Partial Class SwatInput
                 Dim lSubBasin As String = lRow.Item("SUBBASIN")
 
                 '1st line
-                lSB.AppendLine(" .Swq file Subbasin: " & lSubBasin & " " & DateNowString() & " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" .Swq file Subbasin: " & lSubBasin & " " & HeaderString())
                 lSB.AppendLine("Nutrient (QUAL2E parameters)")
 
                 For lParam = 2 To 18
@@ -176,7 +176,7 @@ Partial Class SwatInput
                     lSB.AppendLine(Format(lRow.Item(lParam), "0.000").PadLeft(16) & pItemLabels(lParam))
                 Next
 
-                Dim lTextFilename As String = pSwatInput.OutputFolder & "\" & StringFname(lSubBasin, pTableName)
+                Dim lTextFilename As String = pSwatInput.TxtInOutFolder & "\" & StringFname(lSubBasin, pTableName)
                 IO.File.WriteAllText(lTextFilename, lSB.ToString)
                 ReplaceNonAscii(lTextFilename)
             Next

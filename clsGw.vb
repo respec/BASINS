@@ -190,7 +190,7 @@ Partial Class SwatInput
                 Dim lSB As New Text.StringBuilder
                 lSB.AppendLine(" .gw file Subbasin:" & lSubBasin & " HRU:" & lHruNum & " Luse:" & lRow.Item(3) _
                              & " Soil: " & lRow.Item(4) & " Slope: " & lRow.Item(5) _
-                             & " " & DateNowString() & " ARCGIS-SWAT interface MAVZ")
+                             & " " & HeaderString())
 
                 lSB.AppendLine(Format(lRow.Item(6), "0.0000").PadLeft(16) & "    | SHALLST : Initial depth of water in the shallow aquifer [mm]")
                 lSB.AppendLine(Format(lRow.Item(7), "0.0000").PadLeft(16) & "    | DEEPST : Initial depth of water in the deep aquifer [mm]")
@@ -207,7 +207,7 @@ Partial Class SwatInput
                 lSB.AppendLine(Format(lRow.Item(18), "0.0000").PadLeft(16) & "    | HLIFE_NGW : Ha;f-life of nitrate in the shallow aquifer [days]")
 
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lTextFilename, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lTextFilename, lSB.ToString)
                 'ReplaceNonAscii(lTextFilename)
             Next
         End Sub

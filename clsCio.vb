@@ -153,7 +153,7 @@ Partial Class SwatInput
                 lSB.AppendLine("Master Watershed File: file.cio")
                 lSB.AppendLine("Project Description:")
                 lSB.AppendLine("General Input/Output section (file.cio):")
-                lSB.AppendLine(DateNowString & "ARCGIS-SWAT interface AV")
+                lSB.AppendLine(HeaderString)
                 lSB.AppendLine("")
                 lSB.AppendLine("General Information/Watershed Configuration:")
                 lSB.AppendLine("fig.fig")
@@ -337,7 +337,7 @@ Partial Class SwatInput
                 Else
                     lSB.AppendLine("   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 End If
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\file.cio", lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\file.cio", lSB.ToString)
             End If
         End Sub
     End Class

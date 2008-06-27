@@ -34,7 +34,10 @@ Partial Class SwatInput
         Public USLE_K(9) As Double
         Public SOL_EC(9) As Double
 
-        Public Sub New()
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                       ByVal aHRU As Double)
+            SUBBASIN = aSUBBASIN
+            HRU = aHRU
         End Sub
 
         Public Sub New(ByVal aSUBBASIN As Double, _
@@ -367,7 +370,7 @@ Partial Class SwatInput
                         ByVal USLE_K10 As Double, _
                         ByVal SOL_EC10 As Double)
 
-            Dim lSQL As String = "INSERT INTO sol ( SUBBASIN ,HRU ,LANDUSE ,SOIL ,SLOPE_CD ,SNAM ,NLAYERS ,HYDGRP ,SOL_ZMX ,ANION_EXCL ,SOL_CRK ,TEXTURE ,SOL_Z1 ,SOL_BD1 ,SOL_AWC1 ,SOL_K1 ,SOL_CBN1 ,CLAY1 ,SILT1 ,SAND1 ,ROCK1 ,SOL_ALB1 ,USLE_K1 ,SOL_EC1 ,SOL_Z2 ,SOL_BD2 ,SOL_AWC2 ,SOL_K2 ,SOL_CBN2 ,CLAY2 ,SILT2 ,SAND2 ,ROCK2 ,SOL_ALB2 ,USLE_K2 ,SOL_EC2 ,SOL_Z3 ,SOL_BD3 ,SOL_AWC3 ,SOL_K3 ,SOL_CBN3 ,CLAY3 ,SILT3 ,SAND3 ,ROCK3 ,SOL_ALB3 ,USLE_K3 ,SOL_EC3 ,SOL_Z4 ,SOL_BD4 ,SOL_AWC4 ,SOL_K4 ,SOL_CBN4 ,CLAY4 ,SILT4 ,SAND4 ,ROCK4 ,SOL_ALB4 ,USLE_K4 ,SOL_EC4 ,SOL_Z5 ,SOL_BD5 ,SOL_AWC5 ,SOL_K5 ,SOL_CBN5 ,CLAY5 ,SILT5 ,SAND5 ,ROCK5 ,SOL_ALB5 ,USLE_K5 ,SOL_EC5 ,SOL_Z6 ,SOL_BD6 ,SOL_AWC6 ,SOL_K6 ,SOL_CBN6 ,CLAY6 ,SILT6 ,SAND6 ,ROCK6 ,SOL_ALB6 ,USLE_K6 ,SOL_EC6 ,SOL_Z7 ,SOL_BD7 ,SOL_AWC7 ,SOL_K7 ,SOL_CBN7 ,CLAY7 ,SILT7 ,SAND7 ,ROCK7 ,SOL_ALB7 ,USLE_K7 ,SOL_EC7 ,SOL_Z8 ,SOL_BD8 ,SOL_AWC8 ,SOL_K8 ,SOL_CBN8 ,CLAY8 ,SILT8 ,SAND8 ,ROCK8 ,SOL_ALB8 ,USLE_K8 ,SOL_EC8 ,SOL_9 ,SOL_BD9 ,SOL_AWC9 ,SOL_K9 ,SOL_CBN9 ,CLAY9 ,SILT9 ,SAND9 ,ROCK9 ,SOL_ALB9 ,USLE_K9 ,SOL_EC9 ,SOL_Z10 ,SOL_BD10 ,SOL_AWC10 ,SOL_K10 ,SOL_CBN10 ,CLAY10 ,SILT10 ,SAND10 ,ROCK10 ,SOL_ALB10 ,USLE_K10 ,SOL_EC10)" _
+            Dim lSQL As String = "INSERT INTO sol ( SUBBASIN ,HRU ,LANDUSE ,SOIL ,SLOPE_CD ,SNAM ,NLAYERS ,HYDGRP ,SOL_ZMX ,ANION_EXCL ,SOL_CRK ,TEXTURE ,SOL_Z1 ,SOL_BD1 ,SOL_AWC1 ,SOL_K1 ,SOL_CBN1 ,CLAY1 ,SILT1 ,SAND1 ,ROCK1 ,SOL_ALB1 ,USLE_K1 ,SOL_EC1 ,SOL_Z2 ,SOL_BD2 ,SOL_AWC2 ,SOL_K2 ,SOL_CBN2 ,CLAY2 ,SILT2 ,SAND2 ,ROCK2 ,SOL_ALB2 ,USLE_K2 ,SOL_EC2 ,SOL_Z3 ,SOL_BD3 ,SOL_AWC3 ,SOL_K3 ,SOL_CBN3 ,CLAY3 ,SILT3 ,SAND3 ,ROCK3 ,SOL_ALB3 ,USLE_K3 ,SOL_EC3 ,SOL_Z4 ,SOL_BD4 ,SOL_AWC4 ,SOL_K4 ,SOL_CBN4 ,CLAY4 ,SILT4 ,SAND4 ,ROCK4 ,SOL_ALB4 ,USLE_K4 ,SOL_EC4 ,SOL_Z5 ,SOL_BD5 ,SOL_AWC5 ,SOL_K5 ,SOL_CBN5 ,CLAY5 ,SILT5 ,SAND5 ,ROCK5 ,SOL_ALB5 ,USLE_K5 ,SOL_EC5 ,SOL_Z6 ,SOL_BD6 ,SOL_AWC6 ,SOL_K6 ,SOL_CBN6 ,CLAY6 ,SILT6 ,SAND6 ,ROCK6 ,SOL_ALB6 ,USLE_K6 ,SOL_EC6 ,SOL_Z7 ,SOL_BD7 ,SOL_AWC7 ,SOL_K7 ,SOL_CBN7 ,CLAY7 ,SILT7 ,SAND7 ,ROCK7 ,SOL_ALB7 ,USLE_K7 ,SOL_EC7 ,SOL_Z8 ,SOL_BD8 ,SOL_AWC8 ,SOL_K8 ,SOL_CBN8 ,CLAY8 ,SILT8 ,SAND8 ,ROCK8 ,SOL_ALB8 ,USLE_K8 ,SOL_EC8 ,SOL_Z9 ,SOL_BD9 ,SOL_AWC9 ,SOL_K9 ,SOL_CBN9 ,CLAY9 ,SILT9 ,SAND9 ,ROCK9 ,SOL_ALB9 ,USLE_K9 ,SOL_EC9 ,SOL_Z10 ,SOL_BD10 ,SOL_AWC10 ,SOL_K10 ,SOL_CBN10 ,CLAY10 ,SILT10 ,SAND10 ,ROCK10 ,SOL_ALB10 ,USLE_K10 ,SOL_EC10)" _
                                & "Values ( '" & SUBBASIN & "' ,'" & HRU & "' ,'" & LANDUSE & "' ,'" & SOIL & "' ,'" & SLOPE_CD & "' ,'" & SNAM & "' ,'" & NLAYERS & "' ,'" & HYDGRP & "' ,'" & SOL_ZMX & "' ,'" & ANION_EXCL & "' ,'" & SOL_CRK & "' ,'" & TEXTURE & "' ,'" & SOL_Z1 & "' ,'" & SOL_BD1 & "' ,'" & SOL_AWC1 & "' ,'" & SOL_K1 & "' ,'" & SOL_CBN1 & "' ,'" & CLAY1 & "' ,'" & SILT1 & "' ,'" & SAND1 & "' ,'" & ROCK1 & "' ,'" & SOL_ALB1 & "' ,'" & USLE_K1 & "' ,'" & SOL_EC1 & "' ,'" & SOL_Z2 & "' ,'" & SOL_BD2 & "' ,'" & SOL_AWC2 & "' ,'" & SOL_K2 & "' ,'" & SOL_CBN2 & "' ,'" & CLAY2 & "' ,'" & SILT2 & "' ,'" & SAND2 & "' ,'" & ROCK2 & "' ,'" & SOL_ALB2 & "' ,'" & USLE_K2 & "' ,'" & SOL_EC2 & "' ,'" & SOL_Z3 & "' ,'" & SOL_BD3 & "' ,'" & SOL_AWC3 & "' ,'" & SOL_K3 & "' ,'" & SOL_CBN3 & "' ,'" & CLAY3 & "' ,'" & SILT3 & "' ,'" & SAND3 & "' ,'" & ROCK3 & "' ,'" & SOL_ALB3 & "' ,'" & USLE_K3 & "' ,'" & SOL_EC3 & "' ,'" & SOL_Z4 & "' ,'" & SOL_BD4 & "' ,'" & SOL_AWC4 & "' ,'" & SOL_K4 & "' ,'" & SOL_CBN4 & "' ,'" & CLAY4 & "' ,'" & SILT4 & "' ,'" & SAND4 & "' ,'" & ROCK4 & "' ,'" & SOL_ALB4 & "' ,'" & USLE_K4 & "' ,'" & SOL_EC4 & "' ,'" & SOL_Z5 & "' ,'" & SOL_BD5 & "' ,'" & SOL_AWC5 & "' ,'" & SOL_K5 & "' ,'" & SOL_CBN5 & "' ,'" & CLAY5 & "' ,'" & SILT5 & "' ,'" & SAND5 & "' ,'" & ROCK5 & "' ,'" & SOL_ALB5 & "' ,'" & USLE_K5 & "' ,'" & SOL_EC5 & "' ,'" & SOL_Z6 & "' ,'" & SOL_BD6 & "' ,'" & SOL_AWC6 & "' ,'" & SOL_K6 & "' ,'" & SOL_CBN6 & "' ,'" & CLAY6 & "' ,'" & SILT6 & "' ,'" & SAND6 & "' ,'" & ROCK6 & "' ,'" & SOL_ALB6 & "' ,'" & USLE_K6 & "' ,'" & SOL_EC6 & "' ,'" & SOL_Z7 & "' ,'" & SOL_BD7 & "' ,'" & SOL_AWC7 & "' ,'" & SOL_K7 & "' ,'" & SOL_CBN7 & "' ,'" & CLAY7 & "' ,'" & SILT7 & "' ,'" & SAND7 & "' ,'" & ROCK7 & "' ,'" & SOL_ALB7 & "' ,'" & USLE_K7 & "' ,'" & SOL_EC7 & "' ,'" & SOL_Z8 & "' ,'" & SOL_BD8 & "' ,'" & SOL_AWC8 & "' ,'" & SOL_K8 & "' ,'" & SOL_CBN8 & "' ,'" & CLAY8 & "' ,'" & SILT8 & "' ,'" & SAND8 & "' ,'" & ROCK8 & "' ,'" & SOL_ALB8 & "' ,'" & USLE_K8 & "' ,'" & SOL_EC8 & "' ,'" & SOL_9 & "' ,'" & SOL_BD9 & "' ,'" & SOL_AWC9 & "' ,'" & SOL_K9 & "' ,'" & SOL_CBN9 & "' ,'" & CLAY9 & "' ,'" & SILT9 & "' ,'" & SAND9 & "' ,'" & ROCK9 & "' ,'" & SOL_ALB9 & "' ,'" & USLE_K9 & "' ,'" & SOL_EC9 & "' ,'" & SOL_Z10 & "' ,'" & SOL_BD10 & "' ,'" & SOL_AWC10 & "' ,'" & SOL_K10 & "' ,'" & SOL_CBN10 & "' ,'" & CLAY10 & "' ,'" & SILT10 & "' ,'" & SAND10 & "' ,'" & ROCK10 & "' ,'" & SOL_ALB10 & "' ,'" & USLE_K10 & "' ,'" & SOL_EC10 & "')"
 
             Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
@@ -387,7 +390,7 @@ Partial Class SwatInput
                 Dim lSB As New Text.StringBuilder
                 lSB.AppendLine(" .Sol file Subbasin:" & lSubBasin & " HRU:" & lHruNum & " Luse:" & lRow.Item(3) _
                              & " Soil: " & lRow.Item(4) & " Slope: " & lRow.Item(5) _
-                             & " " & DateNowString() & " ARCGIS-SWAT interface MAVZ")
+                             & " " & HeaderString())
                 lSB.AppendLine(" Soil Name: " & lRow.Item("SNAM"))
 
                 lSB.AppendLine(" Soil Hydrologic Group: " & lRow.Item("HYDGRP"))
@@ -420,7 +423,7 @@ Partial Class SwatInput
                 lSB.Append(" Salinity (EC, Form 5)    :") : AppendN(lSB, lRow, lNLyrs, "SOL_EC")
                 lSB.AppendLine(Space(30))
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lTextFilename, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lTextFilename, lSB.ToString)
                 'ReplaceNonAscii(lTextFilename)
             Next
         End Sub

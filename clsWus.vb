@@ -190,7 +190,7 @@ Partial Class SwatInput
                 Dim lTextFilename As String = StringFnameHRUs(lSubBasin, lHruNum) & "." & pTableName
 
                 Dim lSB As New Text.StringBuilder
-                lSB.AppendLine(" .wus file Subbasin: " + lSubBasin + " " + DateNowString() + " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" .wus file Subbasin: " & lSubBasin & " " & HeaderString())
                 lSB.AppendLine()
                 lSB.AppendLine()
 
@@ -242,7 +242,7 @@ Partial Class SwatInput
                 Next
                 lSB.AppendLine()
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lTextFilename, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lTextFilename, lSB.ToString)
                 'ReplaceNonAscii(lTextFilename)
             Next
         End Sub

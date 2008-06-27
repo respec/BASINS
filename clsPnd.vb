@@ -169,7 +169,7 @@ Partial Class SwatInput
 
                 Dim lSB As New Text.StringBuilder
 
-                lSB.AppendLine(" .Pnd file Subbasin: " & lSubBasin & " " & DateNowString() & " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                lSB.AppendLine(" .Pnd file Subbasin: " & lSubBasin & " " & HeaderString())
                 lSB.AppendLine("Pond inputs:")
                 lSB.AppendLine(Format(lRow.Item(2), "0.000").PadLeft(16) & "    | PND_FR : Fraction of subbasin area that drains into ponds. The value for PND_FR should be between 0.0 and 1.0. If PND_FR = 1.0, the pond is at the outlet of the subbasin on the main channel")
                 lSB.AppendLine(Format(lRow.Item(3), "0.000").PadLeft(16) & "    | PND_PSA: Surface area of ponds when filled to principal spillway [ha]")
@@ -217,7 +217,7 @@ Partial Class SwatInput
                 lSB.AppendLine(Format(lRow.Item(43), "0.000").PadLeft(16) & "    | WET_ORGN: Initial concentration of organic N in wetland [mg N/l]")
                 lSB.AppendLine(Format(lRow.Item(44), "0.000").PadLeft(16) & "    | WET_ORGP: Initial concentration of organic P in wetland [mg P/l]")
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lTextFilename, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lTextFilename, lSB.ToString)
                 'ReplaceNonAscii(lTextFilename)
             Next
         End Sub

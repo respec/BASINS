@@ -272,7 +272,7 @@ Partial Class SwatInput
                 Dim lSB As New Text.StringBuilder
                 lSB.AppendLine(" .chm file Subbasin:" & sSubNum & " HRU:" & sHruNum & " Luse:" & lRow.Item(3) _
                              & " Soil: " & lRow.Item(4) & " Slope: " & lRow.Item(5) _
-                             & " " & DateNowString() & " ARCGIS-SWAT interface MAVZ")
+                             & " " & HeaderString())
                 lSB.AppendLine("Soil Nutrient Data")
                 lSB.AppendLine(" Soil Layer               :           1           2           3           4           5           6           7           8           9          10")
 
@@ -296,7 +296,7 @@ Partial Class SwatInput
                     End If
                 Next
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & lTextFilename, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lTextFilename, lSB.ToString)
                 'ReplaceNonAscii(lTextFilename)
             Next
         End Sub

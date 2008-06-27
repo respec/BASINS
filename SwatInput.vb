@@ -11,7 +11,8 @@ Public Class SwatInput
     Friend StatusBar As Windows.Forms.StatusBar = Nothing
     Friend CnSwatParm As OleDbConnection
     Friend CnSwatInput As OleDbConnection
-    Friend OutputFolder As String = ""
+    Friend ProjectFolder As String = ""
+    Friend TxtInOutFolder As String = ""
 
     Private pNeedToClose As Boolean = False
 #End Region
@@ -44,10 +45,11 @@ Public Class SwatInput
                           ByVal aOutGDB As OleDbConnection, _
                           ByVal aOutputFolder As String, _
                           ByVal aStatusBar As Windows.Forms.StatusBar)
-        OutputFolder = aOutputFolder
-        If OutputFolder.Length > 0 AndAlso Not IO.Directory.Exists(OutputFolder) Then
-            IO.Directory.CreateDirectory(OutputFolder)
+        ProjectFolder = aOutputFolder
+        If ProjectFolder.Length > 0 AndAlso Not IO.Directory.Exists(ProjectFolder) Then
+            IO.Directory.CreateDirectory(ProjectFolder)
         End If
+        TxtInOutFolder = IO.Path.Combine(ProjectFolder, "Scenarios\Default\TxtInOut")
         CnSwatParm = aSwatGDB
         CnSwatInput = aOutGDB
         StatusBar = aStatusBar
@@ -66,12 +68,13 @@ Public Class SwatInput
         If Not IO.File.Exists(aOutGDB) Then
             BuildNewProject(aOutGDB, aProjectFolder)
         End If
-        Dim lCnSwatInput As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & aOutGDB)
-        lCnSwatInput.Open()
+        If CnSwatInput Is Nothing Then
+            CnSwatInput = OpenOleDB(aOutGDB)
+        End If
 
         Dim lCnSwatParm As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & aSwatGDB)
         lCnSwatParm.Open()
-        Initialize(lCnSwatParm, lCnSwatInput, aProjectFolder, Nothing)
+        Initialize(lCnSwatParm, CnSwatInput, aProjectFolder, Nothing)
         pNeedToClose = True
     End Sub
 
@@ -89,7 +92,8 @@ Public Class SwatInput
                 CnSwatParm.Close()
                 CnSwatParm = Nothing
             End If
-            OutputFolder = ""
+            ProjectFolder = ""
+            TxtInOutFolder = ""
             pNeedToClose = False
             StatusBar = Nothing
         End If
@@ -248,15 +252,35 @@ Public Class SwatInput
     Private Function CreateAccessDatabase(ByVal aDatabaseName As String, ByVal aDatabaseFullPath As String) As Boolean
         Dim lResult As Boolean
         Try
-            Dim lConnectionString As String
-            Dim lCatalog As New ADOX.Catalog()
-
             Dim lDatabaseFullPathAndFile As String = IO.Path.Combine(aDatabaseFullPath, aDatabaseName)
             If IO.File.Exists(lDatabaseFullPathAndFile) Then
                 IO.File.Delete(lDatabaseFullPathAndFile)
             End If
-            lConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lDatabaseFullPathAndFile
+
+            Dim lConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lDatabaseFullPathAndFile
+            Dim lCatalog As New ADOX.Catalog()
             lCatalog.Create(lConnectionString)
+
+            CnSwatInput = OpenOleDB(lDatabaseFullPathAndFile)
+
+            Dim lAssembly As Reflection.Assembly = Reflection.Assembly.GetExecutingAssembly
+            Dim lNewArgs() As Object = {Me}
+            Dim lArgs(-1) As Object
+
+            For Each lType As Type In lAssembly.GetTypes
+                Debug.Print(lType.Name)
+                Dim lTableCreateMethod As System.Reflection.MethodInfo = lType.GetMethod("TableCreate")
+                If Not lTableCreateMethod Is Nothing Then
+                    Try
+                        Dim lObject As Object = lType.InvokeMember("New", Reflection.BindingFlags.CreateInstance _
+                                                                        + Reflection.BindingFlags.NonPublic _
+                                                                        + Reflection.BindingFlags.Instance, Nothing, Nothing, lNewArgs)
+                        lTableCreateMethod.Invoke(lObject, lArgs)
+                    Catch e As Exception
+                        Logger.Dbg("Could not create table for " & lType.Name & ": " & e.Message)
+                    End Try
+                End If
+            Next
             lResult = True
 
             'If DatabaseName = "RasterStore.mdb" Then
@@ -276,6 +300,11 @@ Public Class SwatInput
         Dim lConnection As New ADODB.Connection
         lConnection.Open(CnSwatInput.ConnectionString)
         Return lConnection
+    End Function
+    Private Function OpenOleDB(ByVal aFileName As String) As OleDb.OleDbConnection
+        Dim lOleDbConnection As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & aFileName)
+        lOleDbConnection.Open()
+        Return lOleDbConnection
     End Function
 End Class
 

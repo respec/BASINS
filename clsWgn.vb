@@ -28,7 +28,8 @@ Partial Class SwatInput
         Public DEWPT(11) As Single
         Public WNDAV(11) As Single
 
-        Public Sub New()
+        Public Sub New(ByVal aSUBBASIN As Integer)
+            SUBBASIN = aSUBBASIN
         End Sub
 
         Public Sub New(ByVal aSUBBASIN As Integer, _
@@ -419,7 +420,7 @@ Partial Class SwatInput
                 Dim lSB As New Text.StringBuilder
                 lSB.AppendLine(" .Wgn file Subbasin: " & lSubBasin _
                              & " STATION NAME:" & lRow.Item(("STATION")) & " " _
-                             & DateNowString() & " AVSWAT2003 -SWAT INTERFACE MAVZ")
+                             & HeaderString())
                 lSB.AppendLine("  LATITUDE =" & Format(lRow.Item(("WLATITUDE")), "0.00").PadLeft(7) _
                              & " LONGITUDE =" & Format(lRow.Item(("WLONGITUDE")), "0.00").PadLeft(7))
                 lSB.AppendLine("  ELEV [m] =" & Format(lRow.Item(("WELEV")), "0.00").PadLeft(7))
@@ -439,7 +440,7 @@ Partial Class SwatInput
                 Append12TextColumns(lSB, lRow, "DEWPT")
                 Append12TextColumns(lSB, lRow, "WNDAV")
 
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & StringFname(lSubBasin, pTableName), lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & StringFname(lSubBasin, pTableName), lSB.ToString)
             Next
         End Sub
 

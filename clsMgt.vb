@@ -17,6 +17,10 @@ Partial Class SwatInput
             pSwatInput = aSwatInput
         End Sub
 
+        Public Function TableCreate() As Boolean
+            Return Table1Create() And Table2Create()
+        End Function
+
         Public Function Table1Create() As Boolean
             'based on mwSWATPlugIn:DBLayer:createHruTable
             Try
@@ -311,7 +315,7 @@ Partial Class SwatInput
                 '1st line
                 lSB.AppendLine(" .mgt file Subbasin:" & lSubBasin & " HRU:" & lHruNum & " Luse:" & lMgt1Row.Item(3) _
                              & " Soil: " & lMgt1Row.Item(4) & " Slope: " & lMgt1Row.Item(5) _
-                             & " " & DateNowString() & " ARCGIS-SWAT2003 interface MAVZ")
+                             & " " & HeaderString())
                 '2. NMGT
                 lSB.AppendLine(Format(0, "0").PadLeft(16) & "    | NMGT:Management code")
 
@@ -465,7 +469,7 @@ Partial Class SwatInput
                     Next
                 End If
                 lSB.AppendLine("")
-                IO.File.WriteAllText(pSwatInput.OutputFolder & "\" & StringFnameHRUs(lSubBasin, lHruNum) & ".mgt", lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & StringFnameHRUs(lSubBasin, lHruNum) & ".mgt", lSB.ToString)
             Next
         End Sub
     End Class

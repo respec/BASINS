@@ -187,7 +187,7 @@ Partial Class SwatInput
                 '1st line
                 lSB.AppendLine(" .hru file Subbasin:" & lSubBasin & " HRU:" & lHruNum _
                              & " Luse:" & lHruRow.Item(3) & " Soil: " & lHruRow.Item(4) & " Slope " & lHruRow.Item(5) _
-                             & " " & DateNowString() & " ARCGIS-SWAT2003 interface MAVZ")
+                             & " " & HeaderString())
                 '2. HRU_FR
                 lSB.AppendLine(Format(lHruRow.Item(6), "0.0000000").PadLeft(16) & "    | HRU_FR : Fraction of subbasin area contained in HRU")
                 '3. SLSUBBSN and so on....read comment
@@ -214,8 +214,7 @@ Partial Class SwatInput
                 lSB.AppendLine(Format(lHruRow.Item(26), "0.000").PadLeft(16) & "    | POT_NO3L : Nitrate decay rate in pothole [1/day]")
                 lSB.AppendLine(Format(lHruRow.Item(27), "0").PadLeft(16) & "    | DEP_IMP : Depth to impervious layer in soil profile [mm]")
 
-                Dim lHruFileName As String = pSwatInput.OutputFolder & "\" & lHruName
-                IO.File.WriteAllText(lHruFileName, lSB.ToString)
+                IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & lHruName, lSB.ToString)
             Next
         End Sub
         Public Function UniqueValues(ByVal aFieldName As String) As DataTable

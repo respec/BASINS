@@ -1,10 +1,10 @@
 Imports System.Data.OleDb
 
 Module modUtility
-    Friend Function DateNowString() As String
+    Friend Function HeaderString() As String
         'For debugging, put a dummy date in all output files so we can compare files and not find unimportant differences
-        Return "6/13/2008 12:00:00 AM"
-        'Return Date.Now.ToString
+        Return "6/13/2008 12:00:00 AM D4EM-SWAT Interface"
+        'Return Date.Now.ToString & " D4EM-SWAT Interface"
     End Function
 
     Friend Function StringFname(ByVal aSubBasin As String, ByVal aType As String) As String
