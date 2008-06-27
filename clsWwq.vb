@@ -6,6 +6,31 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsWwqItem
+        Public Lao As Long
+        Public Igropt As Long
+        Public Ai0 As Double
+        Public Ai1 As Double
+        Public Ai2 As Double
+        Public Ai3 As Double
+        Public Ai4 As Double
+        Public Ai5 As Double
+        Public Ai6 As Double
+        Public Mumax As Double
+        Public Rhoq As Double
+        Public Tfact As Double
+        Public K_l As Double
+        Public K_n As Double
+        Public K_p As Double
+        Public Lambda0 As Double
+        Public Lambda1 As Double
+        Public Lambda2 As Double
+        Public P_n As Double
+
+        Public Sub New()
+        End Sub
+    End Class
+
     ''' <summary>
     ''' WWQ Input Section
     ''' </summary>
@@ -81,30 +106,13 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal Lao As Long, _
-                       ByVal Igropt As Long, _
-                       ByVal Ai0 As Double, _
-                       ByVal Ai1 As Double, _
-                       ByVal Ai2 As Double, _
-                       ByVal Ai3 As Double, _
-                       ByVal Ai4 As Double, _
-                       ByVal Ai5 As Double, _
-                       ByVal Ai6 As Double, _
-                       ByVal Mumax As Double, _
-                       ByVal Rhoq As Double, _
-                       ByVal Tfact As Double, _
-                       ByVal K_l As Double, _
-                       ByVal K_n As Double, _
-                       ByVal K_p As Double, _
-                       ByVal Lambda0 As Double, _
-                       ByVal Lambda1 As Double, _
-                       ByVal Lambda2 As Double, _
-                       ByVal P_n As Double)
-
-            Dim lSQL As String = "INSERT INTO wwq ( Lao , Igropt , Ai0 , Ai1 , Ai2 , Ai3 , Ai4 , Ai5 , Ai6 , Mumax , Rhoq , Tfact , K_l , K_n , K_p , Lambda0 , Lambda1 , Lambda2 , P_n   )" _
-                               & "Values ('" & Lao & "'  ,'" & Igropt & "'  ,'" & Ai0 & "'  ,'" & Ai1 & "'  ,'" & Ai2 & "'  ,'" & Ai3 & "'  ,'" & Ai4 & "'  ,'" & Ai5 & "'  ,'" & Ai6 & "'  ,'" & Mumax & "'  ,'" & Rhoq & "'  ,'" & Tfact & "'  ,'" & K_l & "'  ,'" & K_n & "'  ,'" & K_p & "'  ,'" & Lambda0 & "'  ,'" & Lambda1 & "'  ,'" & Lambda2 & "'  ,'" & P_n & "'  )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsWwqItem)
+            With aItem
+                Dim lSQL As String = "INSERT INTO wwq ( Lao , Igropt , Ai0 , Ai1 , Ai2 , Ai3 , Ai4 , Ai5 , Ai6 , Mumax , Rhoq , Tfact , K_l , K_n , K_p , Lambda0 , Lambda1 , Lambda2 , P_n   )" _
+                                   & "Values ('" & .Lao & "'  ,'" & .Igropt & "'  ,'" & .Ai0 & "'  ,'" & .Ai1 & "'  ,'" & .Ai2 & "'  ,'" & .Ai3 & "'  ,'" & .Ai4 & "'  ,'" & .Ai5 & "'  ,'" & .Ai6 & "'  ,'" & .Mumax & "'  ,'" & .Rhoq & "'  ,'" & .Tfact & "'  ,'" & .K_l & "'  ,'" & .K_n & "'  ,'" & .K_p & "'  ,'" & .Lambda0 & "'  ,'" & .Lambda1 & "'  ,'" & .Lambda2 & "'  ,'" & .P_n & "'  )"
+                Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+                lCommand.ExecuteNonQuery()
+            End With
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)

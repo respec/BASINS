@@ -6,6 +6,87 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsBsnItem
+        Public SFTMP As Double
+        Public SMTMP As Double
+        Public SMFMX As Double
+        Public SMFMN As Double
+        Public TIMP As Double
+        Public SNOCOVMX As Double
+        Public SNO50COV As Double
+        Public IPET As Long
+        Public ESCO As Double
+        Public EPCO As Double
+        Public EVLAI As Double
+        Public FFCB As Double
+        Public IEVENT As Long
+        Public ICRK As Long
+        Public SURLAG As Double
+        Public ADJ_PKR As Double
+        Public PRF As Double
+        Public SPCON As Double
+        Public SPEXP As Double
+        Public RCN As Double
+        Public CMN As Double
+        Public N_UPDIS As Double
+        Public P_UPDIS As Double
+        Public NPERCO As Double
+        Public PPERCO As Double
+        Public PHOSKD As Double
+        Public PSP As Double
+        Public RSDCO As Double
+        Public PERCOP As Double
+        Public ISUBWQ As Long
+        Public WDPQ As Double
+        Public WGPQ As Double
+        Public WDLPQ As Double
+        Public WGLPQ As Double
+        Public WDPS As Double
+        Public WGPS As Double
+        Public WDLPS As Double
+        Public WGLPS As Double
+        Public BACTKDQ As Double
+        Public THBACT As Double
+        Public WOF_P As Double
+        Public WOF_LP As Double
+        Public WDPF As Double
+        Public WGPF As Double
+        Public WDLPF As Double
+        Public WGLPF As Double
+        Public IRTE As Long
+        Public MSK_COL1 As Double
+        Public MSK_COL2 As Double
+        Public MSK_X As Double
+        Public IDEG As Long
+        Public IWQ As Long
+        Public TRNSRCH As Double
+        Public EVRCH As Double
+        Public IRTPEST As Long
+        Public ICN As Long
+        Public CNCOEF As Double
+        Public CDN As Double
+        Public SDNCO As Double
+        Public BACT_SWF As Double
+        Public BACTMX As Double
+        Public BACTMINLP As Double
+        Public BACTMINP As Double
+        Public WDLPRCH As Double
+        Public WDPRCH As Double
+        Public WDLPRES As Double
+        Public WDPRES As Double
+        Public TB_ADJ As Double
+        Public DEPIMP_BSN As Double
+        Public DDRAIN_BSN As Double
+        Public TDRAIN_BSN As Double
+        Public GDRAIN_BSN As Double
+        Public CN_FROZ As Double
+        Public ISED_DET As Double
+        Public ETFILE As String
+
+        Public Sub New()
+        End Sub
+    End Class
+
     ''' <summary>
     ''' Basin (BSN) Input Section
     ''' </summary>
@@ -137,87 +218,13 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub AddBsn(ByVal ConString As String, _
-                ByVal SFTMP As Double, _
-                ByVal SMTMP As Double, _
-                ByVal SMFMX As Double, _
-                ByVal SMFMN As Double, _
-                ByVal TIMP As Double, _
-                ByVal SNOCOVMX As Double, _
-                ByVal SNO50COV As Double, _
-                ByVal IPET As Long, _
-                ByVal ESCO As Double, _
-                ByVal EPCO As Double, _
-                ByVal EVLAI As Double, _
-                ByVal FFCB As Double, _
-                ByVal IEVENT As Long, _
-                ByVal ICRK As Long, _
-                ByVal SURLAG As Double, _
-                ByVal ADJ_PKR As Double, _
-                ByVal PRF As Double, _
-                ByVal SPCON As Double, _
-                ByVal SPEXP As Double, _
-                ByVal RCN As Double, _
-                ByVal CMN As Double, _
-                ByVal N_UPDIS As Double, _
-                ByVal P_UPDIS As Double, _
-                ByVal NPERCO As Double, _
-                ByVal PPERCO As Double, _
-                ByVal PHOSKD As Double, _
-                ByVal PSP As Double, _
-                ByVal RSDCO As Double, _
-                ByVal PERCOP As Double, _
-                ByVal ISUBWQ As Long, _
-                ByVal WDPQ As Double, _
-                ByVal WGPQ As Double, _
-                ByVal WDLPQ As Double, _
-                ByVal WGLPQ As Double, _
-                ByVal WDPS As Double, _
-                ByVal WGPS As Double, _
-                ByVal WDLPS As Double, _
-                ByVal WGLPS As Double, _
-                ByVal BACTKDQ As Double, _
-                ByVal THBACT As Double, _
-                ByVal WOF_P As Double, _
-                ByVal WOF_LP As Double, _
-                ByVal WDPF As Double, _
-                ByVal WGPF As Double, _
-                ByVal WDLPF As Double, _
-                ByVal WGLPF As Double, _
-                ByVal IRTE As Long, _
-                ByVal MSK_COL1 As Double, _
-                ByVal MSK_COL2 As Double, _
-                ByVal MSK_X As Double, _
-                ByVal IDEG As Long, _
-                ByVal IWQ As Long, _
-                ByVal TRNSRCH As Double, _
-                ByVal EVRCH As Double, _
-                ByVal IRTPEST As Long, _
-                ByVal ICN As Long, _
-                ByVal CNCOEF As Double, _
-                ByVal CDN As Double, _
-                ByVal SDNCO As Double, _
-                ByVal BACT_SWF As Double, _
-                ByVal BACTMX As Double, _
-                ByVal BACTMINLP As Double, _
-                ByVal BACTMINP As Double, _
-                ByVal WDLPRCH As Double, _
-                ByVal WDPRCH As Double, _
-                ByVal WDLPRES As Double, _
-                ByVal WDPRES As Double, _
-                ByVal TB_ADJ As Double, _
-                ByVal DEPIMP_BSN As Double, _
-                ByVal DDRAIN_BSN As Double, _
-                ByVal TDRAIN_BSN As Double, _
-                ByVal GDRAIN_BSN As Double, _
-                ByVal CN_FROZ As Double, _
-                ByVal ISED_DET As Double, _
-                ByVal ETFILE As String)
-
-            Dim lSQL As String = "INSERT INTO bsn ( SFTMP , SMTMP , SMFMX , SMFMN , TIMP , SNOCOVMX , SNO50COV , IPET , ESCO , EPCO , EVLAI , FFCB , IEVENT , ICRK , SURLAG , ADJ_PKR , PRF , SPCON , SPEXP , RCN , CMN , N_UPDIS , P_UPDIS , NPERCO , PPERCO , PHOSKD , PSP , RSDCO , PERCOP , ISUBWQ , WDPQ , WGPQ , WDLPQ , WGLPQ , WDPS , WGPS , WDLPS , WGLPS , BACTKDQ , THBACT , WOF_P , WOF_LP , WDPF , WGPF , WDLPF , WGLPF , IRTE , MSK_COL1 , MSK_COL2 , MSK_X , IDEG , IWQ , TRNSRCH , EVRCH , IRTPEST , ICN , CNCOEF , CDN , SDNCO , BACT_SWF , BACTMX , BACTMINLP , BACTMINP , WDLPRCH , WDPRCH , WDLPRES , WDPRES , TB_ADJ , DEPIMP_BSN , DDRAIN_BSN , TDRAIN_BSN , GDRAIN_BSN , CN_FROZ , ISED_DET , ETFILE  ) " _
-                               & "Values ('" & SFTMP & "'  ,'" & SMTMP & "'  ,'" & SMFMX & "'  ,'" & SMFMN & "'  ,'" & TIMP & "'  ,'" & SNOCOVMX & "'  ,'" & SNO50COV & "'  ,'" & IPET & "'  ,'" & ESCO & "'  ,'" & EPCO & "'  ,'" & EVLAI & "'  ,'" & FFCB & "'  ,'" & IEVENT & "'  ,'" & ICRK & "'  ,'" & SURLAG & "'  ,'" & ADJ_PKR & "'  ,'" & PRF & "'  ,'" & SPCON & "'  ,'" & SPEXP & "'  ,'" & RCN & "'  ,'" & CMN & "'  ,'" & N_UPDIS & "'  ,'" & P_UPDIS & "'  ,'" & NPERCO & "'  ,'" & PPERCO & "'  ,'" & PHOSKD & "'  ,'" & PSP & "'  ,'" & RSDCO & "'  ,'" & PERCOP & "'  ,'" & ISUBWQ & "'  ,'" & WDPQ & "'  ,'" & WGPQ & "'  ,'" & WDLPQ & "'  ,'" & WGLPQ & "'  ,'" & WDPS & "'  ,'" & WGPS & "'  ,'" & WDLPS & "'  ,'" & WGLPS & "'  ,'" & BACTKDQ & "'  ,'" & THBACT & "'  ,'" & WOF_P & "'  ,'" & WOF_LP & "'  ,'" & WDPF & "'  ,'" & WGPF & "'  ,'" & WDLPF & "'  ,'" & WGLPF & "'  ,'" & IRTE & "'  ,'" & MSK_COL1 & "'  ,'" & MSK_COL2 & "'  ,'" & MSK_X & "'  ,'" & IDEG & "'  ,'" & IWQ & "'  ,'" & TRNSRCH & "'  ,'" & EVRCH & "'  ,'" & IRTPEST & "'  ,'" & ICN & "'  ,'" & CNCOEF & "'  ,'" & CDN & "'  ,'" & SDNCO & "'  ,'" & BACT_SWF & "'  ,'" & BACTMX & "'  ,'" & BACTMINLP & "'  ,'" & BACTMINP & "'  ,'" & WDLPRCH & "'  ,'" & WDPRCH & "'  ,'" & WDLPRES & "'  ,'" & WDPRES & "'  ,'" & TB_ADJ & "'  ,'" & DEPIMP_BSN & "'  ,'" & DDRAIN_BSN & "'  ,'" & TDRAIN_BSN & "'  ,'" & GDRAIN_BSN & "'  ,'" & CN_FROZ & "'  ,'" & ISED_DET & "'  ,'" & ETFILE & "'  )"
-            Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
-            lCommand.ExecuteNonQuery()
+        Public Sub Add(ByVal aItem As clsBsnItem)
+            With aItem
+                Dim lSQL As String = "INSERT INTO bsn ( SFTMP , SMTMP , SMFMX , SMFMN , TIMP , SNOCOVMX , SNO50COV , IPET , ESCO , EPCO , EVLAI , FFCB , IEVENT , ICRK , SURLAG , ADJ_PKR , PRF , SPCON , SPEXP , RCN , CMN , N_UPDIS , P_UPDIS , NPERCO , PPERCO , PHOSKD , PSP , RSDCO , PERCOP , ISUBWQ , WDPQ , WGPQ , WDLPQ , WGLPQ , WDPS , WGPS , WDLPS , WGLPS , BACTKDQ , THBACT , WOF_P , WOF_LP , WDPF , WGPF , WDLPF , WGLPF , IRTE , MSK_COL1 , MSK_COL2 , MSK_X , IDEG , IWQ , TRNSRCH , EVRCH , IRTPEST , ICN , CNCOEF , CDN , SDNCO , BACT_SWF , BACTMX , BACTMINLP , BACTMINP , WDLPRCH , WDPRCH , WDLPRES , WDPRES , TB_ADJ , DEPIMP_BSN , DDRAIN_BSN , TDRAIN_BSN , GDRAIN_BSN , CN_FROZ , ISED_DET , ETFILE  ) " _
+                                   & "Values ('" & .SFTMP & "'  ,'" & .SMTMP & "'  ,'" & .SMFMX & "'  ,'" & .SMFMN & "'  ,'" & .TIMP & "'  ,'" & .SNOCOVMX & "'  ,'" & .SNO50COV & "'  ,'" & .IPET & "'  ,'" & .ESCO & "'  ,'" & .EPCO & "'  ,'" & .EVLAI & "'  ,'" & .FFCB & "'  ,'" & .IEVENT & "'  ,'" & .ICRK & "'  ,'" & .SURLAG & "'  ,'" & .ADJ_PKR & "'  ,'" & .PRF & "'  ,'" & .SPCON & "'  ,'" & .SPEXP & "'  ,'" & .RCN & "'  ,'" & .CMN & "'  ,'" & .N_UPDIS & "'  ,'" & .P_UPDIS & "'  ,'" & .NPERCO & "'  ,'" & .PPERCO & "'  ,'" & .PHOSKD & "'  ,'" & .PSP & "'  ,'" & .RSDCO & "'  ,'" & .PERCOP & "'  ,'" & .ISUBWQ & "'  ,'" & .WDPQ & "'  ,'" & .WGPQ & "'  ,'" & .WDLPQ & "'  ,'" & .WGLPQ & "'  ,'" & .WDPS & "'  ,'" & .WGPS & "'  ,'" & .WDLPS & "'  ,'" & .WGLPS & "'  ,'" & .BACTKDQ & "'  ,'" & .THBACT & "'  ,'" & .WOF_P & "'  ,'" & .WOF_LP & "'  ,'" & .WDPF & "'  ,'" & .WGPF & "'  ,'" & .WDLPF & "'  ,'" & .WGLPF & "'  ,'" & .IRTE & "'  ,'" & .MSK_COL1 & "'  ,'" & .MSK_COL2 & "'  ,'" & .MSK_X & "'  ,'" & .IDEG & "'  ,'" & .IWQ & "'  ,'" & .TRNSRCH & "'  ,'" & .EVRCH & "'  ,'" & .IRTPEST & "'  ,'" & .ICN & "'  ,'" & .CNCOEF & "'  ,'" & .CDN & "'  ,'" & .SDNCO & "'  ,'" & .BACT_SWF & "'  ,'" & .BACTMX & "'  ,'" & .BACTMINLP & "'  ,'" & .BACTMINP & "'  ,'" & .WDLPRCH & "'  ,'" & .WDPRCH & "'  ,'" & .WDLPRES & "'  ,'" & .WDPRES & "'  ,'" & .TB_ADJ & "'  ,'" & .DEPIMP_BSN & "'  ,'" & .DDRAIN_BSN & "'  ,'" & .TDRAIN_BSN & "'  ,'" & .GDRAIN_BSN & "'  ,'" & .CN_FROZ & "'  ,'" & .ISED_DET & "'  ,'" & .ETFILE & "'  )"
+                Dim lCommand As New System.Data.OleDb.OleDbCommand(lSQL, pSwatInput.CnSwatInput)
+                lCommand.ExecuteNonQuery()
+            End With
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
