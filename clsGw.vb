@@ -6,6 +6,71 @@ Partial Class SwatInput
         End Get
     End Property
 
+    Public Class clsGwItem
+        Public SUBBASIN As Double
+        Public HRU As Double
+        Public LANDUSE As String
+        Public SOIL As String
+        Public SLOPE_CD As String
+        Public SHALLST As Double
+        Public DEEPST As Double
+        Public GW_DELAY As Double
+        Public ALPHA_BF As Double
+        Public GWQMN As Double
+        Public GW_REVAP As Double
+        Public REVAPMN As Double
+        Public RCHRG_DP As Double
+        Public GWHT As Double
+        Public GW_SPYLD As Double
+        Public SHALLST_N As Double
+        Public GWSOLP As Double
+        Public HLIFE_NGW As Double
+
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                        ByVal aHRU As Double)
+            SUBBASIN = aSUBBASIN
+            HRU = aHRU
+        End Sub
+
+        Public Sub New(ByVal aSUBBASIN As Double, _
+                        ByVal aHRU As Double, _
+                        ByVal aLANDUSE As String, _
+                        ByVal aSOIL As String, _
+                        ByVal aSLOPE_CD As String, _
+                        ByVal aSHALLST As Double, _
+                        ByVal aDEEPST As Double, _
+                        ByVal aGW_DELAY As Double, _
+                        ByVal aALPHA_BF As Double, _
+                        ByVal aGWQMN As Double, _
+                        ByVal aGW_REVAP As Double, _
+                        ByVal aREVAPMN As Double, _
+                        ByVal aRCHRG_DP As Double, _
+                        ByVal aGWHT As Double, _
+                        ByVal aGW_SPYLD As Double, _
+                        ByVal aSHALLST_N As Double, _
+                        ByVal aGWSOLP As Double, _
+                        ByVal aHLIFE_NGW As Double)
+            SUBBASIN = aSUBBASIN
+            HRU = aHRU
+            LANDUSE = aLANDUSE
+            SOIL = aSOIL
+            SLOPE_CD = aSLOPE_CD
+            SHALLST = aSHALLST
+            DEEPST = aDEEPST
+            GW_DELAY = aGW_DELAY
+            ALPHA_BF = aALPHA_BF
+            GWQMN = aGWQMN
+            GW_REVAP = aGW_REVAP
+            REVAPMN = aREVAPMN
+            RCHRG_DP = aRCHRG_DP
+            GWHT = aGWHT
+            GW_SPYLD = aGW_SPYLD
+            SHALLST_N = aSHALLST_N
+            GWSOLP = aGWSOLP
+            HLIFE_NGW = aHLIFE_NGW
+        End Sub
+    End Class
+
     ''' <summary>
     ''' Gw Input Section
     ''' </summary>
