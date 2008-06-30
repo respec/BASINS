@@ -108,8 +108,7 @@ Module modUtility
         Return lDataSet.Tables(lTableName)
     End Function
 
-    Public Sub ExecuteNonQuery(ByVal aSQL As String, ByVal aConnection As OleDbConnection)
-        System.GC.WaitForPendingFinalizers()
+    Public Function ExecuteNonQuery(ByVal aSQL As String, ByVal aConnection As OleDbConnection) As Boolean
         Dim lCommand As New System.Data.OleDb.OleDbCommand(aSQL, aConnection)
         lCommand.CommandTimeout = 30
         Dim lStartTime As Date = Date.Now
@@ -117,6 +116,7 @@ Module modUtility
 TryExecute:
         Try
             lCommand.ExecuteNonQuery()
+            Return True
         Catch e As Exception
             Windows.Forms.Application.DoEvents()
             If Date.Now.Subtract(lStartTime).Seconds < lCommand.CommandTimeout Then
@@ -129,9 +129,10 @@ TryExecute:
                 GoTo TryExecute
             Else
                 MapWinUtility.Logger.Dbg("ExecuteNonQuery Exception after " & Date.Now.Subtract(lStartTime).Seconds & " seconds: " & e.Message)
+                Return False
             End If
         End Try
-    End Sub
+    End Function
 
     'Function find whether a table exist or not
     Friend Function IsTableExist(ByVal strTable As String, ByVal aConnection As OleDb.OleDbConnection) As Boolean
@@ -159,13 +160,7 @@ TryExecute:
 
     Friend Function DropTable(ByVal tableName As String, ByVal aConnection As OleDb.OleDbConnection) As Boolean
         If IsTableExist(tableName, aConnection) Then
-            Dim SQL As String
-            Dim objCmd As New OleDbCommand
-
-            SQL = "DROP TABLE " + "" & tableName & ""
-
-            objCmd = New OleDbCommand(SQL, aConnection)
-            objCmd.ExecuteNonQuery()
+            ExecuteNonQuery("DROP TABLE " & tableName & ";", aConnection)
         End If
     End Function
 End Module

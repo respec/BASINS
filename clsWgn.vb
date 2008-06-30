@@ -32,6 +32,33 @@ Partial Class SwatInput
             SUBBASIN = aSUBBASIN
         End Sub
 
+        Public Sub New(ByVal aSUBBASIN As Integer, ByVal aDataRow As DataRow)
+            SUBBASIN = aSUBBASIN
+            With aDataRow
+                STATION = .Item("STATION")
+                WLATITUDE = .Item("WLATITUDE")
+                WLONGITUDE = .Item("WLONGITUDE")
+                WELEV = .Item("WELEV")
+                RAIN_YRS = .Item("RAIN_YRS")
+                For lMonth As Integer = 1 To 12
+                    TMPMX(lMonth - 1) = .Item("TMPMX" & lMonth)
+                    TMPMN(lMonth - 1) = .Item("TMPMN" & lMonth)
+                    TMPSTDMX(lMonth - 1) = .Item("TMPSTDMX" & lMonth)
+                    TMPSTDMN(lMonth - 1) = .Item("TMPSTDMN" & lMonth)
+                    PCPMM(lMonth - 1) = .Item("PCPMM" & lMonth)
+                    PCPSTD(lMonth - 1) = .Item("PCPSTD" & lMonth)
+                    PCPSKW(lMonth - 1) = .Item("PCPSKW" & lMonth)
+                    PR_W1_(lMonth - 1) = .Item("PR_W1_" & lMonth)
+                    PR_W2_(lMonth - 1) = .Item("PR_W2_" & lMonth)
+                    PCPD(lMonth - 1) = .Item("PCPD" & lMonth)
+                    RAINHHMX(lMonth - 1) = .Item("RAINHHMX" & lMonth)
+                    SOLARAV(lMonth - 1) = .Item("SOLARAV" & lMonth)
+                    DEWPT(lMonth - 1) = .Item("DEWPT" & lMonth)
+                    WNDAV(lMonth - 1) = .Item("WNDAV" & lMonth)
+                Next
+            End With
+        End Sub
+
         Public Function AddSQL() As String
             Return "INSERT INTO wgn( SUBBASIN, STATION, WLATITUDE, WLONGITUDE, WELEV, RAIN_YRS, " _
                     & GroupOfStrings("TMPMX#", 12, ", ") & ", " _
@@ -195,442 +222,35 @@ Partial Class SwatInput
             aSB.AppendLine()
         End Sub
 
-        Public Sub createWeatherGenData()
-            'ONLY FOR US DATABASES, NOT FOR FOREIGN DATABASE, IF SOMEONE WANTS TO
-            'HAVE THEIR OWN DATABASE, THEY MAY HAVE TO CREATE THEIR OWN WEATHER 
-            'DATABASE AND REPLACE THAT WITH US WEATHER DATABASE.
-            'Open the US Weather database dbf file
-            Dim i As Integer
-            Dim ConnectionString As String
-            Dim conParameterDatabase As String
-            Dim ds As New DataSet
-            Dim da As OleDb.OleDbDataAdapter
-            Dim sql As String
-            Dim qryString As String = ""
-            Dim rstStationName As New DataSet
-            Dim rstStationNameCounter As Integer
-            Dim stationID As Integer = 0
-            Dim subbasinID As Integer = 0
-            Dim stationName As String = ""
+        Public Sub createWeatherGenData(ByVal aSubBasinIDs As ArrayList) ', ByVal aWeatherFolder As String)
+            Dim lStationID As Integer = 0
+            Dim lStationName As String = ""
 
+            If pSwatInput.Wgn.TableCreate() Then
+                'Dim lSubWgnTable As DataTable = pSwatInput.QueryInputDB("SELECT SubWgn.Subbasin, SubWgn.Station,SubWgn.MinRec  FROM(SubWgn) ORDER BY SubWgn.Subbasin;")
 
-            If IsTableExist("wgn", conStrProject) Then
-                dropTable("wgn", conStrProject)
+                'Open the US Weather database dbf file
+                'Dim dBaseConnection As New System.Data.OleDb.OleDbConnection( _
+                '    "Provider=Microsoft.Jet.OLEDB.4.0;Data Source= " & aWeatherFolder & ";Extended Properties=dBase IV")
+                'dBaseConnection.Open()
+
+                For Each lSubBasinID As Integer In aSubBasinIDs
+                    'lSubBasinID = lSubWgnTable.Rows(i)("Subbasin")
+                    lStationID = 544 'lSubWgnTable.Rows(i)("MinRec")
+                    lStationName = "NCGREENVILLE" 'lSubWgnTable.Rows(i)("Station")
+                    Dim lTable As DataTable = pSwatInput.QueryGDB("SELECT * FROM weatherstations WHERE STATION LIKE '" & lStationName & "%'")
+                    'Dim lTable As DataTable = QueryDB("SELECT * FROM Statwgn WHERE ID = " & stationID, dBaseConnection)
+
+                    If lTable.Rows.Count > 0 Then
+                        pSwatInput.Wgn.Add(New clsWgnItem(lSubBasinID, lTable.Rows(0)))
+                    Else
+                        MapWinUtility.Logger.Dbg("Could not find weather station for " & lSubBasinID)
+                    End If
+                Next
+
+                'dBaseConnection.Close()
             End If
-            createWgn(conStrProject)
-
-            '1.) US Database
-
-            'Get the required data from weather database with the aid of subWgn table
-            ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;" & _
-            "Data Source= " & System.IO.Path.GetDirectoryName(SaveConFig.S2005ParamDBPath) & "\Weather" & ";Extended Properties=dBase IV"
-
-            'SWAT2005 parameter database connections string
-            conParameterDatabase = "PROVIDER=Microsoft.Jet.OLEDB.4.0;Data Source=" & SaveConFig.S2005ParamDBPath
-
-
-            Dim dBaseConnection As New System.Data.OleDb.OleDbConnection(ConnectionString)
-            dBaseConnection.Open()
-
-
-            qryString = "SELECT  SubWgn.Subbasin, SubWgn.Station,SubWgn.MinRec  FROM(SubWgn) ORDER BY SubWgn.Subbasin;"
-            rstStationName = FetchData(conStrProject, qryString)
-            rstStationNameCounter = rstStationName.Tables(0).Rows.Count
-
-            If Not g_USWeatherDatabaseON Then
-
-                For i = 0 To rstStationNameCounter - 1
-                    System.Windows.Forms.Application.DoEvents()
-                    'Get the station records from access table
-                    stationID = rstStationName.Tables(0).Rows(i)("MinRec")
-                    subbasinID = rstStationName.Tables(0).Rows(i)("Subbasin")
-                    stationName = rstStationName.Tables(0).Rows(i)("Station")
-                    sql = "SELECT STATION, WLATITUDE, WLONGITUDE, WELEV, RAIN_YRS, TMPMX1, TMPMX2, TMPMX3, TMPMX4, TMPMX5, TMPMX6, TMPMX7, TMPMX8, TMPMX9, TMPMX10, TMPMX11, TMPMX12, 	TMPMN1, TMPMN2, TMPMN3, TMPMN4, TMPMN5, TMPMN6, TMPMN7,	TMPMN8, TMPMN9, TMPMN10, TMPMN11, TMPMN12, TMPSTDMX1, TMPSTDMX2, TMPSTDMX3, TMPSTDMX4, TMPSTDMX5, TMPSTDMX6, TMPSTDMX7, 	TMPSTDMX8, TMPSTDMX9, TMPSTDMX10, TMPSTDMX11, TMPSTDMX12, TMPSTDMN1, TMPSTDMN2, TMPSTDMN3, TMPSTDMN4, TMPSTDMN5, TMPSTDMN6, TMPSTDMN7, TMPSTDMN8, TMPSTDMN9, TMPSTDMN10, TMPSTDMN11, TMPSTDMN12, PCPMM1, PCPMM2, PCPMM3, PCPMM4, PCPMM5, PCPMM6, PCPMM7, PCPMM8, PCPMM9, PCPMM10, PCPMM11, PCPMM12, PCPSTD1, PCPSTD2, PCPSTD3, PCPSTD4, PCPSTD5, PCPSTD6, PCPSTD7, PCPSTD8, PCPSTD9, PCPSTD10, PCPSTD11, PCPSTD12, PCPSKW1, PCPSKW2, PCPSKW3, PCPSKW4, PCPSKW5, PCPSKW6, PCPSKW7, PCPSKW8, PCPSKW9, PCPSKW10, PCPSKW11, PCPSKW12, PR_W1_1, 	PR_W1_2, PR_W1_3, PR_W1_4, PR_W1_5, PR_W1_6, PR_W1_7, PR_W1_8, PR_W1_9, PR_W1_10, PR_W1_11, PR_W1_12, PR_W2_1, PR_W2_2, PR_W2_3, PR_W2_4, PR_W2_5, PR_W2_6, PR_W2_7, PR_W2_8, PR_W2_9, PR_W2_10, PR_W2_11, PR_W2_12, PCPD1, PCPD2, PCPD3, PCPD4, PCPD5, PCPD6, PCPD7, PCPD8, PCPD9, PCPD10, PCPD11, PCPD12, RAINHHMX1, RAINHHMX2, RAINHHMX3, RAINHHMX4, RAINHHMX5, RAINHHMX6, RAINHHMX7, RAINHHMX8, RAINHHMX9, RAINHHMX10, RAINHHMX11, RAINHHMX12, SOLARAV1, SOLARAV2, SOLARAV3, SOLARAV4, SOLARAV5, SOLARAV6, SOLARAV7, SOLARAV8, SOLARAV9, SOLARAV10, SOLARAV11, SOLARAV12, DEWPT1, DEWPT2, DEWPT3, DEWPT4, DEWPT5, DEWPT6, DEWPT7, DEWPT8, DEWPT9, DEWPT10, DEWPT11, DEWPT12, WNDAV1, WNDAV2, WNDAV3, WNDAV4, WNDAV5, WNDAV6, WNDAV7, WNDAV8, WNDAV9, WNDAV10, WNDAV11, WNDAV12 FROM userwgn WHERE STATION LIKE '" & stationName & "%'"
-                    ds = FetchData(conParameterDatabase, sql)
-
-                    For k As Integer = 0 To ds.Tables(0).Rows.Count - 1
-                        System.Windows.Forms.Application.DoEvents()
-                        AddWgn(conStrProject, subbasinID, _
-                                ds.Tables(0).Rows(k)("STATION"), _
-                                ds.Tables(0).Rows(k)("WLATITUDE"), _
-                                ds.Tables(0).Rows(k)("WLONGITUDE"), _
-                                ds.Tables(0).Rows(k)("WELEV"), _
-                                ds.Tables(0).Rows(k)("RAIN_YRS"), _
-                                ds.Tables(0).Rows(k)("TMPMX1"), _
-                                ds.Tables(0).Rows(k)("TMPMX2"), _
-                                ds.Tables(0).Rows(k)("TMPMX3"), _
-                                ds.Tables(0).Rows(k)("TMPMX4"), _
-                                ds.Tables(0).Rows(k)("TMPMX5"), _
-                                ds.Tables(0).Rows(k)("TMPMX6"), _
-                                ds.Tables(0).Rows(k)("TMPMX7"), _
-                                ds.Tables(0).Rows(k)("TMPMX8"), _
-                                ds.Tables(0).Rows(k)("TMPMX9"), _
-                                ds.Tables(0).Rows(k)("TMPMX10"), _
-                                ds.Tables(0).Rows(k)("TMPMX11"), _
-                                ds.Tables(0).Rows(k)("TMPMX12"), _
-                                ds.Tables(0).Rows(k)("TMPMN1"), _
-                                ds.Tables(0).Rows(k)("TMPMN2"), _
-                                ds.Tables(0).Rows(k)("TMPMN3"), _
-                                ds.Tables(0).Rows(k)("TMPMN4"), _
-                                ds.Tables(0).Rows(k)("TMPMN5"), _
-                                ds.Tables(0).Rows(k)("TMPMN6"), _
-                                ds.Tables(0).Rows(k)("TMPMN7"), _
-                                ds.Tables(0).Rows(k)("TMPMN8"), _
-                                ds.Tables(0).Rows(k)("TMPMN9"), _
-                                ds.Tables(0).Rows(k)("TMPMN10"), _
-                                ds.Tables(0).Rows(k)("TMPMN11"), _
-                                ds.Tables(0).Rows(k)("TMPMN12"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX1"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX2"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX3"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX4"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX5"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX6"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX7"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX8"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX9"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX10"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX11"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMX12"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN1"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN2"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN3"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN4"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN5"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN6"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN7"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN8"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN9"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN10"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN11"), _
-                                ds.Tables(0).Rows(k)("TMPSTDMN12"), _
-                                ds.Tables(0).Rows(k)("PCPMM1"), _
-                                ds.Tables(0).Rows(k)("PCPMM2"), _
-                                ds.Tables(0).Rows(k)("PCPMM3"), _
-                                ds.Tables(0).Rows(k)("PCPMM4"), _
-                                ds.Tables(0).Rows(k)("PCPMM5"), _
-                                ds.Tables(0).Rows(k)("PCPMM6"), _
-                                ds.Tables(0).Rows(k)("PCPMM7"), _
-                                ds.Tables(0).Rows(k)("PCPMM8"), _
-                                ds.Tables(0).Rows(k)("PCPMM9"), _
-                                ds.Tables(0).Rows(k)("PCPMM10"), _
-                                ds.Tables(0).Rows(k)("PCPMM11"), _
-                                ds.Tables(0).Rows(k)("PCPMM12"), _
-                                ds.Tables(0).Rows(k)("PCPSTD1"), _
-                                ds.Tables(0).Rows(k)("PCPSTD2"), _
-                                ds.Tables(0).Rows(k)("PCPSTD3"), _
-                                ds.Tables(0).Rows(k)("PCPSTD4"), _
-                                ds.Tables(0).Rows(k)("PCPSTD5"), _
-                                ds.Tables(0).Rows(k)("PCPSTD6"), _
-                                ds.Tables(0).Rows(k)("PCPSTD7"), _
-                                ds.Tables(0).Rows(k)("PCPSTD8"), _
-                                ds.Tables(0).Rows(k)("PCPSTD9"), _
-                                ds.Tables(0).Rows(k)("PCPSTD10"), _
-                                ds.Tables(0).Rows(k)("PCPSTD11"), _
-                                ds.Tables(0).Rows(k)("PCPSTD12"), _
-                                ds.Tables(0).Rows(k)("PCPSKW1"), _
-                                ds.Tables(0).Rows(k)("PCPSKW2"), _
-                                ds.Tables(0).Rows(k)("PCPSKW3"), _
-                                ds.Tables(0).Rows(k)("PCPSKW4"), _
-                                ds.Tables(0).Rows(k)("PCPSKW5"), _
-                                ds.Tables(0).Rows(k)("PCPSKW6"), _
-                                ds.Tables(0).Rows(k)("PCPSKW7"), _
-                                ds.Tables(0).Rows(k)("PCPSKW8"), _
-                                ds.Tables(0).Rows(k)("PCPSKW9"), _
-                                ds.Tables(0).Rows(k)("PCPSKW10"), _
-                                ds.Tables(0).Rows(k)("PCPSKW11"), _
-                                ds.Tables(0).Rows(k)("PCPSKW12"), _
-                                ds.Tables(0).Rows(k)("PR_W1_1"), _
-                                ds.Tables(0).Rows(k)("PR_W1_2"), _
-                                ds.Tables(0).Rows(k)("PR_W1_3"), _
-                                ds.Tables(0).Rows(k)("PR_W1_4"), _
-                                ds.Tables(0).Rows(k)("PR_W1_5"), _
-                                ds.Tables(0).Rows(k)("PR_W1_6"), _
-                                ds.Tables(0).Rows(k)("PR_W1_7"), _
-                                ds.Tables(0).Rows(k)("PR_W1_8"), _
-                                ds.Tables(0).Rows(k)("PR_W1_9"), _
-                                ds.Tables(0).Rows(k)("PR_W1_10"), _
-                                ds.Tables(0).Rows(k)("PR_W1_11"), _
-                                ds.Tables(0).Rows(k)("PR_W1_12"), _
-                                ds.Tables(0).Rows(k)("PR_W2_1"), _
-                                ds.Tables(0).Rows(k)("PR_W2_2"), _
-                                ds.Tables(0).Rows(k)("PR_W2_3"), _
-                                ds.Tables(0).Rows(k)("PR_W2_4"), _
-                                ds.Tables(0).Rows(k)("PR_W2_5"), _
-                                ds.Tables(0).Rows(k)("PR_W2_6"), _
-                                ds.Tables(0).Rows(k)("PR_W2_7"), _
-                                ds.Tables(0).Rows(k)("PR_W2_8"), _
-                                ds.Tables(0).Rows(k)("PR_W2_9"), _
-                                ds.Tables(0).Rows(k)("PR_W2_10"), _
-                                ds.Tables(0).Rows(k)("PR_W2_11"), _
-                                ds.Tables(0).Rows(k)("PR_W2_12"), _
-                                ds.Tables(0).Rows(k)("PCPD1"), _
-                                ds.Tables(0).Rows(k)("PCPD2"), _
-                                ds.Tables(0).Rows(k)("PCPD3"), _
-                                ds.Tables(0).Rows(k)("PCPD4"), _
-                                ds.Tables(0).Rows(k)("PCPD5"), _
-                                ds.Tables(0).Rows(k)("PCPD6"), _
-                                ds.Tables(0).Rows(k)("PCPD7"), _
-                                ds.Tables(0).Rows(k)("PCPD8"), _
-                                ds.Tables(0).Rows(k)("PCPD9"), _
-                                ds.Tables(0).Rows(k)("PCPD10"), _
-                                ds.Tables(0).Rows(k)("PCPD11"), _
-                                ds.Tables(0).Rows(k)("PCPD12"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX1"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX2"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX3"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX4"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX5"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX6"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX7"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX8"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX9"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX10"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX11"), _
-                                ds.Tables(0).Rows(k)("RAINHHMX12"), _
-                                ds.Tables(0).Rows(k)("SOLARAV1"), _
-                                ds.Tables(0).Rows(k)("SOLARAV2"), _
-                                ds.Tables(0).Rows(k)("SOLARAV3"), _
-                                ds.Tables(0).Rows(k)("SOLARAV4"), _
-                                ds.Tables(0).Rows(k)("SOLARAV5"), _
-                                ds.Tables(0).Rows(k)("SOLARAV6"), _
-                                ds.Tables(0).Rows(k)("SOLARAV7"), _
-                                ds.Tables(0).Rows(k)("SOLARAV8"), _
-                                ds.Tables(0).Rows(k)("SOLARAV9"), _
-                                ds.Tables(0).Rows(k)("SOLARAV10"), _
-                                ds.Tables(0).Rows(k)("SOLARAV11"), _
-                                ds.Tables(0).Rows(k)("SOLARAV12"), _
-                                ds.Tables(0).Rows(k)("DEWPT1"), _
-                                ds.Tables(0).Rows(k)("DEWPT2"), _
-                                ds.Tables(0).Rows(k)("DEWPT3"), _
-                                ds.Tables(0).Rows(k)("DEWPT4"), _
-                                ds.Tables(0).Rows(k)("DEWPT5"), _
-                                ds.Tables(0).Rows(k)("DEWPT6"), _
-                                ds.Tables(0).Rows(k)("DEWPT7"), _
-                                ds.Tables(0).Rows(k)("DEWPT8"), _
-                                ds.Tables(0).Rows(k)("DEWPT9"), _
-                                ds.Tables(0).Rows(k)("DEWPT10"), _
-                                ds.Tables(0).Rows(k)("DEWPT11"), _
-                                ds.Tables(0).Rows(k)("DEWPT12"), _
-                                ds.Tables(0).Rows(k)("WNDAV1"), _
-                                ds.Tables(0).Rows(k)("WNDAV2"), _
-                                ds.Tables(0).Rows(k)("WNDAV3"), _
-                                ds.Tables(0).Rows(k)("WNDAV4"), _
-                                ds.Tables(0).Rows(k)("WNDAV5"), _
-                                ds.Tables(0).Rows(k)("WNDAV6"), _
-                                ds.Tables(0).Rows(k)("WNDAV7"), _
-                                ds.Tables(0).Rows(k)("WNDAV8"), _
-                                ds.Tables(0).Rows(k)("WNDAV9"), _
-                                ds.Tables(0).Rows(k)("WNDAV10"), _
-                                ds.Tables(0).Rows(k)("WNDAV11"), _
-                                ds.Tables(0).Rows(k)("WNDAV12"))
-
-                    Next
-
-                Next
-
-            Else
-
-
-
-                For i = 0 To rstStationNameCounter - 1
-                    'Get the records from weather dbf file for US Stations
-                    stationID = rstStationName.Tables(0).Rows(i)("MinRec")
-                    subbasinID = rstStationName.Tables(0).Rows(i)("Subbasin")
-                    stationName = rstStationName.Tables(0).Rows(i)("Station")
-
-                    sql = "SELECT STATE, STATION, LSTATION,ID ,WLATITUDE, WLONGITUDE, WELEV, RAIN_YRS, TMPMX1, TMPMX2, TMPMX3, TMPMX4, TMPMX5, TMPMX6, TMPMX7, TMPMX8, TMPMX9, TMPMX10, TMPMX11, TMPMX12, 	TMPMN1, TMPMN2, TMPMN3, TMPMN4, TMPMN5, TMPMN6, TMPMN7,	TMPMN8, TMPMN9, TMPMN10, TMPMN11, TMPMN12, TMPSTDMX1, TMPSTDMX2, TMPSTDMX3, TMPSTDMX4, TMPSTDMX5, TMPSTDMX6, TMPSTDMX7, 	TMPSTDMX8, TMPSTDMX9, TMPSTDMX10, TMPSTDMX11, TMPSTDMX12, TMPSTDMN1, TMPSTDMN2, TMPSTDMN3, TMPSTDMN4, TMPSTDMN5, TMPSTDMN6, TMPSTDMN7, TMPSTDMN8, TMPSTDMN9, TMPSTDMN10, TMPSTDMN11, TMPSTDMN12, PCPMM1, PCPMM2, PCPMM3, PCPMM4, PCPMM5, PCPMM6, PCPMM7, PCPMM8, PCPMM9, PCPMM10, PCPMM11, PCPMM12, PCPSTD1, PCPSTD2, PCPSTD3, PCPSTD4, PCPSTD5, PCPSTD6, PCPSTD7, PCPSTD8, PCPSTD9, PCPSTD10, PCPSTD11, PCPSTD12, PCPSKW1, PCPSKW2, PCPSKW3, PCPSKW4, PCPSKW5, PCPSKW6, PCPSKW7, PCPSKW8, PCPSKW9, PCPSKW10, PCPSKW11, PCPSKW12, PR_W1_1, 	PR_W1_2, PR_W1_3, PR_W1_4, PR_W1_5, PR_W1_6, PR_W1_7, PR_W1_8, PR_W1_9, PR_W1_10, PR_W1_11, PR_W1_12, PR_W2_1, PR_W2_2, PR_W2_3, PR_W2_4, PR_W2_5, PR_W2_6, PR_W2_7, PR_W2_8, PR_W2_9, PR_W2_10, PR_W2_11, PR_W2_12, PCPD1, PCPD2, PCPD3, PCPD4, PCPD5, PCPD6, PCPD7, PCPD8, PCPD9, PCPD10, PCPD11, PCPD12, RAINHHMX1, RAINHHMX2, RAINHHMX3, RAINHHMX4, RAINHHMX5, RAINHHMX6, RAINHHMX7, RAINHHMX8, RAINHHMX9, RAINHHMX10, RAINHHMX11, RAINHHMX12, SOLARAV1, SOLARAV2, SOLARAV3, SOLARAV4, SOLARAV5, SOLARAV6, SOLARAV7, SOLARAV8, SOLARAV9, SOLARAV10, SOLARAV11, SOLARAV12, DEWPT1, DEWPT2, DEWPT3, DEWPT4, DEWPT5, DEWPT6, DEWPT7, DEWPT8, DEWPT9, DEWPT10, DEWPT11, DEWPT12, WNDAV1, WNDAV2, WNDAV3, WNDAV4, WNDAV5, WNDAV6, WNDAV7, WNDAV8, WNDAV9, WNDAV10, WNDAV11, WNDAV12 FROM Statwgn WHERE ID = " & stationID
-                    da = New OleDb.OleDbDataAdapter(sql, dBaseConnection)
-                    da.Fill(ds, "tableData")
-                Next
-
-
-
-                For k As Integer = 0 To ds.Tables(0).Rows.Count - 1
-                    System.Windows.Forms.Application.DoEvents()
-                    AddWgn(conStrProject, subbasinID, _
-                            ds.Tables(0).Rows(k)("STATION"), _
-                            ds.Tables(0).Rows(k)("WLATITUDE"), _
-                            ds.Tables(0).Rows(k)("WLONGITUDE"), _
-                            ds.Tables(0).Rows(k)("WELEV"), _
-                            ds.Tables(0).Rows(k)("RAIN_YRS"), _
-                            ds.Tables(0).Rows(k)("TMPMX1"), _
-                            ds.Tables(0).Rows(k)("TMPMX2"), _
-                            ds.Tables(0).Rows(k)("TMPMX3"), _
-                            ds.Tables(0).Rows(k)("TMPMX4"), _
-                            ds.Tables(0).Rows(k)("TMPMX5"), _
-                            ds.Tables(0).Rows(k)("TMPMX6"), _
-                            ds.Tables(0).Rows(k)("TMPMX7"), _
-                            ds.Tables(0).Rows(k)("TMPMX8"), _
-                            ds.Tables(0).Rows(k)("TMPMX9"), _
-                            ds.Tables(0).Rows(k)("TMPMX10"), _
-                            ds.Tables(0).Rows(k)("TMPMX11"), _
-                            ds.Tables(0).Rows(k)("TMPMX12"), _
-                            ds.Tables(0).Rows(k)("TMPMN1"), _
-                            ds.Tables(0).Rows(k)("TMPMN2"), _
-                            ds.Tables(0).Rows(k)("TMPMN3"), _
-                            ds.Tables(0).Rows(k)("TMPMN4"), _
-                            ds.Tables(0).Rows(k)("TMPMN5"), _
-                            ds.Tables(0).Rows(k)("TMPMN6"), _
-                            ds.Tables(0).Rows(k)("TMPMN7"), _
-                            ds.Tables(0).Rows(k)("TMPMN8"), _
-                            ds.Tables(0).Rows(k)("TMPMN9"), _
-                            ds.Tables(0).Rows(k)("TMPMN10"), _
-                            ds.Tables(0).Rows(k)("TMPMN11"), _
-                            ds.Tables(0).Rows(k)("TMPMN12"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX1"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX2"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX3"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX4"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX5"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX6"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX7"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX8"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX9"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX10"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX11"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMX12"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN1"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN2"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN3"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN4"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN5"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN6"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN7"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN8"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN9"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN10"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN11"), _
-                            ds.Tables(0).Rows(k)("TMPSTDMN12"), _
-                            ds.Tables(0).Rows(k)("PCPMM1"), _
-                            ds.Tables(0).Rows(k)("PCPMM2"), _
-                            ds.Tables(0).Rows(k)("PCPMM3"), _
-                            ds.Tables(0).Rows(k)("PCPMM4"), _
-                            ds.Tables(0).Rows(k)("PCPMM5"), _
-                            ds.Tables(0).Rows(k)("PCPMM6"), _
-                            ds.Tables(0).Rows(k)("PCPMM7"), _
-                            ds.Tables(0).Rows(k)("PCPMM8"), _
-                            ds.Tables(0).Rows(k)("PCPMM9"), _
-                            ds.Tables(0).Rows(k)("PCPMM10"), _
-                            ds.Tables(0).Rows(k)("PCPMM11"), _
-                            ds.Tables(0).Rows(k)("PCPMM12"), _
-                            ds.Tables(0).Rows(k)("PCPSTD1"), _
-                            ds.Tables(0).Rows(k)("PCPSTD2"), _
-                            ds.Tables(0).Rows(k)("PCPSTD3"), _
-                            ds.Tables(0).Rows(k)("PCPSTD4"), _
-                            ds.Tables(0).Rows(k)("PCPSTD5"), _
-                            ds.Tables(0).Rows(k)("PCPSTD6"), _
-                            ds.Tables(0).Rows(k)("PCPSTD7"), _
-                            ds.Tables(0).Rows(k)("PCPSTD8"), _
-                            ds.Tables(0).Rows(k)("PCPSTD9"), _
-                            ds.Tables(0).Rows(k)("PCPSTD10"), _
-                            ds.Tables(0).Rows(k)("PCPSTD11"), _
-                            ds.Tables(0).Rows(k)("PCPSTD12"), _
-                            ds.Tables(0).Rows(k)("PCPSKW1"), _
-                            ds.Tables(0).Rows(k)("PCPSKW2"), _
-                            ds.Tables(0).Rows(k)("PCPSKW3"), _
-                            ds.Tables(0).Rows(k)("PCPSKW4"), _
-                            ds.Tables(0).Rows(k)("PCPSKW5"), _
-                            ds.Tables(0).Rows(k)("PCPSKW6"), _
-                            ds.Tables(0).Rows(k)("PCPSKW7"), _
-                            ds.Tables(0).Rows(k)("PCPSKW8"), _
-                            ds.Tables(0).Rows(k)("PCPSKW9"), _
-                            ds.Tables(0).Rows(k)("PCPSKW10"), _
-                            ds.Tables(0).Rows(k)("PCPSKW11"), _
-                            ds.Tables(0).Rows(k)("PCPSKW12"), _
-                            ds.Tables(0).Rows(k)("PR_W1_1"), _
-                            ds.Tables(0).Rows(k)("PR_W1_2"), _
-                            ds.Tables(0).Rows(k)("PR_W1_3"), _
-                            ds.Tables(0).Rows(k)("PR_W1_4"), _
-                            ds.Tables(0).Rows(k)("PR_W1_5"), _
-                            ds.Tables(0).Rows(k)("PR_W1_6"), _
-                            ds.Tables(0).Rows(k)("PR_W1_7"), _
-                            ds.Tables(0).Rows(k)("PR_W1_8"), _
-                            ds.Tables(0).Rows(k)("PR_W1_9"), _
-                            ds.Tables(0).Rows(k)("PR_W1_10"), _
-                            ds.Tables(0).Rows(k)("PR_W1_11"), _
-                            ds.Tables(0).Rows(k)("PR_W1_12"), _
-                            ds.Tables(0).Rows(k)("PR_W2_1"), _
-                            ds.Tables(0).Rows(k)("PR_W2_2"), _
-                            ds.Tables(0).Rows(k)("PR_W2_3"), _
-                            ds.Tables(0).Rows(k)("PR_W2_4"), _
-                            ds.Tables(0).Rows(k)("PR_W2_5"), _
-                            ds.Tables(0).Rows(k)("PR_W2_6"), _
-                            ds.Tables(0).Rows(k)("PR_W2_7"), _
-                            ds.Tables(0).Rows(k)("PR_W2_8"), _
-                            ds.Tables(0).Rows(k)("PR_W2_9"), _
-                            ds.Tables(0).Rows(k)("PR_W2_10"), _
-                            ds.Tables(0).Rows(k)("PR_W2_11"), _
-                            ds.Tables(0).Rows(k)("PR_W2_12"), _
-                            ds.Tables(0).Rows(k)("PCPD1"), _
-                            ds.Tables(0).Rows(k)("PCPD2"), _
-                            ds.Tables(0).Rows(k)("PCPD3"), _
-                            ds.Tables(0).Rows(k)("PCPD4"), _
-                            ds.Tables(0).Rows(k)("PCPD5"), _
-                            ds.Tables(0).Rows(k)("PCPD6"), _
-                            ds.Tables(0).Rows(k)("PCPD7"), _
-                            ds.Tables(0).Rows(k)("PCPD8"), _
-                            ds.Tables(0).Rows(k)("PCPD9"), _
-                            ds.Tables(0).Rows(k)("PCPD10"), _
-                            ds.Tables(0).Rows(k)("PCPD11"), _
-                            ds.Tables(0).Rows(k)("PCPD12"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX1"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX2"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX3"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX4"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX5"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX6"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX7"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX8"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX9"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX10"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX11"), _
-                            ds.Tables(0).Rows(k)("RAINHHMX12"), _
-                            ds.Tables(0).Rows(k)("SOLARAV1"), _
-                            ds.Tables(0).Rows(k)("SOLARAV2"), _
-                            ds.Tables(0).Rows(k)("SOLARAV3"), _
-                            ds.Tables(0).Rows(k)("SOLARAV4"), _
-                            ds.Tables(0).Rows(k)("SOLARAV5"), _
-                            ds.Tables(0).Rows(k)("SOLARAV6"), _
-                            ds.Tables(0).Rows(k)("SOLARAV7"), _
-                            ds.Tables(0).Rows(k)("SOLARAV8"), _
-                            ds.Tables(0).Rows(k)("SOLARAV9"), _
-                            ds.Tables(0).Rows(k)("SOLARAV10"), _
-                            ds.Tables(0).Rows(k)("SOLARAV11"), _
-                            ds.Tables(0).Rows(k)("SOLARAV12"), _
-                            ds.Tables(0).Rows(k)("DEWPT1"), _
-                            ds.Tables(0).Rows(k)("DEWPT2"), _
-                            ds.Tables(0).Rows(k)("DEWPT3"), _
-                            ds.Tables(0).Rows(k)("DEWPT4"), _
-                            ds.Tables(0).Rows(k)("DEWPT5"), _
-                            ds.Tables(0).Rows(k)("DEWPT6"), _
-                            ds.Tables(0).Rows(k)("DEWPT7"), _
-                            ds.Tables(0).Rows(k)("DEWPT8"), _
-                            ds.Tables(0).Rows(k)("DEWPT9"), _
-                            ds.Tables(0).Rows(k)("DEWPT10"), _
-                            ds.Tables(0).Rows(k)("DEWPT11"), _
-                            ds.Tables(0).Rows(k)("DEWPT12"), _
-                            ds.Tables(0).Rows(k)("WNDAV1"), _
-                            ds.Tables(0).Rows(k)("WNDAV2"), _
-                            ds.Tables(0).Rows(k)("WNDAV3"), _
-                            ds.Tables(0).Rows(k)("WNDAV4"), _
-                            ds.Tables(0).Rows(k)("WNDAV5"), _
-                            ds.Tables(0).Rows(k)("WNDAV6"), _
-                            ds.Tables(0).Rows(k)("WNDAV7"), _
-                            ds.Tables(0).Rows(k)("WNDAV8"), _
-                            ds.Tables(0).Rows(k)("WNDAV9"), _
-                            ds.Tables(0).Rows(k)("WNDAV10"), _
-                            ds.Tables(0).Rows(k)("WNDAV11"), _
-                            ds.Tables(0).Rows(k)("WNDAV12"))
-
-                Next
-
-                'MsgBox(ds.Tables(0).Rows.Count)
-
-            End If
-            dBaseConnection.Close()
-
-
         End Sub
+
     End Class
 End Class
