@@ -244,9 +244,6 @@ Public Class SwatInput
 
         CreateAccessDatabase(aOutGDB, aOutputFolder)
 
-        'pSubWgn.TableCreate()
-        'pSubWgn.Add(1, 1, 1, 1, 1)
-
         Return True
     End Function
 

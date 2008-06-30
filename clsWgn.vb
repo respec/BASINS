@@ -81,6 +81,8 @@ Partial Class SwatInput
         Public Function TableCreate() As Boolean
             'based on mwSWATPlugIn:DBLayer:createRTE
             Try
+                DropTable(pTableName, pSwatInput.CnSwatInput)
+
                 Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
 
                 'Open the Catalog

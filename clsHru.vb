@@ -71,70 +71,39 @@ Partial Class SwatInput
 
         Public Function TableCreate() As Boolean
             'based on mwSWATPlugIn:DBLayer:createHruTable
-            Try
-                DropTable(pTableName, pSwatInput.CnSwatInput)
+            DropTable(pTableName, pSwatInput.CnSwatInput)
 
-                'Open the connection
-                Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
-
-                'Open the Catalog
-                Dim lCatalog As New ADOX.Catalog
-                lCatalog.ActiveConnection = lConnection
-
-                'Create the table
-                Dim lTable As New ADOX.Table
-                lTable.Name = pTableName
-
-                Dim lKeyColumn As New ADOX.Column
-                With lKeyColumn
-                    .Name = "OID"
-                    .Type = ADOX.DataTypeEnum.adInteger
-                    .ParentCatalog = lCatalog
-                    .Properties("AutoIncrement").Value = True
-                End With
-
-                With lTable.Columns
-                    .Append(lKeyColumn)
-                    .Append("SUBBASIN", ADOX.DataTypeEnum.adDouble)
-                    .Append("HRU", ADOX.DataTypeEnum.adDouble)
-                    .Append("LANDUSE", ADOX.DataTypeEnum.adVarWChar, 4)
-                    .Append("SOIL", ADOX.DataTypeEnum.adVarWChar, 40)
-                    .Append("SLOPE_CD", ADOX.DataTypeEnum.adVarWChar, 20)
-                    .Append("HRU_FR", ADOX.DataTypeEnum.adDouble)
-                    .Append("SLSUBBSN", ADOX.DataTypeEnum.adSingle)
-                    .Append("HRU_SLP", ADOX.DataTypeEnum.adSingle)
-                    .Append("OV_N", ADOX.DataTypeEnum.adSingle)
-                    .Append("LAT_TTIME", ADOX.DataTypeEnum.adSingle)
-                    .Append("LAT_SED", ADOX.DataTypeEnum.adSingle)
-                    .Append("SLSOIL", ADOX.DataTypeEnum.adSingle)
-                    .Append("CANMX", ADOX.DataTypeEnum.adSingle)
-                    .Append("ESCO", ADOX.DataTypeEnum.adSingle)
-                    .Append("EPCO", ADOX.DataTypeEnum.adSingle)
-                    .Append("RSDIN", ADOX.DataTypeEnum.adSingle)
-                    .Append("ERORGN", ADOX.DataTypeEnum.adSingle)
-                    .Append("ERORGP", ADOX.DataTypeEnum.adSingle)
-                    .Append("POT_FR", ADOX.DataTypeEnum.adSingle)
-                    .Append("FLD_FR", ADOX.DataTypeEnum.adSingle)
-                    .Append("RIP_FR", ADOX.DataTypeEnum.adSingle)
-                    .Append("POT_TILE", ADOX.DataTypeEnum.adSingle)
-                    .Append("POT_VOLX", ADOX.DataTypeEnum.adSingle)
-                    .Append("POT_VOL", ADOX.DataTypeEnum.adSingle)
-                    .Append("POT_NSED", ADOX.DataTypeEnum.adSingle)
-                    .Append("POT_NO3L", ADOX.DataTypeEnum.adSingle)
-                    .Append("DEP_IMP", ADOX.DataTypeEnum.adInteger, 4)
-                End With
-
-                lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
-                lCatalog.Tables.Append(lTable)
-                lTable = Nothing
-                lCatalog = Nothing
-                lConnection.Close()
-                lConnection = Nothing
-                Return True
-            Catch lEx As ApplicationException
-                Debug.Print(lEx.Message)
-                Return False
-            End Try
+            ExecuteNonQuery("CREATE TABLE " & pTableName & " (" _
+                          & "OID INT IDENTITY PRIMARY KEY, " _
+                          & "SUBBASIN Double, " _
+                          & "HRU Double, " _
+                          & "LANDUSE VarChar(4), " _
+                          & "SOIL VarChar(40), " _
+                          & "SLOPE_CD VarChar(20), " _
+                          & "HRU_FR Double, " _
+                          & "SLSUBBSN Single, " _
+                          & "HRU_SLP Single, " _
+                          & "OV_N Single, " _
+                          & "LAT_TTIME Single, " _
+                          & "LAT_SED Single, " _
+                          & "SLSOIL Single, " _
+                          & "CANMX Single, " _
+                          & "ESCO Single, " _
+                          & "EPCO Single, " _
+                          & "RSDIN Single, " _
+                          & "ERORGN Single, " _
+                          & "ERORGP Single, " _
+                          & "POT_FR Single, " _
+                          & "FLD_FR Single, " _
+                          & "RIP_FR Single, " _
+                          & "POT_TILE Single, " _
+                          & "POT_VOLX Single, " _
+                          & "POT_VOL Single, " _
+                          & "POT_NSED Single, " _
+                          & "POT_NO3L Single, " _
+                          & "DEP_IMP Integer4 " _
+                          & ");", pSwatInput.CnSwatInput)
+            Return True
         End Function
 
         Public Function Table() As DataTable

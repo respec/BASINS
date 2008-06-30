@@ -1,6 +1,7 @@
 Imports System.Data.OleDb
 
 Module modUtility
+
     Friend Function HeaderString() As String
         'For debugging, put a dummy date in all output files so we can compare files and not find unimportant differences
         Return "6/13/2008 12:00:00 AM D4EM-SWAT Interface"
@@ -108,11 +109,28 @@ Module modUtility
     End Function
 
     Public Sub ExecuteNonQuery(ByVal aSQL As String, ByVal aConnection As OleDbConnection)
-        'Dim lStartTime As Date = Date.Now
         System.GC.WaitForPendingFinalizers()
         Dim lCommand As New System.Data.OleDb.OleDbCommand(aSQL, aConnection)
         lCommand.CommandTimeout = 30
-        lCommand.ExecuteNonQuery()
+        Dim lStartTime As Date = Date.Now
+        Dim lLogged As Boolean = False
+TryExecute:
+        Try
+            lCommand.ExecuteNonQuery()
+        Catch e As Exception
+            Windows.Forms.Application.DoEvents()
+            If Date.Now.Subtract(lStartTime).Seconds < lCommand.CommandTimeout Then
+                System.Threading.Thread.Sleep(100)
+                If Not lLogged Then
+                    MapWinUtility.Logger.Dbg("ExecuteNonQuery Exception: " & e.Message & ", Retrying: " & aSQL)
+                    MapWinUtility.Logger.Flush()
+                    lLogged = True
+                End If
+                GoTo TryExecute
+            Else
+                MapWinUtility.Logger.Dbg("ExecuteNonQuery Exception after " & Date.Now.Subtract(lStartTime).Seconds & " seconds: " & e.Message)
+            End If
+        End Try
     End Sub
 
     'Function find whether a table exist or not

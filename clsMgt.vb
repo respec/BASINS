@@ -128,6 +128,8 @@ Partial Class SwatInput
     ''' <remarks></remarks>
     Public Class clsMgt
         Private pSwatInput As SwatInput
+        Private pTable1Name As String = "mgt1"
+        Private pTable2Name As String = "mgt2"
 
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
@@ -140,6 +142,8 @@ Partial Class SwatInput
         Public Function Table1Create() As Boolean
             'based on mwSWATPlugIn:DBLayer:createHruTable
             Try
+                DropTable(pTable1Name, pSwatInput.CnSwatInput)
+
                 'Open the connection
                 Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
 
@@ -149,7 +153,7 @@ Partial Class SwatInput
 
                 'Create the table
                 Dim lTable As New ADOX.Table
-                lTable.Name = "mgt1"
+                lTable.Name = pTable1Name
 
                 Dim lKeyColumn As New ADOX.Column
                 With lKeyColumn
@@ -207,6 +211,8 @@ Partial Class SwatInput
         Public Function Table2Create() As Boolean
             'based on mwSWATPlugIn:DBLayer:createHruTable
             Try
+                DropTable(pTable2Name, pSwatInput.CnSwatInput)
+
                 'Open the connection
                 Dim lConnection As ADODB.Connection = pSwatInput.OpenADOConnection()
 
@@ -216,7 +222,7 @@ Partial Class SwatInput
 
                 'Create the table
                 Dim lTable As New ADOX.Table
-                lTable.Name = "mgt2"
+                lTable.Name = pTable2Name
 
                 Dim lKeyColumn As New ADOX.Column
                 With lKeyColumn
