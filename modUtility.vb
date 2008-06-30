@@ -109,9 +109,45 @@ Module modUtility
 
     Public Sub ExecuteNonQuery(ByVal aSQL As String, ByVal aConnection As OleDbConnection)
         'Dim lStartTime As Date = Date.Now
+        System.GC.WaitForPendingFinalizers()
         Dim lCommand As New System.Data.OleDb.OleDbCommand(aSQL, aConnection)
         lCommand.CommandTimeout = 30
         lCommand.ExecuteNonQuery()
     End Sub
 
+    'Function find whether a table exist or not
+    Friend Function IsTableExist(ByVal strTable As String, ByVal aConnection As OleDb.OleDbConnection) As Boolean
+        Try
+
+            Dim schemaTable As DataTable = aConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, New Object() {Nothing, Nothing, Nothing, "TABLE"})
+            Dim I As Int32
+            For I = 0 To schemaTable.Rows.Count - 1
+                Dim rd As DataRow = schemaTable.Rows(I)
+                If rd("TABLE_TYPE").ToString = "TABLE" Then
+                    If (rd("TABLE_NAME").ToString) = strTable Then
+                        'Table exists
+                        IsTableExist = True
+                        Exit For
+                    Else
+                        'Table not exists
+                        IsTableExist = False
+                    End If
+                End If
+            Next
+        Catch ex As Exception
+            MapWinUtility.Logger.Dbg(ex.Message)
+        End Try
+    End Function
+
+    Friend Function DropTable(ByVal tableName As String, ByVal aConnection As OleDb.OleDbConnection) As Boolean
+        If IsTableExist(tableName, aConnection) Then
+            Dim SQL As String
+            Dim objCmd As New OleDbCommand
+
+            SQL = "DROP TABLE " + "" & tableName & ""
+
+            objCmd = New OleDbCommand(SQL, aConnection)
+            objCmd.ExecuteNonQuery()
+        End If
+    End Function
 End Module

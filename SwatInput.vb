@@ -11,6 +11,7 @@ Public Class SwatInput
     Friend StatusBar As Windows.Forms.StatusBar = Nothing
     Friend CnSwatParm As OleDbConnection
     Friend CnSwatInput As OleDbConnection
+    Friend CnSwatSoils As OleDbConnection
     Friend ProjectFolder As String = ""
     Friend TxtInOutFolder As String = ""
 
@@ -28,9 +29,10 @@ Public Class SwatInput
     ''' <remarks></remarks>
     Public Sub New(ByVal aSwatGDB As OleDbConnection, _
                    ByVal aOutGDB As OleDbConnection, _
+                   ByVal aSwatSoilsDB As OleDbConnection, _
                    ByVal aOutputFolder As String, _
                    ByVal aStatusBar As Windows.Forms.StatusBar)
-        Initialize(aSwatGDB, aOutGDB, aOutputFolder, aStatusBar)
+        Initialize(aSwatGDB, aOutGDB, aSwatSoilsDB, aOutputFolder, aStatusBar)
     End Sub
 
     ''' <summary>
@@ -43,6 +45,7 @@ Public Class SwatInput
     ''' <remarks></remarks>
     Public Sub Initialize(ByVal aSwatGDB As OleDbConnection, _
                           ByVal aOutGDB As OleDbConnection, _
+                          ByVal aSwatSoilsDB As OleDbConnection, _
                           ByVal aOutputFolder As String, _
                           ByVal aStatusBar As Windows.Forms.StatusBar)
         ProjectFolder = aOutputFolder
@@ -52,6 +55,7 @@ Public Class SwatInput
         TxtInOutFolder = IO.Path.Combine(ProjectFolder, "Scenarios\Default\TxtInOut")
         CnSwatParm = aSwatGDB
         CnSwatInput = aOutGDB
+        CnSwatSoils = aSwatSoilsDB
         StatusBar = aStatusBar
     End Sub
 
@@ -65,6 +69,12 @@ Public Class SwatInput
     Public Sub New(ByVal aSwatGDB As String, _
                    ByVal aOutGDB As String, _
                    ByVal aProjectFolder As String)
+
+        CnSwatParm = OpenOleDB(aSwatGDB)
+
+        Dim lSwatSoilsDBFileName As String = aSwatGDB.Replace("SWAT2005.mdb", "SWAT_US_Soils.mdb")
+        CnSwatSoils = OpenOleDB(lSwatSoilsDBFileName)
+
         If Not IO.File.Exists(aOutGDB) Then
             BuildNewProject(aOutGDB, aProjectFolder)
         End If
@@ -72,9 +82,7 @@ Public Class SwatInput
             CnSwatInput = OpenOleDB(aOutGDB)
         End If
 
-        Dim lCnSwatParm As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & aSwatGDB)
-        lCnSwatParm.Open()
-        Initialize(lCnSwatParm, CnSwatInput, aProjectFolder, Nothing)
+        Initialize(CnSwatParm, CnSwatInput, CnSwatSoils, aProjectFolder, Nothing)
         pNeedToClose = True
     End Sub
 
@@ -119,6 +127,10 @@ Public Class SwatInput
     ''' <remarks></remarks>
     Public Function QueryGDB(ByVal aQuery As String) As DataTable
         Return QueryDB(aQuery, CnSwatParm)
+    End Function
+
+    Public Function QuerySoils(ByVal aQuery As String) As DataTable
+        Return QueryDB(aQuery, CnSwatSoils)
     End Function
 
     ''' <summary>
