@@ -20,9 +20,9 @@ Partial Class SwatInput
         Public ISGAGE As Long
         Public IHGAGE As Long
         Public IWGAGE As Long
-        Public ELEVB(11) As Single
-        Public ELEVB_FR(11) As Single
-        Public SNOEB(11) As Single
+        Public ELEVB(9) As Single
+        Public ELEVB_FR(9) As Single
+        Public SNOEB(9) As Single
         Public PLAPS As Single
         Public TLAPS As Single
         Public SNO_SUB As Single
