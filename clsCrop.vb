@@ -167,10 +167,10 @@ Partial Class SwatInput
 
         Private Shared Sub InitFields()
             Columns = New Generic.List(Of clsDataColumn)
-            Columns.Add(New clsDataColumn("ICNUM", 1, "Double", "0", 4, ""))
-            Columns.Add(New clsDataColumn("CPNM", 1, "String", "%s", 6, ""))
-            Columns.Add(New clsDataColumn("IDC", 1, "Integer", "0", 4, vbCrLf))
-            Columns.Add(New clsDataColumn("CROPNAME", 1, "String", "%s", 0, ""))
+            Columns.Add(New clsDataColumn("ICNUM", 1, "Double", "", 4, ""))
+            Columns.Add(New clsDataColumn("CPNM", 1, "String", "", 6, ""))
+            Columns.Add(New clsDataColumn("IDC", 1, "Integer", "", 4, ""))
+            Columns.Add(New clsDataColumn("CROPNAME", 1, "String", "", 0, ""))
             Columns.Add(New clsDataColumn("BIO_E", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("HVSTI", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("BLAI", 1, "Single", "0.00", 8, ""))
@@ -179,8 +179,8 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("FRGRW2", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("LAIMX2", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("DLAI", 1, "Single", "0.00", 7, ""))
-            Columns.Add(New clsDataColumn("CHTMX", 1, "Single", "0.00", 7, ""))
-            Columns.Add(New clsDataColumn("RDMX", 1, "Single", "0.00", 8, vbCrLf))
+            Columns.Add(New clsDataColumn("CHTMX", 1, "Single", "0.00", 8, ""))
+            Columns.Add(New clsDataColumn("RDMX", 1, "Single", "0.00", 7, vbCrLf))
             Columns.Add(New clsDataColumn("T_OPT", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("T_BASE", 1, "Single", "0.00", 8, ""))
             Columns.Add(New clsDataColumn("CNYLD", 1, "Single", "0.0000", 9, ""))
@@ -208,11 +208,11 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("CN2D", 1, "Single", "", 0, ""))
             Columns.Add(New clsDataColumn("FERTFIELD", 1, "Integer", "", 0, ""))
 
-            Columns.Add(New clsDataColumn("ALAI_MIN", 1, "Single", "0.000", 8, ""))
+            Columns.Add(New clsDataColumn("ALAI_MIN", 1, "Single", "0.000", 8, vbCrLf))
             Columns.Add(New clsDataColumn("BIO_LEAF", 1, "Single", "0.000", 7, ""))
             Columns.Add(New clsDataColumn("MAT_YRS", 1, "Double", "0", 6, ""))
             Columns.Add(New clsDataColumn("BMX_TREES", 1, "Double", "0.00", 7, ""))
-            Columns.Add(New clsDataColumn("EXT_COEF", 1, "Double", "0.000", 8, ""))
+            Columns.Add(New clsDataColumn("EXT_COEF", 1, "Double", "0.000", 8, vbCrLf))
         End Sub
 
         'Public Function TableCreate() As Boolean
@@ -329,15 +329,17 @@ Partial Class SwatInput
 
             Dim lSB As New Text.StringBuilder
             For Each lRow As DataRow In aTable.Rows
-
                 lSB.AppendLine(lRow.Item(1).ToString.PadLeft(4) & lRow.Item(2).ToString.Trim.PadLeft(6) & lRow.Item(3).ToString.PadLeft(4))
                 For Each lColumn As clsDataColumn In Columns
                     If lColumn.TextFormat.Length > 0 Then
                         lSB.Append(Format(lRow.Item(lColumn.Name), lColumn.TextFormat).PadLeft(lColumn.TextPad))
+                        If lColumn.TextSuffix.Length > 0 Then
+                            lSB.Append(lColumn.TextSuffix)
+                        End If
                     End If
                 Next
             Next
-            IO.File.WriteAllText(pSwatInput.ProjectFolder & pTableName & ".dat", lSB.ToString)
+            IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & pTableName & ".dat", lSB.ToString)
         End Sub
 
     End Class
