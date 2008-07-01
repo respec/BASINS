@@ -65,6 +65,8 @@
   <ItemGroup>
     <Compile Include="clsBsn.vb" />
     <Compile Include="clsChm.vb" />
+    <Compile Include="clsCrop.vb" />
+    <Compile Include="clsDataColumn.vb" />
     <Compile Include="clsGw.vb" />
     <Compile Include="clsMgt.vb" />
     <Compile Include="clsCio.vb" />
