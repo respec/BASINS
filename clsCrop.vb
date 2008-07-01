@@ -56,6 +56,54 @@ Partial Class SwatInput
         Public Sub New()
         End Sub
 
+        Public Sub New(ByVal aRow As DataRow)
+            With aRow
+                ICNUM = .Item("ICNUM")
+                CPNM = .Item("CPNM")
+                IDC = .Item("IDC")
+                CROPNAME = .Item("CROPNAME")
+                BIO_E = .Item("BIO_E")
+                HVSTI = .Item("HVSTI")
+                BLAI = .Item("BLAI")
+                FRGRW1 = .Item("FRGRW1")
+                FRGRW2 = .Item("FRGRW2")
+                LAIMX2 = .Item("LAIMX2")
+                DLAI = .Item("DLAI")
+                CHTMX = .Item("CHTMX")
+                RDMX = .Item("RDMX")
+                T_OPT = .Item("T_OPT")
+                T_BASE = .Item("T_BASE")
+                CNYLD = .Item("CNYLD")
+                CPYLD = .Item("CPYLD")
+                BN1 = .Item("BN1")
+                BN2 = .Item("BN2")
+                BN3 = .Item("BN3")
+                BP1 = .Item("BP1")
+                BP2 = .Item("BP2")
+                BP3 = .Item("BP3")
+                WSYF = .Item("WSYF")
+                USLE_C = .Item("USLE_C")
+                GSI = .Item("GSI")
+                VPDFR = .Item("VPDFR")
+                FRGMAX = .Item("FRGMAX")
+                WAVP = .Item("WAVP")
+                CO2HI = .Item("CO2HI")
+                BIOEHI = .Item("BIOEHI")
+                RSDCO_PL = .Item("RSDCO_PL")
+                OV_N = .Item("OV_N")
+                CN2A = .Item("CN2A")
+                CN2B = .Item("CN2B")
+                CN2C = .Item("CN2C")
+                CN2D = .Item("CN2D")
+                FERTFIELD = .Item("FERTFIELD")
+                ALAI_MIN = .Item("ALAI_MIN")
+                BIO_LEAF = .Item("BIO_LEAF")
+                MAT_YRS = .Item("MAT_YRS")
+                BMX_TREES = .Item("BMX_TREES")
+                EXT_COEF = .Item("EXT_COEF")
+            End With
+        End Sub
+
         Public Function AddSQL() As String
             Dim lSQL As String = "INSERT INTO crop ( ICNUM,CPNM,IDC,CROPNAME,BIO_E,HVSTI,BLAI,FRGRW1,LAIMX1,FRGRW2,LAIMX2,DLAI,CHTMX,RDMX,T_OPT,T_BASE,CNYLD,CPYLD,BN1,BN2,BN3,BP1,BP2,BP3,WSYF,USLE_C,GSI,VPDFR,FRGMAX,WAVP,CO2HI,BIOEHI,RSDCO_PL,OV_N,CN2A,CN2B,CN2C,CN2D,FERTFIELD,ALAI_MIN,BIO_LEAF,MAT_YRS,BMX_TREES,EXT_COEF ) Values (" _
                                & ICNUM & ", " _
@@ -263,6 +311,16 @@ Partial Class SwatInput
         Public Sub Add(ByVal aItem As clsChmItem)
             ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
+
+        Public Function FindCrop(ByVal aCropName As String, Optional ByVal aTable As DataTable = Nothing) As clsCropItem
+            If aTable Is Nothing Then aTable = Table()
+            For Each lRow As DataRow In aTable.Rows
+                If lRow.Item("CPNM").ToString = aCropName Then
+                    Return New clsCropItem(lRow)
+                End If
+            Next
+            Return Nothing
+        End Function
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
