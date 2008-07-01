@@ -76,6 +76,7 @@
     <Compile Include="clsSol.vb" />
     <Compile Include="clsSubBsn.vb" />
     <Compile Include="clsSwq.vb" />
+    <Compile Include="clsUrban.vb" />
     <Compile Include="clsWgn.vb" />
     <Compile Include="clsWus.vb" />
     <Compile Include="clsWwq.vb" />
