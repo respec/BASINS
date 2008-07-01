@@ -221,36 +221,5 @@ Partial Class SwatInput
             Next
             aSB.AppendLine()
         End Sub
-
-        Public Sub createWeatherGenData(ByVal aSubBasinIDs As ArrayList) ', ByVal aWeatherFolder As String)
-            Dim lStationID As Integer = 0
-            Dim lStationName As String = ""
-
-            If pSwatInput.Wgn.TableCreate() Then
-                'Dim lSubWgnTable As DataTable = pSwatInput.QueryInputDB("SELECT SubWgn.Subbasin, SubWgn.Station,SubWgn.MinRec  FROM(SubWgn) ORDER BY SubWgn.Subbasin;")
-
-                'Open the US Weather database dbf file
-                'Dim dBaseConnection As New System.Data.OleDb.OleDbConnection( _
-                '    "Provider=Microsoft.Jet.OLEDB.4.0;Data Source= " & aWeatherFolder & ";Extended Properties=dBase IV")
-                'dBaseConnection.Open()
-
-                For Each lSubBasinID As Integer In aSubBasinIDs
-                    'lSubBasinID = lSubWgnTable.Rows(i)("Subbasin")
-                    lStationID = 544 'lSubWgnTable.Rows(i)("MinRec")
-                    lStationName = "NCGREENVILLE" 'lSubWgnTable.Rows(i)("Station")
-                    Dim lTable As DataTable = pSwatInput.QueryGDB("SELECT * FROM weatherstations WHERE STATION LIKE '" & lStationName & "%'")
-                    'Dim lTable As DataTable = QueryDB("SELECT * FROM Statwgn WHERE ID = " & stationID, dBaseConnection)
-
-                    If lTable.Rows.Count > 0 Then
-                        pSwatInput.Wgn.Add(New clsWgnItem(lSubBasinID, lTable.Rows(0)))
-                    Else
-                        MapWinUtility.Logger.Dbg("Could not find weather station for " & lSubBasinID)
-                    End If
-                Next
-
-                'dBaseConnection.Close()
-            End If
-        End Sub
-
     End Class
 End Class
