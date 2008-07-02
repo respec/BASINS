@@ -72,11 +72,13 @@
     <Compile Include="clsMgt.vb" />
     <Compile Include="clsCio.vb" />
     <Compile Include="clsHru.vb" />
+    <Compile Include="clsPest.vb" />
     <Compile Include="clsPnd.vb" />
     <Compile Include="clsRes.vb" />
     <Compile Include="clsSol.vb" />
     <Compile Include="clsSubBsn.vb" />
     <Compile Include="clsSwq.vb" />
+    <Compile Include="clsTill.vb" />
     <Compile Include="clsUrban.vb" />
     <Compile Include="clsWgn.vb" />
     <Compile Include="clsWus.vb" />
