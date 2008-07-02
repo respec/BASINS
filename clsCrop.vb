@@ -211,8 +211,8 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("ALAI_MIN", 1, "Single", "0.000", 8, vbCrLf))
             Columns.Add(New clsDataColumn("BIO_LEAF", 1, "Single", "0.000", 7, ""))
             Columns.Add(New clsDataColumn("MAT_YRS", 1, "Double", "0", 6, ""))
-            Columns.Add(New clsDataColumn("BMX_TREES", 1, "Double", "0.00", 7, ""))
-            Columns.Add(New clsDataColumn("EXT_COEF", 1, "Double", "0.000", 8, vbCrLf))
+            Columns.Add(New clsDataColumn("BMX_TREES", 1, "Double", "0.00", 8, ""))
+            Columns.Add(New clsDataColumn("EXT_COEF", 1, "Double", "0.000", 8, ""))
         End Sub
 
         Public Function TableCreate() As Boolean

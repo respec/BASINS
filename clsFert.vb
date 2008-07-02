@@ -80,8 +80,8 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("FORGP", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("FNH3N", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("BACTPDB", 1, "Single", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("BACTLPDB", 1, "Single", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("BACTKDDB", 1, "Single", "0.000", 8, ""))
+            Columns.Add(New clsDataColumn("BACTLPDB", 1, "Single", "0.00", 10, ""))
+            Columns.Add(New clsDataColumn("BACTKDDB", 1, "Single", "0.00", 10, ""))
             Columns.Add(New clsDataColumn("FERTNAME", 1, "VARCHAR(55)", "", 8, ""))
             Columns.Add(New clsDataColumn("MANURE", 1, "Integer", "", 8, ""))
         End Sub

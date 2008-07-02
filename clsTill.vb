@@ -54,12 +54,12 @@ Partial Class SwatInput
         Private Shared Sub InitColumns()
             Columns = New Generic.List(Of clsDataColumn)
 
-            Columns.Add(New clsDataColumn("ITNUM", 1, "Double", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("TILLNM", 1, "VARCHAR(8)", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("EFTMIX", 1, "Single", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("DEPTIL", 1, "Single", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("OPNAME", 1, "VARCHAR(40)", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("OPNUM", 1, "VARCHAR(4)", "0.000", 8, ""))
+            Columns.Add(New clsDataColumn("ITNUM", 1, "Double", "0", 4, ""))
+            Columns.Add(New clsDataColumn("TILLNM", 1, "VARCHAR(8)", "%s", 12, ""))
+            Columns.Add(New clsDataColumn("EFTMIX", 1, "Single", "0.000", 16, ""))
+            Columns.Add(New clsDataColumn("DEPTIL", 1, "Single", "0.000", 16, ""))
+            Columns.Add(New clsDataColumn("OPNAME", 1, "VARCHAR(40)", "", 8, ""))
+            Columns.Add(New clsDataColumn("OPNUM", 1, "VARCHAR(4)", "", 8, ""))
 
         End Sub
 
