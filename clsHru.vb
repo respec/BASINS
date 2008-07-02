@@ -69,16 +69,16 @@ Partial Class SwatInput
 
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
-            If Columns Is Nothing Then InitFields()
+            If Columns Is Nothing Then InitColumns()
         End Sub
 
-        Private Shared Sub InitFields()
+        Private Shared Sub InitColumns()
             Columns = New Generic.List(Of clsDataColumn)
             Columns.Add(New clsDataColumn("SUBBASIN", 1, "Double", "", 0, ""))
             Columns.Add(New clsDataColumn("HRU", 1, "Double", "", 0, ""))
-            Columns.Add(New clsDataColumn("LANDUSE", 1, "String", "", 0, ""))
-            Columns.Add(New clsDataColumn("SOIL", 1, "String", "", 0, ""))
-            Columns.Add(New clsDataColumn("SLOPE_CD", 1, "String", "", 0, ""))
+            Columns.Add(New clsDataColumn("LANDUSE", 1, "VARCHAR(4)", "%s", 0, ""))
+            Columns.Add(New clsDataColumn("SOIL", 1, "VARCHAR(40)", "%s", 0, ""))
+            Columns.Add(New clsDataColumn("SLOPE_CD", 1, "VARCHAR(20)", "%s", 0, ""))
             Columns.Add(New clsDataColumn("HRU_FR", 1, "Double", "0.0000000", 16, "    | HRU_FR : Fraction of subbasin area contained in HRU"))
             Columns.Add(New clsDataColumn("SLSUBBSN", 1, "Single", "0.000", 16, "    | SLSUBBSN : Average slope length [m]"))
             Columns.Add(New clsDataColumn("HRU_SLP", 1, "Single", "0.000", 16, "    | HRU_SLP : Average slope stepness [m/m]"))

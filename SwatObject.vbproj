@@ -67,6 +67,7 @@
     <Compile Include="clsChm.vb" />
     <Compile Include="clsCrop.vb" />
     <Compile Include="clsDataColumn.vb" />
+    <Compile Include="clsFert.vb" />
     <Compile Include="clsGw.vb" />
     <Compile Include="clsMgt.vb" />
     <Compile Include="clsCio.vb" />

@@ -54,7 +54,7 @@ Partial Class SwatInput
         End Sub
 
         Public Function AddSQL() As String
-            Return "INSERT INTO urban ( IUNUM,URBNAME,URBFLNM,FIMP,FCIMP,CURBDEN,URBCOEF,DIRTMX,THALF,TNCONC,TPCONC,TNO3CONC,OV_N,CN2A,CN2B,CN2C,CN2D,URBCN2 ) Values (" _
+            Return "INSERT INTO urban ( " & clsDataColumn.ColumnNames(clsHru.Columns) & " ) Values (" _
                    & IUNUM & ", " _
                    & URBNAME & ", " _
                    & URBFLNM & ", " _
@@ -84,14 +84,14 @@ Partial Class SwatInput
 
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
-            If Columns Is Nothing Then InitFields()
+            If Columns Is Nothing Then InitColumns()
         End Sub
 
-        Private Shared Sub InitFields()
+        Private Shared Sub InitColumns()
             Columns = New Generic.List(Of clsDataColumn)
             Columns.Add(New clsDataColumn("IUNUM", 1, "Double", "0", 3, ""))
-            Columns.Add(New clsDataColumn("URBNAME", 1, "String", "%s", 5, ""))
-            Columns.Add(New clsDataColumn("URBFLNM", 1, "String", "%s", 56, ""))
+            Columns.Add(New clsDataColumn("URBNAME", 1, "VARCHAR(4)", "%s", 5, ""))
+            Columns.Add(New clsDataColumn("URBFLNM", 1, "VARCHAR(54)", "%s", 56, ""))
             Columns.Add(New clsDataColumn("FIMP", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("FCIMP", 1, "Single", "0.000", 8, vbCrLf))
             Columns.Add(New clsDataColumn("CURBDEN", 1, "Single", "0.000", 12, ""))
@@ -109,8 +109,8 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("URBCN2", 1, "Single", "0.0", 6, ""))
         End Sub
 
-        'Public Function TableCreate() As Boolean
-        'End Function
+        Public Function TableCreate() As Boolean
+        End Function
 
         Public Function Table() As DataTable
             pSwatInput.Status("Reading " & pTableName & " from database ...")

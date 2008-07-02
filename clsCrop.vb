@@ -105,7 +105,7 @@ Partial Class SwatInput
         End Sub
 
         Public Function AddSQL() As String
-            Dim lSQL As String = "INSERT INTO crop ( ICNUM,CPNM,IDC,CROPNAME,BIO_E,HVSTI,BLAI,FRGRW1,LAIMX1,FRGRW2,LAIMX2,DLAI,CHTMX,RDMX,T_OPT,T_BASE,CNYLD,CPYLD,BN1,BN2,BN3,BP1,BP2,BP3,WSYF,USLE_C,GSI,VPDFR,FRGMAX,WAVP,CO2HI,BIOEHI,RSDCO_PL,OV_N,CN2A,CN2B,CN2C,CN2D,FERTFIELD,ALAI_MIN,BIO_LEAF,MAT_YRS,BMX_TREES,EXT_COEF ) Values (" _
+            Dim lSQL As String = "INSERT INTO crop ( " & clsDataColumn.ColumnNames(clsHru.Columns) & " ) Values (" _
                                & ICNUM & ", " _
                                & CPNM & ", " _
                                & IDC & ", " _
@@ -162,15 +162,15 @@ Partial Class SwatInput
 
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
-            If Columns Is Nothing Then InitFields()
+            If Columns Is Nothing Then InitColumns()
         End Sub
 
-        Private Shared Sub InitFields()
+        Private Shared Sub InitColumns()
             Columns = New Generic.List(Of clsDataColumn)
             Columns.Add(New clsDataColumn("ICNUM", 1, "Double", "0", 4, ""))
-            Columns.Add(New clsDataColumn("CPNM", 1, "String", "%s", 6, ""))
+            Columns.Add(New clsDataColumn("CPNM", 1, "VARCHAR(4)", "%s", 6, ""))
             Columns.Add(New clsDataColumn("IDC", 1, "Integer", "0", 4, vbCrLf))
-            Columns.Add(New clsDataColumn("CROPNAME", 1, "String", "", 0, ""))
+            Columns.Add(New clsDataColumn("CROPNAME", 1, "VARCHAR(30)", "", 0, ""))
             Columns.Add(New clsDataColumn("BIO_E", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("HVSTI", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("BLAI", 1, "Single", "0.00", 8, ""))
@@ -215,93 +215,93 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("EXT_COEF", 1, "Double", "0.000", 8, vbCrLf))
         End Sub
 
-        'Public Function TableCreate() As Boolean
-        '    'based on mwSWATPlugIn.DBLayer.createChmTable
-        '    Try
-        '        DropTable(pTableName, pSwatInput.CnSwatInput)
+        Public Function TableCreate() As Boolean
+            '    'based on mwSWATPlugIn.DBLayer.createChmTable
+            '    Try
+            '        DropTable(pTableName, pSwatInput.CnSwatInput)
 
-        '        Dim lConnection As New ADODB.Connection
-        '        lConnection.Open(pSwatInput.CnSwatParm.ConnectionString)
+            '        Dim lConnection As New ADODB.Connection
+            '        lConnection.Open(pSwatInput.CnSwatParm.ConnectionString)
 
-        '        'Open the Catalog
-        '        Dim lCatalog As New ADOX.Catalog
-        '        lCatalog.ActiveConnection = lConnection
+            '        'Open the Catalog
+            '        Dim lCatalog As New ADOX.Catalog
+            '        lCatalog.ActiveConnection = lConnection
 
-        '        'Create the table
-        '        Dim lTable As New ADOX.Table
-        '        lTable.Name = pTableName
+            '        'Create the table
+            '        Dim lTable As New ADOX.Table
+            '        lTable.Name = pTableName
 
-        '        Dim lKeyColumn As New ADOX.Column
-        '        With lKeyColumn
-        '            .Name = "OBJECTID"
-        '            .Type = ADOX.DataTypeEnum.adInteger
-        '            .ParentCatalog = lCatalog
-        '            .Properties("AutoIncrement").Value = True
-        '        End With
+            '        Dim lKeyColumn As New ADOX.Column
+            '        With lKeyColumn
+            '            .Name = "OBJECTID"
+            '            .Type = ADOX.DataTypeEnum.adInteger
+            '            .ParentCatalog = lCatalog
+            '            .Properties("AutoIncrement").Value = True
+            '        End With
 
-        '        Dim i As Integer
+            '        Dim i As Integer
 
-        '        With lTable.Columns
-        '            .Append(lKeyColumn)
+            '        With lTable.Columns
+            '            .Append(lKeyColumn)
 
-        '            .Append("ICNUM", ADOX.DataTypeEnum.adDouble)
-        '            .Append("CPNM", ADOX.DataTypeEnum.adVarWChar, 4)
-        '            .Append("IDC", ADOX.DataTypeEnum.adInteger)
-        '            .Append("CROPNAME", ADOX.DataTypeEnum.adVarWChar, 30)
-        '            .Append("BIO_E", ADOX.DataTypeEnum.adSingle)
-        '            .Append("HVSTI", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BLAI", ADOX.DataTypeEnum.adSingle)
-        '            .Append("FRGRW1", ADOX.DataTypeEnum.adSingle)
-        '            .Append("LAIMX1", ADOX.DataTypeEnum.adSingle)
-        '            .Append("FRGRW2", ADOX.DataTypeEnum.adSingle)
-        '            .Append("LAIMX2", ADOX.DataTypeEnum.adSingle)
-        '            .Append("DLAI", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CHTMX", ADOX.DataTypeEnum.adSingle)
-        '            .Append("RDMX", ADOX.DataTypeEnum.adSingle)
-        '            .Append("T_OPT", ADOX.DataTypeEnum.adSingle)
-        '            .Append("T_BASE", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CNYLD", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CPYLD", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BN1", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BN2", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BN3", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BP1", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BP2", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BP3", ADOX.DataTypeEnum.adSingle)
-        '            .Append("WSYF", ADOX.DataTypeEnum.adSingle)
-        '            .Append("USLE_C", ADOX.DataTypeEnum.adSingle)
-        '            .Append("GSI", ADOX.DataTypeEnum.adSingle)
-        '            .Append("VPDFR", ADOX.DataTypeEnum.adSingle)
-        '            .Append("FRGMAX", ADOX.DataTypeEnum.adSingle)
-        '            .Append("WAVP", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CO2HI", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BIOEHI", ADOX.DataTypeEnum.adSingle)
-        '            .Append("RSDCO_PL", ADOX.DataTypeEnum.adSingle)
-        '            .Append("OV_N", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CN2A", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CN2B", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CN2C", ADOX.DataTypeEnum.adSingle)
-        '            .Append("CN2D", ADOX.DataTypeEnum.adSingle)
-        '            .Append("FERTFIELD", ADOX.DataTypeEnum.adInteger)
-        '            .Append("ALAI_MIN", ADOX.DataTypeEnum.adSingle)
-        '            .Append("BIO_LEAF", ADOX.DataTypeEnum.adSingle)
-        '            .Append("MAT_YRS", ADOX.DataTypeEnum.adDouble)
-        '            .Append("BMX_TREES", ADOX.DataTypeEnum.adDouble)
-        '            .Append("EXT_COEF", ADOX.DataTypeEnum.adDouble)
-        '        End With
+            '            .Append("ICNUM", ADOX.DataTypeEnum.adDouble)
+            '            .Append("CPNM", ADOX.DataTypeEnum.adVarWChar, 4)
+            '            .Append("IDC", ADOX.DataTypeEnum.adInteger)
+            '            .Append("CROPNAME", ADOX.DataTypeEnum.adVarWChar, 30)
+            '            .Append("BIO_E", ADOX.DataTypeEnum.adSingle)
+            '            .Append("HVSTI", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BLAI", ADOX.DataTypeEnum.adSingle)
+            '            .Append("FRGRW1", ADOX.DataTypeEnum.adSingle)
+            '            .Append("LAIMX1", ADOX.DataTypeEnum.adSingle)
+            '            .Append("FRGRW2", ADOX.DataTypeEnum.adSingle)
+            '            .Append("LAIMX2", ADOX.DataTypeEnum.adSingle)
+            '            .Append("DLAI", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CHTMX", ADOX.DataTypeEnum.adSingle)
+            '            .Append("RDMX", ADOX.DataTypeEnum.adSingle)
+            '            .Append("T_OPT", ADOX.DataTypeEnum.adSingle)
+            '            .Append("T_BASE", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CNYLD", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CPYLD", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BN1", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BN2", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BN3", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BP1", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BP2", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BP3", ADOX.DataTypeEnum.adSingle)
+            '            .Append("WSYF", ADOX.DataTypeEnum.adSingle)
+            '            .Append("USLE_C", ADOX.DataTypeEnum.adSingle)
+            '            .Append("GSI", ADOX.DataTypeEnum.adSingle)
+            '            .Append("VPDFR", ADOX.DataTypeEnum.adSingle)
+            '            .Append("FRGMAX", ADOX.DataTypeEnum.adSingle)
+            '            .Append("WAVP", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CO2HI", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BIOEHI", ADOX.DataTypeEnum.adSingle)
+            '            .Append("RSDCO_PL", ADOX.DataTypeEnum.adSingle)
+            '            .Append("OV_N", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CN2A", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CN2B", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CN2C", ADOX.DataTypeEnum.adSingle)
+            '            .Append("CN2D", ADOX.DataTypeEnum.adSingle)
+            '            .Append("FERTFIELD", ADOX.DataTypeEnum.adInteger)
+            '            .Append("ALAI_MIN", ADOX.DataTypeEnum.adSingle)
+            '            .Append("BIO_LEAF", ADOX.DataTypeEnum.adSingle)
+            '            .Append("MAT_YRS", ADOX.DataTypeEnum.adDouble)
+            '            .Append("BMX_TREES", ADOX.DataTypeEnum.adDouble)
+            '            .Append("EXT_COEF", ADOX.DataTypeEnum.adDouble)
+            '        End With
 
-        '        lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
-        '        lCatalog.Tables.Append(lTable)
-        '        lTable = Nothing
-        '        lCatalog = Nothing
-        '        lConnection.Close()
-        '        lConnection = Nothing
-        '        Return True
-        '    Catch lEx As ApplicationException
-        '        Debug.Print(lEx.Message)
-        '        Return False
-        '    End Try
-        'End Function
+            '        lTable.Keys.Append("PrimaryKey", ADOX.KeyTypeEnum.adKeyPrimary, lKeyColumn.Name)
+            '        lCatalog.Tables.Append(lTable)
+            '        lTable = Nothing
+            '        lCatalog = Nothing
+            '        lConnection.Close()
+            '        lConnection = Nothing
+            '        Return True
+            '    Catch lEx As ApplicationException
+            '        Debug.Print(lEx.Message)
+            '        Return False
+            '    End Try
+        End Function
 
         Public Function Table() As DataTable
             pSwatInput.Status("Reading " & pTableName & " from database ...")

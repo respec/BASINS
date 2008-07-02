@@ -1,4 +1,5 @@
 Imports System.Data.OleDb
+Imports MapWinUtility
 
 Module modUtility
 
@@ -122,13 +123,13 @@ TryExecute:
             If Date.Now.Subtract(lStartTime).Seconds < lCommand.CommandTimeout Then
                 System.Threading.Thread.Sleep(100)
                 If Not lLogged Then
-                    MapWinUtility.Logger.Dbg("ExecuteNonQuery Exception: " & e.Message & ", Retrying: " & aSQL)
-                    MapWinUtility.Logger.Flush()
+                    Logger.Dbg("ExecuteNonQuery Exception: " & e.Message & ", Retrying: " & aSQL)
+                    Logger.Flush()
                     lLogged = True
                 End If
                 GoTo TryExecute
             Else
-                MapWinUtility.Logger.Dbg("ExecuteNonQuery Exception after " & Date.Now.Subtract(lStartTime).Seconds & " seconds: " & e.Message)
+                Logger.Dbg("ExecuteNonQuery Exception after " & Date.Now.Subtract(lStartTime).Seconds & " seconds: " & e.Message)
                 Return False
             End If
         End Try
@@ -154,35 +155,35 @@ TryExecute:
                 End If
             Next
         Catch ex As Exception
-            MapWinUtility.Logger.Dbg(ex.Message)
+            Logger.Dbg(ex.Message)
         End Try
     End Function
 
-    Friend Sub CreateTable(ByVal aTableName As String, ByVal aKeyName As String, ByVal aColumns As String, ByVal aConnection As OleDb.OleDbConnection)
-        DropTable(aTableName, aConnection)
-        ExecuteNonQuery("CREATE TABLE " & aTableName & " (" _
-                          & aKeyName & " INT IDENTITY PRIMARY KEY, " _
-                          & aColumns & ");", aConnection)
-    End Sub
+    'Friend Sub CreateTable(ByVal aTableName As String, ByVal aKeyName As String, ByVal aColumns As String, ByVal aConnection As OleDb.OleDbConnection)
+    '    DropTable(aTableName, aConnection)
+    '    ExecuteNonQuery("CREATE TABLE " & aTableName & " (" _
+    '                      & aKeyName & " INT IDENTITY PRIMARY KEY, " _
+    '                      & aColumns & ");", aConnection)
+    'End Sub
 
-    Friend Function CreateTable(ByVal aTableName As String, ByVal aKeyName As String, ByVal aColumnNames() As String, ByVal aColumnTypes() As String, ByVal ColumnCounts() As Integer, ByVal aConnection As OleDb.OleDbConnection) As Boolean
-        DropTable(aTableName, aConnection)
-        Dim lSQL As String = "CREATE TABLE " & aTableName & " (" _
-                          & aKeyName & " INT IDENTITY PRIMARY KEY, "
-        Dim lLastIndex As Integer = aColumnNames.GetUpperBound(0)
-        For lColumnNameIndex As Integer = 0 To lLastIndex
-            If Not ColumnCounts Is Nothing AndAlso ColumnCounts(lColumnNameIndex) > 1 Then
-                For lColumnCountIndex As Integer = 1 To ColumnCounts(lColumnNameIndex)
-                    lSQL &= aColumnNames(lColumnNameIndex) & lColumnCountIndex & " " & aColumnTypes(lColumnNameIndex)
-                    If lColumnCountIndex < ColumnCounts(lColumnNameIndex) Then lSQL &= ", "
-                Next
-            Else
-                lSQL &= aColumnNames(lColumnNameIndex) & " " & aColumnTypes(lColumnNameIndex)
-            End If
-            If lColumnNameIndex < lLastIndex Then lSQL &= ", "
-        Next
-        ExecuteNonQuery(lSQL & ");", aConnection)
-    End Function
+    'Friend Function CreateTable(ByVal aTableName As String, ByVal aKeyName As String, ByVal aColumnNames() As String, ByVal aColumnTypes() As String, ByVal ColumnCounts() As Integer, ByVal aConnection As OleDb.OleDbConnection) As Boolean
+    '    DropTable(aTableName, aConnection)
+    '    Dim lSQL As String = "CREATE TABLE " & aTableName & " (" _
+    '                      & aKeyName & " INT IDENTITY PRIMARY KEY, "
+    '    Dim lLastIndex As Integer = aColumnNames.GetUpperBound(0)
+    '    For lColumnNameIndex As Integer = 0 To lLastIndex
+    '        If Not ColumnCounts Is Nothing AndAlso ColumnCounts(lColumnNameIndex) > 1 Then
+    '            For lColumnCountIndex As Integer = 1 To ColumnCounts(lColumnNameIndex)
+    '                lSQL &= aColumnNames(lColumnNameIndex) & lColumnCountIndex & " " & aColumnTypes(lColumnNameIndex)
+    '                If lColumnCountIndex < ColumnCounts(lColumnNameIndex) Then lSQL &= ", "
+    '            Next
+    '        Else
+    '            lSQL &= aColumnNames(lColumnNameIndex) & " " & aColumnTypes(lColumnNameIndex)
+    '        End If
+    '        If lColumnNameIndex < lLastIndex Then lSQL &= ", "
+    '    Next
+    '    ExecuteNonQuery(lSQL & ");", aConnection)
+    'End Function
 
     Friend Function CreateTable(ByVal aTableName As String, ByVal aKeyName As String, ByVal aDataColumns As Generic.List(Of clsDataColumn), ByVal aConnection As OleDb.OleDbConnection) As Boolean
         DropTable(aTableName, aConnection)
@@ -191,12 +192,19 @@ TryExecute:
 
         For Each lField As clsDataColumn In aDataColumns
             With lField
+                Dim lTypeString As String = .TypeString
+                If lTypeString.ToLower = "string" Then
+                    Logger.Dbg(aTableName & "." & .Name & ": String should be changed to VARCHAR(field width)")
+                    lTypeString = "VARCHAR"
+                End If
+                lTypeString = " " & lTypeString & ", "
+
                 If .Count > 1 Then
                     For lColumnCountIndex As Integer = 1 To .Count
-                        lSQL &= .Name & lColumnCountIndex & " " & .TypeString & ", "
+                        lSQL &= .Name & lColumnCountIndex & lTypeString
                     Next
                 Else
-                    lSQL &= .Name & " " & .TypeString & ", "
+                    lSQL &= .Name & lTypeString
                 End If
             End With
         Next
