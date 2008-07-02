@@ -167,9 +167,9 @@ Partial Class SwatInput
 
         Private Shared Sub InitFields()
             Columns = New Generic.List(Of clsDataColumn)
-            Columns.Add(New clsDataColumn("ICNUM", 1, "Double", "", 4, ""))
-            Columns.Add(New clsDataColumn("CPNM", 1, "String", "", 6, ""))
-            Columns.Add(New clsDataColumn("IDC", 1, "Integer", "", 4, ""))
+            Columns.Add(New clsDataColumn("ICNUM", 1, "Double", "0", 4, ""))
+            Columns.Add(New clsDataColumn("CPNM", 1, "String", "%s", 6, ""))
+            Columns.Add(New clsDataColumn("IDC", 1, "Integer", "0", 4, vbCrLf))
             Columns.Add(New clsDataColumn("CROPNAME", 1, "String", "", 0, ""))
             Columns.Add(New clsDataColumn("BIO_E", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("HVSTI", 1, "Single", "0.00", 7, ""))
@@ -323,24 +323,9 @@ Partial Class SwatInput
         End Function
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
-            If aTable Is Nothing Then aTable = Table()
-
             pSwatInput.Status("Writing " & pTableName & " text ...")
-
-            Dim lSB As New Text.StringBuilder
-            For Each lRow As DataRow In aTable.Rows
-                lSB.AppendLine(lRow.Item(1).ToString.PadLeft(4) & lRow.Item(2).ToString.Trim.PadLeft(6) & lRow.Item(3).ToString.PadLeft(4))
-                For Each lColumn As clsDataColumn In Columns
-                    If lColumn.TextFormat.Length > 0 Then
-                        lSB.Append(Format(lRow.Item(lColumn.Name), lColumn.TextFormat).PadLeft(lColumn.TextPad))
-                        If lColumn.TextSuffix.Length > 0 Then
-                            lSB.Append(lColumn.TextSuffix)
-                        End If
-                    End If
-                Next
-            Next
-            IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\" & pTableName & ".dat", lSB.ToString)
+            If aTable Is Nothing Then aTable = Table()
+            SaveTableAsText(aTable, Columns, pSwatInput.TxtInOutFolder & "\" & pTableName & ".dat")
         End Sub
-
     End Class
 End Class

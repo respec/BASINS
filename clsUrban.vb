@@ -94,7 +94,7 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("URBFLNM", 1, "String", "%s", 56, ""))
             Columns.Add(New clsDataColumn("FIMP", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("FCIMP", 1, "Single", "0.000", 8, vbCrLf))
-            Columns.Add(New clsDataColumn("CURBDEN", 1, "Single", "0.000", 8, ""))
+            Columns.Add(New clsDataColumn("CURBDEN", 1, "Single", "0.000", 12, ""))
             Columns.Add(New clsDataColumn("URBCOEF", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("DIRTMX", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("THALF", 1, "Single", "0.000", 8, ""))
@@ -106,7 +106,7 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("CN2B", 1, "Double", "", 8, ""))
             Columns.Add(New clsDataColumn("CN2C", 1, "Double", "", 8, ""))
             Columns.Add(New clsDataColumn("CN2D", 1, "Double", "", 8, ""))
-            Columns.Add(New clsDataColumn("URBCN2", 1, "Single", "0.0", 8, ""))
+            Columns.Add(New clsDataColumn("URBCN2", 1, "Single", "0.0", 6, ""))
         End Sub
 
         'Public Function TableCreate() As Boolean
@@ -132,25 +132,9 @@ Partial Class SwatInput
         End Function
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
-            If aTable Is Nothing Then aTable = Table()
-
             pSwatInput.Status("Writing " & pTableName & " text ...")
-
-            Dim lSB As New Text.StringBuilder
-            For Each lRow As DataRow In aTable.Rows
-                For Each lColumn As clsDataColumn In Columns
-                    If lColumn.TextFormat.Length > 0 Then
-                        If lColumn.TextFormat = "%s" Then
-                            lSB.Append(lRow.Item(lColumn.Name).ToString.PadLeft(lColumn.TextPad))
-                        Else
-                            lSB.Append(Format(lRow.Item(lColumn.Name), lColumn.TextFormat).PadLeft(lColumn.TextPad))
-                        End If
-                    End If
-                Next
-                lSB.AppendLine()
-            Next
-            IO.File.WriteAllText(pSwatInput.ProjectFolder & pTableName & ".dat", lSB.ToString)
+            If aTable Is Nothing Then aTable = Table()
+            SaveTableAsText(aTable, Columns, pSwatInput.TxtInOutFolder & "\" & pTableName & ".dat")
         End Sub
-
     End Class
 End Class

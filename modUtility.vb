@@ -209,4 +209,22 @@ TryExecute:
             ExecuteNonQuery("DROP TABLE " & tableName & ";", aConnection)
         End If
     End Function
+
+    Public Sub SaveTableAsText(ByVal aTable As DataTable, ByVal aColumns As Generic.List(Of clsDataColumn), ByVal aSaveFileName As String)
+        Dim lSB As New Text.StringBuilder
+        For Each lRow As DataRow In aTable.Rows
+            For Each lColumn As clsDataColumn In aColumns
+                If lColumn.TextFormat.Length > 0 Then
+                    If lColumn.TextFormat = "%s" Then
+                        lSB.Append(lRow.Item(lColumn.Name).ToString.PadLeft(lColumn.TextPad))
+                    Else
+                        lSB.Append(Format(lRow.Item(lColumn.Name), lColumn.TextFormat).PadLeft(lColumn.TextPad))
+                    End If
+                End If
+                lSB.Append(lColumn.TextSuffix)
+            Next
+            lSB.AppendLine()
+        Next
+        IO.File.WriteAllText(aSaveFileName, lSB.ToString)
+    End Sub
 End Module
