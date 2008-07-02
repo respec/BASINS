@@ -83,6 +83,7 @@
     <Compile Include="clsWgn.vb" />
     <Compile Include="clsWus.vb" />
     <Compile Include="clsWwq.vb" />
+    <Compile Include="HeatUnitsCalculation.vb" />
     <Compile Include="modUtility.vb" />
     <Compile Include="clsRte.vb" />
     <Compile Include="SwatInput.vb" />

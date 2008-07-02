@@ -21,10 +21,10 @@ Public Class clsDataColumn
             With lField
                 If .Count > 1 Then
                     For lColumnCountIndex As Integer = 1 To .Count
-                        lSB.Append(.Name & lColumnCountIndex & " " & .TypeString & ", ")
+                        lSB.Append(.Name & lColumnCountIndex & ", ")
                     Next
                 Else
-                    lSB.Append(.Name & " " & .TypeString & ", ")
+                    lSB.Append(.Name & ", ")
                 End If
             End With
         Next

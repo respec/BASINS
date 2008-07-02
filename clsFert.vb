@@ -81,7 +81,7 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("FNH3N", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("BACTPDB", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("BACTLPDB", 1, "Single", "0.000", 8, ""))
-            Columns.Add(New clsDataColumn("BACTKDDB", 1, "Single", "0.00E+00", 8, "0.00E+00")) 'TODO: figure out what should be in next column rather than hard code "0.00E+00"
+            Columns.Add(New clsDataColumn("BACTKDDB", 1, "Single", "0.000", 8, ""))
             Columns.Add(New clsDataColumn("FERTNAME", 1, "VARCHAR(55)", "", 8, ""))
             Columns.Add(New clsDataColumn("MANURE", 1, "Integer", "", 8, ""))
         End Sub

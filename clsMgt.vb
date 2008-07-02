@@ -5,6 +5,9 @@ Partial Class SwatInput
             Return pMgt
         End Get
     End Property
+    Public Function calHeatUnits(ByVal aCropName As String, ByVal aX As Single, ByVal aY As Single, ByVal aDataDirectory As String) As Single
+        Return calHeatUnits(aCropName, aX, aY, aDataDirectory)
+    End Function
 
     Public Class clsMgtItem1
         Public SUBBASIN As Double
@@ -42,7 +45,7 @@ Partial Class SwatInput
                        ByVal aSOIL As String, _
                        ByVal aSLOPE_CD As String)
             SUBBASIN = aSUBBASIN
-            HRU = aHRU
+            Hru = aHRU
             LANDUSE = aLANDUSE
             SOIL = aSOIL
             SLOPE_CD = aSLOPE_CD
@@ -50,7 +53,7 @@ Partial Class SwatInput
 
         Public Function AddSQL() As String
             Return "INSERT INTO mgt1 ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , IGRO , PLANT_ID , LAI_INIT , BIO_INIT , PHU_PLT , BIOMIX , CN2 , USLE_P , BIO_MIN , FILTERW , IURBAN , URBLU , IRRSC , IRRNO , FLOWMIN , DIVMAX , FLOWFR , DDRAIN , TDRAIN , GDRAIN , NROT , HUSC , ISCROP  ) " _
-                 & "Values ('" & SUBBASIN & "', '" & HRU & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & IGRO & "', '" & PLANT_ID & "', '" & LAI_INIT & "', '" & BIO_INIT & "', '" & PHU_PLT & "', '" & BIOMIX & "', '" & CN2 & "', '" & USLE_P & "', '" & BIO_MIN & "', '" & FILTERW & "', '" & IURBAN & "', '" & URBLU & "', '" & IRRSC & "', '" & IRRNO & "', '" & FLOWMIN & "', '" & DIVMAX & "', '" & FLOWFR & "', '" & DDRAIN & "', '" & TDRAIN & "', '" & GDRAIN & "', '" & NROT & "', '" & HUSC & "', '" & ISCROP & "'  )"
+                 & "Values ('" & SUBBASIN & "', '" & Hru & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & IGRO & "', '" & PLANT_ID & "', '" & LAI_INIT & "', '" & BIO_INIT & "', '" & PHU_PLT & "', '" & BIOMIX & "', '" & CN2 & "', '" & USLE_P & "', '" & BIO_MIN & "', '" & FILTERW & "', '" & IURBAN & "', '" & URBLU & "', '" & IRRSC & "', '" & IRRNO & "', '" & FLOWMIN & "', '" & DIVMAX & "', '" & FLOWFR & "', '" & DDRAIN & "', '" & TDRAIN & "', '" & GDRAIN & "', '" & NROT & "', '" & HUSC & "', '" & ISCROP & "'  )"
         End Function
     End Class
 
