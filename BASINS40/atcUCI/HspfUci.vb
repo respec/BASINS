@@ -460,7 +460,7 @@ Public Class HspfUci
                 aEchoFile = aEchoFile.Trim
             End If
             If aFilesOK Then
-                Dim lName As String = FilenameOnly(pName)
+                Dim lName As String = IO.Path.GetFileNameWithoutExtension(pName)
                 's = Left(s, Len(s) - 4)
                 'Call F90_SPIPH(pStatusIn, pStatusOut)
                 'set debug level
@@ -941,7 +941,7 @@ Public Class HspfUci
             If lPath.Length > 0 Then
                 SendHspfMessage("CURDIR " & lPath)
             End If
-            Dim lFileName As String = FilenameOnly(pName)
+            Dim lFileName As String = IO.Path.GetFileNameWithoutExtension(pName)
             SendHspfMessage("ACTIVATE " & lFileName & " " & lOption)
             Dim lMsg As String = WaitForChildMessage()
             SendHspfMessage("SIMULATE") 'calls F90_SIMSCN
@@ -1212,7 +1212,7 @@ Public Class HspfUci
         If wdmsfl > 0 Then
             'okay to continue
             ndsn = basedsn
-            cscen = FilenameOnly(pName)
+            cscen = IO.Path.GetFileNameWithoutExtension(pName)
 
             For j = 1 To 8
                 'create each of the 8 expert system dsns
@@ -1353,7 +1353,7 @@ Public Class HspfUci
     '    If wdmsfl > 0 Then
     '        'okay to continue
     '        ndsn = basedsn
-    '        cscen = FilenameOnly(pName)
+    '        cscen = IO.Path.GetFileNameWithoutExtension(pName)
 
     '        For j = 1 To 28
     '            'create each of the 28 aquatox dsns
@@ -1667,7 +1667,7 @@ Public Class HspfUci
         End If
 
         If aWdmId > 0 Then 'okay to continue
-            Dim lScenario As String = FilenameOnly(pName)
+            Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(pName)
             Dim lDsn As Integer = FindFreeDSN(aWdmId, aBaseDsn)
             Dim lGenericTs As New atcData.atcTimeseries(Nothing)
             With lGenericTs.Attributes

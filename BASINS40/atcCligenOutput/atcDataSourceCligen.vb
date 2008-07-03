@@ -78,7 +78,7 @@ Public Class atcDataSourceCligen
                                              "tmax", "tmin", "rad", "w-vl", "w-dir", "tdew"}
                 Dim lTSKey As String
                 Dim lTSIndex As Integer
-                Dim lLocation As String = FilenameOnly(aFileName)
+                Dim lLocation As String = IO.Path.GetFileNameWithoutExtension(aFileName)
                 Dim lConstituentCode As Integer = -1
                 Dim lJDate As Double
                 Dim lDate() As Integer = {0, 0, 0, 24, 0, 0}

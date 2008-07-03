@@ -757,7 +757,7 @@ Module modEditLimits
     '                   NoDsnCount = NoDsnCount + 1
     '                   NoDsn(NoDsnCount) = CInt(dsn)
     '                   cwdmid(NoDsnCount) = wdmid
-    '                   scen(NoDsnCount) = UCase(FilenameOnly((myUci.Name)))
+    '                   scen(NoDsnCount) = UCase(IO.Path.GetFileNameWithoutExtension((myUci.Name)))
     '                   'UPGRADE_WARNING: Couldn't resolve default property of object g.TextMatrix. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
     '                   locn(NoDsnCount) = g.TextMatrix(i, 0) & g.TextMatrix(i, 1)
     '                   'UPGRADE_WARNING: Couldn't resolve default property of object g.TextMatrix. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'

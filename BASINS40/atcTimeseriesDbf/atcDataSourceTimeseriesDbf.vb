@@ -11,7 +11,7 @@ Public Class atcDataSourceTimeseriesDbf
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "Timseries DBF"
+            Return "Timeseries DBF"
         End Get
     End Property
 

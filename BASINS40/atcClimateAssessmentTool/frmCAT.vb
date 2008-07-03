@@ -900,7 +900,7 @@ NextIteration:
                     If chkSaveAll.Checked Then lModifiedScenarioName &= "-" & aIteration + 1
                 Else
                     lPreparedInput = aPreparedInputs.ItemByIndex(aIteration)
-                    lModifiedScenarioName = FilenameOnly(PathNameOnly(lPreparedInput))
+                    lModifiedScenarioName = IO.Path.GetFileNameWithoutExtension(PathNameOnly(lPreparedInput))
                 End If
 
                 UpdateStatusLabel(aIteration)
@@ -1001,7 +1001,7 @@ NextIteration:
                     End If
                 Next
             Else
-                .CellValue(lRow, 0) = FilenameOnly(PathNameOnly(pPreparedInputs.ItemByIndex(lstInputs.CheckedIndices.Item(aIteration))))
+                .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(pPreparedInputs.ItemByIndex(lstInputs.CheckedIndices.Item(aIteration))))
             End If
             .CellColor(lRow, 0) = Drawing.SystemColors.Control
 

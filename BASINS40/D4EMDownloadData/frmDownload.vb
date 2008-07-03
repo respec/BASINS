@@ -124,20 +124,22 @@ Public Class frmDownload
             If lSelected.NumSelected > 0 Then
                 Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
                 Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
-                If lFilename.StartsWith("nwis_stations_") Then
-                    Select Case lFilename.Substring(14)
-                        Case "discharge"
-                            chkNWIS_GetNWISDischarge.Enabled = True
-                            chkNWIS_GetNWISDischarge.Checked = True
-                        Case "qw"
-                            chkNWIS_GetNWISWQ.Enabled = True
-                            chkNWIS_GetNWISWQ.Checked = True
-                        Case "measurements"
-                            chkNWIS_GetNWISMeasurements.Enabled = True
-                            chkNWIS_GetNWISMeasurements.Checked = True
-                        Case "gw", "peak" 'download of these data not yet implemented
-                    End Select
-                End If
+                Select Case lFilename
+                    Case "nwis_stations_discharge"
+                        chkNWIS_GetNWISDischarge.Enabled = True
+                        chkNWIS_GetNWISDischarge.Checked = True
+                    Case "nwis_stations_qw"
+                        chkNWIS_GetNWISWQ.Enabled = True
+                        chkNWIS_GetNWISWQ.Checked = True
+                    Case "nwis_stations_measurements"
+                        chkNWIS_GetNWISMeasurements.Enabled = True
+                        chkNWIS_GetNWISMeasurements.Checked = True
+                    Case "nwis_stations_gw", "nwis_stations_peak" 'download of these data not yet implemented
+                    Case "storet"
+                        chkSTORET_Results.Enabled = True
+                        chkSTORET_Results.Text = "Results"
+                        chkSTORET_Results.Checked = True
+                End Select
             End If
         End If
         If Not chkNWIS_GetNWISDischarge.Enabled AndAlso _
