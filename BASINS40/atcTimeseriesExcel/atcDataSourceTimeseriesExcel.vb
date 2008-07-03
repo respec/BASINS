@@ -11,7 +11,7 @@ Public Class atcDataSourceTimeseriesExcel
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "Timseries EXCEL"
+            Return "Timeseries EXCEL"
         End Get
     End Property
 
