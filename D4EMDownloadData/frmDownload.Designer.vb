@@ -638,11 +638,12 @@ Partial Class frmDownload
         'chkSTORET_Results
         '
         Me.chkSTORET_Results.AutoSize = True
+        Me.chkSTORET_Results.Enabled = False
         Me.chkSTORET_Results.Location = New System.Drawing.Point(112, 19)
         Me.chkSTORET_Results.Name = "chkSTORET_Results"
-        Me.chkSTORET_Results.Size = New System.Drawing.Size(61, 17)
+        Me.chkSTORET_Results.Size = New System.Drawing.Size(276, 17)
         Me.chkSTORET_Results.TabIndex = 18
-        Me.chkSTORET_Results.Text = "Results"
+        Me.chkSTORET_Results.Text = "Results (available after Stations are selected on map)"
         Me.chkSTORET_Results.UseVisualStyleBackColor = True
         '
         'chkSTORET_Stations

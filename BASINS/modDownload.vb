@@ -46,7 +46,7 @@ Public Module modDownload
 
                         'come up with a suggested name for the new project
                         Dim lDataPath As String = DefaultBasinsDataDir()
-                        Dim lDefDirName As String = FilenameOnly(GisUtil.ProjectFileName)
+                        Dim lDefDirName As String = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
                         Dim lDefaultProjectFileName As String = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
                         lDefDirName = PathNameOnly(lDefaultProjectFileName)
                         Logger.Dbg("CreateNewProjectDirectory:" & lDefDirName)
@@ -246,7 +246,7 @@ Public Module modDownload
                 Dim lCurLayer As MapWinGIS.Shapefile
                 lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
-                Select Case FilenameOnly(lCurLayer.Filename).ToLower
+                Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
                     Case "cat", "huc", "huc250d3"
                         lThemeTag = "HUC8" '"huc_cd"
                         lFieldName = "CU"
@@ -1183,7 +1183,7 @@ StartOver:
         Try
             Dim lRendererName As String = GetDefaultRenderer(aFilename)
 
-            LayerName = FilenameOnly(aFilename)
+            LayerName = IO.Path.GetFileNameWithoutExtension(aFilename)
             If layerXml Is Nothing Then
                 Visible = True
                 If lRendererName.Length = 0 Then
@@ -1302,10 +1302,10 @@ StartOver:
                 If LCase(aFilename).IndexOf("\landuse\") > 0 Then
                     SetLandUseColors(MWlay, shpFile)
                 ElseIf LCase(aFilename).IndexOf("\nhd\") > 0 Then
-                    If InStr(FilenameOnly(shpFile.Filename), "NHD") > 0 Then
-                        MWlay.Name = FilenameOnly(shpFile.Filename)
+                    If InStr(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), "NHD") > 0 Then
+                        MWlay.Name = IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     Else
-                        MWlay.Name &= " " & FilenameOnly(shpFile.Filename)
+                        MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     End If
                 ElseIf LCase(aFilename).IndexOf("\census\") > 0 Then
                     SetCensusColors(MWlay, shpFile)
@@ -1370,9 +1370,9 @@ StartOver:
                     Case "no" : Visible = False
                     Case Else : Visible = False
                 End Select
-                If LayerName = "" Then LayerName = FilenameOnly(aFilename)
+                If LayerName = "" Then LayerName = IO.Path.GetFileNameWithoutExtension(aFilename)
                 If LayerName = "National Elevation Dataset" Or LayerName = "DEM Elevation Model" Then
-                    LayerName &= " (" & FilenameOnly(aFilename) & ")"
+                    LayerName &= " (" & IO.Path.GetFileNameWithoutExtension(aFilename) & ")"
                 End If
                 g = New MapWinGIS.Grid
                 g.Open(aFilename)
@@ -1463,7 +1463,7 @@ StartOver:
         Dim colorBreak As MapWinGIS.ShapefileColorBreak
         Dim colorScheme As MapWinGIS.ShapefileColorScheme
 
-        MWlay.Name &= " " & FilenameOnly(shpFile.Filename).Substring(2)
+        MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename).Substring(2)
         colorScheme = New MapWinGIS.ShapefileColorScheme
         colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "lucode")
         If colorScheme.FieldIndex > 0 Then
@@ -1854,7 +1854,7 @@ StartOver:
         Dim colorScheme As MapWinGIS.ShapefileColorScheme
         Dim prefix As String = (MWlay.FileName.ToUpper.Chars(MWlay.FileName.Length - 5))
 
-        MWlay.Name &= " " & Left(FilenameOnly(shpFile.Filename), 8)
+        MWlay.Name &= " " & Left(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), 8)
 
         If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") Or _
            MWlay.FileName.ToLower.EndsWith("_tgr_p.shp") Then

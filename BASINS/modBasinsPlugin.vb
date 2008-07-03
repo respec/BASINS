@@ -210,7 +210,7 @@ Public Module modBasinsPlugin
 
             If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
                 ctext = "Selected Features:"
-                Select Case FilenameOnly(lCurLayer.Filename).ToLower
+                Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
                     Case "cat", "huc", "huc250d3"
                         lFieldName = "CU"
                         lFieldDesc = "catname"

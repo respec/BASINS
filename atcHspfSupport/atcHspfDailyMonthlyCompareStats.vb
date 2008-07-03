@@ -12,7 +12,7 @@ Public Module DailyMonthlyCompareStats
                            Optional ByVal aEDateJ As Double = 0) As String
 
         Dim lStr As String
-        lStr = "Daily and Monthly " & aCons & " Statistics for '" & FilenameOnly(aUci.Name) & "' scenario." & vbCrLf
+        lStr = "Daily and Monthly " & aCons & " Statistics for '" & IO.Path.GetFileNameWithoutExtension(aUci.Name) & "' scenario." & vbCrLf
         lStr &= "   Run Made " & FileDateTime(aUci.Name) & vbCrLf
         lStr &= "   " & aUci.GlobalBlock.RunInf.Value & vbCrLf
 

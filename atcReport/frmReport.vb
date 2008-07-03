@@ -310,7 +310,7 @@ Public Class frmReport
                     lProblem = lOutput
                 End Try
                 Dim lTitle1 As String = "Watershed Characterization Report"
-                Dim lTitle2 As String = FilenameOnly(pPlugIn.Reports(lbxReports.SelectedIndices(i) + 1))
+                Dim lTitle2 As String = IO.Path.GetFileNameWithoutExtension(pPlugIn.Reports(lbxReports.SelectedIndices(i) + 1))
                 Dim lReportFilename As String = lblFolder.Text & lTitle2 & ".txt"
                 If Not lOutputGridSource Is Nothing And Len(lProblem) = 0 Then
                     'write file
@@ -354,7 +354,7 @@ Public Class frmReport
         End If
 
         For Each lReport As String In pPlugIn.Reports
-            lbxReports.Items.Add(FilenameOnly(lReport))
+            lbxReports.Items.Add(IO.Path.GetFileNameWithoutExtension(lReport))
         Next lReport
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
@@ -374,7 +374,7 @@ Public Class frmReport
     Public Overrides Function ToString() As String
         Dim lAllReports As String = ""
         For lReportIndex As Integer = 1 To pPlugIn.Reports.Count
-            Dim lReport As String = FilenameOnly(pPlugIn.Reports(lReportIndex))
+            Dim lReport As String = IO.Path.GetFileNameWithoutExtension(pPlugIn.Reports(lReportIndex))
             lAllReports &= lReport & vbCrLf
             'Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
             'Dim lOutput As Object
@@ -390,7 +390,7 @@ Public Class frmReport
             '  lProblem = lOutput
             'End Try
             'Dim lTitle1 As String = "Watershed Characterization Report"
-            'Dim lTitle2 As String = FilenameOnly(pPlugIn.Reports(lReportIndex))
+            'Dim lTitle2 As String = IO.Path.GetFileNameWithoutExtension(pPlugIn.Reports(lReportIndex))
             'If Not lOutputGridSource Is Nothing And Len(lProblem) = 0 Then
             '  'write file
             '  lAllReports &= lTitle1 & vbCrLf & "  " _

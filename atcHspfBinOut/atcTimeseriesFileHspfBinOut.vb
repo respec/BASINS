@@ -144,7 +144,7 @@ Public Class atcTimeseriesFileHspfBinOut
                         With lTSer
                             .Attributes.SetValue("Operation", lBinHeader.Id.OperationName)
                             .Attributes.SetValue("Section", lBinHeader.Id.SectionName)
-                            .Attributes.SetValue("IDSCEN", FilenameOnly(Specification))
+                            .Attributes.SetValue("IDSCEN", IO.Path.GetFileNameWithoutExtension(Specification))
                             .Attributes.SetValue("IDLOCN", Left(lBinHeader.Id.OperationName, 1) & ":" & (lBinHeader.Id.OperationNumber))
                             Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(lDataIndex)
                             .Attributes.SetValue("IDCONS", lConstituent)

@@ -221,7 +221,7 @@ Module modModelSetup
         'open project wdm
         Dim lDataSources As New Collection(Of atcData.atcDataSource)
         Dim lDataSource As New atcWDM.atcDataSourceWDM
-        Dim lProjectWDMName As String = FilenameOnly(aUciName) & ".wdm"
+        Dim lProjectWDMName As String = IO.Path.GetFileNameWithoutExtension(aUciName) & ".wdm"
         Dim lFound As Boolean = False
         For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
             If lBASINSDataSource.Specification.ToUpper = lProjectWDMName.ToUpper Then
@@ -260,7 +260,7 @@ Module modModelSetup
 
         ChDriveDir(PathNameOnly(aUciName))
 
-        Dim lWatershedName As String = FilenameOnly(aUciName)
+        Dim lWatershedName As String = IO.Path.GetFileNameWithoutExtension(aUciName)
         Dim lWatershed As New Watershed
         Dim lCreateUCI As Boolean = False
         If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
@@ -670,7 +670,7 @@ Module modModelSetup
                                         facname = GisUtil.FieldValue(pcsLayerIndex, j - 1, facIndex)
                                         If aChkCalculate Then
                                             'calculate mile point on stream
-                                            'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), FilenameOnly(OutletsJoinThemeName), PCSIdField, pNPDES(j))
+                                            'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), IO.Path.GetFileNameWithoutExtension(OutletsJoinThemeName), PCSIdField, pNPDES(j))
                                             'mipt = dist / 1609.3
                                         Else
                                             mipt = 0.0#
@@ -724,7 +724,7 @@ Module modModelSetup
                 Do While i <= cNPDES.Count
                     If aChkCalculate Then
                         'calculate mile point on stream
-                        'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), FilenameOnly(OutletsJoinThemeName), PCSIdField, pNPDES(j))
+                        'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), IO.Path.GetFileNameWithoutExtension(OutletsJoinThemeName), PCSIdField, pNPDES(j))
                         'mipt = dist / 1609.3
                     Else
                         mipt = 0.0#

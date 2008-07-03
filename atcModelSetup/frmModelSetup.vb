@@ -2328,7 +2328,7 @@ Public Class frmModelSetup
             cboMet.SelectedIndex = 0
         End If
 
-        tbxName.Text = FilenameOnly(GisUtil.ProjectFileName)
+        tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
 
         With AtcGridPervious
             .Source = New atcControls.atcGridSource

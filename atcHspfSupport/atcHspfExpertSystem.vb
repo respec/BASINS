@@ -50,7 +50,7 @@ Public Class ExpertSystem
     Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcDataSource)
         pUci = aUci
         pDataSource = aDataSource
-        ReadEXSFile(FilenameOnly(aUci.Name) & ".exs")
+        ReadEXSFile(IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs")
         'pErrorCriteria.Edit()
     End Sub
 

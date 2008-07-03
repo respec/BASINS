@@ -184,13 +184,13 @@ Public Class atcBasinsPlugIn
                 ShowHelp("")
             Case atcDataManager.LaunchMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
-                Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_Project.FileName) & ".apr"
+                Dim lAprFileName As String = "\basins\apr\" & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
                     Dim lExeName As String = _
                        FindFile("Please locate BasinsArchive.exe", _
                        "\BASINS\etc\basinsarchive\BasinsArchive.exe")
                     If Len(lExeName) > 0 Then
-                        Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_Project.FileName) & ", " & FilenameOnly(lAprFileName)
+                        Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_Project.FileName) & ", " & IO.Path.GetFileNameWithoutExtension(lAprFileName)
                         Shell(Exec_Str, AppWinStyle.NormalFocus, False)
                     End If
                 End If
@@ -289,7 +289,7 @@ FoundDir:
                 End If
             End If
 
-            lPrjFileName = aDataDirName & "\" & FilenameOnly(aDataDirName) & ".mwprj"
+            lPrjFileName = aDataDirName & "\" & IO.Path.GetFileNameWithoutExtension(aDataDirName) & ".mwprj"
             If FileExists(lPrjFileName) Then
                 Logger.Dbg("Opening project " & lPrjFileName)
                 Return g_Project.Load(lPrjFileName)
