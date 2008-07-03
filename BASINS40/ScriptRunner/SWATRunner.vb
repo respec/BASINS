@@ -13,23 +13,19 @@ Imports SwatObject
 Module SWATRunner
     Private pRefreshDB As Boolean = False
     Private pOutputSummarize As Boolean = True
-    Private pInputSummarize As Boolean = False
+    Private pInputSummarize As Boolean = True
     Private pRunModel As Boolean = True
-    'Private Const pBasePath As String = "D:\Basins\data\SWATOutput\UM\baseline90"
-    Private Const pBasePath As String = "C:\Project\UMRB\baseline90"
-    'Private Const pInputPath As String = "D:\Basins\data\SWATOutput\UM\baseline90jack"
-    Private Const pInputPath As String = "C:\Project\UMRB\baseline90\Scenarios\RevCrop"
-    'Private Const pSWATGDB As String = "SWAT2005.mdb"
-    'Private Const pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
-    Private Const pSWATGDB As String = "C:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
-    Private Const pOutGDBPath As String = pInputPath & "\TablesIn"
-    Private Const pOutGDB As String = "baseline90.mdb"
-    Private Const pOutputFolder As String = pInputPath & "\TxtInOut"
-    Private Const pReportsFolder As String = pInputPath & "\TablesOut"
-    Private Const pSWATExe As String = pOutputFolder & "\swat2005.exe" 'local copy with input data
+    Private pScenario As String = "RevCrop"
+    Private pDrive As String = "G:"
+    Private pBasePath As String = pDrive & "\Project\UMRB\baseline90"
+    Private pSWATGDB As String = "c:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
+    Private pInputPath As String = pDrive & pBasePath & "\Scenarios\" & pScenario
+    Private pOutGDBPath As String = pInputPath & "\TablesIn"
+    Private pOutGDB As String = "baseline90.mdb"
+    Private pOutputFolder As String = pInputPath & "\TxtInOut"
+    Private pReportsFolder As String = pInputPath & "\TablesOut"
+    Private pSWATExe As String = pOutputFolder & "\swat2005.exe" 'local copy with input data
     'Private Const pSWATExe As String = "C:\Program Files\SWAT 2005 Editor\swat2005.exe"
-    Private pSwatOutput As Text.StringBuilder
-    Private pSwatError As Text.StringBuilder
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pInputPath)
@@ -45,12 +41,13 @@ Module SWATRunner
                 IO.File.Delete(lOutGDB)
             End If
             IO.File.Copy(pBasePath & "\" & pOutGDB, lOutGDB)
+            Logger.Dbg("Copied " & lOutGDB & " from " & pBasePath)
         End If
 
         Logger.Dbg("InitializeSwatInput")
-        SwatInput.Initialize(pSWATGDB, lOutGDB, pOutputFolder)
+        Dim lSwatInput As New SwatInput(pSWATGDB, lOutGDB, pOutputFolder)
 
-        Dim lCIOTable As DataTable = SwatInput.CIO.Table
+        Dim lCIOTable As DataTable = lSwatInput.CIO.Table
 
         Dim lUserParms As New atcCollection
         With lUserParms
@@ -60,34 +57,35 @@ Module SWATRunner
         End With
         Dim lAsk As New frmArgs
         If lAsk.AskUser("User Specified Parameters", lUserParms) Then
-            SwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", lUserParms.ItemByKey("Start Year"))
-            SwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", lUserParms.ItemByKey("Number of Years"))
+            lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", lUserParms.ItemByKey("Start Year"))
+            lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", lUserParms.ItemByKey("Number of Years"))
             pRunModel = lUserParms.ItemByKey("Run Model")
-            SwatInput.CIO.Save(False)
+            lSwatInput.CIO.Save(False)
             If pInputSummarize Then
-                SwatInput.Hru.TableCreate()
+                'TODO: why do we need to make a new HRU table?
+                'lSwatInput.Hru.TableCreate()
 
                 Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
                 For Each lString As String In LinesInFile("SWATParmChanges.txt")
                     Dim lParms() As String = lString.Split(";")
-                    SwatInput.UpdateInputDB(lParms(0).Trim, lParms(1).Trim, lParms(2).Trim, lParms(3).Trim, lParms(4).Trim)
+                    lSwatInput.UpdateInputDB(lParms(0).Trim, lParms(1).Trim, lParms(2).Trim, lParms(3).Trim, lParms(4).Trim)
                 Next
 
                 Logger.Dbg("SWATSummarizeInput")
                 Dim lStreamWriter As New IO.StreamWriter(pInputPath & "\logs\LandUses.txt")
-                Dim lUniqueLandUses As DataTable = SwatInput.Hru.UniqueValues("LandUse")
+                Dim lUniqueLandUses As DataTable = lSwatInput.Hru.UniqueValues("LandUse")
                 For Each lLandUse As DataRow In lUniqueLandUses.Rows
                     lStreamWriter.WriteLine(lLandUse.Item(0).ToString)
                 Next
                 lStreamWriter.Close()
 
-                Dim lLandUSeTable As DataTable = AggregateCrops(SwatInput.SubBasin.TableWithArea("LandUse"))
+                Dim lLandUSeTable As DataTable = AggregateCrops(lSwatInput.SubBsn.TableWithArea("LandUse"))
                 SaveFileString(pInputPath & "\logs\AreaLandUseReport.txt", _
                                SWATArea.Report(lLandUSeTable))
                 SaveFileString(pInputPath & "\logs\AreaSoilReport.txt", _
-                               SWATArea.Report(SwatInput.SubBasin.TableWithArea("Soil")))
+                               SWATArea.Report(lSwatInput.SubBsn.TableWithArea("Soil")))
                 SaveFileString(pInputPath & "\logs\AreaSlopeCodeReport.txt", _
-                               SWATArea.Report(SwatInput.SubBasin.TableWithArea("Slope_Cd")))
+                               SWATArea.Report(lSwatInput.SubBsn.TableWithArea("Slope_Cd")))
             End If
 
             If pRunModel Then
