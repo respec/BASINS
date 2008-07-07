@@ -55,7 +55,7 @@ Public Module ScriptShapefileFromWDM
 
         'convert that grid source to a shapefile
         Dim lOutputProjection As String = aMapWin.Project.ProjectProjection
-        Dim lShapefileName As String = pTestPath & FilenameOnly(pTestWDMFileName) & ".shp"
+        Dim lShapefileName As String = pTestPath & IO.Path.GetFileNameWithoutExtension(pTestWDMFileName) & ".shp"
         GisUtilities.GridSourceToShapefile(aMapWin, lShapefileName, lSource, lXfieldName, lYfieldName, lOutputProjection)
 
         atcDataManager.DataSources.Remove(lHspfWdmFile)

@@ -25,8 +25,8 @@ Module HSPFOutputReports
 
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
-        'Dim lTestName As String = "hyd_man"
-        Dim lTestName As String = "upatoi"
+        Dim lTestName As String = "hyd_man"
+        'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
@@ -53,7 +53,7 @@ Module HSPFOutputReports
                 pOutputLocations.Add("R:10")
                 pOutputLocations.Add("R:307")
             Case "hyd_man"
-                pTestPath = "C:\test\EXP_CAL\hyd_man.net_cat"
+                pTestPath = "C:\test\EXP_CAL\hyd_man.net"
                 pBaseName = "hyd_man"
                 pOutputLocations.Add("R:5")
                 pOutputLocations.Add("R:4")
@@ -65,7 +65,7 @@ Module HSPFOutputReports
                 pBaseName = "SCR10"
                 pOutputLocations.Add("R:70")
                 pOutputLocations.Add("R:180")
-                pOutputLocations.Add("R:526")
+                pOutputLocations.Add("R:320")
                 pOutputLocations.Add("R:410")
                 pOutputLocations.Add("R:880")
         End Select
@@ -97,13 +97,13 @@ Module HSPFOutputReports
         For Each lExpertSystemFileName As String In lExpertSystemFileNames
             Try
                 Dim lFileCopied As Boolean = False
-                If FilenameOnly(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
+                If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
                     IO.File.Copy(lExpertSystemFileName, pBaseName & ".exs")
                     lFileCopied = True
                 End If
                 lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
                 Dim lStr As String = lExpertSystem.Report
-                SaveFileString("outfiles\ExpertSysStats-" & FilenameOnly(lExpertSystemFileName) & ".txt", lStr)
+                SaveFileString("outfiles\ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
 
                 'lStr = lExpertSystem.AsString 'NOTE:just testing
                 'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
@@ -275,6 +275,7 @@ Module HSPFOutputReports
         Next lExpertSystemFileName
 
         'open HBN file
+        'TODO: need to allow additional binary output files!
         Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"
         Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
         lHspfBinDataSource.Open(lHspfBinFileName)

@@ -40,7 +40,7 @@ Public Module BASINSProjectSummary
             'vbTab & "Tag" & vbTab & lLayer.Tag & vbCrLf & _
             'vbTab & "String" & vbTab & lLayer.ToString & vbcrlf & _
 
-            Dim lFileNameBase As String = FilenameOnly(lLayer.FileName)
+            Dim lFileNameBase As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName)
             If lFileNameBase.ToLower = "cat" Then
                 lString.AppendLine("CatalogingUnitCount" & vbTab & lLayer.Shapes.NumShapes)
                 Dim lShapeFile As MapWinGIS.Shapefile = lLayer.GetObject
