@@ -31,8 +31,9 @@ Public Class SwatInput
                    ByVal aOutGDB As OleDbConnection, _
                    ByVal aSwatSoilsDB As OleDbConnection, _
                    ByVal aOutputFolder As String, _
+                   ByVal aScenario As String, _
                    ByVal aStatusBar As Windows.Forms.StatusBar)
-        Initialize(aSwatGDB, aOutGDB, aSwatSoilsDB, aOutputFolder, aStatusBar)
+        Initialize(aSwatGDB, aOutGDB, aSwatSoilsDB, aOutputFolder, aScenario, aStatusBar)
     End Sub
 
     ''' <summary>
@@ -47,12 +48,13 @@ Public Class SwatInput
                           ByVal aOutGDB As OleDbConnection, _
                           ByVal aSwatSoilsDB As OleDbConnection, _
                           ByVal aOutputFolder As String, _
+                          ByVal aScenario As String, _
                           ByVal aStatusBar As Windows.Forms.StatusBar)
         ProjectFolder = aOutputFolder
         If ProjectFolder.Length > 0 AndAlso Not IO.Directory.Exists(ProjectFolder) Then
             IO.Directory.CreateDirectory(ProjectFolder)
         End If
-        TxtInOutFolder = IO.Path.Combine(ProjectFolder, "Scenarios\Default\TxtInOut")
+        TxtInOutFolder = IO.Path.Combine(ProjectFolder, "Scenarios\" & aScenario & "\TxtInOut")
         CnSwatParm = aSwatGDB
         CnSwatInput = aOutGDB
         CnSwatSoils = aSwatSoilsDB
@@ -68,7 +70,8 @@ Public Class SwatInput
     ''' <remarks>Opens database connections</remarks>
     Public Sub New(ByVal aSwatGDB As String, _
                    ByVal aOutGDB As String, _
-                   ByVal aProjectFolder As String)
+                   ByVal aProjectFolder As String, _
+                   ByVal aScenario As String)
 
         CnSwatParm = OpenOleDB(aSwatGDB)
 
@@ -76,13 +79,13 @@ Public Class SwatInput
         CnSwatSoils = OpenOleDB(lSwatSoilsDBFileName)
 
         If Not IO.File.Exists(aOutGDB) Then
-            BuildNewProject(aOutGDB, aProjectFolder)
+            BuildNewProject(aOutGDB, aProjectFolder, aScenario)
         End If
         If CnSwatInput Is Nothing Then
             CnSwatInput = OpenOleDB(aOutGDB)
         End If
 
-        Initialize(CnSwatParm, CnSwatInput, CnSwatSoils, aProjectFolder, Nothing)
+        Initialize(CnSwatParm, CnSwatInput, CnSwatSoils, aProjectFolder, aScenario, Nothing)
         pNeedToClose = True
     End Sub
 
@@ -223,18 +226,18 @@ Public Class SwatInput
     ''' <returns></returns>
     ''' <remarks>based on code from OpenSWAT</remarks>
     Private Function BuildNewProject(ByVal aOutGDB As String, _
-                                     ByVal aOutputFolder As String) As Boolean
-
+                                     ByVal aOutputFolder As String, _
+                                     ByVal aScenario As String) As Boolean
         'SaveConFig.US_SoilsDatabasePath = System.IO.Path.GetDirectoryName(Trim(txtSWATGDB.Text)) & "\SWAT_US_Soils.mdb"
 
         'First, try to create the project database... check if it's there first...
         ' If Not System.IO.File.Exists(prjDBName) Then
         IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default") '
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\Scen")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\TablesIn")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\TablesOut")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\Default\TxtInOut")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario)
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\Scen")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TablesIn")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TablesOut")
+        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TxtInOut")
         IO.Directory.CreateDirectory(aOutputFolder & "\Watershed")
         IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Grid")
         IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Shapes")
