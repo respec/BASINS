@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5E5A80B8-06DC-428F-A139-F1CF20D756B2}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>atcTimseriesWRDB</RootNamespace>
-    <AssemblyName>atcTimseriesWRDB</AssemblyName>
+    <RootNamespace>atcTimeseriesWRDB</RootNamespace>
+    <AssemblyName>atcTimeseriesWRDB</AssemblyName>
     <MyType>Windows</MyType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -17,7 +17,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcTimseriesWRDB.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesWRDB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -27,7 +27,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcTimseriesWRDB.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesWRDB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>

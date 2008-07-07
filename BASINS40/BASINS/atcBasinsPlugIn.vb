@@ -160,6 +160,17 @@ Public Class atcBasinsPlugIn
 
         g_MapWin.ApplicationInfo.WelcomePlugin = ""
         g_MapWin.ClearCustomWindowTitle()
+
+        CloseForms()
+    End Sub
+
+    Private Sub CloseForms()
+        If pBuildFrm IsNot Nothing Then
+            Try
+                pBuildFrm.Close()
+            Catch
+            End Try
+        End If
     End Sub
 
     Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
@@ -493,6 +504,7 @@ FoundDir:
     End Sub
 
     Public Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
+        CloseForms()
         If Not aProjectFile Is Nothing AndAlso aProjectFile.Length > 0 Then
             Try
                 ChDriveDir(IO.Path.GetDirectoryName(aProjectFile))

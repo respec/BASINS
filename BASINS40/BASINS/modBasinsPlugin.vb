@@ -67,8 +67,8 @@ Public Module modBasinsPlugin
             Dim lCheckDir As String = DefaultBasinsDataDir()
             If FileExists(lCheckDir, True, False) Then g_BasinsDataDirs.Add(lCheckDir)
 
-            For Each lDrive As IO.DriveInfo In IO.DriveInfo.GetDrives()
-                With lDrive
+            For Each lDriveInfo As IO.DriveInfo In IO.DriveInfo.GetDrives()
+                With lDriveInfo
                     If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
                         lCheckDir = .Name & BasinsDataPath
                         If Not g_BasinsDataDirs.Contains(lCheckDir) AndAlso FileExists(lCheckDir, True, False) Then
@@ -160,27 +160,23 @@ Public Module modBasinsPlugin
     End Function
 
     ''' <summary>
-    ''' 
+    ''' check to see if project has both a catalog unit layer and a state layer
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Friend Function IsBASINSProject() As Boolean
-        'make sure the project has a cat layer and state layer
         Dim lHaveCatLayer As Boolean = False
         Dim lHaveStateLayer As Boolean = False
-        For i As Integer = 0 To GisUtil.NumLayers - 1
-            If FilenameNoPath(GisUtil.LayerFileName(i)) = "st.shp" Then
-                lHaveStateLayer = True
-            End If
-            If FilenameNoPath(GisUtil.LayerFileName(i)) = "cat.shp" Then
-                lHaveCatLayer = True
+        For Each lLayer As MapWindow.Interfaces.Layer In g_MapWin.Layers
+            Select Case FilenameNoPath(lLayer.FileName).ToLower
+                Case "st.shp" : lHaveStateLayer = True
+                Case "cat.shp" : lHaveCatLayer = True
+            End Select
+            If lHaveCatLayer And lHaveStateLayer Then
+                Exit For
             End If
         Next
-        If lHaveCatLayer And lHaveStateLayer Then
-            Return True
-        Else
-            Return False
-        End If
+        Return lHaveCatLayer And lHaveStateLayer
     End Function
 
     Public Function DefaultBasinsDataDir() As String

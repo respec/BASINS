@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{F05FE01B-E35C-4444-B5A2-47085D073631}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>atcTimseriesDbf</RootNamespace>
-    <AssemblyName>atcTimseriesDbf</AssemblyName>
+    <RootNamespace>atcTimeseriesDbf</RootNamespace>
+    <AssemblyName>atcTimeseriesDbf</AssemblyName>
     <MyType>Windows</MyType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -17,7 +17,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcTimseriesDbf.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesDbf.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -27,7 +27,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcTimseriesDbf.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesDbf.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
