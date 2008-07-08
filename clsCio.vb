@@ -59,6 +59,7 @@ Partial Class SwatInput
     Public Class clsCIO
         Private pSwatInput As SwatInput
         Private pTableName As String = "cio"
+        Public PrintHru As Boolean = True ' not saved in DB
 
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
@@ -149,7 +150,7 @@ Partial Class SwatInput
             ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
-        Public Sub Save(ByVal aPrintHRU As Boolean, Optional ByVal aTable As DataTable = Nothing)
+        Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
             pSwatInput.Status("Writing " & pTableName & " text ...")
             Dim lSB As New System.Text.StringBuilder
@@ -336,16 +337,16 @@ Partial Class SwatInput
                 lSB.AppendLine("Subbasin output variables:")
                 lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 lSB.AppendLine("HRU output variables:")
-                If aPrintHRU = False Then
-                    lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
-                Else
+                If PrintHru Then
                     lSB.AppendLine("   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
+                Else
+                    lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 End If
                 lSB.AppendLine("HRU data to be printed:")
-                If aPrintHRU = False Then
-                    lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
-                Else
+                If PrintHru Then
                     lSB.AppendLine("   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
+                Else
+                    lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 End If
                 IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\file.cio", lSB.ToString)
             End If
