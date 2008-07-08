@@ -91,24 +91,30 @@ Module SWATRunner
                                SWATArea.Report(lSwatInput.SubBsn.TableWithArea("Slope_Cd")))
             End If
 
+            Dim lTotalArea As Double = 0.0
             Dim lTotalAreaNotConverted As Double = 0.0
             Dim lTotalAreaConverted As Double = 0.0
-            Dim lTotalAreaCorn As Double = 0.0
+            Dim lTotalAreaCornFut As Double = 0.0
+            Dim lTotalAreaCornNow As Double = 0.0
             Dim lCornConversions As New CornConversions
             Dim lSummaryWriter As New IO.StreamWriter(pInputFolder & "\logs\CornChanges.txt")
             lSummaryWriter.WriteLine("FrmCrp" & vbTab & "ToCrp" & vbTab _
                                    & "FrcChg".PadLeft(12) & vbTab _
+                                   & "Area".PadLeft(12) & vbTab _
+                                   & "AreaCornNow".PadLeft(12) & vbTab _
                                    & "AreaChg".PadLeft(12) & vbTab _
                                    & "AreaSkip".PadLeft(12) & vbTab _
-                                   & "AreaCorn".PadLeft(12) & vbTab _
+                                   & "AreaCornFut".PadLeft(12) & vbTab _
                                    & "CntPot" & vbTab & "CntAct")
             Dim lHruWriter As New IO.StreamWriter(pInputFolder & "\logs\CornHruChanges.txt")
             lHruWriter.WriteLine("FrmCrp" & vbTab & "ToCrp" & vbTab _
                                & "SubId" & vbTab & "Soil" & vbTab & "Slope" & vbTab _
                                & "FrcChg".PadLeft(12) & vbTab _
+                               & "Area".PadLeft(12) & vbTab _
+                               & "AreaCornNow".PadLeft(12) & vbTab _
                                & "AreaChg".PadLeft(12) & vbTab _
                                & "AreaSkip".PadLeft(12) & vbTab _
-                               & "AreaCorn".PadLeft(12) & vbTab)
+                               & "AreaCornFut".PadLeft(12) & vbTab)
 
             For Each lLandUse As DataRow In lUniqueLandUses.Rows
                 Dim lLandUseName As String = lLandUse.Item(0).ToString
@@ -129,52 +135,70 @@ Module SWATRunner
                     lCornFractionBefore = lCornConversion.Fraction
                 End If
                 Dim lChangedHruCount As Integer = 0
+                Dim lCropArea As Double = 0.0
                 Dim lCropAreaNotConverted As Double = 0.0
                 Dim lCropAreaConverted As Double = 0.0
-                Dim lCropAreaCorn As Double = 0.0
+                Dim lCropAreaCornNow As Double = 0.0
+                Dim lCropAreaCornFut As Double = 0.0
                 For Each lPotentialChangedHru As DataRow In lPotentialChangedHrus.Rows
                     Dim lHruItem As New SwatInput.clsHruItem(lPotentialChangedHru)
                     With lHruItem
                         Dim lAreaSubBasin As Double = lSwatInput.QueryInputDB("Select SUB_KM FROM(sub) WHERE SUBBASIN=" & .SUBBASIN & ";").Rows(0).Item(0)
                         Dim lHruChangeTo As DataTable = lSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUSeConvertsTo & "' AND SOIL='" & .SOIL & "' AND SLOPE_CD='" & .SLOPE_CD & "' AND SUBBASIN=" & .SUBBASIN & ";")
-                        Dim lAreaPotentialConvert As Double = lAreaSubBasin * lConvertFractionNet * .HRU_FR
+                        Dim lHruArea As Double = lAreaSubBasin * .HRU_FR
+                        Dim lAreaPotentialConvert As Double = lHruArea * lConvertFractionNet
                         Dim lHruAreaNotConverted As Double = 0.0
                         Dim lHruAreaConverted As Double = 0.0
-                        Dim lHruAreaCorn As Double = 0.0
+                        Dim lHruAreaCornNow As Double = lHruArea * lCornFractionBefore
+                        Dim lHruAreaCornFut As Double = 0.0
                         If lHruChangeTo.Rows.Count > 0 Then
                             lHruAreaConverted = lAreaPotentialConvert
                             lChangedHruCount += 1
-                            lHruAreaCorn = lCornFractionAfter * .HRU_FR * lAreaSubBasin
+                            lHruAreaCornFut = lCornFractionAfter * lHruArea
                         Else 'no conversion
                             lHruAreaNotConverted = lAreaPotentialConvert
-                            lHruAreaCorn = lCornFractionBefore * .HRU_FR * lAreaSubBasin
+                            lHruAreaCornFut = lCornFractionBefore * lHruArea
                         End If
                         lHruWriter.WriteLine(lLandUseName & vbTab & lLandUSeConvertsTo & vbTab _
                                            & .SUBBASIN & vbTab & .SOIL & vbTab & .SLOPE_CD & vbTab _
                                            & DoubleToString(lConvertFractionNet, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                                           & DoubleToString(lHruArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                                           & DoubleToString(lHruAreaCornNow, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                            & DoubleToString(lHruAreaConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                            & DoubleToString(lHruAreaNotConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
-                                           & DoubleToString(lHruAreaCorn, 12, pFormat, , , 10).PadLeft(12))
+                                           & DoubleToString(lHruAreaCornFut, 12, pFormat, , , 10).PadLeft(12))
+                        lCropArea += lHruArea
                         lCropAreaConverted += lHruAreaConverted
                         lCropAreaNotConverted += lHruAreaNotConverted
-                        lCropAreaCorn += lHruAreaCorn
+                        lCropAreaCornNow += lHruAreaCornNow
+                        lCropAreaCornFut += lHruAreaCornFut
                     End With
                 Next
                 lSummaryWriter.WriteLine(lLandUseName & vbTab & lLandUSeConvertsTo & vbTab _
                                        & DoubleToString(lConvertFractionNet, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                                       & DoubleToString(lCropArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                                       & DoubleToString(lCropAreaCornNow, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & DoubleToString(lCropAreaConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & DoubleToString(lCropAreaNotConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
-                                       & DoubleToString(lCropAreaCorn, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                                       & DoubleToString(lCropAreaCornFut, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & lPotentialChangedHrus.Rows.Count & vbTab _
                                        & lChangedHruCount)
+                lTotalArea += lCropArea
                 lTotalAreaConverted += lCropAreaConverted
                 lTotalAreaNotConverted += lCropAreaNotConverted
-                lTotalAreaCorn += lCropAreaCorn
+                lTotalAreaCornNow += lCropAreaCornNow
+                lTotalAreaCornFut += lCropAreaCornFut
                 lHruWriter.Flush()
             Next
+            lSummaryWriter.WriteLine("Total" & vbTab & Space(6) & vbTab _
+                          & Space(12) & vbTab _
+                          & DoubleToString(lTotalArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                          & DoubleToString(lTotalAreaCornNow, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                          & DoubleToString(lTotalAreaConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                          & DoubleToString(lTotalAreaNotConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+                          & DoubleToString(lTotalAreaCornFut, 12, pFormat, , , 10).PadLeft(12))
             lSummaryWriter.Flush()
-            Logger.Dbg("AreaConvertedTotal " & lTotalAreaConverted & " NotTotal " & lTotalAreaNotConverted & " CornTotal " & lTotalAreaCorn)
-
+            Logger.Dbg("AreaTotal " & lTotalArea & " Converted " & lTotalAreaConverted & " NotTotal " & lTotalAreaNotConverted & " CornTotal " & lTotalAreaCornFut)
 
             'update areas 
             'lSwatInput.UpdateInputDB("HRU", "OID", .oi, "IYR", lUserParms.ItemByKey("Start Year"))
