@@ -51,8 +51,19 @@ Public Class SwatInput
                           ByVal aScenario As String, _
                           ByVal aStatusBar As Windows.Forms.StatusBar)
         ProjectFolder = aOutputFolder
-        If ProjectFolder.Length > 0 AndAlso Not IO.Directory.Exists(ProjectFolder) Then
+        If ProjectFolder.Length > 0 Then
             IO.Directory.CreateDirectory(ProjectFolder)
+            IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario)
+            IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\Scen")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TablesIn")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TablesOut")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TxtInOut")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Watershed")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Grid")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Shapes")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Tables")
+            IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\text")
         End If
         TxtInOutFolder = IO.Path.Combine(ProjectFolder, "Scenarios\" & aScenario & "\TxtInOut")
         CnSwatParm = aSwatGDB
@@ -79,7 +90,7 @@ Public Class SwatInput
         CnSwatSoils = OpenOleDB(lSwatSoilsDBFileName)
 
         If Not IO.File.Exists(aOutGDB) Then
-            BuildNewProject(aOutGDB, aProjectFolder, aScenario)
+            CreateAccessDatabase(aOutGDB, aProjectFolder)
         End If
         If CnSwatInput Is Nothing Then
             CnSwatInput = OpenOleDB(aOutGDB)
@@ -217,38 +228,6 @@ Public Class SwatInput
         End If
     End Sub
 #End Region
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="aOutGDB"></param>
-    ''' <param name="aOutputFolder"></param>
-    ''' <returns></returns>
-    ''' <remarks>based on code from OpenSWAT</remarks>
-    Private Function BuildNewProject(ByVal aOutGDB As String, _
-                                     ByVal aOutputFolder As String, _
-                                     ByVal aScenario As String) As Boolean
-        'SaveConFig.US_SoilsDatabasePath = System.IO.Path.GetDirectoryName(Trim(txtSWATGDB.Text)) & "\SWAT_US_Soils.mdb"
-
-        'First, try to create the project database... check if it's there first...
-        ' If Not System.IO.File.Exists(prjDBName) Then
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario)
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\Scen")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TablesIn")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TablesOut")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Scenarios\" & aScenario & "\TxtInOut")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Grid")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Shapes")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\Tables")
-        IO.Directory.CreateDirectory(aOutputFolder & "\Watershed\text")
-        'end if
-
-        CreateAccessDatabase(aOutGDB, aOutputFolder)
-
-        Return True
-    End Function
 
     Private Function CreateAccessDatabase(ByVal aDatabaseName As String, ByVal aDatabaseFullPath As String) As Boolean
         Dim lResult As Boolean
