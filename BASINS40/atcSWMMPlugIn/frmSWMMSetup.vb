@@ -170,7 +170,7 @@ Public Class frmSWMMSetup
             CreateMetConstituent(lMetWDMFileName, "MD189070", "PEVT", .MetConstituents)
 
             'create conduits and nodes from streams shapefile
-            CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", "WID2", "DEP2", pPlugIn.SWMMProject, .Conduits)
+            CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", "WID2", "DEP2", "", "", "", "", "", "", "", "", "", "", "", True, pPlugIn.SWMMProject, .Conduits)
 
             'create catchments from subbasins shapefile
             Dim lSubbasinsShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"

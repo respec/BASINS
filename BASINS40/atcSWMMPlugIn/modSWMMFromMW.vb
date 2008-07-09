@@ -51,6 +51,18 @@ Friend Module modSWMMFromMW
                                                 ByVal aElevLowFieldName As String, _
                                                 ByVal aMeanWidthFieldName As String, _
                                                 ByVal aMeanDepthFieldName As String, _
+                                                ByVal aManningsNFieldName As String, _
+                                                ByVal aInletOffsetFieldName As String, _
+                                                ByVal aOutletOffsetFieldName As String, _
+                                                ByVal aInitialFlowFieldName As String, _
+                                                ByVal aMaxFlowFieldName As String, _
+                                                ByVal aShapeFieldName As String, _
+                                                ByVal aGeometry1FieldName As String, _
+                                                ByVal aGeometry2FieldName As String, _
+                                                ByVal aGeometry3FieldName As String, _
+                                                ByVal aGeometry4FieldName As String, _
+                                                ByVal aNumBarrelsFieldName As String, _
+                                                ByVal aCreateNodes As Boolean, _
                                                 ByVal aSWMMProject As SWMMProject, _
                                                 ByRef aConduits As Conduits) As Boolean
         aConduits.Clear()
@@ -59,83 +71,177 @@ Friend Module modSWMMFromMW
             GisUtil.AddLayer(aShapefileName, "Conduits")
         End If
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aShapefileName)
-        Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aSubbasinFieldName)
-        Dim lDownSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aDownSubbasinFieldName)
-        Dim lElevHighFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aElevHighFieldName)
-        Dim lElevLowFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aElevLowFieldName)
-        Dim lMeanWidthFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aMeanWidthFieldName)
-        Dim lMeanDepthFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aMeanDepthFieldName)
+
+        'these fields normally exist when using a basins delineation
+        Dim lSubbasinFieldIndex As Integer = -1
+        If aSubbasinFieldName.Length > 0 Then lSubbasinFieldIndex = GisUtil.FieldIndex(lLayerIndex, aSubbasinFieldName)
+        Dim lDownSubbasinFieldIndex As Integer = -1
+        If aDownSubbasinFieldName.Length > 0 Then lDownSubbasinFieldIndex = GisUtil.FieldIndex(lLayerIndex, aDownSubbasinFieldName)
+        Dim lElevHighFieldIndex As Integer = -1
+        If aElevHighFieldName.Length > 0 Then lElevHighFieldIndex = GisUtil.FieldIndex(lLayerIndex, aElevHighFieldName)
+        Dim lElevLowFieldIndex As Integer = -1
+        If aElevLowFieldName.Length > 0 Then lElevLowFieldIndex = GisUtil.FieldIndex(lLayerIndex, aElevLowFieldName)
+        Dim lMeanWidthFieldIndex As Integer = -1
+        If aMeanWidthFieldName.Length > 0 Then lMeanWidthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aMeanWidthFieldName)
+        Dim lMeanDepthFieldIndex As Integer = -1
+        If aMeanDepthFieldName.Length > 0 Then lMeanDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aMeanDepthFieldName)
+
+        'these fields may exist for some users
+        Dim lManningsNFieldIndex As Integer = -1
+        If aManningsNFieldName.Length > 0 Then lManningsNFieldIndex = GisUtil.FieldIndex(lLayerIndex, aManningsNFieldName)
+        Dim lInletOffsetFieldIndex As Integer = -1
+        If aInletOffsetFieldName.Length > 0 Then lInletOffsetFieldIndex = GisUtil.FieldIndex(lLayerIndex, aInletOffsetFieldName)
+        Dim lOutletOffsetFieldIndex As Integer = -1
+        If aOutletOffsetFieldName.Length > 0 Then lOutletOffsetFieldIndex = GisUtil.FieldIndex(lLayerIndex, aOutletOffsetFieldName)
+        Dim lInitialFlowFieldIndex As Integer = -1
+        If aInitialFlowFieldName.Length > 0 Then lInitialFlowFieldIndex = GisUtil.FieldIndex(lLayerIndex, aInitialFlowFieldName)
+        Dim lMaxFlowFieldIndex As Integer = -1
+        If aMaxFlowFieldName.Length > 0 Then lMaxFlowFieldIndex = GisUtil.FieldIndex(lLayerIndex, aMaxFlowFieldName)
+        Dim lShapeFieldIndex As Integer = -1
+        If aShapeFieldName.Length > 0 Then lShapeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aShapeFieldName)
+        Dim lGeometry1FieldIndex As Integer = -1
+        If aGeometry1FieldName.Length > 0 Then lGeometry1FieldIndex = GisUtil.FieldIndex(lLayerIndex, aGeometry1FieldName)
+        Dim lGeometry2FieldIndex As Integer = -1
+        If aGeometry2FieldName.Length > 0 Then lGeometry2FieldIndex = GisUtil.FieldIndex(lLayerIndex, aGeometry2FieldName)
+        Dim lGeometry3FieldIndex As Integer = -1
+        If aGeometry3FieldName.Length > 0 Then lGeometry3FieldIndex = GisUtil.FieldIndex(lLayerIndex, aGeometry3FieldName)
+        Dim lGeometry4FieldIndex As Integer = -1
+        If aGeometry4FieldName.Length > 0 Then lGeometry4FieldIndex = GisUtil.FieldIndex(lLayerIndex, aGeometry4FieldName)
+        Dim lNumBarrelsFieldIndex As Integer = -1
+        If aNumBarrelsFieldName.Length > 0 Then lNumBarrelsFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNumBarrelsFieldName)
 
         'create all conduits
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lConduit As New Conduit
-            lConduit.Name = "C" & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
+            If lSubbasinFieldIndex > -1 Then
+                lConduit.Name = "C" & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
+            Else
+                lConduit.Name = "C" & CStr(lFeatureIndex + 1)
+            End If
 
             lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex) * 3.281 'need to convert meters to feet
-            'lConduit.ManningsN()
-            'lConduit.InletOffset()
-            'lConduit.OutletOffset()
-            'lConduit.InitialFlow()
-            'lConduit.MaxFlow()
-            'lconduit.Shape
+
+            If lManningsNFieldIndex > -1 Then
+                lConduit.ManningsN = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lManningsNFieldIndex)
+            End If
+            If lInletOffsetFieldIndex > -1 Then
+                lConduit.InletOffset = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInletOffsetFieldIndex)
+            End If
+            If lOutletOffsetFieldIndex > -1 Then
+                lConduit.OutletOffset = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutletOffsetFieldIndex)
+            End If
+            If lInitialFlowFieldIndex > -1 Then
+                lConduit.InitialFlow = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInitialFlowFieldIndex)
+            End If
+            If lMaxFlowFieldIndex > -1 Then
+                lConduit.MaxFlow = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMaxFlowFieldIndex)
+            End If
+            If lShapeFieldIndex > -1 Then
+                lConduit.Shape = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lShapeFieldIndex)
+            End If
+            If lNumBarrelsFieldIndex > -1 Then
+                lConduit.NumBarrels = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lNumBarrelsFieldIndex)
+            End If
+
+            Dim lMeanDepth As Double = 0.0
+            If lMeanDepthFieldIndex > -1 Then
+                lMeanDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanDepthFieldIndex)
+            End If
+            Dim lMeanWidth As Double = 0.0
+            If lMeanWidthFieldIndex > -1 Then
+                lMeanWidth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanWidthFieldIndex)
+            End If
+
             lConduit.Geometry3 = 1.0 'left slope
             lConduit.Geometry4 = 1.0 'right slope
-            Dim lMeanDepth As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanDepthFieldIndex)
             lConduit.Geometry1 = lMeanDepth * 1.25 'full height = mean depth * 1.25
-            lConduit.Geometry2 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanWidthFieldIndex) - (lMeanDepth / lConduit.Geometry3) - (lMeanDepth / lConduit.Geometry4) 'base width
-            'lConduit.NumBarrels()
+            lConduit.Geometry2 = lMeanWidth - (lMeanDepth / lConduit.Geometry3) - (lMeanDepth / lConduit.Geometry4) 'base width
 
-            Dim lElevHigh As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevHighFieldIndex)
-            Dim lElevLow As Double = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevLowFieldIndex)
-            If lElevHigh < lElevLow Then
-                'something is wrong, switch places
-                Dim lTemp As Double = lElevHigh
-                lElevHigh = lElevLow
-                lElevLow = lTemp
+            If lGeometry1FieldIndex > -1 Then
+                lConduit.Geometry1 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry1FieldIndex)
             End If
-            Dim lXup As Double
-            Dim lYup As Double
-            Dim lXdown As Double
-            Dim lYdown As Double
-            GisUtil.EndPointsOfLine(lLayerIndex, lFeatureIndex, lXup, lYup, lXdown, lYdown)
-            'todo: may need to verify which way the line is digitized
-
-            'create node at upstream end
-            Dim lUpNode As New Node
-            Dim lSubID As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-            lUpNode.Name = "J" & lSubID
-            lUpNode.Type = "JUNCTION"
-            lUpNode.InvertElevation = lElevHigh
-            lUpNode.XPos = lXup
-            lUpNode.YPos = lYup
-            If Not aSWMMProject.Nodes.Contains(lUpNode.Name) Then
-                aSWMMProject.Nodes.Add(lUpNode)
-                lConduit.InletNode = lUpNode
-            Else
-                lConduit.InletNode = aSWMMProject.Nodes(lUpNode.Name)
+            If lGeometry2FieldIndex > -1 Then
+                lConduit.Geometry2 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry2FieldIndex)
+            End If
+            If lGeometry3FieldIndex > -1 Then
+                lConduit.Geometry3 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry3FieldIndex)
+            End If
+            If lGeometry4FieldIndex > -1 Then
+                lConduit.Geometry4 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry4FieldIndex)
             End If
 
-            'create node at downstream end
-            Dim lNode As New Node
-            Dim lDownID As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDownSubbasinFieldIndex)
-            If CInt(lDownID) > 0 Then
-                lNode.Name = "J" & lDownID
-                lNode.Type = "JUNCTION"
-            Else
-                lNode.Name = "O1"
-                lNode.Type = "OUTFALL"
-            End If
-            lNode.InvertElevation = lElevLow
-            lNode.XPos = lXdown
-            lNode.YPos = lYdown
-            If Not aSWMMProject.Nodes.Contains(lNode.Name) Then
-                aSWMMProject.Nodes.Add(lNode)
-                lConduit.OutletNode = lNode
-            Else
-                lConduit.OutletNode = aSWMMProject.Nodes(lNode.Name)
-                'make sure coordinates correspond with downstream end
-                lConduit.OutletNode.XPos = lNode.XPos
-                lConduit.OutletNode.YPos = lNode.YPos
+            If aCreateNodes Then
+                Dim lElevHigh As Double = 0.0
+                If lElevHighFieldIndex > -1 Then
+                    lElevHigh = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevHighFieldIndex)
+                End If
+
+                Dim lElevLow As Double = 0.0
+                If lElevLowFieldIndex > -1 Then
+                    lElevLow = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevLowFieldIndex)
+                End If
+
+                If lElevHigh < lElevLow Then
+                    'something is wrong, switch places
+                    Dim lTemp As Double = lElevHigh
+                    lElevHigh = lElevLow
+                    lElevLow = lTemp
+                End If
+
+                Dim lXup As Double
+                Dim lYup As Double
+                Dim lXdown As Double
+                Dim lYdown As Double
+                GisUtil.EndPointsOfLine(lLayerIndex, lFeatureIndex, lXup, lYup, lXdown, lYdown)
+                'todo: may need to verify which way the line is digitized
+
+                'create node at upstream end
+                Dim lUpNode As New Node
+                Dim lSubID As String
+                If lSubbasinFieldIndex > -1 Then
+                    lSubID = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
+                Else
+                    lSubID = CStr(lFeatureIndex + 1)
+                End If
+                lUpNode.Name = "J" & lSubID
+                lUpNode.Type = "JUNCTION"
+                lUpNode.InvertElevation = lElevHigh
+                lUpNode.XPos = lXup
+                lUpNode.YPos = lYup
+                If Not aSWMMProject.Nodes.Contains(lUpNode.Name) Then
+                    aSWMMProject.Nodes.Add(lUpNode)
+                    lConduit.InletNode = lUpNode
+                Else
+                    lConduit.InletNode = aSWMMProject.Nodes(lUpNode.Name)
+                End If
+
+                'create node at downstream end
+                Dim lNode As New Node
+                Dim lDownID As String
+                If lDownSubbasinFieldIndex > -1 Then
+                    lDownID = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDownSubbasinFieldIndex)
+                Else
+                    lDownID = CStr(lFeatureIndex + 1)
+                End If
+                If CInt(lDownID) > 0 Then
+                    lNode.Name = "J" & lDownID
+                    lNode.Type = "JUNCTION"
+                Else
+                    lNode.Name = "O1"
+                    lNode.Type = "OUTFALL"
+                End If
+                lNode.InvertElevation = lElevLow
+                lNode.XPos = lXdown
+                lNode.YPos = lYdown
+                If Not aSWMMProject.Nodes.Contains(lNode.Name) Then
+                    aSWMMProject.Nodes.Add(lNode)
+                    lConduit.OutletNode = lNode
+                Else
+                    lConduit.OutletNode = aSWMMProject.Nodes(lNode.Name)
+                    'make sure coordinates correspond with downstream end
+                    lConduit.OutletNode.XPos = lNode.XPos
+                    lConduit.OutletNode.YPos = lNode.YPos
+                End If
             End If
 
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lConduit.X, lConduit.Y)
