@@ -170,14 +170,56 @@ Public Class frmSWMMSetup
             CreateMetConstituent(lMetWDMFileName, "MD189070", "PEVT", .MetConstituents)
 
             'create conduits and nodes from streams shapefile
-            CreateConduitsFromShapefile(lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp", "SUBBASIN", "SUBBASINR", "MAXEL", "MINEL", "WID2", "DEP2", "", "", "", "", "", "", "", "", "", "", "", True, pPlugIn.SWMMProject, .Conduits)
+            Dim lConduitSpecs As New ConduitShapefileSpecs
+            lConduitSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp"
+            lConduitSpecs.SubbasinFieldName = "SUBBASIN"
+            lConduitSpecs.DownSubbasinFieldName = "SUBBASINR"
+            lConduitSpecs.ElevHighFieldName = "MAXEL"
+            lConduitSpecs.ElevLowFieldName = "MINEL"
+            lConduitSpecs.MeanWidthFieldName = "WID2"
+            lConduitSpecs.MeanDepthFieldName = "DEP2"
+            lConduitSpecs.ManningsNFieldName = ""
+            lConduitSpecs.InletOffsetFieldName = ""
+            lConduitSpecs.OutletOffsetFieldName = ""
+            lConduitSpecs.InitialFlowFieldName = ""
+            lConduitSpecs.MaxFlowFieldName = ""
+            lConduitSpecs.ShapeFieldName = ""
+            lConduitSpecs.Geometry1FieldName = ""
+            lConduitSpecs.Geometry2FieldName = ""
+            lConduitSpecs.Geometry3FieldName = ""
+            lConduitSpecs.Geometry4FieldName = ""
+            lConduitSpecs.NumBarrelsFieldName = ""
+            lConduitSpecs.CreateNodes = True
+            CreateConduitsFromShapefile(lConduitSpecs, pPlugIn.SWMMProject, .Conduits)
 
             'create catchments from subbasins shapefile
-            Dim lSubbasinsShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"
-            CreateCatchmentsFromShapefile(lSubbasinsShapefileName, "SUBBASIN", "SLO1", pPlugIn.SWMMProject, .Catchments)
+            Dim lCatchmentSpecs As New CatchmentShapefileSpecs
+            lCatchmentSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"
+            lCatchmentSpecs.SubbasinFieldName = "SUBBASIN"
+            lCatchmentSpecs.SlopeFieldName = "SLO1"
+            lCatchmentSpecs.WidthFieldName = ""
+            lCatchmentSpecs.CurbLengthFieldName = ""
+            lCatchmentSpecs.SnowPackNameFieldName = ""
+            lCatchmentSpecs.ManningsNImpervFieldName = ""
+            lCatchmentSpecs.ManningsNPervFieldName = ""
+            lCatchmentSpecs.DepressionStorageImpervFieldName = ""
+            lCatchmentSpecs.DepressionStoragePervFieldName = ""
+            lCatchmentSpecs.PercentZeroStorageFieldName = ""
+            lCatchmentSpecs.RouteToFieldName = ""
+            lCatchmentSpecs.PercentRoutedFieldName = ""
+            lCatchmentSpecs.MaxInfiltRateFieldName = ""
+            lCatchmentSpecs.MinInfiltRateFieldName = ""
+            lCatchmentSpecs.DecayRateConstantFieldName = ""
+            lCatchmentSpecs.DryTimeFieldName = ""
+            lCatchmentSpecs.MaxInfiltVolumeFieldName = ""
+            lCatchmentSpecs.SuctionFieldName = ""
+            lCatchmentSpecs.ConductivityFieldName = ""
+            lCatchmentSpecs.InitialDeficitFieldName = ""
+            lCatchmentSpecs.CurveNumberFieldName = ""
+            CreateCatchmentsFromShapefile(lCatchmentSpecs, pPlugIn.SWMMProject, .Catchments)
 
             'create landuses from nlcd landcover
-            CreateLandusesFromGrid("C:\BASINS\data\02060006-1\NLCD\NLCD_LandCover_2001.tif", lSubbasinsShapefileName, .Catchments, .Landuses)
+            CreateLandusesFromGrid("C:\BASINS\data\02060006-1\NLCD\NLCD_LandCover_2001.tif", lCatchmentSpecs.ShapefileName, .Catchments, .Landuses)
 
             'add backdrop file
             .BackdropFile = lBasinsFolder & "\Predefined Delineations\West Branch\wbranch.bmp"
