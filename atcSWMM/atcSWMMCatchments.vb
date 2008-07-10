@@ -31,8 +31,8 @@ Public Class Catchments
                     lSB.Append(StrPad("R1", 16, " ", False))
                 End If
                 lSB.Append(" ")
-                If Not .Conduit Is Nothing Then
-                    lSB.Append(StrPad(.Conduit.OutletNode.Name, 16, " ", False))
+                If Not .OutletNode Is Nothing Then
+                    lSB.Append(StrPad(.OutletNode.Name, 16, " ", False))
                 Else
                     lSB.Append(StrPad("J1", 16, " ", False))
                 End If
@@ -184,7 +184,7 @@ End Class
 Public Class Catchment
     Public Name As String
     Public RainGage As RainGage
-    Public Conduit As Conduit
+    Public OutletNode As Node
     Public Area As Double = 0.0 'in acres or hectares
     Public PercentImpervious As Double = 0.0
     Public Width As Double = 0.0 'in feet or meters
