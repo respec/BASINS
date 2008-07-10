@@ -11,6 +11,12 @@ Public Class Nodes
         Return lKey
     End Function
 
+    Public Sub AddRange(ByVal aEnumerable As IEnumerable)
+        For Each lNode As Node In aEnumerable
+            Me.Add(lNode)
+        Next
+    End Sub
+
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
 

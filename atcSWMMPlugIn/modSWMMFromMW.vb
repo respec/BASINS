@@ -2,8 +2,38 @@ Imports atcMwGisUtility
 Imports atcSWMM
 Imports atcData
 Imports MapWinUtility
+Imports atcUtility
+Imports System.Reflection
+Imports System.Collections.ObjectModel
 
 Friend Module modSWMMFromMW
+
+    Public Function Populate(ByVal aTable As atcTable, ByVal aDummyObject As Object, ByVal aFieldMap As atcUtility.atcCollection) As ArrayList
+        Dim lNewList As New ArrayList
+        Dim lType As Type = aDummyObject.GetType
+        Dim lNewArgs() As Object = {}
+        For lRecord As Integer = 1 To aTable.NumRecords
+            aTable.CurrentRecord = lRecord
+
+            Dim lObject As Object = lType.InvokeMember("New", Reflection.BindingFlags.CreateInstance _
+                                                            + Reflection.BindingFlags.Public _
+                                                            + Reflection.BindingFlags.Instance, Nothing, Nothing, Nothing)
+
+            For Each lField As FieldInfo In lType.GetFields()
+                If aFieldMap.Keys.Contains(lField.Name) Then
+                    Dim lValue As String = aTable.Value(aTable.FieldNumber(aFieldMap.ItemByKey(lField.Name)))
+                    Select Case lField.FieldType.Name
+                        Case "Integer" : lField.SetValue(lObject, CInt(lValue))
+                        Case "Double" : lField.SetValue(lObject, CDbl(lValue))
+                        Case "String" : lField.SetValue(lObject, lValue)
+                    End Select
+                End If
+            Next
+            lNewList.Add(lObject)
+        Next
+        Return lNewList
+    End Function
+
     Public Function CreateCatchmentsFromShapefile(ByVal aCatchmentSpecs As CatchmentShapefileSpecs, _
                                                   ByVal aSWMMProject As SWMMProject, _
                                                   ByRef aCatchments As Catchments) As Boolean
