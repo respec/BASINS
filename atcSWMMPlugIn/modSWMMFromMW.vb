@@ -433,8 +433,8 @@ Friend Module modSWMMFromMW
             If lOutfallTypeFieldIndex > -1 Then
                 lNode.OutfallType = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutfallTypeFieldIndex)
             End If
-            If lNameFieldIndex > -1 Then
-                lNode.StageTable = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lNameFieldIndex)
+            If lStageTableFieldIndex > -1 Then
+                lNode.StageTable = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lStageTableFieldIndex)
             End If
             If lTideGateFieldIndex > -1 Then
                 lNode.TideGate = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lTideGateFieldIndex)
