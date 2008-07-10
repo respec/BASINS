@@ -6,6 +6,8 @@ Public Class ConduitShapefileSpecs
     Public ElevLowFieldName As String = ""
     Public MeanWidthFieldName As String = ""
     Public MeanDepthFieldName As String = ""
+    Public InletNodeFieldName As String = ""
+    Public OutletNodeFieldName As String = ""
     Public ManningsNFieldName As String = ""
     Public InletOffsetFieldName As String = ""
     Public OutletOffsetFieldName As String = ""
@@ -23,6 +25,7 @@ End Class
 Public Class CatchmentShapefileSpecs
     Public ShapefileName As String = ""
     Public SubbasinFieldName As String = ""
+    Public OutletNodeFieldName As String = ""
     Public SlopeFieldName As String = ""
     Public WidthFieldName As String = ""
     Public CurbLengthFieldName As String = ""

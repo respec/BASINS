@@ -16,6 +16,10 @@ Friend Module modSWMMFromMW
         Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.SubbasinFieldName)
         Dim lSlopeFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.SlopeFieldName)
 
+        'this field normally exists when using a nodes shapefile
+        Dim lOutletNodeFieldIndex As Integer = -1
+        If aCatchmentSpecs.OutletNodeFieldName.Length > 0 Then lOutletNodeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.OutletNodeFieldName)
+
         'these fields may exist for some users
         Dim lWidthFieldIndex As Integer = -1
         If aCatchmentSpecs.WidthFieldName.Length > 0 Then lWidthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.WidthFieldName)
@@ -65,17 +69,28 @@ Friend Module modSWMMFromMW
                 lCatchment.RainGage = aSWMMProject.RainGages(0)
             End If
 
-            'find associated conduit
-            For Each lConduit As Conduit In aSWMMProject.Conduits
-                If lConduit.Name.Substring(1) = lSubbasinID Then
-                    lCatchment.Conduit = lConduit
-                    Exit For
-                End If
-            Next
+            'find associated outlet node
+            Dim lOutletNode As String = ""
+            If lOutletNodeFieldIndex > -1 Then
+                lOutletNode = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutletNodeFieldIndex)
+            End If
+            If aSWMMProject.Nodes.Contains(lOutletNode) Then
+                lCatchment.OutletNode = aSWMMProject.Nodes(lOutletNode)
+            End If
+
+            If lCatchment.OutletNode Is Nothing Then
+                'find node through associated conduit
+                For Each lConduit As Conduit In aSWMMProject.Conduits
+                    If lConduit.Name.Substring(1) = lSubbasinID Then
+                        lCatchment.OutletNode = lConduit.OutletNode
+                        Exit For
+                    End If
+                Next
+            End If
 
             lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
             'lCatchment.PercentImpervious()  'this is computed later
-            lCatchment.Width = lCatchment.Area * 43560 / lCatchment.Conduit.Length
+            lCatchment.Width = Math.Sqrt(lCatchment.Area * 43560)
             If lSlopeFieldIndex > 0 Then
                 lCatchment.Slope = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSlopeFieldIndex)
             End If
@@ -166,6 +181,12 @@ Friend Module modSWMMFromMW
         Dim lMeanDepthFieldIndex As Integer = -1
         If aConduitSpecs.MeanDepthFieldName.Length > 0 Then lMeanDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.MeanDepthFieldName)
 
+        'these fields normally exist when using a nodes shapefile
+        Dim lInletNodeFieldIndex As Integer = -1
+        If aConduitSpecs.InletNodeFieldName.Length > 0 Then lInletNodeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.InletNodeFieldName)
+        Dim lOutletNodeFieldIndex As Integer = -1
+        If aConduitSpecs.OutletNodeFieldName.Length > 0 Then lOutletNodeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.OutletNodeFieldName)
+
         'these fields may exist for some users
         Dim lManningsNFieldIndex As Integer = -1
         If aConduitSpecs.ManningsNFieldName.Length > 0 Then lManningsNFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.ManningsNFieldName)
@@ -251,6 +272,7 @@ Friend Module modSWMMFromMW
             End If
 
             If aConduitSpecs.CreateNodes Then
+                'nodes not specified, create them at end points of conduits
                 Dim lElevHigh As Double = 0.0
                 If lElevHighFieldIndex > -1 Then
                     lElevHigh = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevHighFieldIndex)
@@ -321,6 +343,23 @@ Friend Module modSWMMFromMW
                     'make sure coordinates correspond with downstream end
                     lConduit.OutletNode.XPos = lNode.XPos
                     lConduit.OutletNode.YPos = lNode.YPos
+                End If
+            Else
+                'use nodes from shapefile 
+                Dim lInletNode As String = ""
+                If lInletNodeFieldIndex > -1 Then
+                    lInletNode = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInletNodeFieldIndex)
+                End If
+                If aSWMMProject.Nodes.Contains(lInletNode) Then
+                    lConduit.InletNode = aSWMMProject.Nodes(lInletNode)
+                End If
+
+                Dim lOutletNode As String = ""
+                If lOutletNodeFieldIndex > -1 Then
+                    lOutletNode = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutletNodeFieldIndex)
+                End If
+                If aSWMMProject.Nodes.Contains(lOutletNode) Then
+                    lConduit.OutletNode = aSWMMProject.Nodes(lOutletNode)
                 End If
             End If
 
