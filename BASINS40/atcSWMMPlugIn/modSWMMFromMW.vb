@@ -6,84 +6,38 @@ Imports atcUtility
 
 Friend Module modSWMMFromMW
 
-    Public Function CreateCatchmentsFromShapefile(ByVal aCatchmentSpecs As CatchmentShapefileSpecs, _
-                                                  ByVal aSWMMProject As SWMMProject, _
-                                                  ByRef aCatchments As Catchments) As Boolean
+    Public Function CompleteCatchmentsFromShapefile(ByVal aCatchmentShapefileName As String, _
+                                                    ByVal aSWMMProject As SWMMProject, _
+                                                    ByRef aCatchments As Catchments) As Boolean
 
-        aCatchments.Clear()
-        If Not GisUtil.IsLayerByFileName(aCatchmentSpecs.ShapefileName) Then
-            GisUtil.AddLayer(aCatchmentSpecs.ShapefileName, "Catchments")
+        If Not GisUtil.IsLayerByFileName(aCatchmentShapefileName) Then
+            GisUtil.AddLayer(aCatchmentShapefileName, "Catchments")
         End If
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aCatchmentSpecs.ShapefileName)
-        Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.SubbasinFieldName)
-        Dim lSlopeFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.SlopeFieldName)
-
-        'this field normally exists when using a nodes shapefile
-        Dim lOutletNodeFieldIndex As Integer = -1
-        If aCatchmentSpecs.OutletNodeFieldName.Length > 0 Then lOutletNodeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.OutletNodeFieldName)
-
-        'these fields may exist for some users
-        Dim lWidthFieldIndex As Integer = -1
-        If aCatchmentSpecs.WidthFieldName.Length > 0 Then lWidthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.WidthFieldName)
-        Dim lCurbLengthFieldIndex As Integer = -1
-        If aCatchmentSpecs.CurbLengthFieldName.Length > 0 Then lCurbLengthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.CurbLengthFieldName)
-        Dim lSnowPackNameFieldIndex As Integer = -1
-        If aCatchmentSpecs.SnowPackNameFieldName.Length > 0 Then lSnowPackNameFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.SnowPackNameFieldName)
-        Dim lManningsNImpervFieldIndex As Integer = -1
-        If aCatchmentSpecs.ManningsNImpervFieldName.Length > 0 Then lManningsNImpervFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.ManningsNImpervFieldName)
-        Dim lManningsNPervFieldIndex As Integer = -1
-        If aCatchmentSpecs.ManningsNPervFieldName.Length > 0 Then lManningsNPervFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.ManningsNPervFieldName)
-        Dim lDepressionStorageImpervFieldIndex As Integer = -1
-        If aCatchmentSpecs.DepressionStorageImpervFieldName.Length > 0 Then lDepressionStorageImpervFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.DepressionStorageImpervFieldName)
-        Dim lDepressionStoragePervFieldIndex As Integer = -1
-        If aCatchmentSpecs.DepressionStoragePervFieldName.Length > 0 Then lDepressionStoragePervFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.DepressionStoragePervFieldName)
-        Dim lPercentZeroStorageFieldIndex As Integer = -1
-        If aCatchmentSpecs.PercentZeroStorageFieldName.Length > 0 Then lPercentZeroStorageFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.PercentZeroStorageFieldName)
-        Dim lRouteToFieldIndex As Integer = -1
-        If aCatchmentSpecs.RouteToFieldName.Length > 0 Then lRouteToFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.RouteToFieldName)
-        Dim lPercentRoutedFieldIndex As Integer = -1
-        If aCatchmentSpecs.PercentRoutedFieldName.Length > 0 Then lPercentRoutedFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.PercentRoutedFieldName)
-        Dim lMaxInfiltRateFieldIndex As Integer = -1
-        If aCatchmentSpecs.MaxInfiltRateFieldName.Length > 0 Then lMaxInfiltRateFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.MaxInfiltRateFieldName)
-        Dim lMinInfiltRateFieldIndex As Integer = -1
-        If aCatchmentSpecs.MinInfiltRateFieldName.Length > 0 Then lMinInfiltRateFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.MinInfiltRateFieldName)
-        Dim lDecayRateConstantFieldIndex As Integer = -1
-        If aCatchmentSpecs.DecayRateConstantFieldName.Length > 0 Then lDecayRateConstantFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.DecayRateConstantFieldName)
-        Dim lDryTimeFieldIndex As Integer = -1
-        If aCatchmentSpecs.DryTimeFieldName.Length > 0 Then lDryTimeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.DryTimeFieldName)
-        Dim lMaxInfiltVolumeFieldIndex As Integer = -1
-        If aCatchmentSpecs.MaxInfiltVolumeFieldName.Length > 0 Then lMaxInfiltVolumeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.MaxInfiltVolumeFieldName)
-        Dim lSuctionFieldIndex As Integer = -1
-        If aCatchmentSpecs.SuctionFieldName.Length > 0 Then lSuctionFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.SuctionFieldName)
-        Dim lConductivityFieldIndex As Integer = -1
-        If aCatchmentSpecs.ConductivityFieldName.Length > 0 Then lConductivityFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.ConductivityFieldName)
-        Dim lInitialDeficitFieldIndex As Integer = -1
-        If aCatchmentSpecs.InitialDeficitFieldName.Length > 0 Then lInitialDeficitFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.InitialDeficitFieldName)
-        Dim lCurveNumberFieldIndex As Integer = -1
-        If aCatchmentSpecs.CurveNumberFieldName.Length > 0 Then lCurveNumberFieldIndex = GisUtil.FieldIndex(lLayerIndex, aCatchmentSpecs.CurveNumberFieldName)
-
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aCatchmentShapefileName)
+        
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lCatchment As New Catchment
-            Dim lSubbasinID As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-            lCatchment.Name = "S" & lSubbasinID
+            Dim lCatchment As Catchment = aCatchments(lFeatureIndex)
+
+            If lCatchment.Name.Length = 0 Then
+                lCatchment.Name = CStr(lFeatureIndex + 1)
+            Else
+                lCatchment.Name = lCatchment.Name
+            End If
+
             If aSWMMProject.RainGages.Count > 0 Then
                 'assign each catchment to the first raingage for now
                 lCatchment.RainGage = aSWMMProject.RainGages(0)
             End If
 
             'find associated outlet node
-            Dim lOutletNode As String = ""
-            If lOutletNodeFieldIndex > -1 Then
-                lOutletNode = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutletNodeFieldIndex)
-            End If
-            If aSWMMProject.Nodes.Contains(lOutletNode) Then
-                lCatchment.OutletNode = aSWMMProject.Nodes(lOutletNode)
+            If aSWMMProject.Nodes.Contains(lCatchment.OutletNodeID) Then
+                lCatchment.OutletNode = aSWMMProject.Nodes(lCatchment.OutletNodeID)
             End If
 
             If lCatchment.OutletNode Is Nothing Then
                 'find node through associated conduit
                 For Each lConduit As Conduit In aSWMMProject.Conduits
-                    If lConduit.Name.Substring(1) = lSubbasinID Then
+                    If lConduit.Name.Substring(1) = lCatchment.Name Then
                         lCatchment.OutletNode = lConduit.OutletNode
                         Exit For
                     End If
@@ -93,203 +47,49 @@ Friend Module modSWMMFromMW
             lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
             'lCatchment.PercentImpervious()  'this is computed later
             lCatchment.Width = Math.Sqrt(lCatchment.Area * 43560)
-            If lSlopeFieldIndex > 0 Then
-                lCatchment.Slope = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSlopeFieldIndex)
-            End If
-            If lWidthFieldIndex > -1 Then
-                lCatchment.Width = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lWidthFieldIndex)
-            End If
-            If lCurbLengthFieldIndex > -1 Then
-                lCatchment.CurbLength = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lCurbLengthFieldIndex)
-            End If
-            If lSnowPackNameFieldIndex > -1 Then
-                lCatchment.SnowPackName = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSnowPackNameFieldIndex)
-            End If
-            If lManningsNImpervFieldIndex > -1 Then
-                lCatchment.ManningsNImperv = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lManningsNImpervFieldIndex)
-            End If
-            If lManningsNPervFieldIndex > -1 Then
-                lCatchment.ManningsNPerv = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lManningsNPervFieldIndex)
-            End If
-            If lDepressionStorageImpervFieldIndex > -1 Then
-                lCatchment.DepressionStorageImperv = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDepressionStorageImpervFieldIndex)
-            End If
-            If lDepressionStoragePervFieldIndex > -1 Then
-                lCatchment.DepressionStoragePerv = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDepressionStoragePervFieldIndex)
-            End If
-            If lPercentZeroStorageFieldIndex > -1 Then
-                lCatchment.PercentZeroStorage = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lPercentZeroStorageFieldIndex)
-            End If
-            If lRouteToFieldIndex > -1 Then
-                lCatchment.RouteTo = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lRouteToFieldIndex)
-            End If
-            If lPercentRoutedFieldIndex > -1 Then
-                lCatchment.PercentRouted = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lPercentRoutedFieldIndex)
-            End If
-            If lMaxInfiltRateFieldIndex > -1 Then
-                lCatchment.MaxInfiltRate = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMaxInfiltRateFieldIndex)
-            End If
-            If lMinInfiltRateFieldIndex > -1 Then
-                lCatchment.MinInfiltRate = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMinInfiltRateFieldIndex)
-            End If
-            If lDecayRateConstantFieldIndex > -1 Then
-                lCatchment.DecayRateConstant = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDecayRateConstantFieldIndex)
-            End If
-            If lDryTimeFieldIndex > -1 Then
-                lCatchment.DryTime = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDryTimeFieldIndex)
-            End If
-            If lMaxInfiltVolumeFieldIndex > -1 Then
-                lCatchment.MaxInfiltVolume = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMaxInfiltVolumeFieldIndex)
-            End If
-            If lSuctionFieldIndex > -1 Then
-                lCatchment.Suction = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSuctionFieldIndex)
-            End If
-            If lConductivityFieldIndex > -1 Then
-                lCatchment.Conductivity = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lConductivityFieldIndex)
-            End If
-            If lInitialDeficitFieldIndex > -1 Then
-                lCatchment.InitialDeficit = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInitialDeficitFieldIndex)
-            End If
-            If lCurveNumberFieldIndex > -1 Then
-                lCatchment.CurveNumber = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lCurveNumberFieldIndex)
-            End If
+
+            lCatchment.Name = "C" & lCatchment.Name
 
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lCatchment.X, lCatchment.Y)
             aCatchments.Add(lCatchment)
         Next
     End Function
 
-    Public Function CreateConduitsFromShapefile(ByVal aConduitSpecs As ConduitShapefileSpecs, _
-                                                ByVal aSWMMProject As SWMMProject, _
-                                                ByRef aConduits As Conduits) As Boolean
-        aConduits.Clear()
+    Public Function CompleteConduitsFromShapefile(ByVal aConduitShapefilename As String, _
+                                                  ByVal aSWMMProject As SWMMProject, _
+                                                  ByRef aConduits As Conduits) As Boolean
 
-        If Not GisUtil.IsLayerByFileName(aConduitSpecs.ShapefileName) Then
-            GisUtil.AddLayer(aConduitSpecs.ShapefileName, "Conduits")
+        Dim lNeedNodes As Boolean = False
+        If aSWMMProject.Nodes.Count = 0 Then
+            lNeedNodes = True
         End If
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aConduitSpecs.ShapefileName)
 
-        'these fields normally exist when using a basins delineation
-        Dim lSubbasinFieldIndex As Integer = -1
-        If aConduitSpecs.SubbasinFieldName.Length > 0 Then lSubbasinFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.SubbasinFieldName)
-        Dim lDownSubbasinFieldIndex As Integer = -1
-        If aConduitSpecs.DownSubbasinFieldName.Length > 0 Then lDownSubbasinFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.DownSubbasinFieldName)
-        Dim lElevHighFieldIndex As Integer = -1
-        If aConduitSpecs.ElevHighFieldName.Length > 0 Then lElevHighFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.ElevHighFieldName)
-        Dim lElevLowFieldIndex As Integer = -1
-        If aConduitSpecs.ElevLowFieldName.Length > 0 Then lElevLowFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.ElevLowFieldName)
-        Dim lMeanWidthFieldIndex As Integer = -1
-        If aConduitSpecs.MeanWidthFieldName.Length > 0 Then lMeanWidthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.MeanWidthFieldName)
-        Dim lMeanDepthFieldIndex As Integer = -1
-        If aConduitSpecs.MeanDepthFieldName.Length > 0 Then lMeanDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.MeanDepthFieldName)
+        If Not GisUtil.IsLayerByFileName(aConduitShapefilename) Then
+            GisUtil.AddLayer(aConduitShapefilename, "Conduits")
+        End If
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aConduitShapefilename)
 
-        'these fields normally exist when using a nodes shapefile
-        Dim lInletNodeFieldIndex As Integer = -1
-        If aConduitSpecs.InletNodeFieldName.Length > 0 Then lInletNodeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.InletNodeFieldName)
-        Dim lOutletNodeFieldIndex As Integer = -1
-        If aConduitSpecs.OutletNodeFieldName.Length > 0 Then lOutletNodeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.OutletNodeFieldName)
-
-        'these fields may exist for some users
-        Dim lManningsNFieldIndex As Integer = -1
-        If aConduitSpecs.ManningsNFieldName.Length > 0 Then lManningsNFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.ManningsNFieldName)
-        Dim lInletOffsetFieldIndex As Integer = -1
-        If aConduitSpecs.InletOffsetFieldName.Length > 0 Then lInletOffsetFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.InletOffsetFieldName)
-        Dim lOutletOffsetFieldIndex As Integer = -1
-        If aConduitSpecs.OutletOffsetFieldName.Length > 0 Then lOutletOffsetFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.OutletOffsetFieldName)
-        Dim lInitialFlowFieldIndex As Integer = -1
-        If aConduitSpecs.InitialFlowFieldName.Length > 0 Then lInitialFlowFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.InitialFlowFieldName)
-        Dim lMaxFlowFieldIndex As Integer = -1
-        If aConduitSpecs.MaxFlowFieldName.Length > 0 Then lMaxFlowFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.MaxFlowFieldName)
-        Dim lShapeFieldIndex As Integer = -1
-        If aConduitSpecs.ShapeFieldName.Length > 0 Then lShapeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.ShapeFieldName)
-        Dim lGeometry1FieldIndex As Integer = -1
-        If aConduitSpecs.Geometry1FieldName.Length > 0 Then lGeometry1FieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.Geometry1FieldName)
-        Dim lGeometry2FieldIndex As Integer = -1
-        If aConduitSpecs.Geometry2FieldName.Length > 0 Then lGeometry2FieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.Geometry2FieldName)
-        Dim lGeometry3FieldIndex As Integer = -1
-        If aConduitSpecs.Geometry3FieldName.Length > 0 Then lGeometry3FieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.Geometry3FieldName)
-        Dim lGeometry4FieldIndex As Integer = -1
-        If aConduitSpecs.Geometry4FieldName.Length > 0 Then lGeometry4FieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.Geometry4FieldName)
-        Dim lNumBarrelsFieldIndex As Integer = -1
-        If aConduitSpecs.NumBarrelsFieldName.Length > 0 Then lNumBarrelsFieldIndex = GisUtil.FieldIndex(lLayerIndex, aConduitSpecs.NumBarrelsFieldName)
-
-        'create all conduits
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lConduit As New Conduit
-            If lSubbasinFieldIndex > -1 Then
-                lConduit.Name = "C" & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-            Else
-                lConduit.Name = "C" & CStr(lFeatureIndex + 1)
-            End If
+            Dim lConduit As Conduit = aConduits(lFeatureIndex)
 
+            'calculate the actual feature length
             lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex) * 3.281 'need to convert meters to feet
 
-            If lManningsNFieldIndex > -1 Then
-                lConduit.ManningsN = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lManningsNFieldIndex)
+            If lConduit.Geometry1 < 0 Then
+                lConduit.Geometry1 = lConduit.MeanDepth * 1.25 'full height = mean depth * 1.25
             End If
-            If lInletOffsetFieldIndex > -1 Then
-                lConduit.InletOffset = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInletOffsetFieldIndex)
-            End If
-            If lOutletOffsetFieldIndex > -1 Then
-                lConduit.OutletOffset = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutletOffsetFieldIndex)
-            End If
-            If lInitialFlowFieldIndex > -1 Then
-                lConduit.InitialFlow = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInitialFlowFieldIndex)
-            End If
-            If lMaxFlowFieldIndex > -1 Then
-                lConduit.MaxFlow = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMaxFlowFieldIndex)
-            End If
-            If lShapeFieldIndex > -1 Then
-                lConduit.Shape = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lShapeFieldIndex)
-            End If
-            If lNumBarrelsFieldIndex > -1 Then
-                lConduit.NumBarrels = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lNumBarrelsFieldIndex)
+            If lConduit.Geometry2 < 0 Then
+                lConduit.Geometry2 = lConduit.MeanWidth - (lConduit.MeanDepth / lConduit.Geometry3) - (lConduit.MeanDepth / lConduit.Geometry4) 'base width
             End If
 
-            Dim lMeanDepth As Double = 0.0
-            If lMeanDepthFieldIndex > -1 Then
-                lMeanDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanDepthFieldIndex)
-            End If
-            Dim lMeanWidth As Double = 0.0
-            If lMeanWidthFieldIndex > -1 Then
-                lMeanWidth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMeanWidthFieldIndex)
-            End If
-
-            lConduit.Geometry3 = 1.0 'left slope
-            lConduit.Geometry4 = 1.0 'right slope
-            lConduit.Geometry1 = lMeanDepth * 1.25 'full height = mean depth * 1.25
-            lConduit.Geometry2 = lMeanWidth - (lMeanDepth / lConduit.Geometry3) - (lMeanDepth / lConduit.Geometry4) 'base width
-
-            If lGeometry1FieldIndex > -1 Then
-                lConduit.Geometry1 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry1FieldIndex)
-            End If
-            If lGeometry2FieldIndex > -1 Then
-                lConduit.Geometry2 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry2FieldIndex)
-            End If
-            If lGeometry3FieldIndex > -1 Then
-                lConduit.Geometry3 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry3FieldIndex)
-            End If
-            If lGeometry4FieldIndex > -1 Then
-                lConduit.Geometry4 = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGeometry4FieldIndex)
-            End If
-
-            If aConduitSpecs.CreateNodes Then
+            If lNeedNodes Then
                 'nodes not specified, create them at end points of conduits
-                Dim lElevHigh As Double = 0.0
-                If lElevHighFieldIndex > -1 Then
-                    lElevHigh = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevHighFieldIndex)
-                End If
 
-                Dim lElevLow As Double = 0.0
-                If lElevLowFieldIndex > -1 Then
-                    lElevLow = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lElevLowFieldIndex)
-                End If
-
-                If lElevHigh < lElevLow Then
+                If lConduit.ElevationHigh < lConduit.ElevationLow Then
                     'something is wrong, switch places
-                    Dim lTemp As Double = lElevHigh
-                    lElevHigh = lElevLow
-                    lElevLow = lTemp
+                    Dim lTemp As Double = lConduit.ElevationHigh
+                    lConduit.ElevationHigh = lConduit.ElevationLow
+                    lConduit.ElevationLow = lTemp
                 End If
 
                 Dim lXup As Double
@@ -301,15 +101,12 @@ Friend Module modSWMMFromMW
 
                 'create node at upstream end
                 Dim lUpNode As New Node
-                Dim lSubID As String
-                If lSubbasinFieldIndex > -1 Then
-                    lSubID = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSubbasinFieldIndex)
-                Else
-                    lSubID = CStr(lFeatureIndex + 1)
+                If lConduit.Name.Length = 0 Then
+                    lConduit.Name = CStr(lFeatureIndex + 1)
                 End If
-                lUpNode.Name = "J" & lSubID
+                lUpNode.Name = "J" & lConduit.Name
                 lUpNode.Type = "JUNCTION"
-                lUpNode.InvertElevation = lElevHigh
+                lUpNode.InvertElevation = lConduit.ElevationHigh
                 lUpNode.XPos = lXup
                 lUpNode.YPos = lYup
                 If Not aSWMMProject.Nodes.Contains(lUpNode.Name) Then
@@ -321,20 +118,14 @@ Friend Module modSWMMFromMW
 
                 'create node at downstream end
                 Dim lNode As New Node
-                Dim lDownID As String
-                If lDownSubbasinFieldIndex > -1 Then
-                    lDownID = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lDownSubbasinFieldIndex)
-                Else
-                    lDownID = CStr(lFeatureIndex + 1)
-                End If
-                If CInt(lDownID) > 0 Then
-                    lNode.Name = "J" & lDownID
+                If lConduit.DownConduitID.Length > 0 Then
+                    lNode.Name = "J" & lConduit.DownConduitID
                     lNode.Type = "JUNCTION"
                 Else
                     lNode.Name = "O1"
                     lNode.Type = "OUTFALL"
                 End If
-                lNode.InvertElevation = lElevLow
+                lNode.InvertElevation = lConduit.ElevationLow
                 lNode.XPos = lXdown
                 lNode.YPos = lYdown
                 If Not aSWMMProject.Nodes.Contains(lNode.Name) Then
@@ -348,26 +139,24 @@ Friend Module modSWMMFromMW
                 End If
             Else
                 'use nodes from shapefile 
-                Dim lInletNode As String = ""
-                If lInletNodeFieldIndex > -1 Then
-                    lInletNode = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInletNodeFieldIndex)
-                End If
-                If aSWMMProject.Nodes.Contains(lInletNode) Then
-                    lConduit.InletNode = aSWMMProject.Nodes(lInletNode)
+                If aSWMMProject.Nodes.Contains(lConduit.InletNodeName) Then
+                    lConduit.InletNode = aSWMMProject.Nodes(lConduit.InletNodeName)
                 End If
 
-                Dim lOutletNode As String = ""
-                If lOutletNodeFieldIndex > -1 Then
-                    lOutletNode = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutletNodeFieldIndex)
-                End If
-                If aSWMMProject.Nodes.Contains(lOutletNode) Then
-                    lConduit.OutletNode = aSWMMProject.Nodes(lOutletNode)
+                If aSWMMProject.Nodes.Contains(lConduit.OutletNodeName) Then
+                    lConduit.OutletNode = aSWMMProject.Nodes(lConduit.OutletNodeName)
                 End If
             End If
 
-            GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lConduit.X, lConduit.Y)
+            'if it doesnt have a name yet, assign it one
+            If lConduit.Name.Length = 0 Then
+                lConduit.Name = "C" & CStr(lFeatureIndex + 1)
+            Else
+                lConduit.Name = "C" & lConduit.Name
+            End If
 
-            aConduits.Add(lConduit)
+            'find the coordinates
+            GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lConduit.X, lConduit.Y)
         Next
 
     End Function
@@ -375,20 +164,22 @@ Friend Module modSWMMFromMW
     Public Function CompleteNodesFromShapefile(ByVal aNodeShapefileName As String, _
                                                ByRef aNodes As Nodes) As Boolean
 
-        If Not GisUtil.IsLayerByFileName(aNodeShapefileName) Then
-            GisUtil.AddLayer(aNodeShapefileName, "Nodes")
-        End If
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aNodeShapefileName)
-
-        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lNode As Node = aNodes(lFeatureIndex)
-            'if it doesnt have a name yet, assign it one
-            If lNode.Name.Length = 0 Then
-                lNode.Name = "N" & CInt(lFeatureIndex)
+        If aNodes.Count > 0 Then
+            If Not GisUtil.IsLayerByFileName(aNodeShapefileName) Then
+                GisUtil.AddLayer(aNodeShapefileName, "Nodes")
             End If
-            'find the coordinates
-            GisUtil.PointXY(lLayerIndex, lFeatureIndex, lNode.XPos, lNode.YPos)
-        Next
+            Dim lLayerIndex As Integer = GisUtil.LayerIndex(aNodeShapefileName)
+
+            For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+                Dim lNode As Node = aNodes(lFeatureIndex)
+                'if it doesnt have a name yet, assign it one
+                If lNode.Name.Length = 0 Then
+                    lNode.Name = "N" & CInt(lFeatureIndex)
+                End If
+                'find the coordinates
+                GisUtil.PointXY(lLayerIndex, lFeatureIndex, lNode.XPos, lNode.YPos)
+            Next
+        End If
 
     End Function
 

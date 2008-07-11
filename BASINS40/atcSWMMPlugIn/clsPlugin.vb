@@ -41,14 +41,6 @@ Public Class PlugIn
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = ModelsMenuName & "_SWMM" Then
-            Dim lTable As New atcUtility.atcTableDBF
-            If lTable.OpenFile("D:\BASINS\data\nodes.dbf") Then
-                Dim lFieldMap As New atcUtility.atcCollection
-                lFieldMap.Add("Name", "ID")
-                lFieldMap.Add("Type", "Type")
-                pSWMMProject.Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lFieldMap))
-            End If
-
             Dim lfrmSWMMSetup As New frmSWMMSetup
             lfrmSWMMSetup.InitializeUI(Me)
             lfrmSWMMSetup.Show()

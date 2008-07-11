@@ -58,7 +58,6 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="atcSWMMShapefileSpecs.vb" />
     <Compile Include="clsPlugin.vb" />
     <Compile Include="frmSWMMSetup.vb">
       <SubType>Form</SubType>

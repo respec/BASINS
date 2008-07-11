@@ -13,6 +13,12 @@ Public Class Catchments
 
     Public SWMMProject As SWMMProject
 
+    Public Sub AddRange(ByVal aEnumerable As IEnumerable)
+        For Each lCatchment As Catchment In aEnumerable
+            Me.Add(lCatchment)
+        Next
+    End Sub
+
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
 
@@ -185,6 +191,7 @@ Public Class Catchment
     Public Name As String
     Public RainGage As RainGage
     Public OutletNode As Node
+    Public OutletNodeID As String
     Public Area As Double = 0.0 'in acres or hectares
     Public PercentImpervious As Double = 0.0
     Public Width As Double = 0.0 'in feet or meters
