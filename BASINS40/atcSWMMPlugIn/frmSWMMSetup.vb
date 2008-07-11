@@ -170,16 +170,21 @@ Public Class frmSWMMSetup
             CreateMetConstituent(lMetWDMFileName, "MD189070", "PEVT", .MetConstituents)
 
             'prepare the shapefile specs to test
-            Dim lNodeSpecs As New NodeShapefileSpecs
             Dim lConduitSpecs As New ConduitShapefileSpecs
             Dim lCatchmentSpecs As New CatchmentShapefileSpecs
-            'FillSpecsForBASINSTest(lNodeSpecs, lConduitSpecs, lCatchmentSpecs)
-            FillSpecsForGenericTest(lNodeSpecs, lConduitSpecs, lCatchmentSpecs)
+            'FillSpecsForBASINSTest(lConduitSpecs, lCatchmentSpecs)
+            FillSpecsForGenericTest(lConduitSpecs, lCatchmentSpecs)
 
             'populate the SWMM classes from the shapefiles
-            If lNodeSpecs.ShapefileName.Length > 0 Then
-                CreateNodesFromShapefile(lNodeSpecs, .Nodes)
+            Dim lFieldMap As New atcUtility.atcCollection
+            lFieldMap.Add("Name", "ID")
+            lFieldMap.Add("Type", "Type")
+            Dim lNodesShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\nodes.shp"
+            Dim lTable As New atcUtility.atcTableDBF
+            If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
+                .Nodes.AddRange(Populate(lTable, New atcSWMM.Node, lFieldMap))
             End If
+            CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
             CreateConduitsFromShapefile(lConduitSpecs, pPlugIn.SWMMProject, .Conduits)
             CreateCatchmentsFromShapefile(lCatchmentSpecs, pPlugIn.SWMMProject, .Catchments)
 
@@ -218,7 +223,7 @@ Public Class frmSWMMSetup
         End If
     End Sub
 
-    Private Sub FillSpecsForBASINSTest(ByRef aNodeSpecs As NodeShapefileSpecs, ByRef aConduitSpecs As ConduitShapefileSpecs, ByRef aCatchmentSpecs As CatchmentShapefileSpecs)
+    Private Sub FillSpecsForBASINSTest(ByRef aConduitSpecs As ConduitShapefileSpecs, ByRef aCatchmentSpecs As CatchmentShapefileSpecs)
 
         'prepare a test assuming the user has the typical files from a BASINS delineation
         Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
@@ -267,23 +272,10 @@ Public Class frmSWMMSetup
         aCatchmentSpecs.CurveNumberFieldName = ""
     End Sub
 
-    Private Sub FillSpecsForGenericTest(ByRef aNodeSpecs As NodeShapefileSpecs, ByRef aConduitSpecs As ConduitShapefileSpecs, ByRef aCatchmentSpecs As CatchmentShapefileSpecs)
+    Private Sub FillSpecsForGenericTest(ByRef aConduitSpecs As ConduitShapefileSpecs, ByRef aCatchmentSpecs As CatchmentShapefileSpecs)
 
         'prepare a test assuming the user has the generic storm sewer shapefiles
         Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-
-        'create nodes from streams shapefile 
-        aNodeSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\nodes.shp"
-        aNodeSpecs.NameFieldName = "ID"
-        aNodeSpecs.TypeFieldName = "Type"
-        aNodeSpecs.InvertElevationFieldName = ""
-        aNodeSpecs.MaxDepthFieldName = ""
-        aNodeSpecs.InitDepthFieldName = ""
-        aNodeSpecs.SurchargeDepthFieldName = ""
-        aNodeSpecs.PondedAreaFieldName = ""
-        aNodeSpecs.OutfallTypeFieldName = ""
-        aNodeSpecs.StageTableFieldName = ""
-        aNodeSpecs.TideGateFieldName = ""
 
         aConduitSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\conduits.shp"
         aConduitSpecs.InletNodeFieldName = "InNodeID"

@@ -372,79 +372,22 @@ Friend Module modSWMMFromMW
 
     End Function
 
-    Public Function CreateNodesFromShapefile(ByVal aNodeSpecs As NodeShapefileSpecs, _
-                                             ByRef aNodes As Nodes) As Boolean
+    Public Function CompleteNodesFromShapefile(ByVal aNodeShapefileName As String, _
+                                               ByRef aNodes As Nodes) As Boolean
 
-        aNodes.Clear()
-
-        If Not GisUtil.IsLayerByFileName(aNodeSpecs.ShapefileName) Then
-            GisUtil.AddLayer(aNodeSpecs.ShapefileName, "Nodes")
+        If Not GisUtil.IsLayerByFileName(aNodeShapefileName) Then
+            GisUtil.AddLayer(aNodeShapefileName, "Nodes")
         End If
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aNodeSpecs.ShapefileName)
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aNodeShapefileName)
 
-        Dim lNameFieldIndex As Integer = -1
-        If aNodeSpecs.NameFieldName.Length > 0 Then lNameFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.NameFieldName)
-        Dim lTypeFieldIndex As Integer = -1
-        If aNodeSpecs.TypeFieldName.Length > 0 Then lTypeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.TypeFieldName)
-        Dim lInvertElevationFieldIndex As Integer = -1
-        If aNodeSpecs.InvertElevationFieldName.Length > 0 Then lInvertElevationFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.InvertElevationFieldName)
-        Dim lMaxDepthFieldIndex As Integer = -1
-        If aNodeSpecs.MaxDepthFieldName.Length > 0 Then lMaxDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.MaxDepthFieldName)
-        Dim lInitDepthFieldIndex As Integer = -1
-        If aNodeSpecs.InitDepthFieldName.Length > 0 Then lInitDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.InitDepthFieldName)
-        Dim lSurchargeDepthFieldIndex As Integer = -1
-        If aNodeSpecs.SurchargeDepthFieldName.Length > 0 Then lSurchargeDepthFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.SurchargeDepthFieldName)
-        Dim lPondedAreaFieldIndex As Integer = -1
-        If aNodeSpecs.PondedAreaFieldName.Length > 0 Then lPondedAreaFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.PondedAreaFieldName)
-        Dim lOutfallTypeFieldIndex As Integer = -1
-        If aNodeSpecs.OutfallTypeFieldName.Length > 0 Then lOutfallTypeFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.OutfallTypeFieldName)
-        Dim lStageTableFieldIndex As Integer = -1
-        If aNodeSpecs.StageTableFieldName.Length > 0 Then lStageTableFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.StageTableFieldName)
-        Dim lTideGateFieldIndex As Integer = -1
-        If aNodeSpecs.TideGateFieldName.Length > 0 Then lTideGateFieldIndex = GisUtil.FieldIndex(lLayerIndex, aNodeSpecs.TideGateFieldName)
-
-        'create all nodes
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lNode As New Node
-
-            If lNameFieldIndex > -1 Then
-                lNode.Name = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lNameFieldIndex)
-            End If
+            Dim lNode As Node = aNodes(lFeatureIndex)
+            'if it doesnt have a name yet, assign it one
             If lNode.Name.Length = 0 Then
                 lNode.Name = "N" & CInt(lFeatureIndex)
             End If
-
-            If lTypeFieldIndex > -1 Then
-                lNode.Type = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lTypeFieldIndex)
-            End If
-            If lInvertElevationFieldIndex > 0 Then
-                lNode.InvertElevation = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInvertElevationFieldIndex)
-            End If
-            If lMaxDepthFieldIndex > -1 Then
-                lNode.MaxDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lMaxDepthFieldIndex)
-            End If
-            If lInitDepthFieldIndex > -1 Then
-                lNode.InitDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lInitDepthFieldIndex)
-            End If
-            If lSurchargeDepthFieldIndex > -1 Then
-                lNode.SurchargeDepth = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lSurchargeDepthFieldIndex)
-            End If
-            If lPondedAreaFieldIndex > -1 Then
-                lNode.PondedArea = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lPondedAreaFieldIndex)
-            End If
-            If lOutfallTypeFieldIndex > -1 Then
-                lNode.OutfallType = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lOutfallTypeFieldIndex)
-            End If
-            If lStageTableFieldIndex > -1 Then
-                lNode.StageTable = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lStageTableFieldIndex)
-            End If
-            If lTideGateFieldIndex > -1 Then
-                lNode.TideGate = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lTideGateFieldIndex)
-            End If
-
+            'find the coordinates
             GisUtil.PointXY(lLayerIndex, lFeatureIndex, lNode.XPos, lNode.YPos)
-
-            aNodes.Add(lNode)
         Next
 
     End Function

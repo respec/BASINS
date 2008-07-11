@@ -48,16 +48,4 @@ Public Class CatchmentShapefileSpecs
     Public CurveNumberFieldName As String = ""
 End Class
 
-Public Class NodeShapefileSpecs
-    Public ShapefileName As String = ""
-    Public NameFieldName As String = ""
-    Public TypeFieldName As String = ""
-    Public InvertElevationFieldName As String = ""
-    Public MaxDepthFieldName As String = ""
-    Public InitDepthFieldName As String = ""
-    Public SurchargeDepthFieldName As String = ""
-    Public PondedAreaFieldName As String = ""
-    Public OutfallTypeFieldName As String = ""
-    Public StageTableFieldName As String = ""
-    Public TideGateFieldName As String = ""
-End Class
+
