@@ -22,7 +22,7 @@ Public Class frmArgs
             Select Case aArgs.Keys(lArgIndex).GetType.Name
                 Case "String"
                     Dim lKey As String = aArgs.Keys(lArgIndex)
-                    Dim lArgValue As Object = aArgs.ItemByIndex(lArgIndex)
+                    Dim lArgValue As Object = GetSetting("BASINS4", aTitle, lKey, aArgs.ItemByIndex(lArgIndex))
                     If lKey.Substring(1, 1) = ":" Then
                         Select Case lKey.Substring(0, 1).ToUpper
                             Case "L" 'Just a label
@@ -31,27 +31,28 @@ Public Class frmArgs
                                 Dim lLabel As Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                                 If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
                                 lArgIndex += 1
-                                Me.AddTextbox(aArgs(lArgIndex).ToString, "txt" & lArgIndex)
+                                AddTextbox(aArgs(lArgIndex).ToString, "txt" & lArgIndex)
                             Case "C" 'Label and checkbox
                                 Dim lLabel As Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                                 If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
                                 lArgIndex += 1
-                                Me.AddCheckbox(aArgs(lArgIndex), "chk" & lArgIndex)
+                                AddCheckbox(aArgs(lArgIndex), "chk" & lArgIndex)
                             Case Else
                                 Stop
                         End Select
                     Else
                         Dim lLabel As Windows.Forms.Label = AddLabel(lKey, "lbl" & lArgIndex)
-                        Select Case lArgValue.GetType.Name
-                            Case "Boolean" : Me.AddCheckbox(lArgValue, "chk" & lArgIndex)
-                            Case Else : Me.AddTextbox(lArgValue, "txt" & lArgIndex)
+                        If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
+                        Select Case aArgs.ItemByIndex(lArgIndex).GetType.Name
+                            Case "Boolean" : AddCheckbox(lArgValue, "chk" & lArgIndex)
+                            Case Else : AddTextbox(lArgValue, "txt" & lArgIndex)
                         End Select
                     End If
             End Select
             lArgIndex += 1
         End While
 
-        Me.Width = (pLeftColumnWidth + pLeft) * 2 + pLeft
+        Me.Width = (pLeftColumnWidth + pLeft) * 4 + pLeft
 
         For Each lItem As Windows.Forms.Control In pRightColumnItems
             lItem.Left = pLeftColumnWidth + pLeft * 2
@@ -64,6 +65,7 @@ Public Class frmArgs
         If pOk Then
             lArgIndex = 0
             While lArgIndex < aArgs.Count
+                Dim lKey As String = aArgs.Keys(lArgIndex)
                 Select Case aArgs(lArgIndex).GetType.Name
                     'Case "String"
                     '    Dim lStr As String = aArgs(lArgIndex)
@@ -99,8 +101,8 @@ Public Class frmArgs
                     Case Else
                         Dim lTextbox As Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
                         aArgs.ItemByIndex(lArgIndex) = lTextbox.Text
-
                 End Select
+                SaveSetting("BASINS4", aTitle, lKey, aArgs.ItemByIndex(lArgIndex))
                 lArgIndex += 1
             End While
         End If
@@ -110,6 +112,7 @@ Public Class frmArgs
     Private Function AddLabel(ByVal aText As String, ByVal aName As String) As Windows.Forms.Label
         Dim lAddLabel As New Windows.Forms.Label
         With lAddLabel
+            .AutoSize = True
             .Text = aText
             .Name = aName
             .Top = pTop
@@ -127,7 +130,7 @@ Public Class frmArgs
             .Text = aText
             .Name = aName
             .Top = pTop - pRowHeight
-            .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
+            .Anchor = Windows.Forms.AnchorStyles.Top Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Right
             Me.Controls.Add(lAddTextbox)
             pRightColumnItems.Add(lAddTextbox)
         End With
@@ -140,7 +143,7 @@ Public Class frmArgs
             .Checked = aChecked
             .Name = aName
             .Top = pTop - pRowHeight
-            .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
+            .Anchor = Windows.Forms.AnchorStyles.Top Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Right
             Me.Controls.Add(lAddCheckbox)
             pRightColumnItems.Add(lAddCheckbox)
         End With
