@@ -20,6 +20,7 @@ Module SWATRunner
     Private pOutputSummarize As Boolean = True
     Private pInputSummarize As Boolean = True
     Private pCropChangeSummarize As Boolean = True
+    Private pChangeCropAreas As Boolean = True
     Private pRunModel As Boolean = True
     Private pScenario As String = "RevCrop"
     Private pDrive As String = "S:"
@@ -50,6 +51,7 @@ Module SWATRunner
                 .Add("UpdateMDB", pUpdateMDB)
                 .Add("OutputSummarize", pOutputSummarize)
                 .Add("InputSummarize", pInputSummarize)
+                .Add("ChangeCropAreas", pChangeCropAreas)
                 .Add("CropChangeSummarize", pCropChangeSummarize)
                 .Add("Scenario", pScenario)
                 .Add("Drive", pDrive)
@@ -72,6 +74,7 @@ Module SWATRunner
                     pOutputSummarize = .ItemByKey("OutputSummarize")
                     pInputSummarize = .ItemByKey("InputSummarize")
                     pCropChangeSummarize = .ItemByKey("CropChangeSummarize")
+                    pChangeCropAreas = .ItemByKey("ChangeCropAreas")
                     pScenario = .ItemByKey("Scenario")
                     pDrive = .ItemByKey("Drive")
                     pBaseFolder = .ItemByKey("BaseFolder")
@@ -111,15 +114,12 @@ Module SWATRunner
             Logger.Dbg("InitializeSwatInput")
             Dim lSwatInput As New SwatInput(pSWATGDB, lOutGDB, pBaseFolder, pScenario)
 
-            'Dim lCIOTable As DataTable = lSwatInput.CIO.Table
-
             If pUpdateMDB Then
                 If pStartYear > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", pStartYear)
                 If pNumYears > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", pNumYears)
+                lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
+                lSwatInput.CIO.PrintHru = False
             End If
-            'If pStartYear > 0 Then lCIOTable.Rows(0).Item("IYR") = pStartYear
-            'If pNumYears > 0 Then lCIOTable.Rows(0).Item("NBYR") = pNumYears
-            'lSwatInput.CIO.Save(lCIOTable)
 
             If pInputSummarize Then
                 SummarizeInput(lSwatInput)
@@ -157,9 +157,11 @@ Module SWATRunner
                 Next
             End If
 
-            If pUpdateMDB Then
+            If pChangeCropAreas Then
                 ChangeHRUfractions(lSwatInput, lCornConversions, lHruChangesFilename)
+            End If
 
+            If pUpdateMDB Then
                 If IO.File.Exists(pParmChangesTextfile) Then
                     Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
                     For Each lString As String In LinesInFile(pParmChangesTextfile)
