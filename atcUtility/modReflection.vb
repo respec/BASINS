@@ -556,45 +556,86 @@ Public Module modReflection
         Return Not pDontNeedTest.Contains(aMethodName)
     End Function
 
-    Public Sub ConnectObjects(ByRef aListOfObjects As ArrayList, _
-                              ByVal aIdFieldName As String, _
-                              ByVal aLinkIdFieldName As String, _
-                              ByVal aLinkFieldName As String)
-        If Not aListOfObjects Is Nothing AndAlso aListOfObjects.Count > 0 Then
-            Dim lType As Type = aListOfObjects(0).GetType
-            Dim lIDField As FieldInfo = Nothing
-            Dim lLinkIDField As FieldInfo = Nothing
-            Dim lLinkField As FieldInfo = Nothing
+    Public Function FieldNames(ByVal aType As Type, ByVal aDelimiter As String) As String
+        Dim lNames As String = ""
+        For Each lField As Reflection.FieldInfo In aType.GetFields()
+            lNames &= lField.Name & aDelimiter
+        Next
+        If lNames.Length > aDelimiter.Length Then 'Trim trailing delimiter
+            lNames = lNames.Substring(0, lNames.Length - aDelimiter.Length)
+        End If
+        Return lNames
+    End Function
 
-            For Each lField As Reflection.FieldInfo In lType.GetFields()
-                If lField.Name = aIdFieldName Then lIDField = lField
-                If lField.Name = aLinkFieldName Then lLinkField = lField
-                If lField.Name = aLinkIdFieldName Then lLinkField = lField
-            Next
+    Public Function FieldValues(ByVal aObject As Object, ByVal aDelimiter As String) As String
+        Dim lValues As String = ""
+        For Each lField As Reflection.FieldInfo In aObject.GetType.GetFields()
+            lValues &= lField.GetValue(aObject) & aDelimiter
+        Next
+        If lValues.Length > aDelimiter.Length Then 'Trim trailing delimiter
+            lValues = lValues.Substring(0, lValues.Length - aDelimiter.Length)
+        End If
+        Return lValues
+    End Function
 
-            If lIDField Is Nothing Then
-                Logger.Dbg("ConnectObjects: ID Field not found: " & aIdFieldName)
-            ElseIf lLinkField Is Nothing Then
-                Logger.Dbg("ConnectObjects: Link Field not found: " & aLinkFieldName)
-            ElseIf lLinkIDField Is Nothing Then
-                Logger.Dbg("ConnectObjects: Link ID Field not found: " & aLinkIdFieldName)
-            Else
-                Dim lNumLinked As Integer = 0
-                For Each lObject As Object In aListOfObjects
-                    Dim lLinkId As Object = lLinkIDField.GetValue(lObject)
-                    For lSearchListIndex As Integer = 0 To aListOfObjects.Count - 1
-                        Dim lSearchObject As Object = aListOfObjects.Item(lSearchListIndex)
-                        If lIDField.GetValue(lSearchObject) = lLinkId Then
-                            lLinkField.SetValue(lObject, lSearchObject)
-                            lNumLinked += 1
-                            Exit For
+    Public Sub NumberObjects(ByVal aObjects As ArrayList, ByVal aFieldToNumber As String, Optional ByVal aPrefix As String = "", Optional ByVal aStartIndex As Integer = 1)
+        If aObjects IsNot Nothing AndAlso aObjects.Count > 0 Then
+            Dim lType As Type = aObjects.Item(0).GetType
+            Dim lField As FieldInfo = lType.GetField(aFieldToNumber)
+            For Each lItem As Object In aObjects
+                Select Case Type.GetTypeCode(lField.FieldType)
+                    Case TypeCode.String
+                        Dim lValue As String = lField.GetValue(lItem)
+                        If lValue Is Nothing OrElse lValue.Length = 0 Then
+                            lField.SetValue(lItem, aPrefix & aStartIndex)
                         End If
-                    Next
-                    'lField.SetValue(aObject, CBool(lValue))
-                Next
-                Logger.Dbg("ConnectObjects linked " & lNumLinked & " of " & aListOfObjects.Count)
-            End If
+                    Case TypeCode.Int32 : lField.SetValue(lItem, aStartIndex)
+                    Case TypeCode.Int64 : lField.SetValue(lItem, CLng(aStartIndex))
+                End Select
+                aStartIndex += 1
+            Next
         End If
     End Sub
+
+    'Public Sub ConnectObjects(ByRef aListOfObjects As ArrayList, _
+    '                          ByVal aIdFieldName As String, _
+    '                          ByVal aLinkIdFieldName As String, _
+    '                          ByVal aLinkFieldName As String)
+    '    If Not aListOfObjects Is Nothing AndAlso aListOfObjects.Count > 0 Then
+    '        Dim lType As Type = aListOfObjects(0).GetType
+    '        Dim lIDField As FieldInfo = Nothing
+    '        Dim lLinkIDField As FieldInfo = Nothing
+    '        Dim lLinkField As FieldInfo = Nothing
+
+    '        For Each lField As Reflection.FieldInfo In lType.GetFields()
+    '            If lField.Name = aIdFieldName Then lIDField = lField
+    '            If lField.Name = aLinkFieldName Then lLinkField = lField
+    '            If lField.Name = aLinkIdFieldName Then lLinkField = lField
+    '        Next
+
+    '        If lIDField Is Nothing Then
+    '            Logger.Dbg("ConnectObjects: ID Field not found: " & aIdFieldName)
+    '        ElseIf lLinkField Is Nothing Then
+    '            Logger.Dbg("ConnectObjects: Link Field not found: " & aLinkFieldName)
+    '        ElseIf lLinkIDField Is Nothing Then
+    '            Logger.Dbg("ConnectObjects: Link ID Field not found: " & aLinkIdFieldName)
+    '        Else
+    '            Dim lNumLinked As Integer = 0
+    '            For Each lObject As Object In aListOfObjects
+    '                Dim lLinkId As Object = lLinkIDField.GetValue(lObject)
+    '                For lSearchListIndex As Integer = 0 To aListOfObjects.Count - 1
+    '                    Dim lSearchObject As Object = aListOfObjects.Item(lSearchListIndex)
+    '                    If lIDField.GetValue(lSearchObject) = lLinkId Then
+    '                        lLinkField.SetValue(lObject, lSearchObject)
+    '                        lNumLinked += 1
+    '                        Exit For
+    '                    End If
+    '                Next
+    '                'lField.SetValue(aObject, CBool(lValue))
+    '            Next
+    '            Logger.Dbg("ConnectObjects linked " & lNumLinked & " of " & aListOfObjects.Count)
+    '        End If
+    '    End If
+    'End Sub
 
 End Module
