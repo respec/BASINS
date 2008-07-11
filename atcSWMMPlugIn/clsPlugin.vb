@@ -46,7 +46,7 @@ Public Class PlugIn
                 Dim lFieldMap As New atcUtility.atcCollection
                 lFieldMap.Add("Name", "ID")
                 lFieldMap.Add("Type", "Type")
-                pSWMMProject.Nodes.AddRange(Populate(lTable, New atcSWMM.Node, lFieldMap))
+                pSWMMProject.Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lFieldMap))
             End If
 
             Dim lfrmSWMMSetup As New frmSWMMSetup
