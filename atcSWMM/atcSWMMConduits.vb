@@ -13,6 +13,12 @@ Public Class Conduits
 
     Public SWMMProject As SWMMProject
 
+    Public Sub AddRange(ByVal aEnumerable As IEnumerable)
+        For Each lConduit As Conduit In aEnumerable
+            Me.Add(lConduit)
+        Next
+    End Sub
+
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
 
@@ -96,18 +102,25 @@ Public Class Conduits
 End Class
 
 Public Class Conduit
-    Public Name As String
+    Public Name As String = ""
     Public InletNode As Node
     Public OutletNode As Node
+    Public InletNodeName As String = ""
+    Public OutletNodeName As String = ""
+    Public DownConduitID As String = ""
     Public Length As Double 'in feet or meters
+    Public MeanWidth As Double = 0.0
+    Public MeanDepth As Double = 0.0
+    Public ElevationHigh As Double = 0.0
+    Public ElevationLow As Double = 0.0
     Public ManningsN As Double = 0.05
     Public InletOffset As Double = 0.0
     Public OutletOffset As Double = 0.0
     Public InitialFlow As Double = 0.0
     Public MaxFlow As Double = 0.0
     Public Shape As String = "TRAPEZOIDAL"
-    Public Geometry1 As Double = 1 'full height
-    Public Geometry2 As Double = 0 'base width
+    Public Geometry1 As Double = -1 'full height
+    Public Geometry2 As Double = -1 'base width
     Public Geometry3 As Double = 1 'left slope
     Public Geometry4 As Double = 1 'right slope
     Public NumBarrels As Integer = 1

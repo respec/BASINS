@@ -169,27 +169,47 @@ Public Class frmSWMMSetup
             CreateMetConstituent(lMetWDMFileName, "MD189070", "ATEM", .MetConstituents)
             CreateMetConstituent(lMetWDMFileName, "MD189070", "PEVT", .MetConstituents)
 
-            'prepare the shapefile specs to test
-            Dim lConduitSpecs As New ConduitShapefileSpecs
-            Dim lCatchmentSpecs As New CatchmentShapefileSpecs
-            'FillSpecsForBASINSTest(lConduitSpecs, lCatchmentSpecs)
-            FillSpecsForGenericTest(lConduitSpecs, lCatchmentSpecs)
-
             'populate the SWMM classes from the shapefiles
             Dim lFieldMap As New atcUtility.atcCollection
-            lFieldMap.Add("Name", "ID")
-            lFieldMap.Add("Type", "Type")
-            Dim lNodesShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\nodes.shp"
             Dim lTable As New atcUtility.atcTableDBF
+            lFieldMap.Add("Name", "ID")
+            'Dim lNodesShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\nodes.shp"
+            Dim lNodesShapefileName As String = ""    'test for BASINS type
             If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
-                .Nodes.AddRange(Populate(lTable, New atcSWMM.Node, lFieldMap))
+                .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lFieldMap))
             End If
             CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
-            CreateConduitsFromShapefile(lConduitSpecs, pPlugIn.SWMMProject, .Conduits)
-            CreateCatchmentsFromShapefile(lCatchmentSpecs, pPlugIn.SWMMProject, .Catchments)
+
+            lFieldMap.Clear()
+            lFieldMap.Add("InletNodeName", "InNodeID")
+            lFieldMap.Add("OutletNodeName", "OutNodeID")
+            lFieldMap.Add("Name", "SUBBASIN")
+            lFieldMap.Add("DownConduitID", "SUBBASINR")
+            lFieldMap.Add("ElevationHigh", "MAXEL")
+            lFieldMap.Add("ElevationLow", "MINEL")
+            lFieldMap.Add("MeanWidth", "WID2")
+            lFieldMap.Add("MeanDepth", "DEP2")
+            'Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\conduits.shp"
+            Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp"
+            If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
+                .Conduits.AddRange(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lFieldMap))
+            End If
+            CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
+
+            lFieldMap.Clear()
+            lFieldMap.Add("Name", "SUBBASIN")
+            lFieldMap.Add("Slope", "SLO1")
+            lFieldMap.Add("Name", "ID")
+            lFieldMap.Add("OutletNodeID", "OutNode")
+            'Dim lCatchmentShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\catchments.shp"
+            Dim lCatchmentShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"
+            If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
+                .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lFieldMap))
+            End If
+            CompleteCatchmentsFromShapefile(lCatchmentShapefileName, pPlugIn.SWMMProject, .Catchments)
 
             'create landuses from nlcd landcover
-            CreateLandusesFromGrid("C:\BASINS\data\02060006-1\NLCD\NLCD_LandCover_2001.tif", lCatchmentSpecs.ShapefileName, .Catchments, .Landuses)
+            CreateLandusesFromGrid("C:\BASINS\data\02060006-1\NLCD\NLCD_LandCover_2001.tif", lCatchmentShapefileName, .Catchments, .Landuses)
 
             'add backdrop file
             .BackdropFile = lBasinsFolder & "\Predefined Delineations\West Branch\wbranch.bmp"
@@ -223,98 +243,4 @@ Public Class frmSWMMSetup
         End If
     End Sub
 
-    Private Sub FillSpecsForBASINSTest(ByRef aConduitSpecs As ConduitShapefileSpecs, ByRef aCatchmentSpecs As CatchmentShapefileSpecs)
-
-        'prepare a test assuming the user has the typical files from a BASINS delineation
-        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-
-        aConduitSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp"
-        aConduitSpecs.SubbasinFieldName = "SUBBASIN"
-        aConduitSpecs.DownSubbasinFieldName = "SUBBASINR"
-        aConduitSpecs.ElevHighFieldName = "MAXEL"
-        aConduitSpecs.ElevLowFieldName = "MINEL"
-        aConduitSpecs.MeanWidthFieldName = "WID2"
-        aConduitSpecs.MeanDepthFieldName = "DEP2"
-        aConduitSpecs.CreateNodes = True
-        aConduitSpecs.ManningsNFieldName = ""
-        aConduitSpecs.InletOffsetFieldName = ""
-        aConduitSpecs.OutletOffsetFieldName = ""
-        aConduitSpecs.InitialFlowFieldName = ""
-        aConduitSpecs.MaxFlowFieldName = ""
-        aConduitSpecs.ShapeFieldName = ""
-        aConduitSpecs.Geometry1FieldName = ""
-        aConduitSpecs.Geometry2FieldName = ""
-        aConduitSpecs.Geometry3FieldName = ""
-        aConduitSpecs.Geometry4FieldName = ""
-        aConduitSpecs.NumBarrelsFieldName = ""
-
-        aCatchmentSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"
-        aCatchmentSpecs.SubbasinFieldName = "SUBBASIN"
-        aCatchmentSpecs.SlopeFieldName = "SLO1"
-        aCatchmentSpecs.WidthFieldName = ""
-        aCatchmentSpecs.CurbLengthFieldName = ""
-        aCatchmentSpecs.SnowPackNameFieldName = ""
-        aCatchmentSpecs.ManningsNImpervFieldName = ""
-        aCatchmentSpecs.ManningsNPervFieldName = ""
-        aCatchmentSpecs.DepressionStorageImpervFieldName = ""
-        aCatchmentSpecs.DepressionStoragePervFieldName = ""
-        aCatchmentSpecs.PercentZeroStorageFieldName = ""
-        aCatchmentSpecs.RouteToFieldName = ""
-        aCatchmentSpecs.PercentRoutedFieldName = ""
-        aCatchmentSpecs.MaxInfiltRateFieldName = ""
-        aCatchmentSpecs.MinInfiltRateFieldName = ""
-        aCatchmentSpecs.DecayRateConstantFieldName = ""
-        aCatchmentSpecs.DryTimeFieldName = ""
-        aCatchmentSpecs.MaxInfiltVolumeFieldName = ""
-        aCatchmentSpecs.SuctionFieldName = ""
-        aCatchmentSpecs.ConductivityFieldName = ""
-        aCatchmentSpecs.InitialDeficitFieldName = ""
-        aCatchmentSpecs.CurveNumberFieldName = ""
-    End Sub
-
-    Private Sub FillSpecsForGenericTest(ByRef aConduitSpecs As ConduitShapefileSpecs, ByRef aCatchmentSpecs As CatchmentShapefileSpecs)
-
-        'prepare a test assuming the user has the generic storm sewer shapefiles
-        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-
-        aConduitSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\conduits.shp"
-        aConduitSpecs.InletNodeFieldName = "InNodeID"
-        aConduitSpecs.OutletNodeFieldName = "OutNodeID"
-        aConduitSpecs.CreateNodes = False
-        aConduitSpecs.ManningsNFieldName = ""
-        aConduitSpecs.InletOffsetFieldName = ""
-        aConduitSpecs.OutletOffsetFieldName = ""
-        aConduitSpecs.InitialFlowFieldName = ""
-        aConduitSpecs.MaxFlowFieldName = ""
-        aConduitSpecs.ShapeFieldName = ""
-        aConduitSpecs.Geometry1FieldName = ""
-        aConduitSpecs.Geometry2FieldName = ""
-        aConduitSpecs.Geometry3FieldName = ""
-        aConduitSpecs.Geometry4FieldName = ""
-        aConduitSpecs.NumBarrelsFieldName = ""
-
-        aCatchmentSpecs.ShapefileName = lBasinsFolder & "\Predefined Delineations\West Branch\catchments.shp"
-        aCatchmentSpecs.SubbasinFieldName = "ID"
-        aCatchmentSpecs.SlopeFieldName = "SLO1"
-        aCatchmentSpecs.OutletNodeFieldName = "OutNode"
-        aCatchmentSpecs.WidthFieldName = ""
-        aCatchmentSpecs.CurbLengthFieldName = ""
-        aCatchmentSpecs.SnowPackNameFieldName = ""
-        aCatchmentSpecs.ManningsNImpervFieldName = ""
-        aCatchmentSpecs.ManningsNPervFieldName = ""
-        aCatchmentSpecs.DepressionStorageImpervFieldName = ""
-        aCatchmentSpecs.DepressionStoragePervFieldName = ""
-        aCatchmentSpecs.PercentZeroStorageFieldName = ""
-        aCatchmentSpecs.RouteToFieldName = ""
-        aCatchmentSpecs.PercentRoutedFieldName = ""
-        aCatchmentSpecs.MaxInfiltRateFieldName = ""
-        aCatchmentSpecs.MinInfiltRateFieldName = ""
-        aCatchmentSpecs.DecayRateConstantFieldName = ""
-        aCatchmentSpecs.DryTimeFieldName = ""
-        aCatchmentSpecs.MaxInfiltVolumeFieldName = ""
-        aCatchmentSpecs.SuctionFieldName = ""
-        aCatchmentSpecs.ConductivityFieldName = ""
-        aCatchmentSpecs.InitialDeficitFieldName = ""
-        aCatchmentSpecs.CurveNumberFieldName = ""
-    End Sub
 End Class
