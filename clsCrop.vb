@@ -172,7 +172,7 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("IDC", 1, "Integer", "0", 4, vbCrLf))
             Columns.Add(New clsDataColumn("CROPNAME", 1, "VARCHAR(30)", "", 0, ""))
             Columns.Add(New clsDataColumn("BIO_E", 1, "Single", "0.00", 7, ""))
-            Columns.Add(New clsDataColumn("HVSTI", 1, "Single", "0.00", 7, ""))
+            Columns.Add(New clsDataColumn("HVSTI", 1, "Single", "0.000", 7, ""))
             Columns.Add(New clsDataColumn("BLAI", 1, "Single", "0.00", 8, ""))
             Columns.Add(New clsDataColumn("FRGRW1", 1, "Single", "0.00", 7, ""))
             Columns.Add(New clsDataColumn("LAIMX1", 1, "Single", "0.00", 7, ""))
