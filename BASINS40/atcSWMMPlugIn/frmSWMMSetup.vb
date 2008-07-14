@@ -192,7 +192,7 @@ Public Class frmSWMMSetup
             'Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\conduits.shp"
             Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp"
             If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
-                .Conduits.AddRange(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lFieldMap))
+                .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lFieldMap), "Name", "C", 1))
             End If
             CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 

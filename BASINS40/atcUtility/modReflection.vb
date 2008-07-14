@@ -578,7 +578,7 @@ Public Module modReflection
         Return lValues
     End Function
 
-    Public Sub NumberObjects(ByVal aObjects As ArrayList, ByVal aFieldToNumber As String, Optional ByVal aPrefix As String = "", Optional ByVal aStartIndex As Integer = 1)
+    Public Function NumberObjects(ByVal aObjects As ArrayList, ByVal aFieldToNumber As String, Optional ByVal aPrefix As String = "", Optional ByVal aStartIndex As Integer = 1) As ArrayList
         If aObjects IsNot Nothing AndAlso aObjects.Count > 0 Then
             Dim lType As Type = aObjects.Item(0).GetType
             Dim lField As FieldInfo = lType.GetField(aFieldToNumber)
@@ -595,7 +595,8 @@ Public Module modReflection
                 aStartIndex += 1
             Next
         End If
-    End Sub
+        Return aObjects
+    End Function
 
     'Public Sub ConnectObjects(ByRef aListOfObjects As ArrayList, _
     '                          ByVal aIdFieldName As String, _

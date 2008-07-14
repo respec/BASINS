@@ -101,9 +101,6 @@ Friend Module modSWMMFromMW
 
                 'create node at upstream end
                 Dim lUpNode As New Node
-                If lConduit.Name.Length = 0 Then
-                    lConduit.Name = CStr(lFeatureIndex + 1)
-                End If
                 lUpNode.Name = "J" & lConduit.Name
                 lUpNode.Type = "JUNCTION"
                 lUpNode.InvertElevation = lConduit.ElevationHigh
