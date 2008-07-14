@@ -15,8 +15,7 @@ Module SWATRunner
     Private pStartYear As Integer = 0 '1960
     Private pNumYears As Integer = 12
     Private pRefreshDB As Boolean = False ' make a copy of the SWATInput database
-    Private pUpdateMDB As Boolean = True ' save changes to table values in the SWATInput database
-    Private pUserInteractiveUpdate As Boolean = True
+    Private pUserInteractiveUpdate As Boolean = True 'False - use these defaults
     Private pOutputSummarize As Boolean = True
     Private pInputSummarize As Boolean = True
     Private pCropChangeSummarize As Boolean = True
@@ -41,6 +40,7 @@ Module SWATRunner
 
         Dim lContinue As Boolean = True
         If pUserInteractiveUpdate Then
+            'these defaults are overwritten by registry values set by most recent run
             Dim lUserParms As New atcCollection
             With lUserParms
                 .Add("Start Year", pStartYear)
@@ -48,7 +48,6 @@ Module SWATRunner
                 .Add("Run Model", pRunModel)
 
                 .Add("RefreshDB", pRefreshDB)
-                .Add("UpdateMDB", pUpdateMDB)
                 .Add("OutputSummarize", pOutputSummarize)
                 .Add("InputSummarize", pInputSummarize)
                 .Add("ChangeCropAreas", pChangeCropAreas)
@@ -70,7 +69,6 @@ Module SWATRunner
                     pRunModel = .ItemByKey("Run Model")
 
                     pRefreshDB = .ItemByKey("RefreshDB")
-                    pUpdateMDB = .ItemByKey("UpdateMDB")
                     pOutputSummarize = .ItemByKey("OutputSummarize")
                     pInputSummarize = .ItemByKey("InputSummarize")
                     pCropChangeSummarize = .ItemByKey("CropChangeSummarize")
@@ -114,12 +112,10 @@ Module SWATRunner
             Logger.Dbg("InitializeSwatInput")
             Dim lSwatInput As New SwatInput(pSWATGDB, lOutGDB, pBaseFolder, pScenario)
 
-            If pUpdateMDB Then
-                If pStartYear > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", pStartYear)
-                If pNumYears > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", pNumYears)
-                lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
-                lSwatInput.CIO.PrintHru = False
-            End If
+            If pStartYear > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", pStartYear)
+            If pNumYears > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", pNumYears)
+            lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
+            lSwatInput.CIO.PrintHru = False
 
             If pInputSummarize Then
                 SummarizeInput(lSwatInput)
@@ -130,22 +126,22 @@ Module SWATRunner
             Dim lTotalAreaConverted As Double = 0.0
             Dim lTotalAreaCornFut As Double = 0.0
             Dim lTotalAreaCornNow As Double = 0.0
-            Dim lCornChangesSummaryFilename As String = IO.Path.Combine(pLogsFolder, "CornChanges.txt")
-            Dim lHruChangesFilename As String = IO.Path.Combine(pLogsFolder, "CornHruChanges.txt")
-            Dim lCornConversions As New CornConversions
+            Dim lCropChangesSummaryFilename As String = IO.Path.Combine(pLogsFolder, "CropChanges.txt")
+            Dim lCropChangesHruFilename As String = IO.Path.Combine(pLogsFolder, "CropHruChanges.txt")
+            Dim lCropConversions As New CropConversions
 
             If pCropChangeSummarize Then
                 SummarizeCropChange(lSwatInput, _
-                                    lCornConversions, _
-                                    lCornChangesSummaryFilename, _
-                                    lHruChangesFilename, _
+                                    lCropConversions, _
+                                    lCropChangesSummaryFilename, _
+                                    lCropChangesHruFilename, _
                                     lTotalArea, _
                                     lTotalAreaNotConverted, _
                                     lTotalAreaConverted, _
                                     lTotalAreaCornFut, _
                                     lTotalAreaCornNow)
             Else
-                For Each lString As String In LinesInFile(lCornChangesSummaryFilename)
+                For Each lString As String In LinesInFile(lCropChangesSummaryFilename)
                     If lString.StartsWith("Total") Then
                         Dim lFields() As String = lString.Split(vbTab)
                         Double.TryParse(lFields(3), lTotalArea)
@@ -158,17 +154,15 @@ Module SWATRunner
             End If
 
             If pChangeCropAreas Then
-                ChangeHRUfractions(lSwatInput, lCornConversions, lHruChangesFilename)
+                ChangeHRUfractions(lSwatInput, lCropConversions, lCropChangesHruFilename)
             End If
 
-            If pUpdateMDB Then
-                If IO.File.Exists(pParmChangesTextfile) Then
-                    Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
-                    For Each lString As String In LinesInFile(pParmChangesTextfile)
-                        Dim lParms() As String = lString.Split(";")
-                        lSwatInput.UpdateInputDB(lParms(0).Trim, lParms(1).Trim, lParms(2).Trim, lParms(3).Trim, lParms(4).Trim)
-                    Next
-                End If
+            If IO.File.Exists(pParmChangesTextfile) Then
+                Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
+                For Each lString As String In LinesInFile(pParmChangesTextfile)
+                    Dim lParms() As String = lString.Split(";")
+                    lSwatInput.UpdateInputDB(lParms(0).Trim, lParms(1).Trim, lParms(2).Trim, lParms(3).Trim, lParms(4).Trim)
+                Next
             End If
 
             If pRunModel Then
@@ -204,9 +198,9 @@ Module SWATRunner
     End Sub
 
     Private Sub SummarizeCropChange(ByVal aSwatInput As SwatInput, _
-                                    ByVal aCornConversions As CornConversions, _
-                                    ByVal aCornChangesSummaryFilename As String, _
-                                    ByVal aHruChangesFilename As String, _
+                                    ByVal aCropConversions As CropConversions, _
+                                    ByVal aCropChangesSummaryFilename As String, _
+                                    ByVal aCropChangesHruFilename As String, _
                                     ByRef aTotalArea As Double, _
                                     ByRef aTotalAreaNotConverted As Double, _
                                     ByRef aTotalAreaConverted As Double, _
@@ -219,25 +213,25 @@ Module SWATRunner
         aTotalAreaCornFut = 0.0
         aTotalAreaCornNow = 0.0
 
-        Dim lSummaryWriter As New IO.StreamWriter(aCornChangesSummaryFilename)
+        Dim lSummaryWriter As New IO.StreamWriter(aCropChangesSummaryFilename)
         lSummaryWriter.WriteLine("FrmCrp" & vbTab & "ToCrp" & vbTab _
                                & "FrcChg".PadLeft(12) & vbTab _
                                & "Area".PadLeft(12) & vbTab _
-                               & "AreaCornNow".PadLeft(12) & vbTab _
-                               & "AreaChg".PadLeft(12) & vbTab _
+                               & "AreaNow".PadLeft(12) & vbTab _
+                               & "AreaChange".PadLeft(12) & vbTab _
                                & "AreaSkip".PadLeft(12) & vbTab _
-                               & "AreaCornFut".PadLeft(12) & vbTab _
+                               & "AreaFuture".PadLeft(12) & vbTab _
                                & "CntPot".PadLeft(8) & vbTab & "CntAct".PadLeft(8))
 
-        Dim lHruWriter As New IO.StreamWriter(aHruChangesFilename)
+        Dim lHruWriter As New IO.StreamWriter(aCropChangesHruFilename)
         lHruWriter.WriteLine("FrmCrp" & vbTab & "ToCrp" & vbTab _
                            & "SubId" & vbTab & "Soil" & vbTab & "Slope" & vbTab _
                            & "FrcChg".PadLeft(12) & vbTab _
                            & "Area".PadLeft(12) & vbTab _
-                           & "AreaCornNow".PadLeft(12) & vbTab _
-                           & "AreaChg".PadLeft(12) & vbTab _
+                           & "AreaNow".PadLeft(12) & vbTab _
+                           & "AreaChange".PadLeft(12) & vbTab _
                            & "AreaSkip".PadLeft(12) & vbTab _
-                           & "AreaCornFut".PadLeft(12))
+                           & "AreaFuture".PadLeft(12))
 
         Dim lTotalPotentialChangeCount As Integer = 0
         Dim lTotalActualChangeCount As Integer = 0
@@ -250,9 +244,9 @@ Module SWATRunner
             Dim lConvertFractionNet As Double = 0
             Dim lCornFractionAfter As Double = 0
             Dim lCornFractionBefore As Double = 0
-            If aCornConversions.Contains(lLandUseName) Then
-                Dim lCornConversion As CornConversion = aCornConversions.Item(lLandUseName)
-                Dim lCornConvertTo As CornConversion = aCornConversions.Item(lCornConversion.NameConvertsTo)
+            If aCropConversions.Contains(lLandUseName) Then
+                Dim lCornConversion As CropConversion = aCropConversions.Item(lLandUseName)
+                Dim lCornConvertTo As CropConversion = aCropConversions.Item(lCornConversion.NameConvertsTo)
                 If lCornConvertTo.Fraction > lCornConversion.Fraction Then
                     lConvertFractionNet = lCornConvertTo.Fraction - lCornConversion.Fraction
                 End If
@@ -334,7 +328,7 @@ Module SWATRunner
     End Sub
 
     Private Sub ChangeHRUfractions(ByVal aSwatInput As SwatInput, _
-                                   ByVal aCornConversions As CornConversions, _
+                                   ByVal aCornConversions As CropConversions, _
                                    ByVal aHruChangesFilename As String)
         Dim lConvertFractionOfAvailable As Double = 0.5 'TODO: compute from desired acres of corn vs. lTotalAreaCornFut or lTotalAreaConverted
         Dim lAreaChange As Double
@@ -344,7 +338,7 @@ Module SWATRunner
             Dim lFields() As String = lString.Split(vbTab)
             If Double.TryParse(lFields(8), lAreaChange) AndAlso lAreaChange > 0 Then
                 Dim lLandUseName As String = lFields(0)
-                Dim lCornConversion As CornConversion = aCornConversions.Item(lLandUseName)
+                Dim lCornConversion As CropConversion = aCornConversions.Item(lLandUseName)
                 Dim lHruToChangeFrom As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseName & "' AND SOIL='" & lFields(3) & "' AND SLOPE_CD='" & lFields(4) & "' AND SUBBASIN=" & lFields(2) & ";")
                 Dim lHruChangeTo As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lCornConversion.NameConvertsTo & "' AND SOIL='" & lFields(3) & "' AND SLOPE_CD='" & lFields(4) & "' AND SUBBASIN=" & lFields(2) & ";")
                 If lHruToChangeFrom.Rows.Count > 0 AndAlso lHruChangeTo.Rows.Count > 0 Then
@@ -602,7 +596,7 @@ Module SWATArea
     End Function
 
     Public Function AggregateCrops(ByVal aInputTable As DataTable) As DataTable
-        Dim lCornConversions As New CornConversions
+        Dim lCornConversions As New CropConversions
         Dim lArea As Double = 0.0
 
         Dim lOutputTable As DataTable = aInputTable.Copy
@@ -617,7 +611,7 @@ Module SWATArea
             For lColumnIndex As Integer = 2 To lOutputTable.Columns.Count - 2
                 Dim lColumnName As String = lOutputTable.Columns(lColumnIndex).ColumnName
                 If lCornConversions.Contains(lColumnName) Then
-                    Dim lCornConversion As CornConversion = lCornConversions.Item(lColumnName)
+                    Dim lCornConversion As CropConversion = lCornConversions.Item(lColumnName)
                     lArea = lRow(lColumnIndex)
                     lRow(lCornColumnIndex) += lArea * lCornConversion.Fraction
                     lRow(lSoybColumnIndex) += lArea * (1 - lCornConversion.Fraction)
@@ -627,28 +621,30 @@ Module SWATArea
         Return lOutputTable
     End Function
 
-    Friend Class CornConversions
-        Inherits KeyedCollection(Of String, CornConversion)
-        Protected Overrides Function GetKeyForItem(ByVal aParm As CornConversion) As String
+    Friend Class CropConversions
+        Inherits KeyedCollection(Of String, CropConversion)
+        Protected Overrides Function GetKeyForItem(ByVal aParm As CropConversion) As String
             Return aParm.Name
         End Function
 
         Public Sub New()
-            Me.Add(New CornConversion("CCCC", 1.0, "CCCC"))
-            'Me.Add(New CornConversion("CCS1", 0.66667, "CCCC"))
-            Me.Add(New CornConversion("CSC1", 0.5, "CCCC")) 'TODO: check
-            'Me.Add(New CornConversion("CSS1", 0.33333, "CCCC"))
-            'Me.Add(New CornConversion("SCC1", 0.66667, "CCCC"))
-            Me.Add(New CornConversion("SCS1", 0.5, "CCCC"))  'TODO: check
-            'Me.Add(New CornConversion("SSC1", 0.33333, "CCCC"))
-            'Me.Add(New CornConversion("SSSC", 0.0, "CCCC"))
-            Me.Add(New CornConversion("AGRR", 0.0, "CCCC"))
-            'Me.Add(New CornConversion("CRP", 0.0, "CCCC"))
-            Me.Add(New CornConversion("HAY", 0.0, "CCCC"))
+            Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
+            Me.Add(New CropConversion("CRP", 1.0, "CRP"))
+            'Me.Add(New CornConversion("CCCC", 1.0, "CCCC"))
+            ''Me.Add(New CornConversion("CCS1", 0.66667, "CCCC"))
+            'Me.Add(New CornConversion("CSC1", 0.5, "CCCC")) 'TODO: check
+            ''Me.Add(New CornConversion("CSS1", 0.33333, "CCCC"))
+            ''Me.Add(New CornConversion("SCC1", 0.66667, "CCCC"))
+            'Me.Add(New CornConversion("SCS1", 0.5, "CCCC"))  'TODO: check
+            ''Me.Add(New CornConversion("SSC1", 0.33333, "CCCC"))
+            ''Me.Add(New CornConversion("SSSC", 0.0, "CCCC"))
+            'Me.Add(New CornConversion("AGRR", 0.0, "CCCC"))
+            ''Me.Add(New CornConversion("CRP", 0.0, "CCCC"))
+            'Me.Add(New CornConversion("HAY", 0.0, "CCCC"))
         End Sub
     End Class
 
-    Friend Class CornConversion
+    Friend Class CropConversion
         Public Name As String
         Public Fraction As Double
         Public NameConvertsTo As String
