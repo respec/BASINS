@@ -193,6 +193,8 @@ Public Class atcTimeseriesMath
         For Each lArg As Object In aArgs
             If lArg.GetType.Name = "atcTimeseries" Then
                 lDataGroup.Add(lArg)
+            ElseIf lArg.GetType.Name = "atcDataGroup" Then
+                lDataGroup.AddRange(lArg)
             Else 'TODO: other types (like constants)
             End If
         Next
