@@ -9,6 +9,7 @@ Imports atcUtility
 Imports atcData
 Imports atcWDM
 Imports atcTimeseriesBinary
+Imports atcList
 Imports SwatObject
 
 Module SWATRunner
@@ -373,6 +374,14 @@ Module SWATRunner
         End With
 
         Dim lOutputFields As New atcData.atcDataAttributes
+        'TODO:add nutrient fields
+        'AREAkm2  PRECIPmm SNOFALLmm SNOMELTmm     IRRmm     PETmm      ETmm SW_INITmm  SW_ENDmm    PERCmm GW_RCHGmm DA_RCHGmm   REVAPmm  SA_IRRmm  DA_IRRmm   SA_STmm   DA_STmmSURQ_GENmmSURQ_CNTmm   TLOSSmm    LATQmm    GW_Qmm    WYLDmm   DAILYCN 
+        'TMP_AVdgC TMP_MXdgC TMP_MNdgCSOL_TMPdgCSOLARMJ/m2  
+        'SYLDt/ha  USLEt/ha
+        'N_APPkg/haP_APPkg/haNAUTOkg/haPAUTOkg/ha NGRZkg/ha PGRZkg/haNCFRTkg/haPCFRTkg/haNRAINkg/ha NFIXkg/ha F-MNkg/ha A-MNkg/ha A-SNkg/ha F-MPkg/haAO-LPkg/ha L-APkg/ha A-SPkg/ha 
+        'DNITkg/ha  NUPkg/ha  PUPkg/ha ORGNkg/ha ORGPkg/ha SEDPkg/ha
+        'NSURQkg/haNLATQkg/ha NO3Lkg/haNO3GWkg/ha SOLPkg/ha P_GWkg/ha    W_STRS  TMP_STRS    N_STRS    P_STRS  
+        'BIOMt/ha       LAI   YLDt/ha   BACTPct  BACTLPct
         lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
         Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
         With lOutputHru
@@ -382,10 +391,15 @@ Module SWATRunner
             WriteDatasets(IO.Path.Combine(pReportsFolder, "hru"), .DataSets)
         End With
 
-        Logger.Dbg("SwatSummaryReport")
-        Dim lTimseriesGroup As New atcDataSourceTimeseriesBinary
-        lTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "hru.tsbin"))
-        WriteSummary(pReportsFolder, lTimseriesGroup.DataSets)
+        Logger.Dbg("SwatSummaryReports")
+        Dim lSubTimseriesGroup As New atcDataSourceTimeseriesBinary
+        lSubTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "rch.tsbin"))
+        WriteReachSummary(pReportsFolder, lSubTimseriesGroup.DataSets)
+        Logger.Dbg("Report Reach Done")
+
+        Dim lHruTimseriesGroup As New atcDataSourceTimeseriesBinary
+        lHruTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "hru.tsbin"))
+        WriteYieldSummary(pReportsFolder, lHruTimseriesGroup.DataSets)
 
         Logger.Dbg("SwatPostProcessingDone")
     End Sub
@@ -399,7 +413,80 @@ Module SWATRunner
         End If
     End Sub
 
-    Private Sub WriteSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup)
+    Private Sub WriteReachSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup)
+        Dim lSubBasin2HUC8 As New atcCollection
+        Dim lSubBasin2HUC8Table As New atcTableDelimited
+        With lSubBasin2HUC8Table
+            .Delimiter = ","
+            .NumHeaderRows = 0
+            .OpenFile(IO.Path.Combine(pBaseFolder, "flowfig.csv"))
+            For lRowIndex As Integer = 1 To .NumRecords
+                lSubBasin2HUC8.Add(.Value(5), .Value(7))
+                .MoveNext()
+            Next
+            .Clear()
+        End With
+
+        'TODO be sure appropriate attributes are written
+        Dim lDisplayAttributesSave As ArrayList = atcDataManager.DisplayAttributes.Clone
+        Dim lDisplayAttributes As String() = {"Location", "Mean", "Max", "Min", "Sum", "Constituent"}
+        With atcDataManager.DisplayAttributes
+            .Clear()
+            .AddRange(lDisplayAttributes)
+        End With
+
+        Dim lConsNitr As String() = {"NH4_OUT", "NO2_OUT", "NO3_OUT", "ORGN_OUT"}
+        Dim lConsPhos As String() = {"ORGP_OUT", "MINP_OUT"}
+        Dim lConsOther As String() = {"AREA", "FLOW_OUT", "SED_OUT"}
+        Dim lConsToOutput As New ArrayList
+        With lConsToOutput
+            .AddRange(lConsNitr)
+            .AddRange(lConsPhos)
+            .AddRange(lConsOther)
+        End With
+
+        For lIndex As Integer = 1 To lSubBasin2HUC8.Count
+            Dim lHuc8 As String = lSubBasin2HUC8.ItemByKey(lIndex.ToString)
+            Dim lReachData As atcDataGroup = aTimeseriesGroup.FindData("Location", "REACH" & lIndex.ToString.PadLeft(5))
+            Dim lReachDataToList As New atcDataGroup
+            Dim lTimserNitr As New atcDataGroup
+            Dim lTimserPhos As New atcDataGroup
+
+            For Each lDataSet As atcTimeseries In lReachData
+                Dim lCons As String = lDataSet.Attributes.GetValue("Constituent")
+                If lConsToOutput.Contains(lCons) Then
+                    lReachDataToList.Add(lDataSet)
+                    If Array.IndexOf(lConsNitr, lCons) > -1 Then
+                        lTimserNitr.Add(lDataSet)
+                    End If
+                    If Array.IndexOf(lConsPhos, lCons) > -1 Then
+                        lTimserPhos.Add(lDataSet)
+                    End If
+                End If
+            Next
+            Dim lTimserNitrTotal As atcTimeseries = atcTimeseriesMath.atcTimeseriesMath.Compute("Add", lTimserNitr)
+            lTimserNitrTotal.Attributes.SetValue("Constituent", "TotalN")
+            lReachDataToList.Add(lTimserNitrTotal)
+            Dim lTimserPhosTotal As atcTimeseries = atcTimeseriesMath.atcTimeseriesMath.Compute("Add", lTimserPhos)
+            lTimserPhosTotal.Attributes.SetValue("Constituent", "TotalP")
+            lReachDataToList.Add(lTimserPhosTotal)
+            'TODO: add a cummulative area term
+
+            Dim lOutputFilenameHuc As String = lHuc8 & "_" & lIndex & ".txt"
+            Dim lList As New atcListPlugin
+            'TODO: just output year
+            lList.Save(lReachDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc))
+
+            'TODO: read output file back in a table, header row count = lDisplayAttributes.GetUpperBound(0), merge with other HUCs
+        Next
+
+        With atcDataManager.DisplayAttributes
+            .Clear()
+            .AddRange(lDisplayAttributesSave)
+        End With
+    End Sub
+
+    Private Sub WriteYieldSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup)
         Dim lCropIds As New atcCollection
         With lCropIds
             .Add("CORN") : .Add("CCCC") : .Add("CSC1") : .Add("CSS1") : .Add("CCS1")
@@ -629,6 +716,10 @@ Module SWATArea
 
         Public Sub New()
             Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
+            Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
+            Me.Add(New CropConversion("HAY", 0.0, "CRP"))
+            Me.Add(New CropConversion("PAST", 0.0, "CRP"))
+            Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
             Me.Add(New CropConversion("CRP", 1.0, "CRP"))
             'Me.Add(New CornConversion("CCCC", 1.0, "CCCC"))
             ''Me.Add(New CornConversion("CCS1", 0.66667, "CCCC"))
