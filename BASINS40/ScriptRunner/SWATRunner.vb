@@ -10,6 +10,7 @@ Imports atcData
 Imports atcWDM
 Imports atcTimeseriesBinary
 Imports atcList
+Imports atcTimeseriesMath.atcTimeseriesMath
 Imports SwatObject
 
 Module SWATRunner
@@ -391,11 +392,42 @@ Module SWATRunner
             WriteDatasets(IO.Path.Combine(pReportsFolder, "hru"), .DataSets)
         End With
 
+        Dim lSubBasin2HUC8 As New atcCollection
+        Dim lSubBasin2HUC8Table As New atcTableDelimited
+        With lSubBasin2HUC8Table
+            .Delimiter = ","
+            .NumHeaderRows = 0
+            .OpenFile(IO.Path.Combine(pBaseFolder, "flowfig.csv"))
+            For lRowIndex As Integer = 1 To .NumRecords
+                lSubBasin2HUC8.Add(.Value(5), .Value(7))
+                .MoveNext()
+            Next
+            .Clear()
+        End With
+
         Logger.Dbg("SwatSummaryReports")
+        'TODO be sure appropriate attributes are written
+        Dim lDisplayAttributesSave As ArrayList = atcDataManager.DisplayAttributes.Clone
+        Dim lDisplayAttributes As String() = {"Location", "Mean", "Max", "Min", "Sum", "Constituent"}
+        With atcDataManager.DisplayAttributes
+            .Clear()
+            .AddRange(lDisplayAttributes)
+        End With
+
         Dim lSubTimseriesGroup As New atcDataSourceTimeseriesBinary
-        lSubTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "rch.tsbin"))
-        WriteReachSummary(pReportsFolder, lSubTimseriesGroup.DataSets)
+        lSubTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "sub.tsbin"))
+        WriteSubSummary(pReportsFolder, lSubTimseriesGroup.DataSets, lSubBasin2HUC8)
+        Logger.Dbg("Report Load Done")
+
+        Dim lRchTimseriesGroup As New atcDataSourceTimeseriesBinary
+        lRchTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "rch.tsbin"))
+        WriteReachSummary(pReportsFolder, lRchTimseriesGroup.DataSets, lSubBasin2HUC8)
         Logger.Dbg("Report Reach Done")
+
+        With atcDataManager.DisplayAttributes
+            .Clear()
+            .AddRange(lDisplayAttributesSave)
+        End With
 
         Dim lHruTimseriesGroup As New atcDataSourceTimeseriesBinary
         lHruTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "hru.tsbin"))
@@ -413,49 +445,43 @@ Module SWATRunner
         End If
     End Sub
 
-    Private Sub WriteReachSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup)
-        Dim lSubBasin2HUC8 As New atcCollection
-        Dim lSubBasin2HUC8Table As New atcTableDelimited
-        With lSubBasin2HUC8Table
-            .Delimiter = ","
-            .NumHeaderRows = 0
-            .OpenFile(IO.Path.Combine(pBaseFolder, "flowfig.csv"))
-            For lRowIndex As Integer = 1 To .NumRecords
-                lSubBasin2HUC8.Add(.Value(5), .Value(7))
-                .MoveNext()
-            Next
-            .Clear()
-        End With
-
-        'TODO be sure appropriate attributes are written
-        Dim lDisplayAttributesSave As ArrayList = atcDataManager.DisplayAttributes.Clone
-        Dim lDisplayAttributes As String() = {"Location", "Mean", "Max", "Min", "Sum", "Constituent"}
-        With atcDataManager.DisplayAttributes
-            .Clear()
-            .AddRange(lDisplayAttributes)
-        End With
-
-        Dim lConsNitr As String() = {"NH4_OUT", "NO2_OUT", "NO3_OUT", "ORGN_OUT"}
-        Dim lConsPhos As String() = {"ORGP_OUT", "MINP_OUT"}
-        Dim lConsOther As String() = {"AREA", "FLOW_OUT", "SED_OUT"}
+    Private Sub WriteSubSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup, ByVal aSubBasin2HUC8 As atcCollection)
+        Dim lConsNitr As String() = {"ORGN", "NSURQ", "LATNO3", "GWNO3"}
+        Dim lConsPhos As String() = {"ORGP", "SOLP", "SEDP"}
+        Dim lConsOtherOut As String() = {"AREA", "WYLD", "SYLD"}
         Dim lConsToOutput As New ArrayList
         With lConsToOutput
             .AddRange(lConsNitr)
             .AddRange(lConsPhos)
-            .AddRange(lConsOther)
+            .AddRange(lConsOtherOut)
         End With
 
-        For lIndex As Integer = 1 To lSubBasin2HUC8.Count
-            Dim lHuc8 As String = lSubBasin2HUC8.ItemByKey(lIndex.ToString)
-            Dim lReachData As atcDataGroup = aTimeseriesGroup.FindData("Location", "REACH" & lIndex.ToString.PadLeft(5))
-            Dim lReachDataToList As New atcDataGroup
+        Dim lSBHuc8 As New Text.StringBuilder
+        lSBHuc8.AppendLine("SubID" & vbTab & "HUC8" & vbTab & "Area".PadLeft(12) _
+                                                    & vbTab & "N_Unit_Load".PadLeft(12) & vbTab & "N_HUC_Load".PadLeft(12) _
+                                                    & vbTab & "P_Unit_Load".PadLeft(12) & vbTab & "P_HUC_Load".PadLeft(12))
+        lSBHuc8.AppendLine(vbTab & vbTab & "km2".PadLeft(12) _
+                                 & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12) _
+                                 & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12))
+
+        For lIndex As Integer = 1 To aSubBasin2HUC8.Count
+            Dim lHuc8 As String = aSubBasin2HUC8.ItemByKey(lIndex.ToString)
+            lSBHuc8.Append(lIndex & vbTab & lHuc8)
+            Dim lSubData As atcDataGroup = aTimeseriesGroup.FindData("Location", "BIGSUB" & lIndex.ToString.PadLeft(4))
+            Dim lSubDataToList As New atcDataGroup
             Dim lTimserNitr As New atcDataGroup
             Dim lTimserPhos As New atcDataGroup
+            Dim lHucAreaFactor As Double = 0.0
 
-            For Each lDataSet As atcTimeseries In lReachData
+            For Each lDataSet As atcTimeseries In lSubData
                 Dim lCons As String = lDataSet.Attributes.GetValue("Constituent")
                 If lConsToOutput.Contains(lCons) Then
-                    lReachDataToList.Add(lDataSet)
+                    lSubDataToList.Add(lDataSet)
+                    If lCons = "AREA" Then
+                        Dim lHucArea As Double = lDataSet.Attributes.GetDefinedValue("Mean").Value
+                        lSBHuc8.Append(vbTab & DecimalAlign(lHucArea))
+                        lHucAreaFactor = lHucArea * 100 'km -> ha
+                    End If
                     If Array.IndexOf(lConsNitr, lCons) > -1 Then
                         lTimserNitr.Add(lDataSet)
                     End If
@@ -464,13 +490,140 @@ Module SWATRunner
                     End If
                 End If
             Next
-            Dim lTimserNitrTotal As atcTimeseries = atcTimeseriesMath.atcTimeseriesMath.Compute("Add", lTimserNitr)
-            lTimserNitrTotal.Attributes.SetValue("Constituent", "TotalN")
-            lReachDataToList.Add(lTimserNitrTotal)
-            Dim lTimserPhosTotal As atcTimeseries = atcTimeseriesMath.atcTimeseriesMath.Compute("Add", lTimserPhos)
-            lTimserPhosTotal.Attributes.SetValue("Constituent", "TotalP")
-            lReachDataToList.Add(lTimserPhosTotal)
-            'TODO: add a cummulative area term
+
+            Dim lTimserNitrUnitLoad As atcTimeseries = Compute("Add", lTimserNitr)
+            lTimserNitrUnitLoad.Attributes.SetValue("Constituent", "UnitN_Load")
+            lSubDataToList.Add(lTimserNitrUnitLoad)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrUnitLoad.Attributes.GetDefinedValue("Mean").Value))
+            Dim lTimserNitrHucLoad As atcTimeseries = Compute("Multiply", lTimserNitrUnitLoad, lHucAreaFactor)
+            lTimserNitrHucLoad.Attributes.SetValue("Constituent", "HucN_Load")
+            lSubDataToList.Add(lTimserNitrHucLoad)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrHucLoad.Attributes.GetDefinedValue("Mean").Value))
+
+            Dim lTimserPhosUnitLoad As atcTimeseries = Compute("Add", lTimserPhos)
+            lTimserPhosUnitLoad.Attributes.SetValue("Constituent", "UnitP_Load")
+            lSubDataToList.Add(lTimserPhosUnitLoad)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosUnitLoad.Attributes.GetDefinedValue("Mean").Value))
+            Dim lTimserPhosHucLoad As atcTimeseries = Compute("Multiply", lTimserPhosUnitLoad, lHucAreaFactor)
+            lTimserPhosHucLoad.Attributes.SetValue("Constituent", "HucP_Load")
+            lSubDataToList.Add(lTimserPhosHucLoad)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosHucLoad.Attributes.GetDefinedValue("Mean").Value))
+            lSBHuc8.AppendLine()
+
+            Dim lOutputFilenameHuc As String = lHuc8 & "_" & lIndex & "_Sub.txt"
+            Dim lList As New atcListPlugin
+            'TODO: just output year
+            lList.Save(lSubDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc))
+
+            'TODO: read output file back in a table, header row count = lDisplayAttributes.GetUpperBound(0), merge with other HUCs
+        Next
+        SaveFileString(IO.Path.Combine(aOutputFolder, "SubBasinSummary.txt"), lSBHuc8.ToString)
+    End Sub
+
+    Private Sub WriteReachSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup, ByVal aSubBasin2HUC8 As atcCollection)
+        Dim lConsNitrOut As String() = {"NH4_OUT", "NO2_OUT", "NO3_OUT", "ORGN_OUT"}
+        Dim lConsNitrIn As String() = {"NH4_IN", "NO2_IN", "NO3_IN", "ORGN_IN"}
+        Dim lConsPhosOut As String() = {"ORGP_OUT", "MINP_OUT"}
+        Dim lConsPhosIn As String() = {"ORGP_IN", "MINP_IN"}
+        Dim lConsOtherOut As String() = {"AREA", "FLOW_OUT", "SED_OUT"}
+        Dim lConsToOutput As New ArrayList
+        With lConsToOutput
+            .AddRange(lConsNitrOut)
+            .AddRange(lConsNitrIn)
+            .AddRange(lConsPhosOut)
+            .AddRange(lConsPhosIn)
+            .AddRange(lConsOtherOut)
+        End With
+
+        Dim lSBHuc8 As New Text.StringBuilder
+        lSBHuc8.AppendLine("SubID" & vbTab & "HUC8" & vbTab & "Area".PadLeft(12) _
+                                                    & vbTab & "N_Total_Out".PadLeft(16) & vbTab & "N_Unit_In".PadLeft(12) & vbTab & "N_Unit_Out".PadLeft(12) & vbTab & "N_Unit_Net".PadLeft(12) _
+                                                    & vbTab & "P_Total_Out".PadLeft(16) & vbTab & "P_Unit_In".PadLeft(12) & vbTab & "P_Unit_Out".PadLeft(12) & vbTab & "P_Unit_Net".PadLeft(12))
+        lSBHuc8.AppendLine(vbTab & vbTab & "km2".PadLeft(12) _
+                                 & vbTab & "kg".PadLeft(16) & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg/ha".PadLeft(12) _
+                                 & vbTab & "kg".PadLeft(16) & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg/ha".PadLeft(12))
+
+        For lIndex As Integer = 1 To aSubBasin2HUC8.Count
+            Dim lHuc8 As String = aSubBasin2HUC8.ItemByKey(lIndex.ToString)
+            lSBHuc8.Append(lIndex & vbTab & lHuc8)
+            Dim lReachData As atcDataGroup = aTimeseriesGroup.FindData("Location", "REACH" & lIndex.ToString.PadLeft(5))
+            Dim lReachDataToList As New atcDataGroup
+            Dim lTimserNitrOut As New atcDataGroup
+            Dim lTimserNitrIn As New atcDataGroup
+            Dim lTimserPhosOut As New atcDataGroup
+            Dim lTimserPhosIn As New atcDataGroup
+            Dim lAreaFactor As Double = 1.0
+
+            For Each lDataSet As atcTimeseries In lReachData
+                Dim lCons As String = lDataSet.Attributes.GetValue("Constituent")
+                If lConsToOutput.Contains(lCons) Then
+                    lReachDataToList.Add(lDataSet)
+                    If lCons = "AREA" Then
+                        Dim lHucCumArea As Double = lDataSet.Attributes.GetDefinedValue("Mean").Value
+                        lSBHuc8.Append(vbTab & DecimalAlign(lHucCumArea))
+                        lAreaFactor = lHucCumArea * 100 'km -> ha
+                    End If
+                    If Array.IndexOf(lConsNitrOut, lCons) > -1 Then
+                        lTimserNitrOut.Add(lDataSet)
+                    End If
+                    If Array.IndexOf(lConsNitrIn, lCons) > -1 Then
+                        lTimserNitrIn.Add(lDataSet)
+                    End If
+                    If Array.IndexOf(lConsPhosOut, lCons) > -1 Then
+                        lTimserPhosOut.Add(lDataSet)
+                    End If
+                    If Array.IndexOf(lConsPhosIn, lCons) > -1 Then
+                        lTimserPhosIn.Add(lDataSet)
+                    End If
+                End If
+            Next
+
+            Dim lTimserNitrTotalIn As atcTimeseries = Compute("Add", lTimserNitrIn)
+            lTimserNitrTotalIn.Attributes.SetValue("Constituent", "TotalN_In")
+            lReachDataToList.Add(lTimserNitrTotalIn)
+            Dim lTimserNitrUnitIn As atcTimeseries = Compute("Divide", lTimserNitrTotalIn, lAreaFactor)
+            lTimserNitrUnitIn.Attributes.SetValue("Constituent", "UnitN_In")
+            lReachDataToList.Add(lTimserNitrUnitIn)
+            Dim lTimserNitrTotalOut As atcTimeseries = Compute("Add", lTimserNitrOut)
+            lTimserNitrTotalOut.Attributes.SetValue("Constituent", "TotalN_Out")
+            lReachDataToList.Add(lTimserNitrTotalOut)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrTotalOut.Attributes.GetDefinedValue("Mean").Value, 16))
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrUnitIn.Attributes.GetDefinedValue("Mean").Value))
+            Dim lTimserNitrUnitOut As atcTimeseries = Compute("Divide", lTimserNitrTotalOut, lAreaFactor)
+            lTimserNitrUnitOut.Attributes.SetValue("Constituent", "UnitN_Out")
+            lReachDataToList.Add(lTimserNitrUnitOut)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrUnitOut.Attributes.GetDefinedValue("Mean").Value))
+            Dim lTimserNitrNet As atcTimeseries = Compute("Subtract", lTimserNitrTotalOut, lTimserNitrTotalIn)
+            lTimserNitrNet.Attributes.SetValue("Constituent", "TotalN_Net")
+            lReachDataToList.Add(lTimserNitrNet)
+            Dim lTimserNitrUnit As atcTimeseries = Compute("Divide", lTimserNitrNet, lAreaFactor)
+            lTimserNitrUnit.Attributes.SetValue("Constituent", "UnitN_Net")
+            lReachDataToList.Add(lTimserNitrUnit)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrUnit.Attributes.GetDefinedValue("Mean").Value))
+
+            Dim lTimserPhosTotalIn As atcTimeseries = Compute("Add", lTimserPhosIn)
+            lTimserPhosTotalIn.Attributes.SetValue("Constituent", "TotalP_In")
+            lReachDataToList.Add(lTimserPhosTotalIn)
+            Dim lTimserPhosUnitIn As atcTimeseries = Compute("Divide", lTimserPhosTotalIn, lAreaFactor)
+            lTimserPhosUnitIn.Attributes.SetValue("Constituent", "UnitP_In")
+            lReachDataToList.Add(lTimserPhosUnitIn)
+            Dim lTimserPhosTotalOut As atcTimeseries = Compute("Add", lTimserPhosOut)
+            lTimserPhosTotalOut.Attributes.SetValue("Constituent", "TotalP_Out")
+            lReachDataToList.Add(lTimserPhosTotalOut)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosTotalOut.Attributes.GetDefinedValue("Mean").Value, 16))
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosUnitIn.Attributes.GetDefinedValue("Mean").Value))
+            Dim lTimserPhosUnitOut As atcTimeseries = Compute("Divide", lTimserPhosTotalOut, lAreaFactor)
+            lTimserPhosUnitOut.Attributes.SetValue("Constituent", "UnitP_Out")
+            lReachDataToList.Add(lTimserPhosUnitOut)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosUnitOut.Attributes.GetDefinedValue("Mean").Value))
+            Dim lTimserPhosNet As atcTimeseries = Compute("Subtract", lTimserPhosTotalOut, lTimserPhosTotalIn)
+            lTimserPhosNet.Attributes.SetValue("Constituent", "TotalP_Net")
+            lReachDataToList.Add(lTimserPhosNet)
+            Dim lTimserPhosUnit As atcTimeseries = Compute("Divide", lTimserPhosNet, lAreaFactor)
+            lTimserPhosUnit.Attributes.SetValue("Constituent", "UnitP_Net")
+            lReachDataToList.Add(lTimserPhosUnit)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosUnit.Attributes.GetDefinedValue("Mean").Value))
+            lSBHuc8.AppendLine()
 
             Dim lOutputFilenameHuc As String = lHuc8 & "_" & lIndex & ".txt"
             Dim lList As New atcListPlugin
@@ -479,11 +632,7 @@ Module SWATRunner
 
             'TODO: read output file back in a table, header row count = lDisplayAttributes.GetUpperBound(0), merge with other HUCs
         Next
-
-        With atcDataManager.DisplayAttributes
-            .Clear()
-            .AddRange(lDisplayAttributesSave)
-        End With
+        SaveFileString(IO.Path.Combine(aOutputFolder, "ReachSummary.txt"), lSBHuc8.ToString)
     End Sub
 
     Private Sub WriteYieldSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup)
