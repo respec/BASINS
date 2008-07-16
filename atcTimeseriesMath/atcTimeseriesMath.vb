@@ -191,12 +191,15 @@ Public Class atcTimeseriesMath
         Dim lDataGroup As New atcDataGroup
 
         For Each lArg As Object In aArgs
-            If lArg.GetType.Name = "atcTimeseries" Then
-                lDataGroup.Add(lArg)
-            ElseIf lArg.GetType.Name = "atcDataGroup" Then
-                lDataGroup.AddRange(lArg)
-            Else 'TODO: other types (like constants)
-            End If
+            Select Case lArg.GetType.Name
+                Case "atcTimeseries"
+                    lDataGroup.Add(lArg)
+                Case "atcDataGroup"
+                    lDataGroup.AddRange(lArg)
+                Case "Double", "Single", "Integer"
+                    lDataAttributes.Add("Number", lArg)
+                Case Else 'TODO: more types
+            End Select
         Next
         If lDataGroup.Count > 0 Then
             lDataAttributes.SetValue("timeseries", lDataGroup)
