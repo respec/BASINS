@@ -4,9 +4,9 @@ Imports atcUtility
 Imports SwatObject
 
 Module SWATAddHruTypeToEachSubbasinIfNeeded
-    Private pDrive As String = "G:"
+    Private pDrive As String = "C:"
     Private pBaseFolder As String = pDrive & "\project\UMRB\baseline90"
-    Private pSWATGDB As String = "c:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
+    Private pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
     Private pInGDB As String = "baseline90.mdb"
     Private pOutGDB As String = "baseline90X.mdb"
     Private pLogsFolder As String
@@ -87,7 +87,7 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
                             lChanged = True 'dont need something else
                             Exit For
                         Else
-                            If lHruLandUse = "AGRR" AndAlso _
+                            If (lHruLandUse = "AGRR" OrElse lHruLandUse = "RNGE" OrElse lHruLandUse = "PAST") AndAlso _
                                lHruSlope = "4-9999" AndAlso _
                                lHruArea < lHuc8CrpNeed Then
                                 lHuc8CrpNeed -= lHruArea
