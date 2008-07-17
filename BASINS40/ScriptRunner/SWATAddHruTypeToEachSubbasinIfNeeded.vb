@@ -4,9 +4,11 @@ Imports atcUtility
 Imports SwatObject
 
 Module SWATAddHruTypeToEachSubbasinIfNeeded
-    Private pDrive As String = "C:"
+    'Private pDrive As String = "C:"
+    Private pDrive As String = "G:"
     Private pBaseFolder As String = pDrive & "\project\UMRB\baseline90"
-    Private pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
+    'Private pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
+    Private pSWATGDB As String = "C:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
     Private pInGDB As String = "baseline90.mdb"
     Private pOutGDB As String = "baseline90X.mdb"
     Private pLogsFolder As String
@@ -84,7 +86,7 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
                         Dim lHruArea As Double = lHruFraction * lSubBasinArea
                         If lHruArea > lHuc8CrpNeed And Not lChanged Then
                             Logger.Dbg("SubBasin " & lSubBasinId & " HUCMinArea " & lHruArea & " too big, only need " & lHuc8CrpNeed)
-                            lChanged = True 'dont need something else
+                            'lChanged = True 'dont need something else
                             Exit For
                         Else
                             If (lHruLandUse = "AGRR" OrElse lHruLandUse = "RNGE" OrElse lHruLandUse = "PAST") AndAlso _
