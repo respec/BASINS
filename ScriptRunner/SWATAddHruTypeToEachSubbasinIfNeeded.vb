@@ -4,16 +4,17 @@ Imports atcUtility
 Imports SwatObject
 
 Module SWATAddHruTypeToEachSubbasinIfNeeded
-    'Private pDrive As String = "C:"
-    Private pDrive As String = "G:"
+    Private pDrive As String = "C:"
+    'Private pDrive As String = "G:"
     Private pBaseFolder As String = pDrive & "\project\UMRB\baseline90"
-    'Private pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
-    Private pSWATGDB As String = "C:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
+    Private pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
+    'Private pSWATGDB As String = "C:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
     Private pInGDB As String = "baseline90.mdb"
     Private pOutGDB As String = "baseline90X.mdb"
     Private pLogsFolder As String
     Private pScenario As String = "AddHruAsNeeded"
     Private pCropToCreate As String = "CRP"
+    Private pMaxHRUsToChange As Integer = 5
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pBaseFolder)
@@ -78,28 +79,22 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
                 If lSubBasinHruTableCrp.Rows.Count = 0 Then
                     lWhereClause = "subbasin=" & lSubBasinId
                     Dim lSubBasinHruTable As DataTable = lSwatInput.QueryInputDB("SELECT * FROM hru WHERE " & lWhereClause & " ORDER BY hru_fr;")
+                    Dim LUsToConvert() As String = {"AGRR", "RNGE", "PAST"}
+                    Dim lSlopeCodes() As String = {"4-9999"}
                     Dim lChanged As Boolean = False
-                    For Each lHruRow As DataRow In lSubBasinHruTable.Rows
-                        Dim lHruId As String = lHruRow.Item("HRU")
-                        Dim lHruLandUse As String = lHruRow.Item("LANDUSE")
-                        Dim lHruSlope As String = lHruRow.Item("SLOPE_CD")
-                        Dim lHruFraction As Double = lHruRow.Item("HRU_FR")
-                        Dim lHruArea As Double = lHruFraction * lSubBasinArea
-                        If lHruArea > lHuc8CrpNeed And Not lChanged Then
-                            Logger.Dbg("SubBasin " & lSubBasinId & " HUCMinArea " & lHruArea & " too big, only need " & lHuc8CrpNeed)
-                            'lChanged = True 'dont need something else
-                            Exit For
-                        Else
-                            If (lHruLandUse = "AGRR" OrElse lHruLandUse = "RNGE" OrElse lHruLandUse = "PAST") AndAlso _
-                               lHruSlope = "4-9999" AndAlso _
-                               lHruArea < lHuc8CrpNeed Then
-                                lHuc8CrpNeed -= lHruArea
-                                Logger.Dbg("SubBasin " & lSubBasinId & " Change " & lHruLandUse & " to " & pCropToCreate & " for " & lHruArea & " need " & lHuc8CrpNeed)
-                                UpdateLandUse(lSwatInput, lSubBasinId, lHruId, lHruLandUse, pCropToCreate)
-                                lChanged = True
-                            End If
+                    'first try converting only hi-slope row crop, range, and pasture
+                    ConvertHRUsToCRP(lSubBasinId, LUsToConvert, lSlopeCodes, lHuc8CrpNeed, lSwatInput, lSubBasinArea, lSubBasinHruTable, lChanged)
+                    If Not lChanged Then
+                        'next try other hi-slope land uses
+                        Dim LUsToConvert2() As String = {"URHD", "URLD", "URMD", "ALFA", "HAY", "FRSD", "FRSE", "FRST"}
+                        ConvertHRUsToCRP(lSubBasinId, LUsToConvert2, lSlopeCodes, lHuc8CrpNeed, lSwatInput, lSubBasinArea, lSubBasinHruTable, lChanged, pMaxHRUsToChange)
+                        If Not lChanged Then
+                            'finally try lower slope land uses
+                            Dim LUsToConvert3() As String = {"URHD", "URLD", "URMD", "ALFA", "HAY", "FRSD", "FRSE", "FRST", "WETF"}
+                            Dim lSlopeCodes2() As String = {"2-4", "4-9999"}
+                            ConvertHRUsToCRP(lSubBasinId, LUsToConvert3, lSlopeCodes2, lHuc8CrpNeed, lSwatInput, lSubBasinArea, lSubBasinHruTable, lChanged, pMaxHRUsToChange)
                         End If
-                    Next
+                    End If
                     If Not lChanged Then
                         Logger.Dbg("Need to convert something else for " & lSubBasinId)
                     End If
@@ -113,6 +108,53 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
         'back to basins log
         Logger.StartToFile(lLogFileName, True, False, True)
     End Sub
+
+    Private Sub ConvertHRUsToCRP(ByVal aSubBasinID As String, ByVal aLUsToConvert As Array, ByVal aSlopeCodes As Array, ByVal aCRPAreaNeeded As Double, _
+                                 ByVal aSwatInput As SwatInput, ByVal aSubBasinArea As Double, ByVal aSubBasinHRUTable As DataTable, _
+                                 ByRef aChanged As Boolean, Optional ByVal aMaxHRUsToChange As Integer = 0)
+        Dim lMaxHRUsToChange As Integer = 1000000
+        If aMaxHRUsToChange > 0 Then lMaxHRUsToChange = aMaxHRUsToChange
+        Dim lHRUsChanged As Integer = 0
+        Dim lHruId As String
+        Dim lHruLandUse As String
+        Dim lHruSlope As String
+        Dim lHruFraction As Double
+        Dim lHruArea As Double
+        For Each lHruRow As DataRow In aSubBasinHRUTable.Rows
+            lHruId = lHruRow.Item("HRU")
+            lHruLandUse = lHruRow.Item("LANDUSE")
+            lHruSlope = lHruRow.Item("SLOPE_CD")
+            lHruFraction = lHruRow.Item("HRU_FR")
+            lHruArea = lHruFraction * aSubBasinArea
+            If lHruArea > aCRPAreaNeeded And Not aChanged Then
+                If lHRUsChanged = 0 Then
+                    Dim lLUString As String = ""
+                    For Each lstr As String In aLUsToConvert
+                        lLUString &= lstr & ", "
+                    Next
+                    lLUString = Left(lLUString, lLUString.Length - 2)
+                    Logger.Dbg("SubBasin " & aSubBasinID & ": " & lLUString & " HRUs too big (only need " & aCRPAreaNeeded & ") - convert other HRUs")
+                End If
+                Exit For
+            Else
+                If Array.IndexOf(aLUsToConvert, lHruLandUse) >= 0 AndAlso _
+                   Array.IndexOf(aSlopeCodes, lHruSlope) >= 0 AndAlso _
+                   lHruArea < aCRPAreaNeeded Then
+                    aCRPAreaNeeded -= lHruArea
+                    Logger.Dbg("SubBasin " & aSubBasinID & " Change " & lHruLandUse & " to " & pCropToCreate & " for " & lHruArea & " need " & aCRPAreaNeeded)
+                    UpdateLandUse(aSwatInput, aSubBasinID, lHruId, lHruLandUse, pCropToCreate)
+                    lHRUsChanged += 1
+                End If
+            End If
+        Next
+        If lHRUsChanged > 0 Then
+            aChanged = True
+        Else
+            aChanged = False
+        End If
+
+    End Sub
+
     Private Sub UpdateLandUse(ByVal aSwatInput As SwatInput, _
                               ByVal aSubBasinId As String, ByVal aHruId As String, _
                               ByVal aHruLandUse As String, ByVal aLandUseNew As String)
@@ -144,4 +186,5 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
             Logger.Dbg("Missing MGT5")
         End If
     End Sub
+
 End Module
