@@ -6,7 +6,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcData", "atcData\atcData.
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcControls", "atcControls\atcControls.vbproj", "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGraph", "atcGraph\atcGraph.vbproj", "{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGraph", "atcGraphExperimental\atcGraph.vbproj", "{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesMath", "atcTimeseriesMath\atcTimeseriesMath.vbproj", "{BD299EB7-7A62-4EF9-8806-86E9288C498F}"
 EndProject
@@ -72,9 +72,9 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUCI", "atcUCI\atcUCI.vbp
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGisUtiliies", "atcGisUtilities\atcGisUtiliies.vbproj", "{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimseriesDbf", "atcTimseriesDbf\atcTimseriesDbf.vbproj", "{F05FE01B-E35C-4444-B5A2-47085D073631}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesDbf", "atcTimeseriesDbf\atcTimeseriesDbf.vbproj", "{F05FE01B-E35C-4444-B5A2-47085D073631}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimseriesExcel", "atcTimseriesExcel\atcTimseriesExcel.vbproj", "{94048896-37EE-4760-8707-8E5989498943}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesExcel", "atcTimeseriesExcel\atcTimeseriesExcel.vbproj", "{94048896-37EE-4760-8707-8E5989498943}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "D4EMDownloadData", "D4EMDownloadData\D4EMDownloadData.vbproj", "{ADD48409-FC1F-4A92-B07C-6B9A9A5BAC72}"
 EndProject
@@ -92,7 +92,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcHspfSupport", "atcHspfSu
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", "..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimseriesWRDB", "atcTimeseriesWRDB\atcTimseriesWRDB.vbproj", "{5E5A80B8-06DC-428F-A139-F1CF20D756B2}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesWRDB", "atcTimeseriesWRDB\atcTimeseriesWRDB.vbproj", "{5E5A80B8-06DC-428F-A139-F1CF20D756B2}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSegmentation", "atcSegmentation\atcSegmentation.vbproj", "{813E3F46-36CA-4320-BB05-325EEC553D3D}"
 EndProject
