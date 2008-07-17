@@ -235,4 +235,70 @@ TryExecute:
         Next
         IO.File.WriteAllText(aSaveFileName, lSB.ToString)
     End Sub
+
+    ''' <summary>
+    ''' Create a new list of objects, one for each record of the table, populated from columns of table
+    ''' </summary>
+    ''' <param name="aObjectType"></param>
+    ''' <param name="aFieldMap">Mapping of object field names as keys to table field names as items</param>
+    ''' <param name="aNewArgs"></param>
+    ''' <param name="aNewBindingFlags"></param>
+    ''' <returns></returns>
+    ''' <remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
+    Public Function PopulateObjects(ByVal aTable As DataTable, _
+                                    ByVal aObjectType As Type, _
+                           Optional ByVal aFieldMap As atcUtility.atcCollection = Nothing, _
+                           Optional ByVal aNewArgs() As Object = Nothing, _
+                           Optional ByVal aNewBindingFlags As Reflection.BindingFlags = Reflection.BindingFlags.CreateInstance _
+                                                                                      + Reflection.BindingFlags.Public _
+                                                                                      + Reflection.BindingFlags.Instance) As ArrayList
+        Dim lNewList As New ArrayList
+        For Each lRow As DataRow In aTable.Rows
+            Dim lObject As Object = aObjectType.InvokeMember("New", aNewBindingFlags, Nothing, Nothing, aNewArgs)
+            PopulateObject(lRow, lObject, aFieldMap)
+            lNewList.Add(lObject)
+        Next
+        Return lNewList
+    End Function
+
+    ''' <summary>
+    ''' Populate an object from the current record of the table
+    ''' </summary>
+    ''' <param name="aObject">Object to populate</param>
+    ''' <param name="aFieldMap">Mapping of object field names as keys to table field names as items</param>
+    ''' <remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
+    Public Sub PopulateObject(ByVal aRow As DataRow, ByRef aObject As Object, Optional ByVal aFieldMap As atcUtility.atcCollection = Nothing)
+        Dim lType As Type = aObject.GetType
+        For Each lField As Reflection.FieldInfo In lType.GetFields()
+            Dim lValue As Object = Nothing
+            Try
+                If aFieldMap IsNot Nothing AndAlso aFieldMap.Keys.Contains(lField.Name) Then
+                    lValue = aRow.Item(aFieldMap.ItemByKey(lField.Name))
+                Else
+                    lValue = aRow.Item(lField.Name)
+                End If
+            Catch
+            End Try
+            If lValue IsNot Nothing Then
+                Select Case Type.GetTypeCode(lField.FieldType)
+                    Case TypeCode.Boolean : lField.SetValue(aObject, CBool(lValue))
+                    Case TypeCode.Byte : lField.SetValue(aObject, CByte(lValue))
+                    Case TypeCode.Char : lField.SetValue(aObject, CChar(lValue))
+                    Case TypeCode.DateTime : lField.SetValue(aObject, CDate(lValue))
+                    Case TypeCode.Decimal : lField.SetValue(aObject, CDec(lValue))
+                    Case TypeCode.Double : lField.SetValue(aObject, CDbl(lValue))
+                    Case TypeCode.Int16 : lField.SetValue(aObject, CShort(lValue))
+                    Case TypeCode.Int32 : lField.SetValue(aObject, CInt(lValue))
+                    Case TypeCode.Int64 : lField.SetValue(aObject, CLng(lValue))
+                    Case TypeCode.SByte : lField.SetValue(aObject, CSByte(lValue))
+                    Case TypeCode.Single : lField.SetValue(aObject, CSng(lValue))
+                    Case TypeCode.String : lField.SetValue(aObject, CStr(lValue))
+                    Case TypeCode.UInt16 : lField.SetValue(aObject, CUShort(lValue))
+                    Case TypeCode.UInt32 : lField.SetValue(aObject, CUInt(lValue))
+                    Case TypeCode.UInt64 : lField.SetValue(aObject, CULng(lValue))
+                End Select
+            End If
+        Next
+    End Sub
+
 End Module

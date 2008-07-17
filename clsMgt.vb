@@ -51,6 +51,10 @@ Partial Class SwatInput
             SLOPE_CD = aSLOPE_CD
         End Sub
 
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
+        End Sub
+
         Public Function AddSQL() As String
             Return "INSERT INTO mgt1 ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , IGRO , PLANT_ID , LAI_INIT , BIO_INIT , PHU_PLT , BIOMIX , CN2 , USLE_P , BIO_MIN , FILTERW , IURBAN , URBLU , IRRSC , IRRNO , FLOWMIN , DIVMAX , FLOWFR , DDRAIN , TDRAIN , GDRAIN , NROT , HUSC , ISCROP  ) " _
                  & "Values ('" & SUBBASIN & "', '" & Hru & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & IGRO & "', '" & PLANT_ID & "', '" & LAI_INIT & "', '" & BIO_INIT & "', '" & PHU_PLT & "', '" & BIOMIX & "', '" & CN2 & "', '" & USLE_P & "', '" & BIO_MIN & "', '" & FILTERW & "', '" & IURBAN & "', '" & URBLU & "', '" & IRRSC & "', '" & IRRNO & "', '" & FLOWMIN & "', '" & DIVMAX & "', '" & FLOWFR & "', '" & DDRAIN & "', '" & TDRAIN & "', '" & GDRAIN & "', '" & NROT & "', '" & HUSC & "', '" & ISCROP & "'  )"
@@ -106,6 +110,10 @@ Partial Class SwatInput
         Public CFRT_ID As Long
         Public IFRT_FREQ As Long
         Public CFRT_KG As Single
+
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
+        End Sub
 
         Public Sub New(ByVal aSUBBASIN As Double, _
                        ByVal aHRU As Double, _

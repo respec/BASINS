@@ -23,6 +23,10 @@ Partial Class SwatInput
             SUBBASIN = aSUBBASIN
         End Sub
 
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
+        End Sub
+
         Public Function AddSQL() As String
             Return "INSERT INTO rte ( SUBBASIN , CH_W2 , CH_D , CH_S2 , CH_L2 , CH_N2 , CH_K2 , CH_EROD , CH_COV , CH_WDR , ALPHA_BNK   ) " _
                  & "Values ('" & SUBBASIN & "', '" & CH_W2 & "', '" & CH_D & "', '" & CH_S2 & "', '" _

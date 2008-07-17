@@ -22,19 +22,8 @@ Partial Class SwatInput
         Public Sub New()
         End Sub
 
-        Public Sub New(ByVal aRow As DataRow)
-            With aRow
-                IPNUM = .Item("IPNUM")
-                PNAME = .Item("PNAME")
-                SKOC = .Item("SKOC")
-                WOF = .Item("WOF")
-                HLIFE_F = .Item("HLIFE_F")
-                HLIFE_S = .Item("HLIFE_S")
-                AP_EF = .Item("AP_EF")
-                WSOL = .Item("WSOL")
-                HENRY = .Item("HENRY")
-                PESTNAME = .Item("PESTNAME")
-            End With
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
         End Sub
 
         Public Function AddSQL() As String

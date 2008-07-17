@@ -86,9 +86,13 @@ Partial Class SwatInput
         Public Sub New()
         End Sub
 
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
+        End Sub
+
         Public Function AddSQL() As String
-            Return "INSERT INTO bsn ( SFTMP , SMTMP , SMFMX , SMFMN , TIMP , SNOCOVMX , SNO50COV , IPET , ESCO , EPCO , EVLAI , FFCB , IEVENT , ICRK , SURLAG , ADJ_PKR , PRF , SPCON , SPEXP , RCN , CMN , N_UPDIS , P_UPDIS , NPERCO , PPERCO , PHOSKD , PSP , RSDCO , PERCOP , ISUBWQ , WDPQ , WGPQ , WDLPQ , WGLPQ , WDPS , WGPS , WDLPS , WGLPS , BACTKDQ , THBACT , WOF_P , WOF_LP , WDPF , WGPF , WDLPF , WGLPF , IRTE , MSK_COL1 , MSK_COL2 , MSK_X , IDEG , IWQ , TRNSRCH , EVRCH , IRTPEST , ICN , CNCOEF , CDN , SDNCO , BACT_SWF , BACTMX , BACTMINLP , BACTMINP , WDLPRCH , WDPRCH , WDLPRES , WDPRES , TB_ADJ , DEPIMP_BSN , DDRAIN_BSN , TDRAIN_BSN , GDRAIN_BSN , CN_FROZ , ISED_DET , ETFILE  ) " _
-                 & "Values ('" & SFTMP & "', '" & SMTMP & "', '" & SMFMX & "', '" & SMFMN & "', '" & TIMP & "', '" & SNOCOVMX & "', '" & SNO50COV & "', '" & IPET & "', '" & ESCO & "', '" & EPCO & "', '" & EVLAI & "', '" & FFCB & "', '" & IEVENT & "', '" & ICRK & "', '" & SURLAG & "', '" & ADJ_PKR & "', '" & PRF & "', '" & SPCON & "', '" & SPEXP & "', '" & RCN & "', '" & CMN & "', '" & N_UPDIS & "', '" & P_UPDIS & "', '" & NPERCO & "', '" & PPERCO & "', '" & PHOSKD & "', '" & PSP & "', '" & RSDCO & "', '" & PERCOP & "', '" & ISUBWQ & "', '" & WDPQ & "', '" & WGPQ & "', '" & WDLPQ & "', '" & WGLPQ & "', '" & WDPS & "', '" & WGPS & "', '" & WDLPS & "', '" & WGLPS & "', '" & BACTKDQ & "', '" & THBACT & "', '" & WOF_P & "', '" & WOF_LP & "', '" & WDPF & "', '" & WGPF & "', '" & WDLPF & "', '" & WGLPF & "', '" & IRTE & "', '" & MSK_COL1 & "', '" & MSK_COL2 & "', '" & MSK_X & "', '" & IDEG & "', '" & IWQ & "', '" & TRNSRCH & "', '" & EVRCH & "', '" & IRTPEST & "', '" & ICN & "', '" & CNCOEF & "', '" & CDN & "', '" & SDNCO & "', '" & BACT_SWF & "', '" & BACTMX & "', '" & BACTMINLP & "', '" & BACTMINP & "', '" & WDLPRCH & "', '" & WDPRCH & "', '" & WDLPRES & "', '" & WDPRES & "', '" & TB_ADJ & "', '" & DEPIMP_BSN & "', '" & DDRAIN_BSN & "', '" & TDRAIN_BSN & "', '" & GDRAIN_BSN & "', '" & CN_FROZ & "', '" & ISED_DET & "', '" & ETFILE & "'  )"
+            Return "INSERT INTO bsn ( " & atcUtility.FieldNames(Me.GetType, ", ") _
+                       & " ) Values ('" & atcUtility.FieldValues(Me, "', '") & "'  )"
         End Function
     End Class
 

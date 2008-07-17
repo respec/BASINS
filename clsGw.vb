@@ -38,6 +38,10 @@ Partial Class SwatInput
             SLOPE_CD = aSLOPE_CD
         End Sub
 
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
+        End Sub
+
         Public Function AddSQL() As String
             Return "INSERT INTO gw ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , SHALLST , DEEPST , GW_DELAY , ALPHA_BF , GWQMN , GW_REVAP , REVAPMN , RCHRG_DP , GWHT , GW_SPYLD , SHALLST_N , GWSOLP , HLIFE_NGW  ) " _
                  & "Values ('" & SUBBASIN & "', '" & HRU & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & SHALLST & "', '" & DEEPST & "', '" & GW_DELAY & "', '" & ALPHA_BF & "', '" & GWQMN & "', '" & GW_REVAP & "', '" & REVAPMN & "', '" & RCHRG_DP & "', '" & GWHT & "', '" & GW_SPYLD & "', '" & SHALLST_N & "', '" & GWSOLP & "', '" & HLIFE_NGW & "'  )"

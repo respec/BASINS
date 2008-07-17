@@ -25,20 +25,7 @@ Partial Class SwatInput
         End Sub
 
         Public Sub New(ByVal aRow As DataRow)
-            With aRow
-                IFNUM = .Item("IFNUM")
-                FERTNM = .Item("FERTNM")
-                FMINN = .Item("FMINN")
-                FMINP = .Item("FMINP")
-                FORGN = .Item("FORGN")
-                FORGP = .Item("FORGP")
-                FNH3N = .Item("FNH3N")
-                BACTPDB = .Item("BACTPDB")
-                BACTLPDB = .Item("BACTLPDB")
-                BACTKDDB = .Item("BACTKDDB")
-                FERTNAME = .Item("FERTNAME")
-                MANURE = .Item("MANURE")
-            End With
+            PopulateObject(aRow, Me)
         End Sub
 
         Public Function AddSQL() As String

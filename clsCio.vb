@@ -50,6 +50,10 @@ Partial Class SwatInput
         Public Sub New()
         End Sub
 
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
+        End Sub
+
         Public Function AddSQL() As String
             Return "INSERT INTO cio ( NBYR, IYR, IDAF, IDAL, IGEN, PCPSIM, IDT, IDIST, REXP, NRGAGE, NRTOT, NRGFIL, TMPSIM, NTGAGE, NTTOT, NTGFIL, SLRSIM, NSTOT, RHSIM, NHTOT, WNDSIM, NWTOT, FCSTYR, FCSTDAY, FCSTCYCLES, DATES, DATEF, FDATES, ISPROJ, ICLB, IPRINT, NYSKIP, ILOG, IPRP, IPRS  ) " _
                  & "Values ('" & NBYR & "', '" & IYR & "', '" & IDAF & "', '" & IDAL & "', '" & IGEN & "', '" & PCPSIM & "', '" & IDT & "', '" & IDIST & "', '" & REXP & "', '" & NRGAGE & "', '" & NRTOT & "', '" & NRGFIL & "', '" & TMPSIM & "', '" & NTGAGE & "', '" & NTTOT & "', '" & NTGFIL & "', '" & SLRSIM & "', '" & NSTOT & "', '" & RHSIM & "', '" & NHTOT & "', '" & WNDSIM & "', '" & NWTOT & "', '" & FCSTYR & "', '" & FCSTDAY & "', '" & FCSTCYCLES & "', '" & DATES & "', '" & DATEF & "', '" & FDATES & "', '" & ISPROJ & "', '" & ICLB & "', '" & IPRINT & "', '" & NYSKIP & "', '" & ILOG & "', '" & IPRP & "', '" & IPRS & "')"

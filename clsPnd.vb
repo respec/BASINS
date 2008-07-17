@@ -56,6 +56,10 @@ Partial Class SwatInput
             SUBBASIN = aSUBBASIN
         End Sub
 
+        Sub New(ByVal aRow As DataRow)
+            PopulateObject(aRow, Me)
+        End Sub
+
         Public Function AddSQL() As String
             Return "INSERT INTO pnd ( SUBBASIN, PND_FR, PND_PSA, PND_PVOL, PND_ESA, PND_EVOL, PND_VOL, PND_SED, PND_NSED, PND_K, IFLOD1, IFLOD2, NDTARG, PSETLP1, PSETLP2, NSETLP1, NSETLP2, CHLAP, SECCIP, PND_NO3, PND_SOLP, PND_ORGN, PND_ORGP, IPND1, IPND2, WET_FR, WET_NSA, WET_NVOL, WET_MXSA, WET_MXVOL, WET_VOL, WET_SED, WET_NSED, WET_K, PSETLW1, PSETLW2, NSETLW1, NSETLW2, CHLAW, SECCIW, WET_NO3, WET_SOLP, WET_ORGN, WET_ORGP  ) " _
                  & "Values ('" & SUBBASIN & "', '" & PND_FR & "', '" & PND_PSA & "', '" & PND_PVOL & "', '" & PND_ESA & "', '" & PND_EVOL & "', '" & PND_VOL & "', '" & PND_SED & "', '" & PND_NSED & "', '" & PND_K & "', '" & IFLOD1 & "', '" & IFLOD2 & "', '" & NDTARG & "', '" & PSETLP1 & "', '" & PSETLP2 & "', '" & NSETLP1 & "', '" & NSETLP2 & "', '" & CHLAP & "', '" & SECCIP & "', '" & PND_NO3 & "', '" & PND_SOLP & "', '" & PND_ORGN & "', '" & PND_ORGP & "', '" & IPND1 & "', '" & IPND2 & "', '" & WET_FR & "', '" & WET_NSA & "', '" & WET_NVOL & "', '" & WET_MXSA & "', '" & WET_MXVOL & "', '" & WET_VOL & "', '" & WET_SED & "', '" & WET_NSED & "', '" & WET_K & "', '" & PSETLW1 & "', '" & PSETLW2 & "', '" & NSETLW1 & "', '" & NSETLW2 & "', '" & CHLAW & "', '" & SECCIW & "', '" & WET_NO3 & "', '" & WET_SOLP & "', '" & WET_ORGN & "', '" & WET_ORGP & "'   )"
