@@ -276,7 +276,7 @@ Module modModelSetup
     End Function
 
     Friend Function ReclassifyLandUses(ByVal aReclassifyFile As String, _
-                                       ByVal aGridPervious As Object, _
+                                       ByVal aGridPervious As atcControls.atcGrid, _
                                        ByVal aLandUses As LandUses) As LandUses
         Dim lReclassifyLandUses As New LandUses
         'if simple reclassifyfile exists, read it in
@@ -335,8 +335,11 @@ Module modModelSetup
                 Dim lPercentImperv As Double
                 For j As Integer = 1 To aGridPervious.Source.Rows
                     If lLandUseName = aGridPervious.Source.CellValue(j, 1) Then
-                        lPercentImperv = aGridPervious.Source.CellValue(j, 2)
-                        Exit For
+                        If Double.TryParse(aGridPervious.Source.CellValue(j, 2), lPercentImperv) Then
+                            Exit For
+                        Else
+                            Logger.Dbg("Warning: non-parsable percent impervious value at row " & j & " '" & aGridPervious.Source.CellValue(j, 2) & "' for land use name " & lLandUseName)
+                        End If
                     End If
                 Next j
                 'find lugroup position in the area array
@@ -375,39 +378,38 @@ Module modModelSetup
                     If aGridPervious.Source.CellValue(j, 0) <> "" Then
                         If lLandUse.Code = aGridPervious.Source.CellValue(j, 0) Then
                             'see if any of these are subbasin-specific
-                            lPercentImperv = aGridPervious.Source.CellValue(j, 2)
-                            Dim lMultiplier As Double
-                            If IsNumeric(aGridPervious.Source.CellValue(j, 3)) Then
-                                lMultiplier = CSng(aGridPervious.Source.CellValue(j, 3))
+                            If Not Double.TryParse(aGridPervious.Source.CellValue(j, 2), lPercentImperv) Then
+                                Logger.Dbg("Warning: non-parsable percent impervious value at row " & j & " '" & aGridPervious.Source.CellValue(j, 2) & "' for land use code " & lLandUse.Code)
                             Else
-                                lMultiplier = 1.0
-                            End If
-                            Dim lSubbasin As String = aGridPervious.Source.CellValue(j, 4)
-                            Dim lSubbasinSpecific As Boolean = False
-                            If Not lSubbasin Is Nothing Then
-                                If lSubbasin.Length > 0 And lSubbasin <> "Invalid Field Number" Then
-                                    lSubbasinSpecific = True
+                                Dim lMultiplier As Double
+                                If Not Double.TryParse(aGridPervious.Source.CellValue(j, 3), lMultiplier) Then
+                                    lMultiplier = 1.0
                                 End If
-                            End If
-                            If lSubbasinSpecific Then
-                                'this row is subbasin-specific
-                                If lSubbasin = lLandUse.ModelID Then
-                                    lLandUseName = aGridPervious.Source.CellValue(j, 1)
+                                Dim lSubbasin As String = aGridPervious.Source.CellValue(j, 4)
+                                Dim lSubbasinSpecific As Boolean = False
+                                If Not lSubbasin Is Nothing Then
+                                    If lSubbasin.Length > 0 And lSubbasin <> "Invalid Field Number" Then
+                                        lSubbasinSpecific = True
+                                    End If
                                 End If
-                            Else
-                                'make sure that no other rows of this lucode are 
-                                'subbasin-specific for this subbasin and that we 
-                                'should therefore not use this row
-                                Dim lUseIt As Boolean = True
-                                For k As Integer = 1 To aGridPervious.Source.Rows
-                                    If k <> j Then
-                                        If aGridPervious.Source.CellValue(k, 0) = aGridPervious.Source.CellValue(j, 0) Then
-                                            'this other row has same lucode
-                                            If aGridPervious.Source.CellValue(k, 1) = aGridPervious.Source.CellValue(j, 1) Then
-                                                'and the same group name
-                                                lSubbasin = aGridPervious.Source.CellValue(k, 4)
-                                                If Not lSubbasin Is Nothing Then
-                                                    If lSubbasin.Length > 0 Then
+                                If lSubbasinSpecific Then
+                                    'this row is subbasin-specific
+                                    If lSubbasin = lLandUse.ModelID Then
+                                        lLandUseName = aGridPervious.Source.CellValue(j, 1)
+                                    End If
+                                Else
+                                    'make sure that no other rows of this lucode are 
+                                    'subbasin-specific for this subbasin and that we 
+                                    'should therefore not use this row
+                                    Dim lUseIt As Boolean = True
+                                    For k As Integer = 1 To aGridPervious.Source.Rows
+                                        If k <> j Then
+                                            If aGridPervious.Source.CellValue(k, 0) = aGridPervious.Source.CellValue(j, 0) Then
+                                                'this other row has same lucode
+                                                If aGridPervious.Source.CellValue(k, 1) = aGridPervious.Source.CellValue(j, 1) Then
+                                                    'and the same group name
+                                                    lSubbasin = aGridPervious.Source.CellValue(k, 4)
+                                                    If lSubbasin IsNot Nothing AndAlso IsNumeric(lSubbasin) Then
                                                         'and its subbasin-specific
                                                         If lSubbasin = lLandUse.ModelID Then
                                                             'and its specific to this subbasin
@@ -417,29 +419,29 @@ Module modModelSetup
                                                 End If
                                             End If
                                         End If
+                                    Next k
+                                    If lUseIt Then 'we want this one now
+                                        lLandUseName = aGridPervious.Source.CellValue(j, 1)
                                     End If
-                                Next k
-                                If lUseIt Then 'we want this one now
-                                    lLandUseName = aGridPervious.Source.CellValue(j, 1)
                                 End If
-                            End If
 
-                            If lLandUseName.Length > 0 Then 'find lugroup position in the area array
-                                For k As Integer = 1 To lUniqueLugroups.Count
-                                    If lLandUseName = lUniqueLugroups(k - 1) Then
-                                        lpos = k - 1
-                                        Exit For
-                                    End If
-                                Next k
-                            End If
+                                If lLandUseName.Length > 0 Then 'find lugroup position in the area array
+                                    For k As Integer = 1 To lUniqueLugroups.Count
+                                        If lLandUseName = lUniqueLugroups(k - 1) Then
+                                            lpos = k - 1
+                                            Exit For
+                                        End If
+                                    Next k
+                                End If
 
-                            If lpos > -1 Then
-                                With lLandUse
-                                    lPerArea(spos, lpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
-                                    lImpArea(spos, lpos) += (.Area * lMultiplier * lPercentImperv / 100)
-                                    lLength(spos) = 0.0 'were not computing lsur since winhspf does that
-                                    lSlope(spos) = .Slope / 100.0
-                                End With
+                                If lpos > -1 Then
+                                    With lLandUse
+                                        lPerArea(spos, lpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
+                                        lImpArea(spos, lpos) += (.Area * lMultiplier * lPercentImperv / 100)
+                                        lLength(spos) = 0.0 'were not computing lsur since winhspf does that
+                                        lSlope(spos) = .Slope / 100.0
+                                    End With
+                                End If
                             End If
                         End If
                     End If
