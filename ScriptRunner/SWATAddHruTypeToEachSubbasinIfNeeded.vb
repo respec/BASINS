@@ -80,6 +80,7 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
                     Dim lSubBasinHruTable As DataTable = lSwatInput.QueryInputDB("SELECT * FROM hru WHERE " & lWhereClause & " ORDER BY hru_fr;")
                     Dim lChanged As Boolean = False
                     For Each lHruRow As DataRow In lSubBasinHruTable.Rows
+                        Dim lHruId As String = lHruRow.Item("HRU")
                         Dim lHruLandUse As String = lHruRow.Item("LANDUSE")
                         Dim lHruSlope As String = lHruRow.Item("SLOPE_CD")
                         Dim lHruFraction As Double = lHruRow.Item("HRU_FR")
@@ -94,6 +95,7 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
                                lHruArea < lHuc8CrpNeed Then
                                 lHuc8CrpNeed -= lHruArea
                                 Logger.Dbg("SubBasin " & lSubBasinId & " Change " & lHruLandUse & " to " & pCropToCreate & " for " & lHruArea & " need " & lHuc8CrpNeed)
+                                UpdateLandUse(lSwatInput, lSubBasinId, lHruId, lHruLandUse, pCropToCreate)
                                 lChanged = True
                             End If
                         End If
@@ -110,5 +112,36 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
 
         'back to basins log
         Logger.StartToFile(lLogFileName, True, False, True)
+    End Sub
+    Private Sub UpdateLandUse(ByVal aSwatInput As SwatInput, _
+                              ByVal aSubBasinId As String, ByVal aHruId As String, _
+                              ByVal aHruLandUse As String, ByVal aLandUseNew As String)
+        Dim lWhereClause As String = " (subbasin=" & aSubBasinId & " AND hru=" & aHruId & ")"
+        Dim lTablesToUpdate As String() = {"hru", "chm", "gw", "mgt1", "sol"}
+        For Each lTable As String In lTablesToUpdate
+            aSwatInput.UpdateInputDB(lTable, lWhereClause, "LANDUSE", aLandUseNew)
+        Next
+        'update other parameters in mgt2 
+        'TODO: dont make so tied to the specific needs of UMRB project !!!!
+        Dim lSql As String = "SELECT * FROM mgt2 WHERE " & lWhereClause & ";"
+        Dim lDataTable As DataTable = aSwatInput.QueryInputDB(lSql)
+        Logger.Dbg("SubBasin " & aSubBasinId & " HRU " & aHruId & " MGT2Count " & lDataTable.Rows.Count)
+        Dim lMgtFound(20) As Boolean
+        For Each lRow As DataRow In lDataTable.Rows
+            Dim lMgtOp As Integer = lRow.Item("MGT_OP")
+            lMgtFound(lMgtOp) = True
+            If lMgtOp = 1 Or lMgtOp = 5 Then
+                aSwatInput.UpdateInputDB("mgt2", "oid", lRow.Item(0), "landuse", aLandUseNew)
+                aSwatInput.UpdateInputDB("mgt2", "oid", lRow.Item(0), "crop", aLandUseNew)
+            Else
+                aSwatInput.DeleteRowInputDB("mgt2", "oid", lRow.Item(0))
+            End If
+        Next
+        If Not lMgtFound(1) Then
+            Logger.Dbg("Missing MGT1")
+        End If
+        If Not lMgtFound(5) Then
+            Logger.Dbg("Missing MGT5")
+        End If
     End Sub
 End Module
