@@ -399,7 +399,7 @@ Public MustInherit Class atcTable
     ''' Populate an object from the current record of the table
     ''' </summary>
     ''' <param name="aObject">Object to populate</param>
-    ''' <param name="aFieldMap">Mapping of object field names as keys to table field names as items</param>
+    ''' <param name="aFieldMap">Mapping of object field/property names as keys to table field names as items</param>
     ''' <remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
     Public Sub PopulateObject(ByRef aObject As Object, Optional ByVal aFieldMap As atcUtility.atcCollection = Nothing)
         Dim lType As Type = aObject.GetType
@@ -413,24 +413,19 @@ Public MustInherit Class atcTable
             End If
 
             If lFieldNumber > 0 Then
-                Dim lValue As String = Value(lFieldNumber)
-                Select Case Type.GetTypeCode(lField.FieldType)
-                    Case TypeCode.Boolean : lField.SetValue(aObject, CBool(lValue))
-                    Case TypeCode.Byte : lField.SetValue(aObject, CByte(lValue))
-                    Case TypeCode.Char : lField.SetValue(aObject, CChar(lValue))
-                    Case TypeCode.DateTime : lField.SetValue(aObject, CDate(lValue))
-                    Case TypeCode.Decimal : lField.SetValue(aObject, CDec(lValue))
-                    Case TypeCode.Double : lField.SetValue(aObject, CDbl(lValue))
-                    Case TypeCode.Int16 : lField.SetValue(aObject, CShort(lValue))
-                    Case TypeCode.Int32 : lField.SetValue(aObject, CInt(lValue))
-                    Case TypeCode.Int64 : lField.SetValue(aObject, CLng(lValue))
-                    Case TypeCode.SByte : lField.SetValue(aObject, CSByte(lValue))
-                    Case TypeCode.Single : lField.SetValue(aObject, CSng(lValue))
-                    Case TypeCode.String : lField.SetValue(aObject, lValue)
-                    Case TypeCode.UInt16 : lField.SetValue(aObject, CUShort(lValue))
-                    Case TypeCode.UInt32 : lField.SetValue(aObject, CUInt(lValue))
-                    Case TypeCode.UInt64 : lField.SetValue(aObject, CULng(lValue))
-                End Select
+                SetSomething(aObject, lField.Name, Value(lFieldNumber))
+            End If
+        Next
+
+        For Each lProperty As Reflection.PropertyInfo In lType.GetProperties()
+            If aFieldMap IsNot Nothing AndAlso aFieldMap.Keys.Contains(lProperty.Name) Then
+                lFieldNumber = FieldNumber(aFieldMap.ItemByKey(lProperty.Name))
+            Else
+                lFieldNumber = FieldNumber(lProperty.Name)
+            End If
+
+            If lFieldNumber > 0 Then
+                SetSomething(aObject, lProperty.Name, Value(lFieldNumber))
             End If
         Next
     End Sub
