@@ -185,12 +185,48 @@ Public Class SwatInput
     Public Sub UpdateInputDB(ByVal aTableName As String, _
                              ByVal aIdFieldName As String, ByVal aId As Integer, _
                              ByVal aValueFieldName As String, ByVal aValue As String)
-        Dim lSQL As String = "UPDATE " & aTableName _
-                           & " SET " & aValueFieldName & " = " & aValue _
-                           & " WHERE " & aIdFieldName & " = " & aId
+        Dim lSQL As String = ""
+        Dim lNumber As Double
+        If Double.TryParse(aValue, lNumber) Then
+            lSQL = "UPDATE " & aTableName _
+                 & " SET " & aValueFieldName & " = " & aValue _
+                 & " WHERE " & aIdFieldName & " = " & aId
+        Else
+            lSQL = "UPDATE " & aTableName _
+                & " SET " & aValueFieldName & " = '" & aValue & "'" _
+                & " WHERE " & aIdFieldName & " = " & aId
+        End If
         Dim lUpdateCommand As OleDbCommand = New OleDbCommand(lSQL, CnSwatInput)
         lUpdateCommand.CommandTimeout = 30
         lUpdateCommand.ExecuteNonQuery()
+    End Sub
+
+    Public Sub UpdateInputDB(ByVal aTableName As String, _
+                             ByVal aWhereClause As String, _
+                             ByVal aValueFieldName As String, ByVal aValue As String)
+        Dim lSQL As String = ""
+        Dim lNumber As Double
+        If Double.TryParse(aValue, lNumber) Then
+            lSQL = "UPDATE " & aTableName _
+                 & " SET " & aValueFieldName & " = " & aValue _
+                 & " WHERE " & aWhereClause
+        Else
+            lSQL = "UPDATE " & aTableName _
+                 & " SET " & aValueFieldName & " = '" & aValue & "'" _
+                 & " WHERE " & aWhereClause
+        End If
+        Dim lUpdateCommand As OleDbCommand = New OleDbCommand(lSQL, CnSwatInput)
+        lUpdateCommand.CommandTimeout = 30
+        lUpdateCommand.ExecuteNonQuery()
+    End Sub
+
+
+    Public Sub DeleteRowInputDB(ByVal aTableName As String, _
+                                ByVal aIdFieldName As String, ByVal aId As Integer)
+        Dim lSQL As String = "DELETE FROM " & aTableName & " WHERE " & aIdFieldName & "=" & aId & ";"
+        Dim lDeleteCommand As OleDbCommand = New OleDbCommand(lSQL, CnSwatInput)
+        lDeleteCommand.CommandTimeout = 30
+        lDeleteCommand.ExecuteNonQuery()
     End Sub
 
     Public Sub SaveAllTextInput()
