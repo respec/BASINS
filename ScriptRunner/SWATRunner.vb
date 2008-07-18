@@ -416,7 +416,8 @@ Module SWATRunner
 
         Dim lSubTimseriesGroup As New atcDataSourceTimeseriesBinary
         lSubTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "sub.tsbin"))
-        WriteSubSummary(pReportsFolder, lSubTimseriesGroup.DataSets, lSubBasin2HUC8)
+        Dim lSubBasinsOutputFileName As String = IO.Path.Combine(pReportsFolder, "SubBasinSummary.txt")
+        WriteSubSummary(pReportsFolder, lSubTimseriesGroup.DataSets, lSubBasin2HUC8, lSubBasinsOutputFileName)
         Logger.Dbg("Report Load Done")
 
         Dim lRchTimseriesGroup As New atcDataSourceTimeseriesBinary
@@ -424,11 +425,33 @@ Module SWATRunner
         Dim lReachOutputFileName As String = IO.Path.Combine(pReportsFolder, "ReachSummary.txt")
         WriteReachSummary(pReportsFolder, lRchTimseriesGroup.DataSets, lSubBasin2HUC8, lReachOutputFileName)
         Logger.Dbg("Report Reach Done")
+
+        Dim lHuc2Summary As New atcCollection
+        Dim lHuc4Summary As New atcCollection
+        Dim lHuc6Summary As New atcCollection
+        Dim lSubBasinOutputTable As New atcTableDelimited
+        With lSubBasinOutputTable
+            .Delimiter = vbTab
+            .OpenFile(lSubBasinsOutputFileName)
+        End With
+
         Dim lReachOutputTable As New atcTableDelimited
         With lReachOutputTable
             .Delimiter = vbTab
             .OpenFile(lReachOutputFileName)
+            .MoveNext()
+            For lIndex As Integer = 2 To .NumRecords
+                .CurrentRecord = lIndex
+                Dim lHuc8 As String = .Value(2)
+                lSubBasinOutputTable.CurrentRecord = lIndex
+                MakeSummary(lHuc8.Substring(0, 2), lReachOutputTable, lSubBasinOutputTable, lHuc2Summary)
+                MakeSummary(lHuc8.Substring(0, 4), lReachOutputTable, lSubBasinOutputTable, lHuc4Summary)
+                MakeSummary(lHuc8.Substring(0, 6), lReachOutputTable, lSubBasinOutputTable, lHuc6Summary)
+            Next
         End With
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc2Summary.txt"), HucSummaryReport(lHuc2Summary))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4Summary.txt"), HucSummaryReport(lHuc4Summary))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc6Summary.txt"), HucSummaryReport(lHuc6Summary))
 
         With atcDataManager.DisplayAttributes
             .Clear()
@@ -442,6 +465,55 @@ Module SWATRunner
         Logger.Dbg("SwatPostProcessingDone")
     End Sub
 
+    Private Class HucSummary
+        Public Name As String
+        Public Area As Double
+        Public AreaCum As Double
+        Public NLoad As Double
+        Public NOutflow As Double
+    End Class
+    Private Function HucSummaryReport(ByVal aHucSummaryCollection As atcCollection) As String
+        Dim lSB As New Text.StringBuilder
+        lSB.AppendLine("HUC".PadLeft(8) _
+             & vbTab & "Area".PadLeft(12) _
+             & vbTab & "AreaCum".PadLeft(12) _
+             & vbTab & "NLocalLoadUnit".PadLeft(12) _
+             & vbTab & "NOutflow".PadLeft(16) _
+             & vbTab & "NOutLoadUnit".PadLeft(12))
+        For Each lHucSummary As HucSummary In aHucSummaryCollection
+            With lHucSummary
+                Dim lNLoadUnit As Double = .NLoad / .Area 'local load 
+                lSB.AppendLine(.Name.PadLeft(8) _
+                               & vbTab & DecimalAlign(.Area, , 0, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(.AreaCum, , 0, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(lNLoadUnit, , 0, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(.NOutflow, 16, 0, 12).PadLeft(16) _
+                               & vbTab & DecimalAlign((.NOutflow / .AreaCum), , 0, 8).PadLeft(12))
+            End With
+        Next
+        Return lSB.ToString
+    End Function
+    Private Sub MakeSummary(ByVal aHuc As String, _
+                            ByVal aReachOutputTable As atcTable, ByVal aSubBasinOutputTable As atcTable, _
+                            ByRef aHucSummary As atcCollection)
+        Dim lHucSummary As HucSummary
+        If aHucSummary.IndexFromKey(aHuc) = -1 Then
+            lHucSummary = New HucSummary
+            lHucSummary.Name = aHuc
+            aHucSummary.Add(aHuc, lHucSummary)
+        Else
+            lHucSummary = aHucSummary.ItemByKey(aHuc)
+        End If
+        With lHucSummary
+            .Area += aSubBasinOutputTable.Value(3)
+            .NLoad += aSubBasinOutputTable.Value(5)
+            If .AreaCum < aReachOutputTable.Value(3) Then 'new downstream
+                .AreaCum = aReachOutputTable.Value(3)
+                .NOutflow = aReachOutputTable.Value(5)
+            End If
+        End With
+    End Sub
+
     Private Sub WriteDatasets(ByVal aFileName As String, ByVal aDatasets As atcDataGroup)
         Dim lDataTarget As New atcDataSourceTimeseriesBinary ' atcDataSourceWDM
         Dim lFileName As String = aFileName & ".tsbin" 'lDataTarget.Filter.?) Then
@@ -451,7 +523,7 @@ Module SWATRunner
         End If
     End Sub
 
-    Private Sub WriteSubSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup, ByVal aSubBasin2HUC8 As atcCollection)
+    Private Sub WriteSubSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup, ByVal aSubBasin2HUC8 As atcCollection, ByVal aOutputFileName As String)
         Dim lConsNitr As String() = {"ORGN", "NSURQ", "LATNO3", "GWNO3"}
         Dim lConsPhos As String() = {"ORGP", "SOLP", "SEDP"}
         Dim lConsOtherOut As String() = {"AREA", "WYLD", "SYLD"}
@@ -521,7 +593,7 @@ Module SWATRunner
             'TODO: just output year
             lList.Save(lSubDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc))
         Next
-        SaveFileString(IO.Path.Combine(aOutputFolder, "SubBasinSummary.txt"), lSBHuc8.ToString)
+        SaveFileString(aOutputFileName, lSBHuc8.ToString)
     End Sub
 
     Private Sub WriteReachSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup, ByVal aSubBasin2HUC8 As atcCollection, ByVal aOutputFileName As String)
