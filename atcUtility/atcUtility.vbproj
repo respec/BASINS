@@ -105,6 +105,7 @@
     <Compile Include="atcTable.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcTableArray.vb" />
     <Compile Include="atcTableDBF.vb">
       <SubType>Code</SubType>
     </Compile>

@@ -202,9 +202,14 @@ Friend Class atcListForm
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcDataGroup
 
-    'Numeric display properties
-    Friend pSigDig As Integer = 5
-    Friend pDecPla As Integer = 3
+    Private pDateFormat As New atcDateFormat
+
+    'Value formatting options, can be overridden by timeseries attributes
+    Private pMaxWidth As Integer = 10
+    Private pFormat As String = "#,##0.########"
+    Private pExpFormat As String = "#.#e#"
+    Private pCantFit As String = "#"
+    Private pSignificantDigits As Integer = 5
 
     'Translator class between pDataGroup and agdMain
     Private pSource As atcTimeseriesGridSource
@@ -214,7 +219,8 @@ Friend Class atcListForm
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing, _
                           Optional ByVal aDisplayAttributes As ArrayList = Nothing, _
                           Optional ByVal aShowValues As Boolean = True, _
-                          Optional ByVal aFilterNoData As Boolean = False)
+                          Optional ByVal aFilterNoData As Boolean = False, _
+                          Optional ByVal aShowForm As Boolean = True)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
@@ -227,19 +233,21 @@ Friend Class atcListForm
             pDisplayAttributes = aDisplayAttributes
         End If
 
-        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        For Each lDisp As atcDataDisplay In DisplayPlugins
-            Dim lMenuText As String = lDisp.Name
-            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-            mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
-        Next
+        If aShowForm Then
+            Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+            For Each lDisp As atcDataDisplay In DisplayPlugins
+                Dim lMenuText As String = lDisp.Name
+                If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
+                mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
+            Next
+        End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
             atcDataManager.UserSelectData(, pDataGroup)
         End If
 
         If pDataGroup.Count > 0 Then
-            Me.Show()
+            If aShowForm Then Me.Show()
             mnuViewValues.Checked = aShowValues
             mnuFilterNoData.Checked = aFilterNoData
             PopulateGrid()
@@ -249,11 +257,44 @@ Friend Class atcListForm
 
     End Sub
 
+    Public Property DateFormat() As atcDateFormat
+        Get
+            Return pDateFormat
+        End Get
+        Set(ByVal newValue As atcDateFormat)
+            pDateFormat = newValue
+            If pSource IsNot Nothing Then
+                pSource.DateFormat = pDateFormat
+                If agdMain IsNot Nothing Then agdMain.Refresh()
+            End If
+        End Set
+    End Property
+
+    Public Sub ValueFormat(Optional ByVal aMaxWidth As Integer = 10, _
+                           Optional ByVal aFormat As String = "#,##0.########", _
+                           Optional ByVal aExpFormat As String = "#.#e#", _
+                           Optional ByVal aCantFit As String = "#", _
+                           Optional ByVal aSignificantDigits As Integer = 5)
+        pMaxWidth = aMaxWidth
+        pFormat = aFormat
+        pExpFormat = aExpFormat
+        pCantFit = aCantFit
+        pSignificantDigits = aSignificantDigits
+        If pSource IsNot Nothing Then
+            pSource.ValueFormat(pMaxWidth, pFormat, pExpFormat, pCantFit, pSignificantDigits)
+            If agdMain IsNot Nothing Then agdMain.Refresh()
+        End If
+    End Sub
+
     Private Sub PopulateGrid()
         'with timeseries data, a list of attributes and options define a timeseries grid source
         pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, _
                                               mnuViewValues.Checked, _
                                               mnuFilterNoData.Checked)
+        With pSource
+            .DateFormat = pDateFormat
+            .ValueFormat(pMaxWidth, pFormat, pExpFormat, pCantFit, pSignificantDigits)
+        End With
 
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
@@ -395,32 +436,49 @@ Friend Class atcListForm
     Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOptions.Click
         Dim lFrmOptions As New frmOptions
         With lFrmOptions
-            .txtSigDig.Value = pSigDig
-            .txtDecPla.Value = pDecPla
+            Select Case pDateFormat.DateOrder
+                Case atcDateFormat.DateOrderEnum.DayMonthYear : .radioOrderDMY.Checked = True
+                Case atcDateFormat.DateOrderEnum.JulianDate : .radioOrderJulian.Checked = True
+                Case atcDateFormat.DateOrderEnum.MonthDayYear : .radioOrderMDY.Checked = True
+                Case atcDateFormat.DateOrderEnum.YearMonthDay : .radioOrderYMD.Checked = True
+            End Select
+            .chkYears.Checked = pDateFormat.IncludeYears
+            .chkSeconds.Checked = pDateFormat.IncludeSeconds
+            .chkMonths.Checked = pDateFormat.IncludeMonths
+            .chkMonthNames.Checked = pDateFormat.MonthNames
+            .chkMinutes.Checked = pDateFormat.IncludeMinutes
+            .chkHours.Checked = pDateFormat.IncludeHours
+            .chkDays.Checked = pDateFormat.IncludeHours
+            .chkMidnight24.Checked = pDateFormat.Midnight24
+
+            .txtFormat.Text = pFormat
+            .txtExpFormat.Text = pExpFormat
+            .txtSignificantDigits.Text = pSignificantDigits
+            .txtMaxWidth.Text = pMaxWidth
+            .txtCantFit.Text = pCantFit
+
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                pSigDig = .txtSigDig.Value
-                pDecPla = .txtDecPla.Value
-                'TODO: these values are to be used in atcTimeseriesGridSrouce:CellValue in a call to DoubleToString
+                If .radioOrderDMY.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.DayMonthYear
+                If .radioOrderJulian.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.JulianDate
+                If .radioOrderMDY.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.MonthDayYear
+                If .radioOrderYMD.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.YearMonthDay
+
+                pDateFormat.IncludeYears = .chkYears.Checked
+                pDateFormat.IncludeSeconds = .chkSeconds.Checked
+                pDateFormat.IncludeMonths = .chkMonths.Checked
+                pDateFormat.MonthNames = .chkMonthNames.Checked
+                pDateFormat.IncludeMinutes = .chkMinutes.Checked
+                pDateFormat.IncludeHours = .chkHours.Checked
+                pDateFormat.IncludeHours = .chkDays.Checked
+                pDateFormat.Midnight24 = .chkMidnight24.Checked
+
+                pFormat = .txtFormat.Text
+                pExpFormat = .txtExpFormat.Text
+                Integer.TryParse(.txtSignificantDigits.Text, pSignificantDigits)
+                Integer.TryParse(.txtMaxWidth.Text, pMaxWidth)
+                pCantFit = .txtCantFit.Text
                 PopulateGrid()
             End If
         End With
     End Sub
-
-    Friend Property SigDig() As Integer
-        Get
-            Return pSigDig
-        End Get
-        Set(ByVal value As Integer)
-            pSigDig = value
-        End Set
-    End Property
-
-    Friend Property DecPla() As Integer
-        Get
-            Return pDecPla
-        End Get
-        Set(ByVal value As Integer)
-            pDecPla = value
-        End Set
-    End Property
 End Class

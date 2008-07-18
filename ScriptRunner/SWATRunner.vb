@@ -33,13 +33,13 @@ Module SWATRunner
     Private pOutputFolder As String
     Private pReportsFolder As String
     Private pLogsFolder As String
-    'Private pLandUseChangesTextfile As String = "SWATLandUseChanges.txt"
     Private pCrpFutureColumn As Integer = 3 'Change to 1 to disable changing CRP to future values
     Private pCrpFuture As String = "CRPFutures.txt"
     Private pParmChangesTextfile As String = "SWATParmChanges.txt"
     Friend pFormat As String = "###,##0.00"
     'Private pSWATExe As String = pOutputFolder & "\swat2005.exe" 'local copy with input data
     Private pSWATExe As String = "C:\Program Files\SWAT 2005 Editor\swat2005.exe"
+    Private CanConvertToCRP() As String = {"AGRR", "RNGE", "PAST", "URHD", "URLD", "URMD", "ALFA", "HAY", "FRSD", "FRSE", "FRST"}
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -62,7 +62,6 @@ Module SWATRunner
                 .Add("BaseFolder", pBaseFolder)
                 .Add("SWATGDB", pSWATGDB)
                 .Add("OutGDB", pOutGDB)
-                '.Add("LandUseChangesTextfile", pLandUseChangesTextfile)
                 .Add("ParmChangesTextfile", pParmChangesTextfile)
                 .Add("CrpFutureTextfile", pCrpFuture)
                 .Add("CrpFutureColumn", pCrpFutureColumn)
@@ -86,7 +85,6 @@ Module SWATRunner
                     pBaseFolder = .ItemByKey("BaseFolder")
                     pSWATGDB = .ItemByKey("SWATGDB")
                     pOutGDB = .ItemByKey("OutGDB")
-                    'pLandUseChangesTextfile = .ItemByKey("LandUseChangesTextfile")
                     pParmChangesTextfile = .ItemByKey("ParmChangesTextfile")
                     pCrpFuture = .ItemByKey("CrpFutureTextfile")
                     pCrpFutureColumn = .ItemByKey("CrpFutureColumn")
@@ -620,6 +618,10 @@ Module SWATRunner
         SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4Summary.txt"), HucSummaryReport(lHuc4Summary))
         SaveFileString(IO.Path.Combine(pReportsFolder, "Huc6Summary.txt"), HucSummaryReport(lHuc6Summary))
 
+        Dim lCombinedOutputTable As atcTable = CombineTables(lSubBasinOutputTable, lReachOutputTable, _
+            "1:1", "1:2", "1:3", "2:3", "1:4", "2:4", "1:5", "2:4-1:5", "2:5", "1:6", "2:6", "1:7", "2:6-1:7", "2:7")
+        lCombinedOutputTable.WriteFile(IO.Path.Combine(pReportsFolder, "SubbasinReach.txt"))
+
         With atcDataManager.DisplayAttributes
             .Clear()
             .AddRange(lDisplayAttributesSave)
@@ -639,6 +641,7 @@ Module SWATRunner
         Public NLoad As Double
         Public NOutflow As Double
     End Class
+
     Private Function HucSummaryReport(ByVal aHucSummaryCollection As atcCollection) As String
         Dim lSB As New Text.StringBuilder
         lSB.AppendLine("HUC".PadLeft(8) _
@@ -1142,21 +1145,77 @@ Module SWATArea
     End Class
 
     Function CombineTables(ByVal ParamArray aArgs() As Object) As atcTable
-        Dim lNewTable As New atcTableFixed
+        Dim lNewTable As New atcTableArray
         Dim lExistingTables As New Generic.List(Of IatcTable)
+        Dim lNewColumnSpecs As New Generic.List(Of String)
         For Each lArg As Object In aArgs
             Dim lArgType As Type = lArg.GetType
             If lArgType.GetInterface("IatcTable") IsNot Nothing Then
                 lExistingTables.Add(lArg)
             Else
-                Select Case Type.GetTypeCode(lArgType)
-                    Case TypeCode.Int32
-
-                    Case TypeCode.String
-                End Select
-
+                lNewColumnSpecs.Add(CStr(lArg))
             End If
         Next
+        lNewTable.NumFields = lNewColumnSpecs.Count
+        Dim lColumnSpec As String
+        Dim lOldTableIndex As Integer
+        Dim lOldColumnIndex As Integer
+        Dim lNewColumnIndex As Integer = 0
+
+        'populate field names
+        For Each lColumnSpec In lNewColumnSpecs
+            lNewColumnIndex += 1
+            lNewTable.FieldName(lNewColumnIndex) = ""
+            While lColumnSpec.Length > 0
+                lOldTableIndex = StrFirstInt(lColumnSpec)
+                If lColumnSpec.StartsWith(":") Then
+                    lColumnSpec = lColumnSpec.Substring(1)
+                    lOldColumnIndex = StrFirstInt(lColumnSpec)
+                    lNewTable.FieldName(lNewColumnIndex) &= lExistingTables(lOldTableIndex - 1).FieldName(lOldColumnIndex)
+
+                    If lColumnSpec.Length > 0 Then 'math with next part of column spec
+                        lNewTable.FieldName(lNewColumnIndex) &= lColumnSpec.Substring(0, 1)
+                        lColumnSpec = lColumnSpec.Substring(1)
+                    End If
+                End If
+            End While
+        Next
+
+        'populate values
+        For lRecord As Integer = 1 To lExistingTables(0).NumRecords
+            lNewTable.CurrentRecord = lRecord
+            For Each lOldTable As atcTable In lExistingTables
+                lOldTable.CurrentRecord = lRecord
+            Next
+
+            For Each lColumnSpec In lNewColumnSpecs
+                lNewColumnIndex += 1
+                While lColumnSpec.Length > 0
+                    Dim lOperator As String = lColumnSpec.Substring(0, 1)
+                    If Not IsNumeric(lOperator) Then lColumnSpec = lColumnSpec.Substring(1)
+                    lOldTableIndex = StrFirstInt(lColumnSpec)
+                    If lColumnSpec.StartsWith(":") Then
+                        lColumnSpec = lColumnSpec.Substring(1)
+                        lOldColumnIndex = StrFirstInt(lColumnSpec)
+                        Dim lOldValue As Double = lExistingTables(lOldTableIndex - 1).Value(lOldColumnIndex)
+                        Select Case lColumnSpec.Substring(0, 1)
+                            Case "+"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) + lOldValue
+                            Case "-"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) - lOldValue
+                            Case "*"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) * lOldValue
+                            Case "/"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) / lOldValue
+                            Case Else
+                                lNewTable.Value(lNewColumnIndex) = lOldValue
+                        End Select
+                    End If
+                End While
+            Next
+        Next
+
+        Return lNewTable
     End Function
 
 End Module

@@ -5,13 +5,12 @@ Imports atcUtility
 Imports MapWinUtility
 
 ''' <summary>
-''' Read and write delimited text files as a table
+''' Manage a table of strings
 ''' </summary>
 ''' <remarks>
-''' Default field delimiter is a comma
-''' First row after NumHeaderRows is read as field names
+''' Values are stored as a Generic.List(Of String()) where the Generic.List manages the rows and each row is an array of String
 ''' </remarks>
-Public Class atcTableDelimited
+Public Class atcTableArray
     Inherits atcTable
 
     Private pFilename As String
@@ -21,10 +20,9 @@ Public Class atcTableDelimited
     Friend pHeader As New ArrayList
     Private pNumFields As Integer
     Private pNumHeaderRows As Integer = -1
-    Private pCurrentRowValues() As String
-    Friend pRecords As New ArrayList
+
+    Friend pRecords As New Generic.List(Of String())
     Private pCurrentRecord As Integer
-    Private pCurrentRecordStart As Integer
     Private pDelimiter As Char = Chr(44) 'default to Chr(44) = comma
 
     Public Overrides Property CurrentRecord() As Integer
@@ -38,16 +36,13 @@ Public Class atcTableDelimited
                 Else
                     pCurrentRecord = newValue
                 End If
-                'parse fields values from this record
-                'TODO: test whether prepending pDelimiter slows this down, could change usage of pCurrentRowValues to (index-1) instead
-                pCurrentRowValues = (pDelimiter & pRecords(pCurrentRecord)).Split(pDelimiter)
-                If pNumFields > pCurrentRowValues.GetUpperBound(0) Then
-                    ReDim Preserve pCurrentRowValues(pNumFields)
-                End If
-
+                While pCurrentRecord > pRecords.Count
+                    Dim lRow(pNumFields) As String
+                    pRecords.Add(lRow)
+                End While
                 Exit Property
             Catch ex As Exception
-                Throw New ApplicationException("atcTableDelimited: Cannot set CurrentRecord to " & newValue & vbCr & ex.Message)
+                Throw New ApplicationException("atcTableArray: Cannot set CurrentRecord to " & newValue & vbCr & ex.Message)
             End Try
         End Set
     End Property
@@ -160,7 +155,7 @@ Public Class atcTableDelimited
 
     Public Overrides Property NumRecords() As Integer
         Get
-            NumRecords = pRecords.Count - 1
+            Return pRecords.Count
         End Get
         Set(ByVal newValue As Integer)
         End Set
@@ -177,24 +172,25 @@ Public Class atcTableDelimited
             ElseIf aFieldNumber > pNumFields Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
             Else
-                Return pCurrentRowValues(aFieldNumber)
+                Value = pRecords(pCurrentRecord - 1)(aFieldNumber - 1)
+                If Value Is Nothing Then Value = ""
             End If
         End Get
         Set(ByVal newValue As String)
-            On Error GoTo ErrHand
-            If pCurrentRecord < 1 Then
-                Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " < 1")
-            ElseIf aFieldNumber < 1 Then
-                Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " < 1")
-            ElseIf aFieldNumber > pNumFields Then
-                Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
-            Else
-                pCurrentRowValues(aFieldNumber) = newValue
-                pRecords(pCurrentRecord) = CurrentRecordAsDelimitedString(pDelimiter)
-            End If
-            Exit Property
-ErrHand:
-            Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & newValue & "' in record #" & pCurrentRecord & vbCr & Err.Description, "Let Value")
+            Try
+                If pCurrentRecord < 1 Then
+                    Throw New ApplicationException("Value: Invalid Current Record Number: " & pCurrentRecord & " < 1")
+                ElseIf aFieldNumber < 1 Then
+                    Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " < 1")
+                ElseIf aFieldNumber > pNumFields Then
+                    Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
+                Else
+                    pRecords(pCurrentRecord - 1)(aFieldNumber - 1) = newValue
+                End If
+                Exit Property
+            Catch e As Exception
+                Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & newValue & "' in record #" & pCurrentRecord & vbCr & e.Message, "Set Value")
+            End Try
         End Set
     End Property
 
@@ -210,10 +206,9 @@ ErrHand:
 
     Public Overrides Function Cousin() As IatcTable
         Dim iField As Short
-        Dim lCousin As New atcTableDelimited
+        Dim lCousin As New atcTableArray
         With lCousin
             .NumFields = pNumFields
-            .Delimiter = pDelimiter
 
             For iField = 1 To pNumFields
                 .FieldName(iField) = FieldName(iField)
@@ -234,72 +229,31 @@ ErrHand:
         Return 0
     End Function
 
-    'Read a stream into the table
-    Public Overridable Function OpenStream(ByVal aStream As Stream) As Boolean
-        Dim inReader As New BinaryReader(aStream)
-        Dim lFinishedHeader As Boolean = False
-        Dim lRecordCount As Integer = 0
-        pRecords = New ArrayList(100)
-        pRecords.Add("Unused record 0")
-        For Each lCurrentLine As String In LinesInFile(inReader)
-            lRecordCount += 1
-            If lRecordCount <= NumHeaderRows Then
-                pHeader.Add(lCurrentLine)
-            ElseIf lRecordCount = NumHeaderRows + 1 Then
-                NumFields = CountString(lCurrentLine, Delimiter) + 1
-                'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
-                'TODO: are quoted ("") - is this correct?
-                pFieldNames = (Delimiter & lCurrentLine).Split(Delimiter)
-            Else
-                pRecords.Add(lCurrentLine)
-            End If
-        Next
-        Me.CurrentRecord = 1
-        Return True
-    End Function
-
-    'Read a string into the table
-    Public Function OpenString(ByVal aString As String) As Boolean
-        pFilename = ""
-        Dim encoding As New System.Text.ASCIIEncoding
-        Dim inBuffer As New MemoryStream(encoding.GetBytes(aString))
-        OpenString = OpenStream(inBuffer)
-        encoding = Nothing
-        inBuffer = Nothing
-    End Function
-
     'Read a file into the table
     Public Overrides Function OpenFile(ByVal Filename As String) As Boolean
-        If Not FileExists(Filename) Then
-            Return False 'can't open a file that doesn't exist
-        End If
-
-        pFilename = Filename
-        Dim inStream As New FileStream(pFilename, FileMode.Open, FileAccess.Read)
-        Dim inBuffer As New BufferedStream(inStream)
-        Return OpenStream(inBuffer)
+        Return False
     End Function
 
     Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
 TryAgain:
         Try
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Filename))
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FileName))
 
-            Dim lOutStream As StreamWriter = File.CreateText(Filename)
+            Dim lOutStream As StreamWriter = File.CreateText(FileName)
 
             lOutStream.Write(Header)
 
             lOutStream.Write(String.Join(Delimiter, pFieldNames, 1, NumFields) & vbCrLf)
-
-            lOutStream.Write(String.Join(vbCrLf, pRecords.ToArray, 1, NumRecords) & vbCrLf)
-
+            For Each lRecord As String() In pRecords
+                lOutStream.Write(String.Join(Delimiter, lRecord) & vbCrLf)
+            Next
             lOutStream.Close()
 
-            Filename = aFilename
+            FileName = aFilename
 
             Return True
         Catch ex As Exception
-            If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, _
+            If Logger.Msg("Error saving " & FileName & vbCr & Err.Description, _
                           MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
                 GoTo TryAgain
             End If

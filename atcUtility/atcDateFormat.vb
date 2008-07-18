@@ -17,7 +17,7 @@ Public Class atcDateFormat
     Private pIncludeMinutes As Boolean = True
     Private pIncludeSeconds As Boolean = False
     Private pTwoDigitYears As Boolean = False
-    Private pDateMonthNames As Boolean = False
+    Private pMonthNames As Boolean = False
     'Private pDateEndInterval As Boolean = True
     Private pMidnight24 As Boolean = True
 
@@ -126,6 +126,15 @@ Public Class atcDateFormat
         End Set
     End Property
 
+    Public Property MonthNames() As Boolean
+        Get
+            Return pMonthNames
+        End Get
+        Set(ByVal newValue As Boolean)
+            pMonthNames = newValue
+        End Set
+    End Property
+
     Public Function JDateToString(ByVal aJulianDate As Double) As String
         Dim lRetval As String = ""
         Dim lCurDate(5) As Integer
@@ -221,7 +230,7 @@ Public Class atcDateFormat
     End Function
 
     Private Function MonthString(ByVal aDate() As Integer) As String
-        If pDateMonthNames Then
+        If pMonthNames Then
             Return MonthName3(aDate(1))
         Else
             Return Format(aDate(1), "00")
