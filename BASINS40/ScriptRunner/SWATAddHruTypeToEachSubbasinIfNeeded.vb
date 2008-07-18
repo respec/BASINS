@@ -7,10 +7,9 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
     Private pDrive As String = "C:"
     'Private pDrive As String = "G:"
     Private pBaseFolder As String = pDrive & "\project\UMRB\baseline90"
-    Private pSWATGDB As String = "C:\Program Files\SWAT\ArcSWAT\Databases\SWAT2005.mdb"
-    'Private pSWATGDB As String = "C:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
+    Private pSWATGDB As String = pBaseFolder & "\SWAT2005.mdb"
     Private pInGDB As String = "baseline90.mdb"
-    Private pOutGDB As String = "baseline90X.mdb"
+    Private pOutGDB As String = "baseline90jk.mdb"
     Private pLogsFolder As String
     Private pScenario As String = "AddHruAsNeeded"
     Private pCropToCreate As String = "CRP"
@@ -175,6 +174,9 @@ Module SWATAddHruTypeToEachSubbasinIfNeeded
             If lMgtOp = 1 Or lMgtOp = 5 Then
                 aSwatInput.UpdateInputDB("mgt2", "oid", lRow.Item(0), "landuse", aLandUseNew)
                 aSwatInput.UpdateInputDB("mgt2", "oid", lRow.Item(0), "crop", aLandUseNew)
+                If lMgtOp = 1 Then
+                    aSwatInput.UpdateInputDB("mgt2", "oid", lRow.Item(0), "plant_id", 106) 'code for CRP
+                End If
             Else
                 aSwatInput.DeleteRowInputDB("mgt2", "oid", lRow.Item(0))
             End If
