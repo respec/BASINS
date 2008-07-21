@@ -271,21 +271,8 @@ Module SWATRunner
         For Each lLandUse As DataRow In lUniqueLandUses.Rows
             Dim lLandUseName As String = lLandUse.Item(0).ToString
             Logger.Dbg("Process " & lLandUseName)
-            Dim lLandUSeConvertsTo As String = ""
+            Dim lLandUseConvertsTo As String = ""
             Dim lPotentialChangedHrus As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseName & "';")
-            Dim lConvertFractionNet As Double = 0
-            Dim lCornFractionAfter As Double = 0
-            Dim lCornFractionBefore As Double = 0
-            If aCropConversions.Contains(lLandUseName) Then
-                Dim lCornConversion As CropConversion = aCropConversions.Item(lLandUseName)
-                Dim lCornConvertTo As CropConversion = aCropConversions.Item(lCornConversion.NameConvertsTo)
-                If lCornConvertTo.Fraction > lCornConversion.Fraction Then
-                    lConvertFractionNet = lCornConvertTo.Fraction - lCornConversion.Fraction
-                End If
-                lLandUSeConvertsTo = lCornConversion.NameConvertsTo
-                lCornFractionAfter = lCornConvertTo.Fraction
-                lCornFractionBefore = lCornConversion.Fraction
-            End If
             Dim lChangedHruCount As Integer = 0
             Dim lCropArea As Double = 0.0
             Dim lCropAreaNotConverted As Double = 0.0
@@ -296,14 +283,34 @@ Module SWATRunner
                 Dim lHruItem As New SwatInput.clsHruItem(lPotentialChangedHru)
                 With lHruItem
                     Dim lSubBasinArea As Double = aSwatInput.QueryInputDB("Select SUB_KM FROM(sub) WHERE SUBBASIN=" & .SUBBASIN & ";").Rows(0).Item(0)
-                    Dim lHruChangeTo As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUSeConvertsTo & "' AND SOIL='" & .SOIL & "' AND SLOPE_CD='" & .SLOPE_CD & "' AND SUBBASIN=" & .SUBBASIN & ";")
+                    Dim lHruChangeTo As DataTable = Nothing
+
+                    Dim lConvertFractionNet As Double = 0
+                    Dim lCornFractionAfter As Double = 0
+                    Dim lCornFractionBefore As Double = 0
+                    If aCropConversions.Contains(lLandUseName) Then
+                        Dim lCornConversion As CropConversion = aCropConversions.Item(lLandUseName)
+                        For Each lConvertToName As String In lCornConversion.NameConvertsTo
+                            Dim lCornConvertTo As CropConversion = aCropConversions.Item(lConvertToName)
+                            If lCornConvertTo.Fraction > lCornConversion.Fraction Then
+                                lLandUseConvertsTo = lConvertToName
+                                lCornFractionAfter = lCornConvertTo.Fraction
+                                lCornFractionBefore = lCornConversion.Fraction
+                                lConvertFractionNet = lCornFractionAfter - lCornFractionBefore
+                                lHruChangeTo = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseConvertsTo & "' AND SOIL='" & .SOIL & "' AND SLOPE_CD='" & .SLOPE_CD & "' AND SUBBASIN=" & .SUBBASIN & ";")
+                                If lHruChangeTo.Rows.Count > 0 Then Exit For 'Found first available conversion, don't look for another
+                            End If
+                        Next
+                    End If
+
                     Dim lHruArea As Double = lSubBasinArea * .HRU_FR
                     Dim lHruAreaPotentialConvert As Double = lHruArea * lConvertFractionNet
                     Dim lHruAreaNotConverted As Double = 0.0
                     Dim lHruAreaConverted As Double = 0.0
                     Dim lHruAreaCornNow As Double = lHruArea * lCornFractionBefore
                     Dim lHruAreaCornFut As Double = 0.0
-                    If lHruChangeTo.Rows.Count > 0 Then
+
+                    If lHruChangeTo IsNot Nothing AndAlso lHruChangeTo.Rows.Count > 0 Then
                         lHruAreaConverted = lHruAreaPotentialConvert
                         lChangedHruCount += 1
                         lHruAreaCornFut = lCornFractionAfter * lHruArea
@@ -326,8 +333,9 @@ Module SWATRunner
                     lCropAreaCornFut += lHruAreaCornFut
                 End With
             Next
-            lSummaryWriter.WriteLine(lLandUseName & vbTab & lLandUSeConvertsTo & vbTab _
-                                   & DoubleToString(lConvertFractionNet, 12, pFormat, , , 10).PadLeft(12) & vbTab _
+
+            lSummaryWriter.WriteLine(lLandUseName & vbTab & lLandUseConvertsTo & vbTab _
+                                   & DoubleToString(lCropAreaConverted / lCropArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                    & DoubleToString(lCropArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                    & DoubleToString(lCropAreaCornNow, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                    & DoubleToString(lCropAreaConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
@@ -449,9 +457,12 @@ Module SWATRunner
                                 lHruAreaNotConverted = lHruAreaPotentialConvert
                                 lHruAreaCornFut = lCornFractionBefore * lHruArea
                             End If
-                            lHruWriter.WriteLine(lHuc8 & vbTab & .SUBBASIN & vbTab _
-                                               & lLandUseName & vbTab & lLandUseConvertsTo & vbTab _
-                                               & .SOIL & vbTab & .SLOPE_CD & vbTab _
+                            lHruWriter.WriteLine(lHuc8 & vbTab _
+                                               & .SUBBASIN & vbTab _
+                                               & lLandUseName & vbTab _
+                                               & lLandUseConvertsTo & vbTab _
+                                               & .SOIL & vbTab _
+                                               & .SLOPE_CD & vbTab _
                                                & DoubleToString(1, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                                & DoubleToString(lHruArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                                & DoubleToString(lHruAreaCornNow, 12, pFormat, , , 10).PadLeft(12) & vbTab _
@@ -514,11 +525,11 @@ Module SWATRunner
         Dim lNumChangesMade As Integer = 0
         For Each lString As String In LinesInFile(aHruChangesFilename)
             Dim lFields() As String = lString.Split(vbTab)
-            If Double.TryParse(lFields(8), lAreaChange) AndAlso lAreaChange > 0 Then
-                Dim lLandUseName As String = lFields(0)
+            If Double.TryParse(lFields(9), lAreaChange) AndAlso lAreaChange > 0 Then
+                Dim lLandUseName As String = lFields(2)
                 Dim lCornConversion As CropConversion = aCornConversions.Item(lLandUseName)
-                Dim lHruToChangeFrom As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseName & "' AND SOIL='" & lFields(3) & "' AND SLOPE_CD='" & lFields(4) & "' AND SUBBASIN=" & lFields(2) & ";")
-                Dim lHruChangeTo As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lCornConversion.NameConvertsTo & "' AND SOIL='" & lFields(3) & "' AND SLOPE_CD='" & lFields(4) & "' AND SUBBASIN=" & lFields(2) & ";")
+                Dim lHruToChangeFrom As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseName & "' AND SOIL='" & lFields(4) & "' AND SLOPE_CD='" & lFields(5) & "' AND SUBBASIN=" & lFields(1) & ";")
+                Dim lHruChangeTo As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lFields(3) & "' AND SOIL='" & lFields(4) & "' AND SLOPE_CD='" & lFields(5) & "' AND SUBBASIN=" & lFields(1) & ";")
                 If lHruToChangeFrom.Rows.Count > 0 AndAlso lHruChangeTo.Rows.Count > 0 Then
                     With lHruToChangeFrom.Rows(0) 'remove fraction of this land use
                         lFractionOfSubbasinToChange = .Item("HRU_FR") * aConvertFractionOfAvailable
@@ -1118,6 +1129,7 @@ Module SWATArea
             Me.Add(New CropConversion("PAST", 0.0, "CRP"))
             Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
             Me.Add(New CropConversion("CRP", 1.0, "CRP"))
+            '"CCCC", "CCS1", "SCC1", "CSC1", "SCS1", "CSS1", "SSC1"
             'Me.Add(New CornConversion("CCCC", 1.0, "CCCC"))
             ''Me.Add(New CornConversion("CCS1", 0.66667, "CCCC"))
             'Me.Add(New CornConversion("CSC1", 0.5, "CCCC")) 'TODO: check
@@ -1135,12 +1147,13 @@ Module SWATArea
     Friend Class CropConversion
         Public Name As String
         Public Fraction As Double
-        Public NameConvertsTo As String
+        Public NameConvertsTo As Generic.List(Of String)
 
-        Public Sub New(ByVal aName As String, ByVal aFraction As Double, ByVal aNameConvertsTo As String)
+        Public Sub New(ByVal aName As String, ByVal aFraction As Double, ByVal ParamArray aNameConvertsTo() As String)
             Name = aName
             Fraction = aFraction
-            NameConvertsTo = aNameConvertsTo
+            NameConvertsTo = New Generic.List(Of String)
+            NameConvertsTo.AddRange(aNameConvertsTo)
         End Sub
     End Class
 
