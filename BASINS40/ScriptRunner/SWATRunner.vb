@@ -143,7 +143,7 @@ Module SWATRunner
             Dim lTotalAreaCornNow As Double = 0.0
             Dim lCropChangesSummaryFilename As String = IO.Path.Combine(pLogsFolder, "CropChanges.txt")
             Dim lCropChangesHruFilename As String = IO.Path.Combine(pLogsFolder, "CropHruChanges.txt")
-            Dim lCropConversions As New CropConversions
+            Dim lCropConversions As New CropConversions("CORN")
 
             If pCropChangeSummarize Then
                 SummarizeCropChange(lSwatInput, _
@@ -855,7 +855,7 @@ Module SWATRunner
             Dim lOutputFilenameHuc As String = lHuc8 & "_" & lIndex & "_Sub.txt"
             Dim lList As New atcListPlugin
             'TODO: just output year
-            lList.Save(lSubDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc))
+            lList.Save(lSubDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc), "DateFormatIncludeYears")
         Next
         SaveFileString(aOutputFileName, lSBHuc8.ToString)
     End Sub
@@ -1142,7 +1142,7 @@ Module SWATArea
     End Function
 
     Public Function AggregateCrops(ByVal aInputTable As DataTable) As DataTable
-        Dim lCropConversions As New CropConversions
+        Dim lCropConversions As New CropConversions("CORN")
         Dim lArea As Double = 0.0
 
         Dim lOutputTable As DataTable = aInputTable.Copy
@@ -1173,25 +1173,28 @@ Module SWATArea
             Return aParm.Name
         End Function
 
-        Public Sub New()
-            'Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
-            'Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
-            'Me.Add(New CropConversion("HAY", 0.0, "CRP"))
-            'Me.Add(New CropConversion("PAST", 0.0, "CRP"))
-            'Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
-            'Me.Add(New CropConversion("CRP", 1.0, "CRP"))            
-            '"CCCC", "CCS1", "SCC1", "CSC1", "SCS1", "CSS1", "SSC1"
-            Me.Add(New CropConversion("CCCC", 1.0, "CCCC"))
-            Me.Add(New CropConversion("CCS1", 0.66667, "CCCC"))
-            Me.Add(New CropConversion("CSC1", 0.5, "CCCC")) 'TODO: check
-            Me.Add(New CropConversion("CSS1", 0.33333, "CCCC"))
-            Me.Add(New CropConversion("SCC1", 0.66667, "CCCC"))
-            Me.Add(New CropConversion("SCS1", 0.5, "CCCC"))  'TODO: check
-            Me.Add(New CropConversion("SSC1", 0.33333, "CCCC"))
-            'Me.Add(New CropConversion("SSSC", 0.0, "CCCC"))
-            Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
-            Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
-            Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
+        Public Sub New(ByVal aCropToName As String)
+            If aCropToName = "CRP" Then
+                Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
+                Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
+                Me.Add(New CropConversion("HAY", 0.0, "CRP"))
+                Me.Add(New CropConversion("PAST", 0.0, "CRP"))
+                Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
+                Me.Add(New CropConversion("CRP", 1.0, "CRP"))
+            ElseIf aCropToName = "CORN" Then
+                '"CCCC", "CCS1", "SCC1", "CSC1", "SCS1", "CSS1", "SSC1"
+                Me.Add(New CropConversion("CCCC", 1.0, "CCCC"))
+                Me.Add(New CropConversion("CCS1", 0.66667, "CCCC"))
+                Me.Add(New CropConversion("CSC1", 0.5, "CCCC")) 'TODO: check
+                Me.Add(New CropConversion("CSS1", 0.33333, "CCCC"))
+                Me.Add(New CropConversion("SCC1", 0.66667, "CCCC"))
+                Me.Add(New CropConversion("SCS1", 0.5, "CCCC"))  'TODO: check
+                Me.Add(New CropConversion("SSC1", 0.33333, "CCCC"))
+                Me.Add(New CropConversion("SSSC", 0.0, "CCCC"))
+                Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
+                Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
+                Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
+            End If
         End Sub
     End Class
 
