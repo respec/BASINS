@@ -44,16 +44,16 @@ Partial Class frmOptions
         Me.btnOK = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
         Me.grpboxNumberFormat = New System.Windows.Forms.GroupBox
-        Me.lblSigDig = New System.Windows.Forms.Label
-        Me.txtFormat = New System.Windows.Forms.TextBox
-        Me.txtSignificantDigits = New System.Windows.Forms.TextBox
-        Me.txtMaxWidth = New System.Windows.Forms.TextBox
-        Me.lblMaxWidth = New System.Windows.Forms.Label
-        Me.txtCantFit = New System.Windows.Forms.TextBox
-        Me.lblCantFit = New System.Windows.Forms.Label
+        Me.lblFormat = New System.Windows.Forms.Label
         Me.txtExpFormat = New System.Windows.Forms.TextBox
         Me.lblExpFormat = New System.Windows.Forms.Label
-        Me.lblFormat = New System.Windows.Forms.Label
+        Me.lblCantFit = New System.Windows.Forms.Label
+        Me.txtCantFit = New System.Windows.Forms.TextBox
+        Me.txtMaxWidth = New System.Windows.Forms.TextBox
+        Me.lblMaxWidth = New System.Windows.Forms.Label
+        Me.txtSignificantDigits = New System.Windows.Forms.TextBox
+        Me.txtFormat = New System.Windows.Forms.TextBox
+        Me.lblSigDig = New System.Windows.Forms.Label
         Me.grpboxDateFormat.SuspendLayout()
         Me.grpboxNumberFormat.SuspendLayout()
         Me.SuspendLayout()
@@ -77,11 +77,11 @@ Partial Class frmOptions
         Me.grpboxDateFormat.Controls.Add(Me.txtTimeSeparator)
         Me.grpboxDateFormat.Controls.Add(Me.lblDateSeparator)
         Me.grpboxDateFormat.Controls.Add(Me.txtDateSeparator)
-        Me.grpboxDateFormat.Location = New System.Drawing.Point(9, 10)
+        Me.grpboxDateFormat.Location = New System.Drawing.Point(9, 11)
         Me.grpboxDateFormat.Margin = New System.Windows.Forms.Padding(2)
         Me.grpboxDateFormat.Name = "grpboxDateFormat"
         Me.grpboxDateFormat.Padding = New System.Windows.Forms.Padding(2)
-        Me.grpboxDateFormat.Size = New System.Drawing.Size(216, 332)
+        Me.grpboxDateFormat.Size = New System.Drawing.Size(216, 331)
         Me.grpboxDateFormat.TabIndex = 1
         Me.grpboxDateFormat.TabStop = False
         Me.grpboxDateFormat.Text = "Date Format"
@@ -279,6 +279,8 @@ Partial Class frmOptions
         '
         'grpboxNumberFormat
         '
+        Me.grpboxNumberFormat.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpboxNumberFormat.Controls.Add(Me.lblFormat)
         Me.grpboxNumberFormat.Controls.Add(Me.txtExpFormat)
         Me.grpboxNumberFormat.Controls.Add(Me.lblExpFormat)
@@ -298,75 +300,21 @@ Partial Class frmOptions
         Me.grpboxNumberFormat.TabStop = False
         Me.grpboxNumberFormat.Text = "Number Format"
         '
-        'lblSigDig
+        'lblFormat
         '
-        Me.lblSigDig.AutoSize = True
-        Me.lblSigDig.Location = New System.Drawing.Point(4, 73)
-        Me.lblSigDig.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblSigDig.Name = "lblSigDig"
-        Me.lblSigDig.Size = New System.Drawing.Size(85, 13)
-        Me.lblSigDig.TabIndex = 2
-        Me.lblSigDig.Text = "Significant Digits"
-        Me.lblSigDig.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'txtFormat
-        '
-        Me.txtFormat.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtFormat.Location = New System.Drawing.Point(111, 18)
-        Me.txtFormat.Name = "txtFormat"
-        Me.txtFormat.Size = New System.Drawing.Size(98, 20)
-        Me.txtFormat.TabIndex = 3
-        '
-        'txtSignificantDigits
-        '
-        Me.txtSignificantDigits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtSignificantDigits.Location = New System.Drawing.Point(150, 70)
-        Me.txtSignificantDigits.Name = "txtSignificantDigits"
-        Me.txtSignificantDigits.Size = New System.Drawing.Size(59, 20)
-        Me.txtSignificantDigits.TabIndex = 4
-        '
-        'txtMaxWidth
-        '
-        Me.txtMaxWidth.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMaxWidth.Location = New System.Drawing.Point(150, 96)
-        Me.txtMaxWidth.Name = "txtMaxWidth"
-        Me.txtMaxWidth.Size = New System.Drawing.Size(59, 20)
-        Me.txtMaxWidth.TabIndex = 6
-        '
-        'lblMaxWidth
-        '
-        Me.lblMaxWidth.AutoSize = True
-        Me.lblMaxWidth.Location = New System.Drawing.Point(4, 99)
-        Me.lblMaxWidth.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblMaxWidth.Name = "lblMaxWidth"
-        Me.lblMaxWidth.Size = New System.Drawing.Size(101, 13)
-        Me.lblMaxWidth.TabIndex = 5
-        Me.lblMaxWidth.Text = "Maximim Characters"
-        Me.lblMaxWidth.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'txtCantFit
-        '
-        Me.txtCantFit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtCantFit.Location = New System.Drawing.Point(150, 122)
-        Me.txtCantFit.Name = "txtCantFit"
-        Me.txtCantFit.Size = New System.Drawing.Size(59, 20)
-        Me.txtCantFit.TabIndex = 7
-        '
-        'lblCantFit
-        '
-        Me.lblCantFit.AutoSize = True
-        Me.lblCantFit.Location = New System.Drawing.Point(4, 125)
-        Me.lblCantFit.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblCantFit.Name = "lblCantFit"
-        Me.lblCantFit.Size = New System.Drawing.Size(104, 13)
-        Me.lblCantFit.TabIndex = 8
-        Me.lblCantFit.Text = "If Number Cannot Fit"
-        Me.lblCantFit.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblFormat.AutoSize = True
+        Me.lblFormat.Location = New System.Drawing.Point(4, 21)
+        Me.lblFormat.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblFormat.Name = "lblFormat"
+        Me.lblFormat.Size = New System.Drawing.Size(85, 13)
+        Me.lblFormat.TabIndex = 11
+        Me.lblFormat.Text = "Standard Format"
+        Me.lblFormat.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtExpFormat
         '
-        Me.txtExpFormat.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtExpFormat.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtExpFormat.Location = New System.Drawing.Point(150, 44)
         Me.txtExpFormat.Name = "txtExpFormat"
         Me.txtExpFormat.Size = New System.Drawing.Size(59, 20)
@@ -383,16 +331,74 @@ Partial Class frmOptions
         Me.lblExpFormat.Text = "Exponent Format"
         Me.lblExpFormat.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
-        'lblFormat
+        'lblCantFit
         '
-        Me.lblFormat.AutoSize = True
-        Me.lblFormat.Location = New System.Drawing.Point(4, 21)
-        Me.lblFormat.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblFormat.Name = "lblFormat"
-        Me.lblFormat.Size = New System.Drawing.Size(87, 13)
-        Me.lblFormat.TabIndex = 11
-        Me.lblFormat.Text = "Exponent Format"
-        Me.lblFormat.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblCantFit.AutoSize = True
+        Me.lblCantFit.Location = New System.Drawing.Point(4, 125)
+        Me.lblCantFit.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblCantFit.Name = "lblCantFit"
+        Me.lblCantFit.Size = New System.Drawing.Size(104, 13)
+        Me.lblCantFit.TabIndex = 8
+        Me.lblCantFit.Text = "If Number Cannot Fit"
+        Me.lblCantFit.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCantFit
+        '
+        Me.txtCantFit.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtCantFit.Location = New System.Drawing.Point(150, 122)
+        Me.txtCantFit.Name = "txtCantFit"
+        Me.txtCantFit.Size = New System.Drawing.Size(59, 20)
+        Me.txtCantFit.TabIndex = 7
+        '
+        'txtMaxWidth
+        '
+        Me.txtMaxWidth.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtMaxWidth.Location = New System.Drawing.Point(150, 96)
+        Me.txtMaxWidth.Name = "txtMaxWidth"
+        Me.txtMaxWidth.Size = New System.Drawing.Size(59, 20)
+        Me.txtMaxWidth.TabIndex = 6
+        '
+        'lblMaxWidth
+        '
+        Me.lblMaxWidth.AutoSize = True
+        Me.lblMaxWidth.Location = New System.Drawing.Point(4, 99)
+        Me.lblMaxWidth.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblMaxWidth.Name = "lblMaxWidth"
+        Me.lblMaxWidth.Size = New System.Drawing.Size(101, 13)
+        Me.lblMaxWidth.TabIndex = 5
+        Me.lblMaxWidth.Text = "Maximim Characters"
+        Me.lblMaxWidth.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtSignificantDigits
+        '
+        Me.txtSignificantDigits.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSignificantDigits.Location = New System.Drawing.Point(150, 70)
+        Me.txtSignificantDigits.Name = "txtSignificantDigits"
+        Me.txtSignificantDigits.Size = New System.Drawing.Size(59, 20)
+        Me.txtSignificantDigits.TabIndex = 4
+        '
+        'txtFormat
+        '
+        Me.txtFormat.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtFormat.Location = New System.Drawing.Point(104, 18)
+        Me.txtFormat.Name = "txtFormat"
+        Me.txtFormat.Size = New System.Drawing.Size(105, 20)
+        Me.txtFormat.TabIndex = 3
+        '
+        'lblSigDig
+        '
+        Me.lblSigDig.AutoSize = True
+        Me.lblSigDig.Location = New System.Drawing.Point(4, 73)
+        Me.lblSigDig.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblSigDig.Name = "lblSigDig"
+        Me.lblSigDig.Size = New System.Drawing.Size(85, 13)
+        Me.lblSigDig.TabIndex = 2
+        Me.lblSigDig.Text = "Significant Digits"
+        Me.lblSigDig.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'frmOptions
         '
@@ -411,7 +417,7 @@ Partial Class frmOptions
         Me.MinimizeBox = False
         Me.MinimumSize = New System.Drawing.Size(227, 250)
         Me.Name = "frmOptions"
-        Me.Text = "List Options"
+        Me.Text = "Formats"
         Me.grpboxDateFormat.ResumeLayout(False)
         Me.grpboxDateFormat.PerformLayout()
         Me.grpboxNumberFormat.ResumeLayout(False)
