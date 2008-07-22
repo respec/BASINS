@@ -341,14 +341,17 @@ Partial Class SwatInput
                 lSB.AppendLine("Subbasin output variables:")
                 lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 lSB.AppendLine("HRU output variables:")
+
+                'TODO: figure out why PrintHru was not propagating to here, hard coded to 0 for now
                 If PrintHru Then
-                    lSB.AppendLine("   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
+                    lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 Else
                     lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 End If
                 lSB.AppendLine("HRU data to be printed:")
+                'TODO: figure out why PrintHru was not propagating to here, hard coded to 0 for now
                 If PrintHru Then
-                    lSB.AppendLine("   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
+                    lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 Else
                     lSB.AppendLine("   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0")
                 End If
