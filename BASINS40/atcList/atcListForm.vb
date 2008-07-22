@@ -46,7 +46,7 @@ Friend Class atcListForm
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewValues As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFilterNoData As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuOptions As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuDateValueFormats As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -66,7 +66,7 @@ Friend Class atcListForm
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuViewValues = New System.Windows.Forms.MenuItem
         Me.mnuFilterNoData = New System.Windows.Forms.MenuItem
-        Me.mnuOptions = New System.Windows.Forms.MenuItem
+        Me.mnuDateValueFormats = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
@@ -118,7 +118,7 @@ Friend Class atcListForm
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues, Me.mnuFilterNoData, Me.mnuOptions})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues, Me.mnuFilterNoData, Me.mnuDateValueFormats})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -154,10 +154,10 @@ Friend Class atcListForm
         Me.mnuFilterNoData.Index = 5
         Me.mnuFilterNoData.Text = "Filter NoData"
         '
-        'mnuOptions
+        'mnuDateValueFormats
         '
-        Me.mnuOptions.Index = 6
-        Me.mnuOptions.Text = "Options"
+        Me.mnuDateValueFormats.Index = 6
+        Me.mnuDateValueFormats.Text = "Date and Value Formats..."
         '
         'mnuAnalysis
         '
@@ -186,7 +186,7 @@ Friend Class atcListForm
         '
         'atcListForm
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(528, 545)
         Me.Controls.Add(Me.agdMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -433,7 +433,7 @@ Friend Class atcListForm
         End If
     End Sub
 
-    Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOptions.Click
+    Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDateValueFormats.Click
         Dim lFrmOptions As New frmOptions
         With lFrmOptions
             Select Case pDateFormat.DateOrder
@@ -443,13 +443,18 @@ Friend Class atcListForm
                 Case atcDateFormat.DateOrderEnum.YearMonthDay : .radioOrderYMD.Checked = True
             End Select
             .chkYears.Checked = pDateFormat.IncludeYears
-            .chkSeconds.Checked = pDateFormat.IncludeSeconds
             .chkMonths.Checked = pDateFormat.IncludeMonths
-            .chkMonthNames.Checked = pDateFormat.MonthNames
-            .chkMinutes.Checked = pDateFormat.IncludeMinutes
+            .chkDays.Checked = pDateFormat.IncludeDays
             .chkHours.Checked = pDateFormat.IncludeHours
-            .chkDays.Checked = pDateFormat.IncludeHours
+            .chkMinutes.Checked = pDateFormat.IncludeMinutes
+            .chkSeconds.Checked = pDateFormat.IncludeSeconds
+
+            .chk2digitYears.Checked = pDateFormat.TwoDigitYears
             .chkMidnight24.Checked = pDateFormat.Midnight24
+            .chkMonthNames.Checked = pDateFormat.MonthNames
+
+            .txtDateSeparator.Text = pDateFormat.DateSeparator
+            .txtTimeSeparator.Text = pDateFormat.TimeSeparator
 
             .txtFormat.Text = pFormat
             .txtExpFormat.Text = pExpFormat
@@ -464,13 +469,18 @@ Friend Class atcListForm
                 If .radioOrderYMD.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.YearMonthDay
 
                 pDateFormat.IncludeYears = .chkYears.Checked
-                pDateFormat.IncludeSeconds = .chkSeconds.Checked
                 pDateFormat.IncludeMonths = .chkMonths.Checked
-                pDateFormat.MonthNames = .chkMonthNames.Checked
-                pDateFormat.IncludeMinutes = .chkMinutes.Checked
                 pDateFormat.IncludeHours = .chkHours.Checked
-                pDateFormat.IncludeHours = .chkDays.Checked
+                pDateFormat.IncludeMinutes = .chkMinutes.Checked
+                pDateFormat.IncludeSeconds = .chkSeconds.Checked
+                pDateFormat.IncludeDays = .chkDays.Checked
+
+                pDateFormat.TwoDigitYears = .chk2digitYears.Checked
                 pDateFormat.Midnight24 = .chkMidnight24.Checked
+                pDateFormat.MonthNames = .chkMonthNames.Checked
+
+                pDateFormat.DateSeparator = .txtDateSeparator.Text
+                pDateFormat.TimeSeparator = .txtTimeSeparator.Text
 
                 pFormat = .txtFormat.Text
                 pExpFormat = .txtExpFormat.Text

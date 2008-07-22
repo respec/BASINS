@@ -44,29 +44,29 @@ Module SWATRunner
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
         Dim lContinue As Boolean = True
-        If pUserInteractiveUpdate Then
-            'these defaults are overwritten by registry values set by most recent run
-            Dim lUserParms As New atcCollection
-            With lUserParms
-                .Add("Start Year", pStartYear)
-                .Add("Number of Years", pNumYears)
-                .Add("Run Model", pRunModel)
+        'these defaults are overwritten by registry values set by most recent run
+        Dim lUserParms As New atcCollection
+        With lUserParms
+            .Add("Start Year", pStartYear)
+            .Add("Number of Years", pNumYears)
+            .Add("Run Model", pRunModel)
 
-                .Add("RefreshDB", pRefreshDB)
-                .Add("OutputSummarize", pOutputSummarize)
-                .Add("InputSummarize", pInputSummarize)
-                .Add("ChangeCropAreas", pChangeCropAreas)
-                .Add("CropChangeSummarize", pCropChangeSummarize)
-                .Add("Scenario", pScenario)
-                .Add("Drive", pDrive)
-                .Add("BaseFolder", pBaseFolder)
-                .Add("SWATGDB", pSWATGDB)
-                .Add("OutGDB", pOutGDB)
-                .Add("ParmChangesTextfile", pParmChangesTextfile)
-                .Add("CrpFutureTextfile", pCrpFuture)
-                .Add("CrpFutureColumn", pCrpFutureColumn)
-                .Add("SWATExe", pSWATExe)
-            End With
+            .Add("RefreshDB", pRefreshDB)
+            .Add("OutputSummarize", pOutputSummarize)
+            .Add("InputSummarize", pInputSummarize)
+            .Add("ChangeCropAreas", pChangeCropAreas)
+            .Add("CropChangeSummarize", pCropChangeSummarize)
+            .Add("Scenario", pScenario)
+            .Add("Drive", pDrive)
+            .Add("BaseFolder", pBaseFolder)
+            .Add("SWATGDB", pSWATGDB)
+            .Add("OutGDB", pOutGDB)
+            .Add("ParmChangesTextfile", pParmChangesTextfile)
+            .Add("CrpFutureTextfile", pCrpFuture)
+            .Add("CrpFutureColumn", pCrpFutureColumn)
+            .Add("SWATExe", pSWATExe)
+        End With
+        If pUserInteractiveUpdate Then
             Dim lAsk As New frmArgs
             lContinue = lAsk.AskUser("User Specified Parameters", lUserParms)
             If lContinue Then
@@ -89,6 +89,7 @@ Module SWATRunner
                     pCrpFuture = .ItemByKey("CrpFutureTextfile")
                     pCrpFutureColumn = .ItemByKey("CrpFutureColumn")
                     pSWATExe = .ItemByKey("SWATExe")
+
                 End With
             End If
         End If
@@ -106,6 +107,11 @@ Module SWATRunner
 
             'log for swat runner
             Logger.StartToFile(IO.Path.Combine(pLogsFolder, "SWATRunner.log"), , , True)
+
+            For Each lParmKey As String In lUserParms.Keys
+                Logger.Dbg(lParmKey & " = " & lUserParms.ItemByKey(lParmKey))
+            Next
+            Logger.Flush()
 
             Dim lOutGDB As String = IO.Path.Combine(pOutGDBFolder, pOutGDB)
             If pRefreshDB OrElse Not IO.File.Exists(lOutGDB) Then 'copy the entire input parameter database for this new scenario
