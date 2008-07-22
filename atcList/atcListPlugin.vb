@@ -44,6 +44,10 @@ Public Class atcListPlugin
                         If lOption.ToLower.StartsWith("dateformat") Then
                             With lForm.DateFormat
                                 Dim lDateValue As String = lOption.Substring(10)
+                                Dim lDateBoolean As Boolean
+                                If Not Boolean.TryParse(lDateValue, lDateBoolean) Then
+                                    lDateBoolean = True
+                                End If
                                 Dim lDateSection As String = StrSplit(lDateValue, "=", """")
                                 Select Case lDateSection.ToLower
                                     Case "orderdmy" : .DateOrder = atcDateFormat.DateOrderEnum.DayMonthYear
@@ -51,16 +55,21 @@ Public Class atcListPlugin
                                     Case "ordermdy" : .DateOrder = atcDateFormat.DateOrderEnum.MonthDayYear
                                     Case "orderymd" : .DateOrder = atcDateFormat.DateOrderEnum.YearMonthDay
 
-                                    Case "includeyears" : .IncludeYears = CBool(lDateValue)
-                                    Case "includemonths" : .IncludeYears = CBool(lDateValue)
-                                    Case "includehours" : .IncludeYears = CBool(lDateValue)
-                                    Case "includeminutes" : .IncludeYears = CBool(lDateValue)
-                                    Case "includeseconds" : .IncludeYears = CBool(lDateValue)
-                                    Case "includedays" : .IncludeYears = CBool(lDateValue)
+                                    Case "includeyears" : .IncludeYears = lDateBoolean
+                                        .IncludeMonths = False : .IncludeDays = False : .IncludeHours = False : .IncludeMinutes = False : .IncludeSeconds = False
+                                    Case "includemonths" : .IncludeMonths = lDateBoolean
+                                        .IncludeDays = False : .IncludeHours = False : .IncludeMinutes = False : .IncludeSeconds = False
+                                    Case "includedays" : .IncludeDays = lDateBoolean
+                                        .IncludeHours = False : .IncludeMinutes = False : .IncludeSeconds = False
+                                    Case "includehours" : .IncludeHours = lDateBoolean
+                                        .IncludeMinutes = False : .IncludeSeconds = False
+                                    Case "includeminutes" : .IncludeMinutes = lDateBoolean
+                                        .IncludeSeconds = False
+                                    Case "includeseconds" : .IncludeSeconds = lDateBoolean
 
-                                    Case "twodigityears" : .IncludeYears = CBool(lDateValue)
-                                    Case "midnight24" : .IncludeYears = CBool(lDateValue)
-                                    Case "monthnames" : .IncludeYears = CBool(lDateValue)
+                                    Case "twodigityears" : .TwoDigitYears = lDateBoolean
+                                    Case "midnight24" : .Midnight24 = lDateBoolean
+                                    Case "monthnames" : .MonthNames = lDateBoolean
 
                                     Case "dateseparator" : .DateSeparator = lDateValue
                                     Case "timeseparator" : .TimeSeparator = lDateValue
