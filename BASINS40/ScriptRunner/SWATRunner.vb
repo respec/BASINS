@@ -185,7 +185,8 @@ Module SWATRunner
             End If
 
             If pChangeCropAreas Then
-                Dim lConvertFractionOfAvailable As Double = 0.5 'TODO: compute from desired acres of corn vs. lTotalAreaCornFut or lTotalAreaConverted
+                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10630000 / 247 '247 acres per square kilometer
+                Dim lConvertFractionOfAvailable As Double = (lTotalAreaCornFut - lDesiredFutureCornArea) / lTotalAreaCornFut  'TODO: compute from desired acres of corn vs. lTotalAreaCornFut or lTotalAreaConverted
                 ChangeHRUfractions(lSwatInput, lCropConversions, lCropChangesHruFilename, lConvertFractionOfAvailable)
             End If
 
@@ -239,11 +240,16 @@ Module SWATRunner
                                     ByRef aTotalAreaCornFut As Double, _
                                     ByRef aTotalAreaCornNow As Double)
 
+        Dim lSubBasinToHuc8 As atcCollection = SubBasinToHUC8()
+
         aTotalArea = 0.0
         aTotalAreaNotConverted = 0.0
         aTotalAreaConverted = 0.0
         aTotalAreaCornFut = 0.0
         aTotalAreaCornNow = 0.0
+
+        Dim lHucOldArea As New atcCollection
+        Dim lHucNewArea As New atcCollection
 
         Dim lSummaryWriter As New IO.StreamWriter(aCropChangesSummaryFilename)
         lSummaryWriter.WriteLine("FrmCrp" & vbTab & "ToCrp" & vbTab _
@@ -256,8 +262,12 @@ Module SWATRunner
                                & "CntPot".PadLeft(8) & vbTab & "CntAct".PadLeft(8))
 
         Dim lHruWriter As New IO.StreamWriter(aCropChangesHruFilename)
-        lHruWriter.WriteLine("FrmCrp" & vbTab & "ToCrp" & vbTab _
-                           & "SubId" & vbTab & "Soil" & vbTab & "Slope" & vbTab _
+        lHruWriter.WriteLine("HUC8".PadLeft(8) & vbTab _
+                           & "SubId" & vbTab _
+                           & "FrmCrp" & vbTab _
+                           & "ToCrp" & vbTab _
+                           & "Soil" & vbTab _
+                           & "Slope" & vbTab _
                            & "FrcChg".PadLeft(12) & vbTab _
                            & "Area".PadLeft(12) & vbTab _
                            & "AreaNow".PadLeft(12) & vbTab _
@@ -270,8 +280,9 @@ Module SWATRunner
         Dim lUniqueLandUses As DataTable = aSwatInput.Hru.UniqueValues("LandUse")
         For Each lLandUse As DataRow In lUniqueLandUses.Rows
             Dim lLandUseName As String = lLandUse.Item(0).ToString
+            Dim lLandUsesConvertedTo As String = ""
+
             Logger.Dbg("Process " & lLandUseName)
-            Dim lLandUseConvertsTo As String = ""
             Dim lPotentialChangedHrus As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseName & "';")
             Dim lChangedHruCount As Integer = 0
             Dim lCropArea As Double = 0.0
@@ -282,27 +293,35 @@ Module SWATRunner
             For Each lPotentialChangedHru As DataRow In lPotentialChangedHrus.Rows
                 Dim lHruItem As New SwatInput.clsHruItem(lPotentialChangedHru)
                 With lHruItem
-                    Dim lSubBasinArea As Double = aSwatInput.QueryInputDB("Select SUB_KM FROM(sub) WHERE SUBBASIN=" & .SUBBASIN & ";").Rows(0).Item(0)
+                    Dim lLandUseConvertsTo As String = ""
                     Dim lHruChangeTo As DataTable = Nothing
 
-                    Dim lConvertFractionNet As Double = 0
-                    Dim lCornFractionAfter As Double = 0
                     Dim lCornFractionBefore As Double = 0
+                    Dim lCornFractionAfter As Double = 0
+                    Dim lConvertFractionNet As Double = 0
+
                     If aCropConversions.Contains(lLandUseName) Then
-                        Dim lCornConversion As CropConversion = aCropConversions.Item(lLandUseName)
-                        For Each lConvertToName As String In lCornConversion.NameConvertsTo
+                        Dim lCropConversion As CropConversion = aCropConversions.Item(lLandUseName)
+                        lCornFractionBefore = lCropConversion.Fraction
+                        For Each lConvertToName As String In lCropConversion.NameConvertsTo
                             Dim lCornConvertTo As CropConversion = aCropConversions.Item(lConvertToName)
-                            If lCornConvertTo.Fraction > lCornConversion.Fraction Then
+                            If lCornConvertTo.Fraction > lCropConversion.Fraction Then
                                 lLandUseConvertsTo = lConvertToName
-                                lCornFractionAfter = lCornConvertTo.Fraction
-                                lCornFractionBefore = lCornConversion.Fraction
-                                lConvertFractionNet = lCornFractionAfter - lCornFractionBefore
                                 lHruChangeTo = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseConvertsTo & "' AND SOIL='" & .SOIL & "' AND SLOPE_CD='" & .SLOPE_CD & "' AND SUBBASIN=" & .SUBBASIN & ";")
-                                If lHruChangeTo.Rows.Count > 0 Then Exit For 'Found first available conversion, don't look for another
+                                If lHruChangeTo.Rows.Count > 0 Then
+                                    lCornFractionAfter = lCornConvertTo.Fraction
+                                    lConvertFractionNet = lCornFractionAfter - lCornFractionBefore
+                                    If Not lLandUsesConvertedTo.Contains(lLandUseConvertsTo) Then
+                                        lLandUsesConvertedTo &= lLandUseConvertsTo & " "
+                                    End If
+
+                                    Exit For 'Found first available conversion, don't look for another
+                                End If
                             End If
                         Next
                     End If
 
+                    Dim lSubBasinArea As Double = aSwatInput.QueryInputDB("Select SUB_KM FROM(sub) WHERE SUBBASIN=" & .SUBBASIN & ";").Rows(0).Item(0)
                     Dim lHruArea As Double = lSubBasinArea * .HRU_FR
                     Dim lHruAreaPotentialConvert As Double = lHruArea * lConvertFractionNet
                     Dim lHruAreaNotConverted As Double = 0.0
@@ -315,17 +334,24 @@ Module SWATRunner
                         lChangedHruCount += 1
                         lHruAreaCornFut = lCornFractionAfter * lHruArea
                     Else 'no conversion
-                        lHruAreaNotConverted = lHruAreaPotentialConvert
-                        lHruAreaCornFut = lCornFractionBefore * lHruArea
+                        lHruAreaNotConverted = lHruArea * (1 - lCornFractionBefore)
+                        lHruAreaCornFut = lHruAreaCornNow
                     End If
-                    lHruWriter.WriteLine(lLandUseName & vbTab & lLandUSeConvertsTo & vbTab _
-                                       & .SUBBASIN & vbTab & .SOIL & vbTab & .SLOPE_CD & vbTab _
+                    Dim lHUC As String = lSubBasinToHuc8.ItemByKey(Format(.SUBBASIN, "0"))
+                    lHruWriter.WriteLine(lHUC & vbTab _
+                                       & .SUBBASIN & vbTab _
+                                       & lLandUseName & vbTab _
+                                       & lLandUseConvertsTo & vbTab _
+                                       & .SOIL & vbTab _
+                                       & .SLOPE_CD & vbTab _
                                        & DoubleToString(lConvertFractionNet, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & DoubleToString(lHruArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & DoubleToString(lHruAreaCornNow, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & DoubleToString(lHruAreaConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & DoubleToString(lHruAreaNotConverted, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                        & DoubleToString(lHruAreaCornFut, 12, pFormat, , , 10).PadLeft(12))
+                    lHucOldArea.Increment(lHUC, lHruAreaCornNow)
+                    lHucNewArea.Increment(lHUC, lHruAreaCornFut)
                     lCropArea += lHruArea
                     lCropAreaConverted += lHruAreaConverted
                     lCropAreaNotConverted += lHruAreaNotConverted
@@ -334,7 +360,7 @@ Module SWATRunner
                 End With
             Next
 
-            lSummaryWriter.WriteLine(lLandUseName & vbTab & lLandUseConvertsTo & vbTab _
+            lSummaryWriter.WriteLine(lLandUseName & vbTab & lLandUsesConvertedTo & vbTab _
                                    & DoubleToString(lCropAreaConverted / lCropArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                    & DoubleToString(lCropArea, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                    & DoubleToString(lCropAreaCornNow, 12, pFormat, , , 10).PadLeft(12) & vbTab _
@@ -343,6 +369,7 @@ Module SWATRunner
                                    & DoubleToString(lCropAreaCornFut, 12, pFormat, , , 10).PadLeft(12) & vbTab _
                                    & lPotentialChangedHrus.Rows.Count.ToString.PadLeft(8) & vbTab _
                                    & lChangedHruCount.ToString.PadLeft(8))
+            lSummaryWriter.Flush()
             aTotalArea += lCropArea
             aTotalAreaConverted += lCropAreaConverted
             aTotalAreaNotConverted += lCropAreaNotConverted
@@ -364,6 +391,20 @@ Module SWATRunner
                                & lTotalActualChangeCount.ToString.PadLeft(8))
         lSummaryWriter.Flush()
         lSummaryWriter.Close()
+
+        'lHucOldArea As New atcCollection
+        'lHucNewArea As New atcCollection
+
+        Dim lHucSummaryWriter As New IO.StreamWriter(aCropChangesSummaryFilename & ".HUC")
+        lHucSummaryWriter.WriteLine("HUC8" & vbTab & "ExistingCornArea" & vbTab & "PotentialCornArea" & vbTab & "Added" & vbTab & "%Increase")
+        For Each lHUC As String In lHucOldArea.Keys
+            Dim lOld As Double = lHucOldArea.ItemByKey(lHUC)
+            Dim lNew As Double = lHucNewArea.ItemByKey(lHUC)
+            lHucSummaryWriter.WriteLine(lHUC & vbTab & DoubleToString(lOld) & vbTab & DoubleToString(lNew) & vbTab & DoubleToString(lNew - lOld) & vbTab & DoubleToString((lNew - lOld) / lOld * 100))
+        Next
+        lHucSummaryWriter.Flush()
+        lHucSummaryWriter.Close()
+
         Logger.Dbg("AreaTotal " & aTotalArea & " Converted " & aTotalAreaConverted & " NotTotal " & aTotalAreaNotConverted & " CornTotal " & aTotalAreaCornFut)
     End Sub
 
@@ -394,8 +435,12 @@ Module SWATRunner
                                & "CntPot".PadLeft(8) & vbTab & "CntAct".PadLeft(8))
 
         Dim lHruWriter As New IO.StreamWriter(aCropChangesHruFilename)
-        lHruWriter.WriteLine("HUC8".PadLeft(8) & vbTab & "FrmCrp" & vbTab & "ToCrp" & vbTab _
-                           & "SubId" & vbTab & "Soil" & vbTab & "Slope" & vbTab _
+        lHruWriter.WriteLine("HUC8".PadLeft(8) & vbTab _
+                           & "SubId" & vbTab _
+                           & "FrmCrp" & vbTab _
+                           & "ToCrp" & vbTab _
+                           & "Soil" & vbTab _
+                           & "Slope" & vbTab _
                            & "FrcChg".PadLeft(12) & vbTab _
                            & "Area".PadLeft(12) & vbTab _
                            & "AreaNow".PadLeft(12) & vbTab _
@@ -517,7 +562,7 @@ Module SWATRunner
     End Sub
 
     Private Sub ChangeHRUfractions(ByVal aSwatInput As SwatInput, _
-                                   ByVal aCornConversions As CropConversions, _
+                                   ByVal aCropConversions As CropConversions, _
                                    ByVal aHruChangesFilename As String, _
                                    ByVal aConvertFractionOfAvailable As Double)
         Dim lAreaChange As Double
@@ -527,7 +572,7 @@ Module SWATRunner
             Dim lFields() As String = lString.Split(vbTab)
             If Double.TryParse(lFields(9), lAreaChange) AndAlso lAreaChange > 0 Then
                 Dim lLandUseName As String = lFields(2)
-                Dim lCornConversion As CropConversion = aCornConversions.Item(lLandUseName)
+                Dim lCropConversion As CropConversion = aCropConversions.Item(lLandUseName)
                 Dim lHruToChangeFrom As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lLandUseName & "' AND SOIL='" & lFields(4) & "' AND SLOPE_CD='" & lFields(5) & "' AND SUBBASIN=" & lFields(1) & ";")
                 Dim lHruChangeTo As DataTable = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lFields(3) & "' AND SOIL='" & lFields(4) & "' AND SLOPE_CD='" & lFields(5) & "' AND SUBBASIN=" & lFields(1) & ";")
                 If lHruToChangeFrom.Rows.Count > 0 AndAlso lHruChangeTo.Rows.Count > 0 Then
@@ -1091,7 +1136,7 @@ Module SWATArea
     End Function
 
     Public Function AggregateCrops(ByVal aInputTable As DataTable) As DataTable
-        Dim lCornConversions As New CropConversions
+        Dim lCropConversions As New CropConversions
         Dim lArea As Double = 0.0
 
         Dim lOutputTable As DataTable = aInputTable.Copy
@@ -1105,11 +1150,11 @@ Module SWATArea
             lRow(lSoybColumnIndex) = 0.0
             For lColumnIndex As Integer = 2 To lOutputTable.Columns.Count - 2
                 Dim lColumnName As String = lOutputTable.Columns(lColumnIndex).ColumnName
-                If lCornConversions.Contains(lColumnName) Then
-                    Dim lCornConversion As CropConversion = lCornConversions.Item(lColumnName)
+                If lCropConversions.Contains(lColumnName) Then
+                    Dim lCropConversion As CropConversion = lCropConversions.Item(lColumnName)
                     lArea = lRow(lColumnIndex)
-                    lRow(lCornColumnIndex) += lArea * lCornConversion.Fraction
-                    lRow(lSoybColumnIndex) += lArea * (1 - lCornConversion.Fraction)
+                    lRow(lCornColumnIndex) += lArea * lCropConversion.Fraction
+                    lRow(lSoybColumnIndex) += lArea * (1 - lCropConversion.Fraction)
                 End If
             Next
         Next
@@ -1123,24 +1168,24 @@ Module SWATArea
         End Function
 
         Public Sub New()
-            Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
-            Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
-            Me.Add(New CropConversion("HAY", 0.0, "CRP"))
-            Me.Add(New CropConversion("PAST", 0.0, "CRP"))
-            Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
-            Me.Add(New CropConversion("CRP", 1.0, "CRP"))
+            'Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
+            'Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
+            'Me.Add(New CropConversion("HAY", 0.0, "CRP"))
+            'Me.Add(New CropConversion("PAST", 0.0, "CRP"))
+            'Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
+            'Me.Add(New CropConversion("CRP", 1.0, "CRP"))            
             '"CCCC", "CCS1", "SCC1", "CSC1", "SCS1", "CSS1", "SSC1"
-            'Me.Add(New CornConversion("CCCC", 1.0, "CCCC"))
-            ''Me.Add(New CornConversion("CCS1", 0.66667, "CCCC"))
-            'Me.Add(New CornConversion("CSC1", 0.5, "CCCC")) 'TODO: check
-            ''Me.Add(New CornConversion("CSS1", 0.33333, "CCCC"))
-            ''Me.Add(New CornConversion("SCC1", 0.66667, "CCCC"))
-            'Me.Add(New CornConversion("SCS1", 0.5, "CCCC"))  'TODO: check
-            ''Me.Add(New CornConversion("SSC1", 0.33333, "CCCC"))
-            ''Me.Add(New CornConversion("SSSC", 0.0, "CCCC"))
-            'Me.Add(New CornConversion("AGRR", 0.0, "CCCC"))
-            ''Me.Add(New CornConversion("CRP", 0.0, "CCCC"))
-            'Me.Add(New CornConversion("HAY", 0.0, "CCCC"))
+            Me.Add(New CropConversion("CCCC", 1.0, "CCCC"))
+            Me.Add(New CropConversion("CCS1", 0.66667, "CCCC"))
+            Me.Add(New CropConversion("CSC1", 0.5, "CCCC")) 'TODO: check
+            Me.Add(New CropConversion("CSS1", 0.33333, "CCCC"))
+            Me.Add(New CropConversion("SCC1", 0.66667, "CCCC"))
+            Me.Add(New CropConversion("SCS1", 0.5, "CCCC"))  'TODO: check
+            Me.Add(New CropConversion("SSC1", 0.33333, "CCCC"))
+            'Me.Add(New CropConversion("SSSC", 0.0, "CCCC"))
+            Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
+            Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
+            Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
         End Sub
     End Class
 
