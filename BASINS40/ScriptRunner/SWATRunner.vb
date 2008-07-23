@@ -598,6 +598,8 @@ Module SWATRunner
 
     Private Sub SummarizeOutputs()
         MkDirPath(IO.Path.GetFullPath(pReportsFolder))
+        Dim lRunDate As Date = IO.File.GetLastWriteTime(IO.Path.Combine(pOutputFolder, "output.rch"))
+
         Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
         With lOutputRch
             .Open(IO.Path.Combine(pOutputFolder, "output.rch"))
@@ -630,8 +632,10 @@ Module SWATRunner
             WriteDatasets(IO.Path.Combine(pReportsFolder, "hru"), .DataSets)
         End With
 
-
         Logger.Dbg("SwatSummaryReports")
+        Dim lSubBasinsOutputFileName As String = IO.Path.Combine(pReportsFolder, "SubBasinSummary.txt")
+        Dim lReachOutputFileName As String = IO.Path.Combine(pReportsFolder, "ReachSummary.txt")
+
         'TODO be sure appropriate attributes are written
         Dim lDisplayAttributesSave As ArrayList = atcDataManager.DisplayAttributes.Clone
         Dim lDisplayAttributes As String() = {"Location", "Mean", "Max", "Min", "Sum", "Constituent"}
@@ -643,19 +647,18 @@ Module SWATRunner
         Dim lSubBasin2HUC8 As atcCollection = SubBasinToHUC8()
         Dim lSubTimseriesGroup As New atcDataSourceTimeseriesBinary
         lSubTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "sub.tsbin"))
-        Dim lSubBasinsOutputFileName As String = IO.Path.Combine(pReportsFolder, "SubBasinSummary.txt")
         WriteSubSummary(pReportsFolder, lSubTimseriesGroup.DataSets, lSubBasin2HUC8, lSubBasinsOutputFileName)
         Logger.Dbg("Report Load Done")
 
         Dim lRchTimseriesGroup As New atcDataSourceTimeseriesBinary
         lRchTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "rch.tsbin"))
-        Dim lReachOutputFileName As String = IO.Path.Combine(pReportsFolder, "ReachSummary.txt")
         WriteReachSummary(pReportsFolder, lRchTimseriesGroup.DataSets, lSubBasin2HUC8, lReachOutputFileName)
         Logger.Dbg("Report Reach Done")
 
         Dim lHuc2Summary As New atcCollection
         Dim lHuc4Summary As New atcCollection
         Dim lHuc6Summary As New atcCollection
+        Dim lHuc8Summary As New atcCollection
         Dim lSubBasinOutputTable As New atcTableDelimited
         With lSubBasinOutputTable
             .Delimiter = vbTab
@@ -674,16 +677,23 @@ Module SWATRunner
                 MakeSummary(lHuc8.Substring(0, 2), lReachOutputTable, lSubBasinOutputTable, lHuc2Summary)
                 MakeSummary(lHuc8.Substring(0, 4), lReachOutputTable, lSubBasinOutputTable, lHuc4Summary)
                 MakeSummary(lHuc8.Substring(0, 6), lReachOutputTable, lSubBasinOutputTable, lHuc6Summary)
+                MakeSummary(lHuc8.Substring(0, 8), lReachOutputTable, lSubBasinOutputTable, lHuc8Summary)
             Next
         End With
-        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc2Summary.txt"), HucSummaryReport(lHuc2Summary))
-        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4Summary.txt"), HucSummaryReport(lHuc4Summary))
-        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc6Summary.txt"), HucSummaryReport(lHuc6Summary))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc2Summary.txt"), HucSummaryReport(lHuc2Summary, lRunDate))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4Summary.txt"), HucSummaryReport(lHuc4Summary, lRunDate))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc6Summary.txt"), HucSummaryReport(lHuc6Summary, lRunDate))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc8Summary.txt"), HucSummaryReport(lHuc8Summary, lRunDate))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc2SummaryEng.txt"), HucSummaryReport(lHuc2Summary, lRunDate, True))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4SummaryEng.txt"), HucSummaryReport(lHuc4Summary, lRunDate, True))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc6SummaryEng.txt"), HucSummaryReport(lHuc6Summary, lRunDate, True))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc8SummaryEng.txt"), HucSummaryReport(lHuc8Summary, lRunDate, True))
 
-        Dim lCombinedOutputTable As atcTableArray = CombineTables(lSubBasinOutputTable, lReachOutputTable, _
-            "1:1", "1:2", "1:3", "2:3", "1:4", "2:4", "1:5", "2:4-1:5", "2:5", "1:6", "2:6", "1:7", "2:6-1:7", "2:7")
-        lCombinedOutputTable.Delimiter = vbTab
-        lCombinedOutputTable.WriteFile(IO.Path.Combine(pReportsFolder, "SubbasinReach.txt"))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4SummaryTony.txt"), HucSummaryTony(lHuc2Summary, lHuc4Summary, lRunDate, False))
+        SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4SummaryTonyEng.txt"), HucSummaryTony(lHuc2Summary, lHuc4Summary, lRunDate, True))
+        'Dim lCombinedOutputTable As atcTable = CombineTables(lSubBasinOutputTable, lReachOutputTable, _
+        '    "1:1", "1:2", "1:3", "2:3", "1:4", "2:4", "1:5", "2:4-1:5", "2:5", "1:6", "2:6", "1:7", "2:6-1:7", "2:7")
+        'lCombinedOutputTable.WriteFile(IO.Path.Combine(pReportsFolder, "SubbasinReach.txt"))
 
         With atcDataManager.DisplayAttributes
             .Clear()
@@ -703,25 +713,195 @@ Module SWATRunner
         Public AreaCum As Double
         Public NLoad As Double
         Public NOutflow As Double
+        Public PLoad As Double
+        Public POutflow As Double
+        Public SedLoad As Double
+        Public SedOutflow As Double
+        Public H2OLoad As Double
+        Public H2OOutflow As Double
     End Class
 
-    Private Function HucSummaryReport(ByVal aHucSummaryCollection As atcCollection) As String
+    Private Function HucSummaryTony(ByVal aHucSummary2 As atcCollection, ByVal aHucSummary4 As atcCollection, ByVal aDateOfRun As Date, Optional ByVal aEnglish As Boolean = False) As String
         Dim lSB As New Text.StringBuilder
+        lSB.AppendLine("Scenario " & vbTab & pScenario & vbTab & "Date " & vbTab & aDateOfRun)
+        lSB.AppendLine("")
         lSB.AppendLine("HUC".PadLeft(8) _
-             & vbTab & "Area".PadLeft(12) _
-             & vbTab & "AreaCum".PadLeft(12) _
-             & vbTab & "NLocalLoadUnit".PadLeft(12) _
-             & vbTab & "NOutflow".PadLeft(16) _
-             & vbTab & "NOutLoadUnit".PadLeft(12))
+             & vbTab & "Area(Local)".PadLeft(12) _
+             & vbTab & "N(LandUnit)".PadLeft(12) _
+             & vbTab & "N(LocalLandLoad)".PadLeft(16) _
+             & vbTab & "P(LandUnit)".PadLeft(12) _
+             & vbTab & "P(LocalLandLoad)".PadLeft(16))
+        If aEnglish Then
+            lSB.AppendLine(Space(8) _
+             & vbTab & "acres*10^6".PadLeft(12) _
+             & vbTab & "lbs/acre".PadLeft(12) _
+             & vbTab & "lbs*10^6".PadLeft(16) _
+             & vbTab & "lbs/acre".PadLeft(12) _
+             & vbTab & "lbs*10^6".PadLeft(16))
+        Else
+            lSB.AppendLine(Space(8) _
+             & vbTab & "ha*10^6".PadLeft(12) _
+             & vbTab & "kg/ha".PadLeft(12) _
+             & vbTab & "kg*10^6".PadLeft(16) _
+             & vbTab & "kg/ha".PadLeft(12) _
+             & vbTab & "kg*10^6".PadLeft(16))
+        End If
+
+        'TODO: move to a function to be shared with HucSummaryReport
+        Dim lAreaFactor As Double = 0.0001 'ha -> km2
+        Dim lUnitLoadFactor As Double = 0.01 'kg/km2 -> kg/ha
+        Dim lMassFactor As Double = 0.000001 'kg -> kg*10^6
+        If aEnglish Then
+            lAreaFactor = 0.000247 'ha -> acre*10^6
+            lUnitLoadFactor = 0.00892 'kg/km2 -> lbs/acre
+            lMassFactor = 0.0000022046 'kg -> lbs*10^6
+        End If
+
+        For Each lHucSummary4 As HucSummary In aHucSummary4
+            With lHucSummary4
+                Dim lNLandUnit As Double = .NLoad / .Area
+                Dim lPLandUnit As Double = .PLoad / .Area
+                lSB.AppendLine(.Name.PadLeft(8) _
+                               & vbTab & DecimalAlign(.Area * lAreaFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(lNLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(.NLoad * lMassFactor, 16, 1, 12).PadLeft(16) _
+                               & vbTab & DecimalAlign(lPLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(.PLoad * lMassFactor, 16, 1, 12).PadLeft(16))
+            End With
+        Next
+        lSB.AppendLine("")
+        Dim lhucsummary2 As HucSummary = aHucSummary2.ItemByIndex(0)
+        With lhucsummary2
+            Dim lNLandUnit As Double = .NLoad / .Area
+            Dim lPLandUnit As Double = .PLoad / .Area
+            lSB.AppendLine(("Total " & .Name).PadLeft(8) _
+                            & vbTab & DecimalAlign(.Area * lAreaFactor, , 3, 8).PadLeft(12) _
+                            & vbTab & DecimalAlign(lNLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                            & vbTab & DecimalAlign(.NLoad * lMassFactor, 16, 1, 12).PadLeft(16) _
+                            & vbTab & DecimalAlign(lPLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                            & vbTab & DecimalAlign(.PLoad * lMassFactor, 16, 1, 12).PadLeft(16))
+            lSB.AppendLine("Outflow".PadLeft(8) _
+                                        & vbTab & " ".PadLeft(8) _
+                                        & vbTab & " ".PadLeft(12) _
+                                        & vbTab & DecimalAlign(.NOutflow * lMassFactor, 16, 1, 12).PadLeft(16) _
+                                        & vbTab & " ".PadLeft(12) _
+                                        & vbTab & DecimalAlign(.POutflow * lMassFactor, 16, 1, 12).PadLeft(16))
+            lSB.AppendLine(" ")
+            lSB.AppendLine("% Removed ".PadLeft(8) _
+                                        & vbTab & " ".PadLeft(8) _
+                                        & vbTab & " ".PadLeft(12) _
+                                        & vbTab & DecimalAlign(100 * (lNLandUnit - (.NOutflow / .AreaCum)) / lNLandUnit, 16, 1, 12).PadLeft(16) _
+                                        & vbTab & " ".PadLeft(12) _
+                                        & vbTab & DecimalAlign(100 * (lPLandUnit - (.POutflow / .AreaCum)) / lPLandUnit, 16, 1, 12).PadLeft(16))
+        End With
+        Return lSB.ToString
+    End Function
+
+    Private Function HucSummaryReport(ByVal aHucSummaryCollection As atcCollection, ByVal aDateOfRun As Date, Optional ByVal aEnglish As Boolean = False) As String
+        Dim lSB As New Text.StringBuilder
+        lSB.AppendLine("Scenario " & vbTab & pScenario & vbTab & "Date " & vbTab & aDateOfRun)
+        lSB.AppendLine("")
+        lSB.AppendLine("HUC".PadLeft(8) _
+             & vbTab & "Area(Local)".PadLeft(12) _
+             & vbTab & "Area(Total)".PadLeft(12) _
+             & vbTab & "N(LandUnit)".PadLeft(12) _
+             & vbTab & "N(OutflowUnit)".PadLeft(12) _
+             & vbTab & "N(Removed)".PadLeft(12) _
+             & vbTab & "N(LocalLandTotal)".PadLeft(16) _
+             & vbTab & "N(OutflowTotal)".PadLeft(16) _
+             & vbTab & "P(LandUnit)".PadLeft(12) _
+             & vbTab & "P(OutflowUnit)".PadLeft(12) _
+             & vbTab & "P(Removed)".PadLeft(12) _
+             & vbTab & "P(LocalLandTotal)".PadLeft(16) _
+             & vbTab & "P(OutflowTotal)".PadLeft(16)) '_
+        '& vbTab & "Sed(LocalUnit)".PadLeft(12) _
+        '& vbTab & "Sed(TotalOutflow)".PadLeft(16) _
+        '& vbTab & "Sed(TotalUnit)".PadLeft(12) _
+        '& vbTab & "H2O(LocalUnit)".PadLeft(12) _
+        '& vbTab & "H2O(TotalOutflow)".PadLeft(16) _
+        '& vbTab & "H2O(TotalUnit)".PadLeft(12))
+        If aEnglish Then
+            lSB.AppendLine(Space(8) _
+             & vbTab & "acres*10^6".PadLeft(12) _
+             & vbTab & "acres*10^6".PadLeft(12) _
+             & vbTab & "lbs/acre".PadLeft(12) _
+             & vbTab & "lbs/acre".PadLeft(12) _
+             & vbTab & "%".PadLeft(12) _
+             & vbTab & "lbs*10^6".PadLeft(16) _
+             & vbTab & "lbs*10^6".PadLeft(16) _
+             & vbTab & "lbs/acre".PadLeft(12) _
+             & vbTab & "lbs/acre".PadLeft(12) _
+             & vbTab & "%".PadLeft(12) _
+             & vbTab & "lbs*10^6".PadLeft(16) _
+             & vbTab & "lbs*10^6".PadLeft(16)) ' _
+            '& vbTab & "?".PadLeft(12) _
+            '& vbTab & "?".PadLeft(16) _
+            '& vbTab & "?".PadLeft(12) _
+            '& vbTab & "?".PadLeft(12) _
+            '& vbTab & "?".PadLeft(16) _
+            '& vbTab & "?".PadLeft(12))
+        Else
+            lSB.AppendLine(Space(8) _
+             & vbTab & "ha*10^6".PadLeft(12) _
+             & vbTab & "ha*10^6".PadLeft(12) _
+             & vbTab & "kg/ha".PadLeft(12) _
+             & vbTab & "kg/ha".PadLeft(12) _
+             & vbTab & "%".PadLeft(12) _
+             & vbTab & "kg*10^6".PadLeft(16) _
+             & vbTab & "kg*10^6".PadLeft(16) _
+             & vbTab & "kg/ha".PadLeft(12) _
+             & vbTab & "kg/ha".PadLeft(12) _
+             & vbTab & "%".PadLeft(12) _
+             & vbTab & "kg*10^6".PadLeft(16) _
+             & vbTab & "kg*10^6".PadLeft(16)) ' _
+            '& vbTab & "?".PadLeft(12) _
+            '& vbTab & "?".PadLeft(16) _
+            '& vbTab & "?".PadLeft(12) _
+            '& vbTab & "?".PadLeft(12) _
+            '& vbTab & "?".PadLeft(16) _
+            '& vbTab & "?".PadLeft(12))
+        End If
         For Each lHucSummary As HucSummary In aHucSummaryCollection
             With lHucSummary
-                Dim lNLoadUnit As Double = .NLoad / .Area 'local load 
+                'local loads
+                Dim lNLandUnit As Double = .NLoad / .Area
+                Dim lNOutflowUnit As Double = .NOutflow / .AreaCum
+                Dim lNRemovalPercent As Double = 100 * (lNLandUnit - lNOutflowUnit) / lNLandUnit
+                Dim lPLandUnit As Double = .PLoad / .Area
+                Dim lPOutflowUnit As Double = .POutflow / .AreaCum
+                Dim lPRemovalPercent As Double = 100 * (lPLandUnit - lPOutflowUnit) / lPLandUnit
+                'Dim lSedLoadUnit As Double = .SedLoad / .Area
+                'Dim lH2OLoadUnit As Double = .H2OLoad / .Area
+
+                'TODO: move to a function to be shared with HucSummaryTony
+                Dim lAreaFactor As Double = 0.0001 'ha -> km2
+                Dim lUnitLoadFactor As Double = 0.01 'kg/km2 -> kg/ha
+                Dim lMassFactor As Double = 0.000001 'kg -> kg*10^6
+                If aEnglish Then
+                    lAreaFactor = 0.000247 'ha -> acre*10^6
+                    lUnitLoadFactor = 0.00892 'kg/km2 -> lbs/acre
+                    lMassFactor = 0.0000022046 'kg -> lbs*10^6
+                End If
+
                 lSB.AppendLine(.Name.PadLeft(8) _
-                               & vbTab & DecimalAlign(.Area, , 0, 8).PadLeft(12) _
-                               & vbTab & DecimalAlign(.AreaCum, , 0, 8).PadLeft(12) _
-                               & vbTab & DecimalAlign(lNLoadUnit, , 0, 8).PadLeft(12) _
-                               & vbTab & DecimalAlign(.NOutflow, 16, 0, 12).PadLeft(16) _
-                               & vbTab & DecimalAlign((.NOutflow / .AreaCum), , 0, 8).PadLeft(12))
+                               & vbTab & DecimalAlign(.Area * lAreaFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(.AreaCum * lAreaFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(lNLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(lNOutflowUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(lNRemovalPercent, , 1, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(.NLoad * lMassFactor, 16, 3, 12).PadLeft(16) _
+                               & vbTab & DecimalAlign(.NOutflow * lMassFactor, 16, 3, 12).PadLeft(16) _
+                               & vbTab & DecimalAlign(lPLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(lPOutflowUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(lPRemovalPercent, , 1, 8).PadLeft(12) _
+                               & vbTab & DecimalAlign(.PLoad * lMassFactor, 16, 3, 12).PadLeft(16) _
+                               & vbTab & DecimalAlign(.POutflow * lMassFactor, 16, 3, 12).PadLeft(16)) ' _
+                '                   & vbTab & DecimalAlign(lSedLoadUnit * 0.00892, , 3, 8).PadLeft(12) _
+                '                   & vbTab & DecimalAlign(.SedOutflow / 1000000.0, 16, 3, 12).PadLeft(16) _
+                '                   & vbTab & DecimalAlign((.SedOutflow / .AreaCum) * 0.00892, , 3, 8).PadLeft(12) _
+                '                   & vbTab & DecimalAlign(lH2OLoadUnit * 0.00892, , 3, 8).PadLeft(12) _
+                '                   & vbTab & DecimalAlign(.H2OOutflow / 1000000.0, 16, 3, 12).PadLeft(16) _
+                '                   & vbTab & DecimalAlign((.H2OOutflow / .AreaCum) * 0.00892, , 3, 8).PadLeft(12))
             End With
         Next
         Return lSB.ToString
@@ -740,9 +920,15 @@ Module SWATRunner
         With lHucSummary
             .Area += aSubBasinOutputTable.Value(3)
             .NLoad += aSubBasinOutputTable.Value(5)
+            .PLoad += aSubBasinOutputTable.Value(7)
+            .SedLoad += aSubBasinOutputTable.Value(9)
+            .H2OLoad += aSubBasinOutputTable.Value(11)
             If .AreaCum < aReachOutputTable.Value(3) Then 'new downstream
                 .AreaCum = aReachOutputTable.Value(3)
                 .NOutflow = aReachOutputTable.Value(5)
+                .POutflow = aReachOutputTable.Value(7)
+                .SedOutflow = aReachOutputTable.Value(9)
+                .H2OOutflow = aReachOutputTable.Value(11)
             End If
         End With
     End Sub
@@ -800,12 +986,18 @@ Module SWATRunner
         End With
 
         Dim lSBHuc8 As New Text.StringBuilder
-        lSBHuc8.AppendLine("SubID" & vbTab & "HUC8" & vbTab & "LocalArea".PadLeft(12) _
-                                                    & vbTab & "N_Unit_Load".PadLeft(12) & vbTab & "N_HUC_Load".PadLeft(12) _
-                                                    & vbTab & "P_Unit_Load".PadLeft(12) & vbTab & "P_HUC_Load".PadLeft(12))
-        lSBHuc8.AppendLine(vbTab & vbTab & "km2".PadLeft(12) _
-                                 & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12) _
-                                 & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12))
+        lSBHuc8.AppendLine("SubID" & vbTab & "HUC8".PadLeft(8) _
+                                   & vbTab & "LocalArea".PadLeft(12) _
+                                   & vbTab & "N_Unit_Load".PadLeft(12) & vbTab & "N_HUC_Load".PadLeft(12) _
+                                   & vbTab & "P_Unit_Load".PadLeft(12) & vbTab & "P_HUC_Load".PadLeft(12) _
+                                   & vbTab & "Sed_Unit_Load".PadLeft(12) & vbTab & "Sed_HUC_Load".PadLeft(16) _
+                                   & vbTab & "H2O_Unit_Load".PadLeft(12) & vbTab & "H2O_HUC_Load".PadLeft(16))
+        lSBHuc8.AppendLine(" " & vbTab & " ".PadLeft(8) _
+                               & vbTab & "km2".PadLeft(12) _
+                               & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12) _
+                               & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12) _
+                               & vbTab & "tonne/ha".PadLeft(12) & vbTab & "tonne".PadLeft(16) _
+                               & vbTab & "mm".PadLeft(12) & vbTab & "?".PadLeft(16)) 'mm * ha
 
         For lIndex As Integer = 1 To aSubBasin2HUC8.Count
             Dim lHuc8 As String = aSubBasin2HUC8.ItemByKey(lIndex.ToString)
@@ -851,10 +1043,24 @@ Module SWATRunner
             lTimserPhosHucLoad.Attributes.SetValue("Constituent", "HucP_Load")
             lSubDataToList.Add(lTimserPhosHucLoad)
             lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosHucLoad.Attributes.GetDefinedValue("Mean").Value))
+
+            'sediment
+            Dim lTimserUnitLoad As atcTimeseries = lSubDataToList.FindData("Constituent", "SYLD").ItemByIndex(0)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserUnitLoad.Attributes.GetDefinedValue("Mean").Value))
+            Dim lTimserLoad As atcTimeseries = Compute("Multiply", lTimserUnitLoad, lHucAreaFactor)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserLoad.Attributes.GetDefinedValue("Mean").Value, 16))
+
+            'H2O
+            lTimserUnitLoad = lSubDataToList.FindData("Constituent", "WYLD").ItemByIndex(0)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserUnitLoad.Attributes.GetDefinedValue("Mean").Value))
+            lTimserLoad = Compute("Multiply", lTimserUnitLoad, lHucAreaFactor)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimserLoad.Attributes.GetDefinedValue("Mean").Value, 16))
+
             lSBHuc8.AppendLine()
 
             Dim lOutputFilenameHuc As String = lHuc8 & "_" & lIndex & "_Sub.txt"
             Dim lList As New atcListPlugin
+            'TODO: just output year
             lList.Save(lSubDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc), "DateFormatIncludeYears")
         Next
         SaveFileString(aOutputFileName, lSBHuc8.ToString)
@@ -865,6 +1071,7 @@ Module SWATRunner
         Dim lConsNitrIn As String() = {"NH4_IN", "NO2_IN", "NO3_IN", "ORGN_IN"}
         Dim lConsPhosOut As String() = {"ORGP_OUT", "MINP_OUT"}
         Dim lConsPhosIn As String() = {"ORGP_IN", "MINP_IN"}
+        Dim lConsOtherIn As String() = {"FLOW_IN", "SED_IN"}
         Dim lConsOtherOut As String() = {"AREA", "FLOW_OUT", "SED_OUT"}
         Dim lConsToOutput As New ArrayList
         With lConsToOutput
@@ -873,15 +1080,20 @@ Module SWATRunner
             .AddRange(lConsPhosOut)
             .AddRange(lConsPhosIn)
             .AddRange(lConsOtherOut)
+            .AddRange(lConsOtherIn)
         End With
 
         Dim lSBHuc8 As New Text.StringBuilder
         lSBHuc8.AppendLine("SubID" & vbTab & "HUC8" & vbTab & "CumArea".PadLeft(12) _
                                                     & vbTab & "N_Total_In".PadLeft(16) & vbTab & "N_Total_Out".PadLeft(16) _
-                                                    & vbTab & "P_Total_In".PadLeft(16) & vbTab & "P_Total_Out".PadLeft(16))
+                                                    & vbTab & "P_Total_In".PadLeft(16) & vbTab & "P_Total_Out".PadLeft(16) _
+                                                    & vbTab & "Sed_Total_In".PadLeft(16) & vbTab & "Sed_Total_Out".PadLeft(16) _
+                                                    & vbTab & "H2O_Total_In".PadLeft(16) & vbTab & "H2O_Total_Out".PadLeft(16))
         lSBHuc8.AppendLine(vbTab & vbTab & "km2".PadLeft(12) _
                                  & vbTab & "kg".PadLeft(16) & vbTab & "kg".PadLeft(16) _
-                                 & vbTab & "kg".PadLeft(16) & vbTab & "kg".PadLeft(16))
+                                 & vbTab & "kg".PadLeft(16) & vbTab & "kg".PadLeft(16) _
+                                 & vbTab & "kg".PadLeft(16) & vbTab & "kg".PadLeft(16) _
+                                 & vbTab & "m3/s".PadLeft(16) & vbTab & "m3/s".PadLeft(16))
 
         For lIndex As Integer = 1 To aSubBasin2HUC8.Count
             Dim lHuc8 As String = aSubBasin2HUC8.ItemByKey(lIndex.ToString)
@@ -935,12 +1147,25 @@ Module SWATRunner
             lTimserPhosTotalOut.Attributes.SetValue("Constituent", "TotalP_Out")
             lReachDataToList.Add(lTimserPhosTotalOut)
             lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosTotalOut.Attributes.GetDefinedValue("Mean").Value, 16))
+
+            'sediment
+            Dim lTimser As atcTimeseries = lReachDataToList.FindData("Constituent", "SED_IN").ItemByIndex(0)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimser.Attributes.GetDefinedValue("Mean").Value, 16))
+            lTimser = lReachDataToList.FindData("Constituent", "SED_Out").ItemByIndex(0)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimser.Attributes.GetDefinedValue("Mean").Value, 16))
+
+            'H2O
+            lTimser = lReachDataToList.FindData("Constituent", "FLOW_IN").ItemByIndex(0)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimser.Attributes.GetDefinedValue("Mean").Value, 16))
+            lTimser = lReachDataToList.FindData("Constituent", "FLOW_OUT").ItemByIndex(0)
+            lSBHuc8.Append(vbTab & DecimalAlign(lTimser.Attributes.GetDefinedValue("Mean").Value, 16))
+
             lSBHuc8.AppendLine()
 
             Dim lOutputFilenameHuc As String = lHuc8 & "_" & lIndex & ".txt"
             Dim lList As New atcListPlugin
             'TODO: just output year
-            lList.Save(lReachDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc))
+            lList.Save(lReachDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc), "DateFormatIncludeYears")
         Next
         SaveFileString(aOutputFileName, lSBHuc8.ToString)
     End Sub
@@ -957,12 +1182,18 @@ Module SWATRunner
         Dim lArea As Double = 0.0
         Dim lUnitYield As Double = 0.0
 
+        'TODO: check and output all units!
         Dim lSBAreaDebug As New Text.StringBuilder
         lSBAreaDebug.AppendLine("SubId" & lTab & _
                                 "HruId" & lTab & _
                                 "Crop" & lTab & _
                                 "Area".PadLeft(lFieldWidth) & lTab & _
                                 "Fraction".PadLeft(lFieldWidth))
+        'lSBAreaDebug.AppendLine(Space(5) & lTab & _
+        '                        Space(6) & lTab & _
+        '                        Space(4) & lTab & _
+        '                        "km2".PadLeft(lFieldWidth) & lTab & _
+        '                        Space(8).PadLeft(lFieldWidth))
         Dim lSBDebug As New Text.StringBuilder
         lSBDebug.AppendLine("SubId" & lTab & _
                             "Crop" & lTab & _
@@ -970,6 +1201,12 @@ Module SWATRunner
                             "Area".PadLeft(lFieldWidth) & lTab & _
                             "UnitYield".PadLeft(lFieldWidth) & lTab & _
                             "Yield".PadLeft(lFieldWidth))
+        'lSBDebug.AppendLine(Space(5) & lTab & _
+        '                    Space(4).PadLeft(8) & lTab & _
+        '                    Space(4) & lTab & _
+        '                    "km2".PadLeft(lFieldWidth) & lTab & _
+        '                    "kg/ha".PadLeft(lFieldWidth) & lTab & _
+        '                    "kg".PadLeft(lFieldWidth))
         Dim lSBAnnual As New Text.StringBuilder
         lSBAnnual.AppendLine("SubId" & lTab & _
                              "Year" & lTab & _
@@ -1224,7 +1461,6 @@ Module SWATArea
             End If
         Next
         lNewTable.NumFields = lNewColumnSpecs.Count
-        Dim lNumRecords As Integer = lExistingTables(0).NumRecords
         Dim lColumnSpec As String
         Dim lOldTableIndex As Integer
         Dim lOldColumnIndex As Integer
@@ -1239,7 +1475,7 @@ Module SWATArea
                 If lColumnSpec.StartsWith(":") Then
                     lColumnSpec = lColumnSpec.Substring(1)
                     lOldColumnIndex = StrFirstInt(lColumnSpec)
-                    lNewTable.FieldName(lNewColumnIndex) &= lExistingTables(lOldTableIndex - 1).FieldName(lOldColumnIndex).Trim
+                    lNewTable.FieldName(lNewColumnIndex) &= lExistingTables(lOldTableIndex - 1).FieldName(lOldColumnIndex)
 
                     If lColumnSpec.Length > 0 Then 'math with next part of column spec
                         lNewTable.FieldName(lNewColumnIndex) &= lColumnSpec.Substring(0, 1)
@@ -1249,16 +1485,13 @@ Module SWATArea
             End While
         Next
 
-        Dim lOldValue As Double 'Value from table to be merged
-        Dim lNewValue As Double 'Value already placed in new combined table
-
         'populate values
-        For lRecord As Integer = 1 To lNumRecords
+        For lRecord As Integer = 1 To lExistingTables(0).NumRecords
             lNewTable.CurrentRecord = lRecord
             For Each lOldTable As atcTable In lExistingTables
                 lOldTable.CurrentRecord = lRecord
             Next
-            lNewColumnIndex = 0
+
             For Each lColumnSpec In lNewColumnSpecs
                 lNewColumnIndex += 1
                 While lColumnSpec.Length > 0
@@ -1268,20 +1501,19 @@ Module SWATArea
                     If lColumnSpec.StartsWith(":") Then
                         lColumnSpec = lColumnSpec.Substring(1)
                         lOldColumnIndex = StrFirstInt(lColumnSpec)
-                        Dim lOldValueStr As String = lExistingTables(lOldTableIndex - 1).Value(lOldColumnIndex)
-                        Double.TryParse(lNewTable.Value(lNewColumnIndex), lNewValue)
-                        If Double.TryParse(lOldValueStr, lOldValue) Then
-                            Select Case lOperator
-                                Case "+" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue + lOldValue)
-                                Case "-" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue - lOldValue)
-                                Case "*" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue * lOldValue)
-                                Case "/" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue / lOldValue)
-                                Case Else : lNewTable.Value(lNewColumnIndex) = lOldValueStr
-                            End Select
-                        Else
-                            Logger.Dbg("Copying non-numeric '" & lOldValueStr & "' from record " & lRecord & " column " & lOldColumnIndex & " of " & lExistingTables(lOldTableIndex - 1).FileName)
-                            lNewTable.Value(lNewColumnIndex) = lOldValueStr
-                        End If
+                        Dim lOldValue As Double = lExistingTables(lOldTableIndex - 1).Value(lOldColumnIndex)
+                        Select Case lColumnSpec.Substring(0, 1)
+                            Case "+"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) + lOldValue
+                            Case "-"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) - lOldValue
+                            Case "*"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) * lOldValue
+                            Case "/"
+                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) / lOldValue
+                            Case Else
+                                lNewTable.Value(lNewColumnIndex) = lOldValue
+                        End Select
                     End If
                 End While
             Next
