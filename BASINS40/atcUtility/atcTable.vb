@@ -73,10 +73,10 @@ Public MustInherit Class atcTable
     Public MustOverride Function CreationCode() As String Implements IatcTable.CreationCode
 
     'Open the specified file, probably read at least the metadata about fields
-    Public MustOverride Function OpenFile(ByVal filename As String) As Boolean Implements IatcTable.OpenFile
+    Public MustOverride Function OpenFile(ByVal aFilename As String) As Boolean Implements IatcTable.OpenFile
 
     'Write the current table to the specified file
-    Public MustOverride Function WriteFile(ByVal filename As String) As Boolean Implements IatcTable.WriteFile
+    Public MustOverride Function WriteFile(ByVal aFilename As String) As Boolean Implements IatcTable.WriteFile
 
     'The number of header rows in the table
     Public MustOverride Property NumHeaderRows() As Integer Implements IatcTable.NumHeaderRows

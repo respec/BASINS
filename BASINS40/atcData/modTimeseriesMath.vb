@@ -259,7 +259,7 @@ Public Module modTimeseriesMath
                         Next
                     End If
                 Else 'out of values in all the datasets
-                    Logger.Dbg("Warning:MergeTimeseries:Ran out of values at " & lNewIndex & " of " & lTotalNumValues)
+                    'Logger.Dbg("Warning:MergeTimeseries:Ran out of values at " & lNewIndex & " of " & lTotalNumValues)
                     lTotalNumValues = lNewIndex - 1
                     Exit For
                 End If

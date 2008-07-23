@@ -27,19 +27,16 @@ Public Class atcTableArray
 
     Public Overrides Property CurrentRecord() As Integer
         Get
-            CurrentRecord = pCurrentRecord
+            Return pCurrentRecord
         End Get
         Set(ByVal newValue As Integer)
             Try
-                If newValue < 1 Or newValue > NumRecords Then
+                If newValue < 1 Then
                     pCurrentRecord = 1
                 Else
                     pCurrentRecord = newValue
                 End If
-                While pCurrentRecord > pRecords.Count
-                    Dim lRow(pNumFields) As String
-                    pRecords.Add(lRow)
-                End While
+                If pCurrentRecord > pRecords.Count Then NumRecords = pCurrentRecord
                 Exit Property
             Catch ex As Exception
                 Throw New ApplicationException("atcTableArray: Cannot set CurrentRecord to " & newValue & vbCr & ex.Message)
@@ -145,7 +142,11 @@ Public Class atcTableArray
     ''' </summary>
     Public Property Header() As String
         Get
-            Return String.Join(vbCrLf, pHeader.ToArray)
+            Dim lReturnValue As String = ""
+            For Each lString As String In pHeader
+                lReturnValue &= lString & vbCrLf
+            Next
+            Return lReturnValue
         End Get
         Set(ByVal newValue As String)
             pHeader.Clear()
@@ -158,6 +159,13 @@ Public Class atcTableArray
             Return pRecords.Count
         End Get
         Set(ByVal newValue As Integer)
+            While newValue > pRecords.Count
+                Dim lRow(pNumFields) As String
+                pRecords.Add(lRow)
+            End While
+            If newValue < pRecords.Count Then
+                pRecords.RemoveRange(newValue, pRecords.Count - newValue)
+            End If
         End Set
     End Property
 
@@ -237,9 +245,8 @@ Public Class atcTableArray
     Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
 TryAgain:
         Try
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FileName))
-
-            Dim lOutStream As StreamWriter = File.CreateText(FileName)
+            IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(aFilename))
+            Dim lOutStream As StreamWriter = File.CreateText(aFilename)
 
             lOutStream.Write(Header)
 
@@ -253,7 +260,7 @@ TryAgain:
 
             Return True
         Catch ex As Exception
-            If Logger.Msg("Error saving " & FileName & vbCr & Err.Description, _
+            If Logger.Msg("Error saving " & aFilename & vbCr & Err.Description, _
                           MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
                 GoTo TryAgain
             End If

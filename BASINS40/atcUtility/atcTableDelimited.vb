@@ -150,7 +150,11 @@ Public Class atcTableDelimited
     ''' </summary>
     Public Property Header() As String
         Get
-            Return String.Join(vbCrLf, pHeader.ToArray)
+            Dim lReturnValue As String = ""
+            For Each lString As String In pHeader
+                lReturnValue &= lString & vbCrLf
+            Next
+            Return lReturnValue
         End Get
         Set(ByVal newValue As String)
             pHeader.Clear()
@@ -283,23 +287,16 @@ ErrHand:
     Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
 TryAgain:
         Try
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Filename))
-
-            Dim lOutStream As StreamWriter = File.CreateText(Filename)
-
+            IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(aFilename))
+            Dim lOutStream As StreamWriter = File.CreateText(aFilename)
             lOutStream.Write(Header)
-
             lOutStream.Write(String.Join(Delimiter, pFieldNames, 1, NumFields) & vbCrLf)
-
             lOutStream.Write(String.Join(vbCrLf, pRecords.ToArray, 1, NumRecords) & vbCrLf)
-
             lOutStream.Close()
-
-            Filename = aFilename
-
+            FileName = aFilename
             Return True
         Catch ex As Exception
-            If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, _
+            If Logger.Msg("Error saving " & aFilename & vbCr & Err.Description, _
                           MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
                 GoTo TryAgain
             End If

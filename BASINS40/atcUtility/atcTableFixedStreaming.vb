@@ -173,10 +173,11 @@ ErrHand:
     ''' </summary>
     Public Property Header() As String
         Get
-            Header = ""
+            Dim lReturnValue As String = ""
             For Each lString As String In pHeader
-                Header &= lString & vbCrLf
+                lReturnValue &= lString & vbCrLf
             Next
+            Return lReturnValue
         End Get
         Set(ByVal newValue As String)
             pHeader.Clear()

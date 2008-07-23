@@ -1048,7 +1048,6 @@ NotEqual:
 
     Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
         Dim OutFile As Short
-        Dim lField As Integer
 TryAgain:
         Try
             If IO.File.Exists(aFilename) Then
@@ -1064,7 +1063,7 @@ TryAgain:
             FileOpen(OutFile, aFilename, OpenMode.Binary)
             pHeader.WriteToFile(OutFile)
 
-            For lField = 1 To pNumFields
+            For lField As Integer = 1 To pNumFields
                 pFields(lField).WriteToFile(OutFile) 'FilePutObject(OutFile, pFields(I), (32 * I) + 1)
             Next
 

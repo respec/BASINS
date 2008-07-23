@@ -680,8 +680,9 @@ Module SWATRunner
         SaveFileString(IO.Path.Combine(pReportsFolder, "Huc4Summary.txt"), HucSummaryReport(lHuc4Summary))
         SaveFileString(IO.Path.Combine(pReportsFolder, "Huc6Summary.txt"), HucSummaryReport(lHuc6Summary))
 
-        Dim lCombinedOutputTable As atcTable = CombineTables(lSubBasinOutputTable, lReachOutputTable, _
+        Dim lCombinedOutputTable As atcTableArray = CombineTables(lSubBasinOutputTable, lReachOutputTable, _
             "1:1", "1:2", "1:3", "2:3", "1:4", "2:4", "1:5", "2:4-1:5", "2:5", "1:6", "2:6", "1:7", "2:6-1:7", "2:7")
+        lCombinedOutputTable.Delimiter = vbTab
         lCombinedOutputTable.WriteFile(IO.Path.Combine(pReportsFolder, "SubbasinReach.txt"))
 
         With atcDataManager.DisplayAttributes
@@ -854,7 +855,6 @@ Module SWATRunner
 
             Dim lOutputFilenameHuc As String = lHuc8 & "_" & lIndex & "_Sub.txt"
             Dim lList As New atcListPlugin
-            'TODO: just output year
             lList.Save(lSubDataToList, IO.Path.Combine(aOutputFolder, lOutputFilenameHuc), "DateFormatIncludeYears")
         Next
         SaveFileString(aOutputFileName, lSBHuc8.ToString)
@@ -1224,6 +1224,7 @@ Module SWATArea
             End If
         Next
         lNewTable.NumFields = lNewColumnSpecs.Count
+        Dim lNumRecords As Integer = lExistingTables(0).NumRecords
         Dim lColumnSpec As String
         Dim lOldTableIndex As Integer
         Dim lOldColumnIndex As Integer
@@ -1238,7 +1239,7 @@ Module SWATArea
                 If lColumnSpec.StartsWith(":") Then
                     lColumnSpec = lColumnSpec.Substring(1)
                     lOldColumnIndex = StrFirstInt(lColumnSpec)
-                    lNewTable.FieldName(lNewColumnIndex) &= lExistingTables(lOldTableIndex - 1).FieldName(lOldColumnIndex)
+                    lNewTable.FieldName(lNewColumnIndex) &= lExistingTables(lOldTableIndex - 1).FieldName(lOldColumnIndex).Trim
 
                     If lColumnSpec.Length > 0 Then 'math with next part of column spec
                         lNewTable.FieldName(lNewColumnIndex) &= lColumnSpec.Substring(0, 1)
@@ -1248,13 +1249,16 @@ Module SWATArea
             End While
         Next
 
+        Dim lOldValue As Double 'Value from table to be merged
+        Dim lNewValue As Double 'Value already placed in new combined table
+
         'populate values
-        For lRecord As Integer = 1 To lExistingTables(0).NumRecords
+        For lRecord As Integer = 1 To lNumRecords
             lNewTable.CurrentRecord = lRecord
             For Each lOldTable As atcTable In lExistingTables
                 lOldTable.CurrentRecord = lRecord
             Next
-
+            lNewColumnIndex = 0
             For Each lColumnSpec In lNewColumnSpecs
                 lNewColumnIndex += 1
                 While lColumnSpec.Length > 0
@@ -1264,19 +1268,20 @@ Module SWATArea
                     If lColumnSpec.StartsWith(":") Then
                         lColumnSpec = lColumnSpec.Substring(1)
                         lOldColumnIndex = StrFirstInt(lColumnSpec)
-                        Dim lOldValue As Double = lExistingTables(lOldTableIndex - 1).Value(lOldColumnIndex)
-                        Select Case lColumnSpec.Substring(0, 1)
-                            Case "+"
-                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) + lOldValue
-                            Case "-"
-                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) - lOldValue
-                            Case "*"
-                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) * lOldValue
-                            Case "/"
-                                lNewTable.Value(lNewColumnIndex) = CDbl(lNewTable.Value(lNewColumnIndex)) / lOldValue
-                            Case Else
-                                lNewTable.Value(lNewColumnIndex) = lOldValue
-                        End Select
+                        Dim lOldValueStr As String = lExistingTables(lOldTableIndex - 1).Value(lOldColumnIndex)
+                        Double.TryParse(lNewTable.Value(lNewColumnIndex), lNewValue)
+                        If Double.TryParse(lOldValueStr, lOldValue) Then
+                            Select Case lOperator
+                                Case "+" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue + lOldValue)
+                                Case "-" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue - lOldValue)
+                                Case "*" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue * lOldValue)
+                                Case "/" : lNewTable.Value(lNewColumnIndex) = DoubleToString(lNewValue / lOldValue)
+                                Case Else : lNewTable.Value(lNewColumnIndex) = lOldValueStr
+                            End Select
+                        Else
+                            Logger.Dbg("Copying non-numeric '" & lOldValueStr & "' from record " & lRecord & " column " & lOldColumnIndex & " of " & lExistingTables(lOldTableIndex - 1).FileName)
+                            lNewTable.Value(lNewColumnIndex) = lOldValueStr
+                        End If
                     End If
                 End While
             Next

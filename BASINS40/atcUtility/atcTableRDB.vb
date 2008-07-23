@@ -56,9 +56,9 @@ Public Class atcTableRDB
     Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
 TryAgain:
         Try
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Filename))
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(aFilename))
 
-            Dim lOutStream As StreamWriter = File.CreateText(Filename)
+            Dim lOutStream As StreamWriter = File.CreateText(aFilename)
 
             lOutStream.Write(Header)
 
@@ -74,11 +74,11 @@ TryAgain:
 
             lOutStream.Close()
 
-            Filename = aFilename
+            FileName = aFilename
 
             Return True
         Catch ex As Exception
-            If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, _
+            If Logger.Msg("Error saving " & aFilename & vbCr & Err.Description, _
                           MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
                 GoTo TryAgain
             End If
