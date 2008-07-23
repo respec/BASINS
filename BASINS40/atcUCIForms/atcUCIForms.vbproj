@@ -58,6 +58,12 @@
     <Compile Include="ctlEditFilesBlock.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ctlEditGlobalBlock.Designer.vb">
+      <DependentUpon>ctlEditGlobalBlock.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditGlobalBlock.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="frmEdit.Designer.vb">
       <DependentUpon>frmEdit.vb</DependentUpon>
     </Compile>
@@ -84,6 +90,10 @@
     <EmbeddedResource Include="ctlEditFilesBlock.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditFilesBlock.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlEditGlobalBlock.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlEditGlobalBlock.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmEdit.resx">
       <SubType>Designer</SubType>
