@@ -331,32 +331,34 @@ Module modModelSetup
                 Next j
                 'find lugroup that corresponds to this lucode
                 Dim lLandUseName As String = lRcode.ItemByKey(lLandUse.Code.ToString)
-                'find percent perv that corresponds to this lugroup
-                Dim lPercentImperv As Double
-                For j As Integer = 1 To aGridPervious.Source.Rows
-                    If lLandUseName = aGridPervious.Source.CellValue(j, 1) Then
-                        If Double.TryParse(aGridPervious.Source.CellValue(j, 2), lPercentImperv) Then
-                            Exit For
-                        Else
-                            Logger.Dbg("Warning: non-parsable percent impervious value at row " & j & " '" & aGridPervious.Source.CellValue(j, 2) & "' for land use name " & lLandUseName)
+                If lLandUseName IsNot Nothing Then
+                    'find percent perv that corresponds to this lugroup
+                    Dim lPercentImperv As Double
+                    For j As Integer = 1 To aGridPervious.Source.Rows
+                        If lLandUseName = aGridPervious.Source.CellValue(j, 1) Then
+                            If Double.TryParse(aGridPervious.Source.CellValue(j, 2), lPercentImperv) Then
+                                Exit For
+                            Else
+                                Logger.Dbg("Warning: non-parsable percent impervious value at row " & j & " '" & aGridPervious.Source.CellValue(j, 2) & "' for land use name " & lLandUseName)
+                            End If
                         End If
-                    End If
-                Next j
-                'find lugroup position in the area array
-                Dim lpos As Long
-                For j As Integer = 0 To lUniqueLugroups.Count - 1
-                    If lLandUseName = lUniqueLugroups(j) Then
-                        lpos = j
-                        Exit For
-                    End If
-                Next j
+                    Next j
+                    'find lugroup position in the area array
+                    Dim lpos As Long
+                    For j As Integer = 0 To lUniqueLugroups.Count - 1
+                        If lLandUseName = lUniqueLugroups(j) Then
+                            lpos = j
+                            Exit For
+                        End If
+                    Next j
 
-                With lLandUse
-                    lPerArea(spos, lpos) += (.Area * (100 - lPercentImperv) / 100)
-                    lImpArea(spos, lpos) += (.Area * lPercentImperv / 100)
-                    lLength(spos) = 0.0
-                    lSlope(spos) = .Slope / 100.0
-                End With
+                    With lLandUse
+                        lPerArea(spos, lpos) += (.Area * (100 - lPercentImperv) / 100)
+                        lImpArea(spos, lpos) += (.Area * lPercentImperv / 100)
+                        lLength(spos) = 0.0
+                        lSlope(spos) = .Slope / 100.0
+                    End With
+                End If
             Next lLandUse
         Else 'using custom table for landuse classification
             For Each lLandUse As LandUse In aLandUses
