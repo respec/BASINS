@@ -51,7 +51,7 @@ Public Class HspfFilesBlk
     Public Property Value(ByVal aIndex As Integer) As HspfData.HspfFile
         Get
             If aIndex > 0 And aIndex <= pFiles.Count Then
-                Value = pFiles.Item(aIndex)
+                Value = pFiles.Item(aIndex - 1)
             Else
                 Value = New HspfData.HspfFile
                 Value.Name = ""

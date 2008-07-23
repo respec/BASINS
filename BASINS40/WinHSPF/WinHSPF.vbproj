@@ -63,6 +63,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmReach.Designer.vb">
+      <DependentUpon>frmReach.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmReach.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="modWinHSPF.vb" />
     <Compile Include="frmWinHSPF.vb">
       <SubType>Form</SubType>
@@ -88,6 +94,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmReach.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmReach.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmWinHSPF.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmWinHSPF.vb</DependentUpon>
