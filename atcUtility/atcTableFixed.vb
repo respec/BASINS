@@ -21,7 +21,6 @@ Public Class atcTableFixed
     Private pData() As String
     Private pRecords As New ArrayList
     Private pCurrentRecord As Integer
-    Private pCurrentRecordStart As Integer
 
     Public Overrides Property CurrentRecord() As Integer
         Get
@@ -177,10 +176,11 @@ ErrHand:
     ''' </summary>
     Public Property Header() As String
         Get
-            Header = ""
+            Dim lReturnValue As String = ""
             For Each lString As String In pHeader
-                Header &= lString & vbCrLf
+                lReturnValue &= lString & vbCrLf
             Next
+            Return lReturnValue
         End Get
         Set(ByVal newValue As String)
             pHeader.Clear()
@@ -329,45 +329,41 @@ ErrHand:
         Return OpenStream(inBuffer)
     End Function
 
-    Public Overrides Function WriteFile(ByVal Filename As String) As Boolean
-        Dim OutFile As Short
-        Dim j, i, dot As Short
-        Dim s As String
+    Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
 TryAgain:
-        On Error GoTo ErrHand
+        Try
+            IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(aFilename))
+            Dim lOutStream As StreamWriter = File.CreateText(aFilename)
+            lOutStream.Write(Header)
 
-        If FileExists(Filename) Then
-            Kill(Filename)
-        Else
-            MkDirPath(System.IO.Path.GetDirectoryName(Filename))
-        End If
+            Dim lColumn As Integer
+            For lColumn = 1 To NumFields
+                lOutStream.Write(Me.FieldName(lColumn).PadRight(Me.FieldLength(lColumn)))
+            Next
+            lOutStream.WriteLine()
 
-        OutFile = FreeFile()
-        FileOpen(OutFile, Filename, OpenMode.Input)
-
-        FilePut(OutFile, Header)
-        
-        MoveFirst()
-        For i = 1 To pRecords.Count
-            FilePut(OutFile, CurrentRecordAsDelimitedString("") & vbCrLf)
-            MoveNext()
-        Next
-
-        FileClose(OutFile)
-
-        pFilename = Filename
-
-        Return True
-
-ErrHand:
-        Resume Next
-        If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, _
-                      MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
-            On Error Resume Next
-            FileClose(OutFile)
-            GoTo TryAgain
-        End If
-        Return False
+            'TODO: test whether pRecords.ToArray ever works or whether we always need to loop
+            Try
+                lOutStream.Write(String.Join(vbCrLf, pRecords.ToArray, 1, NumRecords) & vbCrLf)
+            Catch
+                For lRecord As Integer = 1 To pRecords.Count
+                    CurrentRecord = lRecord
+                    For lColumn = 1 To NumFields
+                        lOutStream.Write(Value(lColumn))
+                    Next
+                    lOutStream.WriteLine()
+                Next
+            End Try
+            lOutStream.Close()
+            FileName = aFilename
+            Return True
+        Catch ex As Exception
+            If Logger.Msg("Error saving " & aFilename & vbCr & Err.Description, _
+                          MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
+                GoTo TryAgain
+            End If
+            Return False
+        End Try
     End Function
 
     Public Overrides Function CreationCode() As String
