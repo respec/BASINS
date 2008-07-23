@@ -14,6 +14,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUCIForms", "atcUCIForms\
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WinHSPF", "WinHSPF\WinHSPF.vbproj", "{483149C8-F683-40DE-AA26-5EB30047AB0F}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSegmentation", "atcSegmentation\atcSegmentation.vbproj", "{813E3F46-36CA-4320-BB05-325EEC553D3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{483149C8-F683-40DE-AA26-5EB30047AB0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{483149C8-F683-40DE-AA26-5EB30047AB0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{483149C8-F683-40DE-AA26-5EB30047AB0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

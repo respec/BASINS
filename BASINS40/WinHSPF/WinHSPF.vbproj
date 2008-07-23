@@ -31,9 +31,19 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinUtility, Version=1.0.2442.22516, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="atcUCI, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Bin\MapWinUtility.dll</HintPath>
+      <HintPath>..\Bin\Plugins\BASINS\atcUCI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="atcUCIForms, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Plugins\BASINS\atcUCIForms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MapWinUtility, Version=1.0.3096.24764, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -99,16 +109,6 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\atcUCIForms\atcUCIForms.vbproj">
-      <Project>{CEEC2636-9312-47E0-8877-BF16E0955906}</Project>
-      <Name>atcUCIForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
-      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
-      <Name>atcUCI</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
