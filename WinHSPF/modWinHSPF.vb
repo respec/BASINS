@@ -3,24 +3,46 @@ Imports atcUCI
 
 Public Module WinHSPF
     Friend pUCI As HspfUci
+    Friend pMsg As HspfMsg
 
     Sub Main()
         Logger.StartToFile("C:\dev\basins40\logs\WinHSPF.log")
 
-        Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
+        pMsg = New HspfMsg
+        pMsg.Open("hspfmsg.mdb")
         Logger.Dbg("WinHSPF:Opened:hspfmsg.mdb")
 
+        Dim lWinHSPF As New frmWinHSPF
+        lWinHSPF.ShowDialog()
+    End Sub
+
+    Sub OpenUCI()
+        'open an existing uci (hard-coded for now)
         Dim lWorkingDir As String = "C:\BASINS\modelout\sediment\"
         ChDir(lWorkingDir)
         Logger.Dbg("WinHSPF:WorkingDir:" & lWorkingDir & ":" & CurDir())
 
         pUCI = New HspfUci
         Dim lUCIName As String = "sed_riv.uci"
-        pUCI.FastReadUci(lMsg, lUCIName)
+        pUCI.FastReadUciForStarter(pMsg, lUCIName)
         Logger.Dbg("WinHSPF:FastReadUci:Done:" & lUCIName)
+    End Sub
 
-        Dim lWinHSPF As New frmWinHSPF
-        lWinHSPF.ShowDialog()
+    Sub SaveUCI()
+        pUCI.Save()
+        Logger.Dbg("WinHSPF:SaveUci:Done:" & pUCI.Name)
+    End Sub
+
+    Sub ReachEditor()
+        If pUCI.OpnBlks("RCHRES").Count > 0 Then
+            frmReach.Show()
+            'ClearTree()
+            'BuildTree()
+            'UpdateLegend()
+            'UpdateDetails()
+        Else
+            Logger.Message("The current project contains no reaches.", "Reach Editor Problem", _
+                           MessageBoxButtons.OK, MessageBoxIcon.Information, DialogResult.OK)
+        End If
     End Sub
 End Module
