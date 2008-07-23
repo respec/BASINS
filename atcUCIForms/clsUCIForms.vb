@@ -18,6 +18,12 @@ Public Class UCIForms
                 lFormEdit.Text = lEditFilesBlock.Caption
                 lFormEdit.EditControl = lEditFilesBlock
                 lForm = lFormEdit
+            Case "HspfGlobalBlk"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditGlobalBlock As New ctlEditGlobalBlock(aObject, aParent)
+                lFormEdit.Text = lEditGlobalBlock.Caption
+                lFormEdit.EditControl = lEditGlobalBlock
+                lForm = lFormEdit
             Case Else
                 lForm = Nothing
         End Select

@@ -34,7 +34,7 @@ Partial Class frmEdit
         Me.cmdOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOk.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdOk.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOk.Location = New System.Drawing.Point(12, 343)
+        Me.cmdOk.Location = New System.Drawing.Point(12, 166)
         Me.cmdOk.Name = "cmdOk"
         Me.cmdOk.Size = New System.Drawing.Size(80, 39)
         Me.cmdOk.TabIndex = 0
@@ -46,7 +46,7 @@ Partial Class frmEdit
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(98, 343)
+        Me.cmdCancel.Location = New System.Drawing.Point(98, 166)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(80, 39)
         Me.cmdCancel.TabIndex = 1
@@ -57,7 +57,7 @@ Partial Class frmEdit
         '
         Me.cmdApply.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdApply.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdApply.Location = New System.Drawing.Point(184, 343)
+        Me.cmdApply.Location = New System.Drawing.Point(184, 166)
         Me.cmdApply.Name = "cmdApply"
         Me.cmdApply.Size = New System.Drawing.Size(80, 39)
         Me.cmdApply.TabIndex = 2
@@ -68,7 +68,7 @@ Partial Class frmEdit
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(270, 343)
+        Me.cmdHelp.Location = New System.Drawing.Point(270, 166)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(80, 39)
         Me.cmdHelp.TabIndex = 3
@@ -79,7 +79,7 @@ Partial Class frmEdit
         '
         Me.cmdEdit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdEdit.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdEdit.Location = New System.Drawing.Point(553, 343)
+        Me.cmdEdit.Location = New System.Drawing.Point(553, 166)
         Me.cmdEdit.Name = "cmdEdit"
         Me.cmdEdit.Size = New System.Drawing.Size(80, 39)
         Me.cmdEdit.TabIndex = 4
@@ -90,7 +90,7 @@ Partial Class frmEdit
         '
         Me.cmdRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdRemove.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRemove.Location = New System.Drawing.Point(467, 343)
+        Me.cmdRemove.Location = New System.Drawing.Point(467, 166)
         Me.cmdRemove.Name = "cmdRemove"
         Me.cmdRemove.Size = New System.Drawing.Size(80, 39)
         Me.cmdRemove.TabIndex = 5
@@ -101,7 +101,7 @@ Partial Class frmEdit
         '
         Me.cmdAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAdd.Location = New System.Drawing.Point(381, 343)
+        Me.cmdAdd.Location = New System.Drawing.Point(381, 166)
         Me.cmdAdd.Name = "cmdAdd"
         Me.cmdAdd.Size = New System.Drawing.Size(80, 39)
         Me.cmdAdd.TabIndex = 6
@@ -115,7 +115,7 @@ Partial Class frmEdit
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.panelEdit.Location = New System.Drawing.Point(0, 0)
         Me.panelEdit.Name = "panelEdit"
-        Me.panelEdit.Size = New System.Drawing.Size(645, 337)
+        Me.panelEdit.Size = New System.Drawing.Size(645, 160)
         Me.panelEdit.TabIndex = 7
         '
         'frmEdit
@@ -124,7 +124,7 @@ Partial Class frmEdit
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(645, 384)
+        Me.ClientSize = New System.Drawing.Size(645, 207)
         Me.Controls.Add(Me.panelEdit)
         Me.Controls.Add(Me.cmdAdd)
         Me.Controls.Add(Me.cmdRemove)
