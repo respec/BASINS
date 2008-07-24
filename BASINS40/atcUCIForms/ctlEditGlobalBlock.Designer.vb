@@ -46,7 +46,7 @@ Partial Class ctlEditGlobalBlock
         Me.Controls.Add(Me.txtRunInfo)
         Me.Controls.Add(Me.lblRunInfo)
         Me.Name = "ctlEditGlobalBlock"
-        Me.Size = New System.Drawing.Size(589, 153)
+        Me.Size = New System.Drawing.Size(589, 89)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

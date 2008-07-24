@@ -3,6 +3,8 @@ Imports MapWinUtility
 Public Class frmEdit
     Private WithEvents pEditControl As ctlEdit
     Private pParent As Windows.Forms.Form
+    Private pAddRemoveFlag As Boolean = True
+    Private pEditFlag As Boolean = True
 
     Friend Property EditControl() As Windows.Forms.Control
         Get
@@ -12,8 +14,32 @@ Public Class frmEdit
             panelEdit.Controls.Add(aControl)
             aControl.Dock = Windows.Forms.DockStyle.Fill
             pEditControl = aControl
+            Width = aControl.Width + 100
+            Height = aControl.Height + 200
         End Set
     End Property
+
+    Friend Property AddRemoveFlag() As Boolean
+        Get
+            Return pAddRemoveFlag
+        End Get
+        Set(ByVal aAddRemoveFlag As Boolean)
+            pAddRemoveFlag = aAddRemoveFlag
+            If pAddRemoveFlag = False Then
+                pEditFlag = False
+            End If
+        End Set
+    End Property
+
+    Friend Property EditFlag() As Boolean
+        Get
+            Return pEditFlag
+        End Get
+        Set(ByVal aEditFlag As Boolean)
+            pEditFlag = aEditFlag
+        End Set
+    End Property
+
 
     Private Sub cmdOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdOk.Click
         pEditControl.Save()
@@ -47,6 +73,13 @@ Public Class frmEdit
 
         ' Add any initialization after the InitializeComponent() call.
         pParent = aParent
+        If Not pEditFlag Then
+            cmdEdit.Visible = False
+        End If
+        If Not pAddRemoveFlag Then
+            cmdAdd.Visible = False
+            cmdRemove.Visible = False
+        End If
     End Sub
 
     Private Sub pEditControl_Change(ByVal aChange As Boolean) Handles pEditControl.Change
