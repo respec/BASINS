@@ -19,7 +19,8 @@ Module SWATRunner
     Private pRefreshDB As Boolean = False ' make a copy of the SWATInput database
     Private pUserInteractiveUpdate As Boolean = True 'False - use these defaults
     Private pOutputSummarize As Boolean = True
-    Private pInputSummarize As Boolean = True
+    Private pInputSummarizeBeforeChange As Boolean = True
+    Private pInputSummarizeChanged As Boolean = True
     Private pCropChangeSummarize As Boolean = True
     Private pChangeCropAreas As Boolean = True
     Private pRunModel As Boolean = True
@@ -53,7 +54,8 @@ Module SWATRunner
 
             .Add("RefreshDB", pRefreshDB)
             .Add("OutputSummarize", pOutputSummarize)
-            .Add("InputSummarize", pInputSummarize)
+            .Add("InputSummarizeBeforeChange", pInputSummarizeBeforeChange)
+            .Add("InputSummarizeChanged", pInputSummarizeChanged)
             .Add("ChangeCropAreas", pChangeCropAreas)
             .Add("CropChangeSummarize", pCropChangeSummarize)
             .Add("Scenario", pScenario)
@@ -77,7 +79,8 @@ Module SWATRunner
 
                     pRefreshDB = .ItemByKey("RefreshDB")
                     pOutputSummarize = .ItemByKey("OutputSummarize")
-                    pInputSummarize = .ItemByKey("InputSummarize")
+                    pInputSummarizeBeforeChange = .ItemByKey("InputSummarizeBeforeChange")
+                    pInputSummarizeChanged = .ItemByKey("InputSummarizeChanged")
                     pCropChangeSummarize = .ItemByKey("CropChangeSummarize")
                     pChangeCropAreas = .ItemByKey("ChangeCropAreas")
                     pScenario = .ItemByKey("Scenario")
@@ -132,8 +135,8 @@ Module SWATRunner
             lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
             lSwatInput.CIO.PrintHru = False
 
-            If pInputSummarize Then
-                SummarizeInput(lSwatInput)
+            If pInputSummarizeBeforeChange Then
+                SummarizeInput(lSwatInput, "Before")
             End If
 
             Dim lTotalArea As Double = 0.0
@@ -166,6 +169,10 @@ Module SWATRunner
                         Double.TryParse(lFields(6), lTotalAreaCornFut)
                     End If
                 Next
+            End If
+
+            If pInputSummarizeChanged Then
+                SummarizeInput(lSwatInput, "Changed")
             End If
 
             If pCrpFutureColumn > 1 Then
@@ -220,21 +227,21 @@ Module SWATRunner
         End If
     End Sub
 
-    Private Sub SummarizeInput(ByVal aSwatInput As SwatInput)
+    Private Sub SummarizeInput(ByVal aSwatInput As SwatInput, ByVal aSuffix As String)
         Logger.Dbg("SWATSummarizeInput")
         Dim lUniqueLandUses As DataTable = aSwatInput.Hru.UniqueValues("LandUse")
-        Dim lStreamWriter As New IO.StreamWriter(IO.Path.Combine(pLogsFolder, "LandUses.txt"))
+        Dim lStreamWriter As New IO.StreamWriter(IO.Path.Combine(pLogsFolder, "LandUses" & aSuffix & ".txt"))
         For Each lLandUse As DataRow In lUniqueLandUses.Rows
             lStreamWriter.WriteLine(lLandUse.Item(0).ToString)
         Next
         lStreamWriter.Close()
 
         Dim lLandUSeTable As DataTable = AggregateCrops(aSwatInput.SubBsn.TableWithArea("LandUse"))
-        SaveFileString(IO.Path.Combine(pLogsFolder, "AreaLandUseReport.txt"), _
+        SaveFileString(IO.Path.Combine(pLogsFolder, "AreaLandUseReport" & aSuffix & ".txt"), _
                        SWATArea.Report(lLandUSeTable))
-        SaveFileString(IO.Path.Combine(pLogsFolder, "AreaSoilReport.txt"), _
+        SaveFileString(IO.Path.Combine(pLogsFolder, "AreaSoilReport" & aSuffix & ".txt"), _
                        SWATArea.Report(aSwatInput.SubBsn.TableWithArea("Soil")))
-        SaveFileString(IO.Path.Combine(pLogsFolder, "AreaSlopeCodeReport.txt"), _
+        SaveFileString(IO.Path.Combine(pLogsFolder, "AreaSlopeCodeReport" & aSuffix & ".txt"), _
                        SWATArea.Report(aSwatInput.SubBsn.TableWithArea("Slope_Cd")))
     End Sub
 
@@ -1437,7 +1444,7 @@ Module SWATArea
                 Me.Add(New CropConversion("SCC1", 0.66667, "CCCC"))
                 Me.Add(New CropConversion("SCS1", 0.5, "CCCC"))  'TODO: check
                 Me.Add(New CropConversion("SSC1", 0.33333, "CCCC"))
-                Me.Add(New CropConversion("SSSC", 0.0, "CCCC"))
+                'Me.Add(New CropConversion("SSSC", 0.0, "CCCC"))
                 Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
                 Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
                 Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
