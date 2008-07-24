@@ -4,6 +4,7 @@ Imports atcUCI
 Public Module WinHSPF
     Friend pUCI As HspfUci
     Friend pMsg As HspfMsg
+    Friend pIcon As Icon
 
     Sub Main()
         Logger.StartToFile("C:\dev\basins40\logs\WinHSPF.log")
@@ -13,6 +14,7 @@ Public Module WinHSPF
         Logger.Dbg("WinHSPF:Opened:hspfmsg.mdb")
 
         Dim lWinHSPF As New frmWinHSPF
+        pIcon = lWinHSPF.Icon
         lWinHSPF.ShowDialog()
     End Sub
 
