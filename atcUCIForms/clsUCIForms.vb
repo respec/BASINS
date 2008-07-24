@@ -23,6 +23,7 @@ Public Class UCIForms
                 Dim lEditGlobalBlock As New ctlEditGlobalBlock(aObject, aParent)
                 lFormEdit.Text = lEditGlobalBlock.Caption
                 lFormEdit.EditControl = lEditGlobalBlock
+                lFormEdit.AddRemoveFlag = False
                 lForm = lFormEdit
             Case Else
                 lForm = Nothing

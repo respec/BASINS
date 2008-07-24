@@ -10,6 +10,18 @@ Public Class ctlEditGlobalBlock
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
+    Public ReadOnly Property ControlHeight() As Integer Implements ctlEdit.Height
+        Get
+            Return Me.Height
+        End Get
+    End Property
+
+    Public ReadOnly Property ControlWidth() As Integer Implements ctlEdit.Width
+        Get
+            Return Me.Width
+        End Get
+    End Property
+
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
             Return "Global Block"
@@ -54,12 +66,12 @@ Public Class ctlEditGlobalBlock
         pHspfGlobalBlk.RunInf.Value = txtRunInfo.Text
     End Sub
 
-    Public Sub New(ByVal aHspfFilesBlk As Object, ByVal aParent As Windows.Forms.Form)
+    Public Sub New(ByVal aHspfGlobalBlk As Object, ByVal aParent As Windows.Forms.Form)
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        Data = aHspfFilesBlk
+        Data = aHspfGlobalBlk
     End Sub
 End Class
