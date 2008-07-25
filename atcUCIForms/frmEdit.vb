@@ -11,11 +11,17 @@ Public Class frmEdit
             Return pEditControl
         End Get
         Set(ByVal aControl As Windows.Forms.Control)
+            'ensure minimum width and height to be able to see buttons
+            If aControl.Width < 640 Then
+                aControl.Width = 640
+            End If
+            Width = aControl.Width
+            Height = aControl.Height + 80
             panelEdit.Controls.Add(aControl)
+            panelEdit.Width = aControl.Width
+            panelEdit.Height = aControl.Height
             aControl.Dock = Windows.Forms.DockStyle.Fill
             pEditControl = aControl
-            Width = aControl.Width + 100
-            Height = aControl.Height + 200
         End Set
     End Property
 
@@ -73,19 +79,22 @@ Public Class frmEdit
 
         ' Add any initialization after the InitializeComponent() call.
         pParent = aParent
-        If Not pEditFlag Then
-            cmdEdit.Visible = False
-        End If
-        If Not pAddRemoveFlag Then
-            cmdAdd.Visible = False
-            cmdRemove.Visible = False
-        End If
     End Sub
 
     Private Sub pEditControl_Change(ByVal aChange As Boolean) Handles pEditControl.Change
         Me.Text = pEditControl.Caption
         If aChange Then
             Me.Text &= " *"
+        End If
+    End Sub
+
+    Private Sub frmEdit_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        If Not pEditFlag Then
+            cmdEdit.Visible = False
+        End If
+        If Not pAddRemoveFlag Then
+            cmdAdd.Visible = False
+            cmdRemove.Visible = False
         End If
     End Sub
 End Class

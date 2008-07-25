@@ -10,18 +10,6 @@ Public Class ctlEditGlobalBlock
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
-    Public ReadOnly Property ControlHeight() As Integer Implements ctlEdit.Height
-        Get
-            Return Me.Height
-        End Get
-    End Property
-
-    Public ReadOnly Property ControlWidth() As Integer Implements ctlEdit.Width
-        Get
-            Return Me.Width
-        End Get
-    End Property
-
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
             Return "Global Block"
