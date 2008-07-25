@@ -27,6 +27,9 @@ Public Module WinHSPF
         pUCI = New HspfUci
         Dim lUCIName As String = "sed_riv.uci"
         pUCI.FastReadUciForStarter(pMsg, lUCIName)
+        'Dim lFilesOK As Boolean = True
+        'Dim lEchoFile As String = ""
+        'pUCI.ReadUci(pMsg, lUCIName, 1, lFilesOK, lEchoFile)
         Logger.Dbg("WinHSPF:FastReadUci:Done:" & lUCIName)
     End Sub
 

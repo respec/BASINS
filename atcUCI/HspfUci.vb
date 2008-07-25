@@ -455,7 +455,9 @@ Public Class HspfUci
             pErrorDescription = "UciFileName '" & aNewName & "' not found"
         Else
             pName = aNewName
+            ReadUCIRecords(pName)
             If aFullFg <> -1 Then 'not doing starter, process wdm files
+                'do fast read of uci, no run interpreter
                 aFilesOK = PreScanFilesBlock(aEchoFile)
                 aEchoFile = aEchoFile.Trim
             End If
@@ -472,10 +474,7 @@ Public Class HspfUci
                     lFlag = -2 'flag as coming from hspf class for status title
                 End If
 
-                If pFastFlag Then
-                    'do fast read of uci, no run interpreter
-                    ReadUCIRecords(pName)
-                Else
+                If Not pFastFlag Then
                     'do normal activate of uci, including running the run interpreter
                     SendHspfMessage("CURDIR " & CurDir())
                     SendHspfMessage("ACTIVATE " & lName & " " & lFlag)
@@ -490,8 +489,6 @@ Public Class HspfUci
                         pErrorDescription = "Error interpreting UCI File '" & lName & "'." & vbCrLf & vbCrLf & "See the file '" & aEchoFile.Trim & "' for more details." '& vbCrLf & vbCrLf & M
                         SendMonitorMessage(pErrorDescription)
                     End If
-                    'also do fast read -- this would be a very significant performance improvement
-                    ReadUCIRecords(pName)
                     pFastFlag = True
                 End If
 
@@ -504,9 +501,7 @@ Public Class HspfUci
                     End If
                 End If
 
-                If pFastFlag Then
-                    SaveBlockOrder(pOrder)
-                End If
+                SaveBlockOrder(pOrder)
 
                 pComment = GetCommentBeforeBlock("RUN")
 
@@ -572,7 +567,7 @@ Public Class HspfUci
                 pConnections = Nothing
                 pConnections = New Collection(Of HspfConnection)
                 Dim lConnection As New HspfConnection 'dummy to get entry point
-                lConnection.readTimSer(Me)
+                lConnection.ReadTimSer(Me)
                 lConnection = Nothing
                 For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
                     lOpn.setTimSerConnections()
