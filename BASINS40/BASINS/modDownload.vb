@@ -1927,9 +1927,10 @@ StartOver:
     Private Function GetDefaultsFor(ByVal Filename As String, _
                                     ByVal aProjectDir As String, _
                                     ByRef aDefaultsXml As Xml.XmlDocument) As Xml.XmlNode
-        Dim lName As String
-
-        lName = Filename.Substring(aProjectDir.Length).ToLower
+        Dim lName As String = Filename.ToLower
+        If lName.StartsWith(aProjectDir) Then
+            lName = Filename.Substring(aProjectDir.Length).ToLower
+        End If
 
         If Not aDefaultsXml Is Nothing Then
             For Each lChild As Xml.XmlNode In aDefaultsXml.FirstChild.ChildNodes

@@ -159,7 +159,7 @@ Public Class atcMetCmpPlugin
             Case "Wind Travel"
                 If aArgs Is Nothing Then
                     Dim ltsgroup As atcDataGroup = atcDataManager.UserSelectData("Select Wind Speed data for computing " & aOperationName)
-                    If Not ltsgroup Is Nothing Then lWindTSer = ltsgroup(0)
+                    If ltsgroup IsNot Nothing AndAlso ltsgroup.Count > 0 Then lWindTSer = ltsgroup(0)
                 Else
                     lWindTSer = aArgs.GetValue("WIND")
                 End If
@@ -171,7 +171,7 @@ Public Class atcMetCmpPlugin
                 Dim lPctSunTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
                     Dim ltsgroup As atcDataGroup = atcDataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName)
-                    If Not ltsgroup Is Nothing Then lPctSunTSer = ltsgroup(0)
+                    If ltsgroup IsNot Nothing AndAlso ltsgroup.Count > 0 Then lPctSunTSer = ltsgroup(0)
                 Else
                     lPctSunTSer = aArgs.GetValue("PSUN")
                 End If
