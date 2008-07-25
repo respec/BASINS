@@ -68,10 +68,12 @@ Partial Class SwatInput
             IPOT = aRow.Item("IPOT")
             FCST_REG = aRow.Item("FCST_REG")
 
-            For i As Integer = 0 To 11
+            For i As Integer = 0 To 9
                 ELEVB(i) = aRow.Item("ELEVB" & i + 1)
                 ELEVB_FR(i) = aRow.Item("ELEVB_FR" & i + 1)
                 SNOEB(i) = aRow.Item("SNOEB" & i + 1)
+            Next
+            For i As Integer = 0 To 11
                 RFINC(i) = aRow.Item("RFINC" & i + 1)
                 TMPINC(i) = aRow.Item("TMPINC" & i + 1)
                 RADINC(i) = aRow.Item("RADINC" & i + 1)
