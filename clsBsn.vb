@@ -228,12 +228,120 @@ Partial Class SwatInput
             pSwatInput.Status("Reading " & pTableName & " from database ...")
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
+        Public Function BsnItem() As clsBsnItem           
+            Dim dt As DataTable = Nothing
+            Return BsnItem(dt)
+        End Function
+
+        Public Function BsnItem(ByVal aTable As DataTable) As clsBsnItem
+            If aTable Is Nothing Then aTable = Table()
+            Dim lRow As DataRow = aTable.Rows(0)
+            pSwatInput.Status("Writing " & pTableName & " to BsnItem ...")
+
+            Dim item As New clsBsnItem()
+            item.SFTMP = lRow.Item(1)
+            Dim myType As Type
+            myType = lRow.Item(1).GetType
+
+
+            item.SMTMP = lRow.Item(2)
+
+            item.SMFMX = lRow.Item(3)
+            item.SMFMN = lRow.Item(4)
+            item.TIMP = lRow.Item(5)
+            item.SNOCOVMX = lRow.Item(6)
+            item.SNO50COV = lRow.Item(7)
+            item.IPET = lRow.Item(8)
+            item.ESCO = lRow.Item(9)
+            item.EPCO = lRow.Item(10)
+            item.EVLAI = lRow.Item(11)
+            item.FFCB = lRow.Item(12)
+
+            item.IEVENT = lRow.Item(13)
+            item.ICRK = lRow.Item(14)
+            item.SURLAG = lRow.Item(15)
+            item.ADJ_PKR = lRow.Item(16)
+            item.PRF = lRow.Item(17)
+            item.SPCON = lRow.Item(18)
+            item.SPEXP = lRow.Item(19)
+
+            item.RCN = lRow.Item(20)
+            item.CMN = lRow.Item(21)
+            item.N_UPDIS = lRow.Item(22)
+            item.P_UPDIS = lRow.Item(23)
+            item.NPERCO = lRow.Item(24)
+            item.PPERCO = lRow.Item(25)
+            item.PHOSKD = lRow.Item(26)
+            item.PSP = lRow.Item(27)
+            item.RSDCO = lRow.Item(28)
+
+            item.PERCOP = lRow.Item(29)
+
+            item.ISUBWQ = lRow.Item(30)
+
+            item.WDPQ = lRow.Item(31)
+            item.WGPQ = lRow.Item(32)
+            item.WDLPQ = lRow.Item(33)
+            item.WGLPQ = lRow.Item(34)
+            item.WDPS = lRow.Item(35)
+            item.WGPS = lRow.Item(36)
+            item.WDLPS = lRow.Item(37)
+            item.WGLPS = lRow.Item(38)
+            item.BACTKDQ = lRow.Item(39)
+            item.THBACT = lRow.Item(40)
+            item.WOF_P = lRow.Item(41)
+            item.WOF_LP = lRow.Item(42)
+            item.WDPF = lRow.Item(43)
+            item.WGPF = lRow.Item(44)
+            item.WDLPF = lRow.Item(45)
+            item.WGLPF = lRow.Item(46)
+
+
+            item.IRTE = lRow.Item(47)
+            item.MSK_COL1 = lRow.Item(48)
+            item.MSK_COL2 = lRow.Item(49)
+            item.MSK_X = lRow.Item(50)
+            item.IDEG = lRow.Item(51)
+            item.IWQ = lRow.Item(52)
+
+            item.TRNSRCH = lRow.Item(53)
+            item.EVRCH = lRow.Item(54)
+            item.IRTPEST = lRow.Item(55)
+            item.ICN = lRow.Item(56)
+            item.CNCOEF = lRow.Item(57)
+            item.CDN = lRow.Item(58)
+            item.SDNCO = lRow.Item(59)
+            item.BACT_SWF = lRow.Item(60)
+            item.BACTMX = lRow.Item(61)
+            item.BACTMINLP = lRow.Item(62)
+            item.BACTMINP = lRow.Item(63)
+            item.WDLPRCH = lRow.Item(64)
+            item.WDPRCH = lRow.Item(65)
+            item.WDLPRES = lRow.Item(66)
+            item.WDPRES = lRow.Item(67)
+            item.TB_ADJ = lRow.Item(68)
+            item.DEPIMP_BSN = lRow.Item(69)
+            item.DDRAIN_BSN = lRow.Item(70)
+            item.TDRAIN_BSN = lRow.Item(71)
+            item.GDRAIN_BSN = lRow.Item(72)
+            item.CN_FROZ = lRow.Item(73)
+            item.ISED_DET = lRow.Item(74)
+            item.ETFILE = lRow.Item(75)
+
+            Return item
+
+        End Function
 
         Public Sub Add(ByVal aItem As clsBsnItem)
             ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
-        Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
+        Public Sub Save()
+            Dim dt As DataTable = Nothing
+            Save(dt)
+        End Sub
+
+        Public Sub Save(ByVal aTable As DataTable)
             If aTable Is Nothing Then aTable = Table()
             Dim lRow As DataRow = aTable.Rows(0)
             pSwatInput.Status("Writing " & pTableName & " text ...")
