@@ -183,7 +183,9 @@ Public Class frmCmpSol
     Private Sub btnCloudCover_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCloudCover.Click
         pTSGroup = atcDataManager.UserSelectData("Select data for Cloud Cover")
         If pTSGroup.Count > 0 Then
-            txtCloudCover.Text = pTSGroup.ItemByIndex(0).ToString
+            Dim lTimser As atcTimeseries = pTSGroup.ItemByIndex(0)
+            txtCloudCover.Text = lTimser.ToString
+            txtLatitude.Text = lTimser.Attributes.GetValue("Latitude", txtLatitude.Text)
         End If
     End Sub
 
