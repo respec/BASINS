@@ -25,6 +25,13 @@ Public Class UCIForms
                 lFormEdit.EditControl = lEditGlobalBlock
                 lFormEdit.AddRemoveFlag = False
                 lForm = lFormEdit
+            Case "HspfFtable"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditFTables As New ctlEditFTables(aObject, aParent)
+                lFormEdit.Text = lEditFTables.Caption
+                lFormEdit.EditControl = lEditFTables
+                lFormEdit.AddRemoveFlag = False
+                lForm = lFormEdit
             Case Else
                 lForm = Nothing
         End Select

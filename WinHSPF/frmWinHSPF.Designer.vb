@@ -23,12 +23,13 @@ Partial Class frmWinHSPF
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.GlobalToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.FilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.FunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ReachEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LandUseEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.GlobalToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.FTablesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -49,10 +50,16 @@ Partial Class frmWinHSPF
         '
         'EditToolStripMenuItem
         '
-        Me.EditToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GlobalToolStripMenuItem, Me.FilesToolStripMenuItem})
+        Me.EditToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GlobalToolStripMenuItem, Me.FilesToolStripMenuItem, Me.FTablesToolStripMenuItem})
         Me.EditToolStripMenuItem.Name = "EditToolStripMenuItem"
         Me.EditToolStripMenuItem.Size = New System.Drawing.Size(43, 22)
         Me.EditToolStripMenuItem.Text = "Edit"
+        '
+        'GlobalToolStripMenuItem
+        '
+        Me.GlobalToolStripMenuItem.Name = "GlobalToolStripMenuItem"
+        Me.GlobalToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.GlobalToolStripMenuItem.Text = "Global"
         '
         'FilesToolStripMenuItem
         '
@@ -85,11 +92,11 @@ Partial Class frmWinHSPF
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(48, 22)
         Me.HelpToolStripMenuItem.Text = "Help"
         '
-        'GlobalToolStripMenuItem
+        'FTablesToolStripMenuItem
         '
-        Me.GlobalToolStripMenuItem.Name = "GlobalToolStripMenuItem"
-        Me.GlobalToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.GlobalToolStripMenuItem.Text = "Global"
+        Me.FTablesToolStripMenuItem.Name = "FTablesToolStripMenuItem"
+        Me.FTablesToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.FTablesToolStripMenuItem.Text = "FTables"
         '
         'frmWinHSPF
         '
@@ -116,5 +123,6 @@ Partial Class frmWinHSPF
     Friend WithEvents ReachEditorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LandUseEditorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents GlobalToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents FTablesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

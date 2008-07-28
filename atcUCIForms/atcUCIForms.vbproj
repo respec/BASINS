@@ -64,6 +64,18 @@
     <Compile Include="ctlEditGlobalBlock.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="frmNewFTable.Designer.vb">
+      <DependentUpon>frmNewFTable.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmNewFTable.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmXSect.Designer.vb">
+      <DependentUpon>frmXSect.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmXSect.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmEdit.Designer.vb">
       <DependentUpon>frmEdit.vb</DependentUpon>
     </Compile>
@@ -85,6 +97,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ctlEditFTables.Designer.vb">
+      <DependentUpon>ctlEditFTables.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditFTables.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ctlEditFilesBlock.resx">
@@ -95,15 +113,27 @@
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditGlobalBlock.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmNewFTable.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmNewFTable.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmEdit.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmEdit.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmXSect.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmXSect.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlEditFTables.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlEditFTables.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

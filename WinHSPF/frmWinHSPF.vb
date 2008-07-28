@@ -1,4 +1,5 @@
 Imports atcUCIForms
+Imports MapWinUtility
 
 Public Class frmWinHSPF
 
@@ -32,4 +33,13 @@ Public Class frmWinHSPF
 
     End Sub
 
+    Private Sub FTablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FTablesToolStripMenuItem.Click
+
+        If pUCI.OpnBlks("RCHRES").Count > 0 Then
+            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").Ids(0).FTable)
+        Else
+            Logger.Message("The current project contains no reaches.", "FTable Editor Problem", _
+                           MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
+        End If
+    End Sub
 End Class
