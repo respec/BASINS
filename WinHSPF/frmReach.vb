@@ -11,6 +11,7 @@ Public Class frmReach
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+        Dim lUnits As Integer = pUCI.GlobalBlock.emfg
 
         With grdReach
             .Source = New atcControls.atcGridSource
@@ -23,6 +24,7 @@ Public Class frmReach
             .Columns = 5
             .CellValue(0, 0) = "ID"
             .CellValue(0, 1) = "Description"
+            .CellValue(0, 2) = "Length"
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
