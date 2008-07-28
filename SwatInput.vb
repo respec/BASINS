@@ -322,6 +322,17 @@ Public Class SwatInput
         lOleDbConnection.Open()
         Return lOleDbConnection
     End Function
+
+    Public Function FieldUnits(ByVal aTableName As String, ByVal aFieldName As String) As String
+        Select Case aTableName.ToLower
+            Case "bsn"
+                Select Case aFieldName.ToUpper
+                    Case "SFTMP" : Return ""
+                End Select
+        End Select
+        Return ""
+    End Function
+
 End Class
 
 
