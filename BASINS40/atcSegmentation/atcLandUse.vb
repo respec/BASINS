@@ -72,12 +72,14 @@ Public Class LandUses
                         With lLandUseExisting
                             Dim lAreaExistingImpervious As Double = .Area * .ImperviousFraction
                             .Area += lLandUse.Area
-                            Select Case lLandUse.Type
-                                Case "PERLND"
-                                    .ImperviousFraction = (.Area - lLandUse.Area) / .Area
-                                Case "IMPLND"
-                                    .ImperviousFraction = (lAreaExistingImpervious + lLandUse.Area) / .Area
-                            End Select
+                            If .Area > 0 Then
+                                Select Case lLandUse.Type
+                                    Case "PERLND"
+                                        .ImperviousFraction = (.Area - lLandUse.Area) / .Area
+                                    Case "IMPLND"
+                                        .ImperviousFraction = (lAreaExistingImpervious + lLandUse.Area) / .Area
+                                End Select
+                            End If
                             .Type = "COMPOSITE"
                         End With
                     Else 'a new landuse
