@@ -5,6 +5,7 @@ Public Module WinHSPF
     Friend pUCI As HspfUci
     Friend pMsg As HspfMsg
     Friend pIcon As Icon
+    'Friend pIPC As ATCoIPC
 
     Sub Main()
         Logger.StartToFile("C:\dev\basins40\logs\WinHSPF.log")

@@ -457,16 +457,11 @@ Public Class HspfUci
             pName = aNewName
             ReadUCIRecords(pName)
             If aFullFg <> -1 Then 'not doing starter, process wdm files
-                'do fast read of uci, no run interpreter
                 aFilesOK = PreScanFilesBlock(aEchoFile)
                 aEchoFile = aEchoFile.Trim
             End If
             If aFilesOK Then
                 Dim lName As String = IO.Path.GetFileNameWithoutExtension(pName)
-                's = Left(s, Len(s) - 4)
-                'Call F90_SPIPH(pStatusIn, pStatusOut)
-                'set debug level
-                'Call F90_SCNDBG(0)
                 Dim lFlag As Integer
                 If aFullFg = -3 Then
                     lFlag = aFullFg
@@ -478,8 +473,6 @@ Public Class HspfUci
                     'do normal activate of uci, including running the run interpreter
                     SendHspfMessage("CURDIR " & CurDir())
                     SendHspfMessage("ACTIVATE " & lName & " " & lFlag)
-                    'IPC.SendProcessMessage "HSPFUCI", "ACTIVATE " & s & " " & -1   'should not run interpret
-                    'Call F90_ACTSCN(i, pWdmUnit(1), pMsgUnit, r, s, Len(s))
                     Dim lMsg As String = WaitForChildMessage()
                     If lMsg.StartsWith("CURDIR") Then
                         lMsg = WaitForChildMessage()
@@ -545,9 +538,6 @@ Public Class HspfUci
 
                 For Each lOpnblk In pOpnBlks 'perlnd, implnd, etc
                     If lOpnblk.Count > 0 Then
-                        If Not pFastFlag Then
-                            SendMonitorMessage("(MSG2 Setting table values for " & lOpnblk.Name & ")")
-                        End If
                         lOpnblk.setTableValues(Msg.BlockDefs(lOpnblk.Name))
                     End If
                 Next
@@ -556,14 +546,8 @@ Public Class HspfUci
                 pSpecialActionBlk.Uci = Me
                 pSpecialActionBlk.ReadUciFile()
 
-                If Not pFastFlag Then
-                    SendMonitorMessage("(MSG2 Processing Ftables)")
-                End If
                 ProcessFTables()
 
-                If Not pFastFlag Then
-                    SendMonitorMessage("(MSG2 Processing Connections)")
-                End If
                 pConnections = Nothing
                 pConnections = New Collection(Of HspfConnection)
                 Dim lConnection As New HspfConnection 'dummy to get entry point
@@ -578,14 +562,8 @@ Public Class HspfUci
                 lMassLink.readMassLinks(Me)
 
                 'look for met segments
-                If Not pFastFlag And pIPCset Then
-                    SendMonitorMessage("(MSG2 Processing Met Segments)")
-                End If
                 Source2MetSeg()
                 'look for point loads
-                If Not pFastFlag And pIPCset Then
-                    SendMonitorMessage("(MSG2 Processing Point Sources)")
-                End If
                 Source2Point()
                 If pIPCset Then SendMonitorMessage("(Hide)")
 
@@ -1755,14 +1733,16 @@ Public Class HspfUci
 
         Dim lWDMFile As New atcWDM.atcDataSourceWDM
         Dim lFound As Boolean = False
-        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
-            If lBASINSDataSource.Specification.ToUpper = IO.Path.GetFullPath(aName).ToUpper Then
-                'found it in the BASINS data sources
-                lWDMFile = lBASINSDataSource
-                lFound = True
-                Exit For
-            End If
-        Next
+        If atcDataManager.DataSources IsNot Nothing Then
+            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+                If lBASINSDataSource.Specification.ToUpper = IO.Path.GetFullPath(aName).ToUpper Then
+                    'found it in the BASINS data sources
+                    lWDMFile = lBASINSDataSource
+                    lFound = True
+                    Exit For
+                End If
+            Next
+        End If
 
         If Not lFound Then
             If Not lWDMFile.Open(aName) Then 'had a problem
