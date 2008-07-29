@@ -33,7 +33,7 @@ Module HSPFOutputReports
 
         Select Case lTestName
             Case "upatoi"
-                pTestPath = "D:\Basins\modelout\Upatoi"
+                pTestPath = "c:\Basins\modelout\Upatoi-test"
                 pBaseName = "upatoi"
                 pOutputLocations.Add("R:46")
             Case "tinley"
