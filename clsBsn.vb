@@ -267,10 +267,7 @@ Partial Class SwatInput
             ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
-        Public Sub Save()
-            Save(Nothing)
-        End Sub
-        Public Sub Save(ByVal aTable As DataTable)
+        Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
             pSwatInput.Status("Writing " & pTableName & " text ...")
 
