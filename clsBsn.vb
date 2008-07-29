@@ -84,6 +84,7 @@ Partial Class SwatInput
         Public ETFILE As String
 
         Public Sub New()
+
         End Sub
 
         Sub New(ByVal aRow As DataRow)
@@ -96,6 +97,7 @@ Partial Class SwatInput
         End Function
 
         Public Function Units() As Dictionary(Of String, String)
+
             Dim unitsDictionary As New Dictionary(Of String, String)
 
             unitsDictionary.Add("SFTMP", "C")
