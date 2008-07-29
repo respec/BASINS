@@ -4,6 +4,7 @@ Imports atcUCI
 Imports atcControls
 
 Public Class frmReach
+   
 
     Public Sub New()
 
@@ -16,7 +17,7 @@ Public Class frmReach
         With grdReach
             .Source = New atcControls.atcGridSource
             .Clear()
-            .AllowHorizontalScrolling = False
+            .AllowHorizontalScrolling = True
             .Visible = True
         End With
 
@@ -24,7 +25,11 @@ Public Class frmReach
             .Columns = 5
             .CellValue(0, 0) = "ID"
             .CellValue(0, 1) = "Description"
-            .CellValue(0, 2) = "Length"
+            .CellValue(0, 2) = "Length (mi)"
+            .CellValue(0, 3) = "Delta H (ft)"
+            .CellValue(0, 4) = "DownstreamID"
+            .CellValue(0, 5) = "N Exits"
+            .CellValue(0, 6) = "Lake Flag"
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
@@ -39,8 +44,14 @@ Public Class frmReach
                 .CellValue(lRow, 0) = lOperation.Id
                 Dim lTable As HspfTable = lOperation.Tables("GEN-INFO")
                 .CellValue(lRow, 1) = lTable.Parms("RCHID").Value
+                .CellValue(lRow, 5) = lTable.Parms("NEXITS").Value
+                .CellValue(lRow, 6) = lTable.Parms("LKFG").Value
+                lTable = lOperation.Tables("HYDR-PARM2")
+                .CellValue(lRow, 2) = lTable.Parms("LEN").Value
+                .CellValue(lRow, 3) = lTable.Parms("DELTH").Value
             Next
         End With
+
 
         grdReach.Refresh()
         grdReach.SizeAllColumnsToContents()
