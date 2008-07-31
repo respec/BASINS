@@ -46,7 +46,7 @@ Partial Class frmDownload
         Me.grpTerraServerWebService = New System.Windows.Forms.GroupBox
         Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_DOQ = New System.Windows.Forms.CheckBox
-        Me.btnOther = New System.Windows.Forms.Button
+        Me.btnHelp = New System.Windows.Forms.Button
         Me.grpNLCD2001 = New System.Windows.Forms.GroupBox
         Me.chkNLCD2001_1992 = New System.Windows.Forms.CheckBox
         Me.chkNLCD2001_Canopy = New System.Windows.Forms.CheckBox
@@ -342,17 +342,16 @@ Partial Class frmDownload
         Me.chkTerraServerWebService_DOQ.Text = "DOQ"
         Me.chkTerraServerWebService_DOQ.UseVisualStyleBackColor = True
         '
-        'btnOther
+        'btnHelp
         '
-        Me.btnOther.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOther.Location = New System.Drawing.Point(267, 432)
-        Me.btnOther.Name = "btnOther"
-        Me.btnOther.Size = New System.Drawing.Size(75, 23)
-        Me.btnOther.TabIndex = 29
-        Me.btnOther.Text = "&Other..."
-        Me.ToolTip1.SetToolTip(Me.btnOther, "Launch old data download tool")
-        Me.btnOther.UseVisualStyleBackColor = True
-        Me.btnOther.Visible = False
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.Location = New System.Drawing.Point(236, 432)
+        Me.btnHelp.Name = "btnHelp"
+        Me.btnHelp.Size = New System.Drawing.Size(59, 23)
+        Me.btnHelp.TabIndex = 29
+        Me.btnHelp.Text = "Help"
+        Me.ToolTip1.SetToolTip(Me.btnHelp, "Launch old data download tool")
+        Me.btnHelp.UseVisualStyleBackColor = True
         '
         'grpNLCD2001
         '
@@ -615,9 +614,9 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(285, 432)
+        Me.btnCancel.Location = New System.Drawing.Point(301, 432)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(75, 23)
+        Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 30
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
@@ -678,9 +677,7 @@ Partial Class frmDownload
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(454, 467)
-        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.grpNWISStations)
-        Me.Controls.Add(Me.btnOther)
         Me.Controls.Add(Me.grpNLCD2001)
         Me.Controls.Add(Me.grpSTORET)
         Me.Controls.Add(Me.chkMerge)
@@ -692,6 +689,8 @@ Partial Class frmDownload
         Me.Controls.Add(Me.grpNWIS)
         Me.Controls.Add(Me.grpBASINS)
         Me.Controls.Add(Me.grpTerraServerWebService)
+        Me.Controls.Add(Me.btnCancel)
+        Me.Controls.Add(Me.btnHelp)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.MaximizeBox = False
@@ -759,7 +758,7 @@ Partial Class frmDownload
     Friend WithEvents chkNLCD2001_Canopy As System.Windows.Forms.CheckBox
     Friend WithEvents btnBrowseWDMdailydischarge As System.Windows.Forms.Button
     Friend WithEvents chkNWIS_GetNWISWQ As System.Windows.Forms.CheckBox
-    Friend WithEvents btnOther As System.Windows.Forms.Button
+    Friend WithEvents btnHelp As System.Windows.Forms.Button
     Friend WithEvents chkNLCD2001_1992 As System.Windows.Forms.CheckBox
     Friend WithEvents grpNWISStations As System.Windows.Forms.GroupBox
     Friend WithEvents chkNWISStations_qw As System.Windows.Forms.CheckBox
