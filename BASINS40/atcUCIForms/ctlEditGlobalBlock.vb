@@ -39,6 +39,35 @@ Public Class ctlEditGlobalBlock
         Set(ByVal aHspfGlobalBlk As Object)
             pHspfGlobalBlk = aHspfGlobalBlk
             txtRunInfo.Text = pHspfGlobalBlk.RunInf.Value
+            txtStartYear.Text = pHspfGlobalBlk.SDate(0)
+            txtStartMo.Text = pHspfGlobalBlk.SDate(1)
+            txtStartDay.Text = pHspfGlobalBlk.SDate(2)
+            txtStartHr.Text = pHspfGlobalBlk.SDate(3)
+            txtStartMin.Text = pHspfGlobalBlk.SDate(4)
+            txtEndYear.Text = pHspfGlobalBlk.EDate(0)
+            txtEndMo.Text = pHspfGlobalBlk.EDate(1)
+            txtEndDay.Text = pHspfGlobalBlk.EDate(2)
+            txtEndHr.Text = pHspfGlobalBlk.EDate(3)
+            txtEndMin.Text = pHspfGlobalBlk.EDate(4)
+
+            'Populate combo boxes
+            Dim i&
+            For i = 0 To 10
+                comboGen.Items.Add(i)
+                comboSpout.Items.Add(i)
+            Next i
+            comboRunFlag.Items.Add("Interp")
+            comboRunFlag.Items.Add("Run")
+            comboUnits.Items.Add("English")
+            comboUnits.Items.Add("Metric")
+
+            With pHspfGlobalBlk
+                'Set the initial selection
+                comboGen.SelectedIndex = .outlev.Value
+                comboSpout.SelectedIndex = .spout.ToString
+                comboRunFlag.SelectedIndex = .runfg.ToString
+                comboUnits.SelectedIndex = .emfg.ToString - 1
+            End With
         End Set
     End Property
 
@@ -52,6 +81,18 @@ Public Class ctlEditGlobalBlock
 
     Public Sub Save() Implements ctlEdit.Save
         pHspfGlobalBlk.RunInf.Value = txtRunInfo.Text
+
+        pHspfGlobalBlk.SDate(0) = txtStartYear.Text
+        pHspfGlobalBlk.SDate(1) = txtStartMo.Text
+        pHspfGlobalBlk.SDate(2) = txtStartDay.Text
+        pHspfGlobalBlk.SDate(3) = txtStartHr.Text
+        pHspfGlobalBlk.SDate(4) = txtStartMin.Text
+        pHspfGlobalBlk.EDate(0) = txtEndYear.Text
+        pHspfGlobalBlk.EDate(1) = txtEndMo.Text
+        pHspfGlobalBlk.EDate(2) = txtEndDay.Text
+        pHspfGlobalBlk.EDate(3) = txtEndHr.Text
+        pHspfGlobalBlk.EDate(4) = txtEndMin.Text
+
     End Sub
 
     Public Sub New(ByVal aHspfGlobalBlk As Object, ByVal aParent As Windows.Forms.Form)
