@@ -170,9 +170,12 @@ Public Class frmSWMMSetup
             CreateMetConstituent(lMetWDMFileName, "MD189070", "PEVT", .MetConstituents)
 
             'populate the SWMM classes from the shapefiles
+            .Nodes.Clear()
+            .Conduits.Clear()
+            .Catchments.Clear()
             Dim lFieldMap As New atcUtility.atcCollection
             Dim lTable As New atcUtility.atcTableDBF
-            lFieldMap.Add("Name", "ID")
+            lFieldMap.Add("ID", "Name")
             'Dim lNodesShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\nodes.shp"
             Dim lNodesShapefileName As String = ""    'test for BASINS type
             If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
@@ -181,14 +184,14 @@ Public Class frmSWMMSetup
             CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
 
             lFieldMap.Clear()
-            lFieldMap.Add("InletNodeName", "InNodeID")
-            lFieldMap.Add("OutletNodeName", "OutNodeID")
-            lFieldMap.Add("Name", "SUBBASIN")
-            lFieldMap.Add("DownConduitID", "SUBBASINR")
-            lFieldMap.Add("ElevationHigh", "MAXEL")
-            lFieldMap.Add("ElevationLow", "MINEL")
-            lFieldMap.Add("MeanWidth", "WID2")
-            lFieldMap.Add("MeanDepth", "DEP2")
+            lFieldMap.Add("InNodeId", "InletNodeName")
+            lFieldMap.Add("OutNodeID", "OutletNodeName")
+            lFieldMap.Add("SUBBASIN", "Name")
+            lFieldMap.Add("SUBBASINR", "DownConduitID")
+            lFieldMap.Add("MAXEL", "ElevationHigh")
+            lFieldMap.Add("MINEL", "ElevationLow")
+            lFieldMap.Add("WID2", "MeanWidth")
+            lFieldMap.Add("DEP2", "MeanDepth")
             'Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\conduits.shp"
             Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp"
             If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
@@ -197,10 +200,10 @@ Public Class frmSWMMSetup
             CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 
             lFieldMap.Clear()
-            lFieldMap.Add("Name", "SUBBASIN")
-            lFieldMap.Add("Slope", "SLO1")
-            lFieldMap.Add("Name", "ID")
-            lFieldMap.Add("OutletNodeID", "OutNode")
+            lFieldMap.Add("SUBBASIN", "Name")
+            lFieldMap.Add("SLO1", "Slope")
+            lFieldMap.Add("ID", "Name")
+            lFieldMap.Add("OutNode", "OutletNodeID")
             'Dim lCatchmentShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\catchments.shp"
             Dim lCatchmentShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then

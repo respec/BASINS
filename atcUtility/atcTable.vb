@@ -374,7 +374,7 @@ Public MustInherit Class atcTable
     ''' Create a new list of objects, one for each record of the table, populated from columns of table
     ''' </summary>
     ''' <param name="aObjectType"></param>
-    ''' <param name="aFieldMap">Mapping of object field names as keys to table field names as items</param>
+    ''' <param name="aFieldMap">Mapping of table field names as keys to object field/property names as items</param>
     ''' <param name="aNewArgs"></param>
     ''' <param name="aNewBindingFlags"></param>
     ''' <returns></returns>
@@ -383,8 +383,8 @@ Public MustInherit Class atcTable
                            Optional ByVal aFieldMap As atcUtility.atcCollection = Nothing, _
                            Optional ByVal aNewArgs() As Object = Nothing, _
                            Optional ByVal aNewBindingFlags As Reflection.BindingFlags = Reflection.BindingFlags.CreateInstance _
-                                                                                    + Reflection.BindingFlags.Public _
-                                                                                    + Reflection.BindingFlags.Instance) As ArrayList
+                                                                                      + Reflection.BindingFlags.Public _
+                                                                                      + Reflection.BindingFlags.Instance) As ArrayList
         Dim lNewList As New ArrayList
         For lRecord As Integer = 1 To NumRecords
             CurrentRecord = lRecord
@@ -399,33 +399,16 @@ Public MustInherit Class atcTable
     ''' Populate an object from the current record of the table
     ''' </summary>
     ''' <param name="aObject">Object to populate</param>
-    ''' <param name="aFieldMap">Mapping of object field/property names as keys to table field names as items</param>
+    ''' <param name="aFieldMap">Mapping of table field names as keys to object field/property names as items</param>
     ''' <remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
     Public Sub PopulateObject(ByRef aObject As Object, Optional ByVal aFieldMap As atcUtility.atcCollection = Nothing)
-        Dim lType As Type = aObject.GetType
         Dim lFieldNumber As Integer
-        For Each lField As Reflection.FieldInfo In lType.GetFields()
-
-            If aFieldMap IsNot Nothing AndAlso aFieldMap.Keys.Contains(lField.Name) Then
-                lFieldNumber = FieldNumber(aFieldMap.ItemByKey(lField.Name))
+        For lFieldNumber = 1 To Me.NumFields
+            Dim lFieldName As String = Me.FieldName(lFieldNumber)
+            If aFieldMap IsNot Nothing AndAlso aFieldMap.Keys.Contains(lFieldName) Then
+                SetSomething(aObject, aFieldMap.ItemByKey(lFieldName), Value(lFieldNumber))
             Else
-                lFieldNumber = FieldNumber(lField.Name)
-            End If
-
-            If lFieldNumber > 0 Then
-                SetSomething(aObject, lField.Name, Value(lFieldNumber))
-            End If
-        Next
-
-        For Each lProperty As Reflection.PropertyInfo In lType.GetProperties()
-            If aFieldMap IsNot Nothing AndAlso aFieldMap.Keys.Contains(lProperty.Name) Then
-                lFieldNumber = FieldNumber(aFieldMap.ItemByKey(lProperty.Name))
-            Else
-                lFieldNumber = FieldNumber(lProperty.Name)
-            End If
-
-            If lFieldNumber > 0 Then
-                SetSomething(aObject, lProperty.Name, Value(lFieldNumber))
+                SetSomething(aObject, lFieldName, Value(lFieldNumber))
             End If
         Next
     End Sub

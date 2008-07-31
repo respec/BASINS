@@ -21,7 +21,9 @@ Friend Module modSWMMFromMW
             If lCatchment.Name.Length = 0 Then
                 lCatchment.Name = CStr(lFeatureIndex + 1)
             Else
-                lCatchment.Name = lCatchment.Name
+                If IsNumeric(CDbl(lCatchment.Name)) Then
+                    lCatchment.Name = CStr(CInt(lCatchment.Name))
+                End If
             End If
 
             If aSWMMProject.RainGages.Count > 0 Then
@@ -30,8 +32,10 @@ Friend Module modSWMMFromMW
             End If
 
             'find associated outlet node
-            If aSWMMProject.Nodes.Contains(lCatchment.OutletNodeID) Then
-                lCatchment.OutletNode = aSWMMProject.Nodes(lCatchment.OutletNodeID)
+            If Not lCatchment.OutletNodeID Is Nothing Then
+                If aSWMMProject.Nodes.Contains(lCatchment.OutletNodeID) Then
+                    lCatchment.OutletNode = aSWMMProject.Nodes(lCatchment.OutletNodeID)
+                End If
             End If
 
             If lCatchment.OutletNode Is Nothing Then
@@ -48,10 +52,9 @@ Friend Module modSWMMFromMW
             'lCatchment.PercentImpervious()  'this is computed later
             lCatchment.Width = Math.Sqrt(lCatchment.Area * 43560)
 
-            lCatchment.Name = "C" & lCatchment.Name
+            lCatchment.Name = "S" & lCatchment.Name
 
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lCatchment.X, lCatchment.Y)
-            aCatchments.Add(lCatchment)
         Next
     End Function
 
@@ -115,7 +118,7 @@ Friend Module modSWMMFromMW
 
                 'create node at downstream end
                 Dim lNode As New Node
-                If lConduit.DownConduitID.Length > 0 Then
+                If lConduit.DownConduitID.Length > 0 And CInt(lConduit.DownConduitID) > 0 Then
                     lNode.Name = "J" & lConduit.DownConduitID
                     lNode.Type = "JUNCTION"
                 Else
@@ -148,7 +151,7 @@ Friend Module modSWMMFromMW
             'if it doesnt have a name yet, assign it one
             If lConduit.Name.Length = 0 Then
                 lConduit.Name = "C" & CStr(lFeatureIndex + 1)
-            Else
+            ElseIf IsNumeric(lConduit.Name) Then
                 lConduit.Name = "C" & lConduit.Name
             End If
 
