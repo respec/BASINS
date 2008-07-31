@@ -379,21 +379,17 @@ Public Class frmDownload
         End With
     End Sub
 
-    Private Sub btnOther_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOther.Click
-        '    Me.Visible = False
-        '    Dim lDirectory As String
-        '    If pMapWin.Project Is Nothing Then
-        '        lDirectory = CurDir()
-        '    Else
-        '        lDirectory = IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "\"
-        '    End If
-        '    BASINS.DownloadNewData(lDirectory)
-        '    Me.Close()
-    End Sub
-
     Private Sub frmDownload_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Download.html")
+            ShowHelp()
         End If
+    End Sub
+
+    Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+        ShowHelp()
+    End Sub
+
+    Private Sub ShowHelp()
+        atcUtility.ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Download.html")
     End Sub
 End Class

@@ -311,6 +311,7 @@ CaseExistRenumber:
 
             If lWriteIt Then
                 Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
+                If Double.IsNaN(lTSFill) Then lTSFill = -999
                 Dim lValue As Double
                 Dim lV(lNvals) As Single
                 Dim lRet As Integer
@@ -558,6 +559,8 @@ CaseExistRenumber:
             Case "date modified", "datmod"
                 lName = "datmod"
                 lValue = DateToyyyyMMddHHmmss(lValue)
+            Case "tsfill" 'Avoid writing NaN values in WDM file to make old tools happy
+                If Double.IsNaN(lValue) Then lValue = -999
         End Select
 
         Dim lMsgDefinition As atcAttributeDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
