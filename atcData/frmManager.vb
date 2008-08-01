@@ -54,11 +54,6 @@ Friend Class frmManager
     Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents EditToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ContentsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents IndexToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents SearchToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents toolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
-    Friend WithEvents AboutToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CloseToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ViewToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AnalysisToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
@@ -88,19 +83,14 @@ Friend Class frmManager
         Me.toolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.AddDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.RenumberDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.RemoveDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.DisplayToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.NativeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AnalysisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ContentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.IndexToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SearchToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.toolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
-        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.AddDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.RenumberDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.RemoveDatasetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -109,10 +99,10 @@ Friend Class frmManager
         Me.txtDetails.AllowDrop = True
         Me.txtDetails.BackColor = System.Drawing.SystemColors.ControlLight
         Me.txtDetails.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.txtDetails.Location = New System.Drawing.Point(0, 225)
+        Me.txtDetails.Location = New System.Drawing.Point(0, 236)
         Me.txtDetails.Multiline = True
         Me.txtDetails.Name = "txtDetails"
-        Me.txtDetails.Size = New System.Drawing.Size(658, 84)
+        Me.txtDetails.Size = New System.Drawing.Size(658, 73)
         Me.txtDetails.TabIndex = 1
         '
         'treeFiles
@@ -122,9 +112,9 @@ Friend Class frmManager
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.treeFiles.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.treeFiles.Location = New System.Drawing.Point(0, 29)
+        Me.treeFiles.Location = New System.Drawing.Point(0, 25)
         Me.treeFiles.Name = "treeFiles"
-        Me.treeFiles.Size = New System.Drawing.Size(658, 190)
+        Me.treeFiles.Size = New System.Drawing.Size(658, 206)
         Me.treeFiles.TabIndex = 0
         '
         'MenuStrip1
@@ -132,7 +122,7 @@ Friend Class frmManager
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.EditToolStripMenuItem, Me.ViewToolStripMenuItem, Me.AnalysisToolStripMenuItem, Me.HelpToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(658, 26)
+        Me.MenuStrip1.Size = New System.Drawing.Size(658, 27)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -140,7 +130,7 @@ Friend Class frmManager
         '
         Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.SaveAsToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.toolStripSeparator2, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(40, 22)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(45, 23)
         Me.FileToolStripMenuItem.Text = "File"
         '
         'NewToolStripMenuItem
@@ -149,7 +139,7 @@ Friend Class frmManager
         Me.NewToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.NewToolStripMenuItem.Name = "NewToolStripMenuItem"
         Me.NewToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.N), System.Windows.Forms.Keys)
-        Me.NewToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.NewToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
         Me.NewToolStripMenuItem.Text = "New"
         '
         'OpenToolStripMenuItem
@@ -158,13 +148,13 @@ Friend Class frmManager
         Me.OpenToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
         Me.OpenToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.O), System.Windows.Forms.Keys)
-        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
         Me.OpenToolStripMenuItem.Text = "Open"
         '
         'toolStripSeparator
         '
         Me.toolStripSeparator.Name = "toolStripSeparator"
-        Me.toolStripSeparator.Size = New System.Drawing.Size(189, 6)
+        Me.toolStripSeparator.Size = New System.Drawing.Size(202, 6)
         '
         'SaveAsToolStripMenuItem
         '
@@ -172,121 +162,91 @@ Friend Class frmManager
         Me.SaveAsToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.SaveAsToolStripMenuItem.Name = "SaveAsToolStripMenuItem"
         Me.SaveAsToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
-        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
         Me.SaveAsToolStripMenuItem.Text = "Save As"
         '
         'toolStripSeparator1
         '
         Me.toolStripSeparator1.Name = "toolStripSeparator1"
-        Me.toolStripSeparator1.Size = New System.Drawing.Size(189, 6)
+        Me.toolStripSeparator1.Size = New System.Drawing.Size(202, 6)
         '
         'CloseToolStripMenuItem
         '
         Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
-        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
         Me.CloseToolStripMenuItem.Text = "Close"
         '
         'toolStripSeparator2
         '
         Me.toolStripSeparator2.Name = "toolStripSeparator2"
-        Me.toolStripSeparator2.Size = New System.Drawing.Size(189, 6)
+        Me.toolStripSeparator2.Size = New System.Drawing.Size(202, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
         'EditToolStripMenuItem
         '
         Me.EditToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddDatasetsToolStripMenuItem, Me.RenumberDatasetsToolStripMenuItem, Me.RemoveDatasetsToolStripMenuItem})
         Me.EditToolStripMenuItem.Name = "EditToolStripMenuItem"
-        Me.EditToolStripMenuItem.Size = New System.Drawing.Size(43, 22)
+        Me.EditToolStripMenuItem.Size = New System.Drawing.Size(48, 23)
         Me.EditToolStripMenuItem.Text = "Edit"
-        '
-        'ViewToolStripMenuItem
-        '
-        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DisplayToolStripMenuItem, Me.NativeToolStripMenuItem})
-        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
-        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(49, 22)
-        Me.ViewToolStripMenuItem.Text = "View"
-        '
-        'DisplayToolStripMenuItem
-        '
-        Me.DisplayToolStripMenuItem.Name = "DisplayToolStripMenuItem"
-        Me.DisplayToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
-        Me.DisplayToolStripMenuItem.Text = "Display"
-        '
-        'NativeToolStripMenuItem
-        '
-        Me.NativeToolStripMenuItem.Name = "NativeToolStripMenuItem"
-        Me.NativeToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
-        Me.NativeToolStripMenuItem.Text = "Native"
-        '
-        'AnalysisToolStripMenuItem
-        '
-        Me.AnalysisToolStripMenuItem.Name = "AnalysisToolStripMenuItem"
-        Me.AnalysisToolStripMenuItem.Size = New System.Drawing.Size(71, 22)
-        Me.AnalysisToolStripMenuItem.Text = "Analysis"
-        '
-        'HelpToolStripMenuItem
-        '
-        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ContentsToolStripMenuItem, Me.IndexToolStripMenuItem, Me.SearchToolStripMenuItem, Me.toolStripSeparator5, Me.AboutToolStripMenuItem})
-        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(48, 22)
-        Me.HelpToolStripMenuItem.Text = "Help"
-        '
-        'ContentsToolStripMenuItem
-        '
-        Me.ContentsToolStripMenuItem.Name = "ContentsToolStripMenuItem"
-        Me.ContentsToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
-        Me.ContentsToolStripMenuItem.Text = "Contents"
-        '
-        'IndexToolStripMenuItem
-        '
-        Me.IndexToolStripMenuItem.Name = "IndexToolStripMenuItem"
-        Me.IndexToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
-        Me.IndexToolStripMenuItem.Text = "Index"
-        '
-        'SearchToolStripMenuItem
-        '
-        Me.SearchToolStripMenuItem.Name = "SearchToolStripMenuItem"
-        Me.SearchToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
-        Me.SearchToolStripMenuItem.Text = "Search"
-        '
-        'toolStripSeparator5
-        '
-        Me.toolStripSeparator5.Name = "toolStripSeparator5"
-        Me.toolStripSeparator5.Size = New System.Drawing.Size(146, 6)
-        '
-        'AboutToolStripMenuItem
-        '
-        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
-        Me.AboutToolStripMenuItem.Text = "About..."
         '
         'AddDatasetsToolStripMenuItem
         '
         Me.AddDatasetsToolStripMenuItem.Name = "AddDatasetsToolStripMenuItem"
-        Me.AddDatasetsToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.AddDatasetsToolStripMenuItem.Size = New System.Drawing.Size(231, 24)
         Me.AddDatasetsToolStripMenuItem.Text = "Add Datasets"
         '
         'RenumberDatasetsToolStripMenuItem
         '
         Me.RenumberDatasetsToolStripMenuItem.Name = "RenumberDatasetsToolStripMenuItem"
-        Me.RenumberDatasetsToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.RenumberDatasetsToolStripMenuItem.Size = New System.Drawing.Size(231, 24)
         Me.RenumberDatasetsToolStripMenuItem.Text = "Renumber Datasets"
         '
         'RemoveDatasetsToolStripMenuItem
         '
         Me.RemoveDatasetsToolStripMenuItem.Name = "RemoveDatasetsToolStripMenuItem"
-        Me.RemoveDatasetsToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.RemoveDatasetsToolStripMenuItem.Size = New System.Drawing.Size(231, 24)
         Me.RemoveDatasetsToolStripMenuItem.Text = "Remove Datasets"
+        '
+        'ViewToolStripMenuItem
+        '
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DisplayToolStripMenuItem, Me.NativeToolStripMenuItem})
+        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(55, 23)
+        Me.ViewToolStripMenuItem.Text = "View"
+        '
+        'DisplayToolStripMenuItem
+        '
+        Me.DisplayToolStripMenuItem.Name = "DisplayToolStripMenuItem"
+        Me.DisplayToolStripMenuItem.Size = New System.Drawing.Size(145, 24)
+        Me.DisplayToolStripMenuItem.Text = "Display"
+        '
+        'NativeToolStripMenuItem
+        '
+        Me.NativeToolStripMenuItem.Name = "NativeToolStripMenuItem"
+        Me.NativeToolStripMenuItem.Size = New System.Drawing.Size(145, 24)
+        Me.NativeToolStripMenuItem.Text = "Native"
+        '
+        'AnalysisToolStripMenuItem
+        '
+        Me.AnalysisToolStripMenuItem.Name = "AnalysisToolStripMenuItem"
+        Me.AnalysisToolStripMenuItem.Size = New System.Drawing.Size(79, 23)
+        Me.AnalysisToolStripMenuItem.Text = "Analysis"
+        '
+        'HelpToolStripMenuItem
+        '
+        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(53, 23)
+        Me.HelpToolStripMenuItem.Text = "Help"
         '
         'frmManager
         '
         Me.AllowDrop = True
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(658, 309)
         Me.Controls.Add(Me.treeFiles)
         Me.Controls.Add(Me.txtDetails)
@@ -577,6 +537,9 @@ Friend Class frmManager
         End If
     End Sub
 
+    Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
+        ShowHelp("")
+    End Sub
 End Class
 
 
