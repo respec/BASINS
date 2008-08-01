@@ -166,11 +166,15 @@ Public Module modFile
         Static lHelpFilename As String = ""
         Static lHelpProcess As Process = Nothing
 
-        If FileExists(aHelpTopic) Then
-            lHelpFilename = aHelpTopic
-            Logger.Dbg("Set new help file '" & lHelpFilename & "'")
+        If aHelpTopic.ToLower.EndsWith(".chm") Then
+            If IO.File.Exists(aHelpTopic) Then
+                lHelpFilename = aHelpTopic
+                Logger.Dbg("Set new help file '" & lHelpFilename & "'")
+            Else
+                Logger.Dbg("New help file not found at '" & lHelpFilename & "'")
+            End If
         Else
-            If Not lHelpProcess Is Nothing Then
+            If lHelpProcess IsNot Nothing Then
                 If Not lHelpProcess.HasExited Then
                     Try
                         Logger.Dbg("Killing old help process")
@@ -183,11 +187,13 @@ Public Module modFile
                 End If
                 lHelpProcess.Close()
                 lHelpProcess = Nothing
-            Else
-                Logger.Dbg("No old help process")
             End If
 
-            If lHelpFilename.Length > 0 Then
+            If Not IO.File.Exists(lHelpFilename) Then
+                lHelpFilename = FindFile("Please locate BASINS 4 help file", "Basins4.0.chm")
+            End If
+
+            If IO.File.Exists(lHelpFilename) Then
                 If aHelpTopic.Length < 1 Then
                     Logger.Dbg("Showing help file '" & lHelpFilename & "'")
                     lHelpProcess = Process.Start("hh.exe", lHelpFilename)

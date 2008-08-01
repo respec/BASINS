@@ -371,6 +371,10 @@ Public Class frmDownload
             .FileName = sender.tag
             .Filter = "*.wdm|*.wdm|*.*|*.*"
             .DefaultExt = ".wdm"
+            .CheckFileExists = False
+            .OverwritePrompt = False
+            .ValidateNames = True
+            .CreatePrompt = False
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
                 sender.tag = .FileName
             Else
