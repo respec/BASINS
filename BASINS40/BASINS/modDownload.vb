@@ -398,7 +398,8 @@ Public Module modDownload
                 pExistingMapWindowProjectName = ""
             End If
         Else
-            Logger.Msg("Region not specified", "Could not create project")
+            'prompt about creating a project with no data
+            CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         End If
 
     End Sub
@@ -416,28 +417,30 @@ Public Module modDownload
 StartOver:
         lDataPath = DefaultBasinsDataDir()
 
-        Dim lRegionXML As New Xml.XmlDocument
+        If aRegion.Length > 0 Then
+            Dim lRegionXML As New Xml.XmlDocument
 
-        With lRegionXML
-            .LoadXml(aRegion)
-            For Each lChild As Xml.XmlNode In .ChildNodes(0).ChildNodes
-                If lChild.InnerText.Length > 0 Then
-                    Select Case lChild.Name.ToLower
-                        Case "northbc", "top"
-                        Case "southbc", "bottom"
-                        Case "westbc", "left"
-                        Case "eastbc", "right"
-                        Case "projection", "boxprojection"
-                        Case Else
-                            If lDefDirName = "NewProject" Then
-                                lDefDirName = lChild.InnerText
-                            Else
-                                lDefDirName = "Multiple"
-                            End If
-                    End Select
-                End If
-            Next
-        End With
+            With lRegionXML
+                .LoadXml(aRegion)
+                For Each lChild As Xml.XmlNode In .ChildNodes(0).ChildNodes
+                    If lChild.InnerText.Length > 0 Then
+                        Select Case lChild.Name.ToLower
+                            Case "northbc", "top"
+                            Case "southbc", "bottom"
+                            Case "westbc", "left"
+                            Case "eastbc", "right"
+                            Case "projection", "boxprojection"
+                            Case Else
+                                If lDefDirName = "NewProject" Then
+                                    lDefDirName = lChild.InnerText
+                                Else
+                                    lDefDirName = "Multiple"
+                                End If
+                        End Select
+                    End If
+                Next
+            End With
+        End If
 
         If lDefDirName = "NewProject" Then
             If lNoData Then
