@@ -80,18 +80,27 @@ Public Class ctlEditGlobalBlock
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
-        pHspfGlobalBlk.RunInf.Value = txtRunInfo.Text
 
-        pHspfGlobalBlk.SDate(0) = txtStartYr.Value
-        pHspfGlobalBlk.SDate(1) = txtStartMo.Value
-        pHspfGlobalBlk.SDate(2) = txtStartDay.Value
-        pHspfGlobalBlk.SDate(3) = txtStartHr.Value
-        pHspfGlobalBlk.SDate(4) = txtStartMin.Value
-        pHspfGlobalBlk.EDate(0) = txtEndYr.Value
-        pHspfGlobalBlk.EDate(1) = txtEndMo.Value
-        pHspfGlobalBlk.EDate(2) = txtEndDay.Value
-        pHspfGlobalBlk.EDate(3) = txtEndHr.Value
-        pHspfGlobalBlk.EDate(4) = txtEndMin.Value
+        With pHspfGlobalBlk
+            .RunInf.Value = txtRunInfo.Text
+
+            .SDate(0) = txtStartYr.Value
+            .SDate(1) = txtStartMo.Value
+            .SDate(2) = txtStartDay.Value
+            .SDate(3) = txtStartHr.Value
+            .SDate(4) = txtStartMin.Value
+            .EDate(0) = txtEndYr.Value
+            .EDate(1) = txtEndMo.Value
+            .EDate(2) = txtEndDay.Value
+            .EDate(3) = txtEndHr.Value
+            .EDate(4) = txtEndMin.Value
+
+            'Set the initial selection
+            .outlev.Value = comboGen.SelectedIndex
+            .spout = comboSpout.SelectedIndex
+            .runfg = comboRunFlag.SelectedIndex
+            .emfg = comboUnits.SelectedIndex + 1
+        End With
 
     End Sub
 
