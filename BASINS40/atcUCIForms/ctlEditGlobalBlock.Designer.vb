@@ -24,16 +24,6 @@ Partial Class ctlEditGlobalBlock
         Me.Label1 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
-        Me.txtStartYear = New System.Windows.Forms.TextBox
-        Me.txtStartMo = New System.Windows.Forms.TextBox
-        Me.txtEndYear = New System.Windows.Forms.TextBox
-        Me.txtEndMo = New System.Windows.Forms.TextBox
-        Me.txtEndDay = New System.Windows.Forms.TextBox
-        Me.txtStartDay = New System.Windows.Forms.TextBox
-        Me.txtEndHr = New System.Windows.Forms.TextBox
-        Me.txtStartHr = New System.Windows.Forms.TextBox
-        Me.txtEndMin = New System.Windows.Forms.TextBox
-        Me.txtStartMin = New System.Windows.Forms.TextBox
         Me.comboGen = New System.Windows.Forms.ComboBox
         Me.comboSpout = New System.Windows.Forms.ComboBox
         Me.comboUnits = New System.Windows.Forms.ComboBox
@@ -49,6 +39,17 @@ Partial Class ctlEditGlobalBlock
         Me.Label12 = New System.Windows.Forms.Label
         Me.Label13 = New System.Windows.Forms.Label
         Me.Label14 = New System.Windows.Forms.Label
+        Me.txtEndMin = New atcControls.atcText
+        Me.txtStartMin = New atcControls.atcText
+        Me.txtEndHr = New atcControls.atcText
+        Me.txtStartHr = New atcControls.atcText
+        Me.txtEndDay = New atcControls.atcText
+        Me.txtStartDay = New atcControls.atcText
+        Me.txtEndMo = New atcControls.atcText
+        Me.txtStartMo = New atcControls.atcText
+        Me.txtEndYr = New atcControls.atcText
+        Me.txtStartYr = New atcControls.atcText
+        Me.AtcText9 = New atcControls.atcText
         Me.SuspendLayout()
         '
         'lblRunInfo
@@ -64,7 +65,7 @@ Partial Class ctlEditGlobalBlock
         'txtRunInfo
         '
         Me.txtRunInfo.Location = New System.Drawing.Point(100, 10)
-        Me.txtRunInfo.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.txtRunInfo.Margin = New System.Windows.Forms.Padding(2)
         Me.txtRunInfo.Name = "txtRunInfo"
         Me.txtRunInfo.Size = New System.Drawing.Size(506, 20)
         Me.txtRunInfo.TabIndex = 1
@@ -98,76 +99,6 @@ Partial Class ctlEditGlobalBlock
         Me.Label3.Size = New System.Drawing.Size(29, 13)
         Me.Label3.TabIndex = 4
         Me.Label3.Text = "End:"
-        '
-        'txtStartYear
-        '
-        Me.txtStartYear.Location = New System.Drawing.Point(100, 63)
-        Me.txtStartYear.Name = "txtStartYear"
-        Me.txtStartYear.Size = New System.Drawing.Size(44, 20)
-        Me.txtStartYear.TabIndex = 2
-        '
-        'txtStartMo
-        '
-        Me.txtStartMo.Location = New System.Drawing.Point(150, 63)
-        Me.txtStartMo.Name = "txtStartMo"
-        Me.txtStartMo.Size = New System.Drawing.Size(33, 20)
-        Me.txtStartMo.TabIndex = 3
-        '
-        'txtEndYear
-        '
-        Me.txtEndYear.Location = New System.Drawing.Point(100, 88)
-        Me.txtEndYear.Name = "txtEndYear"
-        Me.txtEndYear.Size = New System.Drawing.Size(44, 20)
-        Me.txtEndYear.TabIndex = 7
-        '
-        'txtEndMo
-        '
-        Me.txtEndMo.Location = New System.Drawing.Point(150, 88)
-        Me.txtEndMo.Name = "txtEndMo"
-        Me.txtEndMo.Size = New System.Drawing.Size(33, 20)
-        Me.txtEndMo.TabIndex = 8
-        '
-        'txtEndDay
-        '
-        Me.txtEndDay.Location = New System.Drawing.Point(189, 88)
-        Me.txtEndDay.Name = "txtEndDay"
-        Me.txtEndDay.Size = New System.Drawing.Size(33, 20)
-        Me.txtEndDay.TabIndex = 9
-        '
-        'txtStartDay
-        '
-        Me.txtStartDay.Location = New System.Drawing.Point(189, 63)
-        Me.txtStartDay.Name = "txtStartDay"
-        Me.txtStartDay.Size = New System.Drawing.Size(33, 20)
-        Me.txtStartDay.TabIndex = 4
-        '
-        'txtEndHr
-        '
-        Me.txtEndHr.Location = New System.Drawing.Point(228, 88)
-        Me.txtEndHr.Name = "txtEndHr"
-        Me.txtEndHr.Size = New System.Drawing.Size(33, 20)
-        Me.txtEndHr.TabIndex = 10
-        '
-        'txtStartHr
-        '
-        Me.txtStartHr.Location = New System.Drawing.Point(228, 63)
-        Me.txtStartHr.Name = "txtStartHr"
-        Me.txtStartHr.Size = New System.Drawing.Size(33, 20)
-        Me.txtStartHr.TabIndex = 5
-        '
-        'txtEndMin
-        '
-        Me.txtEndMin.Location = New System.Drawing.Point(267, 88)
-        Me.txtEndMin.Name = "txtEndMin"
-        Me.txtEndMin.Size = New System.Drawing.Size(33, 20)
-        Me.txtEndMin.TabIndex = 11
-        '
-        'txtStartMin
-        '
-        Me.txtStartMin.Location = New System.Drawing.Point(267, 63)
-        Me.txtStartMin.Name = "txtStartMin"
-        Me.txtStartMin.Size = New System.Drawing.Size(33, 20)
-        Me.txtStartMin.TabIndex = 6
         '
         'comboGen
         '
@@ -255,7 +186,7 @@ Partial Class ctlEditGlobalBlock
         '
         Me.Label9.AutoSize = True
         Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label9.Location = New System.Drawing.Point(108, 45)
+        Me.Label9.Location = New System.Drawing.Point(110, 45)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(29, 13)
         Me.Label9.TabIndex = 24
@@ -265,7 +196,7 @@ Partial Class ctlEditGlobalBlock
         '
         Me.Label10.AutoSize = True
         Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label10.Location = New System.Drawing.Point(155, 45)
+        Me.Label10.Location = New System.Drawing.Point(158, 45)
         Me.Label10.Name = "Label10"
         Me.Label10.Size = New System.Drawing.Size(22, 13)
         Me.Label10.TabIndex = 25
@@ -275,7 +206,7 @@ Partial Class ctlEditGlobalBlock
         '
         Me.Label11.AutoSize = True
         Me.Label11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label11.Location = New System.Drawing.Point(192, 45)
+        Me.Label11.Location = New System.Drawing.Point(197, 45)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(26, 13)
         Me.Label11.TabIndex = 26
@@ -285,7 +216,7 @@ Partial Class ctlEditGlobalBlock
         '
         Me.Label12.AutoSize = True
         Me.Label12.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label12.Location = New System.Drawing.Point(235, 45)
+        Me.Label12.Location = New System.Drawing.Point(242, 45)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(18, 13)
         Me.Label12.TabIndex = 27
@@ -295,7 +226,7 @@ Partial Class ctlEditGlobalBlock
         '
         Me.Label13.AutoSize = True
         Me.Label13.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label13.Location = New System.Drawing.Point(271, 45)
+        Me.Label13.Location = New System.Drawing.Point(280, 45)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(24, 13)
         Me.Label13.TabIndex = 28
@@ -311,10 +242,262 @@ Partial Class ctlEditGlobalBlock
         Me.Label14.TabIndex = 29
         Me.Label14.Text = "Output Level:"
         '
+        'txtEndMin
+        '
+        Me.txtEndMin.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtEndMin.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtEndMin.DefaultValue = 0
+        Me.txtEndMin.HardMax = 59
+        Me.txtEndMin.HardMin = 0
+        Me.txtEndMin.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtEndMin.Location = New System.Drawing.Point(275, 88)
+        Me.txtEndMin.MaxDecimal = 0
+        Me.txtEndMin.maxWidth = 0
+        Me.txtEndMin.Name = "txtEndMin"
+        Me.txtEndMin.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndMin.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndMin.SelLength = 0
+        Me.txtEndMin.SelStart = 1
+        Me.txtEndMin.Size = New System.Drawing.Size(35, 19)
+        Me.txtEndMin.SoftMax = 0
+        Me.txtEndMin.SoftMin = 0
+        Me.txtEndMin.TabIndex = 11
+        Me.txtEndMin.Value = CType(0, Long)
+        '
+        'txtStartMin
+        '
+        Me.txtStartMin.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtStartMin.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtStartMin.DefaultValue = 0
+        Me.txtStartMin.HardMax = 59
+        Me.txtStartMin.HardMin = 0
+        Me.txtStartMin.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtStartMin.Location = New System.Drawing.Point(275, 63)
+        Me.txtStartMin.MaxDecimal = 0
+        Me.txtStartMin.maxWidth = 0
+        Me.txtStartMin.Name = "txtStartMin"
+        Me.txtStartMin.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartMin.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartMin.SelLength = 0
+        Me.txtStartMin.SelStart = 1
+        Me.txtStartMin.Size = New System.Drawing.Size(35, 19)
+        Me.txtStartMin.SoftMax = 0
+        Me.txtStartMin.SoftMin = 0
+        Me.txtStartMin.TabIndex = 6
+        Me.txtStartMin.Value = CType(0, Long)
+        '
+        'txtEndHr
+        '
+        Me.txtEndHr.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtEndHr.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtEndHr.DefaultValue = 0
+        Me.txtEndHr.HardMax = 24
+        Me.txtEndHr.HardMin = 0
+        Me.txtEndHr.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtEndHr.Location = New System.Drawing.Point(234, 88)
+        Me.txtEndHr.MaxDecimal = 0
+        Me.txtEndHr.maxWidth = 0
+        Me.txtEndHr.Name = "txtEndHr"
+        Me.txtEndHr.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndHr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndHr.SelLength = 0
+        Me.txtEndHr.SelStart = 1
+        Me.txtEndHr.Size = New System.Drawing.Size(35, 19)
+        Me.txtEndHr.SoftMax = 0
+        Me.txtEndHr.SoftMin = 0
+        Me.txtEndHr.TabIndex = 10
+        Me.txtEndHr.Value = CType(0, Long)
+        '
+        'txtStartHr
+        '
+        Me.txtStartHr.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtStartHr.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtStartHr.DefaultValue = 0
+        Me.txtStartHr.HardMax = 24
+        Me.txtStartHr.HardMin = 0
+        Me.txtStartHr.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtStartHr.Location = New System.Drawing.Point(234, 63)
+        Me.txtStartHr.MaxDecimal = 0
+        Me.txtStartHr.maxWidth = 0
+        Me.txtStartHr.Name = "txtStartHr"
+        Me.txtStartHr.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartHr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartHr.SelLength = 0
+        Me.txtStartHr.SelStart = 1
+        Me.txtStartHr.Size = New System.Drawing.Size(35, 19)
+        Me.txtStartHr.SoftMax = 0
+        Me.txtStartHr.SoftMin = 0
+        Me.txtStartHr.TabIndex = 5
+        Me.txtStartHr.Value = CType(0, Long)
+        '
+        'txtEndDay
+        '
+        Me.txtEndDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtEndDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtEndDay.DefaultValue = 1
+        Me.txtEndDay.HardMax = 31
+        Me.txtEndDay.HardMin = 1
+        Me.txtEndDay.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtEndDay.Location = New System.Drawing.Point(193, 88)
+        Me.txtEndDay.MaxDecimal = 0
+        Me.txtEndDay.maxWidth = 0
+        Me.txtEndDay.Name = "txtEndDay"
+        Me.txtEndDay.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndDay.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndDay.SelLength = 0
+        Me.txtEndDay.SelStart = 1
+        Me.txtEndDay.Size = New System.Drawing.Size(35, 19)
+        Me.txtEndDay.SoftMax = 0
+        Me.txtEndDay.SoftMin = 0
+        Me.txtEndDay.TabIndex = 9
+        Me.txtEndDay.Value = CType(1, Long)
+        '
+        'txtStartDay
+        '
+        Me.txtStartDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtStartDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtStartDay.DefaultValue = 1
+        Me.txtStartDay.HardMax = 31
+        Me.txtStartDay.HardMin = 1
+        Me.txtStartDay.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtStartDay.Location = New System.Drawing.Point(193, 63)
+        Me.txtStartDay.MaxDecimal = 0
+        Me.txtStartDay.maxWidth = 0
+        Me.txtStartDay.Name = "txtStartDay"
+        Me.txtStartDay.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartDay.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartDay.SelLength = 0
+        Me.txtStartDay.SelStart = 1
+        Me.txtStartDay.Size = New System.Drawing.Size(35, 19)
+        Me.txtStartDay.SoftMax = 0
+        Me.txtStartDay.SoftMin = 0
+        Me.txtStartDay.TabIndex = 4
+        Me.txtStartDay.Value = CType(1, Long)
+        '
+        'txtEndMo
+        '
+        Me.txtEndMo.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtEndMo.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtEndMo.DefaultValue = 1
+        Me.txtEndMo.HardMax = 12
+        Me.txtEndMo.HardMin = 1
+        Me.txtEndMo.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtEndMo.Location = New System.Drawing.Point(152, 88)
+        Me.txtEndMo.MaxDecimal = 0
+        Me.txtEndMo.maxWidth = 0
+        Me.txtEndMo.Name = "txtEndMo"
+        Me.txtEndMo.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndMo.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndMo.SelLength = 0
+        Me.txtEndMo.SelStart = 1
+        Me.txtEndMo.Size = New System.Drawing.Size(35, 19)
+        Me.txtEndMo.SoftMax = 0
+        Me.txtEndMo.SoftMin = 0
+        Me.txtEndMo.TabIndex = 8
+        Me.txtEndMo.Value = CType(1, Long)
+        '
+        'txtStartMo
+        '
+        Me.txtStartMo.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtStartMo.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtStartMo.DefaultValue = 1
+        Me.txtStartMo.HardMax = 12
+        Me.txtStartMo.HardMin = 1
+        Me.txtStartMo.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtStartMo.Location = New System.Drawing.Point(152, 63)
+        Me.txtStartMo.MaxDecimal = 0
+        Me.txtStartMo.maxWidth = 0
+        Me.txtStartMo.Name = "txtStartMo"
+        Me.txtStartMo.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartMo.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartMo.SelLength = 0
+        Me.txtStartMo.SelStart = 1
+        Me.txtStartMo.Size = New System.Drawing.Size(35, 19)
+        Me.txtStartMo.SoftMax = 0
+        Me.txtStartMo.SoftMin = 0
+        Me.txtStartMo.TabIndex = 3
+        Me.txtStartMo.Value = CType(1, Long)
+        '
+        'txtEndYr
+        '
+        Me.txtEndYr.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtEndYr.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtEndYr.DefaultValue = 0
+        Me.txtEndYr.HardMax = 9999
+        Me.txtEndYr.HardMin = 0
+        Me.txtEndYr.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtEndYr.Location = New System.Drawing.Point(102, 88)
+        Me.txtEndYr.MaxDecimal = 0
+        Me.txtEndYr.maxWidth = 0
+        Me.txtEndYr.Name = "txtEndYr"
+        Me.txtEndYr.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndYr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtEndYr.SelLength = 0
+        Me.txtEndYr.SelStart = 1
+        Me.txtEndYr.Size = New System.Drawing.Size(44, 19)
+        Me.txtEndYr.SoftMax = 0
+        Me.txtEndYr.SoftMin = 0
+        Me.txtEndYr.TabIndex = 7
+        Me.txtEndYr.Value = CType(0, Long)
+        '
+        'txtStartYr
+        '
+        Me.txtStartYr.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtStartYr.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtStartYr.DefaultValue = 0
+        Me.txtStartYr.HardMax = 9999
+        Me.txtStartYr.HardMin = 0
+        Me.txtStartYr.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.txtStartYr.Location = New System.Drawing.Point(102, 63)
+        Me.txtStartYr.MaxDecimal = 0
+        Me.txtStartYr.maxWidth = 0
+        Me.txtStartYr.Name = "txtStartYr"
+        Me.txtStartYr.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartYr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.txtStartYr.SelLength = 0
+        Me.txtStartYr.SelStart = 1
+        Me.txtStartYr.Size = New System.Drawing.Size(44, 19)
+        Me.txtStartYr.SoftMax = 5
+        Me.txtStartYr.SoftMin = 1
+        Me.txtStartYr.TabIndex = 2
+        Me.txtStartYr.Tag = "1111"
+        Me.txtStartYr.Value = CType(0, Long)
+        '
+        'AtcText9
+        '
+        Me.AtcText9.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcText9.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.AtcText9.DefaultValue = Nothing
+        Me.AtcText9.HardMax = 0
+        Me.AtcText9.HardMin = 0
+        Me.AtcText9.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.AtcText9.Location = New System.Drawing.Point(275, 88)
+        Me.AtcText9.MaxDecimal = 0
+        Me.AtcText9.maxWidth = 0
+        Me.AtcText9.Name = "AtcText9"
+        Me.AtcText9.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.AtcText9.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.AtcText9.SelLength = 0
+        Me.AtcText9.SelStart = 0
+        Me.AtcText9.Size = New System.Drawing.Size(35, 19)
+        Me.AtcText9.SoftMax = 0
+        Me.AtcText9.SoftMin = 0
+        Me.AtcText9.TabIndex = 39
+        '
         'ctlEditGlobalBlock
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.Controls.Add(Me.txtEndMin)
+        Me.Controls.Add(Me.txtStartMin)
+        Me.Controls.Add(Me.txtEndHr)
+        Me.Controls.Add(Me.txtStartHr)
+        Me.Controls.Add(Me.txtEndDay)
+        Me.Controls.Add(Me.txtStartDay)
+        Me.Controls.Add(Me.txtEndMo)
+        Me.Controls.Add(Me.txtStartMo)
+        Me.Controls.Add(Me.txtEndYr)
+        Me.Controls.Add(Me.txtStartYr)
         Me.Controls.Add(Me.Label14)
         Me.Controls.Add(Me.Label13)
         Me.Controls.Add(Me.Label12)
@@ -330,22 +513,12 @@ Partial Class ctlEditGlobalBlock
         Me.Controls.Add(Me.comboRunFlag)
         Me.Controls.Add(Me.comboSpout)
         Me.Controls.Add(Me.comboGen)
-        Me.Controls.Add(Me.txtEndMin)
-        Me.Controls.Add(Me.txtStartMin)
-        Me.Controls.Add(Me.txtEndHr)
-        Me.Controls.Add(Me.txtStartHr)
-        Me.Controls.Add(Me.txtEndDay)
-        Me.Controls.Add(Me.txtStartDay)
-        Me.Controls.Add(Me.txtEndMo)
-        Me.Controls.Add(Me.txtEndYear)
-        Me.Controls.Add(Me.txtStartMo)
-        Me.Controls.Add(Me.txtStartYear)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.txtRunInfo)
         Me.Controls.Add(Me.lblRunInfo)
-        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "ctlEditGlobalBlock"
         Me.Size = New System.Drawing.Size(617, 125)
         Me.ResumeLayout(False)
@@ -357,16 +530,6 @@ Partial Class ctlEditGlobalBlock
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents txtStartYear As System.Windows.Forms.TextBox
-    Friend WithEvents txtStartMo As System.Windows.Forms.TextBox
-    Friend WithEvents txtEndYear As System.Windows.Forms.TextBox
-    Friend WithEvents txtEndMo As System.Windows.Forms.TextBox
-    Friend WithEvents txtEndDay As System.Windows.Forms.TextBox
-    Friend WithEvents txtStartDay As System.Windows.Forms.TextBox
-    Friend WithEvents txtEndHr As System.Windows.Forms.TextBox
-    Friend WithEvents txtStartHr As System.Windows.Forms.TextBox
-    Friend WithEvents txtEndMin As System.Windows.Forms.TextBox
-    Friend WithEvents txtStartMin As System.Windows.Forms.TextBox
     Friend WithEvents comboGen As System.Windows.Forms.ComboBox
     Friend WithEvents comboSpout As System.Windows.Forms.ComboBox
     Friend WithEvents comboUnits As System.Windows.Forms.ComboBox
@@ -382,5 +545,16 @@ Partial Class ctlEditGlobalBlock
     Friend WithEvents Label12 As System.Windows.Forms.Label
     Friend WithEvents Label13 As System.Windows.Forms.Label
     Friend WithEvents Label14 As System.Windows.Forms.Label
+    Friend WithEvents txtStartYr As atcControls.atcText
+    Friend WithEvents txtEndYr As atcControls.atcText
+    Friend WithEvents txtStartMo As atcControls.atcText
+    Friend WithEvents txtEndMo As atcControls.atcText
+    Friend WithEvents txtEndDay As atcControls.atcText
+    Friend WithEvents txtStartDay As atcControls.atcText
+    Friend WithEvents txtEndHr As atcControls.atcText
+    Friend WithEvents txtStartHr As atcControls.atcText
+    Friend WithEvents txtEndMin As atcControls.atcText
+    Friend WithEvents txtStartMin As atcControls.atcText
+    Friend WithEvents AtcText9 As atcControls.atcText
 
 End Class

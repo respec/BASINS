@@ -39,16 +39,16 @@ Public Class ctlEditGlobalBlock
         Set(ByVal aHspfGlobalBlk As Object)
             pHspfGlobalBlk = aHspfGlobalBlk
             txtRunInfo.Text = pHspfGlobalBlk.RunInf.Value
-            txtStartYear.Text = pHspfGlobalBlk.SDate(0)
-            txtStartMo.Text = pHspfGlobalBlk.SDate(1)
-            txtStartDay.Text = pHspfGlobalBlk.SDate(2)
-            txtStartHr.Text = pHspfGlobalBlk.SDate(3)
-            txtStartMin.Text = pHspfGlobalBlk.SDate(4)
-            txtEndYear.Text = pHspfGlobalBlk.EDate(0)
-            txtEndMo.Text = pHspfGlobalBlk.EDate(1)
-            txtEndDay.Text = pHspfGlobalBlk.EDate(2)
-            txtEndHr.Text = pHspfGlobalBlk.EDate(3)
-            txtEndMin.Text = pHspfGlobalBlk.EDate(4)
+            txtStartYr.Value = pHspfGlobalBlk.SDate(0)
+            txtStartMo.Value = pHspfGlobalBlk.SDate(1)
+            txtStartDay.Value = pHspfGlobalBlk.SDate(2)
+            txtStartHr.Value = pHspfGlobalBlk.SDate(3)
+            txtStartMin.Value = pHspfGlobalBlk.SDate(4)
+            txtEndYr.Value = pHspfGlobalBlk.EDate(0)
+            txtEndMo.Value = pHspfGlobalBlk.EDate(1)
+            txtEndDay.Value = pHspfGlobalBlk.EDate(2)
+            txtEndHr.Value = pHspfGlobalBlk.EDate(3)
+            txtEndMin.Value = pHspfGlobalBlk.EDate(4)
 
             'Populate combo boxes
             Dim i&
@@ -82,16 +82,16 @@ Public Class ctlEditGlobalBlock
     Public Sub Save() Implements ctlEdit.Save
         pHspfGlobalBlk.RunInf.Value = txtRunInfo.Text
 
-        pHspfGlobalBlk.SDate(0) = txtStartYear.Text
-        pHspfGlobalBlk.SDate(1) = txtStartMo.Text
-        pHspfGlobalBlk.SDate(2) = txtStartDay.Text
-        pHspfGlobalBlk.SDate(3) = txtStartHr.Text
-        pHspfGlobalBlk.SDate(4) = txtStartMin.Text
-        pHspfGlobalBlk.EDate(0) = txtEndYear.Text
-        pHspfGlobalBlk.EDate(1) = txtEndMo.Text
-        pHspfGlobalBlk.EDate(2) = txtEndDay.Text
-        pHspfGlobalBlk.EDate(3) = txtEndHr.Text
-        pHspfGlobalBlk.EDate(4) = txtEndMin.Text
+        pHspfGlobalBlk.SDate(0) = txtStartYr.Value
+        pHspfGlobalBlk.SDate(1) = txtStartMo.Value
+        pHspfGlobalBlk.SDate(2) = txtStartDay.Value
+        pHspfGlobalBlk.SDate(3) = txtStartHr.Value
+        pHspfGlobalBlk.SDate(4) = txtStartMin.Value
+        pHspfGlobalBlk.EDate(0) = txtEndYr.Value
+        pHspfGlobalBlk.EDate(1) = txtEndMo.Value
+        pHspfGlobalBlk.EDate(2) = txtEndDay.Value
+        pHspfGlobalBlk.EDate(3) = txtEndHr.Value
+        pHspfGlobalBlk.EDate(4) = txtEndMin.Value
 
     End Sub
 
