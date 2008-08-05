@@ -807,7 +807,7 @@ Public Class HspfUci
         RemoveConnectionsFromCollection(1) 'remove all type ext src
         For Each lOpn As HspfOperation In Me.OpnSeqBlock.Opns
             For lSourceIndex As Integer = 1 To lOpn.Sources.Count
-                Dim lConn As HspfConnection = lOpn.Sources.Item(lSourceIndex)
+                Dim lConn As HspfConnection = lOpn.Sources.Item(lSourceIndex - 1)
                 If lConn.Typ = 1 Then
                     Me.Connections.Add(lConn)
                 End If
@@ -2403,8 +2403,8 @@ x:
         Dim i As Integer
         Dim lConn As HspfConnection
 
-        i = 1
-        Do While i <= Me.Connections.Count
+        i = 0
+        Do While i < Me.Connections.Count
             'remove this type of connections from pconnections collection
             lConn = Me.Connections.Item(i)
             If lConn.Typ = itype Then
