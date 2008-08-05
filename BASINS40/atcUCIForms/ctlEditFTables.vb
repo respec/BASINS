@@ -44,9 +44,40 @@ Public Class ctlEditFTables
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
+        Dim i, j As Integer
+
         With pDataSource
             Changed = False
         End With
+
+        pHspfFtable.Nrows = txtNRows.Value
+        pHspfFtable.Ncols = txtNCols.Value
+        With grdEdit.Source
+            For i = 1 To .Rows - 1
+                pHspfFtable.Depth(i) = .CellValue(i, 0)
+                pHspfFtable.Area(i) = .CellValue(i, 1)
+                pHspfFtable.Volume(i) = .CellValue(i, 2)
+                For j = 3 To .Columns - 1
+                    If j = 3 Then
+                        pHspfFtable.Outflow1(i) = .CellValue(i, j)
+                    End If
+                    If j = 4 Then
+                        pHspfFtable.Outflow2(i) = .CellValue(i, j)
+                    End If
+                    If j = 5 Then
+                        pHspfFtable.Outflow3(i) = .CellValue(i, j)
+                    End If
+                    If j = 6 Then
+                        pHspfFtable.Outflow4(i) = .CellValue(i, j)
+                    End If
+                    If j = 7 Then
+                        pHspfFtable.Outflow5(i) = .CellValue(i, j)
+                    End If
+                Next
+            Next
+        End With
+        pHspfFtable.Edited()
+        pChanged = False
     End Sub
 
     Public Property Data() As Object Implements ctlEdit.Data
@@ -140,7 +171,7 @@ Public Class ctlEditFTables
                 Next
             Next
         End With
-
+        pChanged = False
         grdEdit.Refresh()
         grdEdit.SizeAllColumnsToContents()
 
@@ -165,7 +196,7 @@ Public Class ctlEditFTables
                 Next
             Next
             For j = 0 To .Columns - 1
-                For i = 1 To .Rows
+                For i = 1 To .Rows - 1
                     If Len(.CellValue(i, j)) = 0 Then
                         .CellValue(i, j) = 0
                     End If
@@ -200,14 +231,55 @@ Public Class ctlEditFTables
         frmNewFTable.Show()
     End Sub
 
-    'Private Sub cboID_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboID.SelectedIndexChanged
-    '    Dim discard, tempID, i As Integer
+    Private Sub cboID_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboID.SelectedIndexChanged
+        Dim discard, tempID, i As Integer
+        i = InStr(1, cboID.SelectedItem, "-")
+        If i > 0 Then
+            tempID = CInt(Mid(cboID.SelectedItem, 1, i - 2))
+        Else
+            tempID = CInt(cboID.SelectedItem)
+        End If
+        If tempID <> pHspfFtable.Id Then
+            If pChanged Then
+                discard = Logger.Msg("Changes have been made.  Discard them?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "Discard Changes")
+            Else
+                discard = 6 'no changes
+            End If
+            If discard = 6 Then 'change table
+                pHspfFtable = pHspfFtable.Operation.OpnBlk.Ids("K" & tempID).FTable
+                pChanged = False
+                txtNRows.Value = pHspfFtable.Nrows
+                txtNCols.Value = pHspfFtable.Ncols
+                RefreshFtables()
+                refreshGrid()
+            Else 'dont discard set back to previous listindex
+                cboID.SelectedIndex = PrevListIndex
+            End If
+        End If
+        PrevListIndex = cboID.SelectedIndex
+    End Sub
+    Public Sub UpdateFTABLE(ByVal aFtab As HspfFtable)
+        Dim i As Long
+        Dim j As Long
 
-    '    i = InStr(1, cboID, "-")
-    '    If i > 0 Then
-    '        tempID = CInt(Mid(cboID, 1, i - 2))
-
-    '    End If
-    'End Sub
+        txtNRows.Value = aFtab.Nrows
+        txtNCols.Value = aFtab.Ncols
+        With grdEdit.Source
+            .Rows = txtNRows.Value
+            .Columns = txtNCols.Value
+            For j = 0 To .Columns - 1
+                For i = 1 To .Rows - 1
+                    .CellEditable(i, j) = True
+                Next i
+            Next j
+            For i = 1 To .Rows
+                .CellValue(i, 0) = aFtab.Depth(i)
+                .CellValue(i, 1) = aFtab.Area(i)
+                .CellValue(i, 2) = aFtab.Volume(i)
+                .CellValue(i, 3) = aFtab.Outflow1(i)
+            Next i
+        End With
+        grdEdit.SizeAllColumnsToContents()
+    End Sub
 End Class
 
