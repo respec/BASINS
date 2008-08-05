@@ -371,8 +371,12 @@ Public Class ExpertSystem
                     pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value
                     'others?
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
-                        pStats(2, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum50")
-                        pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum90")
+                        pStats(2, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum50") '50% low
+                        pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum90") '10% high
+                        pStats(11, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum90") '10% low
+                        pStats(12, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum75") '25% low
+                        pStats(13, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum75") '25% high
+                        pStats(14, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum50") '50% high
 
                         Dim lTmpDate(5) As Integer
                         J2Date(pSDateJ, lTmpDate)
@@ -463,7 +467,7 @@ Public Class ExpertSystem
                     'convert storm peak stat from acre-inch/day to cfs
                     pStats(5, lStatGroup, lSiteIndex) *= pSites(lSiteIndex).Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
                 ElseIf lStatGroup = 2 Then
-                    For i As Integer = 1 To 10
+                    For i As Integer = 1 To pStatistics.Count
                         If i < 5 Or i > 6 Then 'convert observed runoff values
                             pStats(i, lStatGroup, lSiteIndex) *= pConvert / pSites(lSiteIndex).Area
                         ElseIf i = 5 Then 'take average over NStorms
@@ -510,12 +514,36 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(4) = Double.NaN
             End If
 
-            'total storm peaks volume
-            If (pStats(5, 2, lSiteIndex) > 0.0#) Then
-                pSites(lSiteIndex).ErrorTerm(11) = 100.0# * ((pStats(5, 1, lSiteIndex) - pStats(5, 2, lSiteIndex)) _
-                                           / pStats(5, 2, lSiteIndex))
+            'volume error in lowest 10% flows
+            If (pStats(11, 2, lSiteIndex) > 0.0#) Then
+                pSites(lSiteIndex).ErrorTerm(12) = 100.0# * ((pStats(11, 1, lSiteIndex) - pStats(11, 2, lSiteIndex)) _
+                                           / pStats(11, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(11) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(12) = Double.NaN
+            End If
+
+            'volume error in lowest 25% flows
+            If (pStats(12, 2, lSiteIndex) > 0.0#) Then
+                pSites(lSiteIndex).ErrorTerm(13) = 100.0# * ((pStats(12, 1, lSiteIndex) - pStats(12, 2, lSiteIndex)) _
+                                           / pStats(12, 2, lSiteIndex))
+            Else
+                pSites(lSiteIndex).ErrorTerm(13) = Double.NaN
+            End If
+
+            'volume error in highest 25% flows
+            If (pStats(13, 2, lSiteIndex) > 0.0#) Then
+                pSites(lSiteIndex).ErrorTerm(14) = 100.0# * ((pStats(13, 1, lSiteIndex) - pStats(13, 2, lSiteIndex)) _
+                                           / pStats(13, 2, lSiteIndex))
+            Else
+                pSites(lSiteIndex).ErrorTerm(14) = Double.NaN
+            End If
+
+            'volume error in highest 25% flows
+            If (pStats(14, 2, lSiteIndex) > 0.0#) Then
+                pSites(lSiteIndex).ErrorTerm(15) = 100.0# * ((pStats(14, 1, lSiteIndex) - pStats(14, 2, lSiteIndex)) _
+                                           / pStats(14, 2, lSiteIndex))
+            Else
+                pSites(lSiteIndex).ErrorTerm(15) = Double.NaN
             End If
 
             'total storm volume
@@ -597,13 +625,16 @@ Public Class ExpertSystem
             For lErrorTerm As Integer = 1 To pErrorCriteria.Count
                 If pSites(lSiteIndex).ErrorTerm(lErrorTerm) <> 0.0# Then
                     lStr &= (pErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
-                            DecimalAlign(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) & _
-                            DecimalAlign(pErrorCriteria(lErrorTerm).Value)
-                    If Math.Abs(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) < pErrorCriteria(lErrorTerm).Value Then
-                        lStr &= " OK" & vbCrLf
-                    Else
-                        lStr &= "    Needs Work" & vbCrLf
+                            DecimalAlign(pSites(lSiteIndex).ErrorTerm(lErrorTerm))
+                    If pErrorCriteria(lErrorTerm).Value > 0 Then
+                        lStr &= DecimalAlign(pErrorCriteria(lErrorTerm).Value)
+                        If Math.Abs(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) < pErrorCriteria(lErrorTerm).Value Then
+                            lStr &= " OK"
+                        Else
+                            lStr &= "    Needs Work"
+                        End If
                     End If
+                    lStr &= vbCrLf
                 End If
             Next lErrorTerm
             lStr &= vbCrLf & vbCrLf
@@ -809,6 +840,10 @@ Friend Class ErrorCriteria
         pErrorCriteria.Add("E9", New ErrorCriterion("Multiplier on third and fourth error terms"))
         pErrorCriteria.Add("E10", New ErrorCriterion("Percent of flows to use in low-flow recession error"))
         pErrorCriteria.Add("E11", New ErrorCriterion("Average storm peak flow error (%)"))
+        pErrorCriteria.Add("E12", New ErrorCriterion("Error in 10% lowest flows (%)"))
+        pErrorCriteria.Add("E13", New ErrorCriterion("Error in 25% lowest flows (%)"))
+        pErrorCriteria.Add("E14", New ErrorCriterion("Error in 25% highest flows (%)"))
+        pErrorCriteria.Add("E15", New ErrorCriterion("Error in 50% highest flows (%)"))
     End Sub
     Public ReadOnly Property Count() As Integer
         Get
@@ -852,29 +887,33 @@ Friend Class ErrorCriterion
 End Class
 
 Friend Class Statistics
-    Private pStatictics As New atcCollection
+    Private pStatistics As New atcCollection
 
     Public Sub New()
-        pStatictics.Add(New Statistic("total (inches)"))
-        pStatictics.Add(New Statistic("50% low (inches)"))
-        pStatictics.Add(New Statistic("10% high (inches)"))
-        pStatictics.Add(New Statistic("storm volume (inches)"))
-        pStatictics.Add(New Statistic("average storm peak (cfs)"))
-        pStatictics.Add(New Statistic("baseflow recession rate"))
-        pStatictics.Add(New Statistic("summer volume (inches)"))
-        pStatictics.Add(New Statistic("winter volume (inches)"))
-        pStatictics.Add(New Statistic("summer storms (inches)"))
-        pStatictics.Add(New Statistic("winter storms (inches)"))
+        pStatistics.Add(New Statistic("total (inches)"))
+        pStatistics.Add(New Statistic("50% low (inches)"))
+        pStatistics.Add(New Statistic("10% high (inches)"))
+        pStatistics.Add(New Statistic("storm volume (inches)"))
+        pStatistics.Add(New Statistic("average storm peak (cfs)"))
+        pStatistics.Add(New Statistic("baseflow recession rate"))
+        pStatistics.Add(New Statistic("summer volume (inches)"))
+        pStatistics.Add(New Statistic("winter volume (inches)"))
+        pStatistics.Add(New Statistic("summer storms (inches)"))
+        pStatistics.Add(New Statistic("winter storms (inches)"))
+        pStatistics.Add(New Statistic("10% low (inches)"))
+        pStatistics.Add(New Statistic("25% low (inches)"))
+        pStatistics.Add(New Statistic("25% high (inches)"))
+        pStatistics.Add(New Statistic("50% high (inches)"))
     End Sub
 
     Public ReadOnly Property Count() As Integer
         Get
-            Return pStatictics.Count
+            Return pStatistics.Count
         End Get
     End Property
     Default Public ReadOnly Property Statistic(ByVal aIndex As Integer) As Statistic
         Get
-            Return pStatictics(aIndex - 1)
+            Return pStatistics(aIndex - 1)
         End Get
     End Property
 End Class
