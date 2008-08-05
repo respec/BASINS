@@ -40,12 +40,7 @@ Public Class ctlEditFTables
     End Sub
 
     Public Sub Remove() Implements ctlEdit.Remove
-        'TODO: add this code
-        With pDataSource
-            'TODO: need selected rows
-            'Dim lRow, lCol As Integer
-            'Dim lTmp As Boolean = .CellSelected(lRow, lCol)
-        End With
+        'not needed
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
@@ -61,9 +56,9 @@ Public Class ctlEditFTables
 
         Set(ByVal aHspfFtables As Object)
             pHspfFtable = aHspfFtables
-            Dim vID As Object
-            For Each vID In pHspfFtable.Operation.OpnBlk.Ids
-                cboID.Items.Add(vID.Id & " - " & vID.Description)
+            Dim lOper As HspfOperation
+            For Each lOper In pHspfFtable.Operation.OpnBlk.Ids
+                cboID.Items.Add(lOper.Id & " - " & lOper.Description)
                 If pHspfFtable.Operation.Tables("HYDR-PARM2").ParmValue("FTBUCI") = cboID.Items.Count Then
                     cboID.SelectedIndex = 0
                     PrevListIndex = cboID.SelectedIndex
@@ -129,16 +124,16 @@ Public Class ctlEditFTables
                     If j = 3 Then
                         .CellValue(i, j) = pHspfFtable.Outflow1(i)
                     End If
-                    If j = 3 Then
+                    If j = 4 Then
                         .CellValue(i, j) = pHspfFtable.Outflow2(i)
                     End If
-                    If j = 3 Then
+                    If j = 5 Then
                         .CellValue(i, j) = pHspfFtable.Outflow3(i)
                     End If
-                    If j = 3 Then
+                    If j = 6 Then
                         .CellValue(i, j) = pHspfFtable.Outflow4(i)
                     End If
-                    If j = 3 Then
+                    If j = 7 Then
                         .CellValue(i, j) = pHspfFtable.Outflow5(i)
                     End If
 
