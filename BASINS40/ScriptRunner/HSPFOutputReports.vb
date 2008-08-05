@@ -25,15 +25,15 @@ Module HSPFOutputReports
 
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
-        Dim lTestName As String = "hyd_man"
-        'Dim lTestName As String = "upatoi"
+        'Dim lTestName As String = "hyd_man"
+        Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
 
         Select Case lTestName
             Case "upatoi"
-                pTestPath = "c:\Basins\modelout\Upatoi-test"
+                pTestPath = "d:\Basins\modelout\Upatoi"
                 pBaseName = "upatoi"
                 pOutputLocations.Add("R:46")
             Case "tinley"
@@ -112,12 +112,28 @@ Module HSPFOutputReports
                 For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
                     Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
                     Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
-                    Dim lSimTSer As atcTimeseries = InchesToCfs(lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0)), lArea)
+                    Dim lSimTSerInches As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0))
+                    lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
+                    Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
                     lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lSimTSer.Attributes.SetValue("YAxis", "Left")
                     Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
                     lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lObsTSer.Attributes.SetValue("YAxis", "Left")
+                    Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
+                    lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
+                    Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
+                    lPrecTSer.Attributes.SetValue("Units", "inches")
+
+                    lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
+                                                                 lCons, lSite, _
+                                                                 "inches", _
+                                                                 lPrecTSer, lSimTSerInches, lObsTSerInches, _
+                                                                 lExpertSystem.SDateJ, _
+                                                                 lExpertSystem.EDateJ)
+                    lOutFileName = "outfiles\Annual" & lCons & "Stats" & "-" & lSite & ".txt"
+                    SaveFileString(lOutFileName, lStr)
+
                     lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                        lCons, lSite, _
                                                                        lSimTSer, lObsTSer, _
@@ -172,7 +188,6 @@ Module HSPFOutputReports
                     End If
                     'add precip to aux axis
                     Dim lPaneCount As Integer = 1
-                    Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
                     If Not lPrecTSer Is Nothing Then
                         lPrecTSer.Attributes.SetValue("YAxis", "Aux")
                         lDataGroup.Add(SubsetByDate(lPrecTSer, _
