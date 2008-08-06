@@ -14,6 +14,7 @@ Module FillMissing
         Dim lWdmFileName As String = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
         Dim lWdmDataSource As New atcDataSourceWDM
         lWdmDataSource.Open(lWdmFileName)
+
         Dim lFlowTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(4)
         Dim lFilledTser As atcTimeseries = FillMissingByInterpolation(lFlowTser, 1)
         Dim lDailyTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(10)
@@ -70,12 +71,16 @@ Module FillMissing
     Public Function FillMissingFromOther(ByVal aOldTSer As atcTimeseries, _
                                          ByVal aFillFrom As atcTimeseries) As atcTimeseries
 
+        'calc date offset to account for the fact that the starting dates are different
+        '  the 96 represents the number of 15 minute periods in a day
+        Dim lDateOffset As Integer = (CInt(aOldTSer.Dates.Values(0) - aFillFrom.Dates.Values(0))) * 96
+
         Dim lNewTSer As atcTimeseries = aOldTSer.Clone
         For lInd As Integer = 1 To lNewTSer.numValues
             If Double.IsNaN(lNewTSer.Values(lInd)) Then
-                lNewTSer.Values(lInd) = aFillFrom.Values(lInd)
+                'need to fill this value
+                lNewTSer.Values(lInd) = aFillFrom.Values(lInd + lDateOffset)
             End If
-            lInd += 1
         Next
         Return lNewTSer
     End Function
