@@ -68,7 +68,7 @@ Public Class frmWinHSPF
             If lTableName = "GLOBAL" Then
                 UCIForms.Edit(Me, pUCI.GlobalBlock)
             ElseIf lTableName = "OPN SEQUENCE" Then
-
+                UCIForms.Edit(Me, pUCI.OpnSeqBlock)
             ElseIf lTableName = "FILES" Then
                 UCIForms.Edit(Me, pUCI.FilesBlock)
             ElseIf lTableName = "CATEGORY" Then
