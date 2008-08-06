@@ -25,6 +25,13 @@ Public Class UCIForms
                 lFormEdit.EditControl = lEditGlobalBlock
                 lFormEdit.AddRemoveFlag = False
                 lForm = lFormEdit
+            Case "HspfOpnSeqBlk"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditOpnSeqBlock As New ctlEditOpnSeqBlock(aObject, aParent)
+                lFormEdit.Text = lEditOpnSeqBlock.Caption
+                lFormEdit.EditControl = lEditOpnSeqBlock
+                lFormEdit.AddRemoveFlag = False
+                lForm = lFormEdit
             Case "HspfFtable"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditFTables As New ctlEditFTables(aObject, aParent)
