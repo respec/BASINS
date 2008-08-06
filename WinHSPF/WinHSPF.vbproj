@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{483149C8-F683-40DE-AA26-5EB30047AB0F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -83,6 +83,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmInputDataEditor.Designer.vb">
+      <DependentUpon>frmInputDataEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmInputDataEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmReach.Designer.vb">
       <DependentUpon>frmReach.vb</DependentUpon>
     </Compile>
@@ -114,6 +120,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmInputDataEditor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmInputDataEditor.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmReach.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmReach.vb</DependentUpon>
