@@ -608,8 +608,15 @@ Public Class ExpertSystem
         lStr &= "Run Created: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
         Dim lYrCnt As Double = timdifJ(pSDateJ, pEDateJ, 6, 1)
         lStr &= "Simulation Period: " & lYrCnt & " years"
-        lStr &= " from " & Format(Date.FromOADate(pSDateJ), "yyyy/MM/dd")
-        lStr &= " to " & Format(Date.FromOADate(pEDateJ), "yyyy/MM/dd") & vbCrLf
+        Dim lDateFormat As New atcDateFormat
+        With lDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .Midnight24 = False
+            lStr &= " from " & .JDateToString(pSDateJ)
+            .Midnight24 = True
+            lStr &= " to " & .JDateToString(pEDateJ) & vbCrLf
+        End With
 
         For lSiteIndex As Integer = 1 To pSites.Count
             'loop for each site
@@ -622,21 +629,27 @@ Public Class ExpertSystem
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
             lStr &= Space(35) & "Current".PadLeft(12) & "Criteria".PadLeft(12) & vbCrLf
-            For lErrorTerm As Integer = 1 To pErrorCriteria.Count
-                If pSites(lSiteIndex).ErrorTerm(lErrorTerm) <> 0.0# Then
-                    lStr &= (pErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
-                            DecimalAlign(pSites(lSiteIndex).ErrorTerm(lErrorTerm))
-                    If pErrorCriteria(lErrorTerm).Value > 0 Then
-                        lStr &= DecimalAlign(pErrorCriteria(lErrorTerm).Value)
-                        If Math.Abs(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) < pErrorCriteria(lErrorTerm).Value Then
-                            lStr &= " OK"
-                        Else
-                            lStr &= "    Needs Work"
+            For lErrorPrintIndex As Integer = 1 To pErrorCriteria.Count
+                For lErrorTerm As Integer = 1 To pErrorCriteria.Count
+                    Dim lErrorCriterion As ErrorCriterion = pErrorCriteria.Criterion(lErrorTerm)
+                    If lErrorCriterion.PrintPosition = lErrorPrintIndex Then
+                        If pSites(lSiteIndex).ErrorTerm(lErrorTerm) <> 0.0# Then
+                            lStr &= (pErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
+                                    DecimalAlign(pSites(lSiteIndex).ErrorTerm(lErrorTerm))
+                            If pErrorCriteria(lErrorTerm).Value > 0 Then
+                                lStr &= DecimalAlign(pErrorCriteria(lErrorTerm).Value)
+                                If Math.Abs(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) < pErrorCriteria(lErrorTerm).Value Then
+                                    lStr &= " OK"
+                                Else
+                                    lStr &= "    Needs Work"
+                                End If
+                            End If
+                            lStr &= vbCrLf
                         End If
+                        Exit For
                     End If
-                    lStr &= vbCrLf
-                End If
-            Next lErrorTerm
+                Next lErrorTerm
+            Next lErrorPrintIndex
             lStr &= vbCrLf & vbCrLf
         Next lSiteIndex
 
@@ -659,23 +672,29 @@ Public Class ExpertSystem
               "Surface Runoff".PadLeft(15) & _
               "Interflow".PadLeft(15) & vbCrLf
         'Write runoff block
-        For lStatIndex As Integer = 1 To pStatistics.Count 'loop for each statistic
-            lStr &= (pStatistics(lStatIndex).Name & " =").PadLeft(30)
-            Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct
-            For k As Integer = 1 To 4
-                If Not Double.IsNaN(pStats(lStatIndex, l(k), aSite)) Then
-                    If lStatIndex = 5 Or lStatIndex = 6 Then 'dont need adjustment for storm peaks or recession rate
-                        lConv = 1
-                    Else
-                        lConv = aConv
-                    End If
-                    lStr &= DecimalAlign(pStats(lStatIndex, l(k), aSite) / lConv, 15)
-                Else
-                    lStr &= Space(15)
+        For lStatPrintIndex As Integer = 1 To pStatistics.Count 'loop for each statistic to print
+            For lStatIndex As Integer = 1 To pStatistics.Count
+                Dim lStatistic As Statistic = pStatistics(lStatIndex)
+                If lStatistic.PrintPosition = lStatPrintIndex Then
+                    lStr &= (pStatistics(lStatIndex).Name & " =").PadLeft(30)
+                    Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct within statistic
+                    For k As Integer = 1 To 4
+                        If Not Double.IsNaN(pStats(lStatIndex, l(k), aSite)) Then
+                            If lStatIndex = 5 Or lStatIndex = 6 Then 'dont need adjustment for storm peaks or recession rate
+                                lConv = 1
+                            Else
+                                lConv = aConv
+                            End If
+                            lStr &= DecimalAlign(pStats(lStatIndex, l(k), aSite) / lConv, 15)
+                        Else
+                            lStr &= Space(15)
+                        End If
+                    Next k
+                    lStr = lStr.TrimEnd & vbCrLf
+                    Exit For
                 End If
-            Next k
-            lStr = lStr.TrimEnd & vbCrLf
-        Next lStatIndex
+            Next lStatIndex
+        Next lStatPrintIndex
         lStr &= vbCrLf
         'Write EvapoTranspiration block
         lStr &= Space(30) & "          EvapoTranspiration" & vbCrLf
@@ -829,21 +848,21 @@ Friend Class ErrorCriteria
         '8 = acceptable error in summer storm volumes (%)
         '9 = multiplier on third and fourth error terms
         '10 = percent of flows to use in low-flow recession error
-        pErrorCriteria.Add("E1", New ErrorCriterion("Error in total volume (%)"))
-        pErrorCriteria.Add("E2", New ErrorCriterion("Error in low-flow recession"))
-        pErrorCriteria.Add("E3", New ErrorCriterion("Error in 50% lowest flows (%)"))
-        pErrorCriteria.Add("E4", New ErrorCriterion("Error in 10% highest flows (%)"))
-        pErrorCriteria.Add("E5", New ErrorCriterion("Error in storm volumes (%)"))
-        pErrorCriteria.Add("E6", New ErrorCriterion("Ratio of interflow to surface runoff (in/in)"))
-        pErrorCriteria.Add("E7", New ErrorCriterion("Seasonal volume error (%)"))
-        pErrorCriteria.Add("E8", New ErrorCriterion("Summer storm volume error (%)"))
-        pErrorCriteria.Add("E9", New ErrorCriterion("Multiplier on third and fourth error terms"))
-        pErrorCriteria.Add("E10", New ErrorCriterion("Percent of flows to use in low-flow recession error"))
-        pErrorCriteria.Add("E11", New ErrorCriterion("Average storm peak flow error (%)"))
-        pErrorCriteria.Add("E12", New ErrorCriterion("Error in 10% lowest flows (%)"))
-        pErrorCriteria.Add("E13", New ErrorCriterion("Error in 25% lowest flows (%)"))
-        pErrorCriteria.Add("E14", New ErrorCriterion("Error in 25% highest flows (%)"))
-        pErrorCriteria.Add("E15", New ErrorCriterion("Error in 50% highest flows (%)"))
+        pErrorCriteria.Add("E1", New ErrorCriterion("Error in total volume (%)", 1))
+        pErrorCriteria.Add("E2", New ErrorCriterion("Error in low-flow recession", 8))
+        pErrorCriteria.Add("E3", New ErrorCriterion("Error in 50% lowest flows (%)", 5))
+        pErrorCriteria.Add("E4", New ErrorCriterion("Error in 10% highest flows (%)", 2))
+        pErrorCriteria.Add("E5", New ErrorCriterion("Error in storm volumes (%)", 9))
+        pErrorCriteria.Add("E6", New ErrorCriterion("Ratio of interflow to surface runoff (in/in)", 10))
+        pErrorCriteria.Add("E7", New ErrorCriterion("Seasonal volume error (%)", 11))
+        pErrorCriteria.Add("E8", New ErrorCriterion("Summer storm volume error (%)", 12))
+        pErrorCriteria.Add("E9", New ErrorCriterion("Multiplier on third and fourth error terms", 13))
+        pErrorCriteria.Add("E10", New ErrorCriterion("Percent of flows to use in low-flow recession error", 14))
+        pErrorCriteria.Add("E11", New ErrorCriterion("Average storm peak flow error (%)", 15))
+        pErrorCriteria.Add("E12", New ErrorCriterion("Error in 10% lowest flows (%)", 7))
+        pErrorCriteria.Add("E13", New ErrorCriterion("Error in 25% lowest flows (%)", 6))
+        pErrorCriteria.Add("E14", New ErrorCriterion("Error in 25% highest flows (%)", 3))
+        pErrorCriteria.Add("E15", New ErrorCriterion("Error in 50% highest flows (%)", 4))
     End Sub
     Public ReadOnly Property Count() As Integer
         Get
@@ -864,10 +883,12 @@ End Class
 
 Friend Class ErrorCriterion
     Private pName As String
-    Private pValue As Double
+    Friend Value As Double
+    Private pPrintPosition As Integer
 
-    Public Sub New(ByVal aName As String)
+    Public Sub New(ByVal aName As String, ByVal aPrintPosition As String)
         pName = aName
+        pPrintPosition = aPrintPosition
     End Sub
 
     Friend ReadOnly Property Name() As String
@@ -875,14 +896,10 @@ Friend Class ErrorCriterion
             Return pName
         End Get
     End Property
-
-    Friend Property Value() As Double
+    Friend ReadOnly Property PrintPosition() As Integer
         Get
-            Return pValue
+            Return pPrintPosition
         End Get
-        Set(ByVal aValue As Double)
-            pValue = aValue
-        End Set
     End Property
 End Class
 
@@ -890,20 +907,20 @@ Friend Class Statistics
     Private pStatistics As New atcCollection
 
     Public Sub New()
-        pStatistics.Add(New Statistic("total (inches)"))
-        pStatistics.Add(New Statistic("50% low (inches)"))
-        pStatistics.Add(New Statistic("10% high (inches)"))
-        pStatistics.Add(New Statistic("storm volume (inches)"))
-        pStatistics.Add(New Statistic("average storm peak (cfs)"))
-        pStatistics.Add(New Statistic("baseflow recession rate"))
-        pStatistics.Add(New Statistic("summer volume (inches)"))
-        pStatistics.Add(New Statistic("winter volume (inches)"))
-        pStatistics.Add(New Statistic("summer storms (inches)"))
-        pStatistics.Add(New Statistic("winter storms (inches)"))
-        pStatistics.Add(New Statistic("10% low (inches)"))
-        pStatistics.Add(New Statistic("25% low (inches)"))
-        pStatistics.Add(New Statistic("25% high (inches)"))
-        pStatistics.Add(New Statistic("50% high (inches)"))
+        pStatistics.Add(New Statistic("total (inches)", 1))
+        pStatistics.Add(New Statistic("50% low (inches)", 5))
+        pStatistics.Add(New Statistic("10% high (inches)", 2))
+        pStatistics.Add(New Statistic("storm volume (inches)", 8))
+        pStatistics.Add(New Statistic("average storm peak (cfs)", 9))
+        pStatistics.Add(New Statistic("baseflow recession rate", 10))
+        pStatistics.Add(New Statistic("summer volume (inches)", 11))
+        pStatistics.Add(New Statistic("winter volume (inches)", 12))
+        pStatistics.Add(New Statistic("summer storms (inches)", 13))
+        pStatistics.Add(New Statistic("winter storms (inches)", 14))
+        pStatistics.Add(New Statistic("10% low (inches)", 7))
+        pStatistics.Add(New Statistic("25% low (inches)", 6))
+        pStatistics.Add(New Statistic("25% high (inches)", 3))
+        pStatistics.Add(New Statistic("50% high (inches)", 4))
     End Sub
 
     Public ReadOnly Property Count() As Integer
@@ -920,13 +937,20 @@ End Class
 
 Friend Class Statistic
     Dim pName As String
+    Dim pPrintPosition As Integer
 
-    Public Sub New(ByVal aName As String)
+    Public Sub New(ByVal aName As String, ByVal aPrintPosition As Integer)
         pName = aName
+        pPrintPosition = aPrintPosition
     End Sub
     Public ReadOnly Property Name() As String
         Get
             Return pName
+        End Get
+    End Property
+    Public ReadOnly Property PrintPosition() As String
+        Get
+            Return pPrintPosition
         End Get
     End Property
 End Class
