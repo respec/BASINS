@@ -22,10 +22,7 @@ Public Module DailyMonthlyCompareStats
         If Math.Abs(lEDateJ) < 0.00001 Then lEDateJ = aUci.GlobalBlock.EdateJ
 
         Dim lYrCnt As Double = timdifJ(lSDateJ, lEDateJ, 6, 1)
-        lStr &= "Simulation Period: " & lYrCnt & " years"
-        lStr &= " from " & Format(Date.FromOADate(lSDateJ), "yyyy/MM/dd")
-        lStr &= " to " & Format(Date.FromOADate(lEDateJ), "yyyy/MM/dd") & vbCrLf
-
+        lStr &= SimulationPeriodString(lSDateJ, lEDateJ, lYrCnt)
         lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
 
         CheckDateJ(aObsTSer, "Observed", lSDateJ, lEDateJ, lStr)

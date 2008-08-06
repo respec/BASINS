@@ -70,6 +70,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="modAnnualCompareStats.vb" />
+    <Compile Include="modMonthlyAverageCompareStats.vb" />
     <Compile Include="modUtility.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

@@ -125,6 +125,15 @@ Module HSPFOutputReports
                     Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
                     lPrecTSer.Attributes.SetValue("Units", "inches")
 
+                    lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
+                                                                         lCons, lSite, _
+                                                                         "inches", _
+                                                                         lSimTSerInches, lObsTSerInches, _
+                                                                         lExpertSystem.SDateJ, _
+                                                                         lExpertSystem.EDateJ)
+                    lOutFileName = "outfiles\MonthlyAverage" & lCons & "Stats" & "-" & lSite & ".txt"
+                    SaveFileString(lOutFileName, lStr)
+
                     lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
                                                                  lCons, lSite, _
                                                                  "inches", _
