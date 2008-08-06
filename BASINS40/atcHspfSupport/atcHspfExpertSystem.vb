@@ -555,46 +555,67 @@ Public Class ExpertSystem
             End If
 
             'summer storm volume
+            Dim lSummerStormVolumeError As Double = Double.NaN
             If (pStats(9, 2, lSiteIndex) > 0.0# And pStats(4, 2, lSiteIndex) > 0.0#) Then
-                pSites(lSiteIndex).ErrorTerm(8) = (100.0# * ((pStats(9, 1, lSiteIndex) - pStats(9, 2, lSiteIndex)) _
-                                            / pStats(9, 2, lSiteIndex))) - pSites(lSiteIndex).ErrorTerm(5)
-            Else
-                pSites(lSiteIndex).ErrorTerm(8) = Double.NaN
+                lSummerStormVolumeError = (100.0# * ((pStats(9, 1, lSiteIndex) - pStats(9, 2, lSiteIndex)) _
+                                            / pStats(9, 2, lSiteIndex))) '- pSites(lSiteIndex).ErrorTerm(5)
+            End If
+
+            'winter storm volume
+            Dim lWinterStormVolumeError As Double = Double.NaN
+            If (pStats(10, 2, lSiteIndex) > 0.0# And pStats(4, 2, lSiteIndex) > 0.0#) Then
+                lWinterStormVolumeError = (100.0# * ((pStats(10, 1, lSiteIndex) - pStats(10, 2, lSiteIndex)) _
+                                            / pStats(10, 2, lSiteIndex))) '- pSites(lSiteIndex).ErrorTerm(5)
+            End If
+
+            'average peak
+            Dim lAverageStormPeakError As Double = Double.NaN
+            If (pStats(5, 2, lSiteIndex) > 0.0#) Then
+                lAverageStormPeakError = (100.0# * ((pStats(5, 1, lSiteIndex) - pStats(5, 2, lSiteIndex)) _
+                                            / pStats(5, 2, lSiteIndex)))
             End If
 
             'error in low flow recession
+            Dim lLowFlowRecessionError As Double = Double.NaN
             If Double.IsNaN(pStats(6, 1, lSiteIndex)) Or _
                Double.IsNaN(pStats(6, 2, lSiteIndex)) Then
                 pSites(lSiteIndex).ErrorTerm(2) = Double.NaN
             Else 'okay to calculate this term
                 pSites(lSiteIndex).ErrorTerm(2) = (1.0# - pStats(6, 1, lSiteIndex)) - (1.0# - pStats(6, 2, lSiteIndex))
+                If pStats(6, 2, lSiteIndex) > 0 Then
+                    lLowFlowRecessionError = 100.0# * ((pStats(6, 1, lSiteIndex) - pStats(6, 2, lSiteIndex)) _
+                                               / pStats(6, 2, lSiteIndex))
+                End If
             End If
 
             'summer flow volume
-            Dim lSummerError As Double
+            Dim lSummerError As Double = Double.NaN
             If (pStats(7, 2, lSiteIndex) > 0.0#) Then
                 lSummerError = 100.0# * ((pStats(7, 1, lSiteIndex) - pStats(7, 2, lSiteIndex)) _
                                            / pStats(7, 2, lSiteIndex))
-            Else
-                lSummerError = Double.NaN
             End If
 
             'winter flow volume
-            Dim lWinterError As Double
+            Dim lWinterError As Double = Double.NaN
             If (pStats(8, 2, lSiteIndex) > 0.0#) Then
                 lWinterError = 100.0# * ((pStats(8, 1, lSiteIndex) - pStats(8, 2, lSiteIndex)) _
                                            / pStats(8, 2, lSiteIndex))
-            Else
-                lWinterError = Double.NaN
             End If
 
             'error in seasonal volume
             If (Double.IsNaN(lSummerError) Or _
-                Double.IsNaN(lWinterError)) Then 'one term or the other has not been obtained
+                   Double.IsNaN(lWinterError)) Then 'one term or the other has not been obtained
                 pSites(lSiteIndex).ErrorTerm(7) = Double.NaN
             Else 'okay to calculate this term
                 pSites(lSiteIndex).ErrorTerm(7) = Math.Abs(lSummerError - lWinterError)
             End If
+
+            pSites(lSiteIndex).ErrorTerm(17) = lSummerError
+            pSites(lSiteIndex).ErrorTerm(18) = lWinterError
+            pSites(lSiteIndex).ErrorTerm(8) = lSummerStormVolumeError
+            pSites(lSiteIndex).ErrorTerm(19) = lWinterStormVolumeError
+            pSites(lSiteIndex).ErrorTerm(16) = lAverageStormPeakError
+            pSites(lSiteIndex).ErrorTerm(20) = lLowFlowRecessionError          
         Next lSiteIndex
 
         Dim lStr As String = StatReportAsString(auci)
@@ -607,16 +628,7 @@ Public Class ExpertSystem
         lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
         lStr &= "Run Created: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
         Dim lYrCnt As Double = timdifJ(pSDateJ, pEDateJ, 6, 1)
-        lStr &= "Simulation Period: " & lYrCnt & " years"
-        Dim lDateFormat As New atcDateFormat
-        With lDateFormat
-            .IncludeHours = False
-            .IncludeMinutes = False
-            .Midnight24 = False
-            lStr &= " from " & .JDateToString(pSDateJ)
-            .Midnight24 = True
-            lStr &= " to " & .JDateToString(pEDateJ) & vbCrLf
-        End With
+        lStr &= SimulationPeriodString(pSDateJ, pEDateJ, lYrCnt)
 
         For lSiteIndex As Integer = 1 To pSites.Count
             'loop for each site
@@ -855,14 +867,19 @@ Friend Class ErrorCriteria
         pErrorCriteria.Add("E5", New ErrorCriterion("Error in storm volumes (%)", 9))
         pErrorCriteria.Add("E6", New ErrorCriterion("Ratio of interflow to surface runoff (in/in)", 10))
         pErrorCriteria.Add("E7", New ErrorCriterion("Seasonal volume error (%)", 11))
-        pErrorCriteria.Add("E8", New ErrorCriterion("Summer storm volume error (%)", 12))
-        pErrorCriteria.Add("E9", New ErrorCriterion("Multiplier on third and fourth error terms", 13))
-        pErrorCriteria.Add("E10", New ErrorCriterion("Percent of flows to use in low-flow recession error", 14))
-        pErrorCriteria.Add("E11", New ErrorCriterion("Average storm peak flow error (%)", 15))
+        pErrorCriteria.Add("E8", New ErrorCriterion("Summer storm volume error (%)", 19))
+        pErrorCriteria.Add("E9", New ErrorCriterion("Multiplier on third and fourth error terms", 14))
+        pErrorCriteria.Add("E10", New ErrorCriterion("Percent of flows to use in low-flow recession error", 15))
+        pErrorCriteria.Add("E11", New ErrorCriterion("Average storm peak flow error (%)", 12))
         pErrorCriteria.Add("E12", New ErrorCriterion("Error in 10% lowest flows (%)", 7))
         pErrorCriteria.Add("E13", New ErrorCriterion("Error in 25% lowest flows (%)", 6))
         pErrorCriteria.Add("E14", New ErrorCriterion("Error in 25% highest flows (%)", 3))
         pErrorCriteria.Add("E15", New ErrorCriterion("Error in 50% highest flows (%)", 4))
+        pErrorCriteria.Add("E16", New ErrorCriterion("Error in average storm peak (%)", 13))
+        pErrorCriteria.Add("E17", New ErrorCriterion("Summer volume error (%)", 17))
+        pErrorCriteria.Add("E18", New ErrorCriterion("Winter volume error (%)", 18))
+        pErrorCriteria.Add("E19", New ErrorCriterion("Winter storm volume error (%)", 20))
+        pErrorCriteria.Add("E20", New ErrorCriterion("Error in baseflow recession (%)", 16))
     End Sub
     Public ReadOnly Property Count() As Integer
         Get
@@ -907,20 +924,20 @@ Friend Class Statistics
     Private pStatistics As New atcCollection
 
     Public Sub New()
-        pStatistics.Add(New Statistic("total (inches)", 1))
-        pStatistics.Add(New Statistic("50% low (inches)", 5))
-        pStatistics.Add(New Statistic("10% high (inches)", 2))
-        pStatistics.Add(New Statistic("storm volume (inches)", 8))
-        pStatistics.Add(New Statistic("average storm peak (cfs)", 9))
-        pStatistics.Add(New Statistic("baseflow recession rate", 10))
-        pStatistics.Add(New Statistic("summer volume (inches)", 11))
-        pStatistics.Add(New Statistic("winter volume (inches)", 12))
-        pStatistics.Add(New Statistic("summer storms (inches)", 13))
-        pStatistics.Add(New Statistic("winter storms (inches)", 14))
-        pStatistics.Add(New Statistic("10% low (inches)", 7))
-        pStatistics.Add(New Statistic("25% low (inches)", 6))
-        pStatistics.Add(New Statistic("25% high (inches)", 3))
-        pStatistics.Add(New Statistic("50% high (inches)", 4))
+        pStatistics.Add(New Statistic("total (inches)", 1)) '1
+        pStatistics.Add(New Statistic("50% low (inches)", 5)) '2
+        pStatistics.Add(New Statistic("10% high (inches)", 2)) '3
+        pStatistics.Add(New Statistic("storm volume (inches)", 8)) '4
+        pStatistics.Add(New Statistic("average storm peak (cfs)", 9)) '5
+        pStatistics.Add(New Statistic("baseflow recession rate", 10)) '6
+        pStatistics.Add(New Statistic("summer volume (inches)", 11)) '7
+        pStatistics.Add(New Statistic("winter volume (inches)", 12)) '8
+        pStatistics.Add(New Statistic("summer storms (inches)", 13)) '9
+        pStatistics.Add(New Statistic("winter storms (inches)", 14)) '10
+        pStatistics.Add(New Statistic("10% low (inches)", 7)) '11
+        pStatistics.Add(New Statistic("25% low (inches)", 6)) '12
+        pStatistics.Add(New Statistic("25% high (inches)", 3)) '13
+        pStatistics.Add(New Statistic("50% high (inches)", 4)) '14
     End Sub
 
     Public ReadOnly Property Count() As Integer

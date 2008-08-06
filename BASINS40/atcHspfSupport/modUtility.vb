@@ -465,4 +465,26 @@ Public Module Utility
         End If
         Return lStr
     End Function
+
+    Friend Function SimulationPeriodString(ByVal aSDatej As Double, ByVal aEDatej As Double, ByVal aYrCnt As Integer) As String
+        Dim lDate(5) As Integer
+        J2Date(aSDatej, lDate)
+        Dim lYearType As String = " "
+        If lDate(1) = 10 AndAlso lDate(2) = 1 AndAlso lDate(3) = 0 Then
+            lYearType &= "Water "
+        ElseIf lDate(1) = 10 AndAlso lDate(2) = 1 AndAlso lDate(3) = 0 Then
+            lYearType &= "Calendar "
+        End If
+        Dim lStr As String = "Simulation Period: " & aYrCnt & lYearType & "years"
+        Dim lDateFormat As New atcDateFormat
+        With lDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .Midnight24 = False
+            lStr &= " from " & .JDateToString(aSDatej)
+            .Midnight24 = True
+            lStr &= " to " & .JDateToString(aEDatej) & vbCrLf
+        End With
+        Return lStr
+    End Function
 End Module
