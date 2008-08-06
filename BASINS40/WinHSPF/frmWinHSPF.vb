@@ -72,7 +72,7 @@ Public Class frmWinHSPF
             ElseIf lTableName = "FILES" Then
                 UCIForms.Edit(Me, pUCI.FilesBlock)
             ElseIf lTableName = "CATEGORY" Then
-
+                UCIForms.Edit(Me, pUCI.CategoryBlock)
             ElseIf lTableName = "FTABLES" Then
                 If pUCI.OpnBlks("RCHRES").Count > 0 Then
                     UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").Ids(0).FTable)

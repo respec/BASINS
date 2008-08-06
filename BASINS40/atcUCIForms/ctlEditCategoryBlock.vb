@@ -3,16 +3,16 @@ Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
 
-Public Class ctlEditOpnSeqBlock
+Public Class ctlEditCategory
     Implements ctlEdit
 
-    Dim pHspfOpnSeqBlk As HspfOpnSeqBlk
+    Dim pHspfCategoryBlk As HspfCategoryBlk
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
-            Return "Open Sequence Block"
+            Return "Edit Category Block"
         End Get
     End Property
 
@@ -39,11 +39,10 @@ Public Class ctlEditOpnSeqBlock
 
     Public Property Data() As Object Implements ctlEdit.Data
         Get
-            Return pHspfOpnSeqBlk
+            Return pHspfCategoryBlk
         End Get
-        Set(ByVal aHspfOpnSeqBlk As Object)
-            pHspfOpnSeqBlk = aHspfOpnSeqBlk
-            txtIndelt.Value = pHspfOpnSeqBlk.Delt
+        Set(ByVal aHspfCategoryBlk As Object)
+            pHspfCategoryBlk = aHspfCategoryBlk
 
             With grdEdit
                 .Source = New atcControls.atcGridSource
@@ -51,19 +50,19 @@ Public Class ctlEditOpnSeqBlock
                 .AllowHorizontalScrolling = False
                 .AllowNewValidValues = True
                 .Visible = True
-                .ColumnWidth(0) = 200
-                .ColumnWidth(1) = 200
+                .ColumnWidth(0) = 175
+                .ColumnWidth(1) = 225
             End With
 
             With grdEdit.Source
                 .Columns = 2
-                .Rows = pHspfOpnSeqBlk.Opns.Count
-                .CellValue(0, 0) = "Name"
-                .CellValue(0, 1) = "Number"
+                .Rows = pHspfCategoryBlk.Categories.Count
+                .CellValue(0, 0) = "Tag"
+                .CellValue(0, 1) = "Name"
 
                 For lRow As Integer = 1 To .Rows - 1
-                    .CellValue(lRow, 0) = pHspfOpnSeqBlk.Opn(lRow).Name
-                    .CellValue(lRow, 1) = pHspfOpnSeqBlk.Opn(lRow).Id
+                    .CellValue(lRow, 0) = pHspfCategoryBlk.Categories(lRow).Name
+                    .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow).Tag
                 Next
 
                 For lCol As Integer = 0 To .Columns - 1
@@ -91,7 +90,6 @@ Public Class ctlEditOpnSeqBlock
 
     Public Sub Save() Implements ctlEdit.Save
 
-        pHspfOpnSeqBlk.Delt = txtIndelt.Value
         'TODO: Open the Add Dialog
         'With grdEdit.Source
         '    Logger.Dbg("EditOpnSeqBlocK:Save:RowCount:" & .Rows)
@@ -103,7 +101,7 @@ Public Class ctlEditOpnSeqBlock
         'pChanged = False
     End Sub
 
-    Public Sub New(ByVal aHspfGOpnSeqBlk As Object, ByVal aParent As Windows.Forms.Form)
+    Public Sub New(ByVal aHspfCategoryBlk As Object, ByVal aParent As Windows.Forms.Form)
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -111,7 +109,6 @@ Public Class ctlEditOpnSeqBlock
         ' Add any initialization after the InitializeComponent() call.
         grdEdit.Source = New atcGridSource
 
-        Data = aHspfGOpnSeqBlk
+        Data = aHspfCategoryBlk
     End Sub
-
 End Class

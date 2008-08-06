@@ -30,7 +30,7 @@ Public Class UCIForms
                 Dim lEditOpnSeqBlock As New ctlEditOpnSeqBlock(aObject, aParent)
                 lFormEdit.Text = lEditOpnSeqBlock.Caption
                 lFormEdit.EditControl = lEditOpnSeqBlock
-                lFormEdit.AddRemoveFlag = False
+                lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
             Case "HspfFtable"
                 Dim lFormEdit As New frmEdit(aParent)
@@ -44,6 +44,13 @@ Public Class UCIForms
                 Dim lEditConnections As New ctlEditConnections(aObject, aParent, aTag)
                 lFormEdit.Text = lEditConnections.Caption
                 lFormEdit.EditControl = lEditConnections
+                lFormEdit.AddRemoveFlag = True
+                lForm = lFormEdit
+            Case "HspfCategoryBlk"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditCategory As New ctlEditCategory(aObject, aParent)
+                lFormEdit.Text = lEditCategory.Caption
+                lFormEdit.EditControl = lEditCategory
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
             Case Else

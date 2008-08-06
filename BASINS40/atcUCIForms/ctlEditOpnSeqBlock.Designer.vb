@@ -23,6 +23,7 @@ Partial Class ctlEditOpnSeqBlock
         Me.Label2 = New System.Windows.Forms.Label
         Me.txtIndelt = New atcControls.atcText
         Me.grdEdit = New atcControls.atcGrid
+        Me.Button1 = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'Label1
@@ -78,10 +79,20 @@ Partial Class ctlEditOpnSeqBlock
         Me.grdEdit.Source = Nothing
         Me.grdEdit.TabIndex = 0
         '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(263, 17)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(113, 24)
+        Me.Button1.TabIndex = 4
+        Me.Button1.Text = "Button1"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'ctlEditOpnSeqBlock
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.txtIndelt)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
@@ -97,5 +108,6 @@ Partial Class ctlEditOpnSeqBlock
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents txtIndelt As atcControls.atcText
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 
 End Class
