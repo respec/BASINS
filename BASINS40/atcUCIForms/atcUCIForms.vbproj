@@ -103,6 +103,12 @@
     <Compile Include="ctlEditFTables.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ctlEditConnections.Designer.vb">
+      <DependentUpon>ctlEditConnections.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditConnections.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ctlEditFilesBlock.resx">
@@ -134,6 +140,10 @@
     <EmbeddedResource Include="ctlEditFTables.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditFTables.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlEditConnections.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlEditConnections.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@ Imports MapWinUtility
 Public Class UCIForms
 
     Public Shared Function Edit(ByVal aParent As Windows.Forms.Form, _
-                                ByVal aObject As Object) As Boolean
+                                ByVal aObject As Object, Optional ByVal aTag As String = "") As Boolean
         Dim lForm As Windows.Forms.Form
 
         Select Case aObject.GetType.Name
@@ -31,6 +31,13 @@ Public Class UCIForms
                 lFormEdit.Text = lEditFTables.Caption
                 lFormEdit.EditControl = lEditFTables
                 lFormEdit.AddRemoveFlag = False
+                lForm = lFormEdit
+            Case "HspfConnection"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditConnections As New ctlEditConnections(aObject, aParent, aTag)
+                lFormEdit.Text = lEditConnections.Caption
+                lFormEdit.EditControl = lEditConnections
+                lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
             Case Else
                 lForm = Nothing

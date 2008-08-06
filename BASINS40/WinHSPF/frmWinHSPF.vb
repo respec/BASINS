@@ -29,6 +29,10 @@ Public Class frmWinHSPF
 
     End Sub
 
+    Private Sub InputDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InputDataEditorToolStripMenuItem.Click
+        frmInputDataEditor.Show()
+    End Sub
+
     Private Sub SetEditMenu()
         Dim lAddFlag As Boolean
         For Each lBlock As HspfBlockDef In pMsg.BlockDefs
@@ -79,13 +83,13 @@ Public Class frmWinHSPF
             ElseIf lTableName = "MONTH-DATA" Then
 
             ElseIf lTableName = "EXT SOURCES" Then
-
+                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
             ElseIf lTableName = "NETWORK" Then
-
+                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
             ElseIf lTableName = "SCHEMATIC" Then
-
+                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
             ElseIf lTableName = "EXT TARGETS" Then
-
+                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
             ElseIf lTableName = "MASS-LINK" Then
 
             ElseIf lTableName = "SPEC-ACTIONS" Then
@@ -104,4 +108,5 @@ Public Class frmWinHSPF
             'UpdateDetails()
         End If
     End Sub
+
 End Class
