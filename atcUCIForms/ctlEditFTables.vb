@@ -8,7 +8,6 @@ Public Class ctlEditFTables
     Implements ctlEdit
 
     Dim pHspfFtable As HspfFtable
-    Dim pDataSource As atcGridSource
     Dim pChanged As Boolean
     Private PrevListIndex As Long
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
@@ -45,10 +44,6 @@ Public Class ctlEditFTables
 
     Public Sub Save() Implements ctlEdit.Save
         Dim i, j As Integer
-
-        With pDataSource
-            Changed = False
-        End With
 
         pHspfFtable.Nrows = txtNRows.Value
         pHspfFtable.Ncols = txtNCols.Value
@@ -108,7 +103,6 @@ Public Class ctlEditFTables
         units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.emfg
 
         With grdEdit
-            .Source = New atcControls.atcGridSource
             .Clear()
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
@@ -116,7 +110,7 @@ Public Class ctlEditFTables
         End With
 
         With grdEdit.Source
-            .Rows = txtNRows.Value
+            .Rows = txtNRows.Value + 1
             .Columns = txtNCols.Value
             For j = 0 To .Columns - 1
                 .CellEditable(0, j) = False
@@ -147,7 +141,7 @@ Public Class ctlEditFTables
                 Next
             Next
 
-            For i = 1 To .Rows
+            For i = 1 To .Rows - 1
                 .CellValue(i, 0) = pHspfFtable.Depth(i)
                 .CellValue(i, 1) = pHspfFtable.Area(i)
                 .CellValue(i, 2) = pHspfFtable.Volume(i)
@@ -181,7 +175,7 @@ Public Class ctlEditFTables
         units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.emfg
 
         With grdEdit.Source
-            .Rows = txtNRows.Value
+            .Rows = txtNRows.Value + 1
             .Columns = txtNCols.Value
             For j = 3 To .Columns - 1
                 If units = 1 Then
@@ -212,7 +206,7 @@ Public Class ctlEditFTables
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        pDataSource = New atcGridSource
+        grdEdit.Source = New atcGridSource
 
         Data = aHspfFtables
     End Sub
@@ -258,28 +252,6 @@ Public Class ctlEditFTables
         End If
         PrevListIndex = cboID.SelectedIndex
     End Sub
-    Public Sub UpdateFTABLE(ByVal aFtab As HspfFtable)
-        Dim i As Long
-        Dim j As Long
 
-        txtNRows.Value = aFtab.Nrows
-        txtNCols.Value = aFtab.Ncols
-        With grdEdit.Source
-            .Rows = txtNRows.Value
-            .Columns = txtNCols.Value
-            For j = 0 To .Columns - 1
-                For i = 1 To .Rows - 1
-                    .CellEditable(i, j) = True
-                Next i
-            Next j
-            For i = 1 To .Rows
-                .CellValue(i, 0) = aFtab.Depth(i)
-                .CellValue(i, 1) = aFtab.Area(i)
-                .CellValue(i, 2) = aFtab.Volume(i)
-                .CellValue(i, 3) = aFtab.Outflow1(i)
-            Next i
-        End With
-        grdEdit.SizeAllColumnsToContents()
-    End Sub
 End Class
 
