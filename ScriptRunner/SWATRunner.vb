@@ -719,7 +719,7 @@ Module SWATRunner
 
         Dim lHruTimseriesGroup As New atcDataSourceTimeseriesBinary
         lHruTimseriesGroup.Open(IO.Path.Combine(pReportsFolder, "hru.tsbin"))
-        WriteYieldSummary(pReportsFolder, lHruTimseriesGroup.DataSets)
+        WriteYieldSummary(lSubBasin2HUC8, pReportsFolder, lHruTimseriesGroup.DataSets)
 
         Logger.Dbg("SwatPostProcessingDone")
     End Sub
@@ -1187,7 +1187,9 @@ Module SWATRunner
         SaveFileString(aOutputFileName, lSBHuc8.ToString)
     End Sub
 
-    Private Sub WriteYieldSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup)
+    Private Sub WriteYieldSummary(ByVal aSubBasin2huc8 As atcCollection, _
+                                  ByVal aOutputFolder As String, _
+                                  ByVal aTimeseriesGroup As atcDataGroup)
         Dim lCropIds As New atcCollection
         With lCropIds
             .Add("CORN") : .Add("CCCC") : .Add("CSC1") : .Add("CSS1") : .Add("CCS1")
@@ -1211,40 +1213,6 @@ Module SWATRunner
         '                        Space(4) & lTab & _
         '                        "km2".PadLeft(lFieldWidth) & lTab & _
         '                        Space(8).PadLeft(lFieldWidth))
-        Dim lSBDebug As New Text.StringBuilder
-        lSBDebug.AppendLine("SubId" & lTab & _
-                            "Crop" & lTab & _
-                            "Year" & lTab & _
-                            "Area".PadLeft(lFieldWidth) & lTab & _
-                            "UnitYield".PadLeft(lFieldWidth) & lTab & _
-                            "Yield".PadLeft(lFieldWidth))
-        'lSBDebug.AppendLine(Space(5) & lTab & _
-        '                    Space(4).PadLeft(8) & lTab & _
-        '                    Space(4) & lTab & _
-        '                    "km2".PadLeft(lFieldWidth) & lTab & _
-        '                    "kg/ha".PadLeft(lFieldWidth) & lTab & _
-        '                    "kg".PadLeft(lFieldWidth))
-        Dim lSBAnnual As New Text.StringBuilder
-        lSBAnnual.AppendLine("SubId" & lTab & _
-                             "Year" & lTab & _
-                             "Area".PadLeft(lFieldWidth) & lTab & _
-                             "CornArea".PadLeft(lFieldWidth) & lTab & _
-                             "%".PadLeft(lFieldWidth) & lTab & _
-                             "UnitYield".PadLeft(lFieldWidth) & lTab & _
-                             "Yield".PadLeft(lFieldWidth))
-        Dim lSBAverage As New Text.StringBuilder
-        lSBAverage.AppendLine("SubId" & lTab & _
-                              "Area".PadLeft(lFieldWidth) & lTab & _
-                              "CornArea".PadLeft(lFieldWidth) & lTab & _
-                              "%".PadLeft(lFieldWidth) & lTab & _
-                              "UnitYield".PadLeft(lFieldWidth) & lTab & _
-                              "Yield".PadLeft(lFieldWidth))
-        Dim lSBTotal As New Text.StringBuilder
-        lSBTotal.AppendLine("Area".PadLeft(lFieldWidth) & lTab & _
-                            "CornArea".PadLeft(lFieldWidth) & lTab & _
-                            "%".PadLeft(lFieldWidth) & lTab & _
-                            "UnitYield".PadLeft(lFieldWidth) & lTab & _
-                            "Yield".PadLeft(lFieldWidth))
 
         Dim lAreaGroup As atcDataGroup = aTimeseriesGroup.FindData("Constituent", "AREA")
         Dim lSubIds As atcCollection = lAreaGroup.SortedAttributeValues("SubId")
@@ -1287,10 +1255,42 @@ Module SWATRunner
         J2Date(lTimserBase.Dates.Value(0), lDateBase)
         Dim lNumValues As Integer = lTimserBase.numValues
 
+        Dim lSBDebug As New Text.StringBuilder
+        lSBDebug.AppendLine("SubId" & lTab & _
+                            "Crop" & lTab & _
+                            "Year" & lTab & _
+                            "Area".PadLeft(lFieldWidth) & lTab & _
+                            "UnitYield".PadLeft(lFieldWidth) & lTab & _
+                            "Yield".PadLeft(lFieldWidth))
+        'lSBDebug.AppendLine(Space(5) & lTab & _
+        '                    Space(4).PadLeft(8) & lTab & _
+        '                    Space(4) & lTab & _
+        '                    "km2".PadLeft(lFieldWidth) & lTab & _
+        '                    "kg/ha".PadLeft(lFieldWidth) & lTab & _
+        '                    "kg".PadLeft(lFieldWidth))
+        Dim lSBAverage As New Text.StringBuilder
+        lSBAverage.AppendLine("SubId" & lTab _
+                            & "HUC8" & lTab _
+                            & "Area".PadLeft(lFieldWidth) & lTab _
+                            & "CornArea".PadLeft(lFieldWidth) & lTab _
+                            & "%".PadLeft(lFieldWidth) & lTab _
+                            & "UnitYield".PadLeft(lFieldWidth) & lTab _
+                            & "Yield".PadLeft(lFieldWidth))
+        Dim lSBAnnual As New Text.StringBuilder
+        lSBAnnual.AppendLine("SubId" & lTab _
+                           & "HUC8" & lTab _
+                           & "Year" & lTab _
+                           & "Area".PadLeft(lFieldWidth) & lTab & _
+                             "CornArea".PadLeft(lFieldWidth) & lTab & _
+                             "%".PadLeft(lFieldWidth) & lTab & _
+                             "UnitYield".PadLeft(lFieldWidth) & lTab & _
+                             "Yield".PadLeft(lFieldWidth))
         Dim lAreaAllTotal As Double = 0.0
         Dim lAreaTotal As Double = 0.0
         Dim lYieldTotal As Double = 0.0
+        Dim lYieldSummaryHuc8 As New atcCollection
         For Each lSubId As String In lSubIds
+            Dim lHuc8 As String = aSubBasin2huc8.ItemByKey(lSubId.Trim)
             Dim lSubIdDataGroup As atcDataGroup = lMatchingDataGroup.FindData("SubId", lSubId)
             Dim lLocationIdsInSub As atcCollection = lSubIdDataGroup.SortedAttributeValues("Location")
             Dim lYieldSum As Double = 0.0
@@ -1329,28 +1329,82 @@ Module SWATRunner
                         Logger.Dbg("Problem:" & lLocationIdDataGroup.Count)
                     End If
                 Next
-                lSBAnnual.AppendLine(lSubId.Trim & lTab & _
-                                     lYear & lTab & _
-                                     DecimalAlign(lSubIdArea) & lTab & _
-                                     DecimalAlign(lAreaSub) & lTab & _
-                                     DecimalAlign(100 * lAreaSub / lSubIdArea, , 1) & lTab & _
-                                     DecimalAlign(lYieldSub / lAreaSub) & lTab & _
-                                     DecimalAlign(lYieldSub))
+                lSBAnnual.AppendLine(lSubId.Trim & lTab _
+                                   & lHuc8 & lTab _
+                                   & lYear & lTab _
+                                   & DecimalAlign(lSubIdArea) & lTab _
+                                   & DecimalAlign(lAreaSub) & lTab _
+                                   & DecimalAlign(100 * lAreaSub / lSubIdArea, , 1) & lTab _
+                                   & DecimalAlign(lYieldSub / lAreaSub) & lTab _
+                                   & DecimalAlign(lYieldSub))
                 lYieldSum += lYieldSub
                 lAreaSum += lAreaSub
                 lYear += 1
             Next
             Dim lAreaAvg As Double = lAreaSum / lNumValues
             Dim lYieldAvg As Double = lYieldSum / lNumValues
-            lSBAverage.AppendLine(lSubId.Trim & lTab & _
-                                  DecimalAlign(lSubIdArea) & lTab & _
-                                  DecimalAlign(lAreaAvg) & lTab & _
-                                  DecimalAlign(100 * lAreaAvg / lSubIdArea, , 1) & lTab & _
-                                  DecimalAlign(lYieldAvg / lAreaAvg) & lTab & _
-                                  DecimalAlign(lYieldAvg))
+            Dim lYieldSummary As New YieldSummary
+            With lYieldSummary
+                .Huc = lHuc8
+                .Area = lSubIdArea
+                .AreaCorn = lAreaAvg
+                .Yield = lYieldAvg
+            End With
+            lYieldSummaryHuc8.Add(lHuc8, lYieldSummary)
+            lSBAverage.AppendLine(lSubId.Trim & lTab _
+                                & lHuc8 & lTab _
+                                & DecimalAlign(lSubIdArea) & lTab _
+                                & DecimalAlign(lAreaAvg) & lTab _
+                                & DecimalAlign(100 * lAreaAvg / lSubIdArea, , 1) & lTab _
+                                & DecimalAlign(lYieldAvg / lAreaAvg) & lTab _
+                                & DecimalAlign(lYieldAvg))
             lAreaTotal += lAreaAvg
             lYieldTotal += lYieldAvg
         Next
+
+        'huc4 report
+        Dim lYieldSummaryHuc4 As New atcCollection
+        For Each lYieldSummary8 As YieldSummary In lYieldSummaryHuc8
+            Dim lHuc4 = lYieldSummary8.Huc.Substring(0, 4)
+            Dim lYieldSummary4 As YieldSummary
+            If lYieldSummaryHuc4.IndexFromKey(lHuc4) = -1 Then
+                lYieldSummary4 = New YieldSummary
+                lYieldSummary4.Huc = lHuc4
+                lYieldSummaryHuc4.Add(lHuc4, lYieldSummary4)
+            Else
+                lYieldSummary4 = lYieldSummaryHuc4.ItemByKey(lHuc4)
+            End If
+            With lYieldSummary4
+                .Area += lYieldSummary8.Area
+                .AreaCorn += lYieldSummary8.AreaCorn
+                .Yield += lYieldSummary8.Yield
+            End With
+        Next
+        Dim lSBAverage4 As New Text.StringBuilder
+        lSBAverage4.AppendLine("HUC4" & lTab _
+                             & "Area".PadLeft(lFieldWidth) & lTab _
+                             & "CornArea".PadLeft(lFieldWidth) & lTab _
+                             & "%".PadLeft(lFieldWidth) & lTab _
+                             & "UnitYield".PadLeft(lFieldWidth) & lTab _
+                             & "Yield".PadLeft(lFieldWidth))
+        For Each lYieldSummary As YieldSummary In lYieldSummaryHuc4
+            With lYieldSummary
+                lSBAverage4.AppendLine(.Huc _
+                             & lTab & DecimalAlign(.Area) _
+                             & lTab & DecimalAlign(.AreaCorn) _
+                             & lTab & DecimalAlign(100 * .AreaCorn / .Area, , 1) _
+                             & lTab & DecimalAlign(.Yield / .AreaCorn) _
+                             & lTab & DecimalAlign(.Yield))
+            End With
+        Next
+        SaveFileString(IO.Path.Combine(aOutputFolder, "AverageHuc4.txt"), lSBAverage4.ToString)
+
+        Dim lSBTotal As New Text.StringBuilder
+        lSBTotal.AppendLine("Area".PadLeft(lFieldWidth) & lTab & _
+                            "CornArea".PadLeft(lFieldWidth) & lTab & _
+                            "%".PadLeft(lFieldWidth) & lTab & _
+                            "UnitYield".PadLeft(lFieldWidth) & lTab & _
+                            "Yield".PadLeft(lFieldWidth))
         lSBTotal.AppendLine(DecimalAlign(lAreaAllTotal) & lTab & _
                             DecimalAlign(lAreaTotal) & lTab & _
                             DecimalAlign(100 * lAreaTotal / lAreaAllTotal, , 1) & lTab & _
@@ -1361,6 +1415,12 @@ Module SWATRunner
         SaveFileString(IO.Path.Combine(aOutputFolder, "Average.txt"), lSBAverage.ToString)
         SaveFileString(IO.Path.Combine(aOutputFolder, "Total.txt"), lSBTotal.ToString)
     End Sub
+    Private Class YieldSummary
+        Public Huc As String
+        Public Area As Double
+        Public AreaCorn As Double
+        Public Yield As Double
+    End Class
 End Module
 
 Module SWATArea
