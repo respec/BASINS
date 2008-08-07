@@ -16,6 +16,7 @@ Module HSPFOutputReports
     Private pBaseName As String
     Private pOutputLocations As New atcCollection
     Private pGraphSaveFormat As String
+    Private pGraphAnnual As Boolean = False
 
     Private Sub Initialize()
         pOutputLocations.Clear()
@@ -36,6 +37,7 @@ Module HSPFOutputReports
                 pTestPath = "d:\Basins\modelout\Upatoi"
                 pBaseName = "upatoi"
                 pOutputLocations.Add("R:46")
+                pGraphAnnual = True
             Case "tinley"
                 pTestPath = "c:\test\tinley"
                 pBaseName = "tinley"
@@ -204,22 +206,26 @@ Module HSPFOutputReports
                                                     lExpertSystem.EDateJ, Nothing))
                         lPaneCount = 2
                     End If
-                    'timeseries - arith
-                    lZgc = CreateZgc()
-                    Dim lGrapher As New clsGraphTime(lDataGroup, lZgc)
-                    If lPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
-                    lZgc.SaveIn(lOutFileBase & pGraphSaveFormat)
-                    'timeseries - log
-                    With lZgc.MasterPane.PaneList(lPaneCount - 1)
-                        .YAxis.Type = ZedGraph.AxisType.Log
-                        'ScaleAxis(lDataGroup, .YAxis)
-                        .YAxis.Scale.Max *= 4 'wag!
-                        .YAxis.Scale.MaxAuto = False
-                        .YAxis.Scale.IsUseTenPower = False
-                    End With
-                    lZgc.SaveIn(lOutFileBase & "_log " & pGraphSaveFormat)
-                    lZgc.Dispose()
-                    lGrapher.Dispose()
+
+                    'whole span
+                    GraphTimeseries(lDataGroup, lPaneCount, lOutFileBase)
+                    If pGraphAnnual Then
+                        'years
+                        Dim lSDateJ As Double = lExpertSystem.SDateJ
+                        Dim lDate(5) As Integer
+                        While lSDateJ < lExpertSystem.EDateJ
+                            Dim lEDateJ As Double = TimAddJ(lSDateJ, 6, 1, 1)
+                            Dim lDataGroupYear As New atcDataGroup
+                            For Each lTimeseries As atcTimeseries In lDataGroup
+                                lDataGroupYear.Add(SubsetByDate(lTimeseries, lSDateJ, lEDateJ, Nothing))
+                            Next
+                            J2Date(lSDateJ, lDate)
+                            If lDate(1) <> 1 OrElse lDate(2) <> 1 Then lDate(0) += 1 'non calendar years label with ending year
+                            GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0))
+                            lSDateJ = lEDateJ
+                        End While
+                    End If
+
                     'monthly
                     Dim lMonthDataGroup As New atcDataGroup
                     lMonthDataGroup.Add(Aggregate(lDataGroup.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
@@ -227,7 +233,7 @@ Module HSPFOutputReports
                     If lPaneCount = 2 Then lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
                     lZgc = CreateZgc()
                     lZgc.Width *= 2
-                    lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
+                    Dim lGrapher As New clsGraphTime(lMonthDataGroup, lZgc)
                     If lPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
                     Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(0).XAxis.Scale
                     lDualDateScale.MaxDaysMonthLabeled = 1200
@@ -340,6 +346,28 @@ Module HSPFOutputReports
                 lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
                 "outfiles\")
         End If
+    End Sub
+
+    Sub GraphTimeseries(ByVal aDataGroup As atcDataGroup, _
+                        ByVal aPaneCount As Integer, _
+                        ByVal aOutFileBase As String)
+        'timeseries - arith
+        Dim lZgc As ZedGraphControl
+        lZgc = CreateZgc()
+        Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
+        If aPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+        lZgc.SaveIn(aOutFileBase & pGraphSaveFormat)
+        'timeseries - log
+        With lZgc.MasterPane.PaneList(aPaneCount - 1)
+            .YAxis.Type = ZedGraph.AxisType.Log
+            'ScaleAxis(lDataGroup, .YAxis)
+            .YAxis.Scale.Max *= 4 'wag!
+            .YAxis.Scale.MaxAuto = False
+            .YAxis.Scale.IsUseTenPower = False
+        End With
+        lZgc.SaveIn(aOutFileBase & "_log " & pGraphSaveFormat)
+        lGrapher.Dispose()
+        lZgc.Dispose()
     End Sub
 
     Sub GraphFlowComponents(ByVal aDataGroup As atcDataGroup, _
