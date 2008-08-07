@@ -51,6 +51,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsUCIForms.vb" />
+    <Compile Include="ctlEditCategoryBlock.Designer.vb">
+      <DependentUpon>ctlEditCategoryBlock.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditCategoryBlock.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ctlEditOpnSeqBlock.Designer.vb">
+      <DependentUpon>ctlEditOpnSeqBlock.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditOpnSeqBlock.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ctlEdit.vb" />
     <Compile Include="ctlEditFilesBlock.Designer.vb">
       <DependentUpon>ctlEditFilesBlock.vb</DependentUpon>
@@ -111,6 +123,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ctlEditCategoryBlock.resx">
+      <DependentUpon>ctlEditCategoryBlock.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlEditOpnSeqBlock.resx">
+      <DependentUpon>ctlEditOpnSeqBlock.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ctlEditFilesBlock.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditFilesBlock.vb</DependentUpon>
