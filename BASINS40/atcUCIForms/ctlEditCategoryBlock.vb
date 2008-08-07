@@ -84,7 +84,7 @@ Public Class ctlEditCategory
     End Sub
 
     Public Sub Remove() Implements ctlEdit.Remove
-        'not be needed
+
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
