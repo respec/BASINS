@@ -56,12 +56,12 @@ Public Class ctlEditCategory
 
             With grdEdit.Source
                 .Columns = 2
-                .Rows = pHspfCategoryBlk.Categories.Count
                 .CellValue(0, 0) = "Tag"
                 .CellValue(0, 1) = "Name"
+                .Rows = pHspfCategoryBlk.Categories.Count
                 For lRow As Integer = 1 To .Rows
-                    .CellValue(lRow, 0) = pHspfCategoryBlk.Categories(lRow - 1).Name
-                    .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow - 1).Tag
+                    .CellValue(lRow, 0) = pHspfCategoryBlk.Categories(lRow - 1).Tag
+                    .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow - 1).Name
                 Next
 
                 For lCol As Integer = 0 To .Columns - 1
@@ -88,15 +88,17 @@ Public Class ctlEditCategory
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
-
-        'TODO: Open the Add Dialog
+        'Dim lCategory As atcUCI.HspfCategory
+        'pHspfCategoryBlk.Clear()
         'With grdEdit.Source
         '    Logger.Dbg("EditOpnSeqBlocK:Save:RowCount:" & .Rows)
-        '    For i As Integer = 1 To .Rows - 1
-        '        pHspfOpnSeqBlk.Opn(i).Name = .CellValue(i, 0)
-        '        pHspfOpnSeqBlk.Opn(i).Id = .CellValue(i, 1)
+        '    For i As Integer = 1 To 2
+        '        lCategory.Tag.Length = .CellValue(i, 0)
+        '        lCategory.Name = .CellValue(i, 1)
+        '        pHspfCategoryBlk.Add(lCategory)
         '    Next
         'End With
+        'pHspfCategoryBlk.Edit()
         'pChanged = False
     End Sub
 
