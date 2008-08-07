@@ -576,16 +576,11 @@ Public Class ExpertSystem
             End If
 
             'error in low flow recession
-            Dim lLowFlowRecessionError As Double = Double.NaN
             If Double.IsNaN(pStats(6, 1, lSiteIndex)) Or _
                Double.IsNaN(pStats(6, 2, lSiteIndex)) Then
                 pSites(lSiteIndex).ErrorTerm(2) = Double.NaN
             Else 'okay to calculate this term
                 pSites(lSiteIndex).ErrorTerm(2) = (1.0# - pStats(6, 1, lSiteIndex)) - (1.0# - pStats(6, 2, lSiteIndex))
-                If pStats(6, 2, lSiteIndex) > 0 Then
-                    lLowFlowRecessionError = 100.0# * ((pStats(6, 1, lSiteIndex) - pStats(6, 2, lSiteIndex)) _
-                                               / pStats(6, 2, lSiteIndex))
-                End If
             End If
 
             'summer flow volume
@@ -615,7 +610,6 @@ Public Class ExpertSystem
             pSites(lSiteIndex).ErrorTerm(8) = lSummerStormVolumeError
             pSites(lSiteIndex).ErrorTerm(19) = lWinterStormVolumeError
             pSites(lSiteIndex).ErrorTerm(16) = lAverageStormPeakError
-            pSites(lSiteIndex).ErrorTerm(20) = lLowFlowRecessionError          
         Next lSiteIndex
 
         Dim lStr As String = StatReportAsString(auci)
@@ -867,7 +861,7 @@ Friend Class ErrorCriteria
         pErrorCriteria.Add("E5", New ErrorCriterion("Error in storm volumes (%)", 9))
         pErrorCriteria.Add("E6", New ErrorCriterion("Ratio of interflow to surface runoff (in/in)", 10))
         pErrorCriteria.Add("E7", New ErrorCriterion("Seasonal volume error (%)", 11))
-        pErrorCriteria.Add("E8", New ErrorCriterion("Summer storm volume error (%)", 19))
+        pErrorCriteria.Add("E8", New ErrorCriterion("Summer storm volume error (%)", 18))
         pErrorCriteria.Add("E9", New ErrorCriterion("Multiplier on third and fourth error terms", 14))
         pErrorCriteria.Add("E10", New ErrorCriterion("Percent of flows to use in low-flow recession error", 15))
         pErrorCriteria.Add("E11", New ErrorCriterion("Average storm peak flow error (%)", 12))
@@ -876,10 +870,9 @@ Friend Class ErrorCriteria
         pErrorCriteria.Add("E14", New ErrorCriterion("Error in 25% highest flows (%)", 3))
         pErrorCriteria.Add("E15", New ErrorCriterion("Error in 50% highest flows (%)", 4))
         pErrorCriteria.Add("E16", New ErrorCriterion("Error in average storm peak (%)", 13))
-        pErrorCriteria.Add("E17", New ErrorCriterion("Summer volume error (%)", 17))
-        pErrorCriteria.Add("E18", New ErrorCriterion("Winter volume error (%)", 18))
-        pErrorCriteria.Add("E19", New ErrorCriterion("Winter storm volume error (%)", 20))
-        pErrorCriteria.Add("E20", New ErrorCriterion("Error in baseflow recession (%)", 16))
+        pErrorCriteria.Add("E17", New ErrorCriterion("Summer volume error (%)", 16))
+        pErrorCriteria.Add("E18", New ErrorCriterion("Winter volume error (%)", 17))
+        pErrorCriteria.Add("E19", New ErrorCriterion("Winter storm volume error (%)", 19))
     End Sub
     Public ReadOnly Property Count() As Integer
         Get
