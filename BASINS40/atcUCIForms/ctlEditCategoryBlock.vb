@@ -59,10 +59,9 @@ Public Class ctlEditCategory
                 .Rows = pHspfCategoryBlk.Categories.Count
                 .CellValue(0, 0) = "Tag"
                 .CellValue(0, 1) = "Name"
-
-                For lRow As Integer = 1 To .Rows - 1
-                    .CellValue(lRow, 0) = pHspfCategoryBlk.Categories(lRow).Name
-                    .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow).Tag
+                For lRow As Integer = 1 To .Rows
+                    .CellValue(lRow, 0) = pHspfCategoryBlk.Categories(lRow - 1).Name
+                    .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow - 1).Tag
                 Next
 
                 For lCol As Integer = 0 To .Columns - 1
