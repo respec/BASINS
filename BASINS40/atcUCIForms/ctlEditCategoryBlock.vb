@@ -88,18 +88,17 @@ Public Class ctlEditCategory
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
-        'Dim lCategory As atcUCI.HspfCategory
-        'pHspfCategoryBlk.Clear()
-        'With grdEdit.Source
-        '    Logger.Dbg("EditOpnSeqBlocK:Save:RowCount:" & .Rows)
-        '    For i As Integer = 1 To 2
-        '        lCategory.Tag.Length = .CellValue(i, 0)
-        '        lCategory.Name = .CellValue(i, 1)
-        '        pHspfCategoryBlk.Add(lCategory)
-        '    Next
-        'End With
-        'pHspfCategoryBlk.Edit()
-        'pChanged = False
+        pHspfCategoryBlk.Clear()
+        With grdEdit.Source
+            Logger.Dbg("EditOpnSeqBlocK:Save:RowCount:" & .Rows)
+            For i As Integer = 1 To .Rows - 1
+                Dim lCategory As New HspfCategory
+                lCategory.Tag = .CellValue(i, 0)
+                lCategory.Name = .CellValue(i, 1)
+                pHspfCategoryBlk.Add(lCategory)
+            Next
+        End With
+        pChanged = False
     End Sub
 
     Public Sub New(ByVal aHspfCategoryBlk As Object, ByVal aParent As Windows.Forms.Form)
