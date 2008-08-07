@@ -12,7 +12,7 @@ Public Class ctlEditOpnSeqBlock
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
-            Return "Open Sequence Block"
+            Return "Operation Sequence Block"
         End Get
     End Property
 
@@ -103,7 +103,7 @@ Public Class ctlEditOpnSeqBlock
         'pChanged = False
     End Sub
 
-    Public Sub New(ByVal aHspfGOpnSeqBlk As Object, ByVal aParent As Windows.Forms.Form)
+    Public Sub New(ByVal aHspfOpnSeqBlk As Object, ByVal aParent As Windows.Forms.Form)
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -111,7 +111,7 @@ Public Class ctlEditOpnSeqBlock
         ' Add any initialization after the InitializeComponent() call.
         grdEdit.Source = New atcGridSource
 
-        Data = aHspfGOpnSeqBlk
+        Data = aHspfOpnSeqBlk
     End Sub
 
 End Class
