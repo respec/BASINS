@@ -171,10 +171,6 @@ Module SWATRunner
                 Next
             End If
 
-            If pInputSummarizeChanged Then
-                SummarizeInput(lSwatInput, "Changed")
-            End If
-
             If pCrpFutureColumn > 1 Then
                 Dim lCrpChanges As New atcTableDelimited
                 lCrpChanges.Delimiter = vbTab
@@ -198,11 +194,16 @@ Module SWATRunner
             End If
 
             If pChangeCropAreas Then
-                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10630000 / 247 '247 acres per square kilometer
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10630000 / 247 '2010 12% 247 acres per square kilometer
+                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 13000000 / 247 '2015 12% 247 acres per square kilometer
                 Logger.Dbg("DesiredFutureCornArea = " & lDesiredFutureCornArea)
                 Dim lConvertFractionOfAvailable As Double = (lDesiredFutureCornArea - lTotalAreaCornNow) / (lTotalAreaCornFut - lTotalAreaCornNow)
                 Logger.Dbg("ConvertFractionOfAvailable = " & lConvertFractionOfAvailable)
                 ChangeHRUfractions(lSwatInput, lCropConversions, lCropChangesHruFilename, lConvertFractionOfAvailable)
+            End If
+
+            If pInputSummarizeChanged Then
+                SummarizeInput(lSwatInput, "Changed")
             End If
 
             If IO.File.Exists(pParmChangesTextfile) Then
@@ -215,6 +216,8 @@ Module SWATRunner
 
             If pRunModel Then
                 lSwatInput.SaveAllTextInput()
+                Logger.Dbg("Launching " & pSWATExe & " in " & pOutputFolder)
+                Logger.Flush()
                 LaunchProgram(pSWATExe, pOutputFolder)
             End If
 
@@ -225,6 +228,7 @@ Module SWATRunner
             'back to basins log
             Logger.StartToFile(lLogFileName, True, False, True)
         End If
+        Logger.Msg("SWATRunner finished at " & DateTime.Now)
     End Sub
 
     Private Sub SummarizeInput(ByVal aSwatInput As SwatInput, ByVal aSuffix As String)
@@ -972,17 +976,24 @@ Module SWATRunner
         Dim lBinaryOutputFileName As String = IO.Path.Combine(pReportsFolder, aOutputType & ".tsbin")
         If Not FileExists(lBinaryOutputFileName) OrElse _
           lRunDate > IO.File.GetLastWriteTime(lBinaryOutputFileName) Then
-            Dim lSwatOutput As New atcTimeseriesSWAT.atcTimeseriesSWAT
-            With lSwatOutput
-                .Open(lSwatOutputFileName)
-                Logger.Dbg(aOutputType & "OutputTimserCount " & .DataSets.Count)
-                Dim lDataTarget As New atcDataSourceTimeseriesBinary ' atcDataSourceWDM
-                TryDelete(lBinaryOutputFileName)
-                If lDataTarget.Open(lBinaryOutputFileName, aAttributes) Then
-                    lDataTarget.AddDatasets(.DataSets)
-                    Logger.Dbg("WroteBinaryDatasetsTo" & lBinaryOutputFileName)
-                End If
-            End With
+            If FileExists(lSwatOutputFileName) Then
+                Dim lSwatOutput As New atcTimeseriesSWAT.atcTimeseriesSWAT
+                With lSwatOutput
+                    If .Open(lSwatOutputFileName) Then
+                        Logger.Dbg(aOutputType & "OutputTimserCount " & .DataSets.Count)
+                        Dim lDataTarget As New atcDataSourceTimeseriesBinary ' atcDataSourceWDM
+                        TryDelete(lBinaryOutputFileName)
+                        If lDataTarget.Open(lBinaryOutputFileName, aAttributes) Then
+                            lDataTarget.AddDatasets(.DataSets)
+                            Logger.Dbg("WroteBinaryDatasetsTo" & lBinaryOutputFileName)
+                        End If
+                    Else
+                        Logger.Dbg("UnableToOpen " & lSwatOutputFileName)
+                    End If
+                End With
+            Else
+                Logger.Dbg("Missing " & lSwatOutputFileName & " UnableToWriteBinaryFile")
+            End If
         Else
             Logger.Dbg("UsingExisting " & lBinaryOutputFileName)
         End If
@@ -1452,9 +1463,35 @@ Module SWATArea
         End With
     End Function
 
+    'Public Function AggregateCrops(ByVal aInputTable As DataTable) As DataTable
+    '    Dim lCornConversions As New CropConversions("CORN")
+    '    Dim lSoybConversions As New CropConversions("SOYB")
+    '    Dim lArea As Double = 0.0
+
+    '    Dim lOutputTable As DataTable = aInputTable.Copy
+    '    Dim lCornColumnIndex As Integer = lOutputTable.Columns.Count
+    '    lOutputTable.Columns.Add("CORN")
+    '    Dim lSoybColumnIndex As Integer = lOutputTable.Columns.Count
+    '    lOutputTable.Columns.Add("SOYB")
+
+    '    For Each lRow As DataRow In lOutputTable.Rows
+    '        lRow(lCornColumnIndex) = 0.0
+    '        lRow(lSoybColumnIndex) = 0.0
+    '        For lColumnIndex As Integer = 2 To lOutputTable.Columns.Count - 2
+    '            Dim lColumnName As String = lOutputTable.Columns(lColumnIndex).ColumnName
+    '            If lCornConversions.Contains(lColumnName) Then
+    '                lRow(lCornColumnIndex) += CDbl(lRow(lColumnIndex)) * lCornConversions.Item(lColumnName).Fraction
+    '            End If
+    '            If lSoybConversions.Contains(lColumnName) Then
+    '                lRow(lSoybColumnIndex) += CDbl(lRow(lColumnIndex)) * lSoybConversions.Item(lColumnName).Fraction
+    '            End If
+    '        Next
+    '    Next
+    '    Return lOutputTable
+    'End Function
+
     Public Function AggregateCrops(ByVal aInputTable As DataTable) As DataTable
-        Dim lCornConversions As New CropConversions("CORN")
-        Dim lSoybConversions As New CropConversions("SOYB")
+        Dim lCropConversions As New CropConversions("CORN")
         Dim lArea As Double = 0.0
 
         Dim lOutputTable As DataTable = aInputTable.Copy
@@ -1468,16 +1505,60 @@ Module SWATArea
             lRow(lSoybColumnIndex) = 0.0
             For lColumnIndex As Integer = 2 To lOutputTable.Columns.Count - 2
                 Dim lColumnName As String = lOutputTable.Columns(lColumnIndex).ColumnName
-                If lCornConversions.Contains(lColumnName) Then
-                    lRow(lCornColumnIndex) += CDbl(lRow(lColumnIndex)) * lCornConversions.Item(lColumnName).Fraction
-                End If
-                If lSoybConversions.Contains(lColumnName) Then
-                    lRow(lSoybColumnIndex) += CDbl(lRow(lColumnIndex)) * lSoybConversions.Item(lColumnName).Fraction
+                If lCropConversions.Contains(lColumnName) Then
+                    Dim lCropConversion As CropConversion = lCropConversions.Item(lColumnName)
+                    lArea = lRow(lColumnIndex)
+                    lRow(lCornColumnIndex) += lArea * lCropConversion.Fraction
+                    lRow(lSoybColumnIndex) += lArea * (1 - lCropConversion.Fraction)
                 End If
             Next
         Next
         Return lOutputTable
     End Function
+
+    'TODO: fix soybeans!
+
+    'Friend Class CropConversions
+    '    Inherits KeyedCollection(Of String, CropConversion)
+    '    Protected Overrides Function GetKeyForItem(ByVal aParm As CropConversion) As String
+    '        Return aParm.Name
+    '    End Function
+
+    '    Public Sub New(ByVal aCropToName As String)
+    '        Select Case aCropToName
+    '            Case "CRP"
+    '                Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
+    '                Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
+    '                Me.Add(New CropConversion("HAY", 0.0, "CRP"))
+    '                Me.Add(New CropConversion("PAST", 0.0, "CRP"))
+    '                Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
+    '                Me.Add(New CropConversion("CRP", 1.0, "CRP"))
+    '            Case "CORN"
+    '                'NOTE: do not remove or comment out lines, just edit the list of what can be converted to
+    '                'All crops that include corn must be included here for area summary report to work
+    '                Me.Add(New CropConversion("CCCC", 1.0, "CCCC"))
+    '                Me.Add(New CropConversion("CCS1", 0.66667, "CCCC"))
+    '                Me.Add(New CropConversion("CSC1", 0.5, "CCCC"))
+    '                Me.Add(New CropConversion("CSS1", 0.33333, "CCCC"))
+    '                Me.Add(New CropConversion("SCC1", 0.66667, "CCCC"))
+    '                Me.Add(New CropConversion("SCS1", 0.5, "CCCC"))
+    '                Me.Add(New CropConversion("SSC1", 0.33333, "CCCC"))
+    '                Me.Add(New CropConversion("SSSC", 0.0))
+    '                Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
+    '                Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
+    '                Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
+    '            Case "SOYB"
+    '                'All crops that include soybeans must be included here for area summary report to work
+    '                Me.Add(New CropConversion("CCS1", 0.33333))
+    '                Me.Add(New CropConversion("CSC1", 0.5))
+    '                Me.Add(New CropConversion("CSS1", 0.66667))
+    '                Me.Add(New CropConversion("SCC1", 0.33333))
+    '                Me.Add(New CropConversion("SCS1", 0.5))
+    '                Me.Add(New CropConversion("SSC1", 0.66667))
+    '                Me.Add(New CropConversion("SSSC", 1.0))
+    '        End Select
+    '    End Sub
+    'End Class
 
     Friend Class CropConversions
         Inherits KeyedCollection(Of String, CropConversion)
@@ -1486,38 +1567,27 @@ Module SWATArea
         End Function
 
         Public Sub New(ByVal aCropToName As String)
-            Select Case aCropToName
-                Case "CRP"
-                    Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
-                    Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
-                    Me.Add(New CropConversion("HAY", 0.0, "CRP"))
-                    Me.Add(New CropConversion("PAST", 0.0, "CRP"))
-                    Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
-                    Me.Add(New CropConversion("CRP", 1.0, "CRP"))
-                Case "CORN"
-                    'NOTE: do not remove or comment out lines, just edit the list of what can be converted to
-                    'All crops that include corn must be included here for area summary report to work
-                    Me.Add(New CropConversion("CCCC", 1.0, "CCCC"))
-                    Me.Add(New CropConversion("CCS1", 0.66667, "CCCC"))
-                    Me.Add(New CropConversion("CSC1", 0.5, "CCCC"))
-                    Me.Add(New CropConversion("CSS1", 0.33333, "CCCC"))
-                    Me.Add(New CropConversion("SCC1", 0.66667, "CCCC"))
-                    Me.Add(New CropConversion("SCS1", 0.5, "CCCC"))
-                    Me.Add(New CropConversion("SSC1", 0.33333, "CCCC"))
-                    Me.Add(New CropConversion("SSSC", 0.0))
-                    Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
-                    Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
-                    Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
-                Case "SOYB"
-                    'All crops that include soybeans must be included here for area summary report to work
-                    Me.Add(New CropConversion("CCS1", 0.33333))
-                    Me.Add(New CropConversion("CSC1", 0.5))
-                    Me.Add(New CropConversion("CSS1", 0.66667))
-                    Me.Add(New CropConversion("SCC1", 0.33333))
-                    Me.Add(New CropConversion("SCS1", 0.5))
-                    Me.Add(New CropConversion("SSC1", 0.66667))
-                    Me.Add(New CropConversion("SSSC", 1.0))
-            End Select
+            If aCropToName = "CRP" Then
+                Me.Add(New CropConversion("AGRR", 0.0, "CRP"))
+                Me.Add(New CropConversion("ALFA", 0.0, "CRP"))
+                Me.Add(New CropConversion("HAY", 0.0, "CRP"))
+                Me.Add(New CropConversion("PAST", 0.0, "CRP"))
+                Me.Add(New CropConversion("RNGE", 0.0, "CRP"))
+                Me.Add(New CropConversion("CRP", 1.0, "CRP"))
+            ElseIf aCropToName = "CORN" Then
+                '"CCCC", "CCS1", "SCC1", "CSC1", "SCS1", "CSS1", "SSC1"
+                Me.Add(New CropConversion("CCCC", 1.0, "CCCC"))
+                Me.Add(New CropConversion("CCS1", 0.66667, "CCCC"))
+                Me.Add(New CropConversion("CSC1", 0.5, "CCCC")) 'TODO: check
+                Me.Add(New CropConversion("CSS1", 0.33333, "CCCC"))
+                Me.Add(New CropConversion("SCC1", 0.66667, "CCCC"))
+                Me.Add(New CropConversion("SCS1", 0.5, "CCCC"))  'TODO: check
+                Me.Add(New CropConversion("SSC1", 0.33333, "CCCC"))
+                'Me.Add(New CropConversion("SSSC", 0.0, "CCCC"))
+                Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
+                Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
+                Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
+            End If
         End Sub
     End Class
 
