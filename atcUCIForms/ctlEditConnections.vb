@@ -78,14 +78,14 @@ Public Class ctlEditConnections
                 .AllowNewValidValues = True
                 .Visible = True
             End With
-
+            '<<<<<<<<<< NETWORK >>>>>>>>>>
             With grdEdit.Source
                 If pConnectionType = "NETWORK" Then
                     .FixedRows = 1
                     .Columns = 15
 
                     'Size up the columns to total 700 (forcing HIDE column out of visbile range)
-                    Dim lColWidth() As Integer = New Integer(14) {65, 65, 60, 50, 50, 50, 45, 45, 45, 45, 45, 45, 45, 45, 45}
+                    Dim lColWidth() As Integer = New Integer(14) {60, 60, 60, 50, 50, 43, 45, 45, 45, 45, 45, 45, 45, 45, 45}
 
                     For i As Integer = 0 To lColWidth.Length - 1
                         grdEdit.ColumnWidth(i) = lColWidth(i)
@@ -143,6 +143,9 @@ Public Class ctlEditConnections
                             End If
                         Next
                     Next
+
+                    '<<<<<<<<<< SCHEMATIC >>>>>>>>>>
+
                 ElseIf pConnectionType = "SCHEMATIC" Then
                     .FixedRows = 1
                     .Columns = 9
@@ -188,36 +191,42 @@ Public Class ctlEditConnections
                         Next
                     Next
 
-                    For j As Integer = 0 To .Columns - 1
+                    For j As Integer = 0 To 13
                         For k As Integer = 1 To .Rows - 1
                             .CellEditable(k, j) = True
                         Next
                     Next
 
+                    '<<<<<<<<<< EXT SOURCES >>>>>>>>>>
+
                 ElseIf pConnectionType = "EXT SOURCES" Then
                     .FixedRows = 1
                     .Columns = 15
 
-                    grdEdit.ColumnWidth(0) = 115
-                    grdEdit.ColumnWidth(1) = 70
-                    grdEdit.ColumnWidth(2) = 100
-                    grdEdit.ColumnWidth(3) = 115
-                    grdEdit.ColumnWidth(4) = 40
-                    grdEdit.ColumnWidth(5) = 40
-                    grdEdit.ColumnWidth(6) = 40
-                    grdEdit.ColumnWidth(7) = 40
-                    grdEdit.ColumnWidth(8) = 40
+                    'Size up the columns to total 700 (forcing HIDE column out of visbile range)
+                    Dim lColWidth() As Integer = New Integer(14) {68, 45, 60, 50, 50, 50, 45, 45, 45, 45, 45, 45, 45, 45, 45}
+
+                    For i As Integer = 0 To lColWidth.Length - 1
+                        grdEdit.ColumnWidth(i) = lColWidth(i)
+                    Next
 
                     .Rows = 1
                     .CellValue(0, 0) = "VolName"
                     .CellValue(0, 1) = "VolID"
-                    .CellValue(0, 2) = "Area Fact"
-                    .CellValue(0, 3) = "VolName"
-                    .CellValue(0, 4) = "VolId"
-                    .CellValue(0, 5) = "MLId"
-                    .CellValue(0, 6) = "Sub1"
-                    .CellValue(0, 7) = "Sub2"
-                    .CellValue(0, 8) = "Hide"
+                    .CellValue(0, 2) = "MemName"
+                    .CellValue(0, 3) = "QFlag"
+                    .CellValue(0, 4) = "SSystem"
+                    .CellValue(0, 5) = "SgapStr"
+                    .CellValue(0, 6) = "MultFact"
+                    .CellValue(0, 7) = "Tran"
+                    .CellValue(0, 8) = "VolName"
+                    .CellValue(0, 9) = "VolId"
+                    .CellValue(0, 10) = "Group"
+                    .CellValue(0, 11) = "MemName"
+                    .CellValue(0, 12) = "MemSub1"
+                    .CellValue(0, 13) = "MemSub2"
+                    .CellValue(0, 14) = "HIDE"
+
 
                     For lCol As Integer = 0 To .Columns
                         .CellColor(0, lCol) = SystemColors.ControlLight
@@ -227,22 +236,97 @@ Public Class ctlEditConnections
                         lOper = pConnection.Uci.OpnSeqBlock.Opn(i)
                         For j As Integer = 0 To lOper.Sources.Count - 1
                             lConn = lOper.Sources(j)
-                            If lConn.Typ = 3 Then
+                            If lConn.Typ = 1 Then
                                 .Rows += 1
                                 .CellValue(.Rows - 1, 0) = lConn.Source.VolName
                                 .CellValue(.Rows - 1, 1) = lConn.Source.VolId
-                                .CellValue(.Rows - 1, 2) = lConn.MFact
-                                .CellValue(.Rows - 1, 3) = lConn.Target.VolName
-                                .CellValue(.Rows - 1, 4) = lConn.Target.VolId
-                                .CellValue(.Rows - 1, 5) = lConn.MassLink
-                                .CellValue(.Rows - 1, 6) = lConn.Target.MemSub1
-                                .CellValue(.Rows - 1, 7) = lConn.Target.MemSub2
-                                .CellValue(.Rows - 1, 8) = lOper.Comment
+                                .CellValue(.Rows - 1, 2) = lConn.Source.Member
+                                .CellValue(.Rows - 1, 3) = lConn.Source.MemSub1
+                                .CellValue(.Rows - 1, 4) = lConn.Ssystem
+                                .CellValue(.Rows - 1, 5) = lConn.Sgapstrg
+                                .CellValue(.Rows - 1, 6) = lConn.MFact
+                                .CellValue(.Rows - 1, 7) = lConn.Tran
+                                .CellValue(.Rows - 1, 8) = lOper.Name
+                                .CellValue(.Rows - 1, 9) = lOper.Id
+                                .CellValue(.Rows - 1, 10) = lConn.Target.Group
+                                .CellValue(.Rows - 1, 11) = lConn.Target.Member
+                                .CellValue(.Rows - 1, 12) = lConn.Target.MemSub1
+                                .CellValue(.Rows - 1, 13) = lConn.Target.MemSub2
+                                .CellValue(.Rows - 1, 14) = lConn.Comment
                             End If
                         Next
                     Next
 
-                    For j As Integer = 0 To .Columns - 1
+                    For j As Integer = 0 To 13
+                        For k As Integer = 1 To .Rows - 1
+                            .CellEditable(k, j) = True
+                        Next
+                    Next
+
+
+                    '<<<<<<<<<< EXT TARGETS >>>>>>>>>>
+
+                ElseIf pConnectionType = "EXT TARGETS" Then
+                    .FixedRows = 1
+                    .Columns = 16
+
+                    'Size up the columns to total 700 (forcing HIDE column out of visbile range)
+                    Dim lColWidth() As Integer = New Integer(15) {63, 35, 60, 50, 50, 50, 45, 45, 45, 45, 45, 30, 40, 40, 60, 40}
+
+                    For i As Integer = 0 To lColWidth.Length - 1
+                        grdEdit.ColumnWidth(i) = lColWidth(i)
+                    Next
+
+                    .Rows = 1
+                    .CellValue(0, 0) = "VolName"
+                    .CellValue(0, 1) = "VolID"
+                    .CellValue(0, 2) = "Group"
+                    .CellValue(0, 3) = "MemName"
+                    .CellValue(0, 4) = "MemSub1"
+                    .CellValue(0, 5) = "MemSub2"
+                    .CellValue(0, 6) = "MultFact"
+                    .CellValue(0, 7) = "Tran"
+                    .CellValue(0, 8) = "VolName"
+                    .CellValue(0, 9) = "VolId"
+                    .CellValue(0, 10) = "MemName"
+                    .CellValue(0, 11) = "QFlag"
+                    .CellValue(0, 12) = "TSystem"
+                    .CellValue(0, 13) = "AggrStr"
+                    .CellValue(0, 14) = "AmdStr"
+                    .CellValue(0, 15) = "HIDE"
+
+
+                    For lCol As Integer = 0 To .Columns
+                        .CellColor(0, lCol) = SystemColors.ControlLight
+                    Next
+
+                    For i As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opn(i)
+                        For j As Integer = 0 To lOper.Targets.Count - 1
+                            lConn = lOper.Targets(j)
+                            If lConn.Typ = 4 Then
+                                .Rows += 1
+                                .CellValue(.Rows - 1, 0) = lConn.Source.VolName
+                                .CellValue(.Rows - 1, 1) = lConn.Source.VolId
+                                .CellValue(.Rows - 1, 2) = lConn.Source.Group
+                                .CellValue(.Rows - 1, 3) = lConn.Source.Member
+                                .CellValue(.Rows - 1, 4) = lConn.Source.MemSub1
+                                .CellValue(.Rows - 1, 5) = lConn.Source.MemSub2
+                                .CellValue(.Rows - 1, 6) = lConn.MFact
+                                .CellValue(.Rows - 1, 7) = lConn.Tran
+                                .CellValue(.Rows - 1, 8) = lConn.Target.VolName
+                                .CellValue(.Rows - 1, 9) = lConn.Target.VolId
+                                .CellValue(.Rows - 1, 10) = lConn.Target.Member
+                                .CellValue(.Rows - 1, 11) = lConn.Target.MemSub1
+                                .CellValue(.Rows - 1, 12) = lConn.Ssystem
+                                .CellValue(.Rows - 1, 13) = lConn.Sgapstrg
+                                .CellValue(.Rows - 1, 14) = lConn.Amdstrg
+                                .CellValue(.Rows - 1, 15) = lConn.Comment
+                            End If
+                        Next
+                    Next
+
+                    For j As Integer = 0 To 14
                         For k As Integer = 1 To .Rows - 1
                             .CellEditable(k, j) = True
                         Next
