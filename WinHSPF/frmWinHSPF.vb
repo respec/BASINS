@@ -59,46 +59,13 @@ Public Class frmWinHSPF
                        "WinHSPF: Edit Problem")
             'DisableAll(False)
         Else
-            Dim lTableName As String = e.ClickedItem.Text
             If pUCI.MetSegs.Count > 0 Then
                 pUCI.MetSeg2Source()
             End If
             pUCI.Point2Source()
 
-            If lTableName = "GLOBAL" Then
-                UCIForms.Edit(Me, pUCI.GlobalBlock)
-            ElseIf lTableName = "OPN SEQUENCE" Then
-                UCIForms.Edit(Me, pUCI.OpnSeqBlock)
-            ElseIf lTableName = "FILES" Then
-                UCIForms.Edit(Me, pUCI.FilesBlock)
-            ElseIf lTableName = "CATEGORY" Then
-                UCIForms.Edit(Me, pUCI.CategoryBlock)
-            ElseIf lTableName = "FTABLES" Then
-                If pUCI.OpnBlks("RCHRES").Count > 0 Then
-                    UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").Ids(0).FTable)
-                Else
-                    Logger.Message("The current project contains no reaches.", "FTable Editor Problem", _
-                                   MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
-                End If
-            ElseIf lTableName = "MONTH-DATA" Then
+            EditBlock(Me, e.ClickedItem.Text)
 
-            ElseIf lTableName = "EXT SOURCES" Then
-                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
-            ElseIf lTableName = "NETWORK" Then
-                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
-            ElseIf lTableName = "SCHEMATIC" Then
-                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
-            ElseIf lTableName = "EXT TARGETS" Then
-                UCIForms.Edit(Me, pUCI.Connections(0), lTableName)
-            ElseIf lTableName = "MASS-LINK" Then
-
-            ElseIf lTableName = "SPEC-ACTIONS" Then
-
-            Else
-                'DisableAll(True)
-                Logger.Msg("Table/Block " & lTableName & " not found.", MsgBoxStyle.OkOnly, "Edit Problem")
-                'DisableAll(False)
-            End If
             pUCI.Source2MetSeg()
             pUCI.Source2Point()
 

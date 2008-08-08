@@ -2,6 +2,7 @@ Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
+Imports atcUCIForms
 
 Public Class frmInputDataEditor
 
@@ -102,93 +103,65 @@ Public Class frmInputDataEditor
     End Sub
 
     Private Sub TableSelected()
-        '        Dim lTable As HspfTable
-        '        Dim lOpnBlk As HspfOpnBlk
-        '        Dim S$, ilen&, iresp&
-        '        Dim opname$
-        '        Dim lOper As HspfOperation, vOper As Object
-        '        Dim M As String
 
-        '        On Error GoTo notFound
+        Dim lTableName As String = ""
+        On Error GoTo notFound
 
-        '        If treUci.SelectedItem.Children > 0 Then
-        '            'do nothing in this case -- this is not a table name
-        '            Exit Sub
-        '        Else
-        '            'we have selected the table name
-        '            S = treUci.SelectedItem.FullPath
-        '            ilen = InStr(1, S, "\")
-        '            If ilen = 0 Then
-        '                opname = S
-        '            Else
-        '                opname = Mid(S, 1, ilen - 1)
-        '            End If
-        '            tabname = treUci.SelectedItem
-        '        End If
+        If treUci.SelectedNode.Nodes.Count > 0 Then
+            'do nothing in this case -- this is not a table name
+            Exit Sub
+        Else
+            'we have selected the table name
+            Dim lName As String = treUci.SelectedNode.Name
+            Dim lcolonpos = InStr(1, lName, ":")
+            Dim lOperationName As String = ""
+            If lcolonpos > 0 Then
+                lOperationName = Mid(lName, 1, lcolonpos - 1)
+            End If
+            lTableName = Trim(treUci.SelectedNode.Text)
 
-        '        Me.Hide()
-        '        If tabname = "GLOBAL" Then
-        '            myUci.GlobalBlock.Edit()
-        '        ElseIf tabname = "OPN SEQUENCE" Then
-        '            myUci.OpnSeqBlock.Edit()
-        '        ElseIf tabname = "FILES" Then
-        '            myUci.filesblock.Edit()
-        '        ElseIf tabname = "CATEGORY" And Not myUci.categoryblock Is Nothing Then
-        '            myUci.categoryblock.Edit()
-        '        ElseIf tabname = "FTABLES" Then
-        '            myUci.OpnBlks("RCHRES").Ids(1).Ftable.Edit()
-        '        ElseIf tabname = "MONTH-DATA" And Not myUci.MonthData Is Nothing Then
-        '            myUci.MonthData.Edit()
-        '        ElseIf tabname = "EXT SOURCES" Then
-        '            myUci.Connections(1).EditExtSrc()
-        '        ElseIf tabname = "NETWORK" Then
-        '            myUci.Connections(1).EditNetwork()
-        '        ElseIf tabname = "SCHEMATIC" Then
-        '            myUci.Connections(1).EditSchematic()
-        '        ElseIf tabname = "EXT TARGETS" Then
-        '            myUci.Connections(1).EditExtTar()
-        '        ElseIf tabname = "MASS-LINK" Then
-        '            myUci.MassLinks(1).Edit()
-        '        ElseIf tabname = "SPEC-ACTIONS" And Not myUci.SpecialActionBlk Is Nothing Then
-        '            myUci.SpecialActionBlk.Edit()
-        '        Else
-        '            'regular case
-        '            lOpnBlk = myUci.OpnBlks(opname)
-        '            If lOpnBlk.Count > 0 Then
-        '                'check to see if this table exists
-        '                If Not lOpnBlk.TableExists(tabname) Then
-        '                    iresp = myMsgBox.Show("Table " & tabname & " does not exist.  Do you want to add it?", "WinHSPF - Input Data Editor", "+&OK", "&Cancel")
-        '                    If iresp = 1 Then
-        '                        lOpnBlk.AddTableForAll(tabname, opname)
-        '                        setDefaultsForTable(myUci, defUci, opname, tabname)
-        '                        Call SetMissingValuesToDefaults(myUci, defUci)
-        '                        Call BoldActive()
-        '                    End If
-        '                End If
-        '                If lOpnBlk.TableExists(tabname) Then
-        '                    lTable = lOpnBlk.tables(tabname)
-        '                    lTable.Edit()
-        '                    'check for missing tables, add if needed
-        '                    CheckAndAddMissingTables(opname)
-        '                    CheckAndAddMassLinks()
-        '                    Call SetMissingValuesToDefaults(myUci, defUci)
-        '                    Call BoldActive()
-        '                End If
-        '            Else
-        '                myMsgBox.Show("No Operations of this type available", "Edit Problem", "+&Ok")
-        '            End If
-        '        End If
-        '        Me.Show(vbModal)
-        '        Exit Sub
+            If lOperationName.Length = 0 Then
+                EditBlock(Me, lTableName)
+            Else
+                'regular case
+                Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks(lOperationName)
+                If lOpnBlk.Count > 0 Then
+                    'check to see if this table exists
+                    If Not lOpnBlk.TableExists(lTableName) Then
+                        If Logger.Msg("Table " & lTableName & " does not exist.  Do you want to add it?", MsgBoxStyle.YesNo, "WinHSPF - Input Data Editor") = MsgBoxResult.Ok Then
+                            lOpnBlk.AddTableForAll(lTableName, lOperationName)
+                            'setDefaultsForTable(myUci, defUci, opname, tabname)
+                            'SetMissingValuesToDefaults(myUci, defUci)
+                            BoldActive()
+                        End If
+                    End If
+                    If lOpnBlk.TableExists(lTableName) Then
+                        Dim lTable As HspfTable = lOpnBlk.Tables(lTableName)
+                        lTable.Edit()
+                        'check for missing tables, add if needed
+                        'CheckAndAddMissingTables(opname)
+                        'CheckAndAddMassLinks()
+                        'SetMissingValuesToDefaults(myUci, defUci)
+                        BoldActive()
+                    End If
+                Else
+                    Logger.Msg("No Operations of this type available", MsgBoxStyle.OkOnly, "Edit Problem")
+                End If
+            End If
+        End If
+        Exit Sub
 
-        'notFound:
-        '        M = Err.Description
-        '        Err.Clear()
-        '        On Error GoTo 0
-        '        myMsgBox.Show("Table/Block " & tabname & " not found." & vbCrLf & M, "Edit Problem", "+&Ok")
+notFound:
+        Logger.Msg("Table/Block " & lTableName & " not found." & vbCrLf & Err.Description, MsgBoxStyle.OkOnly, "Edit Problem")
     End Sub
 
     Private Sub treUci_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles treUci.DoubleClick
         TableSelected()
+    End Sub
+
+    Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
+        pUCI.Source2MetSeg()
+        pUCI.Source2Point()
+        Me.Dispose()
     End Sub
 End Class
