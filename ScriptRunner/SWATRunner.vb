@@ -615,21 +615,11 @@ Module SWATRunner
 
     Private Sub SummarizeOutputs()
         MkDirPath(IO.Path.GetFullPath(pReportsFolder))
-        Dim lRunDate As Date = IO.File.GetLastWriteTime(IO.Path.Combine(pOutputFolder, "output.rch"))
 
-        Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputRch
-            .Open(IO.Path.Combine(pOutputFolder, "output.rch"))
-            Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
-            WriteDatasets(IO.Path.Combine(pReportsFolder, "rch"), .DataSets)
-        End With
-
-        Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputSub
-            .Open(IO.Path.Combine(pOutputFolder, "output.sub"))
-            Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
-            WriteDatasets(IO.Path.Combine(pReportsFolder, "sub"), .DataSets)
-        End With
+        Dim lOutputRchSwatFileName As String = IO.Path.Combine(pOutputFolder, "output.rch")
+        Dim lRunDate As Date = IO.File.GetLastWriteTime(lOutputRchSwatFileName)
+        WriteBinaryDatasetsIfNeeded("rch")
+        WriteBinaryDatasetsIfNeeded("sub")
 
         Dim lOutputFields As New atcData.atcDataAttributes
         'TODO:add nutrient fields
@@ -641,13 +631,7 @@ Module SWATRunner
         'NSURQkg/haNLATQkg/ha NO3Lkg/haNO3GWkg/ha SOLPkg/ha P_GWkg/ha    W_STRS  TMP_STRS    N_STRS    P_STRS  
         'BIOMt/ha       LAI   YLDt/ha   BACTPct  BACTLPct
         lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
-        Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
-        With lOutputHru
-            '.Open(IO.Path.Combine(pOutputFolder, "tab.hru"), lOutputFields)
-            .Open(IO.Path.Combine(pOutputFolder, "output.hru"), lOutputFields)
-            Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
-            WriteDatasets(IO.Path.Combine(pReportsFolder, "hru"), .DataSets)
-        End With
+        WriteBinaryDatasetsIfNeeded("sub", lOutputFields)
 
         Logger.Dbg("SwatSummaryReports")
         Dim lSubBasinsOutputFileName As String = IO.Path.Combine(pReportsFolder, "SubBasinSummary.txt")
@@ -982,12 +966,25 @@ Module SWATRunner
         Return lHUC8toSubBasin
     End Function
 
-    Private Sub WriteDatasets(ByVal aFileName As String, ByVal aDatasets As atcDataGroup)
-        Dim lDataTarget As New atcDataSourceTimeseriesBinary ' atcDataSourceWDM
-        Dim lFileName As String = aFileName & ".tsbin" 'lDataTarget.Filter.?) Then
-        TryDelete(lFileName)
-        If lDataTarget.Open(lFileName) Then
-            lDataTarget.AddDatasets(aDatasets)
+    Private Sub WriteBinaryDatasetsIfNeeded(ByVal aOutputType As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing)
+        Dim lSwatOutputFileName As String = IO.Path.Combine(pOutputFolder, "output." & aOutputType)
+        Dim lRunDate As Date = IO.File.GetLastWriteTime(lSwatOutputFileName)
+        Dim lBinaryOutputFileName As String = IO.Path.Combine(pReportsFolder, aOutputType & ".tsbin")
+        If Not FileExists(lBinaryOutputFileName) OrElse _
+          lRunDate > IO.File.GetLastWriteTime(lBinaryOutputFileName) Then
+            Dim lSwatOutput As New atcTimeseriesSWAT.atcTimeseriesSWAT
+            With lSwatOutput
+                .Open(lSwatOutputFileName)
+                Logger.Dbg(aOutputType & "OutputTimserCount " & .DataSets.Count)
+                Dim lDataTarget As New atcDataSourceTimeseriesBinary ' atcDataSourceWDM
+                TryDelete(lBinaryOutputFileName)
+                If lDataTarget.Open(lBinaryOutputFileName, aAttributes) Then
+                    lDataTarget.AddDatasets(.DataSets)
+                    Logger.Dbg("WroteBinaryDatasetsTo" & lBinaryOutputFileName)
+                End If
+            End With
+        Else
+            Logger.Dbg("UsingExisting " & lBinaryOutputFileName)
         End If
     End Sub
 
