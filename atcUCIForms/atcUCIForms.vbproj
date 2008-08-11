@@ -51,6 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsUCIForms.vb" />
+    <Compile Include="ctlEditSpecialAction.Designer.vb">
+      <DependentUpon>ctlEditSpecialAction.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditSpecialAction.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ctlEditCategoryBlock.Designer.vb">
       <DependentUpon>ctlEditCategoryBlock.vb</DependentUpon>
     </Compile>
@@ -129,6 +135,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ctlEditSpecialAction.resx">
+      <DependentUpon>ctlEditSpecialAction.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ctlEditCategoryBlock.resx">
       <DependentUpon>ctlEditCategoryBlock.vb</DependentUpon>
       <SubType>Designer</SubType>
