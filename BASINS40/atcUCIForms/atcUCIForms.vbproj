@@ -121,6 +121,12 @@
     <Compile Include="ctlEditConnections.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ctlEditTable.Designer.vb">
+      <DependentUpon>ctlEditTable.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditTable.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ctlEditCategoryBlock.resx">
@@ -164,6 +170,10 @@
     <EmbeddedResource Include="ctlEditConnections.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditConnections.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlEditTable.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlEditTable.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
