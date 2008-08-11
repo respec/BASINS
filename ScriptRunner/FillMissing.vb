@@ -11,7 +11,7 @@ Module FillMissing
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pTestPath)
         'open WDM file
-        Dim lWdmFileName As String = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
+        Dim lWdmFileName As String = System.IO.Path.Combine(pTestPath, pBaseName & ".wdm")
         Dim lWdmDataSource As New atcDataSourceWDM
         lWdmDataSource.Open(lWdmFileName)
 
