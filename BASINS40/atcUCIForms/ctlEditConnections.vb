@@ -334,6 +334,7 @@ Public Class ctlEditConnections
                 End If
             End With
             grdEdit.Refresh()
+
         End Set
     End Property
 
