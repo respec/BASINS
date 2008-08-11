@@ -53,6 +53,7 @@ Public Class frmInputDataEditor
 
         'now bold the ones that are active
         Call BoldActive()
+        treUci.SelectedNode = treUci.Nodes("GLOBAL")  'make the global the selected node
 
     End Sub
 
@@ -137,7 +138,7 @@ Public Class frmInputDataEditor
                     End If
                     If lOpnBlk.TableExists(lTableName) Then
                         Dim lTable As HspfTable = lOpnBlk.Tables(lTableName)
-                        lTable.Edit()
+                        UCIForms.Edit(Me, lTable)
                         'check for missing tables, add if needed
                         'CheckAndAddMissingTables(opname)
                         'CheckAndAddMassLinks()
