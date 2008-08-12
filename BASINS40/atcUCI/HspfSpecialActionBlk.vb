@@ -176,4 +176,20 @@ Public Class HspfSpecialActionBlk
         pUserDefineQuans = New Collection
         pConditions = New Collection
     End Sub
+
+    Public Function HspfSpecialRecordName(ByRef aType As HspfData.HspfSpecialRecordType) As String
+        Dim lRecordName As String
+
+        Select Case aType
+            Case HspfData.HspfSpecialRecordType.hComment : lRecordName = "Comment"
+            Case HspfData.HspfSpecialRecordType.hAction : lRecordName = "Action"
+            Case HspfData.HspfSpecialRecordType.hDistribute : lRecordName = "Distribute"
+            Case HspfData.HspfSpecialRecordType.hUserDefineName : lRecordName = "User Defn Name"
+            Case HspfData.HspfSpecialRecordType.hUserDefineQuan : lRecordName = "User Defn Quan"
+            Case HspfData.HspfSpecialRecordType.hCondition : lRecordName = "Condition"
+            Case Else : lRecordName = "Unknown"
+        End Select
+
+        Return lRecordName
+    End Function
 End Class
