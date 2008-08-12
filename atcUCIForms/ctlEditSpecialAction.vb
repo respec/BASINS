@@ -58,8 +58,7 @@ Public Class ctlEditSpecialAction
 
         With pSpecialActionBlk.Records
             For i = 1 To .Count
-                's = atcUCI.modUciRead.HspfSpecialRecordName(.Item(i).SpecType)
-                s = 3
+                s = pSpecialActionBlk.HspfSpecialRecordName(.Item(i).SpecType)
                 atcgrid0.Source.CellValue(i, 0) = s
                 atcgrid0.Source.CellValue(i, 1) = .Item(i)
             Next

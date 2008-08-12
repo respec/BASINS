@@ -60,6 +60,13 @@ Public Class UCIForms
                 lFormEdit.EditControl = lEditSpecialAction
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
+            Case "HspfTable"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditTable As New ctlEditTable(aObject, aParent)
+                lFormEdit.Text = lEditTable.Caption
+                lFormEdit.EditControl = lEditTable
+                lFormEdit.AddRemoveFlag = False
+                lForm = lFormEdit
             Case Else
                 lForm = Nothing
         End Select
