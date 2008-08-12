@@ -43,9 +43,9 @@
       <HintPath>..\D4EM\Bin\atcUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Interop.ADOX, Version=2.8.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Interop.ADOX, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dev\MapWindow4Dev\Bin\Plugins\SWAT\Interop.ADOX.dll</HintPath>
+      <HintPath>..\D4EM\Bin\Interop.ADOX.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinUtility, Version=1.0.3093.18971, Culture=neutral, processorArchitecture=MSIL">
