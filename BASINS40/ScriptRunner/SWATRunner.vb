@@ -635,7 +635,7 @@ Module SWATRunner
         'NSURQkg/haNLATQkg/ha NO3Lkg/haNO3GWkg/ha SOLPkg/ha P_GWkg/ha    W_STRS  TMP_STRS    N_STRS    P_STRS  
         'BIOMt/ha       LAI   YLDt/ha   BACTPct  BACTLPct
         lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
-        WriteBinaryDatasetsIfNeeded("sub", lOutputFields)
+        WriteBinaryDatasetsIfNeeded("hru", lOutputFields)
 
         Logger.Dbg("SwatSummaryReports")
         Dim lSubBasinsOutputFileName As String = IO.Path.Combine(pReportsFolder, "SubBasinSummary.txt")
@@ -979,7 +979,7 @@ Module SWATRunner
             If FileExists(lSwatOutputFileName) Then
                 Dim lSwatOutput As New atcTimeseriesSWAT.atcTimeseriesSWAT
                 With lSwatOutput
-                    If .Open(lSwatOutputFileName) Then
+                    If .Open(lSwatOutputFileName, aAttributes) Then
                         Logger.Dbg(aOutputType & "OutputTimserCount " & .DataSets.Count)
                         Dim lDataTarget As New atcDataSourceTimeseriesBinary ' atcDataSourceWDM
                         TryDelete(lBinaryOutputFileName)
