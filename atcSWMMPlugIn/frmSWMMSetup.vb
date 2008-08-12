@@ -149,25 +149,52 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+
         'hard code some things to test SWMM classes
+        Dim lSwmmProjectName As String = "TestProject"
+        Dim lStartYear As Integer = 2006
+        Dim lStartMonth As Integer = 10
+        Dim lStartDay As Integer = 24
+        Dim lEndYear As Integer = 2006
+        Dim lEndMonth As Integer = 10
+        Dim lEndDay As Integer = 31
+        Dim lMetShapefileName As String = "C:\basins\data\02060006\met\met.shp"
+        Dim lPrecGageName As String = "MD189070"  'could be multiple?
+        Dim lMetWDMFileName As String = "C:\basins\data\02060006\met\met.wdm"
+        Dim lMetGageName As String = "MD189070"
+        Dim lLandUseGridName As String = "C:\BASINS\data\02060006\NLCD\NLCD_LandCover_2001.tif"
+        'Dim lNodesShapefileName As String = "C:\basins\Predefined Delineations\West Branch\nodes.shp"
+        'Dim lConduitShapefileName As String = "C:\basins\Predefined Delineations\West Branch\conduits.shp"
+        'Dim lCatchmentShapefileName As String = "C:\basins\Predefined Delineations\West Branch\catchments.shp"
+        Dim lNodesShapefileName As String = ""    'test for BASINS type
+        Dim lConduitShapefileName As String = "C:\basins\Predefined Delineations\West Branch\wb_strms.shp"
+        Dim lCatchmentShapefileName As String = "C:\basins\Predefined Delineations\West Branch\wb_subs.shp"
+
         With pPlugIn.SWMMProject
-            .Name = "TestProject"
+            .Name = lSwmmProjectName
             .Title = "SWMM Project Written from BASINS"
             Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
             'TODO: still use modelout?
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
 
+            'add backdrop file
+            .BackdropFile = FilenameSetExt(lSWMMProjectFileName, ".bmp")
+            GisUtil.SaveMapAsImage(.BackdropFile)
+            .BackdropX1 = GisUtil.MapExtentXmin
+            .BackdropY1 = GisUtil.MapExtentYmin
+            .BackdropX2 = GisUtil.MapExtentXmax
+            .BackdropY2 = GisUtil.MapExtentYmax
+
             'set start and end dates
-            .SJDate = MJD(2006, 10, 24)
-            .EJDate = MJD(2006, 10, 31)
+            .SJDate = MJD(lStartYear, lStartMonth, lStartDay)
+            .EJDate = MJD(lEndYear, lEndMonth, lEndDay)
 
             'create rain gages from shapefile and selected station
-            CreateRaingageFromShapefile(lBasinsFolder & "\data\02060006-1\met\met.shp", "MD189070", .RainGages)
+            CreateRaingageFromShapefile(lMetShapefileName, lPrecGageName, .RainGages)
 
             'create met constituents from wdm file and selected station
-            Dim lMetWDMFileName As String = lBasinsFolder & "\data\02060006-1\met\met.wdm"
-            CreateMetConstituent(lMetWDMFileName, "MD189070", "ATEM", .MetConstituents)
-            CreateMetConstituent(lMetWDMFileName, "MD189070", "PEVT", .MetConstituents)
+            CreateMetConstituent(lMetWDMFileName, lMetGageName, "ATEM", .MetConstituents)
+            CreateMetConstituent(lMetWDMFileName, lMetGageName, "PEVT", .MetConstituents)
 
             'populate the SWMM classes from the shapefiles
             .Nodes.Clear()
@@ -176,8 +203,7 @@ Public Class frmSWMMSetup
             Dim lFieldMap As New atcUtility.atcCollection
             Dim lTable As New atcUtility.atcTableDBF
             lFieldMap.Add("ID", "Name")
-            'Dim lNodesShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\nodes.shp"
-            Dim lNodesShapefileName As String = ""    'test for BASINS type
+
             If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
                 .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lFieldMap))
             End If
@@ -192,8 +218,6 @@ Public Class frmSWMMSetup
             lFieldMap.Add("MINEL", "ElevationLow")
             lFieldMap.Add("WID2", "MeanWidth")
             lFieldMap.Add("DEP2", "MeanDepth")
-            'Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\conduits.shp"
-            Dim lConduitShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_strms.shp"
             If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
                 .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lFieldMap), "Name", "C", 1))
             End If
@@ -204,22 +228,13 @@ Public Class frmSWMMSetup
             lFieldMap.Add("SLO1", "Slope")
             lFieldMap.Add("ID", "Name")
             lFieldMap.Add("OutNode", "OutletNodeID")
-            'Dim lCatchmentShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\catchments.shp"
-            Dim lCatchmentShapefileName As String = lBasinsFolder & "\Predefined Delineations\West Branch\wb_subs.shp"
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                 .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lFieldMap))
             End If
             CompleteCatchmentsFromShapefile(lCatchmentShapefileName, pPlugIn.SWMMProject, .Catchments)
 
             'create landuses from nlcd landcover
-            CreateLandusesFromGrid("C:\BASINS\data\02060006-1\NLCD\NLCD_LandCover_2001.tif", lCatchmentShapefileName, .Catchments, .Landuses)
-
-            'add backdrop file
-            .BackdropFile = lBasinsFolder & "\Predefined Delineations\West Branch\wbranch.bmp"
-            .BackdropX1 = 328689.908 'GisUtil.MapExtentXmin
-            .BackdropY1 = 4294938.703 'GisUtil.MapExtentYmin
-            .BackdropX2 = 357258.259 'GisUtil.MapExtentXmax
-            .BackdropY2 = 4319284.185 'GisUtil.MapExtentYmax
+            CreateLandusesFromGrid(lLandUseGridName, lCatchmentShapefileName, .Catchments, .Landuses)
 
             'save project file and start SWMM
             .Save(lSWMMProjectFileName)

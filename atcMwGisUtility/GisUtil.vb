@@ -2415,6 +2415,25 @@ Public Class GisUtil
         aCentroidY = lPt.y
     End Sub
 
+    Public Shared Sub SaveMapAsImage(ByVal aImageFileName As String)
+        Dim lImage As New MapWinGIS.Image
+
+        lImage = CType(GetMappingObject.View.Snapshot(GetMappingObject.View.Extents), MapWinGIS.Image)
+
+        If aImageFileName <> "" Then
+            If Not lImage.Save(aImageFileName, False, MapWinGIS.ImageType.USE_FILE_EXTENSION) Then
+                MapWinUtility.Logger.Msg("There were errors saving the image.", MsgBoxStyle.Exclamation, "Could Not Save")
+                Exit Sub
+            End If
+        End If
+
+        Try
+            lImage.Close()
+            lImage = Nothing
+        Catch ex As Exception
+        End Try
+    End Sub
+
     Public Shared Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer)
         'build a unique values renderer from a given layer and field
 
