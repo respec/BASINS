@@ -61,13 +61,11 @@ Public Class frmSWMMSetup
     Friend WithEvents cboLandUseLayer As System.Windows.Forms.ComboBox
     Friend WithEvents lblLandUseLayer As System.Windows.Forms.Label
     Friend WithEvents TabPage4 As System.Windows.Forms.TabPage
-    Friend WithEvents Label18 As System.Windows.Forms.Label
     Friend WithEvents Label17 As System.Windows.Forms.Label
     Friend WithEvents Label16 As System.Windows.Forms.Label
     Friend WithEvents Label15 As System.Windows.Forms.Label
     Friend WithEvents Label14 As System.Windows.Forms.Label
     Friend WithEvents Label13 As System.Windows.Forms.Label
-    Friend WithEvents cboStream9 As System.Windows.Forms.ComboBox
     Friend WithEvents cboStream8 As System.Windows.Forms.ComboBox
     Friend WithEvents cboStream7 As System.Windows.Forms.ComboBox
     Friend WithEvents cboStream6 As System.Windows.Forms.ComboBox
@@ -98,6 +96,8 @@ Public Class frmSWMMSetup
     Friend WithEvents cboOutlets As System.Windows.Forms.ComboBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
+    Friend WithEvents cboPoint As System.Windows.Forms.ComboBox
+    Friend WithEvents Label19 As System.Windows.Forms.Label
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWMMSetup))
@@ -109,6 +109,8 @@ Public Class frmSWMMSetup
         Me.ofdExisting = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.cboOutlets = New System.Windows.Forms.ComboBox
+        Me.Label5 = New System.Windows.Forms.Label
         Me.cboMet = New System.Windows.Forms.ComboBox
         Me.Label9 = New System.Windows.Forms.Label
         Me.cboStreams = New System.Windows.Forms.ComboBox
@@ -129,13 +131,11 @@ Public Class frmSWMMSetup
         Me.cboLandUseLayer = New System.Windows.Forms.ComboBox
         Me.lblLandUseLayer = New System.Windows.Forms.Label
         Me.TabPage4 = New System.Windows.Forms.TabPage
-        Me.Label18 = New System.Windows.Forms.Label
         Me.Label17 = New System.Windows.Forms.Label
         Me.Label16 = New System.Windows.Forms.Label
         Me.Label15 = New System.Windows.Forms.Label
         Me.Label14 = New System.Windows.Forms.Label
         Me.Label13 = New System.Windows.Forms.Label
-        Me.cboStream9 = New System.Windows.Forms.ComboBox
         Me.cboStream8 = New System.Windows.Forms.ComboBox
         Me.cboStream7 = New System.Windows.Forms.ComboBox
         Me.cboStream6 = New System.Windows.Forms.ComboBox
@@ -154,6 +154,9 @@ Public Class frmSWMMSetup
         Me.cboSub1 = New System.Windows.Forms.ComboBox
         Me.Label8 = New System.Windows.Forms.Label
         Me.Label7 = New System.Windows.Forms.Label
+        Me.TabPage5 = New System.Windows.Forms.TabPage
+        Me.cboPoint = New System.Windows.Forms.ComboBox
+        Me.Label19 = New System.Windows.Forms.Label
         Me.TabPage6 = New System.Windows.Forms.TabPage
         Me.Label22 = New System.Windows.Forms.Label
         Me.AtcGridMet = New atcControls.atcGrid
@@ -163,14 +166,12 @@ Public Class frmSWMMSetup
         Me.cmdSelectWDM = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
-        Me.cboOutlets = New System.Windows.Forms.ComboBox
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.TabPage5 = New System.Windows.Forms.TabPage
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage4.SuspendLayout()
         Me.TabPage3.SuspendLayout()
+        Me.TabPage5.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -241,8 +242,8 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Controls.Add(Me.TabPage2)
-        Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage3)
+        Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Controls.Add(Me.TabPage6)
         Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
@@ -275,6 +276,28 @@ Public Class frmSWMMSetup
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'cboOutlets
+        '
+        Me.cboOutlets.AllowDrop = True
+        Me.cboOutlets.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboOutlets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboOutlets.Location = New System.Drawing.Point(168, 228)
+        Me.cboOutlets.Name = "cboOutlets"
+        Me.cboOutlets.Size = New System.Drawing.Size(339, 25)
+        Me.cboOutlets.TabIndex = 14
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label5.Location = New System.Drawing.Point(11, 231)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(93, 17)
+        Me.Label5.TabIndex = 13
+        Me.Label5.Text = "Nodes Layer:"
         '
         'cboMet
         '
@@ -487,13 +510,11 @@ Public Class frmSWMMSetup
         '
         'TabPage4
         '
-        Me.TabPage4.Controls.Add(Me.Label18)
         Me.TabPage4.Controls.Add(Me.Label17)
         Me.TabPage4.Controls.Add(Me.Label16)
         Me.TabPage4.Controls.Add(Me.Label15)
         Me.TabPage4.Controls.Add(Me.Label14)
         Me.TabPage4.Controls.Add(Me.Label13)
-        Me.TabPage4.Controls.Add(Me.cboStream9)
         Me.TabPage4.Controls.Add(Me.cboStream8)
         Me.TabPage4.Controls.Add(Me.cboStream7)
         Me.TabPage4.Controls.Add(Me.cboStream6)
@@ -512,17 +533,9 @@ Public Class frmSWMMSetup
         Me.TabPage4.Text = "Conduits"
         Me.TabPage4.UseVisualStyleBackColor = True
         '
-        'Label18
-        '
-        Me.Label18.Location = New System.Drawing.Point(72, 292)
-        Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(152, 23)
-        Me.Label18.TabIndex = 23
-        Me.Label18.Text = "Stream Name Field:"
-        '
         'Label17
         '
-        Me.Label17.Location = New System.Drawing.Point(72, 260)
+        Me.Label17.Location = New System.Drawing.Point(71, 259)
         Me.Label17.Name = "Label17"
         Me.Label17.Size = New System.Drawing.Size(168, 23)
         Me.Label17.TabIndex = 22
@@ -530,7 +543,7 @@ Public Class frmSWMMSetup
         '
         'Label16
         '
-        Me.Label16.Location = New System.Drawing.Point(72, 227)
+        Me.Label16.Location = New System.Drawing.Point(71, 227)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(168, 23)
         Me.Label16.TabIndex = 21
@@ -538,44 +551,34 @@ Public Class frmSWMMSetup
         '
         'Label15
         '
-        Me.Label15.Location = New System.Drawing.Point(72, 195)
+        Me.Label15.Location = New System.Drawing.Point(71, 195)
         Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(152, 23)
+        Me.Label15.Size = New System.Drawing.Size(194, 23)
         Me.Label15.TabIndex = 20
-        Me.Label15.Text = "Depth Field (meters):"
+        Me.Label15.Text = "Mean Depth Field (meters):"
         '
         'Label14
         '
-        Me.Label14.Location = New System.Drawing.Point(72, 164)
+        Me.Label14.Location = New System.Drawing.Point(71, 162)
         Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(152, 23)
+        Me.Label14.Size = New System.Drawing.Size(178, 23)
         Me.Label14.TabIndex = 19
-        Me.Label14.Text = "Width Field (meters):"
+        Me.Label14.Text = "Mean Width Field (meters):"
         '
         'Label13
         '
-        Me.Label13.Location = New System.Drawing.Point(72, 132)
+        Me.Label13.Location = New System.Drawing.Point(71, 131)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(152, 23)
         Me.Label13.TabIndex = 18
-        Me.Label13.Text = "Slope Field (percent):"
-        '
-        'cboStream9
-        '
-        Me.cboStream9.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboStream9.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream9.Location = New System.Drawing.Point(248, 288)
-        Me.cboStream9.Name = "cboStream9"
-        Me.cboStream9.Size = New System.Drawing.Size(166, 25)
-        Me.cboStream9.TabIndex = 17
+        Me.Label13.Text = "Outlet Node ID Field:"
         '
         'cboStream8
         '
         Me.cboStream8.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream8.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream8.Location = New System.Drawing.Point(248, 256)
+        Me.cboStream8.Location = New System.Drawing.Point(271, 256)
         Me.cboStream8.Name = "cboStream8"
         Me.cboStream8.Size = New System.Drawing.Size(166, 25)
         Me.cboStream8.TabIndex = 16
@@ -585,7 +588,7 @@ Public Class frmSWMMSetup
         Me.cboStream7.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream7.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream7.Location = New System.Drawing.Point(248, 224)
+        Me.cboStream7.Location = New System.Drawing.Point(271, 224)
         Me.cboStream7.Name = "cboStream7"
         Me.cboStream7.Size = New System.Drawing.Size(166, 25)
         Me.cboStream7.TabIndex = 15
@@ -595,7 +598,7 @@ Public Class frmSWMMSetup
         Me.cboStream6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream6.Location = New System.Drawing.Point(248, 192)
+        Me.cboStream6.Location = New System.Drawing.Point(271, 192)
         Me.cboStream6.Name = "cboStream6"
         Me.cboStream6.Size = New System.Drawing.Size(166, 25)
         Me.cboStream6.TabIndex = 14
@@ -605,7 +608,7 @@ Public Class frmSWMMSetup
         Me.cboStream5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream5.Location = New System.Drawing.Point(248, 160)
+        Me.cboStream5.Location = New System.Drawing.Point(271, 160)
         Me.cboStream5.Name = "cboStream5"
         Me.cboStream5.Size = New System.Drawing.Size(166, 25)
         Me.cboStream5.TabIndex = 13
@@ -615,7 +618,7 @@ Public Class frmSWMMSetup
         Me.cboStream4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream4.Location = New System.Drawing.Point(248, 128)
+        Me.cboStream4.Location = New System.Drawing.Point(271, 128)
         Me.cboStream4.Name = "cboStream4"
         Me.cboStream4.Size = New System.Drawing.Size(166, 25)
         Me.cboStream4.TabIndex = 12
@@ -625,7 +628,7 @@ Public Class frmSWMMSetup
         Me.cboStream3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream3.Location = New System.Drawing.Point(248, 96)
+        Me.cboStream3.Location = New System.Drawing.Point(271, 96)
         Me.cboStream3.Name = "cboStream3"
         Me.cboStream3.Size = New System.Drawing.Size(166, 25)
         Me.cboStream3.TabIndex = 11
@@ -635,7 +638,7 @@ Public Class frmSWMMSetup
         Me.cboStream2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream2.Location = New System.Drawing.Point(248, 63)
+        Me.cboStream2.Location = New System.Drawing.Point(271, 63)
         Me.cboStream2.Name = "cboStream2"
         Me.cboStream2.Size = New System.Drawing.Size(166, 25)
         Me.cboStream2.TabIndex = 10
@@ -645,34 +648,34 @@ Public Class frmSWMMSetup
         Me.cboStream1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream1.Location = New System.Drawing.Point(248, 32)
+        Me.cboStream1.Location = New System.Drawing.Point(271, 32)
         Me.cboStream1.Name = "cboStream1"
         Me.cboStream1.Size = New System.Drawing.Size(166, 25)
         Me.cboStream1.TabIndex = 9
         '
         'Label10
         '
-        Me.Label10.Location = New System.Drawing.Point(72, 99)
+        Me.Label10.Location = New System.Drawing.Point(71, 99)
         Me.Label10.Name = "Label10"
         Me.Label10.Size = New System.Drawing.Size(152, 23)
         Me.Label10.TabIndex = 8
-        Me.Label10.Text = "Length Field (meters):"
+        Me.Label10.Text = "Inlet Node ID Field:"
         '
         'Label11
         '
-        Me.Label11.Location = New System.Drawing.Point(72, 67)
+        Me.Label11.Location = New System.Drawing.Point(71, 67)
         Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(152, 23)
+        Me.Label11.Size = New System.Drawing.Size(194, 23)
         Me.Label11.TabIndex = 7
-        Me.Label11.Text = "Downstream ID Field:"
+        Me.Label11.Text = "Downstream Conduit ID Field:"
         '
         'Label12
         '
-        Me.Label12.Location = New System.Drawing.Point(72, 36)
+        Me.Label12.Location = New System.Drawing.Point(71, 35)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(152, 23)
         Me.Label12.TabIndex = 6
-        Me.Label12.Text = "Subbasin ID Field:"
+        Me.Label12.Text = "Name/ID Field:"
         '
         'TabPage3
         '
@@ -705,7 +708,7 @@ Public Class frmSWMMSetup
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(167, 23)
         Me.Label21.TabIndex = 5
-        Me.Label21.Text = "Model Segment ID Field:"
+        Me.Label21.Text = "Outlet Node ID Field:"
         '
         'cboSub2
         '
@@ -741,7 +744,35 @@ Public Class frmSWMMSetup
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(152, 23)
         Me.Label7.TabIndex = 0
-        Me.Label7.Text = "Subbasin ID Field:"
+        Me.Label7.Text = "Name/ID Field:"
+        '
+        'TabPage5
+        '
+        Me.TabPage5.Controls.Add(Me.cboPoint)
+        Me.TabPage5.Controls.Add(Me.Label19)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Size = New System.Drawing.Size(517, 340)
+        Me.TabPage5.TabIndex = 6
+        Me.TabPage5.Text = "Nodes"
+        Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'cboPoint
+        '
+        Me.cboPoint.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPoint.Location = New System.Drawing.Point(247, 35)
+        Me.cboPoint.Name = "cboPoint"
+        Me.cboPoint.Size = New System.Drawing.Size(167, 25)
+        Me.cboPoint.TabIndex = 15
+        '
+        'Label19
+        '
+        Me.Label19.AutoSize = True
+        Me.Label19.Location = New System.Drawing.Point(71, 39)
+        Me.Label19.Name = "Label19"
+        Me.Label19.Size = New System.Drawing.Size(100, 17)
+        Me.Label19.TabIndex = 14
+        Me.Label19.Text = "Name/ID Field:"
         '
         'TabPage6
         '
@@ -852,37 +883,6 @@ Public Class frmSWMMSetup
         Me.lblStatus.TabIndex = 0
         Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         '
-        'cboOutlets
-        '
-        Me.cboOutlets.AllowDrop = True
-        Me.cboOutlets.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboOutlets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboOutlets.Location = New System.Drawing.Point(168, 228)
-        Me.cboOutlets.Name = "cboOutlets"
-        Me.cboOutlets.Size = New System.Drawing.Size(339, 25)
-        Me.cboOutlets.TabIndex = 14
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(11, 231)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(93, 17)
-        Me.Label5.TabIndex = 13
-        Me.Label5.Text = "Nodes Layer:"
-        '
-        'TabPage5
-        '
-        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(517, 340)
-        Me.TabPage5.TabIndex = 6
-        Me.TabPage5.Text = "Nodes"
-        Me.TabPage5.UseVisualStyleBackColor = True
-        '
         'frmSWMMSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -907,6 +907,8 @@ Public Class frmSWMMSetup
         Me.TabPage2.PerformLayout()
         Me.TabPage4.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
+        Me.TabPage5.ResumeLayout(False)
+        Me.TabPage5.PerformLayout()
         Me.TabPage6.ResumeLayout(False)
         Me.TabPage6.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
@@ -919,8 +921,78 @@ Public Class frmSWMMSetup
 #End Region
 
     Private pPlugIn As PlugIn
+    Private pNodeFieldMap As New atcUtility.atcCollection
+    Private pConduitFieldMap As New atcUtility.atcCollection
+    Private pCatchmentFieldMap As New atcUtility.atcCollection
+
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
+    End Sub
+
+    Private Sub cboLanduse_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLanduse.SelectedIndexChanged
+        If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
+            cboLandUseLayer.Visible = False
+            lblLandUseLayer.Visible = False
+            cboDescription.Visible = False
+            lblDescription.Visible = False
+            lblClass.Text = "/BASINS/etc/giras.dbf"
+            'SetPerviousGrid()
+        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+            cboLandUseLayer.Items.Clear()
+            Dim lLayerDefaultIndex As Integer = 0
+            For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
+                If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile
+                    cboLandUseLayer.Items.Add(GisUtil.LayerName(lLayerIndex))
+                    If GisUtil.NumFeatures(lLayerIndex) < 1000 And lLayerDefaultIndex = 0 Then
+                        lLayerDefaultIndex = cboLandUseLayer.Items.Count
+                    End If
+                End If
+            Next
+            If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
+                'pick one without too many polygons for efficiency
+                cboLandUseLayer.SelectedIndex = lLayerDefaultIndex - 1
+            End If
+            cboLandUseLayer.Visible = True
+            lblLandUseLayer.Visible = True
+            cboDescription.Visible = True
+            lblDescription.Visible = True
+            lblClass.Text = "<none>"
+            'SetPerviousGrid()
+        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
+            cboLandUseLayer.Items.Clear()
+            For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
+                If GisUtil.LayerType(lLayerIndex) = 4 Then  'Grid 
+                    If InStr(UCase(GisUtil.LayerFileName(lLayerIndex)), "\NLCD\") > 0 Then
+                        cboLandUseLayer.Items.Add(GisUtil.LayerName(lLayerIndex))
+                    End If
+                End If
+            Next
+            If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
+                cboLandUseLayer.SelectedIndex = 0
+            End If
+            cboLandUseLayer.Visible = True
+            lblLandUseLayer.Visible = True
+            cboDescription.Visible = False
+            lblDescription.Visible = False
+            lblClass.Text = "/BASINS/etc/nlcd.dbf"
+            'SetPerviousGrid()
+        Else 'grid
+            cboLandUseLayer.Items.Clear()
+            For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
+                If GisUtil.LayerType(lLayerIndex) = 4 Then  'Grid
+                    cboLandUseLayer.Items.Add(GisUtil.LayerName(lLayerIndex))
+                End If
+            Next
+            If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
+                cboLandUseLayer.SelectedIndex = 0
+            End If
+            cboLandUseLayer.Visible = True
+            lblLandUseLayer.Visible = True
+            cboDescription.Visible = False
+            lblDescription.Visible = False
+            lblClass.Text = "<none>"
+            'SetPerviousGrid()
+        End If
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -951,16 +1023,23 @@ Public Class frmSWMMSetup
         Dim lMetWDMFileName As String = "C:\basins\data\02060006\met\met.wdm"
         Dim lMetGageName As String = "MD189070"
         Dim lLandUseGridName As String = "C:\BASINS\data\02060006\NLCD\NLCD_LandCover_2001.tif"
-        'Dim lNodesShapefileName As String = "C:\basins\Predefined Delineations\West Branch\nodes.shp"
-        'Dim lConduitShapefileName As String = "C:\basins\Predefined Delineations\West Branch\conduits.shp"
-        'Dim lCatchmentShapefileName As String = "C:\basins\Predefined Delineations\West Branch\catchments.shp"
-        Dim lNodesShapefileName As String = ""    'test for BASINS type
+
+        'set file names for nodes, conduits, and catchments
+        Dim lNodesShapefileName As String = ""
+        If cboOutlets.SelectedIndex > 0 Then
+            Dim lNodeLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+            lNodesShapefileName = GisUtil.LayerFileName(lNodeLayerIndex)
+        End If
 
         Dim lConduitLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
         Dim lConduitShapefileName As String = GisUtil.LayerFileName(lConduitLayerIndex)
 
         Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
         Dim lCatchmentShapefileName As String = GisUtil.LayerFileName(lCatchmentLayerIndex)
+
+        'Dim lNodesShapefileName As String = "C:\basins\Predefined Delineations\West Branch\nodes.shp"
+        'Dim lConduitShapefileName As String = "C:\basins\Predefined Delineations\West Branch\conduits.shp"
+        'Dim lCatchmentShapefileName As String = "C:\basins\Predefined Delineations\West Branch\catchments.shp"
 
         lblStatus.Text = "Preparing to process"
         Me.Refresh()
@@ -1003,36 +1082,20 @@ Public Class frmSWMMSetup
             .Nodes.Clear()
             .Conduits.Clear()
             .Catchments.Clear()
-            Dim lFieldMap As New atcUtility.atcCollection
             Dim lTable As New atcUtility.atcTableDBF
-            lFieldMap.Add("ID", "Name")
 
             If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
-                .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lFieldMap))
+                .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, pNodeFieldMap))
             End If
             CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
 
-            lFieldMap.Clear()
-            lFieldMap.Add("InNodeId", "InletNodeName")
-            lFieldMap.Add("OutNodeID", "OutletNodeName")
-            lFieldMap.Add("SUBBASIN", "Name")
-            lFieldMap.Add("SUBBASINR", "DownConduitID")
-            lFieldMap.Add("MAXEL", "ElevationHigh")
-            lFieldMap.Add("MINEL", "ElevationLow")
-            lFieldMap.Add("WID2", "MeanWidth")
-            lFieldMap.Add("DEP2", "MeanDepth")
             If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
-                .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lFieldMap), "Name", "C", 1))
+                .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, pConduitFieldMap), "Name", "C", 1))
             End If
             CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 
-            lFieldMap.Clear()
-            lFieldMap.Add("SUBBASIN", "Name")
-            lFieldMap.Add("SLO1", "Slope")
-            lFieldMap.Add("ID", "Name")
-            lFieldMap.Add("OutNode", "OutletNodeID")
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
-                .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lFieldMap))
+                .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
             End If
             CompleteCatchmentsFromShapefile(lCatchmentShapefileName, pPlugIn.SWMMProject, .Catchments)
 
@@ -1076,7 +1139,7 @@ Public Class frmSWMMSetup
             'not giras, make sure subbasins and land use layers aren't the same
             If cboSubbasins.Items(cboSubbasins.SelectedIndex) = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex) Then
                 'same layer cannot be used for both
-                Logger.Msg("The same layer cannot be used for the subbasins layer and the landuse layer.", vbOKOnly, "BASINS HSPF Problem")
+                Logger.Msg("The same layer cannot be used for the catchments layer and the landuse layer.", vbOKOnly, "BASINS HSPF Problem")
                 EnableControls(True)
                 Return False
             End If
@@ -1106,6 +1169,24 @@ Public Class frmSWMMSetup
         'pMetStations = New atcCollection
         'pMetBaseDsns = New atcCollection
 
+        'set field mapping for nodes, conduits, and catchments
+        pNodeFieldMap.Clear()
+        pNodeFieldMap.Add("ID", "Name")
+        pConduitFieldMap.Clear()
+        pConduitFieldMap.Add("InNodeId", "InletNodeName")
+        pConduitFieldMap.Add("OutNodeID", "OutletNodeName")
+        pConduitFieldMap.Add("SUBBASIN", "Name")
+        pConduitFieldMap.Add("SUBBASINR", "DownConduitID")
+        pConduitFieldMap.Add("MAXEL", "ElevationHigh")
+        pConduitFieldMap.Add("MINEL", "ElevationLow")
+        pConduitFieldMap.Add("WID2", "MeanWidth")
+        pConduitFieldMap.Add("DEP2", "MeanDepth")
+        pCatchmentFieldMap.Clear()
+        pCatchmentFieldMap.Add("SUBBASIN", "Name")
+        pCatchmentFieldMap.Add("SLO1", "Slope")
+        pCatchmentFieldMap.Add("ID", "Name")
+        pCatchmentFieldMap.Add("OutNode", "OutletNodeID")
+
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
         cboLanduse.Items.Add("NLCD Grid")
         cboLanduse.Items.Add("Other Shapefile")
@@ -1134,7 +1215,7 @@ Public Class frmSWMMSetup
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 1 Then 'PointShapefile
                 cboOutlets.Items.Add(lLayerName)
-                If lLayerName.IndexOf("Node") > -1 Or lLayerName.ToUpper = "OUTLETS" Then
+                If lLayerName.IndexOf("Node") > -1 Then
                     cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
                 End If
                 cboMet.Items.Add(lLayerName)
