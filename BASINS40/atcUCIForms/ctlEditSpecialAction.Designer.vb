@@ -21,18 +21,18 @@ Partial Class ctlEditSpecialAction
     Private Sub InitializeComponent()
         Me.tabSpecial = New System.Windows.Forms.TabControl
         Me.REcords = New System.Windows.Forms.TabPage
-        Me.atcgrid0 = New atcControls.atcGrid
         Me.TabPage2 = New System.Windows.Forms.TabPage
-        Me.atcgrid1 = New atcControls.atcGrid
         Me.TabPage3 = New System.Windows.Forms.TabPage
-        Me.atcgrid2 = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
-        Me.atcgrid3 = New atcControls.atcGrid
         Me.TabPage5 = New System.Windows.Forms.TabPage
-        Me.atcgrid4 = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
-        Me.atcgrid5 = New atcControls.atcGrid
         Me.lblcounts = New System.Windows.Forms.Label
+        Me.atcgrid0 = New atcControls.atcGrid
+        Me.atcgrid1 = New atcControls.atcGrid
+        Me.atcgrid2 = New atcControls.atcGrid
+        Me.atcgrid3 = New atcControls.atcGrid
+        Me.atcgrid4 = New atcControls.atcGrid
+        Me.atcgrid5 = New atcControls.atcGrid
         Me.Button1 = New System.Windows.Forms.Button
         Me.tabSpecial.SuspendLayout()
         Me.REcords.SuspendLayout()
@@ -68,6 +68,70 @@ Partial Class ctlEditSpecialAction
         Me.REcords.Text = "Records"
         Me.REcords.UseVisualStyleBackColor = True
         '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.atcgrid1)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Actions"
+        Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'TabPage3
+        '
+        Me.TabPage3.Controls.Add(Me.atcgrid2)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage3.Name = "TabPage3"
+        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage3.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage3.TabIndex = 2
+        Me.TabPage3.Text = "Distributes"
+        Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'TabPage4
+        '
+        Me.TabPage4.Controls.Add(Me.atcgrid3)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage4.Name = "TabPage4"
+        Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage4.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage4.TabIndex = 3
+        Me.TabPage4.Text = "User Define Names"
+        Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'TabPage5
+        '
+        Me.TabPage5.Controls.Add(Me.atcgrid4)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage5.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage5.TabIndex = 4
+        Me.TabPage5.Text = "User Define Quans"
+        Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'TabPage6
+        '
+        Me.TabPage6.Controls.Add(Me.atcgrid5)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage6.Name = "TabPage6"
+        Me.TabPage6.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage6.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage6.TabIndex = 5
+        Me.TabPage6.Text = "Conditions"
+        Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'lblcounts
+        '
+        Me.lblcounts.AutoSize = True
+        Me.lblcounts.Location = New System.Drawing.Point(13, 493)
+        Me.lblcounts.Name = "lblcounts"
+        Me.lblcounts.Size = New System.Drawing.Size(39, 13)
+        Me.lblcounts.TabIndex = 2
+        Me.lblcounts.Text = "counts"
+        '
         'atcgrid0
         '
         Me.atcgrid0.AllowHorizontalScrolling = True
@@ -80,17 +144,6 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid0.Size = New System.Drawing.Size(900, 430)
         Me.atcgrid0.Source = Nothing
         Me.atcgrid0.TabIndex = 0
-        '
-        'TabPage2
-        '
-        Me.TabPage2.Controls.Add(Me.atcgrid1)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(915, 446)
-        Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "Actions"
-        Me.TabPage2.UseVisualStyleBackColor = True
         '
         'atcgrid1
         '
@@ -105,17 +158,6 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid1.Source = Nothing
         Me.atcgrid1.TabIndex = 1
         '
-        'TabPage3
-        '
-        Me.TabPage3.Controls.Add(Me.atcgrid2)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(915, 446)
-        Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "Distributes"
-        Me.TabPage3.UseVisualStyleBackColor = True
-        '
         'atcgrid2
         '
         Me.atcgrid2.AllowHorizontalScrolling = True
@@ -128,17 +170,6 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid2.Size = New System.Drawing.Size(900, 430)
         Me.atcgrid2.Source = Nothing
         Me.atcgrid2.TabIndex = 1
-        '
-        'TabPage4
-        '
-        Me.TabPage4.Controls.Add(Me.atcgrid3)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(915, 446)
-        Me.TabPage4.TabIndex = 3
-        Me.TabPage4.Text = "User Define Names"
-        Me.TabPage4.UseVisualStyleBackColor = True
         '
         'atcgrid3
         '
@@ -153,17 +184,6 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid3.Source = Nothing
         Me.atcgrid3.TabIndex = 1
         '
-        'TabPage5
-        '
-        Me.TabPage5.Controls.Add(Me.atcgrid4)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage5.Size = New System.Drawing.Size(915, 446)
-        Me.TabPage5.TabIndex = 4
-        Me.TabPage5.Text = "User Define Quans"
-        Me.TabPage5.UseVisualStyleBackColor = True
-        '
         'atcgrid4
         '
         Me.atcgrid4.AllowHorizontalScrolling = True
@@ -176,17 +196,6 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid4.Size = New System.Drawing.Size(900, 430)
         Me.atcgrid4.Source = Nothing
         Me.atcgrid4.TabIndex = 1
-        '
-        'TabPage6
-        '
-        Me.TabPage6.Controls.Add(Me.atcgrid5)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage6.Size = New System.Drawing.Size(915, 446)
-        Me.TabPage6.TabIndex = 5
-        Me.TabPage6.Text = "Conditions"
-        Me.TabPage6.UseVisualStyleBackColor = True
         '
         'atcgrid5
         '
@@ -201,20 +210,11 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid5.Source = Nothing
         Me.atcgrid5.TabIndex = 1
         '
-        'lblcounts
-        '
-        Me.lblcounts.AutoSize = True
-        Me.lblcounts.Location = New System.Drawing.Point(13, 493)
-        Me.lblcounts.Name = "lblcounts"
-        Me.lblcounts.Size = New System.Drawing.Size(39, 13)
-        Me.lblcounts.TabIndex = 2
-        Me.lblcounts.Text = "counts"
-        '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(793, 498)
+        Me.Button1.Location = New System.Drawing.Point(629, 506)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(93, 22)
+        Me.Button1.Size = New System.Drawing.Size(213, 33)
         Me.Button1.TabIndex = 3
         Me.Button1.Text = "Button1"
         Me.Button1.UseVisualStyleBackColor = True
@@ -249,11 +249,11 @@ Partial Class ctlEditSpecialAction
     Friend WithEvents TabPage6 As System.Windows.Forms.TabPage
     Friend WithEvents lblcounts As System.Windows.Forms.Label
     Friend WithEvents atcgrid0 As atcControls.atcGrid
-    Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents atcgrid1 As atcControls.atcGrid
     Friend WithEvents atcgrid2 As atcControls.atcGrid
     Friend WithEvents atcgrid3 As atcControls.atcGrid
     Friend WithEvents atcgrid4 As atcControls.atcGrid
     Friend WithEvents atcgrid5 As atcControls.atcGrid
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 
 End Class
