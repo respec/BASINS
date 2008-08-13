@@ -7,7 +7,7 @@ Imports System.Collections.ObjectModel
 Public Class ctlEditSpecialAction
     Implements ctlEdit
 
-    Dim pSpecialActionBlk As New HspfSpecialActionBlk
+    Dim pSpecialActionBlk As HspfSpecialActionBlk
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
@@ -54,13 +54,13 @@ Public Class ctlEditSpecialAction
         End With
     End Sub
     Private Sub DisplayRecords()
-        Dim i, s As Integer
 
+        Dim lRecordType As String
         With pSpecialActionBlk.Records
-            For i = 1 To .Count
-                s = pSpecialActionBlk.HspfSpecialRecordName(.Item(i).SpecType)
-                atcgrid0.Source.CellValue(i, 0) = s
-                atcgrid0.Source.CellValue(i, 1) = .Item(i)
+            For lIndex As Integer = 1 To .Count
+                lRecordType = pSpecialActionBlk.HspfSpecialRecordName(.Item(lIndex).SpecType)
+                atcgrid0.Source.CellValue(lIndex, 0) = lRecordType
+                atcgrid0.Source.CellValue(lIndex, 1) = .Item(lIndex).Text
             Next
         End With
         atcgrid0.SizeAllColumnsToContents()
@@ -364,6 +364,7 @@ Public Class ctlEditSpecialAction
 
 
         Set(ByVal aHspfSpecialAction As Object)
+            pSpecialActionBlk = aHspfSpecialAction
             atcgrid0.Source = New atcControls.atcGridSource
             With atcgrid0
                 .Clear()
@@ -522,6 +523,8 @@ Public Class ctlEditSpecialAction
 
             atcgrid5.SizeAllColumnsToContents()
             atcgrid5.Refresh()
+
+            Display()
         End Set
     End Property
 
