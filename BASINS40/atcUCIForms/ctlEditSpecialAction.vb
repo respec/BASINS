@@ -42,7 +42,7 @@ Public Class ctlEditSpecialAction
         cc = 0
 
         With atcgrid0
-            For i = 1 To .Source.Rows
+            For i = 1 To .Source.Rows - 1   'top header row was being counted so subtracted 1
                 Select Case .Source.CellValue(i, 0)
                     Case "Action" : ac += 1
                     Case "Distribute" : dc += 1
@@ -51,7 +51,7 @@ Public Class ctlEditSpecialAction
                     Case "Condition" : cc += 1
                 End Select
             Next
-            lblcounts.Text = "Records: " & (.Source.Rows) & ", Actions: " & (ac) & ", Distributes: " & (dc) & ", User Define Names: " & (unc) & ", User Define Quans: " & (uqc) & ", Conditions: " & (cc)
+            lblcounts.Text = "Records: " & (.Source.Rows - 1) & ", Actions: " & (ac) & ", Distributes: " & (dc) & ", User Define Names: " & (unc) & ", User Define Quans: " & (uqc) & ", Conditions: " & (cc)
         End With
     End Sub
     Private Sub DisplayRecords()
@@ -353,10 +353,6 @@ Public Class ctlEditSpecialAction
 
     End Sub
 
-    Public Sub Save() Implements ctlEdit.Save
-
-    End Sub
-
     Public Property Data() As Object Implements ctlEdit.Data
         Get
             Return pSpecialActionBlk
@@ -376,6 +372,11 @@ Public Class ctlEditSpecialAction
             With atcgrid0.Source
                 .CellValue(0, 0) = "Type"
                 .CellValue(0, 1) = "Text"
+
+                For lCol As Integer = 0 To 1
+                    .CellColor(0, lCol) = SystemColors.ControlLight
+                Next
+
             End With
 
             atcgrid0.SizeAllColumnsToContents()
@@ -412,6 +413,11 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 18) = "Tc"
                 .CellValue(0, 19) = "Ts"
                 .CellValue(0, 20) = "Num"
+
+                For lCol As Integer = 0 To 20
+                    .CellColor(0, lCol) = SystemColors.ControlLight
+                Next
+
             End With
 
             atcgrid1.SizeAllColumnsToContents()
@@ -442,6 +448,11 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 12) = "Frac8"
                 .CellValue(0, 13) = "Frac9"
                 .CellValue(0, 14) = "Frac10"
+
+                For lCol As Integer = 0 To 14
+                    .CellColor(0, lCol) = SystemColors.ControlLight
+                Next
+
             End With
 
             atcgrid2.SizeAllColumnsToContents()
@@ -472,6 +483,11 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 11) = "Sub3"
                 .CellValue(0, 12) = "Frac"
                 .CellValue(0, 13) = "ActCd"
+
+                For lCol As Integer = 0 To 13
+                    .CellColor(0, lCol) = SystemColors.ControlLight
+                Next
+
             End With
 
             atcgrid3.SizeAllColumnsToContents()
@@ -502,6 +518,11 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 11) = "AgCode"
                 .CellValue(0, 12) = "AgStep"
                 .CellValue(0, 13) = "Tran"
+
+                For lCol As Integer = 0 To 13
+                    .CellColor(0, lCol) = SystemColors.ControlLight
+                Next
+
             End With
 
             atcgrid4.SizeAllColumnsToContents()
@@ -519,9 +540,10 @@ Public Class ctlEditSpecialAction
 
             With atcgrid5.Source
                 .CellValue(0, 0) = "Text"
+                .CellColor(0, 0) = SystemColors.ControlLight
             End With
 
-            atcgrid5.SizeAllColumnsToContents()
+            'atcgrid5.SizeAllColumnsToContents()
             atcgrid5.Refresh()
 
             Display()
@@ -632,9 +654,13 @@ Public Class ctlEditSpecialAction
                         End If
                     End If
                 Next i
-                If .Rows > 1 Then
-                    .Rows = .Rows - 1
-                End If
+
+                For j As Integer = 0 To .Columns - 1
+                    For k As Integer = 1 To .Rows
+                        .CellEditable(k, j) = True
+                    Next
+                Next
+
                 atcgrid1.SizeAllColumnsToContents()
                 atcgrid1.Refresh()
             End With
@@ -698,9 +724,6 @@ Public Class ctlEditSpecialAction
                         .CellValue(.Rows - 1, 13) = Mid(newText, 71, 4)
                     End If
                 Next i
-                If .Rows > 1 Then
-                    .Rows = .Rows - 1
-                End If
                 atcgrid3.SizeAllColumnsToContents()
             End With
         ElseIf tabSpecial.SelectedIndex = 4 Then
@@ -740,29 +763,54 @@ Public Class ctlEditSpecialAction
                         .CellValue(.Rows - 1, 13) = Mid(newText, 67, 4)
                     End If
                 Next i
-                If .Rows > 1 Then
-                    .Rows = .Rows - 1
-                End If
                 atcgrid4.SizeAllColumnsToContents()
             End With
         ElseIf tabSpecial.SelectedIndex = 5 Then
             'conditionals
             With atcgrid5.Source
                 .Columns = 1
-                .Rows = 1
+                .Rows = 2
                 For i = 1 To atcgrid0.Source.Rows
                     If atcgrid0.Source.CellValue(i, 0) = "Condition" Then
-                        .Rows = .Rows + 1
                         .CellValue(.Rows - 1, 0) = atcgrid0.Source.CellValue(i, 1)
                     End If
                 Next i
-                If .Rows > 1 Then
-                    .Rows = .Rows - 1
-                End If
-                atcgrid5.SizeAllColumnsToContents()
+                'atcgrid5.SizeAllColumnsToContents()
+                atcgrid5.Refresh()
             End With
         End If
         PreviousTab = tabSpecial.SelectedIndex
     End Sub
 
+    Public Sub Save() Implements ctlEdit.Save
+        Dim mySpecialRecord As HspfSpecialRecord
+        Dim lOper As Integer
+
+        PutRecsToFrontTab(tabSpecial.SelectedIndex)
+
+        With pSpecialActionBlk.Records
+            Do Until .Count = 0
+                .Remove(1)
+            Loop
+            For lOper = 1 To atcgrid0.Source.Rows
+                mySpecialRecord = New HspfSpecialRecord
+                mySpecialRecord.Text = atcgrid0.Source.CellValue(lOper, 1)
+                If atcgrid0.Source.CellValue(lOper, 0) = "Comment" Then
+                    mySpecialRecord.SpecType = 6
+                ElseIf atcgrid0.Source.CellValue(lOper, 0) = "Condition" Then
+                    mySpecialRecord.SpecType = 5
+                ElseIf atcgrid0.Source.CellValue(lOper, 0) = "Distribute" Then
+                    mySpecialRecord.SpecType = 2
+                ElseIf atcgrid0.Source.CellValue(lOper, 0) = "User Defn Name" Then
+                    mySpecialRecord.SpecType = 3
+                ElseIf atcgrid0.Source.CellValue(lOper, 0) = "User Defn Quan" Then
+                    mySpecialRecord.SpecType = 4
+                Else
+                    mySpecialRecord.SpecType = 1
+                End If
+                pSpecialActionBlk.Records.Add(mySpecialRecord)
+            Next
+        End With
+
+    End Sub
 End Class
