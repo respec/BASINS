@@ -85,7 +85,7 @@ Public Class ctlEditSpecialAction
                         newText = "   "
                         newText = BlankPad(newText & .CellValue(rowcount, 0), 8)
                         ctemp = "   "
-                        RSet(ctemp = .CellValue(rowcount, 1), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 1)))
                         newText = newText & ctemp
                         If Len(.CellValue(rowcount, 2)) = 0 Then
                             newText = newText & "    "
@@ -93,7 +93,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "    "
                         Else
                             ctemp = "   "
-                            RSet(ctemp = .CellValue(rowcount, 2), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 2)))
                             newText = newText & ctemp
                         End If
                         newText = BlankPad(newText & .CellValue(rowcount, 3), 17)
@@ -103,7 +103,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp = .CellValue(rowcount, 4), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 4)))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 5)) = 0 Then
@@ -119,7 +119,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp = .CellValue(rowcount, 6), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 6)))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 7)) = 0 Then
@@ -128,7 +128,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp = .CellValue(rowcount, 7), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 7)))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 8)) = 0 Then
@@ -137,7 +137,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp = .CellValue(rowcount, 8), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 8)))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 9)) = 0 Then
@@ -146,7 +146,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp = .CellValue(rowcount, 9), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 9)))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 10)) = 0 Then
@@ -155,11 +155,11 @@ Public Class ctlEditSpecialAction
                             newText = newText & "  "
                         Else
                             ctemp = "  "
-                            RSet(ctemp = .CellValue(rowcount, 10), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 10)))
                             newText = newText & ctemp
                         End If
                         ctemp = "  "
-                        RSet(ctemp = .CellValue(rowcount, 11), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 11)))
                         newText = newText & ctemp & "  "
                         If IsNumeric(.CellValue(rowcount, 12)) Then
                             newText = BlankPad(newText & .CellValue(rowcount, 12), 57) 'addr
@@ -172,7 +172,7 @@ Public Class ctlEditSpecialAction
                         newText = BlankPad(newText & .CellValue(rowcount, 16), 60)
                         If IsNumeric(.CellValue(rowcount, 17)) Then
                             ctemp = "          "
-                            RSet(ctemp = .CellValue(rowcount, 17), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 17)))
                             newText = newText & ctemp 'value
                         Else
                             newText = BlankPad(newText & .CellValue(rowcount, 17), 70) 'quan
@@ -183,14 +183,14 @@ Public Class ctlEditSpecialAction
                             newText = newText & "    "
                         Else
                             ctemp = "    "
-                            RSet(ctemp = .CellValue(rowcount, 19), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 19)))
                             newText = newText & ctemp
                         End If
                         If .CellValue(rowcount, 20) = 0 Then
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp = .CellValue(rowcount, 20), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 20)))
                             newText = newText & ctemp
                         End If
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -207,19 +207,19 @@ Public Class ctlEditSpecialAction
                         rowcount = rowcount + 1
                         newText = "  DISTRB"
                         ctemp = "   "
-                        RSet(ctemp = .CellValue(rowcount, 0), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 0)))
                         newText = newText & ctemp
                         ctemp = "    "
-                        RSet(ctemp = .CellValue(rowcount, 1), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 1)))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 2), 18)
                         ctemp = "    "
-                        RSet(ctemp = .CellValue(rowcount, 3), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 3)))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 4), 30)
                         For j = 1 To 10
                             ctemp = "     "
-                            RSet(ctemp = .CellValue(rowcount, 4 + j), 3)
+                            RSet(ctemp, Len(.CellValue(rowcount, 4 + j)))
                             newText = newText & ctemp
                         Next j
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -237,7 +237,7 @@ Public Class ctlEditSpecialAction
                         newText = "  UVNAME  "
                         newText = BlankPad(newText & .CellValue(rowcount, 0), 16)
                         ctemp = "   "
-                        RSet(ctemp = .CellValue(rowcount, 1), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 1)))
                         newText = newText & ctemp & " "
                         If IsNumeric(.CellValue(rowcount, 2)) Then
                             newText = BlankPad(newText & .CellValue(rowcount, 2), 35) 'addr
@@ -249,7 +249,7 @@ Public Class ctlEditSpecialAction
                         End If
                         newText = newText & " "
                         ctemp = "     "
-                        RSet(ctemp = .CellValue(rowcount, 6), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 6)))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 7), 46)
                         newText = newText & "    "
@@ -263,7 +263,7 @@ Public Class ctlEditSpecialAction
                         End If
                         newText = newText & " "
                         ctemp = "     "
-                        RSet(ctemp = .CellValue(rowcount, 12), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 12)))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 13), 76)
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -282,7 +282,7 @@ Public Class ctlEditSpecialAction
                         newText = BlankPad(newText & .CellValue(rowcount, 0), 16)
                         newText = BlankPad(newText & .CellValue(rowcount, 1), 23)
                         ctemp = "   "
-                        RSet(ctemp = .CellValue(rowcount, 2), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 2)))
                         newText = newText & ctemp & " "
                         If IsNumeric(.CellValue(rowcount, 3)) Then
                             newText = BlankPad(newText & .CellValue(rowcount, 3), 42) 'addr
@@ -293,18 +293,18 @@ Public Class ctlEditSpecialAction
                             newText = BlankPad(newText & .CellValue(rowcount, 6), 42)
                         End If
                         ctemp = "   "
-                        RSet(ctemp = .CellValue(rowcount, 7), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 7)))
                         newText = newText & ctemp
                         ctemp = "          "
-                        RSet(ctemp = .CellValue(rowcount, 8), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 8)))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 9), 58)
                         ctemp = "   "
-                        RSet(ctemp = .CellValue(rowcount, 10), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 10)))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 11), 64)
                         ctemp = "   "
-                        RSet(ctemp = .CellValue(rowcount, 12), 3)
+                        RSet(ctemp, Len(.CellValue(rowcount, 12)))
                         newText = newText & ctemp & " "
                         newText = newText & .CellValue(rowcount, 13)
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -544,7 +544,6 @@ Public Class ctlEditSpecialAction
                 .CellColor(0, 0) = SystemColors.ControlLight
             End With
 
-            'atcgrid5.SizeAllColumnsToContents()
             atcgrid5.Refresh()
 
             Display()
@@ -569,217 +568,218 @@ Public Class ctlEditSpecialAction
             PutRecsToFrontTab(PreviousTab)
             atcgrid0.Refresh()
         End If
+        If tabSpecial.SelectedIndex <> PreviousTab Then
+            'now load records for this tab
+            If tabSpecial.SelectedIndex = 1 Then
+                'action type records
+                With atcgrid1.Source
+                    .Columns = 21
+                    .Rows = 1
+                    For i = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(i, 0) = "Action" Then
+                            .Rows = .Rows + 1
+                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            .CellValue(.Rows - 1, 0) = Trim(Mid(newText, 1, 6))
+                            .CellValue(.Rows - 1, 1) = Mid(newText, 7, 3)
+                            If Mid(newText, 10, 4) = "    " Then
+                                .CellValue(.Rows - 1, 2) = 0
+                            Else
+                                .CellValue(.Rows - 1, 2) = Mid(newText, 10, 4)
+                            End If
+                            .CellValue(.Rows - 1, 3) = Mid(newText, 14, 2)
+                            If Mid(newText, 16, 3) = "   " Then
+                                .CellValue(.Rows - 1, 4) = 0
+                            Else
+                                .CellValue(.Rows - 1, 4) = Mid(newText, 16, 3)
+                            End If
+                            If Mid(newText, 19, 4) = "    " Then
+                                .CellValue(.Rows - 1, 5) = 0
+                            Else
+                                .CellValue(.Rows - 1, 5) = Mid(newText, 19, 4)
+                            End If
+                            If Mid(newText, 23, 3) = "   " Then
+                                .CellValue(.Rows - 1, 6) = 0
+                            Else
+                                .CellValue(.Rows - 1, 6) = Mid(newText, 23, 3)
+                            End If
+                            If Mid(newText, 26, 3) = "   " Then
+                                .CellValue(.Rows - 1, 7) = 0
+                            Else
+                                .CellValue(.Rows - 1, 7) = Mid(newText, 26, 3)
+                            End If
+                            If Mid(newText, 29, 3) = "   " Then
+                                .CellValue(.Rows - 1, 8) = 0
+                            Else
+                                .CellValue(.Rows - 1, 8) = Mid(newText, 29, 3)
+                            End If
+                            If Mid(newText, 32, 3) = "   " Then
+                                .CellValue(.Rows - 1, 9) = 0
+                            Else
+                                .CellValue(.Rows - 1, 9) = Mid(newText, 32, 3)
+                            End If
+                            If Mid(newText, 35, 2) = "  " Then
+                                .CellValue(.Rows - 1, 10) = 0
+                            Else
+                                .CellValue(.Rows - 1, 10) = Mid(newText, 35, 2)
+                            End If
+                            .CellValue(.Rows - 1, 11) = Mid(newText, 37, 2)
+                            'determine if vname or addr
+                            If IsNumeric(Mid(newText, 41, 8)) Then
+                                .CellValue(.Rows - 1, 12) = Mid(newText, 41, 8) 'addr
+                                .CellValue(.Rows - 1, 13) = ""
+                                .CellValue(.Rows - 1, 14) = ""
+                                .CellValue(.Rows - 1, 15) = ""
+                            Else
+                                .CellValue(.Rows - 1, 12) = Mid(newText, 41, 6)
+                                .CellValue(.Rows - 1, 13) = Mid(newText, 47, 3)
+                                .CellValue(.Rows - 1, 14) = Mid(newText, 50, 3)
+                                .CellValue(.Rows - 1, 15) = Mid(newText, 53, 3)
+                            End If
+                            .CellValue(.Rows - 1, 16) = Mid(newText, 56, 3)
+                            'determine if value or uvquan
+                            If IsNumeric(Mid(newText, 59, 10)) Then
+                                .CellValue(.Rows - 1, 17) = Trim(Mid(newText, 59, 10)) 'value
+                            Else
+                                .CellValue(.Rows - 1, 17) = Mid(newText, 63, 6) 'quan
+                            End If
+                            .CellValue(.Rows - 1, 18) = Mid(newText, 70, 2)
+                            If Len(Trim(Mid(newText, 73, 3))) = 0 Or Len(newText) < 73 Then
+                                .CellValue(.Rows - 1, 19) = 0
+                            Else
+                                .CellValue(.Rows - 1, 19) = Mid(newText, 73, 3)
+                            End If
+                            If Mid(newText, 76, 3) = "   " Or Len(newText) < 76 Then
+                                .CellValue(.Rows - 1, 20) = 0
+                            Else
+                                .CellValue(.Rows - 1, 20) = Mid(newText, 76, 3)
+                            End If
+                        End If
+                    Next i
 
-        'now load records for this tab
-        If tabSpecial.SelectedIndex = 1 Then
-            'action type records
-            With atcgrid1.Source
-                .Columns = 21
-                .Rows = 1
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "Action" Then
-                        .Rows = .Rows + 1
-                        newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
-                        .CellValue(.Rows - 1, 0) = Trim(Mid(newText, 1, 6))
-                        .CellValue(.Rows - 1, 1) = Mid(newText, 7, 3)
-                        If Mid(newText, 10, 4) = "    " Then
-                            .CellValue(.Rows - 1, 2) = 0
-                        Else
-                            .CellValue(.Rows - 1, 2) = Mid(newText, 10, 4)
-                        End If
-                        .CellValue(.Rows - 1, 3) = Mid(newText, 14, 2)
-                        If Mid(newText, 16, 3) = "   " Then
-                            .CellValue(.Rows - 1, 4) = 0
-                        Else
-                            .CellValue(.Rows - 1, 4) = Mid(newText, 16, 3)
-                        End If
-                        If Mid(newText, 19, 4) = "    " Then
-                            .CellValue(.Rows - 1, 5) = 0
-                        Else
-                            .CellValue(.Rows - 1, 5) = Mid(newText, 19, 4)
-                        End If
-                        If Mid(newText, 23, 3) = "   " Then
-                            .CellValue(.Rows - 1, 6) = 0
-                        Else
-                            .CellValue(.Rows - 1, 6) = Mid(newText, 23, 3)
-                        End If
-                        If Mid(newText, 26, 3) = "   " Then
-                            .CellValue(.Rows - 1, 7) = 0
-                        Else
-                            .CellValue(.Rows - 1, 7) = Mid(newText, 26, 3)
-                        End If
-                        If Mid(newText, 29, 3) = "   " Then
-                            .CellValue(.Rows - 1, 8) = 0
-                        Else
-                            .CellValue(.Rows - 1, 8) = Mid(newText, 29, 3)
-                        End If
-                        If Mid(newText, 32, 3) = "   " Then
-                            .CellValue(.Rows - 1, 9) = 0
-                        Else
-                            .CellValue(.Rows - 1, 9) = Mid(newText, 32, 3)
-                        End If
-                        If Mid(newText, 35, 2) = "  " Then
-                            .CellValue(.Rows - 1, 10) = 0
-                        Else
-                            .CellValue(.Rows - 1, 10) = Mid(newText, 35, 2)
-                        End If
-                        .CellValue(.Rows - 1, 11) = Mid(newText, 37, 2)
-                        'determine if vname or addr
-                        If IsNumeric(Mid(newText, 41, 8)) Then
-                            .CellValue(.Rows - 1, 12) = Mid(newText, 41, 8) 'addr
-                            .CellValue(.Rows - 1, 13) = ""
-                            .CellValue(.Rows - 1, 14) = ""
-                            .CellValue(.Rows - 1, 15) = ""
-                        Else
-                            .CellValue(.Rows - 1, 12) = Mid(newText, 41, 6)
-                            .CellValue(.Rows - 1, 13) = Mid(newText, 47, 3)
-                            .CellValue(.Rows - 1, 14) = Mid(newText, 50, 3)
-                            .CellValue(.Rows - 1, 15) = Mid(newText, 53, 3)
-                        End If
-                        .CellValue(.Rows - 1, 16) = Mid(newText, 56, 3)
-                        'determine if value or uvquan
-                        If IsNumeric(Mid(newText, 59, 10)) Then
-                            .CellValue(.Rows - 1, 17) = Trim(Mid(newText, 59, 10)) 'value
-                        Else
-                            .CellValue(.Rows - 1, 17) = Mid(newText, 63, 6) 'quan
-                        End If
-                        .CellValue(.Rows - 1, 18) = Mid(newText, 70, 2)
-                        If Len(Trim(Mid(newText, 73, 3))) = 0 Or Len(newText) < 73 Then
-                            .CellValue(.Rows - 1, 19) = 0
-                        Else
-                            .CellValue(.Rows - 1, 19) = Mid(newText, 73, 3)
-                        End If
-                        If Mid(newText, 76, 3) = "   " Or Len(newText) < 76 Then
-                            .CellValue(.Rows - 1, 20) = 0
-                        Else
-                            .CellValue(.Rows - 1, 20) = Mid(newText, 76, 3)
-                        End If
-                    End If
-                Next i
-
-                For j As Integer = 0 To .Columns - 1
-                    For k As Integer = 1 To .Rows - 1
-                        .CellEditable(k, j) = True
+                    For j As Integer = 0 To .Columns - 1
+                        For k As Integer = 1 To .Rows - 1
+                            .CellEditable(k, j) = True
+                        Next
                     Next
-                Next
 
-                atcgrid1.SizeAllColumnsToContents()
-                atcgrid1.Refresh()
-            End With
-        ElseIf tabSpecial.SelectedIndex = 2 Then
-            'distributes
-            With atcgrid2.Source
-                .Columns = 15
-                .Rows = 1
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "Distribute" Then
-                        .Rows = .Rows + 1
-                        newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
-                        .CellValue(.Rows - 1, 0) = Mid(newText, 7, 3)
-                        .CellValue(.Rows - 1, 1) = Mid(newText, 11, 3)
-                        .CellValue(.Rows - 1, 2) = Mid(newText, 15, 2)
-                        .CellValue(.Rows - 1, 3) = Mid(newText, 18, 3)
-                        .CellValue(.Rows - 1, 4) = Mid(newText, 22, 5)
-                        .CellValue(.Rows - 1, 5) = Mid(newText, 29, 5)
-                        .CellValue(.Rows - 1, 6) = Mid(newText, 34, 5)
-                        .CellValue(.Rows - 1, 7) = Mid(newText, 39, 5)
-                        .CellValue(.Rows - 1, 8) = Mid(newText, 44, 5)
-                        .CellValue(.Rows - 1, 9) = Mid(newText, 49, 5)
-                        .CellValue(.Rows - 1, 10) = Mid(newText, 54, 5)
-                        .CellValue(.Rows - 1, 11) = Mid(newText, 59, 5)
-                        .CellValue(.Rows - 1, 12) = Mid(newText, 64, 5)
-                        .CellValue(.Rows - 1, 13) = Mid(newText, 69, 5)
-                        .CellValue(.Rows - 1, 14) = Mid(newText, 74, 5)
-                    End If
-                Next i
-                If .Rows > 1 Then
-                    .Rows = .Rows - 1
-                End If
-                atcgrid2.SizeAllColumnsToContents()
-            End With
-        ElseIf tabSpecial.SelectedIndex = 3 Then
-            'uvname
-            With atcgrid3.Source
-                .Columns = 14
-                .Rows = 1
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "User Defn Name" Then
-                        .Rows = .Rows + 1
-                        newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
-                        .CellValue(.Rows - 1, 0) = Mid(newText, 9, 6)
-                        .CellValue(.Rows - 1, 1) = Mid(newText, 15, 3)
-                        .CellValue(.Rows - 1, 2) = Mid(newText, 19, 6)
-                        .CellValue(.Rows - 1, 3) = Mid(newText, 25, 3)
-                        .CellValue(.Rows - 1, 4) = Mid(newText, 28, 3)
-                        .CellValue(.Rows - 1, 5) = Mid(newText, 31, 3)
-                        .CellValue(.Rows - 1, 6) = Mid(newText, 35, 5)
-                        .CellValue(.Rows - 1, 7) = Mid(newText, 41, 4)
-                        .CellValue(.Rows - 1, 8) = Mid(newText, 49, 6)
-                        .CellValue(.Rows - 1, 9) = Mid(newText, 55, 3)
-                        .CellValue(.Rows - 1, 10) = Mid(newText, 58, 3)
-                        .CellValue(.Rows - 1, 11) = Mid(newText, 61, 3)
-                        If Mid(newText, 65, 5) = "     " Then
-                            .CellValue(.Rows - 1, 12) = 1
-                        Else
-                            .CellValue(.Rows - 1, 12) = Mid(newText, 65, 5)
+                    atcgrid1.SizeAllColumnsToContents()
+                    atcgrid1.Refresh()
+                End With
+            ElseIf tabSpecial.SelectedIndex = 2 Then
+                'distributes
+                With atcgrid2.Source
+                    .Columns = 15
+                    .Rows = 1
+                    For i = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(i, 0) = "Distribute" Then
+                            .Rows = .Rows + 1
+                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            .CellValue(.Rows - 1, 0) = Mid(newText, 7, 3)
+                            .CellValue(.Rows - 1, 1) = Mid(newText, 11, 3)
+                            .CellValue(.Rows - 1, 2) = Mid(newText, 15, 2)
+                            .CellValue(.Rows - 1, 3) = Mid(newText, 18, 3)
+                            .CellValue(.Rows - 1, 4) = Mid(newText, 22, 5)
+                            .CellValue(.Rows - 1, 5) = Mid(newText, 29, 5)
+                            .CellValue(.Rows - 1, 6) = Mid(newText, 34, 5)
+                            .CellValue(.Rows - 1, 7) = Mid(newText, 39, 5)
+                            .CellValue(.Rows - 1, 8) = Mid(newText, 44, 5)
+                            .CellValue(.Rows - 1, 9) = Mid(newText, 49, 5)
+                            .CellValue(.Rows - 1, 10) = Mid(newText, 54, 5)
+                            .CellValue(.Rows - 1, 11) = Mid(newText, 59, 5)
+                            .CellValue(.Rows - 1, 12) = Mid(newText, 64, 5)
+                            .CellValue(.Rows - 1, 13) = Mid(newText, 69, 5)
+                            .CellValue(.Rows - 1, 14) = Mid(newText, 74, 5)
                         End If
-                        .CellValue(.Rows - 1, 13) = Mid(newText, 71, 4)
+                    Next i
+                    If .Rows > 1 Then
+                        .Rows = .Rows - 1
                     End If
-                Next i
-                atcgrid3.SizeAllColumnsToContents()
-            End With
-        ElseIf tabSpecial.SelectedIndex = 4 Then
-            'User Defn Quan
-            With atcgrid4.Source
-                .Columns = 14
-                .Rows = 1
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "User Defn Quan" Then
-                        .Rows = .Rows + 1
-                        newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
-                        .CellValue(.Rows - 1, 0) = Mid(newText, 8, 6)
-                        .CellValue(.Rows - 1, 1) = Mid(newText, 15, 6)
-                        .CellValue(.Rows - 1, 2) = Mid(newText, 22, 3)
-                        .CellValue(.Rows - 1, 3) = Mid(newText, 26, 6)
-                        .CellValue(.Rows - 1, 4) = Mid(newText, 33, 3)
-                        .CellValue(.Rows - 1, 5) = Mid(newText, 36, 3)
-                        .CellValue(.Rows - 1, 6) = Mid(newText, 39, 3)
-                        .CellValue(.Rows - 1, 7) = Mid(newText, 41, 3)
-                        If Mid(newText, 44, 10) = "          " Then
-                            .CellValue(.Rows - 1, 8) = 1.0#
-                        Else
-                            .CellValue(.Rows - 1, 8) = Mid(newText, 44, 10)
+                    atcgrid2.SizeAllColumnsToContents()
+                End With
+            ElseIf tabSpecial.SelectedIndex = 3 Then
+                'uvname
+                With atcgrid3.Source
+                    .Columns = 14
+                    .Rows = 1
+                    For i = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(i, 0) = "User Defn Name" Then
+                            .Rows = .Rows + 1
+                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            .CellValue(.Rows - 1, 0) = Mid(newText, 9, 6)
+                            .CellValue(.Rows - 1, 1) = Mid(newText, 15, 3)
+                            .CellValue(.Rows - 1, 2) = Mid(newText, 19, 6)
+                            .CellValue(.Rows - 1, 3) = Mid(newText, 25, 3)
+                            .CellValue(.Rows - 1, 4) = Mid(newText, 28, 3)
+                            .CellValue(.Rows - 1, 5) = Mid(newText, 31, 3)
+                            .CellValue(.Rows - 1, 6) = Mid(newText, 35, 5)
+                            .CellValue(.Rows - 1, 7) = Mid(newText, 41, 4)
+                            .CellValue(.Rows - 1, 8) = Mid(newText, 49, 6)
+                            .CellValue(.Rows - 1, 9) = Mid(newText, 55, 3)
+                            .CellValue(.Rows - 1, 10) = Mid(newText, 58, 3)
+                            .CellValue(.Rows - 1, 11) = Mid(newText, 61, 3)
+                            If Mid(newText, 65, 5) = "     " Then
+                                .CellValue(.Rows - 1, 12) = 1
+                            Else
+                                .CellValue(.Rows - 1, 12) = Mid(newText, 65, 5)
+                            End If
+                            .CellValue(.Rows - 1, 13) = Mid(newText, 71, 4)
                         End If
-                        .CellValue(.Rows - 1, 9) = Mid(newText, 55, 2)
-                        If Mid(newText, 57, 3) = "   " Then
-                            .CellValue(.Rows - 1, 10) = 1
-                        Else
-                            .CellValue(.Rows - 1, 10) = Mid(newText, 57, 3)
+                    Next i
+                    atcgrid3.SizeAllColumnsToContents()
+                End With
+            ElseIf tabSpecial.SelectedIndex = 4 Then
+                'User Defn Quan
+                With atcgrid4.Source
+                    .Columns = 14
+                    .Rows = 1
+                    For i = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(i, 0) = "User Defn Quan" Then
+                            .Rows = .Rows + 1
+                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            .CellValue(.Rows - 1, 0) = Mid(newText, 8, 6)
+                            .CellValue(.Rows - 1, 1) = Mid(newText, 15, 6)
+                            .CellValue(.Rows - 1, 2) = Mid(newText, 22, 3)
+                            .CellValue(.Rows - 1, 3) = Mid(newText, 26, 6)
+                            .CellValue(.Rows - 1, 4) = Mid(newText, 33, 3)
+                            .CellValue(.Rows - 1, 5) = Mid(newText, 36, 3)
+                            .CellValue(.Rows - 1, 6) = Mid(newText, 39, 3)
+                            .CellValue(.Rows - 1, 7) = Mid(newText, 41, 3)
+                            If Mid(newText, 44, 10) = "          " Then
+                                .CellValue(.Rows - 1, 8) = 1.0#
+                            Else
+                                .CellValue(.Rows - 1, 8) = Mid(newText, 44, 10)
+                            End If
+                            .CellValue(.Rows - 1, 9) = Mid(newText, 55, 2)
+                            If Mid(newText, 57, 3) = "   " Then
+                                .CellValue(.Rows - 1, 10) = 1
+                            Else
+                                .CellValue(.Rows - 1, 10) = Mid(newText, 57, 3)
+                            End If
+                            .CellValue(.Rows - 1, 11) = Mid(newText, 61, 2)
+                            If Mid(newText, 63, 3) = "   " Then
+                                .CellValue(.Rows - 1, 12) = 1
+                            Else
+                                .CellValue(.Rows - 1, 12) = Mid(newText, 63, 3)
+                            End If
+                            .CellValue(.Rows - 1, 13) = Mid(newText, 67, 4)
                         End If
-                        .CellValue(.Rows - 1, 11) = Mid(newText, 61, 2)
-                        If Mid(newText, 63, 3) = "   " Then
-                            .CellValue(.Rows - 1, 12) = 1
-                        Else
-                            .CellValue(.Rows - 1, 12) = Mid(newText, 63, 3)
+                    Next i
+                    atcgrid4.SizeAllColumnsToContents()
+                End With
+            ElseIf tabSpecial.SelectedIndex = 5 Then
+                'conditionals
+                With atcgrid5.Source
+                    .Columns = 1
+                    .Rows = 2
+                    For i = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(i, 0) = "Condition" Then
+                            .CellValue(.Rows - 1, 0) = atcgrid0.Source.CellValue(i, 1)
                         End If
-                        .CellValue(.Rows - 1, 13) = Mid(newText, 67, 4)
-                    End If
-                Next i
-                atcgrid4.SizeAllColumnsToContents()
-            End With
-        ElseIf tabSpecial.SelectedIndex = 5 Then
-            'conditionals
-            With atcgrid5.Source
-                .Columns = 1
-                .Rows = 2
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "Condition" Then
-                        .CellValue(.Rows - 1, 0) = atcgrid0.Source.CellValue(i, 1)
-                    End If
-                Next i
-                'atcgrid5.SizeAllColumnsToContents()
-                atcgrid5.Refresh()
-            End With
+                    Next i
+                    'atcgrid5.SizeAllColumnsToContents()
+                    atcgrid5.Refresh()
+                End With
+            End If
         End If
         PreviousTab = tabSpecial.SelectedIndex
     End Sub
@@ -816,4 +816,5 @@ Public Class ctlEditSpecialAction
         End With
 
     End Sub
+
 End Class
