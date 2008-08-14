@@ -3,6 +3,7 @@ Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
+Imports atcData
 
 Public Class Conduits
     Inherits KeyedCollection(Of String, Conduit)
@@ -21,13 +22,22 @@ Public Class Conduits
 
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
+        Dim lConduit As Conduit
 
         lString.Append("[CONDUITS]" & vbCrLf & _
                        ";;               Inlet            Outlet                      Manning    Inlet      Outlet     Init.      Max.      " & vbCrLf & _
-                       ";;Name           Node             Node             Length     N          Offset     Offset     Flow       Flow      " & vbCrLf & _
-                       ";;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------" & vbCrLf)
+                       ";;Name           Node             Node             Length     N          Offset     Offset     Flow       Flow      " & vbCrLf)
+        If Me.Count > 0 Then
+            lConduit = Me.Items(0)
+            Dim lIsMetric As Boolean = SWMMProject.IsMetric
+            lString.Append(";;" & Space(15) _
+                                & Space(17) _
+                                & Space(17) _
+                                & lConduit.Length.Definition.Units.PadRight(11))
+        End If
+        lString.Append(";;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------" & vbCrLf)
 
-        For Each lConduit As Conduit In Me
+        For Each lConduit In Me
             With lConduit
                 lString.Append(StrPad(.Name, 16, " ", False))
                 lString.Append(" ")
@@ -35,7 +45,7 @@ Public Class Conduits
                 lString.Append(" ")
                 lString.Append(StrPad(.OutletNode.Name, 16, " ", False))
                 lString.Append(" ")
-                lString.Append(StrPad(Format(.Length, "0.0"), 10, " ", False))
+                lString.Append(StrPad(Format(.Length.Value, "0.0"), 10, " ", False))
                 lString.Append(" ")
                 lString.Append(StrPad(Format(.ManningsN, "0.00"), 10, " ", False))
                 lString.Append(" ")
@@ -55,7 +65,7 @@ Public Class Conduits
                        ";;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels   " & vbCrLf & _
                        ";;-------------- ------------ ---------------- ---------- ---------- ---------- ----------" & vbCrLf)
 
-        For Each lConduit As Conduit In Me
+        For Each lConduit In Me
             With lConduit
                 lString.Append(StrPad(.Name, 16, " ", False))
                 lString.Append(" ")
@@ -108,7 +118,8 @@ Public Class Conduit
     Public InletNodeName As String = ""
     Public OutletNodeName As String = ""
     Public DownConduitID As String = ""
-    Public Length As Double 'in feet or meters
+    Public Length As New atcDefinedValue
+    Private Shared LengthDefinition As atcAttributeDefinition
     Public MeanWidth As Double = 0.0
     Public MeanDepth As Double = 0.0
     Public ElevationHigh As Double = 0.0
@@ -126,4 +137,28 @@ Public Class Conduit
     Public NumBarrels As Integer = 1
     Public X() As Double
     Public Y() As Double
+    Private Shared pIsMetric As Boolean
+
+    Public Shared Property IsMetric() As Boolean
+        Get
+            Return pIsMetric
+        End Get
+        Set(ByVal aIsMetric As Boolean)
+            If LengthDefinition Is Nothing Then
+                LengthDefinition = New atcAttributeDefinition
+            End If
+            With LengthDefinition
+                If aIsMetric Then
+                    .Units = "meters"
+                Else
+                    .Units = "feet"
+                End If
+            End With
+            pIsMetric = aIsMetric
+        End Set
+    End Property
+
+    Public Sub New()
+        Length.Definition = LengthDefinition
+    End Sub
 End Class
