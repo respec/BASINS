@@ -32,6 +32,7 @@ Public Class PlugIn
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
         AddMenuIfMissing(ModelsMenuName & "_SWMM", ModelsMenuName, "SWMM")
         pSWMMProject = New SWMMProject
+        pSWMMProject.IsMetric = False
     End Sub
 
     Public Overrides Sub Terminate()

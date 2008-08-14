@@ -76,7 +76,7 @@ Friend Module modSWMMFromMW
             Dim lConduit As Conduit = aConduits(lFeatureIndex)
 
             'calculate the actual feature length
-            lConduit.Length = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex) * 3.281 'need to convert meters to feet
+            lConduit.Length.Value = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex) * 3.281 'need to convert meters to feet
 
             If lConduit.Geometry1 < 0 Then
                 lConduit.Geometry1 = lConduit.MeanDepth * 1.25 'full height = mean depth * 1.25

@@ -3,6 +3,8 @@ Imports System.Text
 Imports atcUtility
 
 Public Class SWMMProject
+    Private pIsMetric As Boolean
+
     Public Catchments As Catchments
     Public Conduits As Conduits
     Public Nodes As Nodes
@@ -59,6 +61,16 @@ Public Class SWMMProject
         MetConstituents.SWMMProject = Me
         BackdropFile = ""
     End Sub
+
+    Public Property IsMetric() As Boolean
+        Get
+            Return pIsMetric
+        End Get
+        Set(ByVal aIsMetric As Boolean)
+            pIsMetric = aIsMetric
+            Conduit.IsMetric = aIsMetric
+        End Set
+    End Property
 
     Public Function Save(ByVal aFileName As String) As Boolean
         Dim lSB As New StringBuilder
