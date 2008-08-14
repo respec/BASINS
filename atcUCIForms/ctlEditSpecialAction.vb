@@ -64,6 +64,7 @@ Public Class ctlEditSpecialAction
                 atcgrid0.Source.CellValue(lIndex, 1) = .Item(lIndex).Text
             Next
         End With
+
         atcgrid0.SizeAllColumnsToContents()
         atcgrid0.Refresh()
 
@@ -78,7 +79,7 @@ Public Class ctlEditSpecialAction
             rowcount = 0
             With atcgrid1.Source
                 For i = 1 To atcgrid0.Source.Rows
-                    If .CellValue(i, 0) = "Action" Then
+                    If atcgrid0.Source.CellValue(i, 0) = "Action" Then
                         'get next record from this tab
                         rowcount = rowcount + 1
                         newText = "   "
@@ -566,6 +567,7 @@ Public Class ctlEditSpecialAction
         If tabSpecial.SelectedIndex <> PreviousTab And PreviousTab <> 0 Then
             'changed tab, put previous tab recs back to first tab
             PutRecsToFrontTab(PreviousTab)
+            atcgrid0.Refresh()
         End If
 
         'now load records for this tab
@@ -656,7 +658,7 @@ Public Class ctlEditSpecialAction
                 Next i
 
                 For j As Integer = 0 To .Columns - 1
-                    For k As Integer = 1 To .Rows
+                    For k As Integer = 1 To .Rows - 1
                         .CellEditable(k, j) = True
                     Next
                 Next
@@ -787,12 +789,13 @@ Public Class ctlEditSpecialAction
         Dim lOper As Integer
 
         PutRecsToFrontTab(tabSpecial.SelectedIndex)
+        atcgrid0.Refresh()
 
         With pSpecialActionBlk.Records
             Do Until .Count = 0
                 .Remove(1)
             Loop
-            For lOper = 1 To atcgrid0.Source.Rows
+            For lOper = 1 To atcgrid0.Source.Rows - 1
                 mySpecialRecord = New HspfSpecialRecord
                 mySpecialRecord.Text = atcgrid0.Source.CellValue(lOper, 1)
                 If atcgrid0.Source.CellValue(lOper, 0) = "Comment" Then
