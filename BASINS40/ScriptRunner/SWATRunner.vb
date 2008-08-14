@@ -194,8 +194,11 @@ Module SWATRunner
             End If
 
             If pChangeCropAreas Then
+                'baseline corn is  ~ 23.64 M Acres
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10630000 / 247 '2010 12% 247 acres per square kilometer
-                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 13000000 / 247 '2015 12% 247 acres per square kilometer
+                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10450000 / 247 '2010 - 12.76% of existing; 247 acres per square kilometer
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 13000000 / 247 '2015 12% 247 acres per square kilometer
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 12640000 / 247 '2015 - 13.55% of existing; 247 acres per square kilometer
                 Logger.Dbg("DesiredFutureCornArea = " & lDesiredFutureCornArea)
                 Dim lConvertFractionOfAvailable As Double = (lDesiredFutureCornArea - lTotalAreaCornNow) / (lTotalAreaCornFut - lTotalAreaCornNow)
                 Logger.Dbg("ConvertFractionOfAvailable = " & lConvertFractionOfAvailable)
