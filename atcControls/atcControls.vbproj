@@ -103,6 +103,12 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcConnectFields.Designer.vb">
+      <DependentUpon>atcConnectFields.vb</DependentUpon>
+    </Compile>
+    <Compile Include="atcConnectFields.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="atcGrid.vb">
       <SubType>UserControl</SubType>
     </Compile>
@@ -121,6 +127,16 @@
     <Compile Include="atcText.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="frmConnectFields.Designer.vb">
+      <DependentUpon>frmConnectFields.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmConnectFields.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="atcConnectFields.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>atcConnectFields.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="atcGrid.resx">
       <DependentUpon>atcGrid.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -133,6 +149,13 @@
       <DependentUpon>atcText.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmConnectFields.resx">
+      <DependentUpon>frmConnectFields.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
