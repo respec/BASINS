@@ -85,7 +85,7 @@ Public Class ctlEditSpecialAction
                         newText = "   "
                         newText = BlankPad(newText & .CellValue(rowcount, 0), 8)
                         ctemp = "   "
-                        RSet(ctemp, Len(.CellValue(rowcount, 1)))
+                        ctemp = RSet(.CellValue(rowcount, 1), Len(ctemp))
                         newText = newText & ctemp
                         If Len(.CellValue(rowcount, 2)) = 0 Then
                             newText = newText & "    "
@@ -93,7 +93,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "    "
                         Else
                             ctemp = "   "
-                            RSet(ctemp, Len(.CellValue(rowcount, 2)))
+                            ctemp = RSet(.CellValue(rowcount, 2), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         newText = BlankPad(newText & .CellValue(rowcount, 3), 17)
@@ -103,7 +103,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp, Len(.CellValue(rowcount, 4)))
+                            ctemp = RSet(.CellValue(rowcount, 4), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 5)) = 0 Then
@@ -119,7 +119,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp, Len(.CellValue(rowcount, 6)))
+                            ctemp = RSet(.CellValue(rowcount, 6), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 7)) = 0 Then
@@ -128,7 +128,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp, Len(.CellValue(rowcount, 7)))
+                            ctemp = RSet(.CellValue(rowcount, 7), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 8)) = 0 Then
@@ -137,7 +137,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp, Len(.CellValue(rowcount, 8)))
+                            ctemp = RSet(.CellValue(rowcount, 8), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 9)) = 0 Then
@@ -146,7 +146,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp, Len(.CellValue(rowcount, 9)))
+                            ctemp = RSet(.CellValue(rowcount, 9), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         If Len(.CellValue(rowcount, 10)) = 0 Then
@@ -155,11 +155,11 @@ Public Class ctlEditSpecialAction
                             newText = newText & "  "
                         Else
                             ctemp = "  "
-                            RSet(ctemp, Len(.CellValue(rowcount, 10)))
+                            ctemp = RSet(.CellValue(rowcount, 10), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         ctemp = "  "
-                        RSet(ctemp, Len(.CellValue(rowcount, 11)))
+                        ctemp = RSet(.CellValue(rowcount, 11), Len(ctemp))
                         newText = newText & ctemp & "  "
                         If IsNumeric(.CellValue(rowcount, 12)) Then
                             newText = BlankPad(newText & .CellValue(rowcount, 12), 57) 'addr
@@ -172,7 +172,7 @@ Public Class ctlEditSpecialAction
                         newText = BlankPad(newText & .CellValue(rowcount, 16), 60)
                         If IsNumeric(.CellValue(rowcount, 17)) Then
                             ctemp = "          "
-                            RSet(ctemp, Len(.CellValue(rowcount, 17)))
+                            ctemp = RSet(.CellValue(rowcount, 17), Len(ctemp))
                             newText = newText & ctemp 'value
                         Else
                             newText = BlankPad(newText & .CellValue(rowcount, 17), 70) 'quan
@@ -183,14 +183,14 @@ Public Class ctlEditSpecialAction
                             newText = newText & "    "
                         Else
                             ctemp = "    "
-                            RSet(ctemp, Len(.CellValue(rowcount, 19)))
+                            ctemp = RSet(.CellValue(rowcount, 19), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         If .CellValue(rowcount, 20) = 0 Then
                             newText = newText & "   "
                         Else
                             ctemp = "   "
-                            RSet(ctemp, Len(.CellValue(rowcount, 20)))
+                            ctemp = RSet(.CellValue(rowcount, 20), Len(ctemp))
                             newText = newText & ctemp
                         End If
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -207,19 +207,19 @@ Public Class ctlEditSpecialAction
                         rowcount = rowcount + 1
                         newText = "  DISTRB"
                         ctemp = "   "
-                        RSet(ctemp, Len(.CellValue(rowcount, 0)))
+                        ctemp = RSet(.CellValue(rowcount, 0), Len(ctemp))
                         newText = newText & ctemp
                         ctemp = "    "
-                        RSet(ctemp, Len(.CellValue(rowcount, 1)))
+                        ctemp = RSet(.CellValue(rowcount, 1), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 2), 18)
                         ctemp = "    "
-                        RSet(ctemp, Len(.CellValue(rowcount, 3)))
+                        ctemp = RSet(.CellValue(rowcount, 3), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 4), 30)
                         For j = 1 To 10
                             ctemp = "     "
-                            RSet(ctemp, Len(.CellValue(rowcount, 4 + j)))
+                            ctemp = RSet(.CellValue(rowcount, 4 + j), Len(ctemp))
                             newText = newText & ctemp
                         Next j
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -237,7 +237,7 @@ Public Class ctlEditSpecialAction
                         newText = "  UVNAME  "
                         newText = BlankPad(newText & .CellValue(rowcount, 0), 16)
                         ctemp = "   "
-                        RSet(ctemp, Len(.CellValue(rowcount, 1)))
+                        ctemp = RSet(.CellValue(rowcount, 1), Len(ctemp))
                         newText = newText & ctemp & " "
                         If IsNumeric(.CellValue(rowcount, 2)) Then
                             newText = BlankPad(newText & .CellValue(rowcount, 2), 35) 'addr
@@ -249,7 +249,7 @@ Public Class ctlEditSpecialAction
                         End If
                         newText = newText & " "
                         ctemp = "     "
-                        RSet(ctemp, Len(.CellValue(rowcount, 6)))
+                        ctemp = RSet(.CellValue(rowcount, 6), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 7), 46)
                         newText = newText & "    "
@@ -263,7 +263,7 @@ Public Class ctlEditSpecialAction
                         End If
                         newText = newText & " "
                         ctemp = "     "
-                        RSet(ctemp, Len(.CellValue(rowcount, 12)))
+                        ctemp = RSet(.CellValue(rowcount, 12), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 13), 76)
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -282,7 +282,7 @@ Public Class ctlEditSpecialAction
                         newText = BlankPad(newText & .CellValue(rowcount, 0), 16)
                         newText = BlankPad(newText & .CellValue(rowcount, 1), 23)
                         ctemp = "   "
-                        RSet(ctemp, Len(.CellValue(rowcount, 2)))
+                        ctemp = RSet(.CellValue(rowcount, 2), Len(ctemp))
                         newText = newText & ctemp & " "
                         If IsNumeric(.CellValue(rowcount, 3)) Then
                             newText = BlankPad(newText & .CellValue(rowcount, 3), 42) 'addr
@@ -293,18 +293,18 @@ Public Class ctlEditSpecialAction
                             newText = BlankPad(newText & .CellValue(rowcount, 6), 42)
                         End If
                         ctemp = "   "
-                        RSet(ctemp, Len(.CellValue(rowcount, 7)))
+                        ctemp = RSet(.CellValue(rowcount, 7), Len(ctemp))
                         newText = newText & ctemp
                         ctemp = "          "
-                        RSet(ctemp, Len(.CellValue(rowcount, 8)))
+                        ctemp = RSet(.CellValue(rowcount, 8), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 9), 58)
                         ctemp = "   "
-                        RSet(ctemp, Len(.CellValue(rowcount, 10)))
+                        ctemp = RSet(.CellValue(rowcount, 10), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 11), 64)
                         ctemp = "   "
-                        RSet(ctemp, Len(.CellValue(rowcount, 12)))
+                        ctemp = RSet(.CellValue(rowcount, 12), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = newText & .CellValue(rowcount, 13)
                         atcgrid0.Source.CellValue(i, 1) = newText
@@ -567,6 +567,7 @@ Public Class ctlEditSpecialAction
             'changed tab, put previous tab recs back to first tab
             PutRecsToFrontTab(PreviousTab)
             atcgrid0.Refresh()
+            atcgrid0.SizeAllColumnsToContents()
         End If
         If tabSpecial.SelectedIndex <> PreviousTab Then
             'now load records for this tab

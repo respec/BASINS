@@ -116,7 +116,17 @@ Public Class HspfSpecialActionBlk
                 mySpecialRecord = New HspfSpecialRecord
                 With mySpecialRecord
                     .Text = cbuff
-                    If Len(cbuff) = 0 Or InStr(cbuff, "***") > 0 Then
+                    Dim noactions As Boolean = False
+                    If InStr(cbuff, "PERLND") = 0 Then
+                        If InStr(cbuff, "IMPLND") = 0 Then
+                            If InStr(cbuff, "RCHRES") = 0 Then
+                                If InStr(cbuff, "COPY") = 0 Then
+                                    noactions = True
+                                End If
+                            End If
+                        End If
+                    End If
+                    If noactions = True Or InStr(cbuff, "***") > 0 Then
                         .SpecType = HspfData.HspfSpecialRecordType.hComment
                     ElseIf Left(Trim(cbuff), 3) = "IF " Or Left(Trim(cbuff), 4) = "ELSE" Or Left(Trim(cbuff), 6) = "END IF" Then
                         .SpecType = HspfData.HspfSpecialRecordType.hCondition
