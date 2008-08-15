@@ -33,7 +33,7 @@ Public Class Conduits
             lString.Append(";;" & Space(15) _
                                 & Space(17) _
                                 & Space(17) _
-                                & lConduit.Length.Definition.Units.PadRight(11))
+                                & lConduit.Length.Definition.Units.PadRight(11) & vbCrLf)
         End If
         lString.Append(";;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------" & vbCrLf)
 
