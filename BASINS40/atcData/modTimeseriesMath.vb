@@ -981,9 +981,9 @@ Finished:
             Next lIndex
             aRSquare = lSum5 / lSum6
         Else 'regression doesnt make sense, return NaN
-            aACoef = Double.NaN
-            aBCoef = Double.NaN
-            aRSquare = Double.NaN
+            aACoef = GetNaN()
+            aBCoef = GetNaN()
+            aRSquare = GetNaN()
         End If
     End Sub
 End Module

@@ -2361,7 +2361,7 @@ Public Class frmModelSetup
 
     Private Sub AtcGridPervious_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPervious.CellEdited
         Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
-        Dim lNewValueNumeric As Double = Double.NaN
+        Dim lNewValueNumeric As Double = GetNaN()
         If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
 
         Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)

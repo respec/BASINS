@@ -97,8 +97,8 @@ Public Class atcDataSourceBasinsObsWQ
                             lData = New atcTimeseries(Me)
                             lData.Dates = New atcTimeseries(Me)
                             lData.numValues = lDBF.NumRecords - lDBF.CurrentRecord + 1
-                            lData.Value(0) = Double.NaN
-                            lData.Dates.Value(0) = Double.NaN
+                            lData.Value(0) = GetNaN()
+                            lData.Dates.Value(0) = GetNaN()
                             lData.Attributes.SetValue("Count", 0)
                             lData.Attributes.SetValue("Scenario", "OBSERVED")
                             lData.Attributes.SetValue("Location", lLocation)
@@ -113,7 +113,7 @@ Public Class atcDataSourceBasinsObsWQ
                         If IsNumeric(lDataValue) Then
                             lData.Value(lTSIndex) = lDataValue
                         Else
-                            lData.Value(lTSIndex) = Double.NaN
+                            lData.Value(lTSIndex) = GetNaN()
                         End If
                         lData.Dates.Value(lTSIndex) = parseWQObsDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
                         lData.Attributes.SetValue("Count", lTSIndex)

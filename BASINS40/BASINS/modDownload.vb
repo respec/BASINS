@@ -931,6 +931,10 @@ StartOver:
             ProcessDownloadResult &= "Downloaded " & lLayersAdded.Count & " Layers"
         End If
 
+        If lLayersAdded.Count > 0 AndAlso lDataAdded.Count > 0 Then
+            ProcessDownloadResult &= vbCrLf
+        End If
+
         If lDataAdded.Count = 1 Then
             ProcessDownloadResult &= "Downloaded Data file: " & lDataAdded(0).ToString
         ElseIf lDataAdded.Count > 1 Then

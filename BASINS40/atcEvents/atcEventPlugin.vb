@@ -38,7 +38,7 @@ Public Class atcEventPlugin
     Public Overrides Function Open(ByVal aOperationName As String, _
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim ltsGroup As atcDataGroup = Nothing
-        Dim lThresh As Double = Double.NaN
+        Dim lThresh As Double = GetNaN()
         Dim lDaysGapAllowed As Double = 0
         Dim lHigh As Boolean
         Dim lOk As Boolean
@@ -46,7 +46,7 @@ Public Class atcEventPlugin
 
         If Not aArgs Is Nothing Then
             ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
-            lThresh = aArgs.GetValue("Threshold", Double.NaN)
+            lThresh = aArgs.GetValue("Threshold", GetNaN)
             lDaysGapAllowed = aArgs.GetValue("DaysGapAllowed", 0)
             lHigh = aArgs.GetValue("High", True)
         End If
@@ -69,9 +69,9 @@ Public Class atcEventPlugin
                         Dim lSum As Double = 0
                         Dim lAve As Double = 0
                         If lHigh Then
-                            lExtreme = Double.MinValue
+                            lExtreme = GetMinValue()
                         Else
-                            lExtreme = Double.MaxValue
+                            lExtreme = GetMaxValue()
                         End If
                         For Each lETs As atcTimeseries In lEvents
                             lDurCnt += lETs.numValues
@@ -232,8 +232,8 @@ Public Class atcEventPlugin
     End Property
 
     Private Function MinMaxLabel(ByVal aTSGroup As atcDataGroup) As String
-        Dim lMin As Double = Double.MaxValue
-        Dim lMax As Double = Double.MinValue
+        Dim lMin As Double = GetMaxValue()
+        Dim lMax As Double = GetMinValue()
         Dim lMinStr As String = ""
         Dim lMaxStr As String = ""
         For Each lts As atcTimeseries In aTSGroup

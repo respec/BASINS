@@ -733,11 +733,11 @@ Public Class GisUtil
             Try
                 lArea = MapWinGeoProc.Utils.Area(lSf.Shape(aFeatureIndex))
                 If lArea < 0.000001 Then 'TODO: try to calculate?
-                    lArea = Double.NaN
+                    lArea = GetNaN()
                 End If
             Catch ex As Exception
                 Logger.Dbg("GisUtil:FeatureArea:Exception:" & ex.Message)
-                lArea = Double.NaN
+                lArea = GetNaN()
             End Try
         End If
         Return lArea
@@ -758,13 +758,13 @@ Public Class GisUtil
                        lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEM AndAlso _
                        lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEZ Then
                         Logger.Dbg("GisUtil:FeatureLength:LengthUndefinedForShapeType:" & lSf.ShapefileType)
-                        lLength = Double.NaN
+                        lLength = GetNaN()
                     End If
                 End If
             End If
         Catch ex As Exception
             Logger.Dbg("GisUtil:FeatureLength:Exception:" & ex.Message)
-            lLength = Double.NaN
+            lLength = GetNaN()
         End Try
         Return lLength
     End Function

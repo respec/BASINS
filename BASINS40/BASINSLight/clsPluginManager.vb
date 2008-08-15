@@ -5,6 +5,42 @@ Imports MapWindow
 Public Class Plugins_IPlugin
     Implements Interfaces.Plugins
 
+    Friend Class PluginEnumerator
+        Implements System.Collections.IEnumerator
+
+        Private m_Collection As MapWindow.Interfaces.Plugins
+        Private m_Idx As Integer = -1
+
+        Public Sub New(ByVal inp As MapWindow.Interfaces.Plugins)
+            m_Collection = inp
+            m_Idx = -1
+        End Sub
+
+        Public Sub Reset() Implements IEnumerator.Reset
+            m_Idx = -1
+        End Sub
+
+        Public ReadOnly Property Current() As Object Implements IEnumerator.Current
+            Get
+                Return m_Collection.Item(m_Idx)
+            End Get
+        End Property
+
+        Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+            m_Idx += 1
+
+            If m_Idx >= m_Collection.Count Then
+                Return False
+            Else
+                Return True
+            End If
+        End Function
+    End Class
+
+    Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
+        Return New PluginEnumerator(Me)
+    End Function
+
     Public m_PluginList As Hashtable
     Public m_LoadedPlugins As Collection
     Public m_ApplicationPlugins As Hashtable

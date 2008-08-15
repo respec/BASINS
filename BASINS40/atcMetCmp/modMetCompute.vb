@@ -116,7 +116,7 @@ Public Module modMetCompute
                 End If
                 Call RadClc(aLatDeg, CldCov(i), ldate(1), ldate(2), SolRad(i))
             Else
-                SolRad(i) = Double.NaN
+                SolRad(i) = GetNaN()
             End If
         Next i
         Array.Copy(SolRad, 1, lCmpTs.Values, 1, lCmpTs.numValues)
@@ -711,7 +711,7 @@ Public Module modMetCompute
                 Next j
             Else
                 For j = 1 To 24
-                    lOutTs(lHrPos + j) = Double.NaN
+                    lOutTs(lHrPos + j) = GetNaN()
                 Next j
             End If
             'increment to next 24 hour period
@@ -845,7 +845,7 @@ Public Module modMetCompute
         'Dim lPoint As Boolean = aInTS.Attributes.GetValue("point", False)
 
         'If lPoint Then
-        '    'lDates.Value(ip) = Double.NaN
+        '    'lDates.Value(ip) = GetNaN
         '    Return Nothing
         'Else
         '    Dim lJDay As Double

@@ -101,8 +101,8 @@ Public Class atcDataSourceCligen
                                     lData = New atcTimeseries(Me)
                                     lData.Dates = New atcTimeseries(Me)
                                     lData.numValues = .NumRecords
-                                    lData.Value(0) = Double.NaN
-                                    lData.Dates.Value(0) = Double.NaN
+                                    lData.Value(0) = GetNaN()
+                                    lData.Dates.Value(0) = GetNaN()
                                     lData.Attributes.SetValue("Count", 0)
                                     lData.Attributes.SetValue("Scenario", "CLIGEN")
                                     lData.Attributes.SetValue("Location", lLocation)

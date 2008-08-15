@@ -38,8 +38,8 @@ Public Class frmSpecifyYearsSeasons
         If aFirstYear <> 0 Then txtOmitBeforeYear.Text = aFirstYear
         If aLastYear <> 0 Then txtOmitAfterYear.Text = aLastYear
 
-        Dim lFirstDate As Double = Double.MaxValue
-        Dim lLastDate As Double = Double.MinValue
+        Dim lFirstDate As Double = GetMaxValue()
+        Dim lLastDate As Double = GetMinValue()
         For Each lDataset As atcData.atcTimeseries In aDataGroup
             If lDataset.Dates.numValues > 0 Then
                 Dim lThisDate As Double = lDataset.Dates.Value(1)
@@ -48,12 +48,12 @@ Public Class frmSpecifyYearsSeasons
                 If lThisDate > lLastDate Then lLastDate = lThisDate
             End If
         Next
-        If lFirstDate < Double.MaxValue Then
+        If lFirstDate < GetMaxValue() Then
             'Dim lDate As Date = Date.FromOADate(lFirstDate)
             'txtOmitBeforeYear.Text = lDate.Year
             lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
         End If
-        If lLastDate > Double.MinValue Then
+        If lLastDate > GetMinValue() Then
             'Dim lDate As Date = Date.FromOADate(lLastDate)
             'txtOmitAfterYear.Text = lDate.Year
             lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)

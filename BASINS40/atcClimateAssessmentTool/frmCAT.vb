@@ -1623,9 +1623,9 @@ NextIteration:
         With lVariation
             .Name = ""
             .Operation = "Mean"
-            .Min = Double.NaN
-            .Max = Double.NaN
-            .Increment = Double.NaN
+            .Min = GetNaN()
+            .Max = GetNaN()
+            .Increment = GetNaN()
         End With
         If frmEnd.AskUser(lVariation) Then
             pUnsaved = True

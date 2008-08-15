@@ -172,7 +172,7 @@ Public Class atcTimeseriesSWAT
                                         If lTSBuilder.NumValues = 0 Then
                                             Dim lYearFill As Integer = lYearBase
                                             While lYear >= lYearFill
-                                                lTSBuilder.AddValue(atcUtility.Jday(lYearFill, 1, 1, 0, 0, 0), Double.NaN)
+                                                lTSBuilder.AddValue(atcUtility.Jday(lYearFill, 1, 1, 0, 0, 0), GetNaN)
                                                 lYearFill += 1
                                             End While
                                             If lSaveSubwatershedId Then

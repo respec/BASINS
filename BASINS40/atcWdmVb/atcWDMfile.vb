@@ -253,7 +253,7 @@ Public Class atcWDMfile
         'Logger.Dbg("  DataPointersInUse:" & lInUse & ":" & lDataPointerInUseCount)
 
         Dim lData As New ArrayList
-        lData.Add(Double.NaN)
+        lData.Add(GetNaN)
         Dim lDate As New ArrayList
         Dim lCurrentDateJ As Double
 
@@ -296,7 +296,7 @@ Public Class atcWDMfile
                             lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
                             Dim lDataCurrent As Double = CDbl(aWdm.ReadSingle())
                             If Math.Abs(lDataCurrent - lTsFill) < Double.Epsilon Then
-                                lDataCurrent = Double.NaN
+                                lDataCurrent = GetNaN()
                             End If
                             lData.Add(lDataCurrent)
                         Next
@@ -304,7 +304,7 @@ Public Class atcWDMfile
                     Else
                         Dim lDataComp As Double = CDbl(aWdm.ReadSingle())
                         If Math.Abs(lDataComp - lTsFill) < Double.Epsilon Then
-                            lDataComp = Double.NaN
+                            lDataComp = GetNaN()
                         End If
                         For lPos As Int32 = 1 To lBlockNumVals
                             lDate.Add(lCurrentDateJ)

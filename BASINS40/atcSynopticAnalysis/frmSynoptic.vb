@@ -10,8 +10,8 @@ Public Class frmSynoptic
     Private WithEvents pEvents As atcDataGroup
 
     Private pInitialized As Boolean = False
-    Private pLastThreshold As Double = Double.NaN
-    Private pLastDaysGapAllowed As Double = Double.NaN
+    Private pLastThreshold As Double = GetNaN()
+    Private pLastDaysGapAllowed As Double = GetNaN()
     Private pLastHighEvents As Boolean = True
 
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper

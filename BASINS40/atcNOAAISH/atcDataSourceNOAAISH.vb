@@ -154,7 +154,7 @@ Public Class atcDataSourceNOAAISH
                                 lData = New atcTimeseries(Me)
                                 lData.Dates = New atcTimeseries(Me)
                                 lData.numValues = lBufSiz
-                                lData.Value(0) = Double.NaN
+                                lData.Value(0) = GetNaN()
                                 lData.Dates.Value(0) = 0
                                 lData.Attributes.SetValue("Count", 0)
                                 lData.Attributes.SetValue("Scenario", "OBSERVED")
@@ -193,7 +193,7 @@ Public Class atcDataSourceNOAAISH
                                             'existing value is missing, replace with current valid one
                                             lCurVal = CDbl(ColValue(i).Value)
                                         Else 'keep existing value
-                                            lCurVal = Double.NaN
+                                            lCurVal = GetNaN()
                                         End If
                                     End If
                                 End If

@@ -85,6 +85,8 @@ Friend Class MapWindowForm
         'SaveSetting(pAppName, "Defaults", "CacheFolder", txtCache.Text)
     End Sub
 
+    'Public Sub Busy(ByVal aBusy As Boolean) Implements MapWinUtility.IProgressStatus.Busy
+    'End Sub
 
     Public Sub Progress(ByVal CurrentPosition As Integer, ByVal LastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
         If CurrentPosition < LastPosition Then
