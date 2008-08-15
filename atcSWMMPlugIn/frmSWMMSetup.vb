@@ -1016,6 +1016,7 @@ Public Class frmSWMMSetup
             Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
             'TODO: still use modelout?
             Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
+            MkDirPath(PathNameOnly(lSWMMProjectFileName))
 
             If Not PreProcessChecking(lSWMMProjectFileName) Then 'failed early checks
                 Exit Sub
@@ -1070,6 +1071,9 @@ Public Class frmSWMMSetup
                 Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
                 Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
                 CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
+                ComputeImperviousPercentage(.Catchments, .Landuses)
+                'Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lblClass.Text, AtcGridPervious, .Landuses)
+                '.Landuses = lReclassifyLanduses
             End If
 
             lblStatus.Text = "Writing SWMM INP file"

@@ -248,8 +248,6 @@ Friend Module modSWMMFromMW
             Next
         Next
 
-        ComputeImperviousPercentage(aCatchments, aLanduses)
-
     End Function
 
     Public Function CreateMetConstituent(ByVal aWDMFileName As String, _
@@ -307,7 +305,7 @@ Friend Module modSWMMFromMW
         Return lGetTimeseries
     End Function
 
-    Private Function ComputeImperviousPercentage(ByVal aCatchments As Catchments, _
+    Friend Function ComputeImperviousPercentage(ByVal aCatchments As Catchments, _
                                                  ByVal aLanduses As Landuses) As Boolean
 
         For Each lCatchment As Catchment In aCatchments
