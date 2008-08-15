@@ -271,7 +271,7 @@ Public Class atcTimeseriesFileHspfBinOut
                     Dim lEJday As Integer = lTimeseries.Attributes.GetValue("EJDay")
                     Dim lOutLev As Integer = .Data.Item(0).OutLev
                     lJDates.Add(lSJday)
-                    lValues.Add(Double.NaN)
+                    lValues.Add(GetNaN)
                     For Each lHspfBinaryDatum As HspfBinaryDatum In .Data
                         Dim lCurJday As Double = Date2J(lHspfBinaryDatum.DateArray)
                         If lCurJday >= lSJday Then
@@ -294,7 +294,7 @@ Public Class atcTimeseriesFileHspfBinOut
             .Dates.Values = lJDates.ToArray
             .Values = lValues.ToArray
             If (.Attributes.GetValue("Point", False)) Then
-                .Values(0) = Double.NaN
+                .Values(0) = GetNaN()
             Else
                 .Values(0) = lValues(1)
             End If

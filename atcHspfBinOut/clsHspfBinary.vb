@@ -198,7 +198,7 @@ Friend Class HspfBinary
     End Property
 
     'Friend Function BinaryValue(ByVal aOperationKey As String, ByVal aVariableKey As String, ByVal aDateKey As String) As Single
-    '    Dim lValue As Double = Double.NaN
+    '    Dim lValue As Double = GetNaN
 
     '    Try
     '        Dim lHeaderKey As String = pHeaders.Item(aOperationKey).Id.AsKey

@@ -325,7 +325,7 @@ Public Class ExpertSystem
             For Each lDatasetType As String In lDataSetTypes ' As Integer = 1 To pDatasetTypes.Count
                 Dim lStatGroup As Integer = pDatasetTypes.IndexFromKey(lDatasetType) + 1
                 'set Stats to undefined for this group
-                ZipR(pStatistics.Count, Double.NaN, pStats, lStatGroup, lSiteIndex)
+                ZipR(pStatistics.Count, GetNaN, pStats, lStatGroup, lSiteIndex)
 
                 Dim lDSN As Integer
                 Select Case lStatGroup 'get the correct dsn
@@ -362,7 +362,7 @@ Public Class ExpertSystem
 
                 If lDataProblem Then  'if we weren't able to retrieve the data set
                     'set Stats to undefined
-                    ZipR(pStatistics.Count, Double.NaN, pStats, lStatGroup, lSiteIndex)
+                    ZipR(pStatistics.Count, GetNaN, pStats, lStatGroup, lSiteIndex)
                     Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf & _
                                "from the file " & aDataSource.Name, "Bad Data Set")
                 Else  'generate statistics
@@ -441,7 +441,7 @@ Public Class ExpertSystem
                             If (lSavDat > 0.0000000001) Then 'have some flow
                                 lRecession = lRecessionTimser.Values(lIndex) / lSavDat
                             Else 'no flow
-                                lRecession = Double.NaN
+                                lRecession = GetNaN()
                             End If
                             lSavDat = lRecessionTimser.Values(lIndex)
                             lRecessionTimser.Values(lIndex - 1) = lRecession
@@ -454,7 +454,7 @@ Public Class ExpertSystem
                         If IsNumeric(lStr) Then
                             pStats(6, lStatGroup, lSiteIndex) = lStr
                         Else
-                            pStats(6, lStatGroup, lSiteIndex) = Double.NaN
+                            pStats(6, lStatGroup, lSiteIndex) = GetNaN()
                         End If
                         lRecessionTimser.Clear()
                         lRecessionTimser.Dates.Clear()
@@ -489,7 +489,7 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(1) = 100.0# * ((pStats(1, 1, lSiteIndex) - pStats(1, 2, lSiteIndex)) _
                                                   / pStats(1, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(1) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(1) = GetNaN()
             End If
 
             '     'total volume difference
@@ -503,7 +503,7 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(3) = 100.0# * ((pStats(2, 1, lSiteIndex) - pStats(2, 2, lSiteIndex)) _
                                                   / pStats(2, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(3) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(3) = GetNaN()
             End If
 
             'volume error in highest 10% flows
@@ -511,7 +511,7 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(4) = 100.0# * ((pStats(3, 1, lSiteIndex) - pStats(3, 2, lSiteIndex)) _
                                            / pStats(3, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(4) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(4) = GetNaN()
             End If
 
             'volume error in lowest 10% flows
@@ -519,7 +519,7 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(12) = 100.0# * ((pStats(11, 1, lSiteIndex) - pStats(11, 2, lSiteIndex)) _
                                            / pStats(11, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(12) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(12) = GetNaN()
             End If
 
             'volume error in lowest 25% flows
@@ -527,7 +527,7 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(13) = 100.0# * ((pStats(12, 1, lSiteIndex) - pStats(12, 2, lSiteIndex)) _
                                            / pStats(12, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(13) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(13) = GetNaN()
             End If
 
             'volume error in highest 25% flows
@@ -535,7 +535,7 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(14) = 100.0# * ((pStats(13, 1, lSiteIndex) - pStats(13, 2, lSiteIndex)) _
                                            / pStats(13, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(14) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(14) = GetNaN()
             End If
 
             'volume error in highest 25% flows
@@ -543,7 +543,7 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(15) = 100.0# * ((pStats(14, 1, lSiteIndex) - pStats(14, 2, lSiteIndex)) _
                                            / pStats(14, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(15) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(15) = GetNaN()
             End If
 
             'total storm volume
@@ -551,25 +551,25 @@ Public Class ExpertSystem
                 pSites(lSiteIndex).ErrorTerm(5) = 100.0# * ((pStats(4, 1, lSiteIndex) - pStats(4, 2, lSiteIndex)) _
                                            / pStats(4, 2, lSiteIndex))
             Else
-                pSites(lSiteIndex).ErrorTerm(5) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(5) = GetNaN()
             End If
 
             'summer storm volume
-            Dim lSummerStormVolumeError As Double = Double.NaN
+            Dim lSummerStormVolumeError As Double = GetNaN()
             If (pStats(9, 2, lSiteIndex) > 0.0# And pStats(4, 2, lSiteIndex) > 0.0#) Then
                 lSummerStormVolumeError = (100.0# * ((pStats(9, 1, lSiteIndex) - pStats(9, 2, lSiteIndex)) _
                                             / pStats(9, 2, lSiteIndex))) '- pSites(lSiteIndex).ErrorTerm(5)
             End If
 
             'winter storm volume
-            Dim lWinterStormVolumeError As Double = Double.NaN
+            Dim lWinterStormVolumeError As Double = GetNaN()
             If (pStats(10, 2, lSiteIndex) > 0.0# And pStats(4, 2, lSiteIndex) > 0.0#) Then
                 lWinterStormVolumeError = (100.0# * ((pStats(10, 1, lSiteIndex) - pStats(10, 2, lSiteIndex)) _
                                             / pStats(10, 2, lSiteIndex))) '- pSites(lSiteIndex).ErrorTerm(5)
             End If
 
             'average peak
-            Dim lAverageStormPeakError As Double = Double.NaN
+            Dim lAverageStormPeakError As Double = GetNaN()
             If (pStats(5, 2, lSiteIndex) > 0.0#) Then
                 lAverageStormPeakError = (100.0# * ((pStats(5, 1, lSiteIndex) - pStats(5, 2, lSiteIndex)) _
                                             / pStats(5, 2, lSiteIndex)))
@@ -578,20 +578,20 @@ Public Class ExpertSystem
             'error in low flow recession
             If Double.IsNaN(pStats(6, 1, lSiteIndex)) Or _
                Double.IsNaN(pStats(6, 2, lSiteIndex)) Then
-                pSites(lSiteIndex).ErrorTerm(2) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(2) = GetNaN()
             Else 'okay to calculate this term
                 pSites(lSiteIndex).ErrorTerm(2) = (1.0# - pStats(6, 1, lSiteIndex)) - (1.0# - pStats(6, 2, lSiteIndex))
             End If
 
             'summer flow volume
-            Dim lSummerError As Double = Double.NaN
+            Dim lSummerError As Double = GetNaN()
             If (pStats(7, 2, lSiteIndex) > 0.0#) Then
                 lSummerError = 100.0# * ((pStats(7, 1, lSiteIndex) - pStats(7, 2, lSiteIndex)) _
                                            / pStats(7, 2, lSiteIndex))
             End If
 
             'winter flow volume
-            Dim lWinterError As Double = Double.NaN
+            Dim lWinterError As Double = GetNaN()
             If (pStats(8, 2, lSiteIndex) > 0.0#) Then
                 lWinterError = 100.0# * ((pStats(8, 1, lSiteIndex) - pStats(8, 2, lSiteIndex)) _
                                            / pStats(8, 2, lSiteIndex))
@@ -600,7 +600,7 @@ Public Class ExpertSystem
             'error in seasonal volume
             If (Double.IsNaN(lSummerError) Or _
                    Double.IsNaN(lWinterError)) Then 'one term or the other has not been obtained
-                pSites(lSiteIndex).ErrorTerm(7) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(7) = GetNaN()
             Else 'okay to calculate this term
                 pSites(lSiteIndex).ErrorTerm(7) = Math.Abs(lSummerError - lWinterError)
             End If

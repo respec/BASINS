@@ -622,12 +622,12 @@ Public Class frmEndpoint
                 Try
                     .Min = CDbl(txtMin.Text)
                 Catch
-                    .Min = Double.NaN
+                    .Min = GetNaN()
                 End Try
                 Try
                     .Max = CDbl(txtMax.Text)
                 Catch
-                    .Max = Double.NaN
+                    .Max = GetNaN()
                 End Try
                 .ColorAboveMax = txtHighColor.BackColor
                 .ColorBelowMin = txtLowColor.BackColor

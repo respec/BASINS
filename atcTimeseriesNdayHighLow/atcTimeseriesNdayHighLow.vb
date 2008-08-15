@@ -150,9 +150,9 @@ Public Class atcTimeseriesNdayHighLow
             Dim lCurrentValue As Double
 
             If aHigh Then
-                lBestSoFar = Double.MinValue
+                lBestSoFar = GetMinValue()
             Else
-                lBestSoFar = Double.MaxValue
+                lBestSoFar = GetMaxValue()
             End If
 
             While lTimeIndex <= aTS.numValues
@@ -245,7 +245,7 @@ Public Class atcTimeseriesNdayHighLow
                             newTS.Value(indexNew) = HighOrLowValue(lCurrentYear, CInt(lNDayNow), aHigh, lDate)
                             newTS.ValueAttributes(indexNew).Add("PeakDate", lDate)
                         Catch e As Exception
-                            newTS.Value(indexNew) = Double.NaN
+                            newTS.Value(indexNew) = GetNaN()
                             newTS.ValueAttributes(indexNew) = New atcDataAttributes()
                             newTS.ValueAttributes(indexNew).SetValue("Explanation", e.Message)
                         End Try
@@ -330,9 +330,9 @@ Public Class atcTimeseriesNdayHighLow
                     Catch ex As Exception
                         lMsg = "ComputeFreq:Exception:" & ex.ToString & ":" & lNdayTs.ToString
                         Logger.Dbg(lMsg)
-                        lTau = Double.NaN
-                        lLevel = Double.NaN
-                        lSlope = Double.NaN
+                        lTau = GetNaN()
+                        lLevel = GetNaN()
+                        lSlope = GetNaN()
                     End Try
 
                     Dim lArguments As New atcDataAttributes
@@ -399,7 +399,7 @@ Public Class atcTimeseriesNdayHighLow
         Try
             If aTimeseries.Attributes.GetValue("Tu", 1) = 6 AndAlso _
                aHigh = aTimeseries.Attributes.GetValue("HighFlag", True) AndAlso _
-               aNDay = aTimeseries.Attributes.GetValue("NDay", Double.NaN) Then
+               aNDay = aTimeseries.Attributes.GetValue("NDay", GetNaN) Then
                 aNdayTsGroup = New atcDataGroup(aTimeseries)
             End If
         Catch ex As Exception
@@ -437,13 +437,13 @@ Public Class atcTimeseriesNdayHighLow
                         End If
                     Catch ex As Exception
                         lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
-                        lQ = Double.NaN
+                        lQ = GetNaN()
                     End Try
 
                     If lQ = 0 Or Double.IsNaN(lQ) Then
                         If lMsg.Length = 0 Then
                             lMsg = "ComputeFreq:ZeroOrNan:" & lQ & ":"
-                            lQ = Double.NaN
+                            lQ = GetNaN()
                         End If
 
                         lMsg &= lNday & ":" & lRecurOrProbNow & ":" & aHigh & ":" & lNdayTs.Attributes.GetValue("Count")

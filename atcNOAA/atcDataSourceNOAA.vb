@@ -138,8 +138,8 @@ Public Class atcDataSourceNOAA
                             lData = New atcTimeseries(Me)
                             lData.Dates = New atcTimeseries(Me)
                             lData.numValues = lBufSiz
-                            lData.Value(0) = Double.NaN
-                            lData.Dates.Value(0) = Double.NaN
+                            lData.Value(0) = GetNaN()
+                            lData.Dates.Value(0) = GetNaN()
                             lData.Attributes.SetValue("Count", 0)
                             lData.Attributes.SetValue("Scenario", "OBSERVED")
                             lData.Attributes.SetValue("Location", ColLocation.Value)

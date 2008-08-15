@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 
 Imports System.Windows.Forms
 
@@ -257,7 +258,7 @@ Public Class atcTimeseriesMath
 
         Dim lArgCount As Integer = 0
 
-        Dim lNumber As Double = Double.NaN
+        Dim lNumber As Double = GetNaN
         Dim lHaveNumber As Boolean = False
         If aArgs.ContainsAttribute("Number") AndAlso Not aArgs.GetValue("Number") Is Nothing Then
             Dim lValue As Double = aArgs.GetValue("Number")

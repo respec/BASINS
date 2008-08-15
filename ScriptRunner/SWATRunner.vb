@@ -1322,8 +1322,8 @@ Module SWATRunner
                             lArea = lAreaTimser.Value(lYearIndex)
                             lUnitYield = lYieldTimser.Value(lYearIndex)
                         Else
-                            lArea = Double.NaN
-                            lUnitYield = Double.NaN
+                            lArea = GetNaN()
+                            lUnitYield = GetNaN()
                         End If
                         Dim lYield As Double = lUnitYield * lArea
                         lSBDebug.AppendLine(lSubId.Trim & lTab & _

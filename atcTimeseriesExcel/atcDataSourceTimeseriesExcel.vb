@@ -1,5 +1,6 @@
 Imports atcData
 Imports atccontrols
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class atcDataSourceTimeseriesExcel
@@ -65,7 +66,7 @@ Public Class atcDataSourceTimeseriesExcel
 
             With lSysDataSet.Tables(0)
                 lDates = New atcTimeseries(Me)
-                lDates.Value(0) = Double.NaN
+                lDates.Value(0) = GetNaN
                 lDates.numValues = .Columns.Count
                 Dim lCount As Integer = 0
                 For lCol As Integer = 1 To .Columns.Count - 1
@@ -87,7 +88,7 @@ Public Class atcDataSourceTimeseriesExcel
                         lData = New atcTimeseries(Me)
                         lData.Dates = lDates
                         lData.numValues = lDates.numValues
-                        lData.Value(0) = Double.NaN
+                        lData.Value(0) = GetNaN()
                         lData.Attributes.SetValue("ID", DataSets.Count + 1)
                         lData.Attributes.SetValue("Scenario", "OBSERVED")
                         lData.Attributes.SetValue("Location", lLocation)
@@ -97,7 +98,7 @@ Public Class atcDataSourceTimeseriesExcel
                         For lCol As Integer = 1 To .Columns.Count - 1
                             Dim lDateValue As Object = .Rows(lRow).Item(lCol)
                             If TypeOf (lDateValue) Is DBNull Then 'save the date
-                                lData.Value(lCol) = Double.NaN
+                                lData.Value(lCol) = GetNaN()
                             Else
                                 lData.Value(lCol) = lDateValue
                             End If

@@ -119,7 +119,7 @@ Public Module WatershedConstituentBalance
                                         lTempDataSet = lLocationDataGroup.Item(0)
                                         Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
                                         If lAttribute Is Nothing Then
-                                            lValue = Double.NaN
+                                            lValue = GetNaN()
                                         Else
                                             lValue = lAttribute.Value
                                         End If
