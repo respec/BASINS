@@ -25,6 +25,7 @@ Public Class atcAttributeDefinition
 
     Private Shared pNaN As Double = GetNaN()
 
+    Public Units As String
     Dim pName As String         'Short name (used for labeling in UI)
     Dim pDescription As String  'Something longer than Name but still short
     Dim pCategory As String     'Optional, used for grouping similar attributes in UI
