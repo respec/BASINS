@@ -818,4 +818,137 @@ Public Class ctlEditSpecialAction
 
     End Sub
 
+    Public Function UVNameInUse(ByVal Name$) As Boolean
+        Dim ctmp As String
+        Dim lIndex As Integer
+
+        UVNameInUse = False
+        'check front tab
+        For lIndex = 1 To atcgrid0.Source.Rows
+            If atcgrid0.Source.CellValue(lIndex, 0) = "User Defn Name" Then
+                ctmp = atcgrid0.Source.CellValue(lIndex, 1)
+                If Trim(Mid(ctmp, 11, 6)) = Name Then
+                    UVNameInUse = True
+                End If
+            End If
+        Next lIndex
+        'check uvname tab as well
+        For lIndex = 1 To atcgrid3.Source.Rows
+            ctmp = atcgrid3.Source.CellValue(lIndex, 0)
+            If Trim(ctmp) = Name Then
+                UVNameInUse = True
+            End If
+        Next
+    End Function
+
+    Public Function NextDistribNumber() As Long
+        Dim ctmp As String
+        Dim lIndex As Integer
+        Dim ifound As Boolean
+
+        NextDistribNumber = 1
+
+        ifound = True
+        Do Until ifound = False
+            ifound = False
+            'check front tab
+            For lIndex = 1 To atcgrid0.Source.Rows
+                If atcgrid0.Source.CellValue(lIndex, 0) = "Distrib" Then
+                    ctmp = atcgrid0.Source.CellValue(lIndex, 1)
+                    If CInt(Mid(ctmp, 9, 3)) = NextDistribNumber Then
+                        ifound = True
+                        Exit For
+                    End If
+                End If
+            Next lIndex
+            If Not ifound Then
+                'check distrib tab as well
+                For lIndex = 1 To atcgrid2.Source.Rows
+                    ctmp = atcgrid2.Source.CellValue(lIndex, 0)
+                    If IsNumeric(ctmp) Then
+                        If CInt(ctmp) = NextDistribNumber Then
+                            ifound = True
+                            Exit For
+                        End If
+                    End If
+                Next
+            End If
+            If ifound Then
+                NextDistribNumber = NextDistribNumber + 1
+            End If
+        Loop
+
+    End Function
+
+    Public Function UVQuanInUse(ByVal Name$, ByVal Id&) As String
+        Dim ctmp As String
+        Dim lIndex As Integer
+
+        UVQuanInUse = ""
+        'check front tab
+        For lIndex = 1 To atcgrid0.Source.Rows
+            If atcgrid0.Source.CellValue(lIndex, 0) = "User Defn Quan" Then
+                ctmp = atcgrid0.Source.CellValue(lIndex, 1)
+                If Trim(Mid(ctmp, 17, 6)) = Name And CInt(Mid(ctmp, 24, 3)) = Id Then
+                    UVQuanInUse = Mid(ctmp, 10, 6)
+                End If
+            End If
+        Next
+        'check uvquan tab as well
+        For lIndex = 1 To atcgrid4.Source.Rows
+            ctmp = atcgrid4.Source.CellValue(lIndex, 1)
+            If Trim(ctmp) = Name Then
+                ctmp = atcgrid4.Source.CellValue(lIndex, 2)
+                If IsNumeric(ctmp) Then
+                    If CInt(ctmp) = Id Then
+                        UVQuanInUse = Mid(ctmp, 10, 6)
+                    End If
+                End If
+            End If
+        Next
+    End Function
+
+    Public Function NextUVQuanName(ByVal firstfour$) As String
+        Dim ctmp As String
+        Dim lIndex As Integer
+        Dim nextnumber As Integer
+        Dim ifound As Boolean
+
+        nextnumber = 1
+        NextUVQuanName = ""
+        ifound = True
+        Do Until ifound = False
+            ifound = False
+            NextUVQuanName = firstfour & CStr(nextnumber)
+            'check front tab
+            For lIndex = 1 To atcgrid0.Source.Rows
+                If atcgrid0.Source.CellValue(lIndex, 0) = "User Defn Quan" Then
+                    ctmp = atcgrid0.Source.CellValue(lIndex, 1)
+                    If Trim(Mid(ctmp, 10, 6)) = NextUVQuanName Then
+                        ifound = True
+                        Exit For
+                    End If
+                End If
+            Next
+            If Not ifound Then
+                'check user defn quan tab as well
+                For lIndex = 1 To atcgrid4.Source.Rows
+                    ctmp = atcgrid4.Source.CellValue(lIndex, 1)
+                    If Trim(ctmp) = NextUVQuanName Then
+                        ifound = True
+                        Exit For
+                    End If
+                Next
+            End If
+            If ifound Then
+                nextnumber = nextnumber + 1
+            End If
+        Loop
+
+    End Function
+
+    Private Sub cmdAgPrac_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAgPrac.Click
+        'frmAgPrac.init(Me.Owner.Uci, Me)
+        'frmAgPrac.Show(vbModal)
+    End Sub
 End Class
