@@ -51,6 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsUCIForms.vb" />
+    <Compile Include="frmAgPrac.Designer.vb">
+      <DependentUpon>frmAgPrac.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAgPrac.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ctlEditSpecialAction.Designer.vb">
       <DependentUpon>ctlEditSpecialAction.vb</DependentUpon>
     </Compile>
@@ -135,6 +141,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmAgPrac.resx">
+      <DependentUpon>frmAgPrac.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ctlEditSpecialAction.resx">
       <DependentUpon>ctlEditSpecialAction.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -207,6 +217,10 @@
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -45,6 +45,9 @@ Partial Class ctlEditSpecialAction
         '
         'tabSpecial
         '
+        Me.tabSpecial.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tabSpecial.Controls.Add(Me.REcords)
         Me.tabSpecial.Controls.Add(Me.TabPage2)
         Me.tabSpecial.Controls.Add(Me.TabPage3)
@@ -125,6 +128,7 @@ Partial Class ctlEditSpecialAction
         '
         'lblcounts
         '
+        Me.lblcounts.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblcounts.AutoSize = True
         Me.lblcounts.Location = New System.Drawing.Point(13, 493)
         Me.lblcounts.Name = "lblcounts"
@@ -134,6 +138,7 @@ Partial Class ctlEditSpecialAction
         '
         'cmdAgPrac
         '
+        Me.cmdAgPrac.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAgPrac.Location = New System.Drawing.Point(800, 482)
         Me.cmdAgPrac.Name = "cmdAgPrac"
         Me.cmdAgPrac.Size = New System.Drawing.Size(131, 35)
@@ -145,6 +150,7 @@ Partial Class ctlEditSpecialAction
         '
         Me.atcgrid0.AllowHorizontalScrolling = True
         Me.atcgrid0.AllowNewValidValues = False
+        Me.atcgrid0.AutoSize = True
         Me.atcgrid0.CellBackColor = System.Drawing.Color.Empty
         Me.atcgrid0.LineColor = System.Drawing.Color.Empty
         Me.atcgrid0.LineWidth = 0.0!
@@ -231,6 +237,7 @@ Partial Class ctlEditSpecialAction
         Me.Size = New System.Drawing.Size(939, 549)
         Me.tabSpecial.ResumeLayout(False)
         Me.REcords.ResumeLayout(False)
+        Me.REcords.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage4.ResumeLayout(False)
