@@ -338,4 +338,69 @@ Friend Module modSWMMFromMW
 
     End Function
 
+    Friend Sub BuildListofPrecStationNames(ByRef aMetWDMName As String, _
+                                           ByVal aPrecStations As atcCollection, _
+                                           ByVal aPrecDsns As atcCollection)
+        aPrecStations.Clear()
+        aPrecDsns.Clear()
+        Dim lDataSource As New atcWDM.atcDataSourceWDM
+        If FileExists(aMetWDMName) Then
+            Dim lFound As Boolean = False
+            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+                If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
+                    'found it in the BASINS data sources
+                    lDataSource = lBASINSDataSource
+                    lFound = True
+                    Exit For
+                End If
+            Next
+
+            If Not lFound Then 'need to open it here
+                If lDataSource.Open(aMetWDMName) Then
+                    lFound = True
+                End If
+            End If
+
+            If lFound Then
+                Dim lCounter As Integer = 0
+                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+
+                    lCounter += 1
+                    Logger.Progress(lCounter, lDataSource.DataSets.Count)
+
+                    If (lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" Or lDataSet.Attributes.GetValue("Scenario") = "COMPUTED") _
+                        And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
+                        Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
+                        Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
+                        Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+                        Dim lSJDay As Double = lDataSet.Dates.Value(0)
+                        Dim lEJDay As Double = lDataSet.Dates.Value(lDataSet.Dates.numValues)
+                        'if this one is computed and observed also exists at same location, just use observed
+                        Dim lAddIt As Boolean = True
+                        If lDataSet.Attributes.GetValue("Scenario") = "COMPUTED" Then
+                            For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
+                                If lDataSet2.Attributes.GetValue("Constituent") = "PREC" And _
+                                   lDataSet2.Attributes.GetValue("Scenario") = "OBSERVED" And _
+                                   lDataSet2.Attributes.GetValue("Location") = lLoc Then
+                                    lAddIt = False
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If lAddIt Then
+                            Dim lLeadingChar As String = ""
+                            Dim lSdate(6) As Integer
+                            Dim lEdate(6) As Integer
+                            J2Date(lSJDay, lSdate)
+                            J2Date(lEJDay, lEdate)
+                            Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
+                            aPrecStations.Add(lLeadingChar & lLoc & ":" & lStanam & " " & lDateString)
+                            aPrecDsns.Add(lDsn)
+                        End If
+                    End If
+                Next
+            End If
+        End If
+    End Sub
+
 End Module
