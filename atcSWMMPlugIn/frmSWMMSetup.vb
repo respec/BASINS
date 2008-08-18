@@ -61,9 +61,7 @@ Public Class frmSWMMSetup
     Friend WithEvents cboLandUseLayer As System.Windows.Forms.ComboBox
     Friend WithEvents lblLandUseLayer As System.Windows.Forms.Label
     Friend WithEvents TabPage6 As System.Windows.Forms.TabPage
-    Friend WithEvents Label22 As System.Windows.Forms.Label
-    Friend WithEvents AtcGridMet As atcControls.atcGrid
-    Friend WithEvents lstMet As System.Windows.Forms.ListBox
+    Friend WithEvents AtcGridPrec As atcControls.atcGrid
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents txtMetWDMName As System.Windows.Forms.TextBox
     Friend WithEvents cmdSelectWDM As System.Windows.Forms.Button
@@ -73,6 +71,7 @@ Public Class frmSWMMSetup
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
     Friend WithEvents atcGridFields As atcControls.atcGrid
+    Friend WithEvents ofdMetWDM As System.Windows.Forms.OpenFileDialog
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWMMSetup))
@@ -106,16 +105,15 @@ Public Class frmSWMMSetup
         Me.cboLandUseLayer = New System.Windows.Forms.ComboBox
         Me.lblLandUseLayer = New System.Windows.Forms.Label
         Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.atcGridFields = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
-        Me.Label22 = New System.Windows.Forms.Label
-        Me.AtcGridMet = New atcControls.atcGrid
-        Me.lstMet = New System.Windows.Forms.ListBox
+        Me.AtcGridPrec = New atcControls.atcGrid
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.txtMetWDMName = New System.Windows.Forms.TextBox
         Me.cmdSelectWDM = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
-        Me.atcGridFields = New atcControls.atcGrid
+        Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
@@ -218,7 +216,7 @@ Public Class frmSWMMSetup
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(517, 340)
+        Me.TabPage1.Size = New System.Drawing.Size(501, 340)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -232,7 +230,7 @@ Public Class frmSWMMSetup
         Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboOutlets.Location = New System.Drawing.Point(168, 228)
         Me.cboOutlets.Name = "cboOutlets"
-        Me.cboOutlets.Size = New System.Drawing.Size(339, 25)
+        Me.cboOutlets.Size = New System.Drawing.Size(323, 25)
         Me.cboOutlets.TabIndex = 14
         '
         'Label5
@@ -254,7 +252,7 @@ Public Class frmSWMMSetup
         Me.cboMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboMet.Location = New System.Drawing.Point(168, 272)
         Me.cboMet.Name = "cboMet"
-        Me.cboMet.Size = New System.Drawing.Size(337, 25)
+        Me.cboMet.Size = New System.Drawing.Size(321, 25)
         Me.cboMet.TabIndex = 12
         '
         'Label9
@@ -276,7 +274,7 @@ Public Class frmSWMMSetup
         Me.cboStreams.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboStreams.Location = New System.Drawing.Point(168, 183)
         Me.cboStreams.Name = "cboStreams"
-        Me.cboStreams.Size = New System.Drawing.Size(337, 25)
+        Me.cboStreams.Size = New System.Drawing.Size(321, 25)
         Me.cboStreams.TabIndex = 9
         '
         'cboSubbasins
@@ -288,7 +286,7 @@ Public Class frmSWMMSetup
         Me.cboSubbasins.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboSubbasins.Location = New System.Drawing.Point(168, 136)
         Me.cboSubbasins.Name = "cboSubbasins"
-        Me.cboSubbasins.Size = New System.Drawing.Size(337, 25)
+        Me.cboSubbasins.Size = New System.Drawing.Size(321, 25)
         Me.cboSubbasins.TabIndex = 8
         '
         'cboLanduse
@@ -300,7 +298,7 @@ Public Class frmSWMMSetup
         Me.cboLanduse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboLanduse.Location = New System.Drawing.Point(168, 88)
         Me.cboLanduse.Name = "cboLanduse"
-        Me.cboLanduse.Size = New System.Drawing.Size(337, 25)
+        Me.cboLanduse.Size = New System.Drawing.Size(321, 25)
         Me.cboLanduse.TabIndex = 7
         '
         'tbxName
@@ -310,7 +308,7 @@ Public Class frmSWMMSetup
         Me.tbxName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tbxName.Location = New System.Drawing.Point(168, 40)
         Me.tbxName.Name = "tbxName"
-        Me.tbxName.Size = New System.Drawing.Size(171, 23)
+        Me.tbxName.Size = New System.Drawing.Size(155, 23)
         Me.tbxName.TabIndex = 6
         '
         'Label4
@@ -365,7 +363,7 @@ Public Class frmSWMMSetup
         Me.TabPage2.Controls.Add(Me.lblLandUseLayer)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(517, 340)
+        Me.TabPage2.Size = New System.Drawing.Size(501, 340)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Land Use"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -383,14 +381,14 @@ Public Class frmSWMMSetup
         Me.AtcGridPervious.LineWidth = 0.0!
         Me.AtcGridPervious.Location = New System.Drawing.Point(14, 148)
         Me.AtcGridPervious.Name = "AtcGridPervious"
-        Me.AtcGridPervious.Size = New System.Drawing.Size(488, 172)
+        Me.AtcGridPervious.Size = New System.Drawing.Size(472, 172)
         Me.AtcGridPervious.Source = Nothing
         Me.AtcGridPervious.TabIndex = 18
         '
         'cmdChange
         '
         Me.cmdChange.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChange.Location = New System.Drawing.Point(430, 117)
+        Me.cmdChange.Location = New System.Drawing.Point(414, 117)
         Me.cmdChange.Name = "cmdChange"
         Me.cmdChange.Size = New System.Drawing.Size(72, 24)
         Me.cmdChange.TabIndex = 17
@@ -402,7 +400,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblClass.Location = New System.Drawing.Point(164, 118)
         Me.lblClass.Name = "lblClass"
-        Me.lblClass.Size = New System.Drawing.Size(258, 20)
+        Me.lblClass.Size = New System.Drawing.Size(242, 20)
         Me.lblClass.TabIndex = 16
         Me.lblClass.Text = "<none>"
         Me.lblClass.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -442,7 +440,7 @@ Public Class frmSWMMSetup
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLandUseLayer.Location = New System.Drawing.Point(168, 40)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(337, 25)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(321, 25)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
@@ -464,57 +462,50 @@ Public Class frmSWMMSetup
         Me.TabPage3.Text = "Field Mapping"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
+        'atcGridFields
+        '
+        Me.atcGridFields.AllowHorizontalScrolling = True
+        Me.atcGridFields.AllowNewValidValues = False
+        Me.atcGridFields.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcGridFields.BackColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.atcGridFields.CellBackColor = System.Drawing.Color.Empty
+        Me.atcGridFields.LineColor = System.Drawing.Color.Empty
+        Me.atcGridFields.LineWidth = 0.0!
+        Me.atcGridFields.Location = New System.Drawing.Point(15, 17)
+        Me.atcGridFields.Name = "atcGridFields"
+        Me.atcGridFields.Size = New System.Drawing.Size(469, 304)
+        Me.atcGridFields.Source = Nothing
+        Me.atcGridFields.TabIndex = 1
+        '
         'TabPage6
         '
-        Me.TabPage6.Controls.Add(Me.Label22)
-        Me.TabPage6.Controls.Add(Me.AtcGridMet)
-        Me.TabPage6.Controls.Add(Me.lstMet)
+        Me.TabPage6.Controls.Add(Me.AtcGridPrec)
         Me.TabPage6.Controls.Add(Me.GroupBox2)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(517, 340)
+        Me.TabPage6.Size = New System.Drawing.Size(501, 340)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Met Stations"
         Me.TabPage6.UseVisualStyleBackColor = True
         '
-        'Label22
+        'AtcGridPrec
         '
-        Me.Label22.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label22.AutoSize = True
-        Me.Label22.Location = New System.Drawing.Point(368, 313)
-        Me.Label22.Name = "Label22"
-        Me.Label22.Size = New System.Drawing.Size(125, 17)
-        Me.Label22.TabIndex = 20
-        Me.Label22.Text = "* Full Set Available"
-        '
-        'AtcGridMet
-        '
-        Me.AtcGridMet.AllowHorizontalScrolling = True
-        Me.AtcGridMet.AllowNewValidValues = False
-        Me.AtcGridMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.AtcGridPrec.AllowHorizontalScrolling = True
+        Me.AtcGridPrec.AllowNewValidValues = False
+        Me.AtcGridPrec.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridMet.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridMet.LineWidth = 0.0!
-        Me.AtcGridMet.Location = New System.Drawing.Point(21, 97)
-        Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(472, 206)
-        Me.AtcGridMet.Source = Nothing
-        Me.AtcGridMet.TabIndex = 19
-        '
-        'lstMet
-        '
-        Me.lstMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstMet.FormattingEnabled = True
-        Me.lstMet.ItemHeight = 17
-        Me.lstMet.Location = New System.Drawing.Point(21, 97)
-        Me.lstMet.Name = "lstMet"
-        Me.lstMet.Size = New System.Drawing.Size(472, 208)
-        Me.lstMet.TabIndex = 1
+        Me.AtcGridPrec.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridPrec.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridPrec.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridPrec.LineWidth = 0.0!
+        Me.AtcGridPrec.Location = New System.Drawing.Point(21, 97)
+        Me.AtcGridPrec.Name = "AtcGridPrec"
+        Me.AtcGridPrec.Size = New System.Drawing.Size(456, 206)
+        Me.AtcGridPrec.Source = Nothing
+        Me.AtcGridPrec.TabIndex = 19
         '
         'GroupBox2
         '
@@ -524,7 +515,7 @@ Public Class frmSWMMSetup
         Me.GroupBox2.Controls.Add(Me.cmdSelectWDM)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 20)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(473, 59)
+        Me.GroupBox2.Size = New System.Drawing.Size(457, 59)
         Me.GroupBox2.TabIndex = 0
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Met WDM File"
@@ -536,13 +527,13 @@ Public Class frmSWMMSetup
         Me.txtMetWDMName.Location = New System.Drawing.Point(21, 23)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
-        Me.txtMetWDMName.Size = New System.Drawing.Size(345, 23)
+        Me.txtMetWDMName.Size = New System.Drawing.Size(329, 23)
         Me.txtMetWDMName.TabIndex = 2
         '
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(382, 21)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(366, 21)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -573,22 +564,12 @@ Public Class frmSWMMSetup
         Me.lblStatus.TabIndex = 0
         Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         '
-        'atcGridFields
+        'ofdMetWDM
         '
-        Me.atcGridFields.AllowHorizontalScrolling = True
-        Me.atcGridFields.AllowNewValidValues = False
-        Me.atcGridFields.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.atcGridFields.BackColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.atcGridFields.CellBackColor = System.Drawing.Color.Empty
-        Me.atcGridFields.LineColor = System.Drawing.Color.Empty
-        Me.atcGridFields.LineWidth = 0.0!
-        Me.atcGridFields.Location = New System.Drawing.Point(15, 17)
-        Me.atcGridFields.Name = "atcGridFields"
-        Me.atcGridFields.Size = New System.Drawing.Size(469, 304)
-        Me.atcGridFields.Source = Nothing
-        Me.atcGridFields.TabIndex = 1
+        Me.ofdMetWDM.DefaultExt = "wdm"
+        Me.ofdMetWDM.Filter = "Met WDM files (*.wdm)|*.wdm"
+        Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
+        Me.ofdMetWDM.Title = "Select Met WDM File"
         '
         'frmSWMMSetup
         '
@@ -614,7 +595,6 @@ Public Class frmSWMMSetup
         Me.TabPage2.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
-        Me.TabPage6.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
@@ -624,10 +604,12 @@ Public Class frmSWMMSetup
 
 #End Region
 
-    Private pPlugIn As PlugIn
-    Private pNodeFieldMap As New atcUtility.atcCollection
-    Private pConduitFieldMap As New atcUtility.atcCollection
-    Private pCatchmentFieldMap As New atcUtility.atcCollection
+    Friend pPlugIn As PlugIn
+    Friend pNodeFieldMap As New atcUtility.atcCollection
+    Friend pConduitFieldMap As New atcUtility.atcCollection
+    Friend pCatchmentFieldMap As New atcUtility.atcCollection
+    Friend pPrecStations As atcCollection
+    Friend pPrecDsns As atcCollection
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
@@ -984,9 +966,7 @@ Public Class frmSWMMSetup
         Dim lEndYear As Integer = 2006
         Dim lEndMonth As Integer = 10
         Dim lEndDay As Integer = 31
-        Dim lMetShapefileName As String = "C:\basins\data\02060006\met\met.shp"
         Dim lPrecGageName As String = "MD189070"  'could be multiple?
-        Dim lMetWDMFileName As String = "C:\basins\data\02060006\met\met.wdm"
         Dim lMetGageName As String = "MD189070"
 
         'set file names for nodes, conduits, and catchments
@@ -1001,6 +981,14 @@ Public Class frmSWMMSetup
 
         Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
         Dim lCatchmentShapefileName As String = GisUtil.LayerFileName(lCatchmentLayerIndex)
+
+        'set file names for met stations
+        Dim lMetShapefileName As String = ""
+        If cboMet.SelectedIndex > 0 Then
+            Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
+            lMetShapefileName = GisUtil.LayerFileName(lMetLayerIndex)
+        End If
+        Dim lMetWDMFileName As String = txtMetWDMName.Text
 
         'Dim lNodesShapefileName As String = "C:\basins\Predefined Delineations\West Branch\nodes.shp"
         'Dim lConduitShapefileName As String = "C:\basins\Predefined Delineations\West Branch\conduits.shp"
@@ -1132,8 +1120,8 @@ Public Class frmSWMMSetup
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
         pPlugIn = aPlugIn
 
-        'pMetStations = New atcCollection
-        'pMetBaseDsns = New atcCollection
+        pPrecStations = New atcCollection
+        pPrecDsns = New atcCollection
 
         'set field mapping for nodes, conduits, and catchments
         pNodeFieldMap.Clear()
@@ -1162,7 +1150,7 @@ Public Class frmSWMMSetup
         cboOutlets.Items.Add("<none>")
         cboMet.Items.Add("<none>")
 
-        With AtcGridMet
+        With AtcGridPrec
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
@@ -1225,4 +1213,99 @@ Public Class frmSWMMSetup
 
     End Sub
 
+    Friend Sub InitializeMetStationList()
+
+        For lLayerIndex As Integer = 0 To cboMet.Items.Count - 1
+            Dim lLayerName As String = cboMet.Items(lLayerIndex)
+            If lLayerName.IndexOf("Weather Station Sites 20") > -1 Then
+                'this takes some time, show window and then do this
+                cboMet.SelectedIndex = lLayerIndex
+            End If
+        Next
+
+    End Sub
+
+    Private Sub cboMet_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMet.SelectedIndexChanged
+        'fill in met wdm file name as appropriate
+        Dim lMetLayerName As String = cboMet.Items(cboMet.SelectedIndex)
+        If lMetLayerName.IndexOf("Weather Station Sites 20") > -1 Then 'new basins met
+            Dim lMetWDMName As String = GisUtil.LayerFileName(GisUtil.LayerIndex(lMetLayerName))
+            lMetWDMName = FilenameSetExt(lMetWDMName, "wdm")
+            txtMetWDMName.Text = lMetWDMName
+        ElseIf lMetLayerName.IndexOf("WDM Weather") > -1 Then 'old basins met 
+            If GisUtil.IsLayer("State Boundaries") Then
+                Dim lStateIndex As Integer = GisUtil.LayerIndex("State Boundaries")
+                Dim lDefaultState As String = GisUtil.FieldValue(lStateIndex, 0, GisUtil.FieldIndex(lStateIndex, "ST"))
+                Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+                Dim lDataPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "data\"
+                txtMetWDMName.Text = lDataPath & "met_data\" & lDefaultState & ".wdm"
+            End If
+        End If
+    End Sub
+
+    Private Sub cmdSelectWDM_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelectWDM.Click
+        If ofdMetWDM.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            txtMetWDMName.Text = ofdMetWDM.FileName
+        End If
+    End Sub
+
+    Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
+
+        lblStatus.Text = "Reading Meteorologic WDM File..."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
+        BuildListofPrecStationNames(txtMetWDMName.Text, pPrecStations, pPrecDsns)
+        SetPrecipStationGrid()
+
+        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+    End Sub
+
+    Private Sub SetPrecipStationGrid()
+
+        If AtcGridPrec.Source Is Nothing Then Exit Sub
+
+        If cboSubbasins.SelectedIndex = -1 Then Exit Sub
+
+        Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+        Dim lCatchmentShapefileName As String = GisUtil.LayerFileName(lCatchmentLayerIndex)
+
+        Dim lTempCatchments As New atcSWMM.Catchments
+        Dim lTable As New atcUtility.atcTableDBF
+        If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
+            lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
+        End If
+
+        AtcGridPrec.Visible = True
+        AtcGridPrec.Clear()
+        With AtcGridPrec.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .Rows = 1 + lTempCatchments.Count
+            .CellValue(0, 0) = "Catchment"
+            .CellValue(0, 1) = "Precip Station"
+            For lIndex As Integer = 1 To lTempCatchments.Count
+                If IsNumeric(lTempCatchments(lIndex - 1).Name) Then
+                    .CellValue(lIndex, 0) = CInt(lTempCatchments(lIndex - 1).Name)
+                Else
+                    .CellValue(lIndex, 0) = lTempCatchments(lIndex - 1).Name
+                End If
+                .CellColor(lIndex, 0) = SystemColors.ControlDark
+                If pPrecStations.Count > 0 Then
+                    .CellValue(lIndex, 1) = pPrecStations(0)
+                    .CellEditable(lIndex, 1) = True
+                End If
+            Next
+        End With
+        AtcGridPrec.ValidValues = pPrecStations
+        AtcGridPrec.SizeAllColumnsToContents()
+        AtcGridPrec.Refresh()
+
+    End Sub
 End Class

@@ -45,6 +45,7 @@ Public Class PlugIn
             Dim lfrmSWMMSetup As New frmSWMMSetup
             lfrmSWMMSetup.InitializeUI(Me)
             lfrmSWMMSetup.Show()
+            lfrmSWMMSetup.InitializeMetStationList()
             aHandled = True
         End If
     End Sub
