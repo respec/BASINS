@@ -948,7 +948,7 @@ Public Class ctlEditSpecialAction
     End Function
 
     Private Sub cmdAgPrac_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAgPrac.Click
-        'frmAgPrac.init(Me.Owner.Uci, Me)
-        'frmAgPrac.Show(vbModal)
+        Dim frmAgPrac As New frmAgPrac
+        frmAgPrac.Show()
     End Sub
 End Class
