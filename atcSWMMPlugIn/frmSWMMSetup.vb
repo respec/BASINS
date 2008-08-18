@@ -72,6 +72,8 @@ Public Class frmSWMMSetup
     Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
     Friend WithEvents atcGridFields As atcControls.atcGrid
     Friend WithEvents ofdMetWDM As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents cboOtherMet As System.Windows.Forms.ComboBox
+    Friend WithEvents lblOtherMet As System.Windows.Forms.Label
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWMMSetup))
@@ -107,6 +109,8 @@ Public Class frmSWMMSetup
         Me.TabPage3 = New System.Windows.Forms.TabPage
         Me.atcGridFields = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.cboOtherMet = New System.Windows.Forms.ComboBox
+        Me.lblOtherMet = New System.Windows.Forms.Label
         Me.AtcGridPrec = New atcControls.atcGrid
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.txtMetWDMName = New System.Windows.Forms.TextBox
@@ -158,7 +162,7 @@ Public Class frmSWMMSetup
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(354, 465)
+        Me.cmdHelp.Location = New System.Drawing.Point(409, 465)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(79, 32)
         Me.cmdHelp.TabIndex = 6
@@ -168,7 +172,7 @@ Public Class frmSWMMSetup
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(442, 465)
+        Me.cmdAbout.Location = New System.Drawing.Point(497, 465)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(87, 32)
         Me.cmdAbout.TabIndex = 7
@@ -196,7 +200,7 @@ Public Class frmSWMMSetup
         Me.TabControl1.Location = New System.Drawing.Point(18, 17)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(509, 369)
+        Me.TabControl1.Size = New System.Drawing.Size(564, 369)
         Me.TabControl1.TabIndex = 8
         '
         'TabPage1
@@ -216,7 +220,7 @@ Public Class frmSWMMSetup
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(501, 340)
+        Me.TabPage1.Size = New System.Drawing.Size(556, 340)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -230,7 +234,7 @@ Public Class frmSWMMSetup
         Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboOutlets.Location = New System.Drawing.Point(168, 228)
         Me.cboOutlets.Name = "cboOutlets"
-        Me.cboOutlets.Size = New System.Drawing.Size(323, 25)
+        Me.cboOutlets.Size = New System.Drawing.Size(378, 25)
         Me.cboOutlets.TabIndex = 14
         '
         'Label5
@@ -252,7 +256,7 @@ Public Class frmSWMMSetup
         Me.cboMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboMet.Location = New System.Drawing.Point(168, 272)
         Me.cboMet.Name = "cboMet"
-        Me.cboMet.Size = New System.Drawing.Size(321, 25)
+        Me.cboMet.Size = New System.Drawing.Size(376, 25)
         Me.cboMet.TabIndex = 12
         '
         'Label9
@@ -274,7 +278,7 @@ Public Class frmSWMMSetup
         Me.cboStreams.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboStreams.Location = New System.Drawing.Point(168, 183)
         Me.cboStreams.Name = "cboStreams"
-        Me.cboStreams.Size = New System.Drawing.Size(321, 25)
+        Me.cboStreams.Size = New System.Drawing.Size(376, 25)
         Me.cboStreams.TabIndex = 9
         '
         'cboSubbasins
@@ -286,7 +290,7 @@ Public Class frmSWMMSetup
         Me.cboSubbasins.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboSubbasins.Location = New System.Drawing.Point(168, 136)
         Me.cboSubbasins.Name = "cboSubbasins"
-        Me.cboSubbasins.Size = New System.Drawing.Size(321, 25)
+        Me.cboSubbasins.Size = New System.Drawing.Size(376, 25)
         Me.cboSubbasins.TabIndex = 8
         '
         'cboLanduse
@@ -298,7 +302,7 @@ Public Class frmSWMMSetup
         Me.cboLanduse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboLanduse.Location = New System.Drawing.Point(168, 88)
         Me.cboLanduse.Name = "cboLanduse"
-        Me.cboLanduse.Size = New System.Drawing.Size(321, 25)
+        Me.cboLanduse.Size = New System.Drawing.Size(376, 25)
         Me.cboLanduse.TabIndex = 7
         '
         'tbxName
@@ -308,7 +312,7 @@ Public Class frmSWMMSetup
         Me.tbxName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tbxName.Location = New System.Drawing.Point(168, 40)
         Me.tbxName.Name = "tbxName"
-        Me.tbxName.Size = New System.Drawing.Size(155, 23)
+        Me.tbxName.Size = New System.Drawing.Size(210, 23)
         Me.tbxName.TabIndex = 6
         '
         'Label4
@@ -481,14 +485,37 @@ Public Class frmSWMMSetup
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.cboOtherMet)
+        Me.TabPage6.Controls.Add(Me.lblOtherMet)
         Me.TabPage6.Controls.Add(Me.AtcGridPrec)
         Me.TabPage6.Controls.Add(Me.GroupBox2)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(501, 340)
+        Me.TabPage6.Size = New System.Drawing.Size(556, 340)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Met Stations"
         Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'cboOtherMet
+        '
+        Me.cboOtherMet.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboOtherMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboOtherMet.FormattingEnabled = True
+        Me.cboOtherMet.Location = New System.Drawing.Point(136, 292)
+        Me.cboOtherMet.Name = "cboOtherMet"
+        Me.cboOtherMet.Size = New System.Drawing.Size(396, 25)
+        Me.cboOtherMet.TabIndex = 21
+        '
+        'lblOtherMet
+        '
+        Me.lblOtherMet.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblOtherMet.AutoSize = True
+        Me.lblOtherMet.Location = New System.Drawing.Point(18, 295)
+        Me.lblOtherMet.Name = "lblOtherMet"
+        Me.lblOtherMet.Size = New System.Drawing.Size(109, 17)
+        Me.lblOtherMet.TabIndex = 20
+        Me.lblOtherMet.Text = "Other Met Data:"
         '
         'AtcGridPrec
         '
@@ -503,7 +530,7 @@ Public Class frmSWMMSetup
         Me.AtcGridPrec.LineWidth = 0.0!
         Me.AtcGridPrec.Location = New System.Drawing.Point(21, 97)
         Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(456, 206)
+        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 181)
         Me.AtcGridPrec.Source = Nothing
         Me.AtcGridPrec.TabIndex = 19
         '
@@ -515,7 +542,7 @@ Public Class frmSWMMSetup
         Me.GroupBox2.Controls.Add(Me.cmdSelectWDM)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 20)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(457, 59)
+        Me.GroupBox2.Size = New System.Drawing.Size(512, 59)
         Me.GroupBox2.TabIndex = 0
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Met WDM File"
@@ -527,13 +554,13 @@ Public Class frmSWMMSetup
         Me.txtMetWDMName.Location = New System.Drawing.Point(21, 23)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
-        Me.txtMetWDMName.Size = New System.Drawing.Size(329, 23)
+        Me.txtMetWDMName.Size = New System.Drawing.Size(384, 23)
         Me.txtMetWDMName.TabIndex = 2
         '
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(366, 21)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 21)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -548,7 +575,7 @@ Public Class frmSWMMSetup
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox1.Location = New System.Drawing.Point(18, 393)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(511, 55)
+        Me.GroupBox1.Size = New System.Drawing.Size(566, 55)
         Me.GroupBox1.TabIndex = 9
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Status"
@@ -560,7 +587,7 @@ Public Class frmSWMMSetup
         Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblStatus.Location = New System.Drawing.Point(16, 24)
         Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(480, 16)
+        Me.lblStatus.Size = New System.Drawing.Size(535, 16)
         Me.lblStatus.TabIndex = 0
         Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         '
@@ -576,7 +603,7 @@ Public Class frmSWMMSetup
         Me.AcceptButton = Me.cmdOK
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(546, 510)
+        Me.ClientSize = New System.Drawing.Size(601, 510)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdAbout)
@@ -595,6 +622,7 @@ Public Class frmSWMMSetup
         Me.TabPage2.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
+        Me.TabPage6.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
@@ -609,7 +637,7 @@ Public Class frmSWMMSetup
     Friend pConduitFieldMap As New atcUtility.atcCollection
     Friend pCatchmentFieldMap As New atcUtility.atcCollection
     Friend pPrecStations As atcCollection
-    Friend pPrecDsns As atcCollection
+    Friend pMetStations As atcCollection
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
@@ -1121,7 +1149,7 @@ Public Class frmSWMMSetup
         pPlugIn = aPlugIn
 
         pPrecStations = New atcCollection
-        pPrecDsns = New atcCollection
+        pMetStations = New atcCollection
 
         'set field mapping for nodes, conduits, and catchments
         pNodeFieldMap.Clear()
@@ -1251,12 +1279,23 @@ Public Class frmSWMMSetup
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
 
-        lblStatus.Text = "Reading Meteorologic WDM File..."
+        lblStatus.Text = "Reading Precipitation Data from WDM File..."
         Me.Refresh()
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
-        BuildListofPrecStationNames(txtMetWDMName.Text, pPrecStations, pPrecDsns)
+        BuildListofValidStationNames(txtMetWDMName.Text, "PREC", pPrecStations)
         SetPrecipStationGrid()
+
+        lblStatus.Text = "Reading Other Meteorologic Data from WDM File..."
+        Me.Refresh()
+
+        BuildListofValidStationNames(txtMetWDMName.Text, "PEVT", pMetStations)
+        For Each lMetStation As String In pMetStations
+            cboOtherMet.Items.Add(lMetStation)
+        Next
+        If cboOtherMet.Items.Count > 0 Then
+            cboOtherMet.SelectedIndex = 0
+        End If
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
@@ -1308,4 +1347,5 @@ Public Class frmSWMMSetup
         AtcGridPrec.Refresh()
 
     End Sub
+
 End Class

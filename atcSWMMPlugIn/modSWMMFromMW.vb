@@ -338,11 +338,10 @@ Friend Module modSWMMFromMW
 
     End Function
 
-    Friend Sub BuildListofPrecStationNames(ByRef aMetWDMName As String, _
-                                           ByVal aPrecStations As atcCollection, _
-                                           ByVal aPrecDsns As atcCollection)
-        aPrecStations.Clear()
-        aPrecDsns.Clear()
+    Friend Sub BuildListofValidStationNames(ByRef aMetWDMName As String, _
+                                            ByRef aMetConstituent As String, _
+                                            ByVal aStations As atcCollection)
+        aStations.Clear()
         Dim lDataSource As New atcWDM.atcDataSourceWDM
         If FileExists(aMetWDMName) Then
             Dim lFound As Boolean = False
@@ -369,17 +368,34 @@ Friend Module modSWMMFromMW
                     Logger.Progress(lCounter, lDataSource.DataSets.Count)
 
                     If (lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" Or lDataSet.Attributes.GetValue("Scenario") = "COMPUTED") _
-                        And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
+                        And lDataSet.Attributes.GetValue("Constituent") = aMetConstituent Then
                         Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
                         Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
                         Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
                         Dim lSJDay As Double = lDataSet.Dates.Value(0)
                         Dim lEJDay As Double = lDataSet.Dates.Value(lDataSet.Dates.numValues)
-                        'if this one is computed and observed also exists at same location, just use observed
                         Dim lAddIt As Boolean = True
+
+                        If aMetConstituent = "PEVT" Then
+                            'special case, see if ATEM dataset exists at the same location
+                            lAddIt = False
+                            For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
+                                If lDataSet2.Attributes.GetValue("Constituent") = "ATEM" And _
+                                   lDataSet2.Attributes.GetValue("Location") = lLoc Then
+                                    Dim lSJDay2 As Double = lDataSet2.Dates.Value(0)
+                                    Dim lEJDay2 As Double = lDataSet2.Dates.Value(lDataSet2.Dates.numValues)
+                                    If lSJDay2 > lSJDay Then lSJDay = lSJDay2
+                                    If lEJDay2 < lEJDay Then lEJDay = lEJDay2
+                                    lAddIt = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
+
+                        'if this one is computed and observed also exists at same location, just use observed
                         If lDataSet.Attributes.GetValue("Scenario") = "COMPUTED" Then
                             For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
-                                If lDataSet2.Attributes.GetValue("Constituent") = "PREC" And _
+                                If lDataSet2.Attributes.GetValue("Constituent") = aMetConstituent And _
                                    lDataSet2.Attributes.GetValue("Scenario") = "OBSERVED" And _
                                    lDataSet2.Attributes.GetValue("Location") = lLoc Then
                                     lAddIt = False
@@ -387,6 +403,7 @@ Friend Module modSWMMFromMW
                                 End If
                             Next
                         End If
+
                         If lAddIt Then
                             Dim lLeadingChar As String = ""
                             Dim lSdate(6) As Integer
@@ -394,8 +411,7 @@ Friend Module modSWMMFromMW
                             J2Date(lSJDay, lSdate)
                             J2Date(lEJDay, lEdate)
                             Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
-                            aPrecStations.Add(lLeadingChar & lLoc & ":" & lStanam & " " & lDateString)
-                            aPrecDsns.Add(lDsn)
+                            aStations.Add(lLeadingChar & lLoc & ":" & lStanam & " " & lDateString)
                         End If
                     End If
                 Next
