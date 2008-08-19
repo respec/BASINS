@@ -63,6 +63,13 @@
     <Compile Include="atcHspfExpertSystem.vb" />
     <Compile Include="atcHspfWatershedConstituentBalance.vb" />
     <Compile Include="atcHspfWatershedSummary.vb" />
+    <Compile Include="clsHspfSupportPlugin.vb" />
+    <Compile Include="frmCompare.Designer.vb">
+      <DependentUpon>frmCompare.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmCompare.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmErrorCriteria.Designer.vb">
       <DependentUpon>frmErrorCriteria.vb</DependentUpon>
     </Compile>
@@ -90,6 +97,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmCompare.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmCompare.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmErrorCriteria.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmErrorCriteria.vb</DependentUpon>
