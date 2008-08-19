@@ -26,13 +26,13 @@ Module CompareStatsTest
             Dim lEDate(5) As Integer : lEDate(0) = 1980 : lEDate(1) = 10 : lEDate(2) = 1
             Dim lEdatej As Double = Date2J(lEDate)
 
-            Dim lTser1 As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(3) 'Shasta
+            Dim lTser1 As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(3) 'Shasta (considered as obs)
             lTser1.Attributes.SetValue("YAxis", "Left")
             lDataGroup.Add(SubsetByDate(lTser1, _
                                         lSDateJ, _
                                         lEdatej, Nothing))
 
-            Dim lTser2 As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(4) 'Scott
+            Dim lTser2 As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(4) 'Scott (considered as sim)
             lTser2.Attributes.SetValue("YAxis", "Left")
             lDataGroup.Add(SubsetByDate(lTser2, _
                                         lSDateJ, _
@@ -41,16 +41,16 @@ Module CompareStatsTest
             Dim lStr As String = ""
             lStr = IntervalReport("USGS Test", atcTimeUnit.TUDay, lDataGroup(0), lDataGroup(1))
             SaveFileString("DailyReport.txt", lStr)
-            lStr = IntervalReport("USGS Test", atcTimeUnit.TUMonth, lDataGroup(0), lDataGroup(1))
-            SaveFileString("MonthlyReport.txt", lStr)
-            lStr = IntervalReport("USGS Test", atcTimeUnit.TUYear, lDataGroup(0), lDataGroup(1))
-            SaveFileString("WaterYearReport.txt", lStr)
+            'lStr = IntervalReport("USGS Test", atcTimeUnit.TUMonth, lDataGroup(0), lDataGroup(1))
+            'SaveFileString("MonthlyReport.txt", lStr)
+            'lStr = IntervalReport("USGS Test", atcTimeUnit.TUYear, lDataGroup(0), lDataGroup(1))
+            'SaveFileString("WaterYearReport.txt", lStr)
 
-            GraphScatterBatch(lDataGroup)
-            GraphDurationBatch(lDataGroup)
-            GraphTimeseriesBatch(lDataGroup)
-            GraphResidualBatch(lDataGroup)
-            GraphCumDifBatch(lDataGroup)
+            'GraphScatterBatch(lDataGroup)
+            'GraphDurationBatch(lDataGroup)
+            'GraphTimeseriesBatch(lDataGroup)
+            'GraphResidualBatch(lDataGroup)
+            'GraphCumDifBatch(lDataGroup)
         Else
             Logger.Msg("Unable to Open " & lWdmFileName)
         End If
@@ -93,7 +93,9 @@ Module CompareStatsTest
             FitLine(aDataGroup.ItemByIndex(1), aDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
             Dim lCorrCoef As Double = Math.Sqrt(lRSquare)
             AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
-            SaveFileString("CompareStats.txt", CompareStats(aDataGroup.ItemByIndex(0), aDataGroup.ItemByIndex(1)))
+            SaveFileString("CompareStats.txt", CompareStats(aDataGroup.ItemByIndex(0), _
+                                                            aDataGroup.ItemByIndex(1), _
+                                             GetClassLimits(aDataGroup.ItemByIndex(0))))
 
             Dim lText As New TextObj
             Dim lFmt As String = "###,##0.###"
@@ -124,6 +126,7 @@ Module CompareStatsTest
         lZgc.Dispose()
     End Sub
 
+ 
     Sub GraphDurationBatch(ByVal aDataGroup As atcDataGroup)
         Dim lOutFileName As String = pBaseName & "_dur"
         Dim lZgc As ZedGraphControl = CreateZgc()
