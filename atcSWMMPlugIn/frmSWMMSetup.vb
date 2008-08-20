@@ -987,16 +987,6 @@ Public Class frmSWMMSetup
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
 
-        'hard code some things to test SWMM classes
-        Dim lStartYear As Integer = 2006
-        Dim lStartMonth As Integer = 10
-        Dim lStartDay As Integer = 24
-        Dim lEndYear As Integer = 2006
-        Dim lEndMonth As Integer = 10
-        Dim lEndDay As Integer = 31
-        Dim lPrecGageName As String = "MD189070"  'could be multiple?
-        Dim lMetGageName As String = "MD189070"
-
         'set file names for nodes, conduits, and catchments
         Dim lNodesShapefileName As String = ""
         If cboOutlets.SelectedIndex > 0 Then
@@ -1037,9 +1027,55 @@ Public Class frmSWMMSetup
             If Not PreProcessChecking(lSWMMProjectFileName) Then 'failed early checks
                 Exit Sub
             End If
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
             .Title = "SWMM Project Written from BASINS"
+
+            Dim lSJDate As Double = 0.0
+            Dim lEJDate As Double = 0.0
+            Dim lPrecGageNamesByCatchment As New Collection
+            Dim lSelectedStation As StationDetails
+            For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+                lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+                'set dates
+                If lSelectedStation.StartJDate > lSJDate Then
+                    lSJDate = lSelectedStation.StartJDate
+                End If
+                If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                    lEJDate = lSelectedStation.EndJDate
+                End If
+                'remember which precip gage goes with each catchment
+                lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+                'create rain gages from shapefile and selected station
+                CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+            Next
+
+            Dim lMetGageName As String = ""
+            If cboOtherMet.SelectedIndex > 0 Then
+                lSelectedStation = pMetStations.ItemByKey(cboOtherMet.Items(cboOtherMet.SelectedIndex))
+                'set dates
+                If lSelectedStation.StartJDate > lSJDate Then
+                    lSJDate = lSelectedStation.StartJDate
+                End If
+                If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                    lEJDate = lSelectedStation.EndJDate
+                End If
+                lMetGageName = lSelectedStation.Name
+            End If
+
+            'create met constituents from wdm file and selected station
+            CreateMetConstituent(lMetWDMFileName, lMetGageName, "ATEM", .MetConstituents)
+            CreateMetConstituent(lMetWDMFileName, lMetGageName, "PEVT", .MetConstituents)
+
+            If lSJDate < 1.0 Or lEJDate < 1 Or lSJDate > lEJDate Then 'failed date checks
+                Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
+                EnableControls(True)
+                Exit Sub
+            End If
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
+            'set start and end dates
+            .SJDate = lSJDate
+            .EJDate = lEJDate
 
             'add backdrop file
             .BackdropFile = FilenameSetExt(lSWMMProjectFileName, ".bmp")
@@ -1048,17 +1084,6 @@ Public Class frmSWMMSetup
             .BackdropY1 = GisUtil.MapExtentYmin
             .BackdropX2 = GisUtil.MapExtentXmax
             .BackdropY2 = GisUtil.MapExtentYmax
-
-            'set start and end dates
-            .SJDate = MJD(lStartYear, lStartMonth, lStartDay)
-            .EJDate = MJD(lEndYear, lEndMonth, lEndDay)
-
-            'create rain gages from shapefile and selected station
-            CreateRaingageFromShapefile(lMetShapefileName, lPrecGageName, .RainGages)
-
-            'create met constituents from wdm file and selected station
-            CreateMetConstituent(lMetWDMFileName, lMetGageName, "ATEM", .MetConstituents)
-            CreateMetConstituent(lMetWDMFileName, lMetGageName, "PEVT", .MetConstituents)
 
             'populate the SWMM classes from the shapefiles
             .Nodes.Clear()
@@ -1079,7 +1104,7 @@ Public Class frmSWMMSetup
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                 .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
             End If
-            CompleteCatchmentsFromShapefile(lCatchmentShapefileName, pPlugIn.SWMMProject, .Catchments)
+            CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
 
             If cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
                 'create landuses from grid
@@ -1111,7 +1136,7 @@ Public Class frmSWMMSetup
         If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
             If GisUtil.LayerIndex("Land Use Index") = -1 Then
                 'cant do giras without land use index layer
-                Logger.Msg("When using GIRAS Landuse, the 'Land Use Index' layer must exist and be named as such.", vbOKOnly, "HSPF GIRAS Problem")
+                Logger.Msg("When using GIRAS Landuse, the 'Land Use Index' layer must exist and be named as such.", vbOKOnly, "SWMM GIRAS Problem")
                 EnableControls(True)
                 Return False
             End If
@@ -1121,7 +1146,7 @@ Public Class frmSWMMSetup
             'not giras, make sure subbasins and land use layers aren't the same
             If cboSubbasins.Items(cboSubbasins.SelectedIndex) = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex) Then
                 'same layer cannot be used for both
-                Logger.Msg("The same layer cannot be used for the catchments layer and the landuse layer.", vbOKOnly, "BASINS HSPF Problem")
+                Logger.Msg("The same layer cannot be used for the catchments layer and the landuse layer.", vbOKOnly, "BASINS SWMM Problem")
                 EnableControls(True)
                 Return False
             End If
@@ -1129,7 +1154,7 @@ Public Class frmSWMMSetup
 
         'If pMetStations.Count = 0 Then
         '    'cannot proceed if there are no met stations, need to specify a met wdm
-        '    Logger.Msg("No met stations are available.  Use the 'Met Stations' tab to specify a WDM file with valid met stations.", vbOKOnly, "BASINS HSPF Problem")
+        '    Logger.Msg("No met stations are available.  Use the 'Met Stations' tab to specify a WDM file with valid met stations.", vbOKOnly, "BASINS SWMM Problem")
         '    EnableControls(True)
         '    Return False
         'End If
@@ -1290,8 +1315,8 @@ Public Class frmSWMMSetup
         Me.Refresh()
 
         BuildListofValidStationNames(txtMetWDMName.Text, "PEVT", pMetStations)
-        For Each lMetStation As String In pMetStations
-            cboOtherMet.Items.Add(lMetStation)
+        For Each lMetStation As StationDetails In pMetStations
+            cboOtherMet.Items.Add(lMetStation.Description)
         Next
         If cboOtherMet.Items.Count > 0 Then
             cboOtherMet.SelectedIndex = 0
@@ -1337,12 +1362,17 @@ Public Class frmSWMMSetup
                 End If
                 .CellColor(lIndex, 0) = SystemColors.ControlDark
                 If pPrecStations.Count > 0 Then
-                    .CellValue(lIndex, 1) = pPrecStations(0)
+                    .CellValue(lIndex, 1) = pPrecStations(0).Description
                     .CellEditable(lIndex, 1) = True
                 End If
             Next
         End With
-        AtcGridPrec.ValidValues = pPrecStations
+
+        Dim lValidValues As New atcCollection
+        For Each lPrecStation As StationDetails In pPrecStations
+            lValidValues.Add(lPrecStation.Description)
+        Next
+        AtcGridPrec.ValidValues = lValidValues
         AtcGridPrec.SizeAllColumnsToContents()
         AtcGridPrec.Refresh()
 

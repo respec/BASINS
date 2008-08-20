@@ -7,6 +7,7 @@ Imports atcUtility
 Friend Module modSWMMFromMW
 
     Public Function CompleteCatchmentsFromShapefile(ByVal aCatchmentShapefileName As String, _
+                                                    ByVal aPrecGageNamesByCatchment As Collection, _
                                                     ByVal aSWMMProject As SWMMProject, _
                                                     ByRef aCatchments As Catchments) As Boolean
 
@@ -14,7 +15,7 @@ Friend Module modSWMMFromMW
             GisUtil.AddLayer(aCatchmentShapefileName, "Catchments")
         End If
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aCatchmentShapefileName)
-        
+
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lCatchment As Catchment = aCatchments(lFeatureIndex)
 
@@ -27,8 +28,8 @@ Friend Module modSWMMFromMW
             End If
 
             If aSWMMProject.RainGages.Count > 0 Then
-                'assign each catchment to the first raingage for now
-                lCatchment.RainGage = aSWMMProject.RainGages(0)
+                'assign each catchment to the selected raingage 
+                lCatchment.RainGage = aSWMMProject.RainGages(aPrecGageNamesByCatchment(lFeatureIndex + 1))
             End If
 
             'find associated outlet node
@@ -405,18 +406,32 @@ Friend Module modSWMMFromMW
                         End If
 
                         If lAddIt Then
-                            Dim lLeadingChar As String = ""
                             Dim lSdate(6) As Integer
                             Dim lEdate(6) As Integer
                             J2Date(lSJDay, lSdate)
                             J2Date(lEJDay, lEdate)
                             Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
-                            aStations.Add(lLeadingChar & lLoc & ":" & lStanam & " " & lDateString)
+                            Dim lStationDetails As New StationDetails
+                            lStationDetails.Name = lLoc
+                            lStationDetails.StartJDate = lSJDay
+                            lStationDetails.EndJDate = lEJDay
+                            lStationDetails.Description = lLoc & ":" & lStanam & " " & lDateString
+                            aStations.Add(lStationDetails.Description, lStationDetails)
                         End If
                     End If
+
+                    lDataSet = Nothing
                 Next
             End If
         End If
+        lDataSource = Nothing
     End Sub
+
+    Friend Class StationDetails
+        Public Name As String
+        Public StartJDate As Double
+        Public EndJDate As Double
+        Public Description As String
+    End Class
 
 End Module
