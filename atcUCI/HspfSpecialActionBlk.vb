@@ -15,7 +15,7 @@ Public Class HspfSpecialActionBlk
     Private pComment As String
     Private pUci As HspfUci
 
-    Friend Property Uci() As HspfUci
+    Public Property Uci() As HspfUci
         Get
             Uci = pUci
         End Get

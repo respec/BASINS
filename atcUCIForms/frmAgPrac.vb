@@ -96,4 +96,11 @@ Public Class frmAgPrac
     Private Sub frmAgPrac_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Form_Load()
     End Sub
+
+    Friend Sub Init(ByVal aUci As HspfUci, ByVal aCtl As ctlEditSpecialAction)
+        pUci = aUci
+        pCtl = aCtl
+        Me.Icon = aCtl.ParentForm.Icon
+    End Sub
+
 End Class
