@@ -949,6 +949,7 @@ Public Class ctlEditSpecialAction
 
     Private Sub cmdAgPrac_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAgPrac.Click
         Dim frmAgPrac As New frmAgPrac
+        frmAgPrac.Init(pSpecialActionBlk.Uci, Me)
         frmAgPrac.Show()
     End Sub
 End Class
