@@ -621,16 +621,15 @@ Public Class ExpertSystem
         lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
         lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
         lStr &= "Run Created: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
-        Dim lYrCnt As Double = timdifJ(pSDateJ, pEDateJ, 6, 1)
-        lStr &= SimulationPeriodString(pSDateJ, pEDateJ, lYrCnt)
+        lStr &= TimeSpanAsString(pSDateJ, pEDateJ)
 
         For lSiteIndex As Integer = 1 To pSites.Count
             'loop for each site
             lStr &= "Site: ".PadLeft(15) & pSites(lSiteIndex).Name & vbCrLf & vbCrLf
 
             'statistics summary
-            lStr &= StatDetails("Total (" & lYrCnt & " year run)", lSiteIndex, 1)
-            lStr &= StatDetails("Annual Average", lSiteIndex, lYrCnt)
+            lStr &= StatDetails("Total (" & aUci.GlobalBlock.YearCount & " year run)", lSiteIndex, 1)
+            lStr &= StatDetails("Annual Average", lSiteIndex, aUci.GlobalBlock.YearCount)
 
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf

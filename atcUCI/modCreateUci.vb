@@ -29,9 +29,9 @@ Module modCreateUci
             .Comment = " "
             .Uci = aUci
             .RunInf.Value = "UCI Created by WinHSPF for " & aWatershed.Name
-            .emfg = 1
+            .EmFg = 1
             .outlev.Value = CStr(1)
-            .runfg = 1
+            .RunFg = 1
         End With
 
         'add files block to uci
