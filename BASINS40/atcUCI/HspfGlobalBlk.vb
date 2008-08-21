@@ -53,11 +53,12 @@ Public Class HspfGlobalBlk
 
     Public ReadOnly Property RunPeriod() As String
         Get
-            Dim lYrCnt As Double = timdifJ(SDateJ, EdateJ, 6, 1)
-            Dim lStr As String = "Simulation Period: " & lYrCnt & " years"
-            lStr &= " from " & Format(Date.FromOADate(SDateJ), "yyyy/MM/dd")
-            lStr &= " to " & Format(Date.FromOADate(EdateJ), "yyyy/MM/dd") & vbCrLf
-            Return lStr
+            Return TimeSpanAsString(SDateJ, EdateJ)
+        End Get
+    End Property
+    Public ReadOnly Property YearCount() As Integer
+        Get
+            Return modDate.YearCount(SDateJ, EdateJ)
         End Get
     End Property
 
@@ -101,17 +102,17 @@ Public Class HspfGlobalBlk
         End Get
     End Property
 
-    Public Property outlev() As HSPFParm
+    Public Property OutLev() As HspfParm
         Get
             Return pOutLev
         End Get
-        Set(ByVal Value As HSPFParm)
+        Set(ByVal Value As HspfParm)
             pOutLev = Value
             Update()
         End Set
     End Property
 
-    Public Property spout() As Integer
+    Public Property SpOut() As Integer
         Get
             Return pSpOut
         End Get
@@ -121,9 +122,9 @@ Public Class HspfGlobalBlk
         End Set
     End Property
 
-    Public Property runfg() As Integer
+    Public Property RunFg() As Integer
         Get
-            runfg = pRunFg
+            RunFg = pRunFg
         End Get
         Set(ByVal Value As Integer)
             pRunFg = Value
@@ -131,7 +132,7 @@ Public Class HspfGlobalBlk
         End Set
     End Property
 
-    Public Property emfg() As Integer
+    Public Property EmFg() As Integer
         Get
             Return pEmFg
         End Get

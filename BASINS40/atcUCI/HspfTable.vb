@@ -185,7 +185,7 @@ Public Class HspfTable
             lParm.ValueAsRead = Mid(s, lParmDef.StartCol, lParmDef.Length)
             If lParm.ValueAsRead = "" And Len(s) > 0 Then lParm.ValueAsRead = " "
             If Len(lParm.Value) = 0 Then 'try default
-                unitfg = pOpn.OpnBlk.Uci.GlobalBlock.emfg
+                unitfg = pOpn.OpnBlk.Uci.GlobalBlock.EmFg
                 If unitfg = 1 Then
                     lParm.Value = lParm.Def.DefaultValue
                 Else
@@ -349,7 +349,7 @@ Public Class HspfTable
                         If lOperation.Tables.Item(lTableName).Comment.Length > 0 Then 'an associated comment
                             lSB.AppendLine(lOperation.Tables.Item(lTableName).Comment) 'pbd
                         Else
-                            If Me.Opn.OpnBlk.Uci.GlobalBlock.emfg = 1 Then
+                            If Me.Opn.OpnBlk.Uci.GlobalBlock.EmFg = 1 Then
                                 lSB.AppendLine(pDef.HeaderE.TrimEnd)
                             Else
                                 lSB.AppendLine(pDef.HeaderM.TrimEnd)

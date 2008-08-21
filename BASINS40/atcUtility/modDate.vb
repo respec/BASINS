@@ -1010,4 +1010,30 @@ Public Module modDate
             Return 0
         End Try
     End Function
+
+    Public Function YearCount(ByVal aSDateJ As Double, ByVal aEdateJ As Double) As Integer
+        Return timdifJ(aSDateJ, aEdateJ, 6, 1)
+    End Function
+
+    Public Function TimeSpanAsString(ByVal aSDateJ As Double, ByVal aEdateJ As Double) As String
+        Dim lDate(5) As Integer
+        J2Date(aSDateJ, lDate)
+        Dim lYearType As String = " "
+        If lDate(1) = 10 AndAlso lDate(2) = 1 AndAlso lDate(3) = 0 Then
+            lYearType &= "Water "
+        ElseIf lDate(1) = 10 AndAlso lDate(2) = 1 AndAlso lDate(3) = 0 Then
+            lYearType &= "Calendar "
+        End If
+        Dim lStr As String = "Simulation Period: " & YearCount(aSDateJ, aEdateJ) & lYearType & "years"
+        Dim lDateFormat As New atcDateFormat
+        With lDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .Midnight24 = False
+            lStr &= " from " & .JDateToString(aSDateJ)
+            .Midnight24 = True
+            lStr &= " to " & .JDateToString(aEdateJ) & vbCrLf
+        End With
+        Return lStr
+    End Function
 End Module

@@ -37,7 +37,7 @@ Public Module ConstituentBalance
         lString.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lString.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
         If aBalanceType = "Water" Then
-            If aUci.GlobalBlock.emfg = 1 Then
+            If aUci.GlobalBlock.EmFg = 1 Then
                 lString.AppendLine("   (Units:Inches)")
             Else
                 lString.AppendLine("   (Units:mm)")
