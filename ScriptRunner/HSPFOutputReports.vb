@@ -17,6 +17,7 @@ Module HSPFOutputReports
     Private pOutputLocations As New atcCollection
     Private pGraphSaveFormat As String
     Private pGraphAnnual As Boolean = False
+    Private pCurveStepType As String = "RearwardStep"
 
     Private Sub Initialize()
         pOutputLocations.Clear()
@@ -38,6 +39,7 @@ Module HSPFOutputReports
                 pBaseName = "upatoi"
                 pOutputLocations.Add("R:46")
                 pGraphAnnual = True
+                pCurveStepType = "NonStep" 'Tony's convention 
             Case "tinley"
                 pTestPath = "c:\test\tinley"
                 pBaseName = "tinley"
@@ -119,9 +121,11 @@ Module HSPFOutputReports
                     Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
                     lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lSimTSer.Attributes.SetValue("YAxis", "Left")
+                    lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
                     Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
                     lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lObsTSer.Attributes.SetValue("YAxis", "Left")
+                    lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
                     Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
                     lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
                     Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))

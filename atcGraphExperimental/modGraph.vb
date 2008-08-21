@@ -281,7 +281,13 @@ FoundMatch:
             Else
                 lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
                 lCurve.Line.Width = 1
-                lCurve.Line.StepType = StepType.RearwardStep
+                Select Case aTimeseries.Attributes.GetValue("StepType", "rearwardstep").ToString.ToLower
+                    Case "rearwardstep" : lCurve.Line.StepType = StepType.RearwardStep
+                    Case "forwardsegment" : lCurve.Line.StepType = StepType.ForwardSegment
+                    Case "forwardstep" : lCurve.Line.StepType = StepType.ForwardStep
+                    Case "nonstep" : lCurve.Line.StepType = StepType.NonStep
+                    Case "rearwardsegment" : lCurve.Line.StepType = StepType.RearwardSegment
+                End Select
             End If
 
             lCurve.Tag = aTimeseries.Serial 'Make this easy to find again even if label changes
