@@ -1044,7 +1044,7 @@ Module SWATRunner
                                & vbTab & "km2".PadLeft(12) _
                                & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12) _
                                & vbTab & "kg/ha".PadLeft(12) & vbTab & "kg".PadLeft(12) _
-                               & vbTab & "tonne/ha".PadLeft(12) & vbTab & "tonne".PadLeft(16) _
+                               & vbTab & "tonnes/ha".PadLeft(12) & vbTab & "tonnes".PadLeft(16) _
                                & vbTab & "mm".PadLeft(12) & vbTab & "?".PadLeft(16)) 'mm * ha
 
         For lIndex As Integer = 1 To aSubBasin2HUC8.Count
@@ -1140,7 +1140,7 @@ Module SWATRunner
         lSBHuc8.AppendLine(vbTab & vbTab & "km2".PadLeft(12) _
                                  & vbTab & "kg".PadLeft(16) & vbTab & "kg".PadLeft(16) _
                                  & vbTab & "kg".PadLeft(16) & vbTab & "kg".PadLeft(16) _
-                                 & vbTab & "kg".PadLeft(16) & vbTab & "kg".PadLeft(16) _
+                                 & vbTab & "tonnes".PadLeft(16) & vbTab & "tonnes".PadLeft(16) _
                                  & vbTab & "m3/s".PadLeft(16) & vbTab & "m3/s".PadLeft(16))
 
         For lIndex As Integer = 1 To aSubBasin2HUC8.Count
