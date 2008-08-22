@@ -117,6 +117,127 @@ Public Module modStat
         Return lLimits
     End Function
 
+    ''' <summary>
+    ''' Calculate duration stats for DS2 (or the simulated data), related to CompareStats,
+    ''' that compares two data series
+    ''' </summary>
+    Public Function DurationStats(ByVal aTSer1 As atcTimeseries, _
+                         Optional ByVal aClassLimits As Generic.List(Of Double) = Nothing) As String
+        '
+        ' Pass in the simulated time series data
+        '
+        Dim lStr As String = ""
+        Dim lNote As String = ""
+        Dim lVal1 As Double
+        Dim lSkipCount As Integer = 0
+        Dim lGoodCount As Integer = 0
+
+        Dim lClassBuckets As New atcCollection 'of ClassBucket
+        Dim lClassBucket As ClassBucket
+        Dim lClassLimit As Double
+
+        If aClassLimits Is Nothing Then
+            Logger.Msg("aClassLimits is nothing")
+        End If
+        For lIndex As Integer = 1 To aTSer1.numValues
+            lVal1 = aTSer1.Values(lIndex)
+            'Logger.Dbg("lVal1:" & CStr(lVal1) & ":lVal2:" & CStr(lVal2))
+            If Not Double.IsNaN(lVal1) Then
+
+                lGoodCount += 1
+                If aClassLimits IsNot Nothing Then
+                    lClassLimit = aClassLimits(0)
+                    For Each lLimit As Double In aClassLimits
+                        If lLimit > lVal1 Then Exit For
+                        lClassLimit = lLimit
+                    Next
+
+                    If lClassBuckets.Keys.Contains(lClassLimit) Then
+                        lClassBucket = lClassBuckets.ItemByKey(lClassLimit)
+                    Else
+                        lClassBucket = New ClassBucket
+                        'lClassBucket.setErrInt(lErrInt)
+                        lClassBuckets.Add(lClassLimit, lClassBucket)
+                    End If
+                    lClassBucket.IncrementCount(lVal1)
+
+                End If
+            Else
+                lSkipCount += 1
+                If lSkipCount = 1 Then
+                    lNote = "*** Note - compare skipped index " & lIndex
+                End If
+            End If
+        Next
+
+        If lNote.Length > 0 Then
+            lNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
+        End If
+
+
+        'The duration curve table, which is a shortened version of Table 2 in CompareStats
+        '
+        If aClassLimits IsNot Nothing Then
+            lStr &= "                Flow duration curve" & vbCrLf
+            'lStr &= aTSer1.ToString() & vbCrLf
+            'lStr &="             Simulated - 11519500 Scott River near Fort Jones, CA.             " & vbCrLf 
+            'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
+
+            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
+            lStr &= "              Cases equal or" & vbCrLf
+            lStr &= "              exceeding lower    Cases equal or" & vbCrLf
+            lStr &= "              limit and less     exceeding lower" & vbCrLf
+            lStr &= "   Lower     than upper limit      class limit" & vbCrLf
+            lStr &= "   class   ------------------- -------------------" & vbCrLf
+            lStr &= "   limit     Cases    Percent    Cases    Percent" & vbCrLf
+            lStr &= "--------- --------- --------- --------- ---------" & vbCrLf
+
+            Dim pctfrac As Double = 0.0
+            Dim numExceedPct As Double = 0.0
+            Dim avgClass As Double = 0.0
+            For Each lLimit As Double In aClassLimits
+                lStr &= DecimalAlign(lLimit, 12, 0)
+                If lClassBuckets.Keys.Contains(lLimit) Then
+                    lClassBucket = lClassBuckets.ItemByKey(lLimit)
+                    With lClassBucket
+                        lStr &= CStr(.Count1).PadLeft(5)
+
+                        pctfrac = .Count1 * 100.0 / lGoodCount
+                        lStr &= DecimalAlign(CStr(pctfrac), 15, 2)
+                        numExceedPct = numberExceeding(lLimit, lClassBuckets, False)
+                        lStr &= DecimalAlign(numExceedPct, 15, 0)
+                        numExceedPct = numberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
+                        lStr &= DecimalAlign(numExceedPct, 15, 2)
+
+                    End With
+                Else
+                    Logger.Dbg("No Bucket for " & lLimit)
+                End If
+                lStr &= vbCrLf
+            Next
+        End If
+
+        lStr &= " --------- --------- --------- ---------- --------- " & vbCrLf
+        'lStr &= CStr(lGoodCount).PadLeft(30) & CStr(lGoodCount).PadLeft(8)
+        'lStr &= "100.00".PadLeft(10) 'total percentage of TS1
+        'lStr &= "100.00".PadLeft(10) 'total percentage of TS2
+        'TSUMA /= lGoodCount
+        'TSUMB /= lGoodCount
+        'lStr &= DecimalAlign(TSUMA, 12, 2) ' Avg of TS1 raw value
+        'lStr &= DecimalAlign(TSUMB, 12, 2) ' Avg of TS2 raw value
+        lStr &= vbCrLf & vbCrLf & vbCrLf
+
+        If lNote.Length > 0 Then
+            lStr &= lNote
+        End If
+        Return lStr
+
+    End Function
+
+    ''' <summary>
+    ''' Compare stats for DS1 (or the observed data) and DS2 (or the simulated data)
+    ''' </summary>
+
     Public Function CompareStats(ByVal aTSer1 As atcTimeseries, _
                                  ByVal aTSer2 As atcTimeseries, _
                         Optional ByVal aClassLimits As Generic.List(Of Double) = Nothing) As String
@@ -281,8 +402,20 @@ Public Module modStat
             lNashSutcliffe = lNashSutcliffeNumerator / lNashSutcliffe
         End If
 
+        lStr &= "Note: TS, Time Series" & vbCrLf & vbCrLf
+        lStr &= "Correlation Coefficient".PadLeft(36) & DecimalAlign(lCorrelationCoefficient, 18) & vbCrLf
+        lStr &= "Coefficient of Determination".PadLeft(36) & DecimalAlign(lCorrelationCoefficient ^ 2, 18) & vbCrLf
+        lStr &= "Mean Error".PadLeft(36) & DecimalAlign(lMeanError, 18) & vbCrLf
+        lStr &= "Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 18) & vbCrLf
+        lStr &= "RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 18) & vbCrLf
+        lStr &= "Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 18) & vbCrLf
+        lStr &= vbCrLf & vbCrLf & vbFormFeed
+
+
         If aClassLimits IsNot Nothing Then
-            lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
+            'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
+            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf
+            lStr &= "            Data Series 2 - " & aTSer2.Attributes.GetValue("ISTAID") & "  " & aTSer2.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
             lStr &= "                           Mean               Root mean" & vbCrLf
             lStr &= "Lower    Number    absolute error(1)     square error(2)        Bias(3)      " & vbCrLf
             lStr &= "class      of     ------------------- ------------------- -------------------" & vbCrLf
@@ -330,7 +463,7 @@ Public Module modStat
         TPDIF2 *= 100.0
 
         'Logger.Msg("TPDIF2 * 100 / lGoodcount = " & CStr(TPDIF2))
-        lStr &= DecimalAlign(TPDIF2, 10, 2) & "|" 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
+        lStr &= DecimalAlign(TPDIF2, 10, 2) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
         'lStr &= DecimalAlign(Math.Abs(lMeanAbsoluteError), 15)
         lStr &= DecimalAlign(Math.Abs(lMeanSMO2M1), 15)
         TPBias *= 100.0
@@ -349,36 +482,33 @@ Public Module modStat
         lStr &= "    Percent = 100 * square root(sum(((TS2-TS1)/TS1)**2)/n) for all TS1 > 0" & vbCrLf
         lStr &= "(3) Average = sum(TS2-TS1)/n" & vbCrLf
         lStr &= "    Percent = 100 * sum(((TS2-TS1)/TS1)/n) for all TS1 > 0" & vbCrLf
-        lStr &= "Note: TS, Time Series" & vbCrLf & vbCrLf
+        lStr &= vbCrLf & vbCrLf & vbFormFeed
 
 
-        lStr &= "Correlation Coefficient".PadLeft(36) & DecimalAlign(lCorrelationCoefficient, 18) & vbCrLf
-        lStr &= "Coefficient of Determination".PadLeft(36) & DecimalAlign(lCorrelationCoefficient ^ 2, 18) & vbCrLf
-        lStr &= "Mean Error".PadLeft(36) & DecimalAlign(lMeanError, 18) & vbCrLf
-        lStr &= "Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 18) & vbCrLf
-        lStr &= "RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 18) & vbCrLf
-        lStr &= "Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 18) & vbCrLf
 
 
 
         'Table nubmer 2
 
         If aClassLimits IsNot Nothing Then
-	    lStr &= "Table 2" & vbCrLf
-            lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
+            lStr &= "Table 2" & vbCrLf
+            'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
             'lStr &="             Simulated - 11519500 Scott River near Fort Jones, CA.             " & vbCrLf 
             'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
-            lStr &="" & vbCrLf 
-            lStr &="         Cases equal or exceeding lower" & vbCrLf
-            lStr &="          limit & less then upper limit     Percent cases" & vbCrLf
-            lStr &="           ----------------------------       equal or        Average of cases" & vbCrLf
-            lStr &="   Lower     Cases         Percent         exceeding limit   within class limits" & vbCrLf
-            lStr &="   class   --------- ------------------- ------------------- -------------------" & vbCrLf
-            lStr &="   limit   Sim   Obs Simulated  Observed Simulated  Observed Simulated  Observed" & vbCrLf
-            lStr &=" --------- ---- ---- --------- --------- --------- --------- --------- ---------" & vbCrLf
-	    Dim pctfrac as Double = 0.0
-	    Dim numExceedPct as Double = 0.0
-	    Dim avgClass as Double = 0.0
+            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf
+            lStr &= "            Data Series 2 - " & aTSer2.Attributes.GetValue("ISTAID") & "  " & aTSer2.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
+
+            lStr &= "" & vbCrLf
+            lStr &= "         Cases equal or exceeding lower" & vbCrLf
+            lStr &= "          limit & less then upper limit     Percent cases" & vbCrLf
+            lStr &= "           ----------------------------       equal or        Average of cases" & vbCrLf
+            lStr &= "   Lower     Cases         Percent         exceeding limit   within class limits" & vbCrLf
+            lStr &= "   class   --------- ------------------- ------------------- -------------------" & vbCrLf
+            lStr &= "   limit   Sim   Obs Simulated  Observed Simulated  Observed Simulated  Observed" & vbCrLf
+            lStr &= " --------- ---- ---- --------- --------- --------- --------- --------- ---------" & vbCrLf
+            Dim pctfrac As Double = 0.0
+            Dim numExceedPct As Double = 0.0
+            Dim avgClass As Double = 0.0
             For Each lLimit As Double In aClassLimits
                 lStr &= DecimalAlign(lLimit, 12, 0)
                 If lClassBuckets.Keys.Contains(lLimit) Then
@@ -425,15 +555,18 @@ Public Module modStat
         TSUMB /= lGoodCount
         lStr &= DecimalAlign(TSUMA, 12, 2) ' Avg of TS1 raw value
         lStr &= DecimalAlign(TSUMB, 12, 2) ' Avg of TS2 raw value
-        lStr &= vbCrLf & vbCrLf & vbCrLf
+        lStr &= vbCrLf & vbCrLf & vbFormFeed
 
 
         'Table Number 3
 
         Dim lEdIndex As Integer
         If aClassLimits IsNot Nothing Then
-            lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
-            lStr &= "   Time Series 1 " & vbCrLf & "   Time Series 2 " & vbCrLf
+            'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
+            'lStr &= "   Time Series 1 " & vbCrLf & "   Time Series 2 " & vbCrLf
+            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf
+            lStr &= "            Data Series 2 - " & aTSer2.Attributes.GetValue("ISTAID") & "  " & aTSer2.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
+
             lStr &= "   Lower         Number of occurrences between indicated deviations    " & vbCrLf
             lStr &= "   class    -------------------------------------------------------------" & vbCrLf
             lStr &= "   limit          -60%    -30%    -10%      0%     10%     30%     60%" & vbCrLf
@@ -480,7 +613,7 @@ Public Module modStat
             lStr &= CStr(lErrTot).PadLeft(7)
         Next
 
-        lStr &= vbCrLf
+        lStr &= vbCrLf & vbCrLf & vbFormFeed
 
         If lNote.Length > 0 Then
             lStr &= lNote
@@ -503,7 +636,6 @@ Public Module modStat
         Next
 
     End Function
-
 
     Private Class ClassBucket
         'Public Count As Integer ' in this Class
@@ -534,11 +666,16 @@ Public Module modStat
             End If
 
         End Sub
+
+        Sub IncrementCount(ByVal aVal As Double)
+            Count1 += 1
+            Total1 += aVal
+        End Sub
+
         Sub IncrementErr(ByVal aVal1 As Double, ByVal aVal2 As Double, ByVal aLimit As Double)
             '
             'Increment the error deviation count
             '
-            Dim lStr As String
             Dim d As Integer
             Dim x As Double
             Dim lDiff As Double = aVal2 - aVal1
