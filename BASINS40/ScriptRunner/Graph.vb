@@ -85,7 +85,6 @@ Module Graph
                 '45 degree line
                 AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
                 'regression line 
-                'TODO: figure out why this seems backwards!
                 FitLine(lDataGroup.ItemByIndex(1), lDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
                 AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
 
@@ -93,8 +92,8 @@ Module Graph
                 Dim lFmt As String = "###,##0.###"
                 lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & Environment.NewLine & _
                              "R Squared = " & DoubleToString(lRSquare, , lFmt)
-                'TODO: turn off border
                 lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
+                lText.FontSpec.Border.IsVisible = False
                 .GraphObjList.Add(lText)
                 .CurveList(0).Label.IsVisible = False
             End With

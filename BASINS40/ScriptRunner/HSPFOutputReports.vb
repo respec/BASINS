@@ -28,12 +28,17 @@ Module HSPFOutputReports
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
+        'Dim lTestName As String = "shena"
         Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
 
         Select Case lTestName
+            Case "shena"
+                pTestPath = "c:\test\genscn"
+                pBaseName = "base"
+                pOutputLocations.Add("Lynnwood")
             Case "upatoi"
                 pTestPath = "d:\Basins\modelout\Upatoi"
                 pBaseName = "upatoi"
@@ -87,6 +92,16 @@ Module HSPFOutputReports
         lMsg.Open("hspfmsg.mdb")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
+        If pOutputLocations.Contains("Lynnwood") Then 'special case to check GenScn examples
+            With lHspfUci.GlobalBlock
+                .SDate(0) = 1986
+                .SDate(1) = 10
+                .SDate(2) = 1
+                .EDate(0) = 1987
+                .EDate(1) = 10
+                .EDate(2) = 1
+            End With
+        End If
         'lHspfUci.Save()
 
         'open WDM file
@@ -115,6 +130,8 @@ Module HSPFOutputReports
                 Dim lCons As String = "Flow"
                 For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
                     Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
+                    If lSite.ToLower = "lynnwood" Then 'special case to check GenScn manual graph examples
+                    End If
                     Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
                     Dim lSimTSerInches As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0))
                     lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
@@ -122,7 +139,7 @@ Module HSPFOutputReports
                     lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lSimTSer.Attributes.SetValue("YAxis", "Left")
                     lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
-                    Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
+                    Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                     lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
                     lObsTSer.Attributes.SetValue("YAxis", "Left")
                     lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
@@ -156,13 +173,18 @@ Module HSPFOutputReports
                                                                        lExpertSystem.EDateJ)
                     lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
                     SaveFileString(lOutFileName, lStr)
+
+                    'graphics 
+                    'TODO: add titles to graphs
                     Dim lDataGroup As New atcDataGroup
-                    lDataGroup.Add(SubsetByDate(lSimTSer, _
-                                                lExpertSystem.SDateJ, _
-                                                lExpertSystem.EDateJ, Nothing))
-                    lDataGroup.Add(SubsetByDate(lObsTSer, _
-                                                lExpertSystem.SDateJ, _
-                                                lExpertSystem.EDateJ, Nothing))
+                    lDataGroup.Add(Aggregate(SubsetByDate(lObsTSer, _
+                                                          lExpertSystem.SDateJ, _
+                                                          lExpertSystem.EDateJ, Nothing), _
+                                             atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
+                    lDataGroup.Add(Aggregate(SubsetByDate(lSimTSer, _
+                                                          lExpertSystem.SDateJ, _
+                                                          lExpertSystem.EDateJ, Nothing), _
+                                             atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
                     Dim lOutFileBase As String = "outfiles\" & lCons & "_" & lSite
                     Dim lZgc As ZedGraphControl
                     'duration plot
@@ -177,13 +199,34 @@ Module HSPFOutputReports
                     lZgc.SaveIn(lOutFileBase & "_cumDif" & pGraphSaveFormat)
                     lGraphCum.Dispose()
                     lZgc.Dispose()
+
                     'scatter
                     lZgc = CreateZgc()
                     lZgc.MasterPane.PaneList(0).YAxis.Type = ZedGraph.AxisType.Log
                     Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
+                    '45 degree line
+                    Dim lPane As ZedGraph.GraphPane = lZgc.MasterPane.PaneList(0)
+                    AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
+                    'regression line 
+                    Dim lACoef As Double
+                    Dim lBCoef As Double
+                    Dim lRSquare As Double
+                    FitLine(lDataGroup.ItemByIndex(1), lDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
+                    AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
+                    Dim lText As New TextObj
+                    Dim lFmt As String = "###,##0.###"
+                    lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & Environment.NewLine & _
+                                 "R = " & DoubleToString(Math.Sqrt(lRSquare), , lFmt) & vbCrLf & _
+                                 "R Squared = " & DoubleToString(lRSquare, , lFmt)
+                    lText.FontSpec.StringAlignment = Drawing.StringAlignment.Near
+                    lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
+                    lText.FontSpec.Border.IsVisible = False
+                    lPane.GraphObjList.Add(lText)
+                    'lPane.XAxis.Title.Text &= vbCrLf & vbCrLf & "Scatter Plot" 'this has an extra (10^3) after scatter plot
                     lZgc.SaveIn(lOutFileBase & "_scatDay" & pGraphSaveFormat)
                     lGraphScatter.Dispose()
                     lZgc.Dispose()
+
                     'scatter - LZS vs Error(cfs)
                     Dim lTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(9))
                     lZgc = CreateZgc()

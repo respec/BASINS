@@ -36,10 +36,11 @@ Public Class clsGraphScatter
                 End With
 
                 With lTimeseriesY.Attributes
-                    Dim lScen As String = .GetValue("scenario")
-                    Dim lLoc As String = .GetValue("location")
-                    Dim lCons As String = .GetValue("constituent")
-                    Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+                    'Dim lScen As String = .GetValue("scenario")
+                    'Dim lLoc As String = .GetValue("location")
+                    'Dim lCons As String = .GetValue("constituent")
+                    'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+                    Dim lCurveColor As Color = Color.Blue
                     Dim lCurve As LineItem = Nothing
                     Dim lXValues() As Double = lTimeseriesX.Values
                     Dim lYValues() As Double = lTimeseriesY.Values
