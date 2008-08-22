@@ -921,8 +921,20 @@ Finished:
     ''' <param name="aRSquare">'r squared', the coefficient of determination</param>
     ''' <remarks>from fortran-newaqt-FITLIN</remarks>
     Public Sub FitLine(ByVal aTSerX As atcTimeseries, ByVal aTSerY As atcTimeseries, _
-                ByRef aACoef As Double, ByRef aBCoef As Double, ByRef aRSquare As Double)
-        'TODO: make this more robust - check time spans, time interval, etc
+                       ByRef aACoef As Double, ByRef aBCoef As Double, ByRef aRSquare As Double)
+        Dim lProblem As String = ""
+        If aTSerX.numValues <> aTSerY.numValues Then
+            lProblem &= aTSerX.ToString & " has " & aTSerX.numValues & " values, " & _
+                        aTSerY.ToString & " has " & aTSerY.numValues & "." & vbCrLf
+        End If
+        If aTSerX.Dates.Value(0) <> aTSerY.Dates.Value(0) Then
+            lProblem &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " & _
+                        aTSerY.ToString & " starts on " & aTSerY.Dates.Value(0).ToString & "." & vbCrLf
+        End If
+        If lProblem.Length > 0 Then
+            Throw New ApplicationException("Timeseries are not compatible." & vbCrLf & lProblem)
+        End If
+
         Dim lNote As String = ""
         Dim lSumX As Double = 0.0
         Dim lValX As Double
@@ -984,6 +996,9 @@ Finished:
             aACoef = GetNaN()
             aBCoef = GetNaN()
             aRSquare = GetNaN()
+        End If
+        If lNote.Length > 0 Then
+            Logger.Dbg("Note:" & lNote)
         End If
     End Sub
 End Module

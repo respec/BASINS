@@ -89,7 +89,6 @@ Module CompareStatsTest
             '45 degree line
             AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
             'regression line 
-            'TODO: figure out why this seems backwards!
             FitLine(aDataGroup.ItemByIndex(1), aDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
             Dim lCorrCoef As Double = Math.Sqrt(lRSquare)
             AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")

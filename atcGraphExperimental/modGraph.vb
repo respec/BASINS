@@ -81,7 +81,7 @@ Public Module modGraph
     <CLSCompliant(False)> _
     Sub AddTimeseriesCurves(ByVal aDataGroup As atcDataGroup, ByVal aZgc As ZedGraphControl)
         Dim lPaneMain As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
-        Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Units", -1)
+        Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Unit", -1)
         Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
 
         Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")
@@ -217,7 +217,7 @@ FoundMatch:
         Dim lName As String = ""
         Select Case aTimeStep
             Case Is > 1 : lName = aTimeStep & "-"
-            Case Else : aTimeUnits = 0 'aTimeStep <= 0 means bad time step, ignore time units and return ""
+            Case Is < 1 : aTimeUnits = 0 'aTimeStep <= 0 means bad time step, ignore time units and return ""
         End Select
         Select Case aTimeUnits
             Case 1 : lName &= "SECONDLY"
@@ -227,6 +227,7 @@ FoundMatch:
             Case 5 : lName &= "MONTHLY"
             Case 6 : lName &= "YEARLY"
         End Select
+        If lName = "7-DAILY" Then lName = "WEEKLY"
         Return lName
     End Function
 
