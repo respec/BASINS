@@ -300,7 +300,7 @@ Public Class frmAgPrac
         End If
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Dim Id&, i&, perlndid&, cbuff$, ctmp$, itype&, uvq$
         Dim nrepeat&, RecordCount&
         Dim LayerFlag As Boolean, j&, Sub1$, Sub2$, DistribID&
@@ -335,7 +335,7 @@ Public Class frmAgPrac
             FirstAction = True
             WroteAction = False
             DistribID = 0
-            Id = lstPrac.Items.Count '<<<<<<<<<<<<<<<<<<<<<<<<<<<<+ 1
+            Id = lstPrac.Items.Count
             RecordCount = 0
             For i = 1 To cPracIDs.Count
                 If cPracIDs(i) = Id Then
@@ -489,13 +489,17 @@ Public Class frmAgPrac
                     End If
                 End If
             Next i
-            If WroteAction And chkDelay.Checked = 1 Then
+            If WroteAction And chkDelay.Checked = True Then
                 'need to close conditional
                 pCtl.AddToEnd("END IF", 5)
             End If
         Else
             Logger.Msg("One Practice and One Land Segment must be selected.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "Add Ag Practice Problem")
         End If
+        Me.Close()
     End Sub
 
+    Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
+        Me.Dispose()
+    End Sub
 End Class
