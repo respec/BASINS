@@ -300,5 +300,202 @@ Public Class frmAgPrac
         End If
     End Sub
 
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Dim Id&, i&, perlndid&, cbuff$, ctmp$, itype&, uvq$
+        Dim nrepeat&, RecordCount&
+        Dim LayerFlag As Boolean, j&, Sub1$, Sub2$, DistribID&
+        Dim FirstAction As Boolean, WroteAction As Boolean
+        Dim rDate(5), SDate(5), EDate(5) As Integer '<<<< This Dim statement was added (changed from Long to String)
+
+        Dim strid As String
+
+        'if one practice and one land use selected, apply
+        If lstPrac.SelectedItems.Count = 1 And lstSeg.SelectedItems.Count = 1 Then
+
+            ctmp = Mid(lstSeg.Items.Item(lstSeg.SelectedIndex), 8)
+            perlndid = StrRetRem(ctmp)
+
+            If chkDelay.Checked = True Then
+                'deferring, add uvquan and conditional
+                uvq = pCtl.UVQuanInUse("PERLND", perlndid)
+                If Len(uvq) = 0 Then
+                    'find an unused uvquan name
+                    uvq = pCtl.NextUVQuanName("prec")
+                    If Len(uvq) = 5 Then
+                        uvq = uvq & " "
+                    End If
+                    'write this one to spec act records
+                    strid = RSet(CStr(perlndid), 3)
+                    cbuff = "  UVQUAN " & uvq & " PERLND " & strid & " PREC             3                 DY  1 SUM"
+                    pCtl.AddToBeginning(cbuff, 4)
+                End If
+            End If
+
+            LayerFlag = False
+            FirstAction = True
+            WroteAction = False
+            DistribID = 0
+            Id = lstPrac.Items.Count '<<<<<<<<<<<<<<<<<<<<<<<<<<<<+ 1
+            RecordCount = 0
+            For i = 1 To cPracIDs.Count
+                If cPracIDs(i) = Id Then
+                    'identify the type of record
+                    cbuff = cPracRecs(i)
+                    If Len(cbuff) = 0 Or InStr(cbuff, "***") > 0 Then
+                        itype = 6
+                    ElseIf Microsoft.VisualBasic.Left(Trim(cbuff), 3) = "IF " Or _
+                           Microsoft.VisualBasic.Left(Trim(cbuff), 4) = "ELSE" Or _
+                           Microsoft.VisualBasic.Left(Trim(cbuff), 6) = "END IF" Then
+                        itype = 5 'hcondition
+                    ElseIf Mid(cbuff, 3, 6) = "DISTRB" Then
+                        itype = 2 'hDistribute
+                        DistribID = pCtl.NextDistribNumber
+                    ElseIf Mid(cbuff, 3, 6) = "UVNAME" Then
+                        itype = 3 'hUserDefineName
+                    ElseIf Mid(cbuff, 3, 6) = "UVQUAN" Then
+                        itype = 4 'hUserDefineQuan
+                    Else
+                        itype = 1 'hAction
+                    End If
+                    'modify this record as appropriate
+                    If itype = 4 Then
+                        'set operation number
+                        strid = RSet(CStr(perlndid), 3)
+                        cbuff = Mid(cbuff, 1, 23) & strid & Mid(cbuff, 27)
+                    ElseIf itype = 3 Then
+                        'create var name from upper/surface split
+                        LayerFlag = True
+                        strid = CStr(atxSurface.Value)
+                        j = InStr(1, strid, ".")
+                        Sub1 = " "
+                        If j > 0 And Len(strid) >= j + 1 Then
+                            Sub1 = Mid(strid, j + 1, 1)
+                        End If
+                        strid = CStr(atxUpper.Value)
+                        j = InStr(1, strid, ".")
+                        Sub2 = " "
+                        If j > 0 And Len(strid) >= j + 1 Then
+                            Sub2 = Mid(strid, j + 1, 1)
+                        End If
+                        cbuff = Mid(cbuff, 1, 13) & Sub1 & Sub2 & Mid(cbuff, 16)
+                        strid = RSet(CStr(atxSurface.Value), 5)
+                        cbuff = Mid(cbuff, 1, 36) & strid & Mid(cbuff, 42)
+                        strid = RSet(CStr(atxUpper.Value), 5)
+                        cbuff = Mid(cbuff, 1, 66) & strid & Mid(cbuff, 72)
+                    ElseIf itype = 2 Then
+                        'change distrib id
+                        strid = RSet(CStr(DistribID), 3)
+                        cbuff = Mid(cbuff, 1, 8) & strid & Mid(cbuff, 12)
+                    ElseIf itype = 1 Then
+                        RecordCount = RecordCount + 1
+
+                        If FirstAction And chkDelay.Checked = True Then
+                            'need to open conditional
+                            pCtl.AddToEnd("IF (" & Trim(uvq) & " < 0.11) THEN", 5)
+                            FirstAction = False
+                        End If
+
+                        'set operation number
+                        strid = RSet(CStr(perlndid), 3)
+                        cbuff = Mid(cbuff, 1, 8) & strid & Mid(cbuff, 12)
+                        'check if defering
+                        If chkDelay.Checked = True Then
+                            cbuff = Mid(cbuff, 1, 15) & "DY  1" & Mid(cbuff, 21)
+                        Else
+                            cbuff = Mid(cbuff, 1, 15) & "     " & Mid(cbuff, 21)
+                        End If
+                        'start year
+                        RSet(CStr(atxYear.Value), 4)
+                        cbuff = Mid(cbuff, 1, 20) & strid & Mid(cbuff, 25)
+                        'start mon
+                        strid = RSet(CStr(atxMo.Value), 3)
+                        If atxMo.Value <> 0 Then
+                            cbuff = Mid(cbuff, 1, 24) & strid & Mid(cbuff, 28)
+                        Else
+                            cbuff = Mid(cbuff, 1, 24) & "   " & Mid(cbuff, 28)
+                        End If
+                        'start day
+                        strid = RSet(CStr(atxDay.Value), 3)
+                        If atxDay.Value <> 0 Then
+                            cbuff = Mid(cbuff, 1, 27) & strid & Mid(cbuff, 31)
+                        Else
+                            cbuff = Mid(cbuff, 1, 27) & "   " & Mid(cbuff, 31)
+                        End If
+                        'start hr
+                        strid = RSet(CStr(atxHr.Value), 3)
+                        If atxMin.Value <> 0 Then
+                            cbuff = Mid(cbuff, 1, 30) & strid & Mid(cbuff, 34)
+                        Else
+                            cbuff = Mid(cbuff, 1, 30) & "   " & Mid(cbuff, 34)
+                        End If
+                        'start min
+                        strid = RSet(CStr(atxMin.Value), 3)
+                        If atxMin.Value <> 0 Then
+                            cbuff = Mid(cbuff, 1, 33) & strid & Mid(cbuff, 37)
+                        Else
+                            cbuff = Mid(cbuff, 1, 33) & "   " & Mid(cbuff, 37)
+                        End If
+                        'distrib id
+                        If IsNumeric(Mid(cbuff, 39, 3)) And DistribID > 0 Then
+                            RSet(CStr(DistribID), 3)
+                            cbuff = Mid(cbuff, 1, 35) & strid & Mid(cbuff, 39)
+                        End If
+                        If LayerFlag Then
+                            'update uvname
+                            cbuff = Mid(cbuff, 1, 45) & Sub1 & Sub2 & Mid(cbuff, 48)
+                        End If
+                        'value
+                        strid = RSet(CStr(ParGrid.Source.CellValue(RecordCount - 1, 1)), 10)
+                        cbuff = Mid(cbuff, 1, 60) & strid & Mid(cbuff, 71)
+                        'check if repeating
+                        If comboRep.Items.Item(comboRep.SelectedIndex) <> "None" Then '<<<<<<<DONT TRUST THIS!!!!!
+                            'repeating
+                            If Len(Mid(cbuff, 75, 3)) = 0 Then
+                                cbuff = Mid(cbuff, 1, 71) & comboRep.Items.Item(comboRep.SelectedIndex) & "   1" & Mid(cbuff, 78)
+                            Else
+                                cbuff = Mid(cbuff, 1, 71) & comboRep.Items.Item(comboRep.SelectedIndex) & Mid(cbuff, 74)
+                            End If
+                        Else
+                            cbuff = Mid(cbuff, 1, 71) & "      " & Mid(cbuff, 77)
+                        End If
+                        If Mid(cbuff, 72, 2) = "YR" Then
+                            'yearly repeating
+                            'check number of repeats
+                            EDate(0) = pUci.GlobalBlock.EDate(0)
+                            EDate(1) = pUci.GlobalBlock.EDate(1)
+                            EDate(2) = pUci.GlobalBlock.EDate(2)
+                            EDate(3) = pUci.GlobalBlock.EDate(3)
+                            EDate(4) = pUci.GlobalBlock.EDate(4)
+                            SDate(0) = atxYear.Value
+                            SDate(1) = atxMo.Value
+                            SDate(2) = atxDay.Value
+                            SDate(3) = atxHr.Value
+                            SDate(4) = atxMin.Value
+                            nrepeat = Int((Date2J(EDate) - Date2J(SDate)) / 365)
+                            strid = RSet(CStr(nrepeat), 3)
+                            cbuff = Mid(cbuff, 1, 77) & strid
+                        End If
+                        WroteAction = True
+                    End If
+                    'add to spec act list
+                    If itype = 3 Then
+                        'check to make sure this name hasn't already been used
+                        ctmp = Mid(cbuff, 11, 5)
+                        If Not pCtl.UVNameInUse(ctmp) Then
+                            pCtl.AddToEnd(cbuff, itype)
+                        End If
+                    Else
+                        pCtl.AddToEnd(cbuff, itype)
+                    End If
+                End If
+            Next i
+            If WroteAction And chkDelay.Checked = 1 Then
+                'need to close conditional
+                pCtl.AddToEnd("END IF", 5)
+            End If
+        Else
+            Logger.Msg("One Practice and One Land Segment must be selected.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "Add Ag Practice Problem")
+        End If
+    End Sub
 
 End Class

@@ -349,7 +349,6 @@ Public Class ctlEditSpecialAction
     Public Sub Help() Implements ctlEdit.Help
         'TODO: add this code
     End Sub
-
     Public Sub Remove() Implements ctlEdit.Remove
 
     End Sub
@@ -946,6 +945,31 @@ Public Class ctlEditSpecialAction
         Loop
 
     End Function
+    Public Sub AddToBeginning(ByVal cbuff$, ByVal itype&)
+        With atcgrid0.Source
+            If (.Rows = 1 And Len(.CellValue(1, 0)) > 0) Or .Rows > 1 Then
+                .Rows += 1
+            End If
+            .CellValue(1, 0) = pSpecialActionBlk.HspfSpecialRecordName(itype)
+            .CellValue(1, 1) = cbuff
+            Changed = True
+        End With
+        atcgrid0.Refresh()
+        atcgrid0.SizeAllColumnsToContents()
+    End Sub
+
+    Public Sub AddToEnd(ByVal cbuff$, ByVal itype&)
+        With atcgrid0.Source
+            If (.Rows = 1 And Len(.CellValue(1, 0)) > 0) Or .Rows > 1 Then
+                .Rows += 1
+            End If
+            .CellValue(.Rows, 0) = pSpecialActionBlk.HspfSpecialRecordName(itype)
+            .CellValue(.Rows, 1) = cbuff
+            Changed = True
+        End With
+        atcgrid0.Refresh()
+        atcgrid0.SizeAllColumnsToContents()
+    End Sub
 
     Private Sub cmdAgPrac_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAgPrac.Click
         Dim frmAgPrac As New frmAgPrac
