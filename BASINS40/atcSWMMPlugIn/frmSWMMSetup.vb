@@ -74,6 +74,10 @@ Public Class frmSWMMSetup
     Friend WithEvents ofdMetWDM As System.Windows.Forms.OpenFileDialog
     Friend WithEvents cboOtherMet As System.Windows.Forms.ComboBox
     Friend WithEvents lblOtherMet As System.Windows.Forms.Label
+    Friend WithEvents lblPrecipStation As System.Windows.Forms.Label
+    Friend WithEvents rbnMultiple As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnSingle As System.Windows.Forms.RadioButton
+    Friend WithEvents cboPrecipStation As System.Windows.Forms.ComboBox
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWMMSetup))
@@ -118,6 +122,10 @@ Public Class frmSWMMSetup
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
+        Me.lblPrecipStation = New System.Windows.Forms.Label
+        Me.cboPrecipStation = New System.Windows.Forms.ComboBox
+        Me.rbnSingle = New System.Windows.Forms.RadioButton
+        Me.rbnMultiple = New System.Windows.Forms.RadioButton
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
@@ -367,7 +375,7 @@ Public Class frmSWMMSetup
         Me.TabPage2.Controls.Add(Me.lblLandUseLayer)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(501, 340)
+        Me.TabPage2.Size = New System.Drawing.Size(556, 340)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Land Use"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -385,14 +393,14 @@ Public Class frmSWMMSetup
         Me.AtcGridPervious.LineWidth = 0.0!
         Me.AtcGridPervious.Location = New System.Drawing.Point(14, 148)
         Me.AtcGridPervious.Name = "AtcGridPervious"
-        Me.AtcGridPervious.Size = New System.Drawing.Size(472, 172)
+        Me.AtcGridPervious.Size = New System.Drawing.Size(527, 172)
         Me.AtcGridPervious.Source = Nothing
         Me.AtcGridPervious.TabIndex = 18
         '
         'cmdChange
         '
         Me.cmdChange.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChange.Location = New System.Drawing.Point(414, 117)
+        Me.cmdChange.Location = New System.Drawing.Point(469, 117)
         Me.cmdChange.Name = "cmdChange"
         Me.cmdChange.Size = New System.Drawing.Size(72, 24)
         Me.cmdChange.TabIndex = 17
@@ -404,7 +412,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblClass.Location = New System.Drawing.Point(164, 118)
         Me.lblClass.Name = "lblClass"
-        Me.lblClass.Size = New System.Drawing.Size(242, 20)
+        Me.lblClass.Size = New System.Drawing.Size(297, 20)
         Me.lblClass.TabIndex = 16
         Me.lblClass.Text = "<none>"
         Me.lblClass.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -444,7 +452,7 @@ Public Class frmSWMMSetup
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLandUseLayer.Location = New System.Drawing.Point(168, 40)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(321, 25)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(376, 25)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
@@ -461,7 +469,7 @@ Public Class frmSWMMSetup
         Me.TabPage3.Controls.Add(Me.atcGridFields)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(501, 340)
+        Me.TabPage3.Size = New System.Drawing.Size(556, 340)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Field Mapping"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -479,12 +487,16 @@ Public Class frmSWMMSetup
         Me.atcGridFields.LineWidth = 0.0!
         Me.atcGridFields.Location = New System.Drawing.Point(15, 17)
         Me.atcGridFields.Name = "atcGridFields"
-        Me.atcGridFields.Size = New System.Drawing.Size(469, 304)
+        Me.atcGridFields.Size = New System.Drawing.Size(524, 304)
         Me.atcGridFields.Source = Nothing
         Me.atcGridFields.TabIndex = 1
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.rbnMultiple)
+        Me.TabPage6.Controls.Add(Me.rbnSingle)
+        Me.TabPage6.Controls.Add(Me.cboPrecipStation)
+        Me.TabPage6.Controls.Add(Me.lblPrecipStation)
         Me.TabPage6.Controls.Add(Me.cboOtherMet)
         Me.TabPage6.Controls.Add(Me.lblOtherMet)
         Me.TabPage6.Controls.Add(Me.AtcGridPrec)
@@ -528,9 +540,9 @@ Public Class frmSWMMSetup
         Me.AtcGridPrec.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridPrec.LineColor = System.Drawing.Color.Empty
         Me.AtcGridPrec.LineWidth = 0.0!
-        Me.AtcGridPrec.Location = New System.Drawing.Point(21, 97)
+        Me.AtcGridPrec.Location = New System.Drawing.Point(21, 136)
         Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 181)
+        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 142)
         Me.AtcGridPrec.Source = Nothing
         Me.AtcGridPrec.TabIndex = 19
         '
@@ -597,6 +609,48 @@ Public Class frmSWMMSetup
         Me.ofdMetWDM.Filter = "Met WDM files (*.wdm)|*.wdm"
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
+        '
+        'lblPrecipStation
+        '
+        Me.lblPrecipStation.AutoSize = True
+        Me.lblPrecipStation.Location = New System.Drawing.Point(24, 139)
+        Me.lblPrecipStation.Name = "lblPrecipStation"
+        Me.lblPrecipStation.Size = New System.Drawing.Size(100, 17)
+        Me.lblPrecipStation.TabIndex = 22
+        Me.lblPrecipStation.Text = "Precip Station:"
+        '
+        'cboPrecipStation
+        '
+        Me.cboPrecipStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPrecipStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPrecipStation.FormattingEnabled = True
+        Me.cboPrecipStation.Location = New System.Drawing.Point(137, 136)
+        Me.cboPrecipStation.Name = "cboPrecipStation"
+        Me.cboPrecipStation.Size = New System.Drawing.Size(395, 25)
+        Me.cboPrecipStation.TabIndex = 23
+        '
+        'rbnSingle
+        '
+        Me.rbnSingle.AutoSize = True
+        Me.rbnSingle.Checked = True
+        Me.rbnSingle.Location = New System.Drawing.Point(27, 96)
+        Me.rbnSingle.Name = "rbnSingle"
+        Me.rbnSingle.Size = New System.Drawing.Size(157, 21)
+        Me.rbnSingle.TabIndex = 24
+        Me.rbnSingle.TabStop = True
+        Me.rbnSingle.Text = "Single Precip Station"
+        Me.rbnSingle.UseVisualStyleBackColor = True
+        '
+        'rbnMultiple
+        '
+        Me.rbnMultiple.AutoSize = True
+        Me.rbnMultiple.Location = New System.Drawing.Point(222, 96)
+        Me.rbnMultiple.Name = "rbnMultiple"
+        Me.rbnMultiple.Size = New System.Drawing.Size(173, 21)
+        Me.rbnMultiple.TabIndex = 25
+        Me.rbnMultiple.Text = "Multiple Precip Stations"
+        Me.rbnMultiple.UseVisualStyleBackColor = True
         '
         'frmSWMMSetup
         '
@@ -1034,20 +1088,38 @@ Public Class frmSWMMSetup
             Dim lEJDate As Double = 0.0
             Dim lPrecGageNamesByCatchment As New Collection
             Dim lSelectedStation As StationDetails
-            For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
-                lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
-                'set dates
-                If lSelectedStation.StartJDate > lSJDate Then
-                    lSJDate = lSelectedStation.StartJDate
+
+            If rbnSingle.Checked Then
+                If cboPrecipStation.SelectedIndex > 0 Then
+                    lSelectedStation = pPrecStations.ItemByKey(cboPrecipStation.Items(cboPrecipStation.SelectedIndex))
+                    'set dates
+                    If lSelectedStation.StartJDate > lSJDate Then
+                        lSJDate = lSelectedStation.StartJDate
+                    End If
+                    If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                        lEJDate = lSelectedStation.EndJDate
+                    End If
+                    'use this precip gage for each catchment
+                    lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+                    'create rain gages from shapefile and selected station
+                    CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
                 End If
-                If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
-                    lEJDate = lSelectedStation.EndJDate
-                End If
-                'remember which precip gage goes with each catchment
-                lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
-                'create rain gages from shapefile and selected station
-                CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
-            Next
+            Else
+                For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+                    lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+                    'set dates
+                    If lSelectedStation.StartJDate > lSJDate Then
+                        lSJDate = lSelectedStation.StartJDate
+                    End If
+                    If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                        lEJDate = lSelectedStation.EndJDate
+                    End If
+                    'remember which precip gage goes with each catchment
+                    lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+                    'create rain gages from shapefile and selected station
+                    CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+                Next
+            End If
 
             Dim lMetGageName As String = ""
             If cboOtherMet.SelectedIndex > 0 Then
@@ -1310,6 +1382,12 @@ Public Class frmSWMMSetup
 
         BuildListofValidStationNames(txtMetWDMName.Text, "PREC", pPrecStations)
         SetPrecipStationGrid()
+        For Each lPrecStation As StationDetails In pPrecStations
+            cboPrecipStation.Items.Add(lPrecStation.Description)
+        Next
+        If cboPrecipStation.Items.Count > 0 Then
+            cboPrecipStation.SelectedIndex = 0
+        End If
 
         lblStatus.Text = "Reading Other Meteorologic Data from WDM File..."
         Me.Refresh()
@@ -1342,7 +1420,6 @@ Public Class frmSWMMSetup
             lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
         End If
 
-        AtcGridPrec.Visible = True
         AtcGridPrec.Clear()
         With AtcGridPrec.Source
             .Columns = 2
@@ -1378,4 +1455,15 @@ Public Class frmSWMMSetup
 
     End Sub
 
+    Private Sub rbnSingle_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbnSingle.CheckedChanged
+        If rbnSingle.Checked Then
+            AtcGridPrec.Visible = False
+            cboPrecipStation.Visible = True
+            lblPrecipStation.Visible = True
+        Else
+            AtcGridPrec.Visible = True
+            cboPrecipStation.Visible = False
+            lblPrecipStation.Visible = False
+        End If
+    End Sub
 End Class
