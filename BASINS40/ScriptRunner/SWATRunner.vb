@@ -738,43 +738,56 @@ Module SWATRunner
              & vbTab & "N(LandUnit)".PadLeft(12) _
              & vbTab & "N(LocalLandLoad)".PadLeft(16) _
              & vbTab & "P(LandUnit)".PadLeft(12) _
-             & vbTab & "P(LocalLandLoad)".PadLeft(16))
+             & vbTab & "P(LocalLandLoad)".PadLeft(16) _
+             & vbTab & "Sed(LandUnit)".PadLeft(14) _
+             & vbTab & "Sed(LocalLandLoad)".PadLeft(18))
         If aEnglish Then
             lSB.AppendLine(Space(8) _
              & vbTab & "acres*10^6".PadLeft(12) _
              & vbTab & "lbs/acre".PadLeft(12) _
              & vbTab & "lbs*10^6".PadLeft(16) _
              & vbTab & "lbs/acre".PadLeft(12) _
-             & vbTab & "lbs*10^6".PadLeft(16))
+             & vbTab & "lbs*10^6".PadLeft(16) _
+             & vbTab & "tons/acre".PadLeft(14) _
+             & vbTab & "tons".PadLeft(18))
         Else
             lSB.AppendLine(Space(8) _
              & vbTab & "ha*10^6".PadLeft(12) _
              & vbTab & "kg/ha".PadLeft(12) _
              & vbTab & "kg*10^6".PadLeft(16) _
              & vbTab & "kg/ha".PadLeft(12) _
-             & vbTab & "kg*10^6".PadLeft(16))
+             & vbTab & "kg*10^6".PadLeft(16) _
+             & vbTab & "tonnes/ha".PadLeft(14) _
+             & vbTab & "tonnes".PadLeft(18))
         End If
 
         'TODO: move to a function to be shared with HucSummaryReport
         Dim lAreaFactor As Double = 0.0001 'ha -> km2
         Dim lUnitLoadFactor As Double = 0.01 'kg/km2 -> kg/ha
         Dim lMassFactor As Double = 0.000001 'kg -> kg*10^6
+        Dim lSedLoadFactor As Double = 1.0 'tonnes/ha - leave as is
+        Dim lSedMassFactor As Double = 1.0 'tonnes - leave as is
         If aEnglish Then
             lAreaFactor = 0.000247 'ha -> acre*10^6
             lUnitLoadFactor = 0.00892 'kg/km2 -> lbs/acre
             lMassFactor = 0.0000022046 'kg -> lbs*10^6
+            lSedLoadFactor = 0.445 'tonnes/ha -> tons/ac
+            lSedMassFactor = 1.1023 'tonnes -> tons
         End If
 
         For Each lHucSummary4 As HucSummary In aHucSummary4
             With lHucSummary4
                 Dim lNLandUnit As Double = .NLoad / .Area
                 Dim lPLandUnit As Double = .PLoad / .Area
+                Dim lSedLandUnit As Double = .SedLoad / .Area
                 lSB.AppendLine(.Name.PadLeft(8) _
                                & vbTab & DecimalAlign(.Area * lAreaFactor, , 3, 8).PadLeft(12) _
                                & vbTab & DecimalAlign(lNLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
                                & vbTab & DecimalAlign(.NLoad * lMassFactor, 16, 1, 12).PadLeft(16) _
                                & vbTab & DecimalAlign(lPLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
-                               & vbTab & DecimalAlign(.PLoad * lMassFactor, 16, 1, 12).PadLeft(16))
+                               & vbTab & DecimalAlign(.PLoad * lMassFactor, 16, 1, 12).PadLeft(16) _
+                               & vbTab & DecimalAlign(lSedLandUnit * lSedLoadFactor, 14, 3, 8).PadLeft(14) _
+                               & vbTab & DecimalAlign(.SedLoad * lSedMassFactor, 18, 1, 12).PadLeft(18))
             End With
         Next
         lSB.AppendLine("")
@@ -782,25 +795,32 @@ Module SWATRunner
         With lhucsummary2
             Dim lNLandUnit As Double = .NLoad / .Area
             Dim lPLandUnit As Double = .PLoad / .Area
+            Dim lSedLandUnit As Double = .SedLoad / .Area
             lSB.AppendLine(("Total " & .Name).PadLeft(8) _
                             & vbTab & DecimalAlign(.Area * lAreaFactor, , 3, 8).PadLeft(12) _
                             & vbTab & DecimalAlign(lNLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
                             & vbTab & DecimalAlign(.NLoad * lMassFactor, 16, 1, 12).PadLeft(16) _
                             & vbTab & DecimalAlign(lPLandUnit * lUnitLoadFactor, , 3, 8).PadLeft(12) _
-                            & vbTab & DecimalAlign(.PLoad * lMassFactor, 16, 1, 12).PadLeft(16))
+                            & vbTab & DecimalAlign(.PLoad * lMassFactor, 16, 1, 12).PadLeft(16) _
+                            & vbTab & DecimalAlign(lSedLandUnit * lSedLoadFactor, 14, 3, 8).PadLeft(14) _
+                            & vbTab & DecimalAlign(.SedLoad * lSedMassFactor, 18, 1, 12).PadLeft(18))
             lSB.AppendLine("Outflow".PadLeft(8) _
                                         & vbTab & " ".PadLeft(8) _
                                         & vbTab & " ".PadLeft(12) _
                                         & vbTab & DecimalAlign(.NOutflow * lMassFactor, 16, 1, 12).PadLeft(16) _
                                         & vbTab & " ".PadLeft(12) _
-                                        & vbTab & DecimalAlign(.POutflow * lMassFactor, 16, 1, 12).PadLeft(16))
+                                        & vbTab & DecimalAlign(.POutflow * lMassFactor, 16, 1, 12).PadLeft(16) _
+                                        & vbTab & " ".PadLeft(14) _
+                                        & vbTab & DecimalAlign(.SedOutflow * lSedMassFactor, 18, 1, 12).PadLeft(18))
             lSB.AppendLine(" ")
             lSB.AppendLine("% Removed ".PadLeft(8) _
                                         & vbTab & " ".PadLeft(8) _
                                         & vbTab & " ".PadLeft(12) _
                                         & vbTab & DecimalAlign(100 * (lNLandUnit - (.NOutflow / .AreaCum)) / lNLandUnit, 16, 1, 12).PadLeft(16) _
                                         & vbTab & " ".PadLeft(12) _
-                                        & vbTab & DecimalAlign(100 * (lPLandUnit - (.POutflow / .AreaCum)) / lPLandUnit, 16, 1, 12).PadLeft(16))
+                                        & vbTab & DecimalAlign(100 * (lPLandUnit - (.POutflow / .AreaCum)) / lPLandUnit, 16, 1, 12).PadLeft(16) _
+                                        & vbTab & " ".PadLeft(14) _
+                                        & vbTab & DecimalAlign(100 * (lSedLandUnit - (.SedOutflow / .AreaCum)) / lSedLandUnit, 18, 1, 12).PadLeft(18))
         End With
         Return lSB.ToString
     End Function
