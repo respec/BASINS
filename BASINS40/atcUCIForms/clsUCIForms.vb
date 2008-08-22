@@ -67,6 +67,13 @@ Public Class UCIForms
                 lFormEdit.EditControl = lEditTable
                 lFormEdit.AddRemoveFlag = False
                 lForm = lFormEdit
+            Case "HspfMassLink"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditMassLinks As New ctlEditMassLinks(aObject, aParent, aTag)
+                lFormEdit.Text = lEditMassLinks.Caption
+                lFormEdit.EditControl = lEditMassLinks
+                lFormEdit.AddRemoveFlag = True
+                lForm = lFormEdit
             Case Else
                 lForm = Nothing
         End Select

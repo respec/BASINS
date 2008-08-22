@@ -51,6 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsUCIForms.vb" />
+    <Compile Include="ctlEditMassLinks.Designer.vb">
+      <DependentUpon>ctlEditMassLinks.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditMassLinks.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="frmAgPrac.Designer.vb">
       <DependentUpon>frmAgPrac.vb</DependentUpon>
     </Compile>
@@ -141,6 +147,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ctlEditMassLinks.resx">
+      <DependentUpon>ctlEditMassLinks.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmAgPrac.resx">
       <DependentUpon>frmAgPrac.vb</DependentUpon>
       <SubType>Designer</SubType>

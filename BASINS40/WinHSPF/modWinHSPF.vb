@@ -80,10 +80,9 @@ Public Module WinHSPF
         ElseIf aTableName = "EXT TARGETS" Then
             UCIForms.Edit(aParent, pUCI.Connections(0), aTableName)
         ElseIf aTableName = "MASS-LINK" Then
-
+            UCIForms.Edit(aParent, pUCI.MassLinks(0), aTableName)
         ElseIf aTableName = "SPEC-ACTIONS" Then
             UCIForms.Edit(aParent, pUCI.SpecialActionBlk, aTableName)
-            'UCIForms.Edit(aParent, pUCI.Connections(0), aTableName)
         Else
             'DisableAll(True)
             Logger.Msg("Table/Block " & aTableName & " not found.", MsgBoxStyle.OkOnly, "Edit Problem")
