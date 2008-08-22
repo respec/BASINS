@@ -138,7 +138,7 @@ Partial Class ctlEditSpecialAction
         '
         'cmdAgPrac
         '
-        Me.cmdAgPrac.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdAgPrac.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdAgPrac.Location = New System.Drawing.Point(800, 482)
         Me.cmdAgPrac.Name = "cmdAgPrac"
         Me.cmdAgPrac.Size = New System.Drawing.Size(131, 35)
@@ -150,6 +150,7 @@ Partial Class ctlEditSpecialAction
         '
         Me.atcgrid0.AllowHorizontalScrolling = True
         Me.atcgrid0.AllowNewValidValues = False
+        Me.atcgrid0.AutoScroll = True
         Me.atcgrid0.AutoSize = True
         Me.atcgrid0.CellBackColor = System.Drawing.Color.Empty
         Me.atcgrid0.LineColor = System.Drawing.Color.Empty

@@ -23,8 +23,8 @@ Partial Class frmAgPrac
         Me.lstSeg = New System.Windows.Forms.ListBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
-        Me.Button1 = New System.Windows.Forms.Button
-        Me.Button2 = New System.Windows.Forms.Button
+        Me.cmdOK = New System.Windows.Forms.Button
+        Me.cmdCancel = New System.Windows.Forms.Button
         Me.Label13 = New System.Windows.Forms.Label
         Me.Label12 = New System.Windows.Forms.Label
         Me.Label11 = New System.Windows.Forms.Label
@@ -34,19 +34,19 @@ Partial Class frmAgPrac
         Me.Label3 = New System.Windows.Forms.Label
         Me.chkDelay = New System.Windows.Forms.CheckBox
         Me.GroupProps = New System.Windows.Forms.GroupBox
+        Me.GroupLayers = New System.Windows.Forms.GroupBox
+        Me.txtNA = New System.Windows.Forms.Label
+        Me.txtUpper = New System.Windows.Forms.Label
+        Me.txtSurface = New System.Windows.Forms.Label
+        Me.GroupPar = New System.Windows.Forms.GroupBox
+        Me.ParGrid = New atcControls.atcGrid
+        Me.atxSurface = New atcControls.atcText
+        Me.atxUpper = New atcControls.atcText
         Me.atxMin = New atcControls.atcText
         Me.atxHr = New atcControls.atcText
         Me.atxYear = New atcControls.atcText
         Me.atxDay = New atcControls.atcText
         Me.atxMo = New atcControls.atcText
-        Me.GroupLayers = New System.Windows.Forms.GroupBox
-        Me.txtNA = New System.Windows.Forms.Label
-        Me.txtUpper = New System.Windows.Forms.Label
-        Me.atxSurface = New atcControls.atcText
-        Me.atxUpper = New atcControls.atcText
-        Me.txtSurface = New System.Windows.Forms.Label
-        Me.GroupPar = New System.Windows.Forms.GroupBox
-        Me.ParGrid = New atcControls.atcGrid
         Me.GroupProps.SuspendLayout()
         Me.GroupLayers.SuspendLayout()
         Me.GroupPar.SuspendLayout()
@@ -86,25 +86,25 @@ Partial Class frmAgPrac
         Me.Label2.TabIndex = 3
         Me.Label2.Text = "Land Segments"
         '
-        'Button1
+        'cmdOK
         '
-        Me.Button1.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button1.Location = New System.Drawing.Point(142, 484)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(79, 37)
-        Me.Button1.TabIndex = 4
-        Me.Button1.Text = "OK"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdOK.Location = New System.Drawing.Point(142, 484)
+        Me.cmdOK.Name = "cmdOK"
+        Me.cmdOK.Size = New System.Drawing.Size(79, 37)
+        Me.cmdOK.TabIndex = 4
+        Me.cmdOK.Text = "OK"
+        Me.cmdOK.UseVisualStyleBackColor = True
         '
-        'Button2
+        'cmdCancel
         '
-        Me.Button2.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button2.Location = New System.Drawing.Point(234, 484)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(79, 37)
-        Me.Button2.TabIndex = 5
-        Me.Button2.Text = "Cancel"
-        Me.Button2.UseVisualStyleBackColor = True
+        Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdCancel.Location = New System.Drawing.Point(234, 484)
+        Me.cmdCancel.Name = "cmdCancel"
+        Me.cmdCancel.Size = New System.Drawing.Size(79, 37)
+        Me.cmdCancel.TabIndex = 5
+        Me.cmdCancel.Text = "Cancel"
+        Me.cmdCancel.UseVisualStyleBackColor = True
         '
         'Label13
         '
@@ -206,6 +206,119 @@ Partial Class frmAgPrac
         Me.GroupProps.TabIndex = 45
         Me.GroupProps.TabStop = False
         Me.GroupProps.Text = "Properties"
+        '
+        'GroupLayers
+        '
+        Me.GroupLayers.Controls.Add(Me.txtNA)
+        Me.GroupLayers.Controls.Add(Me.txtUpper)
+        Me.GroupLayers.Controls.Add(Me.atxSurface)
+        Me.GroupLayers.Controls.Add(Me.atxUpper)
+        Me.GroupLayers.Controls.Add(Me.txtSurface)
+        Me.GroupLayers.Location = New System.Drawing.Point(268, 351)
+        Me.GroupLayers.Name = "GroupLayers"
+        Me.GroupLayers.Size = New System.Drawing.Size(165, 125)
+        Me.GroupLayers.TabIndex = 46
+        Me.GroupLayers.TabStop = False
+        Me.GroupLayers.Text = "Layer Split"
+        '
+        'txtNA
+        '
+        Me.txtNA.AutoSize = True
+        Me.txtNA.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtNA.Location = New System.Drawing.Point(44, 56)
+        Me.txtNA.Name = "txtNA"
+        Me.txtNA.Size = New System.Drawing.Size(76, 13)
+        Me.txtNA.TabIndex = 52
+        Me.txtNA.Text = "Not Applicable"
+        '
+        'txtUpper
+        '
+        Me.txtUpper.AutoSize = True
+        Me.txtUpper.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtUpper.Location = New System.Drawing.Point(21, 76)
+        Me.txtUpper.Name = "txtUpper"
+        Me.txtUpper.Size = New System.Drawing.Size(36, 13)
+        Me.txtUpper.TabIndex = 51
+        Me.txtUpper.Text = "Upper"
+        '
+        'txtSurface
+        '
+        Me.txtSurface.AutoSize = True
+        Me.txtSurface.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtSurface.Location = New System.Drawing.Point(21, 36)
+        Me.txtSurface.Name = "txtSurface"
+        Me.txtSurface.Size = New System.Drawing.Size(44, 13)
+        Me.txtSurface.TabIndex = 49
+        Me.txtSurface.Text = "Surface"
+        '
+        'GroupPar
+        '
+        Me.GroupPar.Controls.Add(Me.ParGrid)
+        Me.GroupPar.Location = New System.Drawing.Point(25, 351)
+        Me.GroupPar.Name = "GroupPar"
+        Me.GroupPar.Size = New System.Drawing.Size(237, 125)
+        Me.GroupPar.TabIndex = 47
+        Me.GroupPar.TabStop = False
+        Me.GroupPar.Text = "Parameters"
+        '
+        'ParGrid
+        '
+        Me.ParGrid.AllowHorizontalScrolling = True
+        Me.ParGrid.AllowNewValidValues = False
+        Me.ParGrid.CellBackColor = System.Drawing.Color.Empty
+        Me.ParGrid.LineColor = System.Drawing.Color.Empty
+        Me.ParGrid.LineWidth = 0.0!
+        Me.ParGrid.Location = New System.Drawing.Point(41, 17)
+        Me.ParGrid.Name = "ParGrid"
+        Me.ParGrid.Size = New System.Drawing.Size(154, 100)
+        Me.ParGrid.Source = Nothing
+        Me.ParGrid.TabIndex = 0
+        '
+        'atxSurface
+        '
+        Me.atxSurface.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSurface.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSurface.DefaultValue = 0
+        Me.atxSurface.HardMax = 9999
+        Me.atxSurface.HardMin = 0
+        Me.atxSurface.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxSurface.Location = New System.Drawing.Point(67, 33)
+        Me.atxSurface.MaxDecimal = 0
+        Me.atxSurface.maxWidth = 0
+        Me.atxSurface.Name = "atxSurface"
+        Me.atxSurface.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxSurface.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxSurface.SelLength = 0
+        Me.atxSurface.SelStart = 1
+        Me.atxSurface.Size = New System.Drawing.Size(76, 19)
+        Me.atxSurface.SoftMax = 5
+        Me.atxSurface.SoftMin = 1
+        Me.atxSurface.TabIndex = 48
+        Me.atxSurface.Tag = "1111"
+        Me.atxSurface.Value = CType(0, Long)
+        '
+        'atxUpper
+        '
+        Me.atxUpper.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxUpper.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxUpper.DefaultValue = 0
+        Me.atxUpper.HardMax = 9999
+        Me.atxUpper.HardMin = 0
+        Me.atxUpper.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxUpper.Location = New System.Drawing.Point(67, 73)
+        Me.atxUpper.MaxDecimal = 0
+        Me.atxUpper.maxWidth = 0
+        Me.atxUpper.Name = "atxUpper"
+        Me.atxUpper.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxUpper.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxUpper.SelLength = 0
+        Me.atxUpper.SelStart = 1
+        Me.atxUpper.Size = New System.Drawing.Size(76, 19)
+        Me.atxUpper.SoftMax = 5
+        Me.atxUpper.SoftMin = 1
+        Me.atxUpper.TabIndex = 50
+        Me.atxUpper.Tag = "1111"
+        Me.atxUpper.Value = CType(0, Long)
         '
         'atxMin
         '
@@ -318,119 +431,6 @@ Partial Class frmAgPrac
         Me.atxMo.TabIndex = 30
         Me.atxMo.Value = CType(1, Long)
         '
-        'GroupLayers
-        '
-        Me.GroupLayers.Controls.Add(Me.txtNA)
-        Me.GroupLayers.Controls.Add(Me.txtUpper)
-        Me.GroupLayers.Controls.Add(Me.atxSurface)
-        Me.GroupLayers.Controls.Add(Me.atxUpper)
-        Me.GroupLayers.Controls.Add(Me.txtSurface)
-        Me.GroupLayers.Location = New System.Drawing.Point(268, 351)
-        Me.GroupLayers.Name = "GroupLayers"
-        Me.GroupLayers.Size = New System.Drawing.Size(165, 125)
-        Me.GroupLayers.TabIndex = 46
-        Me.GroupLayers.TabStop = False
-        Me.GroupLayers.Text = "Layer Split"
-        '
-        'txtNA
-        '
-        Me.txtNA.AutoSize = True
-        Me.txtNA.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtNA.Location = New System.Drawing.Point(44, 56)
-        Me.txtNA.Name = "txtNA"
-        Me.txtNA.Size = New System.Drawing.Size(76, 13)
-        Me.txtNA.TabIndex = 52
-        Me.txtNA.Text = "Not Applicable"
-        '
-        'txtUpper
-        '
-        Me.txtUpper.AutoSize = True
-        Me.txtUpper.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtUpper.Location = New System.Drawing.Point(21, 76)
-        Me.txtUpper.Name = "txtUpper"
-        Me.txtUpper.Size = New System.Drawing.Size(36, 13)
-        Me.txtUpper.TabIndex = 51
-        Me.txtUpper.Text = "Upper"
-        '
-        'atxSurface
-        '
-        Me.atxSurface.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSurface.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxSurface.DefaultValue = 0
-        Me.atxSurface.HardMax = 9999
-        Me.atxSurface.HardMin = 0
-        Me.atxSurface.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxSurface.Location = New System.Drawing.Point(67, 33)
-        Me.atxSurface.MaxDecimal = 0
-        Me.atxSurface.maxWidth = 0
-        Me.atxSurface.Name = "atxSurface"
-        Me.atxSurface.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxSurface.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxSurface.SelLength = 0
-        Me.atxSurface.SelStart = 1
-        Me.atxSurface.Size = New System.Drawing.Size(76, 19)
-        Me.atxSurface.SoftMax = 5
-        Me.atxSurface.SoftMin = 1
-        Me.atxSurface.TabIndex = 48
-        Me.atxSurface.Tag = "1111"
-        Me.atxSurface.Value = CType(0, Long)
-        '
-        'atxUpper
-        '
-        Me.atxUpper.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxUpper.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxUpper.DefaultValue = 0
-        Me.atxUpper.HardMax = 9999
-        Me.atxUpper.HardMin = 0
-        Me.atxUpper.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxUpper.Location = New System.Drawing.Point(67, 73)
-        Me.atxUpper.MaxDecimal = 0
-        Me.atxUpper.maxWidth = 0
-        Me.atxUpper.Name = "atxUpper"
-        Me.atxUpper.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxUpper.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxUpper.SelLength = 0
-        Me.atxUpper.SelStart = 1
-        Me.atxUpper.Size = New System.Drawing.Size(76, 19)
-        Me.atxUpper.SoftMax = 5
-        Me.atxUpper.SoftMin = 1
-        Me.atxUpper.TabIndex = 50
-        Me.atxUpper.Tag = "1111"
-        Me.atxUpper.Value = CType(0, Long)
-        '
-        'txtSurface
-        '
-        Me.txtSurface.AutoSize = True
-        Me.txtSurface.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtSurface.Location = New System.Drawing.Point(21, 36)
-        Me.txtSurface.Name = "txtSurface"
-        Me.txtSurface.Size = New System.Drawing.Size(44, 13)
-        Me.txtSurface.TabIndex = 49
-        Me.txtSurface.Text = "Surface"
-        '
-        'GroupPar
-        '
-        Me.GroupPar.Controls.Add(Me.ParGrid)
-        Me.GroupPar.Location = New System.Drawing.Point(25, 351)
-        Me.GroupPar.Name = "GroupPar"
-        Me.GroupPar.Size = New System.Drawing.Size(237, 125)
-        Me.GroupPar.TabIndex = 47
-        Me.GroupPar.TabStop = False
-        Me.GroupPar.Text = "Parameters"
-        '
-        'ParGrid
-        '
-        Me.ParGrid.AllowHorizontalScrolling = True
-        Me.ParGrid.AllowNewValidValues = False
-        Me.ParGrid.CellBackColor = System.Drawing.Color.Empty
-        Me.ParGrid.LineColor = System.Drawing.Color.Empty
-        Me.ParGrid.LineWidth = 0.0!
-        Me.ParGrid.Location = New System.Drawing.Point(41, 17)
-        Me.ParGrid.Name = "ParGrid"
-        Me.ParGrid.Size = New System.Drawing.Size(154, 100)
-        Me.ParGrid.Source = Nothing
-        Me.ParGrid.TabIndex = 0
-        '
         'frmAgPrac
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -439,8 +439,8 @@ Partial Class frmAgPrac
         Me.Controls.Add(Me.GroupPar)
         Me.Controls.Add(Me.GroupLayers)
         Me.Controls.Add(Me.GroupProps)
-        Me.Controls.Add(Me.Button2)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.cmdCancel)
+        Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.lstSeg)
@@ -461,8 +461,8 @@ Partial Class frmAgPrac
     Friend WithEvents lstSeg As System.Windows.Forms.ListBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents Button1 As System.Windows.Forms.Button
-    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents cmdOK As System.Windows.Forms.Button
+    Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents atxMin As atcControls.atcText
     Friend WithEvents atxHr As atcControls.atcText
     Friend WithEvents atxDay As atcControls.atcText

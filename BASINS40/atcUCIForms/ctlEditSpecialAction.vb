@@ -342,7 +342,6 @@ Public Class ctlEditSpecialAction
     End Function
 
     Public Sub Add() Implements ctlEdit.Add
-
         Changed = True
     End Sub
 
@@ -366,6 +365,7 @@ Public Class ctlEditSpecialAction
                 .Clear()
                 .AllowHorizontalScrolling = False
                 .AllowNewValidValues = True
+                .AutoScroll = True
                 .Visible = True
             End With
 
@@ -946,29 +946,32 @@ Public Class ctlEditSpecialAction
 
     End Function
     Public Sub AddToBeginning(ByVal cbuff$, ByVal itype&)
+
         With atcgrid0.Source
             If (.Rows = 1 And Len(.CellValue(1, 0)) > 0) Or .Rows > 1 Then
                 .Rows += 1
+                'shifts table down one row starting from the bottom
+                For lRow As Integer = 1 To .Rows - 1
+                    .CellValue(.Rows - lRow, 0) = .CellValue(.Rows - lRow - 1, 0)
+                    .CellValue(.Rows - lRow, 1) = .CellValue(.Rows - lRow - 1, 1)
+                Next
             End If
             .CellValue(1, 0) = pSpecialActionBlk.HspfSpecialRecordName(itype)
             .CellValue(1, 1) = cbuff
             Changed = True
         End With
-        atcgrid0.Refresh()
         atcgrid0.SizeAllColumnsToContents()
+        atcgrid0.Refresh()
     End Sub
 
     Public Sub AddToEnd(ByVal cbuff$, ByVal itype&)
         With atcgrid0.Source
-            If (.Rows = 1 And Len(.CellValue(1, 0)) > 0) Or .Rows > 1 Then
-                .Rows += 1
-            End If
             .CellValue(.Rows, 0) = pSpecialActionBlk.HspfSpecialRecordName(itype)
-            .CellValue(.Rows, 1) = cbuff
+            .CellValue(.Rows - 1, 1) = cbuff
             Changed = True
         End With
-        atcgrid0.Refresh()
         atcgrid0.SizeAllColumnsToContents()
+        atcgrid0.Refresh()
     End Sub
 
     Private Sub cmdAgPrac_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAgPrac.Click
@@ -976,4 +979,9 @@ Public Class ctlEditSpecialAction
         frmAgPrac.Init(pSpecialActionBlk.Uci, Me)
         frmAgPrac.Show()
     End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        MsgBox(tabSpecial.Width)
+    End Sub
+
 End Class
