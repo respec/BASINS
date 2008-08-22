@@ -320,14 +320,18 @@ Public Class atcDataGroup
                 Try
                     If lAttributeNumeric Then
                         Dim lKey As Double = ts.Attributes.GetValue(lAttributeName, pNaN)
-                        If Not aMissingValue Is Nothing OrElse Not Double.IsNaN(lKey) Then
+                        If Double.IsNaN(lKey) Then
+                            If Not aMissingValue Is Nothing Then
+                                If lSortedValues.Count = 0 OrElse lSortedValues(0) <> aMissingValue Then
+                                    lSortedValues.Insert(0, GetMinValue, aMissingValue)
+                                End If
+                            End If
+                        Else
                             lItemIndex = lSortedValues.BinarySearchForKey(lKey)
                             ' lItemIndex = lSortedValues.Count means the key was not found and it belongs at the end
-                            ' lKey <> lSortedValues.Keys.Item(lItemIndex) means that the key was not found, except that NaN <> NaN
-                            ' so we have additional checks to match NaN to NaN for this test
+                            ' lKey <> lSortedValues.Keys.Item(lItemIndex) means that the key was not found
                             If lItemIndex = lSortedValues.Count OrElse _
-                              (lKey <> lSortedValues.Keys.Item(lItemIndex) AndAlso _
-                               (Not Double.IsNaN(lKey) OrElse Not Double.IsNaN(lSortedValues.Keys.Item(lItemIndex)))) Then
+                              (lKey <> lSortedValues.Keys.Item(lItemIndex)) Then
                                 'Not a duplicate, add to the list
                                 lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
                                 If Not lValue Is Nothing Then

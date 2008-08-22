@@ -196,17 +196,19 @@ Public Module modString
         End If
 
         Try
-            lCurPower = Fix(Log10(aValue))
-            If aValue >= 1 Then
-                lCurPower += 1
-            End If
-            lShiftPower = 10 ^ (aDigits - lCurPower)
-            aValue = aValue * lShiftPower 'Shift val so number of digits before decimal = significant digits
-            aValue = Fix(aValue + 0.5) 'Round up if needed
-            aValue = aValue / lShiftPower 'Shift val back to where it belongs
+            If Not Double.IsInfinity(aValue) AndAlso Not Double.IsNaN(aValue) Then
+                lCurPower = Fix(Log10(aValue))
+                If aValue >= 1 Then
+                    lCurPower += 1
+                End If
+                lShiftPower = 10 ^ (aDigits - lCurPower)
+                aValue = aValue * lShiftPower 'Shift val so number of digits before decimal = significant digits
+                aValue = Fix(aValue + 0.5) 'Round up if needed
+                aValue = aValue / lShiftPower 'Shift val back to where it belongs
 
-            If lNegative Then
-                aValue = -aValue
+                If lNegative Then
+                    aValue = -aValue
+                End If
             End If
         Catch e As Exception
             Debug.Print("atcUtility:modString:SignificantDigits:error " & e.Message)

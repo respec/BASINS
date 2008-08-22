@@ -646,23 +646,17 @@ Public Module modTimeseriesMath
 
     'Build Date array for a timeseries with start/end of aTSer and time units/step of aTU/aTS
     Public Function NewDates(ByVal aTSer As atcTimeseries, ByVal aTU As atcTimeUnit, ByVal aTS As Integer) As Double()
-
-        Dim lNewDates(0) As Double
-        Dim lIntvl As Double
         Dim lSJDay As Double
         Dim lEJDay As Double
-        Dim lNewNumDates As Integer
-        Dim lDate(5) As Integer
-        Dim lSDate(5) As Integer
-        Dim lTUnit As Integer
-        Dim lTStep As Integer
-
         If aTU >= atcTimeUnit.TUSecond AndAlso aTU <= atcTimeUnit.TUCentury Then
             'get start date/time for existing TSer
             aTSer.EnsureValuesRead()
             If aTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aTSer.Dates.Value(0)) Then
-                lTUnit = aTSer.Attributes.GetValue("Time Unit")
-                lTStep = aTSer.Attributes.GetValue("Time Step")
+                Dim lIntvl As Double
+                Dim lDate(5) As Integer
+                Dim lSDate(5) As Integer
+                Dim lTUnit As Integer = aTSer.Attributes.GetValue("Time Unit")
+                Dim lTStep As Integer = aTSer.Attributes.GetValue("Time Step")
                 Select Case lTUnit
                     Case atcTimeUnit.TUSecond : lIntvl = lTStep * JulianSecond
                     Case atcTimeUnit.TUMinute : lIntvl = lTStep * JulianMinute
@@ -686,6 +680,26 @@ Public Module modTimeseriesMath
             Else
                 lSJDay = aTSer.Dates.Value(0)
             End If
+            lEJDay = aTSer.Dates.Value(aTSer.numValues)
+        End If
+        Return NewDates(lSJDay, lEJDay, aTU, aTS)
+    End Function
+
+    ''' <summary>
+    ''' Build a constant-interval date array
+    ''' </summary>
+    ''' <param name="aStartDate">Beginning of the first interval</param>
+    ''' <param name="aEndDate">End of the last interval</param>
+    ''' <param name="aTU">Time Units</param>
+    ''' <param name="aTS">Time Step (number of Time Units per step)</param>
+    Public Function NewDates(ByVal aStartDate As Double, ByVal aEndDate As Double, ByVal aTU As atcTimeUnit, ByVal aTS As Integer) As Double()
+        Dim lNewDates(0) As Double
+        If aTU >= atcTimeUnit.TUSecond AndAlso aTU <= atcTimeUnit.TUCentury Then
+            Dim lIntvl As Double
+            Dim lNewNumDates As Integer
+            Dim lDate(5) As Integer
+            Dim lSDate(5) As Integer
+
             'get interval of new TSer
             Select Case aTU
                 Case atcTimeUnit.TUSecond : lIntvl = aTS * JulianSecond
@@ -696,14 +710,13 @@ Public Module modTimeseriesMath
                 Case atcTimeUnit.TUYear : lIntvl = aTS * 365.25
                 Case atcTimeUnit.TUCentury : lIntvl = aTS * 36525
             End Select
-            lEJDay = aTSer.Dates.Value(aTSer.numValues)
-            lNewNumDates = CInt((lEJDay - lSJDay) / lIntvl)
+            lNewNumDates = CInt((aEndDate - aStartDate) / lIntvl)
             ReDim lNewDates(lNewNumDates)
-            lNewDates(0) = lSJDay 'new TSer start is same as existing TSer start
-            If aTU > modDate.atcTimeUnit.TUDay Then J2Date(lSJDay, lSDate) 'will need start date array
+            lNewDates(0) = aStartDate
+            If aTU > modDate.atcTimeUnit.TUDay Then J2Date(aStartDate, lSDate) 'will need start date array
             For i As Integer = 1 To lNewNumDates
                 If aTU < modDate.atcTimeUnit.TUMonth Then
-                    lNewDates(i) = lSJDay + lIntvl * i
+                    lNewDates(i) = aStartDate + lIntvl * i
                 Else 'need to use special TIMADD function for long, varying length intervals
                     TIMADD(lSDate, aTU, aTS, i, lDate)
                     lNewDates(i) = Date2J(lDate)
@@ -712,6 +725,25 @@ Public Module modTimeseriesMath
         End If
         Return lNewDates
     End Function
+
+    Public Function NewTimeseries(ByVal aStartDate As Double, ByVal aEndDate As Double, _
+                                  ByVal aTU As atcTimeUnit, ByVal aTS As Integer, _
+                         Optional ByVal aDataSource As atcDataSource = Nothing, _
+                         Optional ByVal aSetAllValues As Double = 0) As atcTimeseries
+        Dim lDates As New atcTimeseries(aDataSource)
+        lDates.Values = NewDates(aStartDate, aEndDate, aTU, aTS)
+        Dim lNewTimeseries As New atcTimeseries(aDataSource)
+        lNewTimeseries.Dates = lDates
+        lNewTimeseries.numValues = lNewTimeseries.Dates.numValues
+        lNewTimeseries.Value(0) = GetNaN()
+        If aSetAllValues <> 0 Then
+            For lIndex As Integer = 1 To lNewTimeseries.numValues
+                lNewTimeseries.Value(lIndex) = aSetAllValues
+            Next
+        End If
+        Return lNewTimeseries
+    End Function
+
 
     ''Make bins, sort data values into the bins, and assign collection of Bins as new attribute
     'Public Sub MakeBins(ByVal aTS As atcTimeseries, Optional ByVal aMaxBinSize As Integer = 100)

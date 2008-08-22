@@ -134,6 +134,7 @@ Public Class atcAttributeDefinition
             .Min = Me.Min
             .TypeString = Me.TypeString
             .Calculator = Me.Calculator
+            .Units = Me.Units
             If Not Me.ValidList Is Nothing Then
                 .ValidList = Me.ValidList.Clone
             End If

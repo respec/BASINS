@@ -589,6 +589,9 @@ Public Class frmSpecifyFrequency
 
 #End Region
 
+    Public Event Chose(ByVal aHigh As Boolean)
+    Public Event Cancelled()
+
     Private WithEvents pDataGroup As atcDataGroup
     Private pDateFormat As atcDateFormat
     Private pOk As Boolean = False
@@ -612,6 +615,12 @@ Public Class frmSpecifyFrequency
         pDataGroup = Nothing
         Return pOk
     End Function
+
+    Public Sub AskUser(ByVal aGroup As atcDataGroup)
+        pDataGroup = aGroup
+        Clear()
+        Me.Show()
+    End Sub
 
     Private Sub Clear()
         pDateFormat = New atcDateFormat
@@ -953,11 +962,12 @@ Public Class frmSpecifyFrequency
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         SeasonsYearsFromForm()
         Calculate("n-day " & HighOrLowString() & " value")
-        pOk = True
-        Close()
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        RaiseEvent Chose(radioHigh.Checked)
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        RaiseEvent Cancelled()
         Close()
     End Sub
 
