@@ -16,16 +16,11 @@ Public Class atcDataAttributes
     Private Shared pAllDefinitions As atcCollection 'of atcAttributeDefinition
     Private Shared pDateFormat As New atcDateFormat
 
-    'Returns lowercase key for use in Me and pAllDefinitions
-    'Warning: modifies argument aAttributeName if a preferred alias is found
-    Private Shared Function AttributeNameToKey(ByRef aAttributeName As String) As String
-        Dim lKey As String = aAttributeName.ToLower
-        Dim lAlias As String = pAllAliases.ItemByKey(lKey)
-        If Not lAlias Is Nothing Then 'We have a preferred alias for this name
+    'Returns preferred alias of the given attribute name, or returns given attribute name unchanged if there is no preferred alias
+    Public Shared Function PreferredName(ByRef aAttributeName As String) As String
+        Dim lAlias As String = pAllAliases.ItemByKey(aAttributeName.ToLower)
+        If lAlias IsNot Nothing Then 'We have a preferred alias for this name
             aAttributeName = lAlias
-            lKey = lAlias.ToLower       'use the preferred alias instead
-
-            'Check for High/Low frequency names in WDM format (HddYYY or LddYYY)
         ElseIf aAttributeName.Length = 6 _
             AndAlso (aAttributeName.Substring(0, 1).ToUpper = "H" OrElse aAttributeName.Substring(0, 1).ToUpper = "L") _
             AndAlso IsNumeric(aAttributeName.Substring(1)) Then
@@ -34,14 +29,19 @@ Public Class atcDataAttributes
             Else
                 aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "High" & CInt(aAttributeName.Substring(3))
             End If
-            lKey = aAttributeName.ToLower
         End If
-        Return lKey
+        Return aAttributeName
+    End Function
+
+    'Returns lowercase key for use in Me and pAllDefinitions
+    Private Shared Function AttributeNameToKey(ByVal aAttributeName As String) As String
+        Return PreferredName(aAttributeName).ToLower
     End Function
 
     Public Shared Sub AddDefinition(ByVal aDefinition As atcAttributeDefinition)
-        Dim lKey As String = AttributeNameToKey((aDefinition.Name))
+        Dim lKey As String = AttributeNameToKey(aDefinition.Name)
         If Not pAllDefinitions.Keys.Contains(lKey) Then
+            aDefinition.Name = PreferredName(aDefinition.Name)
             pAllDefinitions.Add(lKey, aDefinition)
         ElseIf aDefinition.Calculated Then
             pAllDefinitions.ItemByKey(lKey) = aDefinition
@@ -174,7 +174,7 @@ Public Class atcDataAttributes
 
     'Set attribute with definition aAttrDefinition to value aValue
     Public Function SetValue(ByVal aAttrDefinition As atcAttributeDefinition, ByVal aValue As Object, Optional ByVal aArguments As atcDataAttributes = Nothing) As Integer
-        Dim key As String = AttributeNameToKey((aAttrDefinition.Name))
+        Dim key As String = AttributeNameToKey(aAttrDefinition.Name)
         Dim tmpAttrDefVal As atcDefinedValue
         Dim index As Integer = MyBase.Keys.IndexOf(key)
         If index = -1 Then
@@ -204,15 +204,14 @@ Public Class atcDataAttributes
     End Sub
 
     Public Sub SetValueIfMissing(ByVal aAttributeName As String, ByVal aAttributeValue As Object)
-        Dim lKey As String = AttributeNameToKey(aAttributeName)
-        If ItemByKey(lKey) Is Nothing Then  'Did not find the named attribute, add with supplied value
+        If ItemByKey(AttributeNameToKey(aAttributeName)) Is Nothing Then
+            'Did not find the named attribute, add with supplied value
             Add(aAttributeName, aAttributeValue)
         End If
     End Sub
 
     'Set attribute with name aAttributeName to value aValue
     Public Shadows Function Add(ByVal aAttributeName As String, ByVal aAttributeValue As Object) As Integer
-        AttributeNameToKey(aAttributeName) 'Set aAttributeName to preferred alias
         Dim lTmpAttrDef As atcAttributeDefinition = GetDefinition(aAttributeName)
         If lTmpAttrDef Is Nothing Then
             lTmpAttrDef = New atcAttributeDefinition
@@ -240,6 +239,13 @@ Public Class atcDataAttributes
             lDef.CopiesInherit = True
             lDef.Editable = True
             'lUnitsDef.ValidList = GetAllUnitsInCategory("all")
+            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
+
+            lDef = New atcAttributeDefinition
+            lDef.Name = "ID"
+            lDef.TypeString = "Integer"
+            lDef.CopiesInherit = False
+            lDef.Editable = False
             pAllDefinitions.Add(lDef.Name.ToLower, lDef)
 
             lDef = New atcAttributeDefinition
@@ -280,10 +286,10 @@ Public Class atcDataAttributes
                 .Add("long filename", "FileName")
                 .Add("path", "FileName")
 
+                .Add("time steps", "Time Step")
                 .Add("ts", "Time Step")
                 .Add("tu", "Time Unit")
 
-                .Add("id", "ID")
                 .Add("dsn", "ID")
 
                 .Add("datcre", "Date Created")

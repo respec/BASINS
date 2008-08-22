@@ -6,12 +6,14 @@ Imports System.Windows.Forms
 Friend Class frmDisplayFrequencyGrid
     Inherits System.Windows.Forms.Form
     Private pInitializing As Boolean
+    Private WithEvents pFormSpecifyFrequency As frmSpecifyFrequency
 
 #Region " Windows Form Designer generated code "
 
     Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
         MyBase.New()
         pInitializing = True
+        Me.Visible = False
         If aDataGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
@@ -30,9 +32,8 @@ Friend Class frmDisplayFrequencyGrid
             atcDataManager.UserSelectData(, pDataGroup)
         End If
 
-        If pDataGroup.Count > 0 AndAlso UserSpecifyAttributes() Then
-            pInitializing = False
-            PopulateGrid()
+        If pDataGroup.Count > 0 Then
+            UserSpecifyAttributes()
         Else 'user declined to specify Data
             Me.Close()
         End If
@@ -312,7 +313,7 @@ Friend Class frmDisplayFrequencyGrid
     End Sub
 
     Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
-        If UserSpecifyAttributes() Then PopulateGrid()
+        UserSpecifyAttributes()
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
@@ -348,17 +349,17 @@ Friend Class frmDisplayFrequencyGrid
         HighDisplay = False
     End Sub
 
-    Private Function UserSpecifyAttributes() As Boolean
-        Dim lForm As New frmSpecifyFrequency
-        Dim lChoseHigh As Boolean
-        If lForm.AskUser(pDataGroup, lChoseHigh) Then
-            pSource = Nothing 'Get rid of obsolete source before changing HighDisplay to avoid refresh trouble
-            Me.HighDisplay = lChoseHigh
-            Return True
-        Else
-            Return False
+    Private Sub UserSpecifyAttributes()
+        If pFormSpecifyFrequency IsNot Nothing Then
+            Try
+                pFormSpecifyFrequency.Close()
+            Catch
+            End Try
+            pFormSpecifyFrequency = Nothing
         End If
-    End Function
+        pFormSpecifyFrequency = New frmSpecifyFrequency
+        pFormSpecifyFrequency.AskUser(pDataGroup)
+    End Sub
 
     Public Overrides Function ToString() As String
         Return Me.Text & vbCrLf & agdMain.ToString
@@ -415,5 +416,22 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuFileSaveViewNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveViewNDay.Click
         atcDataManager.UserSelectDisplay("N-Day timeseries", pSource.AllNday)
+    End Sub
+
+    Private Sub pFormSpecifyFrequency_Cancelled() Handles pFormSpecifyFrequency.Cancelled
+        pFormSpecifyFrequency = Nothing
+        If pInitializing Then
+            Me.Close()
+        End If
+    End Sub
+
+    Private Sub pFormSpecifyFrequency_Chose(ByVal aHigh As Boolean) Handles pFormSpecifyFrequency.Chose
+        pSource = Nothing 'Get rid of obsolete source before changing HighDisplay to avoid refresh trouble
+        Me.HighDisplay = aHigh
+        If pInitializing Then
+            pInitializing = False
+            Me.Show()
+        End If
+        PopulateGrid()
     End Sub
 End Class

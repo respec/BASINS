@@ -490,17 +490,22 @@ Friend Class frmSelectData
     End Sub
 
     Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As atcGrid)
-        Dim lNumeric As Boolean = atcDataAttributes.GetDefinition(aAttributeName).IsNumeric
+        'Logger.Dbg("Start Populating Criteria List for " & aAttributeName)
+        Dim lDefinition As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
         Dim lSortedItems As atcCollection
-        Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
-
-        Logger.Dbg("Start Populating Criteria List for " & aAttributeName)
-
-        If lAttributeDef Is Nothing Then
+        Dim lNumeric As Boolean = False
+        If lDefinition Is Nothing Then
             lSortedItems = New atcCollection
         Else
-            aList.Visible = False
-            lSortedItems = AvailableData.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
+            lNumeric = atcDataAttributes.GetDefinition(aAttributeName).IsNumeric
+            Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
+
+            If lAttributeDef Is Nothing Then
+                lSortedItems = New atcCollection
+            Else
+                aList.Visible = False
+                lSortedItems = AvailableData.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
+            End If
         End If
 
         With aList
@@ -514,7 +519,7 @@ Friend Class frmSelectData
             .Refresh()
         End With
 
-        Logger.Dbg("Finished PopulateCriteriaList(" & aAttributeName & ")")
+        'Logger.Dbg("Finished PopulateCriteriaList(" & aAttributeName & ")")
     End Sub
 
     Private Sub PopulateMatching()

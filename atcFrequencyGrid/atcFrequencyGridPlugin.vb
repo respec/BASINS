@@ -18,7 +18,6 @@ Public Class atcFrequencyGridPlugin
 
         Dim lForm As New frmDisplayFrequencyGrid(lDataGroup)
         If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 AndAlso Not lForm.IsDisposed Then
-            lForm.Show()
             Return lForm
         Else
             Return Nothing
