@@ -197,7 +197,12 @@ Public Class SWMMProject
     Public Function HourlyTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String
         Dim lSB As New StringBuilder
 
-        For lIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True) To aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
+        Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
+        If Me.SJDate = aTimeSeries.Dates.Values(0) Then
+            lStartIndex = 0
+        End If
+        Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
+        For lIndex As Integer = lStartIndex To lEndIndex
             If aTimeSeries.Values(lIndex) > 0 Then
                 lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
                 lSB.Append(" ")
