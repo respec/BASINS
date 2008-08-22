@@ -1,5 +1,7 @@
 Imports atcData
 Imports atcUtility
+'Imports System.Windows.Forms.WebBrowser
+
 
 Public Class frmCompare
 
@@ -77,5 +79,26 @@ Public Class frmCompare
         If pSimulated IsNot Nothing Then lDataGroup.Add(pSimulated)
 
         DateChooser.DataGroup = lDataGroup
+    End Sub
+
+    Private Sub lblHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblHelp.Click
+        Dim lHelpBrowser As Windows.Forms.WebBrowser
+        lHelpBrowser = New Windows.Forms.WebBrowser()
+
+        Dim lStrHelpText As String
+
+        'lHelpWin = New Windows.Forms.HtmlDocument
+        lStrHelpText = "<html><head><title>Help:AWSTAT->Compare</title></head>" & vbCrLf
+        lStrHelpText &= "<body>Help with AWSTAT->Compare</body></html>" & vbCrLf
+
+        'lHelpWin.Write(lStrHelpText)
+        lHelpBrowser.Document.Write(lStrHelpText) '  .Window.Open("", lStrHelpText, "", False)
+        lHelpBrowser.Height = 100
+        lHelpBrowser.Width = 200
+        lHelpBrowser.Select()
+        lHelpBrowser.Visible = True
+        lHelpBrowser.Show()
+        'lHelpBrowser.Url = System.Uri("http://www.aquaterra.com")
+
     End Sub
 End Class
