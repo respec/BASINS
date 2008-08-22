@@ -29,7 +29,12 @@ Friend Module modSWMMFromMW
 
             If aSWMMProject.RainGages.Count > 0 Then
                 'assign each catchment to the selected raingage 
-                lCatchment.RainGage = aSWMMProject.RainGages(aPrecGageNamesByCatchment(lFeatureIndex + 1))
+                If aPrecGageNamesByCatchment.Count > 1 Then
+                    lCatchment.RainGage = aSWMMProject.RainGages(aPrecGageNamesByCatchment(lFeatureIndex + 1))
+                Else
+                    'using one raingage for all
+                    lCatchment.RainGage = aSWMMProject.RainGages(aPrecGageNamesByCatchment(1))
+                End If
             End If
 
             'find associated outlet node
