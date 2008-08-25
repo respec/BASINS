@@ -565,12 +565,14 @@ Public Class atcTimeseriesNdayHighLow
                 If lPos < lOperationName.Length Then
                     lReturn = lOperationName.Substring(lPos)
                 End If
-                If lOperationName.Contains("low") Then
-                    lOperationName = "n-day low value"
-                    lHigh = False
-                Else
-                    lOperationName = "n-day high value"
-                    lHigh = True
+                If lNDay > 0 AndAlso lReturn > 0 Then
+                    If lOperationName.Contains("low") Then
+                        lOperationName = "n-day low value"
+                        lHigh = False
+                    Else
+                        lOperationName = "n-day high value"
+                        lHigh = True
+                    End If
                 End If
         End Select
 

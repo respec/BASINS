@@ -3,7 +3,7 @@ Imports atcUtility
 
 Imports System.Windows.Forms
 
-Friend Class atcListForm
+Public Class atcListForm
     Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
