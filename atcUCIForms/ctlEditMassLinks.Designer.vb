@@ -75,7 +75,7 @@ Partial Class ctlEditMassLinks
         Me.grdMassLink.Source = Nothing
         Me.grdMassLink.TabIndex = 5
         '
-        'ctlEditMasslink
+        'ctlEditMassLinks
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -85,7 +85,7 @@ Partial Class ctlEditMassLinks
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.txtDefine)
         Me.Margin = New System.Windows.Forms.Padding(2)
-        Me.Name = "ctlEditMasslink"
+        Me.Name = "ctlEditMassLinks"
         Me.Size = New System.Drawing.Size(725, 356)
         Me.ResumeLayout(False)
         Me.PerformLayout()
