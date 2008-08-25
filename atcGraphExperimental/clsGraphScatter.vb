@@ -26,12 +26,18 @@ Public Class clsGraphScatter
                 With lPane.XAxis
                     .Type = AxisType.Linear
                     .Scale.MaxAuto = False
+                    .Scale.IsUseTenPower = False
+                    .Title.IsOmitMag = True
+                    .Scale.Mag = 0
                     .Title.Text = lTimeseriesX.ToString
                 End With
 
                 With lPane.YAxis
                     .Type = AxisType.Linear
                     .Scale.MaxAuto = False
+                    .Scale.IsUseTenPower = False
+                    .Scale.Mag = 0
+                    .Title.IsOmitMag = True
                     .Title.Text = lTimeseriesY.ToString
                 End With
 

@@ -11,21 +11,29 @@ Public Module modGraph
 
     <CLSCompliant(False)> _
     Public Function AddLine(ByRef aPane As ZedGraph.GraphPane, _
-                       ByVal aACoef As Double, ByVal aBCoef As Double, _
-                       Optional ByVal aLineStyle As Drawing.Drawing2D.DashStyle = Drawing.Drawing2D.DashStyle.Solid, _
-                       Optional ByVal aTag As String = Nothing) As LineItem
+                            ByVal aACoef As Double, _
+                            ByVal aBCoef As Double, _
+                   Optional ByVal aLineStyle As Drawing.Drawing2D.DashStyle = Drawing.Drawing2D.DashStyle.Solid, _
+                   Optional ByVal aTag As String = Nothing) As LineItem
         With aPane
-            Dim lXValues(1) As Double
-            Dim lYValues(1) As Double
-            If aBCoef > 0 Then
-                lXValues(0) = .XAxis.Scale.Min
-                lYValues(0) = (aACoef * lXValues(0)) + aBCoef
-            Else
-                lYValues(0) = .YAxis.Scale.Min
-                lXValues(0) = (lYValues(0) - aBCoef) / aACoef
-            End If
-            lXValues(1) = .XAxis.Scale.Max
-            lYValues(1) = (aACoef * lXValues(1)) + aBCoef
+            'Dim lXValues(1) As Double
+            'Dim lYValues(1) As Double
+            'If aBCoef > 0 Then
+            '    lXValues(0) = .XAxis.Scale.Min
+            '    lYValues(0) = (aACoef * lXValues(0)) + aBCoef
+            'Else
+            '    lYValues(0) = .YAxis.Scale.Min
+            '    lXValues(0) = (lYValues(0) - aBCoef) / aACoef
+            'End If
+            'lXValues(1) = .XAxis.Scale.Max
+            'lYValues(1) = (aACoef * lXValues(1)) + aBCoef
+            Dim lXValues(1000) As Double
+            Dim lYValues(1000) As Double
+            Dim lStep As Double = (.XAxis.Scale.Max - .XAxis.Scale.Min) / lXValues.GetUpperBound(0)
+            For lIndex As Integer = 0 To lXValues.GetUpperBound(0)
+                lXValues(lIndex) = .XAxis.Scale.Min + (lStep * lIndex)
+                lYValues(lIndex) = (aACoef * lXValues(lIndex)) + aBCoef
+            Next
             Dim lCurve As LineItem = .AddCurve("", lXValues, lYValues, Drawing.Color.Blue, SymbolType.None)
             lCurve.Line.Style = aLineStyle
             lCurve.Tag = aTag

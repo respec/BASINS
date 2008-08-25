@@ -202,8 +202,9 @@ Module HSPFOutputReports
 
                     'scatter
                     lZgc = CreateZgc()
-                    lZgc.MasterPane.PaneList(0).YAxis.Type = ZedGraph.AxisType.Log
                     Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
+
+                    'TODO: move the regression line and title to a more generic place
                     '45 degree line
                     Dim lPane As ZedGraph.GraphPane = lZgc.MasterPane.PaneList(0)
                     AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
@@ -222,8 +223,14 @@ Module HSPFOutputReports
                     lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
                     lText.FontSpec.Border.IsVisible = False
                     lPane.GraphObjList.Add(lText)
-                    'lPane.XAxis.Title.Text &= vbCrLf & vbCrLf & "Scatter Plot" 'this has an extra (10^3) after scatter plot
+                    lPane.XAxis.Title.Text &= vbCrLf & vbCrLf & "Scatter Plot"
+
                     lZgc.SaveIn(lOutFileBase & "_scatDay" & pGraphSaveFormat)
+                    With lZgc.MasterPane.PaneList(0)
+                        .YAxis.Type = AxisType.Log
+                        .XAxis.Type = AxisType.Log
+                    End With
+                    lZgc.SaveIn(lOutFileBase & "_scatDay_log" & pGraphSaveFormat)
                     lGraphScatter.Dispose()
                     lZgc.Dispose()
 
