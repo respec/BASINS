@@ -838,7 +838,8 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
     Private Sub DsnReadGeneral(ByVal aFileUnit As Integer, _
                                ByRef aDataset As atcTimeseries)
         Dim lSaInd, lSaLen, lRetcod As Integer
-        Dim lTu, lTs As Integer
+        Dim lTu As atcTimeUnit
+        Dim lTs As Integer
         Dim lNvals As Integer
         Dim lStr As String = ""
         Dim lSdat(6) As Integer
@@ -853,21 +854,24 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
         End If
         aDataset.Attributes.SetValue("ts", lTs)
 
-        lSaInd = 17 'time units
-        F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTu, lRetcod)
+        lSaInd = 17 'time unit
+        Dim lTuInt As Integer
+        F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTuInt, lRetcod)
         If (lRetcod <> 0) Then 'set to default of daily time units
-            lTu = 4
+            lTu = atcTimeUnit.TUDay
+        Else
+            lTu = CType(lTuInt, atcTimeUnit)
         End If
-        aDataset.Attributes.SetValue("tu", lTu)
 
+        aDataset.Attributes.SetValue("tu", lTu)
         'TODO: set constant interval/interval length attribute(s) in aDataset.Dates
         'lDateSum.CIntvl = True
         Select Case lTu
-            Case 4 'day
+            Case atcTimeUnit.TUDay
                 aDataset.Attributes.SetValue("interval", lTs)
-            Case 3 'hour
+            Case atcTimeUnit.TUHour
                 aDataset.Attributes.SetValue("interval", lTs / CDbl(24))
-            Case 2 'minute
+            Case atcTimeUnit.TUMinute
                 aDataset.Attributes.SetValue("interval", lTs / CDbl(1440))
         End Select
 
