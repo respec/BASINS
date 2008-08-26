@@ -89,7 +89,7 @@ Public Module modStat
 
         Dim lLimit As Generic.List(Of Double) = GetClassLimits(lTSer1)
         If lLimit Is Nothing Then
-            MsgBox("lLimit is nothing")
+            Logger.Msg("lLimit is nothing")
         End If
 
         lStr &= vbCrLf & CompareStats(lTSer1, lTSer2, lLimit)
@@ -183,7 +183,7 @@ Public Module modStat
             'lStr &="             Simulated - 11519500 Scott River near Fort Jones, CA.             " & vbCrLf 
             'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
 
-            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
+            lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf & vbCrLf
             lStr &= "              Cases equal or" & vbCrLf
             lStr &= "              exceeding lower    Cases equal or" & vbCrLf
             lStr &= "              limit and less     exceeding lower" & vbCrLf
@@ -338,18 +338,18 @@ Public Module modStat
         '
         'When all values are screened once, devide the count into the sum of differences
         '
-        Dim TPDIF As Double
-        Dim TPDIF2 As Double
-        Dim TPBias As Double
-        Dim TSUMA As Double
-        Dim TSUMB As Double
+        Dim lTPDIF As Double
+        Dim lTPDIF2 As Double
+        Dim lTPBias As Double
+        Dim lTSUMA As Double
+        Dim lTSUMB As Double
         For Each lClassBucket In lClassBuckets
             With lClassBucket
-                TPDIF += .TotalDifferencePCT
-                TPDIF2 += .TotalSSPCT ' has to be put here to have the correct sum
-                TPBias += .TotalBiasPCT
-                TSUMA += .Total1
-                TSUMB += .Total2
+                lTPDIF += .TotalDifferencePCT
+                lTPDIF2 += .TotalSSPCT ' has to be put here to have the correct sum
+                lTPBias += .TotalBiasPCT
+                lTSUMA += .Total1
+                lTSUMB += .Total2
                 .TotalDifference /= .Count1
                 .TotalSS /= .Count1
                 .TotalSS = Math.Pow(.TotalSS, 0.5)
@@ -409,13 +409,14 @@ Public Module modStat
         lStr &= "Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 18) & vbCrLf
         lStr &= "RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 18) & vbCrLf
         lStr &= "Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 18) & vbCrLf
-        lStr &= vbCrLf & vbCrLf & vbFormFeed
+        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
 
 
         If aClassLimits IsNot Nothing Then
             'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
-            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf
-            lStr &= "            Data Series 2 - " & aTSer2.Attributes.GetValue("ISTAID") & "  " & aTSer2.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
+
+            lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf
+            lStr &= "            Data Series 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
             lStr &= "                           Mean               Root mean" & vbCrLf
             lStr &= "Lower    Number    absolute error(1)     square error(2)        Bias(3)      " & vbCrLf
             lStr &= "class      of     ------------------- ------------------- -------------------" & vbCrLf
@@ -452,23 +453,23 @@ Public Module modStat
         lStr &= "--------- --------- --------- --------- --------- --------- --------- ---------" & vbCrLf
         lStr &= CStr(lGoodCount).PadLeft(18)
         lStr &= DecimalAlign(lMeanAbsoluteError, 15)
-        TPDIF *= 100.0
-        TPDIF /= lGoodCount
-        lStr &= DecimalAlign(TPDIF, 10, 2) 'Average Percent Difference: TotalDiffPercent/Total#ofObs
+        lTPDIF *= 100.0
+        lTPDIF /= lGoodCount
+        lStr &= DecimalAlign(lTPDIF, 10, 2) 'Average Percent Difference: TotalDiffPercent/Total#ofObs
         lStr &= DecimalAlign(lRmsError, 12)
         'Logger.Msg("lRmsError = " & CStr(lRmsError))
         'Logger.Msg("TPDIF2 = " & CStr(TPDIF2))
-        TPDIF2 /= lGoodCount
-        TPDIF2 = Math.Sqrt(TPDIF2)
-        TPDIF2 *= 100.0
+        lTPDIF2 /= lGoodCount
+        lTPDIF2 = Math.Sqrt(lTPDIF2)
+        lTPDIF2 *= 100.0
 
         'Logger.Msg("TPDIF2 * 100 / lGoodcount = " & CStr(TPDIF2))
-        lStr &= DecimalAlign(TPDIF2, 10, 2) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
+        lStr &= DecimalAlign(lTPDIF2, 10, 2) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
         'lStr &= DecimalAlign(Math.Abs(lMeanAbsoluteError), 15)
         lStr &= DecimalAlign(Math.Abs(lMeanSMO2M1), 15)
-        TPBias *= 100.0
-        TPBias /= lGoodCount
-        lStr &= DecimalAlign(TPBias, 10, 2) 'Average Percent Bias: TotalPercentBias/Total#ofObs
+        lTPBias *= 100.0
+        lTPBias /= lGoodCount
+        lStr &= DecimalAlign(lTPBias, 10, 2) 'Average Percent Bias: TotalPercentBias/Total#ofObs
         lStr &= vbCrLf & vbCrLf
         Dim STEST As Double
         STEST = Math.Sqrt(lGoodCount / (lGoodCount - 1) * (lRmsError ^ 2 - Math.Abs(lMeanSMO2M1) ^ 2))
@@ -482,10 +483,7 @@ Public Module modStat
         lStr &= "    Percent = 100 * square root(sum(((TS2-TS1)/TS1)**2)/n) for all TS1 > 0" & vbCrLf
         lStr &= "(3) Average = sum(TS2-TS1)/n" & vbCrLf
         lStr &= "    Percent = 100 * sum(((TS2-TS1)/TS1)/n) for all TS1 > 0" & vbCrLf
-        lStr &= vbCrLf & vbCrLf & vbFormFeed
-
-
-
+        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
 
 
         'Table nubmer 2
@@ -495,8 +493,8 @@ Public Module modStat
             'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
             'lStr &="             Simulated - 11519500 Scott River near Fort Jones, CA.             " & vbCrLf 
             'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
-            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf
-            lStr &= "            Data Series 2 - " & aTSer2.Attributes.GetValue("ISTAID") & "  " & aTSer2.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
+            lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf
+            lStr &= "            Data Series 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
 
             lStr &= "" & vbCrLf
             lStr &= "         Cases equal or exceeding lower" & vbCrLf
@@ -551,11 +549,11 @@ Public Module modStat
         lStr &= CStr(lGoodCount).PadLeft(30) & CStr(lGoodCount).PadLeft(8)
         lStr &= "100.00".PadLeft(10) 'total percentage of TS1
         lStr &= "100.00".PadLeft(10) 'total percentage of TS2
-        TSUMA /= lGoodCount
-        TSUMB /= lGoodCount
-        lStr &= DecimalAlign(TSUMA, 12, 2) ' Avg of TS1 raw value
-        lStr &= DecimalAlign(TSUMB, 12, 2) ' Avg of TS2 raw value
-        lStr &= vbCrLf & vbCrLf & vbFormFeed
+        lTSUMA /= lGoodCount
+        lTSUMB /= lGoodCount
+        lStr &= DecimalAlign(lTSUMA, 12, 2) ' Avg of TS1 raw value
+        lStr &= DecimalAlign(lTSUMB, 12, 2) ' Avg of TS2 raw value
+        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
 
 
         'Table Number 3
@@ -564,8 +562,8 @@ Public Module modStat
         If aClassLimits IsNot Nothing Then
             'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
             'lStr &= "   Time Series 1 " & vbCrLf & "   Time Series 2 " & vbCrLf
-            lStr &= "            Data Series 1 - " & aTSer1.Attributes.GetValue("ISTAID") & "  " & aTSer1.Attributes.GetValue("STANAM") & vbCrLf
-            lStr &= "            Data Series 2 - " & aTSer2.Attributes.GetValue("ISTAID") & "  " & aTSer2.Attributes.GetValue("STANAM") & vbCrLf & vbCrLf
+            lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf
+            lStr &= "            Data Series 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
 
             lStr &= "   Lower         Number of occurrences between indicated deviations    " & vbCrLf
             lStr &= "   class    -------------------------------------------------------------" & vbCrLf
@@ -613,10 +611,18 @@ Public Module modStat
             lStr &= CStr(lErrTot).PadLeft(7)
         Next
 
-        lStr &= vbCrLf & vbCrLf & vbFormFeed
+        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
 
         If lNote.Length > 0 Then
             lStr &= lNote
+        End If
+        Return lStr
+    End Function
+
+    Private Function TimeserIdString(ByVal aTSer As atcTimeseries) As String
+        Dim lStr As String = aTSer.Attributes.GetValue("ISTAID") & "  " & aTSer.Attributes.GetValue("STANAM")
+        If lStr.Trim.Length = 0 Then
+            lStr = aTSer.ToString
         End If
         Return lStr
     End Function
