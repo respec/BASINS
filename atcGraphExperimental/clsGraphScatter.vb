@@ -26,18 +26,12 @@ Public Class clsGraphScatter
                 With lPane.XAxis
                     .Type = AxisType.Linear
                     .Scale.MaxAuto = False
-                    .Scale.IsUseTenPower = False
-                    .Title.IsOmitMag = True
-                    .Scale.Mag = 0
                     .Title.Text = lTimeseriesX.ToString
                 End With
 
                 With lPane.YAxis
                     .Type = AxisType.Linear
                     .Scale.MaxAuto = False
-                    .Scale.IsUseTenPower = False
-                    .Scale.Mag = 0
-                    .Title.IsOmitMag = True
                     .Title.Text = lTimeseriesY.ToString
                 End With
 
@@ -74,4 +68,25 @@ Public Class clsGraphScatter
         End Set
     End Property
 
+    Public Sub AddFitLine()
+        '45 degree line
+        Dim lPane As ZedGraph.GraphPane = pZgc.MasterPane.PaneList(0)
+        AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
+        'regression line 
+        Dim lACoef As Double
+        Dim lBCoef As Double
+        Dim lRSquare As Double
+        FitLine(Datasets(1), Datasets(0), lACoef, lBCoef, lRSquare)
+        AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
+        Dim lText As New TextObj
+        Dim lFmt As String = "###,##0.###"
+        lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & Environment.NewLine & _
+                     "R = " & DoubleToString(Math.Sqrt(lRSquare), , lFmt) & vbCrLf & _
+                     "R Squared = " & DoubleToString(lRSquare, , lFmt)
+        lText.FontSpec.StringAlignment = Drawing.StringAlignment.Near
+        lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
+        lText.FontSpec.Border.IsVisible = False
+        lPane.GraphObjList.Add(lText)
+        lPane.XAxis.Title.Text &= vbCrLf & vbCrLf & "Scatter Plot"
+    End Sub
 End Class
