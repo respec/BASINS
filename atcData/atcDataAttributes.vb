@@ -126,6 +126,9 @@ Public Class atcDataAttributes
                     Return lValue.ToString
                 ElseIf TypeOf (lValue) Is atcDataGroup Then
                     Return lValue.ToString
+                ElseIf TypeOf (lValue) Is atcTimeUnit Then
+                    Dim lTU As atcTimeUnit = lValue
+                    Return lTU.ToString.Substring(2)
                 ElseIf InStr(aAttributeName.ToLower, "history") > 0 Then
                     If InStr(lValue.ToString.ToLower, "read from") Then 'make value shorter by removing path and "read "
                         Return "from " & FilenameNoPath(lValue.ToString)
@@ -286,9 +289,10 @@ Public Class atcDataAttributes
                 .Add("long filename", "FileName")
                 .Add("path", "FileName")
 
-                .Add("time steps", "Time Step")
                 .Add("ts", "Time Step")
                 .Add("tu", "Time Unit")
+                .Add("time steps", "Time Step")
+                .Add("time units", "Time Unit")
 
                 .Add("dsn", "ID")
 
