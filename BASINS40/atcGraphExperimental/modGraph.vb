@@ -283,7 +283,9 @@ FoundMatch:
         lYAxis.IsVisible = True
 
         With lPane
-            If .XAxis.Type <> AxisType.DateDual Then .XAxis.Type = AxisType.DateDual
+            If .XAxis.Type <> AxisType.DateDual Then
+                .XAxis.Type = AxisType.DateDual
+            End If
             If aTimeseries.Attributes.GetValue("point", False) Then
                 lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
                 lCurve.Line.IsVisible = False
@@ -483,6 +485,9 @@ FoundMatch:
             .IsFontsScaled = False
             .IsPenWidthScaled = False
             With .XAxis
+                .Scale.IsUseTenPower = False
+                .Title.IsOmitMag = True
+                .Scale.Mag = 0
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MajorTic.IsOpposite = True
@@ -507,6 +512,9 @@ FoundMatch:
                 .IsVisible = False
             End With
             With .YAxis
+                .Scale.IsUseTenPower = False
+                .Title.IsOmitMag = True
+                .Scale.Mag = 0
                 .MajorGrid.IsVisible = True
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
