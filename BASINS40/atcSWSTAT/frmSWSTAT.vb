@@ -1062,38 +1062,41 @@ Friend Class frmSWSTAT
         lList.SwapRowsColumns = True
 
 
-        Dim lselectedData As atcDataGroup = SelectedData()
-        Dim lfrmReport As New frmTextReport
-        lfrmReport.Title = "Basic Flow Statistics"
+        'Code section is to print out Text format of Basic Statistics, leave to remind how formatting is working to get 
+        '     at the precise formatting in a SWSTAT format table
+        '
+        'Dim lselectedData As atcDataGroup = SelectedData()
+        'Dim lfrmReport As New frmTextReport
+        'lfrmReport.Title = "Basic Flow Statistics"
 
-        lfrmReport.ReportBody = "  DATA-                                                     NUMBER      NON-ZERO" & vbCrLf
-        lfrmReport.ReportBody &= "   SET                                        STANDARD   OF DATA VALUES RETURNS" & vbCrLf
-        lfrmReport.ReportBody &= " NUMBER    MINIMUM     MAXIMUM        MEAN   DEVIATION     USED  UNUSED CODE  NO." & vbCrLf
-        lfrmReport.ReportBody &= " ------ ---------- ----------- ----------- -----------  ------- ------- ---- ---" & vbCrLf
+        'lfrmReport.ReportBody = "  DATA-                                                     NUMBER      NON-ZERO" & vbCrLf
+        'lfrmReport.ReportBody &= "   SET                                        STANDARD   OF DATA VALUES RETURNS" & vbCrLf
+        'lfrmReport.ReportBody &= " NUMBER    MINIMUM     MAXIMUM        MEAN   DEVIATION     USED  UNUSED CODE  NO." & vbCrLf
+        'lfrmReport.ReportBody &= " ------ ---------- ----------- ----------- -----------  ------- ------- ---- ---" & vbCrLf
 
-        Dim lTemp As Double = 0.0
-        Dim lTSstats As New ArrayList()
-        If lselectedData.Count > 0 Then
-            For Each aTS As atcTimeseries In lselectedData
+        'Dim lTemp As Double = 0.0
+        'Dim lTSstats As New ArrayList()
+        'If lselectedData.Count > 0 Then
+        '    For Each aTS As atcTimeseries In lselectedData
 
-                lTSstats = TSStats(aTS)
+        '        lTSstats = TSStats(aTS)
 
-                lfrmReport.ReportBody &= CStr(aTS.Attributes.GetValue("ID")).PadLeft(6)
-                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(0), , 3, 6, False).PadLeft(13) 'min
-                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(1), , 3, 6, False).PadLeft(12) 'max
-                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(2), , 3, 6, False).PadLeft(12) 'mean
-                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(3), , 3, 6, False).PadLeft(12) 'lstdev
-                lfrmReport.ReportBody &= CStr(lTSstats(4)).PadLeft(8) 'used
-                lfrmReport.ReportBody &= CStr(lTSstats(5)).PadLeft(8) 'unused
-                lfrmReport.ReportBody &= vbCrLf
+        '        lfrmReport.ReportBody &= CStr(aTS.Attributes.GetValue("ID")).PadLeft(6)
+        '        lfrmReport.ReportBody &= DecimalAlignM(lTSstats(0), , 3, 6, False).PadLeft(13) 'min
+        '        lfrmReport.ReportBody &= DecimalAlignM(lTSstats(1), , 3, 6, False).PadLeft(12) 'max
+        '        lfrmReport.ReportBody &= DecimalAlignM(lTSstats(2), , 3, 6, False).PadLeft(12) 'mean
+        '        lfrmReport.ReportBody &= DecimalAlignM(lTSstats(3), , 3, 6, False).PadLeft(12) 'lstdev
+        '        lfrmReport.ReportBody &= CStr(lTSstats(4)).PadLeft(8) 'used
+        '        lfrmReport.ReportBody &= CStr(lTSstats(5)).PadLeft(8) 'unused
+        '        lfrmReport.ReportBody &= vbCrLf
 
-            Next
-        Else
-            Logger.Msg("Select at least one time series")
-        End If
+        '    Next
+        'Else
+        'Logger.Msg("Select at least one time series")
+        'End If
 
 
-        lfrmReport.displayReport()
+        'lfrmReport.displayReport()
 
     End Sub
 
@@ -1171,7 +1174,8 @@ Friend Class frmSWSTAT
                         .IncludeMonths = False
                     End With
                     lList.Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
-                    lList.Initialize(lHiLow.DataSets, pNDayAttributes, True)
+                    lList.Initialize(lHiLow.DataSets, pNDayAttributes, True, , )
+
                 End If
             Else
                 Logger.Msg("Select at least one number of days")
@@ -1402,7 +1406,7 @@ Friend Class frmSWSTAT
                         lTS.Attributes.SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
                     Next
 
-                    lList.Initialize(lHiLow.DataSets, pTrendAttributes, True)
+                    lList.Initialize(lHiLow.DataSets, pTrendAttributes, False)
                     lList.SwapRowsColumns = True
                 End If
             Else
