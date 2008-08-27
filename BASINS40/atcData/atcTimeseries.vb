@@ -213,6 +213,12 @@ Public Class atcTimeseries
             Return pValuesNeedToBeRead
         End Get
         Set(ByVal newValue As Boolean)
+            If newValue Then
+                numValues = 0
+                If Attributes.ContainsAttribute("HeaderComplete") Then
+                    Attributes.SetValue("HeaderComplete", False)
+                End If
+            End If
             pValuesNeedToBeRead = newValue
             If Not pDates Is Nothing Then
                 pDates.ValuesNeedToBeRead = newValue
