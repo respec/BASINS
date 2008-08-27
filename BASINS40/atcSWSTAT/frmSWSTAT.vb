@@ -198,7 +198,6 @@ Friend Class frmSWSTAT
         Me.txtOmitAfterYear = New System.Windows.Forms.TextBox
         Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox
         Me.cboYears = New System.Windows.Forms.ComboBox
-        Me.agdData = New atcControls.atcGrid
         Me.tabNDay = New System.Windows.Forms.TabPage
         Me.chkLog = New System.Windows.Forms.CheckBox
         Me.panelTop = New System.Windows.Forms.Panel
@@ -222,6 +221,7 @@ Friend Class frmSWSTAT
         Me.btnDoFrequency = New System.Windows.Forms.Button
         Me.btnDisplayTrend = New System.Windows.Forms.Button
         Me.btnNDay = New System.Windows.Forms.Button
+        Me.agdData = New atcControls.atcGrid
         Me.tabMain.SuspendLayout()
         Me.tabSelectDates.SuspendLayout()
         Me.grpHighLow.SuspendLayout()
@@ -285,7 +285,7 @@ Friend Class frmSWSTAT
         Me.tabMain.Location = New System.Drawing.Point(0, 2)
         Me.tabMain.Name = "tabMain"
         Me.tabMain.SelectedIndex = 0
-        Me.tabMain.Size = New System.Drawing.Size(443, 428)
+        Me.tabMain.Size = New System.Drawing.Size(443, 407)
         Me.tabMain.TabIndex = 1
         '
         'tabSelectDates
@@ -299,7 +299,7 @@ Friend Class frmSWSTAT
         Me.tabSelectDates.Location = New System.Drawing.Point(4, 22)
         Me.tabSelectDates.Name = "tabSelectDates"
         Me.tabSelectDates.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectDates.Size = New System.Drawing.Size(435, 402)
+        Me.tabSelectDates.Size = New System.Drawing.Size(435, 381)
         Me.tabSelectDates.TabIndex = 0
         Me.tabSelectDates.Text = "Select Dates"
         '
@@ -340,7 +340,7 @@ Friend Class frmSWSTAT
         'btnDisplayBasic
         '
         Me.btnDisplayBasic.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDisplayBasic.Location = New System.Drawing.Point(8, 371)
+        Me.btnDisplayBasic.Location = New System.Drawing.Point(8, 350)
         Me.btnDisplayBasic.Name = "btnDisplayBasic"
         Me.btnDisplayBasic.Size = New System.Drawing.Size(157, 23)
         Me.btnDisplayBasic.TabIndex = 69
@@ -505,23 +505,6 @@ Friend Class frmSWSTAT
         Me.cboYears.Name = "cboYears"
         Me.cboYears.Size = New System.Drawing.Size(233, 21)
         Me.cboYears.TabIndex = 44
-        '
-        'agdData
-        '
-        Me.agdData.AllowHorizontalScrolling = True
-        Me.agdData.AllowNewValidValues = False
-        Me.agdData.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdData.CellBackColor = System.Drawing.Color.Empty
-        Me.agdData.LineColor = System.Drawing.Color.Empty
-        Me.agdData.LineWidth = 0.0!
-        Me.agdData.Location = New System.Drawing.Point(233, 342)
-        Me.agdData.Name = "agdData"
-        Me.agdData.Size = New System.Drawing.Size(199, 52)
-        Me.agdData.Source = Nothing
-        Me.agdData.TabIndex = 1
-        Me.agdData.Visible = False
         '
         'tabNDay
         '
@@ -775,10 +758,27 @@ Friend Class frmSWSTAT
         Me.btnNDay.Text = "Display N-Day Timeseries"
         Me.btnNDay.UseVisualStyleBackColor = True
         '
+        'agdData
+        '
+        Me.agdData.AllowHorizontalScrolling = True
+        Me.agdData.AllowNewValidValues = False
+        Me.agdData.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdData.CellBackColor = System.Drawing.Color.Empty
+        Me.agdData.LineColor = System.Drawing.Color.Empty
+        Me.agdData.LineWidth = 0.0!
+        Me.agdData.Location = New System.Drawing.Point(233, 342)
+        Me.agdData.Name = "agdData"
+        Me.agdData.Size = New System.Drawing.Size(199, 31)
+        Me.agdData.Source = Nothing
+        Me.agdData.TabIndex = 1
+        Me.agdData.Visible = False
+        '
         'frmSWSTAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(443, 430)
+        Me.ClientSize = New System.Drawing.Size(443, 409)
         Me.Controls.Add(Me.tabMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
@@ -1058,7 +1058,94 @@ Friend Class frmSWSTAT
         Dim lList As New atcList.atcListForm
         lList.Initialize(SelectedData(), pBasicAttributes, False, , )
         lList.SwapRowsColumns = True
+
+
+        Dim lselectedData As atcDataGroup = SelectedData()
+        Dim lfrmReport As New frmTextReport
+        lfrmReport.Title = "Basic Flow Statistics"
+
+        lfrmReport.ReportBody = "  DATA-                                                     NUMBER      NON-ZERO" & vbCrLf
+        lfrmReport.ReportBody &= "   SET                                        STANDARD   OF DATA VALUES RETURNS" & vbCrLf
+        lfrmReport.ReportBody &= " NUMBER    MINIMUM     MAXIMUM        MEAN   DEVIATION     USED  UNUSED CODE  NO." & vbCrLf
+        lfrmReport.ReportBody &= " ------ ---------- ----------- ----------- -----------  ------- ------- ---- ---" & vbCrLf
+
+        Dim lTemp As Double = 0.0
+        Dim lTSstats As New ArrayList()
+        If lselectedData.Count > 0 Then
+            For Each aTS As atcTimeseries In lselectedData
+
+                lTSstats = TSStats(aTS)
+
+                lfrmReport.ReportBody &= CStr(aTS.Attributes.GetValue("ID")).PadLeft(6)
+                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(0), , 3, 6, False).PadLeft(13) 'min
+                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(1), , 3, 6, False).PadLeft(12) 'max
+                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(2), , 3, 6, False).PadLeft(12) 'mean
+                lfrmReport.ReportBody &= DecimalAlignM(lTSstats(3), , 3, 6, False).PadLeft(12) 'lstdev
+                lfrmReport.ReportBody &= CStr(lTSstats(4)).PadLeft(8) 'used
+                lfrmReport.ReportBody &= CStr(lTSstats(5)).PadLeft(8) 'unused
+                lfrmReport.ReportBody &= vbCrLf
+
+            Next
+        Else
+            Logger.Msg("Select at least one time series")
+        End If
+
+
+        lfrmReport.displayReport()
+
     End Sub
+
+    Private Function TSStats(ByVal aTS As atcTimeseries) As ArrayList
+
+        Dim lmean As Double
+        Dim lmin As Double
+        Dim lmax As Double
+        Dim lstdev As Double
+        Dim lUsed As Integer
+        Dim lTotalCount As Integer
+        Dim lSum As Double
+        Dim lUnused As Integer
+        Dim lSS As Double
+
+        Dim lusedVals As New ArrayList()
+        Dim lStats As New ArrayList()
+
+        lmin = Double.MaxValue
+        lmax = Double.MinValue
+        For Each lVal As Double In aTS.Values
+            lTotalCount += 1
+            If lVal > 0 Then
+                lUsed += 1
+                lSum += lVal
+                lusedVals.Add(lVal)
+                If lVal > lmax Then
+                    lmax = lVal
+                End If
+                If lVal < lmin Then
+                    lmin = lVal
+                End If
+            End If
+        Next
+
+        lmean = lSum / lUsed
+        lUnused = lTotalCount - lUsed
+
+        For Each lVal As Double In lusedVals
+            lSS += (lVal - lmean) ^ 2
+        Next
+
+        lstdev = Math.Sqrt(lSS / lUsed)
+
+        lStats.Add(lmin)
+        lStats.Add(lmax)
+        lStats.Add(lmean)
+        lStats.Add(lstdev)
+        lStats.Add(lUsed)
+        lStats.Add(lUnused)
+
+        Return lStats
+
+    End Function
 
     Private Sub btnNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNDay.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
@@ -1085,6 +1172,7 @@ Friend Class frmSWSTAT
                         .IncludeMonths = False
                     End With
                     lList.Initialize(lHiLow.DataSets, pNDayAttributes, True)
+                    lList.SwapRowsColumns = True
                 End If
             Else
                 Logger.Msg("Select at least one number of days")
@@ -1313,6 +1401,7 @@ Friend Class frmSWSTAT
                     Next
                     pTrendAttributes.Add("Count")
                     lList1.Initialize(lHiLow.DataSets, pTrendAttributes, True)
+                    lList1.SwapRowsColumns = True
                 End If
             Else
                 Logger.Msg("Select at least one number of days from the N-Day Tab")

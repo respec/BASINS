@@ -243,6 +243,41 @@ Public Module modString
         Return lString.PadRight(aFieldWidth)
     End Function
 
+    Function DecimalAlignM(ByVal aValue As Double, _
+             Optional ByVal aFieldWidth As Integer = 12, _
+             Optional ByVal aDecimalPlaces As Integer = 3, _
+             Optional ByVal aSignificantDigits As Integer = 5, _
+             Optional ByVal aComma As Boolean = True) As String
+        Dim lString As String
+        If Double.IsNaN(aValue) Then
+            If aFieldWidth > 5 Then
+                lString = Space(aFieldWidth / 2) & "NaN"
+            Else
+                lString = "NaN"
+            End If
+        Else
+
+            Dim lFormat As String = ""
+            If aComma Then
+                lFormat = "###,##0.000"
+            Else
+                lFormat = "#####0.000"
+            End If
+
+            If aDecimalPlaces > 1 Then
+                lFormat &= StrDup(aDecimalPlaces - 1, "#")
+            End If
+            lString = DoubleToString(aValue, aFieldWidth, lFormat, , , aSignificantDigits)
+            Dim dp As Integer = lString.IndexOf("."c)
+            If dp >= 0 Then
+                Dim lAddLeft As Integer = aFieldWidth - 5 - dp
+                If lAddLeft > 0 Then lString = Space(lAddLeft) & lString
+            End If
+        End If
+        Return lString.PadRight(aFieldWidth)
+    End Function
+
+
     Function DoubleToString(ByVal aValue As Double, _
                    Optional ByVal aMaxWidth As Integer = 10, _
                    Optional ByVal aFormat As String = "#,##0.########", _

@@ -68,6 +68,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="frmTextReport.Designer.vb">
+      <DependentUpon>frmTextReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTextReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmDisplayFrequencyGrid.resx">
@@ -83,6 +89,10 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTextReport.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmTextReport.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
