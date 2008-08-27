@@ -244,4 +244,15 @@ Public Class atcTimeseries
         End If
         Return -1
     End Function
+
+    Public Function OriginalParent() As atcTimeseries
+        Dim lFoundParent As atcTimeseries = Me
+        Dim lNextParent As atcTimeseries = Me.Attributes.GetValue("Parent Timeseries")
+        While lNextParent IsNot Nothing
+            lFoundParent = lNextParent
+            lNextParent = lNextParent.Attributes.GetValue("Parent Timeseries")
+        End While
+        Return lFoundParent
+    End Function
+
 End Class

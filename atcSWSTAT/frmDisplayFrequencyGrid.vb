@@ -232,7 +232,8 @@ Friend Class frmDisplayFrequencyGrid
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "frmDisplayFrequencyGrid"
-        Me.Text = "High Values"
+        'Me.Text = "High Values"
+        Me.Text = "Frequency Statistics"
         Me.ResumeLayout(False)
 
     End Sub
@@ -388,9 +389,12 @@ Friend Class frmDisplayFrequencyGrid
             mnuViewHigh.Checked = newValue
             mnuViewLow.Checked = Not newValue
             If newValue Then
-                Me.Text = "High Values"
+                'Me.Text = "High Values"
+
+                Me.Text = "Frequency Statistics"
             Else
-                Me.Text = "Low Values"
+                'Me.Text = "Low Values"
+                Me.Text = "Frequency Statistics"
             End If
             If Not pSource Is Nothing AndAlso pSource.High <> newValue Then
                 pSource.High = newValue
