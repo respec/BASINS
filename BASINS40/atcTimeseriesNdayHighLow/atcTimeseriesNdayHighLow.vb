@@ -9,6 +9,10 @@ Public Class atcTimeseriesNdayHighLow
     Private pAvailableOperations As atcDataAttributes
     Private Const pName As String = "Timeseries::n-day high/low"
 
+    Private Shared KENTAUattribute As atcAttributeDefinition
+    Private Shared KENPLVattribute As atcAttributeDefinition
+    Private Shared KENSLPLattribute As atcAttributeDefinition
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return pName
@@ -342,6 +346,29 @@ Public Class atcTimeseriesNdayHighLow
                     SetKenTauAttr(aAttributesStorage, aNDay, aHigh, "Value", "Value", lTau, lArguments)
                     SetKenTauAttr(aAttributesStorage, aNDay, aHigh, "ProbLevel", "Probability Level", lLevel, lArguments)
                     SetKenTauAttr(aAttributesStorage, aNDay, aHigh, "Slope", "Slope", lSlope, lArguments)
+
+                    'Store these attributes in WDM-friendly locations in the annual timeseries
+                    If KENTAUattribute Is Nothing Then
+                        KENTAUattribute = New atcAttributeDefinition
+                        KENTAUattribute.Name = "KENTAU"
+                        KENTAUattribute.TypeString = "Double"
+                        KENTAUattribute.ID = 283
+                    End If
+                    If KENPLVattribute Is Nothing Then
+                        KENPLVattribute = New atcAttributeDefinition
+                        KENPLVattribute.Name = "KENPLV"
+                        KENPLVattribute.TypeString = "Double"
+                        KENPLVattribute.ID = 284
+                    End If
+                    If KENSLPLattribute Is Nothing Then
+                        KENSLPLattribute = New atcAttributeDefinition
+                        KENSLPLattribute.Name = "KENSLPL"
+                        KENSLPLattribute.TypeString = "Double"
+                        KENSLPLattribute.ID = 285
+                    End If
+                    lNdayTs.Attributes.SetValue(KENTAUattribute, lTau, lArguments)
+                    lNdayTs.Attributes.SetValue(KENPLVattribute, lLevel, lArguments)
+                    lNdayTs.Attributes.SetValue(KENSLPLattribute, lSlope, lArguments)
                 End If
             Next
         End If

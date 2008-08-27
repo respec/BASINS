@@ -16,15 +16,7 @@ Public Class atcFrequencyGridPlugin
 
         Dim pBasicAttributes As New ArrayList
         With pBasicAttributes
-            '.Add("History 1")
-
-            .Add("Data Source")
-            .Add("STAID")
-            .Add("STANAM")
-            .Add("Constituent")
-            .Add("Id")
-            .Add("Time step")
-            .Add("Time unit")
+            .Add("ID")
             .Add("Min")
             .Add("Max")
             .Add("Mean")
@@ -35,30 +27,37 @@ Public Class atcFrequencyGridPlugin
 
         Dim pNDayAttributes As New ArrayList
         With pNDayAttributes
-            '.Add("History 1")
-            .Add("Data Source")
+            '.Add("Data Source")
             .Add("STAID")
             .Add("STANAM")
             .Add("Constituent")
-            .Add("Id")
-            .Add("Time steps")
-            .Add("Time units")
-            .Add("Count")
-            .Add("CountMissing")
+            '.Add("ID")
+            '.Add("Time steps")
+            '.Add("Time units")
+            '.Add("Count")
+            '.Add("CountMissing")
         End With
 
         Dim pTrendAttributes As New ArrayList
         With pTrendAttributes
-            '.Add("History 1")
-            .Add("Data Source")
-            .Add("STAID")
-            .Add("STANAM")
-            .Add("Constituent")
-            .Add("Id")
-            .Add("Time step")
-            .Add("Time unit")
+            .Add("Original ID")
+            .Add("KENTAU")
+            .Add("KENPLV")
+            .Add("KENSLPL")
+            '.Add("YearFrom")
+            '.Add("YearTo")
             .Add("Count")
             .Add("CountMissing")
+            '.Add("Non-zeroReturnsCode")
+            '.Add("Non-zeroReturnsNO.")
+            .Add("Min")
+            .Add("Max")
+            '.Add("Qualifiers")
+            .Add("Constituent")
+            .Add("STAID")
+            '.Add("STANAM")
+            '.Add("Time step")
+            '.Add("Time unit")
         End With
 
 
