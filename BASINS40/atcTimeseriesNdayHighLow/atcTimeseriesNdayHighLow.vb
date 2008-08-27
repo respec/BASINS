@@ -603,6 +603,13 @@ Public Class atcTimeseriesNdayHighLow
                 End If
         End Select
 
+        'Missed here to catch the 'low' condition and hence set High correctly
+        If lOperationName.Contains("low") Then
+            lHigh = False
+        ElseIf lOperationName.Contains("high") Then
+            lHigh = True
+        End If
+
         If aArgs Is Nothing Then
             ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
             Dim lForm As New frmSpecifyYearsSeasons
