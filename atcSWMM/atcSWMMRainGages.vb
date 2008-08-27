@@ -71,7 +71,7 @@ Public Class RainGages
         For Each lRaingage As RainGage In Me
             Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & "\" & lRaingage.Name & "P.DAT"
             Dim lSB As New StringBuilder
-            lSB.Append(Me.SWMMProject.HourlyTimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
+            lSB.Append(Me.SWMMProject.PrecipTimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
             SaveFileString(lFileName, lSB.ToString)
         Next
 

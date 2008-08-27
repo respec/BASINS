@@ -73,13 +73,13 @@ Public Class SWMMProject
     End Property
 
     Public Function Save(ByVal aFileName As String) As Boolean
-        Dim lSB As New StringBuilder
+        Dim lSW As New IO.StreamWriter(aFileName)
         FileName = aFileName
 
         '[TITLE]
-        lSB.AppendLine("[TITLE]")
-        lSB.AppendLine(Title)
-        lSB.AppendLine("")
+        lSW.WriteLine("[TITLE]")
+        lSW.WriteLine(Title)
+        lSW.WriteLine("")
 
         '[OPTIONS]
         Dim lSDate(6) As Integer
@@ -88,113 +88,115 @@ Public Class SWMMProject
         J2Date(EJDate, lEDate)
         Dim lStartDateString As String = lSDate(1) & "/" & lSDate(2) & "/" & lSDate(0)
         Dim lStartTimeString As String = Format(lSDate(3), "00") & ":" & Format(lSDate(4), "00") & ":00"
-        lSB.AppendLine("[OPTIONS]")
-        lSB.AppendLine("FLOW_UNITS           " & FlowUnits)
-        lSB.AppendLine("INFILTRATION         " & InfiltrationMethod)
-        lSB.AppendLine("FLOW_ROUTING         " & FlowRouting)
-        lSB.AppendLine("START_DATE           " & lStartDateString)
-        lSB.AppendLine("START_TIME           " & lStartTimeString)
-        lSB.AppendLine("REPORT_START_DATE    " & lStartDateString)
-        lSB.AppendLine("REPORT_START_TIME    " & lStartTimeString)
-        lSB.AppendLine("END_DATE             " & lEDate(1) & "/" & lEDate(2) & "/" & lEDate(0))
-        lSB.AppendLine("END_TIME             " & Format(lEDate(3), "00") & ":" & Format(lEDate(4), "00") & ":00")
-        lSB.AppendLine("SWEEP_START          " & SweepStart)
-        lSB.AppendLine("SWEEP_END            " & SweepEnd)
-        lSB.AppendLine("DRY_DAYS             " & DryDays)
-        lSB.AppendLine("REPORT_STEP          " & ReportStep)
-        lSB.AppendLine("WET_STEP             " & WetStep)
-        lSB.AppendLine("DRY_STEP             " & DryStep)
-        lSB.AppendLine("ROUTING_STEP         " & RoutingStep)
-        lSB.AppendLine("ALLOW_PONDING        " & AllowPonding)
-        lSB.AppendLine("INERTIAL_DAMPING     " & InertialDamping)
-        lSB.AppendLine("VARIABLE_STEP        " & VariableStep)
-        lSB.AppendLine("LENGTHENING_STEP     " & LengtheningStep)
-        lSB.AppendLine("MIN_SURFAREA         " & MinSurfArea)
-        lSB.AppendLine("NORMAL_FLOW_LIMITED  " & NormalFlowLimited)
-        lSB.AppendLine("SKIP_STEADY_STATE    " & SkipSteadyState)
-        lSB.AppendLine("IGNORE_RAINFALL      " & IgnoreRainfall)
-        lSB.AppendLine("FORCE_MAIN_EQUATION  " & ForceMainEquation)
-        lSB.AppendLine("LINK_OFFSETS         " & LinkOffsets)
-        lSB.AppendLine("")
+        lSW.WriteLine("[OPTIONS]")
+        lSW.WriteLine("FLOW_UNITS           " & FlowUnits)
+        lSW.WriteLine("INFILTRATION         " & InfiltrationMethod)
+        lSW.WriteLine("FLOW_ROUTING         " & FlowRouting)
+        lSW.WriteLine("START_DATE           " & lStartDateString)
+        lSW.WriteLine("START_TIME           " & lStartTimeString)
+        lSW.WriteLine("REPORT_START_DATE    " & lStartDateString)
+        lSW.WriteLine("REPORT_START_TIME    " & lStartTimeString)
+        lSW.WriteLine("END_DATE             " & lEDate(1) & "/" & lEDate(2) & "/" & lEDate(0))
+        lSW.WriteLine("END_TIME             " & Format(lEDate(3), "00") & ":" & Format(lEDate(4), "00") & ":00")
+        lSW.WriteLine("SWEEP_START          " & SweepStart)
+        lSW.WriteLine("SWEEP_END            " & SweepEnd)
+        lSW.WriteLine("DRY_DAYS             " & DryDays)
+        lSW.WriteLine("REPORT_STEP          " & ReportStep)
+        lSW.WriteLine("WET_STEP             " & WetStep)
+        lSW.WriteLine("DRY_STEP             " & DryStep)
+        lSW.WriteLine("ROUTING_STEP         " & RoutingStep)
+        lSW.WriteLine("ALLOW_PONDING        " & AllowPonding)
+        lSW.WriteLine("INERTIAL_DAMPING     " & InertialDamping)
+        lSW.WriteLine("VARIABLE_STEP        " & VariableStep)
+        lSW.WriteLine("LENGTHENING_STEP     " & LengtheningStep)
+        lSW.WriteLine("MIN_SURFAREA         " & MinSurfArea)
+        lSW.WriteLine("NORMAL_FLOW_LIMITED  " & NormalFlowLimited)
+        lSW.WriteLine("SKIP_STEADY_STATE    " & SkipSteadyState)
+        lSW.WriteLine("IGNORE_RAINFALL      " & IgnoreRainfall)
+        lSW.WriteLine("FORCE_MAIN_EQUATION  " & ForceMainEquation)
+        lSW.WriteLine("LINK_OFFSETS         " & LinkOffsets)
+        lSW.WriteLine("")
 
         '[EVAPORATION] and [TEMPERATURE]
-        lSB.AppendLine(MetConstituents.ToString)
+        lSW.WriteLine(MetConstituents.ToString)
 
         '[RAINGAGES]
-        lSB.AppendLine(RainGages.ToString)
+        lSW.WriteLine(RainGages.ToString)
         RainGages.TimeSeriesToFile()
 
         '[SUBCATCHMENTS]
-        lSB.AppendLine(Catchments.ToString)
+        lSW.WriteLine(Catchments.ToString)
 
         '[SUBAREAS]
-        lSB.AppendLine(Catchments.SubareasToString)
+        lSW.WriteLine(Catchments.SubareasToString)
 
         '[INFILTRATION]
-        lSB.AppendLine(Catchments.InfiltrationToString)
+        lSW.WriteLine(Catchments.InfiltrationToString)
 
         '[JUNCTIONS] and [OUTFALLS]
-        lSB.AppendLine(Nodes.ToString)
+        lSW.WriteLine(Nodes.ToString)
 
         '[CONDUITS] and [XSECTIONS]
-        lSB.AppendLine(Conduits.ToString)
+        lSW.WriteLine(Conduits.ToString)
 
         '[LOSSES]
-        lSB.AppendLine("[LOSSES]")
-        lSB.AppendLine(";;Link           Inlet      Outlet     Average    Flap Gate ")
-        lSB.AppendLine(";;-------------- ---------- ---------- ---------- ----------")
-        lSB.AppendLine("")
+        lSW.WriteLine("[LOSSES]")
+        lSW.WriteLine(";;Link           Inlet      Outlet     Average    Flap Gate ")
+        lSW.WriteLine(";;-------------- ---------- ---------- ---------- ----------")
+        lSW.WriteLine("")
 
         '[LANDUSES]
-        lSB.AppendLine(Landuses.ToString)
+        lSW.WriteLine(Landuses.ToString)
 
         '[COVERAGES]
-        lSB.AppendLine(Landuses.CoveragesToString)
+        lSW.WriteLine(Landuses.CoveragesToString)
 
         '[TIMESERIES]
-        lSB.AppendLine(MetConstituents.TimeSeriesHeaderToString)
-        lSB.AppendLine(MetConstituents.TimeSeriesToString)
+        lSW.WriteLine(MetConstituents.TimeSeriesHeaderToString)
+        MetConstituents.TimeSeriesToStream(lSW)
+        lSW.WriteLine()
 
         '[REPORT]
-        lSB.AppendLine("[REPORT]")
-        lSB.AppendLine("INPUT      NO")
-        lSB.AppendLine("CONTROLS   NO")
-        lSB.AppendLine("")
+        lSW.WriteLine("[REPORT]")
+        lSW.WriteLine("INPUT      NO")
+        lSW.WriteLine("CONTROLS   NO")
+        lSW.WriteLine("")
 
         '[TAGS]
-        lSB.AppendLine("[TAGS]")
-        lSB.AppendLine("")
+        lSW.WriteLine("[TAGS]")
+        lSW.WriteLine("")
 
         '[MAP]
-        lSB.AppendLine("[MAP]")
-        lSB.AppendLine("UNITS      " & MapUnits)
-        lSB.AppendLine("")
+        lSW.WriteLine("[MAP]")
+        lSW.WriteLine("UNITS      " & MapUnits)
+        lSW.WriteLine("")
 
         '[COORDINATES]
-        lSB.AppendLine(Nodes.CoordinatesToString)
+        lSW.WriteLine(Nodes.CoordinatesToString)
 
         '[VERTICES]
-        lSB.AppendLine(Conduits.VerticesToString)
+        lSW.WriteLine(Conduits.VerticesToString)
 
         '[Polygons]
-        lSB.AppendLine(Catchments.PolygonsToString)
+        lSW.WriteLine(Catchments.PolygonsToString)
 
         '[SYMBOLS]
-        lSB.AppendLine(RainGages.CoordinatesToString)
+        lSW.WriteLine(RainGages.CoordinatesToString)
 
         '[BACKDROP]
         If BackdropFile.Length > 0 Then
-            lSB.AppendLine("")
-            lSB.AppendLine("[BACKDROP]")
-            lSB.AppendLine("FILE       " & """" & BackdropFile & """")
-            lSB.AppendLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
+            lSW.WriteLine("")
+            lSW.WriteLine("[BACKDROP]")
+            lSW.WriteLine("FILE       " & """" & BackdropFile & """")
+            lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
         End If
 
-        SaveFileString(FileName, lSB.ToString)
+        lSW.Close()
+
         Return True
     End Function
 
-    Public Function HourlyTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String
+    Public Function PrecipTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String
         Dim lSB As New StringBuilder
 
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
@@ -227,32 +229,30 @@ Public Class SWMMProject
         Return lSB.ToString
     End Function
 
-    Public Function TimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String
-        Dim lSB As New StringBuilder
+    Public Sub TimeSeriesToStream(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String, ByVal aSW As IO.StreamWriter)
 
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
         If Me.SJDate = aTimeSeries.Dates.Values(0) Then
             lStartIndex = 0
         End If
         Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
-        For lIndex As Integer = lStartIndex To lEndIndex
-            lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
-            lSB.Append(" ")
+        For lIndex As Integer = lStartIndex To lEndIndex - 1
+            aSW.Write(StrPad(aTimeseriesTag, 16, " ", False))
+            aSW.Write(" ")
             Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
             Dim lDate(6) As Integer
             J2Date(lJDate, lDate)
             Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
             Dim lTimeString As String = lDate(3) & ":" & lDate(4)
-            lSB.Append(StrPad(lDateString, 10, " ", False))
-            lSB.Append(" ")
-            lSB.Append(StrPad(lTimeString, 10, " ", False))
-            lSB.Append(" ")
-            lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex), "0.000"), 10, " ", False))
-            lSB.Append(vbCrLf)
+            aSW.Write(StrPad(lDateString, 10, " ", False))
+            aSW.Write(" ")
+            aSW.Write(StrPad(lTimeString, 10, " ", False))
+            aSW.Write(" ")
+            aSW.Write(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
+            aSW.Write(vbCrLf)
         Next
 
-        Return lSB.ToString
-    End Function
+    End Sub
 
     Public Sub Run(ByVal aInputFileName As String)
         If IO.File.Exists(aInputFileName) Then
