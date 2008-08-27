@@ -3,7 +3,8 @@ Imports atcData
 Imports atcUCI
 
 Public Module Utility
-    Friend Function ConstituentsToOutput(ByVal aType As String) As atcCollection
+    Friend Function ConstituentsToOutput(ByVal aType As String, _
+                                Optional ByVal aCategory As Boolean = False) As atcCollection
         Dim lConstituentsToOutput As New atcCollection
         Select Case aType
             Case "Water"
@@ -37,18 +38,22 @@ Public Module Utility
                 lConstituentsToOutput.Add("P:TAET", "    Total")
                 lConstituentsToOutput.Add("R:Header0", "Flow")
                 lConstituentsToOutput.Add("R:ROVOL", "    OutVolume")
-                lConstituentsToOutput.Add("R:ROVOL1", "    OVolPtIn")
-                lConstituentsToOutput.Add("R:ROVOL1-1", "    OVolPtInX1")
-                lConstituentsToOutput.Add("R:ROVOL1-2", "    OVolPtInX2")
-                lConstituentsToOutput.Add("R:ROVOL2", "    OVolNPIn")
-                lConstituentsToOutput.Add("R:ROVOL2-1", "    OVolNPInX1")
-                lConstituentsToOutput.Add("R:ROVOL2-2", "    OVolNPInX2")
-                lConstituentsToOutput.Add("R:ROVOL3", "    OVolPmpIn")
-                lConstituentsToOutput.Add("R:ROVOL3-1", "    OVolPmpInX1")
-                lConstituentsToOutput.Add("R:ROVOL3-2", "    OVolPmpInX2")
-                lConstituentsToOutput.Add("R:ROVOL4", "    OVolRsvIn")
-                lConstituentsToOutput.Add("R:ROVOL4-1", "    OVolRsvInX1")
-                lConstituentsToOutput.Add("R:ROVOL4-2", "    OVolRsvInX2")
+                If aCategory Then 'user used categories to indicate where water came from
+                    lConstituentsToOutput.Add("R:ROVOL1", "    OVolPtIn")
+                    lConstituentsToOutput.Add("R:ROVOL1-1", "    OVolPtInX1")
+                    lConstituentsToOutput.Add("R:ROVOL1-2", "    OVolPtInX2")
+                    lConstituentsToOutput.Add("R:ROVOL2", "    OVolNPIn")
+                    lConstituentsToOutput.Add("R:ROVOL2-1", "    OVolNPInX1")
+                    lConstituentsToOutput.Add("R:ROVOL2-2", "    OVolNPInX2")
+                    lConstituentsToOutput.Add("R:ROVOL3", "    OVolPmpIn")
+                    lConstituentsToOutput.Add("R:ROVOL3-1", "    OVolPmpInX1")
+                    lConstituentsToOutput.Add("R:ROVOL3-2", "    OVolPmpInX2")
+                    lConstituentsToOutput.Add("R:ROVOL4", "    OVolRsvIn")
+                    lConstituentsToOutput.Add("R:ROVOL4-1", "    OVolRsvInX1")
+                    lConstituentsToOutput.Add("R:ROVOL4-2", "    OVolRsvInX2")
+                Else
+                    lConstituentsToOutput.Add("R:IVOL", "     InVolume")
+                End If
                 lConstituentsToOutput.Add("R:PRSUPY", "    SurfPrecVol")
                 lConstituentsToOutput.Add("R:VOLEV", "    SurfEvapVol")
             Case "SedimentCopper"

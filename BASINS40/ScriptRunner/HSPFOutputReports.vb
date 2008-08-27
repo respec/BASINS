@@ -239,7 +239,7 @@ Module HSPFOutputReports
             HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
                 lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
-                "outfiles\")
+                "outfiles\", True)
         End If
     End Sub
 End Module
