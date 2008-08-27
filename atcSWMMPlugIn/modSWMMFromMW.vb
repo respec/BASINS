@@ -348,7 +348,7 @@ Friend Module modSWMMFromMW
                                             ByRef aMetConstituent As String, _
                                             ByVal aStations As atcCollection)
         aStations.Clear()
-        Dim lDataSource As New atcWDM.atcDataSourceWDM
+        Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
         If FileExists(aMetWDMName) Then
             Dim lFound As Boolean = False
             For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
@@ -361,6 +361,7 @@ Friend Module modSWMMFromMW
             Next
 
             If Not lFound Then 'need to open it here
+                lDataSource = New atcWDM.atcDataSourceWDM
                 If lDataSource.Open(aMetWDMName) Then
                     lFound = True
                 End If
@@ -378,8 +379,16 @@ Friend Module modSWMMFromMW
                         Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
                         Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
                         Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
-                        Dim lSJDay As Double = lDataSet.Dates.Value(0)
-                        Dim lEJDay As Double = lDataSet.Dates.Value(lDataSet.Dates.numValues)
+                        Dim lSJDay As Double
+                        Dim lEJDay As Double
+                        lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
+                        lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
+                        If lSJDay = 0 Then
+                            lSJDay = lDataSet.Dates.Value(0)
+                        End If
+                        If lEJDay = 0 Then
+                            lEJDay = lDataSet.Dates.Value(lDataSet.Dates.numValues)
+                        End If
                         Dim lAddIt As Boolean = True
 
                         If aMetConstituent = "PEVT" Then
@@ -388,11 +397,21 @@ Friend Module modSWMMFromMW
                             For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
                                 If lDataSet2.Attributes.GetValue("Constituent") = "ATEM" And _
                                    lDataSet2.Attributes.GetValue("Location") = lLoc Then
-                                    Dim lSJDay2 As Double = lDataSet2.Dates.Value(0)
-                                    Dim lEJDay2 As Double = lDataSet2.Dates.Value(lDataSet2.Dates.numValues)
+                                    Dim lSJDay2 As Double
+                                    Dim lEJDay2 As Double
+                                    lSJDay2 = lDataSet2.Attributes.GetValue("Start Date", 0)
+                                    lEJDay2 = lDataSet2.Attributes.GetValue("End Date", 0)
+                                    If lSJDay2 = 0 Then
+                                        lSJDay2 = lDataSet2.Dates.Value(0)
+                                    End If
+                                    If lEJDay2 = 0 Then
+                                        lEJDay2 = lDataSet2.Dates.Value(lDataSet2.Dates.numValues)
+                                    End If
                                     If lSJDay2 > lSJDay Then lSJDay = lSJDay2
                                     If lEJDay2 < lEJDay Then lEJDay = lEJDay2
                                     lAddIt = True
+                                    'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                                    lDataSet2.ValuesNeedToBeRead = True
                                     Exit For
                                 End If
                             Next
@@ -424,8 +443,8 @@ Friend Module modSWMMFromMW
                             aStations.Add(lStationDetails.Description, lStationDetails)
                         End If
                     End If
-
-                    lDataSet = Nothing
+                    'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                    lDataSet.ValuesNeedToBeRead = True
                 Next
             End If
         End If
