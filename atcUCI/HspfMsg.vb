@@ -795,4 +795,10 @@ Public Class HspfMsg
             End If
         End With
     End Sub
+
+    Public Sub New()
+    End Sub
+    Public Sub New(ByVal aFileName As String)
+        Me.Open(aFileName)
+    End Sub
 End Class
