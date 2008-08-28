@@ -56,6 +56,38 @@ Public Module Utility
                 End If
                 lConstituentsToOutput.Add("R:PRSUPY", "    SurfPrecVol")
                 lConstituentsToOutput.Add("R:VOLEV", "    SurfEvapVol")
+            Case "Sediment"
+                lConstituentsToOutput.Add("I:Header0", "Storage(tons/acre)")
+                lConstituentsToOutput.Add("I:SLDS", "  Total")
+                lConstituentsToOutput.Add("I:Header1", "Washoff(tons/acre)")
+                lConstituentsToOutput.Add("I:SOSLD", "  Total")
+
+                lConstituentsToOutput.Add("P:Header0", "Storage (tons/acre)")
+                lConstituentsToOutput.Add("P:DETS", "  Detached ")
+                lConstituentsToOutput.Add("P:Header1", "Washoff (tons/acre)")
+                lConstituentsToOutput.Add("P:SOSED", "  Total")
+
+                lConstituentsToOutput.Add("R:BEDDEP", "Bed Depth (ft)")
+                lConstituentsToOutput.Add("R:Header0", "Bed Storage (tons)")
+                lConstituentsToOutput.Add("R:RSED-BED-SAND", "  Sand")
+                lConstituentsToOutput.Add("R:RSED-BED-SILT", "  Silt")
+                lConstituentsToOutput.Add("R:RSED-BED-CLAY", "  Clay")
+                lConstituentsToOutput.Add("R:RSED-BED-TOT", "  Total")
+                lConstituentsToOutput.Add("R:Header1", "Inflow (tons)")
+                lConstituentsToOutput.Add("R:ISED-SAND", "  Sand")
+                lConstituentsToOutput.Add("R:ISED-SILT", "  Silt")
+                lConstituentsToOutput.Add("R:ISED-CLAY", "  Clay")
+                lConstituentsToOutput.Add("R:ISED-TOT", "  Total")
+                lConstituentsToOutput.Add("R:Header2", "Dep(+)/Scour(-) (tons)")
+                lConstituentsToOutput.Add("R:DEPSCOUR-SAND", "  Sand")
+                lConstituentsToOutput.Add("R:DEPSCOUR-SILT", "  Silt")
+                lConstituentsToOutput.Add("R:DEPSCOUR-CLAY", "  Clay")
+                lConstituentsToOutput.Add("R:DEPSCOUR-TOT", "  Total")
+                lConstituentsToOutput.Add("R:Header3", "Outflow (tons)")
+                lConstituentsToOutput.Add("R:ROSED-SAND", "  Sand")
+                lConstituentsToOutput.Add("R:ROSED-SILT", "  Silt")
+                lConstituentsToOutput.Add("R:ROSED-CLAY", "  Clay")
+                lConstituentsToOutput.Add("R:ROSED-TOT", "  Total")
             Case "SedimentCopper"
                 lConstituentsToOutput.Add("I:SOSLD", "Solids   ")
                 lConstituentsToOutput.Add("I:SOQUAL-Copper", "Copper   ")
@@ -182,7 +214,9 @@ Public Module Utility
         Return lConstituentsToOutput
     End Function
 
-    Public Function LandUses(ByVal aUci As HspfUci, ByVal aOperationTypes As atcCollection, Optional ByVal aOutletLocation As String = "") As atcCollection
+    Public Function LandUses(ByVal aUci As HspfUci, _
+                             ByVal aOperationTypes As atcCollection, _
+                    Optional ByVal aOutletLocation As String = "") As atcCollection
         Dim lLocations As New atcCollection
         If aOutletLocation.Length > 0 Then
             lLocations = UpstreamLocations(aUci, aOperationTypes, aOutletLocation)
@@ -220,7 +254,9 @@ Public Module Utility
         Return lLandUses
     End Function
 
-    Public Function UpstreamLocations(ByVal aUci As HspfUci, ByVal aOperationTypes As atcCollection, ByVal aLocation As String) As atcCollection
+    Public Function UpstreamLocations(ByVal aUci As HspfUci, _
+                                      ByVal aOperationTypes As atcCollection, _
+                                      ByVal aLocation As String) As atcCollection
         Dim lLocations As New atcCollection 'key-location, value-total area
         UpstreamLocationAreaCalc(aUci, aLocation, aOperationTypes, lLocations)
         Return lLocations
@@ -248,7 +284,8 @@ Public Module Utility
         aLocations.Add(aLocation, 1.0)
     End Sub
 
-    Public Function CfsToInches(ByVal aTSerIn As atcTimeseries, ByVal aArea As Double) As atcTimeseries
+    Public Function CfsToInches(ByVal aTSerIn As atcTimeseries, _
+                                ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (12.0# * 24.0# * 3600.0#) / (aArea * 43560.0#)   'cfs days to inches
         Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
         Dim lArgsMath As New atcDataAttributes
@@ -258,7 +295,8 @@ Public Module Utility
         Return lTsMath.DataSets(0)
     End Function
 
-    Public Function InchesToCfs(ByVal aTSerIn As atcTimeseries, ByVal aArea As Double) As atcTimeseries
+    Public Function InchesToCfs(ByVal aTSerIn As atcTimeseries, _
+                                ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (aArea * 43560.0#) / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
         Dim lInterval As Double = aTSerIn.Attributes.GetValue("interval", 1.0)
         lConversionFactor /= lInterval
@@ -270,20 +308,23 @@ Public Module Utility
         Return lTsMath.DataSets(0)
     End Function
 
-    Friend Sub CheckDateJ(ByVal aTSer As atcTimeseries, ByVal aName As String, _
-                           ByRef aSDateJ As Double, ByRef aEDateJ As Double, ByRef aStr As String)
+    Friend Sub CheckDateJ(ByVal aTSer As atcTimeseries, _
+                          ByVal aName As String, _
+                          ByRef aSDateJ As Double, _
+                          ByRef aEDateJ As Double, _
+                          ByRef aStr As String)
         Dim lDateTmp As Double = aTSer.Dates.Values(0)
         If aSDateJ < lDateTmp Then
             aStr &= "   Adjusted Start Date from " & Format(Date.FromOADate(aSDateJ), "yyyy/MM/dd") & _
-                                        "to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+                                             "to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
                                         " due to " & aName & vbCrLf & vbCrLf
             aSDateJ = lDateTmp
         End If
         lDateTmp = aTSer.Dates.Values(aTSer.numValues)
         If aEDateJ > lDateTmp Then
             aStr &= "   Adjusted End Date from " & Format(Date.FromOADate(aEDateJ), "yyyy/MM/dd") & _
-                                        " to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
-                                        " due to " & aName & vbCrLf & vbCrLf
+                                          " to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+                                      " due to " & aName & vbCrLf & vbCrLf
             aEDateJ = lDateTmp
         End If
     End Sub

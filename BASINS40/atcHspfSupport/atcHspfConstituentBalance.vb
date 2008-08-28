@@ -36,12 +36,15 @@ Public Module ConstituentBalance
         lString.AppendLine("   Run Made " & aRunMade)
         lString.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lString.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        Dim lDecimalPlaces As Integer = 3
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
                 lString.AppendLine("   (Units:Inches)")
             Else
                 lString.AppendLine("   (Units:mm)")
             End If
+        ElseIf aBalanceType = "Sediment" Then
+            lDecimalPlaces = 1
         End If
         lString.AppendLine(vbCrLf)
 
@@ -93,8 +96,8 @@ Public Module ConstituentBalance
                                     lString.AppendLine(aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ")" & vbCrLf)
                                     lString.Append("Date    " & vbTab & "      Mean")
                                     For Each lAttribute In lCalculatedAttributes
-                                        Dim s As String = lAttribute.Arguments(1).Value
-                                        lString.Append(vbTab & s.PadLeft(10))
+                                        Dim lStr As String = lAttribute.Arguments(1).Value
+                                        lString.Append(vbTab & lStr.PadLeft(10))
                                     Next
                                     lString.AppendLine()
                                     lNeedHeader = False
@@ -107,9 +110,9 @@ Public Module ConstituentBalance
                                 lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
 
                                 If Not lAttribute Is Nothing Then
-                                    lString.Append(lConstituentName & vbTab & DecimalAlign(lAttribute.Value))
+                                    lString.Append(lConstituentName.PadRight(12) & vbTab & DecimalAlign(lAttribute.Value, , lDecimalPlaces))
                                     For Each lAttribute In lCalculatedAttributes
-                                        lString.Append(vbTab & DecimalAlign(lAttribute.Value))
+                                        lString.Append(vbTab & DecimalAlign(lAttribute.Value, , lDecimalPlaces))
                                     Next
                                     lString.AppendLine()
                                 Else
@@ -138,7 +141,7 @@ Public Module ConstituentBalance
                                 Next
                                 lString.Append(lConstituentName)
                                 For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
-                                    lString.Append(vbTab & DecimalAlign(lCurFieldValues(lFieldPos)))
+                                    lString.Append(vbTab & DecimalAlign(lCurFieldValues(lFieldPos), , lDecimalPlaces))
                                 Next
                                 lString.AppendLine()
                             Else
