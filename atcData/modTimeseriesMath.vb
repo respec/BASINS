@@ -537,110 +537,115 @@ Public Module modTimeseriesMath
                               ByVal aTS As Integer, _
                               ByVal aTran As atcTran, _
                               Optional ByVal aDataSource As atcDataSource = Nothing) As atcTimeseries
-
-        Dim lNewDates() As Double = NewDates(aTimeseries, aTU, aTS)
-        Dim lNumNewVals As Integer = lNewDates.GetUpperBound(0)
-        If lNumNewVals > 0 Then
-            Dim lNewTSer As New atcTimeseries(aDataSource)
-            lNewTSer.Dates = New atcTimeseries(aDataSource)
-            CopyBaseAttributes(aTimeseries, lNewTSer)
-            lNewTSer.Attributes.SetValue("TU", aTU)
-            lNewTSer.Attributes.SetValue("TS", aTS)
-            lNewTSer.Attributes.SetValue("point", False)
-            If aTimeseries.ValueAttributesExist Then 'TODO:: Something with value attributes
-            End If
-            lNewTSer.Dates.Values = lNewDates
-            Dim lNewIndex As Integer = 1
-            Dim lNewVals(lNumNewVals) As Double
-            Dim lDateNew As Double = lNewDates(1)
-            Dim lDateOld As Double
-            Dim lValOld As Double
-            Dim lOldIndex As Integer = 1
-            Dim lPrevDateOld As Double = lNewDates(0) 'old and new TSers should have same start date
-            Dim lPrevDateNew As Double = lNewDates(0)
-            Dim lOverlapStart As Double
-            Dim lOverlapEnd As Double
-            Dim lNumOldVals As Integer = aTimeseries.numValues
-            Dim lFraction As Double
-            Dim lCumuFrac As Double
-
-            If aTimeseries.numValues > 0 Then
-                lValOld = aTimeseries.Value(1)
-                lDateOld = aTimeseries.Dates.Value(1)
-            End If
-
-            Select Case aTran
-
-                Case atcTran.TranAverSame, atcTran.TranSumDiv
-                    While lNewIndex <= lNumNewVals
-                        lDateNew = lNewDates(lNewIndex)
-                        lNewVals(lNewIndex) = 0
-                        While lPrevDateOld < lDateNew And lOldIndex <= lNumOldVals
-                            If lPrevDateOld > lPrevDateNew Then lOverlapStart = lPrevDateOld Else lOverlapStart = lPrevDateNew
-                            If lDateNew > lDateOld Then lOverlapEnd = lDateOld Else lOverlapEnd = lDateNew
-                            lFraction = (lOverlapEnd - lOverlapStart) / (lDateNew - lPrevDateNew)
-                            lCumuFrac = lCumuFrac + lFraction
-                            If aTran = atcTran.TranSumDiv Then
-                                lFraction = (lOverlapEnd - lOverlapStart) / (lDateOld - lPrevDateOld)
-                            End If
-                            lNewVals(lNewIndex) = lNewVals(lNewIndex) + lFraction * lValOld
-                            If lPrevDateOld < lDateNew Then
-                                If lDateOld > lDateNew Then 'use remaining part of this old interval on next new interval
-                                    lPrevDateOld = lDateNew
-                                    If aTran = atcTran.TranSumDiv Then lValOld = lValOld - lValOld * lFraction
-                                Else
-                                    lPrevDateOld = lDateOld
-                                    lOldIndex = lOldIndex + 1
-                                    If lOldIndex <= lNumOldVals Then
-                                        lDateOld = aTimeseries.Dates.Value(lOldIndex)
-                                        lValOld = aTimeseries.Value(lOldIndex)
-                                    End If
-                                    lCumuFrac = 0
-                                End If
-                            End If
-                        End While
-                        lPrevDateNew = lDateNew
-                        If aTran = atcTran.TranSumDiv AndAlso lCumuFrac > 0.01 AndAlso lCumuFrac < 0.999 Then
-                            lNewVals(lNewIndex) = lNewVals(lNewIndex) / lCumuFrac
-                        End If
-                        lNewIndex = lNewIndex + 1
-                    End While
-
-                Case atcTran.TranMax
-                    While lNewIndex <= lNumNewVals
-                        lDateNew = lNewDates(lNewIndex)
-                        lNewVals(lNewIndex) = -1.0E+30
-                        While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
-                            If lNewVals(lNewIndex) < lValOld Then lNewVals(lNewIndex) = lValOld
-                            lOldIndex = lOldIndex + 1
-                            If lOldIndex <= lNumOldVals Then
-                                lDateOld = aTimeseries.Dates.Value(lOldIndex)
-                                lValOld = aTimeseries.Value(lOldIndex)
-                            End If
-                        End While
-                        lNewIndex = lNewIndex + 1
-                    End While
-
-                Case atcTran.TranMin
-                    While lNewIndex <= lNumNewVals
-                        lDateNew = lNewDates(lNewIndex)
-                        lNewVals(lNewIndex) = 1.0E+30
-                        While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
-                            If lNewVals(lNewIndex) > lValOld Then lNewVals(lNewIndex) = lValOld
-                            lOldIndex = lOldIndex + 1
-                            If lOldIndex <= lNumOldVals Then
-                                lDateOld = aTimeseries.Dates.Value(lOldIndex)
-                                lValOld = aTimeseries.Value(lOldIndex)
-                            End If
-                        End While
-                        lNewIndex = lNewIndex + 1
-                    End While
-
-            End Select
-            lNewTSer.Values = lNewVals
-            Return lNewTSer
+        If aTimeseries.Attributes.GetValue("tu") = aTU AndAlso _
+           aTimeseries.Attributes.GetValue("ts") = aTS Then
+            ' Already have desired time unit and time step, clone so we consistently return a new TS
+            Return aTimeseries.Clone(aDataSource)
         Else
-            Return Nothing
+            Dim lNewDates() As Double = NewDates(aTimeseries, aTU, aTS)
+            Dim lNumNewVals As Integer = lNewDates.GetUpperBound(0)
+            If lNumNewVals > 0 Then
+                Dim lNewTSer As New atcTimeseries(aDataSource)
+                lNewTSer.Dates = New atcTimeseries(aDataSource)
+                CopyBaseAttributes(aTimeseries, lNewTSer)
+                lNewTSer.Attributes.SetValue("TU", aTU)
+                lNewTSer.Attributes.SetValue("TS", aTS)
+                lNewTSer.Attributes.SetValue("point", False)
+                If aTimeseries.ValueAttributesExist Then 'TODO:: Something with value attributes
+                End If
+                lNewTSer.Dates.Values = lNewDates
+                Dim lNewIndex As Integer = 1
+                Dim lNewVals(lNumNewVals) As Double
+                Dim lDateNew As Double = lNewDates(1)
+                Dim lDateOld As Double
+                Dim lValOld As Double
+                Dim lOldIndex As Integer = 1
+                Dim lPrevDateOld As Double = lNewDates(0) 'old and new TSers should have same start date
+                Dim lPrevDateNew As Double = lNewDates(0)
+                Dim lOverlapStart As Double
+                Dim lOverlapEnd As Double
+                Dim lNumOldVals As Integer = aTimeseries.numValues
+                Dim lFraction As Double
+                Dim lCumuFrac As Double
+
+                If aTimeseries.numValues > 0 Then
+                    lValOld = aTimeseries.Value(1)
+                    lDateOld = aTimeseries.Dates.Value(1)
+                End If
+
+                Select Case aTran
+
+                    Case atcTran.TranAverSame, atcTran.TranSumDiv
+                        While lNewIndex <= lNumNewVals
+                            lDateNew = lNewDates(lNewIndex)
+                            lNewVals(lNewIndex) = 0
+                            While lPrevDateOld < lDateNew And lOldIndex <= lNumOldVals
+                                If lPrevDateOld > lPrevDateNew Then lOverlapStart = lPrevDateOld Else lOverlapStart = lPrevDateNew
+                                If lDateNew > lDateOld Then lOverlapEnd = lDateOld Else lOverlapEnd = lDateNew
+                                lFraction = (lOverlapEnd - lOverlapStart) / (lDateNew - lPrevDateNew)
+                                lCumuFrac = lCumuFrac + lFraction
+                                If aTran = atcTran.TranSumDiv Then
+                                    lFraction = (lOverlapEnd - lOverlapStart) / (lDateOld - lPrevDateOld)
+                                End If
+                                lNewVals(lNewIndex) = lNewVals(lNewIndex) + lFraction * lValOld
+                                If lPrevDateOld < lDateNew Then
+                                    If lDateOld > lDateNew Then 'use remaining part of this old interval on next new interval
+                                        lPrevDateOld = lDateNew
+                                        If aTran = atcTran.TranSumDiv Then lValOld = lValOld - lValOld * lFraction
+                                    Else
+                                        lPrevDateOld = lDateOld
+                                        lOldIndex = lOldIndex + 1
+                                        If lOldIndex <= lNumOldVals Then
+                                            lDateOld = aTimeseries.Dates.Value(lOldIndex)
+                                            lValOld = aTimeseries.Value(lOldIndex)
+                                        End If
+                                        lCumuFrac = 0
+                                    End If
+                                End If
+                            End While
+                            lPrevDateNew = lDateNew
+                            If aTran = atcTran.TranSumDiv AndAlso lCumuFrac > 0.01 AndAlso lCumuFrac < 0.999 Then
+                                lNewVals(lNewIndex) = lNewVals(lNewIndex) / lCumuFrac
+                            End If
+                            lNewIndex = lNewIndex + 1
+                        End While
+
+                    Case atcTran.TranMax
+                        While lNewIndex <= lNumNewVals
+                            lDateNew = lNewDates(lNewIndex)
+                            lNewVals(lNewIndex) = -1.0E+30
+                            While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
+                                If lNewVals(lNewIndex) < lValOld Then lNewVals(lNewIndex) = lValOld
+                                lOldIndex = lOldIndex + 1
+                                If lOldIndex <= lNumOldVals Then
+                                    lDateOld = aTimeseries.Dates.Value(lOldIndex)
+                                    lValOld = aTimeseries.Value(lOldIndex)
+                                End If
+                            End While
+                            lNewIndex = lNewIndex + 1
+                        End While
+
+                    Case atcTran.TranMin
+                        While lNewIndex <= lNumNewVals
+                            lDateNew = lNewDates(lNewIndex)
+                            lNewVals(lNewIndex) = 1.0E+30
+                            While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
+                                If lNewVals(lNewIndex) > lValOld Then lNewVals(lNewIndex) = lValOld
+                                lOldIndex = lOldIndex + 1
+                                If lOldIndex <= lNumOldVals Then
+                                    lDateOld = aTimeseries.Dates.Value(lOldIndex)
+                                    lValOld = aTimeseries.Value(lOldIndex)
+                                End If
+                            End While
+                            lNewIndex = lNewIndex + 1
+                        End While
+
+                End Select
+                lNewTSer.Values = lNewVals
+                Return lNewTSer
+            Else
+                Return Nothing
+            End If
         End If
     End Function
 

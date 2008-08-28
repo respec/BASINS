@@ -234,49 +234,37 @@ Public Module modString
                 lFormat &= StrDup(aDecimalPlaces - 1, "#")
             End If
             lString = DoubleToString(aValue, aFieldWidth, lFormat, , , aSignificantDigits)
-            Dim dp As Integer = lString.IndexOf("."c)
-            If dp >= 0 Then
-                Dim lAddLeft As Integer = aFieldWidth - 5 - dp
-                If lAddLeft > 0 Then lString = Space(lAddLeft) & lString
-            End If
         End If
-        Return lString.PadRight(aFieldWidth)
+        Return DecimalAlign(lString, aFieldWidth, aDecimalPlaces)
     End Function
 
-    Function DecimalAlignM(ByVal aValue As Double, _
-             Optional ByVal aFieldWidth As Integer = 12, _
-             Optional ByVal aDecimalPlaces As Integer = 3, _
-             Optional ByVal aSignificantDigits As Integer = 5, _
-             Optional ByVal aComma As Boolean = True) As String
-        Dim lString As String
-        If Double.IsNaN(aValue) Then
-            If aFieldWidth > 5 Then
-                lString = Space(aFieldWidth / 2) & "NaN"
-            Else
-                lString = "NaN"
-            End If
+    Function DecimalAlign(ByVal aValue As String, _
+                          ByVal aFieldWidth As Integer, _
+                          ByVal aWidthAfterDecimal As Integer) As String
+
+        Dim lDecimalPosition As Integer = aValue.IndexOf("."c)
+        If lDecimalPosition < 0 Then
+            Return aValue.PadRight(aWidthAfterDecimal + 1).PadLeft(aFieldWidth)
         Else
-
-            Dim lFormat As String = ""
-            If aComma Then
-                lFormat = "###,##0.000"
-            Else
-                lFormat = "#####0.000"
-            End If
-
-            If aDecimalPlaces > 1 Then
-                lFormat &= StrDup(aDecimalPlaces - 1, "#")
-            End If
-            lString = DoubleToString(aValue, aFieldWidth, lFormat, , , aSignificantDigits)
-            Dim dp As Integer = lString.IndexOf("."c)
-            If dp >= 0 Then
-                Dim lAddLeft As Integer = aFieldWidth - 5 - dp
-                If lAddLeft > 0 Then lString = Space(lAddLeft) & lString
-            End If
+            Dim lAddRight As Integer = aFieldWidth - aWidthAfterDecimal - lDecimalPosition - 1
+            Select Case lAddRight
+                Case Is > 0 : aValue &= Space(lAddRight)
+                Case Is < 0
+                    Select Case aValue.Length + lAddRight
+                        Case Is <= 0 : aValue = ""
+                        Case lDecimalPosition : aValue = aValue.Substring(0, lDecimalPosition)
+                        Case Is > lDecimalPosition
+                            aValue = aValue.Substring(0, aValue.Length + lAddRight)
+                            While aValue.EndsWith("0")
+                                aValue = aValue.Substring(0, aValue.Length - 1)
+                            End While
+                        Case Else
+                            aValue = aValue.Substring(0, aValue.Length + lAddRight)
+                    End Select
+            End Select
+            Return aValue.PadLeft(aFieldWidth)
         End If
-        Return lString.PadRight(aFieldWidth)
     End Function
-
 
     Function DoubleToString(ByVal aValue As Double, _
                    Optional ByVal aMaxWidth As Integer = 10, _

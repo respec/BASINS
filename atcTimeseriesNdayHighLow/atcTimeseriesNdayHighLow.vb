@@ -574,13 +574,11 @@ Public Class atcTimeseriesNdayHighLow
         Select Case lOperationName
             Case "7q10"
                 lNDay = 7
-                lHigh = False
                 lReturn = 10
                 lOperationName = "n-day low value"
                 'lLogFlg = False
             Case "1hi100", "1high100"
                 lNDay = 1
-                lHigh = True
                 lReturn = 100
                 lOperationName = "n-day high value"
             Case Else
@@ -595,20 +593,14 @@ Public Class atcTimeseriesNdayHighLow
                 If lNDay > 0 AndAlso lReturn > 0 Then
                     If lOperationName.Contains("low") Then
                         lOperationName = "n-day low value"
-                        lHigh = False
                     Else
                         lOperationName = "n-day high value"
-                        lHigh = True
                     End If
                 End If
         End Select
 
-        'Missed here to catch the 'low' condition and hence set High correctly
-        If lOperationName.Contains("low") Then
-            lHigh = False
-        ElseIf lOperationName.Contains("high") Then
-            lHigh = True
-        End If
+        'Change default from True to False if operation name contains "low"
+        If lOperationName.Contains("low") Then lHigh = False
 
         If aArgs Is Nothing Then
             ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")

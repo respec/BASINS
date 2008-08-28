@@ -156,6 +156,12 @@ Public Class atcTimeseries
         Return lClone
     End Function
 
+    Public Overloads Function Clone(ByVal aDataSource As atcDataSource) As atcDataSet
+        Dim lClone As atcTimeseries = Me.Clone
+        lClone.pDataSource = aDataSource
+        Return lClone
+    End Function
+
     ''' <summary>Create a new timeseries and reference the source that it came from</summary>
     Public Sub New(ByVal aDataSource As atcDataSource)
         MyBase.New()
