@@ -87,8 +87,8 @@ Public Class ctlEditConnections
                     'Size up the columns to total 700 (forcing HIDE column out of visbile range)
                     Dim lColWidth() As Integer = New Integer(14) {60, 60, 60, 50, 50, 43, 45, 45, 45, 45, 45, 45, 45, 45, 45}
 
-                    For i As Integer = 0 To lColWidth.Length - 1
-                        grdEdit.ColumnWidth(i) = lColWidth(i)
+                    For lCol As Integer = 0 To lColWidth.Length - 1
+                        grdEdit.ColumnWidth(lCol) = lColWidth(lCol)
                     Next
 
                     .Rows = 1
@@ -108,9 +108,9 @@ Public Class ctlEditConnections
                     .CellValue(0, 13) = "MemSub2"
                     .CellValue(0, 14) = "HIDE"
 
-                    For j As Integer = 0 To .Columns - 1
-                        For k As Integer = 1 To .Rows - 1
-                            .CellEditable(k, j) = True
+                    For lCol As Integer = 0 To .Columns - 1
+                        For lRow As Integer = 1 To .Rows - 1
+                            .CellEditable(lRow, lCol) = True
                         Next
                     Next
 
@@ -172,10 +172,10 @@ Public Class ctlEditConnections
                         .CellColor(0, lCol) = SystemColors.ControlLight
                     Next
 
-                    For i As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
-                        lOper = pConnection.Uci.OpnSeqBlock.Opn(i)
-                        For j As Integer = 0 To lOper.Sources.Count - 1
-                            lConn = lOper.Sources(j)
+                    For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
+                        For lLoopVar2 As Integer = 0 To lOper.Sources.Count - 1
+                            lConn = lOper.Sources(lLoopVar2)
                             If lConn.Typ = 3 Then
                                 .Rows += 1
                                 .CellValue(.Rows - 1, 0) = lConn.Source.VolName
@@ -191,9 +191,9 @@ Public Class ctlEditConnections
                         Next
                     Next
 
-                    For j As Integer = 0 To 13
-                        For k As Integer = 1 To .Rows - 1
-                            .CellEditable(k, j) = True
+                    For lCol As Integer = 0 To 13
+                        For lRow As Integer = 1 To .Rows - 1
+                            .CellEditable(lRow, lCol) = True
                         Next
                     Next
 
@@ -206,8 +206,8 @@ Public Class ctlEditConnections
                     'Size up the columns to total 700 (forcing HIDE column out of visbile range)
                     Dim lColWidth() As Integer = New Integer(14) {68, 45, 60, 50, 50, 50, 45, 45, 45, 45, 45, 45, 45, 45, 45}
 
-                    For i As Integer = 0 To lColWidth.Length - 1
-                        grdEdit.ColumnWidth(i) = lColWidth(i)
+                    For lCol As Integer = 0 To lColWidth.Length - 1
+                        grdEdit.ColumnWidth(lCol) = lColWidth(lCol)
                     Next
 
                     .Rows = 1
@@ -232,10 +232,10 @@ Public Class ctlEditConnections
                         .CellColor(0, lCol) = SystemColors.ControlLight
                     Next
 
-                    For i As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
-                        lOper = pConnection.Uci.OpnSeqBlock.Opn(i)
-                        For j As Integer = 0 To lOper.Sources.Count - 1
-                            lConn = lOper.Sources(j)
+                    For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
+                        For lLoopVar2 As Integer = 0 To lOper.Sources.Count - 1
+                            lConn = lOper.Sources(lLoopVar2)
                             If lConn.Typ = 1 Then
                                 .Rows += 1
                                 .CellValue(.Rows - 1, 0) = lConn.Source.VolName
@@ -257,9 +257,9 @@ Public Class ctlEditConnections
                         Next
                     Next
 
-                    For j As Integer = 0 To 13
-                        For k As Integer = 1 To .Rows - 1
-                            .CellEditable(k, j) = True
+                    For lCol As Integer = 0 To 13
+                        For lRow As Integer = 1 To .Rows - 1
+                            .CellEditable(lRow, lCol) = True
                         Next
                     Next
 
@@ -300,10 +300,10 @@ Public Class ctlEditConnections
                         .CellColor(0, lCol) = SystemColors.ControlLight
                     Next
 
-                    For i As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
-                        lOper = pConnection.Uci.OpnSeqBlock.Opn(i)
-                        For j As Integer = 0 To lOper.Targets.Count - 1
-                            lConn = lOper.Targets(j)
+                    For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
+                        For lLoopVar2 As Integer = 0 To lOper.Targets.Count - 1
+                            lConn = lOper.Targets(lLoopVar2)
                             If lConn.Typ = 4 Then
                                 .Rows += 1
                                 .CellValue(.Rows - 1, 0) = lConn.Source.VolName
@@ -326,9 +326,9 @@ Public Class ctlEditConnections
                         Next
                     Next
 
-                    For j As Integer = 0 To 14
-                        For k As Integer = 1 To .Rows - 1
-                            .CellEditable(k, j) = True
+                    For lCol As Integer = 0 To 14
+                        For lRow As Integer = 1 To .Rows - 1
+                            .CellEditable(lRow, lCol) = True
                         Next
                     Next
                 End If
