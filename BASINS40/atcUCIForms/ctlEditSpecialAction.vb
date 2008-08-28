@@ -33,7 +33,7 @@ Public Class ctlEditSpecialAction
         DisplayCounts()
     End Sub
     Private Sub DisplayCounts()
-        Dim ac, dc, unc, uqc, cc, i As Integer
+        Dim ac, dc, unc, uqc, cc, lRow As Integer
 
         ac = 0
         dc = 0
@@ -42,8 +42,8 @@ Public Class ctlEditSpecialAction
         cc = 0
 
         With atcgrid0
-            For i = 1 To .Source.Rows - 1   'top header row was being counted so subtracted 1
-                Select Case .Source.CellValue(i, 0)
+            For lRow = 1 To .Source.Rows - 1   'top header row was being counted so subtracted 1
+                Select Case .Source.CellValue(lRow, 0)
                     Case "Action" : ac += 1
                     Case "Distribute" : dc += 1
                     Case "User Defn Name" : unc += 1
@@ -58,10 +58,10 @@ Public Class ctlEditSpecialAction
 
         Dim lRecordType As String
         With pSpecialActionBlk.Records
-            For lIndex As Integer = 1 To .Count
-                lRecordType = pSpecialActionBlk.HspfSpecialRecordName(.Item(lIndex).SpecType)
-                atcgrid0.Source.CellValue(lIndex, 0) = lRecordType
-                atcgrid0.Source.CellValue(lIndex, 1) = .Item(lIndex).Text
+            For lOper As Integer = 1 To .Count
+                lRecordType = pSpecialActionBlk.HspfSpecialRecordName(.Item(lOper).SpecType)
+                atcgrid0.Source.CellValue(lOper, 0) = lRecordType
+                atcgrid0.Source.CellValue(lOper, 1) = .Item(lOper).Text
             Next
         End With
 
@@ -71,15 +71,15 @@ Public Class ctlEditSpecialAction
     End Sub
 
     Private Sub PutRecsToFrontTab(ByVal itab As Integer)
-        Dim rowcount, i, j As Integer
+        Dim lRow, lCol, rowcount As Integer
         Dim newText, ctemp As String
 
         If itab = 1 Then
             'action type records
             rowcount = 0
             With atcgrid1.Source
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "Action" Then
+                For lRow = 1 To atcgrid0.Source.Rows
+                    If atcgrid0.Source.CellValue(lRow, 0) = "Action" Then
                         'get next record from this tab
                         rowcount = rowcount + 1
                         newText = "   "
@@ -193,16 +193,16 @@ Public Class ctlEditSpecialAction
                             ctemp = RSet(.CellValue(rowcount, 20), Len(ctemp))
                             newText = newText & ctemp
                         End If
-                        atcgrid0.Source.CellValue(i, 1) = newText
+                        atcgrid0.Source.CellValue(lRow, 1) = newText
                     End If
-                Next i
+                Next
             End With
         ElseIf itab = 2 Then
             'distribute records
             rowcount = 0
             With atcgrid2.Source
-                For i = 1 To .Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "Distribute" Then
+                For lRow = 1 To .Rows
+                    If atcgrid0.Source.CellValue(lRow, 0) = "Distribute" Then
                         'get next record from this tab
                         rowcount = rowcount + 1
                         newText = "  DISTRB"
@@ -217,21 +217,21 @@ Public Class ctlEditSpecialAction
                         ctemp = RSet(.CellValue(rowcount, 3), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 4), 30)
-                        For j = 1 To 10
+                        For lCol = 1 To 10
                             ctemp = "     "
-                            ctemp = RSet(.CellValue(rowcount, 4 + j), Len(ctemp))
+                            ctemp = RSet(.CellValue(rowcount, 4 + lCol), Len(ctemp))
                             newText = newText & ctemp
-                        Next j
-                        atcgrid0.Source.CellValue(i, 1) = newText
+                        Next
+                        atcgrid0.Source.CellValue(lRow, 1) = newText
                     End If
-                Next i
+                Next
             End With
         ElseIf itab = 3 Then
             'User Defn Name records
             rowcount = 0
             With atcgrid3.Source
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "User Defn Name" Then
+                For lRow = 1 To atcgrid0.Source.Rows
+                    If atcgrid0.Source.CellValue(lRow, 0) = "User Defn Name" Then
                         'get next record from this tab
                         rowcount = rowcount + 1
                         newText = "  UVNAME  "
@@ -266,16 +266,16 @@ Public Class ctlEditSpecialAction
                         ctemp = RSet(.CellValue(rowcount, 12), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 13), 76)
-                        atcgrid0.Source.CellValue(i, 1) = newText
+                        atcgrid0.Source.CellValue(lRow, 1) = newText
                     End If
-                Next i
+                Next
             End With
         ElseIf itab = 4 Then
             'User Defn Quan records
             rowcount = 0
             With atcgrid4.Source
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "User Defn Quan" Then
+                For lRow = 1 To atcgrid0.Source.Rows
+                    If atcgrid0.Source.CellValue(lRow, 0) = "User Defn Quan" Then
                         'get next record from this tab
                         rowcount = rowcount + 1
                         newText = "  UVQUAN "
@@ -307,33 +307,33 @@ Public Class ctlEditSpecialAction
                         ctemp = RSet(.CellValue(rowcount, 12), Len(ctemp))
                         newText = newText & ctemp & " "
                         newText = newText & .CellValue(rowcount, 13)
-                        atcgrid0.Source.CellValue(i, 1) = newText
+                        atcgrid0.Source.CellValue(lRow, 1) = newText
                     End If
-                Next i
+                Next
             End With
         ElseIf itab = 5 Then
             'conditional records
             rowcount = 0
             With atcgrid5.Source
-                For i = 1 To atcgrid0.Source.Rows
-                    If atcgrid0.Source.CellValue(i, 0) = "Condition" Then
+                For lRow = 1 To atcgrid0.Source.Rows
+                    If atcgrid0.Source.CellValue(lRow, 0) = "Condition" Then
                         'get next record from this tab
                         rowcount = rowcount + 1
-                        atcgrid0.Source.CellValue(i, 1) = .CellValue(rowcount, 0)
+                        atcgrid0.Source.CellValue(lRow, 1) = .CellValue(rowcount, 0)
                     End If
-                Next i
+                Next
             End With
         End If
     End Sub
     Private Function BlankPad(ByVal ctxt As String, ByVal ilen As Integer)
         'pad a string to be the desired length
-        Dim i, j As Integer
+        Dim lOper1, lOper2 As Integer
         If Len(ctxt) > ilen Then
             BlankPad = Mid(ctxt, 1, ilen)
         ElseIf Len(ctxt) < ilen Then
-            j = ilen - Len(ctxt)
+            lOper2 = ilen - Len(ctxt)
             BlankPad = ctxt
-            For i = 1 To j
+            For lOper1 = 1 To lOper2
                 BlankPad = BlankPad & " "
             Next
         Else
@@ -559,7 +559,7 @@ Public Class ctlEditSpecialAction
     End Sub
 
     Public Sub tabSpecial_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tabSpecial.Click
-        Dim i As Integer
+        Dim lRow As Integer
         Dim newText As String
 
         If tabSpecial.SelectedIndex <> PreviousTab And PreviousTab <> 0 Then
@@ -575,10 +575,10 @@ Public Class ctlEditSpecialAction
                 With atcgrid1.Source
                     .Columns = 21
                     .Rows = 1
-                    For i = 1 To atcgrid0.Source.Rows
-                        If atcgrid0.Source.CellValue(i, 0) = "Action" Then
+                    For lRow = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(lRow, 0) = "Action" Then
                             .Rows = .Rows + 1
-                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            newText = Mid(atcgrid0.Source.CellValue(lRow, 1), 3)
                             .CellValue(.Rows - 1, 0) = Trim(Mid(newText, 1, 6))
                             .CellValue(.Rows - 1, 1) = Mid(newText, 7, 3)
                             If Mid(newText, 10, 4) = "    " Then
@@ -654,7 +654,7 @@ Public Class ctlEditSpecialAction
                                 .CellValue(.Rows - 1, 20) = Mid(newText, 76, 3)
                             End If
                         End If
-                    Next i
+                    Next
 
                     For j As Integer = 0 To .Columns - 1
                         For k As Integer = 1 To .Rows - 1
@@ -670,10 +670,10 @@ Public Class ctlEditSpecialAction
                 With atcgrid2.Source
                     .Columns = 15
                     .Rows = 1
-                    For i = 1 To atcgrid0.Source.Rows
-                        If atcgrid0.Source.CellValue(i, 0) = "Distribute" Then
+                    For lRow = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(lRow, 0) = "Distribute" Then
                             .Rows = .Rows + 1
-                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            newText = Mid(atcgrid0.Source.CellValue(lRow, 1), 3)
                             .CellValue(.Rows - 1, 0) = Mid(newText, 7, 3)
                             .CellValue(.Rows - 1, 1) = Mid(newText, 11, 3)
                             .CellValue(.Rows - 1, 2) = Mid(newText, 15, 2)
@@ -690,7 +690,7 @@ Public Class ctlEditSpecialAction
                             .CellValue(.Rows - 1, 13) = Mid(newText, 69, 5)
                             .CellValue(.Rows - 1, 14) = Mid(newText, 74, 5)
                         End If
-                    Next i
+                    Next
                     If .Rows > 1 Then
                         .Rows = .Rows - 1
                     End If
@@ -701,10 +701,10 @@ Public Class ctlEditSpecialAction
                 With atcgrid3.Source
                     .Columns = 14
                     .Rows = 1
-                    For i = 1 To atcgrid0.Source.Rows
-                        If atcgrid0.Source.CellValue(i, 0) = "User Defn Name" Then
+                    For lRow = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(lRow, 0) = "User Defn Name" Then
                             .Rows = .Rows + 1
-                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            newText = Mid(atcgrid0.Source.CellValue(lRow, 1), 3)
                             .CellValue(.Rows - 1, 0) = Mid(newText, 9, 6)
                             .CellValue(.Rows - 1, 1) = Mid(newText, 15, 3)
                             .CellValue(.Rows - 1, 2) = Mid(newText, 19, 6)
@@ -724,7 +724,7 @@ Public Class ctlEditSpecialAction
                             End If
                             .CellValue(.Rows - 1, 13) = Mid(newText, 71, 4)
                         End If
-                    Next i
+                    Next
                     atcgrid3.SizeAllColumnsToContents()
                 End With
             ElseIf tabSpecial.SelectedIndex = 4 Then
@@ -732,10 +732,10 @@ Public Class ctlEditSpecialAction
                 With atcgrid4.Source
                     .Columns = 14
                     .Rows = 1
-                    For i = 1 To atcgrid0.Source.Rows
-                        If atcgrid0.Source.CellValue(i, 0) = "User Defn Quan" Then
+                    For lRow = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(lRow, 0) = "User Defn Quan" Then
                             .Rows = .Rows + 1
-                            newText = Mid(atcgrid0.Source.CellValue(i, 1), 3)
+                            newText = Mid(atcgrid0.Source.CellValue(lRow, 1), 3)
                             .CellValue(.Rows - 1, 0) = Mid(newText, 8, 6)
                             .CellValue(.Rows - 1, 1) = Mid(newText, 15, 6)
                             .CellValue(.Rows - 1, 2) = Mid(newText, 22, 3)
@@ -763,7 +763,7 @@ Public Class ctlEditSpecialAction
                             End If
                             .CellValue(.Rows - 1, 13) = Mid(newText, 67, 4)
                         End If
-                    Next i
+                    Next
                     atcgrid4.SizeAllColumnsToContents()
                 End With
             ElseIf tabSpecial.SelectedIndex = 5 Then
@@ -771,11 +771,11 @@ Public Class ctlEditSpecialAction
                 With atcgrid5.Source
                     .Columns = 1
                     .Rows = 2
-                    For i = 1 To atcgrid0.Source.Rows
-                        If atcgrid0.Source.CellValue(i, 0) = "Condition" Then
-                            .CellValue(.Rows - 1, 0) = atcgrid0.Source.CellValue(i, 1)
+                    For lRow = 1 To atcgrid0.Source.Rows
+                        If atcgrid0.Source.CellValue(lRow, 0) = "Condition" Then
+                            .CellValue(.Rows - 1, 0) = atcgrid0.Source.CellValue(lRow, 1)
                         End If
-                    Next i
+                    Next
                     'atcgrid5.SizeAllColumnsToContents()
                     atcgrid5.Refresh()
                 End With
@@ -908,39 +908,39 @@ Public Class ctlEditSpecialAction
     End Function
 
     Public Function NextUVQuanName(ByVal firstfour$) As String
-        Dim ctmp As String
+        Dim lctmp As String
         Dim lIndex As Integer
-        Dim nextnumber As Integer
-        Dim ifound As Boolean
+        Dim lnextnumber As Integer
+        Dim lfound As Boolean
 
-        nextnumber = 1
+        lnextnumber = 1
         NextUVQuanName = ""
-        ifound = True
-        Do Until ifound = False
-            ifound = False
-            NextUVQuanName = firstfour & CStr(nextnumber)
+        lfound = True
+        Do Until lfound = False
+            lfound = False
+            NextUVQuanName = firstfour & CStr(lnextnumber)
             'check front tab
             For lIndex = 1 To atcgrid0.Source.Rows
                 If atcgrid0.Source.CellValue(lIndex, 0) = "User Defn Quan" Then
-                    ctmp = atcgrid0.Source.CellValue(lIndex, 1)
-                    If Trim(Mid(ctmp, 10, 6)) = NextUVQuanName Then
-                        ifound = True
+                    lctmp = atcgrid0.Source.CellValue(lIndex, 1)
+                    If Trim(Mid(lctmp, 10, 6)) = NextUVQuanName Then
+                        lfound = True
                         Exit For
                     End If
                 End If
             Next
-            If Not ifound Then
+            If Not lfound Then
                 'check user defn quan tab as well
                 For lIndex = 1 To atcgrid4.Source.Rows
-                    ctmp = atcgrid4.Source.CellValue(lIndex, 1)
-                    If Trim(ctmp) = NextUVQuanName Then
-                        ifound = True
+                    lctmp = atcgrid4.Source.CellValue(lIndex, 1)
+                    If Trim(lctmp) = NextUVQuanName Then
+                        lfound = True
                         Exit For
                     End If
                 Next
             End If
-            If ifound Then
-                nextnumber = nextnumber + 1
+            If lfound Then
+                lnextnumber = lnextnumber + 1
             End If
         Loop
 

@@ -70,9 +70,9 @@ Public Class ctlEditOpnSeqBlock
                     .CellColor(0, lCol) = SystemColors.ControlLight
                 Next
 
-                For m As Integer = 0 To .Columns - 1
-                    For k As Integer = 1 To .Rows - 1
-                        .CellEditable(k, m) = True
+                For lCol As Integer = 0 To .Columns - 1
+                    For lRow As Integer = 1 To .Rows - 1
+                        .CellEditable(lRow, lCol) = True
                     Next
                 Next
 

@@ -51,11 +51,11 @@ Public Class ctlEditGlobalBlock
             txtEndMin.Value = pHspfGlobalBlk.EDate(4)
 
             'Populate combo boxes
-            Dim i&
-            For i = 0 To 10
-                comboGen.Items.Add(i)
-                comboSpout.Items.Add(i)
-            Next i
+            Dim lOper As Integer
+            For lOper = 0 To 10
+                comboGen.Items.Add(lOper)
+                comboSpout.Items.Add(lOper)
+            Next
             comboRunFlag.Items.Add("Interp")
             comboRunFlag.Items.Add("Run")
             comboUnits.Items.Add("English")

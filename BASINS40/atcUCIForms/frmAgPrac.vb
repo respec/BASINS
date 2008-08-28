@@ -122,9 +122,8 @@ Public Class frmAgPrac
 
 
     Private Sub ShowDetails()
-        Dim i&, cbuff$, itype&, ctmp$
-        Dim rDate(5) As String
-        Dim SDate(5) As String
+        Dim i, itype, ctmp As Integer
+        Dim SDate(5), RDate(5), cbuff As String
         Dim ActionCount As Integer
         Dim LayerFlag As Boolean
         Dim Id As Long
@@ -301,11 +300,14 @@ Public Class frmAgPrac
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Dim Id&, i&, perlndid&, cbuff$, ctmp$, itype&, uvq$
         Dim nrepeat&, RecordCount&
-        Dim LayerFlag As Boolean, j&, Sub1$, Sub2$, DistribID&
+        Dim LayerFlag As Boolean
         Dim FirstAction As Boolean, WroteAction As Boolean
-        Dim rDate(5), SDate(5), EDate(5) As Integer '<<<< This Dim statement was added (changed from Long to String)
+        Dim rDate(5), SDate(5), EDate(5), ID, i, j, DistribID, perlndid, itype As Integer
+        Dim uvq, cbuff, ctmp, Sub1, Sub2 As String
+        uvq = ""    '.net conversion: Silences 'used before assigned' error
+        Sub1 = ""   '.net conversion: Silences 'used before assigned' error
+        Sub2 = ""   '.net conversion: Silences 'used before assigned' error
 
         Dim strid As String
 
@@ -335,10 +337,10 @@ Public Class frmAgPrac
             FirstAction = True
             WroteAction = False
             DistribID = 0
-            Id = lstPrac.Items.Count
+            ID = lstPrac.Items.Count
             RecordCount = 0
             For i = 1 To cPracIDs.Count
-                If cPracIDs(i) = Id Then
+                If cPracIDs(i) = ID Then
                     'identify the type of record
                     cbuff = cPracRecs(i)
                     If Len(cbuff) = 0 Or InStr(cbuff, "***") > 0 Then

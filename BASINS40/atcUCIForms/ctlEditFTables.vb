@@ -43,30 +43,30 @@ Public Class ctlEditFTables
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
-        Dim i, j As Integer
+        Dim lRow, lCol As Integer
 
         pHspfFtable.Nrows = txtNRows.Value
         pHspfFtable.Ncols = txtNCols.Value
         With grdEdit.Source
-            For i = 1 To .Rows - 1
-                pHspfFtable.Depth(i) = .CellValue(i, 0)
-                pHspfFtable.Area(i) = .CellValue(i, 1)
-                pHspfFtable.Volume(i) = .CellValue(i, 2)
-                For j = 3 To .Columns - 1
-                    If j = 3 Then
-                        pHspfFtable.Outflow1(i) = .CellValue(i, j)
+            For lRow = 1 To .Rows - 1
+                pHspfFtable.Depth(lRow) = .CellValue(lRow, 0)
+                pHspfFtable.Area(lRow) = .CellValue(lRow, 1)
+                pHspfFtable.Volume(lRow) = .CellValue(lRow, 2)
+                For lCol = 3 To .Columns - 1
+                    If lCol = 3 Then
+                        pHspfFtable.Outflow1(lRow) = .CellValue(lRow, lCol)
                     End If
-                    If j = 4 Then
-                        pHspfFtable.Outflow2(i) = .CellValue(i, j)
+                    If lCol = 4 Then
+                        pHspfFtable.Outflow2(lRow) = .CellValue(lRow, lCol)
                     End If
-                    If j = 5 Then
-                        pHspfFtable.Outflow3(i) = .CellValue(i, j)
+                    If lCol = 5 Then
+                        pHspfFtable.Outflow3(lRow) = .CellValue(lRow, lCol)
                     End If
-                    If j = 6 Then
-                        pHspfFtable.Outflow4(i) = .CellValue(i, j)
+                    If lCol = 6 Then
+                        pHspfFtable.Outflow4(lRow) = .CellValue(lRow, lCol)
                     End If
-                    If j = 7 Then
-                        pHspfFtable.Outflow5(i) = .CellValue(i, j)
+                    If lCol = 7 Then
+                        pHspfFtable.Outflow5(lRow) = .CellValue(lRow, lCol)
                     End If
                 Next
             Next
@@ -99,7 +99,7 @@ Public Class ctlEditFTables
     End Property
 
     Private Sub RefreshFtables()
-        Dim i, j, units As Integer
+        Dim lRow, lCol, units As Integer
         units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.emfg
 
         With grdEdit
@@ -112,27 +112,27 @@ Public Class ctlEditFTables
         With grdEdit.Source
             .Rows = txtNRows.Value + 1
             .Columns = txtNCols.Value
-            For j = 0 To .Columns - 1
-                .CellEditable(0, j) = False
+            For lCol = 0 To .Columns - 1
+                .CellEditable(0, lCol) = False
             Next
             If units = 1 Then
                 .CellValue(0, 0) = "Depth (ft)"
                 .CellValue(0, 1) = "Area (acres)"
                 .CellValue(0, 2) = "Volume (acre-ft)"
-                For j = 3 To .Columns - 1
-                    .CellValue(0, j) = "Outflow" & j - 2 & "(ft3/s)"
+                For lCol = 3 To .Columns - 1
+                    .CellValue(0, lCol) = "Outflow" & lCol - 2 & "(ft3/s)"
                 Next
             Else 'metric
                 .CellValue(0, 0) = "Depth (m)"
                 .CellValue(0, 1) = "Area (ha)"
                 .CellValue(0, 2) = "Volume (Mm3)"
-                For j = 3 To .Columns - 1
-                    .CellValue(0, j) = "Outflow" & j - 2 & "(m3/s)"
+                For lCol = 3 To .Columns - 1
+                    .CellValue(0, lCol) = "Outflow" & lCol - 2 & "(m3/s)"
                 Next
             End If
 
-            For lCol As Integer = 0 To .Columns - 1
-                .CellColor(0, lCol) = SystemColors.ControlLight
+            For lCol2 As Integer = 0 To .Columns - 1
+                .CellColor(0, lCol2) = SystemColors.ControlLight
             Next
 
             For m As Integer = 0 To .Columns - 1
@@ -141,25 +141,25 @@ Public Class ctlEditFTables
                 Next
             Next
 
-            For i = 1 To .Rows - 1
-                .CellValue(i, 0) = pHspfFtable.Depth(i)
-                .CellValue(i, 1) = pHspfFtable.Area(i)
-                .CellValue(i, 2) = pHspfFtable.Volume(i)
-                For j = 3 To .Columns - 1
-                    If j = 3 Then
-                        .CellValue(i, j) = pHspfFtable.Outflow1(i)
+            For lRow = 1 To .Rows - 1
+                .CellValue(lRow, 0) = pHspfFtable.Depth(lRow)
+                .CellValue(lRow, 1) = pHspfFtable.Area(lRow)
+                .CellValue(lRow, 2) = pHspfFtable.Volume(lRow)
+                For lCol = 3 To .Columns - 1
+                    If lCol = 3 Then
+                        .CellValue(lRow, lCol) = pHspfFtable.Outflow1(lRow)
                     End If
-                    If j = 4 Then
-                        .CellValue(i, j) = pHspfFtable.Outflow2(i)
+                    If lCol = 4 Then
+                        .CellValue(lRow, lCol) = pHspfFtable.Outflow2(lRow)
                     End If
-                    If j = 5 Then
-                        .CellValue(i, j) = pHspfFtable.Outflow3(i)
+                    If lCol = 5 Then
+                        .CellValue(lRow, lCol) = pHspfFtable.Outflow3(lRow)
                     End If
-                    If j = 6 Then
-                        .CellValue(i, j) = pHspfFtable.Outflow4(i)
+                    If lCol = 6 Then
+                        .CellValue(lRow, lCol) = pHspfFtable.Outflow4(lRow)
                     End If
-                    If j = 7 Then
-                        .CellValue(i, j) = pHspfFtable.Outflow5(i)
+                    If lCol = 7 Then
+                        .CellValue(lRow, lCol) = pHspfFtable.Outflow5(lRow)
                     End If
 
                 Next
@@ -171,17 +171,17 @@ Public Class ctlEditFTables
 
     End Sub
     Private Sub refreshGrid()
-        Dim i, j, units As Integer
+        Dim lRow, lCol, units As Integer
         units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.emfg
 
         With grdEdit.Source
             .Rows = txtNRows.Value + 1
             .Columns = txtNCols.Value
-            For j = 3 To .Columns - 1
+            For lCol = 3 To .Columns - 1
                 If units = 1 Then
-                    .CellValue(0, j) = "Outflow" & j - 2 & " (ft3/s)"
+                    .CellValue(0, lCol) = "Outflow" & lCol - 2 & " (ft3/s)"
                 Else
-                    .CellValue(0, j) = "Outflow" & j - 2 & " (m3/s)"
+                    .CellValue(0, lCol) = "Outflow" & lCol - 2 & " (m3/s)"
                 End If
                 For m As Integer = 0 To .Columns - 1
                     For k As Integer = 1 To .Rows - 1
@@ -189,10 +189,10 @@ Public Class ctlEditFTables
                     Next
                 Next
             Next
-            For j = 0 To .Columns - 1
-                For i = 1 To .Rows - 1
-                    If Len(.CellValue(i, j)) = 0 Then
-                        .CellValue(i, j) = 0
+            For lCol = 0 To .Columns - 1
+                For lRow = 1 To .Rows - 1
+                    If Len(.CellValue(lRow, lCol)) = 0 Then
+                        .CellValue(lRow, lCol) = 0
                     End If
                 Next
             Next
@@ -226,10 +226,10 @@ Public Class ctlEditFTables
     End Sub
 
     Private Sub cboID_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboID.SelectedIndexChanged
-        Dim discard, tempID, i As Integer
-        i = InStr(1, cboID.SelectedItem, "-")
-        If i > 0 Then
-            tempID = CInt(Mid(cboID.SelectedItem, 1, i - 2))
+        Dim discard, tempID, lOper As Integer
+        lOper = InStr(1, cboID.SelectedItem, "-")
+        If lOper > 0 Then
+            tempID = CInt(Mid(cboID.SelectedItem, 1, lOper - 2))
         Else
             tempID = CInt(cboID.SelectedItem)
         End If

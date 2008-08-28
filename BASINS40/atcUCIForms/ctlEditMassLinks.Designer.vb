@@ -66,6 +66,7 @@ Partial Class ctlEditMassLinks
         '
         Me.grdMassLink.AllowHorizontalScrolling = True
         Me.grdMassLink.AllowNewValidValues = False
+        Me.grdMassLink.AutoScroll = True
         Me.grdMassLink.CellBackColor = System.Drawing.Color.Empty
         Me.grdMassLink.LineColor = System.Drawing.Color.Empty
         Me.grdMassLink.LineWidth = 0.0!
