@@ -258,11 +258,19 @@ Public Module PollutantLoading
                     Next k
                 Next j
             Next i
-            'calc emcs (land use area weighted)
+            'calc emcs (runoff volume weighted)
+
+            Dim lAreaTimesRunoffCoeffS(lSelectedAreaIndexes.Count) As Double
+            For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
+                For k = 1 To lMaxlu
+                    lAreaTimesRunoffCoeffS(i) = lAreaTimesRunoffCoeffS(i) + (lRunoffL(k) * lAreasLS(k, i))
+                Next k
+            Next i
+
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                     For k = 1 To lMaxlu
-                        lEMCsSC(i, j) = lEMCsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) / 4046.8564 / lAreasS(i))
+                        lEMCsSC(i, j) = lEMCsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) * lRunoffL(k) / lAreaTimesRunoffCoeffS(i))
                     Next k
                 Next j
             Next i
