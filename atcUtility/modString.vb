@@ -246,7 +246,8 @@ Public Module modString
         If lDecimalPosition < 0 Then
             Return aValue.PadRight(aWidthAfterDecimal + 1).PadLeft(aFieldWidth)
         Else
-            Dim lAddRight As Integer = aFieldWidth - aWidthAfterDecimal - lDecimalPosition - 1
+            'Width already after decimal = (aValue.Length - lDecimalPosition - 1)
+            Dim lAddRight As Integer = aWidthAfterDecimal - (aValue.Length - lDecimalPosition - 1)
             Select Case lAddRight
                 Case Is > 0 : aValue &= Space(lAddRight)
                 Case Is < 0
