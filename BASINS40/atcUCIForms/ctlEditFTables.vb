@@ -104,7 +104,7 @@ Public Class ctlEditFTables
 
         With grdEdit
             .Clear()
-            .AllowHorizontalScrolling = False
+            .AllowHorizontalScrolling = True
             .AllowNewValidValues = True
             .Visible = True
         End With
@@ -131,14 +131,14 @@ Public Class ctlEditFTables
                 Next
             End If
 
-            For lCol2 As Integer = 0 To .Columns - 1
-                .CellColor(0, lCol2) = SystemColors.ControlLight
-            Next
-
             For m As Integer = 0 To .Columns - 1
                 For k As Integer = 1 To .Rows - 1
                     .CellEditable(k, m) = True
                 Next
+            Next
+
+            For lCol2 As Integer = 0 To .Columns - 1
+                .CellColor(0, lCol2) = SystemColors.ControlLight
             Next
 
             For lRow = 1 To .Rows - 1
@@ -170,9 +170,10 @@ Public Class ctlEditFTables
         grdEdit.SizeAllColumnsToContents()
 
     End Sub
-    Private Sub refreshGrid()
+
+    Private Sub RefreshGrid()
         Dim lRow, lCol, units As Integer
-        units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.emfg
+        units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.EmFg
 
         With grdEdit.Source
             .Rows = txtNRows.Value + 1
@@ -196,10 +197,16 @@ Public Class ctlEditFTables
                     End If
                 Next
             Next
+
+            For lCol2 As Integer = 0 To .Columns - 1
+                .CellColor(0, lCol2) = SystemColors.ControlLight
+            Next
+
             grdEdit.Refresh()
             grdEdit.SizeAllColumnsToContents()
         End With
     End Sub
+
     Public Sub New(ByVal aHspfFtables As Object, ByVal aParent As Windows.Forms.Form)
 
         ' This call is required by the Windows Form Designer.
@@ -213,16 +220,6 @@ Public Class ctlEditFTables
 
     Private Sub grdEdit_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdEdit.CellEdited
         Changed = True
-    End Sub
-
-    Private Sub cmdImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImport.Click
-        Dim frmXSect As New frmXSect
-        frmXSect.Show()
-    End Sub
-
-    Private Sub cmdCompute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCompute.Click
-        Dim frmNewFTable As New frmNewFTable
-        frmNewFTable.Show()
     End Sub
 
     Private Sub cboID_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboID.SelectedIndexChanged
@@ -245,7 +242,7 @@ Public Class ctlEditFTables
                 txtNRows.Value = pHspfFtable.Nrows
                 txtNCols.Value = pHspfFtable.Ncols
                 RefreshFtables()
-                refreshGrid()
+                RefreshGrid()
             Else 'dont discard set back to previous listindex
                 cboID.SelectedIndex = PrevListIndex
             End If
@@ -253,5 +250,68 @@ Public Class ctlEditFTables
         PrevListIndex = cboID.SelectedIndex
     End Sub
 
+    Private Sub txtNRows_Change(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtNRows.Leave
+        If txtNRows.Value > 1 And txtNCols.Value < 26 Then
+            RefreshGrid()
+            pChanged = True
+        End If
+    End Sub
+
+    Private Sub txtNCols_Change(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtNCols.Leave
+        If txtNCols.Value > 3 And txtNCols.Value < 9 Then
+            RefreshGrid()
+            pChanged = True
+        End If
+    End Sub
+
+    Private Sub cmdImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImport.Click
+        Dim frmXSect As New frmXSect
+        'frmXSect.CurrentReach(pHspfFtable.Operation.Id, pHspfFtable.Operation.FTable)
+        txtNRows.Value = pHspfFtable.Nrows
+        txtNCols.Value = pHspfFtable.Ncols
+        frmXSect.Init(Me)
+        frmXSect.Show()
+    End Sub
+
+    Private Sub cmdCompute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCompute.Click
+        Dim frmNewFTable As New frmNewFTable
+        frmNewFTable.Init(Me)
+        frmNewFTable.Show()
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFcurve.Click
+        'Set data for plot
+        'ReDim XYD(0)
+        'XYD(0).NVal = pHspfFtable.Nrows
+        'ReDim XYD(0).Var(0).Vals(XYD(0).NVal)
+        'ReDim XYD(0).Var(1).Vals(XYD(0).NVal)
+        'XYD(0).Var(0).Trans = 1
+        '      XYD(0).Var(0).Trans = 1
+        '      XYD(0).Var(1).Trans = 1
+        '      For j = 0 To 1
+        '          XYD(0).Var(j).Min = 1.0E+30
+        '          XYD(0).Var(j).Max = -1.0E+30
+        '      Next j
+        '      For i = 0 To XYD(0).NVal - 1
+        '          XYD(0).Var(0).Vals(i) = grdEdit.TextMatrix(i + 1, 3)
+        '          XYD(0).Var(1).Vals(i) = grdEdit.TextMatrix(i + 1, 0)
+        '          For j = 0 To 1
+        '              If XYD(0).Var(j).Vals(i) < XYD(0).Var(j).Min Then
+        '                  XYD(0).Var(j).Min = XYD(0).Var(j).Vals(i)
+        '              End If
+        '              If XYD(0).Var(j).Vals(i) > XYD(0).Var(j).Max Then
+        '                  XYD(0).Var(j).Max = XYD(0).Var(j).Vals(i)
+        '              End If
+        '          Next j
+        '      Next i
+        '      Call GLInit(1, g, 1, 2)
+        '      capt = "F-Curve for Reach " & CStr(pFTable.Operation.Id) & " (" & pFTable.Operation.Description & ")"
+        '      Call GLTitl("", capt)
+        '      Call GLAxLab("Depth (ft)", "Outflow (cfs)", "", "")
+        '      Call GLDoXY(g, 1, XYD(), 1)
+        'Else
+        '      Call MsgBox("This option is not yet implemented.", , "FTable Problem")
+        'End If
+    End Sub
 End Class
 
