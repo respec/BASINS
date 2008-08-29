@@ -122,8 +122,8 @@ Public Class frmAgPrac
 
 
     Private Sub ShowDetails()
-        Dim lOper, lOperType, lTempString As Integer
-        Dim SDate(5), RDate(5), lBufferString As String
+        Dim lOper, lOperType As Integer
+        Dim SDate(5), RDate(5), lBufferString, lTempString As String
         Dim lActionCount As Integer
         Dim lLayerFlag As Boolean
         Dim lId As Long
