@@ -229,6 +229,8 @@ Public Module PollutantLoading
         Next i
         Logger.Dbg("SubBasinAreasCalculated")
 
+        Dim lRatio As Single = aRatio
+        Dim lRunoffL(lMaxlu) As Single
         If aUseExportCoefficent Then 'Export Coefficients Method
             'calculate loads
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
@@ -241,14 +243,12 @@ Public Module PollutantLoading
             Next i
         Else
             'calculate loads by emc (simple) method
-            'build array for each runoff coeff for each land use type
-            Dim lRunoffL(lMaxlu) As Single
             For j = 1 To aGridSource.Rows - 1
+                'build array for each runoff coeff for each land use type
                 lLucode = aGridSource.CellValue(j, 1)
                 lRunoffL(lLucode) = 0.05 + (0.009 * aGridSource.CellValue(j, 3))
                 'will result in values from .05 to .95 
             Next j
-            Dim lRatio As Single = aRatio
             'calc loads
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
@@ -258,22 +258,7 @@ Public Module PollutantLoading
                     Next k
                 Next j
             Next i
-            'calc emcs (runoff volume weighted)
-
-            Dim lAreaTimesRunoffCoeffS(lSelectedAreaIndexes.Count) As Double
-            For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
-                For k = 1 To lMaxlu
-                    lAreaTimesRunoffCoeffS(i) = lAreaTimesRunoffCoeffS(i) + (lRunoffL(k) * lAreasLS(k, i))
-                Next k
-            Next i
-
-            For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
-                For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
-                    For k = 1 To lMaxlu
-                        lEMCsSC(i, j) = lEMCsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) * lRunoffL(k) / lAreaTimesRunoffCoeffS(i))
-                    Next k
-                Next j
-            Next i
+            
         End If
         Logger.Dbg("LoadsCalculated")
 
@@ -304,14 +289,28 @@ Public Module PollutantLoading
                         If lBMPArea > 0.0 Then
                             'have some bmp area
                             lBMPType = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPTypeFieldIndex)
+                            'calculate area of each landuse within this bmp zone and subbasin
+                            Dim lBMPAreaL(lMaxlu) As Double
+                            TabulateBMPAreas(lBMPLayerIndex, k - 1, lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1), _
+                                             aLandUse, aLandUseLayer, aLandUseId, lMaxlu, _
+                                             lBMPAreaL)
                             For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                                 'find the efficiency of this bmp type for this constituent
                                 lEffic = GetEfficiency(aBmps.GridSource, lBMPType, lConsNames(j))
-                                'subtract the load reduction due to this bmp from the load;
+
+                                'calculate removals for each landuse;
                                 'the load reduction is the load * fractional area * fractional removal efficiency,
                                 'ie 1000 lbs load with 20% bmp area with a 30% removal = 60 lbs removed 
-                                'Note: BMP removals are assumed in parallel and not in series
-                                lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoadsSC(i, j) * lBMPArea / lAreasS(i) * lEffic / 100)
+                                For lLuIndex As Integer = 1 To lMaxlu
+                                    If aUseExportCoefficent Then 'Export Coefficients Method
+                                        lLoad = (lCoeffsLC(lLuIndex, j) * lAreasLS(lLuIndex, i) / 4046.8564)
+                                    Else
+                                        lLoad = (lPrecS(i) * lRatio * lRunoffL(lLuIndex) * lCoeffsLC(lLuIndex, j) * lAreasLS(lLuIndex, i) / 4046.8564 * 2.72 / 12)
+                                    End If
+                                    If lBMPAreaL(lLuIndex) > 0 Then
+                                        lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoad * lBMPAreaL(lLuIndex) / 4046.8564 / lAreasS(i) * lEffic / 100)
+                                    End If
+                                Next lLuIndex
                             Next j
                         End If
                     Next k
@@ -426,6 +425,22 @@ Public Module PollutantLoading
             Logger.Dbg("NoStreamBankLoadsApplied")
         End If
 
+        If Not aUseExportCoefficent Then
+            'calc emcs (runoff volume weighted)
+            Dim lAreaTimesRunoffCoeffS(lSelectedAreaIndexes.Count) As Double
+            For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
+                For k = 1 To lMaxlu
+                    lAreaTimesRunoffCoeffS(i) = lAreaTimesRunoffCoeffS(i) + (lRunoffL(k) * lAreasLS(k, i))
+                Next k
+            Next i
+            For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
+                For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                    For k = 1 To lMaxlu
+                        lEMCsSC(i, j) = lEMCsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) * lRunoffL(k) / lAreaTimesRunoffCoeffS(i))
+                    Next k
+                Next j
+            Next i
+        End If
 
         'calculate loads per acre
         For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
@@ -678,6 +693,61 @@ Public Module PollutantLoading
                 Next j
             End If
         End If
+    End Sub
+
+    Private Sub TabulateBMPAreas(ByVal aBMPLayerIndex As Integer, ByVal aBMPFeatureIndex As Integer, _
+                                 ByVal aSubbasinLayerIndex As Integer, ByVal aSubbasinFeatureIndex As Integer, _
+                                 ByVal aLandUseType As String, ByVal aLandUseLayer As String, ByVal aLandUseId As String, ByVal aMaxlu As Integer, _
+                                 ByRef aBMPAreaL() As Double)
+
+        If GisUtil.OverlappingPolygons(aBMPLayerIndex, aBMPFeatureIndex, aSubbasinLayerIndex, aSubbasinFeatureIndex) Then
+
+            'this bmp polygon and subbasin overlap, process it
+            Dim lOverlayOutputFile As String = PathNameOnly(GisUtil.LayerFileName(aSubbasinLayerIndex)) & "\tempbmpoverlay.shp"
+            GisUtil.OverlaySelected(aBMPLayerIndex, aBMPFeatureIndex, aSubbasinLayerIndex, aSubbasinFeatureIndex, lOverlayOutputFile, True)
+            If Not FileExists(FilenameNoExt(lOverlayOutputFile) & ".prj") Then
+                'create .prj file
+                IO.File.Copy(FilenameNoExt(GisUtil.LayerFileName(aSubbasinLayerIndex)) & ".prj", FilenameNoExt(lOverlayOutputFile) & ".prj")
+            End If
+            GisUtil.AddLayer(lOverlayOutputFile, "TempBmpOverlay")
+
+            Dim lOverlayIndex As Integer
+            lOverlayIndex = GisUtil.LayerIndex(lOverlayOutputFile)
+
+            Dim lLanduseLayerIndex As Integer
+            Dim lOverlayIndexes As New Collection
+            lOverlayIndexes.Add(1)  'there will be only one feature in overlay -- not actually
+            Dim lAreasLS(aMaxlu, 1) As Double
+
+            If aLandUseType = "USGS GIRAS Shapefile" Then
+                CalculateGIRASAreas(aSubbasinLayerIndex, lOverlayIndexes, _
+                                    lAreasLS)
+            ElseIf aLandUseType = "Other Shapefile" Then
+                lLanduseLayerIndex = GisUtil.LayerIndex(aLandUseLayer)
+                GisUtil.TabulatePolygonAreas(lLanduseLayerIndex, _
+                                             GisUtil.FieldIndex(lLanduseLayerIndex, aLandUseId), _
+                                             aSubbasinLayerIndex, lOverlayIndexes, _
+                                             lAreasLS)
+            Else 'grid
+                lLanduseLayerIndex = GisUtil.LayerIndex(aLandUseLayer)
+                Dim lGridmax As Integer = System.Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
+                Dim laAreaLS(lGridmax, GisUtil.NumFeatures(aSubbasinLayerIndex)) As Double
+                GisUtil.TabulateAreas(lLanduseLayerIndex, aSubbasinLayerIndex, _
+                                      laAreaLS)
+                'transfer values from selected polygons to lAreasLS
+                For lLandUseIndex As Integer = 1 To aMaxlu
+                    lAreasLS(lLandUseIndex, 0) = laAreaLS(lLandUseIndex, 1)
+                Next
+            End If
+
+            'transfer values from 2d array to 1d array for returning
+            For lLandUseIndex As Integer = 1 To aMaxlu
+                aBMPAreaL(lLandUseIndex) = lAreasLS(lLandUseIndex, 0)
+            Next
+
+            GisUtil.RemoveLayer(lOverlayIndex)
+        End If
+
     End Sub
 
     ''' <summary>
