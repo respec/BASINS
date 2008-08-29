@@ -42,7 +42,11 @@ Module HSPFOutputReports
             Case "upatoi"
                 pTestPath = "d:\Basins\modelout\Upatoi"
                 pBaseName = "upatoi"
+                pOutputLocations.Add("R:14")
+                pOutputLocations.Add("R:34")
                 pOutputLocations.Add("R:46")
+                pOutputLocations.Add("R:62")
+                pOutputLocations.Add("R:74")
                 pGraphAnnual = True
                 pCurveStepType = "NonStep" 'Tony's convention 
             Case "tinley"

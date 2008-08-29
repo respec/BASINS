@@ -15,6 +15,7 @@ Module HSPFWatershedSummaryWQReport
     Private pBaseName As String
     Private pDrive As String = "D:" 'C: in CA
     Private pSummaryType As String
+    Private pOperationTypes As New atcCollection
 
     Private Sub Initialize()
         Dim lTestName As String = "upatoi"
@@ -44,6 +45,14 @@ Module HSPFWatershedSummaryWQReport
         'pSummaryType = "TotalP"
         'pSummaryType = "WaterTemp"
         'pSummaryType = "Zinc"
+        Select Case pSummaryType
+            Case "Water"
+                pOperationTypes.Add("P:", "PERLND")
+                pOperationTypes.Add("I:", "IMPLND")
+                pOperationTypes.Add("R:", "RCHRES")
+            Case "Sediment"
+                pOperationTypes.Add("R:", "RCHRES")
+        End Select
     End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -61,15 +70,11 @@ Module HSPFWatershedSummaryWQReport
         lHspfBinDataSource.Open(lHspfBinFileName)
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
 
-        'constituent balance
-        Dim lOperationTypes As New atcCollection
-        lOperationTypes.Add("P:", "PERLND")
-        lOperationTypes.Add("I:", "IMPLND")
-        lOperationTypes.Add("R:", "RCHRES")
         Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
+        'constituent balance
         Dim lString As Text.StringBuilder = HspfSupport.ConstituentBalance.Report _
-                (lHspfUci, pSummaryType, lOperationTypes, pBaseName, _
+                (lHspfUci, pSummaryType, pOperationTypes, pBaseName, _
                  lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime)
         Dim lOutFileName As String = "outfiles\" & pSummaryType & "_" & "ConstituentBalance.txt"
         SaveFileString(lOutFileName, lString.ToString)
