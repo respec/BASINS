@@ -12,7 +12,7 @@ Public Class ctlEditMassLinks
 
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
     Dim prevMLid As Integer
-    Dim lMassLinkIdStarter() As Integer
+    Dim lMassLinkIdStarter As New ArrayList()
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
@@ -92,9 +92,14 @@ Public Class ctlEditMassLinks
     End Sub
     Public Sub Add() Implements ctlEdit.Add
 
+        '.net conversion:
+        'Add uses the array.insert call to place the entry in order in the MassLink.Uci.MassLinks array. The lMassLinkIdStarter
+        'indexes the rows where each ID starts - i.e. the second entry in ID lMassLinkIdStarter corresponds to the row
+        'where the second ID in the combobox (from the top) starts. 
+
         With grdMassLink.Source
             .Rows += 1
-            Dim lMassLinkToAddRow As Integer = lMassLinkIdStarter(cboID.SelectedIndex) + .Rows
+            Dim lMassLinkToAddRow As Integer = lMassLinkIdStarter.Item(cboID.SelectedIndex) + .Rows - 2
             Dim lMassLinkToAdd As HspfMassLink
 
             lMassLinkToAdd = New HspfMassLink
@@ -105,6 +110,7 @@ Public Class ctlEditMassLinks
         End With
         Changed = True
     End Sub
+
     Public Property Data() As Object Implements ctlEdit.Data
         Get
             Return pMassLink
@@ -116,7 +122,6 @@ Public Class ctlEditMassLinks
             Dim lMassLinkLooperCount
             Dim lMassLinkLooperID() As Integer
             lMassLinkLooperID = New Integer() {} '.net conversion: Silences 'used before assigned' error
-            lMassLinkIdStarter = New Integer() {}
             pMassLink = aMassLink
 
             'build list of masslinks
@@ -130,13 +135,11 @@ Public Class ctlEditMassLinks
                     End If
                 Next
 
-                '.net conversion: lMassLinkIdStarter an array that holds the rows in pMassLink.Uci.MassLinks where Ids change.
                 If found = False Then
                     lMassLinkLooperCount += 1
                     ReDim Preserve lMassLinkLooperID(lMassLinkLooperCount)
-                    ReDim Preserve lMassLinkIdStarter(lMassLinkLooperCount)
                     lMassLinkLooperID(lMassLinkLooperCount - 1) = lMassLink.MassLinkId
-                    lMassLinkIdStarter(lMassLinkLooperCount - 1) = lMassLinkNumber
+                    lMassLinkIdStarter.Add(lMassLinkNumber)
                 End If
             Next
             lMassLinkIdStarter(0) -= 1
@@ -227,7 +230,7 @@ Public Class ctlEditMassLinks
         If prevMLid <> cboID.SelectedIndex Then
             If Changed Then
                 Me.Hide()
-                discard = Logger.Msg("Changes to current MassLink have not been saved. Discard them?", Microsoft.VisualBasic.MsgBoxStyle.OkOnly)
+                discard = Logger.Msg("Changes to current MassLink have not been saved. Discard them?", Microsoft.VisualBasic.MsgBoxStyle.YesNo)
                 Me.Show()
             Else
                 discard = 1 'no changes
@@ -245,6 +248,36 @@ Public Class ctlEditMassLinks
         Changed = True
     End Sub
     Private Sub cmdAddNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddNew.Click
+        Dim lOper, lCheckThisId, lIdExistsAtIndex As Integer
+        Dim lExists As Boolean
+        Dim lcboIdItems() As Integer
+        lcboIdItems = New Integer() {}
+
+        For lOper = 0 To cboID.Items.Count - 1
+            ReDim Preserve lcboIdItems(lcboIdItems.Length)
+            lcboIdItems(lOper) = cboID.Items.Item(lOper)
+        Next
+
+        lExists = True
+        lCheckThisId = 0
+        Do Until lExists = False
+            lCheckThisId += 1
+            lIdExistsAtIndex = Array.IndexOf(lcboIdItems, lCheckThisId)
+            If lIdExistsAtIndex = -1 Then
+                cboID.Items.Insert(lCheckThisId - 1, lCheckThisId)
+                Exit Do
+            End If
+        Loop
+
+        lMassLinkIdStarter.Insert(lCheckThisId - 1, lMassLinkIdStarter.Item(lCheckThisId - 1))
+        For lOper = 1 To (lMassLinkIdStarter.Count - lCheckThisId)
+            lMassLinkIdStarter.Item(lMassLinkIdStarter.Count - lOper) += 1
+        Next
+
+        cboID.SelectedIndex = lCheckThisId - 1
+        Add()
+
 
     End Sub
+
 End Class
