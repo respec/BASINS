@@ -1682,6 +1682,72 @@ Public Class GisUtil
         lSfOut.Close()
     End Sub
 
+    Public Shared Sub OverlaySelected(ByVal aLayer1Index As Integer, ByVal aLayer1SelectedIndex As Integer, _
+                                      ByVal aLayer2Index As Integer, ByVal aLayer2SelectedIndex As Integer, _
+                                      ByVal aOutputLayerName As String, ByVal aCreateNew As Boolean)
+
+        'obtain handle to layer 1  
+        Dim lLayer1 As MapWindow.Interfaces.Layer = LayerFromIndex(aLayer1Index)
+        Dim lSf1 As New MapWinGIS.Shapefile
+        lSf1 = lLayer1.GetObject
+
+        'set layer 2 (subbasins)
+        Dim lLayer2 As MapWindow.Interfaces.Layer = LayerFromIndex(aLayer2Index)
+        Dim lSf2 As New MapWinGIS.Shapefile
+        lSf2 = lLayer2.GetObject
+        Dim lSf2Ext As MapWinGIS.Extents = lSf2.Extents
+
+        Dim lBsuc As Boolean
+        Dim lSfOut As New MapWinGIS.Shapefile
+        If aCreateNew Then 'create new output overlay shapefile
+            lSfOut.CreateNew("overlay", MapWinGIS.ShpfileType.SHP_POLYGON)
+        Else 'open existing output shape file
+            lBsuc = lSfOut.Open(aOutputLayerName)
+        End If
+
+        lSfOut.StartEditingShapes(True)
+
+        Dim lShapeNew As MapWinGIS.Shape
+        Dim lShape1 As MapWinGIS.Shape
+        Dim lShape1Ext As MapWinGIS.Extents
+        Dim lShape2 As MapWinGIS.Shape
+        Dim lShape2Ext As MapWinGIS.Extents
+
+        lShape2 = lSf2.Shape(aLayer2SelectedIndex)
+        lShape1 = lSf1.Shape(aLayer1SelectedIndex)
+        lShape2Ext = lShape2.Extents
+        lShape1Ext = lShape1.Extents
+
+        '********** do overlay ***********
+
+        If Not (lShape1Ext.xMin > lShape2Ext.xMax OrElse _
+                lShape1Ext.xMax < lShape2Ext.xMin OrElse _
+                lShape1Ext.yMin > lShape2Ext.yMax OrElse _
+                lShape1Ext.yMax < lShape2Ext.yMin) Then
+            'look for intersection from overlay of these shapes
+            lShapeNew = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lShape2)
+            If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
+                lBsuc = lSfOut.EditInsertShape(lShapeNew, lSfOut.NumShapes)
+                If Not lBsuc Then
+                    Logger.Dbg("Problem Adding Shape") 'TODO:add more details, message box?
+                End If
+            End If
+            lShapeNew = Nothing
+        End If
+
+        If aCreateNew Then 'delete old version of this file if it exists
+            If Not TryDeleteShapefile(aOutputLayerName) Then
+                'TryDeleteShapefile fails when the shapefile cannot be deleted, ie it is on the map
+                Logger.Msg("The Shapefile " & aOutputLayerName & " could not be deleted." & vbCrLf & _
+                           "This can cause misleading results from the overlay operation.", "Overlay Warning")
+            End If
+        End If
+
+        lBsuc = lSfOut.SaveAs(aOutputLayerName)
+        lSfOut.StopEditingShapes()
+        lSfOut.Close()
+    End Sub
+
     ''' <summary>Given two polygon layers, calculate the area of each polygon of the 
     '''          first layer with each polygon of the second layer. 
     '''          Output array contains area of each polygon combination.</summary>
