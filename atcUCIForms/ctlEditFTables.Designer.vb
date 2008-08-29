@@ -21,7 +21,7 @@ Partial Class ctlEditFTables
     Private Sub InitializeComponent()
         Me.cmdImport = New System.Windows.Forms.Button
         Me.cmdCompute = New System.Windows.Forms.Button
-        Me.Button1 = New System.Windows.Forms.Button
+        Me.cmdFcurve = New System.Windows.Forms.Button
         Me.cboID = New System.Windows.Forms.ComboBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
@@ -34,10 +34,10 @@ Partial Class ctlEditFTables
         'cmdImport
         '
         Me.cmdImport.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdImport.Location = New System.Drawing.Point(527, 133)
-        Me.cmdImport.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdImport.Location = New System.Drawing.Point(395, 108)
+        Me.cmdImport.Margin = New System.Windows.Forms.Padding(2)
         Me.cmdImport.Name = "cmdImport"
-        Me.cmdImport.Size = New System.Drawing.Size(131, 47)
+        Me.cmdImport.Size = New System.Drawing.Size(98, 38)
         Me.cmdImport.TabIndex = 1
         Me.cmdImport.Text = "Import From Cross Section"
         Me.cmdImport.UseVisualStyleBackColor = True
@@ -45,43 +45,41 @@ Partial Class ctlEditFTables
         'cmdCompute
         '
         Me.cmdCompute.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdCompute.Location = New System.Drawing.Point(527, 185)
-        Me.cmdCompute.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdCompute.Location = New System.Drawing.Point(395, 150)
+        Me.cmdCompute.Margin = New System.Windows.Forms.Padding(2)
         Me.cmdCompute.Name = "cmdCompute"
-        Me.cmdCompute.Size = New System.Drawing.Size(129, 47)
+        Me.cmdCompute.Size = New System.Drawing.Size(97, 38)
         Me.cmdCompute.TabIndex = 2
         Me.cmdCompute.Text = "Compute New"
         Me.cmdCompute.UseVisualStyleBackColor = True
         '
-        'Button1
+        'cmdFcurve
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Location = New System.Drawing.Point(527, 236)
-        Me.Button1.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(129, 47)
-        Me.Button1.TabIndex = 3
-        Me.Button1.Text = "F-Curve"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.cmdFcurve.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdFcurve.Location = New System.Drawing.Point(395, 192)
+        Me.cmdFcurve.Margin = New System.Windows.Forms.Padding(2)
+        Me.cmdFcurve.Name = "cmdFcurve"
+        Me.cmdFcurve.Size = New System.Drawing.Size(97, 38)
+        Me.cmdFcurve.TabIndex = 3
+        Me.cmdFcurve.Text = "F-Curve"
+        Me.cmdFcurve.UseVisualStyleBackColor = True
         '
         'cboID
         '
         Me.cboID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboID.FormattingEnabled = True
-        Me.cboID.Location = New System.Drawing.Point(80, 4)
-        Me.cboID.Margin = New System.Windows.Forms.Padding(4)
+        Me.cboID.Location = New System.Drawing.Point(60, 3)
         Me.cboID.Name = "cboID"
-        Me.cboID.Size = New System.Drawing.Size(404, 24)
+        Me.cboID.Size = New System.Drawing.Size(304, 21)
         Me.cboID.TabIndex = 4
         '
         'Label1
         '
         Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(491, 63)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label1.Location = New System.Drawing.Point(368, 51)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(56, 17)
+        Me.Label1.Size = New System.Drawing.Size(45, 13)
         Me.Label1.TabIndex = 7
         Me.Label1.Text = "NRows:"
         '
@@ -89,20 +87,18 @@ Partial Class ctlEditFTables
         '
         Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(491, 98)
-        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label2.Location = New System.Drawing.Point(368, 80)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(49, 17)
+        Me.Label2.Size = New System.Drawing.Size(38, 13)
         Me.Label2.TabIndex = 8
         Me.Label2.Text = "NCols:"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(12, 7)
-        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label3.Location = New System.Drawing.Point(9, 6)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(56, 17)
+        Me.Label3.Size = New System.Drawing.Size(43, 13)
         Me.Label3.TabIndex = 9
         Me.Label3.Text = "FTable:"
         '
@@ -115,8 +111,7 @@ Partial Class ctlEditFTables
         Me.txtNCols.HardMax = 8
         Me.txtNCols.HardMin = 4
         Me.txtNCols.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.txtNCols.Location = New System.Drawing.Point(559, 92)
-        Me.txtNCols.Margin = New System.Windows.Forms.Padding(4)
+        Me.txtNCols.Location = New System.Drawing.Point(419, 75)
         Me.txtNCols.MaxDecimal = 0
         Me.txtNCols.maxWidth = 0
         Me.txtNCols.Name = "txtNCols"
@@ -124,7 +119,7 @@ Partial Class ctlEditFTables
         Me.txtNCols.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.txtNCols.SelLength = 0
         Me.txtNCols.SelStart = 1
-        Me.txtNCols.Size = New System.Drawing.Size(108, 28)
+        Me.txtNCols.Size = New System.Drawing.Size(81, 23)
         Me.txtNCols.SoftMax = -999
         Me.txtNCols.SoftMin = -999
         Me.txtNCols.TabIndex = 6
@@ -139,8 +134,7 @@ Partial Class ctlEditFTables
         Me.txtNRows.HardMax = 25
         Me.txtNRows.HardMin = 1
         Me.txtNRows.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.txtNRows.Location = New System.Drawing.Point(559, 57)
-        Me.txtNRows.Margin = New System.Windows.Forms.Padding(4)
+        Me.txtNRows.Location = New System.Drawing.Point(419, 46)
         Me.txtNRows.MaxDecimal = 0
         Me.txtNRows.maxWidth = 0
         Me.txtNRows.Name = "txtNRows"
@@ -148,7 +142,7 @@ Partial Class ctlEditFTables
         Me.txtNRows.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.txtNRows.SelLength = 0
         Me.txtNRows.SelStart = 1
-        Me.txtNRows.Size = New System.Drawing.Size(108, 28)
+        Me.txtNRows.Size = New System.Drawing.Size(81, 23)
         Me.txtNRows.SoftMax = -999
         Me.txtNRows.SoftMin = -999
         Me.txtNRows.TabIndex = 5
@@ -164,16 +158,16 @@ Partial Class ctlEditFTables
         Me.grdEdit.CellBackColor = System.Drawing.Color.Empty
         Me.grdEdit.LineColor = System.Drawing.Color.Empty
         Me.grdEdit.LineWidth = 0.0!
-        Me.grdEdit.Location = New System.Drawing.Point(16, 57)
-        Me.grdEdit.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.grdEdit.Location = New System.Drawing.Point(12, 46)
+        Me.grdEdit.Margin = New System.Windows.Forms.Padding(2)
         Me.grdEdit.Name = "grdEdit"
-        Me.grdEdit.Size = New System.Drawing.Size(454, 382)
+        Me.grdEdit.Size = New System.Drawing.Size(340, 310)
         Me.grdEdit.Source = Nothing
         Me.grdEdit.TabIndex = 0
         '
         'ctlEditFTables
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
@@ -181,13 +175,13 @@ Partial Class ctlEditFTables
         Me.Controls.Add(Me.txtNCols)
         Me.Controls.Add(Me.txtNRows)
         Me.Controls.Add(Me.cboID)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.cmdFcurve)
         Me.Controls.Add(Me.cmdCompute)
         Me.Controls.Add(Me.cmdImport)
         Me.Controls.Add(Me.grdEdit)
-        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "ctlEditFTables"
-        Me.Size = New System.Drawing.Size(689, 441)
+        Me.Size = New System.Drawing.Size(517, 358)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -195,7 +189,7 @@ Partial Class ctlEditFTables
     Friend WithEvents grdEdit As atcControls.atcGrid
     Friend WithEvents cmdImport As System.Windows.Forms.Button
     Friend WithEvents cmdCompute As System.Windows.Forms.Button
-    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents cmdFcurve As System.Windows.Forms.Button
     Friend WithEvents cboID As System.Windows.Forms.ComboBox
     Friend WithEvents txtNRows As atcControls.atcText
     Friend WithEvents txtNCols As atcControls.atcText
