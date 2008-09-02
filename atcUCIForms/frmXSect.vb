@@ -4,60 +4,192 @@ Imports atcUCI
 Imports atcUtility
 Imports atcControls
 Imports System.Collections.ObjectModel
-
-
+Imports System.IO
 
 Public Class frmXSect
+
     Dim CurrentReach As Integer
     Dim lCurrentFTab As HspfTable
     Dim pUci As HspfUci
+    Private FileName As String
+    Dim chanid$(), ChanL!(), ChanYm!(), ChanWm!(), ChanN!(), ChanS!()
+    Dim ChanM11!(), ChanM12!(), ChanYc!(), ChanM21!(), ChanM22!()
+    Dim ChanYt1!(), ChanYt2!(), ChanM31!(), ChanM32!(), ChanW11!()
+    Dim ChanW12!(), ChanRecCnt&
 
-    '    Private Sub cboXFile_Click()
-    '        Dim ArrayVals(16) As Single
-    '        Call GetPTFData(cboXFile.Text, ArrayVals)
-    '        With agdXSect
-    '            .TextMatrix(1, 2) = ArrayVals(1)
-    '            .TextMatrix(2, 2) = ArrayVals(2)
-    '            .TextMatrix(3, 2) = ArrayVals(3)
-    '            .TextMatrix(4, 2) = ArrayVals(4)
-    '            .TextMatrix(5, 2) = ArrayVals(5)
-    '            .TextMatrix(6, 2) = ArrayVals(6)
-    '            .TextMatrix(7, 2) = ArrayVals(7)
-    '            .TextMatrix(8, 2) = ArrayVals(8)
-    '            .TextMatrix(9, 2) = ArrayVals(9)
-    '            .TextMatrix(10, 2) = ArrayVals(10)
-    '            .TextMatrix(11, 2) = ArrayVals(11)
-    '            .TextMatrix(12, 2) = ArrayVals(12)
-    '            .TextMatrix(13, 2) = ArrayVals(13)
-    '            .TextMatrix(14, 2) = ArrayVals(14)
-    '            .TextMatrix(15, 2) = ArrayVals(15)
-    '            .TextMatrix(16, 2) = ArrayVals(16)
-    '        End With
-    '    End Sub
+    Public Sub ReadPTFFile(ByVal newName As String, ByVal ret As Integer)
 
-    '    Private Sub cmdOpen_Click()
-    '        Dim ret&, ArrayIds$(), cnt&, i&
+        Dim delim, quote, lstr, lTname, tstr As String
+        Dim lFreeFile, amax As Integer
 
-    '        ChDriveDir("\basins\modelout")
-    '        CDFile.flags = &H8806&
-    '        CDFile.Filter = "BASINS Trapezoidal Files (*.ptf)"
-    '        CDFile.FileName = "*.ptf"
-    '        CDFile.DialogTitle = "Select BASINS Trapezoidal File"
-    '        On Error GoTo 50
-    '        CDFile.CancelError = True
-    '        CDFile.Action = 1
-    '        'read file here
-    '        Call ReadPTFFile(CDFile.FileName, ret)
-    '        If ret = 0 Then
-    '            Call GetPTFFileIds(cnt, ArrayIds)
-    '            cboXFile.Clear()
-    '            For i = 1 To cnt
-    '                cboXFile.AddItem(ArrayIds(i))
-    '            Next i
-    '            cboXFile.ListIndex = 0
-    '        End If
-    '50:     'continue here on cancel
-    '    End Sub
+        ret = 0
+        delim = " "
+        quote = """"
+
+        'read ptf file for channel data
+        lFreeFile = FreeFile()
+        'On Error GoTo ErrHandler
+        lTname = Microsoft.VisualBasic.Left(newName, Len(newName) - 3) & "ptf"
+        FileOpen(lFreeFile, lTname, OpenMode.Input)
+        lstr = LineInput(lFreeFile) 'header line
+        ChanRecCnt = 0
+        ReDim chanid(1)
+        ReDim ChanL(1)
+        ReDim ChanYm(1)
+        ReDim ChanWm(1)
+        ReDim ChanN(1)
+        ReDim ChanS(1)
+        ReDim ChanM11(1)
+        ReDim ChanM12(1)
+        ReDim ChanYc(1)
+        ReDim ChanM21(1)
+        ReDim ChanM22(1)
+        ReDim ChanYt1(1)
+        ReDim ChanYt2(1)
+        ReDim ChanM31(1)
+        ReDim ChanM32(1)
+        ReDim ChanW11(1)
+        ReDim ChanW12(1)
+        Do Until EOF(lFreeFile)
+            lstr = LineInput(lFreeFile)
+            ChanRecCnt = ChanRecCnt + 1
+            amax = UBound(chanid)
+            If ChanRecCnt > amax Then
+                ReDim Preserve chanid(amax * 2)
+                ReDim Preserve ChanL(amax * 2)
+                ReDim Preserve ChanYm(amax * 2)
+                ReDim Preserve ChanWm(amax * 2)
+                ReDim Preserve ChanN(amax * 2)
+                ReDim Preserve ChanS(amax * 2)
+                ReDim Preserve ChanM11(amax * 2)
+                ReDim Preserve ChanM12(amax * 2)
+                ReDim Preserve ChanYc(amax * 2)
+                ReDim Preserve ChanM21(amax * 2)
+                ReDim Preserve ChanM22(amax * 2)
+                ReDim Preserve ChanYt1(amax * 2)
+                ReDim Preserve ChanYt2(amax * 2)
+                ReDim Preserve ChanM31(amax * 2)
+                ReDim Preserve ChanM32(amax * 2)
+                ReDim Preserve ChanW11(amax * 2)
+                ReDim Preserve ChanW12(amax * 2)
+            End If
+            chanid(ChanRecCnt) = StrSplit(lstr, delim, quote) 'reach id
+            ChanL(ChanRecCnt) = StrSplit(lstr, delim, quote)  'length
+            ChanYm(ChanRecCnt) = StrSplit(lstr, delim, quote) 'mean depth
+            ChanWm(ChanRecCnt) = StrSplit(lstr, delim, quote) 'mean width
+            ChanN(ChanRecCnt) = StrSplit(lstr, delim, quote)  'mann n
+            ChanS(ChanRecCnt) = StrSplit(lstr, delim, quote)  'long slope
+            If ChanS(ChanRecCnt) < 0.0001 Then
+                ChanS(ChanRecCnt) = 0.0001
+            End If
+            tstr = StrSplit(lstr, delim, quote)
+            ChanM31(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope upper left
+            ChanM21(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope lower left
+            ChanW11(ChanRecCnt) = StrSplit(lstr, delim, quote)  'zero slope width left
+            ChanM11(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope chan left
+            ChanM12(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope chan right
+            ChanW12(ChanRecCnt) = StrSplit(lstr, delim, quote)  'zero slope width right
+            ChanM22(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope lower right
+            ChanM32(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope upper right
+            ChanYc(ChanRecCnt) = StrSplit(lstr, delim, quote)  'channel depth
+            ChanYt1(ChanRecCnt) = StrSplit(lstr, delim, quote)  'depth at slope change
+            ChanYt2(ChanRecCnt) = StrSplit(lstr, delim, quote)  'channel max depth
+        Loop
+        FileClose()
+        Exit Sub
+        'ErrHandler:
+        '        Call MsgBox("Problem reading file " & tname, , "Create Problem")
+        '        ret = 3
+    End Sub
+
+    Public Sub GetPTFData(ByVal RCHId As String, ByVal ArrayVals() As Single)
+        Dim ChanRecCnt As Integer
+        Dim lOper As Integer
+        Dim Id As String
+
+        ChanRecCnt = 0
+        lOper = Len(RCHId)
+        If lOper > 0 Then  'have a reach id
+            Id = CInt(RCHId)
+            For lOper = 1 To ChanRecCnt
+                If Trim(chanid(lOper)) = Id Then  'found the oneq
+                    ArrayVals(1) = ChanL(lOper)
+                    ArrayVals(2) = ChanYm(lOper)
+                    ArrayVals(3) = ChanWm(lOper)
+                    ArrayVals(4) = ChanN(lOper)
+                    ArrayVals(5) = ChanS(lOper)
+                    ArrayVals(6) = ChanM32(lOper)
+                    ArrayVals(7) = ChanM22(lOper)
+                    ArrayVals(8) = ChanW12(lOper)
+                    ArrayVals(9) = ChanM12(lOper)
+                    ArrayVals(10) = ChanM11(lOper)
+                    ArrayVals(11) = ChanW11(lOper)
+                    ArrayVals(12) = ChanM21(lOper)
+                    ArrayVals(13) = ChanM31(lOper)
+                    ArrayVals(14) = ChanYc(lOper)
+                    ArrayVals(15) = ChanYt1(lOper)
+                    ArrayVals(16) = ChanYt2(lOper)
+                End If
+            Next
+        End If
+    End Sub
+    'Private Sub cboXFile_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboXFile.SelectedIndexChanged
+    '    Dim ArrayVals(16) As Single
+    '    Call GetPTFData(cboXFile.Text, ArrayVals)
+    '    With agdXSect.Source
+    '        .CellValue(1, 2) = ArrayVals(1)
+    '        .CellValue(2, 2) = ArrayVals(2)
+    '        .CellValue(3, 2) = ArrayVals(3)
+    '        .CellValue(4, 2) = ArrayVals(4)
+    '        .CellValue(5, 2) = ArrayVals(5)
+    '        .CellValue(6, 2) = ArrayVals(6)
+    '        .CellValue(7, 2) = ArrayVals(7)
+    '        .CellValue(8, 2) = ArrayVals(8)
+    '        .CellValue(9, 2) = ArrayVals(9)
+    '        .CellValue(10, 2) = ArrayVals(10)
+    '        .CellValue(11, 2) = ArrayVals(11)
+    '        .CellValue(12, 2) = ArrayVals(12)
+    '        .CellValue(13, 2) = ArrayVals(13)
+    '        .CellValue(14, 2) = ArrayVals(14)
+    '        .CellValue(15, 2) = ArrayVals(15)
+    '        .CellValue(16, 2) = ArrayVals(16)
+    '    End With
+    'End Sub
+    Public Sub GetPTFFileIds(ByRef cnt As Integer, ByRef ArrayIds() As String)
+        Dim lOper As Integer
+
+        cnt = ChanRecCnt
+        ReDim ArrayIds(cnt)
+        For lOper = 1 To cnt
+            ArrayIds(lOper - 1) = chanid(lOper)
+        Next
+    End Sub
+    
+
+    Private Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpen.Click
+        Dim ret&, ArrayIds$(), cnt&, lOper&
+        Dim lStream As Stream = Nothing
+        ArrayIds = New String() {}
+
+        cnt = 0
+        ChDriveDir("\basins\modelout")
+        OpenFileDialog1.Filter = "BASINS Trapezoidal Files | *.ptf"
+        OpenFileDialog1.FileName = "*.ptf"
+        OpenFileDialog1.Title = "Select BASINS Trapezoidal File"
+        OpenFileDialog1.ShowDialog()
+        'read file here
+        'lStream = OpenFileDialog1.OpenFile()
+        ReadPTFFile(OpenFileDialog1.FileName, ret)
+        If ret = 0 Then
+            Call GetPTFFileIds(cnt, ArrayIds)
+            cboXFile.Enabled = True
+            cboXFile.Items.Clear()
+            For lOper = 0 To cnt - 1
+                cboXFile.Items.Add(ArrayIds(lOper))
+            Next
+            cboXFile.SelectedIndex = 0
+        End If
+    End Sub
 
     '    Private Sub cmdSave_Click()
     '        Dim ArrayVals!(16)
@@ -70,22 +202,22 @@ Public Class frmXSect
     '        CDFile.CancelError = True
     '        CDFile.Action = 2
     '        With agdXSect
-    '            ArrayVals(1) = .TextMatrix(1, 2)
-    '            ArrayVals(2) = .TextMatrix(2, 2)
-    '            ArrayVals(3) = .TextMatrix(3, 2)
-    '            ArrayVals(4) = .TextMatrix(4, 2)
-    '            ArrayVals(5) = .TextMatrix(5, 2)
-    '            ArrayVals(6) = .TextMatrix(6, 2)
-    '            ArrayVals(7) = .TextMatrix(7, 2)
-    '            ArrayVals(8) = .TextMatrix(8, 2)
-    '            ArrayVals(9) = .TextMatrix(9, 2)
-    '            ArrayVals(10) = .TextMatrix(10, 2)
-    '            ArrayVals(11) = .TextMatrix(11, 2)
-    '            ArrayVals(12) = .TextMatrix(12, 2)
-    '            ArrayVals(13) = .TextMatrix(13, 2)
-    '            ArrayVals(14) = .TextMatrix(14, 2)
-    '            ArrayVals(15) = .TextMatrix(15, 2)
-    '            ArrayVals(16) = .TextMatrix(16, 2)
+    '            ArrayVals(1) = .CellValue(1, 2)
+    '            ArrayVals(2) = .CellValue(2, 2)
+    '            ArrayVals(3) = .CellValue(3, 2)
+    '            ArrayVals(4) = .CellValue(4, 2)
+    '            ArrayVals(5) = .CellValue(5, 2)
+    '            ArrayVals(6) = .CellValue(6, 2)
+    '            ArrayVals(7) = .CellValue(7, 2)
+    '            ArrayVals(8) = .CellValue(8, 2)
+    '            ArrayVals(9) = .CellValue(9, 2)
+    '            ArrayVals(10) = .CellValue(10, 2)
+    '            ArrayVals(11) = .CellValue(11, 2)
+    '            ArrayVals(12) = .CellValue(12, 2)
+    '            ArrayVals(13) = .CellValue(13, 2)
+    '            ArrayVals(14) = .CellValue(14, 2)
+    '            ArrayVals(15) = .CellValue(15, 2)
+    '            ArrayVals(16) = .CellValue(16, 2)
     '        End With
     '        Call WritePTFFile(CDFile.FileName, 1, ArrayVals)
     '10:     'continue here on cancel
@@ -98,22 +230,22 @@ Public Class frmXSect
     '        If Index = 0 Then
     '            'okay
     '            With agdXSect
-    '                l = .TextMatrix(1, 2)
-    '                ym = .TextMatrix(2, 2)
-    '                wm = .TextMatrix(3, 2)
-    '                n = .TextMatrix(4, 2)
-    '                s = .TextMatrix(5, 2)
-    '                m32 = .TextMatrix(6, 2)
-    '                m22 = .TextMatrix(7, 2)
-    '                w12 = .TextMatrix(8, 2)
-    '                m12 = .TextMatrix(9, 2)
-    '                m11 = .TextMatrix(10, 2)
-    '                w11 = .TextMatrix(11, 2)
-    '                m21 = .TextMatrix(12, 2)
-    '                m31 = .TextMatrix(13, 2)
-    '                yc = .TextMatrix(14, 2)
-    '                yt1 = .TextMatrix(15, 2)
-    '                yt2 = .TextMatrix(16, 2)
+    '                l = .CellValue(1, 2)
+    '                ym = .CellValue(2, 2)
+    '                wm = .CellValue(3, 2)
+    '                n = .CellValue(4, 2)
+    '                s = .CellValue(5, 2)
+    '                m32 = .CellValue(6, 2)
+    '                m22 = .CellValue(7, 2)
+    '                w12 = .CellValue(8, 2)
+    '                m12 = .CellValue(9, 2)
+    '                m11 = .CellValue(10, 2)
+    '                w11 = .CellValue(11, 2)
+    '                m21 = .CellValue(12, 2)
+    '                m31 = .CellValue(13, 2)
+    '                yc = .CellValue(14, 2)
+    '                yt1 = .CellValue(15, 2)
+    '                yt2 = .CellValue(16, 2)
     '                curftab.FTableFromCrossSect(l, ym, wm, n, s, m11, m12, yc, m21, _
     '                               m22, yt1, yt2, m31, m32, w11, w12)
     '            End With
@@ -135,46 +267,46 @@ Public Class frmXSect
     '        With agdXSect
     '            .cols = 3
     '            .FixedCols = 2
-    '            .TextMatrix(0, 0) = "Variable"
-    '            .TextMatrix(0, 1) = "Description"
-    '            .TextMatrix(0, 2) = "Value"
-    '            .TextMatrix(1, 0) = "L"
-    '            .TextMatrix(2, 0) = "Ym"
-    '            .TextMatrix(3, 0) = "Wm"
-    '            .TextMatrix(4, 0) = "n"
-    '            .TextMatrix(5, 0) = "S"
-    '            .TextMatrix(6, 0) = "m32"
-    '            .TextMatrix(7, 0) = "m22"
-    '            .TextMatrix(8, 0) = "W12"
-    '            .TextMatrix(9, 0) = "m12"
-    '            .TextMatrix(10, 0) = "m11"
-    '            .TextMatrix(11, 0) = "W11"
-    '            .TextMatrix(12, 0) = "m21"
-    '            .TextMatrix(13, 0) = "m31"
-    '            .TextMatrix(14, 0) = "Yc"
-    '            .TextMatrix(15, 0) = "Yt1"
-    '            .TextMatrix(16, 0) = "Yt2"
+    '            .CellValue(0, 0) = "Variable"
+    '            .CellValue(0, 1) = "Description"
+    '            .CellValue(0, 2) = "Value"
+    '            .CellValue(1, 0) = "L"
+    '            .CellValue(2, 0) = "Ym"
+    '            .CellValue(3, 0) = "Wm"
+    '            .CellValue(4, 0) = "n"
+    '            .CellValue(5, 0) = "S"
+    '            .CellValue(6, 0) = "m32"
+    '            .CellValue(7, 0) = "m22"
+    '            .CellValue(8, 0) = "W12"
+    '            .CellValue(9, 0) = "m12"
+    '            .CellValue(10, 0) = "m11"
+    '            .CellValue(11, 0) = "W11"
+    '            .CellValue(12, 0) = "m21"
+    '            .CellValue(13, 0) = "m31"
+    '            .CellValue(14, 0) = "Yc"
+    '            .CellValue(15, 0) = "Yt1"
+    '            .CellValue(16, 0) = "Yt2"
     '            For i = 1 To 16
-    '                .TextMatrix(i, 2) = 0.01
+    '                .CellValue(i, 2) = 0.01
     '                .ColType(2) = ATCoSng
     '                .ColMin(2) = 0.00001
     '            Next i
-    '            .TextMatrix(1, 1) = "Length (ft)"
-    '            .TextMatrix(2, 1) = "Mean Depth (ft)"
-    '            .TextMatrix(3, 1) = "Mean Width (ft)"
-    '            .TextMatrix(4, 1) = "Mannings Roughness Coefficient"
-    '            .TextMatrix(5, 1) = "Longitudinal Slope"
-    '            .TextMatrix(6, 1) = "Side Slope of Upper Flood Plain Left"
-    '            .TextMatrix(7, 1) = "Side Slope of Lower Flood Plain Left"
-    '            .TextMatrix(8, 1) = "Zero Slope Flood Plain Width Left (ft)"
-    '            .TextMatrix(9, 1) = "Side Slope of Channel Left"
-    '            .TextMatrix(10, 1) = "Side Slope of Channel Right"
-    '            .TextMatrix(11, 1) = "Zero Slope Flood Plain Width Right (ft)"
-    '            .TextMatrix(12, 1) = "Side Slope Lower Flood Plain Right"
-    '            .TextMatrix(13, 1) = "Side Slope Upper Flood Plain Right"
-    '            .TextMatrix(14, 1) = "Channel Depth (ft)"
-    '            .TextMatrix(15, 1) = "Flood Side Slope Change at Depth (ft)"
-    '            .TextMatrix(16, 1) = "Maximum Depth (ft)"
+    '            .CellValue(1, 1) = "Length (ft)"
+    '            .CellValue(2, 1) = "Mean Depth (ft)"
+    '            .CellValue(3, 1) = "Mean Width (ft)"
+    '            .CellValue(4, 1) = "Mannings Roughness Coefficient"
+    '            .CellValue(5, 1) = "Longitudinal Slope"
+    '            .CellValue(6, 1) = "Side Slope of Upper Flood Plain Left"
+    '            .CellValue(7, 1) = "Side Slope of Lower Flood Plain Left"
+    '            .CellValue(8, 1) = "Zero Slope Flood Plain Width Left (ft)"
+    '            .CellValue(9, 1) = "Side Slope of Channel Left"
+    '            .CellValue(10, 1) = "Side Slope of Channel Right"
+    '            .CellValue(11, 1) = "Zero Slope Flood Plain Width Right (ft)"
+    '            .CellValue(12, 1) = "Side Slope Lower Flood Plain Right"
+    '            .CellValue(13, 1) = "Side Slope Upper Flood Plain Right"
+    '            .CellValue(14, 1) = "Channel Depth (ft)"
+    '            .CellValue(15, 1) = "Flood Side Slope Change at Depth (ft)"
+    '            .CellValue(16, 1) = "Maximum Depth (ft)"
     '            .ColEditable(2) = True
     '            .ColsSizeByContents()
     '        End With
@@ -206,5 +338,8 @@ Public Class frmXSect
     '    End Sub
     Friend Sub Init(ByVal aCtl As ctlEditFTables)
         Me.Icon = aCtl.ParentForm.Icon
+        cboXFile.Text = "<Select A File> "
+        cboXFile.Enabled = False
     End Sub
+
 End Class
