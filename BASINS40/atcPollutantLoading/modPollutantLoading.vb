@@ -302,13 +302,15 @@ Public Module PollutantLoading
                                 'the load reduction is the load * fractional area * fractional removal efficiency,
                                 'ie 1000 lbs load with 20% bmp area with a 30% removal = 60 lbs removed 
                                 For lLuIndex As Integer = 1 To lMaxlu
+                                    'calculate the full load first, for this area, as if no bmp
                                     If aUseExportCoefficent Then 'Export Coefficients Method
-                                        lLoad = (lCoeffsLC(lLuIndex, j) * lAreasLS(lLuIndex, i) / 4046.8564)
+                                        lLoad = (lCoeffsLC(lLuIndex, j) * lBMPAreaL(lLuIndex) / 4046.8564)
                                     Else
-                                        lLoad = (lPrecS(i) * lRatio * lRunoffL(lLuIndex) * lCoeffsLC(lLuIndex, j) * lAreasLS(lLuIndex, i) / 4046.8564 * 2.72 / 12)
+                                        lLoad = (lPrecS(i) * lRatio * lRunoffL(lLuIndex) * lCoeffsLC(lLuIndex, j) * lBMPAreaL(lLuIndex) / 4046.8564 * 2.72 / 12)
                                     End If
+                                    'the removal due to the bmp is the load times the efficiency
                                     If lBMPAreaL(lLuIndex) > 0 Then
-                                        lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoad * lBMPAreaL(lLuIndex) / 4046.8564 / lAreasS(i) * lEffic / 100)
+                                        lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoad * (lEffic) / 100)
                                     End If
                                 Next lLuIndex
                             Next j
@@ -425,20 +427,25 @@ Public Module PollutantLoading
             Logger.Dbg("NoStreamBankLoadsApplied")
         End If
 
+        Dim lVolume(lSelectedAreaIndexes.Count) As Double
         If Not aUseExportCoefficent Then
             'calc emcs (runoff volume weighted)
-            Dim lAreaTimesRunoffCoeffS(lSelectedAreaIndexes.Count) As Double
+            Dim lDenomS(lSelectedAreaIndexes.Count) As Double
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For k = 1 To lMaxlu
-                    lAreaTimesRunoffCoeffS(i) = lAreaTimesRunoffCoeffS(i) + (lRunoffL(k) * lAreasLS(k, i))
+                    lDenomS(i) = lDenomS(i) + (lPrecS(i) * lRatio * lRunoffL(k) * lAreasLS(k, i) * 2.72)
                 Next k
             Next i
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
-                    For k = 1 To lMaxlu
-                        lEMCsSC(i, j) = lEMCsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) * lRunoffL(k) / lAreaTimesRunoffCoeffS(i))
-                    Next k
+                    lEMCsSC(i, j) = lEMCsSC(i, j) + (lLoadsSC(i, j) * 4046.8564 * 12 / lDenomS(i))
                 Next j
+            Next i
+            'calc runoff volume in cfs
+            For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
+                For k = 1 To lMaxlu
+                    lVolume(i) = lVolume(i) + (lPrecS(i) / 12 * lRatio * lRunoffL(k) * lAreasLS(k, i) * 3.281 * 3.281 / 31536000)  '31536000 is what pload uses as the number of seconds in a year
+                Next k
             Next i
         End If
 
@@ -504,6 +511,7 @@ Public Module PollutantLoading
                         'add fields to the output shapefile
                         Dim lOutputLayerIndex As String = GisUtil.LayerIndex(lLayerDesc)
                         Dim lFieldIndex As Integer
+                        Dim lFlowFieldIndex As Integer
                         GisUtil.StartSetFeatureValue(lOutputLayerIndex)
 
                         Dim lFieldNameSuffix As String = ""
@@ -515,12 +523,22 @@ Public Module PollutantLoading
                             lFieldNameSuffix = "_emc"
                         End If
 
+                        If k = 3 Then
+                            'also add field for flow volumes in cfs
+                            Try
+                                lFlowFieldIndex = GisUtil.FieldIndex(lOutputLayerIndex, "Flow_Cfs")
+                            Catch
+                                lFlowFieldIndex = GisUtil.AddField(lOutputLayerIndex, "Flow_Cfs", 2, 10)
+                            End Try
+                        End If
+
                         'add loads
                         Try
                             lFieldIndex = GisUtil.FieldIndex(lOutputLayerIndex, lConsNames(j) & lFieldNameSuffix)
                         Catch
                             lFieldIndex = GisUtil.AddField(lOutputLayerIndex, lConsNames(j) & lFieldNameSuffix, 2, 10)
                         End Try
+
                         For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                             If k = 1 Then
                                 GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, lLoadsPerAcreSC(i, j))
@@ -528,6 +546,7 @@ Public Module PollutantLoading
                                 GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, lLoadsSC(i, j))
                             ElseIf k = 3 Then
                                 GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, lEMCsSC(i, j))
+                                GisUtil.SetFeatureValue(lOutputLayerIndex, lFlowFieldIndex, i, lVolume(i))
                             End If
                         Next i
                         GisUtil.StopSetFeatureValue(lOutputLayerIndex)
@@ -716,23 +735,23 @@ Public Module PollutantLoading
 
             Dim lLanduseLayerIndex As Integer
             Dim lOverlayIndexes As New Collection
-            lOverlayIndexes.Add(1)  'there will be only one feature in overlay -- not actually
+            lOverlayIndexes.Add(0)  'there will be only one feature in overlay 
             Dim lAreasLS(aMaxlu, 1) As Double
 
             If aLandUseType = "USGS GIRAS Shapefile" Then
-                CalculateGIRASAreas(aSubbasinLayerIndex, lOverlayIndexes, _
+                CalculateGIRASAreas(lOverlayIndex, lOverlayIndexes, _
                                     lAreasLS)
             ElseIf aLandUseType = "Other Shapefile" Then
                 lLanduseLayerIndex = GisUtil.LayerIndex(aLandUseLayer)
                 GisUtil.TabulatePolygonAreas(lLanduseLayerIndex, _
                                              GisUtil.FieldIndex(lLanduseLayerIndex, aLandUseId), _
-                                             aSubbasinLayerIndex, lOverlayIndexes, _
+                                             lOverlayIndex, lOverlayIndexes, _
                                              lAreasLS)
             Else 'grid
                 lLanduseLayerIndex = GisUtil.LayerIndex(aLandUseLayer)
                 Dim lGridmax As Integer = System.Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
-                Dim laAreaLS(lGridmax, GisUtil.NumFeatures(aSubbasinLayerIndex)) As Double
-                GisUtil.TabulateAreas(lLanduseLayerIndex, aSubbasinLayerIndex, _
+                Dim laAreaLS(lGridmax, GisUtil.NumFeatures(lOverlayIndex)) As Double
+                GisUtil.TabulateAreas(lLanduseLayerIndex, lOverlayIndex, _
                                       laAreaLS)
                 'transfer values from selected polygons to lAreasLS
                 For lLandUseIndex As Integer = 1 To aMaxlu
