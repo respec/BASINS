@@ -1701,6 +1701,11 @@ Public Class GisUtil
         Dim lSfOut As New MapWinGIS.Shapefile
         If aCreateNew Then 'create new output overlay shapefile
             lSfOut.CreateNew("overlay", MapWinGIS.ShpfileType.SHP_POLYGON)
+            Dim [lOf] As New MapWinGIS.Field
+            [lOf].Name = "loverlay"
+            [lOf].Type = MapWinGIS.FieldType.INTEGER_FIELD
+            [lOf].Width = 10
+            lBsuc = lSfOut.EditInsertField([lOf], 0)
         Else 'open existing output shape file
             lBsuc = lSfOut.Open(aOutputLayerName)
         End If
