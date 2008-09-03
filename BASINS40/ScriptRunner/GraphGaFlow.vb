@@ -2,6 +2,7 @@ Imports atcUtility
 Imports atcData
 Imports atcWDM
 Imports atcGraph
+Imports atcList
 Imports HspfSupport
 Imports MapWindow.Interfaces
 Imports ZedGraph
@@ -20,6 +21,21 @@ Module GraphGaFlow
         If lWdmDataSource.Open(lWdmFileName) Then
             Dim lDataGroup As New atcDataGroup
             ChDriveDir(IO.Directory.GetCurrentDirectory & "\outfiles")
+
+            Dim lTserDaily As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(30) 'Peachtree Ck
+            Dim lHighLowSource As atcDataSource = New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+            Dim lArgsMath As New atcDataAttributes
+            lArgsMath.SetValue("timeseries", lTserDaily)
+            lArgsMath.SetValue("LogFlg", True)
+            lArgsMath.SetValue("NDay", 1)
+            lArgsMath.SetValue("Return Period", 100)
+            lArgsMath.SetValue("HighFlag", True)
+            lHighLowSource.Open("n-day high timeseries", lArgsMath)
+            Dim lTserNDay As atcTimeseries = lHighLowSource.DataSets(0)
+            Dim lList As New atcListPlugin
+            'TODO: just output year
+            lList.Save(lHighLowSource.DataSets, IO.Path.Combine(CurDir, "Hi1Day.txt"), "DateFormatIncludeYears")
+
 
             Dim lSDate(5) As Integer : lSDate(0) = 2000 : lSDate(1) = 1 : lSDate(2) = 1
             Dim lSDateJ As Double = Date2J(lSDate)
@@ -70,32 +86,12 @@ Module GraphGaFlow
 
     Sub GraphScatterBatch(ByVal aDataGroup As atcDataGroup)
         Dim lOutFileName As String = pBaseName & "_scat"
-        Dim lACoef As Double
-        Dim lBCoef As Double
-        Dim lRSquare As Double
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphScatter(aDataGroup, lZgc)
+        lGrapher.AddFitLine()
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
         With lPane
             ScaleAxis(aDataGroup, .YAxis)
-            '45 degree line
-            AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
-            'regression line 
-            FitLine(aDataGroup.ItemByIndex(1), aDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
-            Dim lCorrCoef As Double = Math.Sqrt(lRSquare)
-            AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
-            SaveFileString("CompareStats.txt", CompareStats(aDataGroup.ItemByIndex(0), aDataGroup.ItemByIndex(1)))
-
-            Dim lText As New TextObj
-            Dim lFmt As String = "###,##0.###"
-            lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & _
-                         Environment.NewLine & _
-                         "Corr Coef = " & DoubleToString(lCorrCoef, , lFmt)
-            'TODO: turn off border
-            lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
-            .GraphObjList.Add(lText)
-            .CurveList(0).Label.IsVisible = False
-
             lZgc.SaveIn(lOutFileName & ".png")
             lZgc.SaveIn(lOutFileName & ".emf")
 
@@ -104,10 +100,6 @@ Module GraphGaFlow
             .XAxis.Type = ZedGraph.AxisType.Log
             .XAxis.Scale.Min = .YAxis.Scale.Min
             .XAxis.Scale.Max = .YAxis.Scale.Max
-            .CurveList.RemoveAt(2)
-            .CurveList.RemoveAt(1)
-            AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "New45DegLine")
-            AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "NewRegLine")
         End With
         lOutFileName = pBaseName & "_scat_log"
         lZgc.SaveIn(lOutFileName & ".png")
