@@ -311,37 +311,176 @@ Friend Module modSWMMFromMW
         Return lGetTimeseries
     End Function
 
-    Friend Function ComputeImperviousPercentage(ByVal aCatchments As Catchments, _
-                                                 ByVal aLanduses As Landuses) As Boolean
+    Friend Function ReclassifyLandUses(ByVal aReclassificationRecords As atcCollection, _
+                                       ByVal aLandUses As Landuses) As Landuses
 
-        For Each lCatchment As Catchment In aCatchments
-            Dim lImperviousArea As Double = 0.0
-            Dim lPerviousArea As Double = 0.0
-            For Each lLanduse As Landuse In aLanduses
-                If lLanduse.Catchment.Name = lCatchment.Name Then
-                    'a match, store areas of pervious and impervious
+        Dim lReclassifyLandUses As New Landuses
 
-                    'TODO: use table to determine % impervious for each
-                    Dim lAddedArea As Boolean = False
-                    If IsNumeric(lLanduse.Name) Then
-                        If Int(lLanduse.Name) > 20 And Int(lLanduse.Name) < 25 Then
-                            lImperviousArea += lLanduse.Area * 0.5
-                            lPerviousArea += lLanduse.Area * 0.5
-                            lAddedArea = True
-                        End If
-                    End If
-                    If Not lAddedArea Then
-                        lPerviousArea += lLanduse.Area
-                    End If
-
-                End If
-            Next
-
-            'compute the impervious percentage for this catchment
-            lCatchment.PercentImpervious = 100.0 * lImperviousArea / (lImperviousArea + lPerviousArea)
-
+        'build collection of unique subbasin ids
+        Dim lUniqueSubids As New atcCollection
+        For Each lLandUse As Landuse In aLandUses
+            lUniqueSubids.Add(lLandUse.Catchment.Name)
         Next
 
+        'build collection of unique landuse groups
+        Dim lUniqueLugroups As New atcCollection
+        For Each lDetail As LanduseReclassificationDetails In aReclassificationRecords
+            lUniqueLugroups.Add(lDetail.GroupDescription)
+        Next
+
+        'create summary arrays
+        Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
+        Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
+
+        'this block for simple grid, should now work generically
+        'For Each lLandUse As Landuse In aLandUses
+        '    'find subbasin position in the area array
+        '    Dim lSpos As Integer
+        '    For j As Integer = 0 To lUniqueSubids.Count - 1
+        '        If lLandUse.Catchment.Name = lUniqueSubids(j) Then
+        '            lSpos = j
+        '            Exit For
+        '        End If
+        '    Next j
+        '    'find lugroup that corresponds to this lucode
+        '    If lLandUse.Name IsNot Nothing Then
+        '        'find percent perv that corresponds to this lugroup
+        '        Dim lPercentImperv As Double
+        '        For Each lDetail As LanduseReclassificationDetails In aReclassificationRecords
+        '            If lLandUse.Name = lDetail.GroupDescription Then
+        '                If Double.TryParse(lDetail.ImperviousPercent, lPercentImperv) Then
+        '                    Exit For
+        '                Else
+        '                    Logger.Dbg("Warning: non-parsable percent impervious value '" & lDetail.ImperviousPercent & "' for land use name " & lLandUse.Name)
+        '                End If
+        '            End If
+        '        Next
+        '        'find lugroup position in the area array
+        '        Dim lLpos As Long
+        '        For j As Integer = 0 To lUniqueLugroups.Count - 1
+        '            If lLandUse.Name = lUniqueLugroups(j) Then
+        '                lLpos = j
+        '                Exit For
+        '            End If
+        '        Next j
+        '        With lLandUse
+        '            lPerArea(lSpos, lLpos) += (.Area * (100 - lPercentImperv) / 100)
+        '            lImpArea(lSpos, lLpos) += (.Area * lPercentImperv / 100)
+        '        End With
+        '    End If
+        'Next lLandUse
+
+        For Each lLandUse As Landuse In aLandUses
+            'loop through each polygon (or grid subid/lucode combination)
+            'find subbasin position in the area array
+            Dim lSpos As Integer
+            For j As Integer = 0 To lUniqueSubids.Count - 1
+                If lLandUse.Catchment.Name = lUniqueSubids(j) Then
+                    lSpos = j
+                    Exit For
+                End If
+            Next j
+
+            'find lugroup that corresponds to this lucode, could be multiple matches
+            For Each lDetail As LanduseReclassificationDetails In aReclassificationRecords
+                Dim lLandUseName As String = ""
+                Dim lLpos As Integer = -1
+                Dim lPercentImperv As Double
+                If lDetail.Code.Trim.Length > 0 Then
+                    If lLandUse.Name = lDetail.Code Then
+                        'see if any of these are subbasin-specific
+                        If Not Double.TryParse(lDetail.ImperviousPercent, lPercentImperv) Then
+                            Logger.Dbg("Warning: non-parsable percent impervious value '" & lDetail.ImperviousPercent & "' for land use name " & lLandUse.Name)
+                        Else
+                            Dim lMultiplier As Double
+                            If Not Double.TryParse(lDetail.Multiplier, lMultiplier) Then
+                                lMultiplier = 1.0
+                            End If
+                            Dim lSubbasin As String = lDetail.Subbasin
+                            Dim lSubbasinSpecific As Boolean = False
+                            If Not lSubbasin Is Nothing Then
+                                If lSubbasin.Trim.Length > 0 Then
+                                    lSubbasinSpecific = True
+                                End If
+                            End If
+                            If lSubbasinSpecific Then
+                                'this row is subbasin-specific
+                                If lSubbasin = lLandUse.Catchment.Name Then
+                                    lLandUseName = lDetail.GroupDescription
+                                End If
+                            Else
+                                'make sure that no other rows of this lucode are 
+                                'subbasin-specific for this subbasin and that we 
+                                'should therefore not use this row
+                                Dim lUseIt As Boolean = True
+                                For Each lDetail2 As LanduseReclassificationDetails In aReclassificationRecords
+                                    If Not lDetail2.Equals(lDetail) Then
+                                        If lDetail2.Code = lDetail.Code And lDetail2.GroupDescription = lDetail.GroupDescription Then
+                                            'this other row has same lucode and group description
+                                            lSubbasin = lDetail2.Subbasin
+                                            If lSubbasin IsNot Nothing AndAlso IsNumeric(lSubbasin) Then
+                                                'and its subbasin-specific
+                                                If lSubbasin = lLandUse.Catchment.Name Then
+                                                    'and its specific to this subbasin
+                                                    lUseIt = False
+                                                End If
+                                            End If
+                                        End If
+                                    End If
+                                Next
+                                If lUseIt Then 'we want this one now
+                                    lLandUseName = lDetail.GroupDescription
+                                End If
+                            End If
+
+                            lLpos = -1
+                            If lLandUseName.Length > 0 Then 'find lugroup position in the area array
+                                For j As Integer = 0 To lUniqueLugroups.Count - 1
+                                    If lLandUseName = lUniqueLugroups(j) Then
+                                        lLpos = j
+                                        Exit For
+                                    End If
+                                Next j
+                            End If
+
+                            If lLpos > -1 Then
+                                With lLandUse
+                                    lPerArea(lSpos, lLpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
+                                    lImpArea(lSpos, lLpos) += (.Area * lMultiplier * lPercentImperv / 100)
+                                End With
+                            End If
+                        End If
+                    End If
+                End If
+            Next
+        Next lLandUse
+
+        For lSpos As Integer = 0 To lUniqueSubids.Count - 1
+            Dim lPerAreaBySubbasin As Double = 0
+            Dim lImpAreaBySubbasin As Double = 0
+            For lLpos As Integer = 0 To lUniqueLugroups.Count - 1
+                lPerAreaBySubbasin = lPerAreaBySubbasin + lPerArea(lSpos, lLpos)
+                lImpAreaBySubbasin = lImpAreaBySubbasin + lImpArea(lSpos, lLpos)
+                Dim lArea As Double = lPerArea(lSpos, lLpos) + lImpArea(lSpos, lLpos)
+                If lArea > 0 Then
+                    Dim lLandUse As New Landuse
+                    With lLandUse
+                        .Name = lUniqueLugroups(lLpos)
+                        .Area = lArea
+                        For Each lOrigLandUse As Landuse In aLandUses
+                            If lOrigLandUse.Catchment.Name = lUniqueSubids(lSpos) Then
+                                .Catchment = lOrigLandUse.Catchment
+                                .Catchment.PercentImpervious = lImpArea(lSpos, lLpos) / (lPerArea(lSpos, lLpos) + lImpArea(lSpos, lLpos))
+                                Exit For
+                            End If
+                        Next
+                    End With
+                    lReclassifyLandUses.Add(lLandUse)
+                End If
+            Next
+        Next
+
+        Return lReclassifyLandUses
     End Function
 
     Friend Sub BuildListofValidStationNames(ByRef aMetWDMName As String, _
@@ -451,11 +590,37 @@ Friend Module modSWMMFromMW
         lDataSource = Nothing
     End Sub
 
+    Friend Sub GetLanduseReclassificationDetails(ByRef aGridSource As atcControls.atcGridSource, _
+                                                 ByVal aLanduseReclassificationDetails As atcCollection)
+        For lRow As Integer = 1 To aGridSource.Rows
+            Dim lLanduseReclassificationDetail As New LanduseReclassificationDetails
+            With lLanduseReclassificationDetail
+                .Code = aGridSource.CellValue(lRow, 0)
+                If .Code Is Nothing Then .Code = ""
+                .GroupDescription = aGridSource.CellValue(lRow, 1)
+                .ImperviousPercent = aGridSource.CellValue(lRow, 2)
+                .Multiplier = aGridSource.CellValue(lRow, 3)
+                If .Multiplier Is Nothing Then .Multiplier = ""
+                .Subbasin = aGridSource.CellValue(lRow, 4)
+                If .Subbasin Is Nothing Then .Subbasin = ""
+            End With
+            aLanduseReclassificationDetails.Add(lLanduseReclassificationDetail)
+        Next
+    End Sub
+
     Friend Class StationDetails
         Public Name As String
         Public StartJDate As Double
         Public EndJDate As Double
         Public Description As String
+    End Class
+
+    Friend Class LanduseReclassificationDetails
+        Public Code As String
+        Public GroupDescription As String
+        Public ImperviousPercent As String
+        Public Multiplier As String
+        Public Subbasin As String
     End Class
 
 End Module

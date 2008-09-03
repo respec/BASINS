@@ -1062,6 +1062,10 @@ Public Class frmSWMMSetup
         End If
         Dim lMetWDMFileName As String = txtMetWDMName.Text
 
+        'set reclassification records
+        Dim lReclassificationRecords As New atcCollection
+        GetLanduseReclassificationDetails(AtcGridPervious.Source, lReclassificationRecords)
+
         'Dim lNodesShapefileName As String = "C:\basins\Predefined Delineations\West Branch\nodes.shp"
         'Dim lConduitShapefileName As String = "C:\basins\Predefined Delineations\West Branch\conduits.shp"
         'Dim lCatchmentShapefileName As String = "C:\basins\Predefined Delineations\West Branch\catchments.shp"
@@ -1184,9 +1188,10 @@ Public Class frmSWMMSetup
                 Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
                 Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
                 CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
-                ComputeImperviousPercentage(.Catchments, .Landuses)
-                'Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lblClass.Text, AtcGridPervious, .Landuses)
-                '.Landuses = lReclassifyLanduses
+                Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
+                .Landuses = lReclassifyLanduses
+
+                'todo, add shapefile options
             End If
 
             lblStatus.Text = "Writing SWMM INP file"
