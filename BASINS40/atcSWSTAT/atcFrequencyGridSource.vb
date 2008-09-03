@@ -20,9 +20,7 @@ Friend Class atcFrequencyGridSource
         MyBase.ColorCells = True
         For Each lData As atcDataSet In pDataGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
-                Debug.WriteLine(lAttribute.Definition.Name)
-
-                If lAttribute.Arguments IsNot Nothing Then
+                If Not lAttribute.Arguments Is Nothing Then
                     If lAttribute.Arguments.ContainsAttribute("Nday") Then
                         Dim lNdays As String = lAttribute.Arguments.GetFormattedValue("Nday")
                         lKey = Format(lAttribute.Arguments.GetValue("Nday"), "00000.0000")
@@ -356,12 +354,32 @@ Friend Class atcFrequencyGridSource
                     lRept.AppendLine()
                     lRept.AppendLine()
                     If pHigh Then
-                        lRept.AppendLine("        Exceedance        Recurrence        Parameter")
+                        If lNumZero > 0 Then
+                            lRept.AppendLine("                                                           Adjusted     Ajusted ")
+                            lRept.AppendLine("        Exceedance        Recurrence        Parameter     Exceedence   Parameter")
+                            lRept.AppendLine("        Probability        Interval           Value     Probability     Value")
+                            lRept.AppendLine("        -----------       ----------        ---------   ------------  -----------")
+                        Else
+                            lRept.AppendLine("        Exceedance        Recurrence        Parameter")
+                            lRept.AppendLine("        Probability        Interval           Value  ")
+                            lRept.AppendLine("        -----------       ----------        ---------")
+                        End If
                     Else
-                        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
+                        If lNumZero > 0 Then
+                            lRept.AppendLine("                                                        Adjusted Non-   Adjusted ")
+                            lRept.AppendLine("       Non-exceedance     Recurrence        Parameter     Exceedence   Parameter")
+                            lRept.AppendLine("        Probability        Interval           Value      Probability     Value")
+                            lRept.AppendLine("        -----------       ----------        ----------  ------------- -----------")
+                        Else
+                            lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
+                            lRept.AppendLine("        Probability        Interval           Value  ")
+                            lRept.AppendLine("        -----------       ----------        ---------")
+                        End If
+
                     End If
-                    lRept.AppendLine("        Probability        Interval           Value  ")
-                    lRept.AppendLine("        -----------       ----------        ---------")
+
+                    'lRept.AppendLine("        Probability        Interval           Value  ")
+                    'lRept.AppendLine("        -----------       ----------        ---------")
 
                     'For Each lRecurrenceKey As String In pRecurrence.Keys
                     '    Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
@@ -371,7 +389,7 @@ Friend Class atcFrequencyGridSource
                     '    lStr = DoubleToString(lNyears, , "0.00")
                     '    lRept.Append(lStr.PadLeft(17))
                     '    lStr = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
-                    '    lRept.AppendLine(lStr.PadLeft(17))                        
+                    '    lRept.AppendLine(lStr.PadLeft(17))
                     'Next
 
                     Dim lReverseString As String = ""

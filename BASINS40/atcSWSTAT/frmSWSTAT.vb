@@ -991,7 +991,7 @@ Friend Class frmSWSTAT
         Else
             pLastYear = 0
         End If
-
+        SaveSettings()
     End Sub
 
     Private Sub ShowCustomYears(ByVal aShowCustom As Boolean)
@@ -1181,7 +1181,6 @@ Friend Class frmSWSTAT
                         .IncludeMinutes = False
                         .IncludeMonths = False
                     End With
-                    SeasonsYearsFromForm()
                     lList.Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
                     lList.Initialize(lHiLow.DataSets, pNDayAttributes, True, , )
 
@@ -1256,6 +1255,7 @@ Friend Class frmSWSTAT
 
     Private Sub Calculate(ByVal aOperationName As String)
         ClearAttributes()
+        SeasonsYearsFromForm()
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lArgs As New atcDataAttributes
         lArgs.SetValue("Timeseries", pDataGroup)
@@ -1271,6 +1271,9 @@ Friend Class frmSWSTAT
 
         lCalculator.Open(aOperationName, lArgs)
         lCalculator.DataSets.Clear()
+    End Sub
+
+    Private Sub SaveSettings()
         Dim lName As String = HighOrLowString()
         SaveSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
         SaveSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
@@ -1413,7 +1416,6 @@ Friend Class frmSWSTAT
                     For Each lTS As atcTimeseries In lHiLow.DataSets
                         lTS.Attributes.SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
                     Next
-                    SeasonsYearsFromForm()
                     lList.Initialize(lHiLow.DataSets, pTrendAttributes, False)
                     lList.SwapRowsColumns = True
                 End If
@@ -1430,10 +1432,10 @@ Friend Class frmSWSTAT
 
     Private Sub btnDoFrequency_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequency.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        SeasonsYearsFromForm()
         Calculate("n-day " & HighOrLowString() & " value")
         Me.Cursor = System.Windows.Forms.Cursors.Default
-        Dim lFreqForm As New frmDisplayFrequencyGrid(SelectedData, radioHigh.Checked)
+
+        Dim lFreqForm As New frmDisplayFrequencyGrid(pDataGroup, radioHigh.Checked)
     End Sub
 
     Private Sub cboYears_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboYears.SelectedIndexChanged

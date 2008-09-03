@@ -420,14 +420,40 @@ Public Class atcTimeseriesNdayHighLow
         Dim lTsMath As atcDataSource = Nothing
         Dim lQ As Double
         Dim lMsg As String = ""
+        Dim lStartedWithNdayTS As Boolean = False
 
         Dim lRecurOrProb() As Double = Obj2Array(aRecurOrProb)
 
         Try
-            If aTimeseries.Attributes.GetValue("Tu", 1) = 6 AndAlso _
-               aHigh = aTimeseries.Attributes.GetValue("HighFlag", True) AndAlso _
-               aNDay = aTimeseries.Attributes.GetValue("NDay", GetNaN) Then
-                aNdayTsGroup = New atcDataGroup(aTimeseries)
+            If aTimeseries.Attributes.GetValue("Tu", 1) = atcTimeUnit.TUYear Then
+                Dim lHigh As Boolean
+                If aTimeseries.Attributes.ContainsAttribute("HighFlag") Then
+                    lHigh = aTimeseries.Attributes.GetValue("HighFlag")
+                ElseIf aTimeseries.Attributes.ContainsAttribute("TSTYPE") Then
+                    lHigh = (aTimeseries.Attributes.GetValue("TSTYPE").ToString.Substring(0, 1) = "H")
+                Else
+                    lHigh = (aTimeseries.Attributes.GetValue("Constituent").ToString.Substring(0, 1) = "H")
+                End If
+                If lHigh = aHigh Then
+                    Dim lNday As Double = 0
+                    If aTimeseries.Attributes.ContainsAttribute("NDay") Then
+                        lNday = aTimeseries.Attributes.GetValue("NDay")
+                    ElseIf aTimeseries.Attributes.ContainsAttribute("TSTYPE") Then
+                        lNday = CInt(aTimeseries.Attributes.GetValue("TSTYPE").ToString.Substring(1))
+                    Else
+                        lNday = CInt(aTimeseries.Attributes.GetValue("Constituent").ToString.Substring(1))
+                    End If
+                    Dim lAllNDay() As Double = Obj2Array(aNDay)
+                    If Array.IndexOf(lAllNDay, lNday) >= 0 Then
+                        ReDim lAllNDay(0)
+                        lAllNDay(0) = lNday
+                        aNDay = lAllNDay
+                        aTimeseries.Attributes.SetValue("HighFlag", lHigh)
+                        aTimeseries.Attributes.SetValue("NDay", lNday)
+                        aNdayTsGroup = New atcDataGroup(aTimeseries)
+                        lStartedWithNdayTS = True
+                    End If
+                End If
             End If
         Catch ex As Exception
 
@@ -445,8 +471,10 @@ Public Class atcTimeseriesNdayHighLow
                     lTsMath = New atcTimeseriesMath.atcTimeseriesMath
                     lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
                     lTsMath.Open("log 10", lArgsMath)
-                    'Save non-log timeseries
-                    lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNdayTs)
+                    If Not lStartedWithNdayTS Then
+                        'Save non-log timeseries
+                        lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNdayTs)
+                    End If
                     lNdayTs = lTsMath.DataSets(0)
                     'Set log-specific attributes
                     lNdayTs.Attributes.SetValue("MEANDD", lNdayTs.Attributes.GetValue("Mean"))
@@ -506,7 +534,7 @@ Public Class atcTimeseriesNdayHighLow
                     Dim lArguments As New atcDataAttributes
                     lArguments.SetValue("Nday", lNday)
                     lArguments.SetValue("Return Period", lRecurOrProbNow)
-                    lArguments.SetValue("NDayTimeseries", lNdayTs)
+                    If Not lStartedWithNdayTS Then lArguments.SetValue("NDayTimeseries", lNdayTs)
 
                     aAttributesStorage.SetValue(lNewAttribute, lQ, lArguments)
 
@@ -643,7 +671,11 @@ Public Class atcTimeseriesNdayHighLow
 
         For Each lTs In ltsGroup
             Dim lNDayTsGroup As atcDataGroup = Nothing 'atcTimeseries
-            lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear, lEndMonth, lEndDay)
+            If lTs.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
+                lTsB = lTs
+            Else
+                lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear, lEndMonth, lEndDay)
+            End If
             Select Case lOperationName
                 Case "n-day low value", "n-day high value"
                     ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes, lNDayTsGroup, lEndMonth, lEndDay)
