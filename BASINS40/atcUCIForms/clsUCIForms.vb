@@ -8,7 +8,7 @@ Public Class UCIForms
 
     Public Shared Function Edit(ByVal aParent As Windows.Forms.Form, _
                                 ByVal aObject As Object, Optional ByVal aTag As String = "") As Boolean
-        Dim lForm As Windows.Forms.Form
+        Dim lForm As Windows.Forms.Form = Nothing
 
         Select Case aObject.GetType.Name
             Case "HspfFilesBlk"
@@ -61,12 +61,31 @@ Public Class UCIForms
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
             Case "HspfTable"
-                Dim lFormEdit As New frmEdit(aParent)
-                Dim lEditTable As New ctlEditTable(aObject, aParent)
-                lFormEdit.Text = lEditTable.Caption
-                lFormEdit.EditControl = lEditTable
-                lFormEdit.AddRemoveFlag = False
-                lForm = lFormEdit
+                Dim lMsgResponse As MsgBoxResult = MsgBoxResult.No
+                If aObject.Name = "PWAT-PARM1" Or aObject.Name = "IWAT-PARM1" Or aObject.Name = "HYDR-PARM1" Then
+                    'choose regular or deluxe version to edit
+                    lMsgResponse = Logger.Msg("Do you want to edit using the enhanced interface for this table?", MsgBoxStyle.YesNo, aObject.Name & " Edit Option")
+                End If
+                If lMsgResponse = MsgBoxResult.Yes Then
+                    If aObject.Name = "PWAT-PARM1" Then
+                        '    frmPwatEdit.init(Me, Me.Opn.Uci.icon)
+                        '    frmPwatEdit.Show(vbModal)
+                    ElseIf aObject.Name = "IWAT-PARM1" Then
+                        '    frmIwatEdit.init(Me, Me.Opn.Uci.icon)
+                        '    frmIwatEdit.Show(vbModal)
+                    ElseIf aObject.Name = "HYDR-PARM1" Then
+                        '    frmHydrEdit.init(Me, Me.Opn.Uci.icon)
+                        '    frmHydrEdit.Show(vbModal)
+                    End If
+                    lForm = Nothing
+                Else
+                    Dim lFormEdit As New frmEdit(aParent)
+                    Dim lEditTable As New ctlEditTable(aObject, aParent)
+                    lFormEdit.Text = lEditTable.Caption
+                    lFormEdit.EditControl = lEditTable
+                    lFormEdit.AddRemoveFlag = False
+                    lForm = lFormEdit
+                End If
             Case "HspfMassLink"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditMassLinks As New ctlEditMassLinks(aObject, aParent, aTag)
