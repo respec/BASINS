@@ -2,15 +2,16 @@ Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcUtility
+Imports atcSegmentation
 Imports atcControls
 Imports System.Collections.ObjectModel
 Imports System.IO
 
 Public Class frmXSect
 
-    Dim CurrentReach As Integer
-    Dim lCurrentFTab As HspfTable
-    Dim pUci As HspfUci
+    Dim pCurrentReachNum As Integer
+    Dim pCurrentFTab As HspfFtable
+    Dim pHspfFTable As HspfFtable
     Private FileName As String
     Dim chanid$(), ChanL!(), ChanYm!(), ChanWm!(), ChanN!(), ChanS!()
     Dim ChanM11!(), ChanM12!(), ChanYc!(), ChanM21!(), ChanM22!()
@@ -102,12 +103,10 @@ Public Class frmXSect
         '        ret = 3
     End Sub
 
-    Public Sub GetPTFData(ByVal RCHId As String, ByVal ArrayVals() As Single)
-        Dim ChanRecCnt As Integer
+    Public Sub GetPTFData(ByVal RCHId As String, ByVal ChanRecCnt As Integer, ByRef ArrayVals() As Single)
         Dim lOper As Integer
         Dim Id As String
 
-        ChanRecCnt = 0
         lOper = Len(RCHId)
         If lOper > 0 Then  'have a reach id
             Id = CInt(RCHId)
@@ -133,28 +132,30 @@ Public Class frmXSect
             Next
         End If
     End Sub
-    'Private Sub cboXFile_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboXFile.SelectedIndexChanged
-    '    Dim ArrayVals(16) As Single
-    '    Call GetPTFData(cboXFile.Text, ArrayVals)
-    '    With agdXSect.Source
-    '        .CellValue(1, 2) = ArrayVals(1)
-    '        .CellValue(2, 2) = ArrayVals(2)
-    '        .CellValue(3, 2) = ArrayVals(3)
-    '        .CellValue(4, 2) = ArrayVals(4)
-    '        .CellValue(5, 2) = ArrayVals(5)
-    '        .CellValue(6, 2) = ArrayVals(6)
-    '        .CellValue(7, 2) = ArrayVals(7)
-    '        .CellValue(8, 2) = ArrayVals(8)
-    '        .CellValue(9, 2) = ArrayVals(9)
-    '        .CellValue(10, 2) = ArrayVals(10)
-    '        .CellValue(11, 2) = ArrayVals(11)
-    '        .CellValue(12, 2) = ArrayVals(12)
-    '        .CellValue(13, 2) = ArrayVals(13)
-    '        .CellValue(14, 2) = ArrayVals(14)
-    '        .CellValue(15, 2) = ArrayVals(15)
-    '        .CellValue(16, 2) = ArrayVals(16)
-    '    End With
-    'End Sub
+   
+    Public Sub cboXFile_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboXFile.SelectedIndexChanged
+        Dim ArrayVals(16) As Single
+        GetPTFData(cboXFile.Text, ChanRecCnt, ArrayVals)
+        With agdXSect.Source
+            .CellValue(1, 2) = ArrayVals(1)
+            .CellValue(2, 2) = ArrayVals(2)
+            .CellValue(3, 2) = ArrayVals(3)
+            .CellValue(4, 2) = ArrayVals(4)
+            .CellValue(5, 2) = ArrayVals(5)
+            .CellValue(6, 2) = ArrayVals(6)
+            .CellValue(7, 2) = ArrayVals(7)
+            .CellValue(8, 2) = ArrayVals(8)
+            .CellValue(9, 2) = ArrayVals(9)
+            .CellValue(10, 2) = ArrayVals(10)
+            .CellValue(11, 2) = ArrayVals(11)
+            .CellValue(12, 2) = ArrayVals(12)
+            .CellValue(13, 2) = ArrayVals(13)
+            .CellValue(14, 2) = ArrayVals(14)
+            .CellValue(15, 2) = ArrayVals(15)
+            .CellValue(16, 2) = ArrayVals(16)
+        End With
+        agdXSect.Refresh()
+    End Sub
     Public Sub GetPTFFileIds(ByRef cnt As Integer, ByRef ArrayIds() As String)
         Dim lOper As Integer
 
@@ -166,7 +167,7 @@ Public Class frmXSect
     End Sub
     
 
-    Private Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpen.Click
+    Public Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpen.Click
         Dim ret&, ArrayIds$(), cnt&, lOper&
         Dim lStream As Stream = Nothing
         ArrayIds = New String() {}
@@ -189,157 +190,228 @@ Public Class frmXSect
             Next
             cboXFile.SelectedIndex = 0
         End If
+
     End Sub
 
-    '    Private Sub cmdSave_Click()
-    '        Dim ArrayVals!(16)
+    'Private Sub cmdXSect_Click(ByVal Index As Integer)
+    '    Dim l!, ym!, wm!, n!, s!, m32!, m22!, w12!
+    '    Dim m12!, m11!, w11!, m21!, m31!, yc!, yt1!, yt2!
 
-    '        CDFile.flags = &H8806&
-    '        CDFile.Filter = "BASINS Trapezoidal Files (*.ptf)|*.ptf"
-    '        CDFile.FileName = "*.ptf"
-    '        CDFile.DialogTitle = "Save Cross Section Specifications"
-    '        On Error GoTo 10
-    '        CDFile.CancelError = True
-    '        CDFile.Action = 2
+    '    If Index = 0 Then
+    '        'okay
     '        With agdXSect
-    '            ArrayVals(1) = .CellValue(1, 2)
-    '            ArrayVals(2) = .CellValue(2, 2)
-    '            ArrayVals(3) = .CellValue(3, 2)
-    '            ArrayVals(4) = .CellValue(4, 2)
-    '            ArrayVals(5) = .CellValue(5, 2)
-    '            ArrayVals(6) = .CellValue(6, 2)
-    '            ArrayVals(7) = .CellValue(7, 2)
-    '            ArrayVals(8) = .CellValue(8, 2)
-    '            ArrayVals(9) = .CellValue(9, 2)
-    '            ArrayVals(10) = .CellValue(10, 2)
-    '            ArrayVals(11) = .CellValue(11, 2)
-    '            ArrayVals(12) = .CellValue(12, 2)
-    '            ArrayVals(13) = .CellValue(13, 2)
-    '            ArrayVals(14) = .CellValue(14, 2)
-    '            ArrayVals(15) = .CellValue(15, 2)
-    '            ArrayVals(16) = .CellValue(16, 2)
+    '            l = .CellValue(1, 2)
+    '            ym = .CellValue(2, 2)
+    '            wm = .CellValue(3, 2)
+    '            n = .CellValue(4, 2)
+    '            s = .CellValue(5, 2)
+    '            m32 = .CellValue(6, 2)
+    '            m22 = .CellValue(7, 2)
+    '            w12 = .CellValue(8, 2)
+    '            m12 = .CellValue(9, 2)
+    '            m11 = .CellValue(10, 2)
+    '            w11 = .CellValue(11, 2)
+    '            m21 = .CellValue(12, 2)
+    '            m31 = .CellValue(13, 2)
+    '            yc = .CellValue(14, 2)
+    '            yt1 = .CellValue(15, 2)
+    '            yt2 = .CellValue(16, 2)
+    '            curftab.FTableFromCrossSect(l, ym, wm, n, s, m11, m12, yc, m21, _
+    '                           m22, yt1, yt2, m31, m32, w11, w12)
     '        End With
-    '        Call WritePTFFile(CDFile.FileName, 1, ArrayVals)
-    '10:     'continue here on cancel
-    '    End Sub
+    '        Unload(Me)
+    '    ElseIf Index = 1 Then
+    '        'cancel
+    '        Unload(Me)
+    '    Else
+    '        Dim d As HH_AKLINK, h$
+    '        d.pszKeywords = "Reach Editor"
+    '        d.fReserved = vbFalse
+    '        d.cbStruct = LenB(d)
+    '        HtmlHelp(Me.hwnd, App.HelpFile, HH_KEYWORD_LOOKUP, d)
+    '    End If
+    'End Sub
 
-    '    Private Sub cmdXSect_Click(ByVal Index As Integer)
-    '        Dim l!, ym!, wm!, n!, s!, m32!, m22!, w12!
-    '        Dim m12!, m11!, w11!, m21!, m31!, yc!, yt1!, yt2!
-
-    '        If Index = 0 Then
-    '            'okay
-    '            With agdXSect
-    '                l = .CellValue(1, 2)
-    '                ym = .CellValue(2, 2)
-    '                wm = .CellValue(3, 2)
-    '                n = .CellValue(4, 2)
-    '                s = .CellValue(5, 2)
-    '                m32 = .CellValue(6, 2)
-    '                m22 = .CellValue(7, 2)
-    '                w12 = .CellValue(8, 2)
-    '                m12 = .CellValue(9, 2)
-    '                m11 = .CellValue(10, 2)
-    '                w11 = .CellValue(11, 2)
-    '                m21 = .CellValue(12, 2)
-    '                m31 = .CellValue(13, 2)
-    '                yc = .CellValue(14, 2)
-    '                yt1 = .CellValue(15, 2)
-    '                yt2 = .CellValue(16, 2)
-    '                curftab.FTableFromCrossSect(l, ym, wm, n, s, m11, m12, yc, m21, _
-    '                               m22, yt1, yt2, m31, m32, w11, w12)
-    '            End With
-    '            Unload(Me)
-    '        ElseIf Index = 1 Then
-    '            'cancel
-    '            Unload(Me)
-    '        Else
-    '            Dim d As HH_AKLINK, h$
-    '            d.pszKeywords = "Reach Editor"
-    '            d.fReserved = vbFalse
-    '            d.cbStruct = LenB(d)
-    '            HtmlHelp(Me.hwnd, App.HelpFile, HH_KEYWORD_LOOKUP, d)
-    '        End If
-    '    End Sub
-
-    '    Private Sub Form_Load()
-    '        Dim i&
-    '        With agdXSect
-    '            .cols = 3
-    '            .FixedCols = 2
-    '            .CellValue(0, 0) = "Variable"
-    '            .CellValue(0, 1) = "Description"
-    '            .CellValue(0, 2) = "Value"
-    '            .CellValue(1, 0) = "L"
-    '            .CellValue(2, 0) = "Ym"
-    '            .CellValue(3, 0) = "Wm"
-    '            .CellValue(4, 0) = "n"
-    '            .CellValue(5, 0) = "S"
-    '            .CellValue(6, 0) = "m32"
-    '            .CellValue(7, 0) = "m22"
-    '            .CellValue(8, 0) = "W12"
-    '            .CellValue(9, 0) = "m12"
-    '            .CellValue(10, 0) = "m11"
-    '            .CellValue(11, 0) = "W11"
-    '            .CellValue(12, 0) = "m21"
-    '            .CellValue(13, 0) = "m31"
-    '            .CellValue(14, 0) = "Yc"
-    '            .CellValue(15, 0) = "Yt1"
-    '            .CellValue(16, 0) = "Yt2"
-    '            For i = 1 To 16
-    '                .CellValue(i, 2) = 0.01
-    '                .ColType(2) = ATCoSng
-    '                .ColMin(2) = 0.00001
-    '            Next i
-    '            .CellValue(1, 1) = "Length (ft)"
-    '            .CellValue(2, 1) = "Mean Depth (ft)"
-    '            .CellValue(3, 1) = "Mean Width (ft)"
-    '            .CellValue(4, 1) = "Mannings Roughness Coefficient"
-    '            .CellValue(5, 1) = "Longitudinal Slope"
-    '            .CellValue(6, 1) = "Side Slope of Upper Flood Plain Left"
-    '            .CellValue(7, 1) = "Side Slope of Lower Flood Plain Left"
-    '            .CellValue(8, 1) = "Zero Slope Flood Plain Width Left (ft)"
-    '            .CellValue(9, 1) = "Side Slope of Channel Left"
-    '            .CellValue(10, 1) = "Side Slope of Channel Right"
-    '            .CellValue(11, 1) = "Zero Slope Flood Plain Width Right (ft)"
-    '            .CellValue(12, 1) = "Side Slope Lower Flood Plain Right"
-    '            .CellValue(13, 1) = "Side Slope Upper Flood Plain Right"
-    '            .CellValue(14, 1) = "Channel Depth (ft)"
-    '            .CellValue(15, 1) = "Flood Side Slope Change at Depth (ft)"
-    '            .CellValue(16, 1) = "Maximum Depth (ft)"
-    '            .ColEditable(2) = True
-    '            .ColsSizeByContents()
-    '        End With
-    '    End Sub
-
-    '    Public Sub CurrentReach(ByVal r&, ByVal ftab As HspfFtable)
-    '        currch = r
-    '        curftab = ftab
-    '        agdXSect.Header = "FTABLE " & CStr(currch)
-    '    End Sub
-
-    '    Private Sub Form_Resize()
-    '        If Not (Me.WindowState = vbMinimized) Then
-    '            If Width < 1500 Then Width = 1500
-    '            If Height < 1500 Then Height = 1500
-    '            agdXSect.Width = Width - 500
-    '            fraXFile.Width = Width - 500
-    '            cmdOpen.Left = 200
-    '            cmdSave.Left = fraXFile.Width - cmdSave.Width - 200
-    '            cboXFile.Left = (fraXFile.Width - cboXFile.Width) / 2
-    '            cmdXSect(0).Left = agdXSect.Left + (agdXSect.Width / 2) - (1.5 * cmdXSect(0).Width) - 400
-    '            cmdXSect(4).Left = agdXSect.Left + (agdXSect.Width / 2) + (0.5 * cmdXSect(0).Width) + 400
-    '            cmdXSect(1).Left = agdXSect.Left + (agdXSect.Width / 2) - (0.5 * cmdXSect(1).Width)
-    '            agdXSect.Height = Height - (4 * cmdXSect(1).Height) + 50
-    '            cmdXSect(1).Top = Height - agdXSect.Top - cmdXSect(1).Height - 200 + fraXFile.Height
-    '            cmdXSect(0).Top = Height - agdXSect.Top - cmdXSect(0).Height - 200 + fraXFile.Height
-    '            cmdXSect(4).Top = Height - agdXSect.Top - cmdXSect(4).Height - 200 + fraXFile.Height
-    '        End If
-    '    End Sub
-    Friend Sub Init(ByVal aCtl As ctlEditFTables)
-        Me.Icon = aCtl.ParentForm.Icon
+    Private Sub Form_Load()
+        Dim lRow, lCol As Integer
+        '.net converstion: Disable and fill file combo box with text indicating that file should be loaded
         cboXFile.Text = "<Select A File> "
         cboXFile.Enabled = False
+
+        '.net conversion: Initialize and populate the table
+        With agdXSect
+            .Source = New atcControls.atcGridSource
+            .Clear()
+            .AllowHorizontalScrolling = False
+            .AllowNewValidValues = True
+            .Visible = True
+            .ColumnWidth(0) = 75
+            .ColumnWidth(1) = 300
+            .ColumnWidth(2) = 75
+        End With
+
+        With agdXSect.Source
+            .Columns = 3
+            .CellValue(0, 0) = "Variable"
+            .CellValue(0, 1) = "Description"
+            .CellValue(0, 2) = "Value"
+            .CellValue(1, 0) = "L"
+            .CellValue(2, 0) = "Ym"
+            .CellValue(3, 0) = "Wm"
+            .CellValue(4, 0) = "n"
+            .CellValue(5, 0) = "S"
+            .CellValue(6, 0) = "m32"
+            .CellValue(7, 0) = "m22"
+            .CellValue(8, 0) = "W12"
+            .CellValue(9, 0) = "m12"
+            .CellValue(10, 0) = "m11"
+            .CellValue(11, 0) = "W11"
+            .CellValue(12, 0) = "m21"
+            .CellValue(13, 0) = "m31"
+            .CellValue(14, 0) = "Yc"
+            .CellValue(15, 0) = "Yt1"
+            .CellValue(16, 0) = "Yt2"
+            For lRow = 1 To 16
+                .CellValue(lRow, 2) = 0.01
+            Next
+            .CellValue(1, 1) = "Length (ft)"
+            .CellValue(2, 1) = "Mean Depth (ft)"
+            .CellValue(3, 1) = "Mean Width (ft)"
+            .CellValue(4, 1) = "Mannings Roughness Coefficient"
+            .CellValue(5, 1) = "Longitudinal Slope"
+            .CellValue(6, 1) = "Side Slope of Upper Flood Plain Left"
+            .CellValue(7, 1) = "Side Slope of Lower Flood Plain Left"
+            .CellValue(8, 1) = "Zero Slope Flood Plain Width Left (ft)"
+            .CellValue(9, 1) = "Side Slope of Channel Left"
+            .CellValue(10, 1) = "Side Slope of Channel Right"
+            .CellValue(11, 1) = "Zero Slope Flood Plain Width Right (ft)"
+            .CellValue(12, 1) = "Side Slope Lower Flood Plain Right"
+            .CellValue(13, 1) = "Side Slope Upper Flood Plain Right"
+            .CellValue(14, 1) = "Channel Depth (ft)"
+            .CellValue(15, 1) = "Flood Side Slope Change at Depth (ft)"
+            .CellValue(16, 1) = "Maximum Depth (ft)"
+
+            For lCol = 0 To 1
+                For lRow = 0 To .Rows - 1
+                    .CellColor(lRow, lCol) = SystemColors.ControlLight
+
+                Next
+            Next
+            .CellColor(0, 2) = SystemColors.ControlLight
+        End With
+        agdXSect.Refresh()
+
     End Sub
 
+    Public Sub CurrentReach(ByVal lReach As Integer, ByVal lFtab As HspfFtable)
+        pCurrentReachNum = lReach
+        pCurrentFTab = lFtab
+        agdXSectTitle.Text = "FTABLE " & CStr(pCurrentReachNum)
+    End Sub
+
+    Friend Sub Init(ByVal aHspfFTable As HspfFtable, ByVal aCtl As ctlEditFTables)
+        Me.Icon = aCtl.ParentForm.Icon
+        pHspfFTable = aHspfFTable
+        Form_Load()
+    End Sub
+
+    Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+        Dim pChannel As New atcSegmentation.Channel
+
+
+        With agdXSect.Source
+            pChannel.Length = .CellValue(1, 2)
+            pChannel.DepthMean = .CellValue(2, 2)
+            pChannel.WidthMean = .CellValue(3, 2)
+            pChannel.ManningN = .CellValue(4, 2)
+            pChannel.SlopeProfile = .CellValue(5, 2)
+            pChannel.SlopeSideUpperFPLeft = .CellValue(6, 2)
+            pChannel.SlopeSideLowerFPLeft = .CellValue(7, 2)
+            pChannel.WidthZeroSlopeLeft = .CellValue(8, 2)
+            pChannel.SlopeSideLeft = .CellValue(9, 2)
+            pChannel.SlopeSideRight = .CellValue(10, 2)
+            pChannel.WidthZeroSlopeRight = .CellValue(11, 2)
+            pChannel.SlopeSideLowerFPRight = .CellValue(12, 2)
+            pChannel.SlopeSideUpperFPRight = .CellValue(13, 2)
+            pChannel.DepthChannel = .CellValue(14, 2)
+            pChannel.DepthSlopeChange = .CellValue(15, 2)
+            pChannel.DepthMax = .CellValue(16, 2)
+            pHspfFTable.FTableFromCrossSect(pChannel)
+        End With
+        Me.Close()
+    End Sub
+
+    Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
+        Dim ArrayVals!(16)
+        Dim lFileStream As Stream
+        Dim lStr As String
+        Dim lFreeFile As Integer
+
+        'CDFile.flags = &H8806&
+        SaveFileDialog1.Filter = "BASINS Trapezoidal Files (*.ptf)|*.ptf"
+        SaveFileDialog1.FileName = "*.ptf"
+        SaveFileDialog1.Title = "Save Cross Section Specifications"
+        'On Error GoTo 10
+        'CDFile.CancelError = True
+        'CDFile.Action = 2
+        With agdXSect.Source
+            ArrayVals(1) = .CellValue(1, 2)
+            ArrayVals(2) = .CellValue(2, 2)
+            ArrayVals(3) = .CellValue(3, 2)
+            ArrayVals(4) = .CellValue(4, 2)
+            ArrayVals(5) = .CellValue(5, 2)
+            ArrayVals(6) = .CellValue(6, 2)
+            ArrayVals(7) = .CellValue(7, 2)
+            ArrayVals(8) = .CellValue(8, 2)
+            ArrayVals(9) = .CellValue(9, 2)
+            ArrayVals(10) = .CellValue(10, 2)
+            ArrayVals(11) = .CellValue(11, 2)
+            ArrayVals(12) = .CellValue(12, 2)
+            ArrayVals(13) = .CellValue(13, 2)
+            ArrayVals(14) = .CellValue(14, 2)
+            ArrayVals(15) = .CellValue(15, 2)
+            ArrayVals(16) = .CellValue(16, 2)
+        End With
+
+        '10:     'continue here on cancel
+
+        lFileStream = SaveFileDialog1.OpenFile()
+        lFreeFile = FreeFile()
+        '.net conversion: NOTE!!!! VB6 version always called below code with chanid=1
+        If Not (lFileStream Is Nothing) Then
+            If Len(chanid) > 0 Then  'have a reach id
+                lstr = "'Reach Number','Length(ft)','Mean Depth(ft)','Mean Width (ft)'," & _
+                       "'Mannings Roughness Coeff.','Long. Slope','Type of x-section','Side slope of upper FP left'," & _
+                       "'Side slope of lower FP left','Zero slope FP width left(ft)','Side slope of channel left'," & _
+                       "'Side slope of channel right','Zero slope FP width right(ft)','Side slope lower FP right'," & _
+                       "'Side slope upper FP right','Channel Depth(ft)','Flood side slope change at depth','Max. depth'," & _
+                       "'No. of exits','Fraction of flow through exit 1','Fraction of flow through exit 2'," & _
+                       "'Fraction of flow through exit 3','Fraction of flow through exit 4','Fraction of flow through exit 5'"
+                Print(lFreeFile, lStr)  'header line
+                lStr = "1" & " " & _
+                      ArrayVals(1) & " " & _
+                      ArrayVals(2) & " " & _
+                      ArrayVals(3) & " " & _
+                      ArrayVals(4) & " " & _
+                      ArrayVals(5) & " " & _
+                      "Trapezoidal" & " " & _
+                      ArrayVals(13) & " " & _
+                      ArrayVals(12) & " " & _
+                      ArrayVals(11) & " " & _
+                      ArrayVals(10) & " " & _
+                      ArrayVals(9) & " " & _
+                      ArrayVals(8) & " " & _
+                      ArrayVals(7) & " " & _
+                      ArrayVals(6) & " " & _
+                      ArrayVals(14) & " " & _
+                      ArrayVals(15) & " " & _
+                      ArrayVals(16) & " " & _
+                      "1 1 0 0 0 0"
+                Print(lFreeFile, lStr)
+                Exit Sub
+            End If
+            lFileStream.Close()
+        End If
+
+    End Sub
 End Class

@@ -21,14 +21,15 @@ Partial Class frmXSect
     Private Sub InitializeComponent()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.cboXFile = New System.Windows.Forms.ComboBox
-        Me.Button2 = New System.Windows.Forms.Button
+        Me.cmdSave = New System.Windows.Forms.Button
         Me.cmdOpen = New System.Windows.Forms.Button
-        Me.Button3 = New System.Windows.Forms.Button
-        Me.Button4 = New System.Windows.Forms.Button
-        Me.Button5 = New System.Windows.Forms.Button
-        Me.Label1 = New System.Windows.Forms.Label
+        Me.cmdOK = New System.Windows.Forms.Button
+        Me.cmdCancel = New System.Windows.Forms.Button
+        Me.cmdHelp = New System.Windows.Forms.Button
+        Me.agdXSectTitle = New System.Windows.Forms.Label
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.agdXSect = New atcControls.atcGrid
+        Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -37,11 +38,11 @@ Partial Class frmXSect
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.cboXFile)
-        Me.GroupBox1.Controls.Add(Me.Button2)
+        Me.GroupBox1.Controls.Add(Me.cmdSave)
         Me.GroupBox1.Controls.Add(Me.cmdOpen)
         Me.GroupBox1.Location = New System.Drawing.Point(18, 16)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(432, 67)
+        Me.GroupBox1.Size = New System.Drawing.Size(444, 67)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Cross-Section Files"
@@ -50,20 +51,20 @@ Partial Class frmXSect
         '
         Me.cboXFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom), System.Windows.Forms.AnchorStyles)
         Me.cboXFile.FormattingEnabled = True
-        Me.cboXFile.Location = New System.Drawing.Point(155, 29)
+        Me.cboXFile.Location = New System.Drawing.Point(161, 29)
         Me.cboXFile.Name = "cboXFile"
         Me.cboXFile.Size = New System.Drawing.Size(123, 21)
         Me.cboXFile.TabIndex = 2
         '
-        'Button2
+        'cmdSave
         '
-        Me.Button2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button2.Location = New System.Drawing.Point(327, 27)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(85, 25)
-        Me.Button2.TabIndex = 1
-        Me.Button2.Text = "Save"
-        Me.Button2.UseVisualStyleBackColor = True
+        Me.cmdSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSave.Location = New System.Drawing.Point(339, 27)
+        Me.cmdSave.Name = "cmdSave"
+        Me.cmdSave.Size = New System.Drawing.Size(85, 25)
+        Me.cmdSave.TabIndex = 1
+        Me.cmdSave.Text = "Save"
+        Me.cmdSave.UseVisualStyleBackColor = True
         '
         'cmdOpen
         '
@@ -74,44 +75,43 @@ Partial Class frmXSect
         Me.cmdOpen.Text = "Open"
         Me.cmdOpen.UseVisualStyleBackColor = True
         '
-        'Button3
+        'cmdOK
         '
-        Me.Button3.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button3.Location = New System.Drawing.Point(80, 487)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(85, 25)
-        Me.Button3.TabIndex = 3
-        Me.Button3.Text = "OK"
-        Me.Button3.UseVisualStyleBackColor = True
+        Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdOK.Location = New System.Drawing.Point(86, 499)
+        Me.cmdOK.Name = "cmdOK"
+        Me.cmdOK.Size = New System.Drawing.Size(85, 25)
+        Me.cmdOK.TabIndex = 3
+        Me.cmdOK.Text = "OK"
+        Me.cmdOK.UseVisualStyleBackColor = True
         '
-        'Button4
+        'cmdCancel
         '
-        Me.Button4.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button4.Location = New System.Drawing.Point(192, 487)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(85, 25)
-        Me.Button4.TabIndex = 4
-        Me.Button4.Text = "Cancel"
-        Me.Button4.UseVisualStyleBackColor = True
+        Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdCancel.Location = New System.Drawing.Point(198, 499)
+        Me.cmdCancel.Name = "cmdCancel"
+        Me.cmdCancel.Size = New System.Drawing.Size(85, 25)
+        Me.cmdCancel.TabIndex = 4
+        Me.cmdCancel.Text = "Cancel"
+        Me.cmdCancel.UseVisualStyleBackColor = True
         '
-        'Button5
+        'cmdHelp
         '
-        Me.Button5.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button5.Location = New System.Drawing.Point(304, 487)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(85, 25)
-        Me.Button5.TabIndex = 5
-        Me.Button5.Text = "Help"
-        Me.Button5.UseVisualStyleBackColor = True
+        Me.cmdHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdHelp.Location = New System.Drawing.Point(310, 499)
+        Me.cmdHelp.Name = "cmdHelp"
+        Me.cmdHelp.Size = New System.Drawing.Size(85, 25)
+        Me.cmdHelp.TabIndex = 5
+        Me.cmdHelp.Text = "Help"
+        Me.cmdHelp.UseVisualStyleBackColor = True
         '
-        'Label1
+        'agdXSectTitle
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(15, 98)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(56, 13)
-        Me.Label1.TabIndex = 7
-        Me.Label1.Text = "FTABLE 1"
+        Me.agdXSectTitle.AutoSize = True
+        Me.agdXSectTitle.Location = New System.Drawing.Point(12, 99)
+        Me.agdXSectTitle.Name = "agdXSectTitle"
+        Me.agdXSectTitle.Size = New System.Drawing.Size(0, 13)
+        Me.agdXSectTitle.TabIndex = 7
         '
         'OpenFileDialog1
         '
@@ -121,13 +121,14 @@ Partial Class frmXSect
         '
         Me.agdXSect.AllowHorizontalScrolling = True
         Me.agdXSect.AllowNewValidValues = False
-        Me.agdXSect.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdXSect.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdXSect.CellBackColor = System.Drawing.Color.Empty
         Me.agdXSect.LineColor = System.Drawing.Color.Empty
         Me.agdXSect.LineWidth = 0.0!
-        Me.agdXSect.Location = New System.Drawing.Point(18, 130)
+        Me.agdXSect.Location = New System.Drawing.Point(15, 121)
         Me.agdXSect.Name = "agdXSect"
-        Me.agdXSect.Size = New System.Drawing.Size(432, 315)
+        Me.agdXSect.Size = New System.Drawing.Size(450, 350)
         Me.agdXSect.Source = Nothing
         Me.agdXSect.TabIndex = 6
         '
@@ -135,12 +136,12 @@ Partial Class frmXSect
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(469, 524)
-        Me.Controls.Add(Me.Label1)
+        Me.ClientSize = New System.Drawing.Size(481, 536)
+        Me.Controls.Add(Me.agdXSectTitle)
         Me.Controls.Add(Me.agdXSect)
-        Me.Controls.Add(Me.Button5)
-        Me.Controls.Add(Me.Button4)
-        Me.Controls.Add(Me.Button3)
+        Me.Controls.Add(Me.cmdHelp)
+        Me.Controls.Add(Me.cmdCancel)
+        Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.GroupBox1)
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmXSect"
@@ -151,13 +152,14 @@ Partial Class frmXSect
 
     End Sub
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents cmdSave As System.Windows.Forms.Button
     Friend WithEvents cmdOpen As System.Windows.Forms.Button
     Friend WithEvents cboXFile As System.Windows.Forms.ComboBox
-    Friend WithEvents Button3 As System.Windows.Forms.Button
-    Friend WithEvents Button4 As System.Windows.Forms.Button
-    Friend WithEvents Button5 As System.Windows.Forms.Button
+    Friend WithEvents cmdOK As System.Windows.Forms.Button
+    Friend WithEvents cmdCancel As System.Windows.Forms.Button
+    Friend WithEvents cmdHelp As System.Windows.Forms.Button
     Friend WithEvents agdXSect As atcControls.atcGrid
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents agdXSectTitle As System.Windows.Forms.Label
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
 End Class
