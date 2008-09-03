@@ -223,6 +223,10 @@
       <Name>atcControls</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation.vbproj">
+      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
+      <Name>atcSegmentation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI</Name>

@@ -266,10 +266,10 @@ Public Class ctlEditFTables
 
     Private Sub cmdImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImport.Click
         Dim frmXSect As New frmXSect
-        'frmXSect.CurrentReach(pHspfFtable.Operation.Id, pHspfFtable.Operation.FTable)
-        'txtNRows.Value = pHspfFtable.Nrows
-        'txtNCols.Value = pHspfFtable.Ncols
-        frmXSect.Init(Me)
+        frmXSect.CurrentReach(pHspfFtable.Operation.Id, pHspfFtable.Operation.FTable)
+        txtNRows.Value = pHspfFtable.Nrows
+        txtNCols.Value = pHspfFtable.Ncols
+        frmXSect.Init(pHspfFtable, Me)
         frmXSect.Show()
     End Sub
 
