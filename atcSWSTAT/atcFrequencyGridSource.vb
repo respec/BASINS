@@ -353,30 +353,56 @@ Friend Class atcFrequencyGridSource
 
                     lRept.AppendLine()
                     lRept.AppendLine()
-                    If pHigh Then
-                        If lNumZero > 0 Then
-                            lRept.AppendLine("                                                           Adjusted     Ajusted ")
-                            lRept.AppendLine("        Exceedance        Recurrence        Parameter     Exceedence   Parameter")
-                            lRept.AppendLine("        Probability        Interval           Value     Probability     Value")
-                            lRept.AppendLine("        -----------       ----------        ---------   ------------  -----------")
-                        Else
-                            lRept.AppendLine("        Exceedance        Recurrence        Parameter")
+
+                    If lNumZero <= 0 Then
+                        If pHigh Then
+                            lRept.AppendLine("        Exceedence        Recurrence        Parameter")
                             lRept.AppendLine("        Probability        Interval           Value  ")
                             lRept.AppendLine("        -----------       ----------        ---------")
-                        End If
-                    Else
-                        If lNumZero > 0 Then
-                            lRept.AppendLine("                                                        Adjusted Non-   Adjusted ")
-                            lRept.AppendLine("       Non-exceedance     Recurrence        Parameter     Exceedence   Parameter")
-                            lRept.AppendLine("        Probability        Interval           Value      Probability     Value")
-                            lRept.AppendLine("        -----------       ----------        ----------  ------------- -----------")
                         Else
                             lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
                             lRept.AppendLine("        Probability        Interval           Value  ")
                             lRept.AppendLine("        -----------       ----------        ---------")
                         End If
-
+                    Else ' when there is or are zero values, need adjustment
+                        If pHigh Then
+                            lRept.AppendLine("                                           Ajusted    Ajusted ")
+                            lRept.AppendLine("    Exceedence  Recurrence   Parameter   Exceedence  Parameter")
+                            lRept.AppendLine("   Probability   Interval      Value    Probability    Value  ")
+                            lRept.AppendLine("   -----------  -----------  ---------  -----------  ---------")
+                        Else
+                            lRept.AppendLine("       Non-                            Ajusted Non-   Ajusted ")
+                            lRept.AppendLine("    Exceedence   Recurrence  Parameter   Exceedence  Parameter")
+                            lRept.AppendLine("   Probability    Interval     Value    Probability    Value  ")
+                            lRept.AppendLine("   -----------  -----------  ---------  -----------  ---------")
+                        End If
                     End If
+
+
+                    ' The original version
+                    'If pHigh Then
+                    '    If lNumZero > 0 Then
+                    '        lRept.AppendLine("                                                           Adjusted     Ajusted ")
+                    '        lRept.AppendLine("        Exceedance        Recurrence        Parameter     Exceedence   Parameter")
+                    '        lRept.AppendLine("        Probability        Interval           Value     Probability     Value")
+                    '        lRept.AppendLine("        -----------       ----------        ---------   ------------  -----------")
+                    '    Else
+                    '        lRept.AppendLine("        Exceedance        Recurrence        Parameter")
+                    '        lRept.AppendLine("        Probability        Interval           Value  ")
+                    '        lRept.AppendLine("        -----------       ----------        ---------")
+                    '    End If
+                    'Else
+                    '    If lNumZero > 0 Then
+                    '        lRept.AppendLine("                                                        Adjusted Non-   Adjusted ")
+                    '        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter     Exceedence   Parameter")
+                    '        lRept.AppendLine("        Probability        Interval           Value      Probability     Value")
+                    '        lRept.AppendLine("        -----------       ----------        ----------  ------------- -----------")
+                    '    Else
+                    '        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
+                    '        lRept.AppendLine("        Probability        Interval           Value  ")
+                    '        lRept.AppendLine("        -----------       ----------        ---------")
+                    '    End If
+                    'End If
 
                     'lRept.AppendLine("        Probability        Interval           Value  ")
                     'lRept.AppendLine("        -----------       ----------        ---------")
