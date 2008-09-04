@@ -332,44 +332,6 @@ Friend Module modSWMMFromMW
         Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
         Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
 
-        'this block for simple grid, should now work generically
-        'For Each lLandUse As Landuse In aLandUses
-        '    'find subbasin position in the area array
-        '    Dim lSpos As Integer
-        '    For j As Integer = 0 To lUniqueSubids.Count - 1
-        '        If lLandUse.Catchment.Name = lUniqueSubids(j) Then
-        '            lSpos = j
-        '            Exit For
-        '        End If
-        '    Next j
-        '    'find lugroup that corresponds to this lucode
-        '    If lLandUse.Name IsNot Nothing Then
-        '        'find percent perv that corresponds to this lugroup
-        '        Dim lPercentImperv As Double
-        '        For Each lDetail As LanduseReclassificationDetails In aReclassificationRecords
-        '            If lLandUse.Name = lDetail.GroupDescription Then
-        '                If Double.TryParse(lDetail.ImperviousPercent, lPercentImperv) Then
-        '                    Exit For
-        '                Else
-        '                    Logger.Dbg("Warning: non-parsable percent impervious value '" & lDetail.ImperviousPercent & "' for land use name " & lLandUse.Name)
-        '                End If
-        '            End If
-        '        Next
-        '        'find lugroup position in the area array
-        '        Dim lLpos As Long
-        '        For j As Integer = 0 To lUniqueLugroups.Count - 1
-        '            If lLandUse.Name = lUniqueLugroups(j) Then
-        '                lLpos = j
-        '                Exit For
-        '            End If
-        '        Next j
-        '        With lLandUse
-        '            lPerArea(lSpos, lLpos) += (.Area * (100 - lPercentImperv) / 100)
-        '            lImpArea(lSpos, lLpos) += (.Area * lPercentImperv / 100)
-        '        End With
-        '    End If
-        'Next lLandUse
-
         For Each lLandUse As Landuse In aLandUses
             'loop through each polygon (or grid subid/lucode combination)
             'find subbasin position in the area array
@@ -470,10 +432,12 @@ Friend Module modSWMMFromMW
                         For Each lOrigLandUse As Landuse In aLandUses
                             If lOrigLandUse.Catchment.Name = lUniqueSubids(lSpos) Then
                                 .Catchment = lOrigLandUse.Catchment
-                                .Catchment.PercentImpervious = lImpArea(lSpos, lLpos) / (lPerArea(lSpos, lLpos) + lImpArea(lSpos, lLpos))
+                                .Catchment.PercentImpervious = lImpAreaBySubbasin / (lPerAreaBySubbasin + lImpAreaBySubbasin) * 100
                                 Exit For
                             End If
                         Next
+                        'swmm file is space delimited, must not use spaces in land use names
+                        .Name = ReplaceString(.Name, " ", "")
                     End With
                     lReclassifyLandUses.Add(lLandUse)
                 End If
@@ -590,22 +554,59 @@ Friend Module modSWMMFromMW
         lDataSource = Nothing
     End Sub
 
-    Friend Sub GetLanduseReclassificationDetails(ByRef aGridSource As atcControls.atcGridSource, _
+    Friend Sub GetLanduseReclassificationDetails(ByVal aReclassifyFile As String, _
+                                                 ByVal aCodesVisible As Boolean, _
+                                                 ByRef aGridSource As atcControls.atcGridSource, _
                                                  ByVal aLanduseReclassificationDetails As atcCollection)
-        For lRow As Integer = 1 To aGridSource.Rows
-            Dim lLanduseReclassificationDetail As New LanduseReclassificationDetails
-            With lLanduseReclassificationDetail
-                .Code = aGridSource.CellValue(lRow, 0)
-                If .Code Is Nothing Then .Code = ""
-                .GroupDescription = aGridSource.CellValue(lRow, 1)
-                .ImperviousPercent = aGridSource.CellValue(lRow, 2)
-                .Multiplier = aGridSource.CellValue(lRow, 3)
-                If .Multiplier Is Nothing Then .Multiplier = ""
-                .Subbasin = aGridSource.CellValue(lRow, 4)
-                If .Subbasin Is Nothing Then .Subbasin = ""
-            End With
-            aLanduseReclassificationDetails.Add(lLanduseReclassificationDetail)
-        Next
+
+        If aReclassifyFile.Length > 0 And Not aCodesVisible Then
+            'have the simple percent pervious grid, need to know which 
+            'lucodes correspond to which lugroups from dbf file
+            Dim lTable As IatcTable = atcTableOpener.OpenAnyTable(aReclassifyFile)
+            For lTableRecordIndex As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = lTableRecordIndex
+                'lRcode.Add(lTable.Value(1), lTable.Value(2))
+                Dim lLanduseReclassificationDetail As New LanduseReclassificationDetails
+                With lLanduseReclassificationDetail
+                    .Code = lTable.Value(1)
+                    If .Code Is Nothing Then .Code = ""
+                    .GroupDescription = lTable.Value(2)
+                End With
+                aLanduseReclassificationDetails.Add(lLanduseReclassificationDetail)
+            Next lTableRecordIndex
+            'now fill in the rest from the grid
+            For lRow As Integer = 1 To aGridSource.Rows
+                For Each lDetail As LanduseReclassificationDetails In aLanduseReclassificationDetails
+                    With lDetail
+                        If .GroupDescription = aGridSource.CellValue(lRow, 1) Then
+                            'descriptions match, fill in the rest
+                            .ImperviousPercent = aGridSource.CellValue(lRow, 2)
+                            .Multiplier = aGridSource.CellValue(lRow, 3)
+                            If .Multiplier Is Nothing Then .Multiplier = ""
+                            .Subbasin = aGridSource.CellValue(lRow, 4)
+                            If .Subbasin Is Nothing Then .Subbasin = ""
+                        End If
+                    End With
+                Next
+            Next
+        Else
+            'the more complex type, fill in from the grid
+            For lRow As Integer = 1 To aGridSource.Rows
+                Dim lLanduseReclassificationDetail As New LanduseReclassificationDetails
+                With lLanduseReclassificationDetail
+                    .Code = aGridSource.CellValue(lRow, 0)
+                    If .Code Is Nothing Then .Code = ""
+                    .GroupDescription = aGridSource.CellValue(lRow, 1)
+                    .ImperviousPercent = aGridSource.CellValue(lRow, 2)
+                    .Multiplier = aGridSource.CellValue(lRow, 3)
+                    If .Multiplier Is Nothing Then .Multiplier = ""
+                    .Subbasin = aGridSource.CellValue(lRow, 4)
+                    If .Subbasin Is Nothing Then .Subbasin = ""
+                End With
+                aLanduseReclassificationDetails.Add(lLanduseReclassificationDetail)
+            Next
+        End If
+
     End Sub
 
     Friend Class StationDetails

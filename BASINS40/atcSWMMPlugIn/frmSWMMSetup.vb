@@ -1064,7 +1064,9 @@ Public Class frmSWMMSetup
 
         'set reclassification records
         Dim lReclassificationRecords As New atcCollection
-        GetLanduseReclassificationDetails(AtcGridPervious.Source, lReclassificationRecords)
+        Dim lCodesVisible As Boolean = True
+        If AtcGridPervious.ColumnWidth(0) = 0 Then lCodesVisible = False
+        GetLanduseReclassificationDetails(lblClass.Text, lCodesVisible, AtcGridPervious.Source, lReclassificationRecords)
 
         'Dim lNodesShapefileName As String = "C:\basins\Predefined Delineations\West Branch\nodes.shp"
         'Dim lConduitShapefileName As String = "C:\basins\Predefined Delineations\West Branch\conduits.shp"
@@ -1181,6 +1183,9 @@ Public Class frmSWMMSetup
                 .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
             End If
             CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
+
+            lblStatus.Text = "Overlaying Landuses with Catchments"
+            Me.Refresh()
 
             If cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
                 'create landuses from grid
