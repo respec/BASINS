@@ -34,7 +34,10 @@ Module modFreq
 
 
     'Kendall Tau Calculation
-    Sub KendallTau(ByVal aTs As atcTimeseries, ByRef aTau As Double, ByRef aLevel As Double, ByRef aSlope As Double)
+    Friend Sub KendallTau(ByVal aTs As atcTimeseries, _
+                          ByRef aTau As Double, _
+                          ByRef aLevel As Double, _
+                          ByRef aSlope As Double)
         Dim lQ() As Single
         Dim lN As Integer = aTs.numValues
         Dim lTau As Single
@@ -72,7 +75,13 @@ Module modFreq
     End Sub
 
     'frequency analysis for specified recurrence interval or probability
-    Function PearsonType3(ByVal aTs As atcTimeseries, ByVal aRecurOrProb As Double, ByVal aHigh As Boolean, ByVal aLogFg As Boolean) As Double
+    Friend Sub PearsonType3(ByVal aTs As atcTimeseries, _
+                            ByVal aRecurOrProbs() As Double, _
+                            ByVal aHigh As Boolean, _
+                            ByVal aLogFg As Boolean, _
+                            ByVal aDataSource As atcDataSource, _
+                            ByRef aAttributesStorage As atcDataAttributes)
+
         Dim lNonLogTS As atcTimeseries = aTs.Attributes.GetValue("NDayTimeseries", aTs)
 
         'Dim lN As Integer = aTs.Attributes.GetValue("Count")
@@ -82,11 +91,8 @@ Module modFreq
         Dim lSkew As Double = aTs.Attributes.GetValue("Skew")
 
         If lN = 0 OrElse Double.IsNaN(lMean) Then ' <= 0 Then 'no data or problem data
-            Return pNan
+            Throw New ApplicationException("Count = 0 or Mean = NaN")
         Else
-            'Turn recurrence into probability
-            If aRecurOrProb > 1 Then aRecurOrProb = 1.0 / aRecurOrProb
-
             Dim lNzi As Integer = aTs.numValues - lN
             Dim lNumons As Integer = 1
 
@@ -97,34 +103,88 @@ Module modFreq
                 lLogarh = 2 'no trans desired
             End If
 
-            Dim lSe(0) As Single
-            If aHigh Then
-                lSe(0) = aRecurOrProb
-            Else
-                lSe(0) = 1 - aRecurOrProb
-            End If
-            Dim lI As Integer = UBound(lSe)  'number of recurrence intervals to calculate-1
+            Dim lIntervalMax As Integer = aRecurOrProbs.GetUpperBound(0) 'number of recurrence intervals to calculate-1
+            Dim lProbs(lIntervalMax) As Double
+            Dim lSe(lIntervalMax) As Single
+            'Turn recurrence into probability
+            For lIntervalIndex As Integer = 0 To lIntervalMax
+                If aRecurOrProbs(lIntervalIndex) <= 0 Then
+                    Throw New ApplicationException("Bad RecurOrProb=" & aRecurOrProbs(lIntervalIndex))
+                ElseIf aRecurOrProbs(lIntervalIndex) > 1 Then
+                    lProbs(lIntervalIndex) = 1.0 / aRecurOrProbs(lIntervalIndex)
+                Else
+                    lProbs(lIntervalIndex) = aRecurOrProbs(lIntervalIndex)
+                End If
+                If aHigh Then
+                    lSe(lIntervalIndex) = lProbs(lIntervalIndex)
+                Else
+                    lSe(lIntervalIndex) = 1 - lProbs(lIntervalIndex)
+                End If
+            Next
 
-            Dim lC(lI) As Single
-            Dim lCcpa(lI) As Single
-            Dim lP(lI) As Single
-            Dim lQ(lI) As Single
-            Dim lAdp(lI) As Single
-            Dim lQnew(lI) As Single
-            Dim lRi(lI) As Single
-            Dim lRsout(1 + (2 * lI)) As Single
+            Dim lC(lIntervalMax) As Single
+            Dim lCcpa(lIntervalMax) As Single
+            Dim lP(lIntervalMax) As Single
+            Dim lQ(lIntervalMax) As Single
+            Dim lAdp(lIntervalMax) As Single
+            Dim lQnew(lIntervalMax) As Single
+            Dim lRi(lIntervalMax) As Single
+            Dim lRsout(1 + (2 * lIntervalMax)) As Single
             Dim lRetcod As Integer
 
             Dim lIlh As Integer  'stats option 1-hi, 2-low,3-month
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, lNzi, lNumons, (lI + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
+                LGPSTX(lN, lNzi, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
                        lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
+                Dim lMsg As String = ""
+
+                Dim lNday As Integer = aTs.Attributes.GetValue("NDay")
+
+                For lIndex As Integer = 0 To lIntervalMax
+                    If lQ(lIndex) = 0 Or Double.IsNaN(lQ(lIndex)) Then
+                        If lMsg.Length = 0 Then
+                            lMsg = "ComputeFreq:ZeroOrNan:" & lQ(lIndex) & ":"
+                            lQ(lIndex) = GetNaN()
+                        End If
+
+                        lMsg &= lNday & ":" & aRecurOrProbs(lIndex) & ":" & aHigh & ":" & lN
+                        Logger.Dbg(lMsg)
+                        lMsg = ""
+                    End If
+
+                    'this is now done in USGS fortran code
+                    'If aLogFg Then 'remove log10 transform 
+                    '    lQ = 10 ^ lQ
+                    'End If
+
+                    Dim lS As String
+                    If lNday = 7 And aRecurOrProbs(lIndex) = 10 And Not aHigh Then
+                        lS = lNday & "Q" & aRecurOrProbs(lIndex)
+                    ElseIf aHigh Then
+                        lS = lNday & "High" & DoubleToString(aRecurOrProbs(lIndex), , "#0.####")
+                    Else
+                        lS = lNday & "Low" & DoubleToString(aRecurOrProbs(lIndex), , "#0.####")
+                    End If
+
+                    Dim lNewAttribute As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS)
+
+                    Dim lArguments As New atcDataAttributes
+                    lArguments.SetValue("Nday", lNday)
+                    lArguments.SetValue("Return Period", aRecurOrProbs(lIndex))
+                    lArguments.SetValue("NDayTimeseries", aTs)
+
+                    aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
+
+                    lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")
+                    aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
+                    lNewAttribute = atcDataAttributes.GetDefinition(lS & "AdjProb")
+                    aAttributesStorage.SetValue(lNewAttribute, lAdp(lIndex), lArguments)
+                Next
             Catch ex As Exception
-                lQ(0) = pNan
                 If pWarned Then
-                    Logger.Dbg("Could not compute Kendall Tau: " & ex.Message)
+                    Logger.Dbg("Could not compute Pearson Type3 Frequency: " & ex.Message)
                 Else
                     Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
                     If IO.File.Exists(lExpectedDLL) Then
@@ -135,8 +195,6 @@ Module modFreq
                     pWarned = True
                 End If
             End Try
-
-            Return lQ(0)
         End If
-    End Function
+    End Sub
 End Module

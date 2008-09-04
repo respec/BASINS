@@ -422,7 +422,7 @@ Public Class atcTimeseriesNdayHighLow
         Dim lMsg As String = ""
         Dim lStartedWithNdayTS As Boolean = False
 
-        Dim lRecurOrProb() As Double = Obj2Array(aRecurOrProb)
+        Dim lRecurOrProbs() As Double = Obj2Array(aRecurOrProb)
 
         Try
             If aTimeseries.Attributes.GetValue("Tu", 1) = atcTimeUnit.TUYear Then
@@ -485,84 +485,13 @@ Public Class atcTimeseriesNdayHighLow
                     lNdayTs.Attributes.SetValue("SDND", lNdayTs.Attributes.GetValue("Standard Deviation"))
                     lNdayTs.Attributes.SetValue("SKWND", lNdayTs.Attributes.GetValue("Skew"))
                 End If
-                Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")
 
-                For Each lRecurOrProbNow As Double In lRecurOrProb
-                    Try
-                        If lRecurOrProbNow > 0 Then
-                            lQ = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh, aLogFg)
-                        Else
-                            Logger.Dbg("Skip:RecurOrProb=" & lRecurOrProbNow)
-                        End If
-                    Catch ex As Exception
-                        lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
-                        lQ = GetNaN()
-                    End Try
-
-                    If lQ = 0 Or Double.IsNaN(lQ) Then
-                        If lMsg.Length = 0 Then
-                            lMsg = "ComputeFreq:ZeroOrNan:" & lQ & ":"
-                            lQ = GetNaN()
-                        End If
-
-                        lMsg &= lNday & ":" & lRecurOrProbNow & ":" & aHigh & ":" & lNdayTs.Attributes.GetValue("Count")
-                        Logger.Dbg(lMsg)
-                        lMsg = ""
-                    End If
-
-                    'this is now done in USGS fortran code
-                    'If aLogFg Then 'remove log10 transform 
-                    '    lQ = 10 ^ lQ
-                    'End If
-
-                    Dim lS As String
-                    If lNday = 7 And lRecurOrProbNow = 10 And Not aHigh Then
-                        lS = lNday & "Q" & lRecurOrProbNow
-                    ElseIf aHigh Then
-                        lS = lNday & "High" & DoubleToString(lRecurOrProbNow, , "#0.####")
-                    Else
-                        lS = lNday & "Low" & DoubleToString(lRecurOrProbNow, , "#0.####")
-                    End If
-
-                    Dim lNewAttribute As New atcAttributeDefinition
-                    With lNewAttribute
-                        .Name = lS
-                        .Description = lS
-                        .DefaultValue = ""
-                        .Editable = False
-                        .TypeString = "Double"
-                        .Calculator = Me
-                        .Category = "N-Day and Frequency"
-                    End With
-
-                    Dim lArguments As New atcDataAttributes
-                    lArguments.SetValue("Nday", lNday)
-                    lArguments.SetValue("Return Period", lRecurOrProbNow)
-                    If Not lStartedWithNdayTS Then lArguments.SetValue("NDayTimeseries", lNdayTs)
-
-                    aAttributesStorage.SetValue(lNewAttribute, lQ, lArguments)
-
-                    'If recurrence interval is an integer, also set WDM-style attribute
-                    'Should not be needed now that atcDataAttributes translates from WDM-style names 
-                    'If Math.Abs(lRecurOrProbNow - CInt(lRecurOrProbNow)) < 0.000001 Then
-                    '    If aHigh Then
-                    '        lS = "H"
-                    '    Else
-                    '        lS = "L"
-                    '    End If
-                    '    lS &= Format(lNday, "00") & DoubleToString(lRecurOrProbNow, , "000")
-                    '    lNewAttribute = New atcAttributeDefinition
-                    '    With lNewAttribute
-                    '        .Name = lS
-                    '        .Description = lS
-                    '        .DefaultValue = ""
-                    '        .Editable = False
-                    '        .TypeString = "Double"
-                    '        .Calculator = Me
-                    '        .Category = "N-Day and Frequency"
-                    '    End With
-                    'End If
-                Next
+                Try
+                    PearsonType3(lNdayTs, lRecurOrProbs, aHigh, aLogFg, Me, aAttributesStorage)
+                Catch ex As Exception
+                    lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
+                    lQ = GetNaN()
+                End Try
 
                 lTsMath = Nothing
 
