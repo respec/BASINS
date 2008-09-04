@@ -73,8 +73,10 @@ Module modFreq
 
     'frequency analysis for specified recurrence interval or probability
     Function PearsonType3(ByVal aTs As atcTimeseries, ByVal aRecurOrProb As Double, ByVal aHigh As Boolean, ByVal aLogFg As Boolean) As Double
+        Dim lNonLogTS As atcTimeseries = aTs.Attributes.GetValue("NDayTimeseries", aTs)
 
-        Dim lN As Integer = aTs.Attributes.GetValue("Count")
+        'Dim lN As Integer = aTs.Attributes.GetValue("Count")
+        Dim lN As Integer = lNonLogTS.Attributes.GetValue("count positive")
         Dim lMean As Double = aTs.Attributes.GetValue("Mean")
         Dim lStd As Double = aTs.Attributes.GetValue("Standard Deviation")
         Dim lSkew As Double = aTs.Attributes.GetValue("Skew")

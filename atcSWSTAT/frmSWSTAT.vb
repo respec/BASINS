@@ -198,7 +198,6 @@ Friend Class frmSWSTAT
         Me.txtOmitAfterYear = New System.Windows.Forms.TextBox
         Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox
         Me.cboYears = New System.Windows.Forms.ComboBox
-        Me.agdData = New atcControls.atcGrid
         Me.tabNDay = New System.Windows.Forms.TabPage
         Me.chkLog = New System.Windows.Forms.CheckBox
         Me.panelTop = New System.Windows.Forms.Panel
@@ -222,6 +221,7 @@ Friend Class frmSWSTAT
         Me.btnDoFrequency = New System.Windows.Forms.Button
         Me.btnDisplayTrend = New System.Windows.Forms.Button
         Me.btnNDay = New System.Windows.Forms.Button
+        Me.agdData = New atcControls.atcGrid
         Me.tabMain.SuspendLayout()
         Me.tabSelectDates.SuspendLayout()
         Me.grpHighLow.SuspendLayout()
@@ -285,7 +285,7 @@ Friend Class frmSWSTAT
         Me.tabMain.Location = New System.Drawing.Point(0, 2)
         Me.tabMain.Name = "tabMain"
         Me.tabMain.SelectedIndex = 0
-        Me.tabMain.Size = New System.Drawing.Size(443, 365)
+        Me.tabMain.Size = New System.Drawing.Size(443, 281)
         Me.tabMain.TabIndex = 1
         '
         'tabSelectDates
@@ -299,7 +299,7 @@ Friend Class frmSWSTAT
         Me.tabSelectDates.Location = New System.Drawing.Point(4, 22)
         Me.tabSelectDates.Name = "tabSelectDates"
         Me.tabSelectDates.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectDates.Size = New System.Drawing.Size(435, 339)
+        Me.tabSelectDates.Size = New System.Drawing.Size(435, 255)
         Me.tabSelectDates.TabIndex = 0
         Me.tabSelectDates.Text = "Select Dates"
         '
@@ -340,7 +340,7 @@ Friend Class frmSWSTAT
         'btnDisplayBasic
         '
         Me.btnDisplayBasic.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDisplayBasic.Location = New System.Drawing.Point(8, 308)
+        Me.btnDisplayBasic.Location = New System.Drawing.Point(8, 224)
         Me.btnDisplayBasic.Name = "btnDisplayBasic"
         Me.btnDisplayBasic.Size = New System.Drawing.Size(157, 23)
         Me.btnDisplayBasic.TabIndex = 69
@@ -506,23 +506,6 @@ Friend Class frmSWSTAT
         Me.cboYears.Size = New System.Drawing.Size(233, 21)
         Me.cboYears.TabIndex = 44
         '
-        'agdData
-        '
-        Me.agdData.AllowHorizontalScrolling = True
-        Me.agdData.AllowNewValidValues = False
-        Me.agdData.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdData.CellBackColor = System.Drawing.Color.Empty
-        Me.agdData.LineColor = System.Drawing.Color.Empty
-        Me.agdData.LineWidth = 0.0!
-        Me.agdData.Location = New System.Drawing.Point(228, 311)
-        Me.agdData.Name = "agdData"
-        Me.agdData.Size = New System.Drawing.Size(199, 20)
-        Me.agdData.Source = Nothing
-        Me.agdData.TabIndex = 1
-        Me.agdData.Visible = False
-        '
         'tabNDay
         '
         Me.tabNDay.BackColor = System.Drawing.SystemColors.Control
@@ -534,7 +517,7 @@ Friend Class frmSWSTAT
         Me.tabNDay.Location = New System.Drawing.Point(4, 22)
         Me.tabNDay.Name = "tabNDay"
         Me.tabNDay.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabNDay.Size = New System.Drawing.Size(435, 339)
+        Me.tabNDay.Size = New System.Drawing.Size(435, 276)
         Me.tabNDay.TabIndex = 2
         Me.tabNDay.Text = "N-Day, Trend, Frequency"
         '
@@ -544,7 +527,7 @@ Friend Class frmSWSTAT
         Me.chkLog.AutoSize = True
         Me.chkLog.Checked = True
         Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkLog.Location = New System.Drawing.Point(308, 284)
+        Me.chkLog.Location = New System.Drawing.Point(308, 221)
         Me.chkLog.Name = "chkLog"
         Me.chkLog.Size = New System.Drawing.Size(80, 17)
         Me.chkLog.TabIndex = 35
@@ -561,7 +544,7 @@ Friend Class frmSWSTAT
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(435, 255)
+        Me.panelTop.Size = New System.Drawing.Size(435, 192)
         Me.panelTop.TabIndex = 34
         '
         'grpRecurrence
@@ -578,7 +561,7 @@ Friend Class frmSWSTAT
         Me.grpRecurrence.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpRecurrence.Location = New System.Drawing.Point(208, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(227, 255)
+        Me.grpRecurrence.Size = New System.Drawing.Size(227, 192)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
@@ -586,7 +569,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceDefault
         '
         Me.btnRecurrenceDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(165, 196)
+        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(165, 133)
         Me.btnRecurrenceDefault.Name = "btnRecurrenceDefault"
         Me.btnRecurrenceDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnRecurrenceDefault.TabIndex = 14
@@ -595,7 +578,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceRemove
         '
         Me.btnRecurrenceRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(132, 196)
+        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(132, 133)
         Me.btnRecurrenceRemove.Name = "btnRecurrenceRemove"
         Me.btnRecurrenceRemove.Size = New System.Drawing.Size(27, 20)
         Me.btnRecurrenceRemove.TabIndex = 13
@@ -610,14 +593,14 @@ Friend Class frmSWSTAT
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(213, 171)
+        Me.lstRecurrence.Size = New System.Drawing.Size(213, 108)
         Me.lstRecurrence.TabIndex = 8
         Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(99, 196)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(99, 133)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
         Me.btnRecurrenceAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnRecurrenceAdd.TabIndex = 10
@@ -627,7 +610,7 @@ Friend Class frmSWSTAT
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 196)
+        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 133)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
         Me.txtRecurrenceAdd.Size = New System.Drawing.Size(87, 20)
         Me.txtRecurrenceAdd.TabIndex = 9
@@ -635,7 +618,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(157, 225)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(157, 162)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
         Me.btnRecurrenceNone.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceNone.TabIndex = 12
@@ -644,7 +627,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceAll
         '
         Me.btnRecurrenceAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 225)
+        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 162)
         Me.btnRecurrenceAll.Name = "btnRecurrenceAll"
         Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAll.TabIndex = 11
@@ -655,7 +638,7 @@ Friend Class frmSWSTAT
         Me.Splitter1.BackColor = System.Drawing.SystemColors.Control
         Me.Splitter1.Location = New System.Drawing.Point(200, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(8, 255)
+        Me.Splitter1.Size = New System.Drawing.Size(8, 192)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
@@ -673,7 +656,7 @@ Friend Class frmSWSTAT
         Me.grpNday.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpNday.Location = New System.Drawing.Point(0, 0)
         Me.grpNday.Name = "grpNday"
-        Me.grpNday.Size = New System.Drawing.Size(200, 255)
+        Me.grpNday.Size = New System.Drawing.Size(200, 192)
         Me.grpNday.TabIndex = 1
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
@@ -681,7 +664,7 @@ Friend Class frmSWSTAT
         'btnNdayDefault
         '
         Me.btnNdayDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 196)
+        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 133)
         Me.btnNdayDefault.Name = "btnNdayDefault"
         Me.btnNdayDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnNdayDefault.TabIndex = 8
@@ -690,7 +673,7 @@ Friend Class frmSWSTAT
         'btnNdayRemove
         '
         Me.btnNdayRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 196)
+        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 133)
         Me.btnNdayRemove.Name = "btnNdayRemove"
         Me.btnNdayRemove.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayRemove.TabIndex = 7
@@ -699,7 +682,7 @@ Friend Class frmSWSTAT
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 196)
+        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 133)
         Me.btnNdayAdd.Name = "btnNdayAdd"
         Me.btnNdayAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayAdd.TabIndex = 4
@@ -709,7 +692,7 @@ Friend Class frmSWSTAT
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 196)
+        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 133)
         Me.txtNdayAdd.Name = "txtNdayAdd"
         Me.txtNdayAdd.Size = New System.Drawing.Size(54, 20)
         Me.txtNdayAdd.TabIndex = 3
@@ -717,7 +700,7 @@ Friend Class frmSWSTAT
         'btnNdayNone
         '
         Me.btnNdayNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayNone.Location = New System.Drawing.Point(130, 225)
+        Me.btnNdayNone.Location = New System.Drawing.Point(130, 162)
         Me.btnNdayNone.Name = "btnNdayNone"
         Me.btnNdayNone.Size = New System.Drawing.Size(64, 23)
         Me.btnNdayNone.TabIndex = 6
@@ -726,7 +709,7 @@ Friend Class frmSWSTAT
         'btnNdayAll
         '
         Me.btnNdayAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAll.Location = New System.Drawing.Point(6, 225)
+        Me.btnNdayAll.Location = New System.Drawing.Point(6, 162)
         Me.btnNdayAll.Name = "btnNdayAll"
         Me.btnNdayAll.Size = New System.Drawing.Size(64, 24)
         Me.btnNdayAll.TabIndex = 5
@@ -741,14 +724,14 @@ Friend Class frmSWSTAT
         Me.lstNday.Location = New System.Drawing.Point(6, 19)
         Me.lstNday.Name = "lstNday"
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstNday.Size = New System.Drawing.Size(188, 171)
+        Me.lstNday.Size = New System.Drawing.Size(188, 108)
         Me.lstNday.TabIndex = 2
         Me.lstNday.Tag = "NDay"
         '
         'btnDoFrequency
         '
         Me.btnDoFrequency.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequency.Location = New System.Drawing.Point(291, 308)
+        Me.btnDoFrequency.Location = New System.Drawing.Point(291, 245)
         Me.btnDoFrequency.Name = "btnDoFrequency"
         Me.btnDoFrequency.Size = New System.Drawing.Size(130, 23)
         Me.btnDoFrequency.TabIndex = 33
@@ -758,7 +741,7 @@ Friend Class frmSWSTAT
         'btnDisplayTrend
         '
         Me.btnDisplayTrend.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDisplayTrend.Location = New System.Drawing.Point(171, 308)
+        Me.btnDisplayTrend.Location = New System.Drawing.Point(171, 245)
         Me.btnDisplayTrend.Name = "btnDisplayTrend"
         Me.btnDisplayTrend.Size = New System.Drawing.Size(114, 23)
         Me.btnDisplayTrend.TabIndex = 31
@@ -768,17 +751,34 @@ Friend Class frmSWSTAT
         'btnNDay
         '
         Me.btnNDay.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNDay.Location = New System.Drawing.Point(8, 308)
+        Me.btnNDay.Location = New System.Drawing.Point(8, 245)
         Me.btnNDay.Name = "btnNDay"
         Me.btnNDay.Size = New System.Drawing.Size(157, 23)
         Me.btnNDay.TabIndex = 29
         Me.btnNDay.Text = "Display N-Day Timeseries"
         Me.btnNDay.UseVisualStyleBackColor = True
         '
+        'agdData
+        '
+        Me.agdData.AllowHorizontalScrolling = True
+        Me.agdData.AllowNewValidValues = False
+        Me.agdData.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdData.CellBackColor = System.Drawing.Color.Empty
+        Me.agdData.LineColor = System.Drawing.Color.Empty
+        Me.agdData.LineWidth = 0.0!
+        Me.agdData.Location = New System.Drawing.Point(228, 311)
+        Me.agdData.Name = "agdData"
+        Me.agdData.Size = New System.Drawing.Size(199, 0)
+        Me.agdData.Source = Nothing
+        Me.agdData.TabIndex = 1
+        Me.agdData.Visible = False
+        '
         'frmSWSTAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(443, 367)
+        Me.ClientSize = New System.Drawing.Size(443, 283)
         Me.Controls.Add(Me.tabMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1

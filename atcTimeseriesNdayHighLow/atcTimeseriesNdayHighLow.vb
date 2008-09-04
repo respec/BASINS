@@ -466,15 +466,19 @@ Public Class atcTimeseriesNdayHighLow
 
         For Each lNdayTs As atcTimeseries In aNdayTsGroup
             If Not lNdayTs Is Nothing Then
+                For lIndex As Integer = 1 To lNdayTs.numValues
+                    If Math.Abs(lNdayTs.Value(lIndex)) < 1.0E-30 Then
+                        lNdayTs.Value(lIndex) = GetNaN()
+                        lNdayTs.ValueAttributes(lIndex).SetValue("Was Zero", True)
+                    End If
+                Next
                 If aLogFg Then 'calc log10 of n day annual series
                     Dim lArgsMath As New atcDataAttributes
                     lTsMath = New atcTimeseriesMath.atcTimeseriesMath
                     lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
                     lTsMath.Open("log 10", lArgsMath)
-                    If Not lStartedWithNdayTS Then
-                        'Save non-log timeseries
-                        lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNdayTs)
-                    End If
+                    'Save non-log timeseries
+                    lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNdayTs)
                     lNdayTs = lTsMath.DataSets(0)
                     'Set log-specific attributes
                     lNdayTs.Attributes.SetValue("MEANDD", lNdayTs.Attributes.GetValue("Mean"))
@@ -561,6 +565,13 @@ Public Class atcTimeseriesNdayHighLow
                 Next
 
                 lTsMath = Nothing
+
+                For lIndex As Integer = 1 To lNdayTs.numValues
+                    If lNdayTs.ValueAttributes(lIndex).GetValue("Was Zero", False) Then
+                        lNdayTs.Value(lIndex) = 0
+                        lNdayTs.ValueAttributes(lIndex).Clear()
+                    End If
+                Next
 
                 If Not (aTimeseries Is lNdayTs) Then 'get rid of intermediate timeseries
                     lNdayTs = Nothing
