@@ -94,6 +94,7 @@
     <Compile Include="atcTimeseriesPointList.vb" />
     <Compile Include="clsGraphBase.vb" />
     <Compile Include="clsGraphCumulativeDifference.vb" />
+    <Compile Include="clsGraphFrequency.vb" />
     <Compile Include="clsGraphProbability.vb" />
     <Compile Include="clsGraphResidual.vb" />
     <Compile Include="clsGraphRunningSum.vb" />
