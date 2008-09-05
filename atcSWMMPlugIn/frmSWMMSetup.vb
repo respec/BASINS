@@ -733,6 +733,38 @@ Public Class frmSWMMSetup
         End If
     End Sub
 
+    Private Sub cboLandUseLayer_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLandUseLayer.SelectedIndexChanged
+        cboDescription.Items.Clear()
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex))
+        If lLayerIndex > -1 Then
+            If cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Grid" Then
+                'make sure this is a grid layer
+                If GisUtil.LayerType(lLayerIndex) = 4 Then
+                    'todo: fill in description fields for selected grid layer if possible
+                End If
+            Else
+                'make sure this is a shape layer
+                If GisUtil.LayerType(lLayerIndex) = 3 Then  'PolygonShapefile
+                    'this is the layer, fill in fields 
+                    For lFieldIndex As Integer = 0 To GisUtil.NumFields(lLayerIndex) - 1
+                        'MsgBox(sf.Field(i).Name)
+                        cboDescription.Items.Add(GisUtil.FieldName(lFieldIndex, lLayerIndex))
+                        If GisUtil.FieldType(lFieldIndex, lLayerIndex) = 0 Then 'string
+                            cboDescription.SelectedIndex = lFieldIndex
+                        End If
+                    Next
+                    If cboDescription.Items.Count > 0 And cboDescription.SelectedIndex < 0 Then
+                        cboDescription.SelectedIndex = 0
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub cboDescription_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboDescription.SelectedIndexChanged
+        SetPerviousGrid()
+    End Sub
+
     Private Sub EnableControls(ByVal aEnabled As Boolean)
         cmdOK.Enabled = aEnabled
         cmdExisting.Enabled = aEnabled
@@ -1096,7 +1128,7 @@ Public Class frmSWMMSetup
             Dim lSelectedStation As StationDetails
 
             If rbnSingle.Checked Then
-                If cboPrecipStation.SelectedIndex > 0 Then
+                If cboPrecipStation.SelectedIndex > -1 Then
                     lSelectedStation = pPrecStations.ItemByKey(cboPrecipStation.Items(cboPrecipStation.SelectedIndex))
                     'set dates
                     If lSelectedStation.StartJDate > lSJDate Then
@@ -1128,7 +1160,7 @@ Public Class frmSWMMSetup
             End If
 
             Dim lMetGageName As String = ""
-            If cboOtherMet.SelectedIndex > 0 Then
+            If cboOtherMet.SelectedIndex > -1 Then
                 lSelectedStation = pMetStations.ItemByKey(cboOtherMet.Items(cboOtherMet.SelectedIndex))
                 'set dates
                 If lSelectedStation.StartJDate > lSJDate Then
@@ -1187,17 +1219,29 @@ Public Class frmSWMMSetup
             lblStatus.Text = "Overlaying Landuses with Catchments"
             Me.Refresh()
 
-            If cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
+            Dim lLanduseLayerName As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+            Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
+            Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
+            If cboLanduse.SelectedIndex = 0 Then
+                'usgs giras is the selected land use type
+                'CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas)
+            ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
                 'create landuses from grid
-                Dim lLanduseLayerName As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-                Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
-                Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
                 CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
-                Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
-                .Landuses = lReclassifyLanduses
-
-                'todo, add shapefile options
+            ElseIf cboLanduse.SelectedIndex = 2 Then
+                'other shape
+                Dim lLanduseFieldName As String = ""
+                If cboDescription.SelectedIndex > -1 Then
+                    lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
+                End If
+                Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
+                Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
+                CreateLandusesFromShapefile(lLandUseFileName, lLanduseFieldName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
             End If
+
+            'now reclassify the landuses 
+            Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
+            .Landuses = lReclassifyLanduses
 
             lblStatus.Text = "Writing SWMM INP file"
             Me.Refresh()
@@ -1476,4 +1520,22 @@ Public Class frmSWMMSetup
             lblPrecipStation.Visible = False
         End If
     End Sub
+
+    Private Function GetFieldIndexFromMap(ByVal aLayerName As String, ByVal aMapFieldName As String, ByVal aFieldMap As atcCollection) As Integer
+        'given a layer ("subbasins") and a field map name ("Name"), return index of field mapped to that name
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aLayerName)
+        GetFieldIndexFromMap = -1
+
+        Dim lFieldName As String
+        For lIndex As Integer = 0 To aFieldMap.Count - 1
+            If aFieldMap(lIndex) = aMapFieldName Then
+                lFieldName = aFieldMap.Keys(lIndex)
+                If GisUtil.IsField(lLayerIndex, lFieldName) Then
+                    GetFieldIndexFromMap = GisUtil.FieldIndex(lLayerIndex, lFieldName)
+                    Exit For
+                End If
+            End If
+        Next
+
+    End Function
 End Class
