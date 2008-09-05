@@ -28,8 +28,8 @@ Partial Class frmXSect
         Me.cmdHelp = New System.Windows.Forms.Button
         Me.agdXSectTitle = New System.Windows.Forms.Label
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
-        Me.agdXSect = New atcControls.atcGrid
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
+        Me.agdXSect = New atcControls.atcGrid
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '

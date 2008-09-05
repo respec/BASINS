@@ -98,9 +98,9 @@ Public Class ctlEditFTables
 
     End Property
 
-    Private Sub RefreshFtables()
+    Public Sub RefreshFtables()
         Dim lRow, lCol, units As Integer
-        units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.emfg
+        units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.EmFg
 
         With grdEdit
             .Clear()

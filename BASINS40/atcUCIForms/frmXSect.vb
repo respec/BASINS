@@ -6,6 +6,7 @@ Imports atcSegmentation
 Imports atcControls
 Imports System.Collections.ObjectModel
 Imports System.IO
+Imports System
 
 Public Class frmXSect
 
@@ -13,224 +14,98 @@ Public Class frmXSect
     Dim pCurrentFTab As HspfFtable
     Dim pHspfFTable As HspfFtable
     Private FileName As String
-    Dim chanid$(), ChanL!(), ChanYm!(), ChanWm!(), ChanN!(), ChanS!()
-    Dim ChanM11!(), ChanM12!(), ChanYc!(), ChanM21!(), ChanM22!()
-    Dim ChanYt1!(), ChanYt2!(), ChanM31!(), ChanM32!(), ChanW11!()
-    Dim ChanW12!(), ChanRecCnt&
+    Dim chanid, ChanL, ChanYm, ChanWm, ChanN, ChanS, ChanM11, ChanM12, ChanYc, ChanM21, ChanM22, ChanYt1, ChanYt2 As New Collection
+    Dim ChanM31, ChanM32, ChanW11, ChanW12 As New Collection
 
-    Public Sub ReadPTFFile(ByVal newName As String, ByVal ret As Integer)
-
-        Dim delim, quote, lstr, lTname, tstr As String
-        Dim lFreeFile, amax As Integer
-
-        ret = 0
-        delim = " "
-        quote = """"
-
-        'read ptf file for channel data
-        lFreeFile = FreeFile()
-        'On Error GoTo ErrHandler
-        lTname = Microsoft.VisualBasic.Left(newName, Len(newName) - 3) & "ptf"
-        FileOpen(lFreeFile, lTname, OpenMode.Input)
-        lstr = LineInput(lFreeFile) 'header line
-        ChanRecCnt = 0
-        ReDim chanid(1)
-        ReDim ChanL(1)
-        ReDim ChanYm(1)
-        ReDim ChanWm(1)
-        ReDim ChanN(1)
-        ReDim ChanS(1)
-        ReDim ChanM11(1)
-        ReDim ChanM12(1)
-        ReDim ChanYc(1)
-        ReDim ChanM21(1)
-        ReDim ChanM22(1)
-        ReDim ChanYt1(1)
-        ReDim ChanYt2(1)
-        ReDim ChanM31(1)
-        ReDim ChanM32(1)
-        ReDim ChanW11(1)
-        ReDim ChanW12(1)
-        Do Until EOF(lFreeFile)
-            lstr = LineInput(lFreeFile)
-            ChanRecCnt = ChanRecCnt + 1
-            amax = UBound(chanid)
-            If ChanRecCnt > amax Then
-                ReDim Preserve chanid(amax * 2)
-                ReDim Preserve ChanL(amax * 2)
-                ReDim Preserve ChanYm(amax * 2)
-                ReDim Preserve ChanWm(amax * 2)
-                ReDim Preserve ChanN(amax * 2)
-                ReDim Preserve ChanS(amax * 2)
-                ReDim Preserve ChanM11(amax * 2)
-                ReDim Preserve ChanM12(amax * 2)
-                ReDim Preserve ChanYc(amax * 2)
-                ReDim Preserve ChanM21(amax * 2)
-                ReDim Preserve ChanM22(amax * 2)
-                ReDim Preserve ChanYt1(amax * 2)
-                ReDim Preserve ChanYt2(amax * 2)
-                ReDim Preserve ChanM31(amax * 2)
-                ReDim Preserve ChanM32(amax * 2)
-                ReDim Preserve ChanW11(amax * 2)
-                ReDim Preserve ChanW12(amax * 2)
-            End If
-            chanid(ChanRecCnt) = StrSplit(lstr, delim, quote) 'reach id
-            ChanL(ChanRecCnt) = StrSplit(lstr, delim, quote)  'length
-            ChanYm(ChanRecCnt) = StrSplit(lstr, delim, quote) 'mean depth
-            ChanWm(ChanRecCnt) = StrSplit(lstr, delim, quote) 'mean width
-            ChanN(ChanRecCnt) = StrSplit(lstr, delim, quote)  'mann n
-            ChanS(ChanRecCnt) = StrSplit(lstr, delim, quote)  'long slope
-            If ChanS(ChanRecCnt) < 0.0001 Then
-                ChanS(ChanRecCnt) = 0.0001
-            End If
-            tstr = StrSplit(lstr, delim, quote)
-            ChanM31(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope upper left
-            ChanM21(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope lower left
-            ChanW11(ChanRecCnt) = StrSplit(lstr, delim, quote)  'zero slope width left
-            ChanM11(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope chan left
-            ChanM12(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope chan right
-            ChanW12(ChanRecCnt) = StrSplit(lstr, delim, quote)  'zero slope width right
-            ChanM22(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope lower right
-            ChanM32(ChanRecCnt) = StrSplit(lstr, delim, quote)  'side slope upper right
-            ChanYc(ChanRecCnt) = StrSplit(lstr, delim, quote)  'channel depth
-            ChanYt1(ChanRecCnt) = StrSplit(lstr, delim, quote)  'depth at slope change
-            ChanYt2(ChanRecCnt) = StrSplit(lstr, delim, quote)  'channel max depth
-        Loop
-        FileClose()
-        Exit Sub
-        'ErrHandler:
-        '        Call MsgBox("Problem reading file " & tname, , "Create Problem")
-        '        ret = 3
-    End Sub
-
-    Public Sub GetPTFData(ByVal RCHId As String, ByVal ChanRecCnt As Integer, ByRef ArrayVals() As Single)
+    Public Sub cboXFile_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboXFile.SelectedIndexChanged
         Dim lOper As Integer
-        Dim Id As String
 
-        lOper = Len(RCHId)
-        If lOper > 0 Then  'have a reach id
-            Id = CInt(RCHId)
-            For lOper = 1 To ChanRecCnt
-                If Trim(chanid(lOper)) = Id Then  'found the oneq
-                    ArrayVals(1) = ChanL(lOper)
-                    ArrayVals(2) = ChanYm(lOper)
-                    ArrayVals(3) = ChanWm(lOper)
-                    ArrayVals(4) = ChanN(lOper)
-                    ArrayVals(5) = ChanS(lOper)
-                    ArrayVals(6) = ChanM32(lOper)
-                    ArrayVals(7) = ChanM22(lOper)
-                    ArrayVals(8) = ChanW12(lOper)
-                    ArrayVals(9) = ChanM12(lOper)
-                    ArrayVals(10) = ChanM11(lOper)
-                    ArrayVals(11) = ChanW11(lOper)
-                    ArrayVals(12) = ChanM21(lOper)
-                    ArrayVals(13) = ChanM31(lOper)
-                    ArrayVals(14) = ChanYc(lOper)
-                    ArrayVals(15) = ChanYt1(lOper)
-                    ArrayVals(16) = ChanYt2(lOper)
+        If cboXFile.Enabled Then  'have a reach id
+            For lOper = 1 To chanid.Count
+                If chanid(lOper) = cboXFile.SelectedItem Then  'found the oneq
+                    With agdXSect.Source
+                        .CellValue(1, 2) = ChanL(lOper)
+                        .CellValue(2, 2) = ChanYm(lOper)
+                        .CellValue(3, 2) = ChanWm(lOper)
+                        .CellValue(4, 2) = ChanN(lOper)
+                        .CellValue(5, 2) = ChanS(lOper)
+                        .CellValue(6, 2) = ChanM32(lOper)
+                        .CellValue(7, 2) = ChanM22(lOper)
+                        .CellValue(8, 2) = ChanW12(lOper)
+                        .CellValue(9, 2) = ChanM12(lOper)
+                        .CellValue(10, 2) = ChanM11(lOper)
+                        .CellValue(11, 2) = ChanW11(lOper)
+                        .CellValue(12, 2) = ChanM21(lOper)
+                        .CellValue(13, 2) = ChanM31(lOper)
+                        .CellValue(14, 2) = ChanYc(lOper)
+                        .CellValue(15, 2) = ChanYt1(lOper)
+                        .CellValue(16, 2) = ChanYt2(lOper)
+                    End With
+                    agdXSect.Refresh()
                 End If
             Next
         End If
     End Sub
-   
-    Public Sub cboXFile_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboXFile.SelectedIndexChanged
-        Dim ArrayVals(16) As Single
-        GetPTFData(cboXFile.Text, ChanRecCnt, ArrayVals)
-        With agdXSect.Source
-            .CellValue(1, 2) = ArrayVals(1)
-            .CellValue(2, 2) = ArrayVals(2)
-            .CellValue(3, 2) = ArrayVals(3)
-            .CellValue(4, 2) = ArrayVals(4)
-            .CellValue(5, 2) = ArrayVals(5)
-            .CellValue(6, 2) = ArrayVals(6)
-            .CellValue(7, 2) = ArrayVals(7)
-            .CellValue(8, 2) = ArrayVals(8)
-            .CellValue(9, 2) = ArrayVals(9)
-            .CellValue(10, 2) = ArrayVals(10)
-            .CellValue(11, 2) = ArrayVals(11)
-            .CellValue(12, 2) = ArrayVals(12)
-            .CellValue(13, 2) = ArrayVals(13)
-            .CellValue(14, 2) = ArrayVals(14)
-            .CellValue(15, 2) = ArrayVals(15)
-            .CellValue(16, 2) = ArrayVals(16)
-        End With
-        agdXSect.Refresh()
-    End Sub
-    Public Sub GetPTFFileIds(ByRef cnt As Integer, ByRef ArrayIds() As String)
-        Dim lOper As Integer
-
-        cnt = ChanRecCnt
-        ReDim ArrayIds(cnt)
-        For lOper = 1 To cnt
-            ArrayIds(lOper - 1) = chanid(lOper)
-        Next
-    End Sub
-    
 
     Public Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpen.Click
-        Dim ret&, ArrayIds$(), cnt&, lOper&
-        Dim lStream As Stream = Nothing
-        ArrayIds = New String() {}
+        Dim lLineString As String
+        Dim lOper As Integer
+        Dim lFileStream As Stream
 
-        cnt = 0
-        ChDriveDir("\basins\modelout")
+        OpenFileDialog1.InitialDirectory = "\basins\modelout"
         OpenFileDialog1.Filter = "BASINS Trapezoidal Files | *.ptf"
         OpenFileDialog1.FileName = "*.ptf"
         OpenFileDialog1.Title = "Select BASINS Trapezoidal File"
-        OpenFileDialog1.ShowDialog()
-        'read file here
-        'lStream = OpenFileDialog1.OpenFile()
-        ReadPTFFile(OpenFileDialog1.FileName, ret)
-        If ret = 0 Then
-            Call GetPTFFileIds(cnt, ArrayIds)
-            cboXFile.Enabled = True
-            cboXFile.Items.Clear()
-            For lOper = 0 To cnt - 1
-                cboXFile.Items.Add(ArrayIds(lOper))
-            Next
-            cboXFile.SelectedIndex = 0
+
+        If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Try
+                lFileStream = OpenFileDialog1.OpenFile()
+                Using sr As StreamReader = New StreamReader(lFileStream)
+
+                    lLineString = sr.ReadLine() 'Skip the big header line
+                    lLineString = sr.ReadLine()
+                    Do
+                        Dim lSplitString As String() = lLineString.Split(New [Char]() {" "c, ","c})
+
+                        chanid.Add(lSplitString(0)) 'reach id
+                        ChanL.Add(lSplitString(1))  'length
+                        ChanYm.Add(lSplitString(2)) 'mean depth
+                        ChanWm.Add(lSplitString(3)) 'mean width
+                        ChanN.Add(lSplitString(4))  'mann n
+                        ChanS.Add(lSplitString(5))  'long slope
+                        If ChanS(ChanS.Count) < 0.0001 Then
+                            ChanS.Remove(ChanS.Count)
+                            ChanS.Add(0.0001)
+                        End If
+                        ChanM31.Add(lSplitString(7))  'side slope upper left
+                        ChanM21.Add(lSplitString(8))  'side slope lower left
+                        ChanW11.Add(lSplitString(9))  'zero slope width left
+                        ChanM11.Add(lSplitString(10))  'side slope chan left
+                        ChanM12.Add(lSplitString(11))  'side slope chan right
+                        ChanW12.Add(lSplitString(12))  'zero slope width right
+                        ChanM22.Add(lSplitString(13))  'side slope lower right
+                        ChanM32.Add(lSplitString(14))  'side slope upper right
+                        ChanYc.Add(lSplitString(15))  'channel depth
+                        ChanYt1.Add(lSplitString(16))  'depth at slope change
+                        ChanYt2.Add(lSplitString(17))  'channel max depth
+
+                        'Advance one line and read
+                        lLineString = sr.ReadLine()
+                    Loop Until lLineString Is Nothing
+                    '    sr.Close()
+                End Using
+
+                cboXFile.Enabled = True
+                cboXFile.Items.Clear()
+                For lOper = 1 To chanid.Count
+                    cboXFile.Items.Add(chanid(lOper))
+                Next
+                cboXFile.SelectedIndex = 0
+            Catch Ex As Exception
+                Logger.Msg("Error Opening File", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "Open Cross Section FTABLE Error")
+            End Try
         End If
-
     End Sub
-
-    'Private Sub cmdXSect_Click(ByVal Index As Integer)
-    '    Dim l!, ym!, wm!, n!, s!, m32!, m22!, w12!
-    '    Dim m12!, m11!, w11!, m21!, m31!, yc!, yt1!, yt2!
-
-    '    If Index = 0 Then
-    '        'okay
-    '        With agdXSect
-    '            l = .CellValue(1, 2)
-    '            ym = .CellValue(2, 2)
-    '            wm = .CellValue(3, 2)
-    '            n = .CellValue(4, 2)
-    '            s = .CellValue(5, 2)
-    '            m32 = .CellValue(6, 2)
-    '            m22 = .CellValue(7, 2)
-    '            w12 = .CellValue(8, 2)
-    '            m12 = .CellValue(9, 2)
-    '            m11 = .CellValue(10, 2)
-    '            w11 = .CellValue(11, 2)
-    '            m21 = .CellValue(12, 2)
-    '            m31 = .CellValue(13, 2)
-    '            yc = .CellValue(14, 2)
-    '            yt1 = .CellValue(15, 2)
-    '            yt2 = .CellValue(16, 2)
-    '            curftab.FTableFromCrossSect(l, ym, wm, n, s, m11, m12, yc, m21, _
-    '                           m22, yt1, yt2, m31, m32, w11, w12)
-    '        End With
-    '        Unload(Me)
-    '    ElseIf Index = 1 Then
-    '        'cancel
-    '        Unload(Me)
-    '    Else
-    '        Dim d As HH_AKLINK, h$
-    '        d.pszKeywords = "Reach Editor"
-    '        d.fReserved = vbFalse
-    '        d.cbStruct = LenB(d)
-    '        HtmlHelp(Me.hwnd, App.HelpFile, HH_KEYWORD_LOOKUP, d)
-    '    End If
-    'End Sub
 
     Private Sub Form_Load()
         Dim lRow, lCol As Integer
@@ -294,19 +169,17 @@ Public Class frmXSect
             For lCol = 0 To 1
                 For lRow = 0 To .Rows - 1
                     .CellColor(lRow, lCol) = SystemColors.ControlLight
-
                 Next
             Next
             .CellColor(0, 2) = SystemColors.ControlLight
         End With
         agdXSect.Refresh()
-
     End Sub
 
     Public Sub CurrentReach(ByVal lReach As Integer, ByVal lFtab As HspfFtable)
         pCurrentReachNum = lReach
         pCurrentFTab = lFtab
-        agdXSectTitle.Text = "FTABLE " & CStr(pCurrentReachNum)
+        agdXSectTitle.Text = "FTABLE " & pCurrentReachNum
     End Sub
 
     Friend Sub Init(ByVal aHspfFTable As HspfFtable, ByVal aCtl As ctlEditFTables)
@@ -316,102 +189,97 @@ Public Class frmXSect
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Dim pChannel As New atcSegmentation.Channel
-
+        Dim lChannel As New atcSegmentation.Channel
 
         With agdXSect.Source
-            pChannel.Length = .CellValue(1, 2)
-            pChannel.DepthMean = .CellValue(2, 2)
-            pChannel.WidthMean = .CellValue(3, 2)
-            pChannel.ManningN = .CellValue(4, 2)
-            pChannel.SlopeProfile = .CellValue(5, 2)
-            pChannel.SlopeSideUpperFPLeft = .CellValue(6, 2)
-            pChannel.SlopeSideLowerFPLeft = .CellValue(7, 2)
-            pChannel.WidthZeroSlopeLeft = .CellValue(8, 2)
-            pChannel.SlopeSideLeft = .CellValue(9, 2)
-            pChannel.SlopeSideRight = .CellValue(10, 2)
-            pChannel.WidthZeroSlopeRight = .CellValue(11, 2)
-            pChannel.SlopeSideLowerFPRight = .CellValue(12, 2)
-            pChannel.SlopeSideUpperFPRight = .CellValue(13, 2)
-            pChannel.DepthChannel = .CellValue(14, 2)
-            pChannel.DepthSlopeChange = .CellValue(15, 2)
-            pChannel.DepthMax = .CellValue(16, 2)
-            pHspfFTable.FTableFromCrossSect(pChannel)
+            lChannel.Length = .CellValue(1, 2)
+            lChannel.DepthMean = .CellValue(2, 2)
+            lChannel.WidthMean = .CellValue(3, 2)
+            lChannel.ManningN = .CellValue(4, 2)
+            lChannel.SlopeProfile = .CellValue(5, 2)
+            lChannel.SlopeSideUpperFPLeft = .CellValue(6, 2)
+            lChannel.SlopeSideLowerFPLeft = .CellValue(7, 2)
+            lChannel.WidthZeroSlopeLeft = .CellValue(8, 2)
+            lChannel.SlopeSideLeft = .CellValue(9, 2)
+            lChannel.SlopeSideRight = .CellValue(10, 2)
+            lChannel.WidthZeroSlopeRight = .CellValue(11, 2)
+            lChannel.SlopeSideLowerFPRight = .CellValue(12, 2)
+            lChannel.SlopeSideUpperFPRight = .CellValue(13, 2)
+            lChannel.DepthChannel = .CellValue(14, 2)
+            lChannel.DepthSlopeChange = .CellValue(15, 2)
+            lChannel.DepthMax = .CellValue(16, 2)
+            pCurrentFTab.FTableFromCrossSect(lChannel)
         End With
+
         Me.Close()
     End Sub
 
     Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
-        Dim ArrayVals!(16)
         Dim lFileStream As Stream
-        Dim lStr As String
-        Dim lFreeFile As Integer
+        Dim lWriter As StreamWriter
+        Dim lOper As Integer
+        Dim lstr As String
 
-        'CDFile.flags = &H8806&
         SaveFileDialog1.Filter = "BASINS Trapezoidal Files (*.ptf)|*.ptf"
         SaveFileDialog1.FileName = "*.ptf"
         SaveFileDialog1.Title = "Save Cross Section Specifications"
-        'On Error GoTo 10
-        'CDFile.CancelError = True
-        'CDFile.Action = 2
-        With agdXSect.Source
-            ArrayVals(1) = .CellValue(1, 2)
-            ArrayVals(2) = .CellValue(2, 2)
-            ArrayVals(3) = .CellValue(3, 2)
-            ArrayVals(4) = .CellValue(4, 2)
-            ArrayVals(5) = .CellValue(5, 2)
-            ArrayVals(6) = .CellValue(6, 2)
-            ArrayVals(7) = .CellValue(7, 2)
-            ArrayVals(8) = .CellValue(8, 2)
-            ArrayVals(9) = .CellValue(9, 2)
-            ArrayVals(10) = .CellValue(10, 2)
-            ArrayVals(11) = .CellValue(11, 2)
-            ArrayVals(12) = .CellValue(12, 2)
-            ArrayVals(13) = .CellValue(13, 2)
-            ArrayVals(14) = .CellValue(14, 2)
-            ArrayVals(15) = .CellValue(15, 2)
-            ArrayVals(16) = .CellValue(16, 2)
-        End With
 
-        '10:     'continue here on cancel
 
-        lFileStream = SaveFileDialog1.OpenFile()
-        lFreeFile = FreeFile()
-        '.net conversion: NOTE!!!! VB6 version always called below code with chanid=1
-        If Not (lFileStream Is Nothing) Then
-            If Len(chanid) > 0 Then  'have a reach id
+        If SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Try
+                lFileStream = SaveFileDialog1.OpenFile()
+
+                lWriter = New StreamWriter(lFileStream)
                 lstr = "'Reach Number','Length(ft)','Mean Depth(ft)','Mean Width (ft)'," & _
-                       "'Mannings Roughness Coeff.','Long. Slope','Type of x-section','Side slope of upper FP left'," & _
-                       "'Side slope of lower FP left','Zero slope FP width left(ft)','Side slope of channel left'," & _
-                       "'Side slope of channel right','Zero slope FP width right(ft)','Side slope lower FP right'," & _
-                       "'Side slope upper FP right','Channel Depth(ft)','Flood side slope change at depth','Max. depth'," & _
-                       "'No. of exits','Fraction of flow through exit 1','Fraction of flow through exit 2'," & _
-                       "'Fraction of flow through exit 3','Fraction of flow through exit 4','Fraction of flow through exit 5'"
-                Print(lFreeFile, lStr)  'header line
-                lStr = "1" & " " & _
-                      ArrayVals(1) & " " & _
-                      ArrayVals(2) & " " & _
-                      ArrayVals(3) & " " & _
-                      ArrayVals(4) & " " & _
-                      ArrayVals(5) & " " & _
-                      "Trapezoidal" & " " & _
-                      ArrayVals(13) & " " & _
-                      ArrayVals(12) & " " & _
-                      ArrayVals(11) & " " & _
-                      ArrayVals(10) & " " & _
-                      ArrayVals(9) & " " & _
-                      ArrayVals(8) & " " & _
-                      ArrayVals(7) & " " & _
-                      ArrayVals(6) & " " & _
-                      ArrayVals(14) & " " & _
-                      ArrayVals(15) & " " & _
-                      ArrayVals(16) & " " & _
-                      "1 1 0 0 0 0"
-                Print(lFreeFile, lStr)
-                Exit Sub
-            End If
-            lFileStream.Close()
-        End If
+                           "'Mannings Roughness Coeff.','Long. Slope','Type of x-section','Side slope of upper FP left'," & _
+                           "'Side slope of lower FP left','Zero slope FP width left(ft)','Side slope of channel left'," & _
+                           "'Side slope of channel right','Zero slope FP width right(ft)','Side slope lower FP right'," & _
+                           "'Side slope upper FP right','Channel Depth(ft)','Flood side slope change at depth','Max. depth'," & _
+                           "'No. of exits','Fraction of flow through exit 1','Fraction of flow through exit 2'," & _
+                           "'Fraction of flow through exit 3','Fraction of flow through exit 4','Fraction of flow through exit 5'"
+                lWriter.WriteLine(lstr)
 
+                If chanid.Count = 0 Then
+                    lstr = "1 0.01 0.01 0.01 0.01 0.01 Trapezoidal 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 1 1 0 0 0 0"
+                    lWriter.WriteLine(lstr)
+                Else
+                    For lOper = 1 To chanid.Count
+                        With agdXSect.Source
+                            lstr = chanid(lOper) & " " & _
+                               ChanL(lOper) & " " & _
+                                       ChanYm(lOper) & " " & _
+                                       ChanWm(lOper) & " " & _
+                                       ChanN(lOper) & " " & _
+                                       ChanS(lOper) & " " & _
+                                       "Trapezoidal" & " " & _
+                                       ChanM31(lOper) & " " & _
+                                       ChanM21(lOper) & " " & _
+                                       ChanW11(lOper) & " " & _
+                                       ChanM11(lOper) & " " & _
+                                       ChanM12(lOper) & " " & _
+                                       ChanW12(lOper) & " " & _
+                                       ChanM22(lOper) & " " & _
+                                       ChanM32(lOper) & " " & _
+                                       ChanYc(lOper) & " " & _
+                                       ChanYt1(lOper) & " " & _
+                                       ChanYt2(lOper) & " " & _
+                                       "1 1 0 0 0 0"
+                            lWriter.WriteLine(lstr)
+                        End With
+                    Next
+                End If
+                lWriter.Close()
+            Catch Ex As Exception
+                Logger.Msg("Error Saving File", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "Save Cross Section FTABLE Error")
+            End Try
+        End If
+    End Sub
+
+    Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
+        Me.Close()
+    End Sub
+
+    Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
+        'TODO: Add this Code
     End Sub
 End Class
