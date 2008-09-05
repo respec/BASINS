@@ -221,7 +221,7 @@ Friend Module modSWMMFromMW
 
     End Function
 
-    Public Function CreateLandusesFromGrid(ByVal aLanduseGridFileName As String, _
+    Friend Function CreateLandusesFromGrid(ByVal aLanduseGridFileName As String, _
                                            ByVal aSubbasinShapefileName As String, _
                                            ByVal aCatchments As Catchments, _
                                            ByRef aLanduses As Landuses) As Boolean
@@ -254,6 +254,53 @@ Friend Module modSWMMFromMW
             Next
         Next
 
+    End Function
+
+    Friend Function CreateLandusesFromShapefile(ByVal aLanduseShapefileName As String, _
+                                                ByVal aLanduseFieldName As String, _
+                                                ByVal aSubbasinShapefileName As String, _
+                                                ByVal aSubbasinFieldName As String, _
+                                                ByVal aCatchments As Catchments, _
+                                                ByRef aLanduses As Landuses) As Boolean
+        'perform overlay for other shapefiles (not GIRAS) 
+
+        aLanduses.Clear()
+
+        If Not GisUtil.IsLayerByFileName(aSubbasinShapefileName) Then
+            GisUtil.AddLayer(aSubbasinShapefileName, "Catchments")
+        End If
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinShapefileName)
+
+        If Not GisUtil.IsLayerByFileName(aLanduseShapefileName) Then
+            GisUtil.AddLayer(aLanduseShapefileName, "Landuse Shapefile")
+        End If
+        Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(aLanduseShapefileName)
+        Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
+
+        'do overlay
+        GisUtil.Overlay(aLanduseShapefileName, aLanduseFieldName, aSubbasinShapefileName, aSubbasinFieldName, _
+                        lLandUsePathName & "\overlay.shp", True)
+
+        Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
+        For i As Integer = 1 To lTable.NumRecords
+            lTable.CurrentRecord = i
+            Dim lLanduse As New Landuse
+            lLanduse.Area = CDbl(lTable.Value(3))
+            lLanduse.Name = lTable.Value(1)
+            'find associated catchment
+            For Each lCatchment As Catchment In aCatchments
+                If lCatchment.Name = lTable.Value(2) Or lCatchment.Name = "S" & lTable.Value(2) Then
+                    lLanduse.Catchment = lCatchment
+                End If
+            Next
+            Dim lKey As String = lLanduse.Name & ":" & lLanduse.Catchment.Name
+            If aLanduses.Contains(lKey) Then
+                aLanduses(lKey).Area += lLanduse.Area
+            Else
+                aLanduses.Add(lLanduse)
+            End If
+
+        Next i
     End Function
 
     Public Function CreateMetConstituent(ByVal aWDMFileName As String, _
@@ -436,8 +483,9 @@ Friend Module modSWMMFromMW
                                 Exit For
                             End If
                         Next
-                        'swmm file is space delimited, must not use spaces in land use names
+                        'swmm file is space delimited, must not use spaces or commas in land use names
                         .Name = ReplaceString(.Name, " ", "")
+                        .Name = ReplaceString(.Name, ",", "_")
                     End With
                     lReclassifyLandUses.Add(lLandUse)
                 End If
@@ -559,7 +607,7 @@ Friend Module modSWMMFromMW
                                                  ByRef aGridSource As atcControls.atcGridSource, _
                                                  ByVal aLanduseReclassificationDetails As atcCollection)
 
-        If aReclassifyFile.Length > 0 And Not aCodesVisible Then
+        If aReclassifyFile.Length > 0 And aReclassifyFile <> "<none>" And Not aCodesVisible Then
             'have the simple percent pervious grid, need to know which 
             'lucodes correspond to which lugroups from dbf file
             Dim lTable As IatcTable = atcTableOpener.OpenAnyTable(aReclassifyFile)
