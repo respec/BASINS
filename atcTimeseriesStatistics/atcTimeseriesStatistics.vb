@@ -125,22 +125,22 @@ Public Class atcTimeseriesStatistics
 
                 AddOperation("%sum*", "percentile sum", defTimeSeriesOne, lCategory)
 
-                AddOperation("bins", "Values in sorted bins", defTimeSeriesOne, lCategory)
+                'Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
+                'If lBinsDefinition Is Nothing Then
+                '    lBinsDefinition = New atcAttributeDefinition
+                '    With lBinsDefinition
+                '        .Name = "Bins"
+                '        .Category = lCategory
+                '        .Description = "Values sorted into a collection of bins"
+                '        .DefaultValue = Nothing
+                '        .Editable = False
+                '        .TypeString = "atcCollection"
+                '        .Calculator = Me
+                '    End With
+                '    atcDataAttributes.AllDefinitions.Add(lBinsDefinition.Name.ToLower, lBinsDefinition)
+                'End If
 
-                Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
-                If lBinsDefinition Is Nothing Then
-                    lBinsDefinition = New atcAttributeDefinition
-                    With lBinsDefinition
-                        .Name = "Bins"
-                        .Category = "Statistics"
-                        .Description = "Values sorted into a collection of bins"
-                        .DefaultValue = Nothing
-                        .Editable = False
-                        .TypeString = "atcCollection"
-                        .Calculator = Me
-                    End With
-                    atcDataAttributes.AllDefinitions.Add(lBinsDefinition.Name.ToLower, lBinsDefinition)
-                End If
+                AddOperation("bins", "Values sorted into a collection of bins", defTimeSeriesOne, lCategory, "atcCollection")
 
             End If
             Return pAvailableOperations

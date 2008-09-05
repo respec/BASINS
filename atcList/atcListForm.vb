@@ -368,9 +368,9 @@ Public Class atcListForm
         Dim lAvailable As New ArrayList
         For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
             Select Case lAttrDef.TypeString.ToLower
-                Case "double", "integer", "boolean", "string"
+                Case "double", "integer", "boolean", "string", "atctimeunit"
                     Select Case lAttrDef.Name
-                        Case "Attributes", "COMPFG", "Constant Coefficient", "Degrees F", "HeaderComplete", "HighFlag", "Kendall Tau", "n-day high value", "n-day low value", "Number", "Return Period", "Summary File", "VBTIME"
+                        Case "Attributes", "COMPFG", "Constant Coefficient", "Degrees F", "HeaderComplete", "HighFlag", "Kendall Tau", "n-day high value", "n-day low value", "Number", "Return Period", "Summary File", "VBTIME", "%*", "%sum*"
                             'Skip displaying some things in the list
                         Case Else
                             lAvailable.Add(lAttrDef.Name)

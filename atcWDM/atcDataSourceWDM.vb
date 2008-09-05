@@ -17,7 +17,7 @@ Public Class atcDataSourceWDM
     Private pNan As Double
     Private pEpsilon As Double
     Private Shared pMsg As atcMsgWDM
-    Private pTu As Integer = 0 'default time units, default 2-minutes
+    Private pTu As atcTimeUnit = 0 'default time units, default 2-minutes
     Private pTs As Integer = 0 'default timestep, default 1 
     Private pAskAboutMissingTuTs As Boolean = True
 
@@ -76,6 +76,7 @@ Public Class atcDataSourceWDM
         'Logger.Progress("", 0, 0)
     End Sub
 
+    'True if attribute is set by custom code and does not need to be processed along with all attributes
     Private Function AttrStored(ByVal aSaind As Integer) As Boolean 'somewhere else
         Select Case aSaind
             Case 17 : AttrStored = True 'tcode
@@ -157,20 +158,20 @@ Public Class atcDataSourceWDM
             Dim lTimser As atcTimeseries = aDataSet
             Dim lTimserConst As atcTimeseries = Nothing
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
-            Dim lTu As Integer = lTimser.Attributes.GetValue("tu", 0)
+            Dim lTu As atcTimeUnit = lTimser.Attributes.GetValue("tu", atcTimeUnit.TUUnknown)
             Dim lAggr As Integer = lTimser.Attributes.GetValue("aggregation", 0)
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
             Dim lTGroup As Integer = aDataSet.Attributes.GetValue("tgroup", 6)
             Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
 
-            If lTs = 0 Or lTu = 0 Then ' sparse dataset - fill in dummy values for write
+            If lTs = 0 Or lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
                 If pAskAboutMissingTuTs Then
                     Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
                     pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lDsn, pTu, pTs, lAggr)
                 End If
                 lTs = pTs
                 lTu = pTu
-                If pTs > 0 And pTu > 0 Then
+                If pTs > 0 And pTu <> atcTimeUnit.TUUnknown Then
                     Dim lJulianInterval As Double
                     Select Case pTu
                         Case 2 : lJulianInterval = JulianMinute * lTs 'minute
@@ -459,7 +460,7 @@ CaseExistRenumber:
         Dim lIVal As Integer
         Dim lStr As String
         Dim lTs As Integer
-        Dim lTu As Integer
+        Dim lTu As atcTimeUnit
 
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsg.Unit
@@ -474,13 +475,12 @@ CaseExistRenumber:
         aTs.Attributes.SetValueIfMissing("COMPFG", 1)
         aTs.Attributes.SetValueIfMissing("TSFORM", 1)
         aTs.Attributes.SetValueIfMissing("TSFILL", -999)
-        lStr = aTs.Attributes.GetValue("tu")
-        If lStr.Length = 0 Then
+        If Not aTs.Attributes.ContainsAttribute("tu") Then
             CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
             aTs.Attributes.SetValue("tu", lTu)
             aTs.Attributes.SetValue("ts", lTs)
         Else
-            lTu = lStr
+            lTu = aTs.Attributes.GetValue("tu")
             lTs = aTs.Attributes.GetValue("ts")
         End If
         lIVal = aTs.Attributes.GetValue("VBTIME", 1)
@@ -547,7 +547,6 @@ CaseExistRenumber:
             Case "count zero" : lName = "numzro"
 
             Case "time unit" : lName = "tcode"
-            Case "time step" : lName = "tsstep"
             Case "time step" : lName = "tsstep"
             Case "scenario" : lName = "idscen"
             Case "location" : lName = "idlocn"
@@ -810,7 +809,7 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
                                     Logger.Dbg(lName & "parsed as '" & lDate.ToString & "' rounded to noon")
                                 End If
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lDate)
-                            Case "DCODE"
+                                'Case "DCODE"
                                 'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(lS)))
                             Case Else
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lS)
