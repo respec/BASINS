@@ -33,9 +33,13 @@ Module GraphGaFlow
             lHighLowSource.Open("n-day high timeseries", lArgsMath)
             Dim lTserNDay As atcTimeseries = lHighLowSource.DataSets(0)
             Dim lList As New atcListPlugin
-            'TODO: just output year
             lList.Save(lHighLowSource.DataSets, IO.Path.Combine(CurDir, "Hi1Day.txt"), "DateFormatIncludeYears")
 
+            Dim lOutFileName As String = pBaseName & "_freq"
+            Dim lZgc As ZedGraphControl = CreateZgc()
+            Dim lGrapher As New clsGraphFrequency(lHighLowSource.DataSets, lZgc)
+            lZgc.SaveIn(lOutFileName & ".png")
+            lZgc.Dispose()
 
             Dim lSDate(5) As Integer : lSDate(0) = 2000 : lSDate(1) = 1 : lSDate(2) = 1
             Dim lSDateJ As Double = Date2J(lSDate)
