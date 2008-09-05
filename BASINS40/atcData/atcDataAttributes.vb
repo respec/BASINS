@@ -112,32 +112,63 @@ Public Class atcDataAttributes
     Public Function GetFormattedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As String
         'TODO: use definition for formatting 
         Try
-            Dim lValue As Object = GetValue(aAttributeName, aDefault)
+            Dim lValue As Object = aDefault
+            Dim lTypeString As String = Nothing
+
             Try
-                If TypeOf (lValue) Is Double Then
-                    If InStr(LCase(aAttributeName), "jday", CompareMethod.Text) Then
-                        Return pDateFormat.JDateToString(lValue)
-                    Else
-                        Return DoubleToString(lValue, 15)
-                    End If
-                ElseIf TypeOf (lValue) Is Integer Then
-                    Return Format(lValue, "#,###;-#,###;0")
-                ElseIf TypeOf (lValue) Is atcTimeseries Then
-                    Return lValue.ToString
-                ElseIf TypeOf (lValue) Is atcDataGroup Then
-                    Return lValue.ToString
-                ElseIf TypeOf (lValue) Is atcTimeUnit Then
-                    Dim lTU As atcTimeUnit = lValue
-                    Return lTU.ToString.Substring(2)
-                ElseIf InStr(aAttributeName.ToLower, "history") > 0 Then
-                    If InStr(lValue.ToString.ToLower, "read from") Then 'make value shorter by removing path and "read "
-                        Return "from " & FilenameNoPath(lValue.ToString)
-                    Else
-                        Return lValue.ToString
-                    End If
+                Dim tmpAttribute As atcDefinedValue
+                tmpAttribute = GetDefinedValue(aAttributeName)
+                If tmpAttribute IsNot Nothing Then
+                    lValue = tmpAttribute.Value
+                    lTypeString = tmpAttribute.Definition.TypeString
                 Else
-                    Return lValue.ToString
+                    If aDefault Is Nothing Then 'search for default value in attribute definition
+                        Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
+                        If lDef IsNot Nothing Then
+                            lValue = lDef.DefaultValue
+                            lTypeString = lDef.TypeString
+                        End If
+                    End If
                 End If
+            Catch  'Could not find 
+            End Try
+
+            If lTypeString Is Nothing Then lTypeString = lValue.GetType.Name
+
+            Try
+                Select Case lTypeString
+                    Case "Double"
+FormatDouble:           Dim lAttName As String = aAttributeName.ToLower
+                        If lAttName.Contains("jday") OrElse lAttName.Contains("date") Then
+                            Return pDateFormat.JDateToString(lValue)
+                        Else
+                            Return DoubleToString(lValue, 15)
+                        End If
+                    Case "Integer"
+FormatInteger:          Return Format(CInt(lValue), "#,###;-#,###;0")
+                    Case "atcTimeseries"
+                        Return lValue.ToString
+                    Case "atcDataGroup"
+                        Return lValue.ToString
+                    Case "atcTimeUnit"
+FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
+                        Return lTU.ToString.Substring(2)
+                    Case Else
+                        If aAttributeName.ToLower.Contains("history") AndAlso lValue.ToString.ToLower.StartsWith("read from") Then 'make value shorter by removing path and "read "
+                            Return "from " & FilenameNoPath(lValue.ToString.Substring(10))
+                        ElseIf TypeOf (lValue) Is DateTime Then
+                            Dim lDate As DateTime = lValue
+                            Return pDateFormat.JDateToString(lDate.ToOADate)
+                        ElseIf TypeOf (lValue) Is Double Then
+                            GoTo FormatDouble
+                        ElseIf TypeOf (lValue) Is Integer Then
+                            GoTo FormatInteger
+                        ElseIf TypeOf (lValue) Is atcTimeUnit Then
+                            GoTo FormatTimeUnit
+                        Else
+                            Return lValue.ToString
+                        End If
+                End Select
             Catch
                 Return "<" & lValue.GetType.Name & ">"
             End Try
@@ -410,7 +441,7 @@ Public Class atcDataAttributes
                     Optional ByVal aKey As String = Nothing, _
                     Optional ByRef aOperation As atcDefinedValue = Nothing) As Boolean
         Select Case aDef.TypeString.ToLower
-            Case "single", "double", "integer", "boolean", "string"
+            Case "single", "double", "integer", "boolean", "string", "atctimeunit"
                 If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
                     If aKey Is Nothing Then aKey = AttributeNameToKey((aDef.Name))
                     aOperation = aDef.Calculator.AvailableOperations.ItemByKey(aKey)

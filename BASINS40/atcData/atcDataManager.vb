@@ -12,6 +12,9 @@ Public Class atcDataManager
     Private Shared pDisplayAttributes As ArrayList
     Private Shared pManagerForm As frmManager
 
+    Private Shared pDefaultSelectionAttributes() As String = {"Scenario", "Location", "Constituent"}
+    Private Shared pDefaultDisplayAttributes() As String = {"History 1", "Constituent", "Id", "Min", "Max", "Mean"}
+
     Private Shared pLikelyShapeLocationFieldNames() As String = { _
         "ACC_ID", "COOP_ID", "COVNAME", "CU", "ECOREG_ID", "EPA_REG_ID", _
         "FIPS", "GAGE_ID", "ID", "LOCATION", "MUID", "NAWQA", "NPD", "NPDES", _
@@ -47,19 +50,8 @@ Public Class atcDataManager
     ''' </summary>
     Public Shared Sub Clear()
         pDataSources = New ArrayList
-
-        pSelectionAttributes = New ArrayList
-        pSelectionAttributes.Add("Scenario")
-        pSelectionAttributes.Add("Location")
-        pSelectionAttributes.Add("Constituent")
-
-        pDisplayAttributes = New ArrayList
-        pDisplayAttributes.Add("History 1")
-        pDisplayAttributes.Add("Constituent")
-        pDisplayAttributes.Add("Id")
-        pDisplayAttributes.Add("Min")
-        pDisplayAttributes.Add("Max")
-        pDisplayAttributes.Add("Mean")
+        pSelectionAttributes = New ArrayList(pDefaultSelectionAttributes)
+        pDisplayAttributes = New ArrayList(pDefaultDisplayAttributes)
     End Sub
 
     ''' <summary>Set of atcDataSource objects representing currently open DataSources</summary>

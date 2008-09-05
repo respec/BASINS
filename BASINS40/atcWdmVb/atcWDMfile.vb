@@ -127,11 +127,11 @@ Public Class atcWDMfile
             DataSets.Add(lDsn, DataSetFromWdm(aWdm, lDsn))
             lDsn = aWdm.ReadInt32(lRec, 2)
             If lDsn = 0 Then
-                Logger.Progress("WDM Refresh Complete", 100, 100)
+                'Logger.Progress("WDM Refresh Complete", 100, 100)
             Else 'try the next dsn
                 lProgPrev = lProg
                 lProg = (100 * lDsn) / 32000 'TODO: use actual number of datasets read and total to read
-                Logger.Progress("WDM Refresh", lProg, lProgPrev)
+                'Logger.Progress("WDM Refresh", lProg, lProgPrev)
             End If
         End While
     End Sub
@@ -172,6 +172,7 @@ Public Class atcWDMfile
     ''' <param name="aRec">record number in WDM file where this data set starts</param>
     ''' <remarks></remarks>
     Private Sub AttributesFromWdm(ByVal aWdm As atcWdmFileHandle, ByVal aDataSet As atcDataSet, ByVal aRec As Int32)
+        Dim lDate As Date
         Dim lPsa As Int32 = aWdm.ReadInt32(aRec, 10)
         Dim lSacnt As Int32 = aWdm.ReadInt32(aRec, lPsa)
         Dim lPSastr As Int32 = aWdm.ReadInt32
@@ -197,14 +198,27 @@ Public Class atcWDMfile
                         Dim lS As String = aWdm.ReadString(.Max / 4)
                         Select Case UCase(.Name)
                             Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
-                                Dim lDate As Date
-                                lDate = New Date(CInt(lS.Substring(0, 4)), _
-                                                 CInt(lS.Substring(4, 2)), _
-                                                 CInt(lS.Substring(6, 2)), _
-                                                 CInt(lS.Substring(8, 2)), _
-                                                 CInt(lS.Substring(10, 2)), _
-                                                 CInt(lS.Substring(12, 2)))
-                                aDataSet.Attributes.SetValue(lAttributeDefinition, lDate)
+                                If IsNumeric(lS.Substring(0, 4)) Then
+                                    Try 'Dates should be formatted YYYYMMDDhhmmss
+                                        lDate = New Date(CInt(lS.Substring(0, 4)), _
+                                                         CInt(lS.Substring(4, 2)), _
+                                                         CInt(lS.Substring(6, 2)), _
+                                                         CInt(lS.Substring(8, 2)), _
+                                                         CInt(lS.Substring(10, 2)), _
+                                                         CInt(lS.Substring(12, 2)))
+                                    Catch ex As Exception
+                                        GoTo ParseDate
+                                    End Try
+                                Else 'parse dates written as M/D/YYYY h:mm:ss (truncated to 14 characters)
+ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' - unknown whether AM or PM")
+                                    Dim lMonth As Integer = StrFirstInt(lS)
+                                    lS = lS.Substring(1)
+                                    Dim lDay As Integer = StrFirstInt(lS)
+                                    lS = lS.Substring(1)
+                                    Dim lYear As Integer = StrFirstInt(lS)
+                                    lDate = New Date(lYear, lMonth, lDay, 12, 0, 0)
+                                    Logger.Dbg(.Name & "parsed as '" & lDate.ToString & "' rounded to noon")
+                                End If
                                 'TODO: set units attribute from DCODE
                                 'Case "DCODE"
                                 ' lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
@@ -212,7 +226,7 @@ Public Class atcWDMfile
                                 aDataSet.Attributes.SetValue(lAttributeDefinition, lS)
                         End Select
                     Case Else
-                        Logger.Msg("Help Me With Attribute Type " & .TypeString)
+                        Logger.Msg(.Name & ": Unknown Attribute Type: " & .TypeString)
                 End Select
             End With
         Next

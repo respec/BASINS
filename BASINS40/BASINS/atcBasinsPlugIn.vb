@@ -137,6 +137,19 @@ Public Class atcBasinsPlugIn
         atcDataManager.LoadPlugin("Timeseries::Statistics")
         atcDataManager.LoadPlugin("D4EM Data Download::Main")
 
+        Try 'atcDataManager.XML gets loaded when opening a project. This makes sure it gets loaded even without a project
+            Dim lAttributesString As String = GetSetting("BASINS4", "DataManager", "SelectionAttributes")
+            If lAttributesString.Length > 0 Then
+                atcDataManager.SelectionAttributes.Clear()
+                atcDataManager.SelectionAttributes.AddRange(lAttributesString.Split(vbTab))
+            End If
+            lAttributesString = GetSetting("BASINS4", "DataManager", "DisplayAttributes")
+            If lAttributesString.Length > 0 Then
+                atcDataManager.DisplayAttributes.Clear()
+                atcDataManager.DisplayAttributes.AddRange(lAttributesString.Split(vbTab))
+            End If
+        Catch
+        End Try
         'g_ProgressPanel = g_MapWin.UIPanel.CreatePanel("Progress", MapWindow.Interfaces.MapWindowDockStyle.Top)
         'g_ProgressPanel.Visible = False
     End Sub
@@ -163,6 +176,8 @@ Public Class atcBasinsPlugIn
         g_MapWin.ClearCustomWindowTitle()
 
         CloseForms()
+        SaveSetting("BASINS4", "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
+        SaveSetting("BASINS4", "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
     End Sub
 
     Private Sub CloseForms()

@@ -8,6 +8,7 @@ Imports System.DateTime
 Public Module modDate
     ''' <summary>Standard timeseries time units</summary>
     Public Enum atcTimeUnit
+        TUUnknown = 0
         TUSecond = 1
         TUMinute = 2
         TUHour = 3
@@ -966,12 +967,12 @@ Public Module modDate
         Return NVALS
     End Function
 
-    Public Sub CalcTimeUnitStep(ByVal aSJDate As Double, ByVal aEJDate As Double, ByRef aTu As Integer, ByRef aTs As Integer)
+    Public Sub CalcTimeUnitStep(ByVal aSJDate As Double, ByVal aEJDate As Double, ByRef aTu As atcTimeUnit, ByRef aTs As Integer)
         aTu = 6
         aTs = 0
         While aTs < 1
             aTs = timdifJ(aSJDate, aEJDate, aTu, 1)
-            If aTs = 0 Then aTu = aTu - 1
+            If aTs = 0 Then aTu -= 1
         End While
     End Sub
 
