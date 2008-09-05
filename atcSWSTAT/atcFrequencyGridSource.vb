@@ -7,6 +7,8 @@ Friend Class atcFrequencyGridSource
     Private pDataGroup As atcDataGroup
     Private pNdays As SortedList
     Private pRecurrence As SortedList
+    Private pAdj As SortedList
+    Private pAdjProb As SortedList
     Private pHigh As Boolean
 
     Private pCalculatedNdays As New ArrayList
@@ -16,28 +18,50 @@ Friend Class atcFrequencyGridSource
         pDataGroup = aDataGroup
         pRecurrence = New SortedList
         pNdays = New SortedList
+        pAdj = New SortedList
+        pAdjProb = New SortedList
+        Dim lAdjStr As String
+        Dim lAdjProbStr As String
+        Dim lHighLow As String
         Dim lKey As String
         MyBase.ColorCells = True
         For Each lData As atcDataSet In pDataGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing Then
+                    lAdjStr = ""
+                    lAdjProbStr = ""
+                    lHighLow = "Low"
+                    If pHigh Then lHighLow = "High"
+
                     If lAttribute.Arguments.ContainsAttribute("Nday") Then
                         Dim lNdays As String = lAttribute.Arguments.GetFormattedValue("Nday")
                         lKey = Format(lAttribute.Arguments.GetValue("Nday"), "00000.0000")
                         If Not pNdays.ContainsKey(lKey) Then
                             pNdays.Add(lKey, lNdays)
                         End If
+                        lAdjStr &= lNdays & lHighLow
                     End If
                     If lAttribute.Arguments.ContainsAttribute("Return Period") Then
                         Dim lNyears As String = lAttribute.Arguments.GetFormattedValue("Return Period")
                         lKey = Format(lAttribute.Arguments.GetValue("Return Period"), "00000.0000")
                         If Not pRecurrence.ContainsKey(lKey) Then
                             pRecurrence.Add(lKey, lNyears)
-                        End If
-                    End If
-                End If
-            Next
-        Next
+                            lAdjStr &= lNyears
+
+                            'Add the adjusted probability and adjusted parameter values
+                            lAdjStr &= "Adj"
+                            lAdjProbStr = lAdjStr & "Prob"
+                            If lData.Attributes.GetValue(lAdjStr) IsNot Nothing Then
+                                pAdj.Add(lKey, lData.Attributes.GetValue(lAdjStr).ToString)
+                            End If
+                            If lData.Attributes.GetValue(lAdjProbStr) IsNot Nothing Then
+                                pAdjProb.Add(lKey, lData.Attributes.GetValue(lAdjProbStr).ToString)
+                            End If
+                        End If ' Not pRecurrence.ContainsKey(lKey)
+                    End If ' lAttribute.Arguments.ContainsAttribute("Return Period)
+                End If 'Not lAttribute.Arguments Is Nothing
+            Next ' For Each lAttribute As atcDefinedValue In lData.Attributes
+        Next ' For Each lData As atcDataSet In pDataGroup
     End Sub
 
     Public Property High() As Boolean
@@ -230,6 +254,7 @@ Friend Class atcFrequencyGridSource
                     Dim lIsLog As Boolean = False
                     Dim lLogString As String = "   "
 
+                    'Compile again
                     If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then
                         'Get original version of NDayTimeseries (not log version)
                         lIsLog = True
@@ -239,7 +264,7 @@ Friend Class atcFrequencyGridSource
                         lNdayTsNonLog = lNdayTs
                     End If
                     Dim lLocation As String = lAttributes.GetValue("STAID", "")
-                    If lLocation.Length = 0 Then'use Location attribute for start of location header
+                    If lLocation.Length = 0 Then 'use Location attribute for start of location header
                         lLocation = lAttributes.GetValue("Location", "")
                     End If
                     lLocation &= " " & lAttributes.GetValue("STANAM", "")
@@ -283,7 +308,8 @@ Friend Class atcFrequencyGridSource
                     lRept.AppendLine(lStr.PadLeft(27) & " - parameter")
 
                     Dim lNumZero As Integer = lNdayTsNonLog.Attributes.GetValue("Count Zero", -1)
-                    Dim lNumPositive As Integer = lNdayTsNonLog.Attributes.GetValue("Count Positive", -1)
+                    'Dim lNumPositive As Integer = lNdayTsNonLog.Attributes.GetValue("Count Positive", -1)
+                    Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero
                     Dim lNumNegative As Integer = lNdayTsNonLog.numValues - lNumZero - lNumPositive
 
                     lStr = lNumPositive
@@ -423,6 +449,9 @@ Friend Class atcFrequencyGridSource
                     For Each lRecurrenceKey As String In pRecurrence.Keys
                         Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
                         Dim lNyears As Double = CDbl(lRecurrence)
+                        Dim lAdj As String
+                        Dim lAdjProb As String
+
                         lStr = DoubleToString(1 / lNyears, , "0.0000")
                         lThisRow = ("  " & lStr.PadLeft(17))
 
@@ -433,12 +462,18 @@ Friend Class atcFrequencyGridSource
                         End If
 
                         lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(16)
+
+                        If lNumZero > 0 Then 'If there is/area zero annual event, then add adj values and probs
+                            lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
+                            lThisRow &= pAdj.Item(lRecurrenceKey).PadLeft(15)
+                        End If
+
                         If pHigh Then
                             lReverseString &= lThisRow & vbCrLf
                         Else
                             lReverseString = lThisRow & vbCrLf & lReverseString
                         End If
-                    Next
+                    Next ' for each lRecurrenceKey As String In pRecurrence.Keys
                     lRept.Append(lReverseString)
 
                     lRept.AppendLine()

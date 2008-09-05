@@ -10,7 +10,7 @@ Imports MapWinUtility
 Imports System
 
 Module GraphGaFlow
-    Private Const pTestPath As String = "D:\Basins\data\03130001\flow"
+    Private Const pTestPath As String = "C:\Basins\data\03130001\flow"
     Private Const pBaseName As String = "flow"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)

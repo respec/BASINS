@@ -467,11 +467,13 @@ Public Class atcTimeseriesNdayHighLow
         For Each lNdayTs As atcTimeseries In aNdayTsGroup
             If Not lNdayTs Is Nothing Then
                 For lIndex As Integer = 1 To lNdayTs.numValues
-                    If Math.Abs(lNdayTs.Value(lIndex)) < 1.0E-30 Then
+                    If Math.Abs(lNdayTs.Value(lIndex)) < 1.0E-30 Then ' See if an NDay annual value is zero
                         lNdayTs.Value(lIndex) = GetNaN()
                         lNdayTs.ValueAttributes(lIndex).SetValue("Was Zero", True)
                     End If
                 Next
+                lNdayTs.Attributes.DiscardCalculated()
+
                 If aLogFg Then 'calc log10 of n day annual series
                     Dim lArgsMath As New atcDataAttributes
                     lTsMath = New atcTimeseriesMath.atcTimeseriesMath
@@ -501,6 +503,8 @@ Public Class atcTimeseriesNdayHighLow
                         lNdayTs.ValueAttributes(lIndex).Clear()
                     End If
                 Next
+
+                lNdayTs.Attributes.DiscardCalculated()
 
                 If Not (aTimeseries Is lNdayTs) Then 'get rid of intermediate timeseries
                     lNdayTs = Nothing
