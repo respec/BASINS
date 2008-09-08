@@ -14,36 +14,40 @@ Public Class frmXSect
     Dim pCurrentFTab As HspfFtable
     Dim pHspfFTable As HspfFtable
     Private FileName As String
-    Dim chanid, ChanL, ChanYm, ChanWm, ChanN, ChanS, ChanM11, ChanM12, ChanYc, ChanM21, ChanM22, ChanYt1, ChanYt2 As New Collection
-    Dim ChanM31, ChanM32, ChanW11, ChanW12 As New Collection
+    Dim chanid, ChanL, ChanYm, ChanWm, ChanN, ChanS, ChanM11, ChanM12, ChanYc, ChanM21, ChanM22, ChanYt1, ChanYt2 As New ArrayList
+    Dim ChanM31, ChanM32, ChanW11, ChanW12 As New ArrayList
+    Dim pPrevSelectedId As Integer
 
     Public Sub cboXFile_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboXFile.SelectedIndexChanged
-        Dim lOper As Integer
 
+        SaveDisplayedXSecParams(pPrevSelectedId)
+
+        RefreshXFiles(cboXFile.SelectedIndex)
+       
+        pPrevSelectedId = cboXFile.SelectedIndex
+
+    End Sub
+    Private Sub RefreshXFiles(ByVal lSelectedXFileIndex As Integer)
         If cboXFile.Enabled Then  'have a reach id
-            For lOper = 1 To chanid.Count
-                If chanid(lOper) = cboXFile.SelectedItem Then  'found the oneq
-                    With agdXSect.Source
-                        .CellValue(1, 2) = ChanL(lOper)
-                        .CellValue(2, 2) = ChanYm(lOper)
-                        .CellValue(3, 2) = ChanWm(lOper)
-                        .CellValue(4, 2) = ChanN(lOper)
-                        .CellValue(5, 2) = ChanS(lOper)
-                        .CellValue(6, 2) = ChanM32(lOper)
-                        .CellValue(7, 2) = ChanM22(lOper)
-                        .CellValue(8, 2) = ChanW12(lOper)
-                        .CellValue(9, 2) = ChanM12(lOper)
-                        .CellValue(10, 2) = ChanM11(lOper)
-                        .CellValue(11, 2) = ChanW11(lOper)
-                        .CellValue(12, 2) = ChanM21(lOper)
-                        .CellValue(13, 2) = ChanM31(lOper)
-                        .CellValue(14, 2) = ChanYc(lOper)
-                        .CellValue(15, 2) = ChanYt1(lOper)
-                        .CellValue(16, 2) = ChanYt2(lOper)
-                    End With
-                    agdXSect.Refresh()
-                End If
-            Next
+            With agdXSect.Source
+                .CellValue(1, 2) = ChanL(lSelectedXFileIndex)
+                .CellValue(2, 2) = ChanYm(lSelectedXFileIndex)
+                .CellValue(3, 2) = ChanWm(lSelectedXFileIndex)
+                .CellValue(4, 2) = ChanN(lSelectedXFileIndex)
+                .CellValue(5, 2) = ChanS(lSelectedXFileIndex)
+                .CellValue(6, 2) = ChanM32(lSelectedXFileIndex)
+                .CellValue(7, 2) = ChanM22(lSelectedXFileIndex)
+                .CellValue(8, 2) = ChanW12(lSelectedXFileIndex)
+                .CellValue(9, 2) = ChanM12(lSelectedXFileIndex)
+                .CellValue(10, 2) = ChanM11(lSelectedXFileIndex)
+                .CellValue(11, 2) = ChanW11(lSelectedXFileIndex)
+                .CellValue(12, 2) = ChanM21(lSelectedXFileIndex)
+                .CellValue(13, 2) = ChanM31(lSelectedXFileIndex)
+                .CellValue(14, 2) = ChanYc(lSelectedXFileIndex)
+                .CellValue(15, 2) = ChanYt1(lSelectedXFileIndex)
+                .CellValue(16, 2) = ChanYt2(lSelectedXFileIndex)
+            End With
+            agdXSect.Refresh()
         End If
     End Sub
 
@@ -73,10 +77,10 @@ Public Class frmXSect
                         ChanWm.Add(lSplitString(3)) 'mean width
                         ChanN.Add(lSplitString(4))  'mann n
                         ChanS.Add(lSplitString(5))  'long slope
-                        If ChanS(ChanS.Count) < 0.0001 Then
-                            ChanS.Remove(ChanS.Count)
-                            ChanS.Add(0.0001)
-                        End If
+                        'If ChanS(ChanS.Count) < 0.0001 Then
+                        '    ChanS.Remove(ChanS.Count)
+                        '    ChanS.Add(0.0001)
+                        'End If
                         ChanM31.Add(lSplitString(7))  'side slope upper left
                         ChanM21.Add(lSplitString(8))  'side slope lower left
                         ChanW11.Add(lSplitString(9))  'zero slope width left
@@ -97,9 +101,11 @@ Public Class frmXSect
 
                 cboXFile.Enabled = True
                 cboXFile.Items.Clear()
-                For lOper = 1 To chanid.Count
+                For lOper = 0 To chanid.Count - 1
                     cboXFile.Items.Add(chanid(lOper))
                 Next
+                RefreshXFiles(0)
+                pPrevSelectedId = 0
                 cboXFile.SelectedIndex = 0
             Catch Ex As Exception
                 Logger.Msg("Error Opening File", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "Open Cross Section FTABLE Error")
@@ -171,7 +177,13 @@ Public Class frmXSect
                     .CellColor(lRow, lCol) = SystemColors.ControlLight
                 Next
             Next
+
+            For lRow = 1 To .Rows - 1
+                .CellEditable(lRow, 2) = True
+            Next
+
             .CellColor(0, 2) = SystemColors.ControlLight
+
         End With
         agdXSect.Refresh()
     End Sub
@@ -214,6 +226,31 @@ Public Class frmXSect
         Me.Close()
     End Sub
 
+    Private Sub SaveDisplayedXSecParams(ByVal lSelectedXFileIndex As Integer)
+
+        If cboXFile.Enabled Then
+            With agdXSect.Source
+                ChanL(lSelectedXFileIndex) = .CellValue(1, 2)
+                ChanYm(lSelectedXFileIndex) = .CellValue(2, 2)
+                ChanWm(lSelectedXFileIndex) = .CellValue(3, 2)
+                ChanN(lSelectedXFileIndex) = .CellValue(4, 2)
+                ChanS(lSelectedXFileIndex) = .CellValue(5, 2)
+                ChanM32(lSelectedXFileIndex) = .CellValue(6, 2)
+                ChanM22(lSelectedXFileIndex) = .CellValue(7, 2)
+                ChanW12(lSelectedXFileIndex) = .CellValue(8, 2)
+                ChanM12(lSelectedXFileIndex) = .CellValue(9, 2)
+                ChanM11(lSelectedXFileIndex) = .CellValue(10, 2)
+                ChanW11(lSelectedXFileIndex) = .CellValue(11, 2)
+                ChanM21(lSelectedXFileIndex) = .CellValue(12, 2)
+                ChanM31(lSelectedXFileIndex) = .CellValue(13, 2)
+                ChanYc(lSelectedXFileIndex) = .CellValue(14, 2)
+                ChanYt1(lSelectedXFileIndex) = .CellValue(15, 2)
+                ChanYt2(lSelectedXFileIndex) = .CellValue(16, 2)
+            End With
+            agdXSect.Refresh()
+        End If
+    End Sub
+
     Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
         Dim lFileStream As Stream
         Dim lWriter As StreamWriter
@@ -224,6 +261,7 @@ Public Class frmXSect
         SaveFileDialog1.FileName = "*.ptf"
         SaveFileDialog1.Title = "Save Cross Section Specifications"
 
+        SaveDisplayedXSecParams(cboXFile.SelectedIndex)
 
         If SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
             Try
@@ -243,7 +281,7 @@ Public Class frmXSect
                     lstr = "1 0.01 0.01 0.01 0.01 0.01 Trapezoidal 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 1 1 0 0 0 0"
                     lWriter.WriteLine(lstr)
                 Else
-                    For lOper = 1 To chanid.Count
+                    For lOper = 0 To chanid.Count - 1
                         With agdXSect.Source
                             lstr = chanid(lOper) & " " & _
                                ChanL(lOper) & " " & _
