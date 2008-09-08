@@ -28,7 +28,6 @@ Module GraphGaFlow
             lArgsMath.SetValue("timeseries", lTserDaily)
             lArgsMath.SetValue("LogFlg", True)
             lArgsMath.SetValue("NDay", 1)
-            lArgsMath.SetValue("Return Period", 100)
             lArgsMath.SetValue("HighFlag", True)
             lHighLowSource.Open("n-day high timeseries", lArgsMath)
             Dim lTserNDay As atcTimeseries = lHighLowSource.DataSets(0)
