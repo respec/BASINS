@@ -275,8 +275,10 @@ Public Class ctlEditFTables
 
     Private Sub cmdCompute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCompute.Click
         Dim frmNewFTable As New frmNewFTable
+        frmNewFTable.SetCurrentFTable(pHspfFtable.Operation.FTable, grdEdit)
         frmNewFTable.Init(Me)
         frmNewFTable.Show()
+
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFcurve.Click
