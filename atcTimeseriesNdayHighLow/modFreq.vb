@@ -178,8 +178,24 @@ Module modFreq
                     aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
 
                     lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")
+                    If lNewAttribute Is Nothing Then
+                        lNewAttribute = New atcAttributeDefinition
+                        With lNewAttribute
+                            .Name = lS & "Adj"
+                            .TypeString = "Double"
+                            .Description = "Adjusted Result"
+                        End With
+                    End If
                     aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
                     lNewAttribute = atcDataAttributes.GetDefinition(lS & "AdjProb")
+                    If lNewAttribute Is Nothing Then
+                        lNewAttribute = New atcAttributeDefinition
+                        With lNewAttribute
+                            .Name = lS & "AdjProb"
+                            .TypeString = "Double"
+                            .Description = "Adjusted Probability"
+                        End With
+                    End If
                     aAttributesStorage.SetValue(lNewAttribute, lAdp(lIndex), lArguments)
                 Next
             Catch ex As Exception
