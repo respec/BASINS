@@ -138,6 +138,27 @@ Public Class clsGraphFrequency
         Next
 
         'TODO - add USGS labeling
+        Dim lUSGSLabel As TextObj = Nothing
+        Dim lStr As String
+        With lPane
+            .XAxis.Title.FontSpec.IsBold = False
+            .YAxis.Title.FontSpec.IsBold = False
+
+            .XAxis.Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" & vbCrLf & "Station - " & aTimeseries.ToString()
+            .YAxis.Title.Text = "ANNUAL PEAK DISCHARGE" & vbCrLf & "CUBIC FEET PER SECOND"
+
+
+            lStr = "Peakfq 5 run " & Date.Today.ToString() & vbCrLf
+            lStr &= "NOTE - Preliminary computation" & vbCrLf & "User is reponsible for assessment and interpretation."
+            'lUSGSLabel = New TextObj(lStr, .Rect.Right - 5.0, .Rect.Bottom - 5.0, CoordType.PaneFraction)
+            lUSGSLabel = New TextObj(lStr, 0.5, 0.6, CoordType.ChartFraction)
+            lUSGSLabel.ZOrder = ZOrder.A_InFront
+            .GraphObjList.Add(lUSGSLabel)
+            lUSGSLabel.IsVisible = True
+            '.GraphObjList.Draw(System.Drawing.Graphics(lUSGSLabel), lPane, 1.0, ZOrder.A_InFront)
+
+        End With
+
 
         SetYRange(lPane) 'TODO: does this do anything?
     End Sub

@@ -38,6 +38,7 @@ Module GraphGaFlow
             Dim lOutFileName As String = pBaseName & "_freq"
             Dim lZgc As ZedGraphControl = CreateZgc()
             Dim lGrapher As New clsGraphFrequency(lHighLowSource.DataSets, lZgc)
+
             lZgc.SaveIn(lOutFileName & ".png")
             lZgc.Dispose()
 
