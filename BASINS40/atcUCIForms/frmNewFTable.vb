@@ -13,8 +13,10 @@ Public Class frmNewFTable
         lFtab = ftab
         lo = O
     End Sub
-    Friend Sub Init(ByVal aCtl As ctlEditFTables)
-        Me.Icon = aCtl.ParentForm.Icon
+
+    Friend Sub Init()
+        '    Friend Sub Init(ByVal aCtl As ctlEditFTables)
+        Me.Icon = lo.ParentForm.Icon
         Me.Text = "New FTable"
         atxChannelLength.Value = lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#
         atxChannelSlope.Value = SignificantDigits(lFtab.Operation.Tables("HYDR-PARM2").Parms("DELTH").Value / (lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#), 3)
@@ -39,21 +41,41 @@ Public Class frmNewFTable
         atxFloodplainSideSlope.Value = 0
 
         ToggleEstimateFields(False)
+        TextLabel5.Enabled = False
+        TextLabel5.Visible = True
 
     End Sub
 
     Private Sub ToggleEstimateFields(ByVal lToggleVal As Boolean)
 
-        atxChannelWidth.Enabled = lToggleVal
-        atxChannelDepth.Enabled = lToggleVal
-        atxChannelManningsN.Enabled = lToggleVal
-        atxFloodplainManningsN.Enabled = lToggleVal
-        atxBankfullDepth.Enabled = lToggleVal
-        atxMaximumFloodplainDepth.Enabled = lToggleVal
-        atxLeftSideFloodPlainWidth.Enabled = lToggleVal
-        atxRightSideFloodPlainWidth.Enabled = lToggleVal
-        atxChannelSideSlope.Enabled = lToggleVal
-        atxFloodplainSideSlope.Enabled = lToggleVal
+        If lToggleVal = True Then
+            TextLabel5.Visible = False
+        Else
+            TextLabel5.Visible = True
+        End If
+
+        atxChannelWidth.Visible = lToggleVal
+        atxChannelDepth.Visible = lToggleVal
+        atxChannelManningsN.Visible = lToggleVal
+        atxFloodplainManningsN.Visible = lToggleVal
+        atxBankfullDepth.Visible = lToggleVal
+        atxMaximumFloodplainDepth.Visible = lToggleVal
+        atxLeftSideFloodPlainWidth.Visible = lToggleVal
+        atxRightSideFloodPlainWidth.Visible = lToggleVal
+        atxChannelSideSlope.Visible = lToggleVal
+        atxFloodplainSideSlope.Visible = lToggleVal
+
+        TextLabel6.Visible = lToggleVal
+        TextLabel7.Visible = lToggleVal
+        TextLabel8.Visible = lToggleVal
+        TextLabel9.Visible = lToggleVal
+        TextLabel10.Visible = lToggleVal
+        TextLabel11.Visible = lToggleVal
+        TextLabel12.Visible = lToggleVal
+        TextLabel13.Visible = lToggleVal
+        TextLabel14.Visible = lToggleVal
+        Textlabel15.Visible = lToggleVal
+
     End Sub
 
     Private Sub DoEstimate()
@@ -117,9 +139,8 @@ Public Class frmNewFTable
             lFtab.Area(j) = Format(ft(i, 1), fmt)
             lFtab.Volume(j) = Format(ft(i, 2), fmt)
             lFtab.Outflow1(j) = Format(ft(i, 3), fmt)
-        Next i
+        Next
         lo.UpdateFTABLE(lFtab)
-
     End Sub
 
     Private Sub cboProv_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboProv.SelectedIndexChanged
@@ -494,7 +515,7 @@ Public Class frmNewFTable
         Dim numRows As Integer
         numRows = UBound(depthsChannel) + UBound(depthsFloodplain)
 
-        ReDim FTable(numRows, 3)
+        ReDim FTable(numRows + 2, 3)
 
         FTable(row, colDepth) = 0 'Depth
         FTable(row, colArea) = 0 'Water surface area
@@ -506,9 +527,9 @@ Public Class frmNewFTable
         dblWaterDepth = 0
         numRows = UBound(depthsChannel)
         Dim i As Integer
-        For i = 1 To numRows
+        For i = 0 To numRows
             dblWaterDepth = depthsChannel(i)
-            If (i = 1) Then
+            If (i = 0) Then
                 dblDepthIncrement = depthsChannel(i)
             Else
                 dblDepthIncrement = depthsChannel(i) - depthsChannel(i - 1)
@@ -558,7 +579,7 @@ Public Class frmNewFTable
 
         'Dim dblFloodPlainDepth As Double
         numRows = UBound(depthsFloodplain)
-        For i = 1 To numRows
+        For i = 0 To numRows
             dblCurrentDepth = depthsFloodplain(i)
             'If (i = 1) Then
             dblDepthIncrement = depthsFloodplain(i) - bankfullDepth_ft
@@ -585,7 +606,6 @@ Public Class frmNewFTable
             FTable(row, colVolume) = dblVolumeFP
             FTable(row, colFlow) = dblOutflow
         Next i
-
         ft = FTable
     End Sub
 
@@ -595,12 +615,12 @@ Public Class frmNewFTable
                                    ByRef depthsChannel() As Double, _
                                    ByRef depthsFloodplain() As Double)
         Dim dblWaterDepth As Double 'G
-        Dim upLimit As Integer
+
         If (bankfullDepth_ft <= 0.02) Then
-            ReDim depthsChannel(1)
-            depthsChannel(1) = bankfullDepth_ft
+            ReDim depthsChannel(0)
+            depthsChannel(0) = bankfullDepth_ft
         ElseIf (bankfullDepth_ft <= 0.06) Then
-            ReDim depthsChannel(2)
+            ReDim depthsChannel(1)
             depthsChannel(0) = 0.02
             depthsChannel(1) = bankfullDepth_ft
         ElseIf (bankfullDepth_ft <= 0.1) Then
@@ -609,18 +629,18 @@ Public Class frmNewFTable
             depthsChannel(1) = 0.06
             depthsChannel(2) = bankfullDepth_ft
         ElseIf (bankfullDepth_ft <= 0.2) Then
-            ReDim depthsChannel(4)
-            depthsChannel(1) = 0.02
-            depthsChannel(2) = 0.06
-            depthsChannel(3) = 0.1
-            depthsChannel(4) = bankfullDepth_ft
+            ReDim depthsChannel(3)
+            depthsChannel(0) = 0.02
+            depthsChannel(1) = 0.06
+            depthsChannel(2) = 0.1
+            depthsChannel(3) = bankfullDepth_ft
         ElseIf (bankfullDepth_ft <= 0.6) Then
             ReDim depthsChannel(4)
-            depthsChannel(1) = 0.02
-            depthsChannel(2) = 0.06
-            depthsChannel(3) = 0.1
-            depthsChannel(4) = 0.6
-            depthsChannel(5) = bankfullDepth_ft
+            depthsChannel(0) = 0.02
+            depthsChannel(1) = 0.06
+            depthsChannel(2) = 0.1
+            depthsChannel(3) = 0.6
+            depthsChannel(4) = bankfullDepth_ft
         ElseIf (bankfullDepth_ft <= 1.0#) Then
             ReDim depthsChannel(5)
             depthsChannel(0) = 0.02
@@ -673,19 +693,18 @@ Public Class frmNewFTable
             dblWaterDepth = 2.0#
             While (dblWaterDepth < bankfullDepth_ft)
                 dblWaterDepth = dblWaterDepth + 1.0#
-                upLimit = UBound(depthsChannel) + 1
-                ReDim Preserve depthsChannel(upLimit)
+                ReDim Preserve depthsChannel(depthsChannel.Length)
                 If (dblWaterDepth < bankfullDepth_ft) Then
-                    depthsChannel(upLimit) = dblWaterDepth
+                    depthsChannel(depthsChannel.Length - 1) = dblWaterDepth
                 Else
-                    depthsChannel(upLimit) = bankfullDepth_ft
+                    depthsChannel(depthsChannel.Length - 1) = bankfullDepth_ft
                 End If
             End While
         End If
 
         dblWaterDepth = bankfullDepth_ft * 1.5
         If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
-            GoTo LastDepth
+            'oh
         Else
             ReDim depthsFloodplain(0)
             depthsFloodplain(0) = dblWaterDepth
@@ -694,40 +713,36 @@ Public Class frmNewFTable
         If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
             GoTo LastDepth
         Else
-            upLimit = UBound(depthsFloodplain) + 1
-            ReDim Preserve depthsFloodplain(upLimit - 1)
-            depthsFloodplain(upLimit) = dblWaterDepth
+            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
+            depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
         End If
         dblWaterDepth = bankfullDepth_ft * 2.5
         If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
             GoTo LastDepth
         Else
-            upLimit = UBound(depthsFloodplain) + 1
-            ReDim Preserve depthsFloodplain(upLimit - 1)
-            depthsFloodplain(upLimit) = dblWaterDepth
+            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
+            depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
         End If
         dblWaterDepth = bankfullDepth_ft * 3.0#
         If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
             GoTo LastDepth
         Else
-            upLimit = UBound(depthsFloodplain) + 1
-            ReDim Preserve depthsFloodplain(upLimit - 1)
-            depthsFloodplain(upLimit) = dblWaterDepth
+            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
+            depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
         End If
+
 LastDepth:
         If (maximumFloodPlainDepth_ft <= bankfullDepth_ft * 1.5) Then
-            upLimit = 1
+            ReDim Preserve depthsFloodplain(0)
         Else
-            upLimit = UBound(depthsFloodplain) + 1
+            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
         End If
-        ReDim Preserve depthsFloodplain(upLimit - 1)
         dblWaterDepth = maximumFloodPlainDepth_ft
-        depthsFloodplain(upLimit) = dblWaterDepth
+        depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
 
         If (maximumFloodPlainDepth_ft < meanChannelDepth_ft * 50.0#) Then
-            upLimit = UBound(depthsFloodplain) + 1
-            ReDim Preserve depthsFloodplain(upLimit - 1)
-            depthsFloodplain(upLimit) = meanChannelDepth_ft * 50.0#
+            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
+            depthsFloodplain(depthsFloodplain.Length - 1) = meanChannelDepth_ft * 50.0#
         End If
     End Sub
 
