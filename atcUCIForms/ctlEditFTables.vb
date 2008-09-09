@@ -275,12 +275,37 @@ Public Class ctlEditFTables
 
     Private Sub cmdCompute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCompute.Click
         Dim frmNewFTable As New frmNewFTable
-        frmNewFTable.SetCurrentFTable(pHspfFtable.Operation.FTable, grdEdit)
-        frmNewFTable.Init(Me)
+        Dim newFTable As New HspfFtable
+        newFTable.Operation = pHspfFtable.Operation
+        newFTable.Id = pHspfFtable.Id
+        frmNewFTable.SetCurrentFTable(newFTable, Me)
+        frmNewFTable.Init()
         frmNewFTable.Show()
 
     End Sub
 
+    Public Sub UpdateFTABLE(ByVal aFtab As HspfFtable)
+        Dim i As Long
+        Dim j As Long
+
+        txtNRows.Value = aFtab.Nrows
+        txtNCols.Value = aFtab.Ncols
+        With grdEdit.Source
+            .Rows = txtNRows.Value
+            .Columns = txtNCols.Value
+            For j = 0 To .Columns - 1
+                For i = 1 To .Rows - 1
+                    .CellEditable(i, j) = True
+                Next
+            Next
+            For i = 1 To .Rows
+                .CellValue(i, 0) = aFtab.Depth(i)
+                .CellValue(i, 1) = aFtab.Area(i)
+                .CellValue(i, 2) = aFtab.Volume(i)
+                .CellValue(i, 3) = aFtab.Outflow1(i)
+            Next
+        End With
+    End Sub
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFcurve.Click
         'Set data for plot
         'ReDim XYD(0)
