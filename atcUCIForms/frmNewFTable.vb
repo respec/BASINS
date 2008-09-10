@@ -76,6 +76,8 @@ Public Class frmNewFTable
         TextLabel14.Visible = lToggleVal
         Textlabel15.Visible = lToggleVal
 
+        cmdComputeFTable.Enabled = lToggleVal
+
     End Sub
 
     Private Sub DoEstimate()
@@ -83,7 +85,7 @@ Public Class frmNewFTable
 
         Rtn = getMeanAnnualFlow_FPS(cboProv.SelectedIndex, atxDrainageArea.Value)
         atxChannelWidth.Value = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
-        atxChannelDepth.Value = SignificantDigits(getMeanChannelDepth_Ft(cboProv.SelectedIndex, Rtn), 5)
+        atxChannelDepth.Value = SignificantDigits(getMeanChannelDepth_Ft(cboProv.SelectedIndex, Rtn), 4) 'THIS ONE MODIFIED
         channelN = SignificantDigits(getChannelManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
         atxChannelManningsN.Value = CStr(channelN)
         channelN = SignificantDigits(getFloodplainManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
@@ -701,6 +703,12 @@ Public Class frmNewFTable
                 End If
             End While
         End If
+
+        Dim tango() As Double = {0.0}
+        tango(0) = 6.7666#
+        MsgBox(tango.Length)
+
+
 
         dblWaterDepth = bankfullDepth_ft * 1.5
         If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
