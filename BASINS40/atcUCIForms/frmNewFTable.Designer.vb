@@ -38,8 +38,22 @@ Partial Class frmNewFTable
         Me.TextLabel4 = New System.Windows.Forms.Label
         Me.cboProv = New System.Windows.Forms.ComboBox
         Me.GroupBox = New System.Windows.Forms.GroupBox
-        Me.atxRightSideFloodPlainWidth = New atcControls.atcText
+        Me.TextLabel5 = New System.Windows.Forms.Label
+        Me.Label385 = New System.Windows.Forms.Label
+        Me.Label15 = New System.Windows.Forms.Label
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.Label14 = New System.Windows.Forms.Label
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.Label8 = New System.Windows.Forms.Label
+        Me.Label10 = New System.Windows.Forms.Label
+        Me.Label3112 = New System.Windows.Forms.Label
+        Me.Label13 = New System.Windows.Forms.Label
+        Me.atxChannelLength = New atcControls.atcText
         Me.atxDrainageArea = New atcControls.atcText
+        Me.atxChannelSlope = New atcControls.atcText
+        Me.atxRightSideFloodPlainWidth = New atcControls.atcText
         Me.atxChannelWidth = New atcControls.atcText
         Me.atxFloodplainSideSlope = New atcControls.atcText
         Me.atxChannelSideSlope = New atcControls.atcText
@@ -49,8 +63,6 @@ Partial Class frmNewFTable
         Me.atxFloodplainManningsN = New atcControls.atcText
         Me.atxChannelManningsN = New atcControls.atcText
         Me.atxChannelDepth = New atcControls.atcText
-        Me.atxChannelLength = New atcControls.atcText
-        Me.atxChannelSlope = New atcControls.atcText
         Me.AtcText12 = New atcControls.atcText
         Me.AtcText13 = New atcControls.atcText
         Me.AtcText22 = New atcControls.atcText
@@ -64,25 +76,13 @@ Partial Class frmNewFTable
         Me.AtcText19 = New atcControls.atcText
         Me.AtcText2 = New atcControls.atcText
         Me.AtcText20 = New atcControls.atcText
-        Me.Label385 = New System.Windows.Forms.Label
-        Me.Label15 = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.Label14 = New System.Windows.Forms.Label
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.Label8 = New System.Windows.Forms.Label
-        Me.Label10 = New System.Windows.Forms.Label
-        Me.Label3112 = New System.Windows.Forms.Label
-        Me.Label13 = New System.Windows.Forms.Label
-        Me.TextLabel5 = New System.Windows.Forms.Label
         Me.GroupBox.SuspendLayout()
         Me.SuspendLayout()
         '
         'TextLabel1
         '
         Me.TextLabel1.AutoSize = True
-        Me.TextLabel1.Location = New System.Drawing.Point(34, 31)
+        Me.TextLabel1.Location = New System.Drawing.Point(35, 31)
         Me.TextLabel1.Name = "TextLabel1"
         Me.TextLabel1.Size = New System.Drawing.Size(119, 13)
         Me.TextLabel1.TabIndex = 0
@@ -91,7 +91,7 @@ Partial Class frmNewFTable
         'TextLabel2
         '
         Me.TextLabel2.AutoSize = True
-        Me.TextLabel2.Location = New System.Drawing.Point(33, 57)
+        Me.TextLabel2.Location = New System.Drawing.Point(34, 57)
         Me.TextLabel2.Name = "TextLabel2"
         Me.TextLabel2.Size = New System.Drawing.Size(97, 13)
         Me.TextLabel2.TabIndex = 1
@@ -100,7 +100,7 @@ Partial Class frmNewFTable
         'cmdComputeFTable
         '
         Me.cmdComputeFTable.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.cmdComputeFTable.Location = New System.Drawing.Point(162, 518)
+        Me.cmdComputeFTable.Location = New System.Drawing.Point(130, 308)
         Me.cmdComputeFTable.Name = "cmdComputeFTable"
         Me.cmdComputeFTable.Size = New System.Drawing.Size(126, 30)
         Me.cmdComputeFTable.TabIndex = 15
@@ -218,7 +218,7 @@ Partial Class frmNewFTable
         'TextLabel3
         '
         Me.TextLabel3.AutoSize = True
-        Me.TextLabel3.Location = New System.Drawing.Point(34, 107)
+        Me.TextLabel3.Location = New System.Drawing.Point(35, 107)
         Me.TextLabel3.Name = "TextLabel3"
         Me.TextLabel3.Size = New System.Drawing.Size(122, 13)
         Me.TextLabel3.TabIndex = 3
@@ -227,7 +227,7 @@ Partial Class frmNewFTable
         'TextLabel4
         '
         Me.TextLabel4.AutoSize = True
-        Me.TextLabel4.Location = New System.Drawing.Point(34, 143)
+        Me.TextLabel4.Location = New System.Drawing.Point(35, 143)
         Me.TextLabel4.Name = "TextLabel4"
         Me.TextLabel4.Size = New System.Drawing.Size(118, 13)
         Me.TextLabel4.TabIndex = 4
@@ -236,13 +236,14 @@ Partial Class frmNewFTable
         'cboProv
         '
         Me.cboProv.FormattingEnabled = True
-        Me.cboProv.Location = New System.Drawing.Point(206, 140)
+        Me.cboProv.Location = New System.Drawing.Point(207, 140)
         Me.cboProv.Name = "cboProv"
         Me.cboProv.Size = New System.Drawing.Size(213, 21)
         Me.cboProv.TabIndex = 4
         '
         'GroupBox
         '
+        Me.GroupBox.Controls.Add(Me.cmdComputeFTable)
         Me.GroupBox.Controls.Add(Me.TextLabel5)
         Me.GroupBox.Controls.Add(Me.atxRightSideFloodPlainWidth)
         Me.GroupBox.Controls.Add(Me.TextLabel13)
@@ -264,12 +265,190 @@ Partial Class frmNewFTable
         Me.GroupBox.Controls.Add(Me.atxChannelDepth)
         Me.GroupBox.Controls.Add(Me.TextLabel14)
         Me.GroupBox.Controls.Add(Me.Textlabel15)
-        Me.GroupBox.Location = New System.Drawing.Point(24, 195)
+        Me.GroupBox.Location = New System.Drawing.Point(25, 195)
         Me.GroupBox.Name = "GroupBox"
-        Me.GroupBox.Size = New System.Drawing.Size(387, 301)
+        Me.GroupBox.Size = New System.Drawing.Size(387, 353)
         Me.GroupBox.TabIndex = 2
         Me.GroupBox.TabStop = False
         Me.GroupBox.Text = "Estimated Channel Characteristics"
+        '
+        'TextLabel5
+        '
+        Me.TextLabel5.AutoSize = True
+        Me.TextLabel5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextLabel5.Location = New System.Drawing.Point(90, 144)
+        Me.TextLabel5.Name = "TextLabel5"
+        Me.TextLabel5.Size = New System.Drawing.Size(206, 13)
+        Me.TextLabel5.TabIndex = 32
+        Me.TextLabel5.Text = "<Select a Physiographic Porvince Above>"
+        '
+        'Label385
+        '
+        Me.Label385.AutoSize = True
+        Me.Label385.Location = New System.Drawing.Point(90, 301)
+        Me.Label385.Name = "Label385"
+        Me.Label385.Size = New System.Drawing.Size(153, 13)
+        Me.Label385.TabIndex = 31
+        Me.Label385.Text = "Right Side Floodplain Width (ft)"
+        '
+        'Label15
+        '
+        Me.Label15.AutoSize = True
+        Me.Label15.Location = New System.Drawing.Point(19, 26)
+        Me.Label15.Name = "Label15"
+        Me.Label15.Size = New System.Drawing.Size(122, 13)
+        Me.Label15.TabIndex = 3
+        Me.Label15.Text = "Drainage Area (sq.Miles)"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(34, 31)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(119, 13)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "Average Channel Slope"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(33, 57)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(97, 13)
+        Me.Label2.TabIndex = 1
+        Me.Label2.Text = "Channel Length, ft."
+        '
+        'Label14
+        '
+        Me.Label14.AutoSize = True
+        Me.Label14.Location = New System.Drawing.Point(19, 62)
+        Me.Label14.Name = "Label14"
+        Me.Label14.Size = New System.Drawing.Size(118, 13)
+        Me.Label14.TabIndex = 4
+        Me.Label14.Text = "Physiographic Province"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(19, 95)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(55, 13)
+        Me.Label4.TabIndex = 33
+        Me.Label4.Text = "Estimates:"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(90, 145)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(123, 13)
+        Me.Label6.TabIndex = 6
+        Me.Label6.Text = "Mean Channel Depth (ft)"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(90, 197)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(128, 13)
+        Me.Label8.TabIndex = 8
+        Me.Label8.Text = "Manning N For Floodplain"
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Location = New System.Drawing.Point(90, 249)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(149, 13)
+        Me.Label10.TabIndex = 10
+        Me.Label10.Text = "Maximum Floodplain Depth (ft)"
+        '
+        'Label3112
+        '
+        Me.Label3112.AutoSize = True
+        Me.Label3112.Location = New System.Drawing.Point(90, 301)
+        Me.Label3112.Name = "Label3112"
+        Me.Label3112.Size = New System.Drawing.Size(153, 13)
+        Me.Label3112.TabIndex = 31
+        Me.Label3112.Text = "Right Side Floodplain Width (ft)"
+        '
+        'Label13
+        '
+        Me.Label13.AutoSize = True
+        Me.Label13.Location = New System.Drawing.Point(90, 353)
+        Me.Label13.Name = "Label13"
+        Me.Label13.Size = New System.Drawing.Size(109, 13)
+        Me.Label13.TabIndex = 13
+        Me.Label13.Text = "Floodplain Side Slope"
+        '
+        'atxChannelLength
+        '
+        Me.atxChannelLength.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxChannelLength.DataType = atcControls.atcText.ATCoDataType.ATCoSng
+        Me.atxChannelLength.DefaultValue = 0.0000099999997473787516
+        Me.atxChannelLength.HardMax = 1000000000
+        Me.atxChannelLength.HardMin = -1000000000
+        Me.atxChannelLength.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxChannelLength.Location = New System.Drawing.Point(212, 52)
+        Me.atxChannelLength.MaxDecimal = 0
+        Me.atxChannelLength.maxWidth = 0
+        Me.atxChannelLength.Name = "atxChannelLength"
+        Me.atxChannelLength.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelLength.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelLength.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxChannelLength.SelLength = 0
+        Me.atxChannelLength.SelStart = 20
+        Me.atxChannelLength.Size = New System.Drawing.Size(93, 23)
+        Me.atxChannelLength.SoftMax = -999
+        Me.atxChannelLength.SoftMin = -999
+        Me.atxChannelLength.TabIndex = 2
+        Me.atxChannelLength.Value = 0.00001!
+        '
+        'atxDrainageArea
+        '
+        Me.atxDrainageArea.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxDrainageArea.DataType = atcControls.atcText.ATCoDataType.ATCoSng
+        Me.atxDrainageArea.DefaultValue = 0.0000099999997473787516
+        Me.atxDrainageArea.HardMax = 1000000000
+        Me.atxDrainageArea.HardMin = -1000000000
+        Me.atxDrainageArea.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxDrainageArea.Location = New System.Drawing.Point(211, 107)
+        Me.atxDrainageArea.MaxDecimal = 0
+        Me.atxDrainageArea.maxWidth = 0
+        Me.atxDrainageArea.Name = "atxDrainageArea"
+        Me.atxDrainageArea.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxDrainageArea.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxDrainageArea.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxDrainageArea.SelLength = 0
+        Me.atxDrainageArea.SelStart = 20
+        Me.atxDrainageArea.Size = New System.Drawing.Size(93, 23)
+        Me.atxDrainageArea.SoftMax = -999
+        Me.atxDrainageArea.SoftMin = -999
+        Me.atxDrainageArea.TabIndex = 3
+        Me.atxDrainageArea.Value = 0.00001!
+        '
+        'atxChannelSlope
+        '
+        Me.atxChannelSlope.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxChannelSlope.DataType = atcControls.atcText.ATCoDataType.ATCoSng
+        Me.atxChannelSlope.DefaultValue = 0.0000099999997473787516
+        Me.atxChannelSlope.HardMax = 1000000000
+        Me.atxChannelSlope.HardMin = -1000000000
+        Me.atxChannelSlope.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxChannelSlope.Location = New System.Drawing.Point(212, 26)
+        Me.atxChannelSlope.MaxDecimal = 0
+        Me.atxChannelSlope.maxWidth = 0
+        Me.atxChannelSlope.Name = "atxChannelSlope"
+        Me.atxChannelSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxChannelSlope.SelLength = 0
+        Me.atxChannelSlope.SelStart = 20
+        Me.atxChannelSlope.Size = New System.Drawing.Size(93, 23)
+        Me.atxChannelSlope.SoftMax = -999
+        Me.atxChannelSlope.SoftMin = -999
+        Me.atxChannelSlope.TabIndex = 1
+        Me.atxChannelSlope.Value = 0.00001!
         '
         'atxRightSideFloodPlainWidth
         '
@@ -285,6 +464,7 @@ Partial Class frmNewFTable
         Me.atxRightSideFloodPlainWidth.Name = "atxRightSideFloodPlainWidth"
         Me.atxRightSideFloodPlainWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxRightSideFloodPlainWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxRightSideFloodPlainWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxRightSideFloodPlainWidth.SelLength = 0
         Me.atxRightSideFloodPlainWidth.SelStart = 20
         Me.atxRightSideFloodPlainWidth.Size = New System.Drawing.Size(93, 23)
@@ -292,28 +472,6 @@ Partial Class frmNewFTable
         Me.atxRightSideFloodPlainWidth.SoftMin = -999
         Me.atxRightSideFloodPlainWidth.TabIndex = 12
         Me.atxRightSideFloodPlainWidth.Value = 0.00001!
-        '
-        'atxDrainageArea
-        '
-        Me.atxDrainageArea.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxDrainageArea.DataType = atcControls.atcText.ATCoDataType.ATCoSng
-        Me.atxDrainageArea.DefaultValue = 0.0000099999997473787516
-        Me.atxDrainageArea.HardMax = 1000000000
-        Me.atxDrainageArea.HardMin = -1000000000
-        Me.atxDrainageArea.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxDrainageArea.Location = New System.Drawing.Point(210, 107)
-        Me.atxDrainageArea.MaxDecimal = 0
-        Me.atxDrainageArea.maxWidth = 0
-        Me.atxDrainageArea.Name = "atxDrainageArea"
-        Me.atxDrainageArea.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxDrainageArea.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxDrainageArea.SelLength = 0
-        Me.atxDrainageArea.SelStart = 20
-        Me.atxDrainageArea.Size = New System.Drawing.Size(93, 23)
-        Me.atxDrainageArea.SoftMax = -999
-        Me.atxDrainageArea.SoftMin = -999
-        Me.atxDrainageArea.TabIndex = 3
-        Me.atxDrainageArea.Value = 0.00001!
         '
         'atxChannelWidth
         '
@@ -329,6 +487,7 @@ Partial Class frmNewFTable
         Me.atxChannelWidth.Name = "atxChannelWidth"
         Me.atxChannelWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxChannelWidth.SelLength = 0
         Me.atxChannelWidth.SelStart = 20
         Me.atxChannelWidth.Size = New System.Drawing.Size(93, 23)
@@ -351,6 +510,7 @@ Partial Class frmNewFTable
         Me.atxFloodplainSideSlope.Name = "atxFloodplainSideSlope"
         Me.atxFloodplainSideSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxFloodplainSideSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainSideSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxFloodplainSideSlope.SelLength = 0
         Me.atxFloodplainSideSlope.SelStart = 20
         Me.atxFloodplainSideSlope.Size = New System.Drawing.Size(93, 23)
@@ -373,6 +533,7 @@ Partial Class frmNewFTable
         Me.atxChannelSideSlope.Name = "atxChannelSideSlope"
         Me.atxChannelSideSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelSideSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelSideSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxChannelSideSlope.SelLength = 0
         Me.atxChannelSideSlope.SelStart = 20
         Me.atxChannelSideSlope.Size = New System.Drawing.Size(93, 23)
@@ -395,6 +556,7 @@ Partial Class frmNewFTable
         Me.atxLeftSideFloodPlainWidth.Name = "atxLeftSideFloodPlainWidth"
         Me.atxLeftSideFloodPlainWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxLeftSideFloodPlainWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxLeftSideFloodPlainWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxLeftSideFloodPlainWidth.SelLength = 0
         Me.atxLeftSideFloodPlainWidth.SelStart = 20
         Me.atxLeftSideFloodPlainWidth.Size = New System.Drawing.Size(93, 23)
@@ -417,6 +579,7 @@ Partial Class frmNewFTable
         Me.atxMaximumFloodplainDepth.Name = "atxMaximumFloodplainDepth"
         Me.atxMaximumFloodplainDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxMaximumFloodplainDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxMaximumFloodplainDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxMaximumFloodplainDepth.SelLength = 0
         Me.atxMaximumFloodplainDepth.SelStart = 20
         Me.atxMaximumFloodplainDepth.Size = New System.Drawing.Size(93, 23)
@@ -439,6 +602,7 @@ Partial Class frmNewFTable
         Me.atxBankfullDepth.Name = "atxBankfullDepth"
         Me.atxBankfullDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxBankfullDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxBankfullDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxBankfullDepth.SelLength = 0
         Me.atxBankfullDepth.SelStart = 20
         Me.atxBankfullDepth.Size = New System.Drawing.Size(93, 23)
@@ -461,6 +625,7 @@ Partial Class frmNewFTable
         Me.atxFloodplainManningsN.Name = "atxFloodplainManningsN"
         Me.atxFloodplainManningsN.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxFloodplainManningsN.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainManningsN.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxFloodplainManningsN.SelLength = 0
         Me.atxFloodplainManningsN.SelStart = 20
         Me.atxFloodplainManningsN.Size = New System.Drawing.Size(93, 23)
@@ -483,6 +648,7 @@ Partial Class frmNewFTable
         Me.atxChannelManningsN.Name = "atxChannelManningsN"
         Me.atxChannelManningsN.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelManningsN.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelManningsN.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxChannelManningsN.SelLength = 0
         Me.atxChannelManningsN.SelStart = 20
         Me.atxChannelManningsN.Size = New System.Drawing.Size(93, 23)
@@ -505,6 +671,7 @@ Partial Class frmNewFTable
         Me.atxChannelDepth.Name = "atxChannelDepth"
         Me.atxChannelDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.atxChannelDepth.SelLength = 0
         Me.atxChannelDepth.SelStart = 20
         Me.atxChannelDepth.Size = New System.Drawing.Size(93, 23)
@@ -512,50 +679,6 @@ Partial Class frmNewFTable
         Me.atxChannelDepth.SoftMin = -999
         Me.atxChannelDepth.TabIndex = 6
         Me.atxChannelDepth.Value = 0.00001!
-        '
-        'atxChannelLength
-        '
-        Me.atxChannelLength.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxChannelLength.DataType = atcControls.atcText.ATCoDataType.ATCoSng
-        Me.atxChannelLength.DefaultValue = 0.0000099999997473787516
-        Me.atxChannelLength.HardMax = 1000000000
-        Me.atxChannelLength.HardMin = -1000000000
-        Me.atxChannelLength.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxChannelLength.Location = New System.Drawing.Point(211, 52)
-        Me.atxChannelLength.MaxDecimal = 0
-        Me.atxChannelLength.maxWidth = 0
-        Me.atxChannelLength.Name = "atxChannelLength"
-        Me.atxChannelLength.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelLength.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelLength.SelLength = 0
-        Me.atxChannelLength.SelStart = 20
-        Me.atxChannelLength.Size = New System.Drawing.Size(93, 23)
-        Me.atxChannelLength.SoftMax = -999
-        Me.atxChannelLength.SoftMin = -999
-        Me.atxChannelLength.TabIndex = 2
-        Me.atxChannelLength.Value = 0.00001!
-        '
-        'atxChannelSlope
-        '
-        Me.atxChannelSlope.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxChannelSlope.DataType = atcControls.atcText.ATCoDataType.ATCoSng
-        Me.atxChannelSlope.DefaultValue = 0.0000099999997473787516
-        Me.atxChannelSlope.HardMax = 1000000000
-        Me.atxChannelSlope.HardMin = -1000000000
-        Me.atxChannelSlope.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxChannelSlope.Location = New System.Drawing.Point(211, 26)
-        Me.atxChannelSlope.MaxDecimal = 0
-        Me.atxChannelSlope.maxWidth = 0
-        Me.atxChannelSlope.Name = "atxChannelSlope"
-        Me.atxChannelSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelSlope.SelLength = 0
-        Me.atxChannelSlope.SelStart = 20
-        Me.atxChannelSlope.Size = New System.Drawing.Size(93, 23)
-        Me.atxChannelSlope.SoftMax = -999
-        Me.atxChannelSlope.SoftMin = -999
-        Me.atxChannelSlope.TabIndex = 1
-        Me.atxChannelSlope.Value = 0.00001!
         '
         'AtcText12
         '
@@ -830,121 +953,11 @@ Partial Class frmNewFTable
         Me.AtcText20.SoftMin = 0
         Me.AtcText20.TabIndex = 24
         '
-        'Label385
-        '
-        Me.Label385.AutoSize = True
-        Me.Label385.Location = New System.Drawing.Point(90, 301)
-        Me.Label385.Name = "Label385"
-        Me.Label385.Size = New System.Drawing.Size(153, 13)
-        Me.Label385.TabIndex = 31
-        Me.Label385.Text = "Right Side Floodplain Width (ft)"
-        '
-        'Label15
-        '
-        Me.Label15.AutoSize = True
-        Me.Label15.Location = New System.Drawing.Point(19, 26)
-        Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(122, 13)
-        Me.Label15.TabIndex = 3
-        Me.Label15.Text = "Drainage Area (sq.Miles)"
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(34, 31)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(119, 13)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Average Channel Slope"
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(33, 57)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(97, 13)
-        Me.Label2.TabIndex = 1
-        Me.Label2.Text = "Channel Length, ft."
-        '
-        'Label14
-        '
-        Me.Label14.AutoSize = True
-        Me.Label14.Location = New System.Drawing.Point(19, 62)
-        Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(118, 13)
-        Me.Label14.TabIndex = 4
-        Me.Label14.Text = "Physiographic Province"
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(19, 95)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(55, 13)
-        Me.Label4.TabIndex = 33
-        Me.Label4.Text = "Estimates:"
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(90, 145)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(123, 13)
-        Me.Label6.TabIndex = 6
-        Me.Label6.Text = "Mean Channel Depth (ft)"
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(90, 197)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(128, 13)
-        Me.Label8.TabIndex = 8
-        Me.Label8.Text = "Manning N For Floodplain"
-        '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(90, 249)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(149, 13)
-        Me.Label10.TabIndex = 10
-        Me.Label10.Text = "Maximum Floodplain Depth (ft)"
-        '
-        'Label3112
-        '
-        Me.Label3112.AutoSize = True
-        Me.Label3112.Location = New System.Drawing.Point(90, 301)
-        Me.Label3112.Name = "Label3112"
-        Me.Label3112.Size = New System.Drawing.Size(153, 13)
-        Me.Label3112.TabIndex = 31
-        Me.Label3112.Text = "Right Side Floodplain Width (ft)"
-        '
-        'Label13
-        '
-        Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(90, 353)
-        Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(109, 13)
-        Me.Label13.TabIndex = 13
-        Me.Label13.Text = "Floodplain Side Slope"
-        '
-        'TextLabel5
-        '
-        Me.TextLabel5.AutoSize = True
-        Me.TextLabel5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextLabel5.Location = New System.Drawing.Point(90, 144)
-        Me.TextLabel5.Name = "TextLabel5"
-        Me.TextLabel5.Size = New System.Drawing.Size(206, 13)
-        Me.TextLabel5.TabIndex = 32
-        Me.TextLabel5.Text = "<Select a Physiographic Porvince Above>"
-        '
         'frmNewFTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(444, 562)
-        Me.Controls.Add(Me.cmdComputeFTable)
+        Me.ClientSize = New System.Drawing.Size(445, 575)
         Me.Controls.Add(Me.cboProv)
         Me.Controls.Add(Me.atxChannelLength)
         Me.Controls.Add(Me.atxDrainageArea)
