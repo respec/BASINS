@@ -171,7 +171,7 @@ Public Class ctlEditFTables
 
     End Sub
 
-    Private Sub RefreshGrid()
+    Public Sub RefreshGrid()
         Dim lRow, lCol, units As Integer
         units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.EmFg
 
@@ -201,7 +201,6 @@ Public Class ctlEditFTables
             For lCol2 As Integer = 0 To .Columns - 1
                 .CellColor(0, lCol2) = SystemColors.ControlLight
             Next
-
             grdEdit.Refresh()
             grdEdit.SizeAllColumnsToContents()
         End With
@@ -270,6 +269,7 @@ Public Class ctlEditFTables
         txtNRows.Value = pHspfFtable.Nrows
         txtNCols.Value = pHspfFtable.Ncols
         frmXSect.Init(pHspfFtable, Me)
+        frmXSect.Owner = frmEdit.ActiveForm
         frmXSect.Show()
     End Sub
 
@@ -280,8 +280,8 @@ Public Class ctlEditFTables
         newFTable.Id = pHspfFtable.Id
         frmNewFTable.SetCurrentFTable(newFTable, Me)
         frmNewFTable.Init()
+        frmNewFTable.Owner = frmEdit.ActiveForm
         frmNewFTable.Show()
-
     End Sub
 
     Public Sub UpdateFTABLE(ByVal aFtab As HspfFtable)
@@ -305,6 +305,8 @@ Public Class ctlEditFTables
                 .CellValue(i, 3) = aFtab.Outflow1(i)
             Next
         End With
+        'RefreshFtables()
+        'RefreshGrid()
     End Sub
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFcurve.Click
         'Set data for plot
@@ -339,6 +341,17 @@ Public Class ctlEditFTables
         'Else
         '      Call MsgBox("This option is not yet implemented.", , "FTable Problem")
         'End If
+    End Sub
+    Public Sub UpdateFTablesFromXSect()
+        Dim tempID, loper As Integer
+        loper = InStr(1, cboID.SelectedItem, "-")
+        tempID = CInt(Mid(cboID.SelectedItem, 1, loper - 2))
+        pHspfFtable = pHspfFtable.Operation.OpnBlk.Ids("K" & tempID).FTable
+        pChanged = False
+        txtNRows.Value = pHspfFtable.Nrows
+        txtNCols.Value = pHspfFtable.Ncols
+        RefreshFtables()
+        RefreshGrid()
     End Sub
 End Class
 

@@ -10,6 +10,7 @@ Imports System
 
 Public Class frmXSect
 
+    Dim pFTableCtl As Object 'the control containing the ftable grid
     Dim pCurrentReachNum As Integer
     Dim pCurrentFTab As HspfFtable
     Dim pHspfFTable As HspfFtable
@@ -23,7 +24,7 @@ Public Class frmXSect
         SaveDisplayedXSecParams(pPrevSelectedId)
 
         RefreshXFiles(cboXFile.SelectedIndex)
-       
+
         pPrevSelectedId = cboXFile.SelectedIndex
 
     End Sub
@@ -196,7 +197,9 @@ Public Class frmXSect
 
     Friend Sub Init(ByVal aHspfFTable As HspfFtable, ByVal aCtl As ctlEditFTables)
         Me.Icon = aCtl.ParentForm.Icon
+        Me.Text = "Import From Cross Section"
         pHspfFTable = aHspfFTable
+        pFTableCtl = aCtl
         Form_Load()
     End Sub
 
@@ -222,7 +225,7 @@ Public Class frmXSect
             lChannel.DepthMax = .CellValue(16, 2)
             pCurrentFTab.FTableFromCrossSect(lChannel)
         End With
-
+        pFTableCtl.UpdateFTablesFromXSect()
         Me.Close()
     End Sub
 

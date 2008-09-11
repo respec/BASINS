@@ -8,15 +8,15 @@ Imports System.Collections.ObjectModel
 Public Class frmNewFTable
 
     Dim lFtab As HspfFtable
-    Dim lo As Object 'the control containing the ftable grid
+    Dim pFTableCtl As Object 'the control containing the ftable grid
     Public Sub SetCurrentFTable(ByVal ftab As HspfFtable, ByVal O As Object)
         lFtab = ftab
-        lo = O
+        pFTableCtl = O
     End Sub
 
     Friend Sub Init()
         '    Friend Sub Init(ByVal aCtl As ctlEditFTables)
-        Me.Icon = lo.ParentForm.Icon
+        Me.Icon = pFTableCtl.ParentForm.Icon
         Me.Text = "New FTable"
         atxChannelLength.Value = lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#
         atxChannelSlope.Value = SignificantDigits(lFtab.Operation.Tables("HYDR-PARM2").Parms("DELTH").Value / (lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#), 3)
@@ -43,16 +43,14 @@ Public Class frmNewFTable
         ToggleEstimateFields(False)
         TextLabel5.Enabled = False
         TextLabel5.Visible = True
+        cboProv.Cursor = Windows.Forms.Cursors.Hand
+        cboProv.DropDownStyle = Windows.Forms.ComboBoxStyle.DropDownList
 
     End Sub
 
     Private Sub ToggleEstimateFields(ByVal lToggleVal As Boolean)
 
-        If lToggleVal = True Then
-            TextLabel5.Visible = False
-        Else
-            TextLabel5.Visible = True
-        End If
+        TextLabel5.Visible = Not lToggleVal
 
         atxChannelWidth.Visible = lToggleVal
         atxChannelDepth.Visible = lToggleVal
@@ -81,15 +79,15 @@ Public Class frmNewFTable
     End Sub
 
     Private Sub DoEstimate()
-        Dim Rtn, channelN As Double
+        Dim Rtn, lChannelN As Double
 
         Rtn = getMeanAnnualFlow_FPS(cboProv.SelectedIndex, atxDrainageArea.Value)
         atxChannelWidth.Value = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
         atxChannelDepth.Value = SignificantDigits(getMeanChannelDepth_Ft(cboProv.SelectedIndex, Rtn), 4) 'THIS ONE MODIFIED
-        channelN = SignificantDigits(getChannelManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
-        atxChannelManningsN.Value = CStr(channelN)
-        channelN = SignificantDigits(getFloodplainManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
-        atxFloodplainManningsN.Value = CStr(channelN)
+        lChannelN = SignificantDigits(getChannelManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
+        atxChannelManningsN.Value = CStr(lChannelN)
+        lChannelN = SignificantDigits(getFloodplainManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
+        atxFloodplainManningsN.Value = CStr(lChannelN)
         atxBankfullDepth.Value = SignificantDigits(getBankfullDepth_ft(Val(atxChannelDepth.Value)), 5)
         atxMaximumFloodplainDepth.Value = SignificantDigits(getMaximumFloodplainDepth_ft(Val(atxChannelDepth.Value)), 5)
         atxLeftSideFloodPlainWidth.Value = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
@@ -99,9 +97,12 @@ Public Class frmNewFTable
     End Sub
     Private Sub cmdComputeFTable_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdComputeFTable.Click
 
-
-        Dim ft(,) As Double = Nothing
+        Dim lft(,) As Double = Nothing
         Dim Msg As String = Nothing
+        Dim lRowCount As Integer
+        Dim lRow As Integer
+        Dim lCol As Long
+        Dim fmt As String
 
         getFTableForNaturalTrapezoidalChannel(CDbl(atxChannelLength.Value), _
                                                     Val(atxChannelSlope.Value), _
@@ -115,41 +116,37 @@ Public Class frmNewFTable
                                                     Val(atxLeftSideFloodPlainWidth.Value), _
                                                     Val(atxRightSideFloodPlainWidth.Value), _
                                                     Val(atxMaximumFloodplainDepth.Value), _
-                                                    Msg, ft)
+                                                    Msg, lft)
         If (Msg <> "") Then
             MsgBox(Msg, vbOKOnly, "Compute New FTABLE Problem")
             Exit Sub
         End If
 
-        Dim rows As Integer
-        rows = UBound(ft)
+        lRowCount = UBound(lft)
 
         'save to new hspf ftable
-        Dim i As Integer
-        Dim j As Long
-        Dim fmt As String
+       
         fmt = "0.##"
-        lFtab.Nrows = rows + 1
+        lFtab.Nrows = lRowCount + 1
         lFtab.Ncols = 4
         lFtab.Depth(0) = 0
         lFtab.Area(0) = 0
         lFtab.Volume(0) = 0
         lFtab.Outflow1(0) = 0
-        For i = 0 To rows
-            j = i + 1
-            lFtab.Depth(j) = Format(ft(i, 0), fmt)
-            lFtab.Area(j) = Format(ft(i, 1), fmt)
-            lFtab.Volume(j) = Format(ft(i, 2), fmt)
-            lFtab.Outflow1(j) = Format(ft(i, 3), fmt)
+        For lRow = 0 To lRowCount
+            lCol = lRow + 1
+            lFtab.Depth(lCol) = Format(lft(lRow, 0), fmt)
+            lFtab.Area(lCol) = Format(lft(lRow, 1), fmt)
+            lFtab.Volume(lCol) = Format(lft(lRow, 2), fmt)
+            lFtab.Outflow1(lCol) = Format(lft(lRow, 3), fmt)
         Next
-        lo.UpdateFTABLE(lFtab)
+        pFTableCtl.UpdateFTABLE(lFtab)
     End Sub
 
     Private Sub cboProv_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboProv.SelectedIndexChanged
         If cboProv.SelectedIndex > 0 Then
             ToggleEstimateFields(True)
             DoEstimate()
-
         Else
             ToggleEstimateFields(False)
         End If
@@ -321,23 +318,26 @@ Public Class frmNewFTable
     Public Function getChannelManningsN(ByVal physiographicProvince As Integer, _
     ByVal drainageArea_SqMiles As Double, _
     ByVal streamSlope As Double) As Double
-        Dim meanAnnualFlow_cfs As Double
-        meanAnnualFlow_cfs = getMeanAnnualFlow_FPS(physiographicProvince, drainageArea_SqMiles)
-        Dim depth_ft As Double
-        depth_ft = getMeanChannelDepth_Ft(physiographicProvince, meanAnnualFlow_cfs)
-        Dim width_ft As Double
-        width_ft = getMeanChannelWidth_Ft(physiographicProvince, meanAnnualFlow_cfs)
-        Dim xsectionalArea_SqFt As Double
-        xsectionalArea_SqFt = getMeanCrossSectionalArea_SqFt(physiographicProvince, meanAnnualFlow_cfs)
-        Dim a As Double
-        a = xsectionalArea_SqFt
-        Dim r As Double
-        r = 0.67 * depth_ft
-        Dim s As Double
-        s = streamSlope
-        Dim Q As Double
-        Q = meanAnnualFlow_cfs
-        getChannelManningsN = (1.49 * a * r ^ (2.0# / 3.0#) * s ^ (1.0# / 2.0#)) / Q
+
+        Dim lMeanAnnualFlow_cfs As Double
+        Dim lDepth_ft As Double
+        Dim lWidth_ft As Double
+        Dim lXsectionalArea_SqFt As Double
+        Dim la As Double
+        Dim lr As Double
+        Dim ls As Double
+        Dim lQ As Double
+
+        lMeanAnnualFlow_cfs = getMeanAnnualFlow_FPS(physiographicProvince, drainageArea_SqMiles)
+        lDepth_ft = getMeanChannelDepth_Ft(physiographicProvince, lMeanAnnualFlow_cfs)
+        lWidth_ft = getMeanChannelWidth_Ft(physiographicProvince, lMeanAnnualFlow_cfs)
+        lXsectionalArea_SqFt = getMeanCrossSectionalArea_SqFt(physiographicProvince, lMeanAnnualFlow_cfs)
+        la = lXsectionalArea_SqFt
+        lr = 0.67 * lDepth_ft
+        ls = streamSlope
+        lQ = lMeanAnnualFlow_cfs
+        getChannelManningsN = (1.49 * la * lr ^ (2.0# / 3.0#) * ls ^ (1.0# / 2.0#)) / lQ
+
     End Function
 
     Public Function getFloodplainManningsN(ByVal physiographicProvince As Integer, _
@@ -596,7 +596,7 @@ Public Class frmNewFTable
             'dblArea = (channelLength_ft * dblWaterSurfaceWidth) / 43560#
             dblW = dblFloodPlainSide1Width + dblFloodPlainSide2Width + 2.0# * floodplainSideSlope_ftPerFt * dblDepthIncrement
             dblAreaFloodPlain = (channelLength_ft * dblW) / 43560.0# + dblArea
-            If (i = 1) Then
+            If (i = 0) Then
                 dblVolumeFP = (dblAreaFloodPlain + dblArea) * dblDepthIncrement / 2.0# + dblVolume
             Else
                 dblVolumeFP = (dblAreaFloodPlain + FTable(row, colArea)) * (dblCurrentDepth - FTable(row, colDepth)) / 2.0# + FTable(row, colVolume)
@@ -703,12 +703,6 @@ Public Class frmNewFTable
                 End If
             End While
         End If
-
-        Dim tango() As Double = {0.0}
-        tango(0) = 6.7666#
-        MsgBox(tango.Length)
-
-
 
         dblWaterDepth = bankfullDepth_ft * 1.5
         If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
