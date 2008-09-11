@@ -454,20 +454,24 @@ Friend Class frmSelectData
             For Each def As atcAttributeDefinition In lAllDefinitions.Clone
                 If atcDataAttributes.IsSimple(def) Then
                     lName = def.Name
-                    If def.Calculated Then
-                        lItemIndex = lCalculatedItems.BinarySearchForKey(lName)
-                        If lItemIndex = lCalculatedItems.Count OrElse lCalculatedItems.Keys.Item(lItemIndex) <> lName Then
-                            lCalculatedItems.Insert(lItemIndex, lName, lName)
-                        End If
-                    Else
-                        'Dim lAttributeValues As atcCollection = AvailableData.SortedAttributeValues(lName, NOTHING_VALUE)
-                        'If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
-                        lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
-                        If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
-                            lNotCalculatedItems.Insert(lItemIndex, lName, lName)
-                        End If
-                        'End If
-                    End If
+                    Select Case lName.ToLower
+                        Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "number", "vbtime", "%*", "%sum*"
+                        Case Else
+                            If def.Calculated Then
+                                lItemIndex = lCalculatedItems.BinarySearchForKey(lName)
+                                If lItemIndex = lCalculatedItems.Count OrElse lCalculatedItems.Keys.Item(lItemIndex) <> lName Then
+                                    lCalculatedItems.Insert(lItemIndex, lName, lName)
+                                End If
+                            Else
+                                'Dim lAttributeValues As atcCollection = AvailableData.SortedAttributeValues(lName, NOTHING_VALUE)
+                                'If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
+                                lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
+                                If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
+                                    lNotCalculatedItems.Insert(lItemIndex, lName, lName)
+                                End If
+                                'End If
+                            End If
+                    End Select
                 End If
             Next
             For Each lName In lNotCalculatedItems

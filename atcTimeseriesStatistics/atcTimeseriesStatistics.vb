@@ -140,7 +140,7 @@ Public Class atcTimeseriesStatistics
                 '    atcDataAttributes.AllDefinitions.Add(lBinsDefinition.Name.ToLower, lBinsDefinition)
                 'End If
 
-                AddOperation("bins", "Values sorted into a collection of bins", defTimeSeriesOne, lCategory, "atcCollection")
+                AddOperation("bins", "Values sorted into a collection of bins", defTimeSeriesOne, lCategory, "atcCollection", Nothing)
 
             End If
             Return pAvailableOperations

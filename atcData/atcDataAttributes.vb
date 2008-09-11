@@ -416,8 +416,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                             ElseIf IsSimple(lDef, lKey, lOperation) Then
                                 Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
                                 Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
-                                Dim lOwnerTS As atcTimeseries = Owner
-                                lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
+                                lArgs.SetValue(lArg.Definition, New atcDataGroup(Owner))
                                 lDef.Calculator.Open(lKey, lArgs)
                                 lAttribute = ItemByKey(lKey)
                             End If
@@ -441,7 +440,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                     Optional ByVal aKey As String = Nothing, _
                     Optional ByRef aOperation As atcDefinedValue = Nothing) As Boolean
         Select Case aDef.TypeString.ToLower
-            Case "single", "double", "integer", "boolean", "string", "atctimeunit"
+            Case "single", "double", "integer", "boolean", "string", "atctimeunit", "atccollection"
                 If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
                     If aKey Is Nothing Then aKey = AttributeNameToKey((aDef.Name))
                     aOperation = aDef.Calculator.AvailableOperations.ItemByKey(aKey)
