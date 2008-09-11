@@ -8,7 +8,7 @@ Public Class atcDataSourceTimeseriesD4EM
 
     Private Shared pFilter As String = "D4EM Text Files (*.txt)|*.txt"
     Private Shared pVersion As String = "#D4EM Met Data"
-    Private Shared pColumns() As String = {"pcp", "tmp", "slr", "wnd", "hmd", "pet"}
+    Private Shared pColumns() As String = {"pcp", "tmp", "slr", "wnd", "hmd", "pet", "clo", "dew"}
 
     Public DataColumnWidth As Integer = 15
     Public DataDecimalWidth As Integer = 6
@@ -199,6 +199,7 @@ Public Class atcDataSourceTimeseriesD4EM
             If DataSets.Keys.Contains(lColumnName) Then
                 lTS = DataSets.ItemByKey(lColumnName)
             ElseIf lColumnName = "hmd" Then
+                'Default relative humidity to 40%
                 lTS = NewTimeseries(lStartDate, lEndDate, atcTimeUnit.TUDay, 1, Me, 40)
                 lTS.Attributes.SetValueIfMissing("Units", "%")
             Else
