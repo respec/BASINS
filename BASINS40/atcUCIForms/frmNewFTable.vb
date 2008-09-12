@@ -102,7 +102,7 @@ Public Class frmNewFTable
         Dim lRowCount As Integer
         Dim lRow As Integer
         Dim lCol As Long
-        Dim fmt As String
+        Dim lFormat As String
 
         getFTableForNaturalTrapezoidalChannel(CDbl(atxChannelLength.Value), _
                                                     Val(atxChannelSlope.Value), _
@@ -126,7 +126,7 @@ Public Class frmNewFTable
 
         'save to new hspf ftable
        
-        fmt = "0.##"
+        lFormat = "0.##"
         lFtab.Nrows = lRowCount + 1
         lFtab.Ncols = 4
         lFtab.Depth(0) = 0
@@ -135,10 +135,10 @@ Public Class frmNewFTable
         lFtab.Outflow1(0) = 0
         For lRow = 0 To lRowCount
             lCol = lRow + 1
-            lFtab.Depth(lCol) = Format(lft(lRow, 0), fmt)
-            lFtab.Area(lCol) = Format(lft(lRow, 1), fmt)
-            lFtab.Volume(lCol) = Format(lft(lRow, 2), fmt)
-            lFtab.Outflow1(lCol) = Format(lft(lRow, 3), fmt)
+            lFtab.Depth(lCol) = Format(lft(lRow, 0), lFormat)
+            lFtab.Area(lCol) = Format(lft(lRow, 1), lFormat)
+            lFtab.Volume(lCol) = Format(lft(lRow, 2), lFormat)
+            lFtab.Outflow1(lCol) = Format(lft(lRow, 3), lFormat)
         Next
         pFTableCtl.UpdateFTABLE(lFtab)
     End Sub
@@ -316,7 +316,7 @@ Public Class frmNewFTable
     End Function
 
     Public Function getChannelManningsN(ByVal physiographicProvince As Integer, _
-    ByVal drainageArea_SqMiles As Double, _
+    ByVal lDrainageArea_SqMiles As Double, _
     ByVal streamSlope As Double) As Double
 
         Dim lMeanAnnualFlow_cfs As Double
@@ -328,7 +328,7 @@ Public Class frmNewFTable
         Dim ls As Double
         Dim lQ As Double
 
-        lMeanAnnualFlow_cfs = getMeanAnnualFlow_FPS(physiographicProvince, drainageArea_SqMiles)
+        lMeanAnnualFlow_cfs = getMeanAnnualFlow_FPS(physiographicProvince, lDrainageArea_SqMiles)
         lDepth_ft = getMeanChannelDepth_Ft(physiographicProvince, lMeanAnnualFlow_cfs)
         lWidth_ft = getMeanChannelWidth_Ft(physiographicProvince, lMeanAnnualFlow_cfs)
         lXsectionalArea_SqFt = getMeanCrossSectionalArea_SqFt(physiographicProvince, lMeanAnnualFlow_cfs)
@@ -340,18 +340,18 @@ Public Class frmNewFTable
 
     End Function
 
-    Public Function getFloodplainManningsN(ByVal physiographicProvince As Integer, _
-    ByVal drainageArea_SqMiles As Double, _
-    ByVal streamSlope As Double) As Double
-        getFloodplainManningsN = getChannelManningsN(physiographicProvince, drainageArea_SqMiles, streamSlope)
+    Public Function getFloodplainManningsN(ByVal lPhysiographicProvince As Integer, _
+    ByVal lDrainageArea_SqMiles As Double, _
+    ByVal lStreamSlope As Double) As Double
+        getFloodplainManningsN = getChannelManningsN(lPhysiographicProvince, lDrainageArea_SqMiles, lStreamSlope)
     End Function
 
-    Public Function getBankfullDepth_ft(ByVal meanChannelDepth As Double) As Double
-        getBankfullDepth_ft = 5.0# * meanChannelDepth
+    Public Function getBankfullDepth_ft(ByVal lMeanChannelDepth As Double) As Double
+        getBankfullDepth_ft = 5.0# * lMeanChannelDepth
     End Function
 
-    Public Function getMaximumFloodplainDepth_ft(ByVal meanChannelDepth As Double) As Double
-        getMaximumFloodplainDepth_ft = 50.0# * meanChannelDepth
+    Public Function getMaximumFloodplainDepth_ft(ByVal lMeanChannelDepth As Double) As Double
+        getMaximumFloodplainDepth_ft = 50.0# * lMeanChannelDepth
     End Function
 
     Public Function getChannelSideSlope() As Double
@@ -363,388 +363,394 @@ Public Class frmNewFTable
     End Function
 
     Private Sub validateInputsForFTableCalculations(ByVal channelLength_ft As Double, _
-    ByVal averageChannelSlope_ftPerFt As Double, _
-    ByVal meanChannelWidth_ft As Double, _
-    ByVal meanChannelDepth_ft As Double, _
-    ByVal channelManningsValue As Double, _
-    ByVal channelSideSlope_ftPerFt As Double, _
-    ByVal bankfullDepth_ft As Double, _
-    ByVal floodPlainManningsValue As Double, _
-    ByVal floodplainSideSlope_ftPerFt As Double, _
-    ByVal leftSideFloodplainWidth_ft As Double, _
-    ByVal rightSideFloodplainWidth_ft As Double, _
-    ByVal maximumFloodPlainDepth_ft As Double, _
-                                                          ByRef Msg As String)
+    ByVal lAverageChannelSlope_ftPerFt As Double, _
+    ByVal lMeanChannelWidth_ft As Double, _
+    ByVal lMeanChannelDepth_ft As Double, _
+    ByVal lChannelManningsValue As Double, _
+    ByVal lChannelSideSlope_ftPerFt As Double, _
+    ByVal lBankfullDepth_ft As Double, _
+    ByVal lFloodPlainManningsValue As Double, _
+    ByVal lFloodplainSideSlope_ftPerFt As Double, _
+    ByVal lLeftSideFloodplainWidth_ft As Double, _
+    ByVal lRightSideFloodplainWidth_ft As Double, _
+    ByVal lMaximumFloodPlainDepth_ft As Double, _
+                                                          ByRef lMsg As String)
         Dim Rtn As Boolean
         Dim Message As String
         Message = ""
         Rtn = False
         Rtn = validateChannelLength(channelLength_ft, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateChannelSlope(averageChannelSlope_ftPerFt, Message)
+        Rtn = validateChannelSlope(lAverageChannelSlope_ftPerFt, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateChannelWidth(meanChannelWidth_ft, Message)
+        Rtn = validateChannelWidth(lMeanChannelWidth_ft, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateChannelDepth(meanChannelDepth_ft, Message)
+        Rtn = validateChannelDepth(lMeanChannelDepth_ft, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateChannelManningsN(channelManningsValue, Message)
+        Rtn = validateChannelManningsN(lChannelManningsValue, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateFloodplainManningsN(floodPlainManningsValue, Message)
+        Rtn = validateFloodplainManningsN(lFloodPlainManningsValue, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateBankfullDepth(bankfullDepth_ft, Message)
+        Rtn = validateBankfullDepth(lBankfullDepth_ft, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateFloodplainSideSlope(floodplainSideSlope_ftPerFt, Message)
+        Rtn = validateFloodplainSideSlope(lFloodplainSideSlope_ftPerFt, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateLeftSideFloodplainWidth(leftSideFloodplainWidth_ft, Message)
+        Rtn = validateLeftSideFloodplainWidth(lLeftSideFloodplainWidth_ft, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateRightSideFloodplainWidth(rightSideFloodplainWidth_ft, Message)
+        Rtn = validateRightSideFloodplainWidth(lRightSideFloodplainWidth_ft, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        Rtn = validateMaximumFloodplainDepth(maximumFloodPlainDepth_ft, Message)
+        Rtn = validateMaximumFloodplainDepth(lMaximumFloodPlainDepth_ft, Message)
         If (Message <> "") Then
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        If (bankfullDepth_ft <= meanChannelDepth_ft) Then
+        If (lBankfullDepth_ft <= lMeanChannelDepth_ft) Then
             Message = "Bankfull Depth must be greater than Mean Channel Depth"
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
-        If (maximumFloodPlainDepth_ft <= bankfullDepth_ft) Then
+        If (lMaximumFloodPlainDepth_ft <= lBankfullDepth_ft) Then
             Message = "Maximum floodplain Depth must be greater than bankfull Depth"
-            Msg = Msg & vbCrLf & Message
+            lMsg = lMsg & vbCrLf & Message
         End If
 
     End Sub
 
     Private Function ConvertNumberToSimpleFormat(ByVal dblVvNumber As Double) As String
+        Dim lStrLvNumber As String : lStrLvNumber = CStr(dblVvNumber)
+        Dim lIntLvMultiplier As Integer
+        Dim intLvPositionOfComplexBit As Integer
+
         ConvertNumberToSimpleFormat = 0
         Const strLcCOMPLEX_BIT As String = "E-"
         Const strLcPADDING_CHARATER As String = "#"
-        Dim strLvNumber As String : strLvNumber = CStr(dblVvNumber)
-        Dim intLvMultiplier As Integer
-        Dim intLvPositionOfComplexBit As Integer
-        intLvPositionOfComplexBit = InStr(strLvNumber, strLcCOMPLEX_BIT)
+        intLvPositionOfComplexBit = InStr(lStrLvNumber, strLcCOMPLEX_BIT)
         If intLvPositionOfComplexBit > 0 Then
-            intLvMultiplier = Val(Mid(strLvNumber, intLvPositionOfComplexBit + Len(strLcCOMPLEX_BIT)))
-            ConvertNumberToSimpleFormat = Format(dblVvNumber, "0." & StrDup(intLvMultiplier + _
-                Len(strLvNumber) - (Len(strLcCOMPLEX_BIT) + Len(Trim(Str(intLvMultiplier)))), strLcPADDING_CHARATER))
+            lIntLvMultiplier = Val(Mid(lStrLvNumber, intLvPositionOfComplexBit + Len(strLcCOMPLEX_BIT)))
+            ConvertNumberToSimpleFormat = Format(dblVvNumber, "0." & StrDup(lIntLvMultiplier + _
+                Len(lStrLvNumber) - (Len(strLcCOMPLEX_BIT) + Len(Trim(Str(lIntLvMultiplier)))), strLcPADDING_CHARATER))
         Else
-            ConvertNumberToSimpleFormat = strLvNumber
+            ConvertNumberToSimpleFormat = lStrLvNumber
         End If
     End Function
 
-    Public Sub getFTableForNaturalTrapezoidalChannel(ByVal channelLength_ft As Double, _
-    ByVal averageChannelSlope_ftPerFt As Double, _
-    ByVal meanChannelWidth_ft As Double, _
-    ByVal meanChannelDepth_ft As Double, _
-    ByVal channelManningsValue As Double, _
-    ByVal channelSideSlope_ftPerFt As Double, _
-    ByVal bankfullDepth_ft As Double, _
-    ByVal floodPlainManningsValue As Double, _
-    ByVal floodplainSideSlope_ftPerFt As Double, _
-    ByVal leftSideFloodplainWidth_ft As Double, _
-    ByVal rightSideFloodplainWidth_ft As Double, _
-    ByVal maximumFloodPlainDepth_ft As Double, ByRef Msg As String, ByRef ft As Double(,))
-        validateInputsForFTableCalculations(channelLength_ft, averageChannelSlope_ftPerFt, _
-                                            meanChannelWidth_ft, meanChannelDepth_ft, _
-                                            channelManningsValue, channelSideSlope_ftPerFt, _
-                                            bankfullDepth_ft, floodPlainManningsValue, _
-                                            floodplainSideSlope_ftPerFt, leftSideFloodplainWidth_ft, _
-                                            rightSideFloodplainWidth_ft, maximumFloodPlainDepth_ft, _
-                                            Msg)
-        Trim(Msg)
-        If (Msg <> "") Then
+    Public Sub getFTableForNaturalTrapezoidalChannel(ByVal lChannelLength_ft As Double, _
+    ByVal lAverageChannelSlope_ftPerFt As Double, _
+    ByVal lMeanChannelWidth_ft As Double, _
+    ByVal lMeanChannelDepth_ft As Double, _
+    ByVal lChannelManningsValue As Double, _
+    ByVal lChannelSideSlope_ftPerFt As Double, _
+    ByVal lBankfullDepth_ft As Double, _
+    ByVal lFloodPlainManningsValue As Double, _
+    ByVal lFloodplainSideSlope_ftPerFt As Double, _
+    ByVal lLeftSideFloodplainWidth_ft As Double, _
+    ByVal lRightSideFloodplainWidth_ft As Double, _
+    ByVal lMaximumFloodPlainDepth_ft As Double, ByRef lMsg As String, ByRef lFt As Double(,))
+        validateInputsForFTableCalculations(lChannelLength_ft, lAverageChannelSlope_ftPerFt, _
+                                            lMeanChannelWidth_ft, lMeanChannelDepth_ft, _
+                                            lChannelManningsValue, lChannelSideSlope_ftPerFt, _
+                                            lBankfullDepth_ft, lFloodPlainManningsValue, _
+                                            lFloodplainSideSlope_ftPerFt, lLeftSideFloodplainWidth_ft, _
+                                            lRightSideFloodplainWidth_ft, lMaximumFloodPlainDepth_ft, _
+                                            lMsg)
+
+        Dim lRow As Integer
+        Dim lColDepth As Integer
+        Dim lColArea As Integer
+        Dim lColVolume As Integer
+        Dim lColFlow As Integer
+        Dim lNumRows As Integer
+        Dim lDepthsChannel() As Double = Nothing
+        Dim lDepthsFloodplain() As Double = Nothing
+        Dim FTable(,) As Double
+        Dim lMaxWaterDepth As Double
+        Dim lDblCrossSecionalArea As Double 'A
+        Dim lDblWettedPerimeter As Double 'wd
+        Dim lDblWaterSurfaceWidth As Double 'W
+        Dim lDblC As Double
+        Dim lDblOutflow As Double 'QC
+        Dim lDblArea As Double 'acr
+        Dim lDblVolume As Double 'stot
+        Dim lDblBottomWidth As Double 'BW
+        Dim lDblWaterSurfaceWidth_Previous As Double
+        Dim lDblArea_Previous As Double
+        Dim lDblHyraulicRadius As Double 'HR
+        Dim lDblWaterDepth As Double 'G
+        Dim lDblDepthIncrement As Double
+        Dim lRowOper As Integer
+        Dim lDblFloodPlainSide1Width As Double
+        Dim lDblFloodPlainSide2Width As Double
+        Dim lDblFloodPlainBottomWidth As Double
+        Dim lDblCrossSecionalAreaFloodPlain As Double
+        Dim lDblWettedPerimeterFloodPlain As Double
+        Dim lDblHydraulicRadiusFloodPlain As Double
+        Dim lDblAreaFloodPlain As Double
+        Dim lDblW As Double
+        Dim lDblVolumeFP As Double
+        Dim lDblCurrentDepth As Double
+        Dim lBW2 As Double
+
+
+        Trim(lMsg)
+        If (lMsg <> "") Then
             Exit Sub
         End If
 
-        Dim depthsChannel() As Double = Nothing
-        Dim depthsFloodplain() As Double = Nothing
-        Dim FTable(,) As Double
-        getDepthIncrements(meanChannelDepth_ft, bankfullDepth_ft, maximumFloodPlainDepth_ft, depthsChannel, depthsFloodplain)
+        getDepthIncrements(lMeanChannelDepth_ft, lBankfullDepth_ft, lMaximumFloodPlainDepth_ft, lDepthsChannel, lDepthsFloodplain)
+        lMaxWaterDepth = lMaximumFloodPlainDepth_ft + lBankfullDepth_ft
+        lDblCrossSecionalArea = 0
+        lDblWettedPerimeter = 0
+        lDblHyraulicRadius = 0
+        lDblWaterSurfaceWidth = 0
+        lDblC = 0
+        lDblOutflow = 0
+        lDblArea = 0
+        lDblVolume = 0
+        lDblBottomWidth = lMeanChannelWidth_ft - 2.0# * lMeanChannelDepth_ft * lChannelSideSlope_ftPerFt
+        lDblWaterSurfaceWidth_Previous = 0
+        lDblArea_Previous = 0
+        lRow = 0
+        lColDepth = 0
+        lColArea = 1
+        lColVolume = 2
+        lColFlow = 3
+        lNumRows = UBound(lDepthsChannel) + UBound(lDepthsFloodplain)
 
-        Dim maxWaterDepth As Double
-        maxWaterDepth = maximumFloodPlainDepth_ft + bankfullDepth_ft
-        Dim dblCrossSecionalArea As Double 'A
-        dblCrossSecionalArea = 0
-        Dim dblWettedPerimeter As Double 'wd
-        dblWettedPerimeter = 0
-        Dim dblHyraulicRadius As Double 'HR
-        dblHyraulicRadius = 0
-        Dim dblWaterSurfaceWidth As Double 'W
-        dblWaterSurfaceWidth = 0
-        Dim dblC As Double
-        dblC = 0
-        Dim dblOutflow As Double 'QC
-        dblOutflow = 0
-        Dim dblArea As Double 'acr
-        dblArea = 0
-        Dim dblVolume As Double 'stot
-        dblVolume = 0
-        Dim dblBottomWidth As Double 'BW
-        dblBottomWidth = meanChannelWidth_ft - 2.0# * meanChannelDepth_ft * channelSideSlope_ftPerFt
-        Dim dblWaterSurfaceWidth_Previous As Double
-        dblWaterSurfaceWidth_Previous = 0
-        Dim dblArea_Previous As Double
-        dblArea_Previous = 0
-        Dim row As Integer
-        Dim colDepth As Integer
-        Dim colArea As Integer
-        Dim colVolume As Integer
-        Dim colFlow As Integer
-        row = 0
-        colDepth = 0
-        colArea = 1
-        colVolume = 2
-        colFlow = 3
-        Dim numRows As Integer
-        numRows = UBound(depthsChannel) + UBound(depthsFloodplain)
+        ReDim FTable(lNumRows + 2, 3)
 
-        ReDim FTable(numRows + 2, 3)
+        FTable(lRow, lColDepth) = 0 'Depth
+        FTable(lRow, lColArea) = 0 'Water surface area
+        FTable(lRow, lColVolume) = 0 'Volume
+        FTable(lRow, lColFlow) = 0 'Flow
 
-        FTable(row, colDepth) = 0 'Depth
-        FTable(row, colArea) = 0 'Water surface area
-        FTable(row, colVolume) = 0 'Volume
-        FTable(row, colFlow) = 0 'Flow
 
-        Dim dblWaterDepth As Double 'G
-        Dim dblDepthIncrement As Double
-        dblWaterDepth = 0
-        numRows = UBound(depthsChannel)
-        Dim i As Integer
-        For i = 0 To numRows
-            dblWaterDepth = depthsChannel(i)
-            If (i = 0) Then
-                dblDepthIncrement = depthsChannel(i)
+        lDblWaterDepth = 0
+        lNumRows = UBound(lDepthsChannel)
+
+        For lRowOper = 0 To lNumRows
+            lDblWaterDepth = lDepthsChannel(lRowOper)
+            If (lRowOper = 0) Then
+                lDblDepthIncrement = lDepthsChannel(lRowOper)
             Else
-                dblDepthIncrement = depthsChannel(i) - depthsChannel(i - 1)
+                lDblDepthIncrement = lDepthsChannel(lRowOper) - lDepthsChannel(lRowOper - 1)
             End If
-            dblCrossSecionalArea = dblBottomWidth * dblWaterDepth + channelSideSlope_ftPerFt * dblWaterDepth * dblWaterDepth
-            dblWettedPerimeter = dblBottomWidth + 2.0# * dblWaterDepth * (1.0# + channelSideSlope_ftPerFt * channelSideSlope_ftPerFt) ^ 0.5
-            dblHyraulicRadius = dblCrossSecionalArea / dblWettedPerimeter
-            dblWaterSurfaceWidth = dblBottomWidth + 2.0# * channelSideSlope_ftPerFt * dblWaterDepth
-            dblWaterSurfaceWidth_Previous = dblBottomWidth + 2.0# * channelSideSlope_ftPerFt * (dblWaterDepth - dblDepthIncrement)
-            dblC = (1.49 * (averageChannelSlope_ftPerFt) ^ 0.5) / (channelManningsValue)
-            dblOutflow = dblCrossSecionalArea * (dblHyraulicRadius ^ (2.0# / 3.0#)) * dblC
-            dblArea = (channelLength_ft * dblWaterSurfaceWidth) / 43560.0#
-            dblArea_Previous = (channelLength_ft * dblWaterSurfaceWidth_Previous) / 43560.0#
-            dblVolume = FTable(row, colVolume) + (dblArea + dblArea_Previous) / 2.0# * dblDepthIncrement
-            row = row + 1
-            FTable(row, colDepth) = dblWaterDepth
-            FTable(row, colArea) = dblArea
-            FTable(row, colVolume) = dblVolume
-            FTable(row, colFlow) = dblOutflow
-        Next i
+            lDblCrossSecionalArea = lDblBottomWidth * lDblWaterDepth + lChannelSideSlope_ftPerFt * lDblWaterDepth * lDblWaterDepth
+            lDblWettedPerimeter = lDblBottomWidth + 2.0# * lDblWaterDepth * (1.0# + lChannelSideSlope_ftPerFt * lChannelSideSlope_ftPerFt) ^ 0.5
+            lDblHyraulicRadius = lDblCrossSecionalArea / lDblWettedPerimeter
+            lDblWaterSurfaceWidth = lDblBottomWidth + 2.0# * lChannelSideSlope_ftPerFt * lDblWaterDepth
+            lDblWaterSurfaceWidth_Previous = lDblBottomWidth + 2.0# * lChannelSideSlope_ftPerFt * (lDblWaterDepth - lDblDepthIncrement)
+            lDblC = (1.49 * (lAverageChannelSlope_ftPerFt) ^ 0.5) / (lChannelManningsValue)
+            lDblOutflow = lDblCrossSecionalArea * (lDblHyraulicRadius ^ (2.0# / 3.0#)) * lDblC
+            lDblArea = (lChannelLength_ft * lDblWaterSurfaceWidth) / 43560.0#
+            lDblArea_Previous = (lChannelLength_ft * lDblWaterSurfaceWidth_Previous) / 43560.0#
+            lDblVolume = FTable(lRow, lColVolume) + (lDblArea + lDblArea_Previous) / 2.0# * lDblDepthIncrement
+            lRow = lRow + 1
+            FTable(lRow, lColDepth) = lDblWaterDepth
+            FTable(lRow, lColArea) = lDblArea
+            FTable(lRow, lColVolume) = lDblVolume
+            FTable(lRow, lColFlow) = lDblOutflow
+        Next
 
         'FloodPlain Calculations
-        Dim dblFloodPlainSide1Width As Double
-        dblFloodPlainSide1Width = leftSideFloodplainWidth_ft
-        Dim dblFloodPlainSide2Width As Double
-        dblFloodPlainSide2Width = leftSideFloodplainWidth_ft
-        Dim BW2 As Double
-        BW2 = dblFloodPlainSide1Width + dblFloodPlainSide2Width
-        Dim dblFloodPlainBottomWidth As Double
-        dblFloodPlainBottomWidth = BW2 + dblWaterSurfaceWidth 'Bottom width of flood plain
-        Dim dblCrossSecionalAreaFloodPlain As Double
-        dblCrossSecionalAreaFloodPlain = 0
-        Dim dblWettedPerimeterFloodPlain As Double
-        dblWettedPerimeterFloodPlain = 0
-        Dim dblHydraulicRadiusFloodPlain As Double
-        dblHydraulicRadiusFloodPlain = 0
-        Dim dblAreaFloodPlain As Double
-        dblAreaFloodPlain = 0
-        Dim dblW As Double
-        dblW = 0
-        Dim dblVolumeFP As Double
-        dblVolumeFP = 0
-        Dim dblCurrentDepth As Double
-        dblCurrentDepth = 0
+        lDblFloodPlainSide1Width = lLeftSideFloodplainWidth_ft
+        lDblFloodPlainSide2Width = lLeftSideFloodplainWidth_ft
+        lBW2 = lDblFloodPlainSide1Width + lDblFloodPlainSide2Width
+        lDblFloodPlainBottomWidth = lBW2 + lDblWaterSurfaceWidth 'Bottom width of flood plain
+        lDblCrossSecionalAreaFloodPlain = 0
+        lDblWettedPerimeterFloodPlain = 0
+        lDblHydraulicRadiusFloodPlain = 0
+        lDblAreaFloodPlain = 0
+        lDblW = 0
+        lDblVolumeFP = 0
+        lDblCurrentDepth = 0
+
         'Dim intNumIncrements As Integer
         'intNumIncrements = maximumFloodPlainDepth_ft - bankfullDepth_ft - 1
 
         'Dim dblFloodPlainDepth As Double
-        numRows = UBound(depthsFloodplain)
-        For i = 0 To numRows
-            dblCurrentDepth = depthsFloodplain(i)
+        lNumRows = UBound(lDepthsFloodplain)
+        For lRowOper = 0 To lNumRows
+            lDblCurrentDepth = lDepthsFloodplain(lRowOper)
             'If (i = 1) Then
-            dblDepthIncrement = depthsFloodplain(i) - bankfullDepth_ft
+            lDblDepthIncrement = lDepthsFloodplain(lRowOper) - lBankfullDepth_ft
             'Else
             'dblDepthIncrement = depthsFloodplain(i) - depthsFloodplain(i - 1)
             'End If
-            dblCrossSecionalAreaFloodPlain = dblFloodPlainBottomWidth * dblDepthIncrement + floodplainSideSlope_ftPerFt * dblDepthIncrement * dblDepthIncrement + dblCrossSecionalArea
-            dblWettedPerimeterFloodPlain = BW2 + 2.0# * dblDepthIncrement * (1.0# + floodplainSideSlope_ftPerFt * floodplainSideSlope_ftPerFt) ^ 0.5 + dblWettedPerimeter
-            dblHydraulicRadiusFloodPlain = dblCrossSecionalAreaFloodPlain / dblWettedPerimeterFloodPlain
-            dblC = (1.49 * averageChannelSlope_ftPerFt ^ 0.5) / (floodPlainManningsValue)
-            dblOutflow = dblCrossSecionalAreaFloodPlain * (dblHydraulicRadiusFloodPlain ^ (2.0# / 3.0#)) * dblC
+            lDblCrossSecionalAreaFloodPlain = lDblFloodPlainBottomWidth * lDblDepthIncrement + lFloodplainSideSlope_ftPerFt * lDblDepthIncrement * lDblDepthIncrement + lDblCrossSecionalArea
+            lDblWettedPerimeterFloodPlain = lBW2 + 2.0# * lDblDepthIncrement * (1.0# + lFloodplainSideSlope_ftPerFt * lFloodplainSideSlope_ftPerFt) ^ 0.5 + lDblWettedPerimeter
+            lDblHydraulicRadiusFloodPlain = lDblCrossSecionalAreaFloodPlain / lDblWettedPerimeterFloodPlain
+            lDblC = (1.49 * lAverageChannelSlope_ftPerFt ^ 0.5) / (lFloodPlainManningsValue)
+            lDblOutflow = lDblCrossSecionalAreaFloodPlain * (lDblHydraulicRadiusFloodPlain ^ (2.0# / 3.0#)) * lDblC
             'dblArea = (channelLength_ft * dblWaterSurfaceWidth) / 43560#
-            dblW = dblFloodPlainSide1Width + dblFloodPlainSide2Width + 2.0# * floodplainSideSlope_ftPerFt * dblDepthIncrement
-            dblAreaFloodPlain = (channelLength_ft * dblW) / 43560.0# + dblArea
-            If (i = 0) Then
-                dblVolumeFP = (dblAreaFloodPlain + dblArea) * dblDepthIncrement / 2.0# + dblVolume
+            lDblW = lDblFloodPlainSide1Width + lDblFloodPlainSide2Width + 2.0# * lFloodplainSideSlope_ftPerFt * lDblDepthIncrement
+            lDblAreaFloodPlain = (lChannelLength_ft * lDblW) / 43560.0# + lDblArea
+            If (lRowOper = 0) Then
+                lDblVolumeFP = (lDblAreaFloodPlain + lDblArea) * lDblDepthIncrement / 2.0# + lDblVolume
             Else
-                dblVolumeFP = (dblAreaFloodPlain + FTable(row, colArea)) * (dblCurrentDepth - FTable(row, colDepth)) / 2.0# + FTable(row, colVolume)
-                'dblVolumeFP = (dblAreaFloodPlain + FTable(row, colArea)) / 2# + FTable(row, colVolume)
+                lDblVolumeFP = (lDblAreaFloodPlain + FTable(lRow, lColArea)) * (lDblCurrentDepth - FTable(lRow, lColDepth)) / 2.0# + FTable(lRow, lColVolume)
+                'dblVolumeFP = (dblAreaFloodPlain + FTable(lRow, lColArea)) / 2# + FTable(lRow, lColVolume)
             End If
-            row = row + 1
-            FTable(row, colDepth) = dblCurrentDepth
-            FTable(row, colArea) = dblAreaFloodPlain
-            FTable(row, colVolume) = dblVolumeFP
-            FTable(row, colFlow) = dblOutflow
-        Next i
-        ft = FTable
+            lRow = lRow + 1
+            FTable(lRow, lColDepth) = lDblCurrentDepth
+            FTable(lRow, lColArea) = lDblAreaFloodPlain
+            FTable(lRow, lColVolume) = lDblVolumeFP
+            FTable(lRow, lColFlow) = lDblOutflow
+        Next
+        lFt = FTable
     End Sub
 
-    Private Sub getDepthIncrements(ByVal meanChannelDepth_ft As Double, _
-    ByVal bankfullDepth_ft As Double, _
-    ByVal maximumFloodPlainDepth_ft As Double, _
-                                   ByRef depthsChannel() As Double, _
-                                   ByRef depthsFloodplain() As Double)
-        Dim dblWaterDepth As Double 'G
+    Private Sub getDepthIncrements(ByVal lMeanChannelDepth_ft As Double, _
+    ByVal lBankfullDepth_ft As Double, _
+    ByVal lMaximumFloodPlainDepth_ft As Double, _
+                                   ByRef lDepthsChannel() As Double, _
+                                   ByRef lDepthsFloodplain() As Double)
+        Dim lDblWaterDepth As Double 'G
 
-        If (bankfullDepth_ft <= 0.02) Then
-            ReDim depthsChannel(0)
-            depthsChannel(0) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 0.06) Then
-            ReDim depthsChannel(1)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 0.1) Then
-            ReDim depthsChannel(2)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 0.2) Then
-            ReDim depthsChannel(3)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = 0.1
-            depthsChannel(3) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 0.6) Then
-            ReDim depthsChannel(4)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = 0.1
-            depthsChannel(3) = 0.6
-            depthsChannel(4) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 1.0#) Then
-            ReDim depthsChannel(5)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = 0.1
-            depthsChannel(3) = 0.2
-            depthsChannel(4) = 0.6
-            depthsChannel(5) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 1.2) Then
-            ReDim depthsChannel(6)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = 0.1
-            depthsChannel(3) = 0.2
-            depthsChannel(4) = 0.6
-            depthsChannel(5) = 1.0#
-            depthsChannel(6) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 1.6) Then
-            ReDim depthsChannel(7)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = 0.1
-            depthsChannel(3) = 0.2
-            depthsChannel(4) = 0.6
-            depthsChannel(5) = 1.0#
-            depthsChannel(6) = 1.2
-            depthsChannel(7) = bankfullDepth_ft
-        ElseIf (bankfullDepth_ft <= 2.0#) Then
-            ReDim depthsChannel(8)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = 0.1
-            depthsChannel(3) = 0.2
-            depthsChannel(4) = 0.6
-            depthsChannel(5) = 1.0#
-            depthsChannel(6) = 1.2
-            depthsChannel(7) = 1.6
-            depthsChannel(8) = bankfullDepth_ft
+        If (lBankfullDepth_ft <= 0.02) Then
+            ReDim lDepthsChannel(0)
+            lDepthsChannel(0) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 0.06) Then
+            ReDim lDepthsChannel(1)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 0.1) Then
+            ReDim lDepthsChannel(2)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 0.2) Then
+            ReDim lDepthsChannel(3)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = 0.1
+            lDepthsChannel(3) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 0.6) Then
+            ReDim lDepthsChannel(4)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = 0.1
+            lDepthsChannel(3) = 0.6
+            lDepthsChannel(4) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 1.0#) Then
+            ReDim lDepthsChannel(5)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = 0.1
+            lDepthsChannel(3) = 0.2
+            lDepthsChannel(4) = 0.6
+            lDepthsChannel(5) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 1.2) Then
+            ReDim lDepthsChannel(6)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = 0.1
+            lDepthsChannel(3) = 0.2
+            lDepthsChannel(4) = 0.6
+            lDepthsChannel(5) = 1.0#
+            lDepthsChannel(6) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 1.6) Then
+            ReDim lDepthsChannel(7)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = 0.1
+            lDepthsChannel(3) = 0.2
+            lDepthsChannel(4) = 0.6
+            lDepthsChannel(5) = 1.0#
+            lDepthsChannel(6) = 1.2
+            lDepthsChannel(7) = lBankfullDepth_ft
+        ElseIf (lBankfullDepth_ft <= 2.0#) Then
+            ReDim lDepthsChannel(8)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = 0.1
+            lDepthsChannel(3) = 0.2
+            lDepthsChannel(4) = 0.6
+            lDepthsChannel(5) = 1.0#
+            lDepthsChannel(6) = 1.2
+            lDepthsChannel(7) = 1.6
+            lDepthsChannel(8) = lBankfullDepth_ft
         Else
-            ReDim depthsChannel(8)
-            depthsChannel(0) = 0.02
-            depthsChannel(1) = 0.06
-            depthsChannel(2) = 0.1
-            depthsChannel(3) = 0.2
-            depthsChannel(4) = 0.6
-            depthsChannel(5) = 1.0#
-            depthsChannel(6) = 1.2
-            depthsChannel(7) = 1.6
-            depthsChannel(8) = 2.0#
-            dblWaterDepth = 2.0#
-            While (dblWaterDepth < bankfullDepth_ft)
-                dblWaterDepth = dblWaterDepth + 1.0#
-                ReDim Preserve depthsChannel(depthsChannel.Length)
-                If (dblWaterDepth < bankfullDepth_ft) Then
-                    depthsChannel(depthsChannel.Length - 1) = dblWaterDepth
+            ReDim lDepthsChannel(8)
+            lDepthsChannel(0) = 0.02
+            lDepthsChannel(1) = 0.06
+            lDepthsChannel(2) = 0.1
+            lDepthsChannel(3) = 0.2
+            lDepthsChannel(4) = 0.6
+            lDepthsChannel(5) = 1.0#
+            lDepthsChannel(6) = 1.2
+            lDepthsChannel(7) = 1.6
+            lDepthsChannel(8) = 2.0#
+            lDblWaterDepth = 2.0#
+            While (lDblWaterDepth < lBankfullDepth_ft)
+                lDblWaterDepth = lDblWaterDepth + 1.0#
+                ReDim Preserve lDepthsChannel(lDepthsChannel.Length)
+                If (lDblWaterDepth < lBankfullDepth_ft) Then
+                    lDepthsChannel(lDepthsChannel.Length - 1) = lDblWaterDepth
                 Else
-                    depthsChannel(depthsChannel.Length - 1) = bankfullDepth_ft
+                    lDepthsChannel(lDepthsChannel.Length - 1) = lBankfullDepth_ft
                 End If
             End While
         End If
 
-        dblWaterDepth = bankfullDepth_ft * 1.5
-        If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
+        lDblWaterDepth = lBankfullDepth_ft * 1.5
+        If (lDblWaterDepth >= lMaximumFloodPlainDepth_ft) Then
             'oh
         Else
-            ReDim depthsFloodplain(0)
-            depthsFloodplain(0) = dblWaterDepth
+            ReDim lDepthsFloodplain(0)
+            lDepthsFloodplain(0) = lDblWaterDepth
         End If
-        dblWaterDepth = bankfullDepth_ft * 2.0#
-        If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
+        lDblWaterDepth = lBankfullDepth_ft * 2.0#
+        If (lDblWaterDepth >= lMaximumFloodPlainDepth_ft) Then
             GoTo LastDepth
         Else
-            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
-            depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
+            ReDim Preserve lDepthsFloodplain(lDepthsFloodplain.Length)
+            lDepthsFloodplain(lDepthsFloodplain.Length - 1) = lDblWaterDepth
         End If
-        dblWaterDepth = bankfullDepth_ft * 2.5
-        If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
+        lDblWaterDepth = lBankfullDepth_ft * 2.5
+        If (lDblWaterDepth >= lMaximumFloodPlainDepth_ft) Then
             GoTo LastDepth
         Else
-            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
-            depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
+            ReDim Preserve lDepthsFloodplain(lDepthsFloodplain.Length)
+            lDepthsFloodplain(lDepthsFloodplain.Length - 1) = lDblWaterDepth
         End If
-        dblWaterDepth = bankfullDepth_ft * 3.0#
-        If (dblWaterDepth >= maximumFloodPlainDepth_ft) Then
+        lDblWaterDepth = lBankfullDepth_ft * 3.0#
+        If (lDblWaterDepth >= lMaximumFloodPlainDepth_ft) Then
             GoTo LastDepth
         Else
-            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
-            depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
+            ReDim Preserve lDepthsFloodplain(lDepthsFloodplain.Length)
+            lDepthsFloodplain(lDepthsFloodplain.Length - 1) = lDblWaterDepth
         End If
 
 LastDepth:
-        If (maximumFloodPlainDepth_ft <= bankfullDepth_ft * 1.5) Then
-            ReDim Preserve depthsFloodplain(0)
+        If (lMaximumFloodPlainDepth_ft <= lBankfullDepth_ft * 1.5) Then
+            ReDim Preserve lDepthsFloodplain(0)
         Else
-            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
+            ReDim Preserve lDepthsFloodplain(lDepthsFloodplain.Length)
         End If
-        dblWaterDepth = maximumFloodPlainDepth_ft
-        depthsFloodplain(depthsFloodplain.Length - 1) = dblWaterDepth
+        lDblWaterDepth = lMaximumFloodPlainDepth_ft
+        lDepthsFloodplain(lDepthsFloodplain.Length - 1) = lDblWaterDepth
 
-        If (maximumFloodPlainDepth_ft < meanChannelDepth_ft * 50.0#) Then
-            ReDim Preserve depthsFloodplain(depthsFloodplain.Length)
-            depthsFloodplain(depthsFloodplain.Length - 1) = meanChannelDepth_ft * 50.0#
+        If (lMaximumFloodPlainDepth_ft < lMeanChannelDepth_ft * 50.0#) Then
+            ReDim Preserve lDepthsFloodplain(lDepthsFloodplain.Length)
+            lDepthsFloodplain(lDepthsFloodplain.Length - 1) = lMeanChannelDepth_ft * 50.0#
         End If
     End Sub
 
