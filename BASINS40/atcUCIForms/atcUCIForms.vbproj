@@ -100,6 +100,12 @@
     <Compile Include="frmNewFTable.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmPwatEdit.Designer.vb">
+      <DependentUpon>frmPwatEdit.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPwatEdit.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmXSect.Designer.vb">
       <DependentUpon>frmXSect.vb</DependentUpon>
     </Compile>
@@ -182,6 +188,10 @@
     <EmbeddedResource Include="frmEdit.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmEdit.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPwatEdit.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPwatEdit.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmXSect.resx">
       <SubType>Designer</SubType>

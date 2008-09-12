@@ -68,8 +68,10 @@ Public Class UCIForms
                 End If
                 If lMsgResponse = MsgBoxResult.Yes Then
                     If aObject.Name = "PWAT-PARM1" Then
-                        '    frmPwatEdit.init(Me, Me.Opn.Uci.icon)
-                        '    frmPwatEdit.Show(vbModal)
+                        Dim frmPwatEdit As New frmPwatEdit
+                        'frmPwatEdit.Init(aParent)
+                        frmPwatEdit.Show()
+                        'frmPwatEdit.Show(vbModal)
                     ElseIf aObject.Name = "IWAT-PARM1" Then
                         '    frmIwatEdit.init(Me, Me.Opn.Uci.icon)
                         '    frmIwatEdit.Show(vbModal)
