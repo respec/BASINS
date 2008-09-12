@@ -285,28 +285,28 @@ Public Class ctlEditFTables
     End Sub
 
     Public Sub UpdateFTABLE(ByVal aFtab As HspfFtable)
-        Dim i As Long
-        Dim j As Long
+        Dim lRow, lCol As Long
 
         txtNRows.Value = aFtab.Nrows
         txtNCols.Value = aFtab.Ncols
         With grdEdit.Source
             .Rows = txtNRows.Value
             .Columns = txtNCols.Value
-            For j = 0 To .Columns - 1
-                For i = 1 To .Rows - 1
-                    .CellEditable(i, j) = True
+
+            For lRow = 1 To .Rows
+                .CellValue(lRow, 0) = aFtab.Depth(lRow)
+                .CellValue(lRow, 1) = aFtab.Area(lRow)
+                .CellValue(lRow, 2) = aFtab.Volume(lRow)
+                .CellValue(lRow, 3) = aFtab.Outflow1(lRow)
+            Next
+
+            For lCol = 0 To .Columns - 1
+                For lRow = 1 To .Rows - 1
+                    .CellEditable(lRow, lCol) = True
                 Next
             Next
-            For i = 1 To .Rows
-                .CellValue(i, 0) = aFtab.Depth(i)
-                .CellValue(i, 1) = aFtab.Area(i)
-                .CellValue(i, 2) = aFtab.Volume(i)
-                .CellValue(i, 3) = aFtab.Outflow1(i)
-            Next
+
         End With
-        'RefreshFtables()
-        'RefreshGrid()
     End Sub
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFcurve.Click
         'Set data for plot
