@@ -40,8 +40,8 @@ Module HSPFOutputReports
                 pBaseName = "base"
                 pOutputLocations.Add("Lynnwood")
             Case "upatoi"
-                pTestPath = "d:\Basins\modelout\Upatoi"
-                pBaseName = "upatoi"
+                pTestPath = "C:\Basins\data\20710-01\Upatoi"
+                pBaseName = "Upatoi"
                 pOutputLocations.Add("R:14")
                 pOutputLocations.Add("R:34")
                 pOutputLocations.Add("R:46")
@@ -121,8 +121,7 @@ Module HSPFOutputReports
             Try
                 Dim lFileCopied As Boolean = False
                 If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
-                    IO.File.Copy(lExpertSystemFileName, pBaseName & ".exs")
-                    lFileCopied = True
+                    lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                 End If
                 lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
                 Dim lStr As String = lExpertSystem.Report
@@ -245,5 +244,6 @@ Module HSPFOutputReports
                 lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
                 "outfiles\", True)
         End If
+        Logger.Msg("Reports Written in " & IO.Path.Combine(pTestPath, "outfiles"), "HSPFOutputReports")
     End Sub
 End Module
