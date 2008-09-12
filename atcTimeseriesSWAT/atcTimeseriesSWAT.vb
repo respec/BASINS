@@ -131,7 +131,11 @@ Public Class atcTimeseriesSWAT
                                         Case 71, 72 : .FieldLength(lField) = 11
                                         Case Else : .FieldLength(lField) = 10
                                     End Select
-                                    .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
+                                    If lField = 1 Then
+                                        .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
+                                    Else 'back up one position to correctly retrieve long field names starting in previous field
+                                        .FieldName(lField) = Mid(lConstituentHeader, lFieldStart - 1, .FieldLength(lField)).Trim
+                                    End If
                                     CType(lTable, atcTableFixedStreaming).FieldStart(lField) = lFieldStart
                                     Select Case lField
                                         Case 1 : lFieldStart = 19 'skip to sub
