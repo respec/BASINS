@@ -256,6 +256,94 @@ Friend Module modSWMMFromMW
 
     End Function
 
+    Friend Function CreateLandusesFromGIRAS(ByVal aLanduseShapefileName As String, _
+                                            ByVal aSubbasinShapefileName As String, _
+                                            ByVal aSubbasinFieldName As String, _
+                                            ByVal aCatchments As Catchments, _
+                                            ByRef aLanduses As Landuses) As Boolean
+        'perform overlay for GIRAS shapefiles
+
+        aLanduses.Clear()
+
+        If Not GisUtil.IsLayerByFileName(aSubbasinShapefileName) Then
+            GisUtil.AddLayer(aSubbasinShapefileName, "Catchments")
+        End If
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinShapefileName)
+        Dim lNumSubbasins As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
+
+        'set land use index layer
+        Dim lLandUseThemeName As String = "Land Use Index"
+        Dim lLanduseFieldName As String = "COVNAME"
+        Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
+        Dim lLandUseFieldIndex As Integer = GisUtil.FieldIndex(lLanduseLayerIndex, lLanduseFieldName)
+        Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex)) & "\landuse"
+
+        'figure out which land use tiles to overlay
+        Dim lLandUseTiles As New atcCollection
+        For lLanduseTileIndex As Integer = 1 To GisUtil.NumFeatures(lLanduseLayerIndex)
+            'loop thru each shape of land use index shapefile
+            For lSubbasinIndex As Integer = 1 To lNumSubbasins
+                'loop thru each subbasin 
+                If GisUtil.OverlappingPolygons(lLanduseLayerIndex, lLanduseTileIndex - 1, lSubbasinLayerIndex, lSubbasinIndex - 1) Then
+                    'add this to collection of tiles we'll need
+                    lLandUseTiles.Add(GisUtil.FieldValue(lLanduseLayerIndex, lLanduseTileIndex - 1, lLandUseFieldIndex))
+                End If
+            Next
+        Next
+
+        'add tiles if not already on map
+        'figure out how many polygons to overlay, for status message
+        Dim lTotalPolygonCount As Integer = 0
+        Dim lTileFileNames As New atcCollection
+        For Each lLandUseTile As String In lLandUseTiles
+            Dim lNewFileName As String = lLandUsePathName & "\" & lLandUseTile & ".shp"
+            lTileFileNames.Add(lNewFileName)
+            If Not GisUtil.IsLayerByFileName(lNewFileName) Then
+                If Not GisUtil.AddLayer(lNewFileName, lLandUseTile) Then
+                    Logger.Msg("The GIRAS Landuse Shapefile " & lNewFileName & "does not exist." & _
+                                vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "SWMM Setup Problem")
+                    Exit Function
+                End If
+            End If
+            lTotalPolygonCount += GisUtil.NumFeatures(GisUtil.LayerIndex(lNewFileName))
+        Next
+        lTotalPolygonCount *= lNumSubbasins
+
+        lLanduseFieldName = "LUCODE"
+        Dim lFirst As Boolean = True
+        Dim lTileIndex As Integer = 0
+        For Each lTileFileName As String In lTileFileNames
+            lTileIndex += 1
+            'lblStatus.Text = "Overlaying Land Use and Subbasins (Tile " & lTileIndex & " of " & lTileFileNames.Count & ")"
+            'Me.Refresh()
+            'do overlay
+            GisUtil.Overlay(lTileFileName, lLanduseFieldName, aSubbasinShapefileName, aSubbasinFieldName, _
+                            lLandUsePathName & "\overlay.shp", lFirst)
+            lFirst = False
+        Next
+
+        Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
+        For i As Integer = 1 To lTable.NumRecords
+            lTable.CurrentRecord = i
+            Dim lLanduse As New Landuse
+            lLanduse.Area = CDbl(lTable.Value(3))
+            lLanduse.Name = lTable.Value(1)
+            'find associated catchment
+            For Each lCatchment As Catchment In aCatchments
+                If lCatchment.Name = lTable.Value(2) Or lCatchment.Name = "S" & lTable.Value(2) Then
+                    lLanduse.Catchment = lCatchment
+                End If
+            Next
+            Dim lKey As String = lLanduse.Name & ":" & lLanduse.Catchment.Name
+            If aLanduses.Contains(lKey) Then
+                aLanduses(lKey).Area += lLanduse.Area
+            Else
+                aLanduses.Add(lLanduse)
+            End If
+
+        Next i
+    End Function
+
     Friend Function CreateLandusesFromShapefile(ByVal aLanduseShapefileName As String, _
                                                 ByVal aLanduseFieldName As String, _
                                                 ByVal aSubbasinShapefileName As String, _
