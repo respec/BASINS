@@ -404,7 +404,6 @@ Friend Class atcFrequencyGridSource
                         End If
                     End If
 
-
                     ' The original version
                     'If pHigh Then
                     '    If lNumZero > 0 Then
@@ -449,8 +448,6 @@ Friend Class atcFrequencyGridSource
                     For Each lRecurrenceKey As String In pRecurrence.Keys
                         Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
                         Dim lNyears As Double = CDbl(lRecurrence)
-                        Dim lAdj As String
-                        Dim lAdjProb As String
 
                         lStr = DoubleToString(1 / lNyears, , "0.0000")
                         lThisRow = ("  " & lStr.PadLeft(17))
