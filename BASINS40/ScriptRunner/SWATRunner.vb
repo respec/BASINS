@@ -637,7 +637,7 @@ Module SWATRunner
         'DNITkg/ha  NUPkg/ha  PUPkg/ha ORGNkg/ha ORGPkg/ha SEDPkg/ha
         'NSURQkg/haNLATQkg/ha NO3Lkg/haNO3GWkg/ha SOLPkg/ha P_GWkg/ha    W_STRS  TMP_STRS    N_STRS    P_STRS  
         'BIOMt/ha       LAI   YLDt/ha   BACTPct  BACTLPct
-        lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
+        lOutputFields.SetValue("FieldName", "AREAkm2;NAUTOkg/ha;PAUTOkg/ha;NUPkg/ha;PUPkg/ha;YLDt/ha")
         WriteBinaryDatasetsIfNeeded("hru", lOutputFields)
 
         Logger.Dbg("SwatSummaryReports")
@@ -1230,6 +1230,10 @@ Module SWATRunner
         Dim lFieldWidth As Integer = 12
         Dim lSigDigits As Integer = 8
         Dim lArea As Double = 0.0
+        Dim lUnitNUptk As Double = 0.0
+        Dim lUnitPUptk As Double = 0.0
+        Dim lUnitNApp As Double = 0.0
+        Dim lUnitPApp As Double = 0.0
         Dim lUnitYield As Double = 0.0
 
         'TODO: check and output all units!
@@ -1288,11 +1292,19 @@ Module SWATRunner
 
         Dim lSBDebug As New Text.StringBuilder
         lSBDebug.AppendLine("SubId" & lTab & _
-                            "Crop" & lTab & _
+                            "Crop" & lTab & lTab & _
                             "Year" & lTab & _
                             "Area".PadLeft(lFieldWidth) & lTab & _
                             "UnitYield".PadLeft(lFieldWidth) & lTab & _
-                            "Yield".PadLeft(lFieldWidth))
+                            "Yield".PadLeft(lFieldWidth) & lTab & _
+                            "UnitNAutoApp".PadLeft(lFieldWidth) & lTab & _
+                            "N Auto App".PadLeft(lFieldWidth) & lTab & _
+                            "Unit N Uptk".PadLeft(lFieldWidth) & lTab & _
+                            "N Uptake".PadLeft(lFieldWidth) & lTab & _
+                            "UnitPAutoApp".PadLeft(lFieldWidth) & lTab & _
+                            "P Auto App".PadLeft(lFieldWidth) & lTab & _
+                            "Unit P Uptk".PadLeft(lFieldWidth) & lTab & _
+                            "P Uptake".PadLeft(lFieldWidth))
         'lSBDebug.AppendLine(Space(5) & lTab & _
         '                    Space(4).PadLeft(8) & lTab & _
         '                    Space(4) & lTab & _
@@ -1301,29 +1313,53 @@ Module SWATRunner
         '                    "kg".PadLeft(lFieldWidth))
         Dim lSBAverage As New Text.StringBuilder
         lSBAverage.AppendLine("SubId" & lTab _
-                            & "HUC8" & lTab _
+                            & "HUC8" & lTab & lTab _
                             & "Area".PadLeft(lFieldWidth) & lTab _
                             & "CornArea".PadLeft(lFieldWidth) & lTab _
                             & "%".PadLeft(lFieldWidth) & lTab _
                             & "UnitYield".PadLeft(lFieldWidth) & lTab _
-                            & "Yield".PadLeft(lFieldWidth))
+                            & "Yield".PadLeft(lFieldWidth) & lTab _
+                            & "UnitNAutoApp".PadLeft(lFieldWidth) & lTab _
+                            & "N Auto App".PadLeft(lFieldWidth) & lTab _
+                            & "Unit N Uptk".PadLeft(lFieldWidth) & lTab _
+                            & "N Uptake".PadLeft(lFieldWidth) & lTab _
+                            & "UnitPAutoApp".PadLeft(lFieldWidth) & lTab _
+                            & "P Auto App".PadLeft(lFieldWidth) & lTab _
+                            & "Unit P Uptk".PadLeft(lFieldWidth) & lTab _
+                            & "P Uptake".PadLeft(lFieldWidth))
         Dim lSBAnnual As New Text.StringBuilder
         lSBAnnual.AppendLine("SubId" & lTab _
-                           & "HUC8" & lTab _
+                           & "HUC8" & lTab & lTab _
                            & "Year" & lTab _
                            & "Area".PadLeft(lFieldWidth) & lTab & _
                              "CornArea".PadLeft(lFieldWidth) & lTab & _
                              "%".PadLeft(lFieldWidth) & lTab & _
                              "UnitYield".PadLeft(lFieldWidth) & lTab & _
-                             "Yield".PadLeft(lFieldWidth))
+                             "Yield".PadLeft(lFieldWidth) & lTab & _
+                             "UnitNAutoApp".PadLeft(lFieldWidth) & lTab & _
+                             "N Auto App".PadLeft(lFieldWidth) & lTab & _
+                             "Unit N Uptk".PadLeft(lFieldWidth) & lTab & _
+                             "N Uptake".PadLeft(lFieldWidth) & lTab & _
+                             "UnitPAutoApp".PadLeft(lFieldWidth) & lTab & _
+                             "P Auto App".PadLeft(lFieldWidth) & lTab & _
+                             "Unit P Uptk".PadLeft(lFieldWidth) & lTab & _
+                             "P Uptake".PadLeft(lFieldWidth))
         Dim lAreaAllTotal As Double = 0.0
         Dim lAreaTotal As Double = 0.0
         Dim lYieldTotal As Double = 0.0
+        Dim lNAppTotal As Double = 0.0
+        Dim lNUptkTotal As Double = 0.0
+        Dim lPAppTotal As Double = 0.0
+        Dim lPUptkTotal As Double = 0.0
         Dim lYieldSummaryHuc8 As New atcCollection
         For Each lSubId As String In lSubIds
             Dim lHuc8 As String = aSubBasin2huc8.ItemByKey(lSubId.Trim)
             Dim lSubIdDataGroup As atcDataGroup = lMatchingDataGroup.FindData("SubId", lSubId)
             Dim lLocationIdsInSub As atcCollection = lSubIdDataGroup.SortedAttributeValues("Location")
+            Dim lNUptkSum As Double = 0.0
+            Dim lNAppSum As Double = 0.0
+            Dim lPUptkSum As Double = 0.0
+            Dim lPAppSum As Double = 0.0
             Dim lYieldSum As Double = 0.0
             Dim lAreaSum As Double = 0.0
             Dim lYear As Integer = lDateBase(0)
@@ -1331,30 +1367,62 @@ Module SWATRunner
             lAreaAllTotal += lSubIdArea
             For lYearIndex As Integer = 1 To lNumValues
                 Dim lAreaSub As Double = 0
+                Dim lNAppSub As Double = 0
+                Dim lNUptkSub As Double = 0
+                Dim lPAppSub As Double = 0
+                Dim lPUptkSub As Double = 0
                 Dim lYieldSub As Double = 0
                 For Each lLocationId As String In lLocationIdsInSub
                     Dim lLocationIdDataGroup As atcDataGroup = lSubIdDataGroup.FindData("Location", lLocationId)
-                    If lLocationIdDataGroup.Count = 2 Then
+                    If lLocationIdDataGroup.Count = 6 Then
                         Dim lAreaTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "Area").Item(0)
+                        Dim lNAppliedTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "NAUTO").Item(0)
+                        Dim lNUptkTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "NUP").Item(0)
+                        Dim lPAppliedTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "PAUTO").Item(0)
+                        Dim lPUptkTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "PUP").Item(0)
                         Dim lYieldTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "Yld").Item(0)
 
                         If lYearIndex <= lAreaTimser.numValues Then
                             lArea = lAreaTimser.Value(lYearIndex)
+                            lUnitNApp = lNAppliedTimser.Value(lYearIndex)
+                            lUnitNUptk = lNUptkTimser.Value(lYearIndex)
+                            lUnitPApp = lPAppliedTimser.Value(lYearIndex)
+                            lUnitPUptk = lPUptkTimser.Value(lYearIndex)
                             lUnitYield = lYieldTimser.Value(lYearIndex)
                         Else
                             lArea = GetNaN()
+                            lUnitNApp = GetNaN()
+                            lUnitNUptk = GetNaN()
+                            lUnitPApp = GetNaN()
+                            lUnitPUptk = GetNaN()
                             lUnitYield = GetNaN()
                         End If
                         Dim lYield As Double = lUnitYield * lArea
+                        Dim lNApp As Double = lUnitNApp * lArea
+                        Dim lNUptk As Double = lUnitNUptk * lArea
+                        Dim lPApp As Double = lUnitPApp * lArea
+                        Dim lPUptk As Double = lUnitPUptk * lArea
                         lSBDebug.AppendLine(lSubId.Trim & lTab & _
                                             lLocationId & lTab & _
                                             lYear & lTab & _
                                             DecimalAlign(lArea) & lTab & _
                                             DecimalAlign(lUnitYield) & lTab & _
-                                            DecimalAlign(lYield))
+                                            DecimalAlign(lYield) & lTab & _
+                                            DecimalAlign(lUnitNApp) & lTab & _
+                                            DecimalAlign(lNApp) & lTab & _
+                                            DecimalAlign(lUnitNUptk) & lTab & _
+                                            DecimalAlign(lNUptk) & lTab & _
+                                            DecimalAlign(lUnitPApp) & lTab & _
+                                            DecimalAlign(lPApp) & lTab & _
+                                            DecimalAlign(lUnitPUptk) & lTab & _
+                                            DecimalAlign(lPUptk))
                         If Not Double.IsNaN(lArea) Then
-                            lAreaSub += lArea
                             lYieldSub += lYield
+                            lAreaSub += lArea
+                            lNAppSub += lNApp
+                            lNUptkSub += lNUptk
+                            lPAppSub += lPApp
+                            lPUptkSub += lPUptk
                         End If
                     Else
                         Logger.Dbg("Problem:" & lLocationIdDataGroup.Count)
@@ -1367,12 +1435,28 @@ Module SWATRunner
                                    & DecimalAlign(lAreaSub) & lTab _
                                    & DecimalAlign(100 * lAreaSub / lSubIdArea, , 1) & lTab _
                                    & DecimalAlign(lYieldSub / lAreaSub) & lTab _
-                                   & DecimalAlign(lYieldSub))
+                                   & DecimalAlign(lYieldSub) & lTab _
+                                   & DecimalAlign(lNAppSub / lAreaSub) & lTab _
+                                   & DecimalAlign(lNAppSub) & lTab _
+                                   & DecimalAlign(lNUptkSub / lAreaSub) & lTab _
+                                   & DecimalAlign(lNUptkSub) & lTab _
+                                   & DecimalAlign(lPAppSub / lAreaSub) & lTab _
+                                   & DecimalAlign(lPAppSub) & lTab _
+                                   & DecimalAlign(lPUptkSub / lAreaSub) & lTab _
+                                   & DecimalAlign(lPUptkSub))
+                lNAppSum += lNAppSub
+                lNUptkSum += lNUptkSub
+                lPAppSum += lPAppSub
+                lPUptkSum += lPUptkSub
                 lYieldSum += lYieldSub
                 lAreaSum += lAreaSub
                 lYear += 1
             Next
             Dim lAreaAvg As Double = lAreaSum / lNumValues
+            Dim lNAppAvg As Double = lNAppSum / lNumValues
+            Dim lNUptkAvg As Double = lNUptkSum / lNumValues
+            Dim lPAppAvg As Double = lPAppSum / lNumValues
+            Dim lPUptkAvg As Double = lPUptkSum / lNumValues
             Dim lYieldAvg As Double = lYieldSum / lNumValues
             Dim lYieldSummary As New YieldSummary
             With lYieldSummary
@@ -1380,6 +1464,10 @@ Module SWATRunner
                 .Area = lSubIdArea
                 .AreaCorn = lAreaAvg
                 .Yield = lYieldAvg
+                .NApp = lNAppAvg
+                .NUptk = lNUptkAvg
+                .PApp = lPAppAvg
+                .PUptk = lPUptkAvg
             End With
             lYieldSummaryHuc8.Add(lHuc8, lYieldSummary)
             lSBAverage.AppendLine(lSubId.Trim & lTab _
@@ -1388,9 +1476,21 @@ Module SWATRunner
                                 & DecimalAlign(lAreaAvg) & lTab _
                                 & DecimalAlign(100 * lAreaAvg / lSubIdArea, , 1) & lTab _
                                 & DecimalAlign(lYieldAvg / lAreaAvg) & lTab _
-                                & DecimalAlign(lYieldAvg))
+                                & DecimalAlign(lYieldAvg) & lTab _
+                                & DecimalAlign(lNAppAvg / lAreaAvg) & lTab _
+                                & DecimalAlign(lNAppAvg) & lTab _
+                                & DecimalAlign(lNUptkAvg / lAreaAvg) & lTab _
+                                & DecimalAlign(lNUptkAvg) & lTab _
+                                & DecimalAlign(lPAppAvg / lAreaAvg) & lTab _
+                                & DecimalAlign(lPAppAvg) & lTab _
+                                & DecimalAlign(lPUptkAvg / lAreaAvg) & lTab _
+                                & DecimalAlign(lPUptkAvg))
             lAreaTotal += lAreaAvg
             lYieldTotal += lYieldAvg
+            lNAppTotal += lNAppAvg
+            lNUptkTotal += lNUptkAvg
+            lPAppTotal += lPAppAvg
+            lPUptkTotal += lPUptkAvg
         Next
 
         'huc4 report
@@ -1409,6 +1509,10 @@ Module SWATRunner
                 .Area += lYieldSummary8.Area
                 .AreaCorn += lYieldSummary8.AreaCorn
                 .Yield += lYieldSummary8.Yield
+                .NApp += lYieldSummary8.NApp
+                .NUptk += lYieldSummary8.NUptk
+                .PApp += lYieldSummary8.PApp
+                .PUptk += lYieldSummary8.PUptk
             End With
         Next
         Dim lSBAverage4 As New Text.StringBuilder
@@ -1417,7 +1521,15 @@ Module SWATRunner
                              & "CornArea".PadLeft(lFieldWidth) & lTab _
                              & "%".PadLeft(lFieldWidth) & lTab _
                              & "UnitYield".PadLeft(lFieldWidth) & lTab _
-                             & "Yield".PadLeft(lFieldWidth))
+                             & "Yield".PadLeft(lFieldWidth) & lTab & _
+                             "UnitNAutoApp".PadLeft(lFieldWidth) & lTab & _
+                             "N Auto App".PadLeft(lFieldWidth) & lTab & _
+                             "Unit N Uptk".PadLeft(lFieldWidth) & lTab & _
+                             "N Uptake".PadLeft(lFieldWidth) & lTab & _
+                             "UnitPAutoApp".PadLeft(lFieldWidth) & lTab & _
+                             "P Auto App".PadLeft(lFieldWidth) & lTab & _
+                             "Unit P Uptk".PadLeft(lFieldWidth) & lTab & _
+                             "P Uptake".PadLeft(lFieldWidth))
         For Each lYieldSummary As YieldSummary In lYieldSummaryHuc4
             With lYieldSummary
                 lSBAverage4.AppendLine(.Huc _
@@ -1425,7 +1537,15 @@ Module SWATRunner
                              & lTab & DecimalAlign(.AreaCorn) _
                              & lTab & DecimalAlign(100 * .AreaCorn / .Area, , 1) _
                              & lTab & DecimalAlign(.Yield / .AreaCorn) _
-                             & lTab & DecimalAlign(.Yield))
+                             & lTab & DecimalAlign(.Yield) _
+                             & lTab & DecimalAlign(.NApp / .AreaCorn) _
+                             & lTab & DecimalAlign(.NApp) _
+                             & lTab & DecimalAlign(.NUptk / .AreaCorn) _
+                             & lTab & DecimalAlign(.NUptk) _
+                             & lTab & DecimalAlign(.PApp / .AreaCorn) _
+                             & lTab & DecimalAlign(.PApp) _
+                             & lTab & DecimalAlign(.PUptk / .AreaCorn) _
+                             & lTab & DecimalAlign(.PUptk))
             End With
         Next
         SaveFileString(IO.Path.Combine(aOutputFolder, "AverageHuc4.txt"), lSBAverage4.ToString)
@@ -1435,12 +1555,28 @@ Module SWATRunner
                             "CornArea".PadLeft(lFieldWidth) & lTab & _
                             "%".PadLeft(lFieldWidth) & lTab & _
                             "UnitYield".PadLeft(lFieldWidth) & lTab & _
-                            "Yield".PadLeft(lFieldWidth))
+                            "Yield".PadLeft(lFieldWidth) & lTab & _
+                            "UnitNAutoApp".PadLeft(lFieldWidth) & lTab & _
+                            "N Auto App".PadLeft(lFieldWidth) & lTab & _
+                            "Unit N Uptk".PadLeft(lFieldWidth) & lTab & _
+                            "N Uptake".PadLeft(lFieldWidth) & lTab & _
+                            "UnitPAutoApp".PadLeft(lFieldWidth) & lTab & _
+                            "P Auto App".PadLeft(lFieldWidth) & lTab & _
+                            "Unit P Uptk".PadLeft(lFieldWidth) & lTab & _
+                            "P Uptake".PadLeft(lFieldWidth))
         lSBTotal.AppendLine(DecimalAlign(lAreaAllTotal) & lTab & _
                             DecimalAlign(lAreaTotal) & lTab & _
                             DecimalAlign(100 * lAreaTotal / lAreaAllTotal, , 1) & lTab & _
                             DecimalAlign(lYieldTotal / lAreaTotal) & lTab & _
-                            DecimalAlign(lYieldTotal))
+                            DecimalAlign(lYieldTotal) & lTab & _
+                            DecimalAlign(lNAppTotal / lAreaTotal) & lTab & _
+                            DecimalAlign(lNAppTotal) & lTab & _
+                            DecimalAlign(lNUptkTotal / lAreaTotal) & lTab & _
+                            DecimalAlign(lNUptkTotal) & lTab & _
+                            DecimalAlign(lPAppTotal / lAreaTotal) & lTab & _
+                            DecimalAlign(lPAppTotal) & lTab & _
+                            DecimalAlign(lPUptkTotal / lAreaTotal) & lTab & _
+                            DecimalAlign(lPUptkTotal))
         SaveFileString(IO.Path.Combine(aOutputFolder, "Debug.txt"), lSBDebug.ToString)
         SaveFileString(IO.Path.Combine(aOutputFolder, "Annual.txt"), lSBAnnual.ToString)
         SaveFileString(IO.Path.Combine(aOutputFolder, "Average.txt"), lSBAverage.ToString)
@@ -1450,6 +1586,10 @@ Module SWATRunner
         Public Huc As String
         Public Area As Double
         Public AreaCorn As Double
+        Public NApp As Double
+        Public PApp As Double
+        Public NUptk As Double
+        Public PUptk As Double
         Public Yield As Double
     End Class
 End Module
