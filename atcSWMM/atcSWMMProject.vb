@@ -200,7 +200,7 @@ Public Class SWMMProject
         Dim lSB As New StringBuilder
 
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
-        If Me.SJDate = aTimeSeries.Dates.Values(0) Then
+        If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
         End If
         Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
@@ -232,7 +232,7 @@ Public Class SWMMProject
     Public Sub TimeSeriesToStream(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String, ByVal aSW As IO.StreamWriter)
 
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
-        If Me.SJDate = aTimeSeries.Dates.Values(0) Then
+        If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
         End If
         Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)

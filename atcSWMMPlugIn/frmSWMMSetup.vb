@@ -1222,9 +1222,11 @@ Public Class frmSWMMSetup
             Dim lLanduseLayerName As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
             Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
             Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
+            Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
+            Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
             If cboLanduse.SelectedIndex = 0 Then
                 'usgs giras is the selected land use type
-                'CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas)
+                CreateLandusesFromGIRAS(lLandUseFileName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
             ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
                 'create landuses from grid
                 CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
@@ -1233,9 +1235,7 @@ Public Class frmSWMMSetup
                 Dim lLanduseFieldName As String = ""
                 If cboDescription.SelectedIndex > -1 Then
                     lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-                End If
-                Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
-                Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
+                End If                
                 CreateLandusesFromShapefile(lLandUseFileName, lLanduseFieldName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
             End If
 
