@@ -62,7 +62,6 @@ Public Class atcTimeseriesRDB
                 Dim lAttrName As String
                 Dim lAttrValue As String
                 Dim lAttributes As New atcDataAttributes
-                lAttributes.SetValue("DataSource", aFileName)
 
                 Dim lInputStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
                 Dim lInputBuffer As New BufferedStream(lInputStream)
@@ -382,7 +381,8 @@ Public Class atcTimeseriesRDB
                         If lCurValue.Length = 0 Then
                             'Skip blank values
                             'If next field is code for this field, then make sure its code starts with "A" for Approved
-                        ElseIf .FieldName(lField + 1) <> .FieldName(lField) & "_cd" OrElse .Value(lField + 1).StartsWith("A") Then
+                        ElseIf .FieldName(lField + 1) <> .FieldName(lField) & "_cd" OrElse _
+                               .Value(lField + 1).StartsWith("A") Then
                             lConstituentDescription = lValueConstituentDescriptions.ItemByKey(lField)
 
                             Dim lDataKey As String = lLocation & ":" & lConstituentDescription
@@ -420,6 +420,10 @@ Public Class atcTimeseriesRDB
                             lTSIndex = lData.Attributes.GetValue("Count") + 1
                             lData.Value(lTSIndex) = lCurValue
                             lData.Dates.Value(lTSIndex) = lDate
+                            If .FieldName(lField + 1) = .FieldName(lField) & "_cd" AndAlso _
+                               .Value(lField + 1).Contains("e") Then
+                                lData.ValueAttributes(lTSIndex).Add("Estimated", True)
+                            End If
                             lData.Attributes.SetValue("Count", lTSIndex)
                         End If
                     Next

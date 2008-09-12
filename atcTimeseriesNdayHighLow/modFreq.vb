@@ -93,7 +93,7 @@ Module modFreq
         If lN = 0 OrElse Double.IsNaN(lMean) Then ' <= 0 Then 'no data or problem data
             Throw New ApplicationException("Count = 0 or Mean = NaN")
         Else
-            Dim lNzi As Integer = aTs.numValues - lN
+            Dim lNZero As Integer = aTs.numValues - lN
             Dim lNumons As Integer = 1
 
             Dim lLogarh As Integer
@@ -136,7 +136,7 @@ Module modFreq
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, lNzi, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
+                LGPSTX(lN, lNZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
                        lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
                 Dim lMsg As String = ""
 
@@ -177,36 +177,42 @@ Module modFreq
 
                     aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
 
-                    lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")
-                    If lNewAttribute Is Nothing Then
-                        lNewAttribute = New atcAttributeDefinition
-                        With lNewAttribute
-                            .Name = lS & "Adj"
-                            .TypeString = "Double"
-                            .Description = "Adjusted Result"
-                        End With
+                    If lNZero > 0 Then
+                        lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")
+                        If lNewAttribute Is Nothing Then
+                            lNewAttribute = New atcAttributeDefinition
+                            With lNewAttribute
+                                .Name = lS & "Adj"
+                                .TypeString = "Double"
+                                .Description = "Adjusted Result"
+                                .Calculator = aDataSource
+                                .DefaultValue = GetNaN()
+                            End With
+                        End If
+                        aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
+                        lNewAttribute = atcDataAttributes.GetDefinition(lS & "AdjProb")
+                        If lNewAttribute Is Nothing Then
+                            lNewAttribute = New atcAttributeDefinition
+                            With lNewAttribute
+                                .Name = lS & "AdjProb"
+                                .TypeString = "Double"
+                                .Description = "Adjusted Probability"
+                                .Calculator = aDataSource
+                                .DefaultValue = GetNaN()
+                            End With
+                        End If
+                        aAttributesStorage.SetValue(lNewAttribute, lAdp(lIndex), lArguments)
                     End If
-                    aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
-                    lNewAttribute = atcDataAttributes.GetDefinition(lS & "AdjProb")
-                    If lNewAttribute Is Nothing Then
-                        lNewAttribute = New atcAttributeDefinition
-                        With lNewAttribute
-                            .Name = lS & "AdjProb"
-                            .TypeString = "Double"
-                            .Description = "Adjusted Probability"
-                        End With
-                    End If
-                    aAttributesStorage.SetValue(lNewAttribute, lAdp(lIndex), lArguments)
                 Next
-            Catch ex As Exception
+            Catch lEx As Exception
                 If pWarned Then
-                    Logger.Dbg("Could not compute Pearson Type3 Frequency: " & ex.Message)
+                    Logger.Dbg("Could not compute Pearson Type3 Frequency: " & lEx.Message)
                 Else
                     Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
                     If IO.File.Exists(lExpectedDLL) Then
-                        Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute PearsonType3")
+                        Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & lEx.Message, "Could not compute PearsonType3")
                     Else
-                        Logger.Msg("Required library not found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute PearsonType3")
+                        Logger.Msg("Required library not found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & lEx.Message, "Could not compute PearsonType3")
                     End If
                     pWarned = True
                 End If
