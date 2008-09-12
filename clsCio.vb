@@ -150,6 +150,14 @@ Partial Class SwatInput
             Return pSwatInput.QueryInputDB("SELECT * FROM " & pTableName & ";")
         End Function
 
+        Public Function Item() As clsCIOItem
+            Return Item(Nothing)
+        End Function
+        Public Function Item(ByVal aTable As DataTable) As clsCIOItem
+            If aTable Is Nothing Then aTable = Table()
+            Return New clsCIOItem(aTable.Rows(0))
+        End Function
+
         Public Sub Add(ByVal aItem As clsCIOItem)
             ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
