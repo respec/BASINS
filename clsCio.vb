@@ -228,11 +228,9 @@ Partial Class SwatInput
                 lSB.AppendLine(MakeString(lRow.Item(21), 0, 4, 4) & "| WINDSIM : Windspeed simulation code: 1=measured, 2=simulated")
                 ' ------ 13-TFACT
                 lSB.AppendLine(MakeString(lRow.Item(22), 0, 4, 4) & "| NWTOT: number of wind speed records in wnd file")
-                ' ------14-K_1
+
                 lSB.AppendLine(MakeString(lRow.Item(23), 0, 4, 4) & "| FCSTYR: beginning year of forecast period")
-                ' ------15-K_N
                 lSB.AppendLine(MakeString(lRow.Item(24), 0, 4, 4) & "| FCSTDAY: beginning julian date of forecast period")
-                ' ------16-K_P
                 lSB.AppendLine(MakeString(lRow.Item(25), 0, 4, 4) & "| FCSTCYCLES: number of time to simulate forecast period")
 
                 lSB.AppendLine("Precipitation Files:")
@@ -313,7 +311,11 @@ Partial Class SwatInput
                     lSB.AppendLine("                    | WNDFILE: name of wind speed file")
                 End If
 
-                lSB.AppendLine("cst.cst             | FCSTFILE: name of forecast data file")
+                If lRow.Item(23) > 0 AndAlso lRow.Item(24) > 0 AndAlso lRow.Item(25) > 0 Then
+                    lSB.AppendLine("cst.cst             | FCSTFILE: name of forecast data file")
+                Else
+                    lSB.AppendLine("                    | FCSTFILE: name of forecast data file")
+                End If
 
                 lSB.AppendLine("Watershed Modeling Options:")
                 lSB.AppendLine("basins.bsn          | BSNFILE: name of basin input file")
