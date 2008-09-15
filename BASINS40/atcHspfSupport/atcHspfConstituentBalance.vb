@@ -139,7 +139,7 @@ Public Module ConstituentBalance
                                     Next
                                     lRecEndPos = lRecStartPos
                                 Next
-                                lString.Append(lConstituentName)
+                                lString.Append(lConstituentName.PadRight(12))
                                 For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
                                     lString.Append(vbTab & DecimalAlign(lCurFieldValues(lFieldPos), , lDecimalPlaces))
                                 Next

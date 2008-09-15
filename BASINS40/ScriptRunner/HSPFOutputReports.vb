@@ -40,6 +40,7 @@ Module HSPFOutputReports
                 pBaseName = "base"
                 pOutputLocations.Add("Lynnwood")
             Case "upatoi"
+                'pTestPath = "D:\Basins\modelout\Upatoi"
                 pTestPath = "C:\Basins\data\20710-01\Upatoi"
                 pBaseName = "Upatoi"
                 pOutputLocations.Add("R:14")
