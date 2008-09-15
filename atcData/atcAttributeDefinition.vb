@@ -262,6 +262,29 @@ Public Class atcAttributeDefinition
         End Set
     End Property
 
+    Public Overrides Function ToString() As String
+        On Error Resume Next
+        Dim lString As String = ""
+        lString &= Name
+        lString &= " (" & TypeString & ") '"
+        lString &= Description & "'"
+        lString &= " Category: " & Category
+        lString &= " CopiesInherit: " & pCopiesInherit
+        lString &= " Help: " & Help
+        lString &= " DefaultValue: " & DefaultValue.ToString
+        lString &= " ID: " & ID
+        lString &= " Editable: " & Editable
+        lString &= " Min: " & Min
+        lString &= " Max: " & Max
+        If ValidList IsNot Nothing AndAlso ValidList.Count > 0 Then
+            lString &= " ValidList: "
+            For Each lValidItem As Object In ValidList
+                lString &= lValidItem.ToString & " "
+            Next
+        End If
+        Return lString
+    End Function
+
     Public Sub Clear()
         Name = ""
         Description = ""

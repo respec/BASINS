@@ -137,6 +137,16 @@ Public Module modTimeseriesMath
 
     End Function
 
+    ''' <summary>
+    ''' Copy any attributes that copies inherit from aFromDataSet into aToDataSet
+    ''' </summary>
+    ''' <param name="aFromDataset">dataset containing attributes to copy</param>
+    ''' <param name="aToDataSet">dataset to copy attributes into</param>
+    ''' <param name="aNumValues">Number of values to copy value attributes of</param>
+    ''' <param name="aStartFrom">Start index for copying value attributes from</param>
+    ''' <param name="aStartTo">Start index for copying value attributes to</param>
+    ''' <remarks>Only copies general attributes if aNumValues is omitted or is less than 1, 
+    ''' Also copes value attributes if aNumValues > 0</remarks>
     Public Sub CopyBaseAttributes(ByVal aFromDataset As atcTimeseries, ByVal aToDataSet As atcTimeseries, _
                                   Optional ByVal aNumValues As Integer = 0, _
                                   Optional ByVal aStartFrom As Integer = 0, _
@@ -349,41 +359,6 @@ Public Module modTimeseriesMath
             Dim lNewDates() As Double = NewDates(aOldTSer, aTU, aTS)
 
             If lNewDates.GetUpperBound(0) > 0 Then 'dates for new timeseries set
-                'Select Case aTU
-                '  Case atcTimeUnit.TUSecond : lIntvl = JulianSecond : lVarLength = 0
-                '  Case atcTimeUnit.TUMinute : lIntvl = JulianMinute : lVarLength = 0
-                '  Case atcTimeUnit.TUHour : lIntvl = JulianHour : lVarLength = 0
-                '  Case atcTimeUnit.TUDay : lIntvl = aTS : lVarLength = 0
-                '  Case atcTimeUnit.TUMonth : lIntvl = aTS * 30.44 : lVarLength = 1
-                '  Case atcTimeUnit.TUYear : lIntvl = aTS * 365.25 : lVarLength = 2
-                '  Case atcTimeUnit.TUCentury : lIntvl = aTS * 36525 : lVarLength = 3
-                'End Select
-
-                Dim lNewTSer As New atcTimeseries(aDataSource)
-                CopyBaseAttributes(aOldTSer, lNewTSer)
-                If aOldTSer.ValueAttributesExist Then 'TODO:: Something with value attributes
-                End If
-
-                'If aOldTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aOldTSer.Dates.Value(0)) Then
-                '  If lVarLength > 0 Then
-                '    J2Date(aOldTSer.Dates.Value(1), lDate)
-                '    If lVarLength = 1 Then
-                '      lSJDay = aOldTSer.Dates.Value(1) - daymon(lDate(0), lDate(1))
-                '    ElseIf lVarLength = 2 Then
-                '      lSJDay = aOldTSer.Dates.Value(1) - 365 - (daymon(lDate(0), 2) - 28)
-                '    Else 'TODO::something for centuries
-                '    End If
-                '  Else
-                '    lSJDay = aOldTSer.Dates.Value(1) - lIntvl
-                '  End If
-                'Else
-                '  lSJDay = aOldTSer.Dates.Value(0)
-                'End If
-                'lEJDay = aOldTSer.Dates.Value(aOldTSer.numValues)
-                'lNewNumVals = (lEJDay - lSJDay) / lIntvl
-                'ReDim lNewVals(lNewNumVals)
-                'ReDim lNewDates(lNewNumVals)
-                'lNewDates(0) = lSJDay
                 lNewNumVals = lNewDates.GetUpperBound(0)
                 ReDim lNewVals(lNewNumVals)
                 lNewVals(0) = pNaN
@@ -391,19 +366,30 @@ Public Module modTimeseriesMath
                 lDateOld = aOldTSer.Dates.Value(lOldInd)
                 lNewInd = 1
                 lDateNew = lNewDates(lNewInd)
+                Dim lAnyValueAttributes As Boolean = aOldTSer.ValueAttributesExist
+                Dim lNewValueAttributes(lNewDates.GetUpperBound(0)) As atcDataAttributes
+
                 While lNewInd <= lNewNumVals
                     While lDateNew < lDateOld - JulianMillisecond 'Fill values not present in original data
                         Select Case lValOld
                             Case aMissVal
                                 If aOldTSer.Value(lOldInd) = aMissVal Then
                                     lNewVals(lNewInd) = aMissVal
+                                    lNewValueAttributes(lNewInd) = New atcDataAttributes
+                                    lNewValueAttributes(lNewInd).SetValue("Missing", True)
                                 Else
                                     lNewVals(lNewInd) = aFillVal
+                                    lNewValueAttributes(lNewInd) = New atcDataAttributes
+                                    lNewValueAttributes(lNewInd).SetValue("Filled", True)
                                 End If
                             Case aAccumVal
                                 lNewVals(lNewInd) = aAccumVal
+                                lNewValueAttributes(lNewInd) = New atcDataAttributes
+                                lNewValueAttributes(lNewInd).SetValue("Accumulated", True)
                             Case Else
                                 lNewVals(lNewInd) = aFillVal
+                                lNewValueAttributes(lNewInd) = New atcDataAttributes
+                                lNewValueAttributes(lNewInd).SetValue("Filled", True)
                         End Select
                         'lNewDates(lNewInd) = lDateNew
                         lNewInd += 1
@@ -420,6 +406,9 @@ Public Module modTimeseriesMath
                     End While
                     lValOld = aOldTSer.Value(lOldInd)
                     lNewVals(lNewInd) = lValOld
+                    If lAnyValueAttributes AndAlso aOldTSer.ValueAttributesExist(lOldInd) Then
+                        lNewValueAttributes(lNewInd) = aOldTSer.ValueAttributes(lOldInd)
+                    End If
                     'lNewDates(lNewInd) = lDateNew
                     'If lVarLength = 1 Then 'monthly
                     '  Call J2Date(lDateNew, lDate)
@@ -439,10 +428,16 @@ Public Module modTimeseriesMath
                         lDateOld = aOldTSer.Dates.Value(lOldInd)
                     End If
                 End While
+                Dim lNewTSer As New atcTimeseries(aDataSource)
+                CopyBaseAttributes(aOldTSer, lNewTSer)
                 lNewTSer.Dates = New atcTimeseries(Nothing)
                 lNewTSer.Dates.Values = lNewDates
                 lNewTSer.Values = lNewVals
-
+                For lNewInd = 1 To lNewValueAttributes.GetUpperBound(0)
+                    If lNewValueAttributes(lNewInd) IsNot Nothing Then
+                        lNewTSer.ValueAttributes(lNewInd) = lNewValueAttributes(lNewInd)
+                    End If
+                Next
                 With lNewTSer.Attributes
                     .SetValue("point", False)
                     .SetValue("tu", aTU)
@@ -545,6 +540,7 @@ Public Module modTimeseriesMath
             Dim lNewDates() As Double = NewDates(aTimeseries, aTU, aTS)
             Dim lNumNewVals As Integer = lNewDates.GetUpperBound(0)
             If lNumNewVals > 0 Then
+                Dim lNaN As Double = GetNaN()
                 Dim lNewTSer As New atcTimeseries(aDataSource)
                 lNewTSer.Dates = New atcTimeseries(aDataSource)
                 CopyBaseAttributes(aTimeseries, lNewTSer)
@@ -583,11 +579,11 @@ Public Module modTimeseriesMath
                                 If lPrevDateOld > lPrevDateNew Then lOverlapStart = lPrevDateOld Else lOverlapStart = lPrevDateNew
                                 If lDateNew > lDateOld Then lOverlapEnd = lDateOld Else lOverlapEnd = lDateNew
                                 lFraction = (lOverlapEnd - lOverlapStart) / (lDateNew - lPrevDateNew)
-                                lCumuFrac = lCumuFrac + lFraction
+                                lCumuFrac += lFraction
                                 If aTran = atcTran.TranSumDiv Then
                                     lFraction = (lOverlapEnd - lOverlapStart) / (lDateOld - lPrevDateOld)
                                 End If
-                                lNewVals(lNewIndex) = lNewVals(lNewIndex) + lFraction * lValOld
+                                lNewVals(lNewIndex) += lFraction * lValOld
                                 If lPrevDateOld < lDateNew Then
                                     If lDateOld > lDateNew Then 'use remaining part of this old interval on next new interval
                                         lPrevDateOld = lDateNew
@@ -599,44 +595,53 @@ Public Module modTimeseriesMath
                                             lDateOld = aTimeseries.Dates.Value(lOldIndex)
                                             lValOld = aTimeseries.Value(lOldIndex)
                                         End If
-                                        lCumuFrac = 0
+                                        'lCumuFrac = 0
                                     End If
                                 End If
                             End While
                             lPrevDateNew = lDateNew
                             If aTran = atcTran.TranSumDiv AndAlso lCumuFrac > 0.01 AndAlso lCumuFrac < 0.999 Then
                                 lNewVals(lNewIndex) = lNewVals(lNewIndex) / lCumuFrac
+                                lCumuFrac = 0
                             End If
                             lNewIndex = lNewIndex + 1
                         End While
 
                     Case atcTran.TranMax
+                        Dim lMinValue As Double = GetMinValue()
                         While lNewIndex <= lNumNewVals
                             lDateNew = lNewDates(lNewIndex)
-                            lNewVals(lNewIndex) = -1.0E+30
+                            lNewVals(lNewIndex) = lMinValue
                             While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
-                                If lNewVals(lNewIndex) < lValOld Then lNewVals(lNewIndex) = lValOld
+                                If lValOld > lNewVals(lNewIndex) Then lNewVals(lNewIndex) = lValOld
                                 lOldIndex = lOldIndex + 1
                                 If lOldIndex <= lNumOldVals Then
                                     lDateOld = aTimeseries.Dates.Value(lOldIndex)
                                     lValOld = aTimeseries.Value(lOldIndex)
                                 End If
                             End While
+                            If lNewVals(lNewIndex) = lMinValue Then
+                                lNewVals(lNewIndex) = lNaN
+                            End If
                             lNewIndex = lNewIndex + 1
                         End While
 
                     Case atcTran.TranMin
+                        Dim lMaxValue As Double = GetMaxValue()
                         While lNewIndex <= lNumNewVals
                             lDateNew = lNewDates(lNewIndex)
-                            lNewVals(lNewIndex) = 1.0E+30
+                            lNewVals(lNewIndex) = lMaxValue
                             While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
-                                If lNewVals(lNewIndex) > lValOld Then lNewVals(lNewIndex) = lValOld
+                                If lValOld < lNewVals(lNewIndex) Then lNewVals(lNewIndex) = lValOld
                                 lOldIndex = lOldIndex + 1
                                 If lOldIndex <= lNumOldVals Then
                                     lDateOld = aTimeseries.Dates.Value(lOldIndex)
                                     lValOld = aTimeseries.Value(lOldIndex)
                                 End If
                             End While
+                            If lNewVals(lNewIndex) = lMaxValue Then
+                                lNewVals(lNewIndex) = lNaN
+                            End If
                             lNewIndex = lNewIndex + 1
                         End While
 

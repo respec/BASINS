@@ -38,15 +38,19 @@ Public Class atcDataAttributes
         Return PreferredName(aAttributeName).ToLower
     End Function
 
-    Public Shared Sub AddDefinition(ByVal aDefinition As atcAttributeDefinition)
+    Public Shared Function AddDefinition(ByVal aDefinition As atcAttributeDefinition) As atcAttributeDefinition
         Dim lKey As String = AttributeNameToKey(aDefinition.Name)
         If Not pAllDefinitions.Keys.Contains(lKey) Then
             aDefinition.Name = PreferredName(aDefinition.Name)
             pAllDefinitions.Add(lKey, aDefinition)
+            AddDefinition = aDefinition
         ElseIf aDefinition.Calculated Then
             pAllDefinitions.ItemByKey(lKey) = aDefinition
+            AddDefinition = aDefinition
+        Else
+            AddDefinition = pAllDefinitions.ItemByKey(lKey)
         End If
-    End Sub
+    End Function
 
     'Retrieve the atcAttributeDefinition for aAttributeName
     Public Shared Function GetDefinition(ByVal aAttributeName As String) As atcAttributeDefinition
@@ -213,14 +217,15 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Dim index As Integer = MyBase.Keys.IndexOf(key)
         If index = -1 Then
             tmpAttrDefVal = New atcDefinedValue
-            tmpAttrDefVal.Definition = aAttrDefinition
             tmpAttrDefVal.Value = aValue
             If aArguments Is Nothing Then
-                AddDefinition(aAttrDefinition) 'Add definition for attributes without arguments
+                tmpAttrDefVal.Definition = AddDefinition(aAttrDefinition) 'Add definition for attributes without arguments
             Else
                 tmpAttrDefVal.Arguments = aArguments
                 If aArguments.GetValue("SeasonDefinition") Is Nothing Then
-                    AddDefinition(aAttrDefinition) 'Add definition for attributes without season
+                    tmpAttrDefVal.Definition = AddDefinition(aAttrDefinition) 'Add definition for attributes without season
+                Else
+                    tmpAttrDefVal.Definition = aAttrDefinition
                 End If
             End If
             index = MyBase.Add(key, tmpAttrDefVal)
