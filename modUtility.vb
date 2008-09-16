@@ -301,4 +301,17 @@ TryExecute:
         Next
     End Sub
 
+    Function SqlAddToUpdate(ByVal aAddSQL As String, ByVal aWhereClause As String) As String
+        Dim lAddSQLSplit() As String = aAddSQL.Split("("c, ")"c)
+        Dim lTableName As String = lAddSQLSplit(0).Substring(12).Trim 'get rid of INSERT INTO
+        Dim lSQL As String = "UPDATE " & lTableName & " SET "
+
+        Dim lFieldNames() As String = lAddSQLSplit(1).Split(",")
+        Dim lFieldValueString As String = lAddSQLSplit(3)
+        For Each lFieldName As String In lFieldNames
+            lSQL &= lFieldName & " = '" & atcUtility.modString.StrSplit(lFieldValueString, ",", "'") & "',"
+        Next
+        lSQL = lSQL.Substring(0, lSQL.Length - 1) & " WHERE " & aWhereClause
+        Return lSQL
+    End Function
 End Module

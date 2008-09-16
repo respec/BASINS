@@ -11,6 +11,8 @@ Partial Class SwatInput
     End Property
 
     Public Class clsSubBsnItem
+        Friend Shared KEYFIELD As String = "OID"
+        Public OID As Integer
         Public SUBBASIN As Double
         Public SUB_KM As Double
         Public SUB_LAT As Double
@@ -46,6 +48,7 @@ Partial Class SwatInput
         End Sub
 
         Public Sub New(ByVal aRow As DataRow)
+            OID = aRow.Item("OID")
             SUBBASIN = aRow.Item("SUBBASIN")
             SUB_KM = aRow.Item("SUB_KM")
             SUB_LAT = aRow.Item("SUB_LAT")
@@ -105,6 +108,10 @@ Partial Class SwatInput
                  & HRUTOT & "' ,'" & IPOT & "' ,'" & FCST_REG & "' ,'" & COMID & "'  )"
             Return lSQL
         End Function
+
+        Public Function UpdateSQL() As String
+            Return SqlAddToUpdate(AddSQL, KEYFIELD & " = " & OID)
+        End Function
     End Class
 
     Public Class clsSubBsn
@@ -153,6 +160,23 @@ Partial Class SwatInput
                                    ADOX.DataTypeEnum.adSingle, _
                                    ADOX.DataTypeEnum.adSingle, _
                                    ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger}
+
+        Public Function Items() As IEnumerable
+            Dim lTable As DataTable = Table()
+            Dim lItems As New Generic.List(Of clsSubBsnItem)
+            For Each lRow As DataRow In lTable.Rows
+                lItems.Add(New clsSubBsnItem(lRow))
+            Next
+            Return lItems
+        End Function
+
+        Public Function Item(ByVal aSubBasinId As Integer) As clsSubBsnItem
+            Return Item(aSubBasinId, Nothing)
+        End Function
+        Public Function Item(ByVal aSubBasinId As Integer, ByVal aTable As DataTable) As clsSubBsnItem
+            If aTable Is Nothing Then aTable = Table()
+            Return New clsSubBsnItem(aTable.Rows(aSubBasinId))
+        End Function
 
         Friend Sub New(ByVal aSwatInput As SwatInput)
             pSwatInput = aSwatInput
@@ -267,6 +291,9 @@ Partial Class SwatInput
             ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
         End Sub
 
+        Public Sub Update(ByVal aItem As clsSubBsnItem)
+            ExecuteNonQuery(aItem.UpdateSQL, pSwatInput.CnSwatInput)
+        End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)
             If aTable Is Nothing Then aTable = Table()
