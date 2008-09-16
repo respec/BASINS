@@ -182,14 +182,25 @@ Public Class atcDataSourceWDM
                     With lTimserConst
                         .Attributes.ChangeTo(lTimser.Attributes)
                         .Dates = New atcTimeseries(Me)
-                        .Dates.Values(0) = CInt(lTimser.Dates.Values(1)) - 1 'whole day portion
-                        Dim lNumValues As Integer = (lTimser.Dates.Value(lTimser.numValues) - .Dates.Values(0)) / lJulianInterval
+                        Dim lNumValues As Integer
+                        If lJulianInterval > 0 Then
+                            .Dates.Value(0) = CInt(lTimser.Dates.Value(1)) - 1 'whole day portion
+                            lNumValues = (lTimser.Dates.Value(lTimser.numValues) - .Dates.Value(0)) / lJulianInterval
+                        Else
+                            .Dates.Value(0) = TimAddJ(lTimser.Dates.Value(1), lTu, lTs, -1) 'for monthly data
+                            lNumValues = lTimser.numValues
+                        End If
                         .numValues = lNumValues
                         .Attributes.SetValue("ts", lTs)
                         .Attributes.SetValue("tu", lTu)
                         Dim lIndex As Integer = 1
                         For lIndexConst As Integer = 1 To lNumValues
-                            Dim lDate As Double = .Dates.Values(0) + (lJulianInterval * lIndexConst)
+                            Dim lDate As Double
+                            If lJulianInterval > 0 Then
+                                lDate = .Dates.Values(0) + (lJulianInterval * lIndexConst)
+                            Else
+                                lDate = TimAddJ(.Dates.Value(0), lTu, lTs, lIndexConst)
+                            End If
                             Dim lAggregationCount As Integer = .ValueAttributes(lIndexConst).GetValue("AggregationCount", 0)
                             .Dates.Values(lIndexConst) = lDate
                             If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then

@@ -75,13 +75,13 @@ Public Class atcDataSourceTimeseriesDbf
                         Case "TIME"
                             lTimeCol = lColumn
                             Logger.Dbg("TimeColumn:" & lColumn)
-                        Case "ID", "STREAM" 'location
+                        Case "ID", "STREAM", "FAC_NAME" 'location
                             If lLocnCol = -1 Then 'only use first one
                                 'should be sure that field is in use here
                                 lLocnCol = lColumn
                                 Logger.Dbg("IdColumn:" & lColumn)
                             End If
-                        Case "SAMPLE"
+                        Case "SAMPLE", "PARM"
                             'SKIP
                         Case Else
                             lConstituents.Add(lColumn, lStr)
@@ -166,7 +166,10 @@ Public Class atcDataSourceTimeseriesDbf
         Dim lTime As String
 
         lTime = aTime
-        If lTime.Length = 0 Then
+        If lTime.Length >= 8 Then
+            'todo: handle more gracefully something that is not a time
+            lTime = "24:00"
+        ElseIf lTime.Length = 0 Then
             lTime = "0:0"
         ElseIf lTime.IndexOf(":") = -1 Then
             lTime = lTime.PadLeft(4, "0")

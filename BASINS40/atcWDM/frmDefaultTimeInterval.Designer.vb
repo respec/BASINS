@@ -74,7 +74,7 @@ Partial Class frmDefaultTimeInterval
         Me.lstTimeUnits.ColumnWidth = 10
         Me.lstTimeUnits.FormattingEnabled = True
         Me.lstTimeUnits.ItemHeight = 16
-        Me.lstTimeUnits.Items.AddRange(New Object() {"Minutes", "Hours", "Days"})
+        Me.lstTimeUnits.Items.AddRange(New Object() {"Minutes", "Hours", "Days", "Months"})
         Me.lstTimeUnits.Location = New System.Drawing.Point(150, 59)
         Me.lstTimeUnits.Name = "lstTimeUnits"
         Me.lstTimeUnits.Size = New System.Drawing.Size(98, 52)
