@@ -28,7 +28,7 @@ Public Class frmDefaultTimeInterval
     End Function
 
     Private Sub btnAll_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAll.Click
-        pTu = lstTimeUnits.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4
+        pTu = lstTimeUnits.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4, months = 5
         If pTu = 1 Then 'nothing was selected
             pTu = 0
         End If
@@ -39,7 +39,7 @@ Public Class frmDefaultTimeInterval
     End Sub
 
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
-        pTu = lstTimeUnits.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4
+        pTu = lstTimeUnits.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4, months = 5
         If pTu = 1 Then 'nothing was selected
             pTu = 0
         End If
