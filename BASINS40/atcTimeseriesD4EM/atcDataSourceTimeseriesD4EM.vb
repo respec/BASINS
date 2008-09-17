@@ -8,7 +8,7 @@ Public Class atcDataSourceTimeseriesD4EM
 
     Private Shared pFilter As String = "D4EM Text Files (*.txt)|*.txt"
     Private Shared pVersion As String = "#D4EM Met Data"
-    Private Shared pColumns() As String = {"pcp", "tmp", "slr", "wnd", "hmd", "pet", "clo", "dew"}
+    Private Shared pColumns() As String = {"pcp", "tmin", "tmean", "tmax", "slr", "wnd", "hmd", "pet", "clo", "dew"}
 
     Public DataColumnWidth As Integer = 15
     Public DataDecimalWidth As Integer = 6
