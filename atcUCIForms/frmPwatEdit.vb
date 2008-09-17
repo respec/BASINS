@@ -7,14 +7,12 @@ Public Class frmPwatEdit
     Dim lMyTable As HspfTable
     Dim lOptionVals As New ArrayList
     Dim lIdList As New ArrayList
-    Dim initing As Boolean
     Dim lPrevCboLandIndex As Integer
 
     Private Sub ComboBox1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLand.SelectedIndexChanged
         Dim lOper As Integer
 
         StoreChanges(lPrevCboLandIndex)
-        initing = True
         'after user changed combo list, use to refresh values
         If chkAssign.Checked = False Then
             'assign to all is not checked
@@ -115,11 +113,9 @@ Public Class frmPwatEdit
 
         End If
         lPrevCboLandIndex = cboLand.SelectedIndex
-        initing = False
     End Sub
 
     Public Sub Init(ByVal aParent As Object)
-        'Me.Icon = aParent.ParentForm.Icon
         Me.Text = "PWATER Simulation and Input Options"
         Me.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedSingle
         lMyTable = aParent
@@ -133,7 +129,6 @@ Public Class frmPwatEdit
         cboLand.Cursor = Windows.Forms.Cursors.Hand
         cboLand.DropDownStyle = Windows.Forms.ComboBoxStyle.DropDownList
 
-        initing = True
         For Each lVOpn In lMyTable.Opn.Uci.OpnBlks("PERLND").Ids
             lOpn = lVOpn
             cboLand.Items.Add(lOpn.Description & " (" & lOpn.Id & ")")
@@ -146,7 +141,6 @@ Public Class frmPwatEdit
         Next
 
         cboLand.SelectedIndex = 0
-        initing = False
     End Sub
 
     Private Sub SaveChanges(ByVal lSaveIndex As Integer)
@@ -169,8 +163,7 @@ Public Class frmPwatEdit
     Private Sub StoreChanges(ByVal lStoreIndex As Long)
         Dim lOper As Integer
 
-        If Not initing Then
-            lOper = lStoreIndex * lMyTable.Parms.Count
+        lOper = lStoreIndex * lMyTable.Parms.Count
 
             'CSNOFG
             If chkSnow.Checked = True Then
@@ -265,7 +258,6 @@ Public Class frmPwatEdit
                 lOptionVals(lOper + 11) = 3
             End If
 
-        End If
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click

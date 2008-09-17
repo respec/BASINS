@@ -73,8 +73,10 @@ Public Class UCIForms
                         frmPwatEdit.Init(aObject)
                         frmPwatEdit.Show()
                     ElseIf aObject.Name = "IWAT-PARM1" Then
-                        '    frmIwatEdit.init(Me, Me.Opn.Uci.icon)
-                        '    frmIwatEdit.Show(vbModal)
+                        Dim frmIwatEdit As New frmIwatEdit
+                        frmIwatEdit.Icon = aParent.Icon
+                        frmIwatEdit.Init(aObject)
+                        frmIwatEdit.Show()
                     ElseIf aObject.Name = "HYDR-PARM1" Then
                         '    frmHydrEdit.init(Me, Me.Opn.Uci.icon)
                         '    frmHydrEdit.Show(vbModal)
