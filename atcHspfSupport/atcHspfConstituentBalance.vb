@@ -28,7 +28,8 @@ Public Module ConstituentBalance
                            ByVal aScenario As String, _
                            ByVal aScenarioResults As atcDataSource, _
                            ByVal aLocations As atcCollection, _
-                           ByVal aRunMade As String) As Text.StringBuilder
+                           ByVal aRunMade As String, _
+                  Optional ByVal aDateColumns As Boolean = False) As Text.StringBuilder
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
 
         Dim lString As New Text.StringBuilder
@@ -59,102 +60,124 @@ Public Module ConstituentBalance
                     'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                     Dim lNeedHeader As Boolean = True
                     Dim lPendingOutput As String = ""
-                    For Each lConstituentKey As String In lConstituentsToOutput.Keys
-                        If lConstituentKey.StartsWith(lOperationKey) Then
-                            Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
-                            lConstituentKey = lConstituentKey.Remove(0, 2)
-                            lConstituentDataGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
-                            If lConstituentDataGroup.Count > 0 Then
-                                lTempDataSet = lConstituentDataGroup.Item(0)
-                                Dim lSeasons As atcSeasonBase
-                                Dim lAttribute As atcDefinedValue
-                                If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
-                                    lSeasons = New atcSeasonsWaterYear
-                                Else
-                                    lSeasons = New atcSeasonsCalendarYear
-                                End If
-                                Dim lSeasonalAttributes As New atcDataAttributes
-                                Dim lCalculatedAttributes As New atcDataAttributes
-                                lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
-                                lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
 
-                                If lNeedHeader Then
-                                    'get operation description for header
-                                    Dim lDesc As String = ""
-                                    Dim lOperName As String = ""
-                                    If lLocation.Substring(0, 1) = "P" Then
-                                        lOperName = "PERLND"
-                                    ElseIf lLocation.Substring(0, 1) = "I" Then
-                                        lOperName = "IMPLND"
-                                    ElseIf lLocation.Substring(0, 1) = "R" Then
-                                        lOperName = "RCHRES"
+                    Try
+                        Dim lOutputTable As New atcTableDelimited
+                        With lOutputTable
+                            For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                                If lConstituentKey.StartsWith(lOperationKey) Then
+                                    Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+                                    lConstituentKey = lConstituentKey.Remove(0, 2)
+                                    lConstituentDataGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
+                                    If lConstituentDataGroup.Count > 0 Then
+                                        lTempDataSet = lConstituentDataGroup.Item(0)
+                                        Dim lSeasons As atcSeasonBase
+                                        Dim lAttribute As atcDefinedValue
+                                        If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
+                                            lSeasons = New atcSeasonsWaterYear
+                                        Else
+                                            lSeasons = New atcSeasonsCalendarYear
+                                        End If
+                                        Dim lSeasonalAttributes As New atcDataAttributes
+                                        Dim lYearlyAttributes As New atcDataAttributes
+                                        lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
+                                        lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lYearlyAttributes)
+
+                                        If lNeedHeader Then  'get operation description for header
+                                            Dim lDesc As String = ""
+                                            Dim lOperName As String = ""
+                                            If lLocation.Substring(0, 1) = "P" Then
+                                                lOperName = "PERLND"
+                                            ElseIf lLocation.Substring(0, 1) = "I" Then
+                                                lOperName = "IMPLND"
+                                            ElseIf lLocation.Substring(0, 1) = "R" Then
+                                                lOperName = "RCHRES"
+                                            End If
+                                            If lOperName.Length > 0 Then
+                                                lDesc = aUci.OpnBlks(lOperName).OperFromID(lLocation.Substring(2)).Description
+                                            End If
+
+                                            .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ")" & vbCrLf
+                                            .NumHeaderRows = 1
+                                            .Delimiter = vbTab
+
+                                            .NumFields = 2 + lYearlyAttributes.Count
+                                            .FieldLength(1) = 16
+                                            .FieldName(1) = "Date".PadRight(12)
+                                            .FieldLength(2) = 12
+                                            .FieldName(2) = "Mean".PadLeft(10)
+                                            For i As Integer = 3 To .NumFields
+                                                .FieldLength(i) = 12
+                                                .FieldName(i) = lYearlyAttributes.Item(i - 3).Arguments(1).Value.ToString.PadLeft(10)
+                                            Next
+                                            .CurrentRecord = 1
+                                            lNeedHeader = False
+                                        End If
+                                        If lPendingOutput.Length > 0 Then
+                                            Dim lPendingRecords() As String = lPendingOutput.Split(vbCr)
+                                            For Each lPendingRecord As String In lPendingRecords
+                                                .Value(1) = lPendingRecord
+                                                .CurrentRecord += 1
+                                            Next
+                                            lPendingOutput = ""
+                                        End If
+
+                                        lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+
+                                        .Value(1) = lConstituentName.PadRight(12)
+                                        If Not lAttribute Is Nothing Then
+                                            .Value(2) = DecimalAlign(lAttribute.Value, , lDecimalPlaces)
+                                            Dim lFieldIndex As Integer = 3
+                                            For Each lAttribute In lYearlyAttributes
+                                                .Value(lFieldIndex) = DecimalAlign(lAttribute.Value, , lDecimalPlaces)
+                                                lFieldIndex += 1
+                                            Next
+                                        Else
+                                            .Value(2) = "Skip-NoData"
+                                        End If
+                                        .CurrentRecord += 1
+                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso _
+                                           lConstituentKey.Length > 5 AndAlso _
+                                           IsNumeric(lConstituentKey.Substring(5)) Then
+                                        Dim lTotalCount As Integer = lConstituentKey.Substring(5)
+                                        Dim lCurFieldValues(.NumFields) As Double
+                                        Dim lCurrentRecordSave As Integer = .CurrentRecord
+                                        For lCount As Integer = 1 To lTotalCount
+                                            .CurrentRecord -= 1
+                                            For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
+                                                If IsNumeric(.Value(lFieldPos)) Then
+                                                    lCurFieldValues(lFieldPos) += .Value(lFieldPos)
+                                                Else
+                                                    Logger.Dbg("Why")
+                                                End If
+                                            Next
+                                        Next
+                                        .CurrentRecord = lCurrentRecordSave
+                                        .Value(1) = lConstituentName.PadRight(12)
+                                        For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
+                                            .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), , lDecimalPlaces)
+                                        Next
+                                        .CurrentRecord += 1
+                                    Else
+                                        If lPendingOutput.Length > 0 Then
+                                            lPendingOutput &= vbCr
+                                        End If
+                                        If lConstituentKey.StartsWith("Header") Then
+                                            lPendingOutput &= vbCr
+                                        End If
+                                        lPendingOutput &= lConstituentName
                                     End If
-                                    If lOperName.Length > 0 Then
-                                        lDesc = aUci.OpnBlks(lOperName).operfromid(lLocation.Substring(2)).description
-                                    End If
-
-                                    lString.AppendLine(aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ")" & vbCrLf)
-                                    lString.Append("Date    " & vbTab & "      Mean")
-                                    For Each lAttribute In lCalculatedAttributes
-                                        Dim lStr As String = lAttribute.Arguments(1).Value
-                                        lString.Append(vbTab & lStr.PadLeft(10))
-                                    Next
-                                    lString.AppendLine()
-                                    lNeedHeader = False
                                 End If
-                                If lPendingOutput.Length > 0 Then
-                                    lString.AppendLine(lPendingOutput)
-                                    lPendingOutput = ""
-                                End If
-
-                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
-
-                                If Not lAttribute Is Nothing Then
-                                    lString.Append(lConstituentName.PadRight(12) & vbTab & DecimalAlign(lAttribute.Value, , lDecimalPlaces))
-                                    For Each lAttribute In lCalculatedAttributes
-                                        lString.Append(vbTab & DecimalAlign(lAttribute.Value, , lDecimalPlaces))
-                                    Next
-                                    lString.AppendLine()
-                                Else
-                                    lString.AppendLine(lConstituentName & vbTab & "Skip-NoData")
-                                End If
-                            ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                   lConstituentKey.Length > 5 AndAlso _
-                                   IsNumeric(lConstituentKey.Substring(5)) Then
-                                Dim lTotalCount As Integer = lConstituentKey.Substring(5)
-                                Dim lStr As String = lString.ToString
-                                Dim lCurFields() As String
-                                Dim lCurFieldValues(1) As Double
-                                Dim lRecStartPos As Integer
-                                Dim lRecEndPos As Integer = lStr.LastIndexOf(vbCr)
-                                For lCount As Integer = 1 To lTotalCount
-                                    lRecStartPos = lStr.LastIndexOf(vbCr, lRecEndPos - 1)
-                                    lCurFields = lStr.Substring(lRecStartPos, lRecEndPos - lRecStartPos).Split(vbTab)
-                                    If lCount = 1 Then
-                                        ReDim lCurFieldValues(lCurFields.GetUpperBound(0))
-                                        lCurFieldValues.Initialize()
-                                    End If
-                                    For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
-                                        lCurFieldValues(lFieldPos) += lCurFields(lFieldPos)
-                                    Next
-                                    lRecEndPos = lRecStartPos
-                                Next
-                                lString.Append(lConstituentName.PadRight(12))
-                                For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
-                                    lString.Append(vbTab & DecimalAlign(lCurFieldValues(lFieldPos), , lDecimalPlaces))
-                                Next
-                                lString.AppendLine()
+                            Next
+                            If aDateColumns Then
+                                lString.Append(.ToStringPivoted)
                             Else
-                                If lPendingOutput.Length > 0 Then
-                                    lPendingOutput &= vbCrLf
-                                End If
-                                If lConstituentKey.StartsWith("Header") Then
-                                    lPendingOutput &= vbCrLf
-                                End If
-                                lPendingOutput &= lConstituentName
+                                lString.Append(.ToString)
                             End If
-                        End If
-                    Next
+                        End With
+                    Catch lEx As Exception
+                        Logger.Dbg(lEx.Message)
+                    End Try
 
                     If lConstituentsToOutput.Count = 0 Then
                         Logger.Dbg(" BalanceType " & aBalanceType & " at " & lLocation & " has no timeseries to output in script!")

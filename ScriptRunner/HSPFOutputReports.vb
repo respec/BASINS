@@ -231,6 +231,11 @@ Module HSPFOutputReports
             lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime)
         lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalance.txt"
         SaveFileString(lOutFileName, lString.ToString)
+        lString = HspfSupport.ConstituentBalance.Report _
+           (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
+            lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime, True)
+        lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalancePivot.txt"
+        SaveFileString(lOutFileName, lString.ToString)
 
         'watershed constituent balance 
         lString = HspfSupport.WatershedConstituentBalance.Report _

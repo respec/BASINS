@@ -33,10 +33,13 @@ Public Class atcTableDelimited
         End Get
         Set(ByVal newValue As Integer)
             Try
-                If newValue < 1 Or newValue > NumRecords Then
+                If newValue < 1 Then
                     pCurrentRecord = 1
                 Else
                     pCurrentRecord = newValue
+                End If
+                If newValue > NumRecords Then
+                    NumRecords = newValue
                 End If
                 'parse fields values from this record
                 'TODO: test whether prepending pDelimiter slows this down, could change usage of pCurrentRowValues to (index-1) instead
@@ -167,6 +170,14 @@ Public Class atcTableDelimited
             NumRecords = pRecords.Count - 1
         End Get
         Set(ByVal newValue As Integer)
+            If newValue >= pRecords.Count Then
+                Dim lEmptyRecord As String = Space(NumFields - 1).Replace(" ", Delimiter)
+                While newValue >= pRecords.Count
+                    pRecords.Add(lEmptyRecord)
+                End While
+            ElseIf newValue < pRecords.Count Then
+                pRecords.RemoveRange(newValue + 1, pRecords.Count - newValue)
+            End If
         End Set
     End Property
 
@@ -287,11 +298,12 @@ ErrHand:
     Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
 TryAgain:
         Try
-            IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(aFilename))
+            Dim lDirectory As String = System.IO.Path.GetDirectoryName(aFilename)
+            If lDirectory.Length > 0 AndAlso Not IO.Directory.Exists(lDirectory) Then
+                IO.Directory.CreateDirectory(lDirectory)
+            End If
             Dim lOutStream As StreamWriter = File.CreateText(aFilename)
-            lOutStream.Write(Header)
-            lOutStream.Write(String.Join(Delimiter, pFieldNames, 1, NumFields) & vbCrLf)
-            lOutStream.Write(String.Join(vbCrLf, pRecords.ToArray, 1, NumRecords) & vbCrLf)
+            lOutStream.Write(ToString)
             lOutStream.Close()
             FileName = aFilename
             Return True
@@ -302,6 +314,74 @@ TryAgain:
             End If
             Return False
         End Try
+    End Function
+
+    Public Overrides Function ToString() As String
+        Dim lSB As New Text.StringBuilder
+        lSB.Append(Header)
+        lSB.Append(String.Join(Delimiter, pFieldNames, 1, NumFields))
+        For Each lRecord As String In pRecords
+            lSB.AppendLine(lRecord.TrimEnd)
+        Next
+        Return lSB.ToString
+    End Function
+
+    Public Function ToStringPivoted() As String
+        Dim lSB As New Text.StringBuilder
+        lSB.Append(Header)
+
+        lSB.Append(pFieldNames(1).Trim.PadLeft(8))
+        Dim lFirstHeader As Boolean = True
+        For lRow As Integer = 2 To NumRecords
+            CurrentRecord = lRow
+            Dim lConsName As String = Value(1)
+            If lConsName.Trim.Length > 1 Then
+                If lConsName.StartsWith(" ") Then
+                    If lFirstHeader Then
+                        lFirstHeader = False
+                    Else
+                        lSB.Append(Delimiter & Space(12))
+                    End If
+                Else
+                    lSB.Append(Delimiter & lConsName.Trim.PadLeft(12))
+                    lFirstHeader = True
+                End If
+            End If
+        Next
+        lSB.AppendLine()
+
+        lSB.Append(Space(8))
+        For lRow As Integer = 2 To NumRecords
+            CurrentRecord = lRow
+            Dim lConsName As String = Value(1)
+            If lConsName.Trim.Length > 0 AndAlso lConsName.StartsWith(" ") Then
+                lSB.Append(Delimiter & lConsName.Trim.PadLeft(12))
+            End If
+        Next
+        lSB.AppendLine()
+
+        Dim lColumnIndex As Integer = 1
+        For Each lFieldName As String In pFieldNames
+            If Not lFieldName Is Nothing AndAlso lFieldName.Length > 0 Then
+                If lColumnIndex > 1 Then
+                    lSB.Append(lFieldName.Trim.PadLeft(8))
+                    For lRow As Integer = 1 To NumRecords
+                        CurrentRecord = lRow
+                        Dim lConsName As String = Value(1)
+                        If lConsName.Trim.Length > 0 AndAlso lConsName.StartsWith(" ") Then
+                            If Value(lColumnIndex).Length > 0 Then
+                                lSB.Append(Delimiter & Value(lColumnIndex))
+                            Else
+                                lSB.Append(Delimiter & Space(12))
+                            End If
+                        End If
+                    Next
+                    lSB.AppendLine()
+                End If
+                lColumnIndex += 1
+            End If
+        Next
+        Return lSB.ToString
     End Function
 
     Public Overrides Function CreationCode() As String

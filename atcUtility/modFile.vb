@@ -999,13 +999,16 @@ TryAgain:
 
         Private pStreamReader As IO.BinaryReader
         Private pCurrentLine As String
+        Private pCanSeek As Boolean
 
         Public Sub New(ByVal aFileName As String)
             pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read), 16384))
+            pCanSeek = pStreamReader.BaseStream.CanSeek
         End Sub
 
         Public Sub New(ByVal aStreamReader As IO.BinaryReader)
             pStreamReader = aStreamReader
+            pCanSeek = pStreamReader.BaseStream.CanSeek
         End Sub
 
         ReadOnly Property Current() As Object Implements IEnumerator.Current
@@ -1018,23 +1021,31 @@ TryAgain:
             If pStreamReader Is Nothing Then
                 Return False
             Else
-                Dim ch As Char
+                Dim lChar As Char
                 Dim lSb As New StringBuilder
+                Dim lEndOfStream As Boolean = False
                 Try
 ReadCharacter:
-                    ch = pStreamReader.ReadChar
-                    Select Case ch
-                        Case ControlChars.Cr 'Found carriage return, consume linefeed if it is next
-                            If pStreamReader.PeekChar = 10 Then pStreamReader.ReadChar()
-                        Case ControlChars.Lf 'Unix-style line ends without carriage return
-                        Case Else 'Found a character that does not end the line
-                            lSb.Append(ch)
-                            GoTo ReadCharacter
-                    End Select
-                    pCurrentLine = lSb.ToString
-                    Logger.Progress(pStreamReader.BaseStream.Position, pStreamReader.BaseStream.Length)
-                    Return True
-                Catch endEx As IO.EndOfStreamException
+                    If pCanSeek AndAlso pStreamReader.PeekChar = -1 Then
+                        lEndOfStream = True
+                    Else
+                        lChar = pStreamReader.ReadChar
+                        Select Case lChar
+                            Case ControlChars.Cr 'Found carriage return, consume linefeed if it is next
+                                If pStreamReader.PeekChar = 10 Then pStreamReader.ReadChar()
+                            Case ControlChars.Lf 'Unix-style line ends without carriage return
+                            Case Else 'Found a character that does not end the line
+                                lSb.Append(lChar)
+                                GoTo ReadCharacter
+                        End Select
+                        pCurrentLine = lSb.ToString
+                        Logger.Progress(pStreamReader.BaseStream.Position, pStreamReader.BaseStream.Length)
+                        Return True
+                    End If
+                Catch lEndOfStreamException As IO.EndOfStreamException
+                    lEndOfStream = True
+                End Try
+                If lEndOfStream Then
                     Try
                         pStreamReader.Close()
                     Catch
@@ -1042,7 +1053,7 @@ ReadCharacter:
                     pStreamReader = Nothing
                     pCurrentLine = lSb.ToString
                     Return (lSb.Length > 0)
-                End Try
+                End If
             End If
         End Function
 
