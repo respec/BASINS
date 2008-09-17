@@ -94,6 +94,12 @@
     <Compile Include="ctlEditGlobalBlock.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="frmIwatEdit.Designer.vb">
+      <DependentUpon>frmIwatEdit.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmIwatEdit.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmNewFTable.Designer.vb">
       <DependentUpon>frmNewFTable.vb</DependentUpon>
     </Compile>
@@ -180,6 +186,10 @@
     <EmbeddedResource Include="ctlEditGlobalBlock.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditGlobalBlock.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmIwatEdit.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmIwatEdit.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmNewFTable.resx">
       <SubType>Designer</SubType>
