@@ -48,12 +48,11 @@ Public Class atcText
         Me.text1.Name = "text1"
         Me.text1.Size = New System.Drawing.Size(184, 20)
         Me.text1.TabIndex = 0
-        Me.text1.Text = "Text1"
         '
-        'ATCtext
+        'atcText
         '
         Me.Controls.Add(Me.text1)
-        Me.Name = "ATCtext"
+        Me.Name = "atcText"
         Me.Size = New System.Drawing.Size(184, 20)
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -72,18 +71,18 @@ Public Class atcText
 
     Private privDataType As ATCoDataType
 
-    Private DefVal As Object
-    Private privHardMax As Double
-    Private privHardMin As Double
-    Private privSoftMax As Double
-    Private privSoftMin As Double
-    Private privMaxWidth As Integer
-    Private privMaxDecimal As Integer
+    Private DefVal As Object = ""
+    Private privHardMax As Double = ATCoDataType.NONE
+    Private privHardMin As Double = ATCoDataType.NONE
+    Private privSoftMax As Double = ATCoDataType.NONE
+    Private privSoftMin As Double = ATCoDataType.NONE
+    Private privMaxWidth As Integer = ATCoDataType.NONE
+    Private privMaxDecimal As Integer = ATCoDataType.NONE
 
-    Private fgColor As System.Drawing.Color
-    Private OkBg As System.Drawing.Color
-    Private OutsideSoftBg As System.Drawing.Color
-    Private OutsideHardBg As System.Drawing.Color
+    Private fgColor As System.Drawing.Color = Color.Black
+    Private OkBg As System.Drawing.Color = Color.White
+    Private OutsideSoftBg As System.Drawing.Color = Color.Yellow
+    Private OutsideHardBg As System.Drawing.Color = Color.Coral
 
     Private Const slop As Double = 1.0001 'real numbers are screwy, so this is the slop factor
 
@@ -287,9 +286,17 @@ Public Class atcText
             If DataType = ATCoDataType.ATCoTxt Then
                 Value = text1.Text
             ElseIf DataType = ATCoDataType.ATCoInt Then
-                If IsNumeric(text1.Text) Then Value = CLng(text1.Text)
+                If IsNumeric(text1.Text) Then
+                    Value = CInt(text1.Text)
+                Else
+                    Value = 0
+                End If
             ElseIf DataType = ATCoDataType.ATCoSng Then
-                If IsNumeric(text1.Text) Then Value = CSng(text1.Text)
+                If IsNumeric(text1.Text) Then
+                    Value = CSng(text1.Text)
+                Else
+                    Value = 0
+                End If
             ElseIf DataType = ATCoDataType.ATCoClr Then
                 If text1.Text = "" Then
                     Value = text1.BackColor
@@ -649,7 +656,7 @@ LeaveSub:
     End Function
 
     Private Function FormatValue(ByVal Val As Object) As String
-        Dim retval$
+        Dim retval As String
 
         retval = CStr(Val)
         FormatValue = retval
@@ -680,29 +687,32 @@ LeaveSub:
                 'Text1.ForeColor = tmpLng Xor &HFFFFFF
             Case Else 'numeric - ATCoInt or ATCoSng
                 Dim expFormat As String, DecimalPlaces As Integer, LogVal As Double
-                If Val <> 0 And maxWidth > 0 Then
-                    If Len(retval) > maxWidth Then 'First try to trim excess digits after decimal
-                        DecimalPlaces = InStr(retval, ".")
-                        If DecimalPlaces > 0 Then
-                            If DecimalPlaces - 1 <= maxWidth Then 'Can shrink string enough just by truncating
-                                retval = retval.Substring(maxWidth) '(retval, maxWidth)
+                Dim lValDouble As Double
+                If TypeOf (Val) Is String AndAlso Double.TryParse(Val, lValDouble) Then
+                    If maxWidth > 0 Then
+                        If Len(retval) > maxWidth Then 'First try to trim excess digits after decimal
+                            DecimalPlaces = InStr(retval, ".")
+                            If DecimalPlaces > 0 Then
+                                If DecimalPlaces - 1 <= maxWidth Then 'Can shrink string enough just by truncating
+                                    retval = retval.Substring(maxWidth) '(retval, maxWidth)
+                                End If
                             End If
                         End If
-                    End If
-                    If Len(retval) > maxWidth Then
-                        LogVal = Abs(Math.Log(Abs(Val)) / Math.Log(10))
-                        If LogVal >= 100 Then
-                            expFormat = "e-###"
-                        ElseIf LogVal >= 10 Then
-                            expFormat = "e-##"
-                        Else
-                            expFormat = "e-#"
+                        If Len(retval) > maxWidth Then
+                            LogVal = Abs(Math.Log(Abs(Val)) / Math.Log(10))
+                            If LogVal >= 100 Then
+                                expFormat = "e-###"
+                            ElseIf LogVal >= 10 Then
+                                expFormat = "e-##"
+                            Else
+                                expFormat = "e-#"
+                            End If
+                            DecimalPlaces = maxWidth - Len(expFormat) - 2
+                            If DecimalPlaces < 1 Then
+                                DecimalPlaces = 1
+                            End If
+                            retval = Format(Val, "#.") & Format(DecimalPlaces, "#") & expFormat
                         End If
-                        DecimalPlaces = maxWidth - Len(expFormat) - 2
-                        If DecimalPlaces < 1 Then
-                            DecimalPlaces = 1
-                        End If
-                        retval = Format(Val, "#.") & Format(DecimalPlaces, "#") & expFormat
                     End If
                 End If
         End Select
