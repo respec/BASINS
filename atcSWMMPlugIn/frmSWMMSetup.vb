@@ -70,7 +70,6 @@ Public Class frmSWMMSetup
     Friend WithEvents cboOutlets As System.Windows.Forms.ComboBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
-    Friend WithEvents atcGridFields As atcControls.atcGrid
     Friend WithEvents ofdMetWDM As System.Windows.Forms.OpenFileDialog
     Friend WithEvents cboOtherMet As System.Windows.Forms.ComboBox
     Friend WithEvents lblOtherMet As System.Windows.Forms.Label
@@ -78,6 +77,7 @@ Public Class frmSWMMSetup
     Friend WithEvents rbnMultiple As System.Windows.Forms.RadioButton
     Friend WithEvents rbnSingle As System.Windows.Forms.RadioButton
     Friend WithEvents cboPrecipStation As System.Windows.Forms.ComboBox
+    Friend WithEvents AtcConnectFields As atcControls.atcConnectFields
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWMMSetup))
@@ -111,8 +111,12 @@ Public Class frmSWMMSetup
         Me.cboLandUseLayer = New System.Windows.Forms.ComboBox
         Me.lblLandUseLayer = New System.Windows.Forms.Label
         Me.TabPage3 = New System.Windows.Forms.TabPage
-        Me.atcGridFields = New atcControls.atcGrid
+        Me.AtcConnectFields = New atcControls.atcConnectFields
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.rbnMultiple = New System.Windows.Forms.RadioButton
+        Me.rbnSingle = New System.Windows.Forms.RadioButton
+        Me.cboPrecipStation = New System.Windows.Forms.ComboBox
+        Me.lblPrecipStation = New System.Windows.Forms.Label
         Me.cboOtherMet = New System.Windows.Forms.ComboBox
         Me.lblOtherMet = New System.Windows.Forms.Label
         Me.AtcGridPrec = New atcControls.atcGrid
@@ -122,10 +126,6 @@ Public Class frmSWMMSetup
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.lblPrecipStation = New System.Windows.Forms.Label
-        Me.cboPrecipStation = New System.Windows.Forms.ComboBox
-        Me.rbnSingle = New System.Windows.Forms.RadioButton
-        Me.rbnMultiple = New System.Windows.Forms.RadioButton
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
@@ -373,9 +373,9 @@ Public Class frmSWMMSetup
         Me.TabPage2.Controls.Add(Me.lblDescription)
         Me.TabPage2.Controls.Add(Me.cboLandUseLayer)
         Me.TabPage2.Controls.Add(Me.lblLandUseLayer)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(556, 340)
+        Me.TabPage2.Size = New System.Drawing.Size(192, 70)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Land Use"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -393,14 +393,14 @@ Public Class frmSWMMSetup
         Me.AtcGridPervious.LineWidth = 0.0!
         Me.AtcGridPervious.Location = New System.Drawing.Point(14, 148)
         Me.AtcGridPervious.Name = "AtcGridPervious"
-        Me.AtcGridPervious.Size = New System.Drawing.Size(527, 172)
+        Me.AtcGridPervious.Size = New System.Drawing.Size(163, 0)
         Me.AtcGridPervious.Source = Nothing
         Me.AtcGridPervious.TabIndex = 18
         '
         'cmdChange
         '
         Me.cmdChange.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChange.Location = New System.Drawing.Point(469, 117)
+        Me.cmdChange.Location = New System.Drawing.Point(105, 117)
         Me.cmdChange.Name = "cmdChange"
         Me.cmdChange.Size = New System.Drawing.Size(72, 24)
         Me.cmdChange.TabIndex = 17
@@ -412,7 +412,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblClass.Location = New System.Drawing.Point(164, 118)
         Me.lblClass.Name = "lblClass"
-        Me.lblClass.Size = New System.Drawing.Size(297, 20)
+        Me.lblClass.Size = New System.Drawing.Size(0, 20)
         Me.lblClass.TabIndex = 16
         Me.lblClass.Text = "<none>"
         Me.lblClass.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -452,7 +452,7 @@ Public Class frmSWMMSetup
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLandUseLayer.Location = New System.Drawing.Point(168, 40)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(376, 25)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(12, 25)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
@@ -466,7 +466,7 @@ Public Class frmSWMMSetup
         '
         'TabPage3
         '
-        Me.TabPage3.Controls.Add(Me.atcGridFields)
+        Me.TabPage3.Controls.Add(Me.AtcConnectFields)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Size = New System.Drawing.Size(556, 340)
@@ -474,22 +474,15 @@ Public Class frmSWMMSetup
         Me.TabPage3.Text = "Field Mapping"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
-        'atcGridFields
+        'AtcConnectFields
         '
-        Me.atcGridFields.AllowHorizontalScrolling = True
-        Me.atcGridFields.AllowNewValidValues = False
-        Me.atcGridFields.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.AtcConnectFields.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.atcGridFields.BackColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.atcGridFields.CellBackColor = System.Drawing.Color.Empty
-        Me.atcGridFields.LineColor = System.Drawing.Color.Empty
-        Me.atcGridFields.LineWidth = 0.0!
-        Me.atcGridFields.Location = New System.Drawing.Point(15, 17)
-        Me.atcGridFields.Name = "atcGridFields"
-        Me.atcGridFields.Size = New System.Drawing.Size(524, 304)
-        Me.atcGridFields.Source = Nothing
-        Me.atcGridFields.TabIndex = 1
+        Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
+        Me.AtcConnectFields.Name = "AtcConnectFields"
+        Me.AtcConnectFields.Size = New System.Drawing.Size(550, 573)
+        Me.AtcConnectFields.TabIndex = 2
         '
         'TabPage6
         '
@@ -501,12 +494,54 @@ Public Class frmSWMMSetup
         Me.TabPage6.Controls.Add(Me.lblOtherMet)
         Me.TabPage6.Controls.Add(Me.AtcGridPrec)
         Me.TabPage6.Controls.Add(Me.GroupBox2)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 26)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(556, 340)
+        Me.TabPage6.Size = New System.Drawing.Size(192, 70)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Met Stations"
         Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'rbnMultiple
+        '
+        Me.rbnMultiple.AutoSize = True
+        Me.rbnMultiple.Location = New System.Drawing.Point(222, 96)
+        Me.rbnMultiple.Name = "rbnMultiple"
+        Me.rbnMultiple.Size = New System.Drawing.Size(173, 21)
+        Me.rbnMultiple.TabIndex = 25
+        Me.rbnMultiple.Text = "Multiple Precip Stations"
+        Me.rbnMultiple.UseVisualStyleBackColor = True
+        '
+        'rbnSingle
+        '
+        Me.rbnSingle.AutoSize = True
+        Me.rbnSingle.Checked = True
+        Me.rbnSingle.Location = New System.Drawing.Point(27, 96)
+        Me.rbnSingle.Name = "rbnSingle"
+        Me.rbnSingle.Size = New System.Drawing.Size(157, 21)
+        Me.rbnSingle.TabIndex = 24
+        Me.rbnSingle.TabStop = True
+        Me.rbnSingle.Text = "Single Precip Station"
+        Me.rbnSingle.UseVisualStyleBackColor = True
+        '
+        'cboPrecipStation
+        '
+        Me.cboPrecipStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPrecipStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPrecipStation.FormattingEnabled = True
+        Me.cboPrecipStation.Location = New System.Drawing.Point(137, 136)
+        Me.cboPrecipStation.Name = "cboPrecipStation"
+        Me.cboPrecipStation.Size = New System.Drawing.Size(31, 25)
+        Me.cboPrecipStation.TabIndex = 23
+        '
+        'lblPrecipStation
+        '
+        Me.lblPrecipStation.AutoSize = True
+        Me.lblPrecipStation.Location = New System.Drawing.Point(24, 139)
+        Me.lblPrecipStation.Name = "lblPrecipStation"
+        Me.lblPrecipStation.Size = New System.Drawing.Size(100, 17)
+        Me.lblPrecipStation.TabIndex = 22
+        Me.lblPrecipStation.Text = "Precip Station:"
         '
         'cboOtherMet
         '
@@ -514,16 +549,16 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboOtherMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboOtherMet.FormattingEnabled = True
-        Me.cboOtherMet.Location = New System.Drawing.Point(136, 292)
+        Me.cboOtherMet.Location = New System.Drawing.Point(136, 22)
         Me.cboOtherMet.Name = "cboOtherMet"
-        Me.cboOtherMet.Size = New System.Drawing.Size(396, 25)
+        Me.cboOtherMet.Size = New System.Drawing.Size(32, 25)
         Me.cboOtherMet.TabIndex = 21
         '
         'lblOtherMet
         '
         Me.lblOtherMet.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblOtherMet.AutoSize = True
-        Me.lblOtherMet.Location = New System.Drawing.Point(18, 295)
+        Me.lblOtherMet.Location = New System.Drawing.Point(18, 25)
         Me.lblOtherMet.Name = "lblOtherMet"
         Me.lblOtherMet.Size = New System.Drawing.Size(109, 17)
         Me.lblOtherMet.TabIndex = 20
@@ -542,7 +577,7 @@ Public Class frmSWMMSetup
         Me.AtcGridPrec.LineWidth = 0.0!
         Me.AtcGridPrec.Location = New System.Drawing.Point(21, 136)
         Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 142)
+        Me.AtcGridPrec.Size = New System.Drawing.Size(147, 0)
         Me.AtcGridPrec.Source = Nothing
         Me.AtcGridPrec.TabIndex = 19
         '
@@ -554,7 +589,7 @@ Public Class frmSWMMSetup
         Me.GroupBox2.Controls.Add(Me.cmdSelectWDM)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 20)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(512, 59)
+        Me.GroupBox2.Size = New System.Drawing.Size(148, 59)
         Me.GroupBox2.TabIndex = 0
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Met WDM File"
@@ -563,16 +598,16 @@ Public Class frmSWMMSetup
         '
         Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 23)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 24)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
-        Me.txtMetWDMName.Size = New System.Drawing.Size(384, 23)
+        Me.txtMetWDMName.Size = New System.Drawing.Size(20, 23)
         Me.txtMetWDMName.TabIndex = 2
         '
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 21)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(57, 22)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -609,48 +644,6 @@ Public Class frmSWMMSetup
         Me.ofdMetWDM.Filter = "Met WDM files (*.wdm)|*.wdm"
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
-        '
-        'lblPrecipStation
-        '
-        Me.lblPrecipStation.AutoSize = True
-        Me.lblPrecipStation.Location = New System.Drawing.Point(24, 139)
-        Me.lblPrecipStation.Name = "lblPrecipStation"
-        Me.lblPrecipStation.Size = New System.Drawing.Size(100, 17)
-        Me.lblPrecipStation.TabIndex = 22
-        Me.lblPrecipStation.Text = "Precip Station:"
-        '
-        'cboPrecipStation
-        '
-        Me.cboPrecipStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPrecipStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboPrecipStation.FormattingEnabled = True
-        Me.cboPrecipStation.Location = New System.Drawing.Point(137, 136)
-        Me.cboPrecipStation.Name = "cboPrecipStation"
-        Me.cboPrecipStation.Size = New System.Drawing.Size(395, 25)
-        Me.cboPrecipStation.TabIndex = 23
-        '
-        'rbnSingle
-        '
-        Me.rbnSingle.AutoSize = True
-        Me.rbnSingle.Checked = True
-        Me.rbnSingle.Location = New System.Drawing.Point(27, 96)
-        Me.rbnSingle.Name = "rbnSingle"
-        Me.rbnSingle.Size = New System.Drawing.Size(157, 21)
-        Me.rbnSingle.TabIndex = 24
-        Me.rbnSingle.TabStop = True
-        Me.rbnSingle.Text = "Single Precip Station"
-        Me.rbnSingle.UseVisualStyleBackColor = True
-        '
-        'rbnMultiple
-        '
-        Me.rbnMultiple.AutoSize = True
-        Me.rbnMultiple.Location = New System.Drawing.Point(222, 96)
-        Me.rbnMultiple.Name = "rbnMultiple"
-        Me.rbnMultiple.Size = New System.Drawing.Size(173, 21)
-        Me.rbnMultiple.TabIndex = 25
-        Me.rbnMultiple.Text = "Multiple Precip Stations"
-        Me.rbnMultiple.UseVisualStyleBackColor = True
         '
         'frmSWMMSetup
         '
@@ -698,15 +691,15 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSubbasins.SelectedIndexChanged
-        SetFieldMappingGrid()
+        SetFieldMappingControl()
     End Sub
 
     Private Sub cboStreams_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboStreams.SelectedIndexChanged
-        SetFieldMappingGrid()
+        SetFieldMappingControl()
     End Sub
 
     Private Sub cboOutlets_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboOutlets.SelectedIndexChanged
-        SetFieldMappingGrid()
+        SetFieldMappingControl()
     End Sub
 
     Private Sub cboLanduse_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLanduse.SelectedIndexChanged
@@ -999,45 +992,63 @@ Public Class frmSWMMSetup
         AtcGridPervious.Refresh()
     End Sub
 
-    Private Sub SetFieldMappingGrid()
-        If atcGridFields.Source Is Nothing Then Exit Sub
+    Private Sub SetFieldMappingControl()
 
-        atcGridFields.Clear()
+        'add source fields from dbf
+        AtcConnectFields.lstSource.Items.Clear()
+        If cboOutlets.SelectedIndex > 0 Then
+            Dim lNodeLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+            For lFieldIndex As Integer = 0 To GisUtil.NumFields(lNodeLayerIndex) - 1
+                AtcConnectFields.lstSource.Items.Add("Node:" & GisUtil.FieldName(lFieldIndex, lNodeLayerIndex))
+            Next
+        End If
+        If cboStreams.SelectedIndex > -1 Then
+            Dim lConduitLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+            For lFieldIndex As Integer = 0 To GisUtil.NumFields(lConduitLayerIndex) - 1
+                AtcConnectFields.lstSource.Items.Add("Conduit:" & GisUtil.FieldName(lFieldIndex, lConduitLayerIndex))
+            Next
+        End If
+        If cboSubbasins.SelectedIndex > -1 Then
+            Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+            For lFieldIndex As Integer = 0 To GisUtil.NumFields(lCatchmentLayerIndex) - 1
+                AtcConnectFields.lstSource.Items.Add("Catchment:" & GisUtil.FieldName(lFieldIndex, lCatchmentLayerIndex))
+            Next
+        End If
 
-        With atcGridFields.Source
-            .Columns = 3
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellColor(0, 2) = SystemColors.ControlDark
-            .CellValue(0, 0) = "Layer Type"
-            .CellValue(0, 1) = "SWMM Variable"
-            .CellValue(0, 2) = "DBF Field Name"
-            Dim lRow As Integer = 0
-            For lIndex As Integer = 0 To pNodeFieldMap.Count - 1
-                lRow += 1
-                .CellValue(lRow, 0) = "Node"
-                .CellValue(lRow, 1) = pNodeFieldMap(lIndex)
-                .CellValue(lRow, 2) = pNodeFieldMap.Keys(lIndex)
-            Next
-            For lIndex As Integer = 0 To pConduitFieldMap.Count - 1
-                lRow += 1
-                .CellValue(lRow, 0) = "Conduit"
-                .CellValue(lRow, 1) = pConduitFieldMap(lIndex)
-                .CellValue(lRow, 2) = pConduitFieldMap.Keys(lIndex)
-            Next
-            For lIndex As Integer = 0 To pCatchmentFieldMap.Count - 1
-                lRow += 1
-                .CellValue(lRow, 0) = "Catchment"
-                .CellValue(lRow, 1) = pCatchmentFieldMap(lIndex)
-                .CellValue(lRow, 2) = pCatchmentFieldMap.Keys(lIndex)
-            Next
-        End With
-        atcGridFields.SizeAllColumnsToContents()
-        atcGridFields.Visible = True
-        atcGridFields.Refresh()
+        'add target properties from introspection on the swmm classes
+        AtcConnectFields.lstTarget.Items.Clear()
+        Dim lNode As New atcSWMM.Node
+        For Each lField As Reflection.FieldInfo In lNode.GetType.GetFields
+            AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
+        Next
+        Dim lConduit As New atcSWMM.Conduit
+        For Each lField As Reflection.FieldInfo In lConduit.GetType.GetFields
+            AtcConnectFields.lstTarget.Items.Add("Conduit:" & lField.Name)
+        Next
+        Dim lCatchment As New atcSWMM.Catchment
+        For Each lField As Reflection.FieldInfo In lCatchment.GetType.GetFields
+            AtcConnectFields.lstTarget.Items.Add("Catchment:" & lField.Name)
+        Next
+
+        'add existing connections from default field maps
+        AtcConnectFields.lstConnections.Items.Clear()
+        Dim lConn As String
+        Dim lType As String = "Node"
+        For lIndex As Integer = 0 To pNodeFieldMap.Count - 1
+            lConn = lType & ":" & pNodeFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pNodeFieldMap(lIndex)
+            AtcConnectFields.AddConnection(lConn, True)
+        Next
+        lType = "Conduit"
+        For lIndex As Integer = 0 To pConduitFieldMap.Count - 1
+            lConn = lType & ":" & pConduitFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pConduitFieldMap(lIndex)
+            AtcConnectFields.AddConnection(lConn, True)
+        Next
+        lType = "Catchment"
+        For lIndex As Integer = 0 To pCatchmentFieldMap.Count - 1
+            lConn = lType & ":" & pCatchmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pCatchmentFieldMap(lIndex)
+            AtcConnectFields.AddConnection(lConn, True)
+        Next
+
     End Sub
 
     Private Sub FillListUniqueLandUses(ByVal aLayerIndex As Long, ByVal aFieldName As String)
@@ -1235,7 +1246,7 @@ Public Class frmSWMMSetup
                 Dim lLanduseFieldName As String = ""
                 If cboDescription.SelectedIndex > -1 Then
                     lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-                End If                
+                End If
                 CreateLandusesFromShapefile(lLandUseFileName, lLanduseFieldName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
             End If
 
@@ -1382,13 +1393,8 @@ Public Class frmSWMMSetup
             .AllowHorizontalScrolling = False
         End With
 
-        With atcGridFields
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
-        End With
-
         SetLanduseTab(cboLanduse.Items(cboLanduse.SelectedIndex))
-        SetFieldMappingGrid()
+        SetFieldMappingControl()
 
     End Sub
 
