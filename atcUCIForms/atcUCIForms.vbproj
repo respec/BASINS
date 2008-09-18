@@ -57,6 +57,12 @@
     <Compile Include="ctlEditMassLinks.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="frmHydrEdit.Designer.vb">
+      <DependentUpon>frmHydrEdit.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmHydrEdit.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmAgPrac.Designer.vb">
       <DependentUpon>frmAgPrac.vb</DependentUpon>
     </Compile>
@@ -186,6 +192,10 @@
     <EmbeddedResource Include="ctlEditGlobalBlock.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditGlobalBlock.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHydrEdit.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmHydrEdit.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmIwatEdit.resx">
       <SubType>Designer</SubType>

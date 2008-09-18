@@ -10,7 +10,7 @@ Public Class frmIwatEdit
     Dim lPrevCboLandIndex As Integer
 
     Public Sub Init(ByVal aParent As Object)
-        Me.Text = "PWATER Simulation and Input Options"
+        Me.Text = "IWATER Simulation and Input Options"
         Me.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedSingle
         lMyTable = aParent
 
