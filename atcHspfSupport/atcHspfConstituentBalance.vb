@@ -10,12 +10,17 @@ Public Module ConstituentBalance
                               ByVal aScenario As String, _
                               ByVal aScenarioResults As atcDataSource, _
                               ByVal aLocations As atcCollection, _
-                              ByVal aRunMade As String)
+                              ByVal aRunMade As String, _
+                     Optional ByVal aDateColumns As Boolean = False, _
+                     Optional ByVal aDecimalPlaces As Integer = 3, _
+                     Optional ByVal aSignificantDigits As Integer = 5, _
+                     Optional ByVal aFieldWidth As Integer = 12)
 
         For Each lBalanceType As String In aBalanceTypes
             Dim lString As Text.StringBuilder = Report(aUci, lBalanceType, aOperations, _
                                                        aScenario, aScenarioResults, aLocations, _
-                                                       aRunMade)
+                                                       aRunMade, _
+                                                       aDateColumns, aDecimalPlaces, aSignificantDigits, aFieldWidth)
             Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_" & "Balance.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lString.ToString)
@@ -29,7 +34,10 @@ Public Module ConstituentBalance
                            ByVal aScenarioResults As atcDataSource, _
                            ByVal aLocations As atcCollection, _
                            ByVal aRunMade As String, _
-                  Optional ByVal aDateColumns As Boolean = False) As Text.StringBuilder
+                  Optional ByVal aDateColumns As Boolean = False, _
+                  Optional ByVal aDecimalPlaces As Integer = 3, _
+                  Optional ByVal aSignificantDigits As Integer = 5, _
+                  Optional ByVal aFieldWidth As Integer = 12) As Text.StringBuilder
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
 
         Dim lString As New Text.StringBuilder
@@ -37,7 +45,6 @@ Public Module ConstituentBalance
         lString.AppendLine("   Run Made " & aRunMade)
         lString.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lString.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
-        Dim lDecimalPlaces As Integer = 3
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
                 lString.AppendLine("   (Units:Inches)")
@@ -45,7 +52,7 @@ Public Module ConstituentBalance
                 lString.AppendLine("   (Units:mm)")
             End If
         ElseIf aBalanceType = "Sediment" Then
-            lDecimalPlaces = 1
+            aDecimalPlaces = 1 'TODO: adjust in calling routine?
         End If
         lString.AppendLine(vbCrLf)
 
@@ -104,11 +111,11 @@ Public Module ConstituentBalance
                                             .NumFields = 2 + lYearlyAttributes.Count
                                             .FieldLength(1) = 16
                                             .FieldName(1) = "Date".PadRight(12)
-                                            .FieldLength(2) = 12
-                                            .FieldName(2) = "Mean".PadLeft(10)
+                                            .FieldLength(2) = aFieldWidth
+                                            .FieldName(2) = Center("Mean", aFieldWidth)
                                             For i As Integer = 3 To .NumFields
-                                                .FieldLength(i) = 12
-                                                .FieldName(i) = lYearlyAttributes.Item(i - 3).Arguments(1).Value.ToString.PadLeft(10)
+                                                .FieldLength(i) = aFieldWidth
+                                                .FieldName(i) = Center(lYearlyAttributes.Item(i - 3).Arguments(1).Value.ToString, aFieldWidth)
                                             Next
                                             .CurrentRecord = 1
                                             lNeedHeader = False
@@ -124,12 +131,12 @@ Public Module ConstituentBalance
 
                                         lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
 
-                                        .Value(1) = lConstituentName.PadRight(12)
+                                        .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         If Not lAttribute Is Nothing Then
-                                            .Value(2) = DecimalAlign(lAttribute.Value, , lDecimalPlaces)
+                                            .Value(2) = DecimalAlign(lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             Dim lFieldIndex As Integer = 3
                                             For Each lAttribute In lYearlyAttributes
-                                                .Value(lFieldIndex) = DecimalAlign(lAttribute.Value, , lDecimalPlaces)
+                                                .Value(lFieldIndex) = DecimalAlign(lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                                 lFieldIndex += 1
                                             Next
                                         Else
@@ -153,9 +160,9 @@ Public Module ConstituentBalance
                                             Next
                                         Next
                                         .CurrentRecord = lCurrentRecordSave
-                                        .Value(1) = lConstituentName.PadRight(12)
+                                        .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
-                                            .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), , lDecimalPlaces)
+                                            .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                         Next
                                         .CurrentRecord += 1
                                     Else

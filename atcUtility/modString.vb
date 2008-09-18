@@ -1070,6 +1070,17 @@ Public Module modString
         Return retval
     End Function
 
+    Public Function Center(ByVal aStr As String, ByVal aWidth As String) As String
+        Dim lPadLength As Integer = aWidth - aStr.Length
+        If lPadLength <= 0 Then
+            Return aStr
+        Else
+            Dim lPadLeftLength As Integer = aStr.Length + (lPadLength / 2)
+            Dim lStr As String = (aStr.PadLeft(lPadLeftLength)).PadRight(aWidth)
+            Return lStr
+        End If
+    End Function
+
     Public Function StrPad(ByVal S As String, ByVal NewLength As Integer, Optional ByVal PadWith As String = " ", Optional ByVal PadLeft As Boolean = True) As String
         ' ##SUMMARY Pads a string with specific character to achieve a specified length.
         ' ##PARAM S M String to be padded.

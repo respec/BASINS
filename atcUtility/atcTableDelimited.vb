@@ -340,10 +340,10 @@ TryAgain:
                     If lFirstHeader Then
                         lFirstHeader = False
                     Else
-                        lSB.Append(Delimiter & Space(12))
+                        lSB.Append(Delimiter & Space(FieldLength(2)))
                     End If
                 Else
-                    lSB.Append(Delimiter & lConsName.Trim.PadLeft(12))
+                    lSB.Append(Delimiter & lConsName.Trim.PadLeft(FieldLength(2)))
                     lFirstHeader = True
                 End If
             End If
@@ -355,7 +355,11 @@ TryAgain:
             CurrentRecord = lRow
             Dim lConsName As String = Value(1)
             If lConsName.Trim.Length > 0 AndAlso lConsName.StartsWith(" ") Then
-                lSB.Append(Delimiter & lConsName.Trim.PadLeft(12))
+                lConsName = lConsName.Trim
+                If lConsName.Length > FieldLength(2) Then
+                    lConsName = lConsName.Substring(0, FieldLength(2))
+                End If
+                lSB.Append(Delimiter & lConsName.PadLeft(FieldLength(2)))
             End If
         Next
         lSB.AppendLine()
@@ -372,7 +376,7 @@ TryAgain:
                             If Value(lColumnIndex).Length > 0 Then
                                 lSB.Append(Delimiter & Value(lColumnIndex))
                             Else
-                                lSB.Append(Delimiter & Space(12))
+                                lSB.Append(Delimiter & Space(FieldLength(lColumnIndex)))
                             End If
                         End If
                     Next
