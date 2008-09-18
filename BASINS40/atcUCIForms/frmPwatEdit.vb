@@ -160,103 +160,103 @@ Public Class frmPwatEdit
 
     End Sub
 
-    Private Sub StoreChanges(ByVal lStoreIndex As Long)
+    Private Sub StoreChanges(ByVal lStoreIndex As Integer)
         Dim lOper As Integer
 
         lOper = lStoreIndex * lMyTable.Parms.Count
 
-            'CSNOFG
-            If chkSnow.Checked = True Then
-                lOptionVals(lOper) = 1
-            Else
-                lOptionVals(lOper) = 0
-            End If
+        'CSNOFG
+        If chkSnow.Checked = True Then
+            lOptionVals(lOper) = 1
+        Else
+            lOptionVals(lOper) = 0
+        End If
 
 
-            'RTOPFG
-            If radio1n1.Checked = True Then
-                lOptionVals(lOper + 1) = 1
-            ElseIf radio1n2.Checked = True Then
-                lOptionVals(lOper + 1) = 0
-            ElseIf radio1n3.Checked = True Then
-                lOptionVals(lOper + 1) = 2
-            ElseIf radio1n4.Checked = True Then
-                lOptionVals(lOper + 1) = 3
-            End If
+        'RTOPFG
+        If radio1n1.Checked = True Then
+            lOptionVals(lOper + 1) = 1
+        ElseIf radio1n2.Checked = True Then
+            lOptionVals(lOper + 1) = 0
+        ElseIf radio1n3.Checked = True Then
+            lOptionVals(lOper + 1) = 2
+        ElseIf radio1n4.Checked = True Then
+            lOptionVals(lOper + 1) = 3
+        End If
 
-            'UZFG
-            If radio2n1.Checked = True Then
-                lOptionVals(lOper + 2) = 1
-            Else
-                lOptionVals(lOper + 2) = 0
-            End If
+        'UZFG
+        If radio2n1.Checked = True Then
+            lOptionVals(lOper + 2) = 1
+        Else
+            lOptionVals(lOper + 2) = 0
+        End If
 
-            'VCSFG
-            If radio3n1.Checked = True Then
-                lOptionVals(lOper + 3) = 0
-            Else
-                lOptionVals(lOper + 3) = 1
-            End If
+        'VCSFG
+        If radio3n1.Checked = True Then
+            lOptionVals(lOper + 3) = 0
+        Else
+            lOptionVals(lOper + 3) = 1
+        End If
 
-            'VUZFG
-            If radio4n1.Checked = True Then
-                lOptionVals(lOper + 4) = 0
-            Else
-                lOptionVals(lOper + 4) = 1
-            End If
+        'VUZFG
+        If radio4n1.Checked = True Then
+            lOptionVals(lOper + 4) = 0
+        Else
+            lOptionVals(lOper + 4) = 1
+        End If
 
-            'VMNFG
-            If radio5n1.Checked = True Then
-                lOptionVals(lOper + 5) = 0
-            Else
-                lOptionVals(lOper + 5) = 1
-            End If
+        'VMNFG
+        If radio5n1.Checked = True Then
+            lOptionVals(lOper + 5) = 0
+        Else
+            lOptionVals(lOper + 5) = 1
+        End If
 
-            'VIFWFG
-            If radio6n1.Checked = True Then
-                lOptionVals(lOper + 6) = 0
-            Else
-                lOptionVals(lOper + 6) = 1
-            End If
+        'VIFWFG
+        If radio6n1.Checked = True Then
+            lOptionVals(lOper + 6) = 0
+        Else
+            lOptionVals(lOper + 6) = 1
+        End If
 
-            'VIRCFG
-            If radio7n1.Checked = True Then
-                lOptionVals(lOper + 7) = 0
-            Else
-                lOptionVals(lOper + 7) = 1
-            End If
+        'VIRCFG
+        If radio7n1.Checked = True Then
+            lOptionVals(lOper + 7) = 0
+        Else
+            lOptionVals(lOper + 7) = 1
+        End If
 
-            'VLEFG
-            If radio8n1.Checked = True Then
-                lOptionVals(lOper + 8) = 0
-            Else
-                lOptionVals(lOper + 8) = 1
-            End If
+        'VLEFG
+        If radio8n1.Checked = True Then
+            lOptionVals(lOper + 8) = 0
+        Else
+            lOptionVals(lOper + 8) = 1
+        End If
 
-            'IFFCFG
-            If radio9n2.Checked = True Then
-                lOptionVals(lOper + 9) = 0
-            Else
-                lOptionVals(lOper + 9) = 1
-            End If
+        'IFFCFG
+        If radio9n2.Checked = True Then
+            lOptionVals(lOper + 9) = 0
+        Else
+            lOptionVals(lOper + 9) = 1
+        End If
 
-            'HWTFG
-            If chkHigh.Checked = True Then
-                lOptionVals(lOper + 10) = 1
-            Else
-                lOptionVals(lOper + 10) = 0
-            End If
+        'HWTFG
+        If chkHigh.Checked = True Then
+            lOptionVals(lOper + 10) = 1
+        Else
+            lOptionVals(lOper + 10) = 0
+        End If
 
-            'IRRGFG
-            If radio10n1.Checked = True Then
-                lOptionVals(lOper + 11) = 0
-            ElseIf radio10n2.Checked = True Then
-                lOptionVals(lOper + 11) = 1
-            ElseIf radio10n3.Checked = True Then
-                lOptionVals(lOper + 11) = 2
-            ElseIf radio10n4.Checked = True Then
-                lOptionVals(lOper + 11) = 3
-            End If
+        'IRRGFG
+        If radio10n1.Checked = True Then
+            lOptionVals(lOper + 11) = 0
+        ElseIf radio10n2.Checked = True Then
+            lOptionVals(lOper + 11) = 1
+        ElseIf radio10n3.Checked = True Then
+            lOptionVals(lOper + 11) = 2
+        ElseIf radio10n4.Checked = True Then
+            lOptionVals(lOper + 11) = 3
+        End If
 
     End Sub
 
