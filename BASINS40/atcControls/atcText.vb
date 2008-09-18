@@ -74,13 +74,13 @@ Public Class atcText
 
     Private privDataType As ATCoDataType
 
-    Private DefVal As Object = ""
+    Private privDefaultValue As String = ""
     Private privHardMax As Double = ATCoDataType.NONE
     Private privHardMin As Double = ATCoDataType.NONE
     Private privSoftMax As Double = ATCoDataType.NONE
     Private privSoftMin As Double = ATCoDataType.NONE
-    Private privMaxWidth As Integer = ATCoDataType.NONE
-    Private privMaxDecimal As Integer = ATCoDataType.NONE
+    Private privMaxWidth As Integer = 20
+    Private privMaxDecimal As Integer = 5
 
     Private fgColor As System.Drawing.Color = Color.Black
     Private OkBg As System.Drawing.Color = Color.White
@@ -219,16 +219,16 @@ Public Class atcText
         End Set
     End Property
 
-    Public Property DefaultValue() As Object
+    Public Property DefaultValue() As String
         Get
-            DefaultValue = DefVal
+            DefaultValue = privDefaultValue
         End Get
-        Set(ByVal newValue As Object)
+        Set(ByVal newValue As String)
             'Logger.Dbg("DefaultValue:Let:" & newValue)
-            If CStr(DefVal) = txtBox.Text Then
+            If privDefaultValue = txtBox.Text Then
                 txtBox.Text = FormatValue(newValue)
             End If
-            DefVal = newValue
+            privDefaultValue = newValue
         End Set
     End Property
 
@@ -283,51 +283,47 @@ Public Class atcText
         End Set
     End Property
 
-    Public Property Value() As Object
+    Public Property Value() As String
         Get
-            Value = ATCoDataType.NONE
-            If DataType = ATCoDataType.ATCoTxt Then
-                Value = txtBox.Text
-            ElseIf DataType = ATCoDataType.ATCoInt Then
-                If IsNumeric(txtBox.Text) Then
-                    Value = CInt(txtBox.Text)
-                Else
-                    Value = 0
-                End If
-            ElseIf DataType = ATCoDataType.ATCoSng Then
-                If IsNumeric(txtBox.Text) Then
-                    Value = CSng(txtBox.Text)
-                Else
-                    Value = 0
-                End If
-            ElseIf DataType = ATCoDataType.ATCoClr Then
-                If txtBox.Text = "" Then
-                    Value = txtBox.BackColor
-                Else
-                    Value = txtBox.Text
-                End If
-            End If
-            If Value = ATCoDataType.NONE Then
-                Value = DefVal
-            End If
-            'DefVal = Value
-            'txtBox.Text = FormatValue(Value)
+            Dim lValue As String = ATCoDataType.NONE
+            Select Case DataType
+                Case ATCoDataType.ATCoTxt, ATCoDataType.NONE
+                    lValue = txtBox.Text
+                Case ATCoDataType.ATCoInt
+                    If IsNumeric(txtBox.Text) Then
+                        lValue = CInt(txtBox.Text)
+                    Else
+                        lValue = ""
+                    End If
+                Case ATCoDataType.ATCoSng
+                    If IsNumeric(txtBox.Text) Then
+                        lValue = CSng(txtBox.Text)
+                    Else
+                        lValue = ""
+                    End If
+                Case ATCoDataType.ATCoClr
+                    If txtBox.Text = "" Then
+                        lValue = txtBox.BackColor.ToArgb
+                    Else
+                        lValue = txtBox.Text
+                    End If
+            End Select
+            Return lValue
         End Get
-        Set(ByVal newValue As Object)
+        Set(ByVal newValue As String)
             'Logger.Dbg("Value:Let:" & newValue)
-            If (DataType = ATCoDataType.ATCoInt Or _
-                DataType = ATCoDataType.ATCoSng) And _
-                IsNumeric(newValue) Then
-                If newValue = ATCoDataType.NONE Then
-                    txtBox.Text = ""
-                    Exit Property
-                End If
-            End If
+            'If (DataType = ATCoDataType.ATCoInt OrElse _
+            '    DataType = ATCoDataType.ATCoSng) AndAlso _
+            '    IsNumeric(newValue) Then
+            '    If newValue = ATCoDataType.NONE Then
+            '        txtBox.Text = ""
+            '        Exit Property
+            '    End If
+            'End If
 
             newValue = Valid(newValue)
             txtBox.Text = FormatValue(newValue)
-            DefVal = newValue
-            txtBox.SelectionStart = Len(txtBox.Text)
+            txtBox.SelectAll()
         End Set
     End Property
 
@@ -379,7 +375,7 @@ Public Class atcText
 
         cdlg.Color = txtBox.BackColor
         If cdlg.ShowDialog() = DialogResult.OK Then
-            Me.Value = cdlg.Color
+            Me.Value = cdlg.Color.ToArgb
         End If
     End Sub
 
@@ -459,8 +455,8 @@ Public Class atcText
 
     Private Sub txtBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBox.LostFocus
         'Logger.Dbg("txtBox:LostFocus:" & txtBox.Text & " " & DefVal)
-        Dim newValue As Object = Valid(txtBox.Text)
-        DefVal = newValue
+        Dim newValue As String = Valid(txtBox.Text)
+        privDefaultValue = newValue
         txtBox.Text = FormatValue(newValue)
         RaiseEvent CommitChange()
         'Dim i&
@@ -484,7 +480,7 @@ Public Class atcText
         End If
     End Sub
 
-    Private Sub txtBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtBox.TextChanged
+    Private Sub txtBox_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBox.TextChanged
         With txtBox
 
             If DataType = ATCoDataType.ATCoClr Then GoTo LeaveSub
@@ -514,10 +510,13 @@ Public Class atcText
                 End If
             End If
 
-            Dim Val!
-            Val = CSng(.Text)
-            If BelowLimit(Val, SoftMin) Or AboveLimit(Val, SoftMax) Then .BackColor = OutsideSoftBg
-            If BelowLimit(Val, HardMin) Or AboveLimit(Val, HardMax) Then .BackColor = OutsideHardBg
+            Dim Val As Double
+            If Double.TryParse(.Text, Val) Then
+                If BelowLimit(Val, SoftMin) Or AboveLimit(Val, SoftMax) Then .BackColor = OutsideSoftBg
+                If BelowLimit(Val, HardMin) Or AboveLimit(Val, HardMax) Then .BackColor = OutsideHardBg
+            Else
+                .BackColor = OutsideHardBg
+            End If
         End With
 LeaveSub:
         RaiseEvent Change()
@@ -542,7 +541,7 @@ LeaveSub:
         InsideLimitsBackground = System.Drawing.Color.White
         OutsideHardLimitBackground = Color.FromArgb(8421631)
         OutsideSoftLimitBackground = Color.FromArgb(8454143)
-        txtBox.Text = FormatValue(DefVal)
+        txtBox.Text = FormatValue(privDefaultValue)
     End Sub
 
     Private Sub UserControl_Resize()
@@ -587,59 +586,67 @@ LeaveSub:
     '    PropBag.WriteProperty("Enabled", (txtBox.Enabled))
     'End Sub
 
-    Private Function Valid(ByVal aValue As Object) As Object
+    Private Function Valid(ByVal aValue As String) As String
         Dim lMsgText As String = ""
-        Dim lValid As Object = aValue
+        Dim lValid As String = aValue
 
         If DataType = ATCoDataType.ATCoTxt Then
-            If HardMax <> ATCoDataType.NONE And aValue.ToString.Length > HardMax Then
-                lValid = CStr(aValue).Substring(0, HardMax)
-                lMsgText = "The value '" & aValue & "' was too long." & vbCr
-                lMsgText &= "Values can be at most " & HardMax & " characters long."
+            If HardMax > 0 And aValue.Length > HardMax Then
+                lValid = aValue.Substring(0, HardMax)
+                lMsgText = "The value '" & aValue & "' was too long." & vbCr _
+                         & "Values can be at most " & HardMax & " characters long."
             End If
-        ElseIf DataType = ATCoDataType.ATCoInt Or _
+        ElseIf DataType = ATCoDataType.ATCoInt OrElse _
                DataType = ATCoDataType.ATCoSng Then
-            Dim lValue As Double
-            If IsNumeric(aValue) Then
-                lValue = CDbl(aValue)
-                aValue = lValue 'We don't want to compare 0.1 with .1 and think they are different
-            Else
-                lMsgText = "The value '" & aValue & "' is not numeric." & vbCr
-                lValue = ATCoDataType.NONE
-            End If
-            If IsNumeric(DefVal) Then
-                If DefVal <> ATCoDataType.NONE And _
-                  (HardMin = ATCoDataType.NONE Or DefVal >= HardMin) And _
-                  (HardMax = ATCoDataType.NONE Or DefVal <= HardMax) Then
-                    If BelowLimit(lValue, HardMin) Or AboveLimit(lValue, HardMax) Then
-                        lValue = DefVal
+            If aValue.Length > 0 Then
+                Dim lDoubleValue As Double
+                If Double.TryParse(aValue, lDoubleValue) Then
+                    aValue = DoubleToString(lDoubleValue) 'We don't want to compare 0.1 with .1 and think they are different
+                Else
+                    lValid = privDefaultValue
+                    lMsgText = "The value '" & aValue & "' is not numeric."
+                    If Not Double.TryParse(privDefaultValue, lDoubleValue) Then
+                        lValid = ""
+                        GoTo FoundValid
+                    End If
+                End If
+                If IsNumeric(privDefaultValue) Then
+                    If privDefaultValue <> ATCoDataType.NONE AndAlso _
+                      (HardMin = ATCoDataType.NONE OrElse privDefaultValue >= HardMin) And _
+                      (HardMax = ATCoDataType.NONE OrElse privDefaultValue <= HardMax) Then
+                        If lDoubleValue = ATCoDataType.NONE _
+                          OrElse BelowLimit(lDoubleValue, HardMin) _
+                          OrElse AboveLimit(lDoubleValue, HardMax) Then
+                            lValid = privDefaultValue
+                        End If
+                    End If
+                End If
+                If BelowLimit(lDoubleValue, HardMin) Then lDoubleValue = HardMin
+                If AboveLimit(lDoubleValue, HardMax) Then lDoubleValue = HardMax
+                lValid = DoubleToString(lDoubleValue)
+                If lValid <> aValue Then
+                    If lMsgText.Length = 0 Then
+                        lMsgText = "The value '" & aValue & "' is outside the valid range. "
+                    End If
+                    If HardMin = ATCoDataType.NONE Then
+                        lMsgText &= "Values must be less than or equal to " & HardMax
+                    ElseIf HardMax = ATCoDataType.NONE Then
+                        lMsgText &= "Values must be greater than or equal to " & HardMin
+                    Else
+                        lMsgText &= "Values must be between " & HardMin & " and " & HardMax
                     End If
                 End If
             End If
-            If BelowLimit(lValue, HardMin) Then lValue = HardMin
-            If AboveLimit(lValue, HardMax) Then lValue = HardMax
-            If CStr(lValue) <> CStr(aValue) Then
-                If lMsgText.Length = 0 Then
-                    lMsgText = "The value '" & aValue & "' is outside the valid range." & vbCr
-                End If
-                If HardMin = ATCoDataType.NONE Then
-                    lMsgText &= "Values must be less than or equal to " & HardMax & Chr(13)
-                ElseIf HardMax = ATCoDataType.NONE Then
-                    lMsgText &= "Values must be greater than or equal to " & HardMin & Chr(13)
-                Else
-                    lMsgText &= "Values must be between " & HardMin & " and " & HardMax & vbCr
-                End If
-            End If
-            lValid = lValue
         End If
         If lMsgText.Length > 0 Then
-            lMsgText &= "Value has been reset to " & lValid
+            lMsgText &= vbCr & "Value has been reset to " & lValid
             Logger.Msg(lMsgText, vbOKOnly, Name)
         End If
+FoundValid:
         Return lValid
     End Function
 
-    Private Function BelowLimit(ByVal testVal!, ByVal LimitVal!) As Boolean
+    Private Function BelowLimit(ByVal testVal As Double, ByVal LimitVal As Double) As Boolean
         If LimitVal = ATCoDataType.NONE Then
             BelowLimit = False
         ElseIf LimitVal >= 0 Then
@@ -649,7 +656,7 @@ LeaveSub:
         End If
     End Function
 
-    Private Function AboveLimit(ByVal testVal!, ByVal LimitVal!) As Boolean
+    Private Function AboveLimit(ByVal testVal As Double, ByVal LimitVal As Double) As Boolean
         If LimitVal = ATCoDataType.NONE Then
             AboveLimit = False
         ElseIf LimitVal >= 0 Then
@@ -659,28 +666,26 @@ LeaveSub:
         End If
     End Function
 
-    Private Function FormatValue(ByVal Val As Object) As String
-        Dim retval As String
-
-        retval = CStr(Val)
-        FormatValue = retval
+    Private Function FormatValue(ByVal Val As String) As String
+        Dim lFormattedValue As String = Val
         Select Case DataType
-            Case ATCoDataType.ATCoTxt : Exit Function
+            Case ATCoDataType.ATCoTxt, ATCoDataType.NONE
+                'no formatting for these types
             Case ATCoDataType.ATCoClr
                 Dim clrName As String
                 Dim tmpClr As Color = Color.Empty
                 If IsNumeric(Val) Then
-                    clrName = colorName(Val)
-                    tmpClr = Color.FromArgb(Val)
+                    tmpClr = Color.FromArgb(CInt(Val))
+                    clrName = colorName(tmpClr)
                 Else
                     clrName = Val
                 End If
                 'Separate if statements in case colorName(val) comes back still numeric
                 If tmpClr.Equals(Color.Empty) Then tmpClr = TextOrNumericColor(clrName)
                 If IsNumeric(clrName) Then
-                    retval = ""
+                    lFormattedValue = ""
                 Else
-                    retval = clrName
+                    lFormattedValue = clrName
                 End If
                 txtBox.BackColor = tmpClr
                 If tmpClr.GetBrightness > 0.4 Then
@@ -693,17 +698,18 @@ LeaveSub:
                 Dim expFormat As String, DecimalPlaces As Integer, LogVal As Double
                 Dim lValDouble As Double
                 If TypeOf (Val) Is String AndAlso Double.TryParse(Val, lValDouble) Then
+                    lFormattedValue = DoubleToString(lValDouble)
                     If maxWidth > 0 Then
-                        If Len(retval) > maxWidth Then 'First try to trim excess digits after decimal
-                            DecimalPlaces = InStr(retval, ".")
+                        If Len(lFormattedValue) > maxWidth Then 'First try to trim excess digits after decimal
+                            DecimalPlaces = InStr(lFormattedValue, ".")
                             If DecimalPlaces > 0 Then
                                 If DecimalPlaces - 1 <= maxWidth Then 'Can shrink string enough just by truncating
-                                    retval = retval.Substring(maxWidth) '(retval, maxWidth)
+                                    lFormattedValue = lFormattedValue.Substring(maxWidth) '(retval, maxWidth)
                                 End If
                             End If
                         End If
-                        If Len(retval) > maxWidth Then
-                            LogVal = Abs(Math.Log(Abs(Val)) / Math.Log(10))
+                        If Len(lFormattedValue) > maxWidth Then
+                            LogVal = Abs(Math.Log(Abs(lValDouble)) / Math.Log(10))
                             If LogVal > 99 Then
                                 expFormat = "e-###"
                             ElseIf LogVal >= 10 Then
@@ -715,12 +721,12 @@ LeaveSub:
                             If DecimalPlaces < 1 Then
                                 DecimalPlaces = 1
                             End If
-                            retval = Format(Val, "#.") & Format(DecimalPlaces, "#") & expFormat
+                            lFormattedValue = Format(Val, "#.") & Format(DecimalPlaces, "#") & expFormat
                         End If
                     End If
                 End If
         End Select
-        FormatValue = retval
+        Return lFormattedValue
     End Function
 
     Public Function ATCoTypeString(ByVal DataType As ATCoDataType) As String
