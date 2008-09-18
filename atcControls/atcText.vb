@@ -32,26 +32,29 @@ Public Class atcText
 
     'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
+    Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
 
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents text1 As System.Windows.Forms.TextBox
+    Friend WithEvents txtBox As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.text1 = New System.Windows.Forms.TextBox
+        Me.components = New System.ComponentModel.Container
+        Me.txtBox = New System.Windows.Forms.TextBox
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.SuspendLayout()
         '
-        'text1
+        'txtBox
         '
-        Me.text1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.text1.Location = New System.Drawing.Point(0, 0)
-        Me.text1.Name = "text1"
-        Me.text1.Size = New System.Drawing.Size(184, 20)
-        Me.text1.TabIndex = 0
+        Me.txtBox.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtBox.Location = New System.Drawing.Point(0, 0)
+        Me.txtBox.Name = "txtBox"
+        Me.txtBox.Size = New System.Drawing.Size(184, 20)
+        Me.txtBox.TabIndex = 0
         '
         'atcText
         '
-        Me.Controls.Add(Me.text1)
+        Me.Controls.Add(Me.txtBox)
         Me.Name = "atcText"
         Me.Size = New System.Drawing.Size(184, 20)
         Me.ResumeLayout(False)
@@ -94,10 +97,10 @@ Public Class atcText
 
     Public Property Alignment() As System.Windows.Forms.HorizontalAlignment
         Get
-            Alignment = text1.TextAlign
+            Alignment = txtBox.TextAlign
         End Get
         Set(ByVal newValue As HorizontalAlignment)
-            text1.TextAlign = newValue
+            txtBox.TextAlign = newValue
         End Set
     End Property
 
@@ -222,8 +225,8 @@ Public Class atcText
         End Get
         Set(ByVal newValue As Object)
             'Logger.Dbg("DefaultValue:Let:" & newValue)
-            If CStr(DefVal) = text1.Text Then
-                text1.Text = FormatValue(newValue)
+            If CStr(DefVal) = txtBox.Text Then
+                txtBox.Text = FormatValue(newValue)
             End If
             DefVal = newValue
         End Set
@@ -231,51 +234,51 @@ Public Class atcText
 
     Overrides Property ForeColor() As System.Drawing.Color
         Get
-            ForeColor = text1.ForeColor
+            ForeColor = txtBox.ForeColor
         End Get
         Set(ByVal newColor As System.Drawing.Color)
             fgColor = newColor
-            text1.ForeColor = newColor
+            txtBox.ForeColor = newColor
         End Set
     End Property
 
     Shadows Property Enabled() As Boolean
         Get
-            Enabled = text1.Enabled
+            Enabled = txtBox.Enabled
         End Get
         Set(ByVal Enable As Boolean)
             'Logger.Dbg("Enabled:Let:" & Enable)
-            text1.Enabled = Enable
+            txtBox.Enabled = Enable
             If Enable Then
-                text1.BackColor = OkBg
-                text1.ForeColor = fgColor
+                txtBox.BackColor = OkBg
+                txtBox.ForeColor = fgColor
             Else
-                text1.BackColor = System.Drawing.Color.LightGray 'vb3DLight
-                text1.ForeColor = System.Drawing.Color.Gray      'vbGrayText
+                txtBox.BackColor = System.Drawing.Color.LightGray 'vb3DLight
+                txtBox.ForeColor = System.Drawing.Color.Gray      'vbGrayText
             End If
         End Set
     End Property
 
     Public Property SelStart() As Integer
         Get
-            SelStart = text1.SelectionStart
+            SelStart = txtBox.SelectionStart
         End Get
         Set(ByVal newValue As Integer)
             'Logger.Dbg("SelStart:Let:" & newValue)
-            If newValue >= 0 And newValue <= Len(text1.Text) Then
-                text1.SelectionStart = newValue
+            If newValue >= 0 And newValue <= Len(txtBox.Text) Then
+                txtBox.SelectionStart = newValue
             End If
         End Set
     End Property
 
     Public Property SelLength() As Integer
         Get
-            SelLength = text1.SelectionLength
+            SelLength = txtBox.SelectionLength
         End Get
         Set(ByVal newValue As Integer)
             'Logger.Dbg("SelLength:Let:" & newValue)
-            If newValue >= 0 And newValue + text1.SelectionStart <= Len(text1.Text) Then
-                text1.SelectionLength = newValue
+            If newValue >= 0 And newValue + txtBox.SelectionStart <= Len(txtBox.Text) Then
+                txtBox.SelectionLength = newValue
             End If
         End Set
     End Property
@@ -284,31 +287,31 @@ Public Class atcText
         Get
             Value = ATCoDataType.NONE
             If DataType = ATCoDataType.ATCoTxt Then
-                Value = text1.Text
+                Value = txtBox.Text
             ElseIf DataType = ATCoDataType.ATCoInt Then
-                If IsNumeric(text1.Text) Then
-                    Value = CInt(text1.Text)
+                If IsNumeric(txtBox.Text) Then
+                    Value = CInt(txtBox.Text)
                 Else
                     Value = 0
                 End If
             ElseIf DataType = ATCoDataType.ATCoSng Then
-                If IsNumeric(text1.Text) Then
-                    Value = CSng(text1.Text)
+                If IsNumeric(txtBox.Text) Then
+                    Value = CSng(txtBox.Text)
                 Else
                     Value = 0
                 End If
             ElseIf DataType = ATCoDataType.ATCoClr Then
-                If text1.Text = "" Then
-                    Value = text1.BackColor
+                If txtBox.Text = "" Then
+                    Value = txtBox.BackColor
                 Else
-                    Value = text1.Text
+                    Value = txtBox.Text
                 End If
             End If
             If Value = ATCoDataType.NONE Then
                 Value = DefVal
             End If
             'DefVal = Value
-            'Text1.Text = FormatValue(Value)
+            'txtBox.Text = FormatValue(Value)
         End Get
         Set(ByVal newValue As Object)
             'Logger.Dbg("Value:Let:" & newValue)
@@ -316,15 +319,15 @@ Public Class atcText
                 DataType = ATCoDataType.ATCoSng) And _
                 IsNumeric(newValue) Then
                 If newValue = ATCoDataType.NONE Then
-                    text1.Text = ""
+                    txtBox.Text = ""
                     Exit Property
                 End If
             End If
 
             newValue = Valid(newValue)
-            text1.Text = FormatValue(newValue)
+            txtBox.Text = FormatValue(newValue)
             DefVal = newValue
-            text1.SelectionStart = Len(text1.Text)
+            txtBox.SelectionStart = Len(txtBox.Text)
         End Set
     End Property
 
@@ -336,9 +339,9 @@ Public Class atcText
             'mnuX(2).Caption = ""
             'mnuX(1).Visible = True
             'mnuX(2).Visible = True
-            'text1.Enabled = False
-            'text1.Enabled = True
-            'text1.Focus()
+            'txtBox.Enabled = False
+            'txtBox.Enabled = True
+            'txtBox.Focus()
             'If DataType = ATCoDataType.ATCoTxt Then
             '    If HardMax <> ATCoDataType.NONE Then
             '        mnuX(1).Caption = "Max Length: " & HardMax
@@ -374,49 +377,115 @@ Public Class atcText
     Private Sub SetColorFromDialog()
         Dim cdlg As New Windows.Forms.ColorDialog
 
-        cdlg.Color = text1.BackColor
+        cdlg.Color = txtBox.BackColor
         If cdlg.ShowDialog() = DialogResult.OK Then
             Me.Value = cdlg.Color
         End If
     End Sub
 
     Private Sub SetToolTip()
-        'Dim softtext$
-        'text1.ToolTipText = ""
-        'If DataType = ATCoTxt Then
-        '    If HardMax <> ATCoDataType.NONE Then text1.ToolTipText = "Max Length: " & HardMax
-        'ElseIf DataType = ATCoInt Or DataType = ATCoSng Then
-        '    If HardMin = ATCoDataType.NONE And HardMax = ATCoDataType.NONE Then
-        '        text1.ToolTipText = ""
-        '    ElseIf HardMin = ATCoDataType.NONE Then
-        '        text1.ToolTipText = "Max: " & HardMax
-        '    ElseIf HardMax = ATCoDataType.NONE Then
-        '        text1.ToolTipText = "Min: " & HardMin
-        '    Else
-        '        text1.ToolTipText = "Min: " & HardMin & " Max: " & HardMax
-        '    End If
+        Dim lToolText As String = ""
+        Dim lSoftLimits As String
+        If DataType = ATCoDataType.ATCoTxt Then
+            If HardMax <> ATCoDataType.NONE Then lToolText = "Max Length: " & HardMax
+        ElseIf DataType = ATCoDataType.ATCoInt OrElse DataType = ATCoDataType.ATCoSng Then
+            If HardMin = ATCoDataType.NONE And HardMax = ATCoDataType.NONE Then
+                lToolText = ""
+            ElseIf HardMin = ATCoDataType.NONE Then
+                lToolText = "Max: " & HardMax
+            ElseIf HardMax = ATCoDataType.NONE Then
+                lToolText = "Min: " & HardMin
+            Else
+                lToolText = "Min: " & HardMin & " Max: " & HardMax
+            End If
 
-        '    If SoftMin = ATCoDataType.NONE And SoftMax = ATCoDataType.NONE Then
-        '        softtext = ""
-        '    ElseIf SoftMin = ATCoDataType.NONE Then
-        '        softtext = "Soft Max: " & SoftMax
-        '    ElseIf SoftMax = ATCoDataType.NONE Then
-        '        softtext = "Soft Min: " & SoftMin
-        '    Else
-        '        softtext = "Soft Min: " & SoftMin & " Soft Max: " & SoftMax
-        '    End If
-        '    If Len(softtext) > 0 Then
-        '        If Len(text1.ToolTipText) > 0 Then
-        '            text1.ToolTipText = text1.ToolTipText & ", " & softtext
-        '        Else
-        '            text1.ToolTipText = softtext
-        '        End If
-        '    End If
+            If SoftMin = ATCoDataType.NONE And SoftMax = ATCoDataType.NONE Then
+                lSoftLimits = ""
+            ElseIf SoftMin = ATCoDataType.NONE Then
+                lSoftLimits = "Soft Max: " & SoftMax
+            ElseIf SoftMax = ATCoDataType.NONE Then
+                lSoftLimits = "Soft Min: " & SoftMin
+            Else
+                lSoftLimits = "Soft Min: " & SoftMin & " Soft Max: " & SoftMax
+            End If
+            If lSoftLimits.Length > 0 Then
+                If lToolText.Length > 0 Then
+                    lToolText &= ", " & lSoftLimits
+                Else
+                    lToolText = lSoftLimits
+                End If
+            End If
+        End If
+        ToolTip1.SetToolTip(txtBox, lToolText)
+    End Sub
+
+    Private Sub txtBox_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBox.GotFocus
+        'Logger.Dbg("txtBox:GotFocus")
+        Tag = Value
+        txtBox.SelectionStart = 0
+        txtBox.SelectionLength = Len(txtBox.Text)
+        SetToolTip()
+    End Sub
+
+    Private Sub txtBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtBox.KeyDown
+        Dim lKeyCode As Windows.Forms.Keys = e.KeyCode
+        'Logger.Dbg("txtBox:KeyDown: " & KeyCode)
+        'Dim newName As String = ""
+        'Dim newColor As Integer
+        If lKeyCode = Keys.Enter Then
+            RaiseEvent CommitChange()
+            lKeyCode = 0
+        ElseIf lKeyCode = Keys.Escape Then
+            Value = Tag
+            RaiseEvent CommitChange()
+            'ElseIf DataType = ATCoDataType.ATCoClr And KeyCode = Keys.Up Then
+            '  testColor(False, txtBox.Text, newName, Color.FromArgb(newColor))
+            'ElseIf DataType = ATCoDataType.ATCoClr And KeyCode = Keys.Down Then
+            '  testColor(True, txtBox.Text, newName, Color.FromArgb(newColor))
+        Else
+            RaiseEvent KeyDown(lKeyCode, e.Shift)
+        End If
+        'If newName <> "" Then
+        '  txtBox.Text = newName
+        '  txtBox.BackColor = Color.FromArgb(newColor)
+        '  If Color.FromArgb(newColor).GetBrightness > 0.4 Then
+        '    txtBox.ForeColor = System.Drawing.Color.Black
+        '  Else
+        '    txtBox.ForeColor = System.Drawing.Color.White
+        '  End If
+        RaiseEvent CommitChange()
         'End If
     End Sub
 
-    Private Sub Text1_Change()
-        With text1
+    Private Sub txtBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBox.LostFocus
+        'Logger.Dbg("txtBox:LostFocus:" & txtBox.Text & " " & DefVal)
+        Dim newValue As Object = Valid(txtBox.Text)
+        DefVal = newValue
+        txtBox.Text = FormatValue(newValue)
+        RaiseEvent CommitChange()
+        'Dim i&
+        'If txtBox.BackColor = OutsideSoftBg Then
+        '  i = Logger.Msg("Value is out of Normal range", vbOKCancel)
+        'ElseIf txtBox.BackColor = OutsideHardBg Then
+        '  i = Logger.Msg("Value is out of Acceptable range", vbRetryCancel)
+        'Else
+        '  i = vbOK
+        'End If
+        'If i = vbRetry Then
+        '  txtBox.SetFocus
+        'ElseIf i = vbCancel Then
+        '  txtBox.Text = OldValStr
+        'End If
+    End Sub
+
+    Private Sub txtBox_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBox.MouseDown
+        If e.Button = Windows.Forms.MouseButtons.Right Then
+            ShowRange()
+        End If
+    End Sub
+
+    Private Sub txtBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtBox.TextChanged
+        With txtBox
 
             If DataType = ATCoDataType.ATCoClr Then GoTo LeaveSub
 
@@ -454,77 +523,12 @@ LeaveSub:
         RaiseEvent Change()
     End Sub
 
-    Private Sub Text1_GotFocus()
-        'Logger.Dbg("Text1:GotFocus")
-        Tag = Value
-        text1.SelectionStart = 0
-        text1.SelectionLength = Len(text1.Text)
-        SetToolTip()
-    End Sub
-
-    Private Sub Text1_KeyDown(ByVal KeyCode As Integer, ByVal Shift As Integer)
-        'Logger.Dbg("Text1:KeyDown: " & KeyCode)
-        'Dim newName As String = ""
-        'Dim newColor As Integer
-        If KeyCode = Keys.Enter Then
-            RaiseEvent CommitChange()
-            KeyCode = 0
-        ElseIf KeyCode = Keys.Escape Then
-            Value = Tag
-            RaiseEvent CommitChange()
-            'ElseIf DataType = ATCoDataType.ATCoClr And KeyCode = Keys.Up Then
-            '  testColor(False, text1.Text, newName, Color.FromArgb(newColor))
-            'ElseIf DataType = ATCoDataType.ATCoClr And KeyCode = Keys.Down Then
-            '  testColor(True, text1.Text, newName, Color.FromArgb(newColor))
-        Else
-            RaiseEvent KeyDown(KeyCode, Shift)
-        End If
-        'If newName <> "" Then
-        '  text1.Text = newName
-        '  text1.BackColor = Color.FromArgb(newColor)
-        '  If Color.FromArgb(newColor).GetBrightness > 0.4 Then
-        '    text1.ForeColor = System.Drawing.Color.Black
-        '  Else
-        '    text1.ForeColor = System.Drawing.Color.White
-        '  End If
-        RaiseEvent CommitChange()
-        'End If
-    End Sub
-
-    Private Sub Text1_LostFocus()
-        'Logger.Dbg("Text1:LostFocus:" & text1.Text & " " & DefVal)
-
-        Dim newValue As Object = Valid(text1.Text)
-        DefVal = newValue
-        text1.Text = FormatValue(newValue)
-        RaiseEvent CommitChange()
-        'Dim i&
-        'If Text1.BackColor = OutsideSoftBg Then
-        '  i = Logger.Msg("Value is out of Normal range", vbOKCancel)
-        'ElseIf Text1.BackColor = OutsideHardBg Then
-        '  i = Logger.Msg("Value is out of Acceptable range", vbRetryCancel)
-        'Else
-        '  i = vbOK
-        'End If
-        'If i = vbRetry Then
-        '  Text1.SetFocus
-        'ElseIf i = vbCancel Then
-        '  Text1.Text = OldValStr
-        'End If
-    End Sub
-
-    Private Sub Text1_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
-        If Button = Windows.Forms.MouseButtons.Right Then
-            ShowRange()
-        End If
-    End Sub
-
     Private Sub UserControl_EnterFocus()
         'Logger.Dbg("Control:EnterFocus")
     End Sub
 
     Private Sub UserControl_Initialize()
-        'Text1.Text = FormatValue(DefaultValue)
+        'txtBox.Text = FormatValue(DefaultValue)
     End Sub
 
     Private Sub UserControl_InitProperties()
@@ -538,12 +542,12 @@ LeaveSub:
         InsideLimitsBackground = System.Drawing.Color.White
         OutsideHardLimitBackground = Color.FromArgb(8421631)
         OutsideSoftLimitBackground = Color.FromArgb(8454143)
-        text1.Text = FormatValue(DefVal)
+        txtBox.Text = FormatValue(DefVal)
     End Sub
 
     Private Sub UserControl_Resize()
-        text1.Width = Me.Width
-        text1.Height = Me.Height
+        txtBox.Width = Me.Width
+        txtBox.Height = Me.Height
     End Sub
 
     'Private Sub UserControl_ReadProperties(ByVal PropBag As PropertyBag)
@@ -555,15 +559,15 @@ LeaveSub:
     '    SoftMax = PropBag.ReadProperty("SoftMax", ATCoDataType.NONE)
     '    SoftMin = PropBag.ReadProperty("SoftMin", ATCoDataType.NONE)
     '    maxWidth = PropBag.ReadProperty("MaxWidth", ATCoDataType.NONE)
-    '    Alignment = PropBag.ReadProperty("Alignment", text1.TextAlign)
+    '    Alignment = PropBag.ReadProperty("Alignment", txtBox.TextAlign)
     '    DataType = PropBag.ReadProperty("DataType", 0)
     '    DefVal = PropBag.ReadProperty("DefaultValue", 0)
-    '    text1.Text = PropBag.ReadProperty("Value", "")
-    '    text1.Enabled = PropBag.ReadProperty("Enabled", True)
-    '    If text1.Enabled Then
-    '        text1.BackColor = OkBg
+    '    txtBox.Text = PropBag.ReadProperty("Value", "")
+    '    txtBox.Enabled = PropBag.ReadProperty("Enabled", True)
+    '    If txtBox.Enabled Then
+    '        txtBox.BackColor = OkBg
     '    Else
-    '        text1.BackColor = System.Drawing.Color.LightGray
+    '        txtBox.BackColor = System.Drawing.Color.LightGray
     '    End If
     'End Sub
 
@@ -579,8 +583,8 @@ LeaveSub:
     '    PropBag.WriteProperty("Alignment", Alignment)
     '    PropBag.WriteProperty("DataType", DataType)
     '    PropBag.WriteProperty("DefaultValue", DefVal)
-    '    PropBag.WriteProperty("Value", text1.Text)
-    '    PropBag.WriteProperty("Enabled", (text1.Enabled))
+    '    PropBag.WriteProperty("Value", txtBox.Text)
+    '    PropBag.WriteProperty("Enabled", (txtBox.Enabled))
     'End Sub
 
     Private Function Valid(ByVal aValue As Object) As Object
@@ -678,13 +682,13 @@ LeaveSub:
                 Else
                     retval = clrName
                 End If
-                text1.BackColor = tmpClr
+                txtBox.BackColor = tmpClr
                 If tmpClr.GetBrightness > 0.4 Then
-                    text1.ForeColor = System.Drawing.Color.Black
+                    txtBox.ForeColor = System.Drawing.Color.Black
                 Else
-                    text1.ForeColor = System.Drawing.Color.White
+                    txtBox.ForeColor = System.Drawing.Color.White
                 End If
-                'Text1.ForeColor = tmpLng Xor &HFFFFFF
+                'txtBox.ForeColor = tmpLng Xor &HFFFFFF
             Case Else 'numeric - ATCoInt or ATCoSng
                 Dim expFormat As String, DecimalPlaces As Integer, LogVal As Double
                 Dim lValDouble As Double
@@ -700,7 +704,7 @@ LeaveSub:
                         End If
                         If Len(retval) > maxWidth Then
                             LogVal = Abs(Math.Log(Abs(Val)) / Math.Log(10))
-                            If LogVal >= 100 Then
+                            If LogVal > 99 Then
                                 expFormat = "e-###"
                             ElseIf LogVal >= 10 Then
                                 expFormat = "e-##"
@@ -732,6 +736,4 @@ LeaveSub:
             ATCoTypeString = "Undefined"
         End If
     End Function
-
-
 End Class
