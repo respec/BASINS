@@ -255,6 +255,13 @@ Module HSPFOutputReports
             lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True)
         lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalancePivot.txt"
         SaveFileString(lOutFileName, lString.ToString)
+        lString = HspfSupport.WatershedConstituentBalance.Report _
+           (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
+            lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True, 2, 5, 8)
+        lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalancePivotNarrowTab.txt"
+        SaveFileString(lOutFileName, lString.ToString)
+        lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalancePivotNarrowSpace.txt"
+        SaveFileString(lOutFileName, lString.ToString.Replace(vbTab, " "))
 
         If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
             HspfSupport.WatershedConstituentBalance.ReportsToFiles _

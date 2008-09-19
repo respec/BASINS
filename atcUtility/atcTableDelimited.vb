@@ -319,7 +319,7 @@ TryAgain:
     Public Overrides Function ToString() As String
         Dim lSB As New Text.StringBuilder
         lSB.Append(Header)
-        lSB.Append(String.Join(Delimiter, pFieldNames, 1, NumFields))
+        lSB.Append(String.Join(Delimiter, pFieldNames, 1, NumFields) & vbCrLf)
         For Each lRecord As String In pRecords
             lSB.AppendLine(lRecord.TrimEnd)
         Next

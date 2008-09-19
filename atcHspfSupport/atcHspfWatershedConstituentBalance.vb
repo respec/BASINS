@@ -222,8 +222,6 @@ Public Module WatershedConstituentBalance
                                     lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
                                     If lConstituentDataGroup.Count > 0 Then
                                         If lNeedHeader Then
-                                            'lString.AppendLine(vbCrLf)
-                                            'lString.AppendLine(aBalanceType & " Balance Report For " & lLandUse & vbCrLf)
                                             .Delimiter = vbTab
                                             .Header = aBalanceType & " Balance Report For " & lLandUse & vbCrLf & " "
                                             .NumHeaderRows = 2
@@ -233,44 +231,35 @@ Public Module WatershedConstituentBalance
                                                 .NumFields = lLandUseOperations.Count + 1
                                             End If
                                             'get operation description for header
-                                            'lString.Append((lOperationType & ":").PadRight(12))
-                                            .FieldLength(1) = 12
-                                            .FieldName(1) = (lOperationType & ":").PadRight(.FieldLength(1))
                                             lFieldIndex = 1
+                                            .FieldLength(lFieldIndex) = aFieldWidth
+                                            .FieldName(lFieldIndex) = (lOperationType & ":").PadRight(.FieldLength(1))
                                             For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
                                                 Dim lOperationName As String = lLandUseOperations.Keys(lOperationIndex)
-                                                'lString.Append(vbTab & (lOperationName & "  ").PadLeft(12))
                                                 lFieldIndex += 1
-                                                .FieldLength(lFieldIndex) = 12
+                                                .FieldLength(lFieldIndex) = aFieldWidth
                                                 .FieldName(lFieldIndex) = (lOperationName & "  ").PadLeft(.FieldLength(lFieldIndex))
                                             Next
                                             If lOutletReport And lOperationType <> "RCHRES" Then
-                                                'lString.Append(vbTab & "WtdAvg  ".PadLeft(12))
                                                 lFieldIndex += 1
-                                                .FieldLength(lFieldIndex) = 12
+                                                .FieldLength(lFieldIndex) = aFieldWidth
                                                 .FieldName(lFieldIndex) = ("WtdAvg  ").PadLeft(.FieldLength(lFieldIndex))
                                             End If
                                             .CurrentRecord = 1
-                                            'lString.AppendLine()
                                             If lOutletReport And lOperationType <> "RCHRES" Then
-                                                'lString.AppendLine()
-                                                'lString.Append("Area".PadRight(12))
-                                                .Value(1) = "Area".PadRight(12)
+                                                .Value(1) = "Area".PadRight(aFieldWidth)
                                                 lFieldIndex = 1
                                                 For Each lOperationKey As String In lLandUseOperations.Keys
                                                     Dim lOperationArea As Double = lLandUseOperations.ItemByKey(lOperationKey)
-                                                    'lString.Append(vbTab & DecimalAlign(lOperationArea))
                                                     lFieldIndex += 1
-                                                    .Value(lFieldIndex) = DecimalAlign(lOperationArea)
+                                                    .Value(lFieldIndex) = DecimalAlign(lOperationArea, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                                     lOperationAreas.Increment(lOperationKey, lOperationArea)
                                                     lLandUseAreas.Increment(lLandUse, lOperationArea)
                                                 Next
-                                                'lString.Append(vbTab & DecimalAlign(lLandUseAreas.ItemByKey(lLandUse)))
                                                 lFieldIndex += 1
-                                                .Value(lFieldIndex) = DecimalAlign(lLandUseAreas.ItemByKey(lLandUse))
+                                                .Value(lFieldIndex) = DecimalAlign(lLandUseAreas.ItemByKey(lLandUse), aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                                 lOperationTypeAreas.Increment(lOperationType, lLandUseAreas.ItemByKey(lLandUse))
                                                 .CurrentRecord += 1
-                                                'lString.AppendLine(vbTab & "(Sum)")
                                             End If
                                             lNeedHeader = False
                                         End If
@@ -282,7 +271,6 @@ Public Module WatershedConstituentBalance
                                             Next
                                             lPendingOutput = ""
                                         End If
-                                        'lString.Append(lConstituentName.PadRight(12))
                                         .Value(1) = lConstituentName.PadRight(12)
                                         Dim lWeightAccum As Double = 0.0
                                         Dim lValue As Double = 0.0
@@ -303,8 +291,7 @@ Public Module WatershedConstituentBalance
                                                 'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")
                                             End If
                                             lFieldIndex += 1
-                                            .Value(lFieldIndex) = DecimalAlign(lValue)
-                                            'lString.Append(vbTab & DecimalAlign(lValue))
+                                            .Value(lFieldIndex) = DecimalAlign(lValue, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             If lOutletReport Then
                                                 If lOperationType <> "RCHRES" Then
                                                     lWeightAccum += lValue * lOperationAreas.ItemByKey(lLocation)
@@ -319,16 +306,14 @@ Public Module WatershedConstituentBalance
                                             If lOperationType <> "RCHRES" Then
                                                 lLandUseConstituentTotals.Increment(lConstituentTotalKey & "-" & lLandUse, lWeightAccum)
                                                 lConstituentTotals.Increment(lConstituentTotalKey, lWeightAccum)
-                                                'lString.Append(vbTab & DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse)))
                                                 lFieldIndex += 1
-                                                .Value(lFieldIndex) = DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse))
+                                                .Value(lFieldIndex) = DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse), aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             ElseIf Math.Abs(lValueOutlet) > 0.00001 Then
                                                 Dim lConstituentTotalKeyIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentTotalKey)
                                                 lConstituentTotals.Increment(lConstituentTotalKey, lValueOutlet)
                                                 lValueOutlet = 0.0
                                             End If
                                         End If
-                                        'lString.AppendLine()
                                         .CurrentRecord += 1
                                     ElseIf lConstituentKey.StartsWith("Total") AndAlso _
                                            lConstituentKey.Length > 5 AndAlso _
@@ -347,25 +332,24 @@ Public Module WatershedConstituentBalance
                                             Next
                                         Next
                                         .CurrentRecord = lCurrentRecordSave
-                                        .Value(1) = lConstituentName.PadRight(12)
+                                        .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         For lFieldIndex = 2 To lCurFieldValues.GetUpperBound(0)
-                                            .Value(lFieldIndex) = DecimalAlign(lCurFieldValues(lFieldIndex))
+                                            .Value(lFieldIndex) = DecimalAlign(lCurFieldValues(lFieldIndex), aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                         Next
                                         .CurrentRecord += 1
                                     Else
-                                        If lPendingOutput.Length > 0 Then
-                                            lPendingOutput &= vbCrLf
-                                        ElseIf lConstituentKey.StartsWith("Header") Then
-                                            lPendingOutput &= vbCrLf
+                                        If lConstituentKey.StartsWith("Header") Then
+                                            lPendingOutput &= vbCr
                                         End If
                                         lPendingOutput &= lConstituentName
                                         If Not lConstituentKey.StartsWith("Header") Then
                                             For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
-                                                lPendingOutput &= vbTab & DecimalAlign(0.0)
+                                                lPendingOutput &= vbTab & DecimalAlign(0.0, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             Next
                                             If lOutletReport And lOperationType <> "RCHRES" Then
-                                                lPendingOutput &= vbTab & DecimalAlign(0.0)
+                                                lPendingOutput &= vbTab & DecimalAlign(0.0, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             End If
+                                            lPendingOutput &= vbCr
                                         End If
                                     End If
                                 End If
@@ -394,15 +378,15 @@ Public Module WatershedConstituentBalance
                         If Not lOperationType.StartsWith("R") Then
                             lDetailsSB.AppendLine(lOperationType)
                             lDetailsSB.AppendLine()
-                            lDetailsSB.Append("LandUse".PadRight(12))
+                            lDetailsSB.Append("LandUse".PadRight(aFieldWidth))
                             For Each lLandUse As String In lLandUses.Keys
                                 If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
                                     lDetailsSB.Append(lLandUse.Substring(2))
                                 End If
                             Next
-                            lDetailsSB.AppendLine(vbTab & "WtdAvg".PadLeft(12))
+                            lDetailsSB.AppendLine(vbTab & "WtdAvg".PadLeft(aFieldWidth))
                             lDetailsSB.AppendLine()
-                            lDetailsSB.Append("Area".PadRight(12))
+                            lDetailsSB.Append("Area".PadRight(aFieldWidth))
                             Dim lAreaTotal As Double = 0.0
                             For Each lLandUse As String In lLandUses.Keys
                                 If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
