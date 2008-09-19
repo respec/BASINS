@@ -55,8 +55,7 @@ Partial Class frmDefaultTimeInterval
         Me.atcTextTimeStep.HardMin = 1
         Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atcTextTimeStep.Location = New System.Drawing.Point(150, 33)
-        Me.atcTextTimeStep.MaxDecimal = 0
-        Me.atcTextTimeStep.maxWidth = 0
+        Me.atcTextTimeStep.MaxWidth = 0
         Me.atcTextTimeStep.Name = "atcTextTimeStep"
         Me.atcTextTimeStep.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atcTextTimeStep.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -67,7 +66,7 @@ Partial Class frmDefaultTimeInterval
         Me.atcTextTimeStep.SoftMin = 0
         Me.atcTextTimeStep.TabIndex = 10
         Me.atcTextTimeStep.TabStop = False
-        Me.atcTextTimeStep.Value = CType(1, Long)
+        Me.atcTextTimeStep.ValueInteger = CType(1, Long)
         '
         'lstTimeUnits
         '

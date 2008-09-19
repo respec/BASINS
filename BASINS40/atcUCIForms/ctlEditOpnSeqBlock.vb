@@ -43,7 +43,7 @@ Public Class ctlEditOpnSeqBlock
         End Get
         Set(ByVal aHspfOpnSeqBlk As Object)
             pHspfOpnSeqBlk = aHspfOpnSeqBlk
-            txtIndelt.Value = pHspfOpnSeqBlk.Delt
+            txtIndelt.ValueInteger = pHspfOpnSeqBlk.Delt
 
             With grdEdit
                 .Source = New atcControls.atcGridSource
@@ -91,7 +91,7 @@ Public Class ctlEditOpnSeqBlock
 
     Public Sub Save() Implements ctlEdit.Save
 
-        pHspfOpnSeqBlk.Delt = txtIndelt.Value
+        pHspfOpnSeqBlk.Delt = txtIndelt.ValueInteger
         'TODO: Open the Add Dialog
         'With grdEdit.Source
         '    Logger.Dbg("EditOpnSeqBlocK:Save:RowCount:" & .Rows)

@@ -5,7 +5,7 @@ Public Class frmDefaultTimeInterval
     Private pResult As Boolean
 
     Public Function AskUser(ByVal aDsn As Integer, ByRef aTu As Integer, ByRef aTs As Integer, ByRef aAggr As Integer) As Boolean
-        If aTs > 0 Then atcTextTimeStep.Value = aTs
+        If aTs > 0 Then atcTextTimeStep.ValueInteger = aTs
         If aTu > 0 Then
             lstTimeUnits.SelectedIndex = aTu - 2
         Else
@@ -32,7 +32,7 @@ Public Class frmDefaultTimeInterval
         If pTu = 1 Then 'nothing was selected
             pTu = 0
         End If
-        pTs = atcTextTimeStep.Value
+        pTs = atcTextTimeStep.ValueInteger
         pAggr = lstAggregation.SelectedIndex
         pResult = False  'dont ask
         Me.Close()
@@ -43,7 +43,7 @@ Public Class frmDefaultTimeInterval
         If pTu = 1 Then 'nothing was selected
             pTu = 0
         End If
-        pTs = atcTextTimeStep.Value
+        pTs = atcTextTimeStep.ValueInteger
         pAggr = lstAggregation.SelectedIndex
         pResult = True 'ask next time
         Me.Close()

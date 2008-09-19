@@ -191,8 +191,8 @@ Public Class frmAgPrac
                 'extract info as needed
                 If lOperType = 3 Then 'hUserDefineName
                     'assume that the uvname will have surface/upper distrib
-                    atxSurface.Value = Mid(lBufferString, 37, 5)
-                    atxUpper.Value = Mid(lBufferString, 67, 5)
+                    atxSurface.ValueDouble = Mid(lBufferString, 37, 5)
+                    atxUpper.ValueDouble = Mid(lBufferString, 67, 5)
                 ElseIf lOperType = 1 Then
                     lActionCount = lActionCount + 1
                     'check if repeating
@@ -240,11 +240,11 @@ Public Class frmAgPrac
                         SDate(4) = pUci.GlobalBlock.SDate(4)
                         If Mid(lBufferString, 72, 2) = "DY" Then
                             'set date to start of run
-                            atxYear.Value = SDate(0)
-                            atxMo.Value = SDate(1)
-                            atxDay.Value = SDate(2)
-                            atxHr.Value = SDate(3)
-                            atxMin.Value = SDate(4)
+                            atxYear.ValueInteger = SDate(0)
+                            atxMo.ValueInteger = SDate(1)
+                            atxDay.ValueInteger = SDate(2)
+                            atxHr.ValueInteger = SDate(3)
+                            atxMin.ValueInteger = SDate(4)
                         Else
                             'yearly repeating or other
                             RDate(0) = SDate(0)
@@ -252,11 +252,11 @@ Public Class frmAgPrac
                             '    'change to following year
                             '    rDate(0) = rDate(0) + 1
                             'End If
-                            atxYear.Value = RDate(0)
-                            atxMo.Value = RDate(1)
-                            atxDay.Value = RDate(2)
-                            atxHr.Value = RDate(3)
-                            atxMin.Value = RDate(4)
+                            atxYear.ValueInteger = RDate(0)
+                            atxMo.ValueInteger = RDate(1)
+                            atxDay.ValueInteger = RDate(2)
+                            atxHr.ValueInteger = RDate(3)
+                            atxMin.ValueInteger = RDate(4)
                         End If
                     End If
                     'fill names and values
@@ -367,22 +367,22 @@ Public Class frmAgPrac
                     ElseIf lType = 3 Then
                         'create var name from upper/surface split
                         lLayerFlag = True
-                        strid = CStr(atxSurface.Value)
+                        strid = CStr(atxSurface.ValueDouble)
                         lLoopVar2 = InStr(1, strid, ".")
                         lSub1 = " "
                         If lLoopVar2 > 0 And Len(strid) >= lLoopVar2 + 1 Then
                             lSub1 = Mid(strid, lLoopVar2 + 1, 1)
                         End If
-                        strid = CStr(atxUpper.Value)
+                        strid = CStr(atxUpper.ValueDouble)
                         lLoopVar2 = InStr(1, strid, ".")
                         lSub2 = " "
                         If lLoopVar2 > 0 And Len(strid) >= lLoopVar2 + 1 Then
                             lSub2 = Mid(strid, lLoopVar2 + 1, 1)
                         End If
                         lBufferString = Mid(lBufferString, 1, 13) & lSub1 & lSub2 & Mid(lBufferString, 16)
-                        strid = RSet(CStr(atxSurface.Value), 5)
+                        strid = RSet(CStr(atxSurface.ValueDouble), 5)
                         lBufferString = Mid(lBufferString, 1, 36) & strid & Mid(lBufferString, 42)
-                        strid = RSet(CStr(atxUpper.Value), 5)
+                        strid = RSet(CStr(atxUpper.ValueDouble), 5)
                         lBufferString = Mid(lBufferString, 1, 66) & strid & Mid(lBufferString, 72)
                     ElseIf lType = 2 Then
                         'change distrib id
@@ -407,32 +407,32 @@ Public Class frmAgPrac
                             lBufferString = Mid(lBufferString, 1, 15) & "     " & Mid(lBufferString, 21)
                         End If
                         'start year
-                        RSet(CStr(atxYear.Value), 4)
+                        RSet(CStr(atxYear.ValueInteger), 4)
                         lBufferString = Mid(lBufferString, 1, 20) & strid & Mid(lBufferString, 25)
                         'start mon
-                        strid = RSet(CStr(atxMo.Value), 3)
-                        If atxMo.Value <> 0 Then
+                        strid = RSet(CStr(atxMo.ValueInteger), 3)
+                        If atxMo.ValueInteger <> 0 Then
                             lBufferString = Mid(lBufferString, 1, 24) & strid & Mid(lBufferString, 28)
                         Else
                             lBufferString = Mid(lBufferString, 1, 24) & "   " & Mid(lBufferString, 28)
                         End If
                         'start day
-                        strid = RSet(CStr(atxDay.Value), 3)
-                        If atxDay.Value <> 0 Then
+                        strid = RSet(CStr(atxDay.ValueInteger), 3)
+                        If atxDay.ValueInteger <> 0 Then
                             lBufferString = Mid(lBufferString, 1, 27) & strid & Mid(lBufferString, 31)
                         Else
                             lBufferString = Mid(lBufferString, 1, 27) & "   " & Mid(lBufferString, 31)
                         End If
                         'start hr
-                        strid = RSet(CStr(atxHr.Value), 3)
-                        If atxMin.Value <> 0 Then
+                        strid = RSet(CStr(atxHr.ValueInteger), 3)
+                        If atxMin.ValueInteger <> 0 Then
                             lBufferString = Mid(lBufferString, 1, 30) & strid & Mid(lBufferString, 34)
                         Else
                             lBufferString = Mid(lBufferString, 1, 30) & "   " & Mid(lBufferString, 34)
                         End If
                         'start min
-                        strid = RSet(CStr(atxMin.Value), 3)
-                        If atxMin.Value <> 0 Then
+                        strid = RSet(CStr(atxMin.ValueInteger), 3)
+                        If atxMin.ValueInteger <> 0 Then
                             lBufferString = Mid(lBufferString, 1, 33) & strid & Mid(lBufferString, 37)
                         Else
                             lBufferString = Mid(lBufferString, 1, 33) & "   " & Mid(lBufferString, 37)
@@ -468,11 +468,11 @@ Public Class frmAgPrac
                             EDate(2) = pUci.GlobalBlock.EDate(2)
                             EDate(3) = pUci.GlobalBlock.EDate(3)
                             EDate(4) = pUci.GlobalBlock.EDate(4)
-                            SDate(0) = atxYear.Value
-                            SDate(1) = atxMo.Value
-                            SDate(2) = atxDay.Value
-                            SDate(3) = atxHr.Value
-                            SDate(4) = atxMin.Value
+                            SDate(0) = atxYear.ValueInteger
+                            SDate(1) = atxMo.ValueInteger
+                            SDate(2) = atxDay.ValueInteger
+                            SDate(3) = atxHr.ValueInteger
+                            SDate(4) = atxMin.ValueInteger
                             lnrepeat = Int((Date2J(EDate) - Date2J(SDate)) / 365)
                             strid = RSet(CStr(lnrepeat), 3)
                             lBufferString = Mid(lBufferString, 1, 77) & strid

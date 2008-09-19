@@ -274,8 +274,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndMin.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndMin.Location = New System.Drawing.Point(367, 108)
         Me.txtEndMin.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtEndMin.MaxDecimal = 0
-        Me.txtEndMin.maxWidth = 0
+        Me.txtEndMin.MaxWidth = 0
         Me.txtEndMin.Name = "txtEndMin"
         Me.txtEndMin.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtEndMin.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -285,7 +284,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndMin.SoftMax = 0
         Me.txtEndMin.SoftMin = 0
         Me.txtEndMin.TabIndex = 11
-        Me.txtEndMin.Value = CType(0, Long)
+        Me.txtEndMin.ValueInteger = CType(0, Long)
         '
         'txtStartMin
         '
@@ -297,8 +296,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartMin.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartMin.Location = New System.Drawing.Point(367, 78)
         Me.txtStartMin.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtStartMin.MaxDecimal = 0
-        Me.txtStartMin.maxWidth = 0
+        Me.txtStartMin.MaxWidth = 0
         Me.txtStartMin.Name = "txtStartMin"
         Me.txtStartMin.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtStartMin.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -308,7 +306,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartMin.SoftMax = 0
         Me.txtStartMin.SoftMin = 0
         Me.txtStartMin.TabIndex = 6
-        Me.txtStartMin.Value = CType(0, Long)
+        Me.txtStartMin.ValueInteger = CType(0, Long)
         '
         'txtEndHr
         '
@@ -320,8 +318,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndHr.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndHr.Location = New System.Drawing.Point(312, 108)
         Me.txtEndHr.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtEndHr.MaxDecimal = 0
-        Me.txtEndHr.maxWidth = 0
+        Me.txtEndHr.MaxWidth = 0
         Me.txtEndHr.Name = "txtEndHr"
         Me.txtEndHr.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtEndHr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -331,7 +328,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndHr.SoftMax = 0
         Me.txtEndHr.SoftMin = 0
         Me.txtEndHr.TabIndex = 10
-        Me.txtEndHr.Value = CType(0, Long)
+        Me.txtEndHr.ValueInteger = CType(0, Long)
         '
         'txtStartHr
         '
@@ -343,8 +340,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartHr.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartHr.Location = New System.Drawing.Point(312, 78)
         Me.txtStartHr.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtStartHr.MaxDecimal = 0
-        Me.txtStartHr.maxWidth = 0
+        Me.txtStartHr.MaxWidth = 0
         Me.txtStartHr.Name = "txtStartHr"
         Me.txtStartHr.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtStartHr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -354,7 +350,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartHr.SoftMax = 0
         Me.txtStartHr.SoftMin = 0
         Me.txtStartHr.TabIndex = 5
-        Me.txtStartHr.Value = CType(0, Long)
+        Me.txtStartHr.ValueInteger = CType(0, Long)
         '
         'txtEndDay
         '
@@ -366,8 +362,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndDay.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndDay.Location = New System.Drawing.Point(257, 108)
         Me.txtEndDay.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtEndDay.MaxDecimal = 0
-        Me.txtEndDay.maxWidth = 0
+        Me.txtEndDay.MaxWidth = 0
         Me.txtEndDay.Name = "txtEndDay"
         Me.txtEndDay.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtEndDay.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -377,7 +372,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndDay.SoftMax = 0
         Me.txtEndDay.SoftMin = 0
         Me.txtEndDay.TabIndex = 9
-        Me.txtEndDay.Value = CType(1, Long)
+        Me.txtEndDay.ValueInteger = CType(1, Long)
         '
         'txtStartDay
         '
@@ -389,8 +384,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartDay.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartDay.Location = New System.Drawing.Point(257, 78)
         Me.txtStartDay.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtStartDay.MaxDecimal = 0
-        Me.txtStartDay.maxWidth = 0
+        Me.txtStartDay.MaxWidth = 0
         Me.txtStartDay.Name = "txtStartDay"
         Me.txtStartDay.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtStartDay.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -400,7 +394,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartDay.SoftMax = 0
         Me.txtStartDay.SoftMin = 0
         Me.txtStartDay.TabIndex = 4
-        Me.txtStartDay.Value = CType(1, Long)
+        Me.txtStartDay.ValueInteger = CType(1, Long)
         '
         'txtEndMo
         '
@@ -412,8 +406,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndMo.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndMo.Location = New System.Drawing.Point(203, 108)
         Me.txtEndMo.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtEndMo.MaxDecimal = 0
-        Me.txtEndMo.maxWidth = 0
+        Me.txtEndMo.MaxWidth = 0
         Me.txtEndMo.Name = "txtEndMo"
         Me.txtEndMo.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtEndMo.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -423,7 +416,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndMo.SoftMax = 0
         Me.txtEndMo.SoftMin = 0
         Me.txtEndMo.TabIndex = 8
-        Me.txtEndMo.Value = CType(1, Long)
+        Me.txtEndMo.ValueInteger = CType(1, Long)
         '
         'txtStartMo
         '
@@ -435,8 +428,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartMo.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartMo.Location = New System.Drawing.Point(203, 78)
         Me.txtStartMo.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtStartMo.MaxDecimal = 0
-        Me.txtStartMo.maxWidth = 0
+        Me.txtStartMo.MaxWidth = 0
         Me.txtStartMo.Name = "txtStartMo"
         Me.txtStartMo.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtStartMo.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -446,7 +438,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartMo.SoftMax = 0
         Me.txtStartMo.SoftMin = 0
         Me.txtStartMo.TabIndex = 3
-        Me.txtStartMo.Value = CType(1, Long)
+        Me.txtStartMo.ValueInteger = CType(1, Long)
         '
         'txtEndYr
         '
@@ -458,8 +450,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndYr.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndYr.Location = New System.Drawing.Point(136, 108)
         Me.txtEndYr.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtEndYr.MaxDecimal = 0
-        Me.txtEndYr.maxWidth = 0
+        Me.txtEndYr.MaxWidth = 0
         Me.txtEndYr.Name = "txtEndYr"
         Me.txtEndYr.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtEndYr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -469,7 +460,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtEndYr.SoftMax = 0
         Me.txtEndYr.SoftMin = 0
         Me.txtEndYr.TabIndex = 7
-        Me.txtEndYr.Value = CType(0, Long)
+        Me.txtEndYr.ValueInteger = CType(0, Long)
         '
         'txtStartYr
         '
@@ -481,8 +472,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartYr.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartYr.Location = New System.Drawing.Point(136, 78)
         Me.txtStartYr.Margin = New System.Windows.Forms.Padding(4)
-        Me.txtStartYr.MaxDecimal = 0
-        Me.txtStartYr.maxWidth = 0
+        Me.txtStartYr.MaxWidth = 0
         Me.txtStartYr.Name = "txtStartYr"
         Me.txtStartYr.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtStartYr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -493,7 +483,7 @@ Partial Class ctlEditGlobalBlock
         Me.txtStartYr.SoftMin = 1
         Me.txtStartYr.TabIndex = 2
         Me.txtStartYr.Tag = "1111"
-        Me.txtStartYr.Value = CType(0, Long)
+        Me.txtStartYr.ValueInteger = CType(0, Long)
         '
         'ctlEditGlobalBlock
         '

@@ -112,8 +112,7 @@ Partial Class ctlEditFTables
         Me.txtNCols.HardMin = 4
         Me.txtNCols.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtNCols.Location = New System.Drawing.Point(419, 75)
-        Me.txtNCols.MaxDecimal = 0
-        Me.txtNCols.maxWidth = 0
+        Me.txtNCols.MaxWidth = 0
         Me.txtNCols.Name = "txtNCols"
         Me.txtNCols.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtNCols.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -123,7 +122,7 @@ Partial Class ctlEditFTables
         Me.txtNCols.SoftMax = -999
         Me.txtNCols.SoftMin = -999
         Me.txtNCols.TabIndex = 6
-        Me.txtNCols.Value = CType(4, Long)
+        Me.txtNCols.ValueInteger = CType(4, Long)
         '
         'txtNRows
         '
@@ -135,8 +134,7 @@ Partial Class ctlEditFTables
         Me.txtNRows.HardMin = 1
         Me.txtNRows.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtNRows.Location = New System.Drawing.Point(419, 46)
-        Me.txtNRows.MaxDecimal = 0
-        Me.txtNRows.maxWidth = 0
+        Me.txtNRows.MaxWidth = 0
         Me.txtNRows.Name = "txtNRows"
         Me.txtNRows.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtNRows.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -146,7 +144,7 @@ Partial Class ctlEditFTables
         Me.txtNRows.SoftMax = -999
         Me.txtNRows.SoftMin = -999
         Me.txtNRows.TabIndex = 5
-        Me.txtNRows.Value = CType(1, Long)
+        Me.txtNRows.ValueInteger = CType(1, Long)
         '
         'grdEdit
         '

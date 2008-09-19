@@ -39,16 +39,16 @@ Public Class ctlEditGlobalBlock
         Set(ByVal aHspfGlobalBlk As Object)
             pHspfGlobalBlk = aHspfGlobalBlk
             txtRunInfo.Text = pHspfGlobalBlk.RunInf.Value
-            txtStartYr.Value = pHspfGlobalBlk.SDate(0)
-            txtStartMo.Value = pHspfGlobalBlk.SDate(1)
-            txtStartDay.Value = pHspfGlobalBlk.SDate(2)
-            txtStartHr.Value = pHspfGlobalBlk.SDate(3)
-            txtStartMin.Value = pHspfGlobalBlk.SDate(4)
-            txtEndYr.Value = pHspfGlobalBlk.EDate(0)
-            txtEndMo.Value = pHspfGlobalBlk.EDate(1)
-            txtEndDay.Value = pHspfGlobalBlk.EDate(2)
-            txtEndHr.Value = pHspfGlobalBlk.EDate(3)
-            txtEndMin.Value = pHspfGlobalBlk.EDate(4)
+            txtStartYr.ValueInteger = pHspfGlobalBlk.SDate(0)
+            txtStartMo.ValueInteger = pHspfGlobalBlk.SDate(1)
+            txtStartDay.ValueInteger = pHspfGlobalBlk.SDate(2)
+            txtStartHr.ValueInteger = pHspfGlobalBlk.SDate(3)
+            txtStartMin.ValueInteger = pHspfGlobalBlk.SDate(4)
+            txtEndYr.ValueInteger = pHspfGlobalBlk.EDate(0)
+            txtEndMo.ValueInteger = pHspfGlobalBlk.EDate(1)
+            txtEndDay.ValueInteger = pHspfGlobalBlk.EDate(2)
+            txtEndHr.ValueInteger = pHspfGlobalBlk.EDate(3)
+            txtEndMin.ValueInteger = pHspfGlobalBlk.EDate(4)
 
             'Populate combo boxes
             Dim lOper As Integer
@@ -84,16 +84,16 @@ Public Class ctlEditGlobalBlock
         With pHspfGlobalBlk
             .RunInf.Value = txtRunInfo.Text
 
-            .SDate(0) = txtStartYr.Value
-            .SDate(1) = txtStartMo.Value
-            .SDate(2) = txtStartDay.Value
-            .SDate(3) = txtStartHr.Value
-            .SDate(4) = txtStartMin.Value
-            .EDate(0) = txtEndYr.Value
-            .EDate(1) = txtEndMo.Value
-            .EDate(2) = txtEndDay.Value
-            .EDate(3) = txtEndHr.Value
-            .EDate(4) = txtEndMin.Value
+            .SDate(0) = txtStartYr.ValueInteger
+            .SDate(1) = txtStartMo.ValueInteger
+            .SDate(2) = txtStartDay.ValueInteger
+            .SDate(3) = txtStartHr.ValueInteger
+            .SDate(4) = txtStartMin.ValueInteger
+            .EDate(0) = txtEndYr.ValueInteger
+            .EDate(1) = txtEndMo.ValueInteger
+            .EDate(2) = txtEndDay.ValueInteger
+            .EDate(3) = txtEndHr.ValueInteger
+            .EDate(4) = txtEndMin.ValueInteger
 
             'Set the initial selection
             .outlev.Value = comboGen.SelectedIndex

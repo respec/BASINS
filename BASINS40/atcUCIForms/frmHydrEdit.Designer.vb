@@ -297,8 +297,7 @@ Partial Class frmHydrEdit
         Me.atxGt.HardMin = -999
         Me.atxGt.InsideLimitsBackground = System.Drawing.Color.White
         Me.atxGt.Location = New System.Drawing.Point(268, 96)
-        Me.atxGt.MaxDecimal = -999
-        Me.atxGt.maxWidth = -999
+        Me.atxGt.MaxWidth = -999
         Me.atxGt.Name = "atxGt"
         Me.atxGt.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.atxGt.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
@@ -318,8 +317,7 @@ Partial Class frmHydrEdit
         Me.atxFvol.HardMin = -999
         Me.atxFvol.InsideLimitsBackground = System.Drawing.Color.White
         Me.atxFvol.Location = New System.Drawing.Point(268, 65)
-        Me.atxFvol.MaxDecimal = -999
-        Me.atxFvol.maxWidth = -999
+        Me.atxFvol.MaxWidth = -999
         Me.atxFvol.Name = "atxFvol"
         Me.atxFvol.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.atxFvol.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
@@ -339,8 +337,7 @@ Partial Class frmHydrEdit
         Me.AtcText2.HardMin = -999
         Me.AtcText2.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcText2.Location = New System.Drawing.Point(268, 96)
-        Me.AtcText2.MaxDecimal = -999
-        Me.AtcText2.maxWidth = -999
+        Me.AtcText2.MaxWidth = -999
         Me.AtcText2.Name = "AtcText2"
         Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
@@ -360,8 +357,7 @@ Partial Class frmHydrEdit
         Me.AtcText1.HardMin = -999
         Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcText1.Location = New System.Drawing.Point(268, 65)
-        Me.AtcText1.MaxDecimal = -999
-        Me.AtcText1.maxWidth = -999
+        Me.AtcText1.MaxWidth = -999
         Me.AtcText1.Name = "AtcText1"
         Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow

@@ -84,22 +84,22 @@ Public Class frmHydrEdit
     End Sub
 
     Private Sub cboExit_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboExit.SelectedIndexChanged
-        'Dim i, nexit, j As Integer
+        Dim i, nexit, j As Integer
 
-        ''after user changed combo list, use to refresh values
-        'j = cboReach.SelectedIndex * parmcount
-        'nexit = cboExit.SelectedIndex + 1
+        'after user changed combo list, use to refresh values
+        j = cboReach.SelectedIndex * parmcount
+        nexit = cboExit.SelectedIndex + 1
 
-        'atxFvol.Value = lOptionVals(j + 4 + nexit)
-        'atxGt.Value = lOptionVals(j + 9 + nexit)
+        atxFvol.ValueDouble = lOptionVals(j + 4 + nexit)
+        atxGt.ValueDouble = lOptionVals(j + 9 + nexit)
 
-        'If lOptionVals(j + 14 + nexit) = 1 Then
-        '    radio2n1.Checked = True
-        'ElseIf lOptionVals(j + 14 + nexit) = 2 Then
-        '    radio2n2.Checked = True
-        'ElseIf lOptionVals(j + 14 + nexit) = 3 Then
-        '    radio2n3.Checked = True
-        'End If
+        If lOptionVals(j + 14 + nexit) = 1 Then
+            radio2n1.Checked = True
+        ElseIf lOptionVals(j + 14 + nexit) = 2 Then
+            radio2n2.Checked = True
+        ElseIf lOptionVals(j + 14 + nexit) = 3 Then
+            radio2n3.Checked = True
+        End If
 
     End Sub
 End Class

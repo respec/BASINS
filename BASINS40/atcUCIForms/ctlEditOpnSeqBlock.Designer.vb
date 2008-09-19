@@ -52,8 +52,7 @@ Partial Class ctlEditOpnSeqBlock
         Me.txtIndelt.HardMin = 0
         Me.txtIndelt.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtIndelt.Location = New System.Drawing.Point(57, 14)
-        Me.txtIndelt.MaxDecimal = 0
-        Me.txtIndelt.maxWidth = 0
+        Me.txtIndelt.MaxWidth = 0
         Me.txtIndelt.Name = "txtIndelt"
         Me.txtIndelt.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtIndelt.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -63,7 +62,7 @@ Partial Class ctlEditOpnSeqBlock
         Me.txtIndelt.SoftMax = 0
         Me.txtIndelt.SoftMin = 0
         Me.txtIndelt.TabIndex = 3
-        Me.txtIndelt.Value = CType(0, Long)
+        Me.txtIndelt.ValueInteger = CType(0, Long)
         '
         'grdEdit
         '
