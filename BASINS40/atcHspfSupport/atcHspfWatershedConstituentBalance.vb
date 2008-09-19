@@ -232,7 +232,7 @@ Public Module WatershedConstituentBalance
                                             End If
                                             'get operation description for header
                                             lFieldIndex = 1
-                                            .FieldLength(lFieldIndex) = aFieldWidth
+                                            .FieldLength(lFieldIndex) = 12
                                             .FieldName(lFieldIndex) = (lOperationType & ":").PadRight(.FieldLength(1))
                                             For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
                                                 Dim lOperationName As String = lLandUseOperations.Keys(lOperationIndex)
@@ -371,57 +371,91 @@ Public Module WatershedConstituentBalance
             If aOutletDetails Then
                 Dim lDetailsSB As New Text.StringBuilder
                 Try
-                    lDetailsSB.AppendLine(aBalanceType & " Balance by Land Use Category")
+                    lDetailsSB.AppendLine(aBalanceType & " Balance by Land Use Category for " & aScenario & " at " & aOutletLocation)
                     lDetailsSB.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
                     lDetailsSB.AppendLine()
                     For Each lOperationType As String In aOperationTypes
-                        If Not lOperationType.StartsWith("R") Then
-                            lDetailsSB.AppendLine(lOperationType)
-                            lDetailsSB.AppendLine()
-                            lDetailsSB.Append("LandUse".PadRight(aFieldWidth))
-                            For Each lLandUse As String In lLandUses.Keys
-                                If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
-                                    lDetailsSB.Append(lLandUse.Substring(2))
-                                End If
-                            Next
-                            lDetailsSB.AppendLine(vbTab & "WtdAvg".PadLeft(aFieldWidth))
-                            lDetailsSB.AppendLine()
-                            lDetailsSB.Append("Area".PadRight(aFieldWidth))
-                            Dim lAreaTotal As Double = 0.0
-                            For Each lLandUse As String In lLandUses.Keys
-                                If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
-                                    Dim lArea As Double = lLandUseAreas.ItemByKey(lLandUse)
-                                    lAreaTotal += lArea
-                                    lDetailsSB.Append(vbTab & DecimalAlign(lArea, , , 8))
-                                End If
-                            Next
-                            lDetailsSB.AppendLine(vbTab & DecimalAlign(lAreaTotal, , , 8) & vbTab & "(Sum)")
-
-                            For Each lConstituentKey As String In lConstituentsToOutput.Keys
-                                Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
-                                If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
-                                    If lConstituentKey.Substring(2).StartsWith("Header") Then
-                                        lDetailsSB.AppendLine()
-                                        lDetailsSB.AppendLine(lConstituentName.PadRight(12))
-                                    Else
-                                        lDetailsSB.Append(lConstituentName.PadRight(12))
-                                        'fill in values for each land use
-                                        Dim lValueTotal As Double = 0.0
-                                        For Each lLandUse As String In lLandUses.Keys
-                                            If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
-                                                Dim lValue As Double = lLandUseConstituentTotals.ItemByKey(lConstituentKey & "-" & lLandUse)
-                                                lValueTotal += lValue
-                                                lDetailsSB.Append(vbTab & DecimalAlign(lValue / lLandUseAreas.ItemByKey(lLandUse)))
-                                            End If
-                                        Next
-                                        lDetailsSB.AppendLine(vbTab & DecimalAlign(lValueTotal / lAreaTotal))
+                        Dim lOutputTable As New atcTableDelimited
+                        With lOutputTable
+                            If Not lOperationType.StartsWith("R") Then
+                                .Delimiter = vbTab
+                                .Header = lOperationType & vbCrLf
+                                .NumHeaderRows = 2
+                                Dim lNumFields As Integer = 0
+                                For Each lLandUse As String In lLandUses.Keys
+                                    If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
+                                        lNumFields += 1
                                     End If
+                                Next
+                                .NumFields = lNumFields + 2
+
+                                lFieldIndex = 1
+                                .FieldLength(lFieldIndex) = 12
+                                .FieldName(lFieldIndex) = "LandUse".PadRight(12)
+                                For Each lLandUse As String In lLandUses.Keys
+                                    If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
+                                        lFieldIndex += 1
+                                        .FieldLength(lFieldIndex) = aFieldWidth
+                                        .FieldName(lFieldIndex) = lLandUse.Substring(2)
+                                    End If
+                                Next
+                                lFieldIndex += 1
+                                .FieldLength(lFieldIndex) = aFieldWidth
+                                .FieldName(lFieldIndex) = "WtdAvg".PadLeft(aFieldWidth)
+
+                                .CurrentRecord = 1
+                                .Value(1) = "Area".PadRight(aFieldWidth)
+                                lFieldIndex = 1
+                                Dim lAreaTotal As Double = 0.0
+                                For Each lLandUse As String In lLandUses.Keys
+                                    If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
+                                        Dim lArea As Double = lLandUseAreas.ItemByKey(lLandUse)
+                                        lAreaTotal += lArea
+                                        lFieldIndex += 1
+                                        .Value(lFieldIndex) = DecimalAlign(lArea, aFieldWidth, aDecimalPlaces, 8)
+                                    End If
+                                Next
+                                lFieldIndex += 1
+                                .Value(lFieldIndex) = DecimalAlign(lAreaTotal, aFieldWidth, aDecimalPlaces, 8)
+
+                                For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                                    Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+                                    If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
+                                        .CurrentRecord += 1
+                                        If lConstituentKey.Substring(2).StartsWith("Header") Then
+                                            .CurrentRecord += 1
+                                            .Value(1) = lConstituentName.PadRight(12)
+                                        Else
+                                            .Value(1) = lConstituentName.PadRight(12)
+                                            'fill in values for each land use
+                                            Dim lValueTotal As Double = 0.0
+                                            lFieldIndex = 1
+                                            For Each lLandUse As String In lLandUses.Keys
+                                                If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
+                                                    Dim lValue As Double = lLandUseConstituentTotals.ItemByKey(lConstituentKey & "-" & lLandUse)
+                                                    lValueTotal += lValue
+                                                    lFieldIndex += 1
+                                                    .Value(lFieldIndex) = DecimalAlign(lValue / lLandUseAreas.ItemByKey(lLandUse), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                End If
+                                            Next
+                                            lFieldIndex += 1
+                                            .Value(lFieldIndex) = DecimalAlign(lValueTotal / lAreaTotal, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                        End If
+                                    End If
+                                Next
+                                If aSegmentRows Then
+                                    lDetailsSB.AppendLine(.ToStringPivoted)
+                                Else
+                                    lDetailsSB.AppendLine(.ToString)
                                 End If
-                            Next
-                            lDetailsSB.AppendLine()
-                        End If
+                            End If
+                        End With
                     Next
-                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & aOutletLocation & "_" & aBalanceType & "_" & "BalanceDetails.txt")
+                    Dim lPivotString As String = ""
+                    If aSegmentRows Then
+                        lPivotString = "Pivot"
+                    End If
+                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & aOutletLocation & "_" & aBalanceType & "_" & "BalanceDetails" & lPivotString & ".txt")
                     SaveFileString(lDetailsFileName, lDetailsSB.ToString)
                     lDetailsSB = Nothing
                 Catch lEx As Exception
