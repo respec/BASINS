@@ -134,7 +134,7 @@ Public Class HspfMsg
                                     lTyp = lParmRow.Item(3) 'Type
                                     Select Case lTyp
                                         Case "I" : lNumeric = True : lParm.Typ = 1 ' ATCoInt
-                                        Case "R" : lNumeric = True : lParm.Typ = 2 ' ATCoSng
+                                        Case "R" : lNumeric = True : lParm.Typ = 2 ' ATCoDbl
                                         Case "C" : lNumeric = False : lParm.Typ = 0 ' ATCoTxt
                                         Case Else : lNumeric = False : lParm.Typ = -999
                                     End Select
@@ -240,7 +240,7 @@ Public Class HspfMsg
             '    s = "(MSG3 Reading about Timeseries Groups and Members for " & lTSGroup.Name & ")"
             '    'IPC.SendMonitorMessage s
             'End If
-            lTSGroup.BlockId = lTSGroupRow.Item(lTSGroupFieldBlockID)
+            lTSGroup.BlockID = lTSGroupRow.Item(lTSGroupFieldBlockID)
             lTSMembers = Nothing
             lTSMembers = New Collection(Of HspfTSMemberDef)
             'lTSMemberTable = myDb.GetTable("TSMemberDefns WHERE TSGroupID = " & CStr(lTSGroup.Id))
@@ -250,7 +250,7 @@ Public Class HspfMsg
                     lTSMember = New HspfTSMemberDef
                     lTSMember.Id = lTSMemberRow.Item(lTSMemberFieldID)
                     lTSMember.Name = lTSMemberRow.Item(lTSMemberFieldName)
-                    lTSMember.TSGroupId = lTSMemberRow.Item(lTSMemberFieldTSGroupID)
+                    lTSMember.TSGroupID = lTSMemberRow.Item(lTSMemberFieldTSGroupID)
                     lTSMember.Parent = lTSGroup
                     lTSMember.SCLU = lTSMemberRow.Item(lTSMemberFieldSCLU)
                     lTSMember.SGRP = lTSMemberRow.Item(lTSMemberFieldSGRP)
@@ -337,7 +337,7 @@ Public Class HspfMsg
                 For i = 1 To 6
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "LEVE" & CStr(15 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 76 + (i * 5)
                     lParmDef.Length = 5
                     lParmDef.Min = -999
@@ -351,7 +351,7 @@ Public Class HspfMsg
                 For i = 1 To 3 'three fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "LCONC" & CStr(7 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = -999
@@ -365,7 +365,7 @@ Public Class HspfMsg
                 For i = 2 To 10 'up to 10 rows possible
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRYR" & CStr((2 * (i - 1)) + 1) 'year
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 12
                     lParmDef.Length = 4
                     lParmDef.Min = 0
@@ -376,7 +376,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRMO" & CStr((2 * (i - 1)) + 1) 'month
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 17
                     lParmDef.Length = 2
                     lParmDef.Min = 1
@@ -387,7 +387,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRDY" & CStr((2 * (i - 1)) + 1) 'day
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 20
                     lParmDef.Length = 2
                     lParmDef.Min = 1
@@ -398,7 +398,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRHR" & CStr((2 * (i - 1)) + 1) 'hour
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 23
                     lParmDef.Length = 2
                     lParmDef.Min = 0
@@ -409,7 +409,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRMI" & CStr((2 * (i - 1)) + 1) 'min
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 26
                     lParmDef.Length = 2
                     lParmDef.Min = 0
@@ -420,7 +420,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRDUR" & CStr((2 * (i - 1)) + 1) 'duration
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 28
                     lParmDef.Length = 5
                     lParmDef.Min = 0
@@ -431,7 +431,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRRAT" & CStr((2 * (i - 1)) + 1) 'rate
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 33
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -442,7 +442,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRYR" & CStr(2 * i) '2nd year
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 49
                     lParmDef.Length = 4
                     lParmDef.Min = 0
@@ -453,7 +453,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRMO" & CStr(2 * i) 'month
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 54
                     lParmDef.Length = 2
                     lParmDef.Min = 1
@@ -464,7 +464,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRDY" & CStr(2 * i) 'day
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 57
                     lParmDef.Length = 2
                     lParmDef.Min = 1
@@ -475,7 +475,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRHR" & CStr(2 * i) 'hour
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 60
                     lParmDef.Length = 2
                     lParmDef.Min = 0
@@ -486,7 +486,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRMI" & CStr(2 * i) 'min
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 63
                     lParmDef.Length = 2
                     lParmDef.Min = 0
@@ -497,7 +497,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRDUR" & CStr(2 * i) 'duration
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 65
                     lParmDef.Length = 5
                     lParmDef.Min = 0
@@ -508,7 +508,7 @@ Public Class HspfMsg
                     .ParmDefs.Add(lParmDef)
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "IRRAT" & CStr(2 * i) 'rate
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 70
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -523,7 +523,7 @@ Public Class HspfMsg
                     For j = 1 To 7 '
                         lParmDef = New HSPFParmDef
                         lParmDef.Name = "DELH" & CStr((7 * (i - 1)) + j)
-                        lParmDef.Typ = 2 ' ATCoSng
+                        lParmDef.Typ = 2 ' ATCoDbl
                         lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
                         lParmDef.Length = 10
                         lParmDef.Min = -999
@@ -537,7 +537,7 @@ Public Class HspfMsg
                 For i = 1 To 2 'two more fields to tack on to make 100
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "DELH" & CStr(98 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 991 + (10 * (i - 1))
                     lParmDef.Length = 10
                     lParmDef.Min = -999
@@ -552,7 +552,7 @@ Public Class HspfMsg
                     For j = 1 To 7 '
                         lParmDef = New HSPFParmDef
                         lParmDef.Name = "DELTT" & CStr((7 * (i - 1)) + j)
-                        lParmDef.Typ = 2 ' ATCoSng
+                        lParmDef.Typ = 2 ' ATCoDbl
                         lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
                         lParmDef.Length = 10
                         lParmDef.Min = -999
@@ -566,7 +566,7 @@ Public Class HspfMsg
                 For i = 1 To 2 'two more fields to tack on to make 100
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "DELTT" & CStr(98 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 991 + (10 * (i - 1))
                     lParmDef.Length = 10
                     lParmDef.Min = -999
@@ -580,7 +580,7 @@ Public Class HspfMsg
                 For i = 1 To 7 'seven fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "PHOTPM" & CStr(7 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -593,7 +593,7 @@ Public Class HspfMsg
                 For i = 1 To 6 'six more fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "PHOTPM" & CStr(14 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
                     lParmDef.Length = 10
                     If i < 5 Then
@@ -617,7 +617,7 @@ Public Class HspfMsg
                 For i = 1 To 7 'seven fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "ALPH" & CStr(7 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0.00001
@@ -630,7 +630,7 @@ Public Class HspfMsg
                 For i = 1 To 4 'four more fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "ALPH" & CStr(14 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0.00001
@@ -644,7 +644,7 @@ Public Class HspfMsg
                 For i = 1 To 7 'seven fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "GAMM" & CStr(7 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -657,7 +657,7 @@ Public Class HspfMsg
                 For i = 1 To 4 'four more fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "GAMM" & CStr(14 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -671,7 +671,7 @@ Public Class HspfMsg
                 For i = 1 To 7 'seven fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "DEL" & CStr(7 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -684,7 +684,7 @@ Public Class HspfMsg
                 For i = 1 To 4 'four more fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "DEL" & CStr(14 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -698,7 +698,7 @@ Public Class HspfMsg
                 For i = 1 To 7 'seven fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "KCLD" & CStr(7 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -711,7 +711,7 @@ Public Class HspfMsg
                 For i = 1 To 4 'four more fields to tack on
                     lParmDef = New HSPFParmDef
                     lParmDef.Name = "KCLD" & CStr(14 + i) 'Name
-                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
                     lParmDef.Length = 10
                     lParmDef.Min = 0
@@ -726,7 +726,7 @@ Public Class HspfMsg
                     For j = 1 To 3 'three values per row
                         lParmDef = New HSPFParmDef
                         lParmDef.Name = "ZERO" & CStr(i) & CStr(j)
-                        lParmDef.Typ = 2 ' ATCoSng
+                        lParmDef.Typ = 2 ' ATCoDbl
                         lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
                         lParmDef.Length = 10
                         lParmDef.Min = 0

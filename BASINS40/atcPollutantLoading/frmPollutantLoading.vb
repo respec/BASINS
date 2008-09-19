@@ -486,14 +486,13 @@ Friend Class frmPollutantLoading
         '
         Me.atxRatio.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.atxRatio.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.atxRatio.DataType = atcControls.atcText.ATCoDataType.ATCoSng
+        Me.atxRatio.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
         Me.atxRatio.DefaultValue = 0
         Me.atxRatio.HardMax = 1
         Me.atxRatio.HardMin = 0
         Me.atxRatio.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxRatio.Location = New System.Drawing.Point(558, 16)
-        Me.atxRatio.MaxDecimal = 0
-        Me.atxRatio.maxWidth = 0
+        Me.atxRatio.MaxWidth = 0
         Me.atxRatio.Name = "atxRatio"
         Me.atxRatio.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxRatio.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -503,20 +502,19 @@ Friend Class frmPollutantLoading
         Me.atxRatio.SoftMax = 0
         Me.atxRatio.SoftMin = 0
         Me.atxRatio.TabIndex = 21
-        Me.atxRatio.Value = 0.0!
+        Me.atxRatio.ValueDouble = 0.0
         '
         'atxPrec
         '
         Me.atxPrec.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.atxPrec.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.atxPrec.DataType = atcControls.atcText.ATCoDataType.ATCoSng
+        Me.atxPrec.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
         Me.atxPrec.DefaultValue = 0
         Me.atxPrec.HardMax = 999
         Me.atxPrec.HardMin = 0
         Me.atxPrec.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxPrec.Location = New System.Drawing.Point(558, 62)
-        Me.atxPrec.MaxDecimal = 0
-        Me.atxPrec.maxWidth = 0
+        Me.atxPrec.MaxWidth = 0
         Me.atxPrec.Name = "atxPrec"
         Me.atxPrec.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxPrec.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -526,7 +524,7 @@ Friend Class frmPollutantLoading
         Me.atxPrec.SoftMax = 0
         Me.atxPrec.SoftMin = 0
         Me.atxPrec.TabIndex = 20
-        Me.atxPrec.Value = 0.0!
+        Me.atxPrec.ValueDouble = 0.0
         '
         'lblRatio
         '
@@ -1337,7 +1335,7 @@ Friend Class frmPollutantLoading
                 Dim lPrec(lNumSubbasins) As Double
                 If rbSingle.Checked Then
                     For i = 0 To lNumSubbasins - 1
-                        lPrec(i) = atxPrec.Value
+                        lPrec(i) = atxPrec.ValueDouble
                     Next i
                 Else
                     For i = 0 To lNumSubbasins - 1
@@ -1352,7 +1350,7 @@ Friend Class frmPollutantLoading
                               lLandUseLayer, _
                               lLandUseId, _
                               lPrec, _
-                              atxRatio.Value, _
+                              atxRatio.ValueDouble, _
                               lConstituents, _
                               lBmps, _
                               lPointLoads, _
@@ -1481,8 +1479,8 @@ Friend Class frmPollutantLoading
             rbSimpleMethod.Checked = True
         End If
 
-        atxPrec.Value = 40.0
-        atxRatio.Value = 0.9
+        atxPrec.ValueDouble = 40.0
+        atxRatio.ValueDouble = 0.9
     End Sub
 
     Private Sub frmPollutantLoading_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing

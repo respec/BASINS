@@ -348,7 +348,7 @@ Public Class atcText
         Set(ByVal newValue As String)
             'Logger.Dbg("Value:Let:" & newValue)
             'If (DataType = ATCoDataType.ATCoInt OrElse _
-            '    DataType = ATCoDataType.ATCoSng) AndAlso _
+            '    DataType = ATCoDataType.ATCoDbl) AndAlso _
             '    IsNumeric(newValue) Then
             '    If newValue = ATCoDataType.NONE Then
             '        txtBox.Text = ""
@@ -378,7 +378,7 @@ Public Class atcText
             '        mnuX(1).Caption = "Max Length: " & HardMax
             '    End If
             'ElseIf DataType = ATCoDataType.ATCoInt Or _
-            '       DataType = ATCoDataType.ATCoSng Then
+            '       DataType = ATCoDataType.ATCoDbl Then
             '    If HardMin = ATCoDataType.NONE And HardMax = ATCoDataType.NONE Then
             '        mnuX(1).Caption = "" '"No Hard Limits"
             '        mnuX(1).Visible = False
@@ -694,7 +694,7 @@ FoundValid:
                     txtBox.ForeColor = System.Drawing.Color.White
                 End If
                 'txtBox.ForeColor = tmpLng Xor &HFFFFFF
-            Case Else 'numeric - ATCoInt or ATCoSng
+            Case Else 'numeric - ATCoInt or ATCoDbl
                 Dim lValDouble As Double
                 If TypeOf (Val) Is String AndAlso Double.TryParse(Val, lValDouble) Then
                     Dim lMaxWidth As Integer = MaxWidth
@@ -714,7 +714,7 @@ FoundValid:
         ElseIf DataType = ATCoDataType.ATCoInt Then
             ATCoTypeString = "ATCoInt"
         ElseIf DataType = ATCoDataType.ATCoDbl Then
-            ATCoTypeString = "ATCoSng"
+            ATCoTypeString = "ATCoDbl"
         ElseIf DataType = ATCoDataType.NONE Then
             ATCoTypeString = "NONE"
         Else
