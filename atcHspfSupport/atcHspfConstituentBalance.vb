@@ -34,7 +34,7 @@ Public Module ConstituentBalance
                            ByVal aScenarioResults As atcDataSource, _
                            ByVal aLocations As atcCollection, _
                            ByVal aRunMade As String, _
-                  Optional ByVal aDateColumns As Boolean = False, _
+                  Optional ByVal aDateRows As Boolean = False, _
                   Optional ByVal aDecimalPlaces As Integer = 3, _
                   Optional ByVal aSignificantDigits As Integer = 5, _
                   Optional ByVal aFieldWidth As Integer = 12) As Text.StringBuilder
@@ -176,7 +176,7 @@ Public Module ConstituentBalance
                                     End If
                                 End If
                             Next
-                            If aDateColumns Then
+                            If aDateRows Then
                                 lString.Append(.ToStringPivoted)
                             Else
                                 lString.Append(.ToString)
