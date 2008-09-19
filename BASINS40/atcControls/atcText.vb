@@ -74,6 +74,7 @@ Public Class atcText
 
     Private privDataType As ATCoDataType
 
+    Private privNumericFormat As String = "0.#####"
     Private privDefaultValue As String = ""
     Private privHardMax As Double = ATCoDataType.NONE
     Private privHardMin As Double = ATCoDataType.NONE
@@ -110,6 +111,15 @@ Public Class atcText
         End Get
         Set(ByVal newValue As ATCoDataType)
             privDataType = newValue
+        End Set
+    End Property
+
+    Public Property NumericFormat() As String
+        Get
+            Return privNumericFormat
+        End Get
+        Set(ByVal newValue As String)
+            privNumericFormat = newValue
         End Set
     End Property
 
@@ -280,6 +290,32 @@ Public Class atcText
             If newValue >= 0 And newValue + txtBox.SelectionStart <= Len(txtBox.Text) Then
                 txtBox.SelectionLength = newValue
             End If
+        End Set
+    End Property
+
+    Public Property ValueInteger() As Integer
+        Get
+            Dim lInt As Integer = 0
+            If Not Integer.TryParse(Value, lInt) Then
+                Integer.TryParse(privDefaultValue, lInt)
+            End If
+            Return lInt
+        End Get
+        Set(ByVal newValue As Integer)
+            Me.Value = newValue.ToString
+        End Set
+    End Property
+
+    Public Property ValueDouble() As Double
+        Get
+            Dim lDbl As Double = 0
+            If Not Double.TryParse(Value, lDbl) Then
+                Double.TryParse(privDefaultValue, lDbl)
+            End If
+            Return lDbl
+        End Get
+        Set(ByVal newValue As Double)
+            Me.Value = newValue.ToString
         End Set
     End Property
 
@@ -601,7 +637,7 @@ LeaveSub:
             If aValue.Length > 0 Then
                 Dim lDoubleValue As Double
                 If Double.TryParse(aValue, lDoubleValue) Then
-                    aValue = DoubleToString(lDoubleValue) 'We don't want to compare 0.1 with .1 and think they are different
+                    aValue = DoubleToString(lDoubleValue, maxWidth, privNumericFormat) 'We don't want to compare 0.1 with .1 and think they are different
                 Else
                     lValid = privDefaultValue
                     lMsgText = "The value '" & aValue & "' is not numeric."
@@ -623,7 +659,7 @@ LeaveSub:
                 End If
                 If BelowLimit(lDoubleValue, HardMin) Then lDoubleValue = HardMin
                 If AboveLimit(lDoubleValue, HardMax) Then lDoubleValue = HardMax
-                lValid = DoubleToString(lDoubleValue)
+                lValid = DoubleToString(lDoubleValue, maxWidth, privNumericFormat)
                 If lValid <> aValue Then
                     If lMsgText.Length = 0 Then
                         lMsgText = "The value '" & aValue & "' is outside the valid range. "
@@ -698,7 +734,7 @@ FoundValid:
                 Dim expFormat As String, DecimalPlaces As Integer, LogVal As Double
                 Dim lValDouble As Double
                 If TypeOf (Val) Is String AndAlso Double.TryParse(Val, lValDouble) Then
-                    lFormattedValue = DoubleToString(lValDouble)
+                    lFormattedValue = DoubleToString(lValDouble, maxWidth, privNumericFormat)
                     If maxWidth > 0 Then
                         If Len(lFormattedValue) > maxWidth Then 'First try to trim excess digits after decimal
                             DecimalPlaces = InStr(lFormattedValue, ".")
