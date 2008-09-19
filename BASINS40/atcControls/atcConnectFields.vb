@@ -108,4 +108,21 @@ Public Class atcConnectFields
         Next
         Return lConnections
     End Function
+
+    Private Sub atcConnectFields_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        lstSource.Width = (Me.Width / 2) - 30
+        lstTarget.Left = (Me.Width / 2) + 10
+        lstTarget.Width = (Me.Width / 2) - 30
+        lblTarget.Left = lstTarget.Left
+        lstSource.Height = (Me.Height / 2) - 64
+        lstTarget.Height = (Me.Height / 2) - 64
+        lstConnections.Height = (Me.Height / 2) - 80
+        lstConnections.Top = lstSource.Height + 150
+        lblConnections.Top = lstConnections.Top - 20
+        btnAdd.Top = lblConnections.Top - 40
+        btnClear.Top = lblConnections.Top - 40
+        btnDelete.Top = lblConnections.Top - 40
+        btnLoad.Top = lblConnections.Top - 40
+        btnSave.Top = lblConnections.Top - 40
+    End Sub
 End Class

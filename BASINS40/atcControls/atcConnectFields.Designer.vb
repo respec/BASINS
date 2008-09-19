@@ -28,7 +28,7 @@ Partial Class atcConnectFields
         Me.btnDelete = New System.Windows.Forms.Button
         Me.lblHeader = New System.Windows.Forms.Label
         Me.lblSource = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
+        Me.lblTarget = New System.Windows.Forms.Label
         Me.btnSave = New System.Windows.Forms.Button
         Me.btnLoad = New System.Windows.Forms.Button
         Me.lblConnections = New System.Windows.Forms.Label
@@ -42,22 +42,22 @@ Partial Class atcConnectFields
         Me.lstSource.ItemHeight = 16
         Me.lstSource.Location = New System.Drawing.Point(18, 70)
         Me.lstSource.Name = "lstSource"
-        Me.lstSource.Size = New System.Drawing.Size(173, 212)
+        Me.lstSource.Size = New System.Drawing.Size(175, 196)
         Me.lstSource.TabIndex = 0
         '
         'lstTarget
         '
-        Me.lstTarget.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstTarget.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lstTarget.FormattingEnabled = True
         Me.lstTarget.ItemHeight = 16
-        Me.lstTarget.Location = New System.Drawing.Point(213, 70)
+        Me.lstTarget.Location = New System.Drawing.Point(219, 70)
         Me.lstTarget.Name = "lstTarget"
-        Me.lstTarget.Size = New System.Drawing.Size(173, 212)
+        Me.lstTarget.Size = New System.Drawing.Size(175, 196)
         Me.lstTarget.TabIndex = 1
         '
         'btnAdd
         '
-        Me.btnAdd.Location = New System.Drawing.Point(18, 297)
+        Me.btnAdd.Location = New System.Drawing.Point(20, 297)
         Me.btnAdd.Name = "btnAdd"
         Me.btnAdd.Size = New System.Drawing.Size(59, 29)
         Me.btnAdd.TabIndex = 2
@@ -66,7 +66,7 @@ Partial Class atcConnectFields
         '
         'btnDelete
         '
-        Me.btnDelete.Location = New System.Drawing.Point(83, 297)
+        Me.btnDelete.Location = New System.Drawing.Point(85, 297)
         Me.btnDelete.Name = "btnDelete"
         Me.btnDelete.Size = New System.Drawing.Size(57, 29)
         Me.btnDelete.TabIndex = 3
@@ -85,21 +85,21 @@ Partial Class atcConnectFields
         'lblSource
         '
         Me.lblSource.AutoSize = True
-        Me.lblSource.Location = New System.Drawing.Point(17, 45)
+        Me.lblSource.Location = New System.Drawing.Point(15, 45)
         Me.lblSource.Name = "lblSource"
         Me.lblSource.Size = New System.Drawing.Size(87, 17)
         Me.lblSource.TabIndex = 6
         Me.lblSource.Text = "Source Field"
         '
-        'Label1
+        'lblTarget
         '
-        Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(210, 45)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(84, 17)
-        Me.Label1.TabIndex = 7
-        Me.Label1.Text = "Target Field"
+        Me.lblTarget.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblTarget.AutoSize = True
+        Me.lblTarget.Location = New System.Drawing.Point(218, 45)
+        Me.lblTarget.Name = "lblTarget"
+        Me.lblTarget.Size = New System.Drawing.Size(84, 17)
+        Me.lblTarget.TabIndex = 7
+        Me.lblTarget.Text = "Target Field"
         '
         'btnSave
         '
@@ -122,7 +122,7 @@ Partial Class atcConnectFields
         'lblConnections
         '
         Me.lblConnections.AutoSize = True
-        Me.lblConnections.Location = New System.Drawing.Point(22, 333)
+        Me.lblConnections.Location = New System.Drawing.Point(17, 329)
         Me.lblConnections.Name = "lblConnections"
         Me.lblConnections.Size = New System.Drawing.Size(86, 17)
         Me.lblConnections.TabIndex = 10
@@ -130,18 +130,19 @@ Partial Class atcConnectFields
         '
         'lstConnections
         '
-        Me.lstConnections.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lstConnections.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstConnections.FormattingEnabled = True
         Me.lstConnections.ItemHeight = 16
-        Me.lstConnections.Location = New System.Drawing.Point(21, 365)
+        Me.lstConnections.Location = New System.Drawing.Point(18, 365)
         Me.lstConnections.Name = "lstConnections"
-        Me.lstConnections.Size = New System.Drawing.Size(365, 148)
+        Me.lstConnections.Size = New System.Drawing.Size(376, 132)
         Me.lstConnections.TabIndex = 11
         '
         'btnClear
         '
-        Me.btnClear.Location = New System.Drawing.Point(146, 297)
+        Me.btnClear.Location = New System.Drawing.Point(148, 297)
         Me.btnClear.Name = "btnClear"
         Me.btnClear.Size = New System.Drawing.Size(57, 29)
         Me.btnClear.TabIndex = 12
@@ -157,7 +158,7 @@ Partial Class atcConnectFields
         Me.Controls.Add(Me.lblConnections)
         Me.Controls.Add(Me.btnLoad)
         Me.Controls.Add(Me.btnSave)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lblTarget)
         Me.Controls.Add(Me.lblSource)
         Me.Controls.Add(Me.lblHeader)
         Me.Controls.Add(Me.btnDelete)
@@ -165,7 +166,7 @@ Partial Class atcConnectFields
         Me.Controls.Add(Me.lstTarget)
         Me.Controls.Add(Me.lstSource)
         Me.Name = "atcConnectFields"
-        Me.Size = New System.Drawing.Size(406, 525)
+        Me.Size = New System.Drawing.Size(414, 521)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -174,7 +175,7 @@ Partial Class atcConnectFields
     Friend WithEvents btnDelete As System.Windows.Forms.Button
     Friend WithEvents lblHeader As System.Windows.Forms.Label
     Friend WithEvents lblSource As System.Windows.Forms.Label
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lblTarget As System.Windows.Forms.Label
     Friend WithEvents btnSave As System.Windows.Forms.Button
     Friend WithEvents btnLoad As System.Windows.Forms.Button
     Friend WithEvents lblConnections As System.Windows.Forms.Label
