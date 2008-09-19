@@ -65,11 +65,11 @@ Public Class atcText
 #End Region
 
     Public Enum ATCoDataType
+        NONE = -999
         ATCoTxt = 0
         ATCoInt = 1
-        ATCoSng = 2
+        ATCoDbl = 2
         ATCoClr = 10
-        NONE = -999
     End Enum
 
     Private privDataType As ATCoDataType
@@ -81,7 +81,6 @@ Public Class atcText
     Private privSoftMax As Double = ATCoDataType.NONE
     Private privSoftMin As Double = ATCoDataType.NONE
     Private privMaxWidth As Integer = 20
-    Private privMaxDecimal As Integer = 5
 
     Private fgColor As System.Drawing.Color = Color.Black
     Private OkBg As System.Drawing.Color = Color.White
@@ -209,9 +208,9 @@ Public Class atcText
         End Set
     End Property
 
-    Public Property maxWidth() As Integer
+    Public Property MaxWidth() As Integer
         Get
-            maxWidth = privMaxWidth
+            MaxWidth = privMaxWidth
         End Get
         Set(ByVal newValue As Integer)
             'Logger.Dbg("MaxWidth:Let:" & newValue)
@@ -219,15 +218,15 @@ Public Class atcText
         End Set
     End Property
 
-    Public Property MaxDecimal() As Integer
-        Get
-            MaxDecimal = privMaxDecimal
-        End Get
-        Set(ByVal newValue As Integer)
-            'Logger.Dbg("MaxDecimal:Let:" & newValue)
-            privMaxDecimal = newValue
-        End Set
-    End Property
+    'Public Property MaxDecimal() As Integer
+    '    Get
+    '        MaxDecimal = privMaxDecimal
+    '    End Get
+    '    Set(ByVal newValue As Integer)
+    '        'Logger.Dbg("MaxDecimal:Let:" & newValue)
+    '        privMaxDecimal = newValue
+    '    End Set
+    'End Property
 
     Public Property DefaultValue() As String
         Get
@@ -296,30 +295,30 @@ Public Class atcText
     Public Property ValueInteger() As Integer
         Get
             Dim lInt As Integer = 0
-            If Not Integer.TryParse(Value, lInt) Then
+            If Not Integer.TryParse(Text, lInt) Then
                 Integer.TryParse(privDefaultValue, lInt)
             End If
             Return lInt
         End Get
         Set(ByVal newValue As Integer)
-            Me.Value = newValue.ToString
+            Me.Text = newValue.ToString
         End Set
     End Property
 
     Public Property ValueDouble() As Double
         Get
             Dim lDbl As Double = 0
-            If Not Double.TryParse(Value, lDbl) Then
+            If Not Double.TryParse(Text, lDbl) Then
                 Double.TryParse(privDefaultValue, lDbl)
             End If
             Return lDbl
         End Get
         Set(ByVal newValue As Double)
-            Me.Value = newValue.ToString
+            Me.Text = newValue.ToString
         End Set
     End Property
 
-    Public Property Value() As String
+    Public Overrides Property Text() As String
         Get
             Dim lValue As String = ATCoDataType.NONE
             Select Case DataType
@@ -331,7 +330,7 @@ Public Class atcText
                     Else
                         lValue = ""
                     End If
-                Case ATCoDataType.ATCoSng
+                Case ATCoDataType.ATCoDbl
                     If IsNumeric(txtBox.Text) Then
                         lValue = CSng(txtBox.Text)
                     Else
@@ -411,7 +410,7 @@ Public Class atcText
 
         cdlg.Color = txtBox.BackColor
         If cdlg.ShowDialog() = DialogResult.OK Then
-            Me.Value = cdlg.Color.ToArgb
+            Me.Text = cdlg.Color.ToArgb
         End If
     End Sub
 
@@ -420,7 +419,7 @@ Public Class atcText
         Dim lSoftLimits As String
         If DataType = ATCoDataType.ATCoTxt Then
             If HardMax <> ATCoDataType.NONE Then lToolText = "Max Length: " & HardMax
-        ElseIf DataType = ATCoDataType.ATCoInt OrElse DataType = ATCoDataType.ATCoSng Then
+        ElseIf DataType = ATCoDataType.ATCoInt OrElse DataType = ATCoDataType.ATCoDbl Then
             If HardMin = ATCoDataType.NONE And HardMax = ATCoDataType.NONE Then
                 lToolText = ""
             ElseIf HardMin = ATCoDataType.NONE Then
@@ -453,7 +452,7 @@ Public Class atcText
 
     Private Sub txtBox_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBox.GotFocus
         'Logger.Dbg("txtBox:GotFocus")
-        Tag = Value
+        Tag = Text
         txtBox.SelectionStart = 0
         txtBox.SelectionLength = Len(txtBox.Text)
         SetToolTip()
@@ -468,7 +467,7 @@ Public Class atcText
             RaiseEvent CommitChange()
             lKeyCode = 0
         ElseIf lKeyCode = Keys.Escape Then
-            Value = Tag
+            Text = Tag
             RaiseEvent CommitChange()
             'ElseIf DataType = ATCoDataType.ATCoClr And KeyCode = Keys.Up Then
             '  testColor(False, txtBox.Text, newName, Color.FromArgb(newColor))
@@ -539,7 +538,7 @@ Public Class atcText
                     GoTo LeaveSub
                 End If
 
-            ElseIf DataType = ATCoDataType.ATCoSng Then
+            ElseIf DataType = ATCoDataType.ATCoDbl Then
                 If Not IsNumeric(.Text) Then
                     If (.Text <> "-" And .Text <> "+" And .Text <> "-." And .Text <> "+." Or HardMin >= 0) And .Text <> "." Then .BackColor = OutsideHardBg
                     GoTo LeaveSub
@@ -571,9 +570,9 @@ LeaveSub:
         HardMin = ATCoDataType.NONE
         SoftMax = ATCoDataType.NONE
         SoftMin = ATCoDataType.NONE
-        maxWidth = ATCoDataType.NONE
+        MaxWidth = 20
         DataType = ATCoDataType.ATCoTxt
-        DefaultValue = ATCoDataType.NONE
+        DefaultValue = ""
         InsideLimitsBackground = System.Drawing.Color.White
         OutsideHardLimitBackground = Color.FromArgb(8421631)
         OutsideSoftLimitBackground = Color.FromArgb(8454143)
@@ -584,43 +583,6 @@ LeaveSub:
         txtBox.Width = Me.Width
         txtBox.Height = Me.Height
     End Sub
-
-    'Private Sub UserControl_ReadProperties(ByVal PropBag As PropertyBag)
-    '    InsideLimitsBackground = PropBag.ReadProperty("InsideLimitsBackground", System.Drawing.Color.White)
-    '    OutsideHardLimitBackground = PropBag.ReadProperty("OutsideHardLimitBackground", 8421631)
-    '    OutsideSoftLimitBackground = PropBag.ReadProperty("OutsideSoftLimitBackground", 8454143)
-    '    HardMax = PropBag.ReadProperty("HardMax", ATCoDataType.NONE)
-    '    HardMin = PropBag.ReadProperty("HardMin", ATCoDataType.NONE)
-    '    SoftMax = PropBag.ReadProperty("SoftMax", ATCoDataType.NONE)
-    '    SoftMin = PropBag.ReadProperty("SoftMin", ATCoDataType.NONE)
-    '    maxWidth = PropBag.ReadProperty("MaxWidth", ATCoDataType.NONE)
-    '    Alignment = PropBag.ReadProperty("Alignment", txtBox.TextAlign)
-    '    DataType = PropBag.ReadProperty("DataType", 0)
-    '    DefVal = PropBag.ReadProperty("DefaultValue", 0)
-    '    txtBox.Text = PropBag.ReadProperty("Value", "")
-    '    txtBox.Enabled = PropBag.ReadProperty("Enabled", True)
-    '    If txtBox.Enabled Then
-    '        txtBox.BackColor = OkBg
-    '    Else
-    '        txtBox.BackColor = System.Drawing.Color.LightGray
-    '    End If
-    'End Sub
-
-    'Private Sub UserControl_WriteProperties(ByVal PropBag As PropertyBag)
-    '    PropBag.WriteProperty("InsideLimitsBackground", InsideLimitsBackground)
-    '    PropBag.WriteProperty("OutsideHardLimitBackground", OutsideHardLimitBackground)
-    '    PropBag.WriteProperty("OutsideSoftLimitBackground", OutsideSoftLimitBackground)
-    '    PropBag.WriteProperty("HardMax", HardMax)
-    '    PropBag.WriteProperty("HardMin", HardMin)
-    '    PropBag.WriteProperty("SoftMax", SoftMax)
-    '    PropBag.WriteProperty("SoftMin", SoftMin)
-    '    PropBag.WriteProperty("MaxWidth", maxWidth)
-    '    PropBag.WriteProperty("Alignment", Alignment)
-    '    PropBag.WriteProperty("DataType", DataType)
-    '    PropBag.WriteProperty("DefaultValue", DefVal)
-    '    PropBag.WriteProperty("Value", txtBox.Text)
-    '    PropBag.WriteProperty("Enabled", (txtBox.Enabled))
-    'End Sub
 
     Private Function Valid(ByVal aValue As String) As String
         Dim lMsgText As String = ""
@@ -633,11 +595,13 @@ LeaveSub:
                          & "Values can be at most " & HardMax & " characters long."
             End If
         ElseIf DataType = ATCoDataType.ATCoInt OrElse _
-               DataType = ATCoDataType.ATCoSng Then
+               DataType = ATCoDataType.ATCoDbl Then
             If aValue.Length > 0 Then
                 Dim lDoubleValue As Double
+                Dim lMaxWidth As Integer = MaxWidth
+                If lMaxWidth < 1 Then lMaxWidth = 255
                 If Double.TryParse(aValue, lDoubleValue) Then
-                    aValue = DoubleToString(lDoubleValue, maxWidth, privNumericFormat) 'We don't want to compare 0.1 with .1 and think they are different
+                    aValue = DoubleToString(lDoubleValue, lMaxWidth, privNumericFormat, , "") 'We don't want to compare 0.1 with .1 and think they are different
                 Else
                     lValid = privDefaultValue
                     lMsgText = "The value '" & aValue & "' is not numeric."
@@ -659,7 +623,7 @@ LeaveSub:
                 End If
                 If BelowLimit(lDoubleValue, HardMin) Then lDoubleValue = HardMin
                 If AboveLimit(lDoubleValue, HardMax) Then lDoubleValue = HardMax
-                lValid = DoubleToString(lDoubleValue, maxWidth, privNumericFormat)
+                lValid = DoubleToString(lDoubleValue, lMaxWidth, privNumericFormat, , "")
                 If lValid <> aValue Then
                     If lMsgText.Length = 0 Then
                         lMsgText = "The value '" & aValue & "' is outside the valid range. "
@@ -731,34 +695,13 @@ FoundValid:
                 End If
                 'txtBox.ForeColor = tmpLng Xor &HFFFFFF
             Case Else 'numeric - ATCoInt or ATCoSng
-                Dim expFormat As String, DecimalPlaces As Integer, LogVal As Double
                 Dim lValDouble As Double
                 If TypeOf (Val) Is String AndAlso Double.TryParse(Val, lValDouble) Then
-                    lFormattedValue = DoubleToString(lValDouble, maxWidth, privNumericFormat)
-                    If maxWidth > 0 Then
-                        If Len(lFormattedValue) > maxWidth Then 'First try to trim excess digits after decimal
-                            DecimalPlaces = InStr(lFormattedValue, ".")
-                            If DecimalPlaces > 0 Then
-                                If DecimalPlaces - 1 <= maxWidth Then 'Can shrink string enough just by truncating
-                                    lFormattedValue = lFormattedValue.Substring(maxWidth) '(retval, maxWidth)
-                                End If
-                            End If
-                        End If
-                        If Len(lFormattedValue) > maxWidth Then
-                            LogVal = Abs(Math.Log(Abs(lValDouble)) / Math.Log(10))
-                            If LogVal > 99 Then
-                                expFormat = "e-###"
-                            ElseIf LogVal >= 10 Then
-                                expFormat = "e-##"
-                            Else
-                                expFormat = "e-#"
-                            End If
-                            DecimalPlaces = maxWidth - Len(expFormat) - 2
-                            If DecimalPlaces < 1 Then
-                                DecimalPlaces = 1
-                            End If
-                            lFormattedValue = Format(Val, "#.") & Format(DecimalPlaces, "#") & expFormat
-                        End If
+                    Dim lMaxWidth As Integer = MaxWidth
+                    If lMaxWidth < 1 Then
+                        lFormattedValue = DoubleToString(lValDouble, 255, NumericFormat)
+                    Else
+                        lFormattedValue = DoubleToString(lValDouble, lMaxWidth, NumericFormat)
                     End If
                 End If
         End Select
@@ -770,7 +713,7 @@ FoundValid:
             ATCoTypeString = "ATCoTxt"
         ElseIf DataType = ATCoDataType.ATCoInt Then
             ATCoTypeString = "ATCoInt"
-        ElseIf DataType = ATCoDataType.ATCoSng Then
+        ElseIf DataType = ATCoDataType.ATCoDbl Then
             ATCoTypeString = "ATCoSng"
         ElseIf DataType = ATCoDataType.NONE Then
             ATCoTypeString = "NONE"
