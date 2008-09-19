@@ -268,6 +268,10 @@ Module HSPFOutputReports
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
                 lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
                 "outfiles\", True)
+            HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+               (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
+                lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
+                "outfiles\", True, True)
         End If
         Logger.Msg("Reports Written in " & IO.Path.Combine(pTestPath, "outfiles"), "HSPFOutputReports")
     End Sub
