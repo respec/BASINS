@@ -283,8 +283,7 @@ Partial Class frmAgPrac
         Me.atxSurface.HardMin = 0
         Me.atxSurface.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxSurface.Location = New System.Drawing.Point(67, 33)
-        Me.atxSurface.MaxDecimal = 0
-        Me.atxSurface.maxWidth = 0
+        Me.atxSurface.MaxWidth = 0
         Me.atxSurface.Name = "atxSurface"
         Me.atxSurface.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxSurface.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -295,7 +294,7 @@ Partial Class frmAgPrac
         Me.atxSurface.SoftMin = 1
         Me.atxSurface.TabIndex = 48
         Me.atxSurface.Tag = "1111"
-        Me.atxSurface.Value = CType(0, Long)
+        Me.atxSurface.ValueDouble = CType(0, Long)
         '
         'atxUpper
         '
@@ -306,8 +305,7 @@ Partial Class frmAgPrac
         Me.atxUpper.HardMin = 0
         Me.atxUpper.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxUpper.Location = New System.Drawing.Point(67, 73)
-        Me.atxUpper.MaxDecimal = 0
-        Me.atxUpper.maxWidth = 0
+        Me.atxUpper.MaxWidth = 0
         Me.atxUpper.Name = "atxUpper"
         Me.atxUpper.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxUpper.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -318,7 +316,7 @@ Partial Class frmAgPrac
         Me.atxUpper.SoftMin = 1
         Me.atxUpper.TabIndex = 50
         Me.atxUpper.Tag = "1111"
-        Me.atxUpper.Value = CType(0, Long)
+        Me.atxUpper.ValueDouble = CType(0, Long)
         '
         'atxMin
         '
@@ -329,8 +327,7 @@ Partial Class frmAgPrac
         Me.atxMin.HardMin = 0
         Me.atxMin.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxMin.Location = New System.Drawing.Point(216, 36)
-        Me.atxMin.MaxDecimal = 0
-        Me.atxMin.maxWidth = 0
+        Me.atxMin.MaxWidth = 0
         Me.atxMin.Name = "atxMin"
         Me.atxMin.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxMin.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -340,7 +337,7 @@ Partial Class frmAgPrac
         Me.atxMin.SoftMax = 0
         Me.atxMin.SoftMin = 0
         Me.atxMin.TabIndex = 33
-        Me.atxMin.Value = CType(0, Long)
+        Me.atxMin.ValueInteger = CType(0, Long)
         '
         'atxHr
         '
@@ -351,8 +348,7 @@ Partial Class frmAgPrac
         Me.atxHr.HardMin = 0
         Me.atxHr.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxHr.Location = New System.Drawing.Point(175, 36)
-        Me.atxHr.MaxDecimal = 0
-        Me.atxHr.maxWidth = 0
+        Me.atxHr.MaxWidth = 0
         Me.atxHr.Name = "atxHr"
         Me.atxHr.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxHr.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -362,7 +358,7 @@ Partial Class frmAgPrac
         Me.atxHr.SoftMax = 0
         Me.atxHr.SoftMin = 0
         Me.atxHr.TabIndex = 32
-        Me.atxHr.Value = CType(0, Long)
+        Me.atxHr.ValueInteger = CType(0, Long)
         '
         'atxYear
         '
@@ -373,8 +369,7 @@ Partial Class frmAgPrac
         Me.atxYear.HardMin = 0
         Me.atxYear.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxYear.Location = New System.Drawing.Point(43, 36)
-        Me.atxYear.MaxDecimal = 0
-        Me.atxYear.maxWidth = 0
+        Me.atxYear.MaxWidth = 0
         Me.atxYear.Name = "atxYear"
         Me.atxYear.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxYear.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -385,7 +380,7 @@ Partial Class frmAgPrac
         Me.atxYear.SoftMin = 1
         Me.atxYear.TabIndex = 29
         Me.atxYear.Tag = "1111"
-        Me.atxYear.Value = CType(0, Long)
+        Me.atxYear.ValueInteger = CType(0, Long)
         '
         'atxDay
         '
@@ -396,8 +391,7 @@ Partial Class frmAgPrac
         Me.atxDay.HardMin = 1
         Me.atxDay.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxDay.Location = New System.Drawing.Point(134, 36)
-        Me.atxDay.MaxDecimal = 0
-        Me.atxDay.maxWidth = 0
+        Me.atxDay.MaxWidth = 0
         Me.atxDay.Name = "atxDay"
         Me.atxDay.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxDay.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -407,7 +401,7 @@ Partial Class frmAgPrac
         Me.atxDay.SoftMax = 0
         Me.atxDay.SoftMin = 0
         Me.atxDay.TabIndex = 31
-        Me.atxDay.Value = CType(1, Long)
+        Me.atxDay.ValueInteger = CType(1, Long)
         '
         'atxMo
         '
@@ -418,8 +412,7 @@ Partial Class frmAgPrac
         Me.atxMo.HardMin = 1
         Me.atxMo.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxMo.Location = New System.Drawing.Point(93, 36)
-        Me.atxMo.MaxDecimal = 0
-        Me.atxMo.maxWidth = 0
+        Me.atxMo.MaxWidth = 0
         Me.atxMo.Name = "atxMo"
         Me.atxMo.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxMo.OutsideSoftLimitBackground = System.Drawing.Color.Empty
@@ -429,7 +422,7 @@ Partial Class frmAgPrac
         Me.atxMo.SoftMax = 0
         Me.atxMo.SoftMin = 0
         Me.atxMo.TabIndex = 30
-        Me.atxMo.Value = CType(1, Long)
+        Me.atxMo.ValueInteger = CType(1, Long)
         '
         'frmAgPrac
         '

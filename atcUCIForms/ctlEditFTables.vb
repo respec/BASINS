@@ -45,8 +45,8 @@ Public Class ctlEditFTables
     Public Sub Save() Implements ctlEdit.Save
         Dim lRow, lCol As Integer
 
-        pHspfFtable.Nrows = txtNRows.Value
-        pHspfFtable.Ncols = txtNCols.Value
+        pHspfFtable.Nrows = txtNRows.ValueInteger
+        pHspfFtable.Ncols = txtNCols.ValueInteger
         With grdEdit.Source
             For lRow = 1 To .Rows - 1
                 pHspfFtable.Depth(lRow) = .CellValue(lRow, 0)
@@ -90,8 +90,8 @@ Public Class ctlEditFTables
                     PrevListIndex = cboID.SelectedIndex
                 End If
             Next
-            txtNRows.Value = pHspfFtable.Nrows
-            txtNCols.Value = pHspfFtable.Ncols
+            txtNRows.ValueInteger = pHspfFtable.Nrows
+            txtNCols.ValueInteger = pHspfFtable.Ncols
             RefreshFtables()
         End Set
 
@@ -110,8 +110,8 @@ Public Class ctlEditFTables
         End With
 
         With grdEdit.Source
-            .Rows = txtNRows.Value + 1
-            .Columns = txtNCols.Value
+            .Rows = txtNRows.ValueInteger + 1
+            .Columns = txtNCols.ValueInteger
             For lCol = 0 To .Columns - 1
                 .CellEditable(0, lCol) = False
             Next
@@ -176,8 +176,8 @@ Public Class ctlEditFTables
         units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.EmFg
 
         With grdEdit.Source
-            .Rows = txtNRows.Value + 1
-            .Columns = txtNCols.Value
+            .Rows = txtNRows.ValueInteger + 1
+            .Columns = txtNCols.ValueInteger
             For lCol = 3 To .Columns - 1
                 If units = 1 Then
                     .CellValue(0, lCol) = "Outflow" & lCol - 2 & " (ft3/s)"
@@ -238,8 +238,8 @@ Public Class ctlEditFTables
             If discard = 6 Then 'change table
                 pHspfFtable = pHspfFtable.Operation.OpnBlk.Ids("K" & tempID).FTable
                 pChanged = False
-                txtNRows.Value = pHspfFtable.Nrows
-                txtNCols.Value = pHspfFtable.Ncols
+                txtNRows.ValueInteger = pHspfFtable.Nrows
+                txtNCols.ValueInteger = pHspfFtable.Ncols
                 RefreshFtables()
                 RefreshGrid()
             Else 'dont discard set back to previous listindex
@@ -250,14 +250,14 @@ Public Class ctlEditFTables
     End Sub
 
     Private Sub txtNRows_Change(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtNRows.Leave
-        If txtNRows.Value > 1 And txtNCols.Value < 26 Then
+        If txtNRows.ValueInteger > 1 And txtNCols.ValueInteger < 26 Then
             RefreshGrid()
             pChanged = True
         End If
     End Sub
 
     Private Sub txtNCols_Change(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtNCols.Leave
-        If txtNCols.Value > 3 And txtNCols.Value < 9 Then
+        If txtNCols.ValueInteger > 3 And txtNCols.ValueInteger < 9 Then
             RefreshGrid()
             pChanged = True
         End If
@@ -266,8 +266,8 @@ Public Class ctlEditFTables
     Private Sub cmdImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImport.Click
         Dim frmXSect As New frmXSect
         frmXSect.CurrentReach(pHspfFtable.Operation.Id, pHspfFtable.Operation.FTable)
-        txtNRows.Value = pHspfFtable.Nrows
-        txtNCols.Value = pHspfFtable.Ncols
+        txtNRows.ValueInteger = pHspfFtable.Nrows
+        txtNCols.ValueInteger = pHspfFtable.Ncols
         frmXSect.Init(pHspfFtable, Me)
         frmXSect.Owner = frmEdit.ActiveForm
         frmXSect.Show()
@@ -287,11 +287,11 @@ Public Class ctlEditFTables
     Public Sub UpdateFTABLE(ByVal aFtab As HspfFtable)
         Dim lRow, lCol As Long
 
-        txtNRows.Value = aFtab.Nrows
-        txtNCols.Value = aFtab.Ncols
+        txtNRows.ValueInteger = aFtab.Nrows
+        txtNCols.ValueInteger = aFtab.Ncols
         With grdEdit.Source
-            .Rows = txtNRows.Value
-            .Columns = txtNCols.Value
+            .Rows = txtNRows.ValueInteger
+            .Columns = txtNCols.ValueInteger
 
             For lRow = 1 To .Rows
                 .CellValue(lRow, 0) = aFtab.Depth(lRow)
@@ -348,8 +348,8 @@ Public Class ctlEditFTables
         tempID = CInt(Mid(cboID.SelectedItem, 1, loper - 2))
         pHspfFtable = pHspfFtable.Operation.OpnBlk.Ids("K" & tempID).FTable
         pChanged = False
-        txtNRows.Value = pHspfFtable.Nrows
-        txtNCols.Value = pHspfFtable.Ncols
+        txtNRows.ValueInteger = pHspfFtable.Nrows
+        txtNCols.ValueInteger = pHspfFtable.Ncols
         RefreshFtables()
         RefreshGrid()
     End Sub

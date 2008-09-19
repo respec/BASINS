@@ -18,9 +18,9 @@ Public Class frmNewFTable
         '    Friend Sub Init(ByVal aCtl As ctlEditFTables)
         Me.Icon = pFTableCtl.ParentForm.Icon
         Me.Text = "New FTable"
-        atxChannelLength.Value = lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#
-        atxChannelSlope.Value = SignificantDigits(lFtab.Operation.Tables("HYDR-PARM2").Parms("DELTH").Value / (lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#), 3)
-        atxDrainageArea.Value = Format(lFtab.Operation.Uci.UpstreamArea(lFtab.Id) / 640.0#, "0.##")
+        atxChannelLength.ValueDouble = lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#
+        atxChannelSlope.ValueDouble = SignificantDigits(lFtab.Operation.Tables("HYDR-PARM2").Parms("DELTH").Value / (lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#), 3)
+        atxDrainageArea.ValueDouble = Format(lFtab.Operation.Uci.UpstreamArea(lFtab.Id) / 640.0#, "0.##")
 
         cboProv.Items.Clear()
         cboProv.Items.Add("Select Physiographic Province")
@@ -29,16 +29,16 @@ Public Class frmNewFTable
         cboProv.Items.Add("Piedmont")
         cboProv.SelectedIndex = 0
 
-        atxChannelWidth.Value = 0
-        atxChannelDepth.Value = 0
-        atxChannelManningsN.Value = 0
-        atxFloodplainManningsN.Value = 0
-        atxBankfullDepth.Value = 0
-        atxMaximumFloodplainDepth.Value = 0
-        atxLeftSideFloodPlainWidth.Value = 0
-        atxRightSideFloodPlainWidth.Value = 0
-        atxChannelSideSlope.Value = 0
-        atxFloodplainSideSlope.Value = 0
+        atxChannelWidth.ValueDouble = 0
+        atxChannelDepth.ValueDouble = 0
+        atxChannelManningsN.ValueDouble = 0
+        atxFloodplainManningsN.ValueDouble = 0
+        atxBankfullDepth.ValueDouble = 0
+        atxMaximumFloodplainDepth.ValueDouble = 0
+        atxLeftSideFloodPlainWidth.ValueDouble = 0
+        atxRightSideFloodPlainWidth.ValueDouble = 0
+        atxChannelSideSlope.ValueDouble = 0
+        atxFloodplainSideSlope.ValueDouble = 0
 
         ToggleEstimateFields(False)
         TextLabel5.Enabled = False
@@ -81,19 +81,19 @@ Public Class frmNewFTable
     Private Sub DoEstimate()
         Dim Rtn, lChannelN As Double
 
-        Rtn = getMeanAnnualFlow_FPS(cboProv.SelectedIndex, atxDrainageArea.Value)
-        atxChannelWidth.Value = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
-        atxChannelDepth.Value = SignificantDigits(getMeanChannelDepth_Ft(cboProv.SelectedIndex, Rtn), 4) 'THIS ONE MODIFIED
-        lChannelN = SignificantDigits(getChannelManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
-        atxChannelManningsN.Value = CStr(lChannelN)
-        lChannelN = SignificantDigits(getFloodplainManningsN(cboProv.SelectedIndex, atxDrainageArea.Value, atxChannelSlope.Value), 5)
-        atxFloodplainManningsN.Value = CStr(lChannelN)
-        atxBankfullDepth.Value = SignificantDigits(getBankfullDepth_ft(Val(atxChannelDepth.Value)), 5)
-        atxMaximumFloodplainDepth.Value = SignificantDigits(getMaximumFloodplainDepth_ft(Val(atxChannelDepth.Value)), 5)
-        atxLeftSideFloodPlainWidth.Value = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
-        atxRightSideFloodPlainWidth.Value = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
-        atxChannelSideSlope.Value = SignificantDigits(getChannelSideSlope(), 5)
-        atxFloodplainSideSlope.Value = SignificantDigits(getFloodplainSideSlope(), 5)
+        Rtn = getMeanAnnualFlow_FPS(cboProv.SelectedIndex, atxDrainageArea.ValueDouble)
+        atxChannelWidth.ValueDouble = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
+        atxChannelDepth.ValueDouble = SignificantDigits(getMeanChannelDepth_Ft(cboProv.SelectedIndex, Rtn), 4) 'THIS ONE MODIFIED
+        lChannelN = SignificantDigits(getChannelManningsN(cboProv.SelectedIndex, atxDrainageArea.ValueDouble, atxChannelSlope.ValueDouble), 5)
+        atxChannelManningsN.ValueDouble = CStr(lChannelN)
+        lChannelN = SignificantDigits(getFloodplainManningsN(cboProv.SelectedIndex, atxDrainageArea.ValueDouble, atxChannelSlope.ValueDouble), 5)
+        atxFloodplainManningsN.ValueDouble = CStr(lChannelN)
+        atxBankfullDepth.ValueDouble = SignificantDigits(getBankfullDepth_ft(Val(atxChannelDepth.ValueDouble)), 5)
+        atxMaximumFloodplainDepth.ValueDouble = SignificantDigits(getMaximumFloodplainDepth_ft(Val(atxChannelDepth.ValueDouble)), 5)
+        atxLeftSideFloodPlainWidth.ValueDouble = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
+        atxRightSideFloodPlainWidth.ValueDouble = SignificantDigits(getMeanChannelWidth_Ft(cboProv.SelectedIndex, Rtn), 5)
+        atxChannelSideSlope.ValueDouble = SignificantDigits(getChannelSideSlope(), 5)
+        atxFloodplainSideSlope.ValueDouble = SignificantDigits(getFloodplainSideSlope(), 5)
     End Sub
     Private Sub cmdComputeFTable_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdComputeFTable.Click
 
@@ -104,18 +104,18 @@ Public Class frmNewFTable
         Dim lCol As Long
         Dim lFormat As String
 
-        getFTableForNaturalTrapezoidalChannel(CDbl(atxChannelLength.Value), _
-                                                    Val(atxChannelSlope.Value), _
-                                                    Val(atxChannelWidth.Value), _
-                                                    Val(atxChannelDepth.Value), _
-                                                    Val(atxChannelManningsN.Value), _
-                                                    Val(atxChannelSideSlope.Value), _
-                                                    Val(atxBankfullDepth.Value), _
-                                                    Val(atxFloodplainManningsN.Value), _
-                                                    Val(atxFloodplainSideSlope.Value), _
-                                                    Val(atxLeftSideFloodPlainWidth.Value), _
-                                                    Val(atxRightSideFloodPlainWidth.Value), _
-                                                    Val(atxMaximumFloodplainDepth.Value), _
+        getFTableForNaturalTrapezoidalChannel(CDbl(atxChannelLength.ValueDouble), _
+                                                    Val(atxChannelSlope.ValueDouble), _
+                                                    Val(atxChannelWidth.ValueDouble), _
+                                                    Val(atxChannelDepth.ValueDouble), _
+                                                    Val(atxChannelManningsN.ValueDouble), _
+                                                    Val(atxChannelSideSlope.ValueDouble), _
+                                                    Val(atxBankfullDepth.ValueDouble), _
+                                                    Val(atxFloodplainManningsN.ValueDouble), _
+                                                    Val(atxFloodplainSideSlope.ValueDouble), _
+                                                    Val(atxLeftSideFloodPlainWidth.ValueDouble), _
+                                                    Val(atxRightSideFloodPlainWidth.ValueDouble), _
+                                                    Val(atxMaximumFloodplainDepth.ValueDouble), _
                                                     Msg, lft)
         If (Msg <> "") Then
             MsgBox(Msg, vbOKOnly, "Compute New FTABLE Problem")
