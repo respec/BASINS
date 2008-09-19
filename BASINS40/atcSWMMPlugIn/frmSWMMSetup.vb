@@ -479,9 +479,9 @@ Public Class frmSWMMSetup
         Me.AtcConnectFields.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
+        Me.AtcConnectFields.Location = New System.Drawing.Point(2, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(550, 573)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(550, 334)
         Me.AtcConnectFields.TabIndex = 2
         '
         'TabPage6
@@ -1083,6 +1083,33 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+
+        'set field mapping as specified in field mapping tab
+        pNodeFieldMap.Clear()
+        pConduitFieldMap.Clear()
+        pCatchmentFieldMap.Clear()
+        For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
+            Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
+            Dim lBaseLen As Integer = 0
+            If Mid(lTxt, 1, 4) = "Node" Then
+                lBaseLen = 4
+            ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
+                lBaseLen = 7
+            ElseIf Mid(lTxt, 1, 9) = "Catchment" Then
+                lBaseLen = 9
+            End If
+            Dim lSpacePos As Integer = InStr(lTxt, " ")
+            Dim lGTPos As Integer = InStr(lTxt, ">")
+            Dim lSrc As String = Mid(lTxt, lBaseLen + 2, lSpacePos - lBaseLen - 2)
+            Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
+            If Mid(lTxt, 1, 4) = "Node" Then
+                pNodeFieldMap.Add(lSrc, lTar)
+            ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
+                pConduitFieldMap.Add(lSrc, lTar)
+            ElseIf Mid(lTxt, 1, 9) = "Catchment" Then
+                pCatchmentFieldMap.Add(lSrc, lTar)
+            End If
+        Next
 
         'set file names for nodes, conduits, and catchments
         Dim lNodesShapefileName As String = ""
