@@ -12,14 +12,23 @@ Public Module WatershedConstituentBalance
                               ByVal aOutletLocations As atcCollection, _
                               ByVal aRunMade As String, _
                      Optional ByVal aOutFilePrefix As String = "", _
-                     Optional ByVal aOutletDetails As Boolean = False)
+                     Optional ByVal aOutletDetails As Boolean = False, _
+                     Optional ByVal aSegmentRows As Boolean = False, _
+                     Optional ByVal aDecimalPlaces As Integer = 3, _
+                     Optional ByVal aSignificantDigits As Integer = 5, _
+                     Optional ByVal aFieldWidth As Integer = 12)
         For Each lOutletLocation As String In aOutletLocations
             Dim lString As Text.StringBuilder = Report(aUci, aBalanceType, _
                                                        aOperationTypes, _
                                                        aScenario, aScenarioResults, _
                                                        aRunMade, lOutletLocation, _
-                                                       aOutFilePrefix, True)
-            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_" & "Balance.txt")
+                                                       aOutFilePrefix, True, _
+                                                       aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth)
+            Dim lPivotString As String = ""
+            If aSegmentRows Then
+                lPivotString = "Pivot"
+            End If
+            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_" & "Balance" & lPivotString & ".txt")
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lString.ToString)
         Next lOutletLocation
@@ -154,7 +163,11 @@ Public Module WatershedConstituentBalance
                            ByVal aRunMade As String, _
                   Optional ByVal aOutletLocation As String = "", _
                   Optional ByVal aOutFilePrefix As String = "", _
-                  Optional ByVal aOutletDetails As Boolean = False) As Text.StringBuilder
+                  Optional ByVal aOutletDetails As Boolean = False, _
+                  Optional ByVal aSegmentRows As Boolean = False, _
+                  Optional ByVal aDecimalPlaces As Integer = 3, _
+                  Optional ByVal aSignificantDigits As Integer = 5, _
+                  Optional ByVal aFieldWidth As Integer = 12) As Text.StringBuilder
 
         Dim lOutletReport As Boolean = False
         If aOutletLocation.Length > 0 Then
@@ -179,6 +192,8 @@ Public Module WatershedConstituentBalance
                 lString.AppendLine("   (Units:mm)")
             End If
         End If
+        lString.AppendLine()
+        lString.AppendLine()
 
         Dim lConstituentDataGroup As atcDataGroup
         Dim lTempDataSet As atcDataSet
@@ -187,6 +202,7 @@ Public Module WatershedConstituentBalance
         Dim lOperationAreas As New atcCollection
         Dim lLandUseAreas As New atcCollection
         Dim lLandUseConstituentTotals As New atcCollection
+        Dim lFieldIndex As Integer
 
         Logger.Dbg("OperationTypesCount:" & aOperationTypes.Count)
         For Each lOperationType As String In aOperationTypes
@@ -194,134 +210,175 @@ Public Module WatershedConstituentBalance
             Dim lValueOutlet As Double = 0.0
             For Each lLandUse As String In lLandUses.Keys
                 If lOperationType.StartsWith(lLandUse.Substring(0, 1)) Then
-                    Dim lNeedHeader As Boolean = True
-                    Dim lLandUseOperations As atcCollection = lLandUses.ItemByKey(lLandUse)
-                    For Each lConstituentKey As String In lConstituentsToOutput.Keys
-                        If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
-                            Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
-                            lConstituentKey = lConstituentKey.Remove(0, 2)
-                            lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
-                            If lConstituentDataGroup.Count > 0 Then
-                                If lNeedHeader Then
-                                    lString.AppendLine(vbCrLf)
-                                    lString.AppendLine(aBalanceType & " Balance Report For " & lLandUse & vbCrLf)
-                                    'get operation description for header
-                                    lString.Append((lOperationType & ":").PadRight(12))
-                                    For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
-                                        Dim lOperationName As String = lLandUseOperations.Keys(lOperationIndex)
-                                        lString.Append(vbTab & (lOperationName & "  ").PadLeft(12))
-                                    Next
-                                    If lOutletReport And lOperationType <> "RCHRES" Then
-                                        lString.Append(vbTab & "WtdAvg  ".PadLeft(12))
-                                    End If
-                                    lString.AppendLine()
-                                    If lOutletReport And lOperationType <> "RCHRES" Then
-                                        lString.AppendLine()
-                                        lString.Append("Area".PadRight(12))
-                                        For Each lOperationKey As String In lLandUseOperations.Keys
-                                            Dim lOperationArea As Double = lLandUseOperations.ItemByKey(lOperationKey)
-                                            lString.Append(vbTab & DecimalAlign(lOperationArea))
-                                            lOperationAreas.Increment(lOperationKey, lOperationArea)
-                                            lLandUseAreas.Increment(lLandUse, lOperationArea)
-                                        Next
-                                        lString.Append(vbTab & DecimalAlign(lLandUseAreas.ItemByKey(lLandUse)))
-                                        lOperationTypeAreas.Increment(lOperationType, lLandUseAreas.ItemByKey(lLandUse))
-                                        lString.AppendLine(vbTab & "(Sum)")
-                                    End If
-                                    lNeedHeader = False
-                                End If
-                                If lPendingOutput.Length > 0 Then
-                                    lString.AppendLine(lPendingOutput)
-                                    lPendingOutput = ""
-                                End If
-                                lString.Append(lConstituentName.PadRight(12))
-                                Dim lWeightAccum As Double = 0.0
-                                Dim lValue As Double = 0.0
-                                For Each lLocation As String In lLandUseOperations.Keys
-                                    Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
-                                    If lLocationDataGroup.Count > 0 Then
-                                        lTempDataSet = lLocationDataGroup.Item(0)
-                                        Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
-                                        If lAttribute Is Nothing Then
-                                            lValue = GetNaN()
-                                        Else
-                                            lValue = lAttribute.Value
+                    Try
+                        Dim lNeedHeader As Boolean = True
+                        Dim lLandUseOperations As atcCollection = lLandUses.ItemByKey(lLandUse)
+                        Dim lOutputTable As New atcTableDelimited
+                        With lOutputTable
+                            For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                                If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
+                                    Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+                                    lConstituentKey = lConstituentKey.Remove(0, 2)
+                                    lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
+                                    If lConstituentDataGroup.Count > 0 Then
+                                        If lNeedHeader Then
+                                            'lString.AppendLine(vbCrLf)
+                                            'lString.AppendLine(aBalanceType & " Balance Report For " & lLandUse & vbCrLf)
+                                            .Delimiter = vbTab
+                                            .Header = aBalanceType & " Balance Report For " & lLandUse & vbCrLf & " "
+                                            .NumHeaderRows = 2
+                                            If lOutletReport And lOperationType <> "RCHRES" Then
+                                                .NumFields = lLandUseOperations.Count + 2
+                                            Else
+                                                .NumFields = lLandUseOperations.Count + 1
+                                            End If
+                                            'get operation description for header
+                                            'lString.Append((lOperationType & ":").PadRight(12))
+                                            .FieldLength(1) = 12
+                                            .FieldName(1) = (lOperationType & ":").PadRight(.FieldLength(1))
+                                            lFieldIndex = 1
+                                            For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
+                                                Dim lOperationName As String = lLandUseOperations.Keys(lOperationIndex)
+                                                'lString.Append(vbTab & (lOperationName & "  ").PadLeft(12))
+                                                lFieldIndex += 1
+                                                .FieldLength(lFieldIndex) = 12
+                                                .FieldName(lFieldIndex) = (lOperationName & "  ").PadLeft(.FieldLength(lFieldIndex))
+                                            Next
+                                            If lOutletReport And lOperationType <> "RCHRES" Then
+                                                'lString.Append(vbTab & "WtdAvg  ".PadLeft(12))
+                                                lFieldIndex += 1
+                                                .FieldLength(lFieldIndex) = 12
+                                                .FieldName(lFieldIndex) = ("WtdAvg  ").PadLeft(.FieldLength(lFieldIndex))
+                                            End If
+                                            .CurrentRecord = 1
+                                            'lString.AppendLine()
+                                            If lOutletReport And lOperationType <> "RCHRES" Then
+                                                'lString.AppendLine()
+                                                'lString.Append("Area".PadRight(12))
+                                                .Value(1) = "Area".PadRight(12)
+                                                lFieldIndex = 1
+                                                For Each lOperationKey As String In lLandUseOperations.Keys
+                                                    Dim lOperationArea As Double = lLandUseOperations.ItemByKey(lOperationKey)
+                                                    'lString.Append(vbTab & DecimalAlign(lOperationArea))
+                                                    lFieldIndex += 1
+                                                    .Value(lFieldIndex) = DecimalAlign(lOperationArea)
+                                                    lOperationAreas.Increment(lOperationKey, lOperationArea)
+                                                    lLandUseAreas.Increment(lLandUse, lOperationArea)
+                                                Next
+                                                'lString.Append(vbTab & DecimalAlign(lLandUseAreas.ItemByKey(lLandUse)))
+                                                lFieldIndex += 1
+                                                .Value(lFieldIndex) = DecimalAlign(lLandUseAreas.ItemByKey(lLandUse))
+                                                lOperationTypeAreas.Increment(lOperationType, lLandUseAreas.ItemByKey(lLandUse))
+                                                .CurrentRecord += 1
+                                                'lString.AppendLine(vbTab & "(Sum)")
+                                            End If
+                                            lNeedHeader = False
                                         End If
-                                    Else
-                                        lValue = 0.0
-                                        'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")
-                                    End If
-                                    lString.Append(vbTab & DecimalAlign(lValue))
-                                    If lOutletReport Then
-                                        If lOperationType <> "RCHRES" Then
-                                            lWeightAccum += lValue * lOperationAreas.ItemByKey(lLocation)
-                                        ElseIf lLocation = aOutletLocation Then
-                                            lValueOutlet = lValue * 12  'feet to inches
+                                        If lPendingOutput.Length > 0 Then
+                                            Dim lPendingRecords() As String = lPendingOutput.Split(vbCr)
+                                            For Each lPendingRecord As String In lPendingRecords
+                                                .Value(1) = lPendingRecord
+                                                .CurrentRecord += 1
+                                            Next
+                                            lPendingOutput = ""
                                         End If
-                                    End If
-                                Next lLocation
+                                        'lString.Append(lConstituentName.PadRight(12))
+                                        .Value(1) = lConstituentName.PadRight(12)
+                                        Dim lWeightAccum As Double = 0.0
+                                        Dim lValue As Double = 0.0
+                                        lFieldIndex = 1
 
-                                If lOutletReport Then
-                                    Dim lConstituentTotalKey As String = lOperationType.Substring(0, 1) & ":" & lConstituentKey
-                                    If lOperationType <> "RCHRES" Then
-                                        lLandUseConstituentTotals.Increment(lConstituentTotalKey & "-" & lLandUse, lWeightAccum)
-                                        lConstituentTotals.Increment(lConstituentTotalKey, lWeightAccum)
-                                        lString.Append(vbTab & DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse)))
-                                    ElseIf Math.Abs(lValueOutlet) > 0.00001 Then
-                                        Dim lConstituentTotalKeyIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentTotalKey)
-                                        lConstituentTotals.Increment(lConstituentTotalKey, lValueOutlet)
-                                        lValueOutlet = 0.0
-                                    End If
-                                End If
-                                lString.AppendLine()
-                            ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                   lConstituentKey.Length > 5 AndAlso _
-                                   IsNumeric(lConstituentKey.Substring(5)) Then
-                                Dim lTotalCount As Integer = lConstituentKey.Substring(5)
-                                Dim lStr As String = lString.ToString
-                                Dim lCurFields() As String
-                                Dim lCurFieldValues(1) As Double
-                                Dim lRecStartPos As Integer
-                                Dim lRecEndPos As Integer = lStr.LastIndexOf(vbCr)
-                                For lCount As Integer = 1 To lTotalCount
-                                    lRecStartPos = lStr.LastIndexOf(vbCr, lRecEndPos - 1)
-                                    lCurFields = lStr.Substring(lRecStartPos, lRecEndPos - lRecStartPos).Split(vbTab)
-                                    If lCount = 1 Then
-                                        ReDim lCurFieldValues(lCurFields.GetUpperBound(0))
-                                        lCurFieldValues.Initialize()
-                                    End If
-                                    For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
-                                        If lCurFields(lFieldPos).Trim.Length > 0 Then
-                                            lCurFieldValues(lFieldPos) += lCurFields(lFieldPos)
+                                        For Each lLocation As String In lLandUseOperations.Keys
+                                            Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
+                                            If lLocationDataGroup.Count > 0 Then
+                                                lTempDataSet = lLocationDataGroup.Item(0)
+                                                Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                                If lAttribute Is Nothing Then
+                                                    lValue = GetNaN()
+                                                Else
+                                                    lValue = lAttribute.Value
+                                                End If
+                                            Else
+                                                lValue = 0.0
+                                                'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")
+                                            End If
+                                            lFieldIndex += 1
+                                            .Value(lFieldIndex) = DecimalAlign(lValue)
+                                            'lString.Append(vbTab & DecimalAlign(lValue))
+                                            If lOutletReport Then
+                                                If lOperationType <> "RCHRES" Then
+                                                    lWeightAccum += lValue * lOperationAreas.ItemByKey(lLocation)
+                                                ElseIf lLocation = aOutletLocation Then
+                                                    lValueOutlet = lValue * 12  'feet to inches
+                                                End If
+                                            End If
+                                        Next lLocation
+
+                                        If lOutletReport Then
+                                            Dim lConstituentTotalKey As String = lOperationType.Substring(0, 1) & ":" & lConstituentKey
+                                            If lOperationType <> "RCHRES" Then
+                                                lLandUseConstituentTotals.Increment(lConstituentTotalKey & "-" & lLandUse, lWeightAccum)
+                                                lConstituentTotals.Increment(lConstituentTotalKey, lWeightAccum)
+                                                'lString.Append(vbTab & DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse)))
+                                                lFieldIndex += 1
+                                                .Value(lFieldIndex) = DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse))
+                                            ElseIf Math.Abs(lValueOutlet) > 0.00001 Then
+                                                Dim lConstituentTotalKeyIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentTotalKey)
+                                                lConstituentTotals.Increment(lConstituentTotalKey, lValueOutlet)
+                                                lValueOutlet = 0.0
+                                            End If
                                         End If
-                                    Next
-                                    lRecEndPos = lRecStartPos
-                                Next
-                                lString.Append(lConstituentName.PadRight(12))
-                                For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
-                                    Dim lValue As Double = lCurFieldValues(lFieldPos)
-                                    lString.Append(vbTab & DecimalAlign(lValue))
-                                Next
-                                lString.AppendLine()
-                            Else
-                                If lPendingOutput.Length > 0 Then
-                                    lPendingOutput &= vbCrLf
-                                End If
-                                If lConstituentKey.StartsWith("Header") Then
-                                    lPendingOutput &= vbCrLf
-                                End If
-                                lPendingOutput &= lConstituentName
-                                If Not lConstituentKey.StartsWith("Header") Then
-                                    For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
-                                        lPendingOutput &= vbTab & DecimalAlign(0.0)
-                                    Next
-                                    If lOutletReport And lOperationType <> "RCHRES" Then
-                                        lPendingOutput &= vbTab & DecimalAlign(0.0)
+                                        'lString.AppendLine()
+                                        .CurrentRecord += 1
+                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso _
+                                           lConstituentKey.Length > 5 AndAlso _
+                                           IsNumeric(lConstituentKey.Substring(5)) Then
+                                        Dim lTotalCount As Integer = lConstituentKey.Substring(5)
+                                        Dim lCurFieldValues(.NumFields) As Double
+                                        Dim lCurrentRecordSave As Integer = .CurrentRecord
+                                        For lCount As Integer = 1 To lTotalCount
+                                            .CurrentRecord -= 1
+                                            For lFieldIndex = 2 To lCurFieldValues.GetUpperBound(0)
+                                                If IsNumeric(.Value(lFieldIndex)) Then
+                                                    lCurFieldValues(lFieldIndex) += .Value(lFieldIndex)
+                                                Else
+                                                    Logger.Dbg("Why")
+                                                End If
+                                            Next
+                                        Next
+                                        .CurrentRecord = lCurrentRecordSave
+                                        .Value(1) = lConstituentName.PadRight(12)
+                                        For lFieldIndex = 2 To lCurFieldValues.GetUpperBound(0)
+                                            .Value(lFieldIndex) = DecimalAlign(lCurFieldValues(lFieldIndex))
+                                        Next
+                                        .CurrentRecord += 1
+                                    Else
+                                        If lPendingOutput.Length > 0 Then
+                                            lPendingOutput &= vbCrLf
+                                        ElseIf lConstituentKey.StartsWith("Header") Then
+                                            lPendingOutput &= vbCrLf
+                                        End If
+                                        lPendingOutput &= lConstituentName
+                                        If Not lConstituentKey.StartsWith("Header") Then
+                                            For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
+                                                lPendingOutput &= vbTab & DecimalAlign(0.0)
+                                            Next
+                                            If lOutletReport And lOperationType <> "RCHRES" Then
+                                                lPendingOutput &= vbTab & DecimalAlign(0.0)
+                                            End If
+                                        End If
                                     End If
                                 End If
+                            Next lConstituentKey
+                            If aSegmentRows Then
+                                lString.AppendLine(.ToStringPivoted)
+                            Else
+                                lString.AppendLine(.ToString)
                             End If
-                        End If
-                    Next lConstituentKey
+                        End With
+                    Catch lEx As Exception
+                        Logger.Dbg(lEx.Message)
+                    End Try
                 End If
             Next lLandUse
         Next lOperationType
