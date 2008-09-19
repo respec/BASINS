@@ -481,7 +481,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(2, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(550, 334)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(554, 334)
         Me.AtcConnectFields.TabIndex = 2
         '
         'TabPage6
@@ -1091,23 +1091,33 @@ Public Class frmSWMMSetup
         For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
             Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
             Dim lBaseLen As Integer = 0
+            Dim lBaseName As String = ""
             If Mid(lTxt, 1, 4) = "Node" Then
                 lBaseLen = 4
+                lBaseName = "Node"
             ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
                 lBaseLen = 7
+                lBaseName = "Conduit"
             ElseIf Mid(lTxt, 1, 9) = "Catchment" Then
                 lBaseLen = 9
+                lBaseName = "Catchment"
             End If
             Dim lSpacePos As Integer = InStr(lTxt, " ")
             Dim lGTPos As Integer = InStr(lTxt, ">")
             Dim lSrc As String = Mid(lTxt, lBaseLen + 2, lSpacePos - lBaseLen - 2)
-            Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
-            If Mid(lTxt, 1, 4) = "Node" Then
-                pNodeFieldMap.Add(lSrc, lTar)
-            ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
-                pConduitFieldMap.Add(lSrc, lTar)
-            ElseIf Mid(lTxt, 1, 9) = "Catchment" Then
-                pCatchmentFieldMap.Add(lSrc, lTar)
+
+            If Mid(lTxt, lGTPos + 2, lBaseLen) = lBaseName Then
+                Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
+                If Mid(lTxt, 1, 4) = "Node" Then
+                    pNodeFieldMap.Add(lSrc, lTar)
+                ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
+                    pConduitFieldMap.Add(lSrc, lTar)
+                ElseIf Mid(lTxt, 1, 9) = "Catchment" Then
+                    pCatchmentFieldMap.Add(lSrc, lTar)
+                End If
+            Else
+                'trying to add field mapping of different types, like a node to a catchment, wont work
+                Logger.Dbg("Problem adding field map " & lTxt)
             End If
         Next
 
