@@ -33,12 +33,17 @@ Public Class frmIwatEdit
                 lOptionVals.Add(tempTable.Parms(lOper).Value)
             Next
         Next
-
+        lPrevCboLandIndex = -1
         cboLand.SelectedIndex = 0
     End Sub
 
     Private Sub cboLand_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLand.SelectedIndexChanged
         Dim lOper As Integer
+
+        If lPrevCboLandIndex <> -1 Then
+            StoreChanges(lPrevCboLandIndex)
+        End If
+
 
         'after user changed combo list, use to refresh values
         If chkAssign.Checked = False Then
@@ -82,6 +87,7 @@ Public Class frmIwatEdit
 
         End If
 
+        lPrevCboLandIndex = cboLand.SelectedIndex
     End Sub
 
 

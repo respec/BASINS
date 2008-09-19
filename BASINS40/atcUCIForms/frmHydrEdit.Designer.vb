@@ -33,17 +33,17 @@ Partial Class frmHydrEdit
         Me.radio2n3 = New System.Windows.Forms.RadioButton
         Me.radio2n2 = New System.Windows.Forms.RadioButton
         Me.radio2n1 = New System.Windows.Forms.RadioButton
+        Me.atxGt = New atcControls.atcText
+        Me.atxFvol = New atcControls.atcText
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox
+        Me.chkAssignExit = New System.Windows.Forms.CheckBox
         Me.cboExit = New System.Windows.Forms.ComboBox
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.RadioButton2 = New System.Windows.Forms.RadioButton
         Me.RadioButton3 = New System.Windows.Forms.RadioButton
         Me.ComboBox1 = New System.Windows.Forms.ComboBox
-        Me.atxGt = New atcControls.atcText
-        Me.atxFvol = New atcControls.atcText
         Me.AtcText2 = New atcControls.atcText
         Me.AtcText1 = New atcControls.atcText
         Me.GroupBox7.SuspendLayout()
@@ -148,7 +148,7 @@ Partial Class frmHydrEdit
         Me.GroupBox1.Controls.Add(Me.atxFvol)
         Me.GroupBox1.Controls.Add(Me.Label3)
         Me.GroupBox1.Controls.Add(Me.Label2)
-        Me.GroupBox1.Controls.Add(Me.CheckBox1)
+        Me.GroupBox1.Controls.Add(Me.chkAssignExit)
         Me.GroupBox1.Controls.Add(Me.cboExit)
         Me.GroupBox1.Location = New System.Drawing.Point(15, 197)
         Me.GroupBox1.Name = "GroupBox1"
@@ -202,6 +202,52 @@ Partial Class frmHydrEdit
         Me.radio2n1.Text = "Smaller of F(vol) and G(t)"
         Me.radio2n1.UseVisualStyleBackColor = True
         '
+        'atxGt
+        '
+        Me.atxGt.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxGt.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxGt.DefaultValue = ""
+        Me.atxGt.HardMax = -999
+        Me.atxGt.HardMin = -999
+        Me.atxGt.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxGt.Location = New System.Drawing.Point(268, 96)
+        Me.atxGt.MaxWidth = -999
+        Me.atxGt.Name = "atxGt"
+        Me.atxGt.NumericFormat = "0.#####"
+        Me.atxGt.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxGt.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxGt.SelLength = 1
+        Me.atxGt.SelStart = 0
+        Me.atxGt.Size = New System.Drawing.Size(91, 25)
+        Me.atxGt.SoftMax = -999
+        Me.atxGt.SoftMin = -999
+        Me.atxGt.TabIndex = 22
+        Me.atxGt.ValueDouble = 0
+        Me.atxGt.ValueInteger = 0
+        '
+        'atxFvol
+        '
+        Me.atxFvol.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxFvol.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxFvol.DefaultValue = ""
+        Me.atxFvol.HardMax = -999
+        Me.atxFvol.HardMin = -999
+        Me.atxFvol.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxFvol.Location = New System.Drawing.Point(268, 65)
+        Me.atxFvol.MaxWidth = -999
+        Me.atxFvol.Name = "atxFvol"
+        Me.atxFvol.NumericFormat = "0.#####"
+        Me.atxFvol.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxFvol.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxFvol.SelLength = 1
+        Me.atxFvol.SelStart = 0
+        Me.atxFvol.Size = New System.Drawing.Size(91, 25)
+        Me.atxFvol.SoftMax = -999
+        Me.atxFvol.SoftMin = -999
+        Me.atxFvol.TabIndex = 21
+        Me.atxFvol.ValueDouble = 0
+        Me.atxFvol.ValueInteger = 0
+        '
         'Label3
         '
         Me.Label3.AutoSize = True
@@ -220,15 +266,15 @@ Partial Class frmHydrEdit
         Me.Label2.TabIndex = 19
         Me.Label2.Text = "F(vol) component of the outflow demand (ODFVFG)"
         '
-        'CheckBox1
+        'chkAssignExit
         '
-        Me.CheckBox1.AutoSize = True
-        Me.CheckBox1.Location = New System.Drawing.Point(238, 31)
-        Me.CheckBox1.Name = "CheckBox1"
-        Me.CheckBox1.Size = New System.Drawing.Size(112, 17)
-        Me.CheckBox1.TabIndex = 18
-        Me.CheckBox1.Text = "Assign To All Exits"
-        Me.CheckBox1.UseVisualStyleBackColor = True
+        Me.chkAssignExit.AutoSize = True
+        Me.chkAssignExit.Location = New System.Drawing.Point(238, 31)
+        Me.chkAssignExit.Name = "chkAssignExit"
+        Me.chkAssignExit.Size = New System.Drawing.Size(112, 17)
+        Me.chkAssignExit.TabIndex = 18
+        Me.chkAssignExit.Text = "Assign To All Exits"
+        Me.chkAssignExit.UseVisualStyleBackColor = True
         '
         'cboExit
         '
@@ -288,46 +334,6 @@ Partial Class frmHydrEdit
         Me.ComboBox1.Size = New System.Drawing.Size(212, 21)
         Me.ComboBox1.TabIndex = 18
         '
-        'atxGt
-        '
-        Me.atxGt.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxGt.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.atxGt.DefaultValue = ""
-        Me.atxGt.HardMax = -999
-        Me.atxGt.HardMin = -999
-        Me.atxGt.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxGt.Location = New System.Drawing.Point(268, 96)
-        Me.atxGt.MaxWidth = -999
-        Me.atxGt.Name = "atxGt"
-        Me.atxGt.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxGt.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxGt.SelLength = 0
-        Me.atxGt.SelStart = 0
-        Me.atxGt.Size = New System.Drawing.Size(91, 25)
-        Me.atxGt.SoftMax = -999
-        Me.atxGt.SoftMin = -999
-        Me.atxGt.TabIndex = 22
-        '
-        'atxFvol
-        '
-        Me.atxFvol.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxFvol.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.atxFvol.DefaultValue = ""
-        Me.atxFvol.HardMax = -999
-        Me.atxFvol.HardMin = -999
-        Me.atxFvol.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxFvol.Location = New System.Drawing.Point(268, 65)
-        Me.atxFvol.MaxWidth = -999
-        Me.atxFvol.Name = "atxFvol"
-        Me.atxFvol.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxFvol.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxFvol.SelLength = 0
-        Me.atxFvol.SelStart = 0
-        Me.atxFvol.Size = New System.Drawing.Size(91, 25)
-        Me.atxFvol.SoftMax = -999
-        Me.atxFvol.SoftMin = -999
-        Me.atxFvol.TabIndex = 21
-        '
         'AtcText2
         '
         Me.AtcText2.Alignment = System.Windows.Forms.HorizontalAlignment.Left
@@ -339,14 +345,17 @@ Partial Class frmHydrEdit
         Me.AtcText2.Location = New System.Drawing.Point(268, 96)
         Me.AtcText2.MaxWidth = -999
         Me.AtcText2.Name = "AtcText2"
+        Me.AtcText2.NumericFormat = "0.#####"
         Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText2.SelLength = 0
+        Me.AtcText2.SelLength = 1
         Me.AtcText2.SelStart = 0
         Me.AtcText2.Size = New System.Drawing.Size(91, 25)
         Me.AtcText2.SoftMax = -999
         Me.AtcText2.SoftMin = -999
         Me.AtcText2.TabIndex = 22
+        Me.AtcText2.ValueDouble = 0
+        Me.AtcText2.ValueInteger = 0
         '
         'AtcText1
         '
@@ -359,14 +368,17 @@ Partial Class frmHydrEdit
         Me.AtcText1.Location = New System.Drawing.Point(268, 65)
         Me.AtcText1.MaxWidth = -999
         Me.AtcText1.Name = "AtcText1"
+        Me.AtcText1.NumericFormat = "0.#####"
         Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText1.SelLength = 0
+        Me.AtcText1.SelLength = 1
         Me.AtcText1.SelStart = 0
         Me.AtcText1.Size = New System.Drawing.Size(91, 25)
         Me.AtcText1.SoftMax = -999
         Me.AtcText1.SoftMin = -999
         Me.AtcText1.TabIndex = 21
+        Me.AtcText1.ValueDouble = 0
+        Me.AtcText1.ValueInteger = 0
         '
         'frmHydrEdit
         '
@@ -405,7 +417,7 @@ Partial Class frmHydrEdit
     Friend WithEvents chkAux2 As System.Windows.Forms.CheckBox
     Friend WithEvents chkAux1 As System.Windows.Forms.CheckBox
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAssignExit As System.Windows.Forms.CheckBox
     Friend WithEvents cboExit As System.Windows.Forms.ComboBox
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents radio2n3 As System.Windows.Forms.RadioButton
