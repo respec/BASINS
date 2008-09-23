@@ -196,7 +196,8 @@ Public Class SWMMProject
         Return True
     End Function
 
-    Public Function PrecipTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String) As String
+    Public Function PrecipTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, _
+                                             ByVal aTimeseriesTag As String) As String
         Dim lSB As New StringBuilder
 
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
@@ -229,7 +230,9 @@ Public Class SWMMProject
         Return lSB.ToString
     End Function
 
-    Public Sub TimeSeriesToStream(ByVal aTimeSeries As atcData.atcTimeseries, ByVal aTimeseriesTag As String, ByVal aSW As IO.StreamWriter)
+    Public Sub TimeSeriesToStream(ByVal aTimeSeries As atcData.atcTimeseries, _
+                                  ByVal aTimeseriesTag As String, _
+                                  ByVal aSW As IO.StreamWriter)
 
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
         If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
@@ -259,6 +262,7 @@ Public Class SWMMProject
             Dim lSWMMexe As String = atcUtility.FindFile("Please locate the EPA SWMM 5.0 Executable", "\Program Files\EPA SWMM 5.0\epaswmm5.exe")
             If IO.File.Exists(lSWMMexe) Then
                 LaunchProgram(lSWMMexe, IO.Path.GetDirectoryName(aInputFileName), "/f " & aInputFileName, False)
+                Logger.Dbg("SWMM launched with input " & aInputFileName)
             Else
                 Logger.Msg("Cannot find the EPA SWMM 5.0 Executable", MsgBoxStyle.Critical, "BASINS SWMM Problem")
             End If

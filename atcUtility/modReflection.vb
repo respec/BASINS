@@ -598,6 +598,7 @@ Public Module modReflection
         Return aObjects
     End Function
 
+
     ''' <summary>
     ''' Set a property or field given its name and a new value
     ''' </summary>
@@ -605,8 +606,20 @@ Public Module modReflection
     ''' <param name="aFieldName">Name of property or field to set</param>
     ''' <param name="aValue">New value to set</param>
     Public Function SetSomething(ByRef aObject As Object, ByVal aFieldName As String, ByVal aValue As Object) As Boolean
+        Return (SetSomething(aObject, aFieldName, aValue, True).Length = 0)
+    End Function
+
+    ''' <summary>
+    ''' Set a property or field given its name and a new value
+    ''' </summary>
+    ''' <param name="aObject">Object whose property or field needs to be set</param>
+    ''' <param name="aFieldName">Name of property or field to set</param>
+    ''' <param name="aValue">New value to set</param>
+    ''' <param name="aLogProblems">Quiet flag</param>
+    Public Function SetSomething(ByRef aObject As Object, ByVal aFieldName As String, ByVal aValue As Object, _
+                                 ByVal aLogProblems As Boolean) As String
+        Dim lSetSomething As String = ""
         Dim lType As Type = aObject.GetType
-        SetSomething = True
         Dim lProperty As Reflection.PropertyInfo = lType.GetProperty(aFieldName)
         If lProperty IsNot Nothing Then
             Select Case Type.GetTypeCode(lProperty.PropertyType)
@@ -626,8 +639,7 @@ Public Module modReflection
                 Case TypeCode.UInt32 : lProperty.SetValue(aObject, CUInt(aValue), Nothing)
                 Case TypeCode.UInt64 : lProperty.SetValue(aObject, CULng(aValue), Nothing)
                 Case Else
-                    Logger.Dbg("Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lProperty.PropertyType.Name)
-                    SetSomething = False
+                    lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lProperty.PropertyType.Name
             End Select
         Else
             Dim lField As Reflection.FieldInfo = lType.GetField(aFieldName)
@@ -649,14 +661,16 @@ Public Module modReflection
                     Case TypeCode.UInt32 : lField.SetValue(aObject, CUInt(aValue))
                     Case TypeCode.UInt64 : lField.SetValue(aObject, CULng(aValue))
                     Case Else
-                        Logger.Dbg("Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lField.FieldType.Name)
-                        SetSomething = False
+                        lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lField.FieldType.Name
                 End Select
             Else
-                Logger.Dbg("Unable to set " & lType.Name & "." & aFieldName & ": unknown field or property")
-                SetSomething = False
+                lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown field or property"
             End If
         End If
+        If aLogProblems AndAlso lSetSomething.Length > 0 Then
+            Logger.Dbg(lSetSomething)
+        End If
+        Return lSetSomething
     End Function
 
 
