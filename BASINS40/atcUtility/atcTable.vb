@@ -406,9 +406,9 @@ Public MustInherit Class atcTable
         For lFieldNumber = 1 To Me.NumFields
             Dim lFieldName As String = Me.FieldName(lFieldNumber)
             If aFieldMap IsNot Nothing AndAlso aFieldMap.Keys.Contains(lFieldName) Then
-                SetSomething(aObject, aFieldMap.ItemByKey(lFieldName), Value(lFieldNumber))
+                SetSomething(aObject, aFieldMap.ItemByKey(lFieldName), Value(lFieldNumber), False)
             Else
-                SetSomething(aObject, lFieldName, Value(lFieldNumber))
+                SetSomething(aObject, lFieldName, Value(lFieldNumber), False)
             End If
         Next
     End Sub

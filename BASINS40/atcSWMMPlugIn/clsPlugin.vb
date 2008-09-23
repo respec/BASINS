@@ -43,10 +43,15 @@ Public Class PlugIn
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = ModelsMenuName & "_SWMM" Then
             Dim lfrmSWMMSetup As New frmSWMMSetup
-            lfrmSWMMSetup.InitializeUI(Me)
-            lfrmSWMMSetup.Show()
-            lfrmSWMMSetup.InitializeMetStationList()
-            aHandled = True
+            With lfrmSWMMSetup
+                .InitializeUI(Me)
+                Logger.Dbg("SWMMSetup Initialized")
+                .Show()
+                Logger.Dbg("SWMMSetup Shown")
+                .InitializeMetStationList()
+                .EnableControls(True)
+                aHandled = True
+            End With
         End If
     End Sub
 

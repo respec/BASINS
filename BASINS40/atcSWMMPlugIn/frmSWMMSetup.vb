@@ -685,6 +685,7 @@ Public Class frmSWMMSetup
     Friend pCatchmentFieldMap As New atcUtility.atcCollection
     Friend pPrecStations As atcCollection
     Friend pMetStations As atcCollection
+    Private pInitializing As Boolean = True
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
@@ -712,6 +713,7 @@ Public Class frmSWMMSetup
 
     Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExisting.Click
         If ofdExisting.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Logger.Dbg("Run SWMM with " & ofdExisting.FileName)
             pPlugIn.SWMMProject.Run(ofdExisting.FileName)
         End If
     End Sub
@@ -729,6 +731,7 @@ Public Class frmSWMMSetup
     Private Sub cboLandUseLayer_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLandUseLayer.SelectedIndexChanged
         cboDescription.Items.Clear()
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex))
+        Logger.Dbg("LandUseLayerIndex " & lLayerIndex & "(" & cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex) & ")")
         If lLayerIndex > -1 Then
             If cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Grid" Then
                 'make sure this is a grid layer
@@ -758,15 +761,18 @@ Public Class frmSWMMSetup
         SetPerviousGrid()
     End Sub
 
-    Private Sub EnableControls(ByVal aEnabled As Boolean)
+    Friend Sub EnableControls(ByVal aEnabled As Boolean)
         cmdOK.Enabled = aEnabled
         cmdExisting.Enabled = aEnabled
-        cmdHelp.Enabled = aEnabled
         cmdCancel.Enabled = aEnabled
-        cmdAbout.Enabled = aEnabled
+        If Not pInitializing Then
+            cmdHelp.Enabled = aEnabled
+            cmdAbout.Enabled = aEnabled
+        End If
     End Sub
 
     Private Sub SetLanduseTab(ByVal aLanduseSelection As String)
+        Logger.Dbg("SetLanduseTab " & aLanduseSelection)
         If aLanduseSelection = "USGS GIRAS Shapefile" Then
             cboLandUseLayer.Visible = False
             lblLandUseLayer.Visible = False
@@ -833,222 +839,228 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub SetPerviousGrid()
-        If AtcGridPervious.Source Is Nothing Then Exit Sub
-
-        AtcGridPervious.Clear()
-        With AtcGridPervious.Source
-            .Rows = 1
-            .Columns = 5
-            .CellValue(0, 0) = "Code"
-            .CellValue(0, 1) = "Group Description"
-            .CellValue(0, 2) = "Impervious Percent"
-            .CellValue(0, 3) = "Multiplier"
-            .CellValue(0, 4) = "Subbasin"
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 2
-        End With
-
-        If lblClass.Text <> "<none>" And _
-          (cboLandUseLayer.Visible = False Or _
-          (cboLandUseLayer.Visible And cboLandUseLayer.SelectedIndex > -1)) Then
-            'giras, nlcd, or other with reclass file set
-            Dim lReclassTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lblClass.Text)
-            'do pre-scan to set up grid
-            Dim lPrevCode As Integer = -1
-            Dim lShowMults As Boolean = False
-            Dim lShowCodes As Boolean = False
-            Dim lGroupNames As New Collection
-            Dim lGroupPercent As New Collection  'dont want to use atccollection because we may want to add mult times
-            Dim lGroupIndex As Integer
-            For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
-                'scan to see if multiple records for the same code
-                lReclassTable.CurrentRecord = lRecordIndex
-                Dim lCode As Long = lReclassTable.Value(1)
-                If lCode = lPrevCode Then
-                    lShowMults = True
-                End If
-                lPrevCode = lCode
-                'scan to see if perv percent varies within a group
-                Dim lInCollection As Boolean = False
-                For lGroupIndex = 1 To lGroupNames.Count
-                    If lGroupNames(lGroupIndex) = lReclassTable.Value(2) Then
-                        lInCollection = True
-                        If lGroupPercent(lGroupIndex) <> lReclassTable.Value(3) Then
-                            lShowCodes = True
-                        End If
-                        Exit For
-                    End If
-                Next lGroupIndex
-
-                If Not lInCollection Then
-                    lGroupNames.Add(lReclassTable.Value(2))
-                    lGroupPercent.Add(lReclassTable.Value(3))
-                End If
-            Next lRecordIndex
-
-            If lShowMults Then
-                lShowCodes = True
-            End If
-
-            'sort list items
-            Dim llReclassTableSorted As New atcCollection
-            For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
-                lReclassTable.CurrentRecord = lRecordIndex
-                llReclassTableSorted.Add(lRecordIndex, lReclassTable.Value(1))
-            Next lRecordIndex
-            llReclassTableSorted.SortByValue()
-
-            'now populate grid
+        If AtcGridPervious.Source Is Nothing Then
+            Logger.Dbg("No atcGridPervious to Set")
+        Else
+            AtcGridPervious.Clear()
             With AtcGridPervious.Source
-                For Each lRow As Integer In llReclassTableSorted.Keys
-                    lReclassTable.CurrentRecord = lRow
-                    If Not lShowCodes Then
-                        'just show group desc and percent perv
-                        Dim lInCollection As Boolean = False
-                        For lRowIndex As Integer = 1 To .Rows
-                            If .CellValue(lRowIndex - 1, 1) = lReclassTable.Value(2) Then
-                                lInCollection = True
-                            End If
-                        Next
-                        If Not lInCollection Then
-                            .Rows += 1
-                            .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
-                            .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
-                            .CellEditable(.Rows - 1, 2) = True
-                            .CellColor(.Rows - 1, 1) = Me.BackColor
-                        End If
-                    Else 'need to show whole table
-                        If lReclassTable.Value(1) > 0 Then
-                            .Rows += 1
-                            .CellValue(.Rows - 1, 0) = lReclassTable.Value(1)
-                            .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
-                            .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
-                            .CellValue(.Rows - 1, 3) = lReclassTable.Value(4)
-                            .CellValue(.Rows - 1, 4) = lReclassTable.Value(5)
-                        End If
-                    End If
-                Next
+                .Rows = 1
+                .Columns = 5
+                .CellValue(0, 0) = "Code"
+                .CellValue(0, 1) = "Group Description"
+                .CellValue(0, 2) = "Impervious Percent"
+                .CellValue(0, 3) = "Multiplier"
+                .CellValue(0, 4) = "Subbasin"
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 2
             End With
 
-            AtcGridPervious.SizeAllColumnsToContents()
-            If lShowMults Then
-                lShowCodes = True
-            Else
+            If lblClass.Text <> "<none>" And _
+              (cboLandUseLayer.Visible = False Or _
+              (cboLandUseLayer.Visible And cboLandUseLayer.SelectedIndex > -1)) Then
+                'giras, nlcd, or other with reclass file set
+                Dim lReclassTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lblClass.Text)
+                'do pre-scan to set up grid
+                Dim lPrevCode As Integer = -1
+                Dim lShowMults As Boolean = False
+                Dim lShowCodes As Boolean = False
+                Dim lGroupNames As New Collection
+                Dim lGroupPercent As New Collection  'dont want to use atccollection because we may want to add mult times
+                Dim lGroupIndex As Integer
+                For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
+                    'scan to see if multiple records for the same code
+                    lReclassTable.CurrentRecord = lRecordIndex
+                    Dim lCode As Long = lReclassTable.Value(1)
+                    If lCode = lPrevCode Then
+                        lShowMults = True
+                    End If
+                    lPrevCode = lCode
+                    'scan to see if perv percent varies within a group
+                    Dim lInCollection As Boolean = False
+                    For lGroupIndex = 1 To lGroupNames.Count
+                        If lGroupNames(lGroupIndex) = lReclassTable.Value(2) Then
+                            lInCollection = True
+                            If lGroupPercent(lGroupIndex) <> lReclassTable.Value(3) Then
+                                lShowCodes = True
+                            End If
+                            Exit For
+                        End If
+                    Next lGroupIndex
+
+                    If Not lInCollection Then
+                        lGroupNames.Add(lReclassTable.Value(2))
+                        lGroupPercent.Add(lReclassTable.Value(3))
+                    End If
+                Next lRecordIndex
+
+                If lShowMults Then
+                    lShowCodes = True
+                End If
+
+                'sort list items
+                Dim llReclassTableSorted As New atcCollection
+                For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
+                    lReclassTable.CurrentRecord = lRecordIndex
+                    llReclassTableSorted.Add(lRecordIndex, lReclassTable.Value(1))
+                Next lRecordIndex
+                llReclassTableSorted.SortByValue()
+
+                'now populate grid
+                With AtcGridPervious.Source
+                    For Each lRow As Integer In llReclassTableSorted.Keys
+                        lReclassTable.CurrentRecord = lRow
+                        If Not lShowCodes Then
+                            'just show group desc and percent perv
+                            Dim lInCollection As Boolean = False
+                            For lRowIndex As Integer = 1 To .Rows
+                                If .CellValue(lRowIndex - 1, 1) = lReclassTable.Value(2) Then
+                                    lInCollection = True
+                                End If
+                            Next
+                            If Not lInCollection Then
+                                .Rows += 1
+                                .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
+                                .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
+                                .CellEditable(.Rows - 1, 2) = True
+                                .CellColor(.Rows - 1, 1) = Me.BackColor
+                            End If
+                        Else 'need to show whole table
+                            If lReclassTable.Value(1) > 0 Then
+                                .Rows += 1
+                                .CellValue(.Rows - 1, 0) = lReclassTable.Value(1)
+                                .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
+                                .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
+                                .CellValue(.Rows - 1, 3) = lReclassTable.Value(4)
+                                .CellValue(.Rows - 1, 4) = lReclassTable.Value(5)
+                            End If
+                        End If
+                    Next
+                End With
+
+                AtcGridPervious.SizeAllColumnsToContents()
+                If lShowMults Then
+                    lShowCodes = True
+                Else
+                    AtcGridPervious.ColumnWidth(3) = 0
+                    AtcGridPervious.ColumnWidth(4) = 0
+                End If
+                If Not lShowCodes Then
+                    AtcGridPervious.ColumnWidth(0) = 0
+                End If
+            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+                If cboLandUseLayer.SelectedIndex > -1 And cboDescription.SelectedIndex > -1 Then
+                    Dim lLayerNameLandUse As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+                    Dim lFieldNameLandUse As String = cboDescription.Items(cboDescription.SelectedIndex)
+                    'no reclass file, get unique landuse names
+                    Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerNameLandUse)
+                    If lLayerIndex > -1 Then
+                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+                        FillListUniqueLandUses(lLayerIndex, lFieldNameLandUse)
+                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+                    End If
+                End If
+            Else 'other grid types with no reclass file set
+                If cboLandUseLayer.SelectedIndex > -1 Then
+                    Dim lLayerNameLandUse As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+                    'get unique landuse names
+                    Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerNameLandUse)
+                    If GisUtil.LayerType(lLayerIndex) = 4 Then 'Grid
+                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+                        For lGridX As Integer = Convert.ToInt32(GisUtil.GridLayerMinimum(lLayerIndex)) To Convert.ToInt32(GisUtil.GridLayerMaximum(lLayerIndex))
+                            AtcGridPervious.Source.Rows += 1
+                            AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 0) = lGridX
+                            AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 1) = lGridX
+                            AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 2) = 100
+                        Next lGridX
+                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+                    End If
+                End If
+                AtcGridPervious.SizeAllColumnsToContents()
+                AtcGridPervious.ColumnWidth(0) = 0
                 AtcGridPervious.ColumnWidth(3) = 0
                 AtcGridPervious.ColumnWidth(4) = 0
             End If
-            If Not lShowCodes Then
-                AtcGridPervious.ColumnWidth(0) = 0
-            End If
-        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-            If cboLandUseLayer.SelectedIndex > -1 And cboDescription.SelectedIndex > -1 Then
-                Dim lLayerNameLandUse As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-                Dim lFieldNameLandUse As String = cboDescription.Items(cboDescription.SelectedIndex)
-                'no reclass file, get unique landuse names
-                Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerNameLandUse)
-                If lLayerIndex > -1 Then
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-                    FillListUniqueLandUses(lLayerIndex, lFieldNameLandUse)
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-                End If
-            End If
-        Else 'other grid types with no reclass file set
-            If cboLandUseLayer.SelectedIndex > -1 Then
-                Dim lLayerNameLandUse As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-                'get unique landuse names
-                Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerNameLandUse)
-                If GisUtil.LayerType(lLayerIndex) = 4 Then 'Grid
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-                    For lGridX As Integer = Convert.ToInt32(GisUtil.GridLayerMinimum(lLayerIndex)) To Convert.ToInt32(GisUtil.GridLayerMaximum(lLayerIndex))
-                        AtcGridPervious.Source.Rows += 1
-                        AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 0) = lGridX
-                        AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 1) = lGridX
-                        AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 2) = 100
-                    Next lGridX
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-                End If
-            End If
-            AtcGridPervious.SizeAllColumnsToContents()
-            AtcGridPervious.ColumnWidth(0) = 0
-            AtcGridPervious.ColumnWidth(3) = 0
-            AtcGridPervious.ColumnWidth(4) = 0
-        End If
 
-        With AtcGridPervious.Source
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellColor(0, 2) = SystemColors.ControlDark
-            .CellColor(0, 3) = SystemColors.ControlDark
-            .CellColor(0, 4) = SystemColors.ControlDark
-            For lRowIndex As Integer = 1 To .Rows - 1
-                .CellEditable(lRowIndex, 2) = True
-                .CellEditable(lRowIndex, 3) = True
-                .CellEditable(lRowIndex, 4) = True
-                .CellColor(lRowIndex, 0) = SystemColors.ControlDark
-                .CellColor(lRowIndex, 1) = SystemColors.ControlDark
-            Next lRowIndex
-        End With
-        AtcGridPervious.Refresh()
+            With AtcGridPervious.Source
+                .CellColor(0, 0) = SystemColors.ControlDark
+                .CellColor(0, 1) = SystemColors.ControlDark
+                .CellColor(0, 2) = SystemColors.ControlDark
+                .CellColor(0, 3) = SystemColors.ControlDark
+                .CellColor(0, 4) = SystemColors.ControlDark
+                For lRowIndex As Integer = 1 To .Rows - 1
+                    .CellEditable(lRowIndex, 2) = True
+                    .CellEditable(lRowIndex, 3) = True
+                    .CellEditable(lRowIndex, 4) = True
+                    .CellColor(lRowIndex, 0) = SystemColors.ControlDark
+                    .CellColor(lRowIndex, 1) = SystemColors.ControlDark
+                Next lRowIndex
+            End With
+            AtcGridPervious.Refresh()
+        End If
     End Sub
 
     Private Sub SetFieldMappingControl()
+        If pInitializing Then
+            Logger.Dbg("SetFieldMappingControl Skipped while initializing")
+        Else
+            Logger.Dbg("SetFieldMappingControl Begin")
 
-        'add source fields from dbf
-        AtcConnectFields.lstSource.Items.Clear()
-        If cboOutlets.SelectedIndex > 0 Then
-            Dim lNodeLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-            For lFieldIndex As Integer = 0 To GisUtil.NumFields(lNodeLayerIndex) - 1
-                AtcConnectFields.lstSource.Items.Add("Node:" & GisUtil.FieldName(lFieldIndex, lNodeLayerIndex))
+            'add source fields from dbf
+            AtcConnectFields.lstSource.Items.Clear()
+            If cboOutlets.SelectedIndex > 0 Then
+                Dim lNodeLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+                For lFieldIndex As Integer = 0 To GisUtil.NumFields(lNodeLayerIndex) - 1
+                    AtcConnectFields.lstSource.Items.Add("Node:" & GisUtil.FieldName(lFieldIndex, lNodeLayerIndex))
+                Next
+            End If
+            If cboStreams.SelectedIndex > -1 Then
+                Dim lConduitLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+                For lFieldIndex As Integer = 0 To GisUtil.NumFields(lConduitLayerIndex) - 1
+                    AtcConnectFields.lstSource.Items.Add("Conduit:" & GisUtil.FieldName(lFieldIndex, lConduitLayerIndex))
+                Next
+            End If
+            If cboSubbasins.SelectedIndex > -1 Then
+                Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+                For lFieldIndex As Integer = 0 To GisUtil.NumFields(lCatchmentLayerIndex) - 1
+                    AtcConnectFields.lstSource.Items.Add("Catchment:" & GisUtil.FieldName(lFieldIndex, lCatchmentLayerIndex))
+                Next
+            End If
+
+            'add target properties from introspection on the swmm classes
+            AtcConnectFields.lstTarget.Items.Clear()
+            Dim lNode As New atcSWMM.Node
+            For Each lField As Reflection.FieldInfo In lNode.GetType.GetFields
+                AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
+            Next
+            Dim lConduit As New atcSWMM.Conduit
+            For Each lField As Reflection.FieldInfo In lConduit.GetType.GetFields
+                AtcConnectFields.lstTarget.Items.Add("Conduit:" & lField.Name)
+            Next
+            Dim lCatchment As New atcSWMM.Catchment
+            For Each lField As Reflection.FieldInfo In lCatchment.GetType.GetFields
+                AtcConnectFields.lstTarget.Items.Add("Catchment:" & lField.Name)
+            Next
+
+            'add existing connections from default field maps
+            AtcConnectFields.lstConnections.Items.Clear()
+            Dim lConn As String
+            Dim lType As String = "Node"
+            For lIndex As Integer = 0 To pNodeFieldMap.Count - 1
+                lConn = lType & ":" & pNodeFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pNodeFieldMap(lIndex)
+                AtcConnectFields.AddConnection(lConn, True)
+            Next
+            lType = "Conduit"
+            For lIndex As Integer = 0 To pConduitFieldMap.Count - 1
+                lConn = lType & ":" & pConduitFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pConduitFieldMap(lIndex)
+                AtcConnectFields.AddConnection(lConn, True)
+            Next
+            lType = "Catchment"
+            For lIndex As Integer = 0 To pCatchmentFieldMap.Count - 1
+                lConn = lType & ":" & pCatchmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pCatchmentFieldMap(lIndex)
+                AtcConnectFields.AddConnection(lConn, True)
             Next
         End If
-        If cboStreams.SelectedIndex > -1 Then
-            Dim lConduitLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-            For lFieldIndex As Integer = 0 To GisUtil.NumFields(lConduitLayerIndex) - 1
-                AtcConnectFields.lstSource.Items.Add("Conduit:" & GisUtil.FieldName(lFieldIndex, lConduitLayerIndex))
-            Next
-        End If
-        If cboSubbasins.SelectedIndex > -1 Then
-            Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
-            For lFieldIndex As Integer = 0 To GisUtil.NumFields(lCatchmentLayerIndex) - 1
-                AtcConnectFields.lstSource.Items.Add("Catchment:" & GisUtil.FieldName(lFieldIndex, lCatchmentLayerIndex))
-            Next
-        End If
-
-        'add target properties from introspection on the swmm classes
-        AtcConnectFields.lstTarget.Items.Clear()
-        Dim lNode As New atcSWMM.Node
-        For Each lField As Reflection.FieldInfo In lNode.GetType.GetFields
-            AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
-        Next
-        Dim lConduit As New atcSWMM.Conduit
-        For Each lField As Reflection.FieldInfo In lConduit.GetType.GetFields
-            AtcConnectFields.lstTarget.Items.Add("Conduit:" & lField.Name)
-        Next
-        Dim lCatchment As New atcSWMM.Catchment
-        For Each lField As Reflection.FieldInfo In lCatchment.GetType.GetFields
-            AtcConnectFields.lstTarget.Items.Add("Catchment:" & lField.Name)
-        Next
-
-        'add existing connections from default field maps
-        AtcConnectFields.lstConnections.Items.Clear()
-        Dim lConn As String
-        Dim lType As String = "Node"
-        For lIndex As Integer = 0 To pNodeFieldMap.Count - 1
-            lConn = lType & ":" & pNodeFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pNodeFieldMap(lIndex)
-            AtcConnectFields.AddConnection(lConn, True)
-        Next
-        lType = "Conduit"
-        For lIndex As Integer = 0 To pConduitFieldMap.Count - 1
-            lConn = lType & ":" & pConduitFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pConduitFieldMap(lIndex)
-            AtcConnectFields.AddConnection(lConn, True)
-        Next
-        lType = "Catchment"
-        For lIndex As Integer = 0 To pCatchmentFieldMap.Count - 1
-            lConn = lType & ":" & pCatchmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pCatchmentFieldMap(lIndex)
-            AtcConnectFields.AddConnection(lConn, True)
-        Next
-
     End Sub
 
     Private Sub FillListUniqueLandUses(ByVal aLayerIndex As Long, ByVal aFieldName As String)
@@ -1083,7 +1095,7 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-
+        Logger.Dbg("Setup SWMM input files")
         'set field mapping as specified in field mapping tab
         pNodeFieldMap.Clear()
         pConduitFieldMap.Clear()
@@ -1157,7 +1169,6 @@ Public Class frmSWMMSetup
         EnableControls(False)
 
         With pPlugIn.SWMMProject
-
             .Name = tbxName.Text
             Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
             'TODO: still use modelout?
@@ -1250,16 +1261,19 @@ Public Class frmSWMMSetup
             Dim lTable As New atcUtility.atcTableDBF
 
             If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
+                Logger.Dbg("Add " & lTable.NumRecords & " NodesFrom " & lNodesShapefileName)
                 .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, pNodeFieldMap))
             End If
             CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
 
             If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
+                Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lConduitShapefileName)
                 .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, pConduitFieldMap), "Name", "C", 1))
             End If
             CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
+                Logger.Dbg("Add " & lTable.NumRecords & " CatchmentsFrom " & lCatchmentShapefileName)
                 .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
             End If
             CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
@@ -1291,22 +1305,27 @@ Public Class frmSWMMSetup
             Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
             .Landuses = lReclassifyLanduses
 
-            lblStatus.Text = "Writing SWMM INP file"
+            Logger.Dbg(lblStatus.Text)
             Me.Refresh()
 
             'save project file and start SWMM
+            Logger.Dbg("Save SWMM input file" & lSWMMProjectFileName)
             .Save(lSWMMProjectFileName)
+            Logger.Dbg("Run SWMM")
             .Run(lSWMMProjectFileName)
+            Logger.Dbg("BackFromSWMM")
         End With
 
         lblStatus.Text = ""
         Me.Refresh()
         Me.Dispose()
         Me.Close()
+        Logger.Dbg("Done")
+        Logger.Flush()
     End Sub
 
     Private Function PreProcessChecking(ByVal aOutputFileName As String) As Boolean
-
+        Logger.Dbg("PreprocessChecking " & aOutputFileName)
         If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
             If GisUtil.LayerIndex("Land Use Index") = -1 Then
                 'cant do giras without land use index layer
@@ -1341,10 +1360,13 @@ Public Class frmSWMMSetup
             End If
         End If
 
+        Logger.Dbg("PreprocessChecking OK")
         Return True
     End Function
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
+        Logger.Dbg("InitializeUI")
+        EnableControls(False)
         pPlugIn = aPlugIn
 
         pPrecStations = New atcCollection
@@ -1431,20 +1453,20 @@ Public Class frmSWMMSetup
         End With
 
         SetLanduseTab(cboLanduse.Items(cboLanduse.SelectedIndex))
+        pInitializing = False
         SetFieldMappingControl()
-
+        Logger.Dbg("InitializeUI Complete")
     End Sub
 
     Friend Sub InitializeMetStationList()
-
         For lLayerIndex As Integer = 0 To cboMet.Items.Count - 1
             Dim lLayerName As String = cboMet.Items(lLayerIndex)
             If lLayerName.IndexOf("Weather Station Sites 20") > -1 Then
                 'this takes some time, show window and then do this
+                Logger.Dbg("Initializing MetStationList")
                 cboMet.SelectedIndex = lLayerIndex
             End If
         Next
-
     End Sub
 
     Private Sub cboMet_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMet.SelectedIndexChanged
@@ -1472,13 +1494,13 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
-
         lblStatus.Text = "Reading Precipitation Data from WDM File..."
         Me.Refresh()
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
         BuildListofValidStationNames(txtMetWDMName.Text, "PREC", pPrecStations)
         SetPrecipStationGrid()
+        Logger.Dbg("Processing " & pPrecStations.Count & " PREC stations")
         For Each lPrecStation As StationDetails In pPrecStations
             cboPrecipStation.Items.Add(lPrecStation.Description)
         Next
@@ -1490,6 +1512,7 @@ Public Class frmSWMMSetup
         Me.Refresh()
 
         BuildListofValidStationNames(txtMetWDMName.Text, "PEVT", pMetStations)
+        Logger.Dbg("Processing " & pMetStations.Count & " MET stations")
         For Each lMetStation As StationDetails In pMetStations
             cboOtherMet.Items.Add(lMetStation.Description)
         Next
@@ -1503,53 +1526,55 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub SetPrecipStationGrid()
+        If AtcGridPrec.Source Is Nothing OrElse cboSubbasins.SelectedIndex = -1 Then
+            Logger.Dbg("No atcGridPrec or Subbasin selected")
+        Else
+            Logger.Dbg("Begin")
+            Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+            Dim lCatchmentShapefileName As String = GisUtil.LayerFileName(lCatchmentLayerIndex)
 
-        If AtcGridPrec.Source Is Nothing Then Exit Sub
+            Dim lTempCatchments As New atcSWMM.Catchments
+            Dim lTable As New atcUtility.atcTableDBF
+            If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
+                lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
+            End If
+            Logger.Dbg("CatchmentsCount " & lTempCatchments.Count)
 
-        If cboSubbasins.SelectedIndex = -1 Then Exit Sub
+            AtcGridPrec.Clear()
+            With AtcGridPrec.Source
+                .Columns = 2
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellColor(0, 0) = SystemColors.ControlDark
+                .CellColor(0, 1) = SystemColors.ControlDark
+                .Rows = 1 + lTempCatchments.Count
+                .CellValue(0, 0) = "Catchment"
+                .CellValue(0, 1) = "Precip Station"
+                For lIndex As Integer = 1 To lTempCatchments.Count
+                    If IsNumeric(lTempCatchments(lIndex - 1).Name) Then
+                        .CellValue(lIndex, 0) = CInt(lTempCatchments(lIndex - 1).Name)
+                    Else
+                        .CellValue(lIndex, 0) = lTempCatchments(lIndex - 1).Name
+                    End If
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    If pPrecStations.Count > 0 Then
+                        .CellValue(lIndex, 1) = pPrecStations(0).Description
+                        .CellEditable(lIndex, 1) = True
+                    End If
+                Next
+            End With
 
-        Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
-        Dim lCatchmentShapefileName As String = GisUtil.LayerFileName(lCatchmentLayerIndex)
-
-        Dim lTempCatchments As New atcSWMM.Catchments
-        Dim lTable As New atcUtility.atcTableDBF
-        If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
-            lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
-        End If
-
-        AtcGridPrec.Clear()
-        With AtcGridPrec.Source
-            .Columns = 2
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .Rows = 1 + lTempCatchments.Count
-            .CellValue(0, 0) = "Catchment"
-            .CellValue(0, 1) = "Precip Station"
-            For lIndex As Integer = 1 To lTempCatchments.Count
-                If IsNumeric(lTempCatchments(lIndex - 1).Name) Then
-                    .CellValue(lIndex, 0) = CInt(lTempCatchments(lIndex - 1).Name)
-                Else
-                    .CellValue(lIndex, 0) = lTempCatchments(lIndex - 1).Name
-                End If
-                .CellColor(lIndex, 0) = SystemColors.ControlDark
-                If pPrecStations.Count > 0 Then
-                    .CellValue(lIndex, 1) = pPrecStations(0).Description
-                    .CellEditable(lIndex, 1) = True
-                End If
+            Logger.Dbg("SetValidValues")
+            Dim lValidValues As New atcCollection
+            For Each lPrecStation As StationDetails In pPrecStations
+                lValidValues.Add(lPrecStation.Description)
             Next
-        End With
-
-        Dim lValidValues As New atcCollection
-        For Each lPrecStation As StationDetails In pPrecStations
-            lValidValues.Add(lPrecStation.Description)
-        Next
-        AtcGridPrec.ValidValues = lValidValues
-        AtcGridPrec.SizeAllColumnsToContents()
-        AtcGridPrec.Refresh()
-
+            AtcGridPrec.ValidValues = lValidValues
+            AtcGridPrec.SizeAllColumnsToContents()
+            AtcGridPrec.Refresh()
+            Logger.Dbg("PrecipStationGrid refreshed")
+        End If
     End Sub
 
     Private Sub rbnSingle_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbnSingle.CheckedChanged
@@ -1581,4 +1606,8 @@ Public Class frmSWMMSetup
         Next
 
     End Function
+
+    Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
+        Logger.Dbg(lblStatus.Text)
+    End Sub
 End Class

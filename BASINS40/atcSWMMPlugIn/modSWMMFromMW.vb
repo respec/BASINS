@@ -11,8 +11,13 @@ Friend Module modSWMMFromMW
                                                     ByVal aSWMMProject As SWMMProject, _
                                                     ByRef aCatchments As Catchments) As Boolean
 
+        Logger.Dbg("ShapefileName " & aCatchmentShapefileName)
         If Not GisUtil.IsLayerByFileName(aCatchmentShapefileName) Then
-            GisUtil.AddLayer(aCatchmentShapefileName, "Catchments")
+            If GisUtil.AddLayer(aCatchmentShapefileName, "Catchments") Then
+                Logger.Dbg("LayerAdded")
+            Else
+                Logger.Msg("ProblemAddingCatchmentLayer") 'Exception?
+            End If
         End If
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aCatchmentShapefileName)
 
@@ -31,17 +36,22 @@ Friend Module modSWMMFromMW
                 'assign each catchment to the selected raingage 
                 If aPrecGageNamesByCatchment.Count > 1 Then
                     lCatchment.RainGage = aSWMMProject.RainGages(aPrecGageNamesByCatchment(lFeatureIndex + 1))
-                Else
-                    'using one raingage for all
+                Else 'using one raingage for all
                     lCatchment.RainGage = aSWMMProject.RainGages(aPrecGageNamesByCatchment(1))
                 End If
+                Logger.Dbg("Assigned Rain Gage " & lCatchment.RainGage.Name)
+            Else
+                Logger.Msg("No Rain Gage available to assign")
             End If
 
             'find associated outlet node
-            If Not lCatchment.OutletNodeID Is Nothing Then
+            If lCatchment.OutletNodeID Is Nothing Then
+                Logger.Dbg("No Outlet Node")
+            Else
                 If aSWMMProject.Nodes.Contains(lCatchment.OutletNodeID) Then
                     lCatchment.OutletNode = aSWMMProject.Nodes(lCatchment.OutletNodeID)
                 End If
+                Logger.Dbg("Outlet Node " & lCatchment.OutletNode.Name)
             End If
 
             If lCatchment.OutletNode Is Nothing Then
@@ -62,11 +72,13 @@ Friend Module modSWMMFromMW
 
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lCatchment.X, lCatchment.Y)
         Next
+        Logger.Dbg("Completed " & GisUtil.NumFeatures(lLayerIndex) & " CatchmentsFromShapeFile")
     End Function
 
     Public Function CompleteConduitsFromShapefile(ByVal aConduitShapefilename As String, _
                                                   ByVal aSWMMProject As SWMMProject, _
                                                   ByRef aConduits As Conduits) As Boolean
+        Logger.Dbg("ShapefileName " & aConduitShapefilename)
 
         Dim lNeedNodes As Boolean = False
         If aSWMMProject.Nodes.Count = 0 Then
@@ -74,7 +86,11 @@ Friend Module modSWMMFromMW
         End If
 
         If Not GisUtil.IsLayerByFileName(aConduitShapefilename) Then
-            GisUtil.AddLayer(aConduitShapefilename, "Conduits")
+            If GisUtil.AddLayer(aConduitShapefilename, "Conduits") Then
+                Logger.Dbg("LayerAdded")
+            Else
+                Logger.Msg("ProblemAddingConduitLayer") 'Exception?
+            End If
         End If
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aConduitShapefilename)
 
@@ -164,15 +180,20 @@ Friend Module modSWMMFromMW
             'find the coordinates
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lConduit.X, lConduit.Y)
         Next
-
+        Logger.Dbg("Completed " & GisUtil.NumFeatures(lLayerIndex) & " ConduitsFromShapeFile")
     End Function
 
     Public Function CompleteNodesFromShapefile(ByVal aNodeShapefileName As String, _
                                                ByRef aNodes As Nodes) As Boolean
 
+        Logger.Dbg("ShapefileName " & aNodeShapefileName & " NodeCount " & aNodes.Count)
         If aNodes.Count > 0 Then
             If Not GisUtil.IsLayerByFileName(aNodeShapefileName) Then
-                GisUtil.AddLayer(aNodeShapefileName, "Nodes")
+                If GisUtil.AddLayer(aNodeShapefileName, "Nodes") Then
+                    Logger.Dbg("LayerAdded")
+                Else
+                    Logger.Msg("ProblemAddingNodeLayer") 'Exception?
+                End If
             End If
             Dim lLayerIndex As Integer = GisUtil.LayerIndex(aNodeShapefileName)
 
@@ -192,10 +213,15 @@ Friend Module modSWMMFromMW
     Public Function CreateRaingageFromShapefile(ByVal aShapefileName As String, _
                                                 ByVal aGageId As String, _
                                                 ByRef aRainGages As RainGages) As Boolean
-
+        Logger.Dbg("ShapefileName " & aShapefileName & " GageID " & aGageId)
         If Not GisUtil.IsLayerByFileName(aShapefileName) Then
-            GisUtil.AddLayer(aShapefileName, "Raingages")
+            If GisUtil.AddLayer(aShapefileName, "Raingages") Then
+                Logger.Dbg("LayerAdded")
+            Else
+                Logger.Msg("ProblemAddingRaingageLayer") 'Exception?
+            End If
         End If
+
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aShapefileName)
         Dim lGageIDFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, "LOCATION")
         Dim lWDMFileName As String = FilenameNoExt(aShapefileName) & ".wdm"
@@ -218,23 +244,33 @@ Friend Module modSWMMFromMW
                 End If
             End If
         Next
-
+        Logger.Dbg("CreateRaingageFromShapefile Count " & aRainGages.Count)
     End Function
 
     Friend Function CreateLandusesFromGrid(ByVal aLanduseGridFileName As String, _
                                            ByVal aSubbasinShapefileName As String, _
                                            ByVal aCatchments As Catchments, _
                                            ByRef aLanduses As Landuses) As Boolean
-
+        Logger.Dbg("GridFile " & aLanduseGridFileName & _
+                   " Catchment " & aSubbasinShapefileName & _
+                   " CatchmentCount " & aCatchments.Count)
         aLanduses.Clear()
 
         If Not GisUtil.IsLayerByFileName(aSubbasinShapefileName) Then
-            GisUtil.AddLayer(aSubbasinShapefileName, "Catchments")
+            If GisUtil.AddLayer(aSubbasinShapefileName, "Catchments") Then
+                Logger.Dbg("CatchmentLayerAdded")
+            Else
+                Logger.Msg("ProblemCatchmentsLayer") 'Exception?
+            End If
         End If
         Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinShapefileName)
 
         If Not GisUtil.IsLayerByFileName(aLanduseGridFileName) Then
-            GisUtil.AddLayer(aLanduseGridFileName, "Landuse Grid")
+            If GisUtil.AddLayer(aLanduseGridFileName, "Landuse Grid") Then
+                Logger.Dbg("LayerLanduseGridAdded")
+            Else
+                Logger.Msg("ProblemLanduseGridLayer") 'Exception?
+            End If
         End If
         Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(aLanduseGridFileName)
 
@@ -262,7 +298,7 @@ Friend Module modSWMMFromMW
                                             ByVal aCatchments As Catchments, _
                                             ByRef aLanduses As Landuses) As Boolean
         'perform overlay for GIRAS shapefiles
-
+        Logger.Dbg("Begin")
         aLanduses.Clear()
 
         If Not GisUtil.IsLayerByFileName(aSubbasinShapefileName) Then
@@ -323,8 +359,8 @@ Friend Module modSWMMFromMW
         Next
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
-        For i As Integer = 1 To lTable.NumRecords
-            lTable.CurrentRecord = i
+        For lRecordIndex As Integer = 1 To lTable.NumRecords
+            lTable.CurrentRecord = lRecordIndex
             Dim lLanduse As New Landuse
             lLanduse.Area = CDbl(lTable.Value(3))
             lLanduse.Name = lTable.Value(1)
@@ -341,7 +377,7 @@ Friend Module modSWMMFromMW
                 aLanduses.Add(lLanduse)
             End If
 
-        Next i
+        Next lRecordIndex
     End Function
 
     Friend Function CreateLandusesFromShapefile(ByVal aLanduseShapefileName As String, _
@@ -351,7 +387,7 @@ Friend Module modSWMMFromMW
                                                 ByVal aCatchments As Catchments, _
                                                 ByRef aLanduses As Landuses) As Boolean
         'perform overlay for other shapefiles (not GIRAS) 
-
+        Logger.Dbg("Begin")
         aLanduses.Clear()
 
         If Not GisUtil.IsLayerByFileName(aSubbasinShapefileName) Then
@@ -370,8 +406,8 @@ Friend Module modSWMMFromMW
                         lLandUsePathName & "\overlay.shp", True)
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
-        For i As Integer = 1 To lTable.NumRecords
-            lTable.CurrentRecord = i
+        For lRecordIndex As Integer = 1 To lTable.NumRecords
+            lTable.CurrentRecord = lRecordIndex
             Dim lLanduse As New Landuse
             lLanduse.Area = CDbl(lTable.Value(3))
             lLanduse.Name = lTable.Value(1)
@@ -387,15 +423,14 @@ Friend Module modSWMMFromMW
             Else
                 aLanduses.Add(lLanduse)
             End If
-
-        Next i
+        Next lRecordIndex
     End Function
 
     Public Function CreateMetConstituent(ByVal aWDMFileName As String, _
                                          ByVal aGageId As String, _
                                          ByVal aConstituentID As String, _
                                          ByRef aMetConstituents As MetConstituents) As Boolean
-
+        Logger.Dbg("Begin")
         Dim lMetConstituent As New MetConstituent
         lMetConstituent.TimeSeries = GetTimeseries(aWDMFileName, "OBSERVED", aGageId, aConstituentID)
         If lMetConstituent.TimeSeries = Nothing Then
@@ -405,13 +440,13 @@ Friend Module modSWMMFromMW
         If Not aMetConstituents.Contains(aConstituentID) Then
             aMetConstituents.Add(lMetConstituent)
         End If
-
     End Function
 
     Private Function GetTimeseries(ByRef aMetWDMName As String, _
                                    ByVal aScenario As String, _
                                    ByVal aLocation As String, _
                                    ByVal aConstituent As String) As atcData.atcTimeseries
+        Logger.Dbg("Begin " & aScenario & " Location " & aLocation & " Constituent " & aConstituent)
         Dim lGetTimeseries As atcData.atcTimeseries = Nothing
 
         Dim lDataSource As New atcWDM.atcDataSourceWDM
@@ -448,7 +483,7 @@ Friend Module modSWMMFromMW
 
     Friend Function ReclassifyLandUses(ByVal aReclassificationRecords As atcCollection, _
                                        ByVal aLandUses As Landuses) As Landuses
-
+        Logger.Dbg("Begin")
         Dim lReclassifyLandUses As New Landuses
 
         'build collection of unique subbasin ids
@@ -586,6 +621,7 @@ Friend Module modSWMMFromMW
     Friend Sub BuildListofValidStationNames(ByRef aMetWDMName As String, _
                                             ByRef aMetConstituent As String, _
                                             ByVal aStations As atcCollection)
+        Logger.Dbg("MetWDMName " & aMetWDMName & " Constituent " & aMetConstituent)
         aStations.Clear()
         Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
         If FileExists(aMetWDMName) Then
@@ -606,10 +642,12 @@ Friend Module modSWMMFromMW
                 End If
             End If
 
-            If lFound Then
+            If Not lFound Then
+                Logger.Dbg("WDMFile Not found") 'FindFile?
+            Else
                 Dim lCounter As Integer = 0
+                Logger.Dbg("LookThrough " & lDataSource.DataSets.Count & " Datasets")
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-
                     lCounter += 1
                     Logger.Progress(lCounter, lDataSource.DataSets.Count)
 
@@ -680,6 +718,7 @@ Friend Module modSWMMFromMW
                             lStationDetails.EndJDate = lEJDay
                             lStationDetails.Description = lLoc & ":" & lStanam & " " & lDateString
                             aStations.Add(lStationDetails.Description, lStationDetails)
+                            'Logger.Dbg("Added " & lStationDetails.Description)
                         End If
                     End If
                     'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
@@ -688,6 +727,7 @@ Friend Module modSWMMFromMW
             End If
         End If
         lDataSource = Nothing
+        Logger.Dbg("Found " & aStations.Count & " Stations")
     End Sub
 
     Friend Sub GetLanduseReclassificationDetails(ByVal aReclassifyFile As String, _

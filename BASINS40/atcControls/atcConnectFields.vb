@@ -26,7 +26,7 @@ Public Class atcConnectFields
             Return True
         Else
             If aQuiet Then
-                Logger.Dbg(lProblems)
+                Logger.Dbg(lProblems.Remove(lProblems.Length - 2))
             Else
                 Logger.Msg(lProblems, "Connection Add Problem")
             End If
