@@ -51,15 +51,14 @@ Public Class atcTimeseriesSTORET
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-
         If MyBase.Open(aFileName, aAttributes) Then
             Dim lDocument As New XmlDocument
             Dim lXMLstr As String
             Try
-                lXMLstr = IO.File.ReadAllText(aFileName).Replace(Chr(182), Chr(9)) 'replace strange delimiter with tab
+                lXMLstr = IO.File.ReadAllText(Specification).Replace(Chr(182), Chr(9)) 'replace strange delimiter with tab
                 lDocument.LoadXml(lXMLstr)
             Catch ex As Exception
-                Logger.Msg(aFileName & vbCrLf & ex.Message, "Could not open STORET file")
+                Logger.Msg(Specification & vbCrLf & ex.Message, "Could not open STORET file")
                 Return False
             End Try
             Dim lResultsNode As XmlNode = lDocument.FirstChild
@@ -118,9 +117,9 @@ Public Class atcTimeseriesSTORET
                                             lTSBuilder.AddValue(lDate, Double.Parse(lValueStr))
                                         Catch
                                             If lValueStr.Length = 0 Then
-                                                Logger.Dbg("No STORET value found. date " & lDateStr & " for " & lKey & " in " & aFileName)
+                                                Logger.Dbg("No STORET value found. date " & lDateStr & " for " & lKey & " in " & Specification)
                                             Else
-                                                Logger.Dbg("Could not parse STORET value '" & lValueStr & "' date " & lDateStr & " for " & lKey & " in " & aFileName)
+                                                Logger.Dbg("Could not parse STORET value '" & lValueStr & "' date " & lDateStr & " for " & lKey & " in " & Specification)
                                             End If
                                             lTSBuilder.AddValue(lDate, pNaN)
                                         End Try
@@ -149,7 +148,7 @@ Public Class atcTimeseriesSTORET
             Logger.Status("")
             Return True
         Else
-            Logger.Dbg("atcDataSource could not open " & aFileName)
+            Logger.Dbg("atcDataSource could not open " & Specification)
             Return False
         End If
     End Function

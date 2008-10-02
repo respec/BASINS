@@ -210,6 +210,7 @@ Public Class atcTimeseriesMath
         If lInstance.Open(aOperationName, lDataAttributes) Then
             Return lInstance.DataSets(0)
         Else
+            lInstance.Clear()
             Return Nothing
         End If
     End Function
@@ -547,7 +548,7 @@ Public Class atcTimeseriesMath
     Public Overrides Function AddDataSet(ByVal aDataSet As atcData.atcDataSet, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
         aDataSet.Attributes.SetValue("Data Source", Specification)
         aDataSet.Attributes.AddHistory(Specification)
-        MyBase.AddDataSet(aDataSet, aExistAction)
+        Return MyBase.AddDataSet(aDataSet, aExistAction)
     End Function
 
 End Class
