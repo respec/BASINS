@@ -19,14 +19,21 @@ Public Class atcSeasonsYearSubset
     Public Sub New(ByVal aStartDate As Date, ByVal aEndDate As Date)
         pStartDate = aStartDate
         pEndDate = aEndDate
-        If pEndDate.Year > pStartDate.Year Then
-            pEndDateNextYear = True
-        End If
+        pEndDateNextYear = (pEndDate.Year > pStartDate.Year)
     End Sub
 
     Public Sub New(ByVal aStartMonth As Integer, ByVal aStartDay As Integer, ByVal aEndMonth As Integer, ByVal aEndDay As Integer)
         pStartDate = New Date(1900, aStartMonth, aStartDay, 0, 0, 0, 0)
-        pEndDate = New Date(1900, aEndMonth, aEndDay, 0, 0, 0, 0)
+        If aEndMonth < aStartMonth OrElse aEndMonth = aStartMonth AndAlso aEndDay < aStartDay Then
+            pEndDateNextYear = True
+            If aEndMonth = 2 AndAlso aEndDay = 29 Then
+                pEndDate = New Date(1901, aEndMonth, 28, 0, 0, 0, 0)
+            Else
+                pEndDate = New Date(1901, aEndMonth, aEndDay, 0, 0, 0, 0)
+            End If
+        Else
+            pEndDate = New Date(1900, aEndMonth, aEndDay, 0, 0, 0, 0)
+        End If
     End Sub
 
     Public Sub New()
@@ -61,7 +68,7 @@ Public Class atcSeasonsYearSubset
             If lDateNoYear >= pStartDate Then
                 Return 1
             Else
-                lDateNoYear = New Date(pEndDate.Year, lDate.Month, lDate.Day, _
+                lDateNoYear = New Date(pEndDate.Year, lDate.Month, lDay, _
                                        lDate.Hour, lDate.Minute, lDate.Second, _
                                        lDate.Millisecond)
                 If lDateNoYear < pEndDate Then

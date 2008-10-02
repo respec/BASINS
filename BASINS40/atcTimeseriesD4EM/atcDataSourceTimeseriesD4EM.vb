@@ -140,6 +140,7 @@ Public Class atcDataSourceTimeseriesD4EM
                             Select Case lAttribute.Definition.TypeString
                                 Case "String" : lType = "Str"
                                 Case "Integer" : lType = "Int"
+                                Case "Single" : lType = "Sgl"
                                 Case "Double" : lType = "Dbl"
                                 Case "atcTimeUnit" : lType = "Str"
                                 Case Else
