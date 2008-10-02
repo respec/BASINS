@@ -42,8 +42,8 @@ Public Class ctlEditTable
             With grdTable
                 .Source = New atcControls.atcGridSource
                 .Clear()
-                .AllowHorizontalScrolling = True
                 .AllowNewValidValues = True
+                .AllowHorizontalScrolling = False
                 .Visible = True
             End With
 
@@ -99,20 +99,42 @@ Public Class ctlEditTable
             Else
                 chkDesc.Checked = False
                 chkDesc.Visible = False
-                'grdTable.Height = grdTable.Top - chkDesc.Top + grdTable.Height
-                'grdTable.Top = chkDesc.Top
+
                 refreshGrid()
             End If
         End Set
     End Property
+    'Private Sub grdTable_RowColChange(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdTable.Change
+    '    Dim unitfg&
+    '    If grdTable.col = 0 Then
+    '        txtDefine = "Table: " & pTable.Name & ", " & pTable.Def.Define & vbCrLf & _
+    '                    "Parameter: Operation Number" & vbCrLf & _
+    '                    vbCrLf
+    '    ElseIf grdTable.col = chkDesc Then
+    '        txtDefine = "Table: " & pTable.Name & ", " & pTable.Def.Define & vbCrLf & _
+    '                    "Parameter: Description" & vbCrLf & _
+    '                    vbCrLf
+    '    Else
+    '        txtDefine = "Table: " & pTable.Name & ", " & pTable.Def.Define & vbCrLf & _
+    '                    "Parameter: " & pTable.Parms(grdTable.col - chkDesc).Def.Define & vbCrLf & _
+    '                    vbCrLf
+    '    End If
+    '    unitfg = pTable.Opn.OpnBlk.Uci.GlobalBlock.emfg
+    '    If unitfg = 1 Then 'english
+    '        txtDefine = txtDefine & pTable.Def.HeaderE
+    '    ElseIf unitfg = 2 Then 'metric
+    '        txtDefine = txtDefine & pTable.Def.HeaderM
+    '    End If
+    'End Sub
 
     Private Sub refreshGrid()
         Dim lParm As HspfParm
         Dim ltable As HspfTable = Nothing
         Dim tname As String = Nothing
         Dim unitfg As String = Nothing
-        'Dim more, skip As Boolean
-        Dim i, lchkDescInteger As Integer
+        Dim more, skip As Boolean
+        Dim i, j, lchkDescInteger As Integer
+        Dim lStartEditCol As Integer
 
         With grdTable.Source
             .Columns = pHspfTable.Parms.Count + 1
@@ -128,73 +150,86 @@ Public Class ctlEditTable
             For i = 0 To pHspfTable.Parms.Count - 1
                 lParm = pHspfTable.Parms(i)
                 .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
-                If lParm.Def.Typ = 2 Then
-                    '.ColType(i + lchkDescInteger) = ATCoSng  'causes formatting problems
-                End If
-                If lParm.Def.Typ = 1 Then
-                    '.ColType(i + lchkDescInteger) = ATCoInt0
-                End If
-                If lParm.Def.Typ = 0 Then
-                    '.ColType(i + lchkDescInteger) = ATCoTxt
-                End If
-                unitfg = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
-                If unitfg = 1 Then 'english
-                    '.ColMax(i + lchkDescInteger) = lParm.Def.Max
-                    '.ColMin(i + lchkDescInteger) = lParm.Def.Min
-                ElseIf unitfg = 2 Then 'metric
-                    '.ColMax(i + lchkDescInteger) = lParm.Def.MetricMax
-                    '.ColMin(i + lchkDescInteger) = lParm.Def.MetricMin
-                End If
+                'The below code is commented because the .ColType, .ColMax, .ColMin was not defined yet.
+                'If lParm.Def.Typ = 2 Then
+                '    '.ColType(i + lchkDescInteger) = ATCoSng  'causes formatting problems
+                'End If
+                'If lParm.Def.Typ = 1 Then
+                '    '.ColType(i + lchkDescInteger) = ATCoInt0
+                'End If
+                'If lParm.Def.Typ = 0 Then
+                '    '.ColType(i + lchkDescInteger) = ATCoTxt
+                'End If
+                'unitfg = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
+                'If unitfg = 1 Then 'english
+                '    '.ColMax(i + lchkDescInteger) = lParm.Def.Max
+                '    '.ColMin(i + lchkDescInteger) = lParm.Def.Min
+                'ElseIf unitfg = 2 Then 'metric
+                '    '.ColMax(i + lchkDescInteger) = lParm.Def.MetricMax
+                '    '.ColMin(i + lchkDescInteger) = lParm.Def.MetricMin
+                'End If
             Next i
 
             'may need index here
-            'tname = pHspfTable.Name
-            'If pHspfTable.OccurCount > 1 Then
-            '    If cboOccur.SelectedIndex > 0 Then
-            '        tname = tname & ":" & cboOccur.SelectedIndex + 1
-            '    End If
-            'End If
+            tname = pHspfTable.Name
+            If pHspfTable.OccurCount > 1 Then
+                If cboOccur.SelectedIndex > 0 Then
+                    tname = tname & ":" & cboOccur.SelectedIndex + 1
+                End If
+            End If
 
-            'more = True
-            '.Rows = 0
-            'j = 1
-            'Do While more = True
-            '    If pHspfTable.EditAllSimilar Then
-            '        If pHspfTable.Opn.OpnBlk.NthOper(j).TableExists(tname) Then
-            '            ltable = pHspfTable.Opn.OpnBlk.NthOper(j).Tables(tname)
-            '            skip = False
-            '        Else
-            '            skip = True
-            '        End If
-            '        j = j + 1
-            '        If j > pHspfTable.Opn.OpnBlk.Ids.Count Then
-            '            more = False
-            '        End If
-            '    ElseIf pHspfTable.OccurCount > 1 Then
-            '        ltable = pHspfTable.Opn.OpnBlk.OperFromID(pHspfTable.Opn.Id).Tables(tname)
-            '        skip = False
-            '        more = False
-            '    Else
-            '        ltable = pHspfTable
-            '        skip = False
-            '        more = False
-            '    End If
+            more = True
+            .Rows = 1
+            j = 1
+            Do While more = True
+                If pHspfTable.EditAllSimilar = True Then
+                    If pHspfTable.Opn.OpnBlk.NthOper(j).TableExists(tname) Then
+                        ltable = pHspfTable.Opn.OpnBlk.NthOper(j).Tables(tname)
+                        skip = False
+                    Else
+                        skip = True
+                    End If
+                    j = j + 1
+                    If j > pHspfTable.Opn.OpnBlk.Ids.Count Then
+                        more = False
+                    End If
+                ElseIf pHspfTable.OccurCount > 1 Then
+                    ltable = pHspfTable.Opn.OpnBlk.OperFromID(pHspfTable.Opn.Id).Tables(tname)
+                    skip = False
+                    more = False
+                Else
+                    ltable = pHspfTable
+                    skip = False
+                    more = False
+                End If
 
-            '    If skip = False Then
-            '        .Rows = .Rows + 1
-            '        .CellValue(.Rows, 0) = ltable.Opn.Id
-            '        If chkDesc.Checked = False Then
-            '            .CellValue(.Rows, 1) = ltable.Opn.Description
-            '        End If
-            '        For i = 1 To pHspfTable.Parms.Count
-            '            .CellValue(.Rows, i + lchkDescInteger) = ltable.Parms(i).Value
-            '        Next i
-            '    End If
-            'Loop
+                .Rows = .Rows + 1
+                If skip = False Then
+                    .CellValue(.Rows - 1, 0) = ltable.Opn.Id
+                    If chkDesc.Checked = True Then
+                        .CellValue(.Rows - 1, 1) = ltable.Opn.Description
+                    End If
+                    For i = 0 To pHspfTable.Parms.Count - 1
+                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(i).Value
+                    Next i
+                End If
+            Loop
+
+            If chkDesc.Checked = True Then
+                lStartEditCol = 2
+            Else
+                lStartEditCol = 1
+            End If
+
+            For lCol As Integer = lStartEditCol To .Columns - 1
+                For lRow As Integer = 1 To .Rows - 1
+                    .CellEditable(lRow, lCol) = True
+                Next
+            Next
 
         End With
 
-        grdTable.SizeAllColumnsToContents()
+        grdTable.SizeAllColumnsToContents(grdTable.Width, True)
         grdTable.Refresh()
 
     End Sub
@@ -220,7 +255,11 @@ Public Class ctlEditTable
         Data = aHspfTable
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+    Private Sub chkDesc_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkDesc.CheckedChanged
         refreshGrid()
+    End Sub
+
+    Private Sub grdTable_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdTable.Resize
+        grdTable.SizeAllColumnsToContents(grdTable.Width, True)
     End Sub
 End Class

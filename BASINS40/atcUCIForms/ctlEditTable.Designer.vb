@@ -24,18 +24,18 @@ Partial Class ctlEditTable
         Me.cboOccur = New System.Windows.Forms.ComboBox
         Me.lblOccur = New System.Windows.Forms.Label
         Me.grdTable = New atcControls.atcGrid
-        Me.Button1 = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'txtDefine
         '
-        Me.txtDefine.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.txtDefine.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDefine.BackColor = System.Drawing.SystemColors.Control
         Me.txtDefine.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtDefine.Location = New System.Drawing.Point(8, 229)
+        Me.txtDefine.Location = New System.Drawing.Point(9, 278)
         Me.txtDefine.Multiline = True
         Me.txtDefine.Name = "txtDefine"
-        Me.txtDefine.Size = New System.Drawing.Size(662, 111)
+        Me.txtDefine.Size = New System.Drawing.Size(644, 111)
         Me.txtDefine.TabIndex = 0
         '
         'chkDesc
@@ -69,29 +69,21 @@ Partial Class ctlEditTable
         '
         Me.grdTable.AllowHorizontalScrolling = True
         Me.grdTable.AllowNewValidValues = False
+        Me.grdTable.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grdTable.CellBackColor = System.Drawing.Color.Empty
         Me.grdTable.LineColor = System.Drawing.Color.Empty
         Me.grdTable.LineWidth = 0.0!
-        Me.grdTable.Location = New System.Drawing.Point(31, 60)
+        Me.grdTable.Location = New System.Drawing.Point(12, 60)
         Me.grdTable.Name = "grdTable"
-        Me.grdTable.Size = New System.Drawing.Size(616, 152)
+        Me.grdTable.Size = New System.Drawing.Size(638, 198)
         Me.grdTable.Source = Nothing
         Me.grdTable.TabIndex = 5
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(485, 10)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(120, 18)
-        Me.Button1.TabIndex = 6
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
         '
         'ctlEditTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.grdTable)
         Me.Controls.Add(Me.lblOccur)
         Me.Controls.Add(Me.cboOccur)
@@ -99,7 +91,7 @@ Partial Class ctlEditTable
         Me.Controls.Add(Me.txtDefine)
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "ctlEditTable"
-        Me.Size = New System.Drawing.Size(686, 346)
+        Me.Size = New System.Drawing.Size(662, 395)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -109,6 +101,5 @@ Partial Class ctlEditTable
     Friend WithEvents cboOccur As System.Windows.Forms.ComboBox
     Friend WithEvents lblOccur As System.Windows.Forms.Label
     Friend WithEvents grdTable As atcControls.atcGrid
-    Friend WithEvents Button1 As System.Windows.Forms.Button
 
 End Class
