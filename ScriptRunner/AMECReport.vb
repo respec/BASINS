@@ -113,7 +113,7 @@ Public Module AMECReport
             Dim lStartMonthDay() As String = aSeasonStart.Split("/")
             Dim lEndMonthDay() As String = aSeasonEnd.Split("/")
             lSeasonData = New atcSeasonsYearSubset(lStartMonthDay(0), lStartMonthDay(1), lEndMonthDay(0), lEndMonthDay(1))
-            Dim lSimTimser As atcTimeseries = lSeasonData.Split(aTimeseries, Nothing)(1)
+            Dim lSimTimser As atcTimeseries = lSeasonData.Split(aTimeseries, Nothing).ItemByKey(1)
             lValues = lSimTimser.Values
         End If
         Dim lNumNonMissingValues As Integer = 0
