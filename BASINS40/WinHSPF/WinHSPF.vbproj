@@ -83,6 +83,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmLand.Designer.vb">
+      <DependentUpon>frmLand.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmLand.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmInputDataEditor.Designer.vb">
       <DependentUpon>frmInputDataEditor.vb</DependentUpon>
     </Compile>
@@ -123,6 +129,10 @@
     <EmbeddedResource Include="frmInputDataEditor.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmInputDataEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLand.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmLand.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmReach.resx">
       <SubType>Designer</SubType>
