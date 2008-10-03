@@ -37,78 +37,126 @@ Public Module AMECReport
 
         Dim lConcentrationsTable As New atcTableDelimited
         With lConcentrationsTable
+            .Delimiter = vbTab
             .NumFields = (lLocnArray.Length * lSeasonStartArray.Length * 4) + 1
             .NumHeaderRows = 3
-            For lLocationIndex As Integer = 0 To lLocnArray.Length - 1
+            For lLocationIndex As Integer = 0 To lLocnArray.GetUpperBound(0)
                 If lLocationIndex > 0 Then
-                    .Header(1) &= StrDup((lSeasonStartArray.Length * 2) + 1, vbTab)
+                    .Header(1) &= vbTab
                     .Header(2) &= vbTab
                     .Header(3) &= vbTab
                 End If
                 .Header(1) &= lLocnArray(lLocationIndex)
-                For lSeasonIndex As Integer = 0 To lSeasonNameArray.Length - 1
-                    .Header(2) &= lSeasonNameArray(lSeasonIndex) & StrDup(3, vbTab)
-                    .Header(3) &= "Simulated" & vbTab & "Observed" & vbTab
+                For lSeasonIndex As Integer = 0 To lSeasonNameArray.GetUpperBound(0)
+                    .Header(1) &= StrDup(4, vbTab)
+                    .Header(2) &= lSeasonNameArray(lSeasonIndex) & " (" & lSeasonStartArray(lSeasonIndex) & "-" & lSeasonEndArray(lSeasonIndex) & ")" & StrDup(4, vbTab)
+                    .Header(3) &= "Simulated" & vbTab & vbTab & "Observed" & vbTab & vbTab
                 Next
             Next
-            .Delimiter = vbTab
             Dim lFieldIndex As Integer = 1
-            For lIndex As Integer = 0 To lLocnArray.Length - 1
+            For lIndex As Integer = 0 To lLocnArray.GetUpperBound(0)
                 'this will need a better search if obs data contains multiple constituents
                 Dim lObsData As atcTimeseries = lDbfDataSource.DataSets.FindData("LOCN", lLocnArray(lIndex))(0)
                 Dim lSimData As atcTimeseries = lWdmDataSource.DataSets.FindData("ID", lSimDsnArray(lIndex))(0)
                 Dim lColumnStart As Integer = lIndex * lSeasonStartArray.Length * 4
                 If lIndex > 0 Then lColumnStart += 1 'TODO: more than 2 locations
-                For lSeasonIndex As Integer = 0 To lSeasonStartArray.Length - 1
-                    Dim lSeasonName As String = lSeasonNameArray(lSeasonIndex)
-                    Dim lSeasonStart As String = lSeasonStartArray(lSeasonIndex)
-                    Dim lSeasonEnd As String = lSeasonEndArray(lSeasonIndex)
-                    Dim lSimValues() As Double
-                    Dim lObsValues() As Double
-                    If lSeasonName = "Annual" Then
-                        lSimValues = lSimData.Values.Clone
-                        lObsValues = lObsData.Values.Clone
-                    Else
-                        Dim lSeasonData As atcSeasonsYearSubset
-                        Dim lStartMonthDay() As String = lSeasonStart.Split("/")
-                        Dim lEndMonthDay() As String = lSeasonEnd.Split("/")
-                        lSeasonData = New atcSeasonsYearSubset(lStartMonthDay(0), lStartMonthDay(1), lEndMonthDay(0), lEndMonthDay(1))
-                        Dim lSimTimser As atcTimeseries = lSeasonData.Split(lSimData, Nothing)(1)
-                        lSimValues = lSimTimser.Values
-                        Dim lObsTimser As atcTimeseries = lSeasonData.Split(lObsData, Nothing)(1)
-                        lObsValues = lObsTimser.Values
-                    End If
-                    Array.Sort(lSimValues)
-                    .CurrentRecord = 1
-                    .FieldName(lFieldIndex) = "Value"
-                    .FieldName(lFieldIndex + 1) = "Prob"
-                    For lValueIndex As Integer = 0 To lSimValues.Length - 1
-                        If lSimValues(lValueIndex) > 0.00005 Then
-                            .Value(lFieldIndex) = DoubleToString(lSimValues(lValueIndex), , "#0.0000")
-                            .Value(lFieldIndex + 1) = DoubleToString((lValueIndex) / (lSimValues.Length), , "#0.0000")
-                            .CurrentRecord += 1
-                        End If
-                    Next
+                For lSeasonIndex As Integer = 0 To lSeasonStartArray.GetUpperBound(0)
+                    PutTimeseriesInGrid(lSimData, lConcentrationsTable, lFieldIndex, _
+                                        lSeasonNameArray(lSeasonIndex), _
+                                        lSeasonStartArray(lSeasonIndex), _
+                                        lSeasonEndArray(lSeasonIndex), True)
                     lFieldIndex += 2
-                    Array.Sort(lObsValues)
-                    .CurrentRecord = 1
-                    .FieldName(lFieldIndex) = "Value"
-                    .FieldName(lFieldIndex + 1) = "Prob"
-                    For lValueIndex As Integer = 0 To lObsValues.Length - 1
-                        If lObsValues(lValueIndex) > 0.00005 Then
-                            .Value(lFieldIndex) = DoubleToString(lObsValues(lValueIndex), , "#0.0000")
-                            .Value(lFieldIndex + 1) = DoubleToString((lValueIndex) / (lObsValues.Length), , "#0.0000")
-                            .CurrentRecord += 1
-                        End If
-                    Next
+
+                    PutTimeseriesInGrid(lObsData, lConcentrationsTable, lFieldIndex, _
+                                        lSeasonNameArray(lSeasonIndex), _
+                                        lSeasonStartArray(lSeasonIndex), _
+                                        lSeasonEndArray(lSeasonIndex), False)
                     lFieldIndex += 2
                 Next
                 lFieldIndex += 1
             Next
-            SaveFileString(gOutputDir & "Seasonal_Phenols_Summary.txt", .ToString)
+            Dim lWdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
+            Dim lMsg As New atcUCI.HspfMsg
+            lMsg.Open("hspfmsg.mdb")
+            'Dim lHspfUci As New atcUCI.HspfUci
+            'lHspfUci.FastReadUciForStarter(lMsg, "Phenol-Mus85" & ".uci")
+
+            'Dim lReport As String = "Observed Concentrations for " & lCurObsCons & vbCrLf _
+            '                      & "Dates: " & lHspfUci.GlobalBlock.RunPeriod & vbCrLf _
+            '                      & "   Run Made: " & lWdmFileInfo.LastWriteTime & vbCrLf _
+            '                      & "   Run Title: " & lHspfUci.GlobalBlock.RunInf.Value & vbCrLf & vbCrLf _
+            '                      & .ToString
+
+            Dim lReport As String = "Observed Concentrations for " & lCurObsCons & vbCrLf _
+                                  & "Dates: " & vbCrLf _
+                                  & "   Run Made: " & lWdmFileInfo.LastWriteTime & vbCrLf _
+                                  & "   Run Title: " & vbCrLf & vbCrLf _
+                                  & .ToString
+
+            SaveFileString(gOutputDir & "Seasonal_Phenols_Summary.txt", lReport)
         End With
     End Sub
+
+    Private Sub PutTimeseriesInGrid(ByVal aTimeseries As atcTimeseries, _
+                                    ByVal aGrid As atcTableDelimited, _
+                                    ByVal aGridColumn As Integer, _
+                                    ByVal aSeasonName As String, _
+                                    ByVal aSeasonStart As String, _
+                                    ByVal aSeasonEnd As String, _
+                                    ByVal aSubtractSmall As Boolean)
+        Dim lValues() As Double
+        Dim lValueIndex As Integer
+        If aSeasonName = "Annual" Then
+            lValues = aTimeseries.Values.Clone
+        Else
+            Dim lSeasonData As atcSeasonsYearSubset
+            Dim lStartMonthDay() As String = aSeasonStart.Split("/")
+            Dim lEndMonthDay() As String = aSeasonEnd.Split("/")
+            lSeasonData = New atcSeasonsYearSubset(lStartMonthDay(0), lStartMonthDay(1), lEndMonthDay(0), lEndMonthDay(1))
+            Dim lSimTimser As atcTimeseries = lSeasonData.Split(aTimeseries, Nothing)(1)
+            lValues = lSimTimser.Values
+        End If
+        Dim lNumNonMissingValues As Integer = 0
+        Dim lNonMissingValues(lValues.GetUpperBound(0)) As Double
+        For lValueIndex = 0 To lValues.GetUpperBound(0)
+            If Not Double.IsNaN(lValues(lValueIndex)) Then
+                lNonMissingValues(lNumNonMissingValues) = lValues(lValueIndex)
+                lNumNonMissingValues += 1
+            End If
+        Next
+        ReDim Preserve lNonMissingValues(lNumNonMissingValues - 1)
+        Array.Sort(lNonMissingValues)
+        With aGrid
+            .CurrentRecord = 1
+            .FieldName(aGridColumn) = "Value"
+            .FieldName(aGridColumn + 1) = "Prob"
+            Dim lDivideBy As Integer = lNumNonMissingValues + 1
+            If aSubtractSmall Then
+                Dim lSmallValues As Integer = 0
+                For lValueIndex = 0 To lNumNonMissingValues - 1
+                    If lNonMissingValues(lValueIndex) > 0.00005 Then
+                        .Value(aGridColumn) = DoubleToString(lNonMissingValues(lValueIndex), , "#0.0000")
+                        .Value(aGridColumn + 1) = DoubleToString((lValueIndex + 1 - lSmallValues) / (lDivideBy - lSmallValues), , "#0.0000")
+                        .CurrentRecord += 1
+                    Else
+                        lSmallValues += 1
+                    End If
+                Next
+            Else
+                For lValueIndex = 0 To lNumNonMissingValues - 1
+                    If lNonMissingValues(lValueIndex) > 0.00005 Then
+                        .Value(aGridColumn) = DoubleToString(lNonMissingValues(lValueIndex), , "#0.0000")
+                        .Value(aGridColumn + 1) = DoubleToString((lValueIndex) / (lNumNonMissingValues), , "#0.0000")
+                        .CurrentRecord += 1
+                    End If
+                Next
+            End If
+        End With
+    End Sub
+
 End Module
+
+
 
 '      (Set curRow 1)
 '      (+= j 2)
