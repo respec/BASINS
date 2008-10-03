@@ -38,6 +38,8 @@ Public Class ctlEditTable
         End Get
 
         Set(ByVal aHspfTable As Object)
+            Dim lOper, lOccurIndex As Integer
+            Dim lTempString As String
 
             With grdTable
                 .Source = New atcControls.atcGridSource
@@ -48,41 +50,39 @@ Public Class ctlEditTable
             End With
 
             pHspfTable = aHspfTable
-            Dim i, loi As Long
-            Dim ctemp As String
 
             If pHspfTable.Def.NumOccur > 1 Then
                 cboOccur.Items.Clear()
 
-                For i = 1 To pHspfTable.OccurCount 'how about later ones?
+                For lOper = 1 To pHspfTable.OccurCount 'how about later ones?
                     If pHspfTable.Def.OccurGroup > 0 Then
                         'this is part of an occurance group, add name of occurance to combo box
-                        ctemp = ""
+                        lTempString = ""
                         If pHspfTable.Opn.Name = "PERLND" Or pHspfTable.Opn.Name = "IMPLND" Then
-                            ctemp = "QUAL-PROPS"
+                            lTempString = "QUAL-PROPS"
                         ElseIf pHspfTable.Opn.Name = "RCHRES" Then
-                            ctemp = "GQ-QALDATA"
+                            lTempString = "GQ-QALDATA"
                         End If
-                        If i > 1 Then
-                            loi = pHspfTable.Opn.OpnBlk.Ids(1).Tables(pHspfTable.Name & ":" & i).OccurIndex
+                        If lOper > 1 Then
+                            lOccurIndex = pHspfTable.Opn.OpnBlk.Ids(1).Tables(pHspfTable.Name & ":" & lOper).OccurIndex
                         Else
-                            loi = pHspfTable.Opn.OpnBlk.Ids(1).Tables(pHspfTable.Name).OccurIndex
+                            lOccurIndex = pHspfTable.Opn.OpnBlk.Ids(1).Tables(pHspfTable.Name).OccurIndex
                         End If
-                        If loi = 0 Then
-                            loi = i
+                        If lOccurIndex = 0 Then
+                            lOccurIndex = lOper
                         End If
-                        If loi > 1 Then
-                            ctemp = ctemp & ":" & loi
+                        If lOccurIndex > 1 Then
+                            lTempString = lTempString & ":" & lOccurIndex
                         End If
-                        If pHspfTable.Opn.OpnBlk.Ids(1).TableExists(ctemp) Then
-                            cboOccur.Items.Add(i & " - " & pHspfTable.Opn.OpnBlk.Ids(1).Tables(ctemp).Parms(1).Value)
+                        If pHspfTable.Opn.OpnBlk.Ids(1).TableExists(lTempString) Then
+                            cboOccur.Items.Add(lOper & " - " & pHspfTable.Opn.OpnBlk.Ids(1).Tables(lTempString).Parms(1).Value)
                         Else
-                            cboOccur.Items.Add(i)
+                            cboOccur.Items.Add(lOper)
                         End If
                     Else
-                        cboOccur.Items.Add(i)
+                        cboOccur.Items.Add(lOper)
                     End If
-                Next i
+                Next
                 cboOccur.SelectedIndex = pHspfTable.OccurNum - 1
                 lblOccur.Visible = True
                 cboOccur.Visible = True
@@ -99,7 +99,6 @@ Public Class ctlEditTable
             Else
                 chkDesc.Checked = False
                 chkDesc.Visible = False
-
                 refreshGrid()
             End If
         End Set
@@ -134,7 +133,7 @@ Public Class ctlEditTable
         Dim unitfg As String = Nothing
         Dim more, skip As Boolean
         Dim i, j, lchkDescInteger As Integer
-        Dim lStartEditCol As Integer
+        Dim lStartEditCol, lCol As Integer
 
         With grdTable.Source
             .Columns = pHspfTable.Parms.Count + 1
@@ -221,10 +220,14 @@ Public Class ctlEditTable
                 lStartEditCol = 1
             End If
 
-            For lCol As Integer = lStartEditCol To .Columns - 1
+            For lCol = lStartEditCol To .Columns - 1
                 For lRow As Integer = 1 To .Rows - 1
                     .CellEditable(lRow, lCol) = True
                 Next
+            Next
+
+            For lCol = 0 To .Columns - 1
+                .CellColor(0, lCol) = SystemColors.ControlLight
             Next
 
         End With
