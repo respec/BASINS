@@ -122,7 +122,9 @@ Public Class atcTableDelimited
         End Get
         Set(ByVal newValue As Integer)
             pNumHeaderRows = newValue
-            'TODO: should anything happen here?
+            For lHeaderIndex As Integer = pHeader.Count + 1 To newValue
+                pHeader.Add("") 'dummy header
+            Next
         End Set
     End Property
 

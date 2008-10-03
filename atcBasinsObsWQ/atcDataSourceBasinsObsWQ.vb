@@ -59,7 +59,6 @@ Public Class atcDataSourceBasinsObsWQ
                 Dim lTSKey As String
                 Dim lTSIndex As Integer
                 Dim lLocation As String = ""
-                Dim lConstituentCode As Integer = -1
                 Dim s As String
                 lDBF = New atcTableDBF
                 lDBF.OpenFile(Specification)
@@ -86,12 +85,7 @@ Public Class atcDataSourceBasinsObsWQ
                         lDBF.CurrentRecord = lRecordNumber
                         lLocation = lDBF.Value(lLocnCol)
                         Dim lConstituentString As String = lDBF.Value(lConsCol)
-                        If lConstituentString.Length > 0 Then
-                            lConstituentCode = lDBF.Value(lConsCol)
-                        Else
-                            lConstituentCode = -1
-                        End If
-                        lTSKey = lLocation & ":" & lConstituentCode
+                        lTSKey = lLocation & ":" & lConstituentString
                         lData = DataSets.ItemByKey(lTSKey)
                         If lData Is Nothing Then
                             lData = New atcTimeseries(Me)
@@ -102,7 +96,7 @@ Public Class atcDataSourceBasinsObsWQ
                             lData.Attributes.SetValue("Count", 0)
                             lData.Attributes.SetValue("Scenario", "OBSERVED")
                             lData.Attributes.SetValue("Location", lLocation)
-                            lData.Attributes.SetValue("Constituent", lConstituentCode)
+                            lData.Attributes.SetValue("Constituent", lConstituentString)
                             lData.Attributes.SetValue("Point", True)
                             lData.Attributes.AddHistory("Read from " & Specification)
                             DataSets.Add(lTSKey, lData)
