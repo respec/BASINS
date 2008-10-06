@@ -9,50 +9,51 @@ Imports MapWinUtility
 Imports mapwinGIS
 
 Public Module AMECReport
-    Private gProjectDir As String = "G:\Projects\AMEC\Phenol\"
+    Private gProjectDir As String = "C:\test\Phenol\"
     Private gOutputDir As String = gProjectDir & "Outfiles\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(gProjectDir)
-        Logger.Dbg(" CurDir:" & CurDir())
-
-        Dim lSDate As Double = Date.Parse("1/1/1973").ToOADate
-        Dim lEDate As Double = Date.Parse("1/1/2003").ToOADate
+        Dim lTab As String = Microsoft.VisualBasic.vbTab
+        Dim lCrLf As String = Microsoft.VisualBasic.vbCrLf ' Chr(13) & Chr(10)
+        Dim lDateRange As String = "1/1/1973 - 1/1/2003" 'Edit this to match observed and simulated data, TODO: automatically extract from UCI file
         Dim lLocnArray() As String = {"LOW", "UP"}
         Dim lSimDsnArray() As String = {"834", "813"}
         Dim lCurObsCons As String = "Phenols_mg/L"
+        Dim lWdmFileName As String = gProjectDir & "Phenol-Mus85.wdm"
+        Dim lDbfFileName As String = gProjectDir & "Phenol.dbf"
+        Dim lReportFilename As String = gOutputDir & "Seasonal_Phenols_Summary.txt"
 
         Dim lSeasonStartArray() As String = {"11/1", "4/1", "6/1", "9/1", "1/1"}
         Dim lSeasonEndArray() As String = {"4/1", "6/1", "9/1", "11/1", "12/31"}
         Dim lSeasonNameArray() As String = {"Winter", "Spring", "Summer", "Fall", "Annual"}
 
         'open WDM file
-        Dim lWdmFileName As String = gProjectDir & "Phenol-Mus85.wdm"
         Dim lWdmDataSource As New atcDataSourceWDM()
         lWdmDataSource.Open(lWdmFileName)
         'open DBF file
-        Dim lDbfFileName As String = gProjectDir & "Phenol.dbf"
         Dim lDbfDataSource As New atcDataSourceBasinsObsWQ()
         lDbfDataSource.Open(lDbfFileName)
 
         Dim lConcentrationsTable As New atcTableDelimited
         With lConcentrationsTable
-            .Delimiter = vbTab
+            .Delimiter = lTab
             .NumFields = (lLocnArray.Length * lSeasonStartArray.Length * 4) + 1
             .NumHeaderRows = 3
             For lLocationIndex As Integer = 0 To lLocnArray.GetUpperBound(0)
                 If lLocationIndex > 0 Then
-                    .Header(1) &= vbTab
-                    .Header(2) &= vbTab
-                    .Header(3) &= vbTab
+                    .Header(1) &= lTab
+                    .Header(2) &= lTab
+                    .Header(3) &= lTab
                 End If
                 .Header(1) &= lLocnArray(lLocationIndex)
                 For lSeasonIndex As Integer = 0 To lSeasonNameArray.GetUpperBound(0)
-                    .Header(1) &= StrDup(4, vbTab)
-                    .Header(2) &= lSeasonNameArray(lSeasonIndex) & " (" & lSeasonStartArray(lSeasonIndex) & "-" & lSeasonEndArray(lSeasonIndex) & ")" & StrDup(4, vbTab)
-                    .Header(3) &= "Simulated" & vbTab & vbTab & "Observed" & vbTab & vbTab
+                    .Header(1) &= lTab & lTab & lTab & lTab
+                    .Header(2) &= lSeasonNameArray(lSeasonIndex) & " (" & lSeasonStartArray(lSeasonIndex) & "-" & lSeasonEndArray(lSeasonIndex) & ")" & lTab & lTab & lTab & lTab
+                    .Header(3) &= "Simulated" & lTab & lTab & "Observed" & lTab & lTab
                 Next
             Next
+
             Dim lFieldIndex As Integer = 1
             For lIndex As Integer = 0 To lLocnArray.GetUpperBound(0)
                 'this will need a better search if obs data contains multiple constituents
@@ -75,25 +76,24 @@ Public Module AMECReport
                 Next
                 lFieldIndex += 1
             Next
-            Dim lWdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
-            Dim lMsg As New atcUCI.HspfMsg
-            lMsg.Open("hspfmsg.mdb")
-            'Dim lHspfUci As New atcUCI.HspfUci
-            'lHspfUci.FastReadUciForStarter(lMsg, "Phenol-Mus85" & ".uci")
 
+            Dim lWdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
+            'Dim lMsg As New atcUCI.HspfMsg
+            'lMsg.Open("hspfmsg.mdb")
+            'Dim lHspfUci As New atcUCI.HspfUci
+            'lHspfUci.FastReadUciForStarter(lMsg, IO.Path.ChangeExtension(lWdmFileName, ".uci"))
             'Dim lReport As String = "Observed Concentrations for " & lCurObsCons & vbCrLf _
             '                      & "Dates: " & lHspfUci.GlobalBlock.RunPeriod & vbCrLf _
             '                      & "   Run Made: " & lWdmFileInfo.LastWriteTime & vbCrLf _
             '                      & "   Run Title: " & lHspfUci.GlobalBlock.RunInf.Value & vbCrLf & vbCrLf _
             '                      & .ToString
 
-            Dim lReport As String = "Observed Concentrations for " & lCurObsCons & vbCrLf _
-                                  & "Dates: " & vbCrLf _
-                                  & "   Run Made: " & lWdmFileInfo.LastWriteTime & vbCrLf _
-                                  & "   Run Title: " & vbCrLf & vbCrLf _
+            Dim lReport As String = "Observed Concentrations for " & lCurObsCons & lCrLf _
+                                  & "Dates: " & lDateRange & lCrLf _
+                                  & "   Run Made: " & lWdmFileInfo.LastWriteTime & lCrLf _
                                   & .ToString
 
-            SaveFileString(gOutputDir & "Seasonal_Phenols_Summary.txt", lReport)
+            SaveFileString(lReportFilename, lReport)
         End With
     End Sub
 
@@ -125,7 +125,7 @@ Public Module AMECReport
             End If
         Next
         ReDim Preserve lNonMissingValues(lNumNonMissingValues - 1)
-        Array.Sort(lNonMissingValues)
+        System.Array.Sort(lNonMissingValues)
         With aGrid
             .CurrentRecord = 1
             .FieldName(aGridColumn) = "Value"
@@ -155,48 +155,3 @@ Public Module AMECReport
     End Sub
 
 End Module
-
-
-
-'      (Set curRow 1)
-'      (+= j 2)
-'      (If (= lSeasonCnt 1)
-'        (Grid j curRow curLocn)
-'      )
-'      (++ curRow)
-'      (Grid j curRow (+ curSeasonName " (" curSeasonDates ")"))
-'      (Grid j (++ curRow)  "Simulated")
-'      (Grid j (++ curRow)  "Value")
-'      (Grid (+ j 1) curRow "Prob")
-'      (Set valCnt (+ (Len lSimVals) 1))
-'      (Set m 0)
-'      (For k = 1 to (Len lSimVals)
-'        (Set val (ArrayItem lSimVals k))
-'        (If (> val 0.00005)
-'          (Grid j (++ curRow) (Format val "#0.0000"))
-'          (Grid (+ j 1) curRow (Format (/ (- k m) (- valCnt m)) "#0.0000"))
-'          (Else (++ m))
-'        )
-'      )
-'      (Set curRow 2)
-'      (+= j 2)
-'      (Grid j (++ curRow) "Observed")
-'      (Grid j (++ curRow)  "Value")
-'      (Grid (+ j 1) curRow "Prob")
-'      (Set valCnt (+ (Len lObsVals) 1))
-'      (For k = 1 to (Len lObsVals)
-'        (Set val (ArrayItem lObsVals k))
-'        (If (> val 0.00005)
-'          (Grid j (++ curRow) (Format val "#0.0000"))
-'          (Grid (+ j 1) curRow (Format (/ k valCnt) "#0.0000"))        
-'        )
-'      )
-'      (Unset lSimSubSet)
-'      (Unset lObsSubSet)
-'    )
-'  )
-'  (+= ReportString (Grid AsText (Chr 9) CRLF))
-'  (Set curObsCons (Mid curObsCons 1 (InStr curObsCons "_")))
-'  (SaveFile (+ gOutputDir "Seasonal_" curObsCons "Summary.txt") ReportString)
-')
-
