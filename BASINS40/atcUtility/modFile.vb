@@ -645,11 +645,11 @@ ErrorWriting:
             If lBaseFileName.Length > 0 AndAlso Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
                 'First look where this function would put a file location
                 lFileName = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\VB and VBA Program Settings\FindFile\FoundFiles", lBaseFileName, "")
-                If lFileName.Length > 0 Then
-                    If Not FileExists(lFileName) Then 'delete bad name in registry
-                        My.Computer.Registry.CurrentUser.DeleteValue("FindFile\FoundFiles\" & lBaseFileName)
-                    End If
-                End If
+                'If lFileName.Length > 0 Then
+                '    If Not FileExists(lFileName) Then 'delete bad name in registry
+                '        My.Computer.Registry.CurrentUser.DeleteValue("FindFile\FoundFiles\" & lBaseFileName)
+                '    End If
+                'End If
 
                 'Next, look in the part of the registry where installer puts file locations
                 If Not FileExists(lFileName) Then

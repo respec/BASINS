@@ -125,20 +125,17 @@ Public Class atcTimeseriesSWAT
                                 .NumFields = lLastField
                                 For lField = 1 To lLastField
                                     Select Case lField
-                                        Case 1 : .FieldLength(lField) = 9
-                                        Case 2 : .FieldLength(lField) = 5
-                                        Case 3 : .FieldLength(lField) = 5
-                                        Case 71, 72 : .FieldLength(lField) = 11
+                                        Case 1 : .FieldLength(lField) = 8 'LULC+HRU
+                                        Case 2 : .FieldLength(lField) = 5 'SUB
+                                        Case 3 : .FieldLength(lField) = 4 'MON contains day, month, and/or year
+                                            'TODO: find rule for when fields are 11 instead of 10 wide 
+                                            'Case 71, 72 : .FieldLength(lField) = 11
                                         Case Else : .FieldLength(lField) = 10
                                     End Select
-                                    If lField = 1 Then
-                                        .FieldName(lField) = Mid(lConstituentHeader, lFieldStart, .FieldLength(lField)).Trim
-                                    Else 'back up one position to correctly retrieve long field names starting in previous field
-                                        .FieldName(lField) = Mid(lConstituentHeader, lFieldStart - 1, .FieldLength(lField)).Trim
-                                    End If
+                                    .FieldName(lField) = lConstituentHeader.Substring(lFieldStart - 1, .FieldLength(lField)).Trim
                                     CType(lTable, atcTableFixedStreaming).FieldStart(lField) = lFieldStart
                                     Select Case lField
-                                        Case 1 : lFieldStart = 19 'skip to sub
+                                        Case 1 : lFieldStart = 18 'skip to sub
                                         Case 2 : lFieldStart = 29 'skip to mon
                                         Case Else : lFieldStart += .FieldLength(lField)
                                     End Select
@@ -151,7 +148,19 @@ Public Class atcTimeseriesSWAT
                     Logger.Status("Reading records for " & Format((.NumFields - lBaseDataField + 1), "#,###") & " constituents from " & Specification, True)
                     .CurrentRecord = 1
                     Dim lYearReading As Integer = 0
-                    Dim lYearBase As Integer = 0
+                    Dim lMonReading As Integer = 0
+                    Dim lDayReading As Integer = 0
+                    Dim lYearBase As Integer = 1900
+                    Dim lMONvalue As Integer
+                    Dim lMONcontains As Integer = 0 'IPRINT from file.cio, 0=Monthly, 1=Daily, 2=Yearly
+                    Dim lCIOfilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(Specification), "file.cio")
+                    If IO.File.Exists(lCIOfilename) Then
+                        Dim lCIO() As String
+                        lCIO = IO.File.ReadAllLines(lCIOfilename)
+                        Integer.TryParse(lCIO(8).Substring(12, 4), lYearBase)
+                        Integer.TryParse(lCIO(58).Substring(15, 1), lMONcontains)
+                    End If
+                    lYear = lYearBase
                     Do
                         If lTableDelimited Then
                             lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
@@ -159,15 +168,40 @@ Public Class atcTimeseriesSWAT
                             lLocation = .Value(1)
                         End If
 
-                        'MON column assumed to hold year
                         Try
-                            If Integer.TryParse(.Value(lBaseDataField - 1).Trim, lYear) Then
+                            If Integer.TryParse(.Value(lBaseDataField - 1).Trim, lMONvalue) Then
+                                Select Case lMONcontains
+                                    Case 0 'Monthly
+                                        If lMONvalue < 13 Then
+                                            If lMONvalue <> lMonReading Then
+                                                lMonReading = lMONvalue
+                                                If lMonReading = 1 AndAlso lDate = 0 Then
+                                                    lYear += 1
+                                                End If
+                                            End If
+                                            lDate = atcUtility.Jday(lYear, lMONvalue, daymon(lYear, lMONvalue), 24, 0, 0)
+                                        End If
+                                    Case 1 'Daily
+                                        If lDate = 0 Then
+                                            lDate = atcUtility.Jday(lYearBase, 1, 1, 24, 0, 0)
+                                            lDayReading = lMONvalue
+                                        ElseIf lMONvalue <> lDayReading Then
+                                            lDate += 1
+                                            lDayReading = lMONvalue
+                                            If lDayReading = 1 Then
+                                                lYear += 1
+                                            End If
+                                        End If
+                                    Case 2 'Yearly
+                                        lYear = lMONvalue
+                                        lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
+                                End Select
                                 If lYear <> lYearReading Then
-                                    Logger.Status("Reading year " & lYear)
+                                    Logger.Status("Reading year " & lYear, True)
+                                    Logger.Flush()
                                     lYearReading = lYear
                                     If lYearBase = 0 Then lYearBase = lYear
                                 End If
-                                lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
                                 For lField = lBaseDataField To .NumFields
                                     Dim lFieldName As String = .FieldName(lField).ToString.Replace("""", "")
                                     If lFieldsToProcess.Length = 0 OrElse lFieldsToProcess.Contains(lDelim & lFieldName.Replace("_", "/") & lDelim) Then
@@ -180,29 +214,40 @@ Public Class atcTimeseriesSWAT
                                                 lYearFill += 1
                                             End While
                                             If lSaveSubwatershedId Then
-                                                lTSBuilder.Attributes.Add("SubId", .Value(lSubIdField))
+                                                lTSBuilder.Attributes.Add("SubId", .Value(lSubIdField).Trim)
                                                 lTSBuilder.Attributes.Add("CropId", lLocation.Substring(0, 4))
-                                                lTSBuilder.Attributes.Add("HruId", lLocation.Substring(4, 5))
+                                                lTSBuilder.Attributes.Add("HruId", lLocation.Substring(4).Trim)
                                             End If
                                         End If
                                         lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
                                     End If
                                 Next
-                            Else 'got to end of run summary, value is number of years as a decimal
+                            Else 'got to end of run summary, value is number of years as a decimal or we have reached blank line after end
                                 Exit Do
                             End If
                         Catch ex As FormatException
                             Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
+                        Catch ex As Exception
+                            Logger.Dbg("Stopping reading SWAT output: " & ex.Message)
+                            Exit Do
                         End Try
                         .CurrentRecord += 1
                     Loop
-                    Logger.Dbg("Created " & lTSBuilders.Count & " Builders From " & .CurrentRecord & " Records")
+                    Logger.Dbg("Read " & Format(lTSBuilders.Count, "#,##0") & " timeseries From " & Format(.CurrentRecord, "#,##0") & " Records")
 
                     Dim lTimeseriesGroup As atcDataGroup = lTSBuilders.CreateTimeseriesGroup()
-                    Logger.Status("Updating Timeseries")
+                    Logger.Status("Filling Timeseries")
 
                     For Each lDataSet As atcData.atcTimeseries In lTimeseriesGroup
-                        lDataSet = FillValues(lDataSet, atcTimeUnit.TUYear, 1, pNaN, pNaN, pNaN)
+                        Select Case lMONcontains
+                            Case 0 'Monthly
+                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUMonth, 1, pNaN, pNaN, pNaN)
+                            Case 1 'Daily
+                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUDay, 1, pNaN, pNaN, pNaN)
+                            Case 2 'Yearly
+                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUYear, 1, pNaN, pNaN, pNaN)
+                        End Select
+
                         With lDataSet.Attributes
                             Dim lKeyParts() As String = .GetValue("Key").Split(":")
                             .SetValue("Scenario", "Simulate") 'TODO: get a name for the scenario
