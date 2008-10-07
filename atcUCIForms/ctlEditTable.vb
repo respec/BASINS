@@ -8,7 +8,35 @@ Public Class ctlEditTable
 
     Dim pHspfTable As HspfTable
     Dim pChanged As Boolean
+    Dim pCurrentSelectedColumn As Integer
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+
+    Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdTable.MouseDownCell
+        Dim lchkDescCheckedInteger As Integer
+        pCurrentSelectedColumn = grdTable.CurrentSelectedColumn
+
+        If chkDesc.Checked = True Then
+            lchkDescCheckedInteger = 1
+        Else
+            lchkDescCheckedInteger = 0
+        End If
+
+        Dim unitfg&
+        If pCurrentSelectedColumn = 0 Then
+            txtDefine.Text = "Table: " & pHspfTable.Name & ", " & pHspfTable.Def.Define & vbCrLf & "Parameter: Operation Number" & vbCrLf & vbCrLf
+        ElseIf pCurrentSelectedColumn = lchkDescCheckedInteger Then
+            txtDefine.Text = "Table: " & pHspfTable.Name & ", " & pHspfTable.Def.Define & vbCrLf & "Parameter: Description" & vbCrLf & vbCrLf
+        Else
+            txtDefine.Text = "Table: " & pHspfTable.Name & ", " & pHspfTable.Def.Define & vbCrLf & "Parameter: " & pHspfTable.Parms(pCurrentSelectedColumn - lchkDescCheckedInteger - 1).Def.Define & vbCrLf & vbCrLf
+        End If
+        unitfg = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
+        If unitfg = 1 Then 'english
+            txtDefine.Text = txtDefine.Text & pHspfTable.Def.HeaderE
+        ElseIf unitfg = 2 Then 'metric
+            txtDefine.Text = txtDefine.Text & pHspfTable.Def.HeaderM
+        End If
+
+    End Sub
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
@@ -47,6 +75,7 @@ Public Class ctlEditTable
                 .AllowNewValidValues = True
                 .AllowHorizontalScrolling = False
                 .Visible = True
+                .Source.HeaderRow = True
             End With
 
             pHspfTable = aHspfTable
@@ -91,8 +120,6 @@ Public Class ctlEditTable
                 cboOccur.Visible = False
             End If
 
-
-
             If Len(pHspfTable.Opn.Description) > 0 And pHspfTable.Name <> "GEN-INFO" Then
                 chkDesc.Checked = True
                 refreshGrid()
@@ -103,28 +130,6 @@ Public Class ctlEditTable
             End If
         End Set
     End Property
-    'Private Sub grdTable_RowColChange(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdTable.Change
-    '    Dim unitfg&
-    '    If grdTable.col = 0 Then
-    '        txtDefine = "Table: " & pTable.Name & ", " & pTable.Def.Define & vbCrLf & _
-    '                    "Parameter: Operation Number" & vbCrLf & _
-    '                    vbCrLf
-    '    ElseIf grdTable.col = chkDesc Then
-    '        txtDefine = "Table: " & pTable.Name & ", " & pTable.Def.Define & vbCrLf & _
-    '                    "Parameter: Description" & vbCrLf & _
-    '                    vbCrLf
-    '    Else
-    '        txtDefine = "Table: " & pTable.Name & ", " & pTable.Def.Define & vbCrLf & _
-    '                    "Parameter: " & pTable.Parms(grdTable.col - chkDesc).Def.Define & vbCrLf & _
-    '                    vbCrLf
-    '    End If
-    '    unitfg = pTable.Opn.OpnBlk.Uci.GlobalBlock.emfg
-    '    If unitfg = 1 Then 'english
-    '        txtDefine = txtDefine & pTable.Def.HeaderE
-    '    ElseIf unitfg = 2 Then 'metric
-    '        txtDefine = txtDefine & pTable.Def.HeaderM
-    '    End If
-    'End Sub
 
     Private Sub refreshGrid()
         Dim lParm As HspfParm
@@ -265,4 +270,5 @@ Public Class ctlEditTable
     Private Sub grdTable_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdTable.Resize
         grdTable.SizeAllColumnsToContents(grdTable.Width, True)
     End Sub
+
 End Class

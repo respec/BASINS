@@ -33,6 +33,10 @@ Public Class atcGrid
 
     Private pColumnEditing As Integer = -1
     Private pRowEditing As Integer = -1
+    Private pCurrentSelectedRow As Integer
+    Private pCurrentSelectedColumn As Integer
+
+
 
 #Region " Windows Form Designer generated code "
 
@@ -169,6 +173,18 @@ Public Class atcGrid
 
         CellComboBox.Items.Clear()
     End Sub
+
+    Public ReadOnly Property CurrentSelectedRow() As Integer
+        Get
+            Return pCurrentSelectedRow
+        End Get
+    End Property
+
+    Public ReadOnly Property CurrentSelectedColumn() As Integer
+        Get
+            Return pCurrentSelectedColumn
+        End Get
+    End Property
 
     Public Property ValidValues() As ICollection
         Get
@@ -601,6 +617,16 @@ Public Class atcGrid
                                     g.FillRectangle(lEachCellBackBrush, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
                                     g.DrawRectangle(lLinePen, lCellLeft - 1, lCellTop - 1, lCellRight - lCellLeft + 1, lCellBottom - lCellTop + 1)
                                 End If
+
+                                'If pSource.HeaderRow is true then make all cells in first row 3D and System.Control gray.
+                                If pSource.HeaderRow And lRow = 0 Then
+                                    g.FillRectangle(SystemBrushes.Control, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
+                                    g.DrawLine(Pens.White, lCellLeft + 1, lCellTop + 1, lCellLeft + 1, lCellBottom - 1)
+                                    g.DrawLine(Pens.Black, lCellLeft + 1, lCellBottom - 1, lCellRight - 1, lCellBottom - 1)
+                                    g.DrawLine(Pens.Black, lCellRight - 1, lCellBottom - 1, lCellRight - 1, lCellTop + 1)
+                                    g.DrawLine(Pens.White, lCellRight - 1, lCellTop + 1, lCellLeft + 1, lCellTop + 1)
+                                End If
+
                                 lCellValue = pSource.CellValue(lRow, lColumn)
                                 If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
                                     lCellAlignment = pSource.Alignment(lRow, lColumn)
@@ -884,6 +910,8 @@ Public Class atcGrid
                 If lRowIndex < pRowBottom.Count AndAlso lColumnIndex < pColumnRight.Count Then
                     lRow = pRowBottom.Keys(lRowIndex)
                     lColumn = pColumnRight.Keys(lColumnIndex)
+                    pCurrentSelectedRow = lRow
+                    pCurrentSelectedColumn = lColumn
                     RaiseEvent MouseDownCell(Me, lRow, lColumn)
                     If pSource.CellEditable(lRow, lColumn) Then
                         EditCell(lRow, lColumn)
