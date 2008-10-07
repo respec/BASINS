@@ -24,6 +24,7 @@ Public Class atcGridSource
     Private pEditable(,) As Boolean
     Private pAlignment(,) As atcAlignment
     Private pColorCells As Boolean = False
+    Private pHeaderRow As Boolean = False
 
     Public Event ChangedRows(ByVal aRows As Integer) 'Number of Rows changed
     Public Event ChangedColumns(ByVal aColumns As Integer) 'Number of Columns changed
@@ -189,6 +190,16 @@ Public Class atcGridSource
         End Get
         Set(ByVal newValue As Integer)
             pFixedRows = newValue
+        End Set
+    End Property
+
+    'Make the top row gray and buttonizable.
+    Overridable Property HeaderRow() As Boolean
+        Get
+            Return pHeaderRow
+        End Get
+        Set(ByVal newValue As Boolean)
+            pHeaderRow = newValue
         End Set
     End Property
 
