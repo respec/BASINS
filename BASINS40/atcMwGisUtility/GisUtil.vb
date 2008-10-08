@@ -17,6 +17,10 @@ Public Class GisUtil
         End Set
     End Property
 
+    Public Shared Function MappingObjectSet() As Boolean
+        Return pMapWin IsNot Nothing
+    End Function
+
     Public Shared Property StatusShow() As Boolean
         Get
             Return pStatusShow

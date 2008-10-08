@@ -13,7 +13,7 @@ Public Class ctlEditTable
 
     Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdTable.MouseDownCell
         Dim lchkDescCheckedInteger As Integer
-        pCurrentSelectedColumn = grdTable.CurrentSelectedColumn
+        pCurrentSelectedColumn = aColumn
 
         If chkDesc.Checked = True Then
             lchkDescCheckedInteger = 1
@@ -75,7 +75,7 @@ Public Class ctlEditTable
                 .AllowNewValidValues = True
                 .AllowHorizontalScrolling = False
                 .Visible = True
-                .Source.HeaderRow = True
+                .Fixed3D = True
             End With
 
             pHspfTable = aHspfTable

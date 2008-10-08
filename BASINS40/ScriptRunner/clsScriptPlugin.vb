@@ -1,6 +1,8 @@
 Public Class ScriptPlugin
     Inherits atcData.atcDataPlugin
 
+    Private Const ToolButtonName As String = "Test"
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "ScriptPlugin"
@@ -9,17 +11,17 @@ Public Class ScriptPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        pMapWin.Toolbar.AddButton("Test")
+        pMapWin.Toolbar.AddButton(ToolButtonName)
     End Sub
 
     Public Overrides Sub Terminate()
         MyBase.Terminate()
-        pMapWin.Toolbar.RemoveButton("Test")
+        pMapWin.Toolbar.RemoveButton(ToolButtonName)
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
-        If aItemName = "Test" Then
+        If aItemName = ToolButtonName Then
             ScriptDriver.Main(pMapWin)
         End If
     End Sub
