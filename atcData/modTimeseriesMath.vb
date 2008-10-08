@@ -661,7 +661,6 @@ Public Module modTimeseriesMath
         If aTU >= atcTimeUnit.TUSecond AndAlso aTU <= atcTimeUnit.TUCentury Then
             'get start date/time for existing TSer
             aTSer.EnsureValuesRead()
-            'Dim lIntvl As Double
             Dim lDate(5) As Integer
             If aTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aTSer.Dates.Value(0)) Then
                 J2Date(aTSer.Dates.Value(1), lDate)
@@ -669,38 +668,29 @@ Public Module modTimeseriesMath
                 J2Date(aTSer.Dates.Value(0), lDate)
             End If
             Dim lSDate(5) As Integer
-            Dim lTUnit As Integer = aTSer.Attributes.GetValue("Time Unit")
-            Dim lTStep As Integer = aTSer.Attributes.GetValue("Time Step")
-            Select Case lTUnit
+            Select Case aTU
                 Case atcTimeUnit.TUSecond
-                    'lIntvl = lTStep * JulianSecond
                 Case atcTimeUnit.TUMinute
-                    'lIntvl = lTStep * JulianMinute
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUHour
-                    'lIntvl = lTStep * JulianHour
                     lDate(4) = 0 'clear minutes
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUDay
-                    'lIntvl = lTStep
                     lDate(3) = 0 'clear hours
                     lDate(4) = 0 'clear minutes
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUMonth
-                    'lIntvl = lTStep * 30.44
                     lDate(2) = 1 'set to beginning of month
                     lDate(3) = 0 'clear hours
                     lDate(4) = 0 'clear minutes
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUYear
-                    'lIntvl = lTStep * 365.25
                     lDate(1) = 1 'set to beginning of Jan
                     lDate(2) = 1 'set to beginning of month
                     lDate(3) = 0 'clear hours
                     lDate(4) = 0 'clear minutes
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUCentury
-                    'lIntvl = lTStep * 36525
                     lDate(0) = Math.Floor(lDate(0) / 100) * 100
                     lDate(1) = 1 'set to beginning of Jan
                     lDate(2) = 1 'set to beginning of month
@@ -709,19 +699,6 @@ Public Module modTimeseriesMath
                     lDate(5) = 0 'clear seconds
             End Select
             lSJDay = Date2J(lDate)
-            'If lIntvl > 28 Then
-            '    If lTUnit = atcTimeUnit.TUMonth Then 'monthly
-            '        lSJDay = aTSer.Dates.Value(1) - daymon(lDate(0), lDate(1))
-            '    ElseIf lTUnit = atcTimeUnit.TUYear Then 'yearly
-            '        lSJDay = aTSer.Dates.Value(1) - 365 - (daymon(lDate(0), 2) - 28)
-            '    Else 'TODO::something for centuries
-            '    End If
-            'Else
-            '    lSJDay = aTSer.Dates.Value(1) - lIntvl
-            'End If
-            'Else
-            '  lSJDay = aTSer.Dates.Value(0)
-            'End If
             lEJDay = aTSer.Dates.Value(aTSer.numValues)
         End If
         Return NewDates(lSJDay, lEJDay, aTU, aTS)
@@ -757,11 +734,11 @@ Public Module modTimeseriesMath
             lNewDates(0) = aStartDate
             If aTU > modDate.atcTimeUnit.TUDay Then J2Date(aStartDate, lSDate) 'will need start date array
             For i As Integer = 1 To lNewNumDates
-                If aTU < modDate.atcTimeUnit.TUMonth Then
-                    lNewDates(i) = aStartDate + lIntvl * i
-                Else 'need to use special TIMADD function for long, varying length intervals
+                If aTU > modDate.atcTimeUnit.TUDay Then 'need to use special TIMADD function for varying length intervals (month, year)
                     TIMADD(lSDate, aTU, aTS, i, lDate)
                     lNewDates(i) = Date2J(lDate)
+                Else
+                    lNewDates(i) = aStartDate + lIntvl * i
                 End If
             Next
         End If
