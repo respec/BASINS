@@ -26,8 +26,8 @@ Partial Class frmWinHSPF
         Me.FunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ReachEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LandUseEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.InputDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -36,61 +36,63 @@ Partial Class frmWinHSPF
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.EditToolStripMenuItem, Me.FunctionsToolStripMenuItem, Me.HelpToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(724, 26)
+        Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(4, 2, 0, 2)
+        Me.MenuStrip1.Size = New System.Drawing.Size(543, 24)
         Me.MenuStrip1.TabIndex = 0
         Me.MenuStrip1.Text = "MenuStrip1"
         '
         'FileToolStripMenuItem
         '
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(40, 22)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
         Me.FileToolStripMenuItem.Text = "File"
         '
         'EditToolStripMenuItem
         '
         Me.EditToolStripMenuItem.Name = "EditToolStripMenuItem"
-        Me.EditToolStripMenuItem.Size = New System.Drawing.Size(43, 22)
+        Me.EditToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.EditToolStripMenuItem.Text = "Edit"
         '
         'FunctionsToolStripMenuItem
         '
         Me.FunctionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReachEditorToolStripMenuItem, Me.LandUseEditorToolStripMenuItem, Me.InputDataEditorToolStripMenuItem})
         Me.FunctionsToolStripMenuItem.Name = "FunctionsToolStripMenuItem"
-        Me.FunctionsToolStripMenuItem.Size = New System.Drawing.Size(81, 22)
+        Me.FunctionsToolStripMenuItem.Size = New System.Drawing.Size(65, 20)
         Me.FunctionsToolStripMenuItem.Text = "Functions"
         '
         'ReachEditorToolStripMenuItem
         '
         Me.ReachEditorToolStripMenuItem.Name = "ReachEditorToolStripMenuItem"
-        Me.ReachEditorToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ReachEditorToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
         Me.ReachEditorToolStripMenuItem.Text = "Reach Editor"
         '
         'LandUseEditorToolStripMenuItem
         '
         Me.LandUseEditorToolStripMenuItem.Name = "LandUseEditorToolStripMenuItem"
-        Me.LandUseEditorToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.LandUseEditorToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
         Me.LandUseEditorToolStripMenuItem.Text = "Land Use Editor"
-        '
-        'HelpToolStripMenuItem
-        '
-        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(48, 22)
-        Me.HelpToolStripMenuItem.Text = "Help"
         '
         'InputDataEditorToolStripMenuItem
         '
         Me.InputDataEditorToolStripMenuItem.Name = "InputDataEditorToolStripMenuItem"
-        Me.InputDataEditorToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.InputDataEditorToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
         Me.InputDataEditorToolStripMenuItem.Text = "Input Data Editor"
+        '
+        'HelpToolStripMenuItem
+        '
+        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(40, 20)
+        Me.HelpToolStripMenuItem.Text = "Help"
         '
         'frmWinHSPF
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(724, 315)
+        Me.ClientSize = New System.Drawing.Size(543, 256)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmWinHSPF"
         Me.Text = "Hydrological Simulation Program - Fortran (HSPF)"
         Me.MenuStrip1.ResumeLayout(False)

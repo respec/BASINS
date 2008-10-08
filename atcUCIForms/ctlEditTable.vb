@@ -75,7 +75,7 @@ Public Class ctlEditTable
                 .AllowNewValidValues = True
                 .AllowHorizontalScrolling = False
                 .Visible = True
-                .Fixed3D = True
+                .Source.FixedRows = 1
             End With
 
             pHspfTable = aHspfTable
