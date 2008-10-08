@@ -423,8 +423,8 @@ Public Module WatershedConstituentBalance
                                     If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                                         .CurrentRecord += 1
                                         If lConstituentKey.Substring(2).StartsWith("Header") Then
-                                            .CurrentRecord += 1
                                             .Value(1) = lConstituentName.PadRight(12)
+                                            .CurrentRecord += 1
                                         Else
                                             .Value(1) = lConstituentName.PadRight(12)
                                             'fill in values for each land use

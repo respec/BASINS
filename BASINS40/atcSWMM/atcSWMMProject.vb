@@ -198,13 +198,12 @@ Public Class SWMMProject
 
     Public Function PrecipTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, _
                                              ByVal aTimeseriesTag As String) As String
-        Dim lSB As New StringBuilder
-
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
         If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
         End If
         Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
+        Dim lSB As New StringBuilder
         For lIndex As Integer = lStartIndex To lEndIndex
             If aTimeSeries.Values(lIndex) > 0 Then
                 lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
@@ -246,7 +245,7 @@ Public Class SWMMProject
             Dim lDate(6) As Integer
             J2Date(lJDate, lDate)
             Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
-            Dim lTimeString As String = lDate(3) & ":" & lDate(4)
+            Dim lTimeString As String = lDate(3).ToString.PadLeft(2, "0") & ":" & lDate(4).ToString.PadLeft(2, "0")
             aSW.Write(StrPad(lDateString, 10, " ", False))
             aSW.Write(" ")
             aSW.Write(StrPad(lTimeString, 10, " ", False))
@@ -254,7 +253,6 @@ Public Class SWMMProject
             aSW.Write(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
             aSW.Write(vbCrLf)
         Next
-
     End Sub
 
     Public Sub Run(ByVal aInputFileName As String)
