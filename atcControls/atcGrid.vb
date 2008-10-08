@@ -16,6 +16,7 @@ Public Class atcGrid
     Private pFont As Font = New Font("Microsoft San Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point) ' MyBase.Font
 
     Private pAllowHorizontalScrolling As Boolean = True
+    Private pFixed3D As Boolean = False
     Private pLineColor As Color
     Private pLineWidth As Single
     Private pCellBackColor As Color
@@ -33,10 +34,6 @@ Public Class atcGrid
 
     Private pColumnEditing As Integer = -1
     Private pRowEditing As Integer = -1
-    Private pCurrentSelectedRow As Integer
-    Private pCurrentSelectedColumn As Integer
-
-
 
 #Region " Windows Form Designer generated code "
 
@@ -173,18 +170,6 @@ Public Class atcGrid
 
         CellComboBox.Items.Clear()
     End Sub
-
-    Public ReadOnly Property CurrentSelectedRow() As Integer
-        Get
-            Return pCurrentSelectedRow
-        End Get
-    End Property
-
-    Public ReadOnly Property CurrentSelectedColumn() As Integer
-        Get
-            Return pCurrentSelectedColumn
-        End Get
-    End Property
 
     Public Property ValidValues() As ICollection
         Get
@@ -340,6 +325,18 @@ Public Class atcGrid
         End Get
         Set(ByVal newValue As Single)
             pLineWidth = newValue
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' True for fixed rows and columns to be rendered with 3-D look
+    ''' </summary>
+    Public Property Fixed3D() As Boolean
+        Get
+            Return pFixed3D
+        End Get
+        Set(ByVal newValue As Boolean)
+            pFixed3D = newValue
         End Set
     End Property
 
@@ -602,7 +599,14 @@ Public Class atcGrid
                                     'Change left edge for measuring where to put cell contents
                                     lCellLeft = lCellRight - ColumnWidth(lColumn)
                                 End If
-                                If pSource.CellSelected(lRow, lColumn) Then
+
+                                If Fixed3D AndAlso lColumnIndex < lFixedColumns OrElse lRow < lFixedRows Then
+                                    g.FillRectangle(SystemBrushes.Control, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
+                                    g.DrawLine(Pens.White, lCellLeft + 1, lCellTop + 1, lCellLeft + 1, lCellBottom - 1)
+                                    g.DrawLine(Pens.Black, lCellLeft + 1, lCellBottom - 1, lCellRight - 1, lCellBottom - 1)
+                                    g.DrawLine(Pens.Black, lCellRight - 1, lCellBottom - 1, lCellRight - 1, lCellTop + 1)
+                                    g.DrawLine(Pens.White, lCellRight - 1, lCellTop + 1, lCellLeft + 1, lCellTop + 1)
+                                ElseIf pSource.CellSelected(lRow, lColumn) Then
                                     lEachCellBackColor = SystemColors.Highlight
                                     lEachCellTextBrush.Color = SystemColors.HighlightText
                                 Else 'If lColorCells Then
@@ -616,15 +620,6 @@ Public Class atcGrid
                                     lEachCellBackBrush.Color = lEachCellBackColor
                                     g.FillRectangle(lEachCellBackBrush, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
                                     g.DrawRectangle(lLinePen, lCellLeft - 1, lCellTop - 1, lCellRight - lCellLeft + 1, lCellBottom - lCellTop + 1)
-                                End If
-
-                                'If pSource.HeaderRow is true then make all cells in first row 3D and System.Control gray.
-                                If pSource.HeaderRow And lRow = 0 Then
-                                    g.FillRectangle(SystemBrushes.Control, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
-                                    g.DrawLine(Pens.White, lCellLeft + 1, lCellTop + 1, lCellLeft + 1, lCellBottom - 1)
-                                    g.DrawLine(Pens.Black, lCellLeft + 1, lCellBottom - 1, lCellRight - 1, lCellBottom - 1)
-                                    g.DrawLine(Pens.Black, lCellRight - 1, lCellBottom - 1, lCellRight - 1, lCellTop + 1)
-                                    g.DrawLine(Pens.White, lCellRight - 1, lCellTop + 1, lCellLeft + 1, lCellTop + 1)
                                 End If
 
                                 lCellValue = pSource.CellValue(lRow, lColumn)
@@ -910,8 +905,6 @@ Public Class atcGrid
                 If lRowIndex < pRowBottom.Count AndAlso lColumnIndex < pColumnRight.Count Then
                     lRow = pRowBottom.Keys(lRowIndex)
                     lColumn = pColumnRight.Keys(lColumnIndex)
-                    pCurrentSelectedRow = lRow
-                    pCurrentSelectedColumn = lColumn
                     RaiseEvent MouseDownCell(Me, lRow, lColumn)
                     If pSource.CellEditable(lRow, lColumn) Then
                         EditCell(lRow, lColumn)
