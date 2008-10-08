@@ -1168,27 +1168,57 @@ Public Class frmSWMMSetup
         Me.Refresh()
         EnableControls(False)
 
-        With pPlugIn.SWMMProject
-            .Name = tbxName.Text
-            Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-            'TODO: still use modelout?
-            Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & .Name & "\" & .Name & ".inp"
-            MkDirPath(PathNameOnly(lSWMMProjectFileName))
+        Dim lName As String = tbxName.Text
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        'TODO: still use modelout?
+        Dim lSWMMProjectFileName As String = lBasinsFolder & "\modelout\" & lName & "\" & lName & ".inp"
+        MkDirPath(PathNameOnly(lSWMMProjectFileName))
 
-            If Not PreProcessChecking(lSWMMProjectFileName) Then 'failed early checks
-                Exit Sub
-            End If
+        If PreProcessChecking(lSWMMProjectFileName) Then
+            With pPlugIn.SWMMProject
+                .Name = lName
+                .Title = "SWMM Project Written from BASINS"
 
-            .Title = "SWMM Project Written from BASINS"
+                Dim lSJDate As Double = 0.0
+                Dim lEJDate As Double = 0.0
+                Dim lPrecGageNamesByCatchment As New Collection
+                Dim lSelectedStation As StationDetails
 
-            Dim lSJDate As Double = 0.0
-            Dim lEJDate As Double = 0.0
-            Dim lPrecGageNamesByCatchment As New Collection
-            Dim lSelectedStation As StationDetails
+                If rbnSingle.Checked Then
+                    If cboPrecipStation.SelectedIndex > -1 Then
+                        lSelectedStation = pPrecStations.ItemByKey(cboPrecipStation.Items(cboPrecipStation.SelectedIndex))
+                        'set dates
+                        If lSelectedStation.StartJDate > lSJDate Then
+                            lSJDate = lSelectedStation.StartJDate
+                        End If
+                        If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                            lEJDate = lSelectedStation.EndJDate
+                        End If
+                        'use this precip gage for each catchment
+                        lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+                        'create rain gages from shapefile and selected station
+                        CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+                    End If
+                Else
+                    For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+                        lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+                        'set dates
+                        If lSelectedStation.StartJDate > lSJDate Then
+                            lSJDate = lSelectedStation.StartJDate
+                        End If
+                        If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                            lEJDate = lSelectedStation.EndJDate
+                        End If
+                        'remember which precip gage goes with each catchment
+                        lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+                        'create rain gages from shapefile and selected station
+                        CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+                    Next
+                End If
 
-            If rbnSingle.Checked Then
-                If cboPrecipStation.SelectedIndex > -1 Then
-                    lSelectedStation = pPrecStations.ItemByKey(cboPrecipStation.Items(cboPrecipStation.SelectedIndex))
+                Dim lMetGageName As String = ""
+                If cboOtherMet.SelectedIndex > -1 Then
+                    lSelectedStation = pMetStations.ItemByKey(cboOtherMet.Items(cboOtherMet.SelectedIndex))
                     'set dates
                     If lSelectedStation.StartJDate > lSJDate Then
                         lSJDate = lSelectedStation.StartJDate
@@ -1196,131 +1226,101 @@ Public Class frmSWMMSetup
                     If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
                         lEJDate = lSelectedStation.EndJDate
                     End If
-                    'use this precip gage for each catchment
-                    lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
-                    'create rain gages from shapefile and selected station
-                    CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+                    lMetGageName = lSelectedStation.Name
                 End If
-            Else
-                For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
-                    lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
-                    'set dates
-                    If lSelectedStation.StartJDate > lSJDate Then
-                        lSJDate = lSelectedStation.StartJDate
+
+                'create met constituents from wdm file and selected station
+                CreateMetConstituent(lMetWDMFileName, lMetGageName, "ATEM", .MetConstituents)
+                CreateMetConstituent(lMetWDMFileName, lMetGageName, "PEVT", .MetConstituents)
+
+                If lSJDate < 1.0 Or lEJDate < 1 Or lSJDate > lEJDate Then 'failed date checks
+                    Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
+                    EnableControls(True)
+                    Exit Sub
+                End If
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
+                'set start and end dates
+                .SJDate = lSJDate
+                .EJDate = lEJDate
+
+                'add backdrop file
+                .BackdropFile = FilenameSetExt(lSWMMProjectFileName, ".bmp")
+                GisUtil.SaveMapAsImage(.BackdropFile)
+                .BackdropX1 = GisUtil.MapExtentXmin
+                .BackdropY1 = GisUtil.MapExtentYmin
+                .BackdropX2 = GisUtil.MapExtentXmax
+                .BackdropY2 = GisUtil.MapExtentYmax
+
+                'populate the SWMM classes from the shapefiles
+                .Nodes.Clear()
+                .Conduits.Clear()
+                .Catchments.Clear()
+                Dim lTable As New atcUtility.atcTableDBF
+
+                If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
+                    Logger.Dbg("Add " & lTable.NumRecords & " NodesFrom " & lNodesShapefileName)
+                    .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, pNodeFieldMap))
+                End If
+                CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
+
+                If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
+                    Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lConduitShapefileName)
+                    .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, pConduitFieldMap), "Name", "C", 1))
+                End If
+                CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
+
+                If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
+                    Logger.Dbg("Add " & lTable.NumRecords & " CatchmentsFrom " & lCatchmentShapefileName)
+                    .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
+                End If
+                CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
+
+                lblStatus.Text = "Overlaying Landuses with Catchments"
+                Me.Refresh()
+
+                Dim lLanduseLayerName As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+                Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
+                Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
+                Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
+                Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
+                If cboLanduse.SelectedIndex = 0 Then
+                    'usgs giras is the selected land use type
+                    CreateLandusesFromGIRAS(lLandUseFileName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
+                ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
+                    'create landuses from grid
+                    CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
+                ElseIf cboLanduse.SelectedIndex = 2 Then
+                    'other shape
+                    Dim lLanduseFieldName As String = ""
+                    If cboDescription.SelectedIndex > -1 Then
+                        lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
                     End If
-                    If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
-                        lEJDate = lSelectedStation.EndJDate
-                    End If
-                    'remember which precip gage goes with each catchment
-                    lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
-                    'create rain gages from shapefile and selected station
-                    CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
-                Next
-            End If
-
-            Dim lMetGageName As String = ""
-            If cboOtherMet.SelectedIndex > -1 Then
-                lSelectedStation = pMetStations.ItemByKey(cboOtherMet.Items(cboOtherMet.SelectedIndex))
-                'set dates
-                If lSelectedStation.StartJDate > lSJDate Then
-                    lSJDate = lSelectedStation.StartJDate
+                    CreateLandusesFromShapefile(lLandUseFileName, lLanduseFieldName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
                 End If
-                If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
-                    lEJDate = lSelectedStation.EndJDate
-                End If
-                lMetGageName = lSelectedStation.Name
-            End If
 
-            'create met constituents from wdm file and selected station
-            CreateMetConstituent(lMetWDMFileName, lMetGageName, "ATEM", .MetConstituents)
-            CreateMetConstituent(lMetWDMFileName, lMetGageName, "PEVT", .MetConstituents)
+                'now reclassify the landuses 
+                Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
+                .Landuses = lReclassifyLanduses
 
-            If lSJDate < 1.0 Or lEJDate < 1 Or lSJDate > lEJDate Then 'failed date checks
-                Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
-                EnableControls(True)
-                Exit Sub
-            End If
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+                Logger.Dbg(lblStatus.Text)
+                Me.Refresh()
 
-            'set start and end dates
-            .SJDate = lSJDate
-            .EJDate = lEJDate
-
-            'add backdrop file
-            .BackdropFile = FilenameSetExt(lSWMMProjectFileName, ".bmp")
-            GisUtil.SaveMapAsImage(.BackdropFile)
-            .BackdropX1 = GisUtil.MapExtentXmin
-            .BackdropY1 = GisUtil.MapExtentYmin
-            .BackdropX2 = GisUtil.MapExtentXmax
-            .BackdropY2 = GisUtil.MapExtentYmax
-
-            'populate the SWMM classes from the shapefiles
-            .Nodes.Clear()
-            .Conduits.Clear()
-            .Catchments.Clear()
-            Dim lTable As New atcUtility.atcTableDBF
-
-            If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
-                Logger.Dbg("Add " & lTable.NumRecords & " NodesFrom " & lNodesShapefileName)
-                .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, pNodeFieldMap))
-            End If
-            CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
-
-            If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
-                Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lConduitShapefileName)
-                .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, pConduitFieldMap), "Name", "C", 1))
-            End If
-            CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
-
-            If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
-                Logger.Dbg("Add " & lTable.NumRecords & " CatchmentsFrom " & lCatchmentShapefileName)
-                .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
-            End If
-            CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
-
-            lblStatus.Text = "Overlaying Landuses with Catchments"
+                'save project file and start SWMM
+                Logger.Dbg("Save SWMM input file" & lSWMMProjectFileName)
+                .Save(lSWMMProjectFileName)
+                Logger.Dbg("Run SWMM")
+                .Run(lSWMMProjectFileName)
+                Logger.Dbg("BackFromSWMM")
+            End With
+            lblStatus.Text = ""
             Me.Refresh()
-
-            Dim lLanduseLayerName As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-            Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
-            Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
-            Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
-            Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
-            If cboLanduse.SelectedIndex = 0 Then
-                'usgs giras is the selected land use type
-                CreateLandusesFromGIRAS(lLandUseFileName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
-            ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
-                'create landuses from grid
-                CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
-            ElseIf cboLanduse.SelectedIndex = 2 Then
-                'other shape
-                Dim lLanduseFieldName As String = ""
-                If cboDescription.SelectedIndex > -1 Then
-                    lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-                End If
-                CreateLandusesFromShapefile(lLandUseFileName, lLanduseFieldName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
-            End If
-
-            'now reclassify the landuses 
-            Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
-            .Landuses = lReclassifyLanduses
-
-            Logger.Dbg(lblStatus.Text)
-            Me.Refresh()
-
-            'save project file and start SWMM
-            Logger.Dbg("Save SWMM input file" & lSWMMProjectFileName)
-            .Save(lSWMMProjectFileName)
-            Logger.Dbg("Run SWMM")
-            .Run(lSWMMProjectFileName)
-            Logger.Dbg("BackFromSWMM")
-        End With
-
-        lblStatus.Text = ""
-        Me.Refresh()
-        Me.Dispose()
-        Me.Close()
-        Logger.Dbg("Done")
+            Me.Dispose()
+            Me.Close()
+            Logger.Dbg("Done")
+        Else
+            Logger.Dbg("Failed PreProcess Check")
+        End If
         Logger.Flush()
     End Sub
 

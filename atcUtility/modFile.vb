@@ -10,6 +10,10 @@ Public Module modFile
 
     Private ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
 
+    Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
+        Return TryMove(aFromFilename, aToPath, False)
+    End Function
+
     ''' <summary>
     ''' Try moving a file to a new location, log a failure rather than raising an exception
     ''' </summary>
@@ -17,9 +21,9 @@ Public Module modFile
     ''' <param name="aToPath">Folder or full path to move to</param>
     ''' <returns>True if successful, False if unsuccessful</returns>
     ''' <remarks></remarks>
-    Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
-        TryMove = False
-        Logger.Dbg("TryMove '" & aFromFilename & "' to '" & aToPath & "'")
+    Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String, ByVal aVerbose As Boolean) As Boolean
+        Dim lTryMove As Boolean = False
+        If aVerbose Then Logger.Dbg("TryMove '" & aFromFilename & "' to '" & aToPath & "'")
         If FileExists(aFromFilename) Then
             Try
                 Try
@@ -35,20 +39,21 @@ Public Module modFile
                     End If
                     TryDelete(aToPath) 'Remove existing file at destination
                     IO.File.Move(aFromFilename, aToPath)
-                    TryMove = True
+                    lTryMove = True
                 Catch exMove As Exception 'If moving didn't work, maybe copying will
-                    Logger.Dbg("Exception '" & exMove.Message & "' while moving '" & aFromFilename & "' to '" & aToPath & "' attempting copy")
+                    If aVerbose Then Logger.Dbg("Exception '" & exMove.Message & "' while moving '" & aFromFilename & "' to '" & aToPath & "' attempting copy")
                     IO.File.Copy(aFromFilename, aToPath)
-                    TryMove = True
+                    lTryMove = True
                     TryDelete(aFromFilename)
                 End Try
-                Logger.Dbg("Moved file from '" & aFromFilename & "' to '" & aToPath & "'")
+                If aVerbose Then Logger.Dbg("Moved file from '" & aFromFilename & "' to '" & aToPath & "'")
             Catch ex As Exception
-                Logger.Dbg("Unable to move file from '" & aFromFilename & "' to '" & aToPath & "' - " & ex.Message)
+                If aVerbose Then Logger.Dbg("Unable to move file from '" & aFromFilename & "' to '" & aToPath & "' - " & ex.Message)
             End Try
         Else
-            Logger.Dbg("File to move does not exist: '" & aFromFilename & "'")
+            If aVerbose Then Logger.Dbg("File to move does not exist: '" & aFromFilename & "'")
         End If
+        Return lTryMove
     End Function
 
     ''' <summary>
@@ -123,7 +128,7 @@ Public Module modFile
         Next
     End Function
 
-    Private Function ShapeFilenames(ByVal aShapefilename As String) As ArrayList 
+    Private Function ShapeFilenames(ByVal aShapefilename As String) As ArrayList
         ShapeFilenames = New ArrayList
         For Each lExtension As String In ShapeExtensions
             ShapeFilenames.Add(IO.Path.ChangeExtension(aShapefilename, lExtension))
