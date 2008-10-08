@@ -86,6 +86,7 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
         Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem
         Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
@@ -99,7 +100,6 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
-        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -137,6 +137,11 @@ Friend Class frmDisplayFrequencyGrid
         '
         Me.mnuFileSaveReport.Index = 4
         Me.mnuFileSaveReport.Text = "Save Report"
+        '
+        'mnuFileSaveViewNDay
+        '
+        Me.mnuFileSaveViewNDay.Index = 5
+        Me.mnuFileSaveViewNDay.Text = "Save/View N-Day"
         '
         'mnuEdit
         '
@@ -211,6 +216,7 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.AllowNewValidValues = False
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
         Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.agdMain.Fixed3D = True
         Me.agdMain.LineColor = System.Drawing.Color.Empty
         Me.agdMain.LineWidth = 0.0!
         Me.agdMain.Location = New System.Drawing.Point(0, 0)
@@ -218,11 +224,6 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.Size = New System.Drawing.Size(720, 545)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
-        '
-        'mnuFileSaveViewNDay
-        '
-        Me.mnuFileSaveViewNDay.Index = 5
-        Me.mnuFileSaveViewNDay.Text = "Save/View N-Day"
         '
         'frmDisplayFrequencyGrid
         '
