@@ -602,26 +602,27 @@ Public Class atcGrid
 
                                 If Fixed3D AndAlso lColumnIndex < lFixedColumns OrElse lRow < lFixedRows Then
                                     g.FillRectangle(SystemBrushes.Control, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
-                                    g.DrawLine(Pens.White, lCellLeft + 1, lCellTop + 1, lCellLeft + 1, lCellBottom - 1)
+                                    g.DrawLine(Pens.White, lCellLeft + 1, lCellTop, lCellLeft + 1, lCellBottom - 1)
                                     g.DrawLine(Pens.Black, lCellLeft + 1, lCellBottom - 1, lCellRight - 1, lCellBottom - 1)
                                     g.DrawLine(Pens.Black, lCellRight - 1, lCellBottom - 1, lCellRight - 1, lCellTop + 1)
-                                    g.DrawLine(Pens.White, lCellRight - 1, lCellTop + 1, lCellLeft + 1, lCellTop + 1)
-                                ElseIf pSource.CellSelected(lRow, lColumn) Then
-                                    lEachCellBackColor = SystemColors.Highlight
-                                    lEachCellTextBrush.Color = SystemColors.HighlightText
-                                Else 'If lColorCells Then
-                                    lEachCellBackColor = pSource.CellColor(lRow, lColumn)
-                                    lEachCellTextBrush.Color = SystemColors.WindowText
-                                    'Else
-                                    '    lEachCellBackColor = pCellBackColor
-                                    '    lEachCellTextBrush.Color = SystemColors.WindowText
+                                    g.DrawLine(Pens.White, lCellRight - 1, lCellTop, lCellLeft + 1, lCellTop)
+                                Else
+                                    If pSource.CellSelected(lRow, lColumn) Then
+                                        lEachCellBackColor = SystemColors.Highlight
+                                        lEachCellTextBrush.Color = SystemColors.HighlightText
+                                    Else 'If lColorCells Then
+                                        lEachCellBackColor = pSource.CellColor(lRow, lColumn)
+                                        lEachCellTextBrush.Color = SystemColors.WindowText
+                                        'Else
+                                        '    lEachCellBackColor = pCellBackColor
+                                        '    lEachCellTextBrush.Color = SystemColors.WindowText
+                                    End If
+                                    If Not lEachCellBackColor.Equals(pCellBackColor) Then
+                                        lEachCellBackBrush.Color = lEachCellBackColor
+                                        g.FillRectangle(lEachCellBackBrush, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
+                                        g.DrawRectangle(lLinePen, lCellLeft - 1, lCellTop - 1, lCellRight - lCellLeft + 1, lCellBottom - lCellTop + 1)
+                                    End If
                                 End If
-                                If Not lEachCellBackColor.Equals(pCellBackColor) Then
-                                    lEachCellBackBrush.Color = lEachCellBackColor
-                                    g.FillRectangle(lEachCellBackBrush, lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
-                                    g.DrawRectangle(lLinePen, lCellLeft - 1, lCellTop - 1, lCellRight - lCellLeft + 1, lCellBottom - lCellTop + 1)
-                                End If
-
                                 lCellValue = pSource.CellValue(lRow, lColumn)
                                 If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
                                     lCellAlignment = pSource.Alignment(lRow, lColumn)

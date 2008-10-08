@@ -73,6 +73,24 @@ Friend Class atcFrequencyGridSource
         End Set
     End Property
 
+    Overrides Property FixedRows() As Integer
+        Get
+            Return 1
+        End Get
+        Set(ByVal value As Integer)
+
+        End Set
+    End Property
+
+    Overrides Property FixedColumns() As Integer
+        Get
+            Return 2
+        End Get
+        Set(ByVal value As Integer)
+
+        End Set
+    End Property
+
     Public Function DataSetAt(ByVal aRow As Integer) As atcDataSet
         Return pDataGroup((aRow - 1) \ pRecurrence.Count)
     End Function
