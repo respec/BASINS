@@ -60,12 +60,13 @@ Public Class HspfFilesBlk
             End If
         End Get
         Set(ByVal aValue As HspfData.HspfFile) '?
-            If aIndex > 0 And aIndex <= pFiles.Count Then
+            If aIndex >= 0 And aIndex < pFiles.Count Then
                 pFiles.RemoveAt(aIndex)
                 pFiles.Insert(aIndex, aValue)
-            ElseIf aIndex = pFiles.Count + 1 Then
+            ElseIf aIndex = pFiles.Count Then
                 pFiles.Add(aValue)
-            Else 'error?
+            Else
+                Throw New ApplicationException("Bad Files Block Index " & aIndex & " Range Must be (0-" & pFiles.Count & ")")
             End If
         End Set
     End Property

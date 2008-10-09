@@ -794,9 +794,9 @@ Public Class HspfUci
                     lConn.Target = lPoint.Target
                     'Me.Connections.Add lConn
                     lOpn.Sources.Add(lConn)
-                    'now remove all point sources
-                    lOpn.PointSources.Clear()
                 Next lPoint
+                'now remove all point sources
+                lOpn.PointSources.Clear()
             Next
         Next lOperationType
 
@@ -2506,7 +2506,9 @@ x:
                 Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
             End If
             lInit = 0
-            If lBuff.Substring(2, 6) = "FTABLE" Then 'this is a new one
+            If lBuff Is Nothing Then
+                lDone = True
+            ElseIf lBuff.Substring(2, 6) = "FTABLE" Then 'this is a new one
                 Dim lId As Integer = CShort(lBuff.Substring(11, 4))
                 'find which operation this ftable is associated with
                 Dim lOperation As HspfOperation = Nothing
