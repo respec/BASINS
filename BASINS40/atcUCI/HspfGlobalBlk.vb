@@ -179,13 +179,13 @@ Public Class HspfGlobalBlk
             Else
                 pSDate(1) = 1
             End If
-            lField = lRecord.Substring(22, 2)
+            lField = lRecord.Substring(22, 2).TrimEnd
             If lField.Length > 0 AndAlso IsInteger(lField) Then
                 pSDate(2) = lField
             Else
                 pSDate(2) = 1
             End If
-            lField = lRecord.Substring(25, 2)
+            lField = lRecord.Substring(25, 2).TrimEnd
             If lField.Length > 0 AndAlso IsInteger(lField) Then
                 pSDate(3) = lField
                 pSDate(4) = lRecord.Substring(28, 2)
@@ -201,24 +201,24 @@ Public Class HspfGlobalBlk
                 Logger.Dbg("EndYearParseFailed:" & lField)
                 pEDate(0) = 2007 'better than nothing?
             End If
-            lField = lRecord.Substring(44, 2)
+            lField = lRecord.Substring(44, 2).TrimEnd
             If lField.Length > 0 AndAlso IsInteger(lField) Then
                 pEDate(1) = lField
             Else
                 pEDate(1) = 12
             End If
-            lField = lRecord.Substring(47, 2)
+            lField = lRecord.Substring(47, 2).TrimEnd
             If lField.Length > 0 AndAlso IsInteger(lField) Then
                 pEDate(2) = lField
             Else
                 pEDate(2) = 31
             End If
-            lField = lRecord.Substring(50, 2)
+            lField = lRecord.Substring(50, 2).TrimEnd
             If lField.Length > 0 AndAlso IsInteger(lField) Then
                 pEDate(3) = lField
                 pEDate(4) = lRecord.Substring(53, 2)
             Else
-                pEDate(3) = 0
+                pEDate(3) = 24
                 pEDate(4) = 0
             End If
 

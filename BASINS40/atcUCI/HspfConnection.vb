@@ -3,6 +3,7 @@ Option Strict Off
 Option Explicit On
 
 Imports System.Text
+Imports MapWinUtility
 
 Public Class HspfConnection
     Private pMFact As Double
@@ -516,7 +517,7 @@ Public Class HspfConnection
                             For Each lConnection As HspfConnection In lOperation.Sources
                                 If lConnection.Typ = lTypeIndex Then
                                     If lConnection.Comment.Length > 0 Then
-                                        lSB.Append(lConnection.Comment)
+                                        lSB.Append(lConnection.Comment & vbCrLf)
                                     End If
                                     Dim lStr As New StringBuilder
                                     lStr.Append(lConnection.Source.VolName.Trim)
@@ -654,40 +655,46 @@ Public Class HspfConnection
                                     If lConnection.Comment.Length > 0 Then
                                         lSB.AppendLine(lConnection.Comment)
                                     End If
-                                    Dim lStr As New StringBuilder
-                                    lStr.Append(lConnection.Source.Opn.Name.Trim)
-                                    lStr.Append(Space(iCol(1) - lStr.Length - 1)) 'pad prev field
-                                    lStr.Append(CStr(lConnection.Source.Opn.Id).PadLeft(iLen(1)))
-                                    lStr.Append(Space(iCol(2) - lStr.Length - 1))
-                                    If NumericallyTheSame((lConnection.MFactAsRead), (lConnection.MFact)) Then
-                                        lStr.Append(lConnection.MFactAsRead)
-                                    ElseIf lConnection.MFact <> 1 Then
-                                        lConnection.MFact = System.Math.Round(lConnection.MFact, 2)
-                                        lStr.Append(CStr(lConnection.MFact).PadLeft(iLen(2)))
-                                    End If
-                                    lStr.Append(Space(iCol(3) - lStr.Length - 1))
-                                    lStr.Append(lConnection.Target.Opn.Name)
-                                    lStr.Append(Space(iCol(4) - lStr.Length - 1))
-                                    lStr.Append(CStr(lConnection.Target.Opn.Id).PadLeft(iLen(5)))
-                                    lStr.Append(Space(iCol(5) - lStr.Length - 1))
-                                    lStr.Append(CStr(lConnection.MassLink).PadLeft(iLen(5)))
-                                    If lConnection.Target.MemSub1 > 0 Then
-                                        lStr.Append(Space(iCol(6) - lStr.Length - 1))
-                                        Dim t As String = CStr(lConnection.Target.MemSub1).PadLeft(iLen(6))
-                                        If lConnection.Target.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Target.Member, 1, t)
+                                    If lConnection.Source.Opn Is Nothing OrElse lConnection.Target.Opn Is Nothing Then
+                                        Logger.Dbg("SchematicProblem" & _
+                                                   lConnection.Source.VolName & ":" & lConnection.Source.VolId & " to " & _
+                                                   lConnection.Target.VolName & ":" & lConnection.Target.VolId)
+                                    Else
+                                        Dim lStr As New StringBuilder
+                                        lStr.Append(lConnection.Source.Opn.Name.Trim)
+                                        lStr.Append(Space(iCol(1) - lStr.Length - 1)) 'pad prev field
+                                        lStr.Append(CStr(lConnection.Source.Opn.Id).PadLeft(iLen(1)))
+                                        lStr.Append(Space(iCol(2) - lStr.Length - 1))
+                                        If NumericallyTheSame((lConnection.MFactAsRead), (lConnection.MFact)) Then
+                                            lStr.Append(lConnection.MFactAsRead)
+                                        ElseIf lConnection.MFact <> 1 Then
+                                            lConnection.MFact = System.Math.Round(lConnection.MFact, 2)
+                                            lStr.Append(CStr(lConnection.MFact).PadLeft(iLen(2)))
                                         End If
-                                        lStr.Append(t)
-                                    End If
-                                    If lConnection.Target.MemSub2 > 0 Then
-                                        lStr.Append(Space(iCol(7) - lStr.Length - 1))
-                                        Dim t As String = CStr(lConnection.Target.MemSub2).PadLeft(iLen(7))
-                                        If lConnection.Target.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Target.Member, 2, t)
+                                        lStr.Append(Space(iCol(3) - lStr.Length - 1))
+                                        lStr.Append(lConnection.Target.Opn.Name)
+                                        lStr.Append(Space(iCol(4) - lStr.Length - 1))
+                                        lStr.Append(CStr(lConnection.Target.Opn.Id).PadLeft(iLen(5)))
+                                        lStr.Append(Space(iCol(5) - lStr.Length - 1))
+                                        lStr.Append(CStr(lConnection.MassLink).PadLeft(iLen(5)))
+                                        If lConnection.Target.MemSub1 > 0 Then
+                                            lStr.Append(Space(iCol(6) - lStr.Length - 1))
+                                            Dim t As String = CStr(lConnection.Target.MemSub1).PadLeft(iLen(6))
+                                            If lConnection.Target.VolName = "RCHRES" Then
+                                                t = pUci.IntAsCat(lConnection.Target.Member, 1, t)
+                                            End If
+                                            lStr.Append(t)
                                         End If
-                                        lStr.Append(t)
+                                        If lConnection.Target.MemSub2 > 0 Then
+                                            lStr.Append(Space(iCol(7) - lStr.Length - 1))
+                                            Dim t As String = CStr(lConnection.Target.MemSub2).PadLeft(iLen(7))
+                                            If lConnection.Target.VolName = "RCHRES" Then
+                                                t = pUci.IntAsCat(lConnection.Target.Member, 2, t)
+                                            End If
+                                            lStr.Append(t)
+                                        End If
+                                        lSB.AppendLine(lStr.ToString)
                                     End If
-                                    lSB.AppendLine(lStr.ToString)
                                 End If
                             Next lConnection
                         Next lOperation

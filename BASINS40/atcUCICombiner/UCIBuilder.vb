@@ -5,12 +5,25 @@ Imports atcWDM
 Imports System.Collections.Specialized
 
 Public Module UCIBuilder
-    Private pBaseDrive As String = "c:\"
-    Private pBaseDir As String = pBaseDrive & "SFBay\"
-    Private pOutputDir As String = pBaseDir & "UCIs\"
-    Private pDataDir As String = pBaseDir & "datafiles\"
+    Private pBaseDrive As String
+    Private pBaseDir As String
+    Private pWorkingDir As String
+    Private pOutputDir As String
+    Private pDataDir As String
+
+    Private Sub Initialize()
+        Dim lTestName As String = "SFBay"
+        Select Case lTestName
+            Case "SFBay"
+                pBaseDrive = "c:\"
+                pBaseDir = pBaseDrive & "SFBay\"
+                pOutputDir = pBaseDir & "UCIs\"
+                pDataDir = pBaseDir & "datafiles\"
+        End Select
+    End Sub
 
     Public Sub UBMain()
+        Initialize()
         Logger.StartToFile(pOutputDir & "uciBuilder.log")
 
         ChDriveDir(pOutputDir)
@@ -18,8 +31,7 @@ Public Module UCIBuilder
 
         'need to have the hspf message file open 
         'to know about all HSPF tables, parameters, etc.
-        Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
+        Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
 
         'open all the input tables that we'll be using
 
@@ -49,15 +61,12 @@ Public Module UCIBuilder
             Logger.Dbg("Could not open parametervalues.csv")
         Else
             'read parm table into memory for later use
-            Dim lrow As Integer = 0
-            lParmTable.CurrentRecord = 1
-            Do Until lParmTable.atEOF
-                lParmTable.MoveNext()
-                lrow = lrow + 1
+            For lRow As Integer = 1 To lParmTable.NumRecords 'Do Until lParmTable.atEOf
+                lParmTable.CurrentRecord = lRow
                 For icol As Integer = 1 To 12
-                    lParmValue(icol, lrow) = lParmTable.Value(icol + 1)
+                    lParmValue(icol, lRow) = lParmTable.Value(icol + 1)
                 Next icol
-            Loop
+            Next 'Loop
         End If
 
         'declare a bunch of variables we'll be using in this routine
@@ -67,14 +76,11 @@ Public Module UCIBuilder
         Dim lProjectNames As New Collection
         Dim lUCINames As New Collection
         Dim lOper As atcUCI.HspfOperation
-        Dim lconn As atcUCI.HspfConnection
+        Dim lConn As atcUCI.HspfConnection
         Dim lStreambase As String
         Dim lStreamLen As Single
         Dim lStreamDeltah As Single
         Dim lStreamName As String
-        Dim lStreamDepth As Single
-        Dim lStreamWidth As Single
-        Dim lStreamSlope As Single
 
         'open the table of areas of each land use in each subbasin
 
@@ -91,9 +97,8 @@ Public Module UCIBuilder
             Next
 
             'loop thru each subbasin
-            lAreaTable.CurrentRecord = 1
-            Do Until lAreaTable.atEOF
-                lAreaTable.MoveNext()
+            For lAreaTableRecordIndex As Integer = 1 To lAreaTable.NumRecords 'Do Until lAreaTable.atEOF
+                lAreaTable.CurrentRecord = lAreaTableRecordIndex 'lAreaTable.MoveNext()
                 lProjectbase = lAreaTable.Value(1)
                 If Not lProjectNames.Contains(lProjectbase) Then
                     lProjectNames.Add(lProjectbase, lProjectbase)
@@ -145,27 +150,36 @@ Public Module UCIBuilder
                 Next
 
                 'look thru streams table looking for a match
-                lOper = lUci.OpnBlks("RCHRES").ids(1)
-                lStreamTable.CurrentRecord = 1
-                Do Until lStreamTable.atEOF
-                    lStreamTable.MoveNext()
+                lOper = lUci.OpnBlks("RCHRES").Ids(1)
+                For lStreamTableIndex As Integer = 1 To lStreamTable.NumRecords ' Do Until lStreamTable.atEOF
+                    lStreamTable.CurrentRecord = lStreamTableIndex
                     lStreambase = lStreamTable.Value(1)
                     If lStreambase = lUcibase Then
                         'found the match, update some parms
                         lStreamLen = SignificantDigits(lStreamTable.Value(4) / 1610, 4)
-                        lOper.Tables("HYDR-PARM2").parmvalue("LEN") = lStreamLen
+                        lOper.Tables("HYDR-PARM2").ParmValue("LEN") = lStreamLen
                         lStreamDeltah = SignificantDigits((lStreamTable.Value(12) - lStreamTable.Value(11)) * 3.281 / 100, 4)
-                        lOper.Tables("HYDR-PARM2").parmvalue("DELTH") = lStreamDeltah
+                        lOper.Tables("HYDR-PARM2").ParmValue("DELTH") = lStreamDeltah
                         lStreamName = lStreamTable.Value(14)
-                        lOper.Tables("GEN-INFO").parmvalue("RCHID") = lStreamName
+                        lOper.Tables("GEN-INFO").ParmValue("RCHID") = lStreamName
                         'update the ftable
-                        lStreamDepth = lStreamTable.Value(10) * 3.28
-                        lStreamWidth = lStreamTable.Value(9) * 3.28
-                        lStreamSlope = lStreamTable.Value(13) / 10000 'to convert to m/m
-                        lOper.FTable.FTableFromCrossSect(lStreamLen * 5280, lStreamDepth, lStreamWidth, 0.05, lStreamSlope, 1.0, 1.0, lStreamDepth * 1.25, 0.5, 0.5, lStreamDepth * 1.875, lStreamDepth * 62.5, 0.5, 0.5, lStreamWidth, lStreamWidth)
-                        lStreamTable.MoveLast()
+                        Dim lChannel As New atcSegmentation.Channel
+                        With lChannel
+                            .DepthChannel = lStreamTable.Value(10) * 3.28
+                            .WidthMean = lStreamTable.Value(9) * 3.28
+                            .SlopeProfile = lStreamTable.Value(13) / 10000 'to convert to m/m
+                            .Length = lStreamLen * 5280
+                            .ManningN = 0.05
+                            'TODO: other parms!!!
+                        End With
+                        lOper.FTable.FTableFromCrossSect(lChannel)
+                        'lStreamDepth = lStreamTable.Value(10) * 3.28
+                        'lStreamWidth = lStreamTable.Value(9) * 3.28
+                        'lStreamSlope = lStreamTable.Value(13) / 10000 'to convert to m/m
+                        'lOper.FTable.FTableFromCrossSect(lStreamLen * 5280, lStreamDepth, lStreamWidth, 0.05, lStreamSlope, 1.0, 1.0, lStreamDepth * 1.25, 0.5, 0.5, lStreamDepth * 1.875, lStreamDepth * 62.5, 0.5, 0.5, lStreamWidth, lStreamWidth)
+                        Exit For ' lStreamTable.MoveLast()
                     End If
-                Loop
+                Next ' Loop
 
                 'update areas in schematic block
                 Dim i As Integer
@@ -179,13 +193,13 @@ Public Module UCIBuilder
                     End If
                     For lIndex As Integer = 1 To lLandUseNames.Count
                         lName = lLandUseNames(lIndex)
-                        For Each lLandOper In lUci.OpnBlks(lOperType).ids
-                            If lName = lLandOper.Tables("GEN-INFO").parms("LSID").value Then
+                        For Each lLandOper In lUci.OpnBlks(lOperType).Ids
+                            If lName = lLandOper.Tables("GEN-INFO").Parms("LSID").Value Then
                                 'this is a land use match
-                                For Each lconn In lLandOper.Targets
-                                    If lconn.Target.VolName = "RCHRES" Then
+                                For Each lConn In lLandOper.Targets
+                                    If lConn.Target.VolName = "RCHRES" Then
                                         'assume this is the one
-                                        lconn.MFact = lAreaTable.Value(lIndex + 2)
+                                        lConn.MFact = lAreaTable.Value(lIndex + 2)
                                     End If
                                 Next
                             End If
@@ -194,12 +208,11 @@ Public Module UCIBuilder
                 Next i
 
                 'look thru met table looking for a match
-                lMetTable.CurrentRecord = 1
-                Dim lmetbase As String = ""
-                Do Until lMetTable.atEOF
-                    lMetTable.MoveNext()
-                    lmetbase = lMetTable.Value(2)
-                    If lmetbase = lUcibase Then
+                Dim lMetBase As String = ""
+                For lMetTableIndex As Integer = 1 To lMetTable.NumRecords 'Do Until lMetTable.atEOF
+                    lMetTable.CurrentRecord = lMetTableIndex
+                    lMetBase = lMetTable.Value(2)
+                    If lMetBase = lUcibase Then
                         'found the match, update met data specs
                         Dim lEtMfact As Double = lMetTable.Value(3)
                         Dim lPrecMfact As Double = lMetTable.Value(4)
@@ -220,73 +233,72 @@ Public Module UCIBuilder
                             'add some ext src records
                             lUci.MetSeg2Source()
                             For Each lOper In lUci.OpnSeqBlock.Opns
-                                lconn = New atcUCI.HspfConnection
-                                lconn.Uci = lUci
-                                lconn.Typ = 1
-                                lconn.Source.VolName = "WDM2"
-                                lconn.Source.VolId = 116
-                                lconn.Source.Member = "HPCP"
-                                lconn.Ssystem = "ENGL"
-                                lconn.Sgapstrg = "ZERO"
-                                lconn.MFact = lPrecMfact * 0.5
-                                lconn.Tran = "SAME"
-                                lconn.Target.VolName = lOper.Name
-                                lconn.Target.VolId = lOper.Id
-                                lconn.Target.Group = "EXTNL"
-                                lconn.Target.Member = "PREC"
-                                lconn.Target.Opn = lOper
-                                lOper.Sources.Add(lconn)
-                                lUci.Connections.Add(lconn)
+                                lConn = New atcUCI.HspfConnection
+                                lConn.Uci = lUci
+                                lConn.Typ = 1
+                                lConn.Source.VolName = "WDM2"
+                                lConn.Source.VolId = 116
+                                lConn.Source.Member = "HPCP"
+                                lConn.Ssystem = "ENGL"
+                                lConn.Sgapstrg = "ZERO"
+                                lConn.MFact = lPrecMfact * 0.5
+                                lConn.Tran = "SAME"
+                                lConn.Target.VolName = lOper.Name
+                                lConn.Target.VolId = lOper.Id
+                                lConn.Target.Group = "EXTNL"
+                                lConn.Target.Member = "PREC"
+                                lConn.Target.Opn = lOper
+                                lOper.Sources.Add(lConn)
+                                lUci.Connections.Add(lConn)
                             Next
                             lUci.Source2MetSeg()
                         End If
 
                         'add irrig to urban perlnds
-                        lOper = lUci.OpnBlks("PERLND").operfromid(104)
-                        lconn = New atcUCI.HspfConnection
-                        lconn.Uci = lUci
-                        lconn.Typ = 1
-                        lconn.Comment = "*** Urban Irrigation"
-                        lconn.Source.VolName = "WDM2"
-                        lconn.Source.VolId = lIrrigDsn
-                        lconn.Source.Member = "IRRG"
-                        lconn.Ssystem = "ENGL"
-                        lconn.Target.VolName = lOper.Name
-                        lconn.Target.VolId = lOper.Id
-                        lconn.Target.Group = "EXTNL"
-                        lconn.Target.Member = "SURLI"
-                        lconn.Target.Opn = lOper
-                        lOper.Sources.Add(lconn)
-                        lUci.Connections.Add(lconn)
+                        lOper = lUci.OpnBlks("PERLND").OperFromID(104)
+                        lConn = New atcUCI.HspfConnection
+                        lConn.Uci = lUci
+                        lConn.Typ = 1
+                        lConn.Comment = "*** Urban Irrigation"
+                        lConn.Source.VolName = "WDM2"
+                        lConn.Source.VolId = lIrrigDsn
+                        lConn.Source.Member = "IRRG"
+                        lConn.Ssystem = "ENGL"
+                        lConn.Target.VolName = lOper.Name
+                        lConn.Target.VolId = lOper.Id
+                        lConn.Target.Group = "EXTNL"
+                        lConn.Target.Member = "SURLI"
+                        lConn.Target.Opn = lOper
+                        lOper.Sources.Add(lConn)
+                        lUci.Connections.Add(lConn)
 
-                        lMetTable.MoveLast()
+                        Exit For ' lMetTable.MoveLast()
                     End If
-                Loop
+                Next 'Loop
 
                 'look thru soil class table looking for a match
-                lSoilClassTable.CurrentRecord = 1
-                Dim lsoilbase As String = ""
+                Dim lSoilBase As String = ""
                 Dim lSoilGroup As String = ""
-                Do Until lSoilClassTable.atEOF
+                For lSoilClassTableIndex As Integer = 1 To lSoilClassTable.NumRecords 'Do Until lSoilClassTable.atEOF
+                    lSoilClassTable.CurrentRecord = lSoilClassTableIndex
                     lSoilClassTable.MoveNext()
-                    lsoilbase = lSoilClassTable.Value(4)
-                    If lsoilbase = lUcibase Then
+                    lSoilBase = lSoilClassTable.Value(4)
+                    If lSoilBase = lUcibase Then
                         'found the match, store soil group
                         lSoilGroup = lSoilClassTable.Value(3)
-                        lSoilClassTable.MoveLast()
+                        Exit For ' lSoilClassTable.MoveLast()
                     End If
-                Loop
+                Next 'Loop
 
                 'get slope from slope table 
-                lSlopeClassTable.CurrentRecord = 1
                 Dim lSlopeBase As String = ""
                 Dim lAgSlope As Single = 0
                 Dim lDevSlope As Single = 0
                 Dim lForSlope As Single = 0
                 Dim lGrassSlope As Single = 0
                 Dim lShrubSlope As Single = 0
-                Do Until lSlopeClassTable.atEOF
-                    lSlopeClassTable.MoveNext()
+                For lSlopeClassTableIndex As Integer = 1 To lSlopeClassTable.NumRecords 'Do Until lSlopeClassTable.atEOF
+                    lSlopeClassTable.CurrentRecord = lSlopeClassTableIndex
                     lSlopeBase = lSlopeClassTable.Value(1)
                     If lSlopeBase = lUcibase Then
                         'found the match, store slopes by land use
@@ -295,9 +307,9 @@ Public Module UCIBuilder
                         lForSlope = lSlopeClassTable.Value(5)
                         lGrassSlope = lSlopeClassTable.Value(6)
                         lShrubSlope = lSlopeClassTable.Value(7)
-                        lSlopeClassTable.MoveLast()
+                        Exit For 'lSlopeClassTable.MoveLast()
                     End If
-                Loop
+                Next 'Loop
 
                 'begin loop thru each operation to set parameters
                 Dim lSlope As Single = 0
@@ -350,22 +362,22 @@ Public Module UCIBuilder
                             lParmColumn = 8 + lSlopeClass
                         End If
                         If lOper.Name = "PERLND" Then
-                            lOper.Tables("PWAT-PARM2").parmvalue("LZSN") = lParmValue(lParmColumn, lParmLine + 1)
-                            lOper.Tables("PWAT-PARM2").parmvalue("INFILT") = lParmValue(lParmColumn, lParmLine + 8)
-                            lOper.Tables("PWAT-PARM2").parmvalue("LSUR") = lParmValue(lParmColumn, lParmLine + 15)
-                            lOper.Tables("PWAT-PARM2").parmvalue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22) 'should have used lslope here
-                            lOper.Tables("PWAT-PARM2").parmvalue("KVARY") = lParmValue(lParmColumn, lParmLine + 29)
-                            lOper.Tables("PWAT-PARM2").parmvalue("AGWRC") = lParmValue(lParmColumn, lParmLine + 36)
-                            lOper.Tables("PWAT-PARM3").parmvalue("BASETP") = lParmValue(lParmColumn, lParmLine + 43)
-                            lOper.Tables("PWAT-PARM4").parmvalue("UZSN") = lParmValue(lParmColumn, lParmLine + 50)
-                            lOper.Tables("PWAT-PARM4").parmvalue("NSUR") = lParmValue(lParmColumn, lParmLine + 57)
-                            lOper.Tables("PWAT-PARM4").parmvalue("INTFW") = lParmValue(lParmColumn, lParmLine + 64)
-                            lOper.Tables("PWAT-PARM4").parmvalue("IRC") = lParmValue(lParmColumn, lParmLine + 71)
-                            lOper.Tables("PWAT-PARM3").parmvalue("DEEPFR") = lParmValue(lParmColumn, lParmLine + 78)
+                            lOper.Tables("PWAT-PARM2").ParmValue("LZSN") = lParmValue(lParmColumn, lParmLine + 1)
+                            lOper.Tables("PWAT-PARM2").ParmValue("INFILT") = lParmValue(lParmColumn, lParmLine + 8)
+                            lOper.Tables("PWAT-PARM2").ParmValue("LSUR") = lParmValue(lParmColumn, lParmLine + 15)
+                            lOper.Tables("PWAT-PARM2").ParmValue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22) 'should have used lslope here
+                            lOper.Tables("PWAT-PARM2").ParmValue("KVARY") = lParmValue(lParmColumn, lParmLine + 29)
+                            lOper.Tables("PWAT-PARM2").ParmValue("AGWRC") = lParmValue(lParmColumn, lParmLine + 36)
+                            lOper.Tables("PWAT-PARM3").ParmValue("BASETP") = lParmValue(lParmColumn, lParmLine + 43)
+                            lOper.Tables("PWAT-PARM4").ParmValue("UZSN") = lParmValue(lParmColumn, lParmLine + 50)
+                            lOper.Tables("PWAT-PARM4").ParmValue("NSUR") = lParmValue(lParmColumn, lParmLine + 57)
+                            lOper.Tables("PWAT-PARM4").ParmValue("INTFW") = lParmValue(lParmColumn, lParmLine + 64)
+                            lOper.Tables("PWAT-PARM4").ParmValue("IRC") = lParmValue(lParmColumn, lParmLine + 71)
+                            lOper.Tables("PWAT-PARM3").ParmValue("DEEPFR") = lParmValue(lParmColumn, lParmLine + 78)
                         Else
-                            lOper.Tables("IWAT-PARM2").parmvalue("LSUR") = lParmValue(lParmColumn, lParmLine + 15) 'these should not be the same as perlnds
-                            lOper.Tables("IWAT-PARM2").parmvalue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22)
-                            lOper.Tables("IWAT-PARM2").parmvalue("NSUR") = lParmValue(lParmColumn, lParmLine + 57)
+                            lOper.Tables("IWAT-PARM2").ParmValue("LSUR") = lParmValue(lParmColumn, lParmLine + 15) 'these should not be the same as perlnds
+                            lOper.Tables("IWAT-PARM2").ParmValue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22)
+                            lOper.Tables("IWAT-PARM2").ParmValue("NSUR") = lParmValue(lParmColumn, lParmLine + 57)
                         End If
 
                     End If
@@ -375,7 +387,7 @@ Public Module UCIBuilder
                 'save each uci
                 lUci.Save()
 
-            Loop
+            Next 'Loop
 
             'at this point we have one UCI for each subbasin/stream reach,
             'still need to do some combining
@@ -387,12 +399,11 @@ Public Module UCIBuilder
             End If
             Dim lConnSources As New Collection
             Dim lConnTargets As New Collection
-            lConnTable.CurrentRecord = 1
-            Do Until lConnTable.atEOF
-                lConnTable.MoveNext()
+            For lConnTableIndex As Integer = 1 To lConnTable.NumRecords 'Do Until lConnTable.atEOF
+                lConnTable.CurrentRecord = lConnTableIndex
                 lConnSources.Add(lConnTable.Value(1))
                 lConnTargets.Add(lConnTable.Value(2))
-            Loop
+            Next 'Loop
 
             'combine the ucis within each project
             For Each lProjectbase In lProjectNames
@@ -432,7 +443,7 @@ Public Module UCIBuilder
                                 lNewOperId = 1
                             End If
                             'make sure this is a unique number
-                            Do While Not lCombinedUci.OpnBlks(lOper.Name).operfromid(lNewOperId) Is Nothing
+                            Do While Not lCombinedUci.OpnBlks(lOper.Name).OperFromID(lNewOperId) Is Nothing
                                 lNewOperId = lNewOperId + 1
                             Loop
 
@@ -444,7 +455,7 @@ Public Module UCIBuilder
                             lOrigId = lOper.Id
                             lOpn.Id = lNewOperId
                             lOpn.Uci = lCombinedUci
-                            lCombinedUci.OpnBlks(lOper.Name).Ids.Add(lOpn, "K" & lOpn.Id)
+                            lCombinedUci.OpnBlks(lOper.Name).Ids.Add(lOpn) ', "K" & lOpn.Id)
                             lOpn.OpnBlk = lCombinedUci.OpnBlks(lOper.Name)
                             lCombinedUci.OpnSeqBlock.Add(lOper)
 
@@ -456,25 +467,25 @@ Public Module UCIBuilder
                             If lOper.Name = "RCHRES" Then
                                 'update ftable number
                                 lOper.FTable.Id = lNewOperId
-                                lOper.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
+                                lOper.Tables("HYDR-PARM2").ParmValue("FTBUCI") = lNewOperId
                                 'do we need to add a connection to this reach?
                                 For i As Integer = 1 To lConnTargets.Count
                                     If lConnTargets(i) = lUCIsInProject(lUciIndex) Then
                                         For j As Integer = 1 To lUCIsInProject.Count
                                             If lConnSources(i) = lUCIsInProject(j) Then
                                                 'add a connection from RCHRES j to RCHRES lUciIndex
-                                                lconn = New atcUCI.HspfConnection
-                                                lconn.Uci = lCombinedUci
-                                                lconn.Typ = 3
-                                                lconn.Source.VolName = "RCHRES"
-                                                lconn.Source.VolId = j
-                                                lconn.MFact = 1.0#
-                                                lconn.Target.VolName = "RCHRES"
-                                                lconn.Target.VolId = lUciIndex
-                                                lconn.MassLink = 3
-                                                lCombinedUci.Connections.Add(lconn)
-                                                lCombinedUci.OpnBlks("RCHRES").operfromid(j).targets.add(lconn)
-                                                lOper.Sources.Add(lconn)
+                                                lConn = New atcUCI.HspfConnection
+                                                lConn.Uci = lCombinedUci
+                                                lConn.Typ = 3
+                                                lConn.Source.VolName = "RCHRES"
+                                                lConn.Source.VolId = j
+                                                lConn.MFact = 1.0#
+                                                lConn.Target.VolName = "RCHRES"
+                                                lConn.Target.VolId = lUciIndex
+                                                lConn.MassLink = 3
+                                                lCombinedUci.Connections.Add(lConn)
+                                                lCombinedUci.OpnBlks("RCHRES").OperFromID(j).Targets.Add(lConn)
+                                                lOper.Sources.Add(lConn)
                                             End If
                                         Next j
                                     End If
@@ -482,16 +493,16 @@ Public Module UCIBuilder
                             End If
 
                             'reset the connection operation numbers
-                            For Each lconn In lOper.Targets
-                                If lconn.Source.VolName = lOper.Name Then
-                                    lconn.Source.VolId = lNewOperId
+                            For Each lConn In lOper.Targets
+                                If lConn.Source.VolName = lOper.Name Then
+                                    lConn.Source.VolId = lNewOperId
                                 End If
-                            Next lconn
-                            For Each lconn In lOper.Sources
-                                If lconn.Target.VolName = lOper.Name Then
-                                    lconn.Target.VolId = lNewOperId
+                            Next lConn
+                            For Each lConn In lOper.Sources
+                                If lConn.Target.VolName = lOper.Name Then
+                                    lConn.Target.VolId = lNewOperId
                                 End If
-                            Next lconn
+                            Next lConn
 
                         Next lOper
 
@@ -513,9 +524,8 @@ Public Module UCIBuilder
             If Not lBayTable.OpenFile(pDataDir & "BayConnectors.csv") Then
                 Logger.Dbg("Could not open BayConnectors.csv")
             End If
-            lBayTable.CurrentRecord = 1
-            Do Until lBayTable.atEOF
-                lBayTable.MoveNext()
+            For lBayTableIndex As Integer = 1 To lBayTable.NumRecords 'Do Until lBayTable.atEOF
+                lBayTable.CurrentRecord = lBayTableIndex
                 Dim lUciname As String = pOutputDir & lBayTable.Value(1) & "\" & lBayTable.Value(1) & ".uci"
                 Dim lUci As New atcUCI.HspfUci
                 lUci.FastReadUciForStarter(lMsg, lUciname)
@@ -523,19 +533,19 @@ Public Module UCIBuilder
 
                 Dim lNewOperId As Integer = 1
                 'make sure this is a unique number
-                Do While Not lUci.OpnBlks("RCHRES").operfromid(lNewOperId) Is Nothing
+                Do While Not lUci.OpnBlks("RCHRES").OperFromID(lNewOperId) Is Nothing
                     lNewOperId = lNewOperId + 1
                 Loop
                 'open a copy of this operation
                 Dim lCopyUci As New atcUCI.HspfUci
                 lCopyUci.FastReadUciForStarter(lMsg, lUciname)
-                Dim lCopyOpn As atcUCI.HspfOperation = lCopyUci.OpnBlks("RCHRES").operfromid(lNewOperId - 1)
+                Dim lCopyOpn As atcUCI.HspfOperation = lCopyUci.OpnBlks("RCHRES").OperFromID(lNewOperId - 1)
                 'add this operation to this uci
                 Dim lOpn As New atcUCI.HspfOperation
                 lOpn = lCopyOpn
                 lOpn.Id = lNewOperId
                 lOpn.Uci = lUci
-                lUci.OpnBlks("RCHRES").Ids.Add(lOpn, "K" & lOpn.Id)
+                lUci.OpnBlks("RCHRES").Ids.Add(lOpn) ', "K" & lOpn.Id)
                 lOpn.OpnBlk = lUci.OpnBlks("RCHRES")
                 lUci.OpnSeqBlock.Add(lCopyOpn)
                 'remove the comments so we don't get repeated headers
@@ -545,43 +555,53 @@ Public Module UCIBuilder
 
                 'update ftable number
                 lOpn.FTable.Id = lNewOperId
-                lOpn.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
+                lOpn.Tables("HYDR-PARM2").ParmValue("FTBUCI") = lNewOperId
                 'update some parms
                 lStreamLen = SignificantDigits(lBayTable.Value(2) / 1610, 4)
-                lOpn.Tables("HYDR-PARM2").parmvalue("LEN") = lStreamLen
+                lOpn.Tables("HYDR-PARM2").ParmValue("LEN") = lStreamLen
                 lStreamDeltah = SignificantDigits((lBayTable.Value(6) - lBayTable.Value(5)) * 3.281 / 100, 4)
-                lOpn.Tables("HYDR-PARM2").parmvalue("DELTH") = lStreamDeltah
+                lOpn.Tables("HYDR-PARM2").ParmValue("DELTH") = lStreamDeltah
                 lStreamName = lBayTable.Value(7)
-                lOpn.Tables("GEN-INFO").parmvalue("RCHID") = lStreamName
+                lOpn.Tables("GEN-INFO").ParmValue("RCHID") = lStreamName
                 'update the ftable
-                lStreamDepth = lBayTable.Value(4) * 3.28
-                lStreamWidth = lBayTable.Value(3) * 3.28
-                lStreamSlope = lStreamDeltah / lStreamLen
-                lOpn.FTable.FTableFromCrossSect(lStreamLen * 5280, lStreamDepth, lStreamWidth, 0.05, lStreamSlope, 1.0, 1.0, lStreamDepth * 1.25, 0.5, 0.5, lStreamDepth * 1.875, lStreamDepth * 62.5, 0.5, 0.5, lStreamWidth, lStreamWidth)
+                Dim lChannel As New atcSegmentation.Channel
+                With lChannel
+                    .DepthChannel = lBayTable.Value(4) * 3.28
+                    .WidthMean = lBayTable.Value(3) * 3.28
+                    .SlopeProfile = lStreamDeltah / lStreamLen
+                    .Length = lStreamLen * 5280
+                    .ManningN = 0.05
+                    'TODO: other parms!!!
+                End With
+                lOpn.FTable.FTableFromCrossSect(lChannel)
+                'lStreamDepth = lBayTable.Value(4) * 3.28
+                'lStreamWidth = lBayTable.Value(3) * 3.28
+                'lStreamSlope = lStreamDeltah / lStreamLen
+                'lOpn.FTable.FTableFromCrossSect(lStreamLen * 5280, lStreamDepth, lStreamWidth, 0.05, lStreamSlope, 1.0, 1.0, lStreamDepth * 1.25, 0.5, 0.5, lStreamDepth * 1.875, lStreamDepth * 62.5, 0.5, 0.5, lStreamWidth, lStreamWidth)
 
                 'remove all connections to this reach
-                Do While lOpn.Sources.Count > 0
-                    lOpn.Sources.Remove(1)
-                Loop
+                'Do While lOpn.Sources.Count > 0
+                lOpn.Sources.Clear()
+                'Loop
                 ''add a connection from RCHRES lNewOperId-1 to RCHRES lNewOperId
-                lconn = New atcUCI.HspfConnection
-                lconn.Uci = lUci
-                lconn.Typ = 3
-                lconn.Source.VolName = "RCHRES"
-                lconn.Source.VolId = lNewOperId - 1
-                lconn.MFact = 1.0#
-                lconn.Target.VolName = "RCHRES"
-                lconn.Target.VolId = lNewOperId
-                lconn.MassLink = 3
-                lconn.Source.Opn = lUci.OpnBlks("RCHRES").operfromid(lNewOperId - 1)
-                lconn.Target.Opn = lOpn
-                lUci.Connections.Add(lconn)
-                lUci.OpnBlks("RCHRES").operfromid(lNewOperId - 1).targets.add(lconn)
-                lOpn.Sources.Add(lconn)
+                lConn = New atcUCI.HspfConnection
+                lConn.Uci = lUci
+                lConn.Typ = 3
+                lConn.Source.VolName = "RCHRES"
+                lConn.Source.VolId = lNewOperId - 1
+                lConn.MFact = 1.0#
+                lConn.Target.VolName = "RCHRES"
+                lConn.Target.VolId = lNewOperId
+                lConn.MassLink = 3
+                lConn.Source.Opn = lUci.OpnBlks("RCHRES").OperFromID(lNewOperId - 1)
+                lConn.Target.Opn = lOpn
+                lUci.Connections.Add(lConn)
+                lUci.OpnBlks("RCHRES").OperFromID(lNewOperId - 1).Targets.Add(lConn)
+                lOpn.Sources.Add(lConn)
 
                 lUci.Source2MetSeg()
                 lUci.Save()
-            Loop
+            Next 'Loop
 
             'connect upstream/downstream projects
             For Each lProjectbase In lProjectNames
@@ -686,24 +706,23 @@ Public Module UCIBuilder
         'add whole set like this for the bottom-most reach
         Dim lnewdsn As Integer = 0
         For i As Integer = 1 To 8
-
             'add wdm data set
-            Dim GenTs As atcData.atcTimeseries
-            GenTs = New atcData.atcTimeseries(lWdm)
-            With GenTs.Attributes
+            Dim lGenTs As atcData.atcTimeseries
+            lGenTs = New atcData.atcTimeseries(lWdm)
+            With lGenTs.Attributes
                 .SetValue("ID", 100 + i)
                 .SetValue("ts", 1)
                 .SetValue("tu", 3)
-                .SetValue("Scenario", UCase(FilenameOnly(aUci.Name)))
-                .SetValue("Constituent", UCase(tstype(i)))
-                .SetValue("Location", UCase("R" & CStr(lOper.Id)))
+                .SetValue("Scenario", IO.Path.GetFileNameWithoutExtension(aUci.Name).ToUpper)
+                .SetValue("Constituent", tstype(i).ToUpper)
+                .SetValue("Location", "R" & CStr(lOper.Id).ToUpper)
                 .SetValue("Description", lOper.Description)
             End With
-            GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
+            lGenTs.Attributes.SetValue("TSTYPE", lGenTs.Attributes.GetValue("Constituent"))
             Dim TsDate As atcData.atcTimeseries
             TsDate = New atcData.atcTimeseries(Nothing)
-            GenTs.Dates = TsDate
-            lWdm.AddDataset(GenTs, 0)
+            lGenTs.Dates = TsDate
+            lWdm.AddDataset(lGenTs, 0)
 
             'add external targets record
             aUci.AddExtTarget("RCHRES", lOper.Id, "ROFLOW", member(i), memsub1(i), _
@@ -740,9 +759,9 @@ Public Module UCIBuilder
                 .SetValue("ID", 1000 + i)
                 .SetValue("ts", 1)
                 .SetValue("tu", 4)
-                .SetValue("Scenario", UCase(FilenameOnly(aUci.Name)))
-                .SetValue("Constituent", UCase(tstype(i)))
-                .SetValue("Location", UCase("R" & CStr(lOper.Id)))
+                .SetValue("Scenario", IO.Path.GetFileNameWithoutExtension(aUci.Name).ToUpper)
+                .SetValue("Constituent", tstype(i).ToUpper)
+                .SetValue("Location", "R" & CStr(lOper.Id).ToUpper) 
                 .SetValue("Description", lOper.Description)
             End With
             GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
