@@ -7,14 +7,21 @@ Imports atcMwGisUtility
 Imports System.Collections.Specialized
 
 Module CreateFutureLanduseGrid
-    Private pCurrentCBPGridName As String = ""
-    Private pCurrentICLUSGridName As String = ""
-    Private pFutureCBPGridName As String = ""
-    Private pFutureICLUSGridName As String = ""
+    Private pCurrentCBPGridName As String = "F:\data\Cat Landuse\OrigLandUse\CBPLandCover\m_cbp_p5lc.tif"
+    Private pCurrentICLUSGridName As String = "F:\data\Cat Landuse\ProcessedLandUse\reprojected\m_bhc2000us_bc.tif"
+    Private pFutureCBPGridPath As String = "F:\data\Cat Landuse\ProcessedLandUse\future\"
+    Private pFutureICLUSGridPath As String = "F:\data\Cat Landuse\ProcessedLandUse\reprojected\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         'this script creates a future scenario CBP land use grid 
         'based on changes to the ICLUS housing density grids
+
+        'Dim lFutureScenario As String = "m_bhc2030us_a2"
+        'Dim lFutureScenario As String = "m_bhc2030us_b2"
+        'Dim lFutureScenario As String = "m_bhc2090us_a2"
+        Dim lFutureScenario As String = "m_bhc2090us_b2"
+        Dim lFutureICLUSGridName As String = pFutureICLUSGridPath & lFutureScenario & ".tif"
+        Dim lFutureCBPGridName As String = pFutureCBPGridPath & "m_cbp_" & lFutureScenario & ".tif"
 
         'initialize the random-number generator
         Rnd(-1.0)
@@ -29,11 +36,11 @@ Module CreateFutureLanduseGrid
         lCurrentICLUSGrid.Open(pCurrentICLUSGridName)
 
         Dim lFutureICLUSGrid As New MapWinGIS.Grid
-        lFutureICLUSGrid.Open(pFutureICLUSGridName)
+        lFutureICLUSGrid.Open(lFutureICLUSGridName)
 
-        FileCopy(pCurrentCBPGridName, pFutureCBPGridName)
+        FileCopy(pCurrentCBPGridName, lFutureCBPGridName)
         Dim lFutureCBPGrid As New MapWinGIS.Grid
-        lFutureCBPGrid.Open(pFutureCBPGridName)
+        lFutureCBPGrid.Open(lFutureCBPGridName)
 
         'go through each cell of the current cbp grid
         Dim lX As Double, lY As Double
@@ -43,8 +50,8 @@ Module CreateFutureLanduseGrid
         Dim lFutureCBPValue As Integer
         Dim lCurrentIclusValue As Integer
         Dim lFutureIclusValue As Integer
-        For lRow As Integer = 1 To lCurrentCBPGrid.Header.NumberRows
-            For lCol As Integer = 1 To lCurrentCBPGrid.Header.NumberCols
+        For lRow As Integer = 0 To lCurrentCBPGrid.Header.NumberRows - 1
+            For lCol As Integer = 0 To lCurrentCBPGrid.Header.NumberCols - 1
                 lCurrentCBPValue = lCurrentCBPGrid.Value(lCol, lRow)
                 'find corresponding cell of current iclus grid
                 lCurrentCBPGrid.CellToProj(lCol, lRow, lX, lY)
@@ -56,7 +63,7 @@ Module CreateFutureLanduseGrid
                 'get the future iclus value at that spot
                 lFutureIclusValue = lFutureICLUSGrid.Value(lFutureIclusCol, lFutureIclusRow)
 
-                If lFutureIclusValue <> lCurrentIclusValue Then
+                If lFutureIclusValue <> lCurrentIclusValue And lCurrentIclusValue < 13 Then
                     'the iclus value has changed, figure out what to call this cell in the future CBP grid
                     lFutureCBPValue = FutureCBPValue(lCurrentCBPValue, lCurrentIclusValue, lFutureIclusValue)
                     lFutureCBPGrid.Value(lCol, lRow) = lFutureCBPValue
