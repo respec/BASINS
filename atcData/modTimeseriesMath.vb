@@ -49,11 +49,12 @@ Public Module modTimeseriesMath
             lnewTS.Values = newValues
             lnewTS.Dates.Values = newDates
             CopyBaseAttributes(aTimeseries, lnewTS, numNewValues, lStart + 1, 1)
+            lnewTS.Attributes.SetValue("SJDAY", aStartDate)
+            lnewTS.Attributes.SetValue("EJDAY", aEndDate)
         Else
             CopyBaseAttributes(aTimeseries, lnewTS)
         End If
         Return lnewTS
-
     End Function
 
     ''' <summary>
