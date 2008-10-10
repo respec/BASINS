@@ -104,15 +104,18 @@ Module modUCIRecords
 
         aRecIndex = 0
         aOccurNumber = 0
+        Dim lRecSearch As String = "  " & aKeyword
         If lRecIndexStart > -1 And lRecIndexEnd > -1 Then
             For lRecIndex = lRecIndexStart + 1 To lRecIndexEnd
                 Dim lRec As String = pUciRec(lRecIndex)
-                If lRec.StartsWith("  " & aKeyword) Then 'found start of this table 
+                If lRec.StartsWith(lRecSearch) Then 'found start of this table 
                     'pbd -- distinguish between soil-data and soil-data2 for instance
-                    If aRecIndex = 0 Then
-                        aRecIndex = lRecIndex
+                    If lRec.Length = lRecSearch.Length Then
+                        If aRecIndex = 0 Then
+                            aRecIndex = lRecIndex
+                        End If
+                        aOccurNumber += 1
                     End If
-                    aOccurNumber += 1
                 End If
             Next lRecIndex
         End If
