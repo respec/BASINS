@@ -152,7 +152,7 @@ Public Class atcDataSourceWDM
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
-        Logger.Dbg("atcDataSourceWdm:AddDataset:entry:" & aExistAction & ":" & MemUsage())
+        Logger.Dbg("atcDataSourceWdm:AddDataset:EntryWithAction:" & aExistAction & ":" & MemUsage())
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Try
             Dim lTimser As atcTimeseries = aDataSet
@@ -257,7 +257,9 @@ Public Class atcDataSourceWDM
             TimDif(lSDat, lEDat, lTu, lTs, lNValsExpected)
             If lNvals < lNValsExpected Then
                 'TODO:  make writing data smarter to deal with big gaps of missing, etc
-                Throw New ApplicationException("NVals:" & lNvals & ":" & lNValsExpected)
+                Throw New ApplicationException("NVals:" & lNvals & ":" & lNValsExpected & vbCrLf & _
+                                               "in " & Specification & vbCrLf & _
+                                               "dsn " & lTimser.Attributes.GetValue("ID", 0))
             End If
 
             'aDataSet.Attributes.CalculateAll() 'should we calculdate attributes on request, not here on creation
