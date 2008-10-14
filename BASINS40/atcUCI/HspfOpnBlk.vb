@@ -159,8 +159,8 @@ Public Class HspfOpnBlk
                         Dim lOperFirst As Integer = CInt(s(i).Substring(0, 5).Trim)
                         Dim lOperLast As Integer = 0
                         Dim lOperLastS As String = ""
-                        If s.Length > 10 Then
-                            s(i).Substring(5, 5).Trim()
+                        If s(i).Length >= 10 Then
+                            lOperLastS = s(i).Substring(5, 5).Trim()
                         End If
                         If lOperLastS.Length > 0 Then
                             lOperLast = CInt(lOperLastS)

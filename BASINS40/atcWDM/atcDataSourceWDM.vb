@@ -655,7 +655,7 @@ CaseExistRenumber:
             Dim lWdmHandle As atcWdmHandle
             If FileExists(Specification) Then
                 lWdmHandle = New atcWdmHandle(0, Specification)
-            ElseIf FilenameNoPath(Specification).Length > 0 Then
+            ElseIf IO.Path.GetFileName(Specification).Length > 0 Then
                 Logger.Dbg("atcDataSourceWDM:Open:WDM file " & Specification & " does not exist - it will be created")
                 MkDirPath(PathNameOnly(Specification))
                 lWdmHandle = New atcWdmHandle(2, Specification)
