@@ -1,13 +1,11 @@
 Imports MapWinUtility
 Imports atcdata
 
-
 Module modData
     Public Function CopyDataSet(ByVal aSourceDataSet As atcDataSet, _
                                 ByVal aTargetSource As atcDataSource, _
                                 ByVal aTargetId As Integer, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
-
         'just change id in the copy
         aSourceDataSet.Attributes.SetValue("id", aTargetId)
 
@@ -73,14 +71,12 @@ Module modData
                                     ByVal aTargetId As Integer, _
                                     ByVal aAttName As String, _
                                     ByVal aAttVal As String) As Boolean
-        Dim lTargetDataSource As atcData.atcDataSource
-        lTargetDataSource = New atcWDM.atcDataSourceWDM
+        Dim lTargetDataSource As atcData.atcDataSource = New atcWDM.atcDataSourceWDM
         If lTargetDataSource.Open(aTargetSpecification) Then
             Dim lTargetDataSet As atcTimeseries = lTargetDataSource.DataSets(lTargetDataSource.DataSets.IndexFromKey(aTargetId))
             lTargetDataSet.EnsureValuesRead()
             lTargetDataSet.Attributes.SetValue(aAttName, aAttVal)
-            Dim lResult As Boolean = lTargetDataSource.AddDataSet(lTargetDataSet, atcData.atcDataSource.EnumExistAction.ExistReplace)
-            Return lResult
+            Return lTargetDataSource.AddDataSet(lTargetDataSet, atcData.atcDataSource.EnumExistAction.ExistReplace)
         Else
             Return False
         End If

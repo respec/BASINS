@@ -674,6 +674,7 @@ Public Class HspfUci
                     lMetSeg.Uci = Me
                 End If
             Next
+            Logger.Dbg("MetSegsComplete for " & lOperationType & " Count " & pMetSegs.Count)
         Next lOperationType
 
         'set any undefined mfacts to 0
@@ -689,7 +690,6 @@ Public Class HspfUci
                 Next lMetSegRecord
             Next lMetSegExisting
         End If
-
     End Sub
 
     Public Sub Source2Point()

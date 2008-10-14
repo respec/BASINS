@@ -175,11 +175,6 @@
       <Name>atcTimeseriesNdayHighLow</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimseriesDbf\atcTimseriesDbf.vbproj">
-      <Project>{F05FE01B-E35C-4444-B5A2-47085D073631}</Project>
-      <Name>atcTimseriesDbf</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI</Name>
