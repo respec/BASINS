@@ -203,7 +203,6 @@ Module modUCIRecords
                                     ByRef aTableName As String, _
                                     ByRef aThisOccur As Integer) As String
 
-        Dim lComment As String = ""
         Dim lRecordKey As Integer = aStartRecord
         Dim lOccurCount As Integer
         If aThisOccur > 1 Then
@@ -222,6 +221,7 @@ Module modUCIRecords
         End If
 
         'start at retkey+1
+        Dim lComment As String = ""
         If lRecordKey > 0 Then
             For lRecordIndex As Integer = lRecordKey - 1 To 0 Step -1
                 If pUciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line

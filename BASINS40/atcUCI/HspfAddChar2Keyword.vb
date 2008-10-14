@@ -10,7 +10,7 @@ Module HspfAddChar2Keyword
     ''' 
     ''' </summary>
     ''' <remarks></remarks>
-    Public lastOperationSerial As Integer
+    Public pLastOperationSerial As Integer
 
     ''' <summary>
     ''' adds a missing character to the end of an input keyword if needed
