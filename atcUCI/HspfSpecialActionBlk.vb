@@ -150,17 +150,15 @@ Public Class HspfSpecialActionBlk
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
-        Dim i As Integer
-
         If pRecords.Count > 0 Then
             If pComment.Length > 0 Then
                 lSB.AppendLine(pComment)
             End If
             lSB.AppendLine("SPEC-ACTIONS")
             With pRecords
-                For i = 1 To .Count
-                    lSB.AppendLine(.Item(i).Text)
-                Next i
+                For lRecordIndex As Integer = 1 To .Count
+                    lSB.AppendLine(.Item(lRecordIndex).Text)
+                Next lRecordIndex
             End With
             lSB.AppendLine("END SPEC-ACTIONS")
         End If

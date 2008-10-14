@@ -373,10 +373,10 @@ Public Class HspfUci
     Public Sub SaveAs(ByRef aOldName As String, ByRef aNewName As String, _
                       ByRef aBaseDsn As Integer, ByRef aRelAbs As Integer)
         If aOldName <> aNewName Then
-            Call pFilesBlk.newName(aOldName, aNewName)
-            Call newOutputDsns(aOldName, aNewName, aBaseDsn, aRelAbs)
+            pFilesBlk.NewName(aOldName, aNewName)
+            newOutputDsns(aOldName, aNewName, aBaseDsn, aRelAbs)
         End If
-        Call Save()
+        Save()
     End Sub
 
     Public Sub New()
@@ -1070,7 +1070,7 @@ Public Class HspfUci
                 pWDMObj(i) = Nothing
             End If
         Next i
-        TserFiles.Clear()
+        pTserFiles.Clear()
 
         M = "after close in ClearWDM"
         Call F90_FILSTA(M, Len(M))
@@ -1749,7 +1749,7 @@ Public Class HspfUci
                 Logger.Msg("Could not open WDM file" & vbCr & aName, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
                 Return Nothing
             Else
-                TserFiles.AddRange(lWDMFile.DataSets)
+                pTserFiles.AddRange(lWDMFile.DataSets)
             End If
         End If
         Return lWDMFile
@@ -1898,15 +1898,17 @@ x:
         Next
     End Function
 
-    Public Function findtimser(ByRef sen As String, ByRef aLocation As String, ByRef Con As String) As Collection
-        findtimser = New Collection
-        For Each lTser As atcData.atcTimeseries In TserFiles
+    Public Function FindTimser(ByRef aScenario As String, _
+                               ByRef aLocation As String, _
+                               ByRef aConstituent As String) As Collection
+        FindTimser = New Collection
+        For Each lTser As atcData.atcTimeseries In pTserFiles
             With lTser.Attributes
-                If (sen = .GetValue("Scenario") _
-                  Or Len(Trim(sen)) = 0) And (aLocation = .GetValue("Location") _
-                  Or Len(Trim(aLocation)) = 0) And (Con = .GetValue("Constituent") _
-                  Or Len(Trim(Con)) = 0) Then 'need this timser
-                    findtimser.Add(lTser)
+                If (aScenario = .GetValue("Scenario") _
+                  Or Len(Trim(aScenario)) = 0) And (aLocation = .GetValue("Location") _
+                  Or Len(Trim(aLocation)) = 0) And (aConstituent = .GetValue("Constituent") _
+                  Or Len(Trim(aConstituent)) = 0) Then 'need this timser
+                    FindTimser.Add(lTser)
                 End If
             End With
         Next
@@ -2039,81 +2041,70 @@ x:
 
     End Sub
 
-    Public Sub AddTable(ByRef opname As String, ByRef opid As Integer, ByRef tabname As String)
+    Public Sub AddTable(ByRef aOperationName As String, ByRef aOperationId As Integer, _
+                        ByRef aTableName As String)
         'create a new table, or add this operation id to the current table
-        Dim lopnblk As HspfOpnBlk
-
-        lopnblk = pOpnBlks.Item(opname)
-        If lopnblk.Count > 0 Then
-            'this operation block exists, okay to add table
-            Call lopnblk.AddTable(opid, tabname, pMsg.BlockDefs.Item(opname))
+        Dim lOpnBlk As HspfOpnBlk = pOpnBlks.Item(aOperationName)
+        If lOpnBlk.Count > 0 Then 'this operation block exists, okay to add table
+            lOpnBlk.AddTable(aOperationId, aTableName, pMsg.BlockDefs.Item(aOperationName))
         End If
-
     End Sub
 
-    Public Sub RemoveTable(ByRef opname As String, ByRef opid As Integer, ByRef tabname As String)
+    Public Sub RemoveTable(ByRef aOperationName As String, ByRef aOperationId As Integer, _
+                           ByRef aTableName As String)
         'remove this operation id from the current table, remove whole table
         'if this is the only operation in the table
-        Dim lopnblk As HspfOpnBlk
-
-        lopnblk = pOpnBlks.Item(opname)
-        If lopnblk.Count > 0 Then
+        Dim lOpnBlk As HspfOpnBlk = pOpnBlks.Item(aOperationName)
+        If lOpnBlk.Count > 0 Then
             'this operation block exists, okay to remove table
-            Call lopnblk.RemoveTable(opid, tabname)
+            lOpnBlk.RemoveTable(aOperationId, aTableName)
         End If
-
     End Sub
 
-    Private Sub newOutputDsns(ByRef oldn As String, ByRef newn As String, ByRef basedsn As Integer, ByRef relabs As Integer)
+    Private Sub NewOutputDsns(ByRef aOldScenario As String, ByRef aNewScenario As String, _
+                              ByRef aBaseDsn As Integer, ByRef aRelAbs As Integer)
         'build new output dsns on saveas
-        Dim lts As Collection 'of atcotimser
-        Dim lTimser As atcData.atcTimeseries
-        Dim addeddsn, Update As Boolean
-        Dim wdmid, wdmsfl, i, ndsn As Integer
-        Dim cwdm, tstype As String
-        Dim GenTs As atcData.atcTimeseries
-        Dim TsDate As atcData.atcTimeseries
-        Dim lConn As HspfConnection
-        Dim vConn As Object
 
         'look for output wdm
-        For i = 4 To 1 Step -1
-            If pWdmUnit(i) > 0 Then
+        Dim lWdmId, lWdmUnit As Integer
+        For lWdmIndex As Integer = 4 To 1 Step -1
+            If pWdmUnit(lWdmIndex) > 0 Then
                 'use this as the output wdm
-                wdmsfl = pWdmUnit(i)
-                wdmid = i
+                lWdmUnit = pWdmUnit(lWdmIndex)
+                lWdmId = lWdmIndex
             End If
-        Next i
+        Next lWdmIndex
 
-        If wdmsfl > 0 Then
+        If lWdmUnit > 0 Then
             'okay to continue
             'look for matching WDM datasets
-            lts = findtimser(UCase(oldn), "", "")
+            Dim lts As Collection 'of atcotimser
+            lts = FindTimser(UCase(aOldScenario), "", "")
             'return the names of the data sets from this wdm file
-            ndsn = 0
-            For i = 1 To lts.Count
-                lTimser = lts.Item(i)
+            Dim ndsn As Integer = 0
+            For i As Integer = 1 To lts.Count
+                Dim lTimser As atcData.atcTimeseries = lts.Item(i)
                 'find a free dsn
-                If relabs = 1 Then
-                    ndsn = CInt(lTimser.Attributes.GetValue("id")) + basedsn - 1
+                If aRelAbs = 1 Then
+                    ndsn = CInt(lTimser.Attributes.GetValue("id")) + aBaseDsn - 1
                 Else
                     If ndsn = 0 Then
-                        ndsn = basedsn - 1
+                        ndsn = aBaseDsn - 1
                     End If
                 End If
 
-                ndsn = FindFreeDSN(wdmid, ndsn)
-                GenTs = New atcData.atcTimeseries(Nothing)
+                ndsn = FindFreeDSN(lWdmId, ndsn)
+                Dim lGenTs As New atcData.atcTimeseries(Nothing)
 
                 'set attribs to the old version
-                With GenTs.Attributes
+                With lGenTs.Attributes
                     .SetValue("ID", ndsn)
-                    .SetValue("Scenario", newn)
+                    .SetValue("Scenario", aNewScenario)
                     .SetValue("Constituent", lTimser.Attributes.GetValue("Constituent"))
                     .SetValue("Location", lTimser.Attributes.GetValue("Location"))
                     .SetValue("Description", lTimser.Attributes.GetValue("Description"))
                 End With
-                TsDate = New atcData.atcTimeseries(Nothing)
+                Dim TsDate As New atcData.atcTimeseries(Nothing)
                 'TODO: Create dates
                 'With myDateSummary
                 '    .CIntvl = lTimser.Dates.Summary.CIntvl
@@ -2122,36 +2113,35 @@ x:
                 '    .Intvl = lTimser.Dates.Summary.Intvl
                 'End With
                 'TsDate.Summary = myDateSummary
-                GenTs.Dates = TsDate
+                lGenTs.Dates = TsDate
 
                 'now add the timser
                 With lTimser.Attributes
-                    addeddsn = AddWDMDataSet(wdmid, ndsn, newn, _
-                                             .GetValue("Location"), _
-                                             .GetValue("Constituent"), _
-                                             lTimser.Attributes.GetValue("tu"), _
-                                             lTimser.Attributes.GetValue("ts"), _
-                                             .GetValue("Description"))
+                    Dim lAddedDsn As Boolean = AddWDMDataSet(lWdmId, ndsn, aNewScenario, _
+                                                             .GetValue("Location"), _
+                                                             .GetValue("Constituent"), _
+                                                             lTimser.Attributes.GetValue("tu"), _
+                                                             lTimser.Attributes.GetValue("ts"), _
+                                                             .GetValue("Description"))
                 End With
                 'update tstype attribute
-                GenTs = Me.GetDataSetFromDsn(wdmid, ndsn)
-                If Not GenTs Is Nothing Then
-                    tstype = lTimser.Attributes.GetValue("TSTYPE")
-                    GenTs.Attributes.SetValue("TSTYPE", tstype)
-                    Update = pWDMObj(wdmid).AddDataset(GenTs, atcData.atcDataSource.EnumExistAction.ExistReplace)
+                lGenTs = Me.GetDataSetFromDsn(lWdmId, ndsn)
+                If Not lGenTs Is Nothing Then
+                    Dim lTsType As String = lTimser.Attributes.GetValue("TSTYPE")
+                    lGenTs.Attributes.SetValue("TSTYPE", lTsType)
+                    Dim Update As Boolean = pWDMObj(lWdmId).AddDataset(lGenTs, atcData.atcDataSource.EnumExistAction.ExistReplace)
                 End If
 
                 'change the appropriate ext targets record
-                cwdm = "WDM" & CStr(wdmid)
-                For Each vConn In pConnections
-                    lConn = vConn
-                    If lConn.Typ = 4 Then
-                        If (Trim(lConn.Target.VolName) = cwdm Or (Trim(lConn.Target.VolName) = "WDM" And wdmid = 1)) And lConn.Target.VolId = lTimser.Attributes.GetValue("id") Then
+                Dim cwdm As String = "WDM" & CStr(lWdmId)
+                For Each lConnection As HspfConnection In pConnections
+                    If lConnection.Typ = 4 Then
+                        If (Trim(lConnection.Target.VolName) = cwdm Or (Trim(lConnection.Target.VolName) = "WDM" And lWdmId = 1)) And lConnection.Target.VolId = lTimser.Attributes.GetValue("id") Then
                             'found the old dsn in the ext targets, change it
-                            lConn.Target.VolId = ndsn
+                            lConnection.Target.VolId = ndsn
                         End If
                     End If
-                Next vConn
+                Next lConnection
             Next i
             'Me.GetWDMObj(wdmid).Refresh    'Not necessary
         End If

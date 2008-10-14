@@ -509,8 +509,8 @@ Public Class HspfOperation
         pId = 0
         pOpTyp = 0
         pDescription = ""
-        lastOperationSerial += 1
-        pSerial = lastOperationSerial
+        pLastOperationSerial += 1
+        pSerial = pLastOperationSerial
         pDefOpnId = 0
     End Sub
 End Class

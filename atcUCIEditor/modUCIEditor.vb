@@ -19,9 +19,11 @@ Module modUCIEditor
         Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
         Dim lUci As New atcUCI.HspfUci
         lUci.FastReadUciForStarter(lMsg, pScenarioName & ".uci")
+        Logger.Dbg("UCI " & lUci.Name & " Opened")
 
         lUci.Name = "LU_Ch.uci"
         lUci.Save()
+        Logger.Dbg("UCI " & lUci.Name & " Saved")
 
     End Sub
 End Module

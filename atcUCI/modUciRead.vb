@@ -93,15 +93,11 @@ Module modUciRead
     End Function
 
     Public Function myFormatI(ByRef aValue As Integer, ByRef aWidth As Integer) As String
-        Dim lString As String
-
-        lString = Space(aWidth)
-        lString = RSet(CStr(aValue), lString.Length)
-
+        Dim lString As String = CStr(aValue).PadLeft(aWidth)
         Return lString
     End Function
 
-    Public Function compareTableString(ByRef aSkipF As Integer, ByRef aSkipL As Integer, _
+    Public Function CompareTableString(ByRef aSkipF As Integer, ByRef aSkipL As Integer, _
                                        ByRef aStr1 As String, ByRef aStr2 As String) As Boolean
         Dim lStr1, lStr2 As String
         Dim lLen1, lLen2 As Integer
@@ -121,7 +117,7 @@ Module modUciRead
             End If
             If lStr1 <> lStr2 Then Return False
             Return True 'match
-        Catch ex As Exception
+        Catch lEx As Exception
             Return False
         End Try
     End Function

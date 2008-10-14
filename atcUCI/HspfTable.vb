@@ -172,7 +172,7 @@ Public Class HspfTable
         pEditAllSimilar = newEditAllSimilar
     End Function
 
-    Public Sub initTable(ByRef s As String)
+    Public Sub InitTable(ByRef aInitValueString As String)
         Dim lParm As HSPFParm
         Dim lParmDef As HSPFParmDef
         Dim unitfg As Integer
@@ -181,9 +181,9 @@ Public Class HspfTable
             lParm = New HspfParm
             lParm.Parent = Me
             lParm.Def = lParmDef
-            lParm.Value = Trim(Mid(s, lParmDef.StartCol, lParmDef.Length))
-            lParm.ValueAsRead = Mid(s, lParmDef.StartCol, lParmDef.Length)
-            If lParm.ValueAsRead = "" And Len(s) > 0 Then lParm.ValueAsRead = " "
+            lParm.Value = Trim(Mid(aInitValueString, lParmDef.StartCol, lParmDef.Length))
+            lParm.ValueAsRead = Mid(aInitValueString, lParmDef.StartCol, lParmDef.Length)
+            If lParm.ValueAsRead = "" And Len(aInitValueString) > 0 Then lParm.ValueAsRead = " "
             If Len(lParm.Value) = 0 Then 'try default
                 unitfg = pOpn.OpnBlk.Uci.GlobalBlock.EmFg
                 If unitfg = 1 Then
