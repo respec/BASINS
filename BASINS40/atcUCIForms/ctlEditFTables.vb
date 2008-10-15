@@ -7,10 +7,16 @@ Imports atcUCIForms
 Public Class ctlEditFTables
     Implements ctlEdit
 
+    Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfFtable As HspfFtable
     Dim pChanged As Boolean
     Private PrevListIndex As Long
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+
+    Private Sub grdEdit_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdEdit.Resize
+        grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+    End Sub
+
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
@@ -92,6 +98,16 @@ Public Class ctlEditFTables
             Next
             txtNRows.ValueInteger = pHspfFtable.Nrows
             txtNCols.ValueInteger = pHspfFtable.Ncols
+
+            With grdEdit
+                .Clear()
+                .AllowHorizontalScrolling = True
+                .AllowNewValidValues = True
+                .Visible = True
+                .Source.FixedRows = 1
+            End With
+
+
             RefreshFtables()
         End Set
 
@@ -101,13 +117,6 @@ Public Class ctlEditFTables
     Public Sub RefreshFtables()
         Dim lRow, lCol, units As Integer
         units = pHspfFtable.Operation.OpnBlk.Uci.GlobalBlock.EmFg
-
-        With grdEdit
-            .Clear()
-            .AllowHorizontalScrolling = True
-            .AllowNewValidValues = True
-            .Visible = True
-        End With
 
         With grdEdit.Source
             .Rows = txtNRows.ValueInteger + 1
@@ -137,10 +146,6 @@ Public Class ctlEditFTables
                 Next
             Next
 
-            For lCol2 As Integer = 0 To .Columns - 1
-                .CellColor(0, lCol2) = SystemColors.ControlLight
-            Next
-
             For lRow = 1 To .Rows - 1
                 .CellValue(lRow, 0) = pHspfFtable.Depth(lRow)
                 .CellValue(lRow, 1) = pHspfFtable.Area(lRow)
@@ -166,8 +171,10 @@ Public Class ctlEditFTables
             Next
         End With
         pChanged = False
+
+        grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
         grdEdit.Refresh()
-        grdEdit.SizeAllColumnsToContents()
+
 
     End Sub
 
@@ -198,11 +205,8 @@ Public Class ctlEditFTables
                 Next
             Next
 
-            For lCol2 As Integer = 0 To .Columns - 1
-                .CellColor(0, lCol2) = SystemColors.ControlLight
-            Next
+            grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
             grdEdit.Refresh()
-            grdEdit.SizeAllColumnsToContents()
         End With
     End Sub
 

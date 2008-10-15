@@ -26,7 +26,11 @@ Partial Class ctlEditCategory
         '
         Me.grdEdit.AllowHorizontalScrolling = True
         Me.grdEdit.AllowNewValidValues = False
+        Me.grdEdit.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grdEdit.CellBackColor = System.Drawing.Color.Empty
+        Me.grdEdit.Fixed3D = False
         Me.grdEdit.LineColor = System.Drawing.Color.Empty
         Me.grdEdit.LineWidth = 0.0!
         Me.grdEdit.Location = New System.Drawing.Point(21, 13)

@@ -66,8 +66,12 @@ Partial Class ctlEditMassLinks
         '
         Me.grdMassLink.AllowHorizontalScrolling = True
         Me.grdMassLink.AllowNewValidValues = False
+        Me.grdMassLink.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grdMassLink.AutoScroll = True
         Me.grdMassLink.CellBackColor = System.Drawing.Color.Empty
+        Me.grdMassLink.Fixed3D = False
         Me.grdMassLink.LineColor = System.Drawing.Color.Empty
         Me.grdMassLink.LineWidth = 0.0!
         Me.grdMassLink.Location = New System.Drawing.Point(15, 56)

@@ -21,19 +21,19 @@ Partial Class ctlEditSpecialAction
     Private Sub InitializeComponent()
         Me.tabSpecial = New System.Windows.Forms.TabControl
         Me.REcords = New System.Windows.Forms.TabPage
+        Me.atcgrid0 = New atcControls.atcGrid
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.atcgrid1 = New atcControls.atcGrid
         Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.atcgrid2 = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
+        Me.atcgrid3 = New atcControls.atcGrid
         Me.TabPage5 = New System.Windows.Forms.TabPage
+        Me.atcgrid4 = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.atcgrid5 = New atcControls.atcGrid
         Me.lblcounts = New System.Windows.Forms.Label
         Me.cmdAgPrac = New System.Windows.Forms.Button
-        Me.atcgrid0 = New atcControls.atcGrid
-        Me.atcgrid1 = New atcControls.atcGrid
-        Me.atcgrid2 = New atcControls.atcGrid
-        Me.atcgrid3 = New atcControls.atcGrid
-        Me.atcgrid4 = New atcControls.atcGrid
-        Me.atcgrid5 = New atcControls.atcGrid
         Me.tabSpecial.SuspendLayout()
         Me.REcords.SuspendLayout()
         Me.TabPage2.SuspendLayout()
@@ -57,7 +57,7 @@ Partial Class ctlEditSpecialAction
         Me.tabSpecial.Location = New System.Drawing.Point(8, 5)
         Me.tabSpecial.Name = "tabSpecial"
         Me.tabSpecial.SelectedIndex = 0
-        Me.tabSpecial.Size = New System.Drawing.Size(923, 472)
+        Me.tabSpecial.Size = New System.Drawing.Size(924, 473)
         Me.tabSpecial.TabIndex = 0
         '
         'REcords
@@ -66,10 +66,29 @@ Partial Class ctlEditSpecialAction
         Me.REcords.Location = New System.Drawing.Point(4, 22)
         Me.REcords.Name = "REcords"
         Me.REcords.Padding = New System.Windows.Forms.Padding(3)
-        Me.REcords.Size = New System.Drawing.Size(915, 446)
+        Me.REcords.Size = New System.Drawing.Size(916, 447)
         Me.REcords.TabIndex = 0
         Me.REcords.Text = "Records"
         Me.REcords.UseVisualStyleBackColor = True
+        '
+        'atcgrid0
+        '
+        Me.atcgrid0.AllowHorizontalScrolling = True
+        Me.atcgrid0.AllowNewValidValues = False
+        Me.atcgrid0.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcgrid0.AutoScroll = True
+        Me.atcgrid0.AutoSize = True
+        Me.atcgrid0.CellBackColor = System.Drawing.Color.Empty
+        Me.atcgrid0.Fixed3D = False
+        Me.atcgrid0.LineColor = System.Drawing.Color.Empty
+        Me.atcgrid0.LineWidth = 0.0!
+        Me.atcgrid0.Location = New System.Drawing.Point(7, 10)
+        Me.atcgrid0.Name = "atcgrid0"
+        Me.atcgrid0.Size = New System.Drawing.Size(901, 431)
+        Me.atcgrid0.Source = Nothing
+        Me.atcgrid0.TabIndex = 0
         '
         'TabPage2
         '
@@ -82,6 +101,23 @@ Partial Class ctlEditSpecialAction
         Me.TabPage2.Text = "Actions"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
+        'atcgrid1
+        '
+        Me.atcgrid1.AllowHorizontalScrolling = True
+        Me.atcgrid1.AllowNewValidValues = False
+        Me.atcgrid1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcgrid1.CellBackColor = System.Drawing.Color.Empty
+        Me.atcgrid1.Fixed3D = False
+        Me.atcgrid1.LineColor = System.Drawing.Color.Empty
+        Me.atcgrid1.LineWidth = 0.0!
+        Me.atcgrid1.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid1.Name = "atcgrid1"
+        Me.atcgrid1.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid1.Source = Nothing
+        Me.atcgrid1.TabIndex = 1
+        '
         'TabPage3
         '
         Me.TabPage3.Controls.Add(Me.atcgrid2)
@@ -92,6 +128,23 @@ Partial Class ctlEditSpecialAction
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Distributes"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'atcgrid2
+        '
+        Me.atcgrid2.AllowHorizontalScrolling = True
+        Me.atcgrid2.AllowNewValidValues = False
+        Me.atcgrid2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcgrid2.CellBackColor = System.Drawing.Color.Empty
+        Me.atcgrid2.Fixed3D = False
+        Me.atcgrid2.LineColor = System.Drawing.Color.Empty
+        Me.atcgrid2.LineWidth = 0.0!
+        Me.atcgrid2.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid2.Name = "atcgrid2"
+        Me.atcgrid2.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid2.Source = Nothing
+        Me.atcgrid2.TabIndex = 1
         '
         'TabPage4
         '
@@ -104,6 +157,23 @@ Partial Class ctlEditSpecialAction
         Me.TabPage4.Text = "User Define Names"
         Me.TabPage4.UseVisualStyleBackColor = True
         '
+        'atcgrid3
+        '
+        Me.atcgrid3.AllowHorizontalScrolling = True
+        Me.atcgrid3.AllowNewValidValues = False
+        Me.atcgrid3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcgrid3.CellBackColor = System.Drawing.Color.Empty
+        Me.atcgrid3.Fixed3D = False
+        Me.atcgrid3.LineColor = System.Drawing.Color.Empty
+        Me.atcgrid3.LineWidth = 0.0!
+        Me.atcgrid3.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid3.Name = "atcgrid3"
+        Me.atcgrid3.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid3.Source = Nothing
+        Me.atcgrid3.TabIndex = 1
+        '
         'TabPage5
         '
         Me.TabPage5.Controls.Add(Me.atcgrid4)
@@ -114,6 +184,23 @@ Partial Class ctlEditSpecialAction
         Me.TabPage5.TabIndex = 4
         Me.TabPage5.Text = "User Define Quans"
         Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'atcgrid4
+        '
+        Me.atcgrid4.AllowHorizontalScrolling = True
+        Me.atcgrid4.AllowNewValidValues = False
+        Me.atcgrid4.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcgrid4.CellBackColor = System.Drawing.Color.Empty
+        Me.atcgrid4.Fixed3D = False
+        Me.atcgrid4.LineColor = System.Drawing.Color.Empty
+        Me.atcgrid4.LineWidth = 0.0!
+        Me.atcgrid4.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid4.Name = "atcgrid4"
+        Me.atcgrid4.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid4.Source = Nothing
+        Me.atcgrid4.TabIndex = 1
         '
         'TabPage6
         '
@@ -126,11 +213,28 @@ Partial Class ctlEditSpecialAction
         Me.TabPage6.Text = "Conditions"
         Me.TabPage6.UseVisualStyleBackColor = True
         '
+        'atcgrid5
+        '
+        Me.atcgrid5.AllowHorizontalScrolling = True
+        Me.atcgrid5.AllowNewValidValues = False
+        Me.atcgrid5.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcgrid5.CellBackColor = System.Drawing.Color.Empty
+        Me.atcgrid5.Fixed3D = False
+        Me.atcgrid5.LineColor = System.Drawing.Color.Empty
+        Me.atcgrid5.LineWidth = 0.0!
+        Me.atcgrid5.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid5.Name = "atcgrid5"
+        Me.atcgrid5.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid5.Source = Nothing
+        Me.atcgrid5.TabIndex = 1
+        '
         'lblcounts
         '
         Me.lblcounts.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblcounts.AutoSize = True
-        Me.lblcounts.Location = New System.Drawing.Point(13, 493)
+        Me.lblcounts.Location = New System.Drawing.Point(13, 494)
         Me.lblcounts.Name = "lblcounts"
         Me.lblcounts.Size = New System.Drawing.Size(39, 13)
         Me.lblcounts.TabIndex = 2
@@ -139,92 +243,12 @@ Partial Class ctlEditSpecialAction
         'cmdAgPrac
         '
         Me.cmdAgPrac.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdAgPrac.Location = New System.Drawing.Point(800, 482)
+        Me.cmdAgPrac.Location = New System.Drawing.Point(800, 483)
         Me.cmdAgPrac.Name = "cmdAgPrac"
         Me.cmdAgPrac.Size = New System.Drawing.Size(131, 35)
         Me.cmdAgPrac.TabIndex = 3
         Me.cmdAgPrac.Text = "Pre-defined Practices"
         Me.cmdAgPrac.UseVisualStyleBackColor = True
-        '
-        'atcgrid0
-        '
-        Me.atcgrid0.AllowHorizontalScrolling = True
-        Me.atcgrid0.AllowNewValidValues = False
-        Me.atcgrid0.AutoScroll = True
-        Me.atcgrid0.AutoSize = True
-        Me.atcgrid0.CellBackColor = System.Drawing.Color.Empty
-        Me.atcgrid0.LineColor = System.Drawing.Color.Empty
-        Me.atcgrid0.LineWidth = 0.0!
-        Me.atcgrid0.Location = New System.Drawing.Point(7, 10)
-        Me.atcgrid0.Name = "atcgrid0"
-        Me.atcgrid0.Size = New System.Drawing.Size(900, 430)
-        Me.atcgrid0.Source = Nothing
-        Me.atcgrid0.TabIndex = 0
-        '
-        'atcgrid1
-        '
-        Me.atcgrid1.AllowHorizontalScrolling = True
-        Me.atcgrid1.AllowNewValidValues = False
-        Me.atcgrid1.CellBackColor = System.Drawing.Color.Empty
-        Me.atcgrid1.LineColor = System.Drawing.Color.Empty
-        Me.atcgrid1.LineWidth = 0.0!
-        Me.atcgrid1.Location = New System.Drawing.Point(7, 8)
-        Me.atcgrid1.Name = "atcgrid1"
-        Me.atcgrid1.Size = New System.Drawing.Size(900, 430)
-        Me.atcgrid1.Source = Nothing
-        Me.atcgrid1.TabIndex = 1
-        '
-        'atcgrid2
-        '
-        Me.atcgrid2.AllowHorizontalScrolling = True
-        Me.atcgrid2.AllowNewValidValues = False
-        Me.atcgrid2.CellBackColor = System.Drawing.Color.Empty
-        Me.atcgrid2.LineColor = System.Drawing.Color.Empty
-        Me.atcgrid2.LineWidth = 0.0!
-        Me.atcgrid2.Location = New System.Drawing.Point(7, 8)
-        Me.atcgrid2.Name = "atcgrid2"
-        Me.atcgrid2.Size = New System.Drawing.Size(900, 430)
-        Me.atcgrid2.Source = Nothing
-        Me.atcgrid2.TabIndex = 1
-        '
-        'atcgrid3
-        '
-        Me.atcgrid3.AllowHorizontalScrolling = True
-        Me.atcgrid3.AllowNewValidValues = False
-        Me.atcgrid3.CellBackColor = System.Drawing.Color.Empty
-        Me.atcgrid3.LineColor = System.Drawing.Color.Empty
-        Me.atcgrid3.LineWidth = 0.0!
-        Me.atcgrid3.Location = New System.Drawing.Point(7, 8)
-        Me.atcgrid3.Name = "atcgrid3"
-        Me.atcgrid3.Size = New System.Drawing.Size(900, 430)
-        Me.atcgrid3.Source = Nothing
-        Me.atcgrid3.TabIndex = 1
-        '
-        'atcgrid4
-        '
-        Me.atcgrid4.AllowHorizontalScrolling = True
-        Me.atcgrid4.AllowNewValidValues = False
-        Me.atcgrid4.CellBackColor = System.Drawing.Color.Empty
-        Me.atcgrid4.LineColor = System.Drawing.Color.Empty
-        Me.atcgrid4.LineWidth = 0.0!
-        Me.atcgrid4.Location = New System.Drawing.Point(7, 8)
-        Me.atcgrid4.Name = "atcgrid4"
-        Me.atcgrid4.Size = New System.Drawing.Size(900, 430)
-        Me.atcgrid4.Source = Nothing
-        Me.atcgrid4.TabIndex = 1
-        '
-        'atcgrid5
-        '
-        Me.atcgrid5.AllowHorizontalScrolling = True
-        Me.atcgrid5.AllowNewValidValues = False
-        Me.atcgrid5.CellBackColor = System.Drawing.Color.Empty
-        Me.atcgrid5.LineColor = System.Drawing.Color.Empty
-        Me.atcgrid5.LineWidth = 0.0!
-        Me.atcgrid5.Location = New System.Drawing.Point(7, 8)
-        Me.atcgrid5.Name = "atcgrid5"
-        Me.atcgrid5.Size = New System.Drawing.Size(900, 430)
-        Me.atcgrid5.Source = Nothing
-        Me.atcgrid5.TabIndex = 1
         '
         'ctlEditSpecialAction
         '
@@ -235,7 +259,7 @@ Partial Class ctlEditSpecialAction
         Me.Controls.Add(Me.tabSpecial)
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "ctlEditSpecialAction"
-        Me.Size = New System.Drawing.Size(939, 549)
+        Me.Size = New System.Drawing.Size(940, 550)
         Me.tabSpecial.ResumeLayout(False)
         Me.REcords.ResumeLayout(False)
         Me.REcords.PerformLayout()
