@@ -6,9 +6,14 @@ Imports atcControls
 Public Class ctlEditOpnSeqBlock
     Implements ctlEdit
 
+    Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfOpnSeqBlk As HspfOpnSeqBlk
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+
+    Private Sub grdEdit_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdEdit.Resize
+        grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+    End Sub
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
@@ -51,6 +56,7 @@ Public Class ctlEditOpnSeqBlock
                 .AllowHorizontalScrolling = False
                 .AllowNewValidValues = True
                 .Visible = True
+                .Source.FixedRows = 1
                 .ColumnWidth(0) = 200
                 .ColumnWidth(1) = 200
             End With
@@ -77,7 +83,10 @@ Public Class ctlEditOpnSeqBlock
                 Next
 
             End With
+
+            grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
             grdEdit.Refresh()
+
         End Set
     End Property
 

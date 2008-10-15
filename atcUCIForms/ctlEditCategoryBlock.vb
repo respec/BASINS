@@ -6,6 +6,7 @@ Imports atcControls
 Public Class ctlEditCategory
     Implements ctlEdit
 
+    Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfCategoryBlk As HspfCategoryBlk
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
@@ -37,6 +38,10 @@ Public Class ctlEditCategory
         pChanged = True
     End Sub
 
+    Private Sub grdEdit_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdEdit.Resize
+        grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+    End Sub
+
     Public Property Data() As Object Implements ctlEdit.Data
         Get
             Return pHspfCategoryBlk
@@ -50,19 +55,22 @@ Public Class ctlEditCategory
                 .AllowHorizontalScrolling = False
                 .AllowNewValidValues = True
                 .Visible = True
-                .ColumnWidth(0) = 175
-                .ColumnWidth(1) = 225
             End With
 
             With grdEdit.Source
+                .FixedRows = 1
                 .Columns = 2
                 .CellValue(0, 0) = "Tag"
                 .CellValue(0, 1) = "Name"
-                .Rows = pHspfCategoryBlk.Categories.Count
-                For lRow As Integer = 1 To .Rows
-                    .CellValue(lRow, 0) = pHspfCategoryBlk.Categories(lRow - 1).Tag
-                    .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow - 1).Name
-                Next
+
+                If pHspfCategoryBlk.Categories.Count = 0 Then
+                    .Rows = 2
+                ElseIf pHspfCategoryBlk.Categories.Count > 0 Then
+                    For lRow As Integer = 1 To .Rows
+                        .CellValue(lRow, 0) = pHspfCategoryBlk.Categories(lRow - 1).Tag
+                        .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow - 1).Name
+                    Next
+                End If
 
                 For lCol As Integer = 0 To .Columns - 1
                     .CellColor(0, lCol) = SystemColors.ControlLight
@@ -75,7 +83,10 @@ Public Class ctlEditCategory
                 Next
 
             End With
+
+            grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
             grdEdit.Refresh()
+
         End Set
     End Property
 

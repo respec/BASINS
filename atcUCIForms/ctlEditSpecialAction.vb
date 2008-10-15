@@ -7,7 +7,9 @@ Imports System.Collections.ObjectModel
 Public Class ctlEditSpecialAction
     Implements ctlEdit
 
+    Dim pVScrollColumnOffset As Integer = 16
     Dim pSpecialActionBlk As HspfSpecialActionBlk
+
     Dim pChanged As Boolean
     Dim PreviousTab As Integer = 0
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
@@ -65,9 +67,18 @@ Public Class ctlEditSpecialAction
             Next
         End With
 
-        atcgrid0.SizeAllColumnsToContents()
+        atcgrid0.SizeAllColumnsToContents(atcgrid0.Width - pVScrollColumnOffset, True)
         atcgrid0.Refresh()
 
+    End Sub
+
+    Private Sub Allatcgrid_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles atcgrid0.Resize, atcgrid1.Resize, atcgrid2.Resize, atcgrid3.Resize, atcgrid4.Resize, atcgrid5.Resize
+        atcgrid0.SizeAllColumnsToContents(atcgrid0.Width - pVScrollColumnOffset, True)
+        atcgrid1.SizeAllColumnsToContents(atcgrid1.Width - pVScrollColumnOffset, True)
+        atcgrid2.SizeAllColumnsToContents(atcgrid2.Width - pVScrollColumnOffset, True)
+        atcgrid3.SizeAllColumnsToContents(atcgrid3.Width - pVScrollColumnOffset, True)
+        atcgrid4.SizeAllColumnsToContents(atcgrid4.Width - pVScrollColumnOffset, True)
+        atcgrid5.SizeAllColumnsToContents(atcgrid5.Width - pVScrollColumnOffset, True)
     End Sub
 
     Private Sub PutRecsToFrontTab(ByVal itab As Integer)
@@ -361,6 +372,7 @@ Public Class ctlEditSpecialAction
         Set(ByVal aHspfSpecialAction As Object)
             pSpecialActionBlk = aHspfSpecialAction
             atcgrid0.Source = New atcControls.atcGridSource
+
             With atcgrid0
                 .Clear()
                 .AllowHorizontalScrolling = False
@@ -372,14 +384,12 @@ Public Class ctlEditSpecialAction
             With atcgrid0.Source
                 .CellValue(0, 0) = "Type"
                 .CellValue(0, 1) = "Text"
-
-                For lCol As Integer = 0 To 1
-                    .CellColor(0, lCol) = SystemColors.ControlLight
-                Next
+                .FixedRows = 1
+                
 
             End With
 
-            atcgrid0.SizeAllColumnsToContents()
+            atcgrid0.SizeAllColumnsToContents(atcgrid0.Width - pVScrollColumnOffset, True)
             atcgrid0.Refresh()
             'action records
 
@@ -414,13 +424,10 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 19) = "Ts"
                 .CellValue(0, 20) = "Num"
 
-                For lCol As Integer = 0 To 20
-                    .CellColor(0, lCol) = SystemColors.ControlLight
-                Next
-
+                .FixedRows = 1
             End With
 
-            atcgrid1.SizeAllColumnsToContents()
+            atcgrid1.SizeAllColumnsToContents(atcgrid1.Width - pVScrollColumnOffset, True)
             atcgrid1.Refresh()
 
             'distributes
@@ -449,13 +456,10 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 13) = "Frac9"
                 .CellValue(0, 14) = "Frac10"
 
-                For lCol As Integer = 0 To 14
-                    .CellColor(0, lCol) = SystemColors.ControlLight
-                Next
-
+                .FixedRows = 1
             End With
 
-            atcgrid2.SizeAllColumnsToContents()
+            atcgrid2.SizeAllColumnsToContents(atcgrid2.Width - pVScrollColumnOffset, True)
             atcgrid2.Refresh()
 
             'uvnames
@@ -484,13 +488,10 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 12) = "Frac"
                 .CellValue(0, 13) = "ActCd"
 
-                For lCol As Integer = 0 To 13
-                    .CellColor(0, lCol) = SystemColors.ControlLight
-                Next
-
+                .FixedRows = 1
             End With
 
-            atcgrid3.SizeAllColumnsToContents()
+            atcgrid3.SizeAllColumnsToContents(atcgrid3.Width - pVScrollColumnOffset, True)
             atcgrid3.Refresh()
 
             'User Defn Quan
@@ -519,13 +520,10 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 12) = "AgStep"
                 .CellValue(0, 13) = "Tran"
 
-                For lCol As Integer = 0 To 13
-                    .CellColor(0, lCol) = SystemColors.ControlLight
-                Next
-
+                .FixedRows = 1
             End With
 
-            atcgrid4.SizeAllColumnsToContents()
+            atcgrid4.SizeAllColumnsToContents(atcgrid4.Width - pVScrollColumnOffset, True)
             atcgrid4.Refresh()
 
             'Conditionals
@@ -540,7 +538,8 @@ Public Class ctlEditSpecialAction
 
             With atcgrid5.Source
                 .CellValue(0, 0) = "Text"
-                .CellColor(0, 0) = SystemColors.ControlLight
+
+                .FixedRows = 1
             End With
 
             atcgrid5.Refresh()
@@ -566,7 +565,7 @@ Public Class ctlEditSpecialAction
             'changed tab, put previous tab recs back to first tab
             PutRecsToFrontTab(PreviousTab)
             atcgrid0.Refresh()
-            atcgrid0.SizeAllColumnsToContents()
+            atcgrid0.SizeAllColumnsToContents(atcgrid0.Width - pVScrollColumnOffset, True)
         End If
         If tabSpecial.SelectedIndex <> PreviousTab Then
             'now load records for this tab
@@ -662,7 +661,7 @@ Public Class ctlEditSpecialAction
                         Next
                     Next
 
-                    atcgrid1.SizeAllColumnsToContents()
+                    atcgrid1.SizeAllColumnsToContents(atcgrid1.Width - pVScrollColumnOffset, True)
                     atcgrid1.Refresh()
                 End With
             ElseIf tabSpecial.SelectedIndex = 2 Then
@@ -694,7 +693,7 @@ Public Class ctlEditSpecialAction
                     If .Rows > 1 Then
                         .Rows = .Rows - 1
                     End If
-                    atcgrid2.SizeAllColumnsToContents()
+                    atcgrid2.SizeAllColumnsToContents(atcgrid2.Width - pVScrollColumnOffset, True)
                 End With
             ElseIf tabSpecial.SelectedIndex = 3 Then
                 'uvname
@@ -725,7 +724,7 @@ Public Class ctlEditSpecialAction
                             .CellValue(.Rows - 1, 13) = Mid(newText, 71, 4)
                         End If
                     Next
-                    atcgrid3.SizeAllColumnsToContents()
+                    atcgrid3.SizeAllColumnsToContents(atcgrid3.Width - pVScrollColumnOffset, True)
                 End With
             ElseIf tabSpecial.SelectedIndex = 4 Then
                 'User Defn Quan
@@ -764,7 +763,7 @@ Public Class ctlEditSpecialAction
                             .CellValue(.Rows - 1, 13) = Mid(newText, 67, 4)
                         End If
                     Next
-                    atcgrid4.SizeAllColumnsToContents()
+                    atcgrid4.SizeAllColumnsToContents(atcgrid4.Width - pVScrollColumnOffset, True)
                 End With
             ElseIf tabSpecial.SelectedIndex = 5 Then
                 'conditionals
@@ -776,7 +775,7 @@ Public Class ctlEditSpecialAction
                             .CellValue(.Rows - 1, 0) = atcgrid0.Source.CellValue(lRow, 1)
                         End If
                     Next
-                    'atcgrid5.SizeAllColumnsToContents()
+                    atcgrid5.SizeAllColumnsToContents(atcgrid5.Width - pVScrollColumnOffset, True)
                     atcgrid5.Refresh()
                 End With
             End If
@@ -960,7 +959,7 @@ Public Class ctlEditSpecialAction
             .CellValue(1, 1) = cbuff
             Changed = True
         End With
-        atcgrid0.SizeAllColumnsToContents()
+        atcgrid0.SizeAllColumnsToContents(atcgrid0.Width - pVScrollColumnOffset, True)
         atcgrid0.Refresh()
     End Sub
 
@@ -970,7 +969,7 @@ Public Class ctlEditSpecialAction
             .CellValue(.Rows - 1, 1) = cbuff
             Changed = True
         End With
-        atcgrid0.SizeAllColumnsToContents()
+        atcgrid0.SizeAllColumnsToContents(atcgrid0.Width - pVScrollColumnOffset, True)
         atcgrid0.Refresh()
     End Sub
 

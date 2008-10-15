@@ -130,6 +130,7 @@ Public Class frmAgPrac
 
 
         ParGrid.Source = New atcControls.atcGridSource
+
         With ParGrid
             .Clear()
             .AllowHorizontalScrolling = False

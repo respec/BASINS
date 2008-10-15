@@ -58,6 +58,7 @@ Public Class UCIForms
                 Dim lEditSpecialAction As New ctlEditSpecialAction(aObject, aParent, aTag)
                 lFormEdit.Text = lEditSpecialAction.Caption
                 lFormEdit.EditControl = lEditSpecialAction
+                lFormEdit.MinimumSize = New System.Drawing.Size(1000, 650)
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
             Case "HspfTable"

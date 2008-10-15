@@ -6,6 +6,7 @@ Imports System.Collections.ObjectModel
 Public Class ctlEditMassLinks
     Implements ctlEdit
 
+    Dim pVScrollColumnOffset As Integer = 16
     Dim pMassLink As HspfMassLink
     Dim pChanged As Boolean
 
@@ -157,6 +158,24 @@ Public Class ctlEditMassLinks
                 .AllowHorizontalScrolling = False
                 .AllowNewValidValues = True
                 .Visible = True
+                .Source.FixedRows = 1
+            End With
+
+            With grdMassLink.Source
+                .Rows = 0
+                .Columns = 12
+                .CellValue(0, 0) = "VolName"
+                .CellValue(0, 1) = "Group"
+                .CellValue(0, 2) = "MemName"
+                .CellValue(0, 3) = "MemSub1"
+                .CellValue(0, 4) = "MemSub2"
+                .CellValue(0, 5) = "MultFactor"
+                .CellValue(0, 6) = "VolName"
+                .CellValue(0, 7) = "Group"
+                .CellValue(0, 8) = "MemName"
+                .CellValue(0, 9) = "MemSub1"
+                .CellValue(0, 10) = "MemSub2"
+                .CellValue(0, 11) = "HIDE"
             End With
 
             RefreshGrid()
@@ -164,23 +183,8 @@ Public Class ctlEditMassLinks
     End Property
     Private Sub RefreshGrid()
         Dim lMassLink As HspfMassLink
-        grdMassLink.Clear()
-        With grdMassLink.Source
-            .Rows = 0
-            .Columns = 12
 
-            .CellValue(0, 0) = "VolName"
-            .CellValue(0, 1) = "Group"
-            .CellValue(0, 2) = "MemName"
-            .CellValue(0, 3) = "MemSub1"
-            .CellValue(0, 4) = "MemSub2"
-            .CellValue(0, 5) = "MultFactor"
-            .CellValue(0, 6) = "VolName"
-            .CellValue(0, 7) = "Group"
-            .CellValue(0, 8) = "MemName"
-            .CellValue(0, 9) = "MemSub1"
-            .CellValue(0, 10) = "MemSub2"
-            .CellValue(0, 11) = "HIDE"
+        With grdMassLink.Source
             Dim lRowFillerIndex As Integer = 1
             For lRow As Integer = 1 To pMassLink.Uci.MassLinks.Count - 1
                 lMassLink = pMassLink.Uci.MassLinks(lRow)
@@ -212,10 +216,15 @@ Public Class ctlEditMassLinks
             Next
 
         End With
-        grdMassLink.SizeAllColumnsToContents()
+        grdMassLink.SizeAllColumnsToContents(grdMassLink.Width - pVScrollColumnOffset, True)
         grdMassLink.Refresh()
         pChanged = False
     End Sub
+
+    Private Sub grdEdit_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdMassLink.Resize
+        grdMassLink.SizeAllColumnsToContents(grdMassLink.Width - pVScrollColumnOffset, True)
+    End Sub
+
     Public Sub New(ByVal aHspfMassLink As Object, ByVal aParent As Windows.Forms.Form, ByVal aTag As String)
 
         ' This call is required by the Windows Form Designer.
