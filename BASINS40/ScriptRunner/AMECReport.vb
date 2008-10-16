@@ -91,13 +91,13 @@ Public Module AMECReport
                         PutTimeseriesInGrid(lSimData, lConcentrationsTable, lFieldIndex, _
                                             lSeasonNameArray(lSeasonIndex), _
                                             lSeasonStartArray(lSeasonIndex), _
-                                            lSeasonEndArray(lSeasonIndex), True)
+                                            lSeasonEndArray(lSeasonIndex))
                         lFieldIndex += 2
 
                         PutTimeseriesInGrid(lObsData, lConcentrationsTable, lFieldIndex, _
                                             lSeasonNameArray(lSeasonIndex), _
                                             lSeasonStartArray(lSeasonIndex), _
-                                            lSeasonEndArray(lSeasonIndex), False)
+                                            lSeasonEndArray(lSeasonIndex))
                         lFieldIndex += 2
                     Next
                     lFieldIndex += 1
@@ -130,8 +130,7 @@ Public Module AMECReport
                                     ByVal aGridColumn As Integer, _
                                     ByVal aSeasonName As String, _
                                     ByVal aSeasonStart As String, _
-                                    ByVal aSeasonEnd As String, _
-                                    ByVal aSubtractSmall As Boolean)
+                                    ByVal aSeasonEnd As String)
         Dim lValues() As Double
         Dim lValueIndex As Integer
         If aSeasonName = "Annual" Then
@@ -147,7 +146,7 @@ Public Module AMECReport
         Dim lNumNonMissingValues As Integer = 0
         Dim lNonMissingValues(lValues.GetUpperBound(0)) As Double
         For lValueIndex = 0 To lValues.GetUpperBound(0)
-            If Not Double.IsNaN(lValues(lValueIndex)) Then
+            If Not Double.IsNaN(lValues(lValueIndex)) AndAlso lValues(lValueIndex) > 0.00005 Then
                 lNonMissingValues(lNumNonMissingValues) = lValues(lValueIndex)
                 lNumNonMissingValues += 1
             End If
@@ -158,28 +157,14 @@ Public Module AMECReport
             .CurrentRecord = 1
             .FieldName(aGridColumn) = "Value"
             .FieldName(aGridColumn + 1) = "Prob"
+            Dim lNonMissingIndex As Integer = 1
             Dim lDivideBy As Integer = lNumNonMissingValues + 1
-            If aSubtractSmall Then
-                Dim lSmallValues As Integer = 0
-                For lValueIndex = 0 To lNumNonMissingValues - 1
-                    If lNonMissingValues(lValueIndex) > 0.00005 Then
-                        .Value(aGridColumn) = DoubleToString(lNonMissingValues(lValueIndex), , "#0.0000")
-                        .Value(aGridColumn + 1) = DoubleToString((lValueIndex + 1 - lSmallValues) / (lDivideBy - lSmallValues), , "#0.0000")
-                        .CurrentRecord += 1
-                    Else
-                        lSmallValues += 1
-                    End If
-                Next
-            Else
-                For lValueIndex = 0 To lNumNonMissingValues - 1
-                    If lNonMissingValues(lValueIndex) > 0.00005 Then
-                        .Value(aGridColumn) = DoubleToString(lNonMissingValues(lValueIndex), , "#0.0000")
-                        .Value(aGridColumn + 1) = DoubleToString((lValueIndex) / (lNumNonMissingValues), , "#0.0000")
-                        .CurrentRecord += 1
-                    End If
-                Next
-            End If
+            For lValueIndex = 0 To lNumNonMissingValues - 1
+                .Value(aGridColumn) = DoubleToString(lNonMissingValues(lValueIndex), , "#0.0000")
+                .Value(aGridColumn + 1) = DoubleToString(lNonMissingIndex / lDivideBy, , "#0.0000")
+                .CurrentRecord += 1
+                lNonMissingIndex += 1
+            Next
         End With
     End Sub
-
 End Module
