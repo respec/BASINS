@@ -7,14 +7,20 @@ Imports atcUtility
 Module modUCIRecords
 
     Private pUciRec As ArrayList
+    Private pBlocks As New atcCollection
 
     Public Sub ReadUCIRecords(ByRef aFileName As String)
         If Not pUciRec Is Nothing Then
             pUciRec = Nothing
         End If
         pUciRec = New ArrayList
+        Dim lIndex As Integer = 0
         For Each lCurrentRecord As String In LinesInFile(aFileName)
             pUciRec.Add(lCurrentRecord.TrimEnd)
+            If pBlocks.Keys.Contains(lCurrentRecord.Trim) Then
+                pBlocks.ItemByKey(lCurrentRecord.Trim) = lIndex
+            End If
+            lIndex += 1
         Next
     End Sub
 
@@ -33,15 +39,23 @@ Module modUCIRecords
                                       ByRef aReturnCode As Integer)
         Dim lRecordIndex As Integer = -1
         If aRecordIndex = -1 Then 'find first record of block
-            For Each lUciRec As String In pUciRec
-                lRecordIndex += 1
-                If lUciRec.StartsWith(aBlockName) Then 'found start
-                    aRecordIndex = lRecordIndex
-                    Exit For
-                End If
-            Next lUciRec
-            aReturnCode = 10
+            If pBlocks.Keys.Contains(aBlockName) Then
+                aRecordIndex = pBlocks.ItemByKey(aBlockName)
+            End If
+            If aRecordIndex = -1 Then
+                aReturnCode = 10
+            End If
         End If
+        'If aRecordIndex = -1 Then 'check again to be sure
+        '    For Each lUciRec As String In pUciRec
+        '        lRecordIndex += 1
+        '        If lUciRec.StartsWith(aBlockName) Then 'found start
+        '            aRecordIndex = lRecordIndex
+        '            Exit For
+        '        End If
+        '    Next lUciRec
+        '    aReturnCode = 10
+        'End If
 
         'start at record after input aRecordIndex
         If aRecordIndex > -1 Then
@@ -81,14 +95,18 @@ Module modUCIRecords
                                               ByRef aOccurNumber As Integer)
         Dim lRecIndexStart As Integer = -1
         Dim lRecIndex As Integer = -1
-        For Each lRec As String In pUciRec
-            lRecIndex += 1
-            If lRec.StartsWith(aOperationName) Then
-                'found start of this operation type block
-                lRecIndexStart = lRecIndex
-                Exit For
-            End If
-        Next lRec
+
+        If pBlocks.Keys.Contains(aOperationName) Then
+            lRecIndexStart = pBlocks.ItemByKey(aOperationName)
+        End If
+        'For Each lRec As String In pUciRec
+        '    lRecIndex += 1
+        '    If lRec.StartsWith(aOperationName) Then
+        '        'found start of this operation type block
+        '        lRecIndexStart = lRecIndex
+        '        Exit For
+        '    End If
+        'Next lRec
 
         Dim lRecIndexEnd As Integer = -1
         If lRecIndexStart > 0 Then
@@ -270,6 +288,19 @@ Module modUCIRecords
             .Add("MASSLINKS")
             .Add("SPECIAL ACTIONS")
         End With
+        pBlocks.Add("RUN", -1)
+        For Each lBlockName As String In lOrder
+            pBlocks.Add(lBlockName, -1)
+        Next
+        pBlocks.Add("CATEGORY", -1)
+        pBlocks.Add("MONTH-DATA", -1)
+        pBlocks.Add("MASS-LINK", -1)
+        pBlocks.Add("SPEC-ACTIONS", -1)
+        pBlocks.Add("EXT SOURCES", -1)
+        pBlocks.Add("EXT TARGETS", -1)
+        pBlocks.Add("SCHEMATIC", -1)
+        pBlocks.Add("NETWORK", -1)
+
         aOrder = lOrder
     End Sub
 

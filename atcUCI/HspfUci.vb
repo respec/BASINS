@@ -29,7 +29,7 @@ Public Class HspfUci
     Private pPointSources As Collection(Of HspfPointSource)
     Private pPollutants As Collection(Of HspfPollutant)
     Private pMonthData As HspfMonthData
-    Private pErrorDescription As String
+    Private pErrorDescription As String = ""
     Private pEdited As Boolean
     Private pInitialized As Boolean
     Private pSpecialActionBlk As HspfSpecialActionBlk
@@ -46,15 +46,19 @@ Public Class HspfUci
     Private pIcon As System.Drawing.Image
 
     Private pIPC As Object 'ATCoCtl.ATCoIPC
-    Private pIPCset As Boolean
+    Private pIPCset As Boolean = False
     Private pNaN As Double = GetNaN()
 
     Public Sub SendHspfMessage(ByVal aMessage As String)
-        If pIPCset Then pIPC.SendProcessMessage("HSPFUCI", aMessage)
+        If pIPCset Then
+            pIPC.SendProcessMessage("HSPFUCI", aMessage)
+        End If
     End Sub
 
     Public Sub SendMonitorMessage(ByVal aMessage As String)
-        If pIPCset Then pIPC.SendMonitorMessage(aMessage)
+        If pIPCset Then
+            pIPC.SendMonitorMessage(aMessage)
+        End If
     End Sub
 
     'Public Property IPC() As Object
@@ -144,7 +148,7 @@ Public Class HspfUci
         End Set
     End Property
 
-    Public Property icon() As System.Drawing.Image
+    Public Property Icon() As System.Drawing.Image
         Get
             Return pIcon
         End Get
@@ -447,7 +451,6 @@ Public Class HspfUci
                        ByRef aFullFg As Integer, _
                        ByRef aFilesOK As Boolean, _
                        ByRef aEchoFile As String)
-        'On Error Resume Next
         pMsg = aMsg
         aFilesOK = True
 
@@ -479,7 +482,9 @@ Public Class HspfUci
                     End If
                     If CDbl(Right(lMsg, 1)) <> 0 Or lMsg.StartsWith("HSPFUCI exited with code") Then
                         'would be helpful to include lMsg here
-                        pErrorDescription = "Error interpreting UCI File '" & lName & "'." & vbCrLf & vbCrLf & "See the file '" & aEchoFile.Trim & "' for more details." '& vbCrLf & vbCrLf & M
+                        pErrorDescription = "Error interpreting UCI File '" & lName & "'." & vbCrLf & vbCrLf & _
+                                            "See the file '" & aEchoFile.Trim & "' for more details." & vbCrLf & _
+                                            "Message " & lMsg
                         SendMonitorMessage(pErrorDescription)
                     End If
                     pFastFlag = True
@@ -487,11 +492,9 @@ Public Class HspfUci
 
                 pInitialized = True
 
-                If pIPCset Then
-                    SendMonitorMessage("(Show)") 'where was the hide?
-                    If Not pFastFlag Then
-                        SendMonitorMessage("(Msg1 Building Collections)")
-                    End If
+                SendMonitorMessage("(Show)") 'where was the hide?
+                If Not pFastFlag Then
+                    SendMonitorMessage("(Msg1 Building Collections)")
                 End If
 
                 SaveBlockOrder(pOrder)
