@@ -167,6 +167,15 @@ Public Class HspfTable
         End Set
     End Property
 
+    Public Sub New()
+        MyBase.New()
+        pDef = New HspfTableDef
+        pParms = New HspfParms
+        pOccurCount = 0
+        pEditAllSimilar = True
+        pCombineOK = True
+    End Sub
+
     Public Function EditAllSimilarChange(ByRef newEditAllSimilar As Boolean) As Object
         EditAllSimilarChange = pEditAllSimilar
         pEditAllSimilar = newEditAllSimilar
@@ -174,25 +183,25 @@ Public Class HspfTable
 
     Public Sub InitTable(ByRef aInitValueString As String)
         Dim lParm As HSPFParm
-        Dim lParmDef As HSPFParmDef
-        Dim unitfg As Integer
+        Dim lUnitfg As Integer = pOpn.OpnBlk.Uci.GlobalBlock.EmFg
 
-        For Each lParmDef In pDef.ParmDefs
+        For Each lParmDef As HSPFParmDef In pDef.ParmDefs
             lParm = New HspfParm
             lParm.Parent = Me
             lParm.Def = lParmDef
             lParm.Value = Trim(Mid(aInitValueString, lParmDef.StartCol, lParmDef.Length))
             lParm.ValueAsRead = Mid(aInitValueString, lParmDef.StartCol, lParmDef.Length)
-            If lParm.ValueAsRead = "" And Len(aInitValueString) > 0 Then lParm.ValueAsRead = " "
-            If Len(lParm.Value) = 0 Then 'try default
-                unitfg = pOpn.OpnBlk.Uci.GlobalBlock.EmFg
-                If unitfg = 1 Then
+            If lParm.ValueAsRead = "" And aInitValueString.Length > 0 Then
+                lParm.ValueAsRead = " "
+            End If
+            If lParm.Value.Length = 0 Then 'try default
+                If lUnitfg = 1 Then
                     lParm.Value = lParm.Def.DefaultValue
                 Else
                     lParm.Value = lParm.Def.MetricDefault
                 End If
             End If
-            If Len(lParm.Value) > 0 Then
+            If lParm.Value.Length > 0 Then
                 If lParm.Def.Typ = 1 Then
                     If IsNumeric(lParm.Value) Then
                         lParm.Value = CStr(CInt(lParm.Value))
@@ -325,7 +334,7 @@ Public Class HspfTable
                         lOutRec = Left(lOutRec, 10) & lSuppStr & Mid(lOutRec, 11 + lSuppStr.Length)
                     End If
                     If Not lOutPend Is Nothing AndAlso lPendingFlag Then
-                        If compareTableString(1, 10, lOutPend, lOutRec) And lTable.CombineOK Then
+                        If CompareTableString(1, 10, lOutPend, lOutRec) And lTable.CombineOK Then
                             lOutRec = Left(lOutPend, 5) & Left(lOutRec, 5) & Right(lOutRec, lOutRec.Length - 10)
                         Else
                             If lOutPend.Length > 80 Then
@@ -393,20 +402,11 @@ notMissingTableForThisOper:
         Return lSB.ToString
     End Function
 
-    Public Sub New()
-        MyBase.New()
-        pDef = New HspfTableDef
-        pParms = New HspfParms
-        pOccurCount = 0
-        pEditAllSimilar = True
-        pCombineOK = True
-    End Sub
-
     Private Sub PrintMultiLine(ByRef aSB As StringBuilder, ByRef aOutPend As String)
         aSB.AppendLine(aOutPend.Substring(0, 80).TrimEnd) 'first line
 
-        Dim lLen As Integer = aOutPend.Length
-        Dim lNLinesMore As Integer = ((lLen - 10) / 70) - 1
+        Dim lLength As Integer = aOutPend.Length
+        Dim lNLinesMore As Integer = ((lLength - 10) / 70) - 1
         'If lNLinesMore > 3 Then 'make sure something in remaining lines
         '    lNLinesMore = aOutPend.TrimEnd
         '    lLen = aOutPend.Length
@@ -416,7 +416,7 @@ notMissingTableForThisOper:
         Dim lNChar As Integer
         For lLineIndex As Integer = 1 To lNLinesMore
             If lLineIndex = lNLinesMore Then
-                lNChar = lLen - (lLineIndex * 70) - 10
+                lNChar = lLength - (lLineIndex * 70) - 10
             Else
                 lNChar = 70
             End If
@@ -494,9 +494,9 @@ notMissingTableForThisOper:
            pDef.Name = "GQ-VALUES" Or _
            pDef.Name = "QUAL-PROPS" Or _
            pDef.Name = "GQ-QALDATA" Then
-            TableNeededForAllQuals = True
+            Return True
         Else
-            TableNeededForAllQuals = False
+            Return False
         End If
     End Function
 
@@ -529,7 +529,7 @@ notMissingTableForThisOper:
         Return lNumericallyTheSame
     End Function
 
-    Shared Function NumFmtRE(ByVal rtmp As Single, Optional ByRef maxWidth As Integer = 16) As String
+    Shared Function NumFmtRE(ByVal aRVal As Single, Optional ByRef aMaxWidth As Integer = 16) As String
         ' ##SUMMARY Converts single-precision number to string with exponential syntax if length of number exceeds specified length.
         ' ##SUMMARY If unspecified, length defaults to 16.
         ' ##SUMMARY   Example: NumFmtRE(123000000, 7) = "1.23e-8"
@@ -540,43 +540,36 @@ notMissingTableForThisOper:
         ' ##LOCAL retval - string used as antecedent to NumFmtRE
         ' ##LOCAL expFormat - string syntax of exponential format
         ' ##LOCAL DecimalPlaces - long number of decimal places
-        Dim LogVal As Double
-        Dim retval As String
-        Dim expFormat As String
-        Dim DecimalPlaces As Integer
-
-        retval = CStr(rtmp)
-        NumFmtRE = retval
-
-        If rtmp <> 0 And maxWidth > 0 Then
-            If Len(retval) > maxWidth Then
-                If Len(retval) - maxWidth = 1 And Left(retval, 2) = "0." Then
+        Dim lNumFmtRE As String = CStr(aRVal)
+        If aRVal <> 0 And aMaxWidth > 0 Then
+            If lNumFmtRE.Length > aMaxWidth Then
+                If lNumFmtRE.Length - aMaxWidth = 1 And lNumFmtRE.StartsWith("0.") Then
                     'special case, can just eliminate leading zero
-                    retval = Mid(retval, 2)
-                ElseIf Len(retval) - maxWidth = 1 And Left(retval, 3) = "-0." Then
+                    lNumFmtRE = lNumFmtRE.Substring(1)
+                ElseIf lNumFmtRE.Length - aMaxWidth = 1 And lNumFmtRE.StartsWith("-0.") Then
                     'special case, can just eliminate leading zero
-                    retval = "-" & Mid(retval, 3)
+                    lNumFmtRE = "-" & lNumFmtRE.Substring(3)
                 Else
                     'Determine appropriate log syntax
-                    LogVal = System.Math.Abs(Log10(System.Math.Abs(rtmp)))
-                    If LogVal >= 100 Then
-                        expFormat = "e-000"
-                    ElseIf LogVal >= 10 Then
-                        expFormat = "e-00"
+                    Dim lLogVal As Double = System.Math.Abs(Log10(System.Math.Abs(aRVal)))
+                    Dim lExpFormat As String
+                    If lLogVal >= 100 Then
+                        lExpFormat = "e-000"
+                    ElseIf lLogVal >= 10 Then
+                        lExpFormat = "e-00"
                     Else
-                        expFormat = "e-0"
+                        lExpFormat = "e-0"
                     End If
                     'Set appropriate decimal position
-                    DecimalPlaces = maxWidth - Len(expFormat) - 2
+                    Dim lDecimalPlaces As Integer = aMaxWidth - Len(lExpFormat) - 2
                     'If DecimalPlaces < 1 Then DecimalPlaces = 1  'pbd changed to accomodate 1.e-5
-                    If (DecimalPlaces < 0) Or (DecimalPlaces = 0 And rtmp > 1.0#) Then
-                        DecimalPlaces = 1
+                    If (lDecimalPlaces < 0) Or (lDecimalPlaces = 0 And aRVal > 1.0#) Then
+                        lDecimalPlaces = 1
                     End If
-
-                    retval = Format(rtmp, "#." & New String("#", DecimalPlaces) & expFormat)
+                    lNumFmtRE = Format(aRVal, "#." & New String("#", lDecimalPlaces) & lExpFormat)
                 End If
             End If
         End If
-        Return retval
+        Return lNumFmtRE
     End Function
 End Class

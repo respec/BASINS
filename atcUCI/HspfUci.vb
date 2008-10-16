@@ -317,6 +317,7 @@ Public Class HspfUci
 
         For Each lBlock As String In pOrder
             Dim lStr As String = ""
+            Logger.Dbg("Write " & lBlock)
             Select Case lBlock
                 Case "GLOBAL"
                     lStr = pGlobalBlk.ToString
@@ -452,17 +453,20 @@ Public Class HspfUci
                        ByRef aFilesOK As Boolean, _
                        ByRef aEchoFile As String)
         pMsg = aMsg
-        aFilesOK = True
 
         If Not IO.File.Exists(aNewName) Then
             pErrorDescription = "UciFileName '" & aNewName & "' not found"
         Else
             pName = aNewName
-            ReadUCIRecords(pName)
+            Logger.Dbg("UCIRecordCount " & ReadUCIRecords(pName))
+
             If aFullFg <> -1 Then 'not doing starter, process wdm files
                 aFilesOK = PreScanFilesBlock(aEchoFile)
                 aEchoFile = aEchoFile.Trim
+            Else
+                aFilesOK = True
             End If
+
             If aFilesOK Then
                 Dim lName As String = IO.Path.GetFileNameWithoutExtension(pName)
                 Dim lFlag As Integer
@@ -538,18 +542,23 @@ Public Class HspfUci
                     lOpnblk.Ids.Add(lOpn)
                     lOpn.OpnBlk = lOpnblk
                 Next
+                Logger.Dbg("GeneralBlocksRead")
 
                 For Each lOpnblk In pOpnBlks 'perlnd, implnd, etc
                     If lOpnblk.Count > 0 Then
                         lOpnblk.setTableValues(Msg.BlockDefs(lOpnblk.Name))
+                        Logger.Dbg(lOpnblk.Name & " BlockRead")
                     End If
                 Next
+                Logger.Dbg("OperationBlocksRead")
 
                 pSpecialActionBlk = New HspfSpecialActionBlk
                 pSpecialActionBlk.Uci = Me
                 pSpecialActionBlk.ReadUciFile()
+                Logger.Dbg("SpecialActionBlockRead")
 
                 ProcessFTables()
+                Logger.Dbg("FtableBlockRead")
 
                 pConnections = Nothing
                 pConnections = New Collection(Of HspfConnection)
@@ -559,21 +568,25 @@ Public Class HspfUci
                 For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
                     lOpn.setTimSerConnections()
                 Next
+                Logger.Dbg("ConnectionBlocksRead")
 
                 pMassLinks.Clear()
                 Dim lMassLink As New HspfMassLink
                 lMassLink.readMassLinks(Me)
+                Logger.Dbg("MassLinkBlockRead")
 
                 'look for met segments
                 Source2MetSeg()
+                Logger.Dbg("MetSegmentsCreated " & pMetSegs.Count)
+
                 'look for point loads
                 Source2Point()
-                If pIPCset Then SendMonitorMessage("(Hide)")
+                Logger.Dbg("PointSources " & pPointSources.Count)
 
+                SendMonitorMessage("(Hide)")
             End If
         End If
         pEdited = False 'all the reads set edited
-        Exit Sub
     End Sub
 
     Public Sub CalcMaxAreaByLand2Stream()

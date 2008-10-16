@@ -1007,7 +1007,8 @@ TryAgain:
         Private pCanSeek As Boolean
 
         Public Sub New(ByVal aFileName As String)
-            pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read), 16384))
+            'NOTE: default buffer size (4096) or larger degrades performance - jlk 10/2008
+            pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read), 1024))
             pCanSeek = pStreamReader.BaseStream.CanSeek
         End Sub
 
@@ -1089,27 +1090,28 @@ ReadCharacter:
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function NextLine(ByVal aReader As IO.BinaryReader) As String
-        Dim ch As Char
+        Dim lChar As Char
         'TODO: test a StringBuilder in place of &= for each character
-        NextLine = ""
+        Dim lNextLine As String = ""
         Try
 ReadCharacter:
-            ch = aReader.ReadChar
-            Select Case ch
+            lChar = aReader.ReadChar
+            Select Case lChar
                 Case ControlChars.Cr 'Found carriage return, consume linefeed if it is next
                     If aReader.PeekChar = 10 Then aReader.ReadChar()
                 Case ControlChars.Lf 'Unix-style line ends without carriage return
                 Case Else 'Found a character that does not end the line
-                    NextLine &= ch
+                    lNextLine &= lChar
                     GoTo ReadCharacter
             End Select
-        Catch endEx As IO.EndOfStreamException
-            If NextLine.Length = 0 Then 'We had nothing to read, already finished file last time
-                Throw endEx
+        Catch lExEndofStream As IO.EndOfStreamException
+            If lNextLine.Length = 0 Then 'We had nothing to read, already finished file last time
+                Throw lExEndofStream
             Else
                 'Reaching the end of file is fine, we are returning the last line now
             End If
         End Try
+        Return lNextLine
     End Function
 
     ''' <summary>

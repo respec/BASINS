@@ -3,26 +3,30 @@ Option Explicit On
 
 Imports System.IO
 Imports atcUtility
+Imports MapWinUtility
 
 Module modUCIRecords
 
     Private pUciRec As ArrayList
     Private pBlocks As New atcCollection
 
-    Public Sub ReadUCIRecords(ByRef aFileName As String)
+    Public Function ReadUCIRecords(ByRef aFileName As String) As Integer
         If Not pUciRec Is Nothing Then
             pUciRec = Nothing
         End If
         pUciRec = New ArrayList
         Dim lIndex As Integer = 0
+        Logger.Dbg("Reading " & aFileName)
         For Each lCurrentRecord As String In LinesInFile(aFileName)
             pUciRec.Add(lCurrentRecord.TrimEnd)
             If pBlocks.Keys.Contains(lCurrentRecord.Trim) Then
                 pBlocks.ItemByKey(lCurrentRecord.Trim) = lIndex
+                Logger.Dbg("Reading " & lCurrentRecord.Trim & " at " & lIndex)
             End If
             lIndex += 1
         Next
-    End Sub
+        Return lIndex
+    End Function
 
     Public Function GetUCIRecord(ByRef aIndex As Integer) As String
         If aIndex >= 0 And aIndex < pUciRec.Count Then
@@ -46,16 +50,6 @@ Module modUCIRecords
                 aReturnCode = 10
             End If
         End If
-        'If aRecordIndex = -1 Then 'check again to be sure
-        '    For Each lUciRec As String In pUciRec
-        '        lRecordIndex += 1
-        '        If lUciRec.StartsWith(aBlockName) Then 'found start
-        '            aRecordIndex = lRecordIndex
-        '            Exit For
-        '        End If
-        '    Next lUciRec
-        '    aReturnCode = 10
-        'End If
 
         'start at record after input aRecordIndex
         If aRecordIndex > -1 Then
@@ -94,23 +88,13 @@ Module modUCIRecords
                                               ByRef aRecIndex As Integer, _
                                               ByRef aOccurNumber As Integer)
         Dim lRecIndexStart As Integer = -1
-        Dim lRecIndex As Integer = -1
-
         If pBlocks.Keys.Contains(aOperationName) Then
             lRecIndexStart = pBlocks.ItemByKey(aOperationName)
         End If
-        'For Each lRec As String In pUciRec
-        '    lRecIndex += 1
-        '    If lRec.StartsWith(aOperationName) Then
-        '        'found start of this operation type block
-        '        lRecIndexStart = lRecIndex
-        '        Exit For
-        '    End If
-        'Next lRec
 
         Dim lRecIndexEnd As Integer = -1
         If lRecIndexStart > 0 Then
-            For lRecIndex = lRecIndexStart + 1 To pUciRec.Count - 1
+            For lRecIndex As Integer = lRecIndexStart + 1 To pUciRec.Count - 1
                 Dim lRec As String = pUciRec(lRecIndex)
                 If lRec.StartsWith("END " & aOperationName) Then
                     'found end of this operation type block
@@ -124,7 +108,7 @@ Module modUCIRecords
         aOccurNumber = 0
         Dim lRecSearch As String = "  " & aKeyword
         If lRecIndexStart > -1 And lRecIndexEnd > -1 Then
-            For lRecIndex = lRecIndexStart + 1 To lRecIndexEnd
+            For lRecIndex As Integer = lRecIndexStart + 1 To lRecIndexEnd
                 Dim lRec As String = pUciRec(lRecIndex)
                 If lRec.StartsWith(lRecSearch) Then 'found start of this table 
                     'pbd -- distinguish between soil-data and soil-data2 for instance
@@ -187,12 +171,9 @@ Module modUCIRecords
 
     Public Function GetCommentBeforeBlock(ByRef aBlockName As String) As String
         Dim lStartRecordIndex As Integer = -1
-        For lRecordIndex As Integer = 0 To pUciRec.Count - 1
-            If pUciRec(lRecordIndex).StartsWith(aBlockName) Then 'found start of block
-                lStartRecordIndex = lRecordIndex
-                Exit For
-            End If
-        Next lRecordIndex
+        If pBlocks.Keys.Contains(aBlockName) Then
+            lStartRecordIndex = pBlocks.ItemByKey(aBlockName)
+        End If
 
         Dim lComment As String = ""
         If lStartRecordIndex > 0 Then

@@ -99,13 +99,16 @@ Module modUciRead
 
     Public Function CompareTableString(ByRef aSkipF As Integer, ByRef aSkipL As Integer, _
                                        ByRef aStr1 As String, ByRef aStr2 As String) As Boolean
-        Dim lStr1, lStr2 As String
-        Dim lLen1, lLen2 As Integer
         Try
-            lLen1 = aStr1.Length
-            lLen2 = aStr2.Length
-            If lLen1 <> lLen2 Then Return False
-            If aSkipF = 1 Then 'skip at left side
+            Dim lLen1 As Integer = aStr1.Length
+            Dim lLen2 As Integer = aStr2.Length
+            Dim lStr1, lStr2 As String
+            If lLen1 <> lLen2 Then
+                Return False
+            ElseIf lLen1 = 5 Then
+                lStr1 = aStr1
+                lStr2 = aStr2
+            ElseIf aSkipF = 1 Then 'skip at left side
                 lStr1 = Right(aStr1, lLen1 - aSkipL)
                 lStr2 = Right(aStr2, lLen2 - aSkipL)
             ElseIf aSkipL = lLen1 Then  'skip at right side
@@ -115,8 +118,11 @@ Module modUciRead
                 lStr1 = Left(aStr1, aSkipF - 1) & Right(aStr1, lLen1 - aSkipL)
                 lStr2 = Left(aStr2, aSkipF - 1) & Right(aStr2, lLen1 - aSkipL)
             End If
-            If lStr1 <> lStr2 Then Return False
-            Return True 'match
+            If lStr1 <> lStr2 Then
+                Return False
+            Else
+                Return True 'match
+            End If
         Catch lEx As Exception
             Return False
         End Try
