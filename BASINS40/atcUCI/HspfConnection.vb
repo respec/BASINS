@@ -309,7 +309,9 @@ Public Class HspfConnection
                 lRetKey = -1
                 Call REM_XBLOCKEX(aUci, lOmCode, lInit, lRetKey, lBuff, lRecTyp, lRetCod)
             End If
-            If lRetCod <> 2 Then Exit Do
+            If lRetCod <> 2 Then
+                Exit Do
+            End If
             lInit = 0
             If lRecTyp = 0 Then
                 lConnection = New HspfConnection
