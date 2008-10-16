@@ -11,74 +11,55 @@ Public Class HspfSpecialActionBlk
     Private pUserDefineNames As Collection 'of HspfSpecialUserDefineName
     Private pUserDefineQuans As Collection 'of HspfSpecialUserDefineQuans
     Private pConditions As Collection 'of HspfSpecialCondition
-    Private pRecords As Collection 'of HspfSpecialRecord
-    Private pComment As String
-    Private pUci As HspfUci
-
-    Public Property Uci() As HspfUci
-        Get
-            Uci = pUci
-        End Get
-        Set(ByVal Value As HspfUci)
-            pUci = Value
-        End Set
-    End Property
+    Private pRecords As Generic.List(Of HspfSpecialRecord)
+    Public Comment As String = ""
+    Public Uci As HspfUci = Nothing
 
     Public ReadOnly Property Caption() As String
         Get
-            Caption = "Special Actions Block"
+            Return "Special Actions Block"
         End Get
-    End Property
-
-
-    Public Property Comment() As String
-        Get
-            Comment = pComment
-        End Get
-        Set(ByVal Value As String)
-            pComment = Value
-        End Set
     End Property
 
     Public ReadOnly Property EditControlName() As String
         Get
-            EditControlName = "ATCoHspf.ctlSpecialActionEdit"
+            Return "ATCoHspf.ctlSpecialActionEdit"
         End Get
     End Property
 
     ReadOnly Property Actions() As Collection
         Get
-            Actions = pActions
+            Return pActions
         End Get
     End Property
 
     ReadOnly Property Distributes() As Collection
         Get
-            Distributes = pDistributes
+            Return pDistributes
         End Get
     End Property
 
     ReadOnly Property UserDefineNames() As Collection
         Get
-            UserDefineNames = pUserDefineNames
+            Return pUserDefineNames
         End Get
     End Property
 
     ReadOnly Property UserDefineQuans() As Collection
         Get
-            UserDefineQuans = pUserDefineQuans
+            return pUserDefineQuans
         End Get
     End Property
 
     ReadOnly Property Conditions() As Collection
         Get
-            Conditions = pConditions
+            Return pConditions
         End Get
     End Property
 
-    ReadOnly Property Records() As Collection
+    ReadOnly Property Records() As Generic.List(Of HspfSpecialRecord)
         Get
-            Records = pRecords
+            Return pRecords
         End Get
     End Property
 
@@ -87,63 +68,58 @@ Public Class HspfSpecialActionBlk
     End Sub
 
     Public Sub ReadUciFile()
-        Dim done As Boolean
-        Dim init, OmCode As Integer
-        Dim retkey, retcod As Integer
-        Dim cbuff As String = Nothing
-        Dim rectyp As Integer
-        Dim mySpecialRecord As HspfSpecialRecord
-        Dim moreUvnames As Integer
-
-        If pUci.FastFlag Then
-            pComment = GetCommentBeforeBlock("SPEC-ACTIONS")
+        If Uci.FastFlag Then
+            Me.Comment = GetCommentBeforeBlock("SPEC-ACTIONS")
         End If
 
-        moreUvnames = 0
-        OmCode = HspfOmCode("SPEC-ACTIONS")
-        init = 1
-        done = False
-        retkey = -1
-        Do Until done
-            If pUci.FastFlag Then
-                GetNextRecordFromBlock("SPEC-ACTIONS", retkey, cbuff, rectyp, retcod)
+        Dim lOmCode As Integer = HspfOmCode("SPEC-ACTIONS")
+        Dim lInit As Integer = 1
+        Dim lDone As Boolean = False
+        Dim lMoreUvNames As Integer = 0
+        Dim lRetKey As Integer = -1
+        Dim lUCIRecord As String = Nothing
+        Dim lUCIRecordType As Integer
+        Dim lReturnCode As Integer
+        Do Until lDone
+            If Uci.FastFlag Then
+                GetNextRecordFromBlock("SPEC-ACTIONS", lRetKey, lUCIRecord, lUCIRecordType, lReturnCode)
             Else
-                retkey = -2 'force return of comments/blanks
-                Call REM_XBLOCKEX((Me.Uci), OmCode, init, retkey, cbuff, rectyp, retcod)
+                lRetKey = -2 'force return of comments/blanks
+                Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetKey, lUCIRecord, lUCIRecordType, lReturnCode)
             End If
-            init = 0
-            If retcod = 2 Then 'normal record
-                mySpecialRecord = New HspfSpecialRecord
-                With mySpecialRecord
-                    .Text = cbuff
-                    If Len(Trim(cbuff)) = 0 Or InStr(cbuff, "***") > 0 Then
+            lInit = 0
+            If lReturnCode = 2 Then 'normal record
+                Dim lSpecialRecord As New HspfSpecialRecord
+                With lSpecialRecord
+                    .Text = lUCIRecord
+                    If Len(Trim(lUCIRecord)) = 0 Or InStr(lUCIRecord, "***") > 0 Then
                         .SpecType = HspfData.HspfSpecialRecordType.hComment
-                    ElseIf Left(Trim(cbuff), 3) = "IF " Or Left(Trim(cbuff), 4) = "ELSE" Or Left(Trim(cbuff), 6) = "END IF" Then
+                    ElseIf Left(Trim(lUCIRecord), 3) = "IF " Or Left(Trim(lUCIRecord), 4) = "ELSE" Or Left(Trim(lUCIRecord), 6) = "END IF" Then
                         .SpecType = HspfData.HspfSpecialRecordType.hCondition
-                    ElseIf Mid(cbuff, 3, 6) = "DISTRB" Then
+                    ElseIf Mid(lUCIRecord, 3, 6) = "DISTRB" Then
                         .SpecType = HspfData.HspfSpecialRecordType.hDistribute
-                    ElseIf Mid(cbuff, 3, 6) = "UVNAME" Then
+                    ElseIf Mid(lUCIRecord, 3, 6) = "UVNAME" Then
                         .SpecType = HspfData.HspfSpecialRecordType.hUserDefineName
                         'look at how many uvnames to come
-                        moreUvnames = CShort(Mid(cbuff, 17, 3))
-                        moreUvnames = Int((moreUvnames - 1) / 2) 'lines to come
-                    ElseIf Mid(cbuff, 3, 6) = "UVQUAN" Then
+                        lMoreUvNames = CShort(Mid(lUCIRecord, 17, 3))
+                        lMoreUvNames = Int((lMoreUvNames - 1) / 2) 'lines to come
+                    ElseIf Mid(lUCIRecord, 3, 6) = "UVQUAN" Then
                         .SpecType = HspfData.HspfSpecialRecordType.hUserDefineQuan
                     Else
-                        If moreUvnames > 0 Then
+                        If lMoreUvNames > 0 Then
                             .SpecType = HspfData.HspfSpecialRecordType.hUserDefineName
                             If Left(.Text, 5) <> "     " Then 'see if record needs padding
                                 .Text = "                  " & .Text
                             End If
-                            moreUvnames = moreUvnames - 1
+                            lMoreUvNames -= 1
                         Else
                             .SpecType = HspfData.HspfSpecialRecordType.hAction
                         End If
                     End If
                 End With
-                pRecords.Add(mySpecialRecord)
+                pRecords.Add(lSpecialRecord)
             Else
-                done = True
+                lDone = True
             End If
         Loop
     End Sub
@@ -151,15 +127,13 @@ Public Class HspfSpecialActionBlk
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
         If pRecords.Count > 0 Then
-            If pComment.Length > 0 Then
-                lSB.AppendLine(pComment)
+            If Me.Comment.Length > 0 Then
+                lSB.AppendLine(Me.Comment)
             End If
             lSB.AppendLine("SPEC-ACTIONS")
-            With pRecords
-                For lRecordIndex As Integer = 1 To .Count
-                    lSB.AppendLine(.Item(lRecordIndex).Text)
-                Next lRecordIndex
-            End With
+            For Each lRecord As atcUCI.HspfSpecialRecord In pRecords
+                lSB.AppendLine(lRecord.Text)
+            Next
             lSB.AppendLine("END SPEC-ACTIONS")
         End If
         Return lSB.ToString
@@ -167,7 +141,7 @@ Public Class HspfSpecialActionBlk
 
     Public Sub New()
         MyBase.New()
-        pRecords = New Collection
+        pRecords = New Generic.List(Of HspfSpecialRecord)
         pActions = New Collection
         pDistributes = New Collection
         pUserDefineNames = New Collection

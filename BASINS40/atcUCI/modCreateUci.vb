@@ -37,7 +37,8 @@ Module modCreateUci
         'add files block to uci
         CreateFilesBlock(aUci, aWatershed.Name, aDataSources)
         aUci.Save() 'TODO: required by prescanfilesblock, need in memory version of prescan...
-        ReadUCIRecords(aUci.Name)
+        Logger.Dbg("UCIRecordCount " & ReadUCIRecords(aUci.Name))
+
         Dim lEchoFileName As String = ""
         Dim lFilesBlockStatus As Boolean = aUci.PreScanFilesBlock(lEchoFileName)
 
