@@ -20,78 +20,20 @@ Public Class HspfTables
 End Class
 
 Public Class HspfTable
-    Private pDef As HspfTableDef
-    Private pOccurCount As Integer 'total number of occurences
-    Private pOccurNum As Integer 'nth occurrence
-    Private pOccurIndex As Integer 'occurence with which this table is associated
-    Private pComment As String = ""
-    Private pTableComment As String = ""
-    Private pParms As HspfParms
-    Private pOpn As HspfOperation
     Private pEditAllSimilar As Boolean
     Private pEdited As Boolean
     Private pSuppID As Integer '>0 indicates parms on this record are in supplemental file
     Private pCombineOK As Boolean
 
-    Public Property OccurCount() As Integer
-        Get
-            Return pOccurCount
-        End Get
-        Set(ByVal Value As Integer)
-            pOccurCount = Value
-        End Set
-    End Property
-
-    Public Property OccurNum() As Integer
-        Get
-            Return pOccurNum
-        End Get
-        Set(ByVal Value As Integer)
-            pOccurNum = Value
-        End Set
-    End Property
-
-    Public Property OccurIndex() As Integer
-        Get
-            Return pOccurIndex
-        End Get
-        Set(ByVal Value As Integer)
-            pOccurIndex = Value
-        End Set
-    End Property
-
-    Public Property Def() As HspfTableDef
-        Get
-            Return pDef
-        End Get
-        Set(ByVal Value As HspfTableDef)
-            pDef = Value
-        End Set
-    End Property
-
-    Public Property Comment() As String
-        Get
-            Return pComment
-        End Get
-        Set(ByVal Value As String)
-            pComment = Value
-        End Set
-    End Property
-
-    Public Property TableComment() As String
-        Get
-            Return pTableComment
-        End Get
-        Set(ByVal Value As String)
-            pTableComment = Value
-        End Set
-    End Property
-
-    Public ReadOnly Property Name() As String
-        Get
-            Return pDef.Name
-        End Get
-    End Property
+    Public Def As New HspfTableDef
+    Public OccurCount As Integer 'total number of occurences
+    Public OccurNum As Integer 'nth occurrence
+    Public OccurIndex As Integer 'occurence with which this table is associated
+    Public Comment As String = ""
+    Public TableComment As String = ""
+    Public Opn As HspfOperation
+    Public ReadOnly Parms As New HspfParms
+    Public ReadOnly EditControlName As String = "ATCoHspf.ctlTableEdit"
 
     ''' <summary>
     ''' Value of parameter with the given name
@@ -99,26 +41,23 @@ Public Class HspfTable
     ''' <param name="aName">Name of parameter</param>
     Public Property ParmValue(ByVal aName As String) As String
         Get
-            Return pParms.Item(aName).Value
+            Return Parms.Item(aName).Value
         End Get
         Set(ByVal newValue As String)
-            pParms.Item(aName).Value = newValue
+            Parms.Item(aName).Value = newValue
         End Set
     End Property
 
-    Public ReadOnly Property Parms() As HspfParms
+    Public ReadOnly Property Name() As String
         Get
-            Return pParms
+            Return Def.Name
         End Get
     End Property
 
-    Public Property Opn() As HspfOperation
+    Public ReadOnly Property Caption() As String
         Get
-            Return pOpn
+            Return Opn.Name & ":" & Name
         End Get
-        Set(ByVal Value As HspfOperation)
-            pOpn = Value
-        End Set
     End Property
 
     Public Property Edited() As Boolean
@@ -127,25 +66,13 @@ Public Class HspfTable
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
-            If Value Then pOpn.Edited = True
+            If Value Then Opn.Edited = True
         End Set
-    End Property
-
-    Public ReadOnly Property EditControlName() As String
-        Get
-            Return "ATCoHspf.ctlTableEdit"
-        End Get
     End Property
 
     Public ReadOnly Property EditAllSimilar() As Boolean
         Get
             Return pEditAllSimilar
-        End Get
-    End Property
-
-    Public ReadOnly Property Caption() As Object
-        Get
-            Return pOpn.Name & ":" & Name
         End Get
     End Property
 
@@ -169,9 +96,7 @@ Public Class HspfTable
 
     Public Sub New()
         MyBase.New()
-        pDef = New HspfTableDef
-        pParms = New HspfParms
-        pOccurCount = 0
+        OccurCount = 0
         pEditAllSimilar = True
         pCombineOK = True
     End Sub
@@ -182,10 +107,10 @@ Public Class HspfTable
     End Function
 
     Public Sub InitTable(ByRef aInitValueString As String)
-        Dim lParm As HSPFParm
-        Dim lUnitfg As Integer = pOpn.OpnBlk.Uci.GlobalBlock.EmFg
+        Dim lParm As HspfParm
+        Dim lUnitfg As Integer = Opn.OpnBlk.Uci.GlobalBlock.EmFg
 
-        For Each lParmDef As HSPFParmDef In pDef.ParmDefs
+        For Each lParmDef As HSPFParmDef In Def.ParmDefs
             lParm = New HspfParm
             lParm.Parent = Me
             lParm.Def = lParmDef
@@ -228,7 +153,7 @@ Public Class HspfTable
                     End If
                 End If
             End If
-            pParms.Add(lParm)
+            Parms.Add(lParm)
         Next lParmDef
     End Sub
 
@@ -263,7 +188,7 @@ Public Class HspfTable
         Dim lFirstOccur, lLastOccur As Integer
         If aInstance = 0 Then
             lFirstOccur = 1
-            lLastOccur = pOccurCount
+            lLastOccur = OccurCount
         Else
             lFirstOccur = aInstance
             lLastOccur = aInstance
@@ -272,21 +197,21 @@ Public Class HspfTable
         Dim lTableName As String
         For lOccur As Integer = lFirstOccur To lLastOccur
             If lOccur = 1 Then
-                lTableName = pDef.Name
+                lTableName = Def.Name
             Else
                 If aInstance = 0 Then
                     lSB.AppendLine() 'add a blank line before additional occurrences of this table
                 End If
-                lTableName = pDef.Name & ":" & lOccur
+                lTableName = Def.Name & ":" & lOccur
             End If
-            lSB.AppendLine("  " & pDef.Name)
+            lSB.AppendLine("  " & Def.Name)
 
             Dim lPendingFlag As Boolean = False
             Dim lFirstOpn As Boolean = True
             Dim lOutPend As String = Nothing 'pending record?
-            For lOperIndex As Integer = 1 To pOpn.OpnBlk.Ids.Count
+            For lOperIndex As Integer = 1 To Opn.OpnBlk.Ids.Count
                 On Error GoTo noTableForThisOper
-                Dim lOperation As HspfOperation = pOpn.OpnBlk.NthOper(lOperIndex)
+                Dim lOperation As HspfOperation = Opn.OpnBlk.NthOper(lOperIndex)
                 'write values here
                 If Err.Number Then Resume
                 If Not (lOperation.TableExists(lTableName)) Then
@@ -359,9 +284,9 @@ Public Class HspfTable
                             lSB.AppendLine(lOperation.Tables.Item(lTableName).Comment) 'pbd
                         Else
                             If Me.Opn.OpnBlk.Uci.GlobalBlock.EmFg = 1 Then
-                                lSB.AppendLine(pDef.HeaderE.TrimEnd)
+                                lSB.AppendLine(Def.HeaderE.TrimEnd)
                             Else
-                                lSB.AppendLine(pDef.HeaderM.TrimEnd)
+                                lSB.AppendLine(Def.HeaderM.TrimEnd)
                             End If
                         End If
                         lFirstOpn = False
@@ -397,7 +322,7 @@ notMissingTableForThisOper:
                     lSB.AppendLine(lOutPend.TrimEnd)
                 End If
             End If
-            lSB.AppendLine("  END " & pDef.Name)
+            lSB.AppendLine("  END " & Def.Name)
         Next lOccur
         Return lSB.ToString
     End Function
@@ -432,7 +357,7 @@ notMissingTableForThisOper:
     Public Sub SetQualIndex(ByRef noccur As Integer, ByRef Nqual As Integer)
         Dim lParm As String = ""
         Dim lT As String = ""
-        Select Case pDef.Name
+        Select Case Def.Name
             Case "GQ-GENDECAY" : lT = "GQ-QALFG" : lParm = "QALFG6" 'rchres
             Case "GQ-HYDPM" : lT = "GQ-QALFG" : lParm = "QALFG1"
             Case "GQ-ROXPM" : lT = "GQ-QALFG" : lParm = "QALFG2"
@@ -474,12 +399,12 @@ notMissingTableForThisOper:
                 If lQualIndex > 1 Then
                     lTableName = lT & ":" & lQualIndex
                 End If
-                If pOpn.TableExists(lTableName) Then
-                    If pOpn.Tables.Item(lTableName).Parms.Item(lParm).Value > 0 Then
+                If Opn.TableExists(lTableName) Then
+                    If Opn.Tables.Item(lTableName).Parms.Item(lParm).Value > 0 Then
                         lTableCount += 1
                         If lTableCount = noccur Then
                             'this is the one this table belongs to
-                            pOccurIndex = lQualIndex
+                            OccurIndex = lQualIndex
                         End If
                     End If
                 End If
@@ -488,12 +413,12 @@ notMissingTableForThisOper:
     End Sub
 
     Public Function TableNeededForAllQuals() As Boolean
-        If pDef.Name = "QUAL-INPUT" Or _
-           pDef.Name = "GQ-QALFG" Or _
-           pDef.Name = "GQ-FLG2" Or _
-           pDef.Name = "GQ-VALUES" Or _
-           pDef.Name = "QUAL-PROPS" Or _
-           pDef.Name = "GQ-QALDATA" Then
+        If Def.Name = "QUAL-INPUT" Or _
+           Def.Name = "GQ-QALFG" Or _
+           Def.Name = "GQ-FLG2" Or _
+           Def.Name = "GQ-VALUES" Or _
+           Def.Name = "QUAL-PROPS" Or _
+           Def.Name = "GQ-QALDATA" Then
             Return True
         Else
             Return False

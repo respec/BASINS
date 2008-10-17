@@ -146,7 +146,7 @@ Module modPollutants
                                     newOpn = New HspfOperation
                                     newOpn.Id = lOpn.Id
                                     newOpn.Name = lOpn.Name
-                                    tPoll.Operations.Add(newOpn, lCtype & newOpn.Id)
+                                    tPoll.Operations.Add(lCtype & newOpn.Id, newOpn)
                                     For Each lTableDef In aMsg.BlockDefs(lCtype).SectionDefs(Left(lCtype, 1) & "QUAL").TableDefs
                                         If piconn > 1 Then
                                             tname = lTableDef.Name & ":" & piconn
@@ -186,7 +186,7 @@ Module modPollutants
                                 newOpn = New HspfOperation
                                 newOpn.Id = lOpn.Id
                                 newOpn.Name = lOpn.Name
-                                tPoll.Operations.Add(newOpn, lCtype & newOpn.Id)
+                                tPoll.Operations.Add(lCtype & newOpn.Id, newOpn)
                                 For Each lTableDef In aMsg.BlockDefs(lCtype).SectionDefs("GQUAL").TableDefs
                                     If k > 1 Then
                                         tname = lTableDef.Name & ":" & k
@@ -257,7 +257,7 @@ Module modPollutants
                                 newOpn = New HspfOperation
                                 newOpn.Id = lOpn.Id
                                 newOpn.Name = lOpn.Name
-                                tPoll.Operations.Add(newOpn, lCtype & newOpn.Id)
+                                tPoll.Operations.Add(lCtype & newOpn.Id, newOpn)
                                 For Each lTableDef In aMsg.BlockDefs(lCtype).SectionDefs(Left(lCtype, 1) & "QUAL").TableDefs
                                     If k > 1 Then
                                         tname = lTableDef.Name & ":" & k
@@ -338,7 +338,7 @@ Module modPollutants
             pflag = 0
             rflag = 0
             If Len(tPoll.ModelType) > 0 Then
-                For Each newOpn In tPoll.Operations
+                For Each newOpn In tPoll.Operations.Values
                     If newOpn.Name = "IMPLND" Then
                         If tPoll.ModelType = "PIOnly" Or tPoll.ModelType = "PIG" Then
                             iflag = 1
@@ -396,7 +396,7 @@ Module modPollutants
             rflag = 0
             If Len(tPoll.ModelType) > 0 Then
                 'put tables back
-                For Each newOpn In tPoll.Operations
+                For Each newOpn In tPoll.Operations.Values
                     If newOpn.Name = "IMPLND" Then
                         If tPoll.ModelType = "PIOnly" Or tPoll.ModelType = "PIG" Then
                             iflag = 1

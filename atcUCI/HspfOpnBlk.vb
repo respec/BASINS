@@ -87,7 +87,11 @@ Public Class HspfOpnBlk
     End Sub
 
     Public Function TableExists(ByRef aName As String) As Boolean
-        Return pTables.Contains(aName)
+        If Not aName Is Nothing Then
+            Return pTables.Contains(aName)
+        Else
+            Return False
+        End If
     End Function
 
     Public Sub setTableValues(ByVal aBlockDef As HspfBlockDef)

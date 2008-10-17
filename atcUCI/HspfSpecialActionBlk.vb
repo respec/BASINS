@@ -12,14 +12,10 @@ Public Class HspfSpecialActionBlk
     Private pUserDefineQuans As Collection 'of HspfSpecialUserDefineQuans
     Private pConditions As Collection 'of HspfSpecialCondition
     Private pRecords As Generic.List(Of HspfSpecialRecord)
+
     Public Comment As String = ""
     Public Uci As HspfUci = Nothing
-
-    Public ReadOnly Property Caption() As String
-        Get
-            Return "Special Actions Block"
-        End Get
-    End Property
+    Public ReadOnly Caption As String = "Special Actions Block"
 
     Public ReadOnly Property EditControlName() As String
         Get
@@ -47,7 +43,7 @@ Public Class HspfSpecialActionBlk
 
     ReadOnly Property UserDefineQuans() As Collection
         Get
-            return pUserDefineQuans
+            Return pUserDefineQuans
         End Get
     End Property
 
@@ -64,7 +60,7 @@ Public Class HspfSpecialActionBlk
     End Property
 
     Public Sub Edit()
-        editInit(Me, Me.Uci.icon, True)
+        editInit(Me, Me.Uci.Icon, True)
     End Sub
 
     Public Sub ReadUciFile()
