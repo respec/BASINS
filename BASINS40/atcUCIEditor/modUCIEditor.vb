@@ -7,8 +7,8 @@ Imports System.Collections.Specialized
 
 Module modUCIEditor
     Private pBaseDrive As String
-    'Private pScenario As String = "mono"
-    Private pScenario As String = "hspf10"
+    Private pScenario As String = "mono"
+    'Private pScenario As String = "hspf10"
     Private pBaseDir As String
     Private pOutputDir As String
     Private pScenarioName As String
@@ -53,14 +53,15 @@ Module modUCIEditor
             Logger.Dbg("UCI " & lUci.Name & " Opened")
 
             'add changes to scematic block here
-            Logger.Dbg("CollectionCount " & lUci.Connections.Count)
+            Logger.Dbg("ConnectionCount " & lUci.Connections.Count)
             For Each lConnection As atcUCI.HspfConnection In lUci.Connections
-                Logger.Dbg(lConnection.Source.VolName & " " & lConnection.MFact & " " & lConnection.Target.VolName)
+                ' Logger.Dbg(lConnection.Source.VolName & " " & lConnection.MFact & " " & lConnection.Target.VolName)
             Next
 
             lUci.Name = pScenarioNameNew & ".uci"
             lUci.Save()
             Logger.Dbg("UCI " & lUci.Name & " Saved")
         End If
+        Logger.Flush()
     End Sub
 End Module
