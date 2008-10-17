@@ -60,10 +60,10 @@ Public Class ctlEditSpecialAction
 
         Dim lRecordType As String
         With pSpecialActionBlk.Records
-            For lOper As Integer = 1 To .Count
+            For lOper As Integer = 0 To .Count - 1
                 lRecordType = pSpecialActionBlk.HspfSpecialRecordName(.Item(lOper).SpecType)
-                atcgrid0.Source.CellValue(lOper, 0) = lRecordType
-                atcgrid0.Source.CellValue(lOper, 1) = .Item(lOper).Text
+                atcgrid0.Source.CellValue(lOper + 1, 0) = lRecordType
+                atcgrid0.Source.CellValue(lOper + 1, 1) = .Item(lOper).Text
             Next
         End With
 
@@ -792,7 +792,7 @@ Public Class ctlEditSpecialAction
 
         With pSpecialActionBlk.Records
             Do Until .Count = 0
-                .Remove(1)
+                .RemoveAt(1)
             Loop
             For lOper = 1 To atcgrid0.Source.Rows - 1
                 mySpecialRecord = New HspfSpecialRecord

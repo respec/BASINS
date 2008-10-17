@@ -2,6 +2,7 @@ Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
+Imports atcUtility
 Imports System.Collections.ObjectModel
 Public Class ctlEditMassLinks
     Implements ctlEdit
@@ -9,17 +10,27 @@ Public Class ctlEditMassLinks
     Dim pVScrollColumnOffset As Integer = 16
     Dim pMassLink As HspfMassLink
     Dim pChanged As Boolean
-
-
-    Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+    Dim pCurrentSelectedColumn As Integer
     Dim prevMLid As Integer
     Dim lMassLinkIdStarter As New ArrayList()
+
+    Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
             Return "Edit Mass Link Block"
         End Get
     End Property
+
+    Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdMassLink.MouseDownCell
+        pCurrentSelectedColumn = aColumn
+        Dim lBlockDef As HspfBlockDef
+
+        lBlockDef = pMassLink.Uci.Msg.BlockDefs("MASS-LINK")
+        txtDefine.Text = lBlockDef.TableDefs(0).ParmDefs(pCurrentSelectedColumn).Name & ": " & lBlockDef.TableDefs(0).ParmDefs(pCurrentSelectedColumn).Define
+
+    End Sub
+
     Public Property Changed() As Boolean Implements ctlEdit.Changed
         Get
             Return pChanged
@@ -31,19 +42,20 @@ Public Class ctlEditMassLinks
             End If
         End Set
     End Property
+
     Public Sub Help() Implements ctlEdit.Help
         'TODO: add this code
     End Sub
     Public Sub Remove() Implements ctlEdit.Remove
         'TODO: add this code
     End Sub
+
     Public Sub Save() Implements ctlEdit.Save
         Dim lMassLinkRow As Integer
         Dim lMassLink, lMassLinkToAdd As HspfMassLink
         Dim complete As Boolean
         Dim lMassLinkTableRow, lMassLinkTableCol As Integer
         lMassLinkTableRow = 1
-
 
         '.net converstion: The following For-loop cycles through all MassLinks. If the ID of a row matches the ID of the displayed table. 
         'Then the rows in the reocrd are replaced with the rows of the table.
@@ -79,7 +91,6 @@ Public Class ctlEditMassLinks
                         lMassLinkToAdd.Target.Member = .CellValue(lMassLinkTableRow, 8)
                         lMassLinkToAdd.Target.MemSub1 = .CellValue(lMassLinkTableRow, 9)
                         lMassLinkToAdd.Target.MemSub2 = .CellValue(lMassLinkTableRow, 10)
-                        lMassLinkToAdd.Comment = .CellValue(lMassLinkTableRow, 11)
                         pMassLink.Uci.MassLinks.RemoveAt(lMassLinkRow)
                         pMassLink.Uci.MassLinks.Insert(lMassLinkRow, lMassLinkToAdd)
                         lMassLinkTableRow += 1
@@ -87,12 +98,14 @@ Public Class ctlEditMassLinks
                 End With
             End If
         Next
+
         RefreshGrid()
         grdMassLink.Refresh()
         pChanged = False
     End Sub
-    Public Sub Add() Implements ctlEdit.Add
 
+    Public Sub Add() Implements ctlEdit.Add
+        Dim lCol As Integer
         '.net conversion:
         'Add uses the array.insert call to place the entry in order in the MassLink.Uci.MassLinks array. The lMassLinkIdStarter
         'indexes the rows where each ID starts - i.e. the second entry in ID lMassLinkIdStarter corresponds to the row
@@ -108,6 +121,11 @@ Public Class ctlEditMassLinks
             lMassLinkToAdd.MassLinkId = cboID.Items.Item(cboID.SelectedIndex)
 
             pMassLink.Uci.MassLinks.Insert(lMassLinkToAddRow, lMassLinkToAdd)
+
+            For lCol = 0 To .Columns - 1
+                .CellEditable(.Rows - 1, lCol) = True
+            Next
+
         End With
         Changed = True
     End Sub
@@ -121,9 +139,11 @@ Public Class ctlEditMassLinks
             Dim found As Boolean
             Dim lMassLink As HspfMassLink
             Dim lMassLinkLooperCount
-            Dim lMassLinkLooperID() As Integer
-            lMassLinkLooperID = New Integer() {} '.net conversion: Silences 'used before assigned' error
+            Dim lMassLinkLooperID() As Integer = Nothing
+
             pMassLink = aMassLink
+
+            grdMassLink.Source = New atcGridSource
 
             'build list of masslinks
             lMassLinkLooperCount = 0
@@ -158,12 +178,11 @@ Public Class ctlEditMassLinks
                 .AllowHorizontalScrolling = False
                 .AllowNewValidValues = True
                 .Visible = True
-                .Source.FixedRows = 1
             End With
 
             With grdMassLink.Source
                 .Rows = 0
-                .Columns = 12
+                .Columns = 11
                 .CellValue(0, 0) = "VolName"
                 .CellValue(0, 1) = "Group"
                 .CellValue(0, 2) = "MemName"
@@ -175,21 +194,24 @@ Public Class ctlEditMassLinks
                 .CellValue(0, 8) = "MemName"
                 .CellValue(0, 9) = "MemSub1"
                 .CellValue(0, 10) = "MemSub2"
-                .CellValue(0, 11) = "HIDE"
             End With
 
             RefreshGrid()
+
         End Set
     End Property
+
     Private Sub RefreshGrid()
         Dim lMassLink As HspfMassLink
+        Dim lRowFillerIndex As Integer = 1
 
         With grdMassLink.Source
-            Dim lRowFillerIndex As Integer = 1
+            .Rows = 1
             For lRow As Integer = 1 To pMassLink.Uci.MassLinks.Count - 1
                 lMassLink = pMassLink.Uci.MassLinks(lRow)
                 If lMassLink.MassLinkId = cboID.Items.Item(cboID.SelectedIndex) Then
                     .CellValue(lRowFillerIndex, 0) = lMassLink.Source.VolName
+
                     .CellValue(lRowFillerIndex, 1) = lMassLink.Source.Group
                     .CellValue(lRowFillerIndex, 2) = lMassLink.Source.Member
                     .CellValue(lRowFillerIndex, 3) = lMassLink.Source.MemSub1
@@ -200,7 +222,6 @@ Public Class ctlEditMassLinks
                     .CellValue(lRowFillerIndex, 8) = lMassLink.Target.Member
                     .CellValue(lRowFillerIndex, 9) = lMassLink.Target.MemSub1
                     .CellValue(lRowFillerIndex, 10) = lMassLink.Target.MemSub2
-                    .CellValue(lRowFillerIndex, 11) = lMassLink.Comment
                     lRowFillerIndex += 1
                 End If
             Next
@@ -211,17 +232,15 @@ Public Class ctlEditMassLinks
                 Next
             Next
 
-            For lCol As Integer = 0 To 11
-                .CellColor(0, lCol) = SystemColors.ControlLight
-            Next
-
         End With
+
         grdMassLink.SizeAllColumnsToContents(grdMassLink.Width - pVScrollColumnOffset, True)
         grdMassLink.Refresh()
         pChanged = False
     End Sub
 
     Private Sub grdEdit_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdMassLink.Resize
+
         grdMassLink.SizeAllColumnsToContents(grdMassLink.Width - pVScrollColumnOffset, True)
     End Sub
 
@@ -231,61 +250,42 @@ Public Class ctlEditMassLinks
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        grdMassLink.Source = New atcGridSource
         Data = aHspfMassLink
     End Sub
+
     Private Sub cboID_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboID.SelectedIndexChanged
-        Dim discard As Integer
+
         If prevMLid <> cboID.SelectedIndex Then
+
             If Changed Then
-                Me.Hide()
-                discard = Logger.Msg("Changes to current MassLink have not been saved. Discard them?", Microsoft.VisualBasic.MsgBoxStyle.YesNo)
-                Me.Show()
-            Else
-                discard = 1 'no changes
+                If Logger.Msg("Changes to current MassLink have not been saved. Discard them?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                    pChanged = False
+                    RefreshGrid()
+                Else
+                    cboID.SelectedIndex = prevMLid
+                End If
             End If
-            If discard = 1 Then 'discard
-                pChanged = False
-                RefreshGrid()
-            Else 'no discard
-                cboID.SelectedIndex = prevMLid
-            End If
+
+            RefreshGrid()
         End If
+
         prevMLid = cboID.SelectedIndex
     End Sub
+
     Private Sub grdMassLink_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdMassLink.CellEdited
         Changed = True
     End Sub
+
     Private Sub cmdAddNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddNew.Click
-        Dim lOper, lCheckThisId, lIdExistsAtIndex As Integer
-        Dim lExists As Boolean
-        Dim lcboIdItems() As Integer
-        lcboIdItems = New Integer() {}
+        Dim lOper As Integer
 
-        For lOper = 0 To cboID.Items.Count - 1
-            ReDim Preserve lcboIdItems(lcboIdItems.Length)
-            lcboIdItems(lOper) = cboID.Items.Item(lOper)
-        Next
-
-        lExists = True
-        lCheckThisId = 0
-        Do Until lExists = False
-            lCheckThisId += 1
-            lIdExistsAtIndex = Array.IndexOf(lcboIdItems, lCheckThisId)
-            If lIdExistsAtIndex = -1 Then
-                cboID.Items.Insert(lCheckThisId - 1, lCheckThisId)
-                Exit Do
+        For lOper = 1 To cboID.Items.Count - 1
+            If Not cboID.Items.Contains(lOper) Then
+                cboID.Items.Insert(lOper - 1, lOper)
+                cboID.SelectedIndex = lOper - 1
+                Exit For
             End If
-        Loop
-
-        lMassLinkIdStarter.Insert(lCheckThisId - 1, lMassLinkIdStarter.Item(lCheckThisId - 1))
-        For lOper = 1 To (lMassLinkIdStarter.Count - lCheckThisId)
-            lMassLinkIdStarter.Item(lMassLinkIdStarter.Count - lOper) += 1
         Next
-
-        cboID.SelectedIndex = lCheckThisId - 1
-        Add()
-
 
     End Sub
 

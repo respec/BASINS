@@ -197,7 +197,7 @@ Partial Class frmLand
         Me.GroupBox1.Size = New System.Drawing.Size(253, 93)
         Me.GroupBox1.TabIndex = 20
         Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Area Sums"
+        Me.GroupBox1.Text = "Sum of Areas in CurrentTable"
         '
         'cmdOK
         '

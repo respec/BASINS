@@ -106,4 +106,5 @@ Public Class frmReach
     Private Sub grdReach_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdReach.CellEdited
         'todo: add limits 
     End Sub
+
 End Class

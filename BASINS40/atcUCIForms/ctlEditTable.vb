@@ -13,6 +13,7 @@ Public Class ctlEditTable
 
     Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdTable.MouseDownCell
         Dim lchkDescCheckedInteger As Integer
+        Dim lUnitfg As Integer
         pCurrentSelectedColumn = aColumn
 
         If chkDesc.Checked = True Then
@@ -21,7 +22,6 @@ Public Class ctlEditTable
             lchkDescCheckedInteger = 0
         End If
 
-        Dim unitfg&
         If pCurrentSelectedColumn = 0 Then
             txtDefine.Text = "Table: " & pHspfTable.Name & ", " & pHspfTable.Def.Define & vbCrLf & "Parameter: Operation Number" & vbCrLf & vbCrLf
         ElseIf pCurrentSelectedColumn = lchkDescCheckedInteger Then
@@ -29,10 +29,10 @@ Public Class ctlEditTable
         Else
             txtDefine.Text = "Table: " & pHspfTable.Name & ", " & pHspfTable.Def.Define & vbCrLf & "Parameter: " & pHspfTable.Parms(pCurrentSelectedColumn - lchkDescCheckedInteger - 1).Def.Define & vbCrLf & vbCrLf
         End If
-        unitfg = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
-        If unitfg = 1 Then 'english
+        lUnitfg = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
+        If lUnitfg = 1 Then 'english
             txtDefine.Text = txtDefine.Text & pHspfTable.Def.HeaderE
-        ElseIf unitfg = 2 Then 'metric
+        ElseIf lUnitfg = 2 Then 'metric
             txtDefine.Text = txtDefine.Text & pHspfTable.Def.HeaderM
         End If
 
@@ -128,6 +128,8 @@ Public Class ctlEditTable
                 chkDesc.Visible = False
                 refreshGrid()
             End If
+
+            txtDefine.Text = "(Click on a parameter column to display its description)"
         End Set
     End Property
 

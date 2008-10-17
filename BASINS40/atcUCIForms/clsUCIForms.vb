@@ -97,6 +97,7 @@ Public Class UCIForms
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditMassLinks As New ctlEditMassLinks(aObject, aParent, aTag)
                 lFormEdit.Text = lEditMassLinks.Caption
+                lFormEdit.MinimumSize = New System.Drawing.Size(650, 400)
                 lFormEdit.EditControl = lEditMassLinks
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit

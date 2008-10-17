@@ -354,10 +354,6 @@ Public Class frmLand
                 End Using
             End If
         End Sub
-
-        Public Sub New()
-
-        End Sub
     End Class
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
