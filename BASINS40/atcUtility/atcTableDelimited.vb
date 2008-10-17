@@ -169,8 +169,7 @@ Public Class atcTableDelimited
 
     Public Overrides Property NumRecords() As Integer
         Get
-            'NumRecords = pRecords.Count - 1
-            NumRecords = pRecords.Count - NumHeaderRows
+            NumRecords = pRecords.Count - 1
         End Get
         Set(ByVal newValue As Integer)
             If newValue >= pRecords.Count Then
@@ -263,12 +262,11 @@ ErrHand:
             lRecordCount += 1
             If lRecordCount <= NumHeaderRows Then
                 pHeader.Add(lCurrentLine)
-            ElseIf lRecordCount = NumHeaderRows + 1 Then ' found the first actual record
+            ElseIf lRecordCount = NumHeaderRows + 1 Then
                 NumFields = CountString(lCurrentLine, Delimiter) + 1
                 'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
                 'TODO: are quoted ("") - is this correct?
                 pFieldNames = (Delimiter & lCurrentLine).Split(Delimiter)
-                pRecords.Add(lCurrentLine)
             Else
                 pRecords.Add(lCurrentLine)
             End If
