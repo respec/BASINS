@@ -267,47 +267,45 @@ Public Module modString
         End If
     End Function
 
-    Public Sub DecimalAlign(ByRef s() As String, Optional ByRef PadLeft As Boolean = True, Optional ByRef PadRight As Boolean = True, Optional ByRef MinWidth As Short = 0)
-        ' ##SUMMARY Formats array of floating point decimals around location of decimal place.
-        ' ##PARAM S M String array containing values to be formatted.
-        ' ##PARAM PadLeft I Number of spaces reserved to the left of the decimal place.
-        ' ##PARAM PadRight I Number of spaces reserved to the right of the decimal place.
-        ' ##PARAM MinWidth I Minimum number of spaces reserved for overall formatted number.
-        Dim MaxDecimalPos As Short 'furthest decimal position from left for all numbers in s
-        Dim MaxAfterDecimal As Short 'furthest decimal position from right for all numbers in s
-        Dim AfterDecimal() As Short 'array of digits after decimal
-        Dim DecimalPos() As Short 'array of decimal positions from left
-        Dim iMin As Short 'lower bound of s
-        Dim iMax As Short 'upper bound of s
-        Dim i As Short 'loop counter
+    ''' <summary>
+    ''' Reformat an array of floating point numbers around location of decimal place.
+    ''' </summary>
+    ''' <param name="aNumericStrings">floating point numbers as strings</param>
+    ''' <param name="PadLeft">False to disable adding spaces left of numbers</param>
+    ''' <param name="PadRight">False to disable adding spaces right of numbers</param>
+    ''' <param name="MinWidth">Minimum width of resulting strings</param>
+    ''' <remarks>aNumericStrings is both an input and output argument</remarks>
+    Public Sub DecimalAlign(ByRef aNumericStrings() As String, Optional ByRef PadLeft As Boolean = True, Optional ByRef PadRight As Boolean = True, Optional ByRef MinWidth As Integer = 0)
+        Dim lMaxDecimalPos As Integer   'furthest decimal position from left for all numbers in s
+        Dim lMaxAfterDecimal As Integer 'furthest decimal position from right for all numbers in s
+        Dim lAfterDecimal() As Integer  'array of digits after decimal
+        Dim lDecimalPos() As Integer    'array of decimal positions from left
+        Dim lIndex As Integer 'loop counter
+        Dim lMaxIndex As Integer = aNumericStrings.GetUpperBound(0)
 
-        iMin = LBound(s)
-        iMax = UBound(s)
-        'UPGRADE_WARNING: Lower bound of array DecimalPos was changed from iMin to 0. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="0F1C9BE1-AF9D-476E-83B1-17D43BECFF20"'
-        ReDim DecimalPos(iMax)
-        'UPGRADE_WARNING: Lower bound of array AfterDecimal was changed from iMin to 0. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="0F1C9BE1-AF9D-476E-83B1-17D43BECFF20"'
-        ReDim AfterDecimal(iMax)
-        For i = iMin To iMax
-            DecimalPos(i) = InStr(s(i), ".")
-            If DecimalPos(i) = 0 Then DecimalPos(i) = Len(s(i)) + 1
-            If DecimalPos(i) > MaxDecimalPos Then MaxDecimalPos = DecimalPos(i)
+        ReDim lDecimalPos(lMaxIndex)
+        ReDim lAfterDecimal(lMaxIndex)
+        For lIndex = 0 To lMaxIndex
+            lDecimalPos(lIndex) = InStr(aNumericStrings(lIndex), ".")
+            If lDecimalPos(lIndex) = 0 Then lDecimalPos(lIndex) = Len(aNumericStrings(lIndex)) + 1
+            If lDecimalPos(lIndex) > lMaxDecimalPos Then lMaxDecimalPos = lDecimalPos(lIndex)
             If PadRight Then
-                AfterDecimal(i) = Len(s(i)) - DecimalPos(i)
-                If AfterDecimal(i) > MaxAfterDecimal Then MaxAfterDecimal = AfterDecimal(i)
+                lAfterDecimal(lIndex) = Len(aNumericStrings(lIndex)) - lDecimalPos(lIndex)
+                If lAfterDecimal(lIndex) > lMaxAfterDecimal Then lMaxAfterDecimal = lAfterDecimal(lIndex)
             End If
         Next
-        For i = iMin To iMax
+        For lIndex = 0 To lMaxIndex
             If PadLeft Then
-                If DecimalPos(i) < MaxDecimalPos Then
-                    s(i) = Space(MaxDecimalPos - DecimalPos(i)) & s(i)
+                If lDecimalPos(lIndex) < lMaxDecimalPos Then
+                    aNumericStrings(lIndex) = Space(lMaxDecimalPos - lDecimalPos(lIndex)) & aNumericStrings(lIndex)
                 End If
             End If
             If PadRight Then
-                If AfterDecimal(i) < MaxAfterDecimal Then
-                    s(i) = s(i) & Space(MaxAfterDecimal - AfterDecimal(i))
+                If lAfterDecimal(lIndex) < lMaxAfterDecimal Then
+                    aNumericStrings(lIndex) = aNumericStrings(lIndex) & Space(lMaxAfterDecimal - lAfterDecimal(lIndex))
                 End If
             End If
-            If MinWidth > 0 Then s(i) = StrPad(s(i), MinWidth)
+            If MinWidth > 0 Then aNumericStrings(lIndex) = StrPad(aNumericStrings(lIndex), MinWidth)
         Next
 
     End Sub
