@@ -32,6 +32,8 @@ Public Class HspfTable
     Public Comment As String = ""
     Public TableComment As String = ""
     Public Opn As HspfOperation
+    Public SuppID As Integer
+    Public CombineOK As Boolean
     Public ReadOnly Parms As New HspfParms
     Public ReadOnly EditControlName As String = "ATCoHspf.ctlTableEdit"
 
@@ -74,24 +76,6 @@ Public Class HspfTable
         Get
             Return pEditAllSimilar
         End Get
-    End Property
-
-    Public Property SuppID() As Integer
-        Get
-            Return pSuppID
-        End Get
-        Set(ByVal Value As Integer)
-            pSuppID = Value
-        End Set
-    End Property
-
-    Public Property CombineOK() As Boolean
-        Get
-            Return pCombineOK
-        End Get
-        Set(ByVal Value As Boolean)
-            pCombineOK = Value
-        End Set
     End Property
 
     Public Sub New()
@@ -431,22 +415,17 @@ notMissingTableForThisOper:
         'see if the current table value is the same as the value as read from the uci
         '4. is the same as 4.0
         '"  " is the same as 1 if 1 is the default
-        Dim lSingle1, lSingle2 As Single
         Dim lNumericallyTheSame As Boolean = False
 
         If IsNumeric(aValueStored) Then
             If IsNumeric(aValueAsRead) Then 'simple case
-                lSingle1 = CSng(aValueAsRead)
-                lSingle2 = CSng(aValueStored)
-                If lSingle1 = lSingle2 Then
+                If Math.Abs(CSng(aValueAsRead) - CSng(aValueStored)) < 1.0E-20 Then
                     lNumericallyTheSame = True
                 End If
             ElseIf aValueAsRead.Length > 0 AndAlso aValueAsRead.Trim.Length = 0 Then
                 'one or more blank characters
                 'see if the value stored is the same as the default
-                lSingle1 = CSng(aValueStored)
-                lSingle2 = CSng(aValueDefault)
-                If lSingle1 = lSingle2 Then 'we can use the blanks
+                If Math.Abs(CSng(aValueStored) - CSng(aValueDefault)) < 1.0E-20 Then 'we can use the blanks
                     lNumericallyTheSame = True
                 End If
             End If
@@ -465,7 +444,7 @@ notMissingTableForThisOper:
         ' ##LOCAL retval - string used as antecedent to NumFmtRE
         ' ##LOCAL expFormat - string syntax of exponential format
         ' ##LOCAL DecimalPlaces - long number of decimal places
-        Dim lNumFmtRE As String = CStr(aRVal)
+        Dim lNumFmtRE As String = aRVal.ToString
         If aRVal <> 0 And aMaxWidth > 0 Then
             If lNumFmtRE.Length > aMaxWidth Then
                 If lNumFmtRE.Length - aMaxWidth = 1 And lNumFmtRE.StartsWith("0.") Then
