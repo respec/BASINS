@@ -2,8 +2,6 @@
 Option Strict Off
 Option Explicit On
 
-Imports System.Text
-
 Public Class HspfMetSeg
     Private pMetSegRecs As New HspfMetSegRecords
     Public Id As Integer
@@ -160,7 +158,7 @@ Public Class HspfMetSeg
     Public Function ToStringFromSpecs(ByRef aOperationType As String, _
                                       ByRef aCol() As Integer, _
                                       ByRef aLen() As Integer) As String
-        Dim lSB As New StringBuilder
+        Dim lSB As New System.Text.StringBuilder
 
         Dim lFirstId As Integer = 0
         Dim lLastId As Integer = 0
@@ -193,7 +191,7 @@ Public Class HspfMetSeg
     Public Function FormatRecords(ByRef aOpTyp As String, _
                                   ByRef aFirstId As Integer, ByRef aLastId As Integer, _
                                   ByRef aCol() As Integer, ByRef aLen() As Integer) As String
-        Dim lSB As New StringBuilder
+        Dim lSB As New System.Text.StringBuilder
 
         Dim lInit As Boolean = True
         For Each lMetSegRec As HspfMetSegRecord In pMetSegRecs
@@ -206,7 +204,7 @@ Public Class HspfMetSeg
                         lSB.AppendLine("*** Met Seg " & Name)
                         lInit = False
                     End If
-                    Dim lStr As New StringBuilder
+                    Dim lStr As New System.Text.StringBuilder
                     lStr.Append(.Source.VolName.Trim.PadRight(aCol(1) - 1))
                     lStr.Append(CStr(.Source.VolId).PadLeft(aLen(1)))
                     lStr.Append(Space(aCol(2) - lStr.Length - 1))

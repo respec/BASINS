@@ -2,56 +2,48 @@
 Option Strict Off
 Option Explicit On
 
-Imports System.Text
-
 Public Class HspfSpecialActionBlk
-
-    Private pActions As Collection 'of HspfSpecialAction
-    Private pDistributes As Collection 'of HspfSpecialDistribute
-    Private pUserDefineNames As Collection 'of HspfSpecialUserDefineName
-    Private pUserDefineQuans As Collection 'of HspfSpecialUserDefineQuans
-    Private pConditions As Collection 'of HspfSpecialCondition
+    'Private pActions As Collection 'of HspfSpecialAction
+    'Private pDistributes As Collection 'of HspfSpecialDistribute
+    'Private pUserDefineNames As Collection 'of HspfSpecialUserDefineName
+    'Private pUserDefineQuans As Collection 'of HspfSpecialUserDefineQuans
+    'Private pConditions As Collection 'of HspfSpecialCondition
     Private pRecords As Generic.List(Of HspfSpecialRecord)
 
     Public Comment As String = ""
     Public Uci As HspfUci = Nothing
     Public ReadOnly Caption As String = "Special Actions Block"
+    Public ReadOnly EditControlName As String = "ATCoHspf.ctlSpecialActionEdit"
 
-    Public ReadOnly Property EditControlName() As String
-        Get
-            Return "ATCoHspf.ctlSpecialActionEdit"
-        End Get
-    End Property
+    'ReadOnly Property Actions() As Collection
+    '    Get
+    '        Return pActions
+    '    End Get
+    'End Property
 
-    ReadOnly Property Actions() As Collection
-        Get
-            Return pActions
-        End Get
-    End Property
+    'ReadOnly Property Distributes() As Collection
+    '    Get
+    '        Return pDistributes
+    '    End Get
+    'End Property
 
-    ReadOnly Property Distributes() As Collection
-        Get
-            Return pDistributes
-        End Get
-    End Property
+    'ReadOnly Property UserDefineNames() As Collection
+    '    Get
+    '        Return pUserDefineNames
+    '    End Get
+    'End Property
 
-    ReadOnly Property UserDefineNames() As Collection
-        Get
-            Return pUserDefineNames
-        End Get
-    End Property
+    'ReadOnly Property UserDefineQuans() As Collection
+    '    Get
+    '        Return pUserDefineQuans
+    '    End Get
+    'End Property
 
-    ReadOnly Property UserDefineQuans() As Collection
-        Get
-            Return pUserDefineQuans
-        End Get
-    End Property
-
-    ReadOnly Property Conditions() As Collection
-        Get
-            Return pConditions
-        End Get
-    End Property
+    'ReadOnly Property Conditions() As Collection
+    '    Get
+    '        Return pConditions
+    '    End Get
+    'End Property
 
     ReadOnly Property Records() As Generic.List(Of HspfSpecialRecord)
         Get
@@ -121,7 +113,7 @@ Public Class HspfSpecialActionBlk
     End Sub
 
     Public Overrides Function ToString() As String
-        Dim lSB As New StringBuilder
+        Dim lSB As New System.Text.StringBuilder
         If pRecords.Count > 0 Then
             If Me.Comment.Length > 0 Then
                 lSB.AppendLine(Me.Comment)
@@ -138,11 +130,11 @@ Public Class HspfSpecialActionBlk
     Public Sub New()
         MyBase.New()
         pRecords = New Generic.List(Of HspfSpecialRecord)
-        pActions = New Collection
-        pDistributes = New Collection
-        pUserDefineNames = New Collection
-        pUserDefineQuans = New Collection
-        pConditions = New Collection
+        'pActions = New Collection
+        'pDistributes = New Collection
+        'pUserDefineNames = New Collection
+        'pUserDefineQuans = New Collection
+        'pConditions = New Collection
     End Sub
 
     Public Function HspfSpecialRecordName(ByRef aType As HspfData.HspfSpecialRecordType) As String
