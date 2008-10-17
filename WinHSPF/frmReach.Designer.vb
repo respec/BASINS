@@ -39,12 +39,13 @@ Partial Class frmReach
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grdReach.CellBackColor = System.Drawing.Color.Empty
+        Me.grdReach.Fixed3D = False
         Me.grdReach.LineColor = System.Drawing.Color.Empty
         Me.grdReach.LineWidth = 0.0!
-        Me.grdReach.Location = New System.Drawing.Point(13, 16)
-        Me.grdReach.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.grdReach.Location = New System.Drawing.Point(10, 13)
+        Me.grdReach.Margin = New System.Windows.Forms.Padding(2)
         Me.grdReach.Name = "grdReach"
-        Me.grdReach.Size = New System.Drawing.Size(736, 273)
+        Me.grdReach.Size = New System.Drawing.Size(552, 222)
         Me.grdReach.Source = Nothing
         Me.grdReach.TabIndex = 0
         '
@@ -65,11 +66,10 @@ Partial Class frmReach
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(230, 305)
-        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdOK.Location = New System.Drawing.Point(172, 248)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(132, 44)
+        Me.cmdOK.Size = New System.Drawing.Size(99, 36)
         Me.cmdOK.TabIndex = 1
         Me.cmdOK.Text = "OK"
         Me.cmdOK.UseVisualStyleBackColor = True
@@ -77,11 +77,10 @@ Partial Class frmReach
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(370, 305)
-        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdCancel.Location = New System.Drawing.Point(278, 248)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(132, 44)
+        Me.cmdCancel.Size = New System.Drawing.Size(99, 36)
         Me.cmdCancel.TabIndex = 2
         Me.cmdCancel.Text = "Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
@@ -89,25 +88,24 @@ Partial Class frmReach
         'FTables
         '
         Me.FTables.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.FTables.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.FTables.Location = New System.Drawing.Point(616, 305)
-        Me.FTables.Margin = New System.Windows.Forms.Padding(4)
+        Me.FTables.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.FTables.Location = New System.Drawing.Point(462, 248)
         Me.FTables.Name = "FTables"
-        Me.FTables.Size = New System.Drawing.Size(132, 44)
+        Me.FTables.Size = New System.Drawing.Size(99, 36)
         Me.FTables.TabIndex = 3
         Me.FTables.Text = "FTables"
         Me.FTables.UseVisualStyleBackColor = True
         '
         'frmReach
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(764, 360)
+        Me.ClientSize = New System.Drawing.Size(573, 292)
         Me.Controls.Add(Me.FTables)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.grdReach)
-        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmReach"
         Me.Text = "WinHSPF - Reach Editor"
         CType(Me.AtcGridBindingSource, System.ComponentModel.ISupportInitialize).EndInit()

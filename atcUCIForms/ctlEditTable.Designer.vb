@@ -32,10 +32,11 @@ Partial Class ctlEditTable
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDefine.BackColor = System.Drawing.SystemColors.Control
         Me.txtDefine.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtDefine.Location = New System.Drawing.Point(9, 278)
+        Me.txtDefine.Location = New System.Drawing.Point(14, 253)
         Me.txtDefine.Multiline = True
         Me.txtDefine.Name = "txtDefine"
-        Me.txtDefine.Size = New System.Drawing.Size(644, 111)
+        Me.txtDefine.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtDefine.Size = New System.Drawing.Size(568, 92)
         Me.txtDefine.TabIndex = 0
         '
         'chkDesc
@@ -76,9 +77,9 @@ Partial Class ctlEditTable
         Me.grdTable.Fixed3D = True
         Me.grdTable.LineColor = System.Drawing.Color.Empty
         Me.grdTable.LineWidth = 0.0!
-        Me.grdTable.Location = New System.Drawing.Point(12, 60)
+        Me.grdTable.Location = New System.Drawing.Point(14, 51)
         Me.grdTable.Name = "grdTable"
-        Me.grdTable.Size = New System.Drawing.Size(638, 198)
+        Me.grdTable.Size = New System.Drawing.Size(568, 196)
         Me.grdTable.Source = Nothing
         Me.grdTable.TabIndex = 5
         '
@@ -93,7 +94,7 @@ Partial Class ctlEditTable
         Me.Controls.Add(Me.txtDefine)
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "ctlEditTable"
-        Me.Size = New System.Drawing.Size(662, 395)
+        Me.Size = New System.Drawing.Size(597, 348)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
