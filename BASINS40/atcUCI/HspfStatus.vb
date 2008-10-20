@@ -240,7 +240,6 @@ Public Class HspfStatus
                                   ByRef aSub1 As Integer, _
                                   ByRef aSub2 As Integer, _
                                   Optional ByRef aInit As Boolean = False)
-        Dim lMassLink As HspfMassLink
         Static lMassLinkPos As Integer 'save between calls
 
         If aInit Then
@@ -267,7 +266,7 @@ Public Class HspfStatus
             aGroup = "?"
             While aGroup = "?"
                 If lMassLinkPos <= pOper.Uci.MassLinks.Count Then
-                    lMassLink = pOper.Uci.MassLinks(lMassLinkPos)
+                    Dim lMassLink As HspfMassLink = pOper.Uci.MassLinks(lMassLinkPos)
                     If lMassLink.MassLinkID = aConnection.MassLink Then
                         If aSource Then
                             aGroup = lMassLink.Target.Group
@@ -295,49 +294,48 @@ Public Class HspfStatus
     End Sub
 
     Private Sub Build()
-        Dim lTableStatus As HspfStatusType
-
         pTableStatus = New Collection(Of HspfStatusType)
+
         If StatusType = HspfStatusTypes.HspfTable Then
             With pOper.Uci.Msg.BlockDefs(pOper.Name) 'as HspfBlockDef
                 For Each lTableDef As HspfTableDef In .TableDefs
-                    For i As Integer = 1 To lTableDef.NumOccur
-                        lTableStatus = New HspfStatusType
+                    For lOccurIndex As Integer = 1 To lTableDef.NumOccur
+                        Dim lTableStatus As HspfStatusType = New HspfStatusType
                         lTableStatus.Name = lTableDef.Name
-                        lTableStatus.Occur = i
+                        lTableStatus.Occur = lOccurIndex
                         lTableStatus.Max = lTableDef.NumOccur
                         pTableStatus.Add(lTableStatus)
-                    Next i
+                    Next lOccurIndex
                 Next lTableDef
             End With
         ElseIf StatusType = HspfStatusTypes.HspfInputTimeseries Or _
                StatusType = HspfStatusTypes.HspfOutputTimeseries Then
             For Each lTSGroupDef As HspfTSGroupDef In pOper.Uci.Msg.TSGroupDefs
-                If lTSGroupDef.BlockId = pOper.OpTyp + 120 Then
+                If lTSGroupDef.BlockID = pOper.OpTyp + 120 Then
                     For Each lTSMemberDef As HspfTSMemberDef In lTSGroupDef.MemberDefs
                         With lTSMemberDef
                             Dim lAddMember As Boolean = False
                             If StatusType = HspfStatusTypes.HspfInputTimeseries Then
-                                If .mio > 0 Then
+                                If .Mio > 0 Then
                                     lAddMember = True
                                 End If
                             ElseIf StatusType = HspfStatusTypes.HspfOutputTimeseries Then
-                                If .mio < 2 Then
+                                If .Mio < 2 Then
                                     lAddMember = True
                                 End If
                             End If
                             If lAddMember Then
                                 'next 2 lines are a kludge for performance! (impact RCHRES:CAT only?)
-                                Dim lDim1 As Integer = .mdim1 : If lDim1 = 100 Then lDim1 = 10
-                                Dim lDim2 As Integer = .mdim2 : If lDim2 = 100 Then lDim2 = 10
+                                Dim lDim1 As Integer = .MDim1 : If lDim1 = 100 Then lDim1 = 10
+                                Dim lDim2 As Integer = .MDim2 : If lDim2 = 100 Then lDim2 = 10
                                 For i As Integer = 1 To lDim1
                                     For j As Integer = 1 To lDim2
-                                        lTableStatus = New HspfStatusType
+                                        Dim lTableStatus As HspfStatusType = New HspfStatusType
                                         lTableStatus.Name = .Parent.Name & ":" & .Name
                                         Dim lOccur As Integer = ((j - 1) * (1000)) + i
                                         lTableStatus.Occur = lOccur
-                                        lTableStatus.Max = .mdim1 * .mdim2
-                                        lTableStatus.Tag = CStr(.msect)
+                                        lTableStatus.Max = .MDim1 * .MDim2
+                                        lTableStatus.Tag = CStr(.Msect)
                                         lTableStatus.Defn = lTSMemberDef
                                         pTableStatus.Add(lTableStatus)
                                     Next j

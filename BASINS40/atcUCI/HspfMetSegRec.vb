@@ -22,14 +22,14 @@ Public Class HspfMetSegRecord
 
     Public Function Compare(ByVal aTargetMetSegRecord As HspfMetSegRecord, _
                             ByRef aOperationName As String) As Boolean
-        Compare = True
+        Dim lCompare As Boolean = True
         If aOperationName = "PERLND" Or aOperationName = "IMPLND" Then
             If aTargetMetSegRecord.MFactP <> Me.MFactP Then
-                Compare = False
+                lCompare = False
             End If
         ElseIf aOperationName = "RCHRES" Then
             If aTargetMetSegRecord.MFactR <> Me.MFactR And Me.MFactR <> -999.0# Then
-                Compare = False
+                lCompare = False
             End If
         End If
 
@@ -43,24 +43,24 @@ Public Class HspfMetSegRecord
             '(for situation like basins pevt, that only gets written for per/implnd
         Else
             If aTargetMetSegRecord.Tran <> Me.Tran Then
-                Compare = False
+                lCompare = False
             ElseIf aTargetMetSegRecord.Sgapstrg <> Me.Sgapstrg Then
-                Compare = False
+                lCompare = False
             ElseIf aTargetMetSegRecord.Ssystem <> Me.Ssystem Then
-                Compare = False
+                lCompare = False
             ElseIf aTargetMetSegRecord.Source.VolName <> Me.Source.VolName Then
-                Compare = False
+                lCompare = False
             ElseIf aTargetMetSegRecord.Source.VolId <> Me.Source.VolId Then
                 Compare = False
             ElseIf aTargetMetSegRecord.Source.Member <> Me.Source.Member Then
-                Compare = False
+                lCompare = False
             ElseIf aTargetMetSegRecord.Source.MemSub1 <> Me.Source.MemSub1 Then
-                Compare = False
+                lCompare = False
             ElseIf aTargetMetSegRecord.Source.MemSub2 <> Me.Source.MemSub2 Then
-                Compare = False
+                lCompare = False
             End If
         End If
-
+        Return lCompare
     End Function
 
     Public Sub New()

@@ -6,132 +6,21 @@ Imports System.Text
 Imports MapWinUtility
 
 Public Class HspfConnection
-    Private pMFact As Double
-    Private pMFactAsRead As String
-    Private pTyp As Integer '1-ExtSource,2-Network,3-Schematic,4-ExtTarget
-    Private pTran As String
-    Private pSgapstrg As String
-    Private pAmdstrg As String
-    Private pSsystem As String
-    Private pSource As HspfSrcTar
-    Private pTarget As HspfSrcTar
-    Private pMassLink As Integer
-    Private pUci As HspfUci
+    Public MFact As Double
+    Public MFactAsRead As String
+    Public Uci As HspfUci
+    Public Source As HspfSrcTar
+    Public Target As HspfSrcTar
+    Public Tran As String
+    Public Sgapstrg As String
+    Public Amdstrg As String
+    Public Ssystem As String
+    Public MassLink As Integer
+    Public Comment As String = ""
+    Public Typ As Integer '1-ExtSource,2-Network,3-Schematic,4-ExtTarget
+    Public ReadOnly EditControlName As String = "ATCoHspf.ctlConnectionEdit"
     Private pDesiredType As String
-    Private pComment As String = ""
 
-    Public Property MFact() As Double
-        Get
-            Return pMFact
-        End Get
-        Set(ByVal Value As Double)
-            pMFact = Value
-        End Set
-    End Property
-
-    Public Property MFactAsRead() As String
-        Get
-            Return pMFactAsRead
-        End Get
-        Set(ByVal Value As String)
-            pMFactAsRead = Value
-        End Set
-    End Property
-
-    Public Property Uci() As HspfUci
-        Get
-            Return pUci
-        End Get
-        Set(ByVal Value As HspfUci)
-            pUci = Value
-        End Set
-    End Property
-
-    Public Property Source() As HspfSrcTar
-        Get
-            Return pSource
-        End Get
-        Set(ByVal Value As HspfSrcTar)
-            pSource = Value
-        End Set
-    End Property
-
-    Public Property Target() As HspfSrcTar
-        Get
-            Return pTarget
-        End Get
-        Set(ByVal Value As HspfSrcTar)
-            pTarget = Value
-        End Set
-    End Property
-
-    Public Property Tran() As String
-        Get
-            Return pTran
-        End Get
-        Set(ByVal Value As String)
-            pTran = Value
-        End Set
-    End Property
-
-
-    Public Property Comment() As String
-        Get
-            Return pComment
-        End Get
-        Set(ByVal Value As String)
-            pComment = Value
-        End Set
-    End Property
-
-    Public Property Ssystem() As String
-        Get
-            Return pSsystem
-        End Get
-        Set(ByVal Value As String)
-            pSsystem = Value
-        End Set
-    End Property
-
-    Public Property Sgapstrg() As String
-        Get
-            Return pSgapstrg
-        End Get
-        Set(ByVal Value As String)
-            pSgapstrg = Value
-        End Set
-    End Property
-
-    Public Property Amdstrg() As String
-        Get
-            Return pAmdstrg
-        End Get
-        Set(ByVal Value As String)
-            pAmdstrg = Value
-        End Set
-    End Property
-    Public Property Typ() As Integer
-        Get
-            Return pTyp
-        End Get
-        Set(ByVal Value As Integer)
-            pTyp = Value
-        End Set
-    End Property
-
-    Public Property MassLink() As Integer
-        Get
-            Return pMassLink
-        End Get
-        Set(ByVal Value As Integer)
-            pMassLink = Value
-        End Set
-    End Property
-    Public ReadOnly Property EditControlName() As String
-        Get
-            Return "ATCoHspf.ctlConnectionEdit"
-        End Get
-    End Property
     Public ReadOnly Property DesiredRecordType() As String
         Get
             Return pDesiredType
@@ -150,7 +39,7 @@ Public Class HspfConnection
         Dim lBuff As String = Nothing
         Dim lStr As String
 
-        pUci = aUci
+        Uci = aUci
 
         Dim lOmCode As Integer = HspfOmCode("EXT SOURCES")
         Dim lInit As Integer = 1
@@ -425,26 +314,26 @@ Public Class HspfConnection
 
     Public Sub New()
         MyBase.New()
-        pSource = New HspfSrcTar
-        pTarget = New HspfSrcTar
-        pTyp = 0
-        pMFact = 1.0#
+        Source = New HspfSrcTar
+        Target = New HspfSrcTar
+        Typ = 0
+        MFact = 1.0#
     End Sub
     Public Sub EditExtSrc()
         pDesiredType = "EXT SOURCES"
-        editInit(Me, Me.Uci.icon, True) 'add remove ok
+        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
     Public Sub EditExtTar()
         pDesiredType = "EXT TARGETS"
-        editInit(Me, Me.Uci.icon, True) 'add remove ok
+        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
     Public Sub EditNetwork()
         pDesiredType = "NETWORK"
-        editInit(Me, Me.Uci.icon, True) 'add remove ok
+        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
     Public Sub EditSchematic()
         pDesiredType = "SCHEMATIC"
-        editInit(Me, Me.Uci.icon, True) 'add remove ok
+        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
 
     Public Overrides Function ToString() As String
@@ -453,14 +342,14 @@ Public Class HspfConnection
         'ext sources, network, schematic, ext targets
         Static lTypeExists() As Boolean = {False, False, False, False}
 
-        If pUci.MetSegs.Count > 0 Then
+        If Uci.MetSegs.Count > 0 Then
             lTypeExists(0) = True
         End If
-        If pUci.PointSources.Count > 0 Then
+        If Uci.PointSources.Count > 0 Then
             lTypeExists(0) = True
         End If
 
-        Dim lOpnSeqBlock As HspfOpnSeqBlk = pUci.OpnSeqBlock
+        Dim lOpnSeqBlock As HspfOpnSeqBlk = Uci.OpnSeqBlock
         For Each lOperation As HspfOperation In lOpnSeqBlock.Opns
             For Each lConnection As HspfConnection In lOperation.Targets
                 lTypeExists(lConnection.Typ - 1) = True
@@ -479,7 +368,7 @@ Public Class HspfConnection
                     Case 3 : lBlockName = "SCHEMATIC"
                     Case 4 : lBlockName = "EXT TARGETS"
                 End Select
-                Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs.Item(lBlockName)
+                Dim lBlockDef As HspfBlockDef = Uci.Msg.BlockDefs.Item(lBlockName)
                 Dim lTableDef As HspfTableDef = lBlockDef.TableDefs.Item(0)
                 'get lengths and starting positions
                 Dim lParmDefIndex As Integer = 0
@@ -503,7 +392,7 @@ Public Class HspfConnection
                         'do met segs - operations with assoc met segs
                         Static lOperationTypes() As String = {"PERLND", "IMPLND", "RCHRES"}
                         For Each lOperationType As String In lOperationTypes
-                            For Each lMetSeg As HspfMetSeg In pUci.MetSegs
+                            For Each lMetSeg As HspfMetSeg In Uci.MetSegs
                                 lSB.AppendLine(lMetSeg.ToStringFromSpecs(lOperationType, iCol, iLen))
                             Next
                         Next
@@ -511,7 +400,7 @@ Public Class HspfConnection
                         '    lSB.AppendLine("") 'write a blank line between met segs and pt srcs
                         'End If
                         'do point sources
-                        For Each lPtSrc As HspfPointSource In pUci.PointSources
+                        For Each lPtSrc As HspfPointSource In Uci.PointSources
                             lSB.AppendLine(lPtSrc.ToStringFromSpecs(iCol, iLen))
                         Next
                         'now do everything else
@@ -534,7 +423,7 @@ Public Class HspfConnection
                                         t = Space(iLen(3))
                                         t = RSet(CStr(lConnection.Source.MemSub1), Len(t))
                                         If lConnection.Source.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Source.Member, 1, t)
+                                            t = Uci.IntAsCat(lConnection.Source.Member, 1, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -562,7 +451,7 @@ Public Class HspfConnection
                                     If lConnection.Target.MemSub1 <> 0 Then
                                         t = CStr(lConnection.Target.MemSub1).PadLeft(iLen(13))
                                         If lConnection.Target.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Target.Member, 1, t)
+                                            t = Uci.IntAsCat(lConnection.Target.Member, 1, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -570,7 +459,7 @@ Public Class HspfConnection
                                     If lConnection.Target.MemSub2 <> 0 Then
                                         t = CStr(lConnection.Target.MemSub2).PadLeft(iLen(14))
                                         If lConnection.Target.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Target.Member, 2, t)
+                                            t = Uci.IntAsCat(lConnection.Target.Member, 2, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -599,7 +488,7 @@ Public Class HspfConnection
                                     If lConnection.Source.MemSub1 <> 0 Then
                                         Dim t As String = CStr(lConnection.Source.MemSub1).PadLeft(iLen(4))
                                         If lConnection.Source.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Source.Member, 1, t)
+                                            t = Uci.IntAsCat(lConnection.Source.Member, 1, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -607,7 +496,7 @@ Public Class HspfConnection
                                     If lConnection.Source.MemSub2 <> 0 Then
                                         Dim t As String = CStr(lConnection.Source.MemSub2).PadLeft(iLen(5))
                                         If lConnection.Source.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Source.Member, 2, t)
+                                            t = Uci.IntAsCat(lConnection.Source.Member, 2, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -632,7 +521,7 @@ Public Class HspfConnection
                                     If lConnection.Target.MemSub1 <> 0 Then
                                         Dim t As String = CStr(lConnection.Target.MemSub1).PadLeft(iLen(13))
                                         If lConnection.Target.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Target.Member, 1, t)
+                                            t = Uci.IntAsCat(lConnection.Target.Member, 1, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -640,7 +529,7 @@ Public Class HspfConnection
                                     If lConnection.Target.MemSub2 <> 0 Then
                                         Dim t As String = CStr(lConnection.Target.MemSub2).PadLeft(iLen(14))
                                         If lConnection.Target.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Target.Member, 2, t)
+                                            t = Uci.IntAsCat(lConnection.Target.Member, 2, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -683,7 +572,7 @@ Public Class HspfConnection
                                             lStr.Append(Space(iCol(6) - lStr.Length - 1))
                                             Dim t As String = CStr(lConnection.Target.MemSub1).PadLeft(iLen(6))
                                             If lConnection.Target.VolName = "RCHRES" Then
-                                                t = pUci.IntAsCat(lConnection.Target.Member, 1, t)
+                                                t = Uci.IntAsCat(lConnection.Target.Member, 1, t)
                                             End If
                                             lStr.Append(t)
                                         End If
@@ -691,7 +580,7 @@ Public Class HspfConnection
                                             lStr.Append(Space(iCol(7) - lStr.Length - 1))
                                             Dim t As String = CStr(lConnection.Target.MemSub2).PadLeft(iLen(7))
                                             If lConnection.Target.VolName = "RCHRES" Then
-                                                t = pUci.IntAsCat(lConnection.Target.Member, 2, t)
+                                                t = Uci.IntAsCat(lConnection.Target.Member, 2, t)
                                             End If
                                             lStr.Append(t)
                                         End If
@@ -721,7 +610,7 @@ Public Class HspfConnection
                                     If lConnection.Source.MemSub1 <> 0 Then
                                         Dim t As String = CStr(lConnection.Source.MemSub1).PadLeft(iLen(4))
                                         If lConnection.Source.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Source.Member, 1, t)
+                                            t = Uci.IntAsCat(lConnection.Source.Member, 1, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -729,7 +618,7 @@ Public Class HspfConnection
                                     If lConnection.Source.MemSub2 <> 0 Then
                                         Dim t As String = CStr(lConnection.Source.MemSub2).PadLeft(iLen(5))
                                         If lConnection.Source.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Source.Member, 2, t)
+                                            t = Uci.IntAsCat(lConnection.Source.Member, 2, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -760,7 +649,7 @@ Public Class HspfConnection
                                     If lConnection.Target.MemSub1 <> 0 Then
                                         Dim t As String = CStr(lConnection.Target.MemSub1).PadLeft(iLen(11))
                                         If lConnection.Target.VolName = "RCHRES" Then
-                                            t = pUci.IntAsCat(lConnection.Target.Member, 1, t)
+                                            t = Uci.IntAsCat(lConnection.Target.Member, 1, t)
                                         End If
                                         lStr.Append(t)
                                     End If
@@ -781,20 +670,17 @@ Public Class HspfConnection
         Return lSB.ToString
     End Function
 
-    Private Function NumericallyTheSame(ByRef ValueAsRead As String, ByRef ValueStored As Single) As Boolean
+    Private Function NumericallyTheSame(ByRef aValueAsRead As String, ByRef aValueStored As Single) As Boolean
         'see if the current mfact value is the same as the value as read from the uci
         '4. is the same as 4.0
-        Dim rtemp1 As Single
-
-        NumericallyTheSame = False
-        If IsNumeric(ValueStored) Then
-            If IsNumeric(ValueAsRead) Then
+        If IsNumeric(aValueStored) Then
+            If IsNumeric(aValueAsRead) Then
                 'simple case
-                rtemp1 = CSng(ValueAsRead)
-                If rtemp1 = ValueStored Then
-                    NumericallyTheSame = True
+                If CSng(aValueAsRead) = aValueStored Then
+                    Return True
                 End If
             End If
         End If
+        Return False
     End Function
 End Class

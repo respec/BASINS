@@ -4,7 +4,6 @@ Option Explicit On
 
 Module modPollutants
     Public Sub modPollutantsBuild(ByRef aUci As HspfUci, ByRef aMsg As HspfMsg)
-
         'figure out how many p or i quals
         Dim nquals As Integer = 0
         For Each lOpn As HspfOperation In aUci.OpnBlks("PERLND").Ids
