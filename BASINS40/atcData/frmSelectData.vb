@@ -1012,9 +1012,13 @@ NextName:
     End Sub
 
     Private Sub mnuOpenData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenData.Click
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource
+        Dim lFilesOnly As New ArrayList(1)
+        lFilesOnly.Add("File")
+        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly)
         If Not lNewSource Is Nothing Then
             atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+            pAvailableData.AddRange(lNewSource.DataSets)
+            Me.Populate()
         End If
     End Sub
 

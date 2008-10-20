@@ -33,10 +33,17 @@
     <Reference Include="MapWindow.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=14ba77d91dae5597, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWindow.Interfaces.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.6.3064.37096, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MapWinUtility, Version=1.0.3146.26450, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -76,12 +83,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="frmTextReport.Designer.vb">
-      <DependentUpon>frmTextReport.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmTextReport.vb">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmDisplayFrequencyGrid.resx">
@@ -98,10 +99,6 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmTextReport.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmTextReport.vb</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="My Project\Application.myapp">
@@ -115,11 +112,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWinUtility\MapWinUtilityBasins.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
-      <Name>MapWinUtilityBasins</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls</Name>
