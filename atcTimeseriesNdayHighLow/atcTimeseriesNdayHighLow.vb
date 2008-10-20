@@ -145,7 +145,9 @@ Public Class atcTimeseriesNdayHighLow
         If aNDay <= 0 Then
             Return Nothing
         ElseIf aTS.numValues < aNDay Then 'Cannot compute a value because fewer than aNDay values are present 
-            Throw New ApplicationException("Only " & aTS.numValues & " values available, needed " & aNDay)
+            'Throw New ApplicationException("Only " & aTS.numValues & " values available, needed " & aNDay)
+            Logger.Dbg("Only " & aTS.numValues & " values available, needed " & aNDay)
+            Return GetNaN()
         Else
             Dim lBestSoFar As Double
             Dim lTimeIndex As Integer = 1
@@ -199,7 +201,7 @@ Public Class atcTimeseriesNdayHighLow
         Try
             Dim lNDay() As Double = Obj2Array(aNDay)
 
-            Dim lTimeCode As Integer = 6 '4=day, 5=month, 6=year
+            Dim lTimeCode As Integer = atcTimeUnit.TUYear
 
             aTS.EnsureValuesRead()
             Dim sjday As Double = aTS.Dates.Value(0)
@@ -219,6 +221,7 @@ Public Class atcTimeseriesNdayHighLow
 
             For Each lNDayNow As Double In lNDay
                 If lNDayNow > 0 Then
+                    'If aTS.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear AndAlso aTS.Attributes.GetValue("Time Unit") Then
                     Dim newValueAttributes(nYears) As atcDataAttributes
                     Dim newTS As New atcTimeseries(Me)
                     newTS.Dates = New atcTimeseries(Me)
@@ -274,6 +277,12 @@ Public Class atcTimeseriesNdayHighLow
                         .SetValue("Ts", 1)
                         .SetValue("HighFlag", aHigh)
                         .SetValue("NDay", lNDayNow)
+
+                        'WDM-specific: make additional space for attributes at the expense of data pointers
+                        .SetValue("NSA", 40)
+                        .SetValue("NSASP", 150)
+                        .SetValue("NDP", 240)
+
                         Dim ltstype As String
                         If aHigh Then ltstype = "H" Else ltstype = "L"
                         ltstype &= Format(lNDayNow, "000")
@@ -311,11 +320,15 @@ Public Class atcTimeseriesNdayHighLow
                   Optional ByVal aEndDay As Integer = 0)
         Dim lNdayTsGroup As atcDataGroup = Nothing
 
-        If aTimeseries.Attributes.GetValue("Tu", 1) = 6 AndAlso _
-           aHigh = aTimeseries.Attributes.GetValue("HighFlag") AndAlso _
-           aNDay = aTimeseries.Attributes.GetValue("NDay") Then
-            'already have the right annual timeseries
-            lNdayTsGroup = New atcDataGroup(aTimeseries)
+        If aTimeseries.Attributes.GetValue("Tu", 1) = 6 Then
+            If aHigh = aTimeseries.Attributes.GetValue("HighFlag") AndAlso _
+               aNDay = aTimeseries.Attributes.GetValue("NDay") Then
+                'already have the right annual timeseries
+                lNdayTsGroup = New atcDataGroup(aTimeseries)
+            Else
+                Logger.Dbg("Cannot compute " & aNDay & "-day " & " High=" & aHigh & " from annual " & aTimeseries.Attributes.GetValue("NDay") & "-day " & " High=" & aTimeseries.Attributes.GetValue("HighFlag"))
+                Return
+            End If
         Else 'calculate the n-day annual timeseries
             lNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh, aAttributesStorage, aEndMonth, aEndDay)
         End If
@@ -436,22 +449,32 @@ Public Class atcTimeseriesNdayHighLow
                 End If
                 If lHigh = aHigh Then
                     Dim lNday As Double = 0
+                    Dim lNdayStr As String
                     If aTimeseries.Attributes.ContainsAttribute("NDay") Then
-                        lNday = aTimeseries.Attributes.GetValue("NDay")
-                    ElseIf aTimeseries.Attributes.ContainsAttribute("TSTYPE") Then
-                        lNday = CInt(aTimeseries.Attributes.GetValue("TSTYPE").ToString.Substring(1))
-                    Else
-                        lNday = CInt(aTimeseries.Attributes.GetValue("Constituent").ToString.Substring(1))
+                        Dim lNdayObj As Object = aTimeseries.Attributes.GetValue("NDay")
+                        If lNdayObj.GetType.Name = "Double" Then
+                            lNday = lNdayObj
+                        End If
                     End If
-                    Dim lAllNDay() As Double = Obj2Array(aNDay)
-                    If Array.IndexOf(lAllNDay, lNday) >= 0 Then
-                        ReDim lAllNDay(0)
-                        lAllNDay(0) = lNday
-                        aNDay = lAllNDay
-                        aTimeseries.Attributes.SetValue("HighFlag", lHigh)
-                        aTimeseries.Attributes.SetValue("NDay", lNday)
-                        aNdayTsGroup = New atcDataGroup(aTimeseries)
-                        lStartedWithNdayTS = True
+                    If lNday = 0 AndAlso aTimeseries.Attributes.ContainsAttribute("TSTYPE") Then
+                        lNdayStr = aTimeseries.Attributes.GetValue("TSTYPE")
+                        Double.TryParse(lNdayStr.Substring(1), lNday)
+                    End If
+                    If lNday = 0 Then
+                        lNdayStr = aTimeseries.Attributes.GetValue("Constituent")
+                        Double.TryParse(lNdayStr.Substring(1), lNday)
+                    End If
+                    If lNday > 0 Then
+                        Dim lAllNDay() As Double = Obj2Array(aNDay)
+                        If Array.IndexOf(lAllNDay, lNday) >= 0 Then
+                            ReDim lAllNDay(0)
+                            lAllNDay(0) = lNday
+                            aNDay = lAllNDay
+                            aTimeseries.Attributes.SetValue("HighFlag", lHigh)
+                            aTimeseries.Attributes.SetValue("NDay", lNday)
+                            aNdayTsGroup = New atcDataGroup(aTimeseries)
+                            lStartedWithNdayTS = True
+                        End If
                     End If
                 End If
             End If

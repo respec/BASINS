@@ -663,8 +663,13 @@ Public Module modTimeseriesMath
             'get start date/time for existing TSer
             aTSer.EnsureValuesRead()
             Dim lDate(5) As Integer
-            If aTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aTSer.Dates.Value(0)) Then
-                J2Date(aTSer.Dates.Value(1), lDate)
+            If aTSer.Dates.Value(0) <= 0 OrElse Double.IsNaN(aTSer.Dates.Value(0)) Then
+                If aTSer.Attributes.ContainsAttribute("tu") Then
+                    J2Date(aTSer.Dates.Value(1), lDate)
+                    TIMADD(lDate, aTSer.Attributes.GetValue("tu"), aTSer.Attributes.GetValue("ts", 1), -1, lDate)
+                ElseIf aTSer.numValues > 1 Then
+                    J2Date(aTSer.Dates.Value(1) - (aTSer.Dates.Value(2) - aTSer.Dates.Value(1)), lDate)
+                End If
             Else
                 J2Date(aTSer.Dates.Value(0), lDate)
             End If
@@ -686,9 +691,10 @@ Public Module modTimeseriesMath
                     lDate(4) = 0 'clear minutes
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUYear
-                    lDate(1) = 1 'set to beginning of Jan
-                    lDate(2) = 1 'set to beginning of month
-                    lDate(3) = 0 'clear hours
+                    'Skip setting month and day to allow drought/flood years to be preserved
+                    'lDate(1) = 1 'set to beginning of Jan
+                    'lDate(2) = 1 'set to beginning of month
+                    lDate(3) = 24 'clear hours
                     lDate(4) = 0 'clear minutes
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUCentury

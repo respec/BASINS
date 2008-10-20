@@ -31,7 +31,10 @@ Friend Class frmSWSTAT
 
         LoadListSettingsOrDefaults(lstNday)
         LoadListSettingsOrDefaults(lstRecurrence)
+        RepopulateForm()
+    End Sub
 
+    Private Sub RepopulateForm()
         SeasonsYearsToForm()
 
         Dim lFirstDate As Double = GetMaxValue()
@@ -65,14 +68,15 @@ Friend Class frmSWSTAT
             lCommonText &= pNoDatesInCommon
         End If
 
+        Dim lLastSelectedIndex As Integer = cboYears.SelectedIndex
+        If lLastSelectedIndex < 0 Then lLastSelectedIndex = 0
         With cboYears.Items
             .Clear()
             .Add(lAllText)
             .Add(lCommonText)
             .Add("Custom")
         End With
-        cboYears.SelectedIndex = 0
-
+        cboYears.SelectedIndex = lLastSelectedIndex
     End Sub
 
     Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
@@ -116,14 +120,10 @@ Friend Class frmSWSTAT
     Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
     Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents tabMain As System.Windows.Forms.TabControl
     Friend WithEvents tabSelectDates As System.Windows.Forms.TabPage
     Friend WithEvents tabNDay As System.Windows.Forms.TabPage
-    Friend WithEvents agdData As atcControls.atcGrid
     Friend WithEvents grpDates As System.Windows.Forms.GroupBox
     Friend WithEvents cboStartMonth As System.Windows.Forms.ComboBox
     Friend WithEvents lblYearStart As System.Windows.Forms.Label
@@ -172,9 +172,6 @@ Friend Class frmSWSTAT
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
-        Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuFileSave = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.tabMain = New System.Windows.Forms.TabControl
@@ -221,7 +218,6 @@ Friend Class frmSWSTAT
         Me.btnDoFrequency = New System.Windows.Forms.Button
         Me.btnDisplayTrend = New System.Windows.Forms.Button
         Me.btnNDay = New System.Windows.Forms.Button
-        Me.agdData = New atcControls.atcGrid
         Me.tabMain.SuspendLayout()
         Me.tabSelectDates.SuspendLayout()
         Me.grpHighLow.SuspendLayout()
@@ -240,29 +236,13 @@ Friend Class frmSWSTAT
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Index = 0
         Me.mnuFileSelectData.Text = "Select &Data"
-        '
-        'mnuFileSelectAttributes
-        '
-        Me.mnuFileSelectAttributes.Index = 1
-        Me.mnuFileSelectAttributes.Text = "Select &Attributes"
-        '
-        'mnuFileSep1
-        '
-        Me.mnuFileSep1.Index = 2
-        Me.mnuFileSep1.Text = "-"
-        '
-        'mnuFileSave
-        '
-        Me.mnuFileSave.Index = 3
-        Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
-        Me.mnuFileSave.Text = "Save"
         '
         'mnuAnalysis
         '
@@ -295,7 +275,6 @@ Friend Class frmSWSTAT
         Me.tabSelectDates.Controls.Add(Me.btnDisplayBasic)
         Me.tabSelectDates.Controls.Add(Me.grpDates)
         Me.tabSelectDates.Controls.Add(Me.grpYears)
-        Me.tabSelectDates.Controls.Add(Me.agdData)
         Me.tabSelectDates.Location = New System.Drawing.Point(4, 22)
         Me.tabSelectDates.Name = "tabSelectDates"
         Me.tabSelectDates.Padding = New System.Windows.Forms.Padding(3)
@@ -516,7 +495,7 @@ Friend Class frmSWSTAT
         Me.tabNDay.Location = New System.Drawing.Point(4, 22)
         Me.tabNDay.Name = "tabNDay"
         Me.tabNDay.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabNDay.Size = New System.Drawing.Size(435, 301)
+        Me.tabNDay.Size = New System.Drawing.Size(435, 307)
         Me.tabNDay.TabIndex = 2
         Me.tabNDay.Text = "N-Day, Trend, Frequency"
         '
@@ -526,7 +505,7 @@ Friend Class frmSWSTAT
         Me.chkLog.AutoSize = True
         Me.chkLog.Checked = True
         Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkLog.Location = New System.Drawing.Point(308, 246)
+        Me.chkLog.Location = New System.Drawing.Point(308, 252)
         Me.chkLog.Name = "chkLog"
         Me.chkLog.Size = New System.Drawing.Size(80, 17)
         Me.chkLog.TabIndex = 35
@@ -543,7 +522,7 @@ Friend Class frmSWSTAT
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(435, 217)
+        Me.panelTop.Size = New System.Drawing.Size(435, 223)
         Me.panelTop.TabIndex = 34
         '
         'grpRecurrence
@@ -560,7 +539,7 @@ Friend Class frmSWSTAT
         Me.grpRecurrence.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpRecurrence.Location = New System.Drawing.Point(208, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(227, 217)
+        Me.grpRecurrence.Size = New System.Drawing.Size(227, 223)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
@@ -568,7 +547,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceDefault
         '
         Me.btnRecurrenceDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(165, 158)
+        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(165, 164)
         Me.btnRecurrenceDefault.Name = "btnRecurrenceDefault"
         Me.btnRecurrenceDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnRecurrenceDefault.TabIndex = 14
@@ -577,7 +556,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceRemove
         '
         Me.btnRecurrenceRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(132, 158)
+        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(132, 164)
         Me.btnRecurrenceRemove.Name = "btnRecurrenceRemove"
         Me.btnRecurrenceRemove.Size = New System.Drawing.Size(27, 20)
         Me.btnRecurrenceRemove.TabIndex = 13
@@ -592,14 +571,14 @@ Friend Class frmSWSTAT
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(213, 133)
+        Me.lstRecurrence.Size = New System.Drawing.Size(213, 139)
         Me.lstRecurrence.TabIndex = 8
         Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(99, 158)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(99, 164)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
         Me.btnRecurrenceAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnRecurrenceAdd.TabIndex = 10
@@ -609,7 +588,7 @@ Friend Class frmSWSTAT
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 158)
+        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 164)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
         Me.txtRecurrenceAdd.Size = New System.Drawing.Size(87, 20)
         Me.txtRecurrenceAdd.TabIndex = 9
@@ -617,7 +596,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(157, 187)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(157, 193)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
         Me.btnRecurrenceNone.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceNone.TabIndex = 12
@@ -626,7 +605,7 @@ Friend Class frmSWSTAT
         'btnRecurrenceAll
         '
         Me.btnRecurrenceAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 187)
+        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 193)
         Me.btnRecurrenceAll.Name = "btnRecurrenceAll"
         Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAll.TabIndex = 11
@@ -637,7 +616,7 @@ Friend Class frmSWSTAT
         Me.Splitter1.BackColor = System.Drawing.SystemColors.Control
         Me.Splitter1.Location = New System.Drawing.Point(200, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(8, 217)
+        Me.Splitter1.Size = New System.Drawing.Size(8, 223)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
@@ -655,7 +634,7 @@ Friend Class frmSWSTAT
         Me.grpNday.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpNday.Location = New System.Drawing.Point(0, 0)
         Me.grpNday.Name = "grpNday"
-        Me.grpNday.Size = New System.Drawing.Size(200, 217)
+        Me.grpNday.Size = New System.Drawing.Size(200, 223)
         Me.grpNday.TabIndex = 1
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
@@ -663,7 +642,7 @@ Friend Class frmSWSTAT
         'btnNdayDefault
         '
         Me.btnNdayDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 158)
+        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 164)
         Me.btnNdayDefault.Name = "btnNdayDefault"
         Me.btnNdayDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnNdayDefault.TabIndex = 8
@@ -672,7 +651,7 @@ Friend Class frmSWSTAT
         'btnNdayRemove
         '
         Me.btnNdayRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 158)
+        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 164)
         Me.btnNdayRemove.Name = "btnNdayRemove"
         Me.btnNdayRemove.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayRemove.TabIndex = 7
@@ -681,7 +660,7 @@ Friend Class frmSWSTAT
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 158)
+        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 164)
         Me.btnNdayAdd.Name = "btnNdayAdd"
         Me.btnNdayAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayAdd.TabIndex = 4
@@ -691,7 +670,7 @@ Friend Class frmSWSTAT
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 158)
+        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 164)
         Me.txtNdayAdd.Name = "txtNdayAdd"
         Me.txtNdayAdd.Size = New System.Drawing.Size(54, 20)
         Me.txtNdayAdd.TabIndex = 3
@@ -699,7 +678,7 @@ Friend Class frmSWSTAT
         'btnNdayNone
         '
         Me.btnNdayNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayNone.Location = New System.Drawing.Point(130, 187)
+        Me.btnNdayNone.Location = New System.Drawing.Point(130, 193)
         Me.btnNdayNone.Name = "btnNdayNone"
         Me.btnNdayNone.Size = New System.Drawing.Size(64, 23)
         Me.btnNdayNone.TabIndex = 6
@@ -708,7 +687,7 @@ Friend Class frmSWSTAT
         'btnNdayAll
         '
         Me.btnNdayAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAll.Location = New System.Drawing.Point(6, 187)
+        Me.btnNdayAll.Location = New System.Drawing.Point(6, 193)
         Me.btnNdayAll.Name = "btnNdayAll"
         Me.btnNdayAll.Size = New System.Drawing.Size(64, 24)
         Me.btnNdayAll.TabIndex = 5
@@ -723,14 +702,14 @@ Friend Class frmSWSTAT
         Me.lstNday.Location = New System.Drawing.Point(6, 19)
         Me.lstNday.Name = "lstNday"
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstNday.Size = New System.Drawing.Size(188, 133)
+        Me.lstNday.Size = New System.Drawing.Size(188, 139)
         Me.lstNday.TabIndex = 2
         Me.lstNday.Tag = "NDay"
         '
         'btnDoFrequency
         '
         Me.btnDoFrequency.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequency.Location = New System.Drawing.Point(291, 270)
+        Me.btnDoFrequency.Location = New System.Drawing.Point(291, 276)
         Me.btnDoFrequency.Name = "btnDoFrequency"
         Me.btnDoFrequency.Size = New System.Drawing.Size(130, 23)
         Me.btnDoFrequency.TabIndex = 33
@@ -740,7 +719,7 @@ Friend Class frmSWSTAT
         'btnDisplayTrend
         '
         Me.btnDisplayTrend.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDisplayTrend.Location = New System.Drawing.Point(171, 270)
+        Me.btnDisplayTrend.Location = New System.Drawing.Point(171, 276)
         Me.btnDisplayTrend.Name = "btnDisplayTrend"
         Me.btnDisplayTrend.Size = New System.Drawing.Size(114, 23)
         Me.btnDisplayTrend.TabIndex = 31
@@ -750,29 +729,12 @@ Friend Class frmSWSTAT
         'btnNDay
         '
         Me.btnNDay.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNDay.Location = New System.Drawing.Point(8, 270)
+        Me.btnNDay.Location = New System.Drawing.Point(8, 276)
         Me.btnNDay.Name = "btnNDay"
         Me.btnNDay.Size = New System.Drawing.Size(157, 23)
         Me.btnNDay.TabIndex = 29
         Me.btnNDay.Text = "Display N-Day Timeseries"
         Me.btnNDay.UseVisualStyleBackColor = True
-        '
-        'agdData
-        '
-        Me.agdData.AllowHorizontalScrolling = True
-        Me.agdData.AllowNewValidValues = False
-        Me.agdData.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdData.CellBackColor = System.Drawing.Color.Empty
-        Me.agdData.LineColor = System.Drawing.Color.Empty
-        Me.agdData.LineWidth = 0.0!
-        Me.agdData.Location = New System.Drawing.Point(228, 311)
-        Me.agdData.Name = "agdData"
-        Me.agdData.Size = New System.Drawing.Size(199, 52)
-        Me.agdData.Source = Nothing
-        Me.agdData.TabIndex = 1
-        Me.agdData.Visible = False
         '
         'frmSWSTAT
         '
@@ -817,13 +779,10 @@ Friend Class frmSWSTAT
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
 
-    'Translator class between pDataGroup and agdData
-    Private pSource As atcTimeseriesGridSource
     Private pDataAttributes As ArrayList
     Private pBasicAttributes As ArrayList
     Private pNDayAttributes As ArrayList
     Private pTrendAttributes As ArrayList
-    Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
     Private pYearStartMonth As Integer = 0
     Private pYearStartDay As Integer = 0
@@ -838,7 +797,7 @@ Friend Class frmSWSTAT
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
     'TODO: Get correct help location
-    Private pHelpLocation As String = "BASINS Details\Analysis\Time Series Functions\List.html"
+    Private pHelpLocation As String = "BASINS Details\Analysis.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp(pHelpLocation)
     End Sub
@@ -894,7 +853,6 @@ Friend Class frmSWSTAT
         If pDataGroup.Count > 0 Then
             PopulateForm()
             If aShowForm Then Me.Show()
-            PopulateDataGrid()
         Else 'user declined to specify timeseries
             Me.Close()
         End If
@@ -907,52 +865,31 @@ Friend Class frmSWSTAT
         End Get
         Set(ByVal newValue As atcDateFormat)
             pDateFormat = newValue
-            If pSource IsNot Nothing Then
-                pSource.DateFormat = pDateFormat
-            End If
         End Set
     End Property
-
-    Private Sub PopulateDataGrid()
-        'with timeseries data, a list of attributes and options define a timeseries grid source
-        pSource = New atcTimeseriesGridSource(pDataGroup, atcDataManager.SelectionAttributes, False)
-        With pSource
-            .DateFormat = pDateFormat
-            .ValueFormat(pMaxWidth, pFormat, pExpFormat, pCantFit, pSignificantDigits)
-        End With
-
-        pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
-        pSwapperSource.SwapRowsColumns = True
-
-        agdData.Initialize(pSwapperSource)
-        'TODO: could SizeAllColumnsToContents return total width?
-        agdData.SizeAllColumnsToContents()
-        agdData.Refresh()
-    End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
         atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
-        If Me.Visible Then PopulateDataGrid()
+        If Me.Visible Then RepopulateForm()
         'TODO: could efficiently insert newly added item(s)
     End Sub
 
     Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
-        If Me.Visible Then PopulateDataGrid()
+        If Me.Visible Then RepopulateForm()
         'TODO: could efficiently remove by serial number
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
         pDataGroup = Nothing
-        pSource = Nothing
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        'atcDataManager.UserSelectData("Select data for surface water statistics", pDataGroup, , False)
-        atcDataManager.UserSelectData("Select data for surface water statistics", pDataGroup, , True)
-        PopulateForm()
+        atcDataManager.UserSelectData("Select data for surface water statistics", pDataGroup, , False)
+        'atcDataManager.UserSelectData("Select data for surface water statistics", pDataGroup, , True)
+        'RepopulateForm()
     End Sub
 
     Private Sub SeasonsYearsToForm()
@@ -1029,28 +966,7 @@ Friend Class frmSWSTAT
         Return lArray
     End Function
 
-    Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
-        Dim lst As New atcControls.atcSelectList
-        Dim lAvailable As New ArrayList
-        For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-            Select Case lAttrDef.TypeString.ToLower
-                Case "double", "integer", "boolean", "string"
-                    Select Case lAttrDef.Name
-                        Case "Attributes", "COMPFG", "Constant Coefficient", "Degrees F", "HeaderComplete", "HighFlag", "Kendall Tau", "n-day high value", "n-day low value", "Number", "Return Period", "Summary File", "VBTIME"
-                            'Skip displaying some things in the list
-                        Case Else
-                            lAvailable.Add(lAttrDef.Name)
-                    End Select
-            End Select
-        Next
-        lAvailable.Sort()
-        If lst.AskUser(lAvailable, atcDataManager.DisplayAttributes) Then
-            PopulateDataGrid()
-        End If
-    End Sub
-
     Private Function SelectedData() As atcDataGroup
-        'TODO: Get selected range of data
         Dim lDataGroupB As New atcDataGroup
         Dim lTsB As atcTimeseries
         SeasonsYearsFromForm()
@@ -1516,8 +1432,5 @@ Friend Class frmSWSTAT
         Next
     End Sub
 
-    Private Sub tabMain_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
-    End Sub
 End Class
 

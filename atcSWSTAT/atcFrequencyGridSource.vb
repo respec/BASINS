@@ -15,23 +15,22 @@ Friend Class atcFrequencyGridSource
     Private pCalculatedRecurrence As New ArrayList
 
     Sub New(ByVal aDataGroup As atcData.atcDataGroup)
-        pDataGroup = aDataGroup
-        pRecurrence = New SortedList
-        pNdays = New SortedList
-        pAdj = New SortedList
-        pAdjProb = New SortedList
         Dim lAdjStr As String
         Dim lAdjProbStr As String
         Dim lHighLow As String
         Dim lKey As String
         MyBase.ColorCells = True
+        pDataGroup = aDataGroup
+        pRecurrence = New SortedList
+        pNdays = New SortedList
+        pAdj = New SortedList
+        pAdjProb = New SortedList
         For Each lData As atcDataSet In pDataGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing Then
                     lAdjStr = ""
                     lAdjProbStr = ""
-                    lHighLow = "Low"
-                    If pHigh Then lHighLow = "High"
+                    If pHigh Then lHighLow = "High" Else lHighLow = "Low"
 
                     If lAttribute.Arguments.ContainsAttribute("Nday") Then
                         Dim lNdays As String = lAttribute.Arguments.GetFormattedValue("Nday")
@@ -51,10 +50,10 @@ Friend Class atcFrequencyGridSource
                             'Add the adjusted probability and adjusted parameter values
                             lAdjStr &= "Adj"
                             lAdjProbStr = lAdjStr & "Prob"
-                            If lData.Attributes.GetValue(lAdjStr) IsNot Nothing Then
+                            If lData.Attributes.ContainsAttribute(lAdjStr) Then
                                 pAdj.Add(lKey, lData.Attributes.GetValue(lAdjStr).ToString)
                             End If
-                            If lData.Attributes.GetValue(lAdjProbStr) IsNot Nothing Then
+                            If lData.Attributes.ContainsAttribute(lAdjProbStr) Then
                                 pAdjProb.Add(lKey, lData.Attributes.GetValue(lAdjProbStr).ToString)
                             End If
                         End If ' Not pRecurrence.ContainsKey(lKey)
@@ -76,9 +75,9 @@ Friend Class atcFrequencyGridSource
     Overrides Property Columns() As Integer
         Get
             If pNdays Is Nothing Then
-                Return 3
+                Return 4
             Else
-                Return pNdays.Count + 2
+                Return pNdays.Count + 3
             End If
         End Get
         Set(ByVal Value As Integer)
@@ -102,7 +101,7 @@ Friend Class atcFrequencyGridSource
     End Function
 
     Public Function NdaysAt(ByVal aColumn As Integer) As String
-        Return pNdays.GetByIndex(aColumn - 2)
+        Return pNdays.GetByIndex(aColumn - 3)
     End Function
 
     Public Function RecurrenceAt(ByVal aRow As Integer) As String
@@ -115,73 +114,86 @@ Friend Class atcFrequencyGridSource
             If aRow = 0 Then
                 Select Case aColumn
                     Case 0 : Return "Data Set"
-                    Case 1 : Return "Return Period"
+                    Case 1 : Return "Probability"
+                    Case 2 : Return "Return Period"
                     Case Else : Return NdaysAt(aColumn)
                 End Select
             Else
                 Select Case aColumn
                     Case 0 : Return DataSetAt(aRow).ToString
-                    Case 1 : Return RecurrenceAt(aRow)
+                    Case 1 : Return DoubleToString(1 / RecurrenceAt(aRow), , "0.0000")
+                    Case 2 : Return RecurrenceAt(aRow)
                     Case Else
                         Dim lDataSet As atcDataSet = DataSetAt(aRow)
                         Dim lAttrName As String = NdaysAt(aColumn)
                         If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
                         lAttrName &= RecurrenceAt(aRow)
+                        If pAdj.Count > 0 Then
+                            RecurrenceAt(aRow)
+                            Dim lKey As String = Format(CDbl(RecurrenceAt(aRow)), "00000.0000")
+                            If pAdj.Item(lKey) Is Nothing Then
+                                CellValue = ""
+                            Else
+                                CellValue = DoubleToString(pAdj.Item(lKey), , "0.000")
+                            End If
+                        Else
+                            If Not lDataSet.Attributes.ContainsAttribute(lAttrName) Then
+                                Try
+                                    Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+                                    Dim lArgs As New atcDataAttributes
+                                    Dim lOperationName As String
+                                    Dim lNdays(pNdays.Count) As Double
+                                    Dim lNextNdays As Integer = 1
+                                    Dim lReturns(pRecurrence.Count) As Double
+                                    Dim lNextReturns As Double = 1
+                                    Dim lValue As Double
 
-                        If Not lDataSet.Attributes.ContainsAttribute(lAttrName) Then
-                            Try
-                                Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-                                Dim lArgs As New atcDataAttributes
-                                Dim lOperationName As String
-                                Dim lNdays(pNdays.Count) As Double
-                                Dim lNextNdays As Integer = 1
-                                Dim lReturns(pRecurrence.Count) As Double
-                                Dim lNextReturns As Double = 1
-                                Dim lValue As Double
-
-                                If pHigh Then
-                                    lOperationName = "n-day high value"
-                                Else
-                                    lOperationName = "n-day low value"
-                                End If
-
-                                lArgs.SetValue("Timeseries", lDataSet)
-
-                                lNdays(0) = NdaysAt(aColumn)
-                                For Each lNday As DictionaryEntry In pNdays
-                                    lValue = CDbl(lNday.Value)
-                                    If lValue <> lNdays(0) AndAlso Not pCalculatedNdays.Contains(lValue) Then
-                                        pCalculatedNdays.Add(lValue)
-                                        lNdays(lNextNdays) = lValue
-                                        lNextNdays += 1
+                                    If pHigh Then
+                                        lOperationName = "n-day high value"
+                                    Else
+                                        lOperationName = "n-day low value"
                                     End If
-                                Next
 
-                                lReturns(0) = RecurrenceAt(aColumn)
-                                For Each lReturn As DictionaryEntry In pRecurrence
-                                    lValue = CDbl(ReplaceString(lReturn.Value, ",", ""))
-                                    If lValue <> lReturns(0) AndAlso Not pCalculatedRecurrence.Contains(lValue) Then
-                                        pCalculatedRecurrence.Add(lValue)
-                                        lReturns(lNextReturns) = lValue
-                                        lNextReturns += 1
-                                    End If
-                                Next
+                                    lArgs.SetValue("Timeseries", lDataSet)
 
-                                ReDim Preserve lNdays(lNextNdays - 1)
-                                ReDim Preserve lReturns(lNextReturns - 1)
+                                    lNdays(0) = NdaysAt(aColumn)
+                                    For Each lNday As DictionaryEntry In pNdays
+                                        lValue = CDbl(lNday.Value)
+                                        If lValue <> lNdays(0) AndAlso Not pCalculatedNdays.Contains(lValue) Then
+                                            pCalculatedNdays.Add(lValue)
+                                            lNdays(lNextNdays) = lValue
+                                            lNextNdays += 1
+                                        End If
+                                    Next
 
-                                lArgs.SetValue("NDay", lNdays)
-                                lArgs.SetValue("Return Period", lReturns)
+                                    lReturns(0) = RecurrenceAt(aColumn)
+                                    For Each lReturn As DictionaryEntry In pRecurrence
+                                        lValue = CDbl(ReplaceString(lReturn.Value, ",", ""))
+                                        If lValue <> lReturns(0) AndAlso Not pCalculatedRecurrence.Contains(lValue) Then
+                                            pCalculatedRecurrence.Add(lValue)
+                                            lReturns(lNextReturns) = lValue
+                                            lNextReturns += 1
+                                        End If
+                                    Next
 
-                                lCalculator.Open(lOperationName, lArgs)
-                            Catch e As Exception
-                                'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
-                            End Try
+                                    ReDim Preserve lNdays(lNextNdays - 1)
+                                    ReDim Preserve lReturns(lNextReturns - 1)
+
+                                    lArgs.SetValue("NDay", lNdays)
+                                    lArgs.SetValue("Return Period", lReturns)
+
+                                    lCalculator.Open(lOperationName, lArgs)
+                                Catch e As Exception
+                                    'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
+                                End Try
+                            End If
+                            If lDataSet.Attributes.ContainsAttribute(lAttrName) Then
+                                CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
+                            Else
+                                CellValue = ""
+                            End If
                         End If
-
-                        CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
                         If CellValue = "NaN" Then CellValue = ""
-
                 End Select
             End If
         End Get
@@ -203,7 +215,7 @@ Friend Class atcFrequencyGridSource
 
     Overrides Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
         Get
-            If aColumn > 1 AndAlso aRow > 0 Then
+            If aColumn > 2 AndAlso aRow > 0 Then
                 Return System.Drawing.SystemColors.Window
             Else
                 Return System.Drawing.SystemColors.Control
@@ -380,68 +392,19 @@ Friend Class atcFrequencyGridSource
                     lRept.AppendLine()
                     lRept.AppendLine()
 
-                    If lNumZero <= 0 Then
-                        If pHigh Then
-                            lRept.AppendLine("        Exceedence        Recurrence        Parameter")
-                            lRept.AppendLine("        Probability        Interval           Value  ")
-                            lRept.AppendLine("        -----------       ----------        ---------")
-                        Else
-                            lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
-                            lRept.AppendLine("        Probability        Interval           Value  ")
-                            lRept.AppendLine("        -----------       ----------        ---------")
-                        End If
-                    Else ' when there is or are zero values, need adjustment
-                        If pHigh Then
-                            lRept.AppendLine("                                           Ajusted    Ajusted ")
-                            lRept.AppendLine("    Exceedence  Recurrence   Parameter   Exceedence  Parameter")
-                            lRept.AppendLine("   Probability   Interval      Value    Probability    Value  ")
-                            lRept.AppendLine("   -----------  -----------  ---------  -----------  ---------")
-                        Else
-                            lRept.AppendLine("       Non-                            Ajusted Non-   Ajusted ")
-                            lRept.AppendLine("    Exceedence   Recurrence  Parameter   Exceedence  Parameter")
-                            lRept.AppendLine("   Probability    Interval     Value    Probability    Value  ")
-                            lRept.AppendLine("   -----------  -----------  ---------  -----------  ---------")
-                        End If
+                    If lNumZero > 0 Then
+                        lRept.AppendLine("                                            Adjusted ")
                     End If
-
-                    ' The original version
-                    'If pHigh Then
-                    '    If lNumZero > 0 Then
-                    '        lRept.AppendLine("                                                           Adjusted     Ajusted ")
-                    '        lRept.AppendLine("        Exceedance        Recurrence        Parameter     Exceedence   Parameter")
-                    '        lRept.AppendLine("        Probability        Interval           Value     Probability     Value")
-                    '        lRept.AppendLine("        -----------       ----------        ---------   ------------  -----------")
-                    '    Else
-                    '        lRept.AppendLine("        Exceedance        Recurrence        Parameter")
-                    '        lRept.AppendLine("        Probability        Interval           Value  ")
-                    '        lRept.AppendLine("        -----------       ----------        ---------")
-                    '    End If
-                    'Else
-                    '    If lNumZero > 0 Then
-                    '        lRept.AppendLine("                                                        Adjusted Non-   Adjusted ")
-                    '        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter     Exceedence   Parameter")
-                    '        lRept.AppendLine("        Probability        Interval           Value      Probability     Value")
-                    '        lRept.AppendLine("        -----------       ----------        ----------  ------------- -----------")
-                    '    Else
-                    '        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
-                    '        lRept.AppendLine("        Probability        Interval           Value  ")
-                    '        lRept.AppendLine("        -----------       ----------        ---------")
-                    '    End If
-                    'End If
-
-                    'lRept.AppendLine("        Probability        Interval           Value  ")
-                    'lRept.AppendLine("        -----------       ----------        ---------")
-
-                    'For Each lRecurrenceKey As String In pRecurrence.Keys
-                    '    Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
-                    '    Dim lNyears As Double = CDbl(lRecurrence)
-                    '    lStr = DoubleToString(1 / lNyears, , "0.0000")
-                    '    lRept.Append("  " & lStr.PadLeft(17))
-                    '    lStr = DoubleToString(lNyears, , "0.00")
-                    '    lRept.Append(lStr.PadLeft(17))
-                    '    lStr = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
-                    '    lRept.AppendLine(lStr.PadLeft(17))
-                    'Next
+                    If pHigh Then
+                        lRept.AppendLine("        Exceedence        Recurrence        Parameter")
+                    Else
+                        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
+                    End If
+                    'If just aligns code
+                    If True Then
+                        lRept.AppendLine("        Probability        Interval           Value  ")
+                        lRept.AppendLine("        -----------       ----------        ---------")
+                    End If
 
                     Dim lReverseString As String = ""
                     Dim lThisRow As String
@@ -458,11 +421,16 @@ Friend Class atcFrequencyGridSource
                             lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(17) & " "
                         End If
 
-                        lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(16)
 
                         If lNumZero > 0 Then 'If there is/area zero annual event, then add adj values and probs
-                            lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
-                            lThisRow &= pAdj.Item(lRecurrenceKey).PadLeft(15)
+                            'lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
+                            If pAdj.Item(lRecurrenceKey) Is Nothing Then
+                                lThisRow &= "".PadLeft(16)
+                            Else
+                                lThisRow &= DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000").PadLeft(16)
+                            End If
+                        Else
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(16)
                         End If
 
                         If pHigh Then
