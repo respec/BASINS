@@ -17,6 +17,7 @@ Public Class UCIForms
                 Dim lEditFilesBlock As New ctlEditFilesBlock(aObject, aParent)
                 lFormEdit.Text = lEditFilesBlock.Caption
                 lFormEdit.EditControl = lEditFilesBlock
+                lFormEdit.MinimumSize = New System.Drawing.Size(640, 320)
                 lForm = lFormEdit
             Case "HspfGlobalBlk"
                 Dim lFormEdit As New frmEdit(aParent)
@@ -24,6 +25,7 @@ Public Class UCIForms
                 lFormEdit.Text = lEditGlobalBlock.Caption
                 lFormEdit.EditControl = lEditGlobalBlock
                 lFormEdit.AddRemoveFlag = False
+                lFormEdit.MinimumSize = New System.Drawing.Size(640, 205)
                 lForm = lFormEdit
             Case "HspfOpnSeqBlk"
                 Dim lFormEdit As New frmEdit(aParent)
@@ -31,6 +33,7 @@ Public Class UCIForms
                 lFormEdit.Text = lEditOpnSeqBlock.Caption
                 lFormEdit.EditControl = lEditOpnSeqBlock
                 lFormEdit.AddRemoveFlag = True
+                lFormEdit.MinimumSize = New System.Drawing.Size(400, 435)
                 lForm = lFormEdit
             Case "HspfFtable"
                 Dim lFormEdit As New frmEdit(aParent)
@@ -38,6 +41,7 @@ Public Class UCIForms
                 lFormEdit.Text = lEditFTables.Caption
                 lFormEdit.EditControl = lEditFTables
                 lFormEdit.AddRemoveFlag = False
+                lFormEdit.MinimumSize = New System.Drawing.Size(640, 438)
                 lForm = lFormEdit
             Case "HspfConnection"
                 Dim lFormEdit As New frmEdit(aParent)
@@ -45,6 +49,7 @@ Public Class UCIForms
                 lFormEdit.Text = lEditConnections.Caption
                 lFormEdit.EditControl = lEditConnections
                 lFormEdit.AddRemoveFlag = True
+                lFormEdit.MinimumSize = New System.Drawing.Size(725, 438)
                 lForm = lFormEdit
             Case "HspfCategoryBlk"
                 Dim lFormEdit As New frmEdit(aParent)
@@ -52,6 +57,7 @@ Public Class UCIForms
                 lFormEdit.Text = lEditCategory.Caption
                 lFormEdit.EditControl = lEditCategory
                 lFormEdit.AddRemoveFlag = True
+                lFormEdit.MinimumSize = New System.Drawing.Size(640, 228)
                 lForm = lFormEdit
             Case "HspfSpecialActionBlk"
                 Dim lFormEdit As New frmEdit(aParent)
@@ -97,7 +103,7 @@ Public Class UCIForms
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditMassLinks As New ctlEditMassLinks(aObject, aParent, aTag)
                 lFormEdit.Text = lEditMassLinks.Caption
-                lFormEdit.MinimumSize = New System.Drawing.Size(650, 400)
+                lFormEdit.MinimumSize = New System.Drawing.Size(650, 428)
                 lFormEdit.EditControl = lEditMassLinks
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit

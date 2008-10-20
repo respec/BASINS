@@ -26,24 +26,29 @@ Partial Class ctlEditFilesBlock
         '
         Me.grdEdit.AllowHorizontalScrolling = True
         Me.grdEdit.AllowNewValidValues = False
+        Me.grdEdit.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grdEdit.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.grdEdit.CellBackColor = System.Drawing.Color.Empty
-        Me.grdEdit.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.grdEdit.Fixed3D = False
         Me.grdEdit.LineColor = System.Drawing.Color.Empty
         Me.grdEdit.LineWidth = 0.0!
-        Me.grdEdit.Location = New System.Drawing.Point(0, 0)
+        Me.grdEdit.Location = New System.Drawing.Point(16, 14)
+        Me.grdEdit.Margin = New System.Windows.Forms.Padding(2)
         Me.grdEdit.Name = "grdEdit"
-        Me.grdEdit.Size = New System.Drawing.Size(552, 226)
+        Me.grdEdit.Size = New System.Drawing.Size(474, 212)
         Me.grdEdit.Source = Nothing
         Me.grdEdit.TabIndex = 0
         '
         'ctlEditFilesBlock
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.grdEdit)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "ctlEditFilesBlock"
-        Me.Size = New System.Drawing.Size(552, 226)
+        Me.Size = New System.Drawing.Size(507, 240)
         Me.ResumeLayout(False)
 
     End Sub

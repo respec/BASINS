@@ -57,8 +57,6 @@ Public Class ctlEditOpnSeqBlock
                 .AllowNewValidValues = True
                 .Visible = True
                 .Source.FixedRows = 1
-                .ColumnWidth(0) = 200
-                .ColumnWidth(1) = 200
             End With
 
             With grdEdit.Source

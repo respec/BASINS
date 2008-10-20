@@ -7,11 +7,16 @@ Imports System.Collections.ObjectModel
 Public Class ctlEditConnections
     Implements ctlEdit
 
+    Dim pVScrollColumnOffset As Integer = 16
     Dim pConnection As HspfConnection
     Dim pConnectionType As String 'ext sources, ext targets, schematic, or network
     Dim pConnections As Collection(Of HspfConnection)
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+
+    Private Sub grdTable_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdEdit.Resize
+        grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+    End Sub
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
@@ -78,18 +83,12 @@ Public Class ctlEditConnections
                 .AllowNewValidValues = True
                 .Visible = True
             End With
+
             '<<<<<<<<<< NETWORK >>>>>>>>>>
             With grdEdit.Source
                 If pConnectionType = "NETWORK" Then
                     .FixedRows = 1
                     .Columns = 15
-
-                    'Size up the columns to total 700 (forcing HIDE column out of visbile range)
-                    Dim lColWidth() As Integer = New Integer(14) {60, 60, 60, 50, 50, 43, 45, 45, 45, 45, 45, 45, 45, 45, 45}
-
-                    For lCol As Integer = 0 To lColWidth.Length - 1
-                        grdEdit.ColumnWidth(lCol) = lColWidth(lCol)
-                    Next
 
                     .Rows = 1
                     .CellValue(0, 0) = "VolName"
@@ -106,17 +105,9 @@ Public Class ctlEditConnections
                     .CellValue(0, 11) = "MemName"
                     .CellValue(0, 12) = "MemSub1"
                     .CellValue(0, 13) = "MemSub2"
-                    .CellValue(0, 14) = "HIDE"
+                    .CellValue(0, 14) = "Comment"
 
-                    For lCol As Integer = 0 To .Columns - 1
-                        For lRow As Integer = 1 To .Rows - 1
-                            .CellEditable(lRow, lCol) = True
-                        Next
-                    Next
 
-                    For lCol As Integer = 0 To .Columns
-                        .CellColor(0, lCol) = SystemColors.ControlLight
-                    Next
 
                     For i As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
                         lOper = pConnection.Uci.OpnSeqBlock.Opn(i)
@@ -150,13 +141,6 @@ Public Class ctlEditConnections
                     .FixedRows = 1
                     .Columns = 9
 
-                    'Size up the columns to total 700 (forcing HIDE column out of visbile range)
-                    Dim lColWidth() As Integer = New Integer(8) {120, 80, 120, 120, 65, 65, 65, 65, 60}
-
-                    For i As Integer = 0 To lColWidth.Length - 1
-                        grdEdit.ColumnWidth(i) = lColWidth(i)
-                    Next
-
                     .Rows = 1
                     .CellValue(0, 0) = "VolName"
                     .CellValue(0, 1) = "VolID"
@@ -166,11 +150,7 @@ Public Class ctlEditConnections
                     .CellValue(0, 5) = "MLId"
                     .CellValue(0, 6) = "Sub1"
                     .CellValue(0, 7) = "Sub2"
-                    .CellValue(0, 8) = "Hide"
-
-                    For lCol As Integer = 0 To .Columns
-                        .CellColor(0, lCol) = SystemColors.ControlLight
-                    Next
+                    .CellValue(0, 8) = "Comment"
 
                     For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
                         lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
@@ -191,24 +171,11 @@ Public Class ctlEditConnections
                         Next
                     Next
 
-                    For lCol As Integer = 0 To 13
-                        For lRow As Integer = 1 To .Rows - 1
-                            .CellEditable(lRow, lCol) = True
-                        Next
-                    Next
-
                     '<<<<<<<<<< EXT SOURCES >>>>>>>>>>
 
                 ElseIf pConnectionType = "EXT SOURCES" Then
                     .FixedRows = 1
                     .Columns = 15
-
-                    'Size up the columns to total 700 (forcing HIDE column out of visbile range)
-                    Dim lColWidth() As Integer = New Integer(14) {68, 45, 60, 50, 50, 50, 45, 45, 45, 45, 45, 45, 45, 45, 45}
-
-                    For lCol As Integer = 0 To lColWidth.Length - 1
-                        grdEdit.ColumnWidth(lCol) = lColWidth(lCol)
-                    Next
 
                     .Rows = 1
                     .CellValue(0, 0) = "VolName"
@@ -225,12 +192,7 @@ Public Class ctlEditConnections
                     .CellValue(0, 11) = "MemName"
                     .CellValue(0, 12) = "MemSub1"
                     .CellValue(0, 13) = "MemSub2"
-                    .CellValue(0, 14) = "HIDE"
-
-
-                    For lCol As Integer = 0 To .Columns
-                        .CellColor(0, lCol) = SystemColors.ControlLight
-                    Next
+                    .CellValue(0, 14) = "Comment"
 
                     For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
                         lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
@@ -257,25 +219,11 @@ Public Class ctlEditConnections
                         Next
                     Next
 
-                    For lCol As Integer = 0 To 13
-                        For lRow As Integer = 1 To .Rows - 1
-                            .CellEditable(lRow, lCol) = True
-                        Next
-                    Next
-
-
                     '<<<<<<<<<< EXT TARGETS >>>>>>>>>>
 
                 ElseIf pConnectionType = "EXT TARGETS" Then
                     .FixedRows = 1
                     .Columns = 16
-
-                    'Size up the columns to total 700 (forcing HIDE column out of visbile range)
-                    Dim lColWidth() As Integer = New Integer(15) {63, 35, 60, 50, 50, 50, 45, 45, 45, 45, 45, 30, 40, 40, 60, 40}
-
-                    For i As Integer = 0 To lColWidth.Length - 1
-                        grdEdit.ColumnWidth(i) = lColWidth(i)
-                    Next
 
                     .Rows = 1
                     .CellValue(0, 0) = "VolName"
@@ -293,12 +241,7 @@ Public Class ctlEditConnections
                     .CellValue(0, 12) = "TSystem"
                     .CellValue(0, 13) = "AggrStr"
                     .CellValue(0, 14) = "AmdStr"
-                    .CellValue(0, 15) = "HIDE"
-
-
-                    For lCol As Integer = 0 To .Columns
-                        .CellColor(0, lCol) = SystemColors.ControlLight
-                    Next
+                    .CellValue(0, 15) = "Comment"
 
                     For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
                         lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
@@ -326,17 +269,55 @@ Public Class ctlEditConnections
                         Next
                     Next
 
-                    For lCol As Integer = 0 To 14
-                        For lRow As Integer = 1 To .Rows - 1
-                            .CellEditable(lRow, lCol) = True
-                        Next
-                    Next
                 End If
+
+                For lCol As Integer = 0 To .Columns - 1
+                    For lRow As Integer = 1 To .Rows - 1
+                        .CellEditable(lRow, lCol) = True
+                    Next
+                Next
+
             End With
+
+            grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
             grdEdit.Refresh()
 
         End Set
     End Property
+
+    Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdEdit.MouseDownCell
+        Dim lBlockDef As New HspfBlockDef
+        Dim lSelectedColumn As Integer = aColumn
+
+        If Len(pConnectionType) > 0 Then
+            lBlockDef = pConnection.Uci.Msg.BlockDefs(pConnectionType)
+            lSelectedColumn = aColumn
+            If pConnectionType = "EXT SOURCES" Then
+                If lSelectedColumn < 10 Then
+                    lSelectedColumn = aColumn
+                Else
+                    lSelectedColumn = aColumn + 1
+                End If
+            ElseIf pConnectionType = "EXT TARGETS" Then
+                lSelectedColumn = aColumn
+            ElseIf pConnectionType = "NETWORK" Then
+                If lSelectedColumn < 10 Then
+                    lSelectedColumn = aColumn
+                Else
+                    lSelectedColumn = aColumn + 1
+                End If
+            ElseIf pConnectionType = "SCHEMATIC" Then
+                lSelectedColumn = aColumn
+            End If
+
+            If lSelectedColumn <= lBlockDef.TableDefs(0).ParmDefs.Count - 1 Then
+                txtDefine.Text = lBlockDef.TableDefs(0).ParmDefs(lSelectedColumn).Name & ": " & lBlockDef.TableDefs(0).ParmDefs(lSelectedColumn).Define
+            Else
+                txtDefine.Clear()
+            End If
+        End If
+
+    End Sub
 
     Public Sub New(ByVal aHspfConnection As Object, ByVal aParent As Windows.Forms.Form, ByVal aTag As String)
 
@@ -344,9 +325,8 @@ Public Class ctlEditConnections
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        pConnectionType = aTag
-        grdEdit.Source = New atcGridSource
 
+        pConnectionType = aTag
         Data = aHspfConnection
     End Sub
 End Class

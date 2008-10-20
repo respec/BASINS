@@ -144,6 +144,7 @@ Public Class ctlEditMassLinks
             pMassLink = aMassLink
 
             grdMassLink.Source = New atcGridSource
+            grdMassLink.Source.FixedRows = 1
 
             'build list of masslinks
             lMassLinkLooperCount = 0
@@ -194,6 +195,9 @@ Public Class ctlEditMassLinks
                 .CellValue(0, 8) = "MemName"
                 .CellValue(0, 9) = "MemSub1"
                 .CellValue(0, 10) = "MemSub2"
+
+                .FixedRows = 1
+
             End With
 
             RefreshGrid()
@@ -211,7 +215,6 @@ Public Class ctlEditMassLinks
                 lMassLink = pMassLink.Uci.MassLinks(lRow)
                 If lMassLink.MassLinkId = cboID.Items.Item(cboID.SelectedIndex) Then
                     .CellValue(lRowFillerIndex, 0) = lMassLink.Source.VolName
-
                     .CellValue(lRowFillerIndex, 1) = lMassLink.Source.Group
                     .CellValue(lRowFillerIndex, 2) = lMassLink.Source.Member
                     .CellValue(lRowFillerIndex, 3) = lMassLink.Source.MemSub1
@@ -240,7 +243,6 @@ Public Class ctlEditMassLinks
     End Sub
 
     Private Sub grdEdit_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdMassLink.Resize
-
         grdMassLink.SizeAllColumnsToContents(grdMassLink.Width - pVScrollColumnOffset, True)
     End Sub
 
