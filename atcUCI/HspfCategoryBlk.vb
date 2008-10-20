@@ -14,22 +14,12 @@ Public Class HspfCategoryBlk
     Private pCategories As Collection(Of HspfCategory)
     Friend Uci As HspfUci
     Public Comment As String
+    Public ReadOnly Caption As String = "Category Block"
+    Public ReadOnly EditControlName As String = "ATCoHspf.ctlCategoryBlkEdit"
 
     Public ReadOnly Property Categories() As Collection(Of HspfCategory)
         Get
             Return pCategories
-        End Get
-    End Property
-
-    Public ReadOnly Property Caption() As String
-        Get
-            Return "Category Block"
-        End Get
-    End Property
-
-    Public ReadOnly Property EditControlName() As String
-        Get
-            EditControlName = "ATCoHspf.ctlCategoryBlkEdit"
         End Get
     End Property
 
@@ -97,7 +87,6 @@ Public Class HspfCategoryBlk
     'End Function
 
     Friend Sub ReadUciFile()
-        On Error GoTo ErrHand
         If Uci.FastFlag Then
             Comment = GetCommentBeforeBlock("CATEGORY")
         End If
@@ -110,51 +99,49 @@ Public Class HspfCategoryBlk
         Dim lRecTyp As Integer
         Dim lCBuff As String = Nothing
 
-
-        Do
-            If Uci.FastFlag Then
-                GetNextRecordFromBlock("CATEGORY", lRetKey, lCBuff, lRecTyp, lRetCod)
-            Else
-                lRetKey = -1
-                Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetKey, lCBuff, lRecTyp, lRetCod)
-            End If
-
-            If lRetCod = 10 Then
-                Exit Do
-            ElseIf lRecTyp = 0 Then
-                Dim lCategory As New HspfCategory
-                If lCBuff.Substring(3, 2).Trim.Length > 0 Then
-                    lCategory.Tag = StrRetRem(lCBuff)
+        Try
+            Do
+                If Uci.FastFlag Then
+                    GetNextRecordFromBlock("CATEGORY", lRetKey, lCBuff, lRecTyp, lRetCod)
                 Else
-                    lCategory.Tag = ""
+                    lRetKey = -1
+                    Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetKey, lCBuff, lRecTyp, lRetCod)
                 End If
-                lCategory.Name = lCBuff.Trim
-                lCategory.Comment = lComment.Trim
-                lCategory.Id = pCategories.Count + 1
-                pCategories.Add(lCategory)
-                lComment = ""
-            ElseIf lRecTyp = -1 And lInit = 0 Then  'dont save first comment, its the header
-                'save comment
-                If lComment.Length = 0 Then
-                    lComment = lCBuff
-                Else
-                    lComment &= vbCrLf & lCBuff
-                End If
-            ElseIf lRetCod = 2 And lRecTyp = -2 Then
-                'save blank line
-                If lComment.Length = 0 Then
-                    lComment = " "
-                Else
-                    lComment &= vbCrLf & " "
-                End If
-            End If
-            lInit = 0
-        Loop
 
-        Exit Sub
-
-ErrHand:
-        Logger.Msg(Err.Description & vbCr & vbCr & lCBuff, MsgBoxStyle.Critical, "Error in ReadUciFile")
+                If lRetCod = 10 Then
+                    Exit Do
+                ElseIf lRecTyp = 0 Then
+                    Dim lCategory As New HspfCategory
+                    If lCBuff.Substring(3, 2).Trim.Length > 0 Then
+                        lCategory.Tag = StrRetRem(lCBuff)
+                    Else
+                        lCategory.Tag = ""
+                    End If
+                    lCategory.Name = lCBuff.Trim
+                    lCategory.Comment = lComment.Trim
+                    lCategory.Id = pCategories.Count + 1
+                    pCategories.Add(lCategory)
+                    lComment = ""
+                ElseIf lRecTyp = -1 And lInit = 0 Then  'dont save first comment, its the header
+                    'save comment
+                    If lComment.Length = 0 Then
+                        lComment = lCBuff
+                    Else
+                        lComment &= vbCrLf & lCBuff
+                    End If
+                ElseIf lRetCod = 2 And lRecTyp = -2 Then
+                    'save blank line
+                    If lComment.Length = 0 Then
+                        lComment = " "
+                    Else
+                        lComment &= vbCrLf & " "
+                    End If
+                End If
+                lInit = 0
+            Loop
+        Catch lEx As ApplicationException
+            Logger.Msg(lEx.Message & vbCr & vbCr & lCBuff, MsgBoxStyle.Critical, "Error in ReadUciFile")
+        End Try
     End Sub
 
     Public Overrides Function ToString() As String
