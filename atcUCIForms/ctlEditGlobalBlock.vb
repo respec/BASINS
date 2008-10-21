@@ -37,7 +37,9 @@ Public Class ctlEditGlobalBlock
             Return pHspfGlobalBlk
         End Get
         Set(ByVal aHspfGlobalBlk As Object)
+
             pHspfGlobalBlk = aHspfGlobalBlk
+
             txtRunInfo.Text = pHspfGlobalBlk.RunInf.Value
             txtStartYr.ValueInteger = pHspfGlobalBlk.SDate(0)
             txtStartMo.ValueInteger = pHspfGlobalBlk.SDate(1)

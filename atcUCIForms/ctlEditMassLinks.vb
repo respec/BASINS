@@ -146,6 +146,10 @@ Public Class ctlEditMassLinks
             grdMassLink.Source = New atcGridSource
             grdMassLink.Source.FixedRows = 1
 
+            cboID.Items.Clear()
+            cboID.Cursor = Windows.Forms.Cursors.Hand
+            cboID.DropDownStyle = Windows.Forms.ComboBoxStyle.DropDownList
+
             'build list of masslinks
             lMassLinkLooperCount = 0
             For lMassLinkNumber As Integer = 1 To pMassLink.Uci.MassLinks.Count - 1 '<<<< .NET Conversion: Changed for Debug
