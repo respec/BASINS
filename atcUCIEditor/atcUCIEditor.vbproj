@@ -59,6 +59,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
     </Compile>
+    <Compile Include="verify.vb" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="My Project\Application.myapp">
