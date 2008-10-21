@@ -190,6 +190,7 @@ Module modFreq
                             End With
                         End If
                         aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
+
                         lNewAttribute = atcDataAttributes.GetDefinition(lS & "AdjProb")
                         If lNewAttribute Is Nothing Then
                             lNewAttribute = New atcAttributeDefinition
@@ -202,6 +203,7 @@ Module modFreq
                             End With
                         End If
                         aAttributesStorage.SetValue(lNewAttribute, lAdp(lIndex), lArguments)
+
                     End If
                 Next
             Catch lEx As Exception

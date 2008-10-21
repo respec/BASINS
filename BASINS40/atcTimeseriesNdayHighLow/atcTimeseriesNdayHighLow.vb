@@ -279,9 +279,9 @@ Public Class atcTimeseriesNdayHighLow
                         .SetValue("NDay", lNDayNow)
 
                         'WDM-specific: make additional space for attributes at the expense of data pointers
-                        .SetValue("NSA", 40)
-                        .SetValue("NSASP", 150)
-                        .SetValue("NDP", 240)
+                        .SetValue("NSA", 50)
+                        .SetValue("NSASP", 170)
+                        .SetValue("NDP", 200)
 
                         Dim ltstype As String
                         If aHigh Then ltstype = "H" Else ltstype = "L"
@@ -506,9 +506,10 @@ Public Class atcTimeseriesNdayHighLow
                     lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNdayTs)
                     lNdayTs = lTsMath.DataSets(0)
                     'Set log-specific attributes
-                    lNdayTs.Attributes.SetValue("MEANDD", lNdayTs.Attributes.GetValue("Mean"))
-                    lNdayTs.Attributes.SetValue("SDND", lNdayTs.Attributes.GetValue("Standard Deviation"))
-                    lNdayTs.Attributes.SetValue("SKWND", lNdayTs.Attributes.GetValue("Skew"))
+                    aAttributesStorage.SetValue("MEANDD", lNdayTs.Attributes.GetValue("Mean"))
+                    aAttributesStorage.SetValue("SDND", lNdayTs.Attributes.GetValue("Standard Deviation"))
+                    aAttributesStorage.SetValue("SKWND", lNdayTs.Attributes.GetValue("Skew"))
+                    aAttributesStorage.SetValue("LDIST", "LP3")
                 End If
 
                 Try

@@ -59,8 +59,8 @@ Friend Class atcFrequencyGridSource
                         End If ' Not pRecurrence.ContainsKey(lKey)
                     End If ' lAttribute.Arguments.ContainsAttribute("Return Period)
                 End If 'Not lAttribute.Arguments Is Nothing
-            Next ' For Each lAttribute As atcDefinedValue In lData.Attributes
-        Next ' For Each lData As atcDataSet In pDataGroup
+            Next ' lAttribute
+        Next ' lData
     End Sub
 
     Public Property High() As Boolean
@@ -77,7 +77,7 @@ Friend Class atcFrequencyGridSource
             If pNdays Is Nothing Then
                 Return 4
             Else
-                Return pNdays.Count + 3
+                Return pNdays.Count + FixedColumns
             End If
         End Get
         Set(ByVal Value As Integer)
@@ -87,7 +87,7 @@ Friend Class atcFrequencyGridSource
     Overrides Property Rows() As Integer
         Get
             Try
-                Return pDataGroup.Count * pRecurrence.Count + 1
+                Return pDataGroup.Count * pRecurrence.Count + FixedRows
             Catch
                 Return 1
             End Try
@@ -96,17 +96,35 @@ Friend Class atcFrequencyGridSource
         End Set
     End Property
 
+    Overrides Property FixedRows() As Integer
+        Get
+            Return 1
+        End Get
+        Set(ByVal value As Integer)
+            'Ignore attemts to change this property
+        End Set
+    End Property
+
+    Overrides Property FixedColumns() As Integer
+        Get
+            Return 3
+        End Get
+        Set(ByVal value As Integer)
+            'Ignore attemts to change this property
+        End Set
+    End Property
+
     Public Function DataSetAt(ByVal aRow As Integer) As atcDataSet
-        Return pDataGroup((aRow - 1) \ pRecurrence.Count)
+        Return pDataGroup((aRow - FixedRows) \ pRecurrence.Count)
     End Function
 
     Public Function NdaysAt(ByVal aColumn As Integer) As String
-        Return pNdays.GetByIndex(aColumn - 3)
+        Return pNdays.GetByIndex(aColumn - FixedColumns)
     End Function
 
     Public Function RecurrenceAt(ByVal aRow As Integer) As String
         'remove any thousands commas in return period
-        Return ReplaceString(pRecurrence.GetByIndex((aRow - 1) Mod pRecurrence.Count), ",", "")
+        Return ReplaceString(pRecurrence.GetByIndex((aRow - Me.FixedRows) Mod pRecurrence.Count), ",", "")
     End Function
 
     Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
@@ -215,10 +233,10 @@ Friend Class atcFrequencyGridSource
 
     Overrides Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
         Get
-            If aColumn > 2 AndAlso aRow > 0 Then
-                Return System.Drawing.SystemColors.Window
-            Else
+            If aColumn < FixedColumns OrElse aRow < FixedRows Then
                 Return System.Drawing.SystemColors.Control
+            Else
+                Return System.Drawing.SystemColors.Window
             End If
         End Get
         Set(ByVal Value As System.Drawing.Color)
@@ -227,6 +245,7 @@ Friend Class atcFrequencyGridSource
 
     Public Function AllNday() As atcDataGroup
         Dim lAllNday As New atcDataGroup
+        Dim lCopyAttrs() As String = {"MEANDD", "SDND", "SKWND", "LDIST"}
 
         For Each lTimeseries As atcTimeseries In pDataGroup
             Dim lAttributes As atcDataAttributes = lTimeseries.Attributes
@@ -239,6 +258,27 @@ Friend Class atcFrequencyGridSource
                 If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then 'find non-log version
                     lNdayTs = lNdayTs.Attributes.GetValue("NDayTimeseries")
                 End If
+
+                lNdayTs.Attributes.GetValue("Skew") ' Trigger calculation of all basic attributes
+
+                For lRow As Integer = Me.FixedRows To Me.FixedRows + pRecurrence.Count - 1
+                    Dim lCompleteAttName As String = lAttrName & RecurrenceAt(lRow)
+                    If lAttributes.ContainsAttribute(lCompleteAttName) Then
+                        Try
+                            lNdayAttribute = lAttributes.GetDefinedValue(lCompleteAttName)
+                            lNdayTs.Attributes.SetValue(lNdayAttribute.Definition, lNdayAttribute.Value, lNdayAttribute.Arguments)
+                        Catch
+                        End Try
+                    End If
+                Next
+
+                For Each lAttrName In lCopyAttrs
+                    If lAttributes.ContainsAttribute(lAttrName) Then
+                        lNdayAttribute = lAttributes.GetDefinedValue(lAttrName)
+                        lNdayTs.Attributes.SetValue(lNdayAttribute.Definition, lNdayAttribute.Value, lNdayAttribute.Arguments)
+                    End If
+                Next
+
                 lAllNday.Add(lNdayTs)
             Next
         Next

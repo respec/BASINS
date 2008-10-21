@@ -573,6 +573,75 @@ CaseExistRenumber:
                 lValue = DateToyyyyMMddHHmmss(lValue)
             Case "tsfill" 'Avoid writing NaN values in WDM file to make old tools happy
                 If Double.IsNaN(lValue) Then lValue = -999
+
+            Case "1low2" : lName = "L01002"
+            Case "1low10" : lName = "L01010"
+            Case "1low20" : lName = "L01020"
+
+            Case "3low2" : lName = "L03002"
+            Case "3low10" : lName = "L03010"
+            Case "3low20" : lName = "L03020"
+
+            Case "4low3" : lName = "L04003"
+
+            Case "7low2" : lName = "L07002"
+            Case "7low5" : lName = "L07005"
+            Case "7low10", "7q10" : lName = "L07010"
+            Case "7low20" : lName = "L07020"
+            Case "7low50" : lName = "L07050"
+            Case "7low100" : lName = "L07100"
+
+            Case "14low2" : lName = "L14002"
+            Case "14low10" : lName = "L14010"
+            Case "14low20" : lName = "L14020"
+
+            Case "30low2" : lName = "L30002"
+            Case "30low10" : lName = "L30010"
+            Case "30low20" : lName = "L30020"
+
+            Case "90low2" : lName = "L90002"
+            Case "90low10" : lName = "L90010"
+            Case "90low20" : lName = "L90020"
+
+            Case "1high2" : lName = "H01002"
+            Case "1high5" : lName = "H01005"
+            Case "1high10" : lName = "H01010"
+            Case "1high20" : lName = "H01020"
+            Case "1high25" : lName = "H01025"
+            Case "1high50" : lName = "H01050"
+            Case "1high100" : lName = "H01100"
+
+            Case "3high2" : lName = "H03002"
+            Case "3high5" : lName = "H03005"
+            Case "3high10" : lName = "H03010"
+            Case "3high20" : lName = "H03020"
+            Case "3high25" : lName = "H03025"
+            Case "3high50" : lName = "H03050"
+            Case "3high100" : lName = "H03100"
+
+            Case "7high2" : lName = "H07002"
+            Case "7high5" : lName = "H07005"
+            Case "7high10" : lName = "H07010"
+            Case "7high20" : lName = "H07020"
+            Case "7high25" : lName = "H07025"
+            Case "7high50" : lName = "H07050"
+            Case "7high100" : lName = "H07100"
+
+            Case "15high2" : lName = "H15002"
+            Case "15high5" : lName = "H15005"
+            Case "15high10" : lName = "H15010"
+            Case "15high20" : lName = "H15020"
+            Case "15high25" : lName = "H15025"
+            Case "15high50" : lName = "H15050"
+            Case "15high100" : lName = "H15100"
+
+            Case "30high2" : lName = "H30002"
+            Case "30high5" : lName = "H30005"
+            Case "30high10" : lName = "H30010"
+            Case "30high20" : lName = "H30020"
+            Case "30high25" : lName = "H30025"
+            Case "30high50" : lName = "H30050"
+            Case "30high100" : lName = "H30100"
         End Select
 
         Dim lMsgDefinition As atcAttributeDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
