@@ -707,22 +707,13 @@ Public Class frmCAT
 #End Region
 
     Private Const RunTitle As String = "Run"
-    Private Const CLIGEN_NAME As String = "Cligen"
-    Private Const StartFolderVariable As String = "{StartFolder}"
     Private Const ResultsFixedRows As Integer = 4
 
     'Private pPlugin As atcClimateAssessmentToolPlugin
 
     Private pUnsaved As Boolean = False
 
-    'all the variations listed in the Input tab
-    Private pInputs As atcCollection
-
-    'all the endpoints listed in the Endpoints tab
-    Private pEndpoints As atcCollection
-
     'file names of prepared input files
-    Private pPreparedInputs As atcCollection
 
     Private pLastUpDownClick As Date = Date.Now
     Private pUpDownButtonDoubleClickSeconds As Double = 0.3
@@ -730,12 +721,11 @@ Public Class frmCAT
     Private pResultsTabIndex As Integer = 2
     Private pTotalIterations As Integer = 0
     Private pTimePerRun As Double = 0 'Time each run takes in seconds
+    Private pCat As New clsCat
 
     Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin)
         mnuPivotHeaders.Checked = GetSetting("BasinsCAT", "Settings", "PivotHeaders", "Yes").Equals("Yes")
         pTimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
-        pInputs = New atcCollection
-        pEndpoints = New atcCollection
         Me.Show()
 
         'pPlugin = aPlugin
@@ -743,29 +733,6 @@ Public Class frmCAT
         '    XML = aPlugin.XML
         'End If
     End Sub
-
-    Private Function OpenDataSource(ByVal aFilename As String) As atcDataSource
-        Dim lAddSource As Boolean = True
-        For Each lDataSource As atcDataSource In atcDataManager.DataSources
-            If lDataSource.Specification.ToLower = aFilename.ToLower Then 'already open
-                Return lDataSource
-            End If
-        Next
-        If lAddSource AndAlso FileExists(aFilename) Then
-            Dim lDataSource As atcDataSource
-            If aFilename.ToLower.EndsWith("wdm") Then
-                lDataSource = New atcWDM.atcDataSourceWDM
-            ElseIf aFilename.ToLower.EndsWith("hbn") Then
-                lDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-            Else
-                Throw New ApplicationException("Could not open '" & aFilename & "' in frmCAT:OpenDataSource")
-            End If
-            lDataSource.Specification = aFilename
-            atcDataManager.OpenDataSource(lDataSource, lDataSource.Specification, Nothing)
-            Return lDataSource
-        End If
-        Return Nothing
-    End Function
 
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
         Dim lSelectedVariations As atcCollection = New atcCollection
@@ -784,17 +751,17 @@ Public Class frmCAT
 
         RefreshTotalIterations()
 
-        If pPreparedInputs Is Nothing Then
+        If pCat.PreparedInputs Is Nothing Then
             lSelectedPreparedInputs = Nothing
             'Make a collection of the variations that are selected/checked in lstInputs
-            For Each lVariation In pInputs
+            For Each lVariation In pCat.Inputs
                 If lVariation.Selected Then lSelectedVariations.Add(lVariation)
             Next
             lNumInputColumns = lSelectedVariations.Count
         Else
             lSelectedPreparedInputs = New atcCollection
             For Each lInputIndex As Integer In lstInputs.CheckedIndices
-                lSelectedPreparedInputs.Add(pPreparedInputs.ItemByIndex(lInputIndex))
+                lSelectedPreparedInputs.Add(pCat.PreparedInputs.ItemByIndex(lInputIndex))
             Next
             lNumInputColumns = 0
         End If
@@ -809,7 +776,7 @@ Public Class frmCAT
             .Columns = 1 + lNumInputColumns
             .CellValue(0, 0) = RunTitle
 
-            For Each lVariation In pEndpoints
+            For Each lVariation In pCat.Endpoints
                 If lVariation.Selected Then
                     .Columns += lVariation.DataSets.Count
                 End If
@@ -817,7 +784,7 @@ Public Class frmCAT
             .Rows = 5
             lColumn = 1
 
-            If pPreparedInputs Is Nothing Then
+            If pCat.PreparedInputs Is Nothing Then
                 For Each lVariation In lSelectedVariations
                     .CellValue(0, lColumn) = lVariation.Name
                     .CellValue(1, lColumn) = lVariation.Operation
@@ -829,7 +796,7 @@ Public Class frmCAT
                 Next
             End If
 
-            For Each lVariation In pEndpoints
+            For Each lVariation In pCat.Endpoints
                 If lVariation.Selected Then
                     For Each lDataset As atcDataSet In lVariation.DataSets
                         .CellValue(0, lColumn) = lVariation.Name
@@ -992,20 +959,20 @@ NextIteration:
             Dim lColumn As Integer = .FixedColumns
             Dim lVariation As atcVariation
 
-            If pPreparedInputs Is Nothing Then
+            If pCat.PreparedInputs Is Nothing Then
                 .CellValue(lRow, 0) = aIteration + 1
-                For Each lVariation In pInputs
+                For Each lVariation In pCat.Inputs
                     If lVariation.Selected Then
                         .CellValue(lRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
                         lColumn += 1
                     End If
                 Next
             Else
-                .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(pPreparedInputs.ItemByIndex(lstInputs.CheckedIndices.Item(aIteration))))
+                .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(pCat.PreparedInputs.ItemByIndex(lstInputs.CheckedIndices.Item(aIteration))))
             End If
             .CellColor(lRow, 0) = Drawing.SystemColors.Control
 
-            For Each lVariation In pEndpoints
+            For Each lVariation In pCat.Endpoints
                 If lVariation.Selected Then
                     For Each lOldData As atcDataSet In lVariation.DataSets
                         Dim lGroup As atcDataGroup = Nothing
@@ -1014,7 +981,7 @@ NextIteration:
                         If lResultDataSpec Is Nothing Then
                             Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
                         Else
-                            Dim lResultDataSource As atcDataSource = OpenDataSource(lResultDataSpec)
+                            Dim lResultDataSource As atcDataSource = pCat.OpenDataSource(lResultDataSpec)
                             If lResultDataSource Is Nothing Then
                                 Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
                             Else
@@ -1405,7 +1372,7 @@ NextIteration:
             pUnsaved = True
             lVariation.Selected = True
             lVariation.CurrentValue = lVariation.Min
-            pInputs.Add(lVariation)
+            pCat.Inputs.Add(lVariation)
             RefreshInputList()
             RefreshTotalIterations()
         End If
@@ -1415,7 +1382,7 @@ NextIteration:
         Dim frmVary As New frmVariationCligen
         Dim lVariation As New VariationCligen
         With lVariation
-            .Name = CLIGEN_NAME
+            .Name = pCat.CLIGEN_NAME
             .ComputationSource = New atcTimeseriesMath.atcTimeseriesMath
             .Operation = "Multiply"
             .Min = 0.9
@@ -1425,24 +1392,24 @@ NextIteration:
         lVariation = frmVary.AskUser(lVariation)
         If Not lVariation Is Nothing Then
             pUnsaved = True
-            If lVariation.Name.IndexOf(CLIGEN_NAME) < 0 Then lVariation.Name = CLIGEN_NAME & " " & lVariation.Name
+            If lVariation.Name.IndexOf(pCat.CLIGEN_NAME) < 0 Then lVariation.Name = pCat.CLIGEN_NAME & " " & lVariation.Name
             lVariation.Selected = True
             lVariation.CurrentValue = lVariation.Min
-            pInputs.Add(lVariation)
+            pCat.Inputs.Add(lVariation)
             RefreshInputList()
             RefreshTotalIterations()
         End If
     End Sub
 
     Private Sub btnInputModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputModify.Click
-        If pPreparedInputs Is Nothing Then
+        If pCat.PreparedInputs Is Nothing Then
             If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
                 lstInputs.SelectedIndex = 0
             End If
             Dim lIndex As Integer = lstInputs.SelectedIndex
-            If lIndex >= 0 And lIndex < pInputs.Count Then
+            If lIndex >= 0 And lIndex < pCat.Inputs.Count Then
                 pUnsaved = True
-                Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
+                Dim lVariation As atcVariation = pCat.Inputs.Item(lIndex)
                 If lVariation.GetType.Name.EndsWith("Cligen") Then
                     Dim frmVaryCligen As New frmVariationCligen
                     lVariation = frmVaryCligen.AskUser(lVariation)
@@ -1461,7 +1428,7 @@ NextIteration:
     End Sub
 
     Private Sub btnInputView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputView.Click
-        If pPreparedInputs Is Nothing Then
+        If pCat.PreparedInputs Is Nothing Then
             If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
                 lstInputs.SelectedIndex = 0
             End If
@@ -1470,7 +1437,7 @@ NextIteration:
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                 For Each lIndex As Integer In lstInputs.SelectedIndices
                     Dim lDataThisIteration As atcDataGroup
-                    Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
+                    Dim lVariation As atcVariation = pCat.Inputs.Item(lIndex)
                     lDataThisIteration = lVariation.StartIteration
                     While Not lDataThisIteration Is Nothing
                         lData.AddRange(lDataThisIteration)
@@ -1491,27 +1458,25 @@ NextIteration:
     Private Sub btnInputRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputRemove.Click
         If lstInputs.SelectedIndices.Count > 0 Then
             pUnsaved = True
-            Dim lKeepThese As New atcCollection
-            Dim lRemoveFrom As atcCollection
-
-            If pPreparedInputs Is Nothing Then
-                lRemoveFrom = pInputs
+            If pCat.PreparedInputs Is Nothing Then
+                Dim lRemoveFrom As Generic.List(Of atcVariation) = pCat.Inputs
+                Dim lKeepThese As New Generic.List(Of atcVariation)
+                For lIndex As Integer = 0 To lstInputs.Items.Count - 1
+                    If Not lstInputs.SelectedIndices.Contains(lIndex) Then
+                        lKeepThese.Add(lRemoveFrom.Item(lIndex))
+                    End If
+                Next
+                pCat.Inputs = lKeepThese
             Else
-                lRemoveFrom = pPreparedInputs
+                Dim lRemoveFrom As atcCollection = pCat.PreparedInputs
+                Dim lKeepThese As New atcCollection
+                For lIndex As Integer = 0 To lstInputs.Items.Count - 1
+                    If Not lstInputs.SelectedIndices.Contains(lIndex) Then
+                        lKeepThese.Add(lRemoveFrom.Item(lIndex))
+                    End If
+                Next
+                pCat.PreparedInputs = lKeepThese
             End If
-
-            For lIndex As Integer = 0 To lstInputs.Items.Count - 1
-                If Not lstInputs.SelectedIndices.Contains(lIndex) Then
-                    lKeepThese.Add(lRemoveFrom.ItemByIndex(lIndex))
-                End If
-            Next
-
-            If pPreparedInputs Is Nothing Then
-                pInputs = lKeepThese
-            Else
-                pPreparedInputs = lKeepThese
-            End If
-
             RefreshInputList()
             RefreshTotalIterations()
         Else
@@ -1529,10 +1494,10 @@ NextIteration:
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then
                     pUnsaved = True
-                    If pPreparedInputs Is Nothing Then
-                        pPreparedInputs = New atcCollection
+                    If pCat.PreparedInputs Is Nothing Then
+                        pCat.PreparedInputs = New atcCollection
                     Else
-                        pPreparedInputs.Clear()
+                        pCat.PreparedInputs.Clear()
                     End If
                     Dim lBaseFilename As String = FilenameNoPath(.FileName)
                     Dim lFolderStart As String = PathNameOnly(.FileName)
@@ -1542,7 +1507,7 @@ NextIteration:
                         If lFolder >= lFolderStart Then
                             Dim lFilename As String = IO.Path.Combine(lFolder, lBaseFilename)
                             If FileExists(lFilename) Then
-                                pPreparedInputs.Add(lFilename)
+                                pCat.PreparedInputs.Add(lFilename)
                             End If
                         End If
                     Next
@@ -1554,21 +1519,32 @@ NextIteration:
         End With
     End Sub
 
-    Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aDirection As Integer)
+    Private Sub MoveItem(ByVal aGroup As Generic.List(Of atcVariation), ByVal aList As CheckedListBox, ByVal aDirection As Integer)
         Dim lMoveFrom As Integer = aList.SelectedIndex
         If lMoveFrom >= 0 AndAlso lMoveFrom < aGroup.Count Then
             pUnsaved = True
             Dim lMoveTo As Integer = lMoveFrom + aDirection
 
-            'Dim lNow As Date = Date.Now
-            'If lNow.Subtract(pLastUpDownClick).TotalSeconds < pUpDownButtonDoubleClickSeconds Then
-            '    If aDirection < 0 Then
-            '        lMoveTo = 0
-            '    Else
-            '        lMoveTo = aGroup.Count - 1
-            '    End If
-            'End If
-            'pLastUpDownClick = lNow
+            If lMoveTo >= 0 AndAlso lMoveTo < aGroup.Count Then
+                Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
+                Dim lMoveMe As Object = aGroup.Item(lMoveFrom)
+                aGroup.RemoveAt(lMoveFrom)
+                aList.Items.RemoveAt(lMoveFrom)
+                aGroup.Insert(lMoveTo, lMoveMe)
+                aList.Items.Insert(lMoveTo, lMoveMe.ToString)
+                If lWasChecked Then aList.SetItemChecked(lMoveTo, True)
+                aList.SelectedIndex = lMoveTo
+            End If
+        Else
+            Logger.Msg("Something must be selected to move it", MsgBoxStyle.Critical, "Nothing Selected")
+        End If
+    End Sub
+
+    Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aDirection As Integer)
+        Dim lMoveFrom As Integer = aList.SelectedIndex
+        If lMoveFrom >= 0 AndAlso lMoveFrom < aGroup.Count Then
+            pUnsaved = True
+            Dim lMoveTo As Integer = lMoveFrom + aDirection
 
             If lMoveTo >= 0 AndAlso lMoveTo < aGroup.Count Then
                 Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
@@ -1586,35 +1562,35 @@ NextIteration:
     End Sub
 
     Private Sub btnInputUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputUp.Click
-        If pPreparedInputs Is Nothing Then
-            MoveItem(pInputs, lstInputs, -1)
+        If pCat.PreparedInputs Is Nothing Then
+            MoveItem(pCat.Inputs, lstInputs, -1)
         Else
-            MoveItem(pPreparedInputs, lstInputs, -1)
+            MoveItem(pCat.PreparedInputs, lstInputs, -1)
         End If
     End Sub
 
     Private Sub btnInputDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputDown.Click
-        If pPreparedInputs Is Nothing Then
-            MoveItem(pInputs, lstInputs, 1)
+        If pCat.PreparedInputs Is Nothing Then
+            MoveItem(pCat.Inputs, lstInputs, 1)
         Else
-            MoveItem(pPreparedInputs, lstInputs, 1)
+            MoveItem(pCat.PreparedInputs, lstInputs, 1)
         End If
     End Sub
 
     Private Sub btnEndpointUp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointUp.Click
-        MoveItem(pEndpoints, lstEndpoints, -1)
+        MoveItem(pCat.Endpoints, lstEndpoints, -1)
     End Sub
 
     Private Sub btnEndpointDown_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointDown.Click
-        MoveItem(pEndpoints, lstEndpoints, 1)
+        MoveItem(pCat.Endpoints, lstEndpoints, 1)
     End Sub
 
     Private Sub btnEndpointTop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointTop.Click
-        MoveItem(pEndpoints, lstEndpoints, -lstEndpoints.SelectedIndex)
+        MoveItem(pCat.Endpoints, lstEndpoints, -lstEndpoints.SelectedIndex)
     End Sub
 
     Private Sub btnEndpointBottom_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointBottom.Click
-        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.Items.Count - lstEndpoints.SelectedIndex - 1)
+        MoveItem(pCat.Endpoints, lstEndpoints, lstEndpoints.Items.Count - lstEndpoints.SelectedIndex - 1)
     End Sub
 
     Private Sub btnEndpointAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointAdd.Click
@@ -1630,7 +1606,7 @@ NextIteration:
         If frmEnd.AskUser(lVariation) Then
             pUnsaved = True
             lVariation.Selected = True
-            pEndpoints.Add(lVariation)
+            pCat.Endpoints.Add(lVariation)
             RefreshEndpointList()
         End If
     End Sub
@@ -1638,15 +1614,15 @@ NextIteration:
     Private Sub RefreshTotalIterations()
         Dim lLabelText As String
 
-        If pPreparedInputs Is Nothing Then
+        If pCat.PreparedInputs Is Nothing Then
             pTotalIterations = 1
-            For Each lVariation As atcVariation In pInputs
+            For Each lVariation As atcVariation In pCat.Inputs
                 If lVariation.Selected AndAlso lVariation.Iterations > 1 Then
                     pTotalIterations *= lVariation.Iterations
                 End If
             Next
         Else
-            pTotalIterations = pPreparedInputs.Count
+            pTotalIterations = pCat.PreparedInputs.Count
         End If
         lLabelText = "Total iterations selected = " & pTotalIterations
         If pTimePerRun > 0 Then
@@ -1664,11 +1640,11 @@ NextIteration:
     End Sub
 
     Private Sub RefreshInputList()
-        If pPreparedInputs Is Nothing Then
-            RefreshList(lstInputs, pInputs)
+        If pCat.PreparedInputs Is Nothing Then
+            RefreshList(lstInputs, pCat.Inputs)
         Else
             lstInputs.Items.Clear()
-            lstInputs.Items.AddRange(pPreparedInputs.ToArray)
+            lstInputs.Items.AddRange(pCat.PreparedInputs.ToArray)
             If lstInputs.CheckedIndices.Count = 0 Then 'Select all if none are selected
                 For lIndex As Integer = 0 To lstInputs.Items.Count - 1
                     lstInputs.SetItemChecked(lIndex, True)
@@ -1678,10 +1654,10 @@ NextIteration:
     End Sub
 
     Private Sub RefreshEndpointList()
-        RefreshList(lstEndpoints, pEndpoints)
+        RefreshList(lstEndpoints, pCat.Endpoints)
     End Sub
 
-    Private Sub RefreshList(ByVal aList As System.Windows.Forms.CheckedListBox, ByVal aVariations As atcCollection)
+    Private Sub RefreshList(ByVal aList As System.Windows.Forms.CheckedListBox, ByVal aVariations As Generic.List(Of atcVariation))
         aList.Items.Clear()
         For Each lVariation As atcVariation In aVariations
             aList.Items.Add(lVariation.ToString)
@@ -1694,8 +1670,8 @@ NextIteration:
             lstInputs.SelectedIndex = 0
         End If
         Dim lIndex As Integer = lstEndpoints.SelectedIndex
-        If lIndex >= 0 And lIndex < pEndpoints.Count Then
-            Dim lVariation As atcVariation = pEndpoints.ItemByIndex(lIndex)
+        If lIndex >= 0 And lIndex < pCat.Endpoints.Count Then
+            Dim lVariation As atcVariation = pCat.Endpoints.Item(lIndex)
             Dim frmEnd As New frmEndpoint
             If frmEnd.AskUser(lVariation) Then
                 pUnsaved = True
@@ -1711,9 +1687,9 @@ NextIteration:
     Private Sub btnEndpointRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointRemove.Click
         If lstEndpoints.SelectedIndices.Count > 0 Then
             pUnsaved = True
-            For lIndex As Integer = pEndpoints.Count - 1 To 0 Step -1
+            For lIndex As Integer = pCat.Endpoints.Count - 1 To 0 Step -1
                 If lstEndpoints.GetSelected(lIndex) Then
-                    pEndpoints.RemoveAt(lIndex)
+                    pCat.Endpoints.RemoveAt(lIndex)
                 End If
             Next
             RefreshEndpointList()
@@ -1732,133 +1708,12 @@ NextIteration:
             .OverwritePrompt = True
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 'write file from form contents
-                SaveFileString(.FileName, (XML))
+                SaveFileString(.FileName, (pCat.XML))
                 pUnsaved = False
                 SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
             End If
         End With
     End Sub
-
-    Public Property XML() As String
-        Get
-            Dim lXML As String = ""
-            Dim lVariation As atcVariation
-
-            lXML &= "<SaveAll>" & chkSaveAll.Checked & "</SaveAll>" & vbCrLf
-
-            lXML &= "<ShowEachRun>" & chkShowEachRunProgress.Checked & "</ShowEachRun>" & vbCrLf
-
-            lXML &= "<UCI>" & vbCrLf
-            lXML &= "  <FileName>" & txtBaseScenario.Text & "</FileName>" & vbCrLf
-            lXML &= "</UCI>" & vbCrLf
-
-            If pPreparedInputs Is Nothing Then
-                lXML &= "<Variations>" & vbCrLf
-                For Each lVariation In pInputs
-                    lXML &= lVariation.XML
-                Next
-                lXML &= "</Variations>" & vbCrLf
-            Else
-                lXML &= "<PreparedInputs>"
-                For Each lPreparedInput As String In pPreparedInputs
-                    lXML &= "<PreparedInput selected=""" & lstInputs.CheckedItems.Contains(lPreparedInput)
-                    lXML &= """>" & lPreparedInput & "</PreparedInput>" & vbCrLf
-                Next
-                lXML &= "</PreparedInputs>"
-            End If
-
-            lXML &= "<Endpoints>" & vbCrLf
-            For Each lVariation In pEndpoints
-                lXML &= lVariation.XML
-            Next
-            lXML &= "</Endpoints>" & vbCrLf
-
-            Dim lStartFolder As String = CurDir()
-            lXML = ReplaceStringNoCase(lXML, lStartFolder, StartFolderVariable)
-            If lXML.Contains(StartFolderVariable) Then
-                lXML = "<StartFolder>" & lStartFolder & "</StartFolder>" & vbCrLf & lXML
-            End If
-
-            lXML = "<BasinsCAT>" & vbCrLf & lXML & "</BasinsCAT>" & vbCrLf
-            'Dim lCXML As New Chilkat.Xml
-            'If lCXML.LoadXml(lXML) Then
-            '  Return lCXML.GetXml
-            'Else
-            '  Logger.Dbg("Could not parse new XML")
-            Return lXML
-            'End If
-        End Get
-
-        Set(ByVal newValue As String)
-            Try
-                Dim lXMLdoc As New Xml.XmlDocument
-StartOver:
-                lXMLdoc.LoadXml(newValue)
-                Dim lNode As Xml.XmlNode = lXMLdoc.FirstChild
-                If lNode.Name.ToLower.Equals("basinscat") Then
-                    For Each lXML As Xml.XmlNode In lNode.ChildNodes
-                        Dim lVariation As atcVariation
-                        Dim lChild As Xml.XmlNode = lXML.FirstChild
-                        Select Case lXML.Name.ToLower
-                            Case "startfolder" 'Replace start folder in all XML if present
-                                Dim lStartFolder As String = lXML.InnerText
-                                newValue = ReplaceString(newValue, lXML.OuterXml, "")
-                                newValue = ReplaceString(newValue, StartFolderVariable, lStartFolder)
-                                GoTo StartOver
-                            Case "saveall"
-                                chkSaveAll.Checked = (lXML.InnerText.ToLower = "true")
-                            Case "showeachrun"
-                                chkShowEachRunProgress.Checked = (lXML.InnerText.ToLower = "true")
-                            Case "uci"
-                                OpenUCI(AbsolutePath(lChild.InnerText, CurDir))
-                            Case "preparedinputs"
-                                If pPreparedInputs Is Nothing Then
-                                    pPreparedInputs = New atcCollection
-                                Else
-                                    pPreparedInputs.Clear()
-                                End If
-                                For Each lChild In lXML.ChildNodes
-                                    pPreparedInputs.Add(lChild.InnerText)
-                                Next
-                                RefreshInputList()
-                                RefreshTotalIterations()
-
-                            Case "variations"
-                                pInputs.Clear()
-                                For Each lChild In lXML.ChildNodes
-                                    If lChild.InnerXml.IndexOf(CLIGEN_NAME) >= 0 Then
-                                        lVariation = New VariationCligen
-                                    Else
-                                        lVariation = New atcVariation
-                                    End If
-                                    lVariation.XML = lChild.OuterXml
-                                    If Not lVariation.IsInput Then
-                                        lVariation.IsInput = True
-                                        Logger.Dbg("Assigned IsInput to loaded variation '" & lVariation.Name & "'")
-                                    End If
-                                    pInputs.Add(lVariation)
-                                Next
-                                RefreshInputList()
-                                RefreshTotalIterations()
-                            Case "endpoints"
-                                pEndpoints.Clear()
-                                For Each lChild In lXML.ChildNodes
-                                    lVariation = New atcVariation
-                                    lVariation.XML = lChild.OuterXml
-                                    'Used to keep input variations in endpoints, skip them
-                                    If Not lVariation.IsInput Then
-                                        pEndpoints.Add(lVariation)
-                                    End If
-                                Next
-                                RefreshEndpointList()
-                        End Select
-                    Next
-                End If
-            Catch e As Exception
-                Logger.Msg("Could not load XML:" & vbCrLf & e.Message & vbCrLf & vbCrLf & newValue, "CAT XML Problem")
-            End Try
-        End Set
-    End Property
 
     Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuLoadVariations.Click
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
@@ -1869,7 +1724,13 @@ StartOver:
             .Title = Me.Text & " - Load Variations"
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then
-                    XML = WholeFileString(.FileName)
+                    pCat.XML = WholeFileString(.FileName)
+                    chkSaveAll.Checked = pCat.SaveAll
+                    chkShowEachRunProgress.Checked = pCat.ShowEachRunProgress
+                    txtBaseScenario.Text = pCat.BaseScenario
+                    RefreshInputList()
+                    RefreshTotalIterations()
+                    RefreshEndpointList()
                     SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
                     pUnsaved = False
                 End If
@@ -1885,8 +1746,8 @@ StartOver:
     End Sub
 
     Private Sub lstInputs_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstInputs.ItemCheck
-        If pPreparedInputs Is Nothing Then
-            Dim lVariation As atcVariation = pInputs.ItemByIndex(e.Index)
+        If pCat.PreparedInputs Is Nothing Then
+            Dim lVariation As atcVariation = pCat.Inputs.Item(e.Index)
             lVariation.Selected = (e.NewValue = CheckState.Checked)
             RefreshTotalIterations()
         Else
@@ -1895,7 +1756,7 @@ StartOver:
     End Sub
 
     Private Sub lstEndpoints_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstEndpoints.ItemCheck
-        Dim lVariation As atcVariation = pEndpoints.ItemByIndex(e.Index)
+        Dim lVariation As atcVariation = pCat.Endpoints.Item(e.Index)
         lVariation.Selected = (e.NewValue = CheckState.Checked)
     End Sub
 
@@ -1914,7 +1775,7 @@ StartOver:
             Dim lCopyText As String = " copy "
             For Each lIndex As Integer In lstEndpoints.SelectedIndices
                 lIndex += lNumCopied
-                Dim lNewEndpoint As atcVariation = pEndpoints(lIndex).Clone
+                Dim lNewEndpoint As atcVariation = pCat.Endpoints(lIndex).Clone
                 Dim lNewEndpointName As String = lNewEndpoint.Name
                 lNewEndpoint.IsInput = False
                 Dim lCopyTextPosition As Integer = lNewEndpointName.LastIndexOf(lCopyText)
@@ -1930,7 +1791,7 @@ StartOver:
                     lCopyNumber += 1
                     lNewEndpoint.Name = lNewEndpointName & lCopyText & lCopyNumber
                 End While
-                pEndpoints.Insert(lIndex + 1, lNewEndpoint)
+                pCat.Endpoints.Insert(lIndex + 1, lNewEndpoint)
                 lNumCopied += 1
             Next
             RefreshEndpointList()
@@ -1940,47 +1801,10 @@ StartOver:
     End Sub
 
     Private Sub mnuOpenUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenUCI.Click
-        OpenUCI()
+        pCat.OpenUCI()
     End Sub
 
     Private Sub txtBaseScenario_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBaseScenario.MouseClick
-        OpenUCI()
-    End Sub
-
-    ''' <summary>
-    ''' Open data files referred to in this UCI file
-    ''' </summary>
-    ''' <param name="aUCIfilename">Full path of UCI file</param>
-    ''' <remarks></remarks>
-    Private Sub OpenUCI(Optional ByVal aUCIfilename As String = "")
-
-        If Not aUCIfilename Is Nothing And Not FileExists(aUCIfilename) Then
-            If FileExists(aUCIfilename & ".uci") Then aUCIfilename &= ".uci"
-        End If
-
-        If aUCIfilename Is Nothing OrElse Not FileExists(aUCIfilename) Then
-            Dim cdlg As New OpenFileDialog
-            cdlg.Title = "Open UCI file containing base scenario"
-            cdlg.Filter = "UCI files|*.uci|All Files|*.*"
-            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-                aUCIfilename = cdlg.FileName
-            End If
-        End If
-
-        If FileExists(aUCIfilename) Then
-            txtBaseScenario.Text = aUCIfilename
-            Dim lUciFolder As String = PathNameOnly(aUCIfilename)
-            ChDriveDir(lUciFolder)
-
-            Dim lFullText As String = WholeFileString(aUCIfilename)
-            For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
-                lWDMfilename = AbsolutePath(lWDMfilename, lUciFolder)
-                OpenDataSource(lWDMfilename)
-            Next
-            For Each lBinOutFilename As String In UCIFilesBlockFilenames(lFullText, "BINO")
-                lBinOutFilename = AbsolutePath(lBinOutFilename, lUciFolder)
-                OpenDataSource(lBinOutFilename)
-            Next
-        End If
+        pCat.OpenUCI()
     End Sub
 End Class
