@@ -1938,7 +1938,9 @@ Public Class frmModelSetup
                         .DeltH = lMaxEl - lMinEl
                         .SegmentId = aSubbasinsModelSegmentIds.ItemByKey(lSubbasinId)
                     End With
-                    lReaches.Add(lReach)
+                    If Not lReaches.Contains(lReach.Id) Then
+                        lReaches.Add(lReach)
+                    End If
                 End If
             Next
         Next
@@ -1974,7 +1976,9 @@ Public Class frmModelSetup
                 .DepthSlopeChange = lReach.Depth * 1.875
                 .DepthMax = lReach.Depth * 62.5
             End With
-            lChannels.Add(lChannel)
+            If Not lChannels.Contains(lChannel.Reach.Id) Then
+                lChannels.Add(lChannel)
+            End If
         Next
         Return lChannels
     End Function
