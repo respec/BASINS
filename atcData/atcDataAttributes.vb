@@ -24,8 +24,9 @@ Public Class atcDataAttributes
         ElseIf aAttributeName.Length = 6 _
             AndAlso (aAttributeName.Substring(0, 1).ToUpper = "H" OrElse aAttributeName.Substring(0, 1).ToUpper = "L") _
             AndAlso IsNumeric(aAttributeName.Substring(1)) Then
-            If aAttributeName.Substring(0, 1).ToUpper = "L" Then
+            If aAttributeName.Substring(0, 1).ToUpper = "L" Then                
                 aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "Low" & CInt(aAttributeName.Substring(3))
+                If aAttributeName = "7Low10" Then aAttributeName = "7Q10"
             Else
                 aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "High" & CInt(aAttributeName.Substring(3))
             End If

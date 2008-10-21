@@ -350,18 +350,6 @@ Friend Class frmDisplayFrequencyGrid
         HighDisplay = False
     End Sub
 
-    'Private Sub UserSpecifyAttributes()
-    '    If pFormSpecify IsNot Nothing Then
-    '        Try
-    '            pFormSpecify.Close()
-    '        Catch
-    '        End Try
-    '        pFormSpecify = Nothing
-    '    End If
-    '    pFormSpecify = New frmSWSTAT
-    '    pFormSpecify.AskUser(pDataGroup)
-    'End Sub
-
     Public Overrides Function ToString() As String
         Return Me.Text & vbCrLf & agdMain.ToString
     End Function
