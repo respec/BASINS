@@ -6,10 +6,19 @@ Imports atcUCIForms
 
 Public Class frmReach
 
+    Dim pVScrollColumnOffset As Integer = 16
+
+    Private Sub grdReach_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdReach.Resize
+        grdReach.SizeAllColumnsToContents(grdReach.Width - pVScrollColumnOffset, True)
+    End Sub
+
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
+
+        Me.Size = New Size(580, 320)
+        Me.MinimumSize = Me.Size
 
         ' Add any initialization after the InitializeComponent() call.
         Dim lUnits As Integer = pUCI.GlobalBlock.emfg
@@ -23,6 +32,7 @@ Public Class frmReach
         End With
 
         With grdReach.Source
+            .FixedRows = 1
             .Columns = 6
             .CellValue(0, 0) = "ID"
             .CellValue(0, 1) = "Description"
@@ -36,19 +46,12 @@ Public Class frmReach
             .CellValue(0, 4) = "DownstreamID"
             .CellValue(0, 5) = "N Exits"
             .CellValue(0, 6) = "Lake Flag"
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            For lCol As Integer = 0 To 6
-                .CellColor(0, lCol) = SystemColors.ControlLight
-            Next
 
             Dim lOperBlock As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
             .Rows = lOperBlock.Count
 
             'loop through each operation and populate the table
             For lRow As Integer = 1 To lOperBlock.Count
-                .CellColor(lRow, 0) = SystemColors.ControlLight
                 Dim lOperation As HspfOperation = lOperBlock.NthOper(lRow)
                 .CellValue(lRow, 0) = lOperation.Id
                 Dim lTable As HspfTable = lOperation.Tables("GEN-INFO")
@@ -69,8 +72,8 @@ Public Class frmReach
 
         End With
 
+        grdReach.SizeAllColumnsToContents(grdReach.Width - pVScrollColumnOffset, True)
         grdReach.Refresh()
-        grdReach.SizeAllColumnsToContents()
 
         Me.Icon = pIcon
 
@@ -91,7 +94,7 @@ Public Class frmReach
                 'TODO -- put downoper back into puci structure
             Next
         End With
-        Me.Close()
+        Me.Dispose()
     End Sub
 
     Private Sub cmdCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdCancel.Click

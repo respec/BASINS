@@ -17,54 +17,54 @@ Public Class UCIForms
                 Dim lEditFilesBlock As New ctlEditFilesBlock(aObject, aParent)
                 lFormEdit.Text = lEditFilesBlock.Caption
                 lFormEdit.EditControl = lEditFilesBlock
-                lFormEdit.MinimumSize = New System.Drawing.Size(640, 320)
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lForm = lFormEdit
             Case "HspfGlobalBlk"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditGlobalBlock As New ctlEditGlobalBlock(aObject, aParent)
                 lFormEdit.Text = lEditGlobalBlock.Caption
                 lFormEdit.EditControl = lEditGlobalBlock
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.AddRemoveFlag = False
-                lFormEdit.MinimumSize = New System.Drawing.Size(640, 205)
                 lForm = lFormEdit
             Case "HspfOpnSeqBlk"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditOpnSeqBlock As New ctlEditOpnSeqBlock(aObject, aParent)
                 lFormEdit.Text = lEditOpnSeqBlock.Caption
                 lFormEdit.EditControl = lEditOpnSeqBlock
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.AddRemoveFlag = True
-                lFormEdit.MinimumSize = New System.Drawing.Size(400, 435)
                 lForm = lFormEdit
             Case "HspfFtable"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditFTables As New ctlEditFTables(aObject, aParent)
                 lFormEdit.Text = lEditFTables.Caption
                 lFormEdit.EditControl = lEditFTables
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.AddRemoveFlag = False
-                lFormEdit.MinimumSize = New System.Drawing.Size(640, 438)
                 lForm = lFormEdit
             Case "HspfConnection"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditConnections As New ctlEditConnections(aObject, aParent, aTag)
                 lFormEdit.Text = lEditConnections.Caption
                 lFormEdit.EditControl = lEditConnections
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.AddRemoveFlag = True
-                lFormEdit.MinimumSize = New System.Drawing.Size(725, 438)
                 lForm = lFormEdit
             Case "HspfCategoryBlk"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditCategory As New ctlEditCategory(aObject, aParent)
                 lFormEdit.Text = lEditCategory.Caption
                 lFormEdit.EditControl = lEditCategory
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.AddRemoveFlag = True
-                lFormEdit.MinimumSize = New System.Drawing.Size(640, 228)
                 lForm = lFormEdit
             Case "HspfSpecialActionBlk"
                 Dim lFormEdit As New frmEdit(aParent)
                 Dim lEditSpecialAction As New ctlEditSpecialAction(aObject, aParent, aTag)
                 lFormEdit.Text = lEditSpecialAction.Caption
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.EditControl = lEditSpecialAction
-                lFormEdit.MinimumSize = New System.Drawing.Size(1000, 650)
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
             Case "HspfTable"
@@ -105,6 +105,14 @@ Public Class UCIForms
                 lFormEdit.Text = lEditMassLinks.Caption
                 lFormEdit.MinimumSize = New System.Drawing.Size(650, 428)
                 lFormEdit.EditControl = lEditMassLinks
+                lFormEdit.AddRemoveFlag = True
+                lForm = lFormEdit
+            Case "HspfMonthData"
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditMonthData As New ctlEditMonthData(aObject, aParent)
+                lFormEdit.Text = lEditMonthData.Caption
+                lFormEdit.EditControl = lEditMonthData
+                lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.AddRemoveFlag = True
                 lForm = lFormEdit
             Case Else

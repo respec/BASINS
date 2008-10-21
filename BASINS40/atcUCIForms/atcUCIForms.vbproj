@@ -57,6 +57,12 @@
     <Compile Include="ctlEditMassLinks.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ctlEditMonthData.Designer.vb">
+      <DependentUpon>ctlEditMonthData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditMonthData.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="frmHydrEdit.Designer.vb">
       <DependentUpon>frmHydrEdit.vb</DependentUpon>
     </Compile>
@@ -168,6 +174,10 @@
     <EmbeddedResource Include="ctlEditMassLinks.resx">
       <DependentUpon>ctlEditMassLinks.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlEditMonthData.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlEditMonthData.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmAgPrac.resx">
       <DependentUpon>frmAgPrac.vb</DependentUpon>

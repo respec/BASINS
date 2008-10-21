@@ -80,6 +80,9 @@ Public Class ctlEditFilesBlock
         End Get
         Set(ByVal aHspfFilesBlk As Object)
             pHspfFilesBlk = aHspfFilesBlk
+
+            Me.MinimumSize = New System.Drawing.Size(640, 320)
+
             With pDataSource
                 .Rows = aHspfFilesBlk.count
                 For lInd As Integer = 1 To aHspfFilesBlk.count

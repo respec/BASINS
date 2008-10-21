@@ -70,7 +70,7 @@ Public Module WinHSPF
                                MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
             End If
         ElseIf aTableName = "MONTH-DATA" Then
-
+            UCIForms.Edit(aParent, pUCI.MonthData)
         ElseIf aTableName = "EXT SOURCES" Then
             UCIForms.Edit(aParent, pUCI.Connections(0), aTableName)
         ElseIf aTableName = "NETWORK" Then
