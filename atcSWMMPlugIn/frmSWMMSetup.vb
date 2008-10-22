@@ -375,9 +375,9 @@ Public Class frmSWMMSetup
         Me.TabPage2.Controls.Add(Me.lblDescription)
         Me.TabPage2.Controls.Add(Me.cboLandUseLayer)
         Me.TabPage2.Controls.Add(Me.lblLandUseLayer)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(192, 70)
+        Me.TabPage2.Size = New System.Drawing.Size(556, 340)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Land Use"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -396,14 +396,14 @@ Public Class frmSWMMSetup
         Me.AtcGridPervious.LineWidth = 0.0!
         Me.AtcGridPervious.Location = New System.Drawing.Point(14, 148)
         Me.AtcGridPervious.Name = "AtcGridPervious"
-        Me.AtcGridPervious.Size = New System.Drawing.Size(163, 0)
+        Me.AtcGridPervious.Size = New System.Drawing.Size(527, 177)
         Me.AtcGridPervious.Source = Nothing
         Me.AtcGridPervious.TabIndex = 18
         '
         'cmdChange
         '
         Me.cmdChange.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChange.Location = New System.Drawing.Point(105, 117)
+        Me.cmdChange.Location = New System.Drawing.Point(469, 117)
         Me.cmdChange.Name = "cmdChange"
         Me.cmdChange.Size = New System.Drawing.Size(72, 24)
         Me.cmdChange.TabIndex = 17
@@ -415,7 +415,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblClass.Location = New System.Drawing.Point(164, 118)
         Me.lblClass.Name = "lblClass"
-        Me.lblClass.Size = New System.Drawing.Size(0, 20)
+        Me.lblClass.Size = New System.Drawing.Size(364, 20)
         Me.lblClass.TabIndex = 16
         Me.lblClass.Text = "<none>"
         Me.lblClass.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -455,7 +455,7 @@ Public Class frmSWMMSetup
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLandUseLayer.Location = New System.Drawing.Point(168, 40)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(12, 25)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(376, 25)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
@@ -484,7 +484,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(2, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(554, 334)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(551, 334)
         Me.AtcConnectFields.TabIndex = 2
         '
         'TabPage6
@@ -497,9 +497,9 @@ Public Class frmSWMMSetup
         Me.TabPage6.Controls.Add(Me.lblOtherMet)
         Me.TabPage6.Controls.Add(Me.AtcGridPrec)
         Me.TabPage6.Controls.Add(Me.GroupBox2)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(192, 70)
+        Me.TabPage6.Size = New System.Drawing.Size(556, 340)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Met Stations"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -534,7 +534,7 @@ Public Class frmSWMMSetup
         Me.cboPrecipStation.FormattingEnabled = True
         Me.cboPrecipStation.Location = New System.Drawing.Point(137, 136)
         Me.cboPrecipStation.Name = "cboPrecipStation"
-        Me.cboPrecipStation.Size = New System.Drawing.Size(31, 25)
+        Me.cboPrecipStation.Size = New System.Drawing.Size(395, 25)
         Me.cboPrecipStation.TabIndex = 23
         '
         'lblPrecipStation
@@ -552,16 +552,16 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboOtherMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboOtherMet.FormattingEnabled = True
-        Me.cboOtherMet.Location = New System.Drawing.Point(136, 22)
+        Me.cboOtherMet.Location = New System.Drawing.Point(136, 292)
         Me.cboOtherMet.Name = "cboOtherMet"
-        Me.cboOtherMet.Size = New System.Drawing.Size(32, 25)
+        Me.cboOtherMet.Size = New System.Drawing.Size(396, 25)
         Me.cboOtherMet.TabIndex = 21
         '
         'lblOtherMet
         '
         Me.lblOtherMet.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblOtherMet.AutoSize = True
-        Me.lblOtherMet.Location = New System.Drawing.Point(18, 25)
+        Me.lblOtherMet.Location = New System.Drawing.Point(18, 295)
         Me.lblOtherMet.Name = "lblOtherMet"
         Me.lblOtherMet.Size = New System.Drawing.Size(109, 17)
         Me.lblOtherMet.TabIndex = 20
@@ -581,7 +581,7 @@ Public Class frmSWMMSetup
         Me.AtcGridPrec.LineWidth = 0.0!
         Me.AtcGridPrec.Location = New System.Drawing.Point(21, 136)
         Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(147, 0)
+        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 138)
         Me.AtcGridPrec.Source = Nothing
         Me.AtcGridPrec.TabIndex = 19
         '
@@ -593,7 +593,7 @@ Public Class frmSWMMSetup
         Me.GroupBox2.Controls.Add(Me.cmdSelectWDM)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 20)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(148, 59)
+        Me.GroupBox2.Size = New System.Drawing.Size(512, 59)
         Me.GroupBox2.TabIndex = 0
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Met WDM File"
@@ -602,16 +602,16 @@ Public Class frmSWMMSetup
         '
         Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 24)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 26)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
-        Me.txtMetWDMName.Size = New System.Drawing.Size(20, 23)
+        Me.txtMetWDMName.Size = New System.Drawing.Size(384, 23)
         Me.txtMetWDMName.TabIndex = 2
         '
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(57, 22)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 24)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -704,6 +704,7 @@ Public Class frmSWMMSetup
 
     Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSubbasins.SelectedIndexChanged
         SetFieldMappingControl()
+        SetPrecipStationGrid()
     End Sub
 
     Private Sub cboStreams_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboStreams.SelectedIndexChanged
@@ -1508,6 +1509,7 @@ Public Class frmSWMMSetup
         lblStatus.Text = "Reading Precipitation Data from WDM File..."
         Me.Refresh()
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        EnableControls(False)
 
         BuildListofValidStationNames(txtMetWDMName.Text, "PREC", pPrecStations)
         SetPrecipStationGrid()
@@ -1534,6 +1536,7 @@ Public Class frmSWMMSetup
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        EnableControls(True)
     End Sub
 
     Private Sub SetPrecipStationGrid()
