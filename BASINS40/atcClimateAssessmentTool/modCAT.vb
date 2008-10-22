@@ -67,12 +67,12 @@ Public Module modCAT
     End Sub
 
     Public Function ScenarioRun(ByVal aBaseFilename As String, _
-                           ByVal aNewScenarioName As String, _
-                           ByVal aModifiedData As atcDataGroup, _
-                           ByVal aPreparedInput As String, _
-                           ByVal aRunModel As Boolean, _
-                           ByVal aShowProgress As Boolean, _
-                           ByVal aKeepRunning As Boolean) As atcCollection 'of atcDataSource
+                                ByVal aNewScenarioName As String, _
+                                ByVal aModifiedData As atcDataGroup, _
+                                ByVal aPreparedInput As String, _
+                                ByVal aRunModel As Boolean, _
+                                ByVal aShowProgress As Boolean, _
+                                ByVal aKeepRunning As Boolean) As atcCollection 'of atcDataSource
         'Copy base UCI and change scenario name within it
         'Copy WDM
         'Change data to be modified in new WDM
@@ -82,7 +82,9 @@ Public Module modCAT
         Dim lModified As New atcCollection
         Dim lCurrentTimeseries As atcTimeseries
 
-        If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
+        If aModifiedData Is Nothing Then
+            aModifiedData = New atcDataGroup
+        End If
 
         If FileExists(aBaseFilename) Then
             Dim lNewBaseFilename As String = AbsolutePath(aBaseFilename, CurDir)
