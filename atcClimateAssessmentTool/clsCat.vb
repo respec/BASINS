@@ -23,7 +23,7 @@ Public Class clsCat
     Public Event Started()
     Public Event StatusUpdate(ByVal aStatus As String)
     Public Event StartIteration(ByVal aIteration As Integer)
-    Public Event UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String)
+    Public Event UpdateResults(ByVal aResultsFilename As String)
 
     Public Property XML() As String
         Get
@@ -137,6 +137,23 @@ StartOver:
         End Set
     End Property
 
+    Public ReadOnly Property TotalIterations() As Integer
+        Get
+            Dim lTotalIterations As Integer = 1
+            If PreparedInputs Is Nothing Then
+                lTotalIterations = 1
+                For Each lVariation As atcVariation In Inputs
+                    If lVariation.Selected AndAlso lVariation.Iterations > 1 Then
+                        lTotalIterations *= lVariation.Iterations
+                    End If
+                Next
+            Else
+                lTotalIterations = PreparedInputs.Count
+            End If
+            Return lTotalIterations
+        End Get
+    End Property
+
     ''' <summary>
     ''' Open data files referred to in this UCI file
     ''' </summary>
@@ -196,15 +213,22 @@ StartOver:
         Return Nothing
     End Function
 
-    Public Function Start(ByVal aBaseScenario As String, ByVal aModifiedScenario As String, _
-                          ByVal aSelectedVariations As Generic.List(Of atcVariation), _
-                          ByVal aSelectedPreparedInputs As atcCollection) As Boolean
+    Public Function StartRun(ByVal aBaseScenario As String, ByVal aModifiedScenario As String, _
+                             Optional ByVal aSelectedVariations As Generic.List(Of atcVariation) = Nothing, _
+                             Optional ByVal aSelectedPreparedInputs As atcCollection = Nothing) As Boolean
+        g_running = True
+        Dim lSelectedVariations As Generic.List(Of atcVariation)
+        If (aSelectedVariations Is Nothing AndAlso aSelectedPreparedInputs Is Nothing) Then
+            lSelectedVariations = Inputs
+        Else
+            lSelectedVariations = aSelectedVariations
+        End If
         'header for attributes
         Dim lNumInputColumns As Integer
-        If aSelectedVariations Is Nothing Then
+        If lSelectedVariations Is Nothing Then
             lNumInputColumns = 0
         Else
-            lNumInputColumns = aSelectedVariations.Count
+            lNumInputColumns = lSelectedVariations.Count
         End If
 
         ResultsGrid = New atcGridSource
@@ -225,7 +249,7 @@ StartOver:
             lColumn = 1
 
             If PreparedInputs Is Nothing Then
-                For Each lVariation As atcVariation In aSelectedVariations
+                For Each lVariation As atcVariation In lSelectedVariations
                     .CellValue(0, lColumn) = lVariation.Name
                     .CellValue(1, lColumn) = lVariation.Operation
                     .CellValue(2, lColumn) = "Current Value"
@@ -259,10 +283,13 @@ StartOver:
 
         Dim lRuns As Integer = 0
         Run(aModifiedScenario, _
-             aSelectedVariations, _
+            lSelectedVariations, _
             aSelectedPreparedInputs, _
             aBaseScenario, _
             lRuns, 0, Nothing)
+
+        g_running = False
+        Return True
     End Function
 
     Private Sub Run(ByVal aModifiedScenarioName As String, _
@@ -307,7 +334,72 @@ NextIteration:
                 End If
                 TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
 
-                RaiseEvent UpdateResults(aIteration, lResults, PathNameOnly(aBaseFileName) & "\" & lModifiedScenarioName & ".results.txt")
+                With ResultsGrid
+                    Dim lRow As Integer = aIteration + .FixedRows
+                    Dim lColumn As Integer = .FixedColumns
+                    Dim lVariation As atcVariation
+
+                    If PreparedInputs Is Nothing Then
+                        .CellValue(lRow, 0) = aIteration + 1
+                        For Each lVariation In Inputs
+                            If lVariation.Selected Then
+                                .CellValue(lRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
+                                lColumn += 1
+                            End If
+                        Next
+                    Else
+                        .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(aPreparedInputs.Item(aIteration)))
+                        '.CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
+                    End If
+                    .CellColor(lRow, 0) = Drawing.SystemColors.Control
+
+                    For Each lVariation In Endpoints
+                        If lVariation.Selected Then
+                            For Each lOldData As atcDataSet In lVariation.DataSets
+                                Dim lGroup As atcDataGroup = Nothing
+                                Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
+                                Dim lResultDataSpec As String = lResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower)
+                                If lResultDataSpec Is Nothing Then
+                                    Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
+                                Else
+                                    Dim lResultDataSource As atcDataSource = OpenDataSource(lResultDataSpec)
+                                    If lResultDataSource Is Nothing Then
+                                        Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
+                                    Else
+                                        lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
+                                        If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
+                                            Dim lData As atcTimeseries = lGroup.Item(0)
+                                            If Not lVariation.Seasons Is Nothing Then
+                                                lData = lVariation.Seasons.SplitBySelected(lData, Nothing).Item(0)
+                                            End If
+                                            .CellValue(lRow, lColumn) = lData.Attributes.GetFormattedValue(lVariation.Operation)
+                                            If .ColorCells Then
+                                                If Not IsNumeric(.CellValue(lRow, lColumn)) Then
+                                                    .CellColor(lRow, lColumn) = lVariation.ColorDefault
+                                                Else
+                                                    Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lVariation.Operation)
+                                                    If Not Double.IsNaN(lVariation.Min) AndAlso lValue < lVariation.Min Then
+                                                        .CellColor(lRow, lColumn) = lVariation.ColorBelowMin
+                                                    ElseIf Not Double.IsNaN(lVariation.Max) AndAlso lValue > lVariation.Max Then
+                                                        .CellColor(lRow, lColumn) = lVariation.ColorAboveMax
+                                                    Else
+                                                        .CellColor(lRow, lColumn) = lVariation.ColorDefault
+                                                    End If
+                                                End If
+                                            End If
+                                        Else
+                                            Logger.Dbg("No Data for ID " & lOldData.Attributes.GetValue("ID") & _
+                                                       " Count " & lResultDataSource.DataSets.Count)
+                                            .CellValue(lRow, lColumn) = ""
+                                        End If
+                                        lColumn += 1
+                                    End If
+                                End If
+                            Next
+                        End If
+                    Next
+                End With
+                RaiseEvent UpdateResults(PathNameOnly(aBaseFileName) & "\" & lModifiedScenarioName & ".results.txt")
 
                 'Close any open results
                 For Each lSpecification As String In lResults
