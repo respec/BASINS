@@ -1037,4 +1037,32 @@ Public Module modDate
         End With
         Return lStr
     End Function
+
+    Public Function FormatTime(ByVal aSeconds As Double) As String
+        Try
+            Dim lFormat As String = "0"
+            Dim lFormatted As String = ""
+            Dim lDays As Integer = Int(aSeconds / 86400)
+            If lDays > 0 Then 'More than a day left
+                lFormatted &= Format(lDays, lFormat) & ":"
+                aSeconds -= 86400 * lDays
+                lFormat = "00"
+            End If
+            Dim lHours As Integer = Int(aSeconds / 3600)
+            If lHours > 0 OrElse lDays > 0 Then 'More than an hour left
+                lFormatted &= Format(lHours, lFormat) & ":"
+                aSeconds -= 3600 * lHours
+                lFormat = "00"
+            End If
+            'Always include minutes:
+            Dim lMinutes As Integer = Int(aSeconds / 60)
+            lFormatted &= Format(lMinutes, lFormat) & ":"
+            aSeconds -= 60 * lMinutes
+            lFormat = "00"
+            Return lFormatted & Format(aSeconds, lFormat)
+        Catch e As Exception
+            Throw New ApplicationException("Exception formatting time '" & aSeconds.ToString & "': " & e.Message)
+            Return ""
+        End Try
+    End Function
 End Module

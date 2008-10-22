@@ -7,7 +7,7 @@ Imports MapWinUtility
 Imports Microsoft.VisualBasic
 Imports System
 
-Public Module ScriptCatSummary
+Public Module CatSummary
     Private Const pFieldWidth As Integer = 12
     Private Const pTestPath As String = "C:\test\SegmentBalance\"
     Private Const pCatSummaryFileName As String = "CatSummary.txt"

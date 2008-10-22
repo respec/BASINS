@@ -755,7 +755,7 @@ Public Class frmCAT
             Next
         End If
 
-        pCat.StartRun(txtBaseScenario.Text, txtModifiedScenarioName.Text, lSelectedVariations, lSelectedPreparedInputs)
+        pCat.StartRun(txtModifiedScenarioName.Text, lSelectedVariations, lSelectedPreparedInputs)
 
         SaveSetting("BasinsCAT", "Settings", "TimePerRun", pCat.TimePerRun)
 
@@ -1078,34 +1078,6 @@ Public Class frmCAT
         End If
         UpdateStatusLabel(lLabelText)
     End Sub
-
-    Private Function FormatTime(ByVal aSeconds As Double) As String
-        Try
-            Dim lFormat As String = "0"
-            Dim lFormatted As String = ""
-            Dim lDays As Integer = Int(aSeconds / 86400)
-            If lDays > 0 Then 'More than a day left
-                lFormatted &= Format(lDays, lFormat) & ":"
-                aSeconds -= 86400 * lDays
-                lFormat = "00"
-            End If
-            Dim lHours As Integer = Int(aSeconds / 3600)
-            If lHours > 0 OrElse lDays > 0 Then 'More than an hour left
-                lFormatted &= Format(lHours, lFormat) & ":"
-                aSeconds -= 3600 * lHours
-                lFormat = "00"
-            End If
-            'Always include minutes:
-            Dim lMinutes As Integer = Int(aSeconds / 60)
-            lFormatted &= Format(lMinutes, lFormat) & ":"
-            aSeconds -= 60 * lMinutes
-            lFormat = "00"
-            Return lFormatted & Format(aSeconds, lFormat)
-        Catch e As Exception
-            Logger.Dbg("Exception formatting time '" & aSeconds.ToString & "': " & e.Message)
-            Return ""
-        End Try
-    End Function
 
     Private Sub btnInputAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputAdd.Click
         Dim frmVary As New frmVariation
@@ -1547,6 +1519,9 @@ Public Class frmCAT
 
     Private Sub txtBaseScenario_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBaseScenario.MouseClick
         pCat.OpenUCI()
+    End Sub
+    Private Sub txtBaseScenarioNameChange(ByVal aBaseScenarioName As String) Handles pCat.BaseScenarioSet
+        txtBaseScenario.Text = aBaseScenarioName
     End Sub
 
     Private Sub pCat_Started() Handles pCat.Started

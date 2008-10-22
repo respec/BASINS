@@ -24,6 +24,7 @@ Public Class clsCat
     Public Event StatusUpdate(ByVal aStatus As String)
     Public Event StartIteration(ByVal aIteration As Integer)
     Public Event UpdateResults(ByVal aResultsFilename As String)
+    Public Event BaseScenarioSet(ByVal aScenarioName As String)
 
     Public Property XML() As String
         Get
@@ -174,9 +175,11 @@ StartOver:
         End If
 
         If FileExists(aUCIfilename) Then
-            BaseScenario = aUCIfilename
             Dim lUciFolder As String = PathNameOnly(aUCIfilename)
             ChDriveDir(lUciFolder)
+
+            BaseScenario = aUCIfilename
+            RaiseEvent BaseScenarioSet(aUCIfilename)
 
             Dim lFullText As String = WholeFileString(aUCIfilename)
             For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
@@ -213,7 +216,7 @@ StartOver:
         Return Nothing
     End Function
 
-    Public Function StartRun(ByVal aBaseScenario As String, ByVal aModifiedScenario As String, _
+    Public Function StartRun(ByVal aModifiedScenario As String, _
                              Optional ByVal aSelectedVariations As Generic.List(Of atcVariation) = Nothing, _
                              Optional ByVal aSelectedPreparedInputs As atcCollection = Nothing) As Boolean
         g_running = True
@@ -278,14 +281,14 @@ StartOver:
         End With
         RaiseEvent Started()
         'don't let winhspflt bring up message boxes
-        Dim lBaseFolder As String = PathNameOnly(AbsolutePath(aBaseScenario, CurDir))
+        Dim lBaseFolder As String = PathNameOnly(AbsolutePath(BaseScenario, CurDir))
         SaveFileString(lBaseFolder & "\WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
 
         Dim lRuns As Integer = 0
         Run(aModifiedScenario, _
             lSelectedVariations, _
             aSelectedPreparedInputs, _
-            aBaseScenario, _
+            BaseScenario, _
             lRuns, 0, Nothing)
 
         g_running = False
