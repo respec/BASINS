@@ -715,7 +715,6 @@ Public Class frmCAT
     Private pUpDownButtonDoubleClickSeconds As Double = 0.3
 
     Private pResultsTabIndex As Integer = 2
-    Private pTotalIterations As Integer = 0
     Private WithEvents pCat As New clsCat
 
     Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin)
@@ -756,7 +755,7 @@ Public Class frmCAT
             Next
         End If
 
-        pCat.Start(txtBaseScenario.Text, txtModifiedScenarioName.Text, lSelectedVariations, lSelectedPreparedInputs)
+        pCat.StartRun(txtBaseScenario.Text, txtModifiedScenarioName.Text, lSelectedVariations, lSelectedPreparedInputs)
 
         SaveSetting("BasinsCAT", "Settings", "TimePerRun", pCat.TimePerRun)
 
@@ -769,71 +768,7 @@ Public Class frmCAT
         lstInputs.Enabled = True
     End Sub
 
-    Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String) Handles pCat.UpdateResults
-        With agdResults.Source
-            Dim lRow As Integer = aIteration + .FixedRows
-            Dim lColumn As Integer = .FixedColumns
-            Dim lVariation As atcVariation
-
-            If pCat.PreparedInputs Is Nothing Then
-                .CellValue(lRow, 0) = aIteration + 1
-                For Each lVariation In pCat.Inputs
-                    If lVariation.Selected Then
-                        .CellValue(lRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
-                        lColumn += 1
-                    End If
-                Next
-            Else
-                .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(pCat.PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
-            End If
-            .CellColor(lRow, 0) = Drawing.SystemColors.Control
-
-            For Each lVariation In pCat.Endpoints
-                If lVariation.Selected Then
-                    For Each lOldData As atcDataSet In lVariation.DataSets
-                        Dim lGroup As atcDataGroup = Nothing
-                        Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
-                        Dim lResultDataSpec As String = aResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower)
-                        If lResultDataSpec Is Nothing Then
-                            Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
-                        Else
-                            Dim lResultDataSource As atcDataSource = pCat.OpenDataSource(lResultDataSpec)
-                            If lResultDataSource Is Nothing Then
-                                Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
-                            Else
-                                lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
-                                If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
-                                    Dim lData As atcTimeseries = lGroup.Item(0)
-                                    If Not lVariation.Seasons Is Nothing Then
-                                        lData = lVariation.Seasons.SplitBySelected(lData, Nothing).Item(0)
-                                    End If
-                                    .CellValue(lRow, lColumn) = lData.Attributes.GetFormattedValue(lVariation.Operation)
-                                    If .ColorCells Then
-                                        If Not IsNumeric(.CellValue(lRow, lColumn)) Then
-                                            .CellColor(lRow, lColumn) = lVariation.ColorDefault
-                                        Else
-                                            Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lVariation.Operation)
-                                            If Not Double.IsNaN(lVariation.Min) AndAlso lValue < lVariation.Min Then
-                                                .CellColor(lRow, lColumn) = lVariation.ColorBelowMin
-                                            ElseIf Not Double.IsNaN(lVariation.Max) AndAlso lValue > lVariation.Max Then
-                                                .CellColor(lRow, lColumn) = lVariation.ColorAboveMax
-                                            Else
-                                                .CellColor(lRow, lColumn) = lVariation.ColorDefault
-                                            End If
-                                        End If
-                                    End If
-                                Else
-                                    Logger.Dbg("No Data for ID " & lOldData.Attributes.GetValue("ID") & _
-                                               " Count " & lResultDataSource.DataSets.Count)
-                                    .CellValue(lRow, lColumn) = ""
-                                End If
-                                lColumn += 1
-                            End If
-                        End If
-                    Next
-                End If
-            Next
-        End With
+    Private Sub UpdateResults(ByVal aResultsFilename As String) Handles pCat.UpdateResults
         agdResults.Refresh()
         Try
             Windows.Forms.Application.DoEvents()
@@ -1136,9 +1071,9 @@ Public Class frmCAT
     End Sub
 
     Private Sub UpdateStatusLabel(ByVal aIteration As Integer) Handles pCat.StartIteration
-        Dim lLabelText As String = "Running # " & aIteration + 1 & " of " & pTotalIterations
+        Dim lLabelText As String = "Running # " & aIteration + 1 & " of " & pCat.TotalIterations
         If pCat.TimePerRun > 0 Then
-            Dim lFormattedTime As String = FormatTime(pCat.TimePerRun * (pTotalIterations - aIteration))
+            Dim lFormattedTime As String = FormatTime(pCat.TimePerRun * (pCat.TotalIterations - aIteration))
             If lFormattedTime.Length > 0 Then lLabelText &= " (" & lFormattedTime & " remaining)"
         End If
         UpdateStatusLabel(lLabelText)
@@ -1428,22 +1363,12 @@ Public Class frmCAT
     End Sub
 
     Private Sub RefreshTotalIterations()
-        Dim lLabelText As String
-
-        If pCat.PreparedInputs Is Nothing Then
-            pTotalIterations = 1
-            For Each lVariation As atcVariation In pCat.Inputs
-                If lVariation.Selected AndAlso lVariation.Iterations > 1 Then
-                    pTotalIterations *= lVariation.Iterations
-                End If
-            Next
-        Else
-            pTotalIterations = pCat.PreparedInputs.Count
-        End If
-        lLabelText = "Total iterations selected = " & pTotalIterations
+        Dim lLabelText As String = "Total iterations selected = " & pCat.TotalIterations
         If pCat.TimePerRun > 0 Then
-            Dim lFormattedTime As String = FormatTime(pCat.TimePerRun * pTotalIterations)
-            If lFormattedTime.Length > 0 Then lLabelText &= " (" & lFormattedTime & ")"
+            Dim lFormattedTime As String = FormatTime(pCat.TimePerRun * pCat.TotalIterations)
+            If lFormattedTime.Length > 0 Then
+                lLabelText &= " (" & lFormattedTime & ")"
+            End If
         End If
         UpdateStatusLabel(lLabelText)
 
