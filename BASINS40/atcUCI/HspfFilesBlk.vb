@@ -272,4 +272,44 @@ Public Class HspfFilesBlk
         pFiles.Clear()
         pFiles = lFiles
     End Sub
+
+    Public Sub newNameAll(ByRef aOldName As String, ByRef aNewName As String)
+        Dim lOldLength, i, j, lSlashPos, lTemp As Integer
+        Dim lTempName As String
+        Dim lHspfFile As HspfData.HspfFile
+        Dim lFiles As New Collection(Of HspfData.HspfFile)
+
+        For Each lHspfFile In pFiles
+            If Trim(lHspfFile.Typ) = "MESSU" Or Trim(lHspfFile.Typ) = "" Or Trim(lHspfFile.Typ) = "BINO" Or Trim(lHspfFile.Typ).StartsWith("WDM") Then
+                'Close lFile.Unit
+                'replace file name
+                lTempName = lHspfFile.Name
+                lOldLength = aOldName.Length
+                lTemp = InStr(1, UCase(lTempName), UCase(aOldName))
+                j = lTempName.Length
+                lSlashPos = 0
+                For i = 1 To j
+                    'check for a path in the name
+                    If (Mid(lTempName, i, 1) = "\") Then
+                        lSlashPos = i
+                    End If
+                Next i
+                If ((lTemp > 0 And lSlashPos > 0 And lTemp > lSlashPos) Or (lTemp > 0 And lSlashPos = 0)) Then
+                    'found the old name in this string, replace it
+                    j = aNewName.Length
+                    lHspfFile.Name = Mid(lTempName, 1, lTemp - 1) & aNewName & Mid(lTempName, lTemp + lOldLength)
+                Else  'just add the new scen name
+                    If lSlashPos = 0 Then 'no path
+                        lHspfFile.Name = aNewName & "." & lTempName
+                    Else 'have a path name, insert after slash
+                        lHspfFile.Name = Mid(lTempName, 1, lSlashPos) & aNewName & "." & Mid(lTempName, lSlashPos + 1, j)
+                    End If
+                End If
+            End If
+            lFiles.Add(lHspfFile)
+        Next
+        pFiles.Clear()
+        pFiles = lFiles
+    End Sub
+
 End Class

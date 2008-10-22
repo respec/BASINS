@@ -16,7 +16,24 @@ Module modUCIEditor
     Private pScenarioNameNew As String
     Private pUpdateFileName As String = "C:\test\HSPF\Updates.txt"
     Private pdoVerify As Boolean = False
+    Private pscenList As New ArrayList()
 
+    Private pHSPFExe As String = "C:\Basins\models\HSPF\bin\WinHspfLt.exe"
+    Private pHspfOutputFolder As String = "?"
+    Private pRunModel As Boolean = True
+
+    Sub setUpScenDirs(ByVal scenList As ArrayList)
+        For Each scen As String In scenList
+            If IO.Directory.Exists(pOutputDir & scen) Then
+                Dim di As New System.IO.DirectoryInfo(pOutputDir & scen)
+                di.Delete(True)
+            End If
+            IO.Directory.CreateDirectory(pOutputDir & scen)
+            FileCopy(pBaseDir & "base.wdm", pOutputDir & scen & "\" & scen & ".wdm")
+            FileCopy(pBaseDir & "base.output.wdm", pOutputDir & scen & "\" & scen & ".output.wdm")
+            FileCopy(pBaseDir & "base.ptsrc.wdm", pOutputDir & scen & "\" & scen & ".ptsrc.wdm")
+        Next
+    End Sub
     Sub Initialize()
         Select Case pScenario
             Case "mono"
@@ -24,11 +41,16 @@ Module modUCIEditor
                 pBaseDir = pBaseDrive & "mono_luChange\"
                 pOutputDir = pBaseDir & "output\"
                 pScenarioName = "base"
-                pScenarioNameNew = "LU_Ch"
+                'pScenarioNameNew = "LU_Ch"
                 'pUpdateFileName = pBaseDir & "lu2030a2.csv"
                 'pUpdateFileName = pBaseDir & "lu2030b2.csv"
                 'pUpdateFileName = pBaseDir & "lu2090a2.csv"
-                pUpdateFileName = pBaseDir & "lu2090b2.csv"
+                'pUpdateFileName = pBaseDir & "lu2090b2.csv"
+                pscenList.Add("lu2030a2")
+                pscenList.Add("lu2030b2")
+                pscenList.Add("lu2090a2")
+                pscenList.Add("lu2090b2")
+                setUpScenDirs(pscenList)
             Case "hspf10"
                 pBaseDrive = "c:\"
                 pBaseDir = pBaseDrive & "test\HSPF\"
@@ -62,7 +84,7 @@ Module modUCIEditor
             End If
             Return
         End If
-        
+
         Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
         Dim lUci As New atcUCI.HspfUci
 
@@ -89,16 +111,66 @@ Module modUCIEditor
             End If
             Logger.Flush()
 
-            If ModifyAreasInSchematicBlock(lUci) Then
-                Logger.Msg("update loaded")
-                lUci.Name = pScenarioNameNew & ".uci"
-                lUci.Save()
-                Logger.Dbg("UCI " & lUci.Name & " Saved")
+            'Loop through all scenarios and save their own set up in their own folders
+            '
+
+            Dim oldScen As String = ""
+            For Each scen As String In pscenList
+                If oldScen = "" Then oldScen = "base" 'first round, the old scen name is 'base.*'
+                pUpdateFileName = scen & ".csv"
+                pScenarioNameNew = pOutputDir & scen & "\" & scen & ".uci"
+                pHspfOutputFolder = pOutputDir & scen
+                If ModifyAreasInSchematicBlock(lUci) Then
+                    Logger.Dbg("update loaded from " & pUpdateFileName)
+
+                    'Write out the sum of total area
+                    '
+                    Dim ltotalArea As Double = 0.0
+                    For Each lConnection As atcUCI.HspfConnection In lUci.Connections
+                        ltotalArea += lConnection.MFact
+                    Next
+                    'Logger.Msg("UCI " & lUci.Name & " covers total areage:" & ltotalArea.ToString)
+                    Logger.Dbg("UCI " & lUci.Name & " covers total areage:" & ltotalArea.ToString)
+                    Logger.Flush()
+
+                    ModifyFilesInFilesBlock(lUci, oldScen, scen)
+                    lUci.Name = pScenarioNameNew
+                    lUci.Save()
+                    Logger.Dbg("UCI " & lUci.Name & " Saved")
+                    Logger.Flush()
+
+                End If
+                oldScen = scen 'save the previous scen name for the file block for the replacement due to using the same luci object
+            Next
+            Logger.Msg("Done Setting up Hspf Land use change inputs.")
+
+            'Run Hspf
+            If pRunModel Then
+                For Each scen As String In pscenList
+                    pScenarioNameNew = pOutputDir & scen & "\" & scen & ".uci"
+                    pHspfOutputFolder = pOutputDir & scen
+
+                    Logger.Dbg("Launching " & IO.Path.GetFileName(pHSPFExe) & " in " & pHspfOutputFolder & " for " & pScenarioNameNew)
+                    Logger.Flush()
+                    LaunchProgram(pHSPFExe, pHspfOutputFolder, pScenarioNameNew)
+                    Logger.Dbg("HSPFRun Finished")
+                Next
             End If
         Catch ex As Exception
             Logger.Msg("Error: " & ex.ToString)
         End Try
     End Sub
+
+    Private Function ModifyFilesInFilesBlock(ByRef aUciOriginal As atcUCI.HspfUci, ByVal oldScen As String, ByVal newScen As String) As Boolean
+        'Change the file names to corresponding scenario name
+
+        'aUciOriginal.FilesBlock.newNameAll("base.wdm", newScen & ".wdm")
+        'aUciOriginal.FilesBlock.newNameAll("base.output.wdm", newScen & ".output.wdm")
+        'aUciOriginal.FilesBlock.newNameAll("base.ptsrc.wdm", newScen & ".ptsrc.wdm")
+        'aUciOriginal.FilesBlock.newNameAll("base", newScen)
+        aUciOriginal.FilesBlock.newNameAll(oldScen, newScen)
+
+    End Function
 
     Private Function ModifyAreasInSchematicBlock(ByRef aUciOriginal As atcUCI.HspfUci) As Boolean
         'Replace area for each schematic source-2-target combination
