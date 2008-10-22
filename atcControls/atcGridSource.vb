@@ -277,13 +277,11 @@ Public Class atcGridSource
 
         For iCol As Integer = 0 To lMaxCol
             For iRow As Integer = 0 To lMaxRow
-                Try
-                    If CellValue(iRow, iCol).IndexOf(vbTab) > -1 Then
-                        lAddTabs(iCol) = True
-                        Exit For
-                    End If
-                Catch 'Ignore empty cells
-                End Try
+                lCellValue = CellValue(iRow, iCol)
+                If lCellValue IsNot Nothing AndAlso lCellValue.Contains(vbTab) Then
+                    lAddTabs(iCol) = True
+                    Exit For
+                End If
             Next
         Next
 
