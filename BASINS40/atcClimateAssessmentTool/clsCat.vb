@@ -1,18 +1,29 @@
 Imports atcData
 Imports atcUtility
+Imports atcControls
+
 Imports MapWinUtility
 Imports System.Windows.Forms
 
 Public Class clsCat
-    Friend Inputs As New Generic.List(Of atcVariation)
-    Friend Endpoints As New Generic.List(Of atcVariation)
-    Friend PreparedInputs As atcCollection
-    Friend SaveAll As Boolean = False
-    Friend ShowEachRunProgress As Boolean = False
-    Friend BaseScenario As String = ""
+    Public Inputs As New Generic.List(Of atcVariation)
+    Public Endpoints As New Generic.List(Of atcVariation)
+    Public PreparedInputs As Generic.List(Of String)
+    Public SaveAll As Boolean = False
+    Public ShowEachRunProgress As Boolean = False
+    Public BaseScenario As String = ""
+    Public ResultsGrid As New atcControls.atcGridSource
+    Public TimePerRun As Double = 0 'Time each run takes in seconds
 
-    Friend CLIGEN_NAME As String = "Cligen"
-    Friend StartFolderVariable As String = "{StartFolder}"
+    Friend Const CLIGEN_NAME As String = "Cligen"
+    Friend Const StartFolderVariable As String = "{StartFolder}"
+    Friend Const RunTitle As String = "Run"
+    Friend Const ResultsFixedRows As Integer = 4
+
+    Public Event Started()
+    Public Event StatusUpdate(ByVal aStatus As String)
+    Public Event StartIteration(ByVal aIteration As Integer)
+    Public Event UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String)
 
     Public Property XML() As String
         Get
@@ -85,7 +96,7 @@ StartOver:
                                 OpenUCI(AbsolutePath(lChild.InnerText, CurDir))
                             Case "preparedinputs"
                                 If PreparedInputs Is Nothing Then
-                                    PreparedInputs = New atcCollection
+                                    PreparedInputs = New Generic.List(Of String)
                                 Else
                                     PreparedInputs.Clear()
                                 End If
@@ -184,4 +195,188 @@ StartOver:
         End If
         Return Nothing
     End Function
+
+    Public Function Start(ByVal aBaseScenario As String, ByVal aModifiedScenario As String, _
+                          ByVal aSelectedVariations As Generic.List(Of atcVariation), _
+                          ByVal aSelectedPreparedInputs As atcCollection) As Boolean
+        'header for attributes
+        Dim lNumInputColumns As Integer
+        If aSelectedVariations Is Nothing Then
+            lNumInputColumns = 0
+        Else
+            lNumInputColumns = aSelectedVariations.Count
+        End If
+
+        ResultsGrid = New atcGridSource
+        With ResultsGrid
+            Dim lUsingSeasons As Boolean = False
+            Dim lColumn As Integer = 1
+            .FixedRows = ResultsFixedRows
+            .FixedColumns = 1
+            .Columns = 1 + lNumInputColumns
+            .CellValue(0, 0) = RunTitle
+
+            For Each lVariation As atcVariation In Endpoints
+                If lVariation.Selected Then
+                    .Columns += lVariation.DataSets.Count
+                End If
+            Next
+            .Rows = 5
+            lColumn = 1
+
+            If PreparedInputs Is Nothing Then
+                For Each lVariation As atcVariation In aSelectedVariations
+                    .CellValue(0, lColumn) = lVariation.Name
+                    .CellValue(1, lColumn) = lVariation.Operation
+                    .CellValue(2, lColumn) = "Current Value"
+                    If Not lVariation.Seasons Is Nothing Then
+                        .CellValue(3, lColumn) = lVariation.Seasons.ToString
+                    End If
+                    lColumn += 1
+                Next
+            End If
+
+            For Each lVariation As atcVariation In Endpoints
+                If lVariation.Selected Then
+                    For Each lDataset As atcDataSet In lVariation.DataSets
+                        .CellValue(0, lColumn) = lVariation.Name
+                        If Not lVariation.Operation Is Nothing Then
+                            .CellValue(1, lColumn) = lVariation.Operation
+                        End If
+                        .CellValue(2, lColumn) = lDataset.ToString
+                        If Not lVariation.Seasons Is Nothing Then
+                            .CellValue(3, lColumn) = lVariation.Seasons.ToString
+                        End If
+                        lColumn += 1
+                    Next
+                End If
+            Next
+        End With
+        RaiseEvent Started()
+        'don't let winhspflt bring up message boxes
+        Dim lBaseFolder As String = PathNameOnly(AbsolutePath(aBaseScenario, CurDir))
+        SaveFileString(lBaseFolder & "\WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
+
+        Dim lRuns As Integer = 0
+        Run(aModifiedScenario, _
+             aSelectedVariations, _
+            aSelectedPreparedInputs, _
+            aBaseScenario, _
+            lRuns, 0, Nothing)
+    End Function
+
+    Private Sub Run(ByVal aModifiedScenarioName As String, _
+                    ByVal aVariations As Generic.List(Of atcVariation), _
+                    ByVal aPreparedInputs As atcCollection, _
+                    ByVal aBaseFileName As String, _
+                    ByRef aIteration As Integer, _
+                    ByRef aStartVariationIndex As Integer, _
+                    ByRef aModifiedData As atcDataGroup)
+
+        If Not g_running Then
+            RaiseEvent StatusUpdate("Stopping Run")
+        Else
+            Logger.Dbg("Run")
+            If aModifiedData Is Nothing Then
+                aModifiedData = New atcDataGroup
+            End If
+            ChDriveDir(PathNameOnly(aBaseFileName))
+
+            If aStartVariationIndex >= aVariations.Count Then 'All variations have values, do a model run
+NextIteration:
+                Dim lPreparedInput As String
+                Dim lModifiedScenarioName As String
+
+                If aPreparedInputs Is Nothing Then
+                    lPreparedInput = ""
+                    lModifiedScenarioName = aModifiedScenarioName
+                    If SaveAll Then
+                        lModifiedScenarioName &= "-" & aIteration + 1
+                    End If
+                Else
+                    lPreparedInput = aPreparedInputs.ItemByIndex(aIteration)
+                    lModifiedScenarioName = IO.Path.GetFileNameWithoutExtension(PathNameOnly(lPreparedInput))
+                End If
+
+                RaiseEvent StartIteration(aIteration)
+                TimePerRun = Now.ToOADate
+                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, True, ShowEachRunProgress, False)
+                If lResults Is Nothing Then
+                    Logger.Dbg("Null scenario results from ScenarioRun")
+                    Exit Sub
+                End If
+                TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
+
+                RaiseEvent UpdateResults(aIteration, lResults, PathNameOnly(aBaseFileName) & "\" & lModifiedScenarioName & ".results.txt")
+
+                'Close any open results
+                For Each lSpecification As String In lResults
+                    lSpecification = lSpecification.ToLower
+                    Dim lMatchDataSource As atcDataSource = Nothing
+                    For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                        If lDataSource.Specification.ToLower = lSpecification Then
+                            lMatchDataSource = lDataSource
+                            Exit For
+                        End If
+                    Next
+                    If Not lMatchDataSource Is Nothing Then
+                        'lMatchDataSource.clear 'TODO: want to make sure we don't have a memory leak here
+                        atcDataManager.DataSources.Remove(lMatchDataSource)
+                    End If
+                Next
+
+                aIteration += 1
+                If g_running AndAlso Not aPreparedInputs Is Nothing AndAlso aIteration < aPreparedInputs.Count Then
+                    GoTo NextIteration
+                End If
+            Else 'Need to loop through values for next variation
+                Dim lVariation As atcVariation = aVariations.Item(aStartVariationIndex)
+                With lVariation
+                    Dim lOriginalDatasets As atcDataGroup = .DataSets.Clone
+                    'save version of data modified by an earlier variation if it will also be modified by this one
+                    Dim lReModifiedData As New atcDataGroup
+
+                    For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
+                        Dim lSourceDataSet As atcTimeseries = .DataSets(lDataSetIndex)
+                        Dim lModifiedIndex As Integer = aModifiedData.Keys.IndexOf(lSourceDataSet)
+                        If lModifiedIndex >= 0 Then
+                            .DataSets.Item(lDataSetIndex) = aModifiedData.ItemByIndex(lModifiedIndex)
+                            lReModifiedData.Add(lSourceDataSet, aModifiedData.ItemByIndex(lModifiedIndex))
+                            aModifiedData.RemoveAt(lModifiedIndex)
+                        End If
+                    Next
+
+                    'Start varying data
+                    Dim lModifiedGroup As atcDataGroup = .StartIteration
+
+                    While g_running And Not lModifiedGroup Is Nothing
+                        'Remove existing modified data also modified by this variation
+                        'Most cases of this were handled above when creating lReModifiedData, 
+                        'but side-effect computation like PET still needs removing here
+                        For Each lKey As Object In lModifiedGroup.Keys
+                            aModifiedData.RemoveByKey(lKey)
+                        Next
+
+                        aModifiedData.Add(lModifiedGroup)
+
+                        'We have handled a variation, now recursively handle more input variations or run the model
+                        Run(aModifiedScenarioName, _
+                            aVariations, _
+                            aPreparedInputs, _
+                            aBaseFileName, _
+                            aIteration, _
+                            aStartVariationIndex + 1, _
+                            aModifiedData)
+
+                        aModifiedData.Remove(lModifiedGroup)
+                        lModifiedGroup = .NextIteration
+                    End While
+
+                    aModifiedData.Add(lReModifiedData)
+
+                    .DataSets = lOriginalDatasets
+                End With
+            End If
+        End If
+    End Sub
 End Class

@@ -705,10 +705,6 @@ Public Class frmCAT
     End Sub
 
 #End Region
-
-    Private Const RunTitle As String = "Run"
-    Private Const ResultsFixedRows As Integer = 4
-
     'Private pPlugin As atcClimateAssessmentToolPlugin
 
     Private pUnsaved As Boolean = False
@@ -720,12 +716,11 @@ Public Class frmCAT
 
     Private pResultsTabIndex As Integer = 2
     Private pTotalIterations As Integer = 0
-    Private pTimePerRun As Double = 0 'Time each run takes in seconds
-    Private pCat As New clsCat
+    Private WithEvents pCat As New clsCat
 
     Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin)
         mnuPivotHeaders.Checked = GetSetting("BasinsCAT", "Settings", "PivotHeaders", "Yes").Equals("Yes")
-        pTimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
+        pCat.TimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
         Me.Show()
 
         'pPlugin = aPlugin
@@ -735,11 +730,8 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
-        Dim lSelectedVariations As atcCollection = New atcCollection
+        Dim lSelectedVariations As New Generic.List(Of atcVariation) 
         Dim lSelectedPreparedInputs As atcCollection
-        Dim lNumInputColumns As Integer
-        Dim lRuns As Integer = 0
-        Dim lVariation As atcVariation
 
         g_running = True
         btnStart.Visible = False
@@ -754,206 +746,30 @@ Public Class frmCAT
         If pCat.PreparedInputs Is Nothing Then
             lSelectedPreparedInputs = Nothing
             'Make a collection of the variations that are selected/checked in lstInputs
-            For Each lVariation In pCat.Inputs
+            For Each lVariation As atcVariation In pCat.Inputs
                 If lVariation.Selected Then lSelectedVariations.Add(lVariation)
             Next
-            lNumInputColumns = lSelectedVariations.Count
         Else
             lSelectedPreparedInputs = New atcCollection
             For Each lInputIndex As Integer In lstInputs.CheckedIndices
-                lSelectedPreparedInputs.Add(pCat.PreparedInputs.ItemByIndex(lInputIndex))
+                lSelectedPreparedInputs.Add(pCat.PreparedInputs.Item(lInputIndex))
             Next
-            lNumInputColumns = 0
         End If
 
-        'header for attributes
-        agdResults.Source = New atcGridSource
-        With agdResults.Source
-            Dim lUsingSeasons As Boolean = False
-            Dim lColumn As Integer = 1
-            .FixedRows = ResultsFixedRows
-            .FixedColumns = 1
-            .Columns = 1 + lNumInputColumns
-            .CellValue(0, 0) = RunTitle
+        pCat.Start(txtBaseScenario.Text, txtModifiedScenarioName.Text, lSelectedVariations, lSelectedPreparedInputs)
 
-            For Each lVariation In pCat.Endpoints
-                If lVariation.Selected Then
-                    .Columns += lVariation.DataSets.Count
-                End If
-            Next
-            .Rows = 5
-            lColumn = 1
-
-            If pCat.PreparedInputs Is Nothing Then
-                For Each lVariation In lSelectedVariations
-                    .CellValue(0, lColumn) = lVariation.Name
-                    .CellValue(1, lColumn) = lVariation.Operation
-                    .CellValue(2, lColumn) = "Current Value"
-                    If Not lVariation.Seasons Is Nothing Then
-                        .CellValue(3, lColumn) = lVariation.Seasons.ToString
-                    End If
-                    lColumn += 1
-                Next
-            End If
-
-            For Each lVariation In pCat.Endpoints
-                If lVariation.Selected Then
-                    For Each lDataset As atcDataSet In lVariation.DataSets
-                        .CellValue(0, lColumn) = lVariation.Name
-                        If Not lVariation.Operation Is Nothing Then
-                            .CellValue(1, lColumn) = lVariation.Operation
-                        End If
-                        .CellValue(2, lColumn) = lDataset.ToString
-                        If Not lVariation.Seasons Is Nothing Then
-                            .CellValue(3, lColumn) = lVariation.Seasons.ToString
-                        End If
-                        lColumn += 1
-                    Next
-                End If
-            Next
-        End With
-        ColorResultsGrid()
-        agdResults.Initialize(agdResults.Source)
-        agdResults.SizeAllColumnsToContents()
-        agdResults.Refresh()
-
-        myTabs.SelectedIndex = pResultsTabIndex
-
-        'don't let winhspflt bring up message boxes
-        Dim lBaseFolder As String = PathNameOnly(AbsolutePath(txtBaseScenario.Text, CurDir))
-        SaveFileString(lBaseFolder & "\WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
-
-        Run(txtModifiedScenarioName.Text, _
-            lSelectedVariations, _
-            lSelectedPreparedInputs, _
-            txtBaseScenario.Text, _
-            lRuns, 0, Nothing)
-
-        SaveSetting("BasinsCAT", "Settings", "TimePerRun", pTimePerRun)
+        SaveSetting("BasinsCAT", "Settings", "TimePerRun", pCat.TimePerRun)
 
         PopulatePivotCombos()
-        UpdateStatusLabel("Finished with " & lRuns & " runs")
+        UpdateStatusLabel("Finished runs")
         g_running = False
         btnStart.Visible = True
         btnStop.Visible = False
         lstEndpoints.Enabled = True
         lstInputs.Enabled = True
-
     End Sub
 
-    Private Sub Run(ByVal aModifiedScenarioName As String, _
-                    ByVal aVariations As atcCollection, _
-                    ByVal aPreparedInputs As atcCollection, _
-                    ByVal aBaseFileName As String, _
-                    ByRef aIteration As Integer, _
-                    ByRef aStartVariation As Integer, _
-                    ByRef aModifiedData As atcDataGroup)
-
-        If Not g_running Then
-            UpdateStatusLabel("Stopping Run")
-        Else
-            Logger.Dbg("Run")
-            If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
-            ChDriveDir(PathNameOnly(aBaseFileName))
-
-            If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
-NextIteration:
-                Dim lPreparedInput As String
-                Dim lModifiedScenarioName As String
-
-                If aPreparedInputs Is Nothing Then
-                    lPreparedInput = ""
-                    lModifiedScenarioName = aModifiedScenarioName
-                    If chkSaveAll.Checked Then lModifiedScenarioName &= "-" & aIteration + 1
-                Else
-                    lPreparedInput = aPreparedInputs.ItemByIndex(aIteration)
-                    lModifiedScenarioName = IO.Path.GetFileNameWithoutExtension(PathNameOnly(lPreparedInput))
-                End If
-
-                UpdateStatusLabel(aIteration)
-                pTimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, True, chkShowEachRunProgress.Checked, False)
-                If lResults Is Nothing Then
-                    Logger.Dbg("Null scenario results from ScenarioRun")
-                    Exit Sub
-                End If
-                pTimePerRun = (Now.ToOADate - pTimePerRun) * 24 * 60 * 60 'Convert days to seconds
-
-                UpdateResults(aIteration, lResults, PathNameOnly(aBaseFileName) & "\" & lModifiedScenarioName & ".results.txt")
-
-                'Close any open results
-                For Each lSpecification As String In lResults
-                    lSpecification = lSpecification.ToLower
-                    Dim lMatchDataSource As atcDataSource = Nothing
-                    For Each lDataSource As atcDataSource In atcDataManager.DataSources
-                        If lDataSource.Specification.ToLower = lSpecification Then
-                            lMatchDataSource = lDataSource
-                            Exit For
-                        End If
-                    Next
-                    If Not lMatchDataSource Is Nothing Then
-                        'lMatchDataSource.clear 'TODO: want to make sure we don't have a memory leak here
-                        atcDataManager.DataSources.Remove(lMatchDataSource)
-                    End If
-                Next
-
-                aIteration += 1
-                If g_running AndAlso Not aPreparedInputs Is Nothing AndAlso aIteration < aPreparedInputs.Count Then
-                    GoTo NextIteration
-                End If
-
-            Else 'Need to loop through values for next variation
-                Dim lVariation As atcVariation = aVariations.ItemByIndex(aStartVariation)
-                With lVariation
-                    Dim lOriginalDatasets As atcDataGroup = .DataSets.Clone
-                    'save version of data modified by an earlier variation if it will also be modified by this one
-                    Dim lReModifiedData As New atcDataGroup
-
-                    For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
-                        Dim lSourceDataSet As atcTimeseries = .DataSets(lDataSetIndex)
-                        Dim lModifiedIndex As Integer = aModifiedData.Keys.IndexOf(lSourceDataSet)
-                        If lModifiedIndex >= 0 Then
-                            .DataSets.Item(lDataSetIndex) = aModifiedData.ItemByIndex(lModifiedIndex)
-                            lReModifiedData.Add(lSourceDataSet, aModifiedData.ItemByIndex(lModifiedIndex))
-                            aModifiedData.RemoveAt(lModifiedIndex)
-                        End If
-                    Next
-
-                    'Start varying data
-                    Dim lModifiedGroup As atcDataGroup = .StartIteration
-
-                    While g_running And Not lModifiedGroup Is Nothing
-                        'Remove existing modified data also modified by this variation
-                        'Most cases of this were handled above when creating lReModifiedData, 
-                        'but side-effect computation like PET still needs removing here
-                        For Each lKey As Object In lModifiedGroup.Keys
-                            aModifiedData.RemoveByKey(lKey)
-                        Next
-
-                        aModifiedData.Add(lModifiedGroup)
-
-                        'We have handled a variation, now recursively handle more input variations or run the model
-                        Run(aModifiedScenarioName, _
-                            aVariations, _
-                            aPreparedInputs, _
-                            aBaseFileName, _
-                            aIteration, _
-                            aStartVariation + 1, _
-                            aModifiedData)
-
-                        aModifiedData.Remove(lModifiedGroup)
-                        lModifiedGroup = .NextIteration
-                    End While
-
-                    aModifiedData.Add(lReModifiedData)
-
-                    .DataSets = lOriginalDatasets
-                End With
-            End If
-        End If
-    End Sub
-
-    Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String)
+    Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String) Handles pCat.UpdateResults
         With agdResults.Source
             Dim lRow As Integer = aIteration + .FixedRows
             Dim lColumn As Integer = .FixedColumns
@@ -968,7 +784,7 @@ NextIteration:
                     End If
                 Next
             Else
-                .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(pCat.PreparedInputs.ItemByIndex(lstInputs.CheckedIndices.Item(aIteration))))
+                .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(pCat.PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
             End If
             .CellColor(lRow, 0) = Drawing.SystemColors.Control
 
@@ -1178,7 +994,7 @@ NextIteration:
         With agdResults
             .Source = Nothing
             .Source = New atcGridSource
-            .Source.FixedRows = ResultsFixedRows
+            .Source.FixedRows = clsCat.ResultsFixedRows
             .Source.FixedColumns = 1
             .Source.FromString(aNewContentsOfGrid)
             ColorResultsGrid()
@@ -1312,17 +1128,17 @@ NextIteration:
         End With
     End Sub
 
-    Private Sub UpdateStatusLabel(ByVal aText As String)
+    Private Sub UpdateStatusLabel(ByVal aText As String) Handles pCat.StatusUpdate
         Logger.Dbg(aText)
         lblTop.Text = aText
         lblTop.Refresh()
         Application.DoEvents()
     End Sub
 
-    Private Sub UpdateStatusLabel(ByVal aIteration As Integer)
+    Private Sub UpdateStatusLabel(ByVal aIteration As Integer) Handles pCat.StartIteration
         Dim lLabelText As String = "Running # " & aIteration + 1 & " of " & pTotalIterations
-        If pTimePerRun > 0 Then
-            Dim lFormattedTime As String = FormatTime(pTimePerRun * (pTotalIterations - aIteration))
+        If pCat.TimePerRun > 0 Then
+            Dim lFormattedTime As String = FormatTime(pCat.TimePerRun * (pTotalIterations - aIteration))
             If lFormattedTime.Length > 0 Then lLabelText &= " (" & lFormattedTime & " remaining)"
         End If
         UpdateStatusLabel(lLabelText)
@@ -1382,7 +1198,7 @@ NextIteration:
         Dim frmVary As New frmVariationCligen
         Dim lVariation As New VariationCligen
         With lVariation
-            .Name = pCat.CLIGEN_NAME
+            .Name = clsCat.CLIGEN_NAME
             .ComputationSource = New atcTimeseriesMath.atcTimeseriesMath
             .Operation = "Multiply"
             .Min = 0.9
@@ -1392,7 +1208,7 @@ NextIteration:
         lVariation = frmVary.AskUser(lVariation)
         If Not lVariation Is Nothing Then
             pUnsaved = True
-            If lVariation.Name.IndexOf(pCat.CLIGEN_NAME) < 0 Then lVariation.Name = pCat.CLIGEN_NAME & " " & lVariation.Name
+            If lVariation.Name.IndexOf(clsCat.CLIGEN_NAME) < 0 Then lVariation.Name = clsCat.CLIGEN_NAME & " " & lVariation.Name
             lVariation.Selected = True
             lVariation.CurrentValue = lVariation.Min
             pCat.Inputs.Add(lVariation)
@@ -1468,8 +1284,8 @@ NextIteration:
                 Next
                 pCat.Inputs = lKeepThese
             Else
-                Dim lRemoveFrom As atcCollection = pCat.PreparedInputs
-                Dim lKeepThese As New atcCollection
+                Dim lRemoveFrom As Generic.List(Of String) = pCat.PreparedInputs
+                Dim lKeepThese As New Generic.List(Of String)
                 For lIndex As Integer = 0 To lstInputs.Items.Count - 1
                     If Not lstInputs.SelectedIndices.Contains(lIndex) Then
                         lKeepThese.Add(lRemoveFrom.Item(lIndex))
@@ -1495,7 +1311,7 @@ NextIteration:
                 If FileExists(.FileName) Then
                     pUnsaved = True
                     If pCat.PreparedInputs Is Nothing Then
-                        pCat.PreparedInputs = New atcCollection
+                        pCat.PreparedInputs = New Generic.List(Of String)
                     Else
                         pCat.PreparedInputs.Clear()
                     End If
@@ -1540,7 +1356,7 @@ NextIteration:
         End If
     End Sub
 
-    Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aDirection As Integer)
+    Private Sub MoveItem(ByVal aGroup As Generic.List(Of String), ByVal aList As CheckedListBox, ByVal aDirection As Integer)
         Dim lMoveFrom As Integer = aList.SelectedIndex
         If lMoveFrom >= 0 AndAlso lMoveFrom < aGroup.Count Then
             pUnsaved = True
@@ -1548,7 +1364,7 @@ NextIteration:
 
             If lMoveTo >= 0 AndAlso lMoveTo < aGroup.Count Then
                 Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
-                Dim lMoveMe As Object = aGroup.ItemByIndex(lMoveFrom)
+                Dim lMoveMe As Object = aGroup.Item(lMoveFrom)
                 aGroup.RemoveAt(lMoveFrom)
                 aList.Items.RemoveAt(lMoveFrom)
                 aGroup.Insert(lMoveTo, lMoveMe)
@@ -1625,8 +1441,8 @@ NextIteration:
             pTotalIterations = pCat.PreparedInputs.Count
         End If
         lLabelText = "Total iterations selected = " & pTotalIterations
-        If pTimePerRun > 0 Then
-            Dim lFormattedTime As String = FormatTime(pTimePerRun * pTotalIterations)
+        If pCat.TimePerRun > 0 Then
+            Dim lFormattedTime As String = FormatTime(pCat.TimePerRun * pTotalIterations)
             If lFormattedTime.Length > 0 Then lLabelText &= " (" & lFormattedTime & ")"
         End If
         UpdateStatusLabel(lLabelText)
@@ -1806,5 +1622,15 @@ NextIteration:
 
     Private Sub txtBaseScenario_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBaseScenario.MouseClick
         pCat.OpenUCI()
+    End Sub
+
+    Private Sub pCat_Started() Handles pCat.Started
+        agdResults.Source = pCat.ResultsGrid
+        ColorResultsGrid()
+        agdResults.Initialize(agdResults.Source)
+        agdResults.SizeAllColumnsToContents()
+        agdResults.Refresh()
+
+        myTabs.SelectedIndex = pResultsTabIndex
     End Sub
 End Class

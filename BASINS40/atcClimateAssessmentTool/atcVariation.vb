@@ -350,6 +350,7 @@ Public Class atcVariation
                     lModifiedTS = MergeTimeseries(lModifiedSplit)
             End Select
 
+            lModifiedTS.Attributes.SetValue("ID", lOriginalData.Attributes.GetValue("ID"))
             lModifiedGroup.Add(lOriginalData, lModifiedTS)
 
             If PETdata.Count > lDataSetIndex Then
