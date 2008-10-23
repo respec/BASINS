@@ -102,6 +102,18 @@ Public Class frmSWMMSetup
         Me.ofdExisting = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.lblEnd = New System.Windows.Forms.Label
+        Me.lblStart = New System.Windows.Forms.Label
+        Me.lblDay = New System.Windows.Forms.Label
+        Me.lblMonth = New System.Windows.Forms.Label
+        Me.lblYear = New System.Windows.Forms.Label
+        Me.atxEDay = New atcControls.atcText
+        Me.atxSDay = New atcControls.atcText
+        Me.atxSYear = New atcControls.atcText
+        Me.atxEMonth = New atcControls.atcText
+        Me.atxSMonth = New atcControls.atcText
+        Me.atxEYear = New atcControls.atcText
         Me.cboOutlets = New System.Windows.Forms.ComboBox
         Me.Label5 = New System.Windows.Forms.Label
         Me.cboMet = New System.Windows.Forms.ComboBox
@@ -140,26 +152,14 @@ Public Class frmSWMMSetup
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
         Me.ofdClass = New System.Windows.Forms.OpenFileDialog
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox
-        Me.lblEnd = New System.Windows.Forms.Label
-        Me.lblStart = New System.Windows.Forms.Label
-        Me.lblDay = New System.Windows.Forms.Label
-        Me.lblMonth = New System.Windows.Forms.Label
-        Me.lblYear = New System.Windows.Forms.Label
-        Me.atxEDay = New atcControls.atcText
-        Me.atxSDay = New atcControls.atcText
-        Me.atxSYear = New atcControls.atcText
-        Me.atxEMonth = New atcControls.atcText
-        Me.atxSMonth = New atcControls.atcText
-        Me.atxEYear = New atcControls.atcText
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdOK
@@ -260,6 +260,209 @@ Public Class frmSWMMSetup
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.lblEnd)
+        Me.GroupBox3.Controls.Add(Me.lblStart)
+        Me.GroupBox3.Controls.Add(Me.lblDay)
+        Me.GroupBox3.Controls.Add(Me.lblMonth)
+        Me.GroupBox3.Controls.Add(Me.lblYear)
+        Me.GroupBox3.Controls.Add(Me.atxEDay)
+        Me.GroupBox3.Controls.Add(Me.atxSDay)
+        Me.GroupBox3.Controls.Add(Me.atxSYear)
+        Me.GroupBox3.Controls.Add(Me.atxEMonth)
+        Me.GroupBox3.Controls.Add(Me.atxSMonth)
+        Me.GroupBox3.Controls.Add(Me.atxEYear)
+        Me.GroupBox3.Location = New System.Drawing.Point(15, 312)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(529, 104)
+        Me.GroupBox3.TabIndex = 27
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Simulation Dates"
+        '
+        'lblEnd
+        '
+        Me.lblEnd.AutoSize = True
+        Me.lblEnd.Location = New System.Drawing.Point(105, 67)
+        Me.lblEnd.Name = "lblEnd"
+        Me.lblEnd.Size = New System.Drawing.Size(33, 17)
+        Me.lblEnd.TabIndex = 37
+        Me.lblEnd.Text = "End"
+        '
+        'lblStart
+        '
+        Me.lblStart.AutoSize = True
+        Me.lblStart.Location = New System.Drawing.Point(100, 37)
+        Me.lblStart.Name = "lblStart"
+        Me.lblStart.Size = New System.Drawing.Size(38, 17)
+        Me.lblStart.TabIndex = 36
+        Me.lblStart.Text = "Start"
+        '
+        'lblDay
+        '
+        Me.lblDay.AutoSize = True
+        Me.lblDay.Location = New System.Drawing.Point(291, 16)
+        Me.lblDay.Name = "lblDay"
+        Me.lblDay.Size = New System.Drawing.Size(33, 17)
+        Me.lblDay.TabIndex = 35
+        Me.lblDay.Text = "Day"
+        '
+        'lblMonth
+        '
+        Me.lblMonth.AutoSize = True
+        Me.lblMonth.Location = New System.Drawing.Point(232, 16)
+        Me.lblMonth.Name = "lblMonth"
+        Me.lblMonth.Size = New System.Drawing.Size(47, 17)
+        Me.lblMonth.TabIndex = 34
+        Me.lblMonth.Text = "Month"
+        '
+        'lblYear
+        '
+        Me.lblYear.AutoSize = True
+        Me.lblYear.Location = New System.Drawing.Point(150, 16)
+        Me.lblYear.Name = "lblYear"
+        Me.lblYear.Size = New System.Drawing.Size(38, 17)
+        Me.lblYear.TabIndex = 33
+        Me.lblYear.Text = "Year"
+        '
+        'atxEDay
+        '
+        Me.atxEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEDay.DefaultValue = ""
+        Me.atxEDay.HardMax = 31
+        Me.atxEDay.HardMin = 1
+        Me.atxEDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEDay.Location = New System.Drawing.Point(294, 67)
+        Me.atxEDay.MaxWidth = 20
+        Me.atxEDay.Name = "atxEDay"
+        Me.atxEDay.NumericFormat = "0"
+        Me.atxEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEDay.SelLength = 2
+        Me.atxEDay.SelStart = 0
+        Me.atxEDay.Size = New System.Drawing.Size(53, 24)
+        Me.atxEDay.SoftMax = -999
+        Me.atxEDay.SoftMin = -999
+        Me.atxEDay.TabIndex = 32
+        Me.atxEDay.ValueDouble = 31
+        Me.atxEDay.ValueInteger = 31
+        '
+        'atxSDay
+        '
+        Me.atxSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSDay.DefaultValue = ""
+        Me.atxSDay.HardMax = 31
+        Me.atxSDay.HardMin = 1
+        Me.atxSDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSDay.Location = New System.Drawing.Point(294, 37)
+        Me.atxSDay.MaxWidth = 20
+        Me.atxSDay.Name = "atxSDay"
+        Me.atxSDay.NumericFormat = "0"
+        Me.atxSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSDay.SelLength = 1
+        Me.atxSDay.SelStart = 0
+        Me.atxSDay.Size = New System.Drawing.Size(53, 24)
+        Me.atxSDay.SoftMax = -999
+        Me.atxSDay.SoftMin = -999
+        Me.atxSDay.TabIndex = 31
+        Me.atxSDay.ValueDouble = 1
+        Me.atxSDay.ValueInteger = 1
+        '
+        'atxSYear
+        '
+        Me.atxSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSYear.DefaultValue = ""
+        Me.atxSYear.HardMax = 9999
+        Me.atxSYear.HardMin = 0
+        Me.atxSYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSYear.Location = New System.Drawing.Point(153, 37)
+        Me.atxSYear.MaxWidth = 20
+        Me.atxSYear.Name = "atxSYear"
+        Me.atxSYear.NumericFormat = "0"
+        Me.atxSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSYear.SelLength = 4
+        Me.atxSYear.SelStart = 0
+        Me.atxSYear.Size = New System.Drawing.Size(76, 24)
+        Me.atxSYear.SoftMax = -999
+        Me.atxSYear.SoftMin = -999
+        Me.atxSYear.TabIndex = 30
+        Me.atxSYear.ValueDouble = 2000
+        Me.atxSYear.ValueInteger = 2000
+        '
+        'atxEMonth
+        '
+        Me.atxEMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEMonth.DefaultValue = ""
+        Me.atxEMonth.HardMax = 12
+        Me.atxEMonth.HardMin = 1
+        Me.atxEMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEMonth.Location = New System.Drawing.Point(235, 67)
+        Me.atxEMonth.MaxWidth = 20
+        Me.atxEMonth.Name = "atxEMonth"
+        Me.atxEMonth.NumericFormat = "0"
+        Me.atxEMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEMonth.SelLength = 2
+        Me.atxEMonth.SelStart = 0
+        Me.atxEMonth.Size = New System.Drawing.Size(53, 24)
+        Me.atxEMonth.SoftMax = -999
+        Me.atxEMonth.SoftMin = -999
+        Me.atxEMonth.TabIndex = 29
+        Me.atxEMonth.ValueDouble = 12
+        Me.atxEMonth.ValueInteger = 12
+        '
+        'atxSMonth
+        '
+        Me.atxSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSMonth.DefaultValue = ""
+        Me.atxSMonth.HardMax = 12
+        Me.atxSMonth.HardMin = 1
+        Me.atxSMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSMonth.Location = New System.Drawing.Point(235, 37)
+        Me.atxSMonth.MaxWidth = 20
+        Me.atxSMonth.Name = "atxSMonth"
+        Me.atxSMonth.NumericFormat = "0"
+        Me.atxSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSMonth.SelLength = 1
+        Me.atxSMonth.SelStart = 0
+        Me.atxSMonth.Size = New System.Drawing.Size(53, 24)
+        Me.atxSMonth.SoftMax = -999
+        Me.atxSMonth.SoftMin = -999
+        Me.atxSMonth.TabIndex = 28
+        Me.atxSMonth.ValueDouble = 1
+        Me.atxSMonth.ValueInteger = 1
+        '
+        'atxEYear
+        '
+        Me.atxEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEYear.DefaultValue = ""
+        Me.atxEYear.HardMax = 9999
+        Me.atxEYear.HardMin = 0
+        Me.atxEYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEYear.Location = New System.Drawing.Point(153, 67)
+        Me.atxEYear.MaxWidth = 20
+        Me.atxEYear.Name = "atxEYear"
+        Me.atxEYear.NumericFormat = "0"
+        Me.atxEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEYear.SelLength = 4
+        Me.atxEYear.SelStart = 0
+        Me.atxEYear.Size = New System.Drawing.Size(76, 24)
+        Me.atxEYear.SoftMax = -999
+        Me.atxEYear.SoftMin = -999
+        Me.atxEYear.TabIndex = 27
+        Me.atxEYear.ValueDouble = 2000
+        Me.atxEYear.ValueInteger = 2000
         '
         'cboOutlets
         '
@@ -510,7 +713,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(2, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(551, 420)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(554, 420)
         Me.AtcConnectFields.TabIndex = 2
         '
         'TabPage6
@@ -607,7 +810,7 @@ Public Class frmSWMMSetup
         Me.AtcGridPrec.LineWidth = 0.0!
         Me.AtcGridPrec.Location = New System.Drawing.Point(21, 136)
         Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 225)
+        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 223)
         Me.AtcGridPrec.Source = Nothing
         Me.AtcGridPrec.TabIndex = 19
         '
@@ -628,7 +831,7 @@ Public Class frmSWMMSetup
         '
         Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 27)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 28)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
         Me.txtMetWDMName.Size = New System.Drawing.Size(384, 23)
@@ -637,7 +840,7 @@ Public Class frmSWMMSetup
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 25)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 26)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -681,209 +884,6 @@ Public Class frmSWMMSetup
         Me.ofdClass.Filter = "DBF Files (*.dbf)|*.dbf"
         Me.ofdClass.Title = "Select Classification File"
         '
-        'GroupBox3
-        '
-        Me.GroupBox3.Controls.Add(Me.lblEnd)
-        Me.GroupBox3.Controls.Add(Me.lblStart)
-        Me.GroupBox3.Controls.Add(Me.lblDay)
-        Me.GroupBox3.Controls.Add(Me.lblMonth)
-        Me.GroupBox3.Controls.Add(Me.lblYear)
-        Me.GroupBox3.Controls.Add(Me.atxEDay)
-        Me.GroupBox3.Controls.Add(Me.atxSDay)
-        Me.GroupBox3.Controls.Add(Me.atxSYear)
-        Me.GroupBox3.Controls.Add(Me.atxEMonth)
-        Me.GroupBox3.Controls.Add(Me.atxSMonth)
-        Me.GroupBox3.Controls.Add(Me.atxEYear)
-        Me.GroupBox3.Location = New System.Drawing.Point(15, 312)
-        Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(529, 104)
-        Me.GroupBox3.TabIndex = 27
-        Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Simulation Dates"
-        '
-        'lblEnd
-        '
-        Me.lblEnd.AutoSize = True
-        Me.lblEnd.Location = New System.Drawing.Point(105, 67)
-        Me.lblEnd.Name = "lblEnd"
-        Me.lblEnd.Size = New System.Drawing.Size(33, 17)
-        Me.lblEnd.TabIndex = 37
-        Me.lblEnd.Text = "End"
-        '
-        'lblStart
-        '
-        Me.lblStart.AutoSize = True
-        Me.lblStart.Location = New System.Drawing.Point(100, 37)
-        Me.lblStart.Name = "lblStart"
-        Me.lblStart.Size = New System.Drawing.Size(38, 17)
-        Me.lblStart.TabIndex = 36
-        Me.lblStart.Text = "Start"
-        '
-        'lblDay
-        '
-        Me.lblDay.AutoSize = True
-        Me.lblDay.Location = New System.Drawing.Point(291, 17)
-        Me.lblDay.Name = "lblDay"
-        Me.lblDay.Size = New System.Drawing.Size(33, 17)
-        Me.lblDay.TabIndex = 35
-        Me.lblDay.Text = "Day"
-        '
-        'lblMonth
-        '
-        Me.lblMonth.AutoSize = True
-        Me.lblMonth.Location = New System.Drawing.Point(234, 17)
-        Me.lblMonth.Name = "lblMonth"
-        Me.lblMonth.Size = New System.Drawing.Size(47, 17)
-        Me.lblMonth.TabIndex = 34
-        Me.lblMonth.Text = "Month"
-        '
-        'lblYear
-        '
-        Me.lblYear.AutoSize = True
-        Me.lblYear.Location = New System.Drawing.Point(150, 17)
-        Me.lblYear.Name = "lblYear"
-        Me.lblYear.Size = New System.Drawing.Size(38, 17)
-        Me.lblYear.TabIndex = 33
-        Me.lblYear.Text = "Year"
-        '
-        'atxEDay
-        '
-        Me.atxEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxEDay.DefaultValue = ""
-        Me.atxEDay.HardMax = 31
-        Me.atxEDay.HardMin = 1
-        Me.atxEDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEDay.Location = New System.Drawing.Point(294, 67)
-        Me.atxEDay.MaxWidth = 20
-        Me.atxEDay.Name = "atxEDay"
-        Me.atxEDay.NumericFormat = "0"
-        Me.atxEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxEDay.SelLength = 2
-        Me.atxEDay.SelStart = 0
-        Me.atxEDay.Size = New System.Drawing.Size(53, 24)
-        Me.atxEDay.SoftMax = -999
-        Me.atxEDay.SoftMin = -999
-        Me.atxEDay.TabIndex = 32
-        Me.atxEDay.ValueDouble = 31
-        Me.atxEDay.ValueInteger = 31
-        '
-        'atxSDay
-        '
-        Me.atxSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxSDay.DefaultValue = ""
-        Me.atxSDay.HardMax = 31
-        Me.atxSDay.HardMin = 1
-        Me.atxSDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSDay.Location = New System.Drawing.Point(294, 37)
-        Me.atxSDay.MaxWidth = 20
-        Me.atxSDay.Name = "atxSDay"
-        Me.atxSDay.NumericFormat = "0"
-        Me.atxSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxSDay.SelLength = 1
-        Me.atxSDay.SelStart = 0
-        Me.atxSDay.Size = New System.Drawing.Size(53, 24)
-        Me.atxSDay.SoftMax = -999
-        Me.atxSDay.SoftMin = -999
-        Me.atxSDay.TabIndex = 31
-        Me.atxSDay.ValueDouble = 1
-        Me.atxSDay.ValueInteger = 1
-        '
-        'atxSYear
-        '
-        Me.atxSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxSYear.DefaultValue = ""
-        Me.atxSYear.HardMax = 9999
-        Me.atxSYear.HardMin = 0
-        Me.atxSYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSYear.Location = New System.Drawing.Point(153, 37)
-        Me.atxSYear.MaxWidth = 20
-        Me.atxSYear.Name = "atxSYear"
-        Me.atxSYear.NumericFormat = "0"
-        Me.atxSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxSYear.SelLength = 4
-        Me.atxSYear.SelStart = 0
-        Me.atxSYear.Size = New System.Drawing.Size(76, 24)
-        Me.atxSYear.SoftMax = -999
-        Me.atxSYear.SoftMin = -999
-        Me.atxSYear.TabIndex = 30
-        Me.atxSYear.ValueDouble = 2000
-        Me.atxSYear.ValueInteger = 2000
-        '
-        'atxEMonth
-        '
-        Me.atxEMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxEMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxEMonth.DefaultValue = ""
-        Me.atxEMonth.HardMax = 12
-        Me.atxEMonth.HardMin = 1
-        Me.atxEMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEMonth.Location = New System.Drawing.Point(235, 67)
-        Me.atxEMonth.MaxWidth = 20
-        Me.atxEMonth.Name = "atxEMonth"
-        Me.atxEMonth.NumericFormat = "0"
-        Me.atxEMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxEMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxEMonth.SelLength = 2
-        Me.atxEMonth.SelStart = 0
-        Me.atxEMonth.Size = New System.Drawing.Size(53, 24)
-        Me.atxEMonth.SoftMax = -999
-        Me.atxEMonth.SoftMin = -999
-        Me.atxEMonth.TabIndex = 29
-        Me.atxEMonth.ValueDouble = 12
-        Me.atxEMonth.ValueInteger = 12
-        '
-        'atxSMonth
-        '
-        Me.atxSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxSMonth.DefaultValue = ""
-        Me.atxSMonth.HardMax = 12
-        Me.atxSMonth.HardMin = 1
-        Me.atxSMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSMonth.Location = New System.Drawing.Point(235, 37)
-        Me.atxSMonth.MaxWidth = 20
-        Me.atxSMonth.Name = "atxSMonth"
-        Me.atxSMonth.NumericFormat = "0"
-        Me.atxSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxSMonth.SelLength = 1
-        Me.atxSMonth.SelStart = 0
-        Me.atxSMonth.Size = New System.Drawing.Size(53, 24)
-        Me.atxSMonth.SoftMax = -999
-        Me.atxSMonth.SoftMin = -999
-        Me.atxSMonth.TabIndex = 28
-        Me.atxSMonth.ValueDouble = 1
-        Me.atxSMonth.ValueInteger = 1
-        '
-        'atxEYear
-        '
-        Me.atxEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxEYear.DefaultValue = ""
-        Me.atxEYear.HardMax = 9999
-        Me.atxEYear.HardMin = 0
-        Me.atxEYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEYear.Location = New System.Drawing.Point(153, 67)
-        Me.atxEYear.MaxWidth = 20
-        Me.atxEYear.Name = "atxEYear"
-        Me.atxEYear.NumericFormat = "0"
-        Me.atxEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxEYear.SelLength = 4
-        Me.atxEYear.SelStart = 0
-        Me.atxEYear.Size = New System.Drawing.Size(76, 24)
-        Me.atxEYear.SoftMax = -999
-        Me.atxEYear.SoftMin = -999
-        Me.atxEYear.TabIndex = 27
-        Me.atxEYear.ValueDouble = 2000
-        Me.atxEYear.ValueInteger = 2000
-        '
         'frmSWMMSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -904,6 +904,8 @@ Public Class frmSWMMSetup
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage2.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
@@ -912,8 +914,6 @@ Public Class frmSWMMSetup
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox3.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
