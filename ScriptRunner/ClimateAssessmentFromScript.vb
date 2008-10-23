@@ -9,6 +9,7 @@ Imports atcWDM
 Module ClimateAssessmentFromScript
     Private Const pBaseFolder As String = "D:\Basins\data\Climate\"
     Private Const pBaseName As String = "base"
+    Private WithEvents pCat As New atcClimateAssessmentTool.clsCat
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pBaseFolder)
@@ -16,7 +17,6 @@ Module ClimateAssessmentFromScript
         Dim lOriginalData As New atcDataSourceWDM
         lOriginalData.Open(pBaseName & ".wdm")
 
-        Dim pCat As New atcClimateAssessmentTool.clsCat
         With pCat
             .BaseScenario = pBaseFolder & pBaseName & ".uci"
             Dim lVariation As New atcVariation
@@ -53,5 +53,9 @@ Module ClimateAssessmentFromScript
             IO.File.WriteAllText("ClimateAssessmentFromScript.txt", pCat.ResultsGrid.ToString)
         End With
         Logger.Dbg("AllDone")
+    End Sub
+
+    Private Sub UpdateStatusLabel(ByVal aIteration As Integer) Handles pCat.StartIteration
+        pCat.StartIterationMessage(aIteration)
     End Sub
 End Module

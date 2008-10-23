@@ -20,11 +20,6 @@ Module CatRunner
     End Sub
 
     Private Sub UpdateStatusLabel(ByVal aIteration As Integer) Handles pCat.StartIteration
-        Dim lString As String = "StartIteration " & aIteration + 1 & " of " & pCat.TotalIterations & _
-                                " (" & ((100 * aIteration) / pCat.TotalIterations) & "%)"
-        If aIteration > 0 Then
-            lString &= " TimeToComplete " & FormatTime((pCat.TotalIterations - aIteration) * pCat.TimePerRun)
-        End If
-        Logger.Dbg(lString)
+        pCat.StartIterationMessage(aIteration)
     End Sub
 End Module
