@@ -25,8 +25,11 @@ Public Class frmAgPrac
         Dim vOper As Object
         Dim lOper As HspfOperation
         Dim lFreeFile, pcount As Integer
-        Dim lTempString, lTname, lStr, lFileLength, lTrimmedlStr As String
+        Dim lTempString, lFileLength, lTrimmedlStr As String
         Dim lCend As Boolean
+        Dim lTname As String = Nothing
+        Dim lStr As String = Nothing
+
 
         txtNA.Visible = False
         txtNA.Enabled = False
@@ -42,61 +45,62 @@ Public Class frmAgPrac
         comboRep.Items.Add("DY")
         comboRep.Items.Add("HR")
         comboRep.Items.Add("MI")
-        'read database
-        lFreeFile = FreeFile()
-        'On Error GoTo ErrHandler
-        lTname = "C:\Basins\models\HSPF\bin\starter" & "\" & "agpractice.txt"
-        FileOpen(lFreeFile, lTname, OpenMode.Input)
-        pcount = 0
+        Try
+            lFreeFile = FreeFile()
 
-        Do Until EOF(lFreeFile)
-            lstr = LineInput(lFreeFile)
-            lFileLength = Len(lStr)
-            If lFileLength > 6 Then
-                If Microsoft.VisualBasic.Left(lStr, 7) = "PRACTIC" Then
-                    'found start of a practice
-                    lTempString = StrRetRem(lStr)
-                    lstPrac.Items.Add(lStr)
-                    pcount = pcount + 1
-                    lCend = False
-                    Do While Not lCend
-                        lStr = LineInput(lFreeFile)
-                        lTrimmedlStr = Trim(lStr)
-                        lFileLength = Len(lTrimmedlStr)
-                        If Microsoft.VisualBasic.Left(lTrimmedlStr, lFileLength) = "END PRACTICE" Then
-                            'found end of practice
-                            lCend = True
-                        Else
-                            cPracIDs.Add(pcount)
-                            cPracRecs.Add(lStr)
-                        End If
-                    Loop
+            lTname = "C:\Basins\models\HSPF\bin\starter" & "\" & "agpractice.txt"
+            FileOpen(lFreeFile, lTname, OpenMode.Input)
+            pcount = 0
+
+            Do Until EOF(lFreeFile)
+                lStr = LineInput(lFreeFile)
+                lFileLength = Len(lStr)
+                If lFileLength > 6 Then
+                    If Microsoft.VisualBasic.Left(lStr, 7) = "PRACTIC" Then
+                        'found start of a practice
+                        lTempString = StrRetRem(lStr)
+                        lstPrac.Items.Add(lStr)
+                        pcount = pcount + 1
+                        lCend = False
+                        Do While Not lCend
+                            lStr = LineInput(lFreeFile)
+                            lTrimmedlStr = Trim(lStr)
+                            lFileLength = Len(lTrimmedlStr)
+                            If Microsoft.VisualBasic.Left(lTrimmedlStr, lFileLength) = "END PRACTICE" Then
+                                'found end of practice
+                                lCend = True
+                            Else
+                                cPracIDs.Add(pcount)
+                                cPracRecs.Add(lStr)
+                            End If
+                        Loop
+                    End If
                 End If
+            Loop
+            FileClose()
+            'formerly goto FillLists
+            For Each vOper In pUci.OpnSeqBlock.Opns
+                lOper = vOper
+                If lOper.Name = "PERLND" Then
+                    lstSeg.Items.Add(lOper.Name & " " & lOper.Id & " (" & lOper.Description & ")")
+                End If
+            Next
+
+            atxYear.HardMax = pUci.GlobalBlock.EDate(0)
+            atxYear.HardMin = pUci.GlobalBlock.SDate(0)
+
+            lstPrac.SetSelected(0, True)
+            lstSeg.SetSelected(0, True)
+            ShowDetails()
+        Catch e As Exception
+            If Err.Number = 53 Then
+                MsgBox("File " & lTname & " not found.", vbOKOnly, "Read Ag Practices Problem")
+            Else
+                MsgBox(Err.Description & vbCrLf & vbCrLf & lStr, vbOKOnly, "Read Ag Practices Problem")
             End If
-        Loop
-        FileClose()
-        'formerly goto FillLists
-        For Each vOper In pUci.OpnSeqBlock.Opns
-            lOper = vOper
-            If lOper.Name = "PERLND" Then
-                lstSeg.Items.Add(lOper.Name & " " & lOper.Id & " (" & lOper.Description & ")")
-            End If
-        Next
+        End Try
 
-        atxYear.HardMax = pUci.GlobalBlock.EDate(0)
-        atxYear.HardMin = pUci.GlobalBlock.SDate(0)
-
-        lstPrac.SetSelected(0, True)
-        lstSeg.SetSelected(0, True)
-        ShowDetails()
-
-        'ErrHandler:
-        '        If Err.Number = 53 Then
-        '            MsgBox("File " & tname & " not found.", vbOKOnly, "Read Ag Practices Problem")
-        '        Else
-        '            MsgBox(Err.Description & vbCrLf & vbCrLf & lstr, _
-        '              vbOKOnly, "Read Ag Practices Problem")
-        'End If
+        
 
     End Sub
 

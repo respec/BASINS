@@ -53,6 +53,19 @@ Public Module WinHSPF
         End If
     End Sub
 
+    Sub PollutantSelectorCheck()
+        If pUCI.Pollutants.Count > 0 Then
+            frmPollutant.Show()
+        Else
+            '.net conversion issue: verify this is the right message to display.
+            'Logger.Message("The current project contains no pollutant sources.", "Pollutant Selector Problem", _
+            '               MessageBoxButtons.OK, MessageBoxIcon.Information, DialogResult.OK)
+            frmPollutant.Show()
+        End If
+    End Sub
+
+
+
     Sub EditBlock(ByVal aParent As Windows.Forms.Form, ByVal aTableName As String)
         If aTableName = "GLOBAL" Then
             UCIForms.Edit(aParent, pUCI.GlobalBlock)
@@ -66,8 +79,7 @@ Public Module WinHSPF
             If pUCI.OpnBlks("RCHRES").Count > 0 Then
                 UCIForms.Edit(aParent, pUCI.OpnBlks("RCHRES").Ids(0).FTable)
             Else
-                Logger.Message("The current project contains no reaches.", "FTable Editor Problem", _
-                               MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
+                Logger.Message("The current project contains no reaches.", "FTable Editor Problem", MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
             End If
         ElseIf aTableName = "MONTH-DATA" Then
             UCIForms.Edit(aParent, pUCI.MonthData)
