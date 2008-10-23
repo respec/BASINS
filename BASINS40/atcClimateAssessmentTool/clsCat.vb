@@ -25,7 +25,7 @@ Public Class clsCat
     Public Event StartIteration(ByVal aIteration As Integer)
     Public Sub StartIterationMessage(ByVal aIteration As Integer) 'default message for batch runs
         Dim lString As String = "StartIteration " & aIteration + 1 & " of " & TotalIterations & _
-                            " (" & ((100 * aIteration) / TotalIterations) & "%)"
+                            " (" & CInt(((100 * aIteration) / TotalIterations)).ToString & "%)"
         If aIteration > 0 Then
             lString &= " TimeToComplete " & FormatTime((TotalIterations - aIteration) * TimePerRun)
         End If

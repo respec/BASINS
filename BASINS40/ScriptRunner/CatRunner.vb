@@ -11,10 +11,15 @@ Module CatRunner
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pBaseFolder)
         Logger.StartToFile("CatRunner.Log", , , True)
-        pCat.XML = IO.File.ReadAllText(pCatXMLFile)
-        pCat.StartRun("Modified")
-        Logger.Dbg("RunsComplete")
-        IO.File.WriteAllText("CatRunnerResults.txt", pCat.ResultsGrid.ToString)
+        With pCat
+            .XML = IO.File.ReadAllText(pCatXMLFile)
+            .StartRun("Modified")
+            Logger.Dbg("RunsComplete")
+            IO.File.WriteAllText("CatRunnerResults.txt", .ResultsGrid.ToString)
+            .Inputs.Clear()
+            .Endpoints.Clear()
+            .PreparedInputs.Clear()
+        End With
         Logger.Dbg("ResultsStored")
         Logger.Flush()
     End Sub

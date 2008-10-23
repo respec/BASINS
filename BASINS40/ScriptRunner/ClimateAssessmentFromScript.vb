@@ -51,6 +51,9 @@ Module ClimateAssessmentFromScript
 
             .StartRun("modified")
             IO.File.WriteAllText("ClimateAssessmentFromScript.txt", pCat.ResultsGrid.ToString)
+            .Inputs.Clear()
+            .Endpoints.Clear()
+            .PreparedInputs.Clear()
         End With
         Logger.Dbg("AllDone")
     End Sub
