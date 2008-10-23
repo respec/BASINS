@@ -42,6 +42,8 @@ Public Class PlugIn
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = ModelsMenuName & "_SWMM" Then
+            pSWMMProject = New SWMMProject
+            pSWMMProject.IsMetric = False
             Dim lfrmSWMMSetup As New frmSWMMSetup
             With lfrmSWMMSetup
                 .InitializeUI(Me)

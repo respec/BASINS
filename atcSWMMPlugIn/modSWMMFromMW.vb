@@ -140,7 +140,7 @@ Friend Module modSWMMFromMW
 
                 'create node at downstream end
                 Dim lNode As New Node
-                If lConduit.DownConduitID.Length > 0 And CInt(lConduit.DownConduitID) > 0 Then
+                If lConduit.DownConduitID.Length > 0 AndAlso CInt(lConduit.DownConduitID) > 0 Then
                     lNode.Name = "J" & lConduit.DownConduitID
                     lNode.Type = "JUNCTION"
                 Else
