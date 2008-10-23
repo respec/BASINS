@@ -78,6 +78,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmActivityAll.Designer.vb">
+      <DependentUpon>frmActivityAll.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmActivityAll.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmLand.Designer.vb">
       <DependentUpon>frmLand.vb</DependentUpon>
     </Compile>
@@ -88,6 +94,12 @@
       <DependentUpon>frmInputDataEditor.vb</DependentUpon>
     </Compile>
     <Compile Include="frmInputDataEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPollutant.Designer.vb">
+      <DependentUpon>frmPollutant.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPollutant.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmReach.Designer.vb">
@@ -121,6 +133,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmActivityAll.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmActivityAll.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmInputDataEditor.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmInputDataEditor.vb</DependentUpon>
@@ -128,6 +144,10 @@
     <EmbeddedResource Include="frmLand.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmLand.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPollutant.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPollutant.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmReach.resx">
       <SubType>Designer</SubType>

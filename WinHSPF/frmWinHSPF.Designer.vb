@@ -27,7 +27,9 @@ Partial Class frmWinHSPF
         Me.ReachEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LandUseEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.InputDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.PollutantToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.btnControl = New System.Windows.Forms.Button
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -37,7 +39,7 @@ Partial Class frmWinHSPF
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(4, 2, 0, 2)
-        Me.MenuStrip1.Size = New System.Drawing.Size(543, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(862, 24)
         Me.MenuStrip1.TabIndex = 0
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -55,7 +57,7 @@ Partial Class frmWinHSPF
         '
         'FunctionsToolStripMenuItem
         '
-        Me.FunctionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReachEditorToolStripMenuItem, Me.LandUseEditorToolStripMenuItem, Me.InputDataEditorToolStripMenuItem})
+        Me.FunctionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReachEditorToolStripMenuItem, Me.LandUseEditorToolStripMenuItem, Me.InputDataEditorToolStripMenuItem, Me.PollutantToolStripMenuItem})
         Me.FunctionsToolStripMenuItem.Name = "FunctionsToolStripMenuItem"
         Me.FunctionsToolStripMenuItem.Size = New System.Drawing.Size(65, 20)
         Me.FunctionsToolStripMenuItem.Text = "Functions"
@@ -63,20 +65,26 @@ Partial Class frmWinHSPF
         'ReachEditorToolStripMenuItem
         '
         Me.ReachEditorToolStripMenuItem.Name = "ReachEditorToolStripMenuItem"
-        Me.ReachEditorToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
+        Me.ReachEditorToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
         Me.ReachEditorToolStripMenuItem.Text = "Reach Editor"
         '
         'LandUseEditorToolStripMenuItem
         '
         Me.LandUseEditorToolStripMenuItem.Name = "LandUseEditorToolStripMenuItem"
-        Me.LandUseEditorToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
+        Me.LandUseEditorToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
         Me.LandUseEditorToolStripMenuItem.Text = "Land Use Editor"
         '
         'InputDataEditorToolStripMenuItem
         '
         Me.InputDataEditorToolStripMenuItem.Name = "InputDataEditorToolStripMenuItem"
-        Me.InputDataEditorToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
+        Me.InputDataEditorToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
         Me.InputDataEditorToolStripMenuItem.Text = "Input Data Editor"
+        '
+        'PollutantToolStripMenuItem
+        '
+        Me.PollutantToolStripMenuItem.Name = "PollutantToolStripMenuItem"
+        Me.PollutantToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
+        Me.PollutantToolStripMenuItem.Text = "Pollutant Selection"
         '
         'HelpToolStripMenuItem
         '
@@ -84,11 +92,22 @@ Partial Class frmWinHSPF
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(40, 20)
         Me.HelpToolStripMenuItem.Text = "Help"
         '
+        'btnControl
+        '
+        Me.btnControl.Image = CType(resources.GetObject("btnControl.Image"), System.Drawing.Image)
+        Me.btnControl.ImageKey = "(none)"
+        Me.btnControl.Location = New System.Drawing.Point(0, 33)
+        Me.btnControl.Name = "btnControl"
+        Me.btnControl.Size = New System.Drawing.Size(53, 49)
+        Me.btnControl.TabIndex = 1
+        Me.btnControl.UseVisualStyleBackColor = True
+        '
         'frmWinHSPF
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(543, 256)
+        Me.ClientSize = New System.Drawing.Size(862, 507)
+        Me.Controls.Add(Me.btnControl)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
@@ -109,5 +128,7 @@ Partial Class frmWinHSPF
     Friend WithEvents ReachEditorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LandUseEditorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents InputDataEditorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents PollutantToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents btnControl As System.Windows.Forms.Button
 
 End Class

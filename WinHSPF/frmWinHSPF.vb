@@ -33,6 +33,10 @@ Public Class frmWinHSPF
         frmInputDataEditor.Show()
     End Sub
 
+    Private Sub PollutantToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PollutantToolStripMenuItem.Click
+        PollutantSelectorCheck()
+    End Sub
+
     Private Sub SetEditMenu()
         Dim lAddFlag As Boolean
         For Each lBlock As HspfBlockDef In pMsg.BlockDefs
@@ -76,4 +80,7 @@ Public Class frmWinHSPF
         End If
     End Sub
 
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnControl.Click
+        frmActivityAll.Show()
+    End Sub
 End Class
