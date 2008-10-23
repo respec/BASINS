@@ -731,9 +731,6 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
-        Dim lSelectedVariations As New Generic.List(Of atcVariation) 
-        Dim lSelectedPreparedInputs As atcCollection
-
         g_running = True
         btnStart.Visible = False
         btnStop.Visible = True
@@ -744,20 +741,7 @@ Public Class frmCAT
 
         RefreshTotalIterations()
 
-        If pCat.PreparedInputs.Count = 0 Then
-            lSelectedPreparedInputs = Nothing
-            'Make a collection of the variations that are selected/checked in lstInputs
-            For Each lVariation As atcVariation In pCat.Inputs
-                If lVariation.Selected Then lSelectedVariations.Add(lVariation)
-            Next
-        Else
-            lSelectedPreparedInputs = New atcCollection
-            For Each lInputIndex As Integer In lstInputs.CheckedIndices
-                lSelectedPreparedInputs.Add(pCat.PreparedInputs.Item(lInputIndex))
-            Next
-        End If
-
-        pCat.StartRun(txtModifiedScenarioName.Text, lSelectedVariations, lSelectedPreparedInputs)
+        pCat.StartRun(txtModifiedScenarioName.Text)
 
         SaveSetting("BasinsCAT", "Settings", "TimePerRun", pCat.TimePerRun)
 
@@ -1127,7 +1111,7 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnInputModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputModify.Click
-        If pCat.PreparedInputs.Count = 0 Is Nothing Then
+        If pCat.PreparedInputs.Count = 0 Then
             If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
                 lstInputs.SelectedIndex = 0
             End If
@@ -1153,7 +1137,7 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnInputView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputView.Click
-        If pCat.PreparedInputs.Count = 0 Is Nothing Then
+        If pCat.PreparedInputs.Count = 0 Then
             If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
                 lstInputs.SelectedIndex = 0
             End If
@@ -1183,7 +1167,7 @@ Public Class frmCAT
     Private Sub btnInputRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputRemove.Click
         If lstInputs.SelectedIndices.Count > 0 Then
             pUnsaved = True
-            If pCat.PreparedInputs Is Nothing Then
+            If pCat.PreparedInputs.Count = 0 Then
                 Dim lRemoveFrom As Generic.List(Of atcVariation) = pCat.Inputs
                 Dim lKeepThese As New Generic.List(Of atcVariation)
                 For lIndex As Integer = 0 To lstInputs.Items.Count - 1
@@ -1219,11 +1203,7 @@ Public Class frmCAT
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then
                     pUnsaved = True
-                    If pCat.PreparedInputs Is Nothing Then
-                        pCat.PreparedInputs = New Generic.List(Of String)
-                    Else
-                        pCat.PreparedInputs.Clear()
-                    End If
+                    pCat.PreparedInputs.Clear()
                     Dim lBaseFilename As String = FilenameNoPath(.FileName)
                     Dim lFolderStart As String = PathNameOnly(.FileName)
                     Dim lParentFolder As String = PathNameOnly(lFolderStart)
@@ -1287,7 +1267,7 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnInputUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputUp.Click
-        If pCat.PreparedInputs Is Nothing Then
+        If pCat.PreparedInputs.Count = 0 Then
             MoveItem(pCat.Inputs, lstInputs, -1)
         Else
             MoveItem(pCat.PreparedInputs, lstInputs, -1)
@@ -1295,7 +1275,7 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnInputDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputDown.Click
-        If pCat.PreparedInputs Is Nothing Then
+        If pCat.PreparedInputs.Count = 0 Then
             MoveItem(pCat.Inputs, lstInputs, 1)
         Else
             MoveItem(pCat.PreparedInputs, lstInputs, 1)
@@ -1355,7 +1335,7 @@ Public Class frmCAT
     End Sub
 
     Private Sub RefreshInputList()
-        If pCat.PreparedInputs Is Nothing Then
+        If pCat.PreparedInputs.Count = 0 Then
             RefreshList(lstInputs, pCat.Inputs)
         Else
             lstInputs.Items.Clear()
@@ -1461,7 +1441,7 @@ Public Class frmCAT
     End Sub
 
     Private Sub lstInputs_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstInputs.ItemCheck
-        If pCat.PreparedInputs Is Nothing Then
+        If pCat.PreparedInputs.Count = 0 Then
             Dim lVariation As atcVariation = pCat.Inputs.Item(e.Index)
             lVariation.Selected = (e.NewValue = CheckState.Checked)
             RefreshTotalIterations()

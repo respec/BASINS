@@ -8,7 +8,7 @@ Imports System.Windows.Forms
 Public Class clsCat
     Public Inputs As New Generic.List(Of atcVariation)
     Public Endpoints As New Generic.List(Of atcVariation)
-    Public PreparedInputs As New Generic.List(Of String)
+    Public PreparedInputs As New Generic.List(Of String) 'TODO: allow selected?
     Public SaveAll As Boolean = False
     Public ShowEachRunProgress As Boolean = False
     Public BaseScenario As String = ""
@@ -96,11 +96,7 @@ StartOver:
                             Case "uci"
                                 OpenUCI(AbsolutePath(lChild.InnerText, CurDir))
                             Case "preparedinputs"
-                                If PreparedInputs Is Nothing Then
-                                    PreparedInputs = New Generic.List(Of String)
-                                Else
-                                    PreparedInputs.Clear()
-                                End If
+                                PreparedInputs.Clear()
                                 For Each lChild In lXML.ChildNodes
                                     PreparedInputs.Add(lChild.InnerText)
                                 Next
@@ -141,7 +137,7 @@ StartOver:
     Public ReadOnly Property TotalIterations() As Integer
         Get
             Dim lTotalIterations As Integer = 1
-            If PreparedInputs Is Nothing Then
+            If PreparedInputs.Count = 0 Then
                 lTotalIterations = 1
                 For Each lVariation As atcVariation In Inputs
                     If lVariation.Selected AndAlso lVariation.Iterations > 1 Then
@@ -216,22 +212,15 @@ StartOver:
         Return Nothing
     End Function
 
-    Public Function StartRun(ByVal aModifiedScenario As String, _
-                             Optional ByVal aSelectedVariations As Generic.List(Of atcVariation) = Nothing, _
-                             Optional ByVal aSelectedPreparedInputs As atcCollection = Nothing) As Boolean
+    Public Function StartRun(ByVal aModifiedScenario As String) As Boolean
         g_running = True
-        Dim lSelectedVariations As Generic.List(Of atcVariation)
-        If (aSelectedVariations Is Nothing AndAlso aSelectedPreparedInputs Is Nothing) Then
-            lSelectedVariations = Inputs
-        Else
-            lSelectedVariations = aSelectedVariations
-        End If
-        'header for attributes
-        Dim lNumInputColumns As Integer
-        If lSelectedVariations Is Nothing Then
-            lNumInputColumns = 0
-        Else
-            lNumInputColumns = lSelectedVariations.Count
+        Dim lSelectedVariations As New Generic.List(Of atcVariation)
+        If PreparedInputs.Count = 0 Then
+            For Each lVariation As atcVariation In Inputs
+                If lVariation.Selected Then
+                    lSelectedVariations.Add(lVariation)
+                End If
+            Next
         End If
 
         ResultsGrid = New atcGridSource
@@ -240,7 +229,7 @@ StartOver:
             Dim lColumn As Integer = 1
             .FixedRows = ResultsFixedRows
             .FixedColumns = 1
-            .Columns = 1 + lNumInputColumns
+            .Columns = 1 + lSelectedVariations.Count
             .CellValue(0, 0) = RunTitle
 
             For Each lVariation As atcVariation In Endpoints
@@ -251,7 +240,8 @@ StartOver:
             .Rows = 5
             lColumn = 1
 
-            If PreparedInputs Is Nothing Then
+            If PreparedInputs.Count = 0 Then
+                'header for attributes
                 For Each lVariation As atcVariation In lSelectedVariations
                     .CellValue(0, lColumn) = lVariation.Name
                     .CellValue(1, lColumn) = lVariation.Operation
@@ -287,7 +277,6 @@ StartOver:
         Dim lRuns As Integer = 0
         Run(aModifiedScenario, _
             lSelectedVariations, _
-            aSelectedPreparedInputs, _
             BaseScenario, _
             lRuns, 0, Nothing)
 
@@ -297,7 +286,6 @@ StartOver:
 
     Private Sub Run(ByVal aModifiedScenarioName As String, _
                     ByVal aVariations As Generic.List(Of atcVariation), _
-                    ByVal aPreparedInputs As atcCollection, _
                     ByVal aBaseFileName As String, _
                     ByRef aIteration As Integer, _
                     ByRef aStartVariationIndex As Integer, _
@@ -317,14 +305,14 @@ NextIteration:
                 Dim lPreparedInput As String
                 Dim lModifiedScenarioName As String
 
-                If aPreparedInputs Is Nothing Then
+                If PreparedInputs.Count = 0 Then
                     lPreparedInput = ""
                     lModifiedScenarioName = aModifiedScenarioName
                     If SaveAll Then
                         lModifiedScenarioName &= "-" & aIteration + 1
                     End If
                 Else
-                    lPreparedInput = aPreparedInputs.ItemByIndex(aIteration)
+                    lPreparedInput = PreparedInputs.Item(aIteration)
                     lModifiedScenarioName = IO.Path.GetFileNameWithoutExtension(PathNameOnly(lPreparedInput))
                 End If
 
@@ -342,7 +330,7 @@ NextIteration:
                     Dim lColumn As Integer = .FixedColumns
                     Dim lVariation As atcVariation
 
-                    If PreparedInputs Is Nothing Then
+                    If PreparedInputs.Count = 0 Then
                         .CellValue(lRow, 0) = aIteration + 1
                         For Each lVariation In Inputs
                             If lVariation.Selected Then
@@ -351,7 +339,7 @@ NextIteration:
                             End If
                         Next
                     Else
-                        .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(aPreparedInputs.Item(aIteration)))
+                        .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(aIteration)))
                         '.CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
                     End If
                     .CellColor(lRow, 0) = Drawing.SystemColors.Control
@@ -421,7 +409,7 @@ NextIteration:
                 Next
 
                 aIteration += 1
-                If g_running AndAlso Not aPreparedInputs Is Nothing AndAlso aIteration < aPreparedInputs.Count Then
+                If g_running AndAlso Not PreparedInputs.Count = 0 AndAlso aIteration < PreparedInputs.Count Then
                     GoTo NextIteration
                 End If
             Else 'Need to loop through values for next variation
@@ -457,7 +445,6 @@ NextIteration:
                         'We have handled a variation, now recursively handle more input variations or run the model
                         Run(aModifiedScenarioName, _
                             aVariations, _
-                            aPreparedInputs, _
                             aBaseFileName, _
                             aIteration, _
                             aStartVariationIndex + 1, _
