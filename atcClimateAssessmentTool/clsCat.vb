@@ -8,7 +8,7 @@ Imports System.Windows.Forms
 Public Class clsCat
     Public Inputs As New Generic.List(Of atcVariation)
     Public Endpoints As New Generic.List(Of atcVariation)
-    Public PreparedInputs As Generic.List(Of String)
+    Public PreparedInputs As New Generic.List(Of String)
     Public SaveAll As Boolean = False
     Public ShowEachRunProgress As Boolean = False
     Public BaseScenario As String = ""
@@ -39,7 +39,7 @@ Public Class clsCat
             lXML &= "  <FileName>" & BaseScenario & "</FileName>" & vbCrLf
             lXML &= "</UCI>" & vbCrLf
 
-            If PreparedInputs Is Nothing Then
+            If PreparedInputs.Count = 0 Then
                 lXML &= "<Variations>" & vbCrLf
                 For Each lVariation In Inputs
                     lXML &= lVariation.XML
