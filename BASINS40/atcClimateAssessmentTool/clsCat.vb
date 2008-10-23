@@ -187,11 +187,11 @@ StartOver:
 
             Dim lFullText As String = WholeFileString(aUCIfilename)
             For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
-                lWDMfilename = AbsolutePath(lWDMfilename, lUciFolder)
+                lWDMfilename = AbsolutePath(Trim(lWDMfilename), lUciFolder)
                 OpenDataSource(lWDMfilename)
             Next
             For Each lBinOutFilename As String In UCIFilesBlockFilenames(lFullText, "BINO")
-                lBinOutFilename = AbsolutePath(lBinOutFilename, lUciFolder)
+                lBinOutFilename = AbsolutePath(Trim(lBinOutFilename), lUciFolder)
                 OpenDataSource(lBinOutFilename)
             Next
         End If
