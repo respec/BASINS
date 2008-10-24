@@ -66,6 +66,7 @@
     <Compile Include="atcHspfConstituentBalance.vb" />
     <Compile Include="atcHspfDailyMonthlyCompareStats.vb" />
     <Compile Include="atcHspfExpertSystem.vb" />
+    <Compile Include="atcHspfConstituentBudget.vb" />
     <Compile Include="atcHspfWatershedConstituentBalance.vb" />
     <Compile Include="atcHspfWatershedSummary.vb" />
     <Compile Include="clsHspfSupportPlugin.vb" />

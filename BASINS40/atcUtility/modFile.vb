@@ -486,17 +486,19 @@ FoundSameUntil:
         ' ##SUMMARY Saves incoming string to a text file.
         ' ##PARAM FileName I Name of output text file
         ' ##PARAM FileContents I Incoming string to be saved to file
-        Dim OutFile As Short
+        Dim OutFile As Short = FreeFile()
         ' ##LOCAL OutFile - integer filenumber of output text file
 
+Retry:
         Try
             MkDirPath(PathNameOnly(filename))
-            OutFile = FreeFile()
             FileOpen(OutFile, filename, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
             Print(OutFile, FileContents)
             FileClose(OutFile)
         Catch ex As Exception
-            Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, "SaveFileString")
+            If Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, Microsoft.VisualBasic.MsgBoxStyle.RetryCancel, "SaveFileString") = MsgBoxResult.Retry Then
+                GoTo Retry
+            End If
         End Try
     End Sub
 

@@ -276,11 +276,9 @@ Public Class HspfOperation
     Public Function DownOper(ByRef aOpType As String) As Integer
         For Each lConnection As HspfConnection In pTargets
             If aOpType.Length = 0 Then 'take first one of any type
-                DownOper = lConnection.Target.VolId
-                Exit For
+                Return lConnection.Target.VolId
             ElseIf lConnection.Target.VolName = aOpType Then  'first of selected type
-                DownOper = lConnection.Target.VolId
-                Exit For
+                Return lConnection.Target.VolId
             End If
         Next lConnection
     End Function

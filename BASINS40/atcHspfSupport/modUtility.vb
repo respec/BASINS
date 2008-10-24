@@ -266,8 +266,16 @@ Public Module Utility
                                          ByVal aLocation As String, _
                                          ByVal aOperationTypes As atcCollection, _
                                          ByRef aLocations As atcCollection)
+        LocationAreaCalc(aUci, aLocation, aOperationTypes, aLocations, True)
+    End Sub
+
+    Public Sub LocationAreaCalc(ByVal aUci As HspfUci, _
+                                ByVal aLocation As String, _
+                                ByVal aOperationTypes As atcCollection, _
+                                ByRef aLocations As atcCollection, _
+                                ByVal aUpstream As Boolean)
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
-        Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).operfromid(aLocation.Substring(2))
+        Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).OperFromID(aLocation.Substring(2))
         If Not lOperation Is Nothing Then
             For Each lConnection As HspfConnection In lOperation.Sources
                 Dim lSourceVolName As String = lConnection.Source.VolName
@@ -276,8 +284,8 @@ Public Module Utility
                     If lConnection.MFact > 0 Then
                         aLocations.Increment(lLocationKey, lConnection.MFact)
                     End If
-                ElseIf lSourceVolName = "RCHRES" Then
-                    UpstreamLocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations)
+                ElseIf aUpstream AndAlso lSourceVolName = "RCHRES" Then
+                    LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True)
                 End If
             Next
         End If
