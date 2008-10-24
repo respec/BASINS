@@ -30,8 +30,8 @@ Module HSPFOutputReports
         'Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
         'Dim lTestName As String = "shena"
-        'Dim lTestName As String = "upatoi"
-        Dim lTestName As String = "housatonic"
+        Dim lTestName As String = "upatoi"
+        'Dim lTestName As String = "housatonic"
         'Dim lTestName As String = "beaver"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
@@ -236,55 +236,67 @@ Module HSPFOutputReports
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
 
         For Each lSummaryType As String In pSummaryTypes
-            Dim lString As Text.StringBuilder = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, lSummaryType)
-            Dim lOutFileName As String = "outfiles\" & lSummaryType & "_" & "WatershedSummary.txt"
-            SaveFileString(lOutFileName, lString.ToString)
-            lString = Nothing
-
+            Dim lString As String
+            Dim lOutFileName As String
             'build collection of operation types to report
             Dim lOperationTypes As New atcCollection
             lOperationTypes.Add("P:", "PERLND")
             lOperationTypes.Add("I:", "IMPLND")
             lOperationTypes.Add("R:", "RCHRES")
+
+            lString = HspfSupport.ConstituentBudget.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime).ToString
+            lOutFileName = "outfiles\" & pBaseName & "_" & lSummaryType & "_" & "Budget.txt"
+            SaveFileString(lOutFileName, lString)
+            lString = Nothing
+
+            lString = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, lSummaryType).ToString
+            lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedSummary.txt"
+            SaveFileString(lOutFileName, lString)
+            lString = Nothing
+
             Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
             'constituent balance
             lString = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime)
+                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalance.txt"
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lString)
+
             lString = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime, True)
+                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime, True).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalancePivot.txt"
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lString)
+
             lString = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime, True, 2, 5, 8)
+                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime, True, 2, 5, 8).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalancePivotNarrowTab.txt"
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lString)
             lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalancePivotNarrowSpace.txt"
-            SaveFileString(lOutFileName, lString.ToString.Replace(vbTab, " "))
+            SaveFileString(lOutFileName, lString.Replace(vbTab, " "))
 
             'watershed constituent balance 
             lString = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime)
+                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalance.txt"
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lString)
+
             lString = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True)
+                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalancePivot.txt"
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lString)
+
             lString = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True, 2, 5, 8)
+                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True, 2, 5, 8).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalancePivotNarrowTab.txt"
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lString)
             lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalancePivotNarrowSpace.txt"
-            SaveFileString(lOutFileName, lString.ToString.Replace(vbTab, " "))
+            SaveFileString(lOutFileName, lString.Replace(vbTab, " "))
 
             If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
                 HspfSupport.WatershedConstituentBalance.ReportsToFiles _
