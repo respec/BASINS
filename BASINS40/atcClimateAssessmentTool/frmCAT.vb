@@ -761,7 +761,7 @@ Public Class frmCAT
         Catch
             'stop
         End Try
-        SaveFileString(aResultsFilename, agdResults.Source.ToString)
+        SaveFileString(aResultsFilename, pCat.ResultsGrid.ToString)
     End Sub
 
     Private Sub cboPivotRows_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboPivotRows.SelectedIndexChanged
