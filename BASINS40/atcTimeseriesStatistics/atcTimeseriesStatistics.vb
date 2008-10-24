@@ -67,6 +67,8 @@ Public Class atcTimeseriesStatistics
 
                 AddOperation("Count Zero", "Count of values equal to zero", defTimeSeriesOne, lCategory, "Integer", 0)
 
+                AddOperation("Count Missing", "Count of values that are undefined", defTimeSeriesOne, lCategory, "Integer", 0)
+
                 AddOperation("Start Date", "Starting Julian Date", defTimeSeriesOne, lCategory)
 
                 AddOperation("End Date", "Ending Julian Date", defTimeSeriesOne, lCategory)
@@ -217,6 +219,7 @@ Public Class atcTimeseriesStatistics
 
             aTimeseries.Attributes.SetValue("Count", CInt(lCount))
             aTimeseries.Attributes.SetValue("Count Positive", CInt(lCountPositive))
+            aTimeseries.Attributes.SetValue("Count Missing", CInt(lLastValueIndex - lCount))
             aTimeseries.Attributes.SetValue("Count Zero", CInt(lCountZero))
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Max", lMax)

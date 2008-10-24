@@ -145,7 +145,11 @@ Public Class atcDataAttributes
                     Case "Double"
 FormatDouble:           Dim lAttName As String = aAttributeName.ToLower
                         If lAttName.Contains("jday") OrElse lAttName.Contains("date") Then
-                            Return pDateFormat.JDateToString(lValue)
+                            If IsNumeric(lValue) Then
+                                Return pDateFormat.JDateToString(lValue)
+                            Else
+                                Return lValue
+                            End If
                         Else
                             Return DoubleToString(lValue, 15)
                         End If
