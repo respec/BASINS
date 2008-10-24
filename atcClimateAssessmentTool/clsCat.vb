@@ -357,7 +357,7 @@ NextIteration:
                             For Each lOldData As atcDataSet In lVariation.DataSets
                                 Dim lGroup As atcDataGroup = Nothing
                                 Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
-                                Dim lResultDataSpec As String = lResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower)
+                                Dim lResultDataSpec As String = lResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower.Trim)
                                 If lResultDataSpec Is Nothing Then
                                     Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
                                 Else

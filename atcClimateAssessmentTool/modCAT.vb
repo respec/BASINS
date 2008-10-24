@@ -97,7 +97,7 @@ Public Module modCAT
                 Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
                 For Each lWDMfilename As String In lWDMFilenames
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
-                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower, lWDMfilename)
+                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lWDMfilename.Trim)
                 Next
             Else
                 Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
@@ -120,7 +120,7 @@ Public Module modCAT
                     End If
 
                     'Key is base file name, value is modified file name
-                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower, lNewWDMfilename)
+                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lNewWDMfilename.Trim)
 
                     'Update scenario name in new WDM
                     For Each lCurrentTimeseries In aModifiedData
@@ -184,7 +184,7 @@ Public Module modCAT
                     If IO.File.Exists(lNewFilename) Then
                         'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
                         'If lHBNResults.Open(lNewFilename) Then
-                        lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower, lNewFilename)
+                        lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower.Trim, lNewFilename.Trim)
                         'Else
                         '    Logger.Dbg("Could not open HBN file '" & lNewFilename & "'")
                         'End If
