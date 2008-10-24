@@ -1,23 +1,21 @@
 Imports atcUtility
 Imports atcData
 Imports atcWDM
+Imports atcSeasons
+Imports atcMwGisUtility
+
 Imports MapWindow.Interfaces
 Imports MapWinUtility
 Imports MapWinGeoProc
-Imports atcMwGisUtility
 Imports System.Collections.Specialized
 
 Module ScriptImportPCStoWDM
     Private pDebug As Boolean = False
 
-    Private Structure SnodasData
-        Dim DateObs As Double
-        Dim Constituent As String
-        Dim Id As Integer
-        Dim FileName As String
-    End Structure
-
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
+        ChDriveDir("C:\test\R4Whitlock")
+        Logger.StartToFile("ScriptImportPCStoWDM.log", , , True)
+
         Dim lTextFilename As String = "qryWDMoutput.txt"
         Dim lWdmName As String = "PCS.wdm"
         Dim lDSN As Integer = 1
@@ -73,8 +71,9 @@ Module ScriptImportPCStoWDM
             Dim lCSV As New atcTableDelimited
             With lCSV
                 .Delimiter = ","c
+                Logger.Dbg("Opening " & lTextFilename )
                 If .OpenFile(lTextFilename) Then
-
+                    Logger.Dbg("Reading " & lTextFilename & " with " & .NumRecords & " records")
                     For lRecord As Integer = 1 To .NumRecords
                         .CurrentRecord = lRecord
                         lKey = .Value(lConstituentColumn) & ":" & .Value(lLocationColumn) & ":" & .Value(lDescriptionColumn)
@@ -105,23 +104,79 @@ Module ScriptImportPCStoWDM
                         End Try
                         lTSBuilder.AddValue(lDate, lValue)
                     Next lRecord
+                    Logger.Dbg("EndOfRead " & lTSBuilders.Count & " TimeseriesCreated")
                 Else
                     Logger.Msg("Unable to open text file: '" & lTextFilename & "'", "PCS to WDM")
                 End If
             End With
 
+            Dim lUpdateReportSB As New Text.StringBuilder
+            lUpdateReportSB.AppendLine("Description" & vbTab & "Constituent" & vbTab & _
+                                       "Index" & vbTab & "Month" & vbTab & "Prev" & vbTab & _
+                                       "Intrp" & vbTab & "Next" & vbTab & "Mean" & vbTab & "MissCnt")
             Dim lNumTimeseries As Integer = lTSBuilders.Count
             Dim lProgressTimeseries As Integer = 1
             Dim lWdm As New atcDataSourceWDM
             If lWdm.Open(lWdmName) Then
-                For Each lDataset As atcDataSet In lTSBuilders.CreateTimeseriesGroup
-                    lDataset = FillValues(lDataset, atcTimeUnit.TUMonth, 1, -999)
+                For Each lDataset As atcTimeseries In lTSBuilders.CreateTimeseriesGroup
+                    Dim lNumValuesOrig As Integer = lDataset.numValues
+                    lDataset = FillValues(lDataset, atcTimeUnit.TUMonth, 1, GetNaN, GetNaN)
+                    Logger.Dbg("Fill " & lDSN & " NumValues " & lNumValuesOrig & " " & lDataset.numValues)
+                    If lNumValuesOrig < lDataset.numValues Then 'some were filled, now be smarter
+                        Dim lDesc As String = lDataset.Attributes.GetValue("Description")
+                        Dim lCons As String = lDataset.Attributes.GetValue("Cons")
+                        'options - interpolate, prev value, aver monthly value
+                        Dim lSeasons As New atcSeasonsMonth
+                        Dim lSeasonalAttributes As New atcDataAttributes
+                        Dim lMonthlyAttributes As New atcDataAttributes
+                        lSeasonalAttributes.SetValue("Mean", 0) 'fluxes are summed from daily, monthly or annual to annual
+                        lSeasons.SetSeasonalAttributes(lDataset, lSeasonalAttributes, lMonthlyAttributes)
+                        For lMonthIndex As Integer = 0 To 11
+                            With lMonthlyAttributes(lMonthIndex)
+                                Logger.Dbg(lDesc & " " & lCons & " " & .Arguments(1).Value & " " & .Arguments(2).Value & " " & DoubleToString(.Value, , "#,###,##0.00"))
+                            End With
+                        Next
+                        Dim lDatasetFillByInterpolation As atcTimeseries = FillMissingByInterpolation(lDataset)
+                        Dim lPrevVal As Double = lDataset.Value(0)
+                        Dim lDateI(5) As Integer
+                        For lIndex As Integer = 1 To lDataset.numValues
+                            Dim lVal As Double = lDataset.Value(lIndex)
+                            If Double.IsNaN(lVal) Then 'need to fill
+                                Try
+                                    J2Date(lDataset.Dates.Values(lIndex), lDateI)
+                                    Dim lMonth As Integer = lDateI(1) - 1
+                                    If lMonth = 0 Then lMonth = 12
+                                    Dim lNextValueIndex As Integer = lIndex + 1
+                                    Dim lMissingCount As Integer = 1
+                                    Dim lNextValue As Double = Double.NaN
+                                    Do While Double.IsNaN(lNextValue) And lNextValueIndex < lDataset.numValues
+                                        lNextValueIndex += 1
+                                        lMissingCount += 1
+                                        lNextValue = lDataset.Value(lNextValueIndex)
+                                    Loop
+                                    lUpdateReportSB.AppendLine(lDesc & vbTab & lCons & vbTab & _
+                                                               lIndex & vbTab & _
+                                                               lMonth & vbTab & _
+                                                               lPrevVal & vbTab & _
+                                                               DoubleToString(lDatasetFillByInterpolation.Value(lIndex), , "#,###,##0.00") & vbTab & _
+                                                               lNextValue & vbTab & _
+                                                               DoubleToString(lMonthlyAttributes(lMonth - 1).Value, , "#,###,##0.00") & vbTab & _
+                                                               lMissingCount)
+                                    lDataset.Value(lIndex) = lDatasetFillByInterpolation.Value(lIndex)
+                                Catch lEx As Exception
+                                    Logger.Dbg("Fill Problem " & lEx.Message)
+                                End Try
+                            End If
+                            If Not Double.IsNaN(lVal) Then lPrevVal = lVal
+                        Next
+                    End If
                     Logger.Progress("Writing " & lProgressTimeseries & " of " & lNumTimeseries, lProgressTimeseries, lNumTimeseries)
                     lProgressTimeseries += 1
                     lDataset.Attributes.SetValue("ID", lDSN)
                     lDSN += 1
                     lWdm.AddDataset(lDataset, atcDataSource.EnumExistAction.ExistRenumber)
                 Next
+                SaveFileString("UpdateReport.txt", lUpdateReportSB.ToString)
                 Logger.Status("Wrote " & lNumTimeseries & " to " & lWdmName, True)
             Else
                 Logger.Msg("Unable to open WDM file '" & lWdmName & "' for writing", "PCS to WDM")
