@@ -6,10 +6,20 @@ Imports atcControls
 Public Class ctlEditTable
     Implements ctlEdit
 
+    Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfTable As HspfTable
     Dim pChanged As Boolean
     Dim pCurrentSelectedColumn As Integer
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+
+    Private Sub grdTable_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdTable.Resize
+        grdTable.SizeAllColumnsToContents(grdTable.Width - pVScrollColumnOffset, True)
+    End Sub
+
+    Private Sub grdTableCellEdited(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdTable.CellEdited
+        pChanged = True
+        RaiseEvent Change(True)
+    End Sub
 
     Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdTable.MouseDownCell
         Dim lchkDescCheckedInteger As Integer
@@ -253,6 +263,46 @@ Public Class ctlEditTable
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
+        Dim lRow, lCol As Integer
+        Dim lParm As HspfParm
+        Dim lTable As HspfTable
+        Dim lTname As String
+
+        lTname = pHspfTable.Name
+        If pHspfTable.OccurCount > 1 Then
+            If cboOccur.SelectedIndex > 0 Then
+                lTname = lTname & ":" & cboOccur.SelectedIndex + 1
+            End If
+        End If
+
+        With grdTable.Source
+            For lRow = 1 To .Rows - 1
+                If .Rows = 1 Then
+                    lTable = Nothing
+                    lTable = pHspfTable.Opn.Tables(lTname)
+                Else
+                    'Set ltable = pTable.Opn.OpnBlk.Ids(j).Tables(tname) 'changed for sort
+                    lTable = Nothing
+                    If Len(.CellValue(lRow, 0)) > 0 Then
+                        If Not pHspfTable.Opn.OpnBlk.OperFromID(.CellValue(lRow, 0)) Is Nothing Then
+                            'make sure there is an operation by this number
+                            lTable = pHspfTable.Opn.OpnBlk.OperFromID(.CellValue(lRow, 0)).Tables(lTname)
+                        End If
+                    End If
+                End If
+                If Not lTable Is Nothing Then
+                    For lCol = 0 To lTable.Parms.Count - 1
+                        lParm = lTable.Parms(lCol)
+                        lParm.Value = .CellValue(lRow, lCol + chkDesc.CheckState + 1)
+                        If lTable.Name = "GEN-INFO" And lCol = 1 Then
+                            lTable.Opn.Description = lParm.Value
+                        End If
+                    Next
+                    lTable.Edited = True
+                End If
+            Next
+        End With
+
         pChanged = False
     End Sub
 
