@@ -1423,10 +1423,19 @@ Public Class frmSWMMSetup
 
                 Dim lPrecGageNamesByCatchment As New Collection
                 Dim lSelectedStation As StationDetails
+                Dim lSJMetDate As Double = 0.0
+                Dim lEJMetDate As Double = 0.0
 
                 If rbnSingle.Checked Then
                     If cboPrecipStation.SelectedIndex > -1 Then
                         lSelectedStation = pPrecStations.ItemByKey(cboPrecipStation.Items(cboPrecipStation.SelectedIndex))
+                        'set dates
+                        If lSelectedStation.StartJDate > lSJMetDate Then
+                            lSJMetDate = lSelectedStation.StartJDate
+                        End If
+                        If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+                            lEJMetDate = lSelectedStation.EndJDate
+                        End If
                         'use this precip gage for each catchment
                         lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
                         'create rain gages from shapefile and selected station
@@ -1435,6 +1444,13 @@ Public Class frmSWMMSetup
                 Else
                     For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
                         lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+                        'set dates
+                        If lSelectedStation.StartJDate > lSJMetDate Then
+                            lSJMetDate = lSelectedStation.StartJDate
+                        End If
+                        If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+                            lEJMetDate = lSelectedStation.EndJDate
+                        End If
                         'remember which precip gage goes with each catchment
                         lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
                         'create rain gages from shapefile and selected station
@@ -1445,6 +1461,13 @@ Public Class frmSWMMSetup
                 Dim lMetGageName As String = ""
                 If cboOtherMet.SelectedIndex > -1 Then
                     lSelectedStation = pMetStations.ItemByKey(cboOtherMet.Items(cboOtherMet.SelectedIndex))
+                    'set dates
+                    If lSelectedStation.StartJDate > lSJMetDate Then
+                        lSJMetDate = lSelectedStation.StartJDate
+                    End If
+                    If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+                        lEJMetDate = lSelectedStation.EndJDate
+                    End If
                     lMetGageName = lSelectedStation.Name
                 End If
 
@@ -1466,8 +1489,24 @@ Public Class frmSWMMSetup
                 lSJDate = Date2J(lSDate)
                 lEJDate = Date2J(lEDate)
 
-                If lSJDate < 1.0 Or lEJDate < 1 Or lSJDate > lEJDate Then 'failed date checks
+                If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
+                    Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS SWMM Problem")
+                    EnableControls(True)
+                    Exit Sub
+                End If
+                If lSJDate > lEJDate Then 'failed date check
+                    Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS SWMM Problem")
+                    EnableControls(True)
+                    Exit Sub
+                End If
+                If lSJMetDate > lEJMetDate Then 'failed date check
                     Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
+                    EnableControls(True)
+                    Exit Sub
+                End If
+                'compare dates from met data with specified start and end dates, make sure they are valid
+                If lSJDate < lSJMetDate Or lEJMetDate < lEJDate Then 'failed date check
+                    Logger.Msg("The specified start/end dates are not within the dates of the specified meteorologic stations.", vbOKOnly, "BASINS SWMM Problem")
                     EnableControls(True)
                     Exit Sub
                 End If
