@@ -17,10 +17,13 @@ Module CatRunner
         pBaseFolders.Add("C:\mono_luChange\output\lu2030b2")
         pBaseFolders.Add("C:\mono_luChange\output\lu2090a2")
         pBaseFolders.Add("C:\mono_luChange\output\lu2090b2")
+        pBaseFolders.Add("C:\mono_luChange\output\Mono10")
+        pBaseFolders.Add("C:\mono_luChange\output\Mono70")
 
         For Each pBaseFolder In pBaseFolders
             ChDriveDir(pBaseFolder)
             Logger.StartToFile("CatRunner.Log", , , True)
+            Logger.DisplayMessageBoxes = False
             With pCat
                 .XML = IO.File.ReadAllText(pCatXMLFile)
                 .StartRun("Modified")

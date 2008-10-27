@@ -106,7 +106,7 @@ Public Module modCAT
                 CreateModifiedUCI(aBaseFilename, aNewScenarioName, lNewUCIfilename)
 
                 For Each lWDMfilename As String In lWDMFilenames
-                    lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
+                    lWDMfilename = AbsolutePath(lWDMfilename, CurDir).Trim()
                     If FilenameNoPath(lWDMfilename).ToLower = FilenameNoPath(aPreparedInput).ToLower Then
                         lWDMfilename = aPreparedInput
                     End If
