@@ -557,7 +557,7 @@ Public Class ctlEditSpecialAction
         Data = aHspfSpecialAction
     End Sub
 
-    Public Sub tabSpecial_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tabSpecial.Click
+    Public Sub tabSpecial_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tabSpecial.SelectedIndexChanged
         Dim lRow As Integer
         Dim newText As String
 
