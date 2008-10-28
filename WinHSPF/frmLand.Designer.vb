@@ -206,7 +206,7 @@ Partial Class frmLand
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(125, 30)
         Me.cmdOK.TabIndex = 9
-        Me.cmdOK.Text = "OK"
+        Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
         '
         'cmdCancel
@@ -216,7 +216,7 @@ Partial Class frmLand
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(125, 30)
         Me.cmdCancel.TabIndex = 10
-        Me.cmdCancel.Text = "Cancel"
+        Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
         '
         'frmLand

@@ -19,6 +19,8 @@ Public Class frmWinHSPF
         'set UCI name in caption
         Me.Text = Me.Text & ": " & pUCI.Name
 
+        'Set the tool tips when mouse-over buttons occur
+
     End Sub
 
     Private Sub ReachEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles ReachEditorToolStripMenuItem.Click
@@ -80,7 +82,11 @@ Public Class frmWinHSPF
         End If
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnControl.Click
+    Private Sub ToolStripButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton2.Click
         frmActivityAll.Show()
+    End Sub
+
+    Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton1.Click
+        frmOutput.Show()
     End Sub
 End Class

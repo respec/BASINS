@@ -28,29 +28,32 @@ Partial Class frmInputDataEditor
         Me.treUci.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.treUci.Location = New System.Drawing.Point(6, 11)
+        Me.treUci.Location = New System.Drawing.Point(4, 9)
+        Me.treUci.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.treUci.Name = "treUci"
-        Me.treUci.Size = New System.Drawing.Size(309, 299)
+        Me.treUci.Size = New System.Drawing.Size(233, 244)
         Me.treUci.TabIndex = 0
         '
         'cmdClose
         '
         Me.cmdClose.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdClose.Location = New System.Drawing.Point(106, 322)
+        Me.cmdClose.Location = New System.Drawing.Point(80, 262)
+        Me.cmdClose.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(106, 31)
+        Me.cmdClose.Size = New System.Drawing.Size(80, 25)
         Me.cmdClose.TabIndex = 1
-        Me.cmdClose.Text = "Close"
+        Me.cmdClose.Text = "&Close"
         Me.cmdClose.UseVisualStyleBackColor = True
         '
         'frmInputDataEditor
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(322, 367)
+        Me.ClientSize = New System.Drawing.Size(242, 298)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.treUci)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Name = "frmInputDataEditor"
         Me.Text = "WinHSPF - Input Data Editor"
         Me.ResumeLayout(False)
