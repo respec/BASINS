@@ -321,9 +321,11 @@ TryAgain:
     Public Overrides Function ToString() As String
         Dim lSB As New Text.StringBuilder
         lSB.Append(Header)
-        lSB.Append(String.Join(Delimiter, pFieldNames, 1, NumFields) & vbCrLf)
-        For Each lRecord As String In pRecords
-            lSB.AppendLine(lRecord.TrimEnd)
+        lSB.AppendLine(String.Join(Delimiter, pFieldNames, 1, NumFields))
+        Dim lLastRecord As Integer = pRecords.Count - 1
+        For lRecordIndex As Integer = 1 To lLastRecord
+            'For Each lRecord As String In pRecords 'This includes the empty record at index 0
+            lSB.AppendLine(pRecords(lRecordIndex).TrimEnd)
         Next
         Return lSB.ToString
     End Function
