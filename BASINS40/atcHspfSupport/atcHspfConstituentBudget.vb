@@ -118,8 +118,8 @@ Public Module ConstituentBudget
     End Function
 
     Private Function TotalForReach(ByVal aReach As HspfOperation, _
-                                               ByVal aAreas As atcCollection, _
-                                               ByVal aNonpointData As atcDataGroup) As Double
+                                   ByVal aAreas As atcCollection, _
+                                   ByVal aNonpointData As atcDataGroup) As Double
         Dim lTotal As Double = 0
 
         For lAreaIndex As Integer = 0 To aAreas.Count - 1

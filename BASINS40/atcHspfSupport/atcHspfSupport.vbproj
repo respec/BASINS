@@ -69,6 +69,7 @@
     <Compile Include="atcHspfConstituentBudget.vb" />
     <Compile Include="atcHspfWatershedConstituentBalance.vb" />
     <Compile Include="atcHspfWatershedSummary.vb" />
+    <Compile Include="atcHspfWatershedSummaryOverland.vb" />
     <Compile Include="clsHspfSupportPlugin.vb" />
     <Compile Include="clsHspfSupportPluginDuration.vb" />
     <Compile Include="frmCompare.Designer.vb">

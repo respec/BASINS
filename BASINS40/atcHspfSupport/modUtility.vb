@@ -292,6 +292,19 @@ Public Module Utility
         aLocations.Add(aLocation, 1.0)
     End Sub
 
+    'Compute total area of an implnd or perlnd by totaling all MFact of connections from it
+    Friend Function OperationArea(ByVal aUci As HspfUci, ByVal aOperation As HspfOperation) As Double
+        Dim lArea As Double = 0
+        For Each lReach As HspfOperation In aUci.OpnBlks("RCHRES").Ids
+            For Each lConnection As HspfConnection In lReach.Sources
+                If lConnection.Source.Opn.Equals(aOperation) Then
+                    lArea += lConnection.MFact
+                End If
+            Next
+        Next
+        Return lArea
+    End Function
+
     Public Function CfsToInches(ByVal aTSerIn As atcTimeseries, _
                                 ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (12.0# * 24.0# * 3600.0#) / (aArea * 43560.0#)   'cfs days to inches
