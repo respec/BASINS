@@ -485,7 +485,12 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
 
     Default Public Shadows Property Item(ByVal index As Integer) As atcDefinedValue
         Get
-            Return MyBase.Item(index)
+            If MyBase.Keys.Count > index Then
+                Return MyBase.Item(index)
+            Else
+                Logger.Dbg("Index " & index & " outOfRange (0," & MyBase.Keys.Count - 1 & ")")
+                Return Nothing
+            End If
         End Get
         Set(ByVal newValue As atcDefinedValue)
             MyBase.Item(index) = newValue
