@@ -21,6 +21,7 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Private pBinFile As HspfBinary
 
+    Private pUnitsEngish As New Generic.Dictionary(Of String, String)
     Private pUnitsTable As atcTable
     Private pUnitsTableModified As Boolean = False
     Private Shared pUnitsTableTemplate As atcTable
@@ -29,6 +30,8 @@ Public Class atcTimeseriesFileHspfBinOut
     Private pCountUnitsMissing As Integer
     Private pCountUnitsHardCode As Integer
     Private pUnitsMissing As atcCollection
+    Private pHspfMsgUnits As New Generic.Dictionary(Of String, String)
+    Public DebugLevel As Integer = 1
 
     Public ReadOnly Property AvailableAttributes() As Collection
         Get
@@ -72,6 +75,9 @@ Public Class atcTimeseriesFileHspfBinOut
         pBinFile.Filename = Specification
 
         Try
+            If DebugLevel > 0 Then
+                Logger.Dbg("Parse " & pBinFile.Headers.Count & " Headers")
+            End If
             Dim lHeaderIndex As Integer = 0
             Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
             For Each lBinHeader As HspfBinaryHeader In pBinFile.Headers
@@ -167,6 +173,9 @@ Public Class atcTimeseriesFileHspfBinOut
         Catch ex As ApplicationException
             Logger.Dbg(ex.Message)
         End Try
+        If DebugLevel > 0 Then
+            Logger.Dbg("Created " & DataSets.Count & " Datasets")
+        End If
 
         If pUnitsTableModified Then
             With pUnitsTable
@@ -176,15 +185,22 @@ Public Class atcTimeseriesFileHspfBinOut
         End If
         Logger.Dbg("UnitsAssigned " & pCountUnitsFound & " " & pCountUnitsHardCode)
         Logger.Dbg("MissingUnique " & pUnitsMissing.Count & " Total " & pCountUnitsMissing)
-        For lIndex As Integer = 0 To pUnitsMissing.Count - 1
-            Logger.Dbg("Missing " & pUnitsMissing.Keys(lIndex) & " " & pUnitsMissing.Item(lIndex))
-        Next
+        If DebugLevel > 1 Then
+            For lIndex As Integer = 0 To pUnitsMissing.Count - 1
+                Logger.Dbg("Missing " & pUnitsMissing.Keys(lIndex) & " " & pUnitsMissing.Item(lIndex))
+            Next
+        End If
     End Sub
 
     Private Function GetUnits(ByVal aConstituent As String, Optional ByVal aUnitSystem As atcUnitSystem = atcUnitSystem.atcEnglish) As String
         Dim lUnits As String = ""
         Dim lUnknown As String = "<unknown>"
         Dim lUnknownFlag As Boolean = False
+
+        Dim lUnitsKey As String = aConstituent.ToLower
+        If pUnitsEngish.ContainsKey(lUnitsKey) Then
+            Return pUnitsEngish.Item(lUnitsKey)
+        End If
 
         If pUnitsTable.FindFirst(1, aConstituent) Then 'cons in field 1
             lUnits = pUnitsTable.Value(2) 'units in field 2
@@ -211,32 +227,41 @@ Public Class atcTimeseriesFileHspfBinOut
                 lUnits = pUnitsTableTemplate.Value(2) 'units in field 2
                 pCountUnitsFound += 1
             Else  'try HspfMsg
-                If pHspfMsg Is Nothing Then 'might need the message file for units
-                    pHspfMsg = New HspfMsg
-                    pHspfMsg.Open("hspfmsg.mdb")
-                End If
-                For lTsGroupIndex As Integer = 0 To pHspfMsg.TSGroupDefs.Count - 1
-                    Dim lTsGroup As atcUCI.HspfTSGroupDef = pHspfMsg.TSGroupDefs(lTsGroupIndex)
-                    For lTsMemberIndex As Integer = 0 To lTsGroup.MemberDefs.Count - 1
-                        Dim lTsMember As atcUCI.HspfTSMemberDef = lTsGroup.MemberDefs(lTsMemberIndex)
-                        If lTsMember.Name.ToLower = aConstituent.ToLower Then
+                If pHspfMsgUnits.Count = 0 Then
+                    If pHspfMsg Is Nothing Then 'might need the message file for units
+                        pHspfMsg = New HspfMsg
+                        pHspfMsg.Open("hspfmsg.mdb")
+                    End If
+                    For lTsGroupIndex As Integer = 0 To pHspfMsg.TSGroupDefs.Count - 1
+                        Dim lTsGroup As atcUCI.HspfTSGroupDef = pHspfMsg.TSGroupDefs(lTsGroupIndex)
+                        For lTsMemberIndex As Integer = 0 To lTsGroup.MemberDefs.Count - 1
+                            Dim lTsMember As atcUCI.HspfTSMemberDef = lTsGroup.MemberDefs(lTsMemberIndex)
                             'todo: check english/metric flag, english assumed for now
-                            pCountUnitsFound += 1
-                            lUnits = lTsMember.EUnits
-                            'Logger.Dbg("FoundMsg " & aConstituent & " (" & lUnits & ")")
-                            Exit For
-                        End If
+                            If pHspfMsgUnits.ContainsKey(lTsMember.Name.ToLower) Then
+                                If pHspfMsgUnits.Item(lTsMember.Name.ToLower) <> lTsMember.EUnits Then
+                                    If DebugLevel > 1 Then
+                                        Logger.Dbg("UnitsConflict " & pHspfMsgUnits.Item(lTsMember.Name.ToLower).ToString & ":" & lTsMember.EUnits)
+                                    End If
+                                End If
+                            Else
+                                pHspfMsgUnits.Add(lTsMember.Name.ToLower, lTsMember.EUnits)
+                            End If
+                        Next
                     Next
-                Next
+                    If DebugLevel > 1 Then
+                        Logger.Dbg("MessageFileUnitCount " & pHspfMsgUnits.Count)
+                    End If
+                End If
+
+                If pHspfMsgUnits.ContainsKey(aConstituent.ToLower) Then
+                    pCountUnitsFound += 1
+                    lUnits = pHspfMsgUnits.Item(aConstituent.ToLower).ToString
+                End If
+
                 If lUnits.Length = 0 Then
                     pCountUnitsMissing += 1
                     'Logger.Dbg("Missing " & aConstituent)
-                    Dim lIndex As Integer = pUnitsMissing.IndexFromKey(aConstituent)
-                    If lIndex >= 0 Then
-                        pUnitsMissing.Item(lIndex) += 1
-                    Else
-                        pUnitsMissing.Add(aConstituent, 1)
-                    End If
+                    pUnitsMissing.Increment(aConstituent, 1)
                     lUnits = lUnknown
                 End If
             End If
@@ -250,6 +275,7 @@ Public Class atcTimeseriesFileHspfBinOut
                 End With
             End If
         End If
+        pUnitsEngish.Add(lUnitsKey, lUnits)
         Return lUnits
     End Function
 
@@ -343,6 +369,7 @@ Public Class atcTimeseriesFileHspfBinOut
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+        If DebugLevel > 0 Then Logger.Dbg("Opening " & aFileName)
         If MyBase.Open(aFileName, aAttributes) Then
             pUnitsTable = New atcTableDBF
             Dim lFileName As String = IO.Path.ChangeExtension(Me.Specification, "units.dbf")
@@ -361,6 +388,7 @@ Public Class atcTimeseriesFileHspfBinOut
                     .WriteFile(.FileName)
                 End With
             End If
+            If DebugLevel > 0 Then Logger.Dbg("UsingUnitsFile " & lFileName & " WithRecordCount " & pUnitsTable.NumRecords)
             BuildTSers()
             Return True
         End If
