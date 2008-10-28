@@ -19,6 +19,7 @@ Partial Class frmWinHSPF
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWinHSPF))
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -29,8 +30,12 @@ Partial Class frmWinHSPF
         Me.InputDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PollutantToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.btnControl = New System.Windows.Forms.Button
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton
+        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton
         Me.MenuStrip1.SuspendLayout()
+        Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -92,22 +97,41 @@ Partial Class frmWinHSPF
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(40, 20)
         Me.HelpToolStripMenuItem.Text = "Help"
         '
-        'btnControl
+        'ToolStrip1
         '
-        Me.btnControl.Image = CType(resources.GetObject("btnControl.Image"), System.Drawing.Image)
-        Me.btnControl.ImageKey = "(none)"
-        Me.btnControl.Location = New System.Drawing.Point(0, 33)
-        Me.btnControl.Name = "btnControl"
-        Me.btnControl.Size = New System.Drawing.Size(53, 49)
-        Me.btnControl.TabIndex = 1
-        Me.btnControl.UseVisualStyleBackColor = True
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2})
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Size = New System.Drawing.Size(862, 25)
+        Me.ToolStrip1.TabIndex = 3
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton1.Text = "Output"
+        Me.ToolStripButton1.ToolTipText = "Output"
+        '
+        'ToolStripButton2
+        '
+        Me.ToolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
+        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton2.Name = "ToolStripButton2"
+        Me.ToolStripButton2.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton2.Text = "Control Cards"
+        Me.ToolStripButton2.ToolTipText = "Control Cards"
         '
         'frmWinHSPF
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(862, 507)
-        Me.Controls.Add(Me.btnControl)
+        Me.Controls.Add(Me.ToolStrip1)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
@@ -116,6 +140,8 @@ Partial Class frmWinHSPF
         Me.Text = "Hydrological Simulation Program - Fortran (HSPF)"
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
+        Me.ToolStrip1.ResumeLayout(False)
+        Me.ToolStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -129,6 +155,9 @@ Partial Class frmWinHSPF
     Friend WithEvents LandUseEditorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents InputDataEditorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents PollutantToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents btnControl As System.Windows.Forms.Button
+    Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
+    Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
+    Friend WithEvents ToolStripButton1 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStripButton2 As System.Windows.Forms.ToolStripButton
 
 End Class

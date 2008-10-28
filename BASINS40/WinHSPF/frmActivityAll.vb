@@ -18,12 +18,15 @@ Public Class frmActivityAll
 
     Private Sub lPerlndActivityControl_grdTableEdited(ByVal aChange As Boolean) Handles lPerlndActivityControl.Change
         pPChanged = True
+        cmdApply.Enabled = True
     End Sub
     Private Sub lImplndActivityControl_grdTableEdited(ByVal aChange As Boolean) Handles lImplndActivityControl.Change
         pIChanged = True
+        cmdApply.Enabled = True
     End Sub
     Private Sub lRchresActivityControl_grdTableEdited(ByVal aChange As Boolean) Handles lRchresActivityControl.Change
         pRChanged = True
+        cmdApply.Enabled = True
     End Sub
 
     Sub New()
@@ -32,6 +35,7 @@ Public Class frmActivityAll
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+        Me.MinimumSize = Me.Size
 
         pPChanged = False
         pIChanged = False
@@ -47,6 +51,7 @@ Public Class frmActivityAll
 
         RefreshTableGeometry()
 
+        cmdApply.Enabled = False
         AddHandler Me.Resize, AddressOf frmActivityAll_Resize
 
     End Sub
@@ -77,6 +82,8 @@ Public Class frmActivityAll
         Else 'should not get here
             MsgBox("No Changes have been made.")
         End If
+
+        cmdApply.Enabled = False
 
         pPChanged = False
         pIChanged = False

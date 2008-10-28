@@ -40,7 +40,7 @@ Public Class frmLand
 
         Me.Text = "WinHSPF - LandUse Editor"
         Me.Icon = pIcon
-        Me.MinimumSize = New Size(970, 635)
+        Me.MinimumSize = Me.Size
 
         CheckSchematic(lSchemFound, lNetFound)
         If lNetFound And Not lSchemFound Then
