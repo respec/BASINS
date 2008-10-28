@@ -9,7 +9,7 @@ Imports System
 
 Public Module CatSummary
     Private Const pFieldWidth As Integer = 12
-    Private Const pTestPath As String = "C:\test\SegmentBalance\"
+    Private Const pTestPath As String = "D:\Mono_10\"
     Private Const pCatSummaryFileName As String = "CatSummary.txt"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -158,7 +158,13 @@ Public Module CatSummary
         Dim lString As String = ""
         If lConsDataGroup.Count > 0 Then
             Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
-            Dim lValue As Double = lTempDataSet.Attributes.GetDefinedValue(aTrans).Value
+            Dim lAttributeDefinedValue As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue(aTrans)
+            Dim lValue As Double
+            If lAttributeDefinedValue Is Nothing Then
+                lValue = Double.NaN
+            Else
+                lValue = lAttributeDefinedValue.Value
+            End If
             lString = vbTab & DecimalAlign(lValue)
             Dim lSeasons As New atcSeasons.atcSeasonsMonth
             Dim lSeasonalAttributes As New atcDataAttributes
