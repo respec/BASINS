@@ -1038,7 +1038,7 @@ Public Class GisUtil
     End Sub
 
     Public Shared Sub ExtentsOfLayer(ByVal aLayerIndex As Integer, _
-                                     ByVal aXMax As Double, ByVal aXMin As Double, ByVal aYMax As Double, ByVal aYMin As Double)
+                                     ByRef aXMax As Double, ByRef aXMin As Double, ByRef aYMax As Double, ByRef aYMin As Double)
         Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         aXMax = lsf.Extents.xMax
         aXMin = lsf.Extents.xMin
