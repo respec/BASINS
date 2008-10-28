@@ -38,37 +38,36 @@ Module modFreq
                           ByRef aTau As Double, _
                           ByRef aLevel As Double, _
                           ByRef aSlope As Double)
-        Dim lQ() As Single
+        Dim lTau As Single = pNan
+        Dim lLevel As Single = pNan
+        Dim lSlope As Single = pNan
         Dim lN As Integer = aTs.numValues
-        Dim lTau As Single
-        Dim lLevel As Single
-        Dim lSlope As Single
-        ReDim lQ(lN - 1)
-        For i As Integer = 1 To aTs.numValues
-            If Double.IsNaN(aTs.Values(i)) Then
-                lQ(i - 1) = 0
-            Else
-                lQ(i - 1) = aTs.Values(i)
-            End If
-        Next
-        Try
-            KENT(lQ(0), lN, lTau, lLevel, lSlope)
-        Catch ex As Exception
-            lTau = pNan
-            lLevel = pNan
-            aSlope = pNan
-            If pWarned Then
-                Logger.Dbg("Could not compute Kendall Tau: " & ex.Message)
-            Else
-                Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
-                If IO.File.Exists(lExpectedDLL) Then
-                    Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute Kendall Tau")
+
+        If lN > 0 Then
+            Dim lQ(lN - 1) As Single
+            For i As Integer = 1 To aTs.numValues
+                If Double.IsNaN(aTs.Values(i)) Then
+                    lQ(i - 1) = 0
                 Else
-                    Logger.Msg("Required library not found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute Kendall Tau")
+                    lQ(i - 1) = aTs.Values(i)
                 End If
-                pWarned = True
-            End If
-        End Try
+            Next
+            Try
+                KENT(lQ(0), lN, lTau, lLevel, lSlope)
+            Catch ex As Exception
+                If pWarned Then
+                    Logger.Dbg("Could not compute Kendall Tau: " & ex.Message)
+                Else
+                    Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
+                    If IO.File.Exists(lExpectedDLL) Then
+                        Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute Kendall Tau")
+                    Else
+                        Logger.Msg("Required library not found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute Kendall Tau")
+                    End If
+                    pWarned = True
+                End If
+            End Try
+        End If
         aTau = lTau
         aLevel = lLevel
         aSlope = lSlope
