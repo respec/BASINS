@@ -101,43 +101,52 @@ Public Module WatershedSummaryOverland
 
             Dim lFirstDataRecord As Integer = .CurrentRecord + 1
             Dim lLastDataRecord As Integer = lFirstDataRecord + lPerlndOperations.Count / lNumUniquePerlnd - 1
+            Dim lSegment As Integer = lPerlndFirstId
+            Dim lSegmentImplnd As Integer = lImplndFirstId
 
             For lRecord As Integer = lFirstDataRecord To lLastDataRecord
                 .CurrentRecord = lRecord
-                lField = 1
-                Dim lSegment As Integer = lPerlndFirstId + (lRecord - lFirstDataRecord) * lRepeatPerlnd
-                .Value(lField) = lSegment
-                Dim lID As Integer = lSegment
-                Dim lRowTotalArea As Double = 0
-                Dim lRowTotalTons As Double = 0
-                SetCellsTonsPerAcre(aUci, lPerlndOperations, _
-                                    lID, _
-                                    lID + lNumUniquePerlnd - 1, _
-                                    lNonpointData, lOutputTable, lField, lRowTotalArea, lRowTotalTons, lTotalAreaPerColumn, lTotalTonsPerColumn)
+                Dim lFound As Boolean = False
+                While Not lFound
+                    lField = 1
+                    .Value(lField) = CInt(10 * Math.Floor(lSegment / 10))
+                    Dim lID As Integer = lSegment
+                    Dim lRowTotalArea As Double = 0
+                    Dim lRowTotalTons As Double = 0
+                    SetCellsTonsPerAcre(aUci, lPerlndOperations, _
+                                        lID, _
+                                        lID + lNumUniquePerlnd - 1, _
+                                        lNonpointData, lOutputTable, lField, lRowTotalArea, lRowTotalTons, lTotalAreaPerColumn, lTotalTonsPerColumn)
 
-                lID = lImplndFirstId + (lRecord - lFirstDataRecord) * lRepeatImplnd
-                SetCellsTonsPerAcre(aUci, lImplndOperations, _
-                                    lID, lID + lNumUniqueImplnd - 1, _
-                                    lNonpointData, lOutputTable, lField, lRowTotalArea, lRowTotalTons, lTotalAreaPerColumn, lTotalTonsPerColumn)
+                    lID = lSegmentImplnd
+                    SetCellsTonsPerAcre(aUci, lImplndOperations, _
+                                        lID, lID + lNumUniqueImplnd - 1, _
+                                        lNonpointData, lOutputTable, lField, lRowTotalArea, lRowTotalTons, lTotalAreaPerColumn, lTotalTonsPerColumn)
 
-                lTotalAreaPerColumn(.NumFields) += lRowTotalArea
-                lTotalTonsPerColumn(.NumFields) += lRowTotalTons
+                    If lRowTotalArea > 0 Then
+                        lFound = True
+                        lTotalAreaPerColumn(.NumFields) += lRowTotalArea
+                        lTotalTonsPerColumn(.NumFields) += lRowTotalTons
 
-                .Value(.NumFields) = DoubleToString(lRowTotalTons / lRowTotalArea)
+                        .Value(.NumFields) = DoubleToString(lRowTotalTons / lRowTotalArea)
 
-                For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
-                    Dim lValue As Double
-                    If Double.TryParse(.Value(lField), lValue) Then
-                        If lValue > lMaxTonsPerAcre(lField) Then
-                            lMaxTonsPerAcre(lField) = lValue
-                            lMaxSegment(lField) = lSegment
-                        End If
-                        If lValue < lMinTonsPerAcre(lField) Then
-                            lMinTonsPerAcre(lField) = lValue
-                            lMinSegment(lField) = lSegment
-                        End If
+                        For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
+                            Dim lValue As Double
+                            If Double.TryParse(.Value(lField), lValue) Then
+                                If lValue > lMaxTonsPerAcre(lField) Then
+                                    lMaxTonsPerAcre(lField) = lValue
+                                    lMaxSegment(lField) = lSegment
+                                End If
+                                If lValue < lMinTonsPerAcre(lField) Then
+                                    lMinTonsPerAcre(lField) = lValue
+                                    lMinSegment(lField) = lSegment
+                                End If
+                            End If
+                        Next
                     End If
-                Next
+                    lSegment += lRepeatPerlnd
+                    lSegmentImplnd += lRepeatImplnd
+                End While
             Next
             .CurrentRecord += 2
             .Value(1) = "Weighted Average"

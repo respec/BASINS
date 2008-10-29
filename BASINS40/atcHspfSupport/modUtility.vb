@@ -297,7 +297,7 @@ Public Module Utility
         Dim lArea As Double = 0
         For Each lReach As HspfOperation In aUci.OpnBlks("RCHRES").Ids
             For Each lConnection As HspfConnection In lReach.Sources
-                If lConnection.Source.Opn.Equals(aOperation) Then
+                If Not lConnection.Source.Opn Is Nothing AndAlso lConnection.Source.Opn.Equals(aOperation) Then
                     lArea += lConnection.MFact
                 End If
             Next
