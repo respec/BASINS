@@ -406,7 +406,7 @@ Public Class HspfUci
         pMassLinks = New Collection(Of HspfMassLink)
         pPollutants = New Collection(Of HspfPollutant)
 
-        DefaultBlockOrder(pOrder)
+        pOrder = DefaultBlockOrder()
     End Sub
 
     'Public Sub CreateUci(ByRef M As HspfMsg, ByRef newName As String, ByRef outputwdm As String, ByRef metwdms() As String, ByRef wdmids() As String, ByRef MetDataDetails As String, ByRef oneseg As Boolean, ByRef PollutantList As Collection)
