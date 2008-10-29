@@ -245,7 +245,7 @@ Module modUCIRecords
         Return lComment.TrimEnd
     End Function
 
-    Public Sub DefaultBlockOrder(ByRef aOrder As ArrayList)
+    Public Function DefaultBlockOrder() As ArrayList
         Dim lOrder As New ArrayList(20)
         With lOrder
             .Add("GLOBAL")
@@ -269,6 +269,8 @@ Module modUCIRecords
             .Add("MASSLINKS")
             .Add("SPECIAL ACTIONS")
         End With
+
+        pBlocks.Clear()
         pBlocks.Add("RUN", -1)
         For Each lBlockName As String In lOrder
             pBlocks.Add(lBlockName, -1)
@@ -282,8 +284,8 @@ Module modUCIRecords
         pBlocks.Add("SCHEMATIC", -1)
         pBlocks.Add("NETWORK", -1)
 
-        aOrder = lOrder
-    End Sub
+        Return lOrder
+    End Function
 
     Public Sub SaveBlockOrder(ByRef aOrder As ArrayList)
         Dim lOrder As New ArrayList(20)
