@@ -44,9 +44,8 @@ Public Module WatershedSummaryOverland
                 Return New Text.StringBuilder("Overland report not yet defined for balance type '" & aBalanceType & "'")
         End Select
 
-        Dim lCumulativePointNonpointColl As New atcCollection
-
         Dim lSB As New Text.StringBuilder
+
         lSB.AppendLine("Overland Summary Report for " & aBalanceType & " in " & aScenario & " " & lUnits)
         lSB.AppendLine("   Run Made " & aRunMade)
         lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
@@ -55,8 +54,10 @@ Public Module WatershedSummaryOverland
         Dim lOutputTable As New atcTableDelimited
         With lOutputTable
             .Delimiter = vbTab
-            .NumFields = 2 + lNumUniquePerlnd + lNumUniqueImplnd
+            .NumFields = 1 + (lNumUniquePerlnd + lNumUniqueImplnd + 1) * 3
             .NumRecords = 8 + lPerlndOperations.Count / lNumUniquePerlnd
+            Dim lTotalPerColumn(.NumFields) As Double
+            Dim lCountPerColumn(.NumFields) As Integer
             Dim lTotalAreaPerColumn(.NumFields) As Double
             Dim lTotalTonsPerColumn(.NumFields) As Double
             Dim lMaxTonsPerAcre(.NumFields) As Double
@@ -72,36 +73,81 @@ Public Module WatershedSummaryOverland
             .Value(lField) = "    "
             .FieldName(lField) = "Segment"
             For lOperationIndex = 0 To lNumUniquePerlnd - 1
+                'Mean
                 lField += 1
                 .FieldLength(lField) = 10
                 .FieldType(lField) = "N"
-                .Value(lField) = lUnits
-                .FieldName(lField) = lPerlndOperations(lOperationIndex).Description
-                lMinTonsPerAcre(lField) = GetMaxValue()
+                .Value(lField) = lPerlndOperations(lOperationIndex).Description
+                If lOperationIndex = 0 Then .FieldName(lField) = "PERLND"
+
+                'Min
+                lField += 1
+                .FieldLength(lField) = 10
+                .FieldType(lField) = "N"
+
+                'Max
+                lField += 1
+                .FieldLength(lField) = 10
+                .FieldType(lField) = "N"
             Next
             For lOperationIndex = 0 To lNumUniqueImplnd - 1
+                'Mean
                 lField += 1
                 .FieldLength(lField) = 10
                 .FieldType(lField) = "N"
-                .Value(lField) = lUnits
-                .FieldName(lField) = lImplndOperations(lOperationIndex).Description
-                lMinTonsPerAcre(lField) = GetMaxValue()
+                .Value(lField) = lImplndOperations(lOperationIndex).Description
+                If lOperationIndex = 0 Then .FieldName(lField) = "IMPLND"
+
+                'Min
+                lField += 1
+                .FieldLength(lField) = 10
+                .FieldType(lField) = "N"
+
+                'Max
+                lField += 1
+                .FieldLength(lField) = 10
+                .FieldType(lField) = "N"
             Next
 
             lField += 1
             .FieldLength(lField) = 10
             .FieldType(lField) = "N"
-            .Value(lField) = lUnits
-            .FieldName(lField) = "Weighted Average"
-            lMinTonsPerAcre(lField) = GetMaxValue()
+            .Value(lField) = "Weighted Average"
+
+            lField += 1
+            .FieldLength(lField) = 10
+            .FieldType(lField) = "N"
+
+            lField += 1
+            .FieldLength(lField) = 10
+            .FieldType(lField) = "N"
 
             .CurrentRecord += 1
-            .Value(2) = "PERLND"
-            .Value(lNumUniquePerlnd + 2) = "IMPLND"
+            lField = 1
+            For lOperationIndex = 0 To lNumUniquePerlnd - 1
+                lField += 1 : .Value(lField) = "Mean"
+                lField += 1 : .Value(lField) = "Min"
+                lField += 1 : .Value(lField) = "Max"
+            Next
+            For lOperationIndex = 0 To lNumUniqueImplnd - 1
+                lField += 1 : .Value(lField) = "Mean"
+                lField += 1 : .Value(lField) = "Min"
+                lField += 1 : .Value(lField) = "Max"
+            Next
+            lField += 1 : .Value(lField) = "Mean"
+            lField += 1 : .Value(lField) = "Min"
+            lField += 1 : .Value(lField) = "Max"
+
+            .CurrentRecord += 1
+            For lField = 2 To .NumFields
+                .Value(lField) = lUnits
+                lMinTonsPerAcre(lField) = GetMaxValue()
+            Next
 
             Dim lFirstDataRecord As Integer = .CurrentRecord + 1
             Dim lLastDataRecord As Integer = lFirstDataRecord + lPerlndOperations.Count / lNumUniquePerlnd - 1
             Dim lSegment As Integer = lPerlndFirstId
+            Dim lSegmentLabel As Integer
             Dim lSegmentImplnd As Integer = lImplndFirstId
 
             For lRecord As Integer = lFirstDataRecord To lLastDataRecord
@@ -109,37 +155,54 @@ Public Module WatershedSummaryOverland
                 Dim lFound As Boolean = False
                 While Not lFound
                     lField = 1
-                    .Value(lField) = CInt(10 * Math.Floor(lSegment / 10))
+                    lSegmentLabel = CInt(10 * Math.Floor(lSegment / 10))
+                    .Value(lField) = lSegmentLabel
                     Dim lID As Integer = lSegment
                     Dim lRowTotalArea As Double = 0
-                    Dim lRowTotalTons As Double = 0
-                    SetCellsTonsPerAcre(aUci, lPerlndOperations, _
-                                        lID, _
-                                        lID + lNumUniquePerlnd - 1, _
-                                        lNonpointData, lOutputTable, lField, lRowTotalArea, lRowTotalTons, lTotalAreaPerColumn, lTotalTonsPerColumn)
+                    Dim lRowTotalTonsMean As Double = 0
+                    Dim lRowTotalTonsMin As Double = 0
+                    Dim lRowTotalTonsMax As Double = 0
+                    SetCellsTonsPerAcre(aUci, lPerlndOperations, lID, lID + lNumUniquePerlnd - 1, _
+                                        lNonpointData, _
+                                        lOutputTable, lField, _
+                                        lRowTotalArea, _
+                                        lRowTotalTonsMean, lRowTotalTonsMin, lRowTotalTonsMax, _
+                                        lTotalAreaPerColumn, lTotalTonsPerColumn)
 
                     lID = lSegmentImplnd
-                    SetCellsTonsPerAcre(aUci, lImplndOperations, _
-                                        lID, lID + lNumUniqueImplnd - 1, _
-                                        lNonpointData, lOutputTable, lField, lRowTotalArea, lRowTotalTons, lTotalAreaPerColumn, lTotalTonsPerColumn)
+                    SetCellsTonsPerAcre(aUci, lImplndOperations, lID, lID + lNumUniqueImplnd - 1, _
+                                        lNonpointData, _
+                                        lOutputTable, lField, _
+                                        lRowTotalArea, _
+                                        lRowTotalTonsMean, lRowTotalTonsMin, lRowTotalTonsMax, _
+                                        lTotalAreaPerColumn, lTotalTonsPerColumn)
 
                     If lRowTotalArea > 0 Then
                         lFound = True
+                        lTotalAreaPerColumn(.NumFields - 2) += lRowTotalArea
+                        lTotalAreaPerColumn(.NumFields - 1) += lRowTotalArea
                         lTotalAreaPerColumn(.NumFields) += lRowTotalArea
-                        lTotalTonsPerColumn(.NumFields) += lRowTotalTons
 
-                        .Value(.NumFields) = DoubleToString(lRowTotalTons / lRowTotalArea)
+                        lTotalTonsPerColumn(.NumFields - 2) += lRowTotalTonsMean
+                        lTotalTonsPerColumn(.NumFields - 1) += lRowTotalTonsMin
+                        lTotalTonsPerColumn(.NumFields) += lRowTotalTonsMax
+
+                        .Value(.NumFields - 2) = DoubleToString(lRowTotalTonsMean / lRowTotalArea)
+                        .Value(.NumFields - 1) = DoubleToString(lRowTotalTonsMin / lRowTotalArea)
+                        .Value(.NumFields) = DoubleToString(lRowTotalTonsMax / lRowTotalArea)
 
                         For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                             Dim lValue As Double
                             If Double.TryParse(.Value(lField), lValue) Then
+                                lCountPerColumn(lField) += 1
+                                lTotalPerColumn(lField) += lValue
                                 If lValue > lMaxTonsPerAcre(lField) Then
                                     lMaxTonsPerAcre(lField) = lValue
-                                    lMaxSegment(lField) = lSegment
+                                    lMaxSegment(lField) = lSegmentLabel
                                 End If
                                 If lValue < lMinTonsPerAcre(lField) Then
                                     lMinTonsPerAcre(lField) = lValue
-                                    lMinSegment(lField) = lSegment
+                                    lMinSegment(lField) = lSegmentLabel
                                 End If
                             End If
                         Next
@@ -148,6 +211,7 @@ Public Module WatershedSummaryOverland
                     lSegmentImplnd += lRepeatImplnd
                 End While
             Next
+
             .CurrentRecord += 2
             .Value(1) = "Weighted Average"
             For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
@@ -155,8 +219,15 @@ Public Module WatershedSummaryOverland
                     .Value(lField) = DoubleToString(lTotalTonsPerColumn(lField) / lTotalAreaPerColumn(lField))
                 End If
             Next
-
             .CurrentRecord += 1
+            .Value(1) = "Arithmetic Mean"
+            For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
+                If lCountPerColumn(lField) > 0 Then
+                    .Value(lField) = DoubleToString(lTotalPerColumn(lField) / lCountPerColumn(lField))
+                End If
+            Next
+
+            .CurrentRecord += 2
             .Value(1) = "Maximum"
             For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                 If lMaxSegment(lField) > 0 Then
@@ -171,7 +242,7 @@ Public Module WatershedSummaryOverland
                 End If
             Next
 
-            .CurrentRecord += 1
+            .CurrentRecord += 2
             .Value(1) = "Minimum"
             For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                 If lMinSegment(lField) > 0 Then
@@ -223,7 +294,9 @@ Public Module WatershedSummaryOverland
                                     ByVal aTable As atcTable, _
                                     ByRef aField As Integer, _
                                     ByRef aTotalArea As Double, _
-                                    ByRef aTotalTons As Double, _
+                                    ByRef aYearlyTonsMean As Double, _
+                                    ByRef aYearlyTonsMin As Double, _
+                                    ByRef aYearlyTonsMax As Double, _
                                     ByRef aTotalAreaPerColumn() As Double, _
                                     ByRef aTotalTonsPerColumn() As Double)
         While aID <= aLastID
@@ -232,21 +305,42 @@ Public Module WatershedSummaryOverland
             If aOperations.Contains(lKey) Then
                 Dim lOperation As HspfOperation = aOperations.Item(lKey)
                 Dim lArea As Double = OperationArea(aUCI, lOperation)
-                Dim lTotal As Double = 0
+                Dim lSumAnnual As Double = 0
+                Dim lMinAnnual As Double = 0
+                Dim lMaxAnnual As Double = 0
 
                 For Each lTs As atcTimeseries In aData.FindData("Location", lOperation.Name.Substring(0, 1) & ":" & aID)
-                    lTotal += lArea * lTs.Attributes.GetValue("SumAnnual")
+                    lSumAnnual += lArea * lTs.Attributes.GetValue("SumAnnual")
+                    Dim lTsYearly As atcTimeseries = FillValues(lTs, atcTimeUnit.TUYear, , GetNaN)
+                    lMinAnnual += lArea * lTsYearly.Attributes.GetValue("Min")
+                    lMaxAnnual += lArea * lTsYearly.Attributes.GetValue("Max")
                 Next
                 aTotalArea += lArea
-                aTotalTons += lTotal
+                aYearlyTonsMean += lSumAnnual
+                aYearlyTonsMin += lMinAnnual
+                aYearlyTonsMax += lMaxAnnual
 
-                aTotalAreaPerColumn(aField) += lArea
-                aTotalTonsPerColumn(aField) += lTotal
 
                 'aTable.Value(aField) = lOperation.Name & lOperation.Id & " area=" & DoubleToString(lArea) & " total=" & DoubleToString(lTotal) & " Per=" & DoubleToString(lTotal / lArea)
-                aTable.Value(aField) = DoubleToString(lTotal / lArea)
+                aTable.Value(aField) = DoubleToString(lSumAnnual / lArea)
+                aTotalAreaPerColumn(aField) += lArea
+                aTotalTonsPerColumn(aField) += lSumAnnual
+
+                aField += 1
+                aTable.Value(aField) = DoubleToString(lMinAnnual / lArea)
+                aTotalAreaPerColumn(aField) += lArea
+                aTotalTonsPerColumn(aField) += lMinAnnual
+
+                aField += 1
+                aTable.Value(aField) = DoubleToString(lMaxAnnual / lArea)
+                aTotalAreaPerColumn(aField) += lArea
+                aTotalTonsPerColumn(aField) += lMaxAnnual
             Else
-                aTable.Value(aField) = "Missing"
+                aTable.Value(aField) = "--"
+                aField += 1
+                aTable.Value(aField) = "--"
+                aField += 1
+                aTable.Value(aField) = "--"
             End If
             aID += 1
         End While
