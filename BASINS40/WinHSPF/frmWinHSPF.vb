@@ -1,6 +1,8 @@
 Imports atcUCIForms
 Imports MapWinUtility
 Imports atcUCI
+Imports System
+Imports atcControls
 
 Public Class frmWinHSPF
 
@@ -82,11 +84,20 @@ Public Class frmWinHSPF
         End If
     End Sub
 
-    Private Sub ToolStripButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton2.Click
-        frmActivityAll.Show()
-    End Sub
-
     Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton1.Click
         frmOutput.Show()
     End Sub
+
+    Private Sub frmWinHSPF_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+    End Sub
+
+    Private Sub EditControlCardsWithTablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditControlCardsWithTablesToolStripMenuItem.Click
+        frmActivityAll.Show()
+    End Sub
+
+    Private Sub EditWithToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditWithToolStripMenuItem.Click
+        frmControl.Show()
+    End Sub
+
 End Class
