@@ -172,7 +172,7 @@ Module modFreq
                     Dim lArguments As New atcDataAttributes
                     lArguments.SetValue("Nday", lNday)
                     lArguments.SetValue("Return Period", aRecurOrProbs(lIndex))
-                    lArguments.SetValue("NDayTimeseries", aTs)
+                    lArguments.SetValue("NDayTimeseries", lNonLogTS)
 
                     aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
 
