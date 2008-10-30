@@ -26,11 +26,11 @@ Partial Class frmOutput
         Me.radio2 = New System.Windows.Forms.RadioButton
         Me.radio1 = New System.Windows.Forms.RadioButton
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.cmdCopy = New System.Windows.Forms.Button
         Me.cmdRemove = New System.Windows.Forms.Button
         Me.cmdAdd = New System.Windows.Forms.Button
         Me.agdOutput = New atcControls.atcGrid
         Me.cmdClose = New System.Windows.Forms.Button
-        Me.cmdCopy = New System.Windows.Forms.Button
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -120,6 +120,15 @@ Partial Class frmOutput
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Output Locations"
         '
+        'cmdCopy
+        '
+        Me.cmdCopy.Location = New System.Drawing.Point(149, 234)
+        Me.cmdCopy.Name = "cmdCopy"
+        Me.cmdCopy.Size = New System.Drawing.Size(60, 20)
+        Me.cmdCopy.TabIndex = 3
+        Me.cmdCopy.Text = "Copy"
+        Me.cmdCopy.UseVisualStyleBackColor = True
+        '
         'cmdRemove
         '
         Me.cmdRemove.Location = New System.Drawing.Point(82, 234)
@@ -161,15 +170,6 @@ Partial Class frmOutput
         Me.cmdClose.TabIndex = 6
         Me.cmdClose.Text = "&Close"
         Me.cmdClose.UseVisualStyleBackColor = True
-        '
-        'cmdCopy
-        '
-        Me.cmdCopy.Location = New System.Drawing.Point(149, 234)
-        Me.cmdCopy.Name = "cmdCopy"
-        Me.cmdCopy.Size = New System.Drawing.Size(60, 20)
-        Me.cmdCopy.TabIndex = 3
-        Me.cmdCopy.Text = "Copy"
-        Me.cmdCopy.UseVisualStyleBackColor = True
         '
         'frmOutput
         '
