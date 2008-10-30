@@ -9,8 +9,12 @@ Imports System
 
 Public Module CatSummary
     Private Const pFieldWidth As Integer = 12
-    Private Const pTestPath As String = "D:\Mono_10\"
+    Private Const pTestPath As String = "C:\mono_luChange\output\lu2090a2\"
     Private Const pCatSummaryFileName As String = "CatSummary.txt"
+    Private pCatXMLFile As String = "VaryPrecTempHbnPrepare.xml"
+    Private WithEvents pCat As New atcClimateAssessmentTool.clsCat
+    Private pCatList As ArrayList
+
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -33,6 +37,36 @@ Public Module CatSummary
 
         'delete the output file if it already exists
         If FileExists(pCatSummaryFileName) Then Kill(pCatSummaryFileName)
+
+        'read in the xml for the endpoints and parse out the variations
+        Logger.Dbg("read in endpoints")
+        With pCat
+            .XML = IO.File.ReadAllText(pCatXMLFile) ' TODO: ZZ deal with no need for uci files
+            '.StartRun("Modified")
+            'Logger.Dbg("RunsComplete")
+            'IO.File.WriteAllText("CatRunnerResults.txt", .ResultsGrid.ToString)
+            '.Inputs.Clear()
+            '.Endpoints.Clear()
+            '.PreparedInputs.Clear()
+        End With
+
+        'build collection of location::constituent<->operation list
+        pCatList = New ArrayList
+        Try
+            For Each lVar As atcClimateAssessmentTool.atcVariation In pCat.Endpoints
+                For Each lds As atcDataSet In lVar.DataSets
+                    Dim lCatTemp(2) As String
+                    lCatTemp(0) = lds.Attributes.GetFormattedValue("location")  ' e.g. Seg1
+                    lCatTemp(1) = lds.Attributes.GetFormattedValue("constituent") ' e.g. HPRC
+                    lCatTemp(2) = lVar.Operation.ToString ' e.g. Sum
+                    If Not foundMatchingEndpoint(pCatList, lCatTemp) Then
+                        pCatList.Add(lCatTemp)
+                    End If
+                Next
+            Next
+        Catch ex As Exception
+            Logger.Msg("Cat structure failed: " & ex.ToString)
+        End Try
 
         'build collection of scenarios (uci base names) to report
         Dim lUcis As New System.Collections.Specialized.NameValueCollection
@@ -74,16 +108,43 @@ Public Module CatSummary
             Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
             'call main cat summary routine
-            DoCatSummary(lScenario)
-
+            Try
+                DoCatSummary(lScenario)
+            Catch ex As Exception
+                Logger.Msg("DoCatSummary Error: " & ex.ToString & vbCrLf & vbCrLf & ex.InnerException.ToString)
+            End Try
+            
             atcDataManager.DataSources.Remove(lHspfBinFile)
             lHspfBinFile.DataSets.Clear()
             lHspfBinFile = Nothing
             atcDataManager.DataSources.Remove(lHspfWdmFile)
             lHspfWdmFile.DataSets.Clear()
             lHspfWdmFile = Nothing
+
         Next lScenario
+
+        pCatList.Clear()
+        pCatList = Nothing
+
+        Logger.Msg("Done summary of CAT run results")
+
     End Sub
+
+    Public Function foundMatchingEndpoint(ByRef aVarList As ArrayList, ByRef aCat() As String) As Boolean
+        'This function loops through the Endpoints-Variation collection to search for the matching one as user specified entry
+        'Found it, return True
+        'Not found it, return False
+        'This function is used to make sure there is only unique set of variations are used to do the cat summary from run results
+        Dim foundMatch As Boolean = False
+        If aVarList Is Nothing Then Return False
+        For Each lCatTemp() As String In aVarList
+            If lCatTemp(0) = aCat(0) AndAlso lCatTemp(1) = aCat(1) AndAlso lCatTemp(2) = aCat(2) Then
+                foundMatch = True
+                Exit For
+            End If
+        Next
+        Return foundMatch
+    End Function
 
     Friend Sub DoCatSummary(ByVal aScenario As String)
         Logger.Dbg("DoCatSummary for " & aScenario)
@@ -92,37 +153,60 @@ Public Module CatSummary
         lString.Append(aScenario)
 
         'Get this hard coded stuff from CAT endpoints/variations!
+        For Each lCat() As String In pCatList
+            Select Case lCat(0)
+                Case "SEG1"
+                    Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
+                    Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
+                    If lMetDataGroup.Count > 0 Then
+                        lString.Append(AnnualAndSeasonalValues(lMetDataGroup, lCat(1), lCat(2)))
+                    End If
+                Case "RIV9"
+                    Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
+                    If lRchDataGroupW.Count > 0 Then
+                        lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, lCat(1), lCat(2)))
+                    End If
+                Case "R:9"
+                    Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
+                    If lRchDataGroup.Count > 0 Then
+                        lString.Append(AnnualValue(lRchDataGroup, lCat(1), lCat(2)))
+                    End If
+            End Select
+            lString.AppendLine()
+        Next
 
-        Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
-        Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
-        lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "_A24013"))
-        lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "A24013"))
-        Logger.Dbg("     AdditionalMetMatchingDatasetCount " & lMetDataGroup.Count)
+        'Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
+        'Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
+        'lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "_A24013"))
+        'lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "A24013"))
+        'Logger.Dbg("     AdditionalMetMatchingDatasetCount " & lMetDataGroup.Count)
 
-        If lMetDataGroup.Count > 0 Then
-            lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "HPRC", "Sum"))
-            lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "ATMP", "Mean"))
-            lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "EVAP", "Sum"))
-        End If
 
-        Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
-        If lRchDataGroupW.Count > 0 Then
-            lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "Mean"))
-            lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "1Hi100"))
-            lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "FLOW", "7Q10"))
-        End If
+        'If lMetDataGroup.Count > 0 Then
+        '    'pCat.XML.
+        '    lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "HPRC", "Sum"))
+        '    lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "ATMP", "Mean"))
+        '    lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "EVAP", "Sum"))
+        'End If
 
-        Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
-        If lRchDataGroup.Count > 0 Then
-            lString.Append(AnnualValue(lRchDataGroup, "RO", "Mean"))
-            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "SumAnnual"))
-            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "SumAnnual", True))
-            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "Mean"))
-            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "Mean", True))
-            lString.Append(AnnualValue(lRchDataGroup, "P-TOT-OUT", "SumAnnual"))
-            lString.Append(AnnualValue(lRchDataGroup, "N-TOT-OUT", "SumAnnual"))
-        End If
-        lString.AppendLine()
+        'Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
+        'If lRchDataGroupW.Count > 0 Then
+        '    lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "Mean"))
+        '    lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "1Hi100"))
+        '    lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "FLOW", "7Q10"))
+        'End If
+
+        'Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
+        'If lRchDataGroup.Count > 0 Then
+        '    lString.Append(AnnualValue(lRchDataGroup, "RO", "Mean"))
+        '    lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "SumAnnual"))
+        '    lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "SumAnnual", True))
+        '    lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "Mean"))
+        '    lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "Mean", True))
+        '    lString.Append(AnnualValue(lRchDataGroup, "P-TOT-OUT", "SumAnnual"))
+        '    lString.Append(AnnualValue(lRchDataGroup, "N-TOT-OUT", "SumAnnual"))
+        'End If
+        'lString.AppendLine()
 
         Logger.Dbg("CAT Report Add - " & lString.ToString)
         AppendFileString(pCatSummaryFileName, lString.ToString)
