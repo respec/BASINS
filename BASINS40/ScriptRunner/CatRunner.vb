@@ -15,10 +15,10 @@ Module CatRunner
         'Add scenario directories
         pBaseFolders.Add("C:\mono_luChange\output\lu2030a2")
         pBaseFolders.Add("C:\mono_luChange\output\lu2030b2")
-        pBaseFolders.Add("C:\mono_luChange\output\lu2090a2")
-        pBaseFolders.Add("C:\mono_luChange\output\lu2090b2")
-        pBaseFolders.Add("C:\mono_luChange\output\Mono10")
-        pBaseFolders.Add("C:\mono_luChange\output\Mono70")
+        'pBaseFolders.Add("C:\mono_luChange\output\lu2090a2")
+        'pBaseFolders.Add("C:\mono_luChange\output\lu2090b2")
+        'pBaseFolders.Add("C:\mono_luChange\output\Mono10")
+        'pBaseFolders.Add("C:\mono_luChange\output\Mono70")
 
         For Each pBaseFolder In pBaseFolders
             ChDriveDir(pBaseFolder)

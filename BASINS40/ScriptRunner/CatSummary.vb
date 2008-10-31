@@ -9,7 +9,7 @@ Imports System
 
 Public Module CatSummary
     Private Const pFieldWidth As Integer = 12
-    Private Const pTestPath As String = "C:\mono_luChange\output\lu2090a2\"
+    Private Const pTestPath As String = "C:\mono_luChange\output\lu2030a2\"
     Private Const pCatSummaryFileName As String = "CatSummary.txt"
     Private pCatXMLFile As String = "VaryPrecTempHbnPrepare.xml"
     Private WithEvents pCat As New atcClimateAssessmentTool.clsCat
@@ -51,14 +51,32 @@ Public Module CatSummary
         End With
 
         'build collection of location::constituent<->operation list
+        Dim z As String = "1,2,12"
+        Dim z1() As String = z.Split(",")
+
         pCatList = New ArrayList
         Try
             For Each lVar As atcClimateAssessmentTool.atcVariation In pCat.Endpoints
+                'ATTENTION:
+                'Put the selected months here assuming there is only one dataset per variation
+                'If not, then the selected months for the first dataset within the current variation is added into all datasets
+                'So has to pay attention here
+                Dim lSelectedMonths As String = ""
+                If lVar.Seasons IsNot Nothing Then
+                    Dim li As Integer
+                    For li = 1 To 12
+                        If lVar.Seasons.SeasonSelected(li) Then lSelectedMonths &= li & ","
+                    Next
+                    'Rid of the last , at the end of the lSelectedMonths string
+                    lSelectedMonths.TrimEnd(",")
+                End If
+
                 For Each lds As atcDataSet In lVar.DataSets
-                    Dim lCatTemp(2) As String
+                    Dim lCatTemp(3) As String
                     lCatTemp(0) = lds.Attributes.GetFormattedValue("location")  ' e.g. Seg1
                     lCatTemp(1) = lds.Attributes.GetFormattedValue("constituent") ' e.g. HPRC
                     lCatTemp(2) = lVar.Operation.ToString ' e.g. Sum
+                    lCatTemp(3) = lSelectedMonths 'either this is empty string or a comma separated list of Months
                     If Not foundMatchingEndpoint(pCatList, lCatTemp) Then
                         pCatList.Add(lCatTemp)
                     End If
@@ -70,6 +88,7 @@ Public Module CatSummary
 
         'build collection of scenarios (uci base names) to report
         Dim lUcis As New System.Collections.Specialized.NameValueCollection
+        'do we want the 'base.uci'?
         AddFilesInDir(lUcis, pTestPath, False, "*.uci")
         Dim lScenarios As New atcCollection
         For Each lUci As String In lUcis
@@ -108,11 +127,7 @@ Public Module CatSummary
             Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
             'call main cat summary routine
-            Try
-                DoCatSummary(lScenario)
-            Catch ex As Exception
-                Logger.Msg("DoCatSummary Error: " & ex.ToString & vbCrLf & vbCrLf & ex.InnerException.ToString)
-            End Try
+            DoCatSummary(lScenario)
             
             atcDataManager.DataSources.Remove(lHspfBinFile)
             lHspfBinFile.DataSets.Clear()
@@ -153,37 +168,73 @@ Public Module CatSummary
         lString.Append(aScenario)
 
         'Get this hard coded stuff from CAT endpoints/variations!
+        Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
+        Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
+        lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "_A24013"))
+        lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "A24013"))
+        Logger.Dbg("     AdditionalMetMatchingDatasetCount " & lMetDataGroup.Count)
         For Each lCat() As String In pCatList
-            Select Case lCat(0)
-                Case "SEG1"
-                    Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
-                    Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
-                    If lMetDataGroup.Count > 0 Then
-                        lString.Append(AnnualAndSeasonalValues(lMetDataGroup, lCat(1), lCat(2)))
-                    End If
-                Case "RIV9"
-                    Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
-                    If lRchDataGroupW.Count > 0 Then
-                        lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, lCat(1), lCat(2)))
-                    End If
-                Case "R:9"
-                    Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
-                    If lRchDataGroup.Count > 0 Then
-                        lString.Append(AnnualValue(lRchDataGroup, lCat(1), lCat(2)))
-                    End If
-            End Select
-            lString.AppendLine()
+            If lCat(0) = "SEG1" Then
+                If lMetDataGroup.Count > 0 Then
+                    lString.Append(AnnualAndSeasonalValues(lMetDataGroup, lCat(1), lCat(2), "Met"))
+                End If
+            End If
         Next
 
+        Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
+        For Each lCat() As String In pCatList
+            If lCat(0) = "RIV9" Then
+                If lRchDataGroupW.Count > 0 Then
+                    lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, lCat(1), lCat(2), "Rch"))
+                End If
+            End If
+        Next
+
+        Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
+        For Each lCat() As String In pCatList
+            If lCat(0) = "R:9" Then
+                If lRchDataGroup.Count > 0 Then
+                    lString.Append(AnnualValue(lRchDataGroup, lCat(1), lCat(2)))
+                    If lCat(3).Length > 1 Then
+                        lString.Append(AnnualValue(lRchDataGroup, lCat(1), lCat(2), lCat(3), True))
+                    End If
+                End If
+            End If
+        Next
+
+        '******** Second try ********
+        'For Each lCat() As String In pCatList
+        '    'lCat is an array of 3 elements, 0: Location (e.g. Seg1, RIV9) 1: Constituent (HPRC, RO) 2: Operation/Transaction (Sum, Mean)
+        '    If lCat(1) = "FLOW" And Not (lCat(2) = "7Q10") Then lCat(1) = "WATR" 'This adjustment is done based on originals
+        '    Select Case lCat(0)
+        '        Case "SEG1"
+        '            Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
+        '            Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
+        '            If lMetDataGroup.Count > 0 Then
+        '                lString.Append(AnnualAndSeasonalValues(lMetDataGroup, lCat(1), lCat(2)))
+        '            End If
+        '        Case "RIV9"
+        '            Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
+        '            If lRchDataGroupW.Count > 0 Then
+        '                lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, lCat(1), lCat(2)))
+        '            End If
+        '        Case "R:9"
+        '            Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
+        '            If lRchDataGroup.Count > 0 Then
+        '                lString.Append(AnnualValue(lRchDataGroup, lCat(1), lCat(2)))
+        '            End If
+        '    End Select
+        'Next
+
+
+        '******* Original ********
         'Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
         'Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
         'lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "_A24013"))
         'lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "A24013"))
         'Logger.Dbg("     AdditionalMetMatchingDatasetCount " & lMetDataGroup.Count)
 
-
         'If lMetDataGroup.Count > 0 Then
-        '    'pCat.XML.
         '    lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "HPRC", "Sum"))
         '    lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "ATMP", "Mean"))
         '    lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "EVAP", "Sum"))
@@ -206,68 +257,89 @@ Public Module CatSummary
         '    lString.Append(AnnualValue(lRchDataGroup, "P-TOT-OUT", "SumAnnual"))
         '    lString.Append(AnnualValue(lRchDataGroup, "N-TOT-OUT", "SumAnnual"))
         'End If
-        'lString.AppendLine()
+
+        lString.AppendLine()
 
         Logger.Dbg("CAT Report Add - " & lString.ToString)
         AppendFileString(pCatSummaryFileName, lString.ToString)
     End Sub
 
-    Private Function AnnualValue(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String, Optional ByVal aSummer As Boolean = False) As String
-        Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
-        Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
+    Private Function AnnualValue(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String, Optional ByVal aMonthsList As String = "", Optional ByVal aSummer As Boolean = False) As String
         Dim lString As String = ""
-        If lConsDataGroup.Count > 0 Then
-            Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
-            Dim lValue As Double = lTempDataSet.Attributes.GetDefinedValue(aTrans).Value
-            lString = vbTab & DecimalAlign(lValue)
-            If aSummer Then
+
+        Try
+            Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
+            Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
+            If lConsDataGroup.Count > 0 Then
+                Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
+                Dim lValue As Double = lTempDataSet.Attributes.GetDefinedValue(aTrans).Value
+                lString = vbTab & DecimalAlign(lValue)
+                If aSummer Then
+                    Dim lSeasons As New atcSeasons.atcSeasonsMonth
+                    Dim lSeasonalAttributes As New atcDataAttributes
+                    Dim lCalculatedAttributes As New atcDataAttributes
+                    lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
+                    lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
+                    lValue = 0
+                    Dim lMonthsStrArray() As String = aMonthsList.Split(",")
+                    For Each ls As String In lMonthsStrArray
+                        lValue += lCalculatedAttributes(Integer.Parse(ls) - 1).Value
+                    Next
+                    'For lIndex As Integer = 3 To 9
+                    '    lValue += lCalculatedAttributes(lIndex).Value 'AMJJASO
+                    'Next lIndex
+                    lString &= vbTab & DecimalAlign(lValue)
+                End If
+            End If
+        Catch ex As Exception
+            Logger.Msg("AnnualValue Error: " & ex.ToString)
+        End Try
+
+        Return lString
+    End Function
+
+    Private Function AnnualAndSeasonalValues(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String, ByVal aKind As String) As String
+        Dim lString As String = ""
+        Try
+            Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
+            Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
+            If lConsDataGroup.Count > 0 Then
+                Dim lTempDataSet As atcDataSet = Nothing
+                If aKind = "Met" Then lTempDataSet = lConsDataGroup.Item(0)
+                If aKind = "Rch" Then lTempDataSet = lConsDataGroup.Item(1)
+                If lTempDataSet Is Nothing Then
+                    Logger.Msg("AnnualAndSeasonalValues Error: The " & aKind & " Dataset is Empty")
+                End If
+                Dim lAttributeDefinedValue As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue(aTrans)
+                Dim lValue As Double
+                If lAttributeDefinedValue Is Nothing Then
+                    lValue = Double.NaN
+                Else
+                    lValue = lAttributeDefinedValue.Value
+                End If
+                lString = vbTab & DecimalAlign(lValue)
                 Dim lSeasons As New atcSeasons.atcSeasonsMonth
                 Dim lSeasonalAttributes As New atcDataAttributes
                 Dim lCalculatedAttributes As New atcDataAttributes
                 lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
                 lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
-                lValue = 0
-                For lIndex As Integer = 3 To 9
-                    lValue += lCalculatedAttributes(lIndex).Value 'AMJJASO
-                Next lIndex
+                lValue = lCalculatedAttributes(0).Value + lCalculatedAttributes(1).Value + lCalculatedAttributes(11).Value   'DJF
+                If aTrans = "Mean" Then lValue = lValue / 3
+                lString &= vbTab & DecimalAlign(lValue)
+                lValue = lCalculatedAttributes(2).Value + lCalculatedAttributes(3).Value + lCalculatedAttributes(4).Value  'MAM
+                If aTrans = "Mean" Then lValue = lValue / 3
+                lString &= vbTab & DecimalAlign(lValue)
+                lValue = lCalculatedAttributes(5).Value + lCalculatedAttributes(6).Value + lCalculatedAttributes(7).Value  'JJA
+                If aTrans = "Mean" Then lValue = lValue / 3
+                lString &= vbTab & DecimalAlign(lValue)
+                lValue = lCalculatedAttributes(8).Value + lCalculatedAttributes(9).Value + lCalculatedAttributes(10).Value  'SON
+                If aTrans = "Mean" Then lValue = lValue / 3
                 lString &= vbTab & DecimalAlign(lValue)
             End If
-        End If
-        Return lString
-    End Function
+        Catch ex As Exception
+            Logger.Msg("AnnualAndSeasonalValues Error: " & ex.ToString)
+        End Try
 
-    Private Function AnnualAndSeasonalValues(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String) As String
-        Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
-        Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
-        Dim lString As String = ""
-        If lConsDataGroup.Count > 0 Then
-            Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
-            Dim lAttributeDefinedValue As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue(aTrans)
-            Dim lValue As Double
-            If lAttributeDefinedValue Is Nothing Then
-                lValue = Double.NaN
-            Else
-                lValue = lAttributeDefinedValue.Value
-            End If
-            lString = vbTab & DecimalAlign(lValue)
-            Dim lSeasons As New atcSeasons.atcSeasonsMonth
-            Dim lSeasonalAttributes As New atcDataAttributes
-            Dim lCalculatedAttributes As New atcDataAttributes
-            lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
-            lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
-            lValue = lCalculatedAttributes(0).Value + lCalculatedAttributes(1).Value + lCalculatedAttributes(11).Value   'DJF
-            If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DecimalAlign(lValue)
-            lValue = lCalculatedAttributes(2).Value + lCalculatedAttributes(3).Value + lCalculatedAttributes(4).Value  'MAM
-            If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DecimalAlign(lValue)
-            lValue = lCalculatedAttributes(5).Value + lCalculatedAttributes(6).Value + lCalculatedAttributes(7).Value  'JJA
-            If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DecimalAlign(lValue)
-            lValue = lCalculatedAttributes(8).Value + lCalculatedAttributes(9).Value + lCalculatedAttributes(10).Value  'SON
-            If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DecimalAlign(lValue)
-        End If
         Return lString
 
     End Function
