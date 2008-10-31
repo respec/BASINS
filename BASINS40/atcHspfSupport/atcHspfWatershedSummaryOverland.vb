@@ -21,14 +21,19 @@ Public Module WatershedSummaryOverland
 
         Dim lPerlndOperations As HspfOperations = aUci.OpnBlks("PERLND").Ids
         Dim lImplndOperations As HspfOperations = aUci.OpnBlks("IMPLND").Ids
-        Dim lPerlndFirstId As Integer = lPerlndOperations(0).Id
-        Dim lImplndFirstId As Integer = lImplndOperations(0).Id
+        Dim lPerlndFirstId As Integer
+        Dim lPerlndLastId As Integer
+        Dim lImplndFirstId As Integer
+        Dim lImplndLastId As Integer
         Dim lNumUniquePerlnd As Integer = NumUniqueOperations(lPerlndOperations)
         Dim lNumUniqueImplnd As Integer = NumUniqueOperations(lImplndOperations)
         Dim lRepeatPerlnd As Integer = OperationsRepeatInterval(lPerlndOperations)
         Dim lRepeatImplnd As Integer = OperationsRepeatInterval(lImplndOperations)
         Dim lOperationIndex As Integer
         Dim lSeasonName As String
+
+        MinMaxID(lPerlndOperations, lPerlndFirstId, lPerlndLastId)
+        MinMaxID(lImplndOperations, lImplndFirstId, lImplndLastId)
 
         Select Case aBalanceType
             Case "Sediment"
@@ -180,7 +185,8 @@ Public Module WatershedSummaryOverland
                 Dim lSegmentLabel As Integer
                 Dim lSegmentImplnd As Integer = lImplndFirstId
 
-                For lRecord As Integer = lFirstDataRecord To lLastDataRecord
+                Dim lRecord As Integer = lFirstDataRecord
+                While lSegment < lPerlndLastId OrElse lSegmentImplnd < lImplndLastId
                     .CurrentRecord = lRecord
                     Dim lFound As Boolean = False
                     While Not lFound
@@ -246,7 +252,8 @@ Public Module WatershedSummaryOverland
                         lSegment += lRepeatPerlnd
                         lSegmentImplnd += lRepeatImplnd
                     End While
-                Next
+                    lRecord += 1
+                End While
 
                 .CurrentRecord += 2
                 .Value(1) = "Weighted Average"
@@ -299,6 +306,16 @@ Public Module WatershedSummaryOverland
         Next
         Return lSB
     End Function
+
+    Private Sub MinMaxID(ByVal aOperations As HspfOperations, ByRef aMinID As Integer, ByRef aMaxID As Integer)
+        aMinID = 10000
+        aMaxID = 0
+        For Each lOperation As HspfOperation In aOperations
+            If lOperation.Id < aMinID Then aMinID = lOperation.Id
+            If lOperation.Id > aMaxID Then aMaxID = lOperation.Id
+        Next
+        If aMinID > aMaxID Then aMinID = 0
+    End Sub
 
     Private Function NumUniqueOperations(ByVal aOperations As HspfOperations) As Integer
         Dim lNumUnique As Integer = 1
