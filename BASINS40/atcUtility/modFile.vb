@@ -624,11 +624,12 @@ ErrorWriting:
         Dim lExePath As String
         Dim lDLLpath As String
 
-        If aDefaultExt.Length = 0 Then 'get extension from default name
+        If aDefaultExt Is Nothing OrElse aDefaultExt.Length = 0 Then 'get extension from default name
             aDefaultExt = FileExt(aDefaultFileName)
         End If
 
-        If aFileFilter.Length = 0 Then 'get filter from default ext
+        If aFileFilter Is Nothing OrElse aFileFilter.Length = 0 Then 'get filter from default ext
+            aFileFilter = ""
             If aDefaultExt.Length > 0 Then
                 aFileFilter &= aDefaultExt & " Files (*." & aDefaultExt & ")|*." & aDefaultExt & "|"
             End If
