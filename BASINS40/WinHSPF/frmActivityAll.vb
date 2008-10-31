@@ -36,6 +36,7 @@ Public Class frmActivityAll
 
         ' Add any initialization after the InitializeComponent() call.
         Me.MinimumSize = Me.Size
+        Me.Icon = pIcon
 
         pPChanged = False
         pIChanged = False

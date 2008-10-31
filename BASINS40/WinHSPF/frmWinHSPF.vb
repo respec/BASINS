@@ -84,13 +84,6 @@ Public Class frmWinHSPF
         End If
     End Sub
 
-    Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton1.Click
-        frmOutput.Show()
-    End Sub
-
-    Private Sub frmWinHSPF_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
-    End Sub
 
     Private Sub EditControlCardsWithTablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditControlCardsWithTablesToolStripMenuItem.Click
         frmActivityAll.Show()
@@ -100,4 +93,11 @@ Public Class frmWinHSPF
         frmControl.Show()
     End Sub
 
+    Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton1.Click
+        frmOutput.Show()
+    End Sub
+
+    Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
+        frmAbout.Show()
+    End Sub
 End Class

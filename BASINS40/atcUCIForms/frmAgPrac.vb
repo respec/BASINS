@@ -14,7 +14,6 @@ Imports System.Collections.ObjectModel
 Public Class frmAgPrac
 
     Dim pUci As HspfUci
-    'in line below, may need to change to ctlEditSpecialAction
     Dim pCtl As ctlEditSpecialAction
 
     Dim cPracIDs As New Collection

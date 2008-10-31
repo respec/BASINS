@@ -34,8 +34,6 @@ Public Class frmOutput
 
         ' Add any initialization after the InitializeComponent() call.
         Me.MinimumSize = Me.Size
-
-        Me.Text = "WinHSPF - Output Manager"
         Me.Icon = pIcon
 
         With agdOutput
@@ -458,4 +456,7 @@ Public Class frmOutput
         RefreshAll()
     End Sub
 
+    Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
+        frmAddDataSet.Show()
+    End Sub
 End Class
