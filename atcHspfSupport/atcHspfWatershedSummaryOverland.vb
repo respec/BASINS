@@ -12,6 +12,8 @@ Public Module WatershedSummaryOverland
                            ByVal aScenario As String, _
                            ByVal aScenarioResults As atcDataSource, _
                            ByVal aRunMade As String, _
+                           ByVal aPerlndSegmentStarts() As Integer, _
+                           ByVal aImplndSegmentStarts() As Integer, _
                   Optional ByVal aEachYear As Boolean = True, _
                   Optional ByVal aSummary As Boolean = True) As Text.StringBuilder
 
@@ -21,19 +23,27 @@ Public Module WatershedSummaryOverland
 
         Dim lPerlndOperations As HspfOperations = aUci.OpnBlks("PERLND").Ids
         Dim lImplndOperations As HspfOperations = aUci.OpnBlks("IMPLND").Ids
-        Dim lPerlndFirstId As Integer
-        Dim lPerlndLastId As Integer
-        Dim lImplndFirstId As Integer
-        Dim lImplndLastId As Integer
-        Dim lNumUniquePerlnd As Integer = NumUniqueOperations(lPerlndOperations)
-        Dim lNumUniqueImplnd As Integer = NumUniqueOperations(lImplndOperations)
-        Dim lRepeatPerlnd As Integer = OperationsRepeatInterval(lPerlndOperations)
-        Dim lRepeatImplnd As Integer = OperationsRepeatInterval(lImplndOperations)
+        'Dim lPerlndFirstId As Integer
+        'Dim lPerlndLastId As Integer
+        'Dim lImplndFirstId As Integer
+        'Dim lImplndLastId As Integer
+        Dim lPerlndColumns As ArrayList = Nothing 'Column titles for PERLND
+        Dim lImplndColumns As ArrayList = Nothing 'Column titles for IMPLND
+        'Dim lNumUniquePerlnd As Integer = NumUniqueOperations(lPerlndOperations)
+        'Dim lNumUniqueImplnd As Integer = NumUniqueOperations(lImplndOperations)
+        'Dim lRepeatPerlnd As Integer = OperationsRepeatInterval(lPerlndOperations)
+        'Dim lRepeatImplnd As Integer = OperationsRepeatInterval(lImplndOperations)
         Dim lOperationIndex As Integer
         Dim lSeasonName As String
 
-        MinMaxID(lPerlndOperations, lPerlndFirstId, lPerlndLastId)
-        MinMaxID(lImplndOperations, lImplndFirstId, lImplndLastId)
+        'MinMaxID(lPerlndOperations, lPerlndFirstId, lPerlndLastId)
+        'MinMaxID(lImplndOperations, lImplndFirstId, lImplndLastId)
+
+        Dim lSegment As Integer
+        Dim lSegmentImplnd As Integer
+
+        FindSegmentStarts(lPerlndOperations, aPerlndSegmentStarts, lPerlndColumns)
+        FindSegmentStarts(lImplndOperations, aImplndSegmentStarts, lImplndColumns)
 
         Select Case aBalanceType
             Case "Sediment"
@@ -81,11 +91,11 @@ Public Module WatershedSummaryOverland
             With lOutputTable
                 .Delimiter = vbTab
                 If lSummary Then
-                    .NumFields = 1 + (lNumUniquePerlnd + lNumUniqueImplnd + 1) * 3
+                    .NumFields = 1 + (lPerlndColumns.Count + lImplndColumns.Count + 1) * 3
                 Else
-                    .NumFields = 1 + (lNumUniquePerlnd + lNumUniqueImplnd + 1)
+                    .NumFields = 1 + (lPerlndColumns.Count + lImplndColumns.Count + 1)
                 End If
-                .NumRecords = 8 + lPerlndOperations.Count / lNumUniquePerlnd
+                .NumRecords = 8 + lPerlndOperations.Count / lPerlndColumns.Count
                 Dim lTotalPerColumn(.NumFields) As Double
                 Dim lCountPerColumn(.NumFields) As Integer
                 Dim lTotalAreaPerColumn(.NumFields) As Double
@@ -96,19 +106,20 @@ Public Module WatershedSummaryOverland
                 Dim lMinSegment(.NumFields) As Integer
 
                 .CurrentRecord = 1
+                Dim lFieldName As String
                 Dim lField As Integer = 0
                 lField += 1
                 .FieldLength(lField) = 30
                 .FieldType(lField) = "C"
-                .Value(lField) = "    "
                 .FieldName(lField) = "Segment"
-                For lOperationIndex = 0 To lNumUniquePerlnd - 1
+                .Value(lField) = "Start"
+                .FieldName(lField + 1) = "PERLND"
+                For Each lFieldName In lPerlndColumns
                     'Mean
                     lField += 1
                     .FieldLength(lField) = 10
                     .FieldType(lField) = "N"
-                    .Value(lField) = lPerlndOperations(lOperationIndex).Description
-                    If lOperationIndex = 0 Then .FieldName(lField) = "PERLND"
+                    .Value(lField) = lFieldName
                     If lSummary Then
                         'Min
                         lField += 1
@@ -121,13 +132,13 @@ Public Module WatershedSummaryOverland
                         .FieldType(lField) = "N"
                     End If
                 Next
-                For lOperationIndex = 0 To lNumUniqueImplnd - 1
+                .FieldName(lField + 1) = "IMPLND"
+                For Each lFieldName In lImplndColumns
                     'Mean
                     lField += 1
                     .FieldLength(lField) = 10
                     .FieldType(lField) = "N"
-                    .Value(lField) = lImplndOperations(lOperationIndex).Description
-                    If lOperationIndex = 0 Then .FieldName(lField) = "IMPLND"
+                    .Value(lField) = lFieldName
                     If lSummary Then
                         'Min
                         lField += 1
@@ -158,12 +169,12 @@ Public Module WatershedSummaryOverland
                 If lSummary Then
                     .CurrentRecord += 1
                     lField = 1
-                    For lOperationIndex = 0 To lNumUniquePerlnd - 1
+                    For lOperationIndex = 0 To lPerlndColumns.Count - 1
                         lField += 1 : .Value(lField) = "Mean"
                         lField += 1 : .Value(lField) = "Min"
                         lField += 1 : .Value(lField) = "Max"
                     Next
-                    For lOperationIndex = 0 To lNumUniqueImplnd - 1
+                    For lOperationIndex = 0 To lImplndColumns.Count - 1
                         lField += 1 : .Value(lField) = "Mean"
                         lField += 1 : .Value(lField) = "Min"
                         lField += 1 : .Value(lField) = "Max"
@@ -180,18 +191,20 @@ Public Module WatershedSummaryOverland
                 Next
 
                 Dim lFirstDataRecord As Integer = .CurrentRecord + 1
-                Dim lLastDataRecord As Integer = lFirstDataRecord + lPerlndOperations.Count / lNumUniquePerlnd - 1
-                Dim lSegment As Integer = lPerlndFirstId
+                'Dim lLastDataRecord As Integer = lFirstDataRecord + lPerlndOperations.Count / lNumUniquePerlnd - 1
                 Dim lSegmentLabel As Integer
-                Dim lSegmentImplnd As Integer = lImplndFirstId
 
                 Dim lRecord As Integer = lFirstDataRecord
-                While lSegment < lPerlndLastId OrElse lSegmentImplnd < lImplndLastId
+                For lSegmentIndex As Integer = 0 To aPerlndSegmentStarts.GetUpperBound(0)
+                    lSegment = aPerlndSegmentStarts(lSegmentIndex)
+                    lSegmentImplnd = aImplndSegmentStarts(lSegmentIndex)
+                    'While lSegment < lPerlndLastId OrElse lSegmentImplnd < lImplndLastId
                     .CurrentRecord = lRecord
                     Dim lFound As Boolean = False
                     While Not lFound
+                        Dim lDescriptionsThisRow As New ArrayList
                         lField = 1
-                        lSegmentLabel = CInt(10 * Math.Floor(lSegment / 10))
+                        lSegmentLabel = lSegment 'CInt(10 * Math.Floor(lSegment / 10))
                         .Value(lField) = lSegmentLabel
                         Dim lID As Integer = lSegment
                         Dim lRowTotalArea As Double = 0
@@ -199,7 +212,7 @@ Public Module WatershedSummaryOverland
                         Dim lRowTotalTonsMin As Double = 0
                         Dim lRowTotalTonsMax As Double = 0
                         SetCellsTonsPerAcre(lSummary, aUci, lPerlndOperations, _
-                                            lID, lID + lNumUniquePerlnd - 1, _
+                                            lID, lID + lPerlndColumns.Count - 1, _
                                             lCurrentNonpointData, _
                                             lOutputTable, lField, _
                                             lRowTotalArea, _
@@ -208,7 +221,7 @@ Public Module WatershedSummaryOverland
 
                         lID = lSegmentImplnd
                         SetCellsTonsPerAcre(lSummary, aUci, lImplndOperations, _
-                                            lID, lID + lNumUniqueImplnd - 1, _
+                                            lID, lID + lImplndColumns.Count - 1, _
                                             lCurrentNonpointData, _
                                             lOutputTable, lField, _
                                             lRowTotalArea, _
@@ -249,11 +262,9 @@ Public Module WatershedSummaryOverland
                                 End If
                             Next
                         End If
-                        lSegment += lRepeatPerlnd
-                        lSegmentImplnd += lRepeatImplnd
                     End While
                     lRecord += 1
-                End While
+                Next
 
                 .CurrentRecord += 2
                 .Value(1) = "Weighted Average"
@@ -318,28 +329,13 @@ Public Module WatershedSummaryOverland
     End Sub
 
     Private Function NumUniqueOperations(ByVal aOperations As HspfOperations) As Integer
-        Dim lNumUnique As Integer = 1
-        If aOperations.Count < 2 Then
-            lNumUnique = aOperations.Count
-        Else
-            'While aOperations(lNumUnique).Description <> aOperations(0).Description
-            '    lNumUnique += 1
-            'End While
-
-            Dim lUniqueThisGroup As Integer
-            Dim lStartGroupIndex As Integer = 0
-
-            While lStartGroupIndex < aOperations.Count
-                lUniqueThisGroup = 1
-                While (lStartGroupIndex + lUniqueThisGroup) < aOperations.Count AndAlso _
-                       aOperations(lStartGroupIndex + lUniqueThisGroup).Description <> aOperations(lStartGroupIndex).Description
-                    lUniqueThisGroup += 1
-                End While
-                If lUniqueThisGroup > lNumUnique Then lNumUnique = lUniqueThisGroup
-                lStartGroupIndex += lUniqueThisGroup
-            End While
-        End If
-        Return lNumUnique
+        Dim lAlreadySeen As New ArrayList
+        For Each lOperation As HspfOperation In aOperations
+            If Not lAlreadySeen.Contains(lOperation.Description) Then
+                lAlreadySeen.Add(lOperation.Description)
+            End If
+        Next
+        Return lAlreadySeen.Count
     End Function
 
     Private Function OperationsRepeatInterval(ByVal aOperations As HspfOperations) As Integer
@@ -357,6 +353,34 @@ Public Module WatershedSummaryOverland
         End If
         Return 100
     End Function
+
+    Private Sub FindSegmentStarts(ByVal aOperations As HspfOperations, ByRef aStarts As Integer(), ByRef aUniqueOperations As ArrayList)
+        Dim lMinID As Integer = 10000
+        Dim lMaxID As Integer = 0
+        Dim lMinDescription As String = ""
+        aUniqueOperations = New ArrayList
+        For Each lOperation As HspfOperation In aOperations
+            With lOperation
+                If Not aUniqueOperations.Contains(.Description) Then
+                    aUniqueOperations.Add(.Description)
+                End If
+                If .Id < lMinID Then lMinID = .Id : lMinDescription = .Description
+                If .Id > lMaxID Then lMaxID = .Id
+            End With
+        Next
+        If aStarts Is Nothing OrElse aStarts.Length = 0 Then
+            Dim lStarts As New ArrayList
+            For Each lOperation As HspfOperation In aOperations
+                If Not lOperation.Description.Equals(lMinDescription) Then
+                    lStarts.Add(lOperation.Id)
+                End If
+            Next
+            ReDim aStarts(lStarts.Count)
+            For lIndex As Integer = 0 To lStarts.Count - 1
+                aStarts(lIndex) = lStarts(lIndex)
+            Next
+        End If
+    End Sub
 
     Private Sub SetCellsTonsPerAcre(ByVal aIncludeMinMax As Boolean, _
                                     ByVal aUCI As HspfUci, _

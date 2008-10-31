@@ -19,6 +19,8 @@ Module HSPFOutputReports
     Private pGraphAnnual As Boolean = False
     Private pCurveStepType As String = "RearwardStep"
     Private pSummaryTypes As New atcCollection
+    Private pPerlndSegmentStarts() As Integer
+    Private pImplndSegmentStarts() As Integer
 
     Private Sub Initialize()
         pOutputLocations.Clear()
@@ -72,6 +74,10 @@ Module HSPFOutputReports
                 pOutputLocations.Add("R:74")
                 pGraphAnnual = True
                 pCurveStepType = "NonStep" 'Tony's convention 
+                Dim pUpatoiPerlndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701, 801, 901, 924}
+                pPerlndSegmentStarts = pUpatoiPerlndSegmentStarts
+                Dim pUpatoiImplndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701, 801, 901, 905}
+                pImplndSegmentStarts = pUpatoiImplndSegmentStarts
             Case "tinley"
                 pTestPath = "c:\test\tinley"
                 pBaseName = "tinley"
@@ -244,7 +250,7 @@ Module HSPFOutputReports
             lOperationTypes.Add("I:", "IMPLND")
             lOperationTypes.Add("R:", "RCHRES")
 
-            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime).ToString
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, pPerlndSegmentStarts, pImplndSegmentStarts).ToString
             lOutFileName = "outfiles\" & pBaseName & "_" & lSummaryType & "_WatershedOverland.txt"
             SaveFileString(lOutFileName, lString)
             lString = Nothing
