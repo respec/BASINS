@@ -25,8 +25,8 @@ Public Module WatershedSummaryOverland
         Dim lImplndFirstId As Integer = lImplndOperations(0).Id
         Dim lNumUniquePerlnd As Integer = NumUniqueOperations(lPerlndOperations)
         Dim lNumUniqueImplnd As Integer = NumUniqueOperations(lImplndOperations)
-        Dim lRepeatPerlnd As Integer = lPerlndOperations(lNumUniquePerlnd).Id - lPerlndFirstId
-        Dim lRepeatImplnd As Integer = lImplndOperations(lNumUniqueImplnd).Id - lImplndFirstId
+        Dim lRepeatPerlnd As Integer = OperationsRepeatInterval(lPerlndOperations)
+        Dim lRepeatImplnd As Integer = OperationsRepeatInterval(lImplndOperations)
         Dim lOperationIndex As Integer
         Dim lSeasonName As String
 
@@ -323,6 +323,22 @@ Public Module WatershedSummaryOverland
             End While
         End If
         Return lNumUnique
+    End Function
+
+    Private Function OperationsRepeatInterval(ByVal aOperations As HspfOperations) As Integer
+        If aOperations.Count > 1 Then
+            Dim lAlreadySeen As New atcCollection
+            Dim lRepeatCheck As Integer = 0
+            While lRepeatCheck < aOperations.Count AndAlso Not lAlreadySeen.Keys.Contains(aOperations(lRepeatCheck).Description)
+                lAlreadySeen.Add(aOperations(lRepeatCheck).Description, aOperations(lRepeatCheck).Id)
+                lRepeatCheck += 1
+            End While
+
+            If lRepeatCheck < aOperations.Count Then
+                Return aOperations(lRepeatCheck).Id - lAlreadySeen.ItemByKey(aOperations(lRepeatCheck).Description)
+            End If
+        End If
+        Return 100
     End Function
 
     Private Sub SetCellsTonsPerAcre(ByVal aIncludeMinMax As Boolean, _
