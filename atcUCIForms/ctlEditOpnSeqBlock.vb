@@ -34,12 +34,12 @@ Public Class ctlEditOpnSeqBlock
     End Property
 
     Public Sub Add() Implements ctlEdit.Add
-        With grdEdit.Source
-            .Rows += 1
-            .CellEditable(.Rows - 1, 0) = True
-            .CellEditable(.Rows - 1, 1) = True
-        End With
-        pChanged = True
+
+        Dim pfrmAddOperation As New frmAddOperation
+        pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
+        pfrmAddOperation.Show()
+
+
     End Sub
 
     Public Property Data() As Object Implements ctlEdit.Data
@@ -117,8 +117,8 @@ Public Class ctlEditOpnSeqBlock
 
         ' Add any initialization after the InitializeComponent() call.
         grdEdit.Source = New atcGridSource
-
         Data = aHspfOpnSeqBlk
+
     End Sub
 
 End Class

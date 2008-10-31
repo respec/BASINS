@@ -63,6 +63,12 @@
     <Compile Include="ctlEditMonthData.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="frmAddOperation.Designer.vb">
+      <DependentUpon>frmAddOperation.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddOperation.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmHydrEdit.Designer.vb">
       <DependentUpon>frmHydrEdit.vb</DependentUpon>
     </Compile>
@@ -178,6 +184,10 @@
     <EmbeddedResource Include="ctlEditMonthData.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlEditMonthData.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddOperation.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddOperation.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmAgPrac.resx">
       <DependentUpon>frmAgPrac.vb</DependentUpon>

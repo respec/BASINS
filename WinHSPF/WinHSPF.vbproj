@@ -78,6 +78,18 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAbout.Designer.vb">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddDataSet.Designer.vb">
+      <DependentUpon>frmAddDataSet.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddDataSet.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmControl.Designer.vb">
       <DependentUpon>frmControl.vb</DependentUpon>
     </Compile>
@@ -145,6 +157,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmAbout.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddDataSet.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddDataSet.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmControl.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmControl.vb</DependentUpon>

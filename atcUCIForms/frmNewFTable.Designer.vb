@@ -39,6 +39,16 @@ Partial Class frmNewFTable
         Me.cboProv = New System.Windows.Forms.ComboBox
         Me.GroupBox = New System.Windows.Forms.GroupBox
         Me.TextLabel5 = New System.Windows.Forms.Label
+        Me.atxRightSideFloodPlainWidth = New atcControls.atcText
+        Me.atxChannelWidth = New atcControls.atcText
+        Me.atxFloodplainSideSlope = New atcControls.atcText
+        Me.atxChannelSideSlope = New atcControls.atcText
+        Me.atxLeftSideFloodPlainWidth = New atcControls.atcText
+        Me.atxMaximumFloodplainDepth = New atcControls.atcText
+        Me.atxBankfullDepth = New atcControls.atcText
+        Me.atxFloodplainManningsN = New atcControls.atcText
+        Me.atxChannelManningsN = New atcControls.atcText
+        Me.atxChannelDepth = New atcControls.atcText
         Me.Label385 = New System.Windows.Forms.Label
         Me.Label15 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
@@ -53,16 +63,6 @@ Partial Class frmNewFTable
         Me.atxChannelLength = New atcControls.atcText
         Me.atxDrainageArea = New atcControls.atcText
         Me.atxChannelSlope = New atcControls.atcText
-        Me.atxRightSideFloodPlainWidth = New atcControls.atcText
-        Me.atxChannelWidth = New atcControls.atcText
-        Me.atxFloodplainSideSlope = New atcControls.atcText
-        Me.atxChannelSideSlope = New atcControls.atcText
-        Me.atxLeftSideFloodPlainWidth = New atcControls.atcText
-        Me.atxMaximumFloodplainDepth = New atcControls.atcText
-        Me.atxBankfullDepth = New atcControls.atcText
-        Me.atxFloodplainManningsN = New atcControls.atcText
-        Me.atxChannelManningsN = New atcControls.atcText
-        Me.atxChannelDepth = New atcControls.atcText
         Me.AtcText12 = New atcControls.atcText
         Me.AtcText13 = New atcControls.atcText
         Me.AtcText22 = New atcControls.atcText
@@ -282,6 +282,246 @@ Partial Class frmNewFTable
         Me.TextLabel5.TabIndex = 32
         Me.TextLabel5.Text = "<Select a Physiographic Porvince Above>"
         '
+        'atxRightSideFloodPlainWidth
+        '
+        Me.atxRightSideFloodPlainWidth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxRightSideFloodPlainWidth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxRightSideFloodPlainWidth.DefaultValue = "9.99999974737875E-06"
+        Me.atxRightSideFloodPlainWidth.HardMax = 1000000000
+        Me.atxRightSideFloodPlainWidth.HardMin = -1000000000
+        Me.atxRightSideFloodPlainWidth.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxRightSideFloodPlainWidth.Location = New System.Drawing.Point(237, 204)
+        Me.atxRightSideFloodPlainWidth.MaxWidth = 0
+        Me.atxRightSideFloodPlainWidth.Name = "atxRightSideFloodPlainWidth"
+        Me.atxRightSideFloodPlainWidth.NumericFormat = "0.#####"
+        Me.atxRightSideFloodPlainWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxRightSideFloodPlainWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxRightSideFloodPlainWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxRightSideFloodPlainWidth.SelLength = 1
+        Me.atxRightSideFloodPlainWidth.SelStart = 0
+        Me.atxRightSideFloodPlainWidth.Size = New System.Drawing.Size(93, 23)
+        Me.atxRightSideFloodPlainWidth.SoftMax = -999
+        Me.atxRightSideFloodPlainWidth.SoftMin = -999
+        Me.atxRightSideFloodPlainWidth.TabIndex = 12
+        Me.atxRightSideFloodPlainWidth.ValueDouble = 0
+        Me.atxRightSideFloodPlainWidth.ValueInteger = 0
+        '
+        'atxChannelWidth
+        '
+        Me.atxChannelWidth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxChannelWidth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxChannelWidth.DefaultValue = "9.99999974737875E-06"
+        Me.atxChannelWidth.HardMax = 1000000000
+        Me.atxChannelWidth.HardMin = -1000000000
+        Me.atxChannelWidth.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxChannelWidth.Location = New System.Drawing.Point(237, 22)
+        Me.atxChannelWidth.MaxWidth = 0
+        Me.atxChannelWidth.Name = "atxChannelWidth"
+        Me.atxChannelWidth.NumericFormat = "0.#####"
+        Me.atxChannelWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxChannelWidth.SelLength = 1
+        Me.atxChannelWidth.SelStart = 0
+        Me.atxChannelWidth.Size = New System.Drawing.Size(93, 23)
+        Me.atxChannelWidth.SoftMax = -999
+        Me.atxChannelWidth.SoftMin = -999
+        Me.atxChannelWidth.TabIndex = 5
+        Me.atxChannelWidth.ValueDouble = 0
+        Me.atxChannelWidth.ValueInteger = 0
+        '
+        'atxFloodplainSideSlope
+        '
+        Me.atxFloodplainSideSlope.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxFloodplainSideSlope.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxFloodplainSideSlope.DefaultValue = "9.99999974737875E-06"
+        Me.atxFloodplainSideSlope.HardMax = 1000000000
+        Me.atxFloodplainSideSlope.HardMin = -1000000000
+        Me.atxFloodplainSideSlope.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainSideSlope.Location = New System.Drawing.Point(237, 256)
+        Me.atxFloodplainSideSlope.MaxWidth = 0
+        Me.atxFloodplainSideSlope.Name = "atxFloodplainSideSlope"
+        Me.atxFloodplainSideSlope.NumericFormat = "0.#####"
+        Me.atxFloodplainSideSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainSideSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainSideSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxFloodplainSideSlope.SelLength = 1
+        Me.atxFloodplainSideSlope.SelStart = 0
+        Me.atxFloodplainSideSlope.Size = New System.Drawing.Size(93, 23)
+        Me.atxFloodplainSideSlope.SoftMax = -999
+        Me.atxFloodplainSideSlope.SoftMin = -999
+        Me.atxFloodplainSideSlope.TabIndex = 14
+        Me.atxFloodplainSideSlope.ValueDouble = 0
+        Me.atxFloodplainSideSlope.ValueInteger = 0
+        '
+        'atxChannelSideSlope
+        '
+        Me.atxChannelSideSlope.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxChannelSideSlope.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxChannelSideSlope.DefaultValue = "9.99999974737875E-06"
+        Me.atxChannelSideSlope.HardMax = 1000000000
+        Me.atxChannelSideSlope.HardMin = -1000000000
+        Me.atxChannelSideSlope.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxChannelSideSlope.Location = New System.Drawing.Point(237, 230)
+        Me.atxChannelSideSlope.MaxWidth = 0
+        Me.atxChannelSideSlope.Name = "atxChannelSideSlope"
+        Me.atxChannelSideSlope.NumericFormat = "0.#####"
+        Me.atxChannelSideSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelSideSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelSideSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxChannelSideSlope.SelLength = 1
+        Me.atxChannelSideSlope.SelStart = 0
+        Me.atxChannelSideSlope.Size = New System.Drawing.Size(93, 23)
+        Me.atxChannelSideSlope.SoftMax = -999
+        Me.atxChannelSideSlope.SoftMin = -999
+        Me.atxChannelSideSlope.TabIndex = 13
+        Me.atxChannelSideSlope.ValueDouble = 0
+        Me.atxChannelSideSlope.ValueInteger = 0
+        '
+        'atxLeftSideFloodPlainWidth
+        '
+        Me.atxLeftSideFloodPlainWidth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxLeftSideFloodPlainWidth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxLeftSideFloodPlainWidth.DefaultValue = "9.99999974737875E-06"
+        Me.atxLeftSideFloodPlainWidth.HardMax = 1000000000
+        Me.atxLeftSideFloodPlainWidth.HardMin = -1000000000
+        Me.atxLeftSideFloodPlainWidth.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxLeftSideFloodPlainWidth.Location = New System.Drawing.Point(237, 178)
+        Me.atxLeftSideFloodPlainWidth.MaxWidth = 0
+        Me.atxLeftSideFloodPlainWidth.Name = "atxLeftSideFloodPlainWidth"
+        Me.atxLeftSideFloodPlainWidth.NumericFormat = "0.#####"
+        Me.atxLeftSideFloodPlainWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxLeftSideFloodPlainWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxLeftSideFloodPlainWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxLeftSideFloodPlainWidth.SelLength = 1
+        Me.atxLeftSideFloodPlainWidth.SelStart = 0
+        Me.atxLeftSideFloodPlainWidth.Size = New System.Drawing.Size(93, 23)
+        Me.atxLeftSideFloodPlainWidth.SoftMax = -999
+        Me.atxLeftSideFloodPlainWidth.SoftMin = -999
+        Me.atxLeftSideFloodPlainWidth.TabIndex = 11
+        Me.atxLeftSideFloodPlainWidth.ValueDouble = 0
+        Me.atxLeftSideFloodPlainWidth.ValueInteger = 0
+        '
+        'atxMaximumFloodplainDepth
+        '
+        Me.atxMaximumFloodplainDepth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxMaximumFloodplainDepth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxMaximumFloodplainDepth.DefaultValue = "9.99999974737875E-06"
+        Me.atxMaximumFloodplainDepth.HardMax = 1000000000
+        Me.atxMaximumFloodplainDepth.HardMin = -1000000000
+        Me.atxMaximumFloodplainDepth.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxMaximumFloodplainDepth.Location = New System.Drawing.Point(237, 152)
+        Me.atxMaximumFloodplainDepth.MaxWidth = 0
+        Me.atxMaximumFloodplainDepth.Name = "atxMaximumFloodplainDepth"
+        Me.atxMaximumFloodplainDepth.NumericFormat = "0.#####"
+        Me.atxMaximumFloodplainDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxMaximumFloodplainDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxMaximumFloodplainDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxMaximumFloodplainDepth.SelLength = 1
+        Me.atxMaximumFloodplainDepth.SelStart = 0
+        Me.atxMaximumFloodplainDepth.Size = New System.Drawing.Size(93, 23)
+        Me.atxMaximumFloodplainDepth.SoftMax = -999
+        Me.atxMaximumFloodplainDepth.SoftMin = -999
+        Me.atxMaximumFloodplainDepth.TabIndex = 10
+        Me.atxMaximumFloodplainDepth.ValueDouble = 0
+        Me.atxMaximumFloodplainDepth.ValueInteger = 0
+        '
+        'atxBankfullDepth
+        '
+        Me.atxBankfullDepth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxBankfullDepth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxBankfullDepth.DefaultValue = "9.99999974737875E-06"
+        Me.atxBankfullDepth.HardMax = 1000000000
+        Me.atxBankfullDepth.HardMin = -1000000000
+        Me.atxBankfullDepth.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxBankfullDepth.Location = New System.Drawing.Point(237, 126)
+        Me.atxBankfullDepth.MaxWidth = 0
+        Me.atxBankfullDepth.Name = "atxBankfullDepth"
+        Me.atxBankfullDepth.NumericFormat = "0.#####"
+        Me.atxBankfullDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxBankfullDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxBankfullDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxBankfullDepth.SelLength = 1
+        Me.atxBankfullDepth.SelStart = 0
+        Me.atxBankfullDepth.Size = New System.Drawing.Size(93, 23)
+        Me.atxBankfullDepth.SoftMax = -999
+        Me.atxBankfullDepth.SoftMin = -999
+        Me.atxBankfullDepth.TabIndex = 9
+        Me.atxBankfullDepth.ValueDouble = 0
+        Me.atxBankfullDepth.ValueInteger = 0
+        '
+        'atxFloodplainManningsN
+        '
+        Me.atxFloodplainManningsN.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxFloodplainManningsN.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxFloodplainManningsN.DefaultValue = "9.99999974737875E-06"
+        Me.atxFloodplainManningsN.HardMax = 1000000000
+        Me.atxFloodplainManningsN.HardMin = -1000000000
+        Me.atxFloodplainManningsN.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainManningsN.Location = New System.Drawing.Point(237, 100)
+        Me.atxFloodplainManningsN.MaxWidth = 0
+        Me.atxFloodplainManningsN.Name = "atxFloodplainManningsN"
+        Me.atxFloodplainManningsN.NumericFormat = "0.#####"
+        Me.atxFloodplainManningsN.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainManningsN.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxFloodplainManningsN.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxFloodplainManningsN.SelLength = 1
+        Me.atxFloodplainManningsN.SelStart = 0
+        Me.atxFloodplainManningsN.Size = New System.Drawing.Size(93, 23)
+        Me.atxFloodplainManningsN.SoftMax = -999
+        Me.atxFloodplainManningsN.SoftMin = -999
+        Me.atxFloodplainManningsN.TabIndex = 8
+        Me.atxFloodplainManningsN.ValueDouble = 0
+        Me.atxFloodplainManningsN.ValueInteger = 0
+        '
+        'atxChannelManningsN
+        '
+        Me.atxChannelManningsN.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxChannelManningsN.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxChannelManningsN.DefaultValue = "9.99999974737875E-06"
+        Me.atxChannelManningsN.HardMax = 1000000000
+        Me.atxChannelManningsN.HardMin = -1000000000
+        Me.atxChannelManningsN.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxChannelManningsN.Location = New System.Drawing.Point(237, 74)
+        Me.atxChannelManningsN.MaxWidth = 0
+        Me.atxChannelManningsN.Name = "atxChannelManningsN"
+        Me.atxChannelManningsN.NumericFormat = "0.#####"
+        Me.atxChannelManningsN.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelManningsN.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelManningsN.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxChannelManningsN.SelLength = 1
+        Me.atxChannelManningsN.SelStart = 0
+        Me.atxChannelManningsN.Size = New System.Drawing.Size(93, 23)
+        Me.atxChannelManningsN.SoftMax = -999
+        Me.atxChannelManningsN.SoftMin = -999
+        Me.atxChannelManningsN.TabIndex = 7
+        Me.atxChannelManningsN.ValueDouble = 0
+        Me.atxChannelManningsN.ValueInteger = 0
+        '
+        'atxChannelDepth
+        '
+        Me.atxChannelDepth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxChannelDepth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxChannelDepth.DefaultValue = "9.99999974737875E-06"
+        Me.atxChannelDepth.HardMax = 1000000000
+        Me.atxChannelDepth.HardMin = -1000000000
+        Me.atxChannelDepth.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxChannelDepth.Location = New System.Drawing.Point(237, 48)
+        Me.atxChannelDepth.MaxWidth = 0
+        Me.atxChannelDepth.Name = "atxChannelDepth"
+        Me.atxChannelDepth.NumericFormat = "0.#####"
+        Me.atxChannelDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxChannelDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxChannelDepth.SelLength = 1
+        Me.atxChannelDepth.SelStart = 0
+        Me.atxChannelDepth.Size = New System.Drawing.Size(93, 23)
+        Me.atxChannelDepth.SoftMax = -999
+        Me.atxChannelDepth.SoftMin = -999
+        Me.atxChannelDepth.TabIndex = 6
+        Me.atxChannelDepth.ValueDouble = 0
+        Me.atxChannelDepth.ValueInteger = 0
+        '
         'Label385
         '
         Me.Label385.AutoSize = True
@@ -385,287 +625,73 @@ Partial Class frmNewFTable
         '
         Me.atxChannelLength.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.atxChannelLength.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxChannelLength.DefaultValue = 0.0000099999997473787516
+        Me.atxChannelLength.DefaultValue = "9.99999974737875E-06"
         Me.atxChannelLength.HardMax = 1000000000
         Me.atxChannelLength.HardMin = -1000000000
         Me.atxChannelLength.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxChannelLength.Location = New System.Drawing.Point(212, 52)
         Me.atxChannelLength.MaxWidth = 0
         Me.atxChannelLength.Name = "atxChannelLength"
+        Me.atxChannelLength.NumericFormat = "0.#####"
         Me.atxChannelLength.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelLength.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelLength.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxChannelLength.SelLength = 0
-        Me.atxChannelLength.SelStart = 20
+        Me.atxChannelLength.SelLength = 1
+        Me.atxChannelLength.SelStart = 0
         Me.atxChannelLength.Size = New System.Drawing.Size(93, 23)
         Me.atxChannelLength.SoftMax = -999
         Me.atxChannelLength.SoftMin = -999
         Me.atxChannelLength.TabIndex = 2
-        Me.atxChannelLength.ValueDouble = 0.00001!
+        Me.atxChannelLength.ValueDouble = 0
+        Me.atxChannelLength.ValueInteger = 0
         '
         'atxDrainageArea
         '
         Me.atxDrainageArea.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.atxDrainageArea.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxDrainageArea.DefaultValue = 0.0000099999997473787516
+        Me.atxDrainageArea.DefaultValue = "9.99999974737875E-06"
         Me.atxDrainageArea.HardMax = 1000000000
         Me.atxDrainageArea.HardMin = -1000000000
         Me.atxDrainageArea.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxDrainageArea.Location = New System.Drawing.Point(211, 107)
         Me.atxDrainageArea.MaxWidth = 0
         Me.atxDrainageArea.Name = "atxDrainageArea"
+        Me.atxDrainageArea.NumericFormat = "0.#####"
         Me.atxDrainageArea.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxDrainageArea.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.atxDrainageArea.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxDrainageArea.SelLength = 0
-        Me.atxDrainageArea.SelStart = 20
+        Me.atxDrainageArea.SelLength = 1
+        Me.atxDrainageArea.SelStart = 0
         Me.atxDrainageArea.Size = New System.Drawing.Size(93, 23)
         Me.atxDrainageArea.SoftMax = -999
         Me.atxDrainageArea.SoftMin = -999
         Me.atxDrainageArea.TabIndex = 3
-        Me.atxDrainageArea.ValueDouble = 0.00001!
+        Me.atxDrainageArea.ValueDouble = 0
+        Me.atxDrainageArea.ValueInteger = 0
         '
         'atxChannelSlope
         '
         Me.atxChannelSlope.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.atxChannelSlope.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxChannelSlope.DefaultValue = 0.0000099999997473787516
+        Me.atxChannelSlope.DefaultValue = "9.99999974737875E-06"
         Me.atxChannelSlope.HardMax = 1000000000
         Me.atxChannelSlope.HardMin = -1000000000
         Me.atxChannelSlope.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atxChannelSlope.Location = New System.Drawing.Point(212, 26)
         Me.atxChannelSlope.MaxWidth = 0
         Me.atxChannelSlope.Name = "atxChannelSlope"
+        Me.atxChannelSlope.NumericFormat = "0.#####"
         Me.atxChannelSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.atxChannelSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxChannelSlope.SelLength = 0
-        Me.atxChannelSlope.SelStart = 20
+        Me.atxChannelSlope.SelLength = 1
+        Me.atxChannelSlope.SelStart = 0
         Me.atxChannelSlope.Size = New System.Drawing.Size(93, 23)
         Me.atxChannelSlope.SoftMax = -999
         Me.atxChannelSlope.SoftMin = -999
         Me.atxChannelSlope.TabIndex = 1
-        Me.atxChannelSlope.ValueDouble = 0.00001!
-        '
-        'atxRightSideFloodPlainWidth
-        '
-        Me.atxRightSideFloodPlainWidth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxRightSideFloodPlainWidth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxRightSideFloodPlainWidth.DefaultValue = 0.0000099999997473787516
-        Me.atxRightSideFloodPlainWidth.HardMax = 1000000000
-        Me.atxRightSideFloodPlainWidth.HardMin = -1000000000
-        Me.atxRightSideFloodPlainWidth.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxRightSideFloodPlainWidth.Location = New System.Drawing.Point(237, 204)
-        Me.atxRightSideFloodPlainWidth.MaxWidth = 0
-        Me.atxRightSideFloodPlainWidth.Name = "atxRightSideFloodPlainWidth"
-        Me.atxRightSideFloodPlainWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxRightSideFloodPlainWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxRightSideFloodPlainWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxRightSideFloodPlainWidth.SelLength = 0
-        Me.atxRightSideFloodPlainWidth.SelStart = 20
-        Me.atxRightSideFloodPlainWidth.Size = New System.Drawing.Size(93, 23)
-        Me.atxRightSideFloodPlainWidth.SoftMax = -999
-        Me.atxRightSideFloodPlainWidth.SoftMin = -999
-        Me.atxRightSideFloodPlainWidth.TabIndex = 12
-        Me.atxRightSideFloodPlainWidth.ValueDouble = 0.00001!
-        '
-        'atxChannelWidth
-        '
-        Me.atxChannelWidth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxChannelWidth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxChannelWidth.DefaultValue = 0.0000099999997473787516
-        Me.atxChannelWidth.HardMax = 1000000000
-        Me.atxChannelWidth.HardMin = -1000000000
-        Me.atxChannelWidth.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxChannelWidth.Location = New System.Drawing.Point(237, 22)
-        Me.atxChannelWidth.MaxWidth = 0
-        Me.atxChannelWidth.Name = "atxChannelWidth"
-        Me.atxChannelWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxChannelWidth.SelLength = 0
-        Me.atxChannelWidth.SelStart = 20
-        Me.atxChannelWidth.Size = New System.Drawing.Size(93, 23)
-        Me.atxChannelWidth.SoftMax = -999
-        Me.atxChannelWidth.SoftMin = -999
-        Me.atxChannelWidth.TabIndex = 5
-        Me.atxChannelWidth.ValueDouble = 0.00001!
-        '
-        'atxFloodplainSideSlope
-        '
-        Me.atxFloodplainSideSlope.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxFloodplainSideSlope.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxFloodplainSideSlope.DefaultValue = 0.0000099999997473787516
-        Me.atxFloodplainSideSlope.HardMax = 1000000000
-        Me.atxFloodplainSideSlope.HardMin = -1000000000
-        Me.atxFloodplainSideSlope.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxFloodplainSideSlope.Location = New System.Drawing.Point(237, 256)
-        Me.atxFloodplainSideSlope.MaxWidth = 0
-        Me.atxFloodplainSideSlope.Name = "atxFloodplainSideSlope"
-        Me.atxFloodplainSideSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxFloodplainSideSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxFloodplainSideSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxFloodplainSideSlope.SelLength = 0
-        Me.atxFloodplainSideSlope.SelStart = 20
-        Me.atxFloodplainSideSlope.Size = New System.Drawing.Size(93, 23)
-        Me.atxFloodplainSideSlope.SoftMax = -999
-        Me.atxFloodplainSideSlope.SoftMin = -999
-        Me.atxFloodplainSideSlope.TabIndex = 14
-        Me.atxFloodplainSideSlope.ValueDouble = 0.00001!
-        '
-        'atxChannelSideSlope
-        '
-        Me.atxChannelSideSlope.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxChannelSideSlope.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxChannelSideSlope.DefaultValue = 0.0000099999997473787516
-        Me.atxChannelSideSlope.HardMax = 1000000000
-        Me.atxChannelSideSlope.HardMin = -1000000000
-        Me.atxChannelSideSlope.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxChannelSideSlope.Location = New System.Drawing.Point(237, 230)
-        Me.atxChannelSideSlope.MaxWidth = 0
-        Me.atxChannelSideSlope.Name = "atxChannelSideSlope"
-        Me.atxChannelSideSlope.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelSideSlope.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelSideSlope.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxChannelSideSlope.SelLength = 0
-        Me.atxChannelSideSlope.SelStart = 20
-        Me.atxChannelSideSlope.Size = New System.Drawing.Size(93, 23)
-        Me.atxChannelSideSlope.SoftMax = -999
-        Me.atxChannelSideSlope.SoftMin = -999
-        Me.atxChannelSideSlope.TabIndex = 13
-        Me.atxChannelSideSlope.ValueDouble = 0.00001!
-        '
-        'atxLeftSideFloodPlainWidth
-        '
-        Me.atxLeftSideFloodPlainWidth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxLeftSideFloodPlainWidth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxLeftSideFloodPlainWidth.DefaultValue = 0.0000099999997473787516
-        Me.atxLeftSideFloodPlainWidth.HardMax = 1000000000
-        Me.atxLeftSideFloodPlainWidth.HardMin = -1000000000
-        Me.atxLeftSideFloodPlainWidth.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxLeftSideFloodPlainWidth.Location = New System.Drawing.Point(237, 178)
-        Me.atxLeftSideFloodPlainWidth.MaxWidth = 0
-        Me.atxLeftSideFloodPlainWidth.Name = "atxLeftSideFloodPlainWidth"
-        Me.atxLeftSideFloodPlainWidth.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxLeftSideFloodPlainWidth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxLeftSideFloodPlainWidth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxLeftSideFloodPlainWidth.SelLength = 0
-        Me.atxLeftSideFloodPlainWidth.SelStart = 20
-        Me.atxLeftSideFloodPlainWidth.Size = New System.Drawing.Size(93, 23)
-        Me.atxLeftSideFloodPlainWidth.SoftMax = -999
-        Me.atxLeftSideFloodPlainWidth.SoftMin = -999
-        Me.atxLeftSideFloodPlainWidth.TabIndex = 11
-        Me.atxLeftSideFloodPlainWidth.ValueDouble = 0.00001!
-        '
-        'atxMaximumFloodplainDepth
-        '
-        Me.atxMaximumFloodplainDepth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxMaximumFloodplainDepth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxMaximumFloodplainDepth.DefaultValue = 0.0000099999997473787516
-        Me.atxMaximumFloodplainDepth.HardMax = 1000000000
-        Me.atxMaximumFloodplainDepth.HardMin = -1000000000
-        Me.atxMaximumFloodplainDepth.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxMaximumFloodplainDepth.Location = New System.Drawing.Point(237, 152)
-        Me.atxMaximumFloodplainDepth.MaxWidth = 0
-        Me.atxMaximumFloodplainDepth.Name = "atxMaximumFloodplainDepth"
-        Me.atxMaximumFloodplainDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxMaximumFloodplainDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxMaximumFloodplainDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxMaximumFloodplainDepth.SelLength = 0
-        Me.atxMaximumFloodplainDepth.SelStart = 20
-        Me.atxMaximumFloodplainDepth.Size = New System.Drawing.Size(93, 23)
-        Me.atxMaximumFloodplainDepth.SoftMax = -999
-        Me.atxMaximumFloodplainDepth.SoftMin = -999
-        Me.atxMaximumFloodplainDepth.TabIndex = 10
-        Me.atxMaximumFloodplainDepth.ValueDouble = 0.00001!
-        '
-        'atxBankfullDepth
-        '
-        Me.atxBankfullDepth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxBankfullDepth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxBankfullDepth.DefaultValue = 0.0000099999997473787516
-        Me.atxBankfullDepth.HardMax = 1000000000
-        Me.atxBankfullDepth.HardMin = -1000000000
-        Me.atxBankfullDepth.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxBankfullDepth.Location = New System.Drawing.Point(237, 126)
-        Me.atxBankfullDepth.MaxWidth = 0
-        Me.atxBankfullDepth.Name = "atxBankfullDepth"
-        Me.atxBankfullDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxBankfullDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxBankfullDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxBankfullDepth.SelLength = 0
-        Me.atxBankfullDepth.SelStart = 20
-        Me.atxBankfullDepth.Size = New System.Drawing.Size(93, 23)
-        Me.atxBankfullDepth.SoftMax = -999
-        Me.atxBankfullDepth.SoftMin = -999
-        Me.atxBankfullDepth.TabIndex = 9
-        Me.atxBankfullDepth.ValueDouble = 0.00001!
-        '
-        'atxFloodplainManningsN
-        '
-        Me.atxFloodplainManningsN.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxFloodplainManningsN.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxFloodplainManningsN.DefaultValue = 0.0000099999997473787516
-        Me.atxFloodplainManningsN.HardMax = 1000000000
-        Me.atxFloodplainManningsN.HardMin = -1000000000
-        Me.atxFloodplainManningsN.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxFloodplainManningsN.Location = New System.Drawing.Point(237, 100)
-        Me.atxFloodplainManningsN.MaxWidth = 0
-        Me.atxFloodplainManningsN.Name = "atxFloodplainManningsN"
-        Me.atxFloodplainManningsN.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxFloodplainManningsN.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxFloodplainManningsN.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxFloodplainManningsN.SelLength = 0
-        Me.atxFloodplainManningsN.SelStart = 20
-        Me.atxFloodplainManningsN.Size = New System.Drawing.Size(93, 23)
-        Me.atxFloodplainManningsN.SoftMax = -999
-        Me.atxFloodplainManningsN.SoftMin = -999
-        Me.atxFloodplainManningsN.TabIndex = 8
-        Me.atxFloodplainManningsN.ValueDouble = 0.00001!
-        '
-        'atxChannelManningsN
-        '
-        Me.atxChannelManningsN.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxChannelManningsN.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxChannelManningsN.DefaultValue = 0.0000099999997473787516
-        Me.atxChannelManningsN.HardMax = 1000000000
-        Me.atxChannelManningsN.HardMin = -1000000000
-        Me.atxChannelManningsN.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxChannelManningsN.Location = New System.Drawing.Point(237, 74)
-        Me.atxChannelManningsN.MaxWidth = 0
-        Me.atxChannelManningsN.Name = "atxChannelManningsN"
-        Me.atxChannelManningsN.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelManningsN.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelManningsN.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxChannelManningsN.SelLength = 0
-        Me.atxChannelManningsN.SelStart = 20
-        Me.atxChannelManningsN.Size = New System.Drawing.Size(93, 23)
-        Me.atxChannelManningsN.SoftMax = -999
-        Me.atxChannelManningsN.SoftMin = -999
-        Me.atxChannelManningsN.TabIndex = 7
-        Me.atxChannelManningsN.ValueDouble = 0.00001!
-        '
-        'atxChannelDepth
-        '
-        Me.atxChannelDepth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxChannelDepth.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxChannelDepth.DefaultValue = 0.0000099999997473787516
-        Me.atxChannelDepth.HardMax = 1000000000
-        Me.atxChannelDepth.HardMin = -1000000000
-        Me.atxChannelDepth.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxChannelDepth.Location = New System.Drawing.Point(237, 48)
-        Me.atxChannelDepth.MaxWidth = 0
-        Me.atxChannelDepth.Name = "atxChannelDepth"
-        Me.atxChannelDepth.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelDepth.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxChannelDepth.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxChannelDepth.SelLength = 0
-        Me.atxChannelDepth.SelStart = 20
-        Me.atxChannelDepth.Size = New System.Drawing.Size(93, 23)
-        Me.atxChannelDepth.SoftMax = -999
-        Me.atxChannelDepth.SoftMin = -999
-        Me.atxChannelDepth.TabIndex = 6
-        Me.atxChannelDepth.ValueDouble = 0.00001!
+        Me.atxChannelSlope.ValueDouble = 0
+        Me.atxChannelSlope.ValueInteger = 0
         '
         'AtcText12
         '
@@ -678,14 +704,17 @@ Partial Class frmNewFTable
         Me.AtcText12.Location = New System.Drawing.Point(201, 209)
         Me.AtcText12.MaxWidth = 0
         Me.AtcText12.Name = "AtcText12"
+        Me.AtcText12.NumericFormat = "0.#####"
         Me.AtcText12.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText12.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText12.SelLength = 0
+        Me.AtcText12.SelLength = 1
         Me.AtcText12.SelStart = 0
         Me.AtcText12.Size = New System.Drawing.Size(93, 23)
         Me.AtcText12.SoftMax = 0
         Me.AtcText12.SoftMin = 0
         Me.AtcText12.TabIndex = 16
+        Me.AtcText12.ValueDouble = 0
+        Me.AtcText12.ValueInteger = 0
         '
         'AtcText13
         '
@@ -698,14 +727,17 @@ Partial Class frmNewFTable
         Me.AtcText13.Location = New System.Drawing.Point(201, 235)
         Me.AtcText13.MaxWidth = 0
         Me.AtcText13.Name = "AtcText13"
+        Me.AtcText13.NumericFormat = "0.#####"
         Me.AtcText13.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText13.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText13.SelLength = 0
+        Me.AtcText13.SelLength = 1
         Me.AtcText13.SelStart = 0
         Me.AtcText13.Size = New System.Drawing.Size(93, 23)
         Me.AtcText13.SoftMax = 0
         Me.AtcText13.SoftMin = 0
         Me.AtcText13.TabIndex = 17
+        Me.AtcText13.ValueDouble = 0
+        Me.AtcText13.ValueInteger = 0
         '
         'AtcText22
         '
@@ -718,14 +750,17 @@ Partial Class frmNewFTable
         Me.AtcText22.Location = New System.Drawing.Point(201, 40)
         Me.AtcText22.MaxWidth = 0
         Me.AtcText22.Name = "AtcText22"
+        Me.AtcText22.NumericFormat = "0.#####"
         Me.AtcText22.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText22.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText22.SelLength = 0
+        Me.AtcText22.SelLength = 1
         Me.AtcText22.SelStart = 0
         Me.AtcText22.Size = New System.Drawing.Size(93, 23)
         Me.AtcText22.SoftMax = 0
         Me.AtcText22.SoftMin = 0
         Me.AtcText22.TabIndex = 26
+        Me.AtcText22.ValueDouble = 0
+        Me.AtcText22.ValueInteger = 0
         '
         'AtcText21
         '
@@ -738,14 +773,17 @@ Partial Class frmNewFTable
         Me.AtcText21.Location = New System.Drawing.Point(201, 14)
         Me.AtcText21.MaxWidth = 0
         Me.AtcText21.Name = "AtcText21"
+        Me.AtcText21.NumericFormat = "0.#####"
         Me.AtcText21.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText21.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText21.SelLength = 0
+        Me.AtcText21.SelLength = 1
         Me.AtcText21.SelStart = 0
         Me.AtcText21.Size = New System.Drawing.Size(93, 23)
         Me.AtcText21.SoftMax = 0
         Me.AtcText21.SoftMin = 0
         Me.AtcText21.TabIndex = 25
+        Me.AtcText21.ValueDouble = 0
+        Me.AtcText21.ValueInteger = 0
         '
         'AtcText1
         '
@@ -758,14 +796,17 @@ Partial Class frmNewFTable
         Me.AtcText1.Location = New System.Drawing.Point(165, 16)
         Me.AtcText1.MaxWidth = 0
         Me.AtcText1.Name = "AtcText1"
+        Me.AtcText1.NumericFormat = "0.#####"
         Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText1.SelLength = 0
+        Me.AtcText1.SelLength = 1
         Me.AtcText1.SelStart = 0
         Me.AtcText1.Size = New System.Drawing.Size(93, 23)
         Me.AtcText1.SoftMax = 0
         Me.AtcText1.SoftMin = 0
         Me.AtcText1.TabIndex = 27
+        Me.AtcText1.ValueDouble = 0
+        Me.AtcText1.ValueInteger = 0
         '
         'AtcText14
         '
@@ -778,14 +819,17 @@ Partial Class frmNewFTable
         Me.AtcText14.Location = New System.Drawing.Point(201, 261)
         Me.AtcText14.MaxWidth = 0
         Me.AtcText14.Name = "AtcText14"
+        Me.AtcText14.NumericFormat = "0.#####"
         Me.AtcText14.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText14.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText14.SelLength = 0
+        Me.AtcText14.SelLength = 1
         Me.AtcText14.SelStart = 0
         Me.AtcText14.Size = New System.Drawing.Size(93, 23)
         Me.AtcText14.SoftMax = 0
         Me.AtcText14.SoftMin = 0
         Me.AtcText14.TabIndex = 18
+        Me.AtcText14.ValueDouble = 0
+        Me.AtcText14.ValueInteger = 0
         '
         'AtcText15
         '
@@ -798,14 +842,17 @@ Partial Class frmNewFTable
         Me.AtcText15.Location = New System.Drawing.Point(201, 287)
         Me.AtcText15.MaxWidth = 0
         Me.AtcText15.Name = "AtcText15"
+        Me.AtcText15.NumericFormat = "0.#####"
         Me.AtcText15.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText15.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText15.SelLength = 0
+        Me.AtcText15.SelLength = 1
         Me.AtcText15.SelStart = 0
         Me.AtcText15.Size = New System.Drawing.Size(93, 23)
         Me.AtcText15.SoftMax = 0
         Me.AtcText15.SoftMin = 0
         Me.AtcText15.TabIndex = 19
+        Me.AtcText15.ValueDouble = 0
+        Me.AtcText15.ValueInteger = 0
         '
         'AtcText16
         '
@@ -818,14 +865,17 @@ Partial Class frmNewFTable
         Me.AtcText16.Location = New System.Drawing.Point(201, 313)
         Me.AtcText16.MaxWidth = 0
         Me.AtcText16.Name = "AtcText16"
+        Me.AtcText16.NumericFormat = "0.#####"
         Me.AtcText16.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText16.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText16.SelLength = 0
+        Me.AtcText16.SelLength = 1
         Me.AtcText16.SelStart = 0
         Me.AtcText16.Size = New System.Drawing.Size(93, 23)
         Me.AtcText16.SoftMax = 0
         Me.AtcText16.SoftMin = 0
         Me.AtcText16.TabIndex = 20
+        Me.AtcText16.ValueDouble = 0
+        Me.AtcText16.ValueInteger = 0
         '
         'AtcText17
         '
@@ -838,14 +888,17 @@ Partial Class frmNewFTable
         Me.AtcText17.Location = New System.Drawing.Point(201, 339)
         Me.AtcText17.MaxWidth = 0
         Me.AtcText17.Name = "AtcText17"
+        Me.AtcText17.NumericFormat = "0.#####"
         Me.AtcText17.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText17.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText17.SelLength = 0
+        Me.AtcText17.SelLength = 1
         Me.AtcText17.SelStart = 0
         Me.AtcText17.Size = New System.Drawing.Size(93, 23)
         Me.AtcText17.SoftMax = 0
         Me.AtcText17.SoftMin = 0
         Me.AtcText17.TabIndex = 21
+        Me.AtcText17.ValueDouble = 0
+        Me.AtcText17.ValueInteger = 0
         '
         'AtcText18
         '
@@ -858,14 +911,17 @@ Partial Class frmNewFTable
         Me.AtcText18.Location = New System.Drawing.Point(201, 365)
         Me.AtcText18.MaxWidth = 0
         Me.AtcText18.Name = "AtcText18"
+        Me.AtcText18.NumericFormat = "0.#####"
         Me.AtcText18.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText18.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText18.SelLength = 0
+        Me.AtcText18.SelLength = 1
         Me.AtcText18.SelStart = 0
         Me.AtcText18.Size = New System.Drawing.Size(93, 23)
         Me.AtcText18.SoftMax = 0
         Me.AtcText18.SoftMin = 0
         Me.AtcText18.TabIndex = 22
+        Me.AtcText18.ValueDouble = 0
+        Me.AtcText18.ValueInteger = 0
         '
         'AtcText19
         '
@@ -878,14 +934,17 @@ Partial Class frmNewFTable
         Me.AtcText19.Location = New System.Drawing.Point(201, 391)
         Me.AtcText19.MaxWidth = 0
         Me.AtcText19.Name = "AtcText19"
+        Me.AtcText19.NumericFormat = "0.#####"
         Me.AtcText19.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText19.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText19.SelLength = 0
+        Me.AtcText19.SelLength = 1
         Me.AtcText19.SelStart = 0
         Me.AtcText19.Size = New System.Drawing.Size(93, 23)
         Me.AtcText19.SoftMax = 0
         Me.AtcText19.SoftMin = 0
         Me.AtcText19.TabIndex = 23
+        Me.AtcText19.ValueDouble = 0
+        Me.AtcText19.ValueInteger = 0
         '
         'AtcText2
         '
@@ -898,14 +957,17 @@ Partial Class frmNewFTable
         Me.AtcText2.Location = New System.Drawing.Point(201, 391)
         Me.AtcText2.MaxWidth = 0
         Me.AtcText2.Name = "AtcText2"
+        Me.AtcText2.NumericFormat = "0.#####"
         Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText2.SelLength = 0
+        Me.AtcText2.SelLength = 1
         Me.AtcText2.SelStart = 0
         Me.AtcText2.Size = New System.Drawing.Size(93, 23)
         Me.AtcText2.SoftMax = 0
         Me.AtcText2.SoftMin = 0
         Me.AtcText2.TabIndex = 32
+        Me.AtcText2.ValueDouble = 0
+        Me.AtcText2.ValueInteger = 0
         '
         'AtcText20
         '
@@ -918,14 +980,17 @@ Partial Class frmNewFTable
         Me.AtcText20.Location = New System.Drawing.Point(201, 443)
         Me.AtcText20.MaxWidth = 0
         Me.AtcText20.Name = "AtcText20"
+        Me.AtcText20.NumericFormat = "0.#####"
         Me.AtcText20.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText20.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText20.SelLength = 0
+        Me.AtcText20.SelLength = 1
         Me.AtcText20.SelStart = 0
         Me.AtcText20.Size = New System.Drawing.Size(93, 23)
         Me.AtcText20.SoftMax = 0
         Me.AtcText20.SoftMin = 0
         Me.AtcText20.TabIndex = 24
+        Me.AtcText20.ValueDouble = 0
+        Me.AtcText20.ValueInteger = 0
         '
         'frmNewFTable
         '

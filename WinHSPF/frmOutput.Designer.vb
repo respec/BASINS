@@ -140,6 +140,7 @@ Partial Class frmOutput
         '
         'cmdAdd
         '
+        Me.cmdAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdAdd.Location = New System.Drawing.Point(15, 234)
         Me.cmdAdd.Name = "cmdAdd"
         Me.cmdAdd.Size = New System.Drawing.Size(60, 20)
@@ -180,7 +181,7 @@ Partial Class frmOutput
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Name = "frmOutput"
-        Me.Text = "frmOutput"
+        Me.Text = "WinHSPF - Output Manager"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
