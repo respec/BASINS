@@ -81,7 +81,7 @@ Public Class HspfMonthData
             If InStr(cbuff, "END") Then 'skip this
             ElseIf InStr(cbuff, "MONTH-DATA") > 0 Then  'another one
                 myMonthDataTable = New HspfMonthDataTable
-                myMonthDataTable.Id = CInt(Right(cbuff, 3))
+                myMonthDataTable.Id = CInt(Right(Trim(cbuff), 3))
                 myMonthDataTable.Block = Me
                 If pUci.FastFlag Then
                     GetNextRecordFromBlock("MONTH-DATA", retkey, cbuff, rectyp, retcod)
