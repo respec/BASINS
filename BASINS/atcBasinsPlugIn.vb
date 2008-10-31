@@ -73,6 +73,10 @@ Public Class atcBasinsPlugIn
 
         Logger.StartToFile(g_BasinsDir & "cache\log\" _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log")
+        LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_BasinsDir & "cache\log\", System.Diagnostics.Process.GetCurrentProcess.Id)
+        Logger.ProgressStatus = New MonitorProgressStatus
+        Logger.Status("SHOW")
+        Logger.Status("LAB TOP HI")
         'Logger.MapWin = g_MapWin
 
         CheckForUpdates(True)
@@ -176,6 +180,7 @@ Public Class atcBasinsPlugIn
         g_MapWin.ClearCustomWindowTitle()
 
         CloseForms()
+        StopMonitor()
         SaveSetting("BASINS4", "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
         SaveSetting("BASINS4", "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
     End Sub

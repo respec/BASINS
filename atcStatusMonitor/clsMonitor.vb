@@ -1,399 +1,237 @@
 Imports System.IO
 
 Public Class clsMonitor
+    Private Shared pfrmStatus As frmStatus
 
-    Private Shared frm As frmStatus
-
-    Private Shared lblText(frmStatus.LastLabel) As String
-    Private Shared lblLast(frmStatus.LastLabel) As String
-    Private Shared lblLogged(frmStatus.LastLabel) As String
-
-    Private Shared LogProcessBuffer As String = ""
+    Private Shared pLabelText(frmStatus.LastLabel) As String
+    Private Shared pLabelLast(frmStatus.LastLabel) As String
+    Private Shared pLabelLogged(frmStatus.LastLabel) As String
 
     Private Const LogDisplayLines As Integer = 250
-    Private Shared LogDisplayBuffer(LogDisplayLines) As String 'Ring buffer of lines of log file to display
-    Private Shared LogDisplayNeedsUpdate As Boolean = False
-    Private Shared LogDisplayFirstLine As Integer = 0
-    Private Shared LogDisplayLastLine As Integer = 0
+    Private Shared pLogDisplayBuffer(LogDisplayLines) As String 'Ring buffer of lines of log file to display
+    Private Shared pLogDisplayNeedsUpdate As Boolean = False
+    Private Shared pLogDisplayFirstLine As Integer = 0
+    Private Shared pLogDisplayLastLine As Integer = 0
 
-    Private Shared ProgressNeedsUpdate As Boolean
-    Private Shared ProgressStartTime As Double = Double.NaN
-    Private Shared ProgressCurrent As Integer
-    Private Shared ProgressFinal As Integer
+    Private Shared pProgressNeedsUpdate As Boolean
+    Private Shared pProgressStartTime As Double = Double.NaN
+    Private Shared pProgressCurrent As Integer
+    Private Shared pProgressFinal As Integer
 
-    Private Shared LastUpdate As Double = Double.NaN
-    Private Shared UpdateInterval As Double = 2 / 720000.0# ' 1 / 720000.0 = 0.1 second
-    Private Shared LogTimeStamps As Boolean = True
+    Private Shared pLastUpdate As Double = Double.NaN
+    Private Const UpdateInterval As Double = 2 / 720000.0# ' 1 / 720000.0 = 0.1 second
 
-    Private Shared LogFile As Integer = -1
-    Private Shared LogFileName As String = ""
-    Private Shared LogFileIndex As Integer = 0
-    Private Shared LogFileOpen As Boolean = False
+    Private Shared pExiting As Boolean = False
 
-    Private Shared Exiting As Boolean = False
-    Private Shared Watcher As New System.IO.FileSystemWatcher
-
-    Private Shared ParentProcess As Process = Nothing
-
-    Private Shared CRLFchars() As Char = {vbCr, vbLf}
+    Private Shared pParentProcess As Process = Nothing
 
     Public Shared Sub Main()
-        LogFile = FreeFile()
-        LogFileName = Microsoft.VisualBasic.Command
-        Dim lTimeStamp As String = CreateTimeStamp() & vbTab & "DBG "
-        Dim lParentID As Integer = StrFirstInt(LogFileName)
-        If lParentID > 0 Then
-            Try
-                ParentProcess = System.Diagnostics.Process.GetProcessById(lParentID)
-            Catch ex As Exception
-                ProcessInput(lTimeStamp & "Failed to get Parent (" & lParentID & ") " & ex.Message)
-            End Try
-        End If
+        Dim lCommandLine As String = Command()
+        Console.WriteLine("StatusMonitorEntryWith " & lCommandLine)
 
-        frm = New frmStatus
-        frm.Clear()
-        frm.Visible = False
-        'frm.Show()
-        If ParentProcess Is Nothing Then
-            frm.Exiting = True 'Let the user quit by closing the form
-
-        End If
+        pfrmStatus = New frmStatus
+        pfrmStatus.Clear()
+        'Console.WriteLine("StatusMonitorFormCreated")
 
         ClearLabels()
 
-        Watcher.Path = System.IO.Path.GetDirectoryName(LogFileName)
-        Watcher.NotifyFilter = (NotifyFilters.LastWrite)
-        Watcher.Filter = System.IO.Path.GetFileName(LogFileName)
+        Dim lParentID As Integer  'StrFirstInt(lCommandLine)
+        If Integer.TryParse(lCommandLine, lParentID) AndAlso lParentID > 0 Then
+            Try
+                pParentProcess = System.Diagnostics.Process.GetProcessById(lParentID)
+            Catch ex As Exception
+                ProcessInput("Failed to get Parent (" & lParentID & ") " & ex.Message)
+            End Try
+        End If
+        If pParentProcess Is Nothing Then
+            pfrmStatus.Exiting = True 'Let the user quit by closing the form
+        Else
+            Console.WriteLine("ParentProcess " & pParentProcess.ProcessName)
+            pfrmStatus.Text = pParentProcess.ProcessName & "Status Monitor"
+        End If
 
-        ProcessInput(Now & vbTab & "Monitoring Started")
-        ProcessInput(lTimeStamp & "Path = " & Watcher.Path & " File = " & Watcher.Filter)
-        ProcessInput(lTimeStamp & "Parent = " & lParentID)
-
-        ProcessRecentLogEntries() 'Process any existing log before watching for new entries
-
-        AddHandler Watcher.Changed, AddressOf OnChanged
-        Watcher.EnableRaisingEvents = True
+        'ProcessInput("Monitoring Started,Parent = " & lParentID)
 
         ManageInterface()
-        Try
-            frm.Exiting = True
-            frm.Close()
-        Catch ex As Exception 'Form might already be closed
-        End Try
 
         Try
-            FileClose(LogFile)
-        Catch ex As Exception 'File might already be closed
+            pfrmStatus.Exiting = True
+            pfrmStatus.Close()
+        Catch lEx As Exception 'Form might already be closed
         End Try
     End Sub
 
     Public Shared Sub ManageInterface()
-        Dim NowDouble As Double = Now.ToOADate
-        LastUpdate = NowDouble
-        While Not Exiting
-            If NowDouble - LastUpdate > UpdateInterval Then
-                For iLabel As Integer = 0 To frmStatus.LastLabel
-                    If Not lblText(iLabel).Equals(lblLast(iLabel)) Then
-                        frm.Label(iLabel) = lblText(iLabel)
-                        lblLast(iLabel) = lblText(iLabel)
-                        lblLogged(iLabel) = lblText(iLabel)
+        Dim lNowDouble As Double = Now.ToOADate
+        pLastUpdate = lNowDouble
+        While Not pExiting
+            If Console.In.Peek > -1 Then
+                Dim lInputLine As String = Console.In.ReadLine
+                Console.WriteLine("StatusProcessing " & lInputLine)
+                ProcessInput(lInputLine)
+            End If
+
+            If lNowDouble - pLastUpdate > UpdateInterval Then
+                For lLabelIndex As Integer = 0 To frmStatus.LastLabel
+                    If Not pLabelText(lLabelIndex).Equals(pLabelLast(lLabelIndex)) Then
+                        Console.WriteLine("UpdateLabel " & lLabelIndex)
+                        pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
+                        pLabelLast(lLabelIndex) = pLabelText(lLabelIndex)
+                        pLabelLogged(lLabelIndex) = pLabelText(lLabelIndex)
                     End If
                 Next
-                If LogDisplayNeedsUpdate Then
-                    With frm.txtLog
+                If pLogDisplayNeedsUpdate Then
+                    With pfrmStatus.txtLog
                         .Text = CurrentLogDisplay()
-                        .SelectionStart = frm.txtLog.Text.Length
+                        .SelectionStart = pfrmStatus.txtLog.Text.Length
                         .ScrollToCaret()
-                        LogDisplayNeedsUpdate = False
+                        pLogDisplayNeedsUpdate = False
                     End With
                 End If
 
-                If ProgressNeedsUpdate Then
-                    If Double.IsNaN(ProgressStartTime) Then 'Progress is finished
-                        frm.Visible = False
-                        frm.Progress.Visible = False
-                        For iLabel As Integer = 2 To 5
-                            frm.Label(iLabel) = lblText(iLabel)
+                If pProgressNeedsUpdate Then
+                    'Console.WriteLine("UpdateProgress")
+                    If Double.IsNaN(pProgressStartTime) Then 'Progress is finished
+                        pfrmStatus.Visible = False
+                        pfrmStatus.Progress.Visible = False
+                        For lLabelIndex As Integer = 2 To 5
+                            pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
                         Next
                     Else
-                        If Not frm.Progress.Visible Then 'See if we should show it
-                            If NowDouble - ProgressStartTime > UpdateInterval * 3 Then
-                                frm.Label(2) = "0"
-                                frm.Label(4) = ProgressFinal
-                                frm.Progress.Maximum = ProgressFinal
-                                frm.Progress.Visible = True
-                                frm.Visible = True
+                        If Not pfrmStatus.Progress.Visible Then 'See if we should show it
+                            If lNowDouble - pProgressStartTime > UpdateInterval * 3 Then
+                                pfrmStatus.Label(2) = "0"
+                                pfrmStatus.Label(4) = pProgressFinal
+                                pfrmStatus.Progress.Maximum = pProgressFinal
+                                pfrmStatus.Progress.Visible = True
+                                pfrmStatus.Visible = True
                             End If
                         End If
-                        If frm.Progress.Visible Then
-                            frm.Progress.Value = ProgressCurrent
-                            If lblLogged(2).Length = 0 AndAlso lblLogged(3).Length = 0 AndAlso lblLogged(4).Length = 0 Then
-                                frm.Label(3) = ProgressCurrent & " of " & ProgressFinal
+                        If pfrmStatus.Progress.Visible Then
+                            pfrmStatus.Progress.Value = pProgressCurrent
+                            If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(3).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
+                                pfrmStatus.Label(3) = pProgressCurrent & " of " & pProgressFinal
                             End If
-                            If lblLogged(5).Length = 0 Then frm.Label(5) = CInt(ProgressCurrent * 1000 / ProgressFinal) / 10 & "%"
+                            If pLabelLogged(5).Length = 0 Then pfrmStatus.Label(5) = CInt(pProgressCurrent * 1000 / pProgressFinal) / 10 & "%"
                         End If
                     End If
-                    ProgressNeedsUpdate = False
+                    pProgressNeedsUpdate = False
                 End If
 
-                If Not ParentProcess Is Nothing AndAlso ParentProcess.HasExited AndAlso Not frm.Exiting Then
-                    Exiting = True
-                    frm.Exiting = True
-                    frm.Label(0) = "Parent Process Exited"
-                    frm.Visible = False 'Needs to not be visible to call ShowDialog
-                    frm.ShowDialog()
+                If Not pParentProcess Is Nothing AndAlso _
+                   pParentProcess.HasExited AndAlso _
+                   Not pfrmStatus.Exiting Then
+                    pExiting = True
+                    pfrmStatus.Exiting = True
+                    pfrmStatus.Label(0) = "Parent Process Exited"
+                    pfrmStatus.Visible = False 'Needs to not be visible to call ShowDialog
+                    pfrmStatus.ShowDialog()
                 End If
-                LastUpdate = NowDouble
+                pLastUpdate = lNowDouble
             Else
                 System.Threading.Thread.Sleep(10)
             End If
             Application.DoEvents()
+            lNowDouble = Now.ToOADate
             'TODO: Check for form button presses here?
         End While
     End Sub
 
     Private Shared Function CurrentLogDisplay() As String
-        Dim iLog As Integer = LogDisplayFirstLine
+        Dim lLogIndex As Integer = pLogDisplayFirstLine
         CurrentLogDisplay = ""
-        If iLog > LogDisplayLastLine Then
-            While iLog <= LogDisplayLines
-                CurrentLogDisplay &= LogDisplayBuffer(iLog) & vbCrLf
-                iLog += 1
+        If lLogIndex > pLogDisplayLastLine Then
+            While lLogIndex <= LogDisplayLines
+                CurrentLogDisplay &= pLogDisplayBuffer(lLogIndex) & vbCrLf
+                lLogIndex += 1
             End While
-            iLog = 0
+            lLogIndex = 0
         End If
-        While iLog <= LogDisplayLastLine
-            CurrentLogDisplay &= LogDisplayBuffer(iLog) & vbCrLf
-            iLog += 1
+        While lLogIndex <= pLogDisplayLastLine
+            CurrentLogDisplay &= pLogDisplayBuffer(lLogIndex) & vbCrLf
+            lLogIndex += 1
         End While
     End Function
 
     Private Shared Sub LogDisplayAddLine(ByVal aNewLine As String)
-        LogDisplayLastLine += 1
-        If LogDisplayLastLine > LogDisplayLines Then LogDisplayLastLine = 0
-        If LogDisplayLastLine = LogDisplayFirstLine Then
-            LogDisplayFirstLine += 1
-            If LogDisplayFirstLine > LogDisplayLines Then LogDisplayFirstLine = 0
+        pLogDisplayLastLine += 1
+        If pLogDisplayLastLine > LogDisplayLines Then pLogDisplayLastLine = 0
+        If pLogDisplayLastLine = pLogDisplayFirstLine Then
+            pLogDisplayFirstLine += 1
+            If pLogDisplayFirstLine > LogDisplayLines Then pLogDisplayFirstLine = 0
         End If
-        LogDisplayBuffer(LogDisplayLastLine) = aNewLine
-        LogDisplayNeedsUpdate = True
-    End Sub
-
-    Private Shared Sub OnChanged(ByVal source As Object, ByVal e As FileSystemEventArgs)
-        ProcessRecentLogEntries()
-    End Sub
-
-    Private Shared Sub ProcessRecentLogEntries()
-        If Not LogFileOpen Then
-TryToOpen:
-            Try
-                Try
-                    FileClose(LogFile)
-                Catch ex As Exception 'File might already be closed
-                End Try
-                FileOpen(LogFile, LogFileName, OpenMode.Input, OpenAccess.Read, OpenShare.Shared)
-                LogFileOpen = True
-                If LogFileIndex > 1 Then Seek(LogFile, LogFileIndex)
-            Catch ex As Exception
-                If MsgBox("""" & LogFileName & """" & vbCrLf & ex.Message & vbCr & vbCr & "Do you want to find the log file to open?", MsgBoxStyle.YesNo, "Unable to open log file") = MsgBoxResult.Yes Then
-                    Dim dlg As New Windows.Forms.OpenFileDialog
-                    dlg.Title = "Open log file"
-                    dlg.FileName = LogFileName
-                    If dlg.ShowDialog = DialogResult.OK Then
-                        LogFileName = dlg.FileName
-                        GoTo TryToOpen
-                    End If
-                End If
-                LogFileOpen = False
-                Exiting = True
-                Exit Sub
-            End Try
-        End If
-        Dim FileLength As Integer
-        Try
-            FileLength = LOF(LogFile)
-            LogDisplayAddLine("Log File Length = " & FileLength & " (" & FileLength - LogFileIndex & " new bytes)")
-            LogProcessBuffer &= InputString(LogFile, FileLength - LogFileIndex)
-            LogFileIndex = FileLength
-        Catch ex As Exception
-            LogFileOpen = False
-            ProcessRecentLogEntries()
-            Exit Sub
-        End Try
-
-        Dim lBufferLength As Integer = LogProcessBuffer.Length
-        Dim lStartLine As Integer = 0
-        Dim lEndLine As Integer
-
-        lEndLine = LogProcessBuffer.IndexOfAny(CRLFchars)
-        While lEndLine >= 0
-            ProcessInput(LogProcessBuffer.Substring(lStartLine, lEndLine - lStartLine))
-            lStartLine = lEndLine + 1
-            While lStartLine < lBufferLength AndAlso LogProcessBuffer.Substring(lStartLine, 1).IndexOfAny(CRLFchars) = 0
-                lStartLine += 1
-            End While
-            If lStartLine >= lBufferLength Then
-                lEndLine = -1
-            Else
-                lEndLine = LogProcessBuffer.IndexOfAny(CRLFchars, lStartLine + 1)
-            End If
-        End While
-        If lStartLine >= lBufferLength Then 'Processed through end of buffer
-            LogProcessBuffer = ""
-        Else 'Did not find end of line at end of buffer, save unprocessed part of buffer
-            LogProcessBuffer = LogProcessBuffer.Substring(lStartLine)
-        End If
-
+        pLogDisplayBuffer(pLogDisplayLastLine) = aNewLine
+        pLogDisplayNeedsUpdate = True
     End Sub
 
     Private Shared Sub ProcessInput(ByVal aInputLine As String)
+        'Console.WriteLine("ProcessInput " & aInputLine)
         LogDisplayAddLine(aInputLine)
 
-        Dim lTimeStamp As String = StrSplit(aInputLine, vbTab, "") 'CreateTimeStamp()
-        Dim Words() As String = aInputLine.Split(" ")
-        Dim AfterFirstWord As String = aInputLine.Substring(Words(0).Length)
+        'Dim lTimeStamp As String = StrSplit(aInputLine, vbTab, "") 'CreateTimeStamp()
+        Dim lWords() As String = aInputLine.Split(" ")
+        Dim lAfterFirstWord As String = aInputLine.Substring(lWords(0).Length)
 
-        If Len(Words(0)) > 0 Then
-            Select Case Mid(Words(0), 1, 3).ToUpper 'Using Mid since Substring generates error when arg too short
+        If lWords(0).Length > 0 Then
+            Select Case Mid(lWords(0), 1, 3).ToUpper 'Using Mid since Substring generates error when arg too short
                 Case "DBG" 'Debug message, just goes into log
-                Case "EXI" : Exiting = True
+                    'Console.WriteLine("Debug")
+                Case "EXI"
+                    'Console.WriteLine("Exiting")
+                    pExiting = True
                 Case "LAB" 'Change a label
-                    Dim LabelIndex As Integer = -1
-                    If IsNumeric(Words(1)) Then
-                        LabelIndex = Words(1)
+                    'Console.WriteLine("ChangeLabel " & lWords(1) & " to " & lAfterFirstWord.Substring(lWords(1).Length + 2))
+                    Dim lLabelIndex As Integer = -1
+                    If IsNumeric(lWords(1)) Then
+                        lLabelIndex = lWords(1)
                     Else
-                        Select Case Words(1).ToUpper
-                            Case "TITLE" : LabelIndex = 0
-                            Case "TOP" : LabelIndex = 1
-                            Case "LEFT" : LabelIndex = 2
-                            Case "MIDDLE" : LabelIndex = 3
-                            Case "RIGHT" : LabelIndex = 4
-                            Case "BOTTOM" : LabelIndex = 5
+                        Select Case lWords(1).ToUpper
+                            Case "TITLE" : lLabelIndex = 0
+                            Case "TOP" : lLabelIndex = 1
+                            Case "LEFT" : lLabelIndex = 2
+                            Case "MIDDLE" : lLabelIndex = 3
+                            Case "RIGHT" : lLabelIndex = 4
+                            Case "BOTTOM" : lLabelIndex = 5
                             Case "CLEAR" : ClearLabels()
                         End Select
                     End If
-                    If LabelIndex >= 0 And LabelIndex <= frmStatus.LastLabel Then
-                        lblText(LabelIndex) = AfterFirstWord.Substring(Words(1).Length)
+                    'Console.WriteLine("LabelIndex " & lLabelIndex)
+                    If lLabelIndex >= 0 And lLabelIndex <= frmStatus.LastLabel Then
+                        pLabelText(lLabelIndex) = lAfterFirstWord.Substring(lWords(1).Length + 2)
                     Else 'could not find valid label index, just put it all in top label
-                        lblText(1) = AfterFirstWord
+                        pLabelText(1) = lAfterFirstWord
                     End If
                 Case "PRO"
-                    If Words.Length > 3 AndAlso IsNumeric(Words(Words.Length - 3)) AndAlso Words(Words.Length - 2).Equals("of") AndAlso IsNumeric(Words(Words.Length - 1)) Then
-                        ProgressCurrent = CInt(Words(Words.Length - 3))
-                        ProgressFinal = CInt(Words(Words.Length - 1))
+                    'Console.WriteLine("Progress " & aInputLine)
+                    If lWords.Length > 3 AndAlso IsNumeric(lWords(lWords.Length - 3)) AndAlso lWords(lWords.Length - 2).Equals("of") AndAlso IsNumeric(lWords(lWords.Length - 1)) Then
+                        pProgressCurrent = CInt(lWords(lWords.Length - 3))
+                        pProgressFinal = CInt(lWords(lWords.Length - 1))
                         'ProgressPercent = lCurrent * 100 / lFinal
-                        If ProgressCurrent >= ProgressFinal Then
-                            ProgressStartTime = Double.NaN
+                        If pProgressCurrent >= pProgressFinal Then
+                            pProgressStartTime = Double.NaN
                             'ProgressPercent = 100
-                        ElseIf Double.IsNaN(ProgressStartTime) Then
-                            ProgressStartTime = Now.ToOADate
+                        ElseIf Double.IsNaN(pProgressStartTime) Then
+                            pProgressStartTime = Now.ToOADate
                         End If
-                        ProgressNeedsUpdate = True
+                        pProgressNeedsUpdate = True
                     End If
+                Case "SHO"
+                    'Console.WriteLine("Show")
+                    With pfrmStatus
+                        .Visible = True
+                        .WindowState = FormWindowState.Normal
+                        .Show()
+                    End With
             End Select
         End If
     End Sub
 
-    Private Shared Function CreateTimeStamp() As String
-        If LogTimeStamps Then
-            With Now
-                Return Format(.Hour, "00") & ":" & _
-                       Format(.Minute, "00") & ":" & _
-                       Format(.Second, "00") & "." & _
-                       Format(.Millisecond, "000") & "  "
-            End With
-        Else
-            Return ""
-        End If
-    End Function
-
     'Clear our cached versions of the labels on the form
     Private Shared Sub ClearLabels()
-        For iLabel As Integer = 0 To frmStatus.LastLabel
-            lblText(iLabel) = ""
-            lblLast(iLabel) = ""
-            lblLogged(iLabel) = ""
+        For lLabelIndex As Integer = 0 To frmStatus.LastLabel
+            pLabelText(lLabelIndex) = ""
+            pLabelLast(lLabelIndex) = ""
+            pLabelLogged(lLabelIndex) = ""
         Next
     End Sub
-
-    'Copied from atcUtility
-    Private Shared Function StrFirstInt(ByRef Source As String) As Integer
-        ' ##SUMMARY Divides alpha numeric sequence into leading numbers and trailing characters.
-        ' ##SUMMARY   Example: StrFirstInt("123Go!) = "123", and changes Source to "Go!"
-        ' ##PARAM Source M String to be analyzed
-        ' ##RETURNS  Returns leading numbers in Source, and returns Source without those numbers.
-        Dim retval As Integer = 0
-        Dim pos As Integer = 1
-        ' ##LOCAL retval - number found at beginning of Source
-        ' ##LOCAL pos - long character position in search through Source
-
-        If IsNumeric(Left(Source, 2)) Then pos = 3 'account for negative number - sign
-        While IsNumeric(Mid(Source, pos, 1))
-            pos += 1
-        End While
-
-        If pos >= 2 Then
-            retval = CInt(Left(Source, pos - 1))
-            Source = LTrim(Mid(Source, pos))
-        End If
-
-        Return retval
-    End Function
-
-    'Copied from atcUtility
-    Private Shared Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
-        ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
-        'delimeter. Quote specifies a particular string that is exempt from the delimeter search.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "") = "Julie", and "Todd, Jane, and Ray" is returned as Source.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "Julie, Todd") = "Julie, Todd", and "Jane, and Ray" is returned as Source.
-        ' ##PARAM Source M String to be analyzed
-        ' ##PARAM delim I Single-character string delimeter
-        ' ##PARAM quote I Multi-character string exempted from search.
-        ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
-        'Returns input parameter without that portion. If no delimiter in string, _
-        'returns whole string, and input parameter reduced to null string.
-        Dim retval As String
-        Dim i As Integer
-        Dim quoted As Boolean
-        Dim trimlen As Integer
-        Dim quotlen As Integer
-        ' ##LOCAL retval - string to return as StrSplit
-        ' ##LOCAL i - long character position of search through Source
-        ' ##LOCAL quoted - Boolean whether quote was encountered in Source
-        ' ##LOCAL trimlen - long length of delimeter, or quote if encountered first
-        ' ##LOCAL quotlen - long length of quote
-
-        Source = LTrim(Source) 'remove leading blanks
-        quotlen = Len(quote)
-        If quotlen > 0 Then
-            i = InStr(Source, quote)
-            If i = 1 Then 'string beginning
-                trimlen = quotlen
-                Source = Mid(Source, trimlen + 1)
-                i = InStr(Source, quote) 'string end
-                quoted = True
-            Else
-                i = InStr(Source, delim)
-                trimlen = Len(delim)
-            End If
-        Else
-            i = InStr(Source, delim)
-            trimlen = Len(delim)
-        End If
-
-        If i > 0 Then 'found delimeter
-            retval = Left(Source, i - 1) 'string to return
-            If Right(retval, 1) = " " Then retval = RTrim(retval)
-            Source = LTrim(Mid(Source, i + trimlen)) 'string remaining
-            If quoted And Len(Source) > 0 Then
-                If Left(Source, Len(delim)) = delim Then Source = LTrim(Mid(Source, Len(delim) + 1))
-            End If
-        Else 'take it all 
-            retval = Source
-            Source = "" 'nothing left
-        End If
-
-        StrSplit = retval
-
-    End Function
 End Class
