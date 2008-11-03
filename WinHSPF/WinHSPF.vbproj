@@ -84,10 +84,16 @@
     <Compile Include="frmAbout.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmAddDataSet.Designer.vb">
-      <DependentUpon>frmAddDataSet.vb</DependentUpon>
+    <Compile Include="frmAddExpert.Designer.vb">
+      <DependentUpon>frmAddExpert.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmAddDataSet.vb">
+    <Compile Include="frmAddExpert.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddMet.Designer.vb">
+      <DependentUpon>frmAddMet.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddMet.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmControl.Designer.vb">
@@ -132,6 +138,12 @@
     <Compile Include="frmReach.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmTime.Designer.vb">
+      <DependentUpon>frmTime.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTime.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="modWinHSPF.vb" />
     <Compile Include="frmWinHSPF.vb">
       <SubType>Form</SubType>
@@ -161,9 +173,13 @@
       <SubType>Designer</SubType>
       <DependentUpon>frmAbout.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmAddDataSet.resx">
+    <EmbeddedResource Include="frmAddExpert.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>frmAddDataSet.vb</DependentUpon>
+      <DependentUpon>frmAddExpert.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddMet.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddMet.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmControl.resx">
       <SubType>Designer</SubType>
@@ -192,6 +208,10 @@
     <EmbeddedResource Include="frmReach.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmReach.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTime.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmTime.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWinHSPF.resx">
       <SubType>Designer</SubType>
