@@ -17,6 +17,7 @@ Public Class clsCat
 
     Friend Const CLIGEN_NAME As String = "Cligen"
     Friend Const StartFolderVariable As String = "{StartFolder}"
+    Friend Const CurDirVariable As String = "{CurDir}"
     Friend Const RunTitle As String = "Run"
     Friend Const ResultsFixedRows As Integer = 4
 
@@ -94,6 +95,9 @@ StartOver:
                         Select Case lXML.Name.ToLower
                             Case "startfolder" 'Replace start folder in all XML if present
                                 Dim lStartFolder As String = lXML.InnerText
+                                If lStartFolder.ToLower = CurDirVariable.ToLower Then
+                                    lStartFolder = CurDir()
+                                End If
                                 newValue = ReplaceString(newValue, lXML.OuterXml, "")
                                 newValue = ReplaceString(newValue, StartFolderVariable, lStartFolder)
                                 GoTo StartOver

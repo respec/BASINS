@@ -90,7 +90,7 @@ Module modWinHSPFLt
             Logger.Dbg("AfterPipesFromCommandLine: '" & lExeCmd & "' FromStatus " & pPipeReadFromStatus & " ToStatus " & pPipeWriteToStatus)
 
             If pPipeWriteToStatus = 0 Or pPipeReadFromStatus = 0 Then
-                Logger.ProgressStatus = New StatusMonitor
+                Logger.ProgressStatus = New StatusMonitor 'MonitorProgressStatus
                 Logger.Status("Begin") 'set handles but don't open
             End If
 
@@ -129,7 +129,7 @@ Module modWinHSPFLt
 
                 Dim lUci As String = ""
                 If lFileName.Length > 0 Then
-                    lUci = FilenameOnly(lFileName)
+                    lUci = IO.Path.GetFileNameWithoutExtension(lFileName)
                 End If
 
                 If lUci.Length > 0 Then
@@ -139,7 +139,7 @@ Module modWinHSPFLt
                         lLoggerString = WholeFileString(Logger.FileName)
                         Logger.Dbg("ChangeLogFileTO:" & lErrLogName)
                     End If
-                    Logger.Status("Open")
+                    Logger.Status("Show")
                     Logger.StartToFile(lErrLogName, False, False, True)
                     Logger.Dbg(lLoggerString)
                     Logger.Status("(LOGTOFILE " & lErrLogName & ")")
@@ -223,7 +223,7 @@ Friend Class StatusMonitor
     Implements MapWinUtility.IProgressStatus
 
     Dim pInit As Boolean = False
-    Dim pProcess As Process
+    Dim pMonitorProcess As Process
 
     Public Sub Progress(ByVal aCurrentPosition As Integer, ByVal aLastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
         'TODO: send progress messages to status monitor
@@ -233,17 +233,27 @@ Friend Class StatusMonitor
         If Not pInit Then
             Try
                 Dim lProcessId As Integer = Process.GetCurrentProcess.Id
-                pProcess = New Process
-                pProcess.StartInfo.FileName = FindFile("Status Monitor", "status.exe")
-                pProcess.StartInfo.Arguments = lProcessId
-                pProcess.StartInfo.UseShellExecute = False
-                pProcess.StartInfo.RedirectStandardInput = True
-                pProcess.StartInfo.RedirectStandardOutput = True
-                pProcess.Start()
-                Dim lStream As IO.FileStream = pProcess.StandardInput.BaseStream
-                pPipeWriteToStatus = lStream.Handle ' SafeFileHandle?
-                lStream = pProcess.StandardOutput.BaseStream
-                pPipeReadFromStatus =lStream.Handle 
+                pMonitorProcess = New Process
+                With pMonitorProcess.StartInfo
+                    .FileName = FindFile("Status Monitor", "statusMonitor.exe")
+                    .Arguments = lProcessId
+                    .CreateNoWindow = True
+                    .UseShellExecute = False
+                    .RedirectStandardInput = True
+                    .RedirectStandardOutput = True
+                    'AddHandler pMonitorProcess.OutputDataReceived, AddressOf MonitorMessageHandler
+                    .RedirectStandardError = True
+                    'AddHandler pMonitorProcess.ErrorDataReceived, AddressOf MonitorMessageHandler
+                End With
+                pMonitorProcess.Start()
+                pMonitorProcess.StandardInput.WriteLine("Show")
+                'pMonitorProcess.BeginErrorReadLine()
+                'pMonitorProcess.BeginOutputReadLine()
+                Logger.Dbg("MonitorLaunched")
+                Dim lStream As IO.FileStream = pMonitorProcess.StandardInput.BaseStream
+                pPipeWriteToStatus = lStream.Handle 'lStream.SafeFileHandle 
+                lStream = pMonitorProcess.StandardOutput.BaseStream
+                pPipeReadFromStatus = lStream.Handle
                 pInit = True
             Catch ex As Exception
                 Logger.Msg("StatusProcessStartError:" & ex.Message)
@@ -253,16 +263,16 @@ Friend Class StatusMonitor
         WriteStatus(aStatusMessage)
 
         If aStatusMessage.ToLower = "exit" Then
-            If Not pProcess.HasExited Then
-                pProcess.Kill()
+            If Not pMonitorProcess.HasExited Then
+                pMonitorProcess.Kill()
             End If
         End If
     End Sub
 
     Private Function WriteStatus(ByVal aMsg As String) As Boolean
-        If Not IsNothing(pProcess) Then
-            If pProcess.HasExited Then
-                If pProcess.ExitCode <> &H103S Then 'TODO: check to be sure codes have not changed
+        If Not IsNothing(pMonitorProcess) Then
+            If pMonitorProcess.HasExited Then
+                If pMonitorProcess.ExitCode <> &H103S Then 'TODO: check to be sure codes have not changed
                     Return False  'Process at other end of pipe is dead, stop talking to it
                 End If
             End If
@@ -280,8 +290,17 @@ Friend Class StatusMonitor
             If Asc(Right(aMsg, 1)) > 31 Then
                 aMsg = "(" & aMsg & ")"
             End If
-            pProcess.StandardInput.WriteLine(aMsg)
+            Logger.Dbg(aMsg)
+            pMonitorProcess.StandardInput.WriteLine(aMsg)
         End If
         Return True
     End Function
+
+    Private Sub MonitorMessageHandler(ByVal aSendingProcess As Object, _
+                                      ByVal aOutLine As DataReceivedEventArgs)
+        If Not String.IsNullOrEmpty(aOutLine.Data) Then
+            Logger.Dbg(aOutLine.Data.ToString)
+            Logger.Flush()
+        End If
+    End Sub
 End Class

@@ -102,6 +102,10 @@ Friend Class MapWindowForm
         Windows.Forms.Application.DoEvents()
     End Sub
 
+    Public Sub ShowErrorDialog(ByVal aEx As System.Exception, ByVal aSendEmail As String) Implements Interfaces.IMapWin.ShowErrorDialog
+        Logger.Msg(aEx.Message)
+    End Sub
+
     Public Sub InitializeVars()
         'This used to be done as part of the frmMain "New" stuff.  However, this
         'helped MapWindow be very slow to load.  Instead, it is now (in version 4) 
@@ -110,7 +114,7 @@ Friend Class MapWindowForm
 
         m_Project = New Project
         m_Menu = New Menus
-        m_Toolbar = New ToolBar
+        m_Toolbar = New Toolbar
         m_PluginManager = New Plugins_IPlugin
         m_HasBeenSaved = True
         'm_StatusBar = New MapWindow.StatusBar

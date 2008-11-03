@@ -70,7 +70,7 @@ Public Module UCICombiner
         Do While lRecordIndex < lCombinedUci.SpecialActionBlk.Records.Count
             lRecord = lCombinedUci.SpecialActionBlk.Records(lRecordIndex)
             If InStr(lRecord.Text, "+=         0.") = 58 Then
-                lCombinedUci.SpecialActionBlk.Records.Remove(lRecordIndex)
+                lCombinedUci.SpecialActionBlk.Records.RemoveAt(lRecordIndex)
             ElseIf lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hUserDefineQuan And _
                 Mid(lRecord.Text, 1, 16) = "  UVQUAN prec   " Then
                 'need one of these for each met segment
@@ -262,7 +262,7 @@ Public Module UCICombiner
             Dim lNewRecord As New atcUCI.HspfSpecialRecord
             lNewRecord.SpecType = lRecord.SpecType
             lNewRecord.Text = "  UVQUAN prec" & CStr(i) & "  " & Mid(lRecord.Text, 17, 7) & CStr(i) & Mid(lRecord.Text, 25)
-            lCombinedUci.SpecialActionBlk.Records.Add(lNewRecord, , , lUvQuanIndex)
+            lCombinedUci.SpecialActionBlk.Records.Add(lNewRecord) ', , , lUvQuanIndex)
             lUvQuanIndex += 1
         Next i
         Logger.Dbg("UvquansAdded")

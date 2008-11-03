@@ -165,12 +165,14 @@ Public Class clsMonitor
     End Sub
 
     Private Shared Sub ProcessInput(ByVal aInputLine As String)
-        'Console.WriteLine("ProcessInput " & aInputLine)
+        Console.WriteLine("ProcessInput " & aInputLine)
         LogDisplayAddLine(aInputLine)
+        Dim lInputLine As String = aInputLine.TrimStart("(").TrimEnd(")")
+        Console.WriteLine("ProcessInput " & lInputLine)
 
         'Dim lTimeStamp As String = StrSplit(aInputLine, vbTab, "") 'CreateTimeStamp()
-        Dim lWords() As String = aInputLine.Split(" ")
-        Dim lAfterFirstWord As String = aInputLine.Substring(lWords(0).Length)
+        Dim lWords() As String = lInputLine.Split(" ")
+        Dim lAfterFirstWord As String = lInputLine.Substring(lWords(0).Length)
 
         If lWords(0).Length > 0 Then
             Select Case Mid(lWords(0), 1, 3).ToUpper 'Using Mid since Substring generates error when arg too short
