@@ -32,25 +32,40 @@ Module HSPFOutputReports
         'Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
         'Dim lTestName As String = "shena"
-        Dim lTestName As String = "upatoi"
+        Dim lTestName As String = "mono_lu2030a2_base"
+        'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "housatonic"
         'Dim lTestName As String = "beaver"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
+
         'pSummaryTypes.Add("Water")
         pSummaryTypes.Add("Sediment")
 
         Select Case lTestName
+            Case "mono"
+                pTestPath = "d:\mono_base"
+                pBaseName = "base"
+                pOutputLocations.Add("R:9")
+            Case "mono_lu2030a2_base"
+                pTestPath = "D:\mono_luChange\output\lu2030a2"
+                pBaseName = "base"
+                pOutputLocations.Add("R:9")
+            Case "mono_lu2030a2_a_10_cccm_F10"
+                pTestPath = "D:\mono_luChange\output\lu2030a2"
+                pBaseName = "a_10_cccm_F10.base"
+                pOutputLocations.Add("R:9")
             Case "housatonic"
                 pTestPath = "d:\projects\housatonic\jackBin"
                 pBaseName = "base"
-                pOutputLocations.Add("R:110")
-                pOutputLocations.Add("R:400")
-                pOutputLocations.Add("R:820")
-                pOutputLocations.Add("R:540")
-                pOutputLocations.Add("R:600")
-                pOutputLocations.Add("R:900")
+                pOutputLocations.Add("R:9")
+                'pOutputLocations.Add("R:110")
+                'pOutputLocations.Add("R:400")
+                'pOutputLocations.Add("R:820")
+                'pOutputLocations.Add("R:540")
+                'pOutputLocations.Add("R:600")
+                'pOutputLocations.Add("R:900")
             Case "beaver"
                 pTestPath = "g:\projects\beaver\tds"
                 pBaseName = "beaver-TDS-Run01"
