@@ -17,15 +17,11 @@ Public Class frmOutput
     '  *  Indices on for-loops of loper2.Targets.Count are {0, .Count-1} (formerly {1, .Count}
     '
     ' 
-    'Written 29 October 2008 by Brandon G.
+    'This comment written 29 October 2008 by Brandon G.
     ' ==============================================================
 
     Dim pVScrollColumnOffset As Integer = 16
-
-    Dim pPChanged As Boolean
-    Dim pIChanged As Boolean
-    Dim pRChanged As Boolean
-    Dim pPGrid, pIGrid, pRGrid As atcGrid
+    Dim pCheckedRadioIndex As Integer
 
     Sub New()
 
@@ -44,7 +40,7 @@ Public Class frmOutput
             .Visible = True
         End With
 
-        radio3.Checked = True
+        radio1.Checked = True
         cmdCopy.Enabled = False
         RefreshAll()
 
@@ -441,22 +437,27 @@ Public Class frmOutput
     End Sub
 
     Private Sub radio1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radio1.CheckedChanged
+        pCheckedRadioIndex = 1
         RefreshAll()
     End Sub
 
     Private Sub radio2_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radio2.CheckedChanged
+        pCheckedRadioIndex = 2
         RefreshAll()
     End Sub
 
     Private Sub radio3_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radio3.CheckedChanged
+        pCheckedRadioIndex = 3
         RefreshAll()
     End Sub
 
     Private Sub radio4_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radio4.CheckedChanged
+        pCheckedRadioIndex = 4
         RefreshAll()
     End Sub
 
     Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
-        frmAddDataSet.Show()
+        Dim lfrmAddExpert As New frmAddExpert(pCheckedRadioIndex)
+        lfrmAddExpert.Show()
     End Sub
 End Class
