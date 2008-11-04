@@ -4,7 +4,6 @@ Option Explicit On
 
 Imports System.Text
 Imports System.Collections.ObjectModel
-Imports atcUtility
 
 Public Class HspfTables
     Inherits KeyedCollection(Of String, HspfTable)
@@ -455,7 +454,7 @@ notMissingTableForThisOper:
                     lNumFmtRE = "-" & lNumFmtRE.Substring(3)
                 Else
                     'Determine appropriate log syntax
-                    Dim lLogVal As Double = System.Math.Abs(Log10(System.Math.Abs(aRVal)))
+                    Dim lLogVal As Double = System.Math.Abs(atcUtility.Log10(System.Math.Abs(aRVal)))
                     Dim lExpFormat As String
                     If lLogVal >= 100 Then
                         lExpFormat = "e-000"

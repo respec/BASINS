@@ -8,23 +8,9 @@ Option Explicit On
     Private pBlock As HspfMonthData
     Private pReferencedBy As Collection 'of hspfoperation
 
-    Public Property Id() As Integer
-        Get
-            Id = pId
-        End Get
-        Set(ByVal Value As Integer)
-            pId = Value
-        End Set
-    End Property
-
-    Public Property Block() As HspfMonthData
-        Get
-            Block = pBlock
-        End Get
-        Set(ByVal Value As HspfMonthData)
-            pBlock = Value
-        End Set
-    End Property
+    Public Comment As String = ""
+    Public Id As Integer
+    Public Block As HspfMonthData
 
     Public Property MonthValue(ByVal aMonth As Integer) As Single
         Get
