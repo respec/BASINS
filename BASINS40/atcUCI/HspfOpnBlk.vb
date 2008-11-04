@@ -57,23 +57,16 @@ Public Class HspfOpnBlk
     End Function
 
     Public Function NthOper(ByRef aNth As Integer) As HspfOperation
-        Dim lOrder(pIds.Count) As Integer
-        Dim lIds(pIds.Count) As Integer
+        Dim lIds As New System.Collections.SortedList
 
-        Dim lCnt As Integer = 0
-        For Each lOperation As HspfOperation In Me.Ids
-            lCnt += 1
-            lIds(lCnt) = lOperation.Id
+        For Each lOperation As HspfOperation In pIds
+            lIds.Add(lOperation.Id, lOperation)
         Next
-
-        SortIntegerArray(0, lCnt, lIds, lOrder)
-
-        For Each lOperation As HspfOperation In Me.Ids
-            If lOperation.Id = lIds(lOrder(aNth)) Then
-                Return lOperation
-            End If
-        Next
-        Return Nothing
+        If aNth < lIds.Count + 1 Then
+            Return lIds.GetByIndex(aNth - 1)
+        Else
+            Return Nothing
+        End If
     End Function
 
     Public Function Count() As Integer
@@ -188,21 +181,21 @@ Public Class HspfOpnBlk
                                 lTable.OccurIndex = 0
                                 lTable.TableComment = lTableComment
                                 lTable.CombineOK = lCombineOk
-                                If Me.Name = "PERLND" And lTable.Def.Parent.Name = "PQUAL" Then
+                                If Me.Name = "PERLND" AndAlso lTable.Def.Parent.Name = "PQUAL" Then
                                     'need to compute proper index
                                     If lOperation.TableExists("NQUALS") Then
                                         Dim lNQual As Integer = lOperation.Tables.Item("NQUALS").ParmValue("NQUAL")
                                         lTable.SetQualIndex(lOccurNum, lNQual)
                                     End If
                                 End If
-                                If Me.Name = "IMPLND" And lTable.Def.Parent.Name = "IQUAL" Then
+                                If Me.Name = "IMPLND" AndAlso lTable.Def.Parent.Name = "IQUAL" Then
                                     'need to compute proper index
                                     If lOperation.TableExists("NQUALS") Then
                                         Dim lNQual As Integer = lOperation.Tables.Item("NQUALS").ParmValue("NQUAL")
                                         lTable.SetQualIndex(lOccurNum, lNQual)
                                     End If
                                 End If
-                                If Me.Name = "RCHRES" And lTable.Def.Parent.Name = "GQUAL" Then
+                                If Me.Name = "RCHRES" AndAlso lTable.Def.Parent.Name = "GQUAL" Then
                                     'need to compute proper index
                                     If lOperation.TableExists("GQ-GENDATA") Then
                                         Dim lNGQual As Integer = lOperation.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
@@ -220,7 +213,7 @@ Public Class HspfOpnBlk
                                 Else
                                     Try
                                         lOperation.Tables.Add(lTable)
-                                        If Not TableExists((lTable.Name)) Then
+                                        If Not TableExists(lTable.Name) Then
                                             pTables.Add(lTable)
                                         End If
                                     Catch
@@ -488,8 +481,9 @@ Public Class HspfOpnBlk
             'must look thru all possible tables
             lTableDefIndex += 1
             Dim lTableDef As HspfTableDef = lBlockDef.TableDefs(lTableDefIndex - 1)
-
-            If lTableDef.OccurGroup = 0 And Not lInGroup Then 'the basic case
+            'TODO: check to see if the 'Not lInGroup' is really needed
+            If lTableDef.OccurGroup = 0 AndAlso _
+               (Not lInGroup Or lTableDef.Name = "GQ-VALUES") Then 'the basic case
                 For Each lOperation As HspfOperation In pIds
                     If lOperation.TableExists(lTableDef.Name) Then
                         Dim lTable As HspfTable = lOperation.Tables.Item(lTableDef.Name)
@@ -579,75 +573,13 @@ Public Class HspfOpnBlk
         Return lSB.ToString
     End Function
 
-    Public Function OperByDesc(ByRef Desc As String) As HspfOperation
-        Dim lId As HspfOperation
-        Dim vId As Object
-
-        'UPGRADE_NOTE: Object OperByDesc may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-        OperByDesc = Nothing 'Changed by Mark
-        For Each vId In Ids
-            lId = vId
-            If lId.Description = Desc Then
-                OperByDesc = lId 'Changed by Mark
+    Public Function OperByDesc(ByRef aDesc As String) As HspfOperation
+        For Each lId As HspfOperation In Ids
+            If lId.Description = aDesc Then
+                Return lId
                 Exit For
             End If
-        Next vId
+        Next lId
+        Return Nothing
     End Function
-
-    Private Sub SortIntegerArray(ByRef opt As Integer, ByRef cnt As Integer, ByRef iVal() As Integer, ByRef pos() As Integer)
-        ' ##SUMMARY Sorts integers in array into ascending order.
-        ' ##PARAM opt I Sort option (0 = sort in place, 1 = move values in array to sorted position)
-        ' ##PARAM cnt I Count of integers to sort
-        ' ##PARAM iVal I Array of integers to sort
-        ' ##PARAM pos O Array containing sorted order of integers
-        Dim i As Integer
-        Dim j As Integer
-        Dim jpt As Integer
-        Dim jpt1 As Integer
-        Dim itmp As Integer
-        ' ##LOCAL i - long counter for outer loop
-        ' ##LOCAL j - long counter for inner loop
-        ' ##LOCAL jpt - long pointer to j index
-        ' ##LOCAL jpt1 - long pointer to (j + 1) index
-        ' ##LOCAL itmp - long temporary holder for values in iVal array
-
-        'set default positions(assume in order)
-        For i = 1 To cnt
-            pos(i) = i
-        Next i
-
-        'make a pointer to values with bubble sort
-        For i = cnt To 2 Step -1
-            For j = 1 To i - 1
-                jpt = pos(j)
-                jpt1 = pos(j + 1)
-                If (iVal(jpt) > iVal(jpt1)) Then
-                    pos(j + 1) = jpt
-                    pos(j) = jpt1
-                End If
-            Next j
-        Next i
-
-        If (opt = 1) Then
-            'move integer values to their sorted positions
-            For i = 1 To cnt
-                If (pos(i) <> i) Then
-                    'need to move ints, first save whats in target space
-                    itmp = iVal(i)
-                    'move sorted data to target position
-                    iVal(i) = iVal(pos(i))
-                    'move temp data to source position
-                    iVal(pos(i)) = itmp
-                    'find the pointer to the other value we are moving
-                    j = i
-                    Do
-                        j = j + 1
-                    Loop While (pos(j) <> i)
-                    pos(j) = pos(i)
-                    pos(i) = i
-                End If
-            Next i
-        End If
-    End Sub
-
 End Class
