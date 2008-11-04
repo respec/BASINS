@@ -313,7 +313,7 @@ Public Module modString
     Function DoubleToString(ByVal aValue As Double, _
                    Optional ByVal aMaxWidth As Integer = 10, _
                    Optional ByVal aFormat As String = "#,##0.########", _
-                   Optional ByVal aExpFormat As String = "#.#e#", _
+                   Optional ByVal aExpFormat As String = "0.#e0", _
                    Optional ByVal aCantFit As String = "#", _
                    Optional ByVal aSignificantDigits As Integer = 5) As String
         Dim lValue As Double
@@ -329,7 +329,7 @@ Public Module modString
         Else
             Dim lDecimalPos As Integer = lString.IndexOf(".")
             Select Case lDecimalPos
-                Case Is < 1 'string does not contain a decimal or it is the first character
+                Case Is <= 1 'string does not contain a decimal or it is the first character
                 Case aMaxWidth, aMaxWidth - 1
                     Return Left(lString, lDecimalPos) 'Truncate at decimal and remove trailing decimal
                 Case Is < aMaxWidth
@@ -338,7 +338,7 @@ Public Module modString
             'At this point we know string is too long and cannot simply be truncated at or after decimal point
             lString = Format(lValue, aExpFormat)
             'A trailing e might be correct if there is no exponent, but it is ugly so we trim it off
-            If lString.EndsWith("e") Then lString = lString.Substring(0, lString.Length - 1)
+            lString = lString.TrimEnd("e")
             If lString.Length <= aMaxWidth Then
                 Return lString
             Else
