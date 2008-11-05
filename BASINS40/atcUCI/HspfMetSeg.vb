@@ -7,6 +7,7 @@ Public Class HspfMetSeg
     Public Id As Integer
     Public Name As String
     Public Uci As HspfUci
+    Public Comment As String = ""
     Public AirType As Integer '1-GATMP, 2-AIRTMP
 
     Public ReadOnly Property MetSegRecs() As HspfMetSegRecords
@@ -18,6 +19,12 @@ Public Class HspfMetSeg
     Public Function Add(ByRef aConnection As HspfConnection) As Boolean
         Dim lResult As Boolean = True
         If Str2Name(aConnection.Target.Member).Length > 0 Then
+            If aConnection.Comment.Length > 0 Then
+                If pMetSegRecs.Count = 0 Then
+                    Comment = aConnection.Comment
+                    aConnection.Comment = ""
+                End If
+            End If
             Dim lMetSegRec As New HspfMetSegRecord
 
             lMetSegRec.Source = aConnection.Source
@@ -155,9 +162,10 @@ Public Class HspfMetSeg
         End If
     End Sub
 
-    Public Function ToStringFromSpecs(ByRef aOperationType As String, _
+    Friend Function ToStringFromSpecs(ByRef aOperationType As String, _
                                       ByRef aCol() As Integer, _
-                                      ByRef aLen() As Integer) As String
+                                      ByRef aLen() As Integer, _
+                                      ByRef aHeaderPending As Boolean) As String
         Dim lSB As New System.Text.StringBuilder
 
         Dim lFirstId As Integer = 0
@@ -174,7 +182,7 @@ Public Class HspfMetSeg
                 If lSB.Length > 0 AndAlso Not lSB.ToString.EndsWith(vbCrLf) Then
                     lSB.AppendLine("")
                 End If
-                lSB.Append(FormatRecords(aOperationType, lFirstId, lLastId, aCol, aLen))
+                lSB.Append(FormatRecords(aOperationType, lFirstId, lLastId, aCol, aLen, aHeaderPending))
                 lFirstId = 0
                 lLastId = 0
             End If
@@ -183,27 +191,24 @@ Public Class HspfMetSeg
             If lSB.Length > 0 AndAlso Not lSB.ToString.EndsWith(vbCrLf) Then
                 lSB.AppendLine("")
             End If
-            lSB.Append(FormatRecords(aOperationType, lFirstId, lLastId, aCol, aLen))
+            lSB.Append(FormatRecords(aOperationType, lFirstId, lLastId, aCol, aLen, aHeaderPending))
         End If
         Return lSB.ToString
     End Function
 
-    Public Function FormatRecords(ByRef aOpTyp As String, _
+    Private Function FormatRecords(ByRef aOpTyp As String, _
                                   ByRef aFirstId As Integer, ByRef aLastId As Integer, _
-                                  ByRef aCol() As Integer, ByRef aLen() As Integer) As String
+                                  ByRef aCol() As Integer, ByRef aLen() As Integer, _
+                                  ByRef aHeaderPending As Boolean) As String
         Dim lSB As New System.Text.StringBuilder
 
         Dim lInit As Boolean = True
         For Each lMetSegRec As HspfMetSegRecord In pMetSegRecs
             With lMetSegRec
                 If (aOpTyp = "RCHRES" And .MFactR > 0.0#) Or _
-                       (aOpTyp = "PERLND" And .MFactP > 0.0#) Or _
-                       (aOpTyp = "IMPLND" And .MFactP > 0.0#) Then
+                   (aOpTyp = "PERLND" And .MFactP > 0.0#) Or _
+                   (aOpTyp = "IMPLND" And .MFactP > 0.0#) Then
                     'have this type of met seg record
-                    If lInit Then
-                        lSB.AppendLine("*** Met Seg " & Name)
-                        lInit = False
-                    End If
                     Dim lStr As New System.Text.StringBuilder
                     lStr.Append(.Source.VolName.Trim.PadRight(aCol(1) - 1))
                     lStr.Append(CStr(.Source.VolId).PadLeft(aLen(1)))
@@ -266,8 +271,7 @@ Public Class HspfMetSeg
                             Case "CLOU" : lMember = "CLOUD"
                             Case "PEVT" : lMember = "PETINP"
                         End Select
-                        If .Name = "ATEM" Then
-                            'get right air temp member name
+                        If .Name = "ATEM" Then 'get right air temp member name
                             If AirType = 1 Then
                                 lMember = "GATMP"
                             ElseIf AirType = 2 Then
@@ -277,6 +281,15 @@ Public Class HspfMetSeg
                     End If
                     lStr.Append(lMember)
                     lStr.Append(Space(aCol(13) - lStr.Length - 1))
+                    If lInit Then
+                        If Comment.Length = 0 Or Not aHeaderPending Then
+                            lSB.AppendLine("*** Met Seg " & Name)
+                        Else
+                            lSB.AppendLine(Comment)
+                            aHeaderPending = False
+                        End If
+                        lInit = False
+                    End If
                     lSB.AppendLine(lStr.ToString)
                 End If
             End With

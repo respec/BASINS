@@ -2,7 +2,6 @@
 Option Strict Off
 Option Explicit On
 
-Imports System.Text
 Imports System.Collections.ObjectModel
 
 Public Class HspfTables
@@ -84,9 +83,9 @@ Public Class HspfTable
         pCombineOK = True
     End Sub
 
-    Public Function EditAllSimilarChange(ByRef newEditAllSimilar As Boolean) As Object
+    Public Function EditAllSimilarChange(ByRef aEditAllSimilar As Boolean) As Object
         EditAllSimilarChange = pEditAllSimilar
-        pEditAllSimilar = newEditAllSimilar
+        pEditAllSimilar = aEditAllSimilar
     End Function
 
     Public Sub InitTable(ByRef aInitValueString As String)
@@ -166,8 +165,6 @@ Public Class HspfTable
     End Function
 
     Public Function ToStringByIndex(Optional ByRef aInstance As Integer = 0) As String
-        Dim lSB As New StringBuilder
-
         Dim lFirstOccur, lLastOccur As Integer
         If aInstance = 0 Then
             lFirstOccur = 1
@@ -177,8 +174,9 @@ Public Class HspfTable
             lLastOccur = aInstance
         End If
 
-        Dim lTableName As String
+        Dim lSB As New System.Text.StringBuilder
         For lOccur As Integer = lFirstOccur To lLastOccur
+            Dim lTableName As String
             If lOccur = 1 Then
                 lTableName = Def.Name
             Else
@@ -193,13 +191,10 @@ Public Class HspfTable
             Dim lFirstOpn As Boolean = True
             Dim lOutPend As String = Nothing 'pending record?
             For lOperIndex As Integer = 1 To Opn.OpnBlk.Ids.Count
-                On Error GoTo noTableForThisOper
                 Dim lOperation As HspfOperation = Opn.OpnBlk.NthOper(lOperIndex)
                 'write values here
-                If Err.Number Then Resume
-                If Not (lOperation.TableExists(lTableName)) Then
-                    'no Table for this Operation
-                Else
+                If Not lOperation Is Nothing AndAlso _
+                   lOperation.TableExists(lTableName) Then
                     Dim lTable As HspfTable = lOperation.Tables.Item(lTableName)
                     Dim lOutRec As String = myFormatI((lOperation.Id), 5) & Space(5)
                     Dim lOutValue As String
@@ -207,13 +202,12 @@ Public Class HspfTable
                         With lParm
                             Dim lValue As String = .Value
                             lOutRec = lOutRec & Space(.Def.StartCol - lOutRec.Length - 1) 'pad prev field
-                            If .Def.Typ = 0 Then ' ATCoTxt 'left justify strings
+                            If .Def.Typ = 0 Then 'left justify strings
                                 If .Def.Length < lValue.Length Then
                                     lValue = Left(lValue, .Def.Length)
                                 End If
                                 lOutValue = LTrim(lValue)
-                            Else
-                                'not a string
+                            Else 'not a string
                                 'compare format of this value with the format as read
                                 If NumericallyTheSame(.ValueAsRead, lValue, .Def.DefaultValue) Then
                                     'use the value as read
@@ -277,7 +271,6 @@ Public Class HspfTable
                     lOutPend = lOutRec
                     GoTo notMissingTableForThisOper
                 End If
-noTableForThisOper:
                 If Not lOutPend Is Nothing AndAlso lPendingFlag Then 'record pending
                     If lOutPend.Length > 80 Then
                         'this is a multi line table
@@ -293,9 +286,9 @@ noTableForThisOper:
                 End If
 notMissingTableForThisOper:
             Next lOperIndex
+
             If Not lOutPend Is Nothing AndAlso lPendingFlag Then 'record pending
-                If lOutPend.Length > 80 Then
-                    'this is a multi line table
+                If lOutPend.Length > 80 Then 'this is a multi line table
                     If lTableName = "REPORT-CON" Then 'special case for this table
                         Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
                         lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
@@ -310,7 +303,8 @@ notMissingTableForThisOper:
         Return lSB.ToString
     End Function
 
-    Private Sub PrintMultiLine(ByRef aSB As StringBuilder, ByRef aOutPend As String)
+    Private Sub PrintMultiLine(ByRef aSB As System.Text.StringBuilder, _
+                               ByRef aOutPend As String)
         aSB.AppendLine(aOutPend.Substring(0, 80).TrimEnd) 'first line
 
         Dim lLength As Integer = aOutPend.Length
