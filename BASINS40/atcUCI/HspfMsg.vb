@@ -6,11 +6,23 @@ Imports MapWinUtility
 
 Public Class HspfMsg
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
-    Private pMsgFileName As String
-    Private pBlockDefs As HspfBlockDefs
     Private pErrorDescription As String
+
+    Public Name As String
+
+    Private pBlockDefs As HspfBlockDefs
+    Public ReadOnly Property BlockDefs() As HspfBlockDefs
+        Get
+            Return pBlockDefs
+        End Get
+    End Property
+
     Private pTSGroupDefs As HspfTSGroupDefs
+    Public ReadOnly Property TSGroupDefs() As HspfTSGroupDefs
+        Get
+            Return pTSGroupDefs
+        End Get
+    End Property
 
     'Public WriteOnly Property Monitor() As Object
     '    Set(ByVal Value As Object)
@@ -32,18 +44,18 @@ Public Class HspfMsg
         End If
 
         'Logger.Dbg("Opening " & aFilename)
-        Dim myDb As New atcMDB(aFilename)
-        pMsgFileName = aFilename
+        Dim lMsgMDb As New atcMDB(aFilename)
+        Name = aFilename
 
         'Logger.Dbg("BlockDefns")
-        Dim lBlkTable As DataTable = myDb.GetTable("BlockDefns")
+        Dim lBlkTable As DataTable = lMsgMDb.GetTable("BlockDefns")
         Dim lBlock As HspfBlockDef
         Dim lBlockFieldID As Integer = lBlkTable.Columns.IndexOf("ID")
         Dim lBlockFieldName As Integer = lBlkTable.Columns.IndexOf("Name")
         Dim lSections As New HspfSectionDefs
 
         'Logger.Dbg("SectionDefns")
-        Dim lSecTable As DataTable = myDb.GetTable("SectionDefns")
+        Dim lSecTable As DataTable = lMsgMDb.GetTable("SectionDefns")
         Dim lSection As HspfSectionDef
         Dim lSectionFieldID As Integer = lSecTable.Columns.IndexOf("ID")
         Dim lSectionFieldName As Integer = lSecTable.Columns.IndexOf("Name")
@@ -52,20 +64,20 @@ Public Class HspfMsg
         Dim lTable As HspfTableDef
         Dim lBlkTableDefs As New HspfTableDefs
 
-        Dim lTabTable As DataTable = myDb.GetTable("TableDefns")
+        Dim lTabTable As DataTable = lMsgMDb.GetTable("TableDefns")
         Dim lTableFieldSectionID As Integer = lTabTable.Columns.IndexOf("SectionID")
         Dim lTableDefs As HspfTableDefs
         Dim lParms As New HspfParmDefs
 
-        Dim lParmTable As DataTable = myDb.GetTable("ParmDefns")
+        Dim lParmTable As DataTable = lMsgMDb.GetTable("ParmDefns")
         Dim lParmFieldTableID As Integer = lParmTable.Columns.IndexOf("TableID")
         Dim lParm As HSPFParmDef
         Dim lTyp As String
 
-        Dim lTSGroupTable As DataTable = myDb.GetTable("TSGroupDefns")
+        Dim lTSGroupTable As DataTable = lMsgMDb.GetTable("TSGroupDefns")
         Dim lTSGroup As HspfTSGroupDef
         Dim lTSMembers As Collection(Of HspfTSMemberDef)
-        Dim lTSMemberTable As DataTable = myDb.GetTable("TSMemberDefns")
+        Dim lTSMemberTable As DataTable = lMsgMDb.GetTable("TSMemberDefns")
         Dim lMemberFieldTSGroupID As Integer = lTSMemberTable.Columns.IndexOf("TSGroupID")
         Dim lTSMember As HspfTSMemberDef
 
@@ -284,27 +296,6 @@ Public Class HspfMsg
         Logger.Dbg("HSPFMsg:Open Finished")
     End Sub
 
-    Public Property Name() As String
-        Get
-            Return pMsgFileName
-        End Get
-        Set(ByVal newValue As String)
-            pMsgFileName = newValue
-        End Set
-    End Property
-
-    Public ReadOnly Property BlockDefs() As HspfBlockDefs
-        Get
-            Return pBlockDefs
-        End Get
-    End Property
-
-    Public ReadOnly Property TSGroupDefs() As HspfTSGroupDefs
-        Get
-            Return pTSGroupDefs
-        End Get
-    End Property
-
     Public ReadOnly Property ErrorDescription() As String
         Get
             ErrorDescription = pErrorDescription
@@ -320,22 +311,19 @@ Public Class HspfMsg
     '    End If
     'End Function
 
-    Private Function FilterNull(ByRef v As Object, Optional ByRef NullReturn As Object = 0) As Object
-        If IsDBNull(v) Then
-            Return NullReturn
+    Private Function FilterNull(ByRef aValue As Object, Optional ByRef aNullReturn As Object = 0) As Object
+        If IsDBNull(aValue) Then
+            Return aNullReturn
         Else
-            Return v
+            Return aValue
         End If
     End Function
 
-    Private Sub updateParmsMultLines(ByRef blockname As String, ByRef ltable As HspfTableDef)
-        Dim i, j As Integer
-        Dim lParmDef As HSPFParmDef
-
-        With ltable
-            If blockname = "DURANL" And .Name = "LEVELS" Then
-                For i = 1 To 6
-                    lParmDef = New HSPFParmDef
+    Private Sub updateParmsMultLines(ByRef aBlockName As String, ByRef aTable As HspfTableDef)
+        With aTable
+            If aBlockName = "DURANL" And .Name = "LEVELS" Then
+                For i As Integer = 1 To 6
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "LEVE" & CStr(15 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 76 + (i * 5)
@@ -347,9 +335,9 @@ Public Class HspfMsg
                     lParmDef.Define = "LEVEL(2thru21) contains the 20 possible user-specified levels for which the input time series will be analyzed."
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "DURANL" And .Name = "LCONC" Then
-                For i = 1 To 3 'three fields to tack on
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "DURANL" And .Name = "LCONC" Then
+                For i As Integer = 1 To 3 'three fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "LCONC" & CStr(7 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
@@ -361,9 +349,9 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "PERLND" And .Name = "IRRIG-SCHED" Then
-                For i = 2 To 10 'up to 10 rows possible
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "PERLND" And .Name = "IRRIG-SCHED" Then
+                For i As Integer = 2 To 10 'up to 10 rows possible
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "IRYR" & CStr((2 * (i - 1)) + 1) 'year
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = (70 * (i - 1)) + 12
@@ -518,10 +506,10 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "HT-BED-DELH" Then
-                For i = 2 To 14 '100 values needed
-                    For j = 1 To 7 '
-                        lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "HT-BED-DELH" Then
+                For i As Integer = 2 To 14 '100 values needed
+                    For j As Integer = 1 To 7 '
+                        Dim lParmDef As New HSPFParmDef
                         lParmDef.Name = "DELH" & CStr((7 * (i - 1)) + j)
                         lParmDef.Typ = 2 ' ATCoDbl
                         lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
@@ -534,8 +522,8 @@ Public Class HspfMsg
                         .ParmDefs.Add(lParmDef)
                     Next j
                 Next i
-                For i = 1 To 2 'two more fields to tack on to make 100
-                    lParmDef = New HSPFParmDef
+                For i As Integer = 1 To 2 'two more fields to tack on to make 100
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "DELH" & CStr(98 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 991 + (10 * (i - 1))
@@ -547,10 +535,10 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "HT-BED-DELTT" Then
-                For i = 2 To 14 '100 values needed
-                    For j = 1 To 7 '
-                        lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "HT-BED-DELTT" Then
+                For i As Integer = 2 To 14 '100 values needed
+                    For j As Integer = 1 To 7 '
+                        Dim lParmDef As New HSPFParmDef
                         lParmDef.Name = "DELTT" & CStr((7 * (i - 1)) + j)
                         lParmDef.Typ = 2 ' ATCoDbl
                         lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
@@ -563,8 +551,8 @@ Public Class HspfMsg
                         .ParmDefs.Add(lParmDef)
                     Next j
                 Next i
-                For i = 1 To 2 'two more fields to tack on to make 100
-                    lParmDef = New HSPFParmDef
+                For i As Integer = 1 To 2 'two more fields to tack on to make 100
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "DELTT" & CStr(98 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 991 + (10 * (i - 1))
@@ -576,9 +564,9 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "GQ-PHOTPM" Then
-                For i = 1 To 7 'seven fields to tack on
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "GQ-PHOTPM" Then
+                For i As Integer = 1 To 7 'seven fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "PHOTPM" & CStr(7 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
@@ -590,8 +578,8 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-                For i = 1 To 6 'six more fields to tack on
-                    lParmDef = New HSPFParmDef
+                For i As Integer = 1 To 6 'six more fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "PHOTPM" & CStr(14 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
@@ -613,9 +601,9 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "GQ-ALPHA" Then
-                For i = 1 To 7 'seven fields to tack on
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "GQ-ALPHA" Then
+                For i As Integer = 1 To 7 'seven fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "ALPH" & CStr(7 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
@@ -627,8 +615,8 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-                For i = 1 To 4 'four more fields to tack on
-                    lParmDef = New HSPFParmDef
+                For i As Integer = 1 To 4 'four more fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "ALPH" & CStr(14 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
@@ -640,9 +628,9 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "GQ-GAMMA" Then
-                For i = 1 To 7 'seven fields to tack on
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "GQ-GAMMA" Then
+                For i As Integer = 1 To 7 'seven fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "GAMM" & CStr(7 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
@@ -654,8 +642,8 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-                For i = 1 To 4 'four more fields to tack on
-                    lParmDef = New HSPFParmDef
+                For i As Integer= 1 To 4 'four more fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "GAMM" & CStr(14 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
@@ -667,9 +655,9 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "GQ-DELTA" Then
-                For i = 1 To 7 'seven fields to tack on
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "GQ-DELTA" Then
+                For i As Integer = 1 To 7 'seven fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "DEL" & CStr(7 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
@@ -681,8 +669,8 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-                For i = 1 To 4 'four more fields to tack on
-                    lParmDef = New HSPFParmDef
+                For i As Integer = 1 To 4 'four more fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "DEL" & CStr(14 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
@@ -694,9 +682,9 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "GQ-CLDFACT" Then
-                For i = 1 To 7 'seven fields to tack on
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "GQ-CLDFACT" Then
+                For i As Integer = 1 To 7 'seven fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "KCLD" & CStr(7 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 71 + (i * 10)
@@ -708,8 +696,8 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-                For i = 1 To 4 'four more fields to tack on
-                    lParmDef = New HSPFParmDef
+                For i As Integer = 1 To 4 'four more fields to tack on
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "KCLD" & CStr(14 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl
                     lParmDef.StartCol = 141 + (i * 10)
@@ -721,10 +709,10 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "RCHRES" And .Name = "GQ-DAUGHTER" Then
-                For i = 2 To 3 '3 rows needed
-                    For j = 1 To 3 'three values per row
-                        lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "RCHRES" And .Name = "GQ-DAUGHTER" Then
+                For i As Integer = 2 To 3 '3 rows needed
+                    For j As Integer = 1 To 3 'three values per row
+                        Dim lParmDef As New HSPFParmDef
                         lParmDef.Name = "ZERO" & CStr(i) & CStr(j)
                         lParmDef.Typ = 2 ' ATCoDbl
                         lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
@@ -737,9 +725,9 @@ Public Class HspfMsg
                         .ParmDefs.Add(lParmDef)
                     Next j
                 Next i
-            ElseIf blockname = "REPORT" And .Name = "REPORT-SRC" Then
-                For i = 2 To 25 'up to 25 rows possible
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "REPORT" And .Name = "REPORT-SRC" Then
+                For i As Integer = 2 To 25 'up to 25 rows possible
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "SRCID" & CStr(i) 'Name
                     lParmDef.Typ = 0 ' ATCoTxt
                     lParmDef.StartCol = (70 * (i - 1)) + 11
@@ -749,9 +737,9 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-            ElseIf blockname = "REPORT" And .Name = "REPORT-CON" Then
-                For i = 2 To 20 'up to 20 rows possible
-                    lParmDef = New HSPFParmDef
+            ElseIf aBlockName = "REPORT" And .Name = "REPORT-CON" Then
+                For i As Integer = 2 To 20 'up to 20 rows possible
+                    Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "CONID" & CStr(i) 'Name
                     lParmDef.Typ = 0 ' ATCoTxt
                     lParmDef.StartCol = ((i - 1) * 70) + 11

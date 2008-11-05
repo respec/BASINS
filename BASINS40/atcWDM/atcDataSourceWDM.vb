@@ -390,7 +390,9 @@ CaseExistRenumber:
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
         Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
-        If Not aNewValue Is Nothing Then aAttribute.Value = aNewValue
+        If Not aNewValue Is Nothing Then
+            aAttribute.Value = aNewValue
+        End If
 
         WriteAttribute = DsnWriteAttribute(lWdmHandle.Unit, lMsg.Unit, lDsn, aAttribute)
 
@@ -408,16 +410,19 @@ CaseExistRenumber:
     End Function
 
     Public Overrides Function RemoveDataset(ByVal aDataSet As atcData.atcDataSet) As Boolean
-        Dim lTimser As atcTimeseries = aDataSet
-        Dim lWdmHandle As New atcWdmHandle(0, Specification)
-        Dim lRetcod As Integer
+        Dim lRemoveDataset As Boolean = False
 
+        Dim lRetcod As Integer
+        Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Call F90_WDDSDL(lWdmHandle.Unit, (aDataSet.Attributes.GetValue("id", 1)), lRetcod)
+        lWdmHandle.Dispose()
+
         If lRetcod = 0 Then
-            RemoveDataset = True
+            lRemoveDataset = True
             DataSets.Remove(aDataSet)
 
             Dim lRemoveDate As Boolean = True
+            Dim lTimser As atcTimeseries = aDataSet
             Dim lSearchSerial As Integer = lTimser.Dates.Serial
             For Each lTs As atcTimeseries In DataSets
                 If lTs.Dates.Serial = lSearchSerial Then
@@ -429,10 +434,10 @@ CaseExistRenumber:
                 pDates.Remove(lTimser.Dates)
             End If
         Else
-            RemoveDataset = False
+            lRemoveDataset = False
             Logger.Dbg("WDM:RemoveDataset:DSN:" & aDataSet.Attributes.GetValue("id", 1) & ":Retcod:" & lRetcod)
         End If
-        lWdmHandle.Dispose()
+        Return lRemoveDataset
     End Function
 
     Public Overrides Function Save(ByVal SaveFileName As String, _
@@ -452,42 +457,35 @@ CaseExistRenumber:
     ''' <returns></returns>
     Private Function DsnBld(ByVal aFileUnit As Integer, _
                             ByVal aTs As atcTimeseries) As Boolean
-        Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp, lPsa As Integer
-
-        lDsn = aTs.Attributes.GetValue("id", 1)
-        lNDn = aTs.Attributes.GetValue("NDN", 10)
-        lNUp = aTs.Attributes.GetValue("NUP", 10)
-        lNSa = aTs.Attributes.GetValue("NSA", 30)
-        lNSasp = aTs.Attributes.GetValue("NSASP", 100)
-        lNDp = aTs.Attributes.GetValue("NDP", 300)
+        Dim lDsn As Integer = aTs.Attributes.GetValue("id", 1)
+        Dim lNDn As Integer = aTs.Attributes.GetValue("NDN", 10)
+        Dim lNUp As Integer = aTs.Attributes.GetValue("NUP", 10)
+        Dim lNSa As Integer = aTs.Attributes.GetValue("NSA", 30)
+        Dim lNSasp As Integer = aTs.Attributes.GetValue("NSASP", 100)
+        Dim lNDp As Integer = aTs.Attributes.GetValue("NDP", 300)
+        Dim lPsa As Integer
         'create label on wdm file
         F90_WDLBAX(aFileUnit, lDsn, 1, lNDn, lNUp, lNSa, lNSasp, lNDp, lPsa)
         'write attributes
-        DsnBld = DsnWriteAttributes(aFileUnit, aTs)
+        Return DsnWriteAttributes(aFileUnit, aTs)
     End Function
 
     Private Function DsnWriteAttributes(ByVal aFileUnit As Integer, _
                                         ByVal aTs As atcTimeseries) As Boolean
-        Dim lCSDat(6) As Integer
-        Dim lDecade As Integer
-        Dim lIVal As Integer
-        Dim lStr As String
-        Dim lTs As Integer
-        Dim lTu As atcTimeUnit
-
-        Dim lMsg As atcWdmHandle = pMsg.MsgHandle
-        Dim lMsgUnit As Integer = lMsg.Unit
         Dim lDsn As Integer = aTs.Attributes.GetValue("id", 1)
-
         'add needed attributes
-        lStr = aTs.Attributes.GetValue("cons", "")
-        If lStr.Length > 4 Then lStr = lStr.Substring(0, 4)
+        Dim lStr As String = aTs.Attributes.GetValue("cons", "")
+        If lStr.Length > 4 Then
+            lStr = lStr.Substring(0, 4)
+        End If
         aTs.Attributes.SetValueIfMissing("TSTYPE", lStr)
         aTs.Attributes.SetValueIfMissing("TGROUP", 6)
         aTs.Attributes.SetValueIfMissing("TSBYR", 1900)
         aTs.Attributes.SetValueIfMissing("COMPFG", 1)
         aTs.Attributes.SetValueIfMissing("TSFORM", 1)
         aTs.Attributes.SetValueIfMissing("TSFILL", -999)
+        Dim lTs As Integer
+        Dim lTu As atcTimeUnit
         If Not aTs.Attributes.ContainsAttribute("tu") Then
             CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
             aTs.Attributes.SetValue("tu", lTu)
@@ -496,12 +494,15 @@ CaseExistRenumber:
             lTu = aTs.Attributes.GetValue("tu")
             lTs = aTs.Attributes.GetValue("ts")
         End If
-        lIVal = aTs.Attributes.GetValue("VBTIME", 1)
-        If lTs > 1 Then lIVal = 2 'timestep > 1 vbtime must vary
+        Dim lIVal As Integer = aTs.Attributes.GetValue("VBTIME", 1)
+        If lTs > 1 Then
+            lIVal = 2 'timestep > 1 vbtime must vary
+        End If
         aTs.Attributes.SetValueIfMissing("VBTIME", lIVal)
 
+        Dim lCSDat(6) As Integer
         J2Date(aTs.Dates.Value(0), lCSDat)
-        lDecade = lCSDat(0) Mod 10
+        Dim lDecade As Integer = lCSDat(0) Mod 10
         If lDecade > 0 Then 'subtract back to start of this decade
             lIVal = lCSDat(0) - lDecade
         Else 'back to start of previous decade
@@ -515,13 +516,14 @@ CaseExistRenumber:
         aTs.Attributes.SetValueIfMissing("desc", "")
 
         DsnWriteAttributes = True
+        Dim lMsg As atcWdmHandle = pMsg.MsgHandle
+        Dim lMsgUnit As Integer = lMsg.Unit
         For lAttributeIndex As Integer = 0 To aTs.Attributes.Count - 1
             If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, aTs.Attributes(lAttributeIndex)) Then
                 DsnWriteAttributes = False
                 Exit For
             End If
         Next
-
         lMsg.Dispose()
     End Function
 

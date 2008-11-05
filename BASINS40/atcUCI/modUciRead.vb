@@ -1,20 +1,6 @@
 Option Explicit On
-
 Module modUciRead
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
-    Public Function readParmDef(ByRef aNameParm As String) As HSPFParmDef
-        Dim lParmDef As New HSPFParmDef
-
-        If aNameParm = "OutLev" Then
-            lParmDef.Define = "Run Interpreter Output Level"
-        ElseIf aNameParm = "RunInf" Then
-            lParmDef.Define = "Run Information"
-        End If
-
-        Return lParmDef
-    End Function
-
     Public Function HspfOmCode(ByRef aOmName As String) As Integer
         Dim lHspfOmCode As Integer
 

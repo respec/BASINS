@@ -4,7 +4,6 @@ Option Explicit On
 
 Imports atcUtility
 Imports MapWinUtility
-Imports System.Text
 
 Public Class HspfGlobalBlk
     Private pRunInf As HSPFParm ' run information
@@ -19,6 +18,9 @@ Public Class HspfGlobalBlk
     Public Uci As HspfUci
     Private pEdited As Boolean
 
+    Public ReadOnly Caption As String = "Global Block"
+    Public ReadOnly EditControlName As String = "ATCoHspf.ctlGlobalBlkEdit"
+
     Public Property Edited() As Boolean
         Get
             Return pEdited
@@ -29,23 +31,12 @@ Public Class HspfGlobalBlk
         End Set
     End Property
 
-    Public ReadOnly Property Caption() As String
-        Get
-            Return "Global Block"
-        End Get
-    End Property
 
-    Public ReadOnly Property EditControlName() As String
-        Get
-            Return "ATCoHspf.ctlGlobalBlkEdit"
-        End Get
-    End Property
-
-    Public Property RunInf() As HSPFParm
+    Public Property RunInf() As HspfParm
         Get
             Return pRunInf
         End Get
-        Set(ByVal Value As HSPFParm)
+        Set(ByVal Value As HspfParm)
             pRunInf = Value
             Update()
         End Set
@@ -143,7 +134,7 @@ Public Class HspfGlobalBlk
     End Property
 
     Public Sub Edit()
-        editInit(Me, Me.Uci.icon)
+        editInit(Me, Me.Uci.Icon)
     End Sub
 
     Public Sub ReadUciFile()
@@ -269,7 +260,7 @@ Public Class HspfGlobalBlk
     End Sub
 
     Public Overrides Function ToString() As String
-        Dim lSB As New StringBuilder
+        Dim lSB As New System.Text.StringBuilder
 
         If Me.Comment.Length > 0 Then
             lSB.AppendLine(Me.Comment.TrimEnd)
@@ -299,11 +290,23 @@ Public Class HspfGlobalBlk
 
     Public Sub New()
         MyBase.New()
-        pOutLev = New HSPFParm
+        pOutLev = New HspfParm
         pOutLev.Parent = Me
         pOutLev.Def = readParmDef("OutLev")
         pRunInf = New HspfParm
         pRunInf.Parent = Me
         pRunInf.Def = readParmDef("RunInf")
     End Sub
+
+    Private Function readParmDef(ByRef aNameParm As String) As HSPFParmDef
+        Dim lParmDef As New HSPFParmDef
+
+        If aNameParm = "OutLev" Then
+            lParmDef.Define = "Run Interpreter Output Level"
+        ElseIf aNameParm = "RunInf" Then
+            lParmDef.Define = "Run Information"
+        End If
+
+        Return lParmDef
+    End Function
 End Class
