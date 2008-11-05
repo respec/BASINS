@@ -194,15 +194,14 @@ Module HassLibs
     'Declare Sub F90_XLKT25 Lib "feqlib.dll" (L&, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!)
 
 
-    Private Sub ChrNum(ByRef ilen As Integer, ByRef istr As String, ByRef onam() As Integer)
-        Dim i As Short
-        For i = 1 To ilen
-            If i <= Len(istr) Then
-                onam(i - 1) = Asc(Mid(istr, i, 1))
+    Private Sub ChrNum(ByRef aLength As Integer, ByRef aString As String, ByRef aStrAsInt() As Integer)
+        For lPos As Integer = 1 To aLength
+            If lPos <= aString.Length Then
+                aStrAsInt(lPos - 1) = Asc(Mid(aString, lPos, 1))
             Else
-                onam(i - 1) = 32
+                aStrAsInt(lPos - 1) = 32
             End If
-        Next i
+        Next lPos
     End Sub
 
     Public Sub F90_GTNXKW(ByRef Init As Integer, ByRef id As Integer, ByRef ckwd As String, ByRef kwdfg As Integer, ByRef contfg As Integer, ByRef retid As Integer)
@@ -305,18 +304,14 @@ Module HassLibs
         Call NumChr(80, info, rninfo)
     End Sub
 
-    Private Sub NumChr(ByRef ilen As Integer, ByRef inam() As Integer, ByRef outstr As String)
-
-        Dim i As Integer
-
-        outstr = ""
-        For i = 0 To ilen - 1 'added "- 1" 8/16/2002 Mark Gray
-            If inam(i) > 0 Then
-                outstr = outstr & Chr(inam(i))
+    Private Sub NumChr(ByRef aLength As Integer, ByRef aStrAsInt() As Integer, ByRef aString As String)
+        aString = ""
+        For lPos As Integer = 0 To aLength - 1
+            If aStrAsInt(lPos) > 0 Then
+                aString &= Chr(aStrAsInt(lPos))
             End If
-        Next i
-        outstr = RTrim(outstr)
-
+        Next lPos
+        aString = aString.TrimEnd
     End Sub
     Private Sub NumChrA(ByRef icnt As Integer, ByRef ilen As Integer, ByRef inam() As Integer, ByRef outstr() As String)
 

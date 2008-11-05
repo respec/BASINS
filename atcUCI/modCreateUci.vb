@@ -388,7 +388,7 @@ Module modCreateUci
                                  ByRef aScenario As String, _
                                  ByRef aDataSources As Collection(Of atcData.atcDataSource))
 
-        Dim lFile As New HspfData.HspfFile
+        Dim lFile As New HspfFile
         aUci.FilesBlock.Clear()
         aUci.FilesBlock.Uci = aUci
 
@@ -718,11 +718,11 @@ Module modCreateUci
 
     Private Sub CreateBinaryOutput(ByRef aUci As HspfUci, ByRef aScenario As String)
         'add file name to files block
-        Dim newFile As New HspfData.HspfFile
-        newFile.Name = aScenario & ".hbn"
-        newFile.Typ = "BINO"
-        newFile.Unit = 92
-        aUci.FilesBlock.Add(newFile)
+        Dim lNewFile As New HspfFile
+        lNewFile.Name = aScenario & ".hbn"
+        lNewFile.Typ = "BINO"
+        lNewFile.Unit = 92
+        aUci.FilesBlock.Add(lNewFile)
 
         'update bin output units
         Dim lOperation As HspfOperation

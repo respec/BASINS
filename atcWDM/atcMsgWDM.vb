@@ -1,7 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
@@ -35,8 +34,6 @@ Friend Class atcMsgWDM
         Dim lName As String = "" 'name
         Dim lValid As String = "" 'valid values, comma delimeted
 
-        Dim lAttr As atcAttributeDefinition
-
         pAttributes = New atcCollection
         pAttributes.Add("<dummy>")
 
@@ -48,7 +45,7 @@ Friend Class atcMsgWDM
         If lMsgUnit > 0 Then
             For lIndex = 1 To 500 'loop thru all possible attributes 
                 'get info about attribute from message file
-                lAttr = New atcAttributeDefinition
+                Dim lAttr As New atcData.atcAttributeDefinition
                 lAttr.Category = "WDM"
                 Call F90_WDSAGY(lMsgUnit, lIndex, lLen, lType, lRMin, lRMax, lRDef, lHlpLen, lHlpRec, lHlpPos, lValidLen, lName, lDesc, lValid)
                 If lLen = 0 Then 'dummy
@@ -94,9 +91,6 @@ Friend Class atcMsgWDM
 
     Public Function MsgHandle() As atcWdmHandle
         Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-        Dim lMsgHandle As New atcWdmHandle(1, lMsgFileName)
-
-        Return lMsgHandle
+        Return New atcWdmHandle(1, lMsgFileName)
     End Function
-
 End Class

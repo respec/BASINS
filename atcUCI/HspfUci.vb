@@ -1826,7 +1826,7 @@ Public Class HspfUci
         Dim Ind, i, iret As Integer
         Dim tname, s, w, tpath As String
         Dim lFile As atcData.atcDataSource
-        Dim lHFile As HspfData.HspfFile
+        Dim lHFile As HspfFile
         Dim FilesOK As Boolean
         Dim ifound As Boolean
         Dim j As Integer

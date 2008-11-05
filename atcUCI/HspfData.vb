@@ -3,13 +3,6 @@ Option Strict Off
 Option Explicit On
 
 Public Class HspfData
-    Public Structure HspfFile
-        Dim Typ As String 'valid are MESSU, WDM(x), DSSx or blank
-        Dim Unit As Integer 'use 21-99
-        Dim Name As String 'complete path
-        Dim Comment As String 'preceeding comment
-    End Structure
-
     Public Enum HspfOperType
         hPerlnd = 1
         hImplnd = 2
