@@ -983,9 +983,12 @@ Friend Class frmSWSTAT
     Private Sub btnDisplayBasic_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplayBasic.Click
         Dim lList As New atcList.atcListForm
 
-        lList.Text = "Basic Data Series Statistics"
-        lList.Initialize(SelectedData(), pBasicAttributes, False, , )
-        lList.SwapRowsColumns = True
+        With lList
+            .Text = "Basic Statistics"
+            .Initialize(SelectedData(), pBasicAttributes, False, , )
+            .Width = 600
+            .SwapRowsColumns = True
+        End With
 
         'Code section is to print out Text format of Basic Statistics, leave to remind how formatting is working to get 
         '     at the precise formatting in a SWSTAT format table
@@ -1019,7 +1022,6 @@ Friend Class frmSWSTAT
         'Else
         'Logger.Msg("Select at least one time series")
         'End If
-
 
         'lfrmReport.displayReport()
 

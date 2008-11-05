@@ -70,9 +70,6 @@ Friend Class frmDisplayFrequencyGrid
     Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewSep2 As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSaveReport As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSaveViewNDay As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
@@ -81,11 +78,9 @@ Friend Class frmDisplayFrequencyGrid
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisplayFrequencyGrid))
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
-        Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
         Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem
         Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
@@ -99,7 +94,6 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
-        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -109,34 +103,24 @@ Friend Class frmDisplayFrequencyGrid
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSaveGrid, Me.mnuFileSaveReport, Me.mnuFileSaveViewNDay})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSaveGrid, Me.mnuFileSaveReport, Me.mnuFileSaveViewNDay})
         Me.mnuFile.Text = "File"
-        '
-        'mnuFileSelectData
-        '
-        Me.mnuFileSelectData.Index = 0
-        Me.mnuFileSelectData.Text = "Select &Data"
-        '
-        'mnuFileSelectAttributes
-        '
-        Me.mnuFileSelectAttributes.Index = 1
-        Me.mnuFileSelectAttributes.Text = "Select &Attributes"
-        '
-        'mnuFileSep1
-        '
-        Me.mnuFileSep1.Index = 2
-        Me.mnuFileSep1.Text = "-"
         '
         'mnuFileSaveGrid
         '
-        Me.mnuFileSaveGrid.Index = 3
+        Me.mnuFileSaveGrid.Index = 0
         Me.mnuFileSaveGrid.Shortcut = System.Windows.Forms.Shortcut.CtrlS
         Me.mnuFileSaveGrid.Text = "Save Grid"
         '
         'mnuFileSaveReport
         '
-        Me.mnuFileSaveReport.Index = 4
+        Me.mnuFileSaveReport.Index = 1
         Me.mnuFileSaveReport.Text = "Save Report"
+        '
+        'mnuFileSaveViewNDay
+        '
+        Me.mnuFileSaveViewNDay.Index = 2
+        Me.mnuFileSaveViewNDay.Text = "Save/View N-Day"
         '
         'mnuEdit
         '
@@ -211,6 +195,7 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.AllowNewValidValues = False
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
         Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.agdMain.Fixed3D = False
         Me.agdMain.LineColor = System.Drawing.Color.Empty
         Me.agdMain.LineWidth = 0.0!
         Me.agdMain.Location = New System.Drawing.Point(0, 0)
@@ -218,11 +203,6 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.Size = New System.Drawing.Size(720, 545)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
-        '
-        'mnuFileSaveViewNDay
-        '
-        Me.mnuFileSaveViewNDay.Index = 5
-        Me.mnuFileSaveViewNDay.Text = "Save/View N-Day"
         '
         'frmDisplayFrequencyGrid
         '
@@ -232,7 +212,6 @@ Friend Class frmDisplayFrequencyGrid
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "frmDisplayFrequencyGrid"
-        'Me.Text = "High Values"
         Me.Text = "Frequency Statistics"
         Me.ResumeLayout(False)
 
@@ -311,17 +290,6 @@ Friend Class frmDisplayFrequencyGrid
                 OpenFile(.FileName)
             End If
         End With
-    End Sub
-
-    'Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
-    '    UserSpecifyAttributes()
-    'End Sub
-
-    Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pInitializing = True
-        pDataGroup = atcDataManager.UserSelectData(, pDataGroup)
-        pInitializing = False
-        PopulateGrid()
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added

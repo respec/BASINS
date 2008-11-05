@@ -378,7 +378,7 @@ Public Class atcListForm
             End Select
         Next
         lAvailable.Sort()
-        If lst.AskUser(lAvailable, atcDataManager.DisplayAttributes) Then
+        If lst.AskUser(lAvailable, pDisplayAttributes) Then
             'TODO: set project modified flag
             PopulateGrid()
         End If

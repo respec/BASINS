@@ -21,6 +21,7 @@ Public Class clsMonitor
     Private Shared pLastUpdate As Double = Double.NaN
     Private Const UpdateInterval As Double = 2 / 720000.0# ' 1 / 720000.0 = 0.1 second
 
+    Private Shared pIgnoringWindowCommands As Boolean = False
     Private Shared pExiting As Boolean = False
 
     Private Shared pParentProcess As Process = Nothing
@@ -63,11 +64,11 @@ Public Class clsMonitor
 
     Public Shared Sub ManageInterface()
         Dim lNowDouble As Double = Now.ToOADate
-        pLastUpdate = lNowDouble
+        pLastUpdate = lNowDouble - UpdateInterval * 2
         While Not pExiting
             If Console.In.Peek > -1 Then
                 Dim lInputLine As String = Console.In.ReadLine
-                Console.WriteLine("StatusProcessing " & lInputLine)
+                Console.WriteLine("ManageInterface lInputLine=" & lInputLine)
                 ProcessInput(lInputLine)
             End If
 
@@ -129,7 +130,7 @@ Public Class clsMonitor
                 End If
                 pLastUpdate = lNowDouble
             Else
-                System.Threading.Thread.Sleep(10)
+                System.Threading.Thread.Sleep(50)
             End If
             Application.DoEvents()
             lNowDouble = Now.ToOADate
@@ -175,17 +176,30 @@ Public Class clsMonitor
         Dim lAfterFirstWord As String = lInputLine.Substring(lWords(0).Length)
 
         If lWords(0).Length > 0 Then
-            Select Case Mid(lWords(0), 1, 3).ToUpper 'Using Mid since Substring generates error when arg too short
-                Case "DBG" 'Debug message, just goes into log
+            Select Case lWords(0).ToUpper
+                'Case "BUTTON"
+                '    Select Case UCase(Rest)
+                '        Case "CANCEL" : cmdCancel.Visible = True
+                '        Case "PAUSE" : cmdPause.Visible = True
+                '        Case "DETAILS", "OUTPUT" : cmdDetails.Visible = True
+                '    End Select
+                'Case "BUTTOFF"
+                '    Select Case UCase(Rest)
+                '        Case "CANCEL" : cmdCancel.Visible = False
+                '        Case "PAUSE" : cmdPause.Visible = False
+                '        Case "DETAILS", "OUTPUT" : cmdDetails.Visible = False
+                '    End Select
+                Case "CLEAR" : ClearLabels()
+                    'Case "DBG" 'Debug message, just goes into log
                     'Console.WriteLine("Debug")
-                Case "EXI"
-                    'Console.WriteLine("Exiting")
-                    pExiting = True
-                Case "LAB" 'Change a label
+                Case "EXIT" : pExiting = True
+                Case "FOLLOWWINDOWCOMMANDS" : pIgnoringWindowCommands = False
+                Case "IGNOREWINDOWCOMMANDS" : pIgnoringWindowCommands = True
+                Case "LABEL" 'Change a label
                     'Console.WriteLine("ChangeLabel " & lWords(1) & " to " & lAfterFirstWord.Substring(lWords(1).Length + 2))
                     Dim lLabelIndex As Integer = -1
                     If IsNumeric(lWords(1)) Then
-                        lLabelIndex = lWords(1)
+                        lLabelIndex = CInt(lWords(1))
                     Else
                         Select Case lWords(1).ToUpper
                             Case "TITLE" : lLabelIndex = 0
@@ -194,7 +208,6 @@ Public Class clsMonitor
                             Case "MIDDLE" : lLabelIndex = 3
                             Case "RIGHT" : lLabelIndex = 4
                             Case "BOTTOM" : lLabelIndex = 5
-                            Case "CLEAR" : ClearLabels()
                         End Select
                     End If
                     'Console.WriteLine("LabelIndex " & lLabelIndex)
@@ -203,7 +216,8 @@ Public Class clsMonitor
                     Else 'could not find valid label index, just put it all in top label
                         pLabelText(1) = lAfterFirstWord
                     End If
-                Case "PRO"
+                    Show()
+                Case "PROGRESS"
                     'Console.WriteLine("Progress " & aInputLine)
                     If lWords.Length > 3 AndAlso IsNumeric(lWords(lWords.Length - 3)) AndAlso lWords(lWords.Length - 2).Equals("of") AndAlso IsNumeric(lWords(lWords.Length - 1)) Then
                         pProgressCurrent = CInt(lWords(lWords.Length - 3))
@@ -212,20 +226,31 @@ Public Class clsMonitor
                         If pProgressCurrent >= pProgressFinal Then
                             pProgressStartTime = Double.NaN
                             'ProgressPercent = 100
+                            Hide()
                         ElseIf Double.IsNaN(pProgressStartTime) Then
                             pProgressStartTime = Now.ToOADate
+                            Show()
                         End If
                         pProgressNeedsUpdate = True
                     End If
-                Case "SHO"
-                    'Console.WriteLine("Show")
-                    With pfrmStatus
-                        .Visible = True
-                        .WindowState = FormWindowState.Normal
-                        .Show()
-                    End With
+                Case "SHOW" : If Not pIgnoringWindowCommands Then Show()
+                Case "HIDE" : If Not pIgnoringWindowCommands Then ClearLabels() : Hide()
             End Select
         End If
+    End Sub
+
+    Private Shared Sub Show()
+        With pfrmStatus
+            If Not .Visible Then
+                .Visible = True
+                .WindowState = FormWindowState.Normal
+                .Show()
+            End If
+        End With
+    End Sub
+
+    Private Shared Sub Hide()
+        pfrmStatus.Visible = False
     End Sub
 
     'Clear our cached versions of the labels on the form
