@@ -458,6 +458,6 @@ Public Class frmOutput
 
     Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
         Dim lfrmAddExpert As New frmAddExpert(pCheckedRadioIndex)
-        lfrmAddExpert.Show()
+        lfrmAddExpert.ShowDialog()
     End Sub
 End Class

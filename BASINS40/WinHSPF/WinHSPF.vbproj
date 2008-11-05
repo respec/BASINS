@@ -126,6 +126,12 @@
     <Compile Include="frmOutput.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmPoint.Designer.vb">
+      <DependentUpon>frmPoint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPoint.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmPollutant.Designer.vb">
       <DependentUpon>frmPollutant.vb</DependentUpon>
     </Compile>
@@ -200,6 +206,10 @@
     <EmbeddedResource Include="frmOutput.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmOutput.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPoint.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPoint.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmPollutant.resx">
       <SubType>Designer</SubType>
