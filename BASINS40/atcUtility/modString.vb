@@ -313,7 +313,7 @@ Public Module modString
     Function DoubleToString(ByVal aValue As Double, _
                    Optional ByVal aMaxWidth As Integer = 10, _
                    Optional ByVal aFormat As String = "#,##0.########", _
-                   Optional ByVal aExpFormat As String = "0.#e0", _
+                   Optional ByVal aExpFormat As String = "0.####e0", _
                    Optional ByVal aCantFit As String = "#", _
                    Optional ByVal aSignificantDigits As Integer = 5) As String
         Dim lValue As Double
@@ -324,21 +324,37 @@ Public Module modString
         End If
 
         Dim lString As String = Format(lValue, aFormat)
+
+        If lString.Length > aMaxWidth Then 'Too long, need to shorten
+            Dim lDecimalPos As Integer = lString.IndexOf(".")
+            Select Case lDecimalPos
+                Case -1 'string does not contain a decimal
+                    GoTo TryExpFormat
+                Case aMaxWidth, aMaxWidth - 1
+                    lString = Left(lString, lDecimalPos) 'Truncate at decimal and remove trailing decimal
+                Case Is < aMaxWidth
+                    lString = Left(lString, aMaxWidth) 'Truncate at least one digit after decimal
+            End Select
+        End If
+
+        Try 'If formatted string cannot be parsed or changes the value too much, skip to exponential format
+            Dim lStrToDbl As Double
+            If Not Double.TryParse(lString, lStrToDbl) _
+               OrElse Math.Abs(aValue) > 1.0E-30 _
+                      AndAlso (Math.Abs((aValue - lStrToDbl) / aValue) > (1 / 10 ^ (aSignificantDigits - 1))) Then
+                GoTo TryExpFormat
+            End If
+        Catch
+            GoTo TryExpFormat
+        End Try
+
         If lString.Length <= aMaxWidth Then
             Return lString
         Else
-            Dim lDecimalPos As Integer = lString.IndexOf(".")
-            Select Case lDecimalPos
-                Case Is <= 1 'string does not contain a decimal or it is the first character
-                Case aMaxWidth, aMaxWidth - 1
-                    Return Left(lString, lDecimalPos) 'Truncate at decimal and remove trailing decimal
-                Case Is < aMaxWidth
-                    Return Left(lString, aMaxWidth) 'Truncate at least one digit after decimal
-            End Select
-            'At this point we know string is too long and cannot simply be truncated at or after decimal point
-            lString = Format(lValue, aExpFormat)
+TryExpFormat:
+            'String is too long and cannot simply be truncated at or after decimal point
             'A trailing e might be correct if there is no exponent, but it is ugly so we trim it off
-            lString = lString.TrimEnd("e")
+            lString = Format(lValue, aExpFormat).TrimEnd("e")
             If lString.Length <= aMaxWidth Then
                 Return lString
             Else
@@ -346,6 +362,31 @@ Public Module modString
             End If
         End If
     End Function
+
+    'Private Function CountSignificantDigits(ByVal aNumericString As String, ByVal aIncludeTrailingZeroes As Boolean) As Integer
+    '    Dim lCount As Integer = 0
+    '    Dim lTrailingZeroes As Integer = 0
+    '    For Each lChar As Char In aNumericString.ToCharArray
+    '        Select Case lChar
+    '            Case "."c 'decimal point is not a digit
+    '            Case "0"c
+    '                If lCount > 0 Then
+    '                    lCount += 1
+    '                    lTrailingZeroes += 1
+    '                End If
+    '            Case "1"c To "9"c
+    '                lTrailingZeroes = 0
+    '                lCount += 1
+    '            Case "e", "E" : Exit For
+    '        End Select
+    '    Next
+
+    '    If aIncludeTrailingZeroes Then
+    '        Return lCount
+    '    Else
+    '        Return lCount - lTrailingZeroes
+    '    End If
+    'End Function
 
     '    Function Str_Read() As String
     '        ' ##SUMMARY Reads a string from a binary database of open file.
