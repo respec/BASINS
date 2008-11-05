@@ -51,7 +51,7 @@ Public Class HspfMetSegRecord
             ElseIf aTargetMetSegRecord.Source.VolName <> Me.Source.VolName Then
                 lCompare = False
             ElseIf aTargetMetSegRecord.Source.VolId <> Me.Source.VolId Then
-                Compare = False
+                lCompare = False
             ElseIf aTargetMetSegRecord.Source.Member <> Me.Source.Member Then
                 lCompare = False
             ElseIf aTargetMetSegRecord.Source.MemSub1 <> Me.Source.MemSub1 Then

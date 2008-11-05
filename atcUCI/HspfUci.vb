@@ -766,6 +766,7 @@ Public Class HspfUci
                                 lPoint.Name = lPoint.Source.VolName & " " & lPoint.Source.VolId
                                 lPoint.Con = ""
                             End If
+                            lPoint.Comment = lConnection.Comment
                             For Each lPointExisting As HspfPointSource In pPointSources
                                 If lPointExisting.Name = lPoint.Name Then
                                     lPoint.Id = lPointExisting.Id
@@ -2632,11 +2633,12 @@ x:
             If Not Me.CategoryBlock Is Nothing Then 'have category block
                 For Each lCategory As HspfCategory In Me.CategoryBlock.Categories
                     If lCategory.Tag = aCategory Then
-                        CatAsInt = lCategory.Id
+                        Return lCategory.Id
                     End If
                 Next lCategory
             End If
         End If
+        Return Nothing
     End Function
 
     Public Function IntAsCat(ByRef aMember As String, _
