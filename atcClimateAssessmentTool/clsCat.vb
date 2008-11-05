@@ -14,6 +14,7 @@ Public Class clsCat
     Public BaseScenario As String = ""
     Public ResultsGrid As New atcControls.atcGridSource
     Public TimePerRun As Double = 0 'Time each run takes in seconds
+    Public RunModel As Boolean = True 'True to actually run the model, false to just look for already computed results
 
     Friend Const CLIGEN_NAME As String = "Cligen"
     Friend Const StartFolderVariable As String = "{StartFolder}"
@@ -330,7 +331,7 @@ NextIteration:
 
                 RaiseEvent StartIteration(aIteration)
                 TimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, True, ShowEachRunProgress, False)
+                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
                 If lResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
                     Exit Sub
