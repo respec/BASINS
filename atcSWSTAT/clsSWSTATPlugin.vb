@@ -22,20 +22,14 @@ Public Class atcFrequencyGridPlugin
             .Add("Mean")
             .Add("Standard Deviation")
             .Add("Count")
-            .Add("CountMissing")
+            .Add("Count Missing")
         End With
 
         Dim pNDayAttributes As New ArrayList
         With pNDayAttributes
-            '.Add("Data Source")
             .Add("STAID")
             .Add("STANAM")
             .Add("Constituent")
-            '.Add("ID")
-            '.Add("Time steps")
-            '.Add("Time units")
-            '.Add("Count")
-            '.Add("CountMissing")
         End With
 
         Dim pTrendAttributes As New ArrayList
@@ -44,22 +38,13 @@ Public Class atcFrequencyGridPlugin
             .Add("KENTAU")
             .Add("KENPLV")
             .Add("KENSLPL")
-            '.Add("YearFrom")
-            '.Add("YearTo")
             .Add("Count")
             .Add("CountMissing")
-            '.Add("Non-zeroReturnsCode")
-            '.Add("Non-zeroReturnsNO.")
             .Add("Min")
             .Add("Max")
-            '.Add("Qualifiers")
             .Add("Constituent")
             .Add("STAID")
-            '.Add("STANAM")
-            '.Add("Time step")
-            '.Add("Time unit")
         End With
-
 
         lForm.Initialize(aDataGroup, pBasicAttributes, pNDayAttributes, pTrendAttributes)
         Return lForm
