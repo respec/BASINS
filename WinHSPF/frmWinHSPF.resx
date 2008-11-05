@@ -218,13 +218,13 @@
   <data name="cmdTime.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAVpJREFUOE9jZMAB
-        Hh4+/P9YdzfDzU2bMFQoODoymGRkMOiEhzPi0o8i/unp0/8NDAz/0QFQEYYYSN3VVav+4zX4zMyZWA0E
-        mYbNUJA4yOANCQnYDT4xYQLcJSAD0A3BxkcWWxkUhGowKPyweRnZv7hcClMD0n+ksxNhcK+UFEZ4EROm
-        6GqaWFkhhoICGuZKfK4hRg5kzracnP8Ms83NCXodX0QhuxZkaI+k5H8GQmEJ00QoTJHDlmhDibUcpA5u
-        KD6XgBQ2NDSAgwmW3NCTHUw/iqGEop8slxIylFh5sEt3lZYSlaTwGYrs9QWOjpC0Skw6JdZQsIEgsLeq
-        iljf4VU3x8ICNf8TGxG4TAXp//n5M6qhf37+RAlbQokdOUmBDHx35w724u/fnz//VwYHk1RIT9fXx3Qh
-        PGCRGK+uXgUbDMJTtbX/t3Jx/QeVQM1ADCrRYHL39u7F6joA+cebWzcCh+8AAAAASUVORK5CYII=
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAATlJREFUOE/tks9L
+        g2AcxvePehNPQjGwungRkhmdGxJ4iZJ+bJXHiCjCW+0WFmPMLcIOUSPGRsV64hkoutnrtmu98MGvz/d5
+        nsOrpdL/+e0GbNtGHgvfmOM48H0fURQhPpypcTd3seu6CDtdjL6RC3f0zFy8Va2iFXbwOULCXfAAktbo
+        obew2LIsnJ1fYPiFDPUTD2RSp5cZYbFpmmi2H9H/QIbasQcyqdPLjLDUMAz0hpiisrEJkrdjRliq6zpe
+        BphCURSk2a97iYcZYammaWgEIZ77SHBrXuY9vaOXGWGpqqrYOzzF0zvG7B55yRxr6Se9zBT+ASura7i+
+        vUe3ByH00FtYGBuM9QoubwK035ALd/TMXBgbl5bL2N45wFWjidYrxnCmxt3chXFAkiTIspx8ec7UFi78
+        G8EfeeEREQGEL7QAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="ToolStripButton5.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -260,7 +260,7 @@
         AAAAAElFTkSuQmCC
 </value>
   </data>
-  <data name="ToolStripButton7.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="cmdPoint.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABcAAAAWCAYAAAArdgcFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAKJJREFUSEvdld0O

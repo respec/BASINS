@@ -43,4 +43,9 @@ Public Class frmTime
         Dim lfrmAddMet As New frmAddMet
         lfrmAddMet.ShowDialog()
     End Sub
+
+    Private Sub cmdEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEdit.Click
+        Dim lfrmAddMet As New frmAddMet
+        lfrmAddMet.ShowDialog()
+    End Sub
 End Class

@@ -30,11 +30,11 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub LandUseEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles LandUseEditorToolStripMenuItem.Click
-        frmLand.Show()
+        frmLand.ShowDialog()
     End Sub
 
     Private Sub InputDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InputDataEditorToolStripMenuItem.Click
-        frmInputDataEditor.Show()
+        frmInputDataEditor.ShowDialog()
     End Sub
 
     Private Sub PollutantToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PollutantToolStripMenuItem.Click
@@ -86,26 +86,30 @@ Public Class frmWinHSPF
 
 
     Private Sub EditControlCardsWithTablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditControlCardsWithTablesToolStripMenuItem.Click
-        frmActivityAll.Show()
+        frmActivityAll.ShowDialog()
     End Sub
 
     Private Sub EditWithToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditWithToolStripMenuItem.Click
-        frmControl.Show()
+        frmControl.ShowDialog()
     End Sub
 
     Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdToolStripOutput.Click
-        frmOutput.Show()
+        frmOutput.ShowDialog()
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
-        frmAbout.Show()
+        frmAbout.ShowDialog()
     End Sub
 
     Private Sub cmdToolStripInputEditor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdToolStripInputEditor.Click
-        frmInputDataEditor.Show()
+        frmInputDataEditor.ShowDialog()
     End Sub
 
-    Private Sub ToolStripButton4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTime.Click
-        frmTime.Show()
+    Private Sub cmdTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTime.Click
+        frmTime.ShowDialog()
+    End Sub
+
+    Private Sub cmdPoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPoint.Click
+        frmPoint.ShowDialog()
     End Sub
 End Class

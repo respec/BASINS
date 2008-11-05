@@ -78,17 +78,17 @@ Public Class UCIForms
                         Dim frmPwatEdit As New frmPwatEdit
                         frmPwatEdit.Icon = aParent.Icon
                         frmPwatEdit.Init(aObject)
-                        frmPwatEdit.Show()
+                        frmPwatEdit.ShowDialog()
                     ElseIf aObject.Name = "IWAT-PARM1" Then
                         Dim frmIwatEdit As New frmIwatEdit
                         frmIwatEdit.Icon = aParent.Icon
                         frmIwatEdit.Init(aObject)
-                        frmIwatEdit.Show()
+                        frmIwatEdit.ShowDialog()
                     ElseIf aObject.Name = "HYDR-PARM1" Then
                         Dim frmHydrEdit As New frmHydrEdit
                         frmHydrEdit.Icon = aParent.Icon
                         frmHydrEdit.Init(aObject)
-                        frmHydrEdit.Show()
+                        frmHydrEdit.ShowDialog()
                     End If
                     lForm = Nothing
                 Else
@@ -121,7 +121,7 @@ Public Class UCIForms
 
         If Not lForm Is Nothing Then
             lForm.Icon = aParent.Icon
-            lForm.Show()
+            lForm.ShowDialog()
         End If
     End Function
 End Class

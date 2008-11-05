@@ -20,10 +20,11 @@ Partial Class frmAddMet
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.Label1 = New System.Windows.Forms.Label
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
-        Me.AtcGrid1 = New atcControls.atcGrid
-        Me.Cancel = New System.Windows.Forms.Button
-        Me.Button2 = New System.Windows.Forms.Button
+        Me.cboName = New System.Windows.Forms.ComboBox
+        Me.agdMet = New atcControls.atcGrid
+        Me.cmdCancel = New System.Windows.Forms.Button
+        Me.cmdOK = New System.Windows.Forms.Button
+        Me.lblName = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
         'Label1
@@ -35,60 +36,70 @@ Partial Class frmAddMet
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Name:"
         '
-        'ComboBox1
+        'cboName
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(53, 10)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(308, 21)
-        Me.ComboBox1.TabIndex = 1
+        Me.cboName.FormattingEnabled = True
+        Me.cboName.Location = New System.Drawing.Point(53, 10)
+        Me.cboName.Name = "cboName"
+        Me.cboName.Size = New System.Drawing.Size(308, 21)
+        Me.cboName.TabIndex = 1
         '
-        'AtcGrid1
+        'agdMet
         '
-        Me.AtcGrid1.AllowHorizontalScrolling = True
-        Me.AtcGrid1.AllowNewValidValues = False
-        Me.AtcGrid1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.agdMet.AllowHorizontalScrolling = True
+        Me.agdMet.AllowNewValidValues = False
+        Me.agdMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGrid1.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.Fixed3D = False
-        Me.AtcGrid1.LineColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.LineWidth = 0.0!
-        Me.AtcGrid1.Location = New System.Drawing.Point(11, 43)
-        Me.AtcGrid1.Name = "AtcGrid1"
-        Me.AtcGrid1.Size = New System.Drawing.Size(488, 249)
-        Me.AtcGrid1.Source = Nothing
-        Me.AtcGrid1.TabIndex = 2
+        Me.agdMet.CellBackColor = System.Drawing.Color.Empty
+        Me.agdMet.Fixed3D = False
+        Me.agdMet.LineColor = System.Drawing.Color.Empty
+        Me.agdMet.LineWidth = 0.0!
+        Me.agdMet.Location = New System.Drawing.Point(11, 43)
+        Me.agdMet.Name = "agdMet"
+        Me.agdMet.Size = New System.Drawing.Size(488, 249)
+        Me.agdMet.Source = Nothing
+        Me.agdMet.TabIndex = 2
         '
-        'Cancel
+        'cmdCancel
         '
-        Me.Cancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Cancel.Location = New System.Drawing.Point(263, 313)
-        Me.Cancel.Name = "Cancel"
-        Me.Cancel.Size = New System.Drawing.Size(76, 25)
-        Me.Cancel.TabIndex = 8
-        Me.Cancel.Text = "&Cancel"
-        Me.Cancel.UseVisualStyleBackColor = True
+        Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdCancel.Location = New System.Drawing.Point(263, 313)
+        Me.cmdCancel.Name = "cmdCancel"
+        Me.cmdCancel.Size = New System.Drawing.Size(76, 25)
+        Me.cmdCancel.TabIndex = 8
+        Me.cmdCancel.Text = "&Cancel"
+        Me.cmdCancel.UseVisualStyleBackColor = True
         '
-        'Button2
+        'cmdOK
         '
-        Me.Button2.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button2.Location = New System.Drawing.Point(175, 313)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(76, 25)
-        Me.Button2.TabIndex = 7
-        Me.Button2.Text = "&OK"
-        Me.Button2.UseVisualStyleBackColor = True
+        Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdOK.Location = New System.Drawing.Point(175, 313)
+        Me.cmdOK.Name = "cmdOK"
+        Me.cmdOK.Size = New System.Drawing.Size(76, 25)
+        Me.cmdOK.TabIndex = 7
+        Me.cmdOK.Text = "&OK"
+        Me.cmdOK.UseVisualStyleBackColor = True
+        '
+        'lblName
+        '
+        Me.lblName.AutoSize = True
+        Me.lblName.Location = New System.Drawing.Point(59, 14)
+        Me.lblName.Name = "lblName"
+        Me.lblName.Size = New System.Drawing.Size(38, 13)
+        Me.lblName.TabIndex = 9
+        Me.lblName.Text = "Name:"
         '
         'frmAddMet
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(515, 350)
-        Me.Controls.Add(Me.Cancel)
-        Me.Controls.Add(Me.Button2)
-        Me.Controls.Add(Me.AtcGrid1)
-        Me.Controls.Add(Me.ComboBox1)
+        Me.Controls.Add(Me.lblName)
+        Me.Controls.Add(Me.cmdCancel)
+        Me.Controls.Add(Me.cmdOK)
+        Me.Controls.Add(Me.agdMet)
+        Me.Controls.Add(Me.cboName)
         Me.Controls.Add(Me.Label1)
         Me.Name = "frmAddMet"
         Me.Text = "WinHSPF - Add Met Segment"
@@ -97,8 +108,9 @@ Partial Class frmAddMet
 
     End Sub
     Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
-    Friend WithEvents AtcGrid1 As atcControls.atcGrid
-    Friend WithEvents Cancel As System.Windows.Forms.Button
-    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents cboName As System.Windows.Forms.ComboBox
+    Friend WithEvents agdMet As atcControls.atcGrid
+    Friend WithEvents cmdCancel As System.Windows.Forms.Button
+    Friend WithEvents cmdOK As System.Windows.Forms.Button
+    Friend WithEvents lblName As System.Windows.Forms.Label
 End Class
