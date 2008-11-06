@@ -6,6 +6,19 @@ Imports atcControls
 
 Public Class frmWinHSPF
 
+    'Variable treatment of forms. Prevents multiple open of same form without having to use restricted modal method.
+    Public pfrmAbout As frmAbout
+    Public pfrmActivityAll As frmActivityAll
+    Public pfrmAddExpert As frmAddExpert
+    Public pfrmAddMet As frmAddMet
+    Public pfrmControl As frmControl
+    Public pfrmInputDataEditor As frmInputDataEditor
+    Public pfrmLand As frmLand
+    Public pfrmOutput As frmOutput
+    Public pfrmPoint As frmPoint
+    Public pfrmPollutant As frmPollutant
+    Public pfrmTime As frmTime
+
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
@@ -30,15 +43,54 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub LandUseEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles LandUseEditorToolStripMenuItem.Click
-        frmLand.ShowDialog()
+
+        If IsNothing(pfrmLand) Then
+            pfrmLand = New frmLand
+            pfrmLand.Show()
+        Else
+            If pfrmLand.IsDisposed Then
+                pfrmLand = New frmLand
+                pfrmLand.Show()
+            Else
+                pfrmLand.WindowState = FormWindowState.Normal
+                pfrmLand.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub InputDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InputDataEditorToolStripMenuItem.Click
-        frmInputDataEditor.ShowDialog()
+
+        If IsNothing(pfrmInputDataEditor) Then
+            pfrmInputDataEditor = New frmInputDataEditor
+            pfrmInputDataEditor.Show()
+        Else
+            If pfrmInputDataEditor.IsDisposed Then
+                pfrmInputDataEditor = New frmInputDataEditor
+                pfrmInputDataEditor.Show()
+            Else
+                pfrmInputDataEditor.WindowState = FormWindowState.Normal
+                pfrmInputDataEditor.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub PollutantToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PollutantToolStripMenuItem.Click
-        PollutantSelectorCheck()
+
+        If IsNothing(pfrmPollutant) Then
+            pfrmPollutant = New frmPollutant
+            pfrmPollutant.Show()
+        Else
+            If pfrmPollutant.IsDisposed Then
+                pfrmPollutant = New frmPollutant
+                pfrmPollutant.Show()
+            Else
+                pfrmPollutant.WindowState = FormWindowState.Normal
+                pfrmPollutant.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub SetEditMenu()
@@ -86,30 +138,122 @@ Public Class frmWinHSPF
 
 
     Private Sub EditControlCardsWithTablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditControlCardsWithTablesToolStripMenuItem.Click
-        frmActivityAll.ShowDialog()
+
+        If IsNothing(pfrmActivityAll) Then
+            pfrmActivityAll = New frmActivityAll
+            pfrmActivityAll.Show()
+        Else
+            If pfrmActivityAll.IsDisposed Then
+                pfrmActivityAll = New frmActivityAll
+                pfrmActivityAll.Show()
+            Else
+                pfrmActivityAll.WindowState = FormWindowState.Normal
+                pfrmActivityAll.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub EditWithToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditWithToolStripMenuItem.Click
-        frmControl.ShowDialog()
+
+        If IsNothing(pfrmControl) Then
+            pfrmControl = New frmControl
+            pfrmControl.Show()
+        Else
+            If pfrmControl.IsDisposed Then
+                pfrmControl = New frmControl
+                pfrmControl.Show()
+            Else
+                pfrmControl.WindowState = FormWindowState.Normal
+                pfrmControl.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdToolStripOutput.Click
-        frmOutput.ShowDialog()
+
+        If IsNothing(pfrmOutput) Then
+            pfrmOutput = New frmOutput
+            pfrmOutput.Show()
+        Else
+            If pfrmOutput.IsDisposed Then
+                pfrmOutput = New frmOutput
+                pfrmOutput.Show()
+            Else
+                pfrmOutput.WindowState = FormWindowState.Normal
+                pfrmOutput.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
-        frmAbout.ShowDialog()
+
+        If IsNothing(pfrmAbout) Then
+            pfrmAbout = New frmAbout
+            pfrmAbout.Show()
+        Else
+            If pfrmAbout.IsDisposed Then
+                pfrmAbout = New frmAbout
+                pfrmAbout.Show()
+            Else
+                pfrmAbout.WindowState = FormWindowState.Normal
+                pfrmAbout.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub cmdToolStripInputEditor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdToolStripInputEditor.Click
-        frmInputDataEditor.ShowDialog()
+
+        If IsNothing(pfrmInputDataEditor) Then
+            pfrmInputDataEditor = New frmInputDataEditor
+            pfrmInputDataEditor.Show()
+        Else
+            If pfrmInputDataEditor.IsDisposed Then
+                pfrmInputDataEditor = New frmInputDataEditor
+                pfrmInputDataEditor.Show()
+            Else
+                pfrmInputDataEditor.WindowState = FormWindowState.Normal
+                pfrmInputDataEditor.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub cmdTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTime.Click
-        frmTime.ShowDialog()
+
+        If IsNothing(pfrmTime) Then
+            pfrmTime = New frmTime
+            pfrmTime.Show()
+        Else
+            If pfrmTime.IsDisposed Then
+                pfrmTime = New frmTime
+                pfrmTime.Show()
+            Else
+                pfrmTime.WindowState = FormWindowState.Normal
+                pfrmTime.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub cmdPoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPoint.Click
-        frmPoint.ShowDialog()
+
+        If IsNothing(pfrmPoint) Then
+            pfrmPoint = New frmPoint
+            pfrmPoint.Show()
+        Else
+            If pfrmPoint.IsDisposed Then
+                pfrmPoint = New frmPoint
+                pfrmPoint.Show()
+            Else
+                pfrmPoint.WindowState = FormWindowState.Normal
+                pfrmPoint.BringToFront()
+            End If
+        End If
+
     End Sub
+
 End Class

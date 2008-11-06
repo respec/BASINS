@@ -239,7 +239,7 @@ Partial Class frmWinHSPF
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.cmdTime, Me.ToolStripButton5, Me.cmdControl, Me.ToolStripButton6, Me.cmdPoint, Me.cmdToolStripInputEditor, Me.cmdToolStripOutput, Me.ToolStripButton9, Me.ToolStripButton10})
         Me.ToolStrip1.Location = New System.Drawing.Point(134, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(279, 27)
+        Me.ToolStrip1.Size = New System.Drawing.Size(248, 27)
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '

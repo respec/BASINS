@@ -23,9 +23,14 @@ Partial Class frmPoint
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPoint))
         Me.chkAllSources = New System.Windows.Forms.CheckBox
         Me.grpSources = New System.Windows.Forms.GroupBox
+        Me.menuPointSources = New System.Windows.Forms.MenuStrip
+        Me.MenuAddPointSources = New System.Windows.Forms.ToolStripMenuItem
+        Me.ContentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.IndexToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.SearchToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.AdvancedGenerationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.lstSources = New System.Windows.Forms.CheckedListBox
-        Me.Button2 = New System.Windows.Forms.Button
-        Me.Button1 = New System.Windows.Forms.Button
+        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.grpDetails = New System.Windows.Forms.GroupBox
@@ -34,16 +39,17 @@ Partial Class frmPoint
         Me.Button7 = New System.Windows.Forms.Button
         Me.Button8 = New System.Windows.Forms.Button
         Me.cmdDetailsShow = New System.Windows.Forms.Button
-        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.cmdDetailsHide = New System.Windows.Forms.Button
+        Me.CreateScenario = New System.Windows.Forms.ToolStripMenuItem
         Me.grpSources.SuspendLayout()
+        Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
         Me.SuspendLayout()
         '
         'chkAllSources
         '
         Me.chkAllSources.AutoSize = True
-        Me.chkAllSources.Location = New System.Drawing.Point(15, 19)
+        Me.chkAllSources.Location = New System.Drawing.Point(15, 65)
         Me.chkAllSources.Name = "chkAllSources"
         Me.chkAllSources.Size = New System.Drawing.Size(70, 17)
         Me.chkAllSources.TabIndex = 7
@@ -52,47 +58,82 @@ Partial Class frmPoint
         '
         'grpSources
         '
+        Me.grpSources.Controls.Add(Me.menuPointSources)
         Me.grpSources.Controls.Add(Me.lstSources)
         Me.grpSources.Controls.Add(Me.chkAllSources)
-        Me.grpSources.Controls.Add(Me.Button2)
-        Me.grpSources.Controls.Add(Me.Button1)
         Me.grpSources.Location = New System.Drawing.Point(12, 12)
         Me.grpSources.Name = "grpSources"
-        Me.grpSources.Size = New System.Drawing.Size(245, 297)
+        Me.grpSources.Size = New System.Drawing.Size(245, 344)
         Me.grpSources.TabIndex = 14
         Me.grpSources.TabStop = False
         Me.grpSources.Text = "Point Sources"
         '
+        'menuPointSources
+        '
+        Me.menuPointSources.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuAddPointSources, Me.CreateScenario})
+        Me.menuPointSources.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow
+        Me.menuPointSources.Location = New System.Drawing.Point(3, 16)
+        Me.menuPointSources.Name = "menuPointSources"
+        Me.menuPointSources.RenderMode = System.Windows.Forms.ToolStripRenderMode.System
+        Me.menuPointSources.Size = New System.Drawing.Size(239, 24)
+        Me.menuPointSources.TabIndex = 18
+        Me.menuPointSources.Text = "MenuStrip1"
+        '
+        'MenuAddPointSources
+        '
+        Me.MenuAddPointSources.BackColor = System.Drawing.SystemColors.Control
+        Me.MenuAddPointSources.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ContentsToolStripMenuItem, Me.IndexToolStripMenuItem, Me.SearchToolStripMenuItem, Me.AdvancedGenerationToolStripMenuItem})
+        Me.MenuAddPointSources.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.MenuAddPointSources.Image = CType(resources.GetObject("MenuAddPointSources.Image"), System.Drawing.Image)
+        Me.MenuAddPointSources.Name = "MenuAddPointSources"
+        Me.MenuAddPointSources.Size = New System.Drawing.Size(117, 20)
+        Me.MenuAddPointSources.Text = "Add Point Source"
+        '
+        'ContentsToolStripMenuItem
+        '
+        Me.ContentsToolStripMenuItem.Name = "ContentsToolStripMenuItem"
+        Me.ContentsToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.ContentsToolStripMenuItem.Text = "Simple Create"
+        '
+        'IndexToolStripMenuItem
+        '
+        Me.IndexToolStripMenuItem.Name = "IndexToolStripMenuItem"
+        Me.IndexToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.IndexToolStripMenuItem.Text = "Import MUTSIN Format"
+        '
+        'SearchToolStripMenuItem
+        '
+        Me.SearchToolStripMenuItem.Name = "SearchToolStripMenuItem"
+        Me.SearchToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.SearchToolStripMenuItem.Text = "Convert All MUTSINs in Project"
+        '
+        'AdvancedGenerationToolStripMenuItem
+        '
+        Me.AdvancedGenerationToolStripMenuItem.Name = "AdvancedGenerationToolStripMenuItem"
+        Me.AdvancedGenerationToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.AdvancedGenerationToolStripMenuItem.Text = "Advanced Generation"
+        '
         'lstSources
         '
         Me.lstSources.FormattingEnabled = True
-        Me.lstSources.Location = New System.Drawing.Point(17, 46)
+        Me.lstSources.Location = New System.Drawing.Point(17, 92)
         Me.lstSources.Name = "lstSources"
-        Me.lstSources.Size = New System.Drawing.Size(211, 199)
+        Me.lstSources.Size = New System.Drawing.Size(211, 229)
         Me.lstSources.TabIndex = 17
         '
-        'Button2
+        'ImageList1
         '
-        Me.Button2.Location = New System.Drawing.Point(126, 265)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(101, 26)
-        Me.Button2.TabIndex = 16
-        Me.Button2.Text = "Create Scenario"
-        Me.Button2.UseVisualStyleBackColor = True
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(17, 265)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(101, 26)
-        Me.Button1.TabIndex = 15
-        Me.Button1.Text = " Add New"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList1.Images.SetKeyName(0, "l.png")
+        Me.ImageList1.Images.SetKeyName(1, "r.png")
+        Me.ImageList1.Images.SetKeyName(2, "add.png")
+        Me.ImageList1.Images.SetKeyName(3, "create.png")
         '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Location = New System.Drawing.Point(137, 376)
+        Me.cmdCancel.Location = New System.Drawing.Point(137, 418)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
         Me.cmdCancel.TabIndex = 18
@@ -102,7 +143,7 @@ Partial Class frmPoint
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Location = New System.Drawing.Point(28, 376)
+        Me.cmdOK.Location = New System.Drawing.Point(28, 418)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(101, 26)
         Me.cmdOK.TabIndex = 17
@@ -117,7 +158,7 @@ Partial Class frmPoint
         Me.grpDetails.Controls.Add(Me.Button8)
         Me.grpDetails.Location = New System.Drawing.Point(283, 12)
         Me.grpDetails.Name = "grpDetails"
-        Me.grpDetails.Size = New System.Drawing.Size(478, 297)
+        Me.grpDetails.Size = New System.Drawing.Size(478, 344)
         Me.grpDetails.TabIndex = 19
         Me.grpDetails.TabStop = False
         Me.grpDetails.Text = "Details of <    >"
@@ -172,7 +213,7 @@ Partial Class frmPoint
         Me.cmdDetailsShow.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsShow.ImageIndex = 1
         Me.cmdDetailsShow.ImageList = Me.ImageList1
-        Me.cmdDetailsShow.Location = New System.Drawing.Point(157, 329)
+        Me.cmdDetailsShow.Location = New System.Drawing.Point(157, 372)
         Me.cmdDetailsShow.Name = "cmdDetailsShow"
         Me.cmdDetailsShow.Size = New System.Drawing.Size(100, 21)
         Me.cmdDetailsShow.TabIndex = 17
@@ -180,20 +221,13 @@ Partial Class frmPoint
         Me.cmdDetailsShow.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdDetailsShow.UseVisualStyleBackColor = True
         '
-        'ImageList1
-        '
-        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
-        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
-        Me.ImageList1.Images.SetKeyName(0, "l.png")
-        Me.ImageList1.Images.SetKeyName(1, "r.png")
-        '
         'cmdDetailsHide
         '
         Me.cmdDetailsHide.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.cmdDetailsHide.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdDetailsHide.ImageIndex = 0
         Me.cmdDetailsHide.ImageList = Me.ImageList1
-        Me.cmdDetailsHide.Location = New System.Drawing.Point(283, 329)
+        Me.cmdDetailsHide.Location = New System.Drawing.Point(283, 372)
         Me.cmdDetailsHide.Name = "cmdDetailsHide"
         Me.cmdDetailsHide.Size = New System.Drawing.Size(100, 21)
         Me.cmdDetailsHide.TabIndex = 20
@@ -201,11 +235,18 @@ Partial Class frmPoint
         Me.cmdDetailsHide.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsHide.UseVisualStyleBackColor = True
         '
+        'CreateScenario
+        '
+        Me.CreateScenario.Image = CType(resources.GetObject("CreateScenario.Image"), System.Drawing.Image)
+        Me.CreateScenario.Name = "CreateScenario"
+        Me.CreateScenario.Size = New System.Drawing.Size(112, 20)
+        Me.CreateScenario.Text = "Create Scenario"
+        '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(792, 423)
+        Me.ClientSize = New System.Drawing.Size(792, 465)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
         Me.Controls.Add(Me.grpDetails)
@@ -216,14 +257,14 @@ Partial Class frmPoint
         Me.Text = "WinHSPF - Point Sources"
         Me.grpSources.ResumeLayout(False)
         Me.grpSources.PerformLayout()
+        Me.menuPointSources.ResumeLayout(False)
+        Me.menuPointSources.PerformLayout()
         Me.grpDetails.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
     Friend WithEvents chkAllSources As System.Windows.Forms.CheckBox
     Friend WithEvents grpSources As System.Windows.Forms.GroupBox
-    Friend WithEvents Button1 As System.Windows.Forms.Button
-    Friend WithEvents Button2 As System.Windows.Forms.Button
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents grpDetails As System.Windows.Forms.GroupBox
@@ -235,4 +276,11 @@ Partial Class frmPoint
     Friend WithEvents cmdDetailsShow As System.Windows.Forms.Button
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
     Friend WithEvents lstSources As System.Windows.Forms.CheckedListBox
+    Friend WithEvents menuPointSources As System.Windows.Forms.MenuStrip
+    Friend WithEvents MenuAddPointSources As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ContentsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents IndexToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SearchToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents AdvancedGenerationToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents CreateScenario As System.Windows.Forms.ToolStripMenuItem
 End Class
