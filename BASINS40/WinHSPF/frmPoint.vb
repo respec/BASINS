@@ -23,20 +23,49 @@ Public Class frmPoint
 
         grpDetails.Text = "Details of " & lstSources.SelectedItem
 
+        AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
+        AddHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+
     End Sub
 
     Private Sub ExpandedView(ByVal aExpand As Boolean)
         If aExpand Then
-            Me.Size = New Size(800, 450)
+            Me.Size = New Size(800, 495)
             cmdDetailsHide.Visible = True
             cmdDetailsShow.Visible = False
             grpDetails.Visible = True
         Else
-            Me.Size = New Size(280, 450)
+            Me.Size = New Size(280, 495)
             cmdDetailsHide.Visible = False
             cmdDetailsShow.Visible = True
             grpDetails.Visible = False
         End If
+
+    End Sub
+
+    Private Sub chkAllSources_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Dim lRow As Integer
+        RemoveHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+
+        For lRow = 0 To lstSources.Items.Count - 1
+            lstSources.SetItemChecked(lRow, chkAllSources.Checked)
+        Next
+
+        AddHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+
+    End Sub
+
+    Private Sub lstSources_IndividualCheckChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs)
+
+        RemoveHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
+
+        chkAllSources.Checked = False
+
+        AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
+
+        RemoveHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+        lstSources.SetItemChecked(e.Index, e.NewValue)
+        AddHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
     End Sub
 
@@ -58,4 +87,5 @@ Public Class frmPoint
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Me.Dispose()
     End Sub
+
 End Class

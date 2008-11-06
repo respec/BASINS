@@ -6,6 +6,7 @@ Public Module WinHSPF
     Friend pUCI As HspfUci
     Friend pMsg As HspfMsg
     Friend pIcon As Icon
+    Friend pfrmReach As frmReach
     'Friend pIPC As ATCoIPC
 
     Sub Main()
@@ -41,8 +42,22 @@ Public Module WinHSPF
     End Sub
 
     Sub ReachEditor()
+
         If pUCI.OpnBlks("RCHRES").Count > 0 Then
-            frmReach.Show()
+
+            If IsNothing(pfrmReach) Then
+                pfrmReach = New frmReach
+                pfrmReach.Show()
+            Else
+                If pfrmReach.IsDisposed Then
+                    pfrmReach = New frmReach
+                    pfrmReach.Show()
+                Else
+                    pfrmReach.WindowState = FormWindowState.Normal
+                    pfrmReach.BringToFront()
+                End If
+            End If
+
             'ClearTree()
             'BuildTree()
             'UpdateLegend()
