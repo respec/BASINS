@@ -10,12 +10,13 @@ Public Module AnnualCompareStats
                            ByVal aPrecTSer As atcTimeseries, _
                            ByVal aSimTSer As atcTimeseries, _
                            ByVal aObsTSer As atcTimeseries, _
+                           ByVal aRunMade As String, _
                            Optional ByVal aSDateJ As Double = 0, _
                            Optional ByVal aEDateJ As Double = 0) As String
 
         Dim lStr As String
         lStr = "Annual Simulated and Observed " & aCons & " Statistics for '" & IO.Path.GetFileNameWithoutExtension(aUci.Name) & "' scenario." & vbCrLf
-        lStr &= "   Run Made " & FileDateTime(aUci.Name) & vbCrLf
+        lStr &= "   Run Made " & aRunMade & vbCrLf
         lStr &= "   " & aUci.GlobalBlock.RunInf.Value & vbCrLf
 
         Dim lSDateJ As Double = aSDateJ

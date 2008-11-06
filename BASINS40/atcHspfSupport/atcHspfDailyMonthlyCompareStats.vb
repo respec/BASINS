@@ -8,6 +8,7 @@ Public Module DailyMonthlyCompareStats
                            ByVal aSite As String, _
                            ByVal aSimTSer As atcTimeseries, _
                            ByVal aObsTSer As atcTimeseries, _
+                           ByVal aRunMade As String, _
                   Optional ByVal aSDateJ As Double = 0, _
                   Optional ByVal aEDateJ As Double = 0) As String
 
@@ -18,7 +19,7 @@ Public Module DailyMonthlyCompareStats
 
         Dim lStr As String
         lStr = "Daily and Monthly " & aCons & " Statistics for '" & IO.Path.GetFileNameWithoutExtension(aUci.Name) & "' scenario." & vbCrLf
-        lStr &= "   Run Made " & FileDateTime(aUci.Name) & vbCrLf
+        lStr &= "   Run Made " & aRunMade & vbCrLf
         lStr &= "   " & aUci.GlobalBlock.RunInf.Value & vbCrLf
         lStr &= "   " & TimeSpanAsString(lSDateJ, lEDateJ)
         lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?

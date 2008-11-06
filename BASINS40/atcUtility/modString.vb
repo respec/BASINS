@@ -251,17 +251,19 @@ Public Module modString
             Select Case lAddRight
                 Case Is > 0 : aValue &= Space(lAddRight)
                 Case Is < 0
-                    Select Case aValue.Length + lAddRight
-                        Case Is <= 0 : aValue = ""
-                        Case lDecimalPosition : aValue = aValue.Substring(0, lDecimalPosition)
-                        Case Is > lDecimalPosition
-                            aValue = aValue.Substring(0, aValue.Length + lAddRight)
-                            While aValue.EndsWith("0")
-                                aValue = aValue.Substring(0, aValue.Length - 1)
-                            End While
-                        Case Else
-                            aValue = aValue.Substring(0, aValue.Length + lAddRight)
-                    End Select
+                    If Not aValue.Contains("e") Then
+                        Select Case aValue.Length + lAddRight
+                            Case Is <= 0 : aValue = ""
+                            Case lDecimalPosition : aValue = aValue.Substring(0, lDecimalPosition)
+                            Case Is > lDecimalPosition
+                                aValue = aValue.Substring(0, aValue.Length + lAddRight)
+                                While aValue.EndsWith("0")
+                                    aValue = aValue.Substring(0, aValue.Length - 1)
+                                End While
+                            Case Else
+                                aValue = aValue.Substring(0, aValue.Length + lAddRight)
+                        End Select
+                    End If
             End Select
             Return aValue.PadLeft(aFieldWidth)
         End If

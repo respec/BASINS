@@ -32,15 +32,15 @@ Module HSPFOutputReports
         'Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
         'Dim lTestName As String = "shena"
-        Dim lTestName As String = "mono_lu2030a2_base"
-        'Dim lTestName As String = "upatoi"
+        'Dim lTestName As String = "mono_lu2030a2_base"
+        Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "housatonic"
         'Dim lTestName As String = "beaver"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
 
-        'pSummaryTypes.Add("Water")
+        pSummaryTypes.Add("Water")
         pSummaryTypes.Add("Sediment")
 
         Select Case lTestName
@@ -89,9 +89,9 @@ Module HSPFOutputReports
                 pOutputLocations.Add("R:74")
                 pGraphAnnual = True
                 pCurveStepType = "NonStep" 'Tony's convention 
-                Dim pUpatoiPerlndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701, 801, 901, 924}
+                Dim pUpatoiPerlndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701, 801, 901, 951} '{101, 201, 301, 401, 501, 601, 701, 801, 901, 924}
                 pPerlndSegmentStarts = pUpatoiPerlndSegmentStarts
-                Dim pUpatoiImplndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701, 801, 901, 905}
+                Dim pUpatoiImplndSegmentStarts() As Integer = {102, 202, 302, 402, 502, 602, 702, 802, 902, 952} '{101, 201, 301, 401, 501, 601, 701, 801, 901, 905}
                 pImplndSegmentStarts = pUpatoiImplndSegmentStarts
             Case "tinley"
                 pTestPath = "c:\test\tinley"
@@ -152,6 +152,16 @@ Module HSPFOutputReports
         End If
         'lHspfUci.Save()
 
+        'open HBN file
+        'TODO: need to allow additional binary output files!
+        Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"
+        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
+        lHspfBinDataSource.Open(lHspfBinFileName)
+
+        'watershed summary
+        Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
+        Dim lRunMade As String = lHspfBinFileInfo.LastWriteTime.ToString
+
         If pSummaryTypes.Contains("Water") Then
             'open WDM file
             Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
@@ -197,6 +207,7 @@ Module HSPFOutputReports
                                                                              lCons, lSite, _
                                                                              "inches", _
                                                                              lSimTSerInches, lObsTSerInches, _
+                                                                             lRunMade, _
                                                                              lExpertSystem.SDateJ, _
                                                                              lExpertSystem.EDateJ)
                         Dim lOutFileName As String = "outfiles\MonthlyAverage" & lCons & "Stats-" & lSite & ".txt"
@@ -206,6 +217,7 @@ Module HSPFOutputReports
                                                                      lCons, lSite, _
                                                                      "inches", _
                                                                      lPrecTSer, lSimTSerInches, lObsTSerInches, _
+                                                                     lRunMade, _
                                                                      lExpertSystem.SDateJ, _
                                                                      lExpertSystem.EDateJ)
                         lOutFileName = "outfiles\Annual" & lCons & "Stats-" & lSite & ".txt"
@@ -214,6 +226,7 @@ Module HSPFOutputReports
                         lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                            lCons, lSite, _
                                                                            lSimTSer, lObsTSer, _
+                                                                           lRunMade, _
                                                                            lExpertSystem.SDateJ, _
                                                                            lExpertSystem.EDateJ)
                         lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats-" & lSite & ".txt"
@@ -247,15 +260,6 @@ Module HSPFOutputReports
             Next lExpertSystemFileName
         End If
 
-        'open HBN file
-        'TODO: need to allow additional binary output files!
-        Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"
-        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
-        lHspfBinDataSource.Open(lHspfBinFileName)
-
-        'watershed summary
-        Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-
         For Each lSummaryType As String In pSummaryTypes
             Dim lString As String
             Dim lOutFileName As String
@@ -265,17 +269,17 @@ Module HSPFOutputReports
             lOperationTypes.Add("I:", "IMPLND")
             lOperationTypes.Add("R:", "RCHRES")
 
-            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, pPerlndSegmentStarts, pImplndSegmentStarts).ToString
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts).ToString
             lOutFileName = "outfiles\" & pBaseName & "_" & lSummaryType & "_WatershedOverland.txt"
             SaveFileString(lOutFileName, lString)
             lString = Nothing
 
-            lString = HspfSupport.ConstituentBudget.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime).ToString
+            lString = HspfSupport.ConstituentBudget.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade).ToString
             lOutFileName = "outfiles\" & pBaseName & "_" & lSummaryType & "_Budget.txt"
             SaveFileString(lOutFileName, lString)
             lString = Nothing
 
-            lString = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, lSummaryType).ToString
+            lString = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lSummaryType).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_WatershedSummary.txt"
             SaveFileString(lOutFileName, lString)
             lString = Nothing
@@ -285,19 +289,19 @@ Module HSPFOutputReports
             'constituent balance
             lString = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime).ToString
+                lHspfBinDataSource, lLocations, lRunMade).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_ConstituentBalance.txt"
             SaveFileString(lOutFileName, lString)
 
             lString = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime, True).ToString
+                lHspfBinDataSource, lLocations, lRunMade, True).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_ConstituentBalancePivot.txt"
             SaveFileString(lOutFileName, lString)
 
             lString = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime, True, 2, 5, 8).ToString
+                lHspfBinDataSource, lLocations, lRunMade, True, 2, 5, 8).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_ConstituentBalancePivotNarrowTab.txt"
             SaveFileString(lOutFileName, lString)
             lOutFileName = "outfiles\" & lSummaryType & "_ConstituentBalancePivotNarrowSpace.txt"
@@ -306,19 +310,19 @@ Module HSPFOutputReports
             'watershed constituent balance 
             lString = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime).ToString
+                lHspfBinDataSource, lRunMade).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_WatershedConstituentBalance.txt"
             SaveFileString(lOutFileName, lString)
 
             lString = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True).ToString
+                lHspfBinDataSource, lRunMade, , , , True).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_WatershedConstituentBalancePivot.txt"
             SaveFileString(lOutFileName, lString)
 
             lString = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, , , , True, 2, 5, 8).ToString
+                lHspfBinDataSource, lRunMade, , , , True, 2, 5, 8).ToString
             lOutFileName = "outfiles\" & lSummaryType & "_WatershedConstituentBalancePivotNarrowTab.txt"
             SaveFileString(lOutFileName, lString)
             lOutFileName = "outfiles\" & lSummaryType & "_WatershedConstituentBalancePivotNarrowSpace.txt"
@@ -327,11 +331,11 @@ Module HSPFOutputReports
             If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
                 HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                    (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                    lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
+                    lHspfBinDataSource, pOutputLocations, lRunMade, _
                     "outfiles\", True)
                 HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                    (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-                    lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
+                    lHspfBinDataSource, pOutputLocations, lRunMade, _
                     "outfiles\", True, True)
             End If
         Next

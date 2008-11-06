@@ -21,7 +21,7 @@ Public Module ConstituentBalance
                                                        aScenario, aScenarioResults, aLocations, _
                                                        aRunMade, _
                                                        aDateColumns, aDecimalPlaces, aSignificantDigits, aFieldWidth)
-            Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_" & "Balance.txt"
+            Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_Balance.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lString.ToString)
         Next lBalanceType

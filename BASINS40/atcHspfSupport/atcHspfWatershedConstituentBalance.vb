@@ -28,7 +28,7 @@ Public Module WatershedConstituentBalance
             If aSegmentRows Then
                 lPivotString = "Pivot"
             End If
-            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_" & "Balance" & lPivotString & ".txt")
+            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_Balance" & lPivotString & ".txt")
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lString.ToString)
         Next lOutletLocation
@@ -40,7 +40,7 @@ Public Module WatershedConstituentBalance
                 Dim lSummaryDetails As atcCollection
                 Dim lSummaryDetail As SummaryDetail
                 For Each lOutletLocation As String In aOutletLocations
-                    Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_" & "BalanceSummary.txt")
+                    Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_BalanceSummary.txt")
                     Dim lSurfaceIndex As Integer = -1
                     Dim lBaseETIndex As Integer = -1
                     Dim lCurrentOperation As String = ""
@@ -455,7 +455,7 @@ Public Module WatershedConstituentBalance
                     If aSegmentRows Then
                         lPivotString = "Pivot"
                     End If
-                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & aOutletLocation & "_" & aBalanceType & "_" & "BalanceDetails" & lPivotString & ".txt")
+                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & aOutletLocation & "_" & aBalanceType & "_BalanceDetails" & lPivotString & ".txt")
                     SaveFileString(lDetailsFileName, lDetailsSB.ToString)
                     lDetailsSB = Nothing
                 Catch lEx As Exception
@@ -494,14 +494,14 @@ Public Module WatershedConstituentBalance
                     If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                         If lNeedHeader Then
                             lSummarySB.AppendLine()
-                            If lOperationType <> "RCHRES" Then
-                                lSummarySB.AppendLine(lOperationType) '& vbTab & vbTab & "Area" & vbTab & DecimalAlign(lOperationTypeArea))
-                            Else
+                            If lOperationType = "RCHRES" Then
                                 lSummarySB.AppendLine(Space(12) & vbTab & "Reach".PadLeft(12) & _
                                                                   vbTab & "Outlets".PadRight(12))
                                 lSummarySB.AppendLine(Space(12) & vbTab & "Inches".PadLeft(12) & _
                                                                   vbTab & "Ac-Ft".PadRight(12))
                                 lSummarySB.AppendLine("RCHRES") ' & vbTab & vbTab & "Area" & vbTab & DecimalAlign(lTotalArea))
+                            Else
+                                lSummarySB.AppendLine(lOperationType) '& vbTab & vbTab & "Area" & vbTab & DecimalAlign(lOperationTypeArea))
                             End If
                             lNeedHeader = False
                         End If
@@ -535,7 +535,7 @@ Public Module WatershedConstituentBalance
                     End If
                 Next
             Next
-            Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & aOutletLocation & "_" & aBalanceType & "_" & "BalanceSummary.txt")
+            Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & aOutletLocation & "_" & aBalanceType & "_BalanceSummary.txt")
             SaveFileString(lSummaryFileName, lSummarySB.ToString)
             lSummarySB = Nothing
         End If

@@ -11,7 +11,7 @@ Public Module WatershedSummary
 
         For Each lSummaryType As String In aSummaryTypes
             Dim lString As Text.StringBuilder = Report(aUci, aScenarioResults, aRunMade, lSummaryType)
-            Dim lOutFileName As String = IO.Path.GetFileNameWithoutExtension(aUci.Name) & "_" & lSummaryType & "_" & "WatershedSummary.txt"
+            Dim lOutFileName As String = IO.Path.GetFileNameWithoutExtension(aUci.Name) & "_" & lSummaryType & "_WatershedSummary.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lString.ToString)
         Next lSummaryType
