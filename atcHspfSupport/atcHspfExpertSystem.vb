@@ -620,7 +620,7 @@ Public Class ExpertSystem
         Dim lStr As String
         lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
         lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
-        lStr &= "Run Created: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
+        lStr &= "UCI Edited: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
         lStr &= TimeSpanAsString(pSDateJ, pEDateJ)
 
         For lSiteIndex As Integer = 1 To pSites.Count

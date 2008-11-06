@@ -189,7 +189,7 @@ Public Class atcBasinsPlugIn
         g_MapWin.ClearCustomWindowTitle()
 
         CloseForms()
-        StopMonitor()
+        'StopMonitor()
         SaveSetting("BASINS4", "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
         SaveSetting("BASINS4", "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
     End Sub
