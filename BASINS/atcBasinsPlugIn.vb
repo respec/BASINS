@@ -73,14 +73,20 @@ Public Class atcBasinsPlugIn
 
         Logger.StartToFile(g_BasinsDir & "cache\log\" _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log")
-        LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
-                      g_BasinsDir & "cache\log\", _
-                      System.Diagnostics.Process.GetCurrentProcess.Id.ToString)
-        Logger.ProgressStatus = New MonitorProgressStatus
-        Logger.Status("SHOW")
-        Logger.Status("LAB TOP HI")
-        Logger.Status("LAB 2 Label2")
-        'Logger.MapWin = g_MapWin
+        'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_BasinsDir & "cache\log\", System.Diagnostics.Process.GetCurrentProcess.Id) Then
+        '    Logger.ProgressStatus = New MonitorProgressStatus
+        '    SendMonitorMessage("Show")
+        '    Logger.Status("Testing")
+        '    'Logger.Status("LABEL 2 Two")
+        '    'Logger.Status("LABEL 3 Three")
+        '    'Logger.Status("LABEL 4 Four")
+        '    'Logger.Status("LABEL 5 Five")
+        '    Dim lSeconds As Integer = 30
+        '    For lIndex As Integer = 1 To lSeconds
+        '        SendMonitorMessage("PROGRESS " & lIndex & " of " & lSeconds)
+        '        System.Threading.Thread.Sleep(1000)
+        '    Next
+        'End If
 
         CheckForUpdates(True)
 
