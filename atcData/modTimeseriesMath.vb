@@ -694,7 +694,7 @@ Public Module modTimeseriesMath
                     'Skip setting month and day to allow drought/flood years to be preserved
                     'lDate(1) = 1 'set to beginning of Jan
                     'lDate(2) = 1 'set to beginning of month
-                    lDate(3) = 24 'clear hours
+                    lDate(3) = 0 'clear hours
                     lDate(4) = 0 'clear minutes
                     lDate(5) = 0 'clear seconds
                 Case atcTimeUnit.TUCentury

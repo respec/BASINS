@@ -343,7 +343,7 @@ Public Module modString
             Dim lStrToDbl As Double
             If Not Double.TryParse(lString, lStrToDbl) _
                OrElse Math.Abs(aValue) > 1.0E-30 _
-                      AndAlso (Math.Abs((aValue - lStrToDbl) / aValue) > (1 / 10 ^ (aSignificantDigits - 1))) Then
+                      AndAlso (Math.Abs((aValue - lStrToDbl) / aValue) > (1 / 10 ^ (aSignificantDigits - 2))) Then
                 GoTo TryExpFormat
             End If
         Catch
@@ -357,6 +357,11 @@ TryExpFormat:
             'String is too long and cannot simply be truncated at or after decimal point
             'A trailing e might be correct if there is no exponent, but it is ugly so we trim it off
             lString = Format(lValue, aExpFormat).TrimEnd("e")
+            If lString.EndsWith("e0") Then
+                lString = lString.Substring(0, lString.Length - 2)
+            ElseIf lString.EndsWith("e1") Then
+                lString = Format(lValue, aExpFormat.Replace("e0", ""))
+            End If
             If lString.Length <= aMaxWidth Then
                 Return lString
             Else
