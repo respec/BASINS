@@ -20,6 +20,7 @@ Partial Class frmTSnew
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmTSnew))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.Label9 = New System.Windows.Forms.Label
@@ -123,6 +124,8 @@ Partial Class frmTSnew
         Me.ComboBox10 = New System.Windows.Forms.ComboBox
         Me.RadioButton19 = New System.Windows.Forms.RadioButton
         Me.RadioButton25 = New System.Windows.Forms.RadioButton
+        Me.cmdFile = New System.Windows.Forms.Button
+        Me.Button1 = New System.Windows.Forms.Button
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         CType(Me.NumericUpDown1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -339,6 +342,8 @@ Partial Class frmTSnew
         '
         'TabPage5
         '
+        Me.TabPage5.Controls.Add(Me.Button1)
+        Me.TabPage5.Controls.Add(Me.cmdFile)
         Me.TabPage5.Controls.Add(Me.RadioButton25)
         Me.TabPage5.Controls.Add(Me.RadioButton19)
         Me.TabPage5.Controls.Add(Me.Label21)
@@ -1242,6 +1247,29 @@ Partial Class frmTSnew
         Me.RadioButton25.Text = "Interpolate between new values"
         Me.RadioButton25.UseVisualStyleBackColor = True
         '
+        'cmdFile
+        '
+        Me.cmdFile.Image = CType(resources.GetObject("cmdFile.Image"), System.Drawing.Image)
+        Me.cmdFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.cmdFile.Location = New System.Drawing.Point(271, 95)
+        Me.cmdFile.Name = "cmdFile"
+        Me.cmdFile.Size = New System.Drawing.Size(76, 22)
+        Me.cmdFile.TabIndex = 28
+        Me.cmdFile.Text = "Load"
+        Me.cmdFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.cmdFile.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button1.Location = New System.Drawing.Point(353, 95)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(76, 22)
+        Me.Button1.TabIndex = 29
+        Me.Button1.Text = "Save"
+        Me.Button1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'frmTSnew
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1399,4 +1427,6 @@ Partial Class frmTSnew
     Friend WithEvents RadioButton19 As System.Windows.Forms.RadioButton
     Friend WithEvents Label21 As System.Windows.Forms.Label
     Friend WithEvents ComboBox10 As System.Windows.Forms.ComboBox
+    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents cmdFile As System.Windows.Forms.Button
 End Class
