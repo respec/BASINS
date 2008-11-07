@@ -63,7 +63,7 @@ Public Class ctlEditFilesBlock
             Logger.Dbg("EditFilesBlocK:Save:RowCount:" & .Rows)
             pHspfFilesBlk.Clear()
             For lInd As Integer = 1 To .Rows - 1
-                Dim lHspfFile As New HspfData.HspfFile
+                Dim lHspfFile As New HspfFile
                 lHspfFile.Typ = .CellValue(lInd, 0)
                 lHspfFile.Unit = .CellValue(lInd, 1)
                 lHspfFile.Name = .CellValue(lInd, 2)
