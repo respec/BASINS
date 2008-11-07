@@ -113,7 +113,7 @@ Module modUtility
         Dim lCommand As New System.Data.OleDb.OleDbCommand(aSQL, aConnection)
         lCommand.CommandTimeout = 30
         Dim lStartTime As Date = Date.Now
-        Dim lLogged As Boolean = False
+        'Dim lLogged As Boolean = False
 TryExecute:
         Try
             lCommand.ExecuteNonQuery()
@@ -122,11 +122,11 @@ TryExecute:
             Windows.Forms.Application.DoEvents()
             If Date.Now.Subtract(lStartTime).Seconds < lCommand.CommandTimeout Then
                 System.Threading.Thread.Sleep(100)
-                If Not lLogged Then
-                    Logger.Dbg("ExecuteNonQuery Exception: " & e.Message & ", Retrying: " & aSQL)
-                    Logger.Flush()
-                    lLogged = True
-                End If
+                'If Not lLogged Then
+                '    Logger.Dbg("ExecuteNonQuery Exception: " & e.Message & ", Retrying: " & aSQL)
+                '    Logger.Flush()
+                '    lLogged = True
+                'End If
                 GoTo TryExecute
             Else
                 Logger.Dbg("ExecuteNonQuery Exception after " & Date.Now.Subtract(lStartTime).Seconds & " seconds: " & e.Message)

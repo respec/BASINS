@@ -11,6 +11,8 @@ Partial Class SwatInput
     End Property
 
     Public Class clsCIOItem
+        Friend Shared KEYFIELD As String = "OBJECTID"
+        Public OBJECTID As Integer
         Public NBYR As Long
         Public IYR As Long
         Public IDAF As Long
@@ -57,6 +59,10 @@ Partial Class SwatInput
         Public Function AddSQL() As String
             Return "INSERT INTO cio ( NBYR, IYR, IDAF, IDAL, IGEN, PCPSIM, IDT, IDIST, REXP, NRGAGE, NRTOT, NRGFIL, TMPSIM, NTGAGE, NTTOT, NTGFIL, SLRSIM, NSTOT, RHSIM, NHTOT, WNDSIM, NWTOT, FCSTYR, FCSTDAY, FCSTCYCLES, DATES, DATEF, FDATES, ISPROJ, ICLB, IPRINT, NYSKIP, ILOG, IPRP, IPRS  ) " _
                  & "Values ('" & NBYR & "', '" & IYR & "', '" & IDAF & "', '" & IDAL & "', '" & IGEN & "', '" & PCPSIM & "', '" & IDT & "', '" & IDIST & "', '" & REXP & "', '" & NRGAGE & "', '" & NRTOT & "', '" & NRGFIL & "', '" & TMPSIM & "', '" & NTGAGE & "', '" & NTTOT & "', '" & NTGFIL & "', '" & SLRSIM & "', '" & NSTOT & "', '" & RHSIM & "', '" & NHTOT & "', '" & WNDSIM & "', '" & NWTOT & "', '" & FCSTYR & "', '" & FCSTDAY & "', '" & FCSTCYCLES & "', '" & DATES & "', '" & DATEF & "', '" & FDATES & "', '" & ISPROJ & "', '" & ICLB & "', '" & IPRINT & "', '" & NYSKIP & "', '" & ILOG & "', '" & IPRP & "', '" & IPRS & "')"
+        End Function
+
+        Public Function UpdateSQL() As String
+            Return SqlAddToUpdate(AddSQL, KEYFIELD & " = " & OBJECTID)
         End Function
     End Class
 
@@ -160,6 +166,10 @@ Partial Class SwatInput
 
         Public Sub Add(ByVal aItem As clsCIOItem)
             ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
+        End Sub
+
+        Public Sub Update(ByVal aItem As clsCIOItem)
+            ExecuteNonQuery(aItem.UpdateSQL, pSwatInput.CnSwatInput)
         End Sub
 
         Public Sub Save(Optional ByVal aTable As DataTable = Nothing)

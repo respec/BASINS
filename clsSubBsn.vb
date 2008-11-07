@@ -162,9 +162,8 @@ Partial Class SwatInput
                                    ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger, ADOX.DataTypeEnum.adInteger}
 
         Public Function Items() As IEnumerable
-            Dim lTable As DataTable = Table()
             Dim lItems As New Generic.List(Of clsSubBsnItem)
-            For Each lRow As DataRow In lTable.Rows
+            For Each lRow As DataRow In Table.Rows
                 lItems.Add(New clsSubBsnItem(lRow))
             Next
             Return lItems
