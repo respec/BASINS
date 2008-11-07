@@ -3,6 +3,7 @@ Imports atcData.atcDataGroup
 Imports atcUtility
 Imports MapWindow.Interfaces
 Imports MapWinUtility
+Imports atcClimateAssessmentTool
 
 Imports Microsoft.VisualBasic
 Imports System
@@ -18,11 +19,6 @@ Public Module CatSummary
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
-        Dim lScenList As New ArrayList
-        lScenList.Add("C:\mono_luChange\output\lu2030a2\")
-        lScenList.Add("C:\mono_luChange\output\lu2030b2\")
-        lScenList.Add("C:\mono_luChange\output\lu2090a2\")
-        lScenList.Add("C:\mono_luChange\output\lu2090b2\")
 
         'For each UCI file in the specified (pTestPath) folder, 
         'do a Cat Summary Report 
@@ -36,158 +32,209 @@ Public Module CatSummary
         'appending to the file for each UCI (scenario)
 
         Logger.Dbg("Start")
+        Dim lBaseFolders As New ArrayList
+        'Add scenario directories
+        lBaseFolders.Add("C:\mono_luChange\output\lu2030a2")
+        lBaseFolders.Add("C:\mono_luChange\output\lu2030b2")
+        'lBaseFolders.Add("C:\mono_luChange\output\lu2090a2")
+        'lBaseFolders.Add("C:\mono_luChange\output\lu2090b2")
+        'lBaseFolders.Add("C:\mono_luChange\output\Mono10")
+        'lBaseFolders.Add("C:\mono_luChange\output\Mono70")
 
-        For Each pTestPath In lScenList
-
-            'change to the directory of the current project
-            ChDriveDir(pTestPath)
-            Logger.Dbg(" CurDir:" & CurDir())
-
-            'delete the output file if it already exists
-            If FileExists(pCatSummaryFileName) Then
-                Kill(pCatSummaryFileName)
-            End If
-
-            'read in the xml for the endpoints and parse out the variations
-            Logger.Dbg("read in endpoints")
+        For Each lBaseFolder As String In lBaseFolders
+            ChDriveDir(lBaseFolder)
+            Logger.StartToFile("CatRunnerSummary.Log", , , True)
+            'Logger.DisplayMessageBoxes = False
             With pCat
-                .XML = IO.File.ReadAllText(pCatXMLFile) ' TODO: ZZ deal with no need for uci files
-                '.StartRun("Modified")
-                'Logger.Dbg("RunsComplete")
-                'IO.File.WriteAllText("CatRunnerResults.txt", .ResultsGrid.ToString)
-                '.Inputs.Clear()
-                '.Endpoints.Clear()
-                '.PreparedInputs.Clear()
+                Try
+                    .XML = IO.File.ReadAllText(pCatXMLFile)
+                    .RunModel = False
+                    .StartRun("Modified")
+                    Logger.Dbg("RunsComplete")
+                    IO.File.WriteAllText("CatRunnerResultsSummary.txt", .ResultsGrid.ToString)
+                    .Inputs.Clear()
+                    .Endpoints.Clear()
+                    .PreparedInputs.Clear()
+                    System.GC.Collect()
+                    System.GC.WaitForPendingFinalizers()
+                Catch ex As Exception
+                    Logger.Msg("CatSummary Error: " & ex.Message & vbCrLf & ex.StackTrace)
+                End Try
             End With
-
-            'build collection of location::constituent<->operation list
-
-            pCatList = New ArrayList
-            Try
-                For Each lVar As atcClimateAssessmentTool.atcVariation In pCat.Endpoints
-                    'ATTENTION:
-                    'Put the selected months here assuming there is only one dataset per variation
-                    'If not, then the selected months for the first dataset within the current variation is added into all datasets
-                    'So has to pay attention here
-                    Dim lSelectedMonths As String = ""
-                    If lVar.Seasons IsNot Nothing Then
-                        For li As Integer = 1 To 12
-                            If lVar.Seasons.SeasonSelected(li) Then lSelectedMonths &= li & ","
-                        Next
-                        'Rid of the last , at the end of the lSelectedMonths string
-                        lSelectedMonths = lSelectedMonths.TrimEnd(",")
-                    End If
-
-                    For Each ldataset As atcDataSet In lVar.DataSets
-                        Dim lCatTemp(4) As String
-                        Dim lChkSeasons As Boolean = True
-                        lCatTemp(0) = ldataset.Attributes.GetFormattedValue("location")  ' e.g. Seg1
-                        lCatTemp(1) = ldataset.Attributes.GetFormattedValue("constituent") ' e.g. HPRC
-                        lCatTemp(2) = lVar.Operation.ToString ' e.g. Sum
-                        lCatTemp(3) = lSelectedMonths ' either this is empty string or a comma separated list of Months
-                        lCatTemp(4) = ""
-                        If lVar.Seasons IsNot Nothing Then
-                            lCatTemp(4) = lVar.Seasons.Name.Substring(lVar.Seasons.Name.IndexOf("-") + 2) ' to get the 'Month' or 'Traditional' part
-                        End If
-                        If lCatTemp(1) = "HPRC" Or lCatTemp(1) = "ATMP" Or lCatTemp(1) = "EVAP" Then lChkSeasons = False
-                        If Not foundMatchingEndpoint(pCatList, lCatTemp, lChkSeasons) Then
-                            pCatList.Add(lCatTemp)
-                        End If
-                    Next
-                Next
-            Catch ex As Exception
-                Logger.Msg("Cat structure failed: " & ex.ToString)
-            End Try
-
-            'build collection of scenarios (uci base names) to report
-            Dim lUcis As New System.Collections.Specialized.NameValueCollection
-            'do we want the 'base.uci'?
-            AddFilesInDir(lUcis, pTestPath, False, "*.uci")
-            Dim lScenarios As New atcCollection
-            For Each lUci As String In lUcis
-                lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
-            Next
-
-            'declare a new data manager to manage the hbn and wdm files
-            'Dim lDataManager As New atcDataManager(aMapWin)
-
-            'loop thru each scenario (uci name)
-            For Each lScenario As String In lScenarios
-                Dim lScenarioDataGroup As New atcDataGroup
-                'If atcDataManager.DataSources.Count > 0 Then
-                '    Logger.Dbg("Clearing " & atcDataManager.DataSources.Count & " datasources.")
-                '    atcDataManager.DataSources.Clear()
-                'End If
-
-                'open the corresponding hbn file
-                Dim lHspfBinFile As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-                Dim lHspfBinFileName As String = lScenario & ".hbn"
-                Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
-                If Not FileExists(lHspfBinFileName) Then
-                    'if hbn doesnt exist, make a guess at what the name might be
-                    lHspfBinFileName = lHspfBinFileName.Replace(".hbn", ".base.hbn")
-                    Logger.Dbg("  NameUpdated " & lHspfBinFileName)
-                End If
-                Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-                If lHspfBinFile.Open(lHspfBinFileName) Then
-                    Logger.Dbg(" Adding " & lHspfBinFile.DataSets.Count)
-                    lScenarioDataGroup.AddRange(lHspfBinFile.DataSets)
-                End If
-                Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
-
-                'open the corresponding wdm file
-                Dim lHspfWdmFile As New atcWDM.atcDataSourceWDM
-                Dim lHspfWdmFileName As String = lScenario & ".wdm"
-                Logger.Dbg(" AboutToOpen " & lHspfWdmFileName)
-                If Not FileExists(lHspfWdmFileName) Then
-                    'if wdm doesnt exist, make a guess at what the name might be
-                    lHspfWdmFileName = lHspfWdmFileName.Replace(".wdm", ".base.wdm")
-                    Logger.Dbg("  NameUpdated " & lHspfWdmFileName)
-                End If
-                If lHspfWdmFile.Open(lHspfWdmFileName) Then
-                    Logger.Dbg(" Adding " & lHspfWdmFile.DataSets.Count)
-                    lScenarioDataGroup.AddRange(lHspfWdmFile.DataSets)
-                End If
-                Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
-
-                'open the corresponding output wdm file
-                Dim lHspfOutWdmFile As New atcWDM.atcDataSourceWDM
-                Dim lHspfOutWdmFileName As String = lScenario & ".output.wdm"
-                If IO.File.Exists(lHspfOutWdmFileName) Then
-                    Logger.Dbg("  Opening " & lHspfOutWdmFileName)
-                    If lHspfOutWdmFile.Open(lHspfOutWdmFileName) Then
-                        Logger.Dbg(" DataSetCount " & lHspfOutWdmFile.DataSets.Count)
-                        lScenarioDataGroup.AddRange(lHspfOutWdmFile.DataSets)
-                    End If
-                Else
-                    Logger.Dbg("  Not Opening " & lHspfOutWdmFileName)
-                End If
-
-                'call main cat summary routine
-                DoCatSummary(lScenarioDataGroup, lScenario)
-
-                lScenarioDataGroup.Clear()
-
-                atcDataManager.DataSources.Remove(lHspfBinFile)
-                lHspfBinFile.DataSets.Clear()
-                lHspfBinFile = Nothing
-
-                atcDataManager.DataSources.Remove(lHspfWdmFile)
-                lHspfWdmFile.DataSets.Clear()
-                lHspfWdmFile = Nothing
-
-                atcDataManager.DataSources.Remove(lHspfOutWdmFile)
-                lHspfOutWdmFile.DataSets.Clear()
-                lHspfOutWdmFile = Nothing
-
-            Next lScenario
-
-            pCatList.Clear()
-            pCatList = Nothing
-
+            Logger.Dbg("ResultsStored")
+            Logger.Flush()
         Next
+
+        'The commented out block below is the direct approach to extract summary result from output wdm and hbns
+        'Dim lScenList As New ArrayList
+        'lScenList.Add("C:\mono_luChange\output\lu2030a2\")
+        'lScenList.Add("C:\mono_luChange\output\lu2030b2\")
+        'lScenList.Add("C:\mono_luChange\output\lu2090a2\")
+        'lScenList.Add("C:\mono_luChange\output\lu2090b2\")
+        'For Each pTestPath In lScenList
+
+        '    'change to the directory of the current project
+        '    ChDriveDir(pTestPath)
+        '    Logger.Dbg(" CurDir:" & CurDir())
+
+        '    'delete the output file if it already exists
+        '    If FileExists(pCatSummaryFileName) Then
+        '        Kill(pCatSummaryFileName)
+        '    End If
+
+        '    'read in the xml for the endpoints and parse out the variations
+        '    Logger.Dbg("read in endpoints")
+        '    With pCat
+        '        .XML = IO.File.ReadAllText(pCatXMLFile) ' TODO: ZZ deal with no need for uci files
+        '        '.StartRun("Modified")
+        '        'Logger.Dbg("RunsComplete")
+        '        'IO.File.WriteAllText("CatRunnerResults.txt", .ResultsGrid.ToString)
+        '        '.Inputs.Clear()
+        '        '.Endpoints.Clear()
+        '        '.PreparedInputs.Clear()
+        '    End With
+
+        '    'build collection of location::constituent<->operation list
+
+        '    pCatList = New ArrayList
+        '    Try
+        '        For Each lVar As atcClimateAssessmentTool.atcVariation In pCat.Endpoints
+        '            'ATTENTION:
+        '            'Put the selected months here assuming there is only one dataset per variation
+        '            'If not, then the selected months for the first dataset within the current variation is added into all datasets
+        '            'So has to pay attention here
+        '            Dim lSelectedMonths As String = ""
+        '            If lVar.Seasons IsNot Nothing Then
+        '                For li As Integer = 1 To 12
+        '                    If lVar.Seasons.SeasonSelected(li) Then lSelectedMonths &= li & ","
+        '                Next
+        '                'Rid of the last , at the end of the lSelectedMonths string
+        '                lSelectedMonths = lSelectedMonths.TrimEnd(",")
+        '            End If
+
+        '            For Each ldataset As atcDataSet In lVar.DataSets
+        '                Dim lCatTemp(4) As String
+        '                Dim lChkSeasons As Boolean = True
+        '                lCatTemp(0) = ldataset.Attributes.GetFormattedValue("location")  ' e.g. Seg1
+        '                lCatTemp(1) = ldataset.Attributes.GetFormattedValue("constituent") ' e.g. HPRC
+        '                lCatTemp(2) = lVar.Operation.ToString ' e.g. Sum
+        '                lCatTemp(3) = lSelectedMonths ' either this is empty string or a comma separated list of Months
+        '                lCatTemp(4) = ""
+        '                If lVar.Seasons IsNot Nothing Then
+        '                    lCatTemp(4) = lVar.Seasons.Name.Substring(lVar.Seasons.Name.IndexOf("-") + 2) ' to get the 'Month' or 'Traditional' part
+        '                End If
+        '                If lCatTemp(1) = "HPRC" Or lCatTemp(1) = "ATMP" Or lCatTemp(1) = "EVAP" Then lChkSeasons = False
+        '                If Not foundMatchingEndpoint(pCatList, lCatTemp, lChkSeasons) Then
+        '                    pCatList.Add(lCatTemp)
+        '                End If
+        '            Next
+        '        Next
+        '    Catch ex As Exception
+        '        Logger.Msg("Cat structure failed: " & ex.ToString)
+        '    End Try
+
+        '    'build collection of scenarios (uci base names) to report
+        '    Dim lUcis As New System.Collections.Specialized.NameValueCollection
+        '    'do we want the 'base.uci'?
+        '    AddFilesInDir(lUcis, pTestPath, False, "*.uci")
+        '    Dim lScenarios As New atcCollection
+        '    For Each lUci As String In lUcis
+        '        lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
+        '    Next
+
+        '    'declare a new data manager to manage the hbn and wdm files
+        '    'Dim lDataManager As New atcDataManager(aMapWin)
+
+        '    'loop thru each scenario (uci name)
+        '    For Each lScenario As String In lScenarios
+        '        Dim lScenarioDataGroup As New atcDataGroup
+        '        'If atcDataManager.DataSources.Count > 0 Then
+        '        '    Logger.Dbg("Clearing " & atcDataManager.DataSources.Count & " datasources.")
+        '        '    atcDataManager.DataSources.Clear()
+        '        'End If
+
+        '        'open the corresponding hbn file
+        '        Dim lHspfBinFile As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+        '        Dim lHspfBinFileName As String = lScenario & ".hbn"
+        '        Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
+        '        If Not FileExists(lHspfBinFileName) Then
+        '            'if hbn doesnt exist, make a guess at what the name might be
+        '            lHspfBinFileName = lHspfBinFileName.Replace(".hbn", ".base.hbn")
+        '            Logger.Dbg("  NameUpdated " & lHspfBinFileName)
+        '        End If
+        '        Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
+        '        If lHspfBinFile.Open(lHspfBinFileName) Then
+        '            Logger.Dbg(" Adding " & lHspfBinFile.DataSets.Count)
+        '            lScenarioDataGroup.AddRange(lHspfBinFile.DataSets)
+        '        End If
+        '        Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
+
+        '        'open the corresponding wdm file
+        '        Dim lHspfWdmFile As New atcWDM.atcDataSourceWDM
+        '        Dim lHspfWdmFileName As String = lScenario & ".wdm"
+        '        Logger.Dbg(" AboutToOpen " & lHspfWdmFileName)
+        '        If Not FileExists(lHspfWdmFileName) Then
+        '            'if wdm doesnt exist, make a guess at what the name might be
+        '            lHspfWdmFileName = lHspfWdmFileName.Replace(".wdm", ".base.wdm")
+        '            Logger.Dbg("  NameUpdated " & lHspfWdmFileName)
+        '        End If
+        '        If lHspfWdmFile.Open(lHspfWdmFileName) Then
+        '            Logger.Dbg(" Adding " & lHspfWdmFile.DataSets.Count)
+        '            lScenarioDataGroup.AddRange(lHspfWdmFile.DataSets)
+        '        End If
+        '        Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
+
+        '        'open the corresponding output wdm file
+        '        Dim lHspfOutWdmFile As New atcWDM.atcDataSourceWDM
+        '        Dim lHspfOutWdmFileName As String = lScenario & ".output.wdm"
+        '        If IO.File.Exists(lHspfOutWdmFileName) Then
+        '            Logger.Dbg("  Opening " & lHspfOutWdmFileName)
+        '            If lHspfOutWdmFile.Open(lHspfOutWdmFileName) Then
+        '                Logger.Dbg(" DataSetCount " & lHspfOutWdmFile.DataSets.Count)
+        '                lScenarioDataGroup.AddRange(lHspfOutWdmFile.DataSets)
+        '            End If
+        '        Else
+        '            Logger.Dbg("  Not Opening " & lHspfOutWdmFileName)
+        '        End If
+
+        '        'call main cat summary routine
+        '        DoCatSummary(lScenarioDataGroup, lScenario)
+
+        '        lScenarioDataGroup.Clear()
+
+        '        atcDataManager.DataSources.Remove(lHspfBinFile)
+        '        lHspfBinFile.DataSets.Clear()
+        '        lHspfBinFile = Nothing
+
+        '        atcDataManager.DataSources.Remove(lHspfWdmFile)
+        '        lHspfWdmFile.DataSets.Clear()
+        '        lHspfWdmFile = Nothing
+
+        '        atcDataManager.DataSources.Remove(lHspfOutWdmFile)
+        '        lHspfOutWdmFile.DataSets.Clear()
+        '        lHspfOutWdmFile = Nothing
+
+        '    Next lScenario
+
+        '    pCatList.Clear()
+        '    pCatList = Nothing
+
+        'Next
         Logger.Msg("Done summary of CAT run results")
 
+    End Sub
+
+    Private Sub UpdateStatusLabel(ByVal aIteration As Integer) Handles pCat.StartIteration
+        pCat.StartIterationMessage(aIteration)
+    End Sub
+
+    Private Sub UpdateResults(ByVal aResultsFilename As String) Handles pCat.UpdateResults
+        Try
+            Windows.Forms.Application.DoEvents()
+        Catch
+            'stop
+        End Try
+        SaveFileString(aResultsFilename, pCat.ResultsGrid.ToString)
     End Sub
 
     Public Function foundMatchingEndpoint(ByRef aVarList As ArrayList, ByRef aCat() As String, ByVal aChkSeasons As Boolean) As Boolean

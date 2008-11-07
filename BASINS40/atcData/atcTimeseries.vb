@@ -186,16 +186,20 @@ Public Class atcTimeseries
             Return pNumValues
         End Get
         Set(ByVal newValue As Long)
-            If pNumValues <> newValue Then
-                pNumValues = newValue
-                ReDim Preserve pValues(pNumValues)
-            End If
-            If Not pDates Is Nothing AndAlso pDates.numValues <> newValue Then
-                pDates.numValues = newValue
-            End If
-            If Not pValueAttributes Is Nothing AndAlso pValueAttributes.GetUpperBound(0) <> newValue Then
-                ReDim Preserve pValueAttributes(pNumValues)
-            End If
+            Try
+                If pNumValues <> newValue Then
+                    pNumValues = newValue
+                    ReDim Preserve pValues(pNumValues)
+                End If
+                If Not pDates Is Nothing AndAlso pDates.numValues <> newValue Then
+                    pDates.numValues = newValue
+                End If
+                If Not pValueAttributes Is Nothing AndAlso pValueAttributes.GetUpperBound(0) <> newValue Then
+                    ReDim Preserve pValueAttributes(pNumValues)
+                End If
+            Catch ex As Exception
+                MapWinUtility.Logger.Msg("Cannot allocate " & newValue & vbCrLf & ex.Message, "Timeseries numValues")
+            End Try
         End Set
     End Property
 
