@@ -282,7 +282,7 @@ Public Class HspfConnection
                         lConnection.Source.MemSub1 = aUci.CatAsInt(lStr)
                     End If
                 End If
-                lStr = Trim(Mid(lBuff, 29, 10))
+                lStr = Mid(lBuff, 29, 10).Trim
                 lConnection.MFactAsRead = Mid(lBuff, 29, 10)
                 If lStr.Length > 0 Then
                     lConnection.MFact = CDbl(lStr)
@@ -362,10 +362,14 @@ Public Class HspfConnection
             If lTypeExists(lTypeIndex - 1) Then
                 Dim lBlockName As String = ""
                 Select Case lTypeIndex
-                    Case 1 : lBlockName = "EXT SOURCES"
-                    Case 2 : lBlockName = "NETWORK"
-                    Case 3 : lBlockName = "SCHEMATIC"
-                    Case 4 : lBlockName = "EXT TARGETS"
+                    Case 1
+                        lBlockName = "EXT SOURCES"
+                    Case 2
+                        lBlockName = "NETWORK"
+                    Case 3
+                        lBlockName = "SCHEMATIC"
+                    Case 4
+                        lBlockName = "EXT TARGETS"
                 End Select
                 Dim lBlockDef As HspfBlockDef = Uci.Msg.BlockDefs.Item(lBlockName)
                 Dim lTableDef As HspfTableDef = lBlockDef.TableDefs.Item(0)
@@ -601,11 +605,12 @@ Public Class HspfConnection
                         For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
                             For Each lConnection As HspfConnection In lOperation.Targets
                                 If lConnection.Typ = lTypeIndex Then
-                                    If lConnection.Comment.Length > 0 Then
-                                        lSB.AppendLine(lConnection.Comment)
-                                    ElseIf lHeaderPending Then
+                                    If lHeaderPending AndAlso (lConnection.Comment.Length = 0 OrElse Not lConnection.Comment.StartsWith("<-")) Then
                                         lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->Tran <-Volume-> <Member> Tsys Aggr Amd ***")
                                         lSB.AppendLine("<Name>   x        <Name> x x<-factor->strg <Name>   x <Name>qf  tem strg strg***")
+                                    End If
+                                    If lConnection.Comment.Length > 0 Then
+                                        lSB.AppendLine(lConnection.Comment)
                                     End If
                                     lHeaderPending = False
                                     Dim lStr As New System.Text.StringBuilder
@@ -678,19 +683,5 @@ Public Class HspfConnection
             End If
         Next lTypeIndex
         Return lSB.ToString
-    End Function
-
-    Private Function NumericallyTheSame(ByRef aValueAsRead As String, ByRef aValueStored As Single) As Boolean
-        'see if the current mfact value is the same as the value as read from the uci
-        '4. is the same as 4.0
-        If IsNumeric(aValueStored) Then
-            If IsNumeric(aValueAsRead) Then
-                'simple case
-                If CSng(aValueAsRead) = aValueStored Then
-                    Return True
-                End If
-            End If
-        End If
-        Return False
     End Function
 End Class
