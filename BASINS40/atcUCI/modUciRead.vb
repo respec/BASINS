@@ -113,4 +113,18 @@ Module modUciRead
             Return False
         End Try
     End Function
+
+    Friend Function NumericallyTheSame(ByRef aValueAsRead As String, ByRef aValueStored As Single) As Boolean
+        'see if the current mfact value is the same as the value as read from the uci
+        '4. is the same as 4.0
+        If IsNumeric(aValueStored) Then
+            If IsNumeric(aValueAsRead) Then
+                'simple case
+                If CSng(aValueAsRead) = aValueStored Then
+                    Return True
+                End If
+            End If
+        End If
+        Return False
+    End Function
 End Module

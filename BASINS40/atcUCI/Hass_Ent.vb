@@ -194,7 +194,9 @@ Module HassLibs
     'Declare Sub F90_XLKT25 Lib "feqlib.dll" (L&, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!, r!)
 
 
-    Private Sub ChrNum(ByRef aLength As Integer, ByRef aString As String, ByRef aStrAsInt() As Integer)
+    Private Sub ChrNum(ByRef aLength As Integer, _
+                       ByRef aString As String, _
+                       ByRef aStrAsInt() As Integer)
         For lPos As Integer = 1 To aLength
             If lPos <= aString.Length Then
                 aStrAsInt(lPos - 1) = Asc(Mid(aString, lPos, 1))
@@ -204,20 +206,29 @@ Module HassLibs
         Next lPos
     End Sub
 
-    Public Sub F90_GTNXKW(ByRef Init As Integer, ByRef id As Integer, ByRef ckwd As String, ByRef kwdfg As Integer, ByRef contfg As Integer, ByRef retid As Integer)
-        Dim ikwd(12) As Integer
-
-        Call F90_GTNXKW_XX(Init, id, ikwd(0), kwdfg, contfg, retid)
-        Call NumChr(12, ikwd, ckwd)
-
+    Public Sub F90_GTNXKW(ByRef aInit As Integer, _
+                          ByRef aId As Integer, _
+                          ByRef aKeyword As String, _
+                          ByRef aKwdFg As Integer, _
+                          ByRef aContFg As Integer, _
+                          ByRef aRetid As Integer)
+        Dim lKeywordI(12) As Integer
+        F90_GTNXKW_XX(aInit, aId, lKeywordI(0), aKwdFg, aContFg, aRetid)
+        NumChr(12, lKeywordI, aKeyword)
     End Sub
 
-    Public Sub F90_XTABLE(ByRef omcode As Integer, ByRef tabno As Integer, ByRef uunits As Integer, ByRef Init As Integer, ByRef addfg As Integer, ByRef Occur As Integer, ByRef retkey As Integer, ByRef cbuff As String, ByRef retcod As Integer)
-        Dim ibuff(80) As Integer
-
-        Call F90_XTABLE_XX(omcode, tabno, uunits, Init, addfg, Occur, retkey, ibuff(0), retcod)
-        Call NumChr(80, ibuff, cbuff)
-
+    Public Sub F90_XTABLE(ByRef aOmCode As Integer, _
+                          ByRef aTabNo As Integer, _
+                          ByRef aUUnits As Integer, _
+                          ByRef aInit As Integer, _
+                          ByRef aAddFg As Integer, _
+                          ByRef aOccur As Integer, _
+                          ByRef aRetKey As Integer, _
+                          ByRef aBuff As String, _
+                          ByRef aRetcod As Integer)
+        Dim lBuffI(80) As Integer
+        F90_XTABLE_XX(aOmCode, aTabNo, aUUnits, aInit, aAddFg, aOccur, aRetKey, lBuffI(0), aRetcod)
+        NumChr(80, lBuffI, aBuff)
     End Sub
 
     Public Sub F90_XTABLEEX(ByRef omcode As Integer, ByRef tabno As Integer, ByRef uunits As Integer, ByRef Init As Integer, ByRef addfg As Integer, ByRef Occur As Integer, ByRef retkey As Integer, ByRef cbuff As String, ByRef rectyp As Integer, ByRef retcod As Integer)
