@@ -16,6 +16,9 @@ Public Class clsCat
     Public TimePerRun As Double = 0 'Time each run takes in seconds
     Public RunModel As Boolean = True 'True to actually run the model, false to just look for already computed results
 
+    Private pLastPrivateMemory As Integer
+    Private pLastGcMemory As Integer
+
     Friend Const CLIGEN_NAME As String = "Cligen"
     Friend Const StartFolderVariable As String = "{StartFolder}"
     Friend Const CurDirVariable As String = "{CurDir}"
@@ -357,7 +360,10 @@ NextIteration:
                     End If
                     .CellColor(lRow, 0) = Drawing.SystemColors.Control
 
+
                     For Each lVariation In Endpoints
+                        System.GC.Collect()
+                        System.GC.WaitForPendingFinalizers()
                         If lVariation.Selected Then
                             For Each lOldData As atcDataSet In lVariation.DataSets
                                 Dim lGroup As atcDataGroup = Nothing
@@ -418,6 +424,9 @@ NextIteration:
                     If Not lMatchDataSource Is Nothing Then
                         'lMatchDataSource.clear 'TODO: want to make sure we don't have a memory leak here
                         atcDataManager.DataSources.Remove(lMatchDataSource)
+                        lMatchDataSource.Clear()
+                        System.GC.Collect()
+                        System.GC.WaitForPendingFinalizers()
                     End If
                 Next
 
@@ -474,4 +483,15 @@ NextIteration:
             End If
         End If
     End Sub
+
+    Friend Function MemUsage() As String
+        System.GC.Collect()
+        System.GC.WaitForPendingFinalizers()
+        Dim lPrivateMemory As Integer = Process.GetCurrentProcess.PrivateMemorySize64 / (2 ^ 20)
+        Dim lGcMemory As Integer = System.GC.GetTotalMemory(True) / (2 ^ 20)
+        MemUsage = "Megabytes: " & lPrivateMemory & " (" & Format((lPrivateMemory - pLastPrivateMemory), "+0;-0") & ") " _
+                   & " GC: " & lGcMemory & " (" & Format((lGcMemory - pLastGcMemory), "+0;-0") & ") "
+        pLastPrivateMemory = lPrivateMemory
+        pLastGcMemory = lGcMemory
+    End Function
 End Class

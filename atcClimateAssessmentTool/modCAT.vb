@@ -110,9 +110,11 @@ Public Module modCAT
                     If FilenameNoPath(lWDMfilename).ToLower = FilenameNoPath(aPreparedInput).ToLower Then
                         lWDMfilename = aPreparedInput
                     End If
-                    'Copy each base WDM to new WDM
+                    'Copy each base WDM to new WDM only if simulation is to be rerun
                     Dim lNewWDMfilename As String = lNewFolder & aNewScenarioName & "." & IO.Path.GetFileName(lWDMfilename)
-                    FileCopy(lWDMfilename, lNewWDMfilename)
+                    If aRunModel Then
+                        FileCopy(lWDMfilename, lNewWDMfilename)
+                    End If
                     Dim lWDMResults As New atcWDM.atcDataSourceWDM
                     If Not lWDMResults.Open(lNewWDMfilename) Then
                         Logger.Msg("Could not open new scenario WDM file '" & lNewWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
