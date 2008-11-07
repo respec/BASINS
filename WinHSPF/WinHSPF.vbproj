@@ -78,6 +78,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmImportPoint.Designer.vb">
+      <DependentUpon>frmImportPoint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmImportPoint.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmAbout.Designer.vb">
       <DependentUpon>frmAbout.vb</DependentUpon>
     </Compile>
@@ -94,6 +100,12 @@
       <DependentUpon>frmAddMet.vb</DependentUpon>
     </Compile>
     <Compile Include="frmAddMet.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddPoint.Designer.vb">
+      <DependentUpon>frmAddPoint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddPoint.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmControl.Designer.vb">
@@ -150,6 +162,12 @@
     <Compile Include="frmTime.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmTSnew.Designer.vb">
+      <DependentUpon>frmTSnew.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTSnew.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="modWinHSPF.vb" />
     <Compile Include="frmWinHSPF.vb">
       <SubType>Form</SubType>
@@ -187,6 +205,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>frmAddMet.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmAddPoint.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddPoint.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmControl.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmControl.vb</DependentUpon>
@@ -194,6 +216,10 @@
     <EmbeddedResource Include="frmActivityAll.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmActivityAll.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmImportPoint.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmImportPoint.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmInputDataEditor.resx">
       <SubType>Designer</SubType>
@@ -222,6 +248,10 @@
     <EmbeddedResource Include="frmTime.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmTime.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTSnew.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmTSnew.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWinHSPF.resx">
       <SubType>Designer</SubType>

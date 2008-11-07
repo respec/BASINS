@@ -7,6 +7,10 @@ Imports System.ComponentModel
 
 Public Class frmPoint
 
+    Private pfrmAddPoint As frmAddPoint
+    Private pfrmImportPoint As frmImportPoint
+    Private pfrmTSnew As frmTSnew
+
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
@@ -30,12 +34,12 @@ Public Class frmPoint
 
     Private Sub ExpandedView(ByVal aExpand As Boolean)
         If aExpand Then
-            Me.Size = New Size(800, 495)
+            Me.Size = New Size(800, 475)
             cmdDetailsHide.Visible = True
             cmdDetailsShow.Visible = False
             grpDetails.Visible = True
         Else
-            Me.Size = New Size(280, 495)
+            Me.Size = New Size(280, 475)
             cmdDetailsHide.Visible = False
             cmdDetailsShow.Visible = True
             grpDetails.Visible = False
@@ -88,4 +92,58 @@ Public Class frmPoint
         Me.Dispose()
     End Sub
 
+    Private Sub cmdSimpleCreate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSimpleCreate.Click
+
+        If IsNothing(pfrmAddPoint) Then
+            pfrmAddPoint = New frmAddPoint
+            pfrmAddPoint.Show()
+        Else
+            If pfrmAddPoint.IsDisposed Then
+                pfrmAddPoint = New frmAddPoint
+                pfrmAddPoint.Show()
+            Else
+                pfrmAddPoint.WindowState = FormWindowState.Normal
+                pfrmAddPoint.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub cmdImportMustin_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImportMustin.Click
+
+        If IsNothing(pfrmImportPoint) Then
+            pfrmImportPoint = New frmImportPoint
+            pfrmImportPoint.Show()
+        Else
+            If pfrmImportPoint.IsDisposed Then
+                pfrmImportPoint = New frmImportPoint
+                pfrmImportPoint.Show()
+            Else
+                pfrmImportPoint.WindowState = FormWindowState.Normal
+                pfrmImportPoint.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub cmdConvertMustin_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdConvertMustin.Click
+
+    End Sub
+
+    Private Sub cmdAdvancedGen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdvancedGen.Click
+
+        If IsNothing(pfrmTSnew) Then
+            pfrmTSnew = New frmTSnew
+            pfrmTSnew.Show()
+        Else
+            If pfrmTSnew.IsDisposed Then
+                pfrmTSnew = New frmTSnew
+                pfrmTSnew.Show()
+            Else
+                pfrmTSnew.WindowState = FormWindowState.Normal
+                pfrmTSnew.BringToFront()
+            End If
+        End If
+
+    End Sub
 End Class
