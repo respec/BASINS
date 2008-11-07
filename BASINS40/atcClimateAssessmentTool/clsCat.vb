@@ -25,6 +25,7 @@ Public Class clsCat
     Friend Const RunTitle As String = "Run"
     Friend Const ResultsFixedRows As Integer = 4
 
+    Public Event Loaded()
     Public Event Started()
     Public Event StatusUpdate(ByVal aStatus As String)
     Public Event StartIteration(ByVal aIteration As Integer)
@@ -143,6 +144,7 @@ StartOver:
                                 Next
                         End Select
                     Next
+                    RaiseEvent Loaded()
                 End If
             Catch e As Exception
                 Logger.Msg("Could not load XML:" & vbCrLf & e.Message & vbCrLf & vbCrLf & newValue, "CAT XML Problem")
