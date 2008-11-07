@@ -36,8 +36,10 @@ Module DailyMonthlyCompareStats
             lObsTser = SubsetByDate(lObsTser, _
                                     lExpertSystem.SDateJ, _
                                     lExpertSystem.EDateJ, Nothing)
+            Dim lHspfWdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
+            Dim lRunMade As String = lHspfWdmFileInfo.LastWriteTime.ToString
             Dim lStr As String = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lCons, lSite, _
-                                                                             lSimTser, lObsTser)
+                                                                             lSimTser, lObsTser, lRunMade)
             Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
             SaveFileString(lOutFileName, lStr)
         Next lSiteIndex

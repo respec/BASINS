@@ -717,9 +717,14 @@ Public Class frmCAT
     Private pUpDownButtonDoubleClickSeconds As Double = 0.3
 
     Private pResultsTabIndex As Integer = 2
-    Private WithEvents pCat As New clsCat
+    Private WithEvents pCat As clsCat
 
-    Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin)
+    Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin, _
+                 Optional ByVal aCat As clsCat = Nothing)
+        pCat = aCat
+        If pCat Is Nothing Then
+            pCat = New clsCat
+        End If
         mnuPivotHeaders.Checked = GetSetting("BasinsCAT", "Settings", "PivotHeaders", "Yes").Equals("Yes")
         pCat.TimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
         Me.Show()
@@ -752,6 +757,15 @@ Public Class frmCAT
         btnStop.Visible = False
         lstEndpoints.Enabled = True
         lstInputs.Enabled = True
+    End Sub
+
+    Private Sub pCat_Loaded() Handles pCat.Loaded
+        chkSaveAll.Checked = pCat.SaveAll
+        chkShowEachRunProgress.Checked = pCat.ShowEachRunProgress
+        txtBaseScenario.Text = pCat.BaseScenario
+        RefreshInputList()
+        RefreshTotalIterations()
+        RefreshEndpointList()
     End Sub
 
     Private Sub UpdateResults(ByVal aResultsFilename As String) Handles pCat.UpdateResults
@@ -1420,12 +1434,6 @@ Public Class frmCAT
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then
                     pCat.XML = WholeFileString(.FileName)
-                    chkSaveAll.Checked = pCat.SaveAll
-                    chkShowEachRunProgress.Checked = pCat.ShowEachRunProgress
-                    txtBaseScenario.Text = pCat.BaseScenario
-                    RefreshInputList()
-                    RefreshTotalIterations()
-                    RefreshEndpointList()
                     SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
                     pUnsaved = False
                 End If
