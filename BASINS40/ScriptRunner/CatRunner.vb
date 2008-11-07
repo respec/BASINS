@@ -32,6 +32,7 @@ Module CatRunner
                 If pEdit Then
                     lFrmCat = New frmCAT
                     lFrmCat.Initialize(Nothing, pCat)
+                    lFrmCat.NoExecutionAllowed()
                 End If
                 .XML = IO.File.ReadAllText(pCatXMLFile)
                 While lFrmCat IsNot Nothing AndAlso lFrmCat.Visible = True

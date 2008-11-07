@@ -735,6 +735,10 @@ Public Class frmCAT
         'End If
     End Sub
 
+    Public Sub NoExecutionAllowed()
+        btnStart.Visible = False
+    End Sub
+
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
         g_running = True
         btnStart.Visible = False
