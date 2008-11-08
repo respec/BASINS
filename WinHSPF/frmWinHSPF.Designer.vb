@@ -32,6 +32,9 @@ Partial Class frmWinHSPF
         Me.LandUseEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.InputDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PollutantToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
+        Me.AQUATOXToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.BMPToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.RightToolStripPanel = New System.Windows.Forms.ToolStripPanel
@@ -108,7 +111,7 @@ Partial Class frmWinHSPF
         '
         'FunctionsToolStripMenuItem
         '
-        Me.FunctionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReachEditorToolStripMenuItem, Me.LandUseEditorToolStripMenuItem, Me.InputDataEditorToolStripMenuItem, Me.PollutantToolStripMenuItem})
+        Me.FunctionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReachEditorToolStripMenuItem, Me.LandUseEditorToolStripMenuItem, Me.InputDataEditorToolStripMenuItem, Me.PollutantToolStripMenuItem, Me.ToolStripSeparator3, Me.AQUATOXToolStripMenuItem, Me.BMPToolStripMenuItem})
         Me.FunctionsToolStripMenuItem.Name = "FunctionsToolStripMenuItem"
         Me.FunctionsToolStripMenuItem.Size = New System.Drawing.Size(65, 20)
         Me.FunctionsToolStripMenuItem.Text = "Functions"
@@ -136,6 +139,23 @@ Partial Class frmWinHSPF
         Me.PollutantToolStripMenuItem.Name = "PollutantToolStripMenuItem"
         Me.PollutantToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
         Me.PollutantToolStripMenuItem.Text = "Pollutant Selection"
+        '
+        'ToolStripSeparator3
+        '
+        Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(170, 6)
+        '
+        'AQUATOXToolStripMenuItem
+        '
+        Me.AQUATOXToolStripMenuItem.Name = "AQUATOXToolStripMenuItem"
+        Me.AQUATOXToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
+        Me.AQUATOXToolStripMenuItem.Text = "AQUATOX"
+        '
+        'BMPToolStripMenuItem
+        '
+        Me.BMPToolStripMenuItem.Name = "BMPToolStripMenuItem"
+        Me.BMPToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
+        Me.BMPToolStripMenuItem.Text = "BMP"
         '
         'HelpToolStripMenuItem
         '
@@ -446,5 +466,8 @@ Partial Class frmWinHSPF
     Friend WithEvents LeftToolStripPanel As System.Windows.Forms.ToolStripPanel
     Friend WithEvents ContentPanel As System.Windows.Forms.ToolStripContentPanel
     Friend WithEvents AboutToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents AQUATOXToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents BMPToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

@@ -55,7 +55,7 @@ Partial Class frmAddMet
         Me.agdMet.Fixed3D = False
         Me.agdMet.LineColor = System.Drawing.Color.Empty
         Me.agdMet.LineWidth = 0.0!
-        Me.agdMet.Location = New System.Drawing.Point(11, 43)
+        Me.agdMet.Location = New System.Drawing.Point(11, 47)
         Me.agdMet.Name = "agdMet"
         Me.agdMet.Size = New System.Drawing.Size(488, 249)
         Me.agdMet.Source = Nothing

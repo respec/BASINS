@@ -19,6 +19,7 @@ Partial Class frmImportPoint
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmImportPoint))
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.lblFile = New System.Windows.Forms.TextBox
@@ -26,12 +27,13 @@ Partial Class frmImportPoint
         Me.cboFac = New System.Windows.Forms.ComboBox
         Me.cboReach = New System.Windows.Forms.ComboBox
         Me.Label6 = New System.Windows.Forms.Label
-        Me.txtScen = New atcControls.atcText
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label7 = New System.Windows.Forms.Label
         Me.Label8 = New System.Windows.Forms.Label
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
+        Me.txtScen = New atcControls.atcText
+        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.SuspendLayout()
         '
         'OpenFileDialog1
@@ -48,8 +50,9 @@ Partial Class frmImportPoint
         '
         'cmdFile
         '
-        Me.cmdFile.Image = CType(resources.GetObject("cmdFile.Image"), System.Drawing.Image)
         Me.cmdFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.cmdFile.ImageIndex = 0
+        Me.cmdFile.ImageList = Me.ImageList1
         Me.cmdFile.Location = New System.Drawing.Point(12, 12)
         Me.cmdFile.Name = "cmdFile"
         Me.cmdFile.Size = New System.Drawing.Size(76, 22)
@@ -82,29 +85,6 @@ Partial Class frmImportPoint
         Me.Label6.Size = New System.Drawing.Size(24, 13)
         Me.Label6.TabIndex = 15
         Me.Label6.Text = "PT-"
-        '
-        'txtScen
-        '
-        Me.txtScen.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.txtScen.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.txtScen.DefaultValue = ""
-        Me.txtScen.HardMax = -999
-        Me.txtScen.HardMin = -999
-        Me.txtScen.InsideLimitsBackground = System.Drawing.Color.White
-        Me.txtScen.Location = New System.Drawing.Point(116, 51)
-        Me.txtScen.MaxWidth = 20
-        Me.txtScen.Name = "txtScen"
-        Me.txtScen.NumericFormat = "0.#####"
-        Me.txtScen.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.txtScen.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.txtScen.SelLength = 1
-        Me.txtScen.SelStart = 0
-        Me.txtScen.Size = New System.Drawing.Size(73, 20)
-        Me.txtScen.SoftMax = -999
-        Me.txtScen.SoftMin = -999
-        Me.txtScen.TabIndex = 14
-        Me.txtScen.ValueDouble = 0
-        Me.txtScen.ValueInteger = 0
         '
         'Label4
         '
@@ -154,6 +134,35 @@ Partial Class frmImportPoint
         Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
         '
+        'txtScen
+        '
+        Me.txtScen.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtScen.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.txtScen.DefaultValue = ""
+        Me.txtScen.HardMax = -999
+        Me.txtScen.HardMin = -999
+        Me.txtScen.InsideLimitsBackground = System.Drawing.Color.White
+        Me.txtScen.Location = New System.Drawing.Point(116, 51)
+        Me.txtScen.MaxWidth = 20
+        Me.txtScen.Name = "txtScen"
+        Me.txtScen.NumericFormat = "0.#####"
+        Me.txtScen.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.txtScen.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.txtScen.SelLength = 1
+        Me.txtScen.SelStart = 0
+        Me.txtScen.Size = New System.Drawing.Size(73, 20)
+        Me.txtScen.SoftMax = -999
+        Me.txtScen.SoftMin = -999
+        Me.txtScen.TabIndex = 14
+        Me.txtScen.ValueDouble = 0
+        Me.txtScen.ValueInteger = 0
+        '
+        'ImageList1
+        '
+        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList1.Images.SetKeyName(0, "toolbar-openicon.png")
+        '
         'frmImportPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -188,4 +197,5 @@ Partial Class frmImportPoint
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
+    Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
 End Class

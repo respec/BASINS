@@ -78,6 +78,30 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAQUATOX.Designer.vb">
+      <DependentUpon>frmAQUATOX.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAQUATOX.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBMP.Designer.vb">
+      <DependentUpon>frmBMP.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBMP.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBMPEffic.Designer.vb">
+      <DependentUpon>frmBMPEffic.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBMPEffic.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHspfParm.Designer.vb">
+      <DependentUpon>frmHspfParm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmHspfParm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmImportPoint.Designer.vb">
       <DependentUpon>frmImportPoint.vb</DependentUpon>
     </Compile>
@@ -142,6 +166,12 @@
       <DependentUpon>frmPoint.vb</DependentUpon>
     </Compile>
     <Compile Include="frmPoint.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPointScenario.Designer.vb">
+      <DependentUpon>frmPointScenario.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPointScenario.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmPollutant.Designer.vb">
@@ -209,6 +239,18 @@
       <SubType>Designer</SubType>
       <DependentUpon>frmAddPoint.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmAQUATOX.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAQUATOX.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBMP.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmBMP.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBMPEffic.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmBMPEffic.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmControl.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmControl.vb</DependentUpon>
@@ -216,6 +258,10 @@
     <EmbeddedResource Include="frmActivityAll.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmActivityAll.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHspfParm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmHspfParm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmImportPoint.resx">
       <SubType>Designer</SubType>
@@ -236,6 +282,10 @@
     <EmbeddedResource Include="frmPoint.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmPoint.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPointScenario.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPointScenario.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmPollutant.resx">
       <SubType>Designer</SubType>
