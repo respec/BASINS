@@ -29,7 +29,7 @@ Partial Class frmPoint
         Me.cmdImportMustin = New System.Windows.Forms.ToolStripMenuItem
         Me.cmdConvertMustin = New System.Windows.Forms.ToolStripMenuItem
         Me.cmdAdvancedGen = New System.Windows.Forms.ToolStripMenuItem
-        Me.CreateScenarioToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.cmdScenario = New System.Windows.Forms.ToolStripMenuItem
         Me.lstSources = New System.Windows.Forms.CheckedListBox
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.cmdCancel = New System.Windows.Forms.Button
@@ -70,7 +70,7 @@ Partial Class frmPoint
         '
         'menuPointSources
         '
-        Me.menuPointSources.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuAddPointSources, Me.CreateScenarioToolStripMenuItem})
+        Me.menuPointSources.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuAddPointSources, Me.cmdScenario})
         Me.menuPointSources.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow
         Me.menuPointSources.Location = New System.Drawing.Point(3, 16)
         Me.menuPointSources.Name = "menuPointSources"
@@ -113,12 +113,12 @@ Partial Class frmPoint
         Me.cmdAdvancedGen.Size = New System.Drawing.Size(232, 22)
         Me.cmdAdvancedGen.Text = "Advanced Generation"
         '
-        'CreateScenarioToolStripMenuItem
+        'cmdScenario
         '
-        Me.CreateScenarioToolStripMenuItem.Image = CType(resources.GetObject("CreateScenarioToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.CreateScenarioToolStripMenuItem.Name = "CreateScenarioToolStripMenuItem"
-        Me.CreateScenarioToolStripMenuItem.Size = New System.Drawing.Size(112, 20)
-        Me.CreateScenarioToolStripMenuItem.Text = "Create Scenario"
+        Me.cmdScenario.Image = CType(resources.GetObject("cmdScenario.Image"), System.Drawing.Image)
+        Me.cmdScenario.Name = "cmdScenario"
+        Me.cmdScenario.Size = New System.Drawing.Size(112, 20)
+        Me.cmdScenario.Text = "Create Scenario"
         '
         'lstSources
         '
@@ -132,8 +132,8 @@ Partial Class frmPoint
         '
         Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
-        Me.ImageList1.Images.SetKeyName(0, "l.png")
-        Me.ImageList1.Images.SetKeyName(1, "r.png")
+        Me.ImageList1.Images.SetKeyName(0, "reverseplay.png")
+        Me.ImageList1.Images.SetKeyName(1, "play.png")
         Me.ImageList1.Images.SetKeyName(2, "add.png")
         Me.ImageList1.Images.SetKeyName(3, "create.png")
         '
@@ -282,5 +282,5 @@ Partial Class frmPoint
     Friend WithEvents cmdImportMustin As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdConvertMustin As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdAdvancedGen As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents CreateScenarioToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents cmdScenario As System.Windows.Forms.ToolStripMenuItem
 End Class

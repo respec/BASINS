@@ -7,10 +7,6 @@ Imports System.ComponentModel
 
 Public Class frmPoint
 
-    Private pfrmAddPoint As frmAddPoint
-    Private pfrmImportPoint As frmImportPoint
-    Private pfrmTSnew As frmTSnew
-
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
@@ -142,6 +138,23 @@ Public Class frmPoint
             Else
                 pfrmTSnew.WindowState = FormWindowState.Normal
                 pfrmTSnew.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub CreateScenarioToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdScenario.Click
+
+        If IsNothing(pfrmPointScenario) Then
+            pfrmPointScenario = New frmPointScenario
+            pfrmPointScenario.Show()
+        Else
+            If pfrmPointScenario.IsDisposed Then
+                pfrmPointScenario = New frmPointScenario
+                pfrmPointScenario.Show()
+            Else
+                pfrmPointScenario.WindowState = FormWindowState.Normal
+                pfrmPointScenario.BringToFront()
             End If
         End If
 

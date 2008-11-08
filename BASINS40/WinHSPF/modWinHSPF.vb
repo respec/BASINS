@@ -6,7 +6,29 @@ Public Module WinHSPF
     Friend pUCI As HspfUci
     Friend pMsg As HspfMsg
     Friend pIcon As Icon
+
+    'Variableize each form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReach As frmReach
+    Friend pfrmAbout As frmAbout
+    Friend pfrmActivityAll As frmActivityAll
+    Friend pfrmAddExpert As frmAddExpert
+    Friend pfrmAddMet As frmAddMet
+    Friend pfrmControl As frmControl
+    Friend pfrmInputDataEditor As frmInputDataEditor
+    Friend pfrmLand As frmLand
+    Friend pfrmOutput As frmOutput
+    Friend pfrmPoint As frmPoint
+    Friend pfrmAddPoint As frmAddPoint
+    Friend pfrmImportPoint As frmImportPoint
+    Friend pfrmTSnew As frmTSnew
+    Friend pfrmPointScenario As frmPointScenario
+    Friend pfrmPollutant As frmPollutant
+    Friend pfrmTime As frmTime
+    Friend pfrmAQUATOX As frmAQUATOX
+    Friend pfrmBMP As frmBMP
+    Friend pfrmBMPEffic As frmBMPEffic
+
+
     'Friend pIPC As ATCoIPC
 
     Sub Main()

@@ -7,17 +7,6 @@ Imports atcControls
 Public Class frmWinHSPF
 
     'Variable treatment of forms. Prevents multiple open of same form without having to use restricted modal method.
-    Public pfrmAbout As frmAbout
-    Public pfrmActivityAll As frmActivityAll
-    Public pfrmAddExpert As frmAddExpert
-    Public pfrmAddMet As frmAddMet
-    Public pfrmControl As frmControl
-    Public pfrmInputDataEditor As frmInputDataEditor
-    Public pfrmLand As frmLand
-    Public pfrmOutput As frmOutput
-    Public pfrmPoint As frmPoint
-    Public pfrmPollutant As frmPollutant
-    Public pfrmTime As frmTime
 
     Public Sub New()
 
@@ -256,4 +245,37 @@ Public Class frmWinHSPF
 
     End Sub
 
+    Private Sub AQUATOXToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AQUATOXToolStripMenuItem.Click
+
+        If IsNothing(pfrmAQUATOX) Then
+            pfrmAQUATOX = New frmAQUATOX
+            pfrmAQUATOX.Show()
+        Else
+            If pfrmAQUATOX.IsDisposed Then
+                pfrmAQUATOX = New frmAQUATOX
+                pfrmAQUATOX.Show()
+            Else
+                pfrmAQUATOX.WindowState = FormWindowState.Normal
+                pfrmAQUATOX.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub BMPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BMPToolStripMenuItem.Click
+
+        If IsNothing(pfrmBMP) Then
+            pfrmBMP = New frmBMP
+            pfrmBMP.Show()
+        Else
+            If pfrmBMP.IsDisposed Then
+                pfrmBMP = New frmBMP
+                pfrmBMP.Show()
+            Else
+                pfrmBMP.WindowState = FormWindowState.Normal
+                pfrmBMP.BringToFront()
+            End If
+        End If
+
+    End Sub
 End Class
