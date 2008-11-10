@@ -229,11 +229,22 @@ Public Module modString
                 lString = "NaN"
             End If
         Else
-            Dim lFormat As String = "###,##0.0"
-            If aDecimalPlaces > 1 Then
-                lFormat &= StrDup(aDecimalPlaces - 1, "#")
+            Dim lFormat As String = "###,##0."
+            If aDecimalPlaces > 0 Then
+                lFormat &= StrDup(aDecimalPlaces, "#")
             End If
-            lString = DoubleToString(aValue, aFieldWidth, lFormat, , , aSignificantDigits)
+
+            If aSignificantDigits > 0 Then
+                lString = Format(SignificantDigits(aValue, aSignificantDigits), lFormat)
+            Else
+                lString = Format(aValue, lFormat)
+            End If
+
+            Dim lDString As String = DoubleToString(aValue, aFieldWidth, lFormat, , , aSignificantDigits)
+            If Not lString.Equals(lDString) Then
+                MapWinUtility.Logger.Dbg("DecimalAlign = '" & lString & "' DoubleToString = '" & lDString & "' Width=" & aFieldWidth & ", Decimals = " & aDecimalPlaces & ", Sig = " & aSignificantDigits & ", value = " & Format(aValue, "#,###.###############"))
+            End If
+
         End If
         Return DecimalAlign(lString, aFieldWidth, aDecimalPlaces)
     End Function
@@ -339,11 +350,17 @@ Public Module modString
             End Select
         End If
 
-        Try 'If formatted string cannot be parsed or changes the value too much, skip to exponential format
+        Try 'If formatted string cannot be parsed, skip to exponential format
             Dim lStrToDbl As Double
-            If Not Double.TryParse(lString, lStrToDbl) _
-               OrElse Math.Abs(aValue) > 1.0E-30 _
-                      AndAlso (Math.Abs((aValue - lStrToDbl) / aValue) > (1 / 10 ^ (aSignificantDigits - 2))) Then
+            If Not Double.TryParse(lString, lStrToDbl) Then
+                GoTo TryExpFormat
+            End If
+
+            'If formatted string changes the value too much, skip to exponential format
+            Dim lAbs As Double = Math.Abs(aValue)
+            If lAbs > 1.0E-30 _
+                AndAlso (lAbs < 0.01 OrElse lAbs > 99999) _
+                AndAlso (Math.Abs((aValue - lStrToDbl) / aValue) > (1 / 10 ^ (aSignificantDigits - 2))) Then
                 GoTo TryExpFormat
             End If
         Catch
@@ -357,11 +374,6 @@ TryExpFormat:
             'String is too long and cannot simply be truncated at or after decimal point
             'A trailing e might be correct if there is no exponent, but it is ugly so we trim it off
             lString = Format(lValue, aExpFormat).TrimEnd("e")
-            If lString.EndsWith("e0") Then
-                lString = lString.Substring(0, lString.Length - 2)
-            ElseIf lString.EndsWith("e1") Then
-                lString = Format(lValue, aExpFormat.Replace("e0", ""))
-            End If
             If lString.Length <= aMaxWidth Then
                 Return lString
             Else
