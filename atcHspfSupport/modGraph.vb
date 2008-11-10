@@ -29,6 +29,13 @@ Public Module Graph
         'duration plot
         lZgc = CreateZgc()
         Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
+        With lGraphDur.ZedGraphCtrl.GraphPane
+            If .YAxis.Scale.Min < 1 Then
+                .YAxis.Scale.MinAuto = False
+                .YAxis.Scale.Min = 1
+                .AxisChange()
+            End If
+        End With
         'TODO: add title 
         lZgc.SaveIn(lOutFileBase & "_dur" & aGraphSaveFormat)
         lGraphDur.Dispose()
