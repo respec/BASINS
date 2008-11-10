@@ -32,194 +32,161 @@ Public Module CatSummary
         'appending to the file for each UCI (scenario)
 
         Logger.Dbg("Start")
-        Dim lBaseFolders As New ArrayList
-        'Add scenario directories
-        lBaseFolders.Add("C:\mono_luChange\output\lu2030a2")
-        lBaseFolders.Add("C:\mono_luChange\output\lu2030b2")
-        'lBaseFolders.Add("C:\mono_luChange\output\lu2090a2")
-        'lBaseFolders.Add("C:\mono_luChange\output\lu2090b2")
-        'lBaseFolders.Add("C:\mono_luChange\output\Mono10")
-        'lBaseFolders.Add("C:\mono_luChange\output\Mono70")
-
-        For Each lBaseFolder As String In lBaseFolders
-            ChDriveDir(lBaseFolder)
-            Logger.StartToFile("CatRunnerSummary.Log", , , True)
-            'Logger.DisplayMessageBoxes = False
-            With pCat
-                Try
-                    .XML = IO.File.ReadAllText(pCatXMLFile)
-                    .RunModel = False
-                    .StartRun("Modified")
-                    Logger.Dbg("RunsComplete")
-                    IO.File.WriteAllText("CatRunnerResultsSummary.txt", .ResultsGrid.ToString)
-                    .Inputs.Clear()
-                    .Endpoints.Clear()
-                    .PreparedInputs.Clear()
-                    System.GC.Collect()
-                    System.GC.WaitForPendingFinalizers()
-                Catch ex As Exception
-                    Logger.Msg("CatSummary Error: " & ex.Message & vbCrLf & ex.StackTrace)
-                End Try
-            End With
-            Logger.Dbg("ResultsStored")
-            Logger.Flush()
-        Next
 
         'The commented out block below is the direct approach to extract summary result from output wdm and hbns
-        'Dim lScenList As New ArrayList
-        'lScenList.Add("C:\mono_luChange\output\lu2030a2\")
+        Dim lScenList As New ArrayList
+        lScenList.Add("C:\mono_luChange\output\lu2030a2\")
         'lScenList.Add("C:\mono_luChange\output\lu2030b2\")
         'lScenList.Add("C:\mono_luChange\output\lu2090a2\")
         'lScenList.Add("C:\mono_luChange\output\lu2090b2\")
-        'For Each pTestPath In lScenList
+        For Each pTestPath In lScenList
 
-        '    'change to the directory of the current project
-        '    ChDriveDir(pTestPath)
-        '    Logger.Dbg(" CurDir:" & CurDir())
+            'change to the directory of the current project
+            ChDriveDir(pTestPath)
+            Logger.Dbg(" CurDir:" & CurDir())
 
-        '    'delete the output file if it already exists
-        '    If FileExists(pCatSummaryFileName) Then
-        '        Kill(pCatSummaryFileName)
-        '    End If
+            'delete the output file if it already exists
+            If FileExists(pCatSummaryFileName) Then
+                Kill(pCatSummaryFileName)
+            End If
 
-        '    'read in the xml for the endpoints and parse out the variations
-        '    Logger.Dbg("read in endpoints")
-        '    With pCat
-        '        .XML = IO.File.ReadAllText(pCatXMLFile) ' TODO: ZZ deal with no need for uci files
-        '        '.StartRun("Modified")
-        '        'Logger.Dbg("RunsComplete")
-        '        'IO.File.WriteAllText("CatRunnerResults.txt", .ResultsGrid.ToString)
-        '        '.Inputs.Clear()
-        '        '.Endpoints.Clear()
-        '        '.PreparedInputs.Clear()
-        '    End With
+            'read in the xml for the endpoints and parse out the variations
+            Logger.Dbg("read in endpoints")
+            With pCat
+                .XML = IO.File.ReadAllText(pCatXMLFile) ' TODO: ZZ deal with no need for uci files
+            End With
 
-        '    'build collection of location::constituent<->operation list
+            'build collection of location::constituent<->operation list
+            pCatList = New ArrayList
+            Try
+                For Each lVar As atcClimateAssessmentTool.atcVariation In pCat.Endpoints
+                    'ATTENTION:
+                    'Put the selected months here assuming there is only one dataset per variation
+                    'If not, then the selected months for the first dataset within the current variation is added into all datasets
+                    'So has to pay attention here
+                    Dim lSelectedMonths As String = ""
+                    If lVar.Seasons IsNot Nothing Then
+                        For li As Integer = 1 To 12
+                            If lVar.Seasons.SeasonSelected(li) Then lSelectedMonths &= li & ","
+                        Next
+                        'Rid of the last , at the end of the lSelectedMonths string
+                        lSelectedMonths = lSelectedMonths.TrimEnd(",")
+                    End If
 
-        '    pCatList = New ArrayList
-        '    Try
-        '        For Each lVar As atcClimateAssessmentTool.atcVariation In pCat.Endpoints
-        '            'ATTENTION:
-        '            'Put the selected months here assuming there is only one dataset per variation
-        '            'If not, then the selected months for the first dataset within the current variation is added into all datasets
-        '            'So has to pay attention here
-        '            Dim lSelectedMonths As String = ""
-        '            If lVar.Seasons IsNot Nothing Then
-        '                For li As Integer = 1 To 12
-        '                    If lVar.Seasons.SeasonSelected(li) Then lSelectedMonths &= li & ","
-        '                Next
-        '                'Rid of the last , at the end of the lSelectedMonths string
-        '                lSelectedMonths = lSelectedMonths.TrimEnd(",")
-        '            End If
+                    For Each ldataset As atcDataSet In lVar.DataSets
+                        Dim lCatTemp(4) As String
+                        Dim lChkSeasons As Boolean = True
+                        lCatTemp(0) = ldataset.Attributes.GetFormattedValue("location")  ' e.g. Seg1
+                        lCatTemp(1) = ldataset.Attributes.GetFormattedValue("constituent") ' e.g. HPRC
+                        lCatTemp(2) = lVar.Operation.ToString ' e.g. Sum
+                        lCatTemp(3) = lSelectedMonths ' either this is empty string or a comma separated list of Months
+                        lCatTemp(4) = ""
+                        If lVar.Seasons IsNot Nothing Then
+                            lCatTemp(4) = lVar.Seasons.Name.Substring(lVar.Seasons.Name.IndexOf("-") + 2) ' to get the 'Month' or 'Traditional' part
+                        End If
+                        If lCatTemp(1) = "HPRC" Or lCatTemp(1) = "ATMP" Or lCatTemp(1) = "EVAP" Then lChkSeasons = False
+                        If Not foundMatchingEndpoint(pCatList, lCatTemp, lChkSeasons) Then
+                            pCatList.Add(lCatTemp)
+                        End If
+                    Next
+                Next
+            Catch ex As Exception
+                Logger.Msg("Cat structure failed: " & ex.ToString)
+            End Try
 
-        '            For Each ldataset As atcDataSet In lVar.DataSets
-        '                Dim lCatTemp(4) As String
-        '                Dim lChkSeasons As Boolean = True
-        '                lCatTemp(0) = ldataset.Attributes.GetFormattedValue("location")  ' e.g. Seg1
-        '                lCatTemp(1) = ldataset.Attributes.GetFormattedValue("constituent") ' e.g. HPRC
-        '                lCatTemp(2) = lVar.Operation.ToString ' e.g. Sum
-        '                lCatTemp(3) = lSelectedMonths ' either this is empty string or a comma separated list of Months
-        '                lCatTemp(4) = ""
-        '                If lVar.Seasons IsNot Nothing Then
-        '                    lCatTemp(4) = lVar.Seasons.Name.Substring(lVar.Seasons.Name.IndexOf("-") + 2) ' to get the 'Month' or 'Traditional' part
-        '                End If
-        '                If lCatTemp(1) = "HPRC" Or lCatTemp(1) = "ATMP" Or lCatTemp(1) = "EVAP" Then lChkSeasons = False
-        '                If Not foundMatchingEndpoint(pCatList, lCatTemp, lChkSeasons) Then
-        '                    pCatList.Add(lCatTemp)
-        '                End If
-        '            Next
-        '        Next
-        '    Catch ex As Exception
-        '        Logger.Msg("Cat structure failed: " & ex.ToString)
-        '    End Try
+            'build collection of scenarios (uci base names) to report
+            Dim lUcis As New System.Collections.Specialized.NameValueCollection
+            'do we want the 'base.uci'?
+            AddFilesInDir(lUcis, pTestPath, False, "*.uci")
+            Dim lScenarios As New atcCollection
+            For Each lUci As String In lUcis
+                lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
+            Next
 
-        '    'build collection of scenarios (uci base names) to report
-        '    Dim lUcis As New System.Collections.Specialized.NameValueCollection
-        '    'do we want the 'base.uci'?
-        '    AddFilesInDir(lUcis, pTestPath, False, "*.uci")
-        '    Dim lScenarios As New atcCollection
-        '    For Each lUci As String In lUcis
-        '        lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
-        '    Next
+            'declare a new data manager to manage the hbn and wdm files
+            'Dim lDataManager As New atcDataManager(aMapWin)
 
-        '    'declare a new data manager to manage the hbn and wdm files
-        '    'Dim lDataManager As New atcDataManager(aMapWin)
+            'loop thru each scenario (uci name)
+            For Each lScenario As String In lScenarios
+                Dim lScenarioDataGroup As New atcDataGroup
+                'If atcDataManager.DataSources.Count > 0 Then
+                '    Logger.Dbg("Clearing " & atcDataManager.DataSources.Count & " datasources.")
+                '    atcDataManager.DataSources.Clear()
+                'End If
 
-        '    'loop thru each scenario (uci name)
-        '    For Each lScenario As String In lScenarios
-        '        Dim lScenarioDataGroup As New atcDataGroup
-        '        'If atcDataManager.DataSources.Count > 0 Then
-        '        '    Logger.Dbg("Clearing " & atcDataManager.DataSources.Count & " datasources.")
-        '        '    atcDataManager.DataSources.Clear()
-        '        'End If
+                'open the corresponding hbn file
+                Dim lHspfBinFile As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                Dim lHspfBinFileName As String = lScenario & ".hbn"
+                Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
+                If Not FileExists(lHspfBinFileName) Then
+                    'if hbn doesnt exist, make a guess at what the name might be
+                    lHspfBinFileName = lHspfBinFileName.Replace(".hbn", ".base.hbn")
+                    Logger.Dbg("  NameUpdated " & lHspfBinFileName)
+                End If
+                Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
+                If lHspfBinFile.Open(lHspfBinFileName) Then
+                    Logger.Dbg(" Adding " & lHspfBinFile.DataSets.Count)
+                    lScenarioDataGroup.AddRange(lHspfBinFile.DataSets)
+                End If
+                Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
-        '        'open the corresponding hbn file
-        '        Dim lHspfBinFile As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-        '        Dim lHspfBinFileName As String = lScenario & ".hbn"
-        '        Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
-        '        If Not FileExists(lHspfBinFileName) Then
-        '            'if hbn doesnt exist, make a guess at what the name might be
-        '            lHspfBinFileName = lHspfBinFileName.Replace(".hbn", ".base.hbn")
-        '            Logger.Dbg("  NameUpdated " & lHspfBinFileName)
-        '        End If
-        '        Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-        '        If lHspfBinFile.Open(lHspfBinFileName) Then
-        '            Logger.Dbg(" Adding " & lHspfBinFile.DataSets.Count)
-        '            lScenarioDataGroup.AddRange(lHspfBinFile.DataSets)
-        '        End If
-        '        Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
+                'open the corresponding wdm file
+                Dim lHspfWdmFile As New atcWDM.atcDataSourceWDM
+                Dim lHspfWdmFileName As String = lScenario & ".wdm"
+                Logger.Dbg(" AboutToOpen " & lHspfWdmFileName)
+                If Not FileExists(lHspfWdmFileName) Then
+                    'if wdm doesnt exist, make a guess at what the name might be
+                    lHspfWdmFileName = lHspfWdmFileName.Replace(".wdm", ".base.wdm")
+                    Logger.Dbg("  NameUpdated " & lHspfWdmFileName)
+                End If
+                If lHspfWdmFile.Open(lHspfWdmFileName) Then
+                    Logger.Dbg(" Adding " & lHspfWdmFile.DataSets.Count)
+                    lScenarioDataGroup.AddRange(lHspfWdmFile.DataSets)
+                End If
+                Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
-        '        'open the corresponding wdm file
-        '        Dim lHspfWdmFile As New atcWDM.atcDataSourceWDM
-        '        Dim lHspfWdmFileName As String = lScenario & ".wdm"
-        '        Logger.Dbg(" AboutToOpen " & lHspfWdmFileName)
-        '        If Not FileExists(lHspfWdmFileName) Then
-        '            'if wdm doesnt exist, make a guess at what the name might be
-        '            lHspfWdmFileName = lHspfWdmFileName.Replace(".wdm", ".base.wdm")
-        '            Logger.Dbg("  NameUpdated " & lHspfWdmFileName)
-        '        End If
-        '        If lHspfWdmFile.Open(lHspfWdmFileName) Then
-        '            Logger.Dbg(" Adding " & lHspfWdmFile.DataSets.Count)
-        '            lScenarioDataGroup.AddRange(lHspfWdmFile.DataSets)
-        '        End If
-        '        Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
+                'open the corresponding output wdm file
+                Dim lHspfOutWdmFile As New atcWDM.atcDataSourceWDM
+                Dim lHspfOutWdmFileName As String = lScenario & ".output.wdm"
+                If IO.File.Exists(lHspfOutWdmFileName) Then
+                    Logger.Dbg("  Opening " & lHspfOutWdmFileName)
+                    If lHspfOutWdmFile.Open(lHspfOutWdmFileName) Then
+                        Logger.Dbg(" DataSetCount " & lHspfOutWdmFile.DataSets.Count)
+                        lScenarioDataGroup.AddRange(lHspfOutWdmFile.DataSets)
+                    End If
+                Else
+                    Logger.Dbg("  Not Opening " & lHspfOutWdmFileName)
+                End If
 
-        '        'open the corresponding output wdm file
-        '        Dim lHspfOutWdmFile As New atcWDM.atcDataSourceWDM
-        '        Dim lHspfOutWdmFileName As String = lScenario & ".output.wdm"
-        '        If IO.File.Exists(lHspfOutWdmFileName) Then
-        '            Logger.Dbg("  Opening " & lHspfOutWdmFileName)
-        '            If lHspfOutWdmFile.Open(lHspfOutWdmFileName) Then
-        '                Logger.Dbg(" DataSetCount " & lHspfOutWdmFile.DataSets.Count)
-        '                lScenarioDataGroup.AddRange(lHspfOutWdmFile.DataSets)
-        '            End If
-        '        Else
-        '            Logger.Dbg("  Not Opening " & lHspfOutWdmFileName)
-        '        End If
+                'call main cat summary routine
+                DoCatSummary(lScenarioDataGroup, lScenario)
 
-        '        'call main cat summary routine
-        '        DoCatSummary(lScenarioDataGroup, lScenario)
+                lScenarioDataGroup.Clear()
 
-        '        lScenarioDataGroup.Clear()
+                atcDataManager.DataSources.Remove(lHspfBinFile)
+                lHspfBinFile.DataSets.Clear()
+                lHspfBinFile = Nothing
 
-        '        atcDataManager.DataSources.Remove(lHspfBinFile)
-        '        lHspfBinFile.DataSets.Clear()
-        '        lHspfBinFile = Nothing
+                atcDataManager.DataSources.Remove(lHspfWdmFile)
+                lHspfWdmFile.DataSets.Clear()
+                lHspfWdmFile = Nothing
 
-        '        atcDataManager.DataSources.Remove(lHspfWdmFile)
-        '        lHspfWdmFile.DataSets.Clear()
-        '        lHspfWdmFile = Nothing
+                atcDataManager.DataSources.Remove(lHspfOutWdmFile)
+                lHspfOutWdmFile.DataSets.Clear()
+                lHspfOutWdmFile = Nothing
 
-        '        atcDataManager.DataSources.Remove(lHspfOutWdmFile)
-        '        lHspfOutWdmFile.DataSets.Clear()
-        '        lHspfOutWdmFile = Nothing
+            Next lScenario
 
-        '    Next lScenario
+            With pCat
+                .Inputs.Clear()
+                .Endpoints.Clear()
+                .PreparedInputs.Clear()
+            End With
 
-        '    pCatList.Clear()
-        '    pCatList = Nothing
+            pCatList.Clear()
+            pCatList = Nothing
 
-        'Next
+        Next
         Logger.Msg("Done summary of CAT run results")
 
     End Sub
@@ -300,31 +267,6 @@ Public Module CatSummary
             End If
         Next
 
-        '******** Second try ********
-        'For Each lCat() As String In pCatList
-        '    'lCat is an array of 3 elements, 0: Location (e.g. Seg1, RIV9) 1: Constituent (HPRC, RO) 2: Operation/Transaction (Sum, Mean)
-        '    If lCat(1) = "FLOW" And Not (lCat(2) = "7Q10") Then lCat(1) = "WATR" 'This adjustment is done based on originals
-        '    Select Case lCat(0)
-        '        Case "SEG1"
-        '            Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
-        '            Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
-        '            If lMetDataGroup.Count > 0 Then
-        '                lString.Append(AnnualAndSeasonalValues(lMetDataGroup, lCat(1), lCat(2)))
-        '            End If
-        '        Case "RIV9"
-        '            Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
-        '            If lRchDataGroupW.Count > 0 Then
-        '                lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, lCat(1), lCat(2)))
-        '            End If
-        '        Case "R:9"
-        '            Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
-        '            If lRchDataGroup.Count > 0 Then
-        '                lString.Append(AnnualValue(lRchDataGroup, lCat(1), lCat(2)))
-        '            End If
-        '    End Select
-        'Next
-
-
         '******* Original ********
         'Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
         'Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
@@ -381,16 +323,30 @@ Public Module CatSummary
                     lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
                     lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
                     lValue = 0
-                    Dim lMonthsStrArray() As String = aMonthsList.Split(",")
-                    For Each ls As String In lMonthsStrArray
-                        lValue += lCalculatedAttributes(Integer.Parse(ls) - 1).Value
+
+                    For Each lVar As atcVariation In pCat.Endpoints
+                        If lVar.DataSets(0).Attributes.GetFormattedValue("Location") = "R:9" AndAlso _
+                           lVar.DataSets(0).Attributes.GetFormattedValue("Constituent") = aCons AndAlso _
+                           lVar.Operation = aTrans AndAlso _
+                           lVar.Seasons IsNot Nothing Then
+                            Dim lData As atcTimeseries = lTempDataSet
+                            lData = lVar.Seasons.SplitBySelected(lData, Nothing).Item(0)
+                            lValue = lData.Attributes.GetFormattedValue(aTrans)
+                            Exit For
+                        End If
                     Next
-                    'For lIndex As Integer = 3 To 9
-                    '    lValue += lCalculatedAttributes(lIndex).Value 'AMJJASO
-                    'Next lIndex
-                    If aTrans.StartsWith("Mean") Then
-                        lValue = lValue / lMonthsStrArray.Length ' to get the Mean of the seasonal months involved
-                    End If
+
+                    'Dim lMonthsStrArray() As String = aMonthsList.Split(",")
+                    'For Each ls As String In lMonthsStrArray
+                    '    lValue += lCalculatedAttributes(Integer.Parse(ls) - 1).Value
+                    'Next
+                    ''For lIndex As Integer = 3 To 9
+                    ''    lValue += lCalculatedAttributes(lIndex).Value 'AMJJASO
+                    ''Next lIndex
+                    'If aTrans.StartsWith("Mean") Then
+                    '    lValue = lValue / lMonthsStrArray.Length ' to get the Mean of the seasonal months involved
+                    'End If
+
                     lString &= vbTab & DecimalAlign(lValue)
                 End If
             End If
@@ -465,33 +421,44 @@ Public Module CatSummary
                     If Not (aMonthList = "" AndAlso aSeasonType = "") Then 'There is a seasonal list of month, either it is 'Month' or 'Traditional' Type
                         If aSeasonType = "Month" Then
                             'Loop through all the month as previously done
-
                         ElseIf aSeasonType = "Traditional" Then
-                            Dim lTriplet(3) As Integer
-                            Select Case aMonthList
-                                Case "0"
-                                    lTriplet(0) = 0 ' Jan
-                                    lTriplet(1) = 1 ' feb
-                                    lTriplet(2) = 2 ' mar
-                                Case "1"
-                                    lTriplet(0) = 3 ' Apr
-                                    lTriplet(1) = 4 ' May
-                                    lTriplet(2) = 5 ' June
-                                Case "2"
-                                    lTriplet(0) = 6 ' July
-                                    lTriplet(1) = 7 ' August
-                                    lTriplet(2) = 8 ' September
-                                Case "3"
-                                    lTriplet(0) = 9 ' Oct
-                                    lTriplet(1) = 10 ' Nov
-                                    lTriplet(2) = 11 ' Dec
-                            End Select
-                            For li As Integer = 0 To 2
-                                lValue += lCalculatedAttributes(lTriplet(li)).Value
+                            For Each lVar As atcVariation In pCat.Endpoints
+                                If lVar.Operation = aTrans AndAlso _
+                                   lTempDataSet.Attributes.GetFormattedValue("Constituent") = aCons AndAlso _
+                                   lVar.Seasons IsNot Nothing Then
+                                    If lVar.Seasons.Name.Substring(lVar.Seasons.Name.IndexOf("-") + 2) = "Traditional" Then
+                                        Dim lData As atcTimeseries = lTempDataSet
+                                        lData = lVar.Seasons.SplitBySelected(lData, Nothing).Item(0)
+                                        lValue = lData.Attributes.GetFormattedValue(aTrans)
+                                        Exit For
+                                    End If
+                                End If
                             Next
-                            If aTrans = "Mean" Then
-                                lValue /= 3
-                            End If
+                            'Dim lTriplet(3) As Integer
+                            'Select Case aMonthList
+                            '    Case "0"
+                            '        lTriplet(0) = 0 ' Jan
+                            '        lTriplet(1) = 1 ' feb
+                            '        lTriplet(2) = 2 ' mar
+                            '    Case "1"
+                            '        lTriplet(0) = 3 ' Apr
+                            '        lTriplet(1) = 4 ' May
+                            '        lTriplet(2) = 5 ' June
+                            '    Case "2"
+                            '        lTriplet(0) = 6 ' July
+                            '        lTriplet(1) = 7 ' August
+                            '        lTriplet(2) = 8 ' September
+                            '    Case "3"
+                            '        lTriplet(0) = 9 ' Oct
+                            '        lTriplet(1) = 10 ' Nov
+                            '        lTriplet(2) = 11 ' Dec
+                            'End Select
+                            'For li As Integer = 0 To 2
+                            '    lValue += lCalculatedAttributes(lTriplet(li)).Value
+                            'Next
+                            'If aTrans = "Mean" Then
+                            '    lValue /= 3
+                            'End If
                         End If
                         lString &= vbTab & DecimalAlign(lValue) ' if there is not month list, then doesnot append a value
                     End If
