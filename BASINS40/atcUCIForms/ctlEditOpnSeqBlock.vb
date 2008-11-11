@@ -7,7 +7,8 @@ Public Class ctlEditOpnSeqBlock
 
     Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfOpnSeqBlk As HspfOpnSeqBlk
-    Dim pfrmAddOperation As New frmAddOperation
+    Dim pfrmAddOperation As frmAddOperation
+
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
@@ -49,7 +50,6 @@ Public Class ctlEditOpnSeqBlock
                 pfrmAddOperation.BringToFront()
             End If
         End If
-
 
     End Sub
 
