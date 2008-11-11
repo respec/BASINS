@@ -4,8 +4,8 @@ Module modHspfReadWrite
 
     Sub Initialize()
         Dim lTestName As String
-        lTestName = "SFBayColma"
-        'lTestName = "mono"
+        'lTestName = "SFBayColma"
+        lTestName = "mono"
 
         Select Case lTestName
             Case "mono"
@@ -34,7 +34,6 @@ Module modHspfReadWrite
         With lHspfUci
             .FastReadUciForStarter(lMsg, pBaseName & ".rev.uci")
             .Name = pBaseName & ".rev2.uci"
-            .Save()
             .SaveAs(pBaseName, pBaseName & "New", 1, 1)
         End With
     End Sub
