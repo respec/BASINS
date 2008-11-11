@@ -6,7 +6,6 @@ Public Class ctlEditSpecialAction
 
     Dim pVScrollColumnOffset As Integer = 16
     Dim pSpecialActionBlk As HspfSpecialActionBlk
-    Dim frmAgPrac As New frmAgPrac
     Dim pChanged As Boolean
     Dim PreviousTab As Integer = 0
     Dim pfrmAgPrac As frmAgPrac
