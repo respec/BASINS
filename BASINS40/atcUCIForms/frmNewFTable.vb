@@ -1,9 +1,5 @@
-Imports System.Drawing
-Imports MapWinUtility
 Imports atcUCI
 Imports atcUtility
-Imports atcControls
-Imports System.Collections.ObjectModel
 
 Public Class frmNewFTable
 

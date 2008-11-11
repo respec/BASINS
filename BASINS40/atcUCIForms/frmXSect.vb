@@ -1,12 +1,7 @@
 Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
-Imports atcUtility
-Imports atcSegmentation
-Imports atcControls
-Imports System.Collections.ObjectModel
 Imports System.IO
-Imports System
 
 Public Class frmXSect
 

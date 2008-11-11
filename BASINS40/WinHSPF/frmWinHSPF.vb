@@ -6,8 +6,6 @@ Imports atcControls
 
 Public Class frmWinHSPF
 
-    'Variable treatment of forms. Prevents multiple open of same form without having to use restricted modal method.
-
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
@@ -274,6 +272,57 @@ Public Class frmWinHSPF
             Else
                 pfrmBMP.WindowState = FormWindowState.Normal
                 pfrmBMP.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub HSPFparmToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HSPFparmToolStripMenuItem.Click
+
+        If IsNothing(pfrmHspfParm) Then
+            pfrmHspfParm = New frmHspfParm
+            pfrmHspfParm.Show()
+        Else
+            If pfrmHspfParm.IsDisposed Then
+                pfrmHspfParm = New frmHspfParm
+                pfrmHspfParm.Show()
+            Else
+                pfrmHspfParm.WindowState = FormWindowState.Normal
+                pfrmHspfParm.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub SaveAsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveAsToolStripMenuItem.Click
+
+        If IsNothing(pfrmSaveAs) Then
+            pfrmSaveAs = New frmSaveAs
+            pfrmSaveAs.Show()
+        Else
+            If pfrmSaveAs.IsDisposed Then
+                pfrmSaveAs = New frmSaveAs
+                pfrmSaveAs.Show()
+            Else
+                pfrmSaveAs.WindowState = FormWindowState.Normal
+                pfrmSaveAs.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub StarterToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles StarterToolStripMenuItem.Click
+
+        If IsNothing(pfrmStarter) Then
+            pfrmStarter = New frmStarter
+            pfrmStarter.Show()
+        Else
+            If pfrmStarter.IsDisposed Then
+                pfrmStarter = New frmStarter
+                pfrmStarter.Show()
+            Else
+                pfrmStarter.WindowState = FormWindowState.Normal
+                pfrmStarter.BringToFront()
             End If
         End If
 

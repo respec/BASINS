@@ -1,5 +1,3 @@
-Imports System.Drawing
-Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
 
@@ -241,10 +239,6 @@ Public Class ctlEditTable
                 For lRow As Integer = 1 To .Rows - 1
                     .CellEditable(lRow, lCol) = True
                 Next
-            Next
-
-            For lCol = 0 To .Columns - 1
-                .CellColor(0, lCol) = SystemColors.ControlLight
             Next
 
         End With

@@ -1,9 +1,4 @@
-Imports atcUtility
-Imports atcUCIForms
 Imports atcUCI
-Imports atcControls
-Imports System
-
 
 Public Class frmOutput
     ' ==============================================================
@@ -337,7 +332,7 @@ Public Class frmOutput
 
         IsAQUATOXLocation = False
         loper = pUCI.OpnBlks(Name).OperFromID(Id)
-        lTable = loper.tables("ACTIVITY")
+        lTable = loper.Tables("ACTIVITY")
         If lTable.Parms(1).Value = 1 And lTable.Parms(4).Value = 1 And _
            lTable.Parms(5).Value = 1 And lTable.Parms(7).Value = 1 And _
            lTable.Parms(8).Value = 1 Then
@@ -346,8 +341,8 @@ Public Class frmOutput
             For j = 1 To 7
                 ifound(j) = False
             Next j
-            For j = 1 To loper.targets.Count
-                lConn = loper.targets(j)
+            For j = 1 To loper.Targets.Count
+                lConn = loper.Targets(j)
                 If Microsoft.VisualBasic.Left(lConn.Target.VolName, 3) = "WDM" Then
                     idsn = lConn.Target.VolId
                     WDMId = lConn.Target.VolName
@@ -457,7 +452,20 @@ Public Class frmOutput
     End Sub
 
     Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
-        Dim lfrmAddExpert As New frmAddExpert(pCheckedRadioIndex)
-        lfrmAddExpert.ShowDialog()
+
+        If IsNothing(pfrmAddExpert) Then
+            pfrmAddExpert = New frmAddExpert(pCheckedRadioIndex)
+            pfrmAddExpert.Show()
+        Else
+            If pfrmAddExpert.IsDisposed Then
+                pfrmAddExpert = New frmAddExpert(pCheckedRadioIndex)
+                pfrmAddExpert.Show()
+            Else
+                pfrmAddExpert.WindowState = FormWindowState.Normal
+                pfrmAddExpert.BringToFront()
+            End If
+        End If
+
+
     End Sub
 End Class

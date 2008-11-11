@@ -1,5 +1,3 @@
-Imports System.Drawing
-Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
 Imports System.Collections.ObjectModel

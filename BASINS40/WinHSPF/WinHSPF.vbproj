@@ -78,6 +78,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAddDataSet.Designer.vb">
+      <DependentUpon>frmAddDataSet.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddDataSet.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmAQUATOX.Designer.vb">
       <DependentUpon>frmAQUATOX.vb</DependentUpon>
     </Compile>
@@ -186,6 +192,18 @@
     <Compile Include="frmReach.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmSaveAs.Designer.vb">
+      <DependentUpon>frmSaveAs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSaveAs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmStarter.Designer.vb">
+      <DependentUpon>frmStarter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmStarter.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmTime.Designer.vb">
       <DependentUpon>frmTime.vb</DependentUpon>
     </Compile>
@@ -226,6 +244,10 @@
     <EmbeddedResource Include="frmAbout.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddDataSet.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddDataSet.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmAddExpert.resx">
       <SubType>Designer</SubType>
@@ -294,6 +316,14 @@
     <EmbeddedResource Include="frmReach.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmReach.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSaveAs.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSaveAs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmStarter.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmStarter.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmTime.resx">
       <SubType>Designer</SubType>
