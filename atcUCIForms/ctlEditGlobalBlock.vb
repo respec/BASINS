@@ -1,7 +1,5 @@
 Imports System.Drawing
-Imports MapWinUtility
 Imports atcUCI
-Imports atcControls
 
 Public Class ctlEditGlobalBlock
     Implements ctlEdit

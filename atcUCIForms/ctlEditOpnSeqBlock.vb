@@ -1,13 +1,13 @@
-Imports System.Drawing
-Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
+Imports System.Windows.Forms
 
 Public Class ctlEditOpnSeqBlock
     Implements ctlEdit
 
     Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfOpnSeqBlk As HspfOpnSeqBlk
+    Dim pfrmAddOperation As New frmAddOperation
     Dim pChanged As Boolean
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
@@ -35,9 +35,20 @@ Public Class ctlEditOpnSeqBlock
 
     Public Sub Add() Implements ctlEdit.Add
 
-        Dim pfrmAddOperation As New frmAddOperation
-        pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
-        pfrmAddOperation.Show()
+        If IsNothing(pfrmAddOperation) Then
+            pfrmAddOperation = New frmAddOperation
+            pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
+            pfrmAddOperation.Show()
+        Else
+            If pfrmAddOperation.IsDisposed Then
+                pfrmAddOperation = New frmAddOperation
+                pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
+                pfrmAddOperation.Show()
+            Else
+                pfrmAddOperation.WindowState = FormWindowState.Normal
+                pfrmAddOperation.BringToFront()
+            End If
+        End If
 
 
     End Sub
@@ -68,10 +79,6 @@ Public Class ctlEditOpnSeqBlock
                 For lRow As Integer = 1 To .Rows - 1
                     .CellValue(lRow, 0) = pHspfOpnSeqBlk.Opn(lRow).Name
                     .CellValue(lRow, 1) = pHspfOpnSeqBlk.Opn(lRow).Id
-                Next
-
-                For lCol As Integer = 0 To .Columns - 1
-                    .CellColor(0, lCol) = SystemColors.ControlLight
                 Next
 
                 For lCol As Integer = 0 To .Columns - 1

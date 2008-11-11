@@ -26,6 +26,7 @@ Partial Class frmWinHSPF
         Me.TopToolStripPanel = New System.Windows.Forms.ToolStripPanel
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.FunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ReachEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -35,6 +36,8 @@ Partial Class frmWinHSPF
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
         Me.AQUATOXToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.BMPToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.HSPFparmToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.StarterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.RightToolStripPanel = New System.Windows.Forms.ToolStripPanel
@@ -99,9 +102,16 @@ Partial Class frmWinHSPF
         '
         'FileToolStripMenuItem
         '
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveAsToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
         Me.FileToolStripMenuItem.Text = "File"
+        '
+        'SaveAsToolStripMenuItem
+        '
+        Me.SaveAsToolStripMenuItem.Name = "SaveAsToolStripMenuItem"
+        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.SaveAsToolStripMenuItem.Text = "Save As..."
         '
         'EditToolStripMenuItem
         '
@@ -111,7 +121,7 @@ Partial Class frmWinHSPF
         '
         'FunctionsToolStripMenuItem
         '
-        Me.FunctionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReachEditorToolStripMenuItem, Me.LandUseEditorToolStripMenuItem, Me.InputDataEditorToolStripMenuItem, Me.PollutantToolStripMenuItem, Me.ToolStripSeparator3, Me.AQUATOXToolStripMenuItem, Me.BMPToolStripMenuItem})
+        Me.FunctionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReachEditorToolStripMenuItem, Me.LandUseEditorToolStripMenuItem, Me.InputDataEditorToolStripMenuItem, Me.PollutantToolStripMenuItem, Me.ToolStripSeparator3, Me.AQUATOXToolStripMenuItem, Me.BMPToolStripMenuItem, Me.HSPFparmToolStripMenuItem, Me.StarterToolStripMenuItem})
         Me.FunctionsToolStripMenuItem.Name = "FunctionsToolStripMenuItem"
         Me.FunctionsToolStripMenuItem.Size = New System.Drawing.Size(65, 20)
         Me.FunctionsToolStripMenuItem.Text = "Functions"
@@ -156,6 +166,18 @@ Partial Class frmWinHSPF
         Me.BMPToolStripMenuItem.Name = "BMPToolStripMenuItem"
         Me.BMPToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
         Me.BMPToolStripMenuItem.Text = "BMP"
+        '
+        'HSPFparmToolStripMenuItem
+        '
+        Me.HSPFparmToolStripMenuItem.Name = "HSPFparmToolStripMenuItem"
+        Me.HSPFparmToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
+        Me.HSPFparmToolStripMenuItem.Text = "HSPFparm"
+        '
+        'StarterToolStripMenuItem
+        '
+        Me.StarterToolStripMenuItem.Name = "StarterToolStripMenuItem"
+        Me.StarterToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
+        Me.StarterToolStripMenuItem.Text = "Starter"
         '
         'HelpToolStripMenuItem
         '
@@ -469,5 +491,8 @@ Partial Class frmWinHSPF
     Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents AQUATOXToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents BMPToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents HSPFparmToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SaveAsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents StarterToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

@@ -40,12 +40,36 @@ Public Class frmTime
     End Sub
 
     Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
-        Dim lfrmAddMet As New frmAddMet
-        lfrmAddMet.ShowDialog()
+
+        If IsNothing(pfrmAddMet) Then
+            pfrmAddMet = New frmAddMet
+            pfrmAddMet.Show()
+        Else
+            If pfrmAddMet.IsDisposed Then
+                pfrmAddMet = New frmAddMet
+                pfrmAddMet.Show()
+            Else
+                pfrmAddMet.WindowState = FormWindowState.Normal
+                pfrmAddMet.BringToFront()
+            End If
+        End If
+
     End Sub
 
     Private Sub cmdEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEdit.Click
-        Dim lfrmAddMet As New frmAddMet
-        lfrmAddMet.ShowDialog()
+
+        If IsNothing(pfrmAddMet) Then
+            pfrmAddMet = New frmAddMet
+            pfrmAddMet.Show()
+        Else
+            If pfrmAddMet.IsDisposed Then
+                pfrmAddMet = New frmAddMet
+                pfrmAddMet.Show()
+            Else
+                pfrmAddMet.WindowState = FormWindowState.Normal
+                pfrmAddMet.BringToFront()
+            End If
+        End If
+
     End Sub
 End Class

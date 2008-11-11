@@ -1,18 +1,17 @@
-Imports System.Drawing
-Imports MapWinUtility
 Imports atcUCI
-Imports atcControls
-Imports System.Collections.ObjectModel
+Imports System.Windows.Forms
 
 Public Class ctlEditSpecialAction
     Implements ctlEdit
 
     Dim pVScrollColumnOffset As Integer = 16
     Dim pSpecialActionBlk As HspfSpecialActionBlk
-
+    Dim frmAgPrac As New frmAgPrac
     Dim pChanged As Boolean
     Dim PreviousTab As Integer = 0
+    Dim pfrmAgPrac As frmAgPrac
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
         Get
             Return "Edit Special Actions Block"
@@ -974,9 +973,24 @@ Public Class ctlEditSpecialAction
     End Sub
 
     Private Sub cmdAgPrac_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAgPrac.Click
-        Dim frmAgPrac As New frmAgPrac
-        frmAgPrac.Init(pSpecialActionBlk.Uci, Me)
-        frmAgPrac.Show()
+
+        If IsNothing(pfrmAgPrac) Then
+            pfrmAgPrac = New frmAgPrac
+            pfrmAgPrac.Init(pSpecialActionBlk.Uci, Me)
+            pfrmAgPrac.Show()
+
+        Else
+            If pfrmAgPrac.IsDisposed Then
+                pfrmAgPrac = New frmAgPrac
+                pfrmAgPrac.Init(pSpecialActionBlk.Uci, Me)
+                pfrmAgPrac.Show()
+            Else
+                pfrmAgPrac.WindowState = FormWindowState.Normal
+                pfrmAgPrac.BringToFront()
+
+            End If
+        End If
+        
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)

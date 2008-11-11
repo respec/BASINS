@@ -1,9 +1,7 @@
-Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
-Imports atcUtility
-Imports System.Collections.ObjectModel
+
 Public Class ctlEditMassLinks
     Implements ctlEdit
 

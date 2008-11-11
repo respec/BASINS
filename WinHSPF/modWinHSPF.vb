@@ -27,7 +27,10 @@ Public Module WinHSPF
     Friend pfrmAQUATOX As frmAQUATOX
     Friend pfrmBMP As frmBMP
     Friend pfrmBMPEffic As frmBMPEffic
-
+    Friend pfrmHspfParm As frmHspfParm
+    Friend pfrmSaveAs As frmSaveAs
+    Friend pfrmStarter As frmStarter
+    Friend pfrmXSect As frmXSect
 
     'Friend pIPC As ATCoIPC
 

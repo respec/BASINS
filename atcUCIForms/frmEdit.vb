@@ -12,9 +12,11 @@ Public Class frmEdit
         End Get
         Set(ByVal aControl As Windows.Forms.Control)
             'ensure minimum width and height to be able to see buttons
+
             If aControl.Width < 640 Then
                 aControl.Width = 640
             End If
+
             Width = aControl.Width
             Height = aControl.Height + 80
             panelEdit.Controls.Add(aControl)
@@ -49,6 +51,7 @@ Public Class frmEdit
 
     Private Sub cmdOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdOk.Click
         pEditControl.Save()
+
         Me.Dispose()
     End Sub
 

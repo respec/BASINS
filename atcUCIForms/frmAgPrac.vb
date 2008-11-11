@@ -2,10 +2,8 @@ Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcUtility
-Imports atcControls
-Imports System.Collections.ObjectModel
 
-'***************IMPORTANT NOTES:***************
+'.net conversion issue:************************
 'Check definition of pCtl 
 'Check starter path - hardcoded for now!!!
 '**********************************************

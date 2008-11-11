@@ -1,8 +1,7 @@
-Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
-Imports atcUCIForms
+Imports System.Windows.Forms
 
 Public Class ctlEditFTables
     Implements ctlEdit
@@ -10,6 +9,10 @@ Public Class ctlEditFTables
     Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfFtable As HspfFtable
     Dim pChanged As Boolean
+    Dim pfrmXSect As frmXSect
+    Dim pfrmNewFTable As New frmNewFTable
+    Dim newFTable As New HspfFtable
+
     Private PrevListIndex As Long
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
@@ -106,7 +109,6 @@ Public Class ctlEditFTables
                 .Visible = True
                 .Source.FixedRows = 1
             End With
-
 
             RefreshFtables()
         End Set
@@ -268,24 +270,61 @@ Public Class ctlEditFTables
     End Sub
 
     Private Sub cmdImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImport.Click
-        Dim frmXSect As New frmXSect
-        frmXSect.CurrentReach(pHspfFtable.Operation.Id, pHspfFtable.Operation.FTable)
-        txtNRows.ValueInteger = pHspfFtable.Nrows
-        txtNCols.ValueInteger = pHspfFtable.Ncols
-        frmXSect.Init(pHspfFtable, Me)
-        frmXSect.Owner = frmEdit.ActiveForm
-        frmXSect.Show()
+
+        If IsNothing(pfrmXSect) Then
+            pfrmXSect = New frmXSect
+            pfrmXSect.CurrentReach(pHspfFtable.Operation.Id, pHspfFtable.Operation.FTable)
+            txtNRows.ValueInteger = pHspfFtable.Nrows
+            txtNCols.ValueInteger = pHspfFtable.Ncols
+            pfrmXSect.Init(pHspfFtable, Me)
+            pfrmXSect.Owner = frmEdit.ActiveForm
+            pfrmXSect.Show()
+        Else
+            If pfrmXSect.IsDisposed Then
+                pfrmXSect = New frmXSect
+                pfrmXSect.CurrentReach(pHspfFtable.Operation.Id, pHspfFtable.Operation.FTable)
+                txtNRows.ValueInteger = pHspfFtable.Nrows
+                txtNCols.ValueInteger = pHspfFtable.Ncols
+                pfrmXSect.Init(pHspfFtable, Me)
+                pfrmXSect.Owner = frmEdit.ActiveForm
+                pfrmXSect.Show()
+            Else
+                pfrmXSect.WindowState = FormWindowState.Normal
+                pfrmXSect.BringToFront()
+
+            End If
+        End If
+
     End Sub
 
     Private Sub cmdCompute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCompute.Click
-        Dim frmNewFTable As New frmNewFTable
-        Dim newFTable As New HspfFtable
-        newFTable.Operation = pHspfFtable.Operation
-        newFTable.Id = pHspfFtable.Id
-        frmNewFTable.SetCurrentFTable(newFTable, Me)
-        frmNewFTable.Init()
-        frmNewFTable.Owner = frmEdit.ActiveForm
-        frmNewFTable.Show()
+
+
+        If IsNothing(pfrmXSect) Then
+            pfrmNewFTable = New frmNewFTable
+            newFTable.Operation = pHspfFtable.Operation
+            newFTable.Id = pHspfFtable.Id
+            pfrmNewFTable.SetCurrentFTable(newFTable, Me)
+            pfrmNewFTable.Init()
+            pfrmNewFTable.Owner = frmEdit.ActiveForm
+            pfrmNewFTable.Show()
+        Else
+            If pfrmXSect.IsDisposed Then
+                pfrmNewFTable = New frmNewFTable
+                newFTable.Operation = pHspfFtable.Operation
+                newFTable.Id = pHspfFtable.Id
+                pfrmNewFTable.SetCurrentFTable(newFTable, Me)
+                pfrmNewFTable.Init()
+                pfrmNewFTable.Owner = frmEdit.ActiveForm
+                pfrmNewFTable.Show()
+            Else
+                pfrmNewFTable.WindowState = FormWindowState.Normal
+                pfrmNewFTable.BringToFront()
+
+            End If
+        End If
+
+
     End Sub
 
     Public Sub UpdateFTABLE(ByVal aFtab As HspfFtable)

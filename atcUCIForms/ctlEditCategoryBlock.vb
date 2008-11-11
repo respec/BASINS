@@ -1,4 +1,3 @@
-Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
@@ -71,10 +70,6 @@ Public Class ctlEditCategory
                         .CellValue(lRow, 1) = pHspfCategoryBlk.Categories(lRow - 1).Name
                     Next
                 End If
-
-                For lCol As Integer = 0 To .Columns - 1
-                    .CellColor(0, lCol) = SystemColors.ControlLight
-                Next
 
                 For m As Integer = 0 To .Columns - 1
                     For k As Integer = 1 To .Rows - 1
