@@ -183,6 +183,8 @@ Module modModelSetup
                             aMetBaseDsns.Add(lDsn)
                         End If
                     End If
+                    'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                    lDataSet.ValuesNeedToBeRead = True
                 Next
             End If
         End If
