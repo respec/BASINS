@@ -325,8 +325,8 @@ Public Module modString
 
     Function DoubleToString(ByVal aValue As Double, _
                    Optional ByVal aMaxWidth As Integer = 10, _
-                   Optional ByVal aFormat As String = "#,##0.########", _
-                   Optional ByVal aExpFormat As String = "0.####e0", _
+                   Optional ByVal aFormat As String = Nothing, _
+                   Optional ByVal aExpFormat As String = Nothing, _
                    Optional ByVal aCantFit As String = "#", _
                    Optional ByVal aSignificantDigits As Integer = 5) As String
         Dim lValue As Double
@@ -336,22 +336,36 @@ Public Module modString
             lValue = aValue
         End If
 
-        Dim lString As String = Format(lValue, aFormat)
-
-        If lString.Length > aMaxWidth Then 'Too long, need to shorten
-            Dim lDecimalPos As Integer = lString.IndexOf(".")
-            Select Case lDecimalPos
-                Case -1 'string does not contain a decimal
-                    GoTo TryExpFormat
-                Case aMaxWidth, aMaxWidth - 1
-                    lString = Left(lString, lDecimalPos) 'Truncate at decimal and remove trailing decimal
-                Case Is < aMaxWidth
-                    lString = Left(lString, aMaxWidth) 'Truncate at least one digit after decimal
-            End Select
+        If aFormat Is Nothing OrElse aFormat.Length = 0 Then
+            If aMaxWidth < 3 Then
+                aFormat = "#.#"
+            Else
+                aFormat = "#,##0." & StrDup(aMaxWidth - 2, "#")
+            End If
         End If
 
+        Dim lString As String = Format(lValue, aFormat)
+        Dim lOldString As String = ""
+
+        If lString.Length > aMaxWidth Then 'Too long, need to shorten
+            'First try leaving out commas to shorten
+            If lString.Replace(",", "").Length <= aMaxWidth Then
+                lString = lString.Replace(",", "")
+            Else
+                Dim lDecimalPos As Integer = lString.IndexOf(".")
+                Select Case lDecimalPos
+                    Case -1 'string does not contain a decimal, can't shorten by formatting with fewer decimal places
+                        GoTo TryExpFormat
+                    Case aMaxWidth, aMaxWidth - 1 'string contains decimal point at end of max width, format without decimal places
+                        lString = Format(lValue, "0")
+                    Case Is < aMaxWidth 'string contains a decimal before max width, format with fewer decimal places
+                        lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos, "#"))
+                End Select
+            End If
+        End If
+
+        Dim lStrToDbl As Double = GetNaN()
         Try 'If formatted string cannot be parsed, skip to exponential format
-            Dim lStrToDbl As Double
             If Not Double.TryParse(lString, lStrToDbl) Then
                 GoTo TryExpFormat
             End If
@@ -361,25 +375,65 @@ Public Module modString
             If lAbs > 1.0E-30 _
                 AndAlso (lAbs < 0.01 OrElse lAbs > 99999) _
                 AndAlso (Math.Abs((aValue - lStrToDbl) / aValue) > (1 / 10 ^ (aSignificantDigits - 2))) Then
+                lOldString = lString
                 GoTo TryExpFormat
+            Else
+                lStrToDbl = GetNaN()
             End If
         Catch
+            lStrToDbl = GetNaN()
             GoTo TryExpFormat
         End Try
 
-        If lString.Length <= aMaxWidth Then
-            Return lString
-        Else
+        If lString.Length > aMaxWidth Then 'String is too long and cannot simply be truncated at or after decimal point
 TryExpFormat:
-            'String is too long and cannot simply be truncated at or after decimal point
-            'A trailing e might be correct if there is no exponent, but it is ugly so we trim it off
-            lString = Format(lValue, aExpFormat).TrimEnd("e")
-            If lString.Length <= aMaxWidth Then
-                Return lString
+            Dim lExpPos As Integer
+            Dim lDecimalCount As Integer = 0
+            If aExpFormat Is Nothing OrElse aExpFormat.Length = 0 Then
+                Select Case aMaxWidth
+                    Case Is < 3
+                        lString = aCantFit
+                        lDecimalCount = -1
+                        GoTo TryOldString
+                    Case 3, 4
+                        lDecimalCount = 0
+                    Case Else
+                        lDecimalCount = aMaxWidth - 4
+                End Select
+                aExpFormat = "0." & StrDup(lDecimalCount, "#") & "e0"
             Else
-                Return aCantFit 'Placeholder for number that does not fit even in exponential notation
+                Dim lDecimalPos As Integer = aExpFormat.IndexOf(".")
+                If lDecimalPos >= 0 Then
+                    lExpPos = aExpFormat.IndexOf("e", lDecimalPos + 1)
+                    lDecimalCount = lExpPos - lDecimalPos - 1
+                End If
+            End If
+
+ReFormatExp:
+            lString = Format(lValue, aExpFormat).TrimEnd("e")
+            If lString.Length > aMaxWidth Then
+                If lDecimalCount > 0 Then 'Try again with fewer decimal places
+                    lDecimalCount -= 1
+                    aExpFormat = "0." & StrDup(lDecimalCount, "#") & "e0"
+                    GoTo ReFormatExp
+                Else 'Ran out of decimal places to remove, just can't fit
+                    lString = aCantFit
+                End If
+            End If
+TryOldString:
+            'If we had a candidate string before trying exponent, use it if it was at least as good
+            If lOldString.Length > 0 Then
+                Dim lStrToDblExp As Double
+                If Double.TryParse(lString, lStrToDblExp) Then
+                    If Math.Abs(aValue - lStrToDbl) <= Math.Abs(aValue - lStrToDblExp) Then
+                        lString = lOldString
+                    End If
+                Else
+                    lString = lOldString
+                End If
             End If
         End If
+        Return lString
     End Function
 
     'Private Function CountSignificantDigits(ByVal aNumericString As String, ByVal aIncludeTrailingZeroes As Boolean) As Integer
