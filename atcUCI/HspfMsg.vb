@@ -4,8 +4,8 @@ Option Explicit On
 Imports System.Collections.ObjectModel
 Imports MapWinUtility
 
+'Copyright 2006-8 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Public Class HspfMsg
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
     Private pErrorDescription As String
 
     Public Name As String
@@ -21,6 +21,13 @@ Public Class HspfMsg
     Public ReadOnly Property TSGroupDefs() As HspfTSGroupDefs
         Get
             Return pTSGroupDefs
+        End Get
+    End Property
+
+    Public ReadOnly Property ErrorDescription() As String
+        Get
+            ErrorDescription = pErrorDescription
+            pErrorDescription = ""
         End Get
     End Property
 
@@ -163,39 +170,19 @@ Public Class HspfMsg
                                             lParm.MetricMax = lParmRow.Item(7)
                                         End If
                                     End If
-                                    'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                                    If IsDBNull(lParmRow.Item(8)) Then
-                                        lParm.DefaultValue = " "
-                                    Else
-                                        lParm.DefaultValue = lParmRow.Item(8) 'default
-                                    End If
+                                    lParm.DefaultValue = lParmRow.Item(8) & " " 'default
                                     If lParmTable.Columns.Count > 10 Then
-                                        'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                                        If IsDBNull(lParmRow.Item(12)) Then
-                                            lParm.MetricDefault = " "
-                                        Else
-                                            lParm.MetricDefault = lParmRow.Item(12) 'default
-                                        End If
+                                        lParm.MetricDefault = lParmRow.Item(12) & " " 'default
                                     Else 'use english default
-                                        'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                                        If IsDBNull(lParmRow.Item(8)) Then
-                                            lParm.MetricDefault = " "
-                                        Else
-                                            lParm.MetricDefault = lParmRow.Item(8)
-                                        End If
+                                        lParm.MetricDefault = lParmRow.Item(8) & " "
                                     End If
                                     lParm.Other = lParmRow.Item(4) & ":" & lParmRow.Item(5)
-                                    'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                                    If IsDBNull(lParmRow.Item(9)) Then
-                                        lParm.Define = " "
-                                    Else
-                                        lParm.Define = lParmRow.Item(9)
-                                    End If
+                                    lParm.Define = lParmRow.Item(9) & " "
                                     lParms.Add(lParm)
                                 End If
                             Next
                             lTable.ParmDefs = lParms
-                            updateParmsMultLines((lBlock.Name), lTable)
+                            UpdateParmsMultLines((lBlock.Name), lTable)
                             lTableDefs.Add(lTable)
                             lBlkTableDefs.Add(lTable)
                         End If
@@ -296,21 +283,6 @@ Public Class HspfMsg
         Logger.Dbg("HSPFMsg:Open Finished")
     End Sub
 
-    Public ReadOnly Property ErrorDescription() As String
-        Get
-            ErrorDescription = pErrorDescription
-            pErrorDescription = ""
-        End Get
-    End Property
-
-    'Private Function FilterNullOld(ByRef v As Object, Optional ByRef NullReturn As Object = 0) As Object
-    '    If IsDBNull(v.value) Then
-    '        Return NullReturn
-    '    Else
-    '        Return v.value
-    '    End If
-    'End Function
-
     Private Function FilterNull(ByRef aValue As Object, Optional ByRef aNullReturn As Object = 0) As Object
         If IsDBNull(aValue) Then
             Return aNullReturn
@@ -319,7 +291,7 @@ Public Class HspfMsg
         End If
     End Function
 
-    Private Sub updateParmsMultLines(ByRef aBlockName As String, ByRef aTable As HspfTableDef)
+    Private Sub UpdateParmsMultLines(ByRef aBlockName As String, ByRef aTable As HspfTableDef)
         With aTable
             If aBlockName = "DURANL" And .Name = "LEVELS" Then
                 For i As Integer = 1 To 6
@@ -642,7 +614,7 @@ Public Class HspfMsg
                     lParmDef.Define = ""
                     .ParmDefs.Add(lParmDef)
                 Next i
-                For i As Integer= 1 To 4 'four more fields to tack on
+                For i As Integer = 1 To 4 'four more fields to tack on
                     Dim lParmDef As New HSPFParmDef
                     lParmDef.Name = "GAMM" & CStr(14 + i) 'Name
                     lParmDef.Typ = 2 ' ATCoDbl

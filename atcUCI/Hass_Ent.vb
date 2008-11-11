@@ -231,28 +231,40 @@ Module HassLibs
         NumChr(80, lBuffI, aBuff)
     End Sub
 
-    Public Sub F90_XTABLEEX(ByRef omcode As Integer, ByRef tabno As Integer, ByRef uunits As Integer, ByRef Init As Integer, ByRef addfg As Integer, ByRef Occur As Integer, ByRef retkey As Integer, ByRef cbuff As String, ByRef rectyp As Integer, ByRef retcod As Integer)
-        Dim ibuff(80) As Integer
-
-        Call F90_XTABLEEX_XX(omcode, tabno, uunits, Init, addfg, Occur, retkey, ibuff(0), rectyp, retcod)
-        Call NumChr(80, ibuff, cbuff)
-
+    Public Sub F90_XTABLEEX(ByRef aOmCode As Integer, _
+                            ByRef aTabNo As Integer, _
+                            ByRef aUUnits As Integer, _
+                            ByRef aInit As Integer, _
+                            ByRef aAddFg As Integer, _
+                            ByRef aOccur As Integer, _
+                            ByRef aRetKey As Integer, _
+                            ByRef aBuff As String, _
+                            ByRef aRecTyp As Integer, _
+                            ByRef aRetCod As Integer)
+        Dim lBuffI(80) As Integer
+        F90_XTABLEEX_XX(aOmCode, aTabNo, aUUnits, aInit, aAddFg, aOccur, aRetKey, lBuffI(0), aRecTyp, aRetCod)
+        NumChr(80, lBuffI, abuff)
     End Sub
 
-    Public Sub F90_XBLOCK(ByRef blkno As Integer, ByRef Init As Integer, ByRef retkey As Integer, ByRef cbuff As String, ByRef retcod As Integer)
-        Dim ibuff(80) As Integer
-
-        Call F90_XBLOCK_XX(blkno, Init, retkey, ibuff(0), retcod)
-        Call NumChr(80, ibuff, cbuff)
-
+    Public Sub F90_XBLOCK(ByRef aBlkNo As Integer, _
+                          ByRef aInit As Integer, _
+                          ByRef aRetKey As Integer, _
+                          ByRef aBuff As String, _
+                          ByRef aRetCod As Integer)
+        Dim lBuffI(80) As Integer
+        F90_XBLOCK_XX(aBlkNo, aInit, aRetKey, lBuffI(0), aRetCod)
+        NumChr(80, lBuffI, aBuff)
     End Sub
 
-    Public Sub F90_XBLOCKEX(ByRef blkno As Integer, ByRef Init As Integer, ByRef retkey As Integer, ByRef cbuff As String, ByRef rectyp As Integer, ByRef retcod As Integer)
-        Dim ibuff(80) As Integer
-
-        Call F90_XBLOCKEX_XX(blkno, Init, retkey, ibuff(0), rectyp, retcod)
-        Call NumChr(80, ibuff, cbuff)
-
+    Public Sub F90_XBLOCKEX(ByRef aBlkNo As Integer, _
+                            ByRef aInit As Integer, _
+                            ByRef aRetKey As Integer, _
+                            ByRef aBuff As String, _
+                            ByRef aRecTyp As Integer, _
+                            ByRef aRetCod As Integer)
+        Dim lBuffI(80) As Integer
+        F90_XBLOCKEX_XX(aBlkNo, aInit, aRetKey, lBuffI(0), aRecTyp, aRetCod)
+        NumChr(80, lBuffI, aBuff)
     End Sub
 
     Public Sub F90_WATHED(ByRef messunit As Integer, ByRef inwat As Integer, ByRef iVal() As Integer, ByRef rval() As Single, ByRef csit As String, ByRef ctyp As String, ByRef cid As String, ByRef cname As String)

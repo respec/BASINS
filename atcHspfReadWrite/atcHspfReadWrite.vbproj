@@ -90,14 +90,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcData\atcData.vbproj">
-      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\atcSegmentation\atcSegmentation.vbproj">
-      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
-      <Name>atcSegmentation</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI</Name>
@@ -106,11 +98,6 @@
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
-      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
-      <Name>atcWDM</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
