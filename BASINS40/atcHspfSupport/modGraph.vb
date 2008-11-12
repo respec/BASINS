@@ -202,6 +202,22 @@ Public Module Graph
         End If
     End Sub
 
+    Public Sub GraphStorms(ByVal aDataGroup As atcDataGroup, _
+                           ByVal aPaneCount As Integer, _
+                           ByVal aOutFileBase As String, _
+                           ByVal aGraphSaveFormat As String, _
+                           ByVal aExpSystem As HspfSupport.atcExpertSystem)
+        For Each lStorm As hexStorm In aExpSystem.Storms
+            Dim lDataGroupStorm As New atcDataGroup
+            For Each lTimeseries As atcTimeseries In aDataGroup
+                lDataGroupStorm.Add(SubsetByDate(lTimeseries, lStorm.SDateJ, lStorm.EDateJ, Nothing))
+            Next
+            Dim lDate(6) As Integer
+            J2Date(lStorm.SDateJ, lDate)
+            GraphTimeseries(lDataGroupStorm, aPaneCount, aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2) & "_" & lDate(3), aGraphSaveFormat)
+        Next
+    End Sub
+
     Private Sub GraphTimeseries(ByVal aDataGroup As atcDataGroup, _
                                 ByVal aPaneCount As Integer, _
                                 ByVal aOutFileBase As String, _

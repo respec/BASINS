@@ -191,13 +191,15 @@ Public Class atcDataPlugin
             Case Else
                 Dim lName As String = Name
                 If aItemName.StartsWith(atcDataManager.SaveDataMenuName & "_") Then
-                    aHandled = atcDataManager.UserSaveData(aItemName.Substring(atcDataManager.SaveDataMenuName.Length + 1))
-                    'TODO: add case where not save data destinations are available, ask user for destination?
+                    aHandled = True
+                    atcDataManager.UserSaveData(aItemName.Substring(atcDataManager.SaveDataMenuName.Length + 1))
                 ElseIf aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & lName) Then
+                    aHandled = True
                     Dim lNewObject As atcDataTool = Me.NewOne
                     lNewObject.Initialize(pMapWin, pMapWinWindowHandle)
                     lNewObject.Show()
                 ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(lName) Then
+                    aHandled = True
                     Try
                         Dim ds As atcDataSource = Me
                         Dim lItemName As String = aItemName '.Replace(" ", "")
