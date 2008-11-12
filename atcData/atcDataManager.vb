@@ -339,20 +339,24 @@ Public Class atcDataManager
         Dim lSaveIn As atcDataSource = Nothing
         Dim lSaveGroup As atcDataGroup = atcDataManager.UserSelectData("Select Data to Save")
         If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
-            For Each lDataSource As atcDataSource In atcDataManager.DataSources
-                If lDataSource.Specification = aSpecification Then
-                    lSaveIn = lDataSource
-                    Exit For
-                End If
-            Next
+
+            'If we already have specified data source open, skip asking user
+            If aSpecification IsNot Nothing AndAlso aSpecification.Length > 0 Then
+                For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                    If lDataSource.Specification = aSpecification Then
+                        lSaveIn = lDataSource
+                        Exit For
+                    End If
+                Next
+            End If
 
             If lSaveIn Is Nothing Then
                 lSaveIn = UserOpenDataFile(False, True)
             End If
 
-            If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
+            If lSaveIn IsNot Nothing AndAlso lSaveIn.Specification.Length > 0 Then
                 For Each lDataSet As atcDataSet In lSaveGroup
-                    lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                    lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistAskUser)
                 Next
                 Return lSaveIn.Save(lSaveIn.Specification)
             End If
@@ -577,24 +581,25 @@ Public Class atcDataManager
 
     <CLSCompliant(False)> _
     Public Shared Function AddMenuIfMissing(ByVal aMenuName As String, _
-                                    ByVal aParent As String, _
-                                    ByVal aMenuText As String, _
-                           Optional ByVal aAfter As String = "", _
-                           Optional ByVal aBefore As String = "", _
-                           Optional ByVal aAlphabetical As Boolean = False) _
-                           As MapWindow.Interfaces.MenuItem
+                                            ByVal aParent As String, _
+                                            ByVal aMenuText As String, _
+                                   Optional ByVal aAfter As String = "", _
+                                   Optional ByVal aBefore As String = "", _
+                                   Optional ByVal aAlphabetical As Boolean = False, _
+                                   Optional ByVal aPicture As Object = Nothing) _
+                                   As MapWindow.Interfaces.MenuItem
         If pMapWin Is Nothing Then
             Return Nothing
         Else
             With pMapWin.Menus
+                Dim lSubmenuIndex As Integer = 0
+                Dim lExistingMenu As MapWindow.Interfaces.MenuItem
                 'Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
                 'If Not lMenu Is Nothing Then 'This item already exists
                 '    Return lMenu
-                If aAlphabetical And aParent.Length > 0 Then
+                If aAlphabetical AndAlso aParent.Length > 0 Then
                     'Need parent to do alphabetical search for position
                     Dim lParentMenu As MapWindow.Interfaces.MenuItem = .Item(aParent)
-                    Dim lSubmenuIndex As Integer = 0
-                    Dim lExistingMenu As MapWindow.Interfaces.MenuItem
 
                     If aAfter.Length > 0 Then
                         'First make sure we are after a particular item
@@ -611,6 +616,7 @@ Public Class atcDataManager
                         If lSubmenuIndex >= lParentMenu.NumSubItems Then
                             'Did not find menu aAfter, so start at first subitem
                             lSubmenuIndex = 0
+                            aAfter = ""
                         End If
                     End If
 
@@ -619,20 +625,52 @@ Public Class atcDataManager
                         lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
                         If Not lExistingMenu Is Nothing AndAlso _
                            Not lExistingMenu.Name Is Nothing Then
-                            If (aBefore.Length > 0 AndAlso lExistingMenu.Text = aBefore) OrElse _
+                            If (aBefore.Length > 0 AndAlso lExistingMenu.Name.Equals(aBefore)) OrElse _
                                lExistingMenu.Text > aMenuText Then
-                                'Add before existing menu with alphabetically later text
-                                Return .AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
+                                'Add before existing menu with either specified name or alphabetically later text
+                                If aAfter.Length = 0 Then 'Didn't find anything to put it after
+                                    If aPicture Is Nothing Then 'Can only directly do before with no picture
+                                        Return .AddMenu(aMenuName, aParent, aMenuText, aBefore)
+                                    Else 'Start over using Before instead of Alphabetical
+                                        Return AddMenuIfMissing(aMenuName, aParent, aMenuText, , lExistingMenu.Name, , aPicture)
+                                    End If
+                                Else
+                                    Return .AddMenu(aMenuName, aParent, aPicture, aMenuText, aAfter)
+                                End If
+                            Else
+                                aAfter = lExistingMenu.Name
                             End If
                         End If
                         lSubmenuIndex += 1
                     End While
                     'Add at default position, after last parent subitem
-                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText)
+                    Return .AddMenu(aMenuName, aParent, aPicture, aMenuText)
                 ElseIf aBefore.Length > 0 Then
-                    Return .AddMenu(aMenuName, aParent, aMenuText, aBefore)
+                    If aPicture Is Nothing Then 'Can only directly do before with no picture
+                        Return .AddMenu(aMenuName, aParent, aMenuText, aBefore)
+                    ElseIf aParent.Length = 0 Then 'can't do before or after with no parent
+                        Return .AddMenu(aMenuName, aPicture, aMenuText)
+                    Else
+                        Dim lParentMenu As MapWindow.Interfaces.MenuItem = .Item(aParent)
+
+                        While lSubmenuIndex < lParentMenu.NumSubItems
+                            lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
+                            If Not lExistingMenu Is Nothing AndAlso _
+                               Not lExistingMenu.Name Is Nothing Then
+                                If (lExistingMenu.Name.Equals(aAfter) OrElse lExistingMenu.Name.Equals(aBefore)) Then
+                                    Exit While
+                                Else
+                                    aAfter = lExistingMenu.Name
+                                End If
+                            End If
+                            lExistingMenu = Nothing
+                            lSubmenuIndex += 1
+                        End While
+
+                        Return .AddMenu(aMenuName, aParent, aPicture, aMenuText, aAfter)
+                    End If
                 Else
-                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
+                    Return .AddMenu(aMenuName, aParent, aPicture, aMenuText, aAfter)
                 End If
             End With
         End If

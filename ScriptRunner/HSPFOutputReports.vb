@@ -170,14 +170,14 @@ Module HSPFOutputReports
 
             Dim lExpertSystemFileNames As New NameValueCollection
             AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
-            Dim lExpertSystem As HspfSupport.ExpertSystem
+            Dim lExpertSystem As HspfSupport.atcExpertSystem
             For Each lExpertSystemFileName As String In lExpertSystemFileNames
                 Try
                     Dim lFileCopied As Boolean = False
                     If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
                         lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                     End If
-                    lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
+                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
                     Dim lStr As String = lExpertSystem.Report
                     SaveFileString("outfiles\ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
 
@@ -185,70 +185,70 @@ Module HSPFOutputReports
                     'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
 
                     Dim lCons As String = "Flow"
-                    For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
-                        Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
-                        Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
-                        Dim lSimTSerInches As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0))
+                    For Each lSite As hexSite In lExpertSystem.Sites
+                        Dim lSiteName As String = lSite.Name
+                        Dim lArea As Double = lSite.Area
+                        Dim lSimTSerInches As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(0))
                         lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
                         Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
                         lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                         lSimTSer.Attributes.SetValue("YAxis", "Left")
                         lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
-                        Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                         lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
                         lObsTSer.Attributes.SetValue("YAxis", "Left")
                         lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
                         Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
                         lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
-                        Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
+                        Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(5))
                         lPrecTSer.Attributes.SetValue("Units", "inches")
 
                         lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
-                                                                             lCons, lSite, _
+                                                                             lCons, lSiteName, _
                                                                              "inches", _
                                                                              lSimTSerInches, lObsTSerInches, _
                                                                              lRunMade, _
                                                                              lExpertSystem.SDateJ, _
                                                                              lExpertSystem.EDateJ)
-                        Dim lOutFileName As String = "outfiles\MonthlyAverage" & lCons & "Stats-" & lSite & ".txt"
+                        Dim lOutFileName As String = "outfiles\MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
                         SaveFileString(lOutFileName, lStr)
 
                         lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
-                                                                     lCons, lSite, _
+                                                                     lCons, lSiteName, _
                                                                      "inches", _
                                                                      lPrecTSer, lSimTSerInches, lObsTSerInches, _
                                                                      lRunMade, _
                                                                      lExpertSystem.SDateJ, _
                                                                      lExpertSystem.EDateJ)
-                        lOutFileName = "outfiles\Annual" & lCons & "Stats-" & lSite & ".txt"
+                        lOutFileName = "outfiles\Annual" & lCons & "Stats-" & lSiteName & ".txt"
                         SaveFileString(lOutFileName, lStr)
 
                         lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
-                                                                           lCons, lSite, _
+                                                                           lCons, lSiteName, _
                                                                            lSimTSer, lObsTSer, _
                                                                            lRunMade, _
                                                                            lExpertSystem.SDateJ, _
                                                                            lExpertSystem.EDateJ)
-                        lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats-" & lSite & ".txt"
+                        lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
                         SaveFileString(lOutFileName, lStr)
 
                         Dim lTimeSeries As New atcCollection
                         lTimeSeries.Add("Observed", lObsTSer)
                         lTimeSeries.Add("Simulated", lSimTSer)
                         lTimeSeries.Add("Precipitation", lPrecTSer)
-                        lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(9)))
-                        lTimeSeries.Add("UZS", lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(8)))
-                        lTimeSeries.Add("PotET", lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(6)))
-                        lTimeSeries.Add("ActET", lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(7)))
-                        lTimeSeries.Add("Baseflow", lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(4)))
-                        lTimeSeries.Add("Interflow", lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(3)))
-                        lTimeSeries.Add("Surface", lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(2)))
+                        lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(9)))
+                        lTimeSeries.Add("UZS", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(8)))
+                        lTimeSeries.Add("PotET", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(6)))
+                        lTimeSeries.Add("ActET", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(7)))
+                        lTimeSeries.Add("Baseflow", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(4)))
+                        lTimeSeries.Add("Interflow", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(3)))
+                        lTimeSeries.Add("Surface", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(2)))
                         GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ, _
-                                 lCons, lSite, _
+                                 lCons, lSiteName, _
                                  lTimeSeries, _
                                  pGraphSaveFormat, pGraphAnnual)
                         lTimeSeries.Dispose()
-                    Next lSiteIndex
+                    Next
 
                     lExpertSystem = Nothing
                     If lFileCopied Then

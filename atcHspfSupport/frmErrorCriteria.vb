@@ -1,7 +1,7 @@
 Public Class frmErrorCriteria
-    Private pErrorCriteria As ErrorCriteria
+    Private pErrorCriteria As hexErrorCriteria
 
-    Friend Sub Edit(ByVal aErrorCriteria As ErrorCriteria)
+    Friend Sub Edit(ByVal aErrorCriteria As hexErrorCriteria)
         pErrorCriteria = aErrorCriteria
         Dim lSource As New atcControls.atcGridSource
         lSource.FixedRows = 1
