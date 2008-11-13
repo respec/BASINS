@@ -99,6 +99,7 @@ Public Class ctlEditFTables
                     PrevListIndex = cboID.SelectedIndex
                 End If
             Next
+
             txtNRows.ValueInteger = pHspfFtable.Nrows
             txtNCols.ValueInteger = pHspfFtable.Ncols
 

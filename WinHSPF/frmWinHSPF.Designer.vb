@@ -63,7 +63,7 @@ Partial Class frmWinHSPF
         Me.cmdPoint = New System.Windows.Forms.ToolStripButton
         Me.cmdToolStripInputEditor = New System.Windows.Forms.ToolStripButton
         Me.cmdToolStripOutput = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripButton9 = New System.Windows.Forms.ToolStripButton
+        Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton
         Me.ToolStripButton10 = New System.Windows.Forms.ToolStripButton
         Me.ToolStripContainer = New System.Windows.Forms.ToolStripContainer
         Me.MenuStrip1.SuspendLayout()
@@ -278,7 +278,7 @@ Partial Class frmWinHSPF
         '
         Me.ToolStrip1.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.None
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.cmdTime, Me.ToolStripButton5, Me.cmdControl, Me.ToolStripButton6, Me.cmdPoint, Me.cmdToolStripInputEditor, Me.cmdToolStripOutput, Me.ToolStripButton9, Me.ToolStripButton10})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.cmdTime, Me.ToolStripButton5, Me.cmdControl, Me.ToolStripButton6, Me.cmdPoint, Me.cmdToolStripInputEditor, Me.cmdToolStripOutput, Me.ToolStripButton10, Me.cmdRunHSPF})
         Me.ToolStrip1.Location = New System.Drawing.Point(134, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(248, 27)
@@ -385,14 +385,14 @@ Partial Class frmWinHSPF
         Me.cmdToolStripOutput.Text = "Output"
         Me.cmdToolStripOutput.ToolTipText = "Output"
         '
-        'ToolStripButton9
+        'cmdRunHSPF
         '
-        Me.ToolStripButton9.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton9.Image = CType(resources.GetObject("ToolStripButton9.Image"), System.Drawing.Image)
-        Me.ToolStripButton9.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton9.Name = "ToolStripButton9"
-        Me.ToolStripButton9.Size = New System.Drawing.Size(23, 24)
-        Me.ToolStripButton9.Text = "ToolStripButton9"
+        Me.cmdRunHSPF.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.cmdRunHSPF.Image = CType(resources.GetObject("cmdRunHSPF.Image"), System.Drawing.Image)
+        Me.cmdRunHSPF.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.cmdRunHSPF.Name = "cmdRunHSPF"
+        Me.cmdRunHSPF.Size = New System.Drawing.Size(23, 24)
+        Me.cmdRunHSPF.Text = "Run HSPF"
         '
         'ToolStripButton10
         '
@@ -479,7 +479,7 @@ Partial Class frmWinHSPF
     Friend WithEvents cmdPoint As System.Windows.Forms.ToolStripButton
     Friend WithEvents cmdToolStripInputEditor As System.Windows.Forms.ToolStripButton
     Friend WithEvents cmdToolStripOutput As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripButton9 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents cmdRunHSPF As System.Windows.Forms.ToolStripButton
     Friend WithEvents ToolStripButton10 As System.Windows.Forms.ToolStripButton
     Friend WithEvents ToolStripContainer As System.Windows.Forms.ToolStripContainer
     Friend WithEvents BottomToolStripPanel As System.Windows.Forms.ToolStripPanel

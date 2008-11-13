@@ -169,7 +169,7 @@ Public Class frmXSect
             .CellValue(16, 1) = "Maximum Depth (ft)"
 
             For lCol = 0 To 1
-                For lRow = 0 To .Rows - 1
+                For lRow = 1 To .Rows - 1
                     .CellColor(lRow, lCol) = SystemColors.ControlLight
                 Next
             Next
@@ -178,7 +178,7 @@ Public Class frmXSect
                 .CellEditable(lRow, 2) = True
             Next
 
-            .CellColor(0, 2) = SystemColors.ControlLight
+            agdXSect.Source.FixedRows = 1
 
         End With
         agdXSect.Refresh()
