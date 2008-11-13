@@ -43,7 +43,7 @@ Partial Class frmTime
         Me.Label1 = New System.Windows.Forms.Label
         Me.agdMet = New atcControls.atcGrid
         Me.Cancel = New System.Windows.Forms.Button
-        Me.Button2 = New System.Windows.Forms.Button
+        Me.cmdOK = New System.Windows.Forms.Button
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -428,15 +428,15 @@ Partial Class frmTime
         Me.Cancel.Text = "&Cancel"
         Me.Cancel.UseVisualStyleBackColor = True
         '
-        'Button2
+        'cmdOK
         '
-        Me.Button2.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button2.Location = New System.Drawing.Point(129, 471)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(76, 25)
-        Me.Button2.TabIndex = 5
-        Me.Button2.Text = "&OK"
-        Me.Button2.UseVisualStyleBackColor = True
+        Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdOK.Location = New System.Drawing.Point(129, 471)
+        Me.cmdOK.Name = "cmdOK"
+        Me.cmdOK.Size = New System.Drawing.Size(76, 25)
+        Me.cmdOK.TabIndex = 5
+        Me.cmdOK.Text = "&OK"
+        Me.cmdOK.UseVisualStyleBackColor = True
         '
         'frmTime
         '
@@ -445,7 +445,7 @@ Partial Class frmTime
         Me.ClientSize = New System.Drawing.Size(422, 508)
         Me.Controls.Add(Me.Cancel)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.Button2)
+        Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.txtEndMinute)
         Me.Controls.Add(Me.txtStartMinute)
         Me.Controls.Add(Me.txtEndHour)
@@ -495,5 +495,5 @@ Partial Class frmTime
     Friend WithEvents cmdEdit As System.Windows.Forms.Button
     Friend WithEvents cmdApply As System.Windows.Forms.Button
     Friend WithEvents Cancel As System.Windows.Forms.Button
-    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents cmdOK As System.Windows.Forms.Button
 End Class
