@@ -182,7 +182,7 @@ FoundMatch:
             aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
         End If
 
-        If Not aCommonScenario Is Nothing AndAlso aCommonScenario.Length > 0 _
+        If aCommonScenario IsNot Nothing AndAlso aCommonScenario.Length > 0 _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonScenario) Then
             If aCommonConstituent.Length > 0 Then
                 aPane.YAxis.Title.Text &= " " & aCommonScenario
@@ -191,18 +191,18 @@ FoundMatch:
             End If
         End If
 
-        If Not aCommonConstituent Is Nothing AndAlso aCommonConstituent.Length > 0 _
+        If aCommonConstituent IsNot Nothing AndAlso aCommonConstituent.Length > 0 _
            AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonConstituent) Then
             aPane.YAxis.Title.Text &= " " & aCommonConstituent
         End If
 
-        If Not aCommonLocation Is Nothing AndAlso aCommonLocation.Length > 0 _
+        If aCommonLocation IsNot Nothing AndAlso aCommonLocation.Length > 0 _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonLocation) Then
             If aPane.XAxis.Title.Text.Length > 0 Then aPane.XAxis.Title.Text &= " at "
             aPane.XAxis.Title.Text &= aCommonLocation
         End If
 
-        If Not aCommonUnits Is Nothing AndAlso aCommonUnits.Length > 0 _
+        If aCommonUnits IsNot Nothing AndAlso aCommonUnits.Length > 0 _
            AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonUnits) Then
             If aPane.YAxis.Title.Text.Length > 0 Then
                 aPane.YAxis.Title.Text &= " (" & aCommonUnits & ")"
