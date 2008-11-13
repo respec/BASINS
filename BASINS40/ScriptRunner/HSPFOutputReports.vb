@@ -232,7 +232,7 @@ Module HSPFOutputReports
                         lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
                         SaveFileString(lOutFileName, lStr)
 
-                        Dim lTimeSeries As New atcCollection
+                        Dim lTimeSeries As New atcDataGroup
                         lTimeSeries.Add("Observed", lObsTSer)
                         lTimeSeries.Add("Simulated", lSimTSer)
                         lTimeSeries.Add("Precipitation", lPrecTSer)
@@ -247,6 +247,13 @@ Module HSPFOutputReports
                                  lCons, lSiteName, _
                                  lTimeSeries, _
                                  pGraphSaveFormat, pGraphAnnual)
+                        lTimeSeries.Clear()
+                        lTimeSeries.Add("Observed", lWdmDataSource.DataSets.ItemByKey(5))
+                        lTimeSeries.Add("Simulated", lWdmDataSource.DataSets.ItemByKey(1109))
+                        lTimeSeries.Add("Prec", lWdmDataSource.DataSets.ItemByKey(1010))
+                        lTimeSeries(0).Attributes.SetValue("Units", "cfs")
+                        lTimeSeries(1).Attributes.SetValue("Units", "cfs")
+                        GraphStorms(lTimeSeries, 2, "outfiles\Storm", pGraphSaveFormat, lExpertSystem)
                         lTimeSeries.Dispose()
                     Next
 

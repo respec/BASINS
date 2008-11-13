@@ -11,7 +11,7 @@ Public Module Graph
     '                   "Baseflow", "Interflow", "Surface"
     Public Sub GraphAll(ByVal aSDateJ As Double, ByVal aEDateJ As Double, _
                         ByVal aCons As String, ByVal aSite As String, _
-                        ByVal aTimeSeries As atcCollection, _
+                        ByVal aTimeSeries As atcDataGroup, _
                         ByVal aGraphSaveFormat As String, ByVal aGraphAnnual As Boolean)
         Dim lDataGroup As New atcDataGroup
         lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"), _
@@ -63,14 +63,14 @@ Public Module Graph
         lGraphScatter.Dispose()
         lZgc.Dispose()
 
-        If aTimeSeries.IndexFromKey("LZS") > -1 Then 'scatter - LZS vs Error(cfs)
+        If aTimeSeries.Keys.Contains("LZS") Then 'scatter - LZS vs Error(cfs)
             lZgc = CreateZgc()
             If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("LZS"), "LZS (in)") Then
                 lZgc.SaveIn(lOutFileBase & "_Error_LZS" & aGraphSaveFormat)
             End If
         End If
 
-        If aTimeSeries.IndexFromKey("UZS") > -1 Then 'scatter - UZS vs Error(cfs)
+        If aTimeSeries.Keys.Contains("UZS") Then 'scatter - UZS vs Error(cfs)
             lZgc = CreateZgc()
             If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("UZS"), "UZS (in)") Then
                 lZgc.SaveIn(lOutFileBase & "_Error_UZS" & aGraphSaveFormat)
@@ -86,7 +86,7 @@ Public Module Graph
         'add precip to aux axis
         Dim lPaneCount As Integer = 1
         Dim lPrecTser As atcTimeseries = Nothing
-        If aTimeSeries.IndexFromKey("Precipitation") > -1 Then
+        If aTimeSeries.Keys.Contains("Precipitation") Then
             lPrecTser = aTimeSeries.ItemByKey("Precipitation")
             lPrecTser.Attributes.SetValue("YAxis", "Aux")
             lDataGroup.Add(SubsetByDate(lPrecTser, _
@@ -136,13 +136,13 @@ Public Module Graph
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
-        lZgc.SaveIn(lOutFileBase & "_month_log " & aGraphSaveFormat)
+        lZgc.SaveIn(lOutFileBase & "_month_log" & aGraphSaveFormat)
         lZgc.Dispose()
         lGrapher.Dispose()
 
         Dim lKeys As New Collection
-        If aTimeSeries.IndexFromKey("PotET") > -1 AndAlso _
-           aTimeSeries.IndexFromKey("PotET") Then
+        If aTimeSeries.Keys.Contains("PotET") AndAlso _
+           aTimeSeries.Keys.Contains("ActET") Then
             'weekly ET - pet vs act
             lDataGroup.Clear()
             lKeys.Add("PotET")
@@ -169,9 +169,9 @@ Public Module Graph
             lKeys.Clear()
         End If
 
-        If aTimeSeries.IndexFromKey("Baseflow") > -1 AndAlso _
-           aTimeSeries.IndexFromKey("Interflow") > -1 AndAlso _
-           aTimeSeries.IndexFromKey("Surface") > -1 Then
+        If aTimeSeries.Keys.Contains("Baseflow") AndAlso _
+           aTimeSeries.Keys.Contains("Interflow") AndAlso _
+           aTimeSeries.Keys.Contains("Surface") Then
             'flow components
             lDataGroup.Clear()
             lKeys.Add("Baseflow")
@@ -214,7 +214,7 @@ Public Module Graph
             Next
             Dim lDate(6) As Integer
             J2Date(lStorm.SDateJ, lDate)
-            GraphTimeseries(lDataGroupStorm, aPaneCount, aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2) & "_" & lDate(3), aGraphSaveFormat)
+            GraphTimeseries(lDataGroupStorm, aPaneCount, aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2), aGraphSaveFormat)
         Next
     End Sub
 
@@ -223,10 +223,13 @@ Public Module Graph
                                 ByVal aOutFileBase As String, _
                                 ByVal aGraphSaveFormat As String)
         'timeseries - arith
-        Dim lZgc As ZedGraphControl
-        lZgc = CreateZgc()
+        Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
-        If aPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+        If aPaneCount = 2 Then
+            EnableAuxAxis(lZgc.MasterPane, True, 0.2)
+            lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+            lZgc.MasterPane.PaneList(1).YAxis.Title.Text = "Flow (cfs)"
+        End If
         lZgc.SaveIn(aOutFileBase & aGraphSaveFormat)
         'timeseries - log
         With lZgc.MasterPane.PaneList(aPaneCount - 1)
@@ -236,7 +239,7 @@ Public Module Graph
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
-        lZgc.SaveIn(aOutFileBase & "_log " & aGraphSaveFormat)
+        lZgc.SaveIn(aOutFileBase & "_log" & aGraphSaveFormat)
         lGrapher.Dispose()
         lZgc.Dispose()
     End Sub
@@ -314,7 +317,7 @@ Public Module Graph
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
-        lZgc.SaveIn(aOutFileBase & "_Components_month_log " & aGraphSaveFormat)
+        lZgc.SaveIn(aOutFileBase & "_Components_month_log" & aGraphSaveFormat)
         lZgc.Dispose()
         lGrapher.Dispose()
     End Sub
