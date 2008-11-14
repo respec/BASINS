@@ -16,6 +16,8 @@ Module HSPFOutputReports
     Private pBaseName As String
     Private pOutputLocations As New atcCollection
     Private pGraphSaveFormat As String
+    Private pGraphSaveWidth As Integer
+    Private pGraphSaveHeight As Integer
     Private pGraphAnnual As Boolean = False
     Private pCurveStepType As String = "RearwardStep"
     Private pSummaryTypes As New atcCollection
@@ -25,8 +27,10 @@ Module HSPFOutputReports
     Private Sub Initialize()
         pOutputLocations.Clear()
 
-        pGraphSaveFormat = ".png"
-        'pGraphSaveFormat = ".emf"
+        'pGraphSaveFormat = ".png"
+        pGraphSaveFormat = ".emf"
+        pGraphSaveWidth = 1024
+        pGraphSaveHeight = 768
 
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
@@ -246,14 +250,17 @@ Module HSPFOutputReports
                         GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ, _
                                  lCons, lSiteName, _
                                  lTimeSeries, _
-                                 pGraphSaveFormat, pGraphAnnual)
+                                 pGraphSaveFormat, _
+                                 pGraphSaveWidth, _
+                                 pGraphSaveHeight, _
+                                 pGraphAnnual)
                         lTimeSeries.Clear()
                         lTimeSeries.Add("Observed", lWdmDataSource.DataSets.ItemByKey(5))
                         lTimeSeries.Add("Simulated", lWdmDataSource.DataSets.ItemByKey(1109))
                         lTimeSeries.Add("Prec", lWdmDataSource.DataSets.ItemByKey(1010))
                         lTimeSeries(0).Attributes.SetValue("Units", "cfs")
                         lTimeSeries(1).Attributes.SetValue("Units", "cfs")
-                        GraphStorms(lTimeSeries, 2, "outfiles\Storm", pGraphSaveFormat, lExpertSystem)
+                        GraphStorms(lTimeSeries, 2, "outfiles\Storm", pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem)
                         lTimeSeries.Dispose()
                     Next
 
