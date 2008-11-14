@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On
 
 Imports MapWinUtility
+Imports System.Windows.Forms
 'Imports atcUCI
 
 Public Class UCIForms
@@ -120,8 +121,10 @@ Public Class UCIForms
         End Select
 
         If Not lForm Is Nothing Then
+
             lForm.Icon = aParent.Icon
-            lForm.ShowDialog()
+            lForm.Show()
+
         End If
     End Function
 End Class

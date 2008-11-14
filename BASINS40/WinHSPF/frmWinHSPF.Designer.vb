@@ -51,20 +51,20 @@ Partial Class frmWinHSPF
         Me.toolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         Me.HelpToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
-        Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton
+        Me.cmdReach = New System.Windows.Forms.ToolStripButton
         Me.cmdTime = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripButton5 = New System.Windows.Forms.ToolStripButton
+        Me.cmdLandUse = New System.Windows.Forms.ToolStripButton
         Me.cmdControl = New System.Windows.Forms.ToolStripDropDownButton
         Me.EditControlCardsWithToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.EditControlCardsWithTablesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.EditWithToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripButton6 = New System.Windows.Forms.ToolStripButton
+        Me.cmdPollutant = New System.Windows.Forms.ToolStripButton
         Me.cmdPoint = New System.Windows.Forms.ToolStripButton
         Me.cmdToolStripInputEditor = New System.Windows.Forms.ToolStripButton
         Me.cmdToolStripOutput = New System.Windows.Forms.ToolStripButton
-        Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton
         Me.ToolStripButton10 = New System.Windows.Forms.ToolStripButton
+        Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton
         Me.ToolStripContainer = New System.Windows.Forms.ToolStripContainer
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
@@ -278,21 +278,21 @@ Partial Class frmWinHSPF
         '
         Me.ToolStrip1.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.None
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.cmdTime, Me.ToolStripButton5, Me.cmdControl, Me.ToolStripButton6, Me.cmdPoint, Me.cmdToolStripInputEditor, Me.cmdToolStripOutput, Me.ToolStripButton10, Me.cmdRunHSPF})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.cmdReach, Me.cmdTime, Me.cmdLandUse, Me.cmdControl, Me.cmdPollutant, Me.cmdPoint, Me.cmdToolStripInputEditor, Me.cmdToolStripOutput, Me.ToolStripButton10, Me.cmdRunHSPF})
         Me.ToolStrip1.Location = New System.Drawing.Point(134, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(248, 27)
+        Me.ToolStrip1.Size = New System.Drawing.Size(279, 27)
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '
-        'ToolStripButton3
+        'cmdReach
         '
-        Me.ToolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
-        Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton3.Name = "ToolStripButton3"
-        Me.ToolStripButton3.Size = New System.Drawing.Size(23, 24)
-        Me.ToolStripButton3.Text = "ToolStripButton3"
+        Me.cmdReach.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.cmdReach.Image = CType(resources.GetObject("cmdReach.Image"), System.Drawing.Image)
+        Me.cmdReach.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.cmdReach.Name = "cmdReach"
+        Me.cmdReach.Size = New System.Drawing.Size(23, 24)
+        Me.cmdReach.Text = "Reach Editor"
         '
         'cmdTime
         '
@@ -304,14 +304,14 @@ Partial Class frmWinHSPF
         Me.cmdTime.Size = New System.Drawing.Size(25, 24)
         Me.cmdTime.Text = "Simulation Time and Meteorologic Data"
         '
-        'ToolStripButton5
+        'cmdLandUse
         '
-        Me.ToolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton5.Image = CType(resources.GetObject("ToolStripButton5.Image"), System.Drawing.Image)
-        Me.ToolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton5.Name = "ToolStripButton5"
-        Me.ToolStripButton5.Size = New System.Drawing.Size(23, 24)
-        Me.ToolStripButton5.Text = "ToolStripButton5"
+        Me.cmdLandUse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.cmdLandUse.Image = CType(resources.GetObject("cmdLandUse.Image"), System.Drawing.Image)
+        Me.cmdLandUse.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.cmdLandUse.Name = "cmdLandUse"
+        Me.cmdLandUse.Size = New System.Drawing.Size(23, 24)
+        Me.cmdLandUse.Text = "Land Use Editor"
         '
         'cmdControl
         '
@@ -348,14 +348,14 @@ Partial Class frmWinHSPF
         Me.EditWithToolStripMenuItem.Size = New System.Drawing.Size(201, 22)
         Me.EditWithToolStripMenuItem.Text = "Descriptions"
         '
-        'ToolStripButton6
+        'cmdPollutant
         '
-        Me.ToolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton6.Image = CType(resources.GetObject("ToolStripButton6.Image"), System.Drawing.Image)
-        Me.ToolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton6.Name = "ToolStripButton6"
-        Me.ToolStripButton6.Size = New System.Drawing.Size(23, 24)
-        Me.ToolStripButton6.Text = "ToolStripButton6"
+        Me.cmdPollutant.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.cmdPollutant.Image = CType(resources.GetObject("cmdPollutant.Image"), System.Drawing.Image)
+        Me.cmdPollutant.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.cmdPollutant.Name = "cmdPollutant"
+        Me.cmdPollutant.Size = New System.Drawing.Size(23, 24)
+        Me.cmdPollutant.Text = "Pollutant Selection"
         '
         'cmdPoint
         '
@@ -385,15 +385,6 @@ Partial Class frmWinHSPF
         Me.cmdToolStripOutput.Text = "Output"
         Me.cmdToolStripOutput.ToolTipText = "Output"
         '
-        'cmdRunHSPF
-        '
-        Me.cmdRunHSPF.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.cmdRunHSPF.Image = CType(resources.GetObject("cmdRunHSPF.Image"), System.Drawing.Image)
-        Me.cmdRunHSPF.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.cmdRunHSPF.Name = "cmdRunHSPF"
-        Me.cmdRunHSPF.Size = New System.Drawing.Size(23, 24)
-        Me.cmdRunHSPF.Text = "Run HSPF"
-        '
         'ToolStripButton10
         '
         Me.ToolStripButton10.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
@@ -402,6 +393,15 @@ Partial Class frmWinHSPF
         Me.ToolStripButton10.Name = "ToolStripButton10"
         Me.ToolStripButton10.Size = New System.Drawing.Size(23, 24)
         Me.ToolStripButton10.Text = "ToolStripButton10"
+        '
+        'cmdRunHSPF
+        '
+        Me.cmdRunHSPF.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.cmdRunHSPF.Image = CType(resources.GetObject("cmdRunHSPF.Image"), System.Drawing.Image)
+        Me.cmdRunHSPF.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.cmdRunHSPF.Name = "cmdRunHSPF"
+        Me.cmdRunHSPF.Size = New System.Drawing.Size(23, 24)
+        Me.cmdRunHSPF.Text = "Run HSPF"
         '
         'ToolStripContainer
         '
@@ -467,15 +467,15 @@ Partial Class frmWinHSPF
     Friend WithEvents toolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents HelpToolStripButton As System.Windows.Forms.ToolStripButton
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
-    Friend WithEvents ToolStripButton3 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents cmdReach As System.Windows.Forms.ToolStripButton
     Friend WithEvents cmdTime As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripButton5 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents cmdLandUse As System.Windows.Forms.ToolStripButton
     Friend WithEvents cmdControl As System.Windows.Forms.ToolStripDropDownButton
     Friend WithEvents EditControlCardsWithToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents EditControlCardsWithTablesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents EditWithToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ToolStripButton6 As System.Windows.Forms.ToolStripButton
+    Friend WithEvents cmdPollutant As System.Windows.Forms.ToolStripButton
     Friend WithEvents cmdPoint As System.Windows.Forms.ToolStripButton
     Friend WithEvents cmdToolStripInputEditor As System.Windows.Forms.ToolStripButton
     Friend WithEvents cmdToolStripOutput As System.Windows.Forms.ToolStripButton

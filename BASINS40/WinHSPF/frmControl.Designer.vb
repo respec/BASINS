@@ -21,6 +21,7 @@ Partial Class frmControl
     Private Sub InitializeComponent()
         Me.SSTabPIR = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.txtNoPERLND = New System.Windows.Forms.Label
         Me.CheckBox12 = New System.Windows.Forms.CheckBox
         Me.CheckBox11 = New System.Windows.Forms.CheckBox
         Me.CheckBox10 = New System.Windows.Forms.CheckBox
@@ -34,6 +35,7 @@ Partial Class frmControl
         Me.CheckBox2 = New System.Windows.Forms.CheckBox
         Me.CheckBox1 = New System.Windows.Forms.CheckBox
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.txtNoIMPLND = New System.Windows.Forms.Label
         Me.CheckBox18 = New System.Windows.Forms.CheckBox
         Me.CheckBox17 = New System.Windows.Forms.CheckBox
         Me.CheckBox16 = New System.Windows.Forms.CheckBox
@@ -41,17 +43,18 @@ Partial Class frmControl
         Me.CheckBox14 = New System.Windows.Forms.CheckBox
         Me.CheckBox13 = New System.Windows.Forms.CheckBox
         Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.txtNoRCHRES = New System.Windows.Forms.Label
         Me.CheckBox19 = New System.Windows.Forms.CheckBox
-        Me.CheckBox20 = New System.Windows.Forms.CheckBox
-        Me.CheckBox21 = New System.Windows.Forms.CheckBox
-        Me.CheckBox22 = New System.Windows.Forms.CheckBox
-        Me.CheckBox23 = New System.Windows.Forms.CheckBox
-        Me.CheckBox24 = New System.Windows.Forms.CheckBox
-        Me.CheckBox25 = New System.Windows.Forms.CheckBox
-        Me.CheckBox26 = New System.Windows.Forms.CheckBox
         Me.CheckBox27 = New System.Windows.Forms.CheckBox
-        Me.CheckBox29 = New System.Windows.Forms.CheckBox
-        Me.CheckBox30 = New System.Windows.Forms.CheckBox
+        Me.CheckBox26 = New System.Windows.Forms.CheckBox
+        Me.CheckBox22x = New System.Windows.Forms.CheckBox
+        Me.CheckBox24 = New System.Windows.Forms.CheckBox
+        Me.CheckBox23 = New System.Windows.Forms.CheckBox
+        Me.CheckBox21 = New System.Windows.Forms.CheckBox
+        Me.CheckBox20 = New System.Windows.Forms.CheckBox
+        Me.CheckBox25 = New System.Windows.Forms.CheckBox
+        Me.CheckBox22 = New System.Windows.Forms.CheckBox
+        Me.CheckBox28 = New System.Windows.Forms.CheckBox
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.SSTabPIR.SuspendLayout()
@@ -75,6 +78,7 @@ Partial Class frmControl
         '
         'TabPage1
         '
+        Me.TabPage1.Controls.Add(Me.txtNoPERLND)
         Me.TabPage1.Controls.Add(Me.CheckBox12)
         Me.TabPage1.Controls.Add(Me.CheckBox11)
         Me.TabPage1.Controls.Add(Me.CheckBox10)
@@ -95,6 +99,17 @@ Partial Class frmControl
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Pervious Land"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'txtNoPERLND
+        '
+        Me.txtNoPERLND.AutoSize = True
+        Me.txtNoPERLND.Enabled = False
+        Me.txtNoPERLND.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtNoPERLND.Location = New System.Drawing.Point(200, 156)
+        Me.txtNoPERLND.Name = "txtNoPERLND"
+        Me.txtNoPERLND.Size = New System.Drawing.Size(150, 13)
+        Me.txtNoPERLND.TabIndex = 12
+        Me.txtNoPERLND.Text = "<NO PERLND Entries Found>"
         '
         'CheckBox12
         '
@@ -218,6 +233,7 @@ Partial Class frmControl
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.txtNoIMPLND)
         Me.TabPage2.Controls.Add(Me.CheckBox18)
         Me.TabPage2.Controls.Add(Me.CheckBox17)
         Me.TabPage2.Controls.Add(Me.CheckBox16)
@@ -231,6 +247,17 @@ Partial Class frmControl
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Impervious Land"
         Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'txtNoIMPLND
+        '
+        Me.txtNoIMPLND.AutoSize = True
+        Me.txtNoIMPLND.Enabled = False
+        Me.txtNoIMPLND.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtNoIMPLND.Location = New System.Drawing.Point(200, 156)
+        Me.txtNoIMPLND.Name = "txtNoIMPLND"
+        Me.txtNoIMPLND.Size = New System.Drawing.Size(147, 13)
+        Me.txtNoIMPLND.TabIndex = 13
+        Me.txtNoIMPLND.Text = "<NO IMPLND Entries Found>"
         '
         'CheckBox18
         '
@@ -294,17 +321,18 @@ Partial Class frmControl
         '
         'TabPage3
         '
+        Me.TabPage3.Controls.Add(Me.txtNoRCHRES)
         Me.TabPage3.Controls.Add(Me.CheckBox19)
-        Me.TabPage3.Controls.Add(Me.CheckBox20)
-        Me.TabPage3.Controls.Add(Me.CheckBox21)
-        Me.TabPage3.Controls.Add(Me.CheckBox22)
-        Me.TabPage3.Controls.Add(Me.CheckBox23)
-        Me.TabPage3.Controls.Add(Me.CheckBox24)
-        Me.TabPage3.Controls.Add(Me.CheckBox25)
-        Me.TabPage3.Controls.Add(Me.CheckBox26)
         Me.TabPage3.Controls.Add(Me.CheckBox27)
-        Me.TabPage3.Controls.Add(Me.CheckBox29)
-        Me.TabPage3.Controls.Add(Me.CheckBox30)
+        Me.TabPage3.Controls.Add(Me.CheckBox26)
+        Me.TabPage3.Controls.Add(Me.CheckBox22x)
+        Me.TabPage3.Controls.Add(Me.CheckBox24)
+        Me.TabPage3.Controls.Add(Me.CheckBox23)
+        Me.TabPage3.Controls.Add(Me.CheckBox21)
+        Me.TabPage3.Controls.Add(Me.CheckBox20)
+        Me.TabPage3.Controls.Add(Me.CheckBox25)
+        Me.TabPage3.Controls.Add(Me.CheckBox22)
+        Me.TabPage3.Controls.Add(Me.CheckBox28)
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
@@ -312,6 +340,17 @@ Partial Class frmControl
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Reaches/Reservoirs"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'txtNoRCHRES
+        '
+        Me.txtNoRCHRES.AutoSize = True
+        Me.txtNoRCHRES.Enabled = False
+        Me.txtNoRCHRES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtNoRCHRES.Location = New System.Drawing.Point(200, 156)
+        Me.txtNoRCHRES.Name = "txtNoRCHRES"
+        Me.txtNoRCHRES.Size = New System.Drawing.Size(151, 13)
+        Me.txtNoRCHRES.TabIndex = 24
+        Me.txtNoRCHRES.Text = "<NO RCHRES Entries Found>"
         '
         'CheckBox19
         '
@@ -323,105 +362,105 @@ Partial Class frmControl
         Me.CheckBox19.Text = "HYDR - Hydraulic Behavior"
         Me.CheckBox19.UseVisualStyleBackColor = True
         '
-        'CheckBox20
+        'CheckBox27
         '
-        Me.CheckBox20.AutoSize = True
-        Me.CheckBox20.Location = New System.Drawing.Point(20, 210)
-        Me.CheckBox20.Name = "CheckBox20"
-        Me.CheckBox20.Size = New System.Drawing.Size(297, 17)
-        Me.CheckBox20.TabIndex = 22
-        Me.CheckBox20.Text = "PLANK - Plankton Populations and Associated Reactions"
-        Me.CheckBox20.UseVisualStyleBackColor = True
-        '
-        'CheckBox21
-        '
-        Me.CheckBox21.AutoSize = True
-        Me.CheckBox21.Location = New System.Drawing.Point(20, 186)
-        Me.CheckBox21.Name = "CheckBox21"
-        Me.CheckBox21.Size = New System.Drawing.Size(324, 17)
-        Me.CheckBox21.TabIndex = 21
-        Me.CheckBox21.Text = "NUTRX - Primary Inorganic Nitrogen and Phosphorus Balances"
-        Me.CheckBox21.UseVisualStyleBackColor = True
-        '
-        'CheckBox22
-        '
-        Me.CheckBox22.AutoSize = True
-        Me.CheckBox22.Location = New System.Drawing.Point(20, 186)
-        Me.CheckBox22.Name = "CheckBox22"
-        Me.CheckBox22.Size = New System.Drawing.Size(151, 17)
-        Me.CheckBox22.TabIndex = 20
-        Me.CheckBox22.Text = "PEST - Pesticide Behavior"
-        Me.CheckBox22.UseVisualStyleBackColor = True
-        '
-        'CheckBox23
-        '
-        Me.CheckBox23.AutoSize = True
-        Me.CheckBox23.Location = New System.Drawing.Point(20, 138)
-        Me.CheckBox23.Name = "CheckBox23"
-        Me.CheckBox23.Size = New System.Drawing.Size(224, 17)
-        Me.CheckBox23.TabIndex = 19
-        Me.CheckBox23.Text = "GQUAL - Generalized Quality Constituents"
-        Me.CheckBox23.UseVisualStyleBackColor = True
-        '
-        'CheckBox24
-        '
-        Me.CheckBox24.AutoSize = True
-        Me.CheckBox24.Location = New System.Drawing.Point(20, 114)
-        Me.CheckBox24.Name = "CheckBox24"
-        Me.CheckBox24.Size = New System.Drawing.Size(228, 17)
-        Me.CheckBox24.TabIndex = 18
-        Me.CheckBox24.Text = "SEDTRN - Behavior of Inorganic Sediment"
-        Me.CheckBox24.UseVisualStyleBackColor = True
-        '
-        'CheckBox25
-        '
-        Me.CheckBox25.AutoSize = True
-        Me.CheckBox25.Location = New System.Drawing.Point(20, 66)
-        Me.CheckBox25.Name = "CheckBox25"
-        Me.CheckBox25.Size = New System.Drawing.Size(188, 17)
-        Me.CheckBox25.TabIndex = 17
-        Me.CheckBox25.Text = "CONS - Conservative Constituents"
-        Me.CheckBox25.UseVisualStyleBackColor = True
+        Me.CheckBox27.AutoSize = True
+        Me.CheckBox27.Location = New System.Drawing.Point(20, 210)
+        Me.CheckBox27.Name = "CheckBox27"
+        Me.CheckBox27.Size = New System.Drawing.Size(297, 17)
+        Me.CheckBox27.TabIndex = 22
+        Me.CheckBox27.Text = "PLANK - Plankton Populations and Associated Reactions"
+        Me.CheckBox27.UseVisualStyleBackColor = True
         '
         'CheckBox26
         '
         Me.CheckBox26.AutoSize = True
-        Me.CheckBox26.Location = New System.Drawing.Point(20, 42)
+        Me.CheckBox26.Location = New System.Drawing.Point(20, 186)
         Me.CheckBox26.Name = "CheckBox26"
-        Me.CheckBox26.Size = New System.Drawing.Size(270, 17)
-        Me.CheckBox26.TabIndex = 16
-        Me.CheckBox26.Text = "ADCALC - Advection of Fully Entrained Constituents"
+        Me.CheckBox26.Size = New System.Drawing.Size(324, 17)
+        Me.CheckBox26.TabIndex = 21
+        Me.CheckBox26.Text = "NUTRX - Primary Inorganic Nitrogen and Phosphorus Balances"
         Me.CheckBox26.UseVisualStyleBackColor = True
         '
-        'CheckBox27
+        'CheckBox22x
         '
-        Me.CheckBox27.AutoSize = True
-        Me.CheckBox27.Location = New System.Drawing.Point(20, 162)
-        Me.CheckBox27.Name = "CheckBox27"
-        Me.CheckBox27.Size = New System.Drawing.Size(212, 17)
-        Me.CheckBox27.TabIndex = 15
-        Me.CheckBox27.Text = "OXRX - Primary DO and BOD Balances"
-        Me.CheckBox27.UseVisualStyleBackColor = True
+        Me.CheckBox22x.AutoSize = True
+        Me.CheckBox22x.Location = New System.Drawing.Point(20, 186)
+        Me.CheckBox22x.Name = "CheckBox22x"
+        Me.CheckBox22x.Size = New System.Drawing.Size(151, 17)
+        Me.CheckBox22x.TabIndex = 20
+        Me.CheckBox22x.Text = "PEST - Pesticide Behavior"
+        Me.CheckBox22x.UseVisualStyleBackColor = True
         '
-        'CheckBox29
+        'CheckBox24
         '
-        Me.CheckBox29.AutoSize = True
-        Me.CheckBox29.Location = New System.Drawing.Point(20, 90)
-        Me.CheckBox29.Name = "CheckBox29"
-        Me.CheckBox29.Size = New System.Drawing.Size(263, 17)
-        Me.CheckBox29.TabIndex = 13
-        Me.CheckBox29.Text = "HTRCH - Heat Exchange and Water Temperature"
-        Me.CheckBox29.UseVisualStyleBackColor = True
+        Me.CheckBox24.AutoSize = True
+        Me.CheckBox24.Location = New System.Drawing.Point(20, 138)
+        Me.CheckBox24.Name = "CheckBox24"
+        Me.CheckBox24.Size = New System.Drawing.Size(224, 17)
+        Me.CheckBox24.TabIndex = 19
+        Me.CheckBox24.Text = "GQUAL - Generalized Quality Constituents"
+        Me.CheckBox24.UseVisualStyleBackColor = True
         '
-        'CheckBox30
+        'CheckBox23
         '
-        Me.CheckBox30.AutoSize = True
-        Me.CheckBox30.Location = New System.Drawing.Point(20, 234)
-        Me.CheckBox30.Name = "CheckBox30"
-        Me.CheckBox30.Size = New System.Drawing.Size(350, 17)
-        Me.CheckBox30.TabIndex = 12
-        Me.CheckBox30.Text = "PHCARB - pH, Carbon Dioxide, Total Inorganic Carbon and Alkalinity"
-        Me.CheckBox30.UseVisualStyleBackColor = True
+        Me.CheckBox23.AutoSize = True
+        Me.CheckBox23.Location = New System.Drawing.Point(20, 114)
+        Me.CheckBox23.Name = "CheckBox23"
+        Me.CheckBox23.Size = New System.Drawing.Size(228, 17)
+        Me.CheckBox23.TabIndex = 18
+        Me.CheckBox23.Text = "SEDTRN - Behavior of Inorganic Sediment"
+        Me.CheckBox23.UseVisualStyleBackColor = True
+        '
+        'CheckBox21
+        '
+        Me.CheckBox21.AutoSize = True
+        Me.CheckBox21.Location = New System.Drawing.Point(20, 66)
+        Me.CheckBox21.Name = "CheckBox21"
+        Me.CheckBox21.Size = New System.Drawing.Size(188, 17)
+        Me.CheckBox21.TabIndex = 17
+        Me.CheckBox21.Text = "CONS - Conservative Constituents"
+        Me.CheckBox21.UseVisualStyleBackColor = True
+        '
+        'CheckBox20
+        '
+        Me.CheckBox20.AutoSize = True
+        Me.CheckBox20.Location = New System.Drawing.Point(20, 42)
+        Me.CheckBox20.Name = "CheckBox20"
+        Me.CheckBox20.Size = New System.Drawing.Size(270, 17)
+        Me.CheckBox20.TabIndex = 16
+        Me.CheckBox20.Text = "ADCALC - Advection of Fully Entrained Constituents"
+        Me.CheckBox20.UseVisualStyleBackColor = True
+        '
+        'CheckBox25
+        '
+        Me.CheckBox25.AutoSize = True
+        Me.CheckBox25.Location = New System.Drawing.Point(20, 162)
+        Me.CheckBox25.Name = "CheckBox25"
+        Me.CheckBox25.Size = New System.Drawing.Size(212, 17)
+        Me.CheckBox25.TabIndex = 15
+        Me.CheckBox25.Text = "OXRX - Primary DO and BOD Balances"
+        Me.CheckBox25.UseVisualStyleBackColor = True
+        '
+        'CheckBox22
+        '
+        Me.CheckBox22.AutoSize = True
+        Me.CheckBox22.Location = New System.Drawing.Point(20, 90)
+        Me.CheckBox22.Name = "CheckBox22"
+        Me.CheckBox22.Size = New System.Drawing.Size(263, 17)
+        Me.CheckBox22.TabIndex = 13
+        Me.CheckBox22.Text = "HTRCH - Heat Exchange and Water Temperature"
+        Me.CheckBox22.UseVisualStyleBackColor = True
+        '
+        'CheckBox28
+        '
+        Me.CheckBox28.AutoSize = True
+        Me.CheckBox28.Location = New System.Drawing.Point(20, 234)
+        Me.CheckBox28.Name = "CheckBox28"
+        Me.CheckBox28.Size = New System.Drawing.Size(350, 17)
+        Me.CheckBox28.TabIndex = 12
+        Me.CheckBox28.Text = "PHCARB - pH, Carbon Dioxide, Total Inorganic Carbon and Alkalinity"
+        Me.CheckBox28.UseVisualStyleBackColor = True
         '
         'cmdCancel
         '
@@ -486,16 +525,19 @@ Partial Class frmControl
     Friend WithEvents CheckBox14 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox13 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox19 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox20 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox21 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox22 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox23 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox24 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox25 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox26 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox27 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox29 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox30 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox26 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox22x As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox24 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox23 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox21 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox20 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox25 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox22 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox28 As System.Windows.Forms.CheckBox
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
+    Friend WithEvents txtNoPERLND As System.Windows.Forms.Label
+    Friend WithEvents txtNoIMPLND As System.Windows.Forms.Label
+    Friend WithEvents txtNoRCHRES As System.Windows.Forms.Label
 End Class
