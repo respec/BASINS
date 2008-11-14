@@ -963,9 +963,9 @@ namespace ZedGraph
 		/// </summary>
 		public bool IsExponent { get { return this is ExponentScale; } }
 		/// <summary>
-		/// True if this scale is <see cref="AxisType.Date" />, false otherwise.
+        /// True if this scale is <see cref="AxisType.Date" /> or <see cref="AxisType.DateDual" />, false otherwise.
 		/// </summary>
-		public bool IsDate { get { return this is DateScale; } }
+		public bool IsDate { get { return this is DateScale || this is DateDualScale; } }
 		/// <summary>
 		/// True if this scale is <see cref="AxisType.Text" />, false otherwise.
 		/// </summary>

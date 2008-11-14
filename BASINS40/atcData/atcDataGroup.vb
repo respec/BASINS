@@ -81,7 +81,7 @@ Public Class atcDataGroup
     ''' <summary>Add an <see cref="atcData.atcDataSet">atcDataSet</see> 
     ''' to the group with the default key of its serial number </summary>
     Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer
-        Add(aDataSet.Serial, aDataSet)
+        If aDataSet IsNot Nothing Then Add(aDataSet.Serial, aDataSet)
     End Function
 
     ''' <summary>Add a dataset to the group with the key specified</summary>

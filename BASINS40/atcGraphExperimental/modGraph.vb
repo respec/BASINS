@@ -560,6 +560,7 @@ FoundMatch:
                 .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
                 .IsHStack = False
                 .Border.IsVisible = False
+                .Fill.IsVisible = False
             End With
             .Border.IsVisible = False
         End With
