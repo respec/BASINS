@@ -65,14 +65,14 @@ Partial Class frmControl
         '
         'SSTabPIR
         '
-        Me.SSTabPIR.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.SSTabPIR.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.SSTabPIR.Controls.Add(Me.TabPage1)
         Me.SSTabPIR.Controls.Add(Me.TabPage2)
         Me.SSTabPIR.Controls.Add(Me.TabPage3)
-        Me.SSTabPIR.Location = New System.Drawing.Point(7, 12)
+        Me.SSTabPIR.Location = New System.Drawing.Point(10, 5)
         Me.SSTabPIR.Name = "SSTabPIR"
         Me.SSTabPIR.SelectedIndex = 0
-        Me.SSTabPIR.Size = New System.Drawing.Size(559, 350)
+        Me.SSTabPIR.Size = New System.Drawing.Size(471, 289)
         Me.SSTabPIR.TabIndex = 1
         Me.SSTabPIR.Tag = ""
         '
@@ -95,7 +95,7 @@ Partial Class frmControl
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(551, 324)
+        Me.TabPage1.Size = New System.Drawing.Size(463, 263)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Pervious Land"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -105,7 +105,7 @@ Partial Class frmControl
         Me.txtNoPERLND.AutoSize = True
         Me.txtNoPERLND.Enabled = False
         Me.txtNoPERLND.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtNoPERLND.Location = New System.Drawing.Point(200, 156)
+        Me.txtNoPERLND.Location = New System.Drawing.Point(156, 125)
         Me.txtNoPERLND.Name = "txtNoPERLND"
         Me.txtNoPERLND.Size = New System.Drawing.Size(150, 13)
         Me.txtNoPERLND.TabIndex = 12
@@ -114,7 +114,7 @@ Partial Class frmControl
         'CheckBox12
         '
         Me.CheckBox12.AutoSize = True
-        Me.CheckBox12.Location = New System.Drawing.Point(20, 282)
+        Me.CheckBox12.Location = New System.Drawing.Point(20, 213)
         Me.CheckBox12.Name = "CheckBox12"
         Me.CheckBox12.Size = New System.Drawing.Size(184, 17)
         Me.CheckBox12.TabIndex = 11
@@ -124,7 +124,7 @@ Partial Class frmControl
         'CheckBox11
         '
         Me.CheckBox11.AutoSize = True
-        Me.CheckBox11.Location = New System.Drawing.Point(20, 258)
+        Me.CheckBox11.Location = New System.Drawing.Point(20, 195)
         Me.CheckBox11.Name = "CheckBox11"
         Me.CheckBox11.Size = New System.Drawing.Size(172, 17)
         Me.CheckBox11.TabIndex = 10
@@ -134,7 +134,7 @@ Partial Class frmControl
         'CheckBox10
         '
         Me.CheckBox10.AutoSize = True
-        Me.CheckBox10.Location = New System.Drawing.Point(20, 234)
+        Me.CheckBox10.Location = New System.Drawing.Point(20, 177)
         Me.CheckBox10.Name = "CheckBox10"
         Me.CheckBox10.Size = New System.Drawing.Size(146, 17)
         Me.CheckBox10.TabIndex = 9
@@ -144,7 +144,7 @@ Partial Class frmControl
         'CheckBox9
         '
         Me.CheckBox9.AutoSize = True
-        Me.CheckBox9.Location = New System.Drawing.Point(20, 210)
+        Me.CheckBox9.Location = New System.Drawing.Point(20, 159)
         Me.CheckBox9.Name = "CheckBox9"
         Me.CheckBox9.Size = New System.Drawing.Size(151, 17)
         Me.CheckBox9.TabIndex = 8
@@ -154,7 +154,7 @@ Partial Class frmControl
         'CheckBox8
         '
         Me.CheckBox8.AutoSize = True
-        Me.CheckBox8.Location = New System.Drawing.Point(20, 186)
+        Me.CheckBox8.Location = New System.Drawing.Point(20, 141)
         Me.CheckBox8.Name = "CheckBox8"
         Me.CheckBox8.Size = New System.Drawing.Size(224, 17)
         Me.CheckBox8.TabIndex = 7
@@ -164,7 +164,7 @@ Partial Class frmControl
         'CheckBox7
         '
         Me.CheckBox7.AutoSize = True
-        Me.CheckBox7.Location = New System.Drawing.Point(20, 162)
+        Me.CheckBox7.Location = New System.Drawing.Point(20, 123)
         Me.CheckBox7.Name = "CheckBox7"
         Me.CheckBox7.Size = New System.Drawing.Size(294, 17)
         Me.CheckBox7.TabIndex = 6
@@ -174,7 +174,7 @@ Partial Class frmControl
         'CheckBox6
         '
         Me.CheckBox6.AutoSize = True
-        Me.CheckBox6.Location = New System.Drawing.Point(20, 138)
+        Me.CheckBox6.Location = New System.Drawing.Point(20, 105)
         Me.CheckBox6.Name = "CheckBox6"
         Me.CheckBox6.Size = New System.Drawing.Size(340, 17)
         Me.CheckBox6.TabIndex = 5
@@ -184,7 +184,7 @@ Partial Class frmControl
         'CheckBox5
         '
         Me.CheckBox5.AutoSize = True
-        Me.CheckBox5.Location = New System.Drawing.Point(20, 114)
+        Me.CheckBox5.Location = New System.Drawing.Point(20, 87)
         Me.CheckBox5.Name = "CheckBox5"
         Me.CheckBox5.Size = New System.Drawing.Size(164, 17)
         Me.CheckBox5.TabIndex = 4
@@ -194,7 +194,7 @@ Partial Class frmControl
         'CheckBox4
         '
         Me.CheckBox4.AutoSize = True
-        Me.CheckBox4.Location = New System.Drawing.Point(20, 90)
+        Me.CheckBox4.Location = New System.Drawing.Point(20, 69)
         Me.CheckBox4.Name = "CheckBox4"
         Me.CheckBox4.Size = New System.Drawing.Size(257, 17)
         Me.CheckBox4.TabIndex = 3
@@ -204,7 +204,7 @@ Partial Class frmControl
         'CheckBox3
         '
         Me.CheckBox3.AutoSize = True
-        Me.CheckBox3.Location = New System.Drawing.Point(20, 66)
+        Me.CheckBox3.Location = New System.Drawing.Point(20, 51)
         Me.CheckBox3.Name = "CheckBox3"
         Me.CheckBox3.Size = New System.Drawing.Size(192, 17)
         Me.CheckBox3.TabIndex = 2
@@ -214,7 +214,7 @@ Partial Class frmControl
         'CheckBox2
         '
         Me.CheckBox2.AutoSize = True
-        Me.CheckBox2.Location = New System.Drawing.Point(20, 42)
+        Me.CheckBox2.Location = New System.Drawing.Point(20, 33)
         Me.CheckBox2.Name = "CheckBox2"
         Me.CheckBox2.Size = New System.Drawing.Size(272, 17)
         Me.CheckBox2.TabIndex = 1
@@ -224,7 +224,7 @@ Partial Class frmControl
         'CheckBox1
         '
         Me.CheckBox1.AutoSize = True
-        Me.CheckBox1.Location = New System.Drawing.Point(20, 18)
+        Me.CheckBox1.Location = New System.Drawing.Point(20, 15)
         Me.CheckBox1.Name = "CheckBox1"
         Me.CheckBox1.Size = New System.Drawing.Size(246, 17)
         Me.CheckBox1.TabIndex = 0
@@ -243,7 +243,7 @@ Partial Class frmControl
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(551, 324)
+        Me.TabPage2.Size = New System.Drawing.Size(463, 263)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Impervious Land"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -253,7 +253,7 @@ Partial Class frmControl
         Me.txtNoIMPLND.AutoSize = True
         Me.txtNoIMPLND.Enabled = False
         Me.txtNoIMPLND.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtNoIMPLND.Location = New System.Drawing.Point(200, 156)
+        Me.txtNoIMPLND.Location = New System.Drawing.Point(158, 125)
         Me.txtNoIMPLND.Name = "txtNoIMPLND"
         Me.txtNoIMPLND.Size = New System.Drawing.Size(147, 13)
         Me.txtNoIMPLND.TabIndex = 13
@@ -262,7 +262,7 @@ Partial Class frmControl
         'CheckBox18
         '
         Me.CheckBox18.AutoSize = True
-        Me.CheckBox18.Location = New System.Drawing.Point(20, 138)
+        Me.CheckBox18.Location = New System.Drawing.Point(20, 105)
         Me.CheckBox18.Name = "CheckBox18"
         Me.CheckBox18.Size = New System.Drawing.Size(290, 17)
         Me.CheckBox18.TabIndex = 5
@@ -272,7 +272,7 @@ Partial Class frmControl
         'CheckBox17
         '
         Me.CheckBox17.AutoSize = True
-        Me.CheckBox17.Location = New System.Drawing.Point(20, 114)
+        Me.CheckBox17.Location = New System.Drawing.Point(20, 87)
         Me.CheckBox17.Name = "CheckBox17"
         Me.CheckBox17.Size = New System.Drawing.Size(336, 17)
         Me.CheckBox17.TabIndex = 4
@@ -282,7 +282,7 @@ Partial Class frmControl
         'CheckBox16
         '
         Me.CheckBox16.AutoSize = True
-        Me.CheckBox16.Location = New System.Drawing.Point(20, 90)
+        Me.CheckBox16.Location = New System.Drawing.Point(20, 69)
         Me.CheckBox16.Name = "CheckBox16"
         Me.CheckBox16.Size = New System.Drawing.Size(247, 17)
         Me.CheckBox16.TabIndex = 3
@@ -292,7 +292,7 @@ Partial Class frmControl
         'CheckBox15
         '
         Me.CheckBox15.AutoSize = True
-        Me.CheckBox15.Location = New System.Drawing.Point(20, 66)
+        Me.CheckBox15.Location = New System.Drawing.Point(20, 51)
         Me.CheckBox15.Name = "CheckBox15"
         Me.CheckBox15.Size = New System.Drawing.Size(198, 17)
         Me.CheckBox15.TabIndex = 2
@@ -302,7 +302,7 @@ Partial Class frmControl
         'CheckBox14
         '
         Me.CheckBox14.AutoSize = True
-        Me.CheckBox14.Location = New System.Drawing.Point(20, 42)
+        Me.CheckBox14.Location = New System.Drawing.Point(20, 33)
         Me.CheckBox14.Name = "CheckBox14"
         Me.CheckBox14.Size = New System.Drawing.Size(272, 17)
         Me.CheckBox14.TabIndex = 1
@@ -312,7 +312,7 @@ Partial Class frmControl
         'CheckBox13
         '
         Me.CheckBox13.AutoSize = True
-        Me.CheckBox13.Location = New System.Drawing.Point(20, 18)
+        Me.CheckBox13.Location = New System.Drawing.Point(20, 15)
         Me.CheckBox13.Name = "CheckBox13"
         Me.CheckBox13.Size = New System.Drawing.Size(246, 17)
         Me.CheckBox13.TabIndex = 0
@@ -336,7 +336,7 @@ Partial Class frmControl
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(551, 324)
+        Me.TabPage3.Size = New System.Drawing.Size(463, 263)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Reaches/Reservoirs"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -346,7 +346,7 @@ Partial Class frmControl
         Me.txtNoRCHRES.AutoSize = True
         Me.txtNoRCHRES.Enabled = False
         Me.txtNoRCHRES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtNoRCHRES.Location = New System.Drawing.Point(200, 156)
+        Me.txtNoRCHRES.Location = New System.Drawing.Point(156, 125)
         Me.txtNoRCHRES.Name = "txtNoRCHRES"
         Me.txtNoRCHRES.Size = New System.Drawing.Size(151, 13)
         Me.txtNoRCHRES.TabIndex = 24
@@ -355,7 +355,7 @@ Partial Class frmControl
         'CheckBox19
         '
         Me.CheckBox19.AutoSize = True
-        Me.CheckBox19.Location = New System.Drawing.Point(20, 18)
+        Me.CheckBox19.Location = New System.Drawing.Point(20, 15)
         Me.CheckBox19.Name = "CheckBox19"
         Me.CheckBox19.Size = New System.Drawing.Size(155, 17)
         Me.CheckBox19.TabIndex = 23
@@ -365,7 +365,7 @@ Partial Class frmControl
         'CheckBox27
         '
         Me.CheckBox27.AutoSize = True
-        Me.CheckBox27.Location = New System.Drawing.Point(20, 210)
+        Me.CheckBox27.Location = New System.Drawing.Point(20, 177)
         Me.CheckBox27.Name = "CheckBox27"
         Me.CheckBox27.Size = New System.Drawing.Size(297, 17)
         Me.CheckBox27.TabIndex = 22
@@ -375,7 +375,7 @@ Partial Class frmControl
         'CheckBox26
         '
         Me.CheckBox26.AutoSize = True
-        Me.CheckBox26.Location = New System.Drawing.Point(20, 186)
+        Me.CheckBox26.Location = New System.Drawing.Point(20, 141)
         Me.CheckBox26.Name = "CheckBox26"
         Me.CheckBox26.Size = New System.Drawing.Size(324, 17)
         Me.CheckBox26.TabIndex = 21
@@ -385,7 +385,7 @@ Partial Class frmControl
         'CheckBox22x
         '
         Me.CheckBox22x.AutoSize = True
-        Me.CheckBox22x.Location = New System.Drawing.Point(20, 186)
+        Me.CheckBox22x.Location = New System.Drawing.Point(20, 159)
         Me.CheckBox22x.Name = "CheckBox22x"
         Me.CheckBox22x.Size = New System.Drawing.Size(151, 17)
         Me.CheckBox22x.TabIndex = 20
@@ -395,7 +395,7 @@ Partial Class frmControl
         'CheckBox24
         '
         Me.CheckBox24.AutoSize = True
-        Me.CheckBox24.Location = New System.Drawing.Point(20, 138)
+        Me.CheckBox24.Location = New System.Drawing.Point(20, 105)
         Me.CheckBox24.Name = "CheckBox24"
         Me.CheckBox24.Size = New System.Drawing.Size(224, 17)
         Me.CheckBox24.TabIndex = 19
@@ -405,7 +405,7 @@ Partial Class frmControl
         'CheckBox23
         '
         Me.CheckBox23.AutoSize = True
-        Me.CheckBox23.Location = New System.Drawing.Point(20, 114)
+        Me.CheckBox23.Location = New System.Drawing.Point(20, 87)
         Me.CheckBox23.Name = "CheckBox23"
         Me.CheckBox23.Size = New System.Drawing.Size(228, 17)
         Me.CheckBox23.TabIndex = 18
@@ -415,7 +415,7 @@ Partial Class frmControl
         'CheckBox21
         '
         Me.CheckBox21.AutoSize = True
-        Me.CheckBox21.Location = New System.Drawing.Point(20, 66)
+        Me.CheckBox21.Location = New System.Drawing.Point(20, 51)
         Me.CheckBox21.Name = "CheckBox21"
         Me.CheckBox21.Size = New System.Drawing.Size(188, 17)
         Me.CheckBox21.TabIndex = 17
@@ -425,7 +425,7 @@ Partial Class frmControl
         'CheckBox20
         '
         Me.CheckBox20.AutoSize = True
-        Me.CheckBox20.Location = New System.Drawing.Point(20, 42)
+        Me.CheckBox20.Location = New System.Drawing.Point(20, 33)
         Me.CheckBox20.Name = "CheckBox20"
         Me.CheckBox20.Size = New System.Drawing.Size(270, 17)
         Me.CheckBox20.TabIndex = 16
@@ -435,7 +435,7 @@ Partial Class frmControl
         'CheckBox25
         '
         Me.CheckBox25.AutoSize = True
-        Me.CheckBox25.Location = New System.Drawing.Point(20, 162)
+        Me.CheckBox25.Location = New System.Drawing.Point(20, 123)
         Me.CheckBox25.Name = "CheckBox25"
         Me.CheckBox25.Size = New System.Drawing.Size(212, 17)
         Me.CheckBox25.TabIndex = 15
@@ -445,7 +445,7 @@ Partial Class frmControl
         'CheckBox22
         '
         Me.CheckBox22.AutoSize = True
-        Me.CheckBox22.Location = New System.Drawing.Point(20, 90)
+        Me.CheckBox22.Location = New System.Drawing.Point(20, 69)
         Me.CheckBox22.Name = "CheckBox22"
         Me.CheckBox22.Size = New System.Drawing.Size(263, 17)
         Me.CheckBox22.TabIndex = 13
@@ -455,7 +455,7 @@ Partial Class frmControl
         'CheckBox28
         '
         Me.CheckBox28.AutoSize = True
-        Me.CheckBox28.Location = New System.Drawing.Point(20, 234)
+        Me.CheckBox28.Location = New System.Drawing.Point(20, 195)
         Me.CheckBox28.Name = "CheckBox28"
         Me.CheckBox28.Size = New System.Drawing.Size(350, 17)
         Me.CheckBox28.TabIndex = 12
@@ -465,7 +465,7 @@ Partial Class frmControl
         'cmdCancel
         '
         Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.cmdCancel.Location = New System.Drawing.Point(299, 373)
+        Me.cmdCancel.Location = New System.Drawing.Point(258, 306)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(100, 30)
         Me.cmdCancel.TabIndex = 4
@@ -475,7 +475,7 @@ Partial Class frmControl
         'cmdOK
         '
         Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.cmdOK.Location = New System.Drawing.Point(174, 373)
+        Me.cmdOK.Location = New System.Drawing.Point(133, 306)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(100, 30)
         Me.cmdOK.TabIndex = 3
@@ -486,7 +486,7 @@ Partial Class frmControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(573, 414)
+        Me.ClientSize = New System.Drawing.Size(490, 348)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.SSTabPIR)

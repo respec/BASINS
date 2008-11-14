@@ -407,7 +407,9 @@ Module modStatusRchres
 
             lAcidph = False
             'check to see if acidph is available
-            For i = 1 To aOperation.Uci.Msg.BlockDefs("RCHRES").SectionDefs.Count
+
+            '.net conversion issue: Changedindex from {1,.Count} to {0, .Count - 1}
+            For i = 0 To aOperation.Uci.Msg.BlockDefs("RCHRES").SectionDefs.Count - 1
                 If aOperation.Uci.Msg.BlockDefs("RCHRES").SectionDefs(i).Name = "ACIDPH" Then
                     lAcidph = True
                 End If

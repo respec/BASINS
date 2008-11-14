@@ -7,6 +7,13 @@ Public Module WinHSPF
     Friend pMsg As HspfMsg
     Friend pIcon As Icon
 
+    Friend defuci As HspfUci = pUCI
+    '********************
+    '.net conversion issue: Setting defuci = pUci for now.
+    '
+    '14 Nov. 2008 - Brandon Gonzales
+    '********************
+
     'Variableize each form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReach As frmReach
     Friend pfrmAbout As frmAbout
