@@ -170,7 +170,7 @@ Public Class atcTimeseriesNdayHighLow
                         lNumSummed = 1
                         lRunningSum = 0
                     Else
-                        Throw New ApplicationException("Missing Value " & DumpDate(aTS.Dates.Value(lCurrentValue)))
+                        Throw New ApplicationException("Missing Value at " & DumpDate(aTS.Dates.Value(lTimeIndex)))
                     End If
                 Else
                     lRunningSum += lCurrentValue

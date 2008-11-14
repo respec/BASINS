@@ -99,6 +99,16 @@ Public Module modTimeseriesMath
 
         lStartTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(0))
         With lStartTimeseriesDate
+            'Roll back end of year by one day if it matches beginning of year
+            If aEndMonth = aStartMonth AndAlso aEndDay = aStartDay Then
+                aEndDay -= 1
+                If aEndDay = 0 Then
+                    aEndMonth -= 1
+                    If aEndMonth = 0 Then aEndMonth = 12
+                    aEndDay = daymon(.Year, aEndMonth)
+                End If
+            End If
+
             lStartYear = .Year
             If aFirstYear > lStartYear Then
                 lStartYear = aFirstYear
