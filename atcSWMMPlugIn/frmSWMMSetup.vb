@@ -1690,21 +1690,21 @@ Public Class frmSWMMSetup
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile 
                 cboSubbasins.Items.Add(lLayerName)
-                If lLayerName.IndexOf("Catchment") > -1 Or lLayerName.ToUpper = "SUBBASINS" Or lLayerName.IndexOf("Watershed Shapefile") > -1 Then
+                If lLayerName.ToUpper.IndexOf("CATCHMENT") > -1 Or lLayerName.ToUpper = "SUBBASINS" Or lLayerName.IndexOf("Watershed Shapefile") > -1 Then
                     cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 2 Then 'LineShapefile 
                 cboStreams.Items.Add(lLayerName)
-                If lLayerName.IndexOf("Conduit") > -1 Or lLayerName.ToUpper = "STREAMS" Or lLayerName.IndexOf("Stream Reach Shapefile") > -1 Then
+                If lLayerName.ToUpper.IndexOf("CONDUIT") > -1 Or lLayerName.ToUpper = "STREAMS" Or lLayerName.IndexOf("Stream Reach Shapefile") > -1 Then
                     cboStreams.SelectedIndex = cboStreams.Items.Count - 1
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 1 Then 'PointShapefile
                 cboOutlets.Items.Add(lLayerName)
-                If lLayerName.IndexOf("Node") > -1 Then
+                If lLayerName.ToUpper.IndexOf("NODE") > -1 Then
                     cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
                 End If
                 cboMet.Items.Add(lLayerName)
-                If lLayerName.IndexOf("Weather Station Sites 20") > -1 Then
+                If lLayerName.ToUpper.IndexOf("WEATHER STATION SITES 20") > -1 Then
                     'this takes some time, show window and then do this
                     'cboMet.SelectedIndex = cboMet.Items.Count - 1
                 End If
