@@ -12,7 +12,10 @@ Public Module Graph
     Public Sub GraphAll(ByVal aSDateJ As Double, ByVal aEDateJ As Double, _
                         ByVal aCons As String, ByVal aSite As String, _
                         ByVal aTimeSeries As atcDataGroup, _
-                        ByVal aGraphSaveFormat As String, ByVal aGraphAnnual As Boolean)
+                        ByVal aGraphSaveFormat As String, _
+                        ByVal aGraphSaveWidth As Integer, _
+                        ByVal aGraphSaveHeight As Integer, _
+                        ByVal aGraphAnnual As Boolean)
         Dim lDataGroup As New atcDataGroup
         lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"), _
                                               aSDateJ, _
@@ -28,6 +31,8 @@ Public Module Graph
 
         'duration plot
         lZgc = CreateZgc()
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
         Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
         With lGraphDur.ZedGraphCtrl.GraphPane
             If .YAxis.Scale.Min < 1 Then
@@ -43,6 +48,8 @@ Public Module Graph
 
         'cummulative difference
         lZgc = CreateZgc()
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
         Dim lGraphCum As New clsGraphCumulativeDifference(lDataGroup, lZgc)
         'TODO: add title 
         lZgc.SaveIn(lOutFileBase & "_cumDif" & aGraphSaveFormat)
@@ -51,6 +58,8 @@ Public Module Graph
 
         'scatter
         lZgc = CreateZgc()
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
         Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
         lGraphScatter.AddFitLine()
 
@@ -65,6 +74,8 @@ Public Module Graph
 
         If aTimeSeries.Keys.Contains("LZS") Then 'scatter - LZS vs Error(cfs)
             lZgc = CreateZgc()
+            lZgc.Width = aGraphSaveWidth
+            lZgc.Height = aGraphSaveHeight
             If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("LZS"), "LZS (in)") Then
                 lZgc.SaveIn(lOutFileBase & "_Error_LZS" & aGraphSaveFormat)
             End If
@@ -72,6 +83,8 @@ Public Module Graph
 
         If aTimeSeries.Keys.Contains("UZS") Then 'scatter - UZS vs Error(cfs)
             lZgc = CreateZgc()
+            lZgc.Width = aGraphSaveWidth
+            lZgc.Height = aGraphSaveHeight
             If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("UZS"), "UZS (in)") Then
                 lZgc.SaveIn(lOutFileBase & "_Error_UZS" & aGraphSaveFormat)
             End If
@@ -79,6 +92,8 @@ Public Module Graph
 
         'scatter - Observed vs Error(cfs)    
         lZgc = CreateZgc()
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
         If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("Observed"), "Observed (cfs)", AxisType.Log) Then
             lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & aGraphSaveFormat)
         End If
@@ -96,7 +111,7 @@ Public Module Graph
         End If
 
         'whole span
-        GraphTimeseries(lDataGroup, lPaneCount, lOutFileBase, aGraphSaveFormat)
+        GraphTimeseries(lDataGroup, lPaneCount, lOutFileBase, aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight)
 
         If aGraphAnnual Then 'single year plots
             Dim lSDateJ As Double = aSDateJ
@@ -109,7 +124,7 @@ Public Module Graph
                 Next
                 J2Date(lSDateJ, lDate)
                 If lDate(1) <> 1 OrElse lDate(2) <> 1 Then lDate(0) += 1 'non calendar years label with ending year
-                GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat)
+                GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight)
                 lSDateJ = lEDateJ
             End While
         End If
@@ -122,7 +137,8 @@ Public Module Graph
             lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
         End If
         lZgc = CreateZgc()
-        lZgc.Width *= 2
+        lZgc.Width = aGraphSaveWidth * 2
+        lZgc.Height = aGraphSaveHeight
         Dim lGrapher As New clsGraphTime(lMonthDataGroup, lZgc)
         If lPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
         Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(0).XAxis.Scale
@@ -160,7 +176,8 @@ Public Module Graph
             Next
             lZgc = CreateZgc()
             lGrapher = New clsGraphTime(lDataGroup, lZgc)
-            lZgc.Width *= 2
+            lZgc.Width = aGraphSaveWidth * 2
+            lZgc.Height = aGraphSaveHeight
             lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
             lDualDateScale.MaxDaysMonthLabeled = 1200
             lZgc.SaveIn(lOutFileBase & "_ET" & aGraphSaveFormat)
@@ -198,7 +215,7 @@ Public Module Graph
                                         aSDateJ, _
                                         aEDateJ, Nothing))
             'do the graphs
-            GraphFlowComponents(lDataGroup, lOutFileBase, aGraphSaveFormat)
+            GraphFlowComponents(lDataGroup, lOutFileBase, aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight)
         End If
     End Sub
 
@@ -206,6 +223,8 @@ Public Module Graph
                            ByVal aPaneCount As Integer, _
                            ByVal aOutFileBase As String, _
                            ByVal aGraphSaveFormat As String, _
+                           ByVal aGraphSaveWidth As Integer, _
+                           ByVal aGraphSaveHeight As Integer, _
                            ByVal aExpSystem As HspfSupport.atcExpertSystem)
         For Each lStorm As hexStorm In aExpSystem.Storms
             Dim lDataGroupStorm As New atcDataGroup
@@ -214,16 +233,20 @@ Public Module Graph
             Next
             Dim lDate(6) As Integer
             J2Date(lStorm.SDateJ, lDate)
-            GraphTimeseries(lDataGroupStorm, aPaneCount, aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2), aGraphSaveFormat)
+            GraphTimeseries(lDataGroupStorm, aPaneCount, aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight)
         Next
     End Sub
 
     Private Sub GraphTimeseries(ByVal aDataGroup As atcDataGroup, _
                                 ByVal aPaneCount As Integer, _
                                 ByVal aOutFileBase As String, _
-                                ByVal aGraphSaveFormat As String)
+                                ByVal aGraphSaveFormat As String, _
+                                ByVal aGraphSaveWidth As Integer, _
+                                ByVal aGraphSaveHeight As Integer)
         'timeseries - arith
         Dim lZgc As ZedGraphControl = CreateZgc()
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         If aPaneCount = 2 Then
             EnableAuxAxis(lZgc.MasterPane, True, 0.2)
@@ -246,7 +269,9 @@ Public Module Graph
 
     Sub GraphFlowComponents(ByVal aDataGroup As atcDataGroup, _
                             ByVal aOutFileBase As String, _
-                            ByVal aGraphSaveFormat As String)
+                            ByVal aGraphSaveFormat As String, _
+                            ByVal aGraphSaveWidth As Integer, _
+                            ByVal aGraphSaveHeight As Integer)
         Dim lDataGroupOutput As New atcDataGroup
 
         'baseflow + interflow
@@ -273,7 +298,8 @@ Public Module Graph
         lDataGroupOutput.Add(aDataGroup.Item(3)) 'precip
 
         Dim lZgc As ZedGraphControl = CreateZgc()
-        lZgc.Width *= 3
+        lZgc.Width = aGraphSaveWidth * 3
+        lZgc.Height = aGraphSaveHeight
         Dim lGrapher As New clsGraphTime(lDataGroupOutput, lZgc)
         Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(1).XAxis.Scale
         lDualDateScale.MaxDaysMonthLabeled = 1200
@@ -301,7 +327,8 @@ Public Module Graph
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(3), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec
         lMonthDataGroup.Add(Aggregate(lMathPrecEtTSer, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec -act et
         lZgc = CreateZgc()
-        lZgc.Width *= 3
+        lZgc.Width = aGraphSaveWidth * 3
+        lZgc.Height = aGraphSaveHeight
         lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
         lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
         lDualDateScale.MaxDaysMonthLabeled = 1200
