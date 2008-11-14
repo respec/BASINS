@@ -327,4 +327,43 @@ Public Class frmWinHSPF
         End If
 
     End Sub
+
+    Private Sub cmdLandUse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLandUse.Click
+
+        If IsNothing(pfrmLand) Then
+            pfrmLand = New frmLand
+            pfrmLand.Show()
+        Else
+            If pfrmLand.IsDisposed Then
+                pfrmLand = New frmLand
+                pfrmLand.Show()
+            Else
+                pfrmLand.WindowState = FormWindowState.Normal
+                pfrmLand.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    Private Sub cmdPollutant_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPollutant.Click
+
+        If IsNothing(pfrmPollutant) Then
+            pfrmPollutant = New frmPollutant
+            pfrmPollutant.Show()
+        Else
+            If pfrmPollutant.IsDisposed Then
+                pfrmPollutant = New frmPollutant
+                pfrmPollutant.Show()
+            Else
+                pfrmPollutant.WindowState = FormWindowState.Normal
+                pfrmPollutant.BringToFront()
+            End If
+        End If
+
+    End Sub
+
+    
+    Private Sub cmdReach_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReach.Click
+        ReachEditor()
+    End Sub
 End Class

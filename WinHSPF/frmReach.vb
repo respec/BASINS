@@ -76,7 +76,15 @@ Public Class frmReach
 
     End Sub
 
-    Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+    Private Sub FTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FTables.Click
+        UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable)  'todo: use selected row
+    End Sub
+
+    Private Sub grdReach_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdReach.CellEdited
+        'todo: add limits 
+    End Sub
+
+    Private Sub cmdOK_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         With grdReach.Source
             Dim lOperBlock As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
             For lRow As Integer = 1 To lOperBlock.Count
@@ -94,17 +102,7 @@ Public Class frmReach
         Me.Dispose()
     End Sub
 
-    Private Sub cmdCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
-        'pEditControl.Save()
+    Private Sub cmdCancel_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Dispose()
     End Sub
-
-    Private Sub FTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FTables.Click
-        UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable)  'todo: use selected row
-    End Sub
-
-    Private Sub grdReach_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdReach.CellEdited
-        'todo: add limits 
-    End Sub
-
 End Class
