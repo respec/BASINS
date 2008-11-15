@@ -15,6 +15,9 @@ Public Class frmControl
     Dim pIChange As Boolean = False
     Dim pRChange As Boolean = False
 
+    Dim defuci As HspfUci = pUCI
+
+
 
     Sub New()
 
@@ -24,6 +27,8 @@ Public Class frmControl
         ' Add any initialization after the InitializeComponent() call.
         Me.MinimumSize = Me.Size
         Me.Icon = pIcon
+
+        MsgBox(defuci.Name)
 
         SSTabPIR.SelectTab(0)
         SSTabPIR.TabPages(0).Enabled = False
@@ -569,7 +574,7 @@ Public Class frmControl
         End If
     End Function
 
-    Public Function matchOperWithDefault(ByVal OpTypName As String, ByVal OpnDesc As String, ByRef defUci As HspfUci) As HspfOperation
+    Public Function matchOperWithDefault(ByVal OpTypName As String, ByVal OpnDesc As String, ByVal defUci As HspfUci) As HspfOperation
         Dim vOpn As Object
         Dim lOpn As HspfOperation
         Dim ctemp As String
@@ -661,7 +666,7 @@ Public Class frmControl
                                 If dOpn.TableExists(lTab.Name) Then
                                     dTab = dOpn.Tables(lTab.Name)
                                     For Each vPar In lTab.Parms
-                                        If vPar.Value = -999.0# Then
+                                        If vPar.Value.GetType.Name = "Double" AndAlso vPar.Value = -999.0# Then
                                             vPar.Value = dTab.Parms(vPar.Name).Value
                                         End If
                                     Next vPar
