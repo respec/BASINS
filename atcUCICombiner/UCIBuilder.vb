@@ -133,7 +133,7 @@ Public Module UCIBuilder
                 'change base name throughout
                 lUci.GlobalBlock.RunInf.Value = "UCI Created for ABAG for " & lProjectbase
                 For lIndex As Integer = 1 To lUci.FilesBlock.Count
-                    Dim lHspfFile As atcUCI.HspfData.HspfFile = lUci.FilesBlock.Value(lIndex)
+                    Dim lHspfFile As atcUCI.HspfFile = lUci.FilesBlock.Value(lIndex)
                     If lHspfFile.Name = "base.wdm" Then
                         lHspfFile.Name = lProjectbase & ".wdm"
                     End If
@@ -625,7 +625,7 @@ Public Module UCIBuilder
                         'add upstream inflow to this project 
                         MakeMods_AddExtSrcLink(lUci)
                         'add ref to upstream wdm 
-                        Dim lHspfFile As New atcUCI.HspfData.HspfFile
+                        Dim lHspfFile As New atcUCI.HspfFile
                         lHspfFile.Name = "..\" & lConnSources(i) & "\" & lConnSources(i) & ".wdm"
                         lHspfFile.Typ = "WDM3"
                         lHspfFile.Unit = 27

@@ -15,7 +15,7 @@ Public Class atcDataSourceWDM
     Private pDates As ArrayList 'of atcTimeseries
     Private pQuick As Boolean = False
     Private pNan As Double
-    Private pEpsilon As Double
+    'Private pEpsilon As Double
     Private Shared pMsg As atcMsgWDM
     Private pTu As atcTimeUnit = 0 'default time units, default 2-minutes
     Private pTs As Integer = 0 'default timestep, default 1 
@@ -36,8 +36,8 @@ Public Class atcDataSourceWDM
         Filter = pFilter
 
         'kludge to force loading of system.double, removal may cause program to exit without message!
-        pNan = System.Double.NaN
-        pEpsilon = System.Double.Epsilon
+        pNan = GetNaN()
+        'pEpsilon = System.Double.Epsilon
 
         If pMsg Is Nothing Then
             pMsg = New atcMsgWDM
@@ -808,7 +808,7 @@ CaseExistRenumber:
                             Dim lInterval As Double = .GetValue("interval", 0)
                             Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
                             For iVal As Integer = 1 To nVals
-                                If Math.Abs((lV(iVal) - lTsFill)) < pEpsilon Then
+                                If Math.Abs((lV(iVal) - lTsFill)) < 1.0E-20 Then 'pEpsilon Then
                                     lVd(iVal) = pNan
                                 Else
                                     lVd(iVal) = lV(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
@@ -834,43 +834,41 @@ CaseExistRenumber:
         End If
     End Sub
 
-    Private Sub RefreshDsn(ByVal aFileUnit As Integer, ByRef aDsn As Integer)
-        Dim lData As atcTimeseries
-        Dim lDates As atcTimeseries
-        Dim lDate As Date
-
-        Dim lAttributeDefinition As atcAttributeDefinition
-
-        Dim lS As String
-        Dim lName As String
-        Dim lInit As Integer
-        Dim lSaind As Integer
-        Dim lSaval(256) As Integer
-
-        lDates = New atcTimeseries(Nothing)
+    Private Sub RefreshDsn(ByVal aFileUnit As Integer, ByVal aDsn As Integer)
+        Dim lDates As New atcTimeseries(Nothing)
         pDates.Add(lDates)
 
-        lData = New atcTimeseries(Me)
+        Dim lData As New atcTimeseries(Me)
         lData.Dates = lDates
         lData.Attributes.SetValue("id", aDsn)
         lData.Attributes.AddHistory("Read from " & Specification)
 
         lData.ValuesNeedToBeRead = True
         DataSets.Add(aDsn, lData)
+        If aFileUnit > 0 AndAlso lData IsNot Nothing Then
+            Try
+                DsnReadGeneral(aFileUnit, lData)
+            Catch lEx As Exception
+                Logger.Dbg("Problem")
+            End Try
+        Else
+            Logger.Dbg("Problem")
+        End If
 
-        DsnReadGeneral(aFileUnit, lData)
-
-        lInit = 1
+        Dim lInit As Integer = 1
         Do
+            Dim lSaind As Integer
+            Dim lSaval(256) As Integer
             F90_GETATT(aFileUnit, aDsn, lInit, lSaind, lSaval(0))
             If lSaind > 0 Then 'process attribute
                 If Not (AttrStored(lSaind)) Then
                     Try
-                        lAttributeDefinition = pMsg.Attributes.ItemByIndex(lSaind)
-                        lName = lAttributeDefinition.Name
-                        lS = AttrVal2String(lSaind, lSaval)
+                        Dim lAttributeDefinition As atcAttributeDefinition = pMsg.Attributes.ItemByIndex(lSaind)
+                        Dim lName As String = lAttributeDefinition.Name
+                        Dim lS As String = AttrVal2String(lSaind, lSaval)
                         Select Case UCase(lName)
                             Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
+                                Dim lDate As Date
                                 If IsNumeric(lS.Substring(0, 4)) Then
                                     Try 'Dates should be formatted YYYYMMDDhhmmss
                                         lDate = New Date(CInt(lS.Substring(0, 4)), _
@@ -919,7 +917,7 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
 
     'Before calling, make sure id property of aDataset has been set to dsn -- aDataset.Attributes.SetValue("id", dsn)
     Private Sub DsnReadGeneral(ByVal aFileUnit As Integer, _
-                               ByRef aDataset As atcTimeseries)
+                               ByVal aDataset As atcTimeseries)
         Dim lSaInd, lSaLen, lRetcod As Integer
         Dim lTu As atcTimeUnit
         Dim lTs As Integer

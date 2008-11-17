@@ -262,8 +262,8 @@ Public Module UCICombiner
             Dim lNewRecord As New atcUCI.HspfSpecialRecord
             lNewRecord.SpecType = lRecord.SpecType
             lNewRecord.Text = "  UVQUAN prec" & CStr(i) & "  " & Mid(lRecord.Text, 17, 7) & CStr(i) & Mid(lRecord.Text, 25)
-            lCombinedUci.SpecialActionBlk.Records.Add(lNewRecord) ', , , lUvQuanIndex)
             lUvQuanIndex += 1
+            lCombinedUci.SpecialActionBlk.Records.Insert(lUvQuanIndex, lNewRecord)
         Next i
         Logger.Dbg("UvquansAdded")
 
@@ -289,7 +289,6 @@ Public Module UCICombiner
             For Each lOpnType As String In lOpnTypesWithBinary
                 lIndex += 1
                 Dim lOpnBlk As atcUCI.HspfOpnBlk = .OpnBlks(lOpnType)
-
                 If lOpnBlk.Ids.Count = 0 Then
                     Logger.Dbg("No " & lOpnType & " to add binary output to")
                 Else
@@ -372,28 +371,33 @@ Public Module UCICombiner
     End Function
 
     Private Sub UpdateFilesBlock(ByVal aUci As atcUCI.HspfUci)
-        Dim lHspfFile As New atcUCI.HspfData.HspfFile
+        Dim lHspfFile As New atcUCI.HspfFile
         With aUci.FilesBlock
+            .Clear()
             lHspfFile.Name = pScenario & ".wdm"
             lHspfFile.Typ = "WDM1"
             lHspfFile.Unit = "21"
-            .Value(0) = lHspfFile
+            .Add(lHspfFile)
+            lHspfFile = New atcUCI.HspfFile
             lHspfFile.Name = pScenario & ".ptsrc.wdm"
             lHspfFile.Typ = "WDM3"
             lHspfFile.Unit = "23"
-            .Value(1) = lHspfFile
+            .Add(lHspfFile)
+            lHspfFile = New atcUCI.HspfFile
             lHspfFile.Name = pScenario & ".output.wdm"
             lHspfFile.Typ = "WDM4"
             lHspfFile.Unit = "24"
-            .Value(2) = lHspfFile
+            .Add(lHspfFile)
+            lHspfFile = New atcUCI.HspfFile
             lHspfFile.Name = pScenario & ".ech"
             lHspfFile.Typ = "MESSU"
             lHspfFile.Unit = "25"
-            .Value(3) = lHspfFile
+            .Add(lHspfFile)
+            lHspfFile = New atcUCI.HspfFile
             lHspfFile.Name = pScenario & ".out"
             lHspfFile.Typ = ""
             lHspfFile.Unit = "26"
-            .Value(4) = lHspfFile
+            .Add(lHspfFile)
         End With
     End Sub
 

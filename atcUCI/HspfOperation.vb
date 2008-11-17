@@ -334,9 +334,10 @@ Public Class HspfOperation
 
     'Returns color for source.VolId
     Private Function IdColor(ByRef aColorId As Integer) As Integer
-        IdColor = RGB(Rnd(-aColorId - 53) * 255, _
-                  Rnd(-aColorId - 27) * 255, _
-                  Rnd(-aColorId - 33) * 255)
+        Dim lIdColor As Integer = RGB(Rnd(-aColorId - 53) * 255, _
+                                      Rnd(-aColorId - 27) * 255, _
+                                      Rnd(-aColorId - 33) * 255)
+        Return lIdColor
     End Function
 
     'Returns percent (0..1) given a source.VolId and value

@@ -69,18 +69,15 @@ Public Class HspfFilesBlk
         AddFromSpecs(aName, aType, lUnit)
     End Sub
 
-    Public Sub AddFromSpecs(ByRef aName As String, _
-                            ByRef aType As String, _
-                            ByRef aUnit As Integer)
-        Dim lUnit As Integer
-        Dim lFound As Boolean
+    Public Sub AddFromSpecs(ByVal aName As String, _
+                            ByVal aType As String, _
+                            ByVal aUnit As Integer)
         Dim lNewFile As New HspfFile
-
         lNewFile.Name = aName
         lNewFile.Typ = aType
         'find available unit
-        lUnit = aUnit - 1
-        lFound = True
+        Dim lUnit As Integer = aUnit - 1
+        Dim lFound As Boolean = True
         Do Until Not lFound
             lUnit += 1
             lFound = False
@@ -134,11 +131,10 @@ Public Class HspfFilesBlk
     Friend Sub ReadUciFile()
         Dim lBuff As String = Nothing
         Try
-            Dim lRectyp As Integer
             If Uci.FastFlag Then
                 pComment = GetCommentBeforeBlock("FILES")
             End If
-
+            Dim lRectyp As Integer
             Dim lRetcod As Integer = 0
             Dim lInit As Integer = 1
             Dim lOmCode As Integer = HspfOmCode("FILES")
