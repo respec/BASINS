@@ -19,6 +19,9 @@ Public Class HspfConnection
     Public Typ As Integer '1-ExtSource,2-Network,3-Schematic,4-ExtTarget
     Public ReadOnly EditControlName As String = "ATCoHspf.ctlConnectionEdit"
     Private pDesiredType As String
+    Friend Shared ExtSourceHeader As String = _
+       "<-Volume-> <Member> SsysSgap<--Mult-->Tran <-Target vols> <-Grp> <-Member-> ***" & vbCrLf & _
+       "<Name>   x <Name> x tem strg<-factor->strg <Name>   x   x        <Name> x x ***"
 
     Public ReadOnly Property DesiredRecordType() As String
         Get
@@ -394,7 +397,10 @@ Public Class HspfConnection
                         Static lOperationTypes() As String = {"PERLND", "IMPLND", "RCHRES"}
                         For Each lOperationType As String In lOperationTypes
                             For Each lMetSeg As HspfMetSeg In Uci.MetSegs
-                                lSB.AppendLine(lMetSeg.ToStringFromSpecs(lOperationType, lColumn, lLength, lHeaderPending))
+                                Dim lStr As String = lMetSeg.ToStringFromSpecs(lOperationType, lColumn, lLength, lHeaderPending)
+                                If lStr.Length > 0 Then
+                                    lSB.AppendLine(lStr)
+                                End If
                             Next
                         Next
                         'If pUci.PointSources.Count > 0 And pUci.MetSegs.Count > 0 Then
@@ -402,6 +408,9 @@ Public Class HspfConnection
                         'End If
                         'do point sources
                         For Each lPtSrc As HspfPointSource In Uci.PointSources
+                            If lHeaderPending Then
+                                lSB.AppendLine(ExtSourceHeader)
+                            End If
                             lSB.AppendLine(lPtSrc.ToStringFromSpecs(lColumn, lLength))
                             lHeaderPending = False
                         Next
@@ -410,10 +419,13 @@ Public Class HspfConnection
                             For Each lConnection As HspfConnection In lOperation.Sources
                                 If lConnection.Typ = lTypeIndex Then
                                     If lConnection.Comment.Length > 0 Then
-                                        lSB.Append(lConnection.Comment & vbCrLf)
+                                        If lConnection.Comment.Contains("<-Volume->") AndAlso Not lHeaderPending Then
+                                            'Logger.Dbg("Skip")
+                                        Else
+                                            lSB.AppendLine(lConnection.Comment)
+                                        End If
                                     ElseIf lHeaderPending Then
-                                        lSB.AppendLine("<-Volume-> <Member> SsysSgap<--Mult-->Tran <-Target vols> <-Grp> <-Member-> ***")
-                                        lSB.AppendLine("<Name>   x <Name> x tem strg<-factor->strg <Name>   x   x        <Name> x x ***")
+                                        lSB.AppendLine(ExtSourceHeader)
                                     End If
                                     Dim lStr As New System.Text.StringBuilder
                                     lStr.Append(lConnection.Source.VolName.Trim)
@@ -478,7 +490,11 @@ Public Class HspfConnection
                             For Each lConnection As HspfConnection In lOperation.Sources 'used to go thru targets, misses range
                                 If lConnection.Typ = lTypeIndex Then
                                     If lConnection.Comment.Length > 0 Then
-                                        lSB.AppendLine(lConnection.Comment)
+                                        If lConnection.Comment.Contains("<-Volume->") AndAlso Not lHeaderPending Then
+                                            'Logger.Dbg("Skip")
+                                        Else
+                                            lSB.AppendLine(lConnection.Comment)
+                                        End If
                                     ElseIf lHeaderPending Then
                                         lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->Tran <-Target vols> <-Grp> <-Member->  ***")
                                         lSB.AppendLine("<Name>   x        <Name> x x<-factor->strg <Name>   x   x        <Name> x x  ***")
@@ -545,6 +561,7 @@ Public Class HspfConnection
                                 End If
                             Next lConnection
                         Next lOperation
+                        Logger.Dbg("NetworkToStringComplete")
                     Case 3 'schematic
                         Dim lHeaderPending As Boolean = True
                         For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
@@ -605,12 +622,15 @@ Public Class HspfConnection
                         For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
                             For Each lConnection As HspfConnection In lOperation.Targets
                                 If lConnection.Typ = lTypeIndex Then
-                                    If lHeaderPending AndAlso (lConnection.Comment.Length = 0 OrElse Not lConnection.Comment.StartsWith("<-")) Then
+                                    If lConnection.Comment.Length > 0 Then
+                                        If lConnection.Comment.Contains("<-Volume->") AndAlso Not lHeaderPending Then
+                                            'Logger.Dbg("Skip")
+                                        Else
+                                            lSB.AppendLine(lConnection.Comment)
+                                        End If
+                                    ElseIf lHeaderPending Then
                                         lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->Tran <-Volume-> <Member> Tsys Aggr Amd ***")
                                         lSB.AppendLine("<Name>   x        <Name> x x<-factor->strg <Name>   x <Name>qf  tem strg strg***")
-                                    End If
-                                    If lConnection.Comment.Length > 0 Then
-                                        lSB.AppendLine(lConnection.Comment)
                                     End If
                                     lHeaderPending = False
                                     Dim lStr As New System.Text.StringBuilder

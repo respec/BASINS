@@ -282,12 +282,15 @@ Public Class HspfMetSeg
                     lStr.Append(lMember)
                     lStr.Append(Space(aCol(13) - lStr.Length - 1))
                     If lInit Then
-                        If Comment.Length = 0 Or Not aHeaderPending Then
+                        If aHeaderPending AndAlso Not Comment.Contains("<-Volume->") Then
+                            lSB.AppendLine(HspfConnection.ExtSourceHeader)
+                        End If
+                        If Comment.Length = 0 Then
                             lSB.AppendLine("*** Met Seg " & Name)
                         Else
                             lSB.AppendLine(Comment)
-                            aHeaderPending = False
                         End If
+                        aHeaderPending = False
                         lInit = False
                     End If
                     lSB.AppendLine(lStr.ToString)
