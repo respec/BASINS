@@ -1,11 +1,13 @@
 Imports MapWinUtility
 Imports atcUCI
 Imports atcUCIForms
+Imports atcUtility
 
 Public Module WinHSPF
     Friend pUCI As HspfUci
     Friend pMsg As HspfMsg
     Friend pIcon As Icon
+    Friend pDefUCI As HspfUci
 
     'Variableize each form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReach As frmReach
@@ -37,10 +39,25 @@ Public Module WinHSPF
     Sub Main()
         Logger.StartToFile("C:\dev\basins40\logs\WinHSPF.log")
 
+        'open hspf message mdb
         pMsg = New HspfMsg
         pMsg.Open("hspfmsg.mdb")
         Logger.Dbg("WinHSPF:Opened:hspfmsg.mdb")
 
+        'get starter uci ready
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lStarterUciName As String = "starter.uci"
+        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter\" & lStarterUciName
+        If Not FileExists(lStarterPath) Then
+            lStarterPath = "\basins\models\hspf\bin\starter\" & lStarterUciName
+            If Not FileExists(lStarterPath) Then
+                lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
+            End If
+        End If
+        pDefUCI = New HspfUci
+        pDefUCI.FastReadUciForStarter(pMsg, lStarterPath)
+
+        'show main form
         Dim lWinHSPF As New frmWinHSPF
         pIcon = lWinHSPF.Icon
         lWinHSPF.ShowDialog()
