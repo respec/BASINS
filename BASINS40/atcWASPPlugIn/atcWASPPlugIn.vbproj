@@ -118,6 +118,10 @@
       <Name>atcUtility</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcWASP\atcWASP.vbproj">
+      <Project>{74201F53-B122-40F0-9678-1DCDC45E99BC}</Project>
+      <Name>atcWASP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM</Name>
