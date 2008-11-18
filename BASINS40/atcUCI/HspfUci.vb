@@ -495,7 +495,7 @@ Public Class HspfUci
                 lConnection.ReadTimSer(Me)
                 lConnection = Nothing
                 For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
-                    lOpn.setTimSerConnections()
+                    lOpn.SetTimSerConnections()
                 Next
                 Logger.Dbg("ConnectionBlocksRead")
 
@@ -1960,8 +1960,8 @@ x:
         Next lSourceIndex
     End Sub
 
-    Public Sub AddOperation(ByRef aName As String, _
-                            ByRef aId As Integer)
+    Public Function AddOperation(ByRef aName As String, _
+                                 ByRef aId As Integer) As HspfOperation
         'add an operation/oper id (ie copy 100) to the uci object
         Dim lOpnBlk As HspfOpnBlk = pOpnBlks.Item(aName)
         If lOpnBlk.Count > 0 Then 'already have some of this operation, make sure this id is not in use
@@ -1986,7 +1986,8 @@ x:
 
         lOpnBlk.Ids.Add(lOpn)
         lOpn.OpnBlk = lOpnBlk
-    End Sub
+        Return lOpn
+    End Function
 
     Public Sub AddTable(ByRef aOperationName As String, _
                         ByRef aOperationId As Integer, _

@@ -23,8 +23,8 @@ Module Graph
         Dim lWdmDataSource As New atcDataSourceWDM
         lWdmDataSource.Open(lWdmFileName)
         'open expert system
-        Dim lExpertSystem As HspfSupport.ExpertSystem
-        lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
+        Dim lExpertSystem As HspfSupport.atcExpertSystem
+        lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
         Dim lCons As String = "Flow"
         'Dim lGraphForm As atcGraph.atcGraphForm
         Dim lZgc As ZedGraphControl

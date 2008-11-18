@@ -19,8 +19,8 @@ Module ExpertSystemStatistics
         Dim lWdmDataSource As New atcDataSourceWDM
         lWdmDataSource.Open(lWdmFileName)
 
-        Dim pExpertSystem As HspfSupport.ExpertSystem
-        pExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
+        Dim pExpertSystem As HspfSupport.atcExpertSystem
+        pExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
         Dim lStr As String = pExpertSystem.Report
         SaveFileString("outfiles\ExpertSysStats.txt", lStr)
     End Sub
