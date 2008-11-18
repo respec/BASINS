@@ -49,20 +49,23 @@ Module modHspfReadWrite
     Private Sub AddBMPs(ByVal aUci As atcUCI.HspfUci, ByVal aMassLinkIdOffset As Integer)
         With aUci
             'add new masslinks based on old ones
-            Dim lMassLinksNew As New Collection(Of atcUCI.HspfMassLink)
+            Dim lBmpracRchresMassLinkId As Integer
+            Dim lNewMassLinks As New Collection(Of atcUCI.HspfMassLink)
             For Each lMassLinkExisting As atcUCI.HspfMassLink In .MassLinks
-                If lMassLinkExisting.Target.VolName = "RCHRES" AndAlso _
-                   lMassLinkExisting.Source.VolName <> "RCHRES" Then
+                If lMassLinkExisting.Target.VolName = "RCHRES" Then
                     Dim lMassLink As atcUCI.HspfMassLink = lMassLinkExisting.Clone
                     With lMassLink
                         .Target.VolName = "BMPRAC"
                         .MassLinkId += aMassLinkIdOffset
+                        If .Source.VolName = "RCHRES" Then
+                            lBmpracRchresMassLinkId = .MassLinkId
+                        End If
                     End With
-                    lMassLinksNew.Add(lMassLink)
+                    lNewMassLinks.Add(lMassLink)
                 End If
             Next
-            For Each lMassLinkNew As atcUCI.HspfMassLink In lMassLinksNew
-                .MassLinks.Add(lMassLinkNew)
+            For Each lNewMassLink As atcUCI.HspfMassLink In lNewMassLinks
+                .MassLinks.Add(lNewMassLink)
             Next
 
             'add bmprac operations
@@ -77,11 +80,25 @@ Module modHspfReadWrite
                 If lOperation.OpTyp = atcUCI.HspfData.HspfOperType.hRchres Then
                     Dim lBmpIndex As Integer = 1
                     For Each lBmpName As String In lBmpNames
-                        Dim lNewBmprac As atcUCI.HspfOperation = _
-                           .AddOperation("BMPRAC", (10 * lOperation.Id) + lBmpIndex) 'TODO: need better way to calc ID
+                        Dim lBmpId As Integer = (10 * lOperation.Id) + lBmpIndex 'TODO: need better way to calc ID
+                        Dim lNewBmprac As atcUCI.HspfOperation = .AddOperation("BMPRAC", lBmpId)
                         .OpnSeqBlock.Opns.Insert(lOperationIndex, lNewBmprac)
+                        Dim lConnection As New atcUCI.HspfConnection
+                        With lConnection
+                            .Typ = 3
+                            .Uci = aUci
+                            .Source.VolName = "BMPRAC"
+                            .Source.VolId = lBmpId
+                            .Source.Opn = lNewBmprac
+                            .MassLink = lBmpracRchresMassLinkId
+                            .Target.VolName = "RCHRES"
+                            .Target.VolId = lOperation.Id
+                            .Target.Opn = lOperation
+                        End With
+                        .Connections.Add(lConnection)
                         lOperationIndex += 1
                         lBmpIndex += 1
+                        lOperation.Sources.Add(lConnection)
                     Next
                 End If
                 lOperationIndex += 1
@@ -119,6 +136,29 @@ Module modHspfReadWrite
             Next lOperation
 
             'update schematic
+            For Each lOperation As atcUCI.HspfOperation In .OpnBlks("RCHRES").Ids
+                For Each lSourceConnection As atcUCI.HspfConnection In lOperation.Sources
+                    If lSourceConnection.Source.VolName = "PERLND" OrElse _
+                       lSourceConnection.Source.VolName = "IMPLND" Then
+                        Dim lBmpIndex As Integer = 1
+                        Dim lConnection As atcUCI.HspfConnection = lSourceConnection.Clone
+                        With lConnection
+                            .Comment = ""
+                            .MassLink = lSourceConnection.MassLink + aMassLinkIdOffset
+                            'TODO: update with info from PRH
+                            .MFact = 0.01
+                            .MFactAsRead = "0.01".PadLeft(10)
+                            .Target.VolName = "BMPRAC"
+                            .Target.VolId = (10 * lOperation.Id) + lBmpIndex
+                            Dim lBmpOperation As atcUCI.HspfOperation = aUci.OpnBlks("BMPRAC").OperFromID(.Target.VolId)
+                            .Target.Opn = lBmpOperation
+                            lConnection.Source.Opn.Targets.Add(lConnection)
+                            lBmpOperation.Sources.Add(lConnection)
+                        End With
+                        .Connections.Add(lConnection)
+                    End If
+                Next
+            Next
         End With
     End Sub
 End Module
