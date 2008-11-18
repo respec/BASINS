@@ -33,6 +33,7 @@ Public Module WinHSPF
     Friend pfrmSaveAs As frmSaveAs
     Friend pfrmStarter As frmStarter
     Friend pfrmXSect As frmXSect
+    Friend pWinHSPF As frmWinHSPF
 
     'Friend pIPC As ATCoIPC
 
@@ -58,9 +59,9 @@ Public Module WinHSPF
         pDefUCI.FastReadUciForStarter(pMsg, lStarterPath)
 
         'show main form
-        Dim lWinHSPF As New frmWinHSPF
-        pIcon = lWinHSPF.Icon
-        lWinHSPF.ShowDialog()
+        pWinHSPF = New frmWinHSPF
+        pIcon = pWinHSPF.Icon
+        pWinHSPF.ShowDialog()
     End Sub
 
     Sub OpenUCI()
@@ -100,10 +101,12 @@ Public Module WinHSPF
                 End If
             End If
 
-            'ClearTree()
-            'BuildTree()
-            'UpdateLegend()
-            'UpdateDetails()
+            With pWinHSPF.SchematicDiagram
+                .ClearTree()
+                .BuildTree()
+                'TODO: .UpdateLegend()
+            End With
+
         Else
             Logger.Message("The current project contains no reaches.", "Reach Editor Problem", _
                            MessageBoxButtons.OK, MessageBoxIcon.Information, DialogResult.OK)
@@ -153,9 +156,7 @@ Public Module WinHSPF
         ElseIf aTableName = "SPEC-ACTIONS" Then
             UCIForms.Edit(aParent, pUCI.SpecialActionBlk, aTableName)
         Else
-            'DisableAll(True)
             Logger.Msg("Table/Block " & aTableName & " not found.", MsgBoxStyle.OkOnly, "Edit Problem")
-            'DisableAll(False)
         End If
     End Sub
 End Module
