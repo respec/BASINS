@@ -1,11 +1,11 @@
 Imports MapWinUtility
-'Imports atcWASP
+Imports atcWASP
 Imports atcData.atcDataManager
 
 Public Class PlugIn
     Inherits atcData.atcDataPlugin
 
-    'Private pWASPProject As WASPProject
+    Private pWASPProject As WASPProject
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -31,8 +31,7 @@ Public Class PlugIn
         atcMwGisUtility.GisUtil.MappingObject = aMapWin
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
         AddMenuIfMissing(ModelsMenuName & "_WASP", ModelsMenuName, "WASP")
-        'pWASPProject = New WASPProject
-        'pWASPProject.IsMetric = False
+        pWASPProject = New WASPProject
     End Sub
 
     Public Overrides Sub Terminate()
@@ -42,8 +41,7 @@ Public Class PlugIn
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = ModelsMenuName & "_WASP" Then
-            'pWASPProject = New WASPProject
-            'pWASPProject.IsMetric = False
+            pWASPProject = New WASPProject
             Dim lfrmWASPSetup As New frmWASPSetup
             With lfrmWASPSetup
                 .InitializeUI(Me)
@@ -57,9 +55,9 @@ Public Class PlugIn
         End If
     End Sub
 
-    'Public ReadOnly Property WASPProject() As WASPProject
-    '    Get
-    '        Return pWASPProject
-    '    End Get
-    'End Property
+    Public ReadOnly Property WASPProject() As WASPProject
+        Get
+            Return pWASPProject
+        End Get
+    End Property
 End Class
