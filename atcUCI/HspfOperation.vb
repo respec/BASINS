@@ -32,7 +32,7 @@ Public Class HspfOperation
     Public Id As Integer
     Public Tag As String = ""
     Public DefOpnId As Integer
-    Public ReadOnly EditControlName As String = "ATCoHspf.ctlOperationEdit"
+    Public Const EditControlName As String = "ATCoHspf.ctlOperationEdit"
     Public ReadOnly TableStatus As HspfStatus
     Public ReadOnly InputTimeseriesStatus As HspfStatus
     Public ReadOnly OutputTimeseriesStatus As HspfStatus
@@ -95,7 +95,7 @@ Public Class HspfOperation
         Return Tables.Contains(aName)
     End Function
 
-    Public Sub setTimSerConnections()
+    Public Sub SetTimSerConnections()
         Dim lOperName As String = HspfOperName(OpTyp)
         For Each lConnection As HspfConnection In Uci.Connections
             With lConnection.Target
@@ -117,7 +117,7 @@ Public Class HspfOperation
         Next lConnection
     End Sub
 
-    Public Sub setTimSerConnectionsSources()
+    Public Sub SetTimSerConnectionsSources()
         Dim lOperName As String = HspfOperName(OpTyp)
         For Each lConnection As HspfConnection In Uci.Connections
             With lConnection.Target
@@ -131,7 +131,7 @@ Public Class HspfOperation
         Next lConnection
     End Sub
 
-    Public Sub setTimSerConnectionsTargets()
+    Public Sub SetTimSerConnectionsTargets()
         Dim lOperName As String = HspfOperName(OpTyp)
         For Each lConnection As HspfConnection In Uci.Connections
             With lConnection.Source

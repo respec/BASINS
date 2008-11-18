@@ -5,6 +5,8 @@ Option Explicit On
 Imports System.Text
 
 Public Class HspfMassLink
+    Implements ICloneable
+
     Public Source As HspfSrcTar
     Public Target As HspfSrcTar
     Public Tran As String
@@ -13,19 +15,36 @@ Public Class HspfMassLink
     Public Uci As HspfUci
     Public MassLinkId As Integer
     Public Comment As String = ""
-    Public ReadOnly Property EditControlName() As String
-        Get
-            EditControlName = "ATCoHspf.ctlMassLinkEdit"
-        End Get
-    End Property
+    Public Const EditControlName As String = "ATCoHspf.ctlMassLinkEdit"
+    Public Const Caption As String = "Mass-Link Block"
 
-    Public ReadOnly Property Caption() As String
-        Get
-            Caption = "Mass-Link Block"
-        End Get
-    End Property
+    Public Sub New()
+        MyBase.New()
+        Source = New HspfSrcTar
+        Target = New HspfSrcTar
+        MFact = 1
+    End Sub
 
-    Public Sub readMassLinks(ByRef aUci As HspfUci)
+    Public Function Clone() As Object Implements System.ICloneable.Clone
+        Dim lNewMassLink As New HspfMassLink
+        With lNewMassLink
+            .Source = Me.Source.Clone
+            .Target = Me.Target.Clone
+            .Tran = Me.Tran
+            .MFact = Me.MFact
+            .MFactAsRead = Me.MFactAsRead
+            .Uci = Me.Uci
+            .MassLinkId = Me.MassLinkId
+            .Comment = Me.Comment
+        End With
+        Return lNewMassLink
+    End Function
+
+    Public Sub Edit()
+        editInit(Me, Me.Uci.Icon, True)
+    End Sub
+
+    Public Sub ReadMassLinks(ByRef aUci As HspfUci)
         Dim lMassLinkIds(-1) As Integer
         Dim lMassLinkKeys(-1) As Integer
         Dim lOmCode As Integer = HspfOmCode("MASS-LINK")
@@ -153,116 +172,98 @@ Public Class HspfMassLink
         Next lMassLinkIndex
     End Sub
 
-    Public Sub New()
-        MyBase.New()
-        Source = New HspfSrcTar
-        Target = New HspfSrcTar
-        MFact = 1
-    End Sub
-
-    Public Sub Edit()
-        editInit(Me, Me.Uci.icon, True)
-    End Sub
-
     Public Overrides Function ToString() As String
-        Dim s As String
-        Dim lSB As New StringBuilder
-        Dim lBlockDef As HspfBlockDef
-        Dim lTableDef As HspfTableDef
-        Dim j, i, k As Integer
-        Dim typeexists(4) As Boolean
-        Dim icol(15) As Integer
-        Dim ilen(15) As Integer
-        Dim lParmDef As HSPFParmDef
-        Dim t As String
-        Dim mlno(-1) As Integer
-        Dim mlcnt As Integer = 0
-        Dim found As Boolean
+        Dim lMassLinkIds(-1) As Integer
+        Dim lMassLinkCount As Integer = 0
 
-        For Each lML As HspfMassLink In Uci.MassLinks
-            found = False
-            For k = 0 To mlcnt - 1
-                If lML.MassLinkID = mlno(k) Then
-                    found = True
+        For Each lMassLink As HspfMassLink In Uci.MassLinks
+            Dim lFound As Boolean = False
+            For lMassLinkIndex As Integer = 0 To lMassLinkCount - 1
+                If lMassLink.MassLinkId = lMassLinkIds(lMassLinkIndex) Then
+                    lFound = True
                 End If
-            Next k
-            If found = False Then
-                mlcnt = mlcnt + 1
-                ReDim Preserve mlno(mlcnt)
-                mlno(mlcnt - 1) = lML.MassLinkID
+            Next lMassLinkIndex
+            If lFound = False Then
+                lMassLinkCount += 1
+                ReDim Preserve lMassLinkIds(lMassLinkCount)
+                lMassLinkIds(lMassLinkCount - 1) = lMassLink.MassLinkId
             End If
-        Next lML
+        Next lMassLink
 
-        s = "MASS-LINK"
-        lBlockDef = Uci.Msg.BlockDefs.Item(s)
-        lTableDef = lBlockDef.TableDefs.Item(0)
+        Dim s As String = "MASS-LINK"
+        Dim lBlockDef As HspfBlockDef = Uci.Msg.BlockDefs.Item(s)
+        Dim lTableDef As HspfTableDef = lBlockDef.TableDefs.Item(0)
         'get lengths and starting positions
-        j = 0
-        For Each lParmDef In lTableDef.ParmDefs
-            icol(j) = lParmDef.StartCol
-            ilen(j) = lParmDef.Length
-            j = j + 1
+        Dim j As Integer = 0
+        Dim lStartCol(15) As Integer
+        Dim lLength(15) As Integer
+        For Each lParmDef As HSPFParmDef In lTableDef.ParmDefs
+            lStartCol(j) = lParmDef.StartCol
+            lLength(j) = lParmDef.Length
+            j += 1
         Next lParmDef
+        Dim lSB As New StringBuilder
         lSB.AppendLine(s)
 
-        For i = 1 To mlcnt
+        For i As Integer = 1 To lMassLinkCount
             lSB.AppendLine(" ")
-            lSB.AppendLine("  MASS-LINK    " & CStr(mlno(i - 1)).PadLeft(5))
+            lSB.AppendLine("  MASS-LINK    " & CStr(lMassLinkIds(i - 1)).PadLeft(5))
             'now start building the records
             lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->     <-Target vols> <-Grp> <-Member->  ***")
             lSB.AppendLine("<Name>            <Name> x x<-factor->     <Name>                <Name> x x  ***")
             For Each lML As HspfMassLink In Uci.MassLinks
-                If lML.MassLinkID = mlno(i - 1) Then
+                If lML.MassLinkId = lMassLinkIds(i - 1) Then
                     If lML.Comment.Length > 0 Then
                         lSB.AppendLine(lML.Comment)
                     End If
                     Dim lStr As New StringBuilder
                     lStr.Append(lML.Source.VolName.Trim)
-                    lStr.Append(Space(icol(1) - lStr.Length - 1)) 'pad prev field
+                    lStr.Append(Space(lStartCol(1) - lStr.Length - 1)) 'pad prev field
                     lStr.Append(lML.Source.Group)
-                    lStr.Append(Space(icol(2) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(2) - lStr.Length - 1))
                     lStr.Append(lML.Source.Member)
-                    lStr.Append(Space(icol(3) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(3) - lStr.Length - 1))
+                    Dim t As String
                     If lML.Source.MemSub1 <> 0 Then
-                        t = CStr(lML.Source.MemSub1).PadLeft(ilen(3))
+                        t = CStr(lML.Source.MemSub1).PadLeft(lLength(3))
                         If lML.Source.VolName = "RCHRES" Then
                             t = Uci.IntAsCat(lML.Source.Member, 1, t)
                         End If
                         lStr.Append(t)
                     End If
-                    lStr.Append(Space(icol(4) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(4) - lStr.Length - 1))
                     If lML.Source.MemSub2 <> 0 Then
-                        t = CStr(lML.Source.MemSub2).PadLeft(ilen(4))
+                        t = CStr(lML.Source.MemSub2).PadLeft(lLength(4))
                         If lML.Source.VolName = "RCHRES" Then
                             t = Uci.IntAsCat(lML.Source.Member, 2, t)
                         End If
                         lStr.Append(t)
                     End If
-                    lStr.Append(Space(icol(5) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(5) - lStr.Length - 1))
                     If NumericallyTheSame((lML.MFactAsRead), (lML.MFact)) Then
                         lStr.Append(lML.MFactAsRead)
                     ElseIf lML.MFact <> 1 Then
-                        lStr.Append(CStr(lML.MFact).PadLeft(ilen(5)))
+                        lStr.Append(CStr(lML.MFact).PadLeft(lLength(5)))
                     End If
-                    lStr.Append(Space(icol(6) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(6) - lStr.Length - 1))
                     'str = str & lML.Tran
                     'str = str & Space(icol(7) - Len(str) - 1)
                     lStr.Append(lML.Target.VolName)
-                    lStr.Append(Space(icol(7) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(7) - lStr.Length - 1))
                     lStr.Append(lML.Target.Group)
-                    lStr.Append(Space(icol(8) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(8) - lStr.Length - 1))
                     lStr.Append(lML.Target.Member)
-                    lStr.Append(Space(icol(9) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(9) - lStr.Length - 1))
                     If lML.Target.MemSub1 <> 0 Then
-                        t = CStr(lML.Target.MemSub1).PadLeft(ilen(9))
+                        t = CStr(lML.Target.MemSub1).PadLeft(lLength(9))
                         If lML.Target.VolName = "RCHRES" Then
                             t = Uci.IntAsCat(lML.Target.Member, 1, t)
                         End If
                         lStr.Append(t)
                     End If
-                    lStr.Append(Space(icol(10) - lStr.Length - 1))
+                    lStr.Append(Space(lStartCol(10) - lStr.Length - 1))
                     If lML.Target.MemSub2 <> 0 Then
-                        t = Space(ilen(10))
+                        t = Space(lLength(10))
                         t = RSet(CStr(lML.Target.MemSub2), Len(t))
                         If lML.Target.VolName = "RCHRES" Then
                             t = Uci.IntAsCat(lML.Target.Member, 2, t)
@@ -272,7 +273,7 @@ Public Class HspfMassLink
                     lSB.AppendLine(lStr.ToString)
                 End If
             Next lML
-            lSB.AppendLine("  END MASS-LINK" & CStr(mlno(i - 1)).PadLeft(5))
+            lSB.AppendLine("  END MASS-LINK" & CStr(lMassLinkIds(i - 1)).PadLeft(5))
         Next i
         lSB.AppendLine("END " & s)
         Return lSB.ToString
