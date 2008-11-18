@@ -364,7 +364,6 @@ Public Module modTimeseriesMath
             Dim lNewNumVals As Integer
             Dim lNewInd As Integer
             Dim lOldInd As Integer
-            Dim lDateNew As Double
             Dim lDateOld As Double
             Dim lValOld As Double
             Dim lNewVals() As Double
@@ -377,12 +376,11 @@ Public Module modTimeseriesMath
                 lOldInd = 1
                 lDateOld = aOldTSer.Dates.Value(lOldInd)
                 lNewInd = 1
-                lDateNew = lNewDates(lNewInd)
                 Dim lAnyValueAttributes As Boolean = aOldTSer.ValueAttributesExist
                 Dim lNewValueAttributes(lNewDates.GetUpperBound(0)) As atcDataAttributes
 
                 While lNewInd <= lNewNumVals
-                    While lDateNew < lDateOld - JulianMillisecond 'Fill values not present in original data
+                    While lNewInd <= lNewNumVals AndAlso lNewDates(lNewInd) < lDateOld - JulianMillisecond 'Fill values not present in original data
                         Select Case lValOld
                             Case aMissVal
                                 If aOldTSer.Value(lOldInd) = aMissVal Then
@@ -403,43 +401,22 @@ Public Module modTimeseriesMath
                                 lNewValueAttributes(lNewInd) = New atcDataAttributes
                                 lNewValueAttributes(lNewInd).SetValue("Filled", True)
                         End Select
-                        'lNewDates(lNewInd) = lDateNew
                         lNewInd += 1
-                        lDateNew = lNewDates(lNewInd)
-                        'If lVarLength = 1 Then
-                        '  Call J2Date(lDateNew, lDate)
-                        '  lDateNew = lDateNew + daymon(lDate(0), lDate(1))
-                        'ElseIf lVarLength = 2 Then
-                        '  Call J2Date(lDateNew, lDate)
-                        '  lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
-                        'Else
-                        '  lDateNew = lDateNew + lIntvl
-                        'End If
                     End While
-                    lValOld = aOldTSer.Value(lOldInd)
-                    lNewVals(lNewInd) = lValOld
-                    If lAnyValueAttributes AndAlso aOldTSer.ValueAttributesExist(lOldInd) Then
-                        lNewValueAttributes(lNewInd) = aOldTSer.ValueAttributes(lOldInd)
-                    End If
-                    'lNewDates(lNewInd) = lDateNew
-                    'If lVarLength = 1 Then 'monthly
-                    '  Call J2Date(lDateNew, lDate)
-                    '  lDateNew = lDateNew + daymon(lDate(0), lDate(1))
-                    'ElseIf lVarLength = 2 Then 'yearly
-                    '  Call J2Date(lDateNew, lDate)
-                    '  lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
-                    'Else
-                    '  lDateNew = lDateNew + lIntvl
-                    'End If
-                    lNewInd += 1
                     If lNewInd <= lNewNumVals Then
-                        lDateNew = lNewDates(lNewInd)
-                    End If
-                    lOldInd += 1
-                    If lOldInd <= aOldTSer.numValues Then
-                        lDateOld = aOldTSer.Dates.Value(lOldInd)
+                        lValOld = aOldTSer.Value(lOldInd)
+                        lNewVals(lNewInd) = lValOld
+                        If lAnyValueAttributes AndAlso aOldTSer.ValueAttributesExist(lOldInd) Then
+                            lNewValueAttributes(lNewInd) = aOldTSer.ValueAttributes(lOldInd)
+                        End If
+                        lNewInd += 1
+                        lOldInd += 1
+                        If lOldInd <= aOldTSer.numValues Then
+                            lDateOld = aOldTSer.Dates.Value(lOldInd)
+                        End If
                     End If
                 End While
+
                 Dim lNewTSer As New atcTimeseries(aDataSource)
                 CopyBaseAttributes(aOldTSer, lNewTSer)
                 lNewTSer.Dates = New atcTimeseries(Nothing)

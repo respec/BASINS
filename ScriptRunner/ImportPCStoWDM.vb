@@ -13,7 +13,7 @@ Module ScriptImportPCStoWDM
     Private pDebug As Boolean = False
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        ChDriveDir("C:\test\R4Whitlock")
+        ChDriveDir("C:\test")
         Logger.StartToFile("ScriptImportPCStoWDM.log", , , True)
 
         Dim lTextFilename As String = "qryWDMoutput.txt"
@@ -27,6 +27,7 @@ Module ScriptImportPCStoWDM
         Dim lDayColumn As Integer = 5
         Dim lValueColumn As Integer = 6
         Dim lLocationColumn As Integer = 8
+        Dim lFill As Boolean = False
 
         Dim lUserParms As New atcCollection
         With lUserParms
@@ -41,6 +42,7 @@ Module ScriptImportPCStoWDM
             .Add("Day Column", lDayColumn)
             .Add("Value Column", lValueColumn)
             .Add("Location Column", lLocationColumn)
+            .Add("Fill Monthly", lFill)
         End With
         Dim lAsk As New frmArgs
         If lAsk.AskUser("Specify full path of text file to import and WDM file to write into", lUserParms) Then
@@ -56,6 +58,7 @@ Module ScriptImportPCStoWDM
                 lDayColumn = .ItemByKey("Day Column")
                 lValueColumn = .ItemByKey("Value Column")
                 lLocationColumn = .ItemByKey("Location Column")
+                lFill = .ItemByKey("Fill Monthly")
             End With
 
             'process the data into timeseries
@@ -84,7 +87,11 @@ Module ScriptImportPCStoWDM
                             lTSBuilder.Attributes.SetValue("Constituent", .Value(lConstituentColumn).Replace("""", ""))
                             lTSBuilder.Attributes.SetValue("Location", .Value(lLocationColumn).Replace("""", ""))
                             lTSBuilder.Attributes.SetValue("Description", .Value(lDescriptionColumn).Replace("""", ""))
-                            lTSBuilder.Attributes.SetValue("tu", atcTimeUnit.TUMonth)
+                            If lFill Then
+                                lTSBuilder.Attributes.SetValue("tu", atcTimeUnit.TUMonth)
+                            Else
+                                lTSBuilder.Attributes.SetValue("tu", atcTimeUnit.TUUnknown)
+                            End If
                             lTSBuilder.Attributes.SetValue("ts", 1)
                         End If
 
@@ -110,18 +117,20 @@ Module ScriptImportPCStoWDM
                 End If
             End With
 
-            Dim lUpdateReportSB As New Text.StringBuilder
-            lUpdateReportSB.AppendLine("Description" & vbTab & "Constituent" & vbTab & _
-                                       "Index" & vbTab & "Month" & vbTab & "Prev" & vbTab & _
-                                       "Intrp" & vbTab & "Next" & vbTab & "Mean" & vbTab & "MissCnt")
+            'Dim lUpdateReportSB As New Text.StringBuilder
+            'lUpdateReportSB.AppendLine("Description" & vbTab & "Constituent" & vbTab & _
+            '                           "Index" & vbTab & "Month" & vbTab & "Prev" & vbTab & _
+            '                           "Intrp" & vbTab & "Next" & vbTab & "Mean" & vbTab & "MissCnt")
             Dim lNumTimeseries As Integer = lTSBuilders.Count
             Dim lProgressTimeseries As Integer = 1
             Dim lWdm As New atcDataSourceWDM
             If lWdm.Open(lWdmName) Then
                 For Each lDataset As atcTimeseries In lTSBuilders.CreateTimeseriesGroup
                     Dim lNumValuesOrig As Integer = lDataset.numValues
-                    lDataset = FillValues(lDataset, atcTimeUnit.TUMonth, 1, GetNaN, GetNaN)
-                    Logger.Dbg("Fill " & lDSN & " NumValues " & lNumValuesOrig & " " & lDataset.numValues)
+                    If lFill Then
+                        lDataset = FillValues(lDataset, atcTimeUnit.TUMonth, 1, GetNaN, GetNaN)
+                        Logger.Dbg("Fill " & lDSN & " NumValues " & lNumValuesOrig & " " & lDataset.numValues)
+                    End If
                     If lNumValuesOrig < lDataset.numValues Then 'some were filled, now be smarter
                         Dim lDesc As String = lDataset.Attributes.GetValue("Description")
                         Dim lCons As String = lDataset.Attributes.GetValue("Cons")
@@ -131,8 +140,8 @@ Module ScriptImportPCStoWDM
                         Dim lMonthlyAttributes As New atcDataAttributes
                         lSeasonalAttributes.SetValue("Mean", 0) 'fluxes are summed from daily, monthly or annual to annual
                         lSeasons.SetSeasonalAttributes(lDataset, lSeasonalAttributes, lMonthlyAttributes)
-                        For lMonthIndex As Integer = 0 To 11
-                            With lMonthlyAttributes(lMonthIndex)
+                        For Each lAttribute As atcDefinedValue In lMonthlyAttributes
+                            With lAttribute
                                 Logger.Dbg(lDesc & " " & lCons & " " & .Arguments(1).Value & " " & .Arguments(2).Value & " " & DoubleToString(.Value, , "#,###,##0.00"))
                             End With
                         Next
@@ -149,19 +158,19 @@ Module ScriptImportPCStoWDM
                                     Dim lNextValueIndex As Integer = lIndex + 1
                                     Dim lMissingCount As Integer = 1
                                     Dim lNextValue As Double = Double.NaN
-                                    Do While Double.IsNaN(lNextValue) And lNextValueIndex < lDataset.numValues
+                                    Do While Double.IsNaN(lNextValue) AndAlso lNextValueIndex < lDataset.numValues
                                         lNextValueIndex += 1
                                         lMissingCount += 1
                                         lNextValue = lDataset.Value(lNextValueIndex)
                                     Loop
-                                    lUpdateReportSB.AppendLine(lDesc & vbTab & lCons & vbTab & _
-                                                               lIndex & vbTab & _
-                                                               lMonth & vbTab & _
-                                                               lPrevVal & vbTab & _
-                                                               DoubleToString(lDatasetFillByInterpolation.Value(lIndex), , "#,###,##0.00") & vbTab & _
-                                                               lNextValue & vbTab & _
-                                                               DoubleToString(lMonthlyAttributes(lMonth - 1).Value, , "#,###,##0.00") & vbTab & _
-                                                               lMissingCount)
+                                    'lUpdateReportSB.AppendLine(lDesc & vbTab & lCons & vbTab & _
+                                    '                           lIndex & vbTab & _
+                                    '                           lMonth & vbTab & _
+                                    '                           lPrevVal & vbTab & _
+                                    '                           DoubleToString(lDatasetFillByInterpolation.Value(lIndex), , "#,###,##0.00") & vbTab & _
+                                    '                           lNextValue & vbTab & _
+                                    '                           DoubleToString(lMonthlyAttributes(lMonth - 1).Value, , "#,###,##0.00") & vbTab & _
+                                    '                           lMissingCount)
                                     lDataset.Value(lIndex) = lDatasetFillByInterpolation.Value(lIndex)
                                 Catch lEx As Exception
                                     Logger.Dbg("Fill Problem " & lEx.Message)
@@ -176,7 +185,7 @@ Module ScriptImportPCStoWDM
                     lDSN += 1
                     lWdm.AddDataset(lDataset, atcDataSource.EnumExistAction.ExistRenumber)
                 Next
-                SaveFileString("UpdateReport.txt", lUpdateReportSB.ToString)
+                'SaveFileString("UpdateReport.txt", lUpdateReportSB.ToString)
                 Logger.Status("Wrote " & lNumTimeseries & " to " & lWdmName, True)
             Else
                 Logger.Msg("Unable to open WDM file '" & lWdmName & "' for writing", "PCS to WDM")
