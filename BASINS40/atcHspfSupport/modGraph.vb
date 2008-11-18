@@ -104,9 +104,10 @@ Public Module Graph
         If aTimeSeries.Keys.Contains("Precipitation") Then
             lPrecTser = aTimeSeries.ItemByKey("Precipitation")
             lPrecTser.Attributes.SetValue("YAxis", "Aux")
-            lDataGroup.Add(SubsetByDate(lPrecTser, _
-                                        aSDateJ, _
-                                        aEDateJ, Nothing))
+            lDataGroup.Add(Aggregate(SubsetByDate(lPrecTser, _
+                                                  aSDateJ, _
+                                                  aEDateJ, Nothing), _
+                                     atcTimeUnit.TUDay, 1, atcTran.TranSumDiv, Nothing))
             lPaneCount = 2
         End If
 
