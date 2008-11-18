@@ -15,6 +15,29 @@ Public Class atcDefinedValue
         End With
         Return newDefinedValue
     End Function
+
+    Public Overrides Function ToString() As String
+        On Error Resume Next
+        Dim lString As String = ""
+        If Definition Is Nothing Then
+            lString &= "No Definition"
+        Else
+            lString &= Definition.ToString
+        End If
+        lString &= " Value = "
+        If Value Is Nothing Then
+            lString &= "Nothing"
+        Else
+            lString &= Value.ToString
+        End If
+        If Arguments IsNot Nothing AndAlso Arguments.Count > 0 Then
+            lString &= " " & Arguments.Count & " Arguments: "
+            For Each lValidItem As atcDefinedValue In Arguments
+                lString &= lValidItem.ToString & " "
+            Next
+        End If
+        Return lString
+    End Function
 End Class
 
 ''' <summary><para>Detailed type information about an attribute value</para></summary>
@@ -271,7 +294,7 @@ Public Class atcAttributeDefinition
         lString &= " Category: " & Category
         lString &= " CopiesInherit: " & pCopiesInherit
         lString &= " Help: " & Help
-        lString &= " DefaultValue: " & DefaultValue.ToString
+        If DefaultValue IsNot Nothing Then lString &= " DefaultValue: " & DefaultValue.ToString
         lString &= " ID: " & ID
         lString &= " Editable: " & Editable
         lString &= " Min: " & Min
