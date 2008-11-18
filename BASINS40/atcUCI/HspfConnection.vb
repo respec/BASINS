@@ -5,6 +5,8 @@ Option Explicit On
 Imports MapWinUtility
 
 Public Class HspfConnection
+    Implements ICloneable
+
     Public MFact As Double
     Public MFactAsRead As String
     Public Uci As HspfUci
@@ -17,11 +19,30 @@ Public Class HspfConnection
     Public MassLink As Integer
     Public Comment As String = ""
     Public Typ As Integer '1-ExtSource,2-Network,3-Schematic,4-ExtTarget
-    Public ReadOnly EditControlName As String = "ATCoHspf.ctlConnectionEdit"
+    Public Const EditControlName As String = "ATCoHspf.ctlConnectionEdit"
     Private pDesiredType As String
     Friend Shared ExtSourceHeader As String = _
        "<-Volume-> <Member> SsysSgap<--Mult-->Tran <-Target vols> <-Grp> <-Member-> ***" & vbCrLf & _
        "<Name>   x <Name> x tem strg<-factor->strg <Name>   x   x        <Name> x x ***"
+
+    Public Function Clone() As Object Implements System.ICloneable.Clone
+        Dim lNewConnection As New HspfConnection
+        With lNewConnection
+            .MFact = Me.MFact
+            .MFactAsRead = Me.MFactAsRead
+            .Uci = Me.Uci
+            .Source = Me.Source.Clone
+            .Target = Me.Target.Clone
+            .Tran = Me.Tran
+            .Sgapstrg = Me.Sgapstrg
+            .Amdstrg = Me.Amdstrg
+            .Ssystem = Me.Ssystem
+            .MassLink = Me.MassLink
+            .Comment = Me.Comment
+            .Typ = Me.Typ
+        End With
+        Return lNewConnection
+    End Function
 
     Public ReadOnly Property DesiredRecordType() As String
         Get
@@ -187,7 +208,9 @@ Public Class HspfConnection
                     lComment = ""
                 End If
                 aUci.Connections.Add(lConnection)
-            ElseIf lRecTyp = -1 And lRetCod <> 1 Then 'save comment
+            ElseIf lRecTyp = -1 And lRetCod <> 1 _
+                AndAlso Not lBuff.Contains("<-Volume->") _
+                AndAlso Not lBuff.Contains("<Name>") Then 'save comment
                 If lComment.Length = 0 Then
                     lComment = lBuff
                 Else
@@ -237,8 +260,9 @@ Public Class HspfConnection
                 lConnection.Comment = lComment
                 aUci.Connections.Add(lConnection)
                 lComment = ""
-            ElseIf lRecTyp = -1 And lRetCod <> 1 Then
-                'save comment
+            ElseIf lRecTyp = -1 And lRetCod <> 1 _
+                AndAlso Not lBuff.Contains("<-Volume->") _
+                AndAlso Not lBuff.Contains("<Name>") Then 'save comment
                 If lComment.Length = 0 Then
                     lComment = lBuff
                 Else
