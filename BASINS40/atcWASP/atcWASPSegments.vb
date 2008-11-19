@@ -31,12 +31,12 @@ Public Class Segments
             lString.Append(" ")
         Next
 
-        lString.Append("C Seg Number   Seg Length  Seg Width  DMult   Vmult  SegSlope  SegRough")
+        lString.Append("C Seg Number   Seg Length  Seg Width  DMult   Vmult  SegSlope  SegRough  DownSeg  InflowTS")
         lString.Append(" ")
 
         For Each lSegment In Me
             With lSegment
-                lString.Append(StrPad(.Number, 16, " ", False))
+                lString.Append(StrPad(.ID, 16, " ", False))
                 lString.Append(" ")
                 lString.Append(StrPad(Format(.Length, "0.00"), 10, " ", False))
                 lString.Append(" ")
@@ -49,6 +49,8 @@ Public Class Segments
                 lString.Append(StrPad(Format(.Slope, "0.0000"), 10, " ", False))
                 lString.Append(" ")
                 lString.Append(StrPad(Format(.Roughness, "0.000"), 10, " ", False))
+                lString.Append(" ")
+                lString.Append(StrPad(.DownID, 16, " ", False))
                 lString.Append(vbCrLf)
             End With
         Next
@@ -60,11 +62,13 @@ End Class
 
 Public Class Segment
     Public Name As String = ""
-    Public Number As Integer = 0
+    Public ID As String = ""
+    Public DownID As String = ""
     Public Length As Double = 0.0
     Public Width As Double = 0.0
     Public Dmult As Double = 0.0
     Public Vmult As Double = 0.0
     Public Slope As Double = 0.05
     Public Roughness As Double = 0.0
+    Public InflowTimeseriesID As String = ""
 End Class
