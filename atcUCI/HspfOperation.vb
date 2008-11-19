@@ -52,7 +52,7 @@ Public Class HspfOperation
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
-            If Value Then
+            If Value AndAlso OpnBlk IsNot Nothing Then
                 OpnBlk.Edited = True
             End If
         End Set

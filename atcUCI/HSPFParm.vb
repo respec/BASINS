@@ -29,7 +29,7 @@ Public Class HspfParm
         End Get
         Set(ByVal Value As String)
             pValue = Value
-            If Not pParent Is Nothing Then
+            If pParent IsNot Nothing Then
                 pParent.Edited = True
             End If
         End Set

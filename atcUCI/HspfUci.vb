@@ -1960,24 +1960,27 @@ x:
         Next lSourceIndex
     End Sub
 
+    Public Function OperationExists(ByVal aName As String, ByVal aId As Integer) As Boolean
+        Dim lExists As Boolean = False
+        Dim lOpnBlk As HspfOpnBlk = pOpnBlks.Item(aName)
+        If lOpnBlk.Count > 0 Then
+            For Each lOperation As HspfOperation In lOpnBlk.Ids
+                If lOperation.Id = aId Then 'in use
+                    lExists = True
+                    Exit For
+                End If
+            Next lOperation
+        End If
+        Return lExists
+    End Function
+
     Public Function AddOperation(ByRef aName As String, _
                                  ByRef aId As Integer) As HspfOperation
         'add an operation/oper id (ie copy 100) to the uci object
         Dim lOpnBlk As HspfOpnBlk = pOpnBlks.Item(aName)
-        If lOpnBlk.Count > 0 Then 'already have some of this operation, make sure this id is not in use
-            Do
-                Dim lIdInUse As Integer = 0
-                For Each lOperation As HspfOperation In lOpnBlk.Ids
-                    If lOperation.Id = aId Then 'in use
-                        lIdInUse = aId
-                        aId += 1
-                    End If
-                Next lOperation
-                If lIdInUse = 0 Then
-                    Exit Do
-                End If
-            Loop
-        End If
+        While OperationExists(aName, aId) 'get next free Id
+            aId += 1
+        End While
 
         Dim lOpn As New HspfOperation
         lOpn.Name = aName
