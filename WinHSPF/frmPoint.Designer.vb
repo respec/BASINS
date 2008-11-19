@@ -35,7 +35,7 @@ Partial Class frmPoint
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.grpDetails = New System.Windows.Forms.GroupBox
-        Me.AtcGrid1 = New atcControls.atcGrid
+        Me.agdPoint = New atcControls.atcGrid
         Me.Button9 = New System.Windows.Forms.Button
         Me.Button7 = New System.Windows.Forms.Button
         Me.Button8 = New System.Windows.Forms.Button
@@ -159,7 +159,7 @@ Partial Class frmPoint
         '
         'grpDetails
         '
-        Me.grpDetails.Controls.Add(Me.AtcGrid1)
+        Me.grpDetails.Controls.Add(Me.agdPoint)
         Me.grpDetails.Controls.Add(Me.Button9)
         Me.grpDetails.Controls.Add(Me.Button7)
         Me.grpDetails.Controls.Add(Me.Button8)
@@ -170,19 +170,19 @@ Partial Class frmPoint
         Me.grpDetails.TabStop = False
         Me.grpDetails.Text = "Details of <    >"
         '
-        'AtcGrid1
+        'agdPoint
         '
-        Me.AtcGrid1.AllowHorizontalScrolling = True
-        Me.AtcGrid1.AllowNewValidValues = False
-        Me.AtcGrid1.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.Fixed3D = False
-        Me.AtcGrid1.LineColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.LineWidth = 0.0!
-        Me.AtcGrid1.Location = New System.Drawing.Point(57, 17)
-        Me.AtcGrid1.Name = "AtcGrid1"
-        Me.AtcGrid1.Size = New System.Drawing.Size(406, 267)
-        Me.AtcGrid1.Source = Nothing
-        Me.AtcGrid1.TabIndex = 25
+        Me.agdPoint.AllowHorizontalScrolling = True
+        Me.agdPoint.AllowNewValidValues = False
+        Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.agdPoint.Fixed3D = False
+        Me.agdPoint.LineColor = System.Drawing.Color.Empty
+        Me.agdPoint.LineWidth = 0.0!
+        Me.agdPoint.Location = New System.Drawing.Point(57, 17)
+        Me.agdPoint.Name = "agdPoint"
+        Me.agdPoint.Size = New System.Drawing.Size(406, 267)
+        Me.agdPoint.Source = Nothing
+        Me.agdPoint.TabIndex = 25
         '
         'Button9
         '
@@ -271,7 +271,7 @@ Partial Class frmPoint
     Friend WithEvents Button8 As System.Windows.Forms.Button
     Friend WithEvents Button9 As System.Windows.Forms.Button
     Friend WithEvents Button7 As System.Windows.Forms.Button
-    Friend WithEvents AtcGrid1 As atcControls.atcGrid
+    Friend WithEvents agdPoint As atcControls.atcGrid
     Friend WithEvents cmdDetailsHide As System.Windows.Forms.Button
     Friend WithEvents cmdDetailsShow As System.Windows.Forms.Button
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
