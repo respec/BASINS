@@ -454,19 +454,16 @@ Public Class HspfConnection
                                     Dim lStr As New System.Text.StringBuilder
                                     lStr.Append(lConnection.Source.VolName.Trim)
                                     lStr.Append(Space(lColumn(1) - lStr.Length - 1)) 'pad prev field
-                                    Dim t As String = Space(lLength(1)) 'right justify numbers
-                                    t = RSet(CStr(lConnection.Source.VolId), Len(t))
-                                    lStr.Append(t)
+                                    lStr.Append(CStr(lConnection.Source.VolId).PadLeft(lLength(1)))
                                     lStr.Append(Space(lColumn(2) - lStr.Length - 1))
                                     lStr.Append(lConnection.Source.Member)
                                     lStr.Append(Space(lColumn(3) - lStr.Length - 1))
                                     If lConnection.Source.MemSub1 <> 0 Then
-                                        t = Space(lLength(3))
-                                        t = RSet(CStr(lConnection.Source.MemSub1), Len(t))
+                                        Dim lS As String = CStr(lConnection.Source.MemSub1).PadLeft(lLength(3))
                                         If lConnection.Source.VolName = "RCHRES" Then
-                                            t = Uci.IntAsCat(lConnection.Source.Member, 1, t)
+                                            lS = Uci.IntAsCat(lConnection.Source.Member, 1, lS)
                                         End If
-                                        lStr.Append(t)
+                                        lStr.Append(lS)
                                     End If
                                     lStr.Append(Space(lColumn(4) - lStr.Length - 1))
                                     lStr.Append(lConnection.Ssystem)
@@ -490,19 +487,19 @@ Public Class HspfConnection
                                     lStr.Append(lConnection.Target.Member)
                                     lStr.Append(Space(lColumn(13) - lStr.Length - 1))
                                     If lConnection.Target.MemSub1 <> 0 Then
-                                        t = CStr(lConnection.Target.MemSub1).PadLeft(lLength(13))
+                                        Dim lS As String = CStr(lConnection.Target.MemSub1).PadLeft(lLength(13))
                                         If lConnection.Target.VolName = "RCHRES" Then
-                                            t = Uci.IntAsCat(lConnection.Target.Member, 1, t)
+                                            lS = Uci.IntAsCat(lConnection.Target.Member, 1, lS)
                                         End If
-                                        lStr.Append(t)
+                                        lStr.Append(lS)
                                     End If
                                     lStr.Append(Space(lColumn(14) - lStr.Length - 1))
                                     If lConnection.Target.MemSub2 <> 0 Then
-                                        t = CStr(lConnection.Target.MemSub2).PadLeft(lLength(14))
+                                        Dim lS As String = CStr(lConnection.Target.MemSub2).PadLeft(lLength(14))
                                         If lConnection.Target.VolName = "RCHRES" Then
-                                            t = Uci.IntAsCat(lConnection.Target.Member, 2, t)
+                                            lS = Uci.IntAsCat(lConnection.Target.Member, 2, lS)
                                         End If
-                                        lStr.Append(t)
+                                        lStr.Append(lS)
                                     End If
                                     lSB.AppendLine(lStr.ToString)
                                 End If
@@ -685,11 +682,9 @@ Public Class HspfConnection
                                     If NumericallyTheSame((lConnection.MFactAsRead), (lConnection.MFact)) Then
                                         lStr.Append(lConnection.MFactAsRead)
                                     ElseIf lConnection.MFact <> 1 Then
-                                        'lConn.MFact = Format(lConn.MFact, "0.#######")
-                                        'RSet t = CStr(lConn.MFact)
-                                        Dim t As String = RSet(HspfTable.NumFmtRE(lConnection.MFact, lLength(6) - 1), lLength(6) - 1)
-                                        lConnection.MFact = CDbl(t)
-                                        lStr.Append(" " & t)
+                                        Dim lS As String = HspfTable.NumFmtRE(lConnection.MFact, lLength(6) - 1).PadLeft(lLength(6) - 1)
+                                        lConnection.MFact = CDbl(lS)
+                                        lStr.Append(" " & lS)
                                     End If
                                     lStr.Append(Space(lColumn(7) - lStr.Length - 1))
                                     lStr.Append(lConnection.Tran)
