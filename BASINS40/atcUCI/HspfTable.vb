@@ -6,6 +6,8 @@ Imports System.Collections.ObjectModel
 
 Public Class HspfTables
     Inherits KeyedCollection(Of String, HspfTable)
+    Implements ICloneable
+
     Protected Overrides Function GetKeyForItem(ByVal aTable As HspfTable) As String
         Dim lTableKey As String
         If aTable.OccurNum > 1 Then
@@ -15,9 +17,26 @@ Public Class HspfTables
         End If
         Return lTableKey
     End Function
+
+    Public Function Clone() As Object Implements System.ICloneable.Clone
+        Dim lNewHspfTables As New HspfTables
+        For Each lHspfTable As HspfTable In Me
+            lNewHspfTables.Add(lHspfTable.Clone)
+        Next
+        Return lNewHspfTables
+    End Function
+
+    Public Sub AddRange(ByVal aHspfTables As HspfTables, ByVal aOperation As atcUCI.HspfOperation)
+        For Each lHspfTable As HspfTable In aHspfTables
+            lHspfTable.Opn = aOperation
+            Me.Add(lHspfTable)
+        Next
+    End Sub
 End Class
 
 Public Class HspfTable
+    Implements ICloneable
+
     Private pEditAllSimilar As Boolean
     Private pEdited As Boolean
     Private pSuppID As Integer '>0 indicates parms on this record are in supplemental file
@@ -34,6 +53,23 @@ Public Class HspfTable
     Public CombineOK As Boolean
     Public ReadOnly Parms As New HspfParms
     Public ReadOnly EditControlName As String = "ATCoHspf.ctlTableEdit"
+
+    Public Function Clone() As Object Implements System.ICloneable.Clone
+        Dim lNewHspfTable As New HspfTable
+        With lNewHspfTable
+            .CombineOK = Me.CombineOK
+            .Comment = Me.Comment
+            .Def = Me.Def 'just a reference
+            For Each lParm As atcUCI.HspfParm In Me.Parms
+                .Parms.Add(lParm)
+            Next
+            .OccurCount = Me.OccurCount
+            .OccurIndex = Me.OccurIndex
+            .OccurNum = Me.OccurNum
+            .TableComment = Me.TableComment
+        End With
+        Return lNewHspfTable
+    End Function
 
     ''' <summary>
     ''' Value of parameter with the given name
@@ -66,7 +102,9 @@ Public Class HspfTable
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
-            If Value Then Opn.Edited = True
+            If Value AndAlso Opn IsNot Nothing Then
+                Opn.Edited = True
+            End If
         End Set
     End Property
 
@@ -90,7 +128,10 @@ Public Class HspfTable
 
     Public Sub InitTable(ByRef aInitValueString As String)
         Dim lParm As HspfParm
-        Dim lUnitfg As Integer = Opn.OpnBlk.Uci.GlobalBlock.EmFg
+        Dim lUnitfg As Integer = 1
+        If Opn IsNot Nothing AndAlso Opn.OpnBlk IsNot Nothing Then
+            lUnitfg = Opn.OpnBlk.Uci.GlobalBlock.EmFg
+        End If
 
         For Each lParmDef As HSPFParmDef In Def.ParmDefs
             lParm = New HspfParm
@@ -193,7 +234,7 @@ Public Class HspfTable
             For lOperIndex As Integer = 1 To Opn.OpnBlk.Ids.Count
                 Dim lOperation As HspfOperation = Opn.OpnBlk.NthOper(lOperIndex)
                 'write values here
-                If Not lOperation Is Nothing AndAlso _
+                If lOperation IsNot Nothing AndAlso _
                    lOperation.TableExists(lTableName) Then
                     Dim lTable As HspfTable = lOperation.Tables.Item(lTableName)
                     Dim lOutRec As String = myFormatI((lOperation.Id), 5) & Space(5)
