@@ -428,13 +428,14 @@ Public Class HspfOpnBlk
             Dim lTableName As String
             Dim lTableOccurNumber As Integer
             If lColonIndex > 0 Then
-                lTableName = aTableName.Substring(0, lColonIndex - 1)
+                lTableName = aTableName.Substring(0, lColonIndex)
                 lTableOccurNumber = CInt(aTableName.Substring(lColonIndex + 1))
             Else
                 lTableName = aTableName
                 lTableOccurNumber = 1
             End If
-            ltable.Def = lBlockDef.TableDefs.Item(lTableName)
+
+            lTable.Def = lBlockDef.TableDefs.Item(lTableName)
             lTable.InitTable("")
             ltable.OccurCount = lTableOccurNumber
             ltable.OccurNum = lTableOccurNumber

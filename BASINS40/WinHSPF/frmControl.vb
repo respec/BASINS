@@ -15,10 +15,6 @@ Public Class frmControl
     Dim pIChange As Boolean = False
     Dim pRChange As Boolean = False
 
-    Dim defuci As HspfUci = pUCI
-
-
-
     Sub New()
 
         ' This call is required by the Windows Form Designer.
@@ -27,8 +23,6 @@ Public Class frmControl
         ' Add any initialization after the InitializeComponent() call.
         Me.MinimumSize = Me.Size
         Me.Icon = pIcon
-
-        MsgBox(defuci.Name)
 
         SSTabPIR.SelectTab(0)
         SSTabPIR.TabPages(0).Enabled = False
@@ -135,7 +129,6 @@ Public Class frmControl
         End If
         GenerateCheckValuesArray()
 
-
     End Sub
 
 
@@ -200,7 +193,7 @@ Public Class frmControl
                 End If
             End If
             If pIChange Or pRChange Or pPChange Then
-                Call SetMissingValuesToDefaults(pUCI, defuci)
+                Call SetMissingValuesToDefaults(pUCI, pDefUCI)
             End If
 
             pUCI.Edited = True
@@ -447,7 +440,7 @@ Public Class frmControl
                     'double check to see if this table exists
                     If Not lOpnBlk.TableExists(tabname) Then
                         lOpnBlk.AddTableForAll(tabname, opname)
-                        setDefaultsForTable(pUCI, defUci, opname, tabname)
+                        setDefaultsForTable(pUCI, pDefUCI, opname, tabname)
                     End If
                 End If
             Next vTableStatus
@@ -644,7 +637,7 @@ Public Class frmControl
         Next vOper
     End Sub
 
-    Public Sub SetMissingValuesToDefaults(ByVal myUci As HspfUci, ByVal defUci As HspfUci)
+    Public Sub SetMissingValuesToDefaults(ByVal myUci As HspfUci, ByVal aDefUCI As HspfUci)
         Dim vOpTyp As Object, loptyp As HspfOpnBlk
         Dim vOpn As Object, lOpn As HspfOperation, dOpn As HspfOperation
         Dim vTab As Object, lTab As HspfTable, dTab As HspfTable
@@ -657,9 +650,9 @@ Public Class frmControl
                 loptyp = myUci.OpnBlks(vOpTyp)
                 For Each vOpn In loptyp.Ids
                     lOpn = vOpn
-                    Id = DefaultOpnId(lOpn, defUci)
+                    Id = DefaultOpnId(lOpn, aDefUCI)
                     If Id > 0 Then
-                        dOpn = defUci.OpnBlks(lOpn.Name).OperFromID(Id)
+                        dOpn = aDefUCI.OpnBlks(lOpn.Name).OperFromID(Id)
                         If Not dOpn Is Nothing Then
                             For Each vTab In lOpn.Tables
                                 lTab = vTab
