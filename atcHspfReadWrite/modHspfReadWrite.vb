@@ -60,10 +60,26 @@ Module modHspfReadWrite
                 If lMassLinkExisting.Target.VolName = "RCHRES" Then
                     Dim lMassLink As atcUCI.HspfMassLink = lMassLinkExisting.Clone
                     With lMassLink
-                        .Target.VolName = "BMPRAC"
                         .MassLinkId += aMassLinkIdOffset
                         If .Source.VolName = "RCHRES" Then
                             lBmpracRchresMassLinkId = .MassLinkId
+                            With .Source
+                                .VolName = "BMPRAC"
+                                .Group = "ROFLOW"
+                                .Member = ""
+                                .MemSub1 = 0
+                            End With
+                        Else
+                            .Target.VolName = "BMPRAC"
+                            If .Target.Member = "OXIF" Then
+                                .Target.Member = "IOX"
+                            ElseIf .Target.Member = "NUIF1" Then
+                                .Target.Member = "IDNUT"
+                            ElseIf .Target.Member = "NUIF2" Then
+                                .Target.Member = "ISNUT"
+                            ElseIf .Target.Member = "PKIF" Then
+                                .Target.Member = "IPLK"
+                            End If
                         End If
                     End With
                     lNewMassLinks.Add(lMassLink)
