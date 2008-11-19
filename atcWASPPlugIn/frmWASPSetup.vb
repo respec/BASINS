@@ -379,6 +379,7 @@ Public Class frmWASPSetup
 
 #End Region
 
+    Friend pSegmentFieldMap As New atcUtility.atcCollection
     Friend pPlugIn As PlugIn
     Friend pBasinsFolder As String
     Private pInitializing As Boolean = True
@@ -398,6 +399,7 @@ Public Class frmWASPSetup
     Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExisting.Click
         If ofdExisting.ShowDialog() = Windows.Forms.DialogResult.OK Then
             Logger.Dbg("Run WASP with " & ofdExisting.FileName)
+            pPlugIn.WASPProject.Run(ofdExisting.FileName)
         End If
     End Sub
 
@@ -423,14 +425,88 @@ Public Class frmWASPSetup
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Logger.Dbg("Setup WASP input files")
+        'set field mapping as specified in field mapping control
+        pSegmentFieldMap.Clear()
+
+        'set file names for segments
+        Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+
+        lblStatus.Text = "Preparing to process"
+        Me.Refresh()
+        EnableControls(False)
+
+        Dim lName As String = tbxName.Text
+        'TODO: still use modelout?
+        Dim lWASPProjectFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".wnf"
+        MkDirPath(PathNameOnly(lWASPProjectFileName))
+
+        If PreProcessChecking(lWASPProjectFileName) Then
+            With pPlugIn.WASPProject
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
+                .Name = lName
+
+                'populate the SWMM classes from the shapefiles
+                .Segments.Clear()
+                Dim lTable As New atcUtility.atcTableDBF
+
+                If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
+                    Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lSegmentShapefileName)
+                    .Segments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap), "Name"))
+                End If
+                'CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
+
+                'save project file and start WASP
+                Logger.Dbg("Save WASP network import file" & lWASPProjectFileName)
+                .Save(lWASPProjectFileName)
+                Logger.Dbg("Run WASP")
+                .Run(lWASPProjectFileName)
+                Logger.Dbg("BackFromWASP")
+            End With
+            lblStatus.Text = ""
+            Me.Refresh()
+            Me.Dispose()
+            Me.Close()
+            Logger.Dbg("Done")
+        Else
+            Logger.Dbg("Failed PreProcess Check")
+        End If
         Logger.Flush()
     End Sub
+
+    Private Function PreProcessChecking(ByVal aOutputFileName As String) As Boolean
+        Logger.Dbg("PreprocessChecking " & aOutputFileName)
+        
+        'see if this file already exists
+        If FileExists(aOutputFileName) Then  'already exists
+            If Logger.Msg("WASP Project '" & FilenameNoPath(aOutputFileName) & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
+                EnableControls(True)
+                Return False
+            End If
+        End If
+
+        Logger.Dbg("PreprocessChecking OK")
+        Return True
+    End Function
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
         Logger.Dbg("InitializeUI")
         EnableControls(False)
         pPlugIn = aPlugIn
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+
+        'set field mapping for segments
+        pSegmentFieldMap.Clear()
+        pSegmentFieldMap.Add("GNIS_NAME", "Name")
+        pSegmentFieldMap.Add("COMID", "ID")
+        pSegmentFieldMap.Add("LENGTHKM", "Length")
+        pSegmentFieldMap.Add("WIDTH", "Width")
+        pSegmentFieldMap.Add("DMULT", "Dmult")
+        pSegmentFieldMap.Add("VMULT", "Vmult")
+        pSegmentFieldMap.Add("SLOPE", "Slope")
+        pSegmentFieldMap.Add("ROUGHNESS", "Roughness")
+        pSegmentFieldMap.Add("DSCOMID", "DownID")
 
         cboMet.Items.Add("<none>")
 
