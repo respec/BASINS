@@ -263,8 +263,7 @@ Public Class HspfMassLink
                     End If
                     lStr.Append(Space(lStartCol(10) - lStr.Length - 1))
                     If lML.Target.MemSub2 <> 0 Then
-                        t = Space(lLength(10))
-                        t = RSet(CStr(lML.Target.MemSub2), Len(t))
+                        t = CStr(lML.Target.MemSub2).PadLeft(lLength(10))
                         If lML.Target.VolName = "RCHRES" Then
                             t = Uci.IntAsCat(lML.Target.Member, 2, t)
                         End If

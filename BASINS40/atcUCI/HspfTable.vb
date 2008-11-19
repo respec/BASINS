@@ -219,12 +219,12 @@ Public Class HspfTable
                                         Dim r As Single = CSng(lValue)
                                         If (Len(CStr(r)) = .Def.Length + 1) And lValue < CStr(1.0#) Then
                                             'just leave off leading zero
-                                            lOutValue = RSet(Mid(CStr(r), 2), Len(lOutValue))
+                                            lOutValue = Mid(CStr(r), 2).PadLeft(lOutValue).Length
                                         Else
-                                            lOutValue = RSet(NumFmtRE(CSng(lValue), .Def.Length), Len(lOutValue))
+                                            lOutValue = NumFmtRE(CSng(lValue), .Def.Length).PadLeft(lOutValue.Length)
                                         End If
                                     Else
-                                        lOutValue = RSet(CStr(lValue), Len(lOutValue))
+                                        lOutValue = CStr(lValue).PadLeft(lOutValue.Length)
                                     End If
                                 End If
                             End If

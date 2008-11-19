@@ -347,9 +347,8 @@ Public Class HspfFtable
                                 t = .Outflow1AsRead(lRow)
                             Else
                                 t = Format(.Outflow1(lRow), lFmt).PadLeft(10)
-                                If t.Length > 10 Then
-                                    'too many digits in the number
-                                    t = RSet(atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(lRow)), 10), 10)
+                                If t.Length > 10 Then 'too many digits in the number
+                                    t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(lRow)), 10).PadLeft(10)
                                 End If
                             End If
                         ElseIf lOutflowIndex = 2 Then
