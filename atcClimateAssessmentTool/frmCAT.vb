@@ -94,6 +94,7 @@ Public Class frmCAT
     Friend WithEvents btnEndpointBottom As System.Windows.Forms.Button
     Friend WithEvents btnEndpointTop As System.Windows.Forms.Button
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
+    Friend WithEvents btnPlot As System.Windows.Forms.Button
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -157,6 +158,7 @@ Public Class frmCAT
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.agdResults = New atcControls.atcGrid
         Me.agdPivot = New atcControls.atcGrid
+        Me.btnPlot = New System.Windows.Forms.Button
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -176,7 +178,7 @@ Public Class frmCAT
         Me.myTabs.Location = New System.Drawing.Point(0, 3)
         Me.myTabs.Name = "myTabs"
         Me.myTabs.SelectedIndex = 0
-        Me.myTabs.Size = New System.Drawing.Size(520, 289)
+        Me.myTabs.Size = New System.Drawing.Size(520, 268)
         Me.myTabs.TabIndex = 1
         '
         'tabInputs
@@ -196,7 +198,7 @@ Public Class frmCAT
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
         Me.tabInputs.Location = New System.Drawing.Point(4, 22)
         Me.tabInputs.Name = "tabInputs"
-        Me.tabInputs.Size = New System.Drawing.Size(512, 263)
+        Me.tabInputs.Size = New System.Drawing.Size(512, 242)
         Me.tabInputs.TabIndex = 0
         Me.tabInputs.Text = "Climate Data"
         Me.tabInputs.UseVisualStyleBackColor = True
@@ -298,7 +300,7 @@ Public Class frmCAT
         Me.lstInputs.IntegralHeight = False
         Me.lstInputs.Location = New System.Drawing.Point(8, 94)
         Me.lstInputs.Name = "lstInputs"
-        Me.lstInputs.Size = New System.Drawing.Size(496, 160)
+        Me.lstInputs.Size = New System.Drawing.Size(496, 139)
         Me.lstInputs.TabIndex = 14
         '
         'btnInputPrepared
@@ -334,7 +336,7 @@ Public Class frmCAT
         Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
         Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
         Me.tabEndpoints.Name = "tabEndpoints"
-        Me.tabEndpoints.Size = New System.Drawing.Size(512, 284)
+        Me.tabEndpoints.Size = New System.Drawing.Size(512, 263)
         Me.tabEndpoints.TabIndex = 1
         Me.tabEndpoints.Text = "Assessment Endpoints"
         Me.tabEndpoints.UseVisualStyleBackColor = True
@@ -400,7 +402,7 @@ Public Class frmCAT
         Me.lstEndpoints.IntegralHeight = False
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
-        Me.lstEndpoints.Size = New System.Drawing.Size(496, 181)
+        Me.lstEndpoints.Size = New System.Drawing.Size(496, 160)
         Me.lstEndpoints.TabIndex = 22
         '
         'btnEndpointDown
@@ -450,7 +452,7 @@ Public Class frmCAT
         Me.tabResults.Controls.Add(Me.agdResults)
         Me.tabResults.Location = New System.Drawing.Point(4, 22)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(512, 284)
+        Me.tabResults.Size = New System.Drawing.Size(512, 263)
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results Table"
         Me.tabResults.UseVisualStyleBackColor = True
@@ -466,7 +468,7 @@ Public Class frmCAT
         Me.tabPivot.Controls.Add(Me.cboPivotRows)
         Me.tabPivot.Location = New System.Drawing.Point(4, 22)
         Me.tabPivot.Name = "tabPivot"
-        Me.tabPivot.Size = New System.Drawing.Size(512, 284)
+        Me.tabPivot.Size = New System.Drawing.Size(512, 263)
         Me.tabPivot.TabIndex = 3
         Me.tabPivot.Text = "Pivot Table"
         Me.tabPivot.UseVisualStyleBackColor = True
@@ -531,7 +533,7 @@ Public Class frmCAT
         'btnStart
         '
         Me.btnStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnStart.Location = New System.Drawing.Point(12, 298)
+        Me.btnStart.Location = New System.Drawing.Point(12, 277)
         Me.btnStart.Name = "btnStart"
         Me.btnStart.Size = New System.Drawing.Size(56, 24)
         Me.btnStart.TabIndex = 0
@@ -631,7 +633,7 @@ Public Class frmCAT
         '
         Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblTop.Location = New System.Drawing.Point(74, 298)
+        Me.lblTop.Location = New System.Drawing.Point(74, 277)
         Me.lblTop.Name = "lblTop"
         Me.lblTop.Size = New System.Drawing.Size(433, 24)
         Me.lblTop.TabIndex = 2
@@ -640,7 +642,7 @@ Public Class frmCAT
         'btnStop
         '
         Me.btnStop.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnStop.Location = New System.Drawing.Point(12, 298)
+        Me.btnStop.Location = New System.Drawing.Point(12, 277)
         Me.btnStop.Name = "btnStop"
         Me.btnStop.Size = New System.Drawing.Size(56, 24)
         Me.btnStop.TabIndex = 3
@@ -661,7 +663,7 @@ Public Class frmCAT
         Me.agdResults.LineWidth = 0.0!
         Me.agdResults.Location = New System.Drawing.Point(8, 8)
         Me.agdResults.Name = "agdResults"
-        Me.agdResults.Size = New System.Drawing.Size(496, 267)
+        Me.agdResults.Size = New System.Drawing.Size(496, 246)
         Me.agdResults.Source = Nothing
         Me.agdResults.TabIndex = 21
         '
@@ -678,14 +680,24 @@ Public Class frmCAT
         Me.agdPivot.LineWidth = 0.0!
         Me.agdPivot.Location = New System.Drawing.Point(8, 89)
         Me.agdPivot.Name = "agdPivot"
-        Me.agdPivot.Size = New System.Drawing.Size(496, 186)
+        Me.agdPivot.Size = New System.Drawing.Size(496, 165)
         Me.agdPivot.Source = Nothing
         Me.agdPivot.TabIndex = 28
+        '
+        'btnPlot
+        '
+        Me.btnPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnPlot.Location = New System.Drawing.Point(77, 277)
+        Me.btnPlot.Name = "btnPlot"
+        Me.btnPlot.Size = New System.Drawing.Size(56, 24)
+        Me.btnPlot.TabIndex = 4
+        Me.btnPlot.Text = "Plot"
         '
         'frmCAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(519, 330)
+        Me.ClientSize = New System.Drawing.Size(519, 309)
+        Me.Controls.Add(Me.btnPlot)
         Me.Controls.Add(Me.lblTop)
         Me.Controls.Add(Me.btnStart)
         Me.Controls.Add(Me.myTabs)
@@ -1526,5 +1538,11 @@ Public Class frmCAT
         agdResults.Refresh()
 
         myTabs.SelectedIndex = pResultsTabIndex
+    End Sub
+
+    Private Sub btnPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlot.Click
+        Dim lPltForm As New frmPlot
+        lPltForm.Results = agdResults.Source
+        lPltForm.Show()
     End Sub
 End Class
