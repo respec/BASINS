@@ -47,7 +47,6 @@ Partial Class frmControl
         Me.CheckBox19 = New System.Windows.Forms.CheckBox
         Me.CheckBox27 = New System.Windows.Forms.CheckBox
         Me.CheckBox26 = New System.Windows.Forms.CheckBox
-        Me.CheckBox22x = New System.Windows.Forms.CheckBox
         Me.CheckBox24 = New System.Windows.Forms.CheckBox
         Me.CheckBox23 = New System.Windows.Forms.CheckBox
         Me.CheckBox21 = New System.Windows.Forms.CheckBox
@@ -325,7 +324,6 @@ Partial Class frmControl
         Me.TabPage3.Controls.Add(Me.CheckBox19)
         Me.TabPage3.Controls.Add(Me.CheckBox27)
         Me.TabPage3.Controls.Add(Me.CheckBox26)
-        Me.TabPage3.Controls.Add(Me.CheckBox22x)
         Me.TabPage3.Controls.Add(Me.CheckBox24)
         Me.TabPage3.Controls.Add(Me.CheckBox23)
         Me.TabPage3.Controls.Add(Me.CheckBox21)
@@ -365,7 +363,7 @@ Partial Class frmControl
         'CheckBox27
         '
         Me.CheckBox27.AutoSize = True
-        Me.CheckBox27.Location = New System.Drawing.Point(20, 177)
+        Me.CheckBox27.Location = New System.Drawing.Point(20, 159)
         Me.CheckBox27.Name = "CheckBox27"
         Me.CheckBox27.Size = New System.Drawing.Size(297, 17)
         Me.CheckBox27.TabIndex = 22
@@ -381,16 +379,6 @@ Partial Class frmControl
         Me.CheckBox26.TabIndex = 21
         Me.CheckBox26.Text = "NUTRX - Primary Inorganic Nitrogen and Phosphorus Balances"
         Me.CheckBox26.UseVisualStyleBackColor = True
-        '
-        'CheckBox22x
-        '
-        Me.CheckBox22x.AutoSize = True
-        Me.CheckBox22x.Location = New System.Drawing.Point(20, 159)
-        Me.CheckBox22x.Name = "CheckBox22x"
-        Me.CheckBox22x.Size = New System.Drawing.Size(151, 17)
-        Me.CheckBox22x.TabIndex = 20
-        Me.CheckBox22x.Text = "PEST - Pesticide Behavior"
-        Me.CheckBox22x.UseVisualStyleBackColor = True
         '
         'CheckBox24
         '
@@ -455,7 +443,7 @@ Partial Class frmControl
         'CheckBox28
         '
         Me.CheckBox28.AutoSize = True
-        Me.CheckBox28.Location = New System.Drawing.Point(20, 195)
+        Me.CheckBox28.Location = New System.Drawing.Point(20, 177)
         Me.CheckBox28.Name = "CheckBox28"
         Me.CheckBox28.Size = New System.Drawing.Size(350, 17)
         Me.CheckBox28.TabIndex = 12
@@ -527,7 +515,6 @@ Partial Class frmControl
     Friend WithEvents CheckBox19 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox27 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox26 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox22x As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox24 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox23 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox21 As System.Windows.Forms.CheckBox
