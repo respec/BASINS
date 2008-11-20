@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
+Imports atcData
 Imports System.Drawing
 Imports System
 
@@ -57,6 +58,21 @@ Public Class frmWASPSetup
     Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
     Friend WithEvents ofdMetWDM As System.Windows.Forms.OpenFileDialog
     Friend WithEvents TabPage4 As System.Windows.Forms.TabPage
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents lblEnd As System.Windows.Forms.Label
+    Friend WithEvents lblStart As System.Windows.Forms.Label
+    Friend WithEvents lblDay As System.Windows.Forms.Label
+    Friend WithEvents lblMonth As System.Windows.Forms.Label
+    Friend WithEvents lblYear As System.Windows.Forms.Label
+    Friend WithEvents atxEDay As atcControls.atcText
+    Friend WithEvents atxSDay As atcControls.atcText
+    Friend WithEvents atxSYear As atcControls.atcText
+    Friend WithEvents atxEMonth As atcControls.atcText
+    Friend WithEvents atxSMonth As atcControls.atcText
+    Friend WithEvents atxEYear As atcControls.atcText
+    Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
+    Friend WithEvents AtcConnectFields As atcControls.atcConnectFields
+    Friend WithEvents AtcGridFlow As atcControls.atcGrid
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -68,6 +84,18 @@ Public Class frmWASPSetup
         Me.ofdExisting = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.lblEnd = New System.Windows.Forms.Label
+        Me.lblStart = New System.Windows.Forms.Label
+        Me.lblDay = New System.Windows.Forms.Label
+        Me.lblMonth = New System.Windows.Forms.Label
+        Me.lblYear = New System.Windows.Forms.Label
+        Me.atxEDay = New atcControls.atcText
+        Me.atxSDay = New atcControls.atcText
+        Me.atxSYear = New atcControls.atcText
+        Me.atxEMonth = New atcControls.atcText
+        Me.atxSMonth = New atcControls.atcText
+        Me.atxEYear = New atcControls.atcText
         Me.cboMet = New System.Windows.Forms.ComboBox
         Me.Label9 = New System.Windows.Forms.Label
         Me.cboStreams = New System.Windows.Forms.ComboBox
@@ -76,18 +104,24 @@ Public Class frmWASPSetup
         Me.Label1 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
         Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.AtcGridFlow = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
         Me.TabPage6 = New System.Windows.Forms.TabPage
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.txtMetWDMName = New System.Windows.Forms.TextBox
         Me.cmdSelectWDM = New System.Windows.Forms.Button
+        Me.TabPage5 = New System.Windows.Forms.TabPage
+        Me.AtcConnectFields = New atcControls.atcConnectFields
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
+        Me.TabPage3.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
+        Me.TabPage5.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -95,7 +129,7 @@ Public Class frmWASPSetup
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(16, 551)
+        Me.cmdOK.Location = New System.Drawing.Point(16, 523)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(72, 32)
         Me.cmdOK.TabIndex = 2
@@ -105,7 +139,7 @@ Public Class frmWASPSetup
         '
         Me.cmdExisting.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdExisting.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdExisting.Location = New System.Drawing.Point(96, 551)
+        Me.cmdExisting.Location = New System.Drawing.Point(96, 523)
         Me.cmdExisting.Name = "cmdExisting"
         Me.cmdExisting.Size = New System.Drawing.Size(120, 32)
         Me.cmdExisting.TabIndex = 4
@@ -116,7 +150,7 @@ Public Class frmWASPSetup
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(224, 551)
+        Me.cmdCancel.Location = New System.Drawing.Point(224, 523)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(88, 32)
         Me.cmdCancel.TabIndex = 5
@@ -126,7 +160,7 @@ Public Class frmWASPSetup
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(409, 551)
+        Me.cmdHelp.Location = New System.Drawing.Point(467, 523)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(79, 32)
         Me.cmdHelp.TabIndex = 6
@@ -136,7 +170,7 @@ Public Class frmWASPSetup
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(497, 551)
+        Me.cmdAbout.Location = New System.Drawing.Point(555, 523)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(87, 32)
         Me.cmdAbout.TabIndex = 7
@@ -159,18 +193,20 @@ Public Class frmWASPSetup
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage6)
+        Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.ItemSize = New System.Drawing.Size(60, 21)
         Me.TabControl1.Location = New System.Drawing.Point(18, 17)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(564, 455)
+        Me.TabControl1.Size = New System.Drawing.Size(622, 427)
         Me.TabControl1.TabIndex = 8
         '
         'TabPage1
         '
         Me.TabPage1.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage1.Controls.Add(Me.GroupBox3)
         Me.TabPage1.Controls.Add(Me.cboMet)
         Me.TabPage1.Controls.Add(Me.Label9)
         Me.TabPage1.Controls.Add(Me.cboStreams)
@@ -179,10 +215,215 @@ Public Class frmWASPSetup
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(556, 426)
+        Me.TabPage1.Size = New System.Drawing.Size(614, 398)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox3.Controls.Add(Me.lblEnd)
+        Me.GroupBox3.Controls.Add(Me.lblStart)
+        Me.GroupBox3.Controls.Add(Me.lblDay)
+        Me.GroupBox3.Controls.Add(Me.lblMonth)
+        Me.GroupBox3.Controls.Add(Me.lblYear)
+        Me.GroupBox3.Controls.Add(Me.atxEDay)
+        Me.GroupBox3.Controls.Add(Me.atxSDay)
+        Me.GroupBox3.Controls.Add(Me.atxSYear)
+        Me.GroupBox3.Controls.Add(Me.atxEMonth)
+        Me.GroupBox3.Controls.Add(Me.atxSMonth)
+        Me.GroupBox3.Controls.Add(Me.atxEYear)
+        Me.GroupBox3.Location = New System.Drawing.Point(14, 270)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(587, 111)
+        Me.GroupBox3.TabIndex = 28
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Simulation Dates"
+        '
+        'lblEnd
+        '
+        Me.lblEnd.AutoSize = True
+        Me.lblEnd.Location = New System.Drawing.Point(105, 67)
+        Me.lblEnd.Name = "lblEnd"
+        Me.lblEnd.Size = New System.Drawing.Size(33, 17)
+        Me.lblEnd.TabIndex = 37
+        Me.lblEnd.Text = "End"
+        '
+        'lblStart
+        '
+        Me.lblStart.AutoSize = True
+        Me.lblStart.Location = New System.Drawing.Point(100, 37)
+        Me.lblStart.Name = "lblStart"
+        Me.lblStart.Size = New System.Drawing.Size(38, 17)
+        Me.lblStart.TabIndex = 36
+        Me.lblStart.Text = "Start"
+        '
+        'lblDay
+        '
+        Me.lblDay.AutoSize = True
+        Me.lblDay.Location = New System.Drawing.Point(291, 16)
+        Me.lblDay.Name = "lblDay"
+        Me.lblDay.Size = New System.Drawing.Size(33, 17)
+        Me.lblDay.TabIndex = 35
+        Me.lblDay.Text = "Day"
+        '
+        'lblMonth
+        '
+        Me.lblMonth.AutoSize = True
+        Me.lblMonth.Location = New System.Drawing.Point(232, 16)
+        Me.lblMonth.Name = "lblMonth"
+        Me.lblMonth.Size = New System.Drawing.Size(47, 17)
+        Me.lblMonth.TabIndex = 34
+        Me.lblMonth.Text = "Month"
+        '
+        'lblYear
+        '
+        Me.lblYear.AutoSize = True
+        Me.lblYear.Location = New System.Drawing.Point(150, 16)
+        Me.lblYear.Name = "lblYear"
+        Me.lblYear.Size = New System.Drawing.Size(38, 17)
+        Me.lblYear.TabIndex = 33
+        Me.lblYear.Text = "Year"
+        '
+        'atxEDay
+        '
+        Me.atxEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEDay.DefaultValue = ""
+        Me.atxEDay.HardMax = 31
+        Me.atxEDay.HardMin = 1
+        Me.atxEDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEDay.Location = New System.Drawing.Point(294, 67)
+        Me.atxEDay.MaxWidth = 20
+        Me.atxEDay.Name = "atxEDay"
+        Me.atxEDay.NumericFormat = "0"
+        Me.atxEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEDay.SelLength = 2
+        Me.atxEDay.SelStart = 0
+        Me.atxEDay.Size = New System.Drawing.Size(53, 24)
+        Me.atxEDay.SoftMax = -999
+        Me.atxEDay.SoftMin = -999
+        Me.atxEDay.TabIndex = 32
+        Me.atxEDay.ValueDouble = 31
+        Me.atxEDay.ValueInteger = 31
+        '
+        'atxSDay
+        '
+        Me.atxSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSDay.DefaultValue = ""
+        Me.atxSDay.HardMax = 31
+        Me.atxSDay.HardMin = 1
+        Me.atxSDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSDay.Location = New System.Drawing.Point(294, 37)
+        Me.atxSDay.MaxWidth = 20
+        Me.atxSDay.Name = "atxSDay"
+        Me.atxSDay.NumericFormat = "0"
+        Me.atxSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSDay.SelLength = 1
+        Me.atxSDay.SelStart = 0
+        Me.atxSDay.Size = New System.Drawing.Size(53, 24)
+        Me.atxSDay.SoftMax = -999
+        Me.atxSDay.SoftMin = -999
+        Me.atxSDay.TabIndex = 31
+        Me.atxSDay.ValueDouble = 1
+        Me.atxSDay.ValueInteger = 1
+        '
+        'atxSYear
+        '
+        Me.atxSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSYear.DefaultValue = ""
+        Me.atxSYear.HardMax = 9999
+        Me.atxSYear.HardMin = 0
+        Me.atxSYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSYear.Location = New System.Drawing.Point(153, 37)
+        Me.atxSYear.MaxWidth = 20
+        Me.atxSYear.Name = "atxSYear"
+        Me.atxSYear.NumericFormat = "0"
+        Me.atxSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSYear.SelLength = 4
+        Me.atxSYear.SelStart = 0
+        Me.atxSYear.Size = New System.Drawing.Size(76, 24)
+        Me.atxSYear.SoftMax = -999
+        Me.atxSYear.SoftMin = -999
+        Me.atxSYear.TabIndex = 30
+        Me.atxSYear.ValueDouble = 2000
+        Me.atxSYear.ValueInteger = 2000
+        '
+        'atxEMonth
+        '
+        Me.atxEMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEMonth.DefaultValue = ""
+        Me.atxEMonth.HardMax = 12
+        Me.atxEMonth.HardMin = 1
+        Me.atxEMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEMonth.Location = New System.Drawing.Point(235, 67)
+        Me.atxEMonth.MaxWidth = 20
+        Me.atxEMonth.Name = "atxEMonth"
+        Me.atxEMonth.NumericFormat = "0"
+        Me.atxEMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEMonth.SelLength = 2
+        Me.atxEMonth.SelStart = 0
+        Me.atxEMonth.Size = New System.Drawing.Size(53, 24)
+        Me.atxEMonth.SoftMax = -999
+        Me.atxEMonth.SoftMin = -999
+        Me.atxEMonth.TabIndex = 29
+        Me.atxEMonth.ValueDouble = 12
+        Me.atxEMonth.ValueInteger = 12
+        '
+        'atxSMonth
+        '
+        Me.atxSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSMonth.DefaultValue = ""
+        Me.atxSMonth.HardMax = 12
+        Me.atxSMonth.HardMin = 1
+        Me.atxSMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSMonth.Location = New System.Drawing.Point(235, 37)
+        Me.atxSMonth.MaxWidth = 20
+        Me.atxSMonth.Name = "atxSMonth"
+        Me.atxSMonth.NumericFormat = "0"
+        Me.atxSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSMonth.SelLength = 1
+        Me.atxSMonth.SelStart = 0
+        Me.atxSMonth.Size = New System.Drawing.Size(53, 24)
+        Me.atxSMonth.SoftMax = -999
+        Me.atxSMonth.SoftMin = -999
+        Me.atxSMonth.TabIndex = 28
+        Me.atxSMonth.ValueDouble = 1
+        Me.atxSMonth.ValueInteger = 1
+        '
+        'atxEYear
+        '
+        Me.atxEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEYear.DefaultValue = ""
+        Me.atxEYear.HardMax = 9999
+        Me.atxEYear.HardMin = 0
+        Me.atxEYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEYear.Location = New System.Drawing.Point(153, 67)
+        Me.atxEYear.MaxWidth = 20
+        Me.atxEYear.Name = "atxEYear"
+        Me.atxEYear.NumericFormat = "0"
+        Me.atxEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEYear.SelLength = 4
+        Me.atxEYear.SelStart = 0
+        Me.atxEYear.Size = New System.Drawing.Size(76, 24)
+        Me.atxEYear.SoftMax = -999
+        Me.atxEYear.SoftMin = -999
+        Me.atxEYear.TabIndex = 27
+        Me.atxEYear.ValueDouble = 2000
+        Me.atxEYear.ValueInteger = 2000
         '
         'cboMet
         '
@@ -193,7 +434,7 @@ Public Class frmWASPSetup
         Me.cboMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboMet.Location = New System.Drawing.Point(168, 127)
         Me.cboMet.Name = "cboMet"
-        Me.cboMet.Size = New System.Drawing.Size(376, 25)
+        Me.cboMet.Size = New System.Drawing.Size(434, 25)
         Me.cboMet.TabIndex = 12
         '
         'Label9
@@ -215,7 +456,7 @@ Public Class frmWASPSetup
         Me.cboStreams.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboStreams.Location = New System.Drawing.Point(168, 87)
         Me.cboStreams.Name = "cboStreams"
-        Me.cboStreams.Size = New System.Drawing.Size(376, 25)
+        Me.cboStreams.Size = New System.Drawing.Size(434, 25)
         Me.cboStreams.TabIndex = 9
         '
         'tbxName
@@ -225,7 +466,7 @@ Public Class frmWASPSetup
         Me.tbxName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tbxName.Location = New System.Drawing.Point(168, 40)
         Me.tbxName.Name = "tbxName"
-        Me.tbxName.Size = New System.Drawing.Size(210, 23)
+        Me.tbxName.Size = New System.Drawing.Size(268, 23)
         Me.tbxName.TabIndex = 6
         '
         'Label4
@@ -250,27 +491,46 @@ Public Class frmWASPSetup
         '
         'TabPage2
         '
-        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(556, 426)
+        Me.TabPage2.Size = New System.Drawing.Size(192, 70)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Segmentation"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
         'TabPage3
         '
-        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage3.Controls.Add(Me.AtcGridFlow)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 26)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(556, 426)
+        Me.TabPage3.Size = New System.Drawing.Size(192, 70)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Flows"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
+        'AtcGridFlow
+        '
+        Me.AtcGridFlow.AllowHorizontalScrolling = True
+        Me.AtcGridFlow.AllowNewValidValues = False
+        Me.AtcGridFlow.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridFlow.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridFlow.Fixed3D = False
+        Me.AtcGridFlow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridFlow.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridFlow.LineWidth = 0.0!
+        Me.AtcGridFlow.Location = New System.Drawing.Point(52, 21)
+        Me.AtcGridFlow.Name = "AtcGridFlow"
+        Me.AtcGridFlow.Size = New System.Drawing.Size(89, 28)
+        Me.AtcGridFlow.Source = Nothing
+        Me.AtcGridFlow.TabIndex = 20
+        '
         'TabPage4
         '
-        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 26)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(556, 426)
+        Me.TabPage4.Size = New System.Drawing.Size(192, 70)
         Me.TabPage4.TabIndex = 6
         Me.TabPage4.Text = "Boundaries/Loads"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -278,9 +538,9 @@ Public Class frmWASPSetup
         'TabPage6
         '
         Me.TabPage6.Controls.Add(Me.GroupBox2)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 26)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(556, 426)
+        Me.TabPage6.Size = New System.Drawing.Size(192, 70)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Environmental Time Series"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -293,7 +553,7 @@ Public Class frmWASPSetup
         Me.GroupBox2.Controls.Add(Me.cmdSelectWDM)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 20)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(512, 59)
+        Me.GroupBox2.Size = New System.Drawing.Size(148, 59)
         Me.GroupBox2.TabIndex = 0
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Met WDM File"
@@ -305,18 +565,38 @@ Public Class frmWASPSetup
         Me.txtMetWDMName.Location = New System.Drawing.Point(21, 29)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
-        Me.txtMetWDMName.Size = New System.Drawing.Size(384, 23)
+        Me.txtMetWDMName.Size = New System.Drawing.Size(20, 23)
         Me.txtMetWDMName.TabIndex = 2
         '
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 27)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(57, 27)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
         Me.cmdSelectWDM.Text = "Select"
         Me.cmdSelectWDM.UseVisualStyleBackColor = True
+        '
+        'TabPage5
+        '
+        Me.TabPage5.Controls.Add(Me.AtcConnectFields)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage5.TabIndex = 7
+        Me.TabPage5.Text = "Field Mapping"
+        Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'AtcConnectFields
+        '
+        Me.AtcConnectFields.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
+        Me.AtcConnectFields.Name = "AtcConnectFields"
+        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 392)
+        Me.AtcConnectFields.TabIndex = 3
         '
         'GroupBox1
         '
@@ -324,9 +604,9 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.lblStatus)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(18, 479)
+        Me.GroupBox1.Location = New System.Drawing.Point(18, 451)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(566, 55)
+        Me.GroupBox1.Size = New System.Drawing.Size(624, 55)
         Me.GroupBox1.TabIndex = 9
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Status"
@@ -338,7 +618,7 @@ Public Class frmWASPSetup
         Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblStatus.Location = New System.Drawing.Point(16, 24)
         Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(535, 16)
+        Me.lblStatus.Size = New System.Drawing.Size(593, 16)
         Me.lblStatus.TabIndex = 0
         Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         '
@@ -354,7 +634,7 @@ Public Class frmWASPSetup
         Me.AcceptButton = Me.cmdOK
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(601, 596)
+        Me.ClientSize = New System.Drawing.Size(659, 568)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdAbout)
@@ -369,9 +649,13 @@ Public Class frmWASPSetup
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
+        Me.TabPage3.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.TabPage5.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -382,6 +666,7 @@ Public Class frmWASPSetup
     Friend pSegmentFieldMap As New atcUtility.atcCollection
     Friend pPlugIn As PlugIn
     Friend pBasinsFolder As String
+    Friend pFlowStations As atcCollection
     Private pInitializing As Boolean = True
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
@@ -389,7 +674,8 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cboStreams_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboStreams.SelectedIndexChanged
-
+        SetFieldMappingControl()
+        SetFlowStationGrid()
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -423,10 +709,62 @@ Public Class frmWASPSetup
         End If
     End Sub
 
+    Private Sub SetFieldMappingControl()
+        If pInitializing Then
+            Logger.Dbg("SetFieldMappingControl Skipped while initializing")
+        Else
+            Logger.Dbg("SetFieldMappingControl Begin")
+
+            'add source fields from dbf
+            AtcConnectFields.lstSource.Items.Clear()
+            If cboStreams.SelectedIndex > -1 Then
+                Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+                For lFieldIndex As Integer = 0 To GisUtil.NumFields(lStreamsLayerIndex) - 1
+                    AtcConnectFields.lstSource.Items.Add("Segment:" & GisUtil.FieldName(lFieldIndex, lStreamsLayerIndex))
+                Next
+            End If
+
+            'add target properties from introspection on the swmm classes
+            AtcConnectFields.lstTarget.Items.Clear()        
+            Dim lSegment As New atcWASP.Segment
+            For Each lField As Reflection.FieldInfo In lSegment.GetType.GetFields
+                AtcConnectFields.lstTarget.Items.Add("Segment:" & lField.Name)
+            Next
+
+            'add existing connections from default field maps
+            AtcConnectFields.lstConnections.Items.Clear()
+            Dim lConn As String
+            Dim lType As String = "Segment"
+            For lIndex As Integer = 0 To pSegmentFieldMap.Count - 1
+                lConn = lType & ":" & pSegmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pSegmentFieldMap(lIndex)
+                AtcConnectFields.AddConnection(lConn, True)
+            Next
+        End If
+    End Sub
+
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Logger.Dbg("Setup WASP input files")
         'set field mapping as specified in field mapping control
         pSegmentFieldMap.Clear()
+        For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
+            Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
+            Dim lBaseLen As Integer = 0
+            Dim lBaseName As String = ""
+            If Mid(lTxt, 1, 7) = "Segment" Then
+                lBaseLen = 7
+                lBaseName = "Segment"
+            End If
+            Dim lSpacePos As Integer = InStr(lTxt, " ")
+            Dim lGTPos As Integer = InStr(lTxt, ">")
+            Dim lSrc As String = Mid(lTxt, lBaseLen + 2, lSpacePos - lBaseLen - 2)
+
+            If Mid(lTxt, lGTPos + 2, lBaseLen) = lBaseName Then
+                Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
+                If Mid(lTxt, 1, 7) = "Segment" Then
+                    pSegmentFieldMap.Add(lSrc, lTar)
+                End If
+            End If
+        Next
 
         'set file names for segments
         Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
@@ -496,19 +834,30 @@ Public Class frmWASPSetup
         pPlugIn = aPlugIn
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
+        pFlowStations = New atcCollection
+
         'set field mapping for segments
         pSegmentFieldMap.Clear()
         pSegmentFieldMap.Add("GNIS_NAME", "Name")
         pSegmentFieldMap.Add("COMID", "ID")
+        pSegmentFieldMap.Add("LINKNO", "ID")
         pSegmentFieldMap.Add("LENGTHKM", "Length")
+        pSegmentFieldMap.Add("Length", "Length")
         pSegmentFieldMap.Add("WIDTH", "Width")
+        pSegmentFieldMap.Add("MeanWidth", "Width")
         pSegmentFieldMap.Add("DMULT", "Dmult")
         pSegmentFieldMap.Add("VMULT", "Vmult")
         pSegmentFieldMap.Add("SLOPE", "Slope")
         pSegmentFieldMap.Add("ROUGHNESS", "Roughness")
         pSegmentFieldMap.Add("DSCOMID", "DownID")
+        pSegmentFieldMap.Add("DSLINKNO", "DownID")
 
         cboMet.Items.Add("<none>")
+
+        With AtcGridFlow
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
 
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
@@ -538,7 +887,11 @@ Public Class frmWASPSetup
 
         tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
 
+        BuildListofValidStationNames("FLOW", pFlowStations)
+        SetFlowStationGrid()
+
         pInitializing = False
+        SetFieldMappingControl()
         Logger.Dbg("InitializeUI Complete")
     End Sub
 
@@ -586,6 +939,55 @@ Public Class frmWASPSetup
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
         Logger.Dbg(lblStatus.Text)
+    End Sub
+
+    Private Sub SetFlowStationGrid()
+        If AtcGridFlow.Source Is Nothing OrElse cboStreams.SelectedIndex = -1 Then
+            Logger.Dbg("No atcGridFlow or Streams layer selected")
+        Else
+            Logger.Dbg("Begin")
+            Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+            Dim lStreamsShapefileName As String = GisUtil.LayerFileName(lStreamsLayerIndex)
+
+            Dim lTempSegments As New atcWASP.Segments
+            Dim lTable As New atcUtility.atcTableDBF
+            If lTable.OpenFile(FilenameSetExt(lStreamsShapefileName, "dbf")) Then
+                lTempSegments.AddRange(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap))
+            End If
+            Logger.Dbg("SegmentsCount " & lTempSegments.Count)
+
+            AtcGridFlow.Clear()
+            With AtcGridFlow.Source
+                .Columns = 2
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellColor(0, 0) = SystemColors.ControlDark
+                .CellColor(0, 1) = SystemColors.ControlDark
+                .Rows = 1 + lTempSegments.Count
+                .CellValue(0, 0) = "Segment"
+                .CellValue(0, 1) = "Input Flow Timeseries"
+                For lIndex As Integer = 1 To lTempSegments.Count
+                    .CellValue(lIndex, 0) = lTempSegments(lIndex - 1).ID & ":" & lTempSegments(lIndex - 1).Name
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    If pFlowStations.Count > 0 Then
+                        .CellValue(lIndex, 1) = "<none>"
+                        .CellEditable(lIndex, 1) = True
+                    End If
+                Next
+            End With
+
+            Logger.Dbg("SetValidValues")
+            Dim lValidValues As New atcCollection
+            lValidValues.Add("<none>")
+            For Each lFlowStation As StationDetails In pFlowStations
+                lValidValues.Add(lFlowStation.Description)
+            Next
+            AtcGridFlow.ValidValues = lValidValues
+            AtcGridFlow.SizeAllColumnsToContents()
+            AtcGridFlow.Refresh()
+            Logger.Dbg("FlowStationGrid refreshed")
+        End If
     End Sub
 
 End Class

@@ -8,7 +8,7 @@ Imports atcData
 Public Class Segments
     Inherits KeyedCollection(Of String, Segment)
     Protected Overrides Function GetKeyForItem(ByVal aSegment As Segment) As String
-        Dim lKey As String = aSegment.Name
+        Dim lKey As String = aSegment.ID & ":" & aSegment.Name
         Return lKey
     End Function
 
@@ -16,7 +16,10 @@ Public Class Segments
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
         For Each lSegment As Segment In aEnumerable
-            Me.Add(lSegment)
+            Try
+                Me.Add(lSegment)
+            Catch
+            End Try
         Next
     End Sub
 
@@ -46,7 +49,7 @@ Public Class Segments
                 lString.Append(" ")
                 lString.Append(StrPad(Format(.Vmult, "0.00"), 10, " ", False))
                 lString.Append(" ")
-                lString.Append(StrPad(Format(.Slope, "0.0000"), 10, " ", False))
+                lString.Append(StrPad(.Slope, 10, " ", False))
                 lString.Append(" ")
                 lString.Append(StrPad(Format(.Roughness, "0.000"), 10, " ", False))
                 lString.Append(" ")
@@ -68,7 +71,7 @@ Public Class Segment
     Public Width As Double = 0.0
     Public Dmult As Double = 0.0
     Public Vmult As Double = 0.0
-    Public Slope As Double = 0.05
+    Public Slope As String = "0.05"
     Public Roughness As Double = 0.0
     Public InflowTimeseriesID As String = ""
 End Class
