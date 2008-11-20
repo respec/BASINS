@@ -40,12 +40,13 @@ Public Class frmPlot
         Dim lselectfield As Integer
         Dim ltitle As String
 
-        SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
-        SaveSetting("BasinsCATPlot", "Settings", "YAxis", "0")
-        SaveSetting("BasinsCATPlot", "Settings", "ZAxis", "0")
-        SaveSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
-        SaveSetting("BasinsCATPlot", "Settings", "SelectField", "0")
-        SaveSetting("BasinsCATPlot", "Settings", "Title", "")
+        'For Debugging use only
+        'SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "YAxis", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "ZAxis", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "SelectField", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "Title", "")
 
         lxaxis = GetSetting("BasinsCATPlot", "Settings", "XAxis", "0")
         lyaxis = GetSetting("BasinsCATPlot", "Settings", "YAxis", "0")
