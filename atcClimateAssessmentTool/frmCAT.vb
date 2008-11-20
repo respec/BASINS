@@ -1543,6 +1543,7 @@ Public Class frmCAT
     Private Sub btnPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlot.Click
         Dim lPltForm As New frmPlot
         lPltForm.Results = agdResults.Source
+        lPltForm.LoadSetting()
         lPltForm.Show()
     End Sub
 End Class
