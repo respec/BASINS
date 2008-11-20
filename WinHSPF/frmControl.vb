@@ -162,37 +162,34 @@ Public Class frmControl
         CheckBox27.Checked = pCheckBoxValues(2)(8)
         CheckBox28.Checked = pCheckBoxValues(2)(9)
 
-
-
-        AddHandler CheckBox1.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox2.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox3.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox4.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox5.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox6.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox7.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox8.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox9.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox10.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox11.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox12.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox13.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox14.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox15.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox16.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox17.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox18.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox19.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox20.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox21.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox22.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox23.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox24.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox25.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox26.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox27.CheckedChanged, AddressOf ChecksChangedLogic
-        AddHandler CheckBox28.CheckedChanged, AddressOf ChecksChangedLogic
-
+        AddHandler CheckBox1.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox2.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox3.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox4.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox5.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox6.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox7.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox8.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox9.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox10.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox11.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox12.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox13.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox14.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox15.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox16.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox17.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox18.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox19.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox20.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox21.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox22.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox23.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox24.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox25.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox26.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox27.CheckedChanged, AddressOf CheckLogic
+        AddHandler CheckBox28.CheckedChanged, AddressOf CheckLogic
 
     End Sub
 
@@ -203,7 +200,7 @@ Public Class frmControl
         Dim lMsgResult As MsgBoxResult
         Dim i As Integer
 
-        MsgBox("p" & pPChange & "---" & "i" & pIChange & "---" & "r" & pRChange)
+        CompareChecksToLoadState()
 
         If (pIChange Or pRChange Or pPChange) Then
             'okay and something has changed
@@ -271,6 +268,8 @@ Public Class frmControl
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Dim lMsgResult As Windows.Forms.DialogResult = Nothing
 
+        CompareChecksToLoadState()
+
         If pIChange Or pRChange Or pPChange Then
             lMsgResult = Logger.Message("Changed have been made to Control Cards. Disacrd Changes?", "WinHSPF - Control Card Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.No)
             If lMsgResult = MsgBoxResult.Yes Then
@@ -281,38 +280,53 @@ Public Class frmControl
         End If
     End Sub
 
-    Private Sub ChecksChangedLogic(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Public Sub CompareChecksToLoadState()
+        Dim lOper As Integer
+
+        For lOper = 0 To 11
+            If pCheckBoxValues(0)(lOper) <> pInitialCheckBoxValues(0)(lOper) Then
+                pPChange = True
+            End If
+        Next
+        For lOper = 0 To 5
+            If pCheckBoxValues(1)(lOper) <> pInitialCheckBoxValues(1)(lOper) Then
+                pIChange = True
+            End If
+        Next
+        For lOper = 0 To 9
+            If pCheckBoxValues(2)(lOper) <> pInitialCheckBoxValues(2)(lOper) Then
+                pRChange = True
+            End If
+        Next
+
+    End Sub
+
+    Private Sub CheckLogic(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Dim lClickedCheckBox As Windows.Forms.CheckBox = sender
 
         Select Case lClickedCheckBox.Name
 
             'PERLND Checkboxes
             Case "CheckBox1"
-                pPChange = CheckBox1.Checked <> pInitialCheckBoxValues(0)(0)
                 pCheckBoxValues(0)(0) = CheckBox1.CheckState
             Case "CheckBox2"
-                pPChange = CheckBox2.Checked <> pInitialCheckBoxValues(0)(1)
                 pCheckBoxValues(0)(1) = CheckBox2.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox1.Checked = True
                 End If
             Case "CheckBox3"
-                pPChange = CheckBox3.Checked <> pInitialCheckBoxValues(0)(2)
                 pCheckBoxValues(0)(2) = CheckBox3.CheckState
             Case "CheckBox4"
-                pPChange = CheckBox4.Checked <> pInitialCheckBoxValues(0)(3)
                 pCheckBoxValues(0)(3) = CheckBox4.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox3.Checked = True
                 End If
             Case "CheckBox5"
-                pPChange = CheckBox5.Checked <> pCheckBoxValues(0)(4)
                 pCheckBoxValues(0)(4) = CheckBox5.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox1.Checked = True
                 End If
             Case "CheckBox6"
-                pPChange = CheckBox6.Checked <> pInitialCheckBoxValues(0)(5)
                 pCheckBoxValues(0)(5) = CheckBox6.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox1.Checked = True
@@ -320,17 +334,14 @@ Public Class frmControl
                     CheckBox5.Checked = True
                 End If
             Case "CheckBox7"
-                pPChange = CheckBox7.Checked <> pInitialCheckBoxValues(0)(6)
                 pCheckBoxValues(0)(6) = CheckBox7.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox3.Checked = True
                     CheckBox4.Checked = True
                 End If
             Case "CheckBox8"
-                pPChange = CheckBox8.Checked <> pInitialCheckBoxValues(0)(7)
                 pCheckBoxValues(0)(7) = CheckBox8.CheckState
             Case "CheckBox9"
-                pPChange = CheckBox9.Checked <> pInitialCheckBoxValues(0)(8)
                 pCheckBoxValues(0)(8) = CheckBox9.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox3.Checked = True
@@ -338,7 +349,6 @@ Public Class frmControl
                     CheckBox8.Checked = True
                 End If
             Case "CheckBox10"
-                pPChange = CheckBox10.Checked <> pInitialCheckBoxValues(0)(9)
                 pCheckBoxValues(0)(9) = CheckBox10.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox1.Checked = True
@@ -348,7 +358,6 @@ Public Class frmControl
                     CheckBox8.Checked = True
                 End If
             Case "CheckBox11"
-                pPChange = CheckBox11.Checked <> pInitialCheckBoxValues(0)(10)
                 pCheckBoxValues(0)(10) = CheckBox11.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox1.Checked = True
@@ -358,7 +367,6 @@ Public Class frmControl
                     CheckBox8.Checked = True
                 End If
             Case "CheckBox12"
-                pPChange = CheckBox12.Checked <> pInitialCheckBoxValues(0)(11)
                 pCheckBoxValues(0)(11) = CheckBox12.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox3.Checked = True
@@ -367,32 +375,26 @@ Public Class frmControl
 
                 'IMPLND Checkboxes
             Case "CheckBox13"
-                pIChange = CheckBox13.Checked <> pInitialCheckBoxValues(1)(0)
                 pCheckBoxValues(1)(0) = CheckBox13.CheckState
             Case "CheckBox14"
-                pIChange = CheckBox14.Checked <> pInitialCheckBoxValues(1)(1)
                 pCheckBoxValues(1)(1) = CheckBox14.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox13.Checked = True
                 End If
             Case "CheckBox15"
-                pIChange = CheckBox15.Checked <> pInitialCheckBoxValues(1)(2)
                 pCheckBoxValues(1)(2) = CheckBox15.CheckState
             Case "CheckBox16"
-                pIChange = CheckBox16.Checked <> pInitialCheckBoxValues(1)(3)
                 pCheckBoxValues(1)(3) = CheckBox16.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox15.Checked = True
                 End If
             Case "CheckBox17"
-                pIChange = CheckBox17.Checked <> pInitialCheckBoxValues(1)(4)
                 pCheckBoxValues(1)(4) = CheckBox17.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox13.Checked = True
                     CheckBox15.Checked = True
                 End If
             Case "CheckBox18"
-                pIChange = CheckBox18.Checked <> pInitialCheckBoxValues(1)(5)
                 pCheckBoxValues(1)(5) = CheckBox18.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox15.Checked = True
@@ -401,31 +403,25 @@ Public Class frmControl
 
                 'RCHRES Checkboxes
             Case "CheckBox19"
-                pRChange = CheckBox19.Checked <> pInitialCheckBoxValues(2)(0)
                 pCheckBoxValues(2)(0) = CheckBox19.CheckState
             Case "CheckBox20"
-                pRChange = CheckBox20.Checked <> pInitialCheckBoxValues(2)(1)
                 pCheckBoxValues(2)(1) = CheckBox20.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
                 End If
-
             Case "CheckBox21"
-                pRChange = CheckBox21.Checked <> pInitialCheckBoxValues(2)(2)
                 pCheckBoxValues(2)(2) = CheckBox21.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
                     CheckBox20.Checked = True
                 End If
             Case "CheckBox22"
-                pRChange = CheckBox22.Checked <> pInitialCheckBoxValues(2)(3)
                 pCheckBoxValues(2)(3) = CheckBox22.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
                     CheckBox20.Checked = True
                 End If
             Case "CheckBox23"
-                pRChange = CheckBox23.Checked <> pInitialCheckBoxValues(2)(4)
                 pCheckBoxValues(2)(4) = CheckBox23.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
@@ -433,7 +429,6 @@ Public Class frmControl
                     CheckBox22.Checked = True
                 End If
             Case "CheckBox24"
-                pRChange = CheckBox24.Checked <> pInitialCheckBoxValues(2)(5)
                 pCheckBoxValues(2)(5) = CheckBox24.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
@@ -442,7 +437,6 @@ Public Class frmControl
                     CheckBox23.Checked = True
                 End If
             Case "CheckBox25"
-                pRChange = CheckBox25.Checked <> pInitialCheckBoxValues(2)(6)
                 pCheckBoxValues(2)(6) = CheckBox25.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
@@ -450,7 +444,6 @@ Public Class frmControl
                     CheckBox22.Checked = True
                 End If
             Case "CheckBox26"
-                pRChange = CheckBox26.Checked <> pInitialCheckBoxValues(2)(7)
                 pCheckBoxValues(2)(7) = CheckBox26.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
@@ -460,7 +453,6 @@ Public Class frmControl
                     CheckBox25.Checked = True
                 End If
             Case "CheckBox27"
-                pRChange = CheckBox27.Checked <> pInitialCheckBoxValues(2)(8)
                 pCheckBoxValues(2)(8) = CheckBox27.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
@@ -471,7 +463,6 @@ Public Class frmControl
                     CheckBox26.Checked = True
                 End If
             Case "CheckBox28"
-                pRChange = CheckBox28.Checked <> pInitialCheckBoxValues(2)(9)
                 pCheckBoxValues(2)(8) = CheckBox28.CheckState
                 If lClickedCheckBox.Checked = True Then
                     CheckBox19.Checked = True
@@ -555,7 +546,7 @@ Public Class frmControl
         Next lVOper
     End Sub
 
-    Public Sub setDefaultsForTable(ByVal myUci As HspfUci, ByVal defUci As HspfUci, ByVal opname As String, ByVal TableName As String)
+    Public Sub SetDefaultsForTable(ByVal pUCI As HspfUci, ByVal aDefUCI As HspfUci, ByVal opname As String, ByVal TableName As String)
         Dim lOptyp As HspfOpnBlk
         Dim lVOpn As Object
         Dim lOpn As HspfOperation
@@ -565,13 +556,13 @@ Public Class frmControl
         Dim lVPar As Object
         Dim Id As Integer
 
-        If myUci.OpnBlks(opname).Count > 0 Then
-            loptyp = myUci.OpnBlks(opname)
+        If pUCI.OpnBlks(opname).Count > 0 Then
+            lOptyp = pUCI.OpnBlks(opname)
             For Each lVOpn In lOptyp.Ids
                 lOpn = lVOpn
-                Id = DefaultOpnId(lOpn, defUci)
+                Id = DefaultOpnId(lOpn, aDefUCI)
                 If Id > 0 Then
-                    lDOpn = defUci.OpnBlks(lOpn.Name).OperFromID(Id)
+                    lDOpn = aDefUCI.OpnBlks(lOpn.Name).OperFromID(Id)
                     If Not lDOpn Is Nothing Then
                         If lOpn.TableExists(TableName) Then
                             lTab = lOpn.Tables(TableName)
@@ -595,13 +586,13 @@ Public Class frmControl
 
     End Sub
 
-    Public Function DefaultOpnId(ByVal lOpn As HspfOperation, ByVal defUci As HspfUci) As Long
+    Public Function DefaultOpnId(ByVal lOpn As HspfOperation, ByVal aDefUCI As HspfUci) As Long
         Dim lDOpn As HspfOperation
 
         If lOpn.DefOpnId <> 0 Then
             DefaultOpnId = lOpn.DefOpnId
         Else
-            lDOpn = matchOperWithDefault(lOpn.Name, lOpn.Description, defUci)
+            lDOpn = matchOperWithDefault(lOpn.Name, lOpn.Description, aDefUCI)
             If lDOpn Is Nothing Then
                 DefaultOpnId = 0
             Else
@@ -675,12 +666,12 @@ Public Class frmControl
         End If
     End Function
 
-    Public Function matchOperWithDefault(ByVal OpTypName As String, ByVal OpnDesc As String, ByVal defUci As HspfUci) As HspfOperation
+    Public Function matchOperWithDefault(ByVal OpTypName As String, ByVal OpnDesc As String, ByVal aDefUCI As HspfUci) As HspfOperation
         Dim lVOpn As Object
         Dim lOpn As HspfOperation
         Dim lTempString As String
 
-        For Each lVOpn In defUci.OpnBlks(OpTypName).Ids
+        For Each lVOpn In aDefUCI.OpnBlks(OpTypName).Ids
             lOpn = lVOpn
             If lOpn.Description = OpnDesc Then
                 matchOperWithDefault = lOpn
@@ -688,7 +679,7 @@ Public Class frmControl
             End If
         Next lVOpn
         'a complete match not found, look for partial
-        For Each lVOpn In defUci.OpnBlks(OpTypName).Ids
+        For Each lVOpn In aDefUCI.OpnBlks(OpTypName).Ids
             lOpn = lVOpn
             If Len(lOpn.Description) > Len(OpnDesc) Then
                 lTempString = Microsoft.VisualBasic.Left(lOpn.Description, Len(OpnDesc))
@@ -712,8 +703,8 @@ Public Class frmControl
             End If
         Next lVOpn
         'not found, use first one
-        If defUci.OpnBlks(OpTypName).Count > 0 Then
-            matchOperWithDefault = defUci.OpnBlks(OpTypName).Ids(1)
+        If aDefUCI.OpnBlks(OpTypName).Count > 0 Then
+            matchOperWithDefault = aDefUCI.OpnBlks(OpTypName).Ids(1)
         Else
             matchOperWithDefault = Nothing
         End If
@@ -746,7 +737,7 @@ Public Class frmControl
         Next lVOper
     End Sub
 
-    Public Sub SetMissingValuesToDefaults(ByVal myUci As HspfUci, ByVal aDefUCI As HspfUci)
+    Public Sub SetMissingValuesToDefaults(ByVal pUCI As HspfUci, ByVal aDefUCI As HspfUci)
         Dim lVOpTyp As Object
         Dim lOptyp As HspfOpnBlk
         Dim lVOpn As Object
@@ -760,8 +751,8 @@ Public Class frmControl
         Dim lOpTyps() As String = {"PERLND", "IMPLND", "RCHRES"}
 
         For Each lVOpTyp In lOpTyps
-            If myUci.OpnBlks(lVOpTyp).Count > 0 Then
-                lOptyp = myUci.OpnBlks(lVOpTyp)
+            If pUCI.OpnBlks(lVOpTyp).Count > 0 Then
+                lOptyp = pUCI.OpnBlks(lVOpTyp)
                 For Each lVOpn In lOptyp.Ids
                     lOpn = lVOpn
                     Id = DefaultOpnId(lOpn, aDefUCI)
