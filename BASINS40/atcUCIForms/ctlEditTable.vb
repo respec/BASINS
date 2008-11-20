@@ -141,7 +141,7 @@ Public Class ctlEditTable
         End Set
     End Property
 
-    Private Sub refreshGrid()
+    Private Sub RefreshGrid()
         Dim lParm As HspfParm
         Dim ltable As HspfTable = Nothing
         Dim tname As String = Nothing
