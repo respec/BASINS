@@ -31,6 +31,81 @@ Public Class frmPlot
         Next
     End Sub
 
+    Public Sub LoadSetting()
+
+        Dim lxaxis As Integer
+        Dim lyaxis As Integer
+        Dim lzaxis As Integer
+        Dim lptlabels As Integer
+        Dim lselectfield As Integer
+        Dim ltitle As String
+
+        'SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "YAxis", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "ZAxis", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "SelectField", "0")
+        'SaveSetting("BasinsCATPlot", "Settings", "Title", "")
+
+        lxaxis = GetSetting("BasinsCATPlot", "Settings", "XAxis", "0")
+        lyaxis = GetSetting("BasinsCATPlot", "Settings", "YAxis", "0")
+        lzaxis = GetSetting("BasinsCATPlot", "Settings", "ZAxis", "0")
+        lptlabels = GetSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
+        lselectfield = GetSetting("BasinsCATPlot", "Settings", "SelectField", "0")
+        ltitle = GetSetting("BasinsCATPlot", "Settings", "Title", "")
+
+        Dim ld As Integer = -99
+        For i As Integer = 0 To cboXAxis.Items.Count - 1
+            If Integer.TryParse(cboXAxis.Items(i).ToString.Split("-")(0), ld) Then
+                If lxaxis = ld Then
+                    cboXAxis.SelectedIndex = i
+                    Exit For
+                End If
+            End If
+        Next
+
+        ld = -99
+        For i As Integer = 0 To cboYAxis.Items.Count - 1
+            If Integer.TryParse(cboYAxis.Items(i).ToString.Split("-")(0), ld) Then
+                If lyaxis = ld Then
+                    cboYAxis.SelectedIndex = i
+                    Exit For
+                End If
+            End If
+        Next
+
+        ld = -99
+        For i As Integer = 0 To cboZAxis.Items.Count - 1
+            If Integer.TryParse(cboZAxis.Items(i).ToString.Split("-")(0), ld) Then
+                If lzaxis = ld Then
+                    cboZAxis.SelectedIndex = i
+                    Exit For
+                End If
+            End If
+        Next
+
+        ld = -99
+        For i As Integer = 0 To cboPointLabels.Items.Count - 1
+            If Integer.TryParse(cboPointLabels.Items(i).ToString.Split("-")(0), ld) Then
+                If lptlabels = ld Then
+                    cboPointLabels.SelectedIndex = i
+                    Exit For
+                End If
+            End If
+        Next
+
+        ld = -99
+        For i As Integer = 0 To cboSelect.Items.Count - 1
+            If Integer.TryParse(cboSelect.Items(i).ToString.Split("-")(0), ld) Then
+                If lselectfield = ld Then
+                    cboSelect.SelectedIndex = i
+                    Exit For
+                End If
+            End If
+        Next
+
+    End Sub
+
     Private Sub btnPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlot.Click
         Dim lGnuplotExe As String = FindFile("Please locate wgnuplot.exe", "wgnuplot.exe")
         Dim lPlotFilename As String = IO.Path.GetTempFileName()
@@ -364,13 +439,53 @@ Public Class frmPlot
     Private Sub btnDone_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDone.Click
 
         'TODO: Save settings here
-        'SaveSetting("BasinsCATPlot", "Settings", "XAxis", cboXAxis)
 
-        '.FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
+
+        If cboXAxis.Text = "None" OrElse cboXAxis.Text = "" Then
+            SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
+        Else
+            SaveSetting("BasinsCATPlot", "Settings", "XAxis", cboXAxis.Text.Split("-")(0))
+        End If
+
+        If cboYAxis.Text = "None" OrElse cboYAxis.Text = "" Then
+            SaveSetting("BasinsCATPlot", "Settings", "YAxis", "0")
+        Else
+            SaveSetting("BasinsCATPlot", "Settings", "YAxis", cboYAxis.Text.Split("-")(0))
+        End If
+
+        If cboZAxis.Text = "None" OrElse cboZAxis.Text = "" Then
+            SaveSetting("BasinsCATPlot", "Settings", "ZAxis", "0")
+        Else
+            SaveSetting("BasinsCATPlot", "Settings", "ZAxis", cboZAxis.Text.Split("-")(0))
+        End If
+
+        If cboPointLabels.Text = "None" OrElse cboPointLabels.Text = "" Then
+            SaveSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
+        Else
+            SaveSetting("BasinsCATPlot", "Settings", "PointLabels", cboPointLabels.Text.Split("-")(0))
+        End If
+
+        If cboSelect.Text = "None" OrElse cboSelect.Text = "" Then
+            SaveSetting("BasinsCATPlot", "Settings", "SelectField", "0")
+        Else
+            SaveSetting("BasinsCATPlot", "Settings", "SelectField", cboSelect.Text.Split("-")(0))
+        End If
+
+        SaveSetting("BasinsCATPlot", "Settings", "Title", txtTitle.Text)
+        Me.Close()
 
     End Sub
 
     Private Sub btnCancelPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancelPlot.Click
         Me.Close()
+    End Sub
+
+    Public Sub New()
+
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
     End Sub
 End Class
