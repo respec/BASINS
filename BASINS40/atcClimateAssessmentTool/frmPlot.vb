@@ -40,12 +40,12 @@ Public Class frmPlot
         Dim lselectfield As Integer
         Dim ltitle As String
 
-        'SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
-        'SaveSetting("BasinsCATPlot", "Settings", "YAxis", "0")
-        'SaveSetting("BasinsCATPlot", "Settings", "ZAxis", "0")
-        'SaveSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
-        'SaveSetting("BasinsCATPlot", "Settings", "SelectField", "0")
-        'SaveSetting("BasinsCATPlot", "Settings", "Title", "")
+        SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
+        SaveSetting("BasinsCATPlot", "Settings", "YAxis", "0")
+        SaveSetting("BasinsCATPlot", "Settings", "ZAxis", "0")
+        SaveSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
+        SaveSetting("BasinsCATPlot", "Settings", "SelectField", "0")
+        SaveSetting("BasinsCATPlot", "Settings", "Title", "")
 
         lxaxis = GetSetting("BasinsCATPlot", "Settings", "XAxis", "0")
         lyaxis = GetSetting("BasinsCATPlot", "Settings", "YAxis", "0")
@@ -166,6 +166,10 @@ Public Class frmPlot
                 lstr.AppendLine("set title ""Data points are labeled with " & cboPointLabels.SelectedItem.ToString.Split("-")(1) & """")
                 lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
                 lColB = cboPointLabels.SelectedItem.ToString.Split("-")(0)
+            ElseIf Not cboSelect.Text = "None" And Not cboSelect.Text = "" Then
+                'lstr.AppendLine("set title ""Data points are labeled with " & cboPointLabels.SelectedItem.ToString.Split("-")(1) & """")
+                lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
+                'lColB = cboPointLabels.SelectedItem.ToString.Split("-")(0)
             Else
                 lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """")
             End If
