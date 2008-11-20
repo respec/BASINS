@@ -1,7 +1,9 @@
 Imports atcUCI
 Imports atcUtility
+Imports MapWinUtility
+Imports System.Collections.ObjectModel
 
-Public Class ctlSchematic
+<System.Runtime.InteropServices.ComVisible(False)> Public Class ctlSchematic
 
     Private Enum LegendType
         LegLand = 0
@@ -9,247 +11,307 @@ Public Class ctlSchematic
         LegPoint = 2
     End Enum
 
-    Dim myUci As atcUCI.HspfUci
-    Dim OpTyps() As String = {"RCHRES", "BMPRAC"}
-    Dim pOperations As Collection 'Set of operations pictured in the main tree diagram
-    Dim picReach As Generic.List(Of PictureBox)
+    Private pDragging As Boolean = False
+    Private pDragOffset As Point
+    'Private pBeforeDragLocation As Point
+
+    Private Class clsIcon
+        Inherits Windows.Forms.Control
+
+        Public Selected As Boolean
+        Public pOperation As HspfOperation
+        Public UpstreamIcons As New Generic.List(Of clsIcon)
+        Public Key As String = ""
+
+        Public Function Center() As Point
+            Return New Point(Me.Left + Me.Width / 2, Me.Top + Me.Height / 2)
+        End Function
+
+        Public Property Operation() As HspfOperation
+            Get
+                Return pOperation
+            End Get
+            Set(ByVal newValue As HspfOperation)
+                pOperation = newValue
+                If pOperation Is Nothing Then
+                    Key = ""
+                Else
+                    Key = OperationKey(pOperation)
+                End If
+            End Set
+        End Property
+    End Class
+
+    Private Class IconCollection
+        Inherits KeyedCollection(Of String, clsIcon)
+        Protected Overrides Function GetKeyForItem(ByVal item As clsIcon) As String
+            Return item.Key
+        End Function
+    End Class
+
+    Private pUci As atcUCI.HspfUci
+    Private pOperationTypesToInclude As New Generic.List(Of String)
+    Private pIcons As New IconCollection
     Private ColorMap As atcCollection '(Of Color)
-    Private CurrentLegend As LegendType
+    Private CurrentLegend As LegendType = LegendType.LegLand
     Private LegendOrder As Generic.List(Of String)
     Private TreeProblemMessageDisplayed As Boolean = False
-    Private ReachSelected() As Boolean
+    Private TreeLoopMessageDisplayed As Boolean = False
     Private LandSelected() As Boolean
-    Private HighlightColor As Color = Color.Aquamarine
+    Private HighlightBrush As Brush = Brushes.Aquamarine
     Private picLegend As atcCollection
-    Private LegendScrollPos, LegendFullHeight As Integer
+    Private LegendScrollPos As Integer
+    Private LegendFullHeight As Integer
     Private MetSelected As Integer
+    Private pIconWidth As Integer = 73
+    Private pIconHeight As Integer = 41
+    Private pBorderWidth As Integer = 3
 
-    Public Sub BuildTree(Optional ByRef Printing As Boolean = False)
+    Public Property UCI() As HspfUci
+        Get
+            Return pUci
+        End Get
+        Set(ByVal newValue As HspfUci)
+            pUci = newValue
+            BuildTree()
+        End Set
+    End Property
 
-        Dim iCur, j, i, k, ypos As Integer
-        Dim iTrib As New Generic.List(Of Integer)
-        Dim iNow As New Generic.List(Of Integer)
-        Dim iTotalTrib As New Generic.List(Of Integer)
-        Dim iTotalTribOp As New Generic.List(Of String)
-        Dim lSrcOpn, lOpn, lTarOpn As atcUCI.HspfOperation
-        Dim lSrc As atcUCI.HspfConnection
-        Dim ifinish, istart, workingwidth As Integer
-        Dim ifound As Boolean
-        Dim maxlayer, iLayer As Integer
-        Dim itemp As Integer
-        Dim Xbase, newstart, curline, newfinish, Ybase As Integer
-        Dim loptyp As Object
-        Dim halfBoxHeight, dy, halfBoxWidth As Integer
-        Dim PicTop() As Integer
-        Dim PicLeft() As Integer
-        Dim drawsurface As Object
-        Dim pic As System.Windows.Forms.PictureBox
-        Dim lOpnBlk As atcUCI.HspfOpnBlk
-        Dim icount As Integer
-        Dim g As Graphics
+    Public Sub BuildTree(Optional ByRef aPrinting As Boolean = False)
+        ClearTree()
+        If pUci IsNot Nothing Then
 
-        icount = 0
-        If myUci.OpnBlks.Count > 0 Then
-            For Each loptyp In OpTyps
-                lOpnBlk = myUci.OpnBlks.Item(loptyp)
-                icount = icount + lOpnBlk.Count
-            Next loptyp
-        End If
+            Dim lNodeSize As New Drawing.Size(pIconWidth, pIconHeight)
 
-        If icount > 0 Then
-            'okay to do tree
-            pOperations = Nothing
-            pOperations = New Collection
-
-            If myUci.Name = "" Then Exit Sub
-
-            'UPGRADE_WARNING: Couldn't resolve default property of object myUci.OpnSeqBlock.Opns.Count. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            For j = 1 To myUci.OpnSeqBlock.Opns.Count 'or other bottom oper
-                lOpn = myUci.OpnSeqBlock.Opns(j)
-                For Each loptyp In OpTyps
-                    'UPGRADE_WARNING: Couldn't resolve default property of object loptyp. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    If lOpn.Name = loptyp Then
-                        pOperations.Add(lOpn)
-                        Exit For
-                    End If
-                Next loptyp
-            Next j
-            lOpn = pOperations.Item(pOperations.Count())
-
-            'find max number of layers in tree
-            maxlayer = 0
-            For i = 1 To pOperations.Count() - 1
-                iLayer = DownLayers(1, i, pOperations)
-                If iLayer > maxlayer Then
-                    maxlayer = iLayer
-                End If
-            Next i
-            If maxlayer = 0 Then maxlayer = 1
-
-            If Printing Then
-                ''UPGRADE_ISSUE: Constant vbPixels was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
-                ''UPGRADE_ISSUE: Printer property Printer.ScaleMode was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                'Printer.ScaleMode = vbPixels
-                ''UPGRADE_ISSUE: Printer property Printer.ScaleWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                'picBuffer.Width = Printer.ScaleWidth / 6
-                ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                'picBuffer.Height = Printer.ScaleHeight / 20
-                ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                'dy = Printer.ScaleHeight / (maxlayer + 1)
-                ''UPGRADE_ISSUE: Printer object was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6B85A2A7-FE9F-4FBE-AA0C-CF11AC86A305"'
-                'drawsurface = Printer
-                'pic = picBuffer
-            Else
-                'TODO: picTree.Clear()
-                picTree.Visible = True 'False
-                dy = (picTree.Height - 20) / maxlayer
-                drawsurface = picTree
-                pic = picReach(0)
-                g = Graphics.FromHwnd(pic.Handle)
-            End If
-            ReDim PicTop(picReach.Count)
-            ReDim PicLeft(picReach.Count)
-
-            halfBoxHeight = pic.Height / 2
-            halfBoxWidth = pic.Width / 2
-            'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.ScaleHeight. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            Ybase = drawsurface.ScaleHeight - dy / 2
-            PicTop(0) = Ybase - halfBoxHeight
-            'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.ScaleWidth. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            PicLeft(0) = drawsurface.ScaleWidth / 2 - halfBoxWidth
-
-            setPicture(lOpn, g)
-            drawBorder(g, Not Printing)
-            If Printing Then
-                'UPGRADE_ISSUE: PictureBox property pic.Image was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.PaintPicture. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                drawsurface.PaintPicture(pic.Image, PicLeft(0), PicTop(0))
-            Else
-                pic.Top = PicTop(0)
-                pic.Left = PicLeft(0) '+ pic.width
-                pic.Tag = pOperations.Count()
-            End If
-            'initialize before big tree loop
-            istart = 0
-            ifinish = 0
-            curline = 0
-            newstart = 0
-            newfinish = 0
-
-10:         'start of tree loop
-            newstart = 0
-            newfinish = 0
-
-            'ypos = Ybase - istart * dy 'lineT(istart).Y1 - dy
-            For j = istart To ifinish 'loop the top layer of branches already placed - count next layer
-                iTrib.Clear()
-                iCur = CInt(picReach(j).Tag)
-                lTarOpn = pOperations.Item(iCur)
-                For i = iCur - 1 To 1 Step -1
-                    lSrcOpn = pOperations.Item(i)
-                    For Each lSrc In lTarOpn.Sources
-                        If lSrcOpn.Name = lSrc.Source.VolName And lSrcOpn.Id = lSrc.Source.VolId Then
-                            'found a trib to this branch
-                            ifound = False
-                            '            For k = 1 To itribcnt 'check to see if we already have it
-                            '              If iTrib(k) = i Then
-                            '                ifound = True       fix 092602 to catch all mult exit situations
-                            '              End If
-                            '            Next k
-                            For k = 0 To iTotalTrib.Count - 1 'check to see if we already have it
-                                If iTotalTrib(k) = lSrcOpn.Id AndAlso iTotalTribOp(k) = lSrcOpn.Name Then
-                                    ifound = True
-                                End If
-                            Next
-                            If ifound Then
-                                'TODO: show multiple exits from a reach
-                                'we can't do tree diagram with multiple exits from a reach,
-                                'just skip this connection on tree diagram for now
-                                If TreeProblemMessageDisplayed = False Then
-                                    MsgBox("A reach with multiple exits has been detected." & vbCrLf & "Only the first exit will be drawn in the tree diagram.", MsgBoxStyle.OkOnly, "WinHSPF Problem")
-                                    TreeProblemMessageDisplayed = True
-                                End If
-                            Else
-                                iTrib.Add(i)
-                                iNow.Add(j)
-                                iTotalTrib.Add(lSrcOpn.Id)
-                                iTotalTribOp.Add(lSrcOpn.Name)
-                            End If
-                        End If
-                    Next lSrc
-                Next i
-                If iTrib.Count = 0 Then 'space holder
-                    iTrib.Add(0)
-                    iNow.Add(0)
-                End If
-            Next j
-
-            'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.ScaleWidth. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            workingwidth = drawsurface.ScaleWidth / iTrib.Count '* Screen.TwipsPerPixelX
-            Xbase = workingwidth / 2
-            For i = 0 To iTrib.Count - 1 'loop to place each trib to this branch
-                If iTrib(i) > 0 Then 'not a space holder
-                    curline = curline + 1
-                    If newstart = 0 Then newstart = curline 'the first branch on this row
-                    newfinish = curline
-                    j = iNow(i)
-                    If Not Printing Then pic = picReach(curline)
-                    PicTop(curline) = PicTop(j) - dy
-                    PicLeft(curline) = Xbase - halfBoxWidth
-                    setPicture(pOperations.Item(iTrib(i)), g)
-                    drawBorder(g, Not Printing)
-                    'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.Line. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    drawsurface.Line(Xbase, PicTop(curline) + halfBoxHeight, PicLeft(j) + halfBoxWidth, PicTop(j) + halfBoxHeight)
-                    With pic
-                        If Printing Then
-                            'UPGRADE_ISSUE: PictureBox property pic.Image was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                            'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.PaintPicture. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            drawsurface.PaintPicture(.Image, PicLeft(curline), PicTop(curline))
-                        Else
-                            .Top = PicTop(curline)
-                            .Left = PicLeft(curline) '+ .width
-                            .Tag = iTrib(i)
-                            .Visible = True
-                        End If
+            Dim lOperation As atcUCI.HspfOperation
+            For Each lOperation In pUci.OpnSeqBlock.Opns
+                If pOperationTypesToInclude.Contains(lOperation.Name) Then
+                    Dim lNewIcon As New clsIcon
+                    With lNewIcon
+                        .Size = lNodeSize
+                        .BackColor = Color.SkyBlue
+                        .Operation = lOperation
                     End With
+                    AddHandler lNewIcon.MouseDown, AddressOf Icon_MouseDown
+                    AddHandler lNewIcon.MouseMove, AddressOf Icon_MouseMove
+                    AddHandler lNewIcon.MouseUp, AddressOf Icon_MouseUp
+                    pIcons.Add(lNewIcon)
+                    picTree.Controls.Add(lNewIcon)
                 End If
-                Xbase = Xbase + workingwidth
-            Next i
+            Next
 
-            If newstart > 0 Then 'another row of branches to do
-                istart = newstart
-                ifinish = newfinish
-            End If
-            If newstart > 0 Then GoTo 10
+            If pIcons.Count > 0 Then 'okay to do tree
 
-            If Printing Then
-                'UPGRADE_ISSUE: Printer method Printer.EndDoc was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                'Printer.EndDoc()
-            Else
-                ReDim Preserve ReachSelected(picReach.Count - 1)
-                For i = 0 To picReach.Count - 1
-                    SetReachSelected(i, ReachSelected(i))
+                Dim lOutlets As New IconCollection
+                Dim lMaximumTreeDepth As Integer = 1
+                Dim lDepth As Integer
+                Dim lIcon As clsIcon
+                Dim lKey As String
+
+                For Each lIcon In pIcons
+                    lDepth = DownLayers(lIcon, lIcon.Key & vbCrLf)
+                    If lDepth > lMaximumTreeDepth Then
+                        lMaximumTreeDepth = lDepth
+                    End If
+                    If lDepth = 1 Then
+                        lOutlets.Add(lIcon)
+                    End If
                 Next
-                picTree.Visible = True
+
+                Dim halfBoxHeight As Integer = pIconHeight / 2
+                Dim dy As Integer
+                Dim halfBoxWidth As Integer = pIconWidth / 2
+                Dim drawsurface As Control
+                'Dim pic As System.Windows.Forms.Control
+
+                'If Printing Then
+                '    ''UPGRADE_ISSUE: Constant vbPixels was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleMode was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'Printer.ScaleMode = vbPixels
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'picBuffer.Width = Printer.ScaleWidth / 6
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'picBuffer.Height = Printer.ScaleHeight / 20
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'dy = Printer.ScaleHeight / (maxlayer + 1)
+                '    ''UPGRADE_ISSUE: Printer object was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6B85A2A7-FE9F-4FBE-AA0C-CF11AC86A305"'
+                '    'drawsurface = Printer
+                '    'pic = picBuffer
+                'Else
+                dy = (picTree.Height - 20) / lMaximumTreeDepth
+                If dy < pIconHeight * 1.5 Then
+                    dy = pIconHeight * 1.5
+                    'TODO: enable vertical scrolling
+                End If
+                drawsurface = picTree
+                'pic = pIcons(0)
+                'End If 'Printing
+
+                Dim Ybase As Integer = drawsurface.Height - dy / 2
+                Dim lWidthPerOutlet As Integer = (drawsurface.Width - 20) / lOutlets.Count
+                Dim Xbase As Integer = lWidthPerOutlet
+
+                For Each lOutlet As clsIcon In lOutlets
+                    LayoutFromIcon(lOutlet, Xbase, Ybase, dy, lWidthPerOutlet, aPrinting)
+                    Xbase += lWidthPerOutlet
+                Next
+
+                'Dim iCur, i, j As Integer
+                'Dim iTrib As New Generic.List(Of Integer)
+                'Dim iNow As New Generic.List(Of Integer)
+                'Dim iTotalTrib As New Generic.List(Of String)
+                'Dim lSrcOpn, lTarOpn As atcUCI.HspfOperation
+                'Dim lSrc As atcUCI.HspfConnection
+                'Dim ifinish, istart, workingwidth As Integer
+                'Dim ifound As Boolean
+                'Dim Xbase, newstart, curline, newfinish
+                'lOperation = pOperations.Item(pOperations.Count - 1)
+                'Dim PicTop(pIcons.Count) As Integer
+                'Dim PicLeft(pIcons.Count) As Integer
+                ''PicTop(0) = Ybase - halfBoxHeight
+                'PicLeft(0) = drawsurface.Width / 2 - halfBoxWidth
+
+                'DrawPictureOnReachControl(lOperation, Printing, pIcons(0))
+
+                'If Printing Then
+                '    'UPGRADE_ISSUE: PictureBox property pic.Image was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+                '    'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.PaintPicture. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                '    'drawsurface.PaintPicture(pic.Image, PicLeft(0), PicTop(0))
+                'Else
+                '    pic.Top = PicTop(0)
+                '    pic.Left = PicLeft(0) '+ pic.width
+                '    pic.Tag = pOperations.Count()
+                'End If
+                ''                'initialize before big tree loop
+                '                istart = 0
+                '                ifinish = 0
+                '                curline = 0
+                '                newstart = 0
+                '                newfinish = 0
+
+                '10:             'start of tree loop
+                '                newstart = 0
+                '                newfinish = 0
+
+                '                'ypos = Ybase - istart * dy 'lineT(istart).Y1 - dy
+                '                For j = istart To ifinish 'loop the top layer of branches already placed - count next layer
+                '                    iTrib.Clear()
+                '                    iCur = CInt(pIcons(j).Tag) - 1
+                '                    lTarOpn = pOperations.Item(iCur)
+                '                    For i = iCur - 1 To 0 Step -1
+                '                        lSrcOpn = pOperations.Item(i)
+                '                        For Each lSrc In lTarOpn.Sources
+                '                            If lSrcOpn.Name = lSrc.Source.VolName AndAlso lSrcOpn.Id = lSrc.Source.VolId Then
+                '                                'found a trib to this branch
+                '                                ifound = False
+                '                                '            For k = 1 To itribcnt 'check to see if we already have it
+                '                                '              If iTrib(k) = i Then
+                '                                '                ifound = True       fix 092602 to catch all mult exit situations
+                '                                '              End If
+                '                                '            Next k
+                '                                Dim lTribKey As String = lSrcOpn.Name & lSrcOpn.Id
+                '                                If iTotalTrib.Contains(lTribKey) Then
+                '                                    'TODO: show multiple exits from a reach
+                '                                    'we can't do tree diagram with multiple exits from a reach,
+                '                                    'just skip this connection on tree diagram for now
+                '                                    If TreeProblemMessageDisplayed = False Then
+                '                                        MsgBox("A reach with multiple exits has been detected." & vbCrLf & "Only the first exit will be drawn in the tree diagram.", MsgBoxStyle.OkOnly, "WinHSPF Problem")
+                '                                        TreeProblemMessageDisplayed = True
+                '                                    End If
+                '                                Else
+                '                                    iTrib.Add(i)
+                '                                    iNow.Add(j)
+                '                                    iTotalTrib.Add(lTribKey)
+                '                                End If
+                '                            End If
+                '                        Next lSrc
+                '                    Next i
+                '                    If iTrib.Count = 0 Then 'space holder
+                '                        iTrib.Add(0)
+                '                        iNow.Add(0)
+                '                    End If
+                '                Next j
+
+                '                workingwidth = drawsurface.Width / iTrib.Count
+                '                Xbase = workingwidth / 2
+                '                For i = 0 To iTrib.Count - 1 'loop to place each trib to this branch
+                '                    If iTrib(i) > 0 Then 'not a space holder
+                '                        curline = curline + 1
+                '                        If newstart = 0 Then newstart = curline 'the first branch on this row
+                '                        newfinish = curline
+                '                        j = iNow(i)
+                '                        If Not Printing Then pic = pIcons(curline)
+                '                        PicTop(curline) = PicTop(j) - dy
+                '                        PicLeft(curline) = Xbase - halfBoxWidth
+
+                '                        DrawPictureOnReachControl(pOperations.Item(iTrib(i)), Printing, pic)
+                '                        With pic
+                '                            If Printing Then
+                '                                'TODO: drawsurface.PaintPicture(.Image, PicLeft(curline), PicTop(curline))
+                '                            Else
+                '                                .Top = PicTop(curline)
+                '                                .Left = PicLeft(curline) '+ .width
+                '                                .Tag = iTrib(i)
+                '                                Logger.Dbg("Placing " & .Tag & " at (" & .Left & ", " & .Top & ")")
+                '                                .Visible = True
+                '                            End If
+                '                        End With
+                '                    End If
+                '                    Xbase = Xbase + workingwidth
+                '                Next i
+
+                '                If newstart > 0 Then 'another row of branches to do
+                '                    istart = newstart
+                '                    ifinish = newfinish
+                '                End If
+                '                If newstart > 0 Then GoTo 10
+
+                If aPrinting Then
+                    'UPGRADE_ISSUE: Printer method Printer.EndDoc was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                    'Printer.EndDoc()
+                Else
+                    DrawTreeBackground()
+                    picTree.Visible = True
+                End If
             End If
         End If
     End Sub
 
-    Private Sub SetReachSelected(ByVal reachIndex&, ByVal sel As Boolean)
-        Dim colr As Color, BorderWidth As Integer
-        BorderWidth = 3
-        With picReach(reachIndex)
-            If sel Then colr = HighlightColor Else colr = picTree.BackColor
-            '.FillStyle = vbFSSolid
-            '.DrawStyle = vbSolid
-            '.DrawWidth = 1
-            'TODO: picTree.Line(colr, .Left - BorderWidth - 1, .Top - BorderWidth - 1, .Width + BorderWidth * 2, .Height + BorderWidth * 2)
-            ReachSelected(reachIndex) = sel
-        End With
+    ''' <summary>
+    ''' Draw the connecting lines and selection halos behind the tree nodes
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub DrawTreeBackground()
+        Dim lBitmap As Bitmap = New Bitmap(picTree.Width, picTree.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        Dim lGraphics As Graphics = Graphics.FromImage(lBitmap)
+        Dim lLinesPen As Pen = Pens.Black
+
+        For Each lIcon As clsIcon In pIcons
+            With lIcon
+                Dim lIconCenter As Point = .Center
+                For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
+                    lGraphics.DrawLine(lLinesPen, lIconCenter, lUpstreamIcon.Center)
+                Next
+                If .Selected Then
+                    lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth - 1, .Top - pBorderWidth - 1, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+                End If
+            End With
+        Next
+        lGraphics.Dispose()
+        picTree.BackgroundImage = lBitmap
     End Sub
 
-    'Not needed until WinHSPF wants it
-    Public Sub setPicture(ByVal aOperation As HspfOperation, ByVal pic As Graphics)
+    Private Sub DrawPictureOnReachControl(ByVal aOperation As HspfOperation, ByVal aPrinting As Boolean, ByVal aControl As Control)
+        Dim lBitmap As New Bitmap(pIconWidth, pIconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        Dim g As Graphics = Graphics.FromImage(lBitmap)
+        setPicture(aOperation, g)
+        drawBorder(g, Not aPrinting)
+        g.Dispose()
+        aControl.BackgroundImage = lBitmap
+    End Sub
+
+    'Draw icon representing aOperation into given graphics object
+    Public Sub setPicture(ByVal aOperation As HspfOperation, ByVal g As Graphics)
         Dim barbase, barHeight, sid, barPos, barWidth, maxNBars As Integer
         Dim lTemp As String
         Dim lStr, desc As String
@@ -262,22 +324,21 @@ Public Class ctlSchematic
         Dim included() As Boolean
 
         barWidth = 3
-        'pic.Caption = pOpnBlk.Name & " " & pId
-        lStr = aOperation.OpnBlk.Name & " " & aOperation.Id
+        lStr = OperationKey(aOperation)
 
         'TODO: pic.ToolTipText = pOpnBlk.Name & " " & pId & " " & pDescription
-        pic.Clear(Color.White)
+        g.Clear(Drawing.SystemColors.Control)
 
-        Dim lStringMeasurement As Drawing.SizeF = pic.MeasureString(lStr, Me.Font)
-        Dim lX As Single = (pic.ClipBounds.Width - lStringMeasurement.Width) / 2
-        Dim lY As Single = pic.ClipBounds.Height - lStringMeasurement.Height * 1.25
+        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(lStr, Me.Font)
+        Dim lX As Single = (pIconWidth - lStringMeasurement.Width) / 2
+        Dim lY As Single = pIconHeight - lStringMeasurement.Height * 1.25
         barbase = lY
-        pic.DrawString(lStr, Me.Font, Brushes.Black, lX, lY)
+        g.DrawString(lStr, Me.Font, Brushes.Black, lX, lY)
         Dim myid As Integer
         Dim pPoint As HspfPointSource
         Select Case CurrentLegend
             Case LegendType.LegLand
-                barMaxVal = pUCI.MaxAreaByLand2Stream
+                barMaxVal = pUci.MaxAreaByLand2Stream
                 barPos = barWidth
                 If LegendOrder Is Nothing Then 'Draw all in the order they fall
                     For Each lSource In aOperation.Sources
@@ -285,10 +346,10 @@ Public Class ctlSchematic
                             barHeight = lSource.MFact / barMaxVal * barbase
                             On Error GoTo ColorNotFound
                             lDesc = lSource.Source.Opn.Description
-                            Dim lPen As New Pen(CType(ColorMap(lDesc), Color))
+                            Dim lPen As New Pen(CType(ColorMap.ItemByKey(lDesc), Color))
                             lDesc = ""
                             On Error GoTo 0
-                            pic.DrawLine(lPen, barPos, barbase, barPos + barWidth, barbase - barHeight)
+                            g.DrawLine(lPen, barPos, barbase, barPos + barWidth, barbase - barHeight)
                             barPos = barPos + barWidth + 1
                         End If
                     Next lSource
@@ -308,13 +369,13 @@ Public Class ctlSchematic
                             On Error GoTo ColorNotFound
                             Dim lPen As New Pen(CType(ColorMap(barDesc), Color))
                             On Error GoTo 0
-                            pic.DrawLine(lPen, barPos, barbase, barPos + barWidth, barbase - barHeight)
+                            g.DrawLine(lPen, barPos, barbase, barPos + barWidth, barbase - barHeight)
                         End If
                         barPos = barPos + barWidth + 1
                     Next barDesc
                 End If
             Case LegendType.LegMet
-                ReDim included(pUCI.MetSegs.Count)
+                ReDim included(pUci.MetSegs.Count)
                 If Not aOperation.MetSeg Is Nothing Then
                     included(aOperation.MetSeg.Id) = True
                     myid = aOperation.MetSeg.Id
@@ -333,11 +394,11 @@ Public Class ctlSchematic
                     End If
                 Next lSource
 
-                lStringMeasurement = pic.MeasureString("X", Me.Font)
+                lStringMeasurement = g.MeasureString("X", Me.Font)
                 lX = lStringMeasurement.Width
                 lY = (barbase - lStringMeasurement.Height) / 2
                 started = False
-                For sid = 1 To pUCI.MetSegs.Count
+                For sid = 1 To pUci.MetSegs.Count
                     If included(sid) Then
                         Dim lStrPrint As String
                         If started Then
@@ -350,21 +411,21 @@ Public Class ctlSchematic
                         'dont underline if this met seg contribs to reach only
                         'indirectly through land segment
                         'If sid = myid Then pic.Font = VB6.FontChangeUnderline(pic.Font, True) Else pic.Font = VB6.FontChangeUnderline(pic.Font, False) ' .ForeColor = vbHighlight Else pic.ForeColor = vbButtonText
-                        pic.DrawString(sid, Me.Font, Brushes.Black, lX, lY)
-                        lX += pic.MeasureString(sid, Me.Font).Width
+                        g.DrawString(sid, Me.Font, Brushes.Black, lX, lY)
+                        lX += g.MeasureString(sid, Me.Font).Width
                     End If
                 Next
                 'pic.Font.Underline = False
             Case LegendType.LegPoint
-                ReDim included(pUCI.PointSources.Count)
+                ReDim included(pUci.PointSources.Count)
                 'Debug.Print pPointSources.Count
                 For Each pPoint In aOperation.PointSources
                     included(pPoint.Id) = True
                 Next pPoint
-                lStringMeasurement = pic.MeasureString("X", Me.Font)
+                lStringMeasurement = g.MeasureString("X", Me.Font)
                 lX = lStringMeasurement.Width
                 lY = (barbase - lStringMeasurement.Height) / 2
-                For sid = 1 To pUCI.PointSources.Count
+                For sid = 1 To pUci.PointSources.Count
                     If included(sid) Then
                         Dim lStrPrint As String
                         If started Then
@@ -373,8 +434,8 @@ Public Class ctlSchematic
                             lStrPrint = sid
                             started = True
                         End If
-                        pic.DrawString(sid, Me.Font, Brushes.Black, lX, lY)
-                        lX += pic.MeasureString(sid, Me.Font).Width
+                        g.DrawString(sid, Me.Font, Brushes.Black, lX, lY)
+                        lX += g.MeasureString(sid, Me.Font).Width
                     End If
                 Next
         End Select
@@ -400,17 +461,17 @@ ColorNotFound:
             lTemp = UCase(barDesc)
         End If
         If InStr(lTemp, "FOREST") > 0 Or InStr(lTemp, "WOOD") > 0 Then
-            ColorMap.Add(ColorMap.Item("FOREST"), lTemp)
+            ColorMap.Add(ColorMap.ItemByKey("FOREST"), lTemp)
         ElseIf InStr(lTemp, "AGRI") > 0 Or InStr(lTemp, "FARM") > 0 Then
-            ColorMap.Add(ColorMap.Item("AGRICULTURAL"), lTemp)
+            ColorMap.Add(ColorMap.ItemByKey("AGRICULTURAL"), lTemp)
         ElseIf InStr(lTemp, "CROP") > 0 Then
-            ColorMap.Add(ColorMap.Item("AGRICULTURAL"), lTemp)
+            ColorMap.Add(ColorMap.ItemByKey("AGRICULTURAL"), lTemp)
         ElseIf InStr(lTemp, "URBAN") > 0 Or InStr(lTemp, "INDU") > 0 Then
-            ColorMap.Add(ColorMap.Item("URBAN"), lTemp)
+            ColorMap.Add(ColorMap.ItemByKey("URBAN"), lTemp)
         ElseIf InStr(lTemp, "WATER") > 0 Then
-            ColorMap.Add(ColorMap.Item("WATERWETLANDS"), lTemp)
+            ColorMap.Add(ColorMap.ItemByKey("WATERWETLANDS"), lTemp)
         ElseIf InStr(lTemp, "RESIDENTIAL") > 0 Then
-            ColorMap.Add(ColorMap.Item("RESIDENTIAL"), lTemp)
+            ColorMap.Add(ColorMap.ItemByKey("RESIDENTIAL"), lTemp)
         Else
             ColorMap.Add(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black), lTemp)
         End If
@@ -433,65 +494,67 @@ ColorNotFound:
         Else
             lPen = New Pen(Color.Black)
         End If
-        pic.DrawLine(lPen, 0, 0, 0, pic.ClipBounds.Height)
-        pic.DrawLine(lPen, 0, 0, pic.ClipBounds.Width, 0)
+        pic.DrawLine(lPen, 0, 0, 0, pIconHeight)
+        pic.DrawLine(lPen, 0, 0, pIconWidth, 0)
         If threeD Then
             lPen = New Pen(System.Drawing.SystemColors.ControlDark)
             'Else
             '    lPen = New Pen(System.Drawing.Color.Black)
         End If
-        pic.DrawLine(lPen, 0, pic.ClipBounds.Height - 1, pic.ClipBounds.Width - 1, pic.ClipBounds.Height - 1)
-        pic.DrawLine(lPen, pic.ClipBounds.Width - 1, 0, pic.ClipBounds.Width - 1, pic.ClipBounds.Height - 1)
+        pic.DrawLine(lPen, 0, pIconHeight - 1, pIconWidth - 1, pIconHeight - 1)
+        pic.DrawLine(lPen, pIconWidth - 1, 0, pIconWidth - 1, pIconHeight - 1)
     End Sub
 
-
-    Private Function DownLayers(ByRef iLayer As Integer, ByRef iOpnInd As Integer, ByRef lOpns As Collection) As Integer
-        Dim lLayer, j, mLayer As Integer
-        Dim lSrcOpn As atcUCI.HspfOperation
-        Dim lTarOpn As atcUCI.HspfOperation
-        Dim lTar As atcUCI.HspfConnection
-
-        mLayer = iLayer
-        lSrcOpn = lOpns.Item(iOpnInd)
-        With lSrcOpn
-            For Each lTar In .Targets
-                For j = iOpnInd + 1 To lOpns.Count()
-                    lTarOpn = lOpns.Item(j)
-                    If lTarOpn.Name = lTar.Target.VolName And lTarOpn.Id = lTar.Target.VolId Then
-                        lLayer = DownLayers(iLayer + 1, j, lOpns)
-                        If lLayer > mLayer Then
-                            mLayer = lLayer
-                        End If
+    'height of tree of this plus all downstream operations. 1=none downstream
+    Private Function DownLayers(ByVal aIcon As clsIcon, ByVal aAlreadyInPath As String) As Integer
+        Dim lDeepestTarget As Integer = 0
+        For Each lTarConn As atcUCI.HspfConnection In aIcon.Operation.Targets
+            Dim lTarOperation As HspfOperation = lTarConn.Target.Opn
+            Dim lKey As String = OperationKey(lTarOperation)
+            If aAlreadyInPath.Contains(lKey & vbCrLf) AndAlso Not TreeLoopMessageDisplayed Then
+                Dim lMessage As String = aAlreadyInPath
+                Logger.Msg(aAlreadyInPath, "Detected loop in operations")
+                TreeLoopMessageDisplayed = True
+            Else
+                If pIcons.Contains(lKey) Then
+                    aAlreadyInPath &= lKey & vbCrLf
+                    Dim lIcon As clsIcon = pIcons(lKey)
+                    lIcon.UpstreamIcons.Add(aIcon)
+                    Dim lTargetDepth As Integer = DownLayers(lIcon, aAlreadyInPath)
+                    If lTargetDepth > lDeepestTarget Then
+                        lDeepestTarget = lTargetDepth
                     End If
-                Next j
-            Next lTar
-        End With
-        DownLayers = mLayer
-
+                End If
+            End If
+        Next lTarConn
+        Return lDeepestTarget + 1
     End Function
 
+    Private Sub LayoutFromIcon(ByVal aIcon As clsIcon, ByVal aX As Integer, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
+        DrawPictureOnReachControl(aIcon.Operation, aPrinting, aIcon)
+        aIcon.Top = aY
+        aIcon.Left = aX
+        Dim lNumUpstream As Integer = aIcon.UpstreamIcons.Count
+        If lNumUpstream > 0 Then
+            aY -= aDy
+            Dim lWidthPerUpstream As Integer = aWidth / lNumUpstream
+            For Each lUpstreamIcon As clsIcon In aIcon.UpstreamIcons
+                LayoutFromIcon(lUpstreamIcon, aX, aY, aDy, lWidthPerUpstream, aPrinting)
+                aX -= lWidthPerUpstream
+            Next
+        End If
+    End Sub
+
     Public Sub ClearTree()
-        'Dim lOpnBlk As atcUCI.HspfOpnBlk
-        'Dim loptyp As Object
-        'Dim i, icount As Integer
-
-        ''UPGRADE_ISSUE: PictureBox method picTree.Cls was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        'picTree.Cls()
-        'For i = 1 To picReach.UBound 'unload any previously loaded branches
-        '    'Unload lineT(i)
-        '    picReach.Unload(i)
-        'Next i
-
-        'icount = 0
-        'For Each loptyp In OpTyps
-        '    lOpnBlk = myUci.OpnBlks.Item(loptyp)
-        '    icount = icount + lOpnBlk.Count
-        'Next loptyp
-
-        'For i = 1 To icount - 1
-        '    'Load lineT(i)
-        '    picReach.Load(i)
-        'Next i
+        picTree.Controls.Clear()
+        For Each lControl As Control In pIcons
+            lControl.Dispose()
+        Next
+        pIcons.Clear()
+        If picTree.BackgroundImage IsNot Nothing Then
+            picTree.BackgroundImage.Dispose()
+            picTree.BackgroundImage = Nothing 'New Bitmap(0, 0, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        End If
     End Sub
 
     Public Sub UpdateLegend(ByVal picTab As Graphics)
@@ -545,10 +608,10 @@ ColorNotFound:
                 End If
                 ypos = txtHeight
                 picLegend(0).Top = ypos
-                If myUci.Name <> "" Then
+                If pUci.Name <> "" Then
                     'UPGRADE_WARNING: Couldn't resolve default property of object myUci.OpnSeqBlock.Opns.Count. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    For oprindex = 1 To myUci.OpnSeqBlock.Opns.Count
-                        lOper = myUci.OpnSeqBlock.Opn(oprindex)
+                    For oprindex = 1 To pUci.OpnSeqBlock.Opns.Count
+                        lOper = pUci.OpnSeqBlock.Opn(oprindex)
                         If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
                             Key = lOper.Description
                             colonpos = InStr(Key, ":")
@@ -605,7 +668,7 @@ ColorNotFound:
                     If picLegend(Index).Tag <> "" Then LegendOrder.Add(picLegend(Index).Tag)
                 Next Index
             Case LegendType.LegMet
-                For Each lmetseg In myUci.MetSegs
+                For Each lmetseg In pUci.MetSegs
                     'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
                     With picLegend(Index)
                         .Tag = Index + 1
@@ -631,7 +694,7 @@ ColorNotFound:
                 Next lmetseg
                 LegendFullHeight = picLegend(0).Height * (Index + 1)
             Case LegendType.LegPoint
-                For Each lPoint In myUci.PointSources
+                For Each lPoint In pUci.PointSources
                     Index = lPoint.Id - 1
                     'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
                     With picLegend(Index)
@@ -762,7 +825,6 @@ ColorError:
         '     End With
     End Sub
 
-    'UPGRADE_NOTE: tag was upgraded to tag_Renamed. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
     Private Function LegendSelected(ByVal tag_Renamed As String) As Boolean
         Dim i As Integer
         LegendSelected = False
@@ -779,7 +841,7 @@ ColorError:
             For i = 0 To picLegend.Count - 1
                 If tag_Renamed = picLegend(i).Tag Then
                     'UPGRADE_ISSUE: PictureBox method picLegend.Point was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                    If picLegend(i).Point(0, 0) = HighlightColor Then LegendSelected = True
+                    'If picLegend(i).Point(0, 0) = HighlightColor Then LegendSelected = True
                     Exit Function
                 End If
             Next
@@ -788,23 +850,22 @@ ColorError:
 
     Private Sub SetLegendScrollButtons()
 
-        If LegendScrollPos > 0 Then
-            btnScrollLegendUp.Visible = True
-        Else
-            btnScrollLegendUp.Visible = False
-        End If
+        'If LegendScrollPos > 0 Then
+        '    btnScrollLegendUp.Visible = True
+        'Else
+        '    btnScrollLegendUp.Visible = False
+        'End If
 
-        If LegendFullHeight - LegendScrollPos > Height Then
-            btnScrollLegendDown.Visible = True
-        Else
-            btnScrollLegendDown.Visible = False
-        End If
+        'If LegendFullHeight - LegendScrollPos > Height Then
+        '    btnScrollLegendDown.Visible = True
+        'Else
+        '    btnScrollLegendDown.Visible = False
+        'End If
 
     End Sub
 
     Private Sub ScrollLegend()
         Dim ypos, boxHeight, txtHeight, Index As Integer
-        'UPGRADE_ISSUE: PictureBox method picTab.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
         txtHeight = 10
         boxHeight = txtHeight * 2
         ypos = txtHeight
@@ -819,15 +880,92 @@ ColorError:
         SetLegendScrollButtons()
     End Sub
 
-    Private Sub btnScrollLegendUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendUp.Click
+    Private Sub btnScrollLegendUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         LegendScrollPos -= Height / 4
         If LegendScrollPos < 0 Then LegendScrollPos = 0
         ScrollLegend()
     End Sub
 
-    Private Sub btnScrollLegendDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendDown.Click
+    Private Sub btnScrollLegendDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         LegendScrollPos += Height / 4
         If LegendScrollPos > LegendFullHeight Then LegendScrollPos = LegendFullHeight
         ScrollLegend()
+    End Sub
+
+    Public Sub New()
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+        ' Add any initialization after the InitializeComponent() call.
+
+        pOperationTypesToInclude.Add("RCHRES")
+        pOperationTypesToInclude.Add("BMPRAC")
+        InitColorMap()
+    End Sub
+
+    Private Sub InitColorMap()
+        ColorMap = New atcCollection
+        ColorMap.Add("WaterWetlands", TextOrNumericColor("blue"))
+        ColorMap.Add("Water/Wetland", TextOrNumericColor("blue"))
+        ColorMap.Add("Construction", TextOrNumericColor("red"))
+        ColorMap.Add("Institutional", TextOrNumericColor("azure"))
+        ColorMap.Add("Agricultural", TextOrNumericColor("green"))
+        ColorMap.Add("Forest/Open", TextOrNumericColor("forestgreen1"))
+        ColorMap.Add("Forest", TextOrNumericColor("forestgreen1"))
+        ColorMap.Add("Commercial", TextOrNumericColor("brickred"))
+        ColorMap.Add("Urban", TextOrNumericColor("gray"))
+        ColorMap.Add("LowResidential", TextOrNumericColor("goldenrod"))
+        ColorMap.Add("MedResidential", TextOrNumericColor("orange"))
+        ColorMap.Add("Residential", TextOrNumericColor("orange"))
+        ColorMap.Add("MultResidential", TextOrNumericColor("orangered"))
+        ColorMap.Add("HIGH TILL CROPLAND", TextOrNumericColor("darkbrown"))
+        ColorMap.Add("LOW TILL CROPLAND", TextOrNumericColor("brown"))
+        ColorMap.Add("Pasture", TextOrNumericColor("lightgreen"))
+        ColorMap.Add("Hay", TextOrNumericColor("lemonchiffon"))
+        ColorMap.Add("Animal/Feedlot", TextOrNumericColor("pink"))
+    End Sub
+
+    Private Sub tabLeft_Selected(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles tabLeft.Selected
+        Select Case e.TabPageIndex
+            Case 0 : CurrentLegend = LegendType.LegLand
+            Case 1 : CurrentLegend = LegendType.LegMet
+            Case 2 : CurrentLegend = LegendType.LegPoint
+        End Select
+        Me.BuildTree()
+    End Sub
+
+
+    Private Sub Icon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        If e.Button = MouseButtons.Left Then
+            Dim MPosition As Point = Me.PointToClient(MousePosition)
+            pDragging = True
+            pDragOffset = sender.Location - MPosition
+            Cursor.Clip = Me.RectangleToScreen(New Rectangle(picTree.Left + SplitLegendTree.SplitterDistance + SplitLegendTree.SplitterWidth + e.X, _
+                                                             picTree.Top + e.Y, picTree.Width - pIconWidth, picTree.Height - pIconHeight))
+        End If
+    End Sub
+
+    Private Sub Icon_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        If pDragging Then
+            'move control to new position
+            Dim MPosition As Point = Me.PointToClient(MousePosition)
+            MPosition.Offset(pDragOffset)
+            sender.Location = MPosition
+            DrawTreeBackground()
+        End If
+    End Sub
+
+    Private Sub Icon_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        Select Case e.Button
+            Case Windows.Forms.MouseButtons.Left
+                If pDragging Then 'end the dragging
+                    pDragging = False
+                    Cursor.Clip = Nothing
+                    sender.Invalidate()
+                End If
+        End Select
+    End Sub
+
+    Private Sub ctlSchematic_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        BuildTree()
     End Sub
 End Class
