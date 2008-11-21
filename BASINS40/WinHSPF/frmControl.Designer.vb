@@ -56,7 +56,6 @@ Partial Class frmControl
         Me.CheckBox28 = New System.Windows.Forms.CheckBox
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
-        Me.Button1 = New System.Windows.Forms.Button
         Me.SSTabPIR.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
@@ -471,21 +470,11 @@ Partial Class frmControl
         Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
         '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(392, 310)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(62, 25)
-        Me.Button1.TabIndex = 5
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
         'frmControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(490, 348)
-        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.SSTabPIR)
@@ -538,5 +527,4 @@ Partial Class frmControl
     Friend WithEvents txtNoPERLND As System.Windows.Forms.Label
     Friend WithEvents txtNoIMPLND As System.Windows.Forms.Label
     Friend WithEvents txtNoRCHRES As System.Windows.Forms.Label
-    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class
