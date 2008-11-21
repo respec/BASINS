@@ -78,6 +78,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ctlLegend.Designer.vb">
+      <DependentUpon>ctlLegend.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlLegend.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ctlSchematic.Designer.vb">
       <DependentUpon>ctlSchematic.vb</DependentUpon>
     </Compile>
@@ -247,6 +253,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ctlLegend.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlLegend.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ctlSchematic.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ctlSchematic.vb</DependentUpon>

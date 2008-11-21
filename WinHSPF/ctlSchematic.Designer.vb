@@ -32,12 +32,11 @@ Partial Class ctlSchematic
         Me.TabPage3 = New System.Windows.Forms.TabPage
         Me.LegendPointSources = New ctlLegend
         Me.agdDetails = New atcControls.atcGrid
-        Me.picTree = New System.Windows.Forms.Panel
+        Me.RightClickMenu = New System.Windows.Forms.ContextMenu
         Me.SplitHorizontal.Panel1.SuspendLayout()
         Me.SplitHorizontal.Panel2.SuspendLayout()
         Me.SplitHorizontal.SuspendLayout()
         Me.SplitLegendTree.Panel1.SuspendLayout()
-        Me.SplitLegendTree.Panel2.SuspendLayout()
         Me.SplitLegendTree.SuspendLayout()
         Me.tabLeft.SuspendLayout()
         Me.TabPage1.SuspendLayout()
@@ -72,10 +71,6 @@ Partial Class ctlSchematic
         'SplitLegendTree.Panel1
         '
         Me.SplitLegendTree.Panel1.Controls.Add(Me.tabLeft)
-        '
-        'SplitLegendTree.Panel2
-        '
-        Me.SplitLegendTree.Panel2.Controls.Add(Me.picTree)
         Me.SplitLegendTree.Size = New System.Drawing.Size(714, 320)
         Me.SplitLegendTree.SplitterDistance = 208
         Me.SplitLegendTree.TabIndex = 0
@@ -166,15 +161,6 @@ Partial Class ctlSchematic
         Me.agdDetails.Source = Nothing
         Me.agdDetails.TabIndex = 6
         '
-        'picTree
-        '
-        Me.picTree.BackColor = System.Drawing.Color.White
-        Me.picTree.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.picTree.Location = New System.Drawing.Point(0, 0)
-        Me.picTree.Name = "picTree"
-        Me.picTree.Size = New System.Drawing.Size(502, 320)
-        Me.picTree.TabIndex = 0
-        '
         'ctlSchematic
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -186,7 +172,6 @@ Partial Class ctlSchematic
         Me.SplitHorizontal.Panel2.ResumeLayout(False)
         Me.SplitHorizontal.ResumeLayout(False)
         Me.SplitLegendTree.Panel1.ResumeLayout(False)
-        Me.SplitLegendTree.Panel2.ResumeLayout(False)
         Me.SplitLegendTree.ResumeLayout(False)
         Me.tabLeft.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
@@ -205,6 +190,6 @@ Partial Class ctlSchematic
     Friend WithEvents LegendLandSurface As ctlLegend
     Friend WithEvents LegendMetSegs As ctlLegend
     Friend WithEvents LegendPointSources As ctlLegend
-    Friend WithEvents picTree As System.Windows.Forms.Panel
+    Friend WithEvents RightClickMenu As System.Windows.Forms.ContextMenu
 
 End Class
