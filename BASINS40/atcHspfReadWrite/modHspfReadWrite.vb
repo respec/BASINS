@@ -41,7 +41,9 @@ Module modHspfReadWrite
             .FastReadUciForStarter(lMsg, pBaseName & ".uci")
             .Name = pBaseName & ".rev.uci"
             If pEdit Then
-                AddBMPs(lHspfUci, pMassLinkOffsetId, pBmpSpecFileName, pLuChangeSpecFileName)
+                SaveFileString("AreaSummaryBase.txt", .AreaReport(True))
+                AddBMPs(lHspfUci, pMassLinkOffsetId, pBmpSpecFileName, pLuChangeSpecFileName, True)
+                SaveFileString("AreaSummaryFinal.txt", .AreaReport(True))
             End If
             .Save()
         End With
@@ -58,7 +60,8 @@ Module modHspfReadWrite
     Private Sub AddBMPs(ByVal aUci As atcUCI.HspfUci, _
                         ByVal aMassLinkIdOffset As Integer, _
                         ByVal aBmpSpecFileName As String, _
-                        ByVal aLuChangeSpecFileName As String)
+                        ByVal aLuChangeSpecFileName As String, _
+                        ByVal aAreaConversion As Boolean)
         Dim lFormat As String = "#######.00"
         With aUci 'add new masslinks based on old ones
             Dim lBmpracRchresMassLinkId As Integer
@@ -96,141 +99,147 @@ Module modHspfReadWrite
                 .MassLinks.Add(lNewMassLink)
             Next
 
-            Dim lLuSpecTable As New atcUtility.atcTableDelimited
-            lLuSpecTable.Delimiter = ","
-            lLuSpecTable.OpenFile(aLuChangeSpecFileName)
-            Dim lConvertedArea As Double = 0.0
-            Dim lNotConvertedArea As Double = 0.0
             Dim lOperationIndex As Integer = 0
-            While lOperationIndex < .OpnSeqBlock.Opns.Count
-                Dim lOperation As atcUCI.HspfOperation = .OpnSeqBlock.Opns(lOperationIndex)
-                If lOperation.OpTyp = atcUCI.HspfData.HspfOperType.hRchres Then
-                    'update schematic as needed
-                    Dim lSourceConnectionIndex As Integer = 0
-                    While lSourceConnectionIndex < lOperation.Sources.Count
-                        Dim lSourceConnection As atcUCI.HspfConnection = lOperation.Sources(lSourceConnectionIndex)
-                        If lSourceConnection.Source.VolName = "PERLND" OrElse _
-                           lSourceConnection.Source.VolName = "IMPLND" Then
-                            Dim lName As String = lSourceConnection.Source.Opn.Tables("GEN-INFO").Parms(0).Value
-                            Dim lId As Integer = CInt(lSourceConnection.Source.Opn.Id / 100)
-                            Dim lFromLUName As String = lName.Substring(lName.Length - 3)
-                            If lLuSpecTable.FindFirst(1, lFromLUName) Then
-                                Do
-                                    Dim lToLUName As String = lLuSpecTable.Value(2)
-                                    Dim lConvertFrac As Double = lLuSpecTable.Value(3)
-                                    Dim lNewSourceConnectionIndex As Integer = 0
-                                    Dim lAreaConverted As Boolean = False
-                                    Dim lAreaConvertedNow As Double = 0.0
-                                    While lNewSourceConnectionIndex < lOperation.Sources.Count
-                                        Dim lNewSourceConnection As atcUCI.HspfConnection = lOperation.Sources(lNewSourceConnectionIndex)
-                                        If lNewSourceConnection.Source.VolName = "PERLND" OrElse _
-                                           lNewSourceConnection.Source.VolName = "IMPLND" Then
-                                            Dim lNewSourceName As String = lNewSourceConnection.Source.Opn.Tables("GEN-INFO").Parms(0).Value
-                                            Dim lNewSourceId As String = CInt(lNewSourceConnection.Source.Opn.Id / 100)
-                                            If lNewSourceName.Substring(lNewSourceName.Length - 3) = lToLUName AndAlso _
-                                               lNewSourceId = lId Then 'add area here
-                                                Dim lNewSourceOperation As atcUCI.HspfOperation = lNewSourceConnection.Source.Opn
+
+            If aAreaConversion Then
+                Dim lLuSpecTable As New atcUtility.atcTableDelimited
+                lLuSpecTable.Delimiter = ","
+                lLuSpecTable.OpenFile(aLuChangeSpecFileName)
+                Dim lConvertedArea As Double = 0.0
+                Dim lNotConvertedArea As Double = 0.0
+                lOperationIndex = 0
+                While lOperationIndex < .OpnSeqBlock.Opns.Count
+                    Dim lOperation As atcUCI.HspfOperation = .OpnSeqBlock.Opns(lOperationIndex)
+                    If lOperation.OpTyp = atcUCI.HspfData.HspfOperType.hRchres Then
+                        'update schematic as needed
+                        Dim lSourceConnectionIndex As Integer = 0
+                        While lSourceConnectionIndex < lOperation.Sources.Count
+                            Dim lSourceConnection As atcUCI.HspfConnection = lOperation.Sources(lSourceConnectionIndex)
+                            If lSourceConnection.Source.VolName = "PERLND" OrElse _
+                               lSourceConnection.Source.VolName = "IMPLND" Then
+                                Dim lName As String = lSourceConnection.Source.Opn.Tables("GEN-INFO").Parms(0).Value
+                                Dim lId As Integer = CInt(lSourceConnection.Source.Opn.Id / 100)
+                                Dim lFromLUName As String = lName.Substring(lName.Length - 3)
+                                If lLuSpecTable.FindFirst(1, lFromLUName) Then
+                                    Do
+                                        Dim lToLUName As String = lLuSpecTable.Value(2)
+                                        Dim lConvertFrac As Double = lLuSpecTable.Value(3)
+                                        Dim lNewSourceConnectionIndex As Integer = 0
+                                        Dim lAreaConverted As Boolean = False
+                                        Dim lAreaConvertedNow As Double = 0.0
+                                        While lNewSourceConnectionIndex < lOperation.Sources.Count
+                                            Dim lNewSourceConnection As atcUCI.HspfConnection = lOperation.Sources(lNewSourceConnectionIndex)
+                                            If lNewSourceConnection.Source.VolName = "PERLND" OrElse _
+                                               lNewSourceConnection.Source.VolName = "IMPLND" Then
+                                                Dim lNewSourceName As String = lNewSourceConnection.Source.Opn.Tables("GEN-INFO").Parms(0).Value
+                                                Dim lNewSourceId As String = CInt(lNewSourceConnection.Source.Opn.Id / 100)
+                                                If lNewSourceName.Substring(lNewSourceName.Length - 3) = lToLUName AndAlso _
+                                                   lNewSourceId = lId Then 'add area here
+                                                    Dim lNewSourceOperation As atcUCI.HspfOperation = lNewSourceConnection.Source.Opn
+                                                    If lSourceConnection.Comment.Length = 0 Then
+                                                        lSourceConnection.Comment = "*** Area Before LUConversion " & lSourceConnection.MFact
+                                                    End If
+                                                    With lNewSourceConnection
+                                                        lAreaConvertedNow = lSourceConnection.Comment.Substring(29) * lConvertFrac
+                                                        If lAreaConvertedNow > lSourceConnection.MFact Then
+                                                            Logger.Dbg(" From " & IdWithName(lSourceConnection.Source.Opn.Id) & _
+                                                                       " To " & IdWithName(.Source.Opn.Id) & _
+                                                                       " BadArea1 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
+                                                                       " AreaAvail " & Format(lSourceConnection.MFact, lFormat).PadLeft(10) & _
+                                                                       " " & lSourceConnection.Comment)
+                                                            lAreaConvertedNow = lSourceConnection.MFact
+                                                        Else
+                                                            Logger.Dbg(" From " & IdWithName(lSourceConnection.Source.Opn.Id) & _
+                                                                       " To " & IdWithName(.Source.Opn.Id) & _
+                                                                       " Convert1 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
+                                                                       " AreaAvail " & Format(lSourceConnection.MFact, lFormat).PadLeft(10) & _
+                                                                       " " & lSourceConnection.Comment)
+                                                        End If
+                                                        .MFact += Format(lAreaConvertedNow, lFormat)
+                                                        .MFactAsRead = ""
+                                                        lSourceConnection.MFact -= Format(lAreaConvertedNow, lFormat)
+                                                        lSourceConnection.MFactAsRead = ""
+                                                    End With
+                                                    lAreaConverted = True
+                                                    Exit While
+                                                End If
+                                            End If
+                                            lNewSourceConnectionIndex += 1
+                                        End While
+                                        If Not lAreaConverted Then 'can we add a new schematic entry?
+                                            Dim lOperationOffset As Integer = 0
+                                            Select Case lToLUName
+                                                Case "nal"
+                                                    lOperationOffset = 12
+                                                Case "npa"
+                                                    lOperationOffset = 17
+                                            End Select
+                                            Dim lOperationId As Integer = (CInt(lSourceConnection.Source.Opn.Id / 100)) * 100 + lOperationOffset
+                                            Dim lOperationKey As String = "K" & lOperationId
+                                            If .OpnBlks("PERLND").Ids.Contains(lOperationKey) Then 'yes we can
+                                                Dim lFromOperationNew As atcUCI.HspfOperation = .OpnBlks("PERLND").Ids(lOperationKey)
+                                                Dim lConnection As atcUCI.HspfConnection = lSourceConnection.Clone
                                                 If lSourceConnection.Comment.Length = 0 Then
                                                     lSourceConnection.Comment = "*** Area Before LUConversion " & lSourceConnection.MFact
                                                 End If
-                                                With lNewSourceConnection
+                                                With lConnection
+                                                    .Comment = ""
+                                                    .Source.Opn = lFromOperationNew
+                                                    .Source.VolId = lFromOperationNew.Id
                                                     lAreaConvertedNow = lSourceConnection.Comment.Substring(29) * lConvertFrac
                                                     If lAreaConvertedNow > lSourceConnection.MFact Then
                                                         Logger.Dbg(" From " & IdWithName(lSourceConnection.Source.Opn.Id) & _
                                                                    " To " & IdWithName(.Source.Opn.Id) & _
-                                                                   " BadArea1 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
+                                                                   " BadArea2 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
                                                                    " AreaAvail " & Format(lSourceConnection.MFact, lFormat).PadLeft(10) & _
                                                                    " " & lSourceConnection.Comment)
                                                         lAreaConvertedNow = lSourceConnection.MFact
                                                     Else
                                                         Logger.Dbg(" From " & IdWithName(lSourceConnection.Source.Opn.Id) & _
                                                                    " To " & IdWithName(.Source.Opn.Id) & _
-                                                                   " Convert1 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
+                                                                   " Convert2 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
                                                                    " AreaAvail " & Format(lSourceConnection.MFact, lFormat).PadLeft(10) & _
                                                                    " " & lSourceConnection.Comment)
                                                     End If
-                                                    .MFact += Format(lAreaConvertedNow, lFormat)
+                                                    .MFact = Format(lAreaConvertedNow, lFormat)
                                                     .MFactAsRead = ""
                                                     lSourceConnection.MFact -= Format(lAreaConvertedNow, lFormat)
                                                     lSourceConnection.MFactAsRead = ""
+                                                    lConnection.Source.Opn.Targets.Add(lConnection)
                                                 End With
-                                                lAreaConverted = True
-                                                Exit While
+                                                With lSourceConnection.Target.Opn.Sources
+                                                    Dim lInsertPosition As Integer = 0
+                                                    While lInsertPosition < .Count
+                                                        Dim lSource As atcUCI.HspfSrcTar = .Item(lInsertPosition).Source
+                                                        If lSource.Opn IsNot Nothing AndAlso lSource.Opn.Id > lOperationId Then
+                                                            Exit While
+                                                        End If
+                                                        lInsertPosition += 1
+                                                    End While
+                                                    .Insert(lInsertPosition, lConnection)
+                                                    lAreaConverted = True
+                                                End With
                                             End If
                                         End If
-                                        lNewSourceConnectionIndex += 1
-                                    End While
-                                    If Not lAreaConverted Then 'can we add a new schematic entry?
-                                        Dim lOperationOffset As Integer = 0
-                                        Select Case lToLUName
-                                            Case "nal"
-                                                lOperationOffset = 12
-                                            Case "npa"
-                                                lOperationOffset = 17
-                                        End Select
-                                        Dim lOperationId As Integer = (CInt(lSourceConnection.Source.Opn.Id / 100)) * 100 + lOperationOffset
-                                        Dim lOperationKey As String = "K" & lOperationId
-                                        If .OpnBlks("PERLND").Ids.Contains(lOperationKey) Then 'yes we can
-                                            Dim lFromOperationNew = .OpnBlks("PERLND").Ids(lOperationKey)
-                                            Dim lConnection As atcUCI.HspfConnection = lSourceConnection.Clone
-                                            If lSourceConnection.Comment.Length = 0 Then
-                                                lSourceConnection.Comment = "*** Area Before LUConversion " & lSourceConnection.MFact
-                                            End If
-                                            With lConnection
-                                                .Comment = ""
-                                                .Source.Opn = lFromOperationNew
-                                                lAreaConvertedNow = lSourceConnection.Comment.Substring(29) * lConvertFrac
-                                                If lAreaConvertedNow > lSourceConnection.MFact Then
-                                                    Logger.Dbg(" From " & IdWithName(lSourceConnection.Source.Opn.Id) & _
-                                                               " To " & IdWithName(.Source.Opn.Id) & _
-                                                               " BadArea2 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
-                                                               " AreaAvail " & Format(lSourceConnection.MFact, lFormat).PadLeft(10) & _
-                                                               " " & lSourceConnection.Comment)
-                                                    lAreaConvertedNow = lSourceConnection.MFact
-                                                Else
-                                                    Logger.Dbg(" From " & IdWithName(lSourceConnection.Source.Opn.Id) & _
-                                                               " To " & IdWithName(.Source.Opn.Id) & _
-                                                               " Convert2 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
-                                                               " AreaAvail " & Format(lSourceConnection.MFact, lFormat).PadLeft(10) & _
-                                                               " " & lSourceConnection.Comment)
-                                                End If
-                                                .MFact += Format(lAreaConvertedNow, lFormat)
-                                                .MFactAsRead = ""
-                                                lSourceConnection.MFact -= Format(lAreaConvertedNow, lFormat)
-                                                lSourceConnection.MFactAsRead = ""
-                                                lConnection.Source.Opn.Targets.Add(lConnection)
-                                            End With
-                                            With lSourceConnection.Target.Opn.Sources
-                                                Dim lInsertPosition As Integer = 0
-                                                While lInsertPosition < .Count
-                                                    Dim lSource As atcUCI.HspfSrcTar = .Item(lInsertPosition).Source
-                                                    If lSource.Opn IsNot Nothing AndAlso lSource.Opn.Id > lOperationId Then
-                                                        Exit While
-                                                    End If
-                                                    lInsertPosition += 1
-                                                End While
-                                                .Insert(lInsertPosition, lConnection)
-                                                lAreaConverted = True
-                                            End With
+                                        If lAreaConverted Then
+                                            lConvertedArea += lAreaConvertedNow
+                                        Else
+                                            Logger.Dbg("CantConvert " & lFromLUName & " to " & lToLUName & _
+                                                        " in " & lSourceConnection.Target.Opn.Id & " from " & lSourceConnection.Source.Opn.Id & _
+                                                        " area " & lSourceConnection.MFact & " frac " & lConvertFrac)
+                                            lNotConvertedArea += lSourceConnection.MFact * lConvertFrac
                                         End If
-                                    End If
-                                    If lAreaConverted Then
-                                        lConvertedArea += lAreaConvertedNow
-                                    Else
-                                        Logger.Dbg("CantConvert " & lFromLUName & " to " & lToLUName & _
-                                                    " in " & lSourceConnection.Target.Opn.Id & " from " & lSourceConnection.Source.Opn.Id & _
-                                                    " area " & lSourceConnection.MFact & " frac " & lConvertFrac)
-                                        lNotConvertedArea += lSourceConnection.MFact * lConvertFrac
-                                    End If
-                                Loop While lLuSpecTable.FindNext(1, lFromLUName)
+                                    Loop While lLuSpecTable.FindNext(1, lFromLUName)
+                                End If
                             End If
-                        End If
-                        lSourceConnectionIndex += 1
-                    End While
-                End If
-                lOperationIndex += 1
-            End While
-            Debug.Print("AreaConverted " & Format(lConvertedArea) & " Not " & Format(lNotConvertedArea))
+                            lSourceConnectionIndex += 1
+                        End While
+                    End If
+                    lOperationIndex += 1
+                End While
+                Debug.Print("AreaConverted " & Format(lConvertedArea) & " Not " & Format(lNotConvertedArea))
+                SaveFileString("AreaSummaryLuConvert.txt", .AreaReport(True))
+            End If
 
             Dim lBmpSpecTable As New atcUtility.atcTableDelimited
             lBmpSpecTable.Delimiter = ","
@@ -299,13 +308,15 @@ Module modHspfReadWrite
                                                 Debug.Print("BadArea")
                                                 lAreaConvertedNow = 0
                                             End If
-                                            .MFact += Format(lAreaConvertedNow, lFormat)
+                                            .MFact = Format(lAreaConvertedNow, lFormat)
                                             .MFactAsRead = ""
-                                            Logger.Dbg(" BMP " & lBmpId & " Reach " & .Target.VolId & _
+                                            Logger.Dbg(" BMP " & lBmpId & _
+                                                       " Reach " & .Target.VolId & _
+                                                       " " & lSourceConnection.Source.VolName & " " & lSourceConnection.Source.VolId & _
                                                        " Convert3 " & Format(lAreaConvertedNow, lFormat).PadLeft(10) & _
                                                        " AreaAvail " & Format(lSourceConnection.MFact, lFormat).PadLeft(10) & _
                                                        " " & lSourceConnection.Comment.Replace(vbCrLf, vbTab))
-                                            lSourceConnection.MFact -= Format(lAreaConvertedNow)
+                                            lSourceConnection.MFact -= Format(lAreaConvertedNow, lFormat)
                                             lSourceConnection.MFactAsRead = ""
                                             .Target.VolName = "BMPRAC"
                                             .Target.VolId = (10 * lOperation.Id) + lBmpIndex - 1
