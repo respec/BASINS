@@ -41,9 +41,17 @@ Public Class Conduits
             With lConduit
                 lString.Append(StrPad(.Name, 16, " ", False))
                 lString.Append(" ")
-                lString.Append(StrPad(.InletNode.Name, 16, " ", False))
+                If .InletNode Is Nothing Then
+                    lString.Append(StrPad(.Name & "S", 16, " ", False))
+                Else
+                    lString.Append(StrPad(.InletNode.Name, 16, " ", False))
+                End If
                 lString.Append(" ")
-                lString.Append(StrPad(.OutletNode.Name, 16, " ", False))
+                If .OutletNode Is Nothing Then
+                    lString.Append(StrPad(.Name & "T", 16, " ", False))
+                Else
+                    lString.Append(StrPad(.OutletNode.Name, 16, " ", False))
+                End If
                 lString.Append(" ")
                 lString.Append(StrPad(Format(.Length.Value, "0.0"), 10, " ", False))
                 lString.Append(" ")

@@ -1551,14 +1551,18 @@ Public Class frmSWMMSetup
                 lblStatus.Text = "Overlaying Landuses with Catchments"
                 Me.Refresh()
 
-                Dim lLanduseLayerName As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-                Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
-                Dim lLandUseFileName As String = GisUtil.LayerFileName(lLanduseLayerIndex)
+                Dim lLandUseFileName As String = ""
+                If cboLandUseLayer.SelectedIndex > -1 Then
+                    Dim lLanduseLayerName As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+                    Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLanduseLayerName)
+                    lLandUseFileName = GisUtil.LayerFileName(lLanduseLayerIndex)
+                End If
+
                 Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
                 Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
                 If cboLanduse.SelectedIndex = 0 Then
                     'usgs giras is the selected land use type
-                    CreateLandusesFromGIRAS(lLandUseFileName, lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
+                    CreateLandusesFromGIRAS(lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
                 ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
                     'create landuses from grid
                     CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
