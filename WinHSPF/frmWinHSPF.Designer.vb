@@ -66,7 +66,7 @@ Partial Class frmWinHSPF
         Me.ToolStripButton10 = New System.Windows.Forms.ToolStripButton
         Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton
         Me.ToolStripContainer = New System.Windows.Forms.ToolStripContainer
-        Me.SchematicDiagram = New WinHSPF.ctlSchematic
+        Me.SchematicDiagram = New ctlSchematic
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
