@@ -292,8 +292,7 @@ Friend Module modSWMMFromMW
 
     End Function
 
-    Friend Function CreateLandusesFromGIRAS(ByVal aLanduseShapefileName As String, _
-                                            ByVal aSubbasinShapefileName As String, _
+    Friend Function CreateLandusesFromGIRAS(ByVal aSubbasinShapefileName As String, _
                                             ByVal aSubbasinFieldName As String, _
                                             ByVal aCatchments As Catchments, _
                                             ByRef aLanduses As Landuses) As Boolean
