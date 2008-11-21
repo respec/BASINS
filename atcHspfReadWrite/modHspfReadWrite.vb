@@ -13,7 +13,12 @@ Module modHspfReadWrite
     Sub Initialize()
         Dim lTestName As String
         'lTestName = "SFBayColma"
-        lTestName = "mono"
+        'lTestName = "lu2030a2bmp"
+        'lTestName = "lu2030b2bmp"
+        'lTestName = "Mono10bmp"
+        'lTestName = "Mono70bmp"
+        'lTestName = "lu2090a2bmp"
+        lTestName = "lu2090b2bmp"
 
         Select Case lTestName
             Case "mono"
@@ -22,10 +27,47 @@ Module modHspfReadWrite
                 pEdit = True
                 pBmpSpecFileName = pTestPath & "\BMPSpecs.txt"
                 pLuChangeSpecFileName = pTestPath & "\LuChangeSpecs.txt"
+            Case "lu2030a2bmp"
+                pTestPath = "c:\mono_luChange\output\lu2030a2bmp"
+                pBaseName = "base"
+                pEdit = True
+                pBmpSpecFileName = pTestPath & "\BMPSpecs.txt"
+                pLuChangeSpecFileName = pTestPath & "\LuChangeSpecs.txt"
+            Case "lu2030b2bmp"
+                pTestPath = "c:\mono_luChange\output\lu2030b2bmp"
+                pBaseName = "base"
+                pEdit = True
+                pBmpSpecFileName = pTestPath & "\BMPSpecs.txt"
+                pLuChangeSpecFileName = pTestPath & "\LuChangeSpecs.txt"
+            Case "Mono10bmp"
+                pTestPath = "c:\mono_luChange\output\Mono10bmp"
+                pBaseName = "base"
+                pEdit = True
+                pBmpSpecFileName = pTestPath & "\BMPSpecs.txt"
+                pLuChangeSpecFileName = pTestPath & "\LuChangeSpecs.txt"
+            Case "Mono70bmp"
+                pTestPath = "c:\mono_luChange\output\Mono70bmp"
+                pBaseName = "base"
+                pEdit = True
+                pBmpSpecFileName = pTestPath & "\BMPSpecs.txt"
+                pLuChangeSpecFileName = pTestPath & "\LuChangeSpecs.txt"
+            Case "lu2090a2bmp"
+                pTestPath = "c:\mono_luChange\output\lu2090a2bmp"
+                pBaseName = "base"
+                pEdit = True
+                pBmpSpecFileName = pTestPath & "\BMPSpecs.txt"
+                pLuChangeSpecFileName = pTestPath & "\LuChangeSpecs.txt"
+            Case "lu2090b2bmp"
+                pTestPath = "c:\mono_luChange\output\lu2090b2bmp"
+                pBaseName = "base"
+                pEdit = True
+                pBmpSpecFileName = pTestPath & "\BMPSpecs.txt"
+                pLuChangeSpecFileName = pTestPath & "\LuChangeSpecs.txt"
             Case "SFBayColma"
                 pTestPath = "G:\SFBay\Task1\UCOLMAnew"
                 pBaseName = "UCOLMA"
         End Select
+
     End Sub
 
     Sub main()
@@ -55,6 +97,7 @@ Module modHspfReadWrite
             .Name = pBaseName & ".rev2.uci"
             .SaveAs(pBaseName, pBaseName & "New", 1, 1)
         End With
+        MsgBox("Done adding BMPs into " & pTestPath)
     End Sub
 
     Private Sub AddBMPs(ByVal aUci As atcUCI.HspfUci, _
