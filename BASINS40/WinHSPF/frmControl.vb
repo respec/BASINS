@@ -6,6 +6,8 @@ Public Class frmControl
     Dim pCheckBoxValues(2)() As Integer
     Dim pInitialCheckBoxValues(2)() As Integer
 
+    Dim pMissingTables(1)() As String
+
     Dim pPChange As Boolean = False
     Dim pIChange As Boolean = False
     Dim pRChange As Boolean = False
@@ -198,7 +200,9 @@ Public Class frmControl
         Dim lOpnBlk As HspfOperation
         Dim lVOpnBlk As Object
         Dim lMsgResult As MsgBoxResult
-        Dim i As Integer
+        Dim lMissingTablesString As String = Nothing
+        Dim lOper, lOper2 As Integer
+
 
         CompareChecksToLoadState()
 
@@ -207,32 +211,41 @@ Public Class frmControl
             For Each lVOpnBlk In pUCI.OpnBlks("PERLND").Ids
                 lOpnBlk = lVOpnBlk
                 lTable = lOpnBlk.Tables("ACTIVITY")
-                For i = 0 To pCheckBoxValues(0).Length - 1
-                    lTable.Parms(i).Value = pCheckBoxValues(0)(i).ToString
-                Next i
+                For lOper2 = 0 To pCheckBoxValues(0).Length - 1
+                    lTable.Parms(lOper2).Value = pCheckBoxValues(0)(lOper2).ToString
+                Next lOper2
             Next lVOpnBlk
 
             For Each lVOpnBlk In pUCI.OpnBlks("IMPLND").Ids
                 lOpnBlk = lVOpnBlk
                 lTable = lOpnBlk.Tables("ACTIVITY")
 
-                For i = 0 To pCheckBoxValues(1).Length - 1
-                    lTable.Parms(i).Value = pCheckBoxValues(1)(i)
-                Next i
+                For lOper2 = 0 To pCheckBoxValues(1).Length - 1
+                    lTable.Parms(lOper2).Value = pCheckBoxValues(1)(lOper2)
+                Next lOper2
             Next lVOpnBlk
 
             For Each lVOpnBlk In pUCI.OpnBlks("RCHRES").Ids
                 lOpnBlk = lVOpnBlk
                 lTable = lOpnBlk.Tables("ACTIVITY")
-                For i = 0 To pCheckBoxValues(2).Length - 1
-                    lTable.Parms(i).Value = pCheckBoxValues(2)(i)
-                Next i
+                For lOper2 = 0 To pCheckBoxValues(2).Length - 1
+                    lTable.Parms(lOper2).Value = pCheckBoxValues(2)(lOper2)
+                Next lOper2
             Next lVOpnBlk
 
             'query for updating tables
             If pPChange Then
                 If AnyMissingTables("PERLND") Then
-                    lMsgResult = Logger.Message("Changed have been made to the PERLND control cards and additional tabled are required. Add the required tables automatically?", "WinHSPF - Control Card Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
+
+                    For lOper = 0 To pMissingTables(0).Length - 1
+                        If pMissingTables(1)(lOper) > 1 Then
+                            lMissingTablesString = String.Concat(lMissingTablesString, pMissingTables(0)(lOper) & " (" & pMissingTables(1)(lOper) & " Occurances)" & vbCrLf)
+                        Else
+                            lMissingTablesString = String.Concat(lMissingTablesString, pMissingTables(0)(lOper) & vbCrLf)
+                        End If
+                    Next
+
+                    lMsgResult = Logger.Message("Changed have been made to the PERLND control cards. The Following Tables are Required:" & vbCrLf & vbCrLf & lMissingTablesString & vbCrLf & "Add the required tables automatically?", "WinHSPF - Control Card Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
                     If lMsgResult = MsgBoxResult.Yes Then
                         Call CheckAndAddMissingTables("PERLND")
                     End If
@@ -240,7 +253,16 @@ Public Class frmControl
             End If
             If pIChange Then
                 If AnyMissingTables("IMPLND") Then
-                    lMsgResult = Logger.Message("Changed have been made to the IMPLND control cards and additional tabled are required. Add the required tables automatically?", "WinHSPF - Control Card Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
+
+                    For lOper = 0 To pMissingTables(0).Length - 1
+                        If pMissingTables(1)(lOper) > 1 Then
+                            lMissingTablesString = String.Concat(lMissingTablesString, pMissingTables(0)(lOper) & " (" & pMissingTables(1)(lOper) & " Occurances)" & vbCrLf)
+                        Else
+                            lMissingTablesString = String.Concat(lMissingTablesString, pMissingTables(0)(lOper) & vbCrLf)
+                        End If
+                    Next
+
+                    lMsgResult = Logger.Message("Changed have been made to the IMPLND control cards. The Following Tables are Required:" & vbCrLf & vbCrLf & lMissingTablesString & vbCrLf & "Add the required tables automatically?", "WinHSPF - Control Card Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
                     If lMsgResult = MsgBoxResult.Yes Then
                         CheckAndAddMissingTables("IMPLND")
                     End If
@@ -248,7 +270,16 @@ Public Class frmControl
             End If
             If pRChange Then
                 If AnyMissingTables("RCHRES") Then
-                    lMsgResult = Logger.Message("Changed have been made to the RCHRES control cards and additional tabled are required. Add the required tables automatically?", "WinHSPF - Control Card Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
+
+                    For lOper = 0 To pMissingTables(0).Length - 1
+                        If pMissingTables(1)(lOper) > 1 Then
+                            lMissingTablesString = String.Concat(lMissingTablesString, pMissingTables(0)(lOper) & " (" & pMissingTables(1)(lOper) & " Occurances)" & vbCrLf)
+                        Else
+                            lMissingTablesString = String.Concat(lMissingTablesString, pMissingTables(0)(lOper) & vbCrLf)
+                        End If
+                    Next
+
+                    lMsgResult = Logger.Message("Changed have been made to the RCHRES control cards. The Following Tables are Required:" & vbCrLf & vbCrLf & lMissingTablesString & vbCrLf & "Add the required tables automatically?", "WinHSPF - Control Card Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
                     If lMsgResult = MsgBoxResult.Yes Then
                         CheckAndAddMissingTables("RCHRES")
                         UpdateFlagDependencies("RCHRES")
@@ -478,30 +509,50 @@ Public Class frmControl
 
     End Sub
 
-    Public Function AnyMissingTables(ByVal aOpName As String)
-        Dim cTablesRequiredMissing As System.Collections.ObjectModel.Collection(Of HspfStatusType)
+    Public Function AnyMissingTables(ByVal aOpName As String) As Boolean
+        Dim lTablesRequiredMissing As System.Collections.ObjectModel.Collection(Of HspfStatusType)
         Dim lOpnBlk As HspfOpnBlk
         Dim lOper As HspfOperation
         Dim lVOper As Object
+        Dim lMissingTableIndex As Integer
 
-        AnyMissingTables = False
+        AnyMissingTables = Nothing
         lOpnBlk = pUCI.OpnBlks(aOpName)
 
         For Each lVOper In lOpnBlk.Ids
             lOper = lVOper  'setting the collection forces build of tablestatus
-            cTablesRequiredMissing = lOper.TableStatus.GetInfo(1, False)
+            lTablesRequiredMissing = lOper.TableStatus.GetInfo(1, False)
             lOper.TableStatus.Update() 'need to update in case we just changed flags
         Next lVOper
 
         For Each lVOper In lOpnBlk.Ids
             lOper = lVOper
-            cTablesRequiredMissing = lOper.TableStatus.GetInfo(1, False)
-            If cTablesRequiredMissing.Count > 0 Then
-                AnyMissingTables = True
+            lTablesRequiredMissing = lOper.TableStatus.GetInfo(1, False)
+            If lTablesRequiredMissing.Count > 0 Then
+                For Each lMissingTable As Object In lTablesRequiredMissing
+                    If pMissingTables(0) Is Nothing Then
+                        ReDim pMissingTables(0)(0)
+                        ReDim pMissingTables(1)(0)
+                        pMissingTables(0)(0) = lMissingTable.Name
+                        pMissingTables(1)(0) = lMissingTable.Occur
+                    Else
+                        lMissingTableIndex = Array.IndexOf(pMissingTables(0), lMissingTable.Name)
+                        If lMissingTableIndex = -1 Then
+                            ReDim Preserve pMissingTables(0)(UBound(pMissingTables(0)) + 1)
+                            ReDim Preserve pMissingTables(1)(UBound(pMissingTables(1)) + 1)
+                            pMissingTables(0)(UBound(pMissingTables(0))) = lMissingTable.Name
+                            pMissingTables(1)(UBound(pMissingTables(1))) = lMissingTable.Occur
+                        ElseIf lMissingTable.Occur > pMissingTables(1)(lMissingTableIndex) Then
+                            pMissingTables(1)(lMissingTableIndex) = lMissingTable.Occur
+                        End If
+                    End If
+                Next
+                Return True
             End If
         Next lVOper
 
     End Function
+
 
     Public Sub CheckAndAddMissingTables(ByVal opname As String)
         Dim lTablesRequiredMissing As System.Collections.ObjectModel.Collection(Of HspfStatusType)
@@ -535,7 +586,7 @@ Public Class frmControl
                     'double check to see if this table exists
                     If Not lOpnBlk.TableExists(lTabname) Then
                         lOpnBlk.AddTableForAll(lTabname, opname)
-                        setDefaultsForTable(pUCI, pDefUCI, opname, lTabname)
+                        SetDefaultsForTable(pUCI, pDefUCI, opname, lTabname)
                     End If
                 End If
             Next lVTableStatus
@@ -777,4 +828,11 @@ Public Class frmControl
         Next lVOpTyp
     End Sub
 
+    'Private Function MatchString(ByVal aString As String) As Boolean
+    '    If aString = pMatchString Then
+    '        Return True
+    '    Else
+    '        Return False
+    '    End If
+    'End Function
 End Class
