@@ -7,21 +7,12 @@ Imports atcControls
 Public Class frmWinHSPF
 
     Public Sub New()
-
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
-
         ' Add any initialization after the InitializeComponent() call.
 
         'set edit menu
         SetEditMenu()
-
-        'go ahead and load UCI for now
-        OpenUCI()
-        'set UCI name in caption
-        Me.Text = Me.Text & ": " & pUCI.Name
-
-        'Set the tool tips when mouse-over buttons occur
 
     End Sub
 
@@ -100,11 +91,9 @@ Public Class frmWinHSPF
     Private Sub EditToolStripMenuItem_DropDownItemClicked(ByVal sender As Object, ByVal e As System.Windows.Forms.ToolStripItemClickedEventArgs) Handles EditToolStripMenuItem.DropDownItemClicked
 
         If pUCI.Name.Length < 1 Then
-            'DisableAll(True)
             Logger.Msg("No Project is active." & vbCrLf & vbCrLf & _
                        "Open or Create a Project before selecting this menu item.", MsgBoxStyle.OkOnly, _
                        "WinHSPF: Edit Problem")
-            'DisableAll(False)
         Else
             If pUCI.MetSegs.Count > 0 Then
                 pUCI.MetSeg2Source()
@@ -116,10 +105,10 @@ Public Class frmWinHSPF
             pUCI.Source2MetSeg()
             pUCI.Source2Point()
 
-            'ClearTree()
-            'BuildTree()
-            'UpdateLegend()
-            'UpdateDetails()
+            With SchematicDiagram
+                .BuildTree()
+                .UpdateLegend()
+            End With
         End If
     End Sub
 
@@ -365,5 +354,13 @@ Public Class frmWinHSPF
     
     Private Sub cmdReach_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReach.Click
         ReachEditor()
+    End Sub
+
+    Private Sub OpenToolStripButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripButton.Click
+        OpenUCI()
+    End Sub
+
+    Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
+        OpenUCI()
     End Sub
 End Class

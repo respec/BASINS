@@ -11,17 +11,19 @@ Imports System.Collections.ObjectModel
         LegPoint = 2
     End Enum
 
-    Private pDragging As Boolean = False
-    Private pDragOffset As Point
-    'Private pBeforeDragLocation As Point
-
     Private Class clsIcon
         Inherits Windows.Forms.Control
 
         Public Selected As Boolean
         Public pOperation As HspfOperation
         Public UpstreamIcons As New Generic.List(Of clsIcon)
+        Public DistanceFromOutlet As Integer = -1
         Public Key As String = ""
+
+        Sub New()
+            SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
+            UpdateStyles()
+        End Sub
 
         Public Function Center() As Point
             Return New Point(Me.Left + Me.Width / 2, Me.Top + Me.Height / 2)
@@ -49,16 +51,35 @@ Imports System.Collections.ObjectModel
         End Function
     End Class
 
+    Friend Class PanelDoubleBuffer
+        Inherits Panel
+        Sub New()
+            SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
+            UpdateStyles()
+        End Sub
+    End Class
+
+    Friend WithEvents picTree As PanelDoubleBuffer
+
+    Private pDragging As Boolean = False
+    Private pDragOffset As Point
+    Private pBeforeDragLocation As Point
+    Private pClickedIcon As clsIcon
+
     Private pUci As atcUCI.HspfUci
     Private pOperationTypesToInclude As New Generic.List(Of String)
     Private pIcons As New IconCollection
+    Private pOutlets As New IconCollection
+    Private pIconsDistantFromOutlet As New atcCollection
+    Private pIconsDistantFromOutletPlaced As New atcCollection
+    Private pMaximumTreeDepth As Integer
     Private ColorMap As atcCollection '(Of Color)
     Private CurrentLegend As LegendType = LegendType.LegLand
     Private LegendOrder As Generic.List(Of String)
     Private TreeProblemMessageDisplayed As Boolean = False
     Private TreeLoopMessageDisplayed As Boolean = False
     Private LandSelected() As Boolean
-    Private HighlightBrush As Brush = Brushes.Aquamarine
+    Private HighlightBrush As Brush = SystemBrushes.Highlight
     Private picLegend As atcCollection
     Private LegendScrollPos As Integer
     Private LegendFullHeight As Integer
@@ -66,6 +87,7 @@ Imports System.Collections.ObjectModel
     Private pIconWidth As Integer = 73
     Private pIconHeight As Integer = 41
     Private pBorderWidth As Integer = 3
+    Private pBarWidth As Integer = 4 'TODO: base on number of items in legend
 
     Public Property UCI() As HspfUci
         Get
@@ -77,7 +99,7 @@ Imports System.Collections.ObjectModel
         End Set
     End Property
 
-    Public Sub BuildTree(Optional ByRef aPrinting As Boolean = False)
+    Public Sub BuildTree(Optional ByVal aPrinting As Boolean = False)
         ClearTree()
         If pUci IsNot Nothing Then
 
@@ -102,177 +124,69 @@ Imports System.Collections.ObjectModel
 
             If pIcons.Count > 0 Then 'okay to do tree
 
-                Dim lOutlets As New IconCollection
-                Dim lMaximumTreeDepth As Integer = 1
-                Dim lDepth As Integer
                 Dim lIcon As clsIcon
-                Dim lKey As String
+
+                pMaximumTreeDepth = 1
 
                 For Each lIcon In pIcons
-                    lDepth = DownLayers(lIcon, lIcon.Key & vbCrLf)
-                    If lDepth > lMaximumTreeDepth Then
-                        lMaximumTreeDepth = lDepth
-                    End If
-                    If lDepth = 1 Then
-                        lOutlets.Add(lIcon)
-                    End If
+                    With lIcon
+                        .DistanceFromOutlet = DownLayers(lIcon, lIcon.Key & vbCrLf)
+                        pIconsDistantFromOutlet.Increment(.DistanceFromOutlet, 1)
+                        Debug.WriteLine(.DistanceFromOutlet & ":" & pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet))
+                        If .DistanceFromOutlet > pMaximumTreeDepth Then
+                            pMaximumTreeDepth = .DistanceFromOutlet
+                        End If
+                        If .DistanceFromOutlet = 1 Then
+                            pOutlets.Add(lIcon)
+                        End If
+                    End With
                 Next
+                LayoutTree(aPrinting)
+            End If
+        End If
+    End Sub
 
-                Dim halfBoxHeight As Integer = pIconHeight / 2
-                Dim dy As Integer
-                Dim halfBoxWidth As Integer = pIconWidth / 2
-                Dim drawsurface As Control
-                'Dim pic As System.Windows.Forms.Control
+    Private Sub LayoutTree(Optional ByVal aPrinting As Boolean = False)
+        If pIcons.Count > 0 Then 'okay to do tree
+            pIconsDistantFromOutletPlaced = New atcCollection
+            Dim drawsurface As Control
+            Dim dy As Integer
 
-                'If Printing Then
-                '    ''UPGRADE_ISSUE: Constant vbPixels was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
-                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleMode was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                '    'Printer.ScaleMode = vbPixels
-                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                '    'picBuffer.Width = Printer.ScaleWidth / 6
-                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                '    'picBuffer.Height = Printer.ScaleHeight / 20
-                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                '    'dy = Printer.ScaleHeight / (maxlayer + 1)
-                '    ''UPGRADE_ISSUE: Printer object was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6B85A2A7-FE9F-4FBE-AA0C-CF11AC86A305"'
-                '    'drawsurface = Printer
-                '    'pic = picBuffer
-                'Else
-                dy = (picTree.Height - 20) / lMaximumTreeDepth
-                If dy < pIconHeight * 1.5 Then
-                    dy = pIconHeight * 1.5
-                    'TODO: enable vertical scrolling
-                End If
-                drawsurface = picTree
-                'pic = pIcons(0)
-                'End If 'Printing
+            'If Printing Then
+            '    ''UPGRADE_ISSUE: Constant vbPixels was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
+            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleMode was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+            '    'Printer.ScaleMode = vbPixels
+            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+            '    'picBuffer.Width = Printer.ScaleWidth / 6
+            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+            '    'picBuffer.Height = Printer.ScaleHeight / 20
+            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+            '    'dy = Printer.ScaleHeight / (maxlayer + 1)
+            '    ''UPGRADE_ISSUE: Printer object was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6B85A2A7-FE9F-4FBE-AA0C-CF11AC86A305"'
+            '    'drawsurface = Printer
+            '    'pic = picBuffer
+            'Else
+            If pMaximumTreeDepth > 1 Then dy = (picTree.Height - pIconHeight * 2) / (pMaximumTreeDepth - 1)
+            If dy < pIconHeight * 1.5 Then
+                dy = pIconHeight * 1.5
+                'TODO: enable vertical scrolling
+            End If
+            drawsurface = picTree
+            picTree.SuspendLayout()
+            'End If 'Printing
 
-                Dim Ybase As Integer = drawsurface.Height - dy / 2
-                Dim lWidthPerOutlet As Integer = (drawsurface.Width - 20) / lOutlets.Count
-                Dim Xbase As Integer = lWidthPerOutlet
+            Dim Ybase As Integer = drawsurface.Height - pIconHeight
 
-                For Each lOutlet As clsIcon In lOutlets
-                    LayoutFromIcon(lOutlet, Xbase, Ybase, dy, lWidthPerOutlet, aPrinting)
-                    Xbase += lWidthPerOutlet
-                Next
+            For Each lOutlet As clsIcon In pOutlets
+                LayoutFromIcon(lOutlet, Ybase, dy, drawsurface.Width, aPrinting)
+            Next
 
-                'Dim iCur, i, j As Integer
-                'Dim iTrib As New Generic.List(Of Integer)
-                'Dim iNow As New Generic.List(Of Integer)
-                'Dim iTotalTrib As New Generic.List(Of String)
-                'Dim lSrcOpn, lTarOpn As atcUCI.HspfOperation
-                'Dim lSrc As atcUCI.HspfConnection
-                'Dim ifinish, istart, workingwidth As Integer
-                'Dim ifound As Boolean
-                'Dim Xbase, newstart, curline, newfinish
-                'lOperation = pOperations.Item(pOperations.Count - 1)
-                'Dim PicTop(pIcons.Count) As Integer
-                'Dim PicLeft(pIcons.Count) As Integer
-                ''PicTop(0) = Ybase - halfBoxHeight
-                'PicLeft(0) = drawsurface.Width / 2 - halfBoxWidth
-
-                'DrawPictureOnReachControl(lOperation, Printing, pIcons(0))
-
-                'If Printing Then
-                '    'UPGRADE_ISSUE: PictureBox property pic.Image was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                '    'UPGRADE_WARNING: Couldn't resolve default property of object drawsurface.PaintPicture. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                '    'drawsurface.PaintPicture(pic.Image, PicLeft(0), PicTop(0))
-                'Else
-                '    pic.Top = PicTop(0)
-                '    pic.Left = PicLeft(0) '+ pic.width
-                '    pic.Tag = pOperations.Count()
-                'End If
-                ''                'initialize before big tree loop
-                '                istart = 0
-                '                ifinish = 0
-                '                curline = 0
-                '                newstart = 0
-                '                newfinish = 0
-
-                '10:             'start of tree loop
-                '                newstart = 0
-                '                newfinish = 0
-
-                '                'ypos = Ybase - istart * dy 'lineT(istart).Y1 - dy
-                '                For j = istart To ifinish 'loop the top layer of branches already placed - count next layer
-                '                    iTrib.Clear()
-                '                    iCur = CInt(pIcons(j).Tag) - 1
-                '                    lTarOpn = pOperations.Item(iCur)
-                '                    For i = iCur - 1 To 0 Step -1
-                '                        lSrcOpn = pOperations.Item(i)
-                '                        For Each lSrc In lTarOpn.Sources
-                '                            If lSrcOpn.Name = lSrc.Source.VolName AndAlso lSrcOpn.Id = lSrc.Source.VolId Then
-                '                                'found a trib to this branch
-                '                                ifound = False
-                '                                '            For k = 1 To itribcnt 'check to see if we already have it
-                '                                '              If iTrib(k) = i Then
-                '                                '                ifound = True       fix 092602 to catch all mult exit situations
-                '                                '              End If
-                '                                '            Next k
-                '                                Dim lTribKey As String = lSrcOpn.Name & lSrcOpn.Id
-                '                                If iTotalTrib.Contains(lTribKey) Then
-                '                                    'TODO: show multiple exits from a reach
-                '                                    'we can't do tree diagram with multiple exits from a reach,
-                '                                    'just skip this connection on tree diagram for now
-                '                                    If TreeProblemMessageDisplayed = False Then
-                '                                        MsgBox("A reach with multiple exits has been detected." & vbCrLf & "Only the first exit will be drawn in the tree diagram.", MsgBoxStyle.OkOnly, "WinHSPF Problem")
-                '                                        TreeProblemMessageDisplayed = True
-                '                                    End If
-                '                                Else
-                '                                    iTrib.Add(i)
-                '                                    iNow.Add(j)
-                '                                    iTotalTrib.Add(lTribKey)
-                '                                End If
-                '                            End If
-                '                        Next lSrc
-                '                    Next i
-                '                    If iTrib.Count = 0 Then 'space holder
-                '                        iTrib.Add(0)
-                '                        iNow.Add(0)
-                '                    End If
-                '                Next j
-
-                '                workingwidth = drawsurface.Width / iTrib.Count
-                '                Xbase = workingwidth / 2
-                '                For i = 0 To iTrib.Count - 1 'loop to place each trib to this branch
-                '                    If iTrib(i) > 0 Then 'not a space holder
-                '                        curline = curline + 1
-                '                        If newstart = 0 Then newstart = curline 'the first branch on this row
-                '                        newfinish = curline
-                '                        j = iNow(i)
-                '                        If Not Printing Then pic = pIcons(curline)
-                '                        PicTop(curline) = PicTop(j) - dy
-                '                        PicLeft(curline) = Xbase - halfBoxWidth
-
-                '                        DrawPictureOnReachControl(pOperations.Item(iTrib(i)), Printing, pic)
-                '                        With pic
-                '                            If Printing Then
-                '                                'TODO: drawsurface.PaintPicture(.Image, PicLeft(curline), PicTop(curline))
-                '                            Else
-                '                                .Top = PicTop(curline)
-                '                                .Left = PicLeft(curline) '+ .width
-                '                                .Tag = iTrib(i)
-                '                                Logger.Dbg("Placing " & .Tag & " at (" & .Left & ", " & .Top & ")")
-                '                                .Visible = True
-                '                            End If
-                '                        End With
-                '                    End If
-                '                    Xbase = Xbase + workingwidth
-                '                Next i
-
-                '                If newstart > 0 Then 'another row of branches to do
-                '                    istart = newstart
-                '                    ifinish = newfinish
-                '                End If
-                '                If newstart > 0 Then GoTo 10
-
-                If aPrinting Then
-                    'UPGRADE_ISSUE: Printer method Printer.EndDoc was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                    'Printer.EndDoc()
-                Else
-                    DrawTreeBackground()
-                    picTree.Visible = True
-                End If
+            If aPrinting Then
+                'UPGRADE_ISSUE: Printer method Printer.EndDoc was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                'Printer.EndDoc()
+            Else
+                DrawTreeBackground()
+                picTree.ResumeLayout()
             End If
         End If
     End Sub
@@ -284,7 +198,7 @@ Imports System.Collections.ObjectModel
     Private Sub DrawTreeBackground()
         Dim lBitmap As Bitmap = New Bitmap(picTree.Width, picTree.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
         Dim lGraphics As Graphics = Graphics.FromImage(lBitmap)
-        Dim lLinesPen As Pen = Pens.Black
+        Dim lLinesPen As Pen = SystemPens.ControlDarkDark
 
         For Each lIcon As clsIcon In pIcons
             With lIcon
@@ -293,7 +207,7 @@ Imports System.Collections.ObjectModel
                     lGraphics.DrawLine(lLinesPen, lIconCenter, lUpstreamIcon.Center)
                 Next
                 If .Selected Then
-                    lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth - 1, .Top - pBorderWidth - 1, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+                    lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
                 End If
             End With
         Next
@@ -312,66 +226,57 @@ Imports System.Collections.ObjectModel
 
     'Draw icon representing aOperation into given graphics object
     Public Sub setPicture(ByVal aOperation As HspfOperation, ByVal g As Graphics)
-        Dim barbase, barHeight, sid, barPos, barWidth, maxNBars As Integer
-        Dim lTemp As String
-        Dim lStr, desc As String
+        Dim barbase, barHeight, sid, barPos As Integer
+        Dim lStr As String
         Dim barDesc As Object
         Dim lSource As HspfConnection
-        Dim lDesc As String
-        Dim colr As Color
         Dim barMaxVal As Double
         Dim started As Boolean
         Dim included() As Boolean
 
-        barWidth = 3
         lStr = OperationKey(aOperation)
 
         'TODO: pic.ToolTipText = pOpnBlk.Name & " " & pId & " " & pDescription
-        g.Clear(Drawing.SystemColors.Control)
+        g.Clear(SystemColors.Control)
 
         Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(lStr, Me.Font)
         Dim lX As Single = (pIconWidth - lStringMeasurement.Width) / 2
         Dim lY As Single = pIconHeight - lStringMeasurement.Height * 1.25
         barbase = lY
-        g.DrawString(lStr, Me.Font, Brushes.Black, lX, lY)
+        g.DrawString(lStr, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
         Dim myid As Integer
         Dim pPoint As HspfPointSource
         Select Case CurrentLegend
             Case LegendType.LegLand
                 barMaxVal = pUci.MaxAreaByLand2Stream
-                barPos = barWidth
+                barPos = pBarWidth
                 If LegendOrder Is Nothing Then 'Draw all in the order they fall
                     For Each lSource In aOperation.Sources
-                        If lSource.Source.VolName = "PERLND" Or lSource.Source.VolName = "IMPLND" Then
-                            barHeight = lSource.MFact / barMaxVal * barbase
-                            On Error GoTo ColorNotFound
-                            lDesc = lSource.Source.Opn.Description
-                            Dim lPen As New Pen(CType(ColorMap.ItemByKey(lDesc), Color))
-                            lDesc = ""
-                            On Error GoTo 0
-                            g.DrawLine(lPen, barPos, barbase, barPos + barWidth, barbase - barHeight)
-                            barPos = barPos + barWidth + 1
+                        If lSource.Source IsNot Nothing AndAlso lSource.Source.Opn IsNot Nothing _
+                          AndAlso (lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND") Then
+                            barHeight = barbase * lSource.MFact / barMaxVal
+                            If barHeight > 0 Then
+                                Dim lBrush As Brush = New SolidBrush(ColorFromDesc(lSource.Source.Opn.Description))
+                                g.FillRectangle(lBrush, barPos, barbase - barHeight, pBarWidth, barHeight)
+                            End If
+                            barPos += pBarWidth + 1
                         End If
                     Next lSource
                 Else 'Draw only land uses in LegendOrder, in order and leaving spaces for ones that do not appear in this segment
                     For Each barDesc In LegendOrder
                         barHeight = 0
                         For Each lSource In aOperation.Sources
-                            If lSource.Source.VolName = "PERLND" Or lSource.Source.VolName = "IMPLND" Then
-                                If Not lSource.Source.Opn Is Nothing Then
-                                    If lSource.Source.Opn.Description = barDesc Then
-                                        barHeight = barHeight + lSource.MFact / barMaxVal * barbase
-                                    End If
-                                End If
+                            If lSource.Source IsNot Nothing AndAlso lSource.Source.Opn IsNot Nothing _
+                              AndAlso (lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND") _
+                              AndAlso lSource.Source.Opn.Description = barDesc Then
+                                barHeight += barbase * lSource.MFact / barMaxVal
                             End If
                         Next lSource
                         If barHeight > 0 Then
-                            On Error GoTo ColorNotFound
-                            Dim lPen As New Pen(CType(ColorMap(barDesc), Color))
-                            On Error GoTo 0
-                            g.DrawLine(lPen, barPos, barbase, barPos + barWidth, barbase - barHeight)
+                            Dim lBrush As Brush = New SolidBrush(ColorFromDesc(barDesc))
+                            g.FillRectangle(lBrush, barPos, barbase - barHeight, pBarWidth, barHeight)
                         End If
-                        barPos = barPos + barWidth + 1
+                        barPos += pBarWidth + 1
                     Next barDesc
                 End If
             Case LegendType.LegMet
@@ -411,7 +316,7 @@ Imports System.Collections.ObjectModel
                         'dont underline if this met seg contribs to reach only
                         'indirectly through land segment
                         'If sid = myid Then pic.Font = VB6.FontChangeUnderline(pic.Font, True) Else pic.Font = VB6.FontChangeUnderline(pic.Font, False) ' .ForeColor = vbHighlight Else pic.ForeColor = vbButtonText
-                        g.DrawString(sid, Me.Font, Brushes.Black, lX, lY)
+                        g.DrawString(sid, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
                         lX += g.MeasureString(sid, Me.Font).Width
                     End If
                 Next
@@ -434,7 +339,7 @@ Imports System.Collections.ObjectModel
                             lStrPrint = sid
                             started = True
                         End If
-                        g.DrawString(sid, Me.Font, Brushes.Black, lX, lY)
+                        g.DrawString(sid, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
                         lX += g.MeasureString(sid, Me.Font).Width
                     End If
                 Next
@@ -454,29 +359,6 @@ Imports System.Collections.ObjectModel
         '  End With
 
         Exit Sub
-ColorNotFound:
-        lTemp = UCase(lDesc)
-        If Len(lTemp) = 0 Then 'changed to use bardesc, pbd
-            'UPGRADE_WARNING: Couldn't resolve default property of object barDesc. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            lTemp = UCase(barDesc)
-        End If
-        If InStr(lTemp, "FOREST") > 0 Or InStr(lTemp, "WOOD") > 0 Then
-            ColorMap.Add(ColorMap.ItemByKey("FOREST"), lTemp)
-        ElseIf InStr(lTemp, "AGRI") > 0 Or InStr(lTemp, "FARM") > 0 Then
-            ColorMap.Add(ColorMap.ItemByKey("AGRICULTURAL"), lTemp)
-        ElseIf InStr(lTemp, "CROP") > 0 Then
-            ColorMap.Add(ColorMap.ItemByKey("AGRICULTURAL"), lTemp)
-        ElseIf InStr(lTemp, "URBAN") > 0 Or InStr(lTemp, "INDU") > 0 Then
-            ColorMap.Add(ColorMap.ItemByKey("URBAN"), lTemp)
-        ElseIf InStr(lTemp, "WATER") > 0 Then
-            ColorMap.Add(ColorMap.ItemByKey("WATERWETLANDS"), lTemp)
-        ElseIf InStr(lTemp, "RESIDENTIAL") > 0 Then
-            ColorMap.Add(ColorMap.ItemByKey("RESIDENTIAL"), lTemp)
-        Else
-            ColorMap.Add(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black), lTemp)
-        End If
-        Err.Clear()
-        Resume
     End Sub
 
     'Returns color for source.VolId
@@ -485,6 +367,34 @@ ColorNotFound:
                                       Rnd(-aColorId - 27) * 255, _
                                       Rnd(-aColorId - 33) * 255)
         Return lIdColor
+    End Function
+
+    Private Function ColorFromDesc(ByVal aDescription As String) As Color
+        Dim lColor As Color
+        Dim lUcaseDesc As String = aDescription.ToUpper
+        Dim lColorIndex As Integer = ColorMap.IndexFromKey(lUcaseDesc)
+        If lColorIndex >= 0 Then
+            lColor = ColorMap.ItemByIndex(lColorIndex)
+        Else
+            If lUcaseDesc.Contains("FOREST") OrElse lUcaseDesc.Contains("WOOD") Then
+                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("FOREST"))
+            ElseIf lUcaseDesc.Contains("AGRI") OrElse lUcaseDesc.Contains("FARM") Then
+                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("AGRICULTURAL"))
+            ElseIf lUcaseDesc.Contains("CROP") Then
+                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("AGRICULTURAL"))
+            ElseIf lUcaseDesc.Contains("URBAN") OrElse lUcaseDesc.Contains("INDU") Then
+                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("URBAN"))
+            ElseIf lUcaseDesc.Contains("WATER") Then
+                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("WATERWETLANDS"))
+            ElseIf lUcaseDesc.Contains("RESIDENTIAL") Then
+                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("RESIDENTIAL"))
+            Else
+                ColorMap.Add(lUcaseDesc, Color.Black)
+            End If
+            Return ColorMap.ItemByKey(lUcaseDesc)
+        End If
+        Return lColor
+
     End Function
 
     Private Sub drawBorder(ByRef pic As Graphics, ByRef threeD As Boolean)
@@ -510,19 +420,21 @@ ColorNotFound:
         Dim lDeepestTarget As Integer = 0
         For Each lTarConn As atcUCI.HspfConnection In aIcon.Operation.Targets
             Dim lTarOperation As HspfOperation = lTarConn.Target.Opn
-            Dim lKey As String = OperationKey(lTarOperation)
-            If aAlreadyInPath.Contains(lKey & vbCrLf) AndAlso Not TreeLoopMessageDisplayed Then
-                Dim lMessage As String = aAlreadyInPath
-                Logger.Msg(aAlreadyInPath, "Detected loop in operations")
-                TreeLoopMessageDisplayed = True
-            Else
-                If pIcons.Contains(lKey) Then
-                    aAlreadyInPath &= lKey & vbCrLf
-                    Dim lIcon As clsIcon = pIcons(lKey)
-                    lIcon.UpstreamIcons.Add(aIcon)
-                    Dim lTargetDepth As Integer = DownLayers(lIcon, aAlreadyInPath)
-                    If lTargetDepth > lDeepestTarget Then
-                        lDeepestTarget = lTargetDepth
+            If lTarOperation IsNot Nothing Then
+                Dim lKey As String = OperationKey(lTarOperation)
+                If aAlreadyInPath.Contains(lKey & vbCrLf) AndAlso Not TreeLoopMessageDisplayed Then
+                    Dim lMessage As String = aAlreadyInPath
+                    Logger.Msg(aAlreadyInPath, "Detected loop in operations")
+                    TreeLoopMessageDisplayed = True
+                Else
+                    If pIcons.Contains(lKey) Then
+                        aAlreadyInPath &= lKey & vbCrLf
+                        Dim lIcon As clsIcon = pIcons(lKey)
+                        If Not lIcon.UpstreamIcons.Contains(aIcon) Then lIcon.UpstreamIcons.Add(aIcon)
+                        Dim lTargetDepth As Integer = DownLayers(lIcon, aAlreadyInPath)
+                        If lTargetDepth > lDeepestTarget Then
+                            lDeepestTarget = lTargetDepth
+                        End If
                     End If
                 End If
             End If
@@ -530,38 +442,46 @@ ColorNotFound:
         Return lDeepestTarget + 1
     End Function
 
-    Private Sub LayoutFromIcon(ByVal aIcon As clsIcon, ByVal aX As Integer, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
+    Private Sub LayoutFromIcon(ByVal aIcon As clsIcon, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
         DrawPictureOnReachControl(aIcon.Operation, aPrinting, aIcon)
-        aIcon.Top = aY
-        aIcon.Left = aX
-        Dim lNumUpstream As Integer = aIcon.UpstreamIcons.Count
-        If lNumUpstream > 0 Then
-            aY -= aDy
-            Dim lWidthPerUpstream As Integer = aWidth / lNumUpstream
-            For Each lUpstreamIcon As clsIcon In aIcon.UpstreamIcons
-                LayoutFromIcon(lUpstreamIcon, aX, aY, aDy, lWidthPerUpstream, aPrinting)
-                aX -= lWidthPerUpstream
-            Next
-        End If
+        With aIcon
+            aIcon.Top = aY - pIconHeight / 2
+            Dim lWidthPerItemThisRow As Integer = aWidth / pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet)
+            aIcon.Left = pIconsDistantFromOutletPlaced.ItemByKey(.DistanceFromOutlet) * lWidthPerItemThisRow + (lWidthPerItemThisRow - pIconWidth) / 2
+            pIconsDistantFromOutletPlaced.Increment(.DistanceFromOutlet, 1)
+            Dim lNumUpstream As Integer = aIcon.UpstreamIcons.Count
+            If lNumUpstream > 0 Then
+                aY -= aDy
+                For Each lUpstreamIcon As clsIcon In aIcon.UpstreamIcons
+                    LayoutFromIcon(lUpstreamIcon, aY, aDy, aWidth, aPrinting)
+                Next
+            End If
+        End With
     End Sub
 
     Public Sub ClearTree()
+        picTree.SuspendLayout()
+        If picTree.BackgroundImage IsNot Nothing Then
+            picTree.BackgroundImage.Dispose()
+            picTree.BackgroundImage = Nothing 'New Bitmap(0, 0, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        End If
         picTree.Controls.Clear()
         For Each lControl As Control In pIcons
             lControl.Dispose()
         Next
         pIcons.Clear()
-        If picTree.BackgroundImage IsNot Nothing Then
-            picTree.BackgroundImage.Dispose()
-            picTree.BackgroundImage = Nothing 'New Bitmap(0, 0, Drawing.Imaging.PixelFormat.Format32bppArgb)
-        End If
+        picTree.ResumeLayout()
+        pIconsDistantFromOutlet.Clear()
+        pIconsDistantFromOutletPlaced.Clear()
+        pOutlets.Clear()
     End Sub
 
-    Public Sub UpdateLegend(ByVal picTab As Graphics)
+    Public Sub UpdateLegend()
         Dim item As Object
         Dim Key As String
         Dim srch, Index, oprindex As Integer
-        Dim colr, i As Integer
+        Dim colr As Color
+        Dim i As Integer
         Dim S As String
         Dim ypos, xpos, colonpos As Integer
         Dim boxWidth, boxHeight, txtHeight As Integer
@@ -571,6 +491,7 @@ ColorNotFound:
 
         LegendOrder = Nothing
 
+        Dim picTab As Graphics
         picTab.Clear(Color.White)
         For Index = 0 To picLegend.Count - 1
             With picLegend(Index)
@@ -597,14 +518,14 @@ ColorNotFound:
                 'TODO: picTab.Font = VB6.FontChangeSize(picTab.Font, 8)
                 If picTab.MeasureString("Perlnd   Implnd", Me.Font).Width > picTab.ClipBounds.Width Then
                     lX = (boxWidth - picTab.MeasureString("Per", Me.Font).Width) / 2
-                    picTab.DrawString(" Per", Me.Font, Brushes.Black, lX, lY)
+                    picTab.DrawString(" Per", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
                     lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Imp", Me.Font).Width) / 2)
-                    picTab.DrawString("Imp ", Me.Font, Brushes.Black, lX, lY)
+                    picTab.DrawString("Imp ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
                 Else
                     lX = (boxWidth - picTab.MeasureString("Perlnd", Me.Font).Width) / 2
-                    picTab.DrawString(" Perlnd", Me.Font, Brushes.Black, lX, lY)
+                    picTab.DrawString(" Perlnd", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
                     lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Implnd", Me.Font).Width) / 2)
-                    picTab.DrawString("Implnd ", Me.Font, Brushes.Black, lX, lY)
+                    picTab.DrawString("Implnd ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
                 End If
                 ypos = txtHeight
                 picLegend(0).Top = ypos
@@ -645,7 +566,7 @@ ColorNotFound:
 
                                 On Error GoTo ColorError
                                 'UPGRADE_WARNING: Couldn't resolve default property of object ColorMap(). Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                colr = ColorMap.Item(Key)
+                                colr = ColorFromDesc(Key)
                                 On Error GoTo 0
                                 'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
                                 .CurrentY = boxHeight / 4
@@ -731,7 +652,7 @@ ColorNotFound:
         'UpdateDetails()
         Exit Sub
 ColorError:
-        colr = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black)
+        colr = Color.Black
         Err.Clear()
         Resume Next
     End Sub
@@ -897,6 +818,11 @@ ColorError:
         InitializeComponent()
         ' Add any initialization after the InitializeComponent() call.
 
+        picTree = New PanelDoubleBuffer
+        Me.SplitLegendTree.Panel2.Controls.Add(Me.picTree)
+        picTree.BackColor = SystemColors.Window
+        picTree.Dock = DockStyle.Fill
+
         pOperationTypesToInclude.Add("RCHRES")
         pOperationTypesToInclude.Add("BMPRAC")
         InitColorMap()
@@ -904,24 +830,24 @@ ColorError:
 
     Private Sub InitColorMap()
         ColorMap = New atcCollection
-        ColorMap.Add("WaterWetlands", TextOrNumericColor("blue"))
-        ColorMap.Add("Water/Wetland", TextOrNumericColor("blue"))
-        ColorMap.Add("Construction", TextOrNumericColor("red"))
-        ColorMap.Add("Institutional", TextOrNumericColor("azure"))
-        ColorMap.Add("Agricultural", TextOrNumericColor("green"))
-        ColorMap.Add("Forest/Open", TextOrNumericColor("forestgreen1"))
-        ColorMap.Add("Forest", TextOrNumericColor("forestgreen1"))
-        ColorMap.Add("Commercial", TextOrNumericColor("brickred"))
-        ColorMap.Add("Urban", TextOrNumericColor("gray"))
-        ColorMap.Add("LowResidential", TextOrNumericColor("goldenrod"))
-        ColorMap.Add("MedResidential", TextOrNumericColor("orange"))
-        ColorMap.Add("Residential", TextOrNumericColor("orange"))
-        ColorMap.Add("MultResidential", TextOrNumericColor("orangered"))
-        ColorMap.Add("HIGH TILL CROPLAND", TextOrNumericColor("darkbrown"))
-        ColorMap.Add("LOW TILL CROPLAND", TextOrNumericColor("brown"))
-        ColorMap.Add("Pasture", TextOrNumericColor("lightgreen"))
-        ColorMap.Add("Hay", TextOrNumericColor("lemonchiffon"))
-        ColorMap.Add("Animal/Feedlot", TextOrNumericColor("pink"))
+        ColorMap.Add("WaterWetlands".ToUpper, TextOrNumericColor("blue"))
+        ColorMap.Add("Water/Wetland".ToUpper, TextOrNumericColor("blue"))
+        ColorMap.Add("Construction".ToUpper, TextOrNumericColor("red"))
+        ColorMap.Add("Institutional".ToUpper, TextOrNumericColor("azure"))
+        ColorMap.Add("Agricultural".ToUpper, TextOrNumericColor("green"))
+        ColorMap.Add("Forest/Open".ToUpper, TextOrNumericColor("forestgreen1"))
+        ColorMap.Add("Forest".ToUpper, TextOrNumericColor("forestgreen1"))
+        ColorMap.Add("Commercial".ToUpper, TextOrNumericColor("brickred"))
+        ColorMap.Add("Urban".ToUpper, TextOrNumericColor("gray"))
+        ColorMap.Add("LowResidential".ToUpper, TextOrNumericColor("goldenrod"))
+        ColorMap.Add("MedResidential".ToUpper, TextOrNumericColor("orange"))
+        ColorMap.Add("Residential".ToUpper, TextOrNumericColor("orange"))
+        ColorMap.Add("MultResidential".ToUpper, TextOrNumericColor("orangered"))
+        ColorMap.Add("HIGH TILL CROPLAND".ToUpper, TextOrNumericColor("darkbrown"))
+        ColorMap.Add("LOW TILL CROPLAND".ToUpper, TextOrNumericColor("brown"))
+        ColorMap.Add("Pasture".ToUpper, TextOrNumericColor("lightgreen"))
+        ColorMap.Add("Hay".ToUpper, TextOrNumericColor("lemonchiffon"))
+        ColorMap.Add("Animal/Feedlot".ToUpper, TextOrNumericColor("pink"))
     End Sub
 
     Private Sub tabLeft_Selected(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles tabLeft.Selected
@@ -935,13 +861,28 @@ ColorError:
 
 
     Private Sub Icon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-        If e.Button = MouseButtons.Left Then
-            Dim MPosition As Point = Me.PointToClient(MousePosition)
-            pDragging = True
-            pDragOffset = sender.Location - MPosition
-            Cursor.Clip = Me.RectangleToScreen(New Rectangle(picTree.Left + SplitLegendTree.SplitterDistance + SplitLegendTree.SplitterWidth + e.X, _
-                                                             picTree.Top + e.Y, picTree.Width - pIconWidth, picTree.Height - pIconHeight))
-        End If
+        Dim lSender As clsIcon = sender
+        Select Case e.Button
+            Case MouseButtons.Left
+                pBeforeDragLocation = lSender.Location
+                Dim MPosition As Point = Me.PointToClient(MousePosition)
+                pDragging = True
+                pDragOffset = lSender.Location - MPosition
+                Cursor.Clip = Me.RectangleToScreen(New Rectangle(picTree.Left + SplitLegendTree.SplitterDistance + SplitLegendTree.SplitterWidth + e.X, _
+                                                                 picTree.Top + e.Y, picTree.Width - pIconWidth, picTree.Height - pIconHeight))
+            Case MouseButtons.Right
+                pClickedIcon = lSender
+                RightClickMenu.MenuItems.Clear()
+                RightClickMenu.MenuItems.Add(lSender.Key)
+                RightClickMenu.MenuItems.Add(lSender.Operation.Description)
+                If lSender.DistanceFromOutlet > 1 Then
+                    RightClickMenu.MenuItems.Add("Select Downstream", AddressOf Event_SelectDownstream)
+                End If
+                If lSender.UpstreamIcons.Count > 0 Then
+                    RightClickMenu.MenuItems.Add("Select Upstream", AddressOf Event_SelectUpstream)
+                End If
+                RightClickMenu.Show(lSender, e.Location)
+        End Select
     End Sub
 
     Private Sub Icon_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -950,7 +891,7 @@ ColorError:
             Dim MPosition As Point = Me.PointToClient(MousePosition)
             MPosition.Offset(pDragOffset)
             sender.Location = MPosition
-            DrawTreeBackground()
+            'DrawTreeBackground()
         End If
     End Sub
 
@@ -960,12 +901,71 @@ ColorError:
                 If pDragging Then 'end the dragging
                     pDragging = False
                     Cursor.Clip = Nothing
-                    sender.Invalidate()
+                    If sender.Location = pBeforeDragLocation Then
+                        sender.Selected = Not sender.Selected
+                    End If
+                    DrawTreeBackground()
+                    'sender.Invalidate()
                 End If
         End Select
     End Sub
 
-    Private Sub ctlSchematic_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
-        BuildTree()
+    Private Sub Event_SelectDownstream(ByVal sender As Object, ByVal e As System.EventArgs)
+        SelectDownstreamIcons(True, pClickedIcon)
+        DrawTreeBackground()
+    End Sub
+
+    Private Sub Event_SelectUpstream(ByVal sender As Object, ByVal e As System.EventArgs)
+        SelectUpstreamIcons(True, pClickedIcon)
+        DrawTreeBackground()
+    End Sub
+
+    Private Sub Event_SelectAll(ByVal sender As Object, ByVal e As System.EventArgs)
+        SelectAllIcons(True)
+        DrawTreeBackground()
+    End Sub
+
+    Private Sub Event_UnselectAll(ByVal sender As Object, ByVal e As System.EventArgs)
+        SelectAllIcons(False)
+        DrawTreeBackground()
+    End Sub
+
+    Private Sub SelectDownstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsIcon)
+        aIcon.Selected = True
+        For Each lIcon As clsIcon In pIcons
+            If lIcon.UpstreamIcons.Contains(aIcon) Then
+                SelectDownstreamIcons(aSelect, lIcon)
+            End If
+        Next
+    End Sub
+
+    Private Sub SelectUpstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsIcon)
+        aIcon.Selected = True
+        For Each lIcon As clsIcon In aIcon.UpstreamIcons
+            SelectUpstreamIcons(aSelect, lIcon)
+        Next
+    End Sub
+
+    Private Sub SelectAllIcons(ByVal aSelect As Boolean)
+        For Each lIcon As clsIcon In pIcons
+            lIcon.Selected = aSelect
+        Next
+    End Sub
+
+    Private Sub picTree_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles picTree.MouseDown
+        Select Case e.Button
+            Case MouseButtons.Left
+                'TODO: start select rectangle
+            Case MouseButtons.Right
+                RightClickMenu.MenuItems.Clear()
+                RightClickMenu.MenuItems.Add("Select All", AddressOf Event_SelectAll)
+                RightClickMenu.MenuItems.Add("Unselect All", AddressOf Event_UnselectAll)
+                RightClickMenu.Show(sender, e.Location)
+        End Select
+
+    End Sub
+
+    Private Sub picTree_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles picTree.Resize
+        LayoutTree()
     End Sub
 End Class

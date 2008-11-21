@@ -61,21 +61,40 @@ Public Module WinHSPF
         'show main form
         pWinHSPF = New frmWinHSPF
         pIcon = pWinHSPF.Icon
+        OpenUCI("D:\BASINS\modelout\sediment\sed_riv.uci")
         pWinHSPF.ShowDialog()
     End Sub
 
-    Sub OpenUCI()
-        'open an existing uci (hard-coded for now)
-        Dim lWorkingDir As String = "C:\BASINS\modelout\sediment\"
-        ChDir(lWorkingDir)
+    'Open an existing uci file
+    Sub OpenUCI(Optional ByVal aFileName As String = "")
+        If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not IO.File.Exists(aFileName) Then
+            Dim lOpenDialog As New OpenFileDialog
+            With lOpenDialog
+                .Title = "Locate UCI file to open"
+                .Filter = "UCI files|*.uci"
+                .FilterIndex = 1
+                .DefaultExt = ".uci"
+                If .ShowDialog <> DialogResult.OK Then
+                    Exit Sub
+                End If
+                aFileName = .FileName
+            End With
+        End If
+        Dim lWorkingDir As String = IO.Path.GetDirectoryName(aFileName)
+        ChDriveDir(lWorkingDir)
         Logger.Dbg("WinHSPF:WorkingDir:" & lWorkingDir & ":" & CurDir())
 
         pUCI = New HspfUci
-        Dim lUCIName As String = "sed_riv.uci"
+        Dim lUCIName As String = IO.Path.GetFileName(aFileName)
         pUCI.FastReadUciForStarter(pMsg, lUCIName)
         'Dim lFilesOK As Boolean = True
         'Dim lEchoFile As String = ""
         'pUCI.ReadUci(pMsg, lUCIName, 1, lFilesOK, lEchoFile)
+        'set UCI name in caption
+        If pWinHSPF IsNot Nothing Then
+            pWinHSPF.Text = pWinHSPF.Tag & ": " & pUCI.Name
+            pWinHSPF.SchematicDiagram.UCI = pUCI
+        End If
         Logger.Dbg("WinHSPF:FastReadUci:Done:" & lUCIName)
     End Sub
 
@@ -102,8 +121,7 @@ Public Module WinHSPF
             End If
 
             With pWinHSPF.SchematicDiagram
-                .ClearTree()
-                .BuildTree()
+                .UCI = pUCI
                 'TODO: .UpdateLegend()
             End With
 
@@ -123,8 +141,6 @@ Public Module WinHSPF
             frmPollutant.Show()
         End If
     End Sub
-
-
 
     Sub EditBlock(ByVal aParent As Windows.Forms.Form, ByVal aTableName As String)
         If aTableName = "GLOBAL" Then
@@ -159,4 +175,8 @@ Public Module WinHSPF
             Logger.Msg("Table/Block " & aTableName & " not found.", MsgBoxStyle.OkOnly, "Edit Problem")
         End If
     End Sub
+
+    Function OperationKey(ByVal aOperation As HspfOperation) As String
+        Return aOperation.Name & " " & aOperation.Id
+    End Function
 End Module
