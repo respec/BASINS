@@ -828,11 +828,4 @@ Public Class frmControl
         Next lVOpTyp
     End Sub
 
-    'Private Function MatchString(ByVal aString As String) As Boolean
-    '    If aString = pMatchString Then
-    '        Return True
-    '    Else
-    '        Return False
-    '    End If
-    'End Function
 End Class
