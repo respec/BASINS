@@ -255,11 +255,14 @@ Module HSPFOutputReports
                                  pGraphSaveHeight, _
                                  pGraphAnnual)
                         lTimeSeries.Clear()
-                        lTimeSeries.Add("Observed", lWdmDataSource.DataSets.ItemByKey(5))
+                        lTimeSeries.Add("Observed", Aggregate(lWdmDataSource.DataSets.ItemByKey(5), atcTimeUnit.TUHour, 1, atcTran.TranAverSame))
+                        'lTimeSeries.Add("Observed", lWdmDataSource.DataSets.ItemByKey(5))
                         lTimeSeries.Add("Simulated", lWdmDataSource.DataSets.ItemByKey(1109))
                         lTimeSeries.Add("Prec", lWdmDataSource.DataSets.ItemByKey(1010))
                         lTimeSeries(0).Attributes.SetValue("Units", "cfs")
+                        lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
                         lTimeSeries(1).Attributes.SetValue("Units", "cfs")
+                        lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
                         GraphStorms(lTimeSeries, 2, "outfiles\Storm", pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem)
                         lTimeSeries.Dispose()
                     Next

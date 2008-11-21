@@ -2607,4 +2607,112 @@ x:
                                          aStarterUci, _
                                          aPollutantListFileName, aMetBaseDsn, aMetWdmId)
     End Sub
+
+    Public Function AreaReport(ByVal aReachColumns As Boolean) As String
+        Dim lTable As New atcUtility.atcTableDelimited
+        With lTable
+            .Delimiter = vbTab
+            Dim lPerlndCnt As Integer = Me.OpnBlks("PERLND").Ids.Count
+            Dim lImplndCnt As Integer = Me.OpnBlks("IMPLND").Ids.Count
+            Dim lRchresCnt As Integer = Me.OpnBlks("RCHRES").Ids.Count
+            Dim lBmpracCnt As Integer = Me.OpnBlks("BMPRAC").Ids.Count
+            .NumFields = lPerlndCnt + lImplndCnt + 2
+            .NumRecords = lRchresCnt + lBmpracCnt + 2
+            Dim lFieldIndex As Integer = 1
+            .FieldName(lFieldIndex) = "BorRID"
+            For Each lOperation As atcUCI.HspfOperation In Me.OpnBlks("PERLND").Ids
+                lFieldIndex += 1
+                .FieldName(lFieldIndex) = "P:" & lOperation.Id
+            Next
+            For Each lOperation As atcUCI.HspfOperation In Me.OpnBlks("IMPLND").Ids
+                lFieldIndex += 1
+                .FieldName(lFieldIndex) = "I:" & lOperation.Id
+            Next
+            lFieldIndex += 1
+            .FieldName(lFieldIndex) = "Total"
+
+            .CurrentRecord = 1
+            For Each lOperation As atcUCI.HspfOperation In Me.OpnBlks("BMPRAC").Ids
+                .Value(1) = "B:" & lOperation.Id
+                For Each lConnection As atcUCI.HspfConnection In lOperation.Sources
+                    If lConnection.Source.VolName = "PERLND" OrElse _
+                       lConnection.Source.VolName = "IMPLND" Then
+                        lFieldIndex = 2
+                        While lFieldIndex < .NumFields
+                            If .FieldName(lFieldIndex).Substring(2) = lConnection.Source.VolId Then
+                                If lFieldIndex = 2 AndAlso .Value(1) = "B:11" Then
+                                    Debug.Print("HI")
+                                End If
+                                If .Value(lFieldIndex).Length = 0 Then
+                                    .Value(lFieldIndex) = lConnection.MFact
+                                Else
+                                    .Value(lFieldIndex) += lConnection.MFact
+                                End If
+                                Exit While
+                            End If
+                            lFieldIndex += 1
+                        End While
+                    End If
+                Next
+                .CurrentRecord += 1
+            Next
+            For Each lOperation As atcUCI.HspfOperation In Me.OpnBlks("RCHRES").Ids
+                .Value(1) = "R:" & lOperation.Id
+                For Each lConnection As atcUCI.HspfConnection In lOperation.Sources
+                    If lConnection.Source.VolName = "PERLND" OrElse _
+                       lConnection.Source.VolName = "IMPLND" Then
+                        lFieldIndex = 2
+                        While lFieldIndex < .NumFields
+                            If .FieldName(lFieldIndex).Substring(2) = lConnection.Source.VolId Then
+                                If .FieldName(lFieldIndex) = "P:101" And .Value(1) = "R:1" Then
+                                    Logger.Dbg(.FieldName(lFieldIndex) & " " & lConnection.MFact)
+                                End If
+                                If .Value(lFieldIndex).Length = 0 Then
+                                    .Value(lFieldIndex) = lConnection.MFact
+                                Else
+                                    .Value(lFieldIndex) += lConnection.MFact
+                                End If
+                                Exit While
+                            End If
+                            lFieldIndex += 1
+                        End While
+                    End If
+                Next
+                .CurrentRecord += 1
+            Next
+            .Value(1) = "Total"
+
+            Dim lFieldTotals(.NumFields) As Double
+            .CurrentRecord = 1
+            While .CurrentRecord < .NumRecords
+                For lFieldIndex = 2 To .NumFields - 1
+                    If .Value(lFieldIndex).Length > 0 Then
+                        If .Value(.NumFields).Length = 0 Then
+                            .Value(.NumFields) = CDbl(.Value(lFieldIndex))
+                        Else
+                            .Value(.NumFields) += CDbl(.Value(lFieldIndex))
+                        End If
+                        lFieldTotals(lFieldIndex) += .Value(lFieldIndex)
+                        lFieldTotals(.NumFields) += .Value(lFieldIndex)
+                    End If
+                Next
+                .CurrentRecord += 1
+            End While
+            For lFieldIndex = 2 To .NumFields
+                .Value(lFieldIndex) = lFieldTotals(lFieldIndex)
+            Next
+        End With
+
+        Dim lStr As String
+        If aReachColumns Then
+            Dim lGridSource As New atcControls.atcGridSourceTable
+            lGridSource.Table = lTable
+            Dim lGridSourceRowColSwapper As New atcControls.atcGridSourceRowColumnSwapper(lGridSource)
+            lGridSourceRowColSwapper.SwapRowsColumns = True
+            lStr = lGridSourceRowColSwapper.ToString()
+        Else
+            lStr = lTable.ToString
+        End If
+        Return lStr
+    End Function
 End Class
