@@ -30,7 +30,7 @@ Partial Class frmPoint
         Me.cmdConvertMustin = New System.Windows.Forms.ToolStripMenuItem
         Me.cmdAdvancedGen = New System.Windows.Forms.ToolStripMenuItem
         Me.cmdScenario = New System.Windows.Forms.ToolStripMenuItem
-        Me.lstSources = New System.Windows.Forms.CheckedListBox
+        Me.lstPoints = New System.Windows.Forms.CheckedListBox
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
@@ -41,6 +41,7 @@ Partial Class frmPoint
         Me.Button8 = New System.Windows.Forms.Button
         Me.cmdDetailsShow = New System.Windows.Forms.Button
         Me.cmdDetailsHide = New System.Windows.Forms.Button
+        Me.agdMasterPoint = New atcControls.atcGrid
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
@@ -59,7 +60,7 @@ Partial Class frmPoint
         'grpSources
         '
         Me.grpSources.Controls.Add(Me.menuPointSources)
-        Me.grpSources.Controls.Add(Me.lstSources)
+        Me.grpSources.Controls.Add(Me.lstPoints)
         Me.grpSources.Controls.Add(Me.chkAllSources)
         Me.grpSources.Location = New System.Drawing.Point(12, 12)
         Me.grpSources.Name = "grpSources"
@@ -120,13 +121,13 @@ Partial Class frmPoint
         Me.cmdScenario.Size = New System.Drawing.Size(112, 20)
         Me.cmdScenario.Text = "Create Scenario"
         '
-        'lstSources
+        'lstPoints
         '
-        Me.lstSources.FormattingEnabled = True
-        Me.lstSources.Location = New System.Drawing.Point(18, 78)
-        Me.lstSources.Name = "lstSources"
-        Me.lstSources.Size = New System.Drawing.Size(211, 229)
-        Me.lstSources.TabIndex = 17
+        Me.lstPoints.FormattingEnabled = True
+        Me.lstPoints.Location = New System.Drawing.Point(18, 78)
+        Me.lstPoints.Name = "lstPoints"
+        Me.lstPoints.Size = New System.Drawing.Size(211, 229)
+        Me.lstPoints.TabIndex = 17
         '
         'ImageList1
         '
@@ -178,9 +179,9 @@ Partial Class frmPoint
         Me.agdPoint.Fixed3D = False
         Me.agdPoint.LineColor = System.Drawing.Color.Empty
         Me.agdPoint.LineWidth = 0.0!
-        Me.agdPoint.Location = New System.Drawing.Point(57, 17)
+        Me.agdPoint.Location = New System.Drawing.Point(57, 21)
         Me.agdPoint.Name = "agdPoint"
-        Me.agdPoint.Size = New System.Drawing.Size(406, 267)
+        Me.agdPoint.Size = New System.Drawing.Size(406, 286)
         Me.agdPoint.Source = Nothing
         Me.agdPoint.TabIndex = 25
         '
@@ -242,11 +243,26 @@ Partial Class frmPoint
         Me.cmdDetailsHide.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsHide.UseVisualStyleBackColor = True
         '
+        'agdMasterPoint
+        '
+        Me.agdMasterPoint.AllowHorizontalScrolling = True
+        Me.agdMasterPoint.AllowNewValidValues = False
+        Me.agdMasterPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.agdMasterPoint.Fixed3D = False
+        Me.agdMasterPoint.LineColor = System.Drawing.Color.Empty
+        Me.agdMasterPoint.LineWidth = 0.0!
+        Me.agdMasterPoint.Location = New System.Drawing.Point(513, 360)
+        Me.agdMasterPoint.Name = "agdMasterPoint"
+        Me.agdMasterPoint.Size = New System.Drawing.Size(247, 66)
+        Me.agdMasterPoint.Source = Nothing
+        Me.agdMasterPoint.TabIndex = 21
+        '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(792, 448)
+        Me.Controls.Add(Me.agdMasterPoint)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
         Me.Controls.Add(Me.grpDetails)
@@ -275,7 +291,7 @@ Partial Class frmPoint
     Friend WithEvents cmdDetailsHide As System.Windows.Forms.Button
     Friend WithEvents cmdDetailsShow As System.Windows.Forms.Button
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
-    Friend WithEvents lstSources As System.Windows.Forms.CheckedListBox
+    Friend WithEvents lstPoints As System.Windows.Forms.CheckedListBox
     Friend WithEvents menuPointSources As System.Windows.Forms.MenuStrip
     Friend WithEvents MenuAddPointSources As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdSimpleCreate As System.Windows.Forms.ToolStripMenuItem
@@ -283,4 +299,5 @@ Partial Class frmPoint
     Friend WithEvents cmdConvertMustin As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdAdvancedGen As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdScenario As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents agdMasterPoint As atcControls.atcGrid
 End Class

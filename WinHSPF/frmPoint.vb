@@ -1,25 +1,421 @@
+Imports atcControls
+Imports atcData
+Imports atcUCI
+Imports atcUCIForms
+Imports atcUtility
+Imports MapWinUtility
+Imports WinHSPF
+
+
 Public Class frmPoint
 
+    Dim DoneBuild As Boolean
+    Dim lts As Collection
+    'tsl was formelry ATCoTSlist
+    Dim WithEvents tsl As atcTimeseries
+
+    Dim InUseFacs() As String, CountInUseFacs&
+    Dim AvailFacs() As String, CountAvailFacs&
+    Dim ConsLinks() As String, MemberLinks() As String, LinkCount&
+    Dim MSub1Links() As Long, MSub2Links() As Long
+
+    Private HsashDragging As Boolean
+    Private HsashDragStart As Single
+
     Public Sub New()
+        Dim i As Integer
+        Dim LinkCount As Integer
+
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
         Me.Icon = pIcon
-        lstSources.SelectionMode = SelectionMode.One
+        lstPoints.SelectionMode = SelectionMode.One
         ExpandedView(False)
 
         'temporarty fill of list.
         For lOper As Integer = 1 To 10
-            lstSources.Items.Add(lOper)
+            lstPoints.Items.Add(lOper)
         Next
 
-        grpDetails.Text = "Details of " & lstSources.SelectedItem
+        grpDetails.Text = "Details of " & lstPoints.SelectedItem
+
+        'always link flow to ivol
+        LinkCount = 1
+        ReDim ConsLinks(LinkCount)
+        ReDim MemberLinks(LinkCount)
+        ReDim MSub1Links(LinkCount)
+        ReDim MSub2Links(LinkCount)
+        ConsLinks(0) = "FLOW"
+        MemberLinks(0) = "IVOL"
+        MSub1Links(0) = 0
+        MSub2Links(0) = 0
+
+        agdPoint.Source = New atcControls.atcGridSource
+        agdMasterPoint.Source = New atcControls.atcGridSource
+
+        DoneBuild = False
+        SetGrid(agdPoint)
+        SetGrid(agdMasterPoint)
+        FillMasterGrid()
+        DoneBuild = True
+        'tsl = New ATCoTSlist
+        'tbrView.ImageList = imgView
+        'AddToolButton("Graph", "Graph Selected Point Sources")
+        'AddToolButton("List", "List/Edit Selected Point Sources")
+        'AddToolButton("Delete", "Delete Selected Point Sources")
+
+        'aslPoint.ButtonVisible("move up") = False
+        'aslPoint.ButtonVisible("move down") = False
+        'fraSash.BackColor = vbButtonFace
+
+        'fraReach.Visible = False
+        'fraSash.Visible = False
+        'SetFormHeight()
+        ''myUci.MetSeg2Source
+        'CountInUseFacs = aslPoint.RightCount
+        'ReDim InUseFacs(CountInUseFacs)
+        'For i = 0 To CountInUseFacs - 1
+        '    InUseFacs(i) = aslPoint.RightItem(i)
+        'Next i
+        'CountAvailFacs = aslPoint.LeftCount
+        'ReDim AvailFacs(CountAvailFacs)
+        'For i = 0 To CountAvailFacs - 1
+        '    AvailFacs(i) = aslPoint.LeftItem(i)
+        'Next i
 
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
-        AddHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+        AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
     End Sub
+
+    Private Sub FillMasterGrid()
+        Dim lTable As HspfTable
+        Dim lOper As HspfOperation
+        Dim lOpnBlk As HspfOpnBlk
+        Dim vpol As Object
+        Dim i&, j&, lloc$, lcon$, lpol$, lsen$, icnt&, k&, lfac$, S$, dsncnt&, dsnptr&()
+        Dim ifound As Boolean
+        Dim activeflag As Boolean
+        Dim lPointItemIndex As Integer
+
+        lstPoints.Items.Clear()
+
+        With agdMasterPoint.Source
+            .Rows = 1
+
+            lts = pUCI.FindTimser("", "", "")
+
+            lOpnBlk = pUCI.OpnBlks("RCHRES")
+            icnt = 1
+
+            For i = 1 To lts.Count
+                lsen = lts(i).Header.sen
+                If Mid(lsen, 1, 3) = "PT-" Then 'this is a pt src
+                    lloc = lts(i).Header.loc
+                    If IsNumeric(Mid(lloc, 4)) Then
+                        'get full reach name
+                        lOper = lOpnBlk.OperFromID(CInt(Mid(lloc, 4)))
+                        If Not lOper Is Nothing Then
+                            'found a reach with this id
+                            lloc = "RCHRES " & lOper.Id & " - " & lOper.Description
+                            lfac = UCase(lts(i).Header.Desc)
+                            lcon = lts(i).Header.con
+                            S = lfac & " (" & Mid(lts(i).Header.sen, 4) & ")"
+
+                            If Not lstPoints.Items.Contains(S) Then
+                                lstPoints.Items.Add(S, False)
+                            End If
+
+                            'see how many times this dsn shows up in pt srcs
+                            dsncnt = 0
+                            activeflag = False
+                            If Not pUCI.PointSources Is Nothing Then
+                                For j = 1 To pUCI.PointSources.Count
+                                    If pUCI.PointSources(j).Target.VolName = lOper.Name And _
+                                       pUCI.PointSources(j).Target.VolId = lOper.Id And _
+                                       Microsoft.VisualBasic.Left(pUCI.PointSources(j).Source.VolName, 3) = lts(i).File.Label And pUCI.PointSources(j).Source.VolId = lts(i).Header.Id Then
+                                        'found this dsn in active point sources
+                                        dsncnt = dsncnt + 1
+                                        activeflag = True
+                                        ReDim Preserve dsnptr(dsncnt)
+                                        dsnptr(dsncnt) = j
+
+
+                                        For lPointItemIndex = 0 To lstPoints.Items.Count - 1
+                                            If lstPoints.Items.Item(lPointItemIndex) = S AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
+                                                lstPoints.SetItemChecked(lPointItemIndex, True)
+                                            End If
+                                        Next
+                                    End If
+                                Next
+                                If activeflag = False Then
+                                    'still add a line for this dsn
+                                    dsncnt = 1
+                                End If
+
+                                For j = 1 To dsncnt
+                                    If icnt > 1 Then .Rows = .Rows + 1
+                                    If activeflag = False Then
+                                        'not an active point source
+                                        .CellValue(icnt, 0) = "No"
+                                        .CellValue(icnt, 9) = "INFLOW"
+                                        '.CellValue(icnt, 10) = "IVOL"
+                                        '.CellValue(icnt, 12) = 0
+                                        '.CellValue(icnt, 13) = 0
+                                    Else
+                                        'this is an active point source
+                                        .CellValue(icnt, 0) = "Yes"
+                                        .CellValue(icnt, 9) = pUCI.PointSources(dsnptr(j)).Target.Group
+                                        .CellValue(icnt, 10) = MemberLongVersion(pUCI.PointSources(dsnptr(j)).Target.Member, pUCI.PointSources(dsnptr(j)).Target.MemSub1, pUCI.PointSources(dsnptr(j)).Target.MemSub2)
+                                        '.CellValue(icnt, 12) = myUci.PointSources(dsnptr(j)).Target.memsub1
+                                        '.CellValue(icnt, 13) = myUci.PointSources(dsnptr(j)).Target.memsub2
+                                    End If
+
+                                    .CellValue(icnt, 1) = lsen
+                                    .CellValue(icnt, 2) = lloc
+                                    .CellValue(icnt, 3) = UCase(lts(i).Header.Desc)
+                                    .CellValue(icnt, 5) = pUCI.GetWDMIdFromName(lts(i).File.Filename)  'save assoc src vol name
+                                    .CellValue(icnt, 6) = lts(i).Header.Id     'save assoc src vol id
+                                    .CellValue(icnt, 7) = lOper.Name     'save assoc tar vol name
+                                    .CellValue(icnt, 8) = lOper.Id         'save assoc tar vol id
+                                    .CellValue(icnt, 11) = i 'save index to lts
+
+                                    'look for this con in pollutant list
+                                    For Each vpol In pUCI.Pollutants
+                                        lpol = vpol
+                                        If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
+                                            lcon = lpol
+                                            Exit For
+                                        End If
+                                    Next vpol
+                                    .CellValue(icnt, 4) = lcon
+
+                                    .CellValue(icnt, 14) = icnt 'save row number
+
+                                    'default member based on constituent name if poss
+                                    If activeflag Then
+                                        'is active, see if we want to remember link
+                                        ifound = False
+                                        For k = 1 To LinkCount
+                                            If ConsLinks(k - 1) = UCase(Trim(lcon)) Then
+                                                ifound = True
+                                                Exit For
+                                            End If
+                                        Next k
+                                        If Not ifound Then
+                                            'add this to list
+                                            LinkCount = LinkCount + 1
+                                            ReDim Preserve ConsLinks(LinkCount)
+                                            ReDim Preserve MemberLinks(LinkCount)
+                                            ReDim Preserve MSub1Links(LinkCount)
+                                            ReDim Preserve MSub2Links(LinkCount)
+                                            ConsLinks(LinkCount - 1) = UCase(Trim(lcon))
+                                            MemberLinks(LinkCount - 1) = MemberFromLongVersion(.CellValue(icnt, 10))
+                                            MSub1Links(LinkCount - 1) = MemSub1FromLongVersion(.CellValue(icnt, 10))
+                                            MSub2Links(LinkCount - 1) = MemSub2FromLongVersion(.CellValue(icnt, 10))
+                                        End If
+                                    End If
+
+                                    icnt = icnt + 1
+                                Next j
+                            End If
+                    End If
+                    End If
+                End If
+            Next i
+
+            agdMasterPoint.SizeAllColumnsToContents()
+            'set default members for all
+            For i = 1 To .Rows
+                For k = 1 To LinkCount
+                    If ConsLinks(k - 1) = UCase(Trim(.CellValue(i, 4))) Then
+                        .CellValue(i, 10) = MemberLongVersion(MemberLinks(k - 1), MSub1Links(k - 1), MSub2Links(k - 1))
+                        '.TextMatrix(i, 12) = MSub1Links(K - 1)
+                        '.TextMatrix(i, 13) = MSub2Links(K - 1)
+                        Exit For
+                    End If
+                Next k
+            Next i
+            If icnt = 1 Then .Rows = 0
+
+        End With
+
+    End Sub
+
+    Private Function MemberFromLongVersion(ByVal S$) As String
+        Dim i&
+        i = InStr(1, S, "(")
+        If i > 0 Then
+            MemberFromLongVersion = Mid(S, 1, i - 1)
+        Else
+            MemberFromLongVersion = S
+        End If
+    End Function
+
+    Private Function MemSub1FromLongVersion(ByVal S$) As Long
+        Dim i&, j&
+        i = InStr(1, S, "(")
+        If i > 0 Then
+            j = InStr(1, S, ",")
+            If j = 0 Then
+                j = InStr(1, S, ")")
+            End If
+            MemSub1FromLongVersion = CInt(Mid(S, i + 1, j - i - 1))
+        Else
+            MemSub1FromLongVersion = 0
+        End If
+    End Function
+
+    Private Function MemSub2FromLongVersion(ByVal S$) As Long
+        Dim i&, j&
+        i = InStr(1, S, ",")
+        If i > 0 Then
+            j = InStr(1, S, ")")
+            MemSub2FromLongVersion = CInt(Mid(S, i + 1, j - i - 1))
+        Else
+            MemSub2FromLongVersion = 0
+        End If
+    End Function
+
+    Private Function MemberLongVersion(ByVal mem$, ByVal sub1&, ByVal sub2&) As String
+        Dim S$
+        S = mem
+        If sub1 > 0 Then
+            S = S & "(" & sub1
+            If sub2 > 0 Then
+                S = S & "," & sub2 & ")"
+            Else
+                S = S & ")"
+            End If
+        End If
+        If InStr(1, S, "|") = 0 Then
+            MemberLongVersion = S & " | " & DescriptionFromMemberSubs(mem, sub1, sub2)
+        Else
+            MemberLongVersion = S
+        End If
+    End Function
+
+    Private Function DescriptionFromMemberSubs(ByVal lmem As String, ByVal sub1&, ByVal sub2&)
+        Dim lOpnBlk As HspfOpnBlk
+        Dim lOpn As HspfOperation
+        Dim lTable As HspfTable
+
+        If lmem = "IVOL" Then
+            DescriptionFromMemberSubs = "water"
+        ElseIf lmem = "CIVOL" Then
+            DescriptionFromMemberSubs = "water for category " & CStr(sub1)
+        ElseIf lmem = "ICON" Then
+            DescriptionFromMemberSubs = "conservative"
+        ElseIf lmem = "IHEAT" Then
+            DescriptionFromMemberSubs = "heat"
+        ElseIf lmem = "ISED" Then
+            Select Case sub1
+                Case 1 : DescriptionFromMemberSubs = "sand"
+                Case 2 : DescriptionFromMemberSubs = "silt"
+                Case 3 : DescriptionFromMemberSubs = "clay"
+            End Select
+        ElseIf lmem = "IDQAL" Then
+            lOpnBlk = pUCI.OpnBlks("RCHRES")
+            DescriptionFromMemberSubs = "dissolved gqual"
+            If Not lOpnBlk Is Nothing Then
+                lOpn = lOpnBlk.Ids(1)
+                If Not lOpn Is Nothing Then
+                    If sub1 = 1 Or sub1 = 0 Then
+                        lTable = lOpn.tables("GQ-QALDATA")
+                    Else
+                        lTable = lOpn.tables("GQ-QALDATA:" & CStr(sub1))
+                    End If
+                    If Not lTable Is Nothing Then
+                        '.net conversion issue: Converted lTable.Parms("GQID") to string with .ToString
+                        DescriptionFromMemberSubs = "dissolved " & Trim(lTable.Parms("GQID").ToString)
+                    End If
+                End If
+            End If
+        ElseIf lmem = "ISQAL" Then
+            Select Case sub1
+                Case 1 : DescriptionFromMemberSubs = "sand associated "
+                Case 2 : DescriptionFromMemberSubs = "silt associated "
+                Case 3 : DescriptionFromMemberSubs = "clay associated "
+            End Select
+            lOpnBlk = pUCI.OpnBlks("RCHRES")
+            If Not lOpnBlk Is Nothing Then
+                lOpn = lOpnBlk.Ids(1)
+                If Not lOpn Is Nothing Then
+                    If sub2 = 1 Then
+                        lTable = lOpn.tables("GQ-QALDATA")
+                    Else
+                        lTable = lOpn.tables("GQ-QALDATA:" & CStr(sub2))
+                    End If
+                    If Not lTable Is Nothing Then
+                        '.net conversion issue: Converted lTable.Parms("GQID") to string with .ToString
+                        DescriptionFromMemberSubs = DescriptionFromMemberSubs & Trim(lTable.Parms("GQID").ToString)
+                    End If
+                End If
+            End If
+        ElseIf lmem = "OXIF" Then
+            Select Case sub1
+                Case 1 : DescriptionFromMemberSubs = "do"
+                Case 2 : DescriptionFromMemberSubs = "bod"
+            End Select
+        ElseIf lmem = "NUIF1" Then
+            Select Case sub1
+                Case 1 : DescriptionFromMemberSubs = "no3"
+                Case 2 : DescriptionFromMemberSubs = "tam"
+                Case 3 : DescriptionFromMemberSubs = "no2"
+                Case 4 : DescriptionFromMemberSubs = "po4"
+            End Select
+        ElseIf lmem = "NUIF2" Then
+            Select Case sub2
+                Case 1 : DescriptionFromMemberSubs = "particulate nh4 on "
+                Case 2 : DescriptionFromMemberSubs = "particulate po4 on "
+            End Select
+            Select Case sub1
+                Case 1 : DescriptionFromMemberSubs = DescriptionFromMemberSubs & "sand"
+                Case 2 : DescriptionFromMemberSubs = DescriptionFromMemberSubs & "silt"
+                Case 3 : DescriptionFromMemberSubs = DescriptionFromMemberSubs & "clay"
+            End Select
+        ElseIf lmem = "PKIF" Then
+            Select Case sub1
+                Case 1 : DescriptionFromMemberSubs = "phyto"
+                Case 2 : DescriptionFromMemberSubs = "zoo"
+                Case 3 : DescriptionFromMemberSubs = "orn"
+                Case 4 : DescriptionFromMemberSubs = "orp"
+                Case 5 : DescriptionFromMemberSubs = "orc"
+            End Select
+        ElseIf lmem = "PHIF" Then
+            Select Case sub1
+                Case 1 : DescriptionFromMemberSubs = "tic"
+                Case 2 : DescriptionFromMemberSubs = "co2"
+            End Select
+        End If
+    End Function
+
+
+    Private Sub SetGrid(ByVal g As atcGrid)
+        With g.Source
+            .Columns = 14
+            .CellValue(0, 0) = "In Use"
+            .CellValue(0, 1) = "HIDE" 'scenario
+            .CellValue(0, 2) = "Reach"
+            .CellValue(0, 3) = "HIDE" 'facility
+            .CellValue(0, 4) = "Pollutant"
+            .CellValue(0, 5) = "HIDE" 'src vol name
+            .CellValue(0, 6) = "HIDE" 'src vol id
+            .CellValue(0, 7) = "HIDE" 'tar vol name
+            .CellValue(0, 8) = "HIDE" 'tar vol id
+            .CellValue(0, 9) = "HIDE" 'tar group
+            .CellValue(0, 10) = "Target Member"
+            .CellValue(0, 11) = "HIDE" 'lts index
+            '.CellValue(0, 12) = "MemSub1"
+            '.CellValue(0, 13) = "MemSub2"
+            .CellValue(0, 12) = "HIDE"
+            .CellValue(0, 13) = "HIDE"
+            .CellValue(0, 14) = "HIDE" 'row number
+        End With
+    End Sub
+
 
     Private Sub ExpandedView(ByVal aExpand As Boolean)
         If aExpand Then
@@ -38,13 +434,13 @@ Public Class frmPoint
 
     Private Sub chkAllSources_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Dim lRow As Integer
-        RemoveHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+        RemoveHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
-        For lRow = 0 To lstSources.Items.Count - 1
-            lstSources.SetItemChecked(lRow, chkAllSources.Checked)
+        For lRow = 0 To lstPoints.Items.Count - 1
+            lstPoints.SetItemChecked(lRow, chkAllSources.Checked)
         Next
 
-        AddHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+        AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
     End Sub
 
@@ -56,14 +452,14 @@ Public Class frmPoint
 
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
 
-        RemoveHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
-        lstSources.SetItemChecked(e.Index, e.NewValue)
-        AddHandler lstSources.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+        RemoveHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+        lstPoints.SetItemChecked(e.Index, e.NewValue)
+        AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
     End Sub
 
-    Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstSources.SelectedIndexChanged
-        grpDetails.Text = "Details of " & lstSources.SelectedItem
+    Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
+        grpDetails.Text = "Details of " & lstPoints.SelectedItem
     End Sub
     Private Sub cmdShowDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsShow.Click
         ExpandedView(True)
