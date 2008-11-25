@@ -25,36 +25,23 @@ Public Class Segments
 
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
-        Dim lSegment As Segment
-
-        lString.Append(Me.Count)
-        lString.Append(" ")
-        For Each lSegment In Me
-            lString.Append(StrPad(lSegment.Name, 16, " ", False))
-            lString.Append(" ")
+        lString.Append(Me.Count & " ")
+        For Each lSegment As Segment In Me
+            lString.Append(lSegment.Name.PadRight(16) & " ")
         Next
 
-        lString.Append("C Seg Number   Seg Length  Seg Width  DMult   Vmult  SegSlope  SegRough  DownSeg  InflowTS")
-        lString.Append(" ")
+        lString.Append("C Seg Number   Seg Length  Seg Width  DMult   Vmult  SegSlope  SegRough  DownSeg  InflowTS ")
 
-        For Each lSegment In Me
+        For Each lSegment As Segment In Me
             With lSegment
-                lString.Append(StrPad(.ID, 16, " ", False))
-                lString.Append(" ")
-                lString.Append(StrPad(Format(.Length, "0.00"), 10, " ", False))
-                lString.Append(" ")
-                lString.Append(StrPad(Format(.Width, "0.00"), 10, " ", False))
-                lString.Append(" ")
-                lString.Append(StrPad(Format(.Dmult, "0.00"), 10, " ", False))
-                lString.Append(" ")
-                lString.Append(StrPad(Format(.Vmult, "0.00"), 10, " ", False))
-                lString.Append(" ")
-                lString.Append(StrPad(.Slope, 10, " ", False))
-                lString.Append(" ")
-                lString.Append(StrPad(Format(.Roughness, "0.000"), 10, " ", False))
-                lString.Append(" ")
-                lString.Append(StrPad(.DownID, 16, " ", False))
-                lString.Append(vbCrLf)
+                lString.Append(.ID.PadRight(16) & " ")
+                lString.Append(Format(.Length, "0.00").PadRight(10) & " ")
+                lString.Append(Format(.Width, "0.00").PadRight(10) & " ")
+                lString.Append(Format(.Dmult, "0.00").PadRight(10) & " ")
+                lString.Append(Format(.Vmult, "0.00").PadRight(10) & " ")
+                lString.Append(.Slope.PadRight(10) & " ")
+                lString.Append(Format(.Roughness, "0.000").PadRight(10) & " ")
+                lString.AppendLine(.DownID.PadRight(16))
             End With
         Next
 
