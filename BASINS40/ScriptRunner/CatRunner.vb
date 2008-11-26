@@ -7,11 +7,12 @@ Module CatRunner
     Private pBaseDrive As String = "C:"
     Private pBaseFolder As String
     Private pBaseFolders As New ArrayList
-    Private pCatXMLFile As String = "VaryPrecTempHbnPrepare.xml"
+    'Private pCatXMLFile As String = "VaryPrecTempHbnPrepare4.xml"
+    Private pCatXMLFile As String = "VaryPrecTempHbnPreparehl.xml"
     'Private pCatXMLFile As String = "zVaryPrecTempHbnPrepare_short.xml"
     'Private pCatXMLFile As String = "VaryPrecTempHbnPrepareFlow2.xml"
     Private WithEvents pCat As New atcClimateAssessmentTool.clsCat
-    Private pRunModel As Boolean = True
+    Private pRunModel As Boolean = False
     Private pEdit As Boolean = False
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -21,19 +22,23 @@ Module CatRunner
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2")
-        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10")
-        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70")
+        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2bmp")
+        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2bmp")
 
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2bmp")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2bmp")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10bmp")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_10")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_70")
+
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmpDbg")
 
         For Each pBaseFolder In pBaseFolders
             ChDriveDir(pBaseFolder)
             Logger.StartToFile("CatRunner.Log", , , True)
             Logger.DisplayMessageBoxes = False
-            Dim lResultsFileName As String = "CatRunnerResultsBMP.txt"
+            Dim lResultsFileName As String = "CatRunnerResults70echmF10.txt"
             With pCat
                 Dim lFrmCat As frmCAT = Nothing
                 If pEdit Then
@@ -47,7 +52,7 @@ Module CatRunner
                 End While
                 If Not pRunModel Then
                     .RunModel = False
-                    lResultsFileName = "CatRunnerResultsSummaryFlow2.txt"
+                    lResultsFileName = "CatRunnerResultsLowHighFlow.txt"
                 End If
                 .StartRun("Modified")
                 Logger.Dbg("RunsComplete")
