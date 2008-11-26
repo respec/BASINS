@@ -1,0 +1,737 @@
+State	County	Min R	Avg R	Max R
+Alabama	Autauga	375	375	375
+Alabama	Baldwin	550	550	550
+Alabama	Barbour	375	387	400
+Alabama	Bibb	375	375	375
+Alabama	Blount	325	325	325
+Alabama	Bullock	375	375	375
+Alabama	Butler	425	425	425
+Alabama	Calhoun	325	325	325
+Alabama	Chambers	325	337	350
+Alabama	Cherokee	300	300	300
+Alabama	Chilton	375	375	375
+Alabama	Choctaw	425	425	425
+Alabama	Clarke	450	450	450
+Alabama	Clay	350	350	350
+Alabama	Cleburne	325	325	325
+Alabama	Coffee	450	450	450
+Alabama	Colbert	300	300	300
+Alabama	Conecuh	450	450	450
+Alabama	Coosa	350	350	350
+Alabama	Covington	475	475	475
+Alabama	Crenshaw	425	425	425
+Alabama	Cullman	325	325	325
+Alabama	Dale	425	425	425
+Alabama	Dallas	392	396	400
+Alabama	De Kalb	300	300	300
+Alabama	Elmore	375	375	375
+Alabama	Escambia	525	525	525
+Alabama	Etowah	325	325	325
+Alabama	Fayette	350	350	350
+Alabama	Franklin	300	312	325
+Alabama	Geneva	450	450	450
+Alabama	Greene	348	361	375
+Alabama	Hale	338	356	375
+Alabama	Henry	400	400	400
+Alabama	Houston	412	418	425
+Alabama	Jackson	275	275	275
+Alabama	Jefferson	350	350	350
+Alabama	Lamar	350	350	350
+Alabama	Lauderdale	300	300	300
+Alabama	Lawrence	300	300	300
+Alabama	Lee	350	350	350
+Alabama	Limestone	275	275	275
+Alabama	Lowndes	400	400	400
+Alabama	Macon	350	350	350
+Alabama	Madison	275	275	275
+Alabama	Marengo	400	400	400
+Alabama	Marion	325	325	325
+Alabama	Marshall	300	300	300
+Alabama	Mobile	550	550	550
+Alabama	Monroe	450	450	450
+Alabama	Montgomery	360	380	400
+Alabama	Morgan	300	300	300
+Alabama	Perry	375	375	375
+Alabama	Pickens	350	350	350
+Alabama	Pike	400	400	400
+Alabama	Randolph	325	325	325
+Alabama	Russell	350	350	350
+Alabama	Shelby	350	350	350
+Alabama	St. Clair	350	350	350
+Alabama	Sumter	375	375	375
+Alabama	Talladega	350	350	350
+Alabama	Tallapoosa	350	350	350
+Alabama	Tuscaloosa	350	350	350
+Alabama	Walker	350	350	350
+Alabama	Washington	451	463	475
+Alabama	Wilcox	425	425	425
+Alabama	Winston	325	325	325
+Florida	Alachua	350	350	350
+Florida	Baker	350	350	350
+Florida	Bay	550	550	550
+Florida	Bradford	350	350	350
+Florida	Brevard	400	400	400
+Florida	Broward	450	450	450
+Florida	Calhoun	525	525	525
+Florida	Charlotte	400	400	400
+Florida	Citrus	350	350	350
+Florida	Clay	350	350	350
+Florida	Collier	450	450	450
+Florida	Columbia	300	325	350
+Florida	Dade	369	409	450
+Florida	De Soto	350	350	350
+Florida	Dixie	400	400	400
+Florida	Duval	400	400	400
+Florida	Escambia	550	550	550
+Florida	Flagler	400	400	400
+Florida	Franklin	500	500	500
+Florida	Gadsden	450	450	450
+Florida	Gilchrist	350	350	350
+Florida	Glades	350	350	350
+Florida	Gulf	500	500	500
+Florida	Hamilton	350	350	350
+Florida	Hardee	400	400	400
+Florida	Hendry	350	350	350
+Florida	Hernando	400	400	400
+Florida	Highlands	350	350	350
+Florida	Hillsborough	400	400	400
+Florida	Holmes	500	500	500
+Florida	Indian River	350	375	400
+Florida	Jackson	450	450	450
+Florida	Jefferson	400	400	400
+Florida	Lafayette	350	350	350
+Florida	Lake	350	350	350
+Florida	Lee	400	400	400
+Florida	Leon	425	425	425
+Florida	Levy	350	350	350
+Florida	Liberty	500	500	500
+Florida	Madison	375	375	375
+Florida	Manatee	400	400	400
+Florida	Marion	350	350	350
+Florida	Martin	400	400	400
+Florida	Monroe	450	450	450
+Florida	Nassau	400	400	400
+Florida	Okaloosa	550	550	550
+Florida	Okeechobee	333	341	350
+Florida	Orange	350	350	350
+Florida	Osceola	350	350	350
+Florida	Palm Beach	450	450	450
+Florida	Pasco	400	400	400
+Florida	Pinellas	400	400	400
+Florida	Polk	350	350	350
+Florida	Putnam	350	350	350
+Florida	Santa Rosa	525	537	550
+Florida	Sarasota	400	400	400
+Florida	Seminole	350	350	350
+Florida	St. Johns	400	400	400
+Florida	St. Lucie	400	400	400
+Florida	Sumter	350	350	350
+Florida	Suwannee	350	350	350
+Florida	Taylor	400	400	400
+Florida	Union	350	350	350
+Florida	Volusia	400	400	400
+Florida	Wakulla	450	450	450
+Florida	Walton	550	550	550
+Florida	Washington	525	525	525
+Georgia	Appling	350	350	350
+Georgia	Atkinson	325	325	325
+Georgia	Bacon	350	350	350
+Georgia	Baker	350	362	375
+Georgia	Baldwin	275	275	275
+Georgia	Banks	300	300	300
+Georgia	Barrow	275	287	300
+Georgia	Bartow	300	300	300
+Georgia	Ben Hill	325	337	350
+Georgia	Berrien	350	350	350
+Georgia	Bibb	300	300	300
+Georgia	Bleckley	300	300	300
+Georgia	Brantley	350	362	375
+Georgia	Brooks	350	362	375
+Georgia	Bryan	350	350	350
+Georgia	Bulloch	300	312	325
+Georgia	Burke	250	262	275
+Georgia	Butts	300	300	300
+Georgia	Calhoun	350	362	375
+Georgia	Camden	400	400	400
+Georgia	Candler	300	300	300
+Georgia	Carroll	325	325	325
+Georgia	Catoosa	275	275	275
+Georgia	Charlton	375	375	375
+Georgia	Chatham	350	350	350
+Georgia	Chattahoochee	350	350	350
+Georgia	Chattooga	300	300	300
+Georgia	Cherokee	300	300	300
+Georgia	Clarke	275	275	275
+Georgia	Clay	350	362	375
+Georgia	Clayton	300	300	300
+Georgia	Clinch	350	350	350
+Georgia	Cobb	300	300	300
+Georgia	Coffee	325	325	325
+Georgia	Colquitt	350	350	350
+Georgia	Columbia	250	250	250
+Georgia	Cook	350	350	350
+Georgia	Coweta	325	325	325
+Georgia	Crawford	300	300	300
+Georgia	Crisp	325	337	350
+Georgia	Dade	275	275	275
+Georgia	Dawson	275	275	275
+Georgia	De Kalb	300	300	300
+Georgia	Decatur	400	412	425
+Georgia	Dodge	300	300	300
+Georgia	Dooly	325	325	325
+Georgia	Dougherty	350	350	350
+Georgia	Douglas	300	300	300
+Georgia	Early	400	400	400
+Georgia	Echols	350	350	350
+Georgia	Effingham	350	350	350
+Georgia	Elbert	250	250	250
+Georgia	Emanuel	300	300	300
+Georgia	Evans	300	312	325
+Georgia	Fannin	275	275	275
+Georgia	Fayette	300	300	300
+Georgia	Floyd	300	300	300
+Georgia	Forsyth	275	275	275
+Georgia	Franklin	300	300	300
+Georgia	Fulton	300	300	300
+Georgia	Gilmer	275	275	275
+Georgia	Glascock	250	250	250
+Georgia	Glynn	400	400	400
+Georgia	Gordon	300	300	300
+Georgia	Grady	400	400	400
+Georgia	Greene	250	250	250
+Georgia	Gwinnett	300	300	300
+Georgia	Habersham	300	300	300
+Georgia	Hall	275	287	300
+Georgia	Hancock	250	250	250
+Georgia	Haralson	300	312	325
+Georgia	Harris	325	325	325
+Georgia	Hart	275	275	275
+Georgia	Heard	325	337	350
+Georgia	Henry	300	300	300
+Georgia	Houston	300	300	300
+Georgia	Irwin	325	325	325
+Georgia	Jackson	275	275	275
+Georgia	Jasper	275	275	275
+Georgia	Jeff Davis	325	325	325
+Georgia	Jefferson	250	262	275
+Georgia	Jenkins	300	300	300
+Georgia	Johnson	300	300	300
+Georgia	Jones	275	275	275
+Georgia	Lamar	300	300	300
+Georgia	Lanier	350	350	350
+Georgia	Laurens	300	300	300
+Georgia	Lee	350	350	350
+Georgia	Liberty	350	350	350
+Georgia	Lincoln	250	250	250
+Georgia	Long	350	350	350
+Georgia	Lowndes	350	350	350
+Georgia	Lumpkin	275	275	275
+Georgia	Macon	325	325	325
+Georgia	Madison	275	275	275
+Georgia	Marion	325	337	350
+Georgia	McDuffie	250	250	250
+Georgia	McIntosh	400	400	400
+Georgia	Meriwether	325	325	325
+Georgia	Miller	400	400	400
+Georgia	Mitchell	350	362	375
+Georgia	Monroe	300	300	300
+Georgia	Montgomery	300	300	300
+Georgia	Morgan	275	275	275
+Georgia	Murray	275	275	275
+Georgia	Muscogee	325	337	350
+Georgia	Newton	300	300	300
+Georgia	Oconee	250	262	275
+Georgia	Oglethorpe	250	250	250
+Georgia	Paulding	300	300	300
+Georgia	Peach	300	300	300
+Georgia	Pickens	275	275	275
+Georgia	Pierce	350	350	350
+Georgia	Pike	300	312	325
+Georgia	Polk	300	300	300
+Georgia	Pulaski	300	300	300
+Georgia	Putnam	275	275	275
+Georgia	Quitman	350	362	375
+Georgia	Rabun	300	300	300
+Georgia	Randolph	350	350	350
+Georgia	Richmond	250	250	250
+Georgia	Rockdale	300	300	300
+Georgia	Schley	325	325	325
+Georgia	Screven	300	300	300
+Georgia	Seminole	425	425	425
+Georgia	Spalding	300	300	300
+Georgia	Stephens	300	300	300
+Georgia	Stewart	350	350	350
+Georgia	Sumter	325	325	325
+Georgia	Talbot	325	325	325
+Georgia	Taliaferro	250	250	250
+Georgia	Tattnall	300	312	325
+Georgia	Taylor	325	325	325
+Georgia	Telfair	325	325	325
+Georgia	Terrell	350	350	350
+Georgia	Thomas	400	400	400
+Georgia	Tift	350	350	350
+Georgia	Toombs	300	312	325
+Georgia	Towns	300	300	300
+Georgia	Treutlen	300	300	300
+Georgia	Troup	325	325	325
+Georgia	Turner	325	337	350
+Georgia	Twiggs	300	300	300
+Georgia	Union	300	300	300
+Georgia	Upson	325	325	325
+Georgia	Walker	275	275	275
+Georgia	Walton	275	275	275
+Georgia	Ware	350	350	350
+Georgia	Warren	250	250	250
+Georgia	Washington	250	262	275
+Georgia	Wayne	375	375	375
+Georgia	Webster	350	350	350
+Georgia	Wheeler	300	300	300
+Georgia	White	300	300	300
+Georgia	Whitfield	275	275	275
+Georgia	Wilcox	325	325	325
+Georgia	Wilkes	250	250	250
+Georgia	Wilkinson	275	287	300
+Georgia	Worth	350	350	350
+Kentucky	Adair	200	200	200
+Kentucky	Allen	175	175	175
+Kentucky	Anderson	175	175	175
+Kentucky	Ballard	250	250	250
+Kentucky	Barren	200	200	200
+Kentucky	Bath	175	175	175
+Kentucky	Bell	150	150	150
+Kentucky	Boone	175	175	175
+Kentucky	Bourbon	175	175	175
+Kentucky	Boyd	150	162	175
+Kentucky	Boyle	175	187	200
+Kentucky	Bracken	175	176	177
+Kentucky	Breathitt	150	150	150
+Kentucky	Breckinridge	175	175	175
+Kentucky	Bullitt	175	175	175
+Kentucky	Butler	175	175	175
+Kentucky	Caldwell	200	200	200
+Kentucky	Calloway	200	200	200
+Kentucky	Campbell	175	175	175
+Kentucky	Carlisle	250	250	250
+Kentucky	Carroll	175	175	175
+Kentucky	Carter	150	150	150
+Kentucky	Casey	200	200	200
+Kentucky	Christian	175	175	175
+Kentucky	Clark	175	175	175
+Kentucky	Clay	175	175	175
+Kentucky	Clinton	200	200	200
+Kentucky	Crittenden	200	200	200
+Kentucky	Cumberland	200	200	200
+Kentucky	Daviess	200	200	200
+Kentucky	Edmonson	200	200	200
+Kentucky	Elliott	150	150	150
+Kentucky	Estill	175	175	175
+Kentucky	Fayette	175	175	175
+Kentucky	Fleming	175	175	175
+Kentucky	Floyd	150	150	150
+Kentucky	Franklin	175	175	175
+Kentucky	Fulton	250	250	250
+Kentucky	Gallatin	175	175	175
+Kentucky	Garrard	200	200	200
+Kentucky	Grant	175	175	175
+Kentucky	Graves	250	250	250
+Kentucky	Grayson	175	175	175
+Kentucky	Green	200	200	200
+Kentucky	Greenup	150	150	150
+Kentucky	Hancock	200	200	200
+Kentucky	Hardin	200	200	200
+Kentucky	Harlan	150	150	150
+Kentucky	Harrison	175	175	175
+Kentucky	Hart	200	200	200
+Kentucky	Henderson	200	200	200
+Kentucky	Henry	175	187	200
+Kentucky	Hickman	250	250	250
+Kentucky	Hopkins	200	200	200
+Kentucky	Jackson	175	175	175
+Kentucky	Jefferson	175	175	175
+Kentucky	Jessamine	175	175	175
+Kentucky	Johnson	150	150	150
+Kentucky	Kenton	175	175	175
+Kentucky	Knott	150	150	150
+Kentucky	Knox	175	175	175
+Kentucky	Larue	200	200	200
+Kentucky	Laurel	175	175	175
+Kentucky	Lawrence	150	150	150
+Kentucky	Lee	175	175	175
+Kentucky	Leslie	150	150	150
+Kentucky	Letcher	150	150	150
+Kentucky	Lewis	175	175	175
+Kentucky	Lincoln	200	200	200
+Kentucky	Livingston	200	200	200
+Kentucky	Logan	175	175	175
+Kentucky	Lyon	200	200	200
+Kentucky	Madison	175	227	280
+Kentucky	Magoffin	150	150	150
+Kentucky	Marion	200	200	200
+Kentucky	Marshall	200	200	200
+Kentucky	Martin	150	150	150
+Kentucky	Mason	175	175	175
+Kentucky	McCracken	250	250	250
+Kentucky	McCreary	175	175	175
+Kentucky	McLean	200	200	200
+Kentucky	Meade	175	175	175
+Kentucky	Menifee	175	175	175
+Kentucky	Mercer	175	175	175
+Kentucky	Metcalfe	200	200	200
+Kentucky	Monroe	200	200	200
+Kentucky	Montgomery	175	175	175
+Kentucky	Morgan	150	150	150
+Kentucky	Muhlenberg	175	175	175
+Kentucky	Nelson	175	175	175
+Kentucky	Nicholas	175	175	175
+Kentucky	Ohio	175	175	175
+Kentucky	Oldham	175	175	175
+Kentucky	Owen	175	175	175
+Kentucky	Owsley	175	175	175
+Kentucky	Pendleton	175	175	175
+Kentucky	Perry	150	150	150
+Kentucky	Pike	150	150	150
+Kentucky	Powell	175	175	175
+Kentucky	Pulaski	175	175	175
+Kentucky	Robertson	175	175	175
+Kentucky	Rockcastle	200	200	200
+Kentucky	Rowan	175	175	175
+Kentucky	Russell	200	200	200
+Kentucky	Scott	175	175	175
+Kentucky	Shelby	175	175	175
+Kentucky	Simpson	175	175	175
+Kentucky	Spencer	175	175	175
+Kentucky	Taylor	200	200	200
+Kentucky	Todd	175	175	175
+Kentucky	Trigg	200	200	200
+Kentucky	Trimble	175	175	175
+Kentucky	Union	200	200	200
+Kentucky	Warren	175	175	175
+Kentucky	Washington	175	175	175
+Kentucky	Wayne	175	175	175
+Kentucky	Webster	200	200	200
+Kentucky	Whitley	175	175	175
+Kentucky	Wolfe	175	175	175
+Kentucky	Woodford	175	175	175
+Mississippi	Adams	450	450	450
+Mississippi	Alcorn	300	300	300
+Mississippi	Amite	475	475	475
+Mississippi	Attala	350	350	350
+Mississippi	Benton	300	300	300
+Mississippi	Bolivar	325	325	325
+Mississippi	Calhoun	325	325	325
+Mississippi	Carroll	350	350	350
+Mississippi	Chickasaw	305	315	325
+Mississippi	Choctaw	350	350	350
+Mississippi	Claiborne	350	375	400
+Mississippi	Clarke	400	400	400
+Mississippi	Clay	350	350	350
+Mississippi	Coahoma	325	325	325
+Mississippi	Copiah	400	400	400
+Mississippi	Covington	425	425	425
+Mississippi	De Soto	300	300	300
+Mississippi	Forrest	475	475	475
+Mississippi	Franklin	450	450	450
+Mississippi	George	525	525	525
+Mississippi	Greene	500	500	500
+Mississippi	Grenada	325	337	350
+Mississippi	Hancock	550	550	550
+Mississippi	Harrison	550	550	550
+Mississippi	Hinds	400	400	400
+Mississippi	Holmes	350	350	350
+Mississippi	Humphreys	350	350	350
+Mississippi	Issaquena	375	375	375
+Mississippi	Itawamba	300	312	325
+Mississippi	Jackson	550	550	550
+Mississippi	Jasper	400	400	400
+Mississippi	Jefferson	400	400	400
+Mississippi	Jefferson Davis	425	425	425
+Mississippi	Jones	425	425	425
+Mississippi	Kemper	375	375	375
+Mississippi	Lafayette	325	325	325
+Mississippi	Lamar	427	451	475
+Mississippi	Lauderdale	400	400	400
+Mississippi	Lawrence	425	425	425
+Mississippi	Leake	350	362	375
+Mississippi	Lee	325	325	325
+Mississippi	Leflore	350	350	350
+Mississippi	Lincoln	425	425	425
+Mississippi	Lowndes	350	350	350
+Mississippi	Madison	275	325	375
+Mississippi	Marion	450	462	475
+Mississippi	Marshall	300	300	300
+Mississippi	Monroe	325	325	325
+Mississippi	Montgomery	332	341	350
+Mississippi	Neshoba	375	375	375
+Mississippi	Newton	400	400	400
+Mississippi	Noxubee	350	350	350
+Mississippi	Oktibbeha	350	350	350
+Mississippi	Panola	325	325	325
+Mississippi	Pearl River	525	525	525
+Mississippi	Perry	475	475	475
+Mississippi	Pike	475	475	475
+Mississippi	Pontotoc	325	325	325
+Mississippi	Prentiss	300	300	300
+Mississippi	Quitman	325	337	350
+Mississippi	Rankin	350	375	400
+Mississippi	Scott	400	400	400
+Mississippi	Sharkey	375	375	375
+Mississippi	Simpson	400	400	400
+Mississippi	Smith	400	400	400
+Mississippi	Stone	525	525	525
+Mississippi	Sunflower	350	350	350
+Mississippi	Tallahatchie	325	325	325
+Mississippi	Tate	300	300	300
+Mississippi	Tippah	300	300	300
+Mississippi	Tishomingo	300	300	300
+Mississippi	Tunica	300	300	300
+Mississippi	Union	325	325	325
+Mississippi	Walthall	475	475	475
+Mississippi	Warren	400	400	400
+Mississippi	Washington	350	350	350
+Mississippi	Wayne	425	425	425
+Mississippi	Webster	350	350	350
+Mississippi	Wilkinson	450	450	450
+Mississippi	Winston	350	350	350
+Mississippi	Yalobusha	325	337	350
+Mississippi	Yazoo	375	375	375
+North Carolina	Alamance	230	230	230
+North Carolina	Alexander	230	230	230
+North Carolina	Alleghany	180	180	180
+North Carolina	Anson	260	260	260
+North Carolina	Ashe	180	182	184
+North Carolina	Avery	190	190	190
+North Carolina	Beaufort	350	350	350
+North Carolina	Bertie	310	310	310
+North Carolina	Bladen	320	320	320
+North Carolina	Brunswick	350	350	350
+North Carolina	Buncombe	200	200	200
+North Carolina	Burke	250	300	350
+North Carolina	Cabarrus	250	250	250
+North Carolina	Caldwell	230	230	230
+North Carolina	Camden	320	320	320
+North Carolina	Carteret	350	350	350
+North Carolina	Caswell	200	200	200
+North Carolina	Catawba	260	260	260
+North Carolina	Chatham	260	260	260
+North Carolina	Cherokee	260	260	260
+North Carolina	Chowan	320	320	320
+North Carolina	Clay	270	270	270
+North Carolina	Cleveland	270	270	270
+North Carolina	Columbus	330	330	330
+North Carolina	Craven	350	350	350
+North Carolina	Cumberland	300	300	300
+North Carolina	Currituck	320	320	320
+North Carolina	Dare	350	350	350
+North Carolina	Davidson	240	240	240
+North Carolina	Davie	230	230	230
+North Carolina	Duplin	330	330	330
+North Carolina	Durham	240	240	240
+North Carolina	Edgecombe	290	290	290
+North Carolina	Forsyth	210	210	210
+North Carolina	Franklin	260	260	260
+North Carolina	Gaston	260	260	260
+North Carolina	Gates	300	300	300
+North Carolina	Graham	240	240	240
+North Carolina	Granville	240	240	240
+North Carolina	Greene	310	315	320
+North Carolina	Guilford	220	220	220
+North Carolina	Halifax	280	280	280
+North Carolina	Harnett	280	280	280
+North Carolina	Haywood	210	210	210
+North Carolina	Henderson	300	300	300
+North Carolina	Hertford	290	290	290
+North Carolina	Hoke	290	290	290
+North Carolina	Hyde	350	350	350
+North Carolina	Iredell	240	240	240
+North Carolina	Jackson	290	290	290
+North Carolina	Johnston	290	290	290
+North Carolina	Jones	340	345	350
+North Carolina	Lee	270	270	270
+North Carolina	Lenoir	330	330	330
+North Carolina	Lincoln	260	260	260
+North Carolina	Macon	290	290	290
+North Carolina	Madison	170	170	170
+North Carolina	Martin	310	320	330
+North Carolina	McDowell	230	230	230
+North Carolina	Mecklenburg	250	250	250
+North Carolina	Mitchell	170	170	170
+North Carolina	Montgomery	260	260	260
+North Carolina	Moore	260	260	260
+North Carolina	Nash	280	280	280
+North Carolina	New Hanover	350	350	350
+North Carolina	Northampton	270	270	270
+North Carolina	Onslow	350	350	350
+North Carolina	Orange	240	240	240
+North Carolina	Pamlico	350	350	350
+North Carolina	Pasquotank	320	320	320
+North Carolina	Pender	340	340	340
+North Carolina	Perquimans	320	320	320
+North Carolina	Person	220	220	220
+North Carolina	Pitt	320	320	320
+North Carolina	Polk	270	270	270
+North Carolina	Randolph	240	240	240
+North Carolina	Richmond	270	270	270
+North Carolina	Robeson	310	340	370
+North Carolina	Rockingham	190	190	190
+North Carolina	Rowan	240	240	240
+North Carolina	Rutherford	270	270	270
+North Carolina	Sampson	320	320	320
+North Carolina	Scotland	290	290	290
+North Carolina	Stanly	250	250	250
+North Carolina	Stokes	190	195	200
+North Carolina	Surry	200	200	200
+North Carolina	Swain	230	230	230
+North Carolina	Transylvania	320	320	320
+North Carolina	Tyrrell	340	345	350
+North Carolina	Union	250	250	250
+North Carolina	Vance	240	240	240
+North Carolina	Wake	270	270	270
+North Carolina	Warren	250	250	250
+North Carolina	Washington	330	330	330
+North Carolina	Watauga	200	200	200
+North Carolina	Wayne	310	310	310
+North Carolina	Wilkes	220	220	220
+North Carolina	Wilson	290	290	290
+North Carolina	Yadkin	210	210	210
+North Carolina	Yancey	150	165	180
+South Carolina	Abbeville	250	255	260
+South Carolina	Aiken	250	250	250
+South Carolina	Allendale	300	300	300
+South Carolina	Anderson	275	275	275
+South Carolina	Bamberg	300	300	300
+South Carolina	Barnwell	275	275	275
+South Carolina	Beaufort	400	400	400
+South Carolina	Berkeley	350	350	350
+South Carolina	Calhoun	275	275	275
+South Carolina	Charleston	400	400	400
+South Carolina	Cherokee	275	275	275
+South Carolina	Chester	250	250	250
+South Carolina	Chesterfield	275	275	275
+South Carolina	Clarendon	300	300	300
+South Carolina	Colleton	350	350	350
+South Carolina	Darlington	300	300	300
+South Carolina	Dillon	325	325	325
+South Carolina	Dorchester	325	325	325
+South Carolina	Edgefield	250	250	250
+South Carolina	Fairfield	250	250	250
+South Carolina	Florence	325	325	325
+South Carolina	Georgetown	322	336	350
+South Carolina	Greenville	300	300	300
+South Carolina	Greenwood	250	250	250
+South Carolina	Hampton	325	337	350
+South Carolina	Horry	330	365	400
+South Carolina	Jasper	350	375	400
+South Carolina	Kershaw	250	262	275
+South Carolina	Lancaster	250	250	250
+South Carolina	Laurens	250	250	250
+South Carolina	Lee	275	275	275
+South Carolina	Lexington	250	250	250
+South Carolina	Marion	325	325	325
+South Carolina	Marlboro	300	300	300
+South Carolina	McCormick	250	250	250
+South Carolina	Newberry	250	250	250
+South Carolina	Oconee	300	300	300
+South Carolina	Orangeburg	275	275	275
+South Carolina	Pickens	300	300	300
+South Carolina	Richland	275	275	275
+South Carolina	Saluda	250	250	250
+South Carolina	Spartanburg	275	275	275
+South Carolina	Sumter	275	287	300
+South Carolina	Union	250	250	250
+South Carolina	Williamsburg	325	325	325
+South Carolina	York	250	250	250
+Tennessee	Anderson	190	190	190
+Tennessee	Bedford	230	230	230
+Tennessee	Benton	230	230	230
+Tennessee	Bledsoe	230	230	230
+Tennessee	Blount	200	200	200
+Tennessee	Bradley	260	260	260
+Tennessee	Campbell	180	180	180
+Tennessee	Cannon	230	230	230
+Tennessee	Carroll	240	240	240
+Tennessee	Carter	150	150	150
+Tennessee	Cheatham	210	210	210
+Tennessee	Chester	280	290	300
+Tennessee	Claiborne	150	155	160
+Tennessee	Clay	200	200	200
+Tennessee	Cocke	170	172	175
+Tennessee	Coffee	230	240	250
+Tennessee	Crockett	270	270	270
+Tennessee	Cumberland	220	220	220
+Tennessee	Davidson	210	210	210
+Tennessee	De Kalb	200	210	220
+Tennessee	Decatur	250	250	250
+Tennessee	Dickson	220	220	220
+Tennessee	Dyer	260	260	260
+Tennessee	Fayette	300	310	320
+Tennessee	Fentress	200	200	200
+Tennessee	Franklin	250	250	250
+Tennessee	Gibson	250	250	250
+Tennessee	Giles	260	260	260
+Tennessee	Grainger	170	170	170
+Tennessee	Greene	150	150	150
+Tennessee	Grundy	240	240	240
+Tennessee	Hamblen	160	160	160
+Tennessee	Hamilton	260	260	260
+Tennessee	Hancock	150	150	150
+Tennessee	Hardeman	300	300	300
+Tennessee	Hardin	280	290	300
+Tennessee	Hawkins	150	150	150
+Tennessee	Haywood	280	280	280
+Tennessee	Henderson	250	250	250
+Tennessee	Henry	230	230	230
+Tennessee	Hickman	230	230	230
+Tennessee	Houston	220	220	220
+Tennessee	Humphreys	230	230	230
+Tennessee	Jackson	210	210	210
+Tennessee	Jefferson	180	180	180
+Tennessee	Johnson	150	150	150
+Tennessee	Knox	190	190	190
+Tennessee	Lake	260	260	260
+Tennessee	Lauderdale	280	280	280
+Tennessee	Lawrence	270	270	270
+Tennessee	Lewis	250	250	250
+Tennessee	Lincoln	250	250	250
+Tennessee	Loudon	210	210	210
+Tennessee	Macon	200	200	200
+Tennessee	Madison	260	260	260
+Tennessee	Marion	250	250	250
+Tennessee	Marshall	240	240	240
+Tennessee	Maury	240	240	240
+Tennessee	McMinn	230	230	230
+Tennessee	McNairy	300	300	300
+Tennessee	Meigs	230	230	230
+Tennessee	Monroe	220	220	220
+Tennessee	Montgomery	200	200	200
+Tennessee	Moore	240	240	240
+Tennessee	Morgan	200	200	200
+Tennessee	Obion	260	260	260
+Tennessee	Overton	210	210	210
+Tennessee	Perry	250	250	250
+Tennessee	Pickett	200	200	200
+Tennessee	Polk	260	260	260
+Tennessee	Putnam	220	220	220
+Tennessee	Rhea	230	230	230
+Tennessee	Roane	210	210	210
+Tennessee	Robertson	200	200	200
+Tennessee	Rutherford	230	230	230
+Tennessee	Scott	180	180	180
+Tennessee	Sequatchie	250	250	250
+Tennessee	Sevier	180	180	180
+Tennessee	Shelby	300	300	300
+Tennessee	Smith	210	210	210
+Tennessee	Stewart	210	210	210
+Tennessee	Sullivan	140	140	140
+Tennessee	Sumner	200	200	200
+Tennessee	Tipton	280	285	290
+Tennessee	Trousdale	210	210	210
+Tennessee	Unicoi	150	150	150
+Tennessee	Union	170	170	170
+Tennessee	Van Buren	220	225	230
+Tennessee	Warren	220	225	230
+Tennessee	Washington	150	150	150
+Tennessee	Wayne	280	280	280
+Tennessee	Weakley	250	250	250
+Tennessee	White	220	220	220
+Tennessee	Williamson	230	230	230
+Tennessee	Wilson	210	210	210
