@@ -404,6 +404,13 @@ Friend Class frmDisplayFrequencyGrid
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
         pDataGroup = Nothing
         pSource = Nothing
+        If pFormSpecifyFrequency IsNot Nothing Then
+            Try
+                pFormSpecifyFrequency.Close()
+            Catch
+            End Try
+            pFormSpecifyFrequency = Nothing
+        End If
     End Sub
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click

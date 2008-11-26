@@ -972,8 +972,12 @@ Friend Class frmSWSTAT
         SeasonsYearsFromForm()
 
         For Each lTs As atcTimeseries In pDataGroup
-            lTsB = SubsetByDateBoundary(lTs, pYearStartMonth, pYearStartDay, Nothing, pFirstYear, pLastYear, pYearEndMonth, pYearEndDay)
-            lTsB.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
+            If lTs.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
+                lTsB = lTs
+            Else
+                lTsB = SubsetByDateBoundary(lTs, pYearStartMonth, pYearStartDay, Nothing, pFirstYear, pLastYear, pYearEndMonth, pYearEndDay)
+                lTsB.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
+            End If
             lDataGroupB.Add(lTsB)
         Next
 
@@ -1101,8 +1105,11 @@ Friend Class frmSWSTAT
                         .IncludeMonths = False
                     End With
                     lList.Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
-                    lList.Initialize(lHiLow.DataSets, pNDayAttributes, True, , )
-
+                    For Each lDataset As atcTimeseries In lHiLow.DataSets
+                        ComputeRanks(lDataset, Not radioHigh.Checked)
+                    Next
+                    lList.Initialize(lHiLow.DataSets.Clone, pNDayAttributes, True, , )
+                    lList.DisplayValueAttributes = True
                 End If
             Else
                 Logger.Msg("Select at least one number of days")

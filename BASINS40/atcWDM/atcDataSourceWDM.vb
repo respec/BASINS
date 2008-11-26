@@ -457,6 +457,18 @@ CaseExistRenumber:
     ''' <returns></returns>
     Private Function DsnBld(ByVal aFileUnit As Integer, _
                             ByVal aTs As atcTimeseries) As Boolean
+
+        If aTs.Attributes.GetValue("tu", atcTimeUnit.TUDay) = atcTimeUnit.TUYear Then
+            'Provide more attribute space and less data pointer space for yearly timeseries
+            With aTs.Attributes
+                .SetValueIfMissing("TGROUP", 7)
+                .SetValueIfMissing("TSBYR", 1700)
+                .SetValueIfMissing("NSA", 100)
+                .SetValue("NSASP", 130)
+                .SetValue("NDP", 120)
+            End With
+        End If
+
         Dim lDsn As Integer = aTs.Attributes.GetValue("id", 1)
         Dim lNDn As Integer = aTs.Attributes.GetValue("NDN", 10)
         Dim lNUp As Integer = aTs.Attributes.GetValue("NUP", 10)
@@ -464,6 +476,7 @@ CaseExistRenumber:
         Dim lNSasp As Integer = aTs.Attributes.GetValue("NSASP", 100)
         Dim lNDp As Integer = aTs.Attributes.GetValue("NDP", 300)
         Dim lPsa As Integer
+
         'create label on wdm file
         F90_WDLBAX(aFileUnit, lDsn, 1, lNDn, lNUp, lNSa, lNSasp, lNDp, lPsa)
         'write attributes
@@ -480,7 +493,6 @@ CaseExistRenumber:
         End If
         aTs.Attributes.SetValueIfMissing("TSTYPE", lStr)
         aTs.Attributes.SetValueIfMissing("TGROUP", 6)
-        aTs.Attributes.SetValueIfMissing("TSBYR", 1900)
         aTs.Attributes.SetValueIfMissing("COMPFG", 1)
         aTs.Attributes.SetValueIfMissing("TSFORM", 1)
         aTs.Attributes.SetValueIfMissing("TSFILL", -999)
@@ -500,15 +512,19 @@ CaseExistRenumber:
         End If
         aTs.Attributes.SetValueIfMissing("VBTIME", lIVal)
 
-        Dim lCSDat(6) As Integer
-        J2Date(aTs.Dates.Value(0), lCSDat)
-        Dim lDecade As Integer = lCSDat(0) Mod 10
-        If lDecade > 0 Then 'subtract back to start of this decade
-            lIVal = lCSDat(0) - lDecade
-        Else 'back to start of previous decade
-            lIVal = lCSDat(0) - 10
+        If lTu < atcTimeUnit.TUYear Then
+            Dim lCSDat(6) As Integer
+            J2Date(aTs.Dates.Value(0), lCSDat)
+            Dim lDecade As Integer = lCSDat(0) Mod 10
+            If lDecade > 0 Then 'subtract back to start of this decade
+                lIVal = lCSDat(0) - lDecade
+            Else 'back to start of previous decade
+                lIVal = lCSDat(0) - 10
+            End If
+            aTs.Attributes.SetValue("TSBYR", lIVal)
+        Else
+            aTs.Attributes.SetValueIfMissing("TSBYR", 1700)
         End If
-        aTs.Attributes.SetValue("TSBYR", lIVal)
 
         aTs.Attributes.SetValueIfMissing("scen", "")
         aTs.Attributes.SetValueIfMissing("cons", "")
@@ -670,6 +686,7 @@ CaseExistRenumber:
                     End If
                     F90_WDBSAC(aFileUnit, aDsn, aMsgUnit, lMsgDefinition.ID, lMsgDefinition.Max, lRetcod, lStr, lStr.Length)
             End Select
+            'Logger.Dbg("Data Attribute to WDM: Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod)
             If lRetcod <> 0 Then
                 If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
                     Logger.Dbg("Skip:" & lName & ", data present")

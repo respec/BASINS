@@ -901,6 +901,31 @@ Public Module modTimeseriesMath
         End If
     End Function
 
+    Public Sub ComputeRanks(ByVal aTimeseries As atcTimeseries, ByVal aLowToHigh As Boolean)
+        Dim lValue As Double
+        Dim lValuesSorted As New Generic.List(Of Double)
+        For Each lValue In aTimeseries.Values
+            If Not Double.IsNaN(lValue) Then
+                lValuesSorted.Add(lValue)
+            End If
+        Next
+        lValuesSorted.Sort()
+        Dim lRank As Integer
+        Dim lLastIndex As Integer = aTimeseries.numValues
+        For lIndex As Integer = 1 To lLastIndex
+            lValue = aTimeseries.Value(lIndex)
+            If Not Double.IsNaN(lValue) Then
+                lRank = lValuesSorted.BinarySearch(lValue)
+                If aLowToHigh Then
+                    lRank += 1
+                Else
+                    lRank = lLastIndex - lRank
+                End If
+                aTimeseries.ValueAttributes(lIndex).SetValue("Rank", lRank)
+            End If
+        Next
+    End Sub
+
     Public Sub ComputePercentileSum(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
         Dim lAttrName As String = "%sum" & Format(aPercentile, "00.####")
         Dim lNumValues As Integer = aTimeseries.numValues

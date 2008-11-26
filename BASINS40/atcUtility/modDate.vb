@@ -393,8 +393,8 @@ Public Module modDate
         Dim d(5) As Integer
         'LOCAL d - date array set to values from j
         J2Date(j, d)
-        DumpDate = Format(j, "00000.00000") & " : " & _
-                   Format(d(0), "0000") & "/" & _
+        'DumpDate = Format(j, "00000.00000") & " : " & _
+        DumpDate = Format(d(0), "0000") & "/" & _
                    Format(d(1), "00") & "/" & _
                    Format(d(2), "00") & " " & _
                    Format(d(3), "00") & ":" & _

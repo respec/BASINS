@@ -52,9 +52,9 @@ Friend Class atcFrequencyGridSource
     Overrides Property Columns() As Integer
         Get
             If pNdays Is Nothing Then
-                Return 3
+                Return 4
             Else
-                Return pNdays.Count + 2
+                Return pNdays.Count + 3
             End If
         End Get
         Set(ByVal Value As Integer)
@@ -96,7 +96,7 @@ Friend Class atcFrequencyGridSource
     End Function
 
     Public Function NdaysAt(ByVal aColumn As Integer) As String
-        Return pNdays.GetByIndex(aColumn - 2)
+        Return pNdays.GetByIndex(aColumn - 3)
     End Function
 
     Public Function RecurrenceAt(ByVal aRow As Integer) As String
@@ -109,13 +109,15 @@ Friend Class atcFrequencyGridSource
             If aRow = 0 Then
                 Select Case aColumn
                     Case 0 : Return "Data Set"
-                    Case 1 : Return "Return Period"
+                    Case 1 : Return "Probability"
+                    Case 2 : Return "Return Period"
                     Case Else : Return NdaysAt(aColumn)
                 End Select
             Else
                 Select Case aColumn
                     Case 0 : Return DataSetAt(aRow).ToString
-                    Case 1 : Return RecurrenceAt(aRow)
+                    Case 1 : Return DoubleToString(1 / RecurrenceAt(aRow), , "0.0000")
+                    Case 2 : Return RecurrenceAt(aRow)
                     Case Else
                         Dim lDataSet As atcDataSet = DataSetAt(aRow)
                         Dim lAttrName As String = NdaysAt(aColumn)
@@ -172,8 +174,11 @@ Friend Class atcFrequencyGridSource
                                 'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
                             End Try
                         End If
-
-                        CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
+                        If lDataSet.Attributes.ContainsAttribute(lAttrName) Then
+                            CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
+                        Else
+                            CellValue = ""
+                        End If
                         If CellValue = "NaN" Then CellValue = ""
 
                 End Select
@@ -197,7 +202,7 @@ Friend Class atcFrequencyGridSource
 
     Overrides Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
         Get
-            If aColumn > 1 AndAlso aRow > 0 Then
+            If aColumn > 2 AndAlso aRow > 0 Then
                 Return System.Drawing.SystemColors.Window
             Else
                 Return System.Drawing.SystemColors.Control
