@@ -330,7 +330,7 @@ Public Class frmReclass
         Dim polygoncount As Long
         Dim lastdisplayed As Long
         Dim tarea As Single
-        Dim LanduseLayerIndex As Long
+        Dim LanduseLayerIndex As Integer
         Dim SubbasinLayerIndex As Long
         Dim LandUseFieldName As String
         Dim DescriptionFieldName As String
@@ -535,7 +535,7 @@ Public Class frmReclass
         Dim tarea As Single
         Dim numSubbasins As Long
         Dim SubbasinsLayerIndex As Long
-        Dim LanduseGridLayerIndex As Long
+        Dim LanduseGridLayerIndex As Integer
 
         Me.Refresh()
         'set subbasin shape file

@@ -593,7 +593,7 @@ Module modModelSetup
 
         Dim OutFile As Integer
         Dim i As Integer, j As Long, k As Long
-        Dim pcsLayerIndex As Long
+        Dim pcsLayerIndex As Integer
         Dim npdesIndex As Long, flowIndex As Long, cuIndex As Long, facIndex As Long
         Dim flow As Single
         Dim facname As String

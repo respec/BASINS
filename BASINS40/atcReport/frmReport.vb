@@ -333,7 +333,7 @@ Public Class frmReport
         pPlugIn = aPlugIn
         cboAreas.Items.Add("<none>")
 
-        For lLayer As Long = 0 To GisUtil.NumLayers() - 1
+        For lLayer As Integer = 0 To GisUtil.NumLayers() - 1
             Dim lString As String = GisUtil.LayerName(lLayer)
             If GisUtil.LayerType(lLayer) = 3 Then
                 'PolygonShapefile 
