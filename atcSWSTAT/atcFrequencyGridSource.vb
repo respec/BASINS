@@ -266,6 +266,10 @@ Friend Class atcFrequencyGridSource
                     If lAttributes.ContainsAttribute(lCompleteAttName) Then
                         Try
                             lNdayAttribute = lAttributes.GetDefinedValue(lCompleteAttName)
+                            Dim lValue As Double = lNdayAttribute.Value
+                            If lAttributes.ContainsAttribute(lCompleteAttName & "Adj") Then
+                                lValue = lAttributes.GetValue(lCompleteAttName & "Adj")
+                            End If
                             lNdayTs.Attributes.SetValue(lNdayAttribute.Definition, lNdayAttribute.Value, lNdayAttribute.Arguments)
                         Catch
                         End Try
@@ -361,17 +365,17 @@ Friend Class atcFrequencyGridSource
 
                     Dim lNumZero As Integer = lNdayTsNonLog.Attributes.GetValue("Count Zero", -1)
                     'Dim lNumPositive As Integer = lNdayTsNonLog.Attributes.GetValue("Count Positive", -1)
-                    Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero
-                    Dim lNumNegative As Integer = lNdayTsNonLog.numValues - lNumZero - lNumPositive
+                    Dim lNumMissing As Integer = lNdayTsNonLog.Attributes.GetValue("Count Missing", 0)
+                    Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero - lNumMissing
 
                     lStr = lNumPositive
                     lRept.AppendLine(lStr.PadLeft(27) & " - non-zero values")
                     lStr = lNumZero
                     lRept.AppendLine(lStr.PadLeft(27) & " - zero values")
-                    lStr = lNumNegative
-                    lRept.AppendLine(lStr.PadLeft(27) & " - negative values (ignored)")
+                    lStr = lNumMissing
+                    lRept.AppendLine(lStr.PadLeft(27) & " - missing values (ignored)")
 
-                    If lNumNegative = 0 AndAlso lNumZero = 0 Then
+                    If lNumMissing = 0 AndAlso lNumZero = 0 Then
                         lPositiveNdayTs = lNdayTsNonLog
                     Else
                         Dim lCurNewValueIndex As Integer = 1

@@ -8,6 +8,7 @@ Public Class atcTimeseriesGridSource
     Private pAllDates As atcTimeseries
     Private pDisplayAttributes As ArrayList
     Private pDisplayValues As Boolean
+    Private pDisplayValueAttributes As Boolean
     Private pFilterNoData As Boolean
 
     Private pDateFormat As New atcDateFormat
@@ -45,6 +46,15 @@ Public Class atcTimeseriesGridSource
         End Set
     End Property
 
+    Public Property DisplayValueAttributes() As Boolean
+        Get
+            Return pDisplayValueAttributes
+        End Get
+        Set(ByVal newValue As Boolean)
+            pDisplayValueAttributes = newValue
+        End Set
+    End Property
+
     Public Sub ValueFormat(Optional ByVal aMaxWidth As Integer = 10, _
                            Optional ByVal aFormat As String = "#,##0.########", _
                            Optional ByVal aExpFormat As String = "#.#e#", _
@@ -79,7 +89,13 @@ Public Class atcTimeseriesGridSource
 
     Overrides Property Columns() As Integer
         Get
-            Return pDataGroup.Count + 1
+            Dim lCols As Integer = 1 + pDataGroup.Count
+            If pDisplayValueAttributes Then
+                For Each lTs As atcTimeseries In pDataGroup
+                    If lTs.ValueAttributesExist Then lCols += 1
+                Next
+            End If
+            Return lCols
         End Get
         Set(ByVal Value As Integer)
         End Set
@@ -111,15 +127,52 @@ Public Class atcTimeseriesGridSource
         End Set
     End Property
 
+    Private Sub CellDataset(ByVal aColumn As Integer, ByRef aTimeseries As atcTimeseries, ByRef aIsValue As Boolean)
+        Dim lCol As Integer = 0
+        Dim lTs As atcTimeseries
+        'If aColumn = 3 Then Stop
+        If pDisplayValueAttributes Then
+            For lTsIndex As Integer = 0 To pDataGroup.Count - 1
+                lTs = pDataGroup.ItemByIndex(lTsIndex)
+                lCol += 1
+                If lCol = aColumn Then
+                    aTimeseries = lTs
+                    aIsValue = True
+                    Exit Sub
+                End If
+                If lTs.ValueAttributesExist Then
+                    lCol += 1
+                    If lCol = aColumn Then
+                        aTimeseries = lTs
+                        aIsValue = False
+                        Exit Sub
+                    End If
+                End If
+            Next
+        Else
+            aTimeseries = pDataGroup.ItemByIndex(aColumn - 1)
+            aIsValue = True
+        End If
+    End Sub
+
     Public Overrides Property CellEditable(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
         Get
             Dim lAttributeRows As Integer = pDisplayAttributes.Count
             Select Case aColumn
                 Case 0 'First column contains attribute name or date
                     Return False
-                Case Is <= pDataGroup.Count
+                Case Is < Columns
+                    Dim lTs As atcTimeseries = Nothing
+                    Dim lIsValue As Boolean = True
+                    CellDataset(aColumn, lTs, lIsValue)
+                    If lTs Is Nothing Then
+                        Return False
+                    End If
+                    If Not lIsValue Then
+                        Return False 'Can't edit anything in a ValueAttribute column yet
+                    End If
                     If aRow < lAttributeRows Then
-                        Dim lDefinedValue As atcDefinedValue = pDataGroup(aColumn - 1).Attributes.GetDefinedValue(pDisplayAttributes(aRow))
+                        Dim lDefinedValue As atcDefinedValue = lTs.Attributes.GetDefinedValue(pDisplayAttributes(aRow))
                         If Not lDefinedValue Is Nothing AndAlso lDefinedValue.Definition.Editable Then
                             Select Case lDefinedValue.Definition.TypeString
                                 Case "String", "Double", "Single", "Integer" : Return True
@@ -151,84 +204,107 @@ Public Class atcTimeseriesGridSource
                     Else
                         Return ""
                     End If
-                Case Is <= pDataGroup.Count
-                    If aRow < lAttributeRows Then
-                        Return pDataGroup(aColumn - 1).Attributes.GetFormattedValue(pDisplayAttributes(aRow))
-                    ElseIf Not pAllDates Is Nothing Then
-                        Try
-                            Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(aColumn - 1)
-                            Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
-                            Dim lIndex As Integer = Array.BinarySearch(lTS.Dates.Values, lDateDisplayed)
-
-                            Dim lMaxWidth As Integer = lTS.Attributes.GetValue("FormatMaxWidth", pMaxWidth)
-                            Dim lFormat As String = lTS.Attributes.GetValue("FormatNumeric", pFormat)
-                            Dim lExpFormat As String = lTS.Attributes.GetValue("FormatExp", pExpFormat)
-                            Dim lCantFit As String = lTS.Attributes.GetValue("FormatCantFit", pCantFit)
-                            Dim lSignificantDigits As Integer = lTS.Attributes.GetValue("FormatSignificantDigits", pSignificantDigits)
-
-                            If lIndex < 0 Then 'Did not find this exact date in this TS
-                                lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
-                                'Test two values closest to lDateDisplayed to see if either is within a millisecond
-                                If lIndex <= lTS.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
-                                    Return DoubleToString(lTS.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
-                                ElseIf lIndex > 0 AndAlso Math.Abs(lTS.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
-                                    Return DoubleToString(lTS.Value(lIndex - 1), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
-                                Else 'No value in this TS is close enough to this date
-                                    Return ""
-                                End If
-                            ElseIf Double.IsNaN(lTS.Value(lIndex)) Then
-                                Return ""
+                Case Is <= Columns
+                    Dim lTs As atcTimeseries = Nothing
+                    Dim lIsValue As Boolean = True
+                    CellDataset(aColumn, lTs, lIsValue)
+                    If lTs IsNot Nothing Then
+                        If aRow < lAttributeRows Then
+                            If lIsValue Then
+                                Return lTs.Attributes.GetFormattedValue(pDisplayAttributes(aRow))
                             Else
-                                Return DoubleToString(lTS.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
+                                Return ""
                             End If
-                        Catch 'was not a Timeseries or could not get a value
-                            Return ""
-                        End Try
-                    Else
-                        Return ""
+                        ElseIf Not pAllDates Is Nothing Then
+                            Try
+                                If lTs.Dates IsNot Nothing Then
+                                    Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
+                                    Dim lIndex As Integer = Array.BinarySearch(lTs.Dates.Values, lDateDisplayed)
+                                    If lIsValue Then
+                                        Dim lMaxWidth As Integer = lTs.Attributes.GetValue("FormatMaxWidth", pMaxWidth)
+                                        Dim lFormat As String = lTs.Attributes.GetValue("FormatNumeric", pFormat)
+                                        Dim lExpFormat As String = lTs.Attributes.GetValue("FormatExp", pExpFormat)
+                                        Dim lCantFit As String = lTs.Attributes.GetValue("FormatCantFit", pCantFit)
+                                        Dim lSignificantDigits As Integer = lTs.Attributes.GetValue("FormatSignificantDigits", pSignificantDigits)
+
+                                        If lIndex < 0 Then 'Did not find this exact date in this TS
+                                            lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
+                                            'Test two values closest to lDateDisplayed to see if either is within a millisecond
+                                            If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                                Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
+                                            ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                                Return DoubleToString(lTs.Value(lIndex - 1), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
+                                            Else 'No value in this TS is close enough to this date
+                                                Return ""
+                                            End If
+                                        ElseIf Double.IsNaN(lTs.Value(lIndex)) Then
+                                            Return ""
+                                        Else
+                                            Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
+                                        End If
+                                    Else
+                                        Dim lValueAtts As String = ""
+                                        If lTs.ValueAttributesExist(lIndex) Then
+                                            For Each lValueAttribute As atcDefinedValue In lTs.ValueAttributes(lIndex)
+                                                lValueAtts &= lValueAttribute.Definition.Name & "=" & lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttribute.Definition.Name) & " "
+                                            Next
+                                        End If
+                                        'Debug.WriteLine(aRow & ", " & aColumn & " = " & lValueAtts)
+                                        Return lValueAtts.TrimEnd(" ")
+                                    End If
+                                Else
+                                    'Stop
+                                End If
+                            Catch 'was not a Timeseries or could not get a value
+                            End Try
+                        End If
                     End If
-                Case Else 'Column out of range
-                    Return ""
+                    'Case Else 'Column out of range
             End Select
+            Return ""
         End Get
         Set(ByVal newValue As String)
             Dim lAttributeRows As Integer = pDisplayAttributes.Count
             Select Case aColumn
                 Case 0 'First column contains attribute name or date
-                Case Is <= pDataGroup.Count
-                    If aRow < lAttributeRows Then
-                        Dim lDefinedValue As atcDefinedValue = pDataGroup(aColumn - 1).Attributes.GetDefinedValue(pDisplayAttributes(aRow))
-                        Select Case lDefinedValue.Definition.TypeString
-                            Case "String" : lDefinedValue.Value = newValue
-                            Case "Double" : lDefinedValue.Value = Double.Parse(newValue)
-                            Case "Single" : lDefinedValue.Value = Single.Parse(newValue)
-                            Case "Integer" : lDefinedValue.Value = Integer.Parse(newValue)
-                            Case Else
-                                MapWinUtility.Logger.Msg("Cannot yet edit values of type '" & lDefinedValue.Definition.TypeString & "'")
-                        End Select
-                    ElseIf Not pAllDates Is Nothing Then
-                        'Try
-                        Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(aColumn - 1)
-                        Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
-                        Dim lIndex As Integer = Array.BinarySearch(lTS.Dates.Values, lDateDisplayed)
+                Case Is < Columns
+                    Dim lTs As atcTimeseries = Nothing
+                    Dim lIsValue As Boolean = True
+                    CellDataset(aColumn, lTs, lIsValue)
+                    If lIsValue Then
+                        If aRow < lAttributeRows Then
+                            Dim lDefinedValue As atcDefinedValue = lTs.Attributes.GetDefinedValue(pDisplayAttributes(aRow))
+                            Select Case lDefinedValue.Definition.TypeString
+                                Case "String" : lDefinedValue.Value = newValue
+                                Case "Double" : lDefinedValue.Value = Double.Parse(newValue)
+                                Case "Single" : lDefinedValue.Value = Single.Parse(newValue)
+                                Case "Integer" : lDefinedValue.Value = Integer.Parse(newValue)
+                                Case Else
+                                    MapWinUtility.Logger.Msg("Cannot yet edit values of type '" & lDefinedValue.Definition.TypeString & "'")
+                            End Select
+                        ElseIf Not pAllDates Is Nothing Then
+                            'Try
+                            Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
+                            Dim lIndex As Integer = Array.BinarySearch(lTS.Dates.Values, lDateDisplayed)
 
-                        If lIndex < 0 Then 'Did not find this exact date in this TS
-                            lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
-                            'Test two values closest to lDateDisplayed to see if either is within a millisecond
-                            If lIndex <= lTS.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
-                                lTS.Value(lIndex) = CDbl(newValue)
-                            ElseIf lIndex > 0 AndAlso Math.Abs(lTS.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
-                                lTS.Value(lIndex - 1) = CDbl(newValue)
+                            If lIndex < 0 Then 'Did not find this exact date in this TS
+                                lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
+                                'Test two values closest to lDateDisplayed to see if either is within a millisecond
+                                If lIndex <= lTS.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                    lTS.Value(lIndex) = CDbl(newValue)
+                                ElseIf lIndex > 0 AndAlso Math.Abs(lTS.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                    lTS.Value(lIndex - 1) = CDbl(newValue)
+                                Else
+                                    'TODO: exception?
+                                End If
                             Else
-                                'TODO: exception?
+                                lTS.Value(lIndex) = CDbl(newValue)
                             End If
+                            'Catch 'was not a Timeseries or could not get a value
+                            'End Try
                         Else
-                            lTS.Value(lIndex) = CDbl(newValue)
+                            'TODO: exception?
                         End If
-                        'Catch 'was not a Timeseries or could not get a value
-                        'End Try
-                    Else
-                        'TODO: exception?
                     End If
                 Case Else 'Column out of range
                     'TODO: exception?

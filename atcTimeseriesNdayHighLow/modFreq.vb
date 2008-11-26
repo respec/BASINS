@@ -79,7 +79,8 @@ Module modFreq
                             ByVal aHigh As Boolean, _
                             ByVal aLogFg As Boolean, _
                             ByVal aDataSource As atcDataSource, _
-                            ByRef aAttributesStorage As atcDataAttributes)
+                            ByRef aAttributesStorage As atcDataAttributes, _
+                            ByVal aNumZero As Integer)
 
         Dim lNonLogTS As atcTimeseries = aTs.Attributes.GetValue("NDayTimeseries", aTs)
 
@@ -92,7 +93,6 @@ Module modFreq
         If lN = 0 OrElse Double.IsNaN(lMean) Then ' <= 0 Then 'no data or problem data
             Throw New ApplicationException("Count = 0 or Mean = NaN")
         Else
-            Dim lNZero As Integer = aTs.numValues - lN
             Dim lNumons As Integer = 1
 
             Dim lLogarh As Integer
@@ -135,7 +135,7 @@ Module modFreq
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, lNZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
+                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
                        lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
                 Dim lMsg As String = ""
 
@@ -159,9 +159,7 @@ Module modFreq
                     'End If
 
                     Dim lS As String
-                    If lNday = 7 And aRecurOrProbs(lIndex) = 10 And Not aHigh Then
-                        lS = lNday & "Q" & aRecurOrProbs(lIndex)
-                    ElseIf aHigh Then
+                    If aHigh Then
                         lS = lNday & "High" & DoubleToString(aRecurOrProbs(lIndex), , "#0.####")
                     Else
                         lS = lNday & "Low" & DoubleToString(aRecurOrProbs(lIndex), , "#0.####")
@@ -176,7 +174,7 @@ Module modFreq
 
                     aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
 
-                    If lNZero > 0 Then
+                    If aNumZero > 0 Then
                         lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")
                         If lNewAttribute Is Nothing Then
                             lNewAttribute = New atcAttributeDefinition

@@ -47,6 +47,7 @@ Public Class atcListForm
     Friend WithEvents mnuViewValues As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFilterNoData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuDateValueFormats As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuViewValueAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -70,6 +71,7 @@ Public Class atcListForm
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
+        Me.mnuViewValueAttributes = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -118,7 +120,7 @@ Public Class atcListForm
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues, Me.mnuFilterNoData, Me.mnuDateValueFormats})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues, Me.mnuViewValueAttributes, Me.mnuFilterNoData, Me.mnuDateValueFormats})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -151,12 +153,12 @@ Public Class atcListForm
         'mnuFilterNoData
         '
         Me.mnuFilterNoData.Checked = True
-        Me.mnuFilterNoData.Index = 5
+        Me.mnuFilterNoData.Index = 6
         Me.mnuFilterNoData.Text = "Filter NoData"
         '
         'mnuDateValueFormats
         '
-        Me.mnuDateValueFormats.Index = 6
+        Me.mnuDateValueFormats.Index = 7
         Me.mnuDateValueFormats.Text = "Date and Value Formats..."
         '
         'mnuAnalysis
@@ -176,6 +178,7 @@ Public Class atcListForm
         Me.agdMain.AllowNewValidValues = False
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
         Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.agdMain.Fixed3D = False
         Me.agdMain.LineColor = System.Drawing.Color.Empty
         Me.agdMain.LineWidth = 0.0!
         Me.agdMain.Location = New System.Drawing.Point(0, 0)
@@ -183,6 +186,11 @@ Public Class atcListForm
         Me.agdMain.Size = New System.Drawing.Size(528, 545)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
+        '
+        'mnuViewValueAttributes
+        '
+        Me.mnuViewValueAttributes.Index = 5
+        Me.mnuViewValueAttributes.Text = "Value Attributes"
         '
         'atcListForm
         '
@@ -291,6 +299,7 @@ Public Class atcListForm
         pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, _
                                               mnuViewValues.Checked, _
                                               mnuFilterNoData.Checked)
+        pSource.DisplayValueAttributes = mnuViewValueAttributes.Checked
         With pSource
             .DateFormat = pDateFormat
             .ValueFormat(pMaxWidth, pFormat, pExpFormat, pCantFit, pSignificantDigits)
@@ -402,6 +411,23 @@ Public Class atcListForm
         mnuFilterNoData.Checked = Not mnuFilterNoData.Checked
         PopulateGrid()
     End Sub
+
+    Private Sub mnuViewValueAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewValueAttributes.Click
+        mnuViewValueAttributes.Checked = Not mnuViewValueAttributes.Checked
+        DisplayValueAttributes = mnuViewValueAttributes.Checked
+    End Sub
+
+    Public Property DisplayValueAttributes() As Boolean
+        Get
+            Return pSource.DisplayValueAttributes
+        End Get
+        Set(ByVal newValue As Boolean)
+            mnuViewValueAttributes.Checked = newValue
+            pSource.DisplayValueAttributes = newValue
+            agdMain.SizeAllColumnsToContents()
+            agdMain.Refresh()
+        End Set
+    End Property
 
     'True for attributes in columns, False for attributes in rows
     Public Property SwapRowsColumns() As Boolean
