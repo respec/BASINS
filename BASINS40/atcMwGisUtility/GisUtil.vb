@@ -2631,6 +2631,252 @@ Public Class GisUtil
         End Get
     End Property
 
+#Region "Added by Chris Wilson during Sediment/Mercury WCS project"
+
+    ''' <summary>
+    ''' Get currently active project mapping units (e.g., "Feet")
+    ''' </summary>
+    ''' <remarks>Added by Chris Wilson 11/24/2008</remarks>
+    Public Shared ReadOnly Property MapUnits() As String
+        Get
+            Return GetMappingObject.Project.MapUnits
+        End Get
+    End Property
+
+    ''' <summary>Layer file name from a layer name</summary>
+    ''' <param name="aLayerName">
+    '''     <para>Name of layer</para>
+    ''' </param>
+    ''' <exception cref="System.Exception" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
+    ''' <remarks>Added by Chris Wilson 11/25/2008</remarks>
+    Public Shared ReadOnly Property LayerFileName(ByVal aLayerName As String) As String
+        Get
+            Return LayerFromIndex(LayerIndex(aLayerName)).FileName
+        End Get
+    End Property
+
+    ''' <summary>Layer type from a layer name</summary>
+    ''' <param name="aLayerName">
+    '''     <para>Name of layer.</para>
+    ''' </param>
+    ''' <exception cref="System.Exception" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
+    ''' <remarks>Added by Chris Wilson 11/25/2008</remarks>
+    <CLSCompliant(False)> _
+    Public Shared ReadOnly Property LayerType(ByVal aLayerName As String) As MapWindow.Interfaces.eLayerType
+        Get
+            Return LayerFromIndex(LayerIndex(aLayerName)).LayerType
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Zoom to the extents of the specified layer
+    ''' </summary>
+    ''' <param name="aLayerIndex">Index of layer.</param>
+    ''' <remarks>Added by Chris Wilson 11/25/2008</remarks>
+    Public Shared Sub ZoomToLayerExtents(ByVal aLayerIndex As Integer)
+        LayerFromIndex(aLayerIndex).ZoomTo()
+    End Sub
+
+    ''' <summary>
+    ''' Zoom to the extents of the specified layer name
+    ''' </summary>
+    ''' <param name="aLayerName">Name of layer.</param>
+    ''' <remarks>Added by Chris Wilson 11/25/2008</remarks>
+    Public Shared Sub ZoomToLayerExtents(ByVal aLayerName As String)
+        LayerFromIndex(LayerIndex(aLayerName)).ZoomTo()
+    End Sub
+
+    ''' <summary>Given two polygon layers, calculate the area of each polygon of the 
+    '''          first layer within each polygon of the second layer. 
+    '''          Output array contains area of each polygon combination.</summary>
+    ''' <param name="aPolygonLayer1Index">
+    '''     <para>Index of first polygon layer to calculate areas for</para>
+    ''' </param>
+    ''' <param name="aLayer1FieldIndex">
+    '''     <para>Index of id field in first layer (eg land use code)</para>
+    ''' </param>
+    ''' <param name="aPolygonLayer2Index">
+    '''     <para>Index of second polygon layer to calculate areas for</para>
+    ''' </param>
+    ''' <returns>Array (one item per Polygon2 shape) of dictionaries (key is Layer1 field value, value is total area)</returns>
+    ''' <remarks>Added by Chris Wilson 11/24/2008 because original version required numeric entries in field</remarks>
+    Public Shared Function TabulatePolygonAreas(ByVal aPolygonLayer1Index As Integer, _
+                                                ByVal aLayer1FieldIndex As Integer, _
+                                                ByVal aPolygonLayer2Index As Integer) As Generic.SortedDictionary(Of String, Double())
+
+        'obtain handle to layer 1 (landuse) 
+        Dim lLayer1 As MapWindow.Interfaces.Layer = LayerFromIndex(aPolygonLayer1Index)
+        Dim lSf1 As New MapWinGIS.Shapefile
+        lSf1 = lLayer1.GetObject
+
+        'set layer 2 (subbasins)
+        Dim lLayer2 As MapWindow.Interfaces.Layer = LayerFromIndex(aPolygonLayer2Index)
+        Dim lSf2 As New MapWinGIS.Shapefile
+        lSf2 = lLayer2.GetObject
+        Dim lSf2Ext As MapWinGIS.Extents = lSf2.Extents
+
+        Dim lShapeNew As MapWinGIS.Shape
+        Dim lShape1 As MapWinGIS.Shape
+        Dim lShape2 As MapWinGIS.Shape
+        Dim lShape2Ext As MapWinGIS.Extents
+
+        'set up collections of subbasin shapes and extents to save computation time later
+        Dim lSf2Shape As New Generic.List(Of MapWinGIS.Shape)
+        Dim lSf2ShapeExtXmax As New Generic.List(Of Double)
+        Dim lSf2ShapeExtXmin As New Generic.List(Of Double)
+        Dim lSf2ShapeExtYmax As New Generic.List(Of Double)
+        Dim lSf2ShapeExtYmin As New Generic.List(Of Double)
+        For k As Integer = 0 To NumFeatures(aPolygonLayer2Index) - 1
+            'loop thru each selected subbasin (or all if none selected)
+            lShape2 = lSf2.Shape(k)
+            lShape2Ext = lShape2.Extents
+            lSf2Shape.Add(lShape2)
+            lSf2ShapeExtXmax.Add(lShape2Ext.xMax)
+            lSf2ShapeExtXmin.Add(lShape2Ext.xMin)
+            lSf2ShapeExtYmax.Add(lShape2Ext.yMax)
+            lSf2ShapeExtYmin.Add(lShape2Ext.yMin)
+        Next k
+        Dim lNumFeatures As Integer = GisUtil.NumFeatures(aPolygonLayer2Index)
+
+        'set up collection of areas for each subbasin and land use type
+        Dim lArea As New Generic.SortedDictionary(Of String, Double())
+
+        '********** do overlay ***********
+
+        Dim lNumShapes As Integer = lSf1.NumShapes
+        For i As Integer = 1 To lNumShapes 'loop through each shape of the land use layer
+            lShape1 = lSf1.Shape(i - 1)
+            Dim lSf1Ext As MapWinGIS.Extents = lShape1.Extents
+            If Not (lSf1Ext.xMin > lSf2Ext.xMax OrElse _
+                    lSf1Ext.xMax < lSf2Ext.xMin OrElse _
+                    lSf1Ext.yMin > lSf2Ext.yMax OrElse _
+                    lSf1Ext.yMax < lSf2Ext.yMin) Then
+                'current first polygon falls in the extents of the second shapefile
+                For lShapeIndex As Integer = 0 To NumFeatures(aPolygonLayer2Index) - 1
+                    'loop thru each shape in second shapefile
+                    If Not (lSf1Ext.xMin > lSf2ShapeExtXmax(lShapeIndex) OrElse _
+                            lSf1Ext.xMax < lSf2ShapeExtXmin(lShapeIndex) OrElse _
+                            lSf1Ext.yMin > lSf2ShapeExtYmax(lShapeIndex) OrElse _
+                            lSf1Ext.yMax < lSf2ShapeExtYmin(lShapeIndex)) Then
+                        'look for intersection from overlay of these shapes
+                        lShapeNew = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lSf2Shape(lShapeIndex))
+                        If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
+                            Dim lShapeArea As Double = Math.Abs(MapWinGeoProc.Utils.Area(lShapeNew))
+                            Dim lFeature1Id As String = FieldValue(aPolygonLayer1Index, i - 1, aLayer1FieldIndex)
+                            With lArea
+                                Dim lAreaPrev() As Double
+                                If .TryGetValue(lFeature1Id, lAreaPrev) Then
+                                    .Remove(lFeature1Id)
+                                Else
+                                    ReDim lAreaPrev(lNumFeatures - 1)
+                                End If
+                                lAreaPrev(lShapeIndex) += lShapeArea
+                                .Add(lFeature1Id, lAreaPrev)
+                            End With
+                        End If
+                        lShapeNew = Nothing
+                    End If
+                Next
+            End If
+
+            lSf1Ext = Nothing
+            lShape1 = Nothing
+        Next i
+        Return lArea
+    End Function
+
+    ''' <summary>Given a grid and a polygon layer, calculate the area of each grid category 
+    '''          within each polygon.  Output array contains area of each grid category
+    '''          and polygon combination.</summary>
+    ''' <remark>This function can be accomplished in MapWindow by 
+    '''         looping through each grid cell and counting the 
+    '''         number of cells of each grid category within each 
+    '''         feature. The MapWinGIS calls to use include the Grid 
+    '''         Property Value, the GridHeader Properties dX, dY, XllCenter, 
+    '''         and YllCenter, and the Shapefile Function PointInShapefile.</remark>
+    ''' <param name="aGridLayerIndex">
+    '''     <para>Index of grid layer containing values</para>
+    ''' </param>
+    ''' <param name="aPolygonLayerIndex">
+    '''     <para>Index of polgon layer to calculate areas for</para>
+    ''' </param>
+    ''' <returns>Sorted dictionary containing array of areas (key is grid value, value is array of total areas (one for each shape in basin))</returns>
+    ''' <remarks>Added by Chris Wilson 11/24/2008 to make consistent with TabulatePolygonAreas</remarks>
+    Public Shared Function TabulateAreas(ByVal aGridLayerIndex As Integer, _
+                                         ByVal aPolygonLayerIndex As Integer) As Generic.SortedDictionary(Of String, Double())
+        'set input grid
+        Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
+        'set input polygon layer
+        Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
+
+        Dim lMinX As Double = Double.MaxValue
+        Dim lMaxX As Double = Double.MinValue
+        Dim lMinY As Double = Double.MaxValue
+        Dim lMaxY As Double = Double.MinValue
+
+        For lPolyIndex As Integer = 0 To NumFeatures(aPolygonLayerIndex) - 1
+            lMinX = Math.Min(lMinX, lPolygonSf.Shape(lPolyIndex).Extents.xMin)
+            lMaxX = Math.Max(lMaxX, lPolygonSf.Shape(lPolyIndex).Extents.xMax)
+            lMinY = Math.Min(lMinY, lPolygonSf.Shape(lPolyIndex).Extents.yMin)
+            lMaxY = Math.Max(lMaxY, lPolygonSf.Shape(lPolyIndex).Extents.yMax)
+        Next
+
+        Dim lStartingColumn As Integer
+        Dim lEndingColumn As Integer
+        Dim lStartingRow As Integer
+        Dim lEndingRow As Integer
+
+        lInputGrid.ProjToCell(lMinX, lMinY, lStartingColumn, lEndingRow)
+        lInputGrid.ProjToCell(lMaxX, lMaxY, lEndingColumn, lStartingRow)
+
+        lStartingRow = Math.Max(0, lStartingRow)
+        lEndingRow = Math.Min(lInputGrid.Header.NumberRows - 1, lEndingRow)
+        lStartingColumn = Math.Max(0, lStartingColumn)
+        lEndingColumn = Math.Min(lInputGrid.Header.NumberCols - 1, lEndingColumn)
+
+        Dim lCellArea As Double = lInputGrid.Header.dX * lInputGrid.Header.dY
+
+        'set up collection of areas for each subbasin and land use type
+        Dim lArea As New Generic.SortedDictionary(Of String, Double())
+
+        lPolygonSf.BeginPointInShapefile()
+        Dim lXPos As Double
+        Dim lYPos As Double
+        Dim lShapeIndex As Integer
+        Dim lGridValue As Integer
+        Dim lNumFeatures As Integer = GisUtil.NumFeatures(aPolygonLayerIndex)
+
+        For lRow As Integer = lStartingRow To lEndingRow
+            For lCol As Integer = lStartingColumn To lEndingColumn
+                lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
+                lShapeIndex = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                If lShapeIndex > -1 Then 'this is in a subbasin
+                    If lInputGrid.Value(lCol, lRow).GetType.Name = "SByte" Then
+                        lGridValue = Convert.ToInt32(lInputGrid.Value(lCol, lRow))
+                    Else
+                        lGridValue = lInputGrid.Value(lCol, lRow)
+                    End If
+
+                    With lArea
+                        Dim lAreaPrev() As Double
+                        If .TryGetValue(lGridValue, lAreaPrev) Then
+                            .Remove(lGridValue)
+                        Else
+                            ReDim lAreaPrev(lNumFeatures - 1)
+                        End If
+                        lAreaPrev(lShapeIndex) += lCellArea
+                        .Add(lGridValue, lAreaPrev)
+                    End With
+                End If
+            Next lCol
+        Next lRow
+        lPolygonSf.EndPointInShapefile()
+        Return lArea
+    End Function
+#End Region
+
 End Class
 
 ''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
