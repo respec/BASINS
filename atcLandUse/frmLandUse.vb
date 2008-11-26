@@ -265,7 +265,7 @@ Public Class frmLandUse
     End Sub
 
     Private Sub cboLanduse_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLanduse.SelectedIndexChanged
-        Dim lyr As Long
+        Dim lyr As Integer
 
         If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
             cboLandUseLayer.Visible = False
@@ -379,7 +379,7 @@ Public Class frmLandUse
     End Sub
 
     Private Sub cboLandUseLayer_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLandUseLayer.SelectedIndexChanged
-        Dim i As Long, lyr As Long
+        Dim i As Long, lyr As Integer
         Dim ctemp As String
 
         cboDescription.Items.Clear()
@@ -492,7 +492,7 @@ Public Class frmLandUse
 
         cboSubbasins.Items.Add("<none>")
 
-        Dim lyr As Long
+        Dim lyr As Integer
 
         For lyr = 0 To GisUtil.NumLayers() - 1
             ctemp = GisUtil.LayerName(lyr)

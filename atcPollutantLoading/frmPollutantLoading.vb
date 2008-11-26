@@ -1201,7 +1201,7 @@ Friend Class frmPollutantLoading
     End Sub
 
     Private Sub cboLanduse_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLanduse.SelectedIndexChanged
-        Dim lLyr As Long
+        Dim lLyr As Integer
         Dim lDef As Integer
 
         Logger.Dbg("LandUseChangedTo " & cboLanduse.Items(cboLanduse.SelectedIndex))

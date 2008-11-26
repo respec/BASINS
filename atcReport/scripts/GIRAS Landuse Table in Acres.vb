@@ -14,7 +14,7 @@ Public Module GIRASLanduseTable
                                ByVal aSelectedAreaIndexes As Collection) As Object
 
         Dim lProblem As String = ""
-        Dim lLanduseLayerIndex As Long
+        Dim lLanduseLayerIndex As Integer
         Dim lLandUseFieldIndex As Long
         Dim lGridSource As New atcGridSource
 
