@@ -570,9 +570,9 @@ Public Class frmSWMMSetup
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label3.Location = New System.Drawing.Point(11, 140)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(126, 17)
+        Me.Label3.Size = New System.Drawing.Size(149, 17)
         Me.Label3.TabIndex = 2
-        Me.Label3.Text = "Catchments Layer:"
+        Me.Label3.Text = "Subcatchments Layer:"
         '
         'Label2
         '
@@ -831,7 +831,7 @@ Public Class frmSWMMSetup
         '
         Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 28)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 29)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
         Me.txtMetWDMName.Size = New System.Drawing.Size(384, 23)
@@ -840,7 +840,7 @@ Public Class frmSWMMSetup
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 26)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 27)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -1266,7 +1266,7 @@ Public Class frmSWMMSetup
             If cboSubbasins.SelectedIndex > -1 Then
                 Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
                 For lFieldIndex As Integer = 0 To GisUtil.NumFields(lCatchmentLayerIndex) - 1
-                    AtcConnectFields.lstSource.Items.Add("Catchment:" & GisUtil.FieldName(lFieldIndex, lCatchmentLayerIndex))
+                    AtcConnectFields.lstSource.Items.Add("Subcatchment:" & GisUtil.FieldName(lFieldIndex, lCatchmentLayerIndex))
                 Next
             End If
 
@@ -1274,15 +1274,21 @@ Public Class frmSWMMSetup
             AtcConnectFields.lstTarget.Items.Clear()
             Dim lNode As New atcSWMM.Node
             For Each lField As Reflection.FieldInfo In lNode.GetType.GetFields
-                AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
+                If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
+                    AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
+                End If
             Next
             Dim lConduit As New atcSWMM.Conduit
             For Each lField As Reflection.FieldInfo In lConduit.GetType.GetFields
-                AtcConnectFields.lstTarget.Items.Add("Conduit:" & lField.Name)
+                If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
+                    AtcConnectFields.lstTarget.Items.Add("Conduit:" & lField.Name)
+                End If
             Next
             Dim lCatchment As New atcSWMM.Catchment
             For Each lField As Reflection.FieldInfo In lCatchment.GetType.GetFields
-                AtcConnectFields.lstTarget.Items.Add("Catchment:" & lField.Name)
+                If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
+                    AtcConnectFields.lstTarget.Items.Add("Subcatchment:" & lField.Name)
+                End If
             Next
 
             'add existing connections from default field maps
@@ -1298,7 +1304,7 @@ Public Class frmSWMMSetup
                 lConn = lType & ":" & pConduitFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pConduitFieldMap(lIndex)
                 AtcConnectFields.AddConnection(lConn, True)
             Next
-            lType = "Catchment"
+            lType = "Subcatchment"
             For lIndex As Integer = 0 To pCatchmentFieldMap.Count - 1
                 lConn = lType & ":" & pCatchmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pCatchmentFieldMap(lIndex)
                 AtcConnectFields.AddConnection(lConn, True)
@@ -1353,9 +1359,9 @@ Public Class frmSWMMSetup
             ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
                 lBaseLen = 7
                 lBaseName = "Conduit"
-            ElseIf Mid(lTxt, 1, 9) = "Catchment" Then
-                lBaseLen = 9
-                lBaseName = "Catchment"
+            ElseIf Mid(lTxt, 1, 12) = "Subcatchment" Then
+                lBaseLen = 12
+                lBaseName = "Subcatchment"
             End If
             Dim lSpacePos As Integer = InStr(lTxt, " ")
             Dim lGTPos As Integer = InStr(lTxt, ">")
@@ -1367,7 +1373,7 @@ Public Class frmSWMMSetup
                     pNodeFieldMap.Add(lSrc, lTar)
                 ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
                     pConduitFieldMap.Add(lSrc, lTar)
-                ElseIf Mid(lTxt, 1, 9) = "Catchment" Then
+                ElseIf Mid(lTxt, 1, 12) = "Subcatchment" Then
                     pCatchmentFieldMap.Add(lSrc, lTar)
                 End If
             Else
@@ -1376,7 +1382,7 @@ Public Class frmSWMMSetup
             End If
         Next
 
-        'set file names for nodes, conduits, and catchments
+        'set file names for nodes, conduits, and subcatchments
         Dim lNodesShapefileName As String = ""
         If cboOutlets.SelectedIndex > 0 Then
             Dim lNodeLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
@@ -1548,7 +1554,7 @@ Public Class frmSWMMSetup
                 End If
                 CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
 
-                lblStatus.Text = "Overlaying Landuses with Catchments"
+                lblStatus.Text = "Overlaying Landuses with Subcatchments"
                 Me.Refresh()
 
                 Dim lLandUseFileName As String = ""
@@ -1589,10 +1595,11 @@ Public Class frmSWMMSetup
                 .Run(lSWMMProjectFileName)
                 Logger.Dbg("BackFromSWMM")
             End With
-            lblStatus.Text = ""
+            lblStatus.Text = "Update specifications if desired, then click OK to proceed."
             Me.Refresh()
-            Me.Dispose()
-            Me.Close()
+            EnableControls(True)
+            'Me.Dispose()
+            'Me.Close()
             Logger.Dbg("Done")
         Else
             Logger.Dbg("Failed PreProcess Check")
@@ -1615,7 +1622,7 @@ Public Class frmSWMMSetup
             'not giras, make sure subbasins and land use layers aren't the same
             If cboSubbasins.Items(cboSubbasins.SelectedIndex) = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex) Then
                 'same layer cannot be used for both
-                Logger.Msg("The same layer cannot be used for the catchments layer and the landuse layer.", vbOKOnly, "BASINS SWMM Problem")
+                Logger.Msg("The same layer cannot be used for the subcatchments layer and the landuse layer.", vbOKOnly, "BASINS SWMM Problem")
                 EnableControls(True)
                 Return False
             End If
@@ -1649,7 +1656,7 @@ Public Class frmSWMMSetup
         pPrecStations = New atcCollection
         pMetStations = New atcCollection
 
-        'set field mapping for nodes, conduits, and catchments
+        'set field mapping for nodes, conduits, and Subcatchments
         pNodeFieldMap.Clear()
         pNodeFieldMap.Add("ID", "Name")
         pConduitFieldMap.Clear()
@@ -1837,7 +1844,7 @@ Public Class frmSWMMSetup
                 .CellColor(0, 0) = SystemColors.ControlDark
                 .CellColor(0, 1) = SystemColors.ControlDark
                 .Rows = 1 + lTempCatchments.Count
-                .CellValue(0, 0) = "Catchment"
+                .CellValue(0, 0) = "Subcatchment"
                 .CellValue(0, 1) = "Precip Station"
                 For lIndex As Integer = 1 To lTempCatchments.Count
                     If IsNumeric(lTempCatchments(lIndex - 1).Name) Then

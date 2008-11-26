@@ -64,7 +64,10 @@ Friend Module modSWMMFromMW
                 Next
             End If
 
-            lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
+            If lCatchment.Area = 0.0 Then
+                lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
+            End If
+
             'lCatchment.PercentImpervious()  'this is computed later
             lCatchment.Width = Math.Sqrt(lCatchment.Area * 43560)
 
@@ -98,7 +101,9 @@ Friend Module modSWMMFromMW
             Dim lConduit As Conduit = aConduits(lFeatureIndex)
 
             'calculate the actual feature length
-            lConduit.Length.Value = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex) * 3.281 'need to convert meters to feet
+            If lConduit.Length.Value Is Nothing Then
+                lConduit.Length.Value = GisUtil.FeatureLength(lLayerIndex, lFeatureIndex) * 3.281 'need to convert meters to feet
+            End If
 
             If lConduit.Geometry1 < 0 Then
                 lConduit.Geometry1 = lConduit.MeanDepth * 1.25 'full height = mean depth * 1.25
