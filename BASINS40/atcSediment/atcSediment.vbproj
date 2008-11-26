@@ -100,19 +100,18 @@
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RTFLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>RTFLib\RTFLib\bin\Debug\RTFLib.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.Xml" />
     <COMReference Include="MapWinGIS">
       <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
       <VersionMajor>3</VersionMajor>
@@ -144,7 +143,18 @@
     <Compile Include="frmSediment.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmSelectR.Designer.vb">
+      <DependentUpon>frmSelectR.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSelectR.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="modSediment.vb" />
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="frmProgress.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmProgress.vb</DependentUpon>
@@ -152,6 +162,16 @@
     <EmbeddedResource Include="frmSediment.resx">
       <DependentUpon>frmSediment.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSelectR.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSelectR.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -166,9 +186,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="My Project\" />
+    <None Include="Resources\Defaults.txt" />
+    <None Include="Resources\R Factors.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

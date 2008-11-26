@@ -1466,7 +1466,12 @@ Public Module Sediment
                 Dim Folder As String = "C:\BASINS\bin\Plugins\Sediment"
                 Dim DefaultFilename As String = Folder & "\Default.sediment"
                 If Filename = "" Then Filename = DefaultFilename
-                If Not My.Computer.FileSystem.FileExists(Filename) Then Exit Sub
+                If Not My.Computer.FileSystem.FileExists(Filename) Then 'create the default file from the file in resources
+                    Dim sw As New IO.StreamWriter(Filename)
+                    sw.Write(My.Resources.Defaults)
+                    sw.Close()
+                    sw.Dispose()
+                End If
                 sr = New IO.StreamReader(Filename)
                 Dim Version As Single = 0.0
                 .Initialize()
