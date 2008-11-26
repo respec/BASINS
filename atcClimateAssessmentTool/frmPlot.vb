@@ -153,14 +153,18 @@ Public Class frmPlot
             If cboSelect.Text = "None" OrElse cboSelect.Text = "" Then
                 lblCol = 4
             Else
-                If rdoEmission.Checked Then
+                If rdoBMP.Checked Then
                     lblCol = 4
-                ElseIf rdoModels.Checked Then
+                ElseIf rdoLanduse.Checked Then
                     lblCol = 5
-                ElseIf rdoModify.Checked Then
+                ElseIf rdoEmission.Checked Then
                     lblCol = 6
-                Else
+                ElseIf rdoModels.Checked Then
                     lblCol = 7
+                ElseIf rdoModify.Checked Then
+                    lblCol = 8
+                Else
+                    lblCol = 8
                 End If
             End If
             If Not cboPointLabels.Text = "None" And Not cboPointLabels.Text = "" Then 'use labels
@@ -181,13 +185,18 @@ Public Class frmPlot
         IO.File.WriteAllText(lPlotFilename, lstr.ToString)
 
         'Do parsing data first here
+        Dim ldataReady As Integer = 0
         If cboSelect.Text = "None" Or cboSelect.Text = "" Then
-            parseCATData(lPlotDatFilename, "All")
+            ldataReady = parseCATData(lPlotDatFilename, "All")
         Else
-            parseCATData(lPlotDatFilename, "Select")
+            ldataReady = parseCATData(lPlotDatFilename, "Select")
         End If
 
-        Process.Start(lGnuplotExe, """" & lPlotFilename & """") '"C:\mono_luChange\output\seddiff.plt")
+        If ldataReady = 0 Then
+            Process.Start(lGnuplotExe, """" & lPlotFilename & """") '"C:\mono_luChange\output\seddiff.plt")
+        Else
+            Logger.Msg("Data parsing doesnot succeed, plotting not done")
+        End If
     End Sub
 
     Private Function parseCATData(ByVal aFilename As String, ByVal aSelection As String) As Integer
@@ -236,37 +245,72 @@ Public Class frmPlot
         End If
 
         Try
+
+            'give warning about selection if no selection is made to each of the five filters
+            If lstboBMP.SelectedItems.Count = 0 OrElse _
+               lstboEmission.SelectedItems.Count = 0 OrElse _
+               lstboModifications.SelectedItems.Count = 0 OrElse _
+               lstboLanduse.SelectedItems.Count = 0 OrElse _
+               lstboModels.SelectedItems.Count = 0 Then
+                If cboSelect.Text.Contains("Run") Then
+                    Logger.Msg("Need to select at least one entry from each of the five filters.")
+                    Return -99
+                Else
+                    Return 0
+                End If
+            End If
+
             'Now get either 2d or 3d data to a temp dat file
+            Dim lcv As String = Nothing
             For lRow As Integer = pResults.FixedRows To pResults.Rows - 1
-                For Each sem As String In lstboEmission.SelectedItems
-                    If pResults.CellValue(lRow, lfilterCol).StartsWith(sem) Then
-                        For Each smodel As String In lstboModels.SelectedItems
-                            If pResults.CellValue(lRow, lfilterCol).Contains(smodel) Then
-                                For Each smodify As String In lstboModifications.SelectedItems
-                                    If pResults.CellValue(lRow, lfilterCol).Contains(smodify) Then
 
-                                        If cboZAxis.Text = "None" OrElse cboZAxis.Text = "" Then ' 2d data
-                                            lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & sem & " " & smodel & " " & smodify
-                                        Else
-                                            lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColZ - 1).Replace(",", "") & " " & sem & " " & " " & smodel & " " & smodify
-                                        End If
+                lcv = pResults.CellValue(lRow, lfilterCol)
+                For Each bmp As String In lstboBMP.SelectedItems
+                    If lcv.EndsWith(bmp) Then
 
-                                        If lptLabelCol > 0 Then
-                                            lline &= " " & pResults.CellValue(lRow, lptLabelCol) & vbCrLf
-                                        Else
-                                            lline &= vbCrLf
-                                        End If
-                                        IO.File.AppendAllText(aFilename, lline)
+                        For Each lu As String In lstboLanduse.SelectedItems
+                            If lcv.Contains(lu) Then
 
-                                        Exit For
+                                For Each sem As String In lstboEmission.SelectedItems
+                                    If lcv.StartsWith(sem) Then
 
-                                    End If
-                                Next
-                            End If
-                        Next
-                    End If
-                Next
-            Next
+                                        For Each smodel As String In lstboModels.SelectedItems
+                                            If lcv.Contains(smodel) Then
+
+                                                For Each smodify As String In lstboModifications.SelectedItems
+                                                    If lcv.Contains(smodify) Then
+
+                                                        If cboZAxis.Text = "None" OrElse cboZAxis.Text = "" Then ' 2d data
+                                                            lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & bmp & " " & lu & " " & sem & " " & smodel & " " & smodify
+                                                        Else
+                                                            lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColZ - 1).Replace(",", "") & " " & bmp & " " & lu & " " & sem & " " & " " & smodel & " " & smodify
+                                                        End If
+
+                                                        If lptLabelCol > 0 Then
+                                                            lline &= " " & pResults.CellValue(lRow, lptLabelCol) & vbCrLf
+                                                        Else
+                                                            lline &= vbCrLf
+                                                        End If
+                                                        IO.File.AppendAllText(aFilename, lline)
+
+                                                        Exit For
+
+                                                    End If ' match modify
+                                                Next ' foreach modify {F10, F30, M}
+
+                                            End If ' match model
+                                        Next ' foreach model {cccm, ..., ncar}
+
+                                    End If ' match emission
+                                Next ' foreach emission {a, b, base}
+
+                            End If ' match landuse
+                        Next ' foreach landuse {lu2030a2, ... mon10, mon70}
+
+                    End If ' match bmp
+                Next 'foreach bmp {y, n}
+            Next ' foreach lRow
+
         Catch ex As Exception
             Logger.Msg("Extrating CAT results Error: " & ex.Message)
             Return -99
@@ -303,14 +347,15 @@ Public Class frmPlot
     End Sub
 
     Private Sub cboSelect_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSelect.SelectedIndexChanged
-        If Not cboSelect.Text = "None" And Not cboSelect.Text = "" Then
+        lstboBMP.Items.Clear()
+        lstboLanduse.Items.Clear()
+        lstboEmission.Items.Clear()
+        lstboModels.Items.Clear()
+        lstboModifications.Items.Clear()
+        lstboLanduse.Items.Clear()
+
+        If cboSelect.Text.Contains("Run") Then
             pUpdatePlotSelection()
-        Else
-            'Clear the four filter listboxes?
-            lstboEmission.Items.Clear()
-            lstboModels.Items.Clear()
-            lstboModifications.Items.Clear()
-            lstboLanduse.Items.Clear()
         End If
     End Sub
 
@@ -321,28 +366,39 @@ Public Class frmPlot
         'It is assumed that there is a field in the CAT result grid that has the scenario name that chains the 
         'component scenario factors into a string with underscore
         '
+
+        If Not cboSelect.Text.Contains("Run") Then
+            'Has to choose a scenario column that has 'Run' in its title
+            'else just return and do nothing
+            Return
+        End If
+
         Dim lfilterCol As Integer = cboSelect.Text.Split("-")(0) - 1
 
         Dim lu As String = ""
         Dim lemission As String = ""
         Dim lwmodels As String = ""
         Dim lmodify As String = ""
+        Dim lbmp As String = ""
 
 
         Dim lEmissionCollection As atcCollection = New atcCollection
         Dim lwModelCollection As atcCollection = New atcCollection
         Dim lModificationCollection As atcCollection = New atcCollection
 
+        Dim lBMPCollection As atcCollection = New atcCollection
+        Dim lLUCollection As atcCollection = New atcCollection
 
         'TODO: do this more dynamically
-        lstboLanduse.Items.Clear()
-        lstboLanduse.Items.Add("2030lua2")
-        lstboLanduse.Items.Add("2030lub2")
-        lstboLanduse.Items.Add("2090lua2")
-        lstboLanduse.Items.Add("2090lub2")
-        lstboLanduse.SelectedIndex = 0
-        lstboLanduse.Enabled = False
+        'lstboLanduse.Items.Clear()
+        'lstboLanduse.Items.Add("2030lua2")
+        'lstboLanduse.Items.Add("2030lub2")
+        'lstboLanduse.Items.Add("2090lua2")
+        'lstboLanduse.Items.Add("2090lub2")
+        'lstboLanduse.SelectedIndex = 0
+        'lstboLanduse.Enabled = False
 
+        Dim lcv As String = Nothing
         For lRow As Integer = pResults.FixedRows To pResults.Rows - 1
 
             'Here do the land use box dynamically
@@ -351,13 +407,18 @@ Public Class frmPlot
             '    lu = pResults.CellValue(lRow, lfilterCol).Split("_")(0)
             'End If
 
-            lemission = pResults.CellValue(lRow, lfilterCol).Split("_")(0)
-            If pResults.CellValue(lRow, lfilterCol).Split("_").Length > 2 Then
-                lwmodels = pResults.CellValue(lRow, lfilterCol).Split("_")(2)
-                lmodify = pResults.CellValue(lRow, lfilterCol).Split("_")(3)
+            lcv = pResults.CellValue(lRow, lfilterCol)
+            lemission = lcv.Split("_")(0)
+            If Not lcv.StartsWith("base") Then
+                lwmodels = lcv.Split("_")(2)
+                lmodify = lcv.Split("_")(3)
+                lu = lcv.Split("_")(4)
+                lbmp = lcv.Split("_")(5)
             Else
-                lwmodels = pResults.CellValue(lRow, lfilterCol).Split("_")(0)
-                lmodify = pResults.CellValue(lRow, lfilterCol).Split("_")(0)
+                lwmodels = lcv.Split("_")(0)
+                lmodify = lcv.Split("_")(0)
+                lu = lcv.Split("_")(1)
+                lbmp = lcv.Split("_")(2)
             End If
 
             If Not lEmissionCollection.Contains(lemission) Then
@@ -371,6 +432,14 @@ Public Class frmPlot
             If Not lModificationCollection.Contains(lmodify) Then
                 lModificationCollection.Add(lmodify)
             End If
+
+            If Not lBMPCollection.Contains(lbmp) Then
+                lBMPCollection.Add(lbmp)
+            End If
+
+            If Not lLUCollection.Contains(lu) Then
+                lLUCollection.Add(lu)
+            End If
         Next
 
         For Each s As String In lEmissionCollection
@@ -381,6 +450,14 @@ Public Class frmPlot
         Next
         For Each s As String In lModificationCollection
             lstboModifications.Items.Add(s)
+        Next
+
+        For Each s As String In lBMPCollection
+            lstboBMP.Items.Add(s)
+        Next
+
+        For Each s As String In lLUCollection
+            lstboLanduse.Items.Add(s)
         Next
 
         For i As Integer = 0 To lstboModels.Items.Count - 1
@@ -492,5 +569,17 @@ Public Class frmPlot
 
         ' Add any initialization after the InitializeComponent() call.
 
+    End Sub
+
+    Private Sub btnAllLanduse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAllLanduse.Click
+        For i As Integer = 0 To lstboLanduse.Items.Count - 1
+            lstboLanduse.SetSelected(i, True)
+        Next
+    End Sub
+
+    Private Sub btnNoneLanduse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNoneLanduse.Click
+        For i As Integer = 0 To lstboLanduse.Items.Count - 1
+            lstboLanduse.SetSelected(i, False)
+        Next
     End Sub
 End Class
