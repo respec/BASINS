@@ -255,7 +255,7 @@ Public Module modString
 
         Dim lDecimalPosition As Integer = aValue.IndexOf("."c)
         If lDecimalPosition < 0 Then
-            Return aValue.PadRight(aWidthAfterDecimal + 1).PadLeft(aFieldWidth)
+            Return aValue.PadRight(aValue.Length + aWidthAfterDecimal + 1).PadLeft(aFieldWidth)
         Else
             'Width already after decimal = (aValue.Length - lDecimalPosition - 1)
             Dim lAddRight As Integer = aWidthAfterDecimal - (aValue.Length - lDecimalPosition - 1)

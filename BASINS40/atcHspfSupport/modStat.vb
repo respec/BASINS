@@ -620,11 +620,13 @@ Public Module modStat
     End Function
 
     Private Function TimeserIdString(ByVal aTSer As atcTimeseries) As String
-        Dim lStr As String = aTSer.Attributes.GetValue("ISTAID") & "  " & aTSer.Attributes.GetValue("STANAM")
+        Dim lStr As String = aTSer.Attributes.GetValue("ISTAID")
+        If lStr.Trim = "0" Then lStr = ""
+        lStr &= " " & aTSer.Attributes.GetValue("STANAM")
         If lStr.Trim.Length = 0 Then
             lStr = aTSer.ToString
         End If
-        Return lStr
+        Return lStr.Trim
     End Function
 
     Private Function numberExceeding(ByVal aClassLimit As Double, ByVal aClassList As atcCollection, ByVal aTS2 As Boolean) As Double
