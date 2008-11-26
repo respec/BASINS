@@ -50,7 +50,7 @@ Partial Class atcConnectFields
         Me.lstTarget.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lstTarget.FormattingEnabled = True
         Me.lstTarget.ItemHeight = 16
-        Me.lstTarget.Location = New System.Drawing.Point(219, 70)
+        Me.lstTarget.Location = New System.Drawing.Point(229, 70)
         Me.lstTarget.Name = "lstTarget"
         Me.lstTarget.Size = New System.Drawing.Size(175, 196)
         Me.lstTarget.TabIndex = 1
@@ -59,16 +59,16 @@ Partial Class atcConnectFields
         '
         Me.btnAdd.Location = New System.Drawing.Point(20, 297)
         Me.btnAdd.Name = "btnAdd"
-        Me.btnAdd.Size = New System.Drawing.Size(59, 29)
+        Me.btnAdd.Size = New System.Drawing.Size(70, 29)
         Me.btnAdd.TabIndex = 2
         Me.btnAdd.Text = "Add"
         Me.btnAdd.UseVisualStyleBackColor = True
         '
         'btnDelete
         '
-        Me.btnDelete.Location = New System.Drawing.Point(85, 297)
+        Me.btnDelete.Location = New System.Drawing.Point(96, 297)
         Me.btnDelete.Name = "btnDelete"
-        Me.btnDelete.Size = New System.Drawing.Size(57, 29)
+        Me.btnDelete.Size = New System.Drawing.Size(71, 29)
         Me.btnDelete.TabIndex = 3
         Me.btnDelete.Text = "Delete"
         Me.btnDelete.UseVisualStyleBackColor = True
@@ -95,7 +95,7 @@ Partial Class atcConnectFields
         '
         Me.lblTarget.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblTarget.AutoSize = True
-        Me.lblTarget.Location = New System.Drawing.Point(218, 45)
+        Me.lblTarget.Location = New System.Drawing.Point(238, 45)
         Me.lblTarget.Name = "lblTarget"
         Me.lblTarget.Size = New System.Drawing.Size(84, 17)
         Me.lblTarget.TabIndex = 7
@@ -103,18 +103,18 @@ Partial Class atcConnectFields
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(295, 297)
+        Me.btnSave.Location = New System.Drawing.Point(344, 297)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(57, 29)
+        Me.btnSave.Size = New System.Drawing.Size(70, 29)
         Me.btnSave.TabIndex = 8
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = True
         '
         'btnLoad
         '
-        Me.btnLoad.Location = New System.Drawing.Point(232, 297)
+        Me.btnLoad.Location = New System.Drawing.Point(268, 297)
         Me.btnLoad.Name = "btnLoad"
-        Me.btnLoad.Size = New System.Drawing.Size(57, 29)
+        Me.btnLoad.Size = New System.Drawing.Size(70, 29)
         Me.btnLoad.TabIndex = 9
         Me.btnLoad.Text = "Load"
         Me.btnLoad.UseVisualStyleBackColor = True
@@ -137,14 +137,14 @@ Partial Class atcConnectFields
         Me.lstConnections.ItemHeight = 16
         Me.lstConnections.Location = New System.Drawing.Point(18, 365)
         Me.lstConnections.Name = "lstConnections"
-        Me.lstConnections.Size = New System.Drawing.Size(376, 132)
+        Me.lstConnections.Size = New System.Drawing.Size(396, 132)
         Me.lstConnections.TabIndex = 11
         '
         'btnClear
         '
-        Me.btnClear.Location = New System.Drawing.Point(148, 297)
+        Me.btnClear.Location = New System.Drawing.Point(173, 297)
         Me.btnClear.Name = "btnClear"
-        Me.btnClear.Size = New System.Drawing.Size(57, 29)
+        Me.btnClear.Size = New System.Drawing.Size(70, 29)
         Me.btnClear.TabIndex = 12
         Me.btnClear.Text = "Clear"
         Me.btnClear.UseVisualStyleBackColor = True
@@ -166,7 +166,7 @@ Partial Class atcConnectFields
         Me.Controls.Add(Me.lstTarget)
         Me.Controls.Add(Me.lstSource)
         Me.Name = "atcConnectFields"
-        Me.Size = New System.Drawing.Size(414, 521)
+        Me.Size = New System.Drawing.Size(434, 521)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
