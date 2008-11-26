@@ -27,8 +27,8 @@ Module HSPFOutputReports
     Private Sub Initialize()
         pOutputLocations.Clear()
 
-        'pGraphSaveFormat = ".png"
-        pGraphSaveFormat = ".emf"
+        pGraphSaveFormat = ".png"
+        'pGraphSaveFormat = ".emf"
         pGraphSaveWidth = 1024
         pGraphSaveHeight = 768
 
@@ -45,7 +45,7 @@ Module HSPFOutputReports
         'Dim lTestName As String = "SantaClara"
 
         pSummaryTypes.Add("Water")
-        pSummaryTypes.Add("Sediment")
+        'pSummaryTypes.Add("Sediment")
 
         Select Case lTestName
             Case "mono"
@@ -204,8 +204,62 @@ Module HSPFOutputReports
                         lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
                         Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
                         lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
-                        Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(5))
-                        lPrecTSer.Attributes.SetValue("Units", "inches")
+
+                        Dim lRchId As Integer
+                        If lSite.Name.StartsWith("RCH") Then
+                            lRchId = lSiteName.Substring(3)
+                        Else
+                            lRchId = lSite.Name
+                        End If
+                        Dim lOperation As atcUCI.HspfOperation = lHspfUci.OpnBlks("RCHRES").OperFromID(lRchId)
+
+                        Dim lPrecSourceCollection As New atcCollection
+                        Dim lAreaFromWeight As Double = lHspfUci.WeightedSourceArea(lOperation, "PREC", lPrecSourceCollection)
+                        Dim lPrecTser As atcTimeseries = Nothing
+                        Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
+                        Dim lMathArgs As New atcDataAttributes
+                        For lSourceIndex As Integer = 0 To lPrecSourceCollection.Count - 1
+                            Dim lPrecDataGroup As atcDataGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
+                            If lPrecDataGroup.Count = 0 Then
+                                Dim lPrecWdmDataSource As New atcDataSourceWDM()
+                                lPrecWdmDataSource.Open(pTestPath & "\FBMet.wdm")
+                                lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
+                            End If
+                            lMathArgs.SetValue("Timeseries", lPrecDataGroup)
+                            lMathArgs.SetValue("Number", lPrecSourceCollection.Item(lSourceIndex))
+                            If lMath.Open("Multiply", lMathArgs) Then
+                                If lSourceIndex = 0 Then
+                                    lPrecTser = lMath.DataSets(0).Clone
+                                Else
+                                    Dim lMathAdd As New atcTimeseriesMath.atcTimeseriesMath
+                                    Dim lMathAddArgs As New atcDataAttributes
+                                    Dim lDataGroup As New atcDataGroup
+                                    lDataGroup.Add(lPrecTser)
+                                    lDataGroup.Add(lMath.DataSets(0))
+                                    lMathAddArgs.SetValue("Timeseries", lDataGroup)
+                                    If lMathAdd.Open("Add", lMathAddArgs) Then
+                                        lPrecTser = lMathAdd.DataSets(0).Clone
+                                    Else
+                                        Logger.Dbg("Problem")
+                                    End If
+                                End If
+                            Else
+                                Logger.Dbg("Problem!")
+                            End If
+                            lMath.Clear()
+                            lMathArgs.Clear()
+                        Next
+                        lMathArgs.SetValue("Timeseries", lPrecTser)
+                        'lMathArgs.SetValue("Number", lSite.Area)
+                        lMathArgs.SetValue("Number", lAreaFromWeight)
+                        If Not lMath.Open("Divide", lMathArgs) Then
+                            Logger.Dbg("Problem")
+                        End If
+                        lPrecTser = lMath.DataSets(0)
+                        lPrecTser.Attributes.SetValue("Location", "Weighted Average")
+
+                        'Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(5))
+                        lPrecTser.Attributes.SetValue("Units", "inches")
 
                         lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
                                                                              lCons, lSiteName, _
@@ -220,7 +274,7 @@ Module HSPFOutputReports
                         lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
                                                                      lCons, lSiteName, _
                                                                      "inches", _
-                                                                     lPrecTSer, lSimTSerInches, lObsTSerInches, _
+                                                                     lPrecTser, lSimTSerInches, lObsTSerInches, _
                                                                      lRunMade, _
                                                                      lExpertSystem.SDateJ, _
                                                                      lExpertSystem.EDateJ)
@@ -239,7 +293,7 @@ Module HSPFOutputReports
                         Dim lTimeSeries As New atcDataGroup
                         lTimeSeries.Add("Observed", lObsTSer)
                         lTimeSeries.Add("Simulated", lSimTSer)
-                        lTimeSeries.Add("Precipitation", lPrecTSer)
+                        lTimeSeries.Add("Precipitation", lPrecTser)
                         lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(9)))
                         lTimeSeries.Add("UZS", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(8)))
                         lTimeSeries.Add("PotET", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(6)))

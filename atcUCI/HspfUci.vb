@@ -1878,16 +1878,49 @@ x:
         editActivityAllInit(Me, (Me.icon))
     End Sub
 
-    Public Function UpstreamArea(ByRef aRchId As Integer) As Single
-        Dim lOperation As HspfOperation = pOpnBlks.Item("RCHRES").OperFromID(aRchId)
-        Dim lTotalArea As Double = LocalUpstreamArea(lOperation)
-        Dim lOperations As Collection(Of HspfOperation) = FindUpstreamOpns(lOperation)
-        Do While lOperations.Count > 0
-            lOperation = lOperations.Item(0)
-            lOperations.RemoveAt(0)
-            lTotalArea += LocalUpstreamArea(lOperation)
-            lOperations = FindUpstreamOpns(lOperation)
-        Loop
+    Public Function WeightedSourceArea(ByVal aOperation As HspfOperation, _
+                                       ByVal aSourceType As String, _
+                                       ByRef aSourceCollection As atcCollection) As Double
+        If aSourceCollection Is Nothing Then
+            aSourceCollection = New atcCollection
+        End If
+        Dim lArea As Double = LocalWeightedSource(aSourceType, aOperation, aSourceCollection)
+        Logger.Dbg("Weight" & aOperation.Name & " " & aOperation.Id & " " & lArea)
+        For Each lOperationUp As HspfOperation In FindUpstreamOpns(aOperation)
+            lArea += WeightedSourceArea(lOperationUp, aSourceType, aSourceCollection)
+        Next
+        Return lArea
+    End Function
+
+    Private Function LocalWeightedSource(ByVal aSourceType As String, _
+                                         ByVal aOperation As HspfOperation, _
+                                         ByVal aSourceCollection As atcCollection) As Double
+        Dim lAreaTotal As Double = 0.0
+        For Each lConnection As HspfConnection In aOperation.Sources
+            If lConnection.Source.VolName = "PERLND" Or _
+               lConnection.Source.VolName = "IMPLND" Then
+                Dim lArea As Double = lConnection.MFact
+                For Each lMetSegRec As atcUCI.HspfMetSegRecord In lConnection.Source.Opn.MetSeg.MetSegRecs
+                    If lMetSegRec.Name = aSourceType Then
+                        With lMetSegRec
+                            lArea *= .MFactP
+                            lAreaTotal += lArea
+                            Dim lKey As Integer = .Source.VolId
+                            aSourceCollection.Increment(lKey, lArea)
+                            Logger.Dbg("Key " & lKey & " " & lConnection.Target.VolName & lConnection.Target.VolId & " Area " & lArea)
+                        End With
+                    End If
+                Next
+            End If
+        Next lConnection
+        Return lAreaTotal
+    End Function
+
+    Public Function UpstreamArea(ByRef aOperation As HspfOperation) As Double
+        Dim lTotalArea As Double = LocalUpstreamArea(aOperation)
+        For Each lOperationUp As HspfOperation In FindUpstreamOpns(aOperation)
+            lTotalArea += UpstreamArea(lOperationUp)
+        Next
         Return lTotalArea
     End Function
 
