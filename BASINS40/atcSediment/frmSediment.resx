@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Label1.Text" xml:space="preserve">
+    <value>The BASINS Sediment Estimator calculates source erosion using the Universal Soil Loss Equation (USLE): A = RKLSCP. The source erosion quantity, expressed in tons/yr, is based on Rainfall Erosivity, R (automatically assigned based on the state and county), Soil Erodibility, K (based on the soil type), Slope Length-Steepness, LS (based on a digital elevation model), Cropping Management, C (based on land use), and Conservation Practice, P (determined by the Best Management Practices employed).
+
+Source sediment delivery is computed based on a parcel's distance to the closest stream network. You can also choose to add bank erosion estimates to compute the basin-total sediment production per year.
+
+Press F1 on each field for context sensitive help on each item.</value>
+  </data>
+  <data name="Label3.Text" xml:space="preserve">
+    <value>The soil type layer is a shape file used to describe the spatial distribution of soil erosivity throughout the basins of interest. This shape file is internally converted to a grid layer for the purposes of the computation.
+
+Soil Erosivity (K) is assigned to each soil type using a lookup table identified on the Erosion Coefficients tab.</value>
+  </data>
+  <data name="Label4.Text" xml:space="preserve">
+    <value>The land use layer is a shape file used to describe the spatial distribution of land use throughout the basins of interest. This shape file is internally converted to a grid layer for the purposes of the computation.
+
+The Cropping Management factor (C) is assigned to each land use using a lookup table identified on the Erosion Coefficients tab.</value>
+  </data>
+  <data name="Label2.Text" xml:space="preserve">
+    <value>The Digital Elevation Model (DEM) layer is used to compute slopes and distances (i.e., the LS factor). Optionally, the DEM can be used to compute a Stream Grid Layer so that the distance from each grid point to a stream grid point can be computed and used to estimate Sediment Yield.
+
+If you choose a grid cell size on the General tab that is different from the original grid size used in the DEM layer identified below, a new, clipped DEM grid will be sampled from the original grid and used for all calculations.</value>
+  </data>
+  <metadata name="SoilID.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="SoilDescription.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="K.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="LandUseID.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="LandUseDescription.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="C.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="Label7.Text" xml:space="preserve">
+    <value>Erosion coefficients are required to specify the rainfall erosivity factor (R) and relate soil types to USLE soil erodibility factors (K) and land use types to cropping factors (C). 
+
+All coefficients and lookup tables are stored in a sediment scenario text data file which also contains all other settings specified on these tabs. By selecting different scenario files, you can model different scenarios.</value>
+  </data>
+  <metadata name="BMPType.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="BMPDescription.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="P.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="Label11.Text" xml:space="preserve">
+    <value>Best Management Practices (BMPs) describe any conservation practive or structural or non-structural method employed to reduce sediment production. These may include the use of contour or terrace farming, silt fences at construction sites, or sedimentation ponds. 
+
+When BMPs are used, you must specify a BMP layer that has a BMP type field. Each BMP type is then mapped to a conservation practice factor using the lookup table below.
+
+When BMPs are not used, the conservation practice factor, P, is set to 1.0 at all locations.</value>
+  </data>
+  <metadata name="HelpProvider1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="txtThreshold.HelpString" xml:space="preserve">
+    <value>Only those stream grid values larger than this threshold value will be considered as "streams". That is, the stream grid may be comprised of grid points indicating the total upstream contributing area, and you may want to specify that only grid points with more than 500 cells contributing should be considered as stream points.</value>
+  </data>
+  <data name="Label5.Text" xml:space="preserve">
+    <value>Sediment yield is defined as that portion of the sheet and rill erosion predicted by the Universal Soil Loss Equation (USLE) that is transported to an outlet point. There are three methods for computing sediment delivery; select the desired method from the drop-down list below; click 'Method Description' for more information on each method.
+
+For three of the methods, it is necessary to compute the distance from each grid point in the basin to the nearest stream. It is therefore necessary to create a 'stream grid layer'. To determine if a grid point is a stream, the system calculates the flow accumulation for each grid and compares it to a specified threshold value (upstream area). The computed stream grid layer should be compared to an existing RF3 layer, and the threshold adjusted until they are similar.</value>
+  </data>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>42</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAICAAAQAAAACoCAAAFgAAACgAAAAgAAAAQAAAAAEACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA
+        AAD///8AAP//AP/MzADMzMwAzMyZAMyZmQCZmZkAAJmZADMzmQDMmWYAmZlmAMxmZgCZZmYAZmZmADMz
+        ZgDMZjMAmWYzAGZmMwCZMzMAZjMzADMzMwCZMwAA/wAAAAAAiAAAiAAA7u7uAN3d3QC7u7sAqqqqAIiI
+        iAB3d3cAVVVVAERERAAiIiIAERERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAABgMGBgMGBgMGBgMGBgMGBgMGBgYGBgYGHQMGBgYICB0GAwMGAwYGAwYGAwMGAwMGAwYGAwYG
+        Bh0HBwcYGBgYGAMDAwMBAwMBAwMBAwMBAwYDAQMGCBgYGBgYGBgYGBgYBgMDBgMGBgYHIQcHBwgHCAYH
+        IRgYGBgYGBgYGBgYHRUGAwYhIyEhGBgYIxgYGBgYGBgYGBgYGBgYGBgYGBUVFQMBAyEjIyMjIyMjGBgY
+        GBgYGBgYGBgYGBgYGBUVFRUVHR0dIyMjIyMjIyMYGBgYGBgYGBgYGBgYHRUVFRUVGBgjIyMjIyMjIyMj
+        IxgYGBgYGBgYGBgYHRUVFRUdGBgYGCMjIyMjIyMjIxgYGBgYGBgYGBgYGBUVFRUdGBgYGBgYIyMjIyMj
+        IyMjGBgYGBgYGBgdFRUVFRUYGBgYGBgYGBgjIyMjGBgjIxgYGBgYGB0VFRUVFRgYGBgYGBgYGBgYGCMj
+        IxgYGCMjIxgdHRUVFRUVFRgYGBgYGBgYGBgYGBgYIyMjGBgYIyEdFRUVFR0VFRUYGBgYGBgYGBgYGBgY
+        GBgjIyEVFRUjHRUVHRgYGBUVGBgYGBgYGCMjIyMjIyMjGCMjFRUVFSEYGBgYGBgVFR0YGBgYGBgYIyMj
+        IyMjIyMjIyMVFRgYGBgYGBgYGBUVIRgYGBgYGBgjIyMjIyMjIyMjGBgYGBgYGBgYGBgYFRUYGBgYGCMj
+        IyMjIyMjIyMjIyMYGBgYGBgYGBgYGBgVFRgYGBgYIyMjIyMjIyMjIyMjIxgYGBgYGBgYGBgYGBUWGBgY
+        GBgjIyMjIyMjIyMjIyMjIwcHBgcHGBgYGBgYGBUYGBgYGCMjIyMjIyMjIyMjIxgYGBgHAwEBAQEHGBgY
+        FR0YGBgYIyMjIyMjIyMjIyMjBwcYGBgYBwMBAQADGBgYHRgYGBgjIyMjIyMjIyMjIyMBAQEBAwcYGBgH
+        AQEBBxgYGBgYGCEOIyMjIyMjIyMjIwcHAwEBAQEHGBgYAwEBARgYGBgYIyMjIyMjIyMjIyMjGBgYGAcB
+        AQADGBgYBwABBxgYGBgjIyMjIyMjIyMjIyMGBwcYGBgHAQEBGBgYBgEBBxgYGCEOIyMOIyMjIyMjIwEB
+        AQEHGBgYAQEBBxgYAQEBGBgYIyMjIyMjIyMjIyMjGAcBAQEDGBgYAQEDGBgDAQEYGBghDiMjIyMjIyMj
+        IyMjGBgGAAEHGBgGAAEYGAYBABgYGCMjIyMjIyMjIyMjIxcjGBgdAQYYGAYBARgYBgEBGBgYGBgYIwYh
+        IyMjIyMjFyMYGBgDARgYBgEHGBgBAxgYGBgYGBgjIyMjIyMjIyEXFxgYGAYdGBgDBxgYBxgYGBgYGBgY
+        GBgYGBgYIyMjDgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAA
+</value>
+  </data>
+</root>
