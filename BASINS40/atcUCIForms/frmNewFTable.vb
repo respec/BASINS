@@ -16,7 +16,7 @@ Public Class frmNewFTable
         Me.Text = "New FTable"
         atxChannelLength.ValueDouble = lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#
         atxChannelSlope.ValueDouble = SignificantDigits(lFtab.Operation.Tables("HYDR-PARM2").Parms("DELTH").Value / (lFtab.Operation.Tables("HYDR-PARM2").Parms("LEN").Value * 5280.0#), 3)
-        atxDrainageArea.ValueDouble = Format(lFtab.Operation.Uci.UpstreamArea(lFtab.Id) / 640.0#, "0.##")
+        atxDrainageArea.ValueDouble = Format(lFtab.Operation.Uci.UpstreamArea(lFtab.Operation) / 640.0#, "0.##")
 
         cboProv.Items.Clear()
         cboProv.Items.Add("Select Physiographic Province")

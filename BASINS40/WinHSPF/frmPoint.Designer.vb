@@ -133,8 +133,8 @@ Partial Class frmPoint
         '
         Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
-        Me.ImageList1.Images.SetKeyName(0, "reverseplay.png")
-        Me.ImageList1.Images.SetKeyName(1, "play.png")
+        Me.ImageList1.Images.SetKeyName(0, "back-16x16.png")
+        Me.ImageList1.Images.SetKeyName(1, "next-16x16.png")
         Me.ImageList1.Images.SetKeyName(2, "add.png")
         Me.ImageList1.Images.SetKeyName(3, "create.png")
         '

@@ -5,13 +5,13 @@ Imports atcUCIForms
 Imports atcUtility
 Imports MapWinUtility
 Imports WinHSPF
-
+Imports System.Collections.ObjectModel
 
 Public Class frmPoint
 
     Dim DoneBuild As Boolean
-    Dim lts As Collection
-    'tsl was formelry ATCoTSlist
+    Dim lts As Collection(Of atcData.atcTimeseries)
+    '.net conversion issue: tsl was formelry ATCoTSlist
     Dim WithEvents tsl As atcTimeseries
 
     Dim InUseFacs() As String, CountInUseFacs&
@@ -23,9 +23,8 @@ Public Class frmPoint
     Private HsashDragStart As Single
 
     Public Sub New()
-        Dim i As Integer
         Dim LinkCount As Integer
-
+        Dim i As Integer
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -60,30 +59,20 @@ Public Class frmPoint
         SetGrid(agdMasterPoint)
         FillMasterGrid()
         DoneBuild = True
-        'tsl = New ATCoTSlist
-        'tbrView.ImageList = imgView
-        'AddToolButton("Graph", "Graph Selected Point Sources")
-        'AddToolButton("List", "List/Edit Selected Point Sources")
-        'AddToolButton("Delete", "Delete Selected Point Sources")
+        '.net conversion issue: tsl formerly atcTSList
+        Dim tsl As New List(Of atcTimeseries)
 
-        'aslPoint.ButtonVisible("move up") = False
-        'aslPoint.ButtonVisible("move down") = False
-        'fraSash.BackColor = vbButtonFace
+        CountInUseFacs = lstPoints.CheckedItems.Count
 
-        'fraReach.Visible = False
-        'fraSash.Visible = False
-        'SetFormHeight()
-        ''myUci.MetSeg2Source
-        'CountInUseFacs = aslPoint.RightCount
-        'ReDim InUseFacs(CountInUseFacs)
-        'For i = 0 To CountInUseFacs - 1
-        '    InUseFacs(i) = aslPoint.RightItem(i)
-        'Next i
-        'CountAvailFacs = aslPoint.LeftCount
-        'ReDim AvailFacs(CountAvailFacs)
-        'For i = 0 To CountAvailFacs - 1
-        '    AvailFacs(i) = aslPoint.LeftItem(i)
-        'Next i
+        For i = 0 To lstPoints.Items.Count - 1
+            If lstPoints.GetItemChecked(i) Then
+                ReDim InUseFacs(UBound(InUseFacs))
+                InUseFacs(UBound(InUseFacs)) = lstPoints.Items.Item(i)
+            Else
+                ReDim AvailFacs(UBound(AvailFacs))
+                AvailFacs(UBound(AvailFacs)) = lstPoints.Items.Item(i)
+            End If
+        Next
 
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
@@ -91,16 +80,22 @@ Public Class frmPoint
     End Sub
 
     Private Sub FillMasterGrid()
-        Dim lTable As HspfTable
         Dim lOper As HspfOperation
         Dim lOpnBlk As HspfOpnBlk
-        Dim vpol As Object
-        Dim i&, j&, lloc$, lcon$, lpol$, lsen$, icnt&, k&, lfac$, S$, dsncnt&, dsnptr&()
+        'Dim vpol As Object
+        Dim i&, j&, lloc$, lsen$, icnt&, k&, lfac$, 
+        Dim lcon$, lpol$, S$, dsncnt&
+        Dim dsnptr() As Integer = Nothing
         Dim ifound As Boolean
         Dim activeflag As Boolean
         Dim lPointItemIndex As Integer
+        Dim lltssplit() As String
 
         lstPoints.Items.Clear()
+
+        pUCI.AddWDMFile("../sed_riv.WDM")
+        pUCI.Point2Source()
+
 
         With agdMasterPoint.Source
             .Rows = 1
@@ -110,118 +105,119 @@ Public Class frmPoint
             lOpnBlk = pUCI.OpnBlks("RCHRES")
             icnt = 1
 
-            For i = 1 To lts.Count
-                lsen = lts(i).Header.sen
+            For i = 1 To lts.Count - 1
+                lsen = lts(i).Attributes.GetValue("Scenario")
                 If Mid(lsen, 1, 3) = "PT-" Then 'this is a pt src
-                    lloc = lts(i).Header.loc
+                    lloc = lts(i).Attributes.GetValue("Location")
                     If IsNumeric(Mid(lloc, 4)) Then
                         'get full reach name
                         lOper = lOpnBlk.OperFromID(CInt(Mid(lloc, 4)))
                         If Not lOper Is Nothing Then
                             'found a reach with this id
                             lloc = "RCHRES " & lOper.Id & " - " & lOper.Description
-                            lfac = UCase(lts(i).Header.Desc)
-                            lcon = lts(i).Header.con
-                            S = lfac & " (" & Mid(lts(i).Header.sen, 4) & ")"
+                            lfac = UCase(lts(i).Attributes.GetValue("Description"))
 
-                            If Not lstPoints.Items.Contains(S) Then
-                                lstPoints.Items.Add(S, False)
-                            End If
+                            '            lcon = lts(i).Header.con
+                            '            S = lfac & " (" & Mid(lts(i).Header.sen, 4) & ")"
 
-                            'see how many times this dsn shows up in pt srcs
-                            dsncnt = 0
-                            activeflag = False
-                            If Not pUCI.PointSources Is Nothing Then
-                                For j = 1 To pUCI.PointSources.Count
-                                    If pUCI.PointSources(j).Target.VolName = lOper.Name And _
-                                       pUCI.PointSources(j).Target.VolId = lOper.Id And _
-                                       Microsoft.VisualBasic.Left(pUCI.PointSources(j).Source.VolName, 3) = lts(i).File.Label And pUCI.PointSources(j).Source.VolId = lts(i).Header.Id Then
-                                        'found this dsn in active point sources
-                                        dsncnt = dsncnt + 1
-                                        activeflag = True
-                                        ReDim Preserve dsnptr(dsncnt)
-                                        dsnptr(dsncnt) = j
+                            '            If Not lstPoints.Items.Contains(S) Then
+                            '                lstPoints.Items.Add(S, False)
+                            '            End If
+
+                            '            'see how many times this dsn shows up in pt srcs
+                            '            dsncnt = 0
+                            '            activeflag = False
+                            '            If Not pUCI.PointSources Is Nothing Then
+                            '                For j = 1 To pUCI.PointSources.Count
+                            '                    If pUCI.PointSources(j).Target.VolName = lOper.Name And _
+                            '                       pUCI.PointSources(j).Target.VolId = lOper.Id And _
+                            '                       Microsoft.VisualBasic.Left(pUCI.PointSources(j).Source.VolName, 3) = lts(i).File.Label And pUCI.PointSources(j).Source.VolId = lts(i).Header.Id Then
+                            '                        'found this dsn in active point sources
+                            '                        dsncnt = dsncnt + 1
+                            '                        activeflag = True
+                            '                        ReDim Preserve dsnptr(dsncnt)
+                            '                        dsnptr(dsncnt) = j
 
 
-                                        For lPointItemIndex = 0 To lstPoints.Items.Count - 1
-                                            If lstPoints.Items.Item(lPointItemIndex) = S AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
-                                                lstPoints.SetItemChecked(lPointItemIndex, True)
-                                            End If
-                                        Next
-                                    End If
-                                Next
-                                If activeflag = False Then
-                                    'still add a line for this dsn
-                                    dsncnt = 1
-                                End If
+                            '                        For lPointItemIndex = 0 To lstPoints.Items.Count - 1
+                            '                            If lstPoints.Items.Item(lPointItemIndex) = S AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
+                            '                                lstPoints.SetItemChecked(lPointItemIndex, True)
+                            '                            End If
+                            '                        Next
+                            '                    End If
+                            '                Next
+                            '                If activeflag = False Then
+                            '                    'still add a line for this dsn
+                            '                    dsncnt = 1
+                            '                End If
 
-                                For j = 1 To dsncnt
-                                    If icnt > 1 Then .Rows = .Rows + 1
-                                    If activeflag = False Then
-                                        'not an active point source
-                                        .CellValue(icnt, 0) = "No"
-                                        .CellValue(icnt, 9) = "INFLOW"
-                                        '.CellValue(icnt, 10) = "IVOL"
-                                        '.CellValue(icnt, 12) = 0
-                                        '.CellValue(icnt, 13) = 0
-                                    Else
-                                        'this is an active point source
-                                        .CellValue(icnt, 0) = "Yes"
-                                        .CellValue(icnt, 9) = pUCI.PointSources(dsnptr(j)).Target.Group
-                                        .CellValue(icnt, 10) = MemberLongVersion(pUCI.PointSources(dsnptr(j)).Target.Member, pUCI.PointSources(dsnptr(j)).Target.MemSub1, pUCI.PointSources(dsnptr(j)).Target.MemSub2)
-                                        '.CellValue(icnt, 12) = myUci.PointSources(dsnptr(j)).Target.memsub1
-                                        '.CellValue(icnt, 13) = myUci.PointSources(dsnptr(j)).Target.memsub2
-                                    End If
+                            '                For j = 1 To dsncnt
+                            '                    If icnt > 1 Then .Rows = .Rows + 1
+                            '                    If activeflag = False Then
+                            '                        'not an active point source
+                            '                        .CellValue(icnt, 0) = "No"
+                            '                        .CellValue(icnt, 9) = "INFLOW"
+                            '                        '.CellValue(icnt, 10) = "IVOL"
+                            '                        '.CellValue(icnt, 12) = 0
+                            '                        '.CellValue(icnt, 13) = 0
+                            '                    Else
+                            '                        'this is an active point source
+                            '                        .CellValue(icnt, 0) = "Yes"
+                            '                        .CellValue(icnt, 9) = pUCI.PointSources(dsnptr(j)).Target.Group
+                            '                        .CellValue(icnt, 10) = MemberLongVersion(pUCI.PointSources(dsnptr(j)).Target.Member, pUCI.PointSources(dsnptr(j)).Target.MemSub1, pUCI.PointSources(dsnptr(j)).Target.MemSub2)
+                            '                        '.CellValue(icnt, 12) = myUci.PointSources(dsnptr(j)).Target.memsub1
+                            '                        '.CellValue(icnt, 13) = myUci.PointSources(dsnptr(j)).Target.memsub2
+                            '                    End If
 
-                                    .CellValue(icnt, 1) = lsen
-                                    .CellValue(icnt, 2) = lloc
-                                    .CellValue(icnt, 3) = UCase(lts(i).Header.Desc)
-                                    .CellValue(icnt, 5) = pUCI.GetWDMIdFromName(lts(i).File.Filename)  'save assoc src vol name
-                                    .CellValue(icnt, 6) = lts(i).Header.Id     'save assoc src vol id
-                                    .CellValue(icnt, 7) = lOper.Name     'save assoc tar vol name
-                                    .CellValue(icnt, 8) = lOper.Id         'save assoc tar vol id
-                                    .CellValue(icnt, 11) = i 'save index to lts
+                            '                    .CellValue(icnt, 1) = lsen
+                            '                    .CellValue(icnt, 2) = lloc
+                            '                    .CellValue(icnt, 3) = UCase(lts(i).Header.Desc)
+                            '                    .CellValue(icnt, 5) = pUCI.GetWDMIdFromName(lts(i).File.Filename)  'save assoc src vol name
+                            '                    .CellValue(icnt, 6) = lts(i).Header.Id     'save assoc src vol id
+                            '                    .CellValue(icnt, 7) = lOper.Name     'save assoc tar vol name
+                            '                    .CellValue(icnt, 8) = lOper.Id         'save assoc tar vol id
+                            '                    .CellValue(icnt, 11) = i 'save index to lts
 
-                                    'look for this con in pollutant list
-                                    For Each vpol In pUCI.Pollutants
-                                        lpol = vpol
-                                        If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
-                                            lcon = lpol
-                                            Exit For
-                                        End If
-                                    Next vpol
-                                    .CellValue(icnt, 4) = lcon
+                            '                    'look for this con in pollutant list
+                            '                    For Each vpol In pUCI.Pollutants
+                            '                        lpol = vpol
+                            '                        If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
+                            '                            lcon = lpol
+                            '                            Exit For
+                            '                        End If
+                            '                    Next vpol
+                            '                    .CellValue(icnt, 4) = lcon
 
-                                    .CellValue(icnt, 14) = icnt 'save row number
+                            '                    .CellValue(icnt, 14) = icnt 'save row number
 
-                                    'default member based on constituent name if poss
-                                    If activeflag Then
-                                        'is active, see if we want to remember link
-                                        ifound = False
-                                        For k = 1 To LinkCount
-                                            If ConsLinks(k - 1) = UCase(Trim(lcon)) Then
-                                                ifound = True
-                                                Exit For
-                                            End If
-                                        Next k
-                                        If Not ifound Then
-                                            'add this to list
-                                            LinkCount = LinkCount + 1
-                                            ReDim Preserve ConsLinks(LinkCount)
-                                            ReDim Preserve MemberLinks(LinkCount)
-                                            ReDim Preserve MSub1Links(LinkCount)
-                                            ReDim Preserve MSub2Links(LinkCount)
-                                            ConsLinks(LinkCount - 1) = UCase(Trim(lcon))
-                                            MemberLinks(LinkCount - 1) = MemberFromLongVersion(.CellValue(icnt, 10))
-                                            MSub1Links(LinkCount - 1) = MemSub1FromLongVersion(.CellValue(icnt, 10))
-                                            MSub2Links(LinkCount - 1) = MemSub2FromLongVersion(.CellValue(icnt, 10))
-                                        End If
-                                    End If
+                            '                    'default member based on constituent name if poss
+                            '                    If activeflag Then
+                            '                        'is active, see if we want to remember link
+                            '                        ifound = False
+                            '                        For k = 1 To LinkCount
+                            '                            If ConsLinks(k - 1) = UCase(Trim(lcon)) Then
+                            '                                ifound = True
+                            '                                Exit For
+                            '                            End If
+                            '                        Next k
+                            '                        If Not ifound Then
+                            '                            'add this to list
+                            '                            LinkCount = LinkCount + 1
+                            '                            ReDim Preserve ConsLinks(LinkCount)
+                            '                            ReDim Preserve MemberLinks(LinkCount)
+                            '                            ReDim Preserve MSub1Links(LinkCount)
+                            '                            ReDim Preserve MSub2Links(LinkCount)
+                            '                            ConsLinks(LinkCount - 1) = UCase(Trim(lcon))
+                            '                            MemberLinks(LinkCount - 1) = MemberFromLongVersion(.CellValue(icnt, 10))
+                            '                            MSub1Links(LinkCount - 1) = MemSub1FromLongVersion(.CellValue(icnt, 10))
+                            '                            MSub2Links(LinkCount - 1) = MemSub2FromLongVersion(.CellValue(icnt, 10))
+                            '                        End If
+                            '                    End If
 
-                                    icnt = icnt + 1
-                                Next j
-                            End If
-                    End If
+                            '                    icnt = icnt + 1
+                            '                Next j
+                            '            End If
+                        End If
                     End If
                 End If
             Next i
@@ -302,6 +298,8 @@ Public Class frmPoint
         Dim lOpn As HspfOperation
         Dim lTable As HspfTable
 
+        DescriptionFromMemberSubs = Nothing
+
         If lmem = "IVOL" Then
             DescriptionFromMemberSubs = "water"
         ElseIf lmem = "CIVOL" Then
@@ -323,9 +321,9 @@ Public Class frmPoint
                 lOpn = lOpnBlk.Ids(1)
                 If Not lOpn Is Nothing Then
                     If sub1 = 1 Or sub1 = 0 Then
-                        lTable = lOpn.tables("GQ-QALDATA")
+                        lTable = lOpn.Tables("GQ-QALDATA")
                     Else
-                        lTable = lOpn.tables("GQ-QALDATA:" & CStr(sub1))
+                        lTable = lOpn.Tables("GQ-QALDATA:" & CStr(sub1))
                     End If
                     If Not lTable Is Nothing Then
                         '.net conversion issue: Converted lTable.Parms("GQID") to string with .ToString
@@ -344,9 +342,9 @@ Public Class frmPoint
                 lOpn = lOpnBlk.Ids(1)
                 If Not lOpn Is Nothing Then
                     If sub2 = 1 Then
-                        lTable = lOpn.tables("GQ-QALDATA")
+                        lTable = lOpn.Tables("GQ-QALDATA")
                     Else
-                        lTable = lOpn.tables("GQ-QALDATA:" & CStr(sub2))
+                        lTable = lOpn.Tables("GQ-QALDATA:" & CStr(sub2))
                     End If
                     If Not lTable Is Nothing Then
                         '.net conversion issue: Converted lTable.Parms("GQID") to string with .ToString
