@@ -3,61 +3,14 @@ Imports atcUtility
 Imports MapWinUtility
 Imports System.Collections.ObjectModel
 
-<System.Runtime.InteropServices.ComVisible(False)> Public Class ctlSchematic
+<System.Runtime.InteropServices.ComVisible(False)> _
+Public Class ctlSchematic
 
     Private Enum LegendType
         LegLand = 0
         LegMet = 1
         LegPoint = 2
     End Enum
-
-    Private Class clsIcon
-        Inherits Windows.Forms.Control
-
-        Public Selected As Boolean
-        Public pOperation As HspfOperation
-        Public UpstreamIcons As New Generic.List(Of clsIcon)
-        Public DistanceFromOutlet As Integer = -1
-        Public Key As String = ""
-
-        Sub New()
-            SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
-            UpdateStyles()
-        End Sub
-
-        Public Function Center() As Point
-            Return New Point(Me.Left + Me.Width / 2, Me.Top + Me.Height / 2)
-        End Function
-
-        Public Property Operation() As HspfOperation
-            Get
-                Return pOperation
-            End Get
-            Set(ByVal newValue As HspfOperation)
-                pOperation = newValue
-                If pOperation Is Nothing Then
-                    Key = ""
-                Else
-                    Key = OperationKey(pOperation)
-                End If
-            End Set
-        End Property
-    End Class
-
-    Private Class IconCollection
-        Inherits KeyedCollection(Of String, clsIcon)
-        Protected Overrides Function GetKeyForItem(ByVal item As clsIcon) As String
-            Return item.Key
-        End Function
-    End Class
-
-    Friend Class PanelDoubleBuffer
-        Inherits Panel
-        Sub New()
-            SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
-            UpdateStyles()
-        End Sub
-    End Class
 
     Friend WithEvents picTree As PanelDoubleBuffer
 
@@ -88,6 +41,7 @@ Imports System.Collections.ObjectModel
     Private pIconHeight As Integer = 41
     Private pBorderWidth As Integer = 3
     Private pBarWidth As Integer = 4 'TODO: base on number of items in legend
+    Private pTreeBackground As Bitmap
 
     Public Property UCI() As HspfUci
         Get
@@ -141,6 +95,12 @@ Imports System.Collections.ObjectModel
                         End If
                     End With
                 Next
+                For Each lIcon In pIcons
+                    For Each lUpIcon As clsIcon In lIcon.UpstreamIcons
+                        lUpIcon.DownstreamIcons.Add(lIcon)
+                    Next
+                Next
+
                 LayoutTree(aPrinting)
             End If
         End If
@@ -196,8 +156,8 @@ Imports System.Collections.ObjectModel
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub DrawTreeBackground()
-        Dim lBitmap As Bitmap = New Bitmap(picTree.Width, picTree.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
-        Dim lGraphics As Graphics = Graphics.FromImage(lBitmap)
+        pTreeBackground = New Bitmap(picTree.Width, picTree.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
         Dim lLinesPen As Pen = SystemPens.ControlDarkDark
 
         For Each lIcon As clsIcon In pIcons
@@ -212,7 +172,57 @@ Imports System.Collections.ObjectModel
             End With
         Next
         lGraphics.Dispose()
-        picTree.BackgroundImage = lBitmap
+        picTree.BackgroundImage = pTreeBackground
+    End Sub
+
+    Private Sub DrawTreeBackground(ByVal aIcon As clsIcon)
+        Dim lGraphics As Graphics = Graphics.FromImage(picTree.BackgroundImage)
+        Dim lLinesPen As Pen = SystemPens.ControlDarkDark
+        'Dim lClipLeft As Integer = aIcon.Left
+        'Dim lClipRight As Integer = aIcon.Right
+        'Dim lClipTop As Integer = aIcon.Top
+        'Dim lClipBottom As Integer = aIcon.Bottom
+
+        'ExtendClip(lClipLeft, lClipRight, lClipTop, lClipBottom, aIcon.UpstreamIcons)
+        'ExtendClip(lClipLeft, lClipRight, lClipTop, lClipBottom, aIcon.DownstreamIcons)
+
+        'lGraphics.SetClip(New Rectangle(lClipLeft - pIconWidth, lClipTop - pIconWidth, lClipRight - lClipLeft + pIconWidth * 2, lClipBottom - lClipTop + pIconWidth * 2))
+        lGraphics.Clear(SystemColors.Window)
+
+        With aIcon
+            Dim lIconCenter As Point = .Center
+            For Each lUpstreamIcon As clsIcon In aIcon.UpstreamIcons
+                With lUpstreamIcon
+                    lGraphics.DrawLine(lLinesPen, lIconCenter, .Center)
+                    If .Selected Then lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+                    .Invalidate()
+                End With
+            Next
+            For Each lDownstreamIcon As clsIcon In aIcon.DownstreamIcons
+                With lDownstreamIcon
+                    lGraphics.DrawLine(lLinesPen, lIconCenter, .Center)
+                    If .Selected Then lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+                    .Invalidate()
+                End With
+            Next
+            If .Selected Then
+                lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+            End If
+        End With
+
+        aIcon.Invalidate()
+        lGraphics.Dispose()
+        'picTree.BackgroundImage = pTreeBackground
+        picTree.Invalidate()
+    End Sub
+
+    Private Sub ExtendClip(ByRef lClipLeft As Integer, ByRef lClipRight As Integer, ByRef lClipTop As Integer, ByRef lClipBottom As Integer, ByVal aIcons As Generic.List(Of clsIcon))
+        For Each lIcon As clsIcon In aIcons
+            If lIcon.Left < lClipLeft Then lClipLeft = lIcon.Left
+            If lIcon.Right > lClipRight Then lClipRight = lIcon.Right
+            If lIcon.Top < lClipTop Then lClipTop = lIcon.Top
+            If lIcon.Bottom > lClipBottom Then lClipBottom = lIcon.Bottom
+        Next
     End Sub
 
     Private Sub DrawPictureOnReachControl(ByVal aOperation As HspfOperation, ByVal aPrinting As Boolean, ByVal aControl As Control)
@@ -476,185 +486,438 @@ Imports System.Collections.ObjectModel
         pOutlets.Clear()
     End Sub
 
-    Public Sub UpdateLegend()
-        Dim item As Object
-        Dim Key As String
-        Dim srch, Index, oprindex As Integer
-        Dim colr As Color
-        Dim i As Integer
-        Dim S As String
-        Dim ypos, xpos, colonpos As Integer
-        Dim boxWidth, boxHeight, txtHeight As Integer
-        Dim lOper As atcUCI.HspfOperation
-        Dim spos, maxpic, cpos As Integer
-        Dim tname As String
-
-        LegendOrder = Nothing
-
-        Dim picTab As Graphics
-        picTab.Clear(Color.White)
-        For Index = 0 To picLegend.Count - 1
-            With picLegend(Index)
-                .Tag = ""
-                .Cls()
-                .Visible = False
-                .Width = picTab.ClipBounds.Width
-            End With
-        Next
-
-        boxWidth = picTab.ClipBounds.Width * 0.4
-        txtHeight = picTab.MeasureString("X", Me.Font).Height
-        boxHeight = txtHeight * 2
-        Index = 0
-        ypos = 0 'boxHeight + txtHeight
-        maxpic = 0
-        Dim lPoint As atcUCI.HspfPointSource
-        Dim lmetseg As atcUCI.HspfMetSeg
-        Dim lX As Single = 0
-        Dim lY As Single = 0
+    Public Sub UpdateDetails()
         Select Case CurrentLegend
-            Case LegendType.LegLand
-                LegendOrder = New Generic.List(Of String)
-                'TODO: picTab.Font = VB6.FontChangeSize(picTab.Font, 8)
-                If picTab.MeasureString("Perlnd   Implnd", Me.Font).Width > picTab.ClipBounds.Width Then
-                    lX = (boxWidth - picTab.MeasureString("Per", Me.Font).Width) / 2
-                    picTab.DrawString(" Per", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Imp", Me.Font).Width) / 2)
-                    picTab.DrawString("Imp ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-                Else
-                    lX = (boxWidth - picTab.MeasureString("Perlnd", Me.Font).Width) / 2
-                    picTab.DrawString(" Perlnd", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Implnd", Me.Font).Width) / 2)
-                    picTab.DrawString("Implnd ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-                End If
-                ypos = txtHeight
-                picLegend(0).Top = ypos
-                If pUci.Name <> "" Then
-                    'UPGRADE_WARNING: Couldn't resolve default property of object myUci.OpnSeqBlock.Opns.Count. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    For oprindex = 1 To pUci.OpnSeqBlock.Opns.Count
-                        lOper = pUci.OpnSeqBlock.Opn(oprindex)
-                        If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
-                            Key = lOper.Description
-                            colonpos = InStr(Key, ":")
-                            If colonpos > 0 Then Key = Mid(Key, colonpos + 1)
-                            For Index = 0 To picLegend.Count - 1
-                                If Key = picLegend(Index).Tag Or picLegend(Index).Tag = "" Then Exit For
-                            Next
-                            If Index >= picLegend.Count Then
-                                'TODO: picLegend.Load(Index)
-                                picLegend(Index).Tag = ""
-                                picLegend(Index).Width = picTab.ClipBounds.Width
-                            End If
-                            With picLegend(Index)
-                                If Index > maxpic Then maxpic = Index
-                                .Height = boxHeight * 1.5 + txtHeight
-                                If .Tag = "" Then
-                                    .Tag = Key
-                                    .Top = ypos - LegendScrollPos
-                                    ypos = ypos + .Height
-                                    .Visible = True
-                                End If
-                                'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                .CurrentX = (.Width - .TextWidth(Key)) / 2
-                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                If .CurrentX < 2 Then .CurrentX = 2
-                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                .CurrentY = boxHeight * 1.5
-                                'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                picLegend(Index).Print(Key)
+            Case LegendType.LegLand : PopulateLandGrid()
+            Case LegendType.LegMet : PopulateMetGrid()
+            Case LegendType.LegPoint : PopulatePointGrid()
+            Case Else
+                agdDetails.Visible = False
+        End Select
+    End Sub
 
-                                On Error GoTo ColorError
-                                'UPGRADE_WARNING: Couldn't resolve default property of object ColorMap(). Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                colr = ColorFromDesc(Key)
-                                On Error GoTo 0
-                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                .CurrentY = boxHeight / 4
-                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                If lOper.Name = "PERLND" Then
-                                    .CurrentX = 0
-                                Else
-                                    'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                    .CurrentX = .Width - boxWidth
+    Private Sub PopulateLandGrid()
+        Dim luse As Integer
+        Dim lConn As HspfConnection
+        Dim lDesc As String
+        Dim AddedThisReach As Boolean
+        Dim ReachNames, LastName As String
+        Dim PgrandTotal, Ptotal, Itotal, IgrandTotal As Single
+        Dim t As Double
+        Dim AreaUnits As String
+
+        If pUci.Name = "" Then Exit Sub
+        If pUci.GlobalBlock.EmFg = 1 Then
+            AreaUnits = " (Acres)"
+        Else
+            AreaUnits = " (Hectares)"
+        End If
+        t = 0
+        agdDetails.Visible = False
+        With agdDetails.Source
+            .Rows = 0
+            .Columns = 5
+            .CellValue(0, 0) = "Land Use"
+            .CellValue(0, 1) = "Reaches"
+            .CellValue(0, 2) = "Implnd" & AreaUnits
+            .CellValue(0, 3) = "Perlnd" & AreaUnits
+            .CellValue(0, 4) = "Total" & AreaUnits
+
+            '.set_ColType(2, ATCoCtl.ATCoDataType.ATCoTxt)
+            '.set_ColType(3, ATCoCtl.ATCoDataType.ATCoTxt)
+            '.set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
+            For luse = 0 To picLegend.Count - 1
+                Ptotal = 0
+                Itotal = 0
+                ReachNames = ""
+                LastName = ""
+                If LegendSelected(CStr(luse)) Then
+                    lDesc = picLegend(luse).Tag
+                    .Rows = .Rows + 1
+                    .CellValue(.Rows, 0) = lDesc
+                    For Each lReach As clsIcon In pIcons ' rch = 0 To picReach.Count - 1
+                        AddedThisReach = False
+                        If lReach.Selected Then
+                            For Each lConn In lReach.Operation.Sources
+                                If lConn.Source.VolName = "PERLND" Then
+                                    If Not lConn.Source.Opn Is Nothing Then
+                                        If lDesc = lConn.Source.Opn.Description Then
+                                            Ptotal = Ptotal + lConn.MFact
+
+
+                                            If Not AddedThisReach Then
+                                                If lReach.Operation.Name <> LastName Then
+                                                    LastName = lReach.Operation.Name
+                                                    ReachNames = ReachNames & LastName & " "
+                                                End If
+                                                ReachNames = ReachNames & lReach.Operation.Id & ", "
+                                                AddedThisReach = True
+                                            End If
+
+
+                                        End If
+                                    End If
+                                ElseIf lConn.Source.VolName = "IMPLND" Then
+                                    If Not lConn.Source.Opn Is Nothing Then
+                                        If lDesc = lConn.Source.Opn.Description Then
+                                            Itotal = Itotal + lConn.MFact
+
+
+                                            If Not AddedThisReach Then
+                                                If lReach.Operation.Name <> LastName Then
+                                                    LastName = lReach.Operation.Name
+                                                    ReachNames = ReachNames & LastName & " "
+                                                End If
+                                                ReachNames = ReachNames & lReach.Operation.Id & ", "
+                                                AddedThisReach = True
+                                            End If
+
+
+                                        End If
+                                    End If
                                 End If
-                                'UPGRADE_ISSUE: PictureBox method picLegend.Line was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                                'TODO: picLegend(Index).Line (boxWidth, boxHeight), colr, BF
-                            End With
+                            Next
                         End If
                     Next
+                    If Len(ReachNames) < 2 Then
+                        .CellValue(.Rows, 1) = ""
+                    Else 'remove final ", "
+                        .CellValue(.Rows, 1) = ReachNames.Substring(0, ReachNames.Length - 2)
+                    End If
+                    .CellValue(.Rows, 2) = DoubleToString(Itotal, 8)
+                    .CellValue(.Rows, 3) = DoubleToString(Ptotal, 8)
+                    .CellValue(.Rows, 4) = DoubleToString(Ptotal + Itotal, 8)
+                    PgrandTotal = PgrandTotal + Ptotal
+                    IgrandTotal = IgrandTotal + Itotal
                 End If
-                LegendFullHeight = ypos
-                ReDim Preserve LandSelected(maxpic)
-                For Index = 0 To picLegend.Count - 1
-                    If picLegend(Index).Tag <> "" Then LegendOrder.Add(picLegend(Index).Tag)
-                Next Index
-            Case LegendType.LegMet
-                For Each lmetseg In pUci.MetSegs
-                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
-                    With picLegend(Index)
-                        .Tag = Index + 1
-                        i = InStr(1, lmetseg.Name, ",")
-                        If i > 0 Then
-                            S = Mid(lmetseg.Name, 1, i - 1) & vbCr & Mid(lmetseg.Name, i + 1)
-                        Else
-                            S = lmetseg.Name
-                        End If
-                        Key = lmetseg.Id & ":" & S
-                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        .CurrentX = (.Width - .TextWidth(Key)) / 2
-                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        .CurrentY = (.Height - .TextHeight(Key)) / 2
-                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        picLegend(Index).Print(Key) 'Precip location name might be nicer
-                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
-                        .Visible = True
-                    End With
-                    Index = Index + 1
-                Next lmetseg
-                LegendFullHeight = picLegend(0).Height * (Index + 1)
-            Case LegendType.LegPoint
-                For Each lPoint In pUci.PointSources
-                    Index = lPoint.Id - 1
-                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
-                    With picLegend(Index)
-                        .Tag = Index + 1
-                        'find a way to shorten name
-                        spos = InStr(1, lPoint.Name, " ")
-                        cpos = InStr(1, lPoint.Name, ",")
-                        If spos < 10 And spos > 2 Then
-                            tname = lPoint.Name.Substring(0, spos - 1)
-                        ElseIf cpos < 10 And cpos > 2 Then
-                            tname = lPoint.Name.Substring(0, cpos - 1)
-                        Else
-                            tname = lPoint.Name.Substring(0, 10)
-                        End If
-                        Key = lPoint.Id & ":" & tname
-                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        .CurrentX = (.Width - .TextWidth(Key)) / 2
-                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        .CurrentY = (.Height - .TextHeight(Key)) / 2
-                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                        picLegend(Index).Print(Key)
-                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
-                        .Visible = True
-                    End With
-                    Index = Index + 1
-                Next lPoint
-                LegendFullHeight = picLegend(0).Height * (Index + 1)
-            Case Else
-        End Select
-        SetLegendScrollButtons()
-        RefreshLegendSelections()
-        'UpdateDetails()
-        Exit Sub
-ColorError:
-        colr = Color.Black
-        Err.Clear()
-        Resume Next
+            Next
+            .Rows = .Rows + 1
+            .CellValue(.Rows, 0) = "Total"
+            .CellValue(.Rows, 1) = ""
+            .CellValue(.Rows, 2) = DoubleToString(IgrandTotal, 8)
+            .CellValue(.Rows, 3) = DoubleToString(PgrandTotal, 8)
+            .CellValue(.Rows, 4) = DoubleToString(PgrandTotal + IgrandTotal, 8)
+            '    For i = 0 To picReach.Count - 1
+            '      If ReachSelected(i) Then
+            '        Set lOper = lOpns(CLng(picReach(i).tag))
+            '        For Each vConn In lOper.Sources
+            '          Set lConn = vConn
+            '          'Debug.Print lConn.source.volname
+            '          If lConn.source.volname = "PERLND" Or lConn.source.volname = "IMPLND" Then
+            '            lDesc = lConn.source.Opn.Description
+            '            If LegendSelected(lDesc) Then
+            '              .rows = .rows + 1
+            '              .TextMatrix(.rows, 0) = lConn.source.volname & " " & lConn.source.volid
+            '              .TextMatrix(.rows, 1) = lDesc
+            '              .TextMatrix(.rows, 2) = lOper.Name & " " & lOper.id
+            '              .TextMatrix(.rows, 3) = lConn.MFact
+            '              t = t + lConn.MFact
+            '            End If
+            '          End If
+            '        Next vConn
+            '      End If
+            '    Next i
+            '    lblTotal(0) = "Total: " & t
+            '    lblTotal(1).Visible = False
+            '    lblTotal(2).Visible = False
+            '    OrigTotal = t
+        End With
+        agdDetails.SizeAllColumnsToContents()
+        agdDetails.Visible = True
+    End Sub
+
+    Private Sub PopulateMetGrid()
+        '    Dim ctran, cSour, r, cdata, cMfacP, cMfacR As Integer
+        '    'UPGRADE_WARNING: Arrays in structure lmetseg may need to be initialized before they can be used. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="814DF224-76BD-4BB4-BFFB-EA359CB9FC48"'
+        '    Dim lmetseg As HspfMetSeg
+
+        '    If pUci.Name = "" Then Exit Sub
+        '    If pUci.MetSegs.Count = 0 Then Exit Sub
+
+        '    If IsNumeric(picLegend(MetSelected).Tag) Then
+        '        lmetseg = pUci.MetSegs.Item(CShort(picLegend(MetSelected).Tag))
+        '    Else
+        '        lmetseg = pUci.MetSegs.Item(1)
+        '    End If
+        '    With agdDetails
+        '        .Visible = False
+        '        .ClearData()
+        '        .set_Header("")
+        '        .rows = 7
+        '        cdata = 0
+        '        cSour = 1
+        '        cMfacP = 2
+        '        cMfacR = 3
+        '        ctran = 4
+        '        .cols = 5
+        '        .set_ColTitle(cdata, "Data Type") : .set_ColType(0, ATCoCtl.ATCoDataType.ATCoTxt)
+        '        .set_ColTitle(cSour, "Source") : .set_ColType(1, ATCoCtl.ATCoDataType.ATCoTxt)
+        '        .set_ColTitle(cMfacP, "P/I MFact") : .set_ColType(2, ATCoCtl.ATCoDataType.ATCoSng)
+        '        .set_ColTitle(cMfacR, "R MFact") : .set_ColType(3, ATCoCtl.ATCoDataType.ATCoSng)
+        '        .set_ColTitle(ctran, "Tran") : .set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
+        '    End With
+
+        '    For r = 1 To 7
+        '        With lmetseg.MetSegRec(r)
+        '            Select Case r
+        '                Case 1 : agdDetails.CellValue(r, cdata, "Precip")
+        '                Case 2 : agdDetails.CellValue(r, cdata, "Air Temp")
+        '                Case 3 : agdDetails.CellValue(r, cdata, "Dew Point")
+        '                Case 4 : agdDetails.CellValue(r, cdata, "Wind")
+        '                Case 5 : agdDetails.CellValue(r, cdata, "Solar Rad")
+        '                Case 6 : agdDetails.CellValue(r, cdata, "Cloud")
+        '                Case 7 : agdDetails.CellValue(r, cdata, "Pot Evap")
+        '            End Select
+        '            If .Typ = 0 Then
+        '                agdDetails.CellValue(r, cSour, "")
+        '                agdDetails.CellValue(r, cMfacP, "")
+        '                agdDetails.CellValue(r, cMfacR, "")
+        '                agdDetails.CellValue(r, ctran, "")
+        '            Else
+        '                agdDetails.CellValue(r, cSour, .Source.volname & " " & .Source.volid)
+        '                agdDetails.CellValue(r, cMfacP, .MFactP)
+        '                agdDetails.CellValue(r, cMfacR, .MFactR)
+        '                agdDetails.CellValue(r, ctran, .Tran)
+        '            End If
+        '        End With
+        '    Next
+        '    agdDetails.SizeAllColumnsToContents()
+        '    agdDetails.Visible = True
+    End Sub
+
+    Private Sub PopulatePointGrid()
+        'Dim cMfac, cdata, r, cSour, ctran As Integer
+        'Dim lPoint As HspfPoint
+        'Dim i As Integer
+        'Dim lcon, lpol As String
+        'Dim vpol As Object
+
+        'If pUci.Name = "" Then Exit Sub
+        'If pUci.PointSources.Count = 0 Then Exit Sub
+
+        'With agdDetails
+        '    .Visible = False
+        '    .ClearData()
+        '    .set_Header("")
+        '    .rows = 1
+        '    .cols = 2
+        '    .set_ColTitle(0, "Point Source") : .set_ColType(0, ATCoCtl.ATCoDataType.ATCoTxt)
+        '    .set_ColTitle(1, "Constituent") : .set_ColType(1, ATCoCtl.ATCoDataType.ATCoTxt)
+        'End With
+
+        'If IsNumeric(picLegend(PointSelected).Tag) Then
+        '    lPoint = pUci.PointSources.Item(CShort(picLegend(PointSelected).Tag))
+        'Else
+        '    lPoint = pUci.PointSources.Item(1)
+        'End If
+
+        'i = 0
+        'For Each lPoint In pUci.PointSources
+        '    If lPoint.Id = PointSelected + 1 Then
+        '        i = i + 1
+        '        With agdDetails
+        '            If .rows < i Then .rows = .rows + 1
+        '            .CellValue(.rows, 0) = lPoint.Name
+        '            lcon = lPoint.con
+        '            If Len(lcon) > 0 Then
+        '                'look for this con in pollutant list
+        '                For Each vpol In PollutantList
+        '                    'UPGRADE_WARNING: Couldn't resolve default property of object vpol. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+        '                    lpol = vpol
+        '                    If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
+        '                        lcon = lpol
+        '                        Exit For
+        '                    End If
+        '                Next vpol
+        '            End If
+        '            .set_TextMatrix(.rows, 1, lcon)
+        '        End With
+        '    End If
+        'Next lPoint
+        'agdDetails.SizeAllColumnsToContents()
+        'agdDetails.Visible = True
+    End Sub
+
+
+    Public Sub UpdateLegend()
+        '        Dim item As Object
+        '        Dim Key As String
+        '        Dim srch, Index, oprindex As Integer
+        '        Dim colr As Color
+        '        Dim i As Integer
+        '        Dim S As String
+        '        Dim ypos, xpos, colonpos As Integer
+        '        Dim boxWidth, boxHeight, txtHeight As Integer
+        '        Dim lOper As atcUCI.HspfOperation
+        '        Dim spos, maxpic, cpos As Integer
+        '        Dim tname As String
+
+        '        LegendOrder = Nothing
+
+        '        Dim picTab As Graphics
+        '        picTab.Clear(Color.White)
+        '        For Index = 0 To picLegend.Count - 1
+        '            With picLegend(Index)
+        '                .Tag = ""
+        '                .Cls()
+        '                .Visible = False
+        '                .Width = picTab.ClipBounds.Width
+        '            End With
+        '        Next
+
+        '        boxWidth = picTab.ClipBounds.Width * 0.4
+        '        txtHeight = picTab.MeasureString("X", Me.Font).Height
+        '        boxHeight = txtHeight * 2
+        '        Index = 0
+        '        ypos = 0 'boxHeight + txtHeight
+        '        maxpic = 0
+        '        Dim lPoint As atcUCI.HspfPointSource
+        '        Dim lmetseg As atcUCI.HspfMetSeg
+        '        Dim lX As Single = 0
+        '        Dim lY As Single = 0
+        '        Select Case CurrentLegend
+        '            Case LegendType.LegLand
+        '                LegendOrder = New Generic.List(Of String)
+        '                'TODO: picTab.Font = VB6.FontChangeSize(picTab.Font, 8)
+        '                If picTab.MeasureString("Perlnd   Implnd", Me.Font).Width > picTab.ClipBounds.Width Then
+        '                    lX = (boxWidth - picTab.MeasureString("Per", Me.Font).Width) / 2
+        '                    picTab.DrawString(" Per", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+        '                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Imp", Me.Font).Width) / 2)
+        '                    picTab.DrawString("Imp ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+        '                Else
+        '                    lX = (boxWidth - picTab.MeasureString("Perlnd", Me.Font).Width) / 2
+        '                    picTab.DrawString(" Perlnd", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+        '                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Implnd", Me.Font).Width) / 2)
+        '                    picTab.DrawString("Implnd ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+        '                End If
+        '                ypos = txtHeight
+        '                picLegend(0).Top = ypos
+        '                If pUci.Name <> "" Then
+        '                    'UPGRADE_WARNING: Couldn't resolve default property of object pUci.OpnSeqBlock.Opns.Count. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+        '                    For oprindex = 1 To pUci.OpnSeqBlock.Opns.Count
+        '                        lOper = pUci.OpnSeqBlock.Opn(oprindex)
+        '                        If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
+        '                            Key = lOper.Description
+        '                            colonpos = InStr(Key, ":")
+        '                            If colonpos > 0 Then Key = Mid(Key, colonpos + 1)
+        '                            For Index = 0 To picLegend.Count - 1
+        '                                If Key = picLegend(Index).Tag Or picLegend(Index).Tag = "" Then Exit For
+        '                            Next
+        '                            If Index >= picLegend.Count Then
+        '                                'TODO: picLegend.Load(Index)
+        '                                picLegend(Index).Tag = ""
+        '                                picLegend(Index).Width = picTab.ClipBounds.Width
+        '                            End If
+        '                            With picLegend(Index)
+        '                                If Index > maxpic Then maxpic = Index
+        '                                .Height = boxHeight * 1.5 + txtHeight
+        '                                If .Tag = "" Then
+        '                                    .Tag = Key
+        '                                    .Top = ypos - LegendScrollPos
+        '                                    ypos = ypos + .Height
+        '                                    .Visible = True
+        '                                End If
+        '                                'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                .CurrentX = (.Width - .TextWidth(Key)) / 2
+        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                If .CurrentX < 2 Then .CurrentX = 2
+        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                .CurrentY = boxHeight * 1.5
+        '                                'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                picLegend(Index).Print(Key)
+
+        '                                On Error GoTo ColorError
+        '                                'UPGRADE_WARNING: Couldn't resolve default property of object ColorMap(). Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+        '                                colr = ColorFromDesc(Key)
+        '                                On Error GoTo 0
+        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                .CurrentY = boxHeight / 4
+        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                If lOper.Name = "PERLND" Then
+        '                                    .CurrentX = 0
+        '                                Else
+        '                                    'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                    .CurrentX = .Width - boxWidth
+        '                                End If
+        '                                'UPGRADE_ISSUE: PictureBox method picLegend.Line was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                                'TODO: picLegend(Index).Line (boxWidth, boxHeight), colr, BF
+        '                            End With
+        '                        End If
+        '                    Next
+        '                End If
+        '                LegendFullHeight = ypos
+        '                ReDim Preserve LandSelected(maxpic)
+        '                For Index = 0 To picLegend.Count - 1
+        '                    If picLegend(Index).Tag <> "" Then LegendOrder.Add(picLegend(Index).Tag)
+        '                Next Index
+        '            Case LegendType.LegMet
+        '                For Each lmetseg In pUci.MetSegs
+        '                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
+        '                    With picLegend(Index)
+        '                        .Tag = Index + 1
+        '                        i = InStr(1, lmetseg.Name, ",")
+        '                        If i > 0 Then
+        '                            S = Mid(lmetseg.Name, 1, i - 1) & vbCr & Mid(lmetseg.Name, i + 1)
+        '                        Else
+        '                            S = lmetseg.Name
+        '                        End If
+        '                        Key = lmetseg.Id & ":" & S
+        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        .CurrentX = (.Width - .TextWidth(Key)) / 2
+        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        .CurrentY = (.Height - .TextHeight(Key)) / 2
+        '                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        picLegend(Index).Print(Key) 'Precip location name might be nicer
+        '                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
+        '                        .Visible = True
+        '                    End With
+        '                    Index = Index + 1
+        '                Next lmetseg
+        '                LegendFullHeight = picLegend(0).Height * (Index + 1)
+        '            Case LegendType.LegPoint
+        '                For Each lPoint In pUci.PointSources
+        '                    Index = lPoint.Id - 1
+        '                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
+        '                    With picLegend(Index)
+        '                        .Tag = Index + 1
+        '                        'find a way to shorten name
+        '                        spos = InStr(1, lPoint.Name, " ")
+        '                        cpos = InStr(1, lPoint.Name, ",")
+        '                        If spos < 10 And spos > 2 Then
+        '                            tname = lPoint.Name.Substring(0, spos - 1)
+        '                        ElseIf cpos < 10 And cpos > 2 Then
+        '                            tname = lPoint.Name.Substring(0, cpos - 1)
+        '                        Else
+        '                            tname = lPoint.Name.Substring(0, 10)
+        '                        End If
+        '                        Key = lPoint.Id & ":" & tname
+        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        .CurrentX = (.Width - .TextWidth(Key)) / 2
+        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        .CurrentY = (.Height - .TextHeight(Key)) / 2
+        '                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+        '                        picLegend(Index).Print(Key)
+        '                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
+        '                        .Visible = True
+        '                    End With
+        '                    Index = Index + 1
+        '                Next lPoint
+        '                LegendFullHeight = picLegend(0).Height * (Index + 1)
+        '            Case Else
+        '        End Select
+        '        SetLegendScrollButtons()
+        '        RefreshLegendSelections()
+        '        UpdateDetails()
+        '        Exit Sub
+        'ColorError:
+        '        colr = Color.Black
+        '        Err.Clear()
+        '        Resume Next
     End Sub
 
     Private Sub RefreshLegendSelections()
@@ -670,9 +933,9 @@ ColorError:
     '    Dim rch As Integer
     '    Dim vConn As Object
     '    Dim i As Integer
-    '    Dim lConn As ATCoHspf.HspfConnection
-    '    Dim lOper As ATCoHspf.HspfOperation
-    '    Dim lPoint As ATCoHspf.HspfPoint
+    '    Dim lConn As HspfConnection
+    '    Dim lOper As HspfOperation
+    '    Dim lPoint As HspfPoint
     '    Select Case CurrentLegend
     '        Case LegendType.LegLand
     '            LandSelected(Index) = Not LandSelected(Index)
@@ -886,12 +1149,13 @@ ColorError:
     End Sub
 
     Private Sub Icon_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        Dim lSender As clsIcon = sender
         If pDragging Then
             'move control to new position
             Dim MPosition As Point = Me.PointToClient(MousePosition)
             MPosition.Offset(pDragOffset)
-            sender.Location = MPosition
-            'DrawTreeBackground()
+            lSender.Location = MPosition
+            DrawTreeBackground() '(lSender)
         End If
     End Sub
 

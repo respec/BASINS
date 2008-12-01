@@ -26,6 +26,7 @@ Partial Class frmWinHSPF
         Me.TopToolStripPanel = New System.Windows.Forms.ToolStripPanel
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.FunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -67,7 +68,7 @@ Partial Class frmWinHSPF
         Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton
         Me.ToolStripContainer = New System.Windows.Forms.ToolStripContainer
         Me.SchematicDiagram = New ctlSchematic
-        Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -105,10 +106,16 @@ Partial Class frmWinHSPF
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenToolStripMenuItem, Me.SaveAsToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenToolStripMenuItem, Me.CloseToolStripMenuItem, Me.SaveAsToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(45, 23)
         Me.FileToolStripMenuItem.Text = "File"
+        '
+        'OpenToolStripMenuItem
+        '
+        Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
+        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(165, 24)
+        Me.OpenToolStripMenuItem.Text = "Open"
         '
         'SaveAsToolStripMenuItem
         '
@@ -192,7 +199,7 @@ Partial Class frmWinHSPF
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(137, 24)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(152, 24)
         Me.AboutToolStripMenuItem.Text = "About"
         '
         'RightToolStripPanel
@@ -221,7 +228,7 @@ Partial Class frmWinHSPF
         Me.ToolStrip2.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.ToolStrip2.Dock = System.Windows.Forms.DockStyle.None
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripButton, Me.OpenToolStripButton, Me.SaveToolStripButton, Me.PrintToolStripButton, Me.toolStripSeparator2, Me.HelpToolStripButton})
-        Me.ToolStrip2.Location = New System.Drawing.Point(6, 27)
+        Me.ToolStrip2.Location = New System.Drawing.Point(3, 27)
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Size = New System.Drawing.Size(131, 25)
         Me.ToolStrip2.TabIndex = 0
@@ -282,7 +289,7 @@ Partial Class frmWinHSPF
         Me.ToolStrip1.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.None
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.cmdReach, Me.cmdTime, Me.cmdLandUse, Me.cmdControl, Me.cmdPollutant, Me.cmdPoint, Me.cmdToolStripInputEditor, Me.cmdToolStripOutput, Me.ToolStripButton10, Me.cmdRunHSPF})
-        Me.ToolStrip1.Location = New System.Drawing.Point(137, 27)
+        Me.ToolStrip1.Location = New System.Drawing.Point(134, 27)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(248, 27)
         Me.ToolStrip1.TabIndex = 4
@@ -425,9 +432,9 @@ Partial Class frmWinHSPF
         '
         'ToolStripContainer.TopToolStripPanel
         '
+        Me.ToolStripContainer.TopToolStripPanel.Controls.Add(Me.MenuStrip1)
         Me.ToolStripContainer.TopToolStripPanel.Controls.Add(Me.ToolStrip2)
         Me.ToolStripContainer.TopToolStripPanel.Controls.Add(Me.ToolStrip1)
-        Me.ToolStripContainer.TopToolStripPanel.Controls.Add(Me.MenuStrip1)
         '
         'SchematicDiagram
         '
@@ -438,11 +445,11 @@ Partial Class frmWinHSPF
         Me.SchematicDiagram.TabIndex = 0
         Me.SchematicDiagram.UCI = Nothing
         '
-        'OpenToolStripMenuItem
+        'CloseToolStripMenuItem
         '
-        Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
-        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(165, 24)
-        Me.OpenToolStripMenuItem.Text = "Open"
+        Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(165, 24)
+        Me.CloseToolStripMenuItem.Text = "Close"
         '
         'frmWinHSPF
         '
@@ -517,5 +524,6 @@ Partial Class frmWinHSPF
     Friend WithEvents StarterToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents SchematicDiagram As ctlSchematic
     Friend WithEvents OpenToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents CloseToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

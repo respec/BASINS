@@ -129,8 +129,8 @@ Public Class frmInputDataEditor
                     If Not lOpnBlk.TableExists(lTableName) Then
                         If Logger.Msg("Table " & lTableName & " does not exist.  Do you want to add it?", MsgBoxStyle.YesNo, "WinHSPF - Input Data Editor") = MsgBoxResult.Ok Then
                             lOpnBlk.AddTableForAll(lTableName, lOperationName)
-                            'setDefaultsForTable(myUci, defUci, opname, tabname)
-                            'SetMissingValuesToDefaults(myUci, defUci)
+                            'setDefaultsForTable(pUci, defUci, opname, tabname)
+                            'SetMissingValuesToDefaults(pUci, defUci)
                             BoldActive()
                         End If
                     End If
@@ -140,7 +140,7 @@ Public Class frmInputDataEditor
                         'check for missing tables, add if needed
                         'CheckAndAddMissingTables(opname)
                         'CheckAndAddMassLinks()
-                        'SetMissingValuesToDefaults(myUci, defUci)
+                        'SetMissingValuesToDefaults(pUci, defUci)
                         BoldActive()
                     End If
                 Else
