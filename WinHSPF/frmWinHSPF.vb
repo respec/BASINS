@@ -351,7 +351,6 @@ Public Class frmWinHSPF
 
     End Sub
 
-    
     Private Sub cmdReach_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReach.Click
         ReachEditor()
     End Sub
@@ -362,5 +361,9 @@ Public Class frmWinHSPF
 
     Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
         OpenUCI()
+    End Sub
+
+    Private Sub CloseToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseToolStripMenuItem.Click
+        CloseUCI()
     End Sub
 End Class

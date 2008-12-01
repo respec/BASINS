@@ -67,6 +67,7 @@ Public Module WinHSPF
 
     'Open an existing uci file
     Sub OpenUCI(Optional ByVal aFileName As String = "")
+        CloseUCI()
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not IO.File.Exists(aFileName) Then
             Dim lOpenDialog As New OpenFileDialog
             With lOpenDialog
@@ -101,6 +102,15 @@ Public Module WinHSPF
     Sub SaveUCI()
         pUCI.Save()
         Logger.Dbg("WinHSPF:SaveUci:Done:" & pUCI.Name)
+    End Sub
+
+    Sub CloseUCI()
+        'TODO: confirm close if UCI has been edited
+        pUCI = Nothing
+        If pWinHSPF IsNot Nothing Then
+            pWinHSPF.Text = pWinHSPF.Tag
+            pWinHSPF.SchematicDiagram.UCI = pUCI
+        End If
     End Sub
 
     Sub ReachEditor()
