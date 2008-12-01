@@ -2766,7 +2766,7 @@ Public Class GisUtil
                             Dim lShapeArea As Double = Math.Abs(MapWinGeoProc.Utils.Area(lShapeNew))
                             Dim lFeature1Id As String = FieldValue(aPolygonLayer1Index, i - 1, aLayer1FieldIndex)
                             With lArea
-                                Dim lAreaPrev() As Double
+                                Dim lAreaPrev() As Double = Nothing
                                 If .TryGetValue(lFeature1Id, lAreaPrev) Then
                                     .Remove(lFeature1Id)
                                 Else
@@ -2860,7 +2860,7 @@ Public Class GisUtil
                     End If
 
                     With lArea
-                        Dim lAreaPrev() As Double
+                        Dim lAreaPrev() As Double = Nothing
                         If .TryGetValue(lGridValue, lAreaPrev) Then
                             .Remove(lGridValue)
                         Else
