@@ -26,9 +26,9 @@ Partial Class frmAddPoint
         Me.Label5 = New System.Windows.Forms.Label
         Me.AtcText1 = New atcControls.atcText
         Me.Label6 = New System.Windows.Forms.Label
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
-        Me.ComboBox2 = New System.Windows.Forms.ComboBox
-        Me.ComboBox3 = New System.Windows.Forms.ComboBox
+        Me.cboReach = New System.Windows.Forms.ComboBox
+        Me.cboPollutant = New System.Windows.Forms.ComboBox
+        Me.cboFac = New System.Windows.Forms.ComboBox
         Me.AtcText2 = New atcControls.atcText
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
@@ -111,29 +111,29 @@ Partial Class frmAddPoint
         Me.Label6.TabIndex = 6
         Me.Label6.Text = "PT-"
         '
-        'ComboBox1
+        'cboReach
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(86, 37)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(259, 21)
-        Me.ComboBox1.TabIndex = 7
+        Me.cboReach.FormattingEnabled = True
+        Me.cboReach.Location = New System.Drawing.Point(86, 37)
+        Me.cboReach.Name = "cboReach"
+        Me.cboReach.Size = New System.Drawing.Size(259, 21)
+        Me.cboReach.TabIndex = 7
         '
-        'ComboBox2
+        'cboPollutant
         '
-        Me.ComboBox2.FormattingEnabled = True
-        Me.ComboBox2.Location = New System.Drawing.Point(86, 64)
-        Me.ComboBox2.Name = "ComboBox2"
-        Me.ComboBox2.Size = New System.Drawing.Size(259, 21)
-        Me.ComboBox2.TabIndex = 8
+        Me.cboPollutant.FormattingEnabled = True
+        Me.cboPollutant.Location = New System.Drawing.Point(86, 64)
+        Me.cboPollutant.Name = "cboPollutant"
+        Me.cboPollutant.Size = New System.Drawing.Size(259, 21)
+        Me.cboPollutant.TabIndex = 8
         '
-        'ComboBox3
+        'cboFac
         '
-        Me.ComboBox3.FormattingEnabled = True
-        Me.ComboBox3.Location = New System.Drawing.Point(86, 91)
-        Me.ComboBox3.Name = "ComboBox3"
-        Me.ComboBox3.Size = New System.Drawing.Size(259, 21)
-        Me.ComboBox3.TabIndex = 9
+        Me.cboFac.FormattingEnabled = True
+        Me.cboFac.Location = New System.Drawing.Point(86, 91)
+        Me.cboFac.Name = "cboFac"
+        Me.cboFac.Size = New System.Drawing.Size(259, 21)
+        Me.cboFac.TabIndex = 9
         '
         'AtcText2
         '
@@ -188,9 +188,9 @@ Partial Class frmAddPoint
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.AtcText2)
-        Me.Controls.Add(Me.ComboBox3)
-        Me.Controls.Add(Me.ComboBox2)
-        Me.Controls.Add(Me.ComboBox1)
+        Me.Controls.Add(Me.cboFac)
+        Me.Controls.Add(Me.cboPollutant)
+        Me.Controls.Add(Me.cboReach)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.AtcText1)
         Me.Controls.Add(Me.Label5)
@@ -212,9 +212,9 @@ Partial Class frmAddPoint
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents AtcText1 As atcControls.atcText
     Friend WithEvents Label6 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
-    Friend WithEvents ComboBox2 As System.Windows.Forms.ComboBox
-    Friend WithEvents ComboBox3 As System.Windows.Forms.ComboBox
+    Friend WithEvents cboReach As System.Windows.Forms.ComboBox
+    Friend WithEvents cboPollutant As System.Windows.Forms.ComboBox
+    Friend WithEvents cboFac As System.Windows.Forms.ComboBox
     Friend WithEvents AtcText2 As atcControls.atcText
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button

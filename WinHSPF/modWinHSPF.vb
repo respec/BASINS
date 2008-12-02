@@ -8,6 +8,7 @@ Public Module WinHSPF
     Friend pMsg As HspfMsg
     Friend pIcon As Icon
     Friend pDefUCI As HspfUci
+    Friend pPollutantList As Collection
 
     'Variableize each form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReach As frmReach
