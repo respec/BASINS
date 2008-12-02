@@ -19,39 +19,42 @@ Public Class MetConstituents
         Dim lFoundEvap As Boolean = False
         For Each lMetConstituent As MetConstituent In Me
             If lMetConstituent.Type = "EVAP" Or lMetConstituent.Type = "PEVT" Then
+                If Not lMetConstituent.TimeSeries Is Nothing Then
+                    lSB.Append("[EVAPORATION]" & vbCrLf & _
+                               ";;Type       Parameters" & vbCrLf & _
+                               ";;---------- ----------" & vbCrLf)
 
-                lSB.Append("[EVAPORATION]" & vbCrLf & _
-                           ";;Type       Parameters" & vbCrLf & _
-                           ";;---------- ----------" & vbCrLf)
-
-                With lMetConstituent
-                    lSB.Append(StrPad("TIMESERIES", 12, " ", False))
-                    lSB.Append(" ")
-                    lSB.Append(StrPad(.TimeSeries.Attributes.GetValue("Location") & ":E", 10, " ", False))
-                    lSB.Append(" ")
-                    lSB.Append(vbCrLf)
-                End With
-                lFoundEvap = True
-                Exit For
+                    With lMetConstituent
+                        lSB.Append(StrPad("TIMESERIES", 12, " ", False))
+                        lSB.Append(" ")
+                        lSB.Append(StrPad(.TimeSeries.Attributes.GetValue("Location") & ":E", 10, " ", False))
+                        lSB.Append(" ")
+                        lSB.Append(vbCrLf)
+                    End With
+                    lFoundEvap = True
+                    Exit For
+                End If
             End If
         Next
 
         For Each lMetConstituent As MetConstituent In Me
             If lMetConstituent.Type = "ATEM" Or lMetConstituent.Type = "ATMP" Then
-                If lFoundEvap Then
-                    lSB.Append(vbCrLf)
+                If Not lMetConstituent.TimeSeries Is Nothing Then
+                    If lFoundEvap Then
+                        lSB.Append(vbCrLf)
+                    End If
+
+                    lSB.Append("[TEMPERATURE]" & vbCrLf)
+
+                    With lMetConstituent
+                        lSB.Append(StrPad("TIMESERIES", 12, " ", False))
+                        lSB.Append(" ")
+                        lSB.Append(StrPad(.TimeSeries.Attributes.GetValue("Location") & ":T", 10, " ", False))
+                        lSB.Append(" ")
+                        lSB.Append(vbCrLf)
+                    End With
+                    Exit For
                 End If
-
-                lSB.Append("[TEMPERATURE]" & vbCrLf)
-
-                With lMetConstituent
-                    lSB.Append(StrPad("TIMESERIES", 12, " ", False))
-                    lSB.Append(" ")
-                    lSB.Append(StrPad(.TimeSeries.Attributes.GetValue("Location") & ":T", 10, " ", False))
-                    lSB.Append(" ")
-                    lSB.Append(vbCrLf)
-                End With
-                Exit For
             End If
         Next
 
@@ -71,20 +74,24 @@ Public Class MetConstituents
         Dim lFoundEvap As Boolean = False
         For Each lMetConstituent As MetConstituent In Me
             If lMetConstituent.Type = "EVAP" Or lMetConstituent.Type = "PEVT" Then
-                aSW.Write(";EVAPORATION" & vbCrLf)
-                Me.SWMMProject.TimeSeriesToStream(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":E", aSW)
-                lFoundEvap = True
-                Exit For
+                If Not lMetConstituent.TimeSeries Is Nothing Then
+                    aSW.Write(";EVAPORATION" & vbCrLf)
+                    Me.SWMMProject.TimeSeriesToStream(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":E", aSW)
+                    lFoundEvap = True
+                    Exit For
+                End If
             End If
         Next
 
         For Each lMetConstituent As MetConstituent In Me
             If lMetConstituent.Type = "ATEM" Or lMetConstituent.Type = "ATMP" Then
-                If lFoundEvap Then
-                    aSW.Write(vbCrLf)
+                If Not lMetConstituent.TimeSeries Is Nothing Then
+                    If lFoundEvap Then
+                        aSW.Write(vbCrLf)
+                    End If
+                    aSW.Write(";TEMPERATURE" & vbCrLf)
+                    Me.SWMMProject.TimeSeriesToStream(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":T", aSW)
                 End If
-                aSW.Write(";TEMPERATURE" & vbCrLf)
-                Me.SWMMProject.TimeSeriesToStream(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":T", aSW)
             End If
         Next
 

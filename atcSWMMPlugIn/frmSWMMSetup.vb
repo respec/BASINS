@@ -1495,26 +1495,28 @@ Public Class frmSWMMSetup
                 lSJDate = Date2J(lSDate)
                 lEJDate = Date2J(lEDate)
 
-                If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
-                    Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS SWMM Problem")
-                    EnableControls(True)
-                    Exit Sub
-                End If
-                If lSJDate > lEJDate Then 'failed date check
-                    Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS SWMM Problem")
-                    EnableControls(True)
-                    Exit Sub
-                End If
-                If lSJMetDate > lEJMetDate Then 'failed date check
-                    Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
-                    EnableControls(True)
-                    Exit Sub
-                End If
-                'compare dates from met data with specified start and end dates, make sure they are valid
-                If lSJDate < lSJMetDate Or lEJMetDate < lEJDate Then 'failed date check
-                    Logger.Msg("The specified start/end dates are not within the dates of the specified meteorologic stations.", vbOKOnly, "BASINS SWMM Problem")
-                    EnableControls(True)
-                    Exit Sub
+                If cboMet.SelectedIndex > 0 Then
+                    If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
+                        Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS SWMM Problem")
+                        EnableControls(True)
+                        Exit Sub
+                    End If
+                    If lSJDate > lEJDate Then 'failed date check
+                        Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS SWMM Problem")
+                        EnableControls(True)
+                        Exit Sub
+                    End If
+                    If lSJMetDate > lEJMetDate Then 'failed date check
+                        Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
+                        EnableControls(True)
+                        Exit Sub
+                    End If
+                    'compare dates from met data with specified start and end dates, make sure they are valid
+                    If lSJDate < lSJMetDate Or lEJMetDate < lEJDate Then 'failed date check
+                        Logger.Msg("The specified start/end dates are not within the dates of the specified meteorologic stations.", vbOKOnly, "BASINS SWMM Problem")
+                        EnableControls(True)
+                        Exit Sub
+                    End If
                 End If
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
@@ -1777,6 +1779,8 @@ Public Class frmSWMMSetup
                 Dim lDataPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "data\"
                 txtMetWDMName.Text = lDataPath & "met_data\" & lDefaultState & ".wdm"
             End If
+        ElseIf lMetLayerName.IndexOf("<none>") > -1 Then 'none, clear out met wdm name
+            txtMetWDMName.Text = ""
         End If
     End Sub
 
@@ -1787,37 +1791,45 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
-        lblStatus.Text = "Reading Precipitation Data from WDM File..."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        EnableControls(False)
+        If Len(txtMetWDMName.Text) > 0 Then
+            lblStatus.Text = "Reading Precipitation Data from WDM File..."
+            Me.Refresh()
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+            EnableControls(False)
 
-        BuildListofValidStationNames(txtMetWDMName.Text, "PREC", pPrecStations)
-        SetPrecipStationGrid()
-        Logger.Dbg("Processing " & pPrecStations.Count & " PREC stations")
-        For Each lPrecStation As StationDetails In pPrecStations
-            cboPrecipStation.Items.Add(lPrecStation.Description)
-        Next
-        If cboPrecipStation.Items.Count > 0 Then
-            cboPrecipStation.SelectedIndex = 0
+            BuildListofValidStationNames(txtMetWDMName.Text, "PREC", pPrecStations)
+            SetPrecipStationGrid()
+            Logger.Dbg("Processing " & pPrecStations.Count & " PREC stations")
+            For Each lPrecStation As StationDetails In pPrecStations
+                cboPrecipStation.Items.Add(lPrecStation.Description)
+            Next
+            If cboPrecipStation.Items.Count > 0 Then
+                cboPrecipStation.SelectedIndex = 0
+            End If
+
+            lblStatus.Text = "Reading Other Meteorologic Data from WDM File..."
+            Me.Refresh()
+
+            BuildListofValidStationNames(txtMetWDMName.Text, "PEVT", pMetStations)
+            Logger.Dbg("Processing " & pMetStations.Count & " MET stations")
+            For Each lMetStation As StationDetails In pMetStations
+                cboOtherMet.Items.Add(lMetStation.Description)
+            Next
+            If cboOtherMet.Items.Count > 0 Then
+                cboOtherMet.SelectedIndex = 0
+            End If
+
+            lblStatus.Text = "Update specifications if desired, then click OK to proceed."
+            Me.Refresh()
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            EnableControls(True)
+        Else
+            'clear lists of precip and met stations
+            pPrecStations.Clear()
+            pMetStations.Clear()
+            cboPrecipStation.Items.Clear()
+            cboOtherMet.Items.Clear()
         End If
-
-        lblStatus.Text = "Reading Other Meteorologic Data from WDM File..."
-        Me.Refresh()
-
-        BuildListofValidStationNames(txtMetWDMName.Text, "PEVT", pMetStations)
-        Logger.Dbg("Processing " & pMetStations.Count & " MET stations")
-        For Each lMetStation As StationDetails In pMetStations
-            cboOtherMet.Items.Add(lMetStation.Description)
-        Next
-        If cboOtherMet.Items.Count > 0 Then
-            cboOtherMet.SelectedIndex = 0
-        End If
-
-        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-        EnableControls(True)
     End Sub
 
     Private Sub SetPrecipStationGrid()
