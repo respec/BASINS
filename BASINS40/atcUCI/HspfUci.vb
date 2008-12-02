@@ -1685,7 +1685,7 @@ Public Class HspfUci
             Try
                 SetAttr(aName, lFileAttribute - FileAttribute.ReadOnly)
             Catch e As Exception
-                logger.Msg("The WDM file " & aName & " is Read Only and cannot be opened in that state.", vbExclamation, "File Open Problem")
+                Logger.Msg("The WDM file " & aName & " is Read Only and cannot be opened in that state.", vbExclamation, "File Open Problem")
                 Return Nothing
             End Try
         End If
@@ -1859,8 +1859,8 @@ x:
 
     Public Function FindTimser(ByRef aScenario As String, _
                                ByRef aLocation As String, _
-                               ByRef aConstituent As String) As Collection
-        Dim lFindTimser As New Collection
+                               ByRef aConstituent As String) As Collection(Of atcData.atcTimeseries)
+        Dim lFindTimser As New Collection(Of atcData.atcTimeseries)
         For Each lTser As atcData.atcTimeseries In pTserFiles
             With lTser.Attributes
                 If (aScenario = .GetValue("Scenario") _
@@ -2063,7 +2063,7 @@ x:
         Next lWdmIndex
 
         If lWdmUnit > 0 Then 'okay to continue, look for matching WDM datasets
-            Dim lts As Collection = FindTimser(aOldScenario.ToUpper, "", "")
+            Dim lts As Collection(Of atcData.atcTimeseries) = FindTimser(aOldScenario.ToUpper, "", "")
             'return the names of the data sets from this wdm file
             Dim lDsn As Integer = 0
             For lIndex As Integer = 1 To lts.Count
