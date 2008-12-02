@@ -3,14 +3,64 @@ Imports atcUtility
 Imports MapWinUtility
 Imports System.Collections.ObjectModel
 
-Friend Class clsIcon
+Public Class ctlLegend
+
+    Public LegendType As EnumLegendType
+    Public Shared IconMargin As Integer = 3
+    Public Icons As New Generic.List(Of clsIcon)
+
+    Public Sub Clear()
+        With pnlLegend
+            .SuspendLayout()
+            If .BackgroundImage IsNot Nothing Then
+                .BackgroundImage.Dispose()
+                .BackgroundImage = Nothing 'New Bitmap(0, 0, Drawing.Imaging.PixelFormat.Format32bppArgb)
+            End If
+            .Controls.Clear()
+            For Each lControl As Control In Icons
+                lControl.Dispose()
+            Next
+            Icons.Clear()
+            .ResumeLayout()
+        End With
+    End Sub
+
+    Public Sub Add(ByVal aIcon As clsIcon)
+        Dim lY As Integer = IconMargin
+        If Icons.Count > 0 Then lY = Icons(Icons.Count - 1).Bottom + IconMargin * 2
+        Icons.Add(aIcon)        
+        aIcon.Top = lY
+        aIcon.Width = Me.Width
+        pnlLegend.Controls.Add(aIcon)
+    End Sub
+
+    Public Function Icon(ByVal aKey As String) As clsIcon
+        For Each lIcon As clsIcon In Icons
+            If lIcon.Tag = aKey Then Return lIcon
+        Next
+        Return Nothing
+    End Function
+
+    Private Sub btnScrollLegendUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendUp.Click
+
+    End Sub
+
+    Private Sub btnScrollLegendDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendDown.Click
+
+    End Sub
+
+End Class
+
+Public Enum EnumLegendType
+    LegLand = 0
+    LegMet = 1
+    LegPoint = 2
+End Enum
+
+Public Class clsIcon
     Inherits Windows.Forms.Control
 
     Public Selected As Boolean
-    Public pOperation As HspfOperation
-    Public DownstreamIcons As New Generic.List(Of clsIcon)
-    Public UpstreamIcons As New Generic.List(Of clsIcon)
-    Public DistanceFromOutlet As Integer = -1
     Public Key As String = ""
 
     Sub New()
@@ -21,6 +71,16 @@ Friend Class clsIcon
     Public Function Center() As Point
         Return New Point(Me.Left + Me.Width / 2, Me.Top + Me.Height / 2)
     End Function
+
+End Class
+
+Public Class clsSchematicIcon
+    Inherits clsIcon
+
+    Public pOperation As HspfOperation
+    Public DownstreamIcons As New Generic.List(Of clsIcon)
+    Public UpstreamIcons As New Generic.List(Of clsIcon)
+    Public DistanceFromOutlet As Integer = -1
 
     Public Property Operation() As HspfOperation
         Get
@@ -35,6 +95,7 @@ Friend Class clsIcon
             End If
         End Set
     End Property
+
 End Class
 
 Friend Class IconCollection
@@ -44,16 +105,10 @@ Friend Class IconCollection
     End Function
 End Class
 
-Friend Class PanelDoubleBuffer
+Public Class PanelDoubleBuffer
     Inherits Panel
     Sub New()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         UpdateStyles()
     End Sub
-End Class
-
-Public Class ctlLegend
-
-    Dim lIcons As Generic.List(Of clsIcon)
-
 End Class

@@ -22,28 +22,16 @@ Partial Class ctlLegend
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.pic = New System.Windows.Forms.PictureBox
         Me.btnScrollLegendUp = New System.Windows.Forms.Button
         Me.btnScrollLegendDown = New System.Windows.Forms.Button
-        CType(Me.pic, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.pnlLegend = New PanelDoubleBuffer()
         Me.SuspendLayout()
-        '
-        'pic
-        '
-        Me.pic.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.pic.Location = New System.Drawing.Point(0, 22)
-        Me.pic.Name = "pic"
-        Me.pic.Size = New System.Drawing.Size(300, 266)
-        Me.pic.TabIndex = 8
-        Me.pic.TabStop = False
         '
         'btnScrollLegendUp
         '
         Me.btnScrollLegendUp.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnScrollLegendUp.Location = New System.Drawing.Point(0, 1)
+        Me.btnScrollLegendUp.Location = New System.Drawing.Point(0, 0)
         Me.btnScrollLegendUp.Name = "btnScrollLegendUp"
         Me.btnScrollLegendUp.Size = New System.Drawing.Size(300, 21)
         Me.btnScrollLegendUp.TabIndex = 7
@@ -61,21 +49,31 @@ Partial Class ctlLegend
         Me.btnScrollLegendDown.Text = "v"
         Me.btnScrollLegendDown.UseVisualStyleBackColor = True
         '
+        'pnlLegend
+        '
+        Me.pnlLegend.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pnlLegend.Location = New System.Drawing.Point(0, 22)
+        Me.pnlLegend.Name = "pnlLegend"
+        Me.pnlLegend.Size = New System.Drawing.Size(300, 268)
+        Me.pnlLegend.TabIndex = 8
+        '
         'ctlLegend
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.Controls.Add(Me.pic)
-        Me.Controls.Add(Me.btnScrollLegendUp)
         Me.Controls.Add(Me.btnScrollLegendDown)
+        Me.Controls.Add(Me.btnScrollLegendUp)
+        Me.Controls.Add(Me.pnlLegend)
+        Me.Margin = New System.Windows.Forms.Padding(0)
         Me.Name = "ctlLegend"
         Me.Size = New System.Drawing.Size(300, 310)
-        CType(Me.pic, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents pic As System.Windows.Forms.PictureBox
     Friend WithEvents btnScrollLegendUp As System.Windows.Forms.Button
     Friend WithEvents btnScrollLegendDown As System.Windows.Forms.Button
+    Friend WithEvents pnlLegend As PanelDoubleBuffer
 
 End Class

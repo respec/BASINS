@@ -6,12 +6,6 @@ Imports System.Collections.ObjectModel
 <System.Runtime.InteropServices.ComVisible(False)> _
 Public Class ctlSchematic
 
-    Private Enum LegendType
-        LegLand = 0
-        LegMet = 1
-        LegPoint = 2
-    End Enum
-
     Friend WithEvents picTree As PanelDoubleBuffer
 
     Private pDragging As Boolean = False
@@ -20,15 +14,14 @@ Public Class ctlSchematic
     Private pClickedIcon As clsIcon
 
     Private pUci As atcUCI.HspfUci
-    Private pOperationTypesToInclude As New Generic.List(Of String)
+    Private pOperationTypesInDiagram As New Generic.List(Of String)
     Private pIcons As New IconCollection
     Private pOutlets As New IconCollection
     Private pIconsDistantFromOutlet As New atcCollection
     Private pIconsDistantFromOutletPlaced As New atcCollection
     Private pMaximumTreeDepth As Integer
     Private ColorMap As atcCollection '(Of Color)
-    Private CurrentLegend As LegendType = LegendType.LegLand
-    Private LegendOrder As Generic.List(Of String)
+
     Private TreeProblemMessageDisplayed As Boolean = False
     Private TreeLoopMessageDisplayed As Boolean = False
     Private LandSelected() As Boolean
@@ -40,8 +33,10 @@ Public Class ctlSchematic
     Private pIconWidth As Integer = 73
     Private pIconHeight As Integer = 41
     Private pBorderWidth As Integer = 3
-    Private pBarWidth As Integer = 4 'TODO: base on number of items in legend
     Private pTreeBackground As Bitmap
+
+    Private WithEvents pCurrentLegend As ctlLegend = Nothing
+    Private LegendOrder As Generic.List(Of String)
 
     Public Property UCI() As HspfUci
         Get
@@ -50,6 +45,7 @@ Public Class ctlSchematic
         Set(ByVal newValue As HspfUci)
             pUci = newValue
             BuildTree()
+            UpdateLegend()
         End Set
     End Property
 
@@ -61,8 +57,8 @@ Public Class ctlSchematic
 
             Dim lOperation As atcUCI.HspfOperation
             For Each lOperation In pUci.OpnSeqBlock.Opns
-                If pOperationTypesToInclude.Contains(lOperation.Name) Then
-                    Dim lNewIcon As New clsIcon
+                If pOperationTypesInDiagram.Contains(lOperation.Name) Then
+                    Dim lNewIcon As New clsSchematicIcon
                     With lNewIcon
                         .Size = lNodeSize
                         .BackColor = Color.SkyBlue
@@ -78,7 +74,7 @@ Public Class ctlSchematic
 
             If pIcons.Count > 0 Then 'okay to do tree
 
-                Dim lIcon As clsIcon
+                Dim lIcon As clsSchematicIcon
 
                 pMaximumTreeDepth = 1
 
@@ -86,7 +82,7 @@ Public Class ctlSchematic
                     With lIcon
                         .DistanceFromOutlet = DownLayers(lIcon, lIcon.Key & vbCrLf)
                         pIconsDistantFromOutlet.Increment(.DistanceFromOutlet, 1)
-                        Debug.WriteLine(.DistanceFromOutlet & ":" & pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet))
+                        'Debug.WriteLine(.DistanceFromOutlet & ":" & pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet))
                         If .DistanceFromOutlet > pMaximumTreeDepth Then
                             pMaximumTreeDepth = .DistanceFromOutlet
                         End If
@@ -96,7 +92,7 @@ Public Class ctlSchematic
                     End With
                 Next
                 For Each lIcon In pIcons
-                    For Each lUpIcon As clsIcon In lIcon.UpstreamIcons
+                    For Each lUpIcon As clsSchematicIcon In lIcon.UpstreamIcons
                         lUpIcon.DownstreamIcons.Add(lIcon)
                     Next
                 Next
@@ -160,7 +156,7 @@ Public Class ctlSchematic
         Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
         Dim lLinesPen As Pen = SystemPens.ControlDarkDark
 
-        For Each lIcon As clsIcon In pIcons
+        For Each lIcon As clsSchematicIcon In pIcons
             With lIcon
                 Dim lIconCenter As Point = .Center
                 For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
@@ -175,7 +171,7 @@ Public Class ctlSchematic
         picTree.BackgroundImage = pTreeBackground
     End Sub
 
-    Private Sub DrawTreeBackground(ByVal aIcon As clsIcon)
+    Private Sub DrawTreeBackground(ByVal aIcon As clsSchematicIcon)
         Dim lGraphics As Graphics = Graphics.FromImage(picTree.BackgroundImage)
         Dim lLinesPen As Pen = SystemPens.ControlDarkDark
         'Dim lClipLeft As Integer = aIcon.Left
@@ -229,16 +225,63 @@ Public Class ctlSchematic
         Dim lBitmap As New Bitmap(pIconWidth, pIconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
         Dim g As Graphics = Graphics.FromImage(lBitmap)
         setPicture(aOperation, g)
-        drawBorder(g, Not aPrinting)
+        drawBorder(g, pIconWidth, pIconHeight, Not aPrinting)
         g.Dispose()
         aControl.BackgroundImage = lBitmap
+    End Sub
+
+    Private Sub SetLandIcon(ByVal aOperation As HspfOperation, ByVal aKey As String, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
+        Dim lNewIcon As clsSchematicIcon
+        If aExistingIcon Is Nothing Then
+            lNewIcon = New clsSchematicIcon
+        Else
+            lNewIcon = aExistingIcon
+        End If
+        With lNewIcon
+            .Width = pCurrentLegend.Width
+            .Height = pIconHeight
+            .Operation = aOperation
+            Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
+            Dim g As Graphics = Graphics.FromImage(lBitmap)
+
+            Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aKey, Me.Font)
+            Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
+            Dim lY As Single = .Height - lStringMeasurement.Height * 1.25
+            Debug.Print(aKey & " " & lX & " " & lY)
+
+            If aExistingIcon Is Nothing Then
+                g.Clear(SystemColors.Control)
+                g.DrawString(aKey, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+            End If
+
+            Dim lBoxHeight As Integer = lY * 0.6
+            lY /= 4
+            lX = lY
+            Dim lBoxWidth As Integer = .Width * 0.4
+
+            If aOperation.Name = "PERLND" Then
+                lX = lY
+            Else
+                lX = .Width - lY - lBoxWidth
+            End If
+            Dim lBrush As Brush = New SolidBrush(ColorFromDesc(aKey))
+            g.FillRectangle(lBrush, lX, lY, lBoxWidth, lBoxHeight)
+
+            drawBorder(g, .Width, .Height, Not aPrinting)
+            g.Dispose()
+            .BackgroundImage = lBitmap
+            'AddHandler .MouseDown, AddressOf Icon_MouseDown
+            'AddHandler .MouseMove, AddressOf Icon_MouseMove
+            'AddHandler .MouseUp, AddressOf Icon_MouseUp
+        End With
+        aExistingIcon = lNewIcon
     End Sub
 
     'Draw icon representing aOperation into given graphics object
     Public Sub setPicture(ByVal aOperation As HspfOperation, ByVal g As Graphics)
         Dim barbase, barHeight, sid, barPos As Integer
         Dim lStr As String
-        Dim barDesc As Object
+        Dim barDesc As String
         Dim lSource As HspfConnection
         Dim barMaxVal As Double
         Dim started As Boolean
@@ -256,23 +299,39 @@ Public Class ctlSchematic
         g.DrawString(lStr, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
         Dim myid As Integer
         Dim pPoint As HspfPointSource
-        Select Case CurrentLegend
-            Case LegendType.LegLand
+        Select Case pCurrentLegend.LegendType
+            Case EnumLegendType.LegLand
                 barMaxVal = pUci.MaxAreaByLand2Stream
-                barPos = pBarWidth
-                If LegendOrder Is Nothing Then 'Draw all in the order they fall
+                barPos = 3
+                Dim lBarWidth As Integer
+                Dim lBarSpace As Integer = 1
+                If LegendOrder Is Nothing OrElse LegendOrder.Count = 0 Then 'Draw all in the order they fall
+                    lBarWidth = (pIconWidth - 6) / aOperation.Sources.Count
+                    If lBarWidth < 1 Then
+                        lBarWidth = 1
+                        lBarSpace = 0
+                    ElseIf lBarWidth > 10 Then
+                        lBarWidth = 10
+                    End If
                     For Each lSource In aOperation.Sources
                         If lSource.Source IsNot Nothing AndAlso lSource.Source.Opn IsNot Nothing _
                           AndAlso (lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND") Then
                             barHeight = barbase * lSource.MFact / barMaxVal
                             If barHeight > 0 Then
                                 Dim lBrush As Brush = New SolidBrush(ColorFromDesc(lSource.Source.Opn.Description))
-                                g.FillRectangle(lBrush, barPos, barbase - barHeight, pBarWidth, barHeight)
+                                g.FillRectangle(lBrush, barPos, barbase - barHeight, lBarWidth, barHeight)
                             End If
-                            barPos += pBarWidth + 1
+                            barPos += lBarWidth + lBarSpace
                         End If
                     Next lSource
                 Else 'Draw only land uses in LegendOrder, in order and leaving spaces for ones that do not appear in this segment
+                    lBarWidth = (pIconWidth - 6) / LegendOrder.Count
+                    If lBarWidth < 1 Then
+                        lBarWidth = 1
+                        lBarSpace = 0
+                    ElseIf lBarWidth > 10 Then
+                        lBarWidth = 10
+                    End If
                     For Each barDesc In LegendOrder
                         barHeight = 0
                         For Each lSource In aOperation.Sources
@@ -284,12 +343,12 @@ Public Class ctlSchematic
                         Next lSource
                         If barHeight > 0 Then
                             Dim lBrush As Brush = New SolidBrush(ColorFromDesc(barDesc))
-                            g.FillRectangle(lBrush, barPos, barbase - barHeight, pBarWidth, barHeight)
+                            g.FillRectangle(lBrush, barPos, barbase - barHeight, lBarWidth, barHeight)
                         End If
-                        barPos += pBarWidth + 1
+                        barPos += lBarWidth + lBarSpace
                     Next barDesc
                 End If
-            Case LegendType.LegMet
+            Case EnumLegendType.LegMet
                 ReDim included(pUci.MetSegs.Count)
                 If Not aOperation.MetSeg Is Nothing Then
                     included(aOperation.MetSeg.Id) = True
@@ -331,7 +390,7 @@ Public Class ctlSchematic
                     End If
                 Next
                 'pic.Font.Underline = False
-            Case LegendType.LegPoint
+            Case EnumLegendType.LegPoint
                 ReDim included(pUci.PointSources.Count)
                 'Debug.Print pPointSources.Count
                 For Each pPoint In aOperation.PointSources
@@ -407,26 +466,24 @@ Public Class ctlSchematic
 
     End Function
 
-    Private Sub drawBorder(ByRef pic As Graphics, ByRef threeD As Boolean)
+    Private Sub drawBorder(ByVal pic As Graphics, ByVal aWidth As Integer, ByVal aHeight As Integer, ByVal threeD As Boolean)
         Dim lPen As Pen
         If threeD Then
             lPen = New Pen(SystemColors.ControlLightLight)
         Else
             lPen = New Pen(Color.Black)
         End If
-        pic.DrawLine(lPen, 0, 0, 0, pIconHeight)
-        pic.DrawLine(lPen, 0, 0, pIconWidth, 0)
+        pic.DrawLine(lPen, 0, 0, 0, aHeight)
+        pic.DrawLine(lPen, 0, 0, aWidth, 0)
         If threeD Then
             lPen = New Pen(System.Drawing.SystemColors.ControlDark)
-            'Else
-            '    lPen = New Pen(System.Drawing.Color.Black)
         End If
-        pic.DrawLine(lPen, 0, pIconHeight - 1, pIconWidth - 1, pIconHeight - 1)
-        pic.DrawLine(lPen, pIconWidth - 1, 0, pIconWidth - 1, pIconHeight - 1)
+        pic.DrawLine(lPen, 0, aHeight - 1, aWidth - 1, aHeight - 1)
+        pic.DrawLine(lPen, aWidth - 1, 0, aWidth - 1, aHeight - 1)
     End Sub
 
     'height of tree of this plus all downstream operations. 1=none downstream
-    Private Function DownLayers(ByVal aIcon As clsIcon, ByVal aAlreadyInPath As String) As Integer
+    Private Function DownLayers(ByVal aIcon As clsSchematicIcon, ByVal aAlreadyInPath As String) As Integer
         Dim lDeepestTarget As Integer = 0
         For Each lTarConn As atcUCI.HspfConnection In aIcon.Operation.Targets
             Dim lTarOperation As HspfOperation = lTarConn.Target.Opn
@@ -439,7 +496,7 @@ Public Class ctlSchematic
                 Else
                     If pIcons.Contains(lKey) Then
                         aAlreadyInPath &= lKey & vbCrLf
-                        Dim lIcon As clsIcon = pIcons(lKey)
+                        Dim lIcon As clsSchematicIcon = pIcons(lKey)
                         If Not lIcon.UpstreamIcons.Contains(aIcon) Then lIcon.UpstreamIcons.Add(aIcon)
                         Dim lTargetDepth As Integer = DownLayers(lIcon, aAlreadyInPath)
                         If lTargetDepth > lDeepestTarget Then
@@ -452,7 +509,7 @@ Public Class ctlSchematic
         Return lDeepestTarget + 1
     End Function
 
-    Private Sub LayoutFromIcon(ByVal aIcon As clsIcon, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
+    Private Sub LayoutFromIcon(ByVal aIcon As clsSchematicIcon, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
         DrawPictureOnReachControl(aIcon.Operation, aPrinting, aIcon)
         With aIcon
             aIcon.Top = aY - pIconHeight / 2
@@ -487,10 +544,10 @@ Public Class ctlSchematic
     End Sub
 
     Public Sub UpdateDetails()
-        Select Case CurrentLegend
-            Case LegendType.LegLand : PopulateLandGrid()
-            Case LegendType.LegMet : PopulateMetGrid()
-            Case LegendType.LegPoint : PopulatePointGrid()
+        Select Case pCurrentLegend.LegendType
+            Case EnumLegendType.LegLand : PopulateLandGrid()
+            Case EnumLegendType.LegMet : PopulateMetGrid()
+            Case EnumLegendType.LegPoint : PopulatePointGrid()
             Case Else
                 agdDetails.Visible = False
         End Select
@@ -535,7 +592,7 @@ Public Class ctlSchematic
                     lDesc = picLegend(luse).Tag
                     .Rows = .Rows + 1
                     .CellValue(.Rows, 0) = lDesc
-                    For Each lReach As clsIcon In pIcons ' rch = 0 To picReach.Count - 1
+                    For Each lReach As clsSchematicIcon In pIcons
                         AddedThisReach = False
                         If lReach.Selected Then
                             For Each lConn In lReach.Operation.Sources
@@ -738,187 +795,215 @@ Public Class ctlSchematic
         'agdDetails.Visible = True
     End Sub
 
-
     Public Sub UpdateLegend()
-        '        Dim item As Object
-        '        Dim Key As String
-        '        Dim srch, Index, oprindex As Integer
-        '        Dim colr As Color
-        '        Dim i As Integer
-        '        Dim S As String
-        '        Dim ypos, xpos, colonpos As Integer
-        '        Dim boxWidth, boxHeight, txtHeight As Integer
-        '        Dim lOper As atcUCI.HspfOperation
-        '        Dim spos, maxpic, cpos As Integer
-        '        Dim tname As String
-
-        '        LegendOrder = Nothing
-
-        '        Dim picTab As Graphics
-        '        picTab.Clear(Color.White)
-        '        For Index = 0 To picLegend.Count - 1
-        '            With picLegend(Index)
-        '                .Tag = ""
-        '                .Cls()
-        '                .Visible = False
-        '                .Width = picTab.ClipBounds.Width
-        '            End With
-        '        Next
-
-        '        boxWidth = picTab.ClipBounds.Width * 0.4
-        '        txtHeight = picTab.MeasureString("X", Me.Font).Height
-        '        boxHeight = txtHeight * 2
-        '        Index = 0
-        '        ypos = 0 'boxHeight + txtHeight
-        '        maxpic = 0
-        '        Dim lPoint As atcUCI.HspfPointSource
-        '        Dim lmetseg As atcUCI.HspfMetSeg
-        '        Dim lX As Single = 0
-        '        Dim lY As Single = 0
-        '        Select Case CurrentLegend
-        '            Case LegendType.LegLand
-        '                LegendOrder = New Generic.List(Of String)
-        '                'TODO: picTab.Font = VB6.FontChangeSize(picTab.Font, 8)
-        '                If picTab.MeasureString("Perlnd   Implnd", Me.Font).Width > picTab.ClipBounds.Width Then
-        '                    lX = (boxWidth - picTab.MeasureString("Per", Me.Font).Width) / 2
-        '                    picTab.DrawString(" Per", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-        '                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Imp", Me.Font).Width) / 2)
-        '                    picTab.DrawString("Imp ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-        '                Else
-        '                    lX = (boxWidth - picTab.MeasureString("Perlnd", Me.Font).Width) / 2
-        '                    picTab.DrawString(" Perlnd", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-        '                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Implnd", Me.Font).Width) / 2)
-        '                    picTab.DrawString("Implnd ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-        '                End If
-        '                ypos = txtHeight
-        '                picLegend(0).Top = ypos
-        '                If pUci.Name <> "" Then
-        '                    'UPGRADE_WARNING: Couldn't resolve default property of object pUci.OpnSeqBlock.Opns.Count. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        '                    For oprindex = 1 To pUci.OpnSeqBlock.Opns.Count
-        '                        lOper = pUci.OpnSeqBlock.Opn(oprindex)
-        '                        If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
-        '                            Key = lOper.Description
-        '                            colonpos = InStr(Key, ":")
-        '                            If colonpos > 0 Then Key = Mid(Key, colonpos + 1)
-        '                            For Index = 0 To picLegend.Count - 1
-        '                                If Key = picLegend(Index).Tag Or picLegend(Index).Tag = "" Then Exit For
-        '                            Next
-        '                            If Index >= picLegend.Count Then
-        '                                'TODO: picLegend.Load(Index)
-        '                                picLegend(Index).Tag = ""
-        '                                picLegend(Index).Width = picTab.ClipBounds.Width
-        '                            End If
-        '                            With picLegend(Index)
-        '                                If Index > maxpic Then maxpic = Index
-        '                                .Height = boxHeight * 1.5 + txtHeight
-        '                                If .Tag = "" Then
-        '                                    .Tag = Key
-        '                                    .Top = ypos - LegendScrollPos
-        '                                    ypos = ypos + .Height
-        '                                    .Visible = True
-        '                                End If
-        '                                'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                .CurrentX = (.Width - .TextWidth(Key)) / 2
-        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                If .CurrentX < 2 Then .CurrentX = 2
-        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                .CurrentY = boxHeight * 1.5
-        '                                'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                picLegend(Index).Print(Key)
-
-        '                                On Error GoTo ColorError
-        '                                'UPGRADE_WARNING: Couldn't resolve default property of object ColorMap(). Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        '                                colr = ColorFromDesc(Key)
-        '                                On Error GoTo 0
-        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                .CurrentY = boxHeight / 4
-        '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                If lOper.Name = "PERLND" Then
-        '                                    .CurrentX = 0
-        '                                Else
-        '                                    'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                    .CurrentX = .Width - boxWidth
-        '                                End If
-        '                                'UPGRADE_ISSUE: PictureBox method picLegend.Line was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                                'TODO: picLegend(Index).Line (boxWidth, boxHeight), colr, BF
-        '                            End With
-        '                        End If
-        '                    Next
-        '                End If
-        '                LegendFullHeight = ypos
-        '                ReDim Preserve LandSelected(maxpic)
-        '                For Index = 0 To picLegend.Count - 1
-        '                    If picLegend(Index).Tag <> "" Then LegendOrder.Add(picLegend(Index).Tag)
-        '                Next Index
-        '            Case LegendType.LegMet
-        '                For Each lmetseg In pUci.MetSegs
-        '                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
-        '                    With picLegend(Index)
-        '                        .Tag = Index + 1
-        '                        i = InStr(1, lmetseg.Name, ",")
-        '                        If i > 0 Then
-        '                            S = Mid(lmetseg.Name, 1, i - 1) & vbCr & Mid(lmetseg.Name, i + 1)
-        '                        Else
-        '                            S = lmetseg.Name
-        '                        End If
-        '                        Key = lmetseg.Id & ":" & S
-        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        .CurrentX = (.Width - .TextWidth(Key)) / 2
-        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        .CurrentY = (.Height - .TextHeight(Key)) / 2
-        '                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        picLegend(Index).Print(Key) 'Precip location name might be nicer
-        '                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
-        '                        .Visible = True
-        '                    End With
-        '                    Index = Index + 1
-        '                Next lmetseg
-        '                LegendFullHeight = picLegend(0).Height * (Index + 1)
-        '            Case LegendType.LegPoint
-        '                For Each lPoint In pUci.PointSources
-        '                    Index = lPoint.Id - 1
-        '                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
-        '                    With picLegend(Index)
-        '                        .Tag = Index + 1
-        '                        'find a way to shorten name
-        '                        spos = InStr(1, lPoint.Name, " ")
-        '                        cpos = InStr(1, lPoint.Name, ",")
-        '                        If spos < 10 And spos > 2 Then
-        '                            tname = lPoint.Name.Substring(0, spos - 1)
-        '                        ElseIf cpos < 10 And cpos > 2 Then
-        '                            tname = lPoint.Name.Substring(0, cpos - 1)
-        '                        Else
-        '                            tname = lPoint.Name.Substring(0, 10)
-        '                        End If
-        '                        Key = lPoint.Id & ":" & tname
-        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        .CurrentX = (.Width - .TextWidth(Key)) / 2
-        '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        .CurrentY = (.Height - .TextHeight(Key)) / 2
-        '                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '                        picLegend(Index).Print(Key)
-        '                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
-        '                        .Visible = True
-        '                    End With
-        '                    Index = Index + 1
-        '                Next lPoint
-        '                LegendFullHeight = picLegend(0).Height * (Index + 1)
-        '            Case Else
-        '        End Select
-        '        SetLegendScrollButtons()
-        '        RefreshLegendSelections()
-        '        UpdateDetails()
-        '        Exit Sub
-        'ColorError:
-        '        colr = Color.Black
-        '        Err.Clear()
-        '        Resume Next
+        pCurrentLegend.SuspendLayout()
+        pCurrentLegend.Clear()
+        If pUci IsNot Nothing Then
+            Dim lNodeSize As New Drawing.Size(pCurrentLegend.Width, pIconHeight)
+            LegendOrder = New Generic.List(Of String)
+            Select Case pCurrentLegend.LegendType
+                Case EnumLegendType.LegLand
+                    Dim lOperation As atcUCI.HspfOperation
+                    For Each lOperation In pUci.OpnSeqBlock.Opns
+                        If lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND" Then
+                            Dim lKey As String = lOperation.Description
+                            If lKey.Contains(":") Then lKey = lKey.Substring(lKey.IndexOf(":") + 1)
+                            If lKey.Length = 0 Then lKey = "Unnamed"
+                            Dim lIcon As clsIcon = pCurrentLegend.Icon(lKey)
+                            If lIcon Is Nothing Then
+                                SetLandIcon(lOperation, lKey, False, lIcon)
+                                pCurrentLegend.Add(lIcon)
+                                LegendOrder.Add(lKey)
+                            Else 'Just add to existing icon, don't need to create a new one
+                                SetLandIcon(lOperation, lKey, False, lIcon)
+                            End If
+                        End If
+                    Next
+            End Select
+        End If
+        pCurrentLegend.ResumeLayout()
     End Sub
+
+    '    Public Sub UpdateLegend()
+    '        Dim item As Object
+    '        Dim Key As String
+    '        Dim srch, Index, oprindex As Integer
+    '        Dim colr As Color
+    '        Dim i As Integer
+    '        Dim S As String
+    '        Dim ypos, xpos, colonpos As Integer
+    '        Dim boxWidth, boxHeight, txtHeight As Integer
+    '        Dim lOper As atcUCI.HspfOperation
+    '        Dim spos, maxpic, cpos As Integer
+    '        Dim tname As String
+
+    '        LegendOrder = Nothing
+
+    '        Dim picTab As Graphics
+    '        picTab.Clear(Color.White)
+    '        For Index = 0 To picLegend.Count - 1
+    '            With picLegend(Index)
+    '                .Tag = ""
+    '                .Cls()
+    '                .Visible = False
+    '                .Width = picTab.ClipBounds.Width
+    '            End With
+    '        Next
+
+    '        boxWidth = picTab.ClipBounds.Width * 0.4
+    '        txtHeight = picTab.MeasureString("X", Me.Font).Height
+    '        boxHeight = txtHeight * 2
+    '        Index = 0
+    '        ypos = 0 'boxHeight + txtHeight
+    '        maxpic = 0
+    '        Dim lPoint As atcUCI.HspfPointSource
+    '        Dim lmetseg As atcUCI.HspfMetSeg
+    '        Dim lX As Single = 0
+    '        Dim lY As Single = 0
+    '        Select Case pCurrentLegend.LegendType
+    '            Case EnumLegendType.LegLand
+    '                LegendOrder = New Generic.List(Of String)
+    '                'TODO: picTab.Font = VB6.FontChangeSize(picTab.Font, 8)
+    '                If picTab.MeasureString("Perlnd   Implnd", Me.Font).Width > picTab.ClipBounds.Width Then
+    '                    lX = (boxWidth - picTab.MeasureString("Per", Me.Font).Width) / 2
+    '                    picTab.DrawString(" Per", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+    '                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Imp", Me.Font).Width) / 2)
+    '                    picTab.DrawString("Imp ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+    '                Else
+    '                    lX = (boxWidth - picTab.MeasureString("Perlnd", Me.Font).Width) / 2
+    '                    picTab.DrawString(" Perlnd", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+    '                    lX = picTab.ClipBounds.Width - ((boxWidth + picTab.MeasureString("Implnd", Me.Font).Width) / 2)
+    '                    picTab.DrawString("Implnd ", Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+    '                End If
+    '                ypos = txtHeight
+    '                picLegend(0).Top = ypos
+    '                If pUci.Name <> "" Then
+    '                    'UPGRADE_WARNING: Couldn't resolve default property of object pUci.OpnSeqBlock.Opns.Count. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+    '                    For oprindex = 1 To pUci.OpnSeqBlock.Opns.Count
+    '                        lOper = pUci.OpnSeqBlock.Opn(oprindex)
+    '                        If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
+    '                            Key = lOper.Description
+    '                            colonpos = InStr(Key, ":")
+    '                            If colonpos > 0 Then Key = Mid(Key, colonpos + 1)
+    '                            For Index = 0 To picLegend.Count - 1
+    '                                If Key = picLegend(Index).Tag Or picLegend(Index).Tag = "" Then Exit For
+    '                            Next
+    '                            If Index >= picLegend.Count Then
+    '                                'TODO: picLegend.Load(Index)
+    '                                picLegend(Index).Tag = ""
+    '                                picLegend(Index).Width = picTab.ClipBounds.Width
+    '                            End If
+    '                            With picLegend(Index)
+    '                                If Index > maxpic Then maxpic = Index
+    '                                .Height = boxHeight * 1.5 + txtHeight
+    '                                If .Tag = "" Then
+    '                                    .Tag = Key
+    '                                    .Top = ypos - LegendScrollPos
+    '                                    ypos = ypos + .Height
+    '                                    .Visible = True
+    '                                End If
+    '                                'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                .CurrentX = (.Width - .TextWidth(Key)) / 2
+    '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                If .CurrentX < 2 Then .CurrentX = 2
+    '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                .CurrentY = boxHeight * 1.5
+    '                                'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                picLegend(Index).Print(Key)
+
+    '                                On Error GoTo ColorError
+    '                                'UPGRADE_WARNING: Couldn't resolve default property of object ColorMap(). Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+    '                                colr = ColorFromDesc(Key)
+    '                                On Error GoTo 0
+    '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                .CurrentY = boxHeight / 4
+    '                                'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                If lOper.Name = "PERLND" Then
+    '                                    .CurrentX = 0
+    '                                Else
+    '                                    'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                    .CurrentX = .Width - boxWidth
+    '                                End If
+    '                                'UPGRADE_ISSUE: PictureBox method picLegend.Line was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                                'TODO: picLegend(Index).Line (boxWidth, boxHeight), colr, BF
+    '                            End With
+    '                        End If
+    '                    Next
+    '                End If
+    '                LegendFullHeight = ypos
+    '                ReDim Preserve LandSelected(maxpic)
+    '                For Index = 0 To picLegend.Count - 1
+    '                    If picLegend(Index).Tag <> "" Then LegendOrder.Add(picLegend(Index).Tag)
+    '                Next Index
+    '            Case EnumLegendType.LegMet
+    '                For Each lmetseg In pUci.MetSegs
+    '                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
+    '                    With picLegend(Index)
+    '                        .Tag = Index + 1
+    '                        i = InStr(1, lmetseg.Name, ",")
+    '                        If i > 0 Then
+    '                            S = Mid(lmetseg.Name, 1, i - 1) & vbCr & Mid(lmetseg.Name, i + 1)
+    '                        Else
+    '                            S = lmetseg.Name
+    '                        End If
+    '                        Key = lmetseg.Id & ":" & S
+    '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        .CurrentX = (.Width - .TextWidth(Key)) / 2
+    '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        .CurrentY = (.Height - .TextHeight(Key)) / 2
+    '                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        picLegend(Index).Print(Key) 'Precip location name might be nicer
+    '                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
+    '                        .Visible = True
+    '                    End With
+    '                    Index = Index + 1
+    '                Next lmetseg
+    '                LegendFullHeight = picLegend(0).Height * (Index + 1)
+    '            Case EnumLegendType.LegPoint
+    '                For Each lPoint In pUci.PointSources
+    '                    Index = lPoint.Id - 1
+    '                    'TODO: If Index >= picLegend.Count Then picLegend.Load(Index)
+    '                    With picLegend(Index)
+    '                        .Tag = Index + 1
+    '                        'find a way to shorten name
+    '                        spos = InStr(1, lPoint.Name, " ")
+    '                        cpos = InStr(1, lPoint.Name, ",")
+    '                        If spos < 10 And spos > 2 Then
+    '                            tname = lPoint.Name.Substring(0, spos - 1)
+    '                        ElseIf cpos < 10 And cpos > 2 Then
+    '                            tname = lPoint.Name.Substring(0, cpos - 1)
+    '                        Else
+    '                            tname = lPoint.Name.Substring(0, 10)
+    '                        End If
+    '                        Key = lPoint.Id & ":" & tname
+    '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        .CurrentX = (.Width - .TextWidth(Key)) / 2
+    '                        'UPGRADE_ISSUE: PictureBox method picLegend.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        'UPGRADE_ISSUE: PictureBox property picLegend.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        .CurrentY = (.Height - .TextHeight(Key)) / 2
+    '                        'UPGRADE_ISSUE: PictureBox method picLegend.Print was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '                        picLegend(Index).Print(Key)
+    '                        If Index > 0 Then .Top = picLegend(Index - 1).Top + picLegend(Index - 1).Height
+    '                        .Visible = True
+    '                    End With
+    '                    Index = Index + 1
+    '                Next lPoint
+    '                LegendFullHeight = picLegend(0).Height * (Index + 1)
+    '            Case Else
+    '        End Select
+    '        SetLegendScrollButtons()
+    '        RefreshLegendSelections()
+    '        UpdateDetails()
+    '        Exit Sub
+    'ColorError:
+    '        colr = Color.Black
+    '        Err.Clear()
+    '        Resume Next
+    '    End Sub
 
     Private Sub RefreshLegendSelections()
         Dim Index As Short
@@ -1014,12 +1099,12 @@ Public Class ctlSchematic
         LegendSelected = False
         If IsNumeric(tag_Renamed) Then
             'If picLegend(CInt(tag)).Point(0, 0) = HighlightColor Then LegendSelected = True
-            Select Case CurrentLegend
-                Case LegendType.LegLand
+            Select Case pCurrentLegend.LegendType
+                Case EnumLegendType.LegLand
                     If CShort(tag_Renamed) <= UBound(LandSelected) Then
                         LegendSelected = LandSelected(CShort(tag_Renamed))
                     End If
-                Case LegendType.LegMet : If CShort(tag_Renamed) = MetSelected Then LegendSelected = True
+                Case EnumLegendType.LegMet : If CShort(tag_Renamed) = MetSelected Then LegendSelected = True
             End Select
         Else
             For i = 0 To picLegend.Count - 1
@@ -1086,8 +1171,14 @@ Public Class ctlSchematic
         picTree.BackColor = SystemColors.Window
         picTree.Dock = DockStyle.Fill
 
-        pOperationTypesToInclude.Add("RCHRES")
-        pOperationTypesToInclude.Add("BMPRAC")
+        pOperationTypesInDiagram.Add("RCHRES")
+        pOperationTypesInDiagram.Add("BMPRAC")
+
+        LegendLandSurface.LegendType = EnumLegendType.LegLand
+        LegendMetSegs.LegendType = EnumLegendType.LegMet
+        LegendPointSources.LegendType = EnumLegendType.LegPoint
+        pCurrentLegend = LegendLandSurface
+
         InitColorMap()
     End Sub
 
@@ -1115,16 +1206,21 @@ Public Class ctlSchematic
 
     Private Sub tabLeft_Selected(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles tabLeft.Selected
         Select Case e.TabPageIndex
-            Case 0 : CurrentLegend = LegendType.LegLand
-            Case 1 : CurrentLegend = LegendType.LegMet
-            Case 2 : CurrentLegend = LegendType.LegPoint
+            Case 0 : pCurrentLegend = LegendLandSurface
+            Case 1 : pCurrentLegend = LegendMetSegs
+            Case 2 : pCurrentLegend = LegendPointSources
         End Select
         Me.BuildTree()
+        Me.UpdateLegend()
     End Sub
 
-
+    ''' <summary>
+    ''' User is clicking on an icon in the schematic
+    ''' </summary>
+    ''' <param name="sender">Schematic icon being clicked</param>
+    ''' <param name="e"></param>
     Private Sub Icon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-        Dim lSender As clsIcon = sender
+        Dim lSender As clsSchematicIcon = sender
         Select Case e.Button
             Case MouseButtons.Left
                 pBeforeDragLocation = lSender.Location
@@ -1148,6 +1244,11 @@ Public Class ctlSchematic
         End Select
     End Sub
 
+    ''' <summary>
+    ''' Mouse is moving on an icon in the schematic, may be dragging
+    ''' </summary>
+    ''' <param name="sender">Schematic icon under mouse</param>
+    ''' <param name="e"></param>
     Private Sub Icon_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Dim lSender As clsIcon = sender
         If pDragging Then
@@ -1159,6 +1260,11 @@ Public Class ctlSchematic
         End If
     End Sub
 
+    ''' <summary>
+    ''' User is releasing mouse button on an icon in the schematic
+    ''' </summary>
+    ''' <param name="sender">Schematic icon being clicked</param>
+    ''' <param name="e"></param>
     Private Sub Icon_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Select Case e.Button
             Case Windows.Forms.MouseButtons.Left
@@ -1194,18 +1300,16 @@ Public Class ctlSchematic
         DrawTreeBackground()
     End Sub
 
-    Private Sub SelectDownstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsIcon)
+    Private Sub SelectDownstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsSchematicIcon)
         aIcon.Selected = True
-        For Each lIcon As clsIcon In pIcons
-            If lIcon.UpstreamIcons.Contains(aIcon) Then
-                SelectDownstreamIcons(aSelect, lIcon)
-            End If
+        For Each lIcon As clsSchematicIcon In aIcon.DownstreamIcons
+            SelectDownstreamIcons(aSelect, lIcon)
         Next
     End Sub
 
-    Private Sub SelectUpstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsIcon)
+    Private Sub SelectUpstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsSchematicIcon)
         aIcon.Selected = True
-        For Each lIcon As clsIcon In aIcon.UpstreamIcons
+        For Each lIcon As clsSchematicIcon In aIcon.UpstreamIcons
             SelectUpstreamIcons(aSelect, lIcon)
         Next
     End Sub
@@ -1231,5 +1335,9 @@ Public Class ctlSchematic
 
     Private Sub picTree_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles picTree.Resize
         LayoutTree()
+    End Sub
+
+    Private Sub pCurrentLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles pCurrentLegend.Resize
+        UpdateLegend()
     End Sub
 End Class
