@@ -41,7 +41,7 @@ Friend Module modSWMMFromMW
                 End If
                 Logger.Dbg("Assigned Rain Gage " & lCatchment.RainGage.Name)
             Else
-                Logger.Msg("No Rain Gage available to assign")
+                Logger.Dbg("No Rain Gage available to assign")
             End If
 
             'find associated outlet node
