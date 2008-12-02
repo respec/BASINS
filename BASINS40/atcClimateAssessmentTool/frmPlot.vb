@@ -4,6 +4,9 @@ Imports MapWinUtility
 Public Class frmPlot
 
     Private pResults As atcControls.atcGridSource
+    Private pDatablocks As Integer = 0
+    Private pcatBlocks As atcCollection = New atcCollection
+    Private pDataValueLbl As Integer = 0
 
     Public Property Results() As atcControls.atcGridSource
         Get
@@ -29,6 +32,7 @@ Public Class frmPlot
             Next
             aCombo.Items.Add(lColTitle)
         Next
+        aCombo.SelectedIndex = 0
     End Sub
 
     Public Sub LoadSetting()
@@ -39,6 +43,7 @@ Public Class frmPlot
         Dim lptlabels As Integer
         Dim lselectfield As Integer
         Dim ltitle As String
+        Dim ldatablock As Integer
 
         'For Debugging use only
         'SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
@@ -54,6 +59,7 @@ Public Class frmPlot
         lptlabels = GetSetting("BasinsCATPlot", "Settings", "PointLabels", "0")
         lselectfield = GetSetting("BasinsCATPlot", "Settings", "SelectField", "0")
         ltitle = GetSetting("BasinsCATPlot", "Settings", "Title", "")
+        ldatablock = GetSetting("BasinsCATPlot", "Settings", "DataBlock", "0")
 
         Dim ld As Integer = -99
         For i As Integer = 0 To cboXAxis.Items.Count - 1
@@ -105,7 +111,110 @@ Public Class frmPlot
             End If
         Next
 
+        cboDatablock.SelectedIndex = ldatablock
     End Sub
+
+    'Private Sub btnPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlot.Click
+    '    Dim lGnuplotExe As String = FindFile("Please locate wgnuplot.exe", "wgnuplot.exe")
+    '    Dim lPlotFilename As String = IO.Path.GetTempFileName()
+    '    Dim lPlotDatFilename As String = IO.Path.GetTempFileName()
+
+    '    Dim lColX As Integer
+    '    Dim lColY As Integer
+    '    Dim lColZ As Integer
+    '    Dim lColB As Integer = 0
+
+    '    Dim lstr As System.Text.StringBuilder = New System.Text.StringBuilder()
+
+    '    lstr.AppendLine("reset;clear;reset;")
+    '    'Differentiate if 3d plot
+    '    If cboXAxis.SelectedItem Is Nothing OrElse cboYAxis.SelectedItem Is Nothing Then
+    '        Logger.Msg("Please specify x- and y- axis category")
+    '        Return
+    '    End If
+
+    '    If cboXAxis.SelectedItem.ToString = "None" Or cboXAxis.SelectedItem.ToString = "" Or _
+    '       cboYAxis.SelectedItem.ToString = "None" Or cboYAxis.SelectedItem.ToString = "" Then
+    '        Logger.Msg("Please specify x- and y- axis category")
+    '        Return
+    '    End If
+
+    '    lstr.AppendLine("set title """ & txtTitle.Text & """;")
+    '    lstr.AppendLine("set xlabel """ & cboXAxis.SelectedItem.ToString.Split("-")(1) & """;")
+    '    lstr.AppendLine("set ylabel """ & cboYAxis.SelectedItem.ToString.Split("-")(1) & """;")
+
+    '    lColX = cboXAxis.SelectedItem.ToString.Split("-")(0)
+    '    lColY = cboYAxis.SelectedItem.ToString.Split("-")(0)
+
+    '    If cboZAxis.Text = "None" Or cboZAxis.Text = "" Then ' 2d plot
+    '        If cboDatablock.Text = "None" Then
+    '            lstr.AppendLine("plot '" & lPlotDatFilename & "' u 1:2 with points t """ & cboYAxis.SelectedItem.ToString.Split("-")(1) & """")
+    '            lstr.AppendLine("pause -1;")
+    '        ElseIf pDatablocks > 0 Then
+    '            lstr.Append("plot ")
+    '            Dim i As Integer = 0
+    '            For i = 0 To pDatablocks - 2
+    '                lstr.AppendLine("'" & lPlotDatFilename & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """, \")
+    '            Next
+    '            lstr.AppendLine("'" & lPlotDatFilename & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """")
+    '            lstr.AppendLine("pause -1;")
+    '        End If
+    '    Else ' 3d plot
+    '        lColZ = cboZAxis.SelectedItem.ToString.Split("-")(0)
+
+    '        lstr.AppendLine("set grid;")
+    '        'lstr.AppendLine("set dgrid3d 30,30;")
+    '        'lstr.AppendLine("set hidden3d")
+
+    '        Dim lblCol As Integer = 4
+    '        If cboSelect.Text = "None" OrElse cboSelect.Text = "" Then
+    '            lblCol = 4
+    '        Else
+    '            If rdoBMP.Checked Then
+    '                lblCol = 4
+    '            ElseIf rdoLanduse.Checked Then
+    '                lblCol = 5
+    '            ElseIf rdoEmission.Checked Then
+    '                lblCol = 6
+    '            ElseIf rdoModels.Checked Then
+    '                lblCol = 7
+    '            ElseIf rdoModify.Checked Then
+    '                lblCol = 8
+    '            Else
+    '                lblCol = 8
+    '            End If
+    '        End If
+    '        If Not cboPointLabels.Text = "None" And Not cboPointLabels.Text = "" Then 'use labels
+    '            lstr.AppendLine("set title ""Data points are labeled with " & cboPointLabels.SelectedItem.ToString.Split("-")(1) & """")
+    '            lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
+    '            lColB = cboPointLabels.SelectedItem.ToString.Split("-")(0)
+    '        ElseIf Not cboSelect.Text = "None" And Not cboSelect.Text = "" Then
+    '            'lstr.AppendLine("set title ""Data points are labeled with " & cboPointLabels.SelectedItem.ToString.Split("-")(1) & """")
+    '            lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
+    '            'lColB = cboPointLabels.SelectedItem.ToString.Split("-")(0)
+    '        Else
+    '            lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """")
+    '        End If
+    '        lstr.AppendLine("pause -1;")
+
+    '    End If
+
+    '    IO.File.WriteAllText(lPlotFilename, lstr.ToString)
+
+    '    'Do parsing data first here
+    '    Dim ldataReady As Integer = 0
+    '    If cboSelect.Text = "None" Or cboSelect.Text = "" Then
+    '        ldataReady = parseCATDataBlock(lPlotDatFilename, "All")
+    '    Else
+    '        ldataReady = parseCATDataBlock(lPlotDatFilename, "Select")
+    '    End If
+
+    '    If ldataReady = 0 Then
+    '        Process.Start(lGnuplotExe, """" & lPlotFilename & """") '"C:\mono_luChange\output\seddiff.plt")
+    '    Else
+    '        Logger.Msg("Data parsing doesnot succeed, plotting not done")
+    '    End If
+    'End Sub
 
     Private Sub btnPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlot.Click
         Dim lGnuplotExe As String = FindFile("Please locate wgnuplot.exe", "wgnuplot.exe")
@@ -125,7 +234,7 @@ Public Class frmPlot
             Logger.Msg("Please specify x- and y- axis category")
             Return
         End If
-        
+
         If cboXAxis.SelectedItem.ToString = "None" Or cboXAxis.SelectedItem.ToString = "" Or _
            cboYAxis.SelectedItem.ToString = "None" Or cboYAxis.SelectedItem.ToString = "" Then
             Logger.Msg("Please specify x- and y- axis category")
@@ -139,58 +248,73 @@ Public Class frmPlot
         lColX = cboXAxis.SelectedItem.ToString.Split("-")(0)
         lColY = cboYAxis.SelectedItem.ToString.Split("-")(0)
 
+        'Do parsing data first here
+        Dim ldataReady As Integer = 0
+        If cboSelect.Text = "None" Or cboSelect.Text = "" Then
+            ldataReady = parseCATDataBlock(lPlotDatFilename, "All")
+        Else
+            ldataReady = parseCATDataBlock(lPlotDatFilename, "Select")
+        End If
+
+        Dim lblCol As Integer = 4
+        If cboSelect.Text = "None" OrElse cboSelect.Text = "" Then
+            lblCol = 4
+        Else
+            If rdoBMP.Checked Then
+                lblCol = 4
+            ElseIf rdoLanduse.Checked Then
+                lblCol = 5
+            ElseIf rdoEmission.Checked Then
+                lblCol = 6
+            ElseIf rdoModels.Checked Then
+                lblCol = 7
+            ElseIf rdoModify.Checked Then
+                lblCol = 8
+            Else
+                lblCol = 8
+            End If
+        End If
+
         If cboZAxis.Text = "None" Or cboZAxis.Text = "" Then ' 2d plot
-            lstr.AppendLine("plot '" & lPlotDatFilename & "' u 1:2 with points t """ & cboYAxis.SelectedItem.ToString.Split("-")(1) & """")
-            lstr.AppendLine("pause -1;")
+            If pDatablocks > 0 Then
+                'lstr.Append("plot ")
+                'Dim i As Integer = 0
+                'For i = 0 To pDatablocks - 2
+                '    lstr.AppendLine("'" & lPlotDatFilename & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """, \")
+                'Next
+                'lstr.AppendLine("'" & lPlotDatFilename & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """")
+                doGnuplotScript("2d", lstr, lPlotDatFilename, "", lblCol)
+                lstr.AppendLine("pause -1;")
+            ElseIf cboDatablock.Text = "None" Then
+                doGnuplotScript("2d", lstr, lPlotDatFilename, cboYAxis.SelectedItem.ToString.Split("-")(1), lblCol)
+                'lstr.AppendLine("plot '" & lPlotDatFilename & "' u 1:2 with points t """ & cboYAxis.SelectedItem.ToString.Split("-")(1) & """")
+                lstr.AppendLine("pause -1;")
+            End If
         Else ' 3d plot
             lColZ = cboZAxis.SelectedItem.ToString.Split("-")(0)
 
             lstr.AppendLine("set grid;")
+            lstr.AppendLine("set grid z;")
             'lstr.AppendLine("set dgrid3d 30,30;")
             'lstr.AppendLine("set hidden3d")
 
-            Dim lblCol As Integer = 4
-            If cboSelect.Text = "None" OrElse cboSelect.Text = "" Then
-                lblCol = 4
-            Else
-                If rdoBMP.Checked Then
-                    lblCol = 4
-                ElseIf rdoLanduse.Checked Then
-                    lblCol = 5
-                ElseIf rdoEmission.Checked Then
-                    lblCol = 6
-                ElseIf rdoModels.Checked Then
-                    lblCol = 7
-                ElseIf rdoModify.Checked Then
-                    lblCol = 8
-                Else
-                    lblCol = 8
-                End If
-            End If
-            If Not cboPointLabels.Text = "None" And Not cboPointLabels.Text = "" Then 'use labels
+
+            If Not cboSelect.Text = "None" And Not cboSelect.Text = "" Then
+                doGnuplotScript("3d", lstr, lPlotDatFilename, cboZAxis.SelectedItem.ToString.Split("-")(1), lblCol)
+                'lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
+            ElseIf Not cboPointLabels.Text = "None" And Not cboPointLabels.Text = "" Then 'use labels
                 lstr.AppendLine("set title ""Data points are labeled with " & cboPointLabels.SelectedItem.ToString.Split("-")(1) & """")
-                lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
-                lColB = cboPointLabels.SelectedItem.ToString.Split("-")(0)
-            ElseIf Not cboSelect.Text = "None" And Not cboSelect.Text = "" Then
-                'lstr.AppendLine("set title ""Data points are labeled with " & cboPointLabels.SelectedItem.ToString.Split("-")(1) & """")
-                lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
+                doGnuplotScript("3d", lstr, lPlotDatFilename, cboZAxis.SelectedItem.ToString.Split("-")(1), lblCol)
+                'lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """, \" & vbCrLf & "'' u 1:2:3:" & lblCol & " with labels center offset 1.5,0.2 notitle; ")
                 'lColB = cboPointLabels.SelectedItem.ToString.Split("-")(0)
             Else
                 lstr.AppendLine("splot '" & lPlotDatFilename & "' u 1:2:3 with points t """ & cboZAxis.SelectedItem.ToString.Split("-")(1) & """")
             End If
             lstr.AppendLine("pause -1;")
-
         End If
 
         IO.File.WriteAllText(lPlotFilename, lstr.ToString)
 
-        'Do parsing data first here
-        Dim ldataReady As Integer = 0
-        If cboSelect.Text = "None" Or cboSelect.Text = "" Then
-            ldataReady = parseCATData(lPlotDatFilename, "All")
-        Else
-            ldataReady = parseCATData(lPlotDatFilename, "Select")
-        End If
 
         If ldataReady = 0 Then
             Process.Start(lGnuplotExe, """" & lPlotFilename & """") '"C:\mono_luChange\output\seddiff.plt")
@@ -198,6 +322,78 @@ Public Class frmPlot
             Logger.Msg("Data parsing doesnot succeed, plotting not done")
         End If
     End Sub
+
+    Private Function doGnuplotScript(ByVal adim As String, ByRef aSB As System.Text.StringBuilder, ByVal afname As String, Optional ByVal aTitle As String = "", Optional ByVal albl As Integer = 0) As Integer
+        'This function create the gnuplot script, with knowledge of the data block information via pcatBlocks and pDatablock
+        Dim i As Integer
+
+        If adim = "2d" Then
+            aSB.Append("plot ")
+            If pcatBlocks.Keys.Count > 1 Then
+                For i = 0 To pcatBlocks.Keys.Count - 2
+                    If albl > 0 Then
+                        aSB.AppendLine("'" & afname & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """, \" & vbCrLf & "'' u 1:2:" & albl & " every :::" & i & "::" & i & " with labels center offset 1.5,0.2 notitle, \")
+                    Else
+                        aSB.AppendLine("'" & afname & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """, \")
+                    End If
+                Next
+                If albl > 0 Then
+                    aSB.AppendLine("'" & afname & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """, \" & vbCrLf & "'' u 1:2:" & albl & " every :::" & i & "::" & i & " with labels center offset 1.5,0.2 notitle;")
+                Else
+                    aSB.AppendLine("'" & afname & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """;")
+                End If
+            Else
+                If albl > 0 Then
+                    aSB.AppendLine("'" & afname & "' u 1:2 with points t """ & aTitle & """, \" & vbCrLf & "'' u 1:2:" & albl & " with labels center offset 1.5,0.2 notitle;")
+                Else
+                    aSB.AppendLine("'" & afname & "' u 1:2 with points t """ & aTitle & """;")
+                End If
+            End If
+        ElseIf adim = "3d" Then
+
+            If chkboContour.Checked Then
+                'Do a 3d contour map using x,y, and z and return
+                aSB.AppendLine("set contour base;")
+                aSB.AppendLine("set dgrid3d;")
+                aSB.AppendLine("set autoscale fix;")
+                aSB.AppendLine("set palette rgbformulae 22,13,-31")
+                aSB.AppendLine("set isosample 30,30;")
+                aSB.AppendLine("set clabel ""%16.0f"";")
+                'aSB.AppendLine("set view map;")
+                aSB.AppendLine("set view 180,0,1")
+                For i = 0 To pcatBlocks.Keys.Count - 1
+                    aSB.AppendLine("splot '" & afname & "' u 1:2:3 every :::" & i & "::" & i & " with pm3d t ""Color contour map for data block: " & pcatBlocks.Keys()(i).ToString & """;")
+                    aSB.AppendLine("pause -1;")
+                Next
+                Return 0
+            End If
+
+            aSB.Append("splot ")
+            If pcatBlocks.Keys.Count > 1 Then
+                For i = 0 To pcatBlocks.Keys.Count - 2
+                    If albl > 0 Then
+                        aSB.Append("'" & afname & "'  u 1:2:3 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString & """, \" & vbCrLf & "'' u 1:2:3:" & albl & " every :::" & i & "::" & i & " with labels center offset 1.5,0.2 notitle, \" & vbCrLf)
+                    Else
+                        aSB.Append("'" & afname & "'  u 1:2:3 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString & """, \" & vbCrLf)
+                    End If
+                Next
+                'for the last line in the splot command
+                If albl > 0 Then
+                    aSB.Append("'" & afname & "'  u 1:2:3 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString & """, \" & vbCrLf & "'' u 1:2:3:" & albl & " every :::" & i & "::" & i & " with labels center offset 1.5,0.2 notitle;" & vbCrLf)
+                Else
+                    aSB.Append("'" & afname & "'  u 1:2:3 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString & """;" & vbCrLf)
+                End If
+            Else ' only one data block
+                If albl > 0 Then
+                    aSB.Append("'" & afname & "'  u 1:2:3 with points t """ & aTitle & """, \" & vbCrLf & "'' u 1:2:3:" & albl & " with labels center offset 1.5,0.2 notitle;" & vbCrLf)
+                Else
+                    aSB.Append("'" & afname & "'  u 1:2:3 with points t """ & aTitle & """;" & vbCrLf)
+                End If
+            End If
+
+        End If
+        Return 0
+    End Function
 
     Private Function parseCATData(ByVal aFilename As String, ByVal aSelection As String) As Integer
         Dim lline As String = ""
@@ -318,6 +514,251 @@ Public Class frmPlot
         Return 0
     End Function
 
+    Private Function parseCATDataBlock(ByVal aFilename As String, ByVal aSelection As String) As Integer
+        Dim lline As String = ""
+        Dim ltemp As String = ""
+
+        'Reset the cat data block collection
+        pcatBlocks.Clear()
+        pDatablocks = 0
+
+        Dim lblockIndex As Integer = 0
+        Select Case cboDatablock.Text
+            Case "None"
+                lblockIndex = 0
+            Case "BMP"
+                lblockIndex = 5 ' or 2 in the case of base_lu2030a2_No
+            Case "Landuse"
+                lblockIndex = 4 ' or 1 in the case of base_lu2030a2_No
+            Case "Emission Scenarios"
+                lblockIndex = 0 ' or 0 for base
+            Case "Weather Models"
+                lblockIndex = 2 ' or 0 for base
+            Case "Modifications"
+                lblockIndex = 3 ' or 0 for base
+            Case Else
+                lblockIndex = 0 ' or 0 for base
+        End Select
+
+        Dim lColX As Integer = cboXAxis.SelectedItem.ToString.Split("-")(0)
+        Dim lColY As Integer = cboYAxis.SelectedItem.ToString.Split("-")(0)
+        Dim lColZ As Integer = -99
+        If Not cboZAxis.Text = "None" And Not cboZAxis.Text = "" Then
+            lColZ = cboZAxis.SelectedItem.ToString.Split("-")(0)
+        End If
+
+        Dim lfilterCol As Integer = -99
+        If Not cboSelect.Text = "None" And Not cboSelect.Text = "" Then
+            lfilterCol = cboSelect.Text.Split("-")(0)
+        End If
+
+        Dim lptLabelCol As Integer = -99
+
+        If Not cboPointLabels.Text = "None" And Not cboPointLabels.Text = "" Then
+            lptLabelCol = cboPointLabels.SelectedItem.ToString.Split("-")(0)
+        End If
+
+        If aSelection = "All" Then
+            Try
+                For lRow As Integer = pResults.FixedRows To pResults.Rows - 1
+
+                    If cboZAxis.Text = "None" OrElse cboZAxis.Text = "" Then ' 2d data
+                        lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "")
+                    Else
+                        lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColZ - 1).Replace(",", "")
+                    End If
+
+                    If lptLabelCol - 1 > 0 Then
+                        lline &= " " & pResults.CellValue(lRow, lptLabelCol - 1) & vbCrLf
+                    Else
+                        lline &= vbCrLf
+                    End If
+
+
+                    If cboDatablock.Text = "None" Or cboDatablock.Text = "" Then
+                        IO.File.AppendAllText(aFilename, lline)
+                    Else
+                        ltemp = pResults.CellValue(lRow, 0)
+                        ' adjust lblockIndex for base scenario name
+                        If ltemp.StartsWith("base") Then
+                            If cboDatablock.Text = "Landuse" Then
+                                lblockIndex = 1
+                            ElseIf cboDatablock.Text = "BMP" Then
+                                lblockIndex = 2
+                            Else
+                                lblockIndex = 0
+                            End If
+                        End If
+
+                        Dim ltempKey As String = pResults.CellValue(lRow, 0).Split("_")(lblockIndex)
+                        If pcatBlocks.ItemByKey(ltempKey) = Nothing Then
+                            pcatBlocks.Add(ltempKey, lline)
+                        Else
+                            ltemp = ""
+                            ltemp = pcatBlocks.ItemByKey(ltempKey)
+                            Dim lind As Integer = pcatBlocks.IndexFromKey(ltempKey)
+                            ltemp &= lline
+                            'pcatBlocks.Add(ltempKey, ltemp)
+                            pcatBlocks.Insert(lind, ltempKey, ltemp)
+                            pcatBlocks.RemoveAt(lind + 1)
+                        End If
+                    End If
+                Next ' foreach lrow
+
+                If cboDatablock.Text <> "None" Then
+                    writeDataBlock(aFilename, pcatBlocks)
+                End If
+            Catch ex As Exception
+                Logger.Msg("Extracting CAT data error: " & ex.Message)
+                Return -99
+            End Try
+            Return 0
+        End If
+
+        Try
+
+            'give warning about selection if no selection is made to each of the five filters
+            If lstboBMP.SelectedItems.Count = 0 OrElse _
+               lstboEmission.SelectedItems.Count = 0 OrElse _
+               lstboModifications.SelectedItems.Count = 0 OrElse _
+               lstboLanduse.SelectedItems.Count = 0 OrElse _
+               lstboModels.SelectedItems.Count = 0 Then
+                If cboSelect.Text.Contains("Run") Then
+                    Logger.Msg("Need to select at least one entry from each of the five filters.")
+                    Return -99
+                Else
+                    Return 0
+                End If
+            End If
+
+            'Now get either 2d or 3d data to a temp dat file
+            Dim lcv As String = Nothing
+            Dim lfound As Boolean = False
+            Dim lDataValLbl As String = ""
+            For lRow As Integer = pResults.FixedRows To pResults.Rows - 1
+
+                lfound = False
+                lcv = pResults.CellValue(lRow, lfilterCol - 1)
+                For Each bmp As String In lstboBMP.SelectedItems
+                    If lcv.EndsWith(bmp) Then
+
+                        For Each lu As String In lstboLanduse.SelectedItems
+                            If lcv.Contains(lu) Then
+
+                                For Each sem As String In lstboEmission.SelectedItems
+                                    If lcv.StartsWith(sem) Then
+
+                                        For Each smodel As String In lstboModels.SelectedItems
+                                            If lcv.Contains(smodel) Then
+
+                                                For Each smodify As String In lstboModifications.SelectedItems
+                                                    If lcv.Contains(smodify) Then
+
+                                                        If cboZAxis.Text = "None" OrElse cboZAxis.Text = "" Then ' 2d data
+                                                            If cboPointLabels.Text = "None" OrElse cboPointLabels.Text = "" Then
+                                                                lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & bmp & " " & lu & " " & sem & " " & smodel & " " & smodify
+                                                            Else
+                                                                If lptLabelCol = lColY Then
+                                                                    lDataValLbl = "->Z:" & pResults.CellValue(lRow, lptLabelCol - 1)
+                                                                Else
+                                                                    lDataValLbl = ":Label:" & pResults.CellValue(lRow, lptLabelCol - 1)
+                                                                End If
+
+                                                                lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & bmp & lDataValLbl & " " & lu & lDataValLbl & " " & sem & lDataValLbl & " " & smodel & lDataValLbl & " " & smodify & lDataValLbl
+                                                            End If
+                                                        Else ' 3d data
+                                                            If cboPointLabels.Text = "None" OrElse cboPointLabels.Text = "" Then
+                                                                lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColZ - 1).Replace(",", "") & " " & bmp & " " & lu & " " & sem & " " & " " & smodel & " " & smodify
+                                                            Else
+                                                                If lptLabelCol = lColZ Then
+                                                                    lDataValLbl = "->Z:" & pResults.CellValue(lRow, lptLabelCol - 1)
+                                                                Else
+                                                                    lDataValLbl = ":Label:" & pResults.CellValue(lRow, lptLabelCol - 1)
+                                                                End If
+                                                                lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColZ - 1).Replace(",", "") & " " & bmp & lDataValLbl & " " & lu & lDataValLbl & " " & sem & lDataValLbl & " " & smodel & lDataValLbl & " " & smodify & lDataValLbl
+                                                            End If
+                                                        End If
+
+                                                        If lptLabelCol - 1 > 0 Then
+                                                            lline &= " " & pResults.CellValue(lRow, lptLabelCol - 1) & vbCrLf ' Don't have to worry about data value
+                                                        Else
+                                                            lline &= vbCrLf
+                                                        End If
+
+                                                        If cboDatablock.Text = "None" Then
+                                                            IO.File.AppendAllText(aFilename, lline)
+                                                        Else
+                                                            ' adjust lblockIndex for base scenario name
+                                                            Dim lblockIndex0 As Integer
+                                                            If lcv.StartsWith("base") Then
+                                                                lblockIndex0 = lblockIndex 'save the default data block column number
+                                                                If cboDatablock.Text = "Landuse" Then
+                                                                    lblockIndex = 1
+                                                                ElseIf cboDatablock.Text = "BMP" Then
+                                                                    lblockIndex = 2
+                                                                Else
+                                                                    lblockIndex = 0
+                                                                End If
+                                                            End If
+
+                                                            Dim ltempKey As String = lcv.Split("_")(lblockIndex)
+                                                            If pcatBlocks.ItemByKey(ltempKey) = Nothing Then
+                                                                pcatBlocks.Add(ltempKey, lline)
+                                                            Else
+                                                                ltemp = ""
+                                                                ltemp = pcatBlocks.ItemByKey(ltempKey)
+                                                                Dim lind As Integer = pcatBlocks.IndexFromKey(ltempKey)
+                                                                ltemp &= lline
+                                                                'pcatBlocks.Insert(ltempKey, ltemp)
+                                                                pcatBlocks.Insert(lind, ltempKey, ltemp)
+                                                                pcatBlocks.RemoveAt(lind + 1)
+                                                            End If
+                                                            If lcv.StartsWith("base") Then
+                                                                lblockIndex = lblockIndex0 ' change it back to default data block number
+                                                            End If
+                                                        End If
+
+                                                        lfound = True
+                                                        Exit For
+
+                                                    End If ' match modify
+                                                Next ' foreach modify {F10, F30, M}
+
+                                            End If ' match model
+                                            If lfound Then Exit For
+                                        Next ' foreach model {cccm, ..., ncar}
+
+                                    End If ' match emission
+                                    If lfound Then Exit For
+                                Next ' foreach emission {a, b, base}
+
+                            End If ' match landuse
+                            If lfound Then Exit For
+                        Next ' foreach landuse {lu2030a2, ... mon10, mon70}
+
+                    End If ' match bmp
+                    If lfound Then Exit For
+                Next 'foreach bmp {y, n}
+            Next ' foreach lRow
+
+            If cboDatablock.Text <> "None" Then
+                writeDataBlock(aFilename, pcatBlocks)
+            End If
+
+        Catch ex As Exception
+            Logger.Msg("Extrating CAT results Error: " & ex.Message)
+            Return -99
+        End Try
+        Return 0
+    End Function
+
+    Private Sub writeDataBlock(ByVal aFilename As String, ByVal acatBlocks As atcCollection)
+        'acatBlocks.Sort()
+        For Each k As String In acatBlocks
+            IO.File.AppendAllText(aFilename, k & vbCrLf)
+        Next
+        pDatablocks = acatBlocks.Keys.Count
+    End Sub
     Private Sub cboXAxis_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboXAxis.SelectedIndexChanged
         pUpdateTitle()
     End Sub
@@ -551,6 +992,12 @@ Public Class frmPlot
             SaveSetting("BasinsCATPlot", "Settings", "SelectField", "0")
         Else
             SaveSetting("BasinsCATPlot", "Settings", "SelectField", cboSelect.Text.Split("-")(0))
+        End If
+
+        If cboDatablock.Text = "None" OrElse cboDatablock.Text = "" Then
+            SaveSetting("BasinsCATPlot", "Settings", "DataBlock", "0")
+        Else
+            SaveSetting("BasinsCATPlot", "Settings", "DataBlock", cboDatablock.SelectedIndex)
         End If
 
         SaveSetting("BasinsCATPlot", "Settings", "Title", txtTitle.Text)
