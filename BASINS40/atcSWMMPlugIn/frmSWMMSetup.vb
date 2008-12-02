@@ -1062,7 +1062,7 @@ Public Class frmSWMMSetup
             lblDescription.Visible = False
             lblClass.Text = pBasinsFolder & "\etc\nlcd.dbf"
             SetPerviousGrid()
-        Else 'grid
+        ElseIf aLanduseSelection = "User Grid" Then 'other grid
             cboLandUseLayer.Items.Clear()
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
                 If GisUtil.LayerType(lLayerIndex) = 4 Then  'Grid
@@ -1078,6 +1078,13 @@ Public Class frmSWMMSetup
             lblDescription.Visible = False
             lblClass.Text = "<none>"
             SetPerviousGrid()
+        Else 'none
+            cboLandUseLayer.Items.Clear()
+            cboLandUseLayer.Visible = False
+            lblLandUseLayer.Visible = False
+            cboDescription.Visible = False
+            lblDescription.Visible = False
+            lblClass.Text = "<none>"
         End If
     End Sub
 
@@ -1568,13 +1575,13 @@ Public Class frmSWMMSetup
 
                 Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
                 Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
-                If cboLanduse.SelectedIndex = 0 Then
+                If cboLanduse.SelectedIndex = 1 Then
                     'usgs giras is the selected land use type
                     CreateLandusesFromGIRAS(lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
-                ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
+                ElseIf cboLanduse.SelectedIndex = 2 Or cboLanduse.SelectedIndex = 4 Then
                     'create landuses from grid
                     CreateLandusesFromGrid(lLandUseFileName, lCatchmentShapefileName, .Catchments, .Landuses)
-                ElseIf cboLanduse.SelectedIndex = 2 Then
+                ElseIf cboLanduse.SelectedIndex = 3 Then
                     'other shape
                     Dim lLanduseFieldName As String = ""
                     If cboDescription.SelectedIndex > -1 Then
@@ -1620,7 +1627,7 @@ Public Class frmSWMMSetup
             End If
         End If
 
-        If cboLanduse.SelectedIndex <> 0 Then
+        If cboLanduse.SelectedIndex <> 0 And cboLanduse.SelectedIndex <> 1 Then
             'not giras, make sure subbasins and land use layers aren't the same
             If cboSubbasins.Items(cboSubbasins.SelectedIndex) = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex) Then
                 'same layer cannot be used for both
@@ -1685,11 +1692,12 @@ Public Class frmSWMMSetup
         pCatchmentFieldMap.Add("StreamLink", "Name")
         pCatchmentFieldMap.Add("AveSlope", "Slope")
 
+        cboLanduse.Items.Add("<none>")
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
         cboLanduse.Items.Add("NLCD Grid")
         cboLanduse.Items.Add("Other Shapefile")
         cboLanduse.Items.Add("User Grid")
-        cboLanduse.SelectedIndex = 0
+        cboLanduse.SelectedIndex = 1
 
         cboOutlets.Items.Add("<none>")
         cboMet.Items.Add("<none>")
@@ -1723,7 +1731,7 @@ Public Class frmSWMMSetup
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 4 Then 'Grid
                 If lLayerName.IndexOf("NLCD") > -1 Then
-                    cboLanduse.SelectedIndex = 1
+                    cboLanduse.SelectedIndex = 2
                 End If
             End If
         Next
