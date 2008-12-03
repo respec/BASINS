@@ -24,11 +24,13 @@ Friend Module modSWMMFromMW
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             Dim lCatchment As Catchment = aCatchments(lFeatureIndex)
 
-            If lCatchment.Name.Length = 0 Then
-                lCatchment.Name = CStr(lFeatureIndex + 1)
-            Else
-                If IsNumeric(CDbl(lCatchment.Name)) Then
-                    lCatchment.Name = CStr(CInt(lCatchment.Name))
+            If Not lCatchment.Name Is Nothing Then
+                If lCatchment.Name.Length = 0 Then
+                    lCatchment.Name = CStr(lFeatureIndex + 1)
+                Else
+                    If IsNumeric(CDbl(lCatchment.Name)) Then
+                        lCatchment.Name = CStr(CInt(lCatchment.Name))
+                    End If
                 End If
             End If
 
