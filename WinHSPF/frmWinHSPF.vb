@@ -106,8 +106,8 @@ Public Class frmWinHSPF
             pUCI.Source2Point()
 
             With SchematicDiagram
-                .BuildTree()
                 .UpdateLegend()
+                .BuildTree()
             End With
         End If
     End Sub

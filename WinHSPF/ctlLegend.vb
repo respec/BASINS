@@ -5,11 +5,23 @@ Imports System.Collections.ObjectModel
 
 Public Class ctlLegend
 
-    Public LegendType As EnumLegendType
     Public Shared IconMargin As Integer = 3
+
+    Public LegendType As EnumLegendType
     Public Icons As New Generic.List(Of clsIcon)
+    Public TopIconIndex As Integer = 0
+
+    Public Event Resized()
+
+    Public Sub New()
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+        Clear()
+    End Sub
 
     Public Sub Clear()
+        btnScrollLegendUp.Left = IconMargin
+        btnScrollLegendDown.Left = IconMargin
         With pnlLegend
             .SuspendLayout()
             If .BackgroundImage IsNot Nothing Then
@@ -30,7 +42,8 @@ Public Class ctlLegend
         If Icons.Count > 0 Then lY = Icons(Icons.Count - 1).Bottom + IconMargin * 2
         Icons.Add(aIcon)        
         aIcon.Top = lY
-        aIcon.Width = Me.Width
+        aIcon.Left = IconMargin
+        aIcon.Width = IconWidth()
         pnlLegend.Controls.Add(aIcon)
     End Sub
 
@@ -41,14 +54,55 @@ Public Class ctlLegend
         Return Nothing
     End Function
 
-    Private Sub btnScrollLegendUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendUp.Click
+    Public Function IconWidth() As Integer
+        Return Me.Width - IconMargin - IconMargin
+    End Function
 
+    Private Sub btnScrollLegendUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendUp.Click
+        If TopIconIndex > 0 Then
+            TopIconIndex -= 1
+            PlaceIcons()
+        End If
     End Sub
 
     Private Sub btnScrollLegendDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendDown.Click
-
+        If TopIconIndex < Icons.Count - 1 Then
+            TopIconIndex += 1
+            PlaceIcons()
+        End If
     End Sub
 
+    ''' <summary>
+    ''' After scrolling or selecting, make sure icons are in correct positions and selections are indicated
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub PlaceIcons()
+        Dim lY As Integer = IconMargin
+        Dim lIndex As Integer = 0
+        Dim lBackground As Bitmap = New Bitmap(pnlLegend.Width, pnlLegend.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        Dim lGraphics As Graphics = Graphics.FromImage(lBackground)
+
+        For Each lIcon As clsIcon In Icons
+            If lIndex < TopIconIndex Then
+                lIcon.Top = -lIcon.Height
+            Else
+                lIcon.Top = lY
+                If lIcon.Selected Then
+                    lGraphics.FillRectangle(SystemBrushes.Highlight, 0, lY - IconMargin, Me.Width, lIcon.Height + IconMargin + IconMargin)
+                End If
+                lY += lIcon.Height + IconMargin * 2
+            End If
+            lIndex += 1
+        Next
+        lGraphics.Dispose()
+        pnlLegend.BackgroundImage = lBackground
+    End Sub
+
+    Private Sub ctlLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        btnScrollLegendUp.Width = Me.Width - IconMargin * 2
+        btnScrollLegendDown.Width = Me.Width - IconMargin * 2
+        RaiseEvent Resized()
+    End Sub
 End Class
 
 Public Enum EnumLegendType

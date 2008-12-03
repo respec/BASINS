@@ -26,10 +26,9 @@ Public Class ctlSchematic
     Private TreeLoopMessageDisplayed As Boolean = False
     Private LandSelected() As Boolean
     Private HighlightBrush As Brush = SystemBrushes.Highlight
-    Private picLegend As atcCollection
     Private LegendScrollPos As Integer
     Private LegendFullHeight As Integer
-    Private MetSelected As Integer
+    Private MetSelected As Integer = -1
     Private pIconWidth As Integer = 73
     Private pIconHeight As Integer = 41
     Private pBorderWidth As Integer = 3
@@ -44,8 +43,8 @@ Public Class ctlSchematic
         End Get
         Set(ByVal newValue As HspfUci)
             pUci = newValue
-            BuildTree()
             UpdateLegend()
+            BuildTree()
         End Set
     End Property
 
@@ -152,6 +151,7 @@ Public Class ctlSchematic
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub DrawTreeBackground()
+        If pTreeBackground IsNot Nothing Then pTreeBackground.Dispose()
         pTreeBackground = New Bitmap(picTree.Width, picTree.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
         Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
         Dim lLinesPen As Pen = SystemPens.ControlDarkDark
@@ -224,13 +224,13 @@ Public Class ctlSchematic
     Private Sub DrawPictureOnReachControl(ByVal aOperation As HspfOperation, ByVal aPrinting As Boolean, ByVal aControl As Control)
         Dim lBitmap As New Bitmap(pIconWidth, pIconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
         Dim g As Graphics = Graphics.FromImage(lBitmap)
-        setPicture(aOperation, g)
+        SetSchematicIcon(aOperation, g)
         drawBorder(g, pIconWidth, pIconHeight, Not aPrinting)
         g.Dispose()
         aControl.BackgroundImage = lBitmap
     End Sub
 
-    Private Sub SetLandIcon(ByVal aOperation As HspfOperation, ByVal aKey As String, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
+    Private Sub SetLandLegendIcon(ByVal aOperation As HspfOperation, ByVal aKey As String, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
         Dim lNewIcon As clsSchematicIcon
         If aExistingIcon Is Nothing Then
             lNewIcon = New clsSchematicIcon
@@ -238,7 +238,7 @@ Public Class ctlSchematic
             lNewIcon = aExistingIcon
         End If
         With lNewIcon
-            .Width = pCurrentLegend.Width
+            .Width = pCurrentLegend.IconWidth
             .Height = pIconHeight
             .Operation = aOperation
             Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
@@ -247,7 +247,6 @@ Public Class ctlSchematic
             Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aKey, Me.Font)
             Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
             Dim lY As Single = .Height - lStringMeasurement.Height * 1.25
-            Debug.Print(aKey & " " & lX & " " & lY)
 
             If aExistingIcon Is Nothing Then
                 g.Clear(SystemColors.Control)
@@ -270,6 +269,43 @@ Public Class ctlSchematic
             drawBorder(g, .Width, .Height, Not aPrinting)
             g.Dispose()
             .BackgroundImage = lBitmap
+            AddHandler .MouseDown, AddressOf LegendIcon_MouseDown
+            'AddHandler .MouseMove, AddressOf LegendIcon_MouseMove
+            'AddHandler .MouseUp, AddressOf LegendIcon_MouseUp
+        End With
+        aExistingIcon = lNewIcon
+    End Sub
+
+    Private Sub SetMetLegendIcon(ByVal aMetSeg As HspfMetSeg, ByVal aKey As String, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
+        Dim lNewIcon As clsSchematicIcon
+        If aExistingIcon Is Nothing Then
+            lNewIcon = New clsSchematicIcon
+        Else
+            lNewIcon = aExistingIcon
+        End If
+        With lNewIcon
+            .Width = pCurrentLegend.Width
+            .Height = pIconHeight
+            .Key = aKey
+            Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
+            Dim g As Graphics = Graphics.FromImage(lBitmap)
+
+            Dim lLabel As String = aMetSeg.Id & ":" & aMetSeg.Name.Replace(",", "") 'Precip location name might be nicer
+
+            Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(lLabel, Me.Font)
+            Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
+            Dim lY As Single = (.Height - lStringMeasurement.Height) / 2
+
+            If aExistingIcon Is Nothing Then
+                g.Clear(SystemColors.Control)
+                g.DrawString(lLabel, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+            End If
+
+            lY /= 4
+
+            drawBorder(g, .Width, .Height, Not aPrinting)
+            g.Dispose()
+            .BackgroundImage = lBitmap
             'AddHandler .MouseDown, AddressOf Icon_MouseDown
             'AddHandler .MouseMove, AddressOf Icon_MouseMove
             'AddHandler .MouseUp, AddressOf Icon_MouseUp
@@ -278,7 +314,7 @@ Public Class ctlSchematic
     End Sub
 
     'Draw icon representing aOperation into given graphics object
-    Public Sub setPicture(ByVal aOperation As HspfOperation, ByVal g As Graphics)
+    Public Sub SetSchematicIcon(ByVal aOperation As HspfOperation, ByVal g As Graphics)
         Dim barbase, barHeight, sid, barPos As Integer
         Dim lStr As String
         Dim barDesc As String
@@ -381,9 +417,8 @@ Public Class ctlSchematic
                             lStrPrint = sid
                             started = True
                         End If
-                        'underline if this met seg contribs to reach directly,
-                        'dont underline if this met seg contribs to reach only
-                        'indirectly through land segment
+                        'TODO: underline if this met seg contribs to reach directly,
+                        'dont underline if this met seg contribs to reach only indirectly through land segment
                         'If sid = myid Then pic.Font = VB6.FontChangeUnderline(pic.Font, True) Else pic.Font = VB6.FontChangeUnderline(pic.Font, False) ' .ForeColor = vbHighlight Else pic.ForeColor = vbButtonText
                         g.DrawString(sid, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
                         lX += g.MeasureString(sid, Me.Font).Width
@@ -560,17 +595,19 @@ Public Class ctlSchematic
         Dim AddedThisReach As Boolean
         Dim ReachNames, LastName As String
         Dim PgrandTotal, Ptotal, Itotal, IgrandTotal As Single
-        Dim t As Double
+        Dim t As Double = 0
         Dim AreaUnits As String
 
-        If pUci.Name = "" Then Exit Sub
+        If pUci Is Nothing OrElse pUci.Name.Length = 0 Then Exit Sub
+
         If pUci.GlobalBlock.EmFg = 1 Then
             AreaUnits = " (Acres)"
         Else
             AreaUnits = " (Hectares)"
         End If
-        t = 0
+
         agdDetails.Visible = False
+        agdDetails.Source = New atcControls.atcGridSource
         With agdDetails.Source
             .Rows = 0
             .Columns = 5
@@ -583,13 +620,13 @@ Public Class ctlSchematic
             '.set_ColType(2, ATCoCtl.ATCoDataType.ATCoTxt)
             '.set_ColType(3, ATCoCtl.ATCoDataType.ATCoTxt)
             '.set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
-            For luse = 0 To picLegend.Count - 1
+            For Each lLegendIcon As clsSchematicIcon In pCurrentLegend.Icons
                 Ptotal = 0
                 Itotal = 0
                 ReachNames = ""
                 LastName = ""
                 If LegendSelected(CStr(luse)) Then
-                    lDesc = picLegend(luse).Tag
+                    lDesc = lLegendIcon.Tag
                     .Rows = .Rows + 1
                     .CellValue(.Rows, 0) = lDesc
                     For Each lReach As clsSchematicIcon In pIcons
@@ -811,14 +848,22 @@ Public Class ctlSchematic
                             If lKey.Length = 0 Then lKey = "Unnamed"
                             Dim lIcon As clsIcon = pCurrentLegend.Icon(lKey)
                             If lIcon Is Nothing Then
-                                SetLandIcon(lOperation, lKey, False, lIcon)
+                                SetLandLegendIcon(lOperation, lKey, False, lIcon)
                                 pCurrentLegend.Add(lIcon)
                                 LegendOrder.Add(lKey)
                             Else 'Just add to existing icon, don't need to create a new one
-                                SetLandIcon(lOperation, lKey, False, lIcon)
+                                SetLandLegendIcon(lOperation, lKey, False, lIcon)
                             End If
                         End If
                     Next
+                Case EnumLegendType.LegMet
+                    For Each lMetSeg As HspfMetSeg In pUci.MetSegs
+                        Dim lKey As String = lMetSeg.Id
+                        Dim lIcon As clsIcon = Nothing
+                        SetMetLegendIcon(lMetSeg, lKey, False, lIcon)
+                        pCurrentLegend.Add(lIcon)
+                        LegendOrder.Add(lKey)
+                    Next lMetSeg
             End Select
         End If
         pCurrentLegend.ResumeLayout()
@@ -1005,12 +1050,12 @@ Public Class ctlSchematic
     '        Resume Next
     '    End Sub
 
-    Private Sub RefreshLegendSelections()
-        Dim Index As Short
-        For Index = 0 To UBound(LandSelected)
-            DrawLegendSelectBox(Index, LegendSelected(CStr(Index)))
-        Next Index
-    End Sub
+    'Private Sub RefreshLegendSelections()
+    '    Dim Index As Short
+    '    For Index = 0 To UBound(LandSelected)
+    '        DrawLegendSelectBox(Index, LegendSelected(CStr(Index)))
+    '    Next Index
+    'End Sub
 
     'Private Sub picLegend_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles picLegend.Click
     '    Dim Index As Short = picLegend.GetIndex(eventSender)
@@ -1076,42 +1121,35 @@ Public Class ctlSchematic
     '    End Select
     'End Sub
 
-    Private Sub DrawLegendSelectBox(ByRef Index As Object, ByRef Selected As Boolean)
-        '     Dim colr As Integer
-        '     With picLegend(Index)
-        '         If Selected Then colr = HighlightColor Else colr = System.Drawing.ColorTranslator.ToOle(picLegend(Index).BackColor)
-        '         'UPGRADE_ISSUE: Constant vbFSTransparent was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
-        '         'UPGRADE_ISSUE: PictureBox property picLegend.FillStyle was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '         .FillStyle = vbFSTransparent
-        '         'UPGRADE_ISSUE: Constant vbSolid was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
-        '         'UPGRADE_ISSUE: PictureBox property picLegend.DrawStyle was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '         .DrawStyle = vbSolid
-        '         'UPGRADE_ISSUE: PictureBox property picLegend.DrawWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        '         .DrawWidth = 2
-        '         'UPGRADE_ISSUE: PictureBox method picLegend.Line was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-        'picLegend(Index).Line (1, 1) - (.Width - 1, .Height - 1), colr, B
-        '         UpdateDetails()
-        '     End With
-    End Sub
+    'Private Sub DrawLegendSelectBox(ByRef Index As Object, ByRef Selected As Boolean)
+    '    Dim colr As Integer
+    '    With picLegend(Index)
+    '        If Selected Then colr = HighlightColor Else colr = System.Drawing.ColorTranslator.ToOle(picLegend(Index).BackColor)
+    '        'UPGRADE_ISSUE: Constant vbFSTransparent was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
+    '        'UPGRADE_ISSUE: PictureBox property picLegend.FillStyle was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '        .FillStyle = vbFSTransparent
+    '        'UPGRADE_ISSUE: Constant vbSolid was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
+    '        'UPGRADE_ISSUE: PictureBox property picLegend.DrawStyle was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '        .DrawStyle = vbSolid
+    '        'UPGRADE_ISSUE: PictureBox property picLegend.DrawWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '        .DrawWidth = 2
+    '        'UPGRADE_ISSUE: PictureBox method picLegend.Line was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
+    '    picLegend(Index).Line (1, 1) - (.Width - 1, .Height - 1), colr, B
+    '        UpdateDetails()
+    '    End With
+    'End Sub
 
-    Private Function LegendSelected(ByVal tag_Renamed As String) As Boolean
-        Dim i As Integer
+    Private Function LegendSelected(ByVal aLegendTag As String) As Boolean
         LegendSelected = False
-        If IsNumeric(tag_Renamed) Then
-            'If picLegend(CInt(tag)).Point(0, 0) = HighlightColor Then LegendSelected = True
-            Select Case pCurrentLegend.LegendType
-                Case EnumLegendType.LegLand
-                    If CShort(tag_Renamed) <= UBound(LandSelected) Then
-                        LegendSelected = LandSelected(CShort(tag_Renamed))
-                    End If
-                Case EnumLegendType.LegMet : If CShort(tag_Renamed) = MetSelected Then LegendSelected = True
-            End Select
+        If IsNumeric(aLegendTag) Then
+            Dim lLegendIndex As Integer = aLegendTag
+            If lLegendIndex >= 0 AndAlso lLegendIndex < pCurrentLegend.Icons.Count Then
+                Return pCurrentLegend.Icons.Item(lLegendIndex).Selected
+            End If
         Else
-            For i = 0 To picLegend.Count - 1
-                If tag_Renamed = picLegend(i).Tag Then
-                    'UPGRADE_ISSUE: PictureBox method picLegend.Point was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-                    'If picLegend(i).Point(0, 0) = HighlightColor Then LegendSelected = True
-                    Exit Function
+            For Each lLegendIcon As clsSchematicIcon In pCurrentLegend.Icons
+                If lLegendIcon.Tag = aLegendTag Then
+                    Return lLegendIcon.Selected
                 End If
             Next
         End If
@@ -1131,34 +1169,6 @@ Public Class ctlSchematic
         '    btnScrollLegendDown.Visible = False
         'End If
 
-    End Sub
-
-    Private Sub ScrollLegend()
-        Dim ypos, boxHeight, txtHeight, Index As Integer
-        txtHeight = 10
-        boxHeight = txtHeight * 2
-        ypos = txtHeight
-        If LegendFullHeight - Height < LegendScrollPos Then
-            LegendScrollPos = LegendFullHeight - Height
-        End If
-        If LegendScrollPos < 0 Then LegendScrollPos = 0
-        For Index = 0 To picLegend.Count - 1
-            picLegend(Index).Top = ypos - LegendScrollPos
-            ypos = ypos + picLegend(Index).Height
-        Next
-        SetLegendScrollButtons()
-    End Sub
-
-    Private Sub btnScrollLegendUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        LegendScrollPos -= Height / 4
-        If LegendScrollPos < 0 Then LegendScrollPos = 0
-        ScrollLegend()
-    End Sub
-
-    Private Sub btnScrollLegendDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        LegendScrollPos += Height / 4
-        If LegendScrollPos > LegendFullHeight Then LegendScrollPos = LegendFullHeight
-        ScrollLegend()
     End Sub
 
     Public Sub New()
@@ -1210,8 +1220,28 @@ Public Class ctlSchematic
             Case 1 : pCurrentLegend = LegendMetSegs
             Case 2 : pCurrentLegend = LegendPointSources
         End Select
-        Me.BuildTree()
-        Me.UpdateLegend()
+        UpdateLegend()
+        BuildTree()
+    End Sub
+
+    ''' <summary>
+    ''' User is clicking on an icon in the legend
+    ''' </summary>
+    ''' <param name="sender">Legend icon being clicked</param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
+    Private Sub LegendIcon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        Dim lSender As clsSchematicIcon = sender
+        Select Case e.Button
+            Case MouseButtons.Left
+                sender.Selected = Not sender.Selected
+                pCurrentLegend.PlaceIcons()
+                UpdateDetails()
+            Case MouseButtons.Right
+                RightClickMenu.MenuItems.Clear()
+                RightClickMenu.MenuItems.Add(lSender.Key)
+                RightClickMenu.Show(lSender, e.Location)
+        End Select
     End Sub
 
     ''' <summary>
@@ -1340,4 +1370,5 @@ Public Class ctlSchematic
     Private Sub pCurrentLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles pCurrentLegend.Resize
         UpdateLegend()
     End Sub
+
 End Class
