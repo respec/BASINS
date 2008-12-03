@@ -1439,36 +1439,38 @@ Public Class frmSWMMSetup
                 Dim lSJMetDate As Double = 0.0
                 Dim lEJMetDate As Double = 0.0
 
-                If rbnSingle.Checked Then
-                    If cboPrecipStation.SelectedIndex > -1 Then
-                        lSelectedStation = pPrecStations.ItemByKey(cboPrecipStation.Items(cboPrecipStation.SelectedIndex))
-                        'set dates
-                        If lSelectedStation.StartJDate > lSJMetDate Then
-                            lSJMetDate = lSelectedStation.StartJDate
+                If cboMet.SelectedIndex > 0 Then
+                    If rbnSingle.Checked Then
+                        If cboPrecipStation.SelectedIndex > -1 Then
+                            lSelectedStation = pPrecStations.ItemByKey(cboPrecipStation.Items(cboPrecipStation.SelectedIndex))
+                            'set dates
+                            If lSelectedStation.StartJDate > lSJMetDate Then
+                                lSJMetDate = lSelectedStation.StartJDate
+                            End If
+                            If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+                                lEJMetDate = lSelectedStation.EndJDate
+                            End If
+                            'use this precip gage for each catchment
+                            lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+                            'create rain gages from shapefile and selected station
+                            CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
                         End If
-                        If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
-                            lEJMetDate = lSelectedStation.EndJDate
-                        End If
-                        'use this precip gage for each catchment
-                        lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
-                        'create rain gages from shapefile and selected station
-                        CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+                    Else
+                        For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+                            lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+                            'set dates
+                            If lSelectedStation.StartJDate > lSJMetDate Then
+                                lSJMetDate = lSelectedStation.StartJDate
+                            End If
+                            If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+                                lEJMetDate = lSelectedStation.EndJDate
+                            End If
+                            'remember which precip gage goes with each catchment
+                            lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+                            'create rain gages from shapefile and selected station
+                            CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+                        Next
                     End If
-                Else
-                    For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
-                        lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
-                        'set dates
-                        If lSelectedStation.StartJDate > lSJMetDate Then
-                            lSJMetDate = lSelectedStation.StartJDate
-                        End If
-                        If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
-                            lEJMetDate = lSelectedStation.EndJDate
-                        End If
-                        'remember which precip gage goes with each catchment
-                        lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
-                        'create rain gages from shapefile and selected station
-                        CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
-                    Next
                 End If
 
                 Dim lMetGageName As String = ""
@@ -1531,14 +1533,6 @@ Public Class frmSWMMSetup
                 .SJDate = lSJDate
                 .EJDate = lEJDate
 
-                'add backdrop file
-                .BackdropFile = FilenameSetExt(lSWMMProjectFileName, ".bmp")
-                GisUtil.SaveMapAsImage(.BackdropFile)
-                .BackdropX1 = GisUtil.MapExtentXmin
-                .BackdropY1 = GisUtil.MapExtentYmin
-                .BackdropX2 = GisUtil.MapExtentXmax
-                .BackdropY2 = GisUtil.MapExtentYmax
-
                 'populate the SWMM classes from the shapefiles
                 .Nodes.Clear()
                 .Conduits.Clear()
@@ -1574,7 +1568,10 @@ Public Class frmSWMMSetup
                 End If
 
                 Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
-                Dim lSubbasinFieldName As String = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
+                Dim lSubbasinFieldName As String = ""
+                If lSubbasinFieldIndex > -1 Then
+                    lSubbasinFieldName = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
+                End If
                 If cboLanduse.SelectedIndex = 1 Then
                     'usgs giras is the selected land use type
                     CreateLandusesFromGIRAS(lCatchmentShapefileName, lSubbasinFieldName, .Catchments, .Landuses)
@@ -1596,6 +1593,14 @@ Public Class frmSWMMSetup
 
                 Logger.Dbg(lblStatus.Text)
                 Me.Refresh()
+
+                'add backdrop file
+                .BackdropFile = FilenameSetExt(lSWMMProjectFileName, ".bmp")
+                GisUtil.SaveMapAsImage(.BackdropFile)
+                .BackdropX1 = GisUtil.MapExtentXmin
+                .BackdropY1 = GisUtil.MapExtentYmin
+                .BackdropX2 = GisUtil.MapExtentXmax
+                .BackdropY2 = GisUtil.MapExtentYmax
 
                 'save project file and start SWMM
                 Logger.Dbg("Save SWMM input file" & lSWMMProjectFileName)
