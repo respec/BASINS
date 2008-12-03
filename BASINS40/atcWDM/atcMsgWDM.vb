@@ -35,7 +35,7 @@ Friend Class atcMsgWDM
         Dim lValid As String = "" 'valid values, comma delimeted
 
         pAttributes = New atcCollection
-        pAttributes.Add("<dummy>")
+        pAttributes.Add("<dummy>", New atcData.atcAttributeDefinition)
 
         'F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
 
@@ -51,7 +51,7 @@ Friend Class atcMsgWDM
                 If lLen = 0 Then 'dummy
                     lAttr.Name = "Dummy" & lIndex
                     lAttr.ID = lIndex
-                    pAttributes.Add(lAttr, "K" & lIndex)
+                    pAttributes.Add("K" & lIndex, lAttr)
                 Else
                     lAttr.Name = lName
                     lAttr.ID = lIndex
