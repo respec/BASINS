@@ -160,6 +160,9 @@ Partial Class frmPoint
         '
         'grpDetails
         '
+        Me.grpDetails.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpDetails.Controls.Add(Me.agdPoint)
         Me.grpDetails.Controls.Add(Me.Button9)
         Me.grpDetails.Controls.Add(Me.Button7)
@@ -175,6 +178,9 @@ Partial Class frmPoint
         '
         Me.agdPoint.AllowHorizontalScrolling = True
         Me.agdPoint.AllowNewValidValues = False
+        Me.agdPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
         Me.agdPoint.Fixed3D = False
         Me.agdPoint.LineColor = System.Drawing.Color.Empty
@@ -231,6 +237,7 @@ Partial Class frmPoint
         '
         'cmdDetailsHide
         '
+        Me.cmdDetailsHide.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdDetailsHide.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.cmdDetailsHide.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdDetailsHide.ImageIndex = 0
