@@ -79,15 +79,15 @@ Public Class frmPoint
 
         CountInUseFacs = lstPoints.CheckedItems.Count
 
-        For i = 0 To lstPoints.Items.Count - 1
-            If lstPoints.GetItemChecked(i) Then
-                ReDim InUseFacs(UBound(InUseFacs))
-                InUseFacs(UBound(InUseFacs)) = lstPoints.Items.Item(i)
-            Else
-                ReDim AvailFacs(UBound(AvailFacs))
-                AvailFacs(UBound(AvailFacs)) = lstPoints.Items.Item(i)
-            End If
-        Next
+        'For i = 0 To lstPoints.Items.Count - 1
+        '    If lstPoints.GetItemChecked(i) Then
+        '        ReDim InUseFacs(UBound(InUseFacs))
+        '        InUseFacs(UBound(InUseFacs)) = lstPoints.Items.Item(i)
+        '    Else
+        '        ReDim AvailFacs(UBound(AvailFacs))
+        '        AvailFacs(UBound(AvailFacs)) = lstPoints.Items.Item(i)
+        '    End If
+        'Next
 
         agdMasterPoint.SizeAllColumnsToContents()
         agdMasterPoint.Refresh()
@@ -113,9 +113,6 @@ Public Class frmPoint
         Dim lPointItemIndex As Integer
 
         lstPoints.Items.Clear()
-        'pUCI.Source2Point()
-        'pUCI.Point2Source()
-        'pUCI.PollutantsBuild()
 
         lts = pUCI.FindTimser("", "", "")
 
@@ -135,16 +132,15 @@ Public Class frmPoint
                         If Not lOper Is Nothing Then
 
                             'found a reach with this id
-
-                            'TEMPORARY BANDAID
-                            lfac = "WESTERN WWTP"
-
-
+                            lfac = UCase(lts(i).Attributes.GetValue("STANAM"))
+                            MsgBox(lfac)
                             lcon = lts(i).Attributes.GetValue("Constituent")
                             S = lfac & " (" & Mid(lts(i).Attributes.GetValue("Scenario"), 4) & ")"
 
                             If Not lstPoints.Items.Contains(S) Then
                                 lstPoints.Items.Add(S, False)
+                                'ReDim Preserve AvailFacs(UBound(AvailFacs, 1), UBound(AvailFacs, 2))
+                                'AvailFacs(UBound(AvailFacs)) = S
                             End If
 
                             'see how many times this dsn shows up in pt srcs
@@ -194,12 +190,8 @@ Public Class frmPoint
 
                                     .CellValue(icnt, 1) = lsen
                                     .CellValue(icnt, 2) = lloc
-                                    '.net conversion issue: TEMPORARY BANDAID
-                                    '.CellValue(icnt, 3) = UCase(lts(i).Header.Desc)
-                                    .CellValue(icnt, 3) = lfac
-                                    '.net conversion issue: TEMPORARY BANDAID
-                                    '.CellValue(icnt, 5) = pUCI.GetWDMIdFromName(lts(i).File.Filename)  'save assoc src vol name
-                                    .CellValue(icnt, 5) = lts(i).Attributes.GetValue("DataSource")  'save assoc src vol name
+                                    .CellValue(icnt, 3) = UCase(lts(i).Attributes.GetValue("STANAM"))
+                                    .CellValue(icnt, 5) = pUCI.GetWDMIdFromName(lts(i).Attributes.GetValue("Data Source"))  'save assoc src vol name
                                     .CellValue(icnt, 6) = lts(i).Attributes.GetValue("Id")     'save assoc src vol id
                                     .CellValue(icnt, 7) = lOper.Name     'save assoc tar vol name
                                     .CellValue(icnt, 8) = lOper.Id         'save assoc tar vol id
@@ -249,19 +241,20 @@ Public Class frmPoint
                 End If
             Next i
 
-            'agdMasterPoint.SizeAllColumnsToContents()
-            ''set default members for all
-            'For i = 1 To .Rows
-            '    For k = 1 To LinkCount
-            '        If ConsLinks(k - 1) = UCase(Trim(.CellValue(i, 4))) Then
-            '            .CellValue(i, 10) = MemberLongVersion(MemberLinks(k - 1), MSub1Links(k - 1), MSub2Links(k - 1))
-            '            '.TextMatrix(i, 12) = MSub1Links(K - 1)
-            '            '.TextMatrix(i, 13) = MSub2Links(K - 1)
-            '            Exit For
-            '    End If
-            'Next k
-            'Next i
-            'If icnt = 1 Then .Rows = 0
+            agdMasterPoint.SizeAllColumnsToContents()
+
+            'set default members for all
+            For i = 1 To .Rows
+                For k = 1 To LinkCount
+                    If ConsLinks(k - 1) = UCase(Trim(.CellValue(i, 4))) Then
+                        .CellValue(i, 10) = MemberLongVersion(MemberLinks(k - 1), MSub1Links(k - 1), MSub2Links(k - 1))
+                        '.TextMatrix(i, 12) = MSub1Links(K - 1)
+                        '.TextMatrix(i, 13) = MSub2Links(K - 1)
+                        Exit For
+                    End If
+                Next k
+            Next i
+            If icnt = 1 Then .Rows = 0
 
         End With
 
@@ -484,7 +477,126 @@ Public Class frmPoint
     End Sub
 
     Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
-        grpDetails.Text = "Details of " & lstPoints.SelectedItem
+        'Dim ifound As Boolean, k&, j&, i&
+        'Dim sen$, fac$, ipos&, ilen&, itmp&
+
+        'grpDetails.Text = "Details of " & lstPoints.SelectedItem
+
+
+        'see if something new is in inuse facilities
+        'For i = 0 To lstPoints.CheckedItems.Count - 1
+        '    ifound = False
+        '    For k = 1 To CountInUseFacs
+        '        If lstPoints.CheckedItems.Item(i) = InUseFacs(k - 1) Then
+        '            ifound = True
+        '            Exit For
+        '        End If
+        '    Next k
+        '    If Not ifound Then
+        '        'something added to inuse facilities
+        '        ilen = Len(lstPoints.CheckedItems.Item(i))
+        '        If ilen > 0 Then
+        '            ipos = InStr(1, lstPoints.CheckedItems.Item(i), "(")
+        '            If ipos > 0 Then
+        '                'make sure this the last paren
+        '                itmp = -1
+        '                Do Until itmp = 0
+        '                    itmp = InStr(ipos + 1, lstPoints.CheckedItems.Item(i), "(")
+        '                    If itmp > 0 Then
+        '                        ipos = itmp
+        '                    End If
+        '                Loop
+        '                sen = "PT-" & Mid(aslPoint.RightItem(i), ipos + 1, ilen - ipos - 1)
+        '                fac = Mid(aslPoint.RightItem(i), 1, ipos - 2)
+        '            End If
+        '        End If
+        '        For k = 1 To agdMasterPoint.rows
+        '            If agdMasterPoint.TextMatrix(k, 1) = sen And agdMasterPoint.TextMatrix(k, 3) = fac Then
+        '                'see if this constituent is in cons link list
+        '                ifound = False
+        '                For j = 1 To LinkCount
+        '                    If ConsLinks(j - 1) = UCase(agdMasterPoint.TextMatrix(k, 4)) Then
+        '                        ifound = True
+        '                        Exit For
+        '                    End If
+        '                Next j
+        '                If ifound Then
+        '                    'set indiv timsers to in use in master grid
+        '                    agdMasterPoint.TextMatrix(k, 0) = "Yes"
+        '                End If
+        '            End If
+        '        Next k
+        '        For k = 1 To agdPoint.rows
+        '            If agdPoint.TextMatrix(k, 1) = sen And agdPoint.TextMatrix(k, 3) = fac Then
+        '                'see if this constituent is in cons link list
+        '                ifound = False
+        '                For j = 1 To LinkCount
+        '                    If ConsLinks(j - 1) = UCase(agdPoint.TextMatrix(k, 4)) Then
+        '                        ifound = True
+        '                        Exit For
+        '                    End If
+        '                Next j
+        '                If ifound Then
+        '                    'set indiv timsers to in use in point grid
+        '                    agdPoint.TextMatrix(k, 0) = "Yes"
+        '                End If
+        '            End If
+        '        Next k
+        '    End If
+        'Next i
+        ''see if something new is in available facilities
+        'For i = 0 To aslPoint.LeftCount - 1
+        '    ifound = False
+        '    For k = 1 To CountAvailFacs
+        '        If aslPoint.LeftItem(i) = AvailFacs(k - 1) Then
+        '            ifound = True
+        '            Exit For
+        '        End If
+        '    Next k
+        '    If Not ifound Then
+        '        'something added to available facilities
+        '        ilen = Len(aslPoint.LeftItem(i))
+        '        If ilen > 0 Then
+        '            ipos = InStr(1, aslPoint.LeftItem(i), "(")
+        '            If ipos > 0 Then
+        '                'make sure this the last paren
+        '                itmp = -1
+        '                Do Until itmp = 0
+        '                    itmp = InStr(ipos + 1, aslPoint.LeftItem(i), "(")
+        '                    If itmp > 0 Then
+        '                        ipos = itmp
+        '                    End If
+        '                Loop
+        '                sen = "PT-" & Mid(aslPoint.LeftItem(i), ipos + 1, ilen - ipos - 1)
+        '                fac = Mid(aslPoint.LeftItem(i), 1, ipos - 2)
+        '            End If
+        '        End If
+        '        For k = 1 To agdMasterPoint.rows
+        '            If agdMasterPoint.TextMatrix(k, 1) = sen And agdMasterPoint.TextMatrix(k, 3) = fac Then
+        '                'set indiv timsers to not in use in master grid
+        '                agdMasterPoint.TextMatrix(k, 0) = "No"
+        '            End If
+        '        Next k
+        '        For k = 1 To agdPoint.rows
+        '            If agdPoint.TextMatrix(k, 1) = sen And agdPoint.TextMatrix(k, 3) = fac Then
+        '                'set indiv timsers to not in use in point grid
+        '                agdPoint.TextMatrix(k, 0) = "No"
+        '            End If
+        '        Next k
+        '    End If
+        'Next i
+        ''rebuild lists
+        'CountInUseFacs = aslPoint.RightCount
+        'ReDim InUseFacs(CountInUseFacs)
+        'For i = 0 To CountInUseFacs - 1
+        '    InUseFacs(i) = aslPoint.RightItem(i)
+        'Next i
+        'CountAvailFacs = aslPoint.LeftCount
+        'ReDim AvailFacs(CountAvailFacs)
+        'For i = 0 To CountAvailFacs - 1
+        '    AvailFacs(i) = aslPoint.LeftItem(i)
+        'Next i
+
     End Sub
     Private Sub cmdShowDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsShow.Click
         ExpandedView(True)

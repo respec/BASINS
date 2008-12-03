@@ -52,9 +52,9 @@ Partial Class frmPoint
         Me.chkAllSources.AutoSize = True
         Me.chkAllSources.Location = New System.Drawing.Point(16, 51)
         Me.chkAllSources.Name = "chkAllSources"
-        Me.chkAllSources.Size = New System.Drawing.Size(70, 17)
+        Me.chkAllSources.Size = New System.Drawing.Size(117, 17)
         Me.chkAllSources.TabIndex = 7
-        Me.chkAllSources.Text = "Select All"
+        Me.chkAllSources.Text = "Select/Deselect All"
         Me.chkAllSources.UseVisualStyleBackColor = True
         '
         'grpSources
