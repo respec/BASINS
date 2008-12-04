@@ -595,7 +595,7 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 392)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 395)
         Me.AtcConnectFields.TabIndex = 3
         '
         'GroupBox1
@@ -955,6 +955,16 @@ Public Class frmWASPSetup
                 lTempSegments.AddRange(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap))
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
+
+            'after reading the attribute table, see if any are selected
+            If GisUtil.NumSelectedFeatures(lStreamsLayerIndex) > 0 Then
+                Dim lSelectedSegments As New atcWASP.Segments
+                'remove from ltempsegments any that are not selected
+                For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lStreamsLayerIndex) - 1
+                    lSelectedSegments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lStreamsLayerIndex)))
+                Next
+                lTempSegments = lSelectedSegments
+            End If
 
             AtcGridFlow.Clear()
             With AtcGridFlow.Source
