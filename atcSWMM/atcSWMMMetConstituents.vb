@@ -97,6 +97,24 @@ Public Class MetConstituents
 
         Return aSW.ToString
     End Function
+
+    Public Function TimeSeriesToFile() As Boolean
+
+        For Each lMetConstituent As MetConstituent In Me
+            If lMetConstituent.Type = "EVAP" Or lMetConstituent.Type = "PEVT" Then
+                Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & "\" & lMetConstituent.TimeSeries.Attributes.GetValue("Location") & "E.DAT"
+                Dim lSB As New StringBuilder
+                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location")))
+                SaveFileString(lFileName, lSB.ToString)
+            ElseIf lMetConstituent.Type = "ATEM" Or lMetConstituent.Type = "ATMP" Then
+                Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & "\" & lMetConstituent.TimeSeries.Attributes.GetValue("Location") & "T.DAT"
+                Dim lSB As New StringBuilder
+                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location")))
+                SaveFileString(lFileName, lSB.ToString)
+            End If
+        Next
+
+    End Function
 End Class
 
 Public Class MetConstituent

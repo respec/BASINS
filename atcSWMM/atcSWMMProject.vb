@@ -154,6 +154,7 @@ Public Class SWMMProject
         '[TIMESERIES]
         lSW.WriteLine(MetConstituents.TimeSeriesHeaderToString)
         MetConstituents.TimeSeriesToStream(lSW)
+        'MetConstituents.TimeSeriesToFile()
         lSW.WriteLine()
 
         '[REPORT]
@@ -196,8 +197,8 @@ Public Class SWMMProject
         Return True
     End Function
 
-    Public Function PrecipTimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, _
-                                             ByVal aTimeseriesTag As String) As String
+    Public Function TimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, _
+                                       ByVal aTimeseriesTag As String) As String
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
         If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
