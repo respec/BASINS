@@ -108,6 +108,7 @@ Public Class frmWinHSPF
             With SchematicDiagram
                 .UpdateLegend()
                 .BuildTree()
+                .UpdateDetails()
             End With
         End If
     End Sub
