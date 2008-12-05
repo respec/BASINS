@@ -35,6 +35,11 @@ Partial Class frmPlot
         Me.lblPointLabels = New System.Windows.Forms.Label
         Me.cboPointLabels = New System.Windows.Forms.ComboBox
         Me.grpSelect = New System.Windows.Forms.GroupBox
+        Me.chkboDBModify = New System.Windows.Forms.CheckBox
+        Me.chkboDBModel = New System.Windows.Forms.CheckBox
+        Me.chkboDBEmission = New System.Windows.Forms.CheckBox
+        Me.chkboDBLanduse = New System.Windows.Forms.CheckBox
+        Me.chkboDBBMP = New System.Windows.Forms.CheckBox
         Me.lblDataBlock = New System.Windows.Forms.Label
         Me.btnNoneLanduse = New System.Windows.Forms.Button
         Me.btnAllLanduse = New System.Windows.Forms.Button
@@ -60,11 +65,6 @@ Partial Class frmPlot
         Me.btnDone = New System.Windows.Forms.Button
         Me.btnCancelPlot = New System.Windows.Forms.Button
         Me.chkboContour = New System.Windows.Forms.CheckBox
-        Me.chkboDBBMP = New System.Windows.Forms.CheckBox
-        Me.chkboDBLanduse = New System.Windows.Forms.CheckBox
-        Me.chkboDBEmission = New System.Windows.Forms.CheckBox
-        Me.chkboDBModel = New System.Windows.Forms.CheckBox
-        Me.chkboDBModify = New System.Windows.Forms.CheckBox
         Me.grpSelect.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -217,6 +217,56 @@ Partial Class frmPlot
         Me.grpSelect.TabIndex = 14
         Me.grpSelect.TabStop = False
         Me.grpSelect.Text = "Select Data For Plot"
+        '
+        'chkboDBModify
+        '
+        Me.chkboDBModify.AutoSize = True
+        Me.chkboDBModify.Location = New System.Drawing.Point(441, 67)
+        Me.chkboDBModify.Name = "chkboDBModify"
+        Me.chkboDBModify.Size = New System.Drawing.Size(83, 17)
+        Me.chkboDBModify.TabIndex = 49
+        Me.chkboDBModify.Text = "Modification"
+        Me.chkboDBModify.UseVisualStyleBackColor = True
+        '
+        'chkboDBModel
+        '
+        Me.chkboDBModel.AutoSize = True
+        Me.chkboDBModel.Location = New System.Drawing.Point(336, 67)
+        Me.chkboDBModel.Name = "chkboDBModel"
+        Me.chkboDBModel.Size = New System.Drawing.Size(99, 17)
+        Me.chkboDBModel.TabIndex = 48
+        Me.chkboDBModel.Text = "Weather Model"
+        Me.chkboDBModel.UseVisualStyleBackColor = True
+        '
+        'chkboDBEmission
+        '
+        Me.chkboDBEmission.AutoSize = True
+        Me.chkboDBEmission.Location = New System.Drawing.Point(218, 67)
+        Me.chkboDBEmission.Name = "chkboDBEmission"
+        Me.chkboDBEmission.Size = New System.Drawing.Size(112, 17)
+        Me.chkboDBEmission.TabIndex = 47
+        Me.chkboDBEmission.Text = "Emission Scenario"
+        Me.chkboDBEmission.UseVisualStyleBackColor = True
+        '
+        'chkboDBLanduse
+        '
+        Me.chkboDBLanduse.AutoSize = True
+        Me.chkboDBLanduse.Location = New System.Drawing.Point(145, 67)
+        Me.chkboDBLanduse.Name = "chkboDBLanduse"
+        Me.chkboDBLanduse.Size = New System.Drawing.Size(67, 17)
+        Me.chkboDBLanduse.TabIndex = 46
+        Me.chkboDBLanduse.Text = "Landuse"
+        Me.chkboDBLanduse.UseVisualStyleBackColor = True
+        '
+        'chkboDBBMP
+        '
+        Me.chkboDBBMP.AutoSize = True
+        Me.chkboDBBMP.Location = New System.Drawing.Point(90, 67)
+        Me.chkboDBBMP.Name = "chkboDBBMP"
+        Me.chkboDBBMP.Size = New System.Drawing.Size(49, 17)
+        Me.chkboDBBMP.TabIndex = 45
+        Me.chkboDBBMP.Text = "BMP"
+        Me.chkboDBBMP.UseVisualStyleBackColor = True
         '
         'lblDataBlock
         '
@@ -459,56 +509,6 @@ Partial Class frmPlot
         Me.chkboContour.TabIndex = 18
         Me.chkboContour.Text = "Contour Map"
         Me.chkboContour.UseVisualStyleBackColor = True
-        '
-        'chkboDBBMP
-        '
-        Me.chkboDBBMP.AutoSize = True
-        Me.chkboDBBMP.Location = New System.Drawing.Point(90, 67)
-        Me.chkboDBBMP.Name = "chkboDBBMP"
-        Me.chkboDBBMP.Size = New System.Drawing.Size(49, 17)
-        Me.chkboDBBMP.TabIndex = 45
-        Me.chkboDBBMP.Text = "BMP"
-        Me.chkboDBBMP.UseVisualStyleBackColor = True
-        '
-        'chkboDBLanduse
-        '
-        Me.chkboDBLanduse.AutoSize = True
-        Me.chkboDBLanduse.Location = New System.Drawing.Point(145, 67)
-        Me.chkboDBLanduse.Name = "chkboDBLanduse"
-        Me.chkboDBLanduse.Size = New System.Drawing.Size(67, 17)
-        Me.chkboDBLanduse.TabIndex = 46
-        Me.chkboDBLanduse.Text = "Landuse"
-        Me.chkboDBLanduse.UseVisualStyleBackColor = True
-        '
-        'chkboDBEmission
-        '
-        Me.chkboDBEmission.AutoSize = True
-        Me.chkboDBEmission.Location = New System.Drawing.Point(218, 67)
-        Me.chkboDBEmission.Name = "chkboDBEmission"
-        Me.chkboDBEmission.Size = New System.Drawing.Size(112, 17)
-        Me.chkboDBEmission.TabIndex = 47
-        Me.chkboDBEmission.Text = "Emission Scenario"
-        Me.chkboDBEmission.UseVisualStyleBackColor = True
-        '
-        'chkboDBModel
-        '
-        Me.chkboDBModel.AutoSize = True
-        Me.chkboDBModel.Location = New System.Drawing.Point(336, 67)
-        Me.chkboDBModel.Name = "chkboDBModel"
-        Me.chkboDBModel.Size = New System.Drawing.Size(99, 17)
-        Me.chkboDBModel.TabIndex = 48
-        Me.chkboDBModel.Text = "Weather Model"
-        Me.chkboDBModel.UseVisualStyleBackColor = True
-        '
-        'chkboDBModify
-        '
-        Me.chkboDBModify.AutoSize = True
-        Me.chkboDBModify.Location = New System.Drawing.Point(441, 67)
-        Me.chkboDBModify.Name = "chkboDBModify"
-        Me.chkboDBModify.Size = New System.Drawing.Size(83, 17)
-        Me.chkboDBModify.TabIndex = 49
-        Me.chkboDBModify.Text = "Modification"
-        Me.chkboDBModify.UseVisualStyleBackColor = True
         '
         'frmPlot
         '
