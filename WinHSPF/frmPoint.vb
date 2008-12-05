@@ -15,8 +15,15 @@ Public Class frmPoint
     '.net conversion issue: tsl was formelry ATCoTSlist
     Dim WithEvents tsl As atcTimeseries
 
-    Dim InUseFacs() As String, CountInUseFacs&
-    Dim AvailFacs() As String = {""}
+    'net conversion issue: The array InUseFacs(1)() is a 2-D array that holds the (index 0) facility name, (index1) scenario string
+    'it should have the same elements as the sources list that are checked.
+    Dim InUseFacs(1)() As String
+
+    'net conversion issue: The array AvailFacs(1)() is a 2-D array that holds the (index 0) facility name, (index1) scenario string
+    'it should have the same elements as the sources list that are NOT checked.
+    Dim AvailFacs(1)() As String
+
+    Dim CountInUseFacs As Integer
     Dim CountAvailFacs As Integer
     Dim ConsLinks() As String, MemberLinks() As String, LinkCount&
     Dim MSub1Links() As Long, MSub2Links() As Long
@@ -26,7 +33,6 @@ Public Class frmPoint
 
     Public Sub New()
         Dim LinkCount As Integer
-        Dim i As Integer
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -35,8 +41,15 @@ Public Class frmPoint
         lstPoints.SelectionMode = SelectionMode.One
         ExpandedView(False)
 
-        grpDetails.Text = "Details of " & lstPoints.SelectedItem
+        ReDim InUseFacs(0)(0)
+        ReDim InUseFacs(1)(0)
+        ReDim AvailFacs(0)(0)
+        ReDim AvailFacs(1)(0)
 
+        'InUseFacs(0)(0) = ""
+        'InUseFacs(1)(0) = ""
+        'AvailFacs(0)(0) = ""
+        'AvailFacs(1)(0) = ""
 
         With agdMasterPoint
             .Source = New atcControls.atcGridSource
@@ -44,6 +57,7 @@ Public Class frmPoint
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
             .Visible = True
+            .Source.FixedRows = 1
         End With
 
         With agdPoint
@@ -54,9 +68,10 @@ Public Class frmPoint
             .Visible = True
         End With
 
-
         'always link flow to ivol
+
         LinkCount = 1
+
         ReDim ConsLinks(LinkCount)
         ReDim MemberLinks(LinkCount)
         ReDim MSub1Links(LinkCount)
@@ -77,28 +92,48 @@ Public Class frmPoint
         '.net conversion issue: tsl formerly atcTSList
         Dim tsl As New List(Of atcTimeseries)
 
-        CountInUseFacs = lstPoints.CheckedItems.Count
-
-        'For i = 0 To lstPoints.Items.Count - 1
-        '    If lstPoints.GetItemChecked(i) Then
-        '        ReDim InUseFacs(UBound(InUseFacs))
-        '        InUseFacs(UBound(InUseFacs)) = lstPoints.Items.Item(i)
-        '    Else
-        '        ReDim AvailFacs(UBound(AvailFacs))
-        '        AvailFacs(UBound(AvailFacs)) = lstPoints.Items.Item(i)
-        '    End If
-        'Next
-
         agdMasterPoint.SizeAllColumnsToContents()
         agdMasterPoint.Refresh()
 
         agdPoint.SizeAllColumnsToContents()
         agdPoint.Refresh()
 
-
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
+    End Sub
+
+    Private Sub Grid2Master()
+        Dim i&, j&, irow&
+
+        If grpDetails.Visible Then
+            With agdPoint.Source
+                For i = 1 To .Rows
+                    irow = .CellValue(i, 14)
+                    For j = 0 To agdMasterPoint.Source.Columns - 1
+                        agdMasterPoint.Source.CellValue(irow, j) = .CellValue(i, j)
+                    Next j
+                Next i
+            End With
+        End If
+
+    End Sub
+
+    Private Sub AddPointSource(ByVal aFacilityName As String, ByVal aScenario As String, ByVal aInUse As Boolean)
+        If aInUse Then
+            ReDim Preserve InUseFacs(0)(UBound(InUseFacs(0)))
+            ReDim Preserve InUseFacs(1)(UBound(InUseFacs(1)))
+            InUseFacs(0)(UBound(InUseFacs(0))) = aFacilityName
+            InUseFacs(1)(UBound(InUseFacs(0))) = aScenario
+            lstPoints.Items.Add(aFacilityName & " (" & aScenario & ")", aInUse)
+        Else
+            ReDim Preserve AvailFacs(0)(UBound(AvailFacs(0)))
+            ReDim Preserve AvailFacs(1)(UBound(AvailFacs(1)))
+            AvailFacs(0)(UBound(AvailFacs(0))) = aFacilityName
+            AvailFacs(1)(UBound(AvailFacs(0))) = aScenario
+            lstPoints.Items.Add(aFacilityName & " (" & aScenario & ")", aInUse)
+        End If
+        CountInUseFacs = lstPoints.CheckedItems.Count
     End Sub
 
     Private Sub FillMasterGrid()
@@ -133,14 +168,11 @@ Public Class frmPoint
 
                             'found a reach with this id
                             lfac = UCase(lts(i).Attributes.GetValue("STANAM"))
-                            MsgBox(lfac)
                             lcon = lts(i).Attributes.GetValue("Constituent")
-                            S = lfac & " (" & Mid(lts(i).Attributes.GetValue("Scenario"), 4) & ")"
 
+                            S = lfac & " (" & Mid(lts(i).Attributes.GetValue("Scenario"), 4) & ")"
                             If Not lstPoints.Items.Contains(S) Then
-                                lstPoints.Items.Add(S, False)
-                                'ReDim Preserve AvailFacs(UBound(AvailFacs, 1), UBound(AvailFacs, 2))
-                                'AvailFacs(UBound(AvailFacs)) = S
+                                AddPointSource(lfac, Mid(lts(i).Attributes.GetValue("Scenario"), 4), False)
                             End If
 
                             'see how many times this dsn shows up in pt srcs
@@ -160,9 +192,10 @@ Public Class frmPoint
 
                                         For lPointItemIndex = 0 To lstPoints.Items.Count - 1
                                             If lstPoints.Items.Item(lPointItemIndex) = S AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
-                                                lstPoints.SetItemChecked(lPointItemIndex, True)
+                                                AddPointSource(lfac, Mid(lts(i).Attributes.GetValue("Scenario"), 4), True)
                                             End If
                                         Next
+
                                     End If
                                 Next
                                 If activeflag = False Then
@@ -198,8 +231,15 @@ Public Class frmPoint
                                     .CellValue(icnt, 11) = i 'save index to lts
 
                                     'look for this con in pollutant list
+
+
+                                    'net conversion issue: Adding "FLOW" - pollutant not up and running yet.
+                                    Dim TempPollutant As New HspfPollutant
+                                    TempPollutant.Name = "FLOW"
+                                    pUCI.Pollutants.Add(TempPollutant)
+
                                     For Each vpol In pUCI.Pollutants
-                                        lpol = vpol
+                                        lpol = vpol.Name
                                         If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
                                             lcon = lpol
                                             Exit For
@@ -477,125 +517,36 @@ Public Class frmPoint
     End Sub
 
     Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
-        'Dim ifound As Boolean, k&, j&, i&
-        'Dim sen$, fac$, ipos&, ilen&, itmp&
+        Dim ifound As Boolean, i&
 
-        'grpDetails.Text = "Details of " & lstPoints.SelectedItem
+        grpDetails.Text = "Details of " & lstPoints.SelectedItem
 
+        For i = 1 To agdMasterPoint.Source.Rows
+            'Check if facility and scenario are in use.
+            If Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 3)) <> -1 AndAlso Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 Then
+                ifound = True
+                'set indiv timsers to in use in master grid
+                agdMasterPoint.Source.CellValue(i, 0) = "Yes"
+            Else
+                ifound = False
+                'set indiv timsers to not in use in master grid
+                agdMasterPoint.Source.CellValue(i, 0) = "No"
+            End If
+        Next
 
-        'see if something new is in inuse facilities
-        'For i = 0 To lstPoints.CheckedItems.Count - 1
-        '    ifound = False
-        '    For k = 1 To CountInUseFacs
-        '        If lstPoints.CheckedItems.Item(i) = InUseFacs(k - 1) Then
-        '            ifound = True
-        '            Exit For
-        '        End If
-        '    Next k
-        '    If Not ifound Then
-        '        'something added to inuse facilities
-        '        ilen = Len(lstPoints.CheckedItems.Item(i))
-        '        If ilen > 0 Then
-        '            ipos = InStr(1, lstPoints.CheckedItems.Item(i), "(")
-        '            If ipos > 0 Then
-        '                'make sure this the last paren
-        '                itmp = -1
-        '                Do Until itmp = 0
-        '                    itmp = InStr(ipos + 1, lstPoints.CheckedItems.Item(i), "(")
-        '                    If itmp > 0 Then
-        '                        ipos = itmp
-        '                    End If
-        '                Loop
-        '                sen = "PT-" & Mid(aslPoint.RightItem(i), ipos + 1, ilen - ipos - 1)
-        '                fac = Mid(aslPoint.RightItem(i), 1, ipos - 2)
-        '            End If
-        '        End If
-        '        For k = 1 To agdMasterPoint.rows
-        '            If agdMasterPoint.TextMatrix(k, 1) = sen And agdMasterPoint.TextMatrix(k, 3) = fac Then
-        '                'see if this constituent is in cons link list
-        '                ifound = False
-        '                For j = 1 To LinkCount
-        '                    If ConsLinks(j - 1) = UCase(agdMasterPoint.TextMatrix(k, 4)) Then
-        '                        ifound = True
-        '                        Exit For
-        '                    End If
-        '                Next j
-        '                If ifound Then
-        '                    'set indiv timsers to in use in master grid
-        '                    agdMasterPoint.TextMatrix(k, 0) = "Yes"
-        '                End If
-        '            End If
-        '        Next k
-        '        For k = 1 To agdPoint.rows
-        '            If agdPoint.TextMatrix(k, 1) = sen And agdPoint.TextMatrix(k, 3) = fac Then
-        '                'see if this constituent is in cons link list
-        '                ifound = False
-        '                For j = 1 To LinkCount
-        '                    If ConsLinks(j - 1) = UCase(agdPoint.TextMatrix(k, 4)) Then
-        '                        ifound = True
-        '                        Exit For
-        '                    End If
-        '                Next j
-        '                If ifound Then
-        '                    'set indiv timsers to in use in point grid
-        '                    agdPoint.TextMatrix(k, 0) = "Yes"
-        '                End If
-        '            End If
-        '        Next k
-        '    End If
-        'Next i
-        ''see if something new is in available facilities
-        'For i = 0 To aslPoint.LeftCount - 1
-        '    ifound = False
-        '    For k = 1 To CountAvailFacs
-        '        If aslPoint.LeftItem(i) = AvailFacs(k - 1) Then
-        '            ifound = True
-        '            Exit For
-        '        End If
-        '    Next k
-        '    If Not ifound Then
-        '        'something added to available facilities
-        '        ilen = Len(aslPoint.LeftItem(i))
-        '        If ilen > 0 Then
-        '            ipos = InStr(1, aslPoint.LeftItem(i), "(")
-        '            If ipos > 0 Then
-        '                'make sure this the last paren
-        '                itmp = -1
-        '                Do Until itmp = 0
-        '                    itmp = InStr(ipos + 1, aslPoint.LeftItem(i), "(")
-        '                    If itmp > 0 Then
-        '                        ipos = itmp
-        '                    End If
-        '                Loop
-        '                sen = "PT-" & Mid(aslPoint.LeftItem(i), ipos + 1, ilen - ipos - 1)
-        '                fac = Mid(aslPoint.LeftItem(i), 1, ipos - 2)
-        '            End If
-        '        End If
-        '        For k = 1 To agdMasterPoint.rows
-        '            If agdMasterPoint.TextMatrix(k, 1) = sen And agdMasterPoint.TextMatrix(k, 3) = fac Then
-        '                'set indiv timsers to not in use in master grid
-        '                agdMasterPoint.TextMatrix(k, 0) = "No"
-        '            End If
-        '        Next k
-        '        For k = 1 To agdPoint.rows
-        '            If agdPoint.TextMatrix(k, 1) = sen And agdPoint.TextMatrix(k, 3) = fac Then
-        '                'set indiv timsers to not in use in point grid
-        '                agdPoint.TextMatrix(k, 0) = "No"
-        '            End If
-        '        Next k
-        '    End If
-        'Next i
-        ''rebuild lists
-        'CountInUseFacs = aslPoint.RightCount
-        'ReDim InUseFacs(CountInUseFacs)
-        'For i = 0 To CountInUseFacs - 1
-        '    InUseFacs(i) = aslPoint.RightItem(i)
-        'Next i
-        'CountAvailFacs = aslPoint.LeftCount
-        'ReDim AvailFacs(CountAvailFacs)
-        'For i = 0 To CountAvailFacs - 1
-        '    AvailFacs(i) = aslPoint.LeftItem(i)
-        'Next i
+        For i = 1 To agdPoint.Source.Rows
+            'Check if facility and scenario are in use.
+            If Array.IndexOf(InUseFacs(0), agdPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdPoint.Source.CellValue(i, 1), 3)) <> -1 AndAlso Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 Then
+                'set indiv timsers to in use in point grid
+                agdPoint.Source.CellValue(i, 0) = "Yes"
+            Else
+                'set indiv timsers to not in use in point grid
+                agdPoint.Source.CellValue(i, 0) = "No"
+            End If
+        Next
+
+        'rebuild lists
+        CountInUseFacs = lstPoints.Items.Count - lstPoints.CheckedItems.Count
 
     End Sub
     Private Sub cmdShowDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsShow.Click
