@@ -7,6 +7,7 @@ Public Class frmPlot
     Private pDatablocks As Integer = 0
     Private pcatBlocks As atcCollection = New atcCollection
     Private pDataValueLbl As Integer = 0
+    Private pOneDataBlock As Boolean = False
 
     Public Property Results() As atcControls.atcGridSource
         Get
@@ -111,7 +112,39 @@ Public Class frmPlot
             End If
         Next
 
-        cboDatablock.SelectedIndex = ldatablock
+        'cboDatablock.SelectedIndex = ldatablock
+        If GetSetting("BasinsCATPlot", "Settings", "DBBMP", "No") = "True" Then
+            chkboDBBMP.Checked = True
+        Else
+            chkboDBBMP.Checked = False
+        End If
+
+        If GetSetting("BasinsCATPlot", "Settings", "DBLanduse", "No") = "True" Then
+            chkboDBLanduse.Checked = True
+        Else
+            chkboDBLanduse.Checked = False
+        End If
+
+        If GetSetting("BasinsCATPlot", "Settings", "DBEmission", "No") = "True" Then
+            chkboDBEmission.Checked = True
+        Else
+            chkboDBEmission.Checked = False
+        End If
+        If GetSetting("BasinsCATPlot", "Settings", "DBModel", "No") = "True" Then
+            chkboDBModel.Checked = True
+        Else
+            chkboDBModel.Checked = False
+        End If
+        If GetSetting("BasinsCATPlot", "Settings", "DBModify", "No") = "True" Then
+            chkboDBModify.Checked = True
+        Else
+            chkboDBModify.Checked = False
+        End If
+        If GetSetting("BasinsCATPlot", "Settings", "DBOneBlock", "No") = "True" Then
+            pOneDataBlock = True
+        Else
+            pOneDataBlock = False
+        End If
     End Sub
 
     'Private Sub btnPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlot.Click
@@ -276,7 +309,7 @@ Public Class frmPlot
         End If
 
         If cboZAxis.Text = "None" Or cboZAxis.Text = "" Then ' 2d plot
-            If pDatablocks > 0 Then
+            If pcatBlocks.Keys.Count > 1 Then
                 'lstr.Append("plot ")
                 'Dim i As Integer = 0
                 'For i = 0 To pDatablocks - 2
@@ -285,7 +318,7 @@ Public Class frmPlot
                 'lstr.AppendLine("'" & lPlotDatFilename & "' u 1:2 every :::" & i & "::" & i & " with points t """ & pcatBlocks.Keys()(i).ToString() & """")
                 doGnuplotScript("2d", lstr, lPlotDatFilename, "", lblCol)
                 lstr.AppendLine("pause -1;")
-            ElseIf cboDatablock.Text = "None" Then
+            ElseIf pcatBlocks.Keys.Count = 1 Then
                 doGnuplotScript("2d", lstr, lPlotDatFilename, cboYAxis.SelectedItem.ToString.Split("-")(1), lblCol)
                 'lstr.AppendLine("plot '" & lPlotDatFilename & "' u 1:2 with points t """ & cboYAxis.SelectedItem.ToString.Split("-")(1) & """")
                 lstr.AppendLine("pause -1;")
@@ -522,23 +555,30 @@ Public Class frmPlot
         pcatBlocks.Clear()
         pDatablocks = 0
 
-        Dim lblockIndex As Integer = 0
-        Select Case cboDatablock.Text
-            Case "None"
-                lblockIndex = 0
-            Case "BMP"
-                lblockIndex = 5 ' or 2 in the case of base_lu2030a2_No
-            Case "Landuse"
-                lblockIndex = 4 ' or 1 in the case of base_lu2030a2_No
-            Case "Emission Scenarios"
-                lblockIndex = 0 ' or 0 for base
-            Case "Weather Models"
-                lblockIndex = 2 ' or 0 for base
-            Case "Modifications"
-                lblockIndex = 3 ' or 0 for base
-            Case Else
-                lblockIndex = 0 ' or 0 for base
-        End Select
+        If chkboDBBMP.Checked OrElse chkboDBLanduse.Checked OrElse chkboDBEmission.Checked OrElse _
+        chkboDBModel.Checked OrElse chkboDBModify.Checked Then
+            pOneDataBlock = False
+        Else
+            pOneDataBlock = True
+        End If
+
+        'Dim lblockIndex As Integer = 0
+        'Select Case cboDatablock.Text
+        '    Case "None"
+        '        lblockIndex = 0
+        '    Case "BMP"
+        '        lblockIndex = 5 ' or 2 in the case of base_lu2030a2_No
+        '    Case "Landuse"
+        '        lblockIndex = 4 ' or 1 in the case of base_lu2030a2_No
+        '    Case "Emission Scenarios"
+        '        lblockIndex = 0 ' or 0 for base
+        '    Case "Weather Models"
+        '        lblockIndex = 2 ' or 0 for base
+        '    Case "Modifications"
+        '        lblockIndex = 3 ' or 0 for base
+        '    Case Else
+        '        lblockIndex = 0 ' or 0 for base
+        'End Select
 
         Dim lColX As Integer = cboXAxis.SelectedItem.ToString.Split("-")(0)
         Dim lColY As Integer = cboYAxis.SelectedItem.ToString.Split("-")(0)
@@ -557,11 +597,12 @@ Public Class frmPlot
         If Not cboPointLabels.Text = "None" And Not cboPointLabels.Text = "" Then
             lptLabelCol = cboPointLabels.SelectedItem.ToString.Split("-")(0)
         End If
-
+        Dim lKey As String = ""
         If aSelection = "All" Then
             Try
                 For lRow As Integer = pResults.FixedRows To pResults.Rows - 1
 
+                    lKey = ""
                     If cboZAxis.Text = "None" OrElse cboZAxis.Text = "" Then ' 2d data
                         lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "")
                     Else
@@ -574,38 +615,78 @@ Public Class frmPlot
                         lline &= vbCrLf
                     End If
 
-
-                    If cboDatablock.Text = "None" Or cboDatablock.Text = "" Then
+                    If pOneDataBlock Then
                         IO.File.AppendAllText(aFilename, lline)
                     Else
                         ltemp = pResults.CellValue(lRow, 0)
-                        ' adjust lblockIndex for base scenario name
-                        If ltemp.StartsWith("base") Then
-                            If cboDatablock.Text = "Landuse" Then
-                                lblockIndex = 1
-                            ElseIf cboDatablock.Text = "BMP" Then
-                                lblockIndex = 2
+                        '' adjust lblockIndex for base scenario name
+                        'If ltemp.StartsWith("base") Then
+                        '    If cboDatablock.Text = "Landuse" Then
+                        '        lblockIndex = 1
+                        '    ElseIf cboDatablock.Text = "BMP" Then
+                        '        lblockIndex = 2
+                        '    Else
+                        '        lblockIndex = 0
+                        '    End If
+                        'End If
+
+                        'Dim ltempKey As String = pResults.CellValue(lRow, 0).Split("_")(lblockIndex)
+
+                        If isPartialKey("BMP") Then
+                            If ltemp.StartsWith("base") Then
+                                lKey &= ltemp.Split("_")(2) & "-"
                             Else
-                                lblockIndex = 0
+                                lKey &= ltemp.Split("_")(5) & "-"
+                            End If
+                        End If
+                        If isPartialKey("Landuse") Then
+                            If ltemp.StartsWith("base") Then
+                                lKey &= ltemp.Split("_")(1) & "-"
+                            Else
+                                lKey &= ltemp.Split("_")(4) & "-"
                             End If
                         End If
 
-                        Dim ltempKey As String = pResults.CellValue(lRow, 0).Split("_")(lblockIndex)
-                        If pcatBlocks.ItemByKey(ltempKey) = Nothing Then
-                            pcatBlocks.Add(ltempKey, lline)
+                        If isPartialKey("Emission") Then
+                            If ltemp.StartsWith("base") Then
+                                lKey &= "base-"
+                            Else
+                                lKey &= ltemp.Split("_")(0) & "-"
+                            End If
+                        End If
+
+                        If isPartialKey("Model") Then
+                            If ltemp.StartsWith("base") Then
+                                lKey &= "base-"
+                            Else
+                                lKey &= ltemp.Split("_")(2) & "-"
+                            End If
+                        End If
+
+                        If isPartialKey("Modify") Then
+                            If ltemp.StartsWith("base") Then
+                                lKey &= "base-"
+                            Else
+                                lKey &= ltemp.Split("_")(3) & "-"
+                            End If
+                        End If
+
+                        lKey = lKey.Trim("-")
+
+                        If pcatBlocks.ItemByKey(lKey) = Nothing Then
+                            pcatBlocks.Add(lKey, lline)
                         Else
                             ltemp = ""
-                            ltemp = pcatBlocks.ItemByKey(ltempKey)
-                            Dim lind As Integer = pcatBlocks.IndexFromKey(ltempKey)
+                            ltemp = pcatBlocks.ItemByKey(lKey)
+                            Dim lind As Integer = pcatBlocks.IndexFromKey(lKey)
                             ltemp &= lline
-                            'pcatBlocks.Add(ltempKey, ltemp)
-                            pcatBlocks.Insert(lind, ltempKey, ltemp)
+                            pcatBlocks.Insert(lind, lKey, ltemp)
                             pcatBlocks.RemoveAt(lind + 1)
                         End If
                     End If
                 Next ' foreach lrow
 
-                If cboDatablock.Text <> "None" Then
+                If pcatBlocks.Keys.Count > 1 Then
                     writeDataBlock(aFilename, pcatBlocks)
                 End If
             Catch ex As Exception
@@ -635,25 +716,32 @@ Public Class frmPlot
             Dim lcv As String = Nothing
             Dim lfound As Boolean = False
             Dim lDataValLbl As String = ""
-            For lRow As Integer = pResults.FixedRows To pResults.Rows - 1
 
+            For lRow As Integer = pResults.FixedRows To pResults.Rows - 1
+                lKey = ""
                 lfound = False
                 lcv = pResults.CellValue(lRow, lfilterCol - 1)
                 For Each bmp As String In lstboBMP.SelectedItems
+
                     If lcv.EndsWith(bmp) Then
-
+                        If isPartialKey("BMP") Then lKey &= bmp & "-"
                         For Each lu As String In lstboLanduse.SelectedItems
+
                             If lcv.Contains(lu) Then
-
+                                If isPartialKey("Landuse") Then lKey &= lu & "-"
                                 For Each sem As String In lstboEmission.SelectedItems
+
                                     If lcv.StartsWith(sem) Then
-
+                                        If isPartialKey("Emission") Then lKey &= sem & "-"
                                         For Each smodel As String In lstboModels.SelectedItems
+
                                             If lcv.Contains(smodel) Then
-
+                                                If isPartialKey("Model") Then lKey &= smodel & "-"
                                                 For Each smodify As String In lstboModifications.SelectedItems
-                                                    If lcv.Contains(smodify) Then
 
+                                                    If lcv.Contains(smodify) Then
+                                                        If isPartialKey("Modify") Then lKey &= smodify & "-"
+                                                        lKey = lKey.Trim("-")
                                                         If cboZAxis.Text = "None" OrElse cboZAxis.Text = "" Then ' 2d data
                                                             If cboPointLabels.Text = "None" OrElse cboPointLabels.Text = "" Then
                                                                 lline = pResults.CellValue(lRow, lColX - 1).Replace(",", "") & " " & pResults.CellValue(lRow, lColY - 1).Replace(",", "") & " " & bmp & " " & lu & " " & sem & " " & smodel & " " & smodify
@@ -685,37 +773,37 @@ Public Class frmPlot
                                                             lline &= vbCrLf
                                                         End If
 
-                                                        If cboDatablock.Text = "None" Then
+                                                        If pOneDataBlock Then
                                                             IO.File.AppendAllText(aFilename, lline)
                                                         Else
-                                                            ' adjust lblockIndex for base scenario name
-                                                            Dim lblockIndex0 As Integer
-                                                            If lcv.StartsWith("base") Then
-                                                                lblockIndex0 = lblockIndex 'save the default data block column number
-                                                                If cboDatablock.Text = "Landuse" Then
-                                                                    lblockIndex = 1
-                                                                ElseIf cboDatablock.Text = "BMP" Then
-                                                                    lblockIndex = 2
-                                                                Else
-                                                                    lblockIndex = 0
-                                                                End If
-                                                            End If
+                                                            '' adjust lblockIndex for base scenario name
+                                                            'Dim lblockIndex0 As Integer
+                                                            'If lcv.StartsWith("base") Then
+                                                            '    lblockIndex0 = lblockIndex 'save the default data block column number
+                                                            '    If cboDatablock.Text = "Landuse" Then
+                                                            '        lblockIndex = 1
+                                                            '    ElseIf cboDatablock.Text = "BMP" Then
+                                                            '        lblockIndex = 2
+                                                            '    Else
+                                                            '        lblockIndex = 0
+                                                            '    End If
+                                                            'End If
 
-                                                            Dim ltempKey As String = lcv.Split("_")(lblockIndex)
-                                                            If pcatBlocks.ItemByKey(ltempKey) = Nothing Then
-                                                                pcatBlocks.Add(ltempKey, lline)
+                                                            'Dim ltempKey As String = lcv.Split("_")(lblockIndex)
+                                                            If pcatBlocks.ItemByKey(lKey) = Nothing Then
+                                                                pcatBlocks.Add(lKey, lline)
                                                             Else
                                                                 ltemp = ""
-                                                                ltemp = pcatBlocks.ItemByKey(ltempKey)
-                                                                Dim lind As Integer = pcatBlocks.IndexFromKey(ltempKey)
+                                                                ltemp = pcatBlocks.ItemByKey(lKey)
+                                                                Dim lind As Integer = pcatBlocks.IndexFromKey(lKey)
                                                                 ltemp &= lline
                                                                 'pcatBlocks.Insert(ltempKey, ltemp)
-                                                                pcatBlocks.Insert(lind, ltempKey, ltemp)
+                                                                pcatBlocks.Insert(lind, lKey, ltemp)
                                                                 pcatBlocks.RemoveAt(lind + 1)
                                                             End If
-                                                            If lcv.StartsWith("base") Then
-                                                                lblockIndex = lblockIndex0 ' change it back to default data block number
-                                                            End If
+                                                            'If lcv.StartsWith("base") Then
+                                                            '    lblockIndex = lblockIndex0 ' change it back to default data block number
+                                                            'End If
                                                         End If
 
                                                         lfound = True
@@ -741,7 +829,7 @@ Public Class frmPlot
                 Next 'foreach bmp {y, n}
             Next ' foreach lRow
 
-            If cboDatablock.Text <> "None" Then
+            If pcatBlocks.Keys.Count > 1 Then
                 writeDataBlock(aFilename, pcatBlocks)
             End If
 
@@ -752,6 +840,23 @@ Public Class frmPlot
         Return 0
     End Function
 
+    Private Function isPartialKey(ByVal aDF As String) As Boolean
+        isPartialKey = False
+        Select Case aDF
+            Case "BMP"
+                If chkboDBBMP.Checked Then isPartialKey = True
+            Case "Landuse"
+                If chkboDBLanduse.Checked Then isPartialKey = True
+            Case "Emission"
+                If chkboDBEmission.Checked Then isPartialKey = True
+            Case "Model"
+                If chkboDBModel.Checked Then isPartialKey = True
+            Case "Modify"
+                If chkboDBModify.Checked Then isPartialKey = True
+            Case Else
+                isPartialKey = False
+        End Select
+    End Function
     Private Sub writeDataBlock(ByVal aFilename As String, ByVal acatBlocks As atcCollection)
         'acatBlocks.Sort()
         For Each k As String In acatBlocks
@@ -963,7 +1068,6 @@ Public Class frmPlot
 
         'TODO: Save settings here
 
-
         If cboXAxis.Text = "None" OrElse cboXAxis.Text = "" Then
             SaveSetting("BasinsCATPlot", "Settings", "XAxis", "0")
         Else
@@ -994,11 +1098,13 @@ Public Class frmPlot
             SaveSetting("BasinsCATPlot", "Settings", "SelectField", cboSelect.Text.Split("-")(0))
         End If
 
-        If cboDatablock.Text = "None" OrElse cboDatablock.Text = "" Then
-            SaveSetting("BasinsCATPlot", "Settings", "DataBlock", "0")
-        Else
-            SaveSetting("BasinsCATPlot", "Settings", "DataBlock", cboDatablock.SelectedIndex)
-        End If
+        SaveSetting("BasinsCATPlot", "Settings", "DBBMP", chkboDBBMP.Checked.ToString)
+        SaveSetting("BasinsCATPlot", "Settings", "DBLanduse", chkboDBLanduse.Checked.ToString)
+        SaveSetting("BasinsCATPlot", "Settings", "DBEmission", chkboDBEmission.Checked.ToString)
+        SaveSetting("BasinsCATPlot", "Settings", "DBModel", chkboDBModel.Checked.ToString)
+        SaveSetting("BasinsCATPlot", "Settings", "DBModify", chkboDBModify.Checked.ToString)
+
+        SaveSetting("BasinsCATPlot", "Settings", "DBOneBlock", pOneDataBlock.ToString)
 
         SaveSetting("BasinsCATPlot", "Settings", "Title", txtTitle.Text)
         Me.Close()

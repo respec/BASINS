@@ -35,7 +35,6 @@ Partial Class frmPlot
         Me.lblPointLabels = New System.Windows.Forms.Label
         Me.cboPointLabels = New System.Windows.Forms.ComboBox
         Me.grpSelect = New System.Windows.Forms.GroupBox
-        Me.cboDatablock = New System.Windows.Forms.ComboBox
         Me.lblDataBlock = New System.Windows.Forms.Label
         Me.btnNoneLanduse = New System.Windows.Forms.Button
         Me.btnAllLanduse = New System.Windows.Forms.Button
@@ -61,6 +60,11 @@ Partial Class frmPlot
         Me.btnDone = New System.Windows.Forms.Button
         Me.btnCancelPlot = New System.Windows.Forms.Button
         Me.chkboContour = New System.Windows.Forms.CheckBox
+        Me.chkboDBBMP = New System.Windows.Forms.CheckBox
+        Me.chkboDBLanduse = New System.Windows.Forms.CheckBox
+        Me.chkboDBEmission = New System.Windows.Forms.CheckBox
+        Me.chkboDBModel = New System.Windows.Forms.CheckBox
+        Me.chkboDBModify = New System.Windows.Forms.CheckBox
         Me.grpSelect.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -128,7 +132,7 @@ Partial Class frmPlot
         'btnPlot
         '
         Me.btnPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnPlot.Location = New System.Drawing.Point(549, 454)
+        Me.btnPlot.Location = New System.Drawing.Point(549, 486)
         Me.btnPlot.Name = "btnPlot"
         Me.btnPlot.Size = New System.Drawing.Size(75, 23)
         Me.btnPlot.TabIndex = 7
@@ -139,7 +143,7 @@ Partial Class frmPlot
         '
         Me.txtTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtTitle.Location = New System.Drawing.Point(48, 406)
+        Me.txtTitle.Location = New System.Drawing.Point(48, 438)
         Me.txtTitle.Name = "txtTitle"
         Me.txtTitle.Size = New System.Drawing.Size(576, 20)
         Me.txtTitle.TabIndex = 8
@@ -148,7 +152,7 @@ Partial Class frmPlot
         '
         Me.lblTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblTitle.AutoSize = True
-        Me.lblTitle.Location = New System.Drawing.Point(15, 409)
+        Me.lblTitle.Location = New System.Drawing.Point(15, 441)
         Me.lblTitle.Name = "lblTitle"
         Me.lblTitle.Size = New System.Drawing.Size(27, 13)
         Me.lblTitle.TabIndex = 9
@@ -180,7 +184,11 @@ Partial Class frmPlot
         Me.grpSelect.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpSelect.Controls.Add(Me.cboDatablock)
+        Me.grpSelect.Controls.Add(Me.chkboDBModify)
+        Me.grpSelect.Controls.Add(Me.chkboDBModel)
+        Me.grpSelect.Controls.Add(Me.chkboDBEmission)
+        Me.grpSelect.Controls.Add(Me.chkboDBLanduse)
+        Me.grpSelect.Controls.Add(Me.chkboDBBMP)
         Me.grpSelect.Controls.Add(Me.lblDataBlock)
         Me.grpSelect.Controls.Add(Me.btnNoneLanduse)
         Me.grpSelect.Controls.Add(Me.btnAllLanduse)
@@ -205,20 +213,10 @@ Partial Class frmPlot
         Me.grpSelect.Controls.Add(Me.cboSelect)
         Me.grpSelect.Location = New System.Drawing.Point(12, 120)
         Me.grpSelect.Name = "grpSelect"
-        Me.grpSelect.Size = New System.Drawing.Size(609, 280)
+        Me.grpSelect.Size = New System.Drawing.Size(609, 312)
         Me.grpSelect.TabIndex = 14
         Me.grpSelect.TabStop = False
         Me.grpSelect.Text = "Select Data For Plot"
-        '
-        'cboDatablock
-        '
-        Me.cboDatablock.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboDatablock.FormattingEnabled = True
-        Me.cboDatablock.Items.AddRange(New Object() {"None", "BMP", "Landuse", "Emission Scenarios", "Weather Models", "Modifications"})
-        Me.cboDatablock.Location = New System.Drawing.Point(90, 64)
-        Me.cboDatablock.Name = "cboDatablock"
-        Me.cboDatablock.Size = New System.Drawing.Size(179, 21)
-        Me.cboDatablock.TabIndex = 44
         '
         'lblDataBlock
         '
@@ -434,7 +432,7 @@ Partial Class frmPlot
         'btnDone
         '
         Me.btnDone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDone.Location = New System.Drawing.Point(12, 454)
+        Me.btnDone.Location = New System.Drawing.Point(12, 486)
         Me.btnDone.Name = "btnDone"
         Me.btnDone.Size = New System.Drawing.Size(75, 23)
         Me.btnDone.TabIndex = 15
@@ -444,7 +442,7 @@ Partial Class frmPlot
         'btnCancelPlot
         '
         Me.btnCancelPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCancelPlot.Location = New System.Drawing.Point(93, 454)
+        Me.btnCancelPlot.Location = New System.Drawing.Point(93, 486)
         Me.btnCancelPlot.Name = "btnCancelPlot"
         Me.btnCancelPlot.Size = New System.Drawing.Size(75, 23)
         Me.btnCancelPlot.TabIndex = 16
@@ -453,19 +451,70 @@ Partial Class frmPlot
         '
         'chkboContour
         '
+        Me.chkboContour.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkboContour.AutoSize = True
-        Me.chkboContour.Location = New System.Drawing.Point(456, 458)
+        Me.chkboContour.Location = New System.Drawing.Point(457, 490)
         Me.chkboContour.Name = "chkboContour"
         Me.chkboContour.Size = New System.Drawing.Size(87, 17)
         Me.chkboContour.TabIndex = 18
         Me.chkboContour.Text = "Contour Map"
         Me.chkboContour.UseVisualStyleBackColor = True
         '
+        'chkboDBBMP
+        '
+        Me.chkboDBBMP.AutoSize = True
+        Me.chkboDBBMP.Location = New System.Drawing.Point(90, 67)
+        Me.chkboDBBMP.Name = "chkboDBBMP"
+        Me.chkboDBBMP.Size = New System.Drawing.Size(49, 17)
+        Me.chkboDBBMP.TabIndex = 45
+        Me.chkboDBBMP.Text = "BMP"
+        Me.chkboDBBMP.UseVisualStyleBackColor = True
+        '
+        'chkboDBLanduse
+        '
+        Me.chkboDBLanduse.AutoSize = True
+        Me.chkboDBLanduse.Location = New System.Drawing.Point(145, 67)
+        Me.chkboDBLanduse.Name = "chkboDBLanduse"
+        Me.chkboDBLanduse.Size = New System.Drawing.Size(67, 17)
+        Me.chkboDBLanduse.TabIndex = 46
+        Me.chkboDBLanduse.Text = "Landuse"
+        Me.chkboDBLanduse.UseVisualStyleBackColor = True
+        '
+        'chkboDBEmission
+        '
+        Me.chkboDBEmission.AutoSize = True
+        Me.chkboDBEmission.Location = New System.Drawing.Point(218, 67)
+        Me.chkboDBEmission.Name = "chkboDBEmission"
+        Me.chkboDBEmission.Size = New System.Drawing.Size(112, 17)
+        Me.chkboDBEmission.TabIndex = 47
+        Me.chkboDBEmission.Text = "Emission Scenario"
+        Me.chkboDBEmission.UseVisualStyleBackColor = True
+        '
+        'chkboDBModel
+        '
+        Me.chkboDBModel.AutoSize = True
+        Me.chkboDBModel.Location = New System.Drawing.Point(336, 67)
+        Me.chkboDBModel.Name = "chkboDBModel"
+        Me.chkboDBModel.Size = New System.Drawing.Size(99, 17)
+        Me.chkboDBModel.TabIndex = 48
+        Me.chkboDBModel.Text = "Weather Model"
+        Me.chkboDBModel.UseVisualStyleBackColor = True
+        '
+        'chkboDBModify
+        '
+        Me.chkboDBModify.AutoSize = True
+        Me.chkboDBModify.Location = New System.Drawing.Point(441, 67)
+        Me.chkboDBModify.Name = "chkboDBModify"
+        Me.chkboDBModify.Size = New System.Drawing.Size(83, 17)
+        Me.chkboDBModify.TabIndex = 49
+        Me.chkboDBModify.Text = "Modification"
+        Me.chkboDBModify.UseVisualStyleBackColor = True
+        '
         'frmPlot
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(633, 489)
+        Me.ClientSize = New System.Drawing.Size(633, 521)
         Me.Controls.Add(Me.chkboContour)
         Me.Controls.Add(Me.btnCancelPlot)
         Me.Controls.Add(Me.btnDone)
@@ -525,7 +574,11 @@ Partial Class frmPlot
     Friend WithEvents rdoBMP As System.Windows.Forms.RadioButton
     Friend WithEvents btnNoneLanduse As System.Windows.Forms.Button
     Friend WithEvents btnAllLanduse As System.Windows.Forms.Button
-    Friend WithEvents cboDatablock As System.Windows.Forms.ComboBox
     Friend WithEvents lblDataBlock As System.Windows.Forms.Label
     Friend WithEvents chkboContour As System.Windows.Forms.CheckBox
+    Friend WithEvents chkboDBBMP As System.Windows.Forms.CheckBox
+    Friend WithEvents chkboDBModel As System.Windows.Forms.CheckBox
+    Friend WithEvents chkboDBEmission As System.Windows.Forms.CheckBox
+    Friend WithEvents chkboDBLanduse As System.Windows.Forms.CheckBox
+    Friend WithEvents chkboDBModify As System.Windows.Forms.CheckBox
 End Class
