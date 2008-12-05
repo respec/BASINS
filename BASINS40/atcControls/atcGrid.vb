@@ -42,6 +42,7 @@ Public Class atcGrid
         'This call is required by the Windows Form Designer.
         InitializeComponent()
         Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
+        Clear()
     End Sub
 
     'UserControl overrides dispose to clean up the component list.

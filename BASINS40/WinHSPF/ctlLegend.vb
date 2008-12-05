@@ -40,16 +40,16 @@ Public Class ctlLegend
     Public Sub Add(ByVal aIcon As clsIcon)
         Dim lY As Integer = IconMargin
         If Icons.Count > 0 Then lY = Icons(Icons.Count - 1).Bottom + IconMargin * 2
-        Icons.Add(aIcon)        
         aIcon.Top = lY
         aIcon.Left = IconMargin
         aIcon.Width = IconWidth()
+        Icons.Add(aIcon)
         pnlLegend.Controls.Add(aIcon)
     End Sub
 
     Public Function Icon(ByVal aKey As String) As clsIcon
         For Each lIcon As clsIcon In Icons
-            If lIcon.Tag = aKey Then Return lIcon
+            If lIcon.Key = aKey Then Return lIcon
         Next
         Return Nothing
     End Function
@@ -87,6 +87,7 @@ Public Class ctlLegend
                 lIcon.Top = -lIcon.Height
             Else
                 lIcon.Top = lY
+                lIcon.Width = IconWidth()
                 If lIcon.Selected Then
                     lGraphics.FillRectangle(SystemBrushes.Highlight, 0, lY - IconMargin, Me.Width, lIcon.Height + IconMargin + IconMargin)
                 End If
@@ -116,6 +117,7 @@ Public Class clsIcon
 
     Public Selected As Boolean
     Public Key As String = ""
+    Public Label As String = ""
 
     Sub New()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
@@ -131,24 +133,13 @@ End Class
 Public Class clsSchematicIcon
     Inherits clsIcon
 
-    Public pOperation As HspfOperation
+    Public ReachOrBMP As HspfOperation
+    Public Implnd As HspfOperation
+    Public Perlnd As HspfOperation
+    Public MetSeg As HspfMetSeg
     Public DownstreamIcons As New Generic.List(Of clsIcon)
     Public UpstreamIcons As New Generic.List(Of clsIcon)
     Public DistanceFromOutlet As Integer = -1
-
-    Public Property Operation() As HspfOperation
-        Get
-            Return pOperation
-        End Get
-        Set(ByVal newValue As HspfOperation)
-            pOperation = newValue
-            If pOperation Is Nothing Then
-                Key = ""
-            Else
-                Key = OperationKey(pOperation)
-            End If
-        End Set
-    End Property
 
 End Class
 

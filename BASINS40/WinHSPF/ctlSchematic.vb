@@ -13,7 +13,7 @@ Public Class ctlSchematic
     Private pBeforeDragLocation As Point
     Private pClickedIcon As clsIcon
 
-    Private pUci As atcUCI.HspfUci
+    Private pUci As HspfUci
     Private pOperationTypesInDiagram As New Generic.List(Of String)
     Private pIcons As New IconCollection
     Private pOutlets As New IconCollection
@@ -24,11 +24,9 @@ Public Class ctlSchematic
 
     Private TreeProblemMessageDisplayed As Boolean = False
     Private TreeLoopMessageDisplayed As Boolean = False
-    Private LandSelected() As Boolean
     Private HighlightBrush As Brush = SystemBrushes.Highlight
     Private LegendScrollPos As Integer
     Private LegendFullHeight As Integer
-    Private MetSelected As Integer = -1
     Private pIconWidth As Integer = 73
     Private pIconHeight As Integer = 41
     Private pBorderWidth As Integer = 3
@@ -45,6 +43,7 @@ Public Class ctlSchematic
             pUci = newValue
             UpdateLegend()
             BuildTree()
+            UpdateDetails()
         End Set
     End Property
 
@@ -54,14 +53,15 @@ Public Class ctlSchematic
 
             Dim lNodeSize As New Drawing.Size(pIconWidth, pIconHeight)
 
-            Dim lOperation As atcUCI.HspfOperation
+            Dim lOperation As HspfOperation
             For Each lOperation In pUci.OpnSeqBlock.Opns
                 If pOperationTypesInDiagram.Contains(lOperation.Name) Then
                     Dim lNewIcon As New clsSchematicIcon
                     With lNewIcon
                         .Size = lNodeSize
                         .BackColor = Color.SkyBlue
-                        .Operation = lOperation
+                        .ReachOrBMP = lOperation
+                        .Key = OperationKey(lOperation)
                     End With
                     AddHandler lNewIcon.MouseDown, AddressOf Icon_MouseDown
                     AddHandler lNewIcon.MouseMove, AddressOf Icon_MouseMove
@@ -230,27 +230,32 @@ Public Class ctlSchematic
         aControl.BackgroundImage = lBitmap
     End Sub
 
-    Private Sub SetLandLegendIcon(ByVal aOperation As HspfOperation, ByVal aKey As String, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
+    Private Sub SetLandLegendIcon(ByVal aOperation As HspfOperation, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon, Optional ByVal aClear As Boolean = False)
         Dim lNewIcon As clsSchematicIcon
         If aExistingIcon Is Nothing Then
             lNewIcon = New clsSchematicIcon
+            AddHandler lNewIcon.MouseDown, AddressOf LegendIcon_MouseDown
+            aClear = True
         Else
             lNewIcon = aExistingIcon
         End If
         With lNewIcon
             .Width = pCurrentLegend.IconWidth
             .Height = pIconHeight
-            .Operation = aOperation
+
             Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
             Dim g As Graphics = Graphics.FromImage(lBitmap)
 
-            Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aKey, Me.Font)
+            .Label = DescToLabel(aOperation.Description)
+
+            Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(.Label, Me.Font)
             Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
             Dim lY As Single = .Height - lStringMeasurement.Height * 1.25
 
-            If aExistingIcon Is Nothing Then
+            If aClear Then
+                .Key = .Label
                 g.Clear(SystemColors.Control)
-                g.DrawString(aKey, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+                g.DrawString(.Label, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
             End If
 
             Dim lBoxHeight As Integer = lY * 0.6
@@ -259,56 +264,63 @@ Public Class ctlSchematic
             Dim lBoxWidth As Integer = .Width * 0.4
 
             If aOperation.Name = "PERLND" Then
+                .Perlnd = aOperation
                 lX = lY
             Else
+                .Implnd = aOperation
                 lX = .Width - lY - lBoxWidth
             End If
-            Dim lBrush As Brush = New SolidBrush(ColorFromDesc(aKey))
+
+            Dim lBrush As Brush = New SolidBrush(ColorFromDesc(.Label))
             g.FillRectangle(lBrush, lX, lY, lBoxWidth, lBoxHeight)
 
             drawBorder(g, .Width, .Height, Not aPrinting)
             g.Dispose()
             .BackgroundImage = lBitmap
-            AddHandler .MouseDown, AddressOf LegendIcon_MouseDown
-            'AddHandler .MouseMove, AddressOf LegendIcon_MouseMove
-            'AddHandler .MouseUp, AddressOf LegendIcon_MouseUp
         End With
         aExistingIcon = lNewIcon
     End Sub
 
-    Private Sub SetMetLegendIcon(ByVal aMetSeg As HspfMetSeg, ByVal aKey As String, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
+    Private Function DescToLabel(ByVal aDesc As String) As String
+        If aDesc Is Nothing OrElse aDesc.Length = 0 Then Return "Unnamed"
+        If aDesc.Contains(":") Then Return aDesc.Substring(aDesc.IndexOf(":") + 1)
+        Return aDesc
+    End Function
+
+    Private Function MetSegLabel(ByVal aMetSeg As HspfMetSeg) As String
+        Return aMetSeg.Id & ":" & aMetSeg.Name.Replace(",", "") 'Precip location name might be nicer
+    End Function
+
+    Private Sub SetMetLegendIcon(ByVal aMetSeg As HspfMetSeg, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
         Dim lNewIcon As clsSchematicIcon
         If aExistingIcon Is Nothing Then
             lNewIcon = New clsSchematicIcon
+            AddHandler lNewIcon.MouseDown, AddressOf LegendIcon_MouseDown
         Else
             lNewIcon = aExistingIcon
         End If
         With lNewIcon
-            .Width = pCurrentLegend.Width
+            .Width = pCurrentLegend.IconWidth
             .Height = pIconHeight
-            .Key = aKey
+            .Key = aMetSeg.Id
             Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
             Dim g As Graphics = Graphics.FromImage(lBitmap)
 
-            Dim lLabel As String = aMetSeg.Id & ":" & aMetSeg.Name.Replace(",", "") 'Precip location name might be nicer
+            .MetSeg = aMetSeg
+            .Label = MetSegLabel(aMetSeg)
 
-            Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(lLabel, Me.Font)
+            Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(.Label, Me.Font)
             Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
             Dim lY As Single = (.Height - lStringMeasurement.Height) / 2
 
-            If aExistingIcon Is Nothing Then
-                g.Clear(SystemColors.Control)
-                g.DrawString(lLabel, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-            End If
+            g.Clear(SystemColors.Control)
+            g.DrawString(.Label, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
 
             lY /= 4
 
             drawBorder(g, .Width, .Height, Not aPrinting)
             g.Dispose()
             .BackgroundImage = lBitmap
-            'AddHandler .MouseDown, AddressOf Icon_MouseDown
-            'AddHandler .MouseMove, AddressOf Icon_MouseMove
-            'AddHandler .MouseUp, AddressOf Icon_MouseUp
         End With
         aExistingIcon = lNewIcon
     End Sub
@@ -354,7 +366,7 @@ Public Class ctlSchematic
                           AndAlso (lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND") Then
                             barHeight = barbase * lSource.MFact / barMaxVal
                             If barHeight > 0 Then
-                                Dim lBrush As Brush = New SolidBrush(ColorFromDesc(lSource.Source.Opn.Description))
+                                Dim lBrush As Brush = New SolidBrush(ColorFromDesc(DescToLabel(lSource.Source.Opn.Description)))
                                 g.FillRectangle(lBrush, barPos, barbase - barHeight, lBarWidth, barHeight)
                             End If
                             barPos += lBarWidth + lBarSpace
@@ -384,6 +396,7 @@ Public Class ctlSchematic
                         barPos += lBarWidth + lBarSpace
                     Next barDesc
                 End If
+
             Case EnumLegendType.LegMet
                 ReDim included(pUci.MetSegs.Count)
                 If Not aOperation.MetSeg Is Nothing Then
@@ -394,8 +407,8 @@ Public Class ctlSchematic
                 End If
                 'myid = 0
                 For Each lSource In aOperation.Sources
-                    If Not lSource.Source.Opn Is Nothing Then
-                        If Not lSource.Source.Opn.MetSeg Is Nothing Then
+                    If lSource.Source.Opn IsNot Nothing Then
+                        If lSource.Source.Opn.MetSeg IsNot Nothing Then
                             If lSource.Source.Opn.Name <> "RCHRES" Then
                                 'myid = lSource.Source.Opn.MetSeg.Id
                                 included(lSource.Source.Opn.MetSeg.Id) = True
@@ -520,7 +533,7 @@ Public Class ctlSchematic
     'height of tree of this plus all downstream operations. 1=none downstream
     Private Function DownLayers(ByVal aIcon As clsSchematicIcon, ByVal aAlreadyInPath As String) As Integer
         Dim lDeepestTarget As Integer = 0
-        For Each lTarConn As atcUCI.HspfConnection In aIcon.Operation.Targets
+        For Each lTarConn As HspfConnection In aIcon.ReachOrBMP.Targets
             Dim lTarOperation As HspfOperation = lTarConn.Target.Opn
             If lTarOperation IsNot Nothing Then
                 Dim lKey As String = OperationKey(lTarOperation)
@@ -545,7 +558,7 @@ Public Class ctlSchematic
     End Function
 
     Private Sub LayoutFromIcon(ByVal aIcon As clsSchematicIcon, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
-        DrawPictureOnReachControl(aIcon.Operation, aPrinting, aIcon)
+        DrawPictureOnReachControl(aIcon.ReachOrBMP, aPrinting, aIcon)
         With aIcon
             aIcon.Top = aY - pIconHeight / 2
             Dim lWidthPerItemThisRow As Integer = aWidth / pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet)
@@ -589,7 +602,6 @@ Public Class ctlSchematic
     End Sub
 
     Private Sub PopulateLandGrid()
-        Dim luse As Integer
         Dim lConn As HspfConnection
         Dim lDesc As String
         Dim AddedThisReach As Boolean
@@ -597,6 +609,7 @@ Public Class ctlSchematic
         Dim PgrandTotal, Ptotal, Itotal, IgrandTotal As Single
         Dim t As Double = 0
         Dim AreaUnits As String
+        Dim lRow As Integer
 
         If pUci Is Nothing OrElse pUci.Name.Length = 0 Then Exit Sub
 
@@ -606,10 +619,9 @@ Public Class ctlSchematic
             AreaUnits = " (Hectares)"
         End If
 
-        agdDetails.Visible = False
-        agdDetails.Source = New atcControls.atcGridSource
-        With agdDetails.Source
-            .Rows = 0
+        Dim lDetailsSource As New atcControls.atcGridSource
+        With lDetailsSource
+            .Rows = 1
             .Columns = 5
             .CellValue(0, 0) = "Land Use"
             .CellValue(0, 1) = "Reaches"
@@ -621,76 +633,78 @@ Public Class ctlSchematic
             '.set_ColType(3, ATCoCtl.ATCoDataType.ATCoTxt)
             '.set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
             For Each lLegendIcon As clsSchematicIcon In pCurrentLegend.Icons
-                Ptotal = 0
-                Itotal = 0
-                ReachNames = ""
-                LastName = ""
-                If LegendSelected(CStr(luse)) Then
-                    lDesc = lLegendIcon.Tag
-                    .Rows = .Rows + 1
-                    .CellValue(.Rows, 0) = lDesc
+                If lLegendIcon.Selected Then
+                    Ptotal = 0
+                    Itotal = 0
+                    ReachNames = ""
+                    LastName = ""
+                    lDesc = lLegendIcon.Key
+                    lRow = .Rows
+                    .CellValue(lRow, 0) = lDesc
                     For Each lReach As clsSchematicIcon In pIcons
                         AddedThisReach = False
                         If lReach.Selected Then
-                            For Each lConn In lReach.Operation.Sources
-                                If lConn.Source.VolName = "PERLND" Then
-                                    If Not lConn.Source.Opn Is Nothing Then
-                                        If lDesc = lConn.Source.Opn.Description Then
-                                            Ptotal = Ptotal + lConn.MFact
+                            Dim lOperation As HspfOperation = lReach.ReachOrBMP
+                            For Each lConn In lOperation.Sources
+                                Select Case lConn.Source.VolName
+                                    Case "PERLND"
+                                        If Not lConn.Source.Opn Is Nothing Then
+                                            If lDesc = DescToLabel(lConn.Source.Opn.Description) Then
+                                                Ptotal = Ptotal + lConn.MFact
 
 
-                                            If Not AddedThisReach Then
-                                                If lReach.Operation.Name <> LastName Then
-                                                    LastName = lReach.Operation.Name
-                                                    ReachNames = ReachNames & LastName & " "
+                                                If Not AddedThisReach Then
+                                                    If lOperation.Name <> LastName Then
+                                                        LastName = lOperation.Name
+                                                        ReachNames = ReachNames & LastName & " "
+                                                    End If
+                                                    ReachNames = ReachNames & lOperation.Id & ", "
+                                                    AddedThisReach = True
                                                 End If
-                                                ReachNames = ReachNames & lReach.Operation.Id & ", "
-                                                AddedThisReach = True
+
+
                                             End If
-
-
                                         End If
-                                    End If
-                                ElseIf lConn.Source.VolName = "IMPLND" Then
-                                    If Not lConn.Source.Opn Is Nothing Then
-                                        If lDesc = lConn.Source.Opn.Description Then
-                                            Itotal = Itotal + lConn.MFact
+                                    Case "IMPLND"
+                                        If Not lConn.Source.Opn Is Nothing Then
+                                            If lDesc = lConn.Source.Opn.Name & " " & lConn.Source.Opn.Id Then
+                                                Itotal = Itotal + lConn.MFact
 
 
-                                            If Not AddedThisReach Then
-                                                If lReach.Operation.Name <> LastName Then
-                                                    LastName = lReach.Operation.Name
-                                                    ReachNames = ReachNames & LastName & " "
+                                                If Not AddedThisReach Then
+                                                    If lOperation.Name <> LastName Then
+                                                        LastName = lOperation.Name
+                                                        ReachNames = ReachNames & LastName & " "
+                                                    End If
+                                                    ReachNames = ReachNames & lOperation.Id & ", "
+                                                    AddedThisReach = True
                                                 End If
-                                                ReachNames = ReachNames & lReach.Operation.Id & ", "
-                                                AddedThisReach = True
+
+
                                             End If
-
-
                                         End If
-                                    End If
-                                End If
+                                End Select
                             Next
                         End If
                     Next
                     If Len(ReachNames) < 2 Then
-                        .CellValue(.Rows, 1) = ""
+                        .CellValue(lRow, 1) = ""
                     Else 'remove final ", "
-                        .CellValue(.Rows, 1) = ReachNames.Substring(0, ReachNames.Length - 2)
+                        .CellValue(lRow, 1) = ReachNames.Substring(0, ReachNames.Length - 2)
                     End If
-                    .CellValue(.Rows, 2) = DoubleToString(Itotal, 8)
-                    .CellValue(.Rows, 3) = DoubleToString(Ptotal, 8)
-                    .CellValue(.Rows, 4) = DoubleToString(Ptotal + Itotal, 8)
+                    .CellValue(lRow, 2) = DoubleToString(Itotal, 8)
+                    .CellValue(lRow, 3) = DoubleToString(Ptotal, 8)
+                    .CellValue(lRow, 4) = DoubleToString(Ptotal + Itotal, 8)
                     PgrandTotal = PgrandTotal + Ptotal
                     IgrandTotal = IgrandTotal + Itotal
                 End If
             Next
-            .Rows = .Rows + 1
-            .CellValue(.Rows, 0) = "Total"
-            .CellValue(.Rows, 1) = ""
-            .CellValue(.Rows, 2) = DoubleToString(IgrandTotal, 8)
-            .CellValue(.Rows, 3) = DoubleToString(PgrandTotal, 8)
-            .CellValue(.Rows, 4) = DoubleToString(PgrandTotal + IgrandTotal, 8)
+            lRow = .Rows
+            .CellValue(lRow, 0) = "Total"
+            .CellValue(lRow, 1) = ""
+            .CellValue(lRow, 2) = DoubleToString(IgrandTotal, 8)
+            .CellValue(lRow, 3) = DoubleToString(PgrandTotal, 8)
+            .CellValue(lRow, 4) = DoubleToString(PgrandTotal + IgrandTotal, 8)
             '    For i = 0 To picReach.Count - 1
             '      If ReachSelected(i) Then
             '        Set lOper = lOpns(CLng(picReach(i).tag))
@@ -716,67 +730,66 @@ Public Class ctlSchematic
             '    lblTotal(2).Visible = False
             '    OrigTotal = t
         End With
+        agdDetails.Initialize(lDetailsSource)
         agdDetails.SizeAllColumnsToContents()
-        agdDetails.Visible = True
+        agdDetails.Refresh()
     End Sub
 
     Private Sub PopulateMetGrid()
-        '    Dim ctran, cSour, r, cdata, cMfacP, cMfacR As Integer
-        '    'UPGRADE_WARNING: Arrays in structure lmetseg may need to be initialized before they can be used. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="814DF224-76BD-4BB4-BFFB-EA359CB9FC48"'
-        '    Dim lmetseg As HspfMetSeg
+        Dim lDetailsSource As New atcControls.atcGridSource
+        With lDetailsSource
+            Dim lDataTypeColumn As Integer = 0
+            Dim lSourceColumn As Integer = 1
+            Dim lMfactColumnPI As Integer = 2
+            Dim lMfactColumnR As Integer = 3
+            Dim lTranColumn As Integer = 4
+            .Columns = 5
+            .Rows = 7
+            Dim lRow As Integer = 0
+            .CellValue(0, lDataTypeColumn) = "Data Type" ') : .set_ColType(0, ATCoCtl.ATCoDataType.ATCoTxt)
+            .CellValue(0, lSourceColumn) = "Source" ') : .set_ColType(1, ATCoCtl.ATCoDataType.ATCoTxt)
+            .CellValue(0, lMfactColumnPI) = "P/I MFact" ') : .set_ColType(2, ATCoCtl.ATCoDataType.ATCoSng)
+            .CellValue(0, lMfactColumnR) = "R MFact" ') : .set_ColType(3, ATCoCtl.ATCoDataType.ATCoSng)
+            .CellValue(0, lTranColumn) = "Tran" ') : .set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
 
-        '    If pUci.Name = "" Then Exit Sub
-        '    If pUci.MetSegs.Count = 0 Then Exit Sub
-
-        '    If IsNumeric(picLegend(MetSelected).Tag) Then
-        '        lmetseg = pUci.MetSegs.Item(CShort(picLegend(MetSelected).Tag))
-        '    Else
-        '        lmetseg = pUci.MetSegs.Item(1)
-        '    End If
-        '    With agdDetails
-        '        .Visible = False
-        '        .ClearData()
-        '        .set_Header("")
-        '        .rows = 7
-        '        cdata = 0
-        '        cSour = 1
-        '        cMfacP = 2
-        '        cMfacR = 3
-        '        ctran = 4
-        '        .cols = 5
-        '        .set_ColTitle(cdata, "Data Type") : .set_ColType(0, ATCoCtl.ATCoDataType.ATCoTxt)
-        '        .set_ColTitle(cSour, "Source") : .set_ColType(1, ATCoCtl.ATCoDataType.ATCoTxt)
-        '        .set_ColTitle(cMfacP, "P/I MFact") : .set_ColType(2, ATCoCtl.ATCoDataType.ATCoSng)
-        '        .set_ColTitle(cMfacR, "R MFact") : .set_ColType(3, ATCoCtl.ATCoDataType.ATCoSng)
-        '        .set_ColTitle(ctran, "Tran") : .set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
-        '    End With
-
-        '    For r = 1 To 7
-        '        With lmetseg.MetSegRec(r)
-        '            Select Case r
-        '                Case 1 : agdDetails.CellValue(r, cdata, "Precip")
-        '                Case 2 : agdDetails.CellValue(r, cdata, "Air Temp")
-        '                Case 3 : agdDetails.CellValue(r, cdata, "Dew Point")
-        '                Case 4 : agdDetails.CellValue(r, cdata, "Wind")
-        '                Case 5 : agdDetails.CellValue(r, cdata, "Solar Rad")
-        '                Case 6 : agdDetails.CellValue(r, cdata, "Cloud")
-        '                Case 7 : agdDetails.CellValue(r, cdata, "Pot Evap")
-        '            End Select
-        '            If .Typ = 0 Then
-        '                agdDetails.CellValue(r, cSour, "")
-        '                agdDetails.CellValue(r, cMfacP, "")
-        '                agdDetails.CellValue(r, cMfacR, "")
-        '                agdDetails.CellValue(r, ctran, "")
-        '            Else
-        '                agdDetails.CellValue(r, cSour, .Source.volname & " " & .Source.volid)
-        '                agdDetails.CellValue(r, cMfacP, .MFactP)
-        '                agdDetails.CellValue(r, cMfacR, .MFactR)
-        '                agdDetails.CellValue(r, ctran, .Tran)
-        '            End If
-        '        End With
-        '    Next
-        '    agdDetails.SizeAllColumnsToContents()
-        '    agdDetails.Visible = True
+            If pUci IsNot Nothing AndAlso pUci.Name.Length > 0 AndAlso pUci.MetSegs.Count > 0 Then
+                For Each lMetSeg As HspfMetSeg In pUci.MetSegs
+                    If Me.LegendMetSegs.Icon(lMetSeg.Id).Selected Then
+                        For lSegRow As Integer = 1 To 7
+                            lRow += 1
+                            Dim lRec As HspfMetSegRecord = lMetSeg.MetSegRecs(lSegRow - 1)
+                            Select Case lSegRow
+                                Case 1 : .CellValue(lRow, lDataTypeColumn) = "Precip"
+                                Case 2 : .CellValue(lRow, lDataTypeColumn) = "Air Temp"
+                                Case 3 : .CellValue(lRow, lDataTypeColumn) = "Dew Point"
+                                Case 4 : .CellValue(lRow, lDataTypeColumn) = "Wind"
+                                Case 5 : .CellValue(lRow, lDataTypeColumn) = "Solar Rad"
+                                Case 6 : .CellValue(lRow, lDataTypeColumn) = "Cloud"
+                                Case 7 : .CellValue(lRow, lDataTypeColumn) = "Pot Evap"
+                            End Select
+                            'If lRec.Typ = 0 Then
+                            '    .CellValue(lRow, lSourceColumn) = ""
+                            '    .CellValue(lRow, lMfactColumnPI) = ""
+                            '    .CellValue(lRow, lMfactColumnR) = ""
+                            '    .CellValue(lRow, lTranColumn) = ""
+                            'Else
+                            Try
+                                .CellValue(lRow, lSourceColumn) = lRec.Source.VolName & " " & lRec.Source.VolId
+                                .CellValue(lRow, lMfactColumnPI) = lRec.MFactP
+                                .CellValue(lRow, lMfactColumnR) = lRec.MFactR
+                                .CellValue(lRow, lTranColumn) = lRec.Tran
+                            Catch e As Exception
+                                Logger.Dbg("Exception filling met grid: " & e.Message)
+                            End Try
+                            'End If
+                        Next
+                    End If
+                Next
+            End If
+        End With
+        agdDetails.Initialize(lDetailsSource)
+        agdDetails.SizeAllColumnsToContents()
+        agdDetails.Refresh()
     End Sub
 
     Private Sub PopulatePointGrid()
@@ -836,37 +849,51 @@ Public Class ctlSchematic
         pCurrentLegend.SuspendLayout()
         pCurrentLegend.Clear()
         If pUci IsNot Nothing Then
-            Dim lNodeSize As New Drawing.Size(pCurrentLegend.Width, pIconHeight)
             LegendOrder = New Generic.List(Of String)
             Select Case pCurrentLegend.LegendType
                 Case EnumLegendType.LegLand
-                    Dim lOperation As atcUCI.HspfOperation
-                    For Each lOperation In pUci.OpnSeqBlock.Opns
+                    For Each lOperation As HspfOperation In pUci.OpnSeqBlock.Opns
                         If lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND" Then
-                            Dim lKey As String = lOperation.Description
-                            If lKey.Contains(":") Then lKey = lKey.Substring(lKey.IndexOf(":") + 1)
-                            If lKey.Length = 0 Then lKey = "Unnamed"
-                            Dim lIcon As clsIcon = pCurrentLegend.Icon(lKey)
+                            Dim lIcon As clsIcon = pCurrentLegend.Icon(OperationKey(lOperation))
                             If lIcon Is Nothing Then
-                                SetLandLegendIcon(lOperation, lKey, False, lIcon)
+                                SetLandLegendIcon(lOperation, False, lIcon)
                                 pCurrentLegend.Add(lIcon)
-                                LegendOrder.Add(lKey)
+                                LegendOrder.Add(lIcon.Label)
                             Else 'Just add to existing icon, don't need to create a new one
-                                SetLandLegendIcon(lOperation, lKey, False, lIcon)
+                                SetLandLegendIcon(lOperation, False, lIcon)
                             End If
                         End If
                     Next
                 Case EnumLegendType.LegMet
                     For Each lMetSeg As HspfMetSeg In pUci.MetSegs
-                        Dim lKey As String = lMetSeg.Id
                         Dim lIcon As clsIcon = Nothing
-                        SetMetLegendIcon(lMetSeg, lKey, False, lIcon)
+                        SetMetLegendIcon(lMetSeg, False, lIcon)
                         pCurrentLegend.Add(lIcon)
-                        LegendOrder.Add(lKey)
+                        LegendOrder.Add(lIcon.Key)
                     Next lMetSeg
             End Select
         End If
         pCurrentLegend.ResumeLayout()
+    End Sub
+
+    Private Sub ResizeLegend()
+        pCurrentLegend.SuspendLayout()
+        If pUci IsNot Nothing Then
+            Select Case pCurrentLegend.LegendType
+                Case EnumLegendType.LegLand
+                    For Each lIcon As clsSchematicIcon In pCurrentLegend.Icons
+                        Dim lClear As Boolean = True
+                        If lIcon.Perlnd IsNot Nothing Then SetLandLegendIcon(lIcon.Perlnd, False, lIcon, lClear) : lClear = False
+                        If lIcon.Implnd IsNot Nothing Then SetLandLegendIcon(lIcon.Implnd, False, lIcon, lClear)
+                    Next
+                Case EnumLegendType.LegMet
+                    For Each lIcon As clsSchematicIcon In pCurrentLegend.Icons
+                        SetMetLegendIcon(lIcon.MetSeg, False, lIcon)
+                    Next
+            End Select
+        End If
+        pCurrentLegend.ResumeLayout()
+        pCurrentLegend.PlaceIcons()
     End Sub
 
     '    Public Sub UpdateLegend()
@@ -878,7 +905,7 @@ Public Class ctlSchematic
     '        Dim S As String
     '        Dim ypos, xpos, colonpos As Integer
     '        Dim boxWidth, boxHeight, txtHeight As Integer
-    '        Dim lOper As atcUCI.HspfOperation
+    '        Dim lOper As HspfOperation
     '        Dim spos, maxpic, cpos As Integer
     '        Dim tname As String
 
@@ -901,8 +928,8 @@ Public Class ctlSchematic
     '        Index = 0
     '        ypos = 0 'boxHeight + txtHeight
     '        maxpic = 0
-    '        Dim lPoint As atcUCI.HspfPointSource
-    '        Dim lmetseg As atcUCI.HspfMetSeg
+    '        Dim lPoint As HspfPointSource
+    '        Dim lmetseg As HspfMetSeg
     '        Dim lX As Single = 0
     '        Dim lY As Single = 0
     '        Select Case pCurrentLegend.LegendType
@@ -1139,21 +1166,21 @@ Public Class ctlSchematic
     '    End With
     'End Sub
 
-    Private Function LegendSelected(ByVal aLegendTag As String) As Boolean
-        LegendSelected = False
-        If IsNumeric(aLegendTag) Then
-            Dim lLegendIndex As Integer = aLegendTag
-            If lLegendIndex >= 0 AndAlso lLegendIndex < pCurrentLegend.Icons.Count Then
-                Return pCurrentLegend.Icons.Item(lLegendIndex).Selected
-            End If
-        Else
-            For Each lLegendIcon As clsSchematicIcon In pCurrentLegend.Icons
-                If lLegendIcon.Tag = aLegendTag Then
-                    Return lLegendIcon.Selected
-                End If
-            Next
-        End If
-    End Function
+    'Private Function LegendSelected(ByVal aLegendTag As String) As Boolean
+    '    LegendSelected = False
+    '    If IsNumeric(aLegendTag) Then
+    '        Dim lLegendIndex As Integer = aLegendTag
+    '        If lLegendIndex >= 0 AndAlso lLegendIndex < pCurrentLegend.Icons.Count Then
+    '            Return pCurrentLegend.Icons.Item(lLegendIndex).Selected
+    '        End If
+    '    Else
+    '        For Each lLegendIcon As clsSchematicIcon In pCurrentLegend.Icons
+    '            If lLegendIcon.Tag = aLegendTag Then
+    '                Return lLegendIcon.Selected
+    '            End If
+    '        Next
+    '    End If
+    'End Function
 
     Private Sub SetLegendScrollButtons()
 
@@ -1222,6 +1249,7 @@ Public Class ctlSchematic
         End Select
         UpdateLegend()
         BuildTree()
+        UpdateDetails()
     End Sub
 
     ''' <summary>
@@ -1234,14 +1262,66 @@ Public Class ctlSchematic
         Dim lSender As clsSchematicIcon = sender
         Select Case e.Button
             Case MouseButtons.Left
-                sender.Selected = Not sender.Selected
-                pCurrentLegend.PlaceIcons()
-                UpdateDetails()
+                ClickLegendIcon(lSender)
             Case MouseButtons.Right
                 RightClickMenu.MenuItems.Clear()
                 RightClickMenu.MenuItems.Add(lSender.Key)
                 RightClickMenu.Show(lSender, e.Location)
         End Select
+    End Sub
+
+    Private Sub ClickLegendIcon(ByVal aLegendIcon As clsSchematicIcon)
+        Debug.Print("ClickLegendIcon")
+        Dim lChangedSchematicSelection As Boolean = False
+        Select Case pCurrentLegend.LegendType
+            Case EnumLegendType.LegLand
+                aLegendIcon.Selected = Not aLegendIcon.Selected
+                Dim lSource As HspfConnection
+                For Each lIcon As clsSchematicIcon In pIcons
+                    For Each lSource In lIcon.ReachOrBMP.Sources
+                        If lSource.Source IsNot Nothing AndAlso lSource.Source.Opn IsNot Nothing _
+                          AndAlso (lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND") Then
+                            Dim lKey As String = lSource.Source.Opn.Description
+                            If lKey = aLegendIcon.Label Then
+                                If lIcon.Selected <> aLegendIcon.Selected Then
+                                    lChangedSchematicSelection = True
+                                    lIcon.Selected = aLegendIcon.Selected
+                                End If
+                                GoTo NextLandIcon
+                            End If
+                        End If
+                    Next
+NextLandIcon:
+                Next
+            Case EnumLegendType.LegMet
+                ''Set only the clicked icon to selected, unselect others
+                'For Each lLegendIcon As clsSchematicIcon In pCurrentLegend.Icons
+                '    lLegendIcon.Selected = ReferenceEquals(lLegendIcon, aLegendIcon)
+                'Next
+                'For Each lIcon As clsSchematicIcon In pIcons
+                '    Dim lSelect As Boolean = (lIcon.Operation.MetSeg.Id = aLegendIcon.Key)
+                '    If lIcon.Selected <> lSelect Then
+                '        lChangedSchematicSelection = True
+                '        lIcon.Selected = lSelect
+                '    End If
+                'Next
+
+                'Toggle selection of the clicked icon and set selection of schematic icons with this met seg
+                aLegendIcon.Selected = Not aLegendIcon.Selected
+                For Each lIcon As clsSchematicIcon In pIcons
+                    If lIcon.ReachOrBMP.MetSeg.Id = aLegendIcon.Key AndAlso lIcon.Selected <> aLegendIcon.Selected Then
+                        lChangedSchematicSelection = True
+                        lIcon.Selected = aLegendIcon.Selected
+                    End If
+                Next
+
+            Case EnumLegendType.LegPoint
+        End Select
+        pCurrentLegend.PlaceIcons()
+        If lChangedSchematicSelection Then
+            DrawTreeBackground()
+        End If
+        UpdateDetails()
     End Sub
 
     ''' <summary>
@@ -1262,8 +1342,8 @@ Public Class ctlSchematic
             Case MouseButtons.Right
                 pClickedIcon = lSender
                 RightClickMenu.MenuItems.Clear()
-                RightClickMenu.MenuItems.Add(lSender.Key)
-                RightClickMenu.MenuItems.Add(lSender.Operation.Description)
+                RightClickMenu.MenuItems.Add("""" & lSender.Key & """")
+                If lSender.Label <> lSender.Key Then RightClickMenu.MenuItems.Add("""" & lSender.Label & """")
                 If lSender.DistanceFromOutlet > 1 Then
                     RightClickMenu.MenuItems.Add("Select Downstream", AddressOf Event_SelectDownstream)
                 End If
@@ -1303,6 +1383,7 @@ Public Class ctlSchematic
                     Cursor.Clip = Nothing
                     If sender.Location = pBeforeDragLocation Then
                         sender.Selected = Not sender.Selected
+                        UpdateDetails()
                     End If
                     DrawTreeBackground()
                     'sender.Invalidate()
@@ -1368,7 +1449,7 @@ Public Class ctlSchematic
     End Sub
 
     Private Sub pCurrentLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles pCurrentLegend.Resize
-        UpdateLegend()
+        ResizeLegend()
     End Sub
 
 End Class

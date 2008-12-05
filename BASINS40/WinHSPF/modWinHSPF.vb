@@ -189,6 +189,10 @@ Public Module WinHSPF
     End Sub
 
     Function OperationKey(ByVal aOperation As HspfOperation) As String
-        Return aOperation.Name & " " & aOperation.Id
+        If aOperation Is Nothing Then
+            Return ""
+        Else
+            Return aOperation.Name & " " & aOperation.Id
+        End If
     End Function
 End Module
