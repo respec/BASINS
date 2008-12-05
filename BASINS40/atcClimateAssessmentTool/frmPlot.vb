@@ -9,6 +9,8 @@ Public Class frmPlot
     Private pDataValueLbl As Integer = 0
     Private pOneDataBlock As Boolean = False
 
+    'Private pTPLabel As Windows.Forms.VisualStyles.VisualStyleElement.ToolTip = New System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip(Me.components)
+
     Public Property Results() As atcControls.atcGridSource
         Get
             Return pResults
@@ -290,21 +292,25 @@ Public Class frmPlot
         End If
 
         Dim lblCol As Integer = 4
-        If cboSelect.Text = "None" OrElse cboSelect.Text = "" Then
-            lblCol = 4
+        If (cboPointLabels.Text = "None" OrElse cboPointLabels.Text = "") And Not labelCATEGORY() Then
+            lblCol = -99 ' Don't label the data points at all
         Else
-            If rdoBMP.Checked Then
+            If cboSelect.Text = "None" OrElse cboSelect.Text = "" Then
                 lblCol = 4
-            ElseIf rdoLanduse.Checked Then
-                lblCol = 5
-            ElseIf rdoEmission.Checked Then
-                lblCol = 6
-            ElseIf rdoModels.Checked Then
-                lblCol = 7
-            ElseIf rdoModify.Checked Then
-                lblCol = 8
             Else
-                lblCol = 8
+                If rdoBMP.Checked Then
+                    lblCol = 4
+                ElseIf rdoLanduse.Checked Then
+                    lblCol = 5
+                ElseIf rdoEmission.Checked Then
+                    lblCol = 6
+                ElseIf rdoModels.Checked Then
+                    lblCol = 7
+                ElseIf rdoModify.Checked Then
+                    lblCol = 8
+                Else
+                    lblCol = 8
+                End If
             End If
         End If
 
@@ -330,7 +336,6 @@ Public Class frmPlot
             lstr.AppendLine("set grid z;")
             'lstr.AppendLine("set dgrid3d 30,30;")
             'lstr.AppendLine("set hidden3d")
-
 
             If Not cboSelect.Text = "None" And Not cboSelect.Text = "" Then
                 doGnuplotScript("3d", lstr, lPlotDatFilename, cboZAxis.SelectedItem.ToString.Split("-")(1), lblCol)
@@ -428,6 +433,13 @@ Public Class frmPlot
         Return 0
     End Function
 
+    Private Function labelCATEGORY() As Boolean
+        If rdoBMP.Checked OrElse rdoLanduse.Checked OrElse rdoEmission.Checked OrElse rdoModels.Checked OrElse rdoModify.Checked Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
     Private Function parseCATData(ByVal aFilename As String, ByVal aSelection As String) As Integer
         Dim lline As String = ""
         Dim lColX As Integer = cboXAxis.SelectedItem.ToString.Split("-")(0)
@@ -900,7 +912,13 @@ Public Class frmPlot
         lstboModifications.Items.Clear()
         lstboLanduse.Items.Clear()
 
-        If cboSelect.Text.Contains("Run") Then
+        If cboSelect.Text = "None" Then
+            rdoBMP.Checked = False
+            rdoLanduse.Checked = False
+            rdoEmission.Checked = False
+            rdoModels.Checked = False
+            rdoModify.Checked = False
+        ElseIf cboSelect.Text.Contains("Run") Then
             pUpdatePlotSelection()
         End If
     End Sub
@@ -1013,7 +1031,13 @@ Public Class frmPlot
     End Sub
 
     Private Sub cboPointLabels_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboPointLabels.SelectedIndexChanged
-
+        If cboPointLabels.Text = "None" OrElse cboPointLabels.Text = "" Then
+            rdoBMP.Checked = False
+            rdoLanduse.Checked = False
+            rdoEmission.Checked = False
+            rdoModels.Checked = False
+            rdoModify.Checked = False
+        End If
     End Sub
 
     Private Sub frmPlot_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
