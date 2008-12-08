@@ -594,6 +594,7 @@ Partial Class frmDownload
         '
         Me.cboRegion.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboRegion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboRegion.FormattingEnabled = True
         Me.cboRegion.Items.AddRange(New Object() {"View Rectangle", "Extent of Selected Layer"})
         Me.cboRegion.Location = New System.Drawing.Point(124, 12)
