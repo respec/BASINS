@@ -25,7 +25,9 @@ Public Class frmPoint
 
     Dim CountInUseFacs As Integer
     Dim CountAvailFacs As Integer
-    Dim ConsLinks() As String, MemberLinks() As String, LinkCount&
+    Dim ConsLinks() As String
+    Dim MemberLinks() As String
+    Dim LinkCount As Integer
     Dim MSub1Links() As Long, MSub2Links() As Long
 
     Private HsashDragging As Boolean
@@ -119,20 +121,31 @@ Public Class frmPoint
 
     End Sub
 
-    Private Sub AddPointSource(ByVal aFacilityName As String, ByVal aScenario As String, ByVal aInUse As Boolean)
-        If aInUse Then
-            ReDim Preserve InUseFacs(0)(UBound(InUseFacs(0)))
-            ReDim Preserve InUseFacs(1)(UBound(InUseFacs(1)))
-            InUseFacs(0)(UBound(InUseFacs(0))) = aFacilityName
-            InUseFacs(1)(UBound(InUseFacs(0))) = aScenario
-            lstPoints.Items.Add(aFacilityName & " (" & aScenario & ")", aInUse)
-        Else
-            ReDim Preserve AvailFacs(0)(UBound(AvailFacs(0)))
-            ReDim Preserve AvailFacs(1)(UBound(AvailFacs(1)))
-            AvailFacs(0)(UBound(AvailFacs(0))) = aFacilityName
-            AvailFacs(1)(UBound(AvailFacs(0))) = aScenario
-            lstPoints.Items.Add(aFacilityName & " (" & aScenario & ")", aInUse)
-        End If
+    Private Sub UpdateListArrays()
+        Dim lOper As Integer
+        Dim lCheckedItemSplit() As String
+
+        For lOper = 1 To lstPoints.Items.Count
+            'split the string of the newly checked item into (Index 0): description and (Index 1): scenario.
+            lCheckedItemSplit = lstPoints.Items.Item(lOper).ToString.Split(New [Char]() {"("c, ")"c})
+            lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
+            'remove the empty string at the end from the ")" character
+            ReDim Preserve lCheckedItemSplit(1)
+
+            If lstPoints.GetItemChecked(lOper) Then
+                ReDim Preserve InUseFacs(0)(UBound(InUseFacs(0)))
+                ReDim Preserve InUseFacs(1)(UBound(InUseFacs(1)))
+                InUseFacs(0)(UBound(InUseFacs(0))) = lCheckedItemSplit(0)
+                InUseFacs(1)(UBound(InUseFacs(0))) = lCheckedItemSplit(1)
+            Else
+                ReDim Preserve AvailFacs(0)(UBound(AvailFacs(0)))
+                ReDim Preserve AvailFacs(1)(UBound(AvailFacs(1)))
+                AvailFacs(0)(UBound(AvailFacs(0))) = lCheckedItemSplit(0)
+                AvailFacs(1)(UBound(AvailFacs(0))) = lCheckedItemSplit(1)
+            End If
+
+        Next
+
         CountInUseFacs = lstPoints.CheckedItems.Count
     End Sub
 
@@ -157,7 +170,7 @@ Public Class frmPoint
             lOpnBlk = pUCI.OpnBlks("RCHRES")
             icnt = 1
 
-            For i = 1 To lts.Count - 1
+            For i = 1 To lts.Count
                 lsen = lts(i).Attributes.GetValue("Scenario")
                 If Mid(lsen, 1, 3) = "PT-" Then 'this is a pt src
                     lloc = lts(i).Attributes.GetValue("Location")
@@ -172,7 +185,7 @@ Public Class frmPoint
 
                             S = lfac & " (" & Mid(lts(i).Attributes.GetValue("Scenario"), 4) & ")"
                             If Not lstPoints.Items.Contains(S) Then
-                                AddPointSource(lfac, Mid(lts(i).Attributes.GetValue("Scenario"), 4), False)
+                                lstPoints.Items.Add(S, False)
                             End If
 
                             'see how many times this dsn shows up in pt srcs
@@ -180,19 +193,16 @@ Public Class frmPoint
                             activeflag = False
                             If Not pUCI.PointSources Is Nothing Then
                                 For j = 1 To pUCI.PointSources.Count
-                                    If pUCI.PointSources(j).Target.VolName = lOper.Name And _
-                                       pUCI.PointSources(j).Target.VolId = lOper.Id And _
-                                       Microsoft.VisualBasic.Left(pUCI.PointSources(j).Source.VolName, 3) = lts(i).File.ToString And pUCI.PointSources(j).Source.VolId = lts(i).Attributes.GetValue("Id") Then
+                                    If pUCI.PointSources(j).Target.VolName = lOper.Name AndAlso pUCI.PointSources(j).Target.VolId = lOper.Id AndAlso Microsoft.VisualBasic.Left(pUCI.PointSources(j).Source.VolName, 3) = lts(i).File.ToString AndAlso pUCI.PointSources(j).Source.VolId = lts(i).Attributes.GetValue("Id") Then
                                         'found this dsn in active point sources
                                         dsncnt = dsncnt + 1
                                         activeflag = True
                                         ReDim Preserve dsnptr(dsncnt)
                                         dsnptr(dsncnt) = j
 
-
                                         For lPointItemIndex = 0 To lstPoints.Items.Count - 1
                                             If lstPoints.Items.Item(lPointItemIndex) = S AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
-                                                AddPointSource(lfac, Mid(lts(i).Attributes.GetValue("Scenario"), 4), True)
+                                                lstPoints.Items.Add(S, True)
                                             End If
                                         Next
 
@@ -235,6 +245,7 @@ Public Class frmPoint
 
                                     'net conversion issue: Adding "FLOW" - pollutant not up and running yet.
                                     Dim TempPollutant As New HspfPollutant
+                                    TempPollutant.Id = 5
                                     TempPollutant.Name = "FLOW"
                                     pUCI.Pollutants.Add(TempPollutant)
 
@@ -297,6 +308,8 @@ Public Class frmPoint
             If icnt = 1 Then .Rows = 0
 
         End With
+
+        UpdateListArrays()
 
     End Sub
 
@@ -503,6 +516,8 @@ Public Class frmPoint
     End Sub
 
     Private Sub lstSources_IndividualCheckChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs)
+        Dim ifound As Boolean, i&
+        Dim lBrackets() As String = {"("c, ")"c}
 
         RemoveHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
 
@@ -510,20 +525,18 @@ Public Class frmPoint
 
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
 
+        'Temporarily removes the event item to update the status of the checked item (A shortcoming of the checkedlistbox)
         RemoveHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
         lstPoints.SetItemChecked(e.Index, e.NewValue)
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
-    End Sub
+        'Update lists to reflect state of the checked item (which caused this event)
+        UpdateListArrays()
 
-    Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
-        Dim ifound As Boolean, i&
-
-        grpDetails.Text = "Details of " & lstPoints.SelectedItem
-
-        For i = 1 To agdMasterPoint.Source.Rows
+        For i = 1 To agdMasterPoint.Source.Rows - 1
             'Check if facility and scenario are in use.
-            If Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 3)) <> -1 AndAlso Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 Then
+
+            If Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) <> -1 AndAlso Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 Then
                 ifound = True
                 'set indiv timsers to in use in master grid
                 agdMasterPoint.Source.CellValue(i, 0) = "Yes"
@@ -532,9 +545,10 @@ Public Class frmPoint
                 'set indiv timsers to not in use in master grid
                 agdMasterPoint.Source.CellValue(i, 0) = "No"
             End If
+
         Next
 
-        For i = 1 To agdPoint.Source.Rows
+        For i = 1 To agdPoint.Source.Rows - 1
             'Check if facility and scenario are in use.
             If Array.IndexOf(InUseFacs(0), agdPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdPoint.Source.CellValue(i, 1), 3)) <> -1 AndAlso Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 Then
                 'set indiv timsers to in use in point grid
@@ -547,6 +561,13 @@ Public Class frmPoint
 
         'rebuild lists
         CountInUseFacs = lstPoints.Items.Count - lstPoints.CheckedItems.Count
+
+
+    End Sub
+
+    Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
+
+        grpDetails.Text = "Details of " & lstPoints.SelectedItem
 
     End Sub
     Private Sub cmdShowDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsShow.Click
