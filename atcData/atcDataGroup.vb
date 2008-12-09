@@ -78,6 +78,15 @@ Public Class atcDataGroup
         Add(aDataSet.Serial, aDataSet)
     End Sub
 
+    ''' <summary>Create a new data group and add datasets
+    ''' to the group with the default key of its serial number</summary>
+    Public Sub New(ByVal ParamArray aDataSets() As atcDataSet)
+        MyBase.New()
+        For Each lDataset As atcDataSet In aDataSets
+            Add(lDataset.Serial, lDataset)
+        Next
+    End Sub
+
     ''' <summary>Add an <see cref="atcData.atcDataSet">atcDataSet</see> 
     ''' to the group with the default key of its serial number </summary>
     Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer

@@ -112,12 +112,12 @@ Public Class atcCollection
     End Property
 
     Public Shadows Sub Clear()
-        If Not pKeys Is Nothing Then pKeys.Clear()
+        If pKeys IsNot Nothing Then pKeys.Clear()
         MyBase.Clear()
     End Sub
 
     Public Overridable Sub Dispose() Implements IDisposable.Dispose
-        If Not pKeys Is Nothing Then pKeys.Clear()
+        If pKeys IsNot Nothing Then pKeys.Clear()
         MyBase.Clear()
     End Sub
 

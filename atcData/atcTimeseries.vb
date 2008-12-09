@@ -13,6 +13,44 @@ Public Class atcTimeseries
     Private Const pEpsilon As Double = 0.000000001
     Private Shared pNaN As Double = atcUtility.GetNaN
 
+    Public Shared Operator +(ByVal aTimeseries1 As atcTimeseries, _
+                             ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
+        Dim lDataGroup As New atcDataGroup
+        lDataGroup.Add(aTimeseries1)
+        lDataGroup.Add(aTimeseries2)
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", lDataGroup)
+        Return DoMath("Add", lArgs)
+    End Operator
+
+    Public Shared Operator +(ByVal aTimeseries As atcTimeseries, _
+                             ByVal aValue As Double) As atcTimeseries
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", aTimeseries)
+        lArgs.Add("Number", aValue)
+        Return DoMath("Add", lArgs)
+    End Operator
+
+
+    Public Shared Operator *(ByVal aTimeseries1 As atcTimeseries, _
+                             ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
+        Dim lDataGroup As New atcDataGroup
+        lDataGroup.Add(aTimeseries1)
+        lDataGroup.Add(aTimeseries2)
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", lDataGroup)
+        Return DoMath("Multiply", lArgs)
+    End Operator
+
+    Public Shared Operator *(ByVal aTimeseries As atcTimeseries, _
+                             ByVal aValue As Double) As atcTimeseries
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", aTimeseries)
+        lArgs.Add("Number", aValue)
+        Return DoMath("Multiply", lArgs)
+    End Operator
+
+
     ''' <summary>Set or get an individual value</summary>
     Public Property Value(ByVal aIndex As Integer) As Double
         Get
