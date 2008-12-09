@@ -49,12 +49,13 @@ Module HSPFOutputReports
 
 
         'Add scenario directories
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2bmp")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2bmp")
+        pBaseFolders.Clear()
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2bmp")
 
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2")
         pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2bmp")
         pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2")
         pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2bmp")
@@ -175,14 +176,21 @@ Module HSPFOutputReports
         Dim lWDMNameCollection As New atcCollection
         Dim lOutputWdmDataSource As New atcDataSourceWDM()
         Dim lScenName As String = ""
-        For Each lfld As String In pBaseFolders ' loop through all land use scenario folders
+        'build collection of scenarios (uci base names) to report
+        Dim lOutputWDMs As New System.Collections.Specialized.NameValueCollection
 
-            Dim lDataGroup4Plot As New atcDataGroup
-            'build collection of scenarios (uci base names) to report
-            Dim lOutputWDMs As New System.Collections.Specialized.NameValueCollection
-            'do we want the 'base.uci'?
+        Dim lp As String = ""
+        Dim lf As String = "C:\mono_luChange\output\graphWQlog.txt"
+        For Each lfld As String In pBaseFolders ' loop through all land use scenario folders
+            lp = ""
             AddFilesInDir(lOutputWDMs, lfld, False, "*.output.wdm")
+            'lfld = "C:\mono_luChange\output\lu2030b2"
+            'AddFilesInDir(lOutputWDMs, lfld, False, "b_10_gfdl_f30.base.output.wdm")
             For Each lOWDM As String In lOutputWDMs
+                lp = ""
+                'If foundQResult(lOWDM) Then ' found a problematic result, then bypass it
+                '    Continue For
+                'End If
                 lOutputWdmDataSource.Open(lOWDM)
 
                 'Flow rate (911, ac.ft/hour -> liter/s)
@@ -205,6 +213,7 @@ Module HSPFOutputReports
 
                 ' Sediment loading
                 Dim lDataGroup As New atcDataGroup
+
                 lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(921)) 'Sand
                 lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(922)) 'Silt
                 lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(923)) 'Clay
@@ -222,10 +231,14 @@ Module HSPFOutputReports
                     Exit Sub
                 End If
 
+                'Double checking: sum Annual
+                'Logger.Msg("Sum Annual Sediment: " & lLoadSum.Attributes.GetFormattedValue("Sum Annual"))
+                '235470 vs 235430    19619.1667 (monthly mean)
+
                 lMath.Clear()
                 lMathArgs.Clear()
                 lMathArgs.SetValue("Timeseries", lLoadSum)
-                lMathArgs.SetValue("Number", 0.251995761 / 1000.0) ' coversion: ton/h -> kg/s * 1000
+                lMathArgs.SetValue("Number", 0.251995761) ' coversion: ton/h -> kg/s
                 Dim lLoadSumNewUnit As atcTimeseries = Nothing
                 If lMath.Open("Multiply", lMathArgs) Then
                     lLoadSumNewUnit = lMath.DataSets(0)
@@ -245,18 +258,18 @@ Module HSPFOutputReports
 
                 Dim lConc As atcTimeseries  ' Intermediate 
                 If lMath.Open("Divide", lMathArgs) Then
-                    lConc = lMath.DataSets(0) ' here unit is: number of 1000 kg / L
+                    lConc = lMath.DataSets(0) ' here unit is: number of kg / L
                     lMath.DataSets.RemoveAt(0)
                 Else
                     Logger.Msg("Calc sediment concentration for " & lOWDM & " problem.")
                     Exit Sub
                 End If
 
-                'Change sediment concentration to mg/L by multiplying 1000 * 1000 * 1000
+                'Change sediment concentration to mg/L by multiplying 1000 * 1000
                 lMath.Clear()
                 lMathArgs.Clear()
                 lMathArgs.SetValue("Timeseries", lConc)
-                lMathArgs.SetValue("Number", 1000 * 1000 * 1000)
+                lMathArgs.SetValue("Number", 1000 * 1000)
                 Dim lConcNewUnit As atcTimeseries
                 If lMath.Open("Multiply", lMathArgs) Then
                     lConcNewUnit = lMath.DataSets(0)
@@ -288,7 +301,11 @@ Module HSPFOutputReports
 
                 With lGraphDur.ZedGraphCtrl.GraphPane
 
-                    .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                    If lscen.StartsWith("base.") Then
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : base"
+                    Else
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                    End If
                     With .XAxis
                         .Scale.Min = 0.0000001
                     End With
@@ -297,26 +314,38 @@ Module HSPFOutputReports
                         .Scale.IsUseTenPower = False
                         .MajorGrid.IsVisible = False
                         .MinorGrid.IsVisible = False
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec (x1000)"
+                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
+                        '.Scale.MinAuto = True
+                        '.Scale.MaxAuto = True
+
+                        'If .Scale.Min < 1 Then
+                        '    .Scale.Min = 0.000001
+                        'End If
+                        '.Scale.Max = 100000
                         .IsVisible = True
                     End With
                     If .YAxis.Scale.Min < 1 Then
                         .YAxis.Scale.MinAuto = False
                         .YAxis.Scale.Min = 1
-                        .AxisChange()
+                        .YAxis.Scale.Max = 1000000
                         .YAxis.MajorGrid.IsVisible = False
                         .YAxis.MinorGrid.IsVisible = False
                         .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
+                        .AxisChange()
                     End If
                     .CurveList("FDC").Color = Drawing.Color.BlueViolet
                     .CurveList("LDC (Sediment)").Color = Drawing.Color.Brown
                     .CurveList("CDC (Sediment)").Color = Drawing.Color.BurlyWood
                     .CurveList("LDC (Sediment)").IsY2Axis = True
                     .CurveList("CDC (Sediment)").IsY2Axis = True
-
                 End With
 
-                lZgc.SaveIn(lGraphFilename)
+                Try
+                    lZgc.SaveIn(lGraphFilename)
+                Catch ex As Exception
+                    lp = "P:Sediment:"
+                    'Stop
+                End Try
                 lGraphDur.Dispose()
                 lZgc.Dispose()
 
@@ -345,10 +374,14 @@ Module HSPFOutputReports
                     Exit Sub
                 End If
 
+                'Double checking: sum Annual
+                Logger.Msg("Sum Annual Nitrogen: " & lLoadSum.Attributes.GetFormattedValue("Sum Annual"))
+
+
                 lMath.Clear()
                 lMathArgs.Clear()
                 lMathArgs.SetValue("Timeseries", lLoadSum)
-                lMathArgs.SetValue("Number", 0.000125997881 / 1000.0) ' coversion: lb/h -> kg/s * 1000,  1 (pound per hour) = 0.000125997881 kilogram per second
+                lMathArgs.SetValue("Number", 0.000125997881) ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
                 lLoadSumNewUnit.Clear()
                 If lMath.Open("Multiply", lMathArgs) Then
                     lLoadSumNewUnit = lMath.DataSets(0)
@@ -368,18 +401,18 @@ Module HSPFOutputReports
 
                 lConc.Clear()
                 If lMath.Open("Divide", lMathArgs) Then
-                    lConc = lMath.DataSets(0) ' here unit is: number of 1000 kg / L
+                    lConc = lMath.DataSets(0) ' here unit is: number of kg / L
                     lMath.DataSets.RemoveAt(0)
                 Else
                     Logger.Msg("Calc Nitrogen concentration for " & lOWDM & " problem.")
                     Exit Sub
                 End If
 
-                'Change Nitrogen concentration to mg/L by multiplying 1000 * 1000 * 1000
+                'Change Nitrogen concentration to mg/L by multiplying 1000 * 1000
                 lMath.Clear()
                 lMathArgs.Clear()
                 lMathArgs.SetValue("Timeseries", lConc)
-                lMathArgs.SetValue("Number", 1000 * 1000 * 1000)
+                lMathArgs.SetValue("Number", 1000 * 1000)
                 lConcNewUnit.Clear()
                 If lMath.Open("Multiply", lMathArgs) Then
                     lConcNewUnit = lMath.DataSets(0)
@@ -411,7 +444,12 @@ Module HSPFOutputReports
 
                 With lGraphDur.ZedGraphCtrl.GraphPane
 
-                    .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                    If lscen.StartsWith("base.") Then
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : base"
+                    Else
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                    End If
+
                     With .XAxis
                         .Scale.Min = 0.0000001
                     End With
@@ -420,29 +458,41 @@ Module HSPFOutputReports
                         .Scale.IsUseTenPower = False
                         .MajorGrid.IsVisible = False
                         .MinorGrid.IsVisible = False
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec (x1000)"
+
+                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
+                        '.Scale.MinAuto = True
+                        '.Scale.MaxAuto = True
+
+                        'If .Scale.Min < 1 Then
+                        '    .Scale.Min = 0.000001
+                        'End If
+                        '.Scale.Max = 100000
                         .IsVisible = True
                     End With
                     If .YAxis.Scale.Min < 1 Then
                         .YAxis.Scale.MinAuto = False
                         .YAxis.Scale.Min = 1
-                        .AxisChange()
+                        .YAxis.Scale.Max = 1000000
                         .YAxis.MajorGrid.IsVisible = False
                         .YAxis.MinorGrid.IsVisible = False
                         .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
+                        .AxisChange()
                     End If
                     .CurveList("FDC").Color = Drawing.Color.BlueViolet
-                    .CurveList("LDC (Nitrogen)").Color = Drawing.Color.DarkGoldenrod
-                    .CurveList("CDC (Nitrogen)").Color = Drawing.Color.DarkKhaki
+                    .CurveList("LDC (Nitrogen)").Color = Drawing.Color.DarkKhaki
+                    .CurveList("CDC (Nitrogen)").Color = Drawing.ColorTranslator.FromHtml("#ff0099")
                     .CurveList("LDC (Nitrogen)").IsY2Axis = True
                     .CurveList("CDC (Nitrogen)").IsY2Axis = True
-
                 End With
 
-                lZgc.SaveIn(lGraphFilename)
+                Try
+                    lZgc.SaveIn(lGraphFilename)
+                Catch ex As Exception
+                    lp &= "P:Nitrogen:"
+                    'Stop
+                End Try
                 lGraphDur.Dispose()
                 lZgc.Dispose()
-
 
                 '******* PO4 *******
                 '******* PO4 Begins *******
@@ -471,7 +521,7 @@ Module HSPFOutputReports
                 lMath.Clear()
                 lMathArgs.Clear()
                 lMathArgs.SetValue("Timeseries", lLoadSum)
-                lMathArgs.SetValue("Number", 0.000125997881 / 1000.0) ' coversion: lb/h -> kg/s * 1000,  1 (pound per hour) = 0.000125997881 kilogram per second
+                lMathArgs.SetValue("Number", 0.000125997881) ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
                 lLoadSumNewUnit.Clear()
                 If lMath.Open("Multiply", lMathArgs) Then
                     lLoadSumNewUnit = lMath.DataSets(0)
@@ -491,18 +541,18 @@ Module HSPFOutputReports
 
                 lConc.Clear()
                 If lMath.Open("Divide", lMathArgs) Then
-                    lConc = lMath.DataSets(0) ' here unit is: number of 1000 kg / L
+                    lConc = lMath.DataSets(0) ' here unit is: number of kg / L
                     lMath.DataSets.RemoveAt(0)
                 Else
                     Logger.Msg("Calc Phosphorus concentration for " & lOWDM & " problem.")
                     Exit Sub
                 End If
 
-                'Change Phosphorus concentration to mg/L by multiplying 1000 * 1000 * 1000
+                'Change Phosphorus concentration to mg/L by multiplying 1000 * 1000
                 lMath.Clear()
                 lMathArgs.Clear()
                 lMathArgs.SetValue("Timeseries", lConc)
-                lMathArgs.SetValue("Number", 1000 * 1000 * 1000)
+                lMathArgs.SetValue("Number", 1000 * 1000)
                 lConcNewUnit.Clear()
                 If lMath.Open("Multiply", lMathArgs) Then
                     lConcNewUnit = lMath.DataSets(0)
@@ -511,7 +561,6 @@ Module HSPFOutputReports
                     Logger.Msg("Calc final phosphorus concentration for " & lOWDM & " problem.")
                     Exit Sub
                 End If
-
 
                 lDataGroup.Clear()
                 lFlow.Attributes.SetValue("Constituent", "FDC")
@@ -534,7 +583,12 @@ Module HSPFOutputReports
 
                 With lGraphDur.ZedGraphCtrl.GraphPane
 
-                    .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                    If lscen.StartsWith("base.") Then
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : base"
+                    Else
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                    End If
+
                     With .XAxis
                         .Scale.Min = 0.0000001
                     End With
@@ -543,31 +597,57 @@ Module HSPFOutputReports
                         .Scale.IsUseTenPower = False
                         .MajorGrid.IsVisible = False
                         .MinorGrid.IsVisible = False
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec (x1000)"
+
+
+                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
+                        '.Scale.MinAuto = True
+                        '.Scale.MaxAuto = True
+                        'If .Scale.Min < 1 Then
+                        '    .Scale.Min = 0.000001
+                        'End If
+                        '.Scale.Max = 100000
                         .IsVisible = True
                     End With
                     If .YAxis.Scale.Min < 1 Then
                         .YAxis.Scale.MinAuto = False
                         .YAxis.Scale.Min = 1
-                        .AxisChange()
+                        .YAxis.Scale.Max = 1000000
                         .YAxis.MajorGrid.IsVisible = False
                         .YAxis.MinorGrid.IsVisible = False
                         .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
+                        .AxisChange()
                     End If
                     .CurveList("FDC").Color = Drawing.Color.BlueViolet
-                    .CurveList("LDC (Phosphorus)").Color = Drawing.Color.Crimson
-                    .CurveList("CDC (Phosphorus)").Color = Drawing.Color.DarkSalmon
+                    .CurveList("LDC (Phosphorus)").Color = Drawing.ColorTranslator.FromHtml("#ff3366")
+                    .CurveList("CDC (Phosphorus)").Color = Drawing.ColorTranslator.FromHtml("#cc9933")
                     .CurveList("LDC (Phosphorus)").IsY2Axis = True
                     .CurveList("CDC (Phosphorus)").IsY2Axis = True
-
                 End With
 
-                lZgc.SaveIn(lGraphFilename)
+                Try
+                    lZgc.SaveIn(lGraphFilename)
+                Catch ex As Exception
+                    lp &= "P:Phos:"
+                    'Stop
+                End Try
                 lGraphDur.Dispose()
                 lZgc.Dispose()
 
+                If lp.StartsWith("P:") Then
+                    IO.File.AppendAllText(lf, lp & lGraphFilename & vbCrLf)
+                End If
+
+                If lFlow IsNot Nothing Then lFlow.Clear()
+                If lLoadSum IsNot Nothing Then lLoadSum.Clear()
+                If lLoadSumNewUnit IsNot Nothing Then lLoadSumNewUnit.Clear()
+                If lConc IsNot Nothing Then lConc.Clear()
+                If lConcNewUnit IsNot Nothing Then lConcNewUnit.Clear()
+                If lDataGroup IsNot Nothing Then lDataGroup.Clear()
+                If lOWDM = lOutputWDMs.Item(lOutputWDMs.Keys.Count - 1).ToString Then
+                    Logger.Msg("Done processing last output WDM in this folder")
+                End If
             Next ' lOWDM in lOutputWDMS within a given scen lfld
-            Exit Sub
+            If lOutputWDMs IsNot Nothing Then lOutputWDMs.Clear()
         Next ' lfld in pBaseFolders
 
         '
@@ -848,4 +928,25 @@ Module HSPFOutputReports
         Logger.Dbg("Reports Written in " & IO.Path.Combine(pTestPath, "outfiles"), "HSPFOutputReports")
         'Logger.Msg("Reports Written in " & IO.Path.Combine(pTestPath, "outfiles"), "HSPFOutputReports")
     End Sub
+
+    Private Function foundQResult(ByVal aScen As String) As Boolean
+        Dim lqList As New ArrayList
+        lqList.Add("a_10_gfdl_f30.base.output.wdm")
+        lqList.Add("b_10_gfdl_f30.base.output.wdm")
+        lqList.Add("a_70_gfdl_f30.base.output.wdm")
+        lqList.Add("b_70_gfdl_f30.base.output.wdm")
+        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_cccm_f10.base.output.wdm")
+        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_ccsr_m.base.output.wdm")
+        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_csir_m.base.output.wdm")
+        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_gfdl_f10.base.output")
+
+
+        foundQResult = False
+        For Each ls As String In lqList
+            If aScen.Contains(ls) Then
+                foundQResult = True
+                Exit For
+            End If
+        Next
+    End Function
 End Module
