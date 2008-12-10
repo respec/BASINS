@@ -29,6 +29,23 @@ Public Class atcTimeseries
         Return DoMath("Add", lArgs)
     End Operator
 
+
+    Public Shared Operator -(ByVal aTimeseries1 As atcTimeseries, _
+                             ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
+        Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", lDataGroup)
+        Return DoMath("Subtract", lArgs)
+    End Operator
+
+    Public Shared Operator -(ByVal aTimeseries As atcTimeseries, _
+                             ByVal aValue As Double) As atcTimeseries
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", aTimeseries)
+        lArgs.Add("Number", aValue)
+        Return DoMath("Subtract", lArgs)
+    End Operator
+
     Public Shared Operator *(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
         Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
@@ -43,6 +60,38 @@ Public Class atcTimeseries
         lArgs.Add("Timeseries", aTimeseries)
         lArgs.Add("Number", aValue)
         Return DoMath("Multiply", lArgs)
+    End Operator
+
+    Public Shared Operator /(ByVal aTimeseries1 As atcTimeseries, _
+                             ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
+        Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", lDataGroup)
+        Return DoMath("Divide", lArgs)
+    End Operator
+
+    Public Shared Operator /(ByVal aTimeseries As atcTimeseries, _
+                             ByVal aValue As Double) As atcTimeseries
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", aTimeseries)
+        lArgs.Add("Number", aValue)
+        Return DoMath("Divide", lArgs)
+    End Operator
+
+    Public Shared Operator ^(ByVal aTimeseries1 As atcTimeseries, _
+                             ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
+        Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", lDataGroup)
+        Return DoMath("Exponent", lArgs)
+    End Operator
+
+    Public Shared Operator ^(ByVal aTimeseries As atcTimeseries, _
+                             ByVal aValue As Double) As atcTimeseries
+        Dim lArgs As New atcDataAttributes
+        lArgs.Add("Timeseries", aTimeseries)
+        lArgs.Add("Number", aValue)
+        Return DoMath("Exponent", lArgs)
     End Operator
 
     ''' <summary>Set or get an individual value</summary>

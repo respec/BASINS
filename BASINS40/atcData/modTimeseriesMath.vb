@@ -335,7 +335,7 @@ Public Module modTimeseriesMath
 
     Public Function DatasetOrGroupToGroup(ByVal aObj As Object) As atcDataGroup
         Select Case aObj.GetType.Name
-            Case "atcDataGroup" : Return aObj
+            Case "atcDataGroup", "atcTimeseriesGroup" : Return aObj
             Case "atcTimeseries" : Return New atcDataGroup(aObj)
             Case Else
                 Logger.Dbg("DatasetOrGroupToGroup: Unrecognized type '" & aObj.GetType.Name & "'")
