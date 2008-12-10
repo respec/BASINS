@@ -15,9 +15,7 @@ Public Class atcTimeseries
 
     Public Shared Operator +(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
-        Dim lDataGroup As New atcDataGroup
-        lDataGroup.Add(aTimeseries1)
-        lDataGroup.Add(aTimeseries2)
+        Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
         Dim lArgs As New atcDataAttributes
         lArgs.Add("Timeseries", lDataGroup)
         Return DoMath("Add", lArgs)
@@ -31,12 +29,9 @@ Public Class atcTimeseries
         Return DoMath("Add", lArgs)
     End Operator
 
-
     Public Shared Operator *(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
-        Dim lDataGroup As New atcDataGroup
-        lDataGroup.Add(aTimeseries1)
-        lDataGroup.Add(aTimeseries2)
+        Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
         Dim lArgs As New atcDataAttributes
         lArgs.Add("Timeseries", lDataGroup)
         Return DoMath("Multiply", lArgs)
@@ -49,7 +44,6 @@ Public Class atcTimeseries
         lArgs.Add("Number", aValue)
         Return DoMath("Multiply", lArgs)
     End Operator
-
 
     ''' <summary>Set or get an individual value</summary>
     Public Property Value(ByVal aIndex As Integer) As Double

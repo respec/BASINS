@@ -150,7 +150,9 @@
     </Compile>
     <Compile Include="atcTimeseriesBuilder.vb" />
     <Compile Include="atcTimeseriesGridSource.vb" />
+    <Compile Include="atcTimeseriesGroup.vb" />
     <Compile Include="atcTimeseriesGroupBuilder.vb" />
+    <Compile Include="atcTimeseriesSource.vb" />
     <Compile Include="frmDataSource.vb">
       <SubType>Form</SubType>
     </Compile>
