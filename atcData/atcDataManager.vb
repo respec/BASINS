@@ -191,6 +191,7 @@ Public Class atcDataManager
         Dim lDataSource As atcDataSource = DataSources(aIndex)
         DataSources.RemoveAt(aIndex)
         RaiseEvent ClosedData(lDataSource)
+        lDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
     End Sub
 
     Public Shared Sub RemoveDataSource(ByVal aSpecification As String)

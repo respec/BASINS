@@ -8,7 +8,7 @@ Public Class atcDataSource
     Private pAttributes As atcDataAttributes
     Private pSpecification As String = ""
     Private pFilter As String = ""
-    Private pData As atcDataGroup
+    Protected pData As atcDataGroup
 
     ''' <summary>
     ''' Enumeration of actions to take is data already exists
@@ -78,9 +78,7 @@ Public Class atcDataSource
             pAttributes.Clear()
             pAttributes = Nothing
         End If
-        If pData Is Nothing Then
-            pData = New atcDataGroup
-        Else
+        If pData IsNot Nothing Then
             For Each lDataSet As atcDataSet In pData
                 lDataSet.Clear()
             Next

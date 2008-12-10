@@ -9,7 +9,7 @@ Imports MapWinUtility
 Imports System.Collections.Specialized
 
 Public Class atcDataSourceWDM
-    Inherits atcData.atcDataSource
+    Inherits atcData.atcTimeseriesSource
 
     Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
     Private pDates As ArrayList 'of atcTimeseries
