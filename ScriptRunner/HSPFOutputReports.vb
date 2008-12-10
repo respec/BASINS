@@ -12,7 +12,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
 Module HSPFOutputReports
-    Private pBaseDrive As String = "C:"
+    Private pBaseDrive As String = "D:"
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
     Private pBaseName As String
@@ -177,109 +177,47 @@ Module HSPFOutputReports
         Dim lOutputWdmDataSource As New atcDataSourceWDM()
         Dim lScenName As String = ""
         'build collection of scenarios (uci base names) to report
-        Dim lOutputWDMs As New System.Collections.Specialized.NameValueCollection
+        Dim lOutputWDMNames As New System.Collections.Specialized.NameValueCollection
 
         Dim lp As String = ""
         Dim lf As String = "C:\mono_luChange\output\graphWQlog.txt"
-        For Each lfld As String In pBaseFolders ' loop through all land use scenario folders
+        For Each lBaseFolder As String In pBaseFolders ' loop through all land use scenario folders
             lp = ""
-            AddFilesInDir(lOutputWDMs, lfld, False, "*.output.wdm")
+            AddFilesInDir(lOutputWDMNames, lBaseFolder, False, "*.output.wdm")
             'lfld = "C:\mono_luChange\output\lu2030b2"
             'AddFilesInDir(lOutputWDMs, lfld, False, "b_10_gfdl_f30.base.output.wdm")
-            For Each lOWDM As String In lOutputWDMs
+            For Each lOutputWDMName As String In lOutputWDMNames
                 lp = ""
                 'If foundQResult(lOWDM) Then ' found a problematic result, then bypass it
                 '    Continue For
                 'End If
-                lOutputWdmDataSource.Open(lOWDM)
+                lOutputWdmDataSource.Open(lOutputWDMName)
 
                 'Flow rate (911, ac.ft/hour -> liter/s)
                 Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
                 Dim lMathArgs As New atcDataAttributes
-                lMathArgs.Add("Timeseries", lOutputWdmDataSource.DataSets.ItemByKey(911))
-                lMathArgs.Add("Number", 342.633844) '1 ((acre foot) per hour) = 342.633844 liter per second
 
-                Dim lFlow As atcTimeseries = Nothing
-                If lMath.Open("Multiply", lMathArgs) Then
-                    lFlow = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Flow extraction problem")
-                    Exit Sub
-                End If
-
+                Dim lFlow As atcTimeseries = _
+                  lOutputWdmDataSource.DataSets.ItemByKey(911) * 342.633844 '1 ((acre foot) per hour) = 342.633844 liter per second
 
                 '****** SEDIMENT *****
 
                 ' Sediment loading
-                Dim lDataGroup As New atcDataGroup
-
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(921)) 'Sand
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(922)) 'Silt
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(923)) 'Clay
-
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lDataGroup)
-
-                Dim lLoadSum As atcTimeseries ' Intermediate 
-                If lMath.Open("Add", lMathArgs) Then
-                    lLoadSum = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Adding sediment for " & lOWDM & " problem.")
-                    Exit Sub
-                End If
-
+                Dim lLoadSum As atcTimeseries = _
+                   lOutputWdmDataSource.DataSets.ItemByKey(921) + _
+                   lOutputWdmDataSource.DataSets.ItemByKey(922) + _
+                   lOutputWdmDataSource.DataSets.ItemByKey(923)
                 'Double checking: sum Annual
                 'Logger.Msg("Sum Annual Sediment: " & lLoadSum.Attributes.GetFormattedValue("Sum Annual"))
                 '235470 vs 235430    19619.1667 (monthly mean)
-
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lLoadSum)
-                lMathArgs.SetValue("Number", 0.251995761) ' coversion: ton/h -> kg/s
-                Dim lLoadSumNewUnit As atcTimeseries = Nothing
-                If lMath.Open("Multiply", lMathArgs) Then
-                    lLoadSumNewUnit = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Change sediment unit problem.")
-                    Exit Sub
-                End If
+                Dim lLoadSumNewUnit As atcTimeseries = lLoadSum * 0.251995761
 
                 ' Sediment concentration
-                lDataGroup.Clear()
-                lDataGroup.Add("sedload", lLoadSumNewUnit)
-                lDataGroup.Add("flow", lFlow)
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lDataGroup)
+                Dim lConc As atcTimeseries = lLoadSumNewUnit / lFlow ' Intermediate - kg/l
+                Dim lConcNewUnit As atcTimeseries = lConc * (1000 * 1000) 'kg/l to mg/L
 
-                Dim lConc As atcTimeseries  ' Intermediate 
-                If lMath.Open("Divide", lMathArgs) Then
-                    lConc = lMath.DataSets(0) ' here unit is: number of kg / L
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Calc sediment concentration for " & lOWDM & " problem.")
-                    Exit Sub
-                End If
-
-                'Change sediment concentration to mg/L by multiplying 1000 * 1000
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lConc)
-                lMathArgs.SetValue("Number", 1000 * 1000)
-                Dim lConcNewUnit As atcTimeseries
-                If lMath.Open("Multiply", lMathArgs) Then
-                    lConcNewUnit = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Calc final sediment concentration for " & lOWDM & " problem.")
-                    Exit Sub
-                End If
-
-                lDataGroup.Clear()
+                Dim lDataGroup As New atcTimeseriesGroup
+                ldatagroup.Clear()
                 lFlow.Attributes.SetValue("Constituent", "FDC")
                 lDataGroup.Add(lFlow)
                 lLoadSumNewUnit.Attributes.SetValue("Constituent", "LDC (Sediment)")
@@ -288,8 +226,8 @@ Module HSPFOutputReports
                 lDataGroup.Add(lConcNewUnit)
 
                 'Do the duration graph
-                Dim lscen As String = IO.Path.GetFileNameWithoutExtension(lOWDM)
-                Dim lGraphFilename As String = IO.Path.Combine(lfld, lscen) & "_dur_sed" & lGraphSaveFormat
+                Dim lscen As String = IO.Path.GetFileNameWithoutExtension(lOutputWDMName)
+                Dim lGraphFilename As String = IO.Path.Combine(lBaseFolder, lscen) & "_dur_sed" & lGraphSaveFormat
                 Dim lZgc As ZedGraphControl
 
                 lZgc = CreateZgc()
@@ -302,9 +240,9 @@ Module HSPFOutputReports
                 With lGraphDur.ZedGraphCtrl.GraphPane
 
                     If lscen.StartsWith("base.") Then
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : base"
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
                     Else
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
                     End If
                     With .XAxis
                         .Scale.Min = 0.0000001
@@ -370,12 +308,12 @@ Module HSPFOutputReports
                     lLoadSum = lMath.DataSets(0)
                     lMath.DataSets.RemoveAt(0)
                 Else
-                    Logger.Msg("Adding Nitrogen for " & lOWDM & " problem.")
+                    Logger.Msg("Adding Nitrogen for " & lOutputWDMName & " problem.")
                     Exit Sub
                 End If
 
                 'Double checking: sum Annual
-                Logger.Msg("Sum Annual Nitrogen: " & lLoadSum.Attributes.GetFormattedValue("Sum Annual"))
+                'Logger.Msg("Sum Annual Nitrogen: " & lLoadSum.Attributes.GetFormattedValue("SumAnnual"))
 
 
                 lMath.Clear()
@@ -404,7 +342,7 @@ Module HSPFOutputReports
                     lConc = lMath.DataSets(0) ' here unit is: number of kg / L
                     lMath.DataSets.RemoveAt(0)
                 Else
-                    Logger.Msg("Calc Nitrogen concentration for " & lOWDM & " problem.")
+                    Logger.Msg("Calc Nitrogen concentration for " & lOutputWDMName & " problem.")
                     Exit Sub
                 End If
 
@@ -418,7 +356,7 @@ Module HSPFOutputReports
                     lConcNewUnit = lMath.DataSets(0)
                     lMath.DataSets.RemoveAt(0)
                 Else
-                    Logger.Msg("Calc final nitrogen concentration for " & lOWDM & " problem.")
+                    Logger.Msg("Calc final nitrogen concentration for " & lOutputWDMName & " problem.")
                     Exit Sub
                 End If
 
@@ -433,7 +371,7 @@ Module HSPFOutputReports
 
                 'Do the duration graph for nitrogen
                 'lscen = IO.Path.GetFileNameWithoutExtension(lOWDM) ' use from above
-                lGraphFilename = IO.Path.Combine(lfld, lscen) & "_dur_nitro" & lGraphSaveFormat
+                lGraphFilename = IO.Path.Combine(lBaseFolder, lscen) & "_dur_nitro" & lGraphSaveFormat
 
                 lZgc = CreateZgc()
                 'Dim lGraphSaveWidth As Integer = 800  ' use from above
@@ -445,9 +383,9 @@ Module HSPFOutputReports
                 With lGraphDur.ZedGraphCtrl.GraphPane
 
                     If lscen.StartsWith("base.") Then
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : base"
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
                     Else
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
                     End If
 
                     With .XAxis
@@ -514,7 +452,7 @@ Module HSPFOutputReports
                     lLoadSum = lMath.DataSets(0)
                     lMath.DataSets.RemoveAt(0)
                 Else
-                    Logger.Msg("Adding Phosphorus for " & lOWDM & " problem.")
+                    Logger.Msg("Adding Phosphorus for " & lOutputWDMName & " problem.")
                     Exit Sub
                 End If
 
@@ -544,7 +482,7 @@ Module HSPFOutputReports
                     lConc = lMath.DataSets(0) ' here unit is: number of kg / L
                     lMath.DataSets.RemoveAt(0)
                 Else
-                    Logger.Msg("Calc Phosphorus concentration for " & lOWDM & " problem.")
+                    Logger.Msg("Calc Phosphorus concentration for " & lOutputWDMName & " problem.")
                     Exit Sub
                 End If
 
@@ -558,7 +496,7 @@ Module HSPFOutputReports
                     lConcNewUnit = lMath.DataSets(0)
                     lMath.DataSets.RemoveAt(0)
                 Else
-                    Logger.Msg("Calc final phosphorus concentration for " & lOWDM & " problem.")
+                    Logger.Msg("Calc final phosphorus concentration for " & lOutputWDMName & " problem.")
                     Exit Sub
                 End If
 
@@ -572,7 +510,7 @@ Module HSPFOutputReports
 
                 'Do the duration graph for nitrogen
                 'lscen = IO.Path.GetFileNameWithoutExtension(lOWDM) ' use from above
-                lGraphFilename = IO.Path.Combine(lfld, lscen) & "_dur_phos" & lGraphSaveFormat
+                lGraphFilename = IO.Path.Combine(lBaseFolder, lscen) & "_dur_phos" & lGraphSaveFormat
 
                 lZgc = CreateZgc()
                 'Dim lGraphSaveWidth As Integer = 800  ' use from above
@@ -584,9 +522,9 @@ Module HSPFOutputReports
                 With lGraphDur.ZedGraphCtrl.GraphPane
 
                     If lscen.StartsWith("base.") Then
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : base"
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
                     Else
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lfld.Substring(lfld.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
+                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
                     End If
 
                     With .XAxis
@@ -643,11 +581,11 @@ Module HSPFOutputReports
                 If lConc IsNot Nothing Then lConc.Clear()
                 If lConcNewUnit IsNot Nothing Then lConcNewUnit.Clear()
                 If lDataGroup IsNot Nothing Then lDataGroup.Clear()
-                If lOWDM = lOutputWDMs.Item(lOutputWDMs.Keys.Count - 1).ToString Then
+                If lOutputWDMName = lOutputWDMNames.Item(lOutputWDMNames.Keys.Count - 1).ToString Then
                     Logger.Msg("Done processing last output WDM in this folder")
                 End If
             Next ' lOWDM in lOutputWDMS within a given scen lfld
-            If lOutputWDMs IsNot Nothing Then lOutputWDMs.Clear()
+            If lOutputWDMNames IsNot Nothing Then lOutputWDMNames.Clear()
         Next ' lfld in pBaseFolders
 
         '
