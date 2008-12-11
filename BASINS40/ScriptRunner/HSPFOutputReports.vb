@@ -12,7 +12,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
 Module HSPFOutputReports
-    Private pBaseDrive As String = "D:"
+    Private pBaseDrive As String = "C:"
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
     Private pBaseName As String
@@ -202,7 +202,7 @@ Module HSPFOutputReports
 
                 '****** SEDIMENT *****
 
-                ' Sediment loading
+                ' Sediment loading (921, sand; 922, silt; 923, clay in tons per hour)
                 Dim lLoadSum As atcTimeseries = _
                    lOutputWdmDataSource.DataSets.ItemByKey(921) + _
                    lOutputWdmDataSource.DataSets.ItemByKey(922) + _
@@ -210,11 +210,18 @@ Module HSPFOutputReports
                 'Double checking: sum Annual
                 'Logger.Msg("Sum Annual Sediment: " & lLoadSum.Attributes.GetFormattedValue("Sum Annual"))
                 '235470 vs 235430    19619.1667 (monthly mean)
-                Dim lLoadSumNewUnit As atcTimeseries = lLoadSum * 0.251995761
+                Dim lLoadSumNewUnit As atcTimeseries = lLoadSum * 0.251995761 '1 (ton per hour) = 0.251995761 kilogram per second
 
                 ' Sediment concentration
                 Dim lConc As atcTimeseries = lLoadSumNewUnit / lFlow ' Intermediate - kg/l
                 Dim lConcNewUnit As atcTimeseries = lConc * (1000 * 1000) 'kg/l to mg/L
+
+                'Rid of Infinitys from TSers
+                For i As Integer = 0 To lFlow.numValues - 1
+                    If Double.IsInfinity(lFlow.Value(i)) Then lFlow.Value(i) = Double.NaN
+                    If Double.IsInfinity(lLoadSumNewUnit.Value(i)) Then lLoadSumNewUnit.Value(i) = Double.NaN
+                    If Double.IsInfinity(lConcNewUnit.Value(i)) Then lConcNewUnit.Value(i) = Double.NaN
+                Next
 
                 Dim lDataGroup As New atcTimeseriesGroup
                 ldatagroup.Clear()
@@ -291,81 +298,70 @@ Module HSPFOutputReports
                 '******* NITROGEN Begins *******
                 '******* NITROGEN *******
                 ' Nitrogen loading
-                lDataGroup.Clear()
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(931)) 'NUCF9, NO3D
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(932)) 'NUCF9, NH3D
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(933)) 'OSNH4, NH3A
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(934)) 'OSNH4, NH3I
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(935)) 'OSNH4, NH3C
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(936)) 'PKCF2, RORN
-
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lDataGroup)
-
+                'Get Tot-N
+                ' Need 931 - NUCF9, NO3D
+                ' Need 932 - NUCF9, NH3D
+                ' Need 933 - OSNH4, NH3A
+                ' Need 934 - OSNH4, NH3I
+                ' Need 935 - OSNH4, NH3C
+                ' Need 936 - PKCF2, RORN
+                ' Need OXCF2 - 951 - BODA; multiplier: 0.043580459 (i.e. (14*16*49)/(1200*106*1.98))
+                ' Need PKCF2 - 953 - PHYT; multiplier: 0.086289308 (i.e. (14*16*49)/(1200*106))
                 lLoadSum.Clear()
-                If lMath.Open("Add", lMathArgs) Then
-                    lLoadSum = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Adding Nitrogen for " & lOutputWDMName & " problem.")
+                'Exit Sub
+
+                Try
+                    lLoadSum = lOutputWdmDataSource.DataSets.ItemByKey(931) + _
+                    lOutputWdmDataSource.DataSets.ItemByKey(932) + _
+                    lOutputWdmDataSource.DataSets.ItemByKey(933) + _
+                    lOutputWdmDataSource.DataSets.ItemByKey(933) + _
+                    lOutputWdmDataSource.DataSets.ItemByKey(934) + _
+                    lOutputWdmDataSource.DataSets.ItemByKey(935) + _
+                    lOutputWdmDataSource.DataSets.ItemByKey(936) + _
+                    (lOutputWdmDataSource.DataSets.ItemByKey(951) * 0.043580459) + _
+                    (lOutputWdmDataSource.DataSets.ItemByKey(953) * 0.086289308)
+                Catch ex As Exception
+                    Logger.Msg("Adding Nitrogen load problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
+                End Try
 
-                'Double checking: sum Annual
-                'Logger.Msg("Sum Annual Nitrogen: " & lLoadSum.Attributes.GetFormattedValue("SumAnnual"))
-
-
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lLoadSum)
-                lMathArgs.SetValue("Number", 0.000125997881) ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
                 lLoadSumNewUnit.Clear()
-                If lMath.Open("Multiply", lMathArgs) Then
-                    lLoadSumNewUnit = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Change Nitrogen unit problem.")
+                Try
+                    lLoadSumNewUnit = lLoadSum * 0.000125997881 ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
+                Catch ex As Exception
+                    Logger.Msg("Change Nitrogen load unit problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
-
-                ' Get Nitrogen concentration
-                lDataGroup.Clear()
-                lDataGroup.Add("nitroload", lLoadSumNewUnit)
-                lDataGroup.Add("flow", lFlow)
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lDataGroup)
+                End Try
 
                 lConc.Clear()
-                If lMath.Open("Divide", lMathArgs) Then
-                    lConc = lMath.DataSets(0) ' here unit is: number of kg / L
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Calc Nitrogen concentration for " & lOutputWDMName & " problem.")
+                Try
+                    lConc = lLoadSum / lFlow ' here unit is: number of kg / L /s
+                Catch ex As Exception
+                    Logger.Msg("Calc Nitrogen concentration problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
+                End Try
 
                 'Change Nitrogen concentration to mg/L by multiplying 1000 * 1000
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lConc)
-                lMathArgs.SetValue("Number", 1000 * 1000)
                 lConcNewUnit.Clear()
-                If lMath.Open("Multiply", lMathArgs) Then
-                    lConcNewUnit = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Calc final nitrogen concentration for " & lOutputWDMName & " problem.")
+                Try
+                    lConcNewUnit = lConc * (1000 * 1000)
+                Catch ex As Exception
+                    Logger.Msg("Calc final nitrogen concentration problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
+                End Try
 
+                'Rid of Infinitys from TSers
+                For i As Integer = 0 To lFlow.numValues - 1
+                    If Double.IsInfinity(lFlow.Value(i)) Then lFlow.Value(i) = Double.NaN
+                    If Double.IsInfinity(lLoadSumNewUnit.Value(i)) Then lLoadSumNewUnit.Value(i) = Double.NaN
+                    If Double.IsInfinity(lConcNewUnit.Value(i)) Then lConcNewUnit.Value(i) = Double.NaN
+                Next
 
                 lDataGroup.Clear()
                 lFlow.Attributes.SetValue("Constituent", "FDC")
                 lDataGroup.Add(lFlow)
-                lLoadSumNewUnit.Attributes.SetValue("Constituent", "LDC (Nitrogen)")
-                lDataGroup.Add(lLoadSumNewUnit)
+                lLoadSum.Attributes.SetValue("Constituent", "LDC (Nitrogen)")
+                lDataGroup.Add(lLoadSum)
                 lConcNewUnit.Attributes.SetValue("Constituent", "CDC (Nitrogen)")
                 lDataGroup.Add(lConcNewUnit)
 
@@ -374,14 +370,11 @@ Module HSPFOutputReports
                 lGraphFilename = IO.Path.Combine(lBaseFolder, lscen) & "_dur_nitro" & lGraphSaveFormat
 
                 lZgc = CreateZgc()
-                'Dim lGraphSaveWidth As Integer = 800  ' use from above
-                'Dim lGraphSaveHeight As Integer = 600 ' use from above
                 lZgc.Width = lGraphSaveWidth
                 lZgc.Height = lGraphSaveHeight
                 lGraphDur = New clsGraphProbability(lDataGroup, lZgc)
 
                 With lGraphDur.ZedGraphCtrl.GraphPane
-
                     If lscen.StartsWith("base.") Then
                         .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
                     Else
@@ -397,7 +390,8 @@ Module HSPFOutputReports
                         .MajorGrid.IsVisible = False
                         .MinorGrid.IsVisible = False
 
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
+                        '.Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
+                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) lb/h"
                         '.Scale.MinAuto = True
                         '.Scale.MaxAuto = True
 
@@ -410,7 +404,7 @@ Module HSPFOutputReports
                     If .YAxis.Scale.Min < 1 Then
                         .YAxis.Scale.MinAuto = False
                         .YAxis.Scale.Min = 1
-                        .YAxis.Scale.Max = 1000000
+                        '.YAxis.Scale.Max = 1000000
                         .YAxis.MajorGrid.IsVisible = False
                         .YAxis.MinorGrid.IsVisible = False
                         .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
@@ -436,75 +430,71 @@ Module HSPFOutputReports
                 '******* PO4 Begins *******
                 '******* PO4 *******
                 ' Phosphorus loading
-                lDataGroup.Clear()
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(941)) 'NUCF9, PO4D
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(942)) 'OSPO4, PO4A
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(943)) 'OSPO4, PO4I
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(944)) 'OSPO4, PO4C
-                lDataGroup.Add(lOutputWdmDataSource.DataSets.ItemByKey(945)) 'PKCF2, RORP
-
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lDataGroup)
-
+                'Get Tot-P
+                ' Need 941 - 'NUCF9, PO4D
+                ' Need 942 - 'OSPO4, PO4A
+                ' Need 943 - 'OSPO4, PO4I
+                ' Need 944 - 'OSPO4, PO4C
+                ' Need 945 - 'PKCF2, RORP
+                ' Need OXCF2 - 951 - BODA; multiplier: 0.006031224 (i.e. (31*49)/(1200*106)/1.98)
+                ' Need PKCF2 - 953 - PHYT; multiplier: 0.011941824 (i.e. (31*49)/(1200*106))
                 lLoadSum.Clear()
-                If lMath.Open("Add", lMathArgs) Then
-                    lLoadSum = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Adding Phosphorus for " & lOutputWDMName & " problem.")
+                Dim lPO4D As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(941)
+                Dim lPO4A As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(942)
+                Dim lPO4I As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(943)
+                Dim lPO4C As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(944)
+                Dim lRORP As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(945)
+                Dim lBODA As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(951) * 0.006031224
+                Dim lPHYT As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(953) * 0.011941824
+                Try
+                    lLoadSum = lPO4D
+                    lLoadSum = lLoadSum + lPO4A
+                    lLoadSum = lLoadSum + lPO4I
+                    lLoadSum = lLoadSum + lPO4C
+                    lLoadSum = lLoadSum + lRORP
+                    lLoadSum = lLoadSum + lBODA
+                    lLoadSum = lLoadSum + lPHYT
+                Catch ex As Exception
+                    Logger.Msg("Adding Phosphorus problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
+                End Try
 
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lLoadSum)
-                lMathArgs.SetValue("Number", 0.000125997881) ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
                 lLoadSumNewUnit.Clear()
-                If lMath.Open("Multiply", lMathArgs) Then
-                    lLoadSumNewUnit = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Change Nitrogen unit problem.")
+                Try
+                    lLoadSumNewUnit = lLoadSum * 0.000125997881 ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
+                Catch ex As Exception
+                    Logger.Msg("Changen unit for Phosphorus load problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
-
-                ' Get Nitrogen concentration
-                lDataGroup.Clear()
-                lDataGroup.Add("po4load", lLoadSumNewUnit)
-                lDataGroup.Add("flow", lFlow)
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lDataGroup)
+                End Try
 
                 lConc.Clear()
-                If lMath.Open("Divide", lMathArgs) Then
-                    lConc = lMath.DataSets(0) ' here unit is: number of kg / L
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Calc Phosphorus concentration for " & lOutputWDMName & " problem.")
+                Try
+                    lConc = lLoadSumNewUnit / lFlow ' here unit is: number of kg / L
+                Catch ex As Exception
+                    Logger.Msg("Calc Phosphorus concentration problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
+                End Try
 
-                'Change Phosphorus concentration to mg/L by multiplying 1000 * 1000
-                lMath.Clear()
-                lMathArgs.Clear()
-                lMathArgs.SetValue("Timeseries", lConc)
-                lMathArgs.SetValue("Number", 1000 * 1000)
                 lConcNewUnit.Clear()
-                If lMath.Open("Multiply", lMathArgs) Then
-                    lConcNewUnit = lMath.DataSets(0)
-                    lMath.DataSets.RemoveAt(0)
-                Else
-                    Logger.Msg("Calc final phosphorus concentration for " & lOutputWDMName & " problem.")
+                Try
+                    lConcNewUnit = lConc * (1000 * 1000) ' convert unit to mg /L
+                Catch ex As Exception
+                    Logger.Msg("Change Phosphorus concentration unit problem for: " & lOutputWDMName)
                     Exit Sub
-                End If
+                End Try
+
+                'Rid of Infinitys from TSers
+                For i As Integer = 0 To lFlow.numValues - 1
+                    If Double.IsInfinity(lFlow.Value(i)) Then lFlow.Value(i) = Double.NaN
+                    If Double.IsInfinity(lLoadSumNewUnit.Value(i)) Then lLoadSumNewUnit.Value(i) = Double.NaN
+                    If Double.IsInfinity(lConcNewUnit.Value(i)) Then lConcNewUnit.Value(i) = Double.NaN
+                Next
 
                 lDataGroup.Clear()
                 lFlow.Attributes.SetValue("Constituent", "FDC")
                 lDataGroup.Add(lFlow)
-                lLoadSumNewUnit.Attributes.SetValue("Constituent", "LDC (Phosphorus)")
-                lDataGroup.Add(lLoadSumNewUnit)
+                lLoadSum.Attributes.SetValue("Constituent", "LDC (Phosphorus)") ' graph original as converted units are not working for phos
+                lDataGroup.Add(lLoadSum)
                 lConcNewUnit.Attributes.SetValue("Constituent", "CDC (Phosphorus)")
                 lDataGroup.Add(lConcNewUnit)
 
@@ -513,14 +503,12 @@ Module HSPFOutputReports
                 lGraphFilename = IO.Path.Combine(lBaseFolder, lscen) & "_dur_phos" & lGraphSaveFormat
 
                 lZgc = CreateZgc()
-                'Dim lGraphSaveWidth As Integer = 800  ' use from above
-                'Dim lGraphSaveHeight As Integer = 600 ' use from above
                 lZgc.Width = lGraphSaveWidth
                 lZgc.Height = lGraphSaveHeight
                 lGraphDur = New clsGraphProbability(lDataGroup, lZgc)
+                'Dim lGraphDuro As New clsGraphTime(lDataGroup, lZgc)
 
                 With lGraphDur.ZedGraphCtrl.GraphPane
-
                     If lscen.StartsWith("base.") Then
                         .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
                     Else
@@ -535,9 +523,8 @@ Module HSPFOutputReports
                         .Scale.IsUseTenPower = False
                         .MajorGrid.IsVisible = False
                         .MinorGrid.IsVisible = False
-
-
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
+                        '.Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
+                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) lb/h"
                         '.Scale.MinAuto = True
                         '.Scale.MaxAuto = True
                         'If .Scale.Min < 1 Then
@@ -546,15 +533,16 @@ Module HSPFOutputReports
                         '.Scale.Max = 100000
                         .IsVisible = True
                     End With
-                    If .YAxis.Scale.Min < 1 Then
-                        .YAxis.Scale.MinAuto = False
-                        .YAxis.Scale.Min = 1
-                        .YAxis.Scale.Max = 1000000
-                        .YAxis.MajorGrid.IsVisible = False
-                        .YAxis.MinorGrid.IsVisible = False
-                        .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
-                        .AxisChange()
-                    End If
+                    'If .YAxis.Scale.Min < 1 Then
+                    .YAxis.Scale.MinAuto = False
+                    .YAxis.Scale.Min = 0.0000001
+                    '    .YAxis.Scale.Min = 1
+                    '    '.YAxis.Scale.Max = 1000000
+                    '    .YAxis.MajorGrid.IsVisible = False
+                    '    .YAxis.MinorGrid.IsVisible = False
+                    '    .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
+                    '    .AxisChange()
+                    'End If
                     .CurveList("FDC").Color = Drawing.Color.BlueViolet
                     .CurveList("LDC (Phosphorus)").Color = Drawing.ColorTranslator.FromHtml("#ff3366")
                     .CurveList("CDC (Phosphorus)").Color = Drawing.ColorTranslator.FromHtml("#cc9933")
