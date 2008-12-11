@@ -10,7 +10,7 @@ Public Class atcExpertSystem
     Private pDatasetTypes As New hexDatasetTypes
 
     Private pUci As atcUCI.HspfUci
-    Private pDataSource As atcDataSource
+    Private pDataSource As atcTimeseriesSource
 
     Private pName As String
     Private pSubjectiveData(25) As Integer
@@ -47,7 +47,7 @@ Public Class atcExpertSystem
     Private Const pConvert As Double = 24.0# * 3600.0# * 12.0# / 43560.0#
     Private Const pNSteps As Integer = 500
 
-    Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcDataSource)
+    Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcTimeseriesSource)
         pUci = aUci
         pDataSource = aDataSource
         ReadEXSFile(IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs")
@@ -302,7 +302,7 @@ Public Class atcExpertSystem
         End If
     End Sub
 
-    Private Sub CalcStats(ByVal aDataSource As atcDataSource)
+    Private Sub CalcStats(ByVal aDataSource As atcTimeseriesSource)
         Dim lDataSetTypes() As String = {"SimTotRunoff", "ObsStreamflow", _
                                          "SimInterflow", "SimBaseflow", _
                                          "ObsPotentialET", "SimActualET"}

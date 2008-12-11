@@ -276,7 +276,7 @@ Friend Class frmManager
         txtDetails.Text = ""
         Dim lName As String = ""
         Dim lCount As String = 0
-        For Each lDataSource As atcDataSource In atcDataManager.DataSources
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             Dim lTypeAndSource() As String = lDataSource.Name.Split(":")
 
             'TODO: leave code for lTypeAndSource(0) - now only Timeseries, might want to add Model or Table later
@@ -312,7 +312,7 @@ Friend Class frmManager
                 Dim lDataSourceIndex As Integer = treeFiles.SelectedNode.Name
                 If lDataSourceIndex > -1 AndAlso _
                        lDataSourceIndex < atcDataManager.DataSources.Count Then
-                    Dim lDataSource As atcDataSource = atcDataManager.DataSources.Item(lDataSourceIndex)
+                    Dim lDataSource As atcTimeseriesSource = atcDataManager.DataSources.Item(lDataSourceIndex)
                     With lDataSource
                         Logger.Dbg(aAction & ":" & .Specification)
                         Dim lActionArgs() As String = aAction.Split(":")
@@ -355,7 +355,7 @@ Friend Class frmManager
         End If
     End Sub
 
-    Private Sub ChangedData(ByVal aDataSource As atcDataSource)
+    Private Sub ChangedData(ByVal aDataSource As atcTimeseriesSource)
         Edit(atcDataManager.DataSources.Count - 1)
     End Sub
 
@@ -400,7 +400,7 @@ Friend Class frmManager
     Private Sub RefreshDetails(ByVal aDataSourceIndex As Integer)
         If aDataSourceIndex > -1 AndAlso _
            aDataSourceIndex < atcDataManager.DataSources.Count Then
-            Dim lDataSource As atcDataSource = atcDataManager.DataSources.Item(aDataSourceIndex)
+            Dim lDataSource As atcTimeseriesSource = atcDataManager.DataSources.Item(aDataSourceIndex)
             txtDetails.Text = lDataSource.Name
             If Not lDataSource.Specification Is Nothing AndAlso lDataSource.Specification.Length > 0 Then
                 txtDetails.Text &= vbCrLf & lDataSource.Specification
@@ -474,7 +474,7 @@ Friend Class frmManager
     Private Sub NewToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NewToolStripMenuItem.Click
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", False, True)
+        Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", False, True)
         If Not lNewSource Is Nothing Then 'user did not cancel
             If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                 If Logger.LastDbgText.Length > 0 Then
@@ -487,7 +487,7 @@ Friend Class frmManager
     Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
         Dim lCollection As New ArrayList
         lCollection.Add("File")
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lCollection)
+        Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lCollection)
         If Not lNewSource Is Nothing Then
             If Not (atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)) Then
                 If Logger.LastDbgText.Length > 0 Then

@@ -712,7 +712,7 @@ Imports MapWinUtility
     Public Function AskUser(ByRef aVariation As atcVariation) As Boolean
         pVariation = aVariation.Clone
 
-        If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
+        If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcTimeseriesGroup
 
         cboFunction.Items.Clear()
         cboFunction.Items.AddRange(pFunctionLabels)
@@ -753,7 +753,7 @@ Imports MapWinUtility
     End Sub
 
     Private Sub UserSelectData()
-        Dim lData As atcDataGroup = atcDataManager.UserSelectData("Select data to vary", pVariation.DataSets)
+        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data to vary", pVariation.DataSets)
         If Not lData Is Nothing Then
             pVariation.DataSets = lData
             UpdateDataText(txtVaryData, lData)
@@ -761,7 +761,7 @@ Imports MapWinUtility
     End Sub
 
     Private Sub UserSelectPET()
-        Dim lData As atcDataGroup = atcDataManager.UserSelectData("Select PET to replace with values computed from air temperature", pVariation.PETdata)
+        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select PET to replace with values computed from air temperature", pVariation.PETdata)
         If Not lData Is Nothing Then
             pVariation.PETdata = lData
             UpdateDataText(txtVaryPET, lData)
@@ -769,7 +769,7 @@ Imports MapWinUtility
     End Sub
 
     Private Sub UpdateDataText(ByVal aTextBox As Windows.Forms.TextBox, _
-                               ByVal aGroup As atcDataGroup)
+                               ByVal aGroup As atcTimeseriesGroup)
         If Not aGroup Is Nothing AndAlso aGroup.Count > 0 Then
             aTextBox.Text = aGroup.ItemByIndex(0).ToString
             If aGroup.Count > 1 Then aTextBox.Text &= " (and " & aGroup.Count - 1 & " more)"

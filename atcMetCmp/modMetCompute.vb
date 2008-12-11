@@ -85,7 +85,7 @@ Public Module modMetCompute
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
     Private Sums() As Double = {0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24, 20.48}
 
-    Public Function CmpSol(ByVal aCldTSer As atcTimeseries, ByVal aSource As atcDataSource, ByVal aLatDeg As Double) As atcTimeseries
+    Public Function CmpSol(ByVal aCldTSer As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aLatDeg As Double) As atcTimeseries
         'compute daily solar radiation based on daily cloud cover
         Dim i As Integer
         Dim ldate(5) As Integer
@@ -125,7 +125,7 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpCldFromSolar(ByVal aDSolTSer As atcTimeseries, ByVal aSource As atcDataSource, ByVal aLatDeg As Double) As atcTimeseries
+    Public Function CmpCldFromSolar(ByVal aDSolTSer As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aLatDeg As Double) As atcTimeseries
         'compute daily cloud cover based on daily solar radiation 
         Dim i As Integer
         Dim ldate(5) As Integer
@@ -160,7 +160,7 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpJen(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aSource As atcDataSource, ByVal aDegF As Boolean, ByVal aCTX As Double, ByVal aCTS() As Double) As atcTimeseries
+    Public Function CmpJen(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aDegF As Boolean, ByVal aCTX As Double, ByVal aCTS() As Double) As atcTimeseries
         'compute JENSEN-HAISE - PET
         'aTMinTS/aTMaxTS - min/max temp timeseries
         'aSRadTS - solar radiation timeseries
@@ -233,7 +233,7 @@ Public Module modMetCompute
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function CmpHamX(ByVal aTemperature As atcTimeseries, _
-                            ByVal aSource As atcDataSource, _
+                            ByVal aSource As atcTimeseriesSource, _
                             ByVal aDegF As Boolean, _
                             ByVal aLatDeg As Double, _
                             ByVal aCTS() As Double) As atcTimeseries
@@ -288,7 +288,7 @@ Public Module modMetCompute
         Return CmpHam(lTMinTS, lTMaxTS, aSource, aDegF, aLatDeg, aCTS)
     End Function
 
-    Public Function CmpHam(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSource As atcDataSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
+    Public Function CmpHam(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
         'compute HAMON - PET
         'aTminTS/aTMaxTS - min/max temp timeseries
         'aDegF   - Temperature in Degrees F (True) or C (False)
@@ -347,7 +347,7 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpPen(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aDewPTS As atcTimeseries, ByVal aWindTS As atcTimeseries, ByVal aSource As atcDataSource) As atcTimeseries
+    Public Function CmpPen(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aDewPTS As atcTimeseries, ByVal aWindTS As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
         'compute PENMAN - PET
         'input timeseries are Min/Max Temp, Dewpoint Temp, Solar Radiation, Wind Movement
 
@@ -393,7 +393,7 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpCld(ByVal aPctSun As atcTimeseries, ByVal aSource As atcDataSource) As atcTimeseries
+    Public Function CmpCld(ByVal aPctSun As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
         'compute %cloud cover from %sunshine
 
         Dim i, j As Integer
@@ -439,7 +439,7 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpWnd(ByVal aWndSpd As atcTimeseries, ByVal aSource As atcDataSource) As atcTimeseries
+    Public Function CmpWnd(ByVal aWndSpd As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
         'compute daily total wind travel (mi) from
         'average daily wind speed (mph)
 
@@ -471,7 +471,7 @@ Public Module modMetCompute
 
     'DisTemp performs disaggregation of daily TMin/TMax to hourly temperature with a constant observation time
     'It calls DisaggTemp which uses a timeseries for observation time
-    Public Function DisTemp(ByVal aMnTmpTS As atcTimeseries, ByVal aMxTmpTS As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aObsTime As Integer) As atcTimeseries ', ByRef SJDt As Double, ByRef EJDt As Double
+    Public Function DisTemp(ByVal aMnTmpTS As atcTimeseries, ByVal aMxTmpTS As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aObsTime As Integer) As atcTimeseries ', ByRef SJDt As Double, ByRef EJDt As Double
         'Disaggregate daily min/max temperature to hourly temperature
         'Mn/MxTmpTS - input daily min/max temp values, 
         '             since disagg method uses either previous or ensuing 
@@ -496,7 +496,7 @@ Public Module modMetCompute
 
     'DisaggTemp performs disaggregation of daily TMin/TMax to hourly temperature 
     'using a timeseries for observation time
-    Public Function DisaggTemp(ByVal aMnTmpTS As atcTimeseries, ByVal aMxTmpTS As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aObsTimeTS As atcTimeseries) As atcTimeseries ', ByRef SJDt As Double, ByRef EJDt As Double
+    Public Function DisaggTemp(ByVal aMnTmpTS As atcTimeseries, ByVal aMxTmpTS As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aObsTimeTS As atcTimeseries) As atcTimeseries ', ByRef SJDt As Double, ByRef EJDt As Double
         'Disaggregate daily min/max temperature to hourly temperature
         'Mn/MxTmpTS - input daily min/max temp values, 
         '             since disagg method uses either previous or ensuing 
@@ -647,7 +647,7 @@ Public Module modMetCompute
                     lHRTemp(lHrPos + j) = tsfil(1)
                 Next j
             End If
-                lHrPos = lHrPos + 24
+            lHrPos = lHrPos + 24
         Next i
         Array.Copy(lHRTemp, 1, lDisTs.Values, 1, lDisTs.numValues)
         Return lDisTs
@@ -663,7 +663,7 @@ Public Module modMetCompute
     ''' <param name="aLatDeg">latitude, in degrees</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function DisSolPet(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aDisOpt As Integer, ByVal aLatDeg As Double) As atcTimeseries
+    Public Function DisSolPet(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aDisOpt As Integer, ByVal aLatDeg As Double) As atcTimeseries
         Dim lHrPos, i, j, retcod As Integer
         Dim lDate(5) As Integer
         Dim lDisTs As New atcTimeseries(aDataSource)
@@ -722,7 +722,7 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function DisWnd(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aDCurve() As Double) As atcTimeseries
+    Public Function DisWnd(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aDCurve() As Double) As atcTimeseries
         'Disaggregate daily wind to hourly
         'InTs - input daily wind timeseries
         'DCurve - hourly diurnal curve for wind disaggregation
@@ -760,7 +760,7 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function DisDewPoint(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aAirTemp As atcTimeseries) As atcTimeseries
+    Public Function DisDewPoint(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aAirTemp As atcTimeseries) As atcTimeseries
         'disaggregate daily Dewpoint Temp to hourly, adjust using min temp as needed
         'aInTs   - input timeseries to be disaggregated
         'aMinTemp - hourly min temp timeseries to make sure disaggregated Dewpoint doesn't exceed
@@ -832,7 +832,7 @@ Public Module modMetCompute
 
     End Function
 
-    Private Function DisaggDates(ByVal aInTS As atcTimeseries, ByVal aDataSource As atcDataSource) As atcTimeseries
+    Private Function DisaggDates(ByVal aInTS As atcTimeseries, ByVal aDataSource As atcTimeseriesSource) As atcTimeseries
         'build new date timeseries class for hourly TSer based on daily TSer (aInTS)
 
         Dim lDates As New atcTimeseries(aDataSource)
@@ -1676,7 +1676,7 @@ Public Module modMetCompute
 
     'DisPrecip performs disaggregation of daily precip to hourly with a constant observation time
     'It calls DisaggPrecip which uses a timeseries for observation time
-    Public Function DisPrecip(ByVal aDyTSer As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aHrTSer As atcDataGroup, ByVal aObsTime As Integer, ByVal aTolerance As Double, Optional ByVal aSumFile As String = "") As atcTimeseries
+    Public Function DisPrecip(ByVal aDyTSer As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aHrTSer As atcTimeseriesGroup, ByVal aObsTime As Integer, ByVal aTolerance As Double, Optional ByVal aSumFile As String = "") As atcTimeseries
         'aDyTSer - daily time series being disaggregated
         'aHrTser - collection of hourly timeseries used to disaggregate daily
         'aObsTime - observation time of daily precip (1 - 24)
@@ -1695,7 +1695,7 @@ Public Module modMetCompute
 
     'DisaggPrecip performs disaggregation of daily precip to hourly 
     'using a timeseries for the observation time
-    Public Function DisaggPrecip(ByVal aDyTSer As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aHrTSer As atcDataGroup, ByVal aObsTimeTS As atcTimeseries, ByVal aTolerance As Double, Optional ByVal aSumFile As String = "") As atcTimeseries
+    Public Function DisaggPrecip(ByVal aDyTSer As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aHrTSer As atcTimeseriesGroup, ByVal aObsTimeTS As atcTimeseries, ByVal aTolerance As Double, Optional ByVal aSumFile As String = "") As atcTimeseries
         'aDyTSer - daily time series being disaggregated
         'aHrTser - collection of hourly timeseries used to disaggregate daily
         'aObsTimeTS - timeseries of observation times for daily precip data (1 - 24)
@@ -2009,7 +2009,7 @@ OuttaHere:
 
     End Sub
 
-    Public Function DisCliGenPrecip(ByVal aDPrecTSer As atcTimeseries, ByVal aDurTSer As atcTimeseries, ByVal aTimePkTSer As atcTimeseries, ByVal aPeakTSer As atcTimeseries, Optional ByVal aDataSource As atcDataSource = Nothing) As atcTimeseries
+    Public Function DisCliGenPrecip(ByVal aDPrecTSer As atcTimeseries, ByVal aDurTSer As atcTimeseries, ByVal aTimePkTSer As atcTimeseries, ByVal aPeakTSer As atcTimeseries, Optional ByVal aDataSource As atcTimeseriesSource = Nothing) As atcTimeseries
         'aDPrecTSer - daily time series being disaggregated
         'aDurTSer - storm duration timeseries (hrs)
         'aTimePkTSer - time to peak timeseries (fraction of duration)

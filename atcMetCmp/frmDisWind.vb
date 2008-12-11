@@ -517,7 +517,7 @@ BadHourDist:
     End Sub
 
     Private Sub btnWind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWind.Click
-        Dim lTSGroup As atcDataGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature")
         If lTSGroup.Count > 0 Then
             pWindTS = lTSGroup(0)
             txtWind.Text = pWindTS.ToString

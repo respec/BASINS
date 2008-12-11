@@ -91,7 +91,7 @@ Public Class atcDataSourceWDM
         End Select
     End Function
 
-    Public Overrides Function AddDatasets(ByVal aDataGroup As atcDataGroup) As Boolean
+    Public Overrides Function AddDatasets(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
         Dim lfrm As New frmSave
         Dim lNumSaved As Integer = 0
         Dim lDSN As Integer
@@ -402,7 +402,7 @@ CaseExistRenumber:
     End Function
 
     Private Function findNextDsn(ByVal aDsn As Integer) As Integer
-        Dim lDatasets As atcDataGroup = DataSets
+        Dim lDatasets As atcTimeseriesGroup = DataSets
         While lDatasets.Keys.Contains(aDsn)
             aDsn += 1
         End While

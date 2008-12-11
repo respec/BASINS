@@ -7,11 +7,11 @@ Friend Class atcDataTreeForm
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(Optional ByRef aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByRef aDataGroup As atcData.atcTimeseriesGroup = Nothing)
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
 
-        If aDataGroup Is Nothing Then aDataGroup = New atcDataGroup
+        If aDataGroup Is Nothing Then aDataGroup = New atcTimeseriesGroup
 
         If aDataGroup.Count = 0 Then 'ask user to specify some Data
             atcDataManager.UserSelectData(, aDataGroup)
@@ -187,7 +187,7 @@ Friend Class atcDataTreeForm
 #End Region
 
     Private WithEvents pTreeViewMain As TreeView   'tree control
-    Private WithEvents pDataGroup As atcDataGroup   'group of atcData displayed
+    Private WithEvents pDataGroup As atcTimeseriesGroup    'group of atcData displayed
     Private pNumValuesShowDefault As Integer = 8
     Private pNumValuesShow As Integer = pNumValuesShowDefault
 
@@ -288,7 +288,8 @@ Friend Class atcDataTreeForm
                                          ByVal aDateOffset As Integer) As String
         Dim lStr As String = ""
         Dim lConditional As String = ""
-        Dim lDateString() As String = DumpDate(aData.Dates.Value(aValueIndex + aDateOffset)).Split(" ")
+        Dim lJDate As Double = aData.Dates.Value(aValueIndex + aDateOffset)
+        Dim lDateString() As String = DumpDate(lJDate).Split(" ")
         Dim lValueAttributes As atcDataAttributes = Nothing
         If aData.ValueAttributesExist Then
             lValueAttributes = aData.ValueAttributes(aValueIndex)
@@ -298,10 +299,10 @@ Friend Class atcDataTreeForm
         Else
             lConditional = lValueAttributes.GetValue("Conditional", "")
         End If
-        lStr = lDateString(2) & " " & _
-               lDateString(3) & " : " & _
+        lStr = lDateString(0) & " " & _
+               lDateString(1) & " : " & _
                lConditional & DoubleToString(aData.Value(aValueIndex)) & " : " & _
-               lDateString(0)
+               DoubleToString(lJDate)
         If Not lValueAttributes Is Nothing Then
             'TODO: add display of any attributes other than conditional - as nodes?
         End If

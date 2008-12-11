@@ -78,7 +78,7 @@ Module modFreq
                             ByVal aRecurOrProbs() As Double, _
                             ByVal aHigh As Boolean, _
                             ByVal aLogFg As Boolean, _
-                            ByVal aDataSource As atcDataSource, _
+                            ByVal aDataSource As atcTimeseriesSource, _
                             ByRef aAttributesStorage As atcDataAttributes, _
                             ByVal aNumZero As Integer)
 

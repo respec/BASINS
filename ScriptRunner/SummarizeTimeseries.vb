@@ -43,7 +43,7 @@ Module ScriptSummarizeTimeseries
             lString.Trim(vbTab)
             lStringBuilder.AppendLine(lString)
 
-            Dim lDataSets As atcDataGroup = atcDataManager.DataSets
+            Dim lDataSets As atcTimeseriesGroup = atcDataManager.DataSets
             Logger.Dbg("DatasetCount " & lDataSets.Count)
             For Each lDS As atcDataSet In lDataSets
                 Dim lValueString As String

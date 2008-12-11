@@ -208,7 +208,7 @@ Public Class atcListForm
 #End Region
 
     'The group of atcTimeseries displayed
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
 
     Private pDateFormat As New atcDateFormat
 
@@ -224,13 +224,13 @@ Public Class atcListForm
     Private pDisplayAttributes As ArrayList
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing, _
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                           Optional ByVal aDisplayAttributes As ArrayList = Nothing, _
                           Optional ByVal aShowValues As Boolean = True, _
                           Optional ByVal aFilterNoData As Boolean = False, _
                           Optional ByVal aShowForm As Boolean = True)
         If aTimeseriesGroup Is Nothing Then
-            pDataGroup = New atcDataGroup
+            pDataGroup = New atcTimeseriesGroup
         Else
             pDataGroup = aTimeseriesGroup
         End If

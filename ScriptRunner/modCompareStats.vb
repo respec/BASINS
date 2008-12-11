@@ -18,7 +18,7 @@ Module CompareStatsTest
         Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
         Dim lWdmDataSource As New atcDataSourceWDM
         If lWdmDataSource.Open(lWdmFileName) Then
-            Dim lDataGroup As New atcDataGroup
+            Dim lDataGroup As New atcTimeseriesGroup
             ChDriveDir(IO.Directory.GetCurrentDirectory & "\outfiles")
 
             Dim lSDate(5) As Integer : lSDate(0) = 1950 : lSDate(1) = 10 : lSDate(2) = 1
@@ -56,7 +56,7 @@ Module CompareStatsTest
         End If
     End Sub
 
-    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lOutFileName As String = pBaseName
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
@@ -76,7 +76,7 @@ Module CompareStatsTest
         lZgc.Dispose()
     End Sub
 
-    Sub GraphScatterBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphScatterBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lOutFileName As String = pBaseName & "_scat"
         Dim lACoef As Double
         Dim lBCoef As Double
@@ -125,8 +125,7 @@ Module CompareStatsTest
         lZgc.Dispose()
     End Sub
 
- 
-    Sub GraphDurationBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphDurationBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lOutFileName As String = pBaseName & "_dur"
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphProbability(aDataGroup, lZgc)
@@ -136,7 +135,7 @@ Module CompareStatsTest
         lZgc.Dispose()
     End Sub
 
-    Sub GraphResidualBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphResidualBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphResidual(aDataGroup, lZgc)
         Dim lOutFileName As String = pBaseName & "_residual"
@@ -145,7 +144,7 @@ Module CompareStatsTest
         lZgc.Dispose()
     End Sub
 
-    Sub GraphCumDifBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphCumDifBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphCumulativeDifference(aDataGroup, lZgc)
         Dim lOutFileName As String = pBaseName & "_cumDif"

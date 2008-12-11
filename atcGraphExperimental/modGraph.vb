@@ -48,7 +48,7 @@ Public Module modGraph
     ''' <param name="aZgc">ZedGraphControl to add the curve to</param>
     ''' <param name="aExistingCurves">Group of other data on this graph, a hint for which Y axis to use</param>
     <CLSCompliant(False)> _
-    Function FindYAxis(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aExistingCurves As atcDataGroup) As String
+    Function FindYAxis(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aExistingCurves As atcTimeseriesGroup) As String
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
         Dim lPane As GraphPane = aZgc.MasterPane.PaneList(0)
         Dim lYAxisName As String = aTimeseries.Attributes.GetValue("YAxis", "")
@@ -87,7 +87,7 @@ Public Module modGraph
     ''' <param name="aZgc">graph control to add curves to</param>
     ''' <remarks></remarks>
     <CLSCompliant(False)> _
-    Sub AddTimeseriesCurves(ByVal aDataGroup As atcDataGroup, ByVal aZgc As ZedGraphControl)
+    Sub AddTimeseriesCurves(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl)
         Dim lPaneMain As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
         Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Unit", -1)
         Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
@@ -102,9 +102,9 @@ Public Module modGraph
 
         Dim lYaxisNames As New atcCollection 'name for each item in aDataGroup
 
-        Dim lLeftDataSets As New atcDataGroup
-        Dim lRightDataSets As New atcDataGroup
-        Dim lAuxDataSets As New atcDataGroup
+        Dim lLeftDataSets As New atcTimeseriesGroup
+        Dim lRightDataSets As New atcTimeseriesGroup
+        Dim lAuxDataSets As New atcTimeseriesGroup
 
         Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
 
@@ -212,7 +212,7 @@ FoundMatch:
         End If
     End Sub
 
-    Private Function GroupContainsAttribute(ByVal aGroup As atcDataGroup, ByVal aAttribute As String, ByVal aValue As String) As Boolean
+    Private Function GroupContainsAttribute(ByVal aGroup As atcTimeseriesGroup, ByVal aAttribute As String, ByVal aValue As String) As Boolean
         For Each lTs As atcTimeseries In aGroup
             If String.Compare(lTs.Attributes.GetValue(aAttribute), aValue, True) = 0 Then
                 Return True
@@ -567,7 +567,7 @@ FoundMatch:
     End Sub
 
     <CLSCompliant(False)> _
-    Public Sub ScaleAxis(ByVal aDataGroup As atcDataGroup, ByVal aAxis As Axis)
+    Public Sub ScaleAxis(ByVal aDataGroup As atcTimeseriesGroup, ByVal aAxis As Axis)
         Dim lDataMin As Double = 1.0E+30
         Dim lDataMax As Double = -1.0E+30
         Dim lLogFlag As Boolean = False

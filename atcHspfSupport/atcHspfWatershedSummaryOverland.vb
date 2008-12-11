@@ -10,7 +10,7 @@ Public Module WatershedSummaryOverland
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcDataSource, _
+                           ByVal aScenarioResults As atcTimeseriesSource, _
                            ByVal aRunMade As String, _
                            ByVal aPerlndSegmentStarts() As Integer, _
                            ByVal aImplndSegmentStarts() As Integer, _
@@ -19,7 +19,7 @@ Public Module WatershedSummaryOverland
 
         Dim lNumberFormat As String = "#,##0.0"
         Dim lUnits As String = ""
-        Dim lAllNonpointData As New atcDataGroup
+        Dim lAllNonpointData As New atcTimeseriesGroup
 
         Dim lPerlndOperations As HspfOperations = aUci.OpnBlks("PERLND").Ids
         Dim lImplndOperations As HspfOperations = aUci.OpnBlks("IMPLND").Ids
@@ -54,17 +54,17 @@ Public Module WatershedSummaryOverland
                 Return New Text.StringBuilder("Overland report not yet defined for balance type '" & aBalanceType & "'")
         End Select
 
-        Dim lAllYearsToDo As New Generic.Dictionary(Of String, atcDataGroup)
+        Dim lAllYearsToDo As New Generic.Dictionary(Of String, atcTimeseriesGroup)
         If aEachYear Then
             Dim lSplitter As New atcSeasons.atcSeasonsCalendarYear
             For Each lOriginalTimeseries As atcTimeseries In lAllNonpointData
                 For Each lYearlyTs As atcTimeseries In lSplitter.Split(lOriginalTimeseries, Nothing)
                     lSeasonName = lYearlyTs.Attributes.GetValue("SeasonName", "")
-                    Dim lDataGroup As atcDataGroup
+                    Dim lDataGroup As atcTimeseriesGroup
                     If lAllYearsToDo.ContainsKey(lSeasonName) Then
                         lDataGroup = lAllYearsToDo.Item(lSeasonName)
                     Else
-                        lDataGroup = New atcDataGroup
+                        lDataGroup = New atcTimeseriesGroup
                         lAllYearsToDo.Add(lSeasonName, lDataGroup)
                     End If
                     lDataGroup.Add(lYearlyTs)
@@ -75,7 +75,7 @@ Public Module WatershedSummaryOverland
         If aSummary Then lAllYearsToDo.Add("Summary", lAllNonpointData)
 
         Dim lSB As New Text.StringBuilder
-        For Each lCurrentNonpointData As atcDataGroup In lAllYearsToDo.Values
+        For Each lCurrentNonpointData As atcTimeseriesGroup In lAllYearsToDo.Values
             Dim lSummary As Boolean = lCurrentNonpointData.Equals(lAllNonpointData)
             lSeasonName = lCurrentNonpointData.ItemByIndex(0).Attributes.GetValue("SeasonName", "")
             lSB.AppendLine("Overland Summary Report for " & aBalanceType & " in " & aScenario & " " & lUnits)
@@ -386,7 +386,7 @@ Public Module WatershedSummaryOverland
                                     ByVal aUCI As HspfUci, _
                                     ByVal aOperations As HspfOperations, _
                                     ByVal aID As Integer, ByVal aLastID As Integer, _
-                                    ByVal aData As atcDataGroup, _
+                                    ByVal aData As atcTimeseriesGroup, _
                                     ByVal aTable As atcTable, _
                                     ByRef aField As Integer, _
                                     ByRef aTotalArea As Double, _

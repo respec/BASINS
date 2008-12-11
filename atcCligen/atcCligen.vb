@@ -12,7 +12,7 @@ Imports System.Collections
 Imports System.IO
 
 Public Class atcCligen
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup

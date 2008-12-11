@@ -7,7 +7,7 @@ Public Class frmDisPrec
 
     Private pOk As Boolean
     Private pDPrecTS As atcTimeseries
-    Private pHPrecTS As atcDataGroup
+    Private pHPrecTS As atcTimeseriesGroup
     Private cObsTime As Integer
     Private cDataTol As Double
 
@@ -247,7 +247,7 @@ Public Class frmDisPrec
     End Sub
 
 #End Region
-    Public Function AskUser(ByRef aDPrecTS As atcTimeseries, ByRef aHPrecTS As atcDataGroup, ByRef aObsTime As Integer, ByRef aDataTol As Double, ByRef aSummFile As String) As Boolean
+    Public Function AskUser(ByRef aDPrecTS As atcTimeseries, ByRef aHPrecTS As atcTimeseriesGroup, ByRef aObsTime As Integer, ByRef aDataTol As Double, ByRef aSummFile As String) As Boolean
         Me.ShowDialog()
         If pOk Then
             aDPrecTS = pDPrecTS
@@ -296,7 +296,7 @@ Public Class frmDisPrec
     End Sub
 
     Private Sub btnDailyPrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDailyPrec.Click
-        Dim lTSGroup As atcDataGroup = atcDataManager.UserSelectData("Select Daily Precipitation Timeseries to Disaggregate")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Precipitation Timeseries to Disaggregate")
         If lTSGroup.Count > 0 Then
             pDPrecTS = lTSGroup(0)
             txtDailyPrec.Text = pDPrecTS.ToString
@@ -304,7 +304,7 @@ Public Class frmDisPrec
     End Sub
 
     Private Sub btnAddHourlyPrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddHourlyPrec.Click
-        Dim lTSGroup As atcDataGroup = atcDataManager.UserSelectData("Select Hourly Precipitation Timeseries to use in Disaggregation")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Hourly Precipitation Timeseries to use in Disaggregation")
         If lTSGroup.Count > 0 Then
             pHPrecTS = lTSGroup
             lstHourlyPrec.Items.Clear()

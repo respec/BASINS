@@ -16,7 +16,7 @@ Module modCreateUci
 
     Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
                                    ByRef aUci As HspfUci, _
-                                   ByRef aDataSources As Collection(Of atcDataSource), _
+                                   ByRef aDataSources As Collection(Of atcTimeseriesSource), _
                                    ByRef aStarterUciName As String, _
                                    Optional ByRef aPollutantListFileName As String = "", _
                                    Optional ByRef aMetBaseDsn As Integer = 11, _
@@ -30,7 +30,7 @@ Module modCreateUci
             .Uci = aUci
             .RunInf.Value = "UCI Created by WinHSPF for " & aWatershed.Name
             .EmFg = 1
-            .outlev.Value = CStr(1)
+            .OutLev.Value = CStr(1)
             .RunFg = 1
         End With
 
@@ -133,7 +133,7 @@ Module modCreateUci
 
         'set timeser connections
         For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
-            lOperation.setTimSerConnections()
+            lOperation.SetTimSerConnections()
         Next
         'create masslinks
         CreateMassLinks(aUci)
@@ -386,7 +386,7 @@ Module modCreateUci
 
     Private Sub CreateFilesBlock(ByRef aUci As HspfUci, _
                                  ByRef aScenario As String, _
-                                 ByRef aDataSources As Collection(Of atcData.atcDataSource))
+                                 ByRef aDataSources As Collection(Of atcData.atcTimeseriesSource))
 
         Dim lFile As New HspfFile
         aUci.FilesBlock.Clear()
@@ -404,7 +404,7 @@ Module modCreateUci
         lFile.Unit = 91
         aUci.FilesBlock.Add(lFile)
 
-        Dim lOutput As atcDataSource = aDataSources(0)
+        Dim lOutput As atcTimeseriesSource = aDataSources(0)
         If lOutput.Name.Length > 0 Then
             lFile.Name = RelativeFilename(lOutput.Specification, CurDir)
             lFile.Typ = lOutput.Name.Substring(lOutput.Name.LastIndexOf(":") + 1) & 1

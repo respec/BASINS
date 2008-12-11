@@ -62,7 +62,7 @@ Public Class atcAttributeDefinition
     Dim pMax As Double          'Maximum acceptable value (NaN if not set)
     Dim pValidList As ArrayList 'List of acceptable values
 
-    Dim pCalculator As atcDataSource 'The source responsible for calculating this attribute or Nothing
+    Dim pCalculator As atcTimeseriesSource 'The source responsible for calculating this attribute or Nothing
 
     ''' <summary>
     ''' Short name, used for labeling in UI
@@ -108,11 +108,11 @@ Public Class atcAttributeDefinition
     ''' <summary>
     ''' The source responsible for calculating this attribute, Nothing if this attribute is not calculated
     ''' </summary>
-    Public Property Calculator() As atcDataSource
+    Public Property Calculator() As atcTimeseriesSource
         Get
             Return pCalculator
         End Get
-        Set(ByVal newValue As atcDataSource)
+        Set(ByVal newValue As atcTimeseriesSource)
             pCalculator = newValue
         End Set
     End Property

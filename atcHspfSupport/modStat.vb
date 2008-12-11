@@ -2,8 +2,6 @@ Imports atcUtility
 Imports atcData
 Imports MapWinUtility
 
-
-
 Public Module modStat
     Public Function IntervalReport(ByVal aSite As String, ByVal aTimeUnit As atcTimeUnit, _
                                    ByVal aTser1 As atcTimeseries, _
@@ -620,9 +618,9 @@ Public Module modStat
     End Function
 
     Private Function TimeserIdString(ByVal aTSer As atcTimeseries) As String
-        Dim lStr As String = aTSer.Attributes.GetValue("ISTAID")
+        Dim lStr As String = aTSer.Attributes.GetValue("ISTAID", "")
         If lStr.Trim = "0" Then lStr = ""
-        lStr &= " " & aTSer.Attributes.GetValue("STANAM")
+        lStr &= " " & aTSer.Attributes.GetValue("STANAM", "")
         If lStr.Trim.Length = 0 Then
             lStr = aTSer.ToString
         End If

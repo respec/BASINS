@@ -4,7 +4,7 @@ Public Class atcChooseDataGroupDates
 
     Private Const pNoDatesInCommon As String = "none"
 
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
 
     Private pDateFormat As atcDateFormat
 
@@ -71,11 +71,11 @@ Public Class atcChooseDataGroupDates
         End Set
     End Property
 
-    Public Property DataGroup() As atcDataGroup
+    Public Property DataGroup() As atcTimeseriesGroup
         Get
             Return pDataGroup
         End Get
-        Set(ByVal aGroup As atcDataGroup)
+        Set(ByVal aGroup As atcTimeseriesGroup)
             pDataGroup = aGroup
             Reset()
         End Set
@@ -148,15 +148,15 @@ Public Class atcChooseDataGroupDates
         End Get
     End Property
 
-    Public Function CreateSelectedDataGroupSubset() As atcDataGroup
+    Public Function CreateSelectedDataGroupSubset() As atcTimeseriesGroup
         If pDataGroup Is Nothing Then
             'nothing to subset, return empty group
-            Return New atcDataGroup
+            Return New atcTimeseriesGroup
         ElseIf SelectedAll Then
             'No need to subset
             Return pDataGroup
         Else
-            Dim lSubsetGroup As New atcDataGroup
+            Dim lSubsetGroup As New atcTimeseriesGroup
             Dim lStartDate As Double = OmitBefore
             Dim lEndDate As Double = OmitAfter
             If lStartDate <= lEndDate Then

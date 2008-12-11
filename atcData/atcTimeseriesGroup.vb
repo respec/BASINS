@@ -1,3 +1,5 @@
+Imports atcUtility
+
 Public Class atcTimeseriesGroup
     Inherits atcDataGroup
     Sub New()
@@ -19,6 +21,24 @@ Public Class atcTimeseriesGroup
             Add(lTimeseries.Serial, lTimeseries)
         Next
     End Sub
+
+    ''' <summary>Create a new timeseries group and add timeseries
+    ''' to the group with the default key of its serial number</summary>
+    Public Sub New(ByVal aDataGroup As atcDataGroup)
+        MyBase.New()
+        For lIndex As Integer = 0 To aDataGroup.Count - 1
+            Add(aDataGroup.Keys(lIndex), aDataGroup.ItemByIndex(lIndex))
+        Next
+    End Sub
+
+    ''' <summary>Create a copy of this data group</summary>
+    Public Shadows Function Clone() As atcTimeseriesGroup
+        Dim lClone As New atcTimeseriesGroup
+        For lIndex As Integer = 0 To MyBase.Count - 1
+            lClone.Add(MyBase.Keys(lIndex), MyBase.Item(lIndex))
+        Next
+        Return lClone
+    End Function
 
     ''' <summary>atcDataSet by index</summary>
     Default Public Shadows Property Item(ByVal aIndex As Integer) As atcTimeseries
@@ -49,4 +69,12 @@ Public Class atcTimeseriesGroup
             MyBase.ItemByKey(aKey) = newValue
         End Set
     End Property
+
+    Public Shadows Function FindData(ByVal aAttributeName As String, ByVal aValue As String, Optional ByVal aLimit As Integer = 0) As atcTimeseriesGroup
+        Return New atcTimeseriesGroup(MyBase.FindData(aAttributeName, aValue, aLimit))
+    End Function
+
+    Public Shadows Function FindData(ByVal aAttributeName As String, ByVal aValues As atcCollection, Optional ByVal aLimit As Integer = 0) As atcTimeseriesGroup
+        Return New atcTimeseriesGroup(MyBase.FindData(aAttributeName, aValues, aLimit))
+    End Function
 End Class

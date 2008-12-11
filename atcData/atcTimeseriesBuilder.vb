@@ -4,7 +4,7 @@ Imports MapWinUtility
 
 Public Class atcTimeseriesBuilder
 
-    Private pDataSource As atcDataSource
+    Private pDataSource As atcTimeseriesSource
     Private pTS As atcTimeseries
     Private pValueAttributes As atcCollection 'of atcDataAttributes
     Private pValues As Generic.List(Of Double)
@@ -15,7 +15,7 @@ Public Class atcTimeseriesBuilder
     Private Shared pNaN As Double = atcUtility.GetNaN
     Private Shared pNumericChars As String = ".-+eE0123456789"
 
-    Public Sub New(ByVal aDataSource As atcDataSource)
+    Public Sub New(ByVal aDataSource As atcTimeseriesSource)
         pDataSource = aDataSource
         Restart()
     End Sub

@@ -85,7 +85,7 @@ Module ScriptWdmCreateFromGrids
         Dim lPolyIdGridNoData As Double = lPolyIdGrid.Header.NodataValue
 
         'process the data into timeseries
-        Dim lDataSource As New atcDataSource
+        Dim lDataSource As New atcTimeseriesSource
 
         For lIndexConstituent As Integer = 0 To lConstituents.Count - 1
             Dim lKey As String = lConstituents.Keys(lIndexConstituent)
@@ -213,7 +213,7 @@ Module ScriptWdmCreateFromGrids
         Dim lWdm As New atcDataSourceWDM
         If lWdm.Open(pWdmName) Then
             For Each lDataset As atcDataSet In lDataSource.DataSets
-                lWdm.AddDataset(lDataset, atcDataSource.EnumExistAction.ExistAppend)
+                lWdm.AddDataset(lDataset, atcTimeseriesSource.EnumExistAction.ExistAppend)
             Next
         End If
         Logger.Dbg("AllDone")

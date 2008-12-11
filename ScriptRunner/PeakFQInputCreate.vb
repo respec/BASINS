@@ -17,7 +17,7 @@ Module ScriptPeakFQInputCreate
 
         Dim lWDM As New atcWDM.atcDataSourceWDM
         lWDM.Open(pWDMFileName)
-        Dim lDataSets As atcDataGroup = lWDM.DataSets
+        Dim lDataSets As atcTimeseriesGroup = lWDM.DataSets
         Logger.Dbg("DatasetCount " & lDataSets.Count)
 
         Dim lStringBuilder As Text.StringBuilder
@@ -122,7 +122,7 @@ Module ScriptPeakFQInputCreate
                             Next
                         End With
                         SaveFileString("pks_" & lStaNum.Trim & ".txt", lStringBuilder.ToString)
-                        If lNewWDM.AddDataset(lTimeseries, atcDataSource.EnumExistAction.ExistRenumber) Then
+                        If lNewWDM.AddDataset(lTimeseries, atcTimeseriesSource.EnumExistAction.ExistRenumber) Then
                             Logger.Dbg("Save timeseries " & lTimeseries.ToString)
                         Else
                             Logger.Dbg("Problem writing timeseries " & lTimeseries.ToString)

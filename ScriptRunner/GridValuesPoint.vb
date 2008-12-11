@@ -1,5 +1,5 @@
 Imports atcData
-Imports atcData.atcDataGroup
+Imports atcData.atcTimeseriesGroup
 Imports atcUtility
 Imports MapWindow.Interfaces
 Imports MapWinUtility

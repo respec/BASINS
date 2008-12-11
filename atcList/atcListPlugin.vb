@@ -11,17 +11,17 @@ Public Class atcListPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aDataGroup As atcData.atcDataGroup) As Object
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Dim lForm As New atcListForm
-        lForm.Initialize(aDataGroup)
+        lForm.Initialize(aTimeseriesGroup)
         Return lForm
     End Function
 
-    Public Overrides Sub Save(ByVal aDataGroup As atcData.atcDataGroup, _
+    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
                               ByVal aFileName As String, _
-                              ByVal ParamArray aOption() As String)
+                              ByVal ParamArray aOptions() As String)
 
-        If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
+        If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
             Dim lForm As New atcListForm
             Dim lFilterNoData As Boolean = False
             Dim lViewValues As Boolean = True
@@ -34,7 +34,7 @@ Public Class atcListPlugin
             Dim lCantFit As String = "#"
             Dim lSignificantDigits As Integer = 5
 
-            For Each lOption As String In aOption
+            For Each lOption As String In aOptions
                 Select Case lOption.ToLower
                     Case "filternodata" : lFilterNoData = True
                     Case "viewnovalues" : lViewValues = False
@@ -94,7 +94,7 @@ Public Class atcListPlugin
 
             If lSpecifiedFormat Then lForm.ValueFormat(lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
 
-            lForm.Initialize(aDataGroup, , lViewValues, lFilterNoData, False)
+            lForm.Initialize(aTimeseriesGroup, , lViewValues, lFilterNoData, False)
             atcUtility.SaveFileString(aFileName, lForm.ToString)
             lForm.Dispose()
         End If

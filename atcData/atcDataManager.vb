@@ -3,11 +3,11 @@ Imports MapWinUtility
 Imports System.Reflection
 
 ''' <summary>Manages a set of currently open DataSources. 
-'''          Uses the set of plugins currently loaded to find ones that inherit atcDataSource
+'''          Uses the set of plugins currently loaded to find ones that inherit atcTimeseriesSource
 ''' </summary>
 Public Class atcDataManager
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
-    Private Shared pDataSources As ArrayList 'of atcDataSource, the currently open data sources
+    Private Shared pDataSources As ArrayList 'of atcTimeseriesSource, the currently open data sources
     Private Shared pSelectionAttributes As ArrayList
     Private Shared pDisplayAttributes As ArrayList
     Private Shared pManagerForm As frmManager
@@ -21,10 +21,10 @@ Public Class atcDataManager
         "NSI_STAT", "RECID", "RIVRCH", "SITE_CODE", "ST", "UA_CODE", "URBAN_ID"}
 
     ''' <summary>Event raised when a data source is opened</summary>
-    Shared Event OpenedData(ByVal aDataSource As atcDataSource)
+    Shared Event OpenedData(ByVal aDataSource As atcTimeseriesSource)
 
     ''' <summary>Event raised when a data source is closed</summary>
-    Shared Event ClosedData(ByVal aDataSource As atcDataSource)
+    Shared Event ClosedData(ByVal aDataSource As atcTimeseriesSource)
 
     ''' <summary>Create a new instance of atcDataManager</summary>
     Private Sub New()
@@ -54,7 +54,7 @@ Public Class atcDataManager
         pDisplayAttributes = New ArrayList(pDefaultDisplayAttributes)
     End Sub
 
-    ''' <summary>Set of atcDataSource objects representing currently open DataSources</summary>
+    ''' <summary>Set of atcTimeseriesSource objects representing currently open DataSources</summary>
     Public Shared ReadOnly Property DataSources() As ArrayList
         Get
             Return pDataSources
@@ -62,10 +62,10 @@ Public Class atcDataManager
     End Property
 
     ''' <summary>Set of atcDataSets found in currently open DataSources</summary>
-    Public Shared Function DataSets() As atcDataGroup
-        Dim lAllData As New atcDataGroup
-        For Each lSource As atcDataSource In DataSources
-            lAllData.AddRange(lSource.DataSets)
+    Public Shared Function DataSets() As atcTimeseriesGroup
+        Dim lAllData As New atcTimeseriesGroup
+        For Each lDataSource As atcTimeseriesSource In DataSources
+            lAllData.AddRange(lDataSource.DataSets)
         Next
         Return lAllData
     End Function
@@ -130,9 +130,9 @@ Public Class atcDataManager
     '''     <para>Attributes associated with specification, may be NOTHING</para>
     ''' </param>
     ''' <returns>Boolean - True if source opened, False otherwise</returns>
-    Public Shared Function OpenDataSource(ByVal aNewSource As atcDataSource, _
-                                   ByVal aSpecification As String, _
-                                   ByVal aAttributes As atcDataAttributes) As Boolean
+    Public Shared Function OpenDataSource(ByVal aNewSource As atcTimeseriesSource, _
+                                          ByVal aSpecification As String, _
+                                          ByVal aAttributes As atcDataAttributes) As Boolean
         Try
             RemoveDataSource(aSpecification)
             If aNewSource.Open(aSpecification, aAttributes) Then
@@ -167,10 +167,10 @@ Public Class atcDataManager
 
     Public Shared Function OpenDataSource(ByVal aSpecification As String) As Boolean
         RemoveDataSource(aSpecification)
-        Dim lMatchDataSource As atcDataSource = Nothing
+        Dim lMatchDataSource As atcTimeseriesSource = Nothing
         Dim lPossibleDataSources As New atcCollection
         Dim lFileExtension As String = IO.Path.GetExtension(aSpecification)
-        For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
+        For Each lDataSource As atcTimeseriesSource In GetPlugins(GetType(atcTimeseriesSource))
             If lDataSource.Filter.Contains(lFileExtension) Then
                 lPossibleDataSources.Add(lDataSource.Name, lDataSource)
             End If
@@ -188,7 +188,7 @@ Public Class atcDataManager
     End Function
 
     Public Shared Sub RemoveDataSource(ByVal aIndex As Integer)
-        Dim lDataSource As atcDataSource = DataSources(aIndex)
+        Dim lDataSource As atcTimeseriesSource = DataSources(aIndex)
         DataSources.RemoveAt(aIndex)
         RaiseEvent ClosedData(lDataSource)
         lDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
@@ -196,7 +196,7 @@ Public Class atcDataManager
 
     Public Shared Sub RemoveDataSource(ByVal aSpecification As String)
         aSpecification = aSpecification.ToLower
-        For Each lDataSource As atcDataSource In DataSources
+        For Each lDataSource As atcTimeseriesSource In DataSources
             If lDataSource.Specification.ToLower.Equals(aSpecification) Then
                 DataSources.Remove(lDataSource)
                 RaiseEvent ClosedData(lDataSource)
@@ -209,9 +209,9 @@ Public Class atcDataManager
     ''' <param name="aDataSourceName">
     '''     <para>Name of data source to create and return</para>
     ''' </param>  
-    Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
+    Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcTimeseriesSource
         aDataSourceName = aDataSourceName.Replace("Timeseries::", "")
-        For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
+        For Each lDataSource As atcTimeseriesSource In GetPlugins(GetType(atcTimeseriesSource))
             If lDataSource.Name.Replace("Timeseries::", "") = aDataSourceName Then
                 Return lDataSource.NewOne
             End If
@@ -221,24 +221,24 @@ Public Class atcDataManager
 
 #Region "User interaction"
 
-    Public Shared Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcDataGroup)
+    Public Shared Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcTimeseriesGroup)
         Dim lSelectDisplay As New frmSelectDisplay
         If Not aTitle Is Nothing AndAlso aTitle.Length > 0 Then lSelectDisplay.Text = aTitle
         lSelectDisplay.AskUser(aDataGroup)
     End Sub
 
-    Public Shared Sub ShowDisplay(ByVal aDisplayName As String, ByVal aDataGroup As atcDataGroup)
+    Public Shared Sub ShowDisplay(ByVal aDisplayName As String, ByVal aTimeseriesGroup As atcTimeseriesGroup)
         If aDisplayName Is Nothing OrElse aDisplayName.Length = 0 Then
-            UserSelectDisplay("", aDataGroup)
+            UserSelectDisplay("", aTimeseriesGroup)
         Else
             Dim lNewDisplay As atcDataDisplay
-            For Each lDisp As atcDataDisplay In GetPlugins(GetType(atcDataDisplay))
-                If lDisp.Name = aDisplayName OrElse lDisp.Name.EndsWith("::" & aDisplayName) Then
-                    Dim lType As System.Type = lDisp.GetType()
+            For Each lDisplay As atcDataDisplay In GetPlugins(GetType(atcDataDisplay))
+                If lDisplay.Name = aDisplayName OrElse lDisplay.Name.EndsWith("::" & aDisplayName) Then
+                    Dim lType As System.Type = lDisplay.GetType()
                     Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
                     lNewDisplay = lAssembly.CreateInstance(lType.FullName)
                     lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
-                    lNewDisplay.Show(aDataGroup)
+                    lNewDisplay.Show(aTimeseriesGroup)
                     Exit Sub
                 End If
             Next
@@ -261,9 +261,9 @@ Public Class atcDataManager
     Public Shared Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing, _
                                          Optional ByVal aTitle As String = "Select a Data Source", _
                                          Optional ByVal aNeedToOpen As Boolean = True, _
-                                         Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
+                                         Optional ByVal aNeedToSave As Boolean = False) As atcTimeseriesSource
         Dim lForm As New frmDataSource
-        Dim lSelectedDataSource As atcDataSource = Nothing
+        Dim lSelectedDataSource As atcTimeseriesSource = Nothing
         lForm.Text = aTitle
         lForm.AskUser(lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
         Return lSelectedDataSource
@@ -322,10 +322,10 @@ Public Class atcDataManager
     End Sub
 
     Friend Shared Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
-                                     Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
+                                            Optional ByVal aNeedToSave As Boolean = False) As atcTimeseriesSource
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
+        Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
         If Not lNewSource Is Nothing Then 'user did not cancel
             If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                 If Logger.LastDbgText.Length > 0 Then
@@ -337,13 +337,13 @@ Public Class atcDataManager
     End Function
 
     Friend Shared Function UserSaveData(ByVal aSpecification As String) As Boolean
-        Dim lSaveIn As atcDataSource = Nothing
-        Dim lSaveGroup As atcDataGroup = atcDataManager.UserSelectData("Select Data to Save")
+        Dim lSaveIn As atcTimeseriesSource = Nothing
+        Dim lSaveGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data to Save")
         If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
 
             'If we already have specified data source open, skip asking user
             If aSpecification IsNot Nothing AndAlso aSpecification.Length > 0 Then
-                For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
                     If lDataSource.Specification = aSpecification Then
                         lSaveIn = lDataSource
                         Exit For
@@ -357,7 +357,7 @@ Public Class atcDataManager
 
             If lSaveIn IsNot Nothing AndAlso lSaveIn.Specification.Length > 0 Then
                 For Each lDataSet As atcDataSet In lSaveGroup
-                    lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistAskUser)
+                    lSaveIn.AddDataSet(lDataSet, atcData.atcTimeseriesSource.EnumExistAction.ExistAskUser)
                 Next
                 Return lSaveIn.Save(lSaveIn.Specification)
             End If
@@ -370,8 +370,8 @@ Public Class atcDataManager
     ''' <summary>
     ''' Return the currently loaded datasets whose Location attribute matches a currently selected shape on the map
     ''' </summary>
-    Private Shared Function DatasetsAtMapSelectedLocations() As atcDataGroup
-        Dim lGroup As New atcDataGroup
+    Private Shared Function DatasetsAtMapSelectedLocations() As atcTimeseriesGroup
+        Dim lGroup As New atcTimeseriesGroup
         Dim lLocations As ArrayList = MapSelectedLocations()
         If lLocations.Count > 0 Then
             For Each lDataSet As atcDataSet In DataSets()
@@ -490,7 +490,7 @@ Public Class atcDataManager
             For Each lName As String In pDisplayAttributes
                 lSaveXML.Append("<DisplayAttribute>" & lName & "</DisplayAttribute>")
             Next
-            For Each lSource As atcDataSource In pDataSources
+            For Each lSource As atcTimeseriesSource In pDataSources
                 If lSource.Category = "File" Then
                     lSaveXML.Append("<DataSource Specification='" & lSource.Specification & "'>" & lSource.Name & "</DataSource>")
                 End If
@@ -512,7 +512,7 @@ Public Class atcDataManager
                         If lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
                             Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
                         Else
-                            Dim lNewDataSource As atcDataSource = DataSourceByName(lDataSourceType)
+                            Dim lNewDataSource As atcTimeseriesSource = DataSourceByName(lDataSourceType)
                             If lNewDataSource Is Nothing Then
                                 Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
                             ElseIf lNewDataSource.Category = "File" Then
@@ -646,7 +646,7 @@ Public Class atcDataManager
 
     Public Overrides Function ToString() As String
         Dim lString As String = "atcDataManger:"
-        For Each lDataSource As atcDataSource In pDataSources
+        For Each lDataSource As atcTimeseriesSource In pDataSources
             lString &= lDataSource.ToString & vbCrLf
         Next lDataSource
         Return lString.TrimEnd(New Char() {vbCr, vbLf})

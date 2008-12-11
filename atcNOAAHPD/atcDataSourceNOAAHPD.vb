@@ -10,7 +10,7 @@ Imports System.Collections
 Imports System.IO
 
 Public Class atcDataSourceNOAAHPD
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFileFilter As String = "TD-3240 Files (*.ncd)|*.ncd|(*.*)|*.*"

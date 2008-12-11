@@ -9,7 +9,7 @@ Imports System.Collections
 Imports System.IO
 
 Public Class atcDataSourceSWATDBF
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "SWAT Output Files (*.dbf)|*.dbf"

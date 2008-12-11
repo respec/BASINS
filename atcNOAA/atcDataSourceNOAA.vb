@@ -10,7 +10,7 @@ Imports System.Collections
 Imports System.IO
 
 Public Class atcDataSourceNOAA
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFileFilter As String = "NOAA Files (*.txt)|*.txt|All Files (*,*)|*.*"
@@ -231,7 +231,7 @@ Public Class atcDataSourceNOAA
                     Open = False
                 End If
             Catch endEx As EndOfStreamException
-                Dim lDataSets As New atcDataGroup
+                Dim lDataSets As New atcTimeseriesGroup
                 Dim lInd As Integer = 0
                 For Each lData In DataSets
                     lData.numValues = lData.Attributes.GetValue("Count")

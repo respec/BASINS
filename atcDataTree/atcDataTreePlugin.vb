@@ -9,14 +9,14 @@ Public Class atcDataTreePlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) _
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup) _
                      As Object 'System.Windows.Forms.Form
-        Dim lDataGroup As atcDataGroup = aDataGroup
+        Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
 
         'creating an instance of the form asks user to specify some Data if none has been passed in
-        Dim lDataTreeForm As New atcDataTreeForm(lDataGroup)
+        Dim lDataTreeForm As New atcDataTreeForm(lTimeseriesGroup)
 
-        If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
+        If Not (lTimeseriesGroup Is Nothing) AndAlso lTimeseriesGroup.Count > 0 Then
             lDataTreeForm.Show()
             Return lDataTreeForm
         Else 'No data to display, don't show or return the form
@@ -25,10 +25,10 @@ Public Class atcDataTreePlugin
         End If
     End Function
 
-    Public Overrides Sub Save(ByVal aDataGroup As atcDataGroup, _
+    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcDataGroup, _
                               ByVal aFileName As String, _
                               ByVal ParamArray aOption() As String)
-        Dim lDataTreeForm As New atcDataTreeForm(aDataGroup)
+        Dim lDataTreeForm As New atcDataTreeForm(aTimeseriesGroup)
         With lDataTreeForm
             .TreeAction(aOption)
             .Save(aFileName)

@@ -688,7 +688,7 @@ StartOver:
                     If lDataType.Length = 0 Then
                         Logger.Dbg("Could not add data from '" & lOutputFileName & "' - no type specified")
                     Else
-                        Dim lNewDataSource As atcData.atcDataSource = atcData.atcDataManager.DataSourceByName(lDataType)
+                        Dim lNewDataSource As atcData.atcTimeseriesSource = atcData.atcDataManager.DataSourceByName(lDataType)
                         If lNewDataSource Is Nothing Then 'Try loading needed plugin for this data type
                             If atcData.atcDataManager.LoadPlugin("Timeseries::" & lDataType) Then
                                 'Try again with newly loaded plugin

@@ -9,25 +9,25 @@ Public Class clsGraphCumulativeDifference
     Inherits clsGraphBase
 
     <CLSCompliant(False)> _
-    Public Sub New(ByVal aDataGroup As atcDataGroup, ByVal aZedGraphControl As ZedGraphControl)
+    Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl)
         MyBase.New(aDataGroup, aZedGraphControl)
     End Sub
 
-    Public Overrides Property Datasets() As atcDataGroup
+    Public Overrides Property Datasets() As atcTimeseriesGroup
         Get
             Return MyBase.Datasets
         End Get
-        Set(ByVal aDataGroup As atcDataGroup)
+        Set(ByVal aDataGroup As atcTimeseriesGroup)
             If aDataGroup.Count = 2 Then
                 Dim lArgsMath As New atcDataAttributes
-                Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+                Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
                 lTsMath.DataSets.Clear()
                 lArgsMath.Clear()
                 lArgsMath.SetValue("timeseries", aDataGroup)
                 If lTsMath.Open("subtract", lArgsMath) Then
                     lArgsMath.Clear()
                     lArgsMath.SetValue("timeseries", lTsMath.DataSets)
-                    Dim lTsRunSum As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+                    Dim lTsRunSum As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
                     If lTsRunSum.Open("running sum", lArgsMath) Then
                         MyBase.Datasets = lTsRunSum.DataSets
                         Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")

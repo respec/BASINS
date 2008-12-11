@@ -36,7 +36,7 @@ Module Graph
         For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
             Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
             Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
-            Dim lDataGroup As New atcDataGroup
+            Dim lDataGroup As New atcTimeseriesGroup
             Dim lSimTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0))
             lSimTser = InchesToCfs(lSimTser, lArea)
             lSimTser.Attributes.SetValue("YAxis", "Left")

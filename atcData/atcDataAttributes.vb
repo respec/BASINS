@@ -34,26 +34,38 @@ Public Class atcDataAttributes
         Return aAttributeName
     End Function
 
-    'Returns lowercase key for use in Me and pAllDefinitions
+    ''' <summary>
+    ''' Returns lowercase key for use in Me and pAllDefinitions
+    ''' </summary>
+    ''' <param name="aAttributeName"></param>
+    ''' <returns>lowercase key</returns>
+    ''' <remarks></remarks>
     Private Shared Function AttributeNameToKey(ByVal aAttributeName As String) As String
         Return PreferredName(aAttributeName).ToLower
     End Function
 
     Public Shared Function AddDefinition(ByVal aDefinition As atcAttributeDefinition) As atcAttributeDefinition
         Dim lKey As String = AttributeNameToKey(aDefinition.Name)
+        Dim lAddDefinition As atcAttributeDefinition
         If Not pAllDefinitions.Keys.Contains(lKey) Then
             aDefinition.Name = PreferredName(aDefinition.Name)
             pAllDefinitions.Add(lKey, aDefinition)
-            AddDefinition = aDefinition
+            lAddDefinition = aDefinition
         ElseIf aDefinition.Calculated Then
             pAllDefinitions.ItemByKey(lKey) = aDefinition
-            AddDefinition = aDefinition
+            lAddDefinition = aDefinition
         Else
-            AddDefinition = pAllDefinitions.ItemByKey(lKey)
+            lAddDefinition = pAllDefinitions.ItemByKey(lKey)
         End If
+        Return lAddDefinition
     End Function
 
-    'Retrieve the atcAttributeDefinition for aAttributeName
+    ''' <summary>
+    ''' Retrieve the atcAttributeDefinition for aAttributeName
+    ''' </summary>
+    ''' <param name="aAttributeName"></param>
+    ''' <returns>AttributeDefinition</returns>
+    ''' <remarks></remarks>
     Public Shared Function GetDefinition(ByVal aAttributeName As String) As atcAttributeDefinition
         Dim lKey As String = AttributeNameToKey(aAttributeName)
         Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
@@ -67,7 +79,7 @@ Public Class atcDataAttributes
             ElseIf lKey.Contains("high") Then
                 lDef = pAllDefinitions.ItemByKey("n-day high value")
             End If
-            If Not lDef Is Nothing Then           'Found a generic definition
+            If lDef IsNot Nothing Then            'Found a generic definition
                 lDef = lDef.Clone(aAttributeName) 'Make a specific definition
             End If
         End If
@@ -102,11 +114,11 @@ Public Class atcDataAttributes
 
     'Returns the names (as keys) and values of all attributes that are set. (sorted by name)
     Public Function ValuesSortedByName() As SortedList
-        Dim lAll As New SortedList(New CaseInsensitiveComparer)
+        Dim lSortedList As New SortedList(New CaseInsensitiveComparer)
         For Each lAdv As atcDefinedValue In Me
-            lAll.Add(lAdv.Definition.Name, lAdv.Value)
+            lSortedList.Add(lAdv.Definition.Name, lAdv.Value)
         Next
-        Return lAll
+        Return lSortedList
     End Function
 
     'True if aAttributeName has been set
@@ -189,9 +201,9 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     'Retrieve or calculate the value for aAttributeName
     'returns aDefault if attribute has not been set and cannot be calculated
     Public Function GetValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = Nothing) As Object
-        Dim tmpAttribute As atcDefinedValue
+        Dim lDefinedValue As atcDefinedValue
         Try
-            tmpAttribute = GetDefinedValue(aAttributeName)
+            lDefinedValue = GetDefinedValue(aAttributeName)
         Catch  'Could not find 
 
             'TODO: Try to calculate attribute?
@@ -199,47 +211,47 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             Return aDefault 'Not found and could not calculate
         End Try
 
-        If tmpAttribute Is Nothing Then
+        If lDefinedValue Is Nothing Then
             If aDefault Is Nothing Then
-                Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
-                If lDef Is Nothing Then
+                Dim lDefinition As atcAttributeDefinition = GetDefinition(aAttributeName)
+                If lDefinition Is Nothing Then
                     Return aDefault
                 Else
-                    Return lDef.DefaultValue
+                    Return lDefinition.DefaultValue
                 End If
             Else
                 Return aDefault
             End If
         Else
-            Return tmpAttribute.Value
+            Return lDefinedValue.Value
         End If
     End Function
 
     'Set attribute with definition aAttrDefinition to value aValue
     Public Function SetValue(ByVal aAttrDefinition As atcAttributeDefinition, ByVal aValue As Object, Optional ByVal aArguments As atcDataAttributes = Nothing) As Integer
-        Dim key As String = AttributeNameToKey(aAttrDefinition.Name)
-        Dim tmpAttrDefVal As atcDefinedValue
-        Dim index As Integer = MyBase.Keys.IndexOf(key)
-        If index = -1 Then
-            tmpAttrDefVal = New atcDefinedValue
-            tmpAttrDefVal.Value = aValue
-            If aArguments Is Nothing Then
-                tmpAttrDefVal.Definition = AddDefinition(aAttrDefinition) 'Add definition for attributes without arguments
+        Dim lKey As String = AttributeNameToKey(aAttrDefinition.Name)
+        Dim lDefinedValue As atcDefinedValue
+        Dim lIndex As Integer = MyBase.Keys.IndexOf(lKey)
+        If lIndex = -1 Then
+            lDefinedValue = New atcDefinedValue
+            lDefinedValue.Value = aValue
+            If aArguments Is Nothing Then 'Add definition for attributes without arguments
+                lDefinedValue.Definition = AddDefinition(aAttrDefinition)
             Else
-                tmpAttrDefVal.Arguments = aArguments
+                lDefinedValue.Arguments = aArguments
                 If aArguments.GetValue("SeasonDefinition") Is Nothing Then
-                    tmpAttrDefVal.Definition = AddDefinition(aAttrDefinition) 'Add definition for attributes without season
+                    lDefinedValue.Definition = AddDefinition(aAttrDefinition) 'Add definition for attributes without season
                 Else
-                    tmpAttrDefVal.Definition = aAttrDefinition
+                    lDefinedValue.Definition = aAttrDefinition
                 End If
             End If
-            index = MyBase.Add(key, tmpAttrDefVal)
+            lIndex = MyBase.Add(lKey, lDefinedValue)
         Else  'Update existing attribute value
-            tmpAttrDefVal = ItemByIndex(index)
-            tmpAttrDefVal.Value = aValue
-            If Not aArguments Is Nothing Then tmpAttrDefVal.Arguments = aArguments
+            lDefinedValue = ItemByIndex(lIndex)
+            lDefinedValue.Value = aValue
+            If Not aArguments Is Nothing Then lDefinedValue.Arguments = aArguments
         End If
-        Return index
+        Return lIndex
     End Function
 
     Public Sub SetValue(ByVal aAttributeName As String, ByVal aAttributeValue As Object)
@@ -420,13 +432,13 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                             If lDef.Calculator.Name.Contains("n-day") Then
                                 lOperation = lDef.Calculator.AvailableOperations.ItemByKey(lDef.Name)
                                 Dim lArgs As New atcDataAttributes
-                                lArgs.SetValue("Timeseries", New atcDataGroup(Owner))
+                                lArgs.SetValue("Timeseries", New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
                                 lDef.Calculator.Open(lKey, lArgs)
                                 lAttribute = ItemByKey(lKey)
                             ElseIf IsSimple(lDef, lKey, lOperation) Then
                                 Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
                                 Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
-                                lArgs.SetValue(lArg.Definition, New atcDataGroup(Owner))
+                                lArgs.SetValue(lArg.Definition, New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
                                 lDef.Calculator.Open(lKey, lArgs)
                                 lAttribute = ItemByKey(lKey)
                             End If
@@ -447,8 +459,8 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     'Optional aKey is the attribute key, passing it is allowed for performance
     'Optional aOperation will be set to the operation definition that calculates the attribute
     Public Shared Function IsSimple(ByVal aDef As atcAttributeDefinition, _
-                    Optional ByVal aKey As String = Nothing, _
-                    Optional ByRef aOperation As atcDefinedValue = Nothing) As Boolean
+                           Optional ByVal aKey As String = Nothing, _
+                           Optional ByRef aOperation As atcDefinedValue = Nothing) As Boolean
         Select Case aDef.TypeString.ToLower
             Case "single", "double", "integer", "boolean", "string", "atctimeunit", "atccollection"
                 If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...

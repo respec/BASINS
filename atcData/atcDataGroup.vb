@@ -39,7 +39,11 @@ Public Class atcDataGroup
     ''' <summary>atcDataSet by index</summary>
     Default Public Shadows Property Item(ByVal aIndex As Integer) As atcDataSet
         Get
-            Return MyBase.Item(aIndex)
+            If aIndex > -1 AndAlso aIndex < MyBase.Count Then
+                Return MyBase.Item(aIndex)
+            Else
+                Return Nothing
+            End If
         End Get
         Set(ByVal newValue As atcDataSet)
             MyBase.Item(aIndex) = newValue
@@ -49,7 +53,11 @@ Public Class atcDataGroup
     ''' <summary>atcDataSet by index</summary>
     Public Shadows Property ItemByIndex(ByVal aIndex As Integer) As atcDataSet
         Get
-            Return MyBase.Item(aIndex)
+            If aIndex > -1 AndAlso aIndex < MyBase.Count Then
+                Return MyBase.Item(aIndex)
+            Else
+                Return Nothing
+            End If
         End Get
         Set(ByVal newValue As atcDataSet)
             MyBase.Item(aIndex) = newValue
@@ -129,11 +137,11 @@ Public Class atcDataGroup
 
     ''' <summary>Create a copy of this data group</summary>
     Public Shadows Function Clone() As atcDataGroup
-        Dim newClone As New atcDataGroup
-        For index As Integer = 0 To MyBase.Count - 1
-            newClone.Add(MyBase.Keys(index), MyBase.Item(index))
+        Dim lClone As New atcDataGroup
+        For lIndex As Integer = 0 To MyBase.Count - 1
+            lClone.Add(MyBase.Keys(lIndex), MyBase.Item(lIndex))
         Next
-        Return newClone
+        Return lClone
     End Function
 
     ''' <summary>Change this group to match the new group

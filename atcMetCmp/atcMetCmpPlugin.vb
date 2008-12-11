@@ -5,7 +5,7 @@ Imports MapWinUtility
 Imports System.Reflection
 
 Public Class atcMetCmpPlugin
-    Inherits atcData.atcDataSource
+    Inherits atcData.atcTimeseriesSource
 
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private pName As String = "Timeseries::Meteorologic Generation"
@@ -158,7 +158,7 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Wind Travel"
                 If aArgs Is Nothing Then
-                    Dim ltsgroup As atcDataGroup = atcDataManager.UserSelectData("Select Wind Speed data for computing " & aOperationName)
+                    Dim ltsgroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Wind Speed data for computing " & aOperationName)
                     If ltsgroup IsNot Nothing AndAlso ltsgroup.Count > 0 Then lWindTSer = ltsgroup(0)
                 Else
                     lWindTSer = aArgs.GetValue("WIND")
@@ -170,7 +170,7 @@ Public Class atcMetCmpPlugin
             Case "Cloud Cover"
                 Dim lPctSunTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
-                    Dim ltsgroup As atcDataGroup = atcDataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName)
+                    Dim ltsgroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName)
                     If ltsgroup IsNot Nothing AndAlso ltsgroup.Count > 0 Then lPctSunTSer = ltsgroup(0)
                 Else
                     lPctSunTSer = aArgs.GetValue("PSUN")
@@ -257,7 +257,7 @@ Public Class atcMetCmpPlugin
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Precipitation"
-                Dim lHrTSers As atcDataGroup = Nothing
+                Dim lHrTSers As atcTimeseriesGroup = Nothing
                 Dim lTol As Double
                 Dim lSummFile As String = ""
                 If aArgs Is Nothing Then

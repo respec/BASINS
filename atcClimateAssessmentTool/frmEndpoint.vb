@@ -449,7 +449,7 @@ Public Class frmEndpoint
     Public Function AskUser(Optional ByVal aVariation As atcVariation = Nothing) As Boolean
         pVariation = aVariation.Clone
 
-        If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
+        If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcTimeseriesGroup
 
         If pVariation.IsInput Then
             panelOperation.Visible = True
@@ -491,7 +491,7 @@ Public Class frmEndpoint
     End Sub
 
     Private Sub UserSelectData()
-        Dim lData As atcDataGroup = atcDataManager.UserSelectData("Select data for endpoint", pVariation.DataSets)
+        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for endpoint", pVariation.DataSets)
         If Not lData Is Nothing Then
             pVariation.DataSets = lData
             UpdateDataText(txtData, lData)
@@ -499,7 +499,7 @@ Public Class frmEndpoint
     End Sub
 
     Private Sub UpdateDataText(ByVal aTextBox As Windows.Forms.TextBox, _
-                               ByVal aGroup As atcDataGroup)
+                               ByVal aGroup As atcTimeseriesGroup)
         If Not aGroup Is Nothing AndAlso aGroup.Count > 0 Then
             aTextBox.Text = aGroup.ItemByIndex(0).ToString
             If aGroup.Count > 1 Then aTextBox.Text &= " (and " & aGroup.Count - 1 & " more)"

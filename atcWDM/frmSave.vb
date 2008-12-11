@@ -5,10 +5,10 @@ Imports MapWinUtility
 
 Public Class frmSave
 
-    Private pDataGroup As atcDataGroup
+    Private pDataGroup As atcTimeseriesGroup
     Private pHighestDSN As Integer
 
-    Public Function AskUser(ByVal aDataGroup As atcDataGroup, ByVal aLabel As String, ByVal aHighestDSN As Integer) As atcDataGroup
+    Public Function AskUser(ByVal aDataGroup As atcTimeseriesGroup, ByVal aLabel As String, ByVal aHighestDSN As Integer) As atcTimeseriesGroup
         pDataGroup = aDataGroup
         Me.lblStatus.Text = aLabel
         pHighestDSN = aHighestDSN
@@ -41,7 +41,7 @@ End Class
 Friend Class WDMGridSource
     Inherits atcControls.atcGridSource
 
-    Private pDataGroup As atcDataGroup
+    Private pDataGroup As atcTimeseriesGroup
     'Private pSelected As atcCollection
     Private pDisplayAttributes As ArrayList
 
@@ -64,7 +64,7 @@ Friend Class WDMGridSource
     '    End Set
     'End Property
 
-    Sub New(ByVal aDataGroup As atcData.atcDataGroup)
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup)
         pDataGroup = aDataGroup
         pDisplayAttributes = New ArrayList
         With pDisplayAttributes

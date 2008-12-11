@@ -211,10 +211,10 @@ Public Class frmSelectDisplay
 
     Private Const pPADDING As Integer = 5
     'Private pArgButton() As Windows.Forms.Button
-    Private pDataGroup As atcDataGroup
+    Private pTimeseriesGroup As atcTimeseriesGroup
 
-    Public Sub AskUser(ByVal aDataGroup As atcDataGroup)
-        pDataGroup = aDataGroup
+    Public Sub AskUser(ByVal aTimeseriesGroup As atcTimeseriesGroup)
+        pTimeseriesGroup = aTimeseriesGroup
         FormFromGroup()
         'iArg -= 1
         'If iArg >= 0 Then
@@ -226,21 +226,21 @@ Public Class frmSelectDisplay
     End Sub
 
     Private Sub FormFromGroup()
-        lblDescribeDatasets.Text = pDataGroup.Count & " dataset"
-        If pDataGroup.Count <> 1 Then lblDescribeDatasets.Text &= "s"
+        lblDescribeDatasets.Text = pTimeseriesGroup.Count & " dataset"
+        If pTimeseriesGroup.Count <> 1 Then lblDescribeDatasets.Text &= "s"
     End Sub
 
     Private Sub btn_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click, btnGraph.Click, btnTree.Click, btnSeasonal.Click, btnFrequency.Click
-        atcDataManager.ShowDisplay(sender.tag, pDataGroup)
+        atcDataManager.ShowDisplay(sender.tag, pTimeseriesGroup)
     End Sub
 
     Private Sub btnDiscard_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDiscard.Click
         Dim lDataSource As atcDataSource
         For iDataSource As Integer = 0 To atcDataManager.DataSources.Count - 1
             lDataSource = atcDataManager.DataSources.Item(iDataSource)
-            If lDataSource.DataSets.Equals(pDataGroup) Then
+            If lDataSource.DataSets.Equals(pTimeseriesGroup) Then
                 If Logger.Msg("Discard " & lDataSource.ToString, MsgBoxStyle.YesNo, "Discard Data") = MsgBoxResult.Yes Then
-                    pDataGroup.Dispose()
+                    pTimeseriesGroup.Dispose()
                     atcDataManager.DataSources.Remove(lDataSource)
                     Me.Close()
                 Else
@@ -257,17 +257,17 @@ Public Class frmSelectDisplay
 
     Private Function SaveData() As Boolean
         Dim lSave As New frmSaveData
-        Dim lSaveSource As atcDataSource = lSave.AskUser(pDataGroup)
+        Dim lSaveSource As atcDataSource = lSave.AskUser(pTimeseriesGroup)
         '    Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
         If Not lSaveSource Is Nothing AndAlso lSaveSource.Specification.Length > 0 Then
-            lSaveSource.AddDatasets(pDataGroup)
+            lSaveSource.AddDatasets(pTimeseriesGroup)
         End If
         '    End If
         '    Me.Close()
     End Function
 
     Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
-                                      Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
+                                      Optional ByVal aNeedToSave As Boolean = False) As atcTimeseriesSource
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
         Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
@@ -278,7 +278,7 @@ Public Class frmSelectDisplay
     End Function
 
     Private Sub btnSelect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelect.Click
-        pDataGroup = atcDataManager.UserSelectData("Select Data", pDataGroup)
+        pTimeseriesGroup = atcDataManager.UserSelectData("Select Data", pTimeseriesGroup)
         FormFromGroup()
     End Sub
 

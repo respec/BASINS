@@ -4,18 +4,18 @@ Imports atcUtility
 Friend Class frmBLM
     Private pPlugIn As BasinsBLM.PlugIn
 
-    Friend Sub New(ByVal aPlugIn As BasinsBLM.PlugIn, Optional ByRef aDataGroup As atcData.atcDataGroup = Nothing)
+    Friend Sub New(ByVal aPlugIn As BasinsBLM.PlugIn, Optional ByRef aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
 
         pPlugIn = aPlugIn
 
-        If aDataGroup Is Nothing Then
-            aDataGroup = atcDataManager.DataSets()
+        If aTimeseriesGroup Is Nothing Then
+            aTimeseriesGroup = atcDataManager.DataSets()
         End If
 
-        If aDataGroup.Count > 0 Then
-            PopulateCriteriaList(aDataGroup)
+        If aTimeseriesGroup.Count > 0 Then
+            PopulateCriteriaList(aTimeseriesGroup)
             'Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
             'For Each ldisp As atcDataDisplay In DisplayPlugins
             '    Dim lMenuText As String = ldisp.Name
@@ -35,7 +35,7 @@ Friend Class frmBLM
         Next
     End Sub
 
-    Private Sub PopulateCriteriaList(ByVal aDataGroup As atcDataGroup)
+    Private Sub PopulateCriteriaList(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lAttributeName As String = "Location"
 
         Dim lLocationList As New atcCollection

@@ -207,15 +207,15 @@ StartOver:
         End If
     End Sub
 
-    Friend Function OpenDataSource(ByVal aFilename As String) As atcDataSource
+    Friend Function OpenDataSource(ByVal aFilename As String) As atcTimeseriesSource
         Dim lAddSource As Boolean = True
-        For Each lDataSource As atcDataSource In atcDataManager.DataSources
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             If lDataSource.Specification.ToLower = aFilename.ToLower Then 'already open
                 Return lDataSource
             End If
         Next
         If lAddSource AndAlso FileExists(aFilename) Then
-            Dim lDataSource As atcDataSource
+            Dim lDataSource As atcTimeseriesSource
             If aFilename.ToLower.EndsWith("wdm") Then
                 lDataSource = New atcWDM.atcDataSourceWDM
             ElseIf aFilename.ToLower.EndsWith("hbn") Then
@@ -307,14 +307,14 @@ StartOver:
                     ByVal aBaseFileName As String, _
                     ByRef aIteration As Integer, _
                     ByRef aStartVariationIndex As Integer, _
-                    ByRef aModifiedData As atcDataGroup)
+                    ByRef aModifiedData As atcTimeseriesGroup)
 
         If Not g_running Then
             RaiseEvent StatusUpdate("Stopping Run")
         Else
             Logger.Dbg("Run")
             If aModifiedData Is Nothing Then
-                aModifiedData = New atcDataGroup
+                aModifiedData = New atcTimeseriesGroup
             End If
             ChDriveDir(PathNameOnly(aBaseFileName))
 
@@ -368,13 +368,13 @@ NextIteration:
                         System.GC.WaitForPendingFinalizers()
                         If lVariation.Selected Then
                             For Each lOldData As atcDataSet In lVariation.DataSets
-                                Dim lGroup As atcDataGroup = Nothing
+                                Dim lGroup As atcTimeseriesGroup = Nothing
                                 Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
                                 Dim lResultDataSpec As String = lResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower.Trim)
                                 If lResultDataSpec Is Nothing Then
                                     Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
                                 Else
-                                    Dim lResultDataSource As atcDataSource = OpenDataSource(lResultDataSpec)
+                                    Dim lResultDataSource As atcTimeseriesSource = OpenDataSource(lResultDataSpec)
                                     If lResultDataSource Is Nothing Then
                                         Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
                                     Else
@@ -416,8 +416,8 @@ NextIteration:
                 'Close any open results
                 For Each lSpecification As String In lResults
                     lSpecification = lSpecification.ToLower
-                    Dim lMatchDataSource As atcDataSource = Nothing
-                    For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                    Dim lMatchDataSource As atcTimeseriesSource = Nothing
+                    For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
                         If lDataSource.Specification.ToLower = lSpecification Then
                             lMatchDataSource = lDataSource
                             Exit For
@@ -439,9 +439,9 @@ NextIteration:
             Else 'Need to loop through values for next variation
                 Dim lVariation As atcVariation = aVariations.Item(aStartVariationIndex)
                 With lVariation
-                    Dim lOriginalDatasets As atcDataGroup = .DataSets.Clone
+                    Dim lOriginalDatasets As atcTimeseriesGroup = .DataSets.Clone
                     'save version of data modified by an earlier variation if it will also be modified by this one
-                    Dim lReModifiedData As New atcDataGroup
+                    Dim lReModifiedData As New atcTimeseriesGroup
 
                     For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
                         Dim lSourceDataSet As atcTimeseries = .DataSets(lDataSetIndex)
@@ -454,7 +454,7 @@ NextIteration:
                     Next
 
                     'Start varying data
-                    Dim lModifiedGroup As atcDataGroup = .StartIteration
+                    Dim lModifiedGroup As atcTimeseriesGroup = .StartIteration
 
                     While g_running And Not lModifiedGroup Is Nothing
                         'Remove existing modified data also modified by this variation

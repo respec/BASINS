@@ -308,7 +308,7 @@ Public Module Utility
     Public Function CfsToInches(ByVal aTSerIn As atcTimeseries, _
                                 ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (12.0# * 24.0# * 3600.0#) / (aArea * 43560.0#)   'cfs days to inches
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+        Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
         Dim lArgsMath As New atcDataAttributes
         lArgsMath.SetValue("timeseries", aTSerIn)
         lArgsMath.SetValue("number", lConversionFactor)
@@ -321,7 +321,7 @@ Public Module Utility
         Dim lConversionFactor As Double = (aArea * 43560.0#) / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
         Dim lInterval As Double = aTSerIn.Attributes.GetValue("interval", 1.0)
         lConversionFactor /= lInterval
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+        Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
         Dim lArgsMath As New atcDataAttributes
         lArgsMath.SetValue("timeseries", aTSerIn)
         lArgsMath.SetValue("number", lConversionFactor)

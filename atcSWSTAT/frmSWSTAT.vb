@@ -767,8 +767,8 @@ Friend Class frmSWSTAT
 #End Region
 
     'The group of atcTimeseries displayed
-    Private WithEvents pDataGroup As atcDataGroup
-    Private WithEvents pNDayGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
+    Private WithEvents pNDayGroup As atcTimeseriesGroup
 
     Private pDateFormat As New atcDateFormat
 
@@ -808,13 +808,13 @@ Friend Class frmSWSTAT
         End If
     End Sub
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing, _
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                           Optional ByVal aBasicAttributes As ArrayList = Nothing, _
                           Optional ByVal aNDayAttributes As ArrayList = Nothing, _
                           Optional ByVal aTrendAttributes As ArrayList = Nothing, _
                           Optional ByVal aShowForm As Boolean = True)
         If aTimeseriesGroup Is Nothing Then
-            pDataGroup = New atcDataGroup
+            pDataGroup = New atcTimeseriesGroup
         Else
             pDataGroup = aTimeseriesGroup
         End If
@@ -966,8 +966,8 @@ Friend Class frmSWSTAT
         Return lArray
     End Function
 
-    Private Function SelectedData() As atcDataGroup
-        Dim lDataGroupB As New atcDataGroup
+    Private Function SelectedData() As atcTimeseriesGroup
+        Dim lDataGroupB As New atcTimeseriesGroup
         Dim lTsB As atcTimeseries
         SeasonsYearsFromForm()
 
@@ -1089,7 +1089,7 @@ Friend Class frmSWSTAT
         Dim lHiLow As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lArgs As New atcDataAttributes
 
-        Dim lselectedData As atcDataGroup = SelectedData()
+        Dim lselectedData As atcTimeseriesGroup = SelectedData()
         If lselectedData.Count > 0 Then
             lArgs.Add("Timeseries", lselectedData)
 
@@ -1293,7 +1293,7 @@ Friend Class frmSWSTAT
         Dim lArgs As New atcDataAttributes
         'Dim lOperation As String
 
-        Dim lselectedData As atcDataGroup = SelectedData()
+        Dim lselectedData As atcTimeseriesGroup = SelectedData()
 
         If lselectedData.Count > 0 Then
             lArgs.Add("Timeseries", lselectedData)

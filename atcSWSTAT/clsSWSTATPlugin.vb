@@ -11,7 +11,7 @@ Public Class atcFrequencyGridPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aDataGroup As atcData.atcDataGroup) As Object
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Dim lForm As New frmSWSTAT
 
         Dim pBasicAttributes As New ArrayList
@@ -46,18 +46,18 @@ Public Class atcFrequencyGridPlugin
             .Add("STAID")
         End With
 
-        lForm.Initialize(aDataGroup, pBasicAttributes, pNDayAttributes, pTrendAttributes)
+        lForm.Initialize(aTimeseriesGroup, pBasicAttributes, pNDayAttributes, pTrendAttributes)
         Return lForm
     End Function
 
-    Public Overrides Sub Save(ByVal aDataGroup As atcData.atcDataGroup, _
+    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
                               ByVal aFileName As String, _
                               ByVal ParamArray aOption() As String)
 
-        If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
+        If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
             Dim lForm As New frmSWSTAT
 
-            lForm.Initialize(aDataGroup)
+            lForm.Initialize(aTimeseriesGroup)
             atcUtility.SaveFileString(aFileName, lForm.ToString)
             lForm.Dispose()
         End If

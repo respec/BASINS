@@ -68,7 +68,7 @@ Public Module modCAT
 
     Public Function ScenarioRun(ByVal aBaseFilename As String, _
                                 ByVal aNewScenarioName As String, _
-                                ByVal aModifiedData As atcDataGroup, _
+                                ByVal aModifiedData As atcTimeseriesGroup, _
                                 ByVal aPreparedInput As String, _
                                 ByVal aRunModel As Boolean, _
                                 ByVal aShowProgress As Boolean, _
@@ -83,7 +83,7 @@ Public Module modCAT
         Dim lCurrentTimeseries As atcTimeseries
 
         If aModifiedData Is Nothing Then
-            aModifiedData = New atcDataGroup
+            aModifiedData = New atcTimeseriesGroup
         End If
 
         If FileExists(aBaseFilename) Then

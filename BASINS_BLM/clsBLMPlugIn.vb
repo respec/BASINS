@@ -6,7 +6,7 @@ Imports System.Text
 Public Class PlugIn
     Inherits atcData.atcDataDisplay
 
-    Private WithEvents pDataGroup As atcDataGroup   'group of atcData potentially used for analysis
+    Private WithEvents pTimeseriesGroup As atcTimeseriesGroup   'group of atcData potentially used for analysis
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -24,12 +24,12 @@ Public Class PlugIn
         MyBase.Initialize(aMapWin, aParentHandle)
         pMapWin = aMapWin
     End Sub
-    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) _
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup) _
                  As Object 'System.Windows.Forms.Form
         'creating an instance of the form asks user to specify some Data if none has been passed in
-        Dim lfrmBLM As New frmBLM(Me, pDataGroup)
+        Dim lfrmBLM As New frmBLM(Me, pTimeseriesGroup)
 
-        If Not (pDataGroup Is Nothing) AndAlso pDataGroup.Count > 0 Then
+        If Not (pTimeseriesGroup Is Nothing) AndAlso pTimeseriesGroup.Count > 0 Then
             lfrmBLM.Show()
             Return lfrmBLM
         Else 'No data to run model on, don't show or return the form
@@ -37,17 +37,17 @@ Public Class PlugIn
             Return Nothing
         End If
     End Function
- 
+
     Public Sub RunBLM(ByVal aLocation As String, ByVal aStationName As String)
         Dim lString As String
 
-        Dim lLocationData As atcDataGroup = pDataGroup.FindData("Location", aLocation)
+        Dim lLocationData As atcTimeseriesGroup = pTimeseriesGroup.FindData("Location", aLocation)
         Logger.Dbg("RunBLM for " & aLocation & " DatasetCount " & lLocationData.Count)
 
         'TODO: get actual data for the location
         'lSB.Append(GetEmbeddedFileAsString("sampleData.blm"))
         Dim lConstituents As atcCollection = ConstituentsNeeded()
-        Dim lConstituentData As New atcDataGroup
+        Dim lConstituentData As New atcTimeseriesGroup
         Dim lConstituentMatchRequestedCount As Integer = 0
         For Each lDataSet As atcTimeseries In lLocationData
             If lConstituents.IndexFromKey(lDataSet.Attributes.GetDefinedValue("Constituent").Value) > -1 Then

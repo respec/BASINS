@@ -4,10 +4,10 @@ Imports MapWinUtility
 
 Public Class atcTimeseriesGroupBuilder
 
-    Private pDataSource As atcDataSource
+    Private pDataSource As atcTimeseriesSource
     Private pBuilders As atcCollection
 
-    Public Sub New(ByVal aDataSource As atcDataSource)
+    Public Sub New(ByVal aDataSource As atcTimeseriesSource)
         pDataSource = aDataSource
         pBuilders = New atcCollection
     End Sub
@@ -73,13 +73,13 @@ Public Class atcTimeseriesGroupBuilder
         Return lBuilder
     End Function
 
-    Public Function CreateTimeseriesGroup() As atcDataGroup
-        Dim lDataSets As New atcDataGroup
+    Public Function CreateTimeseriesGroup() As atcTimeseriesGroup
+        Dim lDataSets As New atcTimeseriesGroup
         CreateTimeseriesAddToGroup(lDataSets)
         Return lDataSets
     End Function
 
-    Public Sub CreateTimeseriesAddToGroup(ByVal aGroup As atcDataGroup)
+    Public Sub CreateTimeseriesAddToGroup(ByVal aGroup As atcTimeseriesGroup)
         Logger.Status("Creating Timeseries")
         Dim lLastBuilder As Integer = pBuilders.Count - 1
         For lBuilderIndex As Integer = 0 To lLastBuilder

@@ -4,7 +4,7 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Class atcDataSourceTimeseriesExcel
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "XLS Files (*.xls)|*.xls"

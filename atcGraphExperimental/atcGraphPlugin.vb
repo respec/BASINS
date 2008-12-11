@@ -17,11 +17,11 @@ Public Class atcGraphPlugin
         End Get
     End Property
 
-    Public Overrides Sub Save(ByVal aDataGroup As atcData.atcDataGroup, _
+    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
                               ByVal aFileName As String, _
                               ByVal ParamArray aOption() As String)
 
-        If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
+        If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
             'Dim lForm As New atcGraphForm()
             'TODO: set up a graph to save
             'lForm.SaveBitmapToFile(aFileName)
@@ -29,21 +29,21 @@ Public Class atcGraphPlugin
         End If
     End Sub
 
-    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) As Object
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup) As Object
         Show = Nothing
 
-        Dim lDataGroup As atcDataGroup = aDataGroup
-        If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
-        If lDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData("Select Data To Graph", lDataGroup)
+        Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
+        If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
+        If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
+            atcDataManager.UserSelectData("Select Data To Graph", lTimeseriesGroup)
         End If
 
-        If lDataGroup.Count > 0 Then
+        If lTimeseriesGroup.Count > 0 Then
             Dim lChooseForm As New frmChooseGraphs
             With lChooseForm.lstChooseGraphs
                 Dim lItemIndex As Integer
                 '.Items.AddRange(pGraphTypeNames)
-                If lDataGroup.Count < 1 Then
+                If lTimeseriesGroup.Count < 1 Then
                     .Items.Add("No data selected, cannot graph")
                     lChooseForm.btnGenerate.Visible = False
                 Else
@@ -51,10 +51,10 @@ Public Class atcGraphPlugin
                     .Items.Add(pGraphTypeNames(1))
                     .Items.Add(pGraphTypeNames(2))
                     Dim lNeededTwoSuffix As String
-                    If lDataGroup.Count = 2 Then
+                    If lTimeseriesGroup.Count = 2 Then
                         lNeededTwoSuffix = ""
                     Else
-                        lNeededTwoSuffix = " (two datasets needed but " & lDataGroup.Count & " datasets selected)"
+                        lNeededTwoSuffix = " (two datasets needed but " & lTimeseriesGroup.Count & " datasets selected)"
                     End If
                     .Items.Add(pGraphTypeNames(3) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(4) & lNeededTwoSuffix)
@@ -74,7 +74,7 @@ Public Class atcGraphPlugin
                     For Each lGraphTypeName As String In .CheckedItems
                         lAllCheckedItemNames &= lGraphTypeName & ","
                         Dim lForm As New atcGraphForm()
-                        Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lDataGroup, lForm)
+                        Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lTimeseriesGroup, lForm)
                         If lGrapher Is Nothing Then
                             lForm.Dispose()
                         Else
@@ -90,7 +90,7 @@ Public Class atcGraphPlugin
 
     <CLSCompliant(False)> _
     Private Function GetGraphType(ByVal aGraphTypeName As String, _
-                                 ByVal aDataGroup As atcDataGroup, _
+                                 ByVal aDataGroup As atcTimeseriesGroup, _
                                  ByVal aGraphForm As atcGraphForm) As clsGraphBase
         Dim lIndex As Integer = Array.IndexOf(pGraphTypeNames, aGraphTypeName)
         Select Case lIndex

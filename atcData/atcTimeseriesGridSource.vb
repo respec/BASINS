@@ -4,7 +4,7 @@ Imports atcUtility
 Public Class atcTimeseriesGridSource
     Inherits atcControls.atcGridSource
 
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
     Private pAllDates As atcTimeseries
     Private pDisplayAttributes As ArrayList
     Private pDisplayValues As Boolean
@@ -20,13 +20,13 @@ Public Class atcTimeseriesGridSource
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
 
-    Sub New(ByVal aDataGroup As atcData.atcDataGroup, _
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
             ByVal aDisplayAttributes As ArrayList, _
             ByVal aDisplayValues As Boolean)
         Me.New(aDataGroup, aDisplayAttributes, aDisplayValues, False)
     End Sub
 
-    Sub New(ByVal aDataGroup As atcData.atcDataGroup, _
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
             ByVal aDisplayAttributes As ArrayList, _
             ByVal aDisplayValues As Boolean, _
             ByVal aFilterNoData As Boolean)

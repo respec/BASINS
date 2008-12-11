@@ -12,7 +12,7 @@ Public Class frmDuration
             .Filter = "Text Files|*.txt|All Files|*.*"
             .FilterIndex = 0
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                Dim lDataGroup As atcDataGroup = DateChooser.CreateSelectedDataGroupSubset
+                Dim lDataGroup As atcTimeseriesGroup = DateChooser.CreateSelectedDataGroupSubset
 
                 'Dim lTU As atcTimeUnit
                 'If radioTUDaily.Checked Then
@@ -35,9 +35,9 @@ Public Class frmDuration
     End Sub
 
     Private Sub btnTSDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTSDir.Click
-        Dim lHad As New atcDataGroup
+        Dim lHad As New atcTimeseriesGroup
         If pTSer IsNot Nothing Then lHad.Add(pTSer)
-        Dim lUserSelected As atcDataGroup = atcDataManager.UserSelectData("Select Dataset", lHad)
+        Dim lUserSelected As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Dataset", lHad)
         If lUserSelected.Count > 0 Then
             pTSer = lUserSelected(0)
             txtTSDir.Text = pTSer.ToString
@@ -54,7 +54,7 @@ Public Class frmDuration
     End Sub
 
     Private Sub SetDates()
-        Dim lDataGroup As New atcDataGroup
+        Dim lDataGroup As New atcTimeseriesGroup
         If pTSer IsNot Nothing Then lDataGroup.Add(pTSer)
         DateChooser.DataGroup = lDataGroup
     End Sub

@@ -195,7 +195,7 @@ Public Class frmSpecifyComputation
                             Select Case aDefVal.Definition.TypeString
                                 Case "atcDataGroup", "atcTimeseries"
                                     Try
-                                        Dim lSelected As atcDataGroup = aDefVal.Value
+                                        Dim lSelected As atcTimeseriesGroup = aDefVal.Value
                                         If lSelected.Count = 1 Then
                                             .Text = lSelected.Item(0).ToString
                                         ElseIf lSelected.Count > 1 Then
@@ -249,7 +249,7 @@ Public Class frmSpecifyComputation
     Private Sub ArgButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Dim iArg As Integer = CInt(sender.tag)
         'TODO: ask UserSelectData to only allow one selection if only one is wanted (atcTimeseries rather than atcDataGroup)
-        Dim lSelected As atcDataGroup = atcDataManager.UserSelectData("Select " _
+        Dim lSelected As atcTimeseriesGroup = atcDataManager.UserSelectData("Select " _
                                                                    & pArgLabel(iArg).Text _
                                                                    & " for " & lblName.Text)
         pArgDefVal(iArg).Value = lSelected

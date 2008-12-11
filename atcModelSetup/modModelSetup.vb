@@ -61,7 +61,7 @@ Module modModelSetup
         End If
     End Sub
 
-    Private Function IsBASINSMetWDM(ByVal aDataSets As atcData.atcDataGroup, _
+    Private Function IsBASINSMetWDM(ByVal aDataSets As atcData.atcTimeseriesGroup, _
                                     ByVal aBaseDsn As Integer, _
                                     ByVal aLoc As String) As Boolean
         Dim lCheckCount As Integer = 0
@@ -114,7 +114,7 @@ Module modModelSetup
         Dim lDataSource As New atcWDM.atcDataSourceWDM
         If FileExists(aMetWDMName) Then
             Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
                 If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
                     'found it in the BASINS data sources
                     lDataSource = lBASINSDataSource
@@ -221,11 +221,11 @@ Module modModelSetup
         lPollutantListFileName = lPollutantListPath
 
         'open project wdm
-        Dim lDataSources As New Collection(Of atcData.atcDataSource)
+        Dim lDataSources As New Collection(Of atcData.atcTimeseriesSource)
         Dim lDataSource As New atcWDM.atcDataSourceWDM
         Dim lProjectWDMName As String = IO.Path.GetFileNameWithoutExtension(aUciName) & ".wdm"
         Dim lFound As Boolean = False
-        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+        For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
             If lBASINSDataSource.Specification.ToUpper = lProjectWDMName.ToUpper Then
                 'found it in the BASINS data sources
                 lDataSource = lBASINSDataSource
@@ -244,7 +244,7 @@ Module modModelSetup
         'open met wdm
         lDataSource = New atcWDM.atcDataSourceWDM
         lFound = False
-        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+        For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
             If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
                 'found it in the BASINS data sources
                 lDataSource = lBASINSDataSource

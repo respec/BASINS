@@ -5,7 +5,7 @@ Public Class atcSeasonYears
 
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
 
     Private pShowBoundaries As Boolean = True
     Private pDateFormat As atcDateFormat
@@ -106,11 +106,11 @@ Public Class atcSeasonYears
         End If
     End Sub
 
-    Public Property DataGroup() As atcDataGroup
+    Public Property DataGroup() As atcTimeseriesGroup
         Get
             Return pDataGroup
         End Get
-        Set(ByVal aGroup As atcDataGroup)
+        Set(ByVal aGroup As atcTimeseriesGroup)
             pDataGroup = aGroup
             Reset()
         End Set

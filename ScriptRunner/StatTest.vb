@@ -48,12 +48,12 @@ Public Module ScriptStatTest
         lString.Trim(vbTab)
         lStringBuilder.AppendLine(lString)
 
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+        Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
         'Dim lHighLowSource As atcDataSource = New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lArgsMath As New atcDataAttributes
 
-        Dim lDataSets As atcDataGroup = atcDataManager.DataSets
-        Dim lDataGroup As New atcDataGroup
+        Dim lDataSets As atcTimeseriesGroup = atcDataManager.DataSets
+        Dim lDataGroup As New atcTimeseriesGroup
         Logger.Dbg("DatasetCount " & lDataSets.Count)
         For Each lDS As atcDataSet In lDataSets
             Dim lID As Integer = lDS.Attributes.GetValue("Id")

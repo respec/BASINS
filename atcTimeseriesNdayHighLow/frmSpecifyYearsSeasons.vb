@@ -9,7 +9,7 @@ Public Class frmSpecifyYearsSeasons
     Private pDateFormat As New atcDateFormat
 
     Public Function AskUser(ByVal aName As String, _
-                            ByVal aDataGroup As atcData.atcDataGroup, _
+                            ByVal aDataGroup As atcData.atcTimeseriesGroup, _
                             ByRef aStartMonth As Integer, _
                             ByRef aStartDay As Integer, _
                             ByRef aEndMonth As Integer, _

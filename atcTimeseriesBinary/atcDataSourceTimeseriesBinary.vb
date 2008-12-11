@@ -3,7 +3,7 @@ Imports atcData
 Imports MapWinUtility
 
 Public Class atcDataSourceTimeseriesBinary
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "Binary Files (*.tsbin)|*.tsbin"
@@ -117,7 +117,7 @@ Public Class atcDataSourceTimeseriesBinary
         Return True
     End Function
 
-    Public Overrides Function AddDatasets(ByVal aDataGroup As atcDataGroup) As Boolean
+    Public Overrides Function AddDatasets(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
         Logger.Status("Writing " & IO.Path.GetFileName(Specification), True)
         Dim lIndex As Integer = 0
         For Each lDataSet As atcData.atcDataSet In aDataGroup
@@ -130,7 +130,7 @@ Public Class atcDataSourceTimeseriesBinary
     End Function
 
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
-                                Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
+                                Optional ByVal aExistAction As atcData.atcTimeseriesSource.EnumExistAction = atcData.atcTimeseriesSource.EnumExistAction.ExistReplace) _
                                          As Boolean
         Dim lFileStream As New IO.FileStream(Specification, IO.FileMode.Append)
         Dim lWriter As New IO.BinaryWriter(lFileStream)

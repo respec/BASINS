@@ -131,12 +131,12 @@ Friend Class frmDataSource
 #End Region
 
     Private pCategories As ArrayList
-    Private pSelectedSource As atcDataSource
+    Private pSelectedSource As atcTimeseriesSource
     Private pSpecification As String
     'Private Const NO_DISPLAY As String = "No Display"
     'Private pDisplayPlugins As ICollection
 
-    Public Sub AskUser(ByRef aSelectedSource As atcDataSource, _
+    Public Sub AskUser(ByRef aSelectedSource As atcTimeseriesSource, _
                        ByRef aNeedToOpen As Boolean, _
                        ByRef aNeedToSave As Boolean, _
               Optional ByVal aCategories As ArrayList = Nothing)
