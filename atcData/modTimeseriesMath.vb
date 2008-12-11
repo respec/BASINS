@@ -957,7 +957,7 @@ Finished:
 
     Public Sub ComputePercentile(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
         Dim lAttrName As String = "%" & Format(aPercentile, "00.####")
-        Dim lNumValues As Integer = aTimeseries.numValues
+        Dim lNumValues As Integer = aTimeseries.numValues - aTimeseries.Attributes.GetValue("Count Missing")
         Select Case lNumValues
             Case Is < 1
                 'Can't compute with no values
@@ -1100,6 +1100,10 @@ Finished:
         If lTSgroup.Count > 1 Then
             lTSOriginal = lTSgroup.Item(1) 'default the current ts to the one after the first
         End If
+
+        For Each lTs As atcTimeseries In lTSgroup
+            lTs.EnsureValuesRead()
+        Next
 
         Dim lValueIndex As Integer
         Dim lValueIndexLast As Integer = lTSFirst.numValues
