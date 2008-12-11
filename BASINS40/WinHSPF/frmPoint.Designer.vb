@@ -39,9 +39,9 @@ Partial Class frmPoint
         Me.Button9 = New System.Windows.Forms.Button
         Me.Button7 = New System.Windows.Forms.Button
         Me.Button8 = New System.Windows.Forms.Button
+        Me.agdMasterPoint = New atcControls.atcGrid
         Me.cmdDetailsShow = New System.Windows.Forms.Button
         Me.cmdDetailsHide = New System.Windows.Forms.Button
-        Me.agdMasterPoint = New atcControls.atcGrid
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
@@ -163,8 +163,8 @@ Partial Class frmPoint
         Me.grpDetails.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpDetails.Controls.Add(Me.agdPoint)
         Me.grpDetails.Controls.Add(Me.Button9)
-        Me.grpDetails.Controls.Add(Me.agdMasterPoint)
         Me.grpDetails.Controls.Add(Me.Button7)
         Me.grpDetails.Controls.Add(Me.Button8)
         Me.grpDetails.Location = New System.Drawing.Point(283, 12)
@@ -185,9 +185,9 @@ Partial Class frmPoint
         Me.agdPoint.Fixed3D = False
         Me.agdPoint.LineColor = System.Drawing.Color.Empty
         Me.agdPoint.LineWidth = 0.0!
-        Me.agdPoint.Location = New System.Drawing.Point(528, 358)
+        Me.agdPoint.Location = New System.Drawing.Point(57, 16)
         Me.agdPoint.Name = "agdPoint"
-        Me.agdPoint.Size = New System.Drawing.Size(233, 69)
+        Me.agdPoint.Size = New System.Drawing.Size(411, 299)
         Me.agdPoint.Source = Nothing
         Me.agdPoint.TabIndex = 25
         '
@@ -221,6 +221,23 @@ Partial Class frmPoint
         Me.Button8.TabIndex = 22
         Me.Button8.UseVisualStyleBackColor = True
         '
+        'agdMasterPoint
+        '
+        Me.agdMasterPoint.AllowHorizontalScrolling = True
+        Me.agdMasterPoint.AllowNewValidValues = False
+        Me.agdMasterPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdMasterPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.agdMasterPoint.Fixed3D = False
+        Me.agdMasterPoint.LineColor = System.Drawing.Color.Empty
+        Me.agdMasterPoint.LineWidth = 0.0!
+        Me.agdMasterPoint.Location = New System.Drawing.Point(589, 358)
+        Me.agdMasterPoint.Name = "agdMasterPoint"
+        Me.agdMasterPoint.Size = New System.Drawing.Size(172, 49)
+        Me.agdMasterPoint.Source = Nothing
+        Me.agdMasterPoint.TabIndex = 21
+        '
         'cmdDetailsShow
         '
         Me.cmdDetailsShow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
@@ -250,31 +267,14 @@ Partial Class frmPoint
         Me.cmdDetailsHide.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsHide.UseVisualStyleBackColor = True
         '
-        'agdMasterPoint
-        '
-        Me.agdMasterPoint.AllowHorizontalScrolling = True
-        Me.agdMasterPoint.AllowNewValidValues = False
-        Me.agdMasterPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdMasterPoint.CellBackColor = System.Drawing.Color.Empty
-        Me.agdMasterPoint.Fixed3D = False
-        Me.agdMasterPoint.LineColor = System.Drawing.Color.Empty
-        Me.agdMasterPoint.LineWidth = 0.0!
-        Me.agdMasterPoint.Location = New System.Drawing.Point(55, 19)
-        Me.agdMasterPoint.Name = "agdMasterPoint"
-        Me.agdMasterPoint.Size = New System.Drawing.Size(409, 288)
-        Me.agdMasterPoint.Source = Nothing
-        Me.agdMasterPoint.TabIndex = 21
-        '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(792, 448)
-        Me.Controls.Add(Me.agdPoint)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
+        Me.Controls.Add(Me.agdMasterPoint)
         Me.Controls.Add(Me.grpDetails)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)

@@ -43,23 +43,12 @@ Public Class frmPoint
         lstPoints.SelectionMode = SelectionMode.One
         ExpandedView(False)
 
-        ReDim InUseFacs(0)(0)
-        ReDim InUseFacs(1)(0)
-        ReDim AvailFacs(0)(0)
-        ReDim AvailFacs(1)(0)
-
-        'InUseFacs(0)(0) = ""
-        'InUseFacs(1)(0) = ""
-        'AvailFacs(0)(0) = ""
-        'AvailFacs(1)(0) = ""
-
         With agdMasterPoint
             .Source = New atcControls.atcGridSource
             .Clear()
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
-            .Visible = True
-            .Source.FixedRows = 1
+            .Visible = False
         End With
 
         With agdPoint
@@ -87,8 +76,37 @@ Public Class frmPoint
         agdMasterPoint.Source = New atcControls.atcGridSource
 
         DoneBuild = False
-        SetGrid(agdPoint)
-        SetGrid(agdMasterPoint)
+        With agdMasterPoint.Source
+            .Columns = 14
+            .CellValue(0, 0) = "In Use"
+            .CellValue(0, 1) = "HIDE" 'scenario
+            .CellValue(0, 2) = "Reach"
+            .CellValue(0, 3) = "HIDE" 'facility
+            .CellValue(0, 4) = "Pollutant"
+            .CellValue(0, 5) = "HIDE" 'src vol name
+            .CellValue(0, 6) = "HIDE" 'src vol id
+            .CellValue(0, 7) = "HIDE" 'tar vol name
+            .CellValue(0, 8) = "HIDE" 'tar vol id
+            .CellValue(0, 9) = "HIDE" 'tar group
+            .CellValue(0, 10) = "Target Member"
+            .CellValue(0, 11) = "HIDE" 'lts index
+            '.CellValue(0, 12) = "MemSub1"
+            '.CellValue(0, 13) = "MemSub2"
+            .CellValue(0, 12) = "HIDE"
+            .CellValue(0, 13) = "HIDE"
+            .CellValue(0, 14) = "HIDE" 'row number
+        End With
+
+        With agdPoint.Source
+            .Columns = 4
+            .Rows = 1
+            .FixedRows = 1
+            .CellValue(0, 0) = "In Use"
+            .CellValue(0, 1) = "Reach"
+            .CellValue(0, 2) = "Pollutant"
+            .CellValue(0, 3) = "Target Member"
+        End With
+
         FillMasterGrid()
         DoneBuild = True
         '.net conversion issue: tsl formerly atcTSList
@@ -97,27 +115,41 @@ Public Class frmPoint
         agdMasterPoint.SizeAllColumnsToContents()
         agdMasterPoint.Refresh()
 
-        agdPoint.SizeAllColumnsToContents()
-        agdPoint.Refresh()
-
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
     End Sub
 
-    Private Sub Grid2Master()
-        Dim i&, j&, irow&
+    Private Sub agdMasterPoint2agdPoint()
+        Dim i&
+        Dim lCheckedItemSplit() As String
+        Dim lagdPointRow As Integer
 
-        If grpDetails.Visible Then
-            With agdPoint.Source
-                For i = 1 To .Rows
-                    irow = .CellValue(i, 14)
-                    For j = 0 To agdMasterPoint.Source.Columns - 1
-                        agdMasterPoint.Source.CellValue(irow, j) = .CellValue(i, j)
-                    Next j
-                Next i
-            End With
+        agdPoint.Source.Rows = 1
+
+        If lstPoints.SelectedIndex <> -1 Then
+            lCheckedItemSplit = lstPoints.Items.Item(lstPoints.SelectedIndex).ToString.Split(New [Char]() {"("c, ")"c})
+
+            'remove space before "(" in string
+            lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
+            ReDim Preserve lCheckedItemSplit(1)
+
+            lagdPointRow = 0
+
+
+            For i = 1 To agdMasterPoint.Source.Rows - 1
+                If Mid(agdMasterPoint.Source.CellValue(i, 1), 4) = lCheckedItemSplit(1) AndAlso agdMasterPoint.Source.CellValue(i, 3) = lCheckedItemSplit(0) Then
+                    lagdPointRow += 1
+                    agdPoint.Source.CellValue(lagdPointRow, 0) = agdMasterPoint.Source.CellValue(i, 0)
+                    agdPoint.Source.CellValue(lagdPointRow, 1) = agdMasterPoint.Source.CellValue(i, 2)
+                    agdPoint.Source.CellValue(lagdPointRow, 2) = agdMasterPoint.Source.CellValue(i, 4)
+                    agdPoint.Source.CellValue(lagdPointRow, 3) = agdMasterPoint.Source.CellValue(i, 10)
+                End If
+            Next i
         End If
+
+        agdPoint.SizeAllColumnsToContents()
+        agdPoint.Refresh()
 
     End Sub
 
@@ -125,11 +157,17 @@ Public Class frmPoint
         Dim lOper As Integer
         Dim lCheckedItemSplit() As String
 
-        For lOper = 1 To lstPoints.Items.Count
-            'split the string of the newly checked item into (Index 0): description and (Index 1): scenario.
+        ReDim InUseFacs(0)(0)
+        ReDim InUseFacs(1)(0)
+        ReDim AvailFacs(0)(0)
+        ReDim AvailFacs(1)(0)
+
+        For lOper = 0 To lstPoints.Items.Count - 1
+            'split the string of the newly checked item into (Index 0): description and (Index 1): scenario
             lCheckedItemSplit = lstPoints.Items.Item(lOper).ToString.Split(New [Char]() {"("c, ")"c})
+
+            'remove space before "(" in string
             lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
-            'remove the empty string at the end from the ")" character
             ReDim Preserve lCheckedItemSplit(1)
 
             If lstPoints.GetItemChecked(lOper) Then
@@ -147,6 +185,7 @@ Public Class frmPoint
         Next
 
         CountInUseFacs = lstPoints.CheckedItems.Count
+
     End Sub
 
     Private Sub FillMasterGrid()
@@ -174,12 +213,14 @@ Public Class frmPoint
                 lsen = lts(i).Attributes.GetValue("Scenario")
                 If Mid(lsen, 1, 3) = "PT-" Then 'this is a pt src
                     lloc = lts(i).Attributes.GetValue("Location")
+
                     If IsNumeric(Mid(lloc, 4)) Then
                         'get full reach name
                         lOper = lOpnBlk.OperFromID(CInt(Mid(lloc, 4)))
                         If Not lOper Is Nothing Then
 
                             'found a reach with this id
+                            lloc = "RCHRES " & lOper.Id & " - " & lOper.Description
                             lfac = UCase(lts(i).Attributes.GetValue("STANAM"))
                             lcon = lts(i).Attributes.GetValue("Constituent")
 
@@ -242,13 +283,6 @@ Public Class frmPoint
 
                                     'look for this con in pollutant list
 
-
-                                    'net conversion issue: Adding "FLOW" - pollutant not up and running yet.
-                                    Dim TempPollutant As New HspfPollutant
-                                    TempPollutant.Id = 5
-                                    TempPollutant.Name = "FLOW"
-                                    pUCI.Pollutants.Add(TempPollutant)
-
                                     For Each vpol In pUCI.Pollutants
                                         lpol = vpol.Name
                                         If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
@@ -291,8 +325,6 @@ Public Class frmPoint
                     End If
                 End If
             Next i
-
-            agdMasterPoint.SizeAllColumnsToContents()
 
             'set default members for all
             For i = 1 To .Rows
@@ -463,31 +495,6 @@ Public Class frmPoint
         End If
     End Function
 
-
-    Private Sub SetGrid(ByVal g As atcGrid)
-        With g.Source
-            .Columns = 14
-            .CellValue(0, 0) = "In Use"
-            .CellValue(0, 1) = "HIDE" 'scenario
-            .CellValue(0, 2) = "Reach"
-            .CellValue(0, 3) = "HIDE" 'facility
-            .CellValue(0, 4) = "Pollutant"
-            .CellValue(0, 5) = "HIDE" 'src vol name
-            .CellValue(0, 6) = "HIDE" 'src vol id
-            .CellValue(0, 7) = "HIDE" 'tar vol name
-            .CellValue(0, 8) = "HIDE" 'tar vol id
-            .CellValue(0, 9) = "HIDE" 'tar group
-            .CellValue(0, 10) = "Target Member"
-            .CellValue(0, 11) = "HIDE" 'lts index
-            '.CellValue(0, 12) = "MemSub1"
-            '.CellValue(0, 13) = "MemSub2"
-            .CellValue(0, 12) = "HIDE"
-            .CellValue(0, 13) = "HIDE"
-            .CellValue(0, 14) = "HIDE" 'row number
-        End With
-    End Sub
-
-
     Private Sub ExpandedView(ByVal aExpand As Boolean)
         If aExpand Then
             Me.Size = New Size(800, 475)
@@ -517,7 +524,6 @@ Public Class frmPoint
 
     Private Sub lstSources_IndividualCheckChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs)
         Dim ifound As Boolean, i&
-        Dim lBrackets() As String = {"("c, ")"c}
 
         RemoveHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
 
@@ -535,8 +541,7 @@ Public Class frmPoint
 
         For i = 1 To agdMasterPoint.Source.Rows - 1
             'Check if facility and scenario are in use.
-
-            If Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) <> -1 AndAlso Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 Then
+            If Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 AndAlso Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) <> -1 Then
                 ifound = True
                 'set indiv timsers to in use in master grid
                 agdMasterPoint.Source.CellValue(i, 0) = "Yes"
@@ -545,12 +550,11 @@ Public Class frmPoint
                 'set indiv timsers to not in use in master grid
                 agdMasterPoint.Source.CellValue(i, 0) = "No"
             End If
-
         Next
 
         For i = 1 To agdPoint.Source.Rows - 1
             'Check if facility and scenario are in use.
-            If Array.IndexOf(InUseFacs(0), agdPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdPoint.Source.CellValue(i, 1), 3)) <> -1 AndAlso Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 Then
+            If Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 AndAlso Array.IndexOf(InUseFacs(0), agdPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdPoint.Source.CellValue(i, 1), 3)) <> -1 Then
                 'set indiv timsers to in use in point grid
                 agdPoint.Source.CellValue(i, 0) = "Yes"
             Else
@@ -566,11 +570,12 @@ Public Class frmPoint
     End Sub
 
     Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
-
+        agdMasterPoint2agdPoint()
         grpDetails.Text = "Details of " & lstPoints.SelectedItem
-
     End Sub
     Private Sub cmdShowDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsShow.Click
+        'if there exists points and no point is selected, then choose the first entry
+        If lstPoints.Items.Count > 0 AndAlso lstPoints.SelectedIndex = -1 Then lstPoints.SelectedIndex = 0
         ExpandedView(True)
     End Sub
 
@@ -656,5 +661,9 @@ Public Class frmPoint
             End If
         End If
 
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        MsgBox(lstPoints.SelectedIndex)
     End Sub
 End Class
