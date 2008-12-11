@@ -9,7 +9,7 @@ Imports System.Collections
 Imports System.IO
 
 Public Class atcTimeseriesSWAT
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "SWAT Output Files (output.*)|output.*"
@@ -235,7 +235,7 @@ Public Class atcTimeseriesSWAT
                     Loop
                     Logger.Dbg("Read " & Format(lTSBuilders.Count, "#,##0") & " timeseries From " & Format(.CurrentRecord, "#,##0") & " Records")
 
-                    Dim lTimeseriesGroup As atcDataGroup = lTSBuilders.CreateTimeseriesGroup()
+                    Dim lTimeseriesGroup As atcTimeseriesGroup = lTSBuilders.CreateTimeseriesGroup()
                     Logger.Status("Filling Timeseries")
 
                     For Each lDataSet As atcData.atcTimeseries In lTimeseriesGroup

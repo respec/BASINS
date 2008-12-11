@@ -4,7 +4,7 @@ Imports atcUtility
 Imports System.Windows.Forms
 
 Public Class atcTimeseriesMath
-    Inherits atcData.atcDataSource
+    Inherits atcTimeseriesSource
     Private pAvailableOperations As atcDataAttributes
     Private Const pName As String = "Timeseries::Math"
 
@@ -189,7 +189,7 @@ Public Class atcTimeseriesMath
 
     Public Shared Function Compute(ByVal aOperationName As String, ByVal ParamArray aArgs() As Object) As atcTimeseries
         Dim lDataAttributes As New atcDataAttributes
-        Dim lDataGroup As New atcDataGroup
+        Dim lDataGroup As New atcTimeseriesGroup
 
         For Each lArg As Object In aArgs
             Select Case lArg.GetType.Name
@@ -270,7 +270,7 @@ Public Class atcTimeseriesMath
 
     'Should only be used within Open routine since results of computations are all that should get added
     'Appends a new history entry to track this computation
-    Public Overrides Function AddDataSet(ByVal aDataSet As atcData.atcDataSet, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
+    Public Overrides Function AddDataSet(ByVal aDataSet As atcData.atcDataSet, Optional ByVal aExistAction As atcData.atcTimeseriesSource.EnumExistAction = atcData.atcTimeseriesSource.EnumExistAction.ExistReplace) As Boolean
         aDataSet.Attributes.SetValue("Data Source", Specification)
         aDataSet.Attributes.AddHistory(Specification)
         Return MyBase.AddDataSet(aDataSet, aExistAction)

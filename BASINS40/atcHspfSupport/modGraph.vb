@@ -11,12 +11,12 @@ Public Module Graph
     '                   "Baseflow", "Interflow", "Surface"
     Public Sub GraphAll(ByVal aSDateJ As Double, ByVal aEDateJ As Double, _
                         ByVal aCons As String, ByVal aSite As String, _
-                        ByVal aTimeSeries As atcDataGroup, _
+                        ByVal aTimeSeries As atcTimeseriesGroup, _
                         ByVal aGraphSaveFormat As String, _
                         ByVal aGraphSaveWidth As Integer, _
                         ByVal aGraphSaveHeight As Integer, _
                         ByVal aGraphAnnual As Boolean)
-        Dim lDataGroup As New atcDataGroup
+        Dim lDataGroup As New atcTimeseriesGroup
         lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"), _
                                               aSDateJ, _
                                               aEDateJ, Nothing), _
@@ -119,7 +119,7 @@ Public Module Graph
             Dim lDate(5) As Integer
             While lSDateJ < aEDateJ
                 Dim lEDateJ As Double = TimAddJ(lSDateJ, 6, 1, 1)
-                Dim lDataGroupYear As New atcDataGroup
+                Dim lDataGroupYear As New atcTimeseriesGroup
                 For Each lTimeseries As atcTimeseries In lDataGroup
                     lDataGroupYear.Add(SubsetByDate(lTimeseries, lSDateJ, lEDateJ, Nothing))
                 Next
@@ -131,7 +131,7 @@ Public Module Graph
         End If
 
         'monthly
-        Dim lMonthDataGroup As New atcDataGroup
+        Dim lMonthDataGroup As New atcTimeseriesGroup
         lMonthDataGroup.Add(Aggregate(lDataGroup.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
         lMonthDataGroup.Add(Aggregate(lDataGroup.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
         If lPaneCount = 2 Then
@@ -220,7 +220,7 @@ Public Module Graph
         End If
     End Sub
 
-    Public Sub GraphStorms(ByVal aDataGroup As atcDataGroup, _
+    Public Sub GraphStorms(ByVal aDataGroup As atcTimeseriesGroup, _
                            ByVal aPaneCount As Integer, _
                            ByVal aOutFileBase As String, _
                            ByVal aGraphSaveFormat As String, _
@@ -228,7 +228,7 @@ Public Module Graph
                            ByVal aGraphSaveHeight As Integer, _
                            ByVal aExpSystem As HspfSupport.atcExpertSystem)
         For Each lStorm As hexStorm In aExpSystem.Storms
-            Dim lDataGroupStorm As New atcDataGroup
+            Dim lDataGroupStorm As New atcTimeseriesGroup
             For Each lTimeseries As atcTimeseries In aDataGroup
                 lDataGroupStorm.Add(SubsetByDate(lTimeseries, lStorm.SDateJ, lStorm.EDateJ, Nothing))
             Next
@@ -238,7 +238,7 @@ Public Module Graph
         Next
     End Sub
 
-    Private Sub GraphTimeseries(ByVal aDataGroup As atcDataGroup, _
+    Private Sub GraphTimeseries(ByVal aDataGroup As atcTimeseriesGroup, _
                                 ByVal aPaneCount As Integer, _
                                 ByVal aOutFileBase As String, _
                                 ByVal aGraphSaveFormat As String, _
@@ -268,12 +268,12 @@ Public Module Graph
         lZgc.Dispose()
     End Sub
 
-    Sub GraphFlowComponents(ByVal aDataGroup As atcDataGroup, _
+    Sub GraphFlowComponents(ByVal aDataGroup As atcTimeseriesGroup, _
                             ByVal aOutFileBase As String, _
                             ByVal aGraphSaveFormat As String, _
                             ByVal aGraphSaveWidth As Integer, _
                             ByVal aGraphSaveHeight As Integer)
-        Dim lDataGroupOutput As New atcDataGroup
+        Dim lDataGroupOutput As New atcTimeseriesGroup
 
         'baseflow + interflow
         Dim lMathBaseInterTSer As atcTimeseries = atcTimeseriesMath.atcTimeseriesMath.Compute("add", aDataGroup.Item(0), aDataGroup.Item(1))
@@ -319,7 +319,7 @@ Public Module Graph
         lGrapher.Dispose()
 
         'now monthly
-        Dim lMonthDataGroup As New atcDataGroup
+        Dim lMonthDataGroup As New atcTimeseriesGroup
         'one axis test
         lDataGroupOutput.Item(3).Attributes.SetValue("YAxis", "Left")
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
@@ -350,7 +350,7 @@ Public Module Graph
         lGrapher.Dispose()
     End Sub
 
-    Function GraphScatterError(ByVal aZgc As ZedGraphControl, ByVal aDataGroup As atcDataGroup, _
+    Function GraphScatterError(ByVal aZgc As ZedGraphControl, ByVal aDataGroup As atcTimeseriesGroup, _
                                ByVal aSDateJ As Double, ByVal aEDateJ As Double, _
                                ByVal aXAxisTser As atcTimeseries, ByVal aXAxisTitle As String, _
                                Optional ByVal aXAxisType As ZedGraph.AxisType = AxisType.Linear) As Boolean
@@ -358,7 +358,7 @@ Public Module Graph
         Dim lMathArgs As New atcDataAttributes
         lMathArgs.SetValue("timeseries", aDataGroup)
         If lMath.Open("subtract", lMathArgs) Then
-            Dim lDataGroupError As New atcDataGroup
+            Dim lDataGroupError As New atcTimeseriesGroup
             lDataGroupError.Add(SubsetByDate(aXAxisTser, aSDateJ, aEDateJ, Nothing))
             lDataGroupError.Add(SubsetByDate(lMath.DataSets(0), aSDateJ, aEDateJ, Nothing))
             Dim lGraphScatter As clsGraphScatter = New clsGraphScatter(lDataGroupError, aZgc)

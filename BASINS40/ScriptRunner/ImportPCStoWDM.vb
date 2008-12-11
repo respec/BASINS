@@ -62,7 +62,7 @@ Module ScriptImportPCStoWDM
             End With
 
             'process the data into timeseries
-            Dim lDataSource As New atcDataSource
+            Dim lDataSource As New atcTimeseriesSource
 
             Dim lTSBuilders As New atcData.atcTimeseriesGroupBuilder(Nothing)
             Dim lTSBuilder As atcData.atcTimeseriesBuilder
@@ -183,7 +183,7 @@ Module ScriptImportPCStoWDM
                     lProgressTimeseries += 1
                     lDataset.Attributes.SetValue("ID", lDSN)
                     lDSN += 1
-                    lWdm.AddDataset(lDataset, atcDataSource.EnumExistAction.ExistRenumber)
+                    lWdm.AddDataset(lDataset, atcTimeseriesSource.EnumExistAction.ExistRenumber)
                 Next
                 'SaveFileString("UpdateReport.txt", lUpdateReportSB.ToString)
                 Logger.Status("Wrote " & lNumTimeseries & " to " & lWdmName, True)

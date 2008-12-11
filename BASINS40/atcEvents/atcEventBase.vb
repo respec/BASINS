@@ -15,11 +15,11 @@ Public Module atcEventBase
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function EventSplit(ByVal aTS As atcTimeseries, _
-                               ByVal aSource As atcDataSource, _
+                               ByVal aSource As atcTimeseriesSource, _
                                ByVal aThreshold As Double, _
                                ByVal aDaysGapAllowed As Double, _
-                               ByVal aHigh As Boolean) As atcDataGroup
-        Dim lNewGroup As New atcDataGroup
+                               ByVal aHigh As Boolean) As atcTimeseriesGroup
+        Dim lNewGroup As New atcTimeseriesGroup
         Dim lEventIndex As Integer = 0
         Dim lPoint As Boolean = aTS.Attributes.GetValue("point", False)
         Dim lPointOffset As Integer
@@ -161,14 +161,14 @@ Public Module atcEventBase
     End Function
 
     Private Sub AddEventTS(ByVal aTS As atcTimeseries, _
-                           ByVal aSource As atcDataSource, _
+                           ByVal aSource As atcTimeseriesSource, _
                            ByVal aThreshold As Double, _
                            ByVal aDaysGapAllowed As Double, _
                            ByVal aHigh As Boolean, _
                            ByVal aStartPos As Integer, _
                            ByVal aEndPos As Integer, _
                            ByVal aPointOffset As Integer, _
-                           ByVal aGroup As atcDataGroup)
+                           ByVal aGroup As atcTimeseriesGroup)
         Dim lNewNumValues As Integer = aEndPos - aStartPos + 1
         If lNewNumValues > 0 Then
             Dim lNewTS As New atcTimeseries(aSource)

@@ -592,7 +592,7 @@ Public Class frmSpecifyFrequency
     Public Event Chose(ByVal aHigh As Boolean)
     Public Event Cancelled()
 
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
     Private pDateFormat As atcDateFormat
     Private pOk As Boolean = False
     Private pYearStartMonth As Integer = 0
@@ -607,7 +607,7 @@ Public Class frmSpecifyFrequency
 
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
-    Public Function AskUser(ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
+    Public Function AskUser(ByVal aGroup As atcTimeseriesGroup, ByRef aChoseHigh As Boolean) As Boolean
         pDataGroup = aGroup
         Clear()
         Me.ShowDialog()
@@ -616,7 +616,7 @@ Public Class frmSpecifyFrequency
         Return pOk
     End Function
 
-    Public Sub AskUser(ByVal aGroup As atcDataGroup)
+    Public Sub AskUser(ByVal aGroup As atcTimeseriesGroup)
         pDataGroup = aGroup
         Clear()
         Me.Show()

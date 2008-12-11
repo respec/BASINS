@@ -307,9 +307,9 @@ Friend Class frmSelectData
     Private pCriteriaFraction() As Single
     Private pCriteriaSearch As String = "" 'recently typed characters of incremental search in criteria list
 
-    Private pMatchingGroup As atcDataGroup
-    Private WithEvents pSelectedGroup As atcDataGroup
-    Private pSaveGroup As atcDataGroup = Nothing
+    Private pMatchingGroup As atcTimeseriesGroup
+    Private WithEvents pSelectedGroup As atcTimeseriesGroup
+    Private pSaveGroup As atcTimeseriesGroup = Nothing
 
     Private pMatchingSource As GridSource
     Private pSelectedSource As GridSource
@@ -323,29 +323,29 @@ Friend Class frmSelectData
 
     Private pTotalTS As Integer = 0
 
-    Private pAvailableData As atcDataGroup = Nothing
+    Private pAvailableData As atcTimeseriesGroup = Nothing
 
     ''' <summary>
     ''' The datasets available for selection. 
     ''' Set this property before calling AskUser or by default all datasets in all open data sources will be available.
     ''' </summary>
-    Public Property AvailableData() As atcDataGroup
+    Public Property AvailableData() As atcTimeseriesGroup
         Get
             If pAvailableData Is Nothing Then
                 pAvailableData = atcDataManager.DataSets
             End If
             Return pAvailableData
         End Get
-        Set(ByVal newValue As atcDataGroup)
+        Set(ByVal newValue As atcTimeseriesGroup)
             pAvailableData = newValue
         End Set
     End Property
 
-    Public Function AskUser(Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
+    Public Function AskUser(Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
         mnuSelectMap.Checked = False
 
         If aGroup Is Nothing Then
-            pSelectedGroup = New atcDataGroup
+            pSelectedGroup = New atcTimeseriesGroup
         Else
             pSaveGroup = aGroup.Clone
             pSelectedGroup = aGroup
@@ -354,7 +354,7 @@ Friend Class frmSelectData
 
         atcSelectedDates.DataGroup = pSelectedGroup
 
-        pMatchingGroup = New atcDataGroup
+        pMatchingGroup = New atcTimeseriesGroup
         pMatchingSource = New GridSource(pMatchingGroup)
         pMatchingSource.SelectedItems = pSelectedGroup
         pSelectedSource = New GridSource(pSelectedGroup)
@@ -533,7 +533,7 @@ Friend Class frmSelectData
         Else
             Dim lSaveCursor As Cursor = Me.Cursor
             pPopulatingMatching = True
-            Dim lAllDatasets As atcDataGroup = AvailableData
+            Dim lAllDatasets As atcTimeseriesGroup = AvailableData
             pTotalTS = lAllDatasets.Count
 Restart:
             Try
@@ -946,7 +946,7 @@ NextName:
         End If
     End Sub
 
-    Private Sub OpenedData(ByVal aDataSource As atcDataSource)
+    Private Sub OpenedData(ByVal aDataSource As atcTimeseriesSource)
         Populate()
     End Sub
 
@@ -1014,7 +1014,7 @@ NextName:
     Private Sub mnuOpenData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenData.Click
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
-        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly)
+        Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lFilesOnly)
         If Not lNewSource Is Nothing Then
             atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
             pAvailableData.AddRange(lNewSource.DataSets)
@@ -1075,7 +1075,7 @@ Friend Class GridSource
     '-1 to not label columns
     Private Const LabelRow As Integer = -1
 
-    Private pDataGroup As atcDataGroup
+    Private pDataGroup As atcTimeseriesGroup
     Private pSelected As atcCollection
 
     Public Property SelectedItems() As atcCollection
@@ -1087,7 +1087,7 @@ Friend Class GridSource
         End Set
     End Property
 
-    Sub New(ByVal aDataGroup As atcData.atcDataGroup)
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup)
         pDataGroup = aDataGroup
     End Sub
 

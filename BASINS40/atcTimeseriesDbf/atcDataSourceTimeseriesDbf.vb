@@ -3,7 +3,7 @@ Imports atcData
 Imports MapWinUtility
 
 Public Class atcDataSourceTimeseriesDbf
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "DBF Files (*.dbf)|*.dbf"

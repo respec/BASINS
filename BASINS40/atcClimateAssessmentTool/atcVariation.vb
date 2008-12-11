@@ -17,9 +17,9 @@ Public Class atcVariation
                                    0.0057, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057}
 
     Private pName As String
-    Private pDataSets As atcDataGroup
-    Public PETdata As atcDataGroup
-    Private pComputationSource As atcDataSource
+    Private pDataSets As atcTimeseriesGroup
+    Public PETdata As atcTimeseriesGroup
+    Private pComputationSource As atcTimeseriesSource
     Private pOperation As String
     'Public AddRemovePer As String
     Private pSelected As Boolean
@@ -62,20 +62,20 @@ Public Class atcVariation
         End Set
     End Property
 
-    Public Overridable Property DataSets() As atcDataGroup
+    Public Overridable Property DataSets() As atcTimeseriesGroup
         Get
             Return pDataSets
         End Get
-        Set(ByVal newValue As atcDataGroup)
+        Set(ByVal newValue As atcTimeseriesGroup)
             pDataSets = newValue
         End Set
     End Property
 
-    Public Overridable Property ComputationSource() As atcDataSource
+    Public Overridable Property ComputationSource() As atcTimeseriesSource
         Get
             Return pComputationSource
         End Get
-        Set(ByVal newValue As atcDataSource)
+        Set(ByVal newValue As atcTimeseriesSource)
             pComputationSource = newValue
         End Set
     End Property
@@ -108,13 +108,13 @@ Public Class atcVariation
         End Get
     End Property
 
-    Public Overridable Function StartIteration() As atcDataGroup
+    Public Overridable Function StartIteration() As atcTimeseriesGroup
         Me.CurrentValue = Me.Min
         pIncrementsSinceStart = 0
         Return VaryData()
     End Function
 
-    Public Overridable Function NextIteration() As atcDataGroup
+    Public Overridable Function NextIteration() As atcTimeseriesGroup
         pIncrementsSinceStart += 1
         If pIncrementsSinceStart < Iterations Then
             Me.CurrentValue = Me.Min + Me.Increment * pIncrementsSinceStart
@@ -124,21 +124,21 @@ Public Class atcVariation
         End If
     End Function
 
-    Protected Overridable Function VaryData() As atcDataGroup
+    Protected Overridable Function VaryData() As atcTimeseriesGroup
         'Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
         Dim lArgsMath As New atcDataAttributes
         Dim lModifiedTS As atcTimeseries = Nothing
-        Dim lModifiedGroup As New atcDataGroup
+        Dim lModifiedGroup As New atcTimeseriesGroup
         Dim lDataSetIndex As Integer = 0
         Dim lValueIndex As Integer
 
-        Dim lEvents As atcDataGroup = Nothing
+        Dim lEvents As atcTimeseriesGroup = Nothing
         Dim lEvent As atcTimeseries
 
         Dim lModifyThis As atcTimeseries
 
         For Each lOriginalData As atcDataSet In DataSets
-            Dim lSplitData As atcDataGroup = Nothing
+            Dim lSplitData As atcTimeseriesGroup = Nothing
             If UseEvents Then
                 lEvents = EventSplit(lOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)
 
@@ -202,27 +202,27 @@ Public Class atcVariation
 
                 If Operation <> "Intensify" Then
                     lModifyThis = MergeTimeseries(lEvents)
-                    lSplitData = New atcDataGroup(lModifyThis)
+                    lSplitData = New atcTimeseriesGroup(lModifyThis)
                     lSplitData.Add(lOriginalData)
                 End If
 
             Else
                 lModifyThis = lOriginalData
                 If Seasons Is Nothing Then
-                    lSplitData = New atcDataGroup(lModifyThis)
+                    lSplitData = New atcTimeseriesGroup(lModifyThis)
                 Else
                     lSplitData = Seasons.SplitBySelected(lModifyThis, Nothing)
                 End If
             End If
 
-            Dim lModifiedSplit As New atcDataGroup
+            Dim lModifiedSplit As New atcTimeseriesGroup
 
             Select Case Operation
                 Case "AddEvents"
                     'if there are seasons, modify data only from selected seasons
-                    Dim lSplitOriginalData As atcDataGroup
+                    Dim lSplitOriginalData As atcTimeseriesGroup
                     If Seasons Is Nothing Then
-                        lSplitOriginalData = New atcDataGroup(lOriginalData)
+                        lSplitOriginalData = New atcTimeseriesGroup(lOriginalData)
                     Else
                         lSplitOriginalData = Seasons.SplitBySelected(lOriginalData, Nothing)
                     End If
@@ -237,9 +237,9 @@ Public Class atcVariation
                     'TODO Case "AddVolume"
                 Case "Intensify"
                     'if there are seasons, modify data only from selected seasons
-                    Dim lSplitOriginalData As atcDataGroup
+                    Dim lSplitOriginalData As atcTimeseriesGroup
                     If Seasons Is Nothing Then
-                        lSplitOriginalData = New atcDataGroup(lOriginalData)
+                        lSplitOriginalData = New atcTimeseriesGroup(lOriginalData)
                     Else
                         lSplitOriginalData = Seasons.SplitBySelected(lOriginalData, Nothing)
                     End If
@@ -312,7 +312,7 @@ Public Class atcVariation
                     lEventIntensifyFactor = lTargetChange / lCurrentVolume
                     Logger.Dbg("EventIntensifyFactor " & DecimalAlign(lEventIntensifyFactor))
                     lModifyThis = MergeTimeseries(lEvents)
-                    lSplitData = New atcDataGroup(lModifyThis)
+                    lSplitData = New atcTimeseriesGroup(lModifyThis)
                     lSplitData.Add(lOriginalData)
 
                     Dim lSplitTS As atcTimeseries = lSplitData.ItemByIndex(0)
@@ -391,7 +391,7 @@ Public Class atcVariation
     ''' <remarks></remarks>
     Private Function AddRemoveEventsVolumeFraction(ByVal aTimeseries As atcTimeseries, _
                                                    ByVal aVolumeChangeFraction As Double, _
-                                                   ByVal aEventsToSearch As atcDataGroup, _
+                                                   ByVal aEventsToSearch As atcTimeseriesGroup, _
                                                    ByVal aSeed As Integer) As atcTimeseries
         Dim lNewTimeseries As atcTimeseries = aTimeseries.Clone
         Dim lMaxEventIndex As Integer = aEventsToSearch.Count  'exclusive upper value, random less than
@@ -504,7 +504,7 @@ Public Class atcVariation
         End While
     End Function
 
-    Private Function AddRemoveEventsTotalVolume(ByVal aTimeseries As atcTimeseries, ByVal aTargetVolumeChange As Double, ByVal aEventsToSearch As atcDataGroup, ByVal aSeed As Integer) As atcTimeseries
+    Private Function AddRemoveEventsTotalVolume(ByVal aTimeseries As atcTimeseries, ByVal aTargetVolumeChange As Double, ByVal aEventsToSearch As atcTimeseriesGroup, ByVal aSeed As Integer) As atcTimeseries
         '    Private Function FindEventsTotalVolume(ByVal aTargetTotalVolume As Double, ByVal aEventsToSearch As atcDataGroup, ByVal aSeed As Integer) As atcDataGroup
         'Dim lEventsFound As New atcDataGroup
         Dim lNewTimeseries As atcTimeseries = aTimeseries.Clone
@@ -576,7 +576,7 @@ Public Class atcVariation
         pLatDeg = 39
 
         pName = "<untitled>"
-        pDataSets = New atcDataGroup
+        pDataSets = New atcTimeseriesGroup
         pComputationSource = Nothing
         pOperation = "Add"
         pSelected = False
@@ -609,7 +609,7 @@ Public Class atcVariation
         ColorBelowMin = System.Drawing.Color.DeepSkyBlue
         ColorDefault = System.Drawing.Color.White
 
-        PETdata = New atcDataGroup
+        PETdata = New atcTimeseriesGroup
     End Sub
 
     Public Overridable Sub CopyTo(ByVal aTargetVariation As atcVariation)
@@ -735,7 +735,7 @@ Public Class atcVariation
         End Set
     End Property
 
-    Private Function GetDataGroupXML(ByVal aDataGroup As atcDataGroup, ByVal aTag As String) As String
+    Private Function GetDataGroupXML(ByVal aDataGroup As atcTimeseriesGroup, ByVal aTag As String) As String
         If aDataGroup Is Nothing OrElse aDataGroup.Count = 0 Then
             Return ""
         Else
@@ -765,20 +765,20 @@ Public Class atcVariation
         End If
     End Function
 
-    Private Sub SetDataGroupXML(ByRef aDataGroup As atcDataGroup, ByVal aTag As String, ByVal aXML As String)
+    Private Sub SetDataGroupXML(ByRef aDataGroup As atcTimeseriesGroup, ByVal aTag As String, ByVal aXML As String)
         Dim lXMLdoc As New Xml.XmlDocument
         Try
             lXMLdoc.LoadXml(aXML)
-            aDataGroup = New atcDataGroup
+            aDataGroup = New atcTimeseriesGroup
             For Each lXML As Xml.XmlNode In lXMLdoc.FirstChild.ChildNodes
                 Dim lKey As String = GetAtt(lXML, "Key")
                 Dim lID As String = GetAtt(lXML, "ID")
                 Dim lHistory As String = GetAtt(lXML, "History")
                 If lID.Length > 0 Then
-                    Dim lDataGroup As atcDataGroup = Nothing
+                    Dim lDataGroup As atcTimeseriesGroup = Nothing
                     If lHistory.Length > 10 Then
                         Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
-                        For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
                             If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
                                 lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
                                 If lDataGroup.Count > 0 Then

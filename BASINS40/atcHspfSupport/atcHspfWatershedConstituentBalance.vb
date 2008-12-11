@@ -8,7 +8,7 @@ Public Module WatershedConstituentBalance
                               ByVal aBalanceType As String, _
                               ByVal aOperationTypes As atcCollection, _
                               ByVal aScenario As String, _
-                              ByVal aScenarioResults As atcDataSource, _
+                              ByVal aScenarioResults As atcTimeseriesSource, _
                               ByVal aOutletLocations As atcCollection, _
                               ByVal aRunMade As String, _
                      Optional ByVal aOutFilePrefix As String = "", _
@@ -159,7 +159,7 @@ Public Module WatershedConstituentBalance
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcDataSource, _
+                           ByVal aScenarioResults As atcTimeseriesSource, _
                            ByVal aRunMade As String, _
                   Optional ByVal aOutletLocation As String = "", _
                   Optional ByVal aOutFilePrefix As String = "", _
@@ -195,7 +195,7 @@ Public Module WatershedConstituentBalance
         lString.AppendLine()
         lString.AppendLine()
 
-        Dim lConstituentDataGroup As atcDataGroup
+        Dim lConstituentDataGroup As atcTimeseriesGroup
         Dim lTempDataSet As atcDataSet
         Dim lPendingOutput As String = ""
         Dim lOperationTypeAreas As New atcCollection
@@ -277,7 +277,7 @@ Public Module WatershedConstituentBalance
                                         lFieldIndex = 1
 
                                         For Each lLocation As String In lLandUseOperations.Keys
-                                            Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
+                                            Dim lLocationDataGroup As atcTimeseriesGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                             If lLocationDataGroup.Count > 0 Then
                                                 lTempDataSet = lLocationDataGroup.Item(0)
                                                 Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")

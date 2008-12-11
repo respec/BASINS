@@ -13,7 +13,7 @@ Module CreateUCITest
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.mdb")
 
-        Dim lDataSources As New Collection(Of atcData.atcDataSource)
+        Dim lDataSources As New Collection(Of atcData.atcTimeseriesSource)
         Dim lDataSource As New atcWDM.atcDataSourceWDM
         lDataSource.Open("test.wdm")
         lDataSources.Add(lDataSource)

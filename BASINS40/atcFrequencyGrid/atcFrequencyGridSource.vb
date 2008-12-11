@@ -4,7 +4,7 @@ Imports atcUtility
 Friend Class atcFrequencyGridSource
     Inherits atcControls.atcGridSource
 
-    Private pDataGroup As atcDataGroup
+    Private pDataGroup As atcTimeseriesGroup
     Private pNdays As SortedList
     Private pRecurrence As SortedList
     Private pHigh As Boolean
@@ -12,7 +12,7 @@ Friend Class atcFrequencyGridSource
     Private pCalculatedNdays As New ArrayList
     Private pCalculatedRecurrence As New ArrayList
 
-    Sub New(ByVal aDataGroup As atcData.atcDataGroup)
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup)
         pDataGroup = aDataGroup
         pRecurrence = New SortedList
         pNdays = New SortedList
@@ -212,8 +212,8 @@ Friend Class atcFrequencyGridSource
         End Set
     End Property
 
-    Public Function AllNday() As atcDataGroup
-        Dim lAllNday As New atcDataGroup
+    Public Function AllNday() As atcTimeseriesGroup
+        Dim lAllNday As New atcTimeseriesGroup
 
         For Each lTimeseries As atcTimeseries In pDataGroup
             Dim lAttributes As atcDataAttributes = lTimeseries.Attributes

@@ -25,7 +25,7 @@ Public Module modTimeseriesMath
     Public Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
                                  ByVal aStartDate As Double, _
                                  ByVal aEndDate As Double, _
-                                 ByVal aDataSource As atcDataSource) As atcTimeseries
+                                 ByVal aDataSource As atcTimeseriesSource) As atcTimeseries
         'TODO: boundary conditions...
         If aTimeseries Is Nothing OrElse aTimeseries.Dates Is Nothing Then Return Nothing
         Dim lStart As Integer = FindDateAtOrAfter(aTimeseries.Dates.Values, aStartDate)
@@ -75,7 +75,7 @@ Public Module modTimeseriesMath
     Public Function SubsetByDateBoundary(ByVal aTimeseries As atcTimeseries, _
                                          ByVal aStartMonth As Integer, _
                                          ByVal aStartDay As Integer, _
-                                         ByVal aDataSource As atcDataSource, _
+                                         ByVal aDataSource As atcTimeseriesSource, _
                                 Optional ByVal aFirstYear As Integer = 0, _
                                 Optional ByVal aLastYear As Integer = 0, _
                                 Optional ByVal aEndMonth As Integer = 0, _
@@ -187,7 +187,7 @@ Public Module modTimeseriesMath
     ''' <returns>atcTimeseries containing all unique dates from the group</returns>
     ''' <remarks>Each atcTimeseries in aGroup is assumed to be in order by date within itself.
     ''' If duplicate dates exist in aGroup, some values will be left out of result.</remarks>
-    Public Function MergeTimeseries(ByVal aGroup As atcDataGroup, _
+    Public Function MergeTimeseries(ByVal aGroup As atcTimeseriesGroup, _
                            Optional ByVal aFilterNoData As Boolean = False) As atcTimeseries
         Dim lNewTS As New atcTimeseries(Nothing) 'will contain new (merged) dates
         Dim lNewIndex As Integer
@@ -313,7 +313,7 @@ Public Module modTimeseriesMath
         End If
     End Sub
 
-    Private Sub MergeAttributes(ByVal aGroup As atcDataGroup, ByVal aTarget As atcTimeseries)
+    Private Sub MergeAttributes(ByVal aGroup As atcTimeseriesGroup, ByVal aTarget As atcTimeseries)
         For Each lAttribute As atcDefinedValue In aGroup(0).Attributes
             If lAttribute.Definition.CopiesInherit Then
                 Dim lMatch As Boolean = True
@@ -333,12 +333,13 @@ Public Module modTimeseriesMath
         Next
     End Sub
 
-    Public Function DatasetOrGroupToGroup(ByVal aObj As Object) As atcDataGroup
-        Select Case aObj.GetType.Name
-            Case "atcDataGroup", "atcTimeseriesGroup" : Return aObj
-            Case "atcTimeseries" : Return New atcDataGroup(aObj)
+    Public Function DatasetOrGroupToGroup(ByVal aObject As Object) As atcDataGroup
+        Select Case aObject.GetType.Name
+            Case "atcDataGroup", "atcTimeseriesGroup" : Return aObject
+            Case "atcTimeseries" : Return New atcTimeseriesGroup(CType(aObject, atcTimeseries))
+            Case "atcDataset" : Return New atcDataGroup(aObject)
             Case Else
-                Logger.Dbg("DatasetOrGroupToGroup: Unrecognized type '" & aObj.GetType.Name & "'")
+                Logger.Dbg("DatasetOrGroupToGroup: Unrecognized type '" & aObject.GetType.Name & "'")
                 Return Nothing
         End Select
     End Function
@@ -352,7 +353,7 @@ Public Module modTimeseriesMath
                                Optional ByVal aFillVal As Double = 0, _
                                Optional ByVal aMissVal As Double = -999, _
                                Optional ByVal aAccumVal As Double = -999, _
-                               Optional ByVal aDataSource As atcDataSource = Nothing) As atcTimeseries
+                               Optional ByVal aDataSource As atcTimeseriesSource = Nothing) As atcTimeseries
         'aTU - Time units (1-sec, 2-min, 3-hour, 4-day, 5-month, 6-year, 7-century).
         'aTS - Timestep in units of aTU.
         'aFillVal - Value to Fill data gaps with.
@@ -520,7 +521,7 @@ Public Module modTimeseriesMath
                               ByVal aTU As atcTimeUnit, _
                               ByVal aTS As Integer, _
                               ByVal aTran As atcTran, _
-                              Optional ByVal aDataSource As atcDataSource = Nothing) As atcTimeseries
+                              Optional ByVal aDataSource As atcTimeseriesSource = Nothing) As atcTimeseries
         If aTimeseries.Attributes.GetValue("tu") = aTU AndAlso _
            aTimeseries.Attributes.GetValue("ts") = aTS Then
             ' Already have desired time unit and time step, clone so we consistently return a new TS
@@ -742,7 +743,7 @@ Public Module modTimeseriesMath
 
     Public Function NewTimeseries(ByVal aStartDate As Double, ByVal aEndDate As Double, _
                                   ByVal aTU As atcTimeUnit, ByVal aTS As Integer, _
-                         Optional ByVal aDataSource As atcDataSource = Nothing, _
+                         Optional ByVal aDataSource As atcTimeseriesSource = Nothing, _
                          Optional ByVal aSetAllValues As Double = 0) As atcTimeseries
         Dim lDates As New atcTimeseries(aDataSource)
         lDates.Values = NewDates(aStartDate, aEndDate, aTU, aTS)
@@ -1089,7 +1090,7 @@ Finished:
             End If
         End If
 
-        Dim lTSgroup As atcDataGroup
+        Dim lTSgroup As atcTimeseriesGroup
         lTSgroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries", Nothing))
         If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
             Err.Raise(vbObjectError + 512, , aOperationName & " did not get a Timeseries argument")

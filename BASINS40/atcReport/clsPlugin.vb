@@ -139,7 +139,7 @@ Public Class PlugIn
         Return lFrmReport
     End Function
 
-    Public Sub Save(ByVal aDataGroup As atcData.atcDataGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
+    Public Sub Save(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
         Dim lFrmReport As frmReport = Show()
         SaveFileString(aFileName, lFrmReport.ToString)
         lFrmReport.Close()

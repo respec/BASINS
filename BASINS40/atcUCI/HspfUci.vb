@@ -1693,7 +1693,7 @@ Public Class HspfUci
         Dim lWDMFile As New atcWDM.atcDataSourceWDM
         Dim lFound As Boolean = False
         If atcDataManager.DataSources IsNot Nothing Then
-            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
                 If lBASINSDataSource.Specification.ToUpper = IO.Path.GetFullPath(aName).ToUpper Then
                     'found it in the BASINS data sources
                     lWDMFile = lBASINSDataSource
@@ -1730,7 +1730,7 @@ Public Class HspfUci
                     Dim lFileName As String = lString.Substring(16).Trim
                     Dim lFilePath As String
                     If lString.StartsWith("WDM") Then
-                        Dim lFile As atcData.atcDataSource = AddWDMFile(lFileName)
+                        Dim lFile As atcData.atcTimeseriesSource = AddWDMFile(lFileName)
                         If Not lFile Is Nothing Then
                             pWdmCount += 1
                             Dim lInd As Integer = WDMInd(Left(lString, 4))
@@ -1767,7 +1767,7 @@ Public Class HspfUci
     Public Sub SetWDMFiles()
         Dim Ind, i, iret As Integer
         Dim tname, s, w, tpath As String
-        Dim lFile As atcData.atcDataSource
+        Dim lFile As atcData.atcTimeseriesSource
         Dim lHFile As HspfFile
         Dim FilesOK As Boolean
         Dim ifound As Boolean
@@ -1842,7 +1842,7 @@ x:
         Return Nothing
     End Function
 
-    Public Function GetWDMObj(ByVal Index As Integer) As atcData.atcDataSource
+    Public Function GetWDMObj(ByVal Index As Integer) As atcData.atcTimeseriesSource
         Return pWDMObj(Index)
     End Function
 
@@ -2110,7 +2110,7 @@ x:
                 If Not lGenTs Is Nothing Then
                     Dim lTsType As String = lTimser.Attributes.GetValue("TSTYPE")
                     lGenTs.Attributes.SetValue("TSTYPE", lTsType)
-                    Dim Update As Boolean = pWDMObj(lWdmId).AddDataset(lGenTs, atcData.atcDataSource.EnumExistAction.ExistReplace)
+                    Dim Update As Boolean = pWDMObj(lWdmId).AddDataset(lGenTs, atcData.atcTimeseriesSource.EnumExistAction.ExistReplace)
                 End If
 
                 'change the appropriate ext targets record
@@ -2631,7 +2631,7 @@ x:
     End Function
 
     Public Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
-                                   ByRef aDataSources As Collection(Of atcData.atcDataSource), _
+                                   ByRef aDataSources As Collection(Of atcData.atcTimeseriesSource), _
                                    ByRef aStarterUci As String, _
                                    Optional ByRef aPollutantListFileName As String = "", _
                                    Optional ByRef aMetBaseDsn As Integer = 11, _

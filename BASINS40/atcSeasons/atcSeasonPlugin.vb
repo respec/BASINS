@@ -4,7 +4,7 @@ Imports MapWinUtility
 Imports System.Reflection
 
 Public Class atcSeasonPlugin
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
 
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private pName As String = "Timeseries::Seasons"
@@ -43,15 +43,15 @@ Public Class atcSeasonPlugin
     Public Overrides Function Open(ByVal aOperationName As String, _
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim lSeasonName As String = ""
-        Dim ltsGroup As atcDataGroup = Nothing
+        Dim lTimeSeriesGroup As atcTimeseriesGroup = Nothing
 
-        If Not aArgs Is Nothing Then
-            ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+        If aArgs IsNot Nothing Then
+            lTimeSeriesGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
         End If
-        If ltsGroup Is Nothing Then
-            ltsGroup = atcDataManager.UserSelectData("Select data for " & aOperationName)
+        If lTimeSeriesGroup Is Nothing Then
+            lTimeSeriesGroup = atcDataManager.UserSelectData("Select data for " & aOperationName)
         End If
-        If Not ltsGroup Is Nothing Then
+        If lTimeSeriesGroup IsNot Nothing Then
             If aOperationName.IndexOf("::") > 0 Then
                 Dim a As [Assembly] = Reflection.Assembly.GetExecutingAssembly
                 Dim lassyTypes As Type() = a.GetTypes()
@@ -66,8 +66,7 @@ Public Class atcSeasonPlugin
                         Exit For
                     End If
                 Next
-            Else
-                'TODO: use form to ask for seasons
+            Else 'TODO: use form to ask for seasons
                 pSeasons = New atcSeasonsMonth
             End If
             If pSeasons Is Nothing Then
@@ -75,7 +74,7 @@ Public Class atcSeasonPlugin
             Else
                 Select Case aOperationName.ToLower
                     Case "split"
-                        For Each lts As atcTimeseries In ltsGroup
+                        For Each lts As atcTimeseries In lTimeSeriesGroup
                             MyBase.DataSets.AddRange(pSeasons.Split(lts, Me))
                         Next
                         If MyBase.DataSets.Count > 0 Then Return True
@@ -84,9 +83,9 @@ Public Class atcSeasonPlugin
                         Dim lCalculatedAttributes As atcDataAttributes = aArgs.GetValue("CalculatedAttributes")
                         If lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
                             Dim lForm As New frmSpecifySeasonalAttributes
-                            lForm.AskUser(ltsGroup, AvailableOperations(False, True))
+                            lForm.AskUser(lTimeSeriesGroup, AvailableOperations(False, True))
                         Else
-                            For Each lts As atcTimeseries In ltsGroup
+                            For Each lts As atcTimeseries In lTimeSeriesGroup
                                 pSeasons.SetSeasonalAttributes(lts, lAttributes, lCalculatedAttributes)
                             Next
                         End If
@@ -104,11 +103,11 @@ Public Class atcSeasonPlugin
     Public Shared ReadOnly Property AllSeasonTypes() As atcCollection
         Get
             Dim lAllTypes As New atcCollection
-            Dim a As [Assembly] = Reflection.Assembly.GetExecutingAssembly
-            Dim lassyTypes As Type() = a.GetTypes()
-            For Each typ As Type In lassyTypes
-                If typ.Name.StartsWith("atcSeasons") Then
-                    lAllTypes.Add(typ)
+            Dim lAssembly As [Assembly] = Reflection.Assembly.GetExecutingAssembly
+            Dim lAssemblyTypes As Type() = lAssembly.GetTypes()
+            For Each lType As Type In lAssemblyTypes
+                If lType.Name.StartsWith("atcSeasons") Then
+                    lAllTypes.Add(lType)
                 End If
             Next
             Return lAllTypes

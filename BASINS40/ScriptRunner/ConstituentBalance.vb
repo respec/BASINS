@@ -55,7 +55,7 @@ Public Module ConstituentBalanceScript
         'loop thru each scenario (uci name)
         For Each lScenario As String In lScenarios
             'open the corresponding hbn file
-            Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+            Dim lHspfBinFile As atcTimeseriesSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
             Dim lHspfBinFileName As String = lScenario & ".hbn"
             Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
             If Not FileExists(lHspfBinFileName) Then

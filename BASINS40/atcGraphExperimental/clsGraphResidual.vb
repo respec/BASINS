@@ -9,21 +9,21 @@ Public Class clsGraphResidual
     Inherits clsGraphBase
 
     <CLSCompliant(False)> _
-    Public Sub New(ByVal aDataGroup As atcDataGroup, ByVal aZedGraphControl As ZedGraphControl)
+    Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl)
         MyBase.New(aDataGroup, aZedGraphControl)
     End Sub
 
-    Public Overrides Property Datasets() As atcDataGroup
+    Public Overrides Property Datasets() As atcTimeseriesGroup
         Get
             Return MyBase.Datasets
         End Get
-        Set(ByVal aDataGroup As atcDataGroup)
+        Set(ByVal aDataGroup As atcTimeseriesGroup)
             If aDataGroup.Count <> 2 Then
                 Logger.Msg("Residual Graph requires 2 timeseries, " & aDataGroup.Count & " specified")
             Else
                 Dim lArgsMath As New atcDataAttributes
                 lArgsMath.SetValue("timeseries", aDataGroup)
-                Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+                Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
                 If lTsMath.Open("subtract", lArgsMath) Then
                     MyBase.Datasets = lTsMath.DataSets
                     Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")

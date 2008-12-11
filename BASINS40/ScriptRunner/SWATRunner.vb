@@ -1022,7 +1022,7 @@ Module SWATRunner
         End If
     End Sub
 
-    Private Sub WriteSubSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup, ByVal aSubBasin2HUC8 As atcCollection, ByVal aOutputFileName As String)
+    Private Sub WriteSubSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcTimeseriesGroup, ByVal aSubBasin2HUC8 As atcCollection, ByVal aOutputFileName As String)
         Dim lConsNitr As String() = {"ORGN", "NSURQ", "LATNO3", "GWNO3"}
         Dim lConsPhos As String() = {"ORGP", "SOLP", "SEDP"}
         Dim lConsOtherOut As String() = {"AREA", "WYLD", "SYLD"}
@@ -1050,10 +1050,10 @@ Module SWATRunner
         For lIndex As Integer = 1 To aSubBasin2HUC8.Count
             Dim lHuc8 As String = aSubBasin2HUC8.ItemByKey(lIndex.ToString)
             lSBHuc8.Append(lIndex & vbTab & lHuc8)
-            Dim lSubData As atcDataGroup = aTimeseriesGroup.FindData("Location", "BIGSUB" & lIndex.ToString.PadLeft(4))
-            Dim lSubDataToList As New atcDataGroup
-            Dim lTimserNitr As New atcDataGroup
-            Dim lTimserPhos As New atcDataGroup
+            Dim lSubData As atcTimeseriesGroup = aTimeseriesGroup.FindData("Location", "BIGSUB" & lIndex.ToString.PadLeft(4))
+            Dim lSubDataToList As New atcTimeseriesGroup
+            Dim lTimserNitr As New atcTimeseriesGroup
+            Dim lTimserPhos As New atcTimeseriesGroup
             Dim lHucAreaFactor As Double = 0.0
 
             For Each lDataSet As atcTimeseries In lSubData
@@ -1114,7 +1114,7 @@ Module SWATRunner
         SaveFileString(aOutputFileName, lSBHuc8.ToString)
     End Sub
 
-    Private Sub WriteReachSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcDataGroup, ByVal aSubBasin2HUC8 As atcCollection, ByVal aOutputFileName As String)
+    Private Sub WriteReachSummary(ByVal aOutputFolder As String, ByVal aTimeseriesGroup As atcTimeseriesGroup, ByVal aSubBasin2HUC8 As atcCollection, ByVal aOutputFileName As String)
         Dim lConsNitrOut As String() = {"NH4_OUT", "NO2_OUT", "NO3_OUT", "ORGN_OUT"}
         Dim lConsNitrIn As String() = {"NH4_IN", "NO2_IN", "NO3_IN", "ORGN_IN"}
         Dim lConsPhosOut As String() = {"ORGP_OUT", "MINP_OUT"}
@@ -1146,12 +1146,12 @@ Module SWATRunner
         For lIndex As Integer = 1 To aSubBasin2HUC8.Count
             Dim lHuc8 As String = aSubBasin2HUC8.ItemByKey(lIndex.ToString)
             lSBHuc8.Append(lIndex & vbTab & lHuc8)
-            Dim lReachData As atcDataGroup = aTimeseriesGroup.FindData("Location", "REACH" & lIndex.ToString.PadLeft(5))
-            Dim lReachDataToList As New atcDataGroup
-            Dim lTimserNitrOut As New atcDataGroup
-            Dim lTimserNitrIn As New atcDataGroup
-            Dim lTimserPhosOut As New atcDataGroup
-            Dim lTimserPhosIn As New atcDataGroup
+            Dim lReachData As atcTimeseriesGroup = aTimeseriesGroup.FindData("Location", "REACH" & lIndex.ToString.PadLeft(5))
+            Dim lReachDataToList As New atcTimeseriesGroup
+            Dim lTimserNitrOut As New atcTimeseriesGroup
+            Dim lTimserNitrIn As New atcTimeseriesGroup
+            Dim lTimserPhosOut As New atcTimeseriesGroup
+            Dim lTimserPhosIn As New atcTimeseriesGroup
             Dim lAreaFactor As Double = 1.0
 
             For Each lDataSet As atcTimeseries In lReachData
@@ -1220,7 +1220,7 @@ Module SWATRunner
 
     Private Sub WriteYieldSummary(ByVal aSubBasin2huc8 As atcCollection, _
                                   ByVal aOutputFolder As String, _
-                                  ByVal aTimeseriesGroup As atcDataGroup)
+                                  ByVal aTimeseriesGroup As atcTimeseriesGroup)
         Dim lCropIds As New atcCollection
         With lCropIds
             .Add("CORN") : .Add("CCCC") : .Add("CSC1") : .Add("CSS1") : .Add("CCS1")
@@ -1249,16 +1249,16 @@ Module SWATRunner
         '                        "km2".PadLeft(lFieldWidth) & lTab & _
         '                        Space(8).PadLeft(lFieldWidth))
 
-        Dim lAreaGroup As atcDataGroup = aTimeseriesGroup.FindData("Constituent", "AREA")
+        Dim lAreaGroup As atcTimeseriesGroup = aTimeseriesGroup.FindData("Constituent", "AREA")
         Dim lSubIds As atcCollection = lAreaGroup.SortedAttributeValues("SubId")
         Dim lSubIdAreas As New atcCollection
         For Each lSubId As String In lSubIds
             Dim lAreaSubIdTotal As Double = 0.0
-            Dim lSubIdDataGroup As atcDataGroup = lAreaGroup.FindData("SubId", lSubId)
+            Dim lSubIdDataGroup As atcTimeseriesGroup = lAreaGroup.FindData("SubId", lSubId)
             Dim lHruIds As atcCollection = lSubIdDataGroup.SortedAttributeValues("HruId")
             Dim lAreaStrings As New atcCollection
             For Each lHruId As String In lHruIds
-                Dim lHruIdDataGroup As atcDataGroup = lSubIdDataGroup.FindData("HruId", lHruId)
+                Dim lHruIdDataGroup As atcTimeseriesGroup = lSubIdDataGroup.FindData("HruId", lHruId)
                 Dim lAreaUsed As Boolean = False
                 For Each lAreaTimeseries As atcTimeseries In lHruIdDataGroup
                     lArea = lAreaTimeseries.Value(1)
@@ -1284,7 +1284,7 @@ Module SWATRunner
         Next
         SaveFileString(IO.Path.Combine(aOutputFolder, "Area.txt"), lSBAreaDebug.ToString)
 
-        Dim lMatchingDataGroup As atcDataGroup = aTimeseriesGroup.FindData("CropId", lCropIds)
+        Dim lMatchingDataGroup As atcTimeseriesGroup = aTimeseriesGroup.FindData("CropId", lCropIds)
         Dim lTimserBase As atcTimeseries = lMatchingDataGroup.Item(0)
         Dim lDateBase(5) As Integer
         J2Date(lTimserBase.Dates.Value(0), lDateBase)
@@ -1354,7 +1354,7 @@ Module SWATRunner
         Dim lYieldSummaryHuc8 As New atcCollection
         For Each lSubId As String In lSubIds
             Dim lHuc8 As String = aSubBasin2huc8.ItemByKey(lSubId.Trim)
-            Dim lSubIdDataGroup As atcDataGroup = lMatchingDataGroup.FindData("SubId", lSubId)
+            Dim lSubIdDataGroup As atcTimeseriesGroup = lMatchingDataGroup.FindData("SubId", lSubId)
             Dim lLocationIdsInSub As atcCollection = lSubIdDataGroup.SortedAttributeValues("Location")
             Dim lNUptkSum As Double = 0.0
             Dim lNAppSum As Double = 0.0
@@ -1373,7 +1373,7 @@ Module SWATRunner
                 Dim lPUptkSub As Double = 0
                 Dim lYieldSub As Double = 0
                 For Each lLocationId As String In lLocationIdsInSub
-                    Dim lLocationIdDataGroup As atcDataGroup = lSubIdDataGroup.FindData("Location", lLocationId)
+                    Dim lLocationIdDataGroup As atcTimeseriesGroup = lSubIdDataGroup.FindData("Location", lLocationId)
                     If lLocationIdDataGroup.Count = 6 Then
                         Dim lAreaTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "Area").Item(0)
                         Dim lNAppliedTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "NAUTO").Item(0)

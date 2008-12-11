@@ -10,12 +10,12 @@ Module modWASPFromMW
         aStations.Clear()
 
         Dim lTotalCount As Integer = 0
-        For Each lDataSource As atcDataSource In atcDataManager.DataSources
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             lTotalCount += lDataSource.DataSets.Count()
         Next
 
         Dim lCounter As Integer = 0
-        For Each lDataSource As atcDataSource In atcDataManager.DataSources
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                 lCounter += 1
                 Logger.Progress(lCounter, lTotalCount)

@@ -1,5 +1,5 @@
 Imports atcData
-Imports atcData.atcDataGroup
+Imports atcData.atcTimeseriesGroup
 Imports atcUtility
 Imports MapWindow.Interfaces
 Imports MapWinUtility
@@ -108,7 +108,7 @@ Public Module CatSummary
 
             'loop thru each scenario (uci name)
             For Each lScenario As String In lScenarios
-                Dim lScenarioDataGroup As New atcDataGroup
+                Dim lScenarioDataGroup As New atcTimeseriesGroup
                 'If atcDataManager.DataSources.Count > 0 Then
                 '    Logger.Dbg("Clearing " & atcDataManager.DataSources.Count & " datasources.")
                 '    atcDataManager.DataSources.Clear()
@@ -222,21 +222,21 @@ Public Module CatSummary
         Return foundMatch
     End Function
 
-    Friend Sub DoCatSummary(ByVal aDataGroup As atcDataGroup, ByVal aScenario As String)
+    Friend Sub DoCatSummary(ByVal aDataGroup As atcTimeseriesGroup, ByVal aScenario As String)
         Logger.Dbg("DoCatSummary for " & aScenario)
 
         Dim lString As New Text.StringBuilder
         lString.Append(aScenario)
 
         'Get this hard coded stuff from CAT endpoints/variations!
-        Dim lMetDataGroup As atcDataGroup = aDataGroup.FindData("Location", "SEG1")
+        Dim lMetDataGroup As atcTimeseriesGroup = aDataGroup.FindData("Location", "SEG1")
         Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
         lMetDataGroup.Add(aDataGroup.FindData("Location", "_A24013"))
         lMetDataGroup.Add(aDataGroup.FindData("Location", "A24013"))
         Logger.Dbg("     AdditionalMetMatchingDatasetCount " & lMetDataGroup.Count)
 
-        Dim lRchDataGroupW As atcDataGroup = aDataGroup.FindData("Location", "RIV9")
-        Dim lRchDataGroup As atcDataGroup = aDataGroup.FindData("Location", "R:9")
+        Dim lRchDataGroupW As atcTimeseriesGroup = aDataGroup.FindData("Location", "RIV9")
+        Dim lRchDataGroup As atcTimeseriesGroup = aDataGroup.FindData("Location", "R:9")
 
         For Each lCat() As String In pCatList
             If lCat(0) = "SEG1" Then
@@ -304,11 +304,11 @@ Public Module CatSummary
         AppendFileString(pCatSummaryFileName, lString.ToString)
     End Sub
 
-    Private Function AnnualValue(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String, Optional ByVal aMonthsList As String = "", Optional ByVal aSummer As Boolean = False) As String
+    Private Function AnnualValue(ByVal aDataGroup As atcTimeseriesGroup, ByVal aCons As String, ByVal aTrans As String, Optional ByVal aMonthsList As String = "", Optional ByVal aSummer As Boolean = False) As String
         Dim lString As String = ""
 
         Try
-            Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
+            Dim lConsDataGroup As atcTimeseriesGroup = aDataGroup.FindData("Constituent", aCons)
             Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
             If lConsDataGroup.Count > 0 Then
                 Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
@@ -357,10 +357,10 @@ Public Module CatSummary
         Return lString
     End Function
 
-    Private Function AnnualAndSeasonalValues(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String, Optional ByVal aMonthList As String = "", Optional ByVal aSeasonType As String = "") As String
+    Private Function AnnualAndSeasonalValues(ByVal aDataGroup As atcTimeseriesGroup, ByVal aCons As String, ByVal aTrans As String, Optional ByVal aMonthList As String = "", Optional ByVal aSeasonType As String = "") As String
         Dim lString As String = ""
         Try
-            Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
+            Dim lConsDataGroup As atcTimeseriesGroup = aDataGroup.FindData("Constituent", aCons)
             Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
             If lConsDataGroup.Count > 0 Then
                 Dim lTempDataSet As atcDataSet = Nothing

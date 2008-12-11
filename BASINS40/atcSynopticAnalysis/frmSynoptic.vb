@@ -5,9 +5,9 @@ Imports MapWinUtility
 
 Public Class frmSynoptic
     'The group of atcTimeseries displayed
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
 
-    Private WithEvents pEvents As atcDataGroup
+    Private WithEvents pEvents As atcTimeseriesGroup
 
     Private pInitialized As Boolean = False
     Private pLastThreshold As Double = GetNaN()
@@ -37,9 +37,9 @@ Public Class frmSynoptic
     Private pColumnTitlesEventDefault() As String = {"Group", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Intensity", "Time Since Last"}
     Private pColumnAttributesEventDefault() As String = {"", "", "", "", "Sum", "Sum", "Max", "Mean", "Mean"}
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
         If aTimeseriesGroup Is Nothing Then
-            pDataGroup = New atcDataGroup
+            pDataGroup = New atcTimeseriesGroup
         Else
             pDataGroup = aTimeseriesGroup
         End If
@@ -437,7 +437,7 @@ Public Class frmSynoptic
         End If
     End Sub
 
-    Private Function GroupTotal(ByVal aDataGroup As atcDataGroup) As Double
+    Private Function GroupTotal(ByVal aDataGroup As atcTimeseriesGroup) As Double
         Dim lTotal As Double = 0
         For Each lTimeseries As atcTimeseries In aDataGroup
             lTotal += lTimeseries.Attributes.GetValue("Sum")

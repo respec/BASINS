@@ -29,19 +29,19 @@ Public Class atcSynopticAnalysisPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aDataGroup As atcDataGroup) _
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup) _
                                    As Object 'System.Windows.Forms.Form
         Dim lForm As New frmSynoptic
-        lForm.Initialize(aDataGroup)
+        lForm.Initialize(aTimeseriesGroup)
         Return lForm
     End Function
 
-    Public Overrides Sub Save(ByVal aDataGroup As atcDataGroup, _
+    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcDataGroup, _
                               ByVal aFileName As String, _
                               ByVal ParamArray aOptions() As String)
 
         Dim lForm As New frmSynoptic
-        lForm.Initialize(aDataGroup)
+        lForm.Initialize(aTimeseriesGroup)
         lForm.Hide()
 
         Dim lReport As New IO.StreamWriter(aFileName)
@@ -67,12 +67,12 @@ Public Class atcSynopticAnalysisPlugin
         Logger.Dbg("SynopticAnalysis Complete, Results in file '" & aFileName & "'")
     End Sub
 
-    Public Shared Function ComputeEvents(ByVal aDataGroup As atcDataGroup, ByVal aThreshold As Double, ByVal aDaysGapAllowed As Double, ByVal aHighEvents As Boolean) As atcDataGroup
-        ComputeEvents = New atcDataGroup
+    Public Shared Function ComputeEvents(ByVal aDataGroup As atcTimeseriesGroup, ByVal aThreshold As Double, ByVal aDaysGapAllowed As Double, ByVal aHighEvents As Boolean) As atcTimeseriesGroup
+        ComputeEvents = New atcTimeseriesGroup
         If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
             For Each lDataSet As atcTimeseries In aDataGroup
-                Dim lEvents As atcDataGroup = atcEvents.EventSplit(lDataSet, Nothing, aThreshold, aDaysGapAllowed, aHighEvents)
+                Dim lEvents As atcTimeseriesGroup = atcEvents.EventSplit(lDataSet, Nothing, aThreshold, aDaysGapAllowed, aHighEvents)
                 ComputeEvents.AddRange(lEvents)
             Next
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
@@ -80,9 +80,9 @@ Public Class atcSynopticAnalysisPlugin
     End Function
 
     Public Shared Function ComputeGroups(ByVal aGroupBy As String, _
-                                         ByVal aEvents As atcDataGroup) As atcCollection
+                                         ByVal aEvents As atcTimeseriesGroup) As atcCollection
         Dim lGroups As New atcCollection
-        Dim lGroup As atcDataGroup
+        Dim lGroup As atcTimeseriesGroup
         Dim lValue As Double
         Dim lValueIndex As Integer
         Dim lGroupIndex As Integer = 0
@@ -91,12 +91,12 @@ Public Class atcSynopticAnalysisPlugin
             Case "Each Event"
                 For Each lEvent As atcTimeseries In aEvents
                     lGroupIndex += 1
-                    lGroups.Add(lGroupIndex, New atcDataGroup(lEvent))
+                    lGroups.Add(lGroupIndex, New atcTimeseriesGroup(lEvent))
                 Next
             Case "Number of Measurements"
                 Dim lIndex As Integer
                 For Each lValue In pMeasurementsGroupEdges
-                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcTimeseriesGroup)
                 Next
                 For Each lEvent As atcTimeseries In aEvents
                     lValue = lEvent.numValues
@@ -109,7 +109,7 @@ Public Class atcSynopticAnalysisPlugin
                 Next
             Case "Month"
                 For lGroupIndex = 1 To 12
-                    lGroups.Add(MonthName(lGroupIndex, True), New atcDataGroup)
+                    lGroups.Add(MonthName(lGroupIndex, True), New atcTimeseriesGroup)
                 Next
                 For Each lEvent As atcTimeseries In aEvents
                     'Find peak if event spans a month boundary
@@ -146,14 +146,14 @@ Public Class atcSynopticAnalysisPlugin
                     If lFirstYear = 0 Then lFirstYear = lYear
 
                     For lAddYear As Integer = lGroups.Count To lYear - lFirstYear
-                        lGroups.Add(lYear, New atcDataGroup)
+                        lGroups.Add(lYear, New atcTimeseriesGroup)
                     Next
                     lGroups.ItemByIndex(lYear - lFirstYear).Add(lEvent)
                 Next
             Case "Total Volume", "Cummulative Volume"
                 Dim lIndex As Integer
                 For Each lValue In pVolumeGroupEdges
-                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcTimeseriesGroup)
                 Next
                 For Each lEvent As atcTimeseries In aEvents
                     lValue = lEvent.Attributes.GetValue("Sum")
@@ -167,7 +167,7 @@ Public Class atcSynopticAnalysisPlugin
             Case "Maximum Intensity"
                 Dim lIndex As Integer
                 For Each lValue In pMaximumGroupEdges
-                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcTimeseriesGroup)
                 Next
                 For Each lEvent As atcTimeseries In aEvents
                     lValue = lEvent.Attributes.GetValue("Max")
@@ -181,7 +181,7 @@ Public Class atcSynopticAnalysisPlugin
             Case "Mean Intensity"
                 Dim lIndex As Integer
                 For Each lValue In pMaximumGroupEdges
-                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcTimeseriesGroup)
                 Next
                 For Each lEvent As atcTimeseries In aEvents
                     lValue = lEvent.Attributes.GetValue("Mean")
@@ -210,7 +210,7 @@ Public Class atcSynopticAnalysisPlugin
                                         ByVal aTimeUnits As String, _
                                         ByVal aColumnTitles() As String, _
                                         ByVal aColumnAttributes() As String) As atcControls.atcGridSource
-        Dim lGroup As atcDataGroup
+        Dim lGroup As atcTimeseriesGroup
         Dim lDataset As atcTimeseries
 
         Dim lColumn As Integer

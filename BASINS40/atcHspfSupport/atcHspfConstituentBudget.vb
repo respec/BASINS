@@ -9,16 +9,16 @@ Public Module ConstituentBudget
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcDataSource, _
+                           ByVal aScenarioResults As atcTimeseriesSource, _
                            ByVal aRunMade As String) As Text.StringBuilder
 
         Dim lNumberFormat As String = "#,##0.0"
         Dim lUnits As String = ""
-        Dim lNonpointData As New atcDataGroup
+        Dim lNonpointData As New atcTimeseriesGroup
 
-        Dim lTotalInflowData As New atcDataGroup
-        Dim lOutflowData As New atcDataGroup
-        Dim lDepScourData As New atcDataGroup
+        Dim lTotalInflowData As New atcTimeseriesGroup
+        Dim lOutflowData As New atcTimeseriesGroup
+        Dim lDepScourData As New atcTimeseriesGroup
 
         Dim lRchresOperations As HspfOperations = aUci.OpnBlks("RCHRES").Ids
 
@@ -119,7 +119,7 @@ Public Module ConstituentBudget
 
     Private Function TotalForReach(ByVal aReach As HspfOperation, _
                                    ByVal aAreas As atcCollection, _
-                                   ByVal aNonpointData As atcDataGroup) As Double
+                                   ByVal aNonpointData As atcTimeseriesGroup) As Double
         Dim lTotal As Double = 0
 
         For lAreaIndex As Integer = 0 To aAreas.Count - 1

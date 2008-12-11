@@ -458,7 +458,7 @@ Friend Module modSWMMFromMW
         Dim lDataSource As New atcWDM.atcDataSourceWDM
         If FileExists(aMetWDMName) Then
             Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
                 If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
                     'found it in the BASINS data sources
                     lDataSource = lBASINSDataSource
@@ -632,7 +632,7 @@ Friend Module modSWMMFromMW
         Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
         If FileExists(aMetWDMName) Then
             Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
                 If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
                     'found it in the BASINS data sources
                     lDataSource = lBASINSDataSource

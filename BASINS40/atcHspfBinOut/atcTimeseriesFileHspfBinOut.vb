@@ -14,7 +14,7 @@ Imports System.Xml
 '''Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 ''' </remarks>
 Public Class atcTimeseriesFileHspfBinOut
-    Inherits atcData.atcDataSource
+    Inherits atcData.atcTimeseriesSource
 
     Private pFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
     Private pName As String = "Timeseries::HSPF Binary Output"

@@ -240,12 +240,12 @@ Public Class frmSpecifySeasonalAttributes
 
 #End Region
 
-    Private WithEvents pGroup As atcDataGroup
+    Private WithEvents pTimseriesGroup As atcTimeseriesGroup
     Private pSeasonsAvailable As atcDataAttributes
     Private pOk As Boolean
 
-    Public Function AskUser(ByVal aGroup As atcDataGroup, ByVal aSeasonsAvailable As atcDataAttributes) As Boolean
-        pGroup = aGroup
+    Public Function AskUser(ByVal aTimeseriesGroup As atcTimeseriesGroup, ByVal aSeasonsAvailable As atcDataAttributes) As Boolean
+        pTimseriesGroup = aTimeseriesGroup
         pSeasonsAvailable = aSeasonsAvailable
         Clear()
         Me.ShowDialog()
@@ -277,24 +277,24 @@ Public Class frmSpecifySeasonalAttributes
         LoadListSelected(lstSeasons)
     End Sub
 
-    Private Sub SaveListSelected(ByVal lst As Windows.Forms.ListBox)
-        SaveSetting("atcSeasons", lst.Tag, "dummy", "")
-        DeleteSetting("atcSeasons", lst.Tag)
-        For Each lItem As String In lst.SelectedItems
-            SaveSetting("atcSeasons", lst.Tag, lItem, lItem)
+    Private Sub SaveListSelected(ByVal aListbox As Windows.Forms.ListBox)
+        SaveSetting("atcSeasons", aListbox.Tag, "dummy", "")
+        DeleteSetting("atcSeasons", aListbox.Tag)
+        For Each lSelectedItem As String In aListbox.SelectedItems
+            SaveSetting("atcSeasons", aListbox.Tag, lSelectedItem, lSelectedItem)
         Next
     End Sub
 
-    Private Sub LoadListSelected(ByVal lst As Windows.Forms.ListBox)
-        Dim lSelectedArray As String(,) = GetAllSettings("atcSeasons", lst.Tag)
+    Private Sub LoadListSelected(ByVal aListbox As Windows.Forms.ListBox)
+        Dim lSelectedArray As String(,) = GetAllSettings("atcSeasons", aListbox.Tag)
         Dim lItemIndex As Integer
         Try
-            lst.ClearSelected()
+            aListbox.ClearSelected()
             For lIndex As Integer = lSelectedArray.GetUpperBound(0) To 0 Step -1
                 Dim lSelectedItem As String = lSelectedArray(lIndex, 1)
-                For lItemIndex = lst.Items.Count - 1 To 0 Step -1
-                    If lst.Items(lItemIndex) = lSelectedItem Then
-                        lst.SetSelected(lItemIndex, True)
+                For lItemIndex = aListbox.Items.Count - 1 To 0 Step -1
+                    If aListbox.Items(lItemIndex) = lSelectedItem Then
+                        aListbox.SetSelected(lItemIndex, True)
                         Exit For
                     End If
                 Next
@@ -306,7 +306,7 @@ Public Class frmSpecifySeasonalAttributes
 
     Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
         lstSeasons.Items.Clear()
-        Dim lSeasonSource As atcDataSource = CurrentSeason()
+        Dim lSeasonSource As atcTimeseriesSource = CurrentSeason()
         If Not lSeasonSource Is Nothing AndAlso lstAttributes.SelectedItems.Count > 0 Then
             Dim lArguments As New atcDataAttributes
             Dim lAttributes As New atcDataAttributes
@@ -323,7 +323,7 @@ Public Class frmSpecifySeasonalAttributes
         End If
     End Sub
 
-    Private Function CurrentSeason() As atcDataSource
+    Private Function CurrentSeason() As atcTimeseriesSource
         For Each lSeason As atcDefinedValue In pSeasonsAvailable
             If lSeason.Definition.Name.Equals(cboSeasons.Text & "::SeasonalAttributes") Then
                 Return lSeason.Definition.Calculator
@@ -334,7 +334,7 @@ Public Class frmSpecifySeasonalAttributes
 
     Private Function CalculateAttributes(ByVal aAttributes As atcDataAttributes, _
                                          ByVal aSetInTimeseries As Boolean) As atcDataAttributes
-        Dim lSeasonSource As atcDataSource = CurrentSeason()
+        Dim lSeasonSource As atcTimeseriesSource = CurrentSeason()
         Dim lCalculatedAttributes As New atcDataAttributes
         Dim lAllCalculatedAttributes As atcDataAttributes
 
@@ -349,7 +349,7 @@ Public Class frmSpecifySeasonalAttributes
             lArguments.SetValue("Attributes", aAttributes)
             lArguments.SetValue("CalculatedAttributes", lCalculatedAttributes)
 
-            For Each lTimeseries As atcTimeseries In pGroup
+            For Each lTimeseries As atcTimeseries In pTimseriesGroup
                 lArguments.SetValue("Timeseries", lTimeseries)
                 lSeasonSource.Open(cboSeasons.Text & "::SeasonalAttributes", lArguments)
                 If aSetInTimeseries Then

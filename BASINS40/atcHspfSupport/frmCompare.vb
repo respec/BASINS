@@ -16,7 +16,7 @@ Public Class frmCompare
             .Filter = "Text Files|*.txt|All Files|*.*"
             .FilterIndex = 0
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                Dim lDataGroup As atcDataGroup = DateChooser.CreateSelectedDataGroupSubset
+                Dim lDataGroup As atcTimeseriesGroup = DateChooser.CreateSelectedDataGroupSubset
 
                 Dim lTU As atcTimeUnit
                 If radioTUDaily.Checked Then
@@ -38,9 +38,9 @@ Public Class frmCompare
     End Sub
 
     Private Sub btnObserved_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnObserved.Click
-        Dim lHad As New atcDataGroup
+        Dim lHad As New atcTimeseriesGroup
         If pObserved IsNot Nothing Then lHad.Add(pObserved)
-        Dim lUserSelected As atcDataGroup = atcDataManager.UserSelectData("Select Observed Dataset", lHad)
+        Dim lUserSelected As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Observed Dataset", lHad)
         If lUserSelected.Count > 0 Then
             pObserved = lUserSelected(0)
             txtObserved.Text = pObserved.ToString
@@ -52,9 +52,9 @@ Public Class frmCompare
     End Sub
 
     Private Sub btnSimulated_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSimulated.Click
-        Dim lHad As New atcDataGroup
+        Dim lHad As New atcTimeseriesGroup
         If pSimulated IsNot Nothing Then lHad.Add(pSimulated)
-        Dim lUserSelected As atcDataGroup = atcDataManager.UserSelectData("Select Simulated Dataset", lHad)
+        Dim lUserSelected As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Simulated Dataset", lHad)
         If lUserSelected.Count > 0 Then
             pSimulated = lUserSelected(0)
             txtSimulated.Text = pSimulated.ToString
@@ -74,7 +74,7 @@ Public Class frmCompare
     End Sub
 
     Private Sub SetDates()
-        Dim lDataGroup As New atcDataGroup
+        Dim lDataGroup As New atcTimeseriesGroup
         If pObserved IsNot Nothing Then lDataGroup.Add(pObserved)
         If pSimulated IsNot Nothing Then lDataGroup.Add(pSimulated)
 

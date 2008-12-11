@@ -8,7 +8,7 @@ Imports MapWinUtility
 Imports System.IO
 
 Public Class atcDataSourceBasinsObsWQ
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "Basins Observed WQ Files (*.dbf)|*.dbf"

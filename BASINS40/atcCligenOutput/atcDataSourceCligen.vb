@@ -11,7 +11,7 @@ Imports System.Collections
 Imports System.IO
 
 Public Class atcDataSourceCligen
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
@@ -70,7 +70,7 @@ Public Class atcDataSourceCligen
             End If
 
             Try
-                Dim lDailyData As New atcDataGroup
+                Dim lDailyTimeseriesGroup As New atcTimeseriesGroup
                 Dim lTable As New atcTableFixed
                 Dim lSCol() As Integer = {0, 2, 5, 8, 12, 18, 24, 29, 36, 42, 48, 53, 58, 64}
                 Dim lFLen() As Integer = {0, 2, 2, 4, 6, 6, 5, 7, 6, 6, 5, 5, 6, 6}
@@ -96,7 +96,7 @@ Public Class atcDataSourceCligen
                             lTable.CurrentRecord = lRecordNumber
                             For i = 4 To .NumFields
                                 lTSKey = .FieldName(i)
-                                lData = lDailyData.ItemByKey(lTSKey)
+                                lData = lDailyTimeseriesGroup.ItemByKey(lTSKey)
                                 If lData Is Nothing Then
                                     lData = New atcTimeseries(Me)
                                     lData.Dates = New atcTimeseries(Me)
@@ -110,7 +110,7 @@ Public Class atcDataSourceCligen
                                     lData.Attributes.SetValue("point", False)
                                     lData.Attributes.SetValue("tu", atcTimeUnit.TUDay)
                                     lData.Attributes.SetValue("ts", 1)
-                                    lDailyData.Add(lTSKey, lData)
+                                    lDailyTimeseriesGroup.Add(lTSKey, lData)
                                 End If
                                 lDate(0) = .Value(3)
                                 lDate(1) = .Value(2)
@@ -127,15 +127,15 @@ Public Class atcDataSourceCligen
                                 End If
                             Next i
                         Next lRecordNumber
-                        For Each lData In lDailyData
+                        For Each lData In lDailyTimeseriesGroup
                             lData.numValues = lData.Attributes.GetValue("Count")
                         Next
                         If lIncludeDaily Then
-                            DataSets.AddRange(lDailyData)
+                            DataSets.AddRange(lDailyTimeseriesGroup)
                         End If
                         If lIncludeHourly Then
-                            Dim lHourlyData As New atcDataGroup
-                            lHourlyData = DisaggCliGen(lDailyData)
+                            Dim lHourlyData As New atcTimeseriesGroup
+                            lHourlyData = DisaggCliGen(lDailyTimeseriesGroup)
                             DataSets.AddRange(lHourlyData)
                         End If
                         Open = True
@@ -225,21 +225,21 @@ Public Class atcDataSourceCligen
         End If
     End Function
 
-    Private Function DisaggCliGen(ByVal aDailyData As atcDataGroup) As atcDataGroup
+    Private Function DisaggCliGen(ByVal aDailyData As atcTimeseriesGroup) As atcTimeseriesGroup
 
         Dim lDisTS As New atcMetCmp.atcMetCmpPlugin
         Dim lts As atcTimeseries
 
         Dim lArgsMet As New atcDataAttributes
-        Dim lMatch As New atcDataGroup
+        Dim lMatch As New atcTimeseriesGroup
         Dim lErr As String = ""
         Dim lStr As String = ""
 
         Logger.Dbg("CliGenUpdate:FindDataManager")
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+        Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
         Logger.Dbg("CliGenUpdate:TsMath: " & lTsMath.ToString)
 
-        Dim lDataGroup As New atcDataGroup
+        Dim lDataGroup As New atcTimeseriesGroup
 
         Dim lTMax As atcTimeseries = Nothing
         Dim lTMin As atcTimeseries = Nothing

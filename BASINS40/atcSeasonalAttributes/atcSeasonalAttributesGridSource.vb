@@ -5,15 +5,15 @@ Imports atcUtility
 Friend Class atcSeasonalAttributesGridSource
     Inherits atcControls.atcGridSource
 
-    Private pDataGroup As atcDataGroup
+    Private pTimeseriesGroup As atcTimeseriesGroup
     Private pSeasons As SortedList
     Private pAttributes As SortedList
 
-    Sub New(ByVal aDataGroup As atcData.atcDataGroup)
-        pDataGroup = aDataGroup
+    Sub New(ByVal aTimseriesGroup As atcData.atcTimeseriesGroup)
+        pTimeseriesGroup = aTimseriesGroup
         pAttributes = New SortedList
         pSeasons = New SortedList
-        For Each lData As atcDataSet In pDataGroup
+        For Each lData As atcDataSet In pTimeseriesGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing AndAlso lAttribute.Arguments.ContainsAttribute("SeasonIndex") Then
                     Dim lSeasonDefinition As atcSeasonBase = lAttribute.Arguments.GetValue("SeasonDefinition")
@@ -49,7 +49,7 @@ Friend Class atcSeasonalAttributesGridSource
     Overrides Property Rows() As Integer
         Get
             Try
-                Return pDataGroup.Count * pAttributes.Count + 1
+                Return pTimeseriesGroup.Count * pAttributes.Count + 1
             Catch
                 Return 1
             End Try
@@ -69,10 +69,10 @@ Friend Class atcSeasonalAttributesGridSource
             Else
                 Dim lAttributeIndex As Integer = (aRow - 1) Mod pAttributes.Count
                 Select Case aColumn
-                    Case 0 : Return pDataGroup((aRow - 1) \ pAttributes.Count).ToString
+                    Case 0 : Return pTimeseriesGroup((aRow - 1) \ pAttributes.Count).ToString
                     Case 1 : Return pAttributes.GetByIndex(lAttributeIndex)
                     Case Else
-                        With pDataGroup((aRow - 1) \ pAttributes.Count).Attributes
+                        With pTimeseriesGroup((aRow - 1) \ pAttributes.Count).Attributes
                             Dim lSeasonalAttrName As String = pAttributes.GetByIndex(lAttributeIndex) & " " & pSeasons.GetKey(aColumn - 2)
                             CellValue = .GetFormattedValue(lSeasonalAttrName, "<nothing>") 'works first try only for 3-digit seasons
                             If CellValue.Equals("<nothing>") Then 'work around formatting issue for 2 digit season index

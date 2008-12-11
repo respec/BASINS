@@ -3,7 +3,7 @@ Public Class atcTimeseries
     Inherits atcDataSet
 
     Private pDates As atcTimeseries
-    Private pDataSource As atcDataSource
+    Private pDataSource As atcTimeseriesSource
     Private pValuesNeedToBeRead As Boolean
 
     Private pNumValues As Integer
@@ -237,21 +237,21 @@ Public Class atcTimeseries
         Return lClone
     End Function
 
-    Public Overloads Function Clone(ByVal aDataSource As atcDataSource) As atcDataSet
+    Public Overloads Function Clone(ByVal aDataSource As atcTimeseriesSource) As atcDataSet
         Dim lClone As atcTimeseries = Me.Clone
         lClone.pDataSource = aDataSource
         Return lClone
     End Function
 
     ''' <summary>Create a new timeseries and reference the source that it came from</summary>
-    Public Sub New(ByVal aDataSource As atcDataSource)
+    Public Sub New(ByVal aTimeseriesSource As atcTimeseriesSource)
         MyBase.New()
 
         Clear()
-        pDataSource = aDataSource
-        If Not aDataSource Is Nothing Then
+        pDataSource = aTimeseriesSource
+        If Not aTimeseriesSource Is Nothing Then
             Try
-                Attributes.SetValue("Data Source", aDataSource.Specification)
+                Attributes.SetValue("Data Source", aTimeseriesSource.Specification)
             Catch ex As Exception
                 'atcDataSource is not really an atcDataSource
             End Try

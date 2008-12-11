@@ -461,7 +461,7 @@ Public Class frmVariationCligen
     Private Sub UserSelectData(ByVal aCligenConstituent As String)
         Dim lReplaceIndex As Integer = pVariation.DataSets.IndexFromKey(aCligenConstituent)
         Dim lDataSet As atcDataSet = pVariation.DataSets.Item(lReplaceIndex)
-        Dim lData As New atcDataGroup
+        Dim lData As New atcTimeseriesGroup
         If Not lDataSet Is Nothing Then lData.Add(lDataSet)
         lData = atcDataManager.UserSelectData("Select data to replace with Cligen " & aCligenConstituent, lData)
         If Not lData Is Nothing AndAlso lData.Count > 0 Then

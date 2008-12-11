@@ -5,7 +5,7 @@ Imports MapWinUtility
 Imports System.Windows.Forms
 
 Public Class atcTimeseriesNdayHighLow
-    Inherits atcData.atcDataSource
+    Inherits atcData.atcTimeseriesSource
     Private pAvailableOperations As atcDataAttributes
     Private Const pName As String = "Timeseries::n-day high/low"
 
@@ -196,9 +196,9 @@ Public Class atcTimeseriesNdayHighLow
                                          ByVal aHigh As Boolean, _
                                          ByVal aAttributesStorage As atcDataAttributes, _
                                 Optional ByVal aEndMonth As Integer = 0, _
-                                Optional ByVal aEndDay As Integer = 0) As atcDataGroup 'atcTimeseries
+                                Optional ByVal aEndDay As Integer = 0) As atcTimeseriesGroup 'atcTimeseries
         Dim lNDay() As Double = Obj2Array(aNDay)
-        Dim newTsGroup As New atcDataGroup
+        Dim newTsGroup As New atcTimeseriesGroup
         Try
             aTimeseries.EnsureValuesRead()
             Dim sjday As Double = aTimeseries.Dates.Value(0)
@@ -335,7 +335,7 @@ Public Class atcTimeseriesNdayHighLow
                         newTsGroup.Add(newTS)
                     End If
                 Else
-                Logger.Dbg("Skip:NDay=" & lNDayNow)
+                    Logger.Dbg("Skip:NDay=" & lNDayNow)
                 End If
             Next
         Catch ex As Exception
@@ -350,7 +350,7 @@ Public Class atcTimeseriesNdayHighLow
                            ByVal aAttributesStorage As atcDataAttributes, _
                   Optional ByVal aEndMonth As Integer = 0, _
                   Optional ByVal aEndDay As Integer = 0)
-        Dim lNdayTsGroup As atcDataGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh, aAttributesStorage, aEndMonth, aEndDay)
+        Dim lNdayTsGroup As atcTimeseriesGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh, aAttributesStorage, aEndMonth, aEndDay)
 
         If Not lNdayTsGroup Is Nothing Then
             For Each lNdayTs As atcTimeseries In lNdayTsGroup
@@ -443,11 +443,11 @@ Public Class atcTimeseriesNdayHighLow
                            ByVal aRecurOrProb As Object, _
                            ByVal aLogFg As Boolean, _
                            ByVal aAttributesStorage As atcDataAttributes, _
-                  Optional ByRef aNdayTsGroup As atcDataGroup = Nothing, _
+                  Optional ByRef aNdayTsGroup As atcTimeseriesGroup = Nothing, _
                   Optional ByVal aEndMonth As Integer = 0, _
                   Optional ByVal aEndDay As Integer = 0)
 
-        Dim lTsMath As atcDataSource = Nothing
+        Dim lTsMath As atcTimeseriesSource = Nothing
         Dim lQ As Double
         Dim lMsg As String = ""
 
@@ -474,7 +474,7 @@ Public Class atcTimeseriesNdayHighLow
                 If aLogFg Then 'calc log10 of n day annual series
                     Dim lArgsMath As New atcDataAttributes
                     lTsMath = New atcTimeseriesMath.atcTimeseriesMath
-                    lArgsMath.SetValue("timeseries", New atcDataGroup(lNonLogTs))
+                    lArgsMath.SetValue("timeseries", New atcTimeseriesGroup(lNonLogTs))
                     lTsMath.Open("log 10", lArgsMath)
                     'Save non-log timeseries
                     lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNonLogTs)
@@ -527,7 +527,7 @@ Public Class atcTimeseriesNdayHighLow
     'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
     'remaining aArgs are expected to follow the args required for the specified operation
     Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-        Dim ltsGroup As atcDataGroup = Nothing
+        Dim ltsGroup As atcTimeseriesGroup = Nothing
         Dim lTs As atcTimeseries
         Dim lTsB As atcTimeseries
         Dim lLogFlg As Boolean = True
@@ -613,7 +613,7 @@ Public Class atcTimeseriesNdayHighLow
         End If
 
         For Each lTs In ltsGroup
-            Dim lNDayTsGroup As atcDataGroup = Nothing 'atcTimeseries
+            Dim lNDayTsGroup As atcTimeseriesGroup = Nothing 'atcTimeseries
             If lTs.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
                 lTsB = lTs
             Else

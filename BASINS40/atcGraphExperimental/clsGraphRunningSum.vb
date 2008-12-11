@@ -9,17 +9,17 @@ Public Class clsGraphRunningSum
     Inherits clsGraphBase
 
     <CLSCompliant(False)> _
-    Public Sub New(ByVal aDataGroup As atcDataGroup, ByVal aZedGraphControl As ZedGraphControl)
+    Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl)
         MyBase.New(aDataGroup, aZedGraphControl)
     End Sub
 
-    Public Overrides Property Datasets() As atcDataGroup
+    Public Overrides Property Datasets() As atcTimeseriesGroup
         Get
             Return MyBase.Datasets
         End Get
-        Set(ByVal aDataGroup As atcDataGroup)
-            Dim lRunningSums As New atcDataGroup
-            Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+        Set(ByVal aDataGroup As atcTimeseriesGroup)
+            Dim lRunningSums As New atcTimeseriesGroup
+            Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
             For Each lTimeseries As atcTimeseries In aDataGroup
                 Dim lArgsMath As New atcDataAttributes
                 lArgsMath.SetValue("timeseries", lTimeseries)

@@ -8,15 +8,15 @@ Public Class clsGraphTime
     Inherits clsGraphBase
 
     <CLSCompliant(False)> _
-    Public Sub New(ByVal aDataGroup As atcDataGroup, ByVal aZedGraphControl As ZedGraphControl)
+    Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl)
         MyBase.New(aDataGroup, aZedGraphControl)
     End Sub
 
-    Public Overrides Property Datasets() As atcDataGroup
+    Public Overrides Property Datasets() As atcTimeseriesGroup
         Get
             Return MyBase.Datasets
         End Get
-        Set(ByVal newValue As atcDataGroup)
+        Set(ByVal newValue As atcTimeseriesGroup)
             MyBase.Datasets = newValue
             AddTimeseriesCurves(newValue, pZgc)
             pZgc.Refresh()

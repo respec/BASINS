@@ -6,7 +6,7 @@ Public Class frmDisSol
     Inherits System.Windows.Forms.Form
 
     Private pOk As Boolean
-    Private pTSGroup As atcDataGroup
+    Private pTSGroup As atcTimeseriesGroup
     Private cLat As Double
 
 #Region " Windows Form Designer generated code "

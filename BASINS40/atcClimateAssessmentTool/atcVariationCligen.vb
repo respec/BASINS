@@ -14,13 +14,13 @@ Public Class VariationCligen
     Public NumYears As Integer = 4
 
     Public Sub New()
-        DataSets = New atcDataGroup
+        DataSets = New atcTimeseriesGroup
         For Each lConstituent As String In CligenConstituents
             DataSets.Add(lConstituent, Nothing)
         Next
     End Sub
 
-    Protected Overrides Function VaryData() As atcData.atcDataGroup
+    Protected Overrides Function VaryData() As atcData.atcTimeseriesGroup
         Dim lHeader As String = Nothing
         Dim lFooter As String = Nothing
         Dim lTable As atcTableFixed = Nothing

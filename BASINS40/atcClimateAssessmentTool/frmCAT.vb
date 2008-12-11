@@ -1172,10 +1172,10 @@ Public Class frmCAT
                 lstInputs.SelectedIndex = 0
             End If
             If lstInputs.SelectedIndices.Count > 0 Then
-                Dim lData As New atcDataGroup
+                Dim lData As New atcTimeseriesGroup
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                 For Each lIndex As Integer In lstInputs.SelectedIndices
-                    Dim lDataThisIteration As atcDataGroup
+                    Dim lDataThisIteration As atcTimeseriesGroup
                     Dim lVariation As atcVariation = pCat.Inputs.Item(lIndex)
                     lDataThisIteration = lVariation.StartIteration
                     While Not lDataThisIteration Is Nothing

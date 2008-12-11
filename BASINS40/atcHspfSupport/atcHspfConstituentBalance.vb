@@ -8,7 +8,7 @@ Public Module ConstituentBalance
                               ByVal aOperations As atcCollection, _
                               ByVal aBalanceTypes As atcCollection, _
                               ByVal aScenario As String, _
-                              ByVal aScenarioResults As atcDataSource, _
+                              ByVal aScenarioResults As atcTimeseriesSource, _
                               ByVal aLocations As atcCollection, _
                               ByVal aRunMade As String, _
                      Optional ByVal aDateColumns As Boolean = False, _
@@ -31,7 +31,7 @@ Public Module ConstituentBalance
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcDataSource, _
+                           ByVal aScenarioResults As atcTimeseriesSource, _
                            ByVal aLocations As atcCollection, _
                            ByVal aRunMade As String, _
                   Optional ByVal aDateRows As Boolean = False, _
@@ -56,14 +56,14 @@ Public Module ConstituentBalance
         End If
         lString.AppendLine(vbCrLf)
 
-        Dim lConstituentDataGroup As atcDataGroup
+        Dim lConstituentDataGroup As atcTimeseriesGroup
         Dim lTempDataSet As atcDataSet
 
         For Each lOperationKey As String In aOperationTypes.Keys
             For Each lLocation As String In aLocations
                 If lLocation.StartsWith(lOperationKey) Then
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
-                    Dim lLocationDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
+                    Dim lLocationDataGroup As atcTimeseriesGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
                     'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                     Dim lNeedHeader As Boolean = True
                     Dim lPendingOutput As String = ""

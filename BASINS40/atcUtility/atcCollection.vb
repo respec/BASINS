@@ -292,14 +292,24 @@ Public Class atcCollection
         If lStop >= aNumValues - 1 Then lStop = aNumValues - 2
         For lIndex As Integer = 0 To lStop
             Try
-                lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex) & ") " & Me.ItemByIndex(lIndex))
+                Dim lItem As Object = Me.ItemByIndex(lIndex)
+                If TypeOf (lItem) Is ArrayList Then
+                    lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex) & ") " & "<ArrayList>")
+                Else
+                    lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex) & ") " & lItem)
+                End If
             Catch
                 'Skip listing unprintable keys/values
             End Try
         Next
         If lCount - lStop > 2 Then
             lString.AppendLine("(skipped " & lCount - lStop - 2 & " values)")
-            lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1) & ") " & Me.ItemByIndex(lCount - 1))
+            Dim lItem As Object = Me.ItemByIndex(lCount - 1)
+            If TypeOf (lItem) Is ArrayList Then
+                lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1) & ") " & "<ArrayList>")
+            Else
+                lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1) & ") " & Me.ItemByIndex(lCount - 1))
+            End If
         End If
         Return lString.ToString
     End Function

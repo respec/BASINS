@@ -16,7 +16,7 @@ Imports System.IO
 ''' </remarks>
 
 Public Class atcTimeseriesRDB
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
 
     Private Shared pFilter As String = "USGS RDB Files (*.rdb, *.txt)|*.rdb;*.txt|All Files (*.*)|(*.*)"
     Private pErrorDescription As String
@@ -325,7 +325,7 @@ Public Class atcTimeseriesRDB
                 End If
             End If
         End While
-        Dim lRawDataSets As New atcDataGroup
+        Dim lRawDataSets As New atcTimeseriesGroup
         Dim lTSIndex As Integer = 0
         Dim lNCons As Integer = 0
         Dim lData As atcTimeseries = Nothing

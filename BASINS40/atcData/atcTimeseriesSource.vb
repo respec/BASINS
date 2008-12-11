@@ -8,7 +8,11 @@ Public Class atcTimeseriesSource
 
     Public Shadows ReadOnly Property DataSets() As atcTimeseriesGroup
         Get
-            Return pData
+            Return CType(pData, atcTimeseriesGroup)
         End Get
     End Property
+
+    Public Overridable Shadows Function AddDatasets(ByVal aTimeseriesGroup As atcTimeseriesGroup) As Boolean
+        Return MyBase.AddDataSets(aTimeseriesGroup)
+    End Function
 End Class

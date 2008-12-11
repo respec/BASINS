@@ -660,7 +660,7 @@ Module HSPFOutputReports
                         Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
                         Dim lMathArgs As New atcDataAttributes
                         For lSourceIndex As Integer = 0 To lPrecSourceCollection.Count - 1
-                            Dim lPrecDataGroup As atcDataGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
+                            Dim lPrecDataGroup As atcTimeseriesGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
                             If lPrecDataGroup.Count = 0 Then
                                 Dim lPrecWdmDataSource As New atcDataSourceWDM()
                                 lPrecWdmDataSource.Open(pTestPath & "\FBMet.wdm")
@@ -674,7 +674,7 @@ Module HSPFOutputReports
                                 Else
                                     Dim lMathAdd As New atcTimeseriesMath.atcTimeseriesMath
                                     Dim lMathAddArgs As New atcDataAttributes
-                                    Dim lDataGroup As New atcDataGroup
+                                    Dim lDataGroup As New atcTimeseriesGroup
                                     lDataGroup.Add(lPrecTser)
                                     lDataGroup.Add(lMath.DataSets(0))
                                     lMathAddArgs.SetValue("Timeseries", lDataGroup)
@@ -731,7 +731,7 @@ Module HSPFOutputReports
                         lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
                         SaveFileString(lOutFileName, lStr)
 
-                        Dim lTimeSeries As New atcDataGroup
+                        Dim lTimeSeries As New atcTimeseriesGroup
                         lTimeSeries.Add("Observed", lObsTSer)
                         lTimeSeries.Add("Simulated", lSimTSer)
                         lTimeSeries.Add("Precipitation", lPrecTser)

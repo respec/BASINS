@@ -86,9 +86,9 @@ Public Class atcSeasonsYearSubset
         End If
     End Function
 
-    Public Overrides Function Split(ByVal aTS As atcData.atcTimeseries, ByVal aSource As atcData.atcDataSource) As atcData.atcDataGroup
+    Public Overrides Function Split(ByVal aTS As atcData.atcTimeseries, ByVal aSource As atcData.atcTimeseriesSource) As atcData.atcTimeseriesGroup
         'Do the split
-        Dim lSplit As atcDataGroup = MyBase.Split(aTS, aSource)
+        Dim lSplit As atcTimeseriesGroup = MyBase.Split(aTS, aSource)
 
         'Set attributes specifying when season begins and ends
         For Each lDataSet As atcDataSet In lSplit

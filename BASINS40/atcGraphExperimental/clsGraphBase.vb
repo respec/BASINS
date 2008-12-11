@@ -4,20 +4,20 @@ Imports ZedGraph
 Public Class clsGraphBase
     Implements IDisposable
 
-    Friend WithEvents pDataGroup As atcDataGroup 'The group of atcData displayed
+    Friend WithEvents pDataGroup As atcTimeseriesGroup 'The group of atcData displayed
     Friend WithEvents pZgc As ZedGraphControl    'The control used to display the data
 
     <CLSCompliant(False)> _
-    Public Sub New(ByVal aDataGroup As atcDataGroup, ByVal aZedgraphControl As ZedGraphControl)
+    Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedgraphControl As ZedGraphControl)
         Me.ZedGraphCtrl = aZedgraphControl
         Me.Datasets = aDataGroup
     End Sub
 
-    Overridable Property Datasets() As atcDataGroup
+    Overridable Property Datasets() As atcTimeseriesGroup
         Get
             Return pDataGroup
         End Get
-        Set(ByVal newValue As atcDataGroup)
+        Set(ByVal newValue As atcTimeseriesGroup)
             pDataGroup = newValue
             If Not pZgc Is Nothing AndAlso Not pZgc.IsDisposed AndAlso Not pZgc.MasterPane Is Nothing Then
                 For Each lPane As ZedGraph.GraphPane In pZgc.MasterPane.PaneList

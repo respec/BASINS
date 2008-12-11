@@ -4,7 +4,7 @@ Imports atcUtility
 Imports System.Reflection
 
 Public Class atcEventPlugin
-    Inherits atcData.atcDataSource
+    Inherits atcData.atcTimeseriesSource
 
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private pName As String = "Timeseries::Events"
@@ -37,7 +37,7 @@ Public Class atcEventPlugin
     'The attribute(s) will be set to the result(s) of calculation(s)
     Public Overrides Function Open(ByVal aOperationName As String, _
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-        Dim ltsGroup As atcDataGroup = Nothing
+        Dim ltsGroup As atcTimeseriesGroup = Nothing
         Dim lThresh As Double = GetNaN()
         Dim lDaysGapAllowed As Double = 0
         Dim lHigh As Boolean
@@ -59,7 +59,7 @@ Public Class atcEventPlugin
         End If
         If lOk Then
             For Each lts As atcTimeseries In ltsGroup
-                Dim lEvents As atcDataGroup = EventSplit(lts, Me, lThresh, lDaysGapAllowed, lHigh)
+                Dim lEvents As atcTimeseriesGroup = EventSplit(lts, Me, lThresh, lDaysGapAllowed, lHigh)
                 Select Case aOperationName
                     Case "Split"
                         MyBase.DataSets.AddRange(lEvents)
@@ -231,7 +231,7 @@ Public Class atcEventPlugin
         End Get
     End Property
 
-    Private Function MinMaxLabel(ByVal aTSGroup As atcDataGroup) As String
+    Private Function MinMaxLabel(ByVal aTSGroup As atcTimeseriesGroup) As String
         Dim lMin As Double = GetMaxValue()
         Dim lMax As Double = GetMinValue()
         Dim lMinStr As String = ""

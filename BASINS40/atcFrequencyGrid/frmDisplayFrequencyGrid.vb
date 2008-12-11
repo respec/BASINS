@@ -10,12 +10,12 @@ Friend Class frmDisplayFrequencyGrid
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
         MyBase.New()
         pInitializing = True
         Me.Visible = False
         If aDataGroup Is Nothing Then
-            pDataGroup = New atcDataGroup
+            pDataGroup = New atcTimeseriesGroup
         Else
             pDataGroup = aDataGroup
         End If
@@ -241,7 +241,7 @@ Friend Class frmDisplayFrequencyGrid
 #End Region
 
     'The group of atcTimeseries displayed
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
 
     Private pSource As atcFrequencyGridSource
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper

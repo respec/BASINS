@@ -1,5 +1,5 @@
 Imports atcData
-Imports atcData.atcDataGroup
+Imports atcData.atcTimeseriesGroup
 Imports atcUtility
 Imports MapWindow.Interfaces
 Imports MapWinUtility
@@ -31,7 +31,7 @@ Public Module ScriptShapefileFromWDM
         Logger.Dbg(" CurDir:" & CurDir())
 
         'open the wdm file
-        Dim lHspfWdmFile As atcDataSource = New atcWDM.atcDataSourceWDM
+        Dim lHspfWdmFile As atcTimeseriesSource = New atcWDM.atcDataSourceWDM
         atcDataManager.OpenDataSource(lHspfWdmFile, pTestWDMFileName, Nothing)
         Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
@@ -49,7 +49,7 @@ Public Module ScriptShapefileFromWDM
         lDisplayAttributes.Add("ejday")
         lDisplayAttributes.Add("time unit")
         lDisplayAttributes.Add("sumannual")
-        Dim lDataGroup As atcDataGroup = atcDataManager.DataSets
+        Dim lDataGroup As atcTimeseriesGroup = atcDataManager.DataSets
         Dim lSource As atcTimeseriesGridSource
         lSource = New atcTimeseriesGridSource(lDataGroup, lDisplayAttributes, "False")
 

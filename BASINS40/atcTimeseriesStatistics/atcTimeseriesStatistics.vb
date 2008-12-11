@@ -6,7 +6,7 @@ Imports System.Windows.Forms
 
 ''' <summary>Computes statistics of a timeseries</summary>
 Public Class atcTimeseriesStatistics
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private Shared pNaN As Double = GetNaN()
     Private Shared pMinValue As Double = GetMinValue()
@@ -329,7 +329,7 @@ Public Class atcTimeseriesStatistics
     'The only element of aArgs is an atcDataGroup or atcTimeseries
     'The attribute(s) will be set to the result(s) of calculation(s)
     Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-        Dim ltsGroup As atcDataGroup
+        Dim ltsGroup As atcTimeseriesGroup
         If aArgs Is Nothing Then
             ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
         Else

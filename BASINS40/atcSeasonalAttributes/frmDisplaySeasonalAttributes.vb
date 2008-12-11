@@ -10,29 +10,29 @@ Friend Class frmDisplaySeasonalAttributes
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
         MyBase.New()
         pInitializing = True
         If aDataGroup Is Nothing Then
-            pDataGroup = New atcDataGroup
+            pTimeseriesGroup = New atcTimeseriesGroup
         Else
-            pDataGroup = aDataGroup
+            pTimeseriesGroup = aDataGroup
         End If
         InitializeComponent() 'required by Windows Form Designer
 
-        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        For Each ldisp As atcDataDisplay In DisplayPlugins
-            Dim lMenuText As String = ldisp.Name
+        Dim lDisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+        For Each lDisplayPlugin As atcDataDisplay In lDisplayPlugins
+            Dim lMenuText As String = lDisplayPlugin.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
             mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
         Next
 
-        If pDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, pDataGroup)
+        If pTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
+            atcDataManager.UserSelectData(, pTimeseriesGroup)
         End If
 
         pInitializing = False
-        If pDataGroup.Count > 0 Then
+        If pTimeseriesGroup.Count > 0 Then
             PopulateGrid()
         Else 'user declined to specify Data
             Me.Close()
@@ -211,7 +211,7 @@ Friend Class frmDisplaySeasonalAttributes
 #End Region
 
     'The group of atcTimeseries displayed
-    Private WithEvents pDataGroup As atcDataGroup
+    Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
 
     'Translator class between pDataGroup and agdMain
     Private pSource As atcSeasonalAttributesGridSource
@@ -219,10 +219,10 @@ Friend Class frmDisplaySeasonalAttributes
 
     Private Sub PopulateGrid()
         Dim lWasSwapped As Boolean = Not pSwapperSource Is Nothing AndAlso pSwapperSource.SwapRowsColumns
-        pSource = New atcSeasonalAttributesGridSource(pDataGroup)
+        pSource = New atcSeasonalAttributesGridSource(pTimeseriesGroup)
         If pSource.Columns < 3 Then
             UserSpecifyAttributes()
-            pSource = New atcSeasonalAttributesGridSource(pDataGroup)
+            pSource = New atcSeasonalAttributesGridSource(pTimeseriesGroup)
         End If
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         If lWasSwapped Then pSwapperSource.SwapRowsColumns = True
@@ -232,19 +232,19 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pTimeseriesGroup)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pDataGroup, , False)
+        atcDataManager.UserSelectData(, pTimeseriesGroup, , False)
     End Sub
 
-    Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
+    Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pTimeseriesGroup.Added
         If Not pInitializing Then PopulateGrid()
         'TODO: could efficiently insert newly added item(s)
     End Sub
 
-    Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
+    Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pTimeseriesGroup.Removed
         If Not pInitializing Then PopulateGrid()
         'TODO: could efficiently remove by serial number
     End Sub
@@ -263,7 +263,7 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub mnuFileForgetAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileForgetAttributes.Click
-        For Each lData As atcDataSet In pDataGroup
+        For Each lData As atcDataSet In pTimeseriesGroup
             Dim lRemoveThese As New ArrayList
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing AndAlso lAttribute.Arguments.ContainsAttribute("SeasonIndex") Then
@@ -296,14 +296,14 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub UserSpecifyAttributes()
-        For Each lPlugin As atcDataPlugin In atcDataManager.GetPlugins(GetType(atcDataSource))
+        For Each lPlugin As atcDataPlugin In atcDataManager.GetPlugins(GetType(atcTimeseriesSource))
             If (lPlugin.Name = "Timeseries::Seasons") Then
-                Dim typ As System.Type = lPlugin.GetType()
-                Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-                Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
-                Dim newArguments As New atcDataAttributes
-                newArguments.SetValue("Timeseries", pDataGroup)
-                newSource.Open("SeasonalAttributes", newArguments)
+                Dim lType As System.Type = lPlugin.GetType()
+                Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
+                Dim lNewTimeseriesSource As atcTimeseriesSource = lAssembly.CreateInstance(lType.FullName)
+                Dim lNewArguments As New atcDataAttributes
+                lNewArguments.SetValue("Timeseries", pTimeseriesGroup)
+                lNewTimeseriesSource.Open("SeasonalAttributes", lNewArguments)
                 Exit For
             End If
         Next
@@ -330,7 +330,7 @@ Friend Class frmDisplaySeasonalAttributes
     End Property
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        pDataGroup = Nothing
+        pTimeseriesGroup = Nothing
         pSource = Nothing
     End Sub
 

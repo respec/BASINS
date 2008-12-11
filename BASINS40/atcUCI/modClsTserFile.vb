@@ -3,5 +3,5 @@ Option Strict Off
 Option Explicit On
 
 Module modClsTserFile
-    Public pTserFiles As New atcData.atcDataGroup
+    Public pTserFiles As New atcData.atcTimeseriesGroup
 End Module

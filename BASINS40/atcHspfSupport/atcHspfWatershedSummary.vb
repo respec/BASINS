@@ -6,7 +6,7 @@ Imports MapWinUtility
 Public Module WatershedSummary
     Public Sub ReportsToFiles(ByVal aSummaryTypes As atcCollection, _
                               ByVal aUci As atcUCI.HspfUci, _
-                              ByVal aScenarioResults As atcDataSource, _
+                              ByVal aScenarioResults As atcTimeseriesSource, _
                               ByVal aRunMade As String)
 
         For Each lSummaryType As String In aSummaryTypes
@@ -17,7 +17,7 @@ Public Module WatershedSummary
         Next lSummaryType
     End Sub
 
-    Public Function Report(ByVal aUci As HspfUci, ByVal aScenarioResults As atcDataSource, ByVal aRunMade As String, ByVal aSummaryType As String) As System.Text.StringBuilder
+    Public Function Report(ByVal aUci As HspfUci, ByVal aScenarioResults As atcTimeseriesSource, ByVal aRunMade As String, ByVal aSummaryType As String) As System.Text.StringBuilder
         Dim lAgchemConstituent As String = ""
         Dim lUnits As String = "lbs"
         Dim lTotalUnits As String = lUnits
@@ -137,7 +137,7 @@ Public Module WatershedSummary
                     lLuName = lOper.Tables("GEN-INFO").Parms(0).Value
                     lLuArea = LandArea(lOper.Name, lOper.Id, aUci)
 
-                    Dim lTempDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
+                    Dim lTempDataGroup As atcTimeseriesGroup = aScenarioResults.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
                     If lTempDataGroup Is Nothing Then
                         Logger.Dbg("No Data") 'TODO: for?
                     End If

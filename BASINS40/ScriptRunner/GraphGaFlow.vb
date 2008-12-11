@@ -10,7 +10,7 @@ Imports MapWinUtility
 Imports System
 
 Module GraphGaFlow
-    Private Const pTestPath As String = "C:\Basins\data\03130001\flow"
+    Private Const pTestPath As String = "d:\Basins\data\03130001\flow"
     Private Const pBaseName As String = "flow"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -19,18 +19,18 @@ Module GraphGaFlow
         Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
         Dim lWdmDataSource As New atcDataSourceWDM
         If lWdmDataSource.Open(lWdmFileName) Then
-            Dim lDataGroup As New atcDataGroup
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
             ChDriveDir(IO.Directory.GetCurrentDirectory & "\outfiles")
 
-            Dim lTserDaily As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(30) 'Peachtree Ck
-            Dim lHighLowSource As atcDataSource = New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+            Dim lTimeseriesDaily As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(30) 'Peachtree Ck
+            Dim lHighLowSource As atcTimeseriesSource = New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
             Dim lArgsMath As New atcDataAttributes
-            lArgsMath.SetValue("timeseries", lTserDaily)
+            lArgsMath.SetValue("timeseries", lTimeseriesDaily)
             lArgsMath.SetValue("LogFlg", True)
             lArgsMath.SetValue("NDay", 1)
             lArgsMath.SetValue("HighFlag", True)
             lHighLowSource.Open("n-day high timeseries", lArgsMath)
-            Dim lTserNDay As atcTimeseries = lHighLowSource.DataSets(0)
+            Dim lTimeseriesNDay As atcTimeseries = lHighLowSource.DataSets(0)
             Dim lList As New atcListPlugin
             lList.Save(lHighLowSource.DataSets, IO.Path.Combine(CurDir, "Hi1Day.txt"), "DateFormatIncludeYears")
 
@@ -48,27 +48,27 @@ Module GraphGaFlow
 
             Dim lTser1 As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(9) 'Chattahoochee at Buford
             lTser1.Attributes.SetValue("YAxis", "Left")
-            lDataGroup.Add(SubsetByDate(lTser1, _
+            lTimeseriesGroup.Add(SubsetByDate(lTser1, _
                                         lSDateJ, _
                                         lEdatej, Nothing))
 
             Dim lTser2 As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(15) 'Chattahoochee at Norcross
             lTser2.Attributes.SetValue("YAxis", "Left")
-            lDataGroup.Add(SubsetByDate(lTser2, _
+            lTimeseriesGroup.Add(SubsetByDate(lTser2, _
                                         lSDateJ, _
                                         lEdatej, Nothing))
 
-            GraphScatterBatch(lDataGroup)
-            GraphDurationBatch(lDataGroup)
-            GraphTimeseriesBatch(lDataGroup)
-            GraphResidualBatch(lDataGroup)
-            GraphCumDifBatch(lDataGroup)
+            GraphScatterBatch(lTimeseriesGroup)
+            GraphDurationBatch(lTimeseriesGroup)
+            GraphTimeseriesBatch(lTimeseriesGroup)
+            GraphResidualBatch(lTimeseriesGroup)
+            GraphCumDifBatch(lTimeseriesGroup)
         Else
             Logger.Msg("Unable to Open " & lWdmFileName)
         End If
     End Sub
 
-    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphTimeseriesBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lOutFileName As String = pBaseName
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
@@ -88,7 +88,7 @@ Module GraphGaFlow
         lZgc.Dispose()
     End Sub
 
-    Sub GraphScatterBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphScatterBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lOutFileName As String = pBaseName & "_scat"
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphScatter(aDataGroup, lZgc)
@@ -111,7 +111,7 @@ Module GraphGaFlow
         lZgc.Dispose()
     End Sub
 
-    Sub GraphDurationBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphDurationBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lOutFileName As String = pBaseName & "_dur"
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphProbability(aDataGroup, lZgc)
@@ -121,7 +121,7 @@ Module GraphGaFlow
         lZgc.Dispose()
     End Sub
 
-    Sub GraphResidualBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphResidualBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphResidual(aDataGroup, lZgc)
         Dim lOutFileName As String = pBaseName & "_residual"
@@ -130,7 +130,7 @@ Module GraphGaFlow
         lZgc.Dispose()
     End Sub
 
-    Sub GraphCumDifBatch(ByVal aDataGroup As atcDataGroup)
+    Sub GraphCumDifBatch(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphCumulativeDifference(aDataGroup, lZgc)
         Dim lOutFileName As String = pBaseName & "_cumDif"
