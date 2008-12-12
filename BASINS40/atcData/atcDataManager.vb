@@ -582,15 +582,33 @@ Public Class atcDataManager
 
     <CLSCompliant(False)> _
     Public Shared Function AddMenuIfMissing(ByVal aMenuName As String, _
-                                    ByVal aParent As String, _
-                                    ByVal aMenuText As String, _
-                           Optional ByVal aAfter As String = "", _
-                           Optional ByVal aBefore As String = "", _
-                           Optional ByVal aAlphabetical As Boolean = False) _
-                           As MapWindow.Interfaces.MenuItem
+                                            ByVal aParent As String, _
+                                            ByVal aMenuText As String, _
+                                   Optional ByVal aAfter As String = "", _
+                                   Optional ByVal aBefore As String = "", _
+                                   Optional ByVal aAlphabetical As Boolean = False) _
+                                              As MapWindow.Interfaces.MenuItem
+        Return AddMenuWithIcon(aMenuName, aParent, aMenuText, Nothing, aAfter, aBefore, aAlphabetical)
+    End Function
+
+    <CLSCompliant(False)> _
+    Public Shared Function AddMenuWithIcon(ByVal aMenuName As String, _
+                                           ByVal aParent As String, _
+                                           ByVal aMenuText As String, _
+                                           ByVal aIcon As System.Drawing.Icon, _
+                                  Optional ByVal aAfter As String = "", _
+                                  Optional ByVal aBefore As String = "", _
+                                  Optional ByVal aAlphabetical As Boolean = False) _
+                                              As MapWindow.Interfaces.MenuItem
         If pMapWin Is Nothing Then
             Return Nothing
         Else
+            Dim lImage As System.Drawing.Image
+            If aIcon IsNot Nothing Then
+                lImage = aIcon.ToBitmap
+            Else
+                lImage = pMapWin.ApplicationInfo.FormIcon.ToBitmap
+            End If
             With pMapWin.Menus
                 'Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
                 'If Not lMenu Is Nothing Then 'This item already exists
@@ -627,20 +645,20 @@ Public Class atcDataManager
                             If (aBefore.Length > 0 AndAlso lExistingMenu.Text = aBefore) OrElse _
                                lExistingMenu.Text > aMenuText Then
                                 'Add before existing menu with alphabetically later text
-                                Return .AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
+                                Return .AddMenu(aMenuName, aParent, lImage, aMenuText, lExistingMenu.Name)
                             End If
                         End If
                         lSubmenuIndex += 1
                     End While
                     'Add at default position, after last parent subitem
-                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText)
+                    Return .AddMenu(aMenuName, aParent, lImage, aMenuText)
                 ElseIf aBefore.Length > 0 Then
-                    Return .AddMenu(aMenuName, aParent, aMenuText, aBefore)
+                    Return .AddMenu(aMenuName, aParent, lImage, aMenuText, aBefore)
                 Else
-                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
+                    Return .AddMenu(aMenuName, aParent, lImage, aMenuText, aAfter)
                 End If
             End With
-        End If
+            End If
     End Function
 #End Region
 

@@ -2,9 +2,12 @@ Imports atcUtility
 Imports atcData
 Imports MapWinUtility
 
+''' <summary>
+''' Binary storage format for atcTimeseries
+''' </summary>
+''' <remarks>Copyright 2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 Public Class atcDataSourceTimeseriesBinary
     Inherits atcTimeseriesSource
-    '##MODULE_REMARKS Copyright 2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "Binary Files (*.tsbin)|*.tsbin"
     Private Shared pVersion As Integer = &H54534231 'TSB1 
@@ -68,6 +71,7 @@ Public Class atcDataSourceTimeseriesBinary
                                     Case 1 : lData.Attributes.SetValue(lAttributeName, lReader.ReadString)
                                     Case 2 : lData.Attributes.SetValue(lAttributeName, lReader.ReadInt32)
                                     Case 3 : lData.Attributes.SetValue(lAttributeName, lReader.ReadDouble)
+                                    Case 4 : lData.Attributes.SetValue(lAttributeName, lReader.ReadSingle)
                                     Case Else
                                         Debug.Print(lAttributeType)
                                 End Select
@@ -146,19 +150,25 @@ Public Class atcDataSourceTimeseriesBinary
                     Case Else
                         Dim lType As Byte = 0
                         Select Case lAttribute.Definition.TypeString
-                            Case "String" : lType = 1
-                            Case "Integer" : lType = 2
-                            Case "Double" : lType = 3
-                            Case "atcTimeUnit"
-                                lType = 1
+                            Case "String", "atcTimeUnit"
+                                lWriter.Write(lName)
+                                lWriter.Write(CByte(1))
+                                lWriter.Write(lAttribute.Value.ToString.TrimEnd)
+                            Case "Integer"
+                                lWriter.Write(lName)
+                                lWriter.Write(CByte(2))
+                                lWriter.Write(CInt(lAttribute.Value))
+                            Case "Double"
+                                lWriter.Write(lName)
+                                lWriter.Write(CByte(3))
+                                lWriter.Write(CDbl(lAttribute.Value))
+                            Case "Single"
+                                lWriter.Write(lName)
+                                lWriter.Write(CByte(4))
+                                lWriter.Write(CSng(lAttribute.Value))
                             Case Else
                                 Debug.Print("AttributeTypeNotDefined:" & lAttribute.Definition.TypeString)
                         End Select
-                        If lType > 0 Then
-                            lWriter.Write(lName)
-                            lWriter.Write(lType)
-                            lWriter.Write(lAttribute.Value.ToString.TrimEnd)
-                        End If
                 End Select
             End If
         Next

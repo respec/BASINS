@@ -13,6 +13,13 @@ Public Class atcTimeseries
     Private Const pEpsilon As Double = 0.000000001
     Private Shared pNaN As Double = atcUtility.GetNaN
 
+    ''' <summary>
+    ''' adds two timseries
+    ''' </summary>
+    ''' <param name="aTimeseries1">first timeseries</param>
+    ''' <param name="aTimeseries2">second timeseries</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator +(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
         Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
@@ -21,6 +28,13 @@ Public Class atcTimeseries
         Return DoMath("Add", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' adds a constant to a timeseries
+    ''' </summary>
+    ''' <param name="aTimeseries">timeseries</param>
+    ''' <param name="aValue">constant</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator +(ByVal aTimeseries As atcTimeseries, _
                              ByVal aValue As Double) As atcTimeseries
         Dim lArgs As New atcDataAttributes
@@ -28,7 +42,6 @@ Public Class atcTimeseries
         lArgs.Add("Number", aValue)
         Return DoMath("Add", lArgs)
     End Operator
-
 
     Public Shared Operator -(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries

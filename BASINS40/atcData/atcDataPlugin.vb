@@ -36,6 +36,12 @@ Public Class atcDataPlugin
         End Get
     End Property
 
+    Public Overridable ReadOnly Property Icon() As System.Drawing.Icon
+        Get
+            Return Nothing
+        End Get
+    End Property
+
     ''' <summary>A company name, individual, or organization name.</summary>
     Public Overridable ReadOnly Property Author() As String Implements MapWindow.Interfaces.IPlugin.Author
         Get
@@ -108,7 +114,7 @@ Public Class atcDataPlugin
 
         If Name.StartsWith("Analysis::") Then
             atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
-            pMenusAdded.Add(atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName & "_" & Name, atcDataManager.AnalysisMenuName, Name.Substring(10), , , True))
+            pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_" & Name, atcDataManager.AnalysisMenuName, Name.Substring(10), Me.Icon, , , True))
         ElseIf Name.StartsWith("Timeseries::") Then
             Try
                 Dim lDataSource As atcDataSource = Me
