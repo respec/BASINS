@@ -97,23 +97,20 @@ Public Class frmPoint
             .CellValue(0, 14) = "HIDE" 'row number
         End With
 
-        With agdPoint.Source
-            .Columns = 4
-            .Rows = 1
-            .FixedRows = 1
-            .CellValue(0, 0) = "In Use"
-            .CellValue(0, 1) = "Reach"
-            .CellValue(0, 2) = "Pollutant"
-            .CellValue(0, 3) = "Target Member"
-        End With
+        'agdPoint properties
+        agdPoint.Source.Columns = 4
+        agdPoint.Source.Rows = 1
+        agdPoint.Source.FixedRows = 1
+        agdPoint.AllowNewValidValues = True
+        agdPoint.Source.CellValue(0, 0) = "In Use"
+        agdPoint.Source.CellValue(0, 1) = "Reach"
+        agdPoint.Source.CellValue(0, 2) = "Pollutant"
+        agdPoint.Source.CellValue(0, 3) = "Target Member"
 
         FillMasterGrid()
         DoneBuild = True
         '.net conversion issue: tsl formerly atcTSList
         Dim tsl As New List(Of atcTimeseries)
-
-        agdMasterPoint.SizeAllColumnsToContents()
-        agdMasterPoint.Refresh()
 
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
@@ -136,7 +133,6 @@ Public Class frmPoint
 
             lagdPointRow = 0
 
-
             For i = 1 To agdMasterPoint.Source.Rows - 1
                 If Mid(agdMasterPoint.Source.CellValue(i, 1), 4) = lCheckedItemSplit(1) AndAlso agdMasterPoint.Source.CellValue(i, 3) = lCheckedItemSplit(0) Then
                     lagdPointRow += 1
@@ -144,12 +140,32 @@ Public Class frmPoint
                     agdPoint.Source.CellValue(lagdPointRow, 1) = agdMasterPoint.Source.CellValue(i, 2)
                     agdPoint.Source.CellValue(lagdPointRow, 2) = agdMasterPoint.Source.CellValue(i, 4)
                     agdPoint.Source.CellValue(lagdPointRow, 3) = agdMasterPoint.Source.CellValue(i, 10)
+                    agdPoint.Source.CellEditable(lagdPointRow, 0) = True
                 End If
             Next i
         End If
 
         agdPoint.SizeAllColumnsToContents()
         agdPoint.Refresh()
+
+    End Sub
+
+    Private Sub agdPoint_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdPoint.MouseDownCell
+        Dim lValidValuesCollection As atcCollection = New atcCollection
+
+
+        Select Case aColumn
+            Case 0
+                lValidValuesCollection.Clear()
+                lValidValuesCollection.Add("Yes")
+                lValidValuesCollection.Add("No")
+                agdPoint.ValidValues = lValidValuesCollection
+            Case 3
+                SetMemberNames(lValidValuesCollection, aRow)
+                agdPoint.ValidValues = lValidValuesCollection
+        End Select
+
+
 
     End Sub
 
@@ -342,6 +358,7 @@ Public Class frmPoint
         End With
 
         UpdateListArrays()
+        agdMasterPoint.Refresh()
 
     End Sub
 
@@ -522,6 +539,146 @@ Public Class frmPoint
 
     End Sub
 
+    Private Sub SetMemberNames(ByVal g As Object, ByVal aRow As Integer)
+        Dim vMember As Object, lMember As HspfTSMemberDef
+        Dim sgroup$, skey$, lsub$, i&, sub1&, sub2&, j&, k&
+        Dim vGroup As Object, lGroup As HspfTSGroupDef, Desc$
+        Dim lOper As HspfOperation
+        Dim scoll As Collection
+        Dim Id As Integer
+
+        Id = agdMasterPoint.Source.CellValue(aRow, 8)
+        lOper = pUCI.OpnBlks("RCHRES").OperFromID(Id)
+        GetMemberNames(lOper, scoll)
+        For i = 1 To scoll.Count
+            GetMemberSubs(lOper, scoll(i), sub1, sub2)
+            If sub1 > 0 Then
+                For j = 1 To sub1
+                    If sub2 > 0 Then
+                        For k = 1 To sub2
+                            g.Add(MemberLongVersion(scoll(i), j, k))
+                        Next k
+                    Else
+                        g.Add(MemberLongVersion(scoll(i), j, sub2))
+                    End If
+                Next j
+            Else
+                g.Add(MemberLongVersion(scoll(i), sub1, sub2))
+            End If
+        Next i
+
+    End Sub
+
+    Private Sub GetMemberNames(ByVal lOper As HspfOperation, ByVal scoll As Collection)
+        Dim lTable As HspfTable
+
+        lTable = lOper.tables("ACTIVITY")
+        scoll = New Collection
+        If lTable.Parms(1).Value = 1 Then
+            'hydr on
+            scoll.Add("IVOL")
+            If Not lOper.Uci.categoryblock Is Nothing Then
+                If lOper.Uci.CategoryBlock.Categories.Count > 0 Then
+                    scoll.Add("CIVOL")
+                End If
+            End If
+        End If
+        If lTable.Parms(3).Value = 1 Then
+            'cons on
+            scoll.Add("ICON")
+        End If
+        If lTable.Parms(4).Value = 1 Then
+            'ht on
+            scoll.Add("IHEAT")
+        End If
+        If lTable.Parms(5).Value = 1 Then
+            'sed on
+            scoll.Add("ISED")
+        End If
+        If lTable.Parms(6).Value = 1 Then
+            'gqual on
+            scoll.Add("IDQAL")
+            scoll.Add("ISQAL")
+        End If
+        If lTable.Parms(7).Value = 1 Then
+            'ox on
+            scoll.Add("OXIF")
+        End If
+        If lTable.Parms(8).Value = 1 Then
+            'nut on
+            scoll.Add("NUIF1")
+            scoll.Add("NUIF2")
+        End If
+        If lTable.Parms(9).Value = 1 Then
+            'plank on
+            scoll.Add("PKIF")
+        End If
+        If lTable.Parms(10).Value = 1 Then
+            'ph on
+            scoll.Add("PHIF")
+        End If
+    End Sub
+
+    Private Sub GetMemberSubs(ByVal lOper As HspfOperation, ByVal lmem As String, ByVal sub1&, ByVal sub2&)
+        Dim lTable As HspfTable, ncons&, ngqual&
+
+        lTable = lOper.tables("ACTIVITY")
+
+        If lmem = "IVOL" Then
+            sub1 = 0
+            sub2 = 0
+        ElseIf lmem = "CIVOL" Then
+            sub1 = lOper.Uci.CategoryBlock.Categories.Count
+            sub2 = 0
+        ElseIf lmem = "ICON" Then
+            If lOper.TableExists("NCONS") Then
+                ncons = lOper.Tables("NCONS").Parms("NCONS").ToString
+            Else
+                ncons = 1
+            End If
+            sub1 = ncons
+            sub2 = 0
+        ElseIf lmem = "IHEAT" Then
+            sub1 = 0
+            sub2 = 0
+        ElseIf lmem = "ISED" Then
+            sub1 = 3
+            sub2 = 0
+        ElseIf lmem = "IDQAL" Then
+            If lOper.TableExists("GQ-GENDATA") Then
+                ngqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
+            Else
+                ngqual = 1
+            End If
+            sub1 = ngqual
+            sub2 = 0
+        ElseIf lmem = "ISQAL" Then
+            If lOper.TableExists("GQ-GENDATA") Then
+                ngqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
+            Else
+                ngqual = 1
+            End If
+            sub1 = 3
+            sub2 = ngqual
+        ElseIf lmem = "OXIF" Then
+            sub1 = 2
+            sub2 = 0
+        ElseIf lmem = "NUIF1" Then
+            sub1 = 4
+            sub2 = 0
+        ElseIf lmem = "NUIF2" Then
+            sub1 = 3
+            sub2 = 2
+        ElseIf lmem = "PKIF" Then
+            sub1 = 5
+            sub2 = 0
+        ElseIf lmem = "PHIF" Then
+            sub1 = 2
+            sub2 = 0
+        End If
+    End Sub
+
+
     Private Sub lstSources_IndividualCheckChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs)
         Dim ifound As Boolean, i&
 
@@ -663,7 +820,4 @@ Public Class frmPoint
 
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        MsgBox(lstPoints.SelectedIndex)
-    End Sub
 End Class
