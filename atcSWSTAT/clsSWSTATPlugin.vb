@@ -11,6 +11,13 @@ Public Class atcFrequencyGridPlugin
         End Get
     End Property
 
+    Public Overrides ReadOnly Property Icon() As System.Drawing.Icon
+        Get
+            Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWSTAT))
+            Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
+        End Get
+    End Property
+
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Dim lForm As New frmSWSTAT
 
