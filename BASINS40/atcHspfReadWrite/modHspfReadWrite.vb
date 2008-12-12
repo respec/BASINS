@@ -145,6 +145,7 @@ Module modHspfReadWrite
             Dim lOperationIndex As Integer = 0
 
             If aAreaConversion Then
+                Logger.Dbg("Converting Areas")
                 Dim lLuSpecTable As New atcUtility.atcTableDelimited
                 lLuSpecTable.Delimiter = ","
                 lLuSpecTable.OpenFile(aLuChangeSpecFileName)
@@ -282,6 +283,8 @@ Module modHspfReadWrite
                 End While
                 Debug.Print("AreaConverted " & Format(lConvertedArea) & " Not " & Format(lNotConvertedArea))
                 SaveFileString("AreaSummaryLuConvert.txt", .AreaReport(True))
+            Else
+                Logger.Dbg("Skip Converting Areas")
             End If
 
             Dim lBmpSpecTable As New atcUtility.atcTableDelimited
@@ -295,6 +298,7 @@ Module modHspfReadWrite
                 Dim lOperation As atcUCI.HspfOperation = .OpnSeqBlock.Opns(lOperationIndex)
                 If lOperation.OpTyp = atcUCI.HspfData.HspfOperType.hRchres Then
                     'update schematic as needed
+                    Logger.Dbg("UpdateSchematicForRchres " & lOperation.Id & " " & lOperation.Description)
                     Dim lSourceConnectionIndex As Integer = 0
                     While lSourceConnectionIndex < lOperation.Sources.Count
                         Dim lSourceConnection As atcUCI.HspfConnection = lOperation.Sources(lSourceConnectionIndex)
