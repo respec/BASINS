@@ -48,8 +48,10 @@ Module HSPFOutputReports
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
 
-        pSummaryTypes.Add("Water")
-        pSummaryTypes.Add("Sediment")
+        'pSummaryTypes.Add("Water")
+        'pSummaryTypes.Add("Sediment")
+        pSummaryTypes.Add("N-PQUAL")
+        pSummaryTypes.Add("P-PQUAL")
 
         Select Case lTestName
             Case "mono"
