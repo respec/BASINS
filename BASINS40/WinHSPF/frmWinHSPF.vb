@@ -55,20 +55,7 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub PollutantToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PollutantToolStripMenuItem.Click
-
-        If IsNothing(pfrmPollutant) Then
-            pfrmPollutant = New frmPollutant
-            pfrmPollutant.Show()
-        Else
-            If pfrmPollutant.IsDisposed Then
-                pfrmPollutant = New frmPollutant
-                pfrmPollutant.Show()
-            Else
-                pfrmPollutant.WindowState = FormWindowState.Normal
-                pfrmPollutant.BringToFront()
-            End If
-        End If
-
+        PollutantSelectorCheck()
     End Sub
 
     Private Sub SetEditMenu()
@@ -336,20 +323,7 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub cmdPollutant_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPollutant.Click
-
-        If IsNothing(pfrmPollutant) Then
-            pfrmPollutant = New frmPollutant
-            pfrmPollutant.Show()
-        Else
-            If pfrmPollutant.IsDisposed Then
-                pfrmPollutant = New frmPollutant
-                pfrmPollutant.Show()
-            Else
-                pfrmPollutant.WindowState = FormWindowState.Normal
-                pfrmPollutant.BringToFront()
-            End If
-        End If
-
+        PollutantSelectorCheck()
     End Sub
 
     Private Sub cmdReach_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReach.Click
