@@ -35,13 +35,14 @@ Partial Class frmPoint
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.grpDetails = New System.Windows.Forms.GroupBox
-        Me.agdPoint = New atcControls.atcGrid
         Me.Button9 = New System.Windows.Forms.Button
         Me.Button7 = New System.Windows.Forms.Button
         Me.Button8 = New System.Windows.Forms.Button
-        Me.agdMasterPoint = New atcControls.atcGrid
         Me.cmdDetailsShow = New System.Windows.Forms.Button
         Me.cmdDetailsHide = New System.Windows.Forms.Button
+        Me.agdMasterPoint = New atcControls.atcGrid
+        Me.agdPoint = New atcControls.atcGrid
+        Me.Button1 = New System.Windows.Forms.Button
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
@@ -174,23 +175,6 @@ Partial Class frmPoint
         Me.grpDetails.TabStop = False
         Me.grpDetails.Text = "Details of <    >"
         '
-        'agdPoint
-        '
-        Me.agdPoint.AllowHorizontalScrolling = True
-        Me.agdPoint.AllowNewValidValues = False
-        Me.agdPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
-        Me.agdPoint.Fixed3D = False
-        Me.agdPoint.LineColor = System.Drawing.Color.Empty
-        Me.agdPoint.LineWidth = 0.0!
-        Me.agdPoint.Location = New System.Drawing.Point(57, 16)
-        Me.agdPoint.Name = "agdPoint"
-        Me.agdPoint.Size = New System.Drawing.Size(411, 299)
-        Me.agdPoint.Source = Nothing
-        Me.agdPoint.TabIndex = 25
-        '
         'Button9
         '
         Me.Button9.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
@@ -221,23 +205,6 @@ Partial Class frmPoint
         Me.Button8.TabIndex = 22
         Me.Button8.UseVisualStyleBackColor = True
         '
-        'agdMasterPoint
-        '
-        Me.agdMasterPoint.AllowHorizontalScrolling = True
-        Me.agdMasterPoint.AllowNewValidValues = False
-        Me.agdMasterPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdMasterPoint.CellBackColor = System.Drawing.Color.Empty
-        Me.agdMasterPoint.Fixed3D = False
-        Me.agdMasterPoint.LineColor = System.Drawing.Color.Empty
-        Me.agdMasterPoint.LineWidth = 0.0!
-        Me.agdMasterPoint.Location = New System.Drawing.Point(589, 358)
-        Me.agdMasterPoint.Name = "agdMasterPoint"
-        Me.agdMasterPoint.Size = New System.Drawing.Size(172, 49)
-        Me.agdMasterPoint.Source = Nothing
-        Me.agdMasterPoint.TabIndex = 21
-        '
         'cmdDetailsShow
         '
         Me.cmdDetailsShow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
@@ -267,11 +234,55 @@ Partial Class frmPoint
         Me.cmdDetailsHide.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsHide.UseVisualStyleBackColor = True
         '
+        'agdMasterPoint
+        '
+        Me.agdMasterPoint.AllowHorizontalScrolling = True
+        Me.agdMasterPoint.AllowNewValidValues = False
+        Me.agdMasterPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdMasterPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.agdMasterPoint.Fixed3D = False
+        Me.agdMasterPoint.LineColor = System.Drawing.Color.Empty
+        Me.agdMasterPoint.LineWidth = 0.0!
+        Me.agdMasterPoint.Location = New System.Drawing.Point(589, 358)
+        Me.agdMasterPoint.Name = "agdMasterPoint"
+        Me.agdMasterPoint.Size = New System.Drawing.Size(172, 49)
+        Me.agdMasterPoint.Source = Nothing
+        Me.agdMasterPoint.TabIndex = 21
+        '
+        'agdPoint
+        '
+        Me.agdPoint.AllowHorizontalScrolling = True
+        Me.agdPoint.AllowNewValidValues = False
+        Me.agdPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.agdPoint.Fixed3D = False
+        Me.agdPoint.LineColor = System.Drawing.Color.Empty
+        Me.agdPoint.LineWidth = 0.0!
+        Me.agdPoint.Location = New System.Drawing.Point(57, 16)
+        Me.agdPoint.Name = "agdPoint"
+        Me.agdPoint.Size = New System.Drawing.Size(411, 299)
+        Me.agdPoint.Source = Nothing
+        Me.agdPoint.TabIndex = 25
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(512, 390)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(108, 25)
+        Me.Button1.TabIndex = 22
+        Me.Button1.Text = "Button1"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(792, 448)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
         Me.Controls.Add(Me.agdMasterPoint)
@@ -310,4 +321,5 @@ Partial Class frmPoint
     Friend WithEvents cmdAdvancedGen As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdScenario As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents agdMasterPoint As atcControls.atcGrid
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class
