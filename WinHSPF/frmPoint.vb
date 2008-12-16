@@ -30,6 +30,9 @@ Public Class frmPoint
     Dim LinkCount As Integer
     Dim MSub1Links() As Long, MSub2Links() As Long
 
+    'net conversion: Adding a collection that keeps 
+    Dim pAgdPointRowReference As New Collection
+
     Private HsashDragging As Boolean
     Private HsashDragStart As Single
 
@@ -48,7 +51,7 @@ Public Class frmPoint
             .Clear()
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
-            .Visible = False
+            .Visible = True
         End With
 
         With agdPoint
@@ -118,7 +121,7 @@ Public Class frmPoint
     End Sub
 
     Private Sub agdMasterPoint2agdPoint()
-        Dim i&
+        Dim i As Integer
         Dim lCheckedItemSplit() As String
         Dim lagdPointRow As Integer
 
@@ -132,6 +135,7 @@ Public Class frmPoint
             ReDim Preserve lCheckedItemSplit(1)
 
             lagdPointRow = 0
+            pAgdPointRowReference.Clear()
 
             For i = 1 To agdMasterPoint.Source.Rows - 1
                 If Mid(agdMasterPoint.Source.CellValue(i, 1), 4) = lCheckedItemSplit(1) AndAlso agdMasterPoint.Source.CellValue(i, 3) = lCheckedItemSplit(0) Then
@@ -140,7 +144,11 @@ Public Class frmPoint
                     agdPoint.Source.CellValue(lagdPointRow, 1) = agdMasterPoint.Source.CellValue(i, 2)
                     agdPoint.Source.CellValue(lagdPointRow, 2) = agdMasterPoint.Source.CellValue(i, 4)
                     agdPoint.Source.CellValue(lagdPointRow, 3) = agdMasterPoint.Source.CellValue(i, 10)
+
+                    pAgdPointRowReference.Add(i)
+
                     agdPoint.Source.CellEditable(lagdPointRow, 0) = True
+                    agdPoint.Source.CellEditable(lagdPointRow, 3) = True
                 End If
             Next i
         End If
@@ -151,21 +159,17 @@ Public Class frmPoint
     End Sub
 
     Private Sub agdPoint_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdPoint.MouseDownCell
-        Dim lValidValuesCollection As atcCollection = New atcCollection
-
+        Dim lValidValuesCollection As Collection = New Collection
 
         Select Case aColumn
             Case 0
-                lValidValuesCollection.Clear()
                 lValidValuesCollection.Add("Yes")
                 lValidValuesCollection.Add("No")
                 agdPoint.ValidValues = lValidValuesCollection
             Case 3
-                SetMemberNames(lValidValuesCollection, aRow)
+                SetMemberNames(lValidValuesCollection, pAgdPointRowReference(aRow))
                 agdPoint.ValidValues = lValidValuesCollection
         End Select
-
-
 
     End Sub
 
@@ -539,90 +543,91 @@ Public Class frmPoint
 
     End Sub
 
-    Private Sub SetMemberNames(ByVal g As Object, ByVal aRow As Integer)
+    Private Sub SetMemberNames(ByRef aCollection As Collection, ByVal aRow As Integer)
         Dim vMember As Object, lMember As HspfTSMemberDef
         Dim sgroup$, skey$, lsub$, i&, sub1&, sub2&, j&, k&
         Dim vGroup As Object, lGroup As HspfTSGroupDef, Desc$
         Dim lOper As HspfOperation
-        Dim scoll As Collection
         Dim Id As Integer
+        Dim lMemberNames As New Collection
+
 
         Id = agdMasterPoint.Source.CellValue(aRow, 8)
         lOper = pUCI.OpnBlks("RCHRES").OperFromID(Id)
-        GetMemberNames(lOper, scoll)
-        For i = 1 To scoll.Count
-            GetMemberSubs(lOper, scoll(i), sub1, sub2)
+        GetMemberNames(lOper, lMemberNames)
+        For i = 1 To lMemberNames.Count
+            GetMemberSubs(lOper, lMemberNames.Item(i), sub1, sub2)
             If sub1 > 0 Then
                 For j = 1 To sub1
                     If sub2 > 0 Then
                         For k = 1 To sub2
-                            g.Add(MemberLongVersion(scoll(i), j, k))
+                            aCollection.Add(MemberLongVersion(lMemberNames.Item(i), j, k))
                         Next k
                     Else
-                        g.Add(MemberLongVersion(scoll(i), j, sub2))
+                        aCollection.Add(MemberLongVersion(lMemberNames.Item(i), j, sub2))
                     End If
                 Next j
             Else
-                g.Add(MemberLongVersion(scoll(i), sub1, sub2))
+                aCollection.Add(MemberLongVersion(lMemberNames.Item(i), sub1, sub2))
             End If
         Next i
 
     End Sub
 
-    Private Sub GetMemberNames(ByVal lOper As HspfOperation, ByVal scoll As Collection)
+    Private Sub GetMemberNames(ByVal lOper As HspfOperation, ByRef scoll As Collection)
         Dim lTable As HspfTable
 
-        lTable = lOper.tables("ACTIVITY")
-        scoll = New Collection
-        If lTable.Parms(1).Value = 1 Then
+        '.net conversion issue: Indexes for lTable.Parms were shifted -1 for index start of 0.
+        lTable = lOper.Tables("ACTIVITY")
+        If lTable.Parms(0).Value = 1 Then
             'hydr on
             scoll.Add("IVOL")
-            If Not lOper.Uci.categoryblock Is Nothing Then
+            If Not lOper.Uci.CategoryBlock Is Nothing Then
                 If lOper.Uci.CategoryBlock.Categories.Count > 0 Then
                     scoll.Add("CIVOL")
                 End If
             End If
         End If
-        If lTable.Parms(3).Value = 1 Then
+        If lTable.Parms(2).Value = 1 Then
             'cons on
             scoll.Add("ICON")
         End If
-        If lTable.Parms(4).Value = 1 Then
+        If lTable.Parms(3).Value = 1 Then
             'ht on
             scoll.Add("IHEAT")
         End If
-        If lTable.Parms(5).Value = 1 Then
+        If lTable.Parms(4).Value = 1 Then
             'sed on
             scoll.Add("ISED")
         End If
-        If lTable.Parms(6).Value = 1 Then
+        If lTable.Parms(5).Value = 1 Then
             'gqual on
             scoll.Add("IDQAL")
             scoll.Add("ISQAL")
         End If
-        If lTable.Parms(7).Value = 1 Then
+        If lTable.Parms(6).Value = 1 Then
             'ox on
             scoll.Add("OXIF")
         End If
-        If lTable.Parms(8).Value = 1 Then
+        If lTable.Parms(7).Value = 1 Then
             'nut on
             scoll.Add("NUIF1")
             scoll.Add("NUIF2")
         End If
-        If lTable.Parms(9).Value = 1 Then
+        If lTable.Parms(8).Value = 1 Then
             'plank on
             scoll.Add("PKIF")
         End If
-        If lTable.Parms(10).Value = 1 Then
+        If lTable.Parms(9).Value = 1 Then
             'ph on
             scoll.Add("PHIF")
         End If
     End Sub
 
-    Private Sub GetMemberSubs(ByVal lOper As HspfOperation, ByVal lmem As String, ByVal sub1&, ByVal sub2&)
+    Private Sub GetMemberSubs(ByVal lOper As HspfOperation, ByVal lmem As String, ByRef sub1&, ByRef sub2&)
         Dim lTable As HspfTable, ncons&, ngqual&
 
-        lTable = lOper.tables("ACTIVITY")
+        lTable = lOper.Tables("ACTIVITY")
 
         If lmem = "IVOL" Then
             sub1 = 0
@@ -820,4 +825,8 @@ Public Class frmPoint
 
     End Sub
 
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        agdMasterPoint.SizeAllColumnsToContents()
+        agdMasterPoint.Refresh()
+    End Sub
 End Class
