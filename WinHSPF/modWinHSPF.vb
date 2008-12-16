@@ -144,14 +144,29 @@ Public Module WinHSPF
     End Sub
 
     Sub PollutantSelectorCheck()
-        If pUCI.Pollutants.Count > 0 Then
-            frmPollutant.Show()
+        If IsNothing(pfrmPollutant) Then
+            pfrmPollutant = New frmPollutant
+            PollutantSelectorShow()
         Else
-            '.net conversion issue: verify this is the right message to display.
-            'Logger.Message("The current project contains no pollutant sources.", "Pollutant Selector Problem", _
-            '               MessageBoxButtons.OK, MessageBoxIcon.Information, DialogResult.OK)
-            frmPollutant.Show()
+            If pfrmPollutant.IsDisposed Then
+                pfrmPollutant = New frmPollutant
+                PollutantSelectorShow()
+            Else
+                pfrmPollutant.WindowState = FormWindowState.Normal
+                pfrmPollutant.BringToFront()
+            End If
         End If
+    End Sub
+
+    Sub PollutantSelectorShow()
+        pUCI.PollutantsBuild()
+        pfrmPollutant.ShowDialog()
+        pUCI.PollutantsUnBuild()
+        'CheckAndAddMissingTables("PERLND")
+        'CheckAndAddMissingTables("IMPLND")
+        'CheckAndAddMissingTables("RCHRES")
+        'UpdateFlagDependencies("RCHRES")
+        'SetMissingValuesToDefaults(myUci, defUci)
     End Sub
 
     Sub EditBlock(ByVal aParent As Windows.Forms.Form, ByVal aTableName As String)
