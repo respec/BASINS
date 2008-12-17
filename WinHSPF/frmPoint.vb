@@ -12,14 +12,15 @@ Public Class frmPoint
     Dim DoneBuild As Boolean
     'Dim lts As Collection(Of atcData.atcTimeseries)
     Dim lts As Collection
+
     '.net conversion issue: tsl was formelry ATCoTSlist
     Dim WithEvents tsl As atcTimeseries
 
-    'net conversion issue: The array InUseFacs(1)() is a 2-D array that holds the (index 0) facility name, (index1) scenario string
+    'The array InUseFacs(,) is a 2-D array that holds the (dimension 0) facility name, (dimension 1) scenario string
     'it should have the same elements as the sources list that are checked.
     Dim InUseFacs(1)() As String
 
-    'net conversion issue: The array AvailFacs(1)() is a 2-D array that holds the (index 0) facility name, (index1) scenario string
+    'The array AvailFacs(,) is a 2-D array that holds the (dimension 0) facility name, (dimension 1) scenario string
     'it should have the same elements as the sources list that are NOT checked.
     Dim AvailFacs(1)() As String
 
@@ -30,7 +31,8 @@ Public Class frmPoint
     Dim LinkCount As Integer
     Dim MSub1Links() As Long, MSub2Links() As Long
 
-    'net conversion: Adding a collection that keeps 
+    'Each integer in pAgdPointRowReference corresponds (in index order) to a row in the current agdPoint grid. 
+    'Item(i) is the row number in agdMasterPoint that corresponds to row (i) in agdPoint.
     Dim pAgdPointRowReference As New Collection
 
     Private HsashDragging As Boolean
@@ -167,7 +169,8 @@ Public Class frmPoint
                 lValidValuesCollection.Add("No")
                 agdPoint.ValidValues = lValidValuesCollection
             Case 3
-                SetMemberNames(lValidValuesCollection, pAgdPointRowReference(aRow))
+                'Get the target member names and set them as lValidValuesCollection. Collection is passed as argument via ByRef.
+                TargetMemberNames2Collection(lValidValuesCollection, pAgdPointRowReference(aRow))
                 agdPoint.ValidValues = lValidValuesCollection
         End Select
 
@@ -177,10 +180,15 @@ Public Class frmPoint
         Dim lOper As Integer
         Dim lCheckedItemSplit() As String
 
-        ReDim InUseFacs(0)(0)
-        ReDim InUseFacs(1)(0)
-        ReDim AvailFacs(0)(0)
-        ReDim AvailFacs(1)(0)
+        InUseFacs(0) = New String() {}
+        InUseFacs(1) = New String() {}
+        AvailFacs(0) = New String() {}
+        AvailFacs(1) = New String() {}
+
+        'ReDim InUseFacs(0)(0)
+        'ReDim InUseFacs(1)(0)
+        'ReDim AvailFacs(0)(0)
+        'ReDim AvailFacs(1)(0)
 
         For lOper = 0 To lstPoints.Items.Count - 1
             'split the string of the newly checked item into (Index 0): description and (Index 1): scenario
@@ -191,17 +199,16 @@ Public Class frmPoint
             ReDim Preserve lCheckedItemSplit(1)
 
             If lstPoints.GetItemChecked(lOper) Then
-                ReDim Preserve InUseFacs(0)(UBound(InUseFacs(0)))
-                ReDim Preserve InUseFacs(1)(UBound(InUseFacs(1)))
-                InUseFacs(0)(UBound(InUseFacs(0))) = lCheckedItemSplit(0)
-                InUseFacs(1)(UBound(InUseFacs(0))) = lCheckedItemSplit(1)
+                ReDim Preserve InUseFacs(0)(InUseFacs(0).GetUpperBound(0) + 1)
+                ReDim Preserve InUseFacs(1)(InUseFacs(1).GetUpperBound(0) + 1)
+                InUseFacs(0)(InUseFacs(0).GetUpperBound(0)) = lCheckedItemSplit(0)
+                InUseFacs(1)(InUseFacs(1).GetUpperBound(0)) = lCheckedItemSplit(1)
             Else
-                ReDim Preserve AvailFacs(0)(UBound(AvailFacs(0)))
-                ReDim Preserve AvailFacs(1)(UBound(AvailFacs(1)))
-                AvailFacs(0)(UBound(AvailFacs(0))) = lCheckedItemSplit(0)
-                AvailFacs(1)(UBound(AvailFacs(0))) = lCheckedItemSplit(1)
+                ReDim Preserve AvailFacs(0)(AvailFacs(0).GetUpperBound(0) + 1)
+                ReDim Preserve AvailFacs(1)(AvailFacs(1).GetUpperBound(0) + 1)
+                AvailFacs(0)(AvailFacs(0).GetUpperBound(0)) = lCheckedItemSplit(0)
+                AvailFacs(1)(AvailFacs(1).GetUpperBound(0)) = lCheckedItemSplit(1)
             End If
-
         Next
 
         CountInUseFacs = lstPoints.CheckedItems.Count
@@ -543,146 +550,138 @@ Public Class frmPoint
 
     End Sub
 
-    Private Sub SetMemberNames(ByRef aCollection As Collection, ByVal aRow As Integer)
-        Dim vMember As Object, lMember As HspfTSMemberDef
-        Dim sgroup$, skey$, lsub$, i&, sub1&, sub2&, j&, k&
-        Dim vGroup As Object, lGroup As HspfTSGroupDef, Desc$
+    Private Sub TargetMemberNames2Collection(ByRef aCollection As Collection, ByVal aRow As Integer)
+        Dim lOper1, lOper2, lOper3, lId, lSub1, lSub2, lNcons, lNgqual As Integer
         Dim lOper As HspfOperation
-        Dim Id As Integer
+        Dim lTable As HspfTable
         Dim lMemberNames As New Collection
 
+        lId = agdMasterPoint.Source.CellValue(aRow, 8)
+        lOper = pUCI.OpnBlks("RCHRES").OperFromID(lId)
 
-        Id = agdMasterPoint.Source.CellValue(aRow, 8)
-        lOper = pUCI.OpnBlks("RCHRES").OperFromID(Id)
-        GetMemberNames(lOper, lMemberNames)
-        For i = 1 To lMemberNames.Count
-            GetMemberSubs(lOper, lMemberNames.Item(i), sub1, sub2)
-            If sub1 > 0 Then
-                For j = 1 To sub1
-                    If sub2 > 0 Then
-                        For k = 1 To sub2
-                            aCollection.Add(MemberLongVersion(lMemberNames.Item(i), j, k))
-                        Next k
-                    Else
-                        aCollection.Add(MemberLongVersion(lMemberNames.Item(i), j, sub2))
-                    End If
-                Next j
-            Else
-                aCollection.Add(MemberLongVersion(lMemberNames.Item(i), sub1, sub2))
-            End If
-        Next i
+        '.net conversion note: The following  was formerly GetMemberNames.
 
-    End Sub
-
-    Private Sub GetMemberNames(ByVal lOper As HspfOperation, ByRef scoll As Collection)
-        Dim lTable As HspfTable
-
-        '.net conversion issue: Indexes for lTable.Parms were shifted -1 for index start of 0.
         lTable = lOper.Tables("ACTIVITY")
+
         If lTable.Parms(0).Value = 1 Then
             'hydr on
-            scoll.Add("IVOL")
+            lMemberNames.Add("IVOL")
             If Not lOper.Uci.CategoryBlock Is Nothing Then
                 If lOper.Uci.CategoryBlock.Categories.Count > 0 Then
-                    scoll.Add("CIVOL")
+                    lMemberNames.Add("CIVOL")
                 End If
             End If
         End If
         If lTable.Parms(2).Value = 1 Then
             'cons on
-            scoll.Add("ICON")
+            lMemberNames.Add("ICON")
         End If
         If lTable.Parms(3).Value = 1 Then
             'ht on
-            scoll.Add("IHEAT")
+            lMemberNames.Add("IHEAT")
         End If
         If lTable.Parms(4).Value = 1 Then
             'sed on
-            scoll.Add("ISED")
+            lMemberNames.Add("ISED")
         End If
         If lTable.Parms(5).Value = 1 Then
             'gqual on
-            scoll.Add("IDQAL")
-            scoll.Add("ISQAL")
+            lMemberNames.Add("IDQAL")
+            lMemberNames.Add("ISQAL")
         End If
         If lTable.Parms(6).Value = 1 Then
             'ox on
-            scoll.Add("OXIF")
+            lMemberNames.Add("OXIF")
         End If
         If lTable.Parms(7).Value = 1 Then
             'nut on
-            scoll.Add("NUIF1")
-            scoll.Add("NUIF2")
+            lMemberNames.Add("NUIF1")
+            lMemberNames.Add("NUIF2")
         End If
         If lTable.Parms(8).Value = 1 Then
             'plank on
-            scoll.Add("PKIF")
+            lMemberNames.Add("PKIF")
         End If
         If lTable.Parms(9).Value = 1 Then
             'ph on
-            scoll.Add("PHIF")
+            lMemberNames.Add("PHIF")
         End If
-    End Sub
-
-    Private Sub GetMemberSubs(ByVal lOper As HspfOperation, ByVal lmem As String, ByRef sub1&, ByRef sub2&)
-        Dim lTable As HspfTable, ncons&, ngqual&
 
         lTable = lOper.Tables("ACTIVITY")
 
-        If lmem = "IVOL" Then
-            sub1 = 0
-            sub2 = 0
-        ElseIf lmem = "CIVOL" Then
-            sub1 = lOper.Uci.CategoryBlock.Categories.Count
-            sub2 = 0
-        ElseIf lmem = "ICON" Then
-            If lOper.TableExists("NCONS") Then
-                ncons = lOper.Tables("NCONS").Parms("NCONS").ToString
-            Else
-                ncons = 1
-            End If
-            sub1 = ncons
-            sub2 = 0
-        ElseIf lmem = "IHEAT" Then
-            sub1 = 0
-            sub2 = 0
-        ElseIf lmem = "ISED" Then
-            sub1 = 3
-            sub2 = 0
-        ElseIf lmem = "IDQAL" Then
-            If lOper.TableExists("GQ-GENDATA") Then
-                ngqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
-            Else
-                ngqual = 1
-            End If
-            sub1 = ngqual
-            sub2 = 0
-        ElseIf lmem = "ISQAL" Then
-            If lOper.TableExists("GQ-GENDATA") Then
-                ngqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
-            Else
-                ngqual = 1
-            End If
-            sub1 = 3
-            sub2 = ngqual
-        ElseIf lmem = "OXIF" Then
-            sub1 = 2
-            sub2 = 0
-        ElseIf lmem = "NUIF1" Then
-            sub1 = 4
-            sub2 = 0
-        ElseIf lmem = "NUIF2" Then
-            sub1 = 3
-            sub2 = 2
-        ElseIf lmem = "PKIF" Then
-            sub1 = 5
-            sub2 = 0
-        ElseIf lmem = "PHIF" Then
-            sub1 = 2
-            sub2 = 0
-        End If
-    End Sub
+        For lOper1 = 1 To lMemberNames.Count
 
+
+            Select Case lMemberNames.Item(lOper1)
+                Case "IVOL"
+                    lSub1 = 0
+                    lSub2 = 0
+                Case "CIVOL"
+                    lSub1 = lOper.Uci.CategoryBlock.Categories.Count
+                    lSub2 = 0
+                Case "ICON"
+                    If lOper.TableExists("NCONS") Then
+                        lNcons = lOper.Tables("NCONS").Parms("NCONS").ToString
+                    Else
+                        lNcons = 1
+                    End If
+                    lSub1 = lNcons
+                    lSub2 = 0
+                Case "IHEAT"
+                    lSub1 = 0
+                    lSub2 = 0
+                Case "ISED"
+                    lSub1 = 3
+                    lSub2 = 0
+                Case "IDQAL"
+                    If lOper.TableExists("GQ-GENDATA") Then
+                        lNgqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
+                    Else
+                        lNgqual = 1
+                    End If
+                    lSub1 = lNgqual
+                    lSub2 = 0
+                Case "ISQAL"
+                    If lOper.TableExists("GQ-GENDATA") Then
+                        lNgqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
+                    Else
+                        lNgqual = 1
+                    End If
+                    lSub1 = 3
+                    lSub2 = lNgqual
+                Case "OXIF"
+                    lSub1 = 2
+                    lSub2 = 0
+                Case "NUIF1"
+                    lSub1 = 4
+                    lSub2 = 0
+                Case "NUIF2"
+                    lSub1 = 3
+                    lSub2 = 2
+                Case "PKIF"
+                    lSub1 = 5
+                    lSub2 = 0
+                Case "PHIF"
+                    lSub1 = 2
+                    lSub2 = 0
+            End Select
+
+            If lSub1 > 0 Then
+                For lOper2 = 1 To lSub1
+                    If lSub2 > 0 Then
+                        For lOper3 = 1 To lSub2
+                            aCollection.Add(MemberLongVersion(lMemberNames.Item(lOper1), lOper2, lOper3))
+                        Next lOper3
+                    Else
+                        aCollection.Add(MemberLongVersion(lMemberNames.Item(lOper1), lOper2, lSub2))
+                    End If
+                Next lOper2
+            Else
+                aCollection.Add(MemberLongVersion(lMemberNames.Item(lOper1), lSub1, lSub2))
+            End If
+        Next lOper1
+
+    End Sub
 
     Private Sub lstSources_IndividualCheckChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs)
         Dim ifound As Boolean, i&
@@ -703,6 +702,8 @@ Public Class frmPoint
 
         For i = 1 To agdMasterPoint.Source.Rows - 1
             'Check if facility and scenario are in use.
+
+            MsgBox(Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) & Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) & Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) & ":::" & Mid(agdMasterPoint.Source.CellValue(i, 1), 4))
             If Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 AndAlso Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) <> -1 Then
                 ifound = True
                 'set indiv timsers to in use in master grid
@@ -714,16 +715,7 @@ Public Class frmPoint
             End If
         Next
 
-        For i = 1 To agdPoint.Source.Rows - 1
-            'Check if facility and scenario are in use.
-            If Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 AndAlso Array.IndexOf(InUseFacs(0), agdPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdPoint.Source.CellValue(i, 1), 3)) <> -1 Then
-                'set indiv timsers to in use in point grid
-                agdPoint.Source.CellValue(i, 0) = "Yes"
-            Else
-                'set indiv timsers to not in use in point grid
-                agdPoint.Source.CellValue(i, 0) = "No"
-            End If
-        Next
+        agdMasterPoint2agdPoint()
 
         'rebuild lists
         CountInUseFacs = lstPoints.Items.Count - lstPoints.CheckedItems.Count
@@ -825,8 +817,4 @@ Public Class frmPoint
 
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        agdMasterPoint.SizeAllColumnsToContents()
-        agdMasterPoint.Refresh()
-    End Sub
 End Class
