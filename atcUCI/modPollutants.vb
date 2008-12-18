@@ -351,7 +351,7 @@ Module modPollutants
 
         'remove any lingering mls from pquals or iquals
         i = 0
-        Do While i <= aUci.MassLinks.Count
+        Do While i < aUci.MassLinks.Count
             tML = aUci.MassLinks(i)
             If tML.Source.VolName = "PERLND" And tML.Source.Group = "PQUAL" And tML.Target.VolName = "RCHRES" Then
                 aUci.MassLinks.RemoveAt(i)
