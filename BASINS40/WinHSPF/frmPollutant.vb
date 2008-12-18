@@ -13,34 +13,42 @@ Public Class frmPollutant
         Me.Icon = pIcon
         Me.MinimumSize = Me.Size
 
-        If pUCI.Pollutants.Count = 0 Then
+        If pDefUCI.Pollutants.Count = 0 Then
             ReadPollutants()
         End If
 
-        For lIndex As Integer = 1 To pDefUCI.Pollutants.Count
-            lstPollutants.Items.Add(pDefUCI.Pollutants(lIndex).Name)
-            If pDefUCI.Pollutants(lIndex).ModelType = "DataIn" Then
-                lstPollutants.SetSelected(lIndex, True)
-            Else
-                lstPollutants.SetSelected(lIndex, False)
-            End If
-        Next lIndex
-
-        For lIndex As Integer = 1 To pUCI.Pollutants.Count
+        For lIndex As Integer = 0 To pUCI.Pollutants.Count - 1
             lstPollutants.Items.Add(pUCI.Pollutants(lIndex).Name)
             lstPollutants.SetSelected(lIndex, True)
+        Next lIndex
+
+        For lIndex As Integer = 0 To pDefUCI.Pollutants.Count - 1
+            'is this one already in the list?
+            Dim lInList As Boolean = False
+            If lstPollutants.Items.Count > 0 Then
+                For lListIndex As Integer = 0 To lstPollutants.Items.Count - 1
+                    If lstPollutants.Items(lListIndex) = pDefUCI.Pollutants(lIndex).Name Then
+                        lInList = True
+                    End If
+                Next
+            End If
+            If Not lInList Then
+                lstPollutants.Items.Add(pDefUCI.Pollutants(lIndex).Name)
+            End If
+            If pDefUCI.Pollutants(lIndex).ModelType = "DataIn" Then
+                lstPollutants.SetSelected(lIndex + pUCI.Pollutants.Count, True)
+            End If
         Next lIndex
 
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         'Dim i, vPoll As Object, lPoll As HspfPollutant, found As Boolean
-        'Dim j&, pcount&, icount&, rcount&
 
-        ''make sure not too many
-        'pcount = 0
-        'icount = 0
-        'rcount = 0
+        'make sure not too many
+        Dim lpcount As Integer = 0
+        Dim licount As Integer = 0
+        Dim lrcount As Integer = 0
         'For i = 1 To aslGQual.RightCount
         '    For Each vPoll In myUci.Pollutants
         '        lPoll = vPoll
@@ -165,254 +173,221 @@ Public Class frmPollutant
     End Sub
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
-        'unload(Me)
+        Me.Dispose()
     End Sub
 
     Private Sub ReadPollutants()
 
-        'Dim delim$, quote$, i&, tname$, amax&, tstr$, tcnt&
-        'Dim tabend As Boolean
-        'Dim ctab$, opf&, opl&, sopl$, j&
-        'Dim vOper As Object, lOper As HspfOperation, tOper As HspfOperation
-        'Dim lTable As HspfTable, lOpnBlk As HspfOpnBlk
-        'Dim massend As Boolean
-        'Dim lML As HspfMassLink, found As Boolean
-        'Dim tempTable As HspfTable, thistable&, tempname$
+        Dim lPollutantFileName As String = PathNameOnly(pDefUCI.Name) & "\pollutants.txt"
+        If Not FileExists(lPollutantFileName) Then
+            lPollutantFileName = FindFile("Please locate pollutants.txt", "pollutants.txt")
+        End If
 
-        'Dim lPollutantFileName As String = PathNameOnly(pDefUCI.Name) & "\pollutants.txt"
-        'If Not FileExists(lPollutantFileName) Then
-        '    lPollutantFileName = FindFile("Please locate pollutants.txt", "pollutants.txt")
-        'End If
+        Dim lRecords As New Collection
+        If FileExists(lPollutantFileName) Then
+            For Each lRecord As String In LinesInFile(lPollutantFileName)
+                lRecords.Add(lRecord)
+            Next
+        End If
 
-        'Dim lStr As String
-        'Dim lLen As Integer
-        'Dim lTmp As String
-        'Dim lCcons As String
-        'Dim lPtype As Integer
-        'Dim lItype As Integer
-        'Dim lRtype As Integer
-        'Dim lCend As Boolean
-        'Dim lFound As Boolean
-        'Dim lOpTyp As String
-        'Dim lOpEnd As Boolean
-        'If FileExists(lPollutantFileName) Then
-        '    Dim lRecords As Collection = LinesInFile(lPollutantFileName)
+        Dim lCurrentIndex As Integer = 1
+        Dim lCurrentRecord As String = ""
+        Do While lCurrentIndex < lRecords.Count
+            lCurrentRecord = lRecords(lCurrentIndex)
+            If lCurrentRecord.StartsWith("CONSTIT") Then
 
-        '    Dim lCurrentIndex As Integer = 0
-        '    For Each lCurrentRecord As String In lRecords
-        '        lCurrentIndex += 1
-        '        lStr = lCurrentRecord.TrimEnd
-        '        lLen = Len(lStr)
+                'found start of a constituent
+                Dim lPoll As New HspfPollutant
+                Dim lTemp As String = StrRetRem(lCurrentRecord)
+                'lCcons = lcurrentrecord
+                lPoll.Name = lCurrentRecord
 
-        '        If lLen > 6 Then
-        '            If lStr.StartsWith("CONSTIT") Then
-        '                'found start of a constituent
+                Dim lPtype As Integer = 0
+                Dim lItype As Integer = 0
+                Dim lRtype As Integer = 0
+                Dim lFoundConstituentEnd As Boolean = False
 
-        '                Dim lPoll As New HspfPollutant
-        '                lTmp = StrRetRem(lStr)
-        '                lCcons = lStr
-        '                lPoll.Name = lStr
-        '                lPtype = 0
-        '                lItype = 0
-        '                lRtype = 0
-        '                lCend = False
-        '                Do While Not lCend
-        '                    lCurrentIndex += 1
-        '                    lStr = Trim(lRecords(lCurrentIndex))
-        '                    lLen = Len(lStr)
+                Do While Not lFoundConstituentEnd
+                    lCurrentIndex += 1
+                    lCurrentRecord = lRecords(lCurrentIndex)
+                    If lCurrentRecord.StartsWith("END CONSTIT") Then
+                        'this is the end of the constituent
+                        lFoundConstituentEnd = True
+                        lPoll.Id = pDefUCI.Pollutants.Count + 1
+                        lPoll.Index = pUCI.Pollutants.Count + 1
+                        If lPtype = 1 And lRtype = 1 Then
+                            lPoll.ModelType = "PIG"
+                        ElseIf lPtype = 1 Then
+                            lPoll.ModelType = "PIOnly"
+                        ElseIf lRtype = 1 Then
+                            lPoll.ModelType = "GOnly"
+                        Else
+                            lPoll.ModelType = "Data"
+                        End If
+                        'see if we already have this constituent in the uci or defuci
+                        Dim lFoundThisConstituentAlready As Boolean = False
+                        For Each lTempPoll As HspfPollutant In pUCI.Pollutants
+                            If lTempPoll.Name = lPoll.Name Then
+                                lFoundThisConstituentAlready = True
+                            End If
+                        Next
+                        For Each lTempPoll As HspfPollutant In pDefUCI.Pollutants
+                            If lTempPoll.Name = lPoll.Name Then
+                                lFoundThisConstituentAlready = True
+                            End If
+                        Next
+                        If Not lFoundThisConstituentAlready Then
+                            'add this constituent to the defuci
+                            pDefUCI.Pollutants.Add(lPoll)
+                        End If
+                        lPoll = Nothing
+                    ElseIf lCurrentRecord.StartsWith("PERLND") Or lCurrentRecord.StartsWith("IMPLND") Or lCurrentRecord.StartsWith("RCHRES") Then
+                        'found start of an operation
+                        Dim lOpnBlk As New HspfOpnBlk
+                        Dim lOpTyp As String = Trim(Mid(lCurrentRecord, 1, 6))
+                        lOpnBlk.Name = lOpTyp
+                        lOpnBlk.Uci = pDefUCI
+                        For Each lOper As HspfOperation In pUCI.OpnBlks(lOpTyp).Ids
+                            lOpnBlk.Ids.Add(lOper)
+                            lPoll.Operations.Add(lOpTyp & lOper.Id, lOper)
+                        Next
+                        Dim lEndofOperation As Boolean = False
+                        Do While Not lEndofOperation
+                            lCurrentIndex += 1
+                            lCurrentRecord = lRecords(lCurrentIndex)
+                            If lCurrentRecord.StartsWith("END " & lOpTyp) Then
+                                'found end of operation
+                                lEndofOperation = True
+                            ElseIf lCurrentRecord.Trim.Length > 0 Then
+                                'found start of table
+                                Dim lTableName = RTrim(Mid(lCurrentRecord, 3))
+                                Dim lEndofTable As Boolean = False
+                                Do While Not lEndofTable
+                                    lCurrentIndex += 1
+                                    lCurrentRecord = lRecords(lCurrentIndex)
+                                    If lCurrentRecord.Trim.Length > 0 Then
+                                        If lCurrentRecord.StartsWith("  END " & lTableName) Then
+                                            'found end of table
+                                            lEndofTable = True
+                                        Else
+                                            If InStr(1, lCurrentRecord, "***") Then
+                                                'comment, ignore
+                                            Else
+                                                'found line of table
+                                                Dim lOpf As String = Mid(lCurrentRecord, 1, 5)
+                                                Dim lOpl = Trim(Mid(lCurrentRecord, 6, 5))
+                                                If Len(lOpl) = 0 Then
+                                                    lOpl = lOpf
+                                                End If
+                                                For Each lOper As Generic.KeyValuePair(Of String, HspfOperation) In lPoll.Operations
+                                                    If lOper.Value.Name = lOpTyp Then
+                                                        If lOpf = lOper.Value.DefOpnId Or (lOpf <= lOper.Value.DefOpnId And lOper.Value.DefOpnId <= lOpl) Then
+                                                            Dim lTable As New HspfTable
+                                                            lTable.Def = pMsg.BlockDefs(lOpTyp).TableDefs(lTableName)
+                                                            lTable.Opn = lOper.Value
+                                                            lTable.InitTable(lCurrentRecord)
+                                                            If lTable.Name = "GQ-QALDATA" Then
+                                                                lRtype = 1
+                                                            ElseIf lTable.Name = "QUAL-PROPS" Then
+                                                                lPtype = 1
+                                                                lItype = 1
+                                                            End If
+                                                            lTable.OccurCount = 1
+                                                            lTable.OccurNum = 1
+                                                            lTable.OccurIndex = 0
+                                                            If Not lOper.Value.TableExists(lTable.Name) Then
+                                                                lOper.Value.Tables.Add(lTable)
+                                                                If Not lPoll.TableExists(lTable.Name) Then
+                                                                    lPoll.Tables.Add(lTable.Name, lTable)
+                                                                End If
+                                                            Else
+                                                                'handle multiple occurs of this table
+                                                                Dim ltempTable As HspfTable = lOper.Value.Tables(lTable.Name)
+                                                                Dim lNOccurance As Integer = ltempTable.OccurCount + 1
+                                                                Dim lTempName As String = ""
+                                                                ltempTable.OccurCount = lNOccurance
+                                                                For lTableIndex As Integer = 2 To lNOccurance - 1
+                                                                    lTempName = lTable.Name & ":" & CStr(lTableIndex)
+                                                                    ltempTable = lOper.Value.Tables(lTempName)
+                                                                    ltempTable.OccurCount = lNOccurance
+                                                                Next
+                                                                lTable.OccurCount = lNOccurance
+                                                                lTable.OccurNum = lNOccurance
+                                                                lTempName = lTable.Name & ":" & CStr(lNOccurance)
+                                                                lOper.Value.Tables.Add(lTable)
+                                                                If Not lPoll.TableExists(lTempName) Then
+                                                                    lPoll.Tables.Add(lTempName, lTable)
+                                                                End If
+                                                            End If
+                                                        End If
+                                                    End If
+                                                Next
+                                            End If
+                                        End If
+                                    End If
+                                Loop
+                            End If
+                        Loop
 
-        '                    If lStr.StartsWith("END CONSTIT") Then
-        '                        'found end of constituent
-        '                        lCend = True
-        '                        lPoll.Id = pDefUCI.Pollutants.Count + 1
-        '                        lPoll.Index = pUCI.Pollutants.Count + 1
-        '                        If lPtype = 1 And lRtype = 1 Then
-        '                            lPoll.ModelType = "PIG"
-        '                        ElseIf lPtype = 1 Then
-        '                            lPoll.ModelType = "PIOnly"
-        '                        ElseIf lRtype = 1 Then
-        '                            lPoll.ModelType = "GOnly"
-        '                        Else
-        '                            lPoll.ModelType = "Data"
-        '                        End If
-        '                        lFound = False
-        '                        For Each lTempPoll As HspfPollutant In pUCI.Pollutants
-        '                            If lTempPoll.Name = lPoll.Name Then
-        '                                lFound = True
-        '                            End If
-        '                        Next
-        '                        For Each lTempPoll As HspfPollutant In pDefUCI.Pollutants
-        '                            If lTempPoll.Name = lPoll.Name Then
-        '                                lFound = True
-        '                            End If
-        '                        Next
-        '                        If lFound = False Then
-        '                            pDefUCI.Pollutants.Add(lPoll)
-        '                        End If
-        '                        lPoll = Nothing
-        '                    Else
-        '                        lOpTyp = lStr.Substring(1, lLen)
-        '                        If lOpTyp = "PERLND" Or lOpTyp = "IMPLND" Or lOpTyp = "RCHRES" Then
-        '                            'found start of an operation
-        '                            lOpnBlk = New HspfOpnBlk
-        '                            lOpnBlk.Name = lOpTyp
-        '                            lOpnBlk.Uci = pDefUCI
-        '                            For Each lOper In pUCI.OpnBlks(lOpTyp).Ids
-        '                                lOpnBlk.Ids.Add(lOper, lOpTyp & lOper.Id)
-        '                            Next
-        '                            For Each lOper In pUCI.OpnBlks(lOpTyp).Ids
-        '                                tOper = New HspfOperation
-        '                                tOper.Name = lOper.Name
-        '                                tOper.Id = lOper.Id
-        '                                tOper.Description = lOper.Description
-        '                                tOper.DefOpnId = DefaultOpnId(tOper, pDefUCI)
-        '                                tOper.OpnBlk = lOpnBlk
-        '                                lPoll.Operations.Add(lOpTyp & tOper.Id, tOper)                                    Next vOper
+                    ElseIf lCurrentRecord.StartsWith("MASS-LINKS") Then
+                            Dim lFoundEndofMassLinks As Boolean = False
+                            Do While Not lFoundEndofMassLinks
+                                lCurrentIndex += 1
+                                lCurrentRecord = lRecords(lCurrentIndex)
+                                If lCurrentRecord.StartsWith("END MASS-LINKS") Then
+                                    'found end of masslinks
+                                    lFoundEndofMassLinks = True
+                                ElseIf lCurrentRecord.Trim.Length > 0 Then
+                                    'found a masslink
+                                    Dim lML As New HspfMassLink
+                                    lML.Uci = pDefUCI
+                                    lML.Source.VolName = Trim(Mid(lCurrentRecord, 1, 6))
+                                    lML.Source.Group = Trim(Mid(lCurrentRecord, 12, 6))
+                                    lML.Source.Member = Trim(Mid(lCurrentRecord, 19, 6))
+                                    Dim lIstr As String = Trim(Mid(lCurrentRecord, 26, 1))
+                                    If Len(lIstr) = 0 Then
+                                        lML.Source.MemSub1 = 0
+                                    Else
+                                        lML.Source.MemSub1 = CInt(lIstr)
+                                    End If
+                                    lIstr = Trim(Mid(lCurrentRecord, 28, 1))
+                                    If Len(lIstr) = 0 Then
+                                        lML.Source.MemSub2 = 0
+                                    Else
+                                        lML.Source.MemSub2 = CInt(lIstr)
+                                    End If
+                                    lIstr = Trim(Mid(lCurrentRecord, 30, 10))
+                                    If Len(lIstr) = 0 Then
+                                        lML.MFact = 1
+                                    Else
+                                        lML.MFact = lIstr
+                                    End If
+                                    lML.Target.VolName = Trim(Mid(lCurrentRecord, 44, 6))
+                                    lML.Target.Group = Trim(Mid(lCurrentRecord, 59, 6))
+                                    lML.Target.Member = Trim(Mid(lCurrentRecord, 66, 6))
+                                    lIstr = Trim(Mid(lCurrentRecord, 73, 1))
+                                    If Len(lIstr) = 0 Then
+                                        lML.Target.MemSub1 = 0
+                                    Else
+                                        lML.Target.MemSub1 = CInt(lIstr)
+                                    End If
+                                    lIstr = Trim(Mid(lCurrentRecord, 75, 1))
+                                    If Len(lIstr) = 0 Then
+                                        lML.Target.MemSub2 = 0
+                                    Else
+                                        lML.Target.MemSub2 = CInt(lIstr)
+                                    End If
+                                    lML.MassLinkId = pUCI.MassLinks(1).FindMassLinkID(lML.Source.VolName, lML.Target.VolName)
+                                    lPoll.MassLinks.Add(lML)
+                                End If
+                            Loop
+                    End If
+                Loop
+            End If
 
-        '                                lOpEnd = False
-        '                                Do While Not lOpEnd
-        '                                    lCurrentIndex += 1
-        '                                    lStr = lRecords(lCurrentIndex)
-        '                                    lLen = Len(RTrim(lStr))
-        '                                    If Left(lStr, ilen) = "END " & coptyp Then
-        '                                        'found end of operation
-        '                                        opend = True
-        '                                    ElseIf ilen > 0 Then
-        '                                        'found start of table
-        '                                        ctab = RTrim(Mid(lStr, 3))
+            lCurrentIndex += 1
+        Loop
 
-        '                                        tabend = False
-        '                                        Do While Not tabend
-        '            Line Input #i, lstr
-        '                                            ilen = Len(lStr)
-        '                                            lStr = RTrim(lStr)
-        '                                            If ilen > 0 Then
-        '                                                If Left(lStr, ilen) = "  END " & ctab Then
-        '                                                    'found end of table
-        '                                                    tabend = True
-        '                                                Else
-        '                                                    If InStr(1, lStr, "***") Then
-        '                                                        'comment, ignore
-        '                                                    Else
-        '                                                        'found line of table
-        '                                                        opf = Left(lStr, 5)
-        '                                                        sopl = Trim(Mid(lStr, 6, 5))
-        '                                                        If Len(sopl) > 0 Then
-        '                                                            opl = sopl
-        '                                                        Else
-        '                                                            opl = opf
-        '                                                        End If
-        '                                                        For Each vOper In lPoll.Operations
-        '                                                            lOper = vOper
-        '                                                            If lOper.Name = coptyp Then
-        '                                                                If opf = lOper.DefOpnId Or (opf <= lOper.DefOpnId And lOper.DefOpnId <= opl) Then
-        '                                                                    lTable = New HspfTable
-        '                                                                    lTable.Def = myMsg.BlockDefs(coptyp).TableDefs(ctab)
-        '                                                                    lTable.Opn = lOper
-        '                                                                    lTable.InitTable(lStr)
-        '                                                                    If lTable.Name = "GQ-QALDATA" Then
-        '                                                                        rtype = 1
-        '                                                                    ElseIf lTable.Name = "QUAL-PROPS" Then
-        '                                                                        ptype = 1
-        '                                                                        itype = 1
-        '                                                                    End If
-        '                                                                    'Set lTable.Opn = lOper
-        '                                                                    lTable.OccurCount = 1
-        '                                                                    lTable.OccurNum = 1
-        '                                                                    lTable.OccurIndex = 0
-        '                                                                    If Not lOper.TableExists(lTable.Name) Then
-        '                                                                        lOper.Tables.Add(lTable, lTable.Name)
-        '                                                                        If Not lPoll.TableExists(lTable.Name) Then
-        '                                                                            lPoll.Tables.Add(lTable, lTable.Name)
-        '                                                                        End If
-        '                                                                    Else
-        '                                                                        'handle multiple occurs of this table
-        '                                                                        tempTable = lOper.Tables(lTable.Name)
-        '                                                                        thistable = tempTable.OccurCount + 1
-        '                                                                        tempTable.OccurCount = thistable
-        '                                                                        For j = 2 To thistable - 1
-        '                                                                            tempname = lTable.Name & ":" & CStr(j)
-        '                                                                            tempTable = lOper.Tables(tempname)
-        '                                                                            tempTable.OccurCount = thistable
-        '                                                                        Next j
-        '                                                                        lTable.OccurCount = thistable
-        '                                                                        lTable.OccurNum = thistable
-        '                                                                        tempname = lTable.Name & ":" & CStr(thistable)
-        '                                                                        lOper.Tables.Add(lTable, tempname)
-        '                                                                        If Not lPoll.TableExists(tempname) Then
-        '                                                                            lPoll.Tables.Add(lTable, tempname)
-        '                                                                        End If
-        '                                                                    End If
-        '                                                                End If
-        '                                                            End If
-        '                                                        Next vOper
-        '                                                    End If
-        '                                                End If
-        '                                            End If
-        '                                        Loop
-
-        '                                    End If
-        '                                Loop
-        '                        ElseIf coptyp = "MASS-LINKS" Then
-        '                                massend = False
-        '                                Do While Not massend
-        '        Line Input #i, lstr
-        '                                    ilen = Len(lStr)
-        '                                    If Left(lStr, ilen) = "END " & coptyp Then
-        '                                        'found end of masslinks
-        '                                        massend = True
-        '                                    ElseIf ilen > 0 Then
-        '                                        'found a masslink
-        '                                        lML = New HspfMassLink
-        '                                        lML.Uci = defUci
-        '                                        lML.Source.VolName = Trim(Mid(lStr, 1, 6))
-        '                                        lML.Source.Group = Trim(Mid(lStr, 12, 6))
-        '                                        lML.Source.Member = Trim(Mid(lStr, 19, 6))
-        '                                        istr = Trim(Mid(lStr, 26, 1))
-        '                                        If Len(istr) = 0 Then
-        '                                            lML.Source.MemSub1 = 0
-        '                                        Else
-        '                                            lML.Source.MemSub1 = CInt(istr)
-        '                                        End If
-        '                                        istr = Trim(Mid(lStr, 28, 1))
-        '                                        If Len(istr) = 0 Then
-        '                                            lML.Source.MemSub2 = 0
-        '                                        Else
-        '                                            lML.Source.MemSub2 = CInt(istr)
-        '                                        End If
-        '                                        istr = Trim(Mid(lStr, 30, 10))
-        '                                        If Len(istr) = 0 Then
-        '                                            lML.MFact = 1
-        '                                        Else
-        '                                            'lML.MFact = CSng(istr)
-        '                                            lML.MFact = istr
-        '                                        End If
-        '                                        lML.Target.VolName = Trim(Mid(lStr, 44, 6))
-        '                                        lML.Target.Group = Trim(Mid(lStr, 59, 6))
-        '                                        lML.Target.Member = Trim(Mid(lStr, 66, 6))
-        '                                        istr = Trim(Mid(lStr, 73, 1))
-        '                                        If Len(istr) = 0 Then
-        '                                            lML.Target.MemSub1 = 0
-        '                                        Else
-        '                                            lML.Target.MemSub1 = CInt(istr)
-        '                                        End If
-        '                                        istr = Trim(Mid(lStr, 75, 1))
-        '                                        If Len(istr) = 0 Then
-        '                                            lML.Target.MemSub2 = 0
-        '                                        Else
-        '                                            lML.Target.MemSub2 = CInt(istr)
-        '                                        End If
-        '                                        lML.MassLinkId = myUci.MassLinks(1).FindMassLinkID(lML.Source.VolName, lML.Target.VolName)
-        '                                        lPoll.MassLinks.Add(lML)
-        '                                    End If
-        '                                Loop
-        '                        End If
-        '                    End If
-        '                Loop
-        '            End If
-        '        End If
-        '    Next
-        'End If
     End Sub
 
     'Private Sub FindAndRemoveExtTargets(ByVal j&)
