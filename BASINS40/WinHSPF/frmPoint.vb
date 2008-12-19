@@ -6,10 +6,10 @@ Imports atcUtility
 Imports MapWinUtility
 Imports WinHSPF
 Imports System.Collections.ObjectModel
+Imports System.Text.RegularExpressions
 
 Public Class frmPoint
 
-    Dim DoneBuild As Boolean
     'Dim lts As Collection(Of atcData.atcTimeseries)
     Dim lts As Collection
 
@@ -18,25 +18,27 @@ Public Class frmPoint
 
     'The array InUseFacs(,) is a 2-D array that holds the (dimension 0) facility name, (dimension 1) scenario string
     'it should have the same elements as the sources list that are checked.
-    Dim InUseFacs(1)() As String
+    Dim pInUseFacs(1)() As String
 
     'The array AvailFacs(,) is a 2-D array that holds the (dimension 0) facility name, (dimension 1) scenario string
     'it should have the same elements as the sources list that are NOT checked.
-    Dim AvailFacs(1)() As String
+    Dim pAvailFacs(1)() As String
 
-    Dim CountInUseFacs As Integer
-    Dim CountAvailFacs As Integer
-    Dim ConsLinks() As String
-    Dim MemberLinks() As String
-    Dim LinkCount As Integer
-    Dim MSub1Links() As Long, MSub2Links() As Long
+
+    Dim pCountInUseFacs As Integer
+    Dim pCountAvailFacs As Integer
+    Dim pConsLinks() As String
+    Dim pMemberLinks() As String
+    Dim pLinkCount As Integer
+    Dim pMSub1Links() As Long
+    Dim pMSub2Links() As Long
+
+    'Pollutant list populated by user selected file.
+    Dim pPollutantList As New Collection
 
     'Each integer in pAgdPointRowReference corresponds (in index order) to a row in the current agdPoint grid. 
     'Item(i) is the row number in agdMasterPoint that corresponds to row (i) in agdPoint.
     Dim pAgdPointRowReference As New Collection
-
-    Private HsashDragging As Boolean
-    Private HsashDragStart As Single
 
     Public Sub New()
         Dim LinkCount As Integer
@@ -53,7 +55,7 @@ Public Class frmPoint
             .Clear()
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
-            .Visible = True
+            .Visible = False
         End With
 
         With agdPoint
@@ -68,19 +70,20 @@ Public Class frmPoint
 
         LinkCount = 1
 
-        ReDim ConsLinks(LinkCount)
-        ReDim MemberLinks(LinkCount)
-        ReDim MSub1Links(LinkCount)
-        ReDim MSub2Links(LinkCount)
-        ConsLinks(0) = "FLOW"
-        MemberLinks(0) = "IVOL"
-        MSub1Links(0) = 0
-        MSub2Links(0) = 0
+        LoadPollutantList(False)
+
+        ReDim pConsLinks(pLinkCount)
+        ReDim pMemberLinks(pLinkCount)
+        ReDim pMSub1Links(pLinkCount)
+        ReDim pMSub2Links(pLinkCount)
+        pConsLinks(0) = "FLOW"
+        pMemberLinks(0) = "IVOL"
+        pMSub1Links(0) = 0
+        pMSub2Links(0) = 0
 
         agdPoint.Source = New atcControls.atcGridSource
         agdMasterPoint.Source = New atcControls.atcGridSource
 
-        DoneBuild = False
         With agdMasterPoint.Source
             .Columns = 14
             .CellValue(0, 0) = "In Use"
@@ -113,7 +116,6 @@ Public Class frmPoint
         agdPoint.Source.CellValue(0, 3) = "Target Member"
 
         FillMasterGrid()
-        DoneBuild = True
         '.net conversion issue: tsl formerly atcTSList
         Dim tsl As New List(Of atcTimeseries)
 
@@ -121,6 +123,78 @@ Public Class frmPoint
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
     End Sub
+
+    Private Sub LoadPollutantList(ByVal aManualSelect As Boolean)
+        Dim lPollutantFileName As String = Nothing
+        Dim lLineNumber As Integer = 0
+
+        cboPollutantList.Enabled = True
+
+        Try
+
+            pPollutantList.Clear()
+            cboPollutantList.Items.Clear()
+            cboPollutantList.Items.Add("<Click to see Pollutant list>")
+
+            If Not aManualSelect Then
+                'Initial try to load default file on startup
+                lPollutantFileName = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\Poltnt_2.prn"
+
+                If Not FileExists(lPollutantFileName) Then
+                    lPollutantFileName = FindFile("Please locate Poltnt_2.prn", "Poltnt_2.prn")
+                End If
+            Else
+                'Open file button manually pressed
+                OpenFileDialog1.InitialDirectory = System.Reflection.Assembly.GetEntryAssembly.Location
+                OpenFileDialog1.Filter = "Pollutant List | *.prn"
+                OpenFileDialog1.FileName = "*.prn"
+                OpenFileDialog1.Title = "Select Pollutant List"
+
+                If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    lPollutantFileName = OpenFileDialog1.FileName
+                ElseIf OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.Cancel Then
+                    Exit Try
+                End If
+            End If
+
+            txtPollutantPath.Text = lPollutantFileName
+
+            For Each lString As String In LinesInFile(lPollutantFileName)
+
+                'skip the first line which is assumed to be a header
+                If lLineNumber = 0 Then
+                    If InStr(lString, "PARM_CODE    PARM_NAME") < 1 Then
+                        If Logger.Message("The header of this pollutant file: " & vbCrLf & lPollutantFileName & vbCrLf & "Does not match common fomating standards. Do you want to continue?", "Pollutant File Suspicious", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.Yes) = Windows.Forms.DialogResult.No Then
+                            Exit Try
+                        End If
+                    End If
+                Else
+
+                    'Split the line with the first five alphanumeric characters and following spaces (1 or more) as the delimiter.
+                    'Will generate blank string ("") as first element in the array. The second string is the pollutant
+                    'name we seek to add to the pPollutantList collection.
+
+                    Dim lSplitString() As String = Regex.Split(lString, "^[A-Z0-9]{5} +")
+
+                    If lSplitString.Length > 1 Then
+                        pPollutantList.Add(lSplitString(1))
+                        cboPollutantList.Items.Add(lSplitString(1))
+                    End If
+                End If
+                lLineNumber += 1
+            Next
+            If cboPollutantList.Items.Count = 1 Then
+                cboPollutantList.Items.Item(0) = "<No pollutants found in file>"
+            End If
+            cboPollutantList.SelectedIndex = 0
+        Catch ex As Exception
+            pPollutantList.Clear()
+            MsgBox(cboPollutantList.Items.Count)
+            cboPollutantList.Enabled = False
+            Logger.Message("There was an error reading the selected pollutant list." & vbCrLf & "Ensure that the pollutant file selected is formatted properly.", "Error Reading the pollutant file", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+        End Try
+    End Sub
+
 
     Private Sub agdMasterPoint2agdPoint()
         Dim i As Integer
@@ -176,19 +250,20 @@ Public Class frmPoint
 
     End Sub
 
+    Private Sub agdPoint_ValueChanged(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdPoint.CellEdited
+        If agdPoint.Source.CellValue(aRow, aColumn) = "Yes" AndAlso Len(agdPoint.Source.CellValue(aRow, 3)) = 0 Then
+            Logger.Message("No target member has been set for the point source " & agdPoint.Source.CellValue(aRow, 2) & " in the current grid." & vbCrLf & "Set the point source In-Use setting to No or assign a valid target member.", "PointSources - Need Target Member", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+        End If
+    End Sub
+
     Private Sub UpdateListArrays()
         Dim lOper As Integer
         Dim lCheckedItemSplit() As String
 
-        InUseFacs(0) = New String() {}
-        InUseFacs(1) = New String() {}
-        AvailFacs(0) = New String() {}
-        AvailFacs(1) = New String() {}
-
-        'ReDim InUseFacs(0)(0)
-        'ReDim InUseFacs(1)(0)
-        'ReDim AvailFacs(0)(0)
-        'ReDim AvailFacs(1)(0)
+        pInUseFacs(0) = New String() {}
+        pInUseFacs(1) = New String() {}
+        pAvailFacs(0) = New String() {}
+        pAvailFacs(1) = New String() {}
 
         For lOper = 0 To lstPoints.Items.Count - 1
             'split the string of the newly checked item into (Index 0): description and (Index 1): scenario
@@ -199,19 +274,19 @@ Public Class frmPoint
             ReDim Preserve lCheckedItemSplit(1)
 
             If lstPoints.GetItemChecked(lOper) Then
-                ReDim Preserve InUseFacs(0)(InUseFacs(0).GetUpperBound(0) + 1)
-                ReDim Preserve InUseFacs(1)(InUseFacs(1).GetUpperBound(0) + 1)
-                InUseFacs(0)(InUseFacs(0).GetUpperBound(0)) = lCheckedItemSplit(0)
-                InUseFacs(1)(InUseFacs(1).GetUpperBound(0)) = lCheckedItemSplit(1)
+                ReDim Preserve pInUseFacs(0)(pInUseFacs(0).GetUpperBound(0) + 1)
+                ReDim Preserve pInUseFacs(1)(pInUseFacs(1).GetUpperBound(0) + 1)
+                pInUseFacs(0)(pInUseFacs(0).GetUpperBound(0)) = lCheckedItemSplit(0)
+                pInUseFacs(1)(pInUseFacs(1).GetUpperBound(0)) = lCheckedItemSplit(1)
             Else
-                ReDim Preserve AvailFacs(0)(AvailFacs(0).GetUpperBound(0) + 1)
-                ReDim Preserve AvailFacs(1)(AvailFacs(1).GetUpperBound(0) + 1)
-                AvailFacs(0)(AvailFacs(0).GetUpperBound(0)) = lCheckedItemSplit(0)
-                AvailFacs(1)(AvailFacs(1).GetUpperBound(0)) = lCheckedItemSplit(1)
+                ReDim Preserve pAvailFacs(0)(pAvailFacs(0).GetUpperBound(0) + 1)
+                ReDim Preserve pAvailFacs(1)(pAvailFacs(1).GetUpperBound(0) + 1)
+                pAvailFacs(0)(pAvailFacs(0).GetUpperBound(0)) = lCheckedItemSplit(0)
+                pAvailFacs(1)(pAvailFacs(1).GetUpperBound(0)) = lCheckedItemSplit(1)
             End If
         Next
 
-        CountInUseFacs = lstPoints.CheckedItems.Count
+        pCountInUseFacs = lstPoints.CheckedItems.Count
 
     End Sub
 
@@ -310,8 +385,8 @@ Public Class frmPoint
 
                                     'look for this con in pollutant list
 
-                                    For Each vpol In pUCI.Pollutants
-                                        lpol = vpol.Name
+                                    For Each vpol In pPollutantList
+                                        lpol = vpol
                                         If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
                                             lcon = lpol
                                             Exit For
@@ -325,23 +400,23 @@ Public Class frmPoint
                                     If activeflag Then
                                         'is active, see if we want to remember link
                                         ifound = False
-                                        For k = 1 To LinkCount
-                                            If ConsLinks(k - 1) = UCase(Trim(lcon)) Then
+                                        For k = 1 To pLinkCount
+                                            If pConsLinks(k - 1) = UCase(Trim(lcon)) Then
                                                 ifound = True
                                                 Exit For
                                             End If
                                         Next k
                                         If Not ifound Then
                                             'add this to list
-                                            LinkCount = LinkCount + 1
-                                            ReDim Preserve ConsLinks(LinkCount)
-                                            ReDim Preserve MemberLinks(LinkCount)
-                                            ReDim Preserve MSub1Links(LinkCount)
-                                            ReDim Preserve MSub2Links(LinkCount)
-                                            ConsLinks(LinkCount - 1) = UCase(Trim(lcon))
-                                            MemberLinks(LinkCount - 1) = MemberFromLongVersion(.CellValue(icnt, 10))
-                                            MSub1Links(LinkCount - 1) = MemSub1FromLongVersion(.CellValue(icnt, 10))
-                                            MSub2Links(LinkCount - 1) = MemSub2FromLongVersion(.CellValue(icnt, 10))
+                                            pLinkCount = pLinkCount + 1
+                                            ReDim Preserve pConsLinks(pLinkCount)
+                                            ReDim Preserve pMemberLinks(pLinkCount)
+                                            ReDim Preserve pMSub1Links(pLinkCount)
+                                            ReDim Preserve pMSub2Links(pLinkCount)
+                                            pConsLinks(pLinkCount - 1) = UCase(Trim(lcon))
+                                            pMemberLinks(pLinkCount - 1) = MemberFromLongVersion(.CellValue(icnt, 10))
+                                            pMSub1Links(pLinkCount - 1) = MemSub1FromLongVersion(.CellValue(icnt, 10))
+                                            pMSub2Links(pLinkCount - 1) = MemSub2FromLongVersion(.CellValue(icnt, 10))
                                         End If
                                     End If
 
@@ -355,9 +430,9 @@ Public Class frmPoint
 
             'set default members for all
             For i = 1 To .Rows
-                For k = 1 To LinkCount
-                    If ConsLinks(k - 1) = UCase(Trim(.CellValue(i, 4))) Then
-                        .CellValue(i, 10) = MemberLongVersion(MemberLinks(k - 1), MSub1Links(k - 1), MSub2Links(k - 1))
+                For k = 1 To pLinkCount
+                    If pConsLinks(k - 1) = UCase(Trim(.CellValue(i, 4))) Then
+                        .CellValue(i, 10) = MemberLongVersion(pMemberLinks(k - 1), pMSub1Links(k - 1), pMSub2Links(k - 1))
                         '.TextMatrix(i, 12) = MSub1Links(K - 1)
                         '.TextMatrix(i, 13) = MSub2Links(K - 1)
                         Exit For
@@ -525,12 +600,12 @@ Public Class frmPoint
 
     Private Sub ExpandedView(ByVal aExpand As Boolean)
         If aExpand Then
-            Me.Size = New Size(800, 475)
+            Me.Size = New Size(800, 590)
             cmdDetailsHide.Visible = True
             cmdDetailsShow.Visible = False
             grpDetails.Visible = True
         Else
-            Me.Size = New Size(280, 475)
+            Me.Size = New Size(280, 590)
             cmdDetailsHide.Visible = False
             cmdDetailsShow.Visible = True
             grpDetails.Visible = False
@@ -688,6 +763,7 @@ Public Class frmPoint
 
         RemoveHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
 
+
         chkAllSources.Checked = False
 
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
@@ -702,9 +778,8 @@ Public Class frmPoint
 
         For i = 1 To agdMasterPoint.Source.Rows - 1
             'Check if facility and scenario are in use.
-
-            MsgBox(Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) & Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) & Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) & ":::" & Mid(agdMasterPoint.Source.CellValue(i, 1), 4))
-            If Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 AndAlso Array.IndexOf(InUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(InUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) <> -1 Then
+            'MsgBox(Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) & Array.IndexOf(pInUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) & Array.IndexOf(pInUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) & ":::" & Mid(agdMasterPoint.Source.CellValue(i, 1), 4))
+            If Array.IndexOf(pConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 AndAlso Array.IndexOf(pInUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(pInUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) <> -1 Then
                 ifound = True
                 'set indiv timsers to in use in master grid
                 agdMasterPoint.Source.CellValue(i, 0) = "Yes"
@@ -718,7 +793,7 @@ Public Class frmPoint
         agdMasterPoint2agdPoint()
 
         'rebuild lists
-        CountInUseFacs = lstPoints.Items.Count - lstPoints.CheckedItems.Count
+        pCountInUseFacs = lstPoints.Items.Count - lstPoints.CheckedItems.Count
 
 
     End Sub
@@ -726,6 +801,9 @@ Public Class frmPoint
     Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
         agdMasterPoint2agdPoint()
         grpDetails.Text = "Details of " & lstPoints.SelectedItem
+
+
+
     End Sub
     Private Sub cmdShowDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsShow.Click
         'if there exists points and no point is selected, then choose the first entry
@@ -742,6 +820,32 @@ Public Class frmPoint
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+        Dim lOper1, lOper2 As Integer
+        Dim lCheckedItemSplit() As String
+
+        'Copy agdPoint to agdMasterPoint
+        'TODO:
+
+        'Set and unselected facilities in lstPoints to not-in-use
+        For lOper1 = 0 To lstPoints.Items.Count - 1
+            'split the selected item text into lCheckedItemSplit(0): facility, lCheckedItemSplit(1): scenario
+
+            'A blank string will be found and added at the end of the string split, but is unimportant
+            lCheckedItemSplit = lstPoints.Items.Item(lstPoints.SelectedIndex).ToString.Split(New [Char]() {"("c, ")"c})
+
+            'remove space before "(" in string.
+            lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
+
+            'add the "PT-" to match entries in agdMasterPoint
+            lCheckedItemSplit(1) = "PT-" & lCheckedItemSplit(1)
+
+            For lOper2 = 1 To agdMasterPoint.Source.Rows - 1
+                If agdMasterPoint.Source.CellValue(lOper2, 3) = lCheckedItemSplit(0) AndAlso agdMasterPoint.Source.CellValue(lOper2, 1) = lCheckedItemSplit(1) Then
+                    agdMasterPoint.Source.CellValue(lOper2, 0) = "No"
+                End If
+            Next
+        Next
+
         Me.Dispose()
     End Sub
 
@@ -817,4 +921,13 @@ Public Class frmPoint
 
     End Sub
 
+    Private Sub cmdFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFile.Click
+        LoadPollutantList(True)
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        cboPollutantList.Items.Add("Click to view pollutant list")
+        cboPollutantList.SelectedIndex = 0
+        MsgBox(cboPollutantList.Items.Count)
+    End Sub
 End Class

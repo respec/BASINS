@@ -42,9 +42,15 @@ Partial Class frmPoint
         Me.cmdDetailsShow = New System.Windows.Forms.Button
         Me.cmdDetailsHide = New System.Windows.Forms.Button
         Me.agdMasterPoint = New atcControls.atcGrid
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.cboPollutantList = New System.Windows.Forms.ComboBox
+        Me.cmdFile = New System.Windows.Forms.Button
+        Me.txtPollutantPath = New System.Windows.Forms.TextBox
+        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'chkAllSources
@@ -137,11 +143,12 @@ Partial Class frmPoint
         Me.ImageList1.Images.SetKeyName(1, "next-16x16.png")
         Me.ImageList1.Images.SetKeyName(2, "add.png")
         Me.ImageList1.Images.SetKeyName(3, "create.png")
+        Me.ImageList1.Images.SetKeyName(4, "open.png")
         '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Location = New System.Drawing.Point(137, 401)
+        Me.cmdCancel.Location = New System.Drawing.Point(137, 516)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
         Me.cmdCancel.TabIndex = 18
@@ -151,7 +158,7 @@ Partial Class frmPoint
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Location = New System.Drawing.Point(28, 401)
+        Me.cmdOK.Location = New System.Drawing.Point(28, 516)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(101, 26)
         Me.cmdOK.TabIndex = 17
@@ -169,7 +176,7 @@ Partial Class frmPoint
         Me.grpDetails.Controls.Add(Me.Button8)
         Me.grpDetails.Location = New System.Drawing.Point(283, 12)
         Me.grpDetails.Name = "grpDetails"
-        Me.grpDetails.Size = New System.Drawing.Size(478, 324)
+        Me.grpDetails.Size = New System.Drawing.Size(478, 422)
         Me.grpDetails.TabIndex = 19
         Me.grpDetails.TabStop = False
         Me.grpDetails.Text = "Details of <    >"
@@ -187,7 +194,7 @@ Partial Class frmPoint
         Me.agdPoint.LineWidth = 0.0!
         Me.agdPoint.Location = New System.Drawing.Point(57, 16)
         Me.agdPoint.Name = "agdPoint"
-        Me.agdPoint.Size = New System.Drawing.Size(411, 299)
+        Me.agdPoint.Size = New System.Drawing.Size(411, 389)
         Me.agdPoint.Source = Nothing
         Me.agdPoint.TabIndex = 25
         '
@@ -227,7 +234,7 @@ Partial Class frmPoint
         Me.cmdDetailsShow.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsShow.ImageIndex = 1
         Me.cmdDetailsShow.ImageList = Me.ImageList1
-        Me.cmdDetailsShow.Location = New System.Drawing.Point(157, 358)
+        Me.cmdDetailsShow.Location = New System.Drawing.Point(157, 466)
         Me.cmdDetailsShow.Name = "cmdDetailsShow"
         Me.cmdDetailsShow.Size = New System.Drawing.Size(100, 21)
         Me.cmdDetailsShow.TabIndex = 17
@@ -242,7 +249,7 @@ Partial Class frmPoint
         Me.cmdDetailsHide.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdDetailsHide.ImageIndex = 0
         Me.cmdDetailsHide.ImageList = Me.ImageList1
-        Me.cmdDetailsHide.Location = New System.Drawing.Point(283, 358)
+        Me.cmdDetailsHide.Location = New System.Drawing.Point(283, 466)
         Me.cmdDetailsHide.Name = "cmdDetailsHide"
         Me.cmdDetailsHide.Size = New System.Drawing.Size(100, 21)
         Me.cmdDetailsHide.TabIndex = 20
@@ -254,24 +261,74 @@ Partial Class frmPoint
         '
         Me.agdMasterPoint.AllowHorizontalScrolling = True
         Me.agdMasterPoint.AllowNewValidValues = False
-        Me.agdMasterPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdMasterPoint.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.agdMasterPoint.CellBackColor = System.Drawing.Color.Empty
         Me.agdMasterPoint.Fixed3D = False
         Me.agdMasterPoint.LineColor = System.Drawing.Color.Empty
         Me.agdMasterPoint.LineWidth = 0.0!
-        Me.agdMasterPoint.Location = New System.Drawing.Point(589, 358)
+        Me.agdMasterPoint.Location = New System.Drawing.Point(502, 455)
         Me.agdMasterPoint.Name = "agdMasterPoint"
-        Me.agdMasterPoint.Size = New System.Drawing.Size(172, 49)
+        Me.agdMasterPoint.Size = New System.Drawing.Size(259, 59)
         Me.agdMasterPoint.Source = Nothing
         Me.agdMasterPoint.TabIndex = 21
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.cboPollutantList)
+        Me.GroupBox1.Controls.Add(Me.cmdFile)
+        Me.GroupBox1.Controls.Add(Me.txtPollutantPath)
+        Me.GroupBox1.Location = New System.Drawing.Point(12, 345)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(245, 89)
+        Me.GroupBox1.TabIndex = 23
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Pollutant List"
+        '
+        'cboPollutantList
+        '
+        Me.cboPollutantList.BackColor = System.Drawing.SystemColors.Control
+        Me.cboPollutantList.Cursor = System.Windows.Forms.Cursors.Arrow
+        Me.cboPollutantList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPollutantList.FormattingEnabled = True
+        Me.cboPollutantList.Location = New System.Drawing.Point(13, 55)
+        Me.cboPollutantList.MaxDropDownItems = 20
+        Me.cboPollutantList.Name = "cboPollutantList"
+        Me.cboPollutantList.Size = New System.Drawing.Size(219, 21)
+        Me.cboPollutantList.TabIndex = 25
+        '
+        'cmdFile
+        '
+        Me.cmdFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.cmdFile.ImageIndex = 4
+        Me.cmdFile.ImageList = Me.ImageList1
+        Me.cmdFile.Location = New System.Drawing.Point(13, 24)
+        Me.cmdFile.Name = "cmdFile"
+        Me.cmdFile.Size = New System.Drawing.Size(58, 22)
+        Me.cmdFile.TabIndex = 24
+        Me.cmdFile.Text = "Open"
+        Me.cmdFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.cmdFile.UseVisualStyleBackColor = True
+        '
+        'txtPollutantPath
+        '
+        Me.txtPollutantPath.Location = New System.Drawing.Point(73, 25)
+        Me.txtPollutantPath.Name = "txtPollutantPath"
+        Me.txtPollutantPath.ReadOnly = True
+        Me.txtPollutantPath.Size = New System.Drawing.Size(159, 20)
+        Me.txtPollutantPath.TabIndex = 23
+        '
+        'OpenFileDialog1
+        '
+        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(792, 448)
+        Me.ClientSize = New System.Drawing.Size(792, 563)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
         Me.Controls.Add(Me.agdMasterPoint)
@@ -286,6 +343,8 @@ Partial Class frmPoint
         Me.menuPointSources.ResumeLayout(False)
         Me.menuPointSources.PerformLayout()
         Me.grpDetails.ResumeLayout(False)
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -310,4 +369,9 @@ Partial Class frmPoint
     Friend WithEvents cmdAdvancedGen As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdScenario As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents agdMasterPoint As atcControls.atcGrid
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents txtPollutantPath As System.Windows.Forms.TextBox
+    Friend WithEvents cmdFile As System.Windows.Forms.Button
+    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents cboPollutantList As System.Windows.Forms.ComboBox
 End Class
