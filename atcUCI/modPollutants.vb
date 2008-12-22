@@ -295,354 +295,338 @@ Module modPollutants
     End Sub
 
     Public Sub modPollutantsUnBuild(ByRef aUci As HspfUci, ByRef myMsg As HspfMsg)
-        Dim lOpn As HspfOperation
-        Dim i, nGqual As Integer
-        Dim lML As HspfMassLink
-        Dim tPoll As HspfPollutant
-        Dim tML As HspfMassLink
-        Dim lCtype As String
-        Dim ltable, tempTable As HspfTable
-        Dim cname As String
-        Dim pflag, nIqual, nPqual, iflag, rflag As Integer
-        Dim psedfg, isedfg, IqualCnt, PqualCnt, GqualCnt, isedcnt, psedcnt As Integer
-        Dim OccurCount, lowestpos, lowestindex, Counter, MaxOccur As Integer
-        Dim ttable As HspfTable
-        Dim SecName As String
-        Dim SecId As Integer
-        Dim iexist As Integer
-        Dim changed As Boolean
-        Dim s As String
 
-        If aUci.Edited = False Then
-            changed = False
-        Else
-            changed = True
+        Dim lchanged As Boolean = False
+        If aUci.Edited Then
+            lchanged = True
         End If
 
         'find total number of each type
-        PqualCnt = 0
-        IqualCnt = 0
-        GqualCnt = 0
-        For Each tPoll In aUci.Pollutants
-            iflag = 0
-            pflag = 0
-            rflag = 0
-            If Len(tPoll.ModelType) > 0 Then
-                For Each lnewOpn As HspfOperation In tPoll.Operations.Values
+        Dim lPqualCnt As Integer = 0
+        Dim lIqualCnt As Integer = 0
+        Dim lGqualCnt As Integer = 0
+        Dim lPoll As HspfPollutant
+        For Each lPoll In aUci.Pollutants
+            Dim liflag As Integer = 0
+            Dim lpflag As Integer = 0
+            Dim lrflag As Integer = 0
+            If Len(lPoll.ModelType) > 0 Then
+                For Each lnewOpn As HspfOperation In lPoll.Operations.Values
                     If lnewOpn.Name = "IMPLND" Then
-                        If tPoll.ModelType = "PIOnly" Or tPoll.ModelType = "PIG" Then
-                            iflag = 1
+                        If lPoll.ModelType = "PIOnly" Or lPoll.ModelType = "PIG" Then
+                            liflag = 1
                         End If
                     ElseIf lnewOpn.Name = "PERLND" Then
-                        If tPoll.ModelType = "PIOnly" Or tPoll.ModelType = "PIG" Then
-                            pflag = 1
+                        If lPoll.ModelType = "PIOnly" Or lPoll.ModelType = "PIG" Then
+                            lpflag = 1
                         End If
                     ElseIf lnewOpn.Name = "RCHRES" Then
-                        If tPoll.ModelType = "GOnly" Or tPoll.ModelType = "PIG" Then
-                            rflag = 1
+                        If lPoll.ModelType = "GOnly" Or lPoll.ModelType = "PIG" Then
+                            lrflag = 1
                         End If
                     End If
                 Next
-                IqualCnt = IqualCnt + iflag
-                PqualCnt = PqualCnt + pflag
-                GqualCnt = GqualCnt + rflag
+                lIqualCnt = lIqualCnt + liflag
+                lPqualCnt = lPqualCnt + lpflag
+                lGqualCnt = lGqualCnt + lrflag
             End If
         Next
 
         'remove any lingering mls from pquals or iquals
-        i = 0
-        Do While i < aUci.MassLinks.Count
-            tML = aUci.MassLinks(i)
-            If tML.Source.VolName = "PERLND" And tML.Source.Group = "PQUAL" And tML.Target.VolName = "RCHRES" Then
-                aUci.MassLinks.RemoveAt(i)
-            ElseIf tML.Source.VolName = "IMPLND" And tML.Source.Group = "IQUAL" And tML.Target.VolName = "RCHRES" Then
-                aUci.MassLinks.RemoveAt(i)
+        Dim lIndex As Integer = 0
+        Do While lIndex < aUci.MassLinks.Count
+            Dim lML As HspfMassLink = aUci.MassLinks(lIndex)
+            If lML.Source.VolName = "PERLND" And lML.Source.Group = "PQUAL" And lML.Target.VolName = "RCHRES" Then
+                aUci.MassLinks.RemoveAt(lIndex)
+            ElseIf lML.Source.VolName = "IMPLND" And lML.Source.Group = "IQUAL" And lML.Target.VolName = "RCHRES" Then
+                aUci.MassLinks.RemoveAt(lIndex)
             Else
-                i = i + 1
+                lIndex += 1
             End If
         Loop
 
-        nPqual = 0
-        nIqual = 0
-        nGqual = 0
-        isedcnt = 0
-        psedcnt = 0
+        Dim lnPqual As Integer = 0
+        Dim lnIqual As Integer = 0
+        Dim lnGqual As Integer = 0
+        Dim lisedcnt As Integer = 0
+        Dim lpsedcnt As Integer = 0
+        Dim lCName As String = ""
         Do While aUci.Pollutants.Count > 0
             'find lowest index to preserve order of pollutants
-            lowestindex = 999
-            lowestpos = 1
-            Counter = 0
-            For Each tPoll In aUci.Pollutants
-                Counter = Counter + 1
-                If tPoll.Index < lowestindex Then
-                    lowestindex = tPoll.Index
-                    lowestpos = Counter
+            Dim lLowestIndex As Integer = 999
+            Dim lLowestPos As Integer = 1
+            Dim lCounter As Integer = 0
+            For Each lPoll In aUci.Pollutants
+                lCounter = lCounter + 1
+                If lPoll.Index < lLowestIndex Then
+                    lLowestIndex = lPoll.Index
+                    lLowestPos = lCounter
                 End If
             Next
-            tPoll = aUci.Pollutants(lowestpos - 1)
+            lPoll = aUci.Pollutants(lLowestPos - 1)
 
-            iflag = 0
-            pflag = 0
-            rflag = 0
-            If Len(tPoll.ModelType) > 0 Then
+            Dim lIflag As Integer = 0
+            Dim lPflag As Integer = 0
+            Dim lRflag As Integer = 0
+            If Len(lPoll.ModelType) > 0 Then
                 'put tables back
-                For Each lnewOpn As HspfOperation In tPoll.Operations.Values
+                For Each lnewOpn As HspfOperation In lPoll.Operations.Values
                     If lnewOpn.Name = "IMPLND" Then
-                        If tPoll.ModelType = "PIOnly" Or tPoll.ModelType = "PIG" Then
-                            iflag = 1
+                        If lPoll.ModelType = "PIOnly" Or lPoll.ModelType = "PIG" Then
+                            lIflag = 1
                         End If
                     ElseIf lnewOpn.Name = "PERLND" Then
-                        If tPoll.ModelType = "PIOnly" Or tPoll.ModelType = "PIG" Then
-                            pflag = 1
+                        If lPoll.ModelType = "PIOnly" Or lPoll.ModelType = "PIG" Then
+                            lPflag = 1
                         End If
                     ElseIf lnewOpn.Name = "RCHRES" Then
-                        If tPoll.ModelType = "GOnly" Or tPoll.ModelType = "PIG" Then
-                            rflag = 1
+                        If lPoll.ModelType = "GOnly" Or lPoll.ModelType = "PIG" Then
+                            lRflag = 1
                         End If
                     End If
                 Next
-                nIqual = nIqual + iflag
-                nPqual = nPqual + pflag
-                nGqual = nGqual + rflag
-                isedfg = 0
-                psedfg = 0
-                For Each lnewOpn As HspfOperation In tPoll.Operations.Values
-                    lCtype = lnewOpn.Name
-                    lOpn = aUci.OpnBlks(lnewOpn.Name).Ids("K" & lnewOpn.Id)
-                    For Each ltable In lnewOpn.Tables
+                lnIqual = lnIqual + lIflag
+                lnPqual = lnPqual + lPflag
+                lnGqual = lnGqual + lRflag
+                Dim lIsedfg As Integer = 0
+                Dim lPsedfg As Integer = 0
+                For Each lnewOpn As HspfOperation In lPoll.Operations.Values
+                    Dim lCtype As String = lnewOpn.Name
+                    Dim lOpn As HspfOperation = aUci.OpnBlks(lnewOpn.Name).Ids("K" & lnewOpn.Id)
+                    For Each lTable As HspfTable In lnewOpn.Tables
                         If lCtype = "IMPLND" Then
-                            If ltable.Name <> "NQUALS" And ltable.Name <> "IQL-AD-FLAGS" And ltable.Name <> "LAT-FACTOR" Then
-                                If ltable.TableNeededForAllQuals Then
-                                    ltable.OccurNum = nIqual
-                                    ltable.OccurCount = IqualCnt
-                                    ltable.OccurIndex = 0
+                            If lTable.Name <> "NQUALS" And lTable.Name <> "IQL-AD-FLAGS" And lTable.Name <> "LAT-FACTOR" Then
+                                If lTable.TableNeededForAllQuals Then
+                                    lTable.OccurNum = lnIqual
+                                    lTable.OccurCount = lIqualCnt
+                                    lTable.OccurIndex = 0
                                 Else
-                                    ltable.OccurIndex = nIqual
+                                    lTable.OccurIndex = lnIqual
                                 End If
                             End If
-                            If ltable.Name = "QUAL-PROPS" Then
-                                isedfg = ltable.Parms("QSDFG").Value
+                            If lTable.Name = "QUAL-PROPS" Then
+                                lIsedfg = lTable.Parms("QSDFG").Value
                             End If
                         ElseIf lCtype = "PERLND" Then
-                            If ltable.Name <> "NQUALS" And ltable.Name <> "PQL-AD-FLAGS" And ltable.Name <> "LAT-FACTOR" Then '(these three can only appear once)
-                                If ltable.TableNeededForAllQuals Then
-                                    ltable.OccurNum = nPqual
-                                    ltable.OccurCount = PqualCnt
-                                    ltable.OccurIndex = 0
+                            If lTable.Name <> "NQUALS" And lTable.Name <> "PQL-AD-FLAGS" And lTable.Name <> "LAT-FACTOR" Then '(these three can only appear once)
+                                If lTable.TableNeededForAllQuals Then
+                                    lTable.OccurNum = lnPqual
+                                    lTable.OccurCount = lPqualCnt
+                                    lTable.OccurIndex = 0
                                 Else
-                                    ltable.OccurIndex = nPqual
+                                    lTable.OccurIndex = lnPqual
                                 End If
                             End If
-                            If ltable.Name = "QUAL-PROPS" Then
-                                psedfg = ltable.Parms("QSDFG").Value
+                            If lTable.Name = "QUAL-PROPS" Then
+                                lPsedfg = lTable.Parms("QSDFG").Value
                             End If
                         ElseIf lCtype = "RCHRES" Then
-                            If ltable.Name <> "GQ-GENDATA" Then
-                                If ltable.TableNeededForAllQuals Then
-                                    ltable.OccurNum = nGqual
-                                    ltable.OccurCount = GqualCnt
-                                    ltable.OccurIndex = 0
+                            If lTable.Name <> "GQ-GENDATA" Then
+                                If lTable.TableNeededForAllQuals Then
+                                    lTable.OccurNum = lnGqual
+                                    lTable.OccurCount = lGqualCnt
+                                    lTable.OccurIndex = 0
                                 Else
-                                    ltable.OccurIndex = nGqual
+                                    lTable.OccurIndex = lnGqual
                                 End If
                             End If
                         End If
 
-                        MaxOccur = myMsg.BlockDefs(lCtype).TableDefs(ltable.Name).NumOccur
-                        SecName = myMsg.BlockDefs(lCtype).TableDefs(ltable.Name).Parent.Name
-                        SecId = myMsg.BlockDefs(lCtype).SectionID(SecName)
+                        Dim lMaxOccur As Integer = myMsg.BlockDefs(lCtype).TableDefs(lTable.Name).NumOccur
+                        Dim lSecName As String = myMsg.BlockDefs(lCtype).TableDefs(lTable.Name).Parent.Name
+                        Dim lSecId As Integer = myMsg.BlockDefs(lCtype).SectionID(lSecName)
                         'calc count for this table
-                        If Not ltable.TableNeededForAllQuals Then
-                            OccurCount = 1
-                            For Each ttable In lOpn.Tables
-                                If ttable.Name = ltable.Name Then
-                                    OccurCount = OccurCount + 1
+                        If Not lTable.TableNeededForAllQuals Then
+                            Dim lOccurCount As Integer = 1
+                            For Each lTempTable As HspfTable In lOpn.Tables
+                                If lTempTable.Name = lTable.Name Then
+                                    lOccurCount = lOccurCount + 1
                                 End If
                             Next
-                            ltable.OccurNum = OccurCount
-                            If OccurCount <= MaxOccur Then
+                            lTable.OccurNum = lOccurCount
+                            If lOccurCount <= lMaxOccur Then
                                 'can add another
-                                ltable.OccurCount = OccurCount
-                                For Each ttable In lOpn.Tables
-                                    If ttable.Name = ltable.Name Then
+                                lTable.OccurCount = lOccurCount
+                                For Each lTempTable As HspfTable In lOpn.Tables
+                                    If lTempTable.Name = lTable.Name Then
                                         'set occurence count for previous tables
-                                        ttable.OccurCount = OccurCount
+                                        lTempTable.OccurCount = lOccurCount
                                     End If
                                 Next
                             End If
                         End If
 
-                        If ltable.OccurNum <= MaxOccur Then
+                        If lTable.OccurNum <= lMaxOccur Then
                             'can add another
-                            If ltable.OccurNum > 1 Then
-                                cname = ltable.Name & ":" & ltable.OccurNum
+                            If lTable.OccurNum > 1 Then
+                                lCName = lTable.Name & ":" & lTable.OccurNum
                             Else
-                                cname = ltable.Name
+                                lCName = lTable.Name
                             End If
-                            lOpn.Tables.Add(ltable)
+                            lOpn.Tables.Add(lTable)
                             If lOpn.TableExists("ACTIVITY") Then
                                 With lOpn.Tables.Item("ACTIVITY")
-                                    .Parms(SecId).Value = 1 'turn on this section
+                                    .Parms(lSecId).Value = 1 'turn on this section
                                     'turn on other prerequisite sections
                                     Select Case lOpn.Name
                                         Case "RCHRES"
-                                            For i = 7 To SecId - 1
-                                                .Parms(i).Value = 1 'previous rqual sections must be on
-                                            Next i
-                                            If SecId > 1 Then
+                                            For lIndex = 7 To lSecId - 1
+                                                .Parms(lIndex).Value = 1 'previous rqual sections must be on
+                                            Next
+                                            If lSecId > 1 Then
                                                 .Parms(1).Value = 1 'hydr must be on
                                             End If
-                                            If SecId > 2 Then
+                                            If lSecId > 2 Then
                                                 .Parms(2).Value = 1 'adcalc must be on
                                             End If
-                                            If SecId > 4 Then
+                                            If lSecId > 4 Then
                                                 .Parms(4).Value = 1 'htrch must be on
                                             End If
                                         Case "IMPLND"
-                                            If SecId = 5 Or SecId = 2 Then
+                                            If lSecId = 5 Or lSecId = 2 Then
                                                 .Parms(1).Value = 1 'atemp must be on
                                             End If
-                                            If SecId > 3 Then
+                                            If lSecId > 3 Then
                                                 .Parms(3).Value = 1 'iwater must be on
                                             End If
                                         Case "PERLND"
-                                            If SecId > 8 Then
+                                            If lSecId > 8 Then
                                                 .Parms(8).Value = 1 'mstlay must be on
                                             End If
-                                            If SecId = 5 Or SecId = 2 Or SecId = 6 Or SecId = 10 Or SecId = 11 Or SecId = 12 Then
+                                            If lSecId = 5 Or lSecId = 2 Or lSecId = 6 Or lSecId = 10 Or lSecId = 11 Or lSecId = 12 Then
                                                 .Parms(1).Value = 1 'atemp must be on
                                             End If
-                                            If SecId = 4 Or SecId = 6 Or SecId = 7 Or SecId = 9 Or SecId = 10 Or SecId = 11 Then
+                                            If lSecId = 4 Or lSecId = 6 Or lSecId = 7 Or lSecId = 9 Or lSecId = 10 Or lSecId = 11 Then
                                                 .Parms(3).Value = 1 'pwater must be on
                                             End If
-                                            If SecId = 6 Or SecId = 10 Or SecId = 11 Then
+                                            If lSecId = 6 Or lSecId = 10 Or lSecId = 11 Then
                                                 .Parms(5).Value = 1 'pstemp must be on
                                             End If
                                     End Select
                                 End With
                             End If
 
-                            If Not aUci.OpnBlks(lCtype).TableExists(cname) Then
-                                aUci.OpnBlks(lCtype).Tables.Add(ltable)
-                                If ltable.OccurNum > 1 And ltable.TableNeededForAllQuals Then
+                            If Not aUci.OpnBlks(lCtype).TableExists(lCName) Then
+                                aUci.OpnBlks(lCtype).Tables.Add(lTable)
+                                If lTable.OccurNum > 1 And lTable.TableNeededForAllQuals Then
                                     'make sure all previous occurs of this table exist
-                                    For i = 1 To ltable.OccurNum - 1
-                                        If i > 1 Then
-                                            cname = ltable.Name & ":" & i
+                                    For lIndex = 1 To lTable.OccurNum - 1
+                                        If lIndex > 1 Then
+                                            lCName = lTable.Name & ":" & lIndex
                                         Else
-                                            cname = ltable.Name
+                                            lCName = lTable.Name
                                         End If
-                                        If Not aUci.OpnBlks(lCtype).TableExists(cname) Then
-                                            tempTable = New HspfTable
-                                            tempTable.Opn = lOpn
-                                            tempTable.Def = myMsg.BlockDefs(lCtype).TableDefs(ltable.Name)
-                                            s = ""
-                                            tempTable.InitTable((s))
-                                            tempTable.OccurNum = i
-                                            tempTable.OccurCount = ltable.OccurCount
-                                            aUci.OpnBlks(lCtype).Tables.Add(tempTable)
+                                        If Not aUci.OpnBlks(lCtype).TableExists(lCName) Then
+                                            Dim ltempTable As New HspfTable
+                                            ltempTable.Opn = lOpn
+                                            ltempTable.Def = myMsg.BlockDefs(lCtype).TableDefs(lTable.Name)
+                                            Dim ls As String = ""
+                                            ltempTable.InitTable((ls))
+                                            ltempTable.OccurNum = lIndex
+                                            ltempTable.OccurCount = lTable.OccurCount
+                                            aUci.OpnBlks(lCtype).Tables.Add(ltempTable)
                                         End If
-                                    Next i
+                                    Next
                                 End If
                             End If
                         End If
                     Next
                 Next
-                If isedfg = 1 Then
-                    isedcnt = isedcnt + 1
+                If lIsedfg = 1 Then
+                    lisedcnt = lisedcnt + 1
                 End If
-                If psedfg = 1 Then
-                    psedcnt = psedcnt + 1
+                If lPsedfg = 1 Then
+                    lpsedcnt = lpsedcnt + 1
                 End If
 
                 'put masslinks back
-                For Each lML In tPoll.MassLinks
+                For Each lML As HspfMassLink In lPoll.MassLinks
                     If lML.Source.Group = "PQUAL" Then
                         If lML.Target.Member = "ISQAL" Then
-                            lML.Source.MemSub1 = psedcnt
+                            lML.Source.MemSub1 = lpsedcnt
                         Else
-                            lML.Source.MemSub1 = nPqual
+                            lML.Source.MemSub1 = lnPqual
                         End If
                     ElseIf lML.Source.Group = "IQUAL" Then
                         If lML.Target.Member = "ISQAL" Then
-                            lML.Source.MemSub1 = isedcnt
+                            lML.Source.MemSub1 = lisedcnt
                         Else
-                            lML.Source.MemSub1 = nIqual
+                            lML.Source.MemSub1 = lnIqual
                         End If
                     End If
                     If lML.Target.Member = "IDQAL" Then
-                        lML.Target.MemSub1 = nGqual
+                        lML.Target.MemSub1 = lnGqual
                     ElseIf lML.Target.Member = "ISQAL" Then
-                        lML.Target.MemSub2 = nGqual
+                        lML.Target.MemSub2 = lnGqual
                     End If
                     'make sure there isnt already a ml to this target
-                    iexist = 0
-                    For i = 1 To aUci.MassLinks.Count
-                        tML = aUci.MassLinks(i - 1)
-                        If tML.Source.VolName = lML.Source.VolName And tML.Target.VolName = lML.Target.VolName And tML.Target.Group = lML.Target.Group And tML.Target.Member = lML.Target.Member And tML.Target.MemSub1 = lML.Target.MemSub1 And tML.Target.MemSub2 = lML.Target.MemSub2 Then
-                            If tML.Source.Group = lML.Source.Group And tML.Source.Member = lML.Source.Member And tML.Source.MemSub1 = lML.Source.MemSub1 And tML.Source.MemSub2 = lML.Source.MemSub2 Then
+                    Dim lIExist As Integer = 0
+                    For lIndex = 1 To aUci.MassLinks.Count
+                        Dim lTempML As HspfMassLink = aUci.MassLinks(lIndex - 1)
+                        If lTempML.Source.VolName = lML.Source.VolName And lTempML.Target.VolName = lML.Target.VolName And lTempML.Target.Group = lML.Target.Group And lTempML.Target.Member = lML.Target.Member And lTempML.Target.MemSub1 = lML.Target.MemSub1 And lTempML.Target.MemSub2 = lML.Target.MemSub2 Then
+                            If lTempML.Source.Group = lML.Source.Group And lTempML.Source.Member = lML.Source.Member And lTempML.Source.MemSub1 = lML.Source.MemSub1 And lTempML.Source.MemSub2 = lML.Source.MemSub2 Then
                                 'exact duplicate
-                                iexist = i
-                            ElseIf tML.Source.Group <> lML.Source.Group Then
+                                lIExist = lIndex
+                            ElseIf lTempML.Source.Group <> lML.Source.Group Then
                                 'different source group, remove it
-                                iexist = i
+                                lIExist = lIndex
                             End If
                         End If
-                    Next i
-                    If iexist > 0 Then
-                        aUci.MassLinks.RemoveAt(iexist)
+                    Next
+                    If lIExist > 0 Then
+                        aUci.MassLinks.RemoveAt(lIExist)
                     End If
                     aUci.MassLinks.Add(lML)
                 Next
             End If
-            aUci.Pollutants.RemoveAt(lowestpos - 1)
+            aUci.Pollutants.RemoveAt(lLowestPos - 1)
         Loop
 
         'set nquals
-        cname = "PERLND"
-        For Each lOpn In aUci.OpnBlks(cname).Ids
+        lCName = "PERLND"
+        For Each lOpn As HspfOperation In aUci.OpnBlks(lCName).Ids
             If lOpn.TableExists("NQUALS") Then
-                lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nPqual
+                lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = lnPqual
             Else
-                If nPqual > 0 Then
-                    aUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
-                    lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nPqual
+                If lnPqual > 0 Then
+                    aUci.OpnBlks(lCName).AddTableForAll("NQUALS", lCName)
+                    lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = lnPqual
                 End If
             End If
-            If nPqual = 0 Then
+            If lnPqual = 0 Then
                 lOpn.Tables.Item("ACTIVITY").ParmValue("PQALFG") = 0
             End If
         Next
-        cname = "IMPLND"
-        For Each lOpn In aUci.OpnBlks(cname).Ids
+        lCName = "IMPLND"
+        For Each lOpn As HspfOperation In aUci.OpnBlks(lCName).Ids
             If lOpn.TableExists("NQUALS") Then
-                lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nIqual
+                lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = lnIqual
             Else
-                If nIqual > 0 Then
-                    aUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
-                    lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nIqual
+                If lnIqual > 0 Then
+                    aUci.OpnBlks(lCName).AddTableForAll("NQUALS", lCName)
+                    lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = lnIqual
                 End If
             End If
-            If nIqual = 0 Then
+            If lnIqual = 0 Then
                 lOpn.Tables.Item("ACTIVITY").ParmValue("IQALFG") = 0
             End If
         Next
-        cname = "RCHRES"
-        For Each lOpn In aUci.OpnBlks(cname).Ids
+        lCName = "RCHRES"
+        For Each lOpn As HspfOperation In aUci.OpnBlks(lCName).Ids
             If lOpn.TableExists("GQ-GENDATA") Then
-                lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = nGqual
+                lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = lnGqual
             Else
-                If nGqual > 0 Then
-                    aUci.OpnBlks(cname).AddTableForAll("GQ-GENDATA", cname)
-                    lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = nGqual
+                If lnGqual > 0 Then
+                    aUci.OpnBlks(lCName).AddTableForAll("GQ-GENDATA", lCName)
+                    lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = lnGqual
                 End If
             End If
-            If nGqual = 0 Then
+            If lnGqual = 0 Then
                 lOpn.Tables.Item("ACTIVITY").ParmValue("GQALFG") = 0
             End If
         Next
 
-        If changed Then
+        If lchanged Then
             aUci.Edited = True
         Else
             aUci.Edited = False
