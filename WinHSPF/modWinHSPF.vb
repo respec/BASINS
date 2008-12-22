@@ -88,10 +88,6 @@ Public Module WinHSPF
 
         pUCI = New HspfUci
         Dim lUCIName As String = IO.Path.GetFileName(aFileName)
-        'pUCI.FastReadUciForStarter(pMsg, lUCIName)
-        'Dim lFilesOK As Boolean = True
-        'Dim lEchoFile As String = ""
-        'pUCI.ReadUci(pMsg, lUCIName, 1, lFilesOK, lEchoFile)
         pUCI.FastReadUci(pMsg, lUCIName)
         'set UCI name in caption
         If pWinHSPF IsNot Nothing Then
@@ -162,11 +158,11 @@ Public Module WinHSPF
         pUCI.PollutantsBuild()
         pfrmPollutant.ShowDialog()
         pUCI.PollutantsUnBuild()
-        'CheckAndAddMissingTables("PERLND")
-        'CheckAndAddMissingTables("IMPLND")
-        'CheckAndAddMissingTables("RCHRES")
-        'UpdateFlagDependencies("RCHRES")
-        'SetMissingValuesToDefaults(myUci, defUci)
+        CheckAndAddMissingTables("PERLND")
+        CheckAndAddMissingTables("IMPLND")
+        CheckAndAddMissingTables("RCHRES")
+        UpdateFlagDependencies("RCHRES")
+        SetMissingValuesToDefaults(pUCI, pDefUCI)
     End Sub
 
     Sub EditBlock(ByVal aParent As Windows.Forms.Form, ByVal aTableName As String)
@@ -210,4 +206,242 @@ Public Module WinHSPF
             Return aOperation.Name & " " & aOperation.Id
         End If
     End Function
+
+    Public Sub CheckAndAddMissingTables(ByVal aOpName As String)
+
+        Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks(aOpName)
+
+        Dim lTablesRequiredMissing As System.Collections.ObjectModel.Collection(Of HspfStatusType)
+        For Each lOper As HspfOperation In lOpnBlk.Ids
+            'setting the collection forces build of tablestatus
+            lTablesRequiredMissing = lOper.TableStatus.GetInfo(1, False)
+            lOper.TableStatus.Update() 'need to update in case we just changed flags
+        Next
+
+        Dim lTabname As String
+        For Each lOper As HspfOperation In lOpnBlk.Ids
+            lTablesRequiredMissing = lOper.TableStatus.GetInfo(1, False)
+
+            For Each lStatus As HspfStatusType In lTablesRequiredMissing
+                If lStatus.Occur > 1 Then
+                    lTabname = lStatus.Name & ":" & lStatus.Occur
+                Else
+                    lTabname = lStatus.Name
+                End If
+                If lOpnBlk.Count > 0 Then
+                    'double check to see if this table exists
+                    If Not lOpnBlk.TableExists(lTabname) Then
+                        lOpnBlk.AddTableForAll(lTabname, aOpName)
+                        SetDefaultsForTable(pUCI, pDefUCI, aOpName, lTabname)
+                    End If
+                End If
+            Next
+        Next
+        For Each lOper As HspfOperation In lOpnBlk.Ids
+            lOper.TableStatus.Update()
+        Next
+    End Sub
+
+    Public Sub SetDefaultsForTable(ByVal aUCI As HspfUci, ByVal aDefUCI As HspfUci, ByVal aOpName As String, ByVal TableName As String)
+
+        If aUCI.OpnBlks(aOpName).Count > 0 Then
+            Dim lOptyp As HspfOpnBlk = aUCI.OpnBlks(aOpName)
+            For Each lOpn As HspfOperation In lOptyp.Ids
+                Dim lId As Integer = DefaultOpnId(lOpn, aDefUCI)
+                If lId > 0 Then
+                    Dim lDOpn As HspfOperation = aDefUCI.OpnBlks(lOpn.Name).OperFromID(lId)
+                    If Not lDOpn Is Nothing Then
+                        If lOpn.TableExists(TableName) Then
+                            Dim lTab As HspfTable = lOpn.Tables(TableName)
+                            If DefaultThisTable(lOptyp.Name, lTab.Name) Then
+                                If lDOpn.TableExists(lTab.Name) Then
+                                    Dim lDTab As HspfTable = lDOpn.Tables(lTab.Name)
+                                    For Each lPar As HspfParm In lTab.Parms
+                                        If DefaultThisParameter(lOptyp.Name, lTab.Name, lPar.Name) Then
+                                            If lPar.Value <> lPar.Name Then
+                                                lPar.Value = lDTab.Parms(lPar.Name).Value
+                                            End If
+                                        End If
+                                    Next
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+            Next
+        End If
+
+    End Sub
+
+    Public Function DefaultOpnId(ByVal aOpn As HspfOperation, ByVal aDefUCI As HspfUci) As Long
+        
+        If aOpn.DefOpnId <> 0 Then
+            DefaultOpnId = aOpn.DefOpnId
+        Else
+            Dim lDOpn As HspfOperation = matchOperWithDefault(aOpn.Name, aOpn.Description, aDefUCI)
+            If lDOpn Is Nothing Then
+                DefaultOpnId = 0
+            Else
+                DefaultOpnId = lDOpn.Id
+            End If
+        End If
+
+    End Function
+
+    Private Function DefaultThisTable(ByVal aOperName As String, ByVal aTableName As String) As Boolean
+        If aOperName = "PERLND" Or aOperName = "IMPLND" Then
+            If aTableName = "ACTIVITY" Or _
+               aTableName = "PRINT-INFO" Or _
+               aTableName = "GEN-INFO" Or _
+               aTableName = "PWAT-PARM5" Then
+                DefaultThisTable = False
+            ElseIf Microsoft.VisualBasic.Left(aTableName, 4) = "QUAL" Then
+                DefaultThisTable = False
+            Else
+                DefaultThisTable = True
+            End If
+        ElseIf aOperName = "RCHRES" Then
+            If aTableName = "ACTIVITY" Or _
+               aTableName = "PRINT-INFO" Or _
+               aTableName = "GEN-INFO" Or _
+               aTableName = "HYDR-PARM1" Then
+                DefaultThisTable = False
+            ElseIf Microsoft.VisualBasic.Left(aTableName, 3) = "GQ-" Then
+                DefaultThisTable = False
+            Else
+                DefaultThisTable = True
+            End If
+        Else
+            DefaultThisTable = False
+        End If
+    End Function
+
+    Private Function DefaultThisParameter(ByVal aOperName As String, ByVal aTableName As String, ByVal aParmName As String) As Boolean
+        DefaultThisParameter = True
+        If aOperName = "PERLND" Then
+            If aTableName = "PWAT-PARM2" Then
+                If aParmName = "SLSUR" Or aParmName = "LSUR" Then
+                    DefaultThisParameter = False
+                End If
+            ElseIf aTableName = "NQUALS" Then
+                If aParmName = "NQUAL" Then
+                    DefaultThisParameter = False
+                End If
+            End If
+        ElseIf aOperName = "IMPLND" Then
+            If aTableName = "IWAT-PARM2" Then
+                If aParmName = "SLSUR" Or aParmName = "LSUR" Then
+                    DefaultThisParameter = False
+                End If
+            ElseIf aTableName = "NQUALS" Then
+                If aParmName = "NQUAL" Then
+                    DefaultThisParameter = False
+                End If
+            End If
+        ElseIf aOperName = "RCHRES" Then
+            If aTableName = "HYDR-PARM2" Then
+                If aParmName = "LEN" Or _
+                   aParmName = "DELTH" Or _
+                   aParmName = "FTBUCI" Then
+                    DefaultThisParameter = False
+                End If
+            ElseIf aTableName = "GQ-GENDATA" Then
+                If aParmName = "NGQUAL" Then
+                    DefaultThisParameter = False
+                End If
+            End If
+        End If
+    End Function
+
+    Public Function matchOperWithDefault(ByVal aOpTypName As String, ByVal aOpnDesc As String, ByVal aDefUCI As HspfUci) As HspfOperation
+
+        For Each lOpn As HspfOperation In aDefUCI.OpnBlks(aOpTypName).Ids
+            If lOpn.Description = aOpnDesc Then
+                matchOperWithDefault = lOpn
+                Exit Function
+            End If
+        Next
+        'a complete match not found, look for partial
+        Dim lTempString As String
+        For Each lOpn As HspfOperation In aDefUCI.OpnBlks(aOpTypName).Ids
+            If Len(lOpn.Description) > Len(aOpnDesc) Then
+                lTempString = Microsoft.VisualBasic.Left(lOpn.Description, Len(aOpnDesc))
+                If lTempString = aOpnDesc Then
+                    matchOperWithDefault = lOpn
+                    Exit Function
+                End If
+            ElseIf Len(lOpn.Description) < Len(aOpnDesc) Then
+                lTempString = Microsoft.VisualBasic.Left(aOpnDesc, Len(lOpn.Description))
+                If lOpn.Description = lTempString Then
+                    matchOperWithDefault = lOpn
+                    Exit Function
+                End If
+            End If
+            If Len(aOpnDesc) > 4 And Len(lOpn.Description) > 4 Then
+                lTempString = Microsoft.VisualBasic.Left(aOpnDesc, 4)
+                If Microsoft.VisualBasic.Left(lOpn.Description, 4) = lTempString Then
+                    matchOperWithDefault = lOpn
+                    Exit Function
+                End If
+            End If
+        Next
+        'not found, use first one
+        If aDefUCI.OpnBlks(aOpTypName).Count > 0 Then
+            matchOperWithDefault = aDefUCI.OpnBlks(aOpTypName).Ids(1)
+        Else
+            matchOperWithDefault = Nothing
+        End If
+    End Function
+
+    Public Sub UpdateFlagDependencies(ByVal aOpName As String)
+
+        Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks(aOpName)
+        For Each lOper As HspfOperation In lOpnBlk.Ids
+            If lOper.TableExists("ACTIVITY") Then
+                If lOper.Tables("ACTIVITY").Parms("SEDFG").Value = 1 Then
+                    If lOper.TableExists("HYDR-PARM1") Then
+                        'change aux flags
+                        lOper.Tables("HYDR-PARM1").Parms("AUX1FG").Value = 1
+                        lOper.Tables("HYDR-PARM1").Parms("AUX2FG").Value = 1
+                        lOper.Tables("HYDR-PARM1").Parms("AUX3FG").Value = 1
+                    End If
+                End If
+                If lOper.Tables("ACTIVITY").Parms("PLKFG").Value = 1 Then
+                    If lOper.TableExists("NUT-FLAGS") Then
+                        'change po4 flag
+                        lOper.Tables("NUT-FLAGS").Parms("PO4FG").Value = 1
+                    End If
+                End If
+            End If
+        Next
+    End Sub
+
+    Public Sub SetMissingValuesToDefaults(ByVal aUCI As HspfUci, ByVal aDefUCI As HspfUci)
+
+        Dim lOpTyps() As String = {"PERLND", "IMPLND", "RCHRES"}
+
+        For Each lOpTypName As String In lOpTyps
+            If aUCI.OpnBlks(lOpTypName).Count > 0 Then
+                Dim lOptyp As HspfOpnBlk = aUCI.OpnBlks(lOpTypName)
+                For Each lOpn As HspfOperation In lOptyp.Ids
+                    Dim lId = DefaultOpnId(lOpn, aDefUCI)
+                    If lId > 0 Then
+                        Dim lDOpn As HspfOperation = aDefUCI.OpnBlks(lOpn.Name).OperFromID(lId)
+                        If Not lDOpn Is Nothing Then
+                            For Each lTab As HspfTable In lOpn.Tables
+                                If lDOpn.TableExists(lTab.Name) Then
+                                    Dim lDTab As HspfTable = lDOpn.Tables(lTab.Name)
+                                    For Each lPar As HspfParm In lTab.Parms
+                                        If lPar.Value.GetType.Name = "Double" AndAlso lPar.Value = -999.0# Then
+                                            lPar.Value = lDTab.Parms(lPar.Name).Value
+                                        End If
+                                    Next lPar
+                                End If
+                            Next lTab
+                        End If
+                    End If
+                Next
+            End If
+        Next
+    End Sub
 End Module
