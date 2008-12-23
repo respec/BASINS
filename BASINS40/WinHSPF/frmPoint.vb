@@ -41,7 +41,7 @@ Public Class frmPoint
     Dim pAgdPointRowReference As New Collection
 
     Public Sub New()
-        Dim LinkCount As Integer
+        Dim lLinkCount As Integer
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -68,7 +68,7 @@ Public Class frmPoint
 
         'always link flow to ivol
 
-        LinkCount = 1
+        lLinkCount = 1
 
         LoadPollutantList(False)
 
@@ -195,9 +195,8 @@ Public Class frmPoint
         End Try
     End Sub
 
-
     Private Sub agdMasterPoint2agdPoint()
-        Dim i As Integer
+        Dim lOper As Integer
         Dim lCheckedItemSplit() As String
         Dim lagdPointRow As Integer
 
@@ -213,24 +212,40 @@ Public Class frmPoint
             lagdPointRow = 0
             pAgdPointRowReference.Clear()
 
-            For i = 1 To agdMasterPoint.Source.Rows - 1
-                If Mid(agdMasterPoint.Source.CellValue(i, 1), 4) = lCheckedItemSplit(1) AndAlso agdMasterPoint.Source.CellValue(i, 3) = lCheckedItemSplit(0) Then
+            For lOper = 1 To agdMasterPoint.Source.Rows - 1
+                If Mid(agdMasterPoint.Source.CellValue(lOper, 1), 4) = lCheckedItemSplit(1) AndAlso agdMasterPoint.Source.CellValue(lOper, 3) = lCheckedItemSplit(0) Then
                     lagdPointRow += 1
-                    agdPoint.Source.CellValue(lagdPointRow, 0) = agdMasterPoint.Source.CellValue(i, 0)
-                    agdPoint.Source.CellValue(lagdPointRow, 1) = agdMasterPoint.Source.CellValue(i, 2)
-                    agdPoint.Source.CellValue(lagdPointRow, 2) = agdMasterPoint.Source.CellValue(i, 4)
-                    agdPoint.Source.CellValue(lagdPointRow, 3) = agdMasterPoint.Source.CellValue(i, 10)
+                    agdPoint.Source.CellValue(lagdPointRow, 0) = agdMasterPoint.Source.CellValue(lOper, 0)
+                    agdPoint.Source.CellValue(lagdPointRow, 1) = agdMasterPoint.Source.CellValue(lOper, 2)
+                    agdPoint.Source.CellValue(lagdPointRow, 2) = agdMasterPoint.Source.CellValue(lOper, 4)
+                    agdPoint.Source.CellValue(lagdPointRow, 3) = agdMasterPoint.Source.CellValue(lOper, 10)
 
-                    pAgdPointRowReference.Add(i)
+                    pAgdPointRowReference.Add(lOper)
 
                     agdPoint.Source.CellEditable(lagdPointRow, 0) = True
                     agdPoint.Source.CellEditable(lagdPointRow, 3) = True
                 End If
-            Next i
+            Next lOper
         End If
 
         agdPoint.SizeAllColumnsToContents()
         agdPoint.Refresh()
+
+    End Sub
+
+    Private Sub agdPoint2agdMasterPoint()
+        Dim lOper As Integer
+        Dim lagdMasterPointRow As Integer
+
+        For lOper = 1 To agdPoint.Source.Rows - 1
+            lagdMasterPointRow = pAgdPointRowReference(lOper)
+            agdMasterPoint.Source.CellValue(lagdMasterPointRow, 0) = agdPoint.Source.CellValue(lOper, 0)
+            agdMasterPoint.Source.CellValue(lagdMasterPointRow, 2) = agdPoint.Source.CellValue(lOper, 1)
+            agdMasterPoint.Source.CellValue(lagdMasterPointRow, 4) = agdPoint.Source.CellValue(lOper, 2)
+            agdMasterPoint.Source.CellValue(lagdMasterPointRow, 10) = agdPoint.Source.CellValue(lOper, 3)
+        Next lOper
+
+        agdMasterPoint.Refresh()
 
     End Sub
 
@@ -251,8 +266,10 @@ Public Class frmPoint
     End Sub
 
     Private Sub agdPoint_ValueChanged(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdPoint.CellEdited
+        'check that a target member has been set if In-Use is set to yes.
         If agdPoint.Source.CellValue(aRow, aColumn) = "Yes" AndAlso Len(agdPoint.Source.CellValue(aRow, 3)) = 0 Then
-            Logger.Message("No target member has been set for the point source " & agdPoint.Source.CellValue(aRow, 2) & " in the current grid." & vbCrLf & "Set the point source In-Use setting to No or assign a valid target member.", "PointSources - Need Target Member", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+            Logger.Message("No target member has been set for the point source: " & vbCrLf & vbCrLf & agdPoint.Source.CellValue(aRow, 1) & "/" & agdPoint.Source.CellValue(aRow, 2) & vbCrLf & vbCrLf & "Assign a valid target source before setting the pollutant to In-Use. ", "PointSources - Need Target Member", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+            agdPoint.Source.CellValue(aRow, aColumn) = "No"
         End If
     End Sub
 
@@ -293,12 +310,13 @@ Public Class frmPoint
     Private Sub FillMasterGrid()
         Dim lOper As HspfOperation
         Dim lOpnBlk As HspfOpnBlk
-        Dim vpol As Object
-        Dim i&, j&, lloc$, lsen$, icnt&, k&, lfac$
-        Dim lcon$, lpol$, S$, dsncnt&
-        Dim dsnptr() As Integer = Nothing
-        Dim ifound As Boolean
-        Dim activeflag As Boolean
+        Dim lObject As Object
+        Dim lOper1, lOper2, lOper3, lOper4, lDsnCount As Integer
+        Dim lScenario, lLocation, lFacility As String
+        Dim lConnection, lPollutantName, lSelectedItemString As String
+        Dim ldsnptr() As Integer = Nothing
+        Dim lFoundFlag As Boolean
+        Dim lActiveFlag As Boolean
         Dim lPointItemIndex As Integer
 
         lstPoints.Items.Clear()
@@ -309,137 +327,137 @@ Public Class frmPoint
             .Rows = 1
 
             lOpnBlk = pUCI.OpnBlks("RCHRES")
-            icnt = 1
+            lOper4 = 1
 
-            For i = 1 To lts.Count
-                lsen = lts(i).Attributes.GetValue("Scenario")
-                If Mid(lsen, 1, 3) = "PT-" Then 'this is a pt src
-                    lloc = lts(i).Attributes.GetValue("Location")
+            For lOper1 = 1 To lts.Count
+                lScenario = lts(lOper1).Attributes.GetValue("Scenario")
+                If Mid(lScenario, 1, 3) = "PT-" Then 'this is a pt src
+                    lLocation = lts(lOper1).Attributes.GetValue("Location")
 
-                    If IsNumeric(Mid(lloc, 4)) Then
+                    If IsNumeric(Mid(lLocation, 4)) Then
                         'get full reach name
-                        lOper = lOpnBlk.OperFromID(CInt(Mid(lloc, 4)))
+                        lOper = lOpnBlk.OperFromID(CInt(Mid(lLocation, 4)))
                         If Not lOper Is Nothing Then
 
                             'found a reach with this id
-                            lloc = "RCHRES " & lOper.Id & " - " & lOper.Description
-                            lfac = UCase(lts(i).Attributes.GetValue("STANAM"))
-                            lcon = lts(i).Attributes.GetValue("Constituent")
+                            lLocation = "RCHRES " & lOper.Id & " - " & lOper.Description
+                            lFacility = UCase(lts(lOper1).Attributes.GetValue("STANAM"))
+                            lConnection = lts(lOper1).Attributes.GetValue("Constituent")
 
-                            S = lfac & " (" & Mid(lts(i).Attributes.GetValue("Scenario"), 4) & ")"
-                            If Not lstPoints.Items.Contains(S) Then
-                                lstPoints.Items.Add(S, False)
+                            lSelectedItemString = lFacility & " (" & Mid(lts(lOper1).Attributes.GetValue("Scenario"), 4) & ")"
+                            If Not lstPoints.Items.Contains(lSelectedItemString) Then
+                                lstPoints.Items.Add(lSelectedItemString, False)
                             End If
 
                             'see how many times this dsn shows up in pt srcs
-                            dsncnt = 0
-                            activeflag = False
+                            lDsnCount = 0
+                            lActiveFlag = False
                             If Not pUCI.PointSources Is Nothing Then
-                                For j = 1 To pUCI.PointSources.Count
-                                    If pUCI.PointSources(j).Target.VolName = lOper.Name AndAlso pUCI.PointSources(j).Target.VolId = lOper.Id AndAlso Microsoft.VisualBasic.Left(pUCI.PointSources(j).Source.VolName, 3) = lts(i).File.ToString AndAlso pUCI.PointSources(j).Source.VolId = lts(i).Attributes.GetValue("Id") Then
+                                For lOper2 = 1 To pUCI.PointSources.Count
+                                    If pUCI.PointSources(lOper2).Target.VolName = lOper.Name AndAlso pUCI.PointSources(lOper2).Target.VolId = lOper.Id AndAlso Microsoft.VisualBasic.Left(pUCI.PointSources(lOper2).Source.VolName, 3) = lts(lOper1).File.ToString AndAlso pUCI.PointSources(lOper2).Source.VolId = lts(lOper1).Attributes.GetValue("Id") Then
                                         'found this dsn in active point sources
-                                        dsncnt = dsncnt + 1
-                                        activeflag = True
-                                        ReDim Preserve dsnptr(dsncnt)
-                                        dsnptr(dsncnt) = j
+                                        lDsnCount += 1
+                                        lActiveFlag = True
+                                        ReDim Preserve ldsnptr(lDsnCount)
+                                        ldsnptr(lDsnCount) = lOper2
 
                                         For lPointItemIndex = 0 To lstPoints.Items.Count - 1
-                                            If lstPoints.Items.Item(lPointItemIndex) = S AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
-                                                lstPoints.Items.Add(S, True)
+                                            If lstPoints.Items.Item(lPointItemIndex) = lSelectedItemString AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
+                                                lstPoints.Items.Add(lSelectedItemString, True)
                                             End If
                                         Next
 
                                     End If
                                 Next
-                                If activeflag = False Then
+                                If lActiveFlag = False Then
                                     'still add a line for this dsn
-                                    dsncnt = 1
+                                    lDsnCount = 1
                                 End If
 
-                                For j = 1 To dsncnt
-                                    If icnt > 1 Then .Rows = .Rows + 1
-                                    If activeflag = False Then
+                                For lOper2 = 1 To lDsnCount
+                                    If lOper4 > 1 Then .Rows = .Rows + 1
+                                    If lActiveFlag = False Then
                                         'not an active point source
-                                        .CellValue(icnt, 0) = "No"
-                                        .CellValue(icnt, 9) = "INFLOW"
+                                        .CellValue(lOper4, 0) = "No"
+                                        .CellValue(lOper4, 9) = "INFLOW"
                                         '.CellValue(icnt, 10) = "IVOL"
                                         '.CellValue(icnt, 12) = 0
                                         '.CellValue(icnt, 13) = 0
                                     Else
                                         'this is an active point source
-                                        .CellValue(icnt, 0) = "Yes"
-                                        .CellValue(icnt, 9) = pUCI.PointSources(dsnptr(j)).Target.Group
-                                        .CellValue(icnt, 10) = MemberLongVersion(pUCI.PointSources(dsnptr(j)).Target.Member, pUCI.PointSources(dsnptr(j)).Target.MemSub1, pUCI.PointSources(dsnptr(j)).Target.MemSub2)
-                                        '.CellValue(icnt, 12) = myUci.PointSources(dsnptr(j)).Target.memsub1
-                                        '.CellValue(icnt, 13) = myUci.PointSources(dsnptr(j)).Target.memsub2
+                                        .CellValue(lOper4, 0) = "Yes"
+                                        .CellValue(lOper4, 9) = pUCI.PointSources(ldsnptr(lOper2)).Target.Group
+                                        .CellValue(lOper4, 10) = MemberLongVersion(pUCI.PointSources(ldsnptr(lOper2)).Target.Member, pUCI.PointSources(ldsnptr(lOper2)).Target.MemSub1, pUCI.PointSources(ldsnptr(lOper2)).Target.MemSub2)
+                                        '.CellValue(lOper4, 12) = myUci.PointSources(dsnptr(j)).Target.memsub1
+                                        '.CellValue(lOper4, 13) = myUci.PointSources(dsnptr(j)).Target.memsub2
                                     End If
 
-                                    .CellValue(icnt, 1) = lsen
-                                    .CellValue(icnt, 2) = lloc
-                                    .CellValue(icnt, 3) = UCase(lts(i).Attributes.GetValue("STANAM"))
-                                    .CellValue(icnt, 5) = pUCI.GetWDMIdFromName(lts(i).Attributes.GetValue("Data Source"))  'save assoc src vol name
-                                    .CellValue(icnt, 6) = lts(i).Attributes.GetValue("Id")     'save assoc src vol id
-                                    .CellValue(icnt, 7) = lOper.Name     'save assoc tar vol name
-                                    .CellValue(icnt, 8) = lOper.Id         'save assoc tar vol id
-                                    .CellValue(icnt, 11) = i 'save index to lts
+                                    .CellValue(lOper4, 1) = lScenario
+                                    .CellValue(lOper4, 2) = lLocation
+                                    .CellValue(lOper4, 3) = UCase(lts(lOper1).Attributes.GetValue("STANAM"))
+                                    .CellValue(lOper4, 5) = pUCI.GetWDMIdFromName(lts(lOper1).Attributes.GetValue("Data Source"))  'save assoc src vol name
+                                    .CellValue(lOper4, 6) = lts(lOper1).Attributes.GetValue("Id")     'save assoc src vol id
+                                    .CellValue(lOper4, 7) = lOper.Name     'save assoc tar vol name
+                                    .CellValue(lOper4, 8) = lOper.Id         'save assoc tar vol id
+                                    .CellValue(lOper4, 11) = lOper1 'save index to lts
 
                                     'look for this con in pollutant list
 
-                                    For Each vpol In pPollutantList
-                                        lpol = vpol
-                                        If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
-                                            lcon = lpol
+                                    For Each lObject In pPollutantList
+                                        lPollutantName = lObject
+                                        If Mid(lConnection, 1, 5) = Mid(lPollutantName, 1, 5) Then
+                                            lConnection = lPollutantName
                                             Exit For
                                         End If
-                                    Next vpol
-                                    .CellValue(icnt, 4) = lcon
+                                    Next lObject
+                                    .CellValue(lOper4, 4) = lConnection
 
-                                    .CellValue(icnt, 14) = icnt 'save row number
+                                    .CellValue(lOper4, 14) = lOper4 'save row number
 
                                     'default member based on constituent name if poss
-                                    If activeflag Then
+                                    If lActiveFlag Then
                                         'is active, see if we want to remember link
-                                        ifound = False
-                                        For k = 1 To pLinkCount
-                                            If pConsLinks(k - 1) = UCase(Trim(lcon)) Then
-                                                ifound = True
+                                        lFoundFlag = False
+                                        For lOper3 = 1 To pLinkCount
+                                            If pConsLinks(lOper3 - 1) = UCase(Trim(lConnection)) Then
+                                                lFoundFlag = True
                                                 Exit For
                                             End If
-                                        Next k
-                                        If Not ifound Then
+                                        Next lOper3
+                                        If Not lFoundFlag Then
                                             'add this to list
                                             pLinkCount = pLinkCount + 1
                                             ReDim Preserve pConsLinks(pLinkCount)
                                             ReDim Preserve pMemberLinks(pLinkCount)
                                             ReDim Preserve pMSub1Links(pLinkCount)
                                             ReDim Preserve pMSub2Links(pLinkCount)
-                                            pConsLinks(pLinkCount - 1) = UCase(Trim(lcon))
-                                            pMemberLinks(pLinkCount - 1) = MemberFromLongVersion(.CellValue(icnt, 10))
-                                            pMSub1Links(pLinkCount - 1) = MemSub1FromLongVersion(.CellValue(icnt, 10))
-                                            pMSub2Links(pLinkCount - 1) = MemSub2FromLongVersion(.CellValue(icnt, 10))
+                                            pConsLinks(pLinkCount - 1) = UCase(Trim(lConnection))
+                                            pMemberLinks(pLinkCount - 1) = MemberFromLongVersion(.CellValue(lOper4, 10))
+                                            pMSub1Links(pLinkCount - 1) = MemSub1FromLongVersion(.CellValue(lOper4, 10))
+                                            pMSub2Links(pLinkCount - 1) = MemSub2FromLongVersion(.CellValue(lOper4, 10))
                                         End If
                                     End If
 
-                                    icnt = icnt + 1
-                                Next j
+                                    lOper4 += 1
+                                Next lOper2
                             End If
                         End If
                     End If
                 End If
-            Next i
+            Next lOper1
 
             'set default members for all
-            For i = 1 To .Rows
-                For k = 1 To pLinkCount
-                    If pConsLinks(k - 1) = UCase(Trim(.CellValue(i, 4))) Then
-                        .CellValue(i, 10) = MemberLongVersion(pMemberLinks(k - 1), pMSub1Links(k - 1), pMSub2Links(k - 1))
+            For lOper1 = 1 To .Rows
+                For lOper3 = 1 To pLinkCount
+                    If pConsLinks(lOper3 - 1) = UCase(Trim(.CellValue(lOper1, 4))) Then
+                        .CellValue(lOper1, 10) = MemberLongVersion(pMemberLinks(lOper3 - 1), pMSub1Links(lOper3 - 1), pMSub2Links(lOper3 - 1))
                         '.TextMatrix(i, 12) = MSub1Links(K - 1)
                         '.TextMatrix(i, 13) = MSub2Links(K - 1)
                         Exit For
                     End If
-                Next k
-            Next i
-            If icnt = 1 Then .Rows = 0
+                Next lOper3
+            Next lOper1
+            If lOper4 = 1 Then .Rows = 0
 
         End With
 
@@ -449,55 +467,55 @@ Public Class frmPoint
     End Sub
 
     Private Function MemberFromLongVersion(ByVal S$) As String
-        Dim i&
-        i = InStr(1, S, "(")
-        If i > 0 Then
-            MemberFromLongVersion = Mid(S, 1, i - 1)
+        Dim lOper1 As Integer
+        lOper1 = InStr(1, S, "(")
+        If lOper1 > 0 Then
+            MemberFromLongVersion = Mid(S, 1, lOper1 - 1)
         Else
             MemberFromLongVersion = S
         End If
     End Function
 
     Private Function MemSub1FromLongVersion(ByVal S$) As Long
-        Dim i&, j&
-        i = InStr(1, S, "(")
-        If i > 0 Then
-            j = InStr(1, S, ",")
-            If j = 0 Then
-                j = InStr(1, S, ")")
+        Dim lOper1, lOper2 As Integer
+        lOper1 = InStr(1, S, "(")
+        If lOper1 > 0 Then
+            lOper2 = InStr(1, S, ",")
+            If lOper2 = 0 Then
+                lOper2 = InStr(1, S, ")")
             End If
-            MemSub1FromLongVersion = CInt(Mid(S, i + 1, j - i - 1))
+            MemSub1FromLongVersion = CInt(Mid(S, lOper1 + 1, lOper2 - lOper1 - 1))
         Else
             MemSub1FromLongVersion = 0
         End If
     End Function
 
     Private Function MemSub2FromLongVersion(ByVal S$) As Long
-        Dim i&, j&
-        i = InStr(1, S, ",")
-        If i > 0 Then
-            j = InStr(1, S, ")")
-            MemSub2FromLongVersion = CInt(Mid(S, i + 1, j - i - 1))
+        Dim lOper1, lOper2 As Integer
+        lOper1 = InStr(1, S, ",")
+        If lOper1 > 0 Then
+            lOper2 = InStr(1, S, ")")
+            MemSub2FromLongVersion = CInt(Mid(S, lOper1 + 1, lOper2 - lOper1 - 1))
         Else
             MemSub2FromLongVersion = 0
         End If
     End Function
 
     Private Function MemberLongVersion(ByVal mem$, ByVal sub1&, ByVal sub2&) As String
-        Dim S$
-        S = mem
+        Dim lString As String
+        lString = mem
         If sub1 > 0 Then
-            S = S & "(" & sub1
+            lString = lString & "(" & sub1
             If sub2 > 0 Then
-                S = S & "," & sub2 & ")"
+                lString = lString & "," & sub2 & ")"
             Else
-                S = S & ")"
+                lString = lString & ")"
             End If
         End If
-        If InStr(1, S, "|") = 0 Then
-            MemberLongVersion = S & " | " & DescriptionFromMemberSubs(mem, sub1, sub2)
+        If InStr(1, lString, "|") = 0 Then
+            MemberLongVersion = lString & " | " & DescriptionFromMemberSubs(mem, sub1, sub2)
         Else
-            MemberLongVersion = S
+            MemberLongVersion = lString
         End If
     End Function
 
@@ -759,7 +777,7 @@ Public Class frmPoint
     End Sub
 
     Private Sub lstSources_IndividualCheckChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs)
-        Dim ifound As Boolean, i&
+        Dim lOper As Integer
 
         RemoveHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
 
@@ -776,17 +794,15 @@ Public Class frmPoint
         'Update lists to reflect state of the checked item (which caused this event)
         UpdateListArrays()
 
-        For i = 1 To agdMasterPoint.Source.Rows - 1
+        For lOper = 1 To agdMasterPoint.Source.Rows - 1
             'Check if facility and scenario are in use.
             'MsgBox(Array.IndexOf(ConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) & Array.IndexOf(pInUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) & Array.IndexOf(pInUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) & ":::" & Mid(agdMasterPoint.Source.CellValue(i, 1), 4))
-            If Array.IndexOf(pConsLinks, UCase(agdMasterPoint.Source.CellValue(i, 4))) <> -1 AndAlso Array.IndexOf(pInUseFacs(0), agdMasterPoint.Source.CellValue(i, 3)) <> -1 AndAlso Array.IndexOf(pInUseFacs(1), Mid(agdMasterPoint.Source.CellValue(i, 1), 4)) <> -1 Then
-                ifound = True
+            If Array.IndexOf(pConsLinks, UCase(agdMasterPoint.Source.CellValue(lOper, 4))) <> -1 AndAlso Array.IndexOf(pInUseFacs(0), agdMasterPoint.Source.CellValue(lOper, 3)) <> -1 AndAlso Array.IndexOf(pInUseFacs(1), Mid(agdMasterPoint.Source.CellValue(lOper, 1), 4)) <> -1 Then
                 'set indiv timsers to in use in master grid
-                agdMasterPoint.Source.CellValue(i, 0) = "Yes"
+                agdMasterPoint.Source.CellValue(lOper, 0) = "Yes"
             Else
-                ifound = False
                 'set indiv timsers to not in use in master grid
-                agdMasterPoint.Source.CellValue(i, 0) = "No"
+                agdMasterPoint.Source.CellValue(lOper, 0) = "No"
             End If
         Next
 
@@ -795,15 +811,12 @@ Public Class frmPoint
         'rebuild lists
         pCountInUseFacs = lstPoints.Items.Count - lstPoints.CheckedItems.Count
 
-
     End Sub
 
     Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
+        agdPoint2agdMasterPoint()
         agdMasterPoint2agdPoint()
         grpDetails.Text = "Details of " & lstPoints.SelectedItem
-
-
-
     End Sub
     Private Sub cmdShowDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsShow.Click
         'if there exists points and no point is selected, then choose the first entry
@@ -821,33 +834,124 @@ Public Class frmPoint
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Dim lOper1, lOper2 As Integer
-        Dim lCheckedItemSplit() As String
+        Dim lString, lCheckedItemSplit(), lScenario, lFacility, lCurrentConnections, lCurrentMember As String
+        Dim lCurrentSub1, lCurrentSub2, lCurrentGroup As String
+        Dim lProblemFlag, lFoundFlag1, lFoundFlag2 As Boolean
 
-        'Copy agdPoint to agdMasterPoint
-        'TODO:
+        agdPoint2agdMasterPoint()
+        agdMasterPoint.SizeAllColumnsToContents()
+        agdMasterPoint.Refresh()
 
-        'Set and unselected facilities in lstPoints to not-in-use
+        'set any unselected facilities in aslpoint to not-in-use
+
         For lOper1 = 0 To lstPoints.Items.Count - 1
-            'split the selected item text into lCheckedItemSplit(0): facility, lCheckedItemSplit(1): scenario
+            If Not lstPoints.GetItemChecked(lOper1) Then
 
-            'A blank string will be found and added at the end of the string split, but is unimportant
-            lCheckedItemSplit = lstPoints.Items.Item(lstPoints.SelectedIndex).ToString.Split(New [Char]() {"("c, ")"c})
+                lString = lstPoints.Items.Item(lOper1)
 
-            'remove space before "(" in string.
-            lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
+                lCheckedItemSplit = lString.Split(New [Char]() {"("c, ")"c})
 
-            'add the "PT-" to match entries in agdMasterPoint
-            lCheckedItemSplit(1) = "PT-" & lCheckedItemSplit(1)
+                lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
+                ReDim Preserve lCheckedItemSplit(1)
 
-            For lOper2 = 1 To agdMasterPoint.Source.Rows - 1
-                If agdMasterPoint.Source.CellValue(lOper2, 3) = lCheckedItemSplit(0) AndAlso agdMasterPoint.Source.CellValue(lOper2, 1) = lCheckedItemSplit(1) Then
-                    agdMasterPoint.Source.CellValue(lOper2, 0) = "No"
+                lScenario = "PT-" & lCheckedItemSplit(1)
+                lFacility = lCheckedItemSplit(0)
+
+                For lOper2 = 1 To agdMasterPoint.Source.Rows - 1
+                    If agdMasterPoint.Source.CellValue(lOper2, 1) = lScenario AndAlso agdMasterPoint.Source.CellValue(lOper2, 3) = lFacility Then
+                        agdMasterPoint.Source.CellValue(lOper2, 0) = "No"
+                        MsgBox(lOper2 & " no")
+                    End If
+                Next lOper2
+            End If
+        Next lOper1
+
+
+
+        'go through master list, putting point sources back
+        For lOper1 = 1 To agdMasterPoint.Source.Rows - 1
+            If agdMasterPoint.Source.CellValue(lOper1, 0) = "Yes" Then
+                'this pt src is active
+                'check to see if member and subs are filled in
+                If Len(agdMasterPoint.Source.CellValue(lOper1, 10)) = 0 Then
+                    lProblemFlag = True
                 End If
-            Next
-        Next
 
+                If Not lProblemFlag Then
+                    'is it already in pt src structure
+                    lFoundFlag1 = 0
+                    For lOper2 = 1 To pUCI.PointSources.Count
+                        If pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7) AndAlso _
+                           pUCI.PointSources(lOper2).Target.VolId = agdMasterPoint.Source.CellValue(lOper1, 8) AndAlso _
+                           pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5) AndAlso _
+                           pUCI.PointSources(lOper2).Source.VolId = agdMasterPoint.Source.CellValue(lOper1, 6) Then
+                            lFoundFlag1 = lOper2
+                        End If
+                    Next lOper2
+                    If lFoundFlag1 > 0 Then
+                        pUCI.PointSources(lFoundFlag1).Target.Group = agdMasterPoint.Source.CellValue(lOper1, 9)
+                        lCurrentMember = agdMasterPoint.Source.CellValue(lOper1, 10)
+                        lOper2 = InStr(1, lCurrentMember, "|")
+                        If lOper2 > 0 Then
+                            lCurrentMember = Mid(lCurrentMember, 1, lOper2 - 2)
+                        End If
+                        pUCI.PointSources(lFoundFlag1).Target.Member = MemberFromLongVersion(lCurrentMember)
+                        pUCI.PointSources(lFoundFlag1).Target.MemSub1 = MemSub1FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
+                        pUCI.PointSources(lFoundFlag1).Target.MemSub2 = MemSub2FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
+                    End If
+
+                    If lFoundFlag1 = 0 Then
+                        'add to point source structure
+                        lCurrentConnections = agdMasterPoint.Source.CellValue(lOper1, 4)
+                        lCurrentGroup = agdMasterPoint.Source.CellValue(lOper1, 9)
+                        lCurrentMember = agdMasterPoint.Source.CellValue(lOper1, 10)
+                        lOper2 = InStr(1, lCurrentMember, "|")
+                        If lOper2 > 0 Then
+                            lCurrentMember = Mid(lCurrentMember, 1, lOper2 - 2)
+                        End If
+                        lCurrentMember = MemberFromLongVersion(lCurrentMember)
+                        lCurrentSub1 = MemSub1FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
+                        lCurrentSub2 = MemSub2FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
+                        If Len(lCurrentGroup) > 0 And Len(lCurrentMember) > 0 Then
+                            pUCI.AddPoint(agdMasterPoint.Source.CellValue(lOper1, 5), agdMasterPoint.Source.CellValue(lOper1, 6), agdMasterPoint.Source.CellValue(lOper1, 8), agdMasterPoint.Source.CellValue(lOper1, 3), lCurrentGroup, lCurrentMember, lCurrentSub1, lCurrentSub2)
+                        Else
+                            agdMasterPoint.Source.CellValue(lOper1, 0) = "No"
+                        End If
+                        pUCI.Edited = True
+                    End If
+                End If
+            Else
+                'this pt src is not active, but is it in pt src structure
+                lFoundFlag2 = False
+                For lOper2 = 0 To pUCI.PointSources.Count - 1
+
+                    pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7)
+                    MsgBox(agdMasterPoint.Source.CellValue(lOper1, 8))
+                    pUCI.PointSources(lOper2).Target.VolId = CInt(agdMasterPoint.Source.CellValue(lOper1, 8))
+                    pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5)
+                    pUCI.PointSources(lOper2).Source.VolId = CInt(agdMasterPoint.Source.CellValue(lOper1, 6))
+
+                    If pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7) And _
+                       pUCI.PointSources(lOper2).Target.VolId = agdMasterPoint.Source.CellValue(lOper1, 8) And _
+                       pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5) And _
+                       pUCI.PointSources(lOper2).Source.VolId = agdMasterPoint.Source.CellValue(lOper1, 6) Then
+                        lFoundFlag2 = True
+                    End If
+                Next lOper2
+                If lFoundFlag2 Then
+                    'remove from point source structure
+                    pUCI.RemovePoint(agdMasterPoint.Source.CellValue(lOper1, 5), agdMasterPoint.Source.CellValue(lOper1, 6), agdMasterPoint.Source.CellValue(lOper1, 8))
+                    pUCI.Edited = True
+                End If
+            End If
+        Next lOper1
+        'myUci.Source2MetSeg
+        If lProblemFlag Then
+            Logger.Message("At least one of the target members for " & vbCrLf & "a point source 'in use' has not been set." & vbCrLf & vbCrLf & "This must be set before continuing.", "Point Source Problem", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+        End If
         Me.Dispose()
     End Sub
+
 
     Private Sub cmdSimpleCreate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSimpleCreate.Click
 
