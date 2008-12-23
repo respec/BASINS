@@ -16,48 +16,6 @@ Public Class frmWinHSPF
 
     End Sub
 
-    Private Sub ReachEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles ReachEditorToolStripMenuItem.Click
-        ReachEditor()
-    End Sub
-
-    Private Sub LandUseEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles LandUseEditorToolStripMenuItem.Click
-
-        If IsNothing(pfrmLand) Then
-            pfrmLand = New frmLand
-            pfrmLand.Show()
-        Else
-            If pfrmLand.IsDisposed Then
-                pfrmLand = New frmLand
-                pfrmLand.Show()
-            Else
-                pfrmLand.WindowState = FormWindowState.Normal
-                pfrmLand.BringToFront()
-            End If
-        End If
-
-    End Sub
-
-    Private Sub InputDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InputDataEditorToolStripMenuItem.Click
-
-        If IsNothing(pfrmInputDataEditor) Then
-            pfrmInputDataEditor = New frmInputDataEditor
-            pfrmInputDataEditor.Show()
-        Else
-            If pfrmInputDataEditor.IsDisposed Then
-                pfrmInputDataEditor = New frmInputDataEditor
-                pfrmInputDataEditor.Show()
-            Else
-                pfrmInputDataEditor.WindowState = FormWindowState.Normal
-                pfrmInputDataEditor.BringToFront()
-            End If
-        End If
-
-    End Sub
-
-    Private Sub PollutantToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PollutantToolStripMenuItem.Click
-        PollutantSelectorCheck()
-    End Sub
-
     Private Sub SetEditMenu()
         Dim lAddFlag As Boolean
         For Each lBlock As HspfBlockDef In pMsg.BlockDefs
@@ -100,56 +58,84 @@ Public Class frmWinHSPF
         End If
     End Sub
 
-
-    Private Sub EditControlCardsWithTablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditControlCardsWithTablesToolStripMenuItem.Click
-
-        If IsNothing(pfrmActivityAll) Then
-            pfrmActivityAll = New frmActivityAll
-            pfrmActivityAll.Show()
-        Else
-            If pfrmActivityAll.IsDisposed Then
-                pfrmActivityAll = New frmActivityAll
-                pfrmActivityAll.Show()
-            Else
-                pfrmActivityAll.WindowState = FormWindowState.Normal
-                pfrmActivityAll.BringToFront()
-            End If
-        End If
-
+    Private Sub ReachEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles ReachEditorToolStripMenuItem.Click
+        ReachEditor()
     End Sub
 
-    Private Sub EditWithToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EditWithToolStripMenuItem.Click
-
-        If IsNothing(pfrmControl) Then
-            pfrmControl = New frmControl
-            pfrmControl.Show()
-        Else
-            If pfrmControl.IsDisposed Then
-                pfrmControl = New frmControl
-                pfrmControl.Show()
-            Else
-                pfrmControl.WindowState = FormWindowState.Normal
-                pfrmControl.BringToFront()
-            End If
-        End If
-
+    Private Sub cmdReach_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReach.Click
+        ReachEditor()
     End Sub
 
-    Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdToolStripOutput.Click
+    Private Sub SimulationTimeAndMetDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SimulationTimeAndMetDataEditorToolStripMenuItem.Click
+        SimulationTimeMetDataEditor()
+    End Sub
 
-        If IsNothing(pfrmOutput) Then
-            pfrmOutput = New frmOutput
-            pfrmOutput.Show()
-        Else
-            If pfrmOutput.IsDisposed Then
-                pfrmOutput = New frmOutput
-                pfrmOutput.Show()
-            Else
-                pfrmOutput.WindowState = FormWindowState.Normal
-                pfrmOutput.BringToFront()
-            End If
-        End If
+    Private Sub cmdTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTime.Click
+        SimulationTimeMetDataEditor()
+    End Sub
 
+    Private Sub LandUseEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles LandUseEditorToolStripMenuItem.Click
+        LandUseEditor()
+    End Sub
+
+    Private Sub cmdLandUse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLandUse.Click
+        LandUseEditor()
+    End Sub
+
+    Private Sub TablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TablesToolStripMenuItem.Click
+        EditControlCardsWithTables()
+    End Sub
+
+    Private Sub cmdControlCardsTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdControlCardsTables.Click
+        EditControlCardsWithTables()
+    End Sub
+
+    Private Sub DescriptionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DescriptionsToolStripMenuItem.Click
+        EditControlCardsWithDescriptions()
+    End Sub
+
+    Private Sub cmdControlCardsDescriptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdControlCardsDescriptions.Click
+        EditControlCardsWithDescriptions()
+    End Sub
+
+    Private Sub PollutantToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PollutantToolStripMenuItem.Click
+        PollutantSelector()
+    End Sub
+
+    Private Sub cmdPollutant_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPollutant.Click
+        PollutantSelector()
+    End Sub
+
+    Private Sub PointSourceEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PointSourceEditorToolStripMenuItem.Click
+        PointSourceEditor()
+    End Sub
+
+    Private Sub cmdPoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPoint.Click
+        PointSourceEditor()
+    End Sub
+
+    Private Sub InputDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InputDataEditorToolStripMenuItem.Click
+        InputDataEditor()
+    End Sub
+
+    Private Sub cmdToolStripInputEditor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdInputDataEditor.Click
+        InputDataEditor()
+    End Sub
+
+    Private Sub cmdOutputManager_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOutputManager.Click
+        OutputManager()
+    End Sub
+
+    Private Sub OutputManagerToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OutputManagerToolStripMenuItem.Click
+        OutputManager()
+    End Sub
+
+    Private Sub cmdViewOutput_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdViewOutput.Click
+        Logger.Msg("'View Output' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
+    End Sub
+
+    Private Sub ViewOutputToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ViewOutputToolStripMenuItem.Click
+        Logger.Msg("'View Output' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
@@ -164,57 +150,6 @@ Public Class frmWinHSPF
             Else
                 pfrmAbout.WindowState = FormWindowState.Normal
                 pfrmAbout.BringToFront()
-            End If
-        End If
-
-    End Sub
-
-    Private Sub cmdToolStripInputEditor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdToolStripInputEditor.Click
-
-        If IsNothing(pfrmInputDataEditor) Then
-            pfrmInputDataEditor = New frmInputDataEditor
-            pfrmInputDataEditor.Show()
-        Else
-            If pfrmInputDataEditor.IsDisposed Then
-                pfrmInputDataEditor = New frmInputDataEditor
-                pfrmInputDataEditor.Show()
-            Else
-                pfrmInputDataEditor.WindowState = FormWindowState.Normal
-                pfrmInputDataEditor.BringToFront()
-            End If
-        End If
-
-    End Sub
-
-    Private Sub cmdTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTime.Click
-
-        If IsNothing(pfrmTime) Then
-            pfrmTime = New frmTime
-            pfrmTime.Show()
-        Else
-            If pfrmTime.IsDisposed Then
-                pfrmTime = New frmTime
-                pfrmTime.Show()
-            Else
-                pfrmTime.WindowState = FormWindowState.Normal
-                pfrmTime.BringToFront()
-            End If
-        End If
-
-    End Sub
-
-    Private Sub cmdPoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPoint.Click
-
-        If IsNothing(pfrmPoint) Then
-            pfrmPoint = New frmPoint
-            pfrmPoint.Show()
-        Else
-            If pfrmPoint.IsDisposed Then
-                pfrmPoint = New frmPoint
-                pfrmPoint.Show()
-            Else
-                pfrmPoint.WindowState = FormWindowState.Normal
-                pfrmPoint.BringToFront()
             End If
         End If
 
@@ -305,29 +240,8 @@ Public Class frmWinHSPF
 
     End Sub
 
-    Private Sub cmdLandUse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLandUse.Click
-
-        If IsNothing(pfrmLand) Then
-            pfrmLand = New frmLand
-            pfrmLand.Show()
-        Else
-            If pfrmLand.IsDisposed Then
-                pfrmLand = New frmLand
-                pfrmLand.Show()
-            Else
-                pfrmLand.WindowState = FormWindowState.Normal
-                pfrmLand.BringToFront()
-            End If
-        End If
-
-    End Sub
-
-    Private Sub cmdPollutant_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPollutant.Click
-        PollutantSelectorCheck()
-    End Sub
-
-    Private Sub cmdReach_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReach.Click
-        ReachEditor()
+    Private Sub PESTToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PESTToolStripMenuItem.Click
+        Logger.Msg("'PEST' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
     End Sub
 
     Private Sub OpenToolStripButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripButton.Click
@@ -340,5 +254,29 @@ Public Class frmWinHSPF
 
     Private Sub CloseToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseToolStripMenuItem.Click
         CloseUCI()
+    End Sub
+
+    Private Sub ExitToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitToolStripMenuItem.Click
+        Me.Dispose()
+    End Sub
+
+    Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
+        SaveUCI()
+    End Sub
+
+    Private Sub SaveToolStripButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripButton.Click
+        SaveUCI()
+    End Sub
+
+    Private Sub NewToolStripButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NewToolStripButton.Click
+        Logger.Msg("'New' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
+    End Sub
+
+    Private Sub RunHSPFToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RunHSPFToolStripMenuItem.Click
+        RunHSPF()
+    End Sub
+
+    Private Sub cmdRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRunHSPF.Click
+        RunHSPF()
     End Sub
 End Class
