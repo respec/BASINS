@@ -917,10 +917,8 @@ Public Module modTimeseriesMath
             lValue = aTimeseries.Value(lIndex)
             If Not Double.IsNaN(lValue) Then
                 lRank = lValuesSorted.BinarySearch(lValue)
-                If aLowToHigh Then
-                    lRank += 1
-                Else
-                    lRank = lLastIndex - lRank
+                If Not aLowToHigh Then
+                    lRank = lLastIndex - lRank + 1
                 End If
                 aTimeseries.ValueAttributes(lIndex).SetValue("Rank", lRank)
             End If
