@@ -135,7 +135,7 @@ Module modFreq
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe(0), _
+                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe(0), _
                        lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
                 Dim lMsg As String = ""
 
