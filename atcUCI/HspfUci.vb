@@ -877,8 +877,9 @@ Public Class HspfUci
             'ret = GetExitCodeProcess(Me.Monitor.launch.hComputeProcess, i)
             'If i <> &H103 Then
             'need to restart hspfengine
-            aReturnCode = CInt(Right(lMsg, 2))
-            'End If
+            If IsNumeric(Right(lMsg, 2)) Then
+                aReturnCode = CInt(Right(lMsg, 2))
+            End If
 
             RestartHSPFEngine()
             'have to reset wdms, may have changed pointers during simulate
@@ -2435,7 +2436,7 @@ x:
             'lOpn.InputTimeseriesStatus.Update
             lMissingTimsers = lOpn.InputTimeseriesStatus.GetInfo(HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired, HspfStatus.HspfStatusPresentMissingEnum.HspfStatusMissing)
             If lMissingTimsers.Count > 0 Then
-                For i As Integer = 1 To lMissingTimsers.Count
+                For i As Integer = 0 To lMissingTimsers.Count - 1
                     lMessageText &= vbCrLf & lOpn.Name & " " & lOpn.Id & " " & lMissingTimsers.Item(i).Name
                 Next i
             End If
@@ -2445,11 +2446,11 @@ x:
         Source2Point()
 
         If lMessageText.Length > 0 Then 'some missing timsers
-            Dim iResp As Integer = 0
-            'TODO: iresp = myMsgBox.Show("WinHSPF has detected missing input time series" & vbCrLf & "required for the selected simulation options:" & vbCrLf & ctxt & vbCrLf & vbCrLf & "Do you want to try running HSPF anyway?", "WinHSPF Simulate Problem", "&OK", "+-&Cancel")
-            aReturnCode = iResp - 1
-        Else
-            aReturnCode = 0
+            If Logger.Msg("WinHSPF has detected missing input time series" & vbCrLf & "required for the selected simulation options:" & vbCrLf & lMessageText & vbCrLf & vbCrLf & "Do you want to try running HSPF anyway?", MsgBoxStyle.OkCancel, "WinHSPF Simulate Problem") = MsgBoxResult.Cancel Then
+                aReturnCode = -1
+            Else
+                aReturnCode = 0
+            End If
         End If
     End Sub
 

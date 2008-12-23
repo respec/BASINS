@@ -243,7 +243,7 @@ Public Class HspfStatus
         Static lMassLinkPos As Integer 'save between calls
 
         If aInit Then
-            lMassLinkPos = 1
+            lMassLinkPos = 0
         End If
 
         If aConnection.MassLink = 0 Then
@@ -265,9 +265,9 @@ Public Class HspfStatus
         Else
             aGroup = "?"
             While aGroup = "?"
-                If lMassLinkPos <= pOper.Uci.MassLinks.Count Then
+                If lMassLinkPos < pOper.Uci.MassLinks.Count Then
                     Dim lMassLink As HspfMassLink = pOper.Uci.MassLinks(lMassLinkPos)
-                    If lMassLink.MassLinkID = aConnection.MassLink Then
+                    If lMassLink.MassLinkId = aConnection.MassLink Then
                         If aSource Then
                             aGroup = lMassLink.Target.Group
                             aMember = lMassLink.Target.Member
