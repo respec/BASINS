@@ -870,7 +870,14 @@ namespace ZedGraph
 				// is set up such that 0,0 is at the location where the
 				// CenterTop of the text needs to be.
 				//RectangleF layoutArea = new RectangleF( 0.0F, 0.0F, sizeF.Width, sizeF.Height );
-				g.DrawString( text, _font, brush, rectF, strFormat );
+				try
+				{
+					g.DrawString(text, _font, brush, rectF, strFormat);
+				}
+				catch (Exception drawEx)
+				{
+					// Not sure why we get an exception here, but don't want to let it prevent drawing the rest of the graph
+				}
 			}
 
 			// Restore the transform matrix back to original

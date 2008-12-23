@@ -10,7 +10,7 @@ Imports System.IO
 Imports System.Xml
 
 Public Class atcTimeseriesSTORET
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "STORET Output Files (*.STORETresults)|*.STORETresults"

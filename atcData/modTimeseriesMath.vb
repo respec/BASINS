@@ -62,16 +62,19 @@ Public Module modTimeseriesMath
     ''' Trim a timeseries if needed to make it start and end at the desired year boundary.
     ''' Useful when complete calendar or water years are needed
     ''' </summary>
-    ''' <param name="aTimeseries"></param>
-    ''' <param name="aStartMonth"></param>
-    ''' <param name="aStartDay"></param>
-    ''' <param name="aDataSource"></param>
-    ''' <param name="aFirstYear"></param>
-    ''' <param name="aLastYear"></param>
-    ''' <param name="aEndMonth"></param>
-    ''' <param name="aEndDay"></param>
+    ''' <param name="aTimeseries">Original timeseries</param>
+    ''' <param name="aStartMonth">Month containing first value of the year</param>
+    ''' <param name="aStartDay">Day containing first value of the year</param>
+    ''' <param name="aDataSource">Data Source to assign to newly created subset timeseries, can be Nothing</param>
+    ''' <param name="aFirstYear">Optional first year of data to include in subset</param>
+    ''' <param name="aLastYear">Optional last year of data to include in subset</param>
+    ''' <param name="aEndMonth">Optional month containing last value of the year</param>
+    ''' <param name="aEndDay">Optional day containing last value of the year</param>
     ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' If omitted or zero, aFirstYear or aLastYear will not be used to limit the subset.
+    ''' If omitted or zero, aEndMonth/aEndDay will default to the day before aStartMonth/aStartDay.
+    ''' </remarks>
     Public Function SubsetByDateBoundary(ByVal aTimeseries As atcTimeseries, _
                                          ByVal aStartMonth As Integer, _
                                          ByVal aStartDay As Integer, _
@@ -87,8 +90,13 @@ Public Module modTimeseriesMath
         Dim lStartYear As Integer
         Dim lEndYear As Integer
 
-        If aEndMonth = 0 Then aEndMonth = aStartMonth
-        If aEndDay = 0 Then aEndDay = aStartDay
+        If aEndMonth = 0 Then
+            aEndMonth = aStartMonth 'Will be rolled back a day later
+        End If
+
+        If aEndDay = 0 Then
+            aEndDay = aStartDay 'Will be rolled back a day later
+        End If
 
         aTimeseries.EnsureValuesRead()
 
@@ -138,7 +146,7 @@ Public Module modTimeseriesMath
                     End If
                 End If
             End If
-            lEndDate = Jday(lEndYear, aEndMonth, aEndDay, 0, 0, 0)
+            lEndDate = Jday(lEndYear, aEndMonth, aEndDay, 24, 0, 0) 'hour 24 = end of last day
         End With
 
         SubsetByDateBoundary = SubsetByDate(aTimeseries, lStartDate, lEndDate, aDataSource)

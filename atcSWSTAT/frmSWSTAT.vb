@@ -975,7 +975,11 @@ Friend Class frmSWSTAT
             If lTs.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
                 lTsB = lTs
             Else
-                lTsB = SubsetByDateBoundary(lTs, pYearStartMonth, pYearStartDay, Nothing, pFirstYear, pLastYear, pYearEndMonth, pYearEndDay)
+                'lTsB = SubsetByDateBoundary(lTs, pYearStartMonth, pYearStartDay, Nothing, pFirstYear, pLastYear, pYearEndMonth, pYearEndDay)
+
+                Dim lSeasons As New atcSeasons.atcSeasonsYearSubset(pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay)
+                lSeasons.SeasonSelected(0) = True
+                lTsB = lSeasons.SplitBySelected(lTs, Nothing).ItemByIndex(1)
                 lTsB.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
             End If
             lDataGroupB.Add(lTsB)

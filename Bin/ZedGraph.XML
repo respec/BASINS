@@ -3660,7 +3660,7 @@
         </member>
         <member name="P:ZedGraph.Scale.IsDate">
             <summary>
-            True if this scale is <see cref="F:ZedGraph.AxisType.Date"/> or <see cref="F:ZedGraph.AxisType.DateDual"/>, false otherwise.
+            True if this scale is <see cref="F:ZedGraph.AxisType.Date"/>, false otherwise.
             </summary>
         </member>
         <member name="P:ZedGraph.Scale.IsText">
@@ -6739,7 +6739,7 @@
         <member name="T:ZedGraph.ProbabilityScale">
             <summary>
             The ProbabilityScale class inherits from the <see cref="T:ZedGraph.Scale"/> class, and implements
-            the features specific to <see cref="F:ZedGraph.AxisType.Probability"/>.
+            the features specific to <see cref="F:ZedGraph.AxisType.Log"/>.
             </summary>
             <remarks>
             ProbabilityScale is a non-linear axis in which the values are scaled using a Gaussian
@@ -6830,11 +6830,15 @@
             <summary>
             Determine the value for any major tic.
             </summary>
+            <remarks>
+            This method properly accounts for <see cref="P:ZedGraph.Scale.IsLog"/>, <see cref="P:ZedGraph.Scale.IsText"/>,
+            and other axis format settings.
+            </remarks>
             <param name="baseVal">
             The value of the first major tic (floating point double)
             </param>
             <param name="tic">
-            The major tic number (0 = first major tic).
+            The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
             </param>
             <returns>
             The specified major tic value (floating point double).
@@ -6844,12 +6848,16 @@
             <summary>
             Determine the value for any minor tic.
             </summary>
+            <remarks>
+            This method properly accounts for <see cref="P:ZedGraph.Scale.IsLog"/>, <see cref="P:ZedGraph.Scale.IsText"/>,
+            and other axis format settings.
+            </remarks>
             <param name="baseVal">
             The value of the first major tic (floating point double).  This tic value is the base
             reference for all tics (including minor ones).
             </param>
             <param name="iTic">
-            The major tic number (0 = first major tic).
+            The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
             </param>
             <returns>
             The specified minor tic value (floating point double).
@@ -6870,15 +6878,23 @@
         </member>
         <member name="M:ZedGraph.ProbabilityScale.PickScale(ZedGraph.GraphPane,System.Drawing.Graphics,System.Single)">
             <summary>
-            Select a reasonable axis scale
+            Select a reasonable base 10 logarithmic axis scale given a range of data values.
             </summary>
             <remarks>
-            This method only applies to <see cref="F:ZedGraph.AxisType.Probability"/> type axes, and it
-            is called by the general <see cref="M:ZedGraph.ProbabilityScale.PickScale(ZedGraph.GraphPane,System.Drawing.Graphics,System.Single)"/> method.  
-            This method honors the <see cref="P:ZedGraph.Scale.MinAuto"/> and <see cref="P:ZedGraph.Scale.MaxAuto"/>.
+            This method only applies to <see cref="F:ZedGraph.AxisType.Log"/> type axes, and it
+            is called by the general <see cref="M:ZedGraph.ProbabilityScale.PickScale(ZedGraph.GraphPane,System.Drawing.Graphics,System.Single)"/> method.  The scale range is chosen
+            based always on powers of 10 (full log cycles).  This
+            method honors the <see cref="P:ZedGraph.Scale.MinAuto"/>, <see cref="P:ZedGraph.Scale.MaxAuto"/>,
+            and <see cref="P:ZedGraph.Scale.MajorStepAuto"/> autorange settings.
+            In the event that any of the autorange settings are false, the
+            corresponding <see cref="P:ZedGraph.Scale.Min"/>, <see cref="P:ZedGraph.Scale.Max"/>, or <see cref="P:ZedGraph.Scale.MajorStep"/>
+            setting is explicitly honored, and the remaining autorange settings (if any) will
+            be calculated to accomodate the non-autoranged values.  For log axes, the MinorStep
+            value is not used.
             <para>On Exit:</para>
             <para><see cref="P:ZedGraph.Scale.Min"/> is set to scale minimum (if <see cref="P:ZedGraph.Scale.MinAuto"/> = true)</para>
             <para><see cref="P:ZedGraph.Scale.Max"/> is set to scale maximum (if <see cref="P:ZedGraph.Scale.MaxAuto"/> = true)</para>
+            <para><see cref="P:ZedGraph.Scale.MajorStep"/> is set to scale step size (if <see cref="P:ZedGraph.Scale.MajorStepAuto"/> = true)</para>
             <para><see cref="P:ZedGraph.Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
             <para><see cref="P:ZedGraph.Scale.Format"/> is set to the display format for the values (this controls the
             number of decimal places, whether there are thousands separators, currency types, etc.)</para>
@@ -6896,7 +6912,7 @@
             font sizes, etc. according to the actual size of the graph.
             </param>
             <seealso cref="M:ZedGraph.ProbabilityScale.PickScale(ZedGraph.GraphPane,System.Drawing.Graphics,System.Single)"/>
-            <seealso cref="F:ZedGraph.AxisType.Probability"/>
+            <seealso cref="F:ZedGraph.AxisType.Log"/>
         </member>
         <member name="M:ZedGraph.ProbabilityScale.CalcBaseTic">
             <summary>
