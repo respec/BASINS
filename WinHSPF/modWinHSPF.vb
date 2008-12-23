@@ -62,8 +62,18 @@ Public Module WinHSPF
         'show main form
         pWinHSPF = New frmWinHSPF
         pIcon = pWinHSPF.Icon
-        OpenUCI("D:\BASINS\modelout\sediment\sed_riv.uci")
+
+        'handle command line
+        Dim lCommand As String = Command()
+        If lCommand.Length > 0 Then
+            If UCase(Right(lCommand, 4)) = ".UCI" Then
+                OpenUCI(lCommand)
+            ElseIf lCommand = "open" Then 'go to open uci prompt
+                OpenUCI()
+            End If
+        End If
         pWinHSPF.ShowDialog()
+
     End Sub
 
     'Open an existing uci file
@@ -139,7 +149,67 @@ Public Module WinHSPF
         End If
     End Sub
 
-    Sub PollutantSelectorCheck()
+    Sub SimulationTimeMetDataEditor()
+        If IsNothing(pfrmTime) Then
+            pfrmTime = New frmTime
+            pfrmTime.Show()
+        Else
+            If pfrmTime.IsDisposed Then
+                pfrmTime = New frmTime
+                pfrmTime.Show()
+            Else
+                pfrmTime.WindowState = FormWindowState.Normal
+                pfrmTime.BringToFront()
+            End If
+        End If
+    End Sub
+
+    Sub LandUseEditor()
+        If IsNothing(pfrmLand) Then
+            pfrmLand = New frmLand
+            pfrmLand.Show()
+        Else
+            If pfrmLand.IsDisposed Then
+                pfrmLand = New frmLand
+                pfrmLand.Show()
+            Else
+                pfrmLand.WindowState = FormWindowState.Normal
+                pfrmLand.BringToFront()
+            End If
+        End If
+    End Sub
+
+    Sub EditControlCardsWithTables()
+        If IsNothing(pfrmActivityAll) Then
+            pfrmActivityAll = New frmActivityAll
+            pfrmActivityAll.Show()
+        Else
+            If pfrmActivityAll.IsDisposed Then
+                pfrmActivityAll = New frmActivityAll
+                pfrmActivityAll.Show()
+            Else
+                pfrmActivityAll.WindowState = FormWindowState.Normal
+                pfrmActivityAll.BringToFront()
+            End If
+        End If
+    End Sub
+
+    Sub EditControlCardsWithDescriptions()
+        If IsNothing(pfrmControl) Then
+            pfrmControl = New frmControl
+            pfrmControl.Show()
+        Else
+            If pfrmControl.IsDisposed Then
+                pfrmControl = New frmControl
+                pfrmControl.Show()
+            Else
+                pfrmControl.WindowState = FormWindowState.Normal
+                pfrmControl.BringToFront()
+            End If
+        End If
+    End Sub
+
+    Sub PollutantSelector()
         If IsNothing(pfrmPollutant) Then
             pfrmPollutant = New frmPollutant
             PollutantSelectorShow()
@@ -163,6 +233,97 @@ Public Module WinHSPF
         CheckAndAddMissingTables("RCHRES")
         UpdateFlagDependencies("RCHRES")
         SetMissingValuesToDefaults(pUCI, pDefUCI)
+    End Sub
+
+    Sub PointSourceEditor()
+        If IsNothing(pfrmPoint) Then
+            pfrmPoint = New frmPoint
+            pfrmPoint.Show()
+        Else
+            If pfrmPoint.IsDisposed Then
+                pfrmPoint = New frmPoint
+                pfrmPoint.Show()
+            Else
+                pfrmPoint.WindowState = FormWindowState.Normal
+                pfrmPoint.BringToFront()
+            End If
+        End If
+    End Sub
+
+    Sub InputDataEditor()
+        If IsNothing(pfrmInputDataEditor) Then
+            pfrmInputDataEditor = New frmInputDataEditor
+            pfrmInputDataEditor.Show()
+        Else
+            If pfrmInputDataEditor.IsDisposed Then
+                pfrmInputDataEditor = New frmInputDataEditor
+                pfrmInputDataEditor.Show()
+            Else
+                pfrmInputDataEditor.WindowState = FormWindowState.Normal
+                pfrmInputDataEditor.BringToFront()
+            End If
+        End If
+    End Sub
+
+    Sub OutputManager()
+        If IsNothing(pfrmOutput) Then
+            pfrmOutput = New frmOutput
+            pfrmOutput.Show()
+        Else
+            If pfrmOutput.IsDisposed Then
+                pfrmOutput = New frmOutput
+                pfrmOutput.Show()
+            Else
+                pfrmOutput.WindowState = FormWindowState.Normal
+                pfrmOutput.BringToFront()
+            End If
+        End If
+    End Sub
+
+    Sub RunHSPF()
+        If pUCI.Edited Then
+            If Logger.Msg("Changes have been made since your last Save." & vbCrLf & vbCrLf & _
+                          "WinHSPF will save the changes before running.", MsgBoxStyle.OkCancel, _
+                          "Confirm Save UCI") = MsgBoxResult.Cancel Then
+                Exit Sub
+                pUCI.Save()
+            End If
+        End If
+
+        'pUCI.ClearAllOutputDsns()
+
+        'Dim lReturnCode As Integer
+        'pUCI.ReportMissingTimsers(lReturnCode)
+        'If lReturnCode = 0 Then
+
+        '    Dim lWinHSPFLtExe As String = atcUtility.FindFile("Please locate the WinHSPFLt Executable", "WinHSPFLt.exe")
+        '    If IO.File.Exists(lWinHSPFLtExe) Then
+        '        LaunchProgram(lWinHSPFLtExe, CurDir() & "\" & pUCI.Name, False)
+        '        Logger.Dbg("WinHSPFLt launched with input " & pUCI.Name)
+        '    Else
+        '        Logger.Msg("Cannot find the WinHSPFLt Executable", MsgBoxStyle.Critical, "WinHSPF Problem")
+        '        Exit Sub
+        '    End If
+
+        '    'Dim lErrorString As String = pUCI.ErrorDescription
+        '    'If Len(lErrorString) > 0 Then
+        '    '    If Logger.Msg(lErrorString & vbCrLf & vbCrLf & "Do you want to view the errors?", _
+        '    '                  MsgBoxStyle.YesNo, _
+        '    '                  "HSPF Problem") = MsgBoxResult.Ok Then
+        '    '    End If
+
+        '    '    'DispFile = New ATCoDispFile
+        '    '    'DispFile.FindString = "ERROR"
+        '    '    'DispFile.OpenFile(pUCI.EchoFileName, "WinHSPF Error View", Me.Icon, False)
+        '    '    'DispFile = Nothing
+        '    'End If
+
+        '    'have to reset wdms, may have changed pointers during simulate
+        '    'ClearWDM()
+        '    'InitWDMArray()
+        '    'SetWDMFiles()
+        'End If
+
     End Sub
 
     Sub EditBlock(ByVal aParent As Windows.Forms.Form, ByVal aTableName As String)

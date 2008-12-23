@@ -1261,9 +1261,9 @@ Public Class ctlSchematic
     Private Sub LegendIcon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Dim lSender As clsSchematicIcon = sender
         Select Case e.Button
-            Case MouseButtons.Left
+            Case Windows.Forms.MouseButtons.Left
                 ClickLegendIcon(lSender)
-            Case MouseButtons.Right
+            Case Windows.Forms.MouseButtons.Right
                 RightClickMenu.MenuItems.Clear()
                 RightClickMenu.MenuItems.Add(lSender.Key)
                 RightClickMenu.Show(lSender, e.Location)
@@ -1332,14 +1332,14 @@ NextLandIcon:
     Private Sub Icon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Dim lSender As clsSchematicIcon = sender
         Select Case e.Button
-            Case MouseButtons.Left
+            Case Windows.Forms.MouseButtons.Left
                 pBeforeDragLocation = lSender.Location
                 Dim MPosition As Point = Me.PointToClient(MousePosition)
                 pDragging = True
                 pDragOffset = lSender.Location - MPosition
-                Cursor.Clip = Me.RectangleToScreen(New Rectangle(picTree.Left + SplitLegendTree.SplitterDistance + SplitLegendTree.SplitterWidth + e.X, _
+                Windows.Forms.Cursor.Clip = Me.RectangleToScreen(New Rectangle(picTree.Left + SplitLegendTree.SplitterDistance + SplitLegendTree.SplitterWidth + e.X, _
                                                                  picTree.Top + e.Y, picTree.Width - pIconWidth, picTree.Height - pIconHeight))
-            Case MouseButtons.Right
+            Case Windows.Forms.MouseButtons.Right
                 pClickedIcon = lSender
                 RightClickMenu.MenuItems.Clear()
                 RightClickMenu.MenuItems.Add("""" & lSender.Key & """")
@@ -1380,7 +1380,7 @@ NextLandIcon:
             Case Windows.Forms.MouseButtons.Left
                 If pDragging Then 'end the dragging
                     pDragging = False
-                    Cursor.Clip = Nothing
+                    Windows.Forms.Cursor.Clip = Nothing
                     If sender.Location = pBeforeDragLocation Then
                         sender.Selected = Not sender.Selected
                         UpdateDetails()
@@ -1433,9 +1433,9 @@ NextLandIcon:
 
     Private Sub picTree_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles picTree.MouseDown
         Select Case e.Button
-            Case MouseButtons.Left
+            Case Windows.Forms.MouseButtons.Left
                 'TODO: start select rectangle
-            Case MouseButtons.Right
+            Case Windows.Forms.MouseButtons.Right
                 RightClickMenu.MenuItems.Clear()
                 RightClickMenu.MenuItems.Add("Select All", AddressOf Event_SelectAll)
                 RightClickMenu.MenuItems.Add("Unselect All", AddressOf Event_UnselectAll)
