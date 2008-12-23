@@ -167,11 +167,33 @@ Public Class atcTimeseries
 
     ''' <summary>Get whether a ValueAttribute exists by index</summary>
     Public Function ValueAttributesExist(Optional ByVal aIndex As Integer = -1) As Boolean
-        If pValueAttributes Is Nothing OrElse aIndex > 0 AndAlso pValueAttributes(aIndex) Is Nothing Then
-            Return False
+        If pValueAttributes Is Nothing Then
+            Return False 'No, we don't have any value attributes at all
+        ElseIf aIndex = -1 Then
+            Return True 'Asking about whole timeseries, not a particular value, and we know we have something
+        ElseIf (aIndex > 0 AndAlso aIndex <= pNumValues AndAlso pValueAttributes(aIndex) IsNot Nothing AndAlso pValueAttributes(aIndex).Count > 0) Then
+            Return True 'Yes, this particular value has value attributes
         Else
-            Return True
+            Return False
         End If
+    End Function
+
+    ''' <summary>Get list of ValueAttribute definitions present</summary>
+    Public Function ValueAttributeDefinitions() As Generic.List(Of atcAttributeDefinition)
+        Dim lDefs As New Generic.List(Of atcAttributeDefinition)
+        If ValueAttributesExist() Then
+            Dim lValueAttribute As atcDefinedValue
+            For lValueIndex As Integer = 1 To Me.numValues
+                If ValueAttributesExist(lValueIndex) Then
+                    For Each lValueAttribute In pValueAttributes(lValueIndex)
+                        If Not lDefs.Contains(lValueAttribute.Definition) Then
+                            lDefs.Add(lValueAttribute.Definition)
+                        End If
+                    Next
+                End If
+            Next
+        End If
+        Return lDefs
     End Function
 
     ''' <summary>Attributes associated with individual data values</summary>

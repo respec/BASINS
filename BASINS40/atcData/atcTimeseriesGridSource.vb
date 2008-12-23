@@ -4,7 +4,7 @@ Imports atcUtility
 Public Class atcTimeseriesGridSource
     Inherits atcControls.atcGridSource
 
-    Private WithEvents pDataGroup As atcTimeseriesGroup
+    Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
     Private pAllDates As atcTimeseries
     Private pDisplayAttributes As ArrayList
     Private pDisplayValues As Boolean
@@ -19,6 +19,7 @@ Public Class atcTimeseriesGridSource
     Private pExpFormat As String = "#.#e#"
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
+    Private pValueAttributeDefs As Generic.List(Of Generic.List(Of atcAttributeDefinition))
 
     Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
             ByVal aDisplayAttributes As ArrayList, _
@@ -30,7 +31,7 @@ Public Class atcTimeseriesGridSource
             ByVal aDisplayAttributes As ArrayList, _
             ByVal aDisplayValues As Boolean, _
             ByVal aFilterNoData As Boolean)
-        pDataGroup = aDataGroup
+        pTimeseriesGroup = aDataGroup
         pDisplayAttributes = aDisplayAttributes
         pDisplayValues = aDisplayValues
         pFilterNoData = aFilterNoData
@@ -52,6 +53,12 @@ Public Class atcTimeseriesGridSource
         End Get
         Set(ByVal newValue As Boolean)
             pDisplayValueAttributes = newValue
+            If newValue Then
+                pValueAttributeDefs = New Generic.List(Of Generic.List(Of atcAttributeDefinition))
+                For Each lTimeseries As atcTimeseries In pTimeseriesGroup
+                    pValueAttributeDefs.Add(lTimeseries.ValueAttributeDefinitions)
+                Next
+            End If
         End Set
     End Property
 
@@ -70,10 +77,10 @@ Public Class atcTimeseriesGridSource
     Private Sub RefreshAllDates()
         Try
             If pDisplayValues Then
-                If pFilterNoData OrElse pDataGroup.Count > 1 Then
-                    pAllDates = MergeTimeseries(pDataGroup, pFilterNoData).Dates
-                ElseIf pDataGroup.Count = 1 Then
-                    Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)
+                If pFilterNoData OrElse pTimeseriesGroup.Count > 1 Then
+                    pAllDates = MergeTimeseries(pTimeseriesGroup, pFilterNoData).Dates
+                ElseIf pTimeseriesGroup.Count = 1 Then
+                    Dim lTS As atcTimeseries = pTimeseriesGroup.ItemByIndex(0)
                     lTS.EnsureValuesRead()
                     pAllDates = lTS.Dates
                 Else
@@ -89,10 +96,10 @@ Public Class atcTimeseriesGridSource
 
     Overrides Property Columns() As Integer
         Get
-            Dim lCols As Integer = 1 + pDataGroup.Count
+            Dim lCols As Integer = 1 + pTimeseriesGroup.Count
             If pDisplayValueAttributes Then
-                For Each lTs As atcTimeseries In pDataGroup
-                    If lTs.ValueAttributesExist Then lCols += 1
+                For Each lDataAttributeDefs As Generic.List(Of atcAttributeDefinition) In pValueAttributeDefs
+                    lCols += lDataAttributeDefs.Count
                 Next
             End If
             Return lCols
@@ -127,30 +134,31 @@ Public Class atcTimeseriesGridSource
         End Set
     End Property
 
-    Private Sub CellDataset(ByVal aColumn As Integer, ByRef aTimeseries As atcTimeseries, ByRef aIsValue As Boolean)
+    Private Sub CellDataset(ByVal aColumn As Integer, ByRef aTimeseries As atcTimeseries, ByRef aIsValue As Boolean, ByRef aValueAttDef As atcAttributeDefinition)
         Dim lCol As Integer = 0
         Dim lTs As atcTimeseries
         'If aColumn = 3 Then Stop
         If pDisplayValueAttributes Then
-            For lTsIndex As Integer = 0 To pDataGroup.Count - 1
-                lTs = pDataGroup.ItemByIndex(lTsIndex)
+            For lTsIndex As Integer = 0 To pTimeseriesGroup.Count - 1
+                lTs = pTimeseriesGroup.ItemByIndex(lTsIndex)
                 lCol += 1
                 If lCol = aColumn Then
                     aTimeseries = lTs
                     aIsValue = True
                     Exit Sub
                 End If
-                If lTs.ValueAttributesExist Then
+                For lAttCol As Integer = 1 To pValueAttributeDefs(lTsIndex).Count
                     lCol += 1
                     If lCol = aColumn Then
                         aTimeseries = lTs
                         aIsValue = False
+                        aValueAttDef = pValueAttributeDefs(lTsIndex)(lAttCol - 1)
                         Exit Sub
                     End If
-                End If
+                Next
             Next
         Else
-            aTimeseries = pDataGroup.ItemByIndex(aColumn - 1)
+            aTimeseries = pTimeseriesGroup.ItemByIndex(aColumn - 1)
             aIsValue = True
         End If
     End Sub
@@ -164,7 +172,8 @@ Public Class atcTimeseriesGridSource
                 Case Is < Columns
                     Dim lTs As atcTimeseries = Nothing
                     Dim lIsValue As Boolean = True
-                    CellDataset(aColumn, lTs, lIsValue)
+                    Dim lValueAttDef As atcAttributeDefinition = Nothing
+                    CellDataset(aColumn, lTs, lIsValue, lValueAttDef)
                     If lTs Is Nothing Then
                         Return False
                     End If
@@ -207,11 +216,14 @@ Public Class atcTimeseriesGridSource
                 Case Is <= Columns
                     Dim lTs As atcTimeseries = Nothing
                     Dim lIsValue As Boolean = True
-                    CellDataset(aColumn, lTs, lIsValue)
+                    Dim lValueAttDef As atcAttributeDefinition = Nothing
+                    CellDataset(aColumn, lTs, lIsValue, lValueAttDef)
                     If lTs IsNot Nothing Then
                         If aRow < lAttributeRows Then
                             If lIsValue Then
                                 Return lTs.Attributes.GetFormattedValue(pDisplayAttributes(aRow))
+                            ElseIf aRow = lAttributeRows - 1 Then
+                                Return lValueAttDef.Name
                             Else
                                 Return ""
                             End If
@@ -243,14 +255,7 @@ Public Class atcTimeseriesGridSource
                                             Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
                                         End If
                                     Else
-                                        Dim lValueAtts As String = ""
-                                        If lTs.ValueAttributesExist(lIndex) Then
-                                            For Each lValueAttribute As atcDefinedValue In lTs.ValueAttributes(lIndex)
-                                                lValueAtts &= lValueAttribute.Definition.Name & "=" & lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttribute.Definition.Name) & " "
-                                            Next
-                                        End If
-                                        'Debug.WriteLine(aRow & ", " & aColumn & " = " & lValueAtts)
-                                        Return lValueAtts.TrimEnd(" ")
+                                        Return lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttDef.Name)
                                     End If
                                 Else
                                     'Stop
@@ -270,7 +275,8 @@ Public Class atcTimeseriesGridSource
                 Case Is < Columns
                     Dim lTs As atcTimeseries = Nothing
                     Dim lIsValue As Boolean = True
-                    CellDataset(aColumn, lTs, lIsValue)
+                    Dim lValueAttDef As atcAttributeDefinition = Nothing
+                    CellDataset(aColumn, lTs, lIsValue, lValueAttDef)
                     If lIsValue Then
                         If aRow < lAttributeRows Then
                             Dim lDefinedValue As atcDefinedValue = lTs.Attributes.GetDefinedValue(pDisplayAttributes(aRow))
@@ -325,11 +331,11 @@ Public Class atcTimeseriesGridSource
         End Set
     End Property
 
-    Private Sub pDataGroup_Added(ByVal aAdded As atcUtility.atcCollection) Handles pDataGroup.Added
+    Private Sub pDataGroup_Added(ByVal aAdded As atcUtility.atcCollection) Handles pTimeseriesGroup.Added
         RefreshAllDates()
     End Sub
 
-    Private Sub pDataGroup_Removed(ByVal aRemoved As atcUtility.atcCollection) Handles pDataGroup.Removed
+    Private Sub pDataGroup_Removed(ByVal aRemoved As atcUtility.atcCollection) Handles pTimeseriesGroup.Removed
         RefreshAllDates()
     End Sub
 End Class

@@ -3,7 +3,7 @@ Imports atcData
 Imports MapWinUtility
 
 Public Class atcDataSourceTimeseriesD4EM
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "D4EM Text Files (*.txt)|*.txt"

@@ -9,7 +9,7 @@ Imports MapWinUtility
 Imports atcWdmVb.atcWdmFileHandle
 
 Public Class atcWDMfile
-    Inherits atcData.atcDataSource
+    Inherits atcTimeseriesSource
 
     Shared pMsgWdm As New atcMsgWDMvb
     Private Const pFileFilter As String = "WDM Files (*.wdm)|*.wdm"

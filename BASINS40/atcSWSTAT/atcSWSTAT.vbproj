@@ -127,6 +127,11 @@
       <Name>atcList</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcSeasons\atcSeasons.vbproj">
+      <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
+      <Name>atcSeasons</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
       <Name>atcTimeseriesNdayHighLow</Name>
