@@ -7,11 +7,13 @@ Imports MapWinUtility
 Imports WinHSPF
 Imports System.Collections.ObjectModel
 Imports System.Text.RegularExpressions
+Imports System.Windows.Forms
+
 
 Public Class frmPoint
 
     'Dim lts As Collection(Of atcData.atcTimeseries)
-    Dim lts As Collection
+    Dim lts As New Collection
 
     '.net conversion issue: tsl was formelry ATCoTSlist
     Dim WithEvents tsl As atcTimeseries
@@ -23,7 +25,6 @@ Public Class frmPoint
     'The array AvailFacs(,) is a 2-D array that holds the (dimension 0) facility name, (dimension 1) scenario string
     'it should have the same elements as the sources list that are NOT checked.
     Dim pAvailFacs(1)() As String
-
 
     Dim pCountInUseFacs As Integer
     Dim pCountAvailFacs As Integer
@@ -41,7 +42,6 @@ Public Class frmPoint
     Dim pAgdPointRowReference As New Collection
 
     Public Sub New()
-        Dim lLinkCount As Integer
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -55,7 +55,7 @@ Public Class frmPoint
             .Clear()
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
-            .Visible = False
+            .Visible = True
         End With
 
         With agdPoint
@@ -68,7 +68,7 @@ Public Class frmPoint
 
         'always link flow to ivol
 
-        lLinkCount = 1
+        pLinkCount = 1
 
         LoadPollutantList(False)
 
@@ -189,7 +189,6 @@ Public Class frmPoint
             cboPollutantList.SelectedIndex = 0
         Catch ex As Exception
             pPollutantList.Clear()
-            MsgBox(cboPollutantList.Items.Count)
             cboPollutantList.Enabled = False
             Logger.Message("There was an error reading the selected pollutant list." & vbCrLf & "Ensure that the pollutant file selected is formatted properly.", "Error Reading the pollutant file", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
         End Try
@@ -353,8 +352,8 @@ Public Class frmPoint
                             lDsnCount = 0
                             lActiveFlag = False
                             If Not pUCI.PointSources Is Nothing Then
-                                For lOper2 = 1 To pUCI.PointSources.Count
-                                    If pUCI.PointSources(lOper2).Target.VolName = lOper.Name AndAlso pUCI.PointSources(lOper2).Target.VolId = lOper.Id AndAlso Microsoft.VisualBasic.Left(pUCI.PointSources(lOper2).Source.VolName, 3) = lts(lOper1).File.ToString AndAlso pUCI.PointSources(lOper2).Source.VolId = lts(lOper1).Attributes.GetValue("Id") Then
+                                For lOper2 = 0 To pUCI.PointSources.Count - 1
+                                    If pUCI.PointSources(lOper2).Target.VolName = lOper.Name AndAlso pUCI.PointSources(lOper2).Target.VolId = lOper.Id AndAlso UCase(Microsoft.VisualBasic.Left(pUCI.PointSources(lOper2).Source.VolName, 3)) = UCase(Microsoft.VisualBasic.Right(lts(lOper1).Attributes.GetValue("Data Source"), 3)) AndAlso pUCI.PointSources(lOper2).Source.VolId = lts(lOper1).Attributes.GetValue("Id") Then
                                         'found this dsn in active point sources
                                         lDsnCount += 1
                                         lActiveFlag = True
@@ -362,8 +361,8 @@ Public Class frmPoint
                                         ldsnptr(lDsnCount) = lOper2
 
                                         For lPointItemIndex = 0 To lstPoints.Items.Count - 1
-                                            If lstPoints.Items.Item(lPointItemIndex) = lSelectedItemString AndAlso lstPoints.GetItemChecked(lPointItemIndex) Then
-                                                lstPoints.Items.Add(lSelectedItemString, True)
+                                            If lstPoints.Items.Item(lPointItemIndex) = lSelectedItemString Then
+                                                lstPoints.SetItemChecked(lPointItemIndex, True)
                                             End If
                                         Next
 
@@ -618,12 +617,15 @@ Public Class frmPoint
 
     Private Sub ExpandedView(ByVal aExpand As Boolean)
         If aExpand Then
-            Me.Size = New Size(800, 590)
+            Me.Size = New Size(1100, 590)
+            Me.MinimumSize = New Size(280, 590)
+            Me.FormBorderStyle = Windows.Forms.FormBorderStyle.Sizable
             cmdDetailsHide.Visible = True
             cmdDetailsShow.Visible = False
             grpDetails.Visible = True
         Else
             Me.Size = New Size(280, 590)
+            Me.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedSingle
             cmdDetailsHide.Visible = False
             cmdDetailsShow.Visible = True
             grpDetails.Visible = False
@@ -833,16 +835,14 @@ Public Class frmPoint
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Dim lOper1, lOper2 As Integer
+        Dim lOper1, lOper2, lFoundIndex As Integer
         Dim lString, lCheckedItemSplit(), lScenario, lFacility, lCurrentConnections, lCurrentMember As String
         Dim lCurrentSub1, lCurrentSub2, lCurrentGroup As String
-        Dim lProblemFlag, lFoundFlag1, lFoundFlag2 As Boolean
+        Dim lProblemFlag, lFoundFlag2 As Boolean
 
         agdPoint2agdMasterPoint()
-        agdMasterPoint.SizeAllColumnsToContents()
-        agdMasterPoint.Refresh()
 
-        'set any unselected facilities in aslpoint to not-in-use
+        'set any unselected facilities in agdMasterPoint to not-in-use
 
         For lOper1 = 0 To lstPoints.Items.Count - 1
             If Not lstPoints.GetItemChecked(lOper1) Then
@@ -860,13 +860,10 @@ Public Class frmPoint
                 For lOper2 = 1 To agdMasterPoint.Source.Rows - 1
                     If agdMasterPoint.Source.CellValue(lOper2, 1) = lScenario AndAlso agdMasterPoint.Source.CellValue(lOper2, 3) = lFacility Then
                         agdMasterPoint.Source.CellValue(lOper2, 0) = "No"
-                        MsgBox(lOper2 & " no")
                     End If
                 Next lOper2
             End If
         Next lOper1
-
-
 
         'go through master list, putting point sources back
         For lOper1 = 1 To agdMasterPoint.Source.Rows - 1
@@ -879,28 +876,28 @@ Public Class frmPoint
 
                 If Not lProblemFlag Then
                     'is it already in pt src structure
-                    lFoundFlag1 = 0
+                    lFoundIndex = 0
                     For lOper2 = 1 To pUCI.PointSources.Count
                         If pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7) AndAlso _
                            pUCI.PointSources(lOper2).Target.VolId = agdMasterPoint.Source.CellValue(lOper1, 8) AndAlso _
                            pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5) AndAlso _
                            pUCI.PointSources(lOper2).Source.VolId = agdMasterPoint.Source.CellValue(lOper1, 6) Then
-                            lFoundFlag1 = lOper2
+                            lFoundIndex = lOper2
                         End If
                     Next lOper2
-                    If lFoundFlag1 > 0 Then
-                        pUCI.PointSources(lFoundFlag1).Target.Group = agdMasterPoint.Source.CellValue(lOper1, 9)
+                    If lFoundIndex > 0 Then
+                        pUCI.PointSources(lFoundIndex).Target.Group = agdMasterPoint.Source.CellValue(lOper1, 9)
                         lCurrentMember = agdMasterPoint.Source.CellValue(lOper1, 10)
                         lOper2 = InStr(1, lCurrentMember, "|")
                         If lOper2 > 0 Then
                             lCurrentMember = Mid(lCurrentMember, 1, lOper2 - 2)
                         End If
-                        pUCI.PointSources(lFoundFlag1).Target.Member = MemberFromLongVersion(lCurrentMember)
-                        pUCI.PointSources(lFoundFlag1).Target.MemSub1 = MemSub1FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
-                        pUCI.PointSources(lFoundFlag1).Target.MemSub2 = MemSub2FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
+                        pUCI.PointSources(lFoundIndex).Target.Member = MemberFromLongVersion(lCurrentMember)
+                        pUCI.PointSources(lFoundIndex).Target.MemSub1 = MemSub1FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
+                        pUCI.PointSources(lFoundIndex).Target.MemSub2 = MemSub2FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
                     End If
 
-                    If lFoundFlag1 = 0 Then
+                    If lFoundIndex = 0 Then
                         'add to point source structure
                         lCurrentConnections = agdMasterPoint.Source.CellValue(lOper1, 4)
                         lCurrentGroup = agdMasterPoint.Source.CellValue(lOper1, 9)
@@ -926,7 +923,6 @@ Public Class frmPoint
                 For lOper2 = 0 To pUCI.PointSources.Count - 1
 
                     pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7)
-                    MsgBox(agdMasterPoint.Source.CellValue(lOper1, 8))
                     pUCI.PointSources(lOper2).Target.VolId = CInt(agdMasterPoint.Source.CellValue(lOper1, 8))
                     pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5)
                     pUCI.PointSources(lOper2).Source.VolId = CInt(agdMasterPoint.Source.CellValue(lOper1, 6))
@@ -1029,9 +1025,9 @@ Public Class frmPoint
         LoadPollutantList(True)
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        cboPollutantList.Items.Add("Click to view pollutant list")
-        cboPollutantList.SelectedIndex = 0
-        MsgBox(cboPollutantList.Items.Count)
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        agdMasterPoint.Refresh()
+        agdMasterPoint.SizeAllColumnsToContents()
+
     End Sub
 End Class
