@@ -47,7 +47,6 @@ Partial Class frmPoint
         Me.cmdFile = New System.Windows.Forms.Button
         Me.txtPollutantPath = New System.Windows.Forms.TextBox
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
-        Me.Button1 = New System.Windows.Forms.Button
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
@@ -177,7 +176,7 @@ Partial Class frmPoint
         Me.grpDetails.Controls.Add(Me.Button8)
         Me.grpDetails.Location = New System.Drawing.Point(283, 12)
         Me.grpDetails.Name = "grpDetails"
-        Me.grpDetails.Size = New System.Drawing.Size(478, 422)
+        Me.grpDetails.Size = New System.Drawing.Size(778, 422)
         Me.grpDetails.TabIndex = 19
         Me.grpDetails.TabStop = False
         Me.grpDetails.Text = "Details of <    >"
@@ -195,7 +194,7 @@ Partial Class frmPoint
         Me.agdPoint.LineWidth = 0.0!
         Me.agdPoint.Location = New System.Drawing.Point(57, 16)
         Me.agdPoint.Name = "agdPoint"
-        Me.agdPoint.Size = New System.Drawing.Size(411, 389)
+        Me.agdPoint.Size = New System.Drawing.Size(711, 389)
         Me.agdPoint.Source = Nothing
         Me.agdPoint.TabIndex = 25
         '
@@ -271,7 +270,7 @@ Partial Class frmPoint
         Me.agdMasterPoint.LineWidth = 0.0!
         Me.agdMasterPoint.Location = New System.Drawing.Point(389, 455)
         Me.agdMasterPoint.Name = "agdMasterPoint"
-        Me.agdMasterPoint.Size = New System.Drawing.Size(372, 87)
+        Me.agdMasterPoint.Size = New System.Drawing.Size(672, 87)
         Me.agdMasterPoint.Source = Nothing
         Me.agdMasterPoint.TabIndex = 21
         '
@@ -324,21 +323,11 @@ Partial Class frmPoint
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(29, 444)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(83, 22)
-        Me.Button1.TabIndex = 24
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(792, 563)
-        Me.Controls.Add(Me.Button1)
+        Me.ClientSize = New System.Drawing.Size(1092, 563)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
@@ -385,5 +374,4 @@ Partial Class frmPoint
     Friend WithEvents cmdFile As System.Windows.Forms.Button
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
     Friend WithEvents cboPollutantList As System.Windows.Forms.ComboBox
-    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class
