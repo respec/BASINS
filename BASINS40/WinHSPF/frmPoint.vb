@@ -641,6 +641,8 @@ Public Class frmPoint
             lstPoints.SetItemChecked(lRow, chkAllSources.Checked)
         Next
 
+        CheckedSourcesUpdate()
+
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
 
     End Sub
@@ -779,10 +781,8 @@ Public Class frmPoint
     End Sub
 
     Private Sub lstSources_IndividualCheckChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs)
-        Dim lOper As Integer
 
         RemoveHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
-
 
         chkAllSources.Checked = False
 
@@ -792,6 +792,13 @@ Public Class frmPoint
         RemoveHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
         lstPoints.SetItemChecked(e.Index, e.NewValue)
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
+
+        CheckedSourcesUpdate()
+
+    End Sub
+
+    Private Sub CheckedSourcesUpdate()
+        Dim lOper As Integer
 
         'Update lists to reflect state of the checked item (which caused this event)
         UpdateListArrays()
@@ -812,7 +819,6 @@ Public Class frmPoint
 
         'rebuild lists
         pCountInUseFacs = lstPoints.Items.Count - lstPoints.CheckedItems.Count
-
     End Sub
 
     Private Sub lstSources_SelectionChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstPoints.SelectedIndexChanged
@@ -844,26 +850,26 @@ Public Class frmPoint
 
         'set any unselected facilities in agdMasterPoint to not-in-use
 
-        For lOper1 = 0 To lstPoints.Items.Count - 1
-            If Not lstPoints.GetItemChecked(lOper1) Then
+        'For lOper1 = 0 To lstPoints.Items.Count - 1
+        '    If Not lstPoints.GetItemChecked(lOper1) Then
 
-                lString = lstPoints.Items.Item(lOper1)
+        '        lString = lstPoints.Items.Item(lOper1)
 
-                lCheckedItemSplit = lString.Split(New [Char]() {"("c, ")"c})
+        '        lCheckedItemSplit = lString.Split(New [Char]() {"("c, ")"c})
 
-                lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
-                ReDim Preserve lCheckedItemSplit(1)
+        '        lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
+        '        ReDim Preserve lCheckedItemSplit(1)
 
-                lScenario = "PT-" & lCheckedItemSplit(1)
-                lFacility = lCheckedItemSplit(0)
+        '        lScenario = "PT-" & lCheckedItemSplit(1)
+        '        lFacility = lCheckedItemSplit(0)
 
-                For lOper2 = 1 To agdMasterPoint.Source.Rows - 1
-                    If agdMasterPoint.Source.CellValue(lOper2, 1) = lScenario AndAlso agdMasterPoint.Source.CellValue(lOper2, 3) = lFacility Then
-                        agdMasterPoint.Source.CellValue(lOper2, 0) = "No"
-                    End If
-                Next lOper2
-            End If
-        Next lOper1
+        '        For lOper2 = 1 To agdMasterPoint.Source.Rows - 1
+        '            If agdMasterPoint.Source.CellValue(lOper2, 1) = lScenario AndAlso agdMasterPoint.Source.CellValue(lOper2, 3) = lFacility Then
+        '                agdMasterPoint.Source.CellValue(lOper2, 0) = "No"
+        '            End If
+        '        Next lOper2
+        '    End If
+        'Next lOper1
 
         'go through master list, putting point sources back
         For lOper1 = 1 To agdMasterPoint.Source.Rows - 1
@@ -877,7 +883,7 @@ Public Class frmPoint
                 If Not lProblemFlag Then
                     'is it already in pt src structure
                     lFoundIndex = 0
-                    For lOper2 = 1 To pUCI.PointSources.Count
+                    For lOper2 = 0 To pUCI.PointSources.Count - 1
                         If pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7) AndAlso _
                            pUCI.PointSources(lOper2).Target.VolId = agdMasterPoint.Source.CellValue(lOper1, 8) AndAlso _
                            pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5) AndAlso _
@@ -921,12 +927,6 @@ Public Class frmPoint
                 'this pt src is not active, but is it in pt src structure
                 lFoundFlag2 = False
                 For lOper2 = 0 To pUCI.PointSources.Count - 1
-
-                    pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7)
-                    pUCI.PointSources(lOper2).Target.VolId = CInt(agdMasterPoint.Source.CellValue(lOper1, 8))
-                    pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5)
-                    pUCI.PointSources(lOper2).Source.VolId = CInt(agdMasterPoint.Source.CellValue(lOper1, 6))
-
                     If pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7) And _
                        pUCI.PointSources(lOper2).Target.VolId = agdMasterPoint.Source.CellValue(lOper1, 8) And _
                        pUCI.PointSources(lOper2).Source.VolName = agdMasterPoint.Source.CellValue(lOper1, 5) And _
@@ -1025,9 +1025,4 @@ Public Class frmPoint
         LoadPollutantList(True)
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        agdMasterPoint.Refresh()
-        agdMasterPoint.SizeAllColumnsToContents()
-
-    End Sub
 End Class
