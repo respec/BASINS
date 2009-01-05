@@ -55,7 +55,7 @@ Public Class frmPoint
             .Clear()
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
-            .Visible = True
+            .Visible = False
         End With
 
         With agdPoint
@@ -253,13 +253,19 @@ Public Class frmPoint
 
         Select Case aColumn
             Case 0
-                lValidValuesCollection.Add("Yes")
-                lValidValuesCollection.Add("No")
-                agdPoint.ValidValues = lValidValuesCollection
+                'Set valid values for all but the header cell (row=0)
+                If aRow <> 0 Then
+                    lValidValuesCollection.Add("Yes")
+                    lValidValuesCollection.Add("No")
+                    agdPoint.ValidValues = lValidValuesCollection
+                End If
             Case 3
-                'Get the target member names and set them as lValidValuesCollection. Collection is passed as argument via ByRef.
-                TargetMemberNames2Collection(lValidValuesCollection, pAgdPointRowReference(aRow))
-                agdPoint.ValidValues = lValidValuesCollection
+                'Set valid values for all but the header cell (row=0)
+                If aRow <> 0 Then
+                    'Get the target member names and set them as lValidValuesCollection. Collection is passed as argument via ByRef.
+                    TargetMemberNames2Collection(lValidValuesCollection, pAgdPointRowReference(aRow))
+                    agdPoint.ValidValues = lValidValuesCollection
+                End If
         End Select
 
     End Sub
@@ -842,34 +848,11 @@ Public Class frmPoint
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Dim lOper1, lOper2, lFoundIndex As Integer
-        Dim lString, lCheckedItemSplit(), lScenario, lFacility, lCurrentConnections, lCurrentMember As String
+        Dim lCurrentConnections, lCurrentMember As String
         Dim lCurrentSub1, lCurrentSub2, lCurrentGroup As String
         Dim lProblemFlag, lFoundFlag2 As Boolean
 
         agdPoint2agdMasterPoint()
-
-        'set any unselected facilities in agdMasterPoint to not-in-use
-
-        'For lOper1 = 0 To lstPoints.Items.Count - 1
-        '    If Not lstPoints.GetItemChecked(lOper1) Then
-
-        '        lString = lstPoints.Items.Item(lOper1)
-
-        '        lCheckedItemSplit = lString.Split(New [Char]() {"("c, ")"c})
-
-        '        lCheckedItemSplit(0) = RTrim(lCheckedItemSplit(0))
-        '        ReDim Preserve lCheckedItemSplit(1)
-
-        '        lScenario = "PT-" & lCheckedItemSplit(1)
-        '        lFacility = lCheckedItemSplit(0)
-
-        '        For lOper2 = 1 To agdMasterPoint.Source.Rows - 1
-        '            If agdMasterPoint.Source.CellValue(lOper2, 1) = lScenario AndAlso agdMasterPoint.Source.CellValue(lOper2, 3) = lFacility Then
-        '                agdMasterPoint.Source.CellValue(lOper2, 0) = "No"
-        '            End If
-        '        Next lOper2
-        '    End If
-        'Next lOper1
 
         'go through master list, putting point sources back
         For lOper1 = 1 To agdMasterPoint.Source.Rows - 1
@@ -882,7 +865,7 @@ Public Class frmPoint
 
                 If Not lProblemFlag Then
                     'is it already in pt src structure
-                    lFoundIndex = 0
+                    lFoundIndex = -1
                     For lOper2 = 0 To pUCI.PointSources.Count - 1
                         If pUCI.PointSources(lOper2).Target.VolName = agdMasterPoint.Source.CellValue(lOper1, 7) AndAlso _
                            pUCI.PointSources(lOper2).Target.VolId = agdMasterPoint.Source.CellValue(lOper1, 8) AndAlso _
@@ -891,7 +874,7 @@ Public Class frmPoint
                             lFoundIndex = lOper2
                         End If
                     Next lOper2
-                    If lFoundIndex > 0 Then
+                    If lFoundIndex > -1 Then
                         pUCI.PointSources(lFoundIndex).Target.Group = agdMasterPoint.Source.CellValue(lOper1, 9)
                         lCurrentMember = agdMasterPoint.Source.CellValue(lOper1, 10)
                         lOper2 = InStr(1, lCurrentMember, "|")
@@ -903,7 +886,7 @@ Public Class frmPoint
                         pUCI.PointSources(lFoundIndex).Target.MemSub2 = MemSub2FromLongVersion(agdMasterPoint.Source.CellValue(lOper1, 10))
                     End If
 
-                    If lFoundIndex = 0 Then
+                    If lFoundIndex = -1 Then
                         'add to point source structure
                         lCurrentConnections = agdMasterPoint.Source.CellValue(lOper1, 4)
                         lCurrentGroup = agdMasterPoint.Source.CellValue(lOper1, 9)
@@ -947,7 +930,6 @@ Public Class frmPoint
         End If
         Me.Dispose()
     End Sub
-
 
     Private Sub cmdSimpleCreate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSimpleCreate.Click
 
@@ -1025,4 +1007,101 @@ Public Class frmPoint
         LoadPollutantList(True)
     End Sub
 
+    Private Sub cmdDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDelete.Click
+        '.net conversion note: Waiting for grid function before implementing this
+
+        'Dim tempts As Collection
+        'Dim alist As Collection
+        'Dim i, lOper As Integer
+        'Dim g As Object, vtP As Object
+        'Dim tP As HspfPointSource
+        'Dim masterrow As Integer
+        'Dim istart&, iend&, j&, lsen$, lfac$, k&, S$, iresp&
+
+        'Me.Cursor = Cursors.WaitCursor
+        'tempts = New Collection
+        'If agdPoint.SelStartRow > 0 Then
+        '    For i = agdPoint.SelStartRow To agdPoint.SelEndRow
+        '        tempts.Add(lts(CInt(agdPoint.TextMatrix(i, 11))))
+        '    Next i
+        'End If
+
+        'If tempts.Count > 0 Then
+        '    'delete the data sets
+        '    j = 0
+        '    istart = 1
+        '    iend = agdPoint.Source.Rows - 1
+        '    iresp = MsgBox("Are you sure you want to delete these timeseries?", vbOKCancel, "Point Sources Graphing Problem")
+        '    If iresp = 1 Then
+        '        For i = istart To iend Step -1
+        '            pUCI.DeleteWDMDataSet(agdMasterPoint.Source.CellValue(i, 5), agdMasterPoint.Source.CellValue(i, 6))
+        '            masterrow = agdPoint.Source.CellValue(i, 14)
+        '            lsen = agdPoint.Source.CellValue(i, 1)
+        '            lfac = agdPoint..Source.CellValue(i, 3)
+        '            'remove from point source structure
+        '            k = 1
+        '            For Each vtP In pUCI.PointSources
+        '                tP = vtP
+        '                If tP.Target.VolName = agdPoint.Source.CellValue(i, 7) And _
+        '                   tP.Target.VolId = agdPoint.Source.CellValue(i, 8) And _
+        '                   tP.Source.VolName = agdPoint.Source.CellValue(i, 5) And _
+        '                   tP.Source.VolId = agdPoint.Source.CellValue(i, 6) Then
+        '                    pUCI.PointSources.Remove(k)
+        '                Else
+        '                    k = k + 1
+        '                End If
+        '            Next vtP
+        '            agdPoint.DeleteRow(i)
+        '            agdMasterPoint.DeleteRow(masterrow)
+        '            j = j + 1
+        '        Next i
+        '        'keep grid in synch
+        '        For i = istart To agdPoint.Source.Rows
+        '            agdPoint.Source.CellValue(i, 14) = agdPoint.Source.CellValue(i, 14) - j
+        '        Next i
+        '        For i = 1 To agdMasterPoint.Source.Rows
+        '            agdMasterPoint.Source.CellValue(i, 14) = i
+        '        Next i
+        '        If agdPoint.Source.Rows = 0 Then
+        '            'none left, remove from list
+        '            alist = New Collection
+        '            S = lfac & " (" & Mid(lsen, 4) & ")"
+        '            For lOper = 0 To lstPoints.Items.Count - 1
+        '                If lstPoints.Items(lOper) = S AndAlso Not lstPoints.GetItemChecked(lOper) Then
+        '                    For j = 0 To lstPoints.LeftCount - 1
+        '                        If aslPoint.LeftItem(j) <> S Then
+        '                            alist.Add(aslPoint.LeftItem(j))
+        '                        End If
+        '                    Next j
+        '                    aslPoint.ClearLeft()
+        '                    For j = 1 To alist.Count
+        '                        aslPoint.LeftItemFastAdd(alist(j))
+        '                    Next j
+        '                ElseIf aslPoint.InRightList(S) Then
+        '                    For j = 0 To aslPoint.RightCount - 1
+        '                        If aslPoint.RightItem(j) <> S Then
+        '                            alist.Add(aslPoint.RightItem(j))
+        '                        End If
+        '                    Next j
+        '                    aslPoint.ClearRight()
+        '                    For j = 1 To alist.Count
+        '                        aslPoint.LeftItemFastAdd(alist(j))
+        '                        aslPoint.MoveRight(aslPoint.LeftCount - 1)
+        '                    Next j
+        '                End If
+        '            Next lOper
+        '            If aslPoint.RightCount > 0 Then
+        '                aslPoint_ItemSelected(aslPoint.RightItem(0))
+        '            ElseIf aslPoint.LeftCount > 0 Then
+        '                aslPoint_ItemSelected(aslPoint.LeftItem(0))
+        '            End If
+        '        End If
+        '    End If
+        'Else 'no rows selected
+        '    MsgBox("No timeseries have been selected for deleting.", vbOKOnly, "Point Sources Delete Problem")
+        'End If
+
+        'Me.Cursor = Cursors.Default
+
+    End Sub
 End Class
