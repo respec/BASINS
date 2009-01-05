@@ -36,7 +36,7 @@ Partial Class frmPoint
         Me.cmdOK = New System.Windows.Forms.Button
         Me.grpDetails = New System.Windows.Forms.GroupBox
         Me.agdPoint = New atcControls.atcGrid
-        Me.Button9 = New System.Windows.Forms.Button
+        Me.cmdDelete = New System.Windows.Forms.Button
         Me.Button7 = New System.Windows.Forms.Button
         Me.Button8 = New System.Windows.Forms.Button
         Me.cmdDetailsShow = New System.Windows.Forms.Button
@@ -47,7 +47,6 @@ Partial Class frmPoint
         Me.cmdFile = New System.Windows.Forms.Button
         Me.txtPollutantPath = New System.Windows.Forms.TextBox
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
-        Me.Button1 = New System.Windows.Forms.Button
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
@@ -172,7 +171,7 @@ Partial Class frmPoint
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpDetails.Controls.Add(Me.agdPoint)
-        Me.grpDetails.Controls.Add(Me.Button9)
+        Me.grpDetails.Controls.Add(Me.cmdDelete)
         Me.grpDetails.Controls.Add(Me.Button7)
         Me.grpDetails.Controls.Add(Me.Button8)
         Me.grpDetails.Location = New System.Drawing.Point(283, 12)
@@ -199,15 +198,15 @@ Partial Class frmPoint
         Me.agdPoint.Source = Nothing
         Me.agdPoint.TabIndex = 25
         '
-        'Button9
+        'cmdDelete
         '
-        Me.Button9.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.Button9.Image = CType(resources.GetObject("Button9.Image"), System.Drawing.Image)
-        Me.Button9.Location = New System.Drawing.Point(6, 112)
-        Me.Button9.Name = "Button9"
-        Me.Button9.Size = New System.Drawing.Size(40, 35)
-        Me.Button9.TabIndex = 24
-        Me.Button9.UseVisualStyleBackColor = True
+        Me.cmdDelete.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.cmdDelete.Image = CType(resources.GetObject("cmdDelete.Image"), System.Drawing.Image)
+        Me.cmdDelete.Location = New System.Drawing.Point(6, 112)
+        Me.cmdDelete.Name = "cmdDelete"
+        Me.cmdDelete.Size = New System.Drawing.Size(40, 35)
+        Me.cmdDelete.TabIndex = 24
+        Me.cmdDelete.UseVisualStyleBackColor = True
         '
         'Button7
         '
@@ -324,21 +323,11 @@ Partial Class frmPoint
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(35, 447)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(77, 29)
-        Me.Button1.TabIndex = 24
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1092, 563)
-        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
@@ -365,7 +354,7 @@ Partial Class frmPoint
     Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents grpDetails As System.Windows.Forms.GroupBox
     Friend WithEvents Button8 As System.Windows.Forms.Button
-    Friend WithEvents Button9 As System.Windows.Forms.Button
+    Friend WithEvents cmdDelete As System.Windows.Forms.Button
     Friend WithEvents Button7 As System.Windows.Forms.Button
     Friend WithEvents agdPoint As atcControls.atcGrid
     Friend WithEvents cmdDetailsHide As System.Windows.Forms.Button
@@ -385,5 +374,4 @@ Partial Class frmPoint
     Friend WithEvents cmdFile As System.Windows.Forms.Button
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
     Friend WithEvents cboPollutantList As System.Windows.Forms.ComboBox
-    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class
