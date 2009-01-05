@@ -12,11 +12,10 @@ Imports System.Windows.Forms
 
 Public Class frmPoint
 
-    'Dim lts As Collection(Of atcData.atcTimeseries)
-    Dim lts As New Collection
+    Dim pTimeSeries As New Collection
 
     '.net conversion issue: tsl was formelry ATCoTSlist
-    Dim WithEvents tsl As atcTimeseries
+    Dim WithEvents pTsl As atcTimeseries
 
     'The array InUseFacs(,) is a 2-D array that holds the (dimension 0) facility name, (dimension 1) scenario string
     'it should have the same elements as the sources list that are checked.
@@ -117,7 +116,9 @@ Public Class frmPoint
 
         FillMasterGrid()
         '.net conversion issue: tsl formerly atcTSList
-        Dim tsl As New List(Of atcTimeseries)
+
+        If lstPoints.Items.Count > 0 AndAlso lstPoints.SelectedIndex = -1 Then lstPoints.SelectedIndex = 0
+        ExpandedView(True)
 
         AddHandler chkAllSources.CheckStateChanged, AddressOf chkAllSources_CheckedChanged
         AddHandler lstPoints.ItemCheck, AddressOf lstSources_IndividualCheckChanged
@@ -326,7 +327,7 @@ Public Class frmPoint
 
         lstPoints.Items.Clear()
 
-        lts = pUCI.FindTimser("", "", "")
+        pTimeSeries = pUCI.FindTimser("", "", "")
 
         With agdMasterPoint.Source
             .Rows = 1
@@ -334,10 +335,10 @@ Public Class frmPoint
             lOpnBlk = pUCI.OpnBlks("RCHRES")
             lOper4 = 1
 
-            For lOper1 = 1 To lts.Count
-                lScenario = lts(lOper1).Attributes.GetValue("Scenario")
+            For lOper1 = 1 To pTimeSeries.Count
+                lScenario = pTimeSeries(lOper1).Attributes.GetValue("Scenario")
                 If Mid(lScenario, 1, 3) = "PT-" Then 'this is a pt src
-                    lLocation = lts(lOper1).Attributes.GetValue("Location")
+                    lLocation = pTimeSeries(lOper1).Attributes.GetValue("Location")
 
                     If IsNumeric(Mid(lLocation, 4)) Then
                         'get full reach name
@@ -346,10 +347,10 @@ Public Class frmPoint
 
                             'found a reach with this id
                             lLocation = "RCHRES " & lOper.Id & " - " & lOper.Description
-                            lFacility = UCase(lts(lOper1).Attributes.GetValue("STANAM"))
-                            lConnection = lts(lOper1).Attributes.GetValue("Constituent")
+                            lFacility = UCase(pTimeSeries(lOper1).Attributes.GetValue("STANAM"))
+                            lConnection = pTimeSeries(lOper1).Attributes.GetValue("Constituent")
 
-                            lSelectedItemString = lFacility & " (" & Mid(lts(lOper1).Attributes.GetValue("Scenario"), 4) & ")"
+                            lSelectedItemString = lFacility & " (" & Mid(pTimeSeries(lOper1).Attributes.GetValue("Scenario"), 4) & ")"
                             If Not lstPoints.Items.Contains(lSelectedItemString) Then
                                 lstPoints.Items.Add(lSelectedItemString, False)
                             End If
@@ -359,7 +360,7 @@ Public Class frmPoint
                             lActiveFlag = False
                             If Not pUCI.PointSources Is Nothing Then
                                 For lOper2 = 0 To pUCI.PointSources.Count - 1
-                                    If pUCI.PointSources(lOper2).Target.VolName = lOper.Name AndAlso pUCI.PointSources(lOper2).Target.VolId = lOper.Id AndAlso UCase(Microsoft.VisualBasic.Left(pUCI.PointSources(lOper2).Source.VolName, 3)) = UCase(Microsoft.VisualBasic.Right(lts(lOper1).Attributes.GetValue("Data Source"), 3)) AndAlso pUCI.PointSources(lOper2).Source.VolId = lts(lOper1).Attributes.GetValue("Id") Then
+                                    If pUCI.PointSources(lOper2).Target.VolName = lOper.Name AndAlso pUCI.PointSources(lOper2).Target.VolId = lOper.Id AndAlso UCase(Microsoft.VisualBasic.Left(pUCI.PointSources(lOper2).Source.VolName, 3)) = UCase(Microsoft.VisualBasic.Right(pTimeSeries(lOper1).Attributes.GetValue("Data Source"), 3)) AndAlso pUCI.PointSources(lOper2).Source.VolId = pTimeSeries(lOper1).Attributes.GetValue("Id") Then
                                         'found this dsn in active point sources
                                         lDsnCount += 1
                                         lActiveFlag = True
@@ -399,9 +400,9 @@ Public Class frmPoint
 
                                     .CellValue(lOper4, 1) = lScenario
                                     .CellValue(lOper4, 2) = lLocation
-                                    .CellValue(lOper4, 3) = UCase(lts(lOper1).Attributes.GetValue("STANAM"))
-                                    .CellValue(lOper4, 5) = pUCI.GetWDMIdFromName(lts(lOper1).Attributes.GetValue("Data Source"))  'save assoc src vol name
-                                    .CellValue(lOper4, 6) = lts(lOper1).Attributes.GetValue("Id")     'save assoc src vol id
+                                    .CellValue(lOper4, 3) = UCase(pTimeSeries(lOper1).Attributes.GetValue("STANAM"))
+                                    .CellValue(lOper4, 5) = pUCI.GetWDMIdFromName(pTimeSeries(lOper1).Attributes.GetValue("Data Source"))  'save assoc src vol name
+                                    .CellValue(lOper4, 6) = pTimeSeries(lOper1).Attributes.GetValue("Id")     'save assoc src vol id
                                     .CellValue(lOper4, 7) = lOper.Name     'save assoc tar vol name
                                     .CellValue(lOper4, 8) = lOper.Id         'save assoc tar vol id
                                     .CellValue(lOper4, 11) = lOper1 'save index to lts
@@ -467,7 +468,10 @@ Public Class frmPoint
         End With
 
         UpdateListArrays()
-        agdMasterPoint.Refresh()
+
+        agdPoint.Refresh()
+        agdPoint.SizeAllColumnsToContents()
+        
 
     End Sub
 
@@ -625,16 +629,12 @@ Public Class frmPoint
         If aExpand Then
             Me.Size = New Size(1100, 590)
             Me.MinimumSize = New Size(280, 590)
-            Me.FormBorderStyle = Windows.Forms.FormBorderStyle.Sizable
             cmdDetailsHide.Visible = True
             cmdDetailsShow.Visible = False
-            grpDetails.Visible = True
         Else
             Me.Size = New Size(280, 590)
-            Me.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedSingle
             cmdDetailsHide.Visible = False
             cmdDetailsShow.Visible = True
-            grpDetails.Visible = False
         End If
 
     End Sub
@@ -838,6 +838,13 @@ Public Class frmPoint
         ExpandedView(True)
     End Sub
 
+    Private Sub frmPoint_Resized(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.ResizeEnd
+        If Me.Size <> Me.MinimumSize Then
+            cmdDetailsHide.Visible = True
+            cmdDetailsShow.Visible = False
+        End If
+        
+    End Sub
     Private Sub cmdDetailsHide_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDetailsHide.Click
         ExpandedView(False)
     End Sub
