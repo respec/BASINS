@@ -55,9 +55,9 @@ Public Class frmStatus
         '
         Me.Progress.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Progress.Location = New System.Drawing.Point(10, 83)
+        Me.Progress.Location = New System.Drawing.Point(8, 72)
         Me.Progress.Name = "Progress"
-        Me.Progress.Size = New System.Drawing.Size(420, 28)
+        Me.Progress.Size = New System.Drawing.Size(423, 24)
         Me.Progress.TabIndex = 0
         '
         'lblTop
@@ -65,9 +65,9 @@ Public Class frmStatus
         Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblTop.BackColor = System.Drawing.Color.Transparent
-        Me.lblTop.Location = New System.Drawing.Point(10, 9)
+        Me.lblTop.Location = New System.Drawing.Point(8, 8)
         Me.lblTop.Name = "lblTop"
-        Me.lblTop.Size = New System.Drawing.Size(420, 19)
+        Me.lblTop.Size = New System.Drawing.Size(423, 16)
         Me.lblTop.TabIndex = 1
         Me.lblTop.Text = "lblTop"
         '
@@ -76,20 +76,20 @@ Public Class frmStatus
         Me.txtLog.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtLog.Location = New System.Drawing.Point(10, 203)
+        Me.txtLog.Location = New System.Drawing.Point(8, 182)
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtLog.Size = New System.Drawing.Size(420, 134)
+        Me.txtLog.Size = New System.Drawing.Size(423, 135)
         Me.txtLog.TabIndex = 2
         '
         'lblLeft
         '
         Me.lblLeft.AutoSize = True
         Me.lblLeft.BackColor = System.Drawing.Color.Transparent
-        Me.lblLeft.Location = New System.Drawing.Point(10, 46)
+        Me.lblLeft.Location = New System.Drawing.Point(8, 40)
         Me.lblLeft.Name = "lblLeft"
-        Me.lblLeft.Size = New System.Drawing.Size(46, 17)
+        Me.lblLeft.Size = New System.Drawing.Size(35, 13)
         Me.lblLeft.TabIndex = 3
         Me.lblLeft.Text = "lblLeft"
         '
@@ -98,9 +98,9 @@ Public Class frmStatus
         Me.lblMiddle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblMiddle.BackColor = System.Drawing.Color.Transparent
-        Me.lblMiddle.Location = New System.Drawing.Point(10, 46)
+        Me.lblMiddle.Location = New System.Drawing.Point(8, 40)
         Me.lblMiddle.Name = "lblMiddle"
-        Me.lblMiddle.Size = New System.Drawing.Size(420, 19)
+        Me.lblMiddle.Size = New System.Drawing.Size(423, 16)
         Me.lblMiddle.TabIndex = 4
         Me.lblMiddle.Text = "lblMiddle"
         Me.lblMiddle.TextAlign = System.Drawing.ContentAlignment.TopCenter
@@ -110,9 +110,9 @@ Public Class frmStatus
         Me.lblRight.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblRight.AutoSize = True
         Me.lblRight.BackColor = System.Drawing.Color.Transparent
-        Me.lblRight.Location = New System.Drawing.Point(382, 46)
+        Me.lblRight.Location = New System.Drawing.Point(391, 40)
         Me.lblRight.Name = "lblRight"
-        Me.lblRight.Size = New System.Drawing.Size(55, 17)
+        Me.lblRight.Size = New System.Drawing.Size(42, 13)
         Me.lblRight.TabIndex = 5
         Me.lblRight.Text = "lblRight"
         Me.lblRight.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -122,26 +122,26 @@ Public Class frmStatus
         Me.lblBottom.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblBottom.BackColor = System.Drawing.Color.Transparent
-        Me.lblBottom.Location = New System.Drawing.Point(10, 129)
+        Me.lblBottom.Location = New System.Drawing.Point(8, 112)
         Me.lblBottom.Name = "lblBottom"
-        Me.lblBottom.Size = New System.Drawing.Size(420, 19)
+        Me.lblBottom.Size = New System.Drawing.Size(423, 16)
         Me.lblBottom.TabIndex = 6
         Me.lblBottom.Text = "lblBottom"
         Me.lblBottom.TextAlign = System.Drawing.ContentAlignment.TopCenter
         '
         'btnCancel
         '
-        Me.btnCancel.Location = New System.Drawing.Point(85, 161)
+        Me.btnCancel.Location = New System.Drawing.Point(11, 131)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(78, 31)
+        Me.btnCancel.Size = New System.Drawing.Size(65, 26)
         Me.btnCancel.TabIndex = 7
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
         'frmStatus
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(440, 333)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(440, 329)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.lblBottom)
         Me.Controls.Add(Me.lblRight)
@@ -193,11 +193,8 @@ Public Class frmStatus
             Label(lLabelIndex) = ""
         Next
         txtLog.Clear()
+        Progress.Visible = False
     End Sub
-
-    'Private Sub frmStatus_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
-    '  MsgBox(New StackTrace(True).ToString, , "frmStatus_Closing")
-    'End Sub
 
     'Private Sub frmStatus_VisibleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.VisibleChanged
     '  If Not Me.Visible Then
@@ -216,7 +213,7 @@ Public Class frmStatus
     Private Sub frmStatus_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
         If Not Exiting Then
             e.Cancel = True
-            Me.Hide()
+            Me.Visible = False
         End If
     End Sub
 

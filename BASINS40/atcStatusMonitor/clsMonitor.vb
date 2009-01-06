@@ -3,6 +3,11 @@ Imports System.IO
 Public Class clsMonitor
     Private Shared pfrmStatus As frmStatus
 
+    Delegate Sub FormCallback()
+    Private Shared pRedrawCallback As FormCallback
+    Private Shared pShowCallback As FormCallback
+    Private Shared pHideCallback As FormCallback
+
     Private Shared pLabelText(frmStatus.LastLabel) As String
     Private Shared pLabelLast(frmStatus.LastLabel) As String
     Private Shared pLabelLogged(frmStatus.LastLabel) As String
@@ -33,17 +38,29 @@ Public Class clsMonitor
     Private Shared pInputBuffer(pInputBufferSize) As Byte
     Private Shared pInputString As String = ""
 
-    Private Shared pWindowTimer As System.Threading.Timer
+    Private Shared WithEvents pWindowTimer As System.Timers.Timer
 
     Public Shared Sub Main()
+
+        ' loop to keep execution at start until we attach to process for debugging and set next statement outside
+        'While Not pExiting
+        '    Application.DoEvents()
+        '    System.Threading.Thread.Sleep(100)
+        'End While
+
         Dim lCommandLine As String = Command()
         'Console.WriteLine("StatusMonitorEntryWith " & lCommandLine)
 
         pfrmStatus = New frmStatus
+        pfrmStatus.Show()
+        pfrmStatus.Visible = False
         pfrmStatus.Clear()
         'Console.WriteLine("StatusMonitorFormCreated")
-
         ClearLabels()
+
+        pRedrawCallback = New FormCallback(AddressOf Redraw)
+        pShowCallback = New FormCallback(AddressOf Show)
+        pHideCallback = New FormCallback(AddressOf Hide)
 
         Dim lParentID As Integer  'StrFirstInt(lCommandLine)
         If Integer.TryParse(lCommandLine, lParentID) AndAlso lParentID > 0 Then
@@ -60,16 +77,16 @@ Public Class clsMonitor
             pfrmStatus.Text = pParentProcess.ProcessName & "Status Monitor"
         End If
 
-        'MsgBox("Monitoring Started,Parent = " & lParentID)
-
-        pWindowTimer = New Threading.Timer(New Threading.TimerCallback(AddressOf RefreshWindow), pWindowTimer, 0, Threading.Timeout.Infinite)
+        pWindowTimer = New Timers.Timer(2000) 'New Threading.Timer(New Threading.TimerCallback(AddressOf RefreshWindow), pWindowTimer, 2000, 2000) 'Threading.Timeout.Infinite)
+        pWindowTimer.Start()
 
         Dim lInput As IO.Stream = Console.OpenStandardInput
         pReadInputCallback = New AsyncCallback(AddressOf InputCallback)
         lInput.BeginRead(pInputBuffer, 0, pInputBufferSize, pReadInputCallback, lInput)
 
         While Not pExiting
-            System.Threading.Thread.Sleep(UpdateMilliseconds)
+            Application.DoEvents()
+            System.Threading.Thread.Sleep(100)
         End While
         'ManageInterface()
 
@@ -84,98 +101,110 @@ Public Class clsMonitor
 
     Public Shared Sub InputCallback(ByVal asyncResult As IAsyncResult)
         Dim lInput As IO.Stream = asyncResult.AsyncState
-        Dim bytesRead As Integer = lInput.EndRead(asyncResult)
+        Try
+            Dim bytesRead As Integer = lInput.EndRead(asyncResult)
 
-        For lIndex As Integer = 0 To bytesRead - 1
-            Select Case pInputBuffer(lIndex)
-                Case 10, 13
-                    If pInputString.Length > 0 Then
-                        ProcessInput(pInputString)
-                        pInputString = ""
-                    End If
-                Case 41 'Accept close paren ) as end of input line if it started with open paren (
-                    If pInputString.StartsWith("(") Then
-                        ProcessInput(pInputString)
-                        pInputString = ""
-                    End If
-                Case Else
-                    pInputString &= Chr(pInputBuffer(lIndex))
-            End Select
-        Next
-
+            For lIndex As Integer = 0 To bytesRead - 1
+                Select Case pInputBuffer(lIndex)
+                    Case 10, 13
+                        If pInputString.Length > 0 Then
+                            ProcessInput(pInputString)
+                            pInputString = ""
+                        End If
+                    Case 41 'Accept close paren ) as end of input line if it started with open paren (
+                        If pInputString.StartsWith("(") Then
+                            ProcessInput(pInputString.Substring(1))
+                            pInputString = ""
+                        End If
+                    Case Else
+                        pInputString &= Chr(pInputBuffer(lIndex))
+                End Select
+            Next
+        Catch e As Exception
+            ProcessInput("Exception in InputCallback: " & e.Message)
+        End Try
         lInput.BeginRead(pInputBuffer, 0, pInputBufferSize, pReadInputCallback, lInput)
     End Sub
 
-    Public Shared Sub RefreshWindow(ByVal state As Object)
-        If pLabelNeedsUpdate Then
-            For lLabelIndex As Integer = 0 To frmStatus.LastLabel
-                If Not pLabelText(lLabelIndex).Equals(pLabelLast(lLabelIndex)) Then
-                    'Console.WriteLine("UpdateLabel " & lLabelIndex)
-                    pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
-                    pLabelLast(lLabelIndex) = pLabelText(lLabelIndex)
-                    pLabelLogged(lLabelIndex) = pLabelText(lLabelIndex)
-                End If
-            Next
-            pfrmStatus.Visible = True
-            pLabelNeedsUpdate = False
-        End If
-        If pLogDisplayNeedsUpdate Then
-            With pfrmStatus.txtLog
-                .Text = CurrentLogDisplay()
-                .SelectionStart = pfrmStatus.txtLog.Text.Length
-                .ScrollToCaret()
-                pLogDisplayNeedsUpdate = False
-            End With
-        End If
-
-        If pProgressNeedsUpdate Then
-            'Console.WriteLine("UpdateProgress")
-            If Double.IsNaN(pProgressStartTime) Then 'Progress is finished
-                pfrmStatus.Progress.Visible = False
-                pfrmStatus.Visible = False
-                For lLabelIndex As Integer = 2 To 5
-                    pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
+    Public Shared Sub Redraw()
+        Try
+            If pLabelNeedsUpdate Then
+                For lLabelIndex As Integer = 0 To frmStatus.LastLabel
+                    If Not pLabelText(lLabelIndex).Equals(pLabelLast(lLabelIndex)) Then
+                        'Console.WriteLine("UpdateLabel " & lLabelIndex)
+                        pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
+                        pLabelLast(lLabelIndex) = pLabelText(lLabelIndex)
+                        pLabelLogged(lLabelIndex) = pLabelText(lLabelIndex)
+                    End If
                 Next
-            Else
-                'If Not pfrmStatus.Progress.Visible Then 'See if we should show it
-                'If lNowDouble - pProgressStartTime > UpdateInterval * 3 Then
-                '    Show()
-                'End If
-                'End If
-                'If pfrmStatus.Progress.Visible Then
-                With pfrmStatus
-                    .Label(2) = "0"
-                    .Label(4) = pProgressFinal
-                    .Progress.Maximum = pProgressFinal
-                    .Progress.Value = pProgressCurrent
-                    .Progress.Visible = True
-                    .Progress.Refresh()
-                    If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(3).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
-                        .Label(3) = pProgressCurrent & " of " & pProgressFinal
-                    End If
-                    If pLabelLogged(5).Length = 0 Then
-                        .Label(5) = CInt(pProgressCurrent * 1000 / pProgressFinal) / 10 & "%"
-                    End If
-                End With
-                'End If
+                pfrmStatus.Visible = True
+                pLabelNeedsUpdate = False
             End If
-            pProgressNeedsUpdate = False
-        End If
+            If pLogDisplayNeedsUpdate Then
+                With pfrmStatus.txtLog
+                    .Text = CurrentLogDisplay()
+                    .SelectionStart = pfrmStatus.txtLog.Text.Length
+                    .ScrollToCaret()
+                    pLogDisplayNeedsUpdate = False
+                End With
+            End If
+
+            If pProgressNeedsUpdate Then
+                'Console.WriteLine("UpdateProgress")
+                If Double.IsNaN(pProgressStartTime) Then 'Progress is finished
+                    pfrmStatus.Progress.Visible = False
+                    pfrmStatus.Visible = False
+                    For lLabelIndex As Integer = 2 To 5
+                        pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
+                    Next
+                Else
+                    'If Not pfrmStatus.Progress.Visible Then 'See if we should show it
+                    'If lNowDouble - pProgressStartTime > UpdateInterval * 3 Then
+                    '    Show()
+                    'End If
+                    'End If
+                    'If pfrmStatus.Progress.Visible Then
+                    With pfrmStatus
+                        .Label(2) = "0"
+                        .Label(4) = pProgressFinal
+                        .Progress.Maximum = pProgressFinal
+                        .Progress.Value = pProgressCurrent
+                        .Progress.Visible = True
+                        .Progress.Refresh()
+                        If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(3).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
+                            .Label(3) = pProgressCurrent & " of " & pProgressFinal
+                        End If
+                        If pLabelLogged(5).Length = 0 Then
+                            .Label(5) = CInt(pProgressCurrent * 1000 / pProgressFinal) / 10 & "%"
+                        End If
+                    End With
+                    'End If
+                End If
+                pProgressNeedsUpdate = False
+            End If
+            If Not pParentProcess Is Nothing AndAlso _
+               pParentProcess.HasExited AndAlso _
+               Not pfrmStatus.Exiting Then
+                With pfrmStatus
+                    .WindowState = FormWindowState.Normal
+                    pExiting = True
+                    .Exiting = True
+                    .Label(0) = "Parent Process Exited"
+                    .Visible = False 'Needs to not be visible to call ShowDialog
+                    pfrmStatus.Refresh()
+                    Application.DoEvents()
+                    pfrmStatus.ShowDialog()
+                End With
+            Else
+                'pWindowTimer.Change(UpdateMilliseconds, Threading.Timeout.Infinite)
+            End If
+            'lNowDouble = Now.ToOADate
+            'TODO: Check for form button presses here?
+        Catch e As Exception
+            MsgBox(e.Message, MsgBoxStyle.Critical, "Exception in RefreshWindow")
+        End Try
         pfrmStatus.Refresh()
         Application.DoEvents()
-        If Not pParentProcess Is Nothing AndAlso _
-           pParentProcess.HasExited AndAlso _
-           Not pfrmStatus.Exiting Then
-            pExiting = True
-            pfrmStatus.Exiting = True
-            pfrmStatus.Label(0) = "Parent Process Exited"
-            pfrmStatus.Visible = False 'Needs to not be visible to call ShowDialog
-            pfrmStatus.ShowDialog()
-        Else
-            pWindowTimer.Change(UpdateMilliseconds, Threading.Timeout.Infinite)
-        End If
-        'lNowDouble = Now.ToOADate
-        'TODO: Check for form button presses here?
     End Sub
 
     'Public Shared Sub ManageInterface()
@@ -358,8 +387,8 @@ Public Class clsMonitor
                         End If
                         pProgressNeedsUpdate = True
                     End If
-                Case "SHOW" : If Not pIgnoringWindowCommands Then Show()
-                Case "HIDE" : If Not pIgnoringWindowCommands Then ClearLabels() : Hide()
+                Case "SHOW" : If Not pIgnoringWindowCommands Then pfrmStatus.Invoke(pShowCallback)
+                Case "HIDE" : If Not pIgnoringWindowCommands Then pfrmStatus.Invoke(pHideCallback)
             End Select
         End If
         System.Threading.Thread.Sleep(0)
@@ -374,6 +403,7 @@ Public Class clsMonitor
     End Sub
 
     Private Shared Sub Hide()
+        ClearLabels()
         pfrmStatus.Visible = False
     End Sub
 
@@ -384,5 +414,10 @@ Public Class clsMonitor
             pLabelLast(lLabelIndex) = ""
             pLabelLogged(lLabelIndex) = ""
         Next
+    End Sub
+
+    Private Shared Sub pWindowTimer_Elapsed(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles pWindowTimer.Elapsed
+        If pExiting Then pWindowTimer.Stop()
+        pfrmStatus.Invoke(pRedrawCallback)
     End Sub
 End Class
