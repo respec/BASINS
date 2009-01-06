@@ -74,10 +74,10 @@ Public Class clsMonitor
             pfrmStatus.Exiting = True 'Let the user quit by closing the form
         Else
             Console.WriteLine("ParentProcess " & pParentProcess.ProcessName)
-            pfrmStatus.Text = pParentProcess.ProcessName & "Status Monitor"
+            pfrmStatus.Text = pParentProcess.ProcessName & " Status Monitor"
         End If
 
-        pWindowTimer = New Timers.Timer(2000) 'New Threading.Timer(New Threading.TimerCallback(AddressOf RefreshWindow), pWindowTimer, 2000, 2000) 'Threading.Timeout.Infinite)
+        pWindowTimer = New Timers.Timer(200) 'New Threading.Timer(New Threading.TimerCallback(AddressOf RefreshWindow), pWindowTimer, 2000, 2000) 'Threading.Timeout.Infinite)
         pWindowTimer.Start()
 
         Dim lInput As IO.Stream = Console.OpenStandardInput
@@ -102,10 +102,11 @@ Public Class clsMonitor
     Public Shared Sub InputCallback(ByVal asyncResult As IAsyncResult)
         Dim lInput As IO.Stream = asyncResult.AsyncState
         Try
-            Dim bytesRead As Integer = lInput.EndRead(asyncResult)
+            Dim lBytesRead As Integer = lInput.EndRead(asyncResult)
 
-            For lIndex As Integer = 0 To bytesRead - 1
+            For lIndex As Integer = 0 To lBytesRead - 1
                 Select Case pInputBuffer(lIndex)
+                    Case 0 'skip null character
                     Case 10, 13
                         If pInputString.Length > 0 Then
                             ProcessInput(pInputString)
@@ -322,16 +323,31 @@ Public Class clsMonitor
     End Sub
 
     Private Shared Sub ProcessInput(ByVal aInputLine As String)
-        Console.WriteLine("ProcessInput " & aInputLine)
+        'Console.WriteLine("ProcessInput " & aInputLine)
         LogDisplayAddLine(aInputLine)
         Dim lInputLine As String = aInputLine.TrimStart("(").TrimEnd(")")
         'Console.WriteLine("ProcessInput " & lInputLine)
 
         'Dim lTimeStamp As String = StrSplit(aInputLine, vbTab, "") 'CreateTimeStamp()
+        If lInputLine.StartsWith("MSG") Then
+            lInputLine = "MSG " & lInputLine.Substring(3)
+        End If
         Dim lWords() As String = lInputLine.Split(" ")
         Dim lAfterFirstWord As String = lInputLine.Substring(lWords(0).Length)
 
         If lWords(0).Length > 0 Then
+            If lWords(0).StartsWith("MSG") Then
+                Dim lMsgID As Integer = CInt(lWords(1))
+                Select Case lMsgID
+                    Case 99 : lWords(0) = "HIDE"
+                    Case 0 'don't do anything
+                    Case 1, 2, 3, 4, 6 : lWords(0) = "LABEL"
+                    Case 5 : lWords(0) = "PROGRESS"
+                    Case 7 : lWords(0) = "DBG"
+                    Case 10 : lWords(0) = "OPEN"
+                End Select
+            End If
+
             Select Case lWords(0).ToUpper
                 'Case "BUTTON"
                 '    Select Case UCase(Rest)
@@ -348,7 +364,8 @@ Public Class clsMonitor
                 Case "CLEAR" : ClearLabels()
                     'Case "DBG" 'Debug message, just goes into log
                     'Console.WriteLine("Debug")
-                Case "EXIT" : pExiting = True
+                Case "EXIT"
+                    pExiting = True
                 Case "FOLLOWWINDOWCOMMANDS" : pIgnoringWindowCommands = False
                 Case "IGNOREWINDOWCOMMANDS" : pIgnoringWindowCommands = True
                 Case "LABEL" 'Change a label
@@ -417,7 +434,10 @@ Public Class clsMonitor
     End Sub
 
     Private Shared Sub pWindowTimer_Elapsed(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles pWindowTimer.Elapsed
-        If pExiting Then pWindowTimer.Stop()
-        pfrmStatus.Invoke(pRedrawCallback)
+        If pExiting Then
+            pWindowTimer.Stop()
+        Else
+            pfrmStatus.Invoke(pRedrawCallback)
+        End If
     End Sub
 End Class
