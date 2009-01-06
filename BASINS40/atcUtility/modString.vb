@@ -1156,31 +1156,34 @@ TryOldString:
         ' ##PARAM Replace I Substring to replace Find
         ' ##RETURNS Returns new string like Source except that _
         'any occurences of Find (case sensitive) are replaced with Replace.
-        Dim retval As String = ""
-        Dim findPos As Integer
-        Dim lastFindEnd As Integer
-        Dim findlen As Integer
-        Dim replacelen As Integer
-        ' ##LOCAL retval - string to be returned as ReplaceString
-        ' ##LOCAL findpos - long position of Find in Source
-        ' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
-        ' ##LOCAL findlen - long length of Find
-        ' ##LOCAL replacelen - long length of Replace
 
-        findlen = Len(Find)
-        If findlen > 0 Then
-            replacelen = Len(ReplaceWith)
-            findPos = InStr(Source, Find)
-            lastFindEnd = 1
-            While findPos > 0
-                retval &= Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
-                lastFindEnd = findPos + findlen
-                findPos = InStr(findPos + findlen, Source, Find)
-            End While
-            ReplaceString = retval & Mid(Source, lastFindEnd)
-        Else
-            ReplaceString = Source
-        End If
+        Return Source.Replace(Find, ReplaceWith)
+
+        'Dim retval As String = ""
+        'Dim findPos As Integer
+        'Dim lastFindEnd As Integer
+        'Dim findlen As Integer
+        'Dim replacelen As Integer
+        '' ##LOCAL retval - string to be returned as ReplaceString
+        '' ##LOCAL findpos - long position of Find in Source
+        '' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
+        '' ##LOCAL findlen - long length of Find
+        '' ##LOCAL replacelen - long length of Replace
+
+        'findlen = Len(Find)
+        'If findlen > 0 Then
+        '    replacelen = Len(ReplaceWith)
+        '    findPos = InStr(Source, Find)
+        '    lastFindEnd = 1
+        '    While findPos > 0
+        '        retval &= Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
+        '        lastFindEnd = findPos + findlen
+        '        findPos = InStr(findPos + findlen, Source, Find)
+        '    End While
+        '    ReplaceString = retval & Mid(Source, lastFindEnd)
+        'Else
+        '    ReplaceString = Source
+        'End If
     End Function
 
     'Public Sub StrTrim(ByRef istr As String)

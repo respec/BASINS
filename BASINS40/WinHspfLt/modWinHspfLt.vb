@@ -182,6 +182,7 @@ Module modWinHSPFLt
         End Try
 
         Logger.Status("EXIT")
+        Application.DoEvents()
     End Sub
 
     Private Sub ShowFeedback(ByRef aProgress As String)
@@ -241,19 +242,22 @@ Friend Class StatusMonitor
                     .UseShellExecute = False
                     .RedirectStandardInput = True
                     .RedirectStandardOutput = True
-                    'AddHandler pMonitorProcess.OutputDataReceived, AddressOf MonitorMessageHandler
+                    AddHandler pMonitorProcess.OutputDataReceived, AddressOf MonitorMessageHandler
                     .RedirectStandardError = True
                     'AddHandler pMonitorProcess.ErrorDataReceived, AddressOf MonitorMessageHandler
                 End With
                 pMonitorProcess.Start()
+                '
+                'NOTE: to debug pMonitorProcess, in VS2005 (not Express) - choose Tools:AttachToProcess - StatusMonitor
+                '
                 pMonitorProcess.StandardInput.WriteLine("Show")
                 'pMonitorProcess.BeginErrorReadLine()
-                'pMonitorProcess.BeginOutputReadLine()
+                pMonitorProcess.BeginOutputReadLine()
                 Logger.Dbg("MonitorLaunched")
                 Dim lStream As IO.FileStream = pMonitorProcess.StandardInput.BaseStream
-                pPipeWriteToStatus = lStream.Handle 'lStream.SafeFileHandle 
-                lStream = pMonitorProcess.StandardOutput.BaseStream
-                pPipeReadFromStatus = lStream.Handle
+                pPipeWriteToStatus = lStream.SafeFileHandle.DangerousGetHandle
+                'lStream = pMonitorProcess.StandardOutput.BaseStream
+                'pPipeReadFromStatus = lStream.SafeFileHandle.DangerousGetHandle
                 pInit = True
             Catch ex As Exception
                 Logger.Msg("StatusProcessStartError:" & ex.Message)
@@ -264,7 +268,7 @@ Friend Class StatusMonitor
 
         If aStatusMessage.ToLower = "exit" Then
             If Not pMonitorProcess.HasExited Then
-                pMonitorProcess.Kill()
+                pMonitorProcess.StandardInput.WriteLine("Exit")
             End If
         End If
     End Sub
@@ -278,15 +282,15 @@ Friend Class StatusMonitor
             End If
         End If
 
-        If Left(aMsg, 1) = "(" And Right(aMsg, 1) = ")" Then
-            aMsg = Mid(aMsg, 2, Len(aMsg) - 2)
+        If aMsg.StartsWith("(") AndAlso aMsg.EndsWith(")") Then
+            aMsg = aMsg.Substring(1, aMsg.Length - 2)
         End If
 
         If aMsg.Length > 0 Then
             Dim OpenParenEscape As String = Chr(6)
-            aMsg = ReplaceString(aMsg, "(", OpenParenEscape)
+            aMsg = aMsg.Replace("(", OpenParenEscape)
             Dim CloseParenEscape As String = Chr(7)
-            aMsg = ReplaceString(aMsg, ")", CloseParenEscape)
+            aMsg = aMsg.Replace(")", CloseParenEscape)
             If Asc(Right(aMsg, 1)) > 31 Then
                 aMsg = "(" & aMsg & ")"
             End If
