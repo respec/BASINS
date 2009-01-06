@@ -286,7 +286,7 @@ Public Class HspfMetSeg
                             lSB.AppendLine(HspfConnection.ExtSourceHeader)
                         End If
                         If Comment.Length = 0 Then
-                            lSB.AppendLine("*** Met Seg " & Name)
+                            lSB.AppendLine("*** Met Seg " & Trim(Name))
                         Else
                             lSB.AppendLine(Comment)
                         End If

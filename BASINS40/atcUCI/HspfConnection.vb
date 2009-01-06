@@ -126,7 +126,9 @@ Public Class HspfConnection
                 lConnection.Comment = lComment
                 aUci.Connections.Add(lConnection)
                 lComment = ""
-            ElseIf lRecTyp = -1 And lRetCod <> 1 Then 'save comment
+            ElseIf lRecTyp = -1 And lRetCod <> 1 _
+                AndAlso Not lBuff.Contains("<-Volume->") _
+                AndAlso Not lBuff.Contains("<Name>") Then 'save comment
                 If lComment.Length = 0 Then
                     lComment = lBuff
                 Else
