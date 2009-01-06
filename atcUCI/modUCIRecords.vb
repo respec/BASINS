@@ -75,8 +75,8 @@ Module modUCIRecords
                 aReturnCode = 2
             End If
         End If
-        If Not aRecord Is Nothing Then
-            aRecord = aRecord.PadRight(80) 'ensure full record
+        If Not aRecord Is Nothing And aRecordType <> -1 Then
+            aRecord = aRecord.PadRight(80) 'ensure full record if not a comment 
         End If
         If aRecordIndex = pUciRec.Count - 1 Then
             aReturnCode = 0

@@ -197,7 +197,7 @@ Public Class HspfFilesBlk
         End If
 
         For Each lFile As HspfFile In pFiles
-            Dim lName As String = lFile.Name
+            Dim lName As String = Trim(lFile.Name)
             If InStr(1, lName, ":") Then
                 'this is the absolute path name, make relative
                 'tpath = CurDir
