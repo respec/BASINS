@@ -30,8 +30,8 @@ Partial Class frmAddPoint
         Me.cboFac = New System.Windows.Forms.ComboBox
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
-        Me.AtcText2 = New atcControls.atcText
-        Me.AtcText1 = New atcControls.atcText
+        Me.atxValue = New atcControls.atcText
+        Me.txtScen = New atcControls.atcText
         Me.SuspendLayout()
         '
         'Label1
@@ -136,52 +136,52 @@ Partial Class frmAddPoint
         Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
         '
-        'AtcText2
+        'atxValue
         '
-        Me.AtcText2.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText2.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.AtcText2.DefaultValue = ""
-        Me.AtcText2.HardMax = -999
-        Me.AtcText2.HardMin = -999
-        Me.AtcText2.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText2.Location = New System.Drawing.Point(86, 118)
-        Me.AtcText2.MaxWidth = 20
-        Me.AtcText2.Name = "AtcText2"
-        Me.AtcText2.NumericFormat = "0.#####"
-        Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText2.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.AtcText2.SelLength = 1
-        Me.AtcText2.SelStart = 0
-        Me.AtcText2.Size = New System.Drawing.Size(73, 29)
-        Me.AtcText2.SoftMax = -999
-        Me.AtcText2.SoftMin = -999
-        Me.AtcText2.TabIndex = 10
-        Me.AtcText2.ValueDouble = 0
-        Me.AtcText2.ValueInteger = 0
+        Me.atxValue.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxValue.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxValue.DefaultValue = ""
+        Me.atxValue.HardMax = -999
+        Me.atxValue.HardMin = -999
+        Me.atxValue.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxValue.Location = New System.Drawing.Point(86, 118)
+        Me.atxValue.MaxWidth = 20
+        Me.atxValue.Name = "atxValue"
+        Me.atxValue.NumericFormat = "0.#####"
+        Me.atxValue.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxValue.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxValue.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.atxValue.SelLength = 1
+        Me.atxValue.SelStart = 0
+        Me.atxValue.Size = New System.Drawing.Size(73, 29)
+        Me.atxValue.SoftMax = -999
+        Me.atxValue.SoftMin = -999
+        Me.atxValue.TabIndex = 10
+        Me.atxValue.ValueDouble = 0
+        Me.atxValue.ValueInteger = 0
         '
-        'AtcText1
+        'txtScen
         '
-        Me.AtcText1.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText1.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.AtcText1.DefaultValue = ""
-        Me.AtcText1.HardMax = -999
-        Me.AtcText1.HardMin = -999
-        Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText1.Location = New System.Drawing.Point(108, 11)
-        Me.AtcText1.MaxWidth = 20
-        Me.AtcText1.Name = "AtcText1"
-        Me.AtcText1.NumericFormat = "0.#####"
-        Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText1.SelLength = 1
-        Me.AtcText1.SelStart = 0
-        Me.AtcText1.Size = New System.Drawing.Size(73, 20)
-        Me.AtcText1.SoftMax = -999
-        Me.AtcText1.SoftMin = -999
-        Me.AtcText1.TabIndex = 5
-        Me.AtcText1.ValueDouble = 0
-        Me.AtcText1.ValueInteger = 0
+        Me.txtScen.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtScen.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.txtScen.DefaultValue = ""
+        Me.txtScen.HardMax = -999
+        Me.txtScen.HardMin = -999
+        Me.txtScen.InsideLimitsBackground = System.Drawing.Color.White
+        Me.txtScen.Location = New System.Drawing.Point(108, 11)
+        Me.txtScen.MaxWidth = 20
+        Me.txtScen.Name = "txtScen"
+        Me.txtScen.NumericFormat = "0.#####"
+        Me.txtScen.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.txtScen.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.txtScen.SelLength = 1
+        Me.txtScen.SelStart = 0
+        Me.txtScen.Size = New System.Drawing.Size(73, 20)
+        Me.txtScen.SoftMax = -999
+        Me.txtScen.SoftMin = -999
+        Me.txtScen.TabIndex = 5
+        Me.txtScen.ValueDouble = 0
+        Me.txtScen.ValueInteger = 0
         '
         'frmAddPoint
         '
@@ -190,12 +190,12 @@ Partial Class frmAddPoint
         Me.ClientSize = New System.Drawing.Size(361, 206)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
-        Me.Controls.Add(Me.AtcText2)
+        Me.Controls.Add(Me.atxValue)
         Me.Controls.Add(Me.cboFac)
         Me.Controls.Add(Me.cboPollutant)
         Me.Controls.Add(Me.cboReach)
         Me.Controls.Add(Me.Label6)
-        Me.Controls.Add(Me.AtcText1)
+        Me.Controls.Add(Me.txtScen)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
@@ -213,12 +213,12 @@ Partial Class frmAddPoint
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents AtcText1 As atcControls.atcText
+    Friend WithEvents txtScen As atcControls.atcText
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents cboReach As System.Windows.Forms.ComboBox
     Friend WithEvents cboPollutant As System.Windows.Forms.ComboBox
     Friend WithEvents cboFac As System.Windows.Forms.ComboBox
-    Friend WithEvents AtcText2 As atcControls.atcText
+    Friend WithEvents atxValue As atcControls.atcText
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
 End Class

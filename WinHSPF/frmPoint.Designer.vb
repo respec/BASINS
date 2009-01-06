@@ -230,6 +230,7 @@ Partial Class frmPoint
         '
         'cmdDetailsShow
         '
+        Me.cmdDetailsShow.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdDetailsShow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.cmdDetailsShow.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsShow.ImageIndex = 1
