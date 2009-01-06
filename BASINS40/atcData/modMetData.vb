@@ -361,7 +361,7 @@ Public Module modMetData
                             If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > pEpsilon And _
                                (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
                                 lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
-                                If lTSer.Value(lSPos) > lValMin And lTSer.Value(lSPos) < lValMax Then 'good value
+                                If lTSer.Value(lSPos) <> aMVal AndAlso lTSer.Value(lSPos) > lValMin AndAlso lTSer.Value(lSPos) < lValMax Then 'good value
                                     lFVal = lTSer.Value(lSPos)
                                     lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
                                     If Math.Abs(lFillAdjust + 999) > pEpsilon AndAlso _

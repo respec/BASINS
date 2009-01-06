@@ -466,7 +466,8 @@ Public Module modTimeseriesMath
     ''' <remarks></remarks>
     Public Function FillMissingByInterpolation(ByVal aOldTSer As atcTimeseries, _
                                       Optional ByVal aMaxFillLength As Double = Double.NaN, _
-                                      Optional ByVal aFillInstances As ArrayList = Nothing) As atcTimeseries
+                                      Optional ByVal aFillInstances As ArrayList = Nothing, _
+                                      Optional ByVal aMissingValue As Double = Double.NaN) As atcTimeseries
         Dim lNewTSer As atcTimeseries = aOldTSer.Clone
 
         Dim lInd As Integer = 1
@@ -474,8 +475,8 @@ Public Module modTimeseriesMath
         Dim lIndNextNotMissing As Integer
         Logger.Dbg("FillMissingByInterp:NumValues:" & lNewTSer.numValues & ":" & aMaxFillLength)
         While lInd <= lNewTSer.numValues
-            If Double.IsNaN(lNewTSer.Values(lInd)) Then 'look for next good value
-                lIndNextNotMissing = FindNextNotMissing(lNewTSer, lInd)
+            If Double.IsNaN(lNewTSer.Values(lInd)) OrElse Math.Abs(lNewTSer.Values(lInd) - aMissingValue) < 0.00001 Then 'look for next good value
+                lIndNextNotMissing = FindNextNotMissing(lNewTSer, lInd, aMissingValue)
                 Dim lMissingLength As Double
                 With lNewTSer.Dates 'find missing length
                     lMissingLength = .Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing)
@@ -514,9 +515,9 @@ Public Module modTimeseriesMath
         Return lNewTSer
     End Function
 
-    Private Function FindNextNotMissing(ByVal aTser As atcTimeseries, ByVal aInd As Integer) As Integer
+    Private Function FindNextNotMissing(ByVal aTser As atcTimeseries, ByVal aInd As Integer, Optional ByVal aMissingValue As Double = Double.NaN) As Integer
         Dim lInd As Integer = aInd
-        While Double.IsNaN(aTser.Values(lInd))
+        While Double.IsNaN(aTser.Values(lInd)) OrElse Math.Abs(aTser.Values(lInd) - aMissingValue) < 0.00001
             lInd += 1
             If lInd >= aTser.numValues Then
                 Return aTser.numValues
