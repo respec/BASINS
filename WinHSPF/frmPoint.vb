@@ -33,9 +33,6 @@ Public Class frmPoint
     Dim pMSub1Links() As Long
     Dim pMSub2Links() As Long
 
-    'Pollutant list populated by user selected file.
-    Dim pPollutantList As New Collection
-
     'Each integer in pAgdPointRowReference corresponds (in index order) to a row in the current agdPoint grid. 
     'Item(i) is the row number in agdMasterPoint that corresponds to row (i) in agdPoint.
     Dim pAgdPointRowReference As New Collection
@@ -44,6 +41,9 @@ Public Class frmPoint
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
+
+        'Initialize pPollutantList
+        pPollutantList = New Collection
 
         Me.Icon = pIcon
         lstPoints.SelectionMode = SelectionMode.One
@@ -627,12 +627,12 @@ Public Class frmPoint
 
     Private Sub ExpandedView(ByVal aExpand As Boolean)
         If aExpand Then
-            Me.Size = New Size(1100, 590)
-            Me.MinimumSize = New Size(280, 590)
+            Me.Size = New Size(grpSources.Width + 900, grpSources.Height + grpPollutants.Height + 177)
+            Me.MinimumSize = New Size(grpSources.Width + 30, grpSources.Height + grpPollutants.Height + 177)
             cmdDetailsHide.Visible = True
             cmdDetailsShow.Visible = False
         Else
-            Me.Size = New Size(280, 590)
+            Me.Size = New Size(grpSources.Width + 30, grpSources.Height + grpPollutants.Height + 177)
             cmdDetailsHide.Visible = False
             cmdDetailsShow.Visible = True
         End If

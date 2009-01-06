@@ -24,14 +24,14 @@ Partial Class frmAddPoint
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label5 = New System.Windows.Forms.Label
-        Me.AtcText1 = New atcControls.atcText
         Me.Label6 = New System.Windows.Forms.Label
         Me.cboReach = New System.Windows.Forms.ComboBox
         Me.cboPollutant = New System.Windows.Forms.ComboBox
         Me.cboFac = New System.Windows.Forms.ComboBox
-        Me.AtcText2 = New atcControls.atcText
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
+        Me.AtcText2 = New atcControls.atcText
+        Me.AtcText1 = New atcControls.atcText
         Me.SuspendLayout()
         '
         'Label1
@@ -79,29 +79,6 @@ Partial Class frmAddPoint
         Me.Label5.TabIndex = 4
         Me.Label5.Text = "Daily Load"
         '
-        'AtcText1
-        '
-        Me.AtcText1.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText1.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.AtcText1.DefaultValue = ""
-        Me.AtcText1.HardMax = -999
-        Me.AtcText1.HardMin = -999
-        Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText1.Location = New System.Drawing.Point(108, 11)
-        Me.AtcText1.MaxWidth = 20
-        Me.AtcText1.Name = "AtcText1"
-        Me.AtcText1.NumericFormat = "0.#####"
-        Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText1.SelLength = 1
-        Me.AtcText1.SelStart = 0
-        Me.AtcText1.Size = New System.Drawing.Size(73, 20)
-        Me.AtcText1.SoftMax = -999
-        Me.AtcText1.SoftMin = -999
-        Me.AtcText1.TabIndex = 5
-        Me.AtcText1.ValueDouble = 0
-        Me.AtcText1.ValueInteger = 0
-        '
         'Label6
         '
         Me.Label6.AutoSize = True
@@ -113,6 +90,7 @@ Partial Class frmAddPoint
         '
         'cboReach
         '
+        Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboReach.FormattingEnabled = True
         Me.cboReach.Location = New System.Drawing.Point(86, 37)
         Me.cboReach.Name = "cboReach"
@@ -121,6 +99,7 @@ Partial Class frmAddPoint
         '
         'cboPollutant
         '
+        Me.cboPollutant.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPollutant.FormattingEnabled = True
         Me.cboPollutant.Location = New System.Drawing.Point(86, 64)
         Me.cboPollutant.Name = "cboPollutant"
@@ -129,11 +108,33 @@ Partial Class frmAddPoint
         '
         'cboFac
         '
+        Me.cboFac.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboFac.FormattingEnabled = True
         Me.cboFac.Location = New System.Drawing.Point(86, 91)
         Me.cboFac.Name = "cboFac"
         Me.cboFac.Size = New System.Drawing.Size(259, 21)
         Me.cboFac.TabIndex = 9
+        '
+        'cmdCancel
+        '
+        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdCancel.Location = New System.Drawing.Point(184, 168)
+        Me.cmdCancel.Name = "cmdCancel"
+        Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
+        Me.cmdCancel.TabIndex = 20
+        Me.cmdCancel.Text = "&Cancel"
+        Me.cmdCancel.UseVisualStyleBackColor = True
+        '
+        'cmdOK
+        '
+        Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdOK.Location = New System.Drawing.Point(75, 168)
+        Me.cmdOK.Name = "cmdOK"
+        Me.cmdOK.Size = New System.Drawing.Size(101, 26)
+        Me.cmdOK.TabIndex = 19
+        Me.cmdOK.Text = "&OK"
+        Me.cmdOK.UseVisualStyleBackColor = True
         '
         'AtcText2
         '
@@ -159,26 +160,28 @@ Partial Class frmAddPoint
         Me.AtcText2.ValueDouble = 0
         Me.AtcText2.ValueInteger = 0
         '
-        'cmdCancel
+        'AtcText1
         '
-        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdCancel.Location = New System.Drawing.Point(184, 168)
-        Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
-        Me.cmdCancel.TabIndex = 20
-        Me.cmdCancel.Text = "&Cancel"
-        Me.cmdCancel.UseVisualStyleBackColor = True
-        '
-        'cmdOK
-        '
-        Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Location = New System.Drawing.Point(75, 168)
-        Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(101, 26)
-        Me.cmdOK.TabIndex = 19
-        Me.cmdOK.Text = "&OK"
-        Me.cmdOK.UseVisualStyleBackColor = True
+        Me.AtcText1.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcText1.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.AtcText1.DefaultValue = ""
+        Me.AtcText1.HardMax = -999
+        Me.AtcText1.HardMin = -999
+        Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcText1.Location = New System.Drawing.Point(108, 11)
+        Me.AtcText1.MaxWidth = 20
+        Me.AtcText1.Name = "AtcText1"
+        Me.AtcText1.NumericFormat = "0.#####"
+        Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcText1.SelLength = 1
+        Me.AtcText1.SelStart = 0
+        Me.AtcText1.Size = New System.Drawing.Size(73, 20)
+        Me.AtcText1.SoftMax = -999
+        Me.AtcText1.SoftMin = -999
+        Me.AtcText1.TabIndex = 5
+        Me.AtcText1.ValueDouble = 0
+        Me.AtcText1.ValueInteger = 0
         '
         'frmAddPoint
         '
