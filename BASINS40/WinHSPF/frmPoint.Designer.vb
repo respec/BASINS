@@ -42,7 +42,7 @@ Partial Class frmPoint
         Me.cmdDetailsShow = New System.Windows.Forms.Button
         Me.cmdDetailsHide = New System.Windows.Forms.Button
         Me.agdMasterPoint = New atcControls.atcGrid
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.grpPollutants = New System.Windows.Forms.GroupBox
         Me.cboPollutantList = New System.Windows.Forms.ComboBox
         Me.cmdFile = New System.Windows.Forms.Button
         Me.txtPollutantPath = New System.Windows.Forms.TextBox
@@ -50,7 +50,7 @@ Partial Class frmPoint
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
+        Me.grpPollutants.SuspendLayout()
         Me.SuspendLayout()
         '
         'chkAllSources
@@ -274,17 +274,17 @@ Partial Class frmPoint
         Me.agdMasterPoint.Source = Nothing
         Me.agdMasterPoint.TabIndex = 21
         '
-        'GroupBox1
+        'grpPollutants
         '
-        Me.GroupBox1.Controls.Add(Me.cboPollutantList)
-        Me.GroupBox1.Controls.Add(Me.cmdFile)
-        Me.GroupBox1.Controls.Add(Me.txtPollutantPath)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 345)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(245, 89)
-        Me.GroupBox1.TabIndex = 23
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Pollutant List"
+        Me.grpPollutants.Controls.Add(Me.cboPollutantList)
+        Me.grpPollutants.Controls.Add(Me.cmdFile)
+        Me.grpPollutants.Controls.Add(Me.txtPollutantPath)
+        Me.grpPollutants.Location = New System.Drawing.Point(12, 345)
+        Me.grpPollutants.Name = "grpPollutants"
+        Me.grpPollutants.Size = New System.Drawing.Size(245, 89)
+        Me.grpPollutants.TabIndex = 23
+        Me.grpPollutants.TabStop = False
+        Me.grpPollutants.Text = "Pollutant List"
         '
         'cboPollutantList
         '
@@ -328,7 +328,7 @@ Partial Class frmPoint
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1092, 563)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.grpPollutants)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
         Me.Controls.Add(Me.agdMasterPoint)
@@ -343,8 +343,8 @@ Partial Class frmPoint
         Me.menuPointSources.ResumeLayout(False)
         Me.menuPointSources.PerformLayout()
         Me.grpDetails.ResumeLayout(False)
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.grpPollutants.ResumeLayout(False)
+        Me.grpPollutants.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -369,7 +369,7 @@ Partial Class frmPoint
     Friend WithEvents cmdAdvancedGen As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdScenario As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents agdMasterPoint As atcControls.atcGrid
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents grpPollutants As System.Windows.Forms.GroupBox
     Friend WithEvents txtPollutantPath As System.Windows.Forms.TextBox
     Friend WithEvents cmdFile As System.Windows.Forms.Button
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog

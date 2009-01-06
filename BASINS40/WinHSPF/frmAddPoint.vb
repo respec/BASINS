@@ -46,7 +46,7 @@ Public Class frmAddPoint
         'For i = 1 To frmPoint.cmbFac.ListCount - 1
         '  cboFac.AddItem frmPoint.cmbFac.List(i)
         'Next i
-        For i = 1 To pfrmPoint.agdMasterPoint.Source.Rows
+        For i = 1 To pfrmPoint.agdMasterPoint.Source.Rows - 1
             ctmp = pfrmPoint.agdMasterPoint.Source.CellValue(i, 3)
             If Not cboFac.Items.Contains(ctmp) Then
                 cboFac.Items.Add(ctmp)
