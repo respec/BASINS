@@ -62,6 +62,7 @@ Friend Class frmManager
     Friend WithEvents AddDatasetsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents RenumberDatasetsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents RemoveDatasetsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents CloseAllToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents treeFiles As System.Windows.Forms.TreeView
     'Friend WithEvents panelOpening As System.Windows.Forms.Panel
     'Friend WithEvents lstDataSourceType As System.Windows.Forms.ListBox
@@ -91,6 +92,7 @@ Friend Class frmManager
         Me.NativeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AnalysisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.CloseAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -128,7 +130,7 @@ Friend Class frmManager
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.SaveAsToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.toolStripSeparator2, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.SaveAsToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.CloseAllToolStripMenuItem, Me.toolStripSeparator2, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(45, 23)
         Me.FileToolStripMenuItem.Text = "File"
@@ -174,7 +176,7 @@ Friend Class frmManager
         '
         Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
         Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
-        Me.CloseToolStripMenuItem.Text = "Close"
+        Me.CloseToolStripMenuItem.Text = "Close Selected"
         '
         'toolStripSeparator2
         '
@@ -243,6 +245,12 @@ Friend Class frmManager
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(53, 23)
         Me.HelpToolStripMenuItem.Text = "Help"
         '
+        'CloseAllToolStripMenuItem
+        '
+        Me.CloseAllToolStripMenuItem.Name = "CloseAllToolStripMenuItem"
+        Me.CloseAllToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
+        Me.CloseAllToolStripMenuItem.Text = "Close All"
+        '
         'frmManager
         '
         Me.AllowDrop = True
@@ -309,50 +317,74 @@ Friend Class frmManager
     Private Sub SelectionAction(ByVal aAction As String)
         If treeFiles.SelectedNode IsNot Nothing Then
             If IsNumeric(treeFiles.SelectedNode.Name) Then
-                Dim lDataSourceIndex As Integer = treeFiles.SelectedNode.Name
-                If lDataSourceIndex > -1 AndAlso _
-                       lDataSourceIndex < atcDataManager.DataSources.Count Then
-                    Dim lDataSource As atcTimeseriesSource = atcDataManager.DataSources.Item(lDataSourceIndex)
-                    With lDataSource
-                        Logger.Dbg(aAction & ":" & .Specification)
-                        Dim lActionArgs() As String = aAction.Split(":")
-                        Select Case lActionArgs(0)
-                            Case "Close"
-                                atcDataManager.RemoveDataSource(lDataSourceIndex)
-                                lDataSourceIndex -= 1
-                                If lDataSourceIndex = -1 And atcDataManager.DataSources.Count > 0 Then
-                                    lDataSourceIndex = 0
-                                End If
-                            Case "View"
-                                .View()
-                            Case "Display"
-                                atcDataManager.UserSelectDisplay(.Specification, .DataSets.Clone)
-                            Case "Analysis"
-                                atcDataManager.ShowDisplay(lActionArgs(1), .DataSets)
-                            Case "RemoveDatasets"
-                                If .CanRemoveDataset Then
-                                    Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
-                                        "Select Datasets to remove from " & .Specification, , .DataSets)
-                                    If lDataGroup.Count > 0 AndAlso _
-                                        Logger.Msg("Remove " & lDataGroup.Count & " datasets from " & vbCrLf & .Specification & "?", _
-                                                   MsgBoxStyle.OkCancel, "Confirm Remove") = MsgBoxResult.Ok Then
-                                        For Each lDataSet As atcDataSet In lDataGroup
-                                            .RemoveDataset(lDataSet)
-                                        Next
-                                        Populate(treeFiles.SelectedNode.Name)
-                                    End If
-                                End If
-                        End Select
-                    End With
-                End If
+                DoAction(aAction, treeFiles.SelectedNode)
             Else
-                Logger.Msg("Choose a specific data source to " & aAction & ", not a data type or file format", aAction & " Problem")
+                If treeFiles.SelectedNode.Nodes IsNot Nothing Then
+                    Select Case treeFiles.SelectedNode.Nodes.Count
+                        Case 1
+                            DoAction(aAction, treeFiles.SelectedNode.Nodes(0))
+                        Case Is > 1
+                            If Logger.Msg(aAction & " " & treeFiles.SelectedNode.Nodes.Count & " sources?", vbYesNo, "More than one data source affected") = MsgBoxResult.Yes Then
+                                Dim lNodes As New ArrayList
+                                For Each lNode As TreeNode In treeFiles.SelectedNode.Nodes
+                                    lNodes.Insert(0, lNode)
+                                Next
+                                'split in two for when tree structure changes during action, for example during Close
+                                For Each lNode As TreeNode In lNodes
+                                    DoAction(aAction, lNode)
+                                Next
+                                Populate(-1)
+                            End If
+                        Case Else
+                            Logger.Msg("Choose a data source to " & aAction & " before choosing the action", aAction & " Problem")
+                    End Select
+                End If
             End If
         ElseIf treeFiles.Nodes.Count = 0 Then
             Logger.Msg("No data sources to " & aAction, aAction & " Problem")
         Else
-            Logger.Msg("Choose a specific data source to " & aAction, aAction & " Problem")
+            Logger.Msg("Choose a data source to " & aAction, aAction & " Problem")
         End If
+    End Sub
+
+    Private Sub DoAction(ByVal aAction As String, ByVal aNode As TreeNode)
+        Dim lDataSourceIndex As Integer = aNode.Name
+        If lDataSourceIndex > -1 AndAlso _
+               lDataSourceIndex < atcDataManager.DataSources.Count Then
+            Dim lDataSource As atcTimeseriesSource = atcDataManager.DataSources.Item(lDataSourceIndex)
+            With lDataSource
+                Logger.Dbg(aAction & ":" & .Specification)
+                Dim lActionArgs() As String = aAction.Split(":")
+                Select Case lActionArgs(0)
+                    Case "Close"
+                        atcDataManager.RemoveDataSource(lDataSourceIndex)
+                        lDataSourceIndex -= 1
+                        If lDataSourceIndex = -1 And atcDataManager.DataSources.Count > 0 Then
+                            lDataSourceIndex = 0
+                        End If
+                    Case "View"
+                        .View()
+                    Case "Display"
+                        atcDataManager.UserSelectDisplay(.Specification, .DataSets.Clone)
+                    Case "Analysis"
+                        atcDataManager.ShowDisplay(lActionArgs(1), .DataSets)
+                    Case "RemoveDatasets"
+                        If .CanRemoveDataset Then
+                            Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
+                                "Select Datasets to remove from " & .Specification, , .DataSets)
+                            If lDataGroup.Count > 0 AndAlso _
+                                Logger.Msg("Remove " & lDataGroup.Count & " datasets from " & vbCrLf & .Specification & "?", _
+                                           MsgBoxStyle.OkCancel, "Confirm Remove") = MsgBoxResult.Ok Then
+                                For Each lDataSet As atcDataSet In lDataGroup
+                                    .RemoveDataset(lDataSet)
+                                Next
+                                Populate(aNode.Name)
+                            End If
+                        End If
+                End Select
+            End With
+        End If
+
     End Sub
 
     Private Sub ChangedData(ByVal aDataSource As atcTimeseriesSource)
@@ -501,6 +533,14 @@ Friend Class frmManager
         SelectionAction("Close")
     End Sub
 
+    Private Sub CloseAllToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseAllToolStripMenuItem.Click
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+            lDataSource.Clear()
+        Next
+        atcDataManager.DataSources.Clear()
+        Populate(-1)
+    End Sub
+
     Private Sub ExitToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitToolStripMenuItem.Click
         Me.Close()
     End Sub
@@ -540,6 +580,7 @@ Friend Class frmManager
     Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
         ShowHelp("")
     End Sub
+
 End Class
 
 
