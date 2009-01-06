@@ -921,9 +921,9 @@ Public Class frmSWMMSetup
 #End Region
 
     Friend pPlugIn As PlugIn
-    Friend pNodeFieldMap As New atcUtility.atcCollection
-    Friend pConduitFieldMap As New atcUtility.atcCollection
-    Friend pCatchmentFieldMap As New atcUtility.atcCollection
+    Friend pDefaultNodeFieldMap As New atcUtility.atcCollection
+    Friend pDefaultConduitFieldMap As New atcUtility.atcCollection
+    Friend pDefaultCatchmentFieldMap As New atcUtility.atcCollection
     Friend pPrecStations As atcCollection
     Friend pMetStations As atcCollection
     Friend pBasinsFolder As String
@@ -1279,41 +1279,54 @@ Public Class frmSWMMSetup
 
             'add target properties from introspection on the swmm classes
             AtcConnectFields.lstTarget.Items.Clear()
-            Dim lNode As New atcSWMM.Node
-            For Each lField As Reflection.FieldInfo In lNode.GetType.GetFields
-                If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
-                    AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
-                End If
-            Next
-            Dim lConduit As New atcSWMM.Conduit
-            For Each lField As Reflection.FieldInfo In lConduit.GetType.GetFields
-                If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
-                    AtcConnectFields.lstTarget.Items.Add("Conduit:" & lField.Name)
-                End If
-            Next
-            Dim lCatchment As New atcSWMM.Catchment
-            For Each lField As Reflection.FieldInfo In lCatchment.GetType.GetFields
-                If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
-                    AtcConnectFields.lstTarget.Items.Add("Subcatchment:" & lField.Name)
-                End If
-            Next
+
+            If cboOutlets.SelectedIndex > 0 Then
+                Dim lNode As New atcSWMM.Node
+                For Each lField As Reflection.FieldInfo In lNode.GetType.GetFields
+                    If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
+                        AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
+                    End If
+                Next
+            End If
+
+            If cboStreams.SelectedIndex > -1 Then
+                Dim lConduit As New atcSWMM.Conduit
+                For Each lField As Reflection.FieldInfo In lConduit.GetType.GetFields
+                    If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
+                        If cboOutlets.SelectedIndex > 0 And (lField.Name = "DownConduitID" Or lField.Name = "ElevationHigh" Or lField.Name = "ElevationLow") Then
+                            'if user has specified a nodes layer, don't add DownConduitID, ElevationHigh, and ElevationLow
+                        Else
+                            AtcConnectFields.lstTarget.Items.Add("Conduit:" & lField.Name)
+                        End If
+                    End If
+                Next
+            End If
+
+            If cboSubbasins.SelectedIndex > -1 Then
+                Dim lCatchment As New atcSWMM.Catchment
+                For Each lField As Reflection.FieldInfo In lCatchment.GetType.GetFields
+                    If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
+                        AtcConnectFields.lstTarget.Items.Add("Subcatchment:" & lField.Name)
+                    End If
+                Next
+            End If
 
             'add existing connections from default field maps
             AtcConnectFields.lstConnections.Items.Clear()
             Dim lConn As String
             Dim lType As String = "Node"
-            For lIndex As Integer = 0 To pNodeFieldMap.Count - 1
-                lConn = lType & ":" & pNodeFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pNodeFieldMap(lIndex)
+            For lIndex As Integer = 0 To pDefaultNodeFieldMap.Count - 1
+                lConn = lType & ":" & pDefaultNodeFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pDefaultNodeFieldMap(lIndex)
                 AtcConnectFields.AddConnection(lConn, True)
             Next
             lType = "Conduit"
-            For lIndex As Integer = 0 To pConduitFieldMap.Count - 1
-                lConn = lType & ":" & pConduitFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pConduitFieldMap(lIndex)
+            For lIndex As Integer = 0 To pDefaultConduitFieldMap.Count - 1
+                lConn = lType & ":" & pDefaultConduitFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pDefaultConduitFieldMap(lIndex)
                 AtcConnectFields.AddConnection(lConn, True)
             Next
             lType = "Subcatchment"
-            For lIndex As Integer = 0 To pCatchmentFieldMap.Count - 1
-                lConn = lType & ":" & pCatchmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pCatchmentFieldMap(lIndex)
+            For lIndex As Integer = 0 To pDefaultCatchmentFieldMap.Count - 1
+                lConn = lType & ":" & pDefaultCatchmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pDefaultCatchmentFieldMap(lIndex)
                 AtcConnectFields.AddConnection(lConn, True)
             Next
         End If
@@ -1353,9 +1366,12 @@ Public Class frmSWMMSetup
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Logger.Dbg("Setup SWMM input files")
         'set field mapping as specified in field mapping tab
-        pNodeFieldMap.Clear()
-        pConduitFieldMap.Clear()
-        pCatchmentFieldMap.Clear()
+        Dim lNodeFieldMap As New atcUtility.atcCollection
+        Dim lConduitFieldMap As New atcUtility.atcCollection
+        Dim lCatchmentFieldMap As New atcUtility.atcCollection
+        lNodeFieldMap.Clear()
+        lConduitFieldMap.Clear()
+        lCatchmentFieldMap.Clear()
         For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
             Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
             Dim lBaseLen As Integer = 0
@@ -1377,11 +1393,11 @@ Public Class frmSWMMSetup
             If Mid(lTxt, lGTPos + 2, lBaseLen) = lBaseName Then
                 Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
                 If Mid(lTxt, 1, 4) = "Node" Then
-                    pNodeFieldMap.Add(lSrc, lTar)
+                    lNodeFieldMap.Add(lSrc, lTar)
                 ElseIf Mid(lTxt, 1, 7) = "Conduit" Then
-                    pConduitFieldMap.Add(lSrc, lTar)
+                    lConduitFieldMap.Add(lSrc, lTar)
                 ElseIf Mid(lTxt, 1, 12) = "Subcatchment" Then
-                    pCatchmentFieldMap.Add(lSrc, lTar)
+                    lCatchmentFieldMap.Add(lSrc, lTar)
                 End If
             Else
                 'trying to add field mapping of different types, like a node to a catchment, wont work
@@ -1541,19 +1557,19 @@ Public Class frmSWMMSetup
 
                 If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
                     Logger.Dbg("Add " & lTable.NumRecords & " NodesFrom " & lNodesShapefileName)
-                    .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, pNodeFieldMap))
+                    .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lNodeFieldMap))
                 End If
                 CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
 
                 If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
                     Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lConduitShapefileName)
-                    .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, pConduitFieldMap), "Name", "C", 1))
+                    .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lConduitFieldMap), "Name", "C", 1))
                 End If
                 CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 
                 If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                     Logger.Dbg("Add " & lTable.NumRecords & " CatchmentsFrom " & lCatchmentShapefileName)
-                    .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
+                    .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
                 End If
                 CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
 
@@ -1567,7 +1583,7 @@ Public Class frmSWMMSetup
                     lLandUseFileName = GisUtil.LayerFileName(lLanduseLayerIndex)
                 End If
 
-                Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", pCatchmentFieldMap)
+                Dim lSubbasinFieldIndex As Integer = GetFieldIndexFromMap(lCatchmentShapefileName, "Name", lCatchmentFieldMap)
                 Dim lSubbasinFieldName As String = ""
                 If lSubbasinFieldIndex > -1 Then
                     lSubbasinFieldName = GisUtil.FieldName(lSubbasinFieldIndex, GisUtil.LayerIndex(lCatchmentShapefileName))
@@ -1670,32 +1686,32 @@ Public Class frmSWMMSetup
         pPrecStations = New atcCollection
         pMetStations = New atcCollection
 
-        'set field mapping for nodes, conduits, and Subcatchments
-        pNodeFieldMap.Clear()
-        pNodeFieldMap.Add("ID", "Name")
-        pConduitFieldMap.Clear()
-        pConduitFieldMap.Add("InNodeId", "InletNodeName")
-        pConduitFieldMap.Add("OutNodeID", "OutletNodeName")
-        pConduitFieldMap.Add("SUBBASIN", "Name")
-        pConduitFieldMap.Add("SUBBASINR", "DownConduitID")
-        pConduitFieldMap.Add("MAXEL", "ElevationHigh")
-        pConduitFieldMap.Add("MINEL", "ElevationLow")
-        pConduitFieldMap.Add("WID2", "MeanWidth")
-        pConduitFieldMap.Add("DEP2", "MeanDepth")
-        pConduitFieldMap.Add("LINKNO", "Name")
-        pConduitFieldMap.Add("DSLINKNO", "DownConduitID")
-        pConduitFieldMap.Add("ElevHigh", "ElevationHigh")
-        pConduitFieldMap.Add("Elevhigh", "ElevationHigh")
-        pConduitFieldMap.Add("ElevLow", "ElevationLow")
-        pConduitFieldMap.Add("MeanWidth", "MeanWidth")
-        pConduitFieldMap.Add("MeanDepth", "MeanDepth")
-        pCatchmentFieldMap.Clear()
-        pCatchmentFieldMap.Add("SUBBASIN", "Name")
-        pCatchmentFieldMap.Add("SLO1", "Slope")
-        pCatchmentFieldMap.Add("ID", "Name")
-        pCatchmentFieldMap.Add("OutNode", "OutletNodeID")
-        pCatchmentFieldMap.Add("StreamLink", "Name")
-        pCatchmentFieldMap.Add("AveSlope", "Slope")
+        'set default field mapping for nodes, conduits, and Subcatchments
+        pDefaultNodeFieldMap.Clear()
+        pDefaultNodeFieldMap.Add("ID", "Name")
+        pDefaultConduitFieldMap.Clear()
+        pDefaultConduitFieldMap.Add("InNodeId", "InletNodeName")
+        pDefaultConduitFieldMap.Add("OutNodeID", "OutletNodeName")
+        pDefaultConduitFieldMap.Add("SUBBASIN", "Name")
+        pDefaultConduitFieldMap.Add("SUBBASINR", "DownConduitID")
+        pDefaultConduitFieldMap.Add("MAXEL", "ElevationHigh")
+        pDefaultConduitFieldMap.Add("MINEL", "ElevationLow")
+        pDefaultConduitFieldMap.Add("WID2", "MeanWidth")
+        pDefaultConduitFieldMap.Add("DEP2", "MeanDepth")
+        pDefaultConduitFieldMap.Add("LINKNO", "Name")
+        pDefaultConduitFieldMap.Add("DSLINKNO", "DownConduitID")
+        pDefaultConduitFieldMap.Add("ElevHigh", "ElevationHigh")
+        pDefaultConduitFieldMap.Add("Elevhigh", "ElevationHigh")
+        pDefaultConduitFieldMap.Add("ElevLow", "ElevationLow")
+        pDefaultConduitFieldMap.Add("MeanWidth", "MeanWidth")
+        pDefaultConduitFieldMap.Add("MeanDepth", "MeanDepth")
+        pDefaultCatchmentFieldMap.Clear()
+        pDefaultCatchmentFieldMap.Add("SUBBASIN", "Name")
+        pDefaultCatchmentFieldMap.Add("SLO1", "Slope")
+        pDefaultCatchmentFieldMap.Add("ID", "Name")
+        pDefaultCatchmentFieldMap.Add("OutNode", "OutletNodeID")
+        pDefaultCatchmentFieldMap.Add("StreamLink", "Name")
+        pDefaultCatchmentFieldMap.Add("AveSlope", "Slope")
 
         cboLanduse.Items.Add("<none>")
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
@@ -1853,10 +1869,34 @@ Public Class frmSWMMSetup
             Dim lCatchmentLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
             Dim lCatchmentShapefileName As String = GisUtil.LayerFileName(lCatchmentLayerIndex)
 
+            'build a copy of the catchment field map to use here
+            Dim lCatchmentFieldMap As New atcUtility.atcCollection
+            For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
+                Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
+                Dim lBaseLen As Integer = 0
+                Dim lBaseName As String = ""
+                If Mid(lTxt, 1, 12) = "Subcatchment" Then
+                    lBaseLen = 12
+                    lBaseName = "Subcatchment"
+                End If
+                Dim lSpacePos As Integer = InStr(lTxt, " ")
+                Dim lGTPos As Integer = InStr(lTxt, ">")
+                Dim lSrc As String = Mid(lTxt, lBaseLen + 2, lSpacePos - lBaseLen - 2)
+                If Mid(lTxt, lGTPos + 2, lBaseLen) = lBaseName Then
+                    Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
+                    If Mid(lTxt, 1, 12) = "Subcatchment" Then
+                        lCatchmentFieldMap.Add(lSrc, lTar)
+                    End If
+                Else
+                    'trying to add field mapping of different types, like a node to a catchment, wont work
+                    Logger.Dbg("Problem adding field map " & lTxt)
+                End If
+            Next
+
             Dim lTempCatchments As New atcSWMM.Catchments
             Dim lTable As New atcUtility.atcTableDBF
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
-                lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, pCatchmentFieldMap))
+                lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
             End If
             Logger.Dbg("CatchmentsCount " & lTempCatchments.Count)
 
