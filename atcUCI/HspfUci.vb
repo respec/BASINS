@@ -2054,16 +2054,14 @@ x:
         'build new output dsns on SaveAs
 
         'look for output wdm
-        Dim lWdmId As Integer
-        Dim lWdmUnit As Integer
+        Dim lWdmId As Integer = 0
         For lWdmIndex As Integer = 4 To 1 Step -1
-            If pWdmUnit(lWdmIndex) > 0 Then 'use this as the output wdm
-                lWdmUnit = pWdmUnit(lWdmIndex)
+            If Not pWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
                 lWdmId = lWdmIndex
             End If
         Next lWdmIndex
 
-        If lWdmUnit > 0 Then 'okay to continue, look for matching WDM datasets
+        If lWdmId > 0 Then 'okay to continue, look for matching WDM datasets
             Dim lts As Collection = FindTimser(aOldScenario.ToUpper, "", "")
             'return the names of the data sets from this wdm file
             Dim lDsn As Integer = 0
@@ -2143,6 +2141,8 @@ x:
             .SetValue("Scenario", aScenario.ToUpper)
             .SetValue("Constituent", aConstituent.ToUpper)
             .SetValue("Location", aLocation.ToUpper)
+            .SetValue("ts", aTimeStep)
+            .SetValue("tu", aTimeUnits)
             If aDesc.Length > 0 Then
                 .SetValue("Description", aDesc.ToUpper)
             End If

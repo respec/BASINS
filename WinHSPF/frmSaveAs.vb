@@ -16,7 +16,6 @@ Public Class frmSaveAs
 
         pCurrentDirectory = PathNameOnly(AbsolutePath(pUCI.Name, CurDir))
         atxName.Text = FilenameNoExt(pUCI.Name)
-        'HSPFMain.newname = ""
 
     End Sub
 
@@ -25,24 +24,30 @@ Public Class frmSaveAs
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        'HSPFMain.newname = txtPath
-        'If optRelAbs(0).Value Then
-        '    HSPFMain.relabs = 1
-        'Else
-        '    HSPFMain.relabs = 2
-        'End If
-        'HSPFMain.basedsn = ATCoTextBase.Value
 
-        '    myUci.Name = newname
-        '    If Len(myUci.Name) > 3 Then
-        '        If UCase(Right(myUci.Name, 4)) <> ".UCI" Then  'force to have uci extension
-        '            myUci.Name = myUci.Name & ".uci"
-        '        End If
-        '    End If
-        '    newname = FilenameOnly(myUci.Name)
-        '    myUci.SaveAs(oldname, newname, basedsn, relabs)
-        '    AddRecentFile(mnuRecent, myUci.Name)
-        '    Caption = BaseCaption & ": " & FilenameOnly(myUci.Name)
+        Dim lRelAbs As Integer
+        If rbnRelative.Checked Then
+            lRelAbs = 1
+        Else
+            lRelAbs = 2
+        End If
+
+        Dim lOldName As String = FilenameNoExt(pUCI.Name)
+
+        pUCI.Name = FilenameNoPath(txtPath.Text)
+        If Not pUCI.Name.ToUpper.EndsWith(".UCI") Then  'force to have uci extension
+            pUCI.Name = pUCI.Name & ".uci"
+        End If
+
+        Dim lNewName As String = FilenameNoExt(pUCI.Name)
+        pUCI.SaveAs(lOldName, lNewName, CInt(atxBase.Text), lRelAbs)
+        'AddRecentFile(mnuRecent, pUci.Name)
+
+        'set UCI name in caption
+        If pWinHSPF IsNot Nothing Then
+            pWinHSPF.Text = pWinHSPF.Tag & ": " & pUCI.Name
+        End If
+
         Me.Dispose()
     End Sub
 
