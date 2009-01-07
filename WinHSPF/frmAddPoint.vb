@@ -10,10 +10,11 @@ Imports System.Collections.ObjectModel
 Public Class frmAddPoint
 
     Public Sub New()
-        Dim lOper As HspfOperation
+        Dim lHspfOperation As HspfOperation
         Dim lOpnBlk As HspfOpnBlk
-        Dim vpol As Object
-        Dim i&, ctmp$
+        Dim lObject As Object
+        Dim lOper As Integer
+        Dim lTempString As String
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -24,34 +25,34 @@ Public Class frmAddPoint
 
         cboReach.Items.Clear()
         lOpnBlk = pUCI.OpnBlks("RCHRES")
-        For i = 1 To lOpnBlk.Count
-            lOper = lOpnBlk.OperFromID(i)
-            cboReach.Items.Add("RCHRES " & lOper.Id & " - " & lOper.Description)
-        Next i
+        For lOper = 1 To lOpnBlk.Count
+            lHspfOperation = lOpnBlk.OperFromID(lOper)
+            cboReach.Items.Add("RCHRES " & lHspfOperation.Id & " - " & lHspfOperation.Description)
+        Next lOper
         cboReach.SelectedIndex = 0
 
         cboPollutant.Items.Clear()
-        For Each vpol In pPollutantList
-            cboPollutant.Items.Add(vpol)
-        Next vpol
+        For Each lObject In pPollutantList
+            cboPollutant.Items.Add(lObject)
+        Next lObject
 
-        For i = 1 To pfrmPoint.agdMasterPoint.Source.Rows()
-            ctmp = pfrmPoint.agdMasterPoint.Source.CellValue(i, 4)
-            If Not cboPollutant.Items.Contains(ctmp) Then
-                cboPollutant.Items.Add(ctmp)
+        For lOper = 1 To pfrmPoint.agdMasterPoint.Source.Rows()
+            lTempString = pfrmPoint.agdMasterPoint.Source.CellValue(lOper, 4)
+            If Not cboPollutant.Items.Contains(lTempString) Then
+                cboPollutant.Items.Add(lTempString)
             End If
-        Next i
+        Next lOper
 
         cboFac.Items.Clear()
         'For i = 1 To pfrmPoint.cmbFac.ListCount - 1
         '  cboFac.AddItem pfrmPoint.cmbFac.List(i)
         'Next i
-        For i = 1 To pfrmPoint.agdMasterPoint.Source.Rows - 1
-            ctmp = pfrmPoint.agdMasterPoint.Source.CellValue(i, 3)
-            If Not cboFac.Items.Contains(ctmp) Then
-                cboFac.Items.Add(ctmp)
+        For lOper = 1 To pfrmPoint.agdMasterPoint.Source.Rows - 1
+            lTempString = pfrmPoint.agdMasterPoint.Source.CellValue(lOper, 3)
+            If Not cboFac.Items.Contains(lTempString) Then
+                cboFac.Items.Add(lTempString)
             End If
-        Next i
+        Next lOper
     End Sub
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
@@ -59,56 +60,56 @@ Public Class frmAddPoint
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Dim sen, loc, con, stanam, tstype As String
-        Dim imready As Boolean
-        Dim dashpos, newdsn As Integer
-        Dim newwdmid As String = Nothing
-        Dim longloc As String
-        Dim jdates(1) As Double
-        Dim rload(1) As Double
+        Dim lScenario, lLocation, lConstituent, lStationName, lTimeSeriesType As String
+        Dim lReadyForCloseFlag As Boolean
+        Dim lDashPosition, lNewDsn As Integer
+        Dim lNewWdmId As Integer = 0
+        Dim lLongLocation As String
+        Dim lJDates(1) As Double
+        Dim lLoadValues(1) As Double
 
-        imready = True
+        lReadyForCloseFlag = True
         'ok, check to make sure everything is filled
         If Len(txtScen.Text) = 0 Then
-            MsgBox("A scenario name must be entered.", vbOKOnly, "Create Point Source Problem")
-            imready = False
+            Logger.Message("A pollutant must be entered.", "Create Point Source Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
+            lReadyForCloseFlag = False
         End If
         If Len(cboReach.Items.Item(cboReach.SelectedIndex)) = 0 Then
-            MsgBox("A reach must be selected.", vbOKOnly, "Create Point Source Problem")
-            imready = False
+            Logger.Message("A reach must be selected.", "Create Point Source Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
+            lReadyForCloseFlag = False
         End If
         If cboPollutant.SelectedIndex = -1 And Len(cboPollutant.Text) = 0 Then
-            MsgBox("A pollutant must be entered.", vbOKOnly, "Create Point Source Problem")
-            imready = False
+            Logger.Message("A pollutant must be entered.", "Create Point Source Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
+            lReadyForCloseFlag = False
         End If
-        If imready Then
-            sen = "PT-" & UCase(Trim(txtScen.Text))
-            longloc = Trim(cboReach.Items.Item(cboReach.SelectedIndex))
-            dashpos = InStr(1, longloc, "-")
-            loc = "RCH" & Trim(Mid(longloc, 7, dashpos - 7))
+        If lReadyForCloseFlag Then
+            lScenario = "PT-" & UCase(Trim(txtScen.Text))
+            lLongLocation = Trim(cboReach.Items.Item(cboReach.SelectedIndex))
+            lDashPosition = InStr(1, lLongLocation, "-")
+            lLocation = "RCH" & Trim(Mid(lLongLocation, 7, lDashPosition - 7))
             If cboPollutant.SelectedIndex > -1 Then
-                'con = Mid(Trim(cboPollutant.Items.Item(cboPollutant.SelectedIndex)), 1, 8)
-                con = cboPollutant.Items.Item(cboPollutant.SelectedIndex)
+                'lConstituent = Mid(Trim(cboPollutant.Items.Item(cboPollutant.SelectedIndex)), 1, 8)
+                lConstituent = cboPollutant.Items.Item(cboPollutant.SelectedIndex)
             Else
-                con = cboPollutant.Text
+                lConstituent = cboPollutant.Text
             End If
             If cboFac.SelectedIndex > -1 Then
-                stanam = cboFac.Items.Item(cboFac.SelectedIndex)
+                lStationName = cboFac.Items.Item(cboFac.SelectedIndex)
             Else
-                stanam = cboFac.Text
+                lStationName = cboFac.Text
             End If
-            con = UCase(con)
-            stanam = UCase(stanam)
-            tstype = Mid(con, 1, 4)
-            If con = "FLOW" Then
-                rload(1) = atxValue.Text
+            lConstituent = UCase(lConstituent)
+            lStationName = UCase(lStationName)
+            lTimeSeriesType = Mid(lConstituent, 1, 4)
+            If lConstituent = "FLOW" Then
+                lLoadValues(1) = atxValue.Text
             Else
-                rload(1) = atxValue.Text / 24.0#  'next call converts to daily
+                lLoadValues(1) = atxValue.Text / 24.0#  'next call converts to daily
             End If
-            pUCI.AddPointSourceDataSet(sen, loc, con, stanam, tstype, 0, jdates, rload, newwdmid, newdsn)
-            pfrmPoint.UpdateListsForNewPointSource(sen, stanam, loc, con, newwdmid, newdsn, "RCHRES", CInt(Mid(loc, 4)), longloc)
+            pUCI.AddPointSourceDataSet(lScenario, lLocation, lConstituent, lStationName, lTimeSeriesType, 0, lJDates, lLoadValues, lNewWdmId, lNewDsn)
+            pfrmPoint.UpdateListsForNewPointSource(lScenario, lStationName, lLocation, lConstituent, "WDM" & lNewWdmId, lNewDsn, "RCHRES", CInt(Mid(lLocation, 4)), lLongLocation)
         End If
-        If imready Then
+        If lReadyForCloseFlag Then
             Me.Dispose()
         End If
     End Sub

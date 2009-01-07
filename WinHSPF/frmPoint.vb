@@ -1014,68 +1014,68 @@ Public Class frmPoint
         LoadPollutantList(True)
     End Sub
 
-    Public Sub UpdateListsForNewPointSource(ByVal sen$, ByVal fac$, ByVal loc$, ByVal con$, ByVal WDMId$, ByVal dsn&, ByVal tarname$, ByVal tarid&, ByVal longloc$)
-        Dim S As String
-        Dim icnt&
-        Dim tempts As Collection
-        Dim k, lOper As Integer
+    Public Sub UpdateListsForNewPointSource(ByVal aScenario$, ByVal aFacility$, ByVal aLocation$, ByVal lConstituent$, ByVal aWDMId$, ByVal aDsn&, ByVal aTargetName$, ByVal aTargetID&, ByVal aLongLocation$)
+        Dim lFacScenString As String
+        Dim lCount As Integer
+        Dim lTempTimeSeries As Collection
+        Dim lOper1, lOper2 As Integer
         Dim lFoundFlag As Boolean
 
-        S = fac & " (" & Mid(sen, 4) & ")"
+        lFacScenString = aFacility & " (" & Mid(aScenario, 4) & ")"
 
         lFoundFlag = False
-        For lOper = 0 To lstPoints.Items.Count - 1
-            If lstPoints.Items.Item(lOper) = S Then
+        For lOper1 = 0 To lstPoints.Items.Count - 1
+            If lstPoints.Items.Item(lOper1) = lFacScenString Then
                 lFoundFlag = True
                 Exit For
             End If
         Next
 
-        If lFoundFlag = False Then lstPoints.Items.Add(S, False)
+        If lFoundFlag = False Then lstPoints.Items.Add(lFacScenString, False)
 
         With agdMasterPoint.Source
-            icnt = .Rows
-            .CellValue(icnt, 0) = "No"
-            .CellValue(icnt, 1) = sen
-            .CellValue(icnt, 2) = longloc
-            .CellValue(icnt, 3) = UCase(fac)
-            .CellValue(icnt, 4) = con
-            .CellValue(icnt, 5) = WDMId
-            .CellValue(icnt, 6) = dsn
-            .CellValue(icnt, 7) = tarname
-            .CellValue(icnt, 8) = tarid
-            .CellValue(icnt, 9) = "INFLOW"
+            lCount = .Rows
+            .CellValue(lCount, 0) = "No"
+            .CellValue(lCount, 1) = aScenario
+            .CellValue(lCount, 2) = aLongLocation
+            .CellValue(lCount, 3) = UCase(aFacility)
+            .CellValue(lCount, 4) = lConstituent
+            .CellValue(lCount, 5) = aWDMId
+            .CellValue(lCount, 6) = aDsn
+            .CellValue(lCount, 7) = aTargetName
+            .CellValue(lCount, 8) = aTargetID
+            .CellValue(lCount, 9) = "INFLOW"
 
-            tempts = pUCI.FindTimser(sen, loc, con)
+            lTempTimeSeries = pUCI.FindTimser(aScenario, aLocation, lConstituent)
 
-            If tempts.Count <> 0 Then
-                pTimeSeries.Add(tempts(tempts.Count))
+            If lTempTimeSeries.Count <> 0 Then
+                pTimeSeries.Add(lTempTimeSeries(lTempTimeSeries.Count))
             End If
 
-            .CellValue(icnt, 11) = pTimeSeries.Count 'save index to lts for list/graph
-            .CellValue(icnt, 14) = icnt 'save row number
+            .CellValue(lCount, 11) = pTimeSeries.Count 'save index to lts for list/graph
+            .CellValue(lCount, 14) = lCount 'save row number
             '.TextMatrix(icnt, 10) = "IVOL"
             '.TextMatrix(icnt, 12) = 0
             '.TextMatrix(icnt, 13) = 0
-            For k = 1 To pLinkCount
-                If pConsLinks(k - 1) = UCase(Trim(con)) Then
-                    .CellValue(icnt, 10) = MemberLongVersion(pMemberLinks(k - 1), pMSub1Links(k - 1), pMSub2Links(k - 1))
+            For lOper2 = 1 To pLinkCount
+                If pConsLinks(lOper2 - 1) = UCase(Trim(lConstituent)) Then
+                    .CellValue(lCount, 10) = MemberLongVersion(pMemberLinks(lOper2 - 1), pMSub1Links(lOper2 - 1), pMSub2Links(lOper2 - 1))
                     '.TextMatrix(icnt, 10) = MemberLinks(k - 1)
                     '.TextMatrix(icnt, 12) = MSub1Links(k - 1)
                     '.TextMatrix(icnt, 13) = MSub2Links(k - 1)
 
                     lFoundFlag = False
-                    For lOper = 0 To lstPoints.Items.Count - 1
-                        If lstPoints.Items.Item(lOper) = S Then
+                    For lOper1 = 0 To lstPoints.Items.Count - 1
+                        If lstPoints.Items.Item(lOper1) = lFacScenString Then
                             lFoundFlag = True
                             Exit For
                         End If
                     Next
 
-                    If lFoundFlag = True Then .CellValue(icnt, 0) = "Yes"
+                    If lFoundFlag = True Then .CellValue(lCount, 0) = "Yes"
 
                 End If
-            Next k
+            Next lOper2
 
         End With
     End Sub
@@ -1182,4 +1182,5 @@ Public Class frmPoint
         agdMasterPoint.Refresh()
         agdMasterPoint.SizeAllColumnsToContents()
     End Sub
+
 End Class
