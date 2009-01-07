@@ -2170,7 +2170,7 @@ x:
                                      ByVal aNdates As Integer, _
                                      ByVal aJdates() As Double, _
                                      ByVal aLoad() As Double, _
-                                     ByVal aWdmid As Integer, _
+                                     ByRef aWdmid As Integer, _
                                      ByRef aDsn As Integer)
         If aWdmid = 0 Then
             For lWdmIndex As Integer = 1 To 4
