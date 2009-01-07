@@ -2633,10 +2633,27 @@ x:
 
     Public Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
                                    ByRef aDataSources As Collection(Of atcData.atcTimeseriesSource), _
-                                   ByRef aStarterUci As String, _
+                                   ByRef aStarterUciName As String, _
                                    Optional ByRef aPollutantListFileName As String = "", _
                                    Optional ByRef aMetBaseDsn As Integer = 11, _
                                    Optional ByVal aMetWdmId As String = "WDM2")
+
+        'get starter uci ready for use defaulting parameters and mass links
+        Dim lDefUci As New HspfUci
+        lDefUci.FastReadUciForStarter(Me.Msg, aStarterUciName)
+
+        modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
+                                         lDefUci, _
+                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId)
+    End Sub
+
+    Public Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
+                                   ByRef aDataSources As Collection(Of atcData.atcTimeseriesSource), _
+                                   ByRef aStarterUci As HspfUci, _
+                                   Optional ByRef aPollutantListFileName As String = "", _
+                                   Optional ByRef aMetBaseDsn As Integer = 11, _
+                                   Optional ByVal aMetWdmId As String = "WDM2")
+
         modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
                                          aStarterUci, _
                                          aPollutantListFileName, aMetBaseDsn, aMetWdmId)
