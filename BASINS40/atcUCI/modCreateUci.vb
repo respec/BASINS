@@ -17,7 +17,7 @@ Module modCreateUci
     Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
                                    ByRef aUci As HspfUci, _
                                    ByRef aDataSources As Collection(Of atcTimeseriesSource), _
-                                   ByRef aStarterUciName As String, _
+                                   ByRef aStarterUci As HspfUci, _
                                    Optional ByRef aPollutantListFileName As String = "", _
                                    Optional ByRef aMetBaseDsn As Integer = 11, _
                                    Optional ByRef aMetWdmId As String = "WDM2")
@@ -61,21 +61,25 @@ Module modCreateUci
             lDsn = aWatershed.MetSegments(0).DataTypes("PREC").Dsn
         End If
         Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
-        Dim lSJDate As Double = lDataSet.Dates.Value(0)
-        Dim lEJDate As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
-        If Not aWatershed.MetSegments Is Nothing Then
-            'also check dates of PEVT dataset
-            lWdmId = aWatershed.MetSegments(0).DataTypes("PEVT").WdmID
-            lWdmIndex = lWdmId.Substring(3)
-            lDsn = aWatershed.MetSegments(0).DataTypes("PEVT").Dsn
-            lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
-            Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
-            Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
-            If lSJDate2 > lSJDate Then
-                lSJDate = lSJDate2
-            End If
-            If lEJDate2 < lEJDate Then
-                lEJDate = lEJDate2
+        Dim lSJDate As Double = 0
+        Dim lEJDate As Double = 0
+        If Not lDataSet Is Nothing Then
+            lSJDate = lDataSet.Dates.Value(0)
+            lEJDate = lDataSet.Dates.Value(lDataSet.numValues) - 1
+            If Not aWatershed.MetSegments Is Nothing Then
+                'also check dates of PEVT dataset
+                lWdmId = aWatershed.MetSegments(0).DataTypes("PEVT").WdmID
+                lWdmIndex = lWdmId.Substring(3)
+                lDsn = aWatershed.MetSegments(0).DataTypes("PEVT").Dsn
+                lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
+                Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
+                Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
+                If lSJDate2 > lSJDate Then
+                    lSJDate = lSJDate2
+                End If
+                If lEJDate2 < lEJDate Then
+                    lEJDate = lEJDate2
+                End If
             End If
         End If
 
@@ -146,13 +150,9 @@ Module modCreateUci
         CreateDefaultOutput(aUci)
         CreateBinaryOutput(aUci, aWatershed.Name)
 
-        'get starter uci ready for use defaulting parameters and mass links
-        Dim lDefUci As New HspfUci
-        lDefUci.FastReadUciForStarter(aUci.Msg, aStarterUciName)
-
         'set default parameter values and mass links from starter
-        SetDefault(aUci, lDefUci)
-        SetDefaultMassLink(aUci, lDefUci)
+        SetDefault(aUci, aStarterUci)
+        SetDefaultMassLink(aUci, aStarterUci)
 
         aUci.Edited = False 'all the reads set edited
     End Sub
@@ -619,10 +619,25 @@ Module modCreateUci
     Private Sub CreatePointSourceDSNs(ByRef aUci As HspfUci, _
                                       ByRef aPollutantListFileName As String)
 
+        Dim lPollutantListFileName As String = "poltnt_2.prn"
+        If aPollutantListFileName.Length = 0 Then
+            'location master pollutant list 
+            Dim lBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            Dim lPollutantListPath As String = lBinLoc.Substring(0, lBinLoc.Length - 3) & "models\hspf\bin\" & lPollutantListFileName
+            If Not FileExists(lPollutantListPath) Then
+                lPollutantListPath = "\basins\models\hspf\bin\" & lPollutantListFileName
+                If Not FileExists(lPollutantListPath) Then
+                    lPollutantListPath = FindFile("Please locate " & lPollutantListFileName, lPollutantListFileName)
+                End If
+            End If
+            lPollutantListFileName = lPollutantListPath
+        Else
+            lPollutantListFileName = aPollutantListFileName
+        End If
 
         Dim lMasterPollutantList As New Collection
         If aPollutantListFileName.Length > 0 Then
-            lMasterPollutantList = ReadPollutantList(aPollutantListFileName)
+            lMasterPollutantList = ReadPollutantList(lPollutantListFileName)
         Else
             lMasterPollutantList = Nothing
         End If
