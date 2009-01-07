@@ -269,7 +269,7 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub NewToolStripButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NewToolStripButton.Click
-        Logger.Msg("'New' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
+        NewUCI()
     End Sub
 
     Private Sub RunHSPFToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RunHSPFToolStripMenuItem.Click
