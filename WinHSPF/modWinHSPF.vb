@@ -1,7 +1,10 @@
 Imports MapWinUtility
+Imports atcData
+Imports atcSegmentation
 Imports atcUCI
 Imports atcUCIForms
 Imports atcUtility
+Imports System.Collections.ObjectModel
 
 Public Module WinHSPF
     Friend pUCI As HspfUci
@@ -105,6 +108,71 @@ Public Module WinHSPF
             pWinHSPF.SchematicDiagram.UCI = pUCI
         End If
         Logger.Dbg("WinHSPF:FastReadUci:Done:" & lUCIName)
+    End Sub
+
+    'Create a new uci file
+    Sub NewUCI()
+
+        CloseUCI()
+
+        'get name of wsd file
+        Dim lWatershedFileName As String = ""
+        Dim lOpenDialog As New OpenFileDialog
+        With lOpenDialog
+            .Title = "Locate BASINS Watershed File to open"
+            .Filter = "BASINS Watershed Files|*.wsd"
+            .FilterIndex = 1
+            .DefaultExt = ".wsd"
+            If .ShowDialog <> DialogResult.OK Then
+                Exit Sub
+            End If
+            lWatershedFileName = .FileName
+        End With
+
+        'get name of met wdm file
+        Dim lMetWDMFileName As String = ""
+        With lOpenDialog
+            .Title = "Locate Met WDM File to open"
+            .Filter = "Meteorologic WDM Files|*.wdm"
+            .FilterIndex = 1
+            .DefaultExt = ".wdm"
+            .FileName = ""
+            If .ShowDialog <> DialogResult.OK Then
+                Exit Sub
+            End If
+            lMetWDMFileName = .FileName
+        End With
+
+        'open project wdm
+        Dim lDataSources As New Collection(Of atcData.atcTimeseriesSource)
+        Dim lProjectDataSource As New atcWDM.atcDataSourceWDM
+        Dim lProjectWDMName As String = IO.Path.GetFileNameWithoutExtension(lWatershedFileName) & ".wdm"
+        lProjectDataSource.Open(lProjectWDMName)
+        lDataSources.Add(lProjectDataSource)
+
+        'open met wdm
+        Dim lMetDataSource As New atcWDM.atcDataSourceWDM
+        lMetDataSource.Open(lMetWDMFileName)
+        lDataSources.Add(lMetDataSource)
+
+        'build new UCI from BASINS files
+        Dim lUCIFileName As String = IO.Path.GetFileNameWithoutExtension(lWatershedFileName) & ".uci"
+        ChDriveDir(PathNameOnly(lWatershedFileName))
+        Dim lWatershedName As String = IO.Path.GetFileNameWithoutExtension(lUCIFileName)
+        Dim lWatershed As New Watershed
+        If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
+            pUCI = New HspfUci
+            pUCI.Msg = pMsg
+            pUCI.CreateUciFromBASINS(lWatershed, _
+                                     lDataSources, _
+                                     pDefUCI)
+            pUCI.Save()
+            If pWinHSPF IsNot Nothing Then
+                pWinHSPF.Text = pWinHSPF.Tag & ": " & pUCI.Name
+                pWinHSPF.SchematicDiagram.UCI = pUCI
+            End If
+        End If
+
     End Sub
 
     Sub SaveUCI()
@@ -290,39 +358,23 @@ Public Module WinHSPF
             End If
         End If
 
-        'pUCI.ClearAllOutputDsns()
-
-        'Dim lReturnCode As Integer
-        'pUCI.ReportMissingTimsers(lReturnCode)
-        'If lReturnCode = 0 Then
-
-        '    Dim lWinHSPFLtExe As String = atcUtility.FindFile("Please locate the WinHSPFLt Executable", "WinHSPFLt.exe")
-        '    If IO.File.Exists(lWinHSPFLtExe) Then
-        '        LaunchProgram(lWinHSPFLtExe, CurDir() & "\" & pUCI.Name, False)
-        '        Logger.Dbg("WinHSPFLt launched with input " & pUCI.Name)
-        '    Else
-        '        Logger.Msg("Cannot find the WinHSPFLt Executable", MsgBoxStyle.Critical, "WinHSPF Problem")
-        '        Exit Sub
-        '    End If
-
-        '    'Dim lErrorString As String = pUCI.ErrorDescription
-        '    'If Len(lErrorString) > 0 Then
-        '    '    If Logger.Msg(lErrorString & vbCrLf & vbCrLf & "Do you want to view the errors?", _
-        '    '                  MsgBoxStyle.YesNo, _
-        '    '                  "HSPF Problem") = MsgBoxResult.Ok Then
-        '    '    End If
-
-        '    '    'DispFile = New ATCoDispFile
-        '    '    'DispFile.FindString = "ERROR"
-        '    '    'DispFile.OpenFile(pUCI.EchoFileName, "WinHSPF Error View", Me.Icon, False)
-        '    '    'DispFile = Nothing
-        '    'End If
-
-        '    'have to reset wdms, may have changed pointers during simulate
-        '    'ClearWDM()
-        '    'InitWDMArray()
-        '    'SetWDMFiles()
-        'End If
+        'DisableAll(True)
+        pUCI.ClearAllOutputDsns()
+        Dim lRetcod As Integer
+        pUCI.RunUci(lRetcod)   'now activate and run
+        'If lRetcod = -99 Then StartHSPFEngine()
+        If pUCI.ErrorDescription.Trim.Length > 0 Then
+            If Logger.Msg(pUCI.ErrorDescription & vbCrLf & vbCrLf & _
+                          "Do you want to view the Echo file?", MsgBoxStyle.YesNo, _
+                          "HSPF Problem") = MsgBoxResult.Yes Then
+                Try
+                    Process.Start(pUCI.EchoFileName.Trim)
+                Catch
+                    Logger.Msg("No application is associated with the Echo file.  It may be opened in a text editor.", vbOKOnly, "HSPF Problem")
+                End Try
+            End If
+        End If
+        'DisableAll(False)
 
     End Sub
 
