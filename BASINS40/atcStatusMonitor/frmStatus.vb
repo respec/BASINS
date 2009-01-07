@@ -55,9 +55,9 @@ Public Class frmStatus
         '
         Me.Progress.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Progress.Location = New System.Drawing.Point(10, 83)
+        Me.Progress.Location = New System.Drawing.Point(8, 72)
         Me.Progress.Name = "Progress"
-        Me.Progress.Size = New System.Drawing.Size(493, 28)
+        Me.Progress.Size = New System.Drawing.Size(497, 24)
         Me.Progress.TabIndex = 0
         '
         'lblTop
@@ -65,31 +65,30 @@ Public Class frmStatus
         Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblTop.BackColor = System.Drawing.Color.Transparent
-        Me.lblTop.Location = New System.Drawing.Point(10, 9)
+        Me.lblTop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblTop.Location = New System.Drawing.Point(8, 8)
         Me.lblTop.Name = "lblTop"
-        Me.lblTop.Size = New System.Drawing.Size(493, 19)
+        Me.lblTop.Size = New System.Drawing.Size(497, 16)
         Me.lblTop.TabIndex = 1
         Me.lblTop.Text = "lblTop"
         '
         'txtLog
         '
-        Me.txtLog.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtLog.Location = New System.Drawing.Point(10, 210)
+        Me.txtLog.Location = New System.Drawing.Point(8, 182)
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtLog.Size = New System.Drawing.Size(493, 0)
+        Me.txtLog.Size = New System.Drawing.Size(497, 244)
         Me.txtLog.TabIndex = 2
         '
         'lblLeft
         '
         Me.lblLeft.AutoSize = True
         Me.lblLeft.BackColor = System.Drawing.Color.Transparent
-        Me.lblLeft.Location = New System.Drawing.Point(10, 46)
+        Me.lblLeft.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblLeft.Location = New System.Drawing.Point(8, 40)
         Me.lblLeft.Name = "lblLeft"
-        Me.lblLeft.Size = New System.Drawing.Size(46, 17)
+        Me.lblLeft.Size = New System.Drawing.Size(42, 13)
         Me.lblLeft.TabIndex = 3
         Me.lblLeft.Text = "lblLeft"
         '
@@ -98,9 +97,10 @@ Public Class frmStatus
         Me.lblMiddle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblMiddle.BackColor = System.Drawing.Color.Transparent
-        Me.lblMiddle.Location = New System.Drawing.Point(10, 46)
+        Me.lblMiddle.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblMiddle.Location = New System.Drawing.Point(8, 40)
         Me.lblMiddle.Name = "lblMiddle"
-        Me.lblMiddle.Size = New System.Drawing.Size(493, 19)
+        Me.lblMiddle.Size = New System.Drawing.Size(497, 16)
         Me.lblMiddle.TabIndex = 4
         Me.lblMiddle.Text = "lblMiddle"
         Me.lblMiddle.TextAlign = System.Drawing.ContentAlignment.TopCenter
@@ -110,9 +110,10 @@ Public Class frmStatus
         Me.lblRight.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblRight.AutoSize = True
         Me.lblRight.BackColor = System.Drawing.Color.Transparent
-        Me.lblRight.Location = New System.Drawing.Point(447, 46)
+        Me.lblRight.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblRight.Location = New System.Drawing.Point(458, 40)
         Me.lblRight.Name = "lblRight"
-        Me.lblRight.Size = New System.Drawing.Size(55, 17)
+        Me.lblRight.Size = New System.Drawing.Size(50, 13)
         Me.lblRight.TabIndex = 5
         Me.lblRight.Text = "lblRight"
         Me.lblRight.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -122,26 +123,28 @@ Public Class frmStatus
         Me.lblBottom.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblBottom.BackColor = System.Drawing.Color.Transparent
-        Me.lblBottom.Location = New System.Drawing.Point(10, 129)
+        Me.lblBottom.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblBottom.Location = New System.Drawing.Point(8, 112)
         Me.lblBottom.Name = "lblBottom"
-        Me.lblBottom.Size = New System.Drawing.Size(493, 19)
+        Me.lblBottom.Size = New System.Drawing.Size(497, 16)
         Me.lblBottom.TabIndex = 6
         Me.lblBottom.Text = "lblBottom"
         Me.lblBottom.TextAlign = System.Drawing.ContentAlignment.TopCenter
         '
         'btnCancel
         '
-        Me.btnCancel.Location = New System.Drawing.Point(13, 151)
+        Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnCancel.Location = New System.Drawing.Point(11, 131)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(78, 30)
+        Me.btnCancel.Size = New System.Drawing.Size(65, 26)
         Me.btnCancel.TabIndex = 7
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
         'frmStatus
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(514, 198)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(514, 438)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.lblBottom)
         Me.Controls.Add(Me.lblRight)
@@ -182,7 +185,7 @@ Public Class frmStatus
                 Case 1 : lblTop.Text = aNewValue
                 Case 2 : lblLeft.Text = aNewValue
                 Case 3 : lblMiddle.Text = aNewValue
-                Case 4 : lblRight.Text = aNewValue
+                Case 4 : lblRight.Text = aNewValue : lblRight.Left = Me.ClientRectangle.Width - lblRight.Width - lblLeft.Left
                 Case 5 : lblBottom.Text = aNewValue
             End Select
         End Set
@@ -219,5 +222,19 @@ Public Class frmStatus
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         Console.WriteLine("Cancel")
+    End Sub
+
+    Private Sub frmStatus_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        Try
+            lblRight.Left = Me.ClientRectangle.Width - lblRight.Width - lblLeft.Left
+            If Me.Height > txtLog.Top + txtLog.Left * 3 Then
+                txtLog.Width = Me.ClientRectangle.Width - txtLog.Left * 2
+                txtLog.Height = Me.ClientRectangle.Height - txtLog.Top - txtLog.Left
+                txtLog.Visible = True
+            Else
+                txtLog.Visible = False
+            End If
+        Catch
+        End Try
     End Sub
 End Class
