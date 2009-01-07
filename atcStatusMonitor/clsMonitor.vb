@@ -166,17 +166,48 @@ Public Class clsMonitor
                     'End If
                     'If pfrmStatus.Progress.Visible Then
                     With pfrmStatus
-                        .Label(2) = "0"
-                        .Label(4) = pProgressFinal
                         .Progress.Maximum = pProgressFinal
                         .Progress.Value = pProgressCurrent
                         .Progress.Visible = True
                         .Progress.Refresh()
-                        If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(3).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
-                            .Label(3) = pProgressCurrent & " of " & pProgressFinal
+                        If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
+                            .Label(2) = "0"
+                            .Label(4) = pProgressFinal
                         End If
+
+                        If pLabelLogged(3).Length = 0 Then
+                            If pProgressFinal = 100 Then
+                                .Label(3) = ""
+                            Else
+                                .Label(3) = pProgressCurrent & " of " & pProgressFinal
+                            End If
+                        End If
+
                         If pLabelLogged(5).Length = 0 Then
-                            .Label(5) = CInt(pProgressCurrent * 1000 / pProgressFinal) / 10 & "%"
+                            Dim lElapsedDays As Double = Date.Now.ToOADate - pProgressStartTime
+                            'If elapsed time is short, skip estimating time remaining
+                            If lElapsedDays * 86400 < 10 Then '86400 seconds per day
+                                .Label(5) = CInt(pProgressCurrent * 100 / pProgressFinal) & "%"
+                            Else
+                                Dim lEstimateTotalTime As Double = lElapsedDays * pProgressFinal / pProgressCurrent
+                                Dim lEstimateLeft As Double = (lEstimateTotalTime - lElapsedDays)
+                                If lEstimateLeft * 1440 < 1 Then 'Less than one minute
+                                    .Label(5) = CInt(pProgressCurrent * 100 / pProgressFinal) & "%" _
+                                              & " (" & Format(lEstimateLeft * 86400, "0") & " seconds remaining)"
+                                ElseIf lEstimateLeft * 24 < 1 Then 'Less than one hour
+                                    Dim lMinutes As Integer = Math.Floor(lEstimateLeft * 1440)
+                                    .Label(5) = CInt(pProgressCurrent * 1000 / pProgressFinal) / 10 & "%" _
+                                              & " (" & lMinutes & ":" & Format((lEstimateLeft - lMinutes / 1440.0) * 86400, "00") & " remaining)"
+                                ElseIf lEstimateLeft < 1 Then
+                                    Dim lEstimate As Date = Date.FromOADate(pProgressStartTime + lEstimateTotalTime)
+                                    .Label(5) = CInt(pProgressCurrent * 10000 / pProgressFinal) / 100 & "%" _
+                                              & " (complete at " & lEstimate.ToShortTimeString & ")"
+                                Else
+                                    Dim lEstimate As Date = Date.FromOADate(pProgressStartTime + lEstimateTotalTime)
+                                    .Label(5) = CInt(pProgressCurrent * 100000 / pProgressFinal) / 1000 & "%" _
+                                              & " (complete on " & lEstimate.ToShortDateString & " at " & lEstimate.ToShortTimeString & ")"
+                                End If
+                            End If
                         End If
                     End With
                     'End If
@@ -391,14 +422,20 @@ Public Class clsMonitor
                     End If
                     pLabelNeedsUpdate = True
                 Case "PROGRESS"
-                    'Console.WriteLine("Progress " & aInputLine)
+                    If lWords.Length = 2 AndAlso IsNumeric(lWords(1)) Then
+                        'Interpret legacy "PROGRESS 10" like new "PROGRESS 10 of 100"
+                        pProgressCurrent = CInt(lWords(1))
+                        'If pProgressCurrent >= 0 AndAlso pProgressCurrent <= 100 Then
+                        pProgressFinal = 100
+                        GoTo FoundProgress
+                        'End If
+                    End If
                     If lWords.Length > 3 AndAlso IsNumeric(lWords(lWords.Length - 3)) AndAlso lWords(lWords.Length - 2).Equals("of") AndAlso IsNumeric(lWords(lWords.Length - 1)) Then
                         pProgressCurrent = CInt(lWords(lWords.Length - 3))
                         pProgressFinal = CInt(lWords(lWords.Length - 1))
-                        'ProgressPercent = lCurrent * 100 / lFinal
+FoundProgress:
                         If pProgressCurrent >= pProgressFinal Then
                             pProgressStartTime = Double.NaN
-                            'ProgressPercent = 100
                         ElseIf Double.IsNaN(pProgressStartTime) Then
                             pProgressStartTime = Now.ToOADate
                         End If
@@ -428,8 +465,7 @@ Public Class clsMonitor
     Private Shared Sub ClearLabels()
         For lLabelIndex As Integer = 0 To frmStatus.LastLabel
             pLabelText(lLabelIndex) = ""
-            'pLabelLast(lLabelIndex) = ""
-            'pLabelLogged(lLabelIndex) = ""
+            pLabelLogged(lLabelIndex) = ""
         Next
         pLabelNeedsUpdate = True
     End Sub
