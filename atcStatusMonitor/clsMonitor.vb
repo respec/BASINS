@@ -387,7 +387,7 @@ Public Class clsMonitor
                     If lLabelIndex >= 0 And lLabelIndex <= frmStatus.LastLabel Then
                         pLabelText(lLabelIndex) = lAfterFirstWord.Substring(lWords(1).Length + 2)
                     Else 'could not find valid label index, just put it all in top label
-                        pLabelText(1) = lAfterFirstWord
+                        pLabelText(1) = lAfterFirstWord.Trim
                     End If
                     pLabelNeedsUpdate = True
                 Case "PROGRESS"
@@ -428,9 +428,10 @@ Public Class clsMonitor
     Private Shared Sub ClearLabels()
         For lLabelIndex As Integer = 0 To frmStatus.LastLabel
             pLabelText(lLabelIndex) = ""
-            pLabelLast(lLabelIndex) = ""
-            pLabelLogged(lLabelIndex) = ""
+            'pLabelLast(lLabelIndex) = ""
+            'pLabelLogged(lLabelIndex) = ""
         Next
+        pLabelNeedsUpdate = True
     End Sub
 
     Private Shared Sub pWindowTimer_Elapsed(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles pWindowTimer.Elapsed
