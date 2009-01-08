@@ -92,7 +92,7 @@ Public Class frmXSect
                         'Advance one line and read
                         lLineString = sr.ReadLine()
                     Loop Until lLineString Is Nothing
-                    '    sr.Close()
+                    sr.Close()
                 End Using
 
                 cboXFile.Enabled = True
@@ -103,6 +103,7 @@ Public Class frmXSect
                 RefreshXFiles(0)
                 pPrevSelectedId = 0
                 cboXFile.SelectedIndex = 0
+
             Catch Ex As Exception
                 Logger.Msg("Error Opening File", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "Open Cross Section FTABLE Error")
             End Try
