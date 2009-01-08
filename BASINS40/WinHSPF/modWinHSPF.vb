@@ -146,7 +146,7 @@ Public Module WinHSPF
         'open project wdm
         Dim lDataSources As New Collection(Of atcData.atcTimeseriesSource)
         Dim lProjectDataSource As New atcWDM.atcDataSourceWDM
-        Dim lProjectWDMName As String = IO.Path.GetFileNameWithoutExtension(lWatershedFileName) & ".wdm"
+        Dim lProjectWDMName As String = PathNameOnly(lWatershedFileName) & "\" & IO.Path.GetFileNameWithoutExtension(lWatershedFileName) & ".wdm"
         lProjectDataSource.Open(lProjectWDMName)
         lDataSources.Add(lProjectDataSource)
 
