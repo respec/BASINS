@@ -388,16 +388,17 @@ Module modCreateUci
                                  ByRef aScenario As String, _
                                  ByRef aDataSources As Collection(Of atcData.atcTimeseriesSource))
 
-        Dim lFile As New HspfFile
         aUci.FilesBlock.Clear()
         aUci.FilesBlock.Uci = aUci
 
+        Dim lFile As New HspfFile
         lFile.Comment = "<FILE>  <UN#>***<----FILE NAME------------------------------------------------->"
         lFile.Name = aScenario & ".ech"
         lFile.Typ = "MESSU"
         lFile.Unit = 24
         aUci.FilesBlock.Add(lFile)
 
+        lFile = New HspfFile
         lFile.Comment = ""
         lFile.Name = aScenario & ".out"
         lFile.Typ = " "
@@ -406,6 +407,7 @@ Module modCreateUci
 
         Dim lOutput As atcTimeseriesSource = aDataSources(0)
         If lOutput.Name.Length > 0 Then
+            lFile = New HspfFile
             lFile.Name = RelativeFilename(lOutput.Specification, CurDir)
             lFile.Typ = lOutput.Name.Substring(lOutput.Name.LastIndexOf(":") + 1) & 1
             lFile.Unit = 25
@@ -414,6 +416,7 @@ Module modCreateUci
 
         For lWdmIndex As Integer = 1 To aDataSources.Count - 1
             If Not aDataSources(lWdmIndex) Is Nothing AndAlso aDataSources(lWdmIndex).Name.Length > 0 Then
+                lFile = New HspfFile
                 lFile.Name = RelativeFilename(aDataSources(lWdmIndex).Specification, CurDir)
                 With aDataSources(lWdmIndex)
                     lFile.Typ = .Name.Substring(.Name.LastIndexOf(":") + 1) & lWdmIndex + 1
