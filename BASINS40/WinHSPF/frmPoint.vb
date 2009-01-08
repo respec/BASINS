@@ -153,7 +153,7 @@ Public Class frmPoint
 
                 If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
                     lPollutantFileName = OpenFileDialog1.FileName
-                ElseIf OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.Cancel Then
+                Else
                     Exit Try
                 End If
             End If
@@ -1176,11 +1176,6 @@ Public Class frmPoint
 
         'Me.Cursor = Cursors.Default
 
-    End Sub
-
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        agdMasterPoint.Refresh()
-        agdMasterPoint.SizeAllColumnsToContents()
     End Sub
 
 End Class
