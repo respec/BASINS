@@ -1667,7 +1667,7 @@ Public Class frmSWMMSetup
 
         'see if this file already exists
         If FileExists(aOutputFileName) Then  'already exists
-            If Logger.Msg("SWMM Project '" & FilenameNoPath(aOutputFileName) & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
+            If Logger.Msg("SWMM Project '" & FilenameNoPath(aOutputFileName) & "' already exists.  Do you want to overwrite it?", MsgBoxStyle.YesNo, "Overwrite?") = MsgBoxResult.No Then
                 EnableControls(True)
                 Return False
             End If
