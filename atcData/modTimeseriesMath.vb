@@ -911,11 +911,28 @@ Public Module modTimeseriesMath
         End If
     End Function
 
-    Public Sub ComputeRanks(ByVal aTimeseries As atcTimeseries, ByVal aLowToHigh As Boolean)
+    ''' <summary>
+    ''' Assign integers from one to the number of non-missing values to the Rank value attributes
+    ''' </summary>
+    ''' <param name="aTimeseries">Values to compute ranks of</param>
+    ''' <param name="aLowToHigh">If True, lowest value gets rank of 1, if False, highest value gets rank of 1</param>
+    ''' <param name="aAllowTies">
+    ''' If True, identical values get the same rank and next rank is not assigned, ex: (5, 5, 9, 7) get ranks (1, 1, 4, 3)
+    ''' If False and aLowToHigh is False, earlier value gets lower rank (5, 5, 9, 7) get ranks (1, 2, 4, 3) 
+    ''' If False and aLowToHigh is True, later value gets lower rank (5, 5, 9, 7) get ranks (2, 1, 4, 3) 
+    ''' </param>
+    ''' <remarks></remarks>
+    Public Sub ComputeRanks(ByVal aTimeseries As atcTimeseries, _
+                            ByVal aLowToHigh As Boolean, _
+                            ByVal aAllowTies As Boolean)
+        Dim lNaN As Double = GetNaN()
         Dim lValue As Double
         Dim lValuesSorted As New Generic.List(Of Double)
+        Dim lFirstValue As Boolean = True
         For Each lValue In aTimeseries.Values
-            If Not Double.IsNaN(lValue) Then
+            If lFirstValue Then
+                lFirstValue = False
+            ElseIf Not Double.IsNaN(lValue) Then
                 lValuesSorted.Add(lValue)
             End If
         Next
@@ -925,11 +942,35 @@ Public Module modTimeseriesMath
         For lIndex As Integer = 1 To lLastIndex
             lValue = aTimeseries.Value(lIndex)
             If Not Double.IsNaN(lValue) Then
-                lRank = lValuesSorted.BinarySearch(lValue)
-                If Not aLowToHigh Then
-                    lRank = lLastIndex - lRank + 1
+                If aLowToHigh Then
+                    ' 1 = lowest value
+                    For lRank = 1 To lValuesSorted.Count
+                        If lValuesSorted(lRank - 1) >= lValue Then
+                            If Not aAllowTies Then
+                                lValuesSorted(lRank - 1) = lNaN
+                            End If
+                            aTimeseries.ValueAttributes(lIndex).SetValue("Rank", lRank)
+                            Exit For
+                        End If
+                    Next
+                Else 'High to Low, 1 = highest value
+                    If aAllowTies Then
+                        For lRank = 1 To lValuesSorted.Count
+                            If lValuesSorted(lValuesSorted.Count - lRank) <= lValue Then
+                                aTimeseries.ValueAttributes(lIndex).SetValue("Rank", lRank)
+                                Exit For
+                            End If
+                        Next
+                    Else 'Give earlier value higher rank in a tie by stepping backward through ranks
+                        For lRank = lValuesSorted.Count To 1 Step -1
+                            If lValuesSorted(lValuesSorted.Count - lRank) >= lValue Then
+                                lValuesSorted(lValuesSorted.Count - lRank) = lNaN
+                                aTimeseries.ValueAttributes(lIndex).SetValue("Rank", lRank)
+                                Exit For
+                            End If
+                        Next
+                    End If
                 End If
-                aTimeseries.ValueAttributes(lIndex).SetValue("Rank", lRank)
             End If
         Next
     End Sub

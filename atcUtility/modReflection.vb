@@ -619,57 +619,63 @@ Public Module modReflection
     Public Function SetSomething(ByRef aObject As Object, ByVal aFieldName As String, ByVal aValue As Object, _
                                  ByVal aLogProblems As Boolean) As String
         Dim lSetSomething As String = ""
-        Dim lType As Type = aObject.GetType
-        Dim lProperty As Reflection.PropertyInfo = lType.GetProperty(aFieldName)
-        If lProperty IsNot Nothing Then
-            Select Case Type.GetTypeCode(lProperty.PropertyType)
-                Case TypeCode.Boolean : lProperty.SetValue(aObject, CBool(aValue), Nothing)
-                Case TypeCode.Byte : lProperty.SetValue(aObject, CByte(aValue), Nothing)
-                Case TypeCode.Char : lProperty.SetValue(aObject, CChar(aValue), Nothing)
-                Case TypeCode.DateTime : lProperty.SetValue(aObject, CDate(aValue), Nothing)
-                Case TypeCode.Decimal : lProperty.SetValue(aObject, CDec(aValue), Nothing)
-                Case TypeCode.Double : lProperty.SetValue(aObject, CDbl(aValue), Nothing)
-                Case TypeCode.Int16 : lProperty.SetValue(aObject, CShort(aValue), Nothing)
-                Case TypeCode.Int32 : lProperty.SetValue(aObject, CInt(aValue), Nothing)
-                Case TypeCode.Int64 : lProperty.SetValue(aObject, CLng(aValue), Nothing)
-                Case TypeCode.SByte : lProperty.SetValue(aObject, CSByte(aValue), Nothing)
-                Case TypeCode.Single : lProperty.SetValue(aObject, CSng(aValue), Nothing)
-                Case TypeCode.String : lProperty.SetValue(aObject, CStr(aValue), Nothing)
-                Case TypeCode.UInt16 : lProperty.SetValue(aObject, CUShort(aValue), Nothing)
-                Case TypeCode.UInt32 : lProperty.SetValue(aObject, CUInt(aValue), Nothing)
-                Case TypeCode.UInt64 : lProperty.SetValue(aObject, CULng(aValue), Nothing)
-                Case Else
-                    lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lProperty.PropertyType.Name
-            End Select
-        Else
-            Dim lField As Reflection.FieldInfo = lType.GetField(aFieldName)
-            If lField IsNot Nothing Then
-                Select Case Type.GetTypeCode(lField.FieldType)
-                    Case TypeCode.Boolean : lField.SetValue(aObject, CBool(aValue))
-                    Case TypeCode.Byte : lField.SetValue(aObject, CByte(aValue))
-                    Case TypeCode.Char : lField.SetValue(aObject, CChar(aValue))
-                    Case TypeCode.DateTime : lField.SetValue(aObject, CDate(aValue))
-                    Case TypeCode.Decimal : lField.SetValue(aObject, CDec(aValue))
-                    Case TypeCode.Double : lField.SetValue(aObject, CDbl(aValue))
-                    Case TypeCode.Int16 : lField.SetValue(aObject, CShort(aValue))
-                    Case TypeCode.Int32 : lField.SetValue(aObject, CInt(aValue))
-                    Case TypeCode.Int64 : lField.SetValue(aObject, CLng(aValue))
-                    Case TypeCode.SByte : lField.SetValue(aObject, CSByte(aValue))
-                    Case TypeCode.Single : lField.SetValue(aObject, CSng(aValue))
-                    Case TypeCode.String : lField.SetValue(aObject, CStr(aValue))
-                    Case TypeCode.UInt16 : lField.SetValue(aObject, CUShort(aValue))
-                    Case TypeCode.UInt32 : lField.SetValue(aObject, CUInt(aValue))
-                    Case TypeCode.UInt64 : lField.SetValue(aObject, CULng(aValue))
+        Try
+            Dim lType As Type = aObject.GetType
+            Dim lProperty As Reflection.PropertyInfo = lType.GetProperty(aFieldName)
+            If lProperty IsNot Nothing Then
+                Select Case Type.GetTypeCode(lProperty.PropertyType)
+                    Case TypeCode.Boolean : lProperty.SetValue(aObject, CBool(aValue), Nothing)
+                    Case TypeCode.Byte : lProperty.SetValue(aObject, CByte(aValue), Nothing)
+                    Case TypeCode.Char : lProperty.SetValue(aObject, CChar(aValue), Nothing)
+                    Case TypeCode.DateTime : lProperty.SetValue(aObject, CDate(aValue), Nothing)
+                    Case TypeCode.Decimal : lProperty.SetValue(aObject, CDec(aValue), Nothing)
+                    Case TypeCode.Double : lProperty.SetValue(aObject, CDbl(aValue), Nothing)
+                    Case TypeCode.Int16 : lProperty.SetValue(aObject, CShort(aValue), Nothing)
+                    Case TypeCode.Int32 : lProperty.SetValue(aObject, CInt(aValue), Nothing)
+                    Case TypeCode.Int64 : lProperty.SetValue(aObject, CLng(aValue), Nothing)
+                    Case TypeCode.SByte : lProperty.SetValue(aObject, CSByte(aValue), Nothing)
+                    Case TypeCode.Single : lProperty.SetValue(aObject, CSng(aValue), Nothing)
+                    Case TypeCode.String : lProperty.SetValue(aObject, CStr(aValue), Nothing)
+                    Case TypeCode.UInt16 : lProperty.SetValue(aObject, CUShort(aValue), Nothing)
+                    Case TypeCode.UInt32 : lProperty.SetValue(aObject, CUInt(aValue), Nothing)
+                    Case TypeCode.UInt64 : lProperty.SetValue(aObject, CULng(aValue), Nothing)
                     Case Else
-                        lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lField.FieldType.Name
+                        lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lProperty.PropertyType.Name
                 End Select
             Else
-                lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown field or property"
+                Dim lField As Reflection.FieldInfo = lType.GetField(aFieldName)
+                If lField IsNot Nothing Then
+                    Select Case Type.GetTypeCode(lField.FieldType)
+                        Case TypeCode.Boolean : lField.SetValue(aObject, CBool(aValue))
+                        Case TypeCode.Byte : lField.SetValue(aObject, CByte(aValue))
+                        Case TypeCode.Char : lField.SetValue(aObject, CChar(aValue))
+                        Case TypeCode.DateTime : lField.SetValue(aObject, CDate(aValue))
+                        Case TypeCode.Decimal : lField.SetValue(aObject, CDec(aValue))
+                        Case TypeCode.Double : lField.SetValue(aObject, CDbl(aValue))
+                        Case TypeCode.Int16 : lField.SetValue(aObject, CShort(aValue))
+                        Case TypeCode.Int32 : lField.SetValue(aObject, CInt(aValue))
+                        Case TypeCode.Int64 : lField.SetValue(aObject, CLng(aValue))
+                        Case TypeCode.SByte : lField.SetValue(aObject, CSByte(aValue))
+                        Case TypeCode.Single : lField.SetValue(aObject, CSng(aValue))
+                        Case TypeCode.String : lField.SetValue(aObject, CStr(aValue))
+                        Case TypeCode.UInt16 : lField.SetValue(aObject, CUShort(aValue))
+                        Case TypeCode.UInt32 : lField.SetValue(aObject, CUInt(aValue))
+                        Case TypeCode.UInt64 : lField.SetValue(aObject, CULng(aValue))
+                        Case Else
+                            lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown type " & lField.FieldType.Name
+                    End Select
+                Else
+                    lSetSomething = "Unable to set " & lType.Name & "." & aFieldName & ": unknown field or property"
+                End If
             End If
-        End If
-        If aLogProblems AndAlso lSetSomething.Length > 0 Then
-            Logger.Dbg(lSetSomething)
-        End If
+            If aLogProblems AndAlso lSetSomething.Length > 0 Then
+                Logger.Dbg(lSetSomething)
+            End If
+        Catch e As Exception
+            If aLogProblems Then
+                Logger.Dbg("Exception setting field " & aFieldName & ": " & e.Message)
+            End If
+        End Try
         Return lSetSomething
     End Function
 

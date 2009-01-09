@@ -53,8 +53,6 @@ Public Class frmStatus
         '
         'Progress
         '
-        Me.Progress.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Progress.Location = New System.Drawing.Point(8, 72)
         Me.Progress.Name = "Progress"
         Me.Progress.Size = New System.Drawing.Size(497, 24)
@@ -62,13 +60,12 @@ Public Class frmStatus
         '
         'lblTop
         '
-        Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblTop.AutoSize = True
         Me.lblTop.BackColor = System.Drawing.Color.Transparent
         Me.lblTop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblTop.Location = New System.Drawing.Point(8, 8)
         Me.lblTop.Name = "lblTop"
-        Me.lblTop.Size = New System.Drawing.Size(497, 16)
+        Me.lblTop.Size = New System.Drawing.Size(42, 13)
         Me.lblTop.TabIndex = 1
         Me.lblTop.Text = "lblTop"
         '
@@ -94,8 +91,6 @@ Public Class frmStatus
         '
         'lblMiddle
         '
-        Me.lblMiddle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblMiddle.BackColor = System.Drawing.Color.Transparent
         Me.lblMiddle.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblMiddle.Location = New System.Drawing.Point(8, 40)
@@ -199,25 +194,11 @@ Public Class frmStatus
         Progress.Visible = False
     End Sub
 
-    'Private Sub frmStatus_VisibleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.VisibleChanged
-    '  If Not Me.Visible Then
-    '    MsgBox(New StackTrace(True).ToString, , "frmStatus_VisibleChanged = " & Me.Visible)
-    '  End If
-    'End Sub
-
-    'Private Sub frmStatus_StyleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.StyleChanged
-    '  MsgBox(New StackTrace(True).ToString, , "frmStatus_StyleChanged")
-    'End Sub
-
-    'Private Sub frmStatus_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Disposed
-    '  MsgBox(New StackTrace(True).ToString, , "frmStatus_Disposed")
-    'End Sub
-
     Private Sub frmStatus_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
         If Not Exiting Then
             e.Cancel = True
-            Me.Visible = False
         End If
+        Me.Visible = False
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
@@ -228,7 +209,10 @@ Public Class frmStatus
         Try
             lblRight.Left = Me.ClientRectangle.Width - lblRight.Width - lblLeft.Left
             If Me.Height > txtLog.Top + txtLog.Left * 3 Then
-                txtLog.Width = Me.ClientRectangle.Width - txtLog.Left * 2
+                Dim lControlWidth As Integer = Me.ClientRectangle.Width - Progress.Left * 2
+                lblMiddle.Width = lControlWidth
+                Progress.Width = lControlWidth
+                txtLog.Width = lControlWidth
                 txtLog.Height = Me.ClientRectangle.Height - txtLog.Top - txtLog.Left
                 txtLog.Visible = True
             Else

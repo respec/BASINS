@@ -136,8 +136,8 @@ Public Module modBasinsPlugin
             g_Toolbar.PressToolbarButton("tbbSelect")
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
-            pBuildFrm.Top = GetSetting("BASINS4", "Window Positions", "BuildTop", "300")
-            pBuildFrm.Left = GetSetting("BASINS4", "Window Positions", "BuildLeft", "0")
+            pBuildFrm.Top = GetSetting(g_AppName, "Window Positions", "BuildTop", "300")
+            pBuildFrm.Left = GetSetting(g_AppName, "Window Positions", "BuildLeft", "0")
             UpdateSelectedFeatures()
         Else
             Logger.Msg("Unable to open national project", "Open National")

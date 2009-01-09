@@ -1110,7 +1110,7 @@ Friend Class frmSWSTAT
                     End With
                     lList.Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
                     For Each lDataset As atcTimeseries In lHiLow.DataSets
-                        ComputeRanks(lDataset, Not radioHigh.Checked)
+                        ComputeRanks(lDataset, Not radioHigh.Checked, False)
                     Next
                     lList.Initialize(lHiLow.DataSets.Clone, pNDayAttributes, True, , )
                     lList.DisplayValueAttributes = True
@@ -1297,10 +1297,10 @@ Friend Class frmSWSTAT
         Dim lArgs As New atcDataAttributes
         'Dim lOperation As String
 
-        Dim lselectedData As atcTimeseriesGroup = SelectedData()
+        Dim lSelectedData As atcTimeseriesGroup = SelectedData()
 
-        If lselectedData.Count > 0 Then
-            lArgs.Add("Timeseries", lselectedData)
+        If lSelectedData.Count > 0 Then
+            lArgs.Add("Timeseries", lSelectedData)
 
             If lstNday.SelectedIndices.Count > 0 Then
                 lArgs.SetValue("NDay", ListToArray(lstNday))
