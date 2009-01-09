@@ -153,8 +153,13 @@ Public Class SWMMProject
 
         '[TIMESERIES]
         lSW.WriteLine(MetConstituents.TimeSeriesHeaderToString)
-        MetConstituents.TimeSeriesToStream(lSW)
-        'MetConstituents.TimeSeriesToFile()
+        If EJDate - SJDate < 30 Then
+            MetConstituents.TimeSeriesToStream(lSW)
+        Else
+            'more than 30 days, write to file
+            lSW.WriteLine(MetConstituents.TimeSeriesFileNamesToString)
+            MetConstituents.TimeSeriesToFile()
+        End If
         lSW.WriteLine()
 
         '[REPORT]
@@ -205,26 +210,20 @@ Public Class SWMMProject
         End If
         Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
         Dim lSB As New StringBuilder
-        For lIndex As Integer = lStartIndex To lEndIndex
-            If aTimeSeries.Values(lIndex) > 0 Then
-                lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
-                lSB.Append(" ")
-                Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
-                Dim lDate(6) As Integer
-                J2Date(lJDate, lDate)
-                lSB.Append(StrPad(lDate(0), 10, " ", False))
-                lSB.Append(" ")
-                lSB.Append(StrPad(lDate(1), 10, " ", False))
-                lSB.Append(" ")
-                lSB.Append(StrPad(lDate(2), 10, " ", False))
-                lSB.Append(" ")
-                lSB.Append(StrPad(lDate(3), 10, " ", False))
-                lSB.Append(" ")
-                lSB.Append(StrPad(lDate(4), 10, " ", False))
-                lSB.Append(" ")
-                lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex), "0.000"), 10, " ", False))
-                lSB.Append(vbCrLf)
-            End If
+        For lIndex As Integer = lStartIndex To lEndIndex - 1
+            lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
+            lSB.Append(" ")
+            Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
+            Dim lDate(6) As Integer
+            J2Date(lJDate, lDate)
+            Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+            Dim lTimeString As String = lDate(3).ToString.PadLeft(2, "0") & ":" & lDate(4).ToString.PadLeft(2, "0")
+            lSB.Append(StrPad(lDateString, 10, " ", False))
+            lSB.Append(" ")
+            lSB.Append(StrPad(lTimeString, 10, " ", False))
+            lSB.Append(" ")
+            lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
+            lSB.Append(vbCrLf)
         Next
 
         Return lSB.ToString
