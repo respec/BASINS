@@ -94,23 +94,26 @@ Public Class frmImportPoint
     End Sub
 
     Private Sub cmdFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFile.Click
-        OpenFileDialog1.ShowDialog()
+        Dim lFileName As String = Nothing
 
         'Dim i&, s$, f$, fun&, wid$
         'Dim tmetseg, ret&
 
         Try
-            If FileExists(PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\modelout", True, False) Then
-                ChDriveDir(PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\modelout")
-            End If
-
-            OpenFileDialog1.Filter = "MUTSIN Files in BASINS 2 Format(*.mut)"
+            OpenFileDialog1.InitialDirectory = System.Reflection.Assembly.GetEntryAssembly.Location
+            OpenFileDialog1.Filter = "MUTSIN Files in BASINS 2 Format(*.mut)|*.mut"
             OpenFileDialog1.FileName = "*.mut"
             OpenFileDialog1.Title = "Select MUTSIN File"
 
+            If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                lFileName = OpenFileDialog1.FileName
+            Else
+                Exit Try
+            End If
+
             lblFile.Text = OpenFileDialog1.FileName
             'read mustin file
-            'Call ReadMutsin(lblFile.Text, facilityname, retcod, nconstits, consnames, ndates, jdates, rloads)
+            Call ReadMutsin(lFileName, facilityname, retcod, nconstits, consnames, ndates, jdates, rloads)
             cboFac.Text = facilityname
 
         Catch ex As Exception
@@ -192,7 +195,7 @@ Public Class frmImportPoint
             End Using
             Exit Sub
         Catch Ex As Exception
-            Logger.Msg("Error Opening File", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "Convert Problem")
+            Logger.Message("Error Opening File", "Import Problem", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
             ret = 1
         End Try
 
