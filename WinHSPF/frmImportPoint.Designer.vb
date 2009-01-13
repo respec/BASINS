@@ -70,6 +70,7 @@ Partial Class frmImportPoint
         '
         'cboFac
         '
+        Me.cboFac.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboFac.FormattingEnabled = True
         Me.cboFac.Location = New System.Drawing.Point(94, 105)
         Me.cboFac.Name = "cboFac"
@@ -78,6 +79,7 @@ Partial Class frmImportPoint
         '
         'cboReach
         '
+        Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboReach.FormattingEnabled = True
         Me.cboReach.Location = New System.Drawing.Point(94, 77)
         Me.cboReach.Name = "cboReach"
@@ -166,8 +168,9 @@ Partial Class frmImportPoint
         '
         'cboPollutant
         '
+        Me.cboPollutant.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPollutant.FormattingEnabled = True
-        Me.cboPollutant.Location = New System.Drawing.Point(34, 149)
+        Me.cboPollutant.Location = New System.Drawing.Point(94, 149)
         Me.cboPollutant.Name = "cboPollutant"
         Me.cboPollutant.Size = New System.Drawing.Size(259, 21)
         Me.cboPollutant.TabIndex = 23
