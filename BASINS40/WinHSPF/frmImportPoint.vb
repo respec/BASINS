@@ -10,9 +10,10 @@ Imports System.Windows.Forms
 
 Public Class frmImportPoint
 
-    Dim facilityname$, nconstits$, consnames$(), ndates&
-    Dim jdates!(), rloads!()
-    Dim retcod As Integer
+    Dim pFacilityName As String
+    Dim pConstituentNames As New Collection
+    Dim pNumberOfDates, pFileReadStatus As Integer 'lFileReadStatus (-1 = not read, 0 = read w/ no problem, 1 = error)
+    Dim pLoadValuesCollection, pJDatesCollection As New Collection
 
     Public Sub New()
 
@@ -66,7 +67,6 @@ Public Class frmImportPoint
         For i = 1 To pfrmPoint.agdMasterPoint.Source.Rows - 1
             ctmp = pfrmPoint.agdMasterPoint.Source.CellValue(i, 3)
 
-
             'search cboFac for lTempString
             lFoundFlag = False
             For lOper2 = 0 To cboFac.Items.Count - 1
@@ -81,7 +81,8 @@ Public Class frmImportPoint
             End If
         Next i
 
-        retcod = -1
+        pFileReadStatus = -1
+
 
     End Sub
 
@@ -90,14 +91,71 @@ Public Class frmImportPoint
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Me.Dispose()
+        Dim sen$, loc$, con$, stanam$, tstype$
+        Dim imready As Boolean
+        Dim dashpos&, i&, j&, newdsn&, longloc$
+        Dim newwdmid As Integer = 0
+        Dim lJDatesArray() As Double
+        Dim lLoadValuesArray() As Double
+
+
+        imready = True
+
+        If pFileReadStatus <> 0 Then
+            MsgBox("An input file be specified.", vbOKOnly, "Import Point Source Problem")
+            imready = False
+        Else
+            If Len(txtScen.Text) = 0 Then
+                MsgBox("A scenario name must be entered.", vbOKOnly, "Import Point Source Problem")
+                imready = False
+            End If
+            If Len(cboReach.Items.Item(cboReach.SelectedIndex)) = 0 Then
+                MsgBox("A reach must be selected.", vbOKOnly, "Import Point Source Problem")
+                imready = False
+            End If
+
+            If imready Then
+
+                sen = "PT-" & UCase(Trim(txtScen.Text))
+                longloc = Trim(cboReach.Items.Item(cboReach.SelectedIndex))
+                dashpos = InStr(1, longloc, "-")
+                loc = "RCH" & Trim(Mid(longloc, 7, dashpos - 7))
+                For i = 1 To pConstituentNames.Count
+
+                    con = UCase(pConstituentNames.Item(i))
+                    If Len(con) > 8 Then
+                        con = Trim(Mid(con, 1, 8))
+                    End If
+                    stanam = UCase(pFacilityName)
+                    tstype = Mid(con, 1, 4)
+
+                    ReDim lJDatesArray(pJDatesCollection.Count)
+                    ReDim lLoadValuesArray(pConstituentNames.Count)
+
+                    For j = 1 To pJDatesCollection.Count
+                        lJDatesArray(j) = pJDatesCollection.Item(j)
+                    Next j
+
+                    For j = 1 To pConstituentNames.Count
+                        lLoadValuesArray(j) = pLoadValuesCollection.Item((i - 1) * pConstituentNames.Count + j)
+                        MsgBox(pLoadValuesCollection.Item((i - 1) * pConstituentNames.Count + j))
+                    Next
+
+                    pUCI.AddPointSourceDataSet(sen, loc, con, stanam, tstype, lJDatesArray.Length - 1, lJDatesArray, lLoadValuesArray, newwdmid, newdsn)
+                    pfrmPoint.UpdateListsForNewPointSource(sen, stanam, loc, con, newwdmid, newdsn, "RCHRES", CInt(Mid(loc, 4)), longloc)
+                Next i
+            End If
+        End If
+        If imready Then
+            Me.Dispose()
+        End If
     End Sub
 
     Private Sub cmdFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFile.Click
         Dim lFileName As String = Nothing
-
-        'Dim i&, s$, f$, fun&, wid$
-        'Dim tmetseg, ret&
+        Dim lDelimiter, lQuote, lLineString As String
+        Dim lCurrentLineNumber, lOperLength, lHeaderCount, j, lDateArray(6) As Integer
+        Dim lStreamReader As StreamReader
 
         Try
             OpenFileDialog1.InitialDirectory = System.Reflection.Assembly.GetEntryAssembly.Location
@@ -112,93 +170,73 @@ Public Class frmImportPoint
             End If
 
             lblFile.Text = OpenFileDialog1.FileName
-            'read mustin file
-            Call ReadMutsin(lFileName, facilityname, retcod, nconstits, consnames, ndates, jdates, rloads)
-            cboFac.Text = facilityname
+
+            lStreamReader = New StreamReader(lFileName)
+
+            lDelimiter = " "
+            lQuote = """"
+
+            lLineString = lStreamReader.ReadLine() 'line with number of header lines
+
+            lCurrentLineNumber = 0
+
+            lCurrentLineNumber += 1
+            lOperLength = Len(lLineString)
+            If IsNumeric(Mid(lLineString, 43, 5)) Then
+                lHeaderCount = CInt(Mid(lLineString, 43, 5))
+            Else
+                lHeaderCount = 25
+            End If
+
+            lLineString = lStreamReader.ReadLine()  'line with facility name
+            lCurrentLineNumber += 1
+            pFacilityName = Trim(lLineString)
+
+            For j = 1 To 5
+                lLineString = lStreamReader.ReadLine()  'unused lines
+                lCurrentLineNumber += 1
+            Next j
+
+            Do Until Len(lLineString) = 0
+                lLineString = lStreamReader.ReadLine()  'read cons
+                lCurrentLineNumber += 1
+                If Len(Trim(lLineString)) > 0 Then
+                    pConstituentNames.Add(Trim(lLineString))
+                End If
+            Loop
+
+            For j = lCurrentLineNumber + 1 To lHeaderCount
+                lLineString = lStreamReader.ReadLine()  'unused lines
+            Next j
+
+            Do While lStreamReader.Peek() >= 0
+                lLineString = lStreamReader.ReadLine()
+                lDateArray(0) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(1) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(2) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(3) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(4) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(5) = 0
+                pJDatesCollection.Add(Date2J(lDateArray))
+
+                For j = 1 To pConstituentNames.Count
+                    pLoadValuesCollection.Add(StrSplit(lLineString, lDelimiter, lQuote))
+                Next j
+
+            Loop
+
+            lStreamReader.Close()
+
+            pFileReadStatus = 0
+            cboFac.Items.Add(pFacilityName)
+            cboFac.SelectedIndex = cboFac.Items.Count - 1
+
+
 
         Catch ex As Exception
-            pPollutantList.Clear()
-            Logger.Message("There was an error reading the selected pollutant list." & vbCrLf & "Ensure that the pollutant file selected is formatted properly.", "Error Reading the pollutant file", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+            Logger.Message("There was an error reading the selected MUSTIN file." & vbCrLf & "Ensure that the file selected is formatted properly.", "Error Reading MUSTIN file", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+            pFileReadStatus = 1
         End Try
-    End Sub
-
-    Public Sub ReadMutsin(ByVal aFileName As String, ByVal facname$, ByVal ret&, ByVal ncons$, ByVal cons$(), ByVal ndate&, ByVal jdates!(), ByVal rVal!())
-
-        Dim delim$, quote$, i&
-        'Dim tname$, amax&, tstr$, tcnt&
-        Dim lLineString As String
-        Dim reccnt&, ilen&, nhead&, j&
-        Dim idate(6) As Integer
-
-        ret = 0
-        delim = " "
-        quote = """"
-
-        'read mut file
-        Try
-            Using sr As StreamReader = New StreamReader(aFileName)
-
-                lLineString = sr.ReadLine() 'line with number of header lines
-
-                reccnt = 0
-
-                reccnt += 1
-                ilen = Len(lLineString)
-                If IsNumeric(Mid(lLineString, 43, 5)) Then
-                    nhead = CInt(Mid(lLineString, 43, 5))
-                Else
-                    nhead = 25
-                End If
-
-                lLineString = sr.ReadLine()  'line with facility name
-                reccnt = reccnt + 1
-                facname = Trim(lLineString)
-
-                For j = 1 To 5
-                    lLineString = sr.ReadLine()  'unused lines
-                    reccnt = reccnt + 1
-                Next j
-
-                ncons = 0
-                Do Until Len(lLineString) = 0
-                    lLineString = sr.ReadLine()  'read cons
-                    reccnt = reccnt + 1
-                    If Len(Trim(lLineString)) > 0 Then
-                        ncons = ncons + 1
-                        ReDim Preserve cons(ncons)
-                        cons(ncons) = Trim(lLineString)
-                    End If
-                Loop
-
-                For j = reccnt + 1 To nhead
-                    lLineString = sr.ReadLine()  'unused lines
-                Next j
-
-                ndate = 0
-                Do Until EOF(i)
-                    lLineString = sr.ReadLine()
-                    ndate = ndate + 1
-                    ReDim Preserve jdates(ndate)
-                    ReDim Preserve rVal(ndate * ncons)
-                    idate(0) = StrSplit(lLineString, delim, quote)
-                    idate(1) = StrSplit(lLineString, delim, quote)
-                    idate(2) = StrSplit(lLineString, delim, quote)
-                    idate(3) = StrSplit(lLineString, delim, quote)
-                    idate(4) = StrSplit(lLineString, delim, quote)
-                    idate(5) = 0
-                    jdates(ndate) = Date2J(idate)
-                    For j = 1 To ncons
-                        rVal(((ndate - 1) * ncons) + j) = StrSplit(lLineString, delim, quote)
-                    Next j
-                Loop
-                sr.Close()
-            End Using
-            Exit Sub
-        Catch Ex As Exception
-            Logger.Message("Error Opening File", "Import Problem", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
-            ret = 1
-        End Try
-
     End Sub
 
 End Class
