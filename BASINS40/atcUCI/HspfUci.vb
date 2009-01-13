@@ -2199,19 +2199,21 @@ x:
             'set the dates
             Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
             Dim lNvals As Double
+            Dim lSJDate As Double = 0
+            Dim lEJDate As Double = 0
             If aNdates = 0 Then 'get dates from global block
-                Dim lSJDate As Double = Me.GlobalBlock.SDateJ
-                Dim lEJDate As Double = Me.GlobalBlock.EdateJ
-                lNvals = lEJDate - lSJDate
-                Dim lDates(lNvals) As Double
-                For lDateIndex As Integer = 0 To lNvals
-                    lDates(lDateIndex) = lSJDate + lDateIndex
-                Next
-                lTsDate.Values = lDates
+                lSJDate = Me.GlobalBlock.SDateJ
+                lEJDate = Me.GlobalBlock.EdateJ
             Else   'dates were supplied as an argument
-                lNvals = aNdates
-                lTsDate.Values = aJdates
+                lSJDate = aJdates(1)
+                lEJDate = aJdates(aNdates)
             End If
+            lNvals = lEJDate - lSJDate
+            Dim lDates(lNvals) As Double
+            For lDateIndex As Integer = 0 To lNvals
+                lDates(lDateIndex) = lSJDate + lDateIndex
+            Next
+            lTsDate.Values = lDates
             lGenericTs.Dates = lTsDate
 
             'now fill in the values
