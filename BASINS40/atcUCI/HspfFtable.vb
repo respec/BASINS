@@ -387,7 +387,7 @@ Public Class HspfFtable
         Return lSB.ToString
     End Function
 
-    Private Function NumericallyTheSame(ByRef aValueAsRead As String, ByRef aValueStored As Single) As Boolean
+    Private Function NumericallyTheSame(ByVal aValueAsRead As String, ByVal aValueStored As Single) As Boolean
         'see if the current ftable value is the same as the value as read from the uci
         '4. is the same as 4.0
         Dim lTemp As Single

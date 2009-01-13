@@ -81,6 +81,14 @@ Public Module WinHSPF
 
     'Open an existing uci file
     Sub OpenUCI(Optional ByVal aFileName As String = "")
+        If Not pUCI Is Nothing AndAlso pUCI.Name.Length > 0 Then
+            'already have an active uci, warn user
+            If Logger.Msg("Only one UCI can be active at a time." & vbCrLf & _
+                          "Continuing will deactivate the current UCI." & vbCrLf & _
+                          "Are you sure you want to continue?", MessageBoxButtons.OKCancel, "UCI Open Warning") = DialogResult.Cancel Then
+                Exit Sub
+            End If
+        End If
         CloseUCI()
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not IO.File.Exists(aFileName) Then
             Dim lOpenDialog As New OpenFileDialog
@@ -112,6 +120,15 @@ Public Module WinHSPF
 
     'Create a new uci file
     Sub NewUCI()
+
+        If Not pUCI Is Nothing AndAlso pUCI.Name.Length > 0 Then
+            'already have an active uci, warn user
+            If Logger.Msg("Only one UCI can be active at a time." & vbCrLf & _
+                          "Continuing will deactivate the current UCI." & vbCrLf & _
+                          "Are you sure you want to continue?", MessageBoxButtons.OKCancel, "New UCI Warning") = DialogResult.Cancel Then
+                Exit Sub
+            End If
+        End If
 
         CloseUCI()
 
