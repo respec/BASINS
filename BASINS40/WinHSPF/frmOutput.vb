@@ -32,6 +32,7 @@ Public Class frmOutput
             .Clear()
             .AllowHorizontalScrolling = False
             .AllowNewValidValues = True
+            .Source.FixedRows = 1
             .Visible = True
         End With
 
@@ -78,7 +79,6 @@ Public Class frmOutput
                         End If
                     End If
                 Next i
-                agdOutput.SizeAllColumnsToContents()
             End With
             cmdCopy.Enabled = False
 
@@ -101,7 +101,7 @@ Public Class frmOutput
                         End If
                     End If
                 Next i
-                agdOutput.SizeAllColumnsToContents()
+
             End With
             cmdCopy.Visible = False
         ElseIf radio3.Checked Then
@@ -152,7 +152,6 @@ Public Class frmOutput
             '                End If
             '            Next vConn
             '        Next i
-            '        agdOutput.SizeAllColumnsToContents()
             '    End With
             '    cmdCopy.Visible = True
         ElseIf radio4.Checked Then
@@ -176,8 +175,11 @@ Public Class frmOutput
             '                End If
             '            End If
             '        Next i
-            '        agdOutput.SizeAllColumnsToContents()
             '    End With
+
+            agdOutput.SizeAllColumnsToContents()
+            agdOutput.Refresh()
+
         End If
     End Sub
 
@@ -388,19 +390,19 @@ Public Class frmOutput
     End Function
 
 
-    Private Function Reach2Copy(ByVal rchid&) As Long
+    Private Function Reach2Copy(ByVal rchid&) As Integer
         'given a reach id, find its associated copy for expert system datasets
 
-        Dim loper3 As HspfOperation
+        Dim lHspfOperation As HspfOperation
         Dim lConn2 As HspfConnection
         Dim i, j As Integer
         Dim larea!, ldsn!, copyid&
         'Dim s As String
 
         copyid = 0
-        loper3 = pUCI.OpnBlks("RCHRES").OperFromID(rchid)
-        For j = 1 To loper3.Targets.Count - 1
-            lConn2 = loper3.Targets(j)
+        lHspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(rchid)
+        For j = 1 To lHspfOperation.Targets.Count - 1
+            lConn2 = lHspfOperation.Targets(j)
             If Microsoft.VisualBasic.Left(lConn2.Target.VolName, 3) = "WDM" And _
               Trim(lConn2.Target.Member) = "SIMQ" Then
                 'this is an expert system output locn, save area and dsn
@@ -409,16 +411,18 @@ Public Class frmOutput
             End If
         Next j
 
-        For i = 1 To pUCI.OpnSeqBlock.Opns.Count - 2
-            loper3 = pUCI.OpnSeqBlock.Opn(i)
-            If loper3.Name = "COPY" Then
-                For j = 1 To loper3.Targets.Count
-                    lConn2 = loper3.Targets(j)
+        Dim Dummy As Object = pUCI.OpnSeqBlock.Opns
+
+        For i = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
+            lHspfOperation = pUCI.OpnSeqBlock.Opns(i)
+            If lHspfOperation.Name = "COPY" Then
+                For j = 0 To lHspfOperation.Targets.Count - 1
+                    lConn2 = lHspfOperation.Targets(j)
                     If Microsoft.VisualBasic.Left(lConn2.Target.VolName, 3) = "WDM" And _
                       Trim(lConn2.Target.Member) = "IFWO" Then
                         If Math.Abs(larea - (lConn2.MFact * 12)) < 0.000001 Then
                             'this appears to be the associated copy
-                            copyid = loper3.Id
+                            copyid = lHspfOperation.Id
                         End If
                     End If
                 Next j
