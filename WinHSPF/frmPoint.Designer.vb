@@ -37,7 +37,7 @@ Partial Class frmPoint
         Me.grpDetails = New System.Windows.Forms.GroupBox
         Me.agdPoint = New atcControls.atcGrid
         Me.cmdDelete = New System.Windows.Forms.Button
-        Me.Button7 = New System.Windows.Forms.Button
+        Me.cmdShowTable = New System.Windows.Forms.Button
         Me.Button8 = New System.Windows.Forms.Button
         Me.cmdDetailsShow = New System.Windows.Forms.Button
         Me.cmdDetailsHide = New System.Windows.Forms.Button
@@ -83,6 +83,7 @@ Partial Class frmPoint
         Me.menuPointSources.Name = "menuPointSources"
         Me.menuPointSources.RenderMode = System.Windows.Forms.ToolStripRenderMode.System
         Me.menuPointSources.Size = New System.Drawing.Size(239, 24)
+        Me.menuPointSources.Stretch = False
         Me.menuPointSources.TabIndex = 18
         Me.menuPointSources.Text = "MenuStrip1"
         '
@@ -172,7 +173,7 @@ Partial Class frmPoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpDetails.Controls.Add(Me.agdPoint)
         Me.grpDetails.Controls.Add(Me.cmdDelete)
-        Me.grpDetails.Controls.Add(Me.Button7)
+        Me.grpDetails.Controls.Add(Me.cmdShowTable)
         Me.grpDetails.Controls.Add(Me.Button8)
         Me.grpDetails.Location = New System.Drawing.Point(283, 12)
         Me.grpDetails.Name = "grpDetails"
@@ -208,15 +209,15 @@ Partial Class frmPoint
         Me.cmdDelete.TabIndex = 24
         Me.cmdDelete.UseVisualStyleBackColor = True
         '
-        'Button7
+        'cmdShowTable
         '
-        Me.Button7.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.Button7.Image = CType(resources.GetObject("Button7.Image"), System.Drawing.Image)
-        Me.Button7.Location = New System.Drawing.Point(6, 71)
-        Me.Button7.Name = "Button7"
-        Me.Button7.Size = New System.Drawing.Size(40, 35)
-        Me.Button7.TabIndex = 23
-        Me.Button7.UseVisualStyleBackColor = True
+        Me.cmdShowTable.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.cmdShowTable.Image = CType(resources.GetObject("cmdShowTable.Image"), System.Drawing.Image)
+        Me.cmdShowTable.Location = New System.Drawing.Point(6, 71)
+        Me.cmdShowTable.Name = "cmdShowTable"
+        Me.cmdShowTable.Size = New System.Drawing.Size(40, 35)
+        Me.cmdShowTable.TabIndex = 23
+        Me.cmdShowTable.UseVisualStyleBackColor = True
         '
         'Button8
         '
@@ -356,7 +357,7 @@ Partial Class frmPoint
     Friend WithEvents grpDetails As System.Windows.Forms.GroupBox
     Friend WithEvents Button8 As System.Windows.Forms.Button
     Friend WithEvents cmdDelete As System.Windows.Forms.Button
-    Friend WithEvents Button7 As System.Windows.Forms.Button
+    Friend WithEvents cmdShowTable As System.Windows.Forms.Button
     Friend WithEvents agdPoint As atcControls.atcGrid
     Friend WithEvents cmdDetailsHide As System.Windows.Forms.Button
     Friend WithEvents cmdDetailsShow As System.Windows.Forms.Button

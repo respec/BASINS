@@ -1,12 +1,7 @@
-Imports atcControls
-Imports atcData
 Imports atcUCI
-Imports atcUCIForms
 Imports atcUtility
 Imports MapWinUtility
-Imports WinHSPF
 Imports System.IO
-Imports System.Windows.Forms
 
 Public Class frmImportPoint
 
@@ -39,27 +34,6 @@ Public Class frmImportPoint
         Next i
         cboReach.SelectedIndex = 0
 
-        cboPollutant.Items.Clear()
-        'For Each vpol In PollutantList
-        '  cboPollutant.AddItem vpol
-        'Next vpol
-        For i = 1 To frmPoint.agdMasterPoint.Source.Rows - 1
-            ctmp = frmPoint.agdMasterPoint.Source.CellValue(i, 4)
-
-            'search cboPollutant for lTempString
-            lFoundFlag = False
-            For lOper2 = 0 To cboPollutant.Items.Count - 1
-                If cboPollutant.Items.Item(lOper2) = ctmp Then
-                    lFoundFlag = True
-                    Exit For
-                End If
-            Next
-
-            If Not lFoundFlag Then
-                cboPollutant.Items.Add(ctmp)
-            End If
-        Next i
-
         cboFac.Items.Clear()
         'For i = 1 To frmPoint.cmbFac.ListCount - 1
         '  cboFac.AddItem frmPoint.cmbFac.List(i)
@@ -91,62 +65,60 @@ Public Class frmImportPoint
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Dim sen$, loc$, con$, stanam$, tstype$
-        Dim imready As Boolean
-        Dim dashpos&, i&, j&, newdsn&, longloc$
-        Dim newwdmid As Integer = 0
+        Dim lScenario, lLocation, lConstituent, lFacilityName, lTimeSeriesType, lLongLocation As String
+        Dim lReadyFlag As Boolean
+        Dim lOper1, lOper2, lDashPosition, lNewDSN As Integer
+        Dim lNewWdmId As Integer = 0
         Dim lJDatesArray() As Double
         Dim lLoadValuesArray() As Double
 
-
-        imready = True
+        lReadyFlag = True
 
         If pFileReadStatus <> 0 Then
             MsgBox("An input file be specified.", vbOKOnly, "Import Point Source Problem")
-            imready = False
+            lReadyFlag = False
         Else
             If Len(txtScen.Text) = 0 Then
                 MsgBox("A scenario name must be entered.", vbOKOnly, "Import Point Source Problem")
-                imready = False
+                lReadyFlag = False
             End If
             If Len(cboReach.Items.Item(cboReach.SelectedIndex)) = 0 Then
                 MsgBox("A reach must be selected.", vbOKOnly, "Import Point Source Problem")
-                imready = False
+                lReadyFlag = False
             End If
 
-            If imready Then
+            If lReadyFlag Then
 
-                sen = "PT-" & UCase(Trim(txtScen.Text))
-                longloc = Trim(cboReach.Items.Item(cboReach.SelectedIndex))
-                dashpos = InStr(1, longloc, "-")
-                loc = "RCH" & Trim(Mid(longloc, 7, dashpos - 7))
-                For i = 1 To pConstituentNames.Count
+                lScenario = "PT-" & UCase(Trim(txtScen.Text))
+                lLongLocation = Trim(cboReach.Items.Item(cboReach.SelectedIndex))
+                lDashPosition = InStr(1, lLongLocation, "-")
+                lLocation = "RCH" & Trim(Mid(lLongLocation, 7, lDashPosition - 7))
+                For lOper1 = 1 To pConstituentNames.Count
 
-                    con = UCase(pConstituentNames.Item(i))
-                    If Len(con) > 8 Then
-                        con = Trim(Mid(con, 1, 8))
+                    lConstituent = UCase(pConstituentNames.Item(lOper1))
+                    If Len(lConstituent) > 8 Then
+                        lConstituent = Trim(lConstituent)
                     End If
-                    stanam = UCase(pFacilityName)
-                    tstype = Mid(con, 1, 4)
+                    lFacilityName = UCase(pFacilityName)
+                    lTimeSeriesType = Mid(lConstituent, 1, 4)
 
                     ReDim lJDatesArray(pJDatesCollection.Count)
                     ReDim lLoadValuesArray(pConstituentNames.Count)
 
-                    For j = 1 To pJDatesCollection.Count
-                        lJDatesArray(j) = pJDatesCollection.Item(j)
-                    Next j
+                    For lOper2 = 1 To pJDatesCollection.Count
+                        lJDatesArray(lOper2) = pJDatesCollection.Item(lOper2)
+                    Next lOper2
 
-                    For j = 1 To pJDatesCollection.Count
-                        lLoadValuesArray(j) = pLoadValuesCollection.Item(((j - 1) * pConstituentNames.Count) + i)
-                        MsgBox(pLoadValuesCollection.Item(((j - 1) * pConstituentNames.Count) + i))
+                    For lOper2 = 1 To pJDatesCollection.Count
+                        lLoadValuesArray(lOper2) = pLoadValuesCollection.Item(((lOper2 - 1) * pConstituentNames.Count) + lOper1)
                     Next
 
-                    pUCI.AddPointSourceDataSet(sen, loc, con, stanam, tstype, lJDatesArray.Length - 1, lJDatesArray, lLoadValuesArray, newwdmid, newdsn)
-                    pfrmPoint.UpdateListsForNewPointSource(sen, stanam, loc, con, newwdmid, newdsn, "RCHRES", CInt(Mid(loc, 4)), longloc)
-                Next i
+                    pUCI.AddPointSourceDataSet(lScenario, lLocation, lConstituent, lFacilityName, lTimeSeriesType, lJDatesArray.Length - 1, lJDatesArray, lLoadValuesArray, lNewWdmId, lNewDSN)
+                    pfrmPoint.UpdateListsForNewPointSource(lScenario, lFacilityName, lLocation, lConstituent, lNewWdmId, lNewDSN, "RCHRES", CInt(Mid(lLocation, 4)), lLongLocation)
+                Next lOper1
             End If
         End If
-        If imready Then
+        If lReadyFlag Then
             Me.Dispose()
         End If
     End Sub
@@ -230,8 +202,6 @@ Public Class frmImportPoint
             pFileReadStatus = 0
             cboFac.Items.Add(pFacilityName)
             cboFac.SelectedIndex = cboFac.Items.Count - 1
-
-
 
         Catch ex As Exception
             Logger.Message("There was an error reading the selected MUSTIN file." & vbCrLf & "Ensure that the file selected is formatted properly.", "Error Reading MUSTIN file", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
