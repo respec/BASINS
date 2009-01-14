@@ -2235,7 +2235,7 @@ x:
                 lCurDate = aJdates(1)
                 Dim lDayCounter As Integer = 0
                 Dim lValueCounter As Integer = 1
-                Do While lCurDate < aJdates(aNdates) 'loop through each day
+                Do While lCurDate <= aJdates(aNdates) 'loop through each day
                     lValues(lDayCounter) = aLoad(lValueCounter) * lMultiplier
                     lDayCounter = lDayCounter + 1
                     lCurDate = lCurDate + 1

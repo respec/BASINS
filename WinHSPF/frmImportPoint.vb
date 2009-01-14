@@ -136,9 +136,9 @@ Public Class frmImportPoint
                         lJDatesArray(j) = pJDatesCollection.Item(j)
                     Next j
 
-                    For j = 1 To pConstituentNames.Count
-                        lLoadValuesArray(j) = pLoadValuesCollection.Item((i - 1) * pConstituentNames.Count + j)
-                        MsgBox(pLoadValuesCollection.Item((i - 1) * pConstituentNames.Count + j))
+                    For j = 1 To pJDatesCollection.Count
+                        lLoadValuesArray(j) = pLoadValuesCollection.Item(((j - 1) * pConstituentNames.Count) + i)
+                        MsgBox(pLoadValuesCollection.Item(((j - 1) * pConstituentNames.Count) + i))
                     Next
 
                     pUCI.AddPointSourceDataSet(sen, loc, con, stanam, tstype, lJDatesArray.Length - 1, lJDatesArray, lLoadValuesArray, newwdmid, newdsn)
