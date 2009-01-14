@@ -202,6 +202,8 @@ Public Class frmStatus
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        Clear()
+        Label(1) = "Cancelling"
         Console.WriteLine("Cancel")
     End Sub
 
