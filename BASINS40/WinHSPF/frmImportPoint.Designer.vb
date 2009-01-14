@@ -34,7 +34,6 @@ Partial Class frmImportPoint
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.txtScen = New atcControls.atcText
-        Me.cboPollutant = New System.Windows.Forms.ComboBox
         Me.SuspendLayout()
         '
         'OpenFileDialog1
@@ -126,7 +125,7 @@ Partial Class frmImportPoint
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdCancel.Location = New System.Drawing.Point(192, 186)
+        Me.cmdCancel.Location = New System.Drawing.Point(192, 160)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
         Me.cmdCancel.TabIndex = 22
@@ -136,7 +135,7 @@ Partial Class frmImportPoint
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Location = New System.Drawing.Point(83, 186)
+        Me.cmdOK.Location = New System.Drawing.Point(83, 160)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(101, 26)
         Me.cmdOK.TabIndex = 21
@@ -166,21 +165,11 @@ Partial Class frmImportPoint
         Me.txtScen.ValueDouble = 0
         Me.txtScen.ValueInteger = 0
         '
-        'cboPollutant
-        '
-        Me.cboPollutant.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboPollutant.FormattingEnabled = True
-        Me.cboPollutant.Location = New System.Drawing.Point(94, 149)
-        Me.cboPollutant.Name = "cboPollutant"
-        Me.cboPollutant.Size = New System.Drawing.Size(259, 21)
-        Me.cboPollutant.TabIndex = 23
-        '
         'frmImportPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(377, 226)
-        Me.Controls.Add(Me.cboPollutant)
+        Me.ClientSize = New System.Drawing.Size(377, 200)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.cboFac)
@@ -211,5 +200,4 @@ Partial Class frmImportPoint
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
-    Friend WithEvents cboPollutant As System.Windows.Forms.ComboBox
 End Class
