@@ -14,7 +14,7 @@ Public Class frmReach
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
-        Me.Size = New Size(580, 320)
+        Me.Size = New Size(grdReach.Width + 40, grdReach.Height + 50)
         Me.MinimumSize = Me.Size
 
         ' Add any initialization after the InitializeComponent() call.
