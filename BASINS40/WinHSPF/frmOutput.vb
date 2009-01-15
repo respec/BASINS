@@ -57,6 +57,8 @@ Public Class frmOutput
         Dim loper As HspfOperation
         Dim i As Integer
         Dim lRow As Integer
+        'Dim lObject As Object
+
 
         If radio1.Checked Then
             txtDesc.Text = "Output will be generated at each 'Hydrology Calibration' output location for " & _
@@ -68,8 +70,8 @@ Public Class frmOutput
                 .CellValue(0, 0) = "Name"
                 .CellValue(0, 1) = "Description"
 
-                For i = 1 To pUCI.OpnSeqBlock.Opns.Count - 1
-                    loper = pUCI.OpnSeqBlock.Opn(i)
+                For i = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
+                    loper = pUCI.OpnSeqBlock.Opns(i)
                     If loper.Name = "RCHRES" Then
                         If IsCalibLocation(loper.Name, loper.Id) Then
                             'this is an expert system output location
@@ -90,8 +92,8 @@ Public Class frmOutput
                 .CellValue(0, 0) = "Name"
                 .CellValue(0, 1) = "Description"
 
-                For i = 1 To pUCI.OpnSeqBlock.Opns.Count - 1
-                    loper = pUCI.OpnSeqBlock.Opn(i)
+                For i = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
+                    loper = pUCI.OpnSeqBlock.Opns(i)
                     If loper.Name = "RCHRES" Then
                         If IsFlowLocation(loper.Name, loper.Id) Then
                             'this is an output flow location
@@ -104,56 +106,57 @@ Public Class frmOutput
 
             End With
             cmdCopy.Visible = False
+
         ElseIf radio3.Checked Then
-            txtDesc.Text = "Output will be generated at each 'Other' output location " & "for the specified constituents."
-            '    With agdOutput.Source
-            '        .Rows = 0
-            '        .Columns = 3
-            '        .CellValue(0, 0) = "Name"
-            '        .CellValue(0, 1) = "Description"
-            '        For i = 1 To pUCI.OpnSeqBlock.Opns.Count - 1
-            '            loper = pUCI.OpnSeqBlock.Opn(i)
-            '            'look for any output from here in ext targets
-            '            For Each vConn In loper.Targets
-            '                lConn = vConn
-            '                lRow = .Rows
-            '                If Mid(lConn.Target.VolName, 1, 3) = "WDM" Then
-            '                    If lConn.Source.VolName = "COPY" Then
-            '                        'assume this is a calibration location, skip it
-            '                    ElseIf lConn.Source.Group = "ROFLOW" And lConn.Source.Member = "ROVOL" Then
-            '                        'this is part of the calibration location
-            '                    ElseIf lConn.Source.Group = "HYDR" And lConn.Source.Member = "RO" And IsFlowLocation(loper.Name, loper.Id) Then
-            '                        'this is an output flow location
+            'txtDesc.Text = "Output will be generated at each 'Other' output location " & "for the specified constituents."
+            'With agdOutput.Source
+            '    .Rows = 0
+            '    .Columns = 3
+            '    .CellValue(0, 0) = "Name"
+            '    .CellValue(0, 1) = "Description"
+            '    For i = 1 To pUCI.OpnSeqBlock.Opns.Count - 1
+            '        loper = pUCI.OpnSeqBlock.Opn(i)
+            '        'look for any output from here in ext targets
+            '        For Each vConn In loper.Targets
+            '            lConn = vConn
+            '            lRow = .Rows
+            '            If Mid(lConn.Target.VolName, 1, 3) = "WDM" Then
+            '                If lConn.Source.VolName = "COPY" Then
+            '                    'assume this is a calibration location, skip it
+            '                ElseIf lConn.Source.Group = "ROFLOW" And lConn.Source.Member = "ROVOL" Then
+            '                    'this is part of the calibration location
+            '                ElseIf lConn.Source.Group = "HYDR" And lConn.Source.Member = "RO" And IsFlowLocation(loper.Name, loper.Id) Then
+            '                    'this is an output flow location
+            '                Else
+            '                    idsn = lConn.Target.VolId
+            '                    WDMId = lConn.Target.VolName
+
+            '                    MsgBox(pUCI.GetDataSetFromDsn(WDMInd(WDMId), idsn).ToString)
+
+            '                    dsnObj = pUCI.GetDataSetFromDsn(WDMInd(WDMId), idsn)
+            '                    If InStr(1, UCase(dsnObj.Header.Desc), "AQUATOX") Then
+            '                        'this an an aquatox output location
             '                    Else
-            '                        idsn = lConn.Target.VolId
-            '                        WDMId = lConn.Target.VolName
+            '                        'this is an other output location
 
-            '                        MsgBox(pUCI.GetDataSetFromDsn(WDMInd(WDMId), idsn).ToString)
-
-            '                        dsnObj = pUCI.GetDataSetFromDsn(WDMInd(WDMId), idsn)
-            '                        If InStr(1, UCase(dsnObj.Header.Desc), "AQUATOX") Then
-            '                            'this an an aquatox output location
-            '                        Else
-            '                            'this is an other output location
-
-            '                            .CellValue(lRow, 0) = loper.Name & " " & loper.Id
-            '                            .CellValue(lRow, 1) = loper.Description
-            '                            ctemp = lConn.Source.Group & ":" & lConn.Source.Member
-            '                            If TSMaxSubscript(1, lConn.Source.Group, lConn.Source.Member) > 1 Then
-            '                                ctemp = ctemp & "(" & lConn.Source.MemSub1
-            '                                If TSMaxSubscript(2, lConn.Source.Group, lConn.Source.Member) > 1 Then
-            '                                    ctemp = ctemp & "," & lConn.Source.MemSub2
-            '                                End If
-            '                                ctemp = ctemp & ")"
+            '                        .CellValue(lRow, 0) = loper.Name & " " & loper.Id
+            '                        .CellValue(lRow, 1) = loper.Description
+            '                        ctemp = lConn.Source.Group & ":" & lConn.Source.Member
+            '                        If TSMaxSubscript(1, lConn.Source.Group, lConn.Source.Member) > 1 Then
+            '                            ctemp = ctemp & "(" & lConn.Source.MemSub1
+            '                            If TSMaxSubscript(2, lConn.Source.Group, lConn.Source.Member) > 1 Then
+            '                                ctemp = ctemp & "," & lConn.Source.MemSub2
             '                            End If
-            '                            .CellValue(lRow, 2) = ctemp
+            '                            ctemp = ctemp & ")"
             '                        End If
+            '                        .CellValue(lRow, 2) = ctemp
             '                    End If
             '                End If
-            '            Next vConn
-            '        Next i
-            '    End With
-            '    cmdCopy.Visible = True
+            '            End If
+            '        Next vConn
+            '    Next i
+            'End With
+            'cmdCopy.Visible = True
         ElseIf radio4.Checked Then
             txtDesc.Text = "Output will be generated at each 'AQUATOX Linkage' output location for " & _
               "inflow, discharge, surface area, mean depth, water temperature, suspended sediment, " & _
@@ -176,11 +179,11 @@ Public Class frmOutput
             '            End If
             '        Next i
             '    End With
-
-            agdOutput.SizeAllColumnsToContents()
-            agdOutput.Refresh()
-
         End If
+
+        agdOutput.SizeAllColumnsToContents()
+        agdOutput.Refresh()
+
     End Sub
 
     Public Function IsCalibLocation(ByVal Name As String, ByVal Id As Integer) As Boolean
