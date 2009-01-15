@@ -478,6 +478,7 @@ Friend Class frmSWSTAT
         '
         'cboYears
         '
+        Me.cboYears.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboYears.FormattingEnabled = True
         Me.cboYears.Location = New System.Drawing.Point(6, 18)
         Me.cboYears.Name = "cboYears"
@@ -975,11 +976,15 @@ Friend Class frmSWSTAT
             If lTs.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
                 lTsB = lTs
             Else
-                'lTsB = SubsetByDateBoundary(lTs, pYearStartMonth, pYearStartDay, Nothing, pFirstYear, pLastYear, pYearEndMonth, pYearEndDay)
+                If pFirstYear > 0 AndAlso pLastYear > 0 Then
+                    lTsB = SubsetByDateBoundary(lTs, pYearStartMonth, pYearStartDay, Nothing, pFirstYear, pLastYear, pYearEndMonth, pYearEndDay)
+                Else
+                    lTsB = lTs
+                End If
 
                 Dim lSeasons As New atcSeasons.atcSeasonsYearSubset(pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay)
                 lSeasons.SeasonSelected(0) = True
-                lTsB = lSeasons.SplitBySelected(lTs, Nothing).ItemByIndex(1)
+                lTsB = lSeasons.SplitBySelected(lTsB, Nothing).ItemByIndex(1)
                 lTsB.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
             End If
             lDataGroupB.Add(lTsB)
@@ -1100,6 +1105,16 @@ Friend Class frmSWSTAT
             If lstNday.SelectedIndices.Count > 0 Then
                 lArgs.SetValue("NDay", ListToArray(lstNday))
                 lArgs.SetValue("HighFlag", radioHigh.Checked)
+
+                lArgs.SetValue("FirstYear", pFirstYear)
+                lArgs.SetValue("LastYear", pLastYear)
+
+                lArgs.SetValue("BoundaryMonth", pYearStartMonth)
+                lArgs.SetValue("BoundaryDay", pYearStartDay)
+
+                lArgs.SetValue("EndMonth", pYearEndMonth)
+                lArgs.SetValue("EndDay", pYearEndDay)
+
                 If lHiLow.Open("n-day " & HighOrLowString().ToLower & " timeseries", lArgs) Then
                     Dim lList As New atcList.atcListForm
                     With lList.DateFormat

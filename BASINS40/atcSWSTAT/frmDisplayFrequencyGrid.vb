@@ -32,11 +32,6 @@ Friend Class frmDisplayFrequencyGrid
             Me.Show()
         End If
         PopulateGrid()
-        'If pDataGroup.Count > 0 Then
-        '    UserSpecifyAttributes()
-        'Else 'user declined to specify Data
-        '    Me.Close()
-        'End If
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -245,13 +240,8 @@ Friend Class frmDisplayFrequencyGrid
                 agdMain.Initialize(pSwapperSource)
                 agdMain.SizeAllColumnsToContents()
 
-                Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSwapperSource.Rows * agdMain.RowHeight(0)
-                Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
-                For lColumn As Integer = 0 To pSwapperSource.Columns - 1
-                    lRequestedWidth += agdMain.ColumnWidth(lColumn)
-                Next
-                Me.Height = lRequestedHeight + 10
-                Me.Width = lRequestedWidth + 10
+                SizeToGrid()
+
                 agdMain.Refresh()
             Else 'user cancelled Frequency Grid specs form
                 Me.Close()
@@ -330,6 +320,7 @@ Friend Class frmDisplayFrequencyGrid
         Set(ByVal newValue As Boolean)
             If pSwapperSource.SwapRowsColumns <> newValue Then
                 pSwapperSource.SwapRowsColumns = newValue
+                SizeToGrid()
                 agdMain.Refresh()
             End If
             mnuViewRows.Checked = newValue
@@ -344,17 +335,11 @@ Friend Class frmDisplayFrequencyGrid
         Set(ByVal newValue As Boolean)
             mnuViewHigh.Checked = newValue
             mnuViewLow.Checked = Not newValue
-            If newValue Then
-                'Me.Text = "High Values"
-
-                Me.Text = "Frequency Statistics"
-            Else
-                'Me.Text = "Low Values"
-                Me.Text = "Frequency Statistics"
-            End If
+            Me.Text = "Frequency Statistics"
             If Not pSource Is Nothing AndAlso pSource.High <> newValue Then
                 pSource.High = newValue
                 agdMain.SizeAllColumnsToContents()
+                SizeToGrid()
                 agdMain.Refresh()
             End If
         End Set
@@ -367,6 +352,7 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
         agdMain.SizeAllColumnsToContents()
+        SizeToGrid()
         agdMain.Refresh()
     End Sub
 
@@ -378,20 +364,19 @@ Friend Class frmDisplayFrequencyGrid
         atcDataManager.UserSelectDisplay("N-Day timeseries", pSource.AllNday)
     End Sub
 
-    'Private Sub pFormSpecifyFrequency_Cancelled() Handles pFormSpecify.Cancelled
-    '    pFormSpecify = Nothing
-    '    If pInitializing Then
-    '        Me.Close()
-    '    End If
-    'End Sub
+    Public Sub SizeToGrid()
+        Try
+            Dim lRequestedHeight As Integer = Me.Height - agdMain.Height + pSwapperSource.Rows * agdMain.RowHeight(0)
+            Dim lRequestedWidth As Integer = Me.Width - agdMain.Width
+            For lColumn As Integer = 0 To pSwapperSource.Columns - 1
+                lRequestedWidth += agdMain.ColumnWidth(lColumn)
+            Next
+            Dim lScreenArea As System.Drawing.Rectangle = My.Computer.Screen.WorkingArea
 
-    'Private Sub pFormSpecifyFrequency_Chose(ByVal aHigh As Boolean) Handles pFormSpecify.ChoseFrequency
-    '    pSource = Nothing 'Get rid of obsolete source before changing HighDisplay to avoid refresh trouble
-    '    Me.HighDisplay = aHigh
-    '    If pInitializing Then
-    '        pInitializing = False
-    '        Me.Show()
-    '    End If
-    '    PopulateGrid()
-    'End Sub
+            Width = Math.Min(lScreenArea.Width - 100, lRequestedWidth + 20)
+            Height = Math.Min(lScreenArea.Height - 100, lRequestedHeight + 20)
+
+        Catch 'Ignore error if we can't tell how large to make it, or can't rezise
+        End Try
+    End Sub
 End Class

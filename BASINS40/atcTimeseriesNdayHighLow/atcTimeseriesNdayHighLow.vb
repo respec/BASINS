@@ -288,7 +288,7 @@ Public Class atcTimeseriesNdayHighLow
                             Dim lDate As Double = GetNaN()
                             Try
                                 newTS.Value(indexNew) = HighOrLowValue(lCurrentYear, CInt(lNDayNow), aHigh, lDate)
-                                newTS.ValueAttributes(indexNew).Add("PeakDate", lDate)
+                                newTS.ValueAttributes(indexNew).Add("Date", lDate)
                             Catch e As Exception
                                 newTS.Value(indexNew) = GetNaN()
                                 newTS.ValueAttributes(indexNew) = New atcDataAttributes()

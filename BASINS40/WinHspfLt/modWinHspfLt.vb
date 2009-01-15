@@ -227,7 +227,7 @@ Friend Class StatusMonitor
     Dim pMonitorProcess As Process
 
     Public Sub Progress(ByVal aCurrentPosition As Integer, ByVal aLastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
-        'TODO: send progress messages to status monitor
+        WriteStatus("PROGRESS " & aCurrentPosition & " of " & aLastPosition)
     End Sub
 
     Public Sub Status(ByVal aStatusMessage As String) Implements MapWinUtility.IProgressStatus.Status

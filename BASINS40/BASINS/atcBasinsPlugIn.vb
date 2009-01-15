@@ -151,12 +151,12 @@ Public Class atcBasinsPlugIn
         atcDataManager.LoadPlugin("D4EM Data Download::Main")
 
         Try 'atcDataManager.XML gets loaded when opening a project. This makes sure it gets loaded even without a project
-            Dim lAttributesString As String = GetSetting("BASINS4", "DataManager", "SelectionAttributes")
+            Dim lAttributesString As String = GetSetting(g_AppName, "DataManager", "SelectionAttributes")
             If lAttributesString.Length > 0 Then
                 atcDataManager.SelectionAttributes.Clear()
                 atcDataManager.SelectionAttributes.AddRange(lAttributesString.Split(vbTab))
             End If
-            lAttributesString = GetSetting("BASINS4", "DataManager", "DisplayAttributes")
+            lAttributesString = GetSetting(g_AppName, "DataManager", "DisplayAttributes")
             If lAttributesString.Length > 0 Then
                 atcDataManager.DisplayAttributes.Clear()
                 atcDataManager.DisplayAttributes.AddRange(lAttributesString.Split(vbTab))
@@ -190,8 +190,8 @@ Public Class atcBasinsPlugIn
 
         CloseForms()
         'StopMonitor()
-        SaveSetting("BASINS4", "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
-        SaveSetting("BASINS4", "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
+        SaveSetting(g_AppName, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
+        SaveSetting(g_AppName, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
     End Sub
 
     Private Sub CloseForms()
@@ -281,10 +281,10 @@ Public Class atcBasinsPlugIn
             Dim lQuiet As String = ""
             Dim lToday As String = Format(Date.Today, "yyyy-MM-dd")
             If aQuiet Then 'Make sure automatic checking happens at most once a day
-                If GetSetting("BASINS4", "Update", "LastCheck", "Never") = lToday Then Exit Sub
+                If GetSetting(g_AppName, "Update", "LastCheck", "Never") = lToday Then Exit Sub
                 lQuiet = "quiet "
             End If
-            SaveSetting("BASINS4", "Update", "LastCheck", lToday)
+            SaveSetting(g_AppName, "Update", "LastCheck", lToday)
 
             Dim lSavePath As String = IO.Path.Combine(g_BasinsDir, "cache")
             Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
@@ -437,6 +437,7 @@ FoundDir:
             lFeedbackCollection.Add("message", Trim(lMessage))
             lFeedbackCollection.Add("sysinfo", lFeedback)
             Dim lClient As New System.Net.WebClient
+            lClient.Proxy.Credentials = System.Net.CredentialCache.DefaultCredentials
             lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
             Logger.Msg("Feedback successfully sent", "Send Feedback")
         End If
