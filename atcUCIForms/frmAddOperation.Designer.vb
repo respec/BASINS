@@ -24,135 +24,153 @@ Partial Class frmAddOperation
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label5 = New System.Windows.Forms.Label
-        Me.TextBox1 = New System.Windows.Forms.TextBox
-        Me.TextBox2 = New System.Windows.Forms.TextBox
-        Me.ListBox1 = New System.Windows.Forms.ListBox
-        Me.ListBox2 = New System.Windows.Forms.ListBox
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
-        Me.Button1 = New System.Windows.Forms.Button
+        Me.txtOperationNumber = New System.Windows.Forms.TextBox
+        Me.txtOperationDescription = New System.Windows.Forms.TextBox
+        Me.lstUp = New System.Windows.Forms.ListBox
+        Me.lstDown = New System.Windows.Forms.ListBox
+        Me.cboOperationType = New System.Windows.Forms.ComboBox
         Me.cmdClose = New System.Windows.Forms.Button
+        Me.cmdOK = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(6, 9)
+        Me.Label1.Location = New System.Drawing.Point(13, 27)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(80, 13)
+        Me.Label1.Size = New System.Drawing.Size(107, 17)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Operation Type"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(216, 9)
+        Me.Label2.Location = New System.Drawing.Point(293, 27)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(44, 13)
+        Me.Label2.Size = New System.Drawing.Size(58, 17)
         Me.Label2.TabIndex = 1
         Me.Label2.Text = "Number"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(26, 40)
+        Me.Label3.Location = New System.Drawing.Point(40, 65)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(60, 13)
+        Me.Label3.Size = New System.Drawing.Size(79, 17)
         Me.Label3.TabIndex = 2
         Me.Label3.Text = "Description"
         '
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(16, 98)
+        Me.Label4.Location = New System.Drawing.Point(21, 121)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(106, 13)
+        Me.Label4.Size = New System.Drawing.Size(143, 17)
         Me.Label4.TabIndex = 3
         Me.Label4.Text = "Upstream Operations"
         '
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(190, 98)
+        Me.Label5.Location = New System.Drawing.Point(253, 121)
+        Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(120, 13)
+        Me.Label5.Size = New System.Drawing.Size(160, 17)
         Me.Label5.TabIndex = 4
         Me.Label5.Text = "Downstream Operations"
         '
-        'TextBox1
+        'txtOperationNumber
         '
-        Me.TextBox1.Location = New System.Drawing.Point(266, 5)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(82, 20)
-        Me.TextBox1.TabIndex = 5
+        Me.txtOperationNumber.Location = New System.Drawing.Point(360, 22)
+        Me.txtOperationNumber.Margin = New System.Windows.Forms.Padding(4)
+        Me.txtOperationNumber.Name = "txtOperationNumber"
+        Me.txtOperationNumber.Size = New System.Drawing.Size(108, 22)
+        Me.txtOperationNumber.TabIndex = 5
+        Me.txtOperationNumber.Text = "1"
         '
-        'TextBox2
+        'txtOperationDescription
         '
-        Me.TextBox2.Location = New System.Drawing.Point(95, 37)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(253, 20)
-        Me.TextBox2.TabIndex = 6
+        Me.txtOperationDescription.Location = New System.Drawing.Point(132, 62)
+        Me.txtOperationDescription.Margin = New System.Windows.Forms.Padding(4)
+        Me.txtOperationDescription.Name = "txtOperationDescription"
+        Me.txtOperationDescription.Size = New System.Drawing.Size(336, 22)
+        Me.txtOperationDescription.TabIndex = 6
         '
-        'ListBox1
+        'lstUp
         '
-        Me.ListBox1.FormattingEnabled = True
-        Me.ListBox1.Location = New System.Drawing.Point(19, 126)
-        Me.ListBox1.Name = "ListBox1"
-        Me.ListBox1.Size = New System.Drawing.Size(158, 147)
-        Me.ListBox1.TabIndex = 7
+        Me.lstUp.FormattingEnabled = True
+        Me.lstUp.ItemHeight = 16
+        Me.lstUp.Location = New System.Drawing.Point(25, 155)
+        Me.lstUp.Margin = New System.Windows.Forms.Padding(4)
+        Me.lstUp.Name = "lstUp"
+        Me.lstUp.Size = New System.Drawing.Size(209, 180)
+        Me.lstUp.TabIndex = 7
         '
-        'ListBox2
+        'lstDown
         '
-        Me.ListBox2.FormattingEnabled = True
-        Me.ListBox2.Location = New System.Drawing.Point(193, 126)
-        Me.ListBox2.Name = "ListBox2"
-        Me.ListBox2.Size = New System.Drawing.Size(158, 147)
-        Me.ListBox2.TabIndex = 8
+        Me.lstDown.FormattingEnabled = True
+        Me.lstDown.ItemHeight = 16
+        Me.lstDown.Location = New System.Drawing.Point(257, 155)
+        Me.lstDown.Margin = New System.Windows.Forms.Padding(4)
+        Me.lstDown.Name = "lstDown"
+        Me.lstDown.Size = New System.Drawing.Size(209, 180)
+        Me.lstDown.TabIndex = 8
         '
-        'ComboBox1
+        'cboOperationType
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(95, 5)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(95, 21)
-        Me.ComboBox1.TabIndex = 9
-        '
-        'Button1
-        '
-        Me.Button1.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button1.Location = New System.Drawing.Point(189, 288)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(102, 28)
-        Me.Button1.TabIndex = 16
-        Me.Button1.Text = "&Close"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.cboOperationType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboOperationType.FormattingEnabled = True
+        Me.cboOperationType.Location = New System.Drawing.Point(132, 22)
+        Me.cboOperationType.Margin = New System.Windows.Forms.Padding(4)
+        Me.cboOperationType.Name = "cboOperationType"
+        Me.cboOperationType.Size = New System.Drawing.Size(125, 24)
+        Me.cboOperationType.TabIndex = 9
         '
         'cmdClose
         '
         Me.cmdClose.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.cmdClose.Location = New System.Drawing.Point(76, 288)
+        Me.cmdClose.Location = New System.Drawing.Point(252, 354)
+        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(102, 28)
-        Me.cmdClose.TabIndex = 15
-        Me.cmdClose.Text = "&OK"
+        Me.cmdClose.Size = New System.Drawing.Size(136, 34)
+        Me.cmdClose.TabIndex = 16
+        Me.cmdClose.Text = "Close"
         Me.cmdClose.UseVisualStyleBackColor = True
+        '
+        'cmdOK
+        '
+        Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cmdOK.Location = New System.Drawing.Point(101, 354)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdOK.Name = "cmdOK"
+        Me.cmdOK.Size = New System.Drawing.Size(136, 34)
+        Me.cmdOK.TabIndex = 15
+        Me.cmdOK.Text = "OK"
+        Me.cmdOK.UseVisualStyleBackColor = True
         '
         'frmAddOperation
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(367, 328)
-        Me.Controls.Add(Me.Button1)
+        Me.ClientSize = New System.Drawing.Size(489, 404)
         Me.Controls.Add(Me.cmdClose)
-        Me.Controls.Add(Me.ComboBox1)
-        Me.Controls.Add(Me.ListBox2)
-        Me.Controls.Add(Me.ListBox1)
-        Me.Controls.Add(Me.TextBox2)
-        Me.Controls.Add(Me.TextBox1)
+        Me.Controls.Add(Me.cmdOK)
+        Me.Controls.Add(Me.cboOperationType)
+        Me.Controls.Add(Me.lstDown)
+        Me.Controls.Add(Me.lstUp)
+        Me.Controls.Add(Me.txtOperationDescription)
+        Me.Controls.Add(Me.txtOperationNumber)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAddOperation"
         Me.Text = "Add Operation"
         Me.ResumeLayout(False)
@@ -164,11 +182,11 @@ Partial Class frmAddOperation
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
-    Friend WithEvents ListBox1 As System.Windows.Forms.ListBox
-    Friend WithEvents ListBox2 As System.Windows.Forms.ListBox
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
-    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents txtOperationNumber As System.Windows.Forms.TextBox
+    Friend WithEvents txtOperationDescription As System.Windows.Forms.TextBox
+    Friend WithEvents lstUp As System.Windows.Forms.ListBox
+    Friend WithEvents lstDown As System.Windows.Forms.ListBox
+    Friend WithEvents cboOperationType As System.Windows.Forms.ComboBox
     Friend WithEvents cmdClose As System.Windows.Forms.Button
+    Friend WithEvents cmdOK As System.Windows.Forms.Button
 End Class
