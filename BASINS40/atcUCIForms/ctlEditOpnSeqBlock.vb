@@ -36,15 +36,28 @@ Public Class ctlEditOpnSeqBlock
 
     Public Sub Add() Implements ctlEdit.Add
 
+        Dim lSelectedRow As Integer = 0
+        With grdEdit.Source
+            For lRowIndex As Integer = 1 To .Rows
+                For lColIndex As Integer = 1 To .Columns
+                    If .CellSelected(lRowIndex, lColIndex) Then
+                        lSelectedRow = lRowIndex
+                    End If
+                Next
+            Next
+        End With
+
         If IsNothing(pfrmAddOperation) Then
             pfrmAddOperation = New frmAddOperation
-            pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
-            pfrmAddOperation.Show()
+            pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent, lSelectedRow)
+            pfrmAddOperation.ShowDialog()
+            Data = pHspfOpnSeqBlk
         Else
             If pfrmAddOperation.IsDisposed Then
                 pfrmAddOperation = New frmAddOperation
-                pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
-                pfrmAddOperation.Show()
+                pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent, lSelectedRow)
+                pfrmAddOperation.ShowDialog()
+                Data = pHspfOpnSeqBlk
             Else
                 pfrmAddOperation.WindowState = FormWindowState.Normal
                 pfrmAddOperation.BringToFront()
@@ -76,9 +89,9 @@ Public Class ctlEditOpnSeqBlock
                 .CellValue(0, 0) = "Name"
                 .CellValue(0, 1) = "Number"
 
-                For lRow As Integer = 1 To .Rows - 1
-                    .CellValue(lRow, 0) = pHspfOpnSeqBlk.Opn(lRow).Name
-                    .CellValue(lRow, 1) = pHspfOpnSeqBlk.Opn(lRow).Id
+                For lRow As Integer = 1 To .Rows
+                    .CellValue(lRow, 0) = pHspfOpnSeqBlk.Opns(lRow - 1).Name
+                    .CellValue(lRow, 1) = pHspfOpnSeqBlk.Opns(lRow - 1).Id
                 Next
 
                 For lCol As Integer = 0 To .Columns - 1

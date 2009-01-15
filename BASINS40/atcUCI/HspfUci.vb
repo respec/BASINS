@@ -2026,6 +2026,37 @@ x:
         Return lOpn
     End Function
 
+    Public Sub AddOperationToOpnSeqBlock(ByVal aOperationName As String, ByVal aOperationId As Integer, ByVal aPosition As Integer)
+
+        'add to opn seq block
+        If aPosition < Me.OpnSeqBlock.Opns.Count Then
+            Me.OpnSeqBlock.AddBefore(Me.OpnBlks(aOperationName).OperFromID(aOperationId), aPosition)
+        Else
+            Me.OpnSeqBlock.Add(Me.OpnBlks(aOperationName).OperFromID(aOperationId))
+        End If
+        Me.OpnBlks(aOperationName).OperFromID(aOperationId).Uci = Me
+
+        If Me.OpnBlks(aOperationName).Count > 1 Then
+            'already have some of this operation
+            For Each lTable As HspfTable In Me.OpnBlks(aOperationName).Ids(1).Tables
+                'add this opn id to this table
+                Me.AddTable(aOperationName, aOperationId, lTable.Name)
+            Next lTable
+        Else
+            Dim lOpnBlk As HspfOpnBlk = Me.OpnBlks(aOperationName)
+            Me.OpnBlks(aOperationName).OperFromID(aOperationId).OpnBlk = lOpnBlk
+        End If
+
+        'add dummy ftable if rchres
+        If aOperationName = "RCHRES" Then
+            Dim lOpn As HspfOperation
+            lOpn = Me.OpnBlks("RCHRES").OperFromID(aOperationId)
+            lOpn.FTable = New HspfFtable
+            lOpn.FTable.Operation = lOpn
+            lOpn.FTable.Id = aOperationId
+        End If
+    End Sub
+
     Public Sub AddTable(ByRef aOperationName As String, _
                         ByRef aOperationId As Integer, _
                         ByRef aTableName As String)
