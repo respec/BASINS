@@ -364,7 +364,6 @@ Friend Class atcFrequencyGridSource
                     lRept.AppendLine(lStr.PadLeft(27) & " - parameter")
 
                     Dim lNumZero As Integer = lNdayTsNonLog.Attributes.GetValue("Count Zero", -1)
-                    'Dim lNumPositive As Integer = lNdayTsNonLog.Attributes.GetValue("Count Positive", -1)
                     Dim lNumMissing As Integer = lNdayTsNonLog.Attributes.GetValue("Count Missing", 0)
                     Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero - lNumMissing
 

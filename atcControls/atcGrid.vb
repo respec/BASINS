@@ -1024,7 +1024,7 @@ Public Class atcGrid
             HScroller.Width = Me.Width
         End If
 
-        scrollCorner.Visible = VScroller.Visible And HScroller.Visible
+        scrollCorner.Visible = VScroller.Visible AndAlso HScroller.Visible
     End Sub
 
     Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged

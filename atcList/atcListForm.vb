@@ -312,16 +312,7 @@ Public Class atcListForm
         'TODO: could SizeAllColumnsToContents return total width?
         agdMain.SizeAllColumnsToContents()
 
-        Dim lTotalWidth As Integer = 10
-        For iColumn As Integer = 0 To pSource.Columns
-            lTotalWidth += agdMain.ColumnWidth(iColumn)
-        Next
-        Try
-            If lTotalWidth < Screen.PrimaryScreen.Bounds.Width Then
-                Me.Width = lTotalWidth
-            End If
-        Catch 'Ignore error if we can't tell how large to make it, or can't rezise
-        End Try
+        SizeToGrid()
         agdMain.Refresh()
     End Sub
 
@@ -399,6 +390,7 @@ Public Class atcListForm
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
         agdMain.SizeAllColumnsToContents()
+        SizeToGrid()
         agdMain.Refresh()
     End Sub
 
@@ -425,6 +417,7 @@ Public Class atcListForm
             mnuViewValueAttributes.Checked = newValue
             pSource.DisplayValueAttributes = newValue
             agdMain.SizeAllColumnsToContents()
+            SizeToGrid()
             agdMain.Refresh()
         End Set
     End Property
@@ -438,6 +431,7 @@ Public Class atcListForm
             If pSwapperSource.SwapRowsColumns <> newValue Then
                 pSwapperSource.SwapRowsColumns = newValue
                 agdMain.SizeAllColumnsToContents()
+                SizeToGrid()
                 agdMain.Refresh()
             End If
             mnuAttributeColumns.Checked = newValue
@@ -517,4 +511,20 @@ Public Class atcListForm
             End If
         End With
     End Sub
+
+    Public Sub SizeToGrid()
+        Try
+            Dim lRequestedHeight As Integer = (Me.Height - agdMain.Height) + pSwapperSource.Rows * agdMain.RowHeight(0)
+            Dim lRequestedWidth As Integer = (Me.Width - agdMain.Width)
+            For lColumn As Integer = 0 To pSwapperSource.Columns - 1
+                lRequestedWidth += agdMain.ColumnWidth(lColumn)
+            Next
+            Dim lScreenArea As System.Drawing.Rectangle = My.Computer.Screen.WorkingArea
+
+            Width = Math.Min(lScreenArea.Width - 100, lRequestedWidth + 20)
+            Height = Math.Min(lScreenArea.Height - 100, lRequestedHeight + 20)
+        Catch 'Ignore error if we can't tell how large to make it, or can't rezise
+        End Try
+    End Sub
+
 End Class

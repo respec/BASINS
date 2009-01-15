@@ -1,6 +1,3 @@
-Imports System.Net
-Imports atcUtility
-
 Public Class frmDownload
 
     Public Const CancelString As String = "<Cancel>"

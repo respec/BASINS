@@ -34,6 +34,7 @@ Public Class atcSeasonsYearSubset
         Else
             pEndDate = New Date(1900, aEndMonth, aEndDay, 0, 0, 0, 0)
         End If
+        pEndDate = pEndDate.AddDays(1) 'Beginning of next day = end of desired day
     End Sub
 
     Public Sub New()
