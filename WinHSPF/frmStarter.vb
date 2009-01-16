@@ -1,7 +1,10 @@
 Imports MapWinUtility
 Imports atcUCI
+Imports atcUtility
 
 Public Class frmStarter
+
+    Dim pVScrollColumnOffset As Integer = 16
 
     Public Sub New()
 
@@ -11,6 +14,9 @@ Public Class frmStarter
         Me.Icon = pIcon
         Me.MinimumSize = Me.Size
         Me.MaximumSize = Me.Size
+
+        agdStarter.Source = New atcControls.atcGridSource
+        RefreshGrid()
 
     End Sub
 
@@ -93,8 +99,84 @@ Public Class frmStarter
                 End If
             Next
 
-            'RefreshGrid()
+            RefreshGrid()
         End If
+
+    End Sub
+
+    Private Sub RefreshGrid()
+
+        With agdStarter
+            .Clear()
+            .AllowHorizontalScrolling = False
+            .AllowNewValidValues = True
+            .Visible = True
+            .Source.FixedRows = 1
+        End With
+
+        With agdStarter.Source
+            .Columns = 3
+            .Rows = 1
+            .CellValue(0, 0) = "Project Operations"
+            .CellValue(0, 1) = "Mapped From Starter Operation"
+
+            Dim lOpTyps As New Collection
+            lOpTyps.Add("PERLND")
+            lOpTyps.Add("IMPLND")
+            lOpTyps.Add("RCHRES")
+
+            Dim lDescList As New atcCollection
+            Dim lOpTyp As HspfOpnBlk
+            Dim lRow As Integer = 0
+            Dim lDesc As String
+            For Each lOpTypName As String In lOpTyps
+                If pUCI.OpnBlks(lOpTypName).Count > 0 Then
+                    lOpTyp = pUCI.OpnBlks(lOpTypName)
+                    For Each lOpn As HspfOperation In lOpTyp.Ids
+                        If Len(Trim(lOpn.Description)) > 0 Then
+                            lDesc = lOpn.Description
+                        Else
+                            lDesc = "Unspecified"
+                        End If
+
+                        If Not lDescList.Contains(lDesc) Then
+                            lDescList.Add(lDesc)
+
+                            'add a row for this one
+                            lRow = lRow + 1
+                            .Rows = lRow
+                            .CellValue(.Rows, 0) = lDesc & " (" & lOpn.Name & ")"
+                            If lOpn.DefOpnId <> 0 Then
+                                Dim ldOpn As HspfOperation = pDefUCI.OpnBlks(lOpn.Name).OperFromID(lOpn.DefOpnId)
+                                lDesc = ldOpn.Description
+                                .CellValue(.Rows, 1) = lDesc & " (" & ldOpn.Name & " " & ldOpn.Id & ")"
+                                .CellValue(.Rows, 2) = lOpn.DefOpnId
+                            Else
+                                Dim lId As Integer = DefaultOpnId(lOpn, pDefUCI)
+                                Dim ldOpn As HspfOperation = pDefUCI.OpnBlks(lOpn.Name).OperFromID(lId)
+                                If Not ldOpn Is Nothing Then
+                                    lDesc = ldOpn.Description
+                                    .CellValue(.Rows, 1) = lDesc & " (" & ldOpn.Name & " " & ldOpn.Id & ")"
+                                Else
+                                    .CellValue(.Rows, 1) = "None available"
+                                End If
+                                .CellValue(.Rows, 2) = lId
+                            End If
+                            .CellValue(.Rows, 3) = lOpn.Name
+                        End If
+                    Next
+                End If
+            Next
+
+            'make column 1 editable
+            For lRowIndex As Integer = 1 To .Rows - 1
+                .CellEditable(lRowIndex, 1) = True
+            Next
+
+        End With
+
+        agdStarter.SizeAllColumnsToContents(agdStarter.Width - pVScrollColumnOffset, True)
+        agdStarter.Refresh()
 
     End Sub
 End Class
