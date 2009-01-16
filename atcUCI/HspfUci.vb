@@ -37,9 +37,6 @@ Public Class HspfUci
     Public AcidPhFlag As Boolean = False
     Public MetSegs As Collection(Of HspfMetSeg)
 
-    Private pMsgWDMName As String
-    Private pMsgUnit As Integer
-    Private pWdmUnit(4) As Integer
     Private pWDMObj(4) As atcWDM.atcDataSourceWDM
     Private pWdmCount As Integer
 
@@ -151,11 +148,9 @@ Public Class HspfUci
         End Set
     End Property
 
-    Public StarterPath As String = ""
-
     Private pOrder As ArrayList 'for saving order of blocks
-
     Private pIcon As System.Drawing.Image
+
     Public Property Icon() As System.Drawing.Image
         Get
             Return pIcon
@@ -166,20 +161,16 @@ Public Class HspfUci
         End Set
     End Property
 
-    Private pIPC As Object 'ATCoCtl.ATCoIPC
-    Private pIPCset As Boolean = False
-    Private pNaN As Double = GetNaN()
-
     Public Sub SendHspfMessage(ByVal aMessage As String)
-        If pIPCset Then
-            pIPC.SendProcessMessage("HSPFUCI", aMessage)
-        End If
+        'If pIPCset Then
+        '    pIPC.SendProcessMessage("HSPFUCI", aMessage)
+        'End If
     End Sub
 
     Public Sub SendMonitorMessage(ByVal aMessage As String)
-        If pIPCset Then
-            pIPC.SendMonitorMessage(aMessage)
-        End If
+        'If pIPCset Then
+        '    pIPC.SendMonitorMessage(aMessage)
+        'End If
     End Sub
 
     'Public Property IPC() As Object
@@ -227,29 +218,10 @@ Public Class HspfUci
         End Get
     End Property
 
-    Public WriteOnly Property MsgWDMName() As String
-        Set(ByVal Value As String)
-            pMsgWDMName = Value
-        End Set
-    End Property
-
     Public ReadOnly Property WDMCount() As Integer
         Get
             Return pWdmCount
         End Get
-    End Property
-
-    Public Property MessageUnit() As Integer
-        Get
-            Return pMsgUnit
-        End Get
-        Set(ByVal Value As Integer)
-            If Value = 0 Then
-                F90_MSGUNIT(pMsgUnit)
-            Else 'could check to be sure?
-                pMsgUnit = Value
-            End If
-        End Set
     End Property
 
     Public Overrides Function ToString() As String
@@ -341,12 +313,6 @@ Public Class HspfUci
 
         pOrder = DefaultBlockOrder()
     End Sub
-
-    'Public Sub CreateUci(ByRef M As HspfMsg, ByRef newName As String, ByRef outputwdm As String, ByRef metwdms() As String, ByRef wdmids() As String, ByRef MetDataDetails As String, ByRef oneseg As Boolean, ByRef PollutantList As Collection)
-
-    '    'Call F90_SPIPH(pStatusIn, pStatusOut)
-    '    Call CreateUciFromBASINS(Me, M, newName, outputwdm, metwdms, wdmids, MetDataDetails, oneseg, PollutantList)
-    'End Sub
 
     Public Sub FastReadUciForStarter(ByRef aMsg As HspfMsg, ByRef aNewName As String)
         Dim lFilesOK As Boolean
@@ -901,9 +867,8 @@ Public Class HspfUci
             pHspfProcess.WaitForExit()
 
             'have to reset wdms, may have changed pointers during simulate
-            'ClearWDM()
-            'InitWDMArray()
-            'SetWDMFiles()
+            ClearWDM()
+            SetWDMFiles()
 
         End If
     End Sub
@@ -1053,34 +1018,15 @@ Public Class HspfUci
         Dim lMsg As String = "before close in ClearWDM"
         Call F90_FILSTA(lMsg, lMsg.Length)
         For lWdmIndex As Integer = 0 To 4
-            If pWdmUnit(lWdmIndex) <> 0 Then
-                pWdmUnit(lWdmIndex) = 0
+            If Not pWDMObj(lWdmIndex) Is Nothing Then
                 pWDMObj(lWdmIndex) = Nothing
             End If
         Next lWdmIndex
         pTserFiles.Clear()
+        pWdmCount = 0
 
         lMsg = "after close in ClearWDM"
         Call F90_FILSTA(lMsg, lMsg.Length)
-    End Sub
-
-    Public Sub InitWDMArray()
-        pWdmCount = 0
-        For lWdmIndex As Integer = 0 To 4
-            pWdmUnit(lWdmIndex) = 0
-        Next lWdmIndex
-        If pMsgUnit = 0 Then 'not yet open
-            Call F90_WDIINI()
-            Call F90_WDBFIN()
-            'IPC.SendProcessMessage "HSPFUCI", "WDIINI"
-            'IPC.SendProcessMessage "HSPFUCI", "WDBFIN"
-            Dim lWdmIndex As Integer = 1
-            pMsgUnit = F90_WDBOPN(lWdmIndex, pMsgWDMName, Len(pMsgWDMName))
-            SendHspfMessage("WDBOPN " & pMsgWDMName & " " & lWdmIndex)
-            Dim lMsg As String = WaitForChildMessage()
-            'could be better
-            pMsgUnit = CInt(Right(lMsg, 3))
-        End If
     End Sub
 
     'Public Sub GetMetSegNames(ByRef fun As Integer, ByRef numMetSeg As Integer, ByRef arrayMetSegs() As String, ByRef lMetDetails() As String, ByRef lMetDescs() As String)
@@ -1157,17 +1103,15 @@ Public Class HspfUci
         aOstr(7) = "UZSX    "
         aOstr(8) = "LZSX    "
 
-        Dim lWdmsFileUnit As Integer = 0
         Dim lWdmId As Integer = 0
         For lWdmIndex As Integer = 4 To 1 Step -1
-            If pWdmUnit(lWdmIndex) > 0 Then 'use this as the output wdm
-                lWdmsFileUnit = pWdmUnit(lWdmIndex)
+            If Not pWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
                 lWdmId = lWdmIndex
                 Exit For
             End If
         Next lWdmIndex
 
-        If lWdmsFileUnit > 0 Then 'okay to continue
+        If lWdmId > 0 Then 'okay to continue
             Dim lDsn As Integer = aBaseDsn
             Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(Name)
 
@@ -1297,17 +1241,16 @@ Public Class HspfUci
     '    End If
 
     '    For i = 4 To 1 Step -1
-    '        If pWdmUnit(i) > 0 Then
+    '        If Not pWDMObj(i) Is Nothing Then
     '            'use this as the output wdm
-    '            wdmsfl = pWdmUnit(i)
     '            wdmid = i
     '        End If
     '    Next i
 
-    '    If wdmsfl > 0 Then
+    '    If wdmid > 0 Then
     '        'okay to continue
     '        ndsn = basedsn
-    '        cscen = IO.Path.GetFileNameWithoutExtension(pName)
+    '        cscen = IO.Path.GetFileNameWithoutExtension(Name)
 
     '        For j = 1 To 28
     '            'create each of the 28 aquatox dsns
@@ -1317,7 +1260,7 @@ Public Class HspfUci
     '                'if there is already a dsn with this scen/loc/cons,
     '                'and it is unused in this uci, delete it to avoid confusion
     '                deleteddsn = 0
-    '                findtimser(UCase(Trim(cscen)), Trim(clocn), Trim(ostr(j)), lts)
+    '                FindTimser(UCase(Trim(cscen)), Trim(clocn), Trim(ostr(j)), lts)
     '                For Each GenTs In lts
     '                    GetWDMIDFromUnit(GenTs.File.FileUnit, wid)
     '                    If CShort(Right(wid, 1)) = wdmid Then
@@ -1374,7 +1317,7 @@ Public Class HspfUci
     '                GenTs.Dates = TsDate
 
     '                GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
-    '                addeddsn = pWDMObj(wdmid).AddDataSet(GenTs, 0)
+    '                addeddsn = pWDMObj(wdmid).AddDataset(GenTs, 0)
     '                adsn(j) = ndsn
     '            End If
     '        Next j
@@ -1665,16 +1608,15 @@ Public Class HspfUci
     End Sub
 
     Public Sub ClearWDMDataSet(ByRef aWdmId As String, ByRef aDsn As Integer)
-        Dim lWdmsfl, lId As Integer
 
+        Dim lId As Integer
         If aWdmId.Length < 4 Then
             lId = 1
         Else
             lId = CShort(aWdmId.Substring(4, 1))
         End If
-        lWdmsfl = pWdmUnit(lId)
         Dim NewGenTs As New atcData.atcTimeseries(Nothing)
-        If lWdmsfl > 0 Then
+        If Not pWDMObj(lId) Is Nothing Then
             Dim GenTs As atcData.atcTimeseries = GetDataSetFromDsn(lId, aDsn)
             'save attributes
             NewGenTs.Attributes.ChangeTo(GenTs.Attributes)
@@ -1706,7 +1648,7 @@ Public Class HspfUci
             lId = CShort(aWdmId.Substring(4, 1))
         End If
 
-        If pWdmUnit(lId) > 0 Then
+        If Not pWDMObj(lId) Is Nothing Then
             Dim GenTs As atcData.atcTimeseries = GetDataSetFromDsn(lId, aDsn)
             GenTs.Dates.EnsureValuesRead()
             pWDMObj(lId).DataSets.Remove(GenTs)
@@ -1835,7 +1777,7 @@ Public Class HspfUci
                     If ifound = False And pWdmCount < 4 Then 'add it to project
                         M = "just before AddWDMFile"
                         Call F90_FILSTA(M, Len(M))
-                        lFile = AddWDMFile(lHFile.Name)
+                        lFile = AddWDMFile(lHFile.Name.Trim)
                         M = "at end of AddWDMFile"
                         Call F90_FILSTA(M, Len(M))
                         If Not lFile Is Nothing Then
@@ -2430,28 +2372,28 @@ x:
         Next lPoint
     End Sub
 
-    Public Sub GetWDMUnits(ByRef aWdmCount As Integer, ByRef aWdmUnits() As Integer)
-        aWdmCount = 0
-        For lWdmIndex As Integer = 1 To 4
-            If pWdmUnit(lWdmIndex) > 0 Then 'add
-                aWdmCount += 1
-                ReDim Preserve aWdmUnits(aWdmCount)
-                aWdmUnits(aWdmCount) = pWdmUnit(lWdmIndex)
-            End If
-        Next lWdmIndex
-    End Sub
+    'Public Sub GetWDMUnits(ByRef aWdmCount As Integer, ByRef aWdmUnits() As Integer)
+    '    aWdmCount = 0
+    '    For lWdmIndex As Integer = 1 To 4
+    '        If Not pWDMObj(lWdmIndex) Is Nothing Then 'add
+    '            aWdmCount += 1
+    '            ReDim Preserve aWdmUnits(aWdmCount)
+    '            aWdmUnits(aWdmCount) = pWdmUnit(lWdmIndex)
+    '        End If
+    '    Next lWdmIndex
+    'End Sub
 
-    Public Sub GetWDMIDFromUnit(ByVal aWdmUnit As Integer, ByRef aWdmId As String)
-        aWdmId = ""
-        For lWdmIndex As Integer = 1 To 4
-            If pWdmUnit(lWdmIndex) > 0 Then
-                If pWdmUnit(lWdmIndex) = aWdmUnit Then
-                    aWdmId = "WDM" & lWdmIndex.ToString
-                    Exit For
-                End If
-            End If
-        Next lWdmIndex
-    End Sub
+    'Public Sub GetWDMIDFromUnit(ByVal aWdmUnit As Integer, ByRef aWdmId As String)
+    '    aWdmId = ""
+    '    For lWdmIndex As Integer = 1 To 4
+    '        If Not pWDMObj(lWdmIndex) Is Nothing Then
+    '            If pWdmUnit(lWdmIndex) = aWdmUnit Then
+    '                aWdmId = "WDM" & lWdmIndex.ToString
+    '                Exit For
+    '            End If
+    '        End If
+    '    Next lWdmIndex
+    'End Sub
 
     Public Sub RemoveConnectionsFromCollection(ByVal aConnectionType As Integer)
         Dim lConnectionIndex As Integer = 0
@@ -2473,22 +2415,22 @@ x:
     End Function
 
     Public Function WaitForChildMessage() As String
-        If pIPCset Then
-            Dim lString As String
-            Do  'process messages from parent
-                lString = pIPC.GetProcessMessage("HSPFUCI") 'pHspfEngine.ReadTokenFromPipe(IPC.ParentRead, pipeBuffer, False)
-                If lString.Length > 3 Then
-                    Select Case (LCase(Left(lString, 3)))
-                        Case "dbg", "msg" ', "com", "act"
-                            pIPC.SendMonitorMessage(lString)
-                            lString = ""
-                    End Select
-                End If
-            Loop While lString.Length = 0
-            Return lString
-        Else
-            Return "No process available"
-        End If
+        'If pIPCset Then
+        '    Dim lString As String = ""
+        '    Do  'process messages from parent
+        '        lString = pIPC.GetProcessMessage("HSPFUCI") 'pHspfEngine.ReadTokenFromPipe(IPC.ParentRead, pipeBuffer, False)
+        '        If lString.Length > 3 Then
+        '            Select Case (LCase(Left(lString, 3)))
+        '                Case "dbg", "msg" ', "com", "act"
+        '                    pIPC.SendMonitorMessage(lString)
+        '                    lString = ""
+        '            End Select
+        '        End If
+        '    Loop While lString.Length = 0
+        '    Return lString
+        'Else
+        Return "No process available"
+        'End If
     End Function
 
     Public Function EchoFileName() As String
@@ -2642,26 +2584,6 @@ x:
                 lDone = True
             End If
         Loop
-    End Sub
-
-    Private Sub RestartHSPFEngine()
-        If pIPCset Then
-            Dim HSPFEngineExe As String = GetSetting("HSPFEngine", "files", "HSPFEngine.exe", "HSPFEngine.exe")
-
-            HSPFEngineExe = atcUtility.FindFile("Please locate HSPFEngine.exe", HSPFEngineExe)
-            SaveSetting("HSPFEngine", "files", "HSPFEngine.exe", HSPFEngineExe)
-
-            pIPC.ExitProcess("HSPFUCI")
-            pIPC.StartProcess("HSPFUCI", HSPFEngineExe & " " & GetCurrentProcessId)
-            SendHspfMessage("W99OPN")
-            SendHspfMessage("WDBFIN")
-            SendHspfMessage("PUTOLV 10")
-            SendHspfMessage("SPIPH " & CStr(pIPC.hPipeReadFromParent("HSPFUCI")) & " " & CStr(pIPC.hPipeWriteToParent("HSPFUCI")) & " ")
-            SendHspfMessage("WDBOPN " & pMsgWDMName & " 1")
-            WaitForChildMessage()
-        Else
-            Logger.Msg("No interprocess communication available")
-        End If
     End Sub
 
     Public Function CatAsInt(ByRef aCategory As String) As Integer
