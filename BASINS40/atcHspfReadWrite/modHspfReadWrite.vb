@@ -111,6 +111,9 @@ Module modHspfReadWrite
             Dim lNewMassLinks As New Collection(Of atcUCI.HspfMassLink)
             For Each lMassLinkExisting As atcUCI.HspfMassLink In .MassLinks
                 If lMassLinkExisting.Target.VolName = "RCHRES" Then
+
+                    'TODO: dont add BMPRAC masslink if it already exists!
+
                     Dim lMassLink As atcUCI.HspfMassLink = lMassLinkExisting.Clone
                     With lMassLink
                         .MassLinkId += aMassLinkIdOffset

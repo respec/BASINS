@@ -9,26 +9,9 @@ Imports System.Collections.ObjectModel
 Module modModelSetup
 
     Friend Sub StartWinHSPF(ByVal aCommand As String)
-        Dim lWinHSPFexe As String
+        Dim lWinHSPFexe As String = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
 
-        'todo:  get this from the registry
-        lWinHSPFexe = "c:\basins\models\hspf\bin\winhspf.exe"
-        If Not FileExists(lWinHSPFexe) Then
-            lWinHSPFexe = "d:\basins\models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(lWinHSPFexe) Then
-            lWinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(lWinHSPFexe) Then
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            lWinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(lWinHSPFexe) Then
-            'if we cant find it in any of the common places, use findfile
-            lWinHSPFexe = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
-        End If
-
-        If FileExists(lWinHSPFexe) Then
+        If IO.File.Exists(lWinHSPFexe) Then
             Logger.Dbg("StartWinHSPF:" & lWinHSPFexe & ":" & aCommand)
             Process.Start(lWinHSPFexe, aCommand)
             Logger.Dbg("WinHSPFStarted")
@@ -38,21 +21,9 @@ Module modModelSetup
     End Sub
 
     Friend Sub StartAQUATOX(ByVal aCommand As String)
-        Dim lAQUATOXexe As String
+        Dim lAQUATOXexe As String = FindFile("Please locate AQUATOX.exe", "AQUATOX.exe")
 
-        'todo:  get this from the registry
-        'AQUATOXexe = reg.RegGetString(HKEY_LOCAL_MACHINE, "SOFTWARE\Eco Modeling\AQUATOX\ExePath", "") & "\AQUATOX.exe"
-        lAQUATOXexe = "\Program Files\AQUATOX_R3\Program\AQUATOX.EXE"
-        If Not FileExists(lAQUATOXexe) Then
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            lAQUATOXexe = Left(lBasinsBinLoc, 2) & lAQUATOXexe
-        End If
-        If Not FileExists(lAQUATOXexe) Then
-            'if we cant find it in any of the common places, use findfile
-            lAQUATOXexe = FindFile("Please locate AQUATOX.exe", "AQUATOX.exe")
-        End If
-
-        If FileExists(lAQUATOXexe) Then
+        If IO.File.Exists(lAQUATOXexe) Then
             Logger.Dbg("StartAQUATOX:" & lAQUATOXexe & ":" & aCommand)
             Process.Start(lAQUATOXexe, aCommand)
             Logger.Dbg("AQUATOXStarted")
@@ -65,7 +36,7 @@ Module modModelSetup
                                     ByVal aBaseDsn As Integer, _
                                     ByVal aLoc As String) As Boolean
         Dim lCheckCount As Integer = 0
-        For Each lDataSet As atcData.atcTimeseries In aDataSets
+        For Each lDataSet As atcTimeseries In aDataSets
             If lDataSet.Attributes.GetValue("Location") = aLoc Then
                 If lDataSet.Attributes.GetValue("ID") = aBaseDsn Then
                     If lDataSet.Attributes.GetValue("TSTYPE") = "PREC" Then
@@ -112,7 +83,7 @@ Module modModelSetup
         aMetStations.Clear()
         aMetBaseDsns.Clear()
         Dim lDataSource As New atcWDM.atcDataSourceWDM
-        If FileExists(aMetWDMName) Then
+        If IO.File.Exists(aMetWDMName) Then
             Dim lFound As Boolean = False
             For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
                 If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
@@ -131,8 +102,7 @@ Module modModelSetup
 
             If lFound Then
                 Dim lCounter As Integer = 0
-                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-
+                For Each lDataSet As atcTimeseries In lDataSource.DataSets
                     lCounter += 1
                     Logger.Progress(lCounter, lDataSource.DataSets.Count)
 
@@ -194,16 +164,15 @@ Module modModelSetup
                               ByVal aMetWDMName As String) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
-        Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
+        Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
 
         'get starter uci ready
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lStarterUciName As String = "starter.uci"
         Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter\" & lStarterUciName
-        If Not FileExists(lStarterPath) Then
+        If Not IO.File.Exists(lStarterPath) Then
             lStarterPath = "\basins\models\hspf\bin\starter\" & lStarterUciName
-            If Not FileExists(lStarterPath) Then
+            If Not IO.File.Exists(lStarterPath) Then
                 lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
             End If
         End If
@@ -212,7 +181,7 @@ Module modModelSetup
         'location master pollutant list 
         Dim lPollutantListFileName As String = "poltnt_2.prn"
         Dim lPollutantListPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\" & lPollutantListFileName
-        If Not FileExists(lPollutantListPath) Then
+        If Not IO.File.Exists(lPollutantListPath) Then
             lPollutantListPath = "\basins\models\hspf\bin\" & lPollutantListFileName
             If Not FileExists(lPollutantListPath) Then
                 lPollutantListPath = FindFile("Please locate " & lPollutantListFileName, lPollutantListFileName)
@@ -309,9 +278,9 @@ Module modModelSetup
 
         'build collection of unique landuse groups
         Dim lUniqueLugroups As New atcCollection
-        For i As Integer = 1 To aGridPervious.Source.Rows
-            lUniqueLugroups.Add(aGridPervious.Source.CellValue(i, 1))
-        Next i
+        For lRowIndex As Integer = 1 To aGridPervious.Source.Rows
+            lUniqueLugroups.Add(aGridPervious.Source.CellValue(lRowIndex, 1))
+        Next lRowIndex
         Logger.Dbg("GridRowCount:" & aGridPervious.Source.Rows & " UniqueLugroupCount:" & lUniqueLugroups.Count)
 
         Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
@@ -336,15 +305,15 @@ Module modModelSetup
                 If lLandUseName IsNot Nothing Then
                     'find percent perv that corresponds to this lugroup
                     Dim lPercentImperv As Double
-                    For j As Integer = 1 To aGridPervious.Source.Rows
-                        If lLandUseName = aGridPervious.Source.CellValue(j, 1) Then
-                            If Double.TryParse(aGridPervious.Source.CellValue(j, 2), lPercentImperv) Then
+                    For lRowIndex As Integer = 1 To aGridPervious.Source.Rows
+                        If lLandUseName = aGridPervious.Source.CellValue(lRowIndex, 1) Then
+                            If Double.TryParse(aGridPervious.Source.CellValue(lRowIndex, 2), lPercentImperv) Then
                                 Exit For
                             Else
-                                Logger.Dbg("Warning: non-parsable percent impervious value at row " & j & " '" & aGridPervious.Source.CellValue(j, 2) & "' for land use name " & lLandUseName)
+                                Logger.Dbg("Warning: non-parsable percent impervious value at row " & lRowIndex & " '" & aGridPervious.Source.CellValue(lRowIndex, 2) & "' for land use name " & lLandUseName)
                             End If
                         End If
-                    Next j
+                    Next lRowIndex
                     'find lugroup position in the area array
                     Dim lpos As Long
                     For j As Integer = 0 To lUniqueLugroups.Count - 1
@@ -375,21 +344,21 @@ Module modModelSetup
                 Next j
 
                 'find lugroup that corresponds to this lucode, could be multiple matches
-                For j As Integer = 1 To aGridPervious.Source.Rows
+                For lSourceRowIndex As Integer = 1 To aGridPervious.Source.Rows
                     Dim lLandUseName As String = ""
                     Dim lpos As Integer = -1
                     Dim lPercentImperv As Double
-                    If aGridPervious.Source.CellValue(j, 0) <> "" Then
-                        If lLandUse.Code = aGridPervious.Source.CellValue(j, 0) Then
+                    If aGridPervious.Source.CellValue(lSourceRowIndex, 0) <> "" Then
+                        If lLandUse.Code = aGridPervious.Source.CellValue(lSourceRowIndex, 0) Then
                             'see if any of these are subbasin-specific
-                            If Not Double.TryParse(aGridPervious.Source.CellValue(j, 2), lPercentImperv) Then
-                                Logger.Dbg("Warning: non-parsable percent impervious value at row " & j & " '" & aGridPervious.Source.CellValue(j, 2) & "' for land use code " & lLandUse.Code)
+                            If Not Double.TryParse(aGridPervious.Source.CellValue(lSourceRowIndex, 2), lPercentImperv) Then
+                                Logger.Dbg("Warning: non-parsable percent impervious value at row " & lSourceRowIndex & " '" & aGridPervious.Source.CellValue(lSourceRowIndex, 2) & "' for land use code " & lLandUse.Code)
                             Else
                                 Dim lMultiplier As Double
-                                If Not Double.TryParse(aGridPervious.Source.CellValue(j, 3), lMultiplier) Then
+                                If Not Double.TryParse(aGridPervious.Source.CellValue(lSourceRowIndex, 3), lMultiplier) Then
                                     lMultiplier = 1.0
                                 End If
-                                Dim lSubbasin As String = aGridPervious.Source.CellValue(j, 4)
+                                Dim lSubbasin As String = aGridPervious.Source.CellValue(lSourceRowIndex, 4)
                                 Dim lSubbasinSpecific As Boolean = False
                                 If Not lSubbasin Is Nothing Then
                                     If lSubbasin.Length > 0 And lSubbasin <> "Invalid Field Number" Then
@@ -399,7 +368,7 @@ Module modModelSetup
                                 If lSubbasinSpecific Then
                                     'this row is subbasin-specific
                                     If lSubbasin = lLandUse.ModelID Then
-                                        lLandUseName = aGridPervious.Source.CellValue(j, 1)
+                                        lLandUseName = aGridPervious.Source.CellValue(lSourceRowIndex, 1)
                                     End If
                                 Else
                                     'make sure that no other rows of this lucode are 
@@ -407,10 +376,10 @@ Module modModelSetup
                                     'should therefore not use this row
                                     Dim lUseIt As Boolean = True
                                     For k As Integer = 1 To aGridPervious.Source.Rows
-                                        If k <> j Then
-                                            If aGridPervious.Source.CellValue(k, 0) = aGridPervious.Source.CellValue(j, 0) Then
+                                        If k <> lSourceRowIndex Then
+                                            If aGridPervious.Source.CellValue(k, 0) = aGridPervious.Source.CellValue(lSourceRowIndex, 0) Then
                                                 'this other row has same lucode
-                                                If aGridPervious.Source.CellValue(k, 1) = aGridPervious.Source.CellValue(j, 1) Then
+                                                If aGridPervious.Source.CellValue(k, 1) = aGridPervious.Source.CellValue(lSourceRowIndex, 1) Then
                                                     'and the same group name
                                                     lSubbasin = aGridPervious.Source.CellValue(k, 4)
                                                     If lSubbasin IsNot Nothing AndAlso IsNumeric(lSubbasin) Then
@@ -425,7 +394,7 @@ Module modModelSetup
                                         End If
                                     Next k
                                     If lUseIt Then 'we want this one now
-                                        lLandUseName = aGridPervious.Source.CellValue(j, 1)
+                                        lLandUseName = aGridPervious.Source.CellValue(lSourceRowIndex, 1)
                                     End If
                                 End If
 
@@ -449,7 +418,7 @@ Module modModelSetup
                             End If
                         End If
                     End If
-                Next j
+                Next lSourceRowIndex
             Next lLandUse
         End If
 
@@ -554,7 +523,6 @@ Module modModelSetup
 
     Friend Sub WritePTFFile(ByVal aPtfFileName As String, _
                             ByVal aChannels As Channels)
-
         Dim lSBPtf As New StringBuilder
 
         lSBPtf.AppendLine("""Reach Number""" & "," & """Length(ft)""" & "," & _
@@ -590,36 +558,7 @@ Module modModelSetup
     Friend Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As Collection, _
                             ByVal aLayerIndex As Integer, ByVal aPointIndex As Integer, ByVal aChkCustom As Boolean, _
                             ByVal aLblCustom As String, ByVal aChkCalculate As Boolean, ByVal aYear As String)
-
-        Dim OutFile As Integer
-        Dim i As Integer, j As Long, k As Long
-        Dim pcsLayerIndex As Integer
-        Dim npdesIndex As Long, flowIndex As Long, cuIndex As Long, facIndex As Long
-        Dim flow As Single
-        Dim facname As String
-        Dim huc As String
-        Dim mipt As Single
-        Dim dbffilename As String
-        Dim dbname As String = ""
-        Dim lnpdes As Object
-        Dim ctemp As String
-        Dim tmpDbf As IatcTable
-        Dim ParmCode(0) As String, ParmName(0) As String
-        Dim RowCount As Long = 0
-        Dim prevdbf As String
-        Dim YearField As Long, ParmField As Long
-        Dim LoadField As Long, NPDESField As Long
-        Dim dbrcount As Long
-        Dim TableYear(0) As String
-        Dim TableParm(0) As String
-        Dim TableLoad(0) As String
-        Dim TableNPDES(0) As String
-        Dim tPoll As String
-        Dim tValue As String
-        Dim iFound As Boolean
-
-        OutFile = FreeFile()
-        FileOpen(OutFile, aPsrFileName, OpenMode.Output)
+        Dim lSB As New StringBuilder
 
         Dim cNPDES As New Collection
         Dim cSubbasin As New Collection
@@ -628,11 +567,12 @@ Module modModelSetup
         Dim cFacName As New Collection
         Dim cHuc As New Collection
 
-        If aOutSubs.Count > 0 Then
-
-            'build collection of npdes sites to output
-            For i = 1 To aOutSubs.Count
-                For j = 0 To aUniqueSubids.Count - 1
+        Dim dbname As String = ""
+        Dim RowCount As Long = 0
+        Dim pcsLayerIndex As Integer
+        If aOutSubs.Count > 0 Then 'build collection of npdes sites to output
+            For i As Integer = 1 To aOutSubs.Count
+                For j As Integer = 0 To aUniqueSubids.Count - 1
                     If aOutSubs(i) = aUniqueSubids(j) Then
                         'found this subbasin in selected list
                         If Len(GisUtil.FieldValue(aLayerIndex, i - 1, aPointIndex)) > 0 Then
@@ -654,19 +594,20 @@ Module modModelSetup
                 If GisUtil.IsLayer("Permit Compliance System") Then
                     'set pcs shape file
                     pcsLayerIndex = GisUtil.LayerIndex("Permit Compliance System")
+                    Dim npdesIndex As Long, flowIndex As Long, cuIndex As Long, facIndex As Long
                     npdesIndex = GisUtil.FieldIndex(pcsLayerIndex, "NPDES")
                     flowIndex = GisUtil.FieldIndex(pcsLayerIndex, "FLOW_RATE")
                     facIndex = GisUtil.FieldIndex(pcsLayerIndex, "FAC_NAME")
                     cuIndex = GisUtil.FieldIndex(pcsLayerIndex, "BCU")
                     If npdesIndex > -1 Then
-                        For i = 1 To cNPDES.Count
-                            flow = 0.0#
-                            facname = ""
-                            huc = ""
-                            mipt = 0.0#
-                            If Len(Trim(cNPDES(i))) > 0 Then
-                                For j = 1 To GisUtil.NumFeatures(pcsLayerIndex)
-                                    If GisUtil.FieldValue(pcsLayerIndex, j - 1, npdesIndex) = cNPDES(i) Then
+                        For lNpdesIndex As Integer = 1 To cNPDES.Count
+                            Dim flow As Double = 0.0
+                            Dim facname As String = ""
+                            Dim huc As String = ""
+                            Dim mipt As Single = 0.0#
+                            If Len(Trim(cNPDES(lNpdesIndex))) > 0 Then
+                                For j As Integer = 1 To GisUtil.NumFeatures(pcsLayerIndex)
+                                    If GisUtil.FieldValue(pcsLayerIndex, j - 1, npdesIndex) = cNPDES(lNpdesIndex) Then
                                         'this is the one
                                         If IsNumeric(GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex)) Then
                                             flow = GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex) * 1.55
@@ -690,16 +631,16 @@ Module modModelSetup
                             cMipt.Add(mipt)
                             cFacName.Add(facname)
                             cHuc.Add(huc)
-                        Next i
+                        Next lNpdesIndex
                     End If
                     'check for dbf associated with each npdes point
-                    i = 1
+                    Dim i As Integer = 1
                     dbname = PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs\"
-                    For Each lnpdes In cNPDES
-                        dbffilename = Trim(cHuc(i)) & ".dbf"
+                    For Each lnpdes As Object In cNPDES
+                        Dim dbffilename As String = Trim(cHuc(i)) & ".dbf"
                         If Len(Dir(dbname & dbffilename)) > 0 And Len(Trim(lnpdes)) > 0 Then
                             'yes, it exists
-                            i = i + 1
+                            i += 1
                         Else
                             'remove from collection
                             cNPDES.Remove(i)
@@ -716,7 +657,6 @@ Module modModelSetup
                         cNPDES.Remove(1)
                     Loop
                 End If
-
             Else
                 'using custom table
                 'must have these fields in this order:
@@ -724,10 +664,11 @@ Module modModelSetup
                 'facname
                 'load (flow or other value) lbs/yr or cfs
                 'parm (flow or other name)
-                tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
+                Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
 
-                i = 1
+                Dim i As Integer = 1
                 Do While i <= cNPDES.Count
+                    Dim mipt As Single = 0.0#
                     If aChkCalculate Then
                         'calculate mile point on stream
                         'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), IO.Path.GetFileNameWithoutExtension(OutletsJoinThemeName), PCSIdField, pNPDES(j))
@@ -736,8 +677,8 @@ Module modModelSetup
                         mipt = 0.0#
                     End If
                     cMipt.Add(mipt)
-                    iFound = False
-                    For j = 1 To tmpDbf.NumRecords
+                    Dim iFound As Boolean = False
+                    For j As Integer = 1 To tmpDbf.NumRecords
                         tmpDbf.CurrentRecord = j
                         If cNPDES(i) = tmpDbf.Value(1) Then
                             cFacName.Add(tmpDbf.Value(2))
@@ -757,23 +698,23 @@ Module modModelSetup
         End If
 
         'write first part of point source file
-        PrintLine(OutFile, " " & CStr(cNPDES.Count))
-        PrintLine(OutFile, " ")
-        WriteLine(OutFile, "Facility Name", "Npdes", "Cuseg", "Mi")
-        For i = 1 To cNPDES.Count
+        lSB.AppendLine(" " & CStr(cNPDES.Count))
+        lSB.AppendLine(" ")
+        lSB.AppendLine("FacilityName Npdes Cuseg Mi")
+        Dim ctemp As String
+        Dim ParmCode(0) As String, ParmName(0) As String
+        For i As Integer = 1 To cNPDES.Count
             ctemp = Chr(34) & cFacName(i) & Chr(34) & " " & cNPDES(i) & " " & cSubbasin(i) & " " & Format(cMipt(i), "0.000000")
-            PrintLine(OutFile, ctemp)
+            lSB.AppendLine(ctemp)
         Next i
 
-        If Not aChkCustom Then
-            'read in Permitted Discharges Parameter Table
-            If cNPDES.Count > 0 Then
-                'open dbf file
-                tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
+        If Not aChkCustom Then 'read in Permitted Discharges Parameter Table
+            If cNPDES.Count > 0 Then 'open dbf file
+                Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
                 RowCount = tmpDbf.NumRecords
                 ReDim ParmCode(RowCount)
                 ReDim ParmName(RowCount)
-                For i = 1 To RowCount
+                For i As Integer = 1 To RowCount
                     tmpDbf.CurrentRecord = i
                     ParmCode(i) = tmpDbf.Value(1)
                     ParmName(i) = tmpDbf.Value(2)
@@ -781,19 +722,26 @@ Module modModelSetup
             End If
         End If
 
-        PrintLine(OutFile, " ")
-        WriteLine(OutFile, "Ordinal Number", "Pollutant", "Load (lbs/hr)")
-        If Not aChkCustom Then
-            'using pcs data
-            prevdbf = ""
-            For j = 1 To cNPDES.Count
+        lSB.AppendLine(" ")
+        lSB.AppendLine("OrdinalNumber Pollutant Load(lbs/hr)")
+        Dim tValue As String
+        If Not aChkCustom Then  'using pcs data
+            Dim prevdbf As String = ""
+            Dim TableYear(0) As String
+            Dim TableParm(0) As String
+            Dim TableLoad(0) As String
+            Dim TableNPDES(0) As String
+            For j As Integer = 1 To cNPDES.Count
                 'open dbf file
-                dbffilename = dbname & Trim(cHuc(j)) & ".dbf"
-                If Len(Dir(dbffilename)) > 0 Then
+                Dim dbffilename As String = dbname & Trim(cHuc(j)) & ".dbf"
+                Dim lDbRowCount As Long
+                If IO.File.Exists(dbffilename) Then
                     If dbffilename <> prevdbf Then
-                        tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(dbffilename)
+                        Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(dbffilename)
                         prevdbf = dbffilename
-                        For k = 1 To tmpDbf.NumFields
+                        Dim YearField As Long, ParmField As Long
+                        Dim LoadField As Long, NPDESField As Long
+                        For k As Integer = 1 To tmpDbf.NumFields
                             If UCase(tmpDbf.FieldName(k)) = "YEAR" Then
                                 YearField = k
                             End If
@@ -807,12 +755,12 @@ Module modModelSetup
                                 NPDESField = k
                             End If
                         Next k
-                        dbrcount = tmpDbf.NumRecords
-                        ReDim TableYear(dbrcount)
-                        ReDim TableParm(dbrcount)
-                        ReDim TableLoad(dbrcount)
-                        ReDim TableNPDES(dbrcount)
-                        For k = 1 To dbrcount
+                        lDbRowCount = tmpDbf.NumRecords
+                        ReDim TableYear(lDbRowCount)
+                        ReDim TableParm(lDbRowCount)
+                        ReDim TableLoad(lDbRowCount)
+                        ReDim TableNPDES(lDbRowCount)
+                        For k As Integer = 1 To lDbRowCount
                             tmpDbf.CurrentRecord = k
                             TableYear(k) = tmpDbf.Value(YearField)
                             TableParm(k) = tmpDbf.Value(ParmField)
@@ -820,11 +768,11 @@ Module modModelSetup
                             TableNPDES(k) = tmpDbf.Value(NPDESField)
                         Next k
                     End If
-                    For k = 1 To dbrcount
+                    For k As Integer = 1 To lDbRowCount
                         If TableNPDES(k) = cNPDES(j) And TableYear(k) = aYear Then
                             'found one, output it
-                            tPoll = ""
-                            For i = 0 To RowCount - 1
+                            Dim tPoll As String = ""
+                            For i As Integer = 0 To RowCount - 1
                                 If TableParm(k) = ParmCode(i) Then
                                     tPoll = ParmName(i)
                                     Exit For
@@ -832,21 +780,20 @@ Module modModelSetup
                             Next i
                             tValue = TableLoad(k) / 8760 'lbs/hr
                             ctemp = CStr(j - 1) & " " & Chr(34) & Trim(tPoll) & Chr(34) & " " & Format(CSng(tValue), "0.000000")
-                            PrintLine(OutFile, ctemp)
+                            lSB.AppendLine(ctemp)
                         End If
                     Next k
                 End If
             Next j
             'now output flows
-            For j = 1 To cNPDES.Count
+            For j As Integer = 1 To cNPDES.Count
                 ctemp = CStr(j - 1) & " Flow " & Format(cFlow(j), "0.000000")
-                PrintLine(OutFile, ctemp)
+                lSB.AppendLine(ctemp)
             Next j
-        Else
-            'using custom data
-            tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
-            For i = 1 To cNPDES.Count
-                For j = 1 To tmpDbf.NumRecords
+        Else 'using custom data
+            Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
+            For i As Integer = 1 To cNPDES.Count
+                For j As Integer = 1 To tmpDbf.NumRecords
                     tmpDbf.CurrentRecord = j
                     If cNPDES(i) = tmpDbf.Value(1) Then
                         If UCase(tmpDbf.Value(4)) = "FLOW" Then
@@ -855,76 +802,69 @@ Module modModelSetup
                             tValue = CSng(tmpDbf.Value(3)) / 8760 'lbs/hr
                             ctemp = CStr(i - 1) & " " & Chr(34) & Trim(tmpDbf.Value(4)) & Chr(34) & " " & Format(CStr(tValue), "0.000000")
                         End If
-                        PrintLine(OutFile, ctemp)
+                        lSB.AppendLine(ctemp)
                     End If
                 Next j
             Next i
         End If
 
-        FileClose(OutFile)
+        SaveFileString(aPsrFileName, lSB.ToString)
     End Sub
 
-    Friend Sub WriteSEGFile(ByVal aSegFileName As String, ByVal aMetSegIds As atcCollection, ByVal aMetIndices As atcCollection, ByVal aMetBaseDsns As atcCollection)
-
-        Dim lOutFile As Integer = FreeFile()
-        FileOpen(lOutFile, aSegFileName, OpenMode.Output)
-
-        WriteLine(lOutFile, "SegID", "PrecWdmId", "PrecDsn", "PrecTstype", "PrecMFactPI", "PrecMFactR", _
-                                     "AtemWdmId", "AtemDsn", "AtemTstype", "AtemMFactPI", "AtemMFactR", _
-                                     "DewpWdmId", "DewpDsn", "DewpTstype", "DewpMFactPI", "DewpMFactR", _
-                                     "WindWdmId", "WindDsn", "WindTstype", "WindMFactPI", "WindMFactR", _
-                                     "SolrWdmId", "SolrDsn", "SolrTstype", "SolrMFactPI", "SolrMFactR", _
-                                     "ClouWdmId", "ClouDsn", "ClouTstype", "ClouMFactPI", "ClouMFactR", _
-                                     "PevtWdmId", "PevtDsn", "PevtTstype", "PevtMFactPI", "PevtMFactR")
-
+    Friend Sub WriteSEGFile(ByVal aSegFileName As String, _
+                            ByVal aMetSegIds As atcCollection, _
+                            ByVal aMetIndices As atcCollection, _
+                            ByVal aMetBaseDsns As atcCollection)
+        Dim lSB As New StringBuilder
+        lSB.AppendLine("SegID" & vbTab & _
+                       "PrecWdmId PrecDsn PrecTstype PrecMFactPI PrecMFactR " & _
+                       "AtemWdmId AtemDsn AtemTstype AtemMFactPI AtemMFactR " & _
+                       "DewpWdmId DewpDsn DewpTstype DewpMFactPI DewpMFactR " & _
+                       "WindWdmId WindDsn WindTstype WindMFactPI WindMFactR " & _
+                       "SolrWdmId SolrDsn SolrTstype SolrMFactPI SolrMFactR " & _
+                       "ClouWdmId ClouDsn ClouTstype ClouMFactPI ClouMFactR " & _
+                       "PevtWdmId PevtDsn PevtTstype PevtMFactPI PevtMFactR")
         For lIndex As Integer = 0 To aMetIndices.Count - 1
             Dim lBaseDsn As Integer = aMetBaseDsns(aMetIndices(lIndex))
-            PrintLine(lOutFile, CStr(aMetSegIds(lIndex)) & " WDM2 " & CStr(lBaseDsn) & " PREC 1 1" & _
-                                                           " WDM2 " & CStr(lBaseDsn + 2) & " ATEM 1 1" & _
-                                                           " WDM2 " & CStr(lBaseDsn + 6) & " DEWP 1 1" & _
-                                                           " WDM2 " & CStr(lBaseDsn + 3) & " WIND 1 1" & _
-                                                           " WDM2 " & CStr(lBaseDsn + 4) & " SOLR 1 1" & _
-                                                           " WDM2 " & CStr(lBaseDsn + 7) & " CLOU 0 1" & _
-                                                           " WDM2 " & CStr(lBaseDsn + 5) & " PEVT 1 1")
+            lSB.AppendLine(CStr(aMetSegIds(lIndex)) & " WDM2 " & lBaseDsn.ToString & " PREC 1 1" & _
+                                                      " WDM2 " & (lBaseDsn + 2).ToString & " ATEM 1 1" & _
+                                                      " WDM2 " & (lBaseDsn + 6).ToString & " DEWP 1 1" & _
+                                                      " WDM2 " & (lBaseDsn + 3).ToString & " WIND 1 1" & _
+                                                      " WDM2 " & (lBaseDsn + 4).ToString & " SOLR 1 1" & _
+                                                      " WDM2 " & (lBaseDsn + 7).ToString & " CLOU 0 1" & _
+                                                      " WDM2 " & (lBaseDsn + 5).ToString & " PEVT 1 1")
         Next
-
-        FileClose(lOutFile)
-
+        SaveFileString(aSegFileName, lSB.ToString)
     End Sub
 
     Friend Sub WriteMAPFile(ByVal aMapFileName As String)
-        Dim lOutFile As Integer
-        Dim i As Integer
-        Dim lTemp As String
-
-        lOutFile = FreeFile()
-        FileOpen(lOutFile, aMapFileName, OpenMode.Output)
-
-        lTemp = "EXT " & GisUtil.MapExtentXmin & " " & GisUtil.MapExtentYmax & " " & GisUtil.MapExtentXmax & " " & GisUtil.MapExtentYmin
-        PrintLine(lOutFile, lTemp)
-
-        For i = 0 To GisUtil.NumLayers - 1
-            If GisUtil.LayerType(i) = 1 Or GisUtil.LayerType(i) = 2 Or GisUtil.LayerType(i) = 3 Then
+        Dim lSB As New StringBuilder
+        lSB.AppendLine("EXT " & GisUtil.MapExtentXmin & _
+                          " " & GisUtil.MapExtentYmax & _
+                          " " & GisUtil.MapExtentXmax & _
+                          " " & GisUtil.MapExtentYmin)
+        For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
+            If GisUtil.LayerType(lLayerIndex) = 1 Or _
+               GisUtil.LayerType(lLayerIndex) = 2 Or _
+               GisUtil.LayerType(lLayerIndex) = 3 Then
                 'shapefile
-                lTemp = "LYR '" + GisUtil.LayerFileName(i) & "', " & GisUtil.LayerColor(i)
-                If GisUtil.LayerType(i) = 3 Then
+                Dim lTemp As String = "LYR '" + GisUtil.LayerFileName(lLayerIndex) & "', " & GisUtil.LayerColor(lLayerIndex)
+                If GisUtil.LayerType(lLayerIndex) = 3 Then
                     'polygon 
-                    If Not GisUtil.LayerTransparent(i) Then
-                        lTemp = lTemp & ",Style Transparent "
+                    If Not GisUtil.LayerTransparent(lLayerIndex) Then
+                        lTemp &= ",Style Transparent "
                     End If
-                    lTemp = lTemp & ",Outline " & GisUtil.LayerOutlineColor(i)
+                    lTemp &= ",Outline " & GisUtil.LayerOutlineColor(lLayerIndex)
                 End If
                 'hide the layers not turned on
-                If Not GisUtil.LayerVisible(i) Then
-                    lTemp = lTemp & ",Hide"
+                If Not GisUtil.LayerVisible(lLayerIndex) Then
+                    lTemp &= ",Hide"
                 End If
                 'add theme name as caption
-                lTemp = lTemp & ",Name '" & GisUtil.LayerName(i) & "'"
-                PrintLine(lOutFile, lTemp)
+                lTemp &= ",Name '" & GisUtil.LayerName(lLayerIndex) & "'"
+                lSB.AppendLine(lTemp)
             End If
-        Next i
-        FileClose(lOutFile)
-
+        Next lLayerIndex
+        SaveFileString(aMapFileName, lSB.ToString)
     End Sub
-
 End Module
