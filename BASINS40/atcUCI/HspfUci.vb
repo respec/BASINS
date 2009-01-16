@@ -19,6 +19,8 @@ Public Class HspfUci
     Public Edited As Boolean = False
 
     Private pInitialized As Boolean = False
+    Private pHspfProcess As New Process
+
     Public Property Initialized() As Boolean
         Get
             If Not (pInitialized) Then
@@ -848,52 +850,93 @@ Public Class HspfUci
     End Sub
 
     Public Sub RunUci(ByRef aReturnCode As Integer)
-        'Call F90_SCNDBG(10)
-        Dim lPath As String = IO.Path.GetDirectoryName(Name)
-        If lPath.Length > 0 Then
-            ChDriveDir(lPath)
-        End If
 
-        Dim lReturnCode As Integer
+        Dim lReturnCode As Integer = 0
         ReportMissingTimsers(lReturnCode)
         If lReturnCode = 0 Then 'user chose do anyway after timser warning
-            Dim lOption As Integer = -1 'dont interp in actscn (itll be done in simscn)
-            'Call F90_ACTSCN(i, pWdmUnit(1), pMsgUnit, r, s, Len(s))
-            'Call F90_SIMSCN(retcod)
 
+            Dim lProcessId As Integer = Process.GetCurrentProcess.Id
+            pHspfProcess = New Process
+            With pHspfProcess.StartInfo
+                Dim HSPFEngineExe As String = GetSetting("HSPFEngineNet", "files", "HSPFEngineNet.exe", "HSPFEngineNet.exe")
+                HSPFEngineExe = atcUtility.FindFile("Please locate HSPFEngineNet.exe", HSPFEngineExe)
+                SaveSetting("HSPFEngine", "files", "HSPFEngineNet.exe", HSPFEngineExe)
+                .FileName = HSPFEngineExe
+                .Arguments = lProcessId '& " wait"
+                .CreateNoWindow = True
+                .UseShellExecute = False
+                .RedirectStandardInput = True
+                .RedirectStandardOutput = True
+                AddHandler pHspfProcess.OutputDataReceived, AddressOf HspfMessageHandler
+                .RedirectStandardError = True
+                AddHandler pHspfProcess.ErrorDataReceived, AddressOf HspfMessageHandler
+            End With
+            Logger.Dbg("AboutToStart HSPF")
+            pHspfProcess.Start()
+            Logger.Dbg("Listen for Output or Error")
+            pHspfProcess.BeginOutputReadLine()
+            pHspfProcess.BeginErrorReadLine()
+
+            System.Threading.Thread.Sleep(1000)
+            pHspfProcess.StandardInput.WriteLine("MONITOR")
+
+            Logger.Dbg("W99OPN")
+            'System.Threading.Thread.Sleep(1000)
+            pHspfProcess.StandardInput.WriteLine("W99OPN")
+
+            Dim lPath As String = IO.Path.GetDirectoryName(Name)
             If lPath.Length > 0 Then
-                SendHspfMessage("CURDIR " & lPath)
+                ChDriveDir(lPath)
             End If
+            Logger.Dbg("Curdir " & CurDir())
+            If lPath.Length > 0 Then
+                pHspfProcess.StandardInput.WriteLine("CURDIR " & lPath)
+            End If
+            Logger.Dbg("CurdirAfterPath " & CurDir())
+
             Dim lFileName As String = IO.Path.GetFileNameWithoutExtension(Name)
-            SendHspfMessage("ACTIVATE " & lFileName & " " & lOption)
-            Dim lMsg As String = WaitForChildMessage()
-            SendHspfMessage("SIMULATE") 'calls F90_SIMSCN
-            lMsg = WaitForChildMessage()
-            lMsg = WaitForChildMessage() 'Activate Complete
-            While CDbl(UCase(CStr(InStr(lMsg, "PROGRESS")))) > 0
-                lMsg = WaitForChildMessage()
-            End While
-            'Stop 'What should we be doing here exactly? Can't do GetExitCodeProcess any more.
-            'ret = GetExitCodeProcess(Me.Monitor.launch.hComputeProcess, i)
-            'If i <> &H103 Then
-            'need to restart hspfengine
-            If IsNumeric(Right(lMsg, 2)) Then
-                aReturnCode = CInt(Right(lMsg, 2))
-            End If
+            Dim lOption As Integer = -1 'dont interp in actscn (itll be done in simscn)
+            pHspfProcess.StandardInput.WriteLine("ACTIVATE " & lFileName & " " & lOption)
 
-            RestartHSPFEngine()
+            pHspfProcess.WaitForExit()
+
             'have to reset wdms, may have changed pointers during simulate
-            ClearWDM()
-            InitWDMArray()
-            SetWDMFiles()
+            'ClearWDM()
+            'InitWDMArray()
+            'SetWDMFiles()
 
-            If IsNumeric(Right(lMsg, 1)) Then
-                aReturnCode = CInt(Right(lMsg, 1))
-            End If
-            'next line fixed 10/28/03 to handle new ipc return message
-            If CDbl(Right(lMsg, 1)) <> 0 Or lMsg.StartsWith("HSPFUCI exited with code") Then
-                pErrorDescription = "Fatal HSPF error while running UCI file '" & lFileName & "'." & vbCrLf & vbCrLf & "See the file '" & EchoFileName() & "' for more details."
-                SendMonitorMessage(pErrorDescription)
+        End If
+    End Sub
+
+    Private Sub HspfMessageHandler(ByVal aSendingProcess As Object, _
+                                   ByVal aOutLine As DataReceivedEventArgs)
+        If Not String.IsNullOrEmpty(aOutLine.Data) Then
+            Dim lMsg As String = aOutLine.Data.ToString
+            If lMsg.StartsWith("Activate complete") Then
+                System.Threading.Thread.Sleep(2000)
+                Logger.Dbg("SimulateStart")
+                pHspfProcess.StandardInput.WriteLine("SIMULATE") 'calls F90_SIMSCN
+            ElseIf lMsg.StartsWith("Simulate complete 0") Then
+                System.Threading.Thread.Sleep(2000)
+                Logger.Dbg("SimulateDone, TryToExit")
+                pHspfProcess.StandardInput.WriteLine("EXIT")
+            ElseIf lMsg.ToLower = "cancel" Then
+                Application.DoEvents()
+                System.Threading.Thread.Sleep(1000)
+                If pHspfProcess.HasExited Then
+                    Logger.Dbg("HSPF already exited")
+                Else
+                    pHspfProcess.StandardInput.WriteLine("MSG1 Canceled")
+                    Application.DoEvents()
+                    System.Threading.Thread.Sleep(2000)
+                    pHspfProcess.Kill()
+                End If
+            ElseIf (Right(lMsg, 1) <> "0" AndAlso InStr(lMsg, "SPIPH") = 0) Or lMsg.StartsWith("HSPFUCI exited with code") Then
+                pErrorDescription = "Fatal HSPF error while running UCI file '" & Name.Trim & "'." & vbCrLf & vbCrLf & "See the file '" & EchoFileName.Trim & "' for more details."
+                Logger.Msg(pErrorDescription, MsgBoxStyle.Critical, "Problem Running HSPF")
+                pHspfProcess.StandardInput.WriteLine("EXIT")
+            ElseIf lMsg IsNot Nothing Then
+                Logger.Dbg("Ignore " & lMsg)
             End If
         End If
     End Sub

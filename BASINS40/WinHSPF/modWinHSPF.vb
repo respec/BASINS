@@ -380,8 +380,9 @@ Public Module WinHSPF
         Dim lRetcod As Integer
         pUCI.RunUci(lRetcod)   'now activate and run
         'If lRetcod = -99 Then StartHSPFEngine()
-        If pUCI.ErrorDescription.Trim.Length > 0 Then
-            If Logger.Msg(pUCI.ErrorDescription & vbCrLf & vbCrLf & _
+        Dim lMsg As String = pUCI.ErrorDescription
+        If lMsg.Trim.Length > 0 Then
+            If Logger.Msg(lMsg & vbCrLf & vbCrLf & _
                           "Do you want to view the Echo file?", MsgBoxStyle.YesNo, _
                           "HSPF Problem") = MsgBoxResult.Yes Then
                 Try

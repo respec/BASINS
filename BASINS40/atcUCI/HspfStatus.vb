@@ -243,7 +243,7 @@ Public Class HspfStatus
         Static lMassLinkPos As Integer 'save between calls
 
         If aInit Then
-            lMassLinkPos = 0
+            lMassLinkPos = 1
         End If
 
         If aConnection.MassLink = 0 Then
