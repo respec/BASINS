@@ -122,6 +122,7 @@ Partial Class frmOutput
         '
         'cmdCopy
         '
+        Me.cmdCopy.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCopy.Location = New System.Drawing.Point(149, 234)
         Me.cmdCopy.Name = "cmdCopy"
         Me.cmdCopy.Size = New System.Drawing.Size(60, 20)
@@ -131,6 +132,7 @@ Partial Class frmOutput
         '
         'cmdRemove
         '
+        Me.cmdRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdRemove.Location = New System.Drawing.Point(82, 234)
         Me.cmdRemove.Name = "cmdRemove"
         Me.cmdRemove.Size = New System.Drawing.Size(60, 20)
@@ -140,6 +142,7 @@ Partial Class frmOutput
         '
         'cmdAdd
         '
+        Me.cmdAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdAdd.Location = New System.Drawing.Point(15, 234)
         Me.cmdAdd.Name = "cmdAdd"
@@ -152,6 +155,9 @@ Partial Class frmOutput
         '
         Me.agdOutput.AllowHorizontalScrolling = True
         Me.agdOutput.AllowNewValidValues = False
+        Me.agdOutput.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdOutput.CellBackColor = System.Drawing.Color.Empty
         Me.agdOutput.Fixed3D = False
         Me.agdOutput.LineColor = System.Drawing.Color.Empty
