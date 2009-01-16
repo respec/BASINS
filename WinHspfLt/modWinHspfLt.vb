@@ -140,6 +140,7 @@ Module modWinHSPFLt
                         Logger.Dbg("ChangeLogFileTO:" & lErrLogName)
                     End If
                     Logger.Status("Show")
+                    Logger.Status("Label Title WinHSPFLt " & lUci)
                     Logger.StartToFile(lErrLogName, False, False, True)
                     Logger.Dbg(lLoggerString)
                     Logger.Status("(LOGTOFILE " & lErrLogName & ")")
@@ -152,6 +153,7 @@ Module modWinHSPFLt
 
                     If lRetcod = 0 Then
                         Logger.Dbg("Pre:  F90_SIMSCN (" & lRetcod & ")")
+                        Logger.Status("Progress Percent Off")
                         Call F90_SIMSCN(lRetcod)
                         Logger.Dbg("Post: F90_SIMSCN (" & lRetcod & ")")
                     End If
