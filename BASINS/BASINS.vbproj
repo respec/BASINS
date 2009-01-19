@@ -83,11 +83,6 @@
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -101,6 +96,11 @@
     <ProjectReference Include="..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj">
       <Project>{59E61F35-B014-4D34-8277-63FF6BE40DD6}</Project>
       <Name>BASINS-D4EMDataManager</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MapWinUtility\MapWinUtilityBasins.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>MapWinUtilityBasins</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData.vbproj">

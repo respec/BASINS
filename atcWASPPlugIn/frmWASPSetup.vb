@@ -666,7 +666,7 @@ Public Class frmWASPSetup
     Friend pSegmentFieldMap As New atcUtility.atcCollection
     Friend pPlugIn As PlugIn
     Friend pBasinsFolder As String
-    Friend pFlowStations As atcCollection
+    Friend pFlowStations As atcUtility.atcCollection
     Private pInitializing As Boolean = True
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
