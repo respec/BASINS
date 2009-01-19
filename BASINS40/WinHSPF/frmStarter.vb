@@ -5,6 +5,8 @@ Imports atcUtility
 Public Class frmStarter
 
     Dim pVScrollColumnOffset As Integer = 16
+    Dim pCurrentSelectedColumn As Integer
+    Dim pCurrentSelectedRow As Integer
 
     Public Sub New()
 
@@ -34,7 +36,6 @@ Public Class frmStarter
                               "Are you sure you want to continue?", MsgBoxStyle.YesNo, _
                               "Apply Starter Values") = vbYes Then
             SaveSpecs()
-            pUCI.SetWDMFiles()
             pUCI.SetDefault(pDefUCI)
         End If
     End Sub
@@ -58,7 +59,13 @@ Public Class frmStarter
                         End If
                         For lRow As Integer = 1 To .Rows
                             If .CellValue(lRow, 0) = lDesc Then
-                                lOpn.DefOpnId = .CellValue(lRow, 2)
+                                Dim lDefDesc = .CellValue(lRow, 1)
+                                Dim lParPos As Integer = InStr(lDefDesc, "(")
+                                Dim lSpacePos As Integer = InStr(Mid(lDefDesc, lParPos), " ")
+                                Dim lDefOpId As String = Mid(lDefDesc, lParPos + lSpacePos, lDefDesc.length - lParPos - lSpacePos)
+                                If IsNumeric(lDefOpId) Then
+                                    lOpn.DefOpnId = CInt(lDefOpId)
+                                End If
                             End If
                         Next
                     Next
@@ -115,7 +122,7 @@ Public Class frmStarter
         End With
 
         With agdStarter.Source
-            .Columns = 3
+            .Columns = 1
             .Rows = 1
             .CellValue(0, 0) = "Project Operations"
             .CellValue(0, 1) = "Mapped From Starter Operation"
@@ -125,12 +132,12 @@ Public Class frmStarter
             lOpTyps.Add("IMPLND")
             lOpTyps.Add("RCHRES")
 
-            Dim lDescList As New atcCollection
             Dim lOpTyp As HspfOpnBlk
             Dim lRow As Integer = 0
             Dim lDesc As String
             For Each lOpTypName As String In lOpTyps
                 If pUCI.OpnBlks(lOpTypName).Count > 0 Then
+                    Dim lDescList As New atcCollection
                     lOpTyp = pUCI.OpnBlks(lOpTypName)
                     For Each lOpn As HspfOperation In lOpTyp.Ids
                         If Len(Trim(lOpn.Description)) > 0 Then
@@ -144,25 +151,22 @@ Public Class frmStarter
 
                             'add a row for this one
                             lRow = lRow + 1
-                            .Rows = lRow
-                            .CellValue(.Rows, 0) = lDesc & " (" & lOpn.Name & ")"
+                            '.Rows = lRow
+                            .CellValue(lRow, 0) = lDesc & " (" & lOpn.Name & ")"
                             If lOpn.DefOpnId <> 0 Then
                                 Dim ldOpn As HspfOperation = pDefUCI.OpnBlks(lOpn.Name).OperFromID(lOpn.DefOpnId)
                                 lDesc = ldOpn.Description
-                                .CellValue(.Rows, 1) = lDesc & " (" & ldOpn.Name & " " & ldOpn.Id & ")"
-                                .CellValue(.Rows, 2) = lOpn.DefOpnId
+                                .CellValue(lRow, 1) = lDesc & " (" & ldOpn.Name & " " & ldOpn.Id & ")"
                             Else
                                 Dim lId As Integer = DefaultOpnId(lOpn, pDefUCI)
                                 Dim ldOpn As HspfOperation = pDefUCI.OpnBlks(lOpn.Name).OperFromID(lId)
                                 If Not ldOpn Is Nothing Then
                                     lDesc = ldOpn.Description
-                                    .CellValue(.Rows, 1) = lDesc & " (" & ldOpn.Name & " " & ldOpn.Id & ")"
+                                    .CellValue(lRow, 1) = lDesc & " (" & ldOpn.Name & " " & ldOpn.Id & ")"
                                 Else
-                                    .CellValue(.Rows, 1) = "None available"
+                                    .CellValue(lRow, 1) = "None available"
                                 End If
-                                .CellValue(.Rows, 2) = lId
                             End If
-                            .CellValue(.Rows, 3) = lOpn.Name
                         End If
                     Next
                 End If
@@ -175,8 +179,35 @@ Public Class frmStarter
 
         End With
 
+        agdStarter.AllowNewValidValues = False
         agdStarter.SizeAllColumnsToContents(agdStarter.Width - pVScrollColumnOffset, True)
         agdStarter.Refresh()
 
+    End Sub
+
+    Private Sub DoLimits()
+
+        If pCurrentSelectedColumn = 1 Then
+            Dim lDesc As String = agdStarter.Source.CellValue(pCurrentSelectedRow, 0)
+            Dim lParPos As Integer = InStr(lDesc, "(")
+            Dim lEndParPos As Integer = InStr(Mid(lDesc, lParPos), ")")
+            Dim lOpType As String = Mid(lDesc, lParPos + 1, lEndParPos - 2)
+            Dim lValidValues As New Collection
+            If pDefUCI.OpnBlks(lOpType).Count > 0 Then
+                For Each lOpn As HspfOperation In pDefUCI.OpnBlks(lOpType).Ids
+                    lDesc = lOpn.Description
+                    lValidValues.Add(lDesc & " (" & lOpn.Name & " " & lOpn.Id & ")")
+                Next
+            End If
+            agdStarter.ValidValues = lValidValues
+            agdStarter.Refresh()
+        End If
+
+    End Sub
+
+    Private Sub agdStarter_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdStarter.MouseDownCell
+        pCurrentSelectedColumn = aColumn
+        pCurrentSelectedRow = aRow
+        DoLimits()
     End Sub
 End Class

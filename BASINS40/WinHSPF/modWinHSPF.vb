@@ -618,7 +618,7 @@ Public Module WinHSPF
         Next
         'not found, use first one
         If aDefUCI.OpnBlks(aOpTypName).Count > 0 Then
-            matchOperWithDefault = aDefUCI.OpnBlks(aOpTypName).Ids(1)
+            matchOperWithDefault = aDefUCI.OpnBlks(aOpTypName).Ids(0)
         Else
             matchOperWithDefault = Nothing
         End If
