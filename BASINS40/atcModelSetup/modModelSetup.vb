@@ -560,24 +560,23 @@ Module modModelSetup
                             ByVal aLblCustom As String, ByVal aChkCalculate As Boolean, ByVal aYear As String)
         Dim lSB As New StringBuilder
 
-        Dim cNPDES As New Collection
-        Dim cSubbasin As New Collection
-        Dim cFlow As New Collection
-        Dim cMipt As New Collection
-        Dim cFacName As New Collection
-        Dim cHuc As New Collection
+        Dim lNPDESSites As New Collection
+        Dim lSubbasins As New Collection
+        Dim lFlows As New Collection
+        Dim lMipts As New Collection
+        Dim lFacNames As New Collection
+        Dim lHucs As New Collection
 
-        Dim dbname As String = ""
-        Dim RowCount As Long = 0
-        Dim pcsLayerIndex As Integer
+        Dim lDbName As String = ""
+        Dim lRowCount As Long = 0
+        Dim lPcsLayerIndex As Integer
         If aOutSubs.Count > 0 Then 'build collection of npdes sites to output
             For i As Integer = 1 To aOutSubs.Count
                 For j As Integer = 0 To aUniqueSubids.Count - 1
-                    If aOutSubs(i) = aUniqueSubids(j) Then
-                        'found this subbasin in selected list
-                        If Len(GisUtil.FieldValue(aLayerIndex, i - 1, aPointIndex)) > 0 Then
-                            cNPDES.Add(GisUtil.FieldValue(aLayerIndex, i - 1, aPointIndex))
-                            cSubbasin.Add(aOutSubs(i))
+                    If aOutSubs(i) = aUniqueSubids(j) Then 'found this subbasin in selected list
+                        If GisUtil.FieldValue(aLayerIndex, i - 1, aPointIndex).Length > 0 Then
+                            lNPDESSites.Add(GisUtil.FieldValue(aLayerIndex, i - 1, aPointIndex))
+                            lSubbasins.Add(aOutSubs(i))
                         End If
                     End If
                 Next j
@@ -589,72 +588,69 @@ Module modModelSetup
             '  "BASINS watershed delineator or update it manually.", vbOKOnly, "BASINS HSPF Information")
             'End If
 
-            If Not aChkCustom Then
-                'use pcs data
+            If Not aChkCustom Then 'use pcs data
                 If GisUtil.IsLayer("Permit Compliance System") Then
                     'set pcs shape file
-                    pcsLayerIndex = GisUtil.LayerIndex("Permit Compliance System")
-                    Dim npdesIndex As Long, flowIndex As Long, cuIndex As Long, facIndex As Long
-                    npdesIndex = GisUtil.FieldIndex(pcsLayerIndex, "NPDES")
-                    flowIndex = GisUtil.FieldIndex(pcsLayerIndex, "FLOW_RATE")
-                    facIndex = GisUtil.FieldIndex(pcsLayerIndex, "FAC_NAME")
-                    cuIndex = GisUtil.FieldIndex(pcsLayerIndex, "BCU")
-                    If npdesIndex > -1 Then
-                        For lNpdesIndex As Integer = 1 To cNPDES.Count
-                            Dim flow As Double = 0.0
-                            Dim facname As String = ""
-                            Dim huc As String = ""
-                            Dim mipt As Single = 0.0#
-                            If Len(Trim(cNPDES(lNpdesIndex))) > 0 Then
-                                For j As Integer = 1 To GisUtil.NumFeatures(pcsLayerIndex)
-                                    If GisUtil.FieldValue(pcsLayerIndex, j - 1, npdesIndex) = cNPDES(lNpdesIndex) Then
+                    lPcsLayerIndex = GisUtil.LayerIndex("Permit Compliance System")
+                    Dim lNpdesFieldIndex As Integer = GisUtil.FieldIndex(lPcsLayerIndex, "NPDES")
+                    Dim lFlowFieldIndex As Integer = GisUtil.FieldIndex(lPcsLayerIndex, "FLOW_RATE")
+                    Dim lFacFieldIndex As Integer = GisUtil.FieldIndex(lPcsLayerIndex, "FAC_NAME")
+                    Dim lCuFieldIndex As Integer = GisUtil.FieldIndex(lPcsLayerIndex, "BCU")
+                    If lNpdesFieldIndex > -1 Then
+                        For lNpdesIndex As Integer = 1 To lNPDESSites.Count
+                            Dim lFlow As Double = 0.0
+                            Dim lFacName As String = ""
+                            Dim lHuc As String = ""
+                            Dim lMipt As Single = 0.0#
+                            If lNPDESSites(lNpdesIndex).ToString.Trim.Length > 0 Then
+                                For j As Integer = 1 To GisUtil.NumFeatures(lPcsLayerIndex)
+                                    If GisUtil.FieldValue(lPcsLayerIndex, j - 1, lNpdesFieldIndex) = lNPDESSites(lNpdesIndex) Then
                                         'this is the one
-                                        If IsNumeric(GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex)) Then
-                                            flow = GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex) * 1.55
+                                        If IsNumeric(GisUtil.FieldValue(lPcsLayerIndex, j - 1, lFlowFieldIndex)) Then
+                                            lFlow = GisUtil.FieldValue(lPcsLayerIndex, j - 1, lFlowFieldIndex) * 1.55
                                         Else
-                                            flow = 0.0
+                                            lFlow = 0.0
                                         End If
-                                        facname = GisUtil.FieldValue(pcsLayerIndex, j - 1, facIndex)
+                                        lFacName = GisUtil.FieldValue(lPcsLayerIndex, j - 1, lFacFieldIndex)
                                         If aChkCalculate Then
                                             'calculate mile point on stream
                                             'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), IO.Path.GetFileNameWithoutExtension(OutletsJoinThemeName), PCSIdField, pNPDES(j))
                                             'mipt = dist / 1609.3
                                         Else
-                                            mipt = 0.0#
+                                            lMipt = 0.0#
                                         End If
-                                        huc = GisUtil.FieldValue(pcsLayerIndex, j - 1, cuIndex)
+                                        lHuc = GisUtil.FieldValue(lPcsLayerIndex, j - 1, lCuFieldIndex)
                                         Exit For
                                     End If
                                 Next j
                             End If
-                            cFlow.Add(flow)
-                            cMipt.Add(mipt)
-                            cFacName.Add(facname)
-                            cHuc.Add(huc)
+                            lFlows.Add(lFlow)
+                            lMipts.Add(lMipt)
+                            lFacNames.Add(lFacName)
+                            lHucs.Add(lHuc)
                         Next lNpdesIndex
                     End If
                     'check for dbf associated with each npdes point
                     Dim i As Integer = 1
-                    dbname = PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs\"
-                    For Each lnpdes As Object In cNPDES
-                        Dim dbffilename As String = Trim(cHuc(i)) & ".dbf"
-                        If Len(Dir(dbname & dbffilename)) > 0 And Len(Trim(lnpdes)) > 0 Then
+                    lDbName = PathNameOnly(GisUtil.LayerFileName(lPcsLayerIndex)) & "\pcs\"
+                    For Each lNpdesSite As Object In lNPDESSites
+                        Dim lDbfFileName As String = lHucs(i).ToString.Trim & ".dbf"
+                        If IO.File.Exists(lDbName & lDbfFileName) > 0 And lNpdesSite.ToString.Trim.Length > 0 Then
                             'yes, it exists
                             i += 1
-                        Else
-                            'remove from collection
-                            cNPDES.Remove(i)
-                            cSubbasin.Remove(i)
-                            cFlow.Remove(i)
-                            cMipt.Remove(i)
-                            cFacName.Remove(i)
-                            cHuc.Remove(i)
+                        Else 'remove from collection
+                            lNPDESSites.Remove(i)
+                            lSubbasins.Remove(i)
+                            lFlows.Remove(i)
+                            lMipts.Remove(i)
+                            lFacNames.Remove(i)
+                            lHucs.Remove(i)
                         End If
-                    Next lnpdes
+                    Next lNpdesSite
                 Else
                     'no pcs layer, clear out
-                    Do While cNPDES.Count > 0
-                        cNPDES.Remove(1)
+                    Do While lNPDESSites.Count > 0
+                        lNPDESSites.Remove(1)
                     Loop
                 End If
             Else
@@ -664,145 +660,145 @@ Module modModelSetup
                 'facname
                 'load (flow or other value) lbs/yr or cfs
                 'parm (flow or other name)
-                Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
+                Dim lDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
 
                 Dim i As Integer = 1
-                Do While i <= cNPDES.Count
-                    Dim mipt As Single = 0.0#
+                Do While i <= lNPDESSites.Count
+                    Dim lMipt As Single = 0.0#
                     If aChkCalculate Then
                         'calculate mile point on stream
                         'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), IO.Path.GetFileNameWithoutExtension(OutletsJoinThemeName), PCSIdField, pNPDES(j))
                         'mipt = dist / 1609.3
                     Else
-                        mipt = 0.0#
+                        lMipt = 0.0#
                     End If
-                    cMipt.Add(mipt)
-                    Dim iFound As Boolean = False
-                    For j As Integer = 1 To tmpDbf.NumRecords
-                        tmpDbf.CurrentRecord = j
-                        If cNPDES(i) = tmpDbf.Value(1) Then
-                            cFacName.Add(tmpDbf.Value(2))
-                            iFound = True
+                    lMipts.Add(lMipt)
+                    Dim lFound As Boolean = False
+                    For j As Integer = 1 To lDbf.NumRecords
+                        lDbf.CurrentRecord = j
+                        If lNPDESSites(i) = lDbf.Value(1) Then
+                            lFacNames.Add(lDbf.Value(2))
+                            lFound = True
                             Exit For
                         End If
                     Next j
-                    If Not iFound Then
-                        cNPDES.Remove(i)
-                        cSubbasin.Remove(i)
-                        cMipt.Remove(i)
+                    If Not lFound Then
+                        lNPDESSites.Remove(i)
+                        lSubbasins.Remove(i)
+                        lMipts.Remove(i)
                     Else
-                        i = i + 1
+                        i += 1
                     End If
                 Loop
             End If
         End If
 
         'write first part of point source file
-        lSB.AppendLine(" " & CStr(cNPDES.Count))
+        lSB.AppendLine(" " & lNPDESSites.Count.ToString)
         lSB.AppendLine(" ")
         lSB.AppendLine("FacilityName Npdes Cuseg Mi")
-        Dim ctemp As String
-        Dim ParmCode(0) As String, ParmName(0) As String
-        For i As Integer = 1 To cNPDES.Count
-            ctemp = Chr(34) & cFacName(i) & Chr(34) & " " & cNPDES(i) & " " & cSubbasin(i) & " " & Format(cMipt(i), "0.000000")
-            lSB.AppendLine(ctemp)
-        Next i
+        Dim lStr As String
+        For lNpdesSiteIndex As Integer = 1 To lNPDESSites.Count
+            lStr = Chr(34) & lFacNames(lNpdesSiteIndex) & Chr(34) & " " & lNPDESSites(lNpdesSiteIndex) & " " & lSubbasins(lNpdesSiteIndex) & " " & Format(lMipts(lNpdesSiteIndex), "0.000000")
+            lSB.AppendLine(lStr)
+        Next lNpdesSiteIndex
 
+        Dim lParmCode(0) As String, lParmName(0) As String
         If Not aChkCustom Then 'read in Permitted Discharges Parameter Table
-            If cNPDES.Count > 0 Then 'open dbf file
-                Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
-                RowCount = tmpDbf.NumRecords
-                ReDim ParmCode(RowCount)
-                ReDim ParmName(RowCount)
-                For i As Integer = 1 To RowCount
-                    tmpDbf.CurrentRecord = i
-                    ParmCode(i) = tmpDbf.Value(1)
-                    ParmName(i) = tmpDbf.Value(2)
+            If lNPDESSites.Count > 0 Then 'open dbf file
+                Dim lDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(lPcsLayerIndex)) & "\pcs3_prm.dbf")
+                lRowCount = lDbf.NumRecords
+                ReDim lParmCode(lRowCount)
+                ReDim lParmName(lRowCount)
+                For i As Integer = 1 To lRowCount
+                    lDbf.CurrentRecord = i
+                    lParmCode(i) = lDbf.Value(1)
+                    lParmName(i) = lDbf.Value(2)
                 Next i
             End If
         End If
 
         lSB.AppendLine(" ")
         lSB.AppendLine("OrdinalNumber Pollutant Load(lbs/hr)")
-        Dim tValue As String
+        Dim lValue As String
         If Not aChkCustom Then  'using pcs data
-            Dim prevdbf As String = ""
-            Dim TableYear(0) As String
-            Dim TableParm(0) As String
-            Dim TableLoad(0) As String
-            Dim TableNPDES(0) As String
-            For j As Integer = 1 To cNPDES.Count
+            Dim lPrevDbf As String = ""
+            Dim lTableYear(0) As String
+            Dim lTableParm(0) As String
+            Dim lTableLoad(0) As String
+            Dim lTableNPDES(0) As String
+            For lNpdesSiteIndex As Integer = 1 To lNPDESSites.Count
                 'open dbf file
-                Dim dbffilename As String = dbname & Trim(cHuc(j)) & ".dbf"
-                Dim lDbRowCount As Long
-                If IO.File.Exists(dbffilename) Then
-                    If dbffilename <> prevdbf Then
-                        Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(dbffilename)
-                        prevdbf = dbffilename
-                        Dim YearField As Long, ParmField As Long
-                        Dim LoadField As Long, NPDESField As Long
-                        For k As Integer = 1 To tmpDbf.NumFields
-                            If UCase(tmpDbf.FieldName(k)) = "YEAR" Then
-                                YearField = k
+                Dim lDbfFileName As String = lDbName & lHucs(lNpdesSiteIndex).ToString.Trim & ".dbf"
+                Dim lDbfRowCount As Long
+                If IO.File.Exists(lDbfFileName) Then
+                    If lDbfFileName <> lPrevDbf Then
+                        Dim lDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lDbfFileName)
+                        lPrevDbf = lDbfFileName
+                        Dim lYearField As Integer, lParmField As Integer
+                        Dim lLoadField As Integer, lNPDESField As Integer
+                        For lFieldIndex As Integer = 1 To lDbf.NumFields
+                            If lDbf.FieldName(lFieldIndex).ToUpper = "YEAR" Then
+                                lYearField = lFieldIndex
                             End If
-                            If UCase(tmpDbf.FieldName(k)) = "PARM" Then
-                                ParmField = k
+                            If lDbf.FieldName(lFieldIndex).ToUpper = "PARM" Then
+                                lParmField = lFieldIndex
                             End If
-                            If UCase(tmpDbf.FieldName(k)) = "LOAD" Then
-                                LoadField = k
+                            If lDbf.FieldName(lFieldIndex).ToUpper = "LOAD" Then
+                                lLoadField = lFieldIndex
                             End If
-                            If UCase(tmpDbf.FieldName(k)) = "NPDES" Then
-                                NPDESField = k
+                            If lDbf.FieldName(lFieldIndex).ToUpper = "NPDES" Then
+                                lNPDESField = lFieldIndex
                             End If
-                        Next k
-                        lDbRowCount = tmpDbf.NumRecords
-                        ReDim TableYear(lDbRowCount)
-                        ReDim TableParm(lDbRowCount)
-                        ReDim TableLoad(lDbRowCount)
-                        ReDim TableNPDES(lDbRowCount)
-                        For k As Integer = 1 To lDbRowCount
-                            tmpDbf.CurrentRecord = k
-                            TableYear(k) = tmpDbf.Value(YearField)
-                            TableParm(k) = tmpDbf.Value(ParmField)
-                            TableLoad(k) = tmpDbf.Value(LoadField)
-                            TableNPDES(k) = tmpDbf.Value(NPDESField)
-                        Next k
+                        Next lFieldIndex
+                        lDbfRowCount = lDbf.NumRecords
+                        ReDim lTableYear(lDbfRowCount)
+                        ReDim lTableParm(lDbfRowCount)
+                        ReDim lTableLoad(lDbfRowCount)
+                        ReDim lTableNPDES(lDbfRowCount)
+                        For lRowIndex As Integer = 1 To lDbfRowCount
+                            lDbf.CurrentRecord = lRowIndex
+                            lTableYear(lRowIndex) = lDbf.Value(lYearField)
+                            lTableParm(lRowIndex) = lDbf.Value(lParmField)
+                            lTableLoad(lRowIndex) = lDbf.Value(lLoadField)
+                            lTableNPDES(lRowIndex) = lDbf.Value(lNPDESField)
+                        Next lRowIndex
                     End If
-                    For k As Integer = 1 To lDbRowCount
-                        If TableNPDES(k) = cNPDES(j) And TableYear(k) = aYear Then
+                    For lDbfRowIndex As Integer = 1 To lDbfRowCount
+                        If lTableNPDES(lDbfRowIndex) = lNPDESSites(lNpdesSiteIndex) And lTableYear(lDbfRowIndex) = aYear Then
                             'found one, output it
-                            Dim tPoll As String = ""
-                            For i As Integer = 0 To RowCount - 1
-                                If TableParm(k) = ParmCode(i) Then
-                                    tPoll = ParmName(i)
+                            Dim lPollutantName As String = ""
+                            For lRowIndex As Integer = 0 To lRowCount - 1
+                                If lTableParm(lDbfRowIndex) = lParmCode(lRowIndex) Then
+                                    lPollutantName = lParmName(lRowIndex)
                                     Exit For
                                 End If
-                            Next i
-                            tValue = TableLoad(k) / 8760 'lbs/hr
-                            ctemp = CStr(j - 1) & " " & Chr(34) & Trim(tPoll) & Chr(34) & " " & Format(CSng(tValue), "0.000000")
-                            lSB.AppendLine(ctemp)
+                            Next lRowIndex
+                            lValue = lTableLoad(lDbfRowIndex) / 8760 'lbs/hr
+                            lStr = CStr(lNpdesSiteIndex - 1) & " " & Chr(34) & Trim(lPollutantName) & Chr(34) & " " & Format(CSng(lValue), "0.000000")
+                            lSB.AppendLine(lStr)
                         End If
-                    Next k
+                    Next lDbfRowIndex
                 End If
-            Next j
+            Next lNpdesSiteIndex
             'now output flows
-            For j As Integer = 1 To cNPDES.Count
-                ctemp = CStr(j - 1) & " Flow " & Format(cFlow(j), "0.000000")
-                lSB.AppendLine(ctemp)
-            Next j
+            For lNpdesSiteIndex As Integer = 1 To lNPDESSites.Count
+                lStr = CStr(lNpdesSiteIndex - 1) & " Flow " & Format(lFlows(lNpdesSiteIndex), "0.000000")
+                lSB.AppendLine(lStr)
+            Next lNpdesSiteIndex
         Else 'using custom data
-            Dim tmpDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
-            For i As Integer = 1 To cNPDES.Count
-                For j As Integer = 1 To tmpDbf.NumRecords
-                    tmpDbf.CurrentRecord = j
-                    If cNPDES(i) = tmpDbf.Value(1) Then
-                        If UCase(tmpDbf.Value(4)) = "FLOW" Then
-                            ctemp = CStr(i - 1) & " Flow " & Format(CStr(tmpDbf.Value(3)), "0.000000")
+            Dim lDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aLblCustom)
+            For i As Integer = 1 To lNPDESSites.Count
+                For j As Integer = 1 To lDbf.NumRecords
+                    lDbf.CurrentRecord = j
+                    If lNPDESSites(i) = lDbf.Value(1) Then
+                        If lDbf.Value(4).ToUpper = "FLOW" Then
+                            lStr = CStr(i - 1) & " Flow " & Format(CStr(lDbf.Value(3)), "0.000000")
                         Else
-                            tValue = CSng(tmpDbf.Value(3)) / 8760 'lbs/hr
-                            ctemp = CStr(i - 1) & " " & Chr(34) & Trim(tmpDbf.Value(4)) & Chr(34) & " " & Format(CStr(tValue), "0.000000")
+                            lValue = CSng(lDbf.Value(3)) / 8760 'lbs/hr
+                            lStr = CStr(i - 1) & " " & Chr(34) & Trim(lDbf.Value(4)) & Chr(34) & " " & Format(CStr(lValue), "0.000000")
                         End If
-                        lSB.AppendLine(ctemp)
+                        lSB.AppendLine(lStr)
                     End If
                 Next j
             Next i

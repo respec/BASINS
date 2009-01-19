@@ -1,9 +1,5 @@
 Imports System.Collections.ObjectModel
-Imports System.IO
 Imports MapWinUtility
-Imports atcUtility
-Imports System.Text
-Imports atcData
 
 Public Class Segments
     Inherits KeyedCollection(Of String, Segment)
@@ -24,7 +20,7 @@ Public Class Segments
     End Sub
 
     Public Overrides Function ToString() As String
-        Dim lString As New StringBuilder
+        Dim lString As New System.Text.StringBuilder
         lString.Append(Me.Count & " ")
         For Each lSegment As Segment In Me
             lString.Append(lSegment.Name.PadRight(16) & " ")
