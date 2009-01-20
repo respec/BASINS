@@ -752,7 +752,7 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
-        g_running = True
+        g_Running = True
         btnStart.Visible = False
         btnStop.Visible = True
         lstEndpoints.Enabled = False
@@ -768,7 +768,7 @@ Public Class frmCAT
 
         PopulatePivotCombos()
         UpdateStatusLabel("Finished runs")
-        g_running = False
+        g_Running = False
         btnStart.Visible = True
         btnStop.Visible = False
         lstEndpoints.Enabled = True
@@ -778,7 +778,11 @@ Public Class frmCAT
     Private Sub pCat_Loaded() Handles pCat.Loaded
         chkSaveAll.Checked = pCat.SaveAll
         chkShowEachRunProgress.Checked = pCat.ShowEachRunProgress
-        txtBaseScenario.Text = pCat.BaseScenario
+        If pCat.Model Is Nothing Then
+            txtBaseScenario.Text = ""
+        Else
+            txtBaseScenario.Text = pCat.Model.BaseScenario
+        End If
         RefreshInputList()
         RefreshTotalIterations()
         RefreshEndpointList()
@@ -1460,7 +1464,7 @@ Public Class frmCAT
     Private Sub btnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStop.Click
         btnStart.Visible = True
         btnStop.Visible = False
-        g_running = False
+        g_Running = False
         UpdateStatusLabel("Stopping")
     End Sub
 
@@ -1520,12 +1524,18 @@ Public Class frmCAT
     End Sub
 
     Private Sub mnuOpenUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenUCI.Click
-        pCat.OpenUCI()
+        pCat.Model = New clsCatModelHSPF
+        pCat.Model.BaseScenario = ""
     End Sub
 
     Private Sub txtBaseScenario_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBaseScenario.MouseClick
-        pCat.OpenUCI()
+        If pCat.Model Is Nothing Then
+            'TODO: choose model
+        Else
+            pCat.Model.BaseScenario = ""
+        End If
     End Sub
+
     Private Sub txtBaseScenarioNameChange(ByVal aBaseScenarioName As String) Handles pCat.BaseScenarioSet
         txtBaseScenario.Text = aBaseScenarioName
     End Sub
