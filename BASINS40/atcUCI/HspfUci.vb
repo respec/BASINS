@@ -909,12 +909,23 @@ Public Class HspfUci
     Public Sub DeleteOperation(ByRef aName As String, ByRef aId As Integer)
         'figure out where this operation is in operation sequence block and delete it
         Dim lOperationIndex As Integer = 1
-        For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
-            If lOpn.Name = aName And _
-               lOpn.Id = aId Then
-                pOpnSeqBlk.Delete(lOperationIndex)
+        Dim lDeleteOperationAtIndex As New Collection
+        Dim lHspfOperation As HspfOperation
+        Dim lHspfConnection As HspfConnection
+        Dim lOper As Integer
+        Dim lHspfConnectionIndex As Integer
+
+
+        For lOperationIndex = 0 To pOpnSeqBlk.Opns.Count - 1
+            lHspfOperation = pOpnSeqBlk.Opns.Item(lOperationIndex)
+            If lHspfOperation.Name = aName AndAlso lHspfOperation.Id = aId Then
+                'pOpnSeqBlk.Delete(lOperationIndex - 1)
+                lDeleteOperationAtIndex.Add(lOperationIndex)
             End If
-            lOperationIndex += 1
+        Next
+
+        For lOper = 1 To lDeleteOperationAtIndex.Count
+            pOpnSeqBlk.Delete(lDeleteOperationAtIndex(lOper))
         Next
 
         'need to remove from all operation type blocks
@@ -930,23 +941,28 @@ Public Class HspfUci
         Dim lSourceCount As Integer = 0
         Dim lSourceVolId() As Integer = {}
         Dim lMassLink As Integer
-        For Each lConnection As HspfConnection In Me.Connections
-            If (lConnection.Source.VolName = aName And lConnection.Source.VolId = aId) Or (lConnection.Target.VolName = aName And lConnection.Target.VolId = aId) Then
-                lMassLink = lConnection.MassLink
-                If lConnection.Target.VolId = aId And lConnection.Target.VolName = aName And lConnection.Source.VolName = aName Then
+
+
+        For lHspfConnectionIndex = 0 To Me.Connections.Count - 1
+            lHspfConnection = Me.Connections.Item(lHspfConnectionIndex)
+
+
+            If (lHspfConnection.Source.VolName = aName And lHspfConnection.Source.VolId = aId) Or (lHspfConnection.Target.VolName = aName And lHspfConnection.Target.VolId = aId) Then
+                lMassLink = lHspfConnection.MassLink
+                If lHspfConnection.Target.VolId = aId And lHspfConnection.Target.VolName = aName And lHspfConnection.Source.VolName = aName Then
                     'remember the source
                     lSourceCount += 1
                     ReDim Preserve lSourceVolId(lSourceCount)
-                    lSourceVolId(lSourceCount) = lConnection.Source.VolId
-                ElseIf lConnection.Source.VolId = aId And lConnection.Source.VolName = aName And lConnection.Target.VolName = aName Then
+                    lSourceVolId(lSourceCount) = lHspfConnection.Source.VolId
+                ElseIf lHspfConnection.Source.VolId = aId And lHspfConnection.Source.VolName = aName And lHspfConnection.Target.VolName = aName Then
                     'remember the target
-                    lTargetVolId = lConnection.Target.VolId
+                    lTargetVolId = lHspfConnection.Target.VolId
                 End If
                 Me.Connections.RemoveAt(lConnectionIndex)
             Else
                 lConnectionIndex += 1
             End If
-        Next lConnection
+        Next
 
         If lSourceCount > 0 And lTargetVolId > 0 Then
             'need to join sources and targets of this deleted opn
