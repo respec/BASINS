@@ -1645,7 +1645,7 @@ Public Class HspfUci
         If aWdmId.Length < 4 Then
             lId = 1
         Else
-            lId = CShort(aWdmId.Substring(4, 1))
+            lId = CShort(aWdmId.Substring(3, 1))
         End If
 
         If Not pWDMObj(lId) Is Nothing Then
