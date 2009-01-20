@@ -6,12 +6,12 @@ Imports MapWinUtility
 Imports System.Windows.Forms
 
 Public Class clsCat
+    Public WithEvents Model As clsCatModel
     Public Inputs As New Generic.List(Of atcVariation)
     Public Endpoints As New Generic.List(Of atcVariation)
     Public PreparedInputs As New Generic.List(Of String) 'TODO: allow selected?
     Public SaveAll As Boolean = False
     Public ShowEachRunProgress As Boolean = False
-    Public BaseScenario As String = ""
     Public ResultsGrid As New atcControls.atcGridSource
     Public TimePerRun As Double = 0 'Time each run takes in seconds
     Public RunModel As Boolean = True 'True to actually run the model, false to just look for already computed results
@@ -49,9 +49,7 @@ Public Class clsCat
 
             lXML &= "<ShowEachRun>" & ShowEachRunProgress & "</ShowEachRun>" & vbCrLf
 
-            lXML &= "<UCI>" & vbCrLf
-            lXML &= "  <FileName>" & BaseScenario & "</FileName>" & vbCrLf
-            lXML &= "</UCI>" & vbCrLf
+            lXML &= Model.XML
 
             If PreparedInputs.Count = 0 Then
                 lXML &= "<Variations>" & vbCrLf
@@ -111,7 +109,10 @@ StartOver:
                             Case "showeachrun"
                                 ShowEachRunProgress = (lXML.InnerText.ToLower = "true")
                             Case "uci"
-                                OpenUCI(AbsolutePath(lChild.InnerText, CurDir))
+                                If Model Is Nothing Then Model = New clsCatModelHSPF
+                                Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
+                                'TODO: generic case for any model type that creates correct Model and sets XML, 
+                                '      BaseScenario (and anything model specific) gets set inside XML property set
                             Case "preparedinputs"
                                 PreparedInputs.Clear()
                                 For Each lChild In lXML.ChildNodes
@@ -169,45 +170,7 @@ StartOver:
         End Get
     End Property
 
-    ''' <summary>
-    ''' Open data files referred to in this UCI file
-    ''' </summary>
-    ''' <param name="aUCIfilename">Full path of UCI file</param>
-    ''' <remarks></remarks>
-    Friend Sub OpenUCI(Optional ByVal aUCIfilename As String = "")
-        If Not aUCIfilename Is Nothing And Not FileExists(aUCIfilename) Then
-            If FileExists(aUCIfilename & ".uci") Then aUCIfilename &= ".uci"
-        End If
-
-        If aUCIfilename Is Nothing OrElse Not FileExists(aUCIfilename) Then
-            Dim cdlg As New OpenFileDialog
-            cdlg.Title = "Open UCI file containing base scenario"
-            cdlg.Filter = "UCI files|*.uci|All Files|*.*"
-            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-                aUCIfilename = cdlg.FileName
-            End If
-        End If
-
-        If FileExists(aUCIfilename) Then
-            Dim lUciFolder As String = PathNameOnly(aUCIfilename)
-            ChDriveDir(lUciFolder)
-
-            BaseScenario = aUCIfilename
-            RaiseEvent BaseScenarioSet(aUCIfilename)
-
-            Dim lFullText As String = WholeFileString(aUCIfilename)
-            For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
-                lWDMfilename = AbsolutePath(Trim(lWDMfilename), lUciFolder)
-                OpenDataSource(lWDMfilename)
-            Next
-            For Each lBinOutFilename As String In UCIFilesBlockFilenames(lFullText, "BINO")
-                lBinOutFilename = AbsolutePath(Trim(lBinOutFilename), lUciFolder)
-                OpenDataSource(lBinOutFilename)
-            Next
-        End If
-    End Sub
-
-    Friend Function OpenDataSource(ByVal aFilename As String) As atcTimeseriesSource
+    Friend Shared Function OpenDataSource(ByVal aFilename As String) As atcTimeseriesSource
         Dim lAddSource As Boolean = True
         For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             If lDataSource.Specification.ToLower = aFilename.ToLower Then 'already open
@@ -231,7 +194,7 @@ StartOver:
     End Function
 
     Public Function StartRun(ByVal aModifiedScenario As String) As Boolean
-        g_running = True
+        g_Running = True
         Dim lSelectedVariations As New Generic.List(Of atcVariation)
         If PreparedInputs.Count = 0 Then
             For Each lVariation As atcVariation In Inputs
@@ -288,35 +251,33 @@ StartOver:
             Next
         End With
         RaiseEvent Started()
-        'don't let winhspflt bring up message boxes
-        Dim lBaseFolder As String = PathNameOnly(AbsolutePath(BaseScenario, CurDir))
-        SaveFileString(lBaseFolder & "\WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
 
         Dim lRuns As Integer = 0
         Run(aModifiedScenario, _
             lSelectedVariations, _
-            BaseScenario, _
             lRuns, 0, Nothing)
 
-        g_running = False
+        g_Running = False
         Return True
     End Function
 
     Private Sub Run(ByVal aModifiedScenarioName As String, _
                     ByVal aVariations As Generic.List(Of atcVariation), _
-                    ByVal aBaseFileName As String, _
                     ByRef aIteration As Integer, _
                     ByRef aStartVariationIndex As Integer, _
                     ByRef aModifiedData As atcTimeseriesGroup)
 
-        If Not g_running Then
+        If Not g_Running Then
             RaiseEvent StatusUpdate("Stopping Run")
         Else
             Logger.Dbg("Run")
             If aModifiedData Is Nothing Then
                 aModifiedData = New atcTimeseriesGroup
             End If
-            ChDriveDir(PathNameOnly(aBaseFileName))
+            Try
+                ChDriveDir(PathNameOnly(Model.BaseScenario))
+            Catch
+            End Try
 
             If aStartVariationIndex >= aVariations.Count Then 'All variations have values, do a model run
 NextIteration:
@@ -336,7 +297,7 @@ NextIteration:
 
                 RaiseEvent StartIteration(aIteration)
                 TimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
+                Dim lResults As atcCollection = Model.ScenarioRun(lModifiedScenarioName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
                 If lResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
                     Exit Sub
@@ -411,7 +372,8 @@ NextIteration:
                         End If
                     Next
                 End With
-                RaiseEvent UpdateResults(PathNameOnly(aBaseFileName) & "\" & lModifiedScenarioName & ".results.txt")
+                'TODO: don't assume Model.BaseScenario is a filename, find results another way
+                RaiseEvent UpdateResults(PathNameOnly(Model.BaseScenario) & "\" & lModifiedScenarioName & ".results.txt")
 
                 'Close any open results
                 For Each lSpecification As String In lResults
@@ -433,7 +395,7 @@ NextIteration:
                 Next
 
                 aIteration += 1
-                If g_running AndAlso Not PreparedInputs.Count = 0 AndAlso aIteration < PreparedInputs.Count Then
+                If g_Running AndAlso Not PreparedInputs.Count = 0 AndAlso aIteration < PreparedInputs.Count Then
                     GoTo NextIteration
                 End If
             Else 'Need to loop through values for next variation
@@ -456,7 +418,7 @@ NextIteration:
                     'Start varying data
                     Dim lModifiedGroup As atcTimeseriesGroup = .StartIteration
 
-                    While g_running And Not lModifiedGroup Is Nothing
+                    While g_Running And Not lModifiedGroup Is Nothing
                         'Remove existing modified data also modified by this variation
                         'Most cases of this were handled above when creating lReModifiedData, 
                         'but side-effect computation like PET still needs removing here
@@ -469,7 +431,6 @@ NextIteration:
                         'We have handled a variation, now recursively handle more input variations or run the model
                         Run(aModifiedScenarioName, _
                             aVariations, _
-                            aBaseFileName, _
                             aIteration, _
                             aStartVariationIndex + 1, _
                             aModifiedData)
@@ -496,4 +457,8 @@ NextIteration:
         pLastPrivateMemory = lPrivateMemory
         pLastGcMemory = lGcMemory
     End Function
+
+    Private Sub Model_BaseScenarioSet(ByVal aBaseScenario As String) Handles Model.BaseScenarioSet
+        RaiseEvent BaseScenarioSet(aBaseScenario)
+    End Sub
 End Class

@@ -9,7 +9,7 @@ Imports System.Collections
 Imports System.IO
 
 Public Class atcDataSourceSynopInput
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFileFilter As String = "Synop Input Files (*.inp)|*.inp"
@@ -109,7 +109,8 @@ Public Class atcDataSourceSynopInput
                     'lData.Value(0) = Double.NaN
                     'lData.Dates.Value(0) = Double.NaN
 
-                    While Not lTable.atEOF
+                    For lRecord As Integer = 1 To .NumRecords
+                        .CurrentRecord = lRecord
                         lDateArr(0) = .Value(2)
                         lDateArr(1) = .Value(3)
                         lDateArr(2) = .Value(4)
@@ -121,8 +122,7 @@ Public Class atcDataSourceSynopInput
                             lData.Value(lTSIndex) = .Value(6)
                             lData.Dates.Value(lTSIndex) = lDate
                         End If
-                        lTable.MoveNext()
-                    End While
+                    Next
                 End With
                 If lTSIndex <> lTable.NumRecords Then
                     Logger.Msg("Expected " & lTable.NumRecords & " records in '" & aFileName & "' but found " & lTSIndex, MsgBoxStyle.Exclamation, "Open Synop Input")

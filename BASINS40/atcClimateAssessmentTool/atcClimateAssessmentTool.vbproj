@@ -168,6 +168,8 @@
     <Compile Include="atcVariation.vb" />
     <Compile Include="atcVariationCligen.vb" />
     <Compile Include="clsCat.vb" />
+    <Compile Include="clsCatModel.vb" />
+    <Compile Include="clsCatModelHSPF.vb" />
     <Compile Include="frmCAT.vb">
       <SubType>Form</SubType>
     </Compile>
