@@ -1016,7 +1016,7 @@ Public Module modDate
         Return timdifJ(aSDateJ, aEdateJ, 6, 1)
     End Function
 
-    Public Function TimeSpanAsString(ByVal aSDateJ As Double, ByVal aEdateJ As Double) As String
+    Public Function TimeSpanAsString(ByVal aSDateJ As Double, ByVal aEdateJ As Double, Optional ByVal aPrefix As String = "Simulation Period: ") As String
         Dim lDate(5) As Integer
         J2Date(aSDateJ, lDate)
         Dim lYearType As String = " "
@@ -1025,7 +1025,7 @@ Public Module modDate
         ElseIf lDate(1) = 10 AndAlso lDate(2) = 1 AndAlso lDate(3) = 0 Then
             lYearType &= "Calendar "
         End If
-        Dim lStr As String = "Simulation Period: " & YearCount(aSDateJ, aEdateJ) & lYearType & "years"
+        Dim lStr As String = aPrefix & YearCount(aSDateJ, aEdateJ) & lYearType & "years"
         Dim lDateFormat As New atcDateFormat
         With lDateFormat
             .IncludeHours = False
