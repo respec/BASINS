@@ -424,21 +424,21 @@ Public Class frmOutput
 
     Private Sub cmdRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRemove.Click
 
-        Dim lRowIndex, lCopyId, lReachIndex, lSelectedCount, lCurrentReachIndex, lIndex1, lIndex2, lIndex3 As Integer
+        Dim lRowIndex, lCopyId, lReachIndex, lSelectedCount, lIndex1, lIndex2, lIndex3 As Integer
         Dim lObject As Object
         Dim lHspfConnection As HspfConnection
         Dim lTargetObject As Object
         Dim lTargetHspfConnection As HspfConnection
         Dim lHspfOperation As HspfOperation
         Dim lColonPosition, lId, lDsnIndex, lLeftParenthPosition, lCommaPosition, lRightParenthPosition As Integer
-        Dim WDMId As String
+        Dim lWdmId As String
         Dim lSpacePosition, lSub1, lSub2 As Integer
-        Dim lTempString, lOperName, lGroup, lMember As String
+        Dim lTempString, lOperName, lGroup, lMember, lCurrentReachString As String
         Dim lDsnObject As atcTimeseries
         Dim lDialogBoxResult As System.Windows.Forms.DialogResult
         Dim lHspfConnectionIndex, lTargetIndex As Integer
         Dim lRemoveUciConnectionAtIndex As New Collection
-        Dim lRemoveWdmDataSetVolName, lRemoveWdmDataSetVolId As New Collection
+        Dim lRemoveWdmDataSetVolName, lRemoveWdmDataSetVolId, lRemoveDsnAtIndex As New Collection
         Dim lRemoveTargetVolName, lRemoveTargetVolId, lRemoveTargetAtIndex As New Collection
 
         '.net conversion issue: The structure of this subroutine has been changed such that removal of WdmDataSets, Targets, UCI entries
@@ -455,13 +455,12 @@ Public Class frmOutput
                 'If agdOutput.Selected(i, 0) And agdOutput.SelEndCol <> agdOutput.SelStartCol Then
                 If pSelectedCell(0) = lRowIndex Then
                     'something is selected
-                    lCurrentReachIndex = agdOutput.Source.CellValue(lRowIndex, 0)
+                    lCurrentReachString = agdOutput.Source.CellValue(lRowIndex, 0)
                     'find copy operation associated with crch
-                    lReachIndex = CLng(Mid(lCurrentReachIndex, 7))
+                    lReachIndex = CLng(Mid(lCurrentReachString, 7))
                     lCopyId = Reach2Copy(lReachIndex)
 
-                    lDialogBoxResult = Logger.Message("Do you want to permanently delete the WDM timeseries associated with this calibration location?", "Delete Query", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.No) = Windows.Forms.DialogResult.Yes
-
+                    lDialogBoxResult = Logger.Message("Do you want to permanently delete the WDM timeseries associated with this calibration location?", "Delete Query", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.No)
                     If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
 
                         lRemoveTargetVolName.Clear()
@@ -547,8 +546,8 @@ Public Class frmOutput
                 'If agdOutput.Selected(i, 0) And agdOutput.SelEndCol <> agdOutput.SelStartCol Then
                 If pSelectedCell(0) = lRowIndex Then
                     'something is selected
-                    lCurrentReachIndex = agdOutput.Source.CellValue(lRowIndex, 0)
-                    lReachIndex = CLng(Mid(lCurrentReachIndex, 7))
+                    lCurrentReachString = agdOutput.Source.CellValue(lRowIndex, 0)
+                    lReachIndex = CLng(Mid(lCurrentReachString, 7))
 
                     lDialogBoxResult = Logger.Message("Do you want to permanently delete the output WDM timeseries?", "Delete Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.No)
 
@@ -698,59 +697,79 @@ Public Class frmOutput
                 'If agdOutput.Selectedl(i, 0) And agdOutput.SelEndCol <> agdOutput.SelStartCol Then
                 If pSelectedCell(0) = lRowIndex Then
                     'something is selected
-                    lCurrentReachIndex = agdOutput.Source.CellValue(lRowIndex, 0)
-                    lReachIndex = CLng(Mid(lCurrentReachIndex, 7))
+                    lCurrentReachString = agdOutput.Source.CellValue(lRowIndex, 0)
+                    lReachIndex = CLng(Mid(lCurrentReachString, 7))
 
                     lIndex1 = 0
-                    For Each lObject In pUCI.Connections
-                        lHspfConnection = lObject
+                    For lHspfConnectionIndex = 0 To pUCI.Connections.Count - 1
+                        lHspfConnection = pUCI.Connections(lHspfConnectionIndex)
                         If lHspfConnection.Typ = 4 AndAlso lHspfConnection.Source.VolName = "RCHRES" AndAlso lHspfConnection.Source.VolId = lReachIndex Then 'this is the one
-                            WDMId = lHspfConnection.Target.VolName
+                            lWdmId = lHspfConnection.Target.VolName
                             lDsnIndex = lHspfConnection.Target.VolId
-                            lDsnObject = pUCI.GetDataSetFromDsn(WDMInd(WDMId), lDsnIndex)
+                            lDsnObject = pUCI.GetDataSetFromDsn(WDMInd(lWdmId), lDsnIndex)
                             If InStr(1, UCase(lDsnObject.Attributes.GetValue("Description")), "AQUATOX") Then
                                 lIndex1 += 1
                             End If
                         End If
-                    Next lObject
+                    Next
 
                     lDialogBoxResult = Logger.Message("Do you want to permanently delete the " & lIndex1 & " WDM timeseries " & vbCrLf & "associated with this AQUATOX Linkage location?", "Delete Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.No)
 
                     'remove the ext targets and dsns
-                    lIndex1 = 1
-                    For Each lObject In pUCI.Connections
-                        lHspfConnection = lObject
+
+                    lRemoveWdmDataSetVolId.Clear()
+                    lRemoveDsnAtIndex.Clear()
+                    lRemoveUciConnectionAtIndex.Clear()
+
+                    For lHspfConnectionIndex = 0 To pUCI.Connections.Count - 1
+                        lHspfConnection = pUCI.Connections(lHspfConnectionIndex)
+
                         If lHspfConnection.Typ = 4 AndAlso lHspfConnection.Source.VolName = "RCHRES" AndAlso lHspfConnection.Source.VolId = lReachIndex Then 'this is the one
-                            WDMId = lHspfConnection.Target.VolName
+                            lWdmId = lHspfConnection.Target.VolName
                             lDsnIndex = lHspfConnection.Target.VolId
-                            lDsnObject = pUCI.GetDataSetFromDsn(WDMInd(WDMId), lDsnIndex)
+                            lDsnObject = pUCI.GetDataSetFromDsn(WDMInd(lWdmId), lDsnIndex)
                             If InStr(1, UCase(lDsnObject.Attributes.GetValue("Description")), "AQUATOX") Then
                                 'found aquatox dsn
                                 If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
                                     'delete this dsn
-                                    pUCI.DeleteWDMDataSet(WDMId, lDsnIndex)
+                                    lRemoveWdmDataSetVolId.Add(lWdmId)
+                                    lRemoveDsnAtIndex.Add(lDsnIndex)
                                 End If
                                 'remove the connection
-                                pUCI.Connections.RemoveAt(lIndex1)
+
+                                'pUCI.Connections.RemoveAt(lIndex1)
+                                lRemoveUciConnectionAtIndex.Add(lHspfConnectionIndex)
+
                                 'also remove connection from operation
                                 lHspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lReachIndex)
-                                lIndex2 = 1
-                                For Each lTargetObject In lHspfOperation.Targets
-                                    lTargetHspfConnection = lTargetObject
-                                    If lTargetHspfConnection.Target.VolName = WDMId And _
-                                      lTargetHspfConnection.Target.VolId = lDsnIndex Then
-                                        lHspfOperation.Targets.RemoveAt(lIndex2)
-                                    Else
-                                        lIndex2 += 1
+
+                                For lTargetIndex = 0 To lHspfOperation.Targets.Count - 1
+                                    lTargetHspfConnection = lHspfOperation.Targets.Item(lTargetIndex)
+
+                                    If lTargetHspfConnection.Target.VolName = lWdmId AndAlso lTargetHspfConnection.Target.VolId = lDsnIndex Then
+                                        'lHspfOperation.Targets.RemoveAt(lTargetIndex)
+                                        lRemoveTargetAtIndex.Add(lTargetIndex)
                                     End If
-                                Next lTargetObject
-                            Else
-                                lIndex1 += 1
+                                Next
+
+                                For lIndex3 = 1 To lRemoveTargetAtIndex.Count
+                                    lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex.Item(lIndex3))
+                                Next
+
                             End If
-                        Else
-                            lIndex1 += 1
                         End If
                     Next
+
+                    For lIndex3 = 1 To lRemoveUciConnectionAtIndex.Count
+                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lIndex3))
+                    Next
+
+                    For lIndex3 = 1 To lRemoveWdmDataSetVolId.Count
+                        pUCI.DeleteWDMDataSet(lRemoveWdmDataSetVolId.Item(lIndex3), lRemoveDsnAtIndex.Item(lIndex3))
+                    Next
+
+
+
                     lSelectedCount += 1
                 End If
             Next lRowIndex
