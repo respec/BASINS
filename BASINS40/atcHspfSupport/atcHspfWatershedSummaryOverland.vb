@@ -15,9 +15,10 @@ Public Module WatershedSummaryOverland
                            ByVal aPerlndSegmentStarts() As Integer, _
                            ByVal aImplndSegmentStarts() As Integer, _
                   Optional ByVal aEachYear As Boolean = True, _
-                  Optional ByVal aSummary As Boolean = True) As Text.StringBuilder
+                  Optional ByVal aSummary As Boolean = True, _
+                  Optional ByVal aIncludeMinMax As Boolean = True) As Text.StringBuilder
 
-        Dim lNumberFormat As String = "#,##0.0"
+        Dim lNumberFormat As String = "#,##0.000"
         Dim lUnits As String = ""
         Dim lAllNonpointData As New atcTimeseriesGroup
 
@@ -75,8 +76,9 @@ Public Module WatershedSummaryOverland
         If aSummary Then lAllYearsToDo.Add("Summary", lAllNonpointData)
 
         Dim lSB As New Text.StringBuilder
+        dim lSJDate as Double = auci.GlobalBlock.SDateJ 
         For Each lCurrentNonpointData As atcTimeseriesGroup In lAllYearsToDo.Values
-            Dim lSummary As Boolean = lCurrentNonpointData.Equals(lAllNonpointData)
+            Dim lSummary As Boolean = aIncludeMinMax AndAlso lCurrentNonpointData.Equals(lAllNonpointData)
             lSeasonName = lCurrentNonpointData.ItemByIndex(0).Attributes.GetValue("SeasonName", "")
             lSB.AppendLine("Overland Summary Report for " & aBalanceType & " in " & aScenario & " " & lUnits)
             lSB.AppendLine("   Run Made " & aRunMade)
@@ -84,7 +86,9 @@ Public Module WatershedSummaryOverland
             If lSummary Then
                 lSB.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
             Else
-                lSB.AppendLine("   Time Span: 1 yr from " & lSeasonName) 'TODO: dates
+                Dim lEJDate As Double = TimAddJ(lSJDate, 6, 1, 1)
+                lSB.AppendLine(TimeSpanAsString(lSJDate, lEJDate, "   Time Span: "))
+                lSJDate = lEJDate
             End If
 
             Dim lOutputTable As New atcTableDelimited
@@ -239,12 +243,12 @@ Public Module WatershedSummaryOverland
                                 lTotalTonsPerColumn(.NumFields - 1) += lRowTotalTonsMin
                                 lTotalTonsPerColumn(.NumFields) += lRowTotalTonsMax
 
-                                .Value(.NumFields - 2) = DoubleToString(lRowTotalTonsMean / lRowTotalArea)
-                                .Value(.NumFields - 1) = DoubleToString(lRowTotalTonsMin / lRowTotalArea)
-                                .Value(.NumFields) = DoubleToString(lRowTotalTonsMax / lRowTotalArea)
+                                .Value(.NumFields - 2) = Format(lRowTotalTonsMean / lRowTotalArea, lNumberFormat)
+                                .Value(.NumFields - 1) = Format(lRowTotalTonsMin / lRowTotalArea, lNumberFormat)
+                                .Value(.NumFields) = Format(lRowTotalTonsMax / lRowTotalArea, lNumberFormat)
                             Else
                                 lTotalTonsPerColumn(.NumFields) += lRowTotalTonsMean
-                                .Value(.NumFields) = DoubleToString(lRowTotalTonsMean / lRowTotalArea)
+                                .Value(.NumFields) = Format(lRowTotalTonsMean / lRowTotalArea, lNumberFormat)
                             End If
                             For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                                 Dim lValue As Double
@@ -270,14 +274,14 @@ Public Module WatershedSummaryOverland
                 .Value(1) = "Weighted Average"
                 For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                     If lTotalAreaPerColumn(lField) > 0 Then
-                        .Value(lField) = DoubleToString(lTotalTonsPerColumn(lField) / lTotalAreaPerColumn(lField))
+                        .Value(lField) = Format(lTotalTonsPerColumn(lField) / lTotalAreaPerColumn(lField), lNumberFormat)
                     End If
                 Next
                 .CurrentRecord += 1
                 .Value(1) = "Arithmetic Mean"
                 For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                     If lCountPerColumn(lField) > 0 Then
-                        .Value(lField) = DoubleToString(lTotalPerColumn(lField) / lCountPerColumn(lField))
+                        .Value(lField) = Format(lTotalPerColumn(lField) / lCountPerColumn(lField), lNumberFormat)
                     End If
                 Next
 
@@ -285,7 +289,7 @@ Public Module WatershedSummaryOverland
                 .Value(1) = "Maximum"
                 For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                     If lMaxSegment(lField) > 0 Then
-                        .Value(lField) = DoubleToString(lMaxTonsPerAcre(lField))
+                        .Value(lField) = Format(lMaxTonsPerAcre(lField), lNumberFormat)
                     End If
                 Next
                 .CurrentRecord += 1
@@ -300,7 +304,7 @@ Public Module WatershedSummaryOverland
                 .Value(1) = "Minimum"
                 For lField = 2 To lTotalAreaPerColumn.GetUpperBound(0)
                     If lMinSegment(lField) > 0 Then
-                        .Value(lField) = DoubleToString(lMinTonsPerAcre(lField))
+                        .Value(lField) = Format(lMinTonsPerAcre(lField), lNumberFormat)
                     End If
                 Next
                 .CurrentRecord += 1
@@ -408,7 +412,7 @@ Public Module WatershedSummaryOverland
                 For Each lTs As atcTimeseries In aData.FindData("Location", lOperation.Name.Substring(0, 1) & ":" & aID)
                     lSumAnnual += lArea * lTs.Attributes.GetValue("SumAnnual")
                     If aIncludeMinMax Then
-                        Dim lTsYearly As atcTimeseries = FillValues(lTs, atcTimeUnit.TUYear, , GetNaN)
+                        Dim lTsYearly As atcTimeseries = Aggregate(lTs, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
                         lMinAnnual += lArea * lTsYearly.Attributes.GetValue("Min")
                         lMaxAnnual += lArea * lTsYearly.Attributes.GetValue("Max")
                     End If
@@ -420,18 +424,19 @@ Public Module WatershedSummaryOverland
 
 
                 'aTable.Value(aField) = lOperation.Name & lOperation.Id & " area=" & DoubleToString(lArea) & " total=" & DoubleToString(lTotal) & " Per=" & DoubleToString(lTotal / lArea)
-                aTable.Value(aField) = DoubleToString(lSumAnnual / lArea)
+                Dim lNumberFormat As String = "#,##0.000"
+                aTable.Value(aField) = Format(lSumAnnual / lArea, lNumberFormat)
                 aTotalAreaPerColumn(aField) += lArea
                 aTotalTonsPerColumn(aField) += lSumAnnual
 
                 If aIncludeMinMax Then
                     aField += 1
-                    aTable.Value(aField) = DoubleToString(lMinAnnual / lArea)
+                    aTable.Value(aField) = Format(lMinAnnual / lArea, lNumberFormat)
                     aTotalAreaPerColumn(aField) += lArea
                     aTotalTonsPerColumn(aField) += lMinAnnual
 
                     aField += 1
-                    aTable.Value(aField) = DoubleToString(lMaxAnnual / lArea)
+                    aTable.Value(aField) = Format(lMaxAnnual / lArea, lNumberFormat)
                     aTotalAreaPerColumn(aField) += lArea
                     aTotalTonsPerColumn(aField) += lMaxAnnual
                 End If

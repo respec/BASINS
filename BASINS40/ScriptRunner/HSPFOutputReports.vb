@@ -49,9 +49,9 @@ Module HSPFOutputReports
         'Dim lTestName As String = "SantaClara"
 
         'pSummaryTypes.Add("Water")
-        'pSummaryTypes.Add("Sediment")
-        pSummaryTypes.Add("N-PQUAL")
-        pSummaryTypes.Add("P-PQUAL")
+        pSummaryTypes.Add("Sediment")
+        'pSummaryTypes.Add("N-PQUAL")
+        'pSummaryTypes.Add("P-PQUAL")
 
         Select Case lTestName
             Case "mono"
@@ -367,6 +367,12 @@ Module HSPFOutputReports
 
             Dim lString As String = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts).ToString
             Dim lOutFileName As String = "outfiles\" & pBaseName & "_" & lSummaryType & "_WatershedOverland.txt"
+            SaveFileString(lOutFileName, lString)
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True).ToString
+            lOutFileName = "outfiles\" & pBaseName & "_" & lSummaryType & "_WatershedOverlandShortWithMinMax.txt"
+            SaveFileString(lOutFileName, lString)
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lSummaryType, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False).ToString
+            lOutFileName  = "outfiles\" & pBaseName & "_" & lSummaryType & "_WatershedOverlandShort.txt"
             SaveFileString(lOutFileName, lString)
 
             lString = Nothing

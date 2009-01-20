@@ -56,9 +56,6 @@ Public Module ConstituentBalance
         End If
         lString.AppendLine(vbCrLf)
 
-        Dim lConstituentDataGroup As atcTimeseriesGroup
-        Dim lTempDataSet As atcDataSet
-
         For Each lOperationKey As String In aOperationTypes.Keys
             For Each lLocation As String In aLocations
                 If lLocation.StartsWith(lOperationKey) Then
@@ -75,23 +72,21 @@ Public Module ConstituentBalance
                                 If lConstituentKey.StartsWith(lOperationKey) Then
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
-                                    lConstituentDataGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
+                                    Dim lConstituentDataGroup As atcTimeseriesGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
                                     If lConstituentDataGroup.Count > 0 Then
-                                        lTempDataSet = lConstituentDataGroup.Item(0)
+                                        Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
                                         Dim lSeasons As atcSeasonBase
-                                        Dim lAttribute As atcDefinedValue
                                         If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
                                             lSeasons = New atcSeasonsWaterYear
                                         Else
                                             lSeasons = New atcSeasonsCalendarYear
                                         End If
                                         Dim lSeasonalAttributes As New atcDataAttributes
-                                        Dim lYearlyAttributes As New atcDataAttributes
                                         lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
+                                        Dim lYearlyAttributes As New atcDataAttributes
                                         lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lYearlyAttributes)
 
                                         If lNeedHeader Then  'get operation description for header
-                                            Dim lDesc As String = ""
                                             Dim lOperName As String = ""
                                             If lLocation.Substring(0, 1) = "P" Then
                                                 lOperName = "PERLND"
@@ -100,6 +95,7 @@ Public Module ConstituentBalance
                                             ElseIf lLocation.Substring(0, 1) = "R" Then
                                                 lOperName = "RCHRES"
                                             End If
+                                            Dim lDesc As String = ""
                                             If lOperName.Length > 0 Then
                                                 lDesc = aUci.OpnBlks(lOperName).OperFromID(lLocation.Substring(2)).Description
                                             End If
@@ -129,7 +125,7 @@ Public Module ConstituentBalance
                                             lPendingOutput = ""
                                         End If
 
-                                        lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                        Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
 
                                         .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         If Not lAttribute Is Nothing Then
