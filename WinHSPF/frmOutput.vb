@@ -424,8 +424,7 @@ Public Class frmOutput
 
     Private Sub cmdRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRemove.Click
 
-        Dim lRowIndex, lCopyId, lReachIndex, lSelectedCount, lIndex1, lIndex2, lIndex3 As Integer
-        Dim lObject As Object
+        Dim lRowIndex, lCopyId, lReachIndex, lSelectedCount, lIndex1, lIndex2 As Integer
         Dim lHspfConnection As HspfConnection
         Dim lTargetObject As Object
         Dim lTargetHspfConnection As HspfConnection
@@ -468,19 +467,19 @@ Public Class frmOutput
                         lRemoveTargetAtIndex.Clear()
 
                         'build collectino of indexes of ext targets datasets to be removed for this copy
-                        For lIndex3 = 0 To pUCI.Connections.Count - 1
-                            lHspfConnection = pUCI.Connections.Item(lIndex3)
+                        For lIndex2 = 0 To pUCI.Connections.Count - 1
+                            lHspfConnection = pUCI.Connections.Item(lIndex2)
                             If lHspfConnection.Typ = 4 AndAlso Trim(lHspfConnection.Source.VolName) = "COPY" AndAlso lHspfConnection.Source.VolId = lCopyId Then 'this is one
                                 'delete this dsn
                                 lRemoveTargetVolName.Add(lHspfConnection.Target.VolName)
                                 lRemoveTargetVolId.Add(lHspfConnection.Target.VolId)
-                                lRemoveTargetAtIndex.Add(lIndex3)
+                                lRemoveTargetAtIndex.Add(lIndex2)
                             End If
                         Next
                     End If
 
-                    For lIndex3 = 1 To lRemoveTargetAtIndex.Count
-                        pUCI.DeleteWDMDataSet(pUCI.Connections.Item(lRemoveTargetAtIndex(lIndex3)).Target.VolName, pUCI.Connections.Item(lRemoveTargetAtIndex(lIndex3)).Target.VolId)
+                    For lIndex2 = 1 To lRemoveTargetAtIndex.Count
+                        pUCI.DeleteWDMDataSet(pUCI.Connections.Item(lRemoveTargetAtIndex(lIndex2)).Target.VolName, pUCI.Connections.Item(lRemoveTargetAtIndex(lIndex2)).Target.VolId)
                     Next
 
                     'now delete this copy operation
@@ -517,8 +516,8 @@ Public Class frmOutput
                                 End If
                             Next lTargetIndex
 
-                            For lIndex3 = 1 To lRemoveTargetAtIndex.Count
-                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex3))
+                            For lIndex2 = 1 To lRemoveTargetAtIndex.Count
+                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2))
                             Next
 
                         End If
@@ -527,8 +526,8 @@ Public Class frmOutput
                     lSelectedCount += 1
                 End If
 
-                For lIndex3 = 1 To lRemoveTargetVolName.Count
-                    pUCI.DeleteWDMDataSet(lRemoveTargetVolName(lIndex3), lRemoveTargetVolId(lIndex3))
+                For lIndex2 = 1 To lRemoveTargetVolName.Count
+                    pUCI.DeleteWDMDataSet(lRemoveTargetVolName(lIndex2), lRemoveTargetVolId(lIndex2))
                 Next
 
             Next lRowIndex
@@ -579,19 +578,19 @@ Public Class frmOutput
                                 End If
                             Next
 
-                            For lIndex3 = 1 To lRemoveTargetAtIndex.Count
-                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex3))
+                            For lIndex2 = 1 To lRemoveTargetAtIndex.Count
+                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2))
                             Next
 
                         End If
                     Next
 
-                    For lIndex3 = 1 To lRemoveTargetVolName.Count
-                        pUCI.DeleteWDMDataSet(lRemoveTargetVolName(lIndex3), lRemoveTargetVolId(lIndex3))
+                    For lIndex2 = 1 To lRemoveTargetVolName.Count
+                        pUCI.DeleteWDMDataSet(lRemoveTargetVolName(lIndex2), lRemoveTargetVolId(lIndex2))
                     Next
 
-                    For lIndex3 = 1 To pUCI.Connections.Count
-                        pUCI.Connections.RemoveAt(lIndex3)
+                    For lIndex2 = 1 To pUCI.Connections.Count
+                        pUCI.Connections.RemoveAt(lIndex2)
                     Next
 
                     lSelectedCount += 1
@@ -669,16 +668,16 @@ Public Class frmOutput
                         End If
                     Next
 
-                    For lIndex3 = 1 To lRemoveWdmDataSetVolName.Count
-                        pUCI.DeleteWDMDataSet(lRemoveWdmDataSetVolName(lIndex3), lRemoveWdmDataSetVolId(lIndex3))
+                    For lIndex2 = 1 To lRemoveWdmDataSetVolName.Count
+                        pUCI.DeleteWDMDataSet(lRemoveWdmDataSetVolName(lIndex2), lRemoveWdmDataSetVolId(lIndex2))
                     Next
 
-                    For lIndex3 = 1 To lRemoveUciConnectionAtIndex.Count
-                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex(lIndex3))
+                    For lIndex2 = 1 To lRemoveUciConnectionAtIndex.Count
+                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex(lIndex2))
                     Next
 
-                    For lIndex3 = 1 To lRemoveTargetAtIndex.Count
-                        pUCI.OpnBlks(lOperName).OperFromID(lId).Targets.RemoveAt(lRemoveTargetAtIndex(lIndex3))
+                    For lIndex2 = 1 To lRemoveTargetAtIndex.Count
+                        pUCI.OpnBlks(lOperName).OperFromID(lId).Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2))
                     Next
 
                     lSelectedCount += 1
@@ -752,20 +751,20 @@ Public Class frmOutput
                                     End If
                                 Next
 
-                                For lIndex3 = 1 To lRemoveTargetAtIndex.Count
-                                    lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex.Item(lIndex3))
+                                For lIndex2 = 1 To lRemoveTargetAtIndex.Count
+                                    lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex.Item(lIndex2))
                                 Next
 
                             End If
                         End If
                     Next
 
-                    For lIndex3 = 1 To lRemoveUciConnectionAtIndex.Count
-                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lIndex3))
+                    For lIndex2 = 1 To lRemoveUciConnectionAtIndex.Count
+                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lIndex2))
                     Next
 
-                    For lIndex3 = 1 To lRemoveWdmDataSetVolId.Count
-                        pUCI.DeleteWDMDataSet(lRemoveWdmDataSetVolId.Item(lIndex3), lRemoveDsnAtIndex.Item(lIndex3))
+                    For lIndex2 = 1 To lRemoveWdmDataSetVolId.Count
+                        pUCI.DeleteWDMDataSet(lRemoveWdmDataSetVolId.Item(lIndex2), lRemoveDsnAtIndex.Item(lIndex2))
                     Next
 
 
