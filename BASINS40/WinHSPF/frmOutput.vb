@@ -426,7 +426,6 @@ Public Class frmOutput
 
         Dim lRowIndex, lCopyId, lReachIndex, lSelectedCount, lIndex1, lIndex2 As Integer
         Dim lHspfConnection As HspfConnection
-        Dim lTargetObject As Object
         Dim lTargetHspfConnection As HspfConnection
         Dim lHspfOperation As HspfOperation
         Dim lColonPosition, lId, lDsnIndex, lLeftParenthPosition, lCommaPosition, lRightParenthPosition As Integer
