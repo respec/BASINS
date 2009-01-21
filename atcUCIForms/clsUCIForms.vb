@@ -35,6 +35,7 @@ Public Class UCIForms
                 lFormEdit.EditControl = lEditOpnSeqBlock
                 lFormEdit.MinimumSize = lFormEdit.Size
                 lFormEdit.AddRemoveFlag = True
+                lFormEdit.EditFlag = False
                 lForm = lFormEdit
             Case "HspfFtable"
                 Dim lFormEdit As New frmEdit(aParent)

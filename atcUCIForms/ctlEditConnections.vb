@@ -1,6 +1,7 @@
 Imports atcUCI
 Imports atcControls
 Imports System.Collections.ObjectModel
+Imports atcData
 
 Public Class ctlEditConnections
     Implements ctlEdit
@@ -278,6 +279,7 @@ Public Class ctlEditConnections
             End With
 
             grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+            grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
             grdEdit.Refresh()
 
         End Set
@@ -313,9 +315,212 @@ Public Class ctlEditConnections
             Else
                 txtDefine.Clear()
             End If
+
+            DoLimits(pConnectionType, aColumn, aRow)
+
         End If
 
     End Sub
+
+    Private Sub DoLimits(ByVal aConnectionType As String, ByVal aSelectedColumn As Integer, ByVal aSelectedRow As Integer)
+        If aConnectionType = "EXT SOURCES" Then
+            With grdEdit
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 0 Then 'svol
+                    SetLimitsWDM(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 1 Then 'svolno
+                    Me.Cursor = Windows.Forms.Cursors.WaitCursor
+                    CheckValidDsn(lValidValues, .Source.CellValue(aSelectedRow, aSelectedColumn - 1), pConnection.Uci)
+                    Me.Cursor = Windows.Forms.Cursors.Default
+                ElseIf aSelectedColumn = 2 Then 'smemn
+                    CheckValidMemberName(lValidValues, .Source.CellValue(aSelectedRow, aSelectedColumn - 1), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), pConnection.Uci)
+                ElseIf aSelectedColumn = 3 Then 'qflg
+                    For lQflg As Integer = 0 To 31
+                        lValidValues.Add(lQflg)
+                    Next
+                ElseIf aSelectedColumn = 4 Then 'ssyst
+                    lValidValues.Add("ENGL")
+                    lValidValues.Add("METR")
+                ElseIf aSelectedColumn = 5 Then 'sgapst
+                    lValidValues.Add(" ") 'allow default blank
+                    lValidValues.Add("UNDF")
+                    lValidValues.Add("ZERO")
+                ElseIf aSelectedColumn = 6 Then 'mfactr
+                ElseIf aSelectedColumn = 7 Then 'tran
+                    SetValidTrans(lValidValues)
+                ElseIf aSelectedColumn = 8 Then 'tvol
+                    SetValidOperations(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 9 Then 'topfst
+                    SetOperationMinMax(lValidValues, pConnection.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 10 Then 'group
+                    SetGroupNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 2))
+                ElseIf aSelectedColumn = 11 Then 'tmemn
+                    SetMemberNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 12 Then 'tmems1
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 4), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), True)
+                ElseIf aSelectedColumn = 13 Then 'tmems2
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 5), .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), False)
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        End If
+    End Sub
+
+    Private Sub SetLimitsWDM(ByVal aValidValues As Collection, ByVal aUci As HspfUci)
+        Dim lFiles As HspfFilesBlk = aUci.FilesBlock
+
+        For lIndex As Integer = 1 To aUci.FilesBlock.Count
+            Dim lFile As HspfFile = aUci.FilesBlock.Value(lIndex)
+            If lFile.Typ.Length > 2 Then
+                If lFile.Typ.Substring(0, 3) = "WDM" Then
+                    aValidValues.Add(lFile.Typ)
+                End If
+            End If
+        Next
+    End Sub
+
+    Private Sub CheckValidDsn(ByVal aValidValues As Collection, ByVal aWDMid As String, ByVal aUci As HspfUci)
+        Dim lWdmId As Integer = WDMInd(aWDMid)
+        For lDsn As Integer = 1 To 9999
+            Dim lDsnObj As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmId, lDsn)
+            If Not lDsnObj Is Nothing Then
+                aValidValues.Add(lDsn)
+            End If
+        Next
+    End Sub
+
+    Private Sub CheckValidMemberName(ByVal aValidValues As Collection, ByVal aDsn As Integer, ByVal aWDMid As String, ByVal aUci As HspfUci)
+        Dim lDsnObj As atcData.atcTimeseries = aUci.GetDataSetFromDsn(WDMInd(aWDMid), aDsn)
+        If Not lDsnObj Is Nothing Then
+            aValidValues.Add(lDsnObj.Attributes.GetDefinedValue("TSTYPE").Value)
+        End If
+    End Sub
+
+    Private Sub SetValidTrans(ByVal aValidValues As Collection)
+        aValidValues.Add(" ") 'allow default blank
+        aValidValues.Add("SAME")
+        aValidValues.Add("AVER")
+        aValidValues.Add("DIV ")
+        aValidValues.Add("INTP")
+        aValidValues.Add("LAST")
+        aValidValues.Add("MAX ")
+        aValidValues.Add("MIN ")
+        aValidValues.Add("SUM ")
+    End Sub
+
+    Private Sub SetValidOperations(ByVal aValidValues As Collection, ByVal aUci As HspfUci)
+        For Each lOpnBlk As HspfOpnBlk In aUci.OpnBlks
+            If lOpnBlk.Count > 0 Then
+                aValidValues.Add(lOpnBlk.Name)
+            End If
+        Next
+    End Sub
+
+    Private Sub SetOperationMinMax(ByVal aValidValues As Collection, ByVal aUci As HspfUci, ByVal aOperType As String)
+        If aOperType.Length > 0 Then
+            Dim lOpnBlk As HspfOpnBlk = aUci.OpnBlks(Trim(aOperType))
+            If lOpnBlk.Count > 0 Then
+                For lIndex As Integer = 0 To lOpnBlk.Count - 1
+                    aValidValues.Add(lOpnBlk.Ids(lIndex).Id)
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub SetGroupNames(ByVal aValidValues As Collection, ByVal aMsg As HspfMsg, ByVal aOperName As String)
+        If aOperName.Length > 0 Then
+            Dim lOper As Integer = HspfOperNum(aOperName)
+            If lOper > 0 Then
+                For Each lGroup As HspfTSGroupDef In aMsg.TSGroupDefs
+                    If lGroup.BlockID = 120 + lOper Then
+                        aValidValues.Add(lGroup.Name)
+                    End If
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub SetMemberNames(ByVal aValidValues As Collection, ByVal aMsg As HspfMsg, ByVal aOperName As String, ByVal aGroupName As String)
+        If aOperName.Length > 0 Then
+            Dim lOper As Integer = HspfOperNum(aOperName)
+            If lOper > 0 Then
+                For Each lGroup As HspfTSGroupDef In aMsg.TSGroupDefs
+                    If lGroup.BlockID = 120 + lOper And lGroup.Name = aGroupName Then
+                        'this is the one we want
+                        Dim lSkey As String = CStr(lGroup.Id)
+                        For Each lMember As HspfTSMemberDef In aMsg.TSGroupDefs(lSkey).MemberDefs
+                            aValidValues.Add(lMember.Name)
+                        Next
+                        Exit Sub
+                    End If
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub SetMemberSubscript(ByVal aValidValues As Collection, ByVal aMsg As HspfMsg, ByVal aOperName As String, ByVal aGroupName As String, ByVal aMemberName As String, ByVal aFirst As Boolean)
+        If aOperName.Length > 0 Then
+            Dim lOper As Integer = HspfOperNum(aOperName)
+            If lOper > 0 Then
+                For Each lGroup As HspfTSGroupDef In aMsg.TSGroupDefs
+                    If lGroup.BlockID = 120 + lOper And lGroup.Name = aGroupName Then
+                        Dim lSkey As String = CStr(lGroup.Id)
+                        For Each lMember As HspfTSMemberDef In aMsg.TSGroupDefs(lSkey).MemberDefs
+                            If lMember.Name = aMemberName Then
+                                If aFirst Then
+                                    If lMember.Maxsb1 = 1 Then aValidValues.Add(0)
+                                    For lSub As Integer = 1 To lMember.Maxsb1
+                                        aValidValues.Add(lSub)
+                                    Next
+                                Else
+                                    If lMember.Maxsb2 = 1 Then aValidValues.Add(0)
+                                    For lSub As Integer = 1 To lMember.Maxsb2
+                                        aValidValues.Add(lSub)
+                                    Next
+                                End If
+                                Exit Sub
+                            End If
+                        Next
+                    End If
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Function WDMInd(ByRef wdmid As String) As Integer
+        Dim w As String
+
+        If Len(wdmid) > 3 Then
+            w = Mid(wdmid, 4, 1)
+            If w = " " Then w = "1"
+        Else
+            w = "1"
+        End If
+        WDMInd = CInt(w)
+    End Function
+
+    Private Function HspfOperNum(ByRef aName As String) As HspfData.HspfOperType
+        Dim lHspfOperNum As HspfData.HspfOperType
+
+        Select Case aName
+            Case "PERLND" : lHspfOperNum = HspfData.HspfOperType.hPerlnd
+            Case "IMPLND" : lHspfOperNum = HspfData.HspfOperType.hImplnd
+            Case "RCHRES" : lHspfOperNum = HspfData.HspfOperType.hRchres
+            Case "COPY" : lHspfOperNum = HspfData.HspfOperType.hCopy
+            Case "PLTGEN" : lHspfOperNum = HspfData.HspfOperType.hPltgen
+            Case "DISPLY" : lHspfOperNum = HspfData.HspfOperType.hDisply
+            Case "DURANL" : lHspfOperNum = HspfData.HspfOperType.hDuranl
+            Case "GENER" : lHspfOperNum = HspfData.HspfOperType.hGener
+            Case "MUTSIN" : lHspfOperNum = HspfData.HspfOperType.hMutsin
+            Case "BMPRAC" : lHspfOperNum = HspfData.HspfOperType.hBmprac
+            Case "REPORT" : lHspfOperNum = HspfData.HspfOperType.hReport
+            Case Else : lHspfOperNum = 0
+        End Select
+
+        Return lHspfOperNum
+    End Function
 
     Public Sub New(ByVal aHspfConnection As Object, ByVal aParent As Windows.Forms.Form, ByVal aTag As String)
 

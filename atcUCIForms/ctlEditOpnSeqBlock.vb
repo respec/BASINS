@@ -1,6 +1,8 @@
 Imports atcUCI
+Imports atcUtility
 Imports atcControls
 Imports System.Windows.Forms
+Imports System.Drawing
 
 Public Class ctlEditOpnSeqBlock
     Implements ctlEdit
@@ -10,7 +12,15 @@ Public Class ctlEditOpnSeqBlock
     Dim pfrmAddOperation As frmAddOperation
 
     Dim pChanged As Boolean
+    Dim pCurrentSelectedColumn As Integer
+    Dim pCurrentSelectedRow As Integer
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
+
+    Private Sub grdEdit_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdEdit.MouseDownCell
+        pCurrentSelectedColumn = aColumn
+        pCurrentSelectedRow = aRow
+        DoLimits()
+    End Sub
 
     Private Sub grdEdit_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdEdit.Resize
         grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
@@ -36,26 +46,15 @@ Public Class ctlEditOpnSeqBlock
 
     Public Sub Add() Implements ctlEdit.Add
 
-        Dim lSelectedRow As Integer = 0
-        With grdEdit.Source
-            For lRowIndex As Integer = 1 To .Rows
-                For lColIndex As Integer = 1 To .Columns
-                    If .CellSelected(lRowIndex, lColIndex) Then
-                        lSelectedRow = lRowIndex
-                    End If
-                Next
-            Next
-        End With
-
         If IsNothing(pfrmAddOperation) Then
             pfrmAddOperation = New frmAddOperation
-            pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent, lSelectedRow)
+            pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent, pCurrentSelectedRow - 1)
             pfrmAddOperation.ShowDialog()
             Data = pHspfOpnSeqBlk
         Else
             If pfrmAddOperation.IsDisposed Then
                 pfrmAddOperation = New frmAddOperation
-                pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent, lSelectedRow)
+                pfrmAddOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent, pCurrentSelectedRow - 1)
                 pfrmAddOperation.ShowDialog()
                 Data = pHspfOpnSeqBlk
             Else
@@ -113,21 +112,65 @@ Public Class ctlEditOpnSeqBlock
     End Sub
 
     Public Sub Remove() Implements ctlEdit.Remove
-        'not be needed
+        With grdEdit.Source
+            If pCurrentSelectedRow > 0 Then
+                For lRow As Integer = pCurrentSelectedRow To .Rows - 1
+                    For lColumn As Integer = 0 To .Columns - 1
+                        .CellValue(lRow, lColumn) = .CellValue(lRow + 1, lColumn)
+                    Next
+                Next
+                .Rows -= 1
+                Changed = True
+            End If
+        End With
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
 
         pHspfOpnSeqBlk.Delt = txtIndelt.ValueInteger
-        'TODO: Open the Add Dialog
-        'With grdEdit.Source
-        '    Logger.Dbg("EditOpnSeqBlocK:Save:RowCount:" & .Rows)
-        '    For i As Integer = 1 To .Rows - 1
-        '        pHspfOpnSeqBlk.Opn(i).Name = .CellValue(i, 0)
-        '        pHspfOpnSeqBlk.Opn(i).Id = .CellValue(i, 1)
-        '    Next
-        'End With
-        'pChanged = False
+
+        'find out if any operations have been deleted
+        For Each lOpn As HspfOperation In pHspfOpnSeqBlk.Opns
+            Dim lInList As Boolean = False
+            For lRow As Integer = 1 To grdEdit.Source.Rows
+                If Len(grdEdit.Source.CellValue(lRow, 1)) > 0 And _
+                   Len(grdEdit.Source.CellValue(lRow, 0)) > 0 Then
+                    If lOpn.Id = grdEdit.Source.CellValue(lRow, 1) And _
+                        lOpn.Name = grdEdit.Source.CellValue(lRow, 0) Then
+                        lInList = True
+                    End If
+                End If
+            Next
+            If Not lInList Then
+                'delete this operation
+                pHspfOpnSeqBlk.Uci.DeleteOperation(lOpn.Name, lOpn.Id)
+            End If
+        Next
+        'find out if any operations have been added
+        For lRow As Integer = 1 To grdEdit.Source.Rows
+            Dim lInList As Boolean = False
+            For Each lOpn As HspfOperation In pHspfOpnSeqBlk.Opns
+                If grdEdit.Source.CellValue(lRow, 1).Length > 0 And _
+                   grdEdit.Source.CellValue(lRow, 0).Length > 0 Then
+                    If lOpn.Id = grdEdit.Source.CellValue(lRow, 1) And _
+                       lOpn.Name = grdEdit.Source.CellValue(lRow, 0) Then
+                        lInList = True
+                    End If
+                End If
+            Next
+            If Not lInList And grdEdit.Source.CellValue(lRow, 1).Length > 0 And _
+                 grdEdit.Source.CellValue(lRow, 0).Length > 0 Then
+                'add this operation
+                Dim lOpn As New HspfOperation
+                lOpn.Name = grdEdit.Source.CellValue(lRow, 0)
+                lOpn.Id = grdEdit.Source.CellValue(lRow, 1)
+                pHspfOpnSeqBlk.Uci.AddOperation(lOpn.Name, lOpn.Id)
+                pHspfOpnSeqBlk.Uci.AddOperationToOpnSeqBlock(lOpn.Name, lOpn.Id, lRow)
+            End If
+        Next
+
+        'TODO: look for operations that are not in the same order as in the opn seq block
+
     End Sub
 
     Public Sub New(ByVal aHspfOpnSeqBlk As Object, ByVal aParent As Windows.Forms.Form)
@@ -139,6 +182,44 @@ Public Class ctlEditOpnSeqBlock
         grdEdit.Source = New atcGridSource
         Data = aHspfOpnSeqBlk
 
+    End Sub
+
+    Public Sub DoLimits()
+        With grdEdit
+            Dim lValidValues As New Collection
+            If pCurrentSelectedColumn = 0 Then 'opername
+                For lIndex As Integer = 0 To pHspfOpnSeqBlk.Uci.OpnBlks.Count - 1
+                    lValidValues.Add(pHspfOpnSeqBlk.Uci.OpnBlks(lIndex).Name)
+                Next
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            Else 'oper id column
+                .ValidValues = lValidValues
+                .Refresh()
+            End If
+        End With
+    End Sub
+
+    Private Sub AtcGridPervious_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdEdit.CellEdited
+        If aColumn = 1 Then
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+
+            'operid should be between 1 and 999
+            If lNewValueNumeric > 0 AndAlso lNewValueNumeric < 1000 Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
+        End If
     End Sub
 
 End Class

@@ -75,6 +75,10 @@ Public Class frmEdit
         pEditControl.Add()
     End Sub
 
+    Private Sub cmdRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdRemove.Click
+        pEditControl.Remove()
+    End Sub
+
     Public Sub New(ByVal aParent As Windows.Forms.Form)
 
         ' This call is required by the Windows Form Designer.
