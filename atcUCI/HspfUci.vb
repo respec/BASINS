@@ -909,7 +909,7 @@ Public Class HspfUci
     Public Sub DeleteOperation(ByRef aName As String, ByRef aId As Integer)
         'figure out where this operation is in operation sequence block and delete it
         Dim lOperationIndex As Integer = 1
-        Dim lDeleteOperationAtIndex As New Collection
+        Dim lDeleteOperationAtIndex, lDeleteTargetAtIndex, lDeleteSourceAtIndex As New Collection
         Dim lHspfOperation As HspfOperation
         Dim lHspfConnection As HspfConnection
         Dim lOper As Integer
@@ -940,12 +940,13 @@ Public Class HspfUci
         Dim lTargetVolId As Integer = 0
         Dim lSourceCount As Integer = 0
         Dim lSourceVolId() As Integer = {}
-        Dim lMassLink As Integer
-
+        Dim lMassLink, lTargetIndex, lSourceIndex, lHspfOperationIndex As Integer
+        Dim lRemoveUciConnectionAtIndex As New Collection
+        Dim lRemoveOperationTargetAtIndex, lRemoveOperationSourceAtIndex As New Collection
+        Dim lOffsetAfterDeleteIndex As Integer
 
         For lHspfConnectionIndex = 0 To Me.Connections.Count - 1
             lHspfConnection = Me.Connections.Item(lHspfConnectionIndex)
-
 
             If (lHspfConnection.Source.VolName = aName And lHspfConnection.Source.VolId = aId) Or (lHspfConnection.Target.VolName = aName And lHspfConnection.Target.VolId = aId) Then
                 lMassLink = lHspfConnection.MassLink
@@ -958,10 +959,14 @@ Public Class HspfUci
                     'remember the target
                     lTargetVolId = lHspfConnection.Target.VolId
                 End If
-                Me.Connections.RemoveAt(lConnectionIndex)
-            Else
-                lConnectionIndex += 1
+                lRemoveUciConnectionAtIndex.Add(lHspfConnectionIndex)
             End If
+        Next
+
+        lOffsetAfterDeleteIndex = 0
+        For lOper = 1 To lRemoveUciConnectionAtIndex.Count
+            Me.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
+            lOffsetAfterDeleteIndex += 1
         Next
 
         If lSourceCount > 0 And lTargetVolId > 0 Then
@@ -989,25 +994,36 @@ Public Class HspfUci
         End If
 
         'remove this oper from source and target collections for other operations
-        For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
-            Dim lTargetIndex As Integer = 1
-            Do While lTargetIndex <= lOpn.Targets.Count
-                If lOpn.Targets.Item(lTargetIndex).Target.VolId = aId And _
-                   lOpn.Targets.Item(lTargetIndex).Target.VolName = aName Then
-                    lOpn.Targets.RemoveAt(lTargetIndex)
-                Else
-                    lTargetIndex += 1
+        For lHspfOperationIndex = 0 To pOpnSeqBlk.Opns.Count - 1
+            lHspfOperation = pOpnSeqBlk.Opns.Item(lHspfOperationIndex)
+
+            For lTargetIndex = 0 To lHspfOperation.Targets.Count - 1
+                If lHspfOperation.Targets.Item(lTargetIndex).Target.VolId = aId AndAlso lHspfOperation.Targets.Item(lTargetIndex).Target.VolName = aName Then
+                    lDeleteTargetAtIndex.Add(lTargetIndex)
                 End If
-            Loop
-            lTargetIndex = 1
-            Do While lTargetIndex <= lOpn.Sources.Count
-                If lOpn.Sources.Item(lTargetIndex).Source.VolId = aId And _
-                   lOpn.Sources.Item(lTargetIndex).Source.VolName = aName Then
-                    lOpn.Sources.RemoveAt(lTargetIndex)
-                Else
-                    lTargetIndex += 1
+            Next
+
+            lOffsetAfterDeleteIndex = 0
+            For lOper = 1 To lDeleteTargetAtIndex.Count
+                Me.Connections.RemoveAt(lDeleteTargetAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
+                lOffsetAfterDeleteIndex += 1
+            Next
+
+
+            For lSourceIndex = 0 To lHspfOperation.Sources.Count - 1
+                If lHspfOperation.Sources.Item(lSourceIndex).Source.VolId = aId AndAlso lHspfOperation.Sources.Item(lSourceIndex).Source.VolName = aName Then
+                    lDeleteSourceAtIndex.Add(lSourceIndex)
                 End If
-            Loop
+            Next
+
+            lOffsetAfterDeleteIndex = 0
+            For lOper = 1 To lDeleteSourceAtIndex.Count
+                Me.Connections.RemoveAt(lDeleteTargetAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
+                lOffsetAfterDeleteIndex += 1
+            Next
+
+
+
         Next
     End Sub
 
