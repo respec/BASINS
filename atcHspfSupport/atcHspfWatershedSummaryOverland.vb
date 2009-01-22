@@ -7,7 +7,7 @@ Imports MapWinUtility
 Public Module WatershedSummaryOverland
 
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _
-                           ByVal aBalanceType As String, _
+                           ByVal aConstituentType As String, _
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
                            ByVal aScenarioResults As atcTimeseriesSource, _
@@ -46,13 +46,13 @@ Public Module WatershedSummaryOverland
         FindSegmentStarts(lPerlndOperations, aPerlndSegmentStarts, lPerlndColumns)
         FindSegmentStarts(lImplndOperations, aImplndSegmentStarts, lImplndColumns)
 
-        Select Case aBalanceType
+        Select Case aConstituentType
             Case "Sediment"
                 lUnits = "(tons/acre)"
                 lAllNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOSED"))
-                lAllNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "SOSLD")))
+                lAllNonpointData.AddRange(aScenarioResults.DataSets.FindData("Constituent", "SOSLD"))
             Case Else
-                Return New Text.StringBuilder("Overland report not yet defined for balance type '" & aBalanceType & "'")
+                Return New Text.StringBuilder("Overland report not yet defined for balance type '" & aConstituentType & "'")
         End Select
 
         Dim lAllYearsToDo As New Generic.Dictionary(Of String, atcTimeseriesGroup)
@@ -76,14 +76,17 @@ Public Module WatershedSummaryOverland
         If aSummary Then lAllYearsToDo.Add("Summary", lAllNonpointData)
 
         Dim lSB As New Text.StringBuilder
-        dim lSJDate as Double = auci.GlobalBlock.SDateJ 
+        Dim lSJDate As Double = auci.GlobalBlock.SDateJ
         For Each lCurrentNonpointData As atcTimeseriesGroup In lAllYearsToDo.Values
-            Dim lSummary As Boolean = aIncludeMinMax AndAlso lCurrentNonpointData.Equals(lAllNonpointData)
             lSeasonName = lCurrentNonpointData.ItemByIndex(0).Attributes.GetValue("SeasonName", "")
-            lSB.AppendLine("Overland Summary Report for " & aBalanceType & " in " & aScenario & " " & lUnits)
+            lSB.AppendLine("Overland Summary Report for " & aConstituentType & " in " & aScenario & " " & lUnits)
             lSB.AppendLine("   Run Made " & aRunMade)
+            lSB.AppendLine("   Results From File " & aScenarioResults.Specification)
             lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-            If lSummary Then
+
+            Dim lCurrentIsAll As Boolean = lCurrentNonpointData.Equals(lAllNonpointData)
+            Dim lSummary As Boolean = aIncludeMinMax AndAlso lCurrentIsAll
+            If lSummary OrElse lCurrentIsAll Then
                 lSB.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
             Else
                 Dim lEJDate As Double = TimAddJ(lSJDate, 6, 1, 1)
