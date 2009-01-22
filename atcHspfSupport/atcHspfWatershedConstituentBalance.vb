@@ -280,7 +280,13 @@ Public Module WatershedConstituentBalance
                                             Dim lLocationDataGroup As atcTimeseriesGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                             If lLocationDataGroup.Count > 0 Then
                                                 lTempDataSet = lLocationDataGroup.Item(0)
-                                                Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                                Dim lAttribute As atcDefinedValue
+                                                Select Case lConstituentKey
+                                                    Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
+                                                        lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+                                                    Case Else
+                                                        lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                                End Select
                                                 If lAttribute Is Nothing Then
                                                     lValue = GetNaN()
                                                 Else
