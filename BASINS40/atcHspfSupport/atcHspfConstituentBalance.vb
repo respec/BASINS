@@ -82,7 +82,12 @@ Public Module ConstituentBalance
                                             lSeasons = New atcSeasonsCalendarYear
                                         End If
                                         Dim lSeasonalAttributes As New atcDataAttributes
-                                        lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
+                                        Select Case lConstituentKey
+                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
+                                                lSeasonalAttributes.SetValue("Last", 0) 'fluxes are last from daily, monthly or annual to annual
+                                            Case Else
+                                                lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
+                                        End Select
                                         Dim lYearlyAttributes As New atcDataAttributes
                                         lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lYearlyAttributes)
 
@@ -125,7 +130,13 @@ Public Module ConstituentBalance
                                             lPendingOutput = ""
                                         End If
 
-                                        Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                        Dim lAttribute As atcDefinedValue
+                                        Select Case lConstituentKey
+                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
+                                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+                                            Case Else
+                                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                        End Select
 
                                         .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         If Not lAttribute Is Nothing Then

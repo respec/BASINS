@@ -73,6 +73,8 @@ Public Class atcTimeseriesStatistics
 
                 AddOperation("End Date", "Ending Julian Date", defTimeSeriesOne, lCategory)
 
+                AddOperation("Last", "Last value", defTimeSeriesOne, lCategory)
+
                 AddOperation("Max", "Maximum value", defTimeSeriesOne, lCategory)
 
                 AddOperation("Min", "Minimum value", defTimeSeriesOne, lCategory)
@@ -222,6 +224,7 @@ Public Class atcTimeseriesStatistics
             aTimeseries.Attributes.SetValue("Count Missing", CInt(lLastValueIndex - lCount))
             aTimeseries.Attributes.SetValue("Count Zero", CInt(lCountZero))
             If lCount > 0 Then
+                aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
                 aTimeseries.Attributes.SetValue("Max", lMax)
                 aTimeseries.Attributes.SetValue("Min", lMin)
                 aTimeseries.Attributes.SetValue("Sum", lSum)
