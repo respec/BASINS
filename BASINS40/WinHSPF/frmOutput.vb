@@ -505,7 +505,7 @@ Public Class frmOutput
                             'remove the connection
 
                             'also remove connection from operation
-                            lHspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lHspfConnectionIndex)
+                            lHspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lReachIndex)
 
                             For lTargetIndex = 0 To lHspfOperation.Targets.Count - 1
                                 lTargetHspfConnection = lHspfOperation.Targets.Item(lTargetIndex)
