@@ -18,7 +18,7 @@ Module ClimateAssessmentFromScript
         lOriginalData.Open(pBaseName & ".wdm")
 
         With pCat
-            .BaseScenario = pBaseFolder & pBaseName & ".uci"
+            .Model.BaseScenario = pBaseFolder & pBaseName & ".uci"
             Dim lVariation As New atcVariation
             With lVariation
                 .Name = "Adjust Precip"
