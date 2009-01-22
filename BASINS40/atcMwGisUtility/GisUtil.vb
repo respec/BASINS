@@ -2481,6 +2481,40 @@ Public Class GisUtil
 
     End Sub
 
+    Public Shared Function CreateEmptyShapefile(ByVal aShapefileName As String, _
+                                                ByVal aProjection As String, ByVal aType As String) As Boolean
+        Dim lShapefile As New MapWinGIS.Shapefile
+
+        Dim lMWType As MapWinGIS.ShpfileType
+        If aType.ToLower = "polygon" Then
+            lMWType = MapWinGIS.ShpfileType.SHP_POLYGON
+        ElseIf aType.ToLower = "line" Then
+            lMWType = MapWinGIS.ShpfileType.SHP_POLYLINE
+        ElseIf aType.ToLower = "point" Then
+            lMWType = MapWinGIS.ShpfileType.SHP_POINT
+        End If
+
+        If Not lShapefile.CreateNew(aShapefileName, lMWType) Then
+            Logger.Dbg("Failed to create new shapefile " & aShapefileName & " ErrorCode " & lShapefile.LastErrorCode)
+            Return False
+        End If
+
+        If aProjection.Length > 0 Then
+            lShapefile.Projection = aProjection
+        Else
+            lShapefile.Projection = GisUtil.ProjectProjection
+        End If
+        If Not lShapefile.SaveAs(lShapefile.Filename) Then
+            Return False
+        End If
+        If Not lShapefile.Close() Then
+            Logger.Dbg("Failed to close shapefile " & lShapefile.Filename & " ErrorCode " & lShapefile.LastErrorCode)
+            Return False
+        End If
+        Return True
+
+    End Function
+
     Public Shared Sub ShapeCentroid(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByRef aCentroidX As Double, ByRef aCentroidY As Double)
         Dim lSf As New MapWinGIS.Shapefile
         lSf = ShapeFileFromIndex(aLayerIndex)
