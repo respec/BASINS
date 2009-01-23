@@ -275,7 +275,7 @@ StartOver:
                 aModifiedData = New atcTimeseriesGroup
             End If
             Try
-                ChDriveDir(PathNameOnly(Model.BaseScenario))
+                ChDriveDir(PathNameOnly((Model.BaseScenario))) 'extra parentheses to avoid setting BaseScenario from ByRef
             Catch
             End Try
 

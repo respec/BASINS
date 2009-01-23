@@ -95,6 +95,7 @@ Public Class frmCAT
     Friend WithEvents btnEndpointTop As System.Windows.Forms.Button
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents btnPlot As System.Windows.Forms.Button
+    Friend WithEvents mnuOpenSWAT As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -159,6 +160,7 @@ Public Class frmCAT
         Me.agdResults = New atcControls.atcGrid
         Me.agdPivot = New atcControls.atcGrid
         Me.btnPlot = New System.Windows.Forms.Button
+        Me.mnuOpenSWAT = New System.Windows.Forms.MenuItem
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -546,47 +548,47 @@ Public Class frmCAT
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenUCI, Me.mnuLoadVariations, Me.mnuSaveVariations, Me.mnuFileSep1, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep2, Me.mnuSavePivot})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenUCI, Me.mnuOpenSWAT, Me.mnuLoadVariations, Me.mnuSaveVariations, Me.mnuFileSep1, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep2, Me.mnuSavePivot})
         Me.mnuFile.Text = "File"
         '
         'mnuOpenUCI
         '
         Me.mnuOpenUCI.Index = 0
-        Me.mnuOpenUCI.Text = "Open UCI file"
+        Me.mnuOpenUCI.Text = "Open HSPF scenario"
         '
         'mnuLoadVariations
         '
-        Me.mnuLoadVariations.Index = 1
+        Me.mnuLoadVariations.Index = 2
         Me.mnuLoadVariations.Text = "Load Climate and Endpoints"
         '
         'mnuSaveVariations
         '
-        Me.mnuSaveVariations.Index = 2
+        Me.mnuSaveVariations.Index = 3
         Me.mnuSaveVariations.Text = "Save Climate and Endpoints"
         '
         'mnuFileSep1
         '
-        Me.mnuFileSep1.Index = 3
+        Me.mnuFileSep1.Index = 4
         Me.mnuFileSep1.Text = "-"
         '
         'mnuLoadResults
         '
-        Me.mnuLoadResults.Index = 4
+        Me.mnuLoadResults.Index = 5
         Me.mnuLoadResults.Text = "Load Results"
         '
         'mnuSaveResults
         '
-        Me.mnuSaveResults.Index = 5
+        Me.mnuSaveResults.Index = 6
         Me.mnuSaveResults.Text = "Save Results"
         '
         'mnuFileSep2
         '
-        Me.mnuFileSep2.Index = 6
+        Me.mnuFileSep2.Index = 7
         Me.mnuFileSep2.Text = "-"
         '
         'mnuSavePivot
         '
-        Me.mnuSavePivot.Index = 7
+        Me.mnuSavePivot.Index = 8
         Me.mnuSavePivot.Text = "Save Pivot"
         '
         'mnuEdit
@@ -692,6 +694,11 @@ Public Class frmCAT
         Me.btnPlot.Size = New System.Drawing.Size(56, 24)
         Me.btnPlot.TabIndex = 4
         Me.btnPlot.Text = "Plot"
+        '
+        'mnuOpenSWAT
+        '
+        Me.mnuOpenSWAT.Index = 1
+        Me.mnuOpenSWAT.Text = "Open SWAT scenario"
         '
         'frmCAT
         '
@@ -1525,6 +1532,11 @@ Public Class frmCAT
 
     Private Sub mnuOpenUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenUCI.Click
         pCat.Model = New clsCatModelHSPF
+        pCat.Model.BaseScenario = ""
+    End Sub
+
+    Private Sub mnuOpenSWAT_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenSWAT.Click
+        pCat.Model = New clsCatModelSWAT
         pCat.Model.BaseScenario = ""
     End Sub
 

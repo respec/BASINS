@@ -14,9 +14,45 @@ Public Class clsCatModelHSPF
             Return pBaseScenario
         End Get
         Set(ByVal newValue As String)
-            OpenDataFiles(newValue)
+            OpenBaseScenario(newValue)
         End Set
     End Property
+
+    ''' <summary>
+    ''' Open data files referred to in this UCI file
+    ''' </summary>
+    ''' <param name="aFilename">Full path of UCI file</param>
+    ''' <remarks></remarks>
+    Friend Sub OpenBaseScenario(Optional ByVal aFilename As String = "")
+        If Not aFilename Is Nothing And Not IO.File.Exists(aFilename) Then
+            If IO.File.Exists(aFilename & ".uci") Then aFilename &= ".uci"
+        End If
+
+        If aFilename Is Nothing OrElse Not IO.File.Exists(aFilename) Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UCI file containing base scenario"
+            cdlg.Filter = "UCI files|*.uci|All Files|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                aFilename = cdlg.FileName
+            End If
+        End If
+
+        If IO.File.Exists(aFilename) Then
+            Dim lUciFolder As String = PathNameOnly(aFilename)
+            ChDriveDir(lUciFolder)
+            pBaseScenario = aFilename
+            RaiseEvent BaseScenarioSet(aFilename)
+            Dim lFullText As String = WholeFileString(aFilename)
+            For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
+                lWDMfilename = AbsolutePath(Trim(lWDMfilename), lUciFolder)
+                clsCat.OpenDataSource(lWDMfilename)
+            Next
+            For Each lBinOutFilename As String In UCIFilesBlockFilenames(lFullText, "BINO")
+                lBinOutFilename = AbsolutePath(Trim(lBinOutFilename), lUciFolder)
+                clsCat.OpenDataSource(lBinOutFilename)
+            Next
+        End If
+    End Sub
 
     Private Sub CreateModifiedUCI(ByVal aNewScenarioName As String, ByVal aNewUciFilename As String)
         Dim lUciContents As String = WholeFileString(BaseScenario)
@@ -88,7 +124,7 @@ Public Class clsCatModelHSPF
             aModifiedData = New atcTimeseriesGroup
         End If
 
-        If FileExists(pBaseScenario) Then
+        If IO.File.Exists(pBaseScenario) Then
             Dim lNewBaseFilename As String = AbsolutePath(pBaseScenario, CurDir)
             Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & "\"
             lNewBaseFilename = lNewFolder & aNewScenarioName & "."
@@ -205,42 +241,6 @@ Public Class clsCatModelHSPF
         End If
         Return lModified
     End Function
-
-    ''' <summary>
-    ''' Open data files referred to in this UCI file
-    ''' </summary>
-    ''' <param name="aUCIfilename">Full path of UCI file</param>
-    ''' <remarks></remarks>
-    Friend Sub OpenDataFiles(Optional ByVal aUCIfilename As String = "")
-        If Not aUCIfilename Is Nothing And Not FileExists(aUCIfilename) Then
-            If FileExists(aUCIfilename & ".uci") Then aUCIfilename &= ".uci"
-        End If
-
-        If aUCIfilename Is Nothing OrElse Not FileExists(aUCIfilename) Then
-            Dim cdlg As New Windows.Forms.OpenFileDialog
-            cdlg.Title = "Open UCI file containing base scenario"
-            cdlg.Filter = "UCI files|*.uci|All Files|*.*"
-            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-                aUCIfilename = cdlg.FileName
-            End If
-        End If
-
-        If FileExists(aUCIfilename) Then
-            Dim lUciFolder As String = PathNameOnly(aUCIfilename)
-            ChDriveDir(lUciFolder)
-            pBaseScenario = aUCIfilename
-            RaiseEvent BaseScenarioSet(aUCIfilename)
-            Dim lFullText As String = WholeFileString(aUCIfilename)
-            For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
-                lWDMfilename = AbsolutePath(Trim(lWDMfilename), lUciFolder)
-                clsCat.OpenDataSource(lWDMfilename)
-            Next
-            For Each lBinOutFilename As String In UCIFilesBlockFilenames(lFullText, "BINO")
-                lBinOutFilename = AbsolutePath(Trim(lBinOutFilename), lUciFolder)
-                clsCat.OpenDataSource(lBinOutFilename)
-            Next
-        End If
-    End Sub
 
     ''' <summary>
     ''' Given the filename of a UCI file and a file type, return the file names, if any, of that type in the UCI
