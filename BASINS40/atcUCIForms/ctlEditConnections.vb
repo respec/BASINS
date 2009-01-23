@@ -1,7 +1,10 @@
 Imports atcUCI
+Imports atcUtility
+Imports MapWinUtility
 Imports atcControls
 Imports System.Collections.ObjectModel
 Imports atcData
+Imports System.Drawing
 
 Public Class ctlEditConnections
     Implements ctlEdit
@@ -11,6 +14,7 @@ Public Class ctlEditConnections
     Dim pConnectionType As String 'ext sources, ext targets, schematic, or network
     Dim pConnections As Collection(Of HspfConnection)
     Dim pChanged As Boolean
+    Dim pCurrentSelectedRow As Integer
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
     Private Sub grdTable_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdEdit.Resize
@@ -38,10 +42,6 @@ Public Class ctlEditConnections
     Public Sub Add() Implements ctlEdit.Add
         With grdEdit.Source
             .Rows += 1
-            .CellEditable(.Rows - 1, 0) = True
-            .CellEditable(.Rows - 1, 1) = True
-            .CellEditable(.Rows - 1, 2) = True
-            .CellEditable(.Rows - 1, 3) = True
         End With
         Changed = True
     End Sub
@@ -51,17 +51,201 @@ Public Class ctlEditConnections
     End Sub
 
     Public Sub Remove() Implements ctlEdit.Remove
-        'TODO: add this code
         With grdEdit.Source
-            'TODO: need selected rows
-            'Dim lRow, lCol As Integer
-            'Dim lTmp As Boolean = .CellSelected(lRow, lCol)
+            If pCurrentSelectedRow > 0 Then
+                For lRow As Integer = pCurrentSelectedRow To .Rows - 1
+                    For lColumn As Integer = 0 To .Columns - 1
+                        .CellValue(lRow, lColumn) = .CellValue(lRow + 1, lColumn)
+                    Next
+                Next
+                .Rows -= 1
+                Changed = True
+            End If
         End With
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
         With grdEdit.Source
 
+            If pConnectionType = "NETWORK" Then
+                'put network block back
+                RemoveSourcesFromOperations()
+                RemoveTargetsFromOperations()
+                pConnection.Uci.RemoveConnectionsFromCollection(2)
+                'create new connections
+                For lRow As Integer = 2 To .Rows
+                    Dim lRowComplete As Boolean = True
+                    For lColumn As Integer = 1 To .Columns - 1
+                        If .CellValue(lRow, lColumn - 1).Length < 1 And lColumn <> 8 And lColumn <> 4 And lColumn <> 12 Then
+                            'no data entered for this field, dont do this row
+                            lRowComplete = False
+                        End If
+                    Next lColumn
+                    If Not lRowComplete Then
+                        Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                                   "This row will be ignored.", MsgBoxStyle.OkOnly, _
+                                   pConnection.Caption & " Edit Problem")
+                    Else
+                        Dim lConn As New HspfConnection
+                        lConn.Uci = pConnection.Uci
+                        lConn.Typ = 2
+                        lConn.Source.VolName = .CellValue(lRow, 0)
+                        lConn.Source.VolId = .CellValue(lRow, 1)
+                        lConn.Source.Group = .CellValue(lRow, 2)
+                        lConn.Source.Member = .CellValue(lRow, 3)
+                        lConn.Source.MemSub1 = .CellValue(lRow, 4)
+                        lConn.Source.MemSub2 = .CellValue(lRow, 5)
+                        lConn.MFact = .CellValue(lRow, 6)
+                        lConn.Tran = .CellValue(lRow, 7)
+                        lConn.Target.VolName = .CellValue(lRow, 8)
+                        lConn.Target.VolId = .CellValue(lRow, 9)
+                        lConn.Target.Group = .CellValue(lRow, 10)
+                        lConn.Target.Member = .CellValue(lRow, 11)
+                        lConn.Target.MemSub1 = .CellValue(lRow, 12)
+                        lConn.Target.MemSub2 = .CellValue(lRow, 13)
+                        lConn.Comment = .CellValue(lRow, 14)
+                        pConnection.Uci.Connections.Add(lConn)
+                    End If
+                Next
+                'set timser connections
+                For Each lOpn As HspfOperation In pConnection.Uci.OpnSeqBlock.Opns
+                    lOpn.SetTimSerConnections()
+                Next
+                pConnection.Uci.Edited = True
+            ElseIf pConnectionType = "SCHEMATIC" Then
+                'put schematic block back
+                RemoveSourcesFromOperations()
+                RemoveTargetsFromOperations()
+                pConnection.Uci.RemoveConnectionsFromCollection(3)
+                'create new connections
+                For lRow As Integer = 2 To .Rows
+                    Dim lRowComplete As Boolean = True
+                    For lColumn As Integer = 1 To .Columns - 1
+                        If .CellValue(lRow, lColumn - 1).Length < 1 Then
+                            'no data entered for this field, dont do this row
+                            lRowComplete = False
+                        End If
+                    Next lColumn
+                    If Not lRowComplete Then
+                        Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                                   "This row will be ignored.", MsgBoxStyle.OkOnly, _
+                                   pConnection.Caption & " Edit Problem")
+                    Else
+                        Dim lConn As New HspfConnection
+                        lConn.Uci = pConnection.Uci
+                        lConn.Typ = 3
+                        lConn.Source.VolName = .CellValue(lRow, 0)
+                        lConn.Source.VolId = .CellValue(lRow, 1)
+                        lConn.MFact = .CellValue(lRow, 2)
+                        lConn.Target.VolName = .CellValue(lRow, 3)
+                        lConn.Target.VolId = .CellValue(lRow, 4)
+                        lConn.MassLink = .CellValue(lRow, 5)
+                        lConn.Target.MemSub1 = .CellValue(lRow, 6)
+                        lConn.Target.MemSub2 = .CellValue(lRow, 7)
+                        lConn.Comment = .CellValue(lRow, 8)
+                        pConnection.Uci.Connections.Add(lConn)
+                    End If
+                Next
+                'set timser connections
+                For Each lOpn As HspfOperation In pConnection.Uci.OpnSeqBlock.Opns
+                    lOpn.SetTimSerConnections()
+                Next
+                pConnection.Uci.Edited = True
+            ElseIf pConnectionType = "EXT SOURCES" Then
+                'put external sources back
+                RemoveSourcesFromOperations()
+                pConnection.Uci.RemoveConnectionsFromCollection(1)
+                'create new connections
+                For lRow As Integer = 2 To .Rows
+                    Dim lRowComplete As Boolean = True
+                    For lColumn As Integer = 1 To .Columns - 1
+                        If .CellValue(lRow, lColumn - 1).Length < 1 And lColumn <> 6 And lColumn <> 8 Then
+                            'no data entered for this field, dont do this row
+                            lRowComplete = False
+                        End If
+                    Next lColumn
+                    If Not lRowComplete Then
+                        Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                                   "This row will be ignored.", MsgBoxStyle.OkOnly, _
+                                   pConnection.Caption & " Edit Problem")
+                    Else
+                        Dim lConn As New HspfConnection
+                        lConn.Uci = pConnection.Uci
+                        lConn.Typ = 1
+                        lConn.Source.VolName = .CellValue(lRow, 0)
+                        lConn.Source.VolId = .CellValue(lRow, 1)
+                        lConn.Source.Member = .CellValue(lRow, 2)
+                        lConn.Source.MemSub1 = .CellValue(lRow, 3)
+                        lConn.Ssystem = .CellValue(lRow, 4)
+                        lConn.Sgapstrg = .CellValue(lRow, 5)
+                        lConn.MFact = .CellValue(lRow, 6)
+                        lConn.Tran = .CellValue(lRow, 7)
+                        lConn.Target.VolName = .CellValue(lRow, 8)
+                        lConn.Target.VolId = .CellValue(lRow, 9)
+                        lConn.Target.Group = .CellValue(lRow, 10)
+                        lConn.Target.Member = .CellValue(lRow, 11)
+                        lConn.Target.MemSub1 = .CellValue(lRow, 12)
+                        lConn.Target.MemSub2 = .CellValue(lRow, 13)
+                        lConn.Comment = .CellValue(lRow, 14)
+                        pConnection.Uci.Connections.Add(lConn)
+                    End If
+                Next
+                'set timser connections
+                For Each lOpn As HspfOperation In pConnection.Uci.OpnSeqBlock.Opns
+                    lOpn.SetTimSerConnections()
+                Next
+                pConnection.Uci.Edited = True
+            ElseIf pConnectionType = "EXT TARGETS" Then
+                'put ext targets back
+                If CheckDataSetExistance(pConnection.Uci) Then
+                    'data sets have all been created, go ahead and refresh
+                    RemoveTargetsFromOperations()
+                    pConnection.Uci.RemoveConnectionsFromCollection(4)
+                    'create new connections
+                    For lRow As Integer = 2 To .Rows
+                        Dim lRowComplete As Boolean = True
+                        For lColumn As Integer = 1 To .Columns - 1
+                            If .CellValue(lRow, lColumn - 1).Length < 1 And lColumn <> 8 And lColumn <> 14 Then
+                                'no data entered for this field, dont do this row
+                                lRowComplete = False
+                            End If
+                        Next lColumn
+                        If Not lRowComplete Then
+                            Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                                       "This row will be ignored.", MsgBoxStyle.OkOnly, _
+                                       pConnection.Caption & " Edit Problem")
+                        Else
+                            Dim lConn As New HspfConnection
+                            lConn.Uci = pConnection.Uci
+                            lConn.Typ = 4
+                            lConn.Source.VolName = .CellValue(lRow, 0)
+                            lConn.Source.VolId = .CellValue(lRow, 1)
+                            lConn.Source.Group = .CellValue(lRow, 2)
+                            lConn.Source.Member = .CellValue(lRow, 3)
+                            lConn.Source.MemSub1 = .CellValue(lRow, 4)
+                            lConn.Source.MemSub2 = .CellValue(lRow, 5)
+                            lConn.MFact = .CellValue(lRow, 6)
+                            lConn.Tran = .CellValue(lRow, 7)
+                            lConn.Target.VolName = .CellValue(lRow, 8)
+                            lConn.Target.VolId = .CellValue(lRow, 9)
+                            lConn.Target.Member = .CellValue(lRow, 10)
+                            If .CellValue(lRow, 11).Length > 0 Then
+                                lConn.Target.MemSub1 = .CellValue(lRow, 11)
+                            End If
+                            lConn.Ssystem = .CellValue(lRow, 12)
+                            lConn.Sgapstrg = .CellValue(lRow, 13)
+                            lConn.Amdstrg = .CellValue(lRow, 14)
+                            lConn.Comment = .CellValue(lRow, 15)
+                            pConnection.Uci.Connections.Add(lConn)
+                        End If
+                    Next
+                    'set timser connections
+                    For Each lOpn As HspfOperation In pConnection.Uci.OpnSeqBlock.Opns
+                        lOpn.SetTimSerConnections()
+                    Next
+                    pConnection.Uci.Edited = True
+                End If
+            End If
         End With
     End Sub
 
@@ -289,6 +473,7 @@ Public Class ctlEditConnections
         Dim lBlockDef As New HspfBlockDef
         Dim lSelectedColumn As Integer = aColumn
 
+        pCurrentSelectedRow = aRow
         If Len(pConnectionType) > 0 Then
             lBlockDef = pConnection.Uci.Msg.BlockDefs(pConnectionType)
             lSelectedColumn = aColumn
@@ -365,6 +550,124 @@ Public Class ctlEditConnections
                 .AllowNewValidValues = False
                 .Refresh()
             End With
+        ElseIf aConnectionType = "EXT TARGETS" Then
+            With grdEdit
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 0 Then 'svol
+                    SetValidOperations(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 1 Then 'svolno
+                    SetOperationMinMax(lValidValues, pConnection.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 2 Then 'sgrpn
+                    SetGroupNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 2))
+                ElseIf aSelectedColumn = 3 Then 'smemn
+                    SetMemberNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 4 Then 'smems1
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 4), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), True)
+                ElseIf aSelectedColumn = 5 Then 'smems2
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 5), .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), False)
+                ElseIf aSelectedColumn = 6 Then 'mfactr
+                ElseIf aSelectedColumn = 7 Then 'tran
+                    SetValidTrans(lValidValues)
+                ElseIf aSelectedColumn = 8 Then 'tvol:wdm and what else
+                    SetLimitsWDM(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 9 Then 'tvolno
+                    'handled in celledited
+                ElseIf aSelectedColumn = 10 Then 'tmemn
+                    CheckValidMemberName(lValidValues, .Source.CellValue(aSelectedRow, aSelectedColumn - 1), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), pConnection.Uci)
+                ElseIf aSelectedColumn = 11 Then 'qflg
+                    For lQflg As Integer = 0 To 31
+                        lValidValues.Add(lQflg)
+                    Next
+                ElseIf aSelectedColumn = 12 Then 'tsyst
+                    lValidValues.Add("ENGL")
+                    lValidValues.Add("METR")
+                ElseIf aSelectedColumn = 13 Then 'aggst
+                    lValidValues.Add(" ") 'allow default blank
+                    lValidValues.Add("AGGR")
+                ElseIf aSelectedColumn = 14 Then 'amdst
+                    lValidValues.Add("ADD ")
+                    lValidValues.Add("REPL")
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        ElseIf aConnectionType = "NETWORK" Then
+            With grdEdit
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 0 Then 'svol
+                    SetValidOperations(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 1 Then 'svolno
+                    SetOperationMinMax(lValidValues, pConnection.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 2 Then 'sgrpn
+                    SetGroupNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 2))
+                ElseIf aSelectedColumn = 3 Then 'smemn
+                    SetMemberNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 4 Then 'smems1
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 4), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), True)
+                ElseIf aSelectedColumn = 5 Then 'smems2
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 5), .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), False)
+                ElseIf aSelectedColumn = 6 Then 'mfactr
+                ElseIf aSelectedColumn = 7 Then 'tran
+                    SetValidTrans(lValidValues)
+                ElseIf aSelectedColumn = 8 Then 'tvol
+                    SetValidOperations(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 9 Then 'topfst
+                    SetOperationMinMax(lValidValues, pConnection.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 10 Then 'tgrpn
+                    SetGroupNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 2))
+                ElseIf aSelectedColumn = 11 Then 'tmem
+                    SetMemberNames(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 12 Then 'tmems1
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 4), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), True)
+                ElseIf aSelectedColumn = 13 Then 'tmems2
+                    SetMemberSubscript(lValidValues, pConnection.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 5), .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), False)
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        ElseIf aConnectionType = "SCHEMATIC" Then
+            With grdEdit
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 0 Then 'svol
+                    SetValidOperations(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 1 Then 'svolno
+                    SetOperationMinMax(lValidValues, pConnection.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 2 Then 'mfactor
+                ElseIf aSelectedColumn = 3 Then 'tvol
+                    SetValidOperations(lValidValues, pConnection.Uci)
+                ElseIf aSelectedColumn = 4 Then 'tvolno
+                    SetOperationMinMax(lValidValues, pConnection.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 5 Then 'mslkno
+                    SetValidMassLinks(lValidValues, pConnection.Uci)
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        End If
+    End Sub
+
+    Private Sub grdEdit_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdEdit.CellEdited
+        If aColumn = 9 Then
+            'handle target dsn for ext targets block
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+
+            'dsn should be between 1 and 9999
+            If lNewValueNumeric > 0 AndAlso lNewValueNumeric < 10000 Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
         End If
     End Sub
 
@@ -489,6 +792,14 @@ Public Class ctlEditConnections
         End If
     End Sub
 
+    Private Sub SetValidMassLinks(ByVal aValidValues As Collection, ByVal aUci As HspfUci)
+        For Each lMassLink As HspfMassLink In aUci.MassLinks
+            If Not aValidValues.Contains(lMassLink.MassLinkId) Then
+                aValidValues.Add(lMassLink.MassLinkId)
+            End If
+        Next
+    End Sub
+
     Private Function WDMInd(ByRef wdmid As String) As Integer
         Dim w As String
 
@@ -520,6 +831,62 @@ Public Class ctlEditConnections
         End Select
 
         Return lHspfOperNum
+    End Function
+
+    Private Sub RemoveSourcesFromOperations()
+        For lIndex As Integer = 0 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+            'remove sources from opns
+            Dim lOper As HspfOperation = pConnection.Uci.OpnSeqBlock.Opns(lIndex)
+            Do While lOper.Sources.Count > 0
+                lOper.Sources.Remove(lOper.Sources(0))
+            Loop
+        Next
+    End Sub
+
+    Private Sub RemoveTargetsFromOperations()
+        For lIndex As Integer = 0 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+            'remove targets from opns
+            Dim lOper As HspfOperation = pConnection.Uci.OpnSeqBlock.Opns(lIndex)
+            Do While lOper.Targets.Count > 0
+                lOper.Targets.Remove(lOper.Targets(0))
+            Loop
+        Next
+    End Sub
+
+    Public Function CheckDataSetExistance(ByVal aUci As HspfUci) As Boolean
+
+        Dim lNoDsns As New Collection
+        Dim lWDMIds As New Collection
+        Dim lScens As New Collection
+        Dim lLocs As New Collection
+        Dim lCons As New Collection
+
+        With grdEdit.Source
+            For lRow As Integer = 1 To .Rows
+                'does this wdm data set exist
+                Dim lDsn As String = .CellValue(lRow, 9)
+                Dim lWdmid As String = .CellValue(lRow, 8)
+                If lDsn.Length > 0 AndAlso lWdmid.Length > 0 AndAlso IsNumeric(lDsn) Then
+                    Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(WDMInd(lWdmid), CInt(lDsn))
+                    If lDataSet Is Nothing Then
+                        'does not exist
+                        lNoDsns.Add(lDsn)
+                        lWDMIds.Add(lWdmid)
+                        lScens.Add(UCase(FilenameNoExt(aUci.Name)))
+                        lLocs.Add(.CellValue(lRow, 0) & .CellValue(lRow, 1))
+                        lCons.Add(.CellValue(lRow, 10))
+                    End If
+                End If
+            Next
+        End With
+
+        If lNoDsns.Count > 0 Then
+            '    frmAddDataSet.icon = myUci.Icon
+            '    Call frmAddDataSet.SetUCI(myUci)
+            '    frmAddDataSet.Show(1)
+            'if vbcancel return false
+        End If
+        Return True
     End Function
 
     Public Sub New(ByVal aHspfConnection As Object, ByVal aParent As Windows.Forms.Form, ByVal aTag As String)
