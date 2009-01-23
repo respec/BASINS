@@ -131,16 +131,23 @@ Public Module ConstituentBalance
                                         End If
 
                                         Dim lAttribute As atcDefinedValue
+                                        Dim lStateVariable As Boolean
                                         Select Case lConstituentKey
                                             Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
                                                 lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+                                                lStateVariable = True
                                             Case Else
                                                 lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                                lStateVariable = False
                                         End Select
 
                                         .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         If Not lAttribute Is Nothing Then
-                                            .Value(2) = DecimalAlign(lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                            If lStateVariable Then 'no value needed for mean column
+                                                .Value(2) = "<NA>".PadLeft(10)
+                                            Else
+                                                .Value(2) = DecimalAlign(lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                            End If
                                             Dim lFieldIndex As Integer = 3
                                             For Each lAttribute In lYearlyAttributes
                                                 .Value(lFieldIndex) = DecimalAlign(lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
@@ -149,38 +156,38 @@ Public Module ConstituentBalance
                                         Else
                                             .Value(2) = "Skip-NoData"
                                         End If
-                                        .CurrentRecord += 1
-                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                           lConstituentKey.Length > 5 AndAlso _
-                                           IsNumeric(lConstituentKey.Substring(5)) Then
-                                        Dim lTotalCount As Integer = lConstituentKey.Substring(5)
-                                        Dim lCurFieldValues(.NumFields) As Double
-                                        Dim lCurrentRecordSave As Integer = .CurrentRecord
-                                        For lCount As Integer = 1 To lTotalCount
-                                            .CurrentRecord -= 1
-                                            For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
-                                                If IsNumeric(.Value(lFieldPos)) Then
-                                                    lCurFieldValues(lFieldPos) += .Value(lFieldPos)
-                                                Else
-                                                    Logger.Dbg("Why")
-                                                End If
+                                            .CurrentRecord += 1
+                                        ElseIf lConstituentKey.StartsWith("Total") AndAlso _
+                                               lConstituentKey.Length > 5 AndAlso _
+                                               IsNumeric(lConstituentKey.Substring(5)) Then
+                                            Dim lTotalCount As Integer = lConstituentKey.Substring(5)
+                                            Dim lCurFieldValues(.NumFields) As Double
+                                            Dim lCurrentRecordSave As Integer = .CurrentRecord
+                                            For lCount As Integer = 1 To lTotalCount
+                                                .CurrentRecord -= 1
+                                                For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
+                                                    If IsNumeric(.Value(lFieldPos)) Then
+                                                        lCurFieldValues(lFieldPos) += .Value(lFieldPos)
+                                                    Else
+                                                        Logger.Dbg("Why")
+                                                    End If
+                                                Next
                                             Next
-                                        Next
-                                        .CurrentRecord = lCurrentRecordSave
-                                        .Value(1) = lConstituentName.PadRight(aFieldWidth)
-                                        For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
-                                            .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
-                                        Next
-                                        .CurrentRecord += 1
-                                    Else
-                                        If lPendingOutput.Length > 0 Then
-                                            lPendingOutput &= vbCr
+                                            .CurrentRecord = lCurrentRecordSave
+                                            .Value(1) = lConstituentName.PadRight(aFieldWidth)
+                                            For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
+                                                .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                            Next
+                                            .CurrentRecord += 1
+                                        Else
+                                            If lPendingOutput.Length > 0 Then
+                                                lPendingOutput &= vbCr
+                                            End If
+                                            If lConstituentKey.StartsWith("Header") Then
+                                                lPendingOutput &= vbCr
+                                            End If
+                                            lPendingOutput &= lConstituentName
                                         End If
-                                        If lConstituentKey.StartsWith("Header") Then
-                                            lPendingOutput &= vbCr
-                                        End If
-                                        lPendingOutput &= lConstituentName
-                                    End If
                                 End If
                             Next
                             If aDateRows Then
