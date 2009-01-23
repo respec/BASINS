@@ -6,11 +6,11 @@ Public Class clsCatModelSWAT
     Implements clsCatModel
 
     Public SWATProgramBase As String = "C:\Program Files\SWAT 2005 Editor\"
-    Public SWATDatabaseName As String = SWATProgramBase & "\Databases\SWAT2005.mdb"
 
     Public Event BaseScenarioSet(ByVal aBaseScenario As String) Implements clsCatModel.BaseScenarioSet
 
     Private pBaseScenario As String = ""
+    Private pSWATDatabaseName As String = ""
 
     Public Property BaseScenario() As String Implements clsCatModel.BaseScenario
         Get
@@ -43,6 +43,18 @@ Public Class clsCatModelSWAT
         End If
     End Sub
 
+    Public Property SWATDatabasePath() As String
+        Get
+            If Not FileExists(pSWATDatabaseName) Then
+                pSWATDatabaseName = FindFile("Please locate SWAT 2005 database", SWATProgramBase & "Databases\SWAT2005.mdb")
+            End If
+            Return pSWATDatabaseName
+        End Get
+        Set(ByVal newValue As String)
+            pSWATDatabaseName = newValue
+        End Set
+    End Property
+
     Public Function ScenarioRun(ByVal aNewScenarioName As String, _
                                 ByVal aModifiedData As atcData.atcTimeseriesGroup, _
                                 ByVal aPreparedInput As String, _
@@ -50,22 +62,28 @@ Public Class clsCatModelSWAT
                                 ByVal aShowProgress As Boolean, _
                                 ByVal aKeepRunning As Boolean) As atcUtility.atcCollection _
                                                         Implements clsCatModel.ScenarioRun
+        Dim lSaveDir As String = CurDir()
         Dim lProjectFolder As String = IO.Path.GetTempPath & aNewScenarioName
-        Dim lSwatInput As New SwatObject.SwatInput(SWATDatabaseName, pBaseScenario, lProjectFolder, aNewScenarioName)
+        Dim lSwatInput As New SwatObject.SwatInput(SWATDatabasePath, pBaseScenario, lProjectFolder, aNewScenarioName)
         lSwatInput.SaveAllTextInput()
         'TODO: write modified data
         If aRunModel Then
             Dim lInputFilePath As String = IO.Path.Combine(lProjectFolder, "Scenarios\" & aNewScenarioName & "\TxtInOut")
-            Logger.Dbg("StartModel")
-            Dim lSWATexePath As String = IO.Path.Combine(SWATProgramBase, "Swat2005.exe")
-            If Not IO.File.Exists(lSWATexePath) Then
-                lSWATexePath = FindFile("Please Locate Swat2005.exe", lSWATexePath)
-                If IO.File.Exists(lSWATexePath) Then
-                    SWATProgramBase = IO.Path.GetDirectoryName(lSWATexePath)
+            ChDir(lInputFilePath)
+            Dim lSWATexeTargetPath As String = IO.Path.Combine(lInputFilePath, "Swat2005.exe")
+            If Not IO.File.Exists(lSWATexeTargetPath) Then
+                Dim lSWATexePath As String = IO.Path.Combine(SWATProgramBase, "Swat2005.exe")
+                If Not IO.File.Exists(lSWATexePath) Then
+                    lSWATexePath = FindFile("Please Locate Swat2005.exe", lSWATexePath)
+                    If IO.File.Exists(lSWATexePath) Then
+                        SWATProgramBase = IO.Path.GetDirectoryName(lSWATexePath)
+                        IO.File.Copy(lSWATexePath, lSWATexeTargetPath)
+                    End If
                 End If
             End If
-            If IO.File.Exists(lSWATexePath) Then
-                LaunchProgram(lSWATexePath, lInputFilePath)
+            If IO.File.Exists(lSWATexeTargetPath) Then
+                Logger.Dbg("StartModel")
+                LaunchProgram(lSWATexeTargetPath, lInputFilePath)
                 Logger.Dbg("DoneModelRun")
             Else
                 Logger.Dbg("SWAT exe not found, skipping model run")
@@ -73,6 +91,7 @@ Public Class clsCatModelSWAT
         End If
         Dim lModified As New atcCollection
         'TODO: read written data for endpoints
+        ChDir(lSaveDir)
         Return lModified
     End Function
 
