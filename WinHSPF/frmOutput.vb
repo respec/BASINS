@@ -508,13 +508,14 @@ Public Class frmOutput
                             For lTargetIndex = 0 To lHspfOperation.Targets.Count - 1
                                 lTargetHspfConnection = lHspfOperation.Targets.Item(lTargetIndex)
                                 If Mid(lTargetHspfConnection.Target.VolName, 1, 3) = "WDM" AndAlso Trim(lTargetHspfConnection.Target.Member) = "SIMQ" Then
-                                    'lHspfOperation.Targets.RemoveAt(lIndex2)
                                     lRemoveTargetAtIndex.Add(lTargetIndex)
                                 End If
                             Next lTargetIndex
 
+                            lOffsetAfterDeleteIndex = 0
                             For lIndex2 = 1 To lRemoveTargetAtIndex.Count
-                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2))
+                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2) - lOffsetAfterDeleteIndex)
+                                lOffsetAfterDeleteIndex += 1
                             Next
 
                         End If
@@ -543,8 +544,8 @@ Public Class frmOutput
 
                     lDialogBoxResult = Logger.Message("Do you want to permanently delete the output WDM timeseries?", "Delete Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.No)
 
-                    'remove the ext targets entry here
                     lRemoveTargetAtIndex.Clear()
+                    lRemoveUciConnectionAtIndex.Clear()
 
                     lHspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lReachIndex)
 
@@ -562,8 +563,10 @@ Public Class frmOutput
                         End If
                     Next
 
+                    lOffsetAfterDeleteIndex = 0
                     For lIndex2 = 1 To lRemoveUciConnectionAtIndex.Count
-                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex(lIndex2))
+                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex(lIndex2) - lOffsetAfterDeleteIndex)
+                        lOffsetAfterDeleteIndex += 1
                     Next
 
                     lRemoveTargetAtIndex.Clear()
@@ -639,11 +642,10 @@ Public Class frmOutput
 
                             If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
                                 'delete this dsn
-                                lRemoveWdmDataSetVolName.Add(lHspfConnection.Target.VolName)
-                                lRemoveWdmDataSetVolId.Add(lHspfConnection.Target.VolId)
+                                pUCI.DeleteWDMDataSet(lHspfConnection.Target.VolName, lHspfConnection.Target.VolId)
                             End If
 
-                            'remove the connection
+                            'remove the connection by adding the index to the list 
                             lRemoveUciConnectionAtIndex.Add(lHspfConnectionIndex)
 
                             'also remove connection from operation
@@ -654,19 +656,20 @@ Public Class frmOutput
                                     lRemoveTargetAtIndex.Add(lTargetIndex)
                                 End If
                             Next lTargetIndex
+
+                            lOffsetAfterDeleteIndex = 0
+                            For lIndex2 = 1 To lRemoveTargetAtIndex.Count
+                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2) - lOffsetAfterDeleteIndex)
+                                lOffsetAfterDeleteIndex += 1
+                            Next
+
                         End If
                     Next
 
-                    For lIndex2 = 1 To lRemoveWdmDataSetVolName.Count
-                        pUCI.DeleteWDMDataSet(lRemoveWdmDataSetVolName(lIndex2), lRemoveWdmDataSetVolId(lIndex2))
-                    Next
-
+                    lOffsetAfterDeleteIndex = 0
                     For lIndex2 = 1 To lRemoveUciConnectionAtIndex.Count
-                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex(lIndex2))
-                    Next
-
-                    For lIndex2 = 1 To lRemoveTargetAtIndex.Count
-                        pUCI.OpnBlks(lOperName).OperFromID(lId).Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2))
+                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex(lIndex2) - lOffsetAfterDeleteIndex)
+                        lOffsetAfterDeleteIndex += 1
                     Next
 
                     lSelectedCount += 1
@@ -720,12 +723,10 @@ Public Class frmOutput
                                 'found aquatox dsn
                                 If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
                                     'delete this dsn
-                                    lRemoveWdmDataSetVolId.Add(lWdmId)
-                                    lRemoveDsnAtIndex.Add(lDsnIndex)
+                                    pUCI.DeleteWDMDataSet(lWdmId, lDsnIndex)
                                 End If
                                 'remove the connection
 
-                                'pUCI.Connections.RemoveAt(lIndex1)
                                 lRemoveUciConnectionAtIndex.Add(lHspfConnectionIndex)
 
                                 'also remove connection from operation
@@ -735,28 +736,25 @@ Public Class frmOutput
                                     lTargetHspfConnection = lHspfOperation.Targets.Item(lTargetIndex)
 
                                     If lTargetHspfConnection.Target.VolName = lWdmId AndAlso lTargetHspfConnection.Target.VolId = lDsnIndex Then
-                                        'lHspfOperation.Targets.RemoveAt(lTargetIndex)
                                         lRemoveTargetAtIndex.Add(lTargetIndex)
                                     End If
                                 Next
 
+                                lOffsetAfterDeleteIndex = 0
                                 For lIndex2 = 1 To lRemoveTargetAtIndex.Count
-                                    lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex.Item(lIndex2))
+                                    lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex.Item(lIndex2) - lOffsetAfterDeleteIndex)
+                                    lOffsetAfterDeleteIndex += 1
                                 Next
 
                             End If
                         End If
                     Next
 
+                    lOffsetAfterDeleteIndex = 0
                     For lIndex2 = 1 To lRemoveUciConnectionAtIndex.Count
-                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lIndex2))
+                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lIndex2) - lOffsetAfterDeleteIndex)
+                        lOffsetAfterDeleteIndex += 1
                     Next
-
-                    For lIndex2 = 1 To lRemoveWdmDataSetVolId.Count
-                        pUCI.DeleteWDMDataSet(lRemoveWdmDataSetVolId.Item(lIndex2), lRemoveDsnAtIndex.Item(lIndex2))
-                    Next
-
-
 
                     lSelectedCount += 1
                 End If
