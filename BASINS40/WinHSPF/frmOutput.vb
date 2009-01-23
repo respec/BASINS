@@ -430,7 +430,7 @@ Public Class frmOutput
         Dim lHspfOperation As HspfOperation
         Dim lColonPosition, lId, lDsnIndex, lLeftParenthPosition, lCommaPosition, lRightParenthPosition As Integer
         Dim lWdmId As String
-        Dim lSpacePosition, lSub1, lSub2 As Integer
+        Dim lSpacePosition, lSub1, lSub2, lOffsetAfterDeleteIndex As Integer
         Dim lTempString, lOperName, lGroup, lMember, lCurrentReachString As String
         Dim lDsnObject As atcTimeseries
         Dim lDialogBoxResult As System.Windows.Forms.DialogResult
@@ -442,6 +442,7 @@ Public Class frmOutput
         '.net conversion issue: The structure of this subroutine has been changed such that removal of WdmDataSets, Targets, UCI entries
         'are done OUTSIDE of loops which locate them. There was a problem with vb6 code deleting collection items while looping through
         'that collection. This was fixed by adding the collection vectors to keep track of which items to delete once outside the loop(s).
+        'Additionally, atcGrid had not implemented multicell select, so no testing was done to verify removal of more than one row.
         '
         'Written by Brandon G. on 2009.01.19 
 
@@ -459,11 +460,11 @@ Public Class frmOutput
                     lCopyId = Reach2Copy(lReachIndex)
 
                     lDialogBoxResult = Logger.Message("Do you want to permanently delete the WDM timeseries associated with this calibration location?", "Delete Query", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.No)
+
                     If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
 
                         lRemoveTargetVolName.Clear()
                         lRemoveTargetVolId.Clear()
-                        lRemoveTargetAtIndex.Clear()
 
                         'build collectino of indexes of ext targets datasets to be removed for this copy
                         For lIndex2 = 0 To pUCI.Connections.Count - 1
@@ -472,13 +473,12 @@ Public Class frmOutput
                                 'delete this dsn
                                 lRemoveTargetVolName.Add(lHspfConnection.Target.VolName)
                                 lRemoveTargetVolId.Add(lHspfConnection.Target.VolId)
-                                lRemoveTargetAtIndex.Add(lIndex2)
                             End If
                         Next
                     End If
 
-                    For lIndex2 = 1 To lRemoveTargetAtIndex.Count
-                        pUCI.DeleteWDMDataSet(pUCI.Connections.Item(lRemoveTargetAtIndex(lIndex2)).Target.VolName, pUCI.Connections.Item(lRemoveTargetAtIndex(lIndex2)).Target.VolId)
+                    For lIndex2 = 1 To lRemoveTargetVolName.Count
+                        pUCI.DeleteWDMDataSet(lRemoveTargetVolName.Item(lIndex2), lRemoveTargetVolId.Item(lIndex2))
                     Next
 
                     'now delete this copy operation
@@ -497,9 +497,7 @@ Public Class frmOutput
 
                             If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
                                 'delete this dsn
-
-                                lRemoveTargetVolName.Add(lHspfConnection.Target.VolName)
-                                lRemoveTargetVolId.Add(lHspfConnection.Target.VolId)
+                                pUCI.DeleteWDMDataSet(lHspfConnection.Target.VolName, lHspfConnection.Target.VolId)
 
                             End If
                             'remove the connection
@@ -525,15 +523,11 @@ Public Class frmOutput
                     lSelectedCount += 1
                 End If
 
-                For lIndex2 = 1 To lRemoveTargetVolName.Count
-                    pUCI.DeleteWDMDataSet(lRemoveTargetVolName(lIndex2), lRemoveTargetVolId(lIndex2))
-                Next
-
             Next lRowIndex
             If lSelectedCount > 0 Then
                 RefreshAll()
             Else
-                Call MsgBox("No location is selected to remove.", vbOKOnly, "Remove Problem")
+                Logger.Message("No location is selected to remove.", "Remove Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
             End If
 
         ElseIf radio2.Checked = True Then 'flow locations
@@ -550,47 +544,43 @@ Public Class frmOutput
                     lDialogBoxResult = Logger.Message("Do you want to permanently delete the output WDM timeseries?", "Delete Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.No)
 
                     'remove the ext targets entry here
-
-                    lRemoveTargetVolName.Clear()
-                    lRemoveTargetVolId.Clear()
                     lRemoveTargetAtIndex.Clear()
+
+                    lHspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lReachIndex)
 
                     For lHspfConnectionIndex = 0 To pUCI.Connections.Count - 1
                         lHspfConnection = pUCI.Connections(lHspfConnectionIndex)
                         If lHspfConnection.Typ = 4 AndAlso lHspfConnection.Source.VolName = "RCHRES" AndAlso lHspfConnection.Source.VolId = lReachIndex AndAlso lHspfConnection.Target.Member = "FLOW" Then 'this is the one
                             If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
                                 'delete this dsn
-                                'pUCI.DeleteWDMDataSet(lHspfConnection.Target.VolName, lHspfConnection.Target.VolId)
-                                lRemoveTargetVolName.Add(lHspfConnection.Target.VolName)
-                                lRemoveTargetVolId.Add(lHspfConnection.Target.VolId)
-                                lRemoveTargetAtIndex.Add(lHspfConnectionIndex)
-
+                                pUCI.DeleteWDMDataSet(lHspfConnection.Target.VolName, lHspfConnection.Target.VolId)
+                               
                             End If
                             'remove the connection
+                            lRemoveUciConnectionAtIndex.Add(lHspfConnectionIndex)
                             'also remove connection from operation
-                            lHspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lReachIndex)
-
-                            For lTargetIndex = 0 To lHspfOperation.Targets.Count - 1
-                                lTargetHspfConnection = lHspfOperation.Targets.Item(lTargetIndex)
-                                If Mid(lTargetHspfConnection.Target.VolName, 1, 3) = "WDM" AndAlso lTargetHspfConnection.Target.Member = "FLOW" Then
-                                    lRemoveTargetAtIndex.Add(lTargetIndex)
-                                End If
-                            Next
-
-                            For lIndex2 = 1 To lRemoveTargetAtIndex.Count
-                                lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2))
-                            Next
-
                         End If
                     Next
 
-                    For lIndex2 = 1 To lRemoveTargetVolName.Count
-                        pUCI.DeleteWDMDataSet(lRemoveTargetVolName(lIndex2), lRemoveTargetVolId(lIndex2))
+                    For lIndex2 = 1 To lRemoveUciConnectionAtIndex.Count
+                        pUCI.Connections.RemoveAt(lRemoveUciConnectionAtIndex(lIndex2))
                     Next
 
-                    For lIndex2 = 1 To pUCI.Connections.Count
-                        pUCI.Connections.RemoveAt(lIndex2)
+                    lRemoveTargetAtIndex.Clear()
+
+                    For lTargetIndex = 0 To lHspfOperation.Targets.Count - 1
+                        lTargetHspfConnection = lHspfOperation.Targets.Item(lTargetIndex)
+                        If Mid(lTargetHspfConnection.Target.VolName, 1, 3) = "WDM" AndAlso lTargetHspfConnection.Target.Member = "FLOW" Then
+                            lRemoveTargetAtIndex.Add(lTargetIndex)
+                        End If
                     Next
+
+                    lOffsetAfterDeleteIndex = 0
+                    For lIndex2 = 1 To lRemoveTargetAtIndex.Count
+                        lHspfOperation.Targets.RemoveAt(lRemoveTargetAtIndex(lIndex2) - lOffsetAfterDeleteIndex)
+                        lOffsetAfterDeleteIndex += 1
+                    Next
+
 
                     lSelectedCount += 1
                 End If
@@ -598,7 +588,7 @@ Public Class frmOutput
             If lSelectedCount > 0 Then
                 RefreshAll()
             Else
-                Call MsgBox("No location is selected to remove.", vbOKOnly, "Remove Problem")
+                Logger.Message("No location is selected to remove.", "Remove Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
             End If
 
         ElseIf radio4.Checked = True Then 'remove other
@@ -685,7 +675,7 @@ Public Class frmOutput
             If lSelectedCount > 0 Then
                 RefreshAll()
             Else
-                Call MsgBox("No output is selected to remove.", vbOKOnly, "Remove Problem")
+                Logger.Message("No location is selected to remove.", "Remove Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
             End If
 
         ElseIf radio3.Checked = True Then 'remove aquatox location
