@@ -78,6 +78,10 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="SwatObject, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SwatObject\bin\Debug\SwatObject.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -170,6 +174,7 @@
     <Compile Include="clsCat.vb" />
     <Compile Include="clsCatModel.vb" />
     <Compile Include="clsCatModelHSPF.vb" />
+    <Compile Include="clsCatModelSWAT.vb" />
     <Compile Include="frmCAT.vb">
       <SubType>Form</SubType>
     </Compile>
