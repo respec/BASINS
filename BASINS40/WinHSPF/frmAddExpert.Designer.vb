@@ -19,8 +19,8 @@ Partial Class frmAddExpert
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.lblOperation = New System.Windows.Forms.Label
-        Me.lblGroup = New System.Windows.Forms.Label
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
         Me.TextBox4 = New System.Windows.Forms.TextBox
         Me.TextBox5 = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
@@ -28,31 +28,31 @@ Partial Class frmAddExpert
         Me.txtDefine = New System.Windows.Forms.TextBox
         Me.optH = New System.Windows.Forms.RadioButton
         Me.optD = New System.Windows.Forms.RadioButton
+        Me.cmdOK = New System.Windows.Forms.Button
         Me.cmdClose = New System.Windows.Forms.Button
-        Me.Button1 = New System.Windows.Forms.Button
         Me.ListBox1 = New System.Windows.Forms.ListBox
         Me.ListBox2 = New System.Windows.Forms.ListBox
         Me.SuspendLayout()
         '
-        'lblOperation
+        'Label1
         '
-        Me.lblOperation.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.lblOperation.AutoSize = True
-        Me.lblOperation.Location = New System.Drawing.Point(12, 7)
-        Me.lblOperation.Name = "lblOperation"
-        Me.lblOperation.Size = New System.Drawing.Size(56, 13)
-        Me.lblOperation.TabIndex = 0
-        Me.lblOperation.Text = "Operation:"
+        Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(12, 7)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(56, 13)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "Operation:"
         '
-        'lblGroup
+        'Label2
         '
-        Me.lblGroup.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.lblGroup.AutoSize = True
-        Me.lblGroup.Location = New System.Drawing.Point(195, 7)
-        Me.lblGroup.Name = "lblGroup"
-        Me.lblGroup.Size = New System.Drawing.Size(82, 13)
-        Me.lblGroup.TabIndex = 1
-        Me.lblGroup.Text = "Group/Member:"
+        Me.Label2.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(195, 7)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(82, 13)
+        Me.Label2.TabIndex = 1
+        Me.Label2.Text = "Group/Member:"
         '
         'TextBox4
         '
@@ -126,25 +126,25 @@ Partial Class frmAddExpert
         Me.optD.Text = "Daily"
         Me.optD.UseVisualStyleBackColor = True
         '
+        'cmdOK
+        '
+        Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.cmdOK.Location = New System.Drawing.Point(102, 287)
+        Me.cmdOK.Name = "cmdOK"
+        Me.cmdOK.Size = New System.Drawing.Size(75, 24)
+        Me.cmdOK.TabIndex = 13
+        Me.cmdOK.Text = "&OK"
+        Me.cmdOK.UseVisualStyleBackColor = True
+        '
         'cmdClose
         '
         Me.cmdClose.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.cmdClose.Location = New System.Drawing.Point(102, 287)
+        Me.cmdClose.Location = New System.Drawing.Point(200, 287)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(75, 24)
-        Me.cmdClose.TabIndex = 13
-        Me.cmdClose.Text = "&OK"
+        Me.cmdClose.TabIndex = 14
+        Me.cmdClose.Text = "&Close"
         Me.cmdClose.UseVisualStyleBackColor = True
-        '
-        'Button1
-        '
-        Me.Button1.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.Button1.Location = New System.Drawing.Point(200, 287)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 24)
-        Me.Button1.TabIndex = 14
-        Me.Button1.Text = "&Close"
-        Me.Button1.UseVisualStyleBackColor = True
         '
         'ListBox1
         '
@@ -171,8 +171,8 @@ Partial Class frmAddExpert
         Me.ClientSize = New System.Drawing.Size(377, 322)
         Me.Controls.Add(Me.ListBox2)
         Me.Controls.Add(Me.ListBox1)
-        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.cmdClose)
+        Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.optD)
         Me.Controls.Add(Me.optH)
         Me.Controls.Add(Me.txtDefine)
@@ -180,16 +180,16 @@ Partial Class frmAddExpert
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.TextBox5)
         Me.Controls.Add(Me.TextBox4)
-        Me.Controls.Add(Me.lblGroup)
-        Me.Controls.Add(Me.lblOperation)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.Label1)
         Me.Name = "frmAddExpert"
         Me.Text = "WinHSPF - Add Output"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents lblOperation As System.Windows.Forms.Label
-    Friend WithEvents lblGroup As System.Windows.Forms.Label
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents TextBox4 As System.Windows.Forms.TextBox
     Friend WithEvents TextBox5 As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
@@ -197,8 +197,8 @@ Partial Class frmAddExpert
     Friend WithEvents txtDefine As System.Windows.Forms.TextBox
     Friend WithEvents optH As System.Windows.Forms.RadioButton
     Friend WithEvents optD As System.Windows.Forms.RadioButton
+    Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents cmdClose As System.Windows.Forms.Button
-    Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents ListBox1 As System.Windows.Forms.ListBox
     Friend WithEvents ListBox2 As System.Windows.Forms.ListBox
 End Class
