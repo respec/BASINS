@@ -393,11 +393,13 @@ Public Class frmOutput
 
     Private Sub radio3_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radio3.CheckedChanged
         pCheckedRadioIndex = 3
+        cmdCopy.Enabled = True
         RefreshAll()
     End Sub
 
     Private Sub radio4_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radio4.CheckedChanged
         pCheckedRadioIndex = 4
+        cmdCopy.Enabled = True
         RefreshAll()
     End Sub
 
@@ -768,6 +770,23 @@ Public Class frmOutput
 
         agdOutput.SizeAllColumnsToContents()
         agdOutput.Refresh()
+
+    End Sub
+
+    Private Sub cmdCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCopy.Click
+
+        If IsNothing(pfrmAddExpert) Then
+            pfrmAddExpert = New frmAddExpert(5)
+            pfrmAddExpert.Show()
+        Else
+            If pfrmAddExpert.IsDisposed Then
+                pfrmAddExpert = New frmAddExpert(5)
+                pfrmAddExpert.Show()
+            Else
+                pfrmAddExpert.WindowState = FormWindowState.Normal
+                pfrmAddExpert.BringToFront()
+            End If
+        End If
 
     End Sub
 End Class
