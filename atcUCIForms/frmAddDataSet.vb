@@ -1,11 +1,17 @@
 Public Class frmAddDataSet
 
+    Dim pEditControl As Object 'the parent control
+
+    Public Sub InitializeForm(ByVal aEditControl As Object)
+        pEditControl = aEditControl
+    End Sub
+
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
-        Me.Icon = pIcon
+        Me.Icon = pEditControl.ParentForm.Icon
         Me.MinimumSize = Me.Size
         Me.MaximumSize = Me.Size
 

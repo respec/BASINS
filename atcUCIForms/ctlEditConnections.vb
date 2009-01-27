@@ -5,6 +5,7 @@ Imports atcControls
 Imports System.Collections.ObjectModel
 Imports atcData
 Imports System.Drawing
+Imports System.Windows.Forms
 
 Public Class ctlEditConnections
     Implements ctlEdit
@@ -15,6 +16,8 @@ Public Class ctlEditConnections
     Dim pConnections As Collection(Of HspfConnection)
     Dim pChanged As Boolean
     Dim pCurrentSelectedRow As Integer
+    Friend pfrmAddDataSet As frmAddDataSet
+
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
     Private Sub grdTable_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdEdit.Resize
@@ -719,10 +722,22 @@ Public Class ctlEditConnections
         End With
 
         If lNoDsns.Count > 0 Then
-            '    frmAddDataSet.icon = myUci.Icon
-            '    Call frmAddDataSet.SetUCI(myUci)
-            '    frmAddDataSet.Show(1)
+            'do form to add datasets 
             'if vbcancel return false
+            If IsNothing(pfrmAddDataSet) Then
+                pfrmAddDataSet = New frmAddDataSet
+                pfrmAddDataSet.InitializeForm(Me)
+                pfrmAddDataSet.Show()
+            Else
+                If pfrmAddDataSet.IsDisposed Then
+                    pfrmAddDataSet = New frmAddDataSet
+                    pfrmAddDataSet.InitializeForm(Me)
+                    pfrmAddDataSet.Show()
+                Else
+                    pfrmAddDataSet.WindowState = FormWindowState.Normal
+                    pfrmAddDataSet.BringToFront()
+                End If
+            End If
         End If
         Return True
     End Function
