@@ -12,41 +12,6 @@ Module modEditLimits
     Private cwdmid() As String
 	
 
-    'Public Sub CheckLimitsMassLink(ByRef g As System.Windows.Forms.Control, ByRef myUci As HspfUci)
-
-    '	'UPGRADE_WARNING: Couldn't resolve default property of object g.ClearValues. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	g.ClearValues()
-    '	'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	If g.col = 0 Then 'svol
-    '		Call SetAllOperations(g, myUci)
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 1 Then  'sgrpn
-    '		Call SetGroupNames(g, (myUci.Msg), 1)
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 2 Then  'smemn
-    '		Call SetMemberNames(g, (myUci.Msg), 2)
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 3 Then  'smems1
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 4 Then  'smems2
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 5 Then  'mfactr
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 6 Then  'tvol
-    '		Call SetAllOperations(g, myUci)
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 7 Then  'tgrpn
-    '		Call SetGroupNames(g, (myUci.Msg), 1)
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 8 Then  'tmem
-    '		Call SetMemberNames(g, (myUci.Msg), 2)
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 9 Then  'tmems1
-    '		'UPGRADE_WARNING: Couldn't resolve default property of object g.col. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-    '	ElseIf g.col = 10 Then  'tmems2
-    '	End If
-    'End Sub
-
     'Public Sub CheckLimitsSpecialActions(ByRef Index As Object, ByRef g As System.Windows.Forms.Control, ByRef myUci As HspfUci)
     '	Dim vOpnBlk As Object
     '	Dim lopnblk As HspfOpnBlk
