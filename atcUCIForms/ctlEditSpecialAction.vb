@@ -1,4 +1,7 @@
 Imports atcUCI
+Imports atcUtility
+Imports MapWinUtility
+Imports System.Drawing
 Imports System.Windows.Forms
 
 Public Class ctlEditSpecialAction
@@ -9,6 +12,7 @@ Public Class ctlEditSpecialAction
     Dim pChanged As Boolean
     Dim PreviousTab As Integer = 0
     Dim pfrmAgPrac As frmAgPrac
+    Dim pCurrentSelectedRow As Integer
     Public Event Change(ByVal aChange As Boolean) Implements ctlEdit.Change
 
     Public ReadOnly Property Caption() As String Implements ctlEdit.Caption
@@ -203,6 +207,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & ctemp
                         End If
                         atcgrid0.Source.CellValue(lRow, 1) = newText
+                        atcgrid0.Source.CellEditable(lRow, 0) = True
                     End If
                 Next
             End With
@@ -232,6 +237,7 @@ Public Class ctlEditSpecialAction
                             newText = newText & ctemp
                         Next
                         atcgrid0.Source.CellValue(lRow, 1) = newText
+                        atcgrid0.Source.CellEditable(lRow, 0) = True
                     End If
                 Next
             End With
@@ -276,6 +282,7 @@ Public Class ctlEditSpecialAction
                         newText = newText & ctemp & " "
                         newText = BlankPad(newText & .CellValue(rowcount, 13), 76)
                         atcgrid0.Source.CellValue(lRow, 1) = newText
+                        atcgrid0.Source.CellEditable(lRow, 0) = True
                     End If
                 Next
             End With
@@ -317,6 +324,7 @@ Public Class ctlEditSpecialAction
                         newText = newText & ctemp & " "
                         newText = newText & .CellValue(rowcount, 13)
                         atcgrid0.Source.CellValue(lRow, 1) = newText
+                        atcgrid0.Source.CellEditable(lRow, 0) = True
                     End If
                 Next
             End With
@@ -329,6 +337,7 @@ Public Class ctlEditSpecialAction
                         'get next record from this tab
                         rowcount = rowcount + 1
                         atcgrid0.Source.CellValue(lRow, 1) = .CellValue(rowcount, 0)
+                        atcgrid0.Source.CellEditable(lRow, 0) = True
                     End If
                 Next
             End With
@@ -352,13 +361,58 @@ Public Class ctlEditSpecialAction
 
     Public Sub Add() Implements ctlEdit.Add
         Changed = True
+
+        Dim lCaption As String = "Special Action Add Problem"
+
+        With tabSpecial
+            If .TabIndex = 0 Then 'add a record
+                With atcgrid0.Source
+                    If pCurrentSelectedRow > 0 Then
+                        .Rows += 1
+                        For lRow As Integer = .Rows To pCurrentSelectedRow - 1
+                            For lColumn As Integer = 0 To .Columns - 1
+                                .CellValue(lRow, lColumn) = .CellValue(lRow - 1, lColumn)
+                            Next
+                        Next
+                        .CellValue(pCurrentSelectedRow, 0) = "Comment"
+                        .CellValue(pCurrentSelectedRow, 1) = ""
+                        DisplayCounts()
+                    Else
+                        Logger.Msg("Select a Row to Add after ", MsgBoxStyle.OkOnly, lCaption)
+                    End If
+                End With
+            Else
+                Logger.Msg("Add " & .TabPages(.TabIndex).Text & " records using the 'Records' tab.", MsgBoxStyle.OkOnly, lCaption)
+            End If
+        End With
     End Sub
 
     Public Sub Help() Implements ctlEdit.Help
         'TODO: add this code
     End Sub
-    Public Sub Remove() Implements ctlEdit.Remove
 
+    Public Sub Remove() Implements ctlEdit.Remove
+        Changed = True
+        Dim lCaption As String = "Special Action Remove Problem"
+
+        With tabSpecial
+            If .TabIndex = 0 Then 'remove a record
+                With atcgrid0.Source
+                    If pCurrentSelectedRow > 0 Then
+                        For lRow As Integer = pCurrentSelectedRow To .Rows - 1
+                            For lColumn As Integer = 0 To .Columns - 1
+                                .CellValue(lRow, lColumn) = .CellValue(lRow + 1, lColumn)
+                            Next
+                        Next
+                        .Rows -= 1
+                    Else
+                        Logger.Msg("No Special Action available to Remove", MsgBoxStyle.OkOnly, lCaption)
+                    End If
+                End With
+            Else
+                Logger.Msg("Remove " & .TabPages(.TabIndex).Text & " records using the 'Records' tab.", MsgBoxStyle.OkOnly, lCaption)
+            End If
+        End With
     End Sub
 
     Public Property Data() As Object Implements ctlEdit.Data
@@ -383,8 +437,6 @@ Public Class ctlEditSpecialAction
                 .CellValue(0, 0) = "Type"
                 .CellValue(0, 1) = "Text"
                 .FixedRows = 1
-                
-
             End With
 
             atcgrid0.SizeAllColumnsToContents(atcgrid0.Width - pVScrollColumnOffset, True)
@@ -942,6 +994,7 @@ Public Class ctlEditSpecialAction
         Loop
 
     End Function
+
     Public Sub AddToBeginning(ByVal cbuff$, ByVal itype&)
 
         With atcgrid0.Source
@@ -986,7 +1039,6 @@ Public Class ctlEditSpecialAction
             Else
                 pfrmAgPrac.WindowState = FormWindowState.Normal
                 pfrmAgPrac.BringToFront()
-
             End If
         End If
         
@@ -994,6 +1046,295 @@ Public Class ctlEditSpecialAction
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         MsgBox(tabSpecial.Width)
+    End Sub
+
+    Public Sub DoLimitsSpecialActions(ByVal aTypeIndex As Integer, ByVal aSelectedColumn As Integer, ByVal aSelectedRow As Integer)
+        Dim vOpnBlk As Object, lopnblk As HspfOpnBlk
+
+        If aTypeIndex = 0 Then
+            If aSelectedColumn = 0 Then
+                With atcgrid0
+                    Dim lValidValues As New Collection
+                    lValidValues.Add("Comment")
+                    lValidValues.Add("Action")
+                    lValidValues.Add("Distribute")
+                    lValidValues.Add("User Defn Name")
+                    lValidValues.Add("User Defn Quan")
+                    lValidValues.Add("Condition")
+                    .ValidValues = lValidValues
+                    .AllowNewValidValues = False
+                    .Refresh()
+                    atcgrid0.Source.CellEditable(aSelectedRow, aSelectedColumn) = True
+                End With
+            End If
+        ElseIf aTypeIndex = 1 Then
+            'action type record
+            With atcgrid1
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 0 Then
+                    'valid operation types
+                    For Each vOpnBlk In pSpecialActionBlk.Uci.OpnBlks
+                        lopnblk = vOpnBlk
+                        If lopnblk.Count > 0 Then
+                            If lopnblk.Name = "PERLND" Or lopnblk.Name = "IMPLND" Or _
+                               lopnblk.Name = "RCHRES" Or lopnblk.Name = "PLTGEN" Or _
+                               lopnblk.Name = "COPY" Or lopnblk.Name = "GENER" Then
+                                lValidValues.Add(lopnblk.Name)
+                            End If
+                        End If
+                    Next vOpnBlk
+                ElseIf aSelectedColumn = 1 Then
+                    SetOperationMinMax(lValidValues, pSpecialActionBlk.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 2 Then
+                    SetOperationMinMax(lValidValues, pSpecialActionBlk.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 2))
+                ElseIf aSelectedColumn = 3 Then
+                    lValidValues.Add("MI")
+                    lValidValues.Add("HR")
+                    lValidValues.Add("DY")
+                    lValidValues.Add("MO")
+                    lValidValues.Add("YR")
+                ElseIf aSelectedColumn = 18 Then
+                    lValidValues.Add("MI")
+                    lValidValues.Add("HR")
+                    lValidValues.Add("DY")
+                    lValidValues.Add("MO")
+                    lValidValues.Add("YR")
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        ElseIf aTypeIndex = 2 Then
+            'distributes
+            With atcgrid2
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 2 Then
+                    lValidValues.Add("MI")
+                    lValidValues.Add("HR")
+                    lValidValues.Add("DY")
+                    lValidValues.Add("MO")
+                    lValidValues.Add("YR")
+                ElseIf aSelectedColumn = 4 Then
+                    lValidValues.Add("SKIP")
+                    lValidValues.Add("SHIFT")
+                    lValidValues.Add("ACCUM")
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        ElseIf aTypeIndex = 3 Then
+            'uvname
+            With atcgrid3
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 7 Then
+                    lValidValues.Add("QUAN")
+                    lValidValues.Add("MOVT")
+                    lValidValues.Add("MOV1")
+                    lValidValues.Add("MOV2")
+                ElseIf aSelectedColumn = 13 Then
+                    lValidValues.Add("")
+                    lValidValues.Add("QUAN")
+                    lValidValues.Add("MOVT")
+                    lValidValues.Add("MOV1")
+                    lValidValues.Add("MOV2")
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        ElseIf aTypeIndex = 4 Then
+            'User Defn Quan
+            With atcgrid4
+                Dim lValidValues As New Collection
+                If aSelectedColumn = 1 Then
+                    'valid operation types
+                    For Each vOpnBlk In pSpecialActionBlk.Uci.OpnBlks
+                        lopnblk = vOpnBlk
+                        If lopnblk.Count > 0 Then
+                            If lopnblk.Name = "PERLND" Or lopnblk.Name = "IMPLND" Or _
+                               lopnblk.Name = "RCHRES" Or lopnblk.Name = "PLTGEN" Or _
+                               lopnblk.Name = "COPY" Or lopnblk.Name = "GENER" Then
+                                lValidValues.Add(lopnblk.Name)
+                            End If
+                        End If
+                    Next vOpnBlk
+                ElseIf aSelectedColumn = 2 Then
+                    SetOperationMinMax(lValidValues, pSpecialActionBlk.Uci, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+                ElseIf aSelectedColumn = 9 Then
+                    lValidValues.Add("MI")
+                    lValidValues.Add("HR")
+                    lValidValues.Add("DY")
+                    lValidValues.Add("MO")
+                    lValidValues.Add("YR")
+                ElseIf aSelectedColumn = 11 Then
+                    lValidValues.Add("MI")
+                    lValidValues.Add("HR")
+                    lValidValues.Add("DY")
+                    lValidValues.Add("MO")
+                    lValidValues.Add("YR")
+                ElseIf aSelectedColumn = 13 Then
+                    lValidValues.Add("SUM")
+                    lValidValues.Add("AVER")
+                    lValidValues.Add("MAX")
+                    lValidValues.Add("MIN")
+                End If
+                .ValidValues = lValidValues
+                .AllowNewValidValues = False
+                .Refresh()
+            End With
+        ElseIf aTypeIndex = 5 Then
+            'conditional
+        End If
+    End Sub
+
+    Private Sub atcgrid0_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid0.MouseDownCell
+        pCurrentSelectedRow = aRow
+        DoLimitsSpecialActions(0, aColumn, aRow)
+    End Sub
+
+    Private Sub atcgrid1_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid1.MouseDownCell
+        pCurrentSelectedRow = aRow
+        DoLimitsSpecialActions(1, aColumn, aRow)
+    End Sub
+
+    Private Sub atcgrid2_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid2.MouseDownCell
+        pCurrentSelectedRow = aRow
+        DoLimitsSpecialActions(2, aColumn, aRow)
+    End Sub
+
+    Private Sub atcgrid3_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid3.MouseDownCell
+        pCurrentSelectedRow = aRow
+        DoLimitsSpecialActions(3, aColumn, aRow)
+    End Sub
+
+    Private Sub atcgrid4_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid4.MouseDownCell
+        pCurrentSelectedRow = aRow
+        DoLimitsSpecialActions(4, aColumn, aRow)
+    End Sub
+
+    Private Sub atcgrid1_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid1.CellEdited
+        
+        Dim lMinValue As Integer = -999
+        Dim lMaxValue As Integer = -999
+        If aColumn = 4 Then
+            lMinValue = 0
+        ElseIf aColumn = 5 Then
+            lMinValue = 0
+        ElseIf aColumn = 6 Then
+            lMinValue = 0
+        ElseIf aColumn = 7 Then
+            lMinValue = 0
+        ElseIf aColumn = 8 Then
+            lMinValue = 0
+        ElseIf aColumn = 9 Then
+            lMinValue = 0
+        ElseIf aColumn = 10 Then
+            lMinValue = 0
+        ElseIf aColumn = 11 Then
+            lMaxValue = 4
+            lMinValue = 2
+        ElseIf aColumn = 19 Then
+            lMinValue = 0
+        ElseIf aColumn = 20 Then
+            lMinValue = 0
+        End If
+
+        If lMaxValue <> -999 Or lMinValue <> -999 Then
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+            If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
+        End If
+    End Sub
+
+    Private Sub atcgrid2_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid2.CellEdited
+        Dim lMinValue As Integer = -999
+        Dim lMaxValue As Integer = -999
+        If aColumn = 0 Then
+            lMinValue = 0
+        ElseIf aColumn = 1 Then
+            lMaxValue = 10
+            lMinValue = 1
+        ElseIf aColumn = 3 Then
+            lMinValue = 0
+        Else
+            lMinValue = 0
+        End If
+
+        If lMaxValue <> -999 Or lMinValue <> -999 Then
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+            If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
+        End If
+    End Sub
+
+    Private Sub atcgrid3_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid3.CellEdited
+        Dim lMinValue As Integer = -999
+        Dim lMaxValue As Integer = -999
+        If aColumn = 1 Then
+            lMinValue = 1
+        End If
+
+        If lMaxValue <> -999 Or lMinValue <> -999 Then
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+            If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
+        End If
+    End Sub
+
+    Private Sub atcgrid4_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles atcgrid4.CellEdited
+        Dim lMinValue As Integer = -999
+        Dim lMaxValue As Integer = -999
+        If aColumn = 7 Then
+            lMaxValue = 4
+            lMinValue = 2
+        ElseIf aColumn = 10 Then
+            lMinValue = 0
+        ElseIf aColumn = 12 Then
+            lMinValue = 0
+        End If
+
+        If lMaxValue <> -999 Or lMinValue <> -999 Then
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+            If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
+        End If
     End Sub
 
 End Class
