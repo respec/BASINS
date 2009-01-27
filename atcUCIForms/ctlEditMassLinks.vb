@@ -9,6 +9,7 @@ Public Class ctlEditMassLinks
     Dim pMassLink As HspfMassLink
     Dim pChanged As Boolean
     Dim pCurrentSelectedColumn As Integer
+    Dim pCurrentSelectedRow As Integer
     Dim prevMLid As Integer
     Dim lMassLinkIdStarter As New ArrayList()
 
@@ -22,10 +23,45 @@ Public Class ctlEditMassLinks
 
     Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdMassLink.MouseDownCell
         pCurrentSelectedColumn = aColumn
-        Dim lBlockDef As HspfBlockDef
+        pCurrentSelectedRow = aRow
 
+        Dim lBlockDef As HspfBlockDef
         lBlockDef = pMassLink.Uci.Msg.BlockDefs("MASS-LINK")
         txtDefine.Text = lBlockDef.TableDefs(0).ParmDefs(pCurrentSelectedColumn).Name & ": " & lBlockDef.TableDefs(0).ParmDefs(pCurrentSelectedColumn).Define
+
+        DoLimits(aColumn, aRow)
+    End Sub
+
+    Private Sub DoLimits(ByVal aSelectedColumn As Integer, ByVal aSelectedRow As Integer)
+        
+        With grdMassLink
+            Dim lValidValues As New Collection
+            If aSelectedColumn = 0 Then 'svol
+                SetAllOperations(lValidValues, pMassLink.Uci)
+            ElseIf aSelectedColumn = 1 Then 'sgrpn
+                SetGroupNames(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+            ElseIf aSelectedColumn = 2 Then 'smemn
+                SetMemberNames(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+            ElseIf aSelectedColumn = 3 Then 'smems1
+                SetMemberSubscript(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), True)
+            ElseIf aSelectedColumn = 4 Then 'smems2
+                SetMemberSubscript(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 4), .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), False)
+            ElseIf aSelectedColumn = 5 Then 'mfactr
+            ElseIf aSelectedColumn = 6 Then 'tvol
+                SetAllOperations(lValidValues, pMassLink.Uci)
+            ElseIf aSelectedColumn = 7 Then 'tgrpn
+                SetGroupNames(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+            ElseIf aSelectedColumn = 8 Then 'tmem
+                SetMemberNames(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1))
+            ElseIf aSelectedColumn = 9 Then 'tmems1
+                SetMemberSubscript(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), .Source.CellValue(aSelectedRow, aSelectedColumn - 1), True)
+            ElseIf aSelectedColumn = 10 Then 'tmems2
+                SetMemberSubscript(lValidValues, pMassLink.Uci.Msg, .Source.CellValue(aSelectedRow, aSelectedColumn - 4), .Source.CellValue(aSelectedRow, aSelectedColumn - 3), .Source.CellValue(aSelectedRow, aSelectedColumn - 2), False)
+            End If
+            .ValidValues = lValidValues
+            .AllowNewValidValues = False
+            .Refresh()
+        End With
 
     End Sub
 
@@ -44,8 +80,19 @@ Public Class ctlEditMassLinks
     Public Sub Help() Implements ctlEdit.Help
         'TODO: add this code
     End Sub
+
     Public Sub Remove() Implements ctlEdit.Remove
-        'TODO: add this code
+        With grdMassLink.Source
+            If pCurrentSelectedRow > 0 Then
+                For lRow As Integer = pCurrentSelectedRow To .Rows - 1
+                    For lColumn As Integer = 0 To .Columns - 1
+                        .CellValue(lRow, lColumn) = .CellValue(lRow + 1, lColumn)
+                    Next
+                Next
+                .Rows -= 1
+                Changed = True
+            End If
+        End With
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
