@@ -1851,11 +1851,13 @@ x:
 
     'TODO: can we get the right dataset by ID from the DataSets collection? Can if it is keyed by ID.
     Public Function GetDataSetFromDsn(ByRef lWdmInd As Integer, ByRef lDsn As Integer) As atcData.atcTimeseries
-        For Each lDataSet As atcData.atcTimeseries In pWDMObj(lWdmInd).DataSets
-            If lDsn = lDataSet.Attributes.GetValue("ID") Then
-                Return lDataSet
-            End If
-        Next
+        If Not pWDMObj(lWdmInd) Is Nothing Then
+            For Each lDataSet As atcData.atcTimeseries In pWDMObj(lWdmInd).DataSets
+                If lDsn = lDataSet.Attributes.GetValue("ID") Then
+                    Return lDataSet
+                End If
+            Next
+        End If
         'MsgBox "DSN " & lDsn & " does not exist.", vbOKOnly
         Return Nothing
     End Function
