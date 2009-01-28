@@ -19,31 +19,36 @@ Partial Class frmAddDataSet
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.AtcGrid1 = New atcControls.atcGrid
+        Me.agdAdd = New atcControls.atcGrid
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
-        'AtcGrid1
+        'agdAdd
         '
-        Me.AtcGrid1.AllowHorizontalScrolling = True
-        Me.AtcGrid1.AllowNewValidValues = False
-        Me.AtcGrid1.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.Fixed3D = False
-        Me.AtcGrid1.LineColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.LineWidth = 0.0!
-        Me.AtcGrid1.Location = New System.Drawing.Point(9, 11)
-        Me.AtcGrid1.Name = "AtcGrid1"
-        Me.AtcGrid1.Size = New System.Drawing.Size(385, 246)
-        Me.AtcGrid1.Source = Nothing
-        Me.AtcGrid1.TabIndex = 0
+        Me.agdAdd.AllowHorizontalScrolling = True
+        Me.agdAdd.AllowNewValidValues = False
+        Me.agdAdd.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdAdd.CellBackColor = System.Drawing.Color.Empty
+        Me.agdAdd.Fixed3D = False
+        Me.agdAdd.LineColor = System.Drawing.Color.Empty
+        Me.agdAdd.LineWidth = 0.0!
+        Me.agdAdd.Location = New System.Drawing.Point(12, 14)
+        Me.agdAdd.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.agdAdd.Name = "agdAdd"
+        Me.agdAdd.Size = New System.Drawing.Size(513, 303)
+        Me.agdAdd.Source = Nothing
+        Me.agdAdd.TabIndex = 0
         '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Location = New System.Drawing.Point(205, 288)
+        Me.cmdCancel.Location = New System.Drawing.Point(273, 354)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
+        Me.cmdCancel.Size = New System.Drawing.Size(135, 32)
         Me.cmdCancel.TabIndex = 24
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
@@ -51,27 +56,29 @@ Partial Class frmAddDataSet
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Location = New System.Drawing.Point(96, 288)
+        Me.cmdOK.Location = New System.Drawing.Point(128, 354)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(101, 26)
+        Me.cmdOK.Size = New System.Drawing.Size(135, 32)
         Me.cmdOK.TabIndex = 23
         Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
         '
         'frmAddDataSet
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(402, 326)
+        Me.ClientSize = New System.Drawing.Size(536, 401)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
-        Me.Controls.Add(Me.AtcGrid1)
+        Me.Controls.Add(Me.agdAdd)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmAddDataSet"
         Me.Text = "Add Data Set"
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents AtcGrid1 As atcControls.atcGrid
+    Friend WithEvents agdAdd As atcControls.atcGrid
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
 End Class

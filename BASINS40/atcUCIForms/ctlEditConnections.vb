@@ -45,6 +45,10 @@ Public Class ctlEditConnections
     Public Sub Add() Implements ctlEdit.Add
         With grdEdit.Source
             .Rows += 1
+            Dim lRow As Integer = .Rows
+            For lCol As Integer = 0 To .Columns - 1
+                .CellEditable(lRow - 1, lCol) = True
+            Next
         End With
         Changed = True
     End Sub
@@ -76,18 +80,22 @@ Public Class ctlEditConnections
                 RemoveTargetsFromOperations()
                 pConnection.Uci.RemoveConnectionsFromCollection(2)
                 'create new connections
-                For lRow As Integer = 2 To .Rows
+                For lRow As Integer = 2 To .Rows - 1
                     Dim lRowComplete As Boolean = True
                     For lColumn As Integer = 1 To .Columns - 1
-                        If .CellValue(lRow, lColumn - 1).Length < 1 And lColumn <> 8 And lColumn <> 4 And lColumn <> 12 Then
-                            'no data entered for this field, dont do this row
-                            lRowComplete = False
+                        If lColumn <> 4 And lColumn <> 8 And lColumn <> 12 Then
+                            If .CellValue(lRow, lColumn - 1) Is Nothing Then
+                                lRowComplete = False
+                            ElseIf .CellValue(lRow, lColumn - 1).Length < 1 Then
+                                'no data entered for this field, dont do this row
+                                lRowComplete = False
+                            End If
                         End If
                     Next lColumn
                     If Not lRowComplete Then
-                        Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                        Logger.Msg("Some required fields on row " & lRow & " are empty." & vbCrLf & _
                                    "This row will be ignored.", MsgBoxStyle.OkOnly, _
-                                   pConnection.Caption & " Edit Problem")
+                                   pConnectionType & " Edit Problem")
                     Else
                         Dim lConn As New HspfConnection
                         lConn.Uci = pConnection.Uci
@@ -121,18 +129,20 @@ Public Class ctlEditConnections
                 RemoveTargetsFromOperations()
                 pConnection.Uci.RemoveConnectionsFromCollection(3)
                 'create new connections
-                For lRow As Integer = 2 To .Rows
+                For lRow As Integer = 2 To .Rows - 1
                     Dim lRowComplete As Boolean = True
                     For lColumn As Integer = 1 To .Columns - 1
-                        If .CellValue(lRow, lColumn - 1).Length < 1 Then
+                        If .CellValue(lRow, lColumn - 1) Is Nothing Then
+                            lRowComplete = False
+                        ElseIf .CellValue(lRow, lColumn - 1).Length < 1 Then
                             'no data entered for this field, dont do this row
                             lRowComplete = False
                         End If
                     Next lColumn
                     If Not lRowComplete Then
-                        Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                        Logger.Msg("Some required fields on row " & lRow & " are empty." & vbCrLf & _
                                    "This row will be ignored.", MsgBoxStyle.OkOnly, _
-                                   pConnection.Caption & " Edit Problem")
+                                   pConnectionType & " Edit Problem")
                     Else
                         Dim lConn As New HspfConnection
                         lConn.Uci = pConnection.Uci
@@ -159,18 +169,22 @@ Public Class ctlEditConnections
                 RemoveSourcesFromOperations()
                 pConnection.Uci.RemoveConnectionsFromCollection(1)
                 'create new connections
-                For lRow As Integer = 2 To .Rows
+                For lRow As Integer = 2 To .Rows - 1
                     Dim lRowComplete As Boolean = True
                     For lColumn As Integer = 1 To .Columns - 1
-                        If .CellValue(lRow, lColumn - 1).Length < 1 And lColumn <> 6 And lColumn <> 8 Then
-                            'no data entered for this field, dont do this row
-                            lRowComplete = False
+                        If lColumn <> 6 And lColumn <> 8 Then
+                            If .CellValue(lRow, lColumn - 1) Is Nothing Then
+                                lRowComplete = False
+                            ElseIf .CellValue(lRow, lColumn - 1).Length < 1 Then
+                                'no data entered for this field, dont do this row
+                                lRowComplete = False
+                            End If
                         End If
                     Next lColumn
                     If Not lRowComplete Then
-                        Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                        Logger.Msg("Some required fields on row " & lRow & " are empty." & vbCrLf & _
                                    "This row will be ignored.", MsgBoxStyle.OkOnly, _
-                                   pConnection.Caption & " Edit Problem")
+                                   pConnectionType & " Edit Problem")
                     Else
                         Dim lConn As New HspfConnection
                         lConn.Uci = pConnection.Uci
@@ -205,18 +219,22 @@ Public Class ctlEditConnections
                     RemoveTargetsFromOperations()
                     pConnection.Uci.RemoveConnectionsFromCollection(4)
                     'create new connections
-                    For lRow As Integer = 2 To .Rows
+                    For lRow As Integer = 2 To .Rows - 1
                         Dim lRowComplete As Boolean = True
                         For lColumn As Integer = 1 To .Columns - 1
-                            If .CellValue(lRow, lColumn - 1).Length < 1 And lColumn <> 8 And lColumn <> 14 Then
-                                'no data entered for this field, dont do this row
-                                lRowComplete = False
+                            If lColumn <> 8 And lColumn <> 14 Then
+                                If .CellValue(lRow, lColumn - 1) Is Nothing Then
+                                    lRowComplete = False
+                                ElseIf .CellValue(lRow, lColumn - 1).Length < 1 Then
+                                    'no data entered for this field, dont do this row
+                                    lRowComplete = False
+                                End If
                             End If
                         Next lColumn
                         If Not lRowComplete Then
-                            Logger.Msg("Some required fields on row " & lRow - 1 & " are empty." & vbCrLf & _
+                            Logger.Msg("Some required fields on row " & lRow & " are empty." & vbCrLf & _
                                        "This row will be ignored.", MsgBoxStyle.OkOnly, _
-                                       pConnection.Caption & " Edit Problem")
+                                       pConnectionType & " Edit Problem")
                         Else
                             Dim lConn As New HspfConnection
                             lConn.Uci = pConnection.Uci
@@ -724,19 +742,23 @@ Public Class ctlEditConnections
         If lNoDsns.Count > 0 Then
             'do form to add datasets 
             'if vbcancel return false
+            Dim lResult As DialogResult = DialogResult.Cancel
             If IsNothing(pfrmAddDataSet) Then
                 pfrmAddDataSet = New frmAddDataSet
-                pfrmAddDataSet.InitializeForm(Me)
-                pfrmAddDataSet.Show()
+                pfrmAddDataSet.InitializeForm(aUci, Me, lNoDsns, lWDMIds, lScens, lLocs, lCons)
+                lResult = pfrmAddDataSet.ShowDialog()
             Else
                 If pfrmAddDataSet.IsDisposed Then
                     pfrmAddDataSet = New frmAddDataSet
-                    pfrmAddDataSet.InitializeForm(Me)
-                    pfrmAddDataSet.Show()
+                    pfrmAddDataSet.InitializeForm(aUci, Me, lNoDsns, lWDMIds, lScens, lLocs, lCons)
+                    lResult = pfrmAddDataSet.ShowDialog()
                 Else
                     pfrmAddDataSet.WindowState = FormWindowState.Normal
                     pfrmAddDataSet.BringToFront()
                 End If
+            End If
+            If lResult = DialogResult.Cancel Then
+                Return False
             End If
         End If
         Return True
