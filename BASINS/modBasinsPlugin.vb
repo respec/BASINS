@@ -19,9 +19,14 @@ Public Module modBasinsPlugin
     Friend g_Plugins As MapWindow.Interfaces.Plugins
     Friend g_Project As MapWindow.Interfaces.Project
     Friend g_MapWinWindowHandle As Integer
-    Friend g_AppName As String = "BASINS4"
+    Friend g_AppNameRegistry As String = "BASINS4" 'For preferences in registry
+    Friend g_AppNameShort As String = "Basins"
+    Friend g_AppNameLong As String = "BASINS 4"
+    Friend g_URL_Home As String = ""
+    Friend g_URL_Register As String = ""
+
     Friend g_BasinsDataDirs As New ArrayList
-    Friend g_BasinsDir As String = ""
+    Friend g_ProgramDir As String = ""
     Friend g_ProgressPanel As Windows.Forms.Panel
     Friend pBuildFrm As frmBuildNew
 
@@ -30,13 +35,13 @@ Public Module modBasinsPlugin
 
     'File menu -- created by MapWindow
 
-    Friend Const ProjectsMenuName As String = "BasinsProjects"
-    Friend Const ProjectsMenuString As String = "Open BASINS Project"
+    Friend Const ProjectsMenuName As String = "ProgramProjects"
+    Friend ProjectsMenuString As String = "Open BASINS Project"
 
     Friend pWelcomeScreenShow As Boolean = False
 
-    Friend Const RegisterMenuName As String = "RegisterBASINS"
-    Friend Const RegisterMenuString As String = "Register as a BASINS user"
+    Friend Const RegisterMenuName As String = "RegisterProgram"
+    Friend RegisterMenuString As String = "Register as a BASINS user"
 
     Friend Const CheckForUpdatesMenuName As String = "CheckForUpdates"
     Friend Const CheckForUpdatesMenuString As String = "Check For Updates"
@@ -45,8 +50,8 @@ Public Module modBasinsPlugin
     Friend Const BasinsHelpMenuName As String = "BasinsHelp"
     Friend Const BasinsHelpMenuString As String = "BASINS Documentation"
 
-    Friend Const BasinsWebPageMenuName As String = "BasinsWebPage"
-    Friend Const BasinsWebPageMenuString As String = "BASINS Web Page"
+    Friend Const ProgramWebPageMenuName As String = "ProgramWebPage"
+    Friend ProgramWebPageMenuString As String = "BASINS Web Page"
 
     Friend Const SendFeedbackMenuName As String = "SendFeedback"
     Friend Const SendFeedbackMenuString As String = "Send Feedback"
@@ -97,7 +102,7 @@ Public Module modBasinsPlugin
     ''' <remarks></remarks>
     Friend Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
-            Dim lFileName As String = IO.Path.Combine(g_BasinsDir, "Data\national\" & NationalProjectFilename)
+            Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national\" & NationalProjectFilename)
             If Not FileExists(lFileName) Then
                 For Each lDir As String In g_BasinsDataDirs
                     lFileName = lDir & "national\" & NationalProjectFilename
@@ -136,8 +141,8 @@ Public Module modBasinsPlugin
             g_Toolbar.PressToolbarButton("tbbSelect")
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
-            pBuildFrm.Top = GetSetting(g_AppName, "Window Positions", "BuildTop", "300")
-            pBuildFrm.Left = GetSetting(g_AppName, "Window Positions", "BuildLeft", "0")
+            pBuildFrm.Top = GetSetting(g_AppNameRegistry, "Window Positions", "BuildTop", "300")
+            pBuildFrm.Left = GetSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", "0")
             UpdateSelectedFeatures()
         Else
             Logger.Msg("Unable to open national project", "Open National")

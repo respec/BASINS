@@ -186,7 +186,6 @@ Friend Class frmAbout
         'picBASINS
         '
         Me.picBASINS.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.picBASINS.Image = CType(resources.GetObject("picBASINS.Image"), System.Drawing.Image)
         Me.picBASINS.Location = New System.Drawing.Point(8, 8)
         Me.picBASINS.Name = "picBASINS"
         Me.picBASINS.Size = New System.Drawing.Size(136, 128)
@@ -300,6 +299,7 @@ Friend Class frmAbout
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnOk
         Me.ClientSize = New System.Drawing.Size(612, 580)
+        Me.Controls.Add(Me.lblBasinsURL)
         Me.Controls.Add(Me.picBASINS)
         Me.Controls.Add(Me.lblBasinsVersion)
         Me.Controls.Add(Me.lblBASINS)
@@ -311,8 +311,6 @@ Friend Class frmAbout
         Me.Controls.Add(Me.grpMapWindow)
         Me.Controls.Add(Me.grpATC)
         Me.Controls.Add(Me.grpZedGraph)
-        Me.Controls.Add(Me.lblBasinsURL)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
@@ -338,6 +336,23 @@ Friend Class frmAbout
     Public Sub ShowAbout()
         Try
             Me.Icon = g_MapWin.ApplicationInfo.FormIcon
+            picBASINS.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
+            picBASINS.Image = g_MapWin.ApplicationInfo.SplashPicture
+
+            lblBASINS.Text = g_AppNameLong
+            lblBASINS.Left = picBASINS.Left + picBASINS.Width + 8
+            lblBasinsVersion.Left = lblBASINS.Left
+
+            If lblBASINS.Text.Length < 10 Then
+                lblBASINS.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            Else
+                lblBASINS.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            End If
+
+            lblBasinsURL.Text = g_URL_Home
+            lblBasinsURL.LinkArea = New LinkArea(0, g_URL_Home.Length)
+            lblBasinsURL.Left = Me.Width - lblBasinsURL.Width - 20
+
             Try
                 lblBasinsVersion.Text = "Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
             Catch

@@ -25,7 +25,7 @@ Imports System.Windows.Forms
 Imports MapWinUtility
 Imports atcUtility
 
-Public Class frmWelcomeScreenBasins
+Public Class frmWelcomeScreen
     Inherits System.Windows.Forms.Form
 
     Private lProject As Project
@@ -71,7 +71,7 @@ Public Class frmWelcomeScreenBasins
     Friend WithEvents lbConvert As System.Windows.Forms.LinkLabel
     Friend WithEvents lbProject4 As System.Windows.Forms.LinkLabel
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWelcomeScreenBasins))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWelcomeScreen))
         Me.lbBuildNew = New System.Windows.Forms.LinkLabel
         Me.lbOpenProject = New System.Windows.Forms.LinkLabel
         Me.cbShowDlg = New System.Windows.Forms.CheckBox
@@ -157,7 +157,7 @@ Public Class frmWelcomeScreenBasins
         Me.lbProject4.TabStop = True
         Me.lbProject4.UseCompatibleTextRendering = True
         '
-        'frmWelcomeScreenBasins
+        'frmWelcomeScreen
         '
         resources.ApplyResources(Me, "$this")
         Me.BackColor = System.Drawing.Color.White
@@ -176,7 +176,7 @@ Public Class frmWelcomeScreenBasins
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "frmWelcomeScreenBasins"
+        Me.Name = "frmWelcomeScreen"
         CType(Me.pctBasinsLogo, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
@@ -226,7 +226,18 @@ Public Class frmWelcomeScreenBasins
 
     Private Sub frmWelcomeScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
+        Me.Icon = g_MapWin.ApplicationInfo.FormIcon
+        Me.Text = "Welcome to " & g_AppNameLong
+        pctBasinsLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
+        pctBasinsLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
+
         cbShowDlg.Checked = lAppInfo.ShowWelcomeScreen
+
+        lbBuildNew.Text = "Build New " & g_AppNameShort & " Project"
+        lbBuildNew.LinkArea = New LinkArea(0, lbBuildNew.Text.Length)
+
+        lbOpenProject.Text = "Open Existing " & g_AppNameShort & " Project"
+        lbOpenProject.LinkArea = New LinkArea(0, lbOpenProject.Text.Length)
 
         'assume no recent projects
         lbProject1.Visible = False
@@ -264,7 +275,7 @@ Public Class frmWelcomeScreenBasins
     End Sub
 
     Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbConvert.LinkClicked
-        Logger.Msg("Select the BASINS Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4")
+        Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4")
         Me.Close()
         SendKeys.Send("%FB")
     End Sub
