@@ -402,10 +402,6 @@ Public Class HspfFtable
         Return lNumericallyTheSame
     End Function
 
-    Public Sub Edit()
-        editInit(Me, Me.Operation.OpnBlk.Uci.icon)
-    End Sub
-
     Public Sub New()
         MyBase.New()
         Nrows = 1

@@ -22,10 +22,6 @@ Public Class HspfMonthData
         End Get
     End Property
 
-    Public Sub Edit()
-        editInit(Me, Me.Uci.Icon, True)
-    End Sub
-
     Public Sub New()
         MyBase.New()
         pMonthDataTables = New Collection(Of HspfMonthDataTable)

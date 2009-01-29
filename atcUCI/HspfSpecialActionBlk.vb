@@ -51,10 +51,6 @@ Public Class HspfSpecialActionBlk
         End Get
     End Property
 
-    Public Sub Edit()
-        editInit(Me, Me.Uci.Icon, True)
-    End Sub
-
     Public Sub ReadUciFile()
         If Uci.FastFlag Then
             Me.Comment = GetCommentBeforeBlock("SPEC-ACTIONS")

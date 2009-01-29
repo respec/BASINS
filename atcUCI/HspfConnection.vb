@@ -352,19 +352,15 @@ Public Class HspfConnection
     End Sub
     Public Sub EditExtSrc()
         pDesiredType = "EXT SOURCES"
-        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
     Public Sub EditExtTar()
         pDesiredType = "EXT TARGETS"
-        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
     Public Sub EditNetwork()
         pDesiredType = "NETWORK"
-        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
     Public Sub EditSchematic()
         pDesiredType = "SCHEMATIC"
-        editInit(Me, Me.Uci.Icon, True) 'add remove ok
     End Sub
 
     Public Overrides Function ToString() As String

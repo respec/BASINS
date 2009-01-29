@@ -133,10 +133,6 @@ Public Class HspfGlobalBlk
         End Set
     End Property
 
-    Public Sub Edit()
-        editInit(Me, Me.Uci.Icon)
-    End Sub
-
     Public Sub ReadUciFile()
         Dim lRecordType, lRecordIndex, lReturnCode As Integer
         Dim lRecord As String = Nothing

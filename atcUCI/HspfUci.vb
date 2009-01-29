@@ -1894,10 +1894,6 @@ x:
         Return lFindTimser
     End Function
 
-    Public Sub EditActivityAll()
-        editActivityAllInit(Me, (Me.icon))
-    End Sub
-
     Public Function WeightedSourceArea(ByVal aOperation As HspfOperation, _
                                        ByVal aSourceType As String, _
                                        ByRef aSourceCollection As atcCollection) As Double

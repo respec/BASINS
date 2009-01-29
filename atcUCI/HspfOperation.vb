@@ -86,11 +86,6 @@ Public Class HspfOperation
         End Set
     End Property
 
-    Public Sub Edit()
-        'status or hourglass needed here
-        editInit(Me, (Uci.Icon), True, True, False)
-    End Sub
-
     Public Function TableExists(ByRef aName As String) As Boolean
         Return Tables.Contains(aName)
     End Function

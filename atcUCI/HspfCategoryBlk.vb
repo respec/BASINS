@@ -68,10 +68,6 @@ Public Class HspfCategoryBlk
         End If
     End Sub
 
-    Public Sub Edit()
-        editInit(Me, Me.Uci.icon, True)
-    End Sub
-
     Public Sub New()
         MyBase.New()
         pCategories = New Collection(Of HspfCategory)

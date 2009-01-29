@@ -90,10 +90,6 @@ Public Class HspfOpnSeqBlk
         pOpns.Insert(aBeforeId, aNewOpn)
     End Sub
 
-    Public Sub Edit()
-        editInit(Me, Me.Uci.icon, True, True)
-    End Sub
-
     Public Sub New()
         MyBase.New()
         pOpns = New Collection(Of HspfOperation)
