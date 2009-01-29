@@ -40,10 +40,6 @@ Public Class HspfMassLink
         Return lNewMassLink
     End Function
 
-    Public Sub Edit()
-        editInit(Me, Me.Uci.Icon, True)
-    End Sub
-
     Public Sub ReadMassLinks(ByRef aUci As HspfUci)
         Dim lMassLinkIds(-1) As Integer
         Dim lMassLinkKeys(-1) As Integer

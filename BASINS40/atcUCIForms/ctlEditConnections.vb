@@ -80,7 +80,7 @@ Public Class ctlEditConnections
                 RemoveTargetsFromOperations()
                 pConnection.Uci.RemoveConnectionsFromCollection(2)
                 'create new connections
-                For lRow As Integer = 2 To .Rows - 1
+                For lRow As Integer = 1 To .Rows - 1
                     Dim lRowComplete As Boolean = True
                     For lColumn As Integer = 1 To .Columns - 1
                         If lColumn <> 4 And lColumn <> 8 And lColumn <> 12 Then
@@ -129,7 +129,7 @@ Public Class ctlEditConnections
                 RemoveTargetsFromOperations()
                 pConnection.Uci.RemoveConnectionsFromCollection(3)
                 'create new connections
-                For lRow As Integer = 2 To .Rows - 1
+                For lRow As Integer = 1 To .Rows - 1
                     Dim lRowComplete As Boolean = True
                     For lColumn As Integer = 1 To .Columns - 1
                         If .CellValue(lRow, lColumn - 1) Is Nothing Then
@@ -169,7 +169,7 @@ Public Class ctlEditConnections
                 RemoveSourcesFromOperations()
                 pConnection.Uci.RemoveConnectionsFromCollection(1)
                 'create new connections
-                For lRow As Integer = 2 To .Rows - 1
+                For lRow As Integer = 1 To .Rows - 1
                     Dim lRowComplete As Boolean = True
                     For lColumn As Integer = 1 To .Columns - 1
                         If lColumn <> 6 And lColumn <> 8 Then
@@ -219,7 +219,7 @@ Public Class ctlEditConnections
                     RemoveTargetsFromOperations()
                     pConnection.Uci.RemoveConnectionsFromCollection(4)
                     'create new connections
-                    For lRow As Integer = 2 To .Rows - 1
+                    For lRow As Integer = 1 To .Rows - 1
                         Dim lRowComplete As Boolean = True
                         For lColumn As Integer = 1 To .Columns - 1
                             If lColumn <> 8 And lColumn <> 14 Then
@@ -311,10 +311,11 @@ Public Class ctlEditConnections
                     .CellValue(0, 13) = "MemSub2"
                     .CellValue(0, 14) = "Comment"
 
+                    grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+                    grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
 
-
-                    For i As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
-                        lOper = pConnection.Uci.OpnSeqBlock.Opn(i)
+                    For i As Integer = 0 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opns(i)
                         For j As Integer = 0 To lOper.Sources.Count - 1
                             lConn = lOper.Sources(j)
                             If lConn.Typ = 2 Then
@@ -356,8 +357,11 @@ Public Class ctlEditConnections
                     .CellValue(0, 7) = "Sub2"
                     .CellValue(0, 8) = "Comment"
 
-                    For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
-                        lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
+                    grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+                    grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
+
+                    For lLoopVar1 As Integer = 0 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opns(lLoopVar1)
                         For lLoopVar2 As Integer = 0 To lOper.Sources.Count - 1
                             lConn = lOper.Sources(lLoopVar2)
                             If lConn.Typ = 3 Then
@@ -398,8 +402,11 @@ Public Class ctlEditConnections
                     .CellValue(0, 13) = "MemSub2"
                     .CellValue(0, 14) = "Comment"
 
-                    For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
-                        lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
+                    grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+                    grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
+
+                    For lLoopVar1 As Integer = 0 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opns(lLoopVar1)
                         For lLoopVar2 As Integer = 0 To lOper.Sources.Count - 1
                             lConn = lOper.Sources(lLoopVar2)
                             If lConn.Typ = 1 Then
@@ -447,8 +454,11 @@ Public Class ctlEditConnections
                     .CellValue(0, 14) = "AmdStr"
                     .CellValue(0, 15) = "Comment"
 
-                    For lLoopVar1 As Integer = 1 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
-                        lOper = pConnection.Uci.OpnSeqBlock.Opn(lLoopVar1)
+                    grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+                    grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
+
+                    For lLoopVar1 As Integer = 0 To pConnection.Uci.OpnSeqBlock.Opns.Count - 1
+                        lOper = pConnection.Uci.OpnSeqBlock.Opns(lLoopVar1)
                         For lLoopVar2 As Integer = 0 To lOper.Targets.Count - 1
                             lConn = lOper.Targets(lLoopVar2)
                             If lConn.Typ = 4 Then
@@ -483,8 +493,6 @@ Public Class ctlEditConnections
 
             End With
 
-            grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
-            grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
             grdEdit.Refresh()
 
         End Set

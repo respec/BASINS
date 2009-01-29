@@ -189,9 +189,6 @@
     <Compile Include="modCreateUci.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="modEditLimits.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="modPollutants.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -235,9 +232,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="modUciRead.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="modUtilEdit.vb">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
