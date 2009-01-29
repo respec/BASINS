@@ -1,5 +1,6 @@
 Imports atcUCI
 Imports atcControls
+Imports System.Drawing
 
 Public Class ctlEditTable
     Implements ctlEdit
@@ -17,6 +18,45 @@ Public Class ctlEditTable
     Private Sub grdTableCellEdited(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdTable.CellEdited
         pChanged = True
         RaiseEvent Change(True)
+
+        Dim lchkDescInteger As Integer
+        If chkDesc.Checked = True Then
+            lchkDescInteger = 1
+        Else
+            lchkDescInteger = 0
+        End If
+        Dim lUnitfg As Integer = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
+
+        Dim lMinValue As Integer = -999
+        Dim lMaxValue As Integer = -999
+
+        Dim lParm As HspfParm = pHspfTable.Parms(aColumn - lchkDescInteger)
+
+        If lParm.Def.Typ = 1 Or lParm.Def.Typ = 2 Then
+            'this is a numeric field
+            If lUnitfg = 1 Then 'english
+                lMaxValue = lParm.Def.Max
+                lMinValue = lParm.Def.Min
+            ElseIf lUnitfg = 2 Then 'metric
+                lMaxValue = lParm.Def.MetricMax
+                lMinValue = lParm.Def.MetricMin
+            End If
+
+            If lMaxValue <> -999 Or lMinValue <> -999 Then
+                Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+                Dim lNewValueNumeric As Double = -999
+                If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+                Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+                If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+                    lNewColor = aGrid.CellBackColor
+                Else
+                    lNewColor = Color.Pink
+                End If
+                If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                    aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+                End If
+            End If
+        End If
     End Sub
 
     Private Sub grdTableClick(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdTable.MouseDownCell
@@ -137,7 +177,13 @@ Public Class ctlEditTable
                 refreshGrid()
             End If
 
-            txtDefine.Text = "(Click on a parameter column to display its description)"
+            txtDefine.Text = "Table: " & pHspfTable.Name & ", " & pHspfTable.Def.Define & vbCrLf & vbCrLf & vbCrLf
+            Dim lUnitfg As Integer = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
+            If lUnitfg = 1 Then 'english
+                txtDefine.Text = txtDefine.Text & pHspfTable.Def.HeaderE
+            ElseIf lUnitfg = 2 Then 'metric
+                txtDefine.Text = txtDefine.Text & pHspfTable.Def.HeaderM
+            End If
         End Set
     End Property
 
@@ -164,24 +210,6 @@ Public Class ctlEditTable
             For i = 0 To pHspfTable.Parms.Count - 1
                 lParm = pHspfTable.Parms(i)
                 .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
-                'The below code is commented because the .ColType, .ColMax, .ColMin was not defined yet.
-                'If lParm.Def.Typ = 2 Then
-                '    '.ColType(i + lchkDescInteger) = ATCoSng  'causes formatting problems
-                'End If
-                'If lParm.Def.Typ = 1 Then
-                '    '.ColType(i + lchkDescInteger) = ATCoInt0
-                'End If
-                'If lParm.Def.Typ = 0 Then
-                '    '.ColType(i + lchkDescInteger) = ATCoTxt
-                'End If
-                'unitfg = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
-                'If unitfg = 1 Then 'english
-                '    '.ColMax(i + lchkDescInteger) = lParm.Def.Max
-                '    '.ColMin(i + lchkDescInteger) = lParm.Def.Min
-                'ElseIf unitfg = 2 Then 'metric
-                '    '.ColMax(i + lchkDescInteger) = lParm.Def.MetricMax
-                '    '.ColMin(i + lchkDescInteger) = lParm.Def.MetricMin
-                'End If
             Next i
 
             'may need index here
