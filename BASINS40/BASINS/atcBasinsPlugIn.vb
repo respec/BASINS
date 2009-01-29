@@ -63,17 +63,36 @@ Public Class atcBasinsPlugIn
 
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
+        g_AppNameLong = aMapWin.ApplicationInfo.ApplicationName
+        Select Case g_AppNameLong
+            Case "USGS Surface Water Analysis"
+                g_AppNameRegistry = "USGS-SW"
+                g_AppNameShort = "USGS-SW"
+                g_URL_Home = "http://water.usgs.gov/software/lists/surface_water/"
+                g_URL_Register = "http://hspf.com/pub/USGS-SW/register.html"
+
+            Case Else '"BASINS 4"
+                g_AppNameRegistry = "BASINS4"
+                g_AppNameShort = "BASINS"
+                g_URL_Home = "http://www.epa.gov/waterscience/BASINS/"
+                g_URL_Register = "http://hspf.com/pub/basins4/register.html"
+        End Select
+
+        ProjectsMenuString = "Open " & g_AppNameShort & " Project"
+        RegisterMenuString = "Register as a " & g_AppNameShort & " user"
+        ProgramWebPageMenuString = g_AppNameShort & " Web Page"
+
         atcMwGisUtility.GisUtil.MappingObject = g_MapWin
         atcDataManager.MapWindow = g_MapWin
 
         g_MapWinWindowHandle = aParentHandle
-        g_MapWin.ApplicationInfo.WelcomePlugin = "BASINS"
-        'Set g_BasinsDir to folder above the Bin folder where the app and plugins live
-        g_BasinsDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & "\"
+        g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen
+        'Set g_ProgramDir to folder above the Bin folder where the app and plugins live
+        g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & IO.Path.DirectorySeparatorChar
 
-        Logger.StartToFile(g_BasinsDir & "cache\log\" _
-                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log")
-        'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_BasinsDir & "cache\log\", System.Diagnostics.Process.GetCurrentProcess.Id) Then
+        Logger.StartToFile(g_ProgramDir & "cache\log\" _
+                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
+        'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_ProgramDir & "cache\log\", System.Diagnostics.Process.GetCurrentProcess.Id) Then
         '    Logger.ProgressStatus = New MonitorProgressStatus
         '    SendMonitorMessage("Show")
         '    Logger.Status("Testing")
@@ -98,8 +117,8 @@ Public Class atcBasinsPlugIn
             Logger.Dbg("Exception loading Timeseries::Statistics - " & e.Message)
         End Try
 
-        'Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_BasinsDir & "docs\Basins4.0.chm")
-        Dim lHelpFilename As String = FindFile("", g_BasinsDir & "docs\Basins4.0.chm")
+        Dim lHelpFilename As String
+        lHelpFilename = FindFile("", g_ProgramDir & "docs\Basins4.0.chm")
         If FileExists(lHelpFilename) Then
             ShowHelp(lHelpFilename)
         Else
@@ -118,7 +137,7 @@ Public Class atcBasinsPlugIn
         atcDataManager.AddMenuIfMissing(ProjectsMenuName, atcDataManager.FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
         atcDataManager.AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
-        atcDataManager.AddMenuIfMissing(BasinsWebPageMenuName, HelpMenuName, BasinsWebPageMenuString, , "mnuOnlineDocs")
+        atcDataManager.AddMenuIfMissing(ProgramWebPageMenuName, HelpMenuName, ProgramWebPageMenuString, , "mnuOnlineDocs")
 
         atcDataManager.AddMenuIfMissing(RegisterMenuName, HelpMenuName, RegisterMenuString, , "mnuShortcuts")
 
@@ -151,12 +170,12 @@ Public Class atcBasinsPlugIn
         atcDataManager.LoadPlugin("D4EM Data Download::Main")
 
         Try 'atcDataManager.XML gets loaded when opening a project. This makes sure it gets loaded even without a project
-            Dim lAttributesString As String = GetSetting(g_AppName, "DataManager", "SelectionAttributes")
+            Dim lAttributesString As String = GetSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes")
             If lAttributesString.Length > 0 Then
                 atcDataManager.SelectionAttributes.Clear()
                 atcDataManager.SelectionAttributes.AddRange(lAttributesString.Split(vbTab))
             End If
-            lAttributesString = GetSetting(g_AppName, "DataManager", "DisplayAttributes")
+            lAttributesString = GetSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes")
             If lAttributesString.Length > 0 Then
                 atcDataManager.DisplayAttributes.Clear()
                 atcDataManager.DisplayAttributes.AddRange(lAttributesString.Split(vbTab))
@@ -170,7 +189,7 @@ Public Class atcBasinsPlugIn
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         g_MapWin.Menus.Remove(ProjectsMenuName)
         g_MapWin.Menus.Remove(BasinsHelpMenuName)
-        g_MapWin.Menus.Remove(BasinsWebPageMenuName)
+        g_MapWin.Menus.Remove(ProgramWebPageMenuName)
         g_MapWin.Menus.Remove(RegisterMenuName)
         g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
         g_MapWin.Menus.Remove(SendFeedbackMenuName)
@@ -190,8 +209,8 @@ Public Class atcBasinsPlugIn
 
         CloseForms()
         'StopMonitor()
-        SaveSetting(g_AppName, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
-        SaveSetting(g_AppName, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
+        SaveSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
+        SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
     End Sub
 
     Private Sub CloseForms()
@@ -214,11 +233,11 @@ Public Class atcBasinsPlugIn
                 Dim lAbout As New frmAbout
                 lAbout.ShowAbout()
             Case RegisterMenuName
-                OpenFile("http://hspf.com/pub/basins4/register.html")
+                OpenFile(g_URL_Register)
             Case CheckForUpdatesMenuName
                 CheckForUpdates(False)
-            Case BasinsWebPageMenuName
-                OpenFile("http://www.epa.gov/waterscience/basins/index.html")
+            Case ProgramWebPageMenuName
+                OpenFile(g_URL_Home)
             Case SendFeedbackMenuName
                 SendFeedback()
             Case BasinsHelpMenuName
@@ -238,12 +257,12 @@ Public Class atcBasinsPlugIn
                 Try
                     Process.Start(lAprFileName)
                 Catch
-                    Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "BASINS/ArcView Problem")
+                    Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "ArcView Problem")
                 End Try
             Case atcDataManager.LaunchMenuName & "_ArcGIS"
                 Dim buildmxdFilename As String = FindFile("Please Locate build.mxd", "\BASINS\etc\build.mxd")
                 If Len(buildmxdFilename) = 0 Then
-                    Logger.Msg("Unable to locate Build.mxd", vbOKOnly, "BASINS/ArcGIS Problem")
+                    Logger.Msg("Unable to locate Build.mxd", vbOKOnly, "ArcGIS Problem")
                 Else
                     Try
                         'write directive file here
@@ -251,7 +270,7 @@ Public Class atcBasinsPlugIn
                         'now start the build mxd
                         Process.Start(buildmxdFilename)
                     Catch
-                        Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "BASINS/ArcGIS Problem")
+                        Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "ArcGIS Problem")
                     End Try
                 End If
             Case Else
@@ -281,12 +300,12 @@ Public Class atcBasinsPlugIn
             Dim lQuiet As String = ""
             Dim lToday As String = Format(Date.Today, "yyyy-MM-dd")
             If aQuiet Then 'Make sure automatic checking happens at most once a day
-                If GetSetting(g_AppName, "Update", "LastCheck", "Never") = lToday Then Exit Sub
+                If GetSetting(g_AppNameRegistry, "Update", "LastCheck", "Never") = lToday Then Exit Sub
                 lQuiet = "quiet "
             End If
-            SaveSetting(g_AppName, "Update", "LastCheck", lToday)
+            SaveSetting(g_AppNameRegistry, "Update", "LastCheck", lToday)
 
-            Dim lSavePath As String = IO.Path.Combine(g_BasinsDir, "cache")
+            Dim lSavePath As String = IO.Path.Combine(g_ProgramDir, "cache")
             Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
             Dim lUpdateCheckerPath As String = IO.Path.Combine(lExePath, "UpdateCheck.exe")
             If IO.File.Exists(lUpdateCheckerPath) Then
@@ -420,11 +439,11 @@ FoundDir:
         lFeedback &= vbCrLf & "Information from MapWinUtility.MiscUtils.GetDebugInfo" & vbCrLf & _
                               MapWinUtility.MiscUtils.GetDebugInfo & vbCrLf & vbCrLf
 
-        Dim lSkipFilename As Integer = g_BasinsDir.Length
-        lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
+        Dim lSkipFilename As Integer = g_ProgramDir.Length
+        lFeedback &= vbCrLf & "Files in " & g_ProgramDir & vbCrLf
 
         Dim lallFiles As New NameValueCollection
-        AddFilesInDir(lallFiles, g_BasinsDir, True)
+        AddFilesInDir(lallFiles, g_ProgramDir, True)
         'lFeedback &= vbCrLf & "Modified" & vbTab & "Size" & vbTab & "Filename" & vbCrLf
         For Each lFilename As String In lallFiles
             lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
@@ -436,10 +455,14 @@ FoundDir:
             lFeedbackCollection.Add("email", Trim(lEmail))
             lFeedbackCollection.Add("message", Trim(lMessage))
             lFeedbackCollection.Add("sysinfo", lFeedback)
-            Dim lClient As New System.Net.WebClient
-            lClient.Proxy.Credentials = System.Net.CredentialCache.DefaultCredentials
-            lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
-            Logger.Msg("Feedback successfully sent", "Send Feedback")
+            Try
+                Dim lClient As New System.Net.WebClient
+                lClient.Proxy.Credentials = System.Net.CredentialCache.DefaultCredentials
+                lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
+                Logger.Msg("Feedback successfully sent", "Send Feedback")
+            Catch e As Exception
+                Logger.Msg("Feedback could not be sent", "Send Feedback")
+            End Try
         End If
     End Sub
 
@@ -512,8 +535,8 @@ FoundDir:
                OrElse Not g_MapWin.ApplicationInfo.ShowWelcomeScreen _
                OrElse (g_Project.FileName Is Nothing And Not pCommandLineScript) Then
                 Logger.Dbg("Welcome:Show")
-                Dim lfrmWelcomeScreenBasins As New frmWelcomeScreenBasins(g_Project, g_MapWin.ApplicationInfo)
-                lfrmWelcomeScreenBasins.ShowDialog()
+                Dim lfrmWelcomeScreen As New frmWelcomeScreen(g_Project, g_MapWin.ApplicationInfo)
+                lfrmWelcomeScreen.ShowDialog()
             Else 'Skip displaying welcome on launch
                 Logger.Dbg("Welcome:Skip")
             End If

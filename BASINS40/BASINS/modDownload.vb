@@ -533,7 +533,7 @@ StartOver:
                                                    Optional ByVal aExistingMapWindowProject As Boolean = False)
         Dim lQuery As String
         Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
-        Dim lNationalDir As String = IO.Path.Combine(g_BasinsDir, "Data\national\")
+        Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national\")
         If IO.Directory.Exists(lNationalDir) Then
             CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
             CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
@@ -545,7 +545,7 @@ StartOver:
                & "<arguments>" _
                & "<DataType>core31</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-               & "<CacheFolder>" & IO.Path.Combine(g_BasinsDir, "cache") & "</CacheFolder>" _
+               & "<CacheFolder>" & IO.Path.Combine(g_ProgramDir, "cache") & "</CacheFolder>" _
                & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
@@ -1146,7 +1146,7 @@ StartOver:
 
                 If lRendererFilename.Length > 0 AndAlso Not IO.File.Exists(lRendererFilename) Then
                     Dim lRendererFilenameNoPath As String = IO.Path.GetFileName(lRendererFilename)
-                    Dim lRenderersPath As String = g_BasinsDir & "etc\renderers\"
+                    Dim lRenderersPath As String = g_ProgramDir & "etc\renderers\"
                     Dim lDefaultRendererFilename As String = FindFile("", lRenderersPath & lRendererFilenameNoPath)
                     If Not FileExists(lDefaultRendererFilename) Then
                         If lRendererFilenameNoPath.Contains("_") Then 'Some layers are named huc8_xxx.shp, renderer is named _xxx & lRendererExt

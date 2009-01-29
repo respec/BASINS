@@ -146,10 +146,7 @@
     <Compile Include="frmBuildNew.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmButtons.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmWelcomeScreenBasins.vb">
+    <Compile Include="frmWelcomeScreen.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="modBasinsPlugin.vb">
@@ -166,17 +163,12 @@
       <DependentUpon>frmBuildNew.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmButtons.resx">
-      <DependentUpon>frmButtons.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmWelcomeScreenBasins.resx">
-      <DependentUpon>frmWelcomeScreenBasins.vb</DependentUpon>
+    <EmbeddedResource Include="frmWelcomeScreen.resx">
+      <DependentUpon>frmWelcomeScreen.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
