@@ -3,7 +3,7 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{9F91345F-B696-40B0-A6A4-65D93B8489FD}</ProjectGuid>
+    <ProjectGuid>{9A8B85B9-8BDF-4621-AF02-A7DB75724D5B}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ApplicationIcon>
@@ -72,15 +72,15 @@
   <ItemGroup>
     <Reference Include="atcControls, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\atcControls\obj\Debug\atcControls.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Plugins\atcControls.dll</HintPath>
     </Reference>
     <Reference Include="atcData, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\atcData\obj\Debug\atcData.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Plugins\atcData.dll</HintPath>
     </Reference>
     <Reference Include="atcUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\atcUtility\obj\Debug\atcUtility.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Plugins\atcUtility.dll</HintPath>
     </Reference>
     <Reference Include="Interop.TKTAUDEMLib, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -176,7 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
-      <Project>{70F1AE0E-C60B-4E61-B11F-188E3BCE0280}</Project>
+      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility</Name>
     </ProjectReference>
     <ProjectReference Include="HTMLBuilder\HTMLBuilder.vbproj">

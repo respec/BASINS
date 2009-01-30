@@ -291,7 +291,7 @@ Friend Class frmSediment
         Me.txtSlopeLength.Location = New System.Drawing.Point(167, 197)
         Me.txtSlopeLength.MaxWidth = 20
         Me.txtSlopeLength.Name = "txtSlopeLength"
-        Me.txtSlopeLength.NumericFormat = "0"
+        'Me.txtSlopeLength.NumericFormat = "0"
         Me.txtSlopeLength.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.txtSlopeLength.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
         Me.txtSlopeLength.SelLength = 2
@@ -300,8 +300,8 @@ Friend Class frmSediment
         Me.txtSlopeLength.SoftMax = -999
         Me.txtSlopeLength.SoftMin = -999
         Me.txtSlopeLength.TabIndex = 6
-        Me.txtSlopeLength.ValueDouble = 30
-        Me.txtSlopeLength.ValueInteger = 30
+        'Me.txtSlopeLength.ValueDouble = 30
+        'Me.txtSlopeLength.ValueInteger = 30
         Me.txtSlopeLength.Visible = False
         '
         'txtGridSize
@@ -317,7 +317,7 @@ Friend Class frmSediment
         Me.txtGridSize.Location = New System.Drawing.Point(167, 171)
         Me.txtGridSize.MaxWidth = 20
         Me.txtGridSize.Name = "txtGridSize"
-        Me.txtGridSize.NumericFormat = "0"
+        'Me.txtGridSize.NumericFormat = "0"
         Me.txtGridSize.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.txtGridSize.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
         Me.txtGridSize.SelLength = 2
@@ -327,8 +327,8 @@ Friend Class frmSediment
         Me.txtGridSize.SoftMax = 300
         Me.txtGridSize.SoftMin = 5
         Me.txtGridSize.TabIndex = 4
-        Me.txtGridSize.ValueDouble = 30
-        Me.txtGridSize.ValueInteger = 30
+        'Me.txtGridSize.ValueDouble = 30
+        'Me.txtGridSize.ValueInteger = 30
         '
         'lblSlopeLength
         '
@@ -1347,7 +1347,7 @@ Friend Class frmSediment
     End Sub
 
     Private Sub btnFillTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFillTables.Click
-        If MessageBox.Show("This will update both the Soil Type and Land Use tables below and fill the first column with all unique ID found in the layers previously identified; new values found will be assigned a factor of 1.0. Are you sure you want to continue?", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) = Windows.Forms.DialogResult.Cancel Then Exit Sub
+        If Logger.Message("This will update both the Soil Type and Land Use tables below and fill the first column with all unique ID found in the layers previously identified; new values found will be assigned a factor of 1.0. Are you sure you want to continue?", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, Windows.Forms.DialogResult.Cancel) = Windows.Forms.DialogResult.Cancel Then Exit Sub
         SaveForm()
         ProgressForm = New frmProgress()
 
@@ -1460,9 +1460,11 @@ Friend Class frmSediment
             .DefaultExt = ".Sediment"
             .Filter = "Sediment files (*.sediment)|*.sediment"
             .FilterIndex = 0
-            .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\BASINS\Sediment"
+            .InitialDirectory = Project.SedimentFolder
             If Not My.Computer.FileSystem.DirectoryExists(.InitialDirectory) Then My.Computer.FileSystem.CreateDirectory(.InitialDirectory)
             .Title = "Open Sediment File"
+            Dim sedfiles As System.Collections.ObjectModel.ReadOnlyCollection(Of String) = My.Computer.FileSystem.GetFiles(Project.SedimentFolder, FileIO.SearchOption.SearchTopLevelOnly, "*.sediment")
+            If sedfiles.Count > 0 Then .FileName = sedfiles(0)
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 LoadData(.FileName)
                 LoadForm()
@@ -1489,10 +1491,13 @@ Friend Class frmSediment
             .DefaultExt = ".Sediment"
             .Filter = "Sediment files (*.sediment)|*.sediment"
             .FilterIndex = 0
-            .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\BASINS\Sediment"
+            .InitialDirectory = Project.SedimentFolder
+            .FileName = Project.FileName
             If Not My.Computer.FileSystem.DirectoryExists(.InitialDirectory) Then My.Computer.FileSystem.CreateDirectory(.InitialDirectory)
             .Title = "Save Sediment File"
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then Project.FileName = .FileName : SaveData()
+            Text = "BASINS Sediment Estimator"
+            If .FileName <> "" Then Text &= " - " & IO.Path.GetFileName(.FileName)
             .Dispose()
         End With
     End Sub
@@ -1579,7 +1584,7 @@ Friend Class frmSediment
 
     Private Sub cboSedimentDelivery_SelectionChangeCommitted(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboSedimentDelivery.SelectionChangeCommitted
         If cboSedimentDelivery.SelectedIndex <> 2 Then
-            MessageBox.Show("Only the area-based sediment delivery method is currently implemented.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Logger.Msg("Only the area-based sediment delivery method is currently implemented.")
             cboSedimentDelivery.SelectedIndex = 2
         End If
     End Sub
@@ -1632,7 +1637,7 @@ Friend Class frmSediment
                     btnSaveAs.PerformClick()
                     'e.Cancel = .FileName = ""
                 Else
-                    Select Case MessageBox.Show(String.Format("Save changes to {0}?", .FileName), "File Has Changed", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
+                    Select Case Logger.Message(String.Format("Save changes to {0}?", .FileName), "File Has Changed", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
                         Case Windows.Forms.DialogResult.Yes : SaveForm() : e.Cancel = Not SaveData()
                         Case Windows.Forms.DialogResult.No : e.Cancel = False
                         Case Windows.Forms.DialogResult.Cancel : e.Cancel = True
@@ -1719,6 +1724,18 @@ Friend Class frmSediment
 
         LoadData()
         LoadForm()
+
+        Dim sedfiles As System.Collections.ObjectModel.ReadOnlyCollection(Of String) = My.Computer.FileSystem.GetFiles(Project.SedimentFolder, FileIO.SearchOption.SearchTopLevelOnly, "*.sediment")
+        Select Case sedfiles.Count
+            Case 0
+            Case 1
+                LoadData(sedfiles(0))
+                LoadForm()
+                wbResults.DocumentText = ""
+            Case Else
+                btnOpen.PerformClick()
+        End Select
+
     End Sub
 
     ''' <summary>
@@ -1730,7 +1747,7 @@ Friend Class frmSediment
                 Text = "BASINS Sediment Estimator"
                 If .FileName <> "" Then Text &= " - " & IO.Path.GetFileName(.FileName)
                 txtOutputName.Text = .OutputFolder
-                txtGridSize.Text = .GridSize
+                txtGridSize.Value = .GridSize
                 txtSlopeLength.Text = 0
                 cboSubbasins.Text = .SubbasinLayer
 
@@ -1794,7 +1811,7 @@ Friend Class frmSediment
                 Text = "BASINS Sediment Estimator"
                 If .FileName <> "" Then Text &= " - " & IO.Path.GetFileName(.FileName)
                 .OutputFolder = txtOutputName.Text
-                .GridSize = txtGridSize.Text
+                .GridSize = txtGridSize.Value
                 .SubbasinLayer = cboSubbasins.Text
 
                 .SoilLayer = cboSoilLayer.Text

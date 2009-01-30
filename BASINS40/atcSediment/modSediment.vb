@@ -200,35 +200,39 @@ Public Module Sediment
     ''' <returns>Grid filename</returns>
     ''' <remarks></remarks>
     Private Function CreateGrid(ByVal GridName As String, Optional ByVal gTemplate As MapWinGIS.Grid = Nothing, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.FloatDataType) As String
-        Dim hdr As New MapWinGIS.GridHeader
-        With hdr
-            If gTemplate Is Nothing Then
-                .dX = Math.Round(Project.GridSize * Project.DistFactor, 2) 'convert meters to project units
-                .dY = .dX
-                .NodataValue = -1 'note: cannot do direct comparison to this value (round-off) instead compare to >=0.0
-                Dim xmax, xmin, ymax, ymin As Double
-                GisUtil.ExtentsOfLayer(GisUtil.LayerIndex(Project.SubbasinLayer), xmax, xmin, ymax, ymin)
-                .NumberCols = (xmax - xmin) / .dX
-                .NumberRows = (ymax - ymin) / .dY
-                .XllCenter = xmin + .dX / 2
-                .YllCenter = ymin + .dY / 2
-                .Projection = GisUtil.ProjectProjection
-            Else
-                .CopyFrom(gTemplate.Header)
-            End If
-        End With
+        Try
+            Dim hdr As New MapWinGIS.GridHeader
+            With hdr
+                If gTemplate Is Nothing Then
+                    .dX = Math.Round(Project.GridSize * Project.DistFactor, 2) 'convert meters to project units
+                    .dY = .dX
+                    .NodataValue = -1 'note: cannot do direct comparison to this value (round-off) instead compare to >=0.0
+                    Dim xmax, xmin, ymax, ymin As Double
+                    GisUtil.ExtentsOfLayer(GisUtil.LayerIndex(Project.SubbasinLayer), xmax, xmin, ymax, ymin)
+                    .NumberCols = (xmax - xmin) / .dX
+                    .NumberRows = (ymax - ymin) / .dY
+                    .XllCenter = xmin + .dX / 2
+                    .YllCenter = ymin + .dY / 2
+                Else
+                    .CopyFrom(gTemplate.Header)
+                End If
+            End With
 
-        Dim GridFile As String = String.Format("{0}\{1}.tif", Project.SedimentFolder, GridName)
-        Do While GisUtil.IsLayerByFileName(GridFile)
-            GisUtil.RemoveLayer(GisUtil.LayerIndex(GridFile))
-        Loop
-        MapWinGeoProc.DataManagement.DeleteGrid(GridFile)
+            Dim GridFile As String = String.Format("{0}\{1}.tif", Project.SedimentFolder, GridName)
+            Do While GisUtil.IsLayerByFileName(GridFile)
+                GisUtil.RemoveLayer(GisUtil.LayerIndex(GridFile))
+            Loop
+            MapWinGeoProc.DataManagement.DeleteGrid(GridFile)
 
-        Dim g As New MapWinGIS.Grid
-        If Not g.CreateNew(GridFile, hdr, DataType, hdr.NodataValue, False, MapWinGIS.GridFileType.GeoTiff) Then GridFile = ""
-        g.Close()
-
-        Return GridFile
+            Dim g As New MapWinGIS.Grid
+            If Not g.CreateNew(GridFile, hdr, DataType, hdr.NodataValue, False, MapWinGIS.GridFileType.GeoTiff) Then GridFile = ""
+            g.AssignNewProjection(GisUtil.ProjectProjection)
+            g.Close()
+            Return GridFile
+        Catch ex As Exception
+            ErrorMsg(, ex)
+            Return Nothing
+        End Try
     End Function
 
     Private Function Delivery_Area(ByVal GridFile As String) As Boolean
@@ -307,6 +311,7 @@ Public Module Sediment
                             If Not ProgressForm.SetProgress(r, .NumberRows - 1) Then Return False
                         Next
                     End With
+                    gDest.AssignNewProjection(GisUtil.ProjectProjection)
                     gDest.Save()
                 Else
                     Return False
@@ -347,6 +352,7 @@ Public Module Sediment
                     If Not ProgressForm.SetProgress(r, .NumberRows - 1) Then Return False
                 Next
             End With
+            g.AssignNewProjection(GisUtil.ProjectProjection)
             Return True
         Catch ex As Exception
             ErrorMsg(, ex)
@@ -382,16 +388,19 @@ Public Module Sediment
                     Case enumDEMUnits.Feet : .ElevFactor = 3.2808
                 End Select
 
-                If Not LayerOK(.SubbasinLayer) Then Return False
-                If Not LayerOK(.SoilLayer, .SoilField) Then Return False
+                If Not LayerOK("Subbasins", "General", .SubbasinLayer) Then Return False
+                If Not LayerOK("Soil Type", "Soil Type", .SoilLayer, .SoilField) Then Return False
                 If .LanduseType = enumLandUseType.GIRAS Then
-                    If GIRASLayers(GisUtil.LayerIndex(.SubbasinLayer)).Count = 0 Then Return False
+                    If GIRASLayers(GisUtil.LayerIndex(.SubbasinLayer)).Count = 0 Then
+                        Logger.Msg("No GIRAS layers were found!")
+                        Return False
+                    End If
                 Else
-                    If Not LayerOK(.LandUseLayer, .LandUseField) Then Return False
+                    If Not LayerOK("Land Use", "Land Use", .LandUseLayer, .LandUseField) Then Return False
                 End If
-                If Not LayerOK(.DEMLayer) Then Return False
-                If .UseBMP And Not LayerOK(.BMPLayer, .BMPField) Then Return False
-                If .DeliveryMethod <> enumDeliveryMethod.Area AndAlso Not LayerOK(.StreamLayer) Then Return False
+                If Not LayerOK("DEM", "DEM", .DEMLayer) Then Return False
+                If .UseBMP AndAlso Not LayerOK("BMP", "BMPs", .BMPLayer, .BMPField) Then Return False
+                'If .DeliveryMethod <> enumDeliveryMethod.Area AndAlso Not LayerOK(.StreamLayer) Then Return False
 
             End With
 
@@ -434,6 +443,7 @@ Public Module Sediment
                             Else
                                 If GisUtil.LayerType(.LandUseLayer) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
                                     If Not LookupGrid(GisUtil.LayerFileName(.LandUseLayer), .LandUseField, GridFile, .dictLandUse(.LanduseType)) Then Return False
+                                    If Not GisUtil.AddLayerToGroup(GridFile, SedimentLayer(enumSedimentLayers.Land_Use), GroupName) Then Return False
                                 Else
                                     'resample landuse grid to same resolution as USLE
                                     .LandUseGridFile = CreateGrid(SedimentLayer(enumSedimentLayers.Land_Use), , MapWinGIS.GridDataType.LongDataType)
@@ -581,12 +591,14 @@ Public Module Sediment
     ''' <summary>
     ''' Determine if layer and/or field are available
     ''' </summary>
+    ''' <param name="LayerType">Text description so warning message is more descriptive if not found.</param>
+    ''' <param name="TabName">Name of tab for warning message</param>
     ''' <param name="LayerName">Name of layer</param>
-    ''' <param name="FieldName">Name of field</param>
-    Private Function LayerOK(ByVal LayerName As String, Optional ByVal FieldName As String = "") As Boolean
+    ''' <param name="FieldName">Name of field (if applicable)</param>
+    Private Function LayerOK(ByVal LayerType As String, ByVal TabName As String, ByVal LayerName As String, Optional ByVal FieldName As String = "") As Boolean
         Try
             If LayerName = "" OrElse Not GisUtil.IsLayer(LayerName) Then
-                Logger.Message(String.Format("The layer named '{0}' was not specified or is not available; please correct this before continuing.", LayerName), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning, DialogResult.OK)
+                Logger.Message(String.Format("The {0} layer on the {1} tab named '{2}' is required but was not specified or is not available; please correct this before continuing.", LayerType, TabName, LayerName), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning, DialogResult.OK)
                 Return False
             Else
                 If FieldName <> "" Then
@@ -918,8 +930,8 @@ Public Module Sediment
         Dim sw As IO.StreamWriter = Nothing
         Try
             With Project
-                Dim Folder As String = "C:\BASINS\bin\Plugins\Sediment"
-                If Not My.Computer.FileSystem.DirectoryExists(Folder) Then My.Computer.FileSystem.CreateDirectory(Folder)
+                'Dim Folder As String = "C:\BASINS\bin\Plugins\Sediment"
+                'If Not My.Computer.FileSystem.DirectoryExists(Folder) Then My.Computer.FileSystem.CreateDirectory(Folder)
                 If .FileName = "" Then
                     With New SaveFileDialog
                         .AddExtension = True
@@ -928,7 +940,7 @@ Public Module Sediment
                         .DefaultExt = ".Sediment"
                         .Filter = "Sediment files (*.sediment)|*.sediment"
                         .FilterIndex = 0
-                        .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\BASINS\Sediment"
+                        .InitialDirectory = Project.SedimentFolder
                         If Not My.Computer.FileSystem.DirectoryExists(.InitialDirectory) Then My.Computer.FileSystem.CreateDirectory(.InitialDirectory)
                         .Title = "Save Sediment File"
                         If .ShowDialog <> Windows.Forms.DialogResult.OK Then .Dispose() : Return False
@@ -1068,122 +1080,137 @@ Public Module Sediment
     ''' </summary>
     ''' <returns>Name of .htm output file that was created</returns>
     Friend Function SummaryReport() As String
-        With Project
-            Dim hb As New clsHTMLBuilder
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level2, clsHTMLBuilder.enumAlign.Center, "BASINS Clean Sediment Tool")
+        Try
+            With Project
+                Dim hb As New clsHTMLBuilder
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level2, clsHTMLBuilder.enumAlign.Center, "BASINS Clean Sediment Tool")
 
-            hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent, clsHTMLBuilder.enumBorderStyle.none, , clsHTMLBuilder.enumDividerStyle.None)
-            hb.AppendTableColumn("", , , 200, clsHTMLBuilder.enumWidthUnits.Pixels)
-            hb.AppendTableColumn("")
+                hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent, clsHTMLBuilder.enumBorderStyle.none, , clsHTMLBuilder.enumDividerStyle.None)
+                hb.AppendTableColumn("", , , 200, clsHTMLBuilder.enumWidthUnits.Pixels)
+                hb.AppendTableColumn("")
 
-            hb.AppendTableRow("Filename:", Project.FileName)
-            hb.AppendTableRowEmpty()
-            hb.AppendTableRow("Output Name:", .OutputFolder)
-            hb.AppendTableRow("Grid Size (m):", .GridSize)
-            hb.AppendTableRow("Subbasins Layer:", .SubbasinLayer)
-            hb.AppendTableRowEmpty()
-            hb.AppendTableRow("Soil Type Layer:", .SoilLayer)
-            hb.AppendTableRow("Soil Type ID Field:", .SoilField)
-            hb.AppendTableRowEmpty()
+                hb.AppendTableRow("Filename:", Project.FileName)
+                hb.AppendTableRowEmpty()
+                hb.AppendTableRow("Output Name:", .OutputFolder)
+                hb.AppendTableRow("Grid Size (m):", .GridSize)
+                hb.AppendTableRow("Subbasins Layer:", .SubbasinLayer)
+                hb.AppendTableRowEmpty()
+                hb.AppendTableRow("Soil Type Layer:", .SoilLayer)
+                hb.AppendTableRow("Soil Type ID Field:", .SoilField)
+                hb.AppendTableRowEmpty()
 
-            hb.AppendTableRow("Land Use Layer Type:", .LanduseType.ToString)
-            If .LanduseType <> enumLandUseType.GIRAS Then
-                hb.AppendTableRow("Land Use Layer:", .LandUseLayer)
-                If .LanduseType = enumLandUseType.UserShapefile Then
-                    hb.AppendTableRow("Land Use Field:", .LandUseField)
+                hb.AppendTableRow("Land Use Layer Type:", .LanduseType.ToString)
+                If .LanduseType <> enumLandUseType.GIRAS Then
+                    hb.AppendTableRow("Land Use Layer:", .LandUseLayer)
+                    If .LanduseType = enumLandUseType.UserShapefile Then
+                        hb.AppendTableRow("Land Use Field:", .LandUseField)
+                    End If
                 End If
-            End If
-            hb.AppendTableRowEmpty()
+                hb.AppendTableRowEmpty()
 
-            hb.AppendTableRow("DEM Layer:", .DEMLayer)
-            hb.AppendTableRow("DEM Elevation Units:", .DEMUnits.ToString)
-            hb.AppendTableRowEmpty()
+                hb.AppendTableRow("DEM Layer:", .DEMLayer)
+                hb.AppendTableRow("DEM Elevation Units:", .DEMUnits.ToString)
+                hb.AppendTableRowEmpty()
 
-            hb.AppendTableRow("R Factor:", .R_Factor)
-            hb.AppendTableRowEmpty()
-            hb.AppendTableEnd()
-
-            hb.AppendImage("R Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "R Factor Map")
-            hb.AppendHorizLine()
-
-            AppendLookupTable(hb, "Soil Type/Erodibility Factors", Project.SoilLayer, Project.SoilField, Project.dictSoil)
-
-            hb.AppendLineBreak()
-            hb.AppendImage("K Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "K Factor Map")
-            hb.AppendHorizLine()
-
-            AppendLookupTable(hb, "Land Use/Cropping Factors", "Land Use", "", Project.dictLandUse(Project.LanduseType))
-
-            hb.AppendLineBreak()
-            hb.AppendImage("C Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "C Factor Map")
-            hb.AppendHorizLine()
-
-            hb.AppendImage("LS Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "LS Factor Map")
-            hb.AppendHorizLine()
-
-            hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent, clsHTMLBuilder.enumBorderStyle.none, , clsHTMLBuilder.enumDividerStyle.None)
-            hb.AppendTableColumn("", , , 200, clsHTMLBuilder.enumWidthUnits.Pixels)
-            hb.AppendTableColumn("")
-            hb.AppendTableRowEmpty()
-            hb.AppendTableRow("Use BMPs?", IIf(.UseBMP, "Yes", "No"))
-            hb.AppendTableRowEmpty()
-
-            If .UseBMP Then
-                hb.AppendTableRow("BMP Layer:", .BMPLayer)
-                hb.AppendTableRow("BMP Type Field:", .BMPField)
+                hb.AppendTableRow("R Factor:", .R_Factor)
+                hb.AppendTableRowEmpty()
                 hb.AppendTableEnd()
-                AppendLookupTable(hb, "BMP Type/Conservation Practice Factors", Project.BMPLayer, Project.BMPField, Project.dictBMP)
-                hb.AppendPara(clsHTMLBuilder.enumAlign.Left, "")
-                hb.AppendImage("P Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "P Factor Map")
-            End If
-            hb.AppendHorizLine()
 
-            hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent, clsHTMLBuilder.enumBorderStyle.none, , clsHTMLBuilder.enumDividerStyle.None)
-            hb.AppendTableColumn("", , , 200, clsHTMLBuilder.enumWidthUnits.Pixels)
-            hb.AppendTableColumn("")
-
-            hb.AppendTableRowEmpty()
-            hb.AppendTableRow("Sediment Delivery Method:", .DeliveryMethod.ToString)
-            If .DeliveryMethod <> enumDeliveryMethod.Area Then hb.AppendTableRow("Area Threshold (km):", .StreamThreshold)
-            hb.AppendTableRowEmpty()
-            hb.AppendTableEnd()
-
-            If .DeliveryMethod <> enumDeliveryMethod.Area Then
-                hb.AppendImage("Stream Grid.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "Stream Grid Map")
-            End If
-
-            hb.AppendHorizLine()
-            hb.AppendImage("Delivery Ratio.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "Delivery Ratio Map")
-
-            hb.AppendHorizLine()
-            hb.AppendImage("USLE Sheet & Rill Erosion.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "USLE Sheet & Rill Erosion Map")
-
-            hb.AppendHorizLine()
-            hb.AppendImage("USLE Sediment.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "USLE Sediment Map")
-            hb.AppendHorizLine()
-
-            AppendResultsTable(hb, "Erosion and Sediment Calculation Results")
-
-            For i As Integer = 0 To GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) - 1
+                hb.AppendImage("R Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "R Factor Map")
                 hb.AppendHorizLine()
-                AppendUSLESummaryTable(hb, i)
-            Next
 
-            Dim OutputFolder As String = .SedimentFolder & "\" & .OutputFolder
-            If Not My.Computer.FileSystem.DirectoryExists(OutputFolder) Then My.Computer.FileSystem.CreateDirectory(OutputFolder)
-            Dim OutputFile As String = OutputFolder & "\Sediment.htm"
-            hb.Save(OutputFile)
-            Return OutputFile
-        End With
+                AppendLookupTable(hb, "Soil Type/Erodibility Factors", Project.SoilLayer, Project.SoilField, Project.dictSoil)
+
+                hb.AppendLineBreak()
+                hb.AppendImage("K Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "K Factor Map")
+                hb.AppendHorizLine()
+
+                If .LanduseType = enumLandUseType.GIRAS Then
+                    Dim lyrList As Generic.List(Of Integer) = GIRASLayers(GisUtil.LayerIndex(.SubbasinLayer))
+                    If lyrList Is Nothing Then
+                        Logger.Message("The GIRAS land use index layer was not found, or is in the wrong format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+                    End If
+                    For Each lyr As Integer In lyrList
+                        AppendLookupTable(hb, "Land Use/Cropping Factors", GisUtil.LayerName(lyr), "LUCODE", Project.dictLandUse(Project.LanduseType))
+                    Next
+                Else
+                    AppendLookupTable(hb, "Land Use/Cropping Factors", SedimentLayer(enumSedimentLayers.Land_Use), "", Project.dictLandUse(Project.LanduseType))
+                End If
+
+                hb.AppendLineBreak()
+                hb.AppendImage("C Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "C Factor Map")
+                hb.AppendHorizLine()
+
+                hb.AppendImage("LS Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "LS Factor Map")
+                hb.AppendHorizLine()
+
+                hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent, clsHTMLBuilder.enumBorderStyle.none, , clsHTMLBuilder.enumDividerStyle.None)
+                hb.AppendTableColumn("", , , 200, clsHTMLBuilder.enumWidthUnits.Pixels)
+                hb.AppendTableColumn("")
+                hb.AppendTableRowEmpty()
+                hb.AppendTableRow("Use BMPs?", IIf(.UseBMP, "Yes", "No"))
+                hb.AppendTableRowEmpty()
+
+                If .UseBMP Then
+                    hb.AppendTableRow("BMP Layer:", .BMPLayer)
+                    hb.AppendTableRow("BMP Type Field:", .BMPField)
+                    hb.AppendTableEnd()
+                    AppendLookupTable(hb, "BMP Type/Conservation Practice Factors", Project.BMPLayer, Project.BMPField, Project.dictBMP)
+                    hb.AppendPara(clsHTMLBuilder.enumAlign.Left, "")
+                    hb.AppendImage("P Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                    hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "P Factor Map")
+                End If
+                hb.AppendHorizLine()
+
+                hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent, clsHTMLBuilder.enumBorderStyle.none, , clsHTMLBuilder.enumDividerStyle.None)
+                hb.AppendTableColumn("", , , 200, clsHTMLBuilder.enumWidthUnits.Pixels)
+                hb.AppendTableColumn("")
+
+                hb.AppendTableRowEmpty()
+                hb.AppendTableRow("Sediment Delivery Method:", .DeliveryMethod.ToString)
+                If .DeliveryMethod <> enumDeliveryMethod.Area Then hb.AppendTableRow("Area Threshold (km):", .StreamThreshold)
+                hb.AppendTableRowEmpty()
+                hb.AppendTableEnd()
+
+                If .DeliveryMethod <> enumDeliveryMethod.Area Then
+                    hb.AppendImage("Stream Grid.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                    hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "Stream Grid Map")
+                End If
+
+                hb.AppendHorizLine()
+                hb.AppendImage("Delivery Ratio.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "Delivery Ratio Map")
+
+                hb.AppendHorizLine()
+                hb.AppendImage("USLE Sheet & Rill Erosion.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "USLE Sheet & Rill Erosion Map")
+
+                hb.AppendHorizLine()
+                hb.AppendImage("USLE Sediment.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
+                hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "USLE Sediment Map")
+                hb.AppendHorizLine()
+
+                AppendResultsTable(hb, "Erosion and Sediment Calculation Results")
+
+                For i As Integer = 0 To GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) - 1
+                    hb.AppendHorizLine()
+                    AppendUSLESummaryTable(hb, i)
+                Next
+
+                Dim OutputFolder As String = .SedimentFolder & "\" & .OutputFolder
+                If Not My.Computer.FileSystem.DirectoryExists(OutputFolder) Then My.Computer.FileSystem.CreateDirectory(OutputFolder)
+                Dim OutputFile As String = OutputFolder & "\Sediment.htm"
+                hb.Save(OutputFile)
+                Return OutputFile
+            End With
+        Catch ex As Exception
+            ErrorMsg(, ex)
+            Return ""
+        End Try
     End Function
 
     ''' <summary>
@@ -1192,22 +1219,27 @@ Public Module Sediment
     ''' <param name="LayerName">Name of detailed layer</param>
     ''' <param name="FieldName">Name of shapefile field to summarize by (ignored if LayerName refers to grid file)</param>
     Friend Function TabulateAreas(ByVal LayerName As String, Optional ByVal FieldName As String = "") As Generic.SortedDictionary(Of String, Double())
-        Dim SourceLayerIndex As Integer = GisUtil.LayerIndex(LayerName)
-        Dim BasinLayerIndex As Integer = GisUtil.LayerIndex(Project.SubbasinLayer)
-        Dim d As Generic.SortedDictionary(Of String, Double())
-        If GisUtil.LayerType(SourceLayerIndex) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
-            Dim SourceFieldIndex As Integer = GisUtil.FieldIndex(SourceLayerIndex, FieldName)
-            d = GisUtil.TabulatePolygonAreas(SourceLayerIndex, SourceFieldIndex, BasinLayerIndex)
-        Else 'grid
-            d = GisUtil.TabulateAreas(SourceLayerIndex, BasinLayerIndex)
-        End If
-        'convert to acres
-        For Each k As String In d.Keys
-            For i As Integer = 0 To d.Item(k).Length - 1
-                d.Item(k)(i) /= (Project.DistFactor ^ 2 * 4046.86) 'convert to meters then square meters to acres
+        Try
+            Dim SourceLayerIndex As Integer = GisUtil.LayerIndex(LayerName)
+            Dim BasinLayerIndex As Integer = GisUtil.LayerIndex(Project.SubbasinLayer)
+            Dim d As Generic.SortedDictionary(Of String, Double())
+            If GisUtil.LayerType(SourceLayerIndex) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+                Dim SourceFieldIndex As Integer = GisUtil.FieldIndex(SourceLayerIndex, FieldName)
+                d = GisUtil.TabulatePolygonAreas(SourceLayerIndex, SourceFieldIndex, BasinLayerIndex)
+            Else 'grid
+                d = GisUtil.TabulateAreas(SourceLayerIndex, BasinLayerIndex)
+            End If
+            'convert to acres
+            For Each k As String In d.Keys
+                For i As Integer = 0 To d.Item(k).Length - 1
+                    d.Item(k)(i) /= (Project.DistFactor ^ 2 * 4046.86) 'convert to meters then square meters to acres
+                Next
             Next
-        Next
-        Return d
+            Return d
+        Catch ex As Exception
+            ErrorMsg(, ex)
+            Return Nothing
+        End Try
     End Function
 
     ''' <summary>
@@ -1219,42 +1251,45 @@ Public Module Sediment
     ''' <param name="LayerField">If layer is shapefile, fieldname used for lookup</param>
     ''' <param name="LookupDict">Dictionary that related lookup ID with USLE factors</param>
     Private Sub AppendLookupTable(ByVal hb As HTMLBuilder.clsHTMLBuilder, ByVal TableName As String, ByVal LayerName As String, ByVal LayerField As String, ByVal LookupDict As Generic.Dictionary(Of String, clsLookup))
+        Try
+            ProgressForm.Status = String.Format("Tabulating {0} areas...", TableName)
 
-        ProgressForm.Status = String.Format("Tabulating {0} areas...", TableName)
-
-        hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
-        hb.AppendTable()
-        For c As Integer = 0 To 3 + GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) - 1
-            If c = 0 Then
-                hb.AppendTableColumn("ID", clsHTMLBuilder.enumAlign.Center)
-            ElseIf c = 1 Then
-                hb.AppendTableColumn("Description", clsHTMLBuilder.enumAlign.Left)
-            ElseIf c = 2 Then
-                hb.AppendTableColumn("Factor", clsHTMLBuilder.enumAlign.Right)
-            Else
-                Dim AreaNum As String = ""
-                If GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) > 1 Then AreaNum = " " & c - 2
-                hb.AppendTableColumn(String.Format("Area{0}\n(ac)", AreaNum), , clsHTMLBuilder.enumAlign.Right)
-            End If
-        Next
-        Dim dictArea As Generic.SortedDictionary(Of String, Double()) = TabulateAreas(LayerName, LayerField)
-        For Each key As String In dictArea.Keys
-            hb.AppendTableRow()
-            hb.AppendTableCell(key)
-            If LookupDict.ContainsKey(key) Then
-                hb.AppendTableCell(LookupDict(key).Description)
-                hb.AppendTableCell(LookupDict(key).Factor.ToString("0.0000"))
-            Else
-                hb.AppendTableCell("")
-                hb.AppendTableCell("")
-            End If
-            For c As Integer = 0 To dictArea.Item(key).Length - 1
-                hb.AppendTableCell(String.Format("{0:0.0}", dictArea.Item(key)(c)))
+            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
+            hb.AppendTable()
+            For c As Integer = 0 To 3 + GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) - 1
+                If c = 0 Then
+                    hb.AppendTableColumn("ID", clsHTMLBuilder.enumAlign.Center)
+                ElseIf c = 1 Then
+                    hb.AppendTableColumn("Description", clsHTMLBuilder.enumAlign.Left)
+                ElseIf c = 2 Then
+                    hb.AppendTableColumn("Factor", clsHTMLBuilder.enumAlign.Right)
+                Else
+                    Dim AreaNum As String = ""
+                    If GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) > 1 Then AreaNum = " " & c - 2
+                    hb.AppendTableColumn(String.Format("Area{0}\n(ac)", AreaNum), , clsHTMLBuilder.enumAlign.Right)
+                End If
             Next
-            hb.AppendTableCellEnd()
-        Next
-        hb.AppendTableRowEnd()
-        hb.AppendTableEnd()
+            Dim dictArea As Generic.SortedDictionary(Of String, Double()) = TabulateAreas(LayerName, LayerField)
+            For Each key As String In dictArea.Keys
+                hb.AppendTableRow()
+                hb.AppendTableCell(key)
+                If LookupDict.ContainsKey(key) Then
+                    hb.AppendTableCell(LookupDict(key).Description)
+                    hb.AppendTableCell(LookupDict(key).Factor.ToString("0.0000"))
+                Else
+                    hb.AppendTableCell("")
+                    hb.AppendTableCell("")
+                End If
+                For c As Integer = 0 To dictArea.Item(key).Length - 1
+                    hb.AppendTableCell(String.Format("{0:0.0}", dictArea.Item(key)(c)))
+                Next
+                hb.AppendTableCellEnd()
+            Next
+            hb.AppendTableRowEnd()
+            hb.AppendTableEnd()
+        Catch ex As Exception
+            ErrorMsg(, ex)
+        End Try
     End Sub
 
     ''' <summary>
@@ -1263,64 +1298,71 @@ Public Module Sediment
     ''' <param name="hb">Active HTMLBuilder</param>
     ''' <param name="TableName">Desired title to be placed before table</param>
     Private Sub AppendResultsTable(ByVal hb As HTMLBuilder.clsHTMLBuilder, ByVal TableName As String)
-        ProgressForm.Status = String.Format("Tabulating {0} summary...", TableName)
+        Try
+            ProgressForm.Status = String.Format("Tabulating {0} summary...", TableName)
 
-        hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
-        hb.AppendTable()
-        hb.AppendTableColumn("Watershed", clsHTMLBuilder.enumAlign.Center)
-        hb.AppendTableColumn("Area\n(ac)", clsHTMLBuilder.enumAlign.Center)
-        hb.AppendTableColumn("Erosion\n(t/ac/yr)", clsHTMLBuilder.enumAlign.Center)
-        hb.AppendTableColumn("Delivery\nRatio", clsHTMLBuilder.enumAlign.Center)
-        hb.AppendTableColumn("Sediment\n(t/ac/yr)", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
+            hb.AppendTable()
+            hb.AppendTableColumn("Watershed", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendTableColumn("Area\n(ac)", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendTableColumn("Erosion\n(t/ac/yr)", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendTableColumn("Delivery\nRatio", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendTableColumn("Sediment\n(t/ac/yr)", clsHTMLBuilder.enumAlign.Center)
 
-        Dim sf As New MapWinGIS.Shapefile
-        sf.Open(GisUtil.LayerFileName(Project.SubbasinLayer))
-        sf.BeginPointInShapefile()
+            Dim sf As New MapWinGIS.Shapefile
+            sf.Open(GisUtil.LayerFileName(Project.SubbasinLayer))
+            sf.BeginPointInShapefile()
 
-        Dim gE As New MapWinGIS.Grid
-        gE.Open(GisUtil.LayerFileName(SedimentLayer(enumSedimentLayers.USLE_Erosion)))
+            Dim gE As New MapWinGIS.Grid
+            gE.Open(GisUtil.LayerFileName(SedimentLayer(enumSedimentLayers.USLE_Erosion)))
 
-        Dim gS As New MapWinGIS.Grid
-        gS.Open(GisUtil.LayerFileName(SedimentLayer(enumSedimentLayers.USLE_Sediment)))
+            Dim gS As New MapWinGIS.Grid
+            gS.Open(GisUtil.LayerFileName(SedimentLayer(enumSedimentLayers.USLE_Sediment)))
 
-        For i As Integer = 0 To GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) - 1
-            'tabulate total area and weighted loads
-            Dim TotalArea As Single = 0, TotalErosion As Single = 0, TotalSediment As Single = 0
-            With gE.Header
-                For r As Integer = 0 To .NumberRows - 1
-                    Dim x, y As Double
-                    gE.CellToProj(0, r, x, y)
-                    Dim arE(.NumberCols - 1) As Single
-                    Dim arS(.NumberCols - 1) As Single
-                    gE.GetRow(r, arE(0))
-                    gS.GetRow(r, arS(0))
-                    For c As Integer = 0 To .NumberCols - 1
-                        If arE(c) <> .NodataValue AndAlso sf.PointInShape(i, x, y) Then
-                            TotalArea += 1
-                            TotalErosion += arE(c)
-                            TotalSediment += arS(c)
-                        End If
-                        x += .dX
+            For i As Integer = 0 To GisUtil.NumFeatures(GisUtil.LayerIndex(Project.SubbasinLayer)) - 1
+                'tabulate total area and weighted loads
+                Dim TotalArea As Single = 0, TotalErosion As Single = 0, TotalSediment As Single = 0
+                With gE.Header
+                    For r As Integer = 0 To .NumberRows - 1
+                        Dim x, y As Double
+                        gE.CellToProj(0, r, x, y)
+                        Dim arE(.NumberCols - 1) As Single
+                        Dim arS(.NumberCols - 1) As Single
+                        gE.GetRow(r, arE(0))
+                        gS.GetRow(r, arS(0))
+                        For c As Integer = 0 To .NumberCols - 1
+                            If arE(c) <> .NodataValue AndAlso sf.PointInShape(i, x, y) Then
+                                TotalArea += 1
+                                TotalErosion += arE(c)
+                                TotalSediment += arS(c)
+                            End If
+                            x += .dX
+                        Next
                     Next
-                Next
-                TotalErosion /= TotalArea 'this gives weighted average in t/ac/yr
-                TotalSediment /= TotalArea
-                TotalArea *= .dX * .dY / (Project.DistFactor ^ 2 * 4046.86) 'convert to meters then square meters to acres
-            End With
-            hb.AppendTableRow()
-            hb.AppendTableCell("Subbasin " & i + 1)
-            hb.AppendTableCell(TotalArea.ToString("0.0"))
-            hb.AppendTableCell(TotalErosion.ToString("0.00"))
-            hb.AppendTableCell((TotalSediment / TotalErosion).ToString("0.00"))
-            hb.AppendTableCell(TotalSediment.ToString("0.00"))
-            hb.AppendTableCellEnd()
-            hb.AppendTableRowEnd()
-        Next
-        hb.AppendTableEnd()
+                    TotalErosion /= TotalArea 'this gives weighted average in t/ac/yr
+                    TotalSediment /= TotalArea
+                    TotalArea *= .dX * .dY / (Project.DistFactor ^ 2 * 4046.86) 'convert to meters then square meters to acres
+                End With
+                hb.AppendTableRow()
+                hb.AppendTableCell("Subbasin " & i + 1)
+                hb.AppendTableCell(TotalArea.ToString("0.0"))
+                hb.AppendTableCell(TotalErosion.ToString("0.00"))
+                hb.AppendTableCell((TotalSediment / TotalErosion).ToString("0.00"))
+                hb.AppendTableCell(TotalSediment.ToString("0.00"))
+                hb.AppendTableCellEnd()
+                hb.AppendTableRowEnd()
+            Next
+            hb.AppendTableEnd()
 
-        gE.Close()
-        sf.EndPointInShapefile()
-        sf.Close()
+            gE.AssignNewProjection(GisUtil.ProjectProjection)
+            gS.AssignNewProjection(GisUtil.ProjectProjection)
+
+            gE.Close()
+            sf.EndPointInShapefile()
+            sf.Close()
+        Catch ex As Exception
+            ErrorMsg(, ex)
+        End Try
     End Sub
 
     ''' <summary>
@@ -1329,59 +1371,63 @@ Public Module Sediment
     ''' <param name="hb">Active HTMLBuilder</param>
     ''' <param name="SubbasinIndex">Index number of desired subbasin</param>
     Private Sub AppendUSLESummaryTable(ByVal hb As HTMLBuilder.clsHTMLBuilder, ByVal SubbasinIndex As Integer)
-        Dim TableName As String = String.Format("Subbasin {0} USLE Parameters", SubbasinIndex + 1)
+        Try
+            Dim TableName As String = String.Format("Subbasin {0} USLE Parameters", SubbasinIndex + 1)
 
-        ProgressForm.Status = String.Format("Tabulating {0} summary...", TableName)
+            ProgressForm.Status = String.Format("Tabulating {0} summary...", TableName)
 
-        hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
-        hb.AppendTable()
-        hb.AppendTableColumn("Item", clsHTMLBuilder.enumAlign.Center)
-        hb.AppendTableColumn("Min", clsHTMLBuilder.enumAlign.Center)
-        hb.AppendTableColumn("Max", clsHTMLBuilder.enumAlign.Center)
-        hb.AppendTableColumn("Mean", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
+            hb.AppendTable()
+            hb.AppendTableColumn("Item", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendTableColumn("Min", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendTableColumn("Max", clsHTMLBuilder.enumAlign.Center)
+            hb.AppendTableColumn("Mean", clsHTMLBuilder.enumAlign.Center)
 
-        Dim sf As New MapWinGIS.Shapefile
-        sf.Open(GisUtil.LayerFileName(Project.SubbasinLayer))
-        sf.BeginPointInShapefile()
+            Dim sf As New MapWinGIS.Shapefile
+            sf.Open(GisUtil.LayerFileName(Project.SubbasinLayer))
+            sf.BeginPointInShapefile()
 
-        For i As enumSedimentLayers = enumSedimentLayers.R_Factors To enumSedimentLayers.USLE_Sediment
-            Dim g As New MapWinGIS.Grid
-            g.Open(GisUtil.LayerFileName(SedimentLayer(i)))
+            For i As enumSedimentLayers = enumSedimentLayers.R_Factors To enumSedimentLayers.USLE_Sediment
+                Dim g As New MapWinGIS.Grid
+                g.Open(GisUtil.LayerFileName(SedimentLayer(i)))
 
-            Dim CellCount As Single = 0, MeanFactor As Single = 0, MinFactor As Single = Single.MaxValue, MaxFactor As Single = Single.MinValue
-            With g.Header
-                For r As Integer = 0 To .NumberRows - 1
-                    Dim x, y As Double
-                    g.CellToProj(0, r, x, y)
-                    Dim ar(.NumberCols - 1) As Single
-                    g.GetRow(r, ar(0))
-                    For c As Integer = 0 To .NumberCols - 1
-                        If ar(c) <> .NodataValue AndAlso ar(c) <> 0.0 AndAlso sf.PointInShape(SubbasinIndex, x, y) Then
-                            CellCount += 1
-                            MeanFactor += ar(c)
-                            MinFactor = Math.Min(MinFactor, ar(c))
-                            MaxFactor = Math.Max(MaxFactor, ar(c))
-                        End If
-                        x += .dX
+                Dim CellCount As Single = 0, MeanFactor As Single = 0, MinFactor As Single = Single.MaxValue, MaxFactor As Single = Single.MinValue
+                With g.Header
+                    For r As Integer = 0 To .NumberRows - 1
+                        Dim x, y As Double
+                        g.CellToProj(0, r, x, y)
+                        Dim ar(.NumberCols - 1) As Single
+                        g.GetRow(r, ar(0))
+                        For c As Integer = 0 To .NumberCols - 1
+                            If ar(c) <> .NodataValue AndAlso ar(c) <> 0.0 AndAlso sf.PointInShape(SubbasinIndex, x, y) Then
+                                CellCount += 1
+                                MeanFactor += ar(c)
+                                MinFactor = Math.Min(MinFactor, ar(c))
+                                MaxFactor = Math.Max(MaxFactor, ar(c))
+                            End If
+                            x += .dX
+                        Next
                     Next
-                Next
-                MeanFactor /= CellCount 'this gives weighted average 
-                hb.AppendTableRow()
-                hb.AppendTableCell(clsHTMLBuilder.enumAlign.Center, SedimentLayer(i))
-                If CellCount > 0 Then
-                    hb.AppendTableCell(MinFactor.ToString("0.00"))
-                    hb.AppendTableCell(MaxFactor.ToString("0.00"))
-                    hb.AppendTableCell(MeanFactor.ToString("0.00"))
-                End If
-                hb.AppendTableCellEnd()
-                hb.AppendTableRowEnd()
-            End With
-            g.Close()
-        Next
-        hb.AppendTableEnd()
+                    MeanFactor /= CellCount 'this gives weighted average 
+                    hb.AppendTableRow()
+                    hb.AppendTableCell(clsHTMLBuilder.enumAlign.Center, SedimentLayer(i))
+                    If CellCount > 0 Then
+                        hb.AppendTableCell(MinFactor.ToString("0.00"))
+                        hb.AppendTableCell(MaxFactor.ToString("0.00"))
+                        hb.AppendTableCell(MeanFactor.ToString("0.00"))
+                    End If
+                    hb.AppendTableCellEnd()
+                    hb.AppendTableRowEnd()
+                End With
+                g.Close()
+            Next
+            hb.AppendTableEnd()
 
-        sf.EndPointInShapefile()
-        sf.Close()
+            sf.EndPointInShapefile()
+            sf.Close()
+        Catch ex As Exception
+            ErrorMsg(, ex)
+        End Try
     End Sub
 
     ''' <summary>
@@ -1390,16 +1436,20 @@ Public Module Sediment
     ''' <param name="LayerName">Name of layer</param>
     ''' <param name="ColoringScheme">Predefined coloring scheme</param>
     Private Sub ApplyColoringScheme(ByVal LayerName As String, ByVal ColoringScheme As MapWinGIS.PredefinedColorScheme)
-        Dim g As New MapWinGIS.Grid
-        If Not g.Open(GisUtil.LayerFileName(LayerName), , False) Then Exit Sub
+        Try
+            Dim g As New MapWinGIS.Grid
+            If Not g.Open(GisUtil.LayerFileName(LayerName), , False) Then Exit Sub
 
-        Dim scheme As New MapWinGIS.GridColorScheme
-        With scheme
-            .UsePredefined(g.Minimum * 0.999, g.Maximum * 1.001, ColoringScheme) 'prevent round-off errors from causing empty cells
-        End With
-        g.Close()
+            Dim scheme As New MapWinGIS.GridColorScheme
+            With scheme
+                .UsePredefined(g.Minimum * 0.999, g.Maximum * 1.001, ColoringScheme) 'prevent round-off errors from causing empty cells
+            End With
+            g.Close()
 
-        GisUtil.ColoringScheme(GisUtil.LayerIndex(LayerName)) = scheme
+            GisUtil.ColoringScheme(GisUtil.LayerIndex(LayerName)) = scheme
+        Catch ex As Exception
+            ErrorMsg(, ex)
+        End Try
     End Sub
 
     ''' <summary>
@@ -1412,35 +1462,39 @@ Public Module Sediment
     ''' <param name="Color2">Color assigned to upper range</param>
     ''' <param name="BreakValue">Grid value that separates two ranges</param>
     Private Sub ApplyColoringScheme(ByVal LayerName As String, ByVal Caption1 As String, ByVal Color1 As System.Drawing.Color, ByVal Caption2 As String, ByVal Color2 As System.Drawing.Color, ByVal BreakValue As Double)
-        Dim g As New MapWinGIS.Grid
-        g.Open(GisUtil.LayerFileName(LayerName), , False)
+        Try
+            Dim g As New MapWinGIS.Grid
+            g.Open(GisUtil.LayerFileName(LayerName), , False)
 
-        Dim scheme As New MapWinGIS.GridColorScheme
-        Dim b1 As New MapWinGIS.GridColorBreak
-        With b1
-            .Caption = Caption1
-            .LowValue = g.Minimum
-            .HighValue = BreakValue
-            .ColoringType = MapWinGIS.ColoringType.Gradient
-            .LowColor = System.Convert.ToUInt32(RGB(Color1.R, Color1.G, Color1.B))
-            .HighColor = .LowColor
-        End With
-        scheme.InsertBreak(b1)
+            Dim scheme As New MapWinGIS.GridColorScheme
+            Dim b1 As New MapWinGIS.GridColorBreak
+            With b1
+                .Caption = Caption1
+                .LowValue = g.Minimum
+                .HighValue = BreakValue
+                .ColoringType = MapWinGIS.ColoringType.Gradient
+                .LowColor = System.Convert.ToUInt32(RGB(Color1.R, Color1.G, Color1.B))
+                .HighColor = .LowColor
+            End With
+            scheme.InsertBreak(b1)
 
-        Dim b2 As New MapWinGIS.GridColorBreak
-        With b2
-            .Caption = Caption2
-            .LowValue = BreakValue * 1.0001
-            .HighValue = g.Maximum * 1.0001
-            .ColoringType = MapWinGIS.ColoringType.Gradient
-            .LowColor = System.Convert.ToUInt32(RGB(Color2.R, Color2.G, Color2.B))
-            .HighColor = .LowColor
-        End With
-        scheme.InsertBreak(b2)
+            Dim b2 As New MapWinGIS.GridColorBreak
+            With b2
+                .Caption = Caption2
+                .LowValue = BreakValue * 1.0001
+                .HighValue = g.Maximum * 1.0001
+                .ColoringType = MapWinGIS.ColoringType.Gradient
+                .LowColor = System.Convert.ToUInt32(RGB(Color2.R, Color2.G, Color2.B))
+                .HighColor = .LowColor
+            End With
+            scheme.InsertBreak(b2)
 
-        g.Close()
+            g.Close()
 
-        GisUtil.ColoringScheme(GisUtil.LayerIndex(LayerName)) = scheme
+            GisUtil.ColoringScheme(GisUtil.LayerIndex(LayerName)) = scheme
+        Catch ex As Exception
+            ErrorMsg(, ex)
+        End Try
     End Sub
 
     ''' <summary>
