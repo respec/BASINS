@@ -542,6 +542,7 @@ Public Class frmCAT
         Me.btnStart.Size = New System.Drawing.Size(56, 24)
         Me.btnStart.TabIndex = 0
         Me.btnStart.Text = "Start"
+        Me.btnStart.Visible = False
         '
         'MainMenu1
         '
@@ -696,6 +697,7 @@ Public Class frmCAT
         Me.btnPlot.Size = New System.Drawing.Size(56, 24)
         Me.btnPlot.TabIndex = 4
         Me.btnPlot.Text = "Plot"
+        Me.btnPlot.Visible = False
         '
         'mnuOpenSWAT
         '
@@ -770,7 +772,7 @@ Public Class frmCAT
     End Sub
 
     Public Sub NoExecutionAllowed()
-        btnStart.Visible = False
+        btnStart.Enabled = False
     End Sub
 
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
@@ -804,10 +806,14 @@ Public Class frmCAT
             txtBaseScenario.Text = ""
             lblOpen.Visible = True
             myTabs.Visible = False
+            btnStart.Visible = False
+            btnPlot.Visible = False
         Else
             txtBaseScenario.Text = pCat.Model.BaseScenario
             lblOpen.Visible = False
             myTabs.Visible = True
+            btnStart.Visible = True
+            btnPlot.Visible = True
         End If
         RefreshInputList()
         RefreshTotalIterations()
@@ -1571,6 +1577,8 @@ Public Class frmCAT
         txtBaseScenario.Text = aBaseScenarioName
         lblOpen.Visible = False
         myTabs.Visible = True
+        btnStart.Visible = True
+        btnPlot.Visible = True
     End Sub
 
     Private Sub pCat_Started() Handles pCat.Started
