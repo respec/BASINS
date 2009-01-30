@@ -137,7 +137,7 @@ Public Class atcVariation
 
         Dim lModifyThis As atcTimeseries
 
-        For Each lOriginalData As atcDataSet In DataSets
+        For Each lOriginalData As atcTimeseries In DataSets
             Dim lSplitData As atcTimeseriesGroup = Nothing
             If UseEvents Then
                 lEvents = EventSplit(lOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)

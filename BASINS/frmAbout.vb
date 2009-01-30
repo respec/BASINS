@@ -37,10 +37,10 @@ Friend Class frmAbout
     Friend WithEvents lblMapwinVersion As System.Windows.Forms.Label
     Friend WithEvents lblProjFileLabel As System.Windows.Forms.Label
     Friend WithEvents lblConfigFileLabel As System.Windows.Forms.Label
-    Friend WithEvents lblBASINS As System.Windows.Forms.Label
-    Friend WithEvents lblBasinsVersion As System.Windows.Forms.Label
-    Friend WithEvents lblBasinsURL As System.Windows.Forms.LinkLabel
-    Friend WithEvents picBASINS As System.Windows.Forms.PictureBox
+    Friend WithEvents lblProgramName As System.Windows.Forms.Label
+    Friend WithEvents lblPluginVersion As System.Windows.Forms.Label
+    Friend WithEvents lblProgramURL As System.Windows.Forms.LinkLabel
+    Friend WithEvents picProgramLogo As System.Windows.Forms.PictureBox
     Friend WithEvents lblAquaTerraURL As System.Windows.Forms.LinkLabel
     Friend WithEvents picATC As System.Windows.Forms.PictureBox
     Friend WithEvents picZedGraph As System.Windows.Forms.PictureBox
@@ -59,10 +59,10 @@ Friend Class frmAbout
         Me.lblConfigFileLabel = New System.Windows.Forms.Label
         Me.lblProjFile = New System.Windows.Forms.Label
         Me.lblConfigFile = New System.Windows.Forms.Label
-        Me.picBASINS = New System.Windows.Forms.PictureBox
-        Me.lblBASINS = New System.Windows.Forms.Label
-        Me.lblBasinsVersion = New System.Windows.Forms.Label
-        Me.lblBasinsURL = New System.Windows.Forms.LinkLabel
+        Me.picProgramLogo = New System.Windows.Forms.PictureBox
+        Me.lblProgramName = New System.Windows.Forms.Label
+        Me.lblPluginVersion = New System.Windows.Forms.Label
+        Me.lblProgramURL = New System.Windows.Forms.LinkLabel
         Me.grpATC = New System.Windows.Forms.GroupBox
         Me.picATC = New System.Windows.Forms.PictureBox
         Me.lblAquaTerraURL = New System.Windows.Forms.LinkLabel
@@ -71,7 +71,7 @@ Friend Class frmAbout
         Me.lblZedGraphURL = New System.Windows.Forms.LinkLabel
         Me.grpMapWindow.SuspendLayout()
         CType(Me.picMapWindow, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.picBASINS, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.picProgramLogo, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.grpATC.SuspendLayout()
         CType(Me.picATC, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.grpZedGraph.SuspendLayout()
@@ -185,42 +185,42 @@ Friend Class frmAbout
         '
         'picBASINS
         '
-        Me.picBASINS.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.picBASINS.Location = New System.Drawing.Point(8, 8)
-        Me.picBASINS.Name = "picBASINS"
-        Me.picBASINS.Size = New System.Drawing.Size(136, 128)
-        Me.picBASINS.TabIndex = 18
-        Me.picBASINS.TabStop = False
+        Me.picProgramLogo.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.picProgramLogo.Location = New System.Drawing.Point(8, 8)
+        Me.picProgramLogo.Name = "picBASINS"
+        Me.picProgramLogo.Size = New System.Drawing.Size(136, 128)
+        Me.picProgramLogo.TabIndex = 18
+        Me.picProgramLogo.TabStop = False
         '
         'lblBASINS
         '
-        Me.lblBASINS.AutoSize = True
-        Me.lblBASINS.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblBASINS.Location = New System.Drawing.Point(152, 16)
-        Me.lblBASINS.Name = "lblBASINS"
-        Me.lblBASINS.Size = New System.Drawing.Size(185, 42)
-        Me.lblBASINS.TabIndex = 19
-        Me.lblBASINS.Text = "BASINS 4"
+        Me.lblProgramName.AutoSize = True
+        Me.lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblProgramName.Location = New System.Drawing.Point(152, 16)
+        Me.lblProgramName.Name = "lblBASINS"
+        Me.lblProgramName.Size = New System.Drawing.Size(185, 42)
+        Me.lblProgramName.TabIndex = 19
+        Me.lblProgramName.Text = "BASINS 4"
         '
         'lblBasinsVersion
         '
-        Me.lblBasinsVersion.Location = New System.Drawing.Point(160, 64)
-        Me.lblBasinsVersion.Name = "lblBasinsVersion"
-        Me.lblBasinsVersion.Size = New System.Drawing.Size(176, 16)
-        Me.lblBasinsVersion.TabIndex = 20
+        Me.lblPluginVersion.Location = New System.Drawing.Point(160, 64)
+        Me.lblPluginVersion.Name = "lblBasinsVersion"
+        Me.lblPluginVersion.Size = New System.Drawing.Size(176, 16)
+        Me.lblPluginVersion.TabIndex = 20
         '
         'lblBasinsURL
         '
-        Me.lblBasinsURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblBasinsURL.AutoSize = True
-        Me.lblBasinsURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblBasinsURL.LinkArea = New System.Windows.Forms.LinkArea(0, 39)
-        Me.lblBasinsURL.Location = New System.Drawing.Point(369, 64)
-        Me.lblBasinsURL.Name = "lblBasinsURL"
-        Me.lblBasinsURL.Size = New System.Drawing.Size(221, 13)
-        Me.lblBasinsURL.TabIndex = 2
-        Me.lblBasinsURL.TabStop = True
-        Me.lblBasinsURL.Text = "http://www.epa.gov/waterscience/BASINS/"
+        Me.lblProgramURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblProgramURL.AutoSize = True
+        Me.lblProgramURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblProgramURL.LinkArea = New System.Windows.Forms.LinkArea(0, 39)
+        Me.lblProgramURL.Location = New System.Drawing.Point(369, 64)
+        Me.lblProgramURL.Name = "lblBasinsURL"
+        Me.lblProgramURL.Size = New System.Drawing.Size(221, 13)
+        Me.lblProgramURL.TabIndex = 2
+        Me.lblProgramURL.TabStop = True
+        Me.lblProgramURL.Text = "http://www.epa.gov/waterscience/BASINS/"
         '
         'grpATC
         '
@@ -299,10 +299,10 @@ Friend Class frmAbout
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnOk
         Me.ClientSize = New System.Drawing.Size(612, 580)
-        Me.Controls.Add(Me.lblBasinsURL)
-        Me.Controls.Add(Me.picBASINS)
-        Me.Controls.Add(Me.lblBasinsVersion)
-        Me.Controls.Add(Me.lblBASINS)
+        Me.Controls.Add(Me.lblProgramURL)
+        Me.Controls.Add(Me.picProgramLogo)
+        Me.Controls.Add(Me.lblPluginVersion)
+        Me.Controls.Add(Me.lblProgramName)
         Me.Controls.Add(Me.lblConfigFile)
         Me.Controls.Add(Me.lblProjFile)
         Me.Controls.Add(Me.lblConfigFileLabel)
@@ -320,7 +320,7 @@ Friend Class frmAbout
         Me.grpMapWindow.ResumeLayout(False)
         Me.grpMapWindow.PerformLayout()
         CType(Me.picMapWindow, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.picBASINS, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.picProgramLogo, System.ComponentModel.ISupportInitialize).EndInit()
         Me.grpATC.ResumeLayout(False)
         Me.grpATC.PerformLayout()
         CType(Me.picATC, System.ComponentModel.ISupportInitialize).EndInit()
@@ -336,25 +336,25 @@ Friend Class frmAbout
     Public Sub ShowAbout()
         Try
             Me.Icon = g_MapWin.ApplicationInfo.FormIcon
-            picBASINS.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
-            picBASINS.Image = g_MapWin.ApplicationInfo.SplashPicture
+            picProgramLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
+            picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
 
-            lblBASINS.Text = g_AppNameLong
-            lblBASINS.Left = picBASINS.Left + picBASINS.Width + 8
-            lblBasinsVersion.Left = lblBASINS.Left
+            lblProgramName.Text = g_AppNameLong
+            lblProgramName.Left = picProgramLogo.Left + picProgramLogo.Width + 8
+            lblPluginVersion.Left = lblProgramName.Left
 
-            If lblBASINS.Text.Length < 10 Then
-                lblBASINS.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            If lblProgramName.Text.Length < 10 Then
+                lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
             Else
-                lblBASINS.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+                lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
             End If
 
-            lblBasinsURL.Text = g_URL_Home
-            lblBasinsURL.LinkArea = New LinkArea(0, g_URL_Home.Length)
-            lblBasinsURL.Left = Me.Width - lblBasinsURL.Width - 20
+            lblProgramURL.Text = g_URL_Home
+            lblProgramURL.LinkArea = New LinkArea(0, g_URL_Home.Length)
+            lblProgramURL.Left = Me.Width - lblProgramURL.Width - 20
 
             Try
-                lblBasinsVersion.Text = "Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                lblPluginVersion.Text = "Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
             Catch
             End Try
             Try
@@ -406,13 +406,13 @@ Friend Class frmAbout
     End Sub
 
     Private Sub lblBasinsURL_LinkClicked(ByVal sender As Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) _
-        Handles lblBasinsURL.LinkClicked
-        OpenLinkURL(lblBasinsURL)
+        Handles lblProgramURL.LinkClicked
+        OpenLinkURL(lblProgramURL)
     End Sub
 
     Private Sub picBASINS_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) _
-        Handles picBASINS.Click
-        OpenLinkURL(lblBasinsURL)
+        Handles picProgramLogo.Click
+        OpenLinkURL(lblProgramURL)
     End Sub
 
     Private Sub lblZedGraphURL_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) _

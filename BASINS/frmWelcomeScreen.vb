@@ -1,6 +1,6 @@
 '********************************************************************************************************
-'File Name: frmWelcomeScreenBasins.vb
-'Description: MapWindowBasins Welcome Screen
+'File Name: frmWelcomeScreen.vb
+'Description: MapWindow Welcome Screen
 '********************************************************************************************************
 'The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); 
 'you may not use this file except in compliance with the License. You may obtain a copy of the License at 
@@ -59,49 +59,49 @@ Public Class frmWelcomeScreen
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents lbOpenProject As System.Windows.Forms.LinkLabel
+    Friend WithEvents lblOpenProject As System.Windows.Forms.LinkLabel
     Friend WithEvents btnClose As System.Windows.Forms.Button
-    Friend WithEvents cbShowDlg As System.Windows.Forms.CheckBox
-    Friend WithEvents lbProject1 As System.Windows.Forms.LinkLabel
-    Friend WithEvents lbProject2 As System.Windows.Forms.LinkLabel
-    Friend WithEvents lbProject3 As System.Windows.Forms.LinkLabel
-    Friend WithEvents lbBuildNew As System.Windows.Forms.LinkLabel
-    Friend WithEvents lbBasinsHelp As System.Windows.Forms.LinkLabel
-    Friend WithEvents pctBasinsLogo As System.Windows.Forms.PictureBox
-    Friend WithEvents lbConvert As System.Windows.Forms.LinkLabel
-    Friend WithEvents lbProject4 As System.Windows.Forms.LinkLabel
+    Friend WithEvents cboShowDlg As System.Windows.Forms.CheckBox
+    Friend WithEvents lblProject1 As System.Windows.Forms.LinkLabel
+    Friend WithEvents lblProject2 As System.Windows.Forms.LinkLabel
+    Friend WithEvents lblProject3 As System.Windows.Forms.LinkLabel
+    Friend WithEvents lblProject4 As System.Windows.Forms.LinkLabel
+    Friend WithEvents lblBuildNew As System.Windows.Forms.LinkLabel
+    Friend WithEvents lblHelp As System.Windows.Forms.LinkLabel
+    Friend WithEvents picProgramLogo As System.Windows.Forms.PictureBox
+    Friend WithEvents lblConvert As System.Windows.Forms.LinkLabel
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWelcomeScreen))
-        Me.lbBuildNew = New System.Windows.Forms.LinkLabel
-        Me.lbOpenProject = New System.Windows.Forms.LinkLabel
-        Me.cbShowDlg = New System.Windows.Forms.CheckBox
+        Me.lblBuildNew = New System.Windows.Forms.LinkLabel
+        Me.lblOpenProject = New System.Windows.Forms.LinkLabel
+        Me.cboShowDlg = New System.Windows.Forms.CheckBox
         Me.btnClose = New System.Windows.Forms.Button
-        Me.lbProject1 = New System.Windows.Forms.LinkLabel
-        Me.lbProject2 = New System.Windows.Forms.LinkLabel
-        Me.lbProject3 = New System.Windows.Forms.LinkLabel
-        Me.pctBasinsLogo = New System.Windows.Forms.PictureBox
-        Me.lbBasinsHelp = New System.Windows.Forms.LinkLabel
-        Me.lbConvert = New System.Windows.Forms.LinkLabel
-        Me.lbProject4 = New System.Windows.Forms.LinkLabel
-        CType(Me.pctBasinsLogo, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.lblProject1 = New System.Windows.Forms.LinkLabel
+        Me.lblProject2 = New System.Windows.Forms.LinkLabel
+        Me.lblProject3 = New System.Windows.Forms.LinkLabel
+        Me.lblProject4 = New System.Windows.Forms.LinkLabel
+        Me.picProgramLogo = New System.Windows.Forms.PictureBox
+        Me.lblHelp = New System.Windows.Forms.LinkLabel
+        Me.lblConvert = New System.Windows.Forms.LinkLabel
+        CType(Me.picProgramLogo, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'lbBuildNew
         '
-        resources.ApplyResources(Me.lbBuildNew, "lbBuildNew")
-        Me.lbBuildNew.Name = "lbBuildNew"
-        Me.lbBuildNew.TabStop = True
+        resources.ApplyResources(Me.lblBuildNew, "lbBuildNew")
+        Me.lblBuildNew.Name = "lbBuildNew"
+        Me.lblBuildNew.TabStop = True
         '
         'lbOpenProject
         '
-        resources.ApplyResources(Me.lbOpenProject, "lbOpenProject")
-        Me.lbOpenProject.Name = "lbOpenProject"
-        Me.lbOpenProject.TabStop = True
+        resources.ApplyResources(Me.lblOpenProject, "lbOpenProject")
+        Me.lblOpenProject.Name = "lbOpenProject"
+        Me.lblOpenProject.TabStop = True
         '
         'cbShowDlg
         '
-        resources.ApplyResources(Me.cbShowDlg, "cbShowDlg")
-        Me.cbShowDlg.Name = "cbShowDlg"
+        resources.ApplyResources(Me.cboShowDlg, "cbShowDlg")
+        Me.cboShowDlg.Name = "cbShowDlg"
         '
         'btnClose
         '
@@ -113,85 +113,85 @@ Public Class frmWelcomeScreen
         '
         'lbProject1
         '
-        resources.ApplyResources(Me.lbProject1, "lbProject1")
-        Me.lbProject1.Name = "lbProject1"
-        Me.lbProject1.TabStop = True
-        Me.lbProject1.UseCompatibleTextRendering = True
+        resources.ApplyResources(Me.lblProject1, "lbProject1")
+        Me.lblProject1.Name = "lbProject1"
+        Me.lblProject1.TabStop = True
+        Me.lblProject1.UseCompatibleTextRendering = True
         '
         'lbProject2
         '
-        resources.ApplyResources(Me.lbProject2, "lbProject2")
-        Me.lbProject2.Name = "lbProject2"
-        Me.lbProject2.TabStop = True
-        Me.lbProject2.UseCompatibleTextRendering = True
+        resources.ApplyResources(Me.lblProject2, "lbProject2")
+        Me.lblProject2.Name = "lbProject2"
+        Me.lblProject2.TabStop = True
+        Me.lblProject2.UseCompatibleTextRendering = True
         '
         'lbProject3
         '
-        resources.ApplyResources(Me.lbProject3, "lbProject3")
-        Me.lbProject3.Name = "lbProject3"
-        Me.lbProject3.TabStop = True
-        Me.lbProject3.UseCompatibleTextRendering = True
-        '
-        'pctBasinsLogo
-        '
-        resources.ApplyResources(Me.pctBasinsLogo, "pctBasinsLogo")
-        Me.pctBasinsLogo.Name = "pctBasinsLogo"
-        Me.pctBasinsLogo.TabStop = False
-        '
-        'lbBasinsHelp
-        '
-        resources.ApplyResources(Me.lbBasinsHelp, "lbBasinsHelp")
-        Me.lbBasinsHelp.Name = "lbBasinsHelp"
-        Me.lbBasinsHelp.TabStop = True
-        '
-        'lbConvert
-        '
-        resources.ApplyResources(Me.lbConvert, "lbConvert")
-        Me.lbConvert.Name = "lbConvert"
-        Me.lbConvert.TabStop = True
+        resources.ApplyResources(Me.lblProject3, "lbProject3")
+        Me.lblProject3.Name = "lbProject3"
+        Me.lblProject3.TabStop = True
+        Me.lblProject3.UseCompatibleTextRendering = True
         '
         'lbProject4
         '
-        resources.ApplyResources(Me.lbProject4, "lbProject4")
-        Me.lbProject4.Name = "lbProject4"
-        Me.lbProject4.TabStop = True
-        Me.lbProject4.UseCompatibleTextRendering = True
+        resources.ApplyResources(Me.lblProject4, "lbProject4")
+        Me.lblProject4.Name = "lbProject4"
+        Me.lblProject4.TabStop = True
+        Me.lblProject4.UseCompatibleTextRendering = True
+        '
+        'pctBasinsLogo
+        '
+        resources.ApplyResources(Me.picProgramLogo, "pctBasinsLogo")
+        Me.picProgramLogo.Name = "pctBasinsLogo"
+        Me.picProgramLogo.TabStop = False
+        '
+        'lbBasinsHelp
+        '
+        resources.ApplyResources(Me.lblHelp, "lbBasinsHelp")
+        Me.lblHelp.Name = "lbBasinsHelp"
+        Me.lblHelp.TabStop = True
+        '
+        'lbConvert
+        '
+        resources.ApplyResources(Me.lblConvert, "lbConvert")
+        Me.lblConvert.Name = "lbConvert"
+        Me.lblConvert.TabStop = True
         '
         'frmWelcomeScreen
         '
         resources.ApplyResources(Me, "$this")
         Me.BackColor = System.Drawing.Color.White
         Me.CancelButton = Me.btnClose
-        Me.Controls.Add(Me.lbProject4)
-        Me.Controls.Add(Me.lbConvert)
-        Me.Controls.Add(Me.lbBasinsHelp)
-        Me.Controls.Add(Me.pctBasinsLogo)
-        Me.Controls.Add(Me.lbProject3)
-        Me.Controls.Add(Me.lbProject2)
-        Me.Controls.Add(Me.lbProject1)
+        Me.Controls.Add(Me.lblConvert)
+        Me.Controls.Add(Me.lblHelp)
+        Me.Controls.Add(Me.picProgramLogo)
+        Me.Controls.Add(Me.lblProject4)
+        Me.Controls.Add(Me.lblProject3)
+        Me.Controls.Add(Me.lblProject2)
+        Me.Controls.Add(Me.lblProject1)
         Me.Controls.Add(Me.btnClose)
-        Me.Controls.Add(Me.cbShowDlg)
-        Me.Controls.Add(Me.lbOpenProject)
-        Me.Controls.Add(Me.lbBuildNew)
+        Me.Controls.Add(Me.cboShowDlg)
+        Me.Controls.Add(Me.lblOpenProject)
+        Me.Controls.Add(Me.lblBuildNew)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmWelcomeScreen"
-        CType(Me.pctBasinsLogo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.picProgramLogo, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
 
 #End Region
 
-    Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbBuildNew.LinkClicked
+    Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblBuildNew.LinkClicked
         Me.Visible = False
         Application.DoEvents()
         LoadNationalProject()
         Me.Close()
     End Sub
 
-    Private Sub lbOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbOpenProject.LinkClicked
+    Private Sub lbOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblOpenProject.LinkClicked
         Dim lOpenFileDialog As New OpenFileDialog
 
         With lOpenFileDialog
@@ -206,13 +206,13 @@ Public Class frmWelcomeScreen
         End With
     End Sub
 
-    Private Sub cbShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbShowDlg.CheckedChanged
-        lAppInfo.ShowWelcomeScreen = cbShowDlg.Checked
+    Private Sub cbShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboShowDlg.CheckedChanged
+        lAppInfo.ShowWelcomeScreen = cboShowDlg.Checked
     End Sub
 
     Private Sub lbProject_LinkClicked(ByVal sender As System.Object, _
                                       ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) _
-        Handles lbProject1.LinkClicked, lbProject2.LinkClicked, lbProject3.LinkClicked, lbProject4.LinkClicked
+        Handles lblProject1.LinkClicked, lblProject2.LinkClicked, lblProject3.LinkClicked, lblProject4.LinkClicked
 
         Dim fileName As String = CStr(CType(sender, Label).Tag)
         If lProject.Load(fileName) Then
@@ -228,42 +228,42 @@ Public Class frmWelcomeScreen
 
         Me.Icon = g_MapWin.ApplicationInfo.FormIcon
         Me.Text = "Welcome to " & g_AppNameLong
-        pctBasinsLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
-        pctBasinsLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
+        picProgramLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
+        picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
 
-        cbShowDlg.Checked = lAppInfo.ShowWelcomeScreen
+        cboShowDlg.Checked = lAppInfo.ShowWelcomeScreen
 
-        lbBuildNew.Text = "Build New " & g_AppNameShort & " Project"
-        lbBuildNew.LinkArea = New LinkArea(0, lbBuildNew.Text.Length)
+        lblBuildNew.Text = "Build New " & g_AppNameShort & " Project"
+        lblBuildNew.LinkArea = New LinkArea(0, lblBuildNew.Text.Length)
 
-        lbOpenProject.Text = "Open Existing " & g_AppNameShort & " Project"
-        lbOpenProject.LinkArea = New LinkArea(0, lbOpenProject.Text.Length)
+        lblOpenProject.Text = "Open Existing " & g_AppNameShort & " Project"
+        lblOpenProject.LinkArea = New LinkArea(0, lblOpenProject.Text.Length)
 
         'assume no recent projects
-        lbProject1.Visible = False
-        lbProject2.Visible = False
-        lbProject3.Visible = False
-        lbProject4.Visible = False
+        lblProject1.Visible = False
+        lblProject2.Visible = False
+        lblProject3.Visible = False
+        lblProject4.Visible = False
 
         'check to see if there were any recent projects
         Dim lRecentCount As Integer = 0
         Dim lCurrent As Integer = 0
         Dim lProjectName As String
         Dim lProjectId As String
-        Dim lbProject As Label
+        Dim lblProject As Label
         While lRecentCount < 4 And lCurrent < lProject.RecentProjects.Count
             lProjectName = CType(lProject.RecentProjects(lCurrent), String)
             lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
             If FileExists(lProjectName) AndAlso LCase(lProjectId) <> "national" Then
                 Select Case lRecentCount
-                    Case 0 : lbProject = lbProject1
-                    Case 1 : lbProject = lbProject2
-                    Case 2 : lbProject = lbProject3
-                    Case Else : lbProject = lbProject4
+                    Case 0 : lblProject = lblProject1
+                    Case 1 : lblProject = lblProject2
+                    Case 2 : lblProject = lblProject3
+                    Case Else : lblProject = lblProject4
                 End Select
-                lbProject.Text = lProjectId
-                lbProject.Tag = lProjectName
-                lbProject.Visible = True
+                lblProject.Text = lProjectId
+                lblProject.Tag = lProjectName
+                lblProject.Visible = True
                 lRecentCount += 1
             End If
             lCurrent += 1
@@ -274,13 +274,13 @@ Public Class frmWelcomeScreen
         Me.Close()
     End Sub
 
-    Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbConvert.LinkClicked
+    Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblConvert.LinkClicked
         Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4")
         Me.Close()
         SendKeys.Send("%FB")
     End Sub
 
-    Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbBasinsHelp.Click
+    Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblHelp.Click
         ShowHelp("")
     End Sub
 
