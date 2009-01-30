@@ -137,6 +137,10 @@
       <Name>atcSynopticAnalysis</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesD4EM\atcTimeseriesD4EM.vbproj">
+      <Project>{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}</Project>
+      <Name>atcTimeseriesD4EM</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
       <Name>atcTimeseriesMath</Name>
       <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
@@ -196,6 +200,7 @@
     <Compile Include="modCAT.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="modSwatMetData.vb" />
     <EmbeddedResource Include="frmCAT.resx">
       <DependentUpon>frmCAT.vb</DependentUpon>
       <SubType>Designer</SubType>
