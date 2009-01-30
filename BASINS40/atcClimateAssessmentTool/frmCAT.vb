@@ -96,6 +96,7 @@ Public Class frmCAT
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents btnPlot As System.Windows.Forms.Button
     Friend WithEvents mnuOpenSWAT As System.Windows.Forms.MenuItem
+    Friend WithEvents lblOpen As System.Windows.Forms.Label
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -161,6 +162,7 @@ Public Class frmCAT
         Me.agdPivot = New atcControls.atcGrid
         Me.btnPlot = New System.Windows.Forms.Button
         Me.mnuOpenSWAT = New System.Windows.Forms.MenuItem
+        Me.lblOpen = New System.Windows.Forms.Label
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -182,6 +184,7 @@ Public Class frmCAT
         Me.myTabs.SelectedIndex = 0
         Me.myTabs.Size = New System.Drawing.Size(520, 268)
         Me.myTabs.TabIndex = 1
+        Me.myTabs.Visible = False
         '
         'tabInputs
         '
@@ -221,7 +224,6 @@ Public Class frmCAT
         Me.txtBaseScenario.Name = "txtBaseScenario"
         Me.txtBaseScenario.Size = New System.Drawing.Size(408, 20)
         Me.txtBaseScenario.TabIndex = 3
-        Me.txtBaseScenario.Text = "<click to select>"
         '
         'btnInputDown
         '
@@ -688,8 +690,8 @@ Public Class frmCAT
         '
         'btnPlot
         '
-        Me.btnPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnPlot.Location = New System.Drawing.Point(77, 277)
+        Me.btnPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnPlot.Location = New System.Drawing.Point(451, 277)
         Me.btnPlot.Name = "btnPlot"
         Me.btnPlot.Size = New System.Drawing.Size(56, 24)
         Me.btnPlot.TabIndex = 4
@@ -700,6 +702,17 @@ Public Class frmCAT
         Me.mnuOpenSWAT.Index = 1
         Me.mnuOpenSWAT.Text = "Open SWAT scenario"
         '
+        '
+        'lblOpen
+        '
+        Me.lblOpen.AutoSize = True
+        Me.lblOpen.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblOpen.Location = New System.Drawing.Point(0, 20)
+        Me.lblOpen.Name = "lblOpen"
+        Me.lblOpen.Size = New System.Drawing.Size(444, 24)
+        Me.lblOpen.TabIndex = 5
+        Me.lblOpen.Text = "Open a scenario or load results using the File menu"
+        '
         'frmCAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -709,6 +722,7 @@ Public Class frmCAT
         Me.Controls.Add(Me.btnStart)
         Me.Controls.Add(Me.myTabs)
         Me.Controls.Add(Me.btnStop)
+        Me.Controls.Add(Me.lblOpen)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "frmCAT"
@@ -722,6 +736,7 @@ Public Class frmCAT
         Me.tabPivot.ResumeLayout(False)
         Me.tabPivot.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -787,8 +802,12 @@ Public Class frmCAT
         chkShowEachRunProgress.Checked = pCat.ShowEachRunProgress
         If pCat.Model Is Nothing Then
             txtBaseScenario.Text = ""
+            lblOpen.Visible = True
+            myTabs.Visible = False
         Else
             txtBaseScenario.Text = pCat.Model.BaseScenario
+            lblOpen.Visible = False
+            myTabs.Visible = True
         End If
         RefreshInputList()
         RefreshTotalIterations()
@@ -1550,6 +1569,8 @@ Public Class frmCAT
 
     Private Sub txtBaseScenarioNameChange(ByVal aBaseScenarioName As String) Handles pCat.BaseScenarioSet
         txtBaseScenario.Text = aBaseScenarioName
+        lblOpen.Visible = False
+        myTabs.Visible = True
     End Sub
 
     Private Sub pCat_Started() Handles pCat.Started

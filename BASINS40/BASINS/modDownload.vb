@@ -33,8 +33,8 @@ Public Module modDownload
             'if currently coming from a BASINS project,
             'ask if the user wants to subset this project
             'or create an entirely new one
-            lResponse = Logger.Msg("Do you want to create a BASINS project based on the selected feature(s) in this BASINS project?" & vbCrLf & vbCrLf & _
-                                   "(Answer 'No' to create an entirely new BASINS project)", vbYesNoCancel, "Create BASINS Project From Selected Features?")
+            lResponse = Logger.Msg("Do you want to create a new project based on the selected feature(s) in this project?" & vbCrLf & vbCrLf & _
+                                   "(Answer 'No' to create a new project from scratch)", vbYesNoCancel, "New Project")
             If lResponse = MsgBoxResult.No Then
                 LoadNationalProject()
             ElseIf lResponse = MsgBoxResult.Yes Then
@@ -65,7 +65,7 @@ Public Module modDownload
                             If lNumFiles + lNumDirs > 0 Then
                                 Logger.Msg("The folder '" & lNewDataDir & "'" & vbCr _
                                        & "already contains " & lNumFiles & " files and " & lNumDirs & " folders." & vbCr _
-                                       & "The folder must be empty before a new project can be created here.", "BASINS Build New")
+                                       & "The folder must be empty before a new project can be created here.", "New Project")
                             Else
                                 'got a good name for the new project
                                 g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
@@ -124,15 +124,15 @@ Public Module modDownload
             'ask if user wants to make this into a BASINS
             'project or create an entirely new one
             If Not NationalProjectIsOpen() AndAlso GisUtil.NumLayers > 0 Then
-                lResponse = Logger.Msg("Do you want to create a BASINS project based on this MapWindow project?" & vbCrLf & vbCrLf & _
-                                       "(Answer 'No' to create an entirely new BASINS project)", vbYesNoCancel, "Convert MapWindow Project to BASINS Project?")
+                lResponse = Logger.Msg("Do you want to create a new project based on this MapWindow project?" & vbCrLf & vbCrLf & _
+                                       "(Answer 'No' to create a new project from scratch)", vbYesNoCancel, "New Project")
                 If lResponse = MsgBoxResult.No Then
                     'create entirely new BASINS project
                     LoadNationalProject()
                 ElseIf lResponse = MsgBoxResult.Yes Then
                     'create a BASINS project based on this MapWindow project
                     If GisUtil.ProjectFileName Is Nothing Then
-                        Logger.Msg("The current MapWindow project must be saved before converting it to a BASINS Project.", "Convert MapWindow Project Problem")
+                        Logger.Msg("The current MapWindow project must be saved before converting it.", "Convert MapWindow Project Problem")
                     Else
                         'set up temporary extents shapefile
                         Dim lProjectDir As String = PathNameOnly(GisUtil.ProjectFileName)
@@ -447,7 +447,7 @@ StartOver:
                 'Already came through here, don't ask again
             Else
                 lNoData = True
-                If Logger.Msg("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then
+                If Logger.Msg("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "Data Extraction") = MsgBoxResult.No Then
                     Return ""
                 End If
             End If
@@ -481,7 +481,7 @@ StartOver:
             If lNumFiles + lNumDirs > 0 Then
                 Logger.Msg("The folder '" & lNewDataDir & "'" & vbCr _
                        & "already contains " & lNumFiles & " files and " & lNumDirs & " folders." & vbCr _
-                       & "The folder must be empty before a new project can be created here.", "BASINS Build New")
+                       & "The folder must be empty before a new project can be created here.", "New Project")
                 GoTo StartOver
             End If
 

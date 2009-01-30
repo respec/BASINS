@@ -40,6 +40,15 @@ Public Class clsCatModelSWAT
             ChDriveDir(lFolder)
             pBaseScenario = aFilename
             RaiseEvent BaseScenarioSet(aFilename)
+            Dim lWDMfilename As String = IO.Path.GetDirectoryName(aFilename) & "\met.wdm"
+            If Not IO.File.Exists(lWDMfilename) Then
+                lWDMfilename = IO.Path.GetDirectoryName(aFilename) & "\met\met.wdm"
+            End If
+            If IO.File.Exists(lWDMfilename) Then
+                clsCat.OpenDataSource(lWDMfilename)
+            Else
+                Logger.Msg("Did not find '" & lWDMfilename & "'", "SWAT Met Data Not Found")
+            End If
         End If
     End Sub
 

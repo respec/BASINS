@@ -25,6 +25,14 @@ Public Module modReflection
         Return lReader.ReadToEnd()
     End Function
 
+    Public Function GetEmbeddedFileAsBitmap(ByVal fileName As String, Optional ByVal aAssembly As Assembly = Nothing) As Drawing.Bitmap
+        If aAssembly Is Nothing Then aAssembly = Assembly.GetCallingAssembly
+        Dim s As IO.Stream = aAssembly.GetManifestResourceStream(aAssembly.GetName().Name + "." + fileName)
+        Dim lBitmap As New Drawing.Bitmap(s)
+        s.Close()
+        Return lBitmap
+    End Function
+
     Public Function BuildMissingTests(ByVal aSavePath As String) As String
         Dim s As String, t As String
         Dim lEntryModule As String, lEntryFunction As String
