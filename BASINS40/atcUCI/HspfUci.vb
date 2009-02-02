@@ -1969,7 +1969,7 @@ x:
                                    ByRef aImplndMasslink As Integer)
         'adds the copy record to the schematic block for each local land segment
         'contributing to this operation
-        For lSourceIndex As Integer = 1 To aOpn.Sources.Count
+        For lSourceIndex As Integer = 0 To aOpn.Sources.Count - 1
             Dim lSourceConnection As HspfConnection = aOpn.Sources.Item(lSourceIndex)
             If lSourceConnection.Source.VolName = "PERLND" Or _
                lSourceConnection.Source.VolName = "IMPLND" Then 'copy this record
@@ -1977,7 +1977,7 @@ x:
                 Dim lCopyOpn As HspfOperation = pOpnBlks.Item("COPY").OperFromID(aCopyId)
                 Dim lCopyOpnMatchIndex As Integer = 0
                 Dim jConn As HspfConnection
-                For lCopyOpnSourceIndex As Integer = 1 To lCopyOpn.Sources.Count
+                For lCopyOpnSourceIndex As Integer = 0 To lCopyOpn.Sources.Count - 1
                     jConn = lCopyOpn.Sources.Item(lCopyOpnSourceIndex)
                     If jConn.Source.VolName = lSourceConnection.Source.VolName And _
                        jConn.Source.VolId = lSourceConnection.Source.VolId Then
