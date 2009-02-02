@@ -23,14 +23,15 @@ Partial Class frmHspfParm
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmHspfParm))
         Me.Button1 = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.Button2 = New System.Windows.Forms.Button
+        Me.agdStarter = New atcControls.atcGrid
+        Me.cmdApply = New System.Windows.Forms.Button
         Me.TextBox2 = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.TextBox1 = New System.Windows.Forms.TextBox
         Me.Label2 = New System.Windows.Forms.Label
-        Me.RadioButton2 = New System.Windows.Forms.RadioButton
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton
-        Me.Label1 = New System.Windows.Forms.Label
+        Me.radioLandUse = New System.Windows.Forms.RadioButton
+        Me.radioParameter = New System.Windows.Forms.RadioButton
+        Me.lblFile = New System.Windows.Forms.Label
         Me.cmdFile = New System.Windows.Forms.Button
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.Button3 = New System.Windows.Forms.Button
@@ -49,14 +50,15 @@ Partial Class frmHspfParm
         '
         'GroupBox1
         '
-        Me.GroupBox1.Controls.Add(Me.Button2)
+        Me.GroupBox1.Controls.Add(Me.agdStarter)
+        Me.GroupBox1.Controls.Add(Me.cmdApply)
         Me.GroupBox1.Controls.Add(Me.TextBox2)
         Me.GroupBox1.Controls.Add(Me.Label3)
         Me.GroupBox1.Controls.Add(Me.TextBox1)
         Me.GroupBox1.Controls.Add(Me.Label2)
-        Me.GroupBox1.Controls.Add(Me.RadioButton2)
-        Me.GroupBox1.Controls.Add(Me.RadioButton1)
-        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.radioLandUse)
+        Me.GroupBox1.Controls.Add(Me.radioParameter)
+        Me.GroupBox1.Controls.Add(Me.lblFile)
         Me.GroupBox1.Controls.Add(Me.cmdFile)
         Me.GroupBox1.Location = New System.Drawing.Point(9, 78)
         Me.GroupBox1.Name = "GroupBox1"
@@ -65,14 +67,28 @@ Partial Class frmHspfParm
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Assign Values From HSPFParm Report file To Starter"
         '
-        'Button2
+        'agdStarter
         '
-        Me.Button2.Location = New System.Drawing.Point(31, 273)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(133, 22)
-        Me.Button2.TabIndex = 2
-        Me.Button2.Text = "&Apply to Starter"
-        Me.Button2.UseVisualStyleBackColor = True
+        Me.agdStarter.AllowHorizontalScrolling = True
+        Me.agdStarter.AllowNewValidValues = False
+        Me.agdStarter.CellBackColor = System.Drawing.SystemColors.Window
+        Me.agdStarter.Fixed3D = False
+        Me.agdStarter.LineColor = System.Drawing.SystemColors.Control
+        Me.agdStarter.LineWidth = 1.0!
+        Me.agdStarter.Location = New System.Drawing.Point(31, 109)
+        Me.agdStarter.Name = "agdStarter"
+        Me.agdStarter.Size = New System.Drawing.Size(426, 158)
+        Me.agdStarter.Source = Nothing
+        Me.agdStarter.TabIndex = 3
+        '
+        'cmdApply
+        '
+        Me.cmdApply.Location = New System.Drawing.Point(31, 273)
+        Me.cmdApply.Name = "cmdApply"
+        Me.cmdApply.Size = New System.Drawing.Size(133, 22)
+        Me.cmdApply.TabIndex = 2
+        Me.cmdApply.Text = "&Apply to Starter"
+        Me.cmdApply.UseVisualStyleBackColor = True
         '
         'TextBox2
         '
@@ -108,36 +124,36 @@ Partial Class frmHspfParm
         Me.Label2.TabIndex = 8
         Me.Label2.Text = "Parameters from HSPFParm"
         '
-        'RadioButton2
+        'radioLandUse
         '
-        Me.RadioButton2.AutoSize = True
-        Me.RadioButton2.Location = New System.Drawing.Point(262, 62)
-        Me.RadioButton2.Name = "RadioButton2"
-        Me.RadioButton2.Size = New System.Drawing.Size(120, 17)
-        Me.RadioButton2.TabIndex = 7
-        Me.RadioButton2.TabStop = True
-        Me.RadioButton2.Text = "Assign By Land Use"
-        Me.RadioButton2.UseVisualStyleBackColor = True
+        Me.radioLandUse.AutoSize = True
+        Me.radioLandUse.Location = New System.Drawing.Point(262, 62)
+        Me.radioLandUse.Name = "radioLandUse"
+        Me.radioLandUse.Size = New System.Drawing.Size(120, 17)
+        Me.radioLandUse.TabIndex = 7
+        Me.radioLandUse.TabStop = True
+        Me.radioLandUse.Text = "Assign By Land Use"
+        Me.radioLandUse.UseVisualStyleBackColor = True
         '
-        'RadioButton1
+        'radioParameter
         '
-        Me.RadioButton1.AutoSize = True
-        Me.RadioButton1.Location = New System.Drawing.Point(31, 62)
-        Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(122, 17)
-        Me.RadioButton1.TabIndex = 6
-        Me.RadioButton1.TabStop = True
-        Me.RadioButton1.Text = "Assign By Parameter"
-        Me.RadioButton1.UseVisualStyleBackColor = True
+        Me.radioParameter.AutoSize = True
+        Me.radioParameter.Location = New System.Drawing.Point(31, 62)
+        Me.radioParameter.Name = "radioParameter"
+        Me.radioParameter.Size = New System.Drawing.Size(122, 17)
+        Me.radioParameter.TabIndex = 6
+        Me.radioParameter.TabStop = True
+        Me.radioParameter.Text = "Assign By Parameter"
+        Me.radioParameter.UseVisualStyleBackColor = True
         '
-        'Label1
+        'lblFile
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(110, 33)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(43, 13)
-        Me.Label1.TabIndex = 5
-        Me.Label1.Text = "<none>"
+        Me.lblFile.AutoSize = True
+        Me.lblFile.Location = New System.Drawing.Point(110, 33)
+        Me.lblFile.Name = "lblFile"
+        Me.lblFile.Size = New System.Drawing.Size(43, 13)
+        Me.lblFile.TabIndex = 5
+        Me.lblFile.Text = "<none>"
         '
         'cmdFile
         '
@@ -189,15 +205,16 @@ Partial Class frmHspfParm
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lblFile As System.Windows.Forms.Label
     Friend WithEvents cmdFile As System.Windows.Forms.Button
     Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents RadioButton2 As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButton1 As System.Windows.Forms.RadioButton
-    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents radioLandUse As System.Windows.Forms.RadioButton
+    Friend WithEvents radioParameter As System.Windows.Forms.RadioButton
+    Friend WithEvents cmdApply As System.Windows.Forms.Button
     Friend WithEvents Button3 As System.Windows.Forms.Button
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents agdStarter As atcControls.atcGrid
 End Class
