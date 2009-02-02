@@ -55,11 +55,21 @@ Public Class HspfOpnSeqBlk
     Public ReadOnly Property Opn(ByVal aIndex As Integer) As HspfOperation
         Get
             'TODO: 0 or 1 based
-            If aIndex > 0 And aIndex <= pOpns.Count Then
+
+            ''1-based code
+            'If aIndex > 0 And aIndex <= pOpns.Count Then
+            '    Opn = pOpns.Item(aIndex)
+            'Else
+            '    Opn = Nothing
+            'End If
+
+            '0-based code
+            If aIndex > -1 And aIndex <= pOpns.Count - 1 Then
                 Opn = pOpns.Item(aIndex)
             Else
                 Opn = Nothing
             End If
+
         End Get
     End Property
 

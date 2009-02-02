@@ -398,7 +398,8 @@ Module modStatusOutputTimeseriesRchres
 
             lAcidph = False
             'check to see if acidph is available			
-            For i = 1 To O.Uci.Msg.BlockDefs("RCHRES").SectionDefs.Count
+            'xxxxxxxxxxxxxxx    
+            For i = 0 To O.Uci.Msg.BlockDefs("RCHRES").SectionDefs.Count - 1
                 If O.Uci.Msg.BlockDefs("RCHRES").SectionDefs(i).Name = "ACIDPH" Then
                     lAcidph = True
                 End If
