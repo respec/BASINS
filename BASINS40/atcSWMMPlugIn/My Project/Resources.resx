@@ -121,4 +121,7 @@
   <data name="NewShapefile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\NewShapefile.ico;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="field_calculator" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\field_calculator.ico;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

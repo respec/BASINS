@@ -98,6 +98,9 @@ Public Class frmSWMMSetup
     Friend WithEvents ofdSubcatchment As System.Windows.Forms.OpenFileDialog
     Friend WithEvents ofdConduits As System.Windows.Forms.OpenFileDialog
     Friend WithEvents ofdNodes As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents cmdSubcatchmentAttributes As System.Windows.Forms.Button
+    Friend WithEvents cmdNodeAttributes As System.Windows.Forms.Button
+    Friend WithEvents cmdConduitAttributes As System.Windows.Forms.Button
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWMMSetup))
@@ -109,6 +112,9 @@ Public Class frmSWMMSetup
         Me.ofdExisting = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.cmdNodeAttributes = New System.Windows.Forms.Button
+        Me.cmdConduitAttributes = New System.Windows.Forms.Button
+        Me.cmdSubcatchmentAttributes = New System.Windows.Forms.Button
         Me.cmdNodes = New System.Windows.Forms.Button
         Me.cmdConduits = New System.Windows.Forms.Button
         Me.cmdSubcatchment = New System.Windows.Forms.Button
@@ -254,6 +260,9 @@ Public Class frmSWMMSetup
         'TabPage1
         '
         Me.TabPage1.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage1.Controls.Add(Me.cmdNodeAttributes)
+        Me.TabPage1.Controls.Add(Me.cmdConduitAttributes)
+        Me.TabPage1.Controls.Add(Me.cmdSubcatchmentAttributes)
         Me.TabPage1.Controls.Add(Me.cmdNodes)
         Me.TabPage1.Controls.Add(Me.cmdConduits)
         Me.TabPage1.Controls.Add(Me.cmdSubcatchment)
@@ -277,11 +286,41 @@ Public Class frmSWMMSetup
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
+        'cmdNodeAttributes
+        '
+        Me.cmdNodeAttributes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdNodeAttributes.Image = Global.atcSWMMPlugIN.My.Resources.Resources.field_calculator
+        Me.cmdNodeAttributes.Location = New System.Drawing.Point(514, 228)
+        Me.cmdNodeAttributes.Name = "cmdNodeAttributes"
+        Me.cmdNodeAttributes.Size = New System.Drawing.Size(30, 25)
+        Me.cmdNodeAttributes.TabIndex = 36
+        Me.cmdNodeAttributes.UseVisualStyleBackColor = True
+        '
+        'cmdConduitAttributes
+        '
+        Me.cmdConduitAttributes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdConduitAttributes.Image = Global.atcSWMMPlugIN.My.Resources.Resources.field_calculator
+        Me.cmdConduitAttributes.Location = New System.Drawing.Point(514, 183)
+        Me.cmdConduitAttributes.Name = "cmdConduitAttributes"
+        Me.cmdConduitAttributes.Size = New System.Drawing.Size(30, 25)
+        Me.cmdConduitAttributes.TabIndex = 34
+        Me.cmdConduitAttributes.UseVisualStyleBackColor = True
+        '
+        'cmdSubcatchmentAttributes
+        '
+        Me.cmdSubcatchmentAttributes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSubcatchmentAttributes.Image = Global.atcSWMMPlugIN.My.Resources.Resources.field_calculator
+        Me.cmdSubcatchmentAttributes.Location = New System.Drawing.Point(514, 136)
+        Me.cmdSubcatchmentAttributes.Name = "cmdSubcatchmentAttributes"
+        Me.cmdSubcatchmentAttributes.Size = New System.Drawing.Size(30, 25)
+        Me.cmdSubcatchmentAttributes.TabIndex = 32
+        Me.cmdSubcatchmentAttributes.UseVisualStyleBackColor = True
+        '
         'cmdNodes
         '
         Me.cmdNodes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdNodes.Image = Global.atcSWMMPlugIN.My.Resources.Resources.NewShapefile
-        Me.cmdNodes.Location = New System.Drawing.Point(514, 228)
+        Me.cmdNodes.Location = New System.Drawing.Point(475, 228)
         Me.cmdNodes.Name = "cmdNodes"
         Me.cmdNodes.Size = New System.Drawing.Size(30, 25)
         Me.cmdNodes.TabIndex = 31
@@ -291,7 +330,7 @@ Public Class frmSWMMSetup
         '
         Me.cmdConduits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdConduits.Image = Global.atcSWMMPlugIN.My.Resources.Resources.NewShapefile
-        Me.cmdConduits.Location = New System.Drawing.Point(514, 183)
+        Me.cmdConduits.Location = New System.Drawing.Point(475, 183)
         Me.cmdConduits.Name = "cmdConduits"
         Me.cmdConduits.Size = New System.Drawing.Size(30, 25)
         Me.cmdConduits.TabIndex = 30
@@ -301,7 +340,7 @@ Public Class frmSWMMSetup
         '
         Me.cmdSubcatchment.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdSubcatchment.Image = Global.atcSWMMPlugIN.My.Resources.Resources.NewShapefile
-        Me.cmdSubcatchment.Location = New System.Drawing.Point(514, 136)
+        Me.cmdSubcatchment.Location = New System.Drawing.Point(475, 136)
         Me.cmdSubcatchment.Name = "cmdSubcatchment"
         Me.cmdSubcatchment.Size = New System.Drawing.Size(30, 25)
         Me.cmdSubcatchment.TabIndex = 29
@@ -521,7 +560,7 @@ Public Class frmSWMMSetup
         Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboOutlets.Location = New System.Drawing.Point(168, 228)
         Me.cboOutlets.Name = "cboOutlets"
-        Me.cboOutlets.Size = New System.Drawing.Size(331, 25)
+        Me.cboOutlets.Size = New System.Drawing.Size(298, 25)
         Me.cboOutlets.TabIndex = 14
         '
         'Label5
@@ -565,7 +604,7 @@ Public Class frmSWMMSetup
         Me.cboStreams.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboStreams.Location = New System.Drawing.Point(168, 183)
         Me.cboStreams.Name = "cboStreams"
-        Me.cboStreams.Size = New System.Drawing.Size(331, 25)
+        Me.cboStreams.Size = New System.Drawing.Size(298, 25)
         Me.cboStreams.TabIndex = 9
         '
         'cboSubbasins
@@ -577,7 +616,7 @@ Public Class frmSWMMSetup
         Me.cboSubbasins.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboSubbasins.Location = New System.Drawing.Point(168, 136)
         Me.cboSubbasins.Name = "cboSubbasins"
-        Me.cboSubbasins.Size = New System.Drawing.Size(331, 25)
+        Me.cboSubbasins.Size = New System.Drawing.Size(298, 25)
         Me.cboSubbasins.TabIndex = 8
         '
         'cboLanduse
@@ -673,7 +712,7 @@ Public Class frmSWMMSetup
         Me.AtcGridPervious.LineWidth = 0.0!
         Me.AtcGridPervious.Location = New System.Drawing.Point(14, 148)
         Me.AtcGridPervious.Name = "AtcGridPervious"
-        Me.AtcGridPervious.Size = New System.Drawing.Size(527, 261)
+        Me.AtcGridPervious.Size = New System.Drawing.Size(527, 262)
         Me.AtcGridPervious.Source = Nothing
         Me.AtcGridPervious.TabIndex = 18
         '
@@ -761,7 +800,7 @@ Public Class frmSWMMSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(2, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(551, 420)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(551, 423)
         Me.AtcConnectFields.TabIndex = 2
         '
         'TabPage6
@@ -858,7 +897,7 @@ Public Class frmSWMMSetup
         Me.AtcGridPrec.LineWidth = 0.0!
         Me.AtcGridPrec.Location = New System.Drawing.Point(21, 136)
         Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 221)
+        Me.AtcGridPrec.Size = New System.Drawing.Size(511, 223)
         Me.AtcGridPrec.Source = Nothing
         Me.AtcGridPrec.TabIndex = 19
         '
@@ -879,7 +918,7 @@ Public Class frmSWMMSetup
         '
         Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 30)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 32)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
         Me.txtMetWDMName.Size = New System.Drawing.Size(384, 23)
@@ -888,7 +927,7 @@ Public Class frmSWMMSetup
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 29)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(421, 31)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -1849,10 +1888,15 @@ Public Class frmSWMMSetup
         Dim lSTooltip As New ToolTip
         lSTooltip.SetToolTip(cmdSubcatchment, "Build New Subcatchments Shapefile")
         Dim lCTooltip As New ToolTip
-        lCTooltip.SetToolTip(cmdSubcatchment, "Build New Conduits Shapefile")
+        lCTooltip.SetToolTip(cmdConduits, "Build New Conduits Shapefile")
         Dim lNTooltip As New ToolTip
-        lNTooltip.SetToolTip(cmdSubcatchment, "Build New Nodes Shapefile")
-
+        lNTooltip.SetToolTip(cmdNodes, "Build New Nodes Shapefile")
+        Dim lSATooltip As New ToolTip
+        lSATooltip.SetToolTip(cmdSubcatchmentAttributes, "Calculate Attributes for Subcatchments")
+        Dim lCATooltip As New ToolTip
+        lCATooltip.SetToolTip(cmdConduitAttributes, "Calculate Attributes for Conduits")
+        Dim lNATooltip As New ToolTip
+        lNATooltip.SetToolTip(cmdNodeAttributes, "Calculate Attributes for Nodes")
         Logger.Dbg("InitializeUI Complete")
     End Sub
 
@@ -2216,31 +2260,56 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdNodes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNodes.Click
-        If ofdNodes.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            Logger.Dbg("Create New Nodes Layer " & ofdNodes.FileName)
-            If GisUtil.CreateEmptyShapefile(ofdNodes.FileName, "", "point") Then
-                GisUtil.AddLayer(ofdNodes.FileName, FilenameNoPath(ofdNodes.FileName))
+        'ask if user wants to create nodes layer from conduit endpoints, or from scratch
 
-                'add fields
-                'string is type 0, integer is type 1, double is type 2
-                Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdNodes.FileName)
-                GisUtil.AddField(lLayerIndex, "Name", 0, 10)
-                GisUtil.AddField(lLayerIndex, "Type", 0, 10) 'junction or outfall
-                GisUtil.AddField(lLayerIndex, "InvertElev", 2, 10) 'in feet or meters
-                GisUtil.AddField(lLayerIndex, "MaxDepth", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "InitDepth", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "SurchargeD", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "PondedArea", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "OutfallTyp", 0, 10) ' = "FREE"
-                GisUtil.AddField(lLayerIndex, "StageTable", 0, 10) ' = ""
-                GisUtil.AddField(lLayerIndex, "TideGate", 0, 10) ' = "NO"
+        Dim lResult As MsgBoxResult = Logger.Msg("Do you want to create Nodes from the Conduit endpoints?" & vbCrLf & _
+                      "(Choose 'No' to create a new empty shapefile.)", MsgBoxStyle.YesNoCancel, _
+                      "Create New Nodes Layer")
+        If lResult = MsgBoxResult.Yes Then
+            'create nodes from conduit endpoints
 
-                cboOutlets.Items.Add(FilenameNoPath(ofdNodes.FileName))
-                cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
-                Logger.Msg("The new shapefile " & FilenameNoPath(ofdNodes.FileName) & " has been created." & vbCrLf & _
-                           "Use the Shapefile Editor to add shapes to the new shapefile.", MsgBoxStyle.OkOnly, "Shapefile created")
+
+        ElseIf lResult = MsgBoxResult.No Then
+            'create new empty shapefile
+            If ofdNodes.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                Logger.Dbg("Create New Nodes Layer " & ofdNodes.FileName)
+                If GisUtil.CreateEmptyShapefile(ofdNodes.FileName, "", "point") Then
+                    GisUtil.AddLayer(ofdNodes.FileName, FilenameNoPath(ofdNodes.FileName))
+
+                    'add fields
+                    'string is type 0, integer is type 1, double is type 2
+                    Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdNodes.FileName)
+                    GisUtil.AddField(lLayerIndex, "Name", 0, 10)
+                    GisUtil.AddField(lLayerIndex, "Type", 0, 10) 'junction or outfall
+                    GisUtil.AddField(lLayerIndex, "InvertElev", 2, 10) 'in feet or meters
+                    GisUtil.AddField(lLayerIndex, "MaxDepth", 2, 10) ' = 0.0
+                    GisUtil.AddField(lLayerIndex, "InitDepth", 2, 10) ' = 0.0
+                    GisUtil.AddField(lLayerIndex, "SurchargeD", 2, 10) ' = 0.0
+                    GisUtil.AddField(lLayerIndex, "PondedArea", 2, 10) ' = 0.0
+                    GisUtil.AddField(lLayerIndex, "OutfallTyp", 0, 10) ' = "FREE"
+                    GisUtil.AddField(lLayerIndex, "StageTable", 0, 10) ' = ""
+                    GisUtil.AddField(lLayerIndex, "TideGate", 0, 10) ' = "NO"
+
+                    cboOutlets.Items.Add(FilenameNoPath(ofdNodes.FileName))
+                    cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
+                    Logger.Msg("The new shapefile " & FilenameNoPath(ofdNodes.FileName) & " has been created." & vbCrLf & _
+                               "Use the Shapefile Editor to add shapes to the new shapefile.", MsgBoxStyle.OkOnly, "Shapefile created")
+                End If
             End If
         End If
+
+    End Sub
+
+    Private Sub cmdSubcatchmentAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSubcatchmentAttributes.Click
+
+    End Sub
+
+    Private Sub cmdConduitAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdConduitAttributes.Click
+
+    End Sub
+
+    Private Sub cmdNodeAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNodeAttributes.Click
+
     End Sub
 
 End Class
