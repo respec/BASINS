@@ -382,7 +382,7 @@ Public Class frmAddExpert
         End If
     End Sub
 
-    Private Sub ListBox2_SelectedIndexChanged() Handles ListBox2.SelectedIndexChanged
+    Private Sub ListBox2_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox2.SelectedIndexChanged
         Dim spacepos&, parenpos&, Id&, opname$, colonpos&
         Dim lOper As HspfOperation, group$, mem$
         Dim i, j, lGetMemberDefAtIndex As Integer
@@ -453,7 +453,7 @@ Public Class frmAddExpert
         End If
     End Sub
 
-    Private Sub ListBox1_SelectedIndexChanged() Handles ListBox1.SelectedIndexChanged
+    Private Sub ListBox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox1.SelectedIndexChanged
         Dim Id&, spacepos&, parenpos&, opname$
         Dim lOper As HspfOperation, lsub$
         Dim ctimser As Collection(Of HspfStatusType)
@@ -556,4 +556,5 @@ Public Class frmAddExpert
     Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
         Me.Dispose()
     End Sub
+
 End Class

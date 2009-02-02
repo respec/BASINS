@@ -399,153 +399,153 @@ Public Class frmHspfParm
     '    End Sub
 
     Private Sub cmdFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFile.Click
-        Dim ArrayIds$(), cnt&, i&
-        Dim lFileName As String
-        Dim ret As Integer
+        'Dim ArrayIds$(), cnt&, i&
+        'Dim lFileName As String
+        'Dim ret As Integer
 
 
-        Try
-            OpenFileDialog1.InitialDirectory = System.Reflection.Assembly.GetEntryAssembly.Location
-            OpenFileDialog1.Filter = "HSPFParm Report Files | *.prn"
-            OpenFileDialog1.FileName = "*.*"
-            OpenFileDialog1.Title = "Select HSPFParm Report File"
+        '  Try
+        '      OpenFileDialog1.InitialDirectory = System.Reflection.Assembly.GetEntryAssembly.Location
+        '      OpenFileDialog1.Filter = "HSPFParm Report Files | *.prn"
+        '      OpenFileDialog1.FileName = "*.*"
+        '      OpenFileDialog1.Title = "Select HSPFParm Report File"
 
-            If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                lFileName = OpenFileDialog1.FileName
-            Else
-                Exit Try
-            End If
+        '      If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        '          lFileName = OpenFileDialog1.FileName
+        '      Else
+        '          Exit Try
+        '      End If
 
-            '.net conversion note: ReadReportFile function now included in this sub
-            Dim lstr$, i&, ilen&, havedesc As Boolean, j&
-            Dim lParm$, loptyp$, lOpId$, lDesc$, lValue$
-            Dim dOpn As HspfOperation, lTable$
-            Dim lparmname$(), lTabledef As HspfTableDef
-            Dim tHSPFParm As clsHSPFParm
-            Dim istart As Long
-            Dim nparms As Long
+        '      '.net conversion note: ReadReportFile function now included in this sub
+        '      Dim lstr$, i&, ilen&, havedesc As Boolean, j&
+        '      Dim lParm$, loptyp$, lOpId$, lDesc$, lValue$
+        '      Dim dOpn As HspfOperation, lTable$
+        '      Dim lparmname$(), lTabledef As HspfTableDef
+        '      Dim tHSPFParm As clsHSPFParm
+        '      Dim istart As Long
+        '      Dim nparms As Long
 
-            HspfParms = New Collection 'of type hspfparm
+        '      HspfParms = New Collection 'of type hspfparm
 
-            ret = 0
-            i = FreeFile(0)
-            On Error GoTo ErrHandler
-      Open Filename For Input As #i
-            Do Until EOF(i)
-        Line Input #i, lstr
-                lstr = Trim(lstr)
-                ilen = Len(lstr)
-                If ilen > 8 Then
-                    If Mid(lstr, 1, 9) = "Parameter" Then
-                        'process these parameter records
-            Line Input #i, lstr 'blank line
-            Line Input #i, lstr 'header line
-                        lstr = Trim(lstr)
-                        ilen = Len(lstr)
-                        If ilen > 50 Then
-                            'have operation description
-                            havedesc = True
-                        Else
-                            havedesc = False
-                        End If
-            Line Input #i, lstr 'parameter line
-                        Do Until Len(Trim(lstr)) = 0
-                            tHSPFParm = New clsHSPFParm
-                            tHSPFParm.Parm = StrRetRem(lstr)
-                            tHSPFParm.Value = StrRetRem(lstr)
-                            tHSPFParm.OpType = StrRetRem(lstr)
-                            tHSPFParm.OpId = StrRetRem(lstr)
-                            tHSPFParm.Table = FindTableName(tHSPFParm.OpType, tHSPFParm.Parm)
-                            If havedesc Then
-                                tHSPFParm.Desc = Trim(Mid(lstr, 21))
-                            Else
-                                tHSPFParm.Desc = ""
-                            End If
-                            tHSPFParm.Id = HspfParms.Count + 1
-                            HspfParms.Add(tHSPFParm)
-              Line Input #i, lstr 'parameter line
-                        Loop
-                    End If
-                End If
-                If ilen > 5 Then
-                    If Mid(lstr, 1, 5) = "Table" Then
-                        'process these table records
-                        lTable = Trim(Mid(lstr, 7))
-            Line Input #i, lstr
-                        lstr = Trim(lstr)
-                        loptyp = Trim(Mid(lstr, 9))
-            Line Input #i, lstr 'blank
-            Line Input #i, lstr 'header
-                        If Mid(lstr, 21, 4) = "Desc" Then
-                            'have operation description
-                            havedesc = True
-                            istart = 40
-                        Else
-                            havedesc = False
-                            istart = 20
-                        End If
-                        If Mid(lstr, 21, 5) = "Occur" Or Mid(lstr, 21, 6) = "QUALID" Or Mid(lstr, 21, 4) = "GQID" Then
-                            'multiple occurance table, don't do for now
-                        Else
-                            'ok to continue
-                            ilen = Len(Trim(lstr)) - istart
+        '      ret = 0
+        '      i = FreeFile(0)
+        '      On Error GoTo ErrHandler
+        'Open Filename For Input As #i
+        '      Do Until EOF(i)
+        '  Line Input #i, lstr
+        '          lstr = Trim(lstr)
+        '          ilen = Len(lstr)
+        '          If ilen > 8 Then
+        '              If Mid(lstr, 1, 9) = "Parameter" Then
+        '                  'process these parameter records
+        '      Line Input #i, lstr 'blank line
+        '      Line Input #i, lstr 'header line
+        '                  lstr = Trim(lstr)
+        '                  ilen = Len(lstr)
+        '                  If ilen > 50 Then
+        '                      'have operation description
+        '                      havedesc = True
+        '                  Else
+        '                      havedesc = False
+        '                  End If
+        '      Line Input #i, lstr 'parameter line
+        '                  Do Until Len(Trim(lstr)) = 0
+        '                      tHSPFParm = New clsHSPFParm
+        '                      tHSPFParm.Parm = StrRetRem(lstr)
+        '                      tHSPFParm.Value = StrRetRem(lstr)
+        '                      tHSPFParm.OpType = StrRetRem(lstr)
+        '                      tHSPFParm.OpId = StrRetRem(lstr)
+        '                      tHSPFParm.Table = FindTableName(tHSPFParm.OpType, tHSPFParm.Parm)
+        '                      If havedesc Then
+        '                          tHSPFParm.Desc = Trim(Mid(lstr, 21))
+        '                      Else
+        '                          tHSPFParm.Desc = ""
+        '                      End If
+        '                      tHSPFParm.Id = HspfParms.Count + 1
+        '                      HspfParms.Add(tHSPFParm)
+        '        Line Input #i, lstr 'parameter line
+        '                  Loop
+        '              End If
+        '          End If
+        '          If ilen > 5 Then
+        '              If Mid(lstr, 1, 5) = "Table" Then
+        '                  'process these table records
+        '                  lTable = Trim(Mid(lstr, 7))
+        '      Line Input #i, lstr
+        '                  lstr = Trim(lstr)
+        '                  loptyp = Trim(Mid(lstr, 9))
+        '      Line Input #i, lstr 'blank
+        '      Line Input #i, lstr 'header
+        '                  If Mid(lstr, 21, 4) = "Desc" Then
+        '                      'have operation description
+        '                      havedesc = True
+        '                      istart = 40
+        '                  Else
+        '                      havedesc = False
+        '                      istart = 20
+        '                  End If
+        '                  If Mid(lstr, 21, 5) = "Occur" Or Mid(lstr, 21, 6) = "QUALID" Or Mid(lstr, 21, 4) = "GQID" Then
+        '                      'multiple occurance table, don't do for now
+        '                  Else
+        '                      'ok to continue
+        '                      ilen = Len(Trim(lstr)) - istart
 
-                            'nparms = Int(ilen / 10) + 1   'why assume 10 chars
-                            lTabledef = myMsg.BlockDefs(loptyp).TableDefs(lTable)
-                            nparms = lTabledef.ParmDefs.Count
+        '                      'nparms = Int(ilen / 10) + 1   'why assume 10 chars
+        '                      lTabledef = myMsg.BlockDefs(loptyp).TableDefs(lTable)
+        '                      nparms = lTabledef.ParmDefs.Count
 
-                            ReDim lparmname(nparms)
-                            lstr = Mid(lstr, istart + 1)
-                            For j = 1 To nparms
-                                'lparmname(j) = StrRetRem(lstr)
-                                lparmname(j) = lTabledef.ParmDefs(j).Name
-                            Next j
-              Line Input #i, lstr 'data line
-                            Do Until Len(Trim(lstr)) = 0
-                                lOpId = Mid(lstr, 1, 5)
-                                If havedesc Then
-                                    lDesc = Mid(lstr, 21, 20)
-                                Else
-                                    lDesc = ""
-                                End If
-                                lstr = Mid(lstr, istart + 1)
-                                For j = 1 To nparms
-                                    tHSPFParm = New clsHSPFParm
-                                    tHSPFParm.Parm = lparmname(j)
-                                    tHSPFParm.Table = lTable
-                                    'tHSPFParm.Value = StrRetRem(lstr)
-                                    If lTabledef.ParmDefs(j).typ <> 0 And Len(lstr) >= lTabledef.ParmDefs(j).Length Then
-                                        tHSPFParm.Value = Mid(lstr, 1, lTabledef.ParmDefs(j).Length)
-                                    End If
-                                    lstr = Mid(lstr, lTabledef.ParmDefs(j).Length + 1)
-                                    tHSPFParm.OpType = loptyp
-                                    tHSPFParm.OpId = lOpId
-                                    tHSPFParm.Desc = Trim(lDesc)
-                                    tHSPFParm.Id = HspfParms.Count + 1
-                                    HspfParms.Add(tHSPFParm)
-                                Next j
-                Line Input #i, lstr 'data line
-                            Loop
-                        End If
-                    End If
-                End If
-            Loop
-      Close #i
-            Exit Sub
-            '.net conversion note: end of the essence of the formeer ReadReportfile sub from VB6 code/
+        '                      ReDim lparmname(nparms)
+        '                      lstr = Mid(lstr, istart + 1)
+        '                      For j = 1 To nparms
+        '                          'lparmname(j) = StrRetRem(lstr)
+        '                          lparmname(j) = lTabledef.ParmDefs(j).Name
+        '                      Next j
+        '        Line Input #i, lstr 'data line
+        '                      Do Until Len(Trim(lstr)) = 0
+        '                          lOpId = Mid(lstr, 1, 5)
+        '                          If havedesc Then
+        '                              lDesc = Mid(lstr, 21, 20)
+        '                          Else
+        '                              lDesc = ""
+        '                          End If
+        '                          lstr = Mid(lstr, istart + 1)
+        '                          For j = 1 To nparms
+        '                              tHSPFParm = New clsHSPFParm
+        '                              tHSPFParm.Parm = lparmname(j)
+        '                              tHSPFParm.Table = lTable
+        '                              'tHSPFParm.Value = StrRetRem(lstr)
+        '                              If lTabledef.ParmDefs(j).typ <> 0 And Len(lstr) >= lTabledef.ParmDefs(j).Length Then
+        '                                  tHSPFParm.Value = Mid(lstr, 1, lTabledef.ParmDefs(j).Length)
+        '                              End If
+        '                              lstr = Mid(lstr, lTabledef.ParmDefs(j).Length + 1)
+        '                              tHSPFParm.OpType = loptyp
+        '                              tHSPFParm.OpId = lOpId
+        '                              tHSPFParm.Desc = Trim(lDesc)
+        '                              tHSPFParm.Id = HspfParms.Count + 1
+        '                              HspfParms.Add(tHSPFParm)
+        '                          Next j
+        '          Line Input #i, lstr 'data line
+        '                      Loop
+        '                  End If
+        '              End If
+        '          End If
+        '      Loop
+        'Close #i
+        '      Exit Sub
+        '      '.net conversion note: end of the essence of the formeer ReadReportfile sub from VB6 code/
 
-            If ret = 0 Then
-                lblFile.Text = lFileName
-                'fill in grid or lists
-                Me.Cursor = Cursors.WaitCursor
-                RefreshParms()
-                DefaultGrid()
-                Me.Cursor = Cursors.Arrow
-            End If
+        '      If ret = 0 Then
+        '          lblFile.Text = lFileName
+        '          'fill in grid or lists
+        '          Me.Cursor = Cursors.WaitCursor
+        '          RefreshParms()
+        '          DefaultGrid()
+        '          Me.Cursor = Cursors.Arrow
+        '      End If
 
-        Catch ex As Exception
-            Logger.Message("There was a problem loading the file specified." & vbCrLf & "Check the syntax of the file and make sure it is not locked by another process.", "HSPFParm Report File load error", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
-        End Try
+        '  Catch ex As Exception
+        '      Logger.Message("There was a problem loading the file specified." & vbCrLf & "Check the syntax of the file and make sure it is not locked by another process.", "HSPFParm Report File load error", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+        '  End Try
 
         '        If FileExists(BASINSPath & "\modelout", True, False) Then
         '            ChDriveDir(BASINSPath & "\modelout")
