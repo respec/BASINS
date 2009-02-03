@@ -26,10 +26,10 @@ Friend Module modSWMMFromMW
 
             If Not lCatchment.Name Is Nothing Then
                 If lCatchment.Name.Length = 0 Then
-                    lCatchment.Name = CStr(lFeatureIndex + 1)
+                    lCatchment.Name = "S" & CStr(lFeatureIndex + 1)
                 Else
                     If IsNumeric(CDbl(lCatchment.Name)) Then
-                        lCatchment.Name = CStr(CInt(lCatchment.Name))
+                        lCatchment.Name = "S" & CStr(CInt(lCatchment.Name))
                     End If
                 End If
             End If
@@ -71,9 +71,9 @@ Friend Module modSWMMFromMW
             End If
 
             'lCatchment.PercentImpervious()  'this is computed later
-            lCatchment.Width = Math.Sqrt(lCatchment.Area * 43560)
-
-            lCatchment.Name = "S" & lCatchment.Name
+            If lCatchment.Width = 0.0 Then
+                lCatchment.Width = Math.Sqrt(lCatchment.Area * 43560)
+            End If
 
             GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lCatchment.X, lCatchment.Y)
         Next
