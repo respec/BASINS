@@ -1794,6 +1794,10 @@ Public Class frmSWMMSetup
         'set default field mapping for nodes, conduits, and Subcatchments
         pDefaultNodeFieldMap.Clear()
         pDefaultNodeFieldMap.Add("ID", "Name")
+        pDefaultNodeFieldMap.Add("InvertElev", "InvertElevation")   'from here down for create new feature
+        pDefaultNodeFieldMap.Add("SurchargeD", "SurchargeDepth")
+        pDefaultNodeFieldMap.Add("OutfallTyp", "OutfallType")
+
         pDefaultConduitFieldMap.Clear()
         pDefaultConduitFieldMap.Add("InNodeId", "InletNodeName")
         pDefaultConduitFieldMap.Add("OutNodeID", "OutletNodeName")
@@ -1808,8 +1812,12 @@ Public Class frmSWMMSetup
         pDefaultConduitFieldMap.Add("ElevHigh", "ElevationHigh")
         pDefaultConduitFieldMap.Add("Elevhigh", "ElevationHigh")
         pDefaultConduitFieldMap.Add("ElevLow", "ElevationLow")
-        pDefaultConduitFieldMap.Add("MeanWidth", "MeanWidth")
-        pDefaultConduitFieldMap.Add("MeanDepth", "MeanDepth")
+        pDefaultConduitFieldMap.Add("InletNode", "InletNodeName")  'from here down for create new feature
+        pDefaultConduitFieldMap.Add("OutletNode", "OutletNodeName")
+        pDefaultConduitFieldMap.Add("InOffset", "InletOffset")
+        pDefaultConduitFieldMap.Add("OutOffset", "OutletOffset")
+        pDefaultConduitFieldMap.Add("InitFlow", "InitialFlow")
+
         pDefaultCatchmentFieldMap.Clear()
         pDefaultCatchmentFieldMap.Add("SUBBASIN", "Name")
         pDefaultCatchmentFieldMap.Add("SLO1", "Slope")
@@ -1817,6 +1825,21 @@ Public Class frmSWMMSetup
         pDefaultCatchmentFieldMap.Add("OutNode", "OutletNodeID")
         pDefaultCatchmentFieldMap.Add("StreamLink", "Name")
         pDefaultCatchmentFieldMap.Add("AveSlope", "Slope")
+        pDefaultCatchmentFieldMap.Add("OutNodeID", "OutletNodeID") 'from here down for create new feature
+        pDefaultCatchmentFieldMap.Add("SnowPkName", "SnowPackName")
+        pDefaultCatchmentFieldMap.Add("ManNImperv", "ManningsNImperv")
+        pDefaultCatchmentFieldMap.Add("ManNPerv", "ManningsNPerv")
+        pDefaultCatchmentFieldMap.Add("DepStorImp", "DepressionStorageImperv")
+        pDefaultCatchmentFieldMap.Add("DepStorPer", "DepressionStoragePerv")
+        pDefaultCatchmentFieldMap.Add("PctZeroSto", "PercentZeroStorage")
+        pDefaultCatchmentFieldMap.Add("PctRouted", "PercentRouted")
+        pDefaultCatchmentFieldMap.Add("MaxInfiltR", "MaxInfiltRate")
+        pDefaultCatchmentFieldMap.Add("MinInfiltR", "MinInfiltRate")
+        pDefaultCatchmentFieldMap.Add("DecayRate", "DecayRateConstant")
+        pDefaultCatchmentFieldMap.Add("MaxInfiltV", "MaxInfiltVolume")
+        pDefaultCatchmentFieldMap.Add("Conductiv", "Conductivity")
+        pDefaultCatchmentFieldMap.Add("InitDefcit", "InitialDeficit")
+        pDefaultCatchmentFieldMap.Add("CurveNum", "CurveNumber")
 
         cboLanduse.Items.Add("<none>")
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
@@ -2260,38 +2283,68 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdNodes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNodes.Click
-        'ask if user wants to create nodes layer from conduit endpoints, or from scratch
+        
+        'create new empty shapefile
+        If ofdNodes.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Logger.Dbg("Create New Nodes Layer " & ofdNodes.FileName)
+            If GisUtil.CreateEmptyShapefile(ofdNodes.FileName, "", "point") Then
+                GisUtil.AddLayer(ofdNodes.FileName, FilenameNoPath(ofdNodes.FileName))
 
-        Dim lResult As MsgBoxResult = Logger.Msg("Do you want to create Nodes from the Conduit endpoints?" & vbCrLf & _
-                      "(Choose 'No' to create a new empty shapefile.)", MsgBoxStyle.YesNoCancel, _
-                      "Create New Nodes Layer")
-        If lResult = MsgBoxResult.Yes Then
-            'create nodes from conduit endpoints
+                'add fields
+                'string is type 0, integer is type 1, double is type 2
+                Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdNodes.FileName)
+                GisUtil.AddField(lLayerIndex, "Name", 0, 10)
+                GisUtil.AddField(lLayerIndex, "Type", 0, 10) 'junction or outfall
+                GisUtil.AddField(lLayerIndex, "InvertElev", 2, 10) 'in feet or meters
+                GisUtil.AddField(lLayerIndex, "MaxDepth", 2, 10) ' = 0.0
+                GisUtil.AddField(lLayerIndex, "InitDepth", 2, 10) ' = 0.0
+                GisUtil.AddField(lLayerIndex, "SurchargeD", 2, 10) ' = 0.0
+                GisUtil.AddField(lLayerIndex, "PondedArea", 2, 10) ' = 0.0
+                GisUtil.AddField(lLayerIndex, "OutfallTyp", 0, 10) ' = "FREE"
+                GisUtil.AddField(lLayerIndex, "StageTable", 0, 10) ' = ""
+                GisUtil.AddField(lLayerIndex, "TideGate", 0, 10) ' = "NO"
 
+                cboOutlets.Items.Add(FilenameNoPath(ofdNodes.FileName))
+                cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
 
-        ElseIf lResult = MsgBoxResult.No Then
-            'create new empty shapefile
-            If ofdNodes.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                Logger.Dbg("Create New Nodes Layer " & ofdNodes.FileName)
-                If GisUtil.CreateEmptyShapefile(ofdNodes.FileName, "", "point") Then
-                    GisUtil.AddLayer(ofdNodes.FileName, FilenameNoPath(ofdNodes.FileName))
-
-                    'add fields
-                    'string is type 0, integer is type 1, double is type 2
-                    Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdNodes.FileName)
-                    GisUtil.AddField(lLayerIndex, "Name", 0, 10)
-                    GisUtil.AddField(lLayerIndex, "Type", 0, 10) 'junction or outfall
-                    GisUtil.AddField(lLayerIndex, "InvertElev", 2, 10) 'in feet or meters
-                    GisUtil.AddField(lLayerIndex, "MaxDepth", 2, 10) ' = 0.0
-                    GisUtil.AddField(lLayerIndex, "InitDepth", 2, 10) ' = 0.0
-                    GisUtil.AddField(lLayerIndex, "SurchargeD", 2, 10) ' = 0.0
-                    GisUtil.AddField(lLayerIndex, "PondedArea", 2, 10) ' = 0.0
-                    GisUtil.AddField(lLayerIndex, "OutfallTyp", 0, 10) ' = "FREE"
-                    GisUtil.AddField(lLayerIndex, "StageTable", 0, 10) ' = ""
-                    GisUtil.AddField(lLayerIndex, "TideGate", 0, 10) ' = "NO"
-
-                    cboOutlets.Items.Add(FilenameNoPath(ofdNodes.FileName))
-                    cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
+                'ask if user wants to add points from conduit endpoints
+                Dim lResult As MsgBoxResult = Logger.Msg("Do you want to create Nodes from the Conduit endpoints?" & vbCrLf & _
+                                                         "(Choose 'No' to create a new empty shapefile.)", MsgBoxStyle.YesNo, _
+                                                         "Create New Nodes Layer")
+                If lResult = MsgBoxResult.Yes Then
+                    'create nodes from conduit endpoints
+                    Dim lConduitLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+                    For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lConduitLayerIndex) - 1
+                        Dim lXup As Double
+                        Dim lYup As Double
+                        Dim lXdown As Double
+                        Dim lYdown As Double
+                        GisUtil.EndPointsOfLine(lConduitLayerIndex, lFeatureIndex, lXup, lYup, lXdown, lYdown)
+                        'is this node already in the shapefile?
+                        Dim lXtemp As Double
+                        Dim lYtemp As Double
+                        Dim lPointFound As Boolean = False
+                        For lPointFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+                            GisUtil.PointXY(lLayerIndex, lPointFeatureIndex, lXtemp, lYtemp)
+                            If lXtemp = lXup And lYtemp = lYup Then
+                                lPointFound = True
+                            End If
+                        Next
+                        If Not lPointFound Then
+                            GisUtil.AddPoint(lLayerIndex, lXup, lYup)
+                        End If
+                        lPointFound = False
+                        For lPointFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+                            GisUtil.PointXY(lLayerIndex, lPointFeatureIndex, lXtemp, lYtemp)
+                            If lXtemp = lXdown And lYtemp = lYdown Then
+                                lPointFound = True
+                            End If
+                        Next
+                        If Not lPointFound Then
+                            GisUtil.AddPoint(lLayerIndex, lXdown, lYdown)
+                        End If
+                    Next
+                ElseIf lResult = MsgBoxResult.No Then
                     Logger.Msg("The new shapefile " & FilenameNoPath(ofdNodes.FileName) & " has been created." & vbCrLf & _
                                "Use the Shapefile Editor to add shapes to the new shapefile.", MsgBoxStyle.OkOnly, "Shapefile created")
                 End If
@@ -2301,15 +2354,117 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdSubcatchmentAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSubcatchmentAttributes.Click
-
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+            Dim lValue As String = "S" & CStr(lFeatureIndex + 1)
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Name"), lFeatureIndex, lValue)
+            lValue = ""   'todo: find closest outlet node id
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutNodeID"), lFeatureIndex, lValue) ' As String
+            lValue = Math.Sqrt(GisUtil.FeatureArea(lLayerIndex, lFeatureIndex)) * 3.281 'convert m to ft
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Width"), lFeatureIndex, lValue) ' As Double = 0.0 'in feet or meters
+            lValue = ""   'todo: compute slope
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Slope"), lFeatureIndex, lValue) ' As Double = 0.0 'percent
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "CurbLength"), lFeatureIndex, lValue) ' As Double = 0.0
+            lValue = ""
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "SnowPkName"), lFeatureIndex, lValue) ' As String = "" 'blank if none
+            lValue = "0.01"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "ManNImperv"), lFeatureIndex, lValue) ' As Double = 0.01
+            lValue = "0.1"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "ManNPerv"), lFeatureIndex, lValue) ' As Double = 0.1
+            lValue = "0.05"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DepStorImp"), lFeatureIndex, lValue) ' As Double = 0.05 'inches or mm
+            lValue = "0.05"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DepStorPer"), lFeatureIndex, lValue) ' As Double = 0.05 'inches or mm
+            lValue = "25.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "PctZeroSto"), lFeatureIndex, lValue) ' As Double = 25.0
+            lValue = "OUTLET"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "RouteTo"), lFeatureIndex, lValue) ' As String = "OUTLET"
+            lValue = "100.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "PctRouted"), lFeatureIndex, lValue) ' As Double = 100.0
+            lValue = "3.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxInfiltR"), lFeatureIndex, lValue) ' As Double = 3.0 'inches/hr or mm/hr
+            lValue = "0.5"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MinInfiltR"), lFeatureIndex, lValue) ' As Double = 0.5 'inches/hr or mm/hr
+            lValue = "4"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DecayRate"), lFeatureIndex, lValue) ' As Double = 4
+            lValue = "7"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DryTime"), lFeatureIndex, lValue) ' As Double = 7 'days (or 4 days if using curve number)
+            lValue = "0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxInfiltV"), lFeatureIndex, lValue) ' As Double = 0 'inches or mm
+            lValue = "3.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Suction"), lFeatureIndex, lValue) ' As Double = 3.0 'inches or mm              'used if Infiltration Method is "GREEN_AMPT"
+            lValue = "0.5"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Conductiv"), lFeatureIndex, lValue) ' As Double = 0.5 'inches/hr or mm/hr   'used if Infiltration Method is "GREEN_AMPT" or "CURVE_NUMBER"
+            lValue = "4.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InitDefcit"), lFeatureIndex, lValue) ' As Double = 4.0                     'used if Infiltration Method is "GREEN_AMPT"
+            lValue = "3.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "CurveNum"), lFeatureIndex, lValue) ' As Double = 3.0                        'used if Infiltration Method is "CURVE_NUMBER"
+        Next
     End Sub
 
     Private Sub cmdConduitAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdConduitAttributes.Click
-
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+            Dim lValue As String = "C" & CStr(lFeatureIndex + 1)
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Name"), lFeatureIndex, lValue)
+            lValue = ""  'todo: find closest inlet node id
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InletNode"), lFeatureIndex, lValue) 'As String = ""
+            lValue = ""  'todo: find closest outlet node id
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutletNode"), lFeatureIndex, lValue) 'As String = ""
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth"), lFeatureIndex, lValue) 'As Double = 0.0
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth"), lFeatureIndex, lValue) ' As Double = 0.0
+            lValue = "0.05"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "ManningsN"), lFeatureIndex, lValue) ' As Double = 0.05
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InOffset"), lFeatureIndex, lValue) ' As Double = 0.0
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutOffset"), lFeatureIndex, lValue) ' As Double = 0.0
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InitFlow"), lFeatureIndex, lValue) ' As Double = 0.0
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxFlow"), lFeatureIndex, lValue) ' As Double = 0.0
+            lValue = "TRAPEZOIDAL"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Shape"), lFeatureIndex, lValue) 'As String = "TRAPEZOIDAL"
+            lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")) * 1.25
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry1"), lFeatureIndex, lValue) 'As Double = -1 'full height
+            lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth")) - (2 * GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth"))) 'base width
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry2"), lFeatureIndex, lValue) 'As Double = -1 'base width
+            lValue = "1"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry3"), lFeatureIndex, lValue) 'As Double = 1 'left slope
+            lValue = "1"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry4"), lFeatureIndex, lValue) 'As Double = 1 'right slope
+            lValue = "1"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "NumBarrels"), lFeatureIndex, lValue) 'As Integer = 1
+        Next
     End Sub
 
     Private Sub cmdNodeAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNodeAttributes.Click
-
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+            Dim lValue As String = "N" & CStr(lFeatureIndex + 1)
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Name"), lFeatureIndex, lValue)
+            lValue = "JUNCTION"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Type"), lFeatureIndex, lValue) 'junction or outfall
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InvertElev"), lFeatureIndex, lValue) 'in feet or meters
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxDepth"), lFeatureIndex, lValue) ' = 0.0
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InitDepth"), lFeatureIndex, lValue) ' = 0.0
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "SurchargeD"), lFeatureIndex, lValue) ' = 0.0
+            lValue = "0.0"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "PondedArea"), lFeatureIndex, lValue) ' = 0.0
+            lValue = "FREE"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutfallTyp"), lFeatureIndex, lValue) ' = "FREE"
+            lValue = ""
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "StageTable"), lFeatureIndex, lValue) ' = ""
+            lValue = "NO"
+            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "TideGate"), lFeatureIndex, lValue) ' = "NO"
+        Next
     End Sub
 
 End Class
