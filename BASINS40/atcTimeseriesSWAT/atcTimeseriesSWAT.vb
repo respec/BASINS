@@ -241,11 +241,11 @@ Public Class atcTimeseriesSWAT
                     For Each lDataSet As atcData.atcTimeseries In lTimeseriesGroup
                         Select Case lMONcontains
                             Case 0 'Monthly
-                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUMonth, 1, pNaN, pNaN, pNaN)
+                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUMonth, 1, pNaN, pNaN, pNaN, Me)
                             Case 1 'Daily
-                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUDay, 1, pNaN, pNaN, pNaN)
+                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUDay, 1, pNaN, pNaN, pNaN, Me)
                             Case 2 'Yearly
-                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUYear, 1, pNaN, pNaN, pNaN)
+                                lDataSet = FillValues(lDataSet, atcTimeUnit.TUYear, 1, pNaN, pNaN, pNaN, Me)
                         End Select
 
                         With lDataSet.Attributes
@@ -254,6 +254,8 @@ Public Class atcTimeseriesSWAT
                             .SetValue("Units", SplitUnits(lKeyParts(0)).Trim)
                             .SetValue("Constituent", lKeyParts(0).Trim)
                             .SetValue("Location", lKeyParts(1).Trim)
+                            .SetValue("ID", Me.DataSets.Count + 1)
+                            .AddHistory("Read from " & Specification)
                         End With
                         Me.DataSets.Add(lDataSet)
                         Logger.Progress(Me.DataSets.Count, lTSBuilders.Count)

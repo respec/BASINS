@@ -140,11 +140,17 @@
     <ProjectReference Include="..\atcTimeseriesD4EM\atcTimeseriesD4EM.vbproj">
       <Project>{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}</Project>
       <Name>atcTimeseriesD4EM</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
       <Name>atcTimeseriesMath</Name>
       <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSWAT\atcTimeseriesSWAT.vbproj">
+      <Project>{8157C92A-68A6-498D-84B7-EF2A299AB7BA}</Project>
+      <Name>atcTimeseriesSWAT</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">

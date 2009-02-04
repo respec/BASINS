@@ -1035,22 +1035,22 @@ TryAgain:
                 Dim lEndOfStream As Boolean = False
                 Try
 ReadCharacter:
-                    If pCanSeek AndAlso pStreamReader.PeekChar = -1 Then
-                        lEndOfStream = True
-                    Else
-                        lChar = pStreamReader.ReadChar
-                        Select Case lChar
-                            Case ControlChars.Cr 'Found carriage return, consume linefeed if it is next
-                                If pStreamReader.PeekChar = 10 Then pStreamReader.ReadChar()
-                            Case ControlChars.Lf 'Unix-style line ends without carriage return
-                            Case Else 'Found a character that does not end the line
-                                lSb.Append(lChar)
-                                GoTo ReadCharacter
-                        End Select
-                        pCurrentLine = lSb.ToString
-                        Logger.Progress(pStreamReader.BaseStream.Position, pStreamReader.BaseStream.Length)
-                        Return True
-                    End If
+                    'If pCanSeek AndAlso pStreamReader.PeekChar = -1 Then
+                    ' lEndOfStream = True
+                    'Else
+                    lChar = pStreamReader.ReadChar
+                    Select Case lChar
+                        Case ControlChars.Cr 'Found carriage return, consume linefeed if it is next
+                            If pStreamReader.PeekChar = 10 Then pStreamReader.ReadChar()
+                        Case ControlChars.Lf 'Unix-style line ends without carriage return
+                        Case Else 'Found a character that does not end the line
+                            lSb.Append(lChar)
+                            GoTo ReadCharacter
+                    End Select
+                    pCurrentLine = lSb.ToString
+                    Logger.Progress(pStreamReader.BaseStream.Position, pStreamReader.BaseStream.Length)
+                    Return True
+                    'End If
                 Catch lEndOfStreamException As IO.EndOfStreamException
                     lEndOfStream = True
                 End Try

@@ -171,21 +171,23 @@ StartOver:
     End Property
 
     Friend Shared Function OpenDataSource(ByVal aFilename As String) As atcTimeseriesSource
-        Dim lAddSource As Boolean = True
         For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             If lDataSource.Specification.ToLower = aFilename.ToLower Then 'already open
                 Return lDataSource
             End If
         Next
-        If lAddSource AndAlso FileExists(aFilename) Then
+        If FileExists(aFilename) Then
             Dim lDataSource As atcTimeseriesSource
-            If aFilename.ToLower.EndsWith("wdm") Then
-                lDataSource = New atcWDM.atcDataSourceWDM
-            ElseIf aFilename.ToLower.EndsWith("hbn") Then
-                lDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-            Else
-                Throw New ApplicationException("Could not open '" & aFilename & "' in frmCAT:OpenDataSource")
-            End If
+            Select Case IO.Path.GetExtension(aFilename).Substring(1).ToLower 'test letters after .
+                Case "wdm" : lDataSource = New atcWDM.atcDataSourceWDM
+                Case "hbn" : lDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                Case "hru" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
+                Case "rch" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
+                Case "sub" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
+                Case Else
+                    Throw New ApplicationException("Could not open '" & aFilename & "' in frmCAT:OpenDataSource")
+            End Select
+
             lDataSource.Specification = aFilename
             atcDataManager.OpenDataSource(lDataSource, lDataSource.Specification, Nothing)
             Return lDataSource

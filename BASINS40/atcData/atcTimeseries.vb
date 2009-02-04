@@ -284,11 +284,11 @@ Public Class atcTimeseries
 
         Clear()
         pDataSource = aTimeseriesSource
-        If Not aTimeseriesSource Is Nothing Then
+        If aTimeseriesSource IsNot Nothing Then
             Try
                 Attributes.SetValue("Data Source", aTimeseriesSource.Specification)
             Catch ex As Exception
-                'atcDataSource is not really an atcDataSource
+                'aTimeseriesSource is not really an atcDataSource
             End Try
         End If
     End Sub
