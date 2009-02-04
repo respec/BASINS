@@ -1032,6 +1032,11 @@ Public Class frmSWMMSetup
     Friend pPrecStations As atcCollection
     Friend pMetStations As atcCollection
     Friend pBasinsFolder As String
+    Friend pSubCatchmentFieldNames As New atcCollection
+    Friend pSubCatchmentFieldDefaults As New atcCollection
+    Friend pSubCatchmentFieldWidths As New atcCollection
+    Friend pSubCatchmentFieldTypes As New atcCollection
+
     Private pInitializing As Boolean = True
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
@@ -1920,6 +1925,106 @@ Public Class frmSWMMSetup
         lCATooltip.SetToolTip(cmdConduitAttributes, "Calculate Attributes for Conduits")
         Dim lNATooltip As New ToolTip
         lNATooltip.SetToolTip(cmdNodeAttributes, "Calculate Attributes for Nodes")
+
+        'build collections of field names, defaults, types, and widths for new shapefile attributes
+        'this is temporary; the plan is to move these to a data table 
+        pSubCatchmentFieldNames = New atcCollection
+        pSubCatchmentFieldNames.Add("Name")
+        pSubCatchmentFieldNames.Add("OutNodeID")
+        pSubCatchmentFieldNames.Add("Width")
+        pSubCatchmentFieldNames.Add("Slope")
+        pSubCatchmentFieldNames.Add("CurbLength")
+        pSubCatchmentFieldNames.Add("SnowPkName")
+        pSubCatchmentFieldNames.Add("ManNImperv")
+        pSubCatchmentFieldNames.Add("ManNPerv")
+        pSubCatchmentFieldNames.Add("DepStorImp")
+        pSubCatchmentFieldNames.Add("DepStorPer")
+        pSubCatchmentFieldNames.Add("PctZeroSto")
+        pSubCatchmentFieldNames.Add("RouteTo")
+        pSubCatchmentFieldNames.Add("PctRouted")
+        pSubCatchmentFieldNames.Add("MaxInfiltR")
+        pSubCatchmentFieldNames.Add("MinInfiltR")
+        pSubCatchmentFieldNames.Add("DecayRate")
+        pSubCatchmentFieldNames.Add("DryTime")
+        pSubCatchmentFieldNames.Add("MaxInfiltV")
+        pSubCatchmentFieldNames.Add("Suction")
+        pSubCatchmentFieldNames.Add("Conductiv")
+        pSubCatchmentFieldNames.Add("InitDefcit")
+        pSubCatchmentFieldNames.Add("CurveNum")
+
+        pSubCatchmentFieldDefaults = New atcCollection
+        pSubCatchmentFieldDefaults.Add("S")  'and the feature index 
+        pSubCatchmentFieldDefaults.Add("")   'find closest outlet node id
+        pSubCatchmentFieldDefaults.Add("")
+        pSubCatchmentFieldDefaults.Add("")   'compute slope
+        pSubCatchmentFieldDefaults.Add("0.0")
+        pSubCatchmentFieldDefaults.Add("")
+        pSubCatchmentFieldDefaults.Add("0.01")
+        pSubCatchmentFieldDefaults.Add("0.1")
+        pSubCatchmentFieldDefaults.Add("0.05")
+        pSubCatchmentFieldDefaults.Add("0.05")
+        pSubCatchmentFieldDefaults.Add("25.0")
+        pSubCatchmentFieldDefaults.Add("OUTLET")
+        pSubCatchmentFieldDefaults.Add("100.0")
+        pSubCatchmentFieldDefaults.Add("3.0")
+        pSubCatchmentFieldDefaults.Add("0.5")
+        pSubCatchmentFieldDefaults.Add("4")
+        pSubCatchmentFieldDefaults.Add("7")
+        pSubCatchmentFieldDefaults.Add("0")
+        pSubCatchmentFieldDefaults.Add("3.0")
+        pSubCatchmentFieldDefaults.Add("0.5")
+        pSubCatchmentFieldDefaults.Add("4.0")
+        pSubCatchmentFieldDefaults.Add("3.0")
+
+        'string is type 0, integer is type 1, double is type 2
+        pSubCatchmentFieldTypes = New atcCollection
+        pSubCatchmentFieldTypes.Add(0)
+        pSubCatchmentFieldTypes.Add(0)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(0)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(0)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(2)
+
+        pSubCatchmentFieldWidths = New atcCollection
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(10)
+
         Logger.Dbg("InitializeUI Complete")
     End Sub
 
@@ -2212,30 +2317,10 @@ Public Class frmSWMMSetup
                 GisUtil.AddLayer(ofdSubcatchment.FileName, FilenameNoPath(ofdSubcatchment.FileName))
 
                 'add fields
-                'string is type 0, integer is type 1, double is type 2
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdSubcatchment.FileName)
-                GisUtil.AddField(lLayerIndex, "Name", 0, 10)
-                GisUtil.AddField(lLayerIndex, "OutNodeID", 0, 10) ' As String
-                GisUtil.AddField(lLayerIndex, "Width", 2, 10) ' As Double = 0.0 'in feet or meters
-                GisUtil.AddField(lLayerIndex, "Slope", 2, 10) ' As Double = 0.0 'percent
-                GisUtil.AddField(lLayerIndex, "CurbLength", 2, 10) ' As Double = 0.0
-                GisUtil.AddField(lLayerIndex, "SnowPkName", 0, 10) ' As String = "" 'blank if none
-                GisUtil.AddField(lLayerIndex, "ManNImperv", 2, 10) ' As Double = 0.01
-                GisUtil.AddField(lLayerIndex, "ManNPerv", 2, 10) ' As Double = 0.1
-                GisUtil.AddField(lLayerIndex, "DepStorImp", 2, 20) ' As Double = 0.05 'inches or mm
-                GisUtil.AddField(lLayerIndex, "DepStorPer", 2, 20) ' As Double = 0.05 'inches or mm
-                GisUtil.AddField(lLayerIndex, "PctZeroSto", 2, 10) ' As Double = 25.0
-                GisUtil.AddField(lLayerIndex, "RouteTo", 0, 10) ' As String = "OUTLET"
-                GisUtil.AddField(lLayerIndex, "PctRouted", 2, 10) ' As Double = 100.0
-                GisUtil.AddField(lLayerIndex, "MaxInfiltR", 2, 10) ' As Double = 3.0 'inches/hr or mm/hr
-                GisUtil.AddField(lLayerIndex, "MinInfiltR", 2, 10) ' As Double = 0.5 'inches/hr or mm/hr
-                GisUtil.AddField(lLayerIndex, "DecayRate", 2, 10) ' As Double = 4
-                GisUtil.AddField(lLayerIndex, "DryTime", 2, 10) ' As Double = 7 'days (or 4 days if using curve number)
-                GisUtil.AddField(lLayerIndex, "MaxInfiltV", 2, 10) ' As Double = 0 'inches or mm
-                GisUtil.AddField(lLayerIndex, "Suction", 2, 10) ' As Double = 3.0 'inches or mm              'used if Infiltration Method is "GREEN_AMPT"
-                GisUtil.AddField(lLayerIndex, "Conductiv", 2, 10) ' As Double = 0.5 'inches/hr or mm/hr   'used if Infiltration Method is "GREEN_AMPT" or "CURVE_NUMBER"
-                GisUtil.AddField(lLayerIndex, "InitDefcit", 2, 10) ' As Double = 4.0                     'used if Infiltration Method is "GREEN_AMPT"
-                GisUtil.AddField(lLayerIndex, "CurveNum", 2, 10) ' As Double = 3.0                        'used if Infiltration Method is "CURVE_NUMBER"
+                For lIndex As Integer = 0 To pSubCatchmentFieldNames.Count
+                    GisUtil.AddField(lLayerIndex, pSubCatchmentFieldNames(lIndex), pSubCatchmentFieldTypes(lIndex), pSubCatchmentFieldWidths(lIndex))
+                Next
 
                 cboSubbasins.Items.Add(FilenameNoPath(ofdSubcatchment.FileName))
                 cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
@@ -2354,53 +2439,11 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdSubcatchmentAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSubcatchmentAttributes.Click
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
-        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lValue As String = "S" & CStr(lFeatureIndex + 1)
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Name"), lFeatureIndex, lValue)
-            lValue = ""   'todo: find closest outlet node id
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutNodeID"), lFeatureIndex, lValue) ' As String
-            lValue = Math.Sqrt(GisUtil.FeatureArea(lLayerIndex, lFeatureIndex)) * 3.281 'convert m to ft
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Width"), lFeatureIndex, lValue) ' As Double = 0.0 'in feet or meters
-            lValue = ""   'todo: compute slope
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Slope"), lFeatureIndex, lValue) ' As Double = 0.0 'percent
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "CurbLength"), lFeatureIndex, lValue) ' As Double = 0.0
-            lValue = ""
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "SnowPkName"), lFeatureIndex, lValue) ' As String = "" 'blank if none
-            lValue = "0.01"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "ManNImperv"), lFeatureIndex, lValue) ' As Double = 0.01
-            lValue = "0.1"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "ManNPerv"), lFeatureIndex, lValue) ' As Double = 0.1
-            lValue = "0.05"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DepStorImp"), lFeatureIndex, lValue) ' As Double = 0.05 'inches or mm
-            lValue = "0.05"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DepStorPer"), lFeatureIndex, lValue) ' As Double = 0.05 'inches or mm
-            lValue = "25.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "PctZeroSto"), lFeatureIndex, lValue) ' As Double = 25.0
-            lValue = "OUTLET"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "RouteTo"), lFeatureIndex, lValue) ' As String = "OUTLET"
-            lValue = "100.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "PctRouted"), lFeatureIndex, lValue) ' As Double = 100.0
-            lValue = "3.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxInfiltR"), lFeatureIndex, lValue) ' As Double = 3.0 'inches/hr or mm/hr
-            lValue = "0.5"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MinInfiltR"), lFeatureIndex, lValue) ' As Double = 0.5 'inches/hr or mm/hr
-            lValue = "4"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DecayRate"), lFeatureIndex, lValue) ' As Double = 4
-            lValue = "7"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "DryTime"), lFeatureIndex, lValue) ' As Double = 7 'days (or 4 days if using curve number)
-            lValue = "0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxInfiltV"), lFeatureIndex, lValue) ' As Double = 0 'inches or mm
-            lValue = "3.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Suction"), lFeatureIndex, lValue) ' As Double = 3.0 'inches or mm              'used if Infiltration Method is "GREEN_AMPT"
-            lValue = "0.5"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Conductiv"), lFeatureIndex, lValue) ' As Double = 0.5 'inches/hr or mm/hr   'used if Infiltration Method is "GREEN_AMPT" or "CURVE_NUMBER"
-            lValue = "4.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InitDefcit"), lFeatureIndex, lValue) ' As Double = 4.0                     'used if Infiltration Method is "GREEN_AMPT"
-            lValue = "3.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "CurveNum"), lFeatureIndex, lValue) ' As Double = 3.0                        'used if Infiltration Method is "CURVE_NUMBER"
-        Next
+        Dim lfrmCalculate As New frmCalculate
+        Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
+
+        lfrmCalculate.InitializeForm(cboSubbasins.Items(cboSubbasins.SelectedIndex), pSubCatchmentFieldNames, pSubCatchmentFieldDefaults, pSubCatchmentFieldWidths, pSubCatchmentFieldTypes)
+        lResult = lfrmCalculate.ShowDialog()
     End Sub
 
     Private Sub cmdConduitAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdConduitAttributes.Click
