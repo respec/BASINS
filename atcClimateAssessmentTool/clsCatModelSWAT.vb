@@ -12,6 +12,9 @@ Public Class clsCatModelSWAT
     Private pBaseScenario As String = ""
     Private pSWATDatabaseName As String = ""
     Private pMetWDM As atcWDM.atcDataSourceWDM
+    Private pBaseOutputHruFileName As String
+    Private pBaseOutputRchFileName As String
+    Private pBaseOutputSubFileName As String
 
     Public Property BaseScenario() As String Implements clsCatModel.BaseScenario
         Get
@@ -41,14 +44,70 @@ Public Class clsCatModelSWAT
             ChDriveDir(lFolder)
             pBaseScenario = aFilename
             RaiseEvent BaseScenarioSet(aFilename)
+
+            'Find and open met data WDM file
             Dim lWDMfilename As String = IO.Path.GetDirectoryName(aFilename) & "\met.wdm"
             If Not IO.File.Exists(lWDMfilename) Then
                 lWDMfilename = IO.Path.GetDirectoryName(aFilename) & "\met\met.wdm"
             End If
+OpenMetWDM:
             If IO.File.Exists(lWDMfilename) Then
                 pMetWDM = clsCat.OpenDataSource(lWDMfilename)
             Else
-                Logger.Msg("Did not find '" & lWDMfilename & "'", "SWAT Met Data Not Found")
+                If Logger.Msg("Did not find '" & lWDMfilename & "'" & vbCrLf & "Browse for met data?", vbOKCancel, "SWAT Met Data Not Found") = MsgBoxResult.Ok Then
+                    Dim lFileDialog As New Windows.Forms.OpenFileDialog
+                    With lFileDialog
+                        .Title = "Please locate met WDM for SWAT"
+                        .Filter = "*.wdm|*.wdm"
+                        If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                            lWDMfilename = .FileName
+                            GoTo OpenMetWDM
+                        End If
+                    End With
+                End If
+            End If
+
+            If pMetWDM IsNot Nothing Then
+                'Find and open output from base run, TODO: offer to browse for base or run base case
+                Dim lTxtInOutFolder As String = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\base\TxtInOut\" ' trailing directory separator
+                pBaseOutputHruFileName = lTxtInOutFolder & "output.hru"
+                If FileExists(pBaseOutputHruFileName) Then
+                    Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
+                    Dim lOutputFields As New atcData.atcDataAttributes
+                    With lOutputHru
+                        lOutputFields.SetValue("FieldName", "AREAkm2;YLDt/ha")
+                        If atcDataManager.OpenDataSource(lOutputHru, pBaseOutputHruFileName, lOutputFields) Then
+                            Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
+                        End If
+                    End With
+                Else
+                    Logger.Dbg("MissingHruOutput " & pBaseOutputHruFileName)
+                End If
+
+                pBaseOutputRchFileName = lTxtInOutFolder & "output.rch"
+                If FileExists(pBaseOutputRchFileName) Then
+                    Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
+                    With lOutputRch
+                        If atcDataManager.OpenDataSource(lOutputRch, pBaseOutputRchFileName, Nothing) Then
+                            Logger.Dbg("OutputRchTimserCount " & .DataSets.Count)
+                        End If
+                    End With
+                Else
+                    Logger.Dbg("MissingRchOutput " & pBaseOutputRchFileName)
+                End If
+
+                pBaseOutputSubFileName = lTxtInOutFolder & "output.sub"
+                If FileExists(pBaseOutputSubFileName) Then
+                    Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
+                    With lOutputSub
+                        If atcDataManager.OpenDataSource(lOutputSub, pBaseOutputSubFileName, Nothing) Then
+                            Logger.Dbg("OutputSubTimserCount " & .DataSets.Count)
+                        End If
+                    End With
+                Else
+                    Logger.Dbg("MissingSubOutput " & pBaseOutputSubFileName)
+                End If
+
             End If
         End If
     End Sub
@@ -110,7 +169,30 @@ Public Class clsCatModelSWAT
             End If
         End If
         Dim lModified As New atcCollection
-        'TODO: read written data for endpoints
+
+        ' Read written data for endpoints
+
+        Dim lOutputHruFileName As String = lTxtInOutFolder & "output.hru"
+        If FileExists(lOutputHruFileName) Then
+            lModified.Add(IO.Path.GetFileName(pBaseOutputHruFileName).ToLower.Trim, lOutputHruFileName.Trim)
+        Else
+            Logger.Dbg("MissingHruOutput " & lOutputHruFileName)
+        End If
+
+        Dim lOutputRchFileName As String = lTxtInOutFolder & "output.rch"
+        If FileExists(lOutputRchFileName) Then
+            lModified.Add(IO.Path.GetFileName(pBaseOutputRchFileName).ToLower.Trim, lOutputRchFileName.Trim)
+        Else
+            Logger.Dbg("MissingRchOutput " & lOutputRchFileName)
+        End If
+
+        Dim lOutputSubFileName As String = lTxtInOutFolder & "output.sub"
+        If FileExists(lOutputSubFileName) Then
+            lModified.Add(IO.Path.GetFileName(pBaseOutputSubFileName).ToLower.Trim, lOutputSubFileName.Trim)
+        Else
+            Logger.Dbg("MissingSubOutput " & lOutputSubFileName)
+        End If
+
         ChDir(lSaveDir)
         Return lModified
     End Function
