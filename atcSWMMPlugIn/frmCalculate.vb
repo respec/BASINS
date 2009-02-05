@@ -30,14 +30,25 @@ Public Class frmCalculate
                 If lCheckedName = "Name" Then
                     lValue = pDefaults(pFields.IndexOf(lCheckedName)) & CStr(lFeatureIndex + 1)
                 ElseIf lCheckedName = "OutNodeID" Then
-                    'todo: find closest outlet node id
+                    'todo: find closest subcatchment outlet node id
                 ElseIf lCheckedName = "Width" Then
+                    'estimate width of subcatchment
                     lValue = Math.Sqrt(GisUtil.FeatureArea(lLayerIndex, lFeatureIndex)) * 3.281 'convert m to ft
                 ElseIf lCheckedName = "Slope" Then
-                    'todo: compute slope
+                    'todo: compute subcatchment slope
+                ElseIf lCheckedName = "InletNode" Then
+                    'todo: find closest conduit inlet node id
+                ElseIf lCheckedName = "OutletNode" Then
+                    'todo: find closest conduit outlet node id
+                ElseIf lCheckedName = "Geometry1" Then
+                    'estimate full height from mean depth of conduit
+                    lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")) * 1.25
+                ElseIf lCheckedName = "Geometry2" Then
+                    'estimate base width from mean width and mean depth of conduit
+                    lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth")) - (2 * GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")))
                 Else
                     'regular case
-                    lValue = pDefaults(lCheckedName)
+                    lValue = pDefaults(pFields.IndexOf(lCheckedName))
                 End If
                 GisUtil.SetFeatureValue(lLayerIndex, lFieldIndex, lFeatureIndex, lValue)
             Next

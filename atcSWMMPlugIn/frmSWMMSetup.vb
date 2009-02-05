@@ -1032,10 +1032,21 @@ Public Class frmSWMMSetup
     Friend pPrecStations As atcCollection
     Friend pMetStations As atcCollection
     Friend pBasinsFolder As String
+
     Friend pSubCatchmentFieldNames As New atcCollection
     Friend pSubCatchmentFieldDefaults As New atcCollection
     Friend pSubCatchmentFieldWidths As New atcCollection
     Friend pSubCatchmentFieldTypes As New atcCollection
+
+    Friend pConduitFieldNames As New atcCollection
+    Friend pConduitFieldDefaults As New atcCollection
+    Friend pConduitFieldWidths As New atcCollection
+    Friend pConduitFieldTypes As New atcCollection
+
+    Friend pNodeFieldNames As New atcCollection
+    Friend pNodeFieldDefaults As New atcCollection
+    Friend pNodeFieldWidths As New atcCollection
+    Friend pNodeFieldTypes As New atcCollection
 
     Private pInitializing As Boolean = True
 
@@ -1929,101 +1940,221 @@ Public Class frmSWMMSetup
         'build collections of field names, defaults, types, and widths for new shapefile attributes
         'this is temporary; the plan is to move these to a data table 
         pSubCatchmentFieldNames = New atcCollection
-        pSubCatchmentFieldNames.Add("Name")
-        pSubCatchmentFieldNames.Add("OutNodeID")
-        pSubCatchmentFieldNames.Add("Width")
-        pSubCatchmentFieldNames.Add("Slope")
-        pSubCatchmentFieldNames.Add("CurbLength")
-        pSubCatchmentFieldNames.Add("SnowPkName")
-        pSubCatchmentFieldNames.Add("ManNImperv")
-        pSubCatchmentFieldNames.Add("ManNPerv")
-        pSubCatchmentFieldNames.Add("DepStorImp")
-        pSubCatchmentFieldNames.Add("DepStorPer")
-        pSubCatchmentFieldNames.Add("PctZeroSto")
-        pSubCatchmentFieldNames.Add("RouteTo")
-        pSubCatchmentFieldNames.Add("PctRouted")
-        pSubCatchmentFieldNames.Add("MaxInfiltR")
-        pSubCatchmentFieldNames.Add("MinInfiltR")
-        pSubCatchmentFieldNames.Add("DecayRate")
-        pSubCatchmentFieldNames.Add("DryTime")
-        pSubCatchmentFieldNames.Add("MaxInfiltV")
-        pSubCatchmentFieldNames.Add("Suction")
-        pSubCatchmentFieldNames.Add("Conductiv")
-        pSubCatchmentFieldNames.Add("InitDefcit")
-        pSubCatchmentFieldNames.Add("CurveNum")
+        pSubCatchmentFieldNames.Add(1, "Name")
+        pSubCatchmentFieldNames.Add(2, "OutNodeID")
+        pSubCatchmentFieldNames.Add(3, "Width")
+        pSubCatchmentFieldNames.Add(4, "Slope")
+        pSubCatchmentFieldNames.Add(5, "CurbLength")
+        pSubCatchmentFieldNames.Add(6, "SnowPkName")
+        pSubCatchmentFieldNames.Add(7, "ManNImperv")
+        pSubCatchmentFieldNames.Add(8, "ManNPerv")
+        pSubCatchmentFieldNames.Add(9, "DepStorImp")
+        pSubCatchmentFieldNames.Add(10, "DepStorPer")
+        pSubCatchmentFieldNames.Add(11, "PctZeroSto")
+        pSubCatchmentFieldNames.Add(12, "RouteTo")
+        pSubCatchmentFieldNames.Add(13, "PctRouted")
+        pSubCatchmentFieldNames.Add(14, "MaxInfiltR")
+        pSubCatchmentFieldNames.Add(15, "MinInfiltR")
+        pSubCatchmentFieldNames.Add(16, "DecayRate")
+        pSubCatchmentFieldNames.Add(17, "DryTime")
+        pSubCatchmentFieldNames.Add(18, "MaxInfiltV")
+        pSubCatchmentFieldNames.Add(19, "Suction")
+        pSubCatchmentFieldNames.Add(20, "Conductiv")
+        pSubCatchmentFieldNames.Add(21, "InitDefcit")
+        pSubCatchmentFieldNames.Add(22, "CurveNum")
 
         pSubCatchmentFieldDefaults = New atcCollection
-        pSubCatchmentFieldDefaults.Add("S")  'and the feature index 
-        pSubCatchmentFieldDefaults.Add("")   'find closest outlet node id
-        pSubCatchmentFieldDefaults.Add("")
-        pSubCatchmentFieldDefaults.Add("")   'compute slope
-        pSubCatchmentFieldDefaults.Add("0.0")
-        pSubCatchmentFieldDefaults.Add("")
-        pSubCatchmentFieldDefaults.Add("0.01")
-        pSubCatchmentFieldDefaults.Add("0.1")
-        pSubCatchmentFieldDefaults.Add("0.05")
-        pSubCatchmentFieldDefaults.Add("0.05")
-        pSubCatchmentFieldDefaults.Add("25.0")
-        pSubCatchmentFieldDefaults.Add("OUTLET")
-        pSubCatchmentFieldDefaults.Add("100.0")
-        pSubCatchmentFieldDefaults.Add("3.0")
-        pSubCatchmentFieldDefaults.Add("0.5")
-        pSubCatchmentFieldDefaults.Add("4")
-        pSubCatchmentFieldDefaults.Add("7")
-        pSubCatchmentFieldDefaults.Add("0")
-        pSubCatchmentFieldDefaults.Add("3.0")
-        pSubCatchmentFieldDefaults.Add("0.5")
-        pSubCatchmentFieldDefaults.Add("4.0")
-        pSubCatchmentFieldDefaults.Add("3.0")
+        pSubCatchmentFieldDefaults.Add(1, "S")  'and the feature index 
+        pSubCatchmentFieldDefaults.Add(2, "")   'find closest outlet node id
+        pSubCatchmentFieldDefaults.Add(3, "")   'compute width
+        pSubCatchmentFieldDefaults.Add(4, "")   'compute slope
+        pSubCatchmentFieldDefaults.Add(5, "0.0")
+        pSubCatchmentFieldDefaults.Add(6, "")
+        pSubCatchmentFieldDefaults.Add(7, "0.01")
+        pSubCatchmentFieldDefaults.Add(8, "0.1")
+        pSubCatchmentFieldDefaults.Add(9, "0.05")
+        pSubCatchmentFieldDefaults.Add(10, "0.05")
+        pSubCatchmentFieldDefaults.Add(11, "25.0")
+        pSubCatchmentFieldDefaults.Add(12, "OUTLET")
+        pSubCatchmentFieldDefaults.Add(13, "100.0")
+        pSubCatchmentFieldDefaults.Add(14, "3.0")
+        pSubCatchmentFieldDefaults.Add(15, "0.5")
+        pSubCatchmentFieldDefaults.Add(16, "4")
+        pSubCatchmentFieldDefaults.Add(17, "7")
+        pSubCatchmentFieldDefaults.Add(18, "0")
+        pSubCatchmentFieldDefaults.Add(19, "3.0")
+        pSubCatchmentFieldDefaults.Add(20, "0.5")
+        pSubCatchmentFieldDefaults.Add(21, "4.0")
+        pSubCatchmentFieldDefaults.Add(22, "3.0")
 
         'string is type 0, integer is type 1, double is type 2
         pSubCatchmentFieldTypes = New atcCollection
-        pSubCatchmentFieldTypes.Add(0)
-        pSubCatchmentFieldTypes.Add(0)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(0)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(0)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
-        pSubCatchmentFieldTypes.Add(2)
+        pSubCatchmentFieldTypes.Add(1, 0)
+        pSubCatchmentFieldTypes.Add(2, 0)
+        pSubCatchmentFieldTypes.Add(3, 2)
+        pSubCatchmentFieldTypes.Add(4, 2)
+        pSubCatchmentFieldTypes.Add(5, 2)
+        pSubCatchmentFieldTypes.Add(6, 0)
+        pSubCatchmentFieldTypes.Add(7, 2)
+        pSubCatchmentFieldTypes.Add(8, 2)
+        pSubCatchmentFieldTypes.Add(9, 2)
+        pSubCatchmentFieldTypes.Add(10, 2)
+        pSubCatchmentFieldTypes.Add(11, 2)
+        pSubCatchmentFieldTypes.Add(12, 0)
+        pSubCatchmentFieldTypes.Add(13, 2)
+        pSubCatchmentFieldTypes.Add(14, 2)
+        pSubCatchmentFieldTypes.Add(15, 2)
+        pSubCatchmentFieldTypes.Add(16, 2)
+        pSubCatchmentFieldTypes.Add(17, 2)
+        pSubCatchmentFieldTypes.Add(18, 2)
+        pSubCatchmentFieldTypes.Add(19, 2)
+        pSubCatchmentFieldTypes.Add(20, 2)
+        pSubCatchmentFieldTypes.Add(21, 2)
+        pSubCatchmentFieldTypes.Add(22, 2)
 
         pSubCatchmentFieldWidths = New atcCollection
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
-        pSubCatchmentFieldWidths.Add(10)
+        pSubCatchmentFieldWidths.Add(1, 10)
+        pSubCatchmentFieldWidths.Add(2, 10)
+        pSubCatchmentFieldWidths.Add(3, 10)
+        pSubCatchmentFieldWidths.Add(4, 10)
+        pSubCatchmentFieldWidths.Add(5, 10)
+        pSubCatchmentFieldWidths.Add(6, 10)
+        pSubCatchmentFieldWidths.Add(7, 10)
+        pSubCatchmentFieldWidths.Add(8, 10)
+        pSubCatchmentFieldWidths.Add(9, 10)
+        pSubCatchmentFieldWidths.Add(10, 10)
+        pSubCatchmentFieldWidths.Add(11, 10)
+        pSubCatchmentFieldWidths.Add(12, 10)
+        pSubCatchmentFieldWidths.Add(13, 10)
+        pSubCatchmentFieldWidths.Add(14, 10)
+        pSubCatchmentFieldWidths.Add(15, 10)
+        pSubCatchmentFieldWidths.Add(16, 10)
+        pSubCatchmentFieldWidths.Add(17, 10)
+        pSubCatchmentFieldWidths.Add(18, 10)
+        pSubCatchmentFieldWidths.Add(19, 10)
+        pSubCatchmentFieldWidths.Add(20, 10)
+        pSubCatchmentFieldWidths.Add(21, 10)
+        pSubCatchmentFieldWidths.Add(22, 10)
+
+        pConduitFieldNames = New atcCollection
+        pConduitFieldNames.Add(1, "Name")
+        pConduitFieldNames.Add(2, "InletNode")
+        pConduitFieldNames.Add(3, "OutletNode")
+        pConduitFieldNames.Add(4, "MeanWidth")
+        pConduitFieldNames.Add(5, "MeanDepth")
+        pConduitFieldNames.Add(6, "ManningsN")
+        pConduitFieldNames.Add(7, "InOffset")
+        pConduitFieldNames.Add(8, "OutOffset")
+        pConduitFieldNames.Add(9, "InitFlow")
+        pConduitFieldNames.Add(10, "MaxFlow")
+        pConduitFieldNames.Add(11, "Shape")
+        pConduitFieldNames.Add(12, "Geometry1")
+        pConduitFieldNames.Add(13, "Geometry2")
+        pConduitFieldNames.Add(14, "Geometry3")
+        pConduitFieldNames.Add(15, "Geometry4")
+        pConduitFieldNames.Add(16, "NumBarrels")
+
+        pConduitFieldDefaults = New atcCollection
+        pConduitFieldDefaults.Add(1, "C")   'plus the FeatureIndex
+        pConduitFieldDefaults.Add(2, "")    'find closest inlet node id
+        pConduitFieldDefaults.Add(3, "")    'find closest outlet node id
+        pConduitFieldDefaults.Add(4, "0.0")
+        pConduitFieldDefaults.Add(5, "0.0")
+        pConduitFieldDefaults.Add(6, "0.05")
+        pConduitFieldDefaults.Add(7, "0.0")
+        pConduitFieldDefaults.Add(8, "0.0")
+        pConduitFieldDefaults.Add(9, "0.0")
+        pConduitFieldDefaults.Add(10, "0.0")
+        pConduitFieldDefaults.Add(11, "TRAPEZOIDAL")
+        pConduitFieldDefaults.Add(12, "")    ' 1.25 times mean depth
+        pConduitFieldDefaults.Add(13, "")    ' "MeanWidth" - (2 * "MeanDepth") 'base width
+        pConduitFieldDefaults.Add(14, "1")
+        pConduitFieldDefaults.Add(15, "1")
+        pConduitFieldDefaults.Add(16, "1")
+
+        pConduitFieldTypes = New atcCollection
+        pConduitFieldTypes.Add(1, 0)
+        pConduitFieldTypes.Add(2, 0)
+        pConduitFieldTypes.Add(3, 0)
+        pConduitFieldTypes.Add(4, 2)
+        pConduitFieldTypes.Add(5, 2)
+        pConduitFieldTypes.Add(6, 2)
+        pConduitFieldTypes.Add(7, 2)
+        pConduitFieldTypes.Add(8, 2)
+        pConduitFieldTypes.Add(9, 2)
+        pConduitFieldTypes.Add(10, 2)
+        pConduitFieldTypes.Add(11, 0)
+        pConduitFieldTypes.Add(12, 2)
+        pConduitFieldTypes.Add(13, 2)
+        pConduitFieldTypes.Add(14, 2)
+        pConduitFieldTypes.Add(15, 2)
+        pConduitFieldTypes.Add(16, 1)
+
+        pConduitFieldWidths = New atcCollection
+        pConduitFieldWidths.Add(1, 10)
+        pConduitFieldWidths.Add(2, 10)
+        pConduitFieldWidths.Add(3, 10)
+        pConduitFieldWidths.Add(4, 10)
+        pConduitFieldWidths.Add(5, 10)
+        pConduitFieldWidths.Add(6, 10)
+        pConduitFieldWidths.Add(7, 10)
+        pConduitFieldWidths.Add(8, 10)
+        pConduitFieldWidths.Add(9, 10)
+        pConduitFieldWidths.Add(10, 10)
+        pConduitFieldWidths.Add(11, 12)
+        pConduitFieldWidths.Add(12, 10)
+        pConduitFieldWidths.Add(13, 10)
+        pConduitFieldWidths.Add(14, 10)
+        pConduitFieldWidths.Add(15, 10)
+        pConduitFieldWidths.Add(16, 10)
+
+        pNodeFieldNames = New atcCollection
+        pNodeFieldNames.Add(1, "Name")
+        pNodeFieldNames.Add(2, "Type")
+        pNodeFieldNames.Add(3, "InvertElev")
+        pNodeFieldNames.Add(4, "MaxDepth")
+        pNodeFieldNames.Add(5, "InitDepth")
+        pNodeFieldNames.Add(6, "SurchargeD")
+        pNodeFieldNames.Add(7, "PondedArea")
+        pNodeFieldNames.Add(8, "OutfallTyp")
+        pNodeFieldNames.Add(9, "StageTable")
+        pNodeFieldNames.Add(10, "TideGate")
+
+        pNodeFieldDefaults = New atcCollection
+        pNodeFieldDefaults.Add(1, "N") 'plus the feature index
+        pNodeFieldDefaults.Add(2, "JUNCTION")
+        pNodeFieldDefaults.Add(3, "0.0")
+        pNodeFieldDefaults.Add(4, "0.0")
+        pNodeFieldDefaults.Add(5, "0.0")
+        pNodeFieldDefaults.Add(6, "0.0")
+        pNodeFieldDefaults.Add(7, "0.0")
+        pNodeFieldDefaults.Add(8, "FREE")
+        pNodeFieldDefaults.Add(9, "")
+        pNodeFieldDefaults.Add(10, "NO")
+
+        pNodeFieldTypes = New atcCollection
+        pNodeFieldTypes.Add(1, 0)
+        pNodeFieldTypes.Add(2, 0)
+        pNodeFieldTypes.Add(3, 2)
+        pNodeFieldTypes.Add(4, 2)
+        pNodeFieldTypes.Add(5, 2)
+        pNodeFieldTypes.Add(6, 2)
+        pNodeFieldTypes.Add(7, 2)
+        pNodeFieldTypes.Add(8, 0)
+        pNodeFieldTypes.Add(9, 0)
+        pNodeFieldTypes.Add(10, 0)
+
+        pNodeFieldWidths = New atcCollection
+        pNodeFieldWidths.Add(1, 10)
+        pNodeFieldWidths.Add(2, 10)
+        pNodeFieldWidths.Add(3, 10)
+        pNodeFieldWidths.Add(4, 10)
+        pNodeFieldWidths.Add(5, 10)
+        pNodeFieldWidths.Add(6, 10)
+        pNodeFieldWidths.Add(7, 10)
+        pNodeFieldWidths.Add(8, 10)
+        pNodeFieldWidths.Add(9, 10)
+        pNodeFieldWidths.Add(10, 10)
 
         Logger.Dbg("InitializeUI Complete")
     End Sub
@@ -2318,10 +2449,11 @@ Public Class frmSWMMSetup
 
                 'add fields
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdSubcatchment.FileName)
-                For lIndex As Integer = 0 To pSubCatchmentFieldNames.Count
+                For lIndex As Integer = 0 To pSubCatchmentFieldNames.Count - 1
                     GisUtil.AddField(lLayerIndex, pSubCatchmentFieldNames(lIndex), pSubCatchmentFieldTypes(lIndex), pSubCatchmentFieldWidths(lIndex))
                 Next
 
+                GisUtil.LayerVisible(lLayerIndex) = True
                 cboSubbasins.Items.Add(FilenameNoPath(ofdSubcatchment.FileName))
                 cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
                 Logger.Msg("The new shapefile " & FilenameNoPath(ofdSubcatchment.FileName) & " has been created." & vbCrLf & _
@@ -2337,28 +2469,12 @@ Public Class frmSWMMSetup
                 GisUtil.AddLayer(ofdConduits.FileName, FilenameNoPath(ofdConduits.FileName))
 
                 'add fields
-                'string is type 0, integer is type 1, double is type 2
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdConduits.FileName)
-                GisUtil.AddField(lLayerIndex, "Name", 0, 10)
-                GisUtil.AddField(lLayerIndex, "InletNode", 0, 10) 'As String = ""
-                GisUtil.AddField(lLayerIndex, "OutletNode", 0, 10) 'As String = ""
-                'GisUtil.AddField(lLayerIndex, "DownConduitID", 0, 10) 'As String = ""  'assume nodes exist
-                GisUtil.AddField(lLayerIndex, "MeanWidth", 2, 10) 'As Double = 0.0
-                GisUtil.AddField(lLayerIndex, "MeanDepth", 2, 10) ' As Double = 0.0
-                'GisUtil.AddField(lLayerIndex, "ElevationHigh", 2, 10) ' As Double = 0.0  'assume nodes exist
-                'GisUtil.AddField(lLayerIndex, "ElevationLow", 2, 10) ' As Double = 0.0   'assume nodes exist
-                GisUtil.AddField(lLayerIndex, "ManningsN", 2, 10) ' As Double = 0.05
-                GisUtil.AddField(lLayerIndex, "InOffset", 2, 10) ' As Double = 0.0
-                GisUtil.AddField(lLayerIndex, "OutOffset", 2, 10) ' As Double = 0.0
-                GisUtil.AddField(lLayerIndex, "InitFlow", 2, 10) ' As Double = 0.0
-                GisUtil.AddField(lLayerIndex, "MaxFlow", 2, 10) ' As Double = 0.0
-                GisUtil.AddField(lLayerIndex, "Shape", 0, 12) 'As String = "TRAPEZOIDAL"
-                GisUtil.AddField(lLayerIndex, "Geometry1", 2, 10) 'As Double = -1 'full height
-                GisUtil.AddField(lLayerIndex, "Geometry2", 2, 10) 'As Double = -1 'base width
-                GisUtil.AddField(lLayerIndex, "Geometry3", 2, 10) 'As Double = 1 'left slope
-                GisUtil.AddField(lLayerIndex, "Geometry4", 2, 10) 'As Double = 1 'right slope
-                GisUtil.AddField(lLayerIndex, "NumBarrels", 1, 10) 'As Integer = 1
+                For lIndex As Integer = 0 To pConduitFieldNames.Count
+                    GisUtil.AddField(lLayerIndex, pConduitFieldNames(lIndex), pConduitFieldTypes(lIndex), pConduitFieldWidths(lIndex))
+                Next
 
+                GisUtil.LayerVisible(lLayerIndex) = True
                 cboStreams.Items.Add(FilenameNoPath(ofdConduits.FileName))
                 cboStreams.SelectedIndex = cboStreams.Items.Count - 1
                 Logger.Msg("The new shapefile " & FilenameNoPath(ofdConduits.FileName) & " has been created." & vbCrLf & _
@@ -2376,19 +2492,12 @@ Public Class frmSWMMSetup
                 GisUtil.AddLayer(ofdNodes.FileName, FilenameNoPath(ofdNodes.FileName))
 
                 'add fields
-                'string is type 0, integer is type 1, double is type 2
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdNodes.FileName)
-                GisUtil.AddField(lLayerIndex, "Name", 0, 10)
-                GisUtil.AddField(lLayerIndex, "Type", 0, 10) 'junction or outfall
-                GisUtil.AddField(lLayerIndex, "InvertElev", 2, 10) 'in feet or meters
-                GisUtil.AddField(lLayerIndex, "MaxDepth", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "InitDepth", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "SurchargeD", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "PondedArea", 2, 10) ' = 0.0
-                GisUtil.AddField(lLayerIndex, "OutfallTyp", 0, 10) ' = "FREE"
-                GisUtil.AddField(lLayerIndex, "StageTable", 0, 10) ' = ""
-                GisUtil.AddField(lLayerIndex, "TideGate", 0, 10) ' = "NO"
+                For lIndex As Integer = 0 To pNodeFieldNames.Count
+                    GisUtil.AddField(lLayerIndex, pNodeFieldNames(lIndex), pNodeFieldTypes(lIndex), pNodeFieldWidths(lIndex))
+                Next
 
+                GisUtil.LayerVisible(lLayerIndex) = True
                 cboOutlets.Items.Add(FilenameNoPath(ofdNodes.FileName))
                 cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
 
@@ -2447,67 +2556,19 @@ Public Class frmSWMMSetup
     End Sub
 
     Private Sub cmdConduitAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdConduitAttributes.Click
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lValue As String = "C" & CStr(lFeatureIndex + 1)
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Name"), lFeatureIndex, lValue)
-            lValue = ""  'todo: find closest inlet node id
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InletNode"), lFeatureIndex, lValue) 'As String = ""
-            lValue = ""  'todo: find closest outlet node id
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutletNode"), lFeatureIndex, lValue) 'As String = ""
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth"), lFeatureIndex, lValue) 'As Double = 0.0
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth"), lFeatureIndex, lValue) ' As Double = 0.0
-            lValue = "0.05"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "ManningsN"), lFeatureIndex, lValue) ' As Double = 0.05
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InOffset"), lFeatureIndex, lValue) ' As Double = 0.0
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutOffset"), lFeatureIndex, lValue) ' As Double = 0.0
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InitFlow"), lFeatureIndex, lValue) ' As Double = 0.0
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxFlow"), lFeatureIndex, lValue) ' As Double = 0.0
-            lValue = "TRAPEZOIDAL"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Shape"), lFeatureIndex, lValue) 'As String = "TRAPEZOIDAL"
-            lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")) * 1.25
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry1"), lFeatureIndex, lValue) 'As Double = -1 'full height
-            lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth")) - (2 * GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth"))) 'base width
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry2"), lFeatureIndex, lValue) 'As Double = -1 'base width
-            lValue = "1"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry3"), lFeatureIndex, lValue) 'As Double = 1 'left slope
-            lValue = "1"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Geometry4"), lFeatureIndex, lValue) 'As Double = 1 'right slope
-            lValue = "1"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "NumBarrels"), lFeatureIndex, lValue) 'As Integer = 1
-        Next
+        Dim lfrmCalculate As New frmCalculate
+        Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
+
+        lfrmCalculate.InitializeForm(cboStreams.Items(cboStreams.SelectedIndex), pConduitFieldNames, pConduitFieldDefaults, pConduitFieldWidths, pConduitFieldTypes)
+        lResult = lfrmCalculate.ShowDialog()
     End Sub
 
     Private Sub cmdNodeAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNodeAttributes.Click
-        Dim lLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lValue As String = "N" & CStr(lFeatureIndex + 1)
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Name"), lFeatureIndex, lValue)
-            lValue = "JUNCTION"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "Type"), lFeatureIndex, lValue) 'junction or outfall
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InvertElev"), lFeatureIndex, lValue) 'in feet or meters
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "MaxDepth"), lFeatureIndex, lValue) ' = 0.0
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "InitDepth"), lFeatureIndex, lValue) ' = 0.0
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "SurchargeD"), lFeatureIndex, lValue) ' = 0.0
-            lValue = "0.0"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "PondedArea"), lFeatureIndex, lValue) ' = 0.0
-            lValue = "FREE"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "OutfallTyp"), lFeatureIndex, lValue) ' = "FREE"
-            lValue = ""
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "StageTable"), lFeatureIndex, lValue) ' = ""
-            lValue = "NO"
-            GisUtil.SetFeatureValue(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "TideGate"), lFeatureIndex, lValue) ' = "NO"
-        Next
+        Dim lfrmCalculate As New frmCalculate
+        Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
+
+        lfrmCalculate.InitializeForm(cboOutlets.Items(cboOutlets.SelectedIndex), pNodeFieldNames, pNodeFieldDefaults, pNodeFieldWidths, pNodeFieldTypes)
+        lResult = lfrmCalculate.ShowDialog()
     End Sub
 
 End Class
