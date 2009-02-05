@@ -2470,7 +2470,7 @@ Public Class frmSWMMSetup
 
                 'add fields
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdConduits.FileName)
-                For lIndex As Integer = 0 To pConduitFieldNames.Count
+                For lIndex As Integer = 0 To pConduitFieldNames.Count - 1
                     GisUtil.AddField(lLayerIndex, pConduitFieldNames(lIndex), pConduitFieldTypes(lIndex), pConduitFieldWidths(lIndex))
                 Next
 
@@ -2493,7 +2493,7 @@ Public Class frmSWMMSetup
 
                 'add fields
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdNodes.FileName)
-                For lIndex As Integer = 0 To pNodeFieldNames.Count
+                For lIndex As Integer = 0 To pNodeFieldNames.Count - 1
                     GisUtil.AddField(lLayerIndex, pNodeFieldNames(lIndex), pNodeFieldTypes(lIndex), pNodeFieldWidths(lIndex))
                 Next
 
@@ -2551,7 +2551,7 @@ Public Class frmSWMMSetup
         Dim lfrmCalculate As New frmCalculate
         Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
 
-        lfrmCalculate.InitializeForm(cboSubbasins.Items(cboSubbasins.SelectedIndex), pSubCatchmentFieldNames, pSubCatchmentFieldDefaults, pSubCatchmentFieldWidths, pSubCatchmentFieldTypes)
+        lfrmCalculate.InitializeForm(cboSubbasins.Items(cboSubbasins.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pSubCatchmentFieldNames, pSubCatchmentFieldDefaults, pSubCatchmentFieldWidths, pSubCatchmentFieldTypes)
         lResult = lfrmCalculate.ShowDialog()
     End Sub
 
@@ -2559,7 +2559,7 @@ Public Class frmSWMMSetup
         Dim lfrmCalculate As New frmCalculate
         Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
 
-        lfrmCalculate.InitializeForm(cboStreams.Items(cboStreams.SelectedIndex), pConduitFieldNames, pConduitFieldDefaults, pConduitFieldWidths, pConduitFieldTypes)
+        lfrmCalculate.InitializeForm(cboStreams.Items(cboStreams.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pConduitFieldNames, pConduitFieldDefaults, pConduitFieldWidths, pConduitFieldTypes)
         lResult = lfrmCalculate.ShowDialog()
     End Sub
 
@@ -2567,7 +2567,7 @@ Public Class frmSWMMSetup
         Dim lfrmCalculate As New frmCalculate
         Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
 
-        lfrmCalculate.InitializeForm(cboOutlets.Items(cboOutlets.SelectedIndex), pNodeFieldNames, pNodeFieldDefaults, pNodeFieldWidths, pNodeFieldTypes)
+        lfrmCalculate.InitializeForm(cboOutlets.Items(cboOutlets.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pNodeFieldNames, pNodeFieldDefaults, pNodeFieldWidths, pNodeFieldTypes)
         lResult = lfrmCalculate.ShowDialog()
     End Sub
 
