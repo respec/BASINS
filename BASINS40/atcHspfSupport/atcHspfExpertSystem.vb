@@ -368,8 +368,8 @@ Public Class atcExpertSystem
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
                         pStats(2, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum50") '50% low
                         pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum90") '10% high
-                        pStats(11, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum90") '10% low
-                        pStats(12, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum75") '25% low
+                        pStats(11, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum10") '10% low
+                        pStats(12, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum25") '25% low
                         pStats(13, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum75") '25% high
                         pStats(14, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum50") '50% high
 
