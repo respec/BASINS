@@ -175,11 +175,13 @@ Public Class atcTimeseriesSWAT
                                         If lMONvalue < 13 Then
                                             If lMONvalue <> lMonReading Then
                                                 lMonReading = lMONvalue
-                                                If lMonReading = 1 AndAlso lDate = 0 Then
+                                                If lMonReading = 1 Then
                                                     lYear += 1
                                                 End If
                                             End If
                                             lDate = atcUtility.Jday(lYear, lMONvalue, daymon(lYear, lMONvalue), 24, 0, 0)
+                                        Else
+                                            GoTo NextRecord
                                         End If
                                     Case 1 'Daily
                                         If lDate = 0 Then
@@ -202,23 +204,27 @@ Public Class atcTimeseriesSWAT
                                     lYearReading = lYear
                                     If lYearBase = 0 Then lYearBase = lYear
                                 End If
+                                'Debug.Print(lYear & " " & DumpDate(lDate) & " at " & lLocation)
                                 For lField = lBaseDataField To .NumFields
                                     Dim lFieldName As String = .FieldName(lField).ToString.Replace("""", "")
                                     If lFieldsToProcess.Length = 0 OrElse lFieldsToProcess.Contains(lDelim & lFieldName.Replace("_", "/") & lDelim) Then
                                         lKey = lFieldName & ":" & lLocation
                                         lTSBuilder = lTSBuilders.Builder(lKey)
                                         If lTSBuilder.NumValues = 0 Then
-                                            Dim lYearFill As Integer = lYearBase
-                                            While lYear >= lYearFill
-                                                lTSBuilder.AddValue(atcUtility.Jday(lYearFill, 1, 1, 0, 0, 0), GetNaN)
-                                                lYearFill += 1
-                                            End While
+                                            If lMONcontains = 2 Then
+                                                Dim lYearFill As Integer = lYearBase
+                                                While lYear >= lYearFill
+                                                    lTSBuilder.AddValue(atcUtility.Jday(lYearFill, 1, 1, 0, 0, 0), GetNaN)
+                                                    lYearFill += 1
+                                                End While
+                                            End If
                                             If lSaveSubwatershedId Then
                                                 lTSBuilder.Attributes.Add("SubId", .Value(lSubIdField).Trim)
                                                 lTSBuilder.Attributes.Add("CropId", lLocation.Substring(0, 4))
                                                 lTSBuilder.Attributes.Add("HruId", lLocation.Substring(4).Trim)
                                             End If
                                         End If
+                                        'Debug.Print(lKey & " = " & .Value(lField).Trim & " = " & Double.Parse(.Value(lField).Trim))
                                         lTSBuilder.AddValue(lDate, Double.Parse(.Value(lField).Trim))
                                     End If
                                 Next
@@ -231,6 +237,7 @@ Public Class atcTimeseriesSWAT
                             Logger.Dbg("Stopping reading SWAT output: " & ex.Message)
                             Exit Do
                         End Try
+NextRecord:
                         .CurrentRecord += 1
                     Loop
                     Logger.Dbg("Read " & Format(lTSBuilders.Count, "#,##0") & " timeseries From " & Format(.CurrentRecord, "#,##0") & " Records")
