@@ -145,9 +145,17 @@ Public Class atcSynopticAnalysisPlugin
 
                     If lFirstYear = 0 Then lFirstYear = lYear
 
-                    For lAddYear As Integer = lGroups.Count To lYear - lFirstYear
-                        lGroups.Add(lYear, New atcTimeseriesGroup)
-                    Next
+                    If lYear < lFirstYear Then
+                        'Year before first year found, probably using bad timeseries or more than one timeseries, add earlier years than have been added
+                        For lAddYear As Integer = lFirstYear - 1 To lYear Step -1
+                            lGroups.Insert(0, lAddYear, New atcTimeseriesGroup)
+                        Next
+                        lFirstYear = lYear
+                    Else
+                        For lAddYear As Integer = lFirstYear + lGroups.Count To lYear
+                            lGroups.Add(lAddYear, New atcTimeseriesGroup)
+                        Next
+                    End If
                     lGroups.ItemByIndex(lYear - lFirstYear).Add(lEvent)
                 Next
             Case "Total Volume", "Cummulative Volume"

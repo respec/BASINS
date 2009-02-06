@@ -707,7 +707,12 @@ StartOver:
                 Case "add_shape"
                     lOutputFileName = lProjectorNode.InnerText
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    lLayersAdded.Add(AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)).Name)
+                    Dim lLayer As MapWindow.Interfaces.Layer = AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                    If lLayer Is Nothing Then
+                        Logger.Msg("Failed add shape layer '" & lOutputFileName & "'")
+                    Else
+                        lLayersAdded.Add(lLayer.Name)
+                    End If
                 Case "add_grid"
                     lOutputFileName = lProjectorNode.InnerText
                     '    Select Case IO.Path.GetFileName(lOutputFileName).ToLower
@@ -717,7 +722,12 @@ StartOver:
                     '            lMessage &= IO.Path.GetFileName(lOutputFileName) & " available, not added to map" & vbCrLf
                     '        Case Else
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    lLayersAdded.Add(AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML)).Name)
+                    Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                    If lLayer Is Nothing Then
+                        Logger.Msg("Failed add grid layer '" & lOutputFileName & "'")
+                    Else
+                        lLayersAdded.Add(lLayer.Name)
+                    End If
                     If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                         'create .prj file as work-around for bug
                         SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
@@ -1935,7 +1945,7 @@ StartOver:
                                     ByVal aProjectDir As String, _
                                     ByRef aDefaultsXml As Xml.XmlDocument) As Xml.XmlNode
         Dim lName As String = Filename.ToLower
-        If lName.StartsWith(aProjectDir) Then
+        If lName.StartsWith(aProjectDir.ToLower) Then
             lName = Filename.Substring(aProjectDir.Length).ToLower
         End If
 
