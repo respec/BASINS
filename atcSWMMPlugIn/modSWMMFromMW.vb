@@ -791,6 +791,280 @@ Friend Module modSWMMFromMW
 
     End Sub
 
+    Public Sub UseDefaultsForNodeAttributes(ByVal aFieldMap As atcCollection, ByVal aFieldNames As atcCollection, ByVal aFieldDefaults As atcCollection, ByRef aNodes As Nodes)
+        'for any value that didn't come from the attribute table, use user-supplied default
+        For Each lNode As Node In aNodes
+            'todo:  use reflection to go through class properties
+            'no default set through field mapping, use user-supplied default
+            If Not aFieldMap.Contains("InitDepth") Then
+                If aFieldNames.IndexOf("InitDepth") > -1 Then
+                    lNode.InitDepth = aFieldDefaults(aFieldNames.IndexOf("InitDepth"))
+                End If
+            End If
+            If Not aFieldMap.Contains("InvertElevation") Then
+                If aFieldNames.IndexOf("InvertElevation") > -1 Then
+                    lNode.InvertElevation = aFieldDefaults(aFieldNames.IndexOf("InvertElevation"))
+                ElseIf aFieldNames.IndexOf("InvertElev") > -1 Then
+                    lNode.InvertElevation = aFieldDefaults(aFieldNames.IndexOf("InvertElev"))
+                End If
+            End If
+            If Not aFieldMap.Contains("MaxDepth") Then
+                If aFieldNames.IndexOf("MaxDepth") > -1 Then
+                    lNode.MaxDepth = aFieldDefaults(aFieldNames.IndexOf("MaxDepth"))
+                End If
+            End If
+            If Not aFieldMap.Contains("OutfallType") Then
+                If aFieldNames.IndexOf("OutfallType") > -1 Then
+                    lNode.OutfallType = aFieldDefaults(aFieldNames.IndexOf("OutfallType"))
+                ElseIf aFieldNames.IndexOf("OutfallTyp") > -1 Then
+                    lNode.OutfallType = aFieldDefaults(aFieldNames.IndexOf("OutfallTyp"))
+                End If
+            End If
+            If Not aFieldMap.Contains("PondedArea") Then
+                If aFieldNames.IndexOf("PondedArea") > -1 Then
+                    lNode.PondedArea = aFieldDefaults(aFieldNames.IndexOf("PondedArea"))
+                End If
+            End If
+            If Not aFieldMap.Contains("StageTable") Then
+                If aFieldNames.IndexOf("StageTable") > -1 Then
+                    lNode.StageTable = aFieldDefaults(aFieldNames.IndexOf("StageTable"))
+                End If
+            End If
+            If Not aFieldMap.Contains("SurchargeDepth") Then
+                If aFieldNames.IndexOf("SurchargeDepth") > -1 Then
+                    lNode.SurchargeDepth = aFieldDefaults(aFieldNames.IndexOf("SurchargeDepth"))
+                ElseIf aFieldNames.IndexOf("SurchargeD") > -1 Then
+                    lNode.SurchargeDepth = aFieldDefaults(aFieldNames.IndexOf("SurchargeD"))
+                End If
+            End If
+            If Not aFieldMap.Contains("TideGate") Then
+                If aFieldNames.IndexOf("TideGate") > -1 Then
+                    lNode.TideGate = aFieldDefaults(aFieldNames.IndexOf("TideGate"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Type") Then
+                If aFieldNames.IndexOf("Type") > -1 Then
+                    lNode.TideGate = aFieldDefaults(aFieldNames.IndexOf("Type"))
+                End If
+            End If
+        Next
+    End Sub
+
+    Public Sub UseDefaultsForConduitAttributes(ByVal aFieldMap As atcCollection, ByVal aFieldNames As atcCollection, ByVal aFieldDefaults As atcCollection, ByRef aConduits As Conduits)
+        'for any value that didn't come from the attribute table, use user-supplied default
+        For Each lConduit As Conduit In aConduits
+            'todo:  use reflection to go through class properties
+            'no default set through field mapping, use user-supplied default
+            If Not aFieldMap.Contains("MeanWidth") Then
+                If aFieldNames.IndexOf("MeanWidth") > -1 Then
+                    lConduit.MeanWidth = aFieldDefaults(aFieldNames.IndexOf("MeanWidth"))
+                End If
+            End If
+            If Not aFieldMap.Contains("MeanDepth") Then
+                If aFieldNames.IndexOf("MeanDepth") > -1 Then
+                    lConduit.MeanDepth = aFieldDefaults(aFieldNames.IndexOf("MeanDepth"))
+                End If
+            End If
+            If Not aFieldMap.Contains("ManningsN") Then
+                If aFieldNames.IndexOf("ManningsN") > -1 Then
+                    lConduit.ManningsN = aFieldDefaults(aFieldNames.IndexOf("ManningsN"))
+                End If
+            End If
+            If Not aFieldMap.Contains("InletOffset") Then
+                If aFieldNames.IndexOf("InletOffset") > -1 Then
+                    lConduit.InletOffset = aFieldDefaults(aFieldNames.IndexOf("InletOffset"))
+                ElseIf aFieldNames.IndexOf("InOffset") > -1 Then
+                    lConduit.InletOffset = aFieldDefaults(aFieldNames.IndexOf("InOffset"))
+                End If
+            End If
+            If Not aFieldMap.Contains("OutletOffset") Then
+                If aFieldNames.IndexOf("OutletOffset") > -1 Then
+                    lConduit.OutletOffset = aFieldDefaults(aFieldNames.IndexOf("OutletOffset"))
+                ElseIf aFieldNames.IndexOf("OutOffset") > -1 Then
+                    lConduit.OutletOffset = aFieldDefaults(aFieldNames.IndexOf("OutOffset"))
+                End If
+            End If
+            If Not aFieldMap.Contains("InitialFlow") Then
+                If aFieldNames.IndexOf("InitialFlow") > -1 Then
+                    lConduit.InitialFlow = aFieldDefaults(aFieldNames.IndexOf("InitialFlow"))
+                ElseIf aFieldNames.IndexOf("InitFlow") > -1 Then
+                    lConduit.InitialFlow = aFieldDefaults(aFieldNames.IndexOf("InitFlow"))
+                End If
+            End If
+            If Not aFieldMap.Contains("MaxFlow") Then
+                If aFieldNames.IndexOf("MaxFlow") > -1 Then
+                    lConduit.MaxFlow = aFieldDefaults(aFieldNames.IndexOf("MaxFlow"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Shape") Then
+                If aFieldNames.IndexOf("Shape") > -1 Then
+                    lConduit.Shape = aFieldDefaults(aFieldNames.IndexOf("Shape"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Geometry1") Then
+                If aFieldNames.IndexOf("Geometry1") > -1 Then
+                    lConduit.Geometry1 = aFieldDefaults(aFieldNames.IndexOf("Geometry1"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Geometry2") Then
+                If aFieldNames.IndexOf("Geometry2") > -1 Then
+                    lConduit.Geometry2 = aFieldDefaults(aFieldNames.IndexOf("Geometry2"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Geometry3") Then
+                If aFieldNames.IndexOf("Geometry3") > -1 Then
+                    lConduit.Geometry3 = aFieldDefaults(aFieldNames.IndexOf("Geometry3"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Geometry4") Then
+                If aFieldNames.IndexOf("Geometry4") > -1 Then
+                    lConduit.Geometry4 = aFieldDefaults(aFieldNames.IndexOf("Geometry4"))
+                End If
+            End If
+            If Not aFieldMap.Contains("NumBarrels") Then
+                If aFieldNames.IndexOf("NumBarrels") > -1 Then
+                    lConduit.NumBarrels = aFieldDefaults(aFieldNames.IndexOf("NumBarrels"))
+                End If
+            End If
+        Next
+    End Sub
+
+    Public Sub UseDefaultsForCatchmentAttributes(ByVal aFieldMap As atcCollection, ByVal aFieldNames As atcCollection, ByVal aFieldDefaults As atcCollection, ByRef aCatchments As Catchments)
+        'for any value that didn't come from the attribute table, use user-supplied default
+        For Each lCatchment As Catchment In aCatchments
+            'todo:  use reflection to go through class properties
+            'no default set through field mapping, use user-supplied default
+            If Not aFieldMap.Contains("Width") Then
+                If aFieldNames.IndexOf("Width") > -1 Then
+                    lCatchment.Width = aFieldDefaults(aFieldNames.IndexOf("Width"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Slope") Then
+                If aFieldNames.IndexOf("Slope") > -1 Then
+                    lCatchment.Slope = aFieldDefaults(aFieldNames.IndexOf("Slope"))
+                End If
+            End If
+            If Not aFieldMap.Contains("CurbLength") Then
+                If aFieldNames.IndexOf("CurbLength") > -1 Then
+                    lCatchment.CurbLength = aFieldDefaults(aFieldNames.IndexOf("CurbLength"))
+                End If
+            End If
+            If Not aFieldMap.Contains("SnowPackName") Then
+                If aFieldNames.IndexOf("SnowPackName") > -1 Then
+                    lCatchment.SnowPackName = aFieldDefaults(aFieldNames.IndexOf("SnowPackName"))
+                ElseIf aFieldNames.IndexOf("SnowPkName") > -1 Then
+                    lCatchment.SnowPackName = aFieldDefaults(aFieldNames.IndexOf("SnowPkName"))
+                End If
+            End If
+            If Not aFieldMap.Contains("ManningsNImperv") Then
+                If aFieldNames.IndexOf("ManningsNImperv") > -1 Then
+                    lCatchment.ManningsNImperv = aFieldDefaults(aFieldNames.IndexOf("ManningsNImperv"))
+                ElseIf aFieldNames.IndexOf("ManNImperv") > -1 Then
+                    lCatchment.ManningsNImperv = aFieldDefaults(aFieldNames.IndexOf("ManNImperv"))
+                End If
+            End If
+            If Not aFieldMap.Contains("ManningsNPerv") Then
+                If aFieldNames.IndexOf("ManningsNPerv") > -1 Then
+                    lCatchment.ManningsNPerv = aFieldDefaults(aFieldNames.IndexOf("ManningsNPerv"))
+                ElseIf aFieldNames.IndexOf("ManNPerv") > -1 Then
+                    lCatchment.ManningsNPerv = aFieldDefaults(aFieldNames.IndexOf("ManNPerv"))
+                End If
+            End If
+            If Not aFieldMap.Contains("DepressionStorageImperv") Then
+                If aFieldNames.IndexOf("DepressionStorageImperv") > -1 Then
+                    lCatchment.DepressionStorageImperv = aFieldDefaults(aFieldNames.IndexOf("DepressionStorageImperv"))
+                ElseIf aFieldNames.IndexOf("DepStorImp") > -1 Then
+                    lCatchment.DepressionStorageImperv = aFieldDefaults(aFieldNames.IndexOf("DepStorImp"))
+                End If
+            End If
+            If Not aFieldMap.Contains("DepressionStoragePerv") Then
+                If aFieldNames.IndexOf("DepressionStoragePerv") > -1 Then
+                    lCatchment.DepressionStoragePerv = aFieldDefaults(aFieldNames.IndexOf("DepressionStoragePerv"))
+                ElseIf aFieldNames.IndexOf("DepStorPer") > -1 Then
+                    lCatchment.DepressionStoragePerv = aFieldDefaults(aFieldNames.IndexOf("DepStorPer"))
+                End If
+            End If
+            If Not aFieldMap.Contains("PercentZeroStorage") Then
+                If aFieldNames.IndexOf("PercentZeroStorage") > -1 Then
+                    lCatchment.PercentZeroStorage = aFieldDefaults(aFieldNames.IndexOf("PercentZeroStorage"))
+                ElseIf aFieldNames.IndexOf("PctZeroSto") > -1 Then
+                    lCatchment.PercentZeroStorage = aFieldDefaults(aFieldNames.IndexOf("PctZeroSto"))
+                End If
+            End If
+            If Not aFieldMap.Contains("RouteTo") Then
+                If aFieldNames.IndexOf("RouteTo") > -1 Then
+                    lCatchment.RouteTo = aFieldDefaults(aFieldNames.IndexOf("RouteTo"))
+                End If
+            End If
+            If Not aFieldMap.Contains("PercentRouted") Then
+                If aFieldNames.IndexOf("PercentRouted") > -1 Then
+                    lCatchment.PercentRouted = aFieldDefaults(aFieldNames.IndexOf("PercentRouted"))
+                ElseIf aFieldNames.IndexOf("PctRouted") > -1 Then
+                    lCatchment.PercentRouted = aFieldDefaults(aFieldNames.IndexOf("PctRouted"))
+                End If
+            End If
+            If Not aFieldMap.Contains("MaxInfiltRate") Then
+                If aFieldNames.IndexOf("MaxInfiltRate") > -1 Then
+                    lCatchment.MaxInfiltRate = aFieldDefaults(aFieldNames.IndexOf("MaxInfiltRate"))
+                ElseIf aFieldNames.IndexOf("MaxInfiltR") > -1 Then
+                    lCatchment.MaxInfiltRate = aFieldDefaults(aFieldNames.IndexOf("MaxInfiltR"))
+                End If
+            End If
+            If Not aFieldMap.Contains("MinInfiltRate") Then
+                If aFieldNames.IndexOf("MinInfiltRate") > -1 Then
+                    lCatchment.MinInfiltRate = aFieldDefaults(aFieldNames.IndexOf("MinInfiltRate"))
+                ElseIf aFieldNames.IndexOf("MinInfiltR") > -1 Then
+                    lCatchment.MinInfiltRate = aFieldDefaults(aFieldNames.IndexOf("MinInfiltR"))
+                End If
+            End If
+            If Not aFieldMap.Contains("DecayRateConstant") Then
+                If aFieldNames.IndexOf("DecayRateConstant") > -1 Then
+                    lCatchment.DecayRateConstant = aFieldDefaults(aFieldNames.IndexOf("DecayRateConstant"))
+                ElseIf aFieldNames.IndexOf("DecayRate") > -1 Then
+                    lCatchment.DecayRateConstant = aFieldDefaults(aFieldNames.IndexOf("DecayRate"))
+                End If
+            End If
+            If Not aFieldMap.Contains("DryTime") Then
+                If aFieldNames.IndexOf("DryTime") > -1 Then
+                    lCatchment.DryTime = aFieldDefaults(aFieldNames.IndexOf("DryTime"))
+                End If
+            End If
+            If Not aFieldMap.Contains("MaxInfiltVolume") Then
+                If aFieldNames.IndexOf("MaxInfiltVolume") > -1 Then
+                    lCatchment.MaxInfiltVolume = aFieldDefaults(aFieldNames.IndexOf("MaxInfiltVolume"))
+                ElseIf aFieldNames.IndexOf("MaxInfiltV") > -1 Then
+                    lCatchment.MaxInfiltVolume = aFieldDefaults(aFieldNames.IndexOf("MaxInfiltV"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Suction") Then
+                If aFieldNames.IndexOf("Suction") > -1 Then
+                    lCatchment.Suction = aFieldDefaults(aFieldNames.IndexOf("Suction"))
+                End If
+            End If
+            If Not aFieldMap.Contains("Conductivity") Then
+                If aFieldNames.IndexOf("Conductivity") > -1 Then
+                    lCatchment.Conductivity = aFieldDefaults(aFieldNames.IndexOf("Conductivity"))
+                ElseIf aFieldNames.IndexOf("Conductiv") > -1 Then
+                    lCatchment.Conductivity = aFieldDefaults(aFieldNames.IndexOf("Conductiv"))
+                End If
+            End If
+            If Not aFieldMap.Contains("InitialDeficit") Then
+                If aFieldNames.IndexOf("InitialDeficit") > -1 Then
+                    lCatchment.InitialDeficit = aFieldDefaults(aFieldNames.IndexOf("InitialDeficit"))
+                ElseIf aFieldNames.IndexOf("InitDefcit") > -1 Then
+                    lCatchment.InitialDeficit = aFieldDefaults(aFieldNames.IndexOf("InitDefcit"))
+                End If
+            End If
+            If Not aFieldMap.Contains("CurveNumber") Then
+                If aFieldNames.IndexOf("CurveNumber") > -1 Then
+                    lCatchment.CurveNumber = aFieldDefaults(aFieldNames.IndexOf("CurveNumber"))
+                ElseIf aFieldNames.IndexOf("CurveNum") > -1 Then
+                    lCatchment.CurveNumber = aFieldDefaults(aFieldNames.IndexOf("CurveNum"))
+                End If
+            End If
+        Next
+    End Sub
+
     Friend Class StationDetails
         Public Name As String
         Public StartJDate As Double

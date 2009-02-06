@@ -1680,18 +1680,21 @@ Public Class frmSWMMSetup
                     Logger.Dbg("Add " & lTable.NumRecords & " NodesFrom " & lNodesShapefileName)
                     .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lNodeFieldMap))
                 End If
+                UseDefaultsForNodeAttributes(lNodeFieldMap, pNodeFieldNames, pNodeFieldDefaults, .Nodes)
                 CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
 
                 If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
                     Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lConduitShapefileName)
                     .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lConduitFieldMap), "Name", "C", 1))
                 End If
+                UseDefaultsForConduitAttributes(lNodeFieldMap, pNodeFieldNames, pNodeFieldDefaults, .Conduits)
                 CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 
                 If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                     Logger.Dbg("Add " & lTable.NumRecords & " CatchmentsFrom " & lCatchmentShapefileName)
                     .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
                 End If
+                UseDefaultsForCatchmentAttributes(lNodeFieldMap, pNodeFieldNames, pNodeFieldDefaults, .Catchments)
                 CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
 
                 lblStatus.Text = "Overlaying Landuses with Subcatchments"

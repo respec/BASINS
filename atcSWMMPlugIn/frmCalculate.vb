@@ -10,6 +10,7 @@ Public Class frmCalculate
     Friend pTypes As atcCollection
     Friend pCalculateLayerName As String
     Friend pNodeLayerName As String
+    Friend pGridLayerIndex As Integer
 
     Public Sub New()
 
@@ -24,10 +25,20 @@ Public Class frmCalculate
 
         For lCheckedIndex As Integer = 0 To clbCalculate.CheckedItems.Count - 1
             Dim lCheckedName As String = clbCalculate.CheckedItems(lCheckedIndex)
+
+            If lCheckedName = "Slope" Then
+                'special case for slope, need grid to calculate slope
+                Dim lfrmSelectGrid As New frmSelectGrid
+                lfrmSelectGrid.InitializeForm(Me)
+                pGridLayerIndex = -1
+                lfrmSelectGrid.ShowDialog()
+            End If
+
             'update this item for each feature
             Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lLayerIndex, lCheckedName, pTypes(pFields.IndexOf(lCheckedName)), pWidths(pFields.IndexOf(lCheckedName)))
             For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
                 Dim lValue As String = ""
+                Dim lUpdateMe As Boolean = True
                 If lCheckedName = "Name" Then
                     lValue = pDefaults(pFields.IndexOf(lCheckedName)) & CStr(lFeatureIndex + 1)
                 ElseIf lCheckedName = "OutNodeID" Then
@@ -43,7 +54,11 @@ Public Class frmCalculate
                     lValue = Math.Sqrt(GisUtil.FeatureArea(lLayerIndex, lFeatureIndex)) * 3.281 'convert m to ft
                 ElseIf lCheckedName = "Slope" Then
                     'compute subcatchment slope in percent
-                    'lValue = GisUtil.GridSlopeInPolygon(lGridLayerIndex, lLayerIndex, lFeatureIndex) * 100
+                    If pGridLayerIndex > -1 Then
+                        lValue = GisUtil.GridSlopeInPolygon(pGridLayerIndex, lLayerIndex, lFeatureIndex) * 100
+                    Else
+                        lUpdateMe = False
+                    End If
                 ElseIf lCheckedName = "InletNode" Then
                     'find closest conduit inlet node id
                     If pNodeLayerName <> "<none>" Then
@@ -74,7 +89,7 @@ Public Class frmCalculate
                     'regular case
                     lValue = pDefaults(pFields.IndexOf(lCheckedName))
                 End If
-                GisUtil.SetFeatureValue(lLayerIndex, lFieldIndex, lFeatureIndex, lValue)
+                If lUpdateMe Then GisUtil.SetFeatureValue(lLayerIndex, lFieldIndex, lFeatureIndex, lValue)
             Next
         Next
         Me.Dispose()
@@ -131,4 +146,8 @@ Public Class frmCalculate
         End If
         Return lValue
     End Function
+
+    Public Sub SetGridLayerIndexForSlope(ByVal aGridLayerIndex As Integer)
+        pGridLayerIndex = aGridLayerIndex
+    End Sub
 End Class
