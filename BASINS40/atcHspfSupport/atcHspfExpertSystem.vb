@@ -3,11 +3,13 @@ Imports atcData
 Imports MapWinUtility
 
 Public Class atcExpertSystem
-    Friend pErrorCriteria As New hexErrorCriteria
-    Public Storms As New Generic.List(Of hexStorm)
-    Public Sites As New Generic.List(Of hexSite)
-    Private pStatistics As New hexStatistics
-    Private pDatasetTypes As New hexDatasetTypes
+    Friend ErrorCriteria As New HexErrorCriteria
+    Public Storms As New Generic.List(Of HexStorm)
+    Public Sites As New Generic.List(Of HexSite)
+    Public ReadOnly SDateJ As Double, EDateJ As Double
+
+    Private pStatistics As New HexStatistics
+    Private pDatasetTypes As New HexDatasetTypes
 
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcTimeseriesSource
@@ -16,7 +18,6 @@ Public Class atcExpertSystem
     Private pSubjectiveData(25) As Integer
     Private pLatMin As Double, pLatMax As Double
     Private pLngMin As Double, pLngMax As Double
-    Private pSDateJ As Double, pEDateJ As Double
     'TODO: get rid of next two global arrays, store in site class
     Private pStats(,,) As Double
     Private pHSPFOutput1(,) As Double
@@ -50,122 +51,11 @@ Public Class atcExpertSystem
     Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcTimeseriesSource)
         pUci = aUci
         pDataSource = aDataSource
-        ReadEXSFile(IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs")
-        'pErrorCriteria.Edit()
-    End Sub
-
-    Public ReadOnly Property SDateJ() As Double
-        Get
-            Return pSDateJ
-        End Get
-    End Property
-    Public ReadOnly Property EDateJ() As Double
-        Get
-            Return pEDateJ
-        End Get
-    End Property
-
-    Public Function Report() As String
-        CalcStats(pDataSource)
-        Dim lStr As String = CalcErrorTerms(pUci)
-        Return lStr
-    End Function
-
-    Public Function AsString() As String
-        Dim lText As New Text.StringBuilder
-        Dim lStr As String = pName.PadRight(8) & _
-                             Sites.Count.ToString.PadLeft(5) & _
-                             "1".PadLeft(5) & _
-                             pLatMin.ToString.PadLeft(8) & _
-                             pLatMax.ToString.PadLeft(8) & _
-                             pLngMin.ToString.PadLeft(8) & _
-                             pLngMax.ToString.PadLeft(8)
-        If pSDateJ > 0 Then
-            Dim lDate(5) As Integer
-            J2Date(pSDateJ, lDate)
-            lStr &= lDate(0).ToString.PadLeft(5) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
-            J2Date(pEDateJ, lDate)
-            lStr &= lDate(0).ToString.PadLeft(6) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
-        End If
-        lText.AppendLine(lStr)
-        For Each lSite As hexSite In Sites
-            lStr = ""
-            With lSite
-                For lDsnIndex As Integer = 0 To 9
-                    lStr &= .Dsn(lDsnIndex).ToString.PadLeft(4)
-                Next lDsnIndex
-                lStr &= .StatDN.PadLeft(3) & "  " & .Name
-            End With
-            lText.AppendLine(lStr)
-        Next
-        lText.AppendLine(Storms.Count.ToString.PadLeft(4))
-        For Each lStorm As hexStorm In Storms
-            lStr = ""
-            With lStorm
-                Dim lDate(5) As Integer
-                J2Date(.SDateJ, lDate)
-                lStr &= lDate(0).ToString.PadLeft(5)
-                For lDateIndex As Integer = 1 To 5
-                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
-                Next
-                J2Date(.EDateJ, lDate)
-                lStr &= lDate(0).ToString.PadLeft(5)
-                For lDateIndex As Integer = 1 To 5
-                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
-                Next
-            End With
-            lText.AppendLine(lStr)
-        Next
-
-        lStr = ""
-        For Each lSite As hexSite In Sites
-            lStr &= lSite.Area.ToString.PadLeft(8)
-        Next
-        lText.AppendLine(lStr)
-
-        lStr = ""
-        For Each lError As hexErrorCriterion In pErrorCriteria
-            lStr &= Format(lError.Value, "#####.00").PadLeft(8)
-        Next
-        lText.AppendLine(lStr)
-
-        For lSiteIndex As Integer = 1 To Sites.Count
-            lStr = ""
-            For lIndex As Integer = 0 To 7
-                lStr &= DecimalAlign(pHSPFOutput1(lIndex + 1, lSiteIndex - 1), 8)
-            Next lIndex
-            lText.AppendLine(lStr)
-            lStr = ""
-            For lIndex As Integer = 0 To 7
-                lStr &= DecimalAlign(pHSPFOutput2(lIndex + 1, lSiteIndex - 1), 8)
-            Next lIndex
-            lText.AppendLine(lStr)
-            lStr = ""
-            For lIndex As Integer = 0 To 5
-                lStr &= DecimalAlign(pHSPFOutput3(lIndex + 1, lSiteIndex - 1), 8)
-            Next lIndex
-            lText.AppendLine(lStr)
-        Next lSiteIndex
-
-        lStr = ""
-        For lIndex As Integer = 0 To 19
-            lStr &= pSubjectiveData(lIndex + 1).ToString.PadLeft(4)
-        Next lIndex
-        lText.AppendLine(lStr)
-
-        lStr = ""
-        For lIndex As Integer = 20 To 22
-            lStr &= pSubjectiveData(lIndex + 1).ToString.PadLeft(4)
-        Next lIndex
-        lText.AppendLine(lStr)
-        Return lText.ToString
-    End Function
-
-    Private Sub ReadEXSFile(ByVal aFilename As String)
-        If Not FileExists(aFilename) Then
-            Throw New ApplicationException("ExpertSystemFile " & aFilename & " not found")
+        Dim lFileName As String = IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs"
+        If Not FileExists(lFileName) Then
+            Throw New ApplicationException("ExpertSystemFile " & lFileName & " not found")
         Else
-            Dim lExsFileString As String = WholeFileString(aFilename)
+            Dim lExsFileString As String = WholeFileString(lFileName)
             Dim lExsRecords() As String = lExsFileString.Split(vbLf)
 
             'Read first line of file
@@ -178,19 +68,19 @@ Public Class atcExpertSystem
             pLngMin = lExsRecord.Substring(35, 8)
             pLngMax = lExsRecord.Substring(43, 8)
             If lExsRecord.Length = 51 Then
-                pSDateJ = pUci.GlobalBlock.SDateJ
-                pEDateJ = pUci.GlobalBlock.EdateJ
+                SDateJ = pUci.GlobalBlock.SDateJ
+                EDateJ = pUci.GlobalBlock.EdateJ
             Else
                 lExsRecord.PadRight(70)
                 Dim lDate(5) As Integer
                 lDate(0) = lExsRecord.Substring(52, 4)
                 lDate(1) = lExsRecord.Substring(56, 2)
                 lDate(2) = lExsRecord.Substring(58, 2)
-                pSDateJ = Date2J(lDate)
+                SDateJ = Date2J(lDate)
                 lDate(0) = lExsRecord.Substring(62, 4)
                 lDate(1) = lExsRecord.Substring(66, 2)
                 lDate(2) = lExsRecord.Substring(68, 2)
-                pEDateJ = Date2J(lDate)
+                EDateJ = Date2J(lDate)
             End If
 
             'Default unspecified lat/integer min/max values to contiguous 48 states
@@ -216,7 +106,7 @@ Public Class atcExpertSystem
                 Next lConsIndex
                 Dim lStatDN As Integer = lExsRecord.Substring(42, 2)  '0 or 1
                 Dim lName As String = lExsRecord.Substring(45).Replace(vbCr, "").Trim
-                Dim lSite As New hexSite(Me, lName, lStatDN, lDsn)
+                Dim lSite As New HexSite(Me, lName, lStatDN, lDsn)
                 Sites.Add(lSite)
             Next lSiteIndex
 
@@ -236,7 +126,7 @@ Public Class atcExpertSystem
                     lStormEDate(lTimeIndex + 1) = lExsRecord.Substring(26 + 3 * lTimeIndex, 3)
                 Next lTimeIndex
                 'Get the starting and ending storm dates in a 1-D Julian array
-                Storms.Add(New hexStorm(lStormSDate, lStormEDate))
+                Storms.Add(New HexStorm(lStormSDate, lStormEDate))
             Next lStormIndex
 
             'Read basin area (acres)
@@ -250,13 +140,17 @@ Public Class atcExpertSystem
             lRecordIndex += 1 'lNSites
             lExsRecord = lExsRecords(lRecordIndex)
             lRecordIndex += 1
-            For lErrorIndex As Integer = 1 To 10
-                pErrorCriteria(lErrorIndex).Value = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
+            For lErrorIndex As Integer = 1 To ErrorCriteria.Count
+                If lExsRecord.Length >= lErrorIndex * 8 Then
+                    Dim lErrorCriteriumValue As String = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
+                    If lErrorCriteriumValue.Length > 0 Then
+                        ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
+                    End If
+                End If
             Next lErrorIndex
-            pErrorCriteria(11).Value = 15  'storm peak criteria not kept in EXS file
-            If (pErrorCriteria(10).Value < 0.000001 And pErrorCriteria(10).Value > -0.000001) Then
+            If (ErrorCriteria(10).Value < 0.000001 And ErrorCriteria(10).Value > -0.000001) Then
                 'percent of time in baseflow read in as zero, change to 30
-                pErrorCriteria(10).Value = 30.0#
+                ErrorCriteria(10).Value = 30.0#
             End If
 
             'Read latest hspf output
@@ -300,7 +194,105 @@ Public Class atcExpertSystem
             '    SISROV = 0
             '  End If
         End If
+        'pErrorCriteria.Edit()
     End Sub
+
+    Public Function Report() As String
+        CalcStats(pDataSource)
+        Return CalcErrorTerms(pUci)
+    End Function
+
+    Public Function AsString() As String
+        Dim lText As New Text.StringBuilder
+        Dim lStr As String = pName.PadRight(8) & _
+                             Sites.Count.ToString.PadLeft(5) & _
+                             "1".PadLeft(5) & _
+                             pLatMin.ToString.PadLeft(8) & _
+                             pLatMax.ToString.PadLeft(8) & _
+                             pLngMin.ToString.PadLeft(8) & _
+                             pLngMax.ToString.PadLeft(8)
+        If SDateJ > 0 Then
+            Dim lDate(5) As Integer
+            J2Date(SDateJ, lDate)
+            lStr &= lDate(0).ToString.PadLeft(5) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
+            J2Date(EDateJ, lDate)
+            lStr &= lDate(0).ToString.PadLeft(6) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
+        End If
+        lText.AppendLine(lStr)
+
+        For Each lSite As HexSite In Sites
+            lStr = ""
+            With lSite
+                For lDsnIndex As Integer = 0 To 9
+                    lStr &= .Dsn(lDsnIndex).ToString.PadLeft(4)
+                Next lDsnIndex
+                lStr &= .StatDN.ToString.PadLeft(3) & "  " & .Name
+            End With
+            lText.AppendLine(lStr)
+        Next
+        lText.AppendLine(Storms.Count.ToString.PadLeft(4))
+
+        For Each lStorm As HexStorm In Storms
+            lStr = ""
+            With lStorm
+                Dim lDate(5) As Integer
+                J2Date(.SDateJ, lDate)
+                lStr &= lDate(0).ToString.PadLeft(5)
+                For lDateIndex As Integer = 1 To 5
+                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
+                Next
+                J2Date(.EDateJ, lDate)
+                lStr &= lDate(0).ToString.PadLeft(5)
+                For lDateIndex As Integer = 1 To 5
+                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
+                Next
+            End With
+            lText.AppendLine(lStr)
+        Next
+
+        lStr = ""
+        For Each lSite As HexSite In Sites
+            lStr &= lSite.Area.ToString.PadLeft(8)
+        Next
+        lText.AppendLine(lStr)
+
+        lStr = ""
+        For Each lError As HexErrorCriterion In ErrorCriteria
+            lStr &= Format(lError.Value, "#####.00").PadLeft(8)
+        Next
+        lText.AppendLine(lStr)
+
+        For lSiteIndex As Integer = 1 To Sites.Count
+            lStr = ""
+            For lIndex As Integer = 0 To 7
+                lStr &= DecimalAlign(pHSPFOutput1(lIndex + 1, lSiteIndex - 1), 8)
+            Next lIndex
+            lText.AppendLine(lStr)
+            lStr = ""
+            For lIndex As Integer = 0 To 7
+                lStr &= DecimalAlign(pHSPFOutput2(lIndex + 1, lSiteIndex - 1), 8)
+            Next lIndex
+            lText.AppendLine(lStr)
+            lStr = ""
+            For lIndex As Integer = 0 To 5
+                lStr &= DecimalAlign(pHSPFOutput3(lIndex + 1, lSiteIndex - 1), 8)
+            Next lIndex
+            lText.AppendLine(lStr)
+        Next lSiteIndex
+
+        lStr = ""
+        For lIndex As Integer = 0 To 19
+            lStr &= pSubjectiveData(lIndex + 1).ToString.PadLeft(4)
+        Next lIndex
+        lText.AppendLine(lStr)
+
+        lStr = ""
+        For lIndex As Integer = 20 To 22
+            lStr &= pSubjectiveData(lIndex + 1).ToString.PadLeft(4)
+        Next lIndex
+        lText.AppendLine(lStr)
+        Return lText.ToString
+    End Function
 
     Private Sub CalcStats(ByVal aDataSource As atcTimeseriesSource)
         Dim lDataSetTypes() As String = {"SimTotRunoff", "ObsStreamflow", _
@@ -312,10 +304,10 @@ Public Class atcExpertSystem
         Dim lTimeStep As Integer, lTimeUnit As Integer, lNVals As Integer
         lTimeStep = 1
         lTimeUnit = 4 'day
-        lNVals = timdifJ(pSDateJ, pEDateJ, lTimeUnit, lTimeStep)
+        lNVals = timdifJ(SDateJ, EDateJ, lTimeUnit, lTimeStep)
 
         For lSiteIndex As Integer = 1 To Sites.Count
-            Dim lSite As hexSite = Sites(lSiteIndex - 1)
+            Dim lSite As HexSite = Sites(lSiteIndex - 1)
             For Each lDatasetType As String In lDataSetTypes ' As Integer = 1 To pDatasetTypes.Count
                 Dim lStatGroup As Integer = pDatasetTypes.IndexFromKey(lDatasetType)
                 'set Stats to undefined for this group
@@ -324,18 +316,18 @@ Public Class atcExpertSystem
                 Dim lDSN As Integer
                 With lSite
                     Select Case lStatGroup 'get the correct dsn
-                        Case 1 : lDSN = .Dsn(0)
-                        Case 2 : lDSN = .Dsn(1)
-                        Case 3 : lDSN = .Dsn(2)
-                        Case 4 : lDSN = .Dsn(3)
-                        Case 5 : lDSN = .Dsn(6)
-                        Case 6 : lDSN = .Dsn(7)
+                        Case 1 : lDSN = .DSN(0)
+                        Case 2 : lDSN = .DSN(1)
+                        Case 3 : lDSN = .DSN(2)
+                        Case 4 : lDSN = .DSN(3)
+                        Case 5 : lDSN = .DSN(6)
+                        Case 6 : lDSN = .DSN(7)
                     End Select
                 End With
                 'Get data - daily values and max values as necessary
                 Dim lTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lDSN))
                 'subset by date to simulation period
-                Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, pSDateJ, pEDateJ, Nothing)
+                Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, SDateJ, EDateJ, Nothing)
                 'don't Clear lTSer as that will clear the original, precluding its future use
                 lTSer = Nothing
 
@@ -374,7 +366,7 @@ Public Class atcExpertSystem
                         pStats(14, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum50") '50% high
 
                         Dim lTmpDate(5) As Integer
-                        J2Date(pSDateJ, lTmpDate)
+                        J2Date(SDateJ, lTmpDate)
 
                         pStats(7, lStatGroup, lSiteIndex) = 0.0# 'summer volume
                         pStats(8, lStatGroup, lSiteIndex) = 0.0# 'winter volume
@@ -395,13 +387,13 @@ Public Class atcExpertSystem
                         pStats(5, lStatGroup, lSiteIndex) = 0.0# 'storm peaks
                         pStats(9, lStatGroup, lSiteIndex) = 0.0# 'summer storms
                         pStats(10, lStatGroup, lSiteIndex) = 0.0# 'winter storms
-                        For Each lStorm As hexStorm In Storms
-                            If lStorm.SDateJ >= pSDateJ And _
-                               lStorm.EDateJ <= pEDateJ Then 'storm within run span
+                        For Each lStorm As HexStorm In Storms
+                            If lStorm.SDateJ >= SDateJ And _
+                               lStorm.EDateJ <= EDateJ Then 'storm within run span
                                 'TODO: this matches VB6Script results, needs to have indexes checked!
                                 Dim lN1 As Integer, lN2 As Integer
-                                lN1 = timdifJ(pSDateJ, lStorm.SDateJ, lTimeUnit, lTimeStep) + 1
-                                lN2 = timdifJ(pSDateJ, lStorm.EDateJ, lTimeUnit, lTimeStep)
+                                lN1 = timdifJ(SDateJ, lStorm.SDateJ, lTimeUnit, lTimeStep) + 1
+                                lN2 = timdifJ(SDateJ, lStorm.EDateJ, lTimeUnit, lTimeStep)
                                 Dim lNLimit As Integer = lDailyTSer.Values.GetUpperBound(0)
                                 If lN2 <= lNLimit Then
                                     Dim lTmpDate(5) As Integer
@@ -477,7 +469,7 @@ Public Class atcExpertSystem
 
     Private Function CalcErrorTerms(ByVal aUci As atcUCI.HspfUci) As String
         For lSiteIndex As Integer = 1 To Sites.Count
-            Dim lSite As hexSite = Sites(lSiteIndex - 1)
+            Dim lSite As HexSite = Sites(lSiteIndex - 1)
             'total volume error
             If (pStats(1, 2, lSiteIndex) > 0.0#) Then
                 lSite.ErrorTerm(1) = 100.0# * ((pStats(1, 1, lSiteIndex) - pStats(1, 2, lSiteIndex)) _
@@ -606,7 +598,7 @@ Public Class atcExpertSystem
             lSite.ErrorTerm(16) = lAverageStormPeakError
         Next lSiteIndex
 
-        Dim lStr As String = StatReportAsString(auci)
+        Dim lStr As String = StatReportAsString(aUci)
         Return lStr
     End Function
 
@@ -615,10 +607,10 @@ Public Class atcExpertSystem
         lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
         lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
         lStr &= "UCI Edited: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
-        lStr &= TimeSpanAsString(pSDateJ, pEDateJ)
+        lStr &= TimeSpanAsString(SDateJ, EDateJ)
 
         For lSiteIndex As Integer = 1 To Sites.Count
-            Dim lSite As hexSite = Sites(lSiteIndex - 1)
+            Dim lSite As HexSite = Sites(lSiteIndex - 1)
             lStr &= "Site: ".PadLeft(15) & lSite.Name & vbCrLf & vbCrLf
 
             'statistics summary
@@ -628,16 +620,16 @@ Public Class atcExpertSystem
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
             lStr &= Space(35) & "Current".PadLeft(12) & "Criteria".PadLeft(12) & vbCrLf
-            For lErrorPrintIndex As Integer = 1 To pErrorCriteria.Count
-                For lErrorTerm As Integer = 1 To pErrorCriteria.Count
-                    Dim lErrorCriterion As hexErrorCriterion = pErrorCriteria.Criterion(lErrorTerm)
+            For lErrorPrintIndex As Integer = 1 To ErrorCriteria.Count
+                For lErrorTerm As Integer = 1 To ErrorCriteria.Count
+                    Dim lErrorCriterion As HexErrorCriterion = ErrorCriteria.Criterion(lErrorTerm)
                     If lErrorCriterion.PrintPosition = lErrorPrintIndex Then
                         If lSite.ErrorTerm(lErrorTerm) <> 0.0# Then
-                            lStr &= (pErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
+                            lStr &= (ErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
                                     DecimalAlign(lSite.ErrorTerm(lErrorTerm))
-                            If pErrorCriteria(lErrorTerm).Value > 0 Then
-                                lStr &= DecimalAlign(pErrorCriteria(lErrorTerm).Value)
-                                If Math.Abs(lSite.ErrorTerm(lErrorTerm)) < pErrorCriteria(lErrorTerm).Value Then
+                            If ErrorCriteria(lErrorTerm).Value > 0 Then
+                                lStr &= DecimalAlign(ErrorCriteria(lErrorTerm).Value)
+                                If Math.Abs(lSite.ErrorTerm(lErrorTerm)) < ErrorCriteria(lErrorTerm).Value Then
                                     lStr &= " OK"
                                 Else
                                     lStr &= "    Needs Work"
@@ -656,10 +648,7 @@ Public Class atcExpertSystem
     End Function
 
     Private Function StatDetails(ByVal aTitle As String, ByVal aSite As Integer, ByVal aConv As Double) As String
-        Dim lConv As Double
-        Dim lStr As String
-
-        lStr = Space(30) & aTitle & vbCrLf & vbCrLf
+        Dim lStr As String = Space(30) & aTitle & vbCrLf & vbCrLf
         lStr &= Space(30) & _
               "Observed".PadLeft(15) & _
               "Simulated".PadLeft(15) & _
@@ -673,22 +662,21 @@ Public Class atcExpertSystem
         'Write runoff block
         For lStatPrintIndex As Integer = 1 To pStatistics.Count 'loop for each statistic to print
             For lStatIndex As Integer = 1 To pStatistics.Count
-                Dim lStatistic As hexStatistic = pStatistics(lStatIndex - 1)
+                Dim lStatistic As HexStatistic = pStatistics(lStatIndex - 1)
                 If lStatistic.PrintPosition = lStatPrintIndex Then
                     lStr &= (lStatistic.Name & " =").PadLeft(30)
-                    Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct within statistic
-                    For k As Integer = 1 To 4
-                        If Not Double.IsNaN(pStats(lStatIndex, l(k), aSite)) Then
+                    Dim lColumnPointer() As Integer = {0, 2, 1, 3, 4} 'gets print order correct within statistic
+                    For lColumn As Integer = 1 To 4
+                        If Not Double.IsNaN(pStats(lStatIndex, lColumnPointer(lColumn), aSite)) Then
+                            Dim lConv As Double = aConv
                             If lStatIndex = 5 Or lStatIndex = 6 Then 'dont need adjustment for storm peaks or recession rate
                                 lConv = 1
-                            Else
-                                lConv = aConv
                             End If
-                            lStr &= DecimalAlign(pStats(lStatIndex, l(k), aSite) / lConv, 15)
+                            lStr &= DecimalAlign(pStats(lStatIndex, lColumnPointer(lColumn), aSite) / lConv, 15)
                         Else
                             lStr &= Space(15)
                         End If
-                    Next k
+                    Next lColumn
                     lStr = lStr.TrimEnd & vbCrLf
                     Exit For
                 End If
@@ -696,7 +684,7 @@ Public Class atcExpertSystem
         Next lStatPrintIndex
         lStr &= vbCrLf
         'Write EvapoTranspiration block
-        lStr &= Space(30) & "          EvapoTranspiration" & vbCrLf
+        lStr &= Space(30) & "EvapoTranspiration".PadRight(28) & vbCrLf
         lStr &= Space(30) & "Potential".PadLeft(15) & "Actual".PadLeft(15) & vbCrLf
         lStr &= ("total (inches) = ").PadLeft(30)
         lStr &= DecimalAlign(pStats(1, 5, aSite) / aConv, 15)
@@ -714,11 +702,11 @@ Public Class atcExpertSystem
     End Sub
 End Class
 
-Public Class hexSite
-    Private pName As String
-    Private pArea As Double
-    Private pStatDN As Integer
-    Private pDSN(9) As Integer '2-D. 1st dim = stat# (see below), and 2nd = site#
+Public Class HexSite
+    Public Area As Double
+    Public ReadOnly Name As String
+    Public ReadOnly StatDN As Integer
+    Public ReadOnly DSN(9) As Integer '2-D. 1st dim = stat# (see below), and 2nd = site#
     '0 = simulated total runoff (in)
     '1 = observed streamflow (cfs)
     '2 = simulated surface runoff (in)
@@ -729,68 +717,27 @@ Public Class hexSite
     '7 = actual evapotranspiration (in)
     '8 = upper zone storage (in)
     '9 = lower zone storage (in)
-    Private pErrorTerm() As Double
+    Public ErrorTerm() As Double
 
     Public Sub New(ByVal aExpertSystem As atcExpertSystem, ByVal aName As String, ByVal aStatDN As Integer, ByVal aDsn() As Integer)
-        pName = aName
-        pStatDN = aStatDN
-        pDSN = aDsn
-        ReDim pErrorTerm(aExpertSystem.pErrorCriteria.Count)
+        Name = aName
+        StatDN = aStatDN
+        DSN = aDsn
+        ReDim ErrorTerm(aExpertSystem.ErrorCriteria.Count)
     End Sub
-    Public ReadOnly Property Name() As String
-        Get
-            Return pName
-        End Get
-    End Property
-    Public Property Area() As String
-        Set(ByVal aArea As String)
-            pArea = aArea
-        End Set
-        Get
-            Return pArea
-        End Get
-    End Property
-    Public ReadOnly Property StatDN() As String
-        Get
-            Return pStatDN
-        End Get
-    End Property
-    Public ReadOnly Property Dsn(ByVal aConstituentIndex As Integer) As Integer
-        Get
-            Return pDSN(aConstituentIndex)
-        End Get
-    End Property
-    Public Property ErrorTerm(ByVal aIndex As Integer) As Double
-        Get
-            Return pErrorTerm(aIndex)
-        End Get
-        Set(ByVal aValue As Double)
-            pErrorTerm(aIndex) = aValue
-        End Set
-    End Property
 End Class
 
-Public Class hexStorm
-    Private pSDateJ As Double
-    Private pEDateJ As Double
+Public Class HexStorm
+    Public ReadOnly SDateJ As Double
+    Public ReadOnly EDateJ As Double
 
     Public Sub New(ByVal aStormSDate() As Integer, ByVal aStormEDate() As Integer)
-        pSDateJ = Date2J(aStormSDate)
-        pEDateJ = Date2J(aStormEDate)
+        SDateJ = Date2J(aStormSDate)
+        EDateJ = Date2J(aStormEDate)
     End Sub
-    Public ReadOnly Property SDateJ() As Double
-        Get
-            Return pSDateJ
-        End Get
-    End Property
-    Public ReadOnly Property EDateJ() As Double
-        Get
-            Return pEDateJ
-        End Get
-    End Property
 End Class
 
-Friend Class hexErrorCriteria
+Friend Class HexErrorCriteria
     Implements IEnumerable
 
     Private pErrorCriteria As New atcCollection
@@ -806,32 +753,32 @@ Friend Class hexErrorCriteria
         '8 = acceptable error in summer storm volumes (%)
         '9 = multiplier on third and fourth error terms
         '10 = percent of flows to use in low-flow recession error
-        pErrorCriteria.Add("E1", New hexErrorCriterion("Error in total volume (%)", 1))
-        pErrorCriteria.Add("E2", New hexErrorCriterion("Error in low-flow recession", 8))
-        pErrorCriteria.Add("E3", New hexErrorCriterion("Error in 50% lowest flows (%)", 5))
-        pErrorCriteria.Add("E4", New hexErrorCriterion("Error in 10% highest flows (%)", 2))
-        pErrorCriteria.Add("E5", New hexErrorCriterion("Error in storm volumes (%)", 9))
-        pErrorCriteria.Add("E6", New hexErrorCriterion("Ratio of interflow to surface runoff (in/in)", 10))
-        pErrorCriteria.Add("E7", New hexErrorCriterion("Seasonal volume error (%)", 11))
-        pErrorCriteria.Add("E8", New hexErrorCriterion("Summer storm volume error (%)", 18))
-        pErrorCriteria.Add("E9", New hexErrorCriterion("Multiplier on third and fourth error terms", 14))
-        pErrorCriteria.Add("E10", New hexErrorCriterion("Percent of flows to use in low-flow recession error", 15))
-        pErrorCriteria.Add("E11", New hexErrorCriterion("Average storm peak flow error (%)", 12))
-        pErrorCriteria.Add("E12", New hexErrorCriterion("Error in 10% lowest flows (%)", 7))
-        pErrorCriteria.Add("E13", New hexErrorCriterion("Error in 25% lowest flows (%)", 6))
-        pErrorCriteria.Add("E14", New hexErrorCriterion("Error in 25% highest flows (%)", 3))
-        pErrorCriteria.Add("E15", New hexErrorCriterion("Error in 50% highest flows (%)", 4))
-        pErrorCriteria.Add("E16", New hexErrorCriterion("Error in average storm peak (%)", 13))
-        pErrorCriteria.Add("E17", New hexErrorCriterion("Summer volume error (%)", 16))
-        pErrorCriteria.Add("E18", New hexErrorCriterion("Winter volume error (%)", 17))
-        pErrorCriteria.Add("E19", New hexErrorCriterion("Winter storm volume error (%)", 19))
+        pErrorCriteria.Add("E1", New HexErrorCriterion("Error in total volume (%)", 1, 10))
+        pErrorCriteria.Add("E2", New HexErrorCriterion("Error in low-flow recession", 8, 0.03))
+        pErrorCriteria.Add("E3", New HexErrorCriterion("Error in 50% lowest flows (%)", 5, 10))
+        pErrorCriteria.Add("E4", New HexErrorCriterion("Error in 10% highest flows (%)", 2, 15))
+        pErrorCriteria.Add("E5", New HexErrorCriterion("Error in storm volumes (%)", 9, 15))
+        pErrorCriteria.Add("E6", New HexErrorCriterion("Ratio of interflow to surface runoff (in/in)", 10, 2.5))
+        pErrorCriteria.Add("E7", New HexErrorCriterion("Seasonal volume error (%)", 11, 20))
+        pErrorCriteria.Add("E8", New HexErrorCriterion("Summer storm volume error (%)", 18, 15))
+        pErrorCriteria.Add("E9", New HexErrorCriterion("Multiplier on third and fourth error terms", 14, 1.5))
+        pErrorCriteria.Add("E10", New HexErrorCriterion("Percent of flows to use in low-flow recession error", 15, 30))
+        pErrorCriteria.Add("E11", New HexErrorCriterion("Average storm peak flow error (%)", 12, 15))
+        pErrorCriteria.Add("E12", New HexErrorCriterion("Error in 10% lowest flows (%)", 7, 10))
+        pErrorCriteria.Add("E13", New HexErrorCriterion("Error in 25% lowest flows (%)", 6, 10))
+        pErrorCriteria.Add("E14", New HexErrorCriterion("Error in 25% highest flows (%)", 3, 10))
+        pErrorCriteria.Add("E15", New HexErrorCriterion("Error in 50% highest flows (%)", 4, 10))
+        pErrorCriteria.Add("E16", New HexErrorCriterion("Error in average storm peak (%)", 13, 15))
+        pErrorCriteria.Add("E17", New HexErrorCriterion("Summer volume error (%)", 16, 20))
+        pErrorCriteria.Add("E18", New HexErrorCriterion("Winter volume error (%)", 17, 15))
+        pErrorCriteria.Add("E19", New HexErrorCriterion("Winter storm volume error (%)", 19, 15))
     End Sub
     Public ReadOnly Property Count() As Integer
         Get
             Return pErrorCriteria.Count
         End Get
     End Property
-    Default Public ReadOnly Property Criterion(ByVal aIndex As Integer) As hexErrorCriterion
+    Default Public ReadOnly Property Criterion(ByVal aIndex As Integer) As HexErrorCriterion
         Get
             Return pErrorCriteria(aIndex - 1)
         End Get
@@ -847,71 +794,50 @@ Friend Class hexErrorCriteria
     End Function
 End Class
 
-Friend Class hexErrorCriterion
-    Private pName As String
+Friend Class HexErrorCriterion
+    Friend ReadOnly Name As String
     Friend Value As Double
-    Private pPrintPosition As Integer
+    Friend ReadOnly PrintPosition As Integer
 
-    Public Sub New(ByVal aName As String, ByVal aPrintPosition As String)
-        pName = aName
-        pPrintPosition = aPrintPosition
+    Public Sub New(ByVal aName As String, ByVal aPrintPosition As String, ByVal aDefault As Double)
+        Name = aName
+        PrintPosition = aPrintPosition
+        Value = aDefault
     End Sub
-
-    Friend ReadOnly Property Name() As String
-        Get
-            Return pName
-        End Get
-    End Property
-    Friend ReadOnly Property PrintPosition() As Integer
-        Get
-            Return pPrintPosition
-        End Get
-    End Property
 End Class
 
-Friend Class hexStatistics
-    Inherits Generic.List(Of hexStatistic)
+Friend Class HexStatistics
+    Inherits Generic.List(Of HexStatistic)
 
     Public Sub New()
-        Add(New hexStatistic("total (inches)", 1)) '1
-        Add(New hexStatistic("50% low (inches)", 5)) '2
-        Add(New hexStatistic("10% high (inches)", 2)) '3
-        Add(New hexStatistic("storm volume (inches)", 8)) '4
-        Add(New hexStatistic("average storm peak (cfs)", 9)) '5
-        Add(New hexStatistic("baseflow recession rate", 10)) '6
-        Add(New hexStatistic("summer volume (inches)", 11)) '7
-        Add(New hexStatistic("winter volume (inches)", 12)) '8
-        Add(New hexStatistic("summer storms (inches)", 13)) '9
-        Add(New hexStatistic("winter storms (inches)", 14)) '10
-        Add(New hexStatistic("10% low (inches)", 7)) '11
-        Add(New hexStatistic("25% low (inches)", 6)) '12
-        Add(New hexStatistic("25% high (inches)", 3)) '13
-        Add(New hexStatistic("50% high (inches)", 4)) '14
+        Add(New HexStatistic("total (inches)", 1)) '1
+        Add(New HexStatistic("50% low (inches)", 5)) '2
+        Add(New HexStatistic("10% high (inches)", 2)) '3
+        Add(New HexStatistic("storm volume (inches)", 8)) '4
+        Add(New HexStatistic("average storm peak (cfs)", 9)) '5
+        Add(New HexStatistic("baseflow recession rate", 10)) '6
+        Add(New HexStatistic("summer volume (inches)", 11)) '7
+        Add(New HexStatistic("winter volume (inches)", 12)) '8
+        Add(New HexStatistic("summer storms (inches)", 13)) '9
+        Add(New HexStatistic("winter storms (inches)", 14)) '10
+        Add(New HexStatistic("10% low (inches)", 7)) '11
+        Add(New HexStatistic("25% low (inches)", 6)) '12
+        Add(New HexStatistic("25% high (inches)", 3)) '13
+        Add(New HexStatistic("50% high (inches)", 4)) '14
     End Sub
-
 End Class
 
-Friend Class hexStatistic
-    Dim pName As String
-    Dim pPrintPosition As Integer
+Friend Class HexStatistic
+    Public ReadOnly Name As String
+    Public ReadOnly PrintPosition As Integer
 
     Public Sub New(ByVal aName As String, ByVal aPrintPosition As Integer)
-        pName = aName
-        pPrintPosition = aPrintPosition
+        Name = aName
+        PrintPosition = aPrintPosition
     End Sub
-    Public ReadOnly Property Name() As String
-        Get
-            Return pName
-        End Get
-    End Property
-    Public ReadOnly Property PrintPosition() As String
-        Get
-            Return pPrintPosition
-        End Get
-    End Property
 End Class
 
-Friend Class hexDatasetTypes
+Friend Class HexDatasetTypes
     Private pDatasetTypes As New atcCollection
     '1 = simulated total runoff (in)
     '2 = observed streamflow (cfs)
@@ -926,20 +852,20 @@ Friend Class hexDatasetTypes
 
     Public Sub New()
         'start of stats stored in pStats
-        pDatasetTypes.Add("SimTotRunoff", New hexDatasetType("Total Runoff", "Simulated", "in"))
-        pDatasetTypes.Add("ObsStreamflow", New hexDatasetType("Streamflow", "Observed", "cfs"))
-        pDatasetTypes.Add("SimInterflow", New hexDatasetType("Interflow", "Simulated", "in"))
-        pDatasetTypes.Add("SimBaseflow", New hexDatasetType("Baseflow", "Simulated", "in"))
-        pDatasetTypes.Add("ObsPotentialET", New hexDatasetType("Potential Evapotranspriation", "Observed", "in"))
-        pDatasetTypes.Add("SimActualET", New hexDatasetType("Actual Evapotranspriation", "Simulated", "in"))
+        pDatasetTypes.Add("SimTotRunoff", New HexDatasetType("Total Runoff", "Simulated", "in"))
+        pDatasetTypes.Add("ObsStreamflow", New HexDatasetType("Streamflow", "Observed", "cfs"))
+        pDatasetTypes.Add("SimInterflow", New HexDatasetType("Interflow", "Simulated", "in"))
+        pDatasetTypes.Add("SimBaseflow", New HexDatasetType("Baseflow", "Simulated", "in"))
+        pDatasetTypes.Add("ObsPotentialET", New HexDatasetType("Potential Evapotranspriation", "Observed", "in"))
+        pDatasetTypes.Add("SimActualET", New HexDatasetType("Actual Evapotranspriation", "Simulated", "in"))
         'end of stats stored in pStats
-        pDatasetTypes.Add("SimSurfaceRunoff", New hexDatasetType("Surface Runoff", "Simulated", "in"))
-        pDatasetTypes.Add("ObsPrecipitation", New hexDatasetType("Precipitation", "Observed", "in"))
-        pDatasetTypes.Add("SimUpperZoneStorage", New hexDatasetType("Upper Zone Storage", "Simulated", "in"))
-        pDatasetTypes.Add("SimLowerZoneStorage", New hexDatasetType("Lower Zone Storage", "Simulated", "in"))
+        pDatasetTypes.Add("SimSurfaceRunoff", New HexDatasetType("Surface Runoff", "Simulated", "in"))
+        pDatasetTypes.Add("ObsPrecipitation", New HexDatasetType("Precipitation", "Observed", "in"))
+        pDatasetTypes.Add("SimUpperZoneStorage", New HexDatasetType("Upper Zone Storage", "Simulated", "in"))
+        pDatasetTypes.Add("SimLowerZoneStorage", New HexDatasetType("Lower Zone Storage", "Simulated", "in"))
     End Sub
 
-    Default Public ReadOnly Property DatasetType(ByVal aIndex As Integer) As hexDatasetType
+    Default Public ReadOnly Property DatasetType(ByVal aIndex As Integer) As HexDatasetType
         Get
             Return pDatasetTypes(aIndex - 1)
         End Get
@@ -947,35 +873,20 @@ Friend Class hexDatasetTypes
     Public Function IndexFromKey(ByVal aKey As String) As Integer
         Try
             Return pDatasetTypes.Keys.IndexOf(aKey) + 1
-        Catch e As Exception
+        Catch lEx As Exception
             Return -1
         End Try
     End Function
 End Class
 
-Friend Class hexDatasetType
-    Dim pName As String
-    Dim pUnits As String
-    Dim pType As String
+Friend Class HexDatasetType
+    Public ReadOnly Name As String
+    Public ReadOnly Units As String
+    Public ReadOnly Type As String
 
     Public Sub New(ByVal aName As String, ByVal aType As String, ByVal aUnits As String)
-        pName = aName
-        pType = aType
-        pUnits = aUnits
+        Name = aName
+        Type = aType
+        Units = aUnits
     End Sub
-    Public ReadOnly Property Name() As String
-        Get
-            Return pName
-        End Get
-    End Property
-    Public ReadOnly Property Type() As String
-        Get
-            Return pType
-        End Get
-    End Property
-    Public ReadOnly Property Units() As String
-        Get
-            Return pUnits
-        End Get
-    End Property
 End Class
