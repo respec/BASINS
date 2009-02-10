@@ -27,6 +27,7 @@ Module HSPFOutputReports
     Private pImplndSegmentStarts() As Integer
     Private pGraphWQOnly As Boolean = False
     Private pGraphWQ As Boolean = False
+    Private pWaterYears As Boolean = False
 
     Private Sub Initialize()
         pOutputLocations.Clear()
@@ -118,6 +119,7 @@ Module HSPFOutputReports
                 pPerlndSegmentStarts = pUpatoiPerlndSegmentStarts
                 Dim pUpatoiImplndSegmentStarts() As Integer = {102, 202, 302, 402, 502, 602, 702, 802, 902, 952} '{101, 201, 301, 401, 501, 601, 701, 801, 901, 905}
                 pImplndSegmentStarts = pUpatoiImplndSegmentStarts
+                pWaterYears = True 'TODO: figure this out from run
             Case "tinley"
                 pTestPath = "c:\test\tinley"
                 pBaseName = "tinley"
@@ -210,12 +212,13 @@ Module HSPFOutputReports
                     lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
                     Dim lStr As String = lExpertSystem.Report
                     SaveFileString("outfiles\ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
+                    SaveFileString("outfiles\" & pBaseName & ".exs", lExpertSystem.AsString)
 
                     'lStr = lExpertSystem.AsString 'NOTE:just testing
                     'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
 
                     Dim lCons As String = "Flow"
-                    For Each lSite As hexSite In lExpertSystem.Sites
+                    For Each lSite As HexSite In lExpertSystem.Sites
                         Dim lSiteName As String = lSite.Name
                         Dim lArea As Double = lSite.Area
                         Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
@@ -371,13 +374,13 @@ Module HSPFOutputReports
             lOperationTypes.Add("I:", "IMPLND")
             lOperationTypes.Add("R:", "RCHRES")
 
-            Dim lString As String = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts).ToString
+            Dim lString As String = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears).ToString
             Dim lOutFileName As String = "outfiles\" & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"
             SaveFileString(lOutFileName, lString)
-            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True).ToString
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears).ToString
             lOutFileName = "outfiles\" & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShortWithMinMax.txt"
             SaveFileString(lOutFileName, lString)
-            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False).ToString
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears).ToString
             lOutFileName = "outfiles\" & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShort.txt"
             SaveFileString(lOutFileName, lString)
 

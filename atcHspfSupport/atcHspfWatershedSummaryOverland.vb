@@ -16,7 +16,8 @@ Public Module WatershedSummaryOverland
                            ByVal aImplndSegmentStarts() As Integer, _
                   Optional ByVal aEachYear As Boolean = True, _
                   Optional ByVal aSummary As Boolean = True, _
-                  Optional ByVal aIncludeMinMax As Boolean = True) As Text.StringBuilder
+                  Optional ByVal aIncludeMinMax As Boolean = True, _
+                  Optional ByVal aWaterYears As Boolean = False) As Text.StringBuilder
 
         Dim lNumberFormat As String = "#,##0.000"
         Dim lUnits As String = ""
@@ -57,7 +58,12 @@ Public Module WatershedSummaryOverland
 
         Dim lAllYearsToDo As New Generic.Dictionary(Of String, atcTimeseriesGroup)
         If aEachYear Then
-            Dim lSplitter As New atcSeasons.atcSeasonsCalendarYear
+            Dim lSplitter As atcSeasons.atcSeasonBase
+            If aWaterYears Then
+                lSplitter = New atcSeasonsWaterYear
+            Else
+                lSplitter = New atcSeasonsCalendarYear
+            End If
             For Each lOriginalTimeseries As atcTimeseries In lAllNonpointData
                 For Each lYearlyTs As atcTimeseries In lSplitter.Split(lOriginalTimeseries, Nothing)
                     lSeasonName = lYearlyTs.Attributes.GetValue("SeasonName", "")
@@ -76,7 +82,7 @@ Public Module WatershedSummaryOverland
         If aSummary Then lAllYearsToDo.Add("Summary", lAllNonpointData)
 
         Dim lSB As New Text.StringBuilder
-        Dim lSJDate As Double = auci.GlobalBlock.SDateJ
+        Dim lSJDate As Double = aUci.GlobalBlock.SDateJ
         For Each lCurrentNonpointData As atcTimeseriesGroup In lAllYearsToDo.Values
             lSeasonName = lCurrentNonpointData.ItemByIndex(0).Attributes.GetValue("SeasonName", "")
             lSB.AppendLine("Overland Summary Report for " & aConstituentType & " in " & aScenario & " " & lUnits)
@@ -365,16 +371,21 @@ Public Module WatershedSummaryOverland
         Dim lMinID As Integer = 10000
         Dim lMaxID As Integer = 0
         Dim lMinDescription As String = ""
-        aUniqueOperations = New ArrayList
+        Dim lOperationIds As New SortedList
         For Each lOperation As HspfOperation In aOperations
             With lOperation
-                If Not aUniqueOperations.Contains(.Description) Then
-                    aUniqueOperations.Add(.Description)
+                Dim lId As Integer = .Id Mod 100
+                If Not lOperationIds.ContainsValue(.Description) Then
+                    lOperationIds.Add(lId, .Description)
                 End If
                 If .Id < lMinID Then lMinID = .Id : lMinDescription = .Description
                 If .Id > lMaxID Then lMaxID = .Id
             End With
         Next
+
+        aUniqueOperations = New ArrayList
+        aUniqueOperations.AddRange(lOperationIds.Values)
+
         If aStarts Is Nothing OrElse aStarts.Length = 0 Then
             Dim lStarts As New ArrayList
             For Each lOperation As HspfOperation In aOperations
@@ -424,7 +435,6 @@ Public Module WatershedSummaryOverland
                 aYearlyTonsMean += lSumAnnual
                 aYearlyTonsMin += lMinAnnual
                 aYearlyTonsMax += lMaxAnnual
-
 
                 'aTable.Value(aField) = lOperation.Name & lOperation.Id & " area=" & DoubleToString(lArea) & " total=" & DoubleToString(lTotal) & " Per=" & DoubleToString(lTotal / lArea)
                 Dim lNumberFormat As String = "#,##0.000"
