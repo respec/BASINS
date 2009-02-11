@@ -234,6 +234,7 @@ Public Module Utility
         If aOutletLocation.Length > 0 Then
             lLocations = UpstreamLocations(aUci, aOperationTypes, aOutletLocation)
         End If
+        Dim lLandUsesSortedById As New SortedList
         Dim lLandUses As New atcCollection
         Dim lOperations As atcCollection
         For lOperationIndex As Integer = 0 To aUci.OpnSeqBlock.Opns.Count - 1
@@ -253,18 +254,25 @@ Public Module Utility
                 If aOutletLocation.Length > 0 Then
                     lOperationArea = lLocations.ItemByKey(lLocationKey)
                 End If
-                Dim lLandUseKey As Integer = lLandUses.IndexFromKey(lLandUse)
-                If lLandUseKey = -1 Then
+                Dim lLandUseKeyIndex As Integer = lLandUses.IndexFromKey(lLandUse)
+                If lLandUseKeyIndex = -1 Then
                     lOperations = New atcCollection
                     lOperations.Add(lOperationKey, lOperationArea)
+                    Dim lId As String = lLocationKey.Substring(0, 2) & Format(lOperation.Id Mod 100, "00")
+                    lLandUsesSortedById.Add(lId, lLandUse)
                     lLandUses.Add(lLandUse, lOperations)
                 Else
-                    lOperations = lLandUses.Item(lLandUseKey)
+                    lOperations = lLandUses.Item(lLandUseKeyIndex)
                     lOperations.Add(lOperationKey, lOperationArea)
                 End If
             End If
         Next
-        Return lLandUses
+        Dim lLandUsesTemp As New atcCollection
+        For Each lLandUseKey As String In lLandUsesSortedById.Keys
+            Dim lKey As String = lLandUsesSortedById.Item(lLandUseKey)
+            lLandUsesTemp.Add(lKey, lLandUses.ItemByKey(lKey))
+        Next
+        Return lLandUsesTemp
     End Function
 
     Public Function UpstreamLocations(ByVal aUci As HspfUci, _
