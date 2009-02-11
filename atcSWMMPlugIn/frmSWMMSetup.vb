@@ -1033,20 +1033,9 @@ Public Class frmSWMMSetup
     Friend pMetStations As atcCollection
     Friend pBasinsFolder As String
 
-    Friend pSubCatchmentFieldNames As New atcCollection
-    Friend pSubCatchmentFieldDefaults As New atcCollection
-    Friend pSubCatchmentFieldWidths As New atcCollection
-    Friend pSubCatchmentFieldTypes As New atcCollection
-
-    Friend pConduitFieldNames As New atcCollection
-    Friend pConduitFieldDefaults As New atcCollection
-    Friend pConduitFieldWidths As New atcCollection
-    Friend pConduitFieldTypes As New atcCollection
-
-    Friend pNodeFieldNames As New atcCollection
-    Friend pNodeFieldDefaults As New atcCollection
-    Friend pNodeFieldWidths As New atcCollection
-    Friend pNodeFieldTypes As New atcCollection
+    Friend pSubCatchmentFieldDetails As atcSWMMFieldDetails
+    Friend pConduitFieldDetails As atcSWMMFieldDetails
+    Friend pNodeFieldDetails As atcSWMMFieldDetails
 
     Private pInitializing As Boolean = True
 
@@ -1677,24 +1666,24 @@ Public Class frmSWMMSetup
                     Logger.Dbg("Add " & lTable.NumRecords & " NodesFrom " & lNodesShapefileName)
                     .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lNodeFieldMap))
                 End If
-                UseDefaultsForNodeAttributes(lNodeFieldMap, pNodeFieldNames, pNodeFieldDefaults, .Nodes)
                 CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
+                UseDefaultsForNodeAttributes(pNodeFieldDetails, .Nodes)
 
                 If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
                     'populate conduits from shapefile attribute table
                     Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lConduitShapefileName)
                     .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lConduitFieldMap), "Name", "C", 1))
                 End If
-                UseDefaultsForConduitAttributes(lConduitFieldMap, pConduitFieldNames, pConduitFieldDefaults, .Conduits)
                 CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
+                UseDefaultsForConduitAttributes(pConduitFieldDetails, .Conduits)
 
                 If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                     'populate subcatchments from shapefile attribute table
                     Logger.Dbg("Add " & lTable.NumRecords & " CatchmentsFrom " & lCatchmentShapefileName)
                     .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
                 End If
-                UseDefaultsForCatchmentAttributes(lCatchmentFieldMap, pSubCatchmentFieldNames, pSubCatchmentFieldDefaults, .Catchments)
                 CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
+                UseDefaultsForCatchmentAttributes(pSubCatchmentFieldDetails, .Catchments)
 
                 lblStatus.Text = "Overlaying Landuses with Subcatchments"
                 Me.Refresh()
@@ -1805,9 +1794,6 @@ Public Class frmSWMMSetup
         'set default field mapping for nodes, conduits, and Subcatchments
         pDefaultNodeFieldMap.Clear()
         pDefaultNodeFieldMap.Add("ID", "Name")
-        pDefaultNodeFieldMap.Add("InvertElev", "InvertElevation")   'from here down for create new feature
-        pDefaultNodeFieldMap.Add("SurchargeD", "SurchargeDepth")
-        pDefaultNodeFieldMap.Add("OutfallTyp", "OutfallType")
 
         pDefaultConduitFieldMap.Clear()
         pDefaultConduitFieldMap.Add("InNodeId", "InletNodeName")
@@ -1823,11 +1809,6 @@ Public Class frmSWMMSetup
         pDefaultConduitFieldMap.Add("ElevHigh", "ElevationHigh")
         pDefaultConduitFieldMap.Add("Elevhigh", "ElevationHigh")
         pDefaultConduitFieldMap.Add("ElevLow", "ElevationLow")
-        pDefaultConduitFieldMap.Add("InletNode", "InletNodeName")  'from here down for create new feature
-        pDefaultConduitFieldMap.Add("OutletNode", "OutletNodeName")
-        pDefaultConduitFieldMap.Add("InOffset", "InletOffset")
-        pDefaultConduitFieldMap.Add("OutOffset", "OutletOffset")
-        pDefaultConduitFieldMap.Add("InitFlow", "InitialFlow")
 
         pDefaultCatchmentFieldMap.Clear()
         pDefaultCatchmentFieldMap.Add("SUBBASIN", "Name")
@@ -1836,21 +1817,6 @@ Public Class frmSWMMSetup
         pDefaultCatchmentFieldMap.Add("OutNode", "OutletNodeID")
         pDefaultCatchmentFieldMap.Add("StreamLink", "Name")
         pDefaultCatchmentFieldMap.Add("AveSlope", "Slope")
-        pDefaultCatchmentFieldMap.Add("OutNodeID", "OutletNodeID") 'from here down for create new feature
-        pDefaultCatchmentFieldMap.Add("SnowPkName", "SnowPackName")
-        pDefaultCatchmentFieldMap.Add("ManNImperv", "ManningsNImperv")
-        pDefaultCatchmentFieldMap.Add("ManNPerv", "ManningsNPerv")
-        pDefaultCatchmentFieldMap.Add("DepStorImp", "DepressionStorageImperv")
-        pDefaultCatchmentFieldMap.Add("DepStorPer", "DepressionStoragePerv")
-        pDefaultCatchmentFieldMap.Add("PctZeroSto", "PercentZeroStorage")
-        pDefaultCatchmentFieldMap.Add("PctRouted", "PercentRouted")
-        pDefaultCatchmentFieldMap.Add("MaxInfiltR", "MaxInfiltRate")
-        pDefaultCatchmentFieldMap.Add("MinInfiltR", "MinInfiltRate")
-        pDefaultCatchmentFieldMap.Add("DecayRate", "DecayRateConstant")
-        pDefaultCatchmentFieldMap.Add("MaxInfiltV", "MaxInfiltVolume")
-        pDefaultCatchmentFieldMap.Add("Conductiv", "Conductivity")
-        pDefaultCatchmentFieldMap.Add("InitDefcit", "InitialDeficit")
-        pDefaultCatchmentFieldMap.Add("CurveNum", "CurveNumber")
 
         cboLanduse.Items.Add("<none>")
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
@@ -1934,6 +1900,23 @@ Public Class frmSWMMSetup
 
         'build collections of field names, defaults, types, and widths for new shapefile attributes
         ReadSWMMFieldSpecs(pBasinsFolder & "\etc\SWMMFields.txt")
+
+        'if there any short field names in the field specs, add them to the default field mapping lists
+        For Each lFieldDetail As FieldDetail In pNodeFieldDetails
+            If lFieldDetail.ShortName.Length > 0 Then
+                pDefaultNodeFieldMap.Add(lFieldDetail.ShortName, lFieldDetail.LongName)
+            End If
+        Next
+        For Each lFieldDetail As FieldDetail In pConduitFieldDetails
+            If lFieldDetail.ShortName.Length > 0 Then
+                pDefaultConduitFieldMap.Add(lFieldDetail.ShortName, lFieldDetail.LongName)
+            End If
+        Next
+        For Each lFieldDetail As FieldDetail In pSubCatchmentFieldDetails
+            If lFieldDetail.ShortName.Length > 0 Then
+                pDefaultCatchmentFieldMap.Add(lFieldDetail.ShortName, lFieldDetail.LongName)
+            End If
+        Next
 
         Logger.Dbg("InitializeUI Complete")
     End Sub
@@ -2228,8 +2211,12 @@ Public Class frmSWMMSetup
 
                 'add fields
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdSubcatchment.FileName)
-                For lIndex As Integer = 0 To pSubCatchmentFieldNames.Count - 1
-                    GisUtil.AddField(lLayerIndex, pSubCatchmentFieldNames(lIndex), pSubCatchmentFieldTypes(lIndex), pSubCatchmentFieldWidths(lIndex))
+                For Each lFieldDetail As FieldDetail In pSubCatchmentFieldDetails
+                    If lFieldDetail.ShortName.Length > 0 Then
+                        GisUtil.AddField(lLayerIndex, lFieldDetail.ShortName, lFieldDetail.Type, lFieldDetail.Width)
+                    Else
+                        GisUtil.AddField(lLayerIndex, lFieldDetail.LongName, lFieldDetail.Type, lFieldDetail.Width)
+                    End If
                 Next
 
                 GisUtil.LayerVisible(lLayerIndex) = True
@@ -2249,8 +2236,12 @@ Public Class frmSWMMSetup
 
                 'add fields
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdConduits.FileName)
-                For lIndex As Integer = 0 To pConduitFieldNames.Count - 1
-                    GisUtil.AddField(lLayerIndex, pConduitFieldNames(lIndex), pConduitFieldTypes(lIndex), pConduitFieldWidths(lIndex))
+                For Each lFieldDetail As FieldDetail In pConduitFieldDetails
+                    If lFieldDetail.ShortName.Length > 0 Then
+                        GisUtil.AddField(lLayerIndex, lFieldDetail.ShortName, lFieldDetail.Type, lFieldDetail.Width)
+                    Else
+                        GisUtil.AddField(lLayerIndex, lFieldDetail.LongName, lFieldDetail.Type, lFieldDetail.Width)
+                    End If
                 Next
 
                 GisUtil.LayerVisible(lLayerIndex) = True
@@ -2272,8 +2263,12 @@ Public Class frmSWMMSetup
 
                 'add fields
                 Dim lLayerIndex As Integer = GisUtil.LayerIndex(ofdNodes.FileName)
-                For lIndex As Integer = 0 To pNodeFieldNames.Count - 1
-                    GisUtil.AddField(lLayerIndex, pNodeFieldNames(lIndex), pNodeFieldTypes(lIndex), pNodeFieldWidths(lIndex))
+                For Each lFieldDetail As FieldDetail In pNodeFieldDetails
+                    If lFieldDetail.ShortName.Length > 0 Then
+                        GisUtil.AddField(lLayerIndex, lFieldDetail.ShortName, lFieldDetail.Type, lFieldDetail.Width)
+                    Else
+                        GisUtil.AddField(lLayerIndex, lFieldDetail.LongName, lFieldDetail.Type, lFieldDetail.Width)
+                    End If
                 Next
 
                 GisUtil.LayerVisible(lLayerIndex) = True
@@ -2330,7 +2325,7 @@ Public Class frmSWMMSetup
         Dim lfrmCalculate As New frmCalculate
         Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
 
-        lfrmCalculate.InitializeForm(cboSubbasins.Items(cboSubbasins.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pSubCatchmentFieldNames, pSubCatchmentFieldDefaults, pSubCatchmentFieldWidths, pSubCatchmentFieldTypes)
+        lfrmCalculate.InitializeForm(cboSubbasins.Items(cboSubbasins.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pSubCatchmentFieldDetails)
         lResult = lfrmCalculate.ShowDialog()
     End Sub
 
@@ -2338,7 +2333,7 @@ Public Class frmSWMMSetup
         Dim lfrmCalculate As New frmCalculate
         Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
 
-        lfrmCalculate.InitializeForm(cboStreams.Items(cboStreams.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pConduitFieldNames, pConduitFieldDefaults, pConduitFieldWidths, pConduitFieldTypes)
+        lfrmCalculate.InitializeForm(cboStreams.Items(cboStreams.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pConduitFieldDetails)
         lResult = lfrmCalculate.ShowDialog()
     End Sub
 
@@ -2346,26 +2341,15 @@ Public Class frmSWMMSetup
         Dim lfrmCalculate As New frmCalculate
         Dim lResult As DialogResult = Windows.Forms.DialogResult.Cancel
 
-        lfrmCalculate.InitializeForm(cboOutlets.Items(cboOutlets.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pNodeFieldNames, pNodeFieldDefaults, pNodeFieldWidths, pNodeFieldTypes)
+        lfrmCalculate.InitializeForm(cboOutlets.Items(cboOutlets.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pNodeFieldDetails)
         lResult = lfrmCalculate.ShowDialog()
     End Sub
 
     Private Sub ReadSWMMFieldSpecs(ByVal aFileName As String)
 
-        pSubCatchmentFieldNames = New atcCollection
-        pSubCatchmentFieldDefaults = New atcCollection
-        pSubCatchmentFieldTypes = New atcCollection
-        pSubCatchmentFieldWidths = New atcCollection
-
-        pConduitFieldNames = New atcCollection
-        pConduitFieldDefaults = New atcCollection
-        pConduitFieldTypes = New atcCollection
-        pConduitFieldWidths = New atcCollection
-
-        pNodeFieldNames = New atcCollection
-        pNodeFieldDefaults = New atcCollection
-        pNodeFieldTypes = New atcCollection
-        pNodeFieldWidths = New atcCollection
+        pSubCatchmentFieldDetails = New atcSWMMFieldDetails
+        pConduitFieldDetails = New atcSWMMFieldDetails
+        pNodeFieldDetails = New atcSWMMFieldDetails
 
         Try
             For Each lString As String In LinesInFile(aFileName)
@@ -2376,104 +2360,89 @@ Public Class frmSWMMSetup
         Catch lEx As Exception
             Logger.Dbg("Problem Loading '" & aFileName & "'" & vbCrLf & lEx.Message, "Load Problem")
             'problem reading default file, just use these hardcoded defaults
-            pSubCatchmentFieldNames = New atcCollection
-            pSubCatchmentFieldDefaults = New atcCollection
-            pSubCatchmentFieldTypes = New atcCollection
-            pSubCatchmentFieldWidths = New atcCollection
-
-            pConduitFieldNames = New atcCollection
-            pConduitFieldDefaults = New atcCollection
-            pConduitFieldTypes = New atcCollection
-            pConduitFieldWidths = New atcCollection
-
-            pNodeFieldNames = New atcCollection
-            pNodeFieldDefaults = New atcCollection
-            pNodeFieldTypes = New atcCollection
-            pNodeFieldWidths = New atcCollection
+            pSubCatchmentFieldDetails.Clear()
+            pConduitFieldDetails.Clear()
+            pNodeFieldDetails.Clear()
 
             'format of the records is entitytype,name,default,type,length
             'string is type 0, integer is type 1, double is type 2
 
-            ParseSWMMFieldSpecs("Subcatchment,Name,S,0,10")
-            ParseSWMMFieldSpecs("Subcatchment,OutNodeID,,0,10")
-            ParseSWMMFieldSpecs("Subcatchment,Width,,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,Slope,,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,CurbLength,0.0,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,SnowPkName,,0,10")
-            ParseSWMMFieldSpecs("Subcatchment,ManNImperv,0.01,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,ManNPerv,0.1,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,DepStorImp,0.05,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,DepStorPer,0.05,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,PctZeroSto,25.0,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,RouteTo,OUTLET,0,10")
-            ParseSWMMFieldSpecs("Subcatchment,PctRouted,100.0,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,MaxInfiltR,3.0,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,MinInfiltR,0.5,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,DecayRate,4,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,DryTime,7,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,MaxInfiltV,0,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,Suction,3.0,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,Conductiv,0.5,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,InitDefcit,4.0,2,10")
-            ParseSWMMFieldSpecs("Subcatchment,CurveNum,3.0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,Name,,S,0,10")
+            ParseSWMMFieldSpecs("Subcatchment,OutletNodeID,OutNodeID,,0,10")
+            ParseSWMMFieldSpecs("Subcatchment,Width,,,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,Slope,,,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,CurbLength,,0.0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,SnowPackName,SnowPkName,,0,10")
+            ParseSWMMFieldSpecs("Subcatchment,ManningsNImperv,ManNImperv,0.01,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,ManningsNPerv,ManNPerv,0.1,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,DepressionStorageImperv,DepStorImp,0.05,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,DepressionStoragePerv,DepStorPer,0.05,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,PercentZeroStorage,PctZeroSto,25.0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,RouteTo,,OUTLET,0,10")
+            ParseSWMMFieldSpecs("Subcatchment,PercentRouted,PctRouted,100.0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,MaxInfiltRate,MaxInfiltR,3.0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,MinInfiltRate,MinInfiltR,0.5,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,DecayRateConstant,DecayRate,4,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,DryTime,,7,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,MaxInfiltVolume,MaxInfiltV,0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,Suction,,3.0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,Conductivity,Conductiv,0.5,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,InitialDeficit,InitDefcit,4.0,2,10")
+            ParseSWMMFieldSpecs("Subcatchment,CurveNumber,CurveNum,3.0,2,10")
 
-            ParseSWMMFieldSpecs("Conduit,Name,C,0,10")
-            ParseSWMMFieldSpecs("Conduit,InletNode,,0,10")
-            ParseSWMMFieldSpecs("Conduit,OutletNode,,0,10")
-            ParseSWMMFieldSpecs("Conduit,MeanWidth,0.0,2,10")
-            ParseSWMMFieldSpecs("Conduit,MeanDepth,0.0,2,10")
-            ParseSWMMFieldSpecs("Conduit,ManningsN,0.05,2,10")
-            ParseSWMMFieldSpecs("Conduit,InOffset,0.0,2,10")
-            ParseSWMMFieldSpecs("Conduit,OutOffset,0.0,2,10")
-            ParseSWMMFieldSpecs("Conduit,InitFlow,0.0,2,10")
-            ParseSWMMFieldSpecs("Conduit,MaxFlow,0.0,2,10")
-            ParseSWMMFieldSpecs("Conduit,Shape,TRAPEZOIDAL,0,12")
-            ParseSWMMFieldSpecs("Conduit,Geometry1,,2,10")
-            ParseSWMMFieldSpecs("Conduit,Geometry2,,2,10")
-            ParseSWMMFieldSpecs("Conduit,Geometry3,1,2,10")
-            ParseSWMMFieldSpecs("Conduit,Geometry4,1,2,10")
-            ParseSWMMFieldSpecs("Conduit,NumBarrels,1,1,10")
+            ParseSWMMFieldSpecs("Conduit,Name,,C,0,10")
+            ParseSWMMFieldSpecs("Conduit,InletNodeName,InletNode,,0,10")
+            ParseSWMMFieldSpecs("Conduit,OutletNodeName,OutletNode,,0,10")
+            ParseSWMMFieldSpecs("Conduit,MeanWidth,,0.0,2,10")
+            ParseSWMMFieldSpecs("Conduit,MeanDepth,,0.0,2,10")
+            ParseSWMMFieldSpecs("Conduit,ManningsN,,0.05,2,10")
+            ParseSWMMFieldSpecs("Conduit,InletOffset,InOffset,0.0,2,10")
+            ParseSWMMFieldSpecs("Conduit,OutletOffset,OutOffset,0.0,2,10")
+            ParseSWMMFieldSpecs("Conduit,InitialFlow,InitFlow,0.0,2,10")
+            ParseSWMMFieldSpecs("Conduit,MaxFlow,,0.0,2,10")
+            ParseSWMMFieldSpecs("Conduit,Shape,,TRAPEZOIDAL,0,12")
+            ParseSWMMFieldSpecs("Conduit,Geometry1,,,2,10")
+            ParseSWMMFieldSpecs("Conduit,Geometry2,,,2,10")
+            ParseSWMMFieldSpecs("Conduit,Geometry3,,1,2,10")
+            ParseSWMMFieldSpecs("Conduit,Geometry4,,1,2,10")
+            ParseSWMMFieldSpecs("Conduit,NumBarrels,,1,1,10")
 
-            ParseSWMMFieldSpecs("Node,Name,N,0,10")
-            ParseSWMMFieldSpecs("Node,Type,JUNCTION,0,10")
-            ParseSWMMFieldSpecs("Node,InvertElev,0.0,2,10")
-            ParseSWMMFieldSpecs("Node,MaxDepth,0.0,2,10")
-            ParseSWMMFieldSpecs("Node,InitDepth,0.0,2,10")
-            ParseSWMMFieldSpecs("Node,SurchargeD,0.0,2,10")
-            ParseSWMMFieldSpecs("Node,PondedArea,0.0,2,10")
-            ParseSWMMFieldSpecs("Node,OutfallTyp,FREE,0,10")
-            ParseSWMMFieldSpecs("Node,StageTable,,0,10")
-            ParseSWMMFieldSpecs("Node,TideGate,NO,0,10")
+            ParseSWMMFieldSpecs("Node,Name,,N,0,10")
+            ParseSWMMFieldSpecs("Node,Type,,JUNCTION,0,10")
+            ParseSWMMFieldSpecs("Node,InvertElevation,InvertElev,0.0,2,10")
+            ParseSWMMFieldSpecs("Node,MaxDepth,,0.0,2,10")
+            ParseSWMMFieldSpecs("Node,InitDepth,,0.0,2,10")
+            ParseSWMMFieldSpecs("Node,SurchargeDepth,SurchargeD,0.0,2,10")
+            ParseSWMMFieldSpecs("Node,PondedArea,,0.0,2,10")
+            ParseSWMMFieldSpecs("Node,OutfallType,OutfallTyp,FREE,0,10")
+            ParseSWMMFieldSpecs("Node,StageTable,,,0,10")
+            ParseSWMMFieldSpecs("Node,TideGate,,NO,0,10")
+
         End Try
 
     End Sub
 
     Private Sub ParseSWMMFieldSpecs(ByVal aString As String)
         Dim lEntityType As String = StrRetRem(aString)
-        Dim lFieldName As String = StrRetRem(aString)
+        Dim lFieldLongName As String = StrRetRem(aString)
+        Dim lFieldShortName As String = StrRetRem(aString)
         Dim lFieldDefault As String = StrRetRem(aString)
         Dim lFieldType As Integer = StrRetRem(aString)
         Dim lFieldWidth As Integer = StrRetRem(aString)
 
-        Dim lCount As Integer = 0
+        Dim lFieldDetail As New FieldDetail
+        lFieldDetail.LongName = lFieldLongName
+        lFieldDetail.ShortName = lFieldShortName
+        lFieldDetail.DefaultValue = lFieldDefault
+        lFieldDetail.Type = lFieldType
+        lFieldDetail.Width = lFieldWidth
+
         If lEntityType = "Subcatchment" Then
-            lCount = pSubCatchmentFieldNames.Count + 1
-            pSubCatchmentFieldNames.Add(lCount, lFieldName)
-            pSubCatchmentFieldDefaults.Add(lCount, lFieldDefault)
-            pSubCatchmentFieldTypes.Add(lCount, lFieldType)
-            pSubCatchmentFieldWidths.Add(lCount, lFieldWidth)
+            pSubCatchmentFieldDetails.Add(lFieldDetail)
         ElseIf lEntityType = "Conduit" Then
-            lCount = pConduitFieldNames.Count + 1
-            pConduitFieldNames.Add(lCount, lFieldName)
-            pConduitFieldDefaults.Add(lCount, lFieldDefault)
-            pConduitFieldTypes.Add(lCount, lFieldType)
-            pConduitFieldWidths.Add(lCount, lFieldWidth)
+            pConduitFieldDetails.Add(lFieldDetail)
         ElseIf lEntityType = "Node" Then
-            lCount = pNodeFieldNames.Count + 1
-            pNodeFieldNames.Add(lCount, lFieldName)
-            pNodeFieldDefaults.Add(lCount, lFieldDefault)
-            pNodeFieldTypes.Add(lCount, lFieldType)
-            pNodeFieldWidths.Add(lCount, lFieldWidth)
+            pNodeFieldDetails.Add(lFieldDetail)
         End If
     End Sub
 

@@ -55,6 +55,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="atcSWMMFieldDetails.vb" />
     <Compile Include="clsPlugin.vb" />
     <Compile Include="frmCalculate.Designer.vb">
       <DependentUpon>frmCalculate.vb</DependentUpon>

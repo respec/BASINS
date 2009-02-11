@@ -4,10 +4,7 @@ Imports System.Windows.Forms
 
 Public Class frmCalculate
 
-    Friend pFields As atcCollection
-    Friend pDefaults As atcCollection
-    Friend pWidths As atcCollection
-    Friend pTypes As atcCollection
+    Friend pFieldDetails As atcSWMMFieldDetails
     Friend pCalculateLayerName As String
     Friend pNodeLayerName As String
     Friend pGridLayerIndex As Integer
@@ -35,13 +32,14 @@ Public Class frmCalculate
             End If
 
             'update this item for each feature
-            Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lLayerIndex, lCheckedName, pTypes(pFields.IndexOf(lCheckedName)), pWidths(pFields.IndexOf(lCheckedName)))
+            Dim lFieldDetail As FieldDetail = pFieldDetails(lCheckedName)
+            Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lLayerIndex, lCheckedName, lFieldDetail.Type, lFieldDetail.Width)
             For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
                 Dim lValue As String = ""
                 Dim lUpdateMe As Boolean = True
                 If lCheckedName = "Name" Then
-                    lValue = pDefaults(pFields.IndexOf(lCheckedName)) & CStr(lFeatureIndex + 1)
-                ElseIf lCheckedName = "OutNodeID" Then
+                    lValue = lFieldDetail.DefaultValue & CStr(lFeatureIndex + 1)
+                ElseIf lCheckedName = "OutletNodeID" Then
                     'find closest subcatchment outlet node id
                     If pNodeLayerName <> "<none>" Then
                         Dim lCentroidX As Double
@@ -59,7 +57,7 @@ Public Class frmCalculate
                     Else
                         lUpdateMe = False
                     End If
-                ElseIf lCheckedName = "InletNode" Then
+                ElseIf lCheckedName = "InletNodeName" Then
                     'find closest conduit inlet node id
                     If pNodeLayerName <> "<none>" Then
                         Dim lX1 As Double
@@ -69,7 +67,7 @@ Public Class frmCalculate
                         GisUtil.EndPointsOfLine(lLayerIndex, lFeatureIndex, lX1, lY1, lX2, lY2)
                         lValue = FindClosestNodeToXY(lX1, lY1)
                     End If
-                ElseIf lCheckedName = "OutletNode" Then
+                ElseIf lCheckedName = "OutletNodeName" Then
                     'find closest conduit outlet node id
                     If pNodeLayerName <> "<none>" Then
                         Dim lX1 As Double
@@ -87,7 +85,7 @@ Public Class frmCalculate
                     lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth")) - (2 * GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")))
                 Else
                     'regular case
-                    lValue = pDefaults(pFields.IndexOf(lCheckedName))
+                    lValue = lFieldDetail.DefaultValue
                 End If
                 If lUpdateMe Then GisUtil.SetFeatureValue(lLayerIndex, lFieldIndex, lFeatureIndex, lValue)
             Next
@@ -105,18 +103,15 @@ Public Class frmCalculate
         Next
     End Sub
 
-    Public Sub InitializeForm(ByVal aCalculateLayerName As String, ByVal aNodeLayerName As String, ByVal aFields As atcCollection, ByVal aDefaults As atcCollection, ByVal aWidths As atcCollection, ByVal aTypes As atcCollection)
+    Public Sub InitializeForm(ByVal aCalculateLayerName As String, ByVal aNodeLayerName As String, ByVal aFieldDetails As atcSWMMFieldDetails)
         pCalculateLayerName = aCalculateLayerName
         pNodeLayerName = aNodeLayerName
-        pFields = aFields
-        pDefaults = aDefaults
-        pWidths = aWidths
-        pTypes = aTypes
+        pFieldDetails = aFieldDetails
 
         clbCalculate.Items.Clear()
-        If Not pFields Is Nothing Then
-            For Each lField As String In pFields
-                clbCalculate.Items.Add(lField, True)
+        If Not pFieldDetails Is Nothing Then
+            For Each lField As FieldDetail In pFieldDetails
+                clbCalculate.Items.Add(lField.LongName, True)
             Next
         End If
     End Sub
