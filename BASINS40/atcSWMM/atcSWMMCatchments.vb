@@ -192,30 +192,30 @@ Public Class Catchment
     Public RainGage As RainGage
     Public OutletNode As Node
     Public OutletNodeID As String
-    Public Area As Double = 0.0 'in acres or hectares
-    Public PercentImpervious As Double = 0.0
-    Public Width As Double = 0.0 'in feet or meters
-    Public Slope As Double = 0.0 'percent
-    Public CurbLength As Double = 0.0
+    Public Area As Double = -1.0 'in acres or hectares
+    Public PercentImpervious As Double = -1.0
+    Public Width As Double = -1.0 'in feet or meters
+    Public Slope As Double = -1.0 'percent
+    Public CurbLength As Double = -1.0
     Public SnowPackName As String = "" 'blank if none
 
-    Public ManningsNImperv As Double = 0.01
-    Public ManningsNPerv As Double = 0.1
-    Public DepressionStorageImperv As Double = 0.05 'inches or mm
-    Public DepressionStoragePerv As Double = 0.05 'inches or mm
-    Public PercentZeroStorage As Double = 25.0
-    Public RouteTo As String = "OUTLET"
-    Public PercentRouted As Double = 100.0
+    Public ManningsNImperv As Double = -1.0
+    Public ManningsNPerv As Double = -1.0
+    Public DepressionStorageImperv As Double = -1.0 'inches or mm
+    Public DepressionStoragePerv As Double = -1.0 'inches or mm
+    Public PercentZeroStorage As Double = -1.0
+    Public RouteTo As String = ""
+    Public PercentRouted As Double = -1.0
 
-    Public MaxInfiltRate As Double = 3.0 'inches/hr or mm/hr
-    Public MinInfiltRate As Double = 0.5 'inches/hr or mm/hr
-    Public DecayRateConstant As Double = 4
-    Public DryTime As Double = 7 'days (or 4 days if using curve number)
-    Public MaxInfiltVolume As Double = 0 'inches or mm
-    Public Suction As Double = 3.0 'inches or mm              'used if Infiltration Method is "GREEN_AMPT"
-    Public Conductivity As Double = 0.5 'inches/hr or mm/hr   'used if Infiltration Method is "GREEN_AMPT" or "CURVE_NUMBER"
-    Public InitialDeficit As Double = 4.0                     'used if Infiltration Method is "GREEN_AMPT"
-    Public CurveNumber As Double = 3.0                        'used if Infiltration Method is "CURVE_NUMBER"
+    Public MaxInfiltRate As Double = -1.0 'inches/hr or mm/hr
+    Public MinInfiltRate As Double = -1.0 'inches/hr or mm/hr
+    Public DecayRateConstant As Double = -1.0
+    Public DryTime As Double = -1.0 'days (or 4 days if using curve number)
+    Public MaxInfiltVolume As Double = -1.0 'inches or mm
+    Public Suction As Double = -1.0 'inches or mm              'used if Infiltration Method is "GREEN_AMPT"
+    Public Conductivity As Double = -1.0 'inches/hr or mm/hr   'used if Infiltration Method is "GREEN_AMPT" or "CURVE_NUMBER"
+    Public InitialDeficit As Double = -1.0                     'used if Infiltration Method is "GREEN_AMPT"
+    Public CurveNumber As Double = -1.0                        'used if Infiltration Method is "CURVE_NUMBER"
 
     Public X() As Double
     Public Y() As Double

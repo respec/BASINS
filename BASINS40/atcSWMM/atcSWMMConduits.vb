@@ -128,21 +128,21 @@ Public Class Conduit
     Public DownConduitID As String = ""
     Public Length As New atcDefinedValue
     Private Shared LengthDefinition As atcAttributeDefinition
-    Public MeanWidth As Double = 0.0
-    Public MeanDepth As Double = 0.0
-    Public ElevationHigh As Double = 0.0
-    Public ElevationLow As Double = 0.0
-    Public ManningsN As Double = 0.05
-    Public InletOffset As Double = 0.0
-    Public OutletOffset As Double = 0.0
-    Public InitialFlow As Double = 0.0
-    Public MaxFlow As Double = 0.0
-    Public Shape As String = "TRAPEZOIDAL"
+    Public MeanWidth As Double = -1.0
+    Public MeanDepth As Double = -1.0
+    Public ElevationHigh As Double = -1.0
+    Public ElevationLow As Double = -1.0
+    Public ManningsN As Double = -1.0
+    Public InletOffset As Double = -1.0
+    Public OutletOffset As Double = -1.0
+    Public InitialFlow As Double = -1.0
+    Public MaxFlow As Double = -1.0
+    Public Shape As String = ""
     Public Geometry1 As Double = -1 'full height
     Public Geometry2 As Double = -1 'base width
-    Public Geometry3 As Double = 1 'left slope
-    Public Geometry4 As Double = 1 'right slope
-    Public NumBarrels As Integer = 1
+    Public Geometry3 As Double = -1 'left slope
+    Public Geometry4 As Double = -1 'right slope
+    Public NumBarrels As Integer = -1
     Public X() As Double
     Public Y() As Double
     Private Shared pIsMetric As Boolean

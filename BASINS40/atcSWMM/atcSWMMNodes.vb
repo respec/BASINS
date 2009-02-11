@@ -93,16 +93,16 @@ Public Class Nodes
 End Class
 
 Public Class Node
-    Public Name As String
+    Public Name As String = ""
     Public Type As String = "" 'junction or outfall
-    Public InvertElevation As Double 'in feet or meters
-    Public MaxDepth As Double = 0.0
-    Public InitDepth As Double = 0.0
-    Public SurchargeDepth As Double = 0.0
-    Public PondedArea As Double = 0.0
-    Public OutfallType As String = "FREE"
+    Public InvertElevation As Double = -1.0 'in feet or meters
+    Public MaxDepth As Double = -1.0
+    Public InitDepth As Double = -1.0
+    Public SurchargeDepth As Double = -1.0
+    Public PondedArea As Double = -1.0
+    Public OutfallType As String = ""
     Public StageTable As String = ""
-    Public TideGate As String = "NO"
+    Public TideGate As String = ""
     Public YPos As Double = 0.0
     Public XPos As Double = 0.0
 End Class
