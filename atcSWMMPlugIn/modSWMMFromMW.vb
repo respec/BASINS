@@ -66,12 +66,12 @@ Friend Module modSWMMFromMW
                 Next
             End If
 
-            If lCatchment.Area = 0.0 Then
+            If lCatchment.Area <= 0.0 Then
                 lCatchment.Area = GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) / 4047.0  'convert m2 to acres
             End If
 
             'lCatchment.PercentImpervious()  'this is computed later
-            If lCatchment.Width = 0.0 Then
+            If lCatchment.Width <= 0.0 Then
                 lCatchment.Width = Math.Sqrt(lCatchment.Area * 43560)
             End If
 
