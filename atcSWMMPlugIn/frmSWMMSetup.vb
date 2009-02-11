@@ -1667,7 +1667,6 @@ Public Class frmSWMMSetup
                     .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lNodeFieldMap))
                 End If
                 CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
-                UseDefaultsForNodeAttributes(pNodeFieldDetails, .Nodes)
 
                 If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
                     'populate conduits from shapefile attribute table
@@ -1675,7 +1674,6 @@ Public Class frmSWMMSetup
                     .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lConduitFieldMap), "Name", "C", 1))
                 End If
                 CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
-                UseDefaultsForConduitAttributes(pConduitFieldDetails, .Conduits)
 
                 If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                     'populate subcatchments from shapefile attribute table
@@ -1683,7 +1681,11 @@ Public Class frmSWMMSetup
                     .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
                 End If
                 CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
-                UseDefaultsForCatchmentAttributes(pSubCatchmentFieldDetails, .Catchments)
+
+                'set variables without a value to the default from the field details
+                UseDefaultsForAttributes(pNodeFieldDetails, .Nodes)
+                UseDefaultsForAttributes(pConduitFieldDetails, .Conduits)
+                UseDefaultsForAttributes(pSubCatchmentFieldDetails, .Catchments)
 
                 lblStatus.Text = "Overlaying Landuses with Subcatchments"
                 Me.Refresh()
