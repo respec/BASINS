@@ -52,8 +52,8 @@ Friend Module modSWMMFromMW
             Else
                 If aSWMMProject.Nodes.Contains(lCatchment.OutletNodeID) Then
                     lCatchment.OutletNode = aSWMMProject.Nodes(lCatchment.OutletNodeID)
+                    Logger.Dbg("Outlet Node " & lCatchment.OutletNode.Name)
                 End If
-                Logger.Dbg("Outlet Node " & lCatchment.OutletNode.Name)
             End If
 
             If lCatchment.OutletNode Is Nothing Then

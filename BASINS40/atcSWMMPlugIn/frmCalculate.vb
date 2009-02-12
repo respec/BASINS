@@ -33,7 +33,11 @@ Public Class frmCalculate
 
             'update this item for each feature
             Dim lFieldDetail As FieldDetail = pFieldDetails(lCheckedName)
-            Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lLayerIndex, lCheckedName, lFieldDetail.Type, lFieldDetail.Width)
+            Dim lFieldName As String = lFieldDetail.ShortName
+            If lFieldName.Length = 0 Then
+                lFieldName = lFieldDetail.LongName
+            End If
+            Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lLayerIndex, lFieldName, lFieldDetail.Type, lFieldDetail.Width)
             For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
                 Dim lValue As String = ""
                 Dim lUpdateMe As Boolean = True
@@ -78,11 +82,19 @@ Public Class frmCalculate
                         lValue = FindClosestNodeToXY(lX2, lY2)
                     End If
                 ElseIf lCheckedName = "Geometry1" Then
-                    'estimate full height from mean depth of conduit
-                    lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")) * 1.25
+                    If GisUtil.IsField(lLayerIndex, "MeanDepth") Then
+                        'estimate full height from mean depth of conduit
+                        lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")) * 1.25
+                    Else
+                        lValue = lFieldDetail.DefaultValue
+                    End If
                 ElseIf lCheckedName = "Geometry2" Then
-                    'estimate base width from mean width and mean depth of conduit
-                    lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth")) - (2 * GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")))
+                    If GisUtil.IsField(lLayerIndex, "MeanDepth") AndAlso GisUtil.IsField(lLayerIndex, "MeanWidth") Then
+                        'estimate base width from mean width and mean depth of conduit
+                        lValue = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanWidth")) - (2 * GisUtil.FieldValue(lLayerIndex, lFeatureIndex, GisUtil.FieldIndex(lLayerIndex, "MeanDepth")))
+                    Else
+                        lValue = lFieldDetail.DefaultValue
+                    End If
                 Else
                     'regular case
                     lValue = lFieldDetail.DefaultValue
