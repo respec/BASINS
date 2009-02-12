@@ -195,7 +195,7 @@ Public Class atcTimeseriesMath
             Select Case lArg.GetType.Name
                 Case "atcTimeseries"
                     lDataGroup.Add(lArg)
-                Case "atcDataGroup"
+                Case "atcDataGroup", "atcTimeseriesGroup"
                     lDataGroup.AddRange(lArg)
                 Case "Double", "Single", "Integer"
                     lDataAttributes.Add("Number", lArg)
