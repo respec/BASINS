@@ -1517,8 +1517,9 @@ Public Class frmSWMMSetup
 
         'set file names for nodes, conduits, and subcatchments
         Dim lNodesShapefileName As String = ""
+        Dim lNodeLayerIndex As Integer = -1
         If cboOutlets.SelectedIndex > 0 Then
-            Dim lNodeLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+            lNodeLayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
             lNodesShapefileName = GisUtil.LayerFileName(lNodeLayerIndex)
         End If
 
@@ -1551,7 +1552,7 @@ Public Class frmSWMMSetup
         Dim lSWMMProjectFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".inp"
         MkDirPath(PathNameOnly(lSWMMProjectFileName))
 
-        If PreProcessChecking(lSWMMProjectFileName) Then
+        If PreProcessChecking(lSWMMProjectFileName, lNodeLayerIndex, lConduitLayerIndex, lCatchmentLayerIndex) Then
             With pPlugIn.SWMMProject
                 .Name = lName
                 .Title = "SWMM Project Written from BASINS"
@@ -1751,7 +1752,7 @@ Public Class frmSWMMSetup
         Logger.Flush()
     End Sub
 
-    Private Function PreProcessChecking(ByVal aOutputFileName As String) As Boolean
+    Private Function PreProcessChecking(ByVal aOutputFileName As String, ByVal aNodeLayerIndex As Integer, ByVal aConduitLayerIndex As Integer, ByVal aCatchmentLayerIndex As Integer) As Boolean
         Logger.Dbg("PreprocessChecking " & aOutputFileName)
         If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
             If GisUtil.LayerIndex("Land Use Index") = -1 Then
@@ -1780,7 +1781,38 @@ Public Class frmSWMMSetup
             End If
         End If
 
+        'see if there are unique names on each layer
+        If Not UniqueKeys(aNodeLayerIndex) Or Not UniqueKeys(aConduitLayerIndex) Or Not UniqueKeys(aCatchmentLayerIndex) Then
+            EnableControls(True)
+            Return False
+        End If
+
         Logger.Dbg("PreprocessChecking OK")
+        Return True
+    End Function
+
+    Private Function UniqueKeys(ByVal aLayerIndex As Integer) As Boolean
+        If aLayerIndex > -1 Then
+            If GisUtil.IsField(aLayerIndex, "Name") Then
+                Dim lFieldIndex As Integer = GisUtil.FieldIndex(aLayerIndex, "Name")
+                Dim lNames As New Collection
+                Dim lName As String
+                Dim lProblem As Boolean = False
+                For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(aLayerIndex) - 1
+                    lName = GisUtil.FieldValue(aLayerIndex, lFeatureIndex, lFieldIndex)
+                    If lNames.Contains(lName) Then
+                        'problem, this key already exists
+                        lProblem = True
+                    Else
+                        lNames.Add(lName, lName)
+                    End If
+                Next
+                If lProblem Then
+                    Logger.Msg("The layer " & GisUtil.LayerName(aLayerIndex) & " does not have unique values in the Name field.", vbOKOnly, "BASINS SWMM Problem")
+                    Return False
+                End If
+            End If
+        End If
         Return True
     End Function
 
@@ -2329,6 +2361,7 @@ Public Class frmSWMMSetup
 
         lfrmCalculate.InitializeForm(cboSubbasins.Items(cboSubbasins.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pSubCatchmentFieldDetails)
         lResult = lfrmCalculate.ShowDialog()
+        SetFieldMappingControl()
     End Sub
 
     Private Sub cmdConduitAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdConduitAttributes.Click
@@ -2337,6 +2370,7 @@ Public Class frmSWMMSetup
 
         lfrmCalculate.InitializeForm(cboStreams.Items(cboStreams.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pConduitFieldDetails)
         lResult = lfrmCalculate.ShowDialog()
+        SetFieldMappingControl()
     End Sub
 
     Private Sub cmdNodeAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNodeAttributes.Click
@@ -2345,6 +2379,7 @@ Public Class frmSWMMSetup
 
         lfrmCalculate.InitializeForm(cboOutlets.Items(cboOutlets.SelectedIndex), cboOutlets.Items(cboOutlets.SelectedIndex), pNodeFieldDetails)
         lResult = lfrmCalculate.ShowDialog()
+        SetFieldMappingControl()
     End Sub
 
     Private Sub ReadSWMMFieldSpecs(ByVal aFileName As String)
