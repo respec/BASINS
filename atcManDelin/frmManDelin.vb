@@ -103,9 +103,9 @@ Public Class frmManDelin
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdClose.Location = New System.Drawing.Point(159, 471)
+        Me.cmdClose.Location = New System.Drawing.Point(159, 482)
         Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(100, 25)
+        Me.cmdClose.Size = New System.Drawing.Size(104, 25)
         Me.cmdClose.TabIndex = 0
         Me.cmdClose.Text = "&Close"
         '
@@ -120,9 +120,9 @@ Public Class frmManDelin
         Me.GroupBox1.Controls.Add(Me.cboReach)
         Me.GroupBox1.Controls.Add(Me.Label3)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(2, 321)
+        Me.GroupBox1.Location = New System.Drawing.Point(2, 326)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(419, 140)
+        Me.GroupBox1.Size = New System.Drawing.Size(423, 150)
         Me.GroupBox1.TabIndex = 17
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Stream Network"
@@ -141,9 +141,9 @@ Public Class frmManDelin
         '
         Me.lblDefine.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblDefine.Location = New System.Drawing.Point(166, 58)
+        Me.lblDefine.Location = New System.Drawing.Point(175, 55)
         Me.lblDefine.Name = "lblDefine"
-        Me.lblDefine.Size = New System.Drawing.Size(245, 46)
+        Me.lblDefine.Size = New System.Drawing.Size(239, 46)
         Me.lblDefine.TabIndex = 20
         Me.lblDefine.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.lblDefine.Visible = False
@@ -162,7 +162,7 @@ Public Class frmManDelin
         Me.cmdDefine.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdDefine.Location = New System.Drawing.Point(7, 52)
         Me.cmdDefine.Name = "cmdDefine"
-        Me.cmdDefine.Size = New System.Drawing.Size(151, 40)
+        Me.cmdDefine.Size = New System.Drawing.Size(163, 49)
         Me.cmdDefine.TabIndex = 18
         Me.cmdDefine.Text = "Define Stream Network and Outlets"
         '
@@ -174,7 +174,7 @@ Public Class frmManDelin
         Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboReach.Location = New System.Drawing.Point(127, 21)
         Me.cboReach.Name = "cboReach"
-        Me.cboReach.Size = New System.Drawing.Size(284, 25)
+        Me.cboReach.Size = New System.Drawing.Size(288, 25)
         Me.cboReach.TabIndex = 17
         '
         'Label3
@@ -199,7 +199,7 @@ Public Class frmManDelin
         Me.GroupBox2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox2.Location = New System.Drawing.Point(2, 205)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(419, 110)
+        Me.GroupBox2.Size = New System.Drawing.Size(423, 115)
         Me.GroupBox2.TabIndex = 18
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Subbasin Parameters"
@@ -208,9 +208,9 @@ Public Class frmManDelin
         '
         Me.lblCalc.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblCalc.Location = New System.Drawing.Point(164, 58)
+        Me.lblCalc.Location = New System.Drawing.Point(176, 58)
         Me.lblCalc.Name = "lblCalc"
-        Me.lblCalc.Size = New System.Drawing.Size(245, 41)
+        Me.lblCalc.Size = New System.Drawing.Size(238, 46)
         Me.lblCalc.TabIndex = 16
         Me.lblCalc.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.lblCalc.Visible = False
@@ -218,9 +218,9 @@ Public Class frmManDelin
         'cmdCalculate
         '
         Me.cmdCalculate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCalculate.Location = New System.Drawing.Point(7, 58)
+        Me.cmdCalculate.Location = New System.Drawing.Point(6, 58)
         Me.cmdCalculate.Name = "cmdCalculate"
-        Me.cmdCalculate.Size = New System.Drawing.Size(151, 40)
+        Me.cmdCalculate.Size = New System.Drawing.Size(163, 46)
         Me.cmdCalculate.TabIndex = 15
         Me.cmdCalculate.Text = "Calculate Subbasin Parameters"
         '
@@ -232,7 +232,7 @@ Public Class frmManDelin
         Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboDEM.Location = New System.Drawing.Point(127, 27)
         Me.cboDEM.Name = "cboDEM"
-        Me.cboDEM.Size = New System.Drawing.Size(284, 25)
+        Me.cboDEM.Size = New System.Drawing.Size(288, 25)
         Me.cboDEM.TabIndex = 14
         '
         'Label2
@@ -260,7 +260,7 @@ Public Class frmManDelin
         Me.GroupBox3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox3.Location = New System.Drawing.Point(2, 12)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(419, 187)
+        Me.GroupBox3.Size = New System.Drawing.Size(423, 187)
         Me.GroupBox3.TabIndex = 19
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Manual Delineation"
@@ -272,7 +272,7 @@ Public Class frmManDelin
         Me.cmdCombine.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdCombine.Location = New System.Drawing.Point(81, 147)
         Me.cmdCombine.Name = "cmdCombine"
-        Me.cmdCombine.Size = New System.Drawing.Size(252, 27)
+        Me.cmdCombine.Size = New System.Drawing.Size(256, 27)
         Me.cmdCombine.TabIndex = 24
         Me.cmdCombine.Text = "Combine Selected Subbasins"
         '
@@ -281,12 +281,14 @@ Public Class frmManDelin
         Me.cmdDelineate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdDelineate.Location = New System.Drawing.Point(7, 57)
         Me.cmdDelineate.Name = "cmdDelineate"
-        Me.cmdDelineate.Size = New System.Drawing.Size(151, 40)
+        Me.cmdDelineate.Size = New System.Drawing.Size(163, 40)
         Me.cmdDelineate.TabIndex = 23
         Me.cmdDelineate.Text = "Delineate Subbasin"
         '
         'lblDelin
         '
+        Me.lblDelin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDelin.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblDelin.Location = New System.Drawing.Point(12, 108)
         Me.lblDelin.Name = "lblDelin"
@@ -310,7 +312,7 @@ Public Class frmManDelin
         '
         Me.cmdCommit.Enabled = False
         Me.cmdCommit.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCommit.Location = New System.Drawing.Point(188, 65)
+        Me.cmdCommit.Location = New System.Drawing.Point(198, 65)
         Me.cmdCommit.Name = "cmdCommit"
         Me.cmdCommit.Size = New System.Drawing.Size(81, 24)
         Me.cmdCommit.TabIndex = 20
@@ -324,7 +326,7 @@ Public Class frmManDelin
         Me.cboLayer.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboLayer.Location = New System.Drawing.Point(127, 25)
         Me.cboLayer.Name = "cboLayer"
-        Me.cboLayer.Size = New System.Drawing.Size(284, 25)
+        Me.cboLayer.Size = New System.Drawing.Size(288, 25)
         Me.cboLayer.TabIndex = 19
         '
         'Label1
@@ -341,7 +343,7 @@ Public Class frmManDelin
         'frmManDelin
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(425, 499)
+        Me.ClientSize = New System.Drawing.Size(429, 510)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
