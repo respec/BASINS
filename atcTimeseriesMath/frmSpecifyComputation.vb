@@ -193,9 +193,9 @@ Public Class frmSpecifyComputation
                         .Text = ""
                         If Not aDefVal.Value Is Nothing Then
                             Select Case aDefVal.Definition.TypeString
-                                Case "atcDataGroup", "atcTimeseries"
+                                Case "atcDataGroup", "atcTimeseriesGroup", "atcTimeseries"
                                     Try
-                                        Dim lSelected As atcTimeseriesGroup = aDefVal.Value
+                                        Dim lSelected As atcDataGroup = aDefVal.Value
                                         If lSelected.Count = 1 Then
                                             .Text = lSelected.Item(0).ToString
                                         ElseIf lSelected.Count > 1 Then
@@ -226,7 +226,7 @@ Public Class frmSpecifyComputation
                         .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
 
                         Select Case aDefVal.Definition.TypeString
-                            Case "atcDataGroup" : .Visible = True
+                            Case "atcDataGroup", "atcTimeseriesGroup" : .Visible = True
                             Case "atcTimeseries" : .Visible = True
                             Case Else : .Visible = False
                         End Select

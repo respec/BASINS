@@ -169,7 +169,7 @@ FormatDouble:           Dim lAttName As String = aAttributeName.ToLower
 FormatInteger:          Return Format(CInt(lValue), "#,###;-#,###;0")
                     Case "atcTimeseries"
                         Return lValue.ToString
-                    Case "atcDataGroup"
+                    Case "atcDataGroup", "atcTimeseriesGroup"
                         Return lValue.ToString
                     Case "atcTimeUnit"
 FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue

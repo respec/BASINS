@@ -15,9 +15,7 @@ Public Class atcTableFixed
 
     Private pFilename As String
     Private pFields() As clsFieldDescriptor
-    Private pHeader As New ArrayList
     Private pNumFields As Integer
-    Private pNumHeaderRows As Integer = -1
     Private pData() As String
     Private pRecords As New ArrayList
     Private pCurrentRecord As Integer
@@ -129,65 +127,6 @@ Public Class atcTableFixed
         End Set
     End Property
 
-    Public Overrides Property NumHeaderRows() As Integer
-        Get
-            If pNumHeaderRows >= 0 Then
-                Return pNumHeaderRows
-            Else
-                Return pHeader.Count
-            End If
-        End Get
-        Set(ByVal newValue As Integer)
-            pNumHeaderRows = newValue
-            'TODO: should anything happen here?
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Get a specified row of the header
-    ''' </summary>
-    ''' <param name="aHeaderRow">Which row to get (range is 1..NumHeaderRows)</param>
-    ''' <returns>text of specified row of the header</returns>
-    Public Property Header(ByVal aHeaderRow As Integer) As String
-        Get
-            If aHeaderRow < 1 Then
-                Return "Header Row " & aHeaderRow & " is less than one"
-            ElseIf aHeaderRow > pHeader.Count Then
-                Return "Header Row " & aHeaderRow & " is greater than number of rows (" & pHeader.Count & ")"
-            Else
-                Return pHeader(aHeaderRow - 1)
-            End If
-        End Get
-        Set(ByVal newValue As String)
-            On Error GoTo ErrHand
-            If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                'Value = "Invalid Field Number"
-            Else
-                pHeader(aHeaderRow - 1) = newValue
-            End If
-            Exit Property
-ErrHand:
-            Logger.Msg("Cannot set header record #" & aHeaderRow & ".  Record number must be between 1 and " & pHeader.Count & "." & vbCr & Err.Description, "Header")
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' All rows of the header concatenated with cr/lf at the end of each line
-    ''' </summary>
-    Public Property Header() As String
-        Get
-            Dim lReturnValue As String = ""
-            For Each lString As String In pHeader
-                lReturnValue &= lString & vbCrLf
-            Next
-            Return lReturnValue
-        End Get
-        Set(ByVal newValue As String)
-            pHeader.Clear()
-            pHeader.AddRange(newValue.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Split(vbCr))
-        End Set
-    End Property
-
     Public Overrides Property NumRecords() As Integer
         Get
             Return pRecords.Count
@@ -250,12 +189,12 @@ ErrHand:
     End Property
 
     Public Overrides Sub Clear()
-        pHeader.Clear()
+        pHeaderLines.Clear()
         ClearData()
     End Sub
 
     Public Overrides Sub ClearData()
-        If pHeader Is Nothing Then pHeader = New ArrayList
+        If pHeaderLines Is Nothing Then pHeaderLines = New ArrayList
         ReDim pData(0)
     End Sub
 
@@ -292,7 +231,7 @@ ErrHand:
 
             For iRec As Integer = 1 To NumHeaderRows 'read header rows, ignore for now
                 lLineReader.MoveNext()
-                pHeader.Add(lLineReader.Current)
+                pHeaderLines.Add(lLineReader.Current)
             Next
 
             pRecords = New ArrayList

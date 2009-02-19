@@ -34,7 +34,7 @@ Public Class atcTableRDB
             If lGotFieldSpecs Then
                 pRecords.Add(lCurrentLine)
             ElseIf lCurrentLine.StartsWith("#") Then
-                pHeader.Add(lCurrentLine)
+                pHeaderLines.Add(lCurrentLine)
             ElseIf NumFields = 0 Then
                 NumFields = CountString(lCurrentLine, Delimiter) + 1
                 'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name

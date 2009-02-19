@@ -26,6 +26,10 @@ Public Class clsCatModelSWAT
     End Property
 
     Friend Sub OpenBaseScenario(Optional ByVal aFilename As String = "")
+        pBaseOutputHruFileName = Nothing
+        pBaseOutputRchFileName = Nothing
+        pBaseOutputSubFileName = Nothing
+
         If Not aFilename Is Nothing AndAlso Not IO.File.Exists(aFilename) Then
             If IO.File.Exists(aFilename & ".mdb") Then aFilename &= ".mdb"
         End If
@@ -68,32 +72,35 @@ OpenMetWDM:
             End If
 
             If pMetWDM IsNot Nothing Then
+OpenOutput:
                 'Find and open output from base run, TODO: offer to run base case
                 Dim lTxtInOutFolder As String = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\base\TxtInOut\" ' trailing directory separator
-                pBaseOutputHruFileName = lTxtInOutFolder & "output.hru"
                 If Not FileExists(pBaseOutputHruFileName) Then
-                    'In BatchSWAT we name the base scenario folder the same as the project folder, so check there for output
-                    pBaseOutputHruFileName = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\" & IO.Path.GetFileName(IO.Path.GetDirectoryName(aFilename)) & "\TxtInOut\output.hru"
-                End If
-                If Not FileExists(pBaseOutputHruFileName) Then
-                    Dim lScenarios As String() = IO.Directory.GetDirectories(IO.Path.GetDirectoryName(aFilename) & "\Scenarios\")
-                    If lScenarios.Length = 1 AndAlso IO.File.Exists(lScenarios(0) & "\TxtInOut\output.hru") Then
-                        pBaseOutputHruFileName = lScenarios(0) & "\TxtInOut\output.hru"
-                    Else
-                        Dim cdlg As New Windows.Forms.OpenFileDialog
-                        With cdlg
-                            .Title = "Please locate 'output.hru' from base SWAT run"
-                            .FileName = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\output.hru"
-                            .Filter = "output.hru|output.hru"
-                            .FilterIndex = 1
-                            .DefaultExt = "hru"
-                            If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-                                pBaseOutputHruFileName = .FileName
-                                Logger.Dbg("User specified output.hru '" & pBaseOutputHruFileName & "'")
-                            Else 'user clicked Cancel
-                                pBaseOutputHruFileName = ""
-                            End If
-                        End With
+                    pBaseOutputHruFileName = lTxtInOutFolder & "output.hru"
+                    If Not FileExists(pBaseOutputHruFileName) Then
+                        'In BatchSWAT we name the base scenario folder the same as the project folder, so check there for output
+                        pBaseOutputHruFileName = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\" & IO.Path.GetFileName(IO.Path.GetDirectoryName(aFilename)) & "\TxtInOut\output.hru"
+                    End If
+                    If Not FileExists(pBaseOutputHruFileName) Then
+                        Dim lScenarios As String() = IO.Directory.GetDirectories(IO.Path.GetDirectoryName(aFilename) & "\Scenarios\")
+                        If lScenarios.Length = 1 AndAlso Not lScenarios(0).Contains("Modified") AndAlso IO.File.Exists(lScenarios(0) & "\TxtInOut\output.hru") Then
+                            pBaseOutputHruFileName = lScenarios(0) & "\TxtInOut\output.hru"
+                        Else
+                            Dim cdlg As New Windows.Forms.OpenFileDialog
+                            With cdlg
+                                .Title = "Please locate 'output.hru' from base SWAT run"
+                                .FileName = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\output.hru"
+                                .Filter = "output.hru|output.hru"
+                                .FilterIndex = 1
+                                .DefaultExt = "hru"
+                                If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                                    pBaseOutputHruFileName = .FileName
+                                    Logger.Dbg("User specified output.hru '" & pBaseOutputHruFileName & "'")
+                                Else 'user clicked Cancel
+                                    pBaseOutputHruFileName = ""
+                                End If
+                            End With
+                        End If
                     End If
                 End If
                 If FileExists(pBaseOutputHruFileName) Then
@@ -107,10 +114,18 @@ OpenMetWDM:
                         End If
                     End With
                 Else
-                    Logger.Dbg("MissingHruOutput " & pBaseOutputHruFileName)
+                    If Logger.Msg("Run base scenario now?", vbYesNo, "SWAT output.hru not found") = MsgBoxResult.Yes Then
+                        pBaseOutputHruFileName = Nothing
+                        ScenarioRun("Base", Nothing, "", True, True, False)
+                        GoTo OpenOutput
+                    Else
+                        Logger.Dbg("MissingHruOutput " & pBaseOutputHruFileName)
+                    End If
                 End If
 
-                pBaseOutputRchFileName = lTxtInOutFolder & "output.rch"
+                If Not FileExists(pBaseOutputRchFileName) Then
+                    pBaseOutputRchFileName = lTxtInOutFolder & "output.rch"
+                End If
                 If FileExists(pBaseOutputRchFileName) Then
                     Dim lOutputRch As New atcTimeseriesSWAT.atcTimeseriesSWAT
                     With lOutputRch
@@ -122,7 +137,9 @@ OpenMetWDM:
                     Logger.Dbg("MissingRchOutput " & pBaseOutputRchFileName)
                 End If
 
-                pBaseOutputSubFileName = lTxtInOutFolder & "output.sub"
+                If Not FileExists(pBaseOutputSubFileName) Then
+                    pBaseOutputSubFileName = lTxtInOutFolder & "output.sub"
+                End If
                 If FileExists(pBaseOutputSubFileName) Then
                     Dim lOutputSub As New atcTimeseriesSWAT.atcTimeseriesSWAT
                     With lOutputSub
@@ -202,21 +219,33 @@ OpenMetWDM:
 
         Dim lOutputHruFileName As String = lTxtInOutFolder & "output.hru"
         If FileExists(lOutputHruFileName) Then
-            lModified.Add(IO.Path.GetFileName(pBaseOutputHruFileName).ToLower.Trim, lOutputHruFileName.Trim)
+            If pBaseOutputHruFileName Is Nothing Then 'running base
+                pBaseOutputHruFileName = lOutputHruFileName
+            Else
+                lModified.Add(IO.Path.GetFileName(pBaseOutputHruFileName).ToLower.Trim, lOutputHruFileName.Trim)
+            End If
         Else
             Logger.Dbg("MissingHruOutput " & lOutputHruFileName)
         End If
 
         Dim lOutputRchFileName As String = lTxtInOutFolder & "output.rch"
         If FileExists(lOutputRchFileName) Then
-            lModified.Add(IO.Path.GetFileName(pBaseOutputRchFileName).ToLower.Trim, lOutputRchFileName.Trim)
+            If pBaseOutputRchFileName Is Nothing Then 'running base
+                pBaseOutputRchFileName = lOutputRchFileName
+            Else
+                lModified.Add(IO.Path.GetFileName(pBaseOutputRchFileName).ToLower.Trim, lOutputRchFileName.Trim)
+            End If
         Else
             Logger.Dbg("MissingRchOutput " & lOutputRchFileName)
         End If
 
         Dim lOutputSubFileName As String = lTxtInOutFolder & "output.sub"
         If FileExists(lOutputSubFileName) Then
-            lModified.Add(IO.Path.GetFileName(pBaseOutputSubFileName).ToLower.Trim, lOutputSubFileName.Trim)
+            If pBaseOutputSubFileName Is Nothing Then 'running base
+                pBaseOutputSubFileName = lOutputRchFileName
+            Else
+                lModified.Add(IO.Path.GetFileName(pBaseOutputSubFileName).ToLower.Trim, lOutputSubFileName.Trim)
+            End If
         Else
             Logger.Dbg("MissingSubOutput " & lOutputSubFileName)
         End If
