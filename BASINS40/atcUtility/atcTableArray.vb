@@ -17,9 +17,7 @@ Public Class atcTableArray
     Friend pFieldNames() As String
     Private pFieldLengths() As Integer
     Private pFieldTypes() As String
-    Friend pHeader As New ArrayList
     Private pNumFields As Integer
-    Private pNumHeaderRows As Integer = -1
 
     Friend pRecords As New Generic.List(Of String())
     Private pCurrentRecord As Integer
@@ -101,38 +99,24 @@ Public Class atcTableArray
         End Set
     End Property
 
-    Public Overrides Property NumHeaderRows() As Integer
-        Get
-            If pNumHeaderRows >= 0 Then
-                Return pNumHeaderRows
-            Else
-                Return pHeader.Count
-            End If
-        End Get
-        Set(ByVal newValue As Integer)
-            pNumHeaderRows = newValue
-            'TODO: should anything happen here?
-        End Set
-    End Property
-
     ''' <summary>
     ''' Get a specified row of the header
     ''' </summary>
     ''' <param name="aHeaderRow">Which row to get (range is 1..NumHeaderRows)</param>
     ''' <returns>text of specified row of the header</returns>
-    Public Property Header(ByVal aHeaderRow As Integer) As String
+    Public Overrides Property Header(ByVal aHeaderRow As Integer) As String
         Get
-            If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                Return "Header row " & aHeaderRow & " outside available range (1 to " & pHeader.Count & ")"
+            If aHeaderRow < 1 Or aHeaderRow > pHeaderLines.Count Then
+                Return "Header row " & aHeaderRow & " outside available range (1 to " & pHeaderLines.Count & ")"
             Else
-                Return pHeader(aHeaderRow - 1)
+                Return pHeaderLines(aHeaderRow - 1)
             End If
         End Get
         Set(ByVal newValue As String)
-            If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeader.Count & "." & vbCr & Err.Description)
+            If aHeaderRow < 1 Or aHeaderRow > pHeaderLines.Count Then
+                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeaderLines.Count & "." & vbCr & Err.Description)
             Else
-                pHeader(aHeaderRow - 1) = newValue
+                pHeaderLines(aHeaderRow - 1) = newValue
             End If
         End Set
     End Property
@@ -140,17 +124,17 @@ Public Class atcTableArray
     ''' <summary>
     ''' All rows of the header concatenated with cr/lf at the end of each line
     ''' </summary>
-    Public Property Header() As String
+    Public Overrides Property Header() As String
         Get
             Dim lReturnValue As String = ""
-            For Each lString As String In pHeader
+            For Each lString As String In pHeaderLines
                 lReturnValue &= lString & vbCrLf
             Next
             Return lReturnValue
         End Get
         Set(ByVal newValue As String)
-            pHeader.Clear()
-            pHeader.AddRange(newValue.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Split(vbCr))
+            pHeaderLines.Clear()
+            pHeaderLines.AddRange(newValue.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Split(vbCr))
         End Set
     End Property
 
@@ -204,7 +188,7 @@ Public Class atcTableArray
 
     Public Overrides Sub Clear()
         ClearData()
-        pHeader.Clear()
+        pHeaderLines.Clear()
         NumFields = 0
     End Sub
 

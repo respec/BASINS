@@ -244,7 +244,7 @@ Public Class atcTimeseriesMath
         'For Each lArg As atcDefinedValue In aArgs
         '    If lArg.Value Is Nothing Then
         '        lNeedToAsk = True
-        '    ElseIf lArg.Definition.Name = "Timeseries" AndAlso lArg.GetType.Name = "atcDataGroup" AndAlso lArg.Value.Count < 1 Then
+        '    ElseIf lArg.Definition.Name = "Timeseries" AndAlso (lArg.GetType.Name = "atcDataGroup" OrElse lArg.GetType.Name = "atcTimeseriesGroup") AndAlso lArg.Value.Count < 1 Then
         '        lNeedToAsk = True
         '    End If
         'Next

@@ -18,9 +18,7 @@ Public Class atcTableDelimited
     Friend pFieldNames() As String
     Private pFieldLengths() As Integer
     Private pFieldTypes() As String
-    Friend pHeader As New ArrayList
     Private pNumFields As Integer
-    Private pNumHeaderRows As Integer = -1
     Private pCurrentRowValues() As String
     Friend pRecords As New ArrayList
     Private pCurrentRecord As Integer
@@ -117,53 +115,14 @@ Public Class atcTableDelimited
             If pNumHeaderRows >= 0 Then
                 Return pNumHeaderRows
             Else
-                Return pHeader.Count
+                Return pHeaderLines.Count
             End If
         End Get
         Set(ByVal newValue As Integer)
             pNumHeaderRows = newValue
-            While pHeader.Count < newValue
-                pHeader.Add("") 'dummy header
+            While pHeaderLines.Count < newValue
+                pHeaderLines.Add("") 'dummy header
             End While
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Get a specified row of the header
-    ''' </summary>
-    ''' <param name="aHeaderRow">Which row to get (range is 1..NumHeaderRows)</param>
-    ''' <returns>text of specified row of the header</returns>
-    Public Property Header(ByVal aHeaderRow As Integer) As String
-        Get
-            If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                Return "Header row " & aHeaderRow & " outside available range (1 to " & pHeader.Count & ")"
-            Else
-                Return pHeader(aHeaderRow - 1)
-            End If
-        End Get
-        Set(ByVal newValue As String)
-            If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeader.Count & "." & vbCr & Err.Description)
-            Else
-                pHeader(aHeaderRow - 1) = newValue
-            End If
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' All rows of the header concatenated with cr/lf at the end of each line
-    ''' </summary>
-    Public Property Header() As String
-        Get
-            Dim lReturnValue As String = ""
-            For Each lString As String In pHeader
-                lReturnValue &= lString & vbCrLf
-            Next
-            Return lReturnValue
-        End Get
-        Set(ByVal newValue As String)
-            pHeader.Clear()
-            pHeader.AddRange(newValue.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Split(vbCr))
         End Set
     End Property
 
@@ -217,7 +176,7 @@ ErrHand:
 
     Public Overrides Sub Clear()
         ClearData()
-        pHeader.Clear()
+        pHeaderLines.Clear()
         NumFields = 0
     End Sub
 
@@ -261,7 +220,7 @@ ErrHand:
         For Each lCurrentLine As String In LinesInFile(inReader)
             lRecordCount += 1
             If lRecordCount <= NumHeaderRows Then
-                pHeader.Add(lCurrentLine)
+                pHeaderLines.Add(lCurrentLine)
             ElseIf lRecordCount = NumHeaderRows + 1 Then
                 NumFields = CountString(lCurrentLine, Delimiter) + 1
                 'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name

@@ -22,6 +22,8 @@ Public Interface IatcTable
     Property FieldLength(ByVal aFieldNumber As Integer) As Integer
     Property FieldName(ByVal aFieldNumber As Integer) As String
     Property FieldType(ByVal aFieldNumber As Integer) As String
+    Property Header(ByVal aHeaderRow As Integer) As String
+    Property Header() As String
     Property NumHeaderRows() As Integer
     Property NumFields() As Integer
     Property NumRecords() As Integer
@@ -56,6 +58,8 @@ Public MustInherit Class atcTable
     Implements IatcTable
 
     Private pFilename As String
+    Friend pHeaderLines As New ArrayList
+    Friend pNumHeaderRows As Integer = -1
 
     'Used within FindMatch
     Private Enum ComparisonEnum
@@ -78,8 +82,65 @@ Public MustInherit Class atcTable
     'Write the current table to the specified file
     Public MustOverride Function WriteFile(ByVal aFilename As String) As Boolean Implements IatcTable.WriteFile
 
-    'The number of header rows in the table
-    Public MustOverride Property NumHeaderRows() As Integer Implements IatcTable.NumHeaderRows
+    ''' <summary>
+    ''' Get a specified row of the header
+    ''' </summary>
+    ''' <param name="aHeaderRow">Which row to get (range is 1..NumHeaderRows)</param>
+    ''' <returns>text of specified row of the header</returns>
+    Public Overridable Property Header(ByVal aHeaderRow As Integer) As String Implements IatcTable.Header
+        Get
+            If aHeaderRow < 1 OrElse aHeaderRow > pHeaderLines.Count Then
+                Return "Header row requested (" & aHeaderRow & ") outside available range (1 to " & pHeaderLines.Count & ")"
+            Else
+                Return pHeaderLines(aHeaderRow - 1)
+            End If
+        End Get
+        Set(ByVal newValue As String)
+            If aHeaderRow < 1 OrElse aHeaderRow > pHeaderLines.Count Then
+                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeaderLines.Count & "." & vbCr & Err.Description)
+            Else
+                pHeaderLines(aHeaderRow - 1) = newValue
+            End If
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' All rows of the header concatenated with cr/lf at the end of each line
+    ''' </summary>
+    Public Overridable Property Header() As String Implements IatcTable.Header
+        Get
+            Dim lReturnValue As String = ""
+            For Each lString As String In pHeaderLines
+                lReturnValue &= lString & vbCrLf
+            Next
+            Return lReturnValue
+        End Get
+        Set(ByVal newValue As String)
+            pHeaderLines.Clear()
+            pHeaderLines.AddRange(newValue.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Split(vbCr))
+        End Set
+    End Property
+
+
+    ''' <summary>
+    ''' The number of header rows in the table
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Overridable Property NumHeaderRows() As Integer Implements IatcTable.NumHeaderRows
+        Get
+            If pNumHeaderRows >= 0 Then
+                Return pNumHeaderRows
+            Else
+                Return pHeaderLines.Count
+            End If
+        End Get
+        Set(ByVal newValue As Integer)
+            pNumHeaderRows = newValue
+            'TODO: should anything happen here?
+        End Set
+    End Property
 
     'The number of fields (columns) in the table
     Public MustOverride Property NumFields() As Integer Implements IatcTable.NumFields
