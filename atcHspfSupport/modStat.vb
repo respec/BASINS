@@ -82,8 +82,12 @@ Public Module modStat
         If lTran = atcTran.TranSumDiv Then
             lStr &= Attributes("Sum", lTSer1, lTSer2, lTSerOpt)
         End If
-        lStr &= Attributes("Mean", lTSer1, lTSer2, lTSerOpt)
-        lStr &= Attributes("Geometric Mean", lTSer1, lTSer2, lTSerOpt)
+        Dim lIncludeResidual As Boolean = False
+        If aTimeUnit = atcTimeUnit.TUYear Then
+            lIncludeResidual = True
+        End If
+        lStr &= Attributes("Mean", lTSer1, lTSer2, lTSerOpt, lIncludeResidual)
+        lStr &= Attributes("Geometric Mean", lTSer1, lTSer2, lTSerOpt, lIncludeResidual)
 
         Dim lLimit As Generic.List(Of Double) = GetClassLimits(lTSer1)
         If lLimit Is Nothing Then
