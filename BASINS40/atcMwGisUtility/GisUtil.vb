@@ -2587,6 +2587,51 @@ Public Class GisUtil
 
     End Sub
 
+    Public Shared Function NearestNeighbor(ByVal aX As Double, ByVal aY As Double, ByVal aPolygonLayerIndex As Integer) As Integer
+        'given a point and a polygon shapefile, find index of closest neighboring polygon to this point
+
+        'this is accomplished by finding the point on the containing polygon's boarder closest to the input point,
+        'and then using the selection functionality to see which other polygon coincides with that point.
+
+        Dim lPt As New MapWinGIS.Point
+        lPt.x = aX
+        lPt.y = aY
+
+        'is this point within a polygon?
+        Dim lPolygonFeatureIndex As Integer = PointInPolygonXY(aX, aY, aPolygonLayerIndex)
+        If lPolygonFeatureIndex > -1 Then
+            'yes
+            Dim lPolygonShapefile As MapWinGIS.Shapefile = ShapeFileFromIndex(aPolygonLayerIndex)
+            Dim lOutputPoint As New MapWinGIS.Point
+            If FeatureIndexValid(lPolygonFeatureIndex, lPolygonShapefile) Then
+                Dim lContainingShape As MapWinGIS.Shape = lPolygonShapefile.Shape(lPolygonFeatureIndex)
+                Dim lLocation As Integer
+                Dim lDistance As Double
+                MapWinGeoProc.Utils.FindNearestPointAndLoc(lPt, lContainingShape, lOutputPoint, lLocation, lDistance)
+            End If
+            If lOutputPoint.x <> 0 And lOutputPoint.y <> 0 Then
+                'found a point on the boarder
+                Dim lExtents As New MapWinGIS.Extents
+                lExtents.SetBounds(lOutputPoint.x, lOutputPoint.y, 0, lOutputPoint.x, lOutputPoint.y, 0)
+                Dim lIntersectingPolygonIndices As Object = Nothing
+                lPolygonShapefile.SelectShapes(lExtents, 0.0, MapWinGIS.SelectMode.INTERSECTION, lIntersectingPolygonIndices)
+                'could use MapWinGeoProc.Selection.SelectPolygonsWithPolygon instead?
+                If lIntersectingPolygonIndices.GetUpperBound(0) > 0 Then
+                    'found some intersecting polygons
+                    For lIndex As Integer = 0 To lIntersectingPolygonIndices.GetUpperBound(0) - 1
+                        If lIntersectingPolygonIndices(lIndex) <> lPolygonFeatureIndex Then
+                            'this polygon is not the one the input point is in, so it must be the nearest neighbor
+                            NearestNeighbor = lIntersectingPolygonIndices(lIndex)
+                        End If
+                    Next
+                End If
+            End If
+        Else
+            'no, we have to be within a polygon to find the nearest neighbor
+            NearestNeighbor = -1
+        End If
+    End Function
+
     Public Shared WriteOnly Property ColoringScheme(ByVal aLayerIndex As Integer) As Object
         Set(ByVal aNewValue As Object)
             Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
