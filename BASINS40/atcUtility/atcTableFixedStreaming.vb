@@ -27,9 +27,8 @@ Public Class atcTableFixedStreaming
             Return pCurrentRecord + 1
         End Get
         Set(ByVal newValue As Integer)
-            While newValue >= pCurrentRecord + 2
+            While newValue >= pCurrentRecord + 2 AndAlso pLinesInFile.MoveNext()
                 pCurrentRecord += 1
-                pLinesInFile.MoveNext()
             End While
             If pCurrentRecord + 1 = newValue Then
                 pDataString = pLinesInFile.Current
