@@ -10,6 +10,7 @@ Public Class frmPollutant
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+
         Me.Icon = pIcon
         Me.MinimumSize = Me.Size
 
@@ -17,26 +18,29 @@ Public Class frmPollutant
             ReadPollutants()
         End If
 
+        clbPollutants.Items.Clear()
         For lIndex As Integer = 0 To pUCI.Pollutants.Count - 1
-            lstPollutants.Items.Add(pUCI.Pollutants(lIndex).Name)
-            lstPollutants.SetSelected(lIndex, True)
+            clbPollutants.Items.Add(pUCI.Pollutants(lIndex).Name, True)
         Next lIndex
 
         For lIndex As Integer = 0 To pDefUCI.Pollutants.Count - 1
             'is this one already in the list?
             Dim lInList As Boolean = False
-            If lstPollutants.Items.Count > 0 Then
-                For lListIndex As Integer = 0 To lstPollutants.Items.Count - 1
-                    If lstPollutants.Items(lListIndex) = pDefUCI.Pollutants(lIndex).Name Then
+            If clbPollutants.Items.Count > 0 Then
+                For lListIndex As Integer = 0 To clbPollutants.Items.Count - 1
+                    If clbPollutants.Items(lListIndex) = pDefUCI.Pollutants(lIndex).Name Then
                         lInList = True
                     End If
                 Next
             End If
             If Not lInList Then
-                lstPollutants.Items.Add(pDefUCI.Pollutants(lIndex).Name)
+                clbPollutants.Items.Add(pDefUCI.Pollutants(lIndex).Name)
             End If
             If pDefUCI.Pollutants(lIndex).ModelType = "DataIn" Then
-                lstPollutants.SetSelected(lIndex + pUCI.Pollutants.Count, True)
+                clbPollutants.SetSelected(lIndex + pUCI.Pollutants.Count, True)
+            Else
+                'if any aren't selected, uncheck the 'all/none' box
+                cbxSelect.Checked = False
             End If
         Next lIndex
 
@@ -49,9 +53,9 @@ Public Class frmPollutant
         Dim licount As Integer = 0
         Dim lrcount As Integer = 0
         Dim lIndex As Integer = 0
-        For lIndex = 1 To lstPollutants.SelectedItems.Count
+        For lIndex = 1 To clbPollutants.SelectedItems.Count
             For Each lPoll As HspfPollutant In pUCI.Pollutants
-                If lPoll.Name = lstPollutants.SelectedItems(lIndex - 1) Then
+                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
                     If lPoll.ModelType = "PIG" Then
                         lpcount = lpcount + 1
                         licount = licount + 1
@@ -65,7 +69,7 @@ Public Class frmPollutant
                 End If
             Next
             For Each lPoll As HspfPollutant In pDefUCI.Pollutants
-                If lPoll.Name = lstPollutants.SelectedItems(lIndex - 1) Then
+                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
                     If lPoll.ModelType = "PIG" Then
                         lpcount = lpcount + 1
                         licount = licount + 1
@@ -94,15 +98,15 @@ Public Class frmPollutant
         End If
 
         'figure out which ones we need to add 
-        For lIndex = 1 To lstPollutants.SelectedItems.Count
+        For lIndex = 1 To clbPollutants.SelectedItems.Count
             Dim lFound As Boolean = False
             For Each lPoll As HspfPollutant In pUCI.Pollutants
-                If lPoll.Name = lstPollutants.SelectedItems(lIndex - 1) Then
+                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
                     lFound = True
                 End If
             Next
             For Each lPoll As HspfPollutant In pDefUCI.Pollutants
-                If lPoll.Name = lstPollutants.SelectedItems(lIndex - 1) And _
+                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) And _
                   lPoll.ModelType = "DataIn" Then
                     lFound = True
                 End If
@@ -110,10 +114,10 @@ Public Class frmPollutant
             If Not lFound Then
                 'need to add
                 pUCI.Edited = True
-                Dim lDefIndex As Integer = 1
-                Do While lDefIndex <= pDefUCI.Pollutants.Count
+                Dim lDefIndex As Integer = 0
+                Do While lDefIndex < pDefUCI.Pollutants.Count
                     Dim lPoll As HspfPollutant = pDefUCI.Pollutants(lDefIndex)
-                    If lPoll.Name = lstPollutants.SelectedItems(lIndex - 1) Then
+                    If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
                         'add this one
                         pUCI.Pollutants.Add(lPoll)
                         If Mid(lPoll.ModelType, 1, 4) = "Data" Then
@@ -135,8 +139,8 @@ Public Class frmPollutant
         Do While lIndex <= pUCI.Pollutants.Count
             Dim lPoll As HspfPollutant = pUCI.Pollutants(lIndex)
             Dim lFound As Boolean = False
-            For lSelectedIndex As Integer = 1 To lstPollutants.SelectedItems.Count
-                If lPoll.Name = lstPollutants.SelectedItems(lSelectedIndex - 1) Then
+            For lSelectedIndex As Integer = 1 To clbPollutants.SelectedItems.Count
+                If lPoll.Name = clbPollutants.SelectedItems(lSelectedIndex - 1) Then
                     lFound = True
                 End If
             Next
@@ -152,10 +156,10 @@ Public Class frmPollutant
             End If
         Loop
 
-        For lIndex = 1 To lstPollutants.Items.Count
+        For lIndex = 1 To clbPollutants.Items.Count
             Dim lfound As Boolean = False
-            For lSelectedIndex As Integer = 1 To lstPollutants.SelectedItems.Count
-                If lstPollutants.Items(lIndex - 1) = lstPollutants.SelectedItems(lSelectedIndex - 1) Then
+            For lSelectedIndex As Integer = 1 To clbPollutants.SelectedItems.Count
+                If clbPollutants.Items(lIndex - 1) = clbPollutants.SelectedItems(lSelectedIndex - 1) Then
                     'this is selected 
                     lfound = True
                 End If
@@ -163,7 +167,7 @@ Public Class frmPollutant
             If Not lfound Then
                 'this one is not selected
                 For Each lPoll As HspfPollutant In pDefUCI.Pollutants
-                    If lPoll.Name = lstPollutants.Items(lIndex - 1) Then
+                    If lPoll.Name = clbPollutants.Items(lIndex - 1) Then
                         'found this unselected item in def list, flag it as not in use
                         If lPoll.ModelType = "DataIn" Then
                             lPoll.ModelType = "Data"
@@ -278,13 +282,16 @@ Public Class frmPollutant
                                                 'comment, ignore
                                             Else
                                                 'found line of table
-                                                Dim lOpf As String = Mid(lCurrentRecord, 1, 5)
-                                                Dim lOpl = Trim(Mid(lCurrentRecord, 6, 5))
-                                                If Len(lOpl) = 0 Then
+                                                Dim lOpf As Integer = CInt(Mid(lCurrentRecord, 1, 5))
+                                                Dim lOpl As Integer
+                                                If Trim(Mid(lCurrentRecord, 6, 5)).Length = 0 Then
                                                     lOpl = lOpf
+                                                Else
+                                                    lOpl = CInt(Mid(lCurrentRecord, 6, 5))
                                                 End If
                                                 For Each lOper As Generic.KeyValuePair(Of String, HspfOperation) In lPoll.Operations
                                                     If lOper.Value.Name = lOpTyp Then
+                                                        lOper.Value.DefOpnId = DefaultOpnId(lOper.Value, pDefUCI)
                                                         If lOpf = lOper.Value.DefOpnId Or (lOpf <= lOper.Value.DefOpnId And lOper.Value.DefOpnId <= lOpl) Then
                                                             Dim lTable As New HspfTable
                                                             lTable.Def = pMsg.BlockDefs(lOpTyp).TableDefs(lTableName)
@@ -594,4 +601,11 @@ Public Class frmPollutant
         Loop
 
     End Sub
+
+    Private Sub cbxSelect_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxSelect.CheckedChanged
+        For lRow As Integer = 0 To clbPollutants.Items.Count - 1
+            clbPollutants.SetItemChecked(lRow, cbxSelect.Checked)
+        Next
+    End Sub
+
 End Class
