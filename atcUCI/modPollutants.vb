@@ -99,7 +99,7 @@ Module modPollutants
 
                 'look through all mass-links
                 Dim lMLIndex As Integer = 0
-                Do While lMLIndex <= aUci.MassLinks.Count
+                Do While lMLIndex < aUci.MassLinks.Count
                     Dim lML As HspfMassLink = aUci.MassLinks(lMLIndex)
                     If (lML.Target.Member = "IDQAL" And lML.Target.MemSub1 = lGQIndex) Or (lML.Target.Member = "ISQAL" And lML.Target.MemSub2 = lGQIndex) Then
 
@@ -226,7 +226,7 @@ Module modPollutants
 
                 'look through all mass-links
                 Dim lMLIndex As Integer = 0
-                Do While lMLIndex <= aUci.MassLinks.Count
+                Do While lMLIndex < aUci.MassLinks.Count
                     Dim lML As HspfMassLink = aUci.MassLinks(lMLIndex)
                     If ((lML.Source.Group = "PQUAL" And lML.Source.MemSub1 = lQIndex) Or (lML.Source.Group = "IQUAL" And lML.Source.MemSub1 = lQIndex)) And lML.Target.VolName = "RCHRES" Then
 
