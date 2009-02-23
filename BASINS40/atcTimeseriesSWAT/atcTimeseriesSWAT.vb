@@ -171,9 +171,15 @@ Public Class atcTimeseriesSWAT
         If MyBase.Open(aFileName, aAttributes) Then
             Dim lDelim As String = ";" 'Used only inside this routine to delimit fields to process
             Dim lFieldsToProcess As String = ""
+            Dim lLocationsToProcess As String = ""
             If aAttributes IsNot Nothing Then
-                lFieldsToProcess = lDelim & aAttributes.GetValue("FieldName", "") & lDelim
+                If aAttributes.ContainsAttribute("FieldName") Then lFieldsToProcess = lDelim & aAttributes.GetValue("FieldName", "") & lDelim
+                If aAttributes.ContainsAttribute("LocationName") Then lLocationsToProcess = lDelim & aAttributes.GetValue("LocationName", "") & lDelim
             End If
+            Dim lKnowInterval As Boolean = False
+            Dim lKnowYearBase As Boolean = False
+            Dim lLocations As New List(Of String)
+ReOpenTable:
             Dim lTable As atcTable = OpenTable()
             If lTable Is Nothing Then
                 Logger.Dbg("Unable to open " & Specification)
@@ -187,9 +193,6 @@ Public Class atcTimeseriesSWAT
 
                     Dim lField As Integer
                     Dim lLocation As String
-                    Dim lKey As String
-                    Dim lDate As Double
-                    Dim lYear As Integer
 
                     Logger.Status("Reading records for " & Format((.NumFields - pBaseDataField + 1), "#,###") & " constituents from " & Specification, True)
                     .CurrentRecord = 1
@@ -197,68 +200,91 @@ Public Class atcTimeseriesSWAT
                     Dim lMonReading As Integer = 0
                     Dim lDayReading As Integer = 0
                     Dim lMONvalue As Integer
-                    Dim lCIOfilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(Specification), "file.cio")
-                    If IO.File.Exists(lCIOfilename) Then
-                        Dim lCIO() As String
-                        lCIO = IO.File.ReadAllLines(lCIOfilename)
-                        Integer.TryParse(lCIO(8).Substring(12, 4), pYearBase)
-                        Integer.TryParse(lCIO(58).Substring(15, 1), pMONcontains)
-                        Dim lSkipYears As Integer = 0
-                        Integer.TryParse(lCIO(59).Substring(0, 20), lSkipYears)
-                        pYearBase += lSkipYears
-                    End If
-                    lYear = pYearBase
-                    pDates = New atcTimeseries(Nothing)
-                    Do
-                        If pTableDelimited Then
-                            lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
-                        Else
-                            lLocation = .Value(1)
-                        End If
-
-                        If lFirstLocation.Length = 0 Then
-                            lFirstLocation = lLocation
-                        ElseIf lLocation = lFirstLocation Then 'Found first location again, so we have seen everything once
-                            Exit Do
-                        End If
-
+                    If Not lKnowInterval AndAlso Not lKnowYearBase Then
                         Try
-                            If Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
-                                Select Case pMONcontains
-                                    Case 0 'Monthly
-                                        If lMONvalue < 13 Then
-                                            If lMONvalue <> lMonReading Then
-                                                lMonReading = lMONvalue
-                                                If lMonReading = 1 Then
-                                                    lYear += 1
-                                                End If
-                                            End If
-                                            lDate = atcUtility.Jday(lYear, lMONvalue, daymon(lYear, lMONvalue), 24, 0, 0)
-                                        Else
-                                            GoTo NextRecord
-                                        End If
-                                    Case 1 'Daily
-                                        If lDate = 0 Then
-                                            lDate = atcUtility.Jday(pYearBase, 1, 1, 24, 0, 0)
-                                            lDayReading = lMONvalue
-                                        ElseIf lMONvalue <> lDayReading Then
-                                            lDate += 1
-                                            lDayReading = lMONvalue
-                                            If lDayReading = 1 Then
-                                                lYear += 1
-                                            End If
-                                        End If
-                                    Case 2 'Yearly
-                                        lYear = lMONvalue
-                                        lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
-                                End Select
-                                If lYear <> lYearReading Then
-                                    'Logger.Status("Reading year " & lYear, True)
-                                    'Logger.Flush()
-                                    lYearReading = lYear
-                                    If pYearBase = 0 Then pYearBase = lYear
+                            Dim lCIOfilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(Specification), "file.cio")
+                            If IO.File.Exists(lCIOfilename) Then
+                                Dim lCIO() As String
+                                lCIO = IO.File.ReadAllLines(lCIOfilename)
+                                If Not lKnowYearBase Then
+                                    lKnowYearBase = Integer.TryParse(lCIO(8).Substring(12, 4), pYearBase)
+                                    Dim lSkipYears As Integer = 0
+                                    Integer.TryParse(lCIO(59).Substring(0, 20), lSkipYears)
+                                    pYearBase += lSkipYears
                                 End If
-                                'Debug.Print(lYear & " " & DumpDate(lDate) & " at " & lLocation)
+                                If Not lKnowInterval Then
+                                    lKnowInterval = Integer.TryParse(lCIO(58).Substring(15, 1), pMONcontains)
+                                End If
+                            End If
+                        Catch e As Exception
+                            Logger.Dbg("Exception reading file.cio: " & e.Message)
+                        End Try
+
+                        If Not lKnowInterval Then
+                            If Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
+                                If lMONvalue > 366 Then 'must be yearly
+                                    lKnowInterval = True
+                                    pMONcontains = 2
+                                    lKnowYearBase = True
+                                    pYearBase = lMONvalue
+                                Else 'Could be daily or monthly, have to scan MON column to be sure
+
+                                    While lMONvalue <= 12
+                                        .CurrentRecord += 1
+                                        If Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
+                                        Else
+                                            Logger.Dbg("Could not parse integer in field " & (pBaseDataField - 1) & " = " & .Value(pBaseDataField - 1))
+                                            Exit While
+                                        End If
+                                    End While
+                                    If lMONvalue > 1000 Then 'must be monthly since we reached a year before going past 12
+                                        'must be monthly
+                                        lKnowInterval = True
+                                        pMONcontains = 0
+                                        lKnowYearBase = True
+                                        pYearBase = lMONvalue
+                                    Else
+                                        lKnowInterval = True
+                                        pMONcontains = 1
+                                    End If
+                                    GoTo ReOpenTable 're-open the table to start over, can't set .CurrentRecord back to one with streaming table
+
+                                End If
+                            End If
+                        End If
+                    End If
+
+                    If lLocations.Count = 0 Then
+                        Do
+                            If pTableDelimited Then
+                                lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
+                            Else
+                                lLocation = .Value(1)
+                            End If
+
+                            If lFirstLocation.Length = 0 Then
+                                lFirstLocation = lLocation
+                            ElseIf lLocation = lFirstLocation Then 'Found first location again, so we have seen everything once
+                                Exit Do
+                            End If
+
+                            lLocations.Add(lLocation)
+                            .CurrentRecord += 1
+                        Loop
+
+                        If Logger.Msg("Found " & Format((.NumFields - pBaseDataField + 1), "#,###") & " constituents and " & Format(lLocations.Count, "#,###") & " locations," & vbCrLf _
+                                 & "total of " & Format((.NumFields - pBaseDataField + 1) * lLocations.Count, "#,###") & " data sets. Continue?", vbYesNo, Specification) = MsgBoxResult.Yes Then
+                            GoTo ReOpenTable 're-open the table to start over, can't set .CurrentRecord back to one with streaming table
+                        Else
+                            Logger.Progress("", 0, 0)
+                            Return False
+                        End If
+                    End If
+                    pDates = New atcTimeseries(Nothing)
+
+                    For Each lLocation In lLocations
+                        If lLocationsToProcess.Length = 0 OrElse lLocationsToProcess.Contains(lDelim & lLocation & lDelim) Then
+                            Try
                                 For lField = pBaseDataField To .NumFields
                                     Dim lFieldName As String = .FieldName(lField).ToString.Replace("""", "")
                                     If lFieldsToProcess.Length = 0 OrElse lFieldsToProcess.Contains(lDelim & lFieldName.Replace("_", "/") & lDelim) Then
@@ -279,7 +305,7 @@ Public Class atcTimeseriesSWAT
                                                 .Add("HruId", lLocation.Substring(4).Trim)
                                             End If
 
-                                            .SetValue("Scenario", "Simulate") 'TODO: get a name for the scenario
+                                            .SetValue("Scenario", "Simulated") 'TODO: get a name for the scenario
                                             .SetValue("Units", SplitUnits(lFieldName).Trim)
                                             .SetValue("Constituent", lFieldName.Trim)
                                             .SetValue("Location", lLocation.Trim)
@@ -298,18 +324,16 @@ Public Class atcTimeseriesSWAT
                                         DataSets.Add(lTS)
                                     End If
                                 Next
-                            Else 'got to end of run summary, value is number of years as a decimal or we have reached blank line after end
-                                Exit Do
-                            End If
-                        Catch ex As FormatException
-                            Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
-                        Catch ex As Exception
-                            Logger.Dbg("Stopping reading SWAT output: " & ex.Message)
-                            Exit Do
-                        End Try
+                            Catch ex As FormatException
+                                Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
+                            Catch ex As Exception
+                                Logger.Dbg("Stopping reading SWAT output: " & ex.Message)
+                                Exit For
+                            End Try
+                        End If
 NextRecord:
                         .CurrentRecord += 1
-                    Loop
+                    Next
                     Try
                         pNumValues = (FileLen(Specification) - .Header.Length) / (pRecordLength * (.CurrentRecord - 1)) - 1
                     Catch ex As Exception
