@@ -152,7 +152,7 @@ Public Class ctlEditTable
                             lTempString = lTempString & ":" & lOccurIndex
                         End If
                         If pHspfTable.Opn.OpnBlk.Ids(1).TableExists(lTempString) Then
-                            cboOccur.Items.Add(lOper & " - " & pHspfTable.Opn.OpnBlk.Ids(1).Tables(lTempString).Parms(1).Value)
+                            cboOccur.Items.Add(lOper & " - " & pHspfTable.Opn.OpnBlk.Ids(1).Tables(lTempString).Parms(0).Value)
                         Else
                             cboOccur.Items.Add(lOper)
                         End If
@@ -345,4 +345,7 @@ Public Class ctlEditTable
         grdTable.SizeAllColumnsToContents(grdTable.Width, True)
     End Sub
 
+    Private Sub cboOccur_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboOccur.SelectedIndexChanged
+        RefreshGrid()
+    End Sub
 End Class

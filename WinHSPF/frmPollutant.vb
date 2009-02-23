@@ -4,6 +4,8 @@ Imports atcUCI
 
 Public Class frmPollutant
 
+    Friend pLoading As Boolean
+
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
@@ -13,6 +15,7 @@ Public Class frmPollutant
 
         Me.Icon = pIcon
         Me.MinimumSize = Me.Size
+        pLoading = True
 
         If pDefUCI.Pollutants.Count = 0 Then
             ReadPollutants()
@@ -24,18 +27,7 @@ Public Class frmPollutant
         Next lIndex
 
         For lIndex As Integer = 0 To pDefUCI.Pollutants.Count - 1
-            'is this one already in the list?
-            Dim lInList As Boolean = False
-            If clbPollutants.Items.Count > 0 Then
-                For lListIndex As Integer = 0 To clbPollutants.Items.Count - 1
-                    If clbPollutants.Items(lListIndex) = pDefUCI.Pollutants(lIndex).Name Then
-                        lInList = True
-                    End If
-                Next
-            End If
-            If Not lInList Then
-                clbPollutants.Items.Add(pDefUCI.Pollutants(lIndex).Name)
-            End If
+            clbPollutants.Items.Add(pDefUCI.Pollutants(lIndex).Name)
             If pDefUCI.Pollutants(lIndex).ModelType = "DataIn" Then
                 clbPollutants.SetSelected(lIndex + pUCI.Pollutants.Count, True)
             Else
@@ -43,6 +35,8 @@ Public Class frmPollutant
                 cbxSelect.Checked = False
             End If
         Next lIndex
+
+        pLoading = False
 
     End Sub
 
@@ -53,9 +47,9 @@ Public Class frmPollutant
         Dim licount As Integer = 0
         Dim lrcount As Integer = 0
         Dim lIndex As Integer = 0
-        For lIndex = 1 To clbPollutants.SelectedItems.Count
+        For lIndex = 1 To clbPollutants.CheckedItems.Count
             For Each lPoll As HspfPollutant In pUCI.Pollutants
-                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
+                If lPoll.Name = clbPollutants.CheckedItems(lIndex - 1) Then
                     If lPoll.ModelType = "PIG" Then
                         lpcount = lpcount + 1
                         licount = licount + 1
@@ -69,7 +63,7 @@ Public Class frmPollutant
                 End If
             Next
             For Each lPoll As HspfPollutant In pDefUCI.Pollutants
-                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
+                If lPoll.Name = clbPollutants.CheckedItems(lIndex - 1) Then
                     If lPoll.ModelType = "PIG" Then
                         lpcount = lpcount + 1
                         licount = licount + 1
@@ -98,15 +92,15 @@ Public Class frmPollutant
         End If
 
         'figure out which ones we need to add 
-        For lIndex = 1 To clbPollutants.SelectedItems.Count
+        For lIndex = 1 To clbPollutants.CheckedItems.Count
             Dim lFound As Boolean = False
             For Each lPoll As HspfPollutant In pUCI.Pollutants
-                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
+                If lPoll.Name = clbPollutants.CheckedItems(lIndex - 1) Then
                     lFound = True
                 End If
             Next
             For Each lPoll As HspfPollutant In pDefUCI.Pollutants
-                If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) And _
+                If lPoll.Name = clbPollutants.CheckedItems(lIndex - 1) And _
                   lPoll.ModelType = "DataIn" Then
                     lFound = True
                 End If
@@ -117,7 +111,7 @@ Public Class frmPollutant
                 Dim lDefIndex As Integer = 0
                 Do While lDefIndex < pDefUCI.Pollutants.Count
                     Dim lPoll As HspfPollutant = pDefUCI.Pollutants(lDefIndex)
-                    If lPoll.Name = clbPollutants.SelectedItems(lIndex - 1) Then
+                    If lPoll.Name = clbPollutants.CheckedItems(lIndex - 1) Then
                         'add this one
                         pUCI.Pollutants.Add(lPoll)
                         If Mid(lPoll.ModelType, 1, 4) = "Data" Then
@@ -136,11 +130,12 @@ Public Class frmPollutant
         Next
 
         'figure out which ones we need to remove
-        Do While lIndex <= pUCI.Pollutants.Count
+        lIndex = 0
+        Do While lIndex < pUCI.Pollutants.Count
             Dim lPoll As HspfPollutant = pUCI.Pollutants(lIndex)
             Dim lFound As Boolean = False
-            For lSelectedIndex As Integer = 1 To clbPollutants.SelectedItems.Count
-                If lPoll.Name = clbPollutants.SelectedItems(lSelectedIndex - 1) Then
+            For lSelectedIndex As Integer = 1 To clbPollutants.CheckedItems.Count
+                If lPoll.Name = clbPollutants.CheckedItems(lSelectedIndex - 1) Then
                     lFound = True
                 End If
             Next
@@ -158,8 +153,8 @@ Public Class frmPollutant
 
         For lIndex = 1 To clbPollutants.Items.Count
             Dim lfound As Boolean = False
-            For lSelectedIndex As Integer = 1 To clbPollutants.SelectedItems.Count
-                If clbPollutants.Items(lIndex - 1) = clbPollutants.SelectedItems(lSelectedIndex - 1) Then
+            For lSelectedIndex As Integer = 1 To clbPollutants.CheckedItems.Count
+                If clbPollutants.Items(lIndex - 1) = clbPollutants.CheckedItems(lSelectedIndex - 1) Then
                     'this is selected 
                     lfound = True
                 End If
@@ -257,7 +252,13 @@ Public Class frmPollutant
                         lOpnBlk.Uci = pDefUCI
                         For Each lOper As HspfOperation In pUCI.OpnBlks(lOpTyp).Ids
                             lOpnBlk.Ids.Add(lOper)
-                            lPoll.Operations.Add(lOpTyp & lOper.Id, lOper)
+                            Dim lTempOper As New HspfOperation
+                            lTempOper.Name = lOper.Name
+                            lTempOper.Id = lOper.Id
+                            lTempOper.Description = lOper.Description
+                            lTempOper.DefOpnId = DefaultOpnId(lTempOper, pDefUCI)
+                            lTempOper.OpnBlk = lOpnBlk
+                            lPoll.Operations.Add(lOpTyp & lTempOper.Id, lTempOper)
                         Next
                         Dim lEndofOperation As Boolean = False
                         Do While Not lEndofOperation
@@ -411,13 +412,13 @@ Public Class frmPollutant
         Dim liscount As Integer = 0  'implnd qual sed assoc count
         Dim licount As Integer = 0   'implnd qual count
         Dim lrcount As Integer = 0   'gqual count
-        For lIndex As Integer = 1 To pUCI.Pollutants.Count
+        For lIndex As Integer = 0 To pUCI.Pollutants.Count - 1
             Dim ltPoll As HspfPollutant = pUCI.Pollutants(lIndex)
             If ltPoll.Index <= lThisIndex Then
-                For lOperIndex As Integer = 1 To ltPoll.Operations.Count
-                    If ltPoll.Operations(lOperIndex).Name = "PERLND" Then
-                        If ltPoll.Operations(lOperIndex).TableExists("QUAL-PROPS") Then
-                            Dim lTable As HspfTable = ltPoll.Operations(lOperIndex).Tables("QUAL-PROPS")
+                For Each lOper As HspfOperation In ltPoll.Operations.Values
+                    If lOper.Name = "PERLND" Then
+                        If lOper.TableExists("QUAL-PROPS") Then
+                            Dim lTable As HspfTable = lOper.Tables("QUAL-PROPS")
                             If lTable.Parms("QSDFG").Value = 1 Then
                                 lpscount = lpscount + 1
                             End If
@@ -426,10 +427,10 @@ Public Class frmPollutant
                         Exit For
                     End If
                 Next
-                For lOperIndex As Integer = 1 To ltPoll.Operations.Count
-                    If ltPoll.Operations(lOperIndex).Name = "IMPLND" Then
-                        If ltPoll.Operations(lOperIndex).TableExists("QUAL-PROPS") Then
-                            Dim lTable As HspfTable = ltPoll.Operations(lOperIndex).Tables("QUAL-PROPS")
+                For Each lOper As HspfOperation In ltPoll.Operations.Values
+                    If lOper.Name = "IMPLND" Then
+                        If lOper.TableExists("QUAL-PROPS") Then
+                            Dim lTable As HspfTable = lOper.Tables("QUAL-PROPS")
                             If lTable.Parms("QSDFG").Value = 1 Then
                                 liscount = liscount + 1
                             End If
@@ -438,9 +439,9 @@ Public Class frmPollutant
                         Exit For
                     End If
                 Next
-                For lOperIndex As Integer = 1 To ltPoll.Operations.Count
-                    If ltPoll.Operations(lOperIndex).Name = "RCHRES" Then
-                        If ltPoll.Operations(lOperIndex).TableExists("GQ-QALDATA") Then
+                For Each lOper As HspfOperation In ltPoll.Operations.Values
+                    If lOper.Name = "RCHRES" Then
+                        If lOper.TableExists("GQ-QALDATA") Then
                             lrcount = lrcount + 1
                         End If
                         Exit For
@@ -455,10 +456,10 @@ Public Class frmPollutant
         Dim lisflag As Boolean = False   'removing a iqual sed assoc
         Dim liflag As Boolean = False    'removing a iqual
         Dim lrflag As Boolean = False    'removing a gqual
-        For lOperIndex As Integer = 1 To lPoll.Operations.Count
-            If lPoll.Operations(lOperIndex).Name = "PERLND" Then
-                If lPoll.Operations(lOperIndex).TableExists("QUAL-PROPS") Then
-                    Dim lTable As HspfTable = lPoll.Operations(lOperIndex).Tables("QUAL-PROPS")
+        For Each lOper As HspfOperation In lPoll.Operations.Values
+            If lOper.Name = "PERLND" Then
+                If lOper.TableExists("QUAL-PROPS") Then
+                    Dim lTable As HspfTable = lOper.Tables("QUAL-PROPS")
                     If lTable.Parms("QSDFG").Value = 1 Then
                         lpsflag = True
                     End If
@@ -467,10 +468,10 @@ Public Class frmPollutant
                 Exit For
             End If
         Next
-        For lOperIndex As Integer = 1 To lPoll.Operations.Count
-            If lPoll.Operations(lOperIndex).Name = "IMPLND" Then
-                If lPoll.Operations(lOperIndex).TableExists("QUAL-PROPS") Then
-                    Dim lTable As HspfTable = lPoll.Operations(lOperIndex).Tables("QUAL-PROPS")
+        For Each lOper As HspfOperation In lPoll.Operations.Values
+            If lOper.Name = "IMPLND" Then
+                If lOper.TableExists("QUAL-PROPS") Then
+                    Dim lTable As HspfTable = lOper.Tables("QUAL-PROPS")
                     If lTable.Parms("QSDFG").Value = 1 Then
                         lisflag = True
                     End If
@@ -479,9 +480,9 @@ Public Class frmPollutant
                 Exit For
             End If
         Next
-        For lOperIndex As Integer = 1 To lPoll.Operations.Count
-            If lPoll.Operations(lOperIndex).Name = "RCHRES" Then
-                If lPoll.Operations(lOperIndex).TableExists("GQ-QALDATA") Then
+        For Each lOper As HspfOperation In lPoll.Operations.Values
+            If lOper.Name = "RCHRES" Then
+                If lOper.TableExists("GQ-QALDATA") Then
                     lrflag = True
                 End If
                 Exit For
@@ -489,19 +490,19 @@ Public Class frmPollutant
         Next
 
         'look through all ext targets for ones to remove
-        Dim lConnIndex As Integer = 1
+        Dim lConnIndex As Integer = 0
         Dim lRemflag As Boolean
-        Do While lConnIndex <= pUCI.Connections.Count
+        Do While lConnIndex < pUCI.Connections.Count
             Dim lConn As HspfConnection = pUCI.Connections(lConnIndex)
             lRemflag = False
             If lConn.Typ = 4 Then
-                If lConn.Source.volname = "RCHRES" And lConn.Source.group = "GQUAL" Then
-                    If lConn.Source.member = "TIQAL" Or lConn.Source.member = "DQAL" Or _
-                       lConn.Source.member = "RDQAL" Or lConn.Source.member = "RRQAL" Or _
-                       lConn.Source.member = "IDQAL" Or lConn.Source.member = "PDQAL" Or _
-                       lConn.Source.member = "GQADDR" Or lConn.Source.member = "GQADWT" Or _
-                       lConn.Source.member = "GQADEP" Or lConn.Source.member = "RODQAL" Or _
-                       lConn.Source.member = "TROQAL" Then
+                If lConn.Source.VolName = "RCHRES" And lConn.Source.Group = "GQUAL" Then
+                    If lConn.Source.Member = "TIQAL" Or lConn.Source.Member = "DQAL" Or _
+                       lConn.Source.Member = "RDQAL" Or lConn.Source.Member = "RRQAL" Or _
+                       lConn.Source.Member = "IDQAL" Or lConn.Source.Member = "PDQAL" Or _
+                       lConn.Source.Member = "GQADDR" Or lConn.Source.Member = "GQADWT" Or _
+                       lConn.Source.Member = "GQADEP" Or lConn.Source.Member = "RODQAL" Or _
+                       lConn.Source.Member = "TROQAL" Then
                         If lrflag And lConn.Source.MemSub1 = lrcount Then
                             lRemflag = True
                         End If
@@ -510,9 +511,9 @@ Public Class frmPollutant
                             lRemflag = True
                         End If
                     End If
-                ElseIf lConn.Source.volname = "PERLND" And lConn.Source.group = "PQUAL" Then
-                    If lConn.Source.member = "SOQSP" Or lConn.Source.member = "WASHQS" Or _
-                       lConn.Source.member = "SCRQS" Or lConn.Source.member = "SOQS" Then
+                ElseIf lConn.Source.VolName = "PERLND" And lConn.Source.Group = "PQUAL" Then
+                    If lConn.Source.Member = "SOQSP" Or lConn.Source.Member = "WASHQS" Or _
+                       lConn.Source.Member = "SCRQS" Or lConn.Source.Member = "SOQS" Then
                         If lpsflag And lConn.Source.MemSub1 = lpscount Then
                             lRemflag = True
                         End If
@@ -521,8 +522,8 @@ Public Class frmPollutant
                             lRemflag = True
                         End If
                     End If
-                ElseIf lConn.Source.volname = "IMPLND" And lConn.Source.group = "IQUAL" Then
-                    If lConn.Source.member = "SOQSP" Or lConn.Source.member = "SOQS" Then
+                ElseIf lConn.Source.VolName = "IMPLND" And lConn.Source.Group = "IQUAL" Then
+                    If lConn.Source.Member = "SOQSP" Or lConn.Source.Member = "SOQS" Then
                         If lisflag And lConn.Source.MemSub1 = liscount Then
                             lRemflag = True
                         End If
@@ -553,8 +554,8 @@ Public Class frmPollutant
         Loop
 
         'look through all ext targets for ones to decrement
-        lConnIndex = 1
-        Do While lConnIndex <= pUCI.Connections.Count
+        lConnIndex = 0
+        Do While lConnIndex < pUCI.Connections.Count
             Dim lConn As HspfConnection = pUCI.Connections(lConnIndex)
             If lConn.Typ = 4 Then
                 If lConn.Source.VolName = "RCHRES" And lConn.Source.Group = "GQUAL" Then
@@ -595,7 +596,7 @@ Public Class frmPollutant
                     End If
                 End If
             End If
-            If Not lremflag Then
+            If Not lRemflag Then
                 lConnIndex += 1
             End If
         Loop
@@ -603,9 +604,11 @@ Public Class frmPollutant
     End Sub
 
     Private Sub cbxSelect_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxSelect.CheckedChanged
-        For lRow As Integer = 0 To clbPollutants.Items.Count - 1
-            clbPollutants.SetItemChecked(lRow, cbxSelect.Checked)
-        Next
+        If Not pLoading Then
+            For lRow As Integer = 0 To clbPollutants.Items.Count - 1
+                clbPollutants.SetItemChecked(lRow, cbxSelect.Checked)
+            Next
+        End If
     End Sub
 
 End Class
