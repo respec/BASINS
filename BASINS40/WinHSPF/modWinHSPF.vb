@@ -296,10 +296,12 @@ Public Module WinHSPF
 
     Sub PollutantSelector()
         If IsNothing(pfrmPollutant) Then
+            pUCI.PollutantsBuild()
             pfrmPollutant = New frmPollutant
             PollutantSelectorShow()
         Else
             If pfrmPollutant.IsDisposed Then
+                pUCI.PollutantsBuild()
                 pfrmPollutant = New frmPollutant
                 PollutantSelectorShow()
             Else
@@ -310,7 +312,6 @@ Public Module WinHSPF
     End Sub
 
     Sub PollutantSelectorShow()
-        pUCI.PollutantsBuild()
         pfrmPollutant.ShowDialog()
         pUCI.PollutantsUnBuild()
         CheckAndAddMissingTables("PERLND")

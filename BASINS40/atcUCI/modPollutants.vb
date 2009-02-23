@@ -466,41 +466,41 @@ Module modPollutants
                             lOpn.Tables.Add(lTable)
                             If lOpn.TableExists("ACTIVITY") Then
                                 With lOpn.Tables.Item("ACTIVITY")
-                                    .Parms(lSecId).Value = 1 'turn on this section
+                                    .Parms(lSecId - 1).Value = 1 'turn on this section
                                     'turn on other prerequisite sections
                                     Select Case lOpn.Name
                                         Case "RCHRES"
-                                            For lIndex = 7 To lSecId - 1
+                                            For lIndex = 6 To lSecId - 1
                                                 .Parms(lIndex).Value = 1 'previous rqual sections must be on
                                             Next
                                             If lSecId > 1 Then
-                                                .Parms(1).Value = 1 'hydr must be on
+                                                .Parms(0).Value = 1 'hydr must be on
                                             End If
                                             If lSecId > 2 Then
-                                                .Parms(2).Value = 1 'adcalc must be on
+                                                .Parms(1).Value = 1 'adcalc must be on
                                             End If
                                             If lSecId > 4 Then
-                                                .Parms(4).Value = 1 'htrch must be on
+                                                .Parms(3).Value = 1 'htrch must be on
                                             End If
                                         Case "IMPLND"
                                             If lSecId = 5 Or lSecId = 2 Then
-                                                .Parms(1).Value = 1 'atemp must be on
+                                                .Parms(0).Value = 1 'atemp must be on
                                             End If
                                             If lSecId > 3 Then
-                                                .Parms(3).Value = 1 'iwater must be on
+                                                .Parms(2).Value = 1 'iwater must be on
                                             End If
                                         Case "PERLND"
                                             If lSecId > 8 Then
-                                                .Parms(8).Value = 1 'mstlay must be on
+                                                .Parms(7).Value = 1 'mstlay must be on
                                             End If
                                             If lSecId = 5 Or lSecId = 2 Or lSecId = 6 Or lSecId = 10 Or lSecId = 11 Or lSecId = 12 Then
-                                                .Parms(1).Value = 1 'atemp must be on
+                                                .Parms(0).Value = 1 'atemp must be on
                                             End If
                                             If lSecId = 4 Or lSecId = 6 Or lSecId = 7 Or lSecId = 9 Or lSecId = 10 Or lSecId = 11 Then
-                                                .Parms(3).Value = 1 'pwater must be on
+                                                .Parms(2).Value = 1 'pwater must be on
                                             End If
                                             If lSecId = 6 Or lSecId = 10 Or lSecId = 11 Then
-                                                .Parms(5).Value = 1 'pstemp must be on
+                                                .Parms(4).Value = 1 'pstemp must be on
                                             End If
                                     End Select
                                 End With
@@ -560,7 +560,7 @@ Module modPollutants
                         lML.Target.MemSub2 = lnGqual
                     End If
                     'make sure there isnt already a ml to this target
-                    Dim lIExist As Integer = 0
+                    Dim lIExist As Integer = -1
                     For lIndex = 1 To aUci.MassLinks.Count
                         Dim lTempML As HspfMassLink = aUci.MassLinks(lIndex - 1)
                         If lTempML.Source.VolName = lML.Source.VolName And lTempML.Target.VolName = lML.Target.VolName And lTempML.Target.Group = lML.Target.Group And lTempML.Target.Member = lML.Target.Member And lTempML.Target.MemSub1 = lML.Target.MemSub1 And lTempML.Target.MemSub2 = lML.Target.MemSub2 Then
@@ -573,8 +573,8 @@ Module modPollutants
                             End If
                         End If
                     Next
-                    If lIExist > 0 Then
-                        aUci.MassLinks.RemoveAt(lIExist)
+                    If lIExist > -1 Then
+                        aUci.MassLinks.RemoveAt(lIExist - 1)
                     End If
                     aUci.MassLinks.Add(lML)
                 Next
