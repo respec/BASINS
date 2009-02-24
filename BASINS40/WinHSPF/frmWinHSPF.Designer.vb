@@ -457,7 +457,7 @@ Partial Class frmWinHSPF
         Me.cmdOutputManager.Name = "cmdOutputManager"
         Me.cmdOutputManager.Size = New System.Drawing.Size(23, 24)
         Me.cmdOutputManager.Text = "Output"
-        Me.cmdOutputManager.ToolTipText = "Output"
+        Me.cmdOutputManager.ToolTipText = "Output Manager"
         '
         'cmdViewOutput
         '
