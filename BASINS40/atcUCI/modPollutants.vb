@@ -153,7 +153,13 @@ Module modPollutants
                                         End If
                                     Next lTableDef
                                     If Len(ltPoll.Name) = 0 Then
-                                        ltPoll.Name = ltPoll.Operations.Item(lCtype & lNewOpn.Id).Tables("QUAL-PROPS").ParmValue("QUALID")
+                                        Dim ltname As String
+                                        If lPIconn > 1 Then
+                                            ltname = "QUAL-PROPS:" & lPIconn
+                                        Else
+                                            ltname = "QUAL-PROPS"
+                                        End If
+                                        ltPoll.Name = ltPoll.Operations.Item(lCtype & lNewOpn.Id).Tables(ltname).ParmValue("QUALID")
                                         ltPoll.Index = lPIconn
                                     End If
                                 Next lOpn
@@ -265,7 +271,13 @@ Module modPollutants
                                     End If
                                 Next lTableDef
                                 If Len(ltPoll.Name) = 0 Then
-                                    ltPoll.Name = ltPoll.Operations.Item(lCtype & newOpn.Id).Tables("QUAL-PROPS").ParmValue("QUALID")
+                                    Dim ltname As String
+                                    If lQIndex > 1 Then
+                                        ltname = "QUAL-PROPS:" & lQIndex
+                                    Else
+                                        ltname = "QUAL-PROPS"
+                                    End If
+                                    ltPoll.Name = ltPoll.Operations.Item(lCtype & newOpn.Id).Tables(ltname).ParmValue("QUALID")
                                     ltPoll.Index = lQIndex
                                 End If
                             Next lOpn
