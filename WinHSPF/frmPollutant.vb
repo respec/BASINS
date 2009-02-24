@@ -29,7 +29,7 @@ Public Class frmPollutant
         For lIndex As Integer = 0 To pDefUCI.Pollutants.Count - 1
             clbPollutants.Items.Add(pDefUCI.Pollutants(lIndex).Name)
             If pDefUCI.Pollutants(lIndex).ModelType = "DataIn" Then
-                clbPollutants.SetSelected(lIndex + pUCI.Pollutants.Count, True)
+                clbPollutants.SetItemChecked(lIndex + pUCI.Pollutants.Count, True)
             Else
                 'if any aren't selected, uncheck the 'all/none' box
                 cbxSelect.Checked = False
