@@ -235,7 +235,7 @@ Public Class atcTimeseries
     ''' </remarks>
     Public Property Dates() As atcTimeseries
         Get
-            EnsureValuesRead()
+            If pDates Is Nothing OrElse pDates.numValues = 0 Then EnsureValuesRead()
             Return pDates
         End Get
         Set(ByVal newValue As atcTimeseries)

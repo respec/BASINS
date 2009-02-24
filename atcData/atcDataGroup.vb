@@ -114,6 +114,10 @@ Public Class atcDataGroup
         RaiseEvent Added(aAddThese)
     End Sub
 
+    Public Shadows Sub AddRange(ByVal aKeys As System.Collections.IEnumerable, ByVal aValues As System.Collections.IEnumerable)
+        MyBase.AddRange(aKeys, aValues)
+    End Sub
+
     ''' <summary>Add items from an IEnumerable to the group.</summary>
     Public Shadows Sub AddRange(ByVal aAddThese As IEnumerable)
         MyBase.AddRange(aAddThese)
