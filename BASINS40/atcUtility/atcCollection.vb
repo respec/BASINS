@@ -10,6 +10,17 @@ Public Class atcCollection
 
     Private pKeys As ArrayList = New ArrayList
 
+    'Do we need to do this or will operator = do this by default?
+    'Public Shared Operator =(ByVal a1 As atcCollection, _
+    '                         ByVal a2 As atcCollection) As Boolean
+    '    Return Object.Equals(a1, a2)
+    'End Operator
+
+    'Public Shared Operator <>(ByVal a1 As atcCollection, _
+    '                          ByVal a2 As atcCollection) As Boolean
+    '    Return Not Object.Equals(a1, a2)
+    'End Operator
+
     ''' <summary>Returns first index of a key equal to or higher than aKey</summary>
     ''' <param name="aKey">Key to search for</param>
     ''' <returns>Returns aKeys.Count if aKeys is empty or contains only values less than aKey</returns>
@@ -94,6 +105,11 @@ Public Class atcCollection
         For lIndex As Integer = 0 To lLastIndex
             Add(aAddThese.Keys(lIndex), aAddThese.ItemByIndex(lIndex))
         Next
+    End Sub
+
+    Public Shadows Sub AddRange(ByVal aKeys As System.Collections.IEnumerable, ByVal aValues As System.Collections.IEnumerable)
+        pKeys.AddRange(aKeys)
+        MyBase.AddRange(aValues)
     End Sub
 
     Public Shadows Sub AddRange(ByVal aC As System.Collections.ICollection)
