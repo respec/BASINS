@@ -102,9 +102,9 @@ Public Class frmOutput
                     If lHspfOperation.Name = "RCHRES" Then
                         If IsAQUATOXLocation(lHspfOperation.Name, lHspfOperation.Id) Then
                             'this is an expert system output location
-                            .Rows = .Rows + 1
-                            .CellValue(.Rows, 0) = lHspfOperation.Name & " " & lHspfOperation.Id
-                            .CellValue(.Rows, 1) = lHspfOperation.Description
+                            lRow = .Rows
+                            .CellValue(lRow, 0) = lHspfOperation.Name & " " & lHspfOperation.Id
+                            .CellValue(lRow, 1) = lHspfOperation.Description
                         End If
                     End If
                 Next lOper
@@ -272,10 +272,8 @@ Public Class frmOutput
     Public Function IsAQUATOXLocation(ByVal aName As String, ByVal aId As Integer) As Boolean
         'call it an aquatox loc if required sections are on and
 
-        Dim lDSNObject As Object
         Dim lHspfTable As HspfTable
         Dim lHspfOperation As HspfOperation
-        Dim lHspfConnection As HspfConnection
         Dim lOper As Integer
         Dim lFoundFlag(7) As Boolean
         Dim lDSNId, lWDMId As String
@@ -283,51 +281,50 @@ Public Class frmOutput
         IsAQUATOXLocation = False
         lHspfOperation = pUCI.OpnBlks(aName).OperFromID(aId)
         lHspfTable = lHspfOperation.Tables("ACTIVITY")
-        If lHspfTable.Parms(1).Value = 1 And lHspfTable.Parms(4).Value = 1 And _
-           lHspfTable.Parms(5).Value = 1 And lHspfTable.Parms(7).Value = 1 And _
-           lHspfTable.Parms(8).Value = 1 Then
+        If lHspfTable.Parms(0).Value = 1 And lHspfTable.Parms(3).Value = 1 And _
+           lHspfTable.Parms(4).Value = 1 And lHspfTable.Parms(6).Value = 1 And _
+           lHspfTable.Parms(7).Value = 1 Then
             'all required rchres sections are on
             '(hydr, htrch, sedtrn, oxrx, nutrx)
             For lOper = 1 To 7
                 lFoundFlag(lOper) = False
             Next lOper
-            For lOper = 1 To lHspfOperation.Targets.Count
-                lHspfConnection = lHspfOperation.Targets(lOper)
+            For Each lHspfConnection As HspfConnection In lHspfOperation.Targets
                 If Microsoft.VisualBasic.Left(lHspfConnection.Target.VolName, 3) = "WDM" Then
                     lDSNId = lHspfConnection.Target.VolId
                     lWDMId = lHspfConnection.Target.VolName
-                    lDSNObject = pUCI.GetDataSetFromDsn(WDMInd(lWDMId), lDSNId)
+                    Dim lDSNObject As atcData.atcTimeseries = pUCI.GetDataSetFromDsn(WDMInd(lWDMId), lDSNId)
                     If Trim(lHspfConnection.Source.Member) = "AVDEP" Then
-                        If InStr(1, UCase(lDSNObject.Header.Desc), "AQUATOX") Then
+                        If InStr(1, UCase(lDSNObject.Attributes.GetValue("Description")), "AQUATOX") Then
                             lFoundFlag(1) = True
                         End If
                     ElseIf Trim(lHspfConnection.Source.Member) = "SAREA" Then
-                        If InStr(1, UCase(lDSNObject.Header.Desc), "AQUATOX") Then
+                        If InStr(1, UCase(lDSNObject.Attributes.GetValue("Description")), "AQUATOX") Then
                             lFoundFlag(2) = True
                         End If
                     ElseIf Trim(lHspfConnection.Source.Member) = "IVOL" Then
-                        If InStr(1, UCase(lDSNObject.Header.Desc), "AQUATOX") Then
+                        If InStr(1, UCase(lDSNObject.Attributes.GetValue("Description")), "AQUATOX") Then
                             lFoundFlag(3) = True
                         End If
                     ElseIf Trim(lHspfConnection.Source.Member) = "RO" Then
-                        If InStr(1, UCase(lDSNObject.Header.Desc), "AQUATOX") Then
+                        If InStr(1, UCase(lDSNObject.Attributes.GetValue("Description")), "AQUATOX") Then
                             lFoundFlag(4) = True
                         End If
                     ElseIf Trim(lHspfConnection.Source.Member) = "TW" Then
-                        If InStr(1, UCase(lDSNObject.Header.Desc), "AQUATOX") Then
+                        If InStr(1, UCase(lDSNObject.Attributes.GetValue("Description")), "AQUATOX") Then
                             lFoundFlag(5) = True
                         End If
                     ElseIf Trim(lHspfConnection.Source.Member) = "NUIF1" Then
-                        If InStr(1, UCase(lDSNObject.Header.Desc), "AQUATOX") Then
+                        If InStr(1, UCase(lDSNObject.Attributes.GetValue("Description")), "AQUATOX") Then
                             lFoundFlag(6) = True
                         End If
                     ElseIf Trim(lHspfConnection.Source.Member) = "OXIF" Then
-                        If InStr(1, UCase(lDSNObject.Header.Desc), "AQUATOX") Then
+                        If InStr(1, UCase(lDSNObject.Attributes.GetValue("Description")), "AQUATOX") Then
                             lFoundFlag(7) = True
                         End If
                     End If
                 End If
-            Next lOper
+            Next
             If lFoundFlag(1) And lFoundFlag(2) And lFoundFlag(3) And lFoundFlag(4) And _
                lFoundFlag(5) And lFoundFlag(6) And lFoundFlag(7) Then
                 'this is an aquatox output location

@@ -1155,209 +1155,201 @@ Public Class HspfUci
                     .SetValue("Scenario", lScenario.ToUpper)
                     .SetValue("Constituent", aOstr(lIndex).ToUpper)
                     .SetValue("Location", aLocn.ToUpper)
+                    .SetValue("TU", 4)
+                    .SetValue("TS", 1)
+                    .SetValue("TSTYPE", aOstr(lIndex).ToUpper)
                 End With
                 Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
-                'TODO: create dates
-                'With myDateSummary
-                '    .CIntvl = True
-                '    .ts = 1
-                '    .Tu = 4
-                '    .Intvl = 1
-                'End With
-                'TsDate.Summary = myDateSummary
                 lGenTs.Dates = lTsDate
 
-                lGenTs.Attributes.SetValue("TSTYPE", lGenTs.Attributes.GetValue("Constituent"))
                 Dim lAddedDsn As Boolean = pWDMObj(lWdmId).AddDataset(lGenTs)
                 aDsn(lIndex) = lDsn
             Next lIndex
         Else 'no wdm files in this uci
             Logger.Msg("No WDM Files are available with this UCI, so no calibration locations may be added", MsgBoxStyle.OkOnly, "Add Problem")
         End If
+
     End Sub
 
-    'Public Sub AddAQUATOXDsns(ByRef Id As Integer, ByRef clocn As String, ByRef basedsn As Integer, ByRef plank As Integer, ByRef gqualfg() As Integer, ByRef wdmid As Integer, ByRef Member() As String, ByRef Sub1() As Integer, ByRef Group() As String, ByRef adsn() As Integer, ByRef ostr() As String)
+    Public Sub AddAQUATOXDsns(ByRef aId As Integer, _
+                              ByRef aLocn As String, _
+                              ByRef aBaseDsn As Integer, _
+                              ByRef aPlankFg As Integer, _
+                              ByRef aGqualFg() As Integer, _
+                              ByRef aWdmId As Integer, _
+                              ByRef aMember() As String, _
+                              ByRef aSub1() As Integer, _
+                              ByRef aGroup() As String, _
+                              ByRef aDsn() As Integer, _
+                              ByRef aOstr() As String)
+        AddAQUATOXDsnsExt(aId, aLocn, aBaseDsn, aPlankFg, aGqualFg, aWdmId, aMember, aSub1, aGroup, aDsn, aOstr, 4)
+    End Sub
 
-    '    AddAQUATOXDsnsExt(Id, clocn, basedsn, plank, gqualfg, wdmid, Member, Sub1, Group, adsn, ostr, 4)
-    'End Sub
+    Public Sub AddAQUATOXDsnsExt(ByRef aId As Integer, _
+                                 ByRef aLocn As String, _
+                                 ByRef aBaseDsn As Integer, _
+                                 ByRef aPlankFg As Integer, _
+                                 ByRef aGqualFg() As Integer, _
+                                 ByRef aWdmId As Integer, _
+                                 ByRef aMember() As String, _
+                                 ByRef aSub1() As Integer, _
+                                 ByRef aGroup() As String, _
+                                 ByRef aDsn() As Integer, _
+                                 ByRef aOstr() As String, _
+                                 ByRef aOutTu As Integer)
 
-    'Public Sub AddAQUATOXDsnsExt(ByRef Id As Integer, ByRef clocn As String, ByRef basedsn As Integer, ByRef plank As Integer, ByRef gqualfg() As Integer, ByRef wdmid As Integer, ByRef Member() As String, ByRef Sub1() As Integer, ByRef Group() As String, ByRef adsn() As Integer, ByRef ostr() As String, ByRef outtu As Integer)
-    '    Dim wdmsfl, ndsn, j, i As Integer
-    '    Dim cscen As String
-    '    Dim GenTs As atcData.atcTimeseries
-    '    Dim addeddsn As Boolean
-    '    Dim lts As Collection 'of atcotimser
-    '    Dim TsDate As atcData.atcTimeseries
-    '    Dim lOper As HspfOperation
-    '    Dim ltable As HspfTable
-    '    Dim wid As String
-    '    Dim deleteddsn As Integer
-    '    Dim vConn As Object
-    '    Dim lConn As HspfConnection
-    '    Dim ctmp As String
-    '    Dim referenced As Boolean
+        aMember(1) = "VOL" : aSub1(1) = 1 : aGroup(1) = "HYDR" : aOstr(1) = "VOL     " 'volume (ac.ft) AVER
+        aMember(2) = "IVOL" : aSub1(2) = 1 : aGroup(2) = "HYDR" : aOstr(2) = "IVOL    " 'inflow (ac.ft) SUM
+        aMember(3) = "RO" : aSub1(3) = 1 : aGroup(3) = "HYDR" : aOstr(3) = "RO      " 'discharge in cfs AVER
+        aMember(4) = "SAREA" : aSub1(4) = 1 : aGroup(4) = "HYDR" : aOstr(4) = "SARA     " 'surface area in acres AVER
+        aMember(5) = "AVDEP" : aSub1(5) = 1 : aGroup(5) = "HYDR" : aOstr(5) = "AVDP    " 'mean depth in feet AVER
+        aMember(6) = "PRSUPY" : aSub1(6) = 1 : aGroup(6) = "HYDR" : aOstr(6) = "PSUP    " 'volume in from precip (ac.ft) SUM
+        aMember(7) = "VOLEV" : aSub1(7) = 1 : aGroup(7) = "HYDR" : aOstr(7) = "VEVP    " 'volume out to evap (ac.ft) SUM
+        aMember(8) = "TW" : aSub1(8) = 1 : aGroup(8) = "HTRCH" : aOstr(8) = "TW      " 'water temp in degrees AVER
+        aMember(9) = "NUIF1" : aSub1(9) = 1 : aGroup(9) = "NUTRX" : aOstr(9) = "NO3     " 'inflow of no3 in lbs SUM
+        aMember(10) = "NUIF1" : aSub1(10) = 2 : aGroup(10) = "NUTRX" : aOstr(10) = "NH3     " 'inflow of nh2 in lbs SUM
+        aMember(11) = "NUIF1" : aSub1(11) = 3 : aGroup(11) = "NUTRX" : aOstr(11) = "NO2     " 'inflow of no2 in lbs SUM
+        aMember(12) = "NUIF1" : aSub1(12) = 4 : aGroup(12) = "NUTRX" : aOstr(12) = "PO4     " 'inflow of po4 in lbs SUM
+        aMember(13) = "OXIF" : aSub1(13) = 1 : aGroup(13) = "OXRX" : aOstr(13) = "DO      " 'inflow of do in lbs SUM
+        aMember(14) = "OXIF" : aSub1(14) = 2 : aGroup(14) = "OXRX" : aOstr(14) = "BOD     " 'inflow of bod in lbs SUM
+        aMember(15) = "PKIF" : aSub1(15) = 5 : aGroup(15) = "PLANK" : aOstr(15) = "ORC     " 'inflow of organic c in lbs SUM
+        aMember(16) = "PKIF" : aSub1(16) = 1 : aGroup(16) = "PLANK" : aOstr(16) = "PHYT    " 'inflow of phyto in lbs SUM
+        aMember(17) = "ISED" : aSub1(17) = 1 : aGroup(17) = "SEDTRN" : aOstr(17) = "ISD1    " 'inflow of sediment in tons SUM
+        aMember(18) = "ISED" : aSub1(18) = 2 : aGroup(18) = "SEDTRN" : aOstr(18) = "ISD2    " 'inflow of sediment in tons SUM
+        aMember(19) = "ISED" : aSub1(19) = 3 : aGroup(19) = "SEDTRN" : aOstr(19) = "ISD3    " 'inflow of sediment in tons SUM
+        aMember(20) = "SSED" : aSub1(20) = 1 : aGroup(20) = "SEDTRN" : aOstr(20) = "SSD1    " 'sediment conc mg/l AVER
+        aMember(21) = "SSED" : aSub1(21) = 2 : aGroup(21) = "SEDTRN" : aOstr(21) = "SSD2    " 'sediment conc mg/l AVER
+        aMember(22) = "SSED" : aSub1(22) = 3 : aGroup(22) = "SEDTRN" : aOstr(22) = "SSD3    " 'sediment conc mg/l AVER
+        aMember(23) = "TIQAL" : aSub1(23) = 1 : aGroup(23) = "GQUAL" : aOstr(23) = "TIQ1    " 'total inflow of qual SUM
+        aMember(24) = "TIQAL" : aSub1(24) = 2 : aGroup(24) = "GQUAL" : aOstr(24) = "TIQ2    " 'total inflow of qual SUM
+        aMember(25) = "TIQAL" : aSub1(25) = 3 : aGroup(25) = "GQUAL" : aOstr(25) = "TIQ3    " 'total inflow of qual SUM
+        aMember(26) = "NUIF2" : aSub1(26) = 4 : aGroup(26) = "NUTRX" : aOstr(26) = "PPO4    " 'inflow of particulate po4 in lbs SUM
+        aMember(27) = "TPKIF" : aSub1(27) = 2 : aGroup(27) = "PLANK" : aOstr(27) = "TORP    " 'inflow of total organic p in lbs SUM
+        aMember(28) = "TPKIF" : aSub1(28) = 5 : aGroup(28) = "PLANK" : aOstr(28) = "TTP     " 'inflow of total p in lbs SUM
 
-    '    Member(1) = "VOL" : Sub1(1) = 1 : Group(1) = "HYDR" : ostr(1) = "VOL     " 'volume (ac.ft) AVER
-    '    Member(2) = "IVOL" : Sub1(2) = 1 : Group(2) = "HYDR" : ostr(2) = "IVOL    " 'inflow (ac.ft) SUM
-    '    Member(3) = "RO" : Sub1(3) = 1 : Group(3) = "HYDR" : ostr(3) = "RO      " 'discharge in cfs AVER
-    '    Member(4) = "SAREA" : Sub1(4) = 1 : Group(4) = "HYDR" : ostr(4) = "SARA     " 'surface area in acres AVER
-    '    Member(5) = "AVDEP" : Sub1(5) = 1 : Group(5) = "HYDR" : ostr(5) = "AVDP    " 'mean depth in feet AVER
-    '    Member(6) = "PRSUPY" : Sub1(6) = 1 : Group(6) = "HYDR" : ostr(6) = "PSUP    " 'volume in from precip (ac.ft) SUM
-    '    Member(7) = "VOLEV" : Sub1(7) = 1 : Group(7) = "HYDR" : ostr(7) = "VEVP    " 'volume out to evap (ac.ft) SUM
-    '    Member(8) = "TW" : Sub1(8) = 1 : Group(8) = "HTRCH" : ostr(8) = "TW      " 'water temp in degrees AVER
-    '    Member(9) = "NUIF1" : Sub1(9) = 1 : Group(9) = "NUTRX" : ostr(9) = "NO3     " 'inflow of no3 in lbs SUM
-    '    Member(10) = "NUIF1" : Sub1(10) = 2 : Group(10) = "NUTRX" : ostr(10) = "NH3     " 'inflow of nh2 in lbs SUM
-    '    Member(11) = "NUIF1" : Sub1(11) = 3 : Group(11) = "NUTRX" : ostr(11) = "NO2     " 'inflow of no2 in lbs SUM
-    '    Member(12) = "NUIF1" : Sub1(12) = 4 : Group(12) = "NUTRX" : ostr(12) = "PO4     " 'inflow of po4 in lbs SUM
-    '    Member(13) = "OXIF" : Sub1(13) = 1 : Group(13) = "OXRX" : ostr(13) = "DO      " 'inflow of do in lbs SUM
-    '    Member(14) = "OXIF" : Sub1(14) = 2 : Group(14) = "OXRX" : ostr(14) = "BOD     " 'inflow of bod in lbs SUM
-    '    Member(15) = "PKIF" : Sub1(15) = 5 : Group(15) = "PLANK" : ostr(15) = "ORC     " 'inflow of organic c in lbs SUM
-    '    Member(16) = "PKIF" : Sub1(16) = 1 : Group(16) = "PLANK" : ostr(16) = "PHYT    " 'inflow of phyto in lbs SUM
-    '    Member(17) = "ISED" : Sub1(17) = 1 : Group(17) = "SEDTRN" : ostr(17) = "ISD1    " 'inflow of sediment in tons SUM
-    '    Member(18) = "ISED" : Sub1(18) = 2 : Group(18) = "SEDTRN" : ostr(18) = "ISD2    " 'inflow of sediment in tons SUM
-    '    Member(19) = "ISED" : Sub1(19) = 3 : Group(19) = "SEDTRN" : ostr(19) = "ISD3    " 'inflow of sediment in tons SUM
-    '    Member(20) = "SSED" : Sub1(20) = 1 : Group(20) = "SEDTRN" : ostr(20) = "SSD1    " 'sediment conc mg/l AVER
-    '    Member(21) = "SSED" : Sub1(21) = 2 : Group(21) = "SEDTRN" : ostr(21) = "SSD2    " 'sediment conc mg/l AVER
-    '    Member(22) = "SSED" : Sub1(22) = 3 : Group(22) = "SEDTRN" : ostr(22) = "SSD3    " 'sediment conc mg/l AVER
-    '    Member(23) = "TIQAL" : Sub1(23) = 1 : Group(23) = "GQUAL" : ostr(23) = "TIQ1    " 'total inflow of qual SUM
-    '    Member(24) = "TIQAL" : Sub1(24) = 2 : Group(24) = "GQUAL" : ostr(24) = "TIQ2    " 'total inflow of qual SUM
-    '    Member(25) = "TIQAL" : Sub1(25) = 3 : Group(25) = "GQUAL" : ostr(25) = "TIQ3    " 'total inflow of qual SUM
-    '    Member(26) = "NUIF2" : Sub1(26) = 4 : Group(26) = "NUTRX" : ostr(26) = "PPO4    " 'inflow of particulate po4 in lbs SUM
-    '    Member(27) = "TPKIF" : Sub1(27) = 2 : Group(27) = "PLANK" : ostr(27) = "TORP    " 'inflow of total organic p in lbs SUM
-    '    Member(28) = "TPKIF" : Sub1(28) = 5 : Group(28) = "PLANK" : ostr(28) = "TTP     " 'inflow of total p in lbs SUM
+        If aPlankFg <> 1 Then
+            aOstr(15) = ""
+            aOstr(16) = ""
+            aOstr(27) = ""
+            aOstr(28) = ""
+        End If
 
+        If aGqualFg(1) <> 1 Then 'if any organic chemicals
+            aOstr(23) = ""
+        End If
+        If aGqualFg(2) <> 1 Then
+            aOstr(24) = ""
+        End If
+        If aGqualFg(3) <> 1 Then
+            aOstr(25) = ""
+        End If
 
-    '    If plank <> 1 Then
-    '        ostr(15) = ""
-    '        ostr(16) = ""
-    '        ostr(27) = ""
-    '        ostr(28) = ""
-    '    End If
+        'check to see that all timsers have inputs
+        Dim lOper As HspfOperation = pOpnBlks.Item("RCHRES").OperFromID(aId)
+        Dim lTable As HspfTable
+        If lOper.TableExists("NUT-FLAGS") Then
+            lTable = lOper.Tables.Item("NUT-FLAGS")
+            If lTable.Parms("NH3FG").Value = 0 Then
+                aOstr(10) = ""
+            End If
+            If lTable.Parms("NO2FG").Value = 0 Then
+                aOstr(11) = ""
+            End If
+            If lTable.Parms("PO4FG").Value = 0 Then
+                aOstr(12) = ""
+            End If
+        Else
+            aOstr(10) = ""
+            aOstr(11) = ""
+            aOstr(12) = ""
+            aOstr(26) = ""
+        End If
+        If lOper.TableExists("PLNK-FLAGS") Then
+            lTable = lOper.Tables.Item("PLNK-FLAGS")
+            If lTable.Parms("PHYFG").Value = 0 Then
+                aOstr(16) = ""
+            End If
+        Else
+            aOstr(16) = ""
+        End If
 
-    '    If gqualfg(1) <> 1 Then 'if any organic chemicals
-    '        ostr(23) = ""
-    '    End If
-    '    If gqualfg(2) <> 1 Then
-    '        ostr(24) = ""
-    '    End If
-    '    If gqualfg(3) <> 1 Then
-    '        ostr(25) = ""
-    '    End If
+        aWdmId = 0
+        For lWdmIndex As Integer = 4 To 1 Step -1
+            If Not pWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
+                aWdmId = lWdmIndex
+                Exit For
+            End If
+        Next lWdmIndex
 
-    '    'check to see that all timsers have inputs
-    '    lOper = pOpnBlks.Item("RCHRES").OperFromID(Id)
-    '    If lOper.TableExists("NUT-FLAGS") Then
-    '        ltable = lOper.Tables.Item("NUT-FLAGS")
-    '        If ltable.Parms("NH3FG").Value = 0 Then
-    '            ostr(10) = ""
-    '        End If
-    '        If ltable.Parms("NO2FG").Value = 0 Then
-    '            ostr(11) = ""
-    '        End If
-    '        If ltable.Parms("PO4FG").Value = 0 Then
-    '            ostr(12) = ""
-    '        End If
-    '    Else
-    '        ostr(10) = ""
-    '        ostr(11) = ""
-    '        ostr(12) = ""
-    '        ostr(26) = ""
-    '    End If
-    '    If lOper.TableExists("PLNK-FLAGS") Then
-    '        ltable = lOper.Tables.Item("PLNK-FLAGS")
-    '        If ltable.Parms("PHYFG").Value = 0 Then
-    '            ostr(16) = ""
-    '        End If
-    '    Else
-    '        ostr(16) = ""
-    '    End If
+        If aWdmId > 0 Then
+            'okay to continue
+            Dim lDsn As Integer = aBaseDsn
+            Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(Name)
 
-    '    For i = 4 To 1 Step -1
-    '        If Not pWDMObj(i) Is Nothing Then
-    '            'use this as the output wdm
-    '            wdmid = i
-    '        End If
-    '    Next i
+            For lIndex As Integer = 1 To 28
+                'create each of the 28 aquatox dsns
 
-    '    If wdmid > 0 Then
-    '        'okay to continue
-    '        ndsn = basedsn
-    '        cscen = IO.Path.GetFileNameWithoutExtension(Name)
+                Dim lReferenced As Boolean
+                Dim lGenTs As atcData.atcTimeseries
+                If aOstr(lIndex).Length > 0 Then
+                    'if there is already a dsn with this scen/loc/cons,
+                    'and it is unused in this uci, delete it to avoid confusion
+                    Dim lDeletedDsn As Integer = 0
+                    Dim lts As Collection = FindTimser(UCase(Trim(lScenario)), Trim(aLocn), Trim(aOstr(lIndex)))
+                    For Each lGenTs In lts
+                        Dim lWid As String = GetWDMIdFromName(lGenTs.Attributes.GetValue("Data Source"))
+                        If CShort(Right(lWid, 1)) = aWdmId Then
+                            'this is on our output wdm
+                            'make sure it is not referenced in this UCI already
+                            lReferenced = False
+                            Dim lctmp As String
+                            For Each lConn As HspfConnection In Me.Connections
+                                lctmp = lConn.Target.VolName
+                                If lctmp = "WDM" Then lctmp = "WDM1"
+                                If lctmp = lWid And lConn.Target.VolId = lGenTs.Attributes.GetValue("ID") Then
+                                    'this dataset is referenced in the uci, don't delete
+                                    lReferenced = True
+                                End If
+                            Next lConn
+                            If Not lReferenced Then
+                                'delete it to avoid confusion
+                                lDeletedDsn = lGenTs.Attributes.GetValue("ID")
+                                ClearWDMDataSet(lWid, lDeletedDsn)
+                                DeleteWDMDataSet(lWid, lDeletedDsn)
+                            End If
+                        End If
+                    Next
 
-    '        For j = 1 To 28
-    '            'create each of the 28 aquatox dsns
+                    If lDeletedDsn > 0 Then
+                        lDsn = lDeletedDsn
+                    Else
+                        lDsn = FindFreeDSN(aWdmId, lDsn)
+                    End If
 
-    '            If Len(ostr(j)) > 0 Then
+                    lGenTs = New atcData.atcTimeseries(Nothing)
+                    With lGenTs.Attributes
+                        .SetValue("ID", lDsn)
+                        .SetValue("Scenario", lScenario.ToUpper)
+                        .SetValue("Constituent", aOstr(lIndex).ToUpper)
+                        .SetValue("Location", aLocn.ToUpper)
+                        .SetValue("Description", "AQUATOX Linkage Timeseries for " & aOstr(lIndex))
+                        .SetValue("TSTYPE", aOstr(lIndex).ToUpper)
+                        .SetValue("TU", aOutTu)
+                        .SetValue("TS", 1)
+                    End With
 
-    '                'if there is already a dsn with this scen/loc/cons,
-    '                'and it is unused in this uci, delete it to avoid confusion
-    '                deleteddsn = 0
-    '                FindTimser(UCase(Trim(cscen)), Trim(clocn), Trim(ostr(j)), lts)
-    '                For Each GenTs In lts
-    '                    GetWDMIDFromUnit(GenTs.File.FileUnit, wid)
-    '                    If CShort(Right(wid, 1)) = wdmid Then
-    '                        'this is on our output wdm
-    '                        'make sure it is not referenced in this UCI already
-    '                        referenced = False
-    '                        For Each vConn In Me.Connections
-    '                            lConn = vConn
-    '                            ctmp = lConn.Target.VolName
-    '                            If ctmp = "WDM" Then ctmp = "WDM1"
-    '                            If ctmp = wid And lConn.Target.VolId = GenTs.Attributes.GetValue("ID") Then
-    '                                'this dataset is referenced in the uci, don't delete
-    '                                referenced = True
-    '                            End If
-    '                        Next vConn
-    '                        If Not referenced Then
-    '                            'delete it to avoid confusion
-    '                            deleteddsn = GenTs.Attributes.GetValue("ID")
-    '                            ClearWDMDataSet(wid, deleteddsn)
-    '                            DeleteWDMDataSet(wid, deleteddsn)
-    '                        End If
-    '                    End If
-    '                Next
+                    Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+                    lGenTs.Dates = lTsDate
 
-    '                If deleteddsn > 0 Then
-    '                    ndsn = deleteddsn
-    '                Else
-    '                    ndsn = FindFreeDSN(wdmid, ndsn)
-    '                End If
-
-    '                GenTs = New atcData.atcTimeseries(Nothing)
-    '                With GenTs.Attributes
-    '                    .SetValue("ID", ndsn)
-    '                    .SetValue("Scenario", UCase(cscen))
-    '                    .SetValue("Constituent", UCase(ostr(j)))
-    '                    .SetValue("Location", UCase(clocn))
-    '                    .SetValue("Description", "AQUATOX Linkage Timeseries for " & ostr(j))
-    '                End With
-
-    '                TsDate = New atcData.atcTimeseries(Nothing)
-    '                'TODO: Create dates
-    '                'With myDateSummary
-    '                '    .CIntvl = True
-    '                '    .ts = 1
-    '                '    If j = 1 Then
-    '                '        .Tu = 3 'output vol as hourly
-    '                '    Else
-    '                '        '.Tu = 4 'the rest as daily by default, or hourly if requested
-    '                '        .Tu = outtu
-    '                '    End If
-    '                '    .Intvl = 1
-    '                'End With
-    '                'TsDate.Summary = myDateSummary
-    '                GenTs.Dates = TsDate
-
-    '                GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
-    '                addeddsn = pWDMObj(wdmid).AddDataset(GenTs, 0)
-    '                adsn(j) = ndsn
-    '            End If
-    '        Next j
-    '    Else
-    '        'no wdm files in this uci
-    '        Call MsgBox("No WDM Files are available with this UCI, so no AQUATOX locations may be added", MsgBoxStyle.OkOnly, "Add Problem")
-    '    End If
-    'End Sub
+                    Dim lAddedDsn As Boolean = pWDMObj(aWdmId).AddDataset(lGenTs)
+                    aDsn(lIndex) = lDsn
+                End If
+            Next
+        Else
+            'no wdm files in this uci
+            Logger.Msg("No WDM Files are available with this UCI, so no AQUATOX locations may be added", MsgBoxStyle.OkOnly, "Add Problem")
+        End If
+    End Sub
 
     Public Sub AddExpertExtTargets(ByRef reachid As Integer, _
                                    ByRef copyid As Integer, _

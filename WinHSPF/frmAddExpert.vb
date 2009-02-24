@@ -25,81 +25,71 @@ Public Class frmAddExpert
 
         Select Case pCheckedRadioIndex
             Case 1 'Hydrology Calibration
-                ListBox1.Size = New Size(350, 173)
-                ListBox2.Visible = False
+                lstOperation.Size = New Size(350, 173)
+                lstGroup.Visible = False
                 txtDescription.Visible = False
                 optH.Visible = False
                 optD.Visible = False
-                Label2.Visible = False
+                lblGroup.Visible = False
             Case 2 'Flow
-                ListBox1.Size = New Size(350, 173)
-                ListBox2.Visible = False
+                lstOperation.Size = New Size(350, 173)
+                lstGroup.Visible = False
                 txtDescription.Visible = False
-                Label2.Visible = False
+                lblGroup.Visible = False
             Case 3 'AQUATOX Linkage
-                ListBox1.Size = New Size(350, 173)
-                ListBox2.Visible = False
+                lstOperation.Size = New Size(350, 173)
+                lstGroup.Visible = False
                 txtDescription.Visible = False
-                Label2.Visible = False
+                lblGroup.Visible = False
             Case 5 'Copy All
-                Label1.Text = "From Operation"
-                Label2.Text = "To Operation"
-                ListBox2.Items.Add("<select origin operation>")
+                lblOperation.Text = "From Operation"
+                lblGroup.Text = "To Operation"
+                lstGroup.Items.Add("<select origin operation>")
                 Me.Text = "WinHSPF - Copy Output"
                 txtDescription.Visible = False
         End Select
 
-        Dim lHspfOperation As HspfOperation
-        Dim i, lIndex2 As Integer
-        Dim S As String
-        Dim lFoundFlag As Boolean
-
         pListBox1DataItems.Clear()
 
         If pCheckedRadioIndex = 4 Then 'other types
-            ListBox2.Enabled = False
-            Label2.Enabled = False
-            For i = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
-                lHspfOperation = pUCI.OpnSeqBlock.Opn(i)
+            lstGroup.Enabled = False
+            lblGroup.Enabled = False
+            For lIndex As Integer = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
+                Dim lHspfOperation As HspfOperation = pUCI.OpnSeqBlock.Opn(lIndex)
                 If lHspfOperation.Name = "RCHRES" Or lHspfOperation.Name = "PERLND" Or lHspfOperation.Name = "IMPLND" Or lHspfOperation.Name = "BMPRAC" Then
-                    S = lHspfOperation.Name & " " & lHspfOperation.Id & " (" & lHspfOperation.Description & ")"
-                    ListBox1.Items.Add(S)
+                    lstOperation.Items.Add(lHspfOperation.Name & " " & lHspfOperation.Id & " (" & lHspfOperation.Description & ")")
                     pListBox1DataItems.Add(lHspfOperation.Id)
                 End If
-            Next i
+            Next
         ElseIf pCheckedRadioIndex = 1 Or pCheckedRadioIndex = 2 Or pCheckedRadioIndex = 3 Then 'calib or flow or aquatox
-            ListBox2.Enabled = False
-            For i = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
-                lHspfOperation = pUCI.OpnSeqBlock.Opn(i)
+            lstGroup.Enabled = False
+            For lIndex As Integer = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
+                Dim lHspfOperation As HspfOperation = pUCI.OpnSeqBlock.Opn(lIndex)
                 If lHspfOperation.Name = "RCHRES" Then
-                    S = lHspfOperation.Name & " " & lHspfOperation.Id & " (" & lHspfOperation.Description & ")"
-                    ListBox1.Items.Add(S)
+                    lstOperation.Items.Add(lHspfOperation.Name & " " & lHspfOperation.Id & " (" & lHspfOperation.Description & ")")
                     pListBox1DataItems.Add(lHspfOperation.Id)
                 End If
-            Next i
+            Next
         ElseIf pCheckedRadioIndex = 5 Then 'copy
-            ListBox1.Items.Clear()
-            ListBox2.Enabled = False
+            lstOperation.Items.Clear()
+            lstGroup.Enabled = False
 
-            For i = 1 To pfrmOutput.agdOutput.Source.Rows - 1
-
-                lFoundFlag = False
-                For lIndex2 = 0 To ListBox1.Items.Count - 1
-                    If pfrmOutput.agdOutput.Source.CellValue(i, 0) = ListBox1.Items.Item(lIndex2) Then
+            For lIndex As Integer = 1 To pfrmOutput.agdOutput.Source.Rows - 1
+                Dim lFoundFlag As Boolean = False
+                For lIndex2 As Integer = 0 To lstOperation.Items.Count - 1
+                    If pfrmOutput.agdOutput.Source.CellValue(lIndex, 0) = lstOperation.Items.Item(lIndex2) Then
                         lFoundFlag = True
                         Exit For
                     End If
                 Next
-
                 If Not lFoundFlag Then
-                    ListBox1.Items.Add(pfrmOutput.agdOutput.Source.CellValue(i, 0))
+                    lstOperation.Items.Add(pfrmOutput.agdOutput.Source.CellValue(lIndex, 0))
                 End If
-
             Next
 
         End If
 
-        If pCheckedRadioIndex = 2 Or pCheckedRadioIndex = 3 Or pCheckedRadioIndex = 5 Then
+        If pCheckedRadioIndex = 2 Or pCheckedRadioIndex = 3 Or pCheckedRadioIndex = 4 Then
             'give option of output timeunits if hourly run, otherwise always daily
             If pUCI.OpnSeqBlock.Delt <= 60 Then
                 optH.Enabled = True
@@ -112,109 +102,110 @@ Public Class frmAddExpert
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Dim ostr$(28), copyid&, ContribArea!
-        Dim lTable As HspfTable, WDMId&, newdsn&, spacepos&, parenpos&
-        Dim opname$, tmem$, group$, mem$, colonpos&, crem$, commapos&, sub1&, sub2&
-        Dim found As Boolean, gqualfg&(3), tempmem$
-        Dim fromOper As HspfOperation
-        Dim toOper As HspfOperation
-        Dim lOper As HspfOperation
-        Dim member(28), tgroup(28), ctemp As String
-        Dim vConn As Object, vToConn As Object
-        Dim lConn As HspfConnection, lToConn As HspfConnection
-        Dim fromcalib As Boolean, outtu As Long
-        Dim Id, lTrans As String
-        Dim msub1(28), adsn(28) As Integer
+
         Dim lDialogResult As Windows.Forms.DialogResult = Nothing
 
+        Dim lOutTu As Integer
         If optH.Checked Then
-            outtu = 3  'hourly
+            lOutTu = 3  'hourly
         End If
-
         If optD.Checked Then
-            outtu = 4  'daily
+            lOutTu = 4  'daily
         End If
 
+        Dim lId As Integer
+        Dim lOstr(28) As String
+        Dim lDsns(28) As Integer
         If pCheckedRadioIndex = 1 Then 'add calib location
-            If ListBox1.SelectedIndex > -1 Then
-                Id = pListBox1DataItems.Item(ListBox1.SelectedIndex + 1)
-                If Not pfrmOutput.IsCalibLocation("RCHRES", (Id)) Then
+            If lstOperation.SelectedIndex > -1 Then
+                lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
+                If Not pfrmOutput.IsCalibLocation("RCHRES", lId) Then
                     Me.Cursor = Cursors.WaitCursor
                     'add data sets
-                    pUCI.AddExpertDsns(Id, Label1.Text, atxBase.Text, adsn, ostr)
+                    pUCI.AddExpertDsns(lId, lblOperation.Text, atxBase.Text, lDsns, lOstr)
                     'add to copy block
-                    copyid = 1
-                    pUCI.AddOperation("COPY", copyid)
-                    pUCI.AddTable("COPY", copyid, "TIMESERIES")
-                    lTable = pUCI.OpnBlks("COPY").OperFromID(copyid).Tables("TIMESERIES")
+                    Dim lCopyId As Integer = 1
+                    pUCI.AddOperation("COPY", lCopyId)
+                    pUCI.AddTable("COPY", lCopyId, "TIMESERIES")
+                    Dim lTable As HspfTable = pUCI.OpnBlks("COPY").OperFromID(lCopyId).Tables("TIMESERIES")
                     lTable.Parms("NMN").Value = 7
                     'add to opn seq block
-                    pUCI.OpnSeqBlock.Add(pUCI.OpnBlks("COPY").OperFromID(copyid))
+                    pUCI.OpnSeqBlock.Add(pUCI.OpnBlks("COPY").OperFromID(lCopyId))
                     'add to ext targets block
-                    ContribArea = pUCI.UpstreamArea(pUCI.OpnBlks.Item("RCHRES").OperFromID(Id))
-                    pUCI.AddExpertExtTargets(Id, copyid, ContribArea, adsn, ostr)
+                    Dim lContribArea As Double = pUCI.UpstreamArea(pUCI.OpnBlks.Item("RCHRES").OperFromID(lId))
+                    pUCI.AddExpertExtTargets(lId, lCopyId, lContribArea, lDsns, lOstr)
                     'add mass-link and schematic copy records
-                    pUCI.AddExpertSchematic(Id, copyid)
+                    pUCI.AddExpertSchematic(lId, lCopyId)
                     pUCI.Edited = True
                     Me.Cursor = Cursors.Arrow
                 End If
             End If
         ElseIf pCheckedRadioIndex = 2 Then 'add flow location
-            If ListBox1.SelectedIndex > -1 Then
-                Id = pListBox1DataItems.Item(ListBox1.SelectedIndex + 1)
-                pUCI.AddOutputWDMDataSetExt(Label1.Text, "FLOW", atxBase.Text, WDMId, outtu, "", newdsn)
-                pUCI.AddExtTarget("RCHRES", Id, "HYDR", "RO", 1, 1, 1.0#, "AVER", _
-                       "WDM" & CStr(WDMId), newdsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
+            If lstOperation.SelectedIndex > -1 Then
+                lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
+                Dim lWDMId As Integer
+                Dim lNewDsn As Integer
+                pUCI.AddOutputWDMDataSetExt(lblOperation.Text, "FLOW", atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
+                pUCI.AddExtTarget("RCHRES", lId, "HYDR", "RO", 1, 1, 1.0#, "AVER", _
+                       "WDM" & CStr(lWDMId), lNewDsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
                 pUCI.Edited = True
             End If
         ElseIf pCheckedRadioIndex = 4 Then 'add this other output
-            If ListBox1.SelectedIndex > -1 And ListBox2.SelectedIndex > -1 Then
-                spacepos = InStr(1, ListBox1.Items(ListBox1.SelectedIndex), " ")
-                parenpos = InStr(1, ListBox1.Items(ListBox1.SelectedIndex), "(")
-                If spacepos > 0 And parenpos > 0 Then
+            If lstOperation.SelectedIndex > -1 And lstGroup.SelectedIndex > -1 Then
+                Dim lSpacePos As Integer = InStr(1, lstOperation.Items(lstOperation.SelectedIndex), " ")
+                Dim lParenPos As Integer = InStr(1, lstOperation.Items(lstOperation.SelectedIndex), "(")
+                If lSpacePos > 0 And lParenPos > 0 Then
                     'parse operation name and id
-                    Id = CInt(Mid(ListBox1.Items(ListBox1.SelectedIndex), spacepos, parenpos - spacepos))
-                    opname = Mid(ListBox1.Items(ListBox1.SelectedIndex), 1, spacepos - 1)
-                    If Id > 0 And Len(opname) > 0 Then
+                    lId = CInt(Mid(lstOperation.Items(lstOperation.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
+                    Dim lOpName As String = Mid(lstOperation.Items(lstOperation.SelectedIndex), 1, lSpacePos - 1)
+                    If lId > 0 And Len(lOpName) > 0 Then
+                        Dim lSub1 As Integer
+                        Dim lSub2 As Integer
+                        Dim lGroup As String
+                        Dim lMem As String
+                        Dim lTempMem As String
                         'parse member name
-                        tmem = ListBox2.Items(ListBox2.SelectedIndex)
-                        parenpos = InStr(1, tmem, "(")
-                        colonpos = InStr(1, tmem, ":")
-                        If parenpos > 0 Then 'has subscripts
-                            crem = Mid(tmem, parenpos)
-                            commapos = InStr(1, crem, ",")
-                            If commapos > 0 Then
-                                sub1 = CInt(Mid(crem, 2, commapos - 2))
-                                sub2 = CInt(Mid(crem, commapos + 1, Len(crem) - commapos - 1))
+                        Dim lTmem As String = lstGroup.Items(lstGroup.SelectedIndex)
+                        lParenPos = InStr(1, lTmem, "(")
+                        Dim lColonPos As Integer = InStr(1, lTmem, ":")
+                        If lParenPos > 0 Then 'has subscripts
+                            Dim lcRem As String = Mid(lTmem, lParenPos)
+                            Dim lCommaPos As String = InStr(1, lcRem, ",")
+                            If lCommaPos > 0 Then
+                                lSub1 = CInt(Mid(lcRem, 2, lCommaPos - 2))
+                                lSub2 = CInt(Mid(lcRem, lCommaPos + 1, Len(lcRem) - lCommaPos - 1))
                             Else
-                                sub1 = CInt(Mid(crem, 2, Len(crem) - 1))
-                                sub2 = 1
+                                lSub1 = CInt(Mid(lcRem, 2, Len(lcRem) - 1))
+                                lSub2 = 1
                             End If
-                            mem = Mid(tmem, colonpos + 1, parenpos - colonpos - 1)
-                            group = Mid(tmem, 1, colonpos - 1)
-                            tempmem = mem & CStr(sub1)
+                            lMem = Mid(lTmem, lColonPos + 1, lParenPos - lColonPos - 1)
+                            lGroup = Mid(lTmem, 1, lColonPos - 1)
+                            lTempMem = lMem & CStr(lSub1)
 
                             '.net conversion note: This is implemented with the assumption that pfrmAddExpert is opened with pfrmOutput as its parent.
-                            If pfrmOutput.TSMaxSubscript(2, group, mem) > 1 Then
-                                tempmem = tempmem & CStr(sub2)
+                            If pfrmOutput.TSMaxSubscript(2, lGroup, lMem) > 1 Then
+                                lTempMem = lTempMem & CStr(lSub2)
                             End If
                         Else
-                            sub1 = 1
-                            sub2 = 1
-                            mem = Mid(tmem, colonpos + 1)
-                            tempmem = mem
+                            lSub1 = 1
+                            lSub2 = 1
+                            lMem = Mid(lTmem, lColonPos + 1)
+                            lTempMem = lMem
                         End If
-                        group = Mid(tmem, 1, colonpos - 1)
+                        lGroup = Mid(lTmem, 1, lColonPos - 1)
                         'now add the data set
-                        If outtu = 3 Then
+                        Dim lTrans As String
+                        If lOutTu = 3 Then
                             'hourly, use blank transform
                             lTrans = "    "
                         Else
                             lTrans = "AVER"
                         End If
-                        pUCI.AddOutputWDMDataSetExt(Label1.Text, tempmem, atxBase.Text, WDMId, outtu, "", newdsn)
-                        pUCI.AddExtTarget(opname, Id, group, mem, sub1, sub2, 1.0#, lTrans, _
-                             "WDM" & CStr(WDMId), newdsn, tempmem, 1, "ENGL", "AGGR", "REPL")
+                        Dim lWDMId As Integer
+                        Dim lNewDsn As Integer
+                        pUCI.AddOutputWDMDataSetExt(lblOperation.Text, lTempMem, atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
+                        pUCI.AddExtTarget(lOpName, lId, lGroup, lMem, lSub1, lSub2, 1.0#, lTrans, _
+                             "WDM" & CStr(lWDMId), lNewDsn, lTempMem, 1, "ENGL", "AGGR", "REPL")
                         pUCI.Edited = True
                     End If
                 End If
@@ -222,94 +213,99 @@ Public Class frmAddExpert
                 lDialogResult = Logger.Message("An operation and group/member must be selected.", "Add Output Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
             End If
         ElseIf pCheckedRadioIndex = 5 Then 'copy
-            If ListBox2.Items.Count > 0 And ListBox2.SelectedIndex > -1 Then
+            If lstGroup.Items.Count > 0 And lstGroup.SelectedIndex > -1 Then
                 'something selected in both lists
-                ctemp = ListBox1.Items(ListBox1.SelectedIndex)
-                spacepos = InStr(1, ctemp, " ")
-                opname = Mid(ctemp, 1, spacepos - 1)
-                Id = CInt(Mid(ctemp, spacepos + 1))
-                fromOper = pUCI.OpnBlks(opname).OperFromID(Id)
-                ctemp = ListBox2.Items(ListBox1.SelectedIndex)
-                spacepos = InStr(1, ctemp, " ")
-                opname = Mid(ctemp, 1, spacepos - 1)
-                Id = CInt(Mid(ctemp, spacepos + 1))
-                toOper = pUCI.OpnBlks(opname).OperFromID(Id)
-                If fromOper.Name = "RCHRES" Then
-                    fromcalib = pfrmOutput.IsCalibLocation(fromOper.Name, fromOper.Id)
+                Dim lctemp As String = lstOperation.Items(lstOperation.SelectedIndex)
+                Dim lSpacePos As Integer = InStr(1, lctemp, " ")
+                Dim lOpname As String = Mid(lctemp, 1, lSpacePos - 1)
+                lId = CInt(Mid(lctemp, lspacepos + 1))
+                Dim lFromOper As HspfOperation = pUCI.OpnBlks(lOpname).OperFromID(lId)
+                lctemp = lstGroup.Items(lstOperation.SelectedIndex)
+                lspacepos = InStr(1, lctemp, " ")
+                lOpname = Mid(lctemp, 1, lSpacePos - 1)
+                lId = CInt(Mid(lctemp, lspacepos + 1))
+                Dim lToOper As HspfOperation = pUCI.OpnBlks(lOpname).OperFromID(lId)
+                Dim lFromCalib As Boolean
+                If lFromOper.Name = "RCHRES" Then
+                    lFromCalib = pfrmOutput.IsCalibLocation(lFromOper.Name, lFromOper.Id)
                 Else
-                    fromcalib = False
+                    lFromCalib = False
                 End If
-                For Each vConn In fromOper.Targets
-                    lConn = vConn
+                For Each lConn As HspfConnection In lFromOper.Targets
                     If Mid(lConn.Target.VolName, 1, 3) = "WDM" Then
                         If lConn.Source.VolName = "COPY" Then
                             'assume this is a calibration location, skip it
                         Else
                             'this is an output from this operation, copy it
-                            If fromcalib And lConn.Source.Group = "ROFLOW" And lConn.Source.Member = "ROVOL" Then
+                            If lFromCalib And lConn.Source.Group = "ROFLOW" And lConn.Source.Member = "ROVOL" Then
                             Else
                                 'make sure we do not already have this output
-                                found = False
-                                For Each vToConn In toOper.Targets
-                                    lToConn = vToConn
+                                Dim lFound As Boolean = False
+                                For Each lToConn As HspfConnection In lToOper.Targets
                                     If lToConn.Source.Group = lConn.Source.Group And _
                                        lToConn.Source.Member = lConn.Source.Member Then
-                                        found = True
+                                        lFound = True
                                     End If
-                                Next vToConn
-                                If found = False Then
+                                Next
+                                If lFound = False Then
                                     'now add it
-                                    Call pUCI.AddOutputWDMDataSet(Label1.Text, lConn.Target.Member, atxBase.Text, WDMId, newdsn)
-                                    pUCI.AddExtTarget(toOper.Name, toOper.Id, lConn.Source.Group, lConn.Source.Member, _
+                                    Dim lWDMId As Integer
+                                    Dim lNewDsn As Integer
+                                    Call pUCI.AddOutputWDMDataSet(lblOperation.Text, lConn.Target.Member, atxBase.Text, lWDMId, lNewDsn)
+                                    pUCI.AddExtTarget(lToOper.Name, lToOper.Id, lConn.Source.Group, lConn.Source.Member, _
                                        lConn.Source.MemSub1, lConn.Source.MemSub2, lConn.MFact, lConn.Tran, _
-                                       "WDM" & CStr(WDMId), newdsn, lConn.Target.Member, lConn.Target.MemSub1, _
+                                       "WDM" & CStr(lWDMId), lNewDsn, lConn.Target.Member, lConn.Target.MemSub1, _
                                        lConn.Ssystem, lConn.Sgapstrg, lConn.Amdstrg)
                                     pUCI.Edited = True
                                 End If
                             End If
                         End If
                     End If
-                Next vConn
+                Next
             Else
                 lDialogResult = Logger.Message("An operation must be selected in the 'To Operation' list.", "Output Manager Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.OK)
             End If
         ElseIf pCheckedRadioIndex = 3 Then 'add aquatox linkage
-            If ListBox1.SelectedIndex > -1 Then
-                Id = pListBox1DataItems.Item(ListBox1.SelectedIndex + 1)
-                If Not pfrmOutput.IsAQUATOXLocation("RCHRES", (Id)) Then
+            If lstOperation.SelectedIndex > -1 Then
+                lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
+                If Not pfrmOutput.IsAQUATOXLocation("RCHRES", (lId)) Then
                     'make sure required sections are on  
-                    lOper = pUCI.OpnBlks("RCHRES").OperFromID(Id)
-                    lTable = lOper.Tables("ACTIVITY")
-                    If lTable.Parms(1).Value = 1 AndAlso lTable.Parms(4).Value = 1 AndAlso lTable.Parms(5).Value = 1 AndAlso lTable.Parms(7).Value = 1 AndAlso lTable.Parms(8).Value = 1 Then
+                    Dim lOper As HspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lId)
+                    Dim lTable As HspfTable = lOper.Tables("ACTIVITY")
+                    If lTable.Parms(0).Value = 1 AndAlso lTable.Parms(3).Value = 1 AndAlso lTable.Parms(4).Value = 1 AndAlso lTable.Parms(6).Value = 1 AndAlso lTable.Parms(7).Value = 1 Then
                         'all required rchres sections are on
                         '(hydr, htrch, sedtrn, oxrx, nutrx)
-                        CheckGQUALs(Id, gqualfg)
+                        Dim lGqualFg(3) As Integer
+                        CheckGQUALs(lId, lGqualFg)
                         Me.Cursor = Cursors.WaitCursor
                         'add data sets
-                        'pUCI.AddAQUATOXDsnsExt(Id, Label1.Text, atxBase.Text, lTable.Parms(9).Value, gqualfg, WDMId, member, msub1, tgroup, adsn, ostr, outtu)
-                        pUCI.AddExpertDsns(Id, Label1.Text, atxBase.Text, adsn, ostr)
+                        Dim lWDMId As Integer
+                        Dim lMember(28) As String
+                        Dim ltGroup(28) As String
+                        Dim lMSub1(28) As Integer
+                        pUCI.AddAQUATOXDsnsExt(lId, lblOperation.Text, atxBase.Text, lTable.Parms(8).Value, lGqualFg, lWDMId, lMember, lMSub1, ltGroup, lDsns, lOstr, lOutTu)
                         'add to ext targets block
-                        pUCI.AddAQUATOXExtTargetsExt(Id, WDMId, member, msub1, tgroup, adsn, ostr, outtu)
+                        pUCI.AddAQUATOXExtTargetsExt(lId, lWDMId, lMember, lMSub1, ltGroup, lDsns, lOstr, lOutTu)
                         pUCI.Edited = True
                         Me.Cursor = Cursors.Arrow
                     Else
-                        ctemp = ""
-                        If lTable.Parms(1).Value = 0 Then
-                            ctemp = ctemp & "HYDR "
+                        Dim lctemp As String = ""
+                        If lTable.Parms(0).Value = 0 Then
+                            lctemp = lctemp & "HYDR "
+                        End If
+                        If lTable.Parms(3).Value = 0 Then
+                            lctemp = lctemp & "HTRCH "
                         End If
                         If lTable.Parms(4).Value = 0 Then
-                            ctemp = ctemp & "HTRCH "
+                            lctemp = lctemp & "SEDTRN "
                         End If
-                        If lTable.Parms(5).Value = 0 Then
-                            ctemp = ctemp & "SEDTRN "
+                        If lTable.Parms(6).Value = 0 Then
+                            lctemp = lctemp & "OXRX "
                         End If
                         If lTable.Parms(7).Value = 0 Then
-                            ctemp = ctemp & "OXRX "
+                            lctemp = lctemp & "NUTRX "
                         End If
-                        If lTable.Parms(8).Value = 0 Then
-                            ctemp = ctemp & "NUTRX "
-                        End If
-                        lDialogResult = Logger.Message("The following required sections are not on: " & ctemp, "AQUATOX Linkage Problem", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+                        lDialogResult = Logger.Message("The following required sections are not on: " & lctemp, "AQUATOX Linkage Problem", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
                     End If
                 End If
             End If
@@ -319,125 +315,120 @@ Public Class frmAddExpert
             pfrmOutput.RefreshAll()
             Me.Dispose()
         End If
-        
+
     End Sub
 
-    Private Sub CheckGQUALs(ByVal Id&, ByVal gqualfg&())
-        Dim lTable As HspfTable
-        Dim lOper As HspfOperation
-        Dim ngqual&, i&, tname$
-        Dim qname() As String
-        Dim itemp As Integer
-        Dim vOpn As Object
-        Dim lOpn As HspfOperation
+    Private Sub CheckGQUALs(ByVal aId As Integer, ByVal aGqualFg() As Integer)
+
         Dim lDialogBoxResult As Windows.Forms.DialogResult
 
-        lOper = pUCI.OpnBlks("RCHRES").OperFromID(Id)
-        lTable = lOper.tables("ACTIVITY")
+        Dim lNgqual As Integer
+        Dim lTemp As Integer
+        Dim lOper As HspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(aId)
+        Dim lTable As HspfTable = lOper.Tables("ACTIVITY")
+
         If lTable.Parms(6).Value = 1 Then
             'gqual on
             'figure out how many gquals
-            ngqual = 0
-            For Each vOpn In pUCI.OpnBlks("RCHRES").Ids
-                lOpn = vOpn
+            lNgqual = 0
+            For Each lOpn As HspfOperation In pUCI.OpnBlks("RCHRES").Ids
                 If lOpn.TableExists("GQ-QALDATA") Then
                     If lOpn.TableExists("GQ-GENDATA") Then
-                        itemp = lOpn.Tables("GQ-GENDATA").Parms("NGQUAL").Value
+                        lTemp = lOpn.Tables("GQ-GENDATA").Parms("NGQUAL").Value
                     Else
-                        itemp = 1
+                        lTemp = 1
                     End If
-                    If itemp > ngqual Then
-                        ngqual = itemp
+                    If lTemp > lNgqual Then
+                        lNgqual = lTemp
                     End If
                 End If
-            Next vOpn
+            Next
 
-            ReDim qname(ngqual)
-            For i = 1 To ngqual
-                If i = 1 Then
-                    tname = "GQ-QALDATA"
+            Dim lQname(lNgqual) As String
+            For lIndex As Integer = 1 To lNgqual
+                Dim lTname As String
+                If lIndex = 1 Then
+                    lTname = "GQ-QALDATA"
                 Else
-                    tname = "GQ-QALDATA:" & i
+                    lTname = "GQ-QALDATA:" & lIndex
                 End If
-                qname(i) = ""
-                For Each vOpn In pUCI.OpnBlks("RCHRES").Ids
-                    lOpn = vOpn
-                    If lOpn.TableExists(tname) And Len(qname(i)) = 0 Then
-                        qname(i) = Trim(lOpn.Tables(tname).Parms("GQID").Value)
+                lQname(lIndex) = ""
+                For Each lOpn As HspfOperation In pUCI.OpnBlks("RCHRES").Ids
+                    If lOpn.TableExists(lTname) And Len(lQname(lIndex)) = 0 Then
+                        lQname(lIndex) = Trim(lOpn.Tables(lTname).Parms("GQID").Value)
                     End If
-                Next vOpn
-                lDialogBoxResult = Logger.Message("Do you want to include the total inflow of GQUAL " & i & " (" & qname(i) & ") in the AQUATOX Linkage?", "AQUATOX Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
-
+                Next
+                lDialogBoxResult = Logger.Message("Do you want to include the total inflow of GQUAL " & lIndex & " (" & lQname(lIndex) & ") in the AQUATOX Linkage?", "AQUATOX Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question, Windows.Forms.DialogResult.Yes)
 
                 If lDialogBoxResult = Windows.Forms.DialogResult.Yes Then
-                    gqualfg(i) = 1
+                    aGqualFg(lIndex) = 1
                 ElseIf lDialogBoxResult = Windows.Forms.DialogResult.No Then
-                    gqualfg(i) = 0
+                    aGqualFg(lIndex) = 0
                 End If
-            Next i
+            Next
         Else
-            gqualfg(1) = 0
-            gqualfg(2) = 0
-            gqualfg(3) = 0
+            aGqualFg(1) = 0
+            aGqualFg(2) = 0
+            aGqualFg(3) = 0
         End If
     End Sub
 
-    Private Sub ListBox2_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox2.SelectedIndexChanged
-        Dim spacepos&, parenpos&, Id&, opname$, colonpos&
-        Dim lOper As HspfOperation, group$, mem$
-        Dim i, j, lGetMemberDefAtIndex As Integer
-        Dim lGroupDef As HspfTSGroupDef
+    Private Sub ListBox2_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstGroup.SelectedIndexChanged
 
-        spacepos = InStr(1, ListBox2.Items.Item(ListBox2.SelectedIndex), " ")
-        parenpos = InStr(1, ListBox2.Items.Item(ListBox2.SelectedIndex), "(")
-        If parenpos = 0 Then parenpos = Len(ListBox2.Items.Item(ListBox2.SelectedIndex)) + 1
-        If spacepos > 0 And parenpos > 0 Then
-            Id = CInt(Mid(ListBox2.Items.Item(ListBox2.SelectedIndex), spacepos, parenpos - spacepos))
-            opname = Mid(ListBox2.Items.Item(ListBox2.SelectedIndex), 1, spacepos - 1)
-            If Id > 0 And Len(opname) > 0 Then
-                If opname = "PERLND" Then
-                    txtLoc.Text = "P" & CStr(Id)
-                ElseIf opname = "IMPLND" Then
-                    txtLoc.Text = "I" & CStr(Id)
-                ElseIf opname = "RCHRES" Then
-                    txtLoc.Text = "RCH" & CStr(Id)
-                ElseIf opname = "BMPRAC" Then
-                    txtLoc.Text = "BMP" & CStr(Id)
+        Dim lId As Integer
+        Dim lOpName As String
+        Dim lSpacePos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), " ")
+        Dim lParenPos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), "(")
+        If lParenPos = 0 Then lParenPos = Len(lstGroup.Items.Item(lstGroup.SelectedIndex)) + 1
+        If lSpacePos > 0 And lParenPos > 0 Then
+            lId = CInt(Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
+            lOpName = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), 1, lSpacePos - 1)
+            If lId > 0 And Len(lOpName) > 0 Then
+                If lOpName = "PERLND" Then
+                    txtLoc.Text = "P" & CStr(lId)
+                ElseIf lOpName = "IMPLND" Then
+                    txtLoc.Text = "I" & CStr(lId)
+                ElseIf lOpName = "RCHRES" Then
+                    txtLoc.Text = "RCH" & CStr(lId)
+                ElseIf lOpName = "BMPRAC" Then
+                    txtLoc.Text = "BMP" & CStr(lId)
                 End If
             End If
         End If
         'set desc text
-        spacepos = InStr(1, ListBox1.Items.Item(ListBox1.SelectedIndex), " ")
-        parenpos = InStr(1, ListBox1.Items.Item(ListBox1.SelectedIndex), "(")
-        If spacepos > 0 And parenpos > 0 Then
-            Id = CInt(Mid(ListBox1.Items.Item(ListBox1.SelectedIndex), spacepos, parenpos - spacepos))
-            opname = Mid(ListBox1.Items.Item(ListBox1.SelectedIndex), 1, spacepos - 1)
-            If Id > 0 And Len(opname) > 0 Then
-                lOper = pUCI.OpnBlks(opname).OperFromID(Id)
-                colonpos = InStr(1, ListBox2.Items.Item(ListBox2.SelectedIndex), ":")
-                If colonpos > 0 Then
-                    group = Mid(ListBox2.Items.Item(ListBox2.SelectedIndex), 1, colonpos - 1)
-                    parenpos = InStr(1, ListBox2.Items.Item(ListBox2.SelectedIndex), "(")
-                    If parenpos > 0 Then
-                        mem = Mid(ListBox2.Items.Item(ListBox2.SelectedIndex), colonpos + 1, parenpos - colonpos - 1)
+        lSpacePos = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), " ")
+        lParenPos = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), "(")
+        If lSpacePos > 0 And lParenPos > 0 Then
+            lId = CInt(Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
+            lOpName = Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), 1, lSpacePos - 1)
+            If lId > 0 And Len(lOpName) > 0 Then
+                Dim lOper As HspfOperation = pUCI.OpnBlks(lOpName).OperFromID(lId)
+                Dim lColonPos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), ":")
+                If lColonPos > 0 Then
+                    Dim lGroup As String = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), 1, lColonPos - 1)
+                    lParenPos = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), "(")
+                    Dim lMem As String
+                    If lParenPos > 0 Then
+                        lMem = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lColonPos + 1, lParenPos - lColonPos - 1)
                     Else
-                        mem = Mid(ListBox2.Items.Item(ListBox2.SelectedIndex), colonpos + 1)
+                        lMem = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lColonPos + 1)
                     End If
 
-                    For i = 0 To pUCI.Msg.TSGroupDefs.Count - 1
-                        If pUCI.Msg.TSGroupDefs.Item(i).Name = group Then
-                            lGroupDef = pUCI.Msg.TSGroupDefs.Item(i)
+                    For lIndex As Integer = 0 To pUCI.Msg.TSGroupDefs.Count - 1
+                        If pUCI.Msg.TSGroupDefs.Item(lIndex).Name = lGroup Then
+                            Dim lGroupDef As HspfTSGroupDef = pUCI.Msg.TSGroupDefs.Item(lIndex)
+                            Dim lGetMemberDefAtIndex As Integer
 
                             '.net conversion issue: Becuase no method to fetch via key in lGroupDef.MemberDefs was found, this loop does it manually.
-                            For j = 0 To lGroupDef.MemberDefs.Count - 1
-                                If lGroupDef.MemberDefs.Item(j).Name = mem Then
-                                    lGetMemberDefAtIndex = j
+                            For lIndex2 As Integer = 0 To lGroupDef.MemberDefs.Count - 1
+                                If lGroupDef.MemberDefs.Item(lIndex2).Name = lMem Then
+                                    lGetMemberDefAtIndex = lIndex2
                                     Exit For
                                 End If
                             Next
 
                             'now set the text
-                            txtDescription.Text = group & ":" & mem & " - " & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).Defn
+                            txtDescription.Text = lGroup & ":" & lMem & " - " & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).Defn
                             If pUCI.GlobalBlock.EmFg = 1 Then
                                 txtDescription.Text = txtDescription.Text & " (" & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).EUnits & ")"
                             Else
@@ -445,110 +436,98 @@ Public Class frmAddExpert
                             End If
                             Exit For
                         End If
-
-
-                    Next i
+                    Next
                 End If
             End If
         End If
     End Sub
 
-    Private Sub ListBox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox1.SelectedIndexChanged
-        Dim Id&, spacepos&, parenpos&, opname$
-        Dim lOper As HspfOperation, lsub$
-        Dim ctimser As Collection(Of HspfStatusType)
-        Dim vTimser As Object, lTimser As HspfStatusType
-        Dim ctemp As String
-        Dim i As Integer
-        Dim exttarget As Boolean
-        Dim lOpnBlk As HspfOpnBlk
-        Dim vConn As Object, lConn As HspfConnection
+    Private Sub ListBox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstOperation.SelectedIndexChanged
 
+        Dim lId As Integer
         If pCheckedRadioIndex = 1 Or pCheckedRadioIndex = 2 Or pCheckedRadioIndex = 3 Then
-            Id = pListBox1DataItems.Item(ListBox1.SelectedIndex + 1)
-            txtLoc.Text = "RCH" & CStr(Id)
+            lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
+            txtLoc.Text = "RCH" & CStr(lId)
         ElseIf pCheckedRadioIndex = 4 Then
             txtDescription.Text = ""
-            spacepos = InStr(1, ListBox1.Items.Item(ListBox1.SelectedIndex), " ")
-            parenpos = InStr(1, ListBox1.Items.Item(ListBox1.SelectedIndex), "(")
-            If spacepos > 0 And parenpos > 0 Then
-                Id = CInt(Mid(ListBox1.Items.Item(ListBox1.SelectedIndex), spacepos, parenpos - spacepos))
-                opname = Mid(ListBox1.Items.Item(ListBox1.SelectedIndex), 1, spacepos - 1)
-                If Id > 0 And Len(opname) > 0 Then
-                    lOper = pUCI.OpnBlks(opname).OperFromID(Id)
+            Dim lSpacePos As Integer = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), " ")
+            Dim lParenPos As Integer = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), "(")
+            If lSpacePos > 0 And lParenPos > 0 Then
+                lId = CInt(Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
+                Dim lOpName As String = Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), 1, lSpacePos - 1)
+                If lId > 0 And Len(lOpName) > 0 Then
+                    Dim lOper As HspfOperation = pUCI.OpnBlks(lOpName).OperFromID(lId)
                     If Not lOper Is Nothing Then
-                        If opname = "PERLND" Then
-                            txtLoc.Text = "P" & CStr(Id)
-                        ElseIf opname = "IMPLND" Then
-                            txtLoc.Text = "I" & CStr(Id)
-                        ElseIf opname = "RCHRES" Then
-                            txtLoc.Text = "RCH" & CStr(Id)
-                        ElseIf opname = "BMPRAC" Then
-                            txtLoc.Text = "BMP" & CStr(Id)
+                        If lOpName = "PERLND" Then
+                            txtLoc.Text = "P" & CStr(lId)
+                        ElseIf lOpName = "IMPLND" Then
+                            txtLoc.Text = "I" & CStr(lId)
+                        ElseIf lOpName = "RCHRES" Then
+                            txtLoc.Text = "RCH" & CStr(lId)
+                        ElseIf lOpName = "BMPRAC" Then
+                            txtLoc.Text = "BMP" & CStr(lId)
                         End If
                         'get possible timsers from edit operation method
                         lOper.OutputTimeseriesStatus.UpdateExtTargetsOutputs()
-                        ctimser = lOper.OutputTimeseriesStatus.GetOutputInfo(2)
-                        ListBox2.Items.Clear()
-                        For Each vTimser In ctimser
-                            lTimser = vTimser
-                            exttarget = False
+                        Dim lTimsers As Collection(Of HspfStatusType) = lOper.OutputTimeseriesStatus.GetOutputInfo(2)
+                        lstGroup.Items.Clear()
+                        For Each lTimser As HspfStatusType In lTimsers
+                            Dim lExtTarget As Boolean = False
                             If lTimser.Present Then
                                 'see if used as external target
-                                For Each vConn In lOper.Targets
-                                    lConn = vConn
+                                For Each lConn As HspfConnection In lOper.Targets
                                     If UCase(Mid(lConn.Target.VolName, 1, 3)) = "WDM" Then
                                         'used as ext target, don't add
-                                        i = InStr(1, lTimser.Name, ":")
-                                        If i > 0 Then
-                                            If lConn.Source.Group = Mid(lTimser.Name, 1, i - 1) Then
-                                                If lConn.Source.Member = Mid(lTimser.Name, i + 1) Then
+                                        Dim lIndex As Integer = InStr(1, lTimser.Name, ":")
+                                        If lIndex > 0 Then
+                                            If lConn.Source.Group = Mid(lTimser.Name, 1, lIndex - 1) Then
+                                                If lConn.Source.Member = Mid(lTimser.Name, lIndex + 1) Then
                                                     If lTimser.Max > 1 Then
                                                         If lConn.Source.MemSub1 = lTimser.Occur Mod 1000 Then
                                                             If lConn.Source.MemSub2 = CLng((1 + (lTimser.Occur) / 1000)) Then
-                                                                exttarget = True
+                                                                lExtTarget = True
                                                             End If
                                                         End If
                                                     Else
-                                                        exttarget = True
+                                                        lExtTarget = True
                                                     End If
                                                 End If
                                             End If
                                         End If
                                     End If
-                                Next vConn
+                                Next
                             End If
-                            If Not exttarget Then
+                            If Not lExtTarget Then
                                 If lTimser.Max = 1 Then
-                                    ListBox2.Items.Add(lTimser.Name)
+                                    lstGroup.Items.Add(lTimser.Name)
                                 Else
-                                    lsub = "(" & lTimser.Occur Mod 1000 & "," & CLng(1 + (lTimser.Occur) / 1000) & ")"
-                                    ListBox2.Items.Add(lTimser.Name & lsub)
+                                    Dim lSub As String = "(" & lTimser.Occur Mod 1000 & "," & CLng(1 + (lTimser.Occur) / 1000) & ")"
+                                    lstGroup.Items.Add(lTimser.Name & lSub)
                                 End If
                             End If
-                        Next vTimser
-                        ListBox2.Enabled = True
-                        Label2.Enabled = True
+                        Next
+                        lstGroup.Enabled = True
+                        lblGroup.Enabled = True
                     End If
                 End If
             End If
         ElseIf pCheckedRadioIndex = 5 Then 'copy
-            ctemp = ListBox1.Items.Item(ListBox1.SelectedIndex)
-            spacepos = InStr(1, ctemp, " ")
-            opname = Mid(ctemp, 1, spacepos - 1)
-            Id = CInt(Mid(ctemp, spacepos + 1))
-            ListBox2.Items.Clear()
-            lOpnBlk = pUCI.OpnBlks(opname)
-            For i = 1 To lOpnBlk.Count
-                lOper = lOpnBlk.NthOper(i)
-                If lOper.Id <> Id Then
-                    ListBox2.Items.Add(lOper.Name & " " & lOper.Id)
+            Dim lTemp As String = lstOperation.Items.Item(lstOperation.SelectedIndex)
+            Dim lSpacePos As Integer = InStr(1, lTemp, " ")
+            Dim lOpName As String = Mid(lTemp, 1, lSpacePos - 1)
+            lId = CInt(Mid(lTemp, lSpacePos + 1))
+            lstGroup.Items.Clear()
+            Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks(lOpName)
+            For lIndex As Integer = 1 To lOpnBlk.Count
+                Dim lOper As HspfOperation = lOpnBlk.NthOper(lIndex)
+                If lOper.Id <> lId Then
+                    lstGroup.Items.Add(lOper.Name & " " & lOper.Id)
                 End If
-            Next i
-            If ListBox2.Items.Count > 0 Then
-                ListBox2.Enabled = True
+            Next lIndex
+            If lstGroup.Items.Count > 0 Then
+                lstGroup.Enabled = True
             Else
-                ListBox2.Enabled = False
+                lstGroup.Enabled = False
             End If
         End If
     End Sub
