@@ -54,10 +54,12 @@ Public Class frmTime
 
         If IsNothing(pfrmAddMet) Then
             pfrmAddMet = New frmAddMet
+            pfrmAddMet.Init("", 0)
             pfrmAddMet.Show()
         Else
             If pfrmAddMet.IsDisposed Then
                 pfrmAddMet = New frmAddMet
+                pfrmAddMet.Init("", 0)
                 pfrmAddMet.Show()
             Else
                 pfrmAddMet.WindowState = FormWindowState.Normal
@@ -69,31 +71,28 @@ Public Class frmTime
 
     Private Sub cmdEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEdit.Click
 
-        If IsNothing(pfrmAddMet) Then
-            pfrmAddMet = New frmAddMet
-            pfrmAddMet.Show()
-        Else
-            If pfrmAddMet.IsDisposed Then
-                pfrmAddMet = New frmAddMet
-                pfrmAddMet.Show()
+        If pCurrentSelectedRow > 0 Then
+            If agdMet.Source.CellValue(pCurrentSelectedRow, 0) = "<none>" Then
+                Logger.Msg("Unable to Edit Met Segment <none>.", MsgBoxStyle.OkOnly, "Edit Met Segment Problem")
             Else
-                pfrmAddMet.WindowState = FormWindowState.Normal
-                pfrmAddMet.BringToFront()
+                If IsNothing(pfrmEditMet) Then
+                    pfrmEditMet = New frmAddMet
+                    pfrmEditMet.Init(agdMet.Source.CellValue(pCurrentSelectedRow, 0), 1)
+                    pfrmEditMet.Show()
+                Else
+                    If pfrmEditMet.IsDisposed Then
+                        pfrmEditMet = New frmAddMet
+                        pfrmEditMet.Init(agdMet.Source.CellValue(pCurrentSelectedRow, 0), 1)
+                        pfrmEditMet.Show()
+                    Else
+                        pfrmEditMet.WindowState = FormWindowState.Normal
+                        pfrmEditMet.BringToFront()
+                    End If
+                End If
             End If
+        Else
+            Logger.Msg("Select a Met Segment from the list below.", MsgBoxStyle.OkOnly, "Edit Met Segment Problem")
         End If
-
-        'If agdMet.SelCount > 0 Then
-        '    If agdMet.TextMatrix(agdMet.SelStartRow, 0) = "<none>" Then
-        '        MsgBox("Unable to Edit Met Segment <none>.", vbOKOnly, "Edit Met Segment Problem")
-        '    Else
-        '        frmAddMet.Init(agdMet.TextMatrix(agdMet.SelStartRow, 0), 1)
-        '        frmAddMet.Show(vbModal)
-        '        RefreshGrid()
-        '        DoLimits(agdMet)
-        '    End If
-        'Else
-        '    MsgBox("Select a Met Segment from the list below.", vbOKOnly, "Edit Met Segment Problem")
-        'End If
 
     End Sub
 
@@ -106,16 +105,16 @@ Public Class frmTime
             .CellValue(0, 1) = "Operation"
             For Each lHSPFOperation As HspfOperation In pUCI.OpnSeqBlock.Opns
                 If lHSPFOperation.Name = "PERLND" Or lHSPFOperation.Name = "IMPLND" Or lHSPFOperation.Name = "RCHRES" Then
-                    Dim lmetseg As HspfMetSeg = lHSPFOperation.MetSeg
                     Dim lRow As Integer = .Rows
+                    Dim lmetseg As HspfMetSeg = lHSPFOperation.MetSeg
                     If lmetseg Is Nothing Then
                         .CellValue(lRow, 0) = "<none>"
                     Else
                         .CellValue(lRow, 0) = lmetseg.Name
                     End If
                     .CellValue(lRow, 1) = lHSPFOperation.Name & " " & lHSPFOperation.Id
+                    .CellEditable(lRow, 0) = True
                 End If
-                .CellEditable(1, 0) = True
             Next
         End With
 
@@ -387,8 +386,18 @@ Public Class frmTime
     End Sub
 
     Private Sub agdMet_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles agdMet.Click
+        DoLimits()
+    End Sub
+
+    Private Sub agdMet_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMet.MouseDownCell
+        pCurrentSelectedRow = aRow
+        DoLimits()
+    End Sub
+
+    Private Sub DoLimits()
         Dim lValidValues As New Collection
 
+        lValidValues.Add("<none>")
         For Each lMetseg As HspfMetSeg In pUCI.MetSegs
             lValidValues.Add(lMetseg.Name)
         Next
@@ -403,10 +412,5 @@ Public Class frmTime
         Else
             cmdApply.Enabled = False
         End If
-
-    End Sub
-
-    Private Sub agdMet_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMet.MouseDownCell
-        pCurrentSelectedRow = aRow
     End Sub
 End Class
