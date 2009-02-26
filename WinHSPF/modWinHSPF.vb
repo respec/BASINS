@@ -19,6 +19,7 @@ Public Module WinHSPF
     Friend pfrmActivityAll As frmActivityAll
     Friend pfrmAddExpert As frmAddExpert
     Friend pfrmAddMet As frmAddMet
+    Friend pfrmEditMet As frmAddMet
     Friend pfrmControl As frmControl
     Friend pfrmInputDataEditor As frmInputDataEditor
     Friend pfrmLand As frmLand

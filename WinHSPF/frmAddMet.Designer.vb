@@ -30,18 +30,21 @@ Partial Class frmAddMet
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(10, 14)
+        Me.Label1.Location = New System.Drawing.Point(13, 17)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(38, 13)
+        Me.Label1.Size = New System.Drawing.Size(49, 17)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Name:"
         '
         'cboName
         '
+        Me.cboName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboName.FormattingEnabled = True
-        Me.cboName.Location = New System.Drawing.Point(53, 10)
+        Me.cboName.Location = New System.Drawing.Point(71, 12)
+        Me.cboName.Margin = New System.Windows.Forms.Padding(4)
         Me.cboName.Name = "cboName"
-        Me.cboName.Size = New System.Drawing.Size(308, 21)
+        Me.cboName.Size = New System.Drawing.Size(409, 24)
         Me.cboName.TabIndex = 1
         '
         'agdMet
@@ -55,18 +58,20 @@ Partial Class frmAddMet
         Me.agdMet.Fixed3D = False
         Me.agdMet.LineColor = System.Drawing.Color.Empty
         Me.agdMet.LineWidth = 0.0!
-        Me.agdMet.Location = New System.Drawing.Point(11, 47)
+        Me.agdMet.Location = New System.Drawing.Point(15, 58)
+        Me.agdMet.Margin = New System.Windows.Forms.Padding(4)
         Me.agdMet.Name = "agdMet"
-        Me.agdMet.Size = New System.Drawing.Size(488, 249)
+        Me.agdMet.Size = New System.Drawing.Size(651, 306)
         Me.agdMet.Source = Nothing
         Me.agdMet.TabIndex = 2
         '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.cmdCancel.Location = New System.Drawing.Point(263, 313)
+        Me.cmdCancel.Location = New System.Drawing.Point(351, 385)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(76, 25)
+        Me.cmdCancel.Size = New System.Drawing.Size(101, 31)
         Me.cmdCancel.TabIndex = 8
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
@@ -74,9 +79,10 @@ Partial Class frmAddMet
         'cmdOK
         '
         Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.cmdOK.Location = New System.Drawing.Point(175, 313)
+        Me.cmdOK.Location = New System.Drawing.Point(233, 385)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(76, 25)
+        Me.cmdOK.Size = New System.Drawing.Size(101, 31)
         Me.cmdOK.TabIndex = 7
         Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
@@ -84,23 +90,24 @@ Partial Class frmAddMet
         'lblName
         '
         Me.lblName.AutoSize = True
-        Me.lblName.Location = New System.Drawing.Point(59, 14)
+        Me.lblName.Location = New System.Drawing.Point(78, 15)
         Me.lblName.Name = "lblName"
-        Me.lblName.Size = New System.Drawing.Size(38, 13)
+        Me.lblName.Size = New System.Drawing.Size(59, 17)
         Me.lblName.TabIndex = 9
-        Me.lblName.Text = "Name:"
+        Me.lblName.Text = "lblName"
         '
         'frmAddMet
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(515, 350)
+        Me.ClientSize = New System.Drawing.Size(687, 431)
         Me.Controls.Add(Me.lblName)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.agdMet)
         Me.Controls.Add(Me.cboName)
         Me.Controls.Add(Me.Label1)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAddMet"
         Me.Text = "WinHSPF - Add Met Segment"
         Me.ResumeLayout(False)

@@ -173,26 +173,6 @@ Public Class HspfUci
         'End If
     End Sub
 
-    'Public Property IPC() As Object
-    '    Get
-    '        Return pIPC
-    '    End Get
-    '    Set(ByVal Value As Object)
-    '        pIPC = Value
-    '        If pIPC Is Nothing Then IPCset = False Else IPCset = True
-
-    '        'With pHspfEngine.launch
-    '        '.SendComputeMessage "SPIPH " & .ComputeReadFromParent & " " & .ComputeWriteToParent
-    '        '.SendComputeMessage "W99OPN"
-    '        'Call F90_W99OPN  'open error file for fortan problems
-    '        'Call F90_WDBFIN  'initialize WDM record buffer
-    '        '.SendComputeMessage "PUTOLV 10"
-    '        'Call F90_PUTOLV(10)
-    '        'Call F90_SCNDBG(-1)
-    '        'End With
-    '    End Set
-    'End Property
-
     'Public WriteOnly Property HelpFile() As String
     '	Set(ByVal Value As String)
     '		'UPGRADE_ISSUE: App property App.HelpFile was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
@@ -1061,56 +1041,34 @@ Public Class HspfUci
         Call F90_FILSTA(lMsg, lMsg.Length)
     End Sub
 
-    'Public Sub GetMetSegNames(ByRef fun As Integer, ByRef numMetSeg As Integer, ByRef arrayMetSegs() As String, ByRef lMetDetails() As String, ByRef lMetDescs() As String)
-    '    Dim i, dsn, j As Integer
-    '    Dim lLocation As String
-    '    Dim tempsj, tempej As Double
-    '    Dim sdat(6) As Integer
-    '    Dim edat(6) As Integer
-    '    Dim lts As Collection 'of atcotimser
-    '    Dim lTser As atcData.atcTimeseries
-    '    Dim ldate As atcData.atcTimeseries
-    '    Dim sj, ej As Double
-    '    Dim llocts As Collection 'of atcotimser
+    Public Sub GetMetSegNames(ByRef aMetSegNames As Collection, ByRef aMetSegBaseDsns As Collection, ByRef aMetSegWDMIds As Collection, ByRef aMetSegDescs As Collection)
 
-    '    numMetSeg = 0
-
-    '    'look for matching WDM datasets
-    '    Call findtimser("OBSERVED", "", "PREC", lts)
-    '    'return the names of the data sets from this wdm file
-    '    For Each lTser In lts
-    '        With lTser
-    '            lLocation = .Attributes.GetValue("Location")
-    '            If Len(lLocation) > 0 And .File.FileUnit = fun Then
-    '                'first get the common dates from prec and pevt at this location
-    '                Call findtimser("OBSERVED", lLocation, "PREC", llocts)
-    '                ldate = llocts.Item(1).Dates
-    '                sj = ldate.Value(0) '.SJDay
-    '                ej = ldate.Value(.numValues) '.EJDay
-    '                Call findtimser("", lLocation, "PEVT", llocts)
-    '                For j = 1 To llocts.Count
-    '                    ldate = llocts.Item(j).Dates
-    '                    tempsj = ldate.Value(0) '.SJDay
-    '                    tempej = ldate.Value(.numValues) '.EJDay
-    '                    If tempsj > sj Then sj = tempsj
-    '                    If tempej < ej Then ej = tempej
-    '                Next j
-    '                'now save info about this met station
-    '                numMetSeg = numMetSeg + 1
-    '                ReDim Preserve arrayMetSegs(numMetSeg)
-    '                arrayMetSegs(numMetSeg - 1) = lLocation
-    '                ReDim Preserve lMetDetails(numMetSeg)
-    '                dsn = .Attributes.GetValue("ID")
-    '                Call J2Date(sj, sdat)
-    '                Call J2Date(ej, edat)
-    '                Call timcnv(edat)
-    '                lMetDetails(numMetSeg - 1) = CStr(dsn) & "," & CStr(sdat(0)) & "," & CStr(sdat(1)) & "," & CStr(sdat(2)) & "," & CStr(sdat(3)) & "," & CStr(sdat(4)) & "," & CStr(sdat(5)) & "," & CStr(edat(0)) & "," & CStr(edat(1)) & "," & CStr(edat(2)) & "," & CStr(edat(3)) & "," & CStr(edat(4)) & "," & CStr(edat(5))
-    '                ReDim Preserve lMetDescs(numMetSeg)
-    '                lMetDescs(numMetSeg - 1) = .Attributes.GetValue("Description")
-    '            End If
-    '        End With
-    '    Next
-    'End Sub
+        'look for matching WDM datasets
+        Dim lts As Collection = FindTimser("", "", "PREC")
+        Dim lLoc As String
+        Dim lSen As String
+        'return the names of the data sets from this wdm file
+        For Each lTser As atcData.atcTimeseries In lts
+            lLoc = lTser.Attributes.GetValue("Location")
+            lSen = lTser.Attributes.GetValue("Scenario")
+            If lSen = "COMPUTED" Then
+                'see if there is also observed at this location, skip this if there is
+                Dim lLocts As Collection = FindTimser("OBSERVED", lLoc, "PREC")
+                If lLocts.Count > 0 Then
+                    lSen = "SKIP"
+                End If
+            End If
+            If lSen = "OBSERVED" Or lSen = "COMPUTED" Then
+                If Len(lLoc) > 0 Then
+                    'this is one we want, save info about this met station
+                    aMetSegNames.Add(lLoc)
+                    aMetSegBaseDsns.Add(lTser.Attributes.GetValue("ID"))
+                    aMetSegWDMIds.Add(GetWDMIdFromName(lTser.Attributes.GetValue("Data Source")))
+                    aMetSegDescs.Add(lTser.Attributes.GetValue("STANAM"))
+                End If
+            End If
+        Next
+    End Sub
 
     Private Function FindFreeDSN(ByVal aWdmId As Integer, ByVal aStartDSN As Integer) As Integer
         Dim lFreeDsn As Integer = aStartDSN + 1
