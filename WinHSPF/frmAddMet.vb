@@ -69,6 +69,13 @@ Public Class frmAddMet
             .CellValue(5, 0) = "Solar Rad"
             .CellValue(6, 0) = "Cloud"
             .CellValue(7, 0) = "Pot Evap"
+            For lRow As Integer = 1 To 7
+                .CellValue(lRow, 1) = ""
+                .CellValue(lRow, 2) = ""
+                .CellValue(lRow, 3) = ""
+                .CellValue(lRow, 4) = ""
+                .CellValue(lRow, 5) = ""
+            Next
 
             If pAddEdit = 1 Then
                 pMetSeg = Nothing
@@ -101,20 +108,24 @@ Public Class frmAddMet
                         .CellValue(lRow, 3) = ldsn & LocFromDsn(lId, ldsn)
                         .CellValue(lRow, 4) = lMetSegRec.MFactP
                         .CellValue(lRow, 5) = lMetSegRec.MFactR
-                        .CellEditable(lRow, 1) = True
-                        .CellEditable(lRow, 2) = True
-                        .CellEditable(lRow, 3) = True
-                        .CellEditable(lRow, 4) = True
-                        .CellEditable(lRow, 5) = True
                     Next
                 End If
             End If
+            For lRow As Integer = 1 To 7
+                .CellEditable(lRow, 1) = True
+                .CellEditable(lRow, 2) = True
+                .CellEditable(lRow, 3) = True
+                .CellEditable(lRow, 4) = True
+                .CellEditable(lRow, 5) = True
+            Next
         End With
 
         agdMet.SizeAllColumnsToContents()
         agdMet.Refresh()
 
-        cboName.SelectedIndex = 0
+        If cboName.Items.Count > 0 Then
+            cboName.SelectedIndex = 0
+        End If
     End Sub
 
     Sub New()
@@ -282,38 +293,47 @@ Public Class frmAddMet
                 Next
             ElseIf pSelectedColumn = 2 Then  'valid tstypes
                 Dim lWDMid As String = .Source.CellValue(pSelectedRow, pSelectedColumn - 1)
-                Dim lId As Integer
-                If lWDMid.Length > 3 Then
-                    lId = CInt(Mid(lWDMid, 4, 1))
-                Else
-                    lId = 1
-                End If
-                Dim lTsFile As New atcData.atcTimeseriesSource
-                Dim lTsTypeCol As New atcCollection
-                If IsNumeric(lId) Then
-                    lTsFile = pUCI.GetWDMObj(CInt(lId))
-                    If Not lTsFile Is Nothing Then
-                        lTsTypeCol = uniqueAttributeValues("TSTYPE", lTsFile)
+                If Not lWDMid Is Nothing AndAlso lWDMid.Length > 0 Then
+                    Dim lId As Integer
+                    If lWDMid.Length > 3 Then
+                        lId = CInt(Mid(lWDMid, 4, 1))
+                    Else
+                        lId = 1
                     End If
+                    Dim lTsFile As New atcData.atcTimeseriesSource
+                    Dim lTsTypeCol As New atcCollection
+                    If IsNumeric(lId) Then
+                        lTsFile = pUCI.GetWDMObj(CInt(lId))
+                        If Not lTsFile Is Nothing Then
+                            lTsTypeCol = uniqueAttributeValues("TSTYPE", lTsFile)
+                        End If
+                    End If
+                    For Each lString As String In lTsTypeCol
+                        lValidValues.Add(lString)
+                    Next
                 End If
-                For Each lString As String In lTsTypeCol
-                    lValidValues.Add(lString)
-                Next
             ElseIf pSelectedColumn = 3 Then 'valid dsns
                 Dim lWDMid As String = .Source.CellValue(pSelectedRow, pSelectedColumn - 2)
-                Dim lId As Integer = CInt(Mid(lWDMid, 4, 1))
-                Dim lTsFile As New atcData.atcTimeseriesSource
-                If IsNumeric(lId) Then
-                    If Not lTsFile Is Nothing Then
-                        For Each lts As atcData.atcTimeseries In lTsFile.DataSets
-                            If lts.Attributes.GetValue("TSTYPE") = .Source.CellValue(pSelectedRow, pSelectedColumn - 1) Then
-                                Dim lDsn As String = lts.Attributes.GetValue("ID")
-                                lValidValues.Add(lDsn & LocFromDsn(lId, CInt(lDsn)))
-                            End If
-                        Next
+                If IsNumeric(Mid(lWDMid, 4, 1)) Then
+                    Dim lId As Integer = CInt(Mid(lWDMid, 4, 1))
+                    Dim lTsFile As New atcData.atcTimeseriesSource
+                    If IsNumeric(lId) Then
+                        lTsFile = pUCI.GetWDMObj(CInt(lId))
+                        If Not lTsFile Is Nothing Then
+                            For Each lts As atcData.atcTimeseries In lTsFile.DataSets
+                                If lts.Attributes.GetValue("TSTYPE") = .Source.CellValue(pSelectedRow, pSelectedColumn - 1) Then
+                                    Dim lDsn As String = lts.Attributes.GetValue("ID")
+                                    lValidValues.Add(lDsn & LocFromDsn(lId, CInt(lDsn)))
+                                End If
+                            Next
+                        End If
                     End If
                 End If
             End If
+
+            .ValidValues = lValidValues
+            .AllowNewValidValues = False
+            .Refresh()
         End With
     End Sub
 
@@ -338,11 +358,44 @@ Public Class frmAddMet
         If pAddEdit = 1 Then 'editing
             If Not pMetSeg Is Nothing Then
                 For lRow = 1 To 7
-                    pMetSeg.MetSegRecs(lRow).Source.VolName = agdMet.Source.CellValue(lRow, 1)
-                    pMetSeg.MetSegRecs(lRow).Source.Member = agdMet.Source.CellValue(lRow, 2)
-                    pMetSeg.MetSegRecs(lRow).Source.VolId = DsnOnly(agdMet.Source.CellValue(lRow, 3))
-                    pMetSeg.MetSegRecs(lRow).MFactP = agdMet.Source.CellValue(lRow, 4)
-                    pMetSeg.MetSegRecs(lRow).MFactR = agdMet.Source.CellValue(lRow, 5)
+                    If AllFieldsPopulated(lRow) Then
+                        'every field is populated
+                        Dim lName As String = ""
+                        Select Case lRow
+                            Case 1 : lName = "PREC"
+                            Case 2 : lName = "ATEM"
+                            Case 3 : lName = "DEWP"
+                            Case 4 : lName = "WIND"
+                            Case 5 : lName = "SOLR"
+                            Case 6 : lName = "CLOU"
+                            Case 7 : lName = "PEVT"
+                        End Select
+                        'does this type of record exist in the metsegrecs?
+                        Dim lFoundIndex As Integer = -1
+                        For lIndex As Integer = 0 To pMetSeg.MetSegRecs.Count - 1
+                            If pMetSeg.MetSegRecs(lIndex).Name = lName Then
+                                lFoundIndex = lIndex
+                            End If
+                        Next
+                        If lFoundIndex > -1 Then
+                            'already exists, just overwrite the properties
+                            pMetSeg.MetSegRecs(lFoundIndex).Source.VolName = agdMet.Source.CellValue(lRow, 1)
+                            pMetSeg.MetSegRecs(lFoundIndex).Source.Member = agdMet.Source.CellValue(lRow, 2)
+                            pMetSeg.MetSegRecs(lFoundIndex).Source.VolId = DsnOnly(agdMet.Source.CellValue(lRow, 3))
+                            pMetSeg.MetSegRecs(lFoundIndex).MFactP = agdMet.Source.CellValue(lRow, 4)
+                            pMetSeg.MetSegRecs(lFoundIndex).MFactR = agdMet.Source.CellValue(lRow, 5)
+                        Else
+                            'does not exist yet, add it now
+                            Dim lMetSegRec As New HspfMetSegRecord
+                            lMetSegRec.Source.VolName = agdMet.Source.CellValue(lRow, 1)
+                            lMetSegRec.Source.Member = agdMet.Source.CellValue(lRow, 2)
+                            lMetSegRec.Source.VolId = DsnOnly(agdMet.Source.CellValue(lRow, 3))
+                            lMetSegRec.MFactP = agdMet.Source.CellValue(lRow, 4)
+                            lMetSegRec.MFactR = agdMet.Source.CellValue(lRow, 5)
+                            lMetSegRec.Name = lName
+                            pMetSeg.MetSegRecs.Add(lMetSegRec)
+                        End If
+                    End If
                 Next lRow
                 pMetSeg.ExpandMetSegName(agdMet.Source.CellValue(1, 1), DsnOnly(agdMet.Source.CellValue(1, 3)))
             End If
@@ -351,35 +404,36 @@ Public Class frmAddMet
             pMetSeg.Uci = pUCI
             With agdMet.Source
                 For lRow = 1 To 7
-                    If Len(.CellValue(lRow, 1)) > 0 And _
-                       Len(.CellValue(lRow, 2)) > 0 And _
-                       Len(.CellValue(lRow, 3)) > 0 Then
-                        pMetSeg.MetSegRecs(lRow).Source.VolName = .CellValue(lRow, 1)
-                        pMetSeg.MetSegRecs(lRow).Source.Member = .CellValue(lRow, 2)
-                        pMetSeg.MetSegRecs(lRow).Source.VolId = DsnOnly(.CellValue(lRow, 3))
+                    If AllFieldsPopulated(lRow) Then
+                        'every field is populated
+                        Dim lMetSegRec As New HspfMetSegRecord
+                        lMetSegRec.Source.VolName = .CellValue(lRow, 1)
+                        lMetSegRec.Source.Member = .CellValue(lRow, 2)
+                        lMetSegRec.Source.VolId = DsnOnly(.CellValue(lRow, 3))
                         If Len(Trim(.CellValue(lRow, 4))) = 0 Then
-                            pMetSeg.MetSegRecs(lRow).MFactP = 0.0#
+                            lMetSegRec.MFactP = 0.0#
                         Else
-                            pMetSeg.MetSegRecs(lRow).MFactP = .CellValue(lRow, 4)
+                            lMetSegRec.MFactP = .CellValue(lRow, 4)
                         End If
                         If Len(Trim(.CellValue(lRow, 5))) = 0 Then
-                            pMetSeg.MetSegRecs(lRow).MFactR = 0.0#
+                            lMetSegRec.MFactR = 0.0#
                         Else
-                            pMetSeg.MetSegRecs(lRow).MFactR = .CellValue(lRow, 5)
+                            lMetSegRec.MFactR = .CellValue(lRow, 5)
                         End If
-                        pMetSeg.MetSegRecs(lRow).Sgapstrg = ""
-                        pMetSeg.MetSegRecs(lRow).Ssystem = "ENGL"
-                        pMetSeg.MetSegRecs(lRow).Tran = "SAME"
-                        pMetSeg.MetSegRecs(lRow).Name = ""
+                        lMetSegRec.Sgapstrg = ""
+                        lMetSegRec.Ssystem = "ENGL"
+                        lMetSegRec.Tran = "SAME"
+                        lMetSegRec.Name = ""
                         Select Case lRow
-                            Case 1 : pMetSeg.MetSegRecs(lRow).Name = "PREC"
-                            Case 2 : pMetSeg.MetSegRecs(lRow).Name = "ATEM"
-                            Case 3 : pMetSeg.MetSegRecs(lRow).Name = "DEWP"
-                            Case 4 : pMetSeg.MetSegRecs(lRow).Name = "WIND"
-                            Case 5 : pMetSeg.MetSegRecs(lRow).Name = "SOLR"
-                            Case 6 : pMetSeg.MetSegRecs(lRow).Name = "CLOU"
-                            Case 7 : pMetSeg.MetSegRecs(lRow).Name = "PEVT"
+                            Case 1 : lMetSegRec.Name = "PREC"
+                            Case 2 : lMetSegRec.Name = "ATEM"
+                            Case 3 : lMetSegRec.Name = "DEWP"
+                            Case 4 : lMetSegRec.Name = "WIND"
+                            Case 5 : lMetSegRec.Name = "SOLR"
+                            Case 6 : lMetSegRec.Name = "CLOU"
+                            Case 7 : lMetSegRec.Name = "PEVT"
                         End Select
+                        pMetSeg.MetSegRecs.Add(lMetSegRec)
                     End If
                 Next lRow
 
@@ -401,6 +455,18 @@ Public Class frmAddMet
 
         Me.Dispose()
     End Sub
+
+    Private Function AllFieldsPopulated(ByVal aRow As Integer) As Boolean
+        Dim lReturnVal As Boolean = True
+        For lCol As Integer = 1 To 5
+            If agdMet.Source.CellValue(aRow, lCol) Is Nothing Then
+                lReturnVal = False
+            ElseIf agdMet.Source.CellValue(aRow, lCol).Length = 0 Then
+                lReturnVal = False
+            End If
+        Next
+        Return lReturnVal
+    End Function
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Dispose()
@@ -443,6 +509,27 @@ Public Class frmAddMet
                 End With
             End If
         End If
+
+        If aColumn = 4 Or aColumn = 5 Then
+            'handle limits for mfactrs
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+
+            'value should be greater than zero
+            If lNewValueNumeric > 0 Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
+        End If
+
     End Sub
 
     Private Sub ClearRestofRow()
