@@ -43,7 +43,14 @@ Public Class atcTableRDB
                 Dim lFieldSpecs() As String = (Delimiter & lCurrentLine).Split(Delimiter)
                 For lField As Integer = 1 To NumFields
                     Me.FieldLength(lField) = StrFirstInt(lFieldSpecs(lField))
-                    Me.FieldType(lField) = lFieldSpecs(lField)
+                    Me.FieldType(lField) = lFieldSpecs(lField).Trim
+                    'When a field is missing width/type header, default to 10 wide string
+                    If Me.FieldLength(lField) = 0 Then
+                        Me.FieldLength(lField) = 10
+                    End If
+                    If Me.FieldType(lField).Length = 0 Then
+                        Me.FieldType(lField) = "s"
+                    End If
                 Next
                 lGotFieldSpecs = True
             End If
