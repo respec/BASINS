@@ -131,9 +131,9 @@ Public Class atcTimeseriesRDB
                 Dim lDateField As Integer = .FieldNumber("measurement_dt")
                 If lDateField = 0 Then Throw New Exception("Required field missing: measurement_dt")
 
-                Dim lValueFieldNames() As String = {"channel_width_va", "xsec_area_va", "velocity_va", "discharge_1"}
-                Dim lConstituentNames() As String = {"WIDTH", "XSECT", "VELOCITY", "DISCHARGE"}
-                Dim lUnits() As String = {"ft", "square feet", "ft/sec", "cfs"}
+                Dim lValueFieldNames() As String = {"channel_width_va", "xsec_area_va", "velocity_va", "discharge_1", "discharge_va", "gage_height_va", "shift_applied_va"}
+                Dim lConstituentNames() As String = {"WIDTH", "XSECT", "VELOCITY", "DISCHARGE1", "DISCHARGE", "GAGE_HEIGHT", "SHIFT_APPLIED"}
+                Dim lUnits() As String = {"ft", "square feet", "ft/sec", "cfs", "cfs", "ft", "ft"}
                 Dim lLastValueField As Integer = lValueFieldNames.GetUpperBound(0)
                 Dim lValueFieldNumber(lLastValueField) As Integer
                 Dim lBuilders(lLastValueField) As atcTimeseriesBuilder
@@ -141,21 +141,22 @@ Public Class atcTimeseriesRDB
 
                 For lValueFieldIndex = 0 To lLastValueField
                     lValueFieldNumber(lValueFieldIndex) = .FieldNumber(lValueFieldNames(lValueFieldIndex))
-                    If lValueFieldNumber(lValueFieldIndex) = 0 Then Logger.Dbg("Missing measurement field: " & lValueFieldNames(lValueFieldIndex))
-                    lBuilders(lValueFieldIndex) = New atcTimeseriesBuilder(Me)
-                    With lBuilders(lValueFieldIndex).Attributes
-                        .ChangeTo(aAttributes)
-                        .SetValue("Constituent", lConstituentNames(lValueFieldIndex))
-                        .SetValue("Units", lUnits(lValueFieldIndex))
-                        .SetValue("Point", True)
-                        .SetValue("Scenario", "OBSERVED")
-                        .SetValue("Location", .GetValue("site_no"))
-                        .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
-                        .SetValue("ID", lValueFieldIndex + 1)
-                    End With
+                    If lValueFieldNumber(lValueFieldIndex) = 0 Then
+                        Logger.Dbg("Missing measurement field: " & lValueFieldNames(lValueFieldIndex))
+                    Else
+                        lBuilders(lValueFieldIndex) = New atcTimeseriesBuilder(Me)
+                        With lBuilders(lValueFieldIndex).Attributes
+                            .ChangeTo(aAttributes)
+                            .SetValue("Constituent", lConstituentNames(lValueFieldIndex))
+                            .SetValue("Units", lUnits(lValueFieldIndex))
+                            .SetValue("Point", True)
+                            .SetValue("Scenario", "OBSERVED")
+                            .SetValue("Location", .GetValue("site_no"))
+                            .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
+                            .SetValue("ID", lValueFieldIndex + 1)
+                        End With
+                    End If
                 Next
-                'Dim lxsec_area_Field As Integer = .FieldNumber("xsec_area_va")
-                'Dim lvelocity_Field As Integer = .FieldNumber("velocity_va")
 
                 Dim lDateString As String
                 Dim lDate As Date
@@ -167,29 +168,33 @@ Public Class atcTimeseriesRDB
                     lDate = Date.Parse(lDateString)
 
                     For lValueFieldIndex = 0 To lLastValueField
-                        lValueString = .Value(lValueFieldNumber(lValueFieldIndex))
-                        If IsNumeric(lValueString) Then
-                            lValue = Double.Parse(lValueString)
-                            'ElseIf lxsec_area_Field >= 0 AndAlso lvelocity_Field >= 0 AndAlso IsNumeric(.Value(lxsec_area_Field)) AndAlso IsNumeric(.Value(lvelocity_Field)) Then
-                            '    lValue = .Value(lxsec_area_Field) * .Value(lvelocity_Field)
-                            '    Logger.Dbg("Computed flow for " & lDateString & " from xsec_area_va * velocity_va = " & DoubleToString(lValue))
-                        Else
-                            lValue = GetNaN()
-                        End If
-                        lBuilders(lValueFieldIndex).AddValue(lDate, lValue)
-                        For lField As Integer = 1 To .NumFields
-                            If Array.IndexOf(lValueFieldNumber, lField) < 0 Then 'Not a value field, add it as value attribute
-                                Select Case .FieldName(lField)
-                                    Case "agency_cd", "site_no", "measurement_dt" 'don't need these as value attributes
-                                    Case Else
-                                        lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), .Value(lField))
-                                End Select
+                        If lValueFieldNumber(lValueFieldIndex) > 0 Then
+                            lValueString = .Value(lValueFieldNumber(lValueFieldIndex))
+                            If IsNumeric(lValueString) Then
+                                lValue = Double.Parse(lValueString)
+                                'ElseIf lxsec_area_Field >= 0 AndAlso lvelocity_Field >= 0 AndAlso IsNumeric(.Value(lxsec_area_Field)) AndAlso IsNumeric(.Value(lvelocity_Field)) Then
+                                '    lValue = .Value(lxsec_area_Field) * .Value(lvelocity_Field)
+                                '    Logger.Dbg("Computed flow for " & lDateString & " from xsec_area_va * velocity_va = " & DoubleToString(lValue))
+                            Else
+                                lValue = GetNaN()
                             End If
-                        Next
+                            lBuilders(lValueFieldIndex).AddValue(lDate, lValue)
+                            For lField As Integer = 1 To .NumFields
+                                If Array.IndexOf(lValueFieldNumber, lField) < 0 Then 'Not a value field, add it as value attribute
+                                    Select Case .FieldName(lField)
+                                        Case "agency_cd", "site_no", "measurement_dt" 'don't need these as value attributes
+                                        Case Else
+                                            lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), .Value(lField))
+                                    End Select
+                                End If
+                            Next
+                        End If
                     Next
                 Next
                 For lValueFieldIndex = 0 To lLastValueField
-                    DataSets.Add(lBuilders(lValueFieldIndex).CreateTimeseries)
+                    If lBuilders(lValueFieldIndex) IsNot Nothing Then
+                        DataSets.Add(lBuilders(lValueFieldIndex).CreateTimeseries)
+                    End If
                 Next
             Else
                 Throw New Exception("Unable to open")
