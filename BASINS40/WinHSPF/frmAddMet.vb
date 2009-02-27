@@ -4,10 +4,6 @@ Imports atcUtility
 
 Public Class frmAddMet
 
-    'Dim Segname As String
-    'Dim curtext As String
-    'Dim lmetseg As HspfMetSeg
-    'Dim AddEdit As Integer
     Dim pSegmentName As String
     Dim pMetSeg As HspfMetSeg
     Dim pAddEdit As Integer
@@ -16,6 +12,9 @@ Public Class frmAddMet
     Dim pMetSegBaseDsns As New Collection
     Dim pMetSegWDMIds As New Collection
     Dim pMetSegDescs As New Collection
+
+    Dim pSelectedRow As Integer
+    Dim pSelectedColumn As Integer
 
     Public Sub Init(ByVal aSegmentName As String, ByVal aAddEditOption As Integer)
         pSegmentName = aSegmentName
@@ -40,7 +39,6 @@ Public Class frmAddMet
                 For lIndex As Integer = 1 To pMetSegNames.Count
                     cboName.Items.Add(pMetSegNames(lIndex) & ":" & pMetSegDescs(lIndex))
                 Next lIndex
-                cboName.SelectedIndex = 0
             End If
         End If
 
@@ -80,31 +78,43 @@ Public Class frmAddMet
                     End If
                 Next
                 If Not pMetSeg Is Nothing Then
-                    For lRow As Integer = 1 To 7
+                    For Each lMetSegRec As HspfMetSegRecord In pMetSeg.MetSegRecs
+                        Dim lRow As Integer = 0
+                        Select Case lMetSegRec.Name
+                            Case "PREC" : lRow = 1
+                            Case "ATEM" : lRow = 2
+                            Case "DEWP" : lRow = 3
+                            Case "WIND" : lRow = 4
+                            Case "SOLR" : lRow = 5
+                            Case "CLOU" : lRow = 6
+                            Case "PEVT" : lRow = 7
+                        End Select
                         Dim lId As Integer
-                        If Len(pMetSeg.MetSegRecs(lRow).Source.VolName) < 4 Then
+                        If Len(lMetSegRec.Source.VolName) < 4 Then
                             lId = 1
                         Else
-                            lId = CInt(Mid(pMetSeg.MetSegRecs(lRow).Source.VolName, 4, 1))
+                            lId = CInt(Mid(lMetSegRec.Source.VolName, 4, 1))
                         End If
-                        Dim ldsn As Integer = pMetSeg.MetSegRecs(lRow).Source.VolId
-                        .CellValue(lRow, 1) = pMetSeg.MetSegRecs(lRow).Source.VolName
-                        .CellValue(lRow, 2) = pMetSeg.MetSegRecs(lRow).Source.Member
+                        Dim ldsn As Integer = lMetSegRec.Source.VolId
+                        .CellValue(lRow, 1) = lMetSegRec.Source.VolName
+                        .CellValue(lRow, 2) = lMetSegRec.Source.Member
                         .CellValue(lRow, 3) = ldsn & LocFromDsn(lId, ldsn)
-                        .CellValue(lRow, 4) = pMetSeg.MetSegRecs(lRow).MFactP
-                        .CellValue(lRow, 5) = pMetSeg.MetSegRecs(lRow).MFactR
+                        .CellValue(lRow, 4) = lMetSegRec.MFactP
+                        .CellValue(lRow, 5) = lMetSegRec.MFactR
                         .CellEditable(lRow, 1) = True
                         .CellEditable(lRow, 2) = True
                         .CellEditable(lRow, 3) = True
                         .CellEditable(lRow, 4) = True
                         .CellEditable(lRow, 5) = True
-                    Next lRow
+                    Next
                 End If
             End If
         End With
 
         agdMet.SizeAllColumnsToContents()
         agdMet.Refresh()
+
+        cboName.SelectedIndex = 0
     End Sub
 
     Sub New()
@@ -119,233 +129,192 @@ Public Class frmAddMet
 
     End Sub
 
-    Private Sub agdMet_CommitChange(ByVal ChangeFromRow As Long, ByVal ChangeToRow As Long, ByVal ChangeFromCol As Long, ByVal ChangeToCol As Long)
-        'DoLimits(agdMet)
-        'If curtext <> agdMet.TextMatrix(agdMet.row, agdMet.col) Then
-        '    If agdMet.row = 1 And (agdMet.col = 1 Or agdMet.col = 2 Or agdMet.col = 3) And _
-        '       AddEdit = 1 Then
-        '        'cant change these, set it back
-        '        MsgBox("The Precip Data Set defines the met segment and thus cannot be changed." & vbCrLf & _
-        '               "Use 'Add' to add a new met segment.", vbOKOnly, "Edit Met Segment Problem")
-        '        agdMet.TextMatrix(agdMet.row, agdMet.col) = curtext
-        '    Else
-        '        ClearRestofRow()
-        '    End If
-        'End If
-        'If AddEdit = 0 Then
-        '    'adding, check for precip data set
-        '    If agdMet.row = 1 And (agdMet.col = 1 Or agdMet.col = 2 Or agdMet.col = 3) Then
-        '        If Len(Trim(agdMet.TextMatrix(1, 1))) > 0 And _
-        '           Len(Trim(agdMet.TextMatrix(1, 2))) > 0 And _
-        '           Len(Trim(agdMet.TextMatrix(1, 3))) > 0 Then
-        '            SegName = myUci.GetWDMAttr(agdMet.TextMatrix(1, 1), DsnOnly(agdMet.TextMatrix(1, 3)), "LOC")
-        '            lblName.Caption = SegName
-        '        End If
-        '    End If
-        'End If
-    End Sub
-
-    Private Sub ClearRestofRow()
-        'With agdMet
-        '    If .col = 1 Then  'wdm ids, clear tstypes and dsns
-        '        .TextMatrix(.row, 2) = ""
-        '        .TextMatrix(.row, 3) = ""
-        '    ElseIf .col = 2 Then  'tstypes, clear dsns
-        '        .TextMatrix(.row, 3) = ""
-        '    End If
-        'End With
-    End Sub
-
-    Private Sub agdMet_RowColChange()
-        'curtext = agdMet.TextMatrix(agdMet.row, agdMet.col)
-        'DoLimits(agdMet)
-    End Sub
-
-    Private Sub agdMet_TextChange(ByVal ChangeFromRow As Long, ByVal ChangeToRow As Long, ByVal ChangeFromCol As Long, ByVal ChangeToCol As Long)
-        'DoLimits(agdMet)
-    End Sub
-
-    Private Sub cboName_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboName.Click
+    Private Sub cboName_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboName.SelectedIndexChanged
 
         'fill in grid from the met data details
-        Dim lBaseDsn As Integer = pMetSegBaseDsns(cboName.SelectedIndex + 1)
-        Dim lMetWdmId As String = pMetSegWDMIds(cboName.SelectedIndex + 1)
-        With agdMet.Source
-            For lRowIndex As Integer = 1 To 7
-                .CellValue(lRowIndex, 1) = lMetWdmId
-                Dim Id As Integer = CInt(Mid(lMetWdmId, 4, 1))
+        If Not agdMet.Source Is Nothing Then
+            Dim lBaseDsn As Integer = pMetSegBaseDsns(cboName.SelectedIndex + 1)
+            Dim lMetWdmId As String = pMetSegWDMIds(cboName.SelectedIndex + 1)
+            With agdMet.Source
+                For lRowIndex As Integer = 1 To 7
+                    .CellValue(lRowIndex, 1) = lMetWdmId
+                    Dim Id As Integer = CInt(Mid(lMetWdmId, 4, 1))
+                    Dim lTsFile As New atcData.atcTimeseriesSource
+                    Dim lTsTypeCol As New atcCollection
+                    If IsNumeric(Id) Then
+                        lTsFile = pUCI.GetWDMObj(CInt(Id))
+                        If Not lTsFile Is Nothing Then
+                            lTsTypeCol = uniqueAttributeValues("TSTYPE", lTsFile)
+                        End If
+                    End If
+                    Id = CInt(Mid(lMetWdmId, 4, 1))
+                    Dim ldsn&
+                    Select Case lRowIndex
+                        Case 1
+                            .CellValue(lRowIndex, 3) = lBaseDsn & LocFromDsn(Id, lBaseDsn)
+                            .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, lBaseDsn).Attributes.GetValue("TSTYPE")
+                            .CellValue(lRowIndex, 4) = 1
+                            .CellValue(lRowIndex, 5) = 1
+                        Case 2
+                            ldsn = lBaseDsn + 2
+                            If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
+                                .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
+                                .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
+                            Else
+                                .CellValue(lRowIndex, 3) = 0
+                                If lTsTypeCol.ItemByKey("ATEM") = "ATEM" Then
+                                    .CellValue(lRowIndex, 2) = "ATEM"
+                                ElseIf lTsTypeCol.ItemByKey("ATMP") = "ATMP" Then
+                                    .CellValue(lRowIndex, 2) = "ATMP"
+                                End If
+                            End If
+                            .CellValue(lRowIndex, 4) = 1
+                            .CellValue(lRowIndex, 5) = 1
+                        Case 3
+                            ldsn = lBaseDsn + 6
+                            If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
+                                .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
+                                .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
+                            Else
+                                .CellValue(lRowIndex, 3) = 0
+                                .CellValue(lRowIndex, 2) = ""
+                                If lTsTypeCol.ItemByKey("DEWP") = "DEWP" Then
+                                    .CellValue(lRowIndex, 2) = "DEWP"
+                                End If
+                            End If
+                            .CellValue(lRowIndex, 4) = 1
+                            .CellValue(lRowIndex, 5) = 1
+                        Case 4
+                            ldsn = lBaseDsn + 3
+                            If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
+                                .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
+                                .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
+                            Else
+                                .CellValue(lRowIndex, 3) = 0
+                                .CellValue(lRowIndex, 2) = ""
+                                If lTsTypeCol.ItemByKey("WIND") = "WIND" Then
+                                    .CellValue(lRowIndex, 2) = "WIND"
+                                ElseIf lTsTypeCol.ItemByKey("WNDH") = "WNDH" Then
+                                    .CellValue(lRowIndex, 2) = "WNDH"
+                                End If
+                            End If
+                            .CellValue(lRowIndex, 4) = 1
+                            .CellValue(lRowIndex, 5) = 1
+                        Case 5
+                            ldsn = lBaseDsn + 4
+                            If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
+                                .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
+                                .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
+                            Else
+                                .CellValue(lRowIndex, 3) = 0
+                                .CellValue(lRowIndex, 2) = ""
+                                If lTsTypeCol.ItemByKey("SOLR") = "SOLR" Then
+                                    .CellValue(lRowIndex, 2) = "SOLR"
+                                End If
+                            End If
+                            .CellValue(lRowIndex, 4) = 1
+                            .CellValue(lRowIndex, 5) = 1
+                        Case 6
+                            ldsn = lBaseDsn + 7
+                            If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
+                                .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
+                                .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
+                            Else
+                                .CellValue(lRowIndex, 3) = 0
+                                .CellValue(lRowIndex, 2) = ""
+                                If lTsTypeCol.ItemByKey("CLOU") = "CLOU" Then
+                                    .CellValue(lRowIndex, 2) = "CLOU"
+                                ElseIf lTsTypeCol.ItemByKey("CLDC") = "CLDC" Then
+                                    .CellValue(lRowIndex, 2) = "CLDC"
+                                End If
+                            End If
+                            .CellValue(lRowIndex, 4) = 0
+                            .CellValue(lRowIndex, 5) = 1
+                        Case 7
+                            ldsn = lBaseDsn + 5
+                            If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
+                                .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
+                                .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
+                            Else
+                                .CellValue(lRowIndex, 3) = 0
+                                .CellValue(lRowIndex, 2) = ""
+                                If lTsTypeCol.ItemByKey("PEVT") = "PEVT" Then
+                                    .CellValue(lRowIndex, 2) = "PEVT"
+                                ElseIf lTsTypeCol.ItemByKey("EVAP") = "EVAP" Then
+                                    .CellValue(lRowIndex, 2) = "EVAP"
+                                End If
+                            End If
+                            .CellValue(lRowIndex, 4) = 1
+                            .CellValue(lRowIndex, 5) = 1
+                    End Select
+                    'default dsns if possible
+                    If Not lTsFile Is Nothing Then
+                        If Len(.CellValue(lRowIndex, 2)) > 0 And .CellValue(lRowIndex, 3) = "0" Then
+                            For Each lTser As atcData.atcTimeseries In lTsFile.DataSets
+                                If lTser.Attributes.GetValue("TSTYPE") = .CellValue(lRowIndex, 2) Then
+                                    .CellValue(lRowIndex, 3) = lTser.Attributes.GetValue("ID") & LocFromDsn(Id, lTser.Attributes.GetValue("ID"))
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                    End If
+                Next lRowIndex
+            End With
+            pSegmentName = pUCI.GetWDMAttr(agdMet.Source.CellValue(1, 1), DsnOnly(agdMet.Source.CellValue(1, 3)), "LOC")
+            agdMet.SizeAllColumnsToContents()
+            agdMet.Refresh()
+        End If
+    End Sub
+
+    Private Sub DoLimits()
+        
+        With agdMet
+            Dim lValidValues As New Collection
+            If pSelectedColumn = 1 Then 'valid wdm ids
+                Dim lFiles As HspfFilesBlk = pUCI.FilesBlock
+                For lIndex As Integer = 1 To pUCI.FilesBlock.Count
+                    Dim lFile As HspfFile = pUCI.FilesBlock.Value(lIndex)
+                    If lFile.Typ.Length > 2 Then
+                        If lFile.Typ.Substring(0, 3) = "WDM" Then
+                            lValidValues.Add(lFile.Typ)
+                        End If
+                    End If
+                Next
+            ElseIf pSelectedColumn = 2 Then  'valid tstypes
+                Dim lWDMid As String = .Source.CellValue(pSelectedRow, pSelectedColumn - 1)
+                Dim lId As Integer
+                If lWDMid.Length > 3 Then
+                    lId = CInt(Mid(lWDMid, 4, 1))
+                Else
+                    lId = 1
+                End If
                 Dim lTsFile As New atcData.atcTimeseriesSource
                 Dim lTsTypeCol As New atcCollection
-                If IsNumeric(Id) Then
-                    lTsFile = pUCI.GetWDMObj(CInt(Id))
+                If IsNumeric(lId) Then
+                    lTsFile = pUCI.GetWDMObj(CInt(lId))
                     If Not lTsFile Is Nothing Then
                         lTsTypeCol = uniqueAttributeValues("TSTYPE", lTsFile)
                     End If
                 End If
-                Id = CInt(Mid(lMetWdmId, 4, 1))
-                Dim ldsn&
-                Select Case lRowIndex
-                    Case 1
-                        .CellValue(lRowIndex, 3) = lBaseDsn & LocFromDsn(Id, lBaseDsn)
-                        .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, lBaseDsn).Attributes.GetValue("TSTYPE")
-                        .CellValue(lRowIndex, 4) = 1
-                        .CellValue(lRowIndex, 5) = 1
-                    Case 2
-                        ldsn = lBaseDsn + 2
-                        If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
-                            .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
-                            .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
-                        Else
-                            .CellValue(lRowIndex, 3) = 0
-                            If lTsTypeCol.ItemByKey("ATEM") = "ATEM" Then
-                                .CellValue(lRowIndex, 2) = "ATEM"
-                            ElseIf lTsTypeCol.ItemByKey("ATMP") = "ATMP" Then
-                                .CellValue(lRowIndex, 2) = "ATMP"
-                            End If
-                        End If
-                        .CellValue(lRowIndex, 4) = 1
-                        .CellValue(lRowIndex, 5) = 1
-                    Case 3
-                        ldsn = lBaseDsn + 6
-                        If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
-                            .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
-                            .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
-                        Else
-                            .CellValue(lRowIndex, 3) = 0
-                            .CellValue(lRowIndex, 2) = ""
-                            If lTsTypeCol.ItemByKey("DEWP") = "DEWP" Then
-                                .CellValue(lRowIndex, 2) = "DEWP"
-                            End If
-                        End If
-                        .CellValue(lRowIndex, 4) = 1
-                        .CellValue(lRowIndex, 5) = 1
-                    Case 4
-                        ldsn = lBaseDsn + 3
-                        If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
-                            .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
-                            .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
-                        Else
-                            .CellValue(lRowIndex, 3) = 0
-                            .CellValue(lRowIndex, 2) = ""
-                            If lTsTypeCol.ItemByKey("WIND") = "WIND" Then
-                                .CellValue(lRowIndex, 2) = "WIND"
-                            ElseIf lTsTypeCol.ItemByKey("WNDH") = "WNDH" Then
-                                .CellValue(lRowIndex, 2) = "WNDH"
-                            End If
-                        End If
-                        .CellValue(lRowIndex, 4) = 1
-                        .CellValue(lRowIndex, 5) = 1
-                    Case 5
-                        ldsn = lBaseDsn + 4
-                        If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
-                            .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
-                            .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
-                        Else
-                            .CellValue(lRowIndex, 3) = 0
-                            .CellValue(lRowIndex, 2) = ""
-                            If lTsTypeCol.ItemByKey("SOLR") = "SOLR" Then
-                                .CellValue(lRowIndex, 2) = "SOLR"
-                            End If
-                        End If
-                        .CellValue(lRowIndex, 4) = 1
-                        .CellValue(lRowIndex, 5) = 1
-                    Case 6
-                        ldsn = lBaseDsn + 7
-                        If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
-                            .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
-                            .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
-                        Else
-                            .CellValue(lRowIndex, 3) = 0
-                            .CellValue(lRowIndex, 2) = ""
-                            If lTsTypeCol.ItemByKey("CLOU") = "CLOU" Then
-                                .CellValue(lRowIndex, 2) = "CLOU"
-                            ElseIf lTsTypeCol.ItemByKey("CLDC") = "CLDC" Then
-                                .CellValue(lRowIndex, 2) = "CLDC"
-                            End If
-                        End If
-                        .CellValue(lRowIndex, 4) = 0
-                        .CellValue(lRowIndex, 5) = 1
-                    Case 7
-                        ldsn = lBaseDsn + 5
-                        If Not pUCI.GetDataSetFromDsn(Id, ldsn) Is Nothing Then
-                            .CellValue(lRowIndex, 3) = ldsn & LocFromDsn(Id, ldsn)
-                            .CellValue(lRowIndex, 2) = pUCI.GetDataSetFromDsn(Id, ldsn).Attributes.GetValue("TSTYPE")
-                        Else
-                            .CellValue(lRowIndex, 3) = 0
-                            .CellValue(lRowIndex, 2) = ""
-                            If lTsTypeCol.ItemByKey("PEVT") = "PEVT" Then
-                                .CellValue(lRowIndex, 2) = "PEVT"
-                            ElseIf lTsTypeCol.ItemByKey("EVAP") = "EVAP" Then
-                                .CellValue(lRowIndex, 2) = "EVAP"
-                            End If
-                        End If
-                        .CellValue(lRowIndex, 4) = 1
-                        .CellValue(lRowIndex, 5) = 1
-                End Select
-                'default dsns if possible
-                If Not lTsFile Is Nothing Then
-                    If Len(.CellValue(lRowIndex, 2)) > 0 And .CellValue(lRowIndex, 3) = "0" Then
-                        For Each lTser As atcData.atcTimeseries In lTsFile.DataSets
-                            If lTser.Attributes.GetValue("TSTYPE") = .CellValue(lRowIndex, 2) Then
-                                .CellValue(lRowIndex, 3) = lTser.Attributes.GetValue("ID") & LocFromDsn(Id, lTser.Attributes.GetValue("ID"))
-                                Exit For
+                For Each lString As String In lTsTypeCol
+                    lValidValues.Add(lString)
+                Next
+            ElseIf pSelectedColumn = 3 Then 'valid dsns
+                Dim lWDMid As String = .Source.CellValue(pSelectedRow, pSelectedColumn - 2)
+                Dim lId As Integer = CInt(Mid(lWDMid, 4, 1))
+                Dim lTsFile As New atcData.atcTimeseriesSource
+                If IsNumeric(lId) Then
+                    If Not lTsFile Is Nothing Then
+                        For Each lts As atcData.atcTimeseries In lTsFile.DataSets
+                            If lts.Attributes.GetValue("TSTYPE") = .Source.CellValue(pSelectedRow, pSelectedColumn - 1) Then
+                                Dim lDsn As String = lts.Attributes.GetValue("ID")
+                                lValidValues.Add(lDsn & LocFromDsn(lId, CInt(lDsn)))
                             End If
                         Next
                     End If
                 End If
-            Next lRowIndex
+            End If
         End With
-        pSegmentName = pUCI.GetWDMAttr(agdMet.Source.CellValue(1, 1), DsnOnly(agdMet.Source.CellValue(1, 3)), "LOC")
-        agdMet.SizeAllColumnsToContents()
-        agdMet.Refresh()
-    End Sub
-
-    Private Sub DoLimits(ByVal g As Object)
-        'Dim i&, S$
-        'Dim tstypecol As CollString
-        'Dim tsfile As ATCclsTserFile
-        'Dim vname As Object
-
-        'g.ClearValues()
-        'If g.col = 1 Then  'valid wdm ids
-        '    If myUci.wdmcount = 1 Then
-        '        g.addValue("WDM1")
-        '    Else
-        '        For i = 2 To myUci.wdmcount
-        '            g.addValue("WDM" & CStr(i))
-        '        Next i
-        '    End If
-        '    'For i = 1 To myUci.filesblock.Count
-        '    '  If Mid(myUci.filesblock.Value(i).typ, 1, 3) = "WDM" Then
-        '    '    g.AddValue myUci.filesblock.Value(i).typ
-        '    '  End If
-        '    'Next i
-        'ElseIf g.col = 2 Then  'valid tstypes
-        '    S = Mid(g.TextMatrix(g.row, 1), 4, 1)
-        '    If IsNumeric(S) Then
-        '        i = CInt(S)
-        '        tsfile = myUci.GetWDMObj(i)
-        '        If Not tsfile Is Nothing Then
-        '            tstypecol = uniqueAttributeValues("TSTYPE", tsfile.DataCollection)
-        '            For Each vname In tstypecol
-        '                g.addValue(vname)
-        '            Next
-        '        End If
-        '    End If
-        'ElseIf g.col = 3 Then 'valid dsns
-        '    S = Mid(g.TextMatrix(g.row, 1), 4, 1)
-        '    If IsNumeric(S) Then
-        '        i = CInt(S)
-        '        tsfile = myUci.GetWDMObj(i)
-        '        If Not tsfile Is Nothing Then
-        '            For i = 1 To tsfile.DataCount
-        '                If tsfile.Data(i).Attrib("TSTYPE") = g.TextMatrix(g.row, 2) Then
-        '                    g.addValue(tsfile.Data(i).Header.Id & LocFromDsn(CInt(S), tsfile.Data(i).Header.Id))
-        '                End If
-        '            Next i
-        '        End If
-        '    End If
-        'End If
     End Sub
 
     Private Function DsnOnly(ByVal aDsnString As String) As String
@@ -447,5 +416,51 @@ Public Class frmAddMet
         Next
         uniqueAttributeValues = lRetval
     End Function
+
+    Private Sub agdMet_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMet.CellEdited
+
+        DoLimits()
+        'If curtext <> agdMet.TextMatrix(agdMet.row, agdMet.col) Then
+        If pSelectedRow = 1 And (pSelectedColumn = 1 Or pSelectedColumn = 2 Or pSelectedColumn = 3) And _
+           pAddEdit = 1 Then
+            'cant change these, set it back
+            Logger.Msg("The Precip Data Set defines the met segment and thus cannot be changed." & vbCrLf & _
+                   "Use 'Add' to add a new met segment.", MsgBoxStyle.OkOnly, "Edit Met Segment Problem")
+            'agdMet.TextMatrix(pSelectedRow, pSelectedColumn) = curtext
+        Else
+            ClearRestofRow()
+        End If
+        'End If
+        If pAddEdit = 0 Then
+            'adding, check for precip data set
+            If pSelectedRow = 1 And (pSelectedColumn = 1 Or pSelectedColumn = 2 Or pSelectedColumn = 3) Then
+                With agdMet.Source
+                    If Len(Trim(.CellValue(1, 1))) > 0 And _
+                       Len(Trim(.CellValue(1, 2))) > 0 And _
+                       Len(Trim(.CellValue(1, 3))) > 0 Then
+                        lblName.Text = pUCI.GetWDMAttr(.CellValue(1, 1), DsnOnly(.CellValue(1, 3)), "LOC")
+                    End If
+                End With
+            End If
+        End If
+    End Sub
+
+    Private Sub ClearRestofRow()
+        With agdMet.Source
+            If pSelectedColumn = 1 Then  'wdm ids, clear tstypes and dsns
+                .CellValue(pSelectedRow, 2) = ""
+                .CellValue(pSelectedRow, 3) = ""
+            ElseIf pSelectedColumn = 2 Then  'tstypes, clear dsns
+                .CellValue(pSelectedRow, 3) = ""
+            End If
+        End With
+    End Sub
+
+    Private Sub agdMet_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMet.MouseDownCell
+        pSelectedColumn = aColumn
+        pSelectedRow = aRow
+
+        DoLimits()
+    End Sub
 
 End Class
