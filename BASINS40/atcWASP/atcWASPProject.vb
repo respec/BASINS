@@ -11,17 +11,22 @@ Public Class WASPProject
     Public Sub New()
         Name = ""
         WNFFileName = ""
+        Segments = New Segments
+        Segments.WASPProject = Me
     End Sub
 
     Public Function Save(ByVal aFileName As String) As Boolean
         'write WASP network file first
         Dim lSW As New IO.StreamWriter(aFileName)
         WNFFileName = aFileName
-        lSW.WriteLine(WNFFileName)
+
+        Dim lSegmentFileName As String = FilenameSetExt(WNFFileName, "SEG")
+
+        lSW.WriteLine(lSegmentFileName)
         lSW.Close()
 
         'now write segments file
-        lSW = New IO.StreamWriter(aFileName)
+        lSW = New IO.StreamWriter(lSegmentFileName)
         lSW.WriteLine(Segments.ToString)
         lSW.Close()
 

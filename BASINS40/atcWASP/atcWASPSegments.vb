@@ -21,15 +21,13 @@ Public Class Segments
 
     Public Overrides Function ToString() As String
         Dim lString As New System.Text.StringBuilder
-        lString.Append(Me.Count & " ")
-        For Each lSegment As Segment In Me
-            lString.Append(lSegment.Name.PadRight(16) & " ")
-        Next
 
-        lString.Append("C Seg Number   Seg Length  Seg Width  DMult   Vmult  SegSlope  SegRough  DownSeg  InflowTS ")
+        lString.Append(";Name            ID               Length     Width      DMult      Vmult      Slope      Roughness  DownSegID        InflowTS        " & vbCrLf)
+        lString.Append(";_______________ ________________ __________ __________ __________ __________ __________ __________ ________________ ________________" & vbCrLf)
 
         For Each lSegment As Segment In Me
             With lSegment
+                lString.Append(.Name.PadRight(16) & " ")
                 lString.Append(.ID.PadRight(16) & " ")
                 lString.Append(Format(.Length, "0.00").PadRight(10) & " ")
                 lString.Append(Format(.Width, "0.00").PadRight(10) & " ")
@@ -37,7 +35,8 @@ Public Class Segments
                 lString.Append(Format(.Vmult, "0.00").PadRight(10) & " ")
                 lString.Append(.Slope.PadRight(10) & " ")
                 lString.Append(Format(.Roughness, "0.000").PadRight(10) & " ")
-                lString.AppendLine(.DownID.PadRight(16))
+                lString.Append(.DownID.PadRight(16) & " ")
+                lString.Append(vbCrLf)
             End With
         Next
 
