@@ -785,15 +785,26 @@ Public Class frmWASPSetup
 
                 .Name = lName
 
-                'populate the SWMM classes from the shapefiles
+                'populate the SWMM classes from the shapefiles'
                 .Segments.Clear()
                 Dim lTable As New atcUtility.atcTableDBF
 
+                'add only selected segments
+                Dim lTempSegments As New atcWASP.Segments
                 If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
-                    Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lSegmentShapefileName)
-                    .Segments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap), "Name"))
+                    Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
+                    lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap), "Name"))
                 End If
+                Logger.Dbg("SegmentsCount " & lTempSegments.Count)
                 'CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
+
+                'after reading the attribute table, see if any are selected
+                If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
+                    'put only selected segments in .segments 
+                    For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
+                        .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
+                    Next
+                End If
 
                 'save project file and start WASP
                 Logger.Dbg("Save WASP network import file" & lWASPProjectFileName)
@@ -865,7 +876,8 @@ Public Class frmWASPSetup
                 
             ElseIf GisUtil.LayerType(lLayerIndex) = 2 Then 'LineShapefile 
                 cboStreams.Items.Add(lLayerName)
-                If lLayerName.ToUpper.IndexOf("CONDUIT") > -1 Or lLayerName.ToUpper = "STREAMS" Or lLayerName.IndexOf("Stream Reach Shapefile") > -1 Then
+                'see if there are any selected features in this layer, if so assume this is the stream segment layer
+                If GisUtil.NumSelectedFeatures(lLayerIndex) > 0 Then
                     cboStreams.SelectedIndex = cboStreams.Items.Count - 1
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 1 Then 'PointShapefile
@@ -878,6 +890,25 @@ Public Class frmWASPSetup
                 
             End If
         Next
+
+        'if no stream layer selected and there is an nhd layer on the map, make it selected
+        If cboStreams.SelectedIndex < 0 Then
+            For lIndex As Integer = 1 To cboStreams.Items.Count
+                Dim lLayerName As String = cboStreams.Items(lIndex - 1).ToString
+                If lLayerName.ToUpper.IndexOf("FLOWLINE") > -1 Then
+                    cboStreams.SelectedIndex = lIndex - 1
+                End If
+            Next
+        End If
+        If cboStreams.SelectedIndex < 0 Then
+            For lIndex As Integer = 1 To cboStreams.Items.Count
+                Dim lLayerName As String = cboStreams.Items(lIndex - 1).ToString
+                If lLayerName.ToUpper.IndexOf("NHD") > -1 Then
+                    cboStreams.SelectedIndex = lIndex - 1
+                End If
+            Next
+        End If
+
         If cboStreams.Items.Count > 0 And cboStreams.SelectedIndex < 0 Then
             cboStreams.SelectedIndex = 0
         End If
@@ -996,6 +1027,9 @@ Public Class frmWASPSetup
             AtcGridFlow.ValidValues = lValidValues
             AtcGridFlow.SizeAllColumnsToContents()
             AtcGridFlow.Refresh()
+
+            lTempSegments.Clear()
+
             Logger.Dbg("FlowStationGrid refreshed")
         End If
     End Sub
