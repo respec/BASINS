@@ -259,7 +259,9 @@ Public Module Utility
                     lOperations = New atcCollection
                     lOperations.Add(lOperationKey, lOperationArea)
                     Dim lId As String = lLocationKey.Substring(0, 2) & Format(lOperation.Id Mod 100, "00")
-                    lLandUsesSortedById.Add(lId, lLandUse)
+                    If lLandUsesSortedById.IndexOfKey(lId) = -1 Then
+                        lLandUsesSortedById.Add(lId, lLandUse)
+                    End If
                     lLandUses.Add(lLandUse, lOperations)
                 Else
                     lOperations = lLandUses.Item(lLandUseKeyIndex)
