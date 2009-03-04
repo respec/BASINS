@@ -73,6 +73,9 @@ Public Class frmWASPSetup
     Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
     Friend WithEvents AtcConnectFields As atcControls.atcConnectFields
     Friend WithEvents AtcGridFlow As atcControls.atcGrid
+    Friend WithEvents cmdGenerate As System.Windows.Forms.Button
+    Friend WithEvents AtcGridSegmentation As atcControls.atcGrid
+    Friend WithEvents AtcGridMet As atcControls.atcGrid
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -102,7 +105,11 @@ Public Class frmWASPSetup
         Me.tbxName = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
+        Me.TabPage5 = New System.Windows.Forms.TabPage
+        Me.AtcConnectFields = New atcControls.atcConnectFields
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.cmdGenerate = New System.Windows.Forms.Button
+        Me.AtcGridSegmentation = New atcControls.atcGrid
         Me.TabPage3 = New System.Windows.Forms.TabPage
         Me.AtcGridFlow = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
@@ -110,18 +117,18 @@ Public Class frmWASPSetup
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.txtMetWDMName = New System.Windows.Forms.TextBox
         Me.cmdSelectWDM = New System.Windows.Forms.Button
-        Me.TabPage5 = New System.Windows.Forms.TabPage
-        Me.AtcConnectFields = New atcControls.atcConnectFields
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
+        Me.AtcGridMet = New atcControls.atcGrid
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
+        Me.TabPage5.SuspendLayout()
+        Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
-        Me.TabPage5.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -189,11 +196,11 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage6)
-        Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.ItemSize = New System.Drawing.Size(60, 21)
@@ -489,95 +496,6 @@ Public Class frmWASPSetup
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "WASP Project Name:"
         '
-        'TabPage2
-        '
-        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(192, 70)
-        Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "Segmentation"
-        Me.TabPage2.UseVisualStyleBackColor = True
-        '
-        'TabPage3
-        '
-        Me.TabPage3.Controls.Add(Me.AtcGridFlow)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 26)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(192, 70)
-        Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "Flows"
-        Me.TabPage3.UseVisualStyleBackColor = True
-        '
-        'AtcGridFlow
-        '
-        Me.AtcGridFlow.AllowHorizontalScrolling = True
-        Me.AtcGridFlow.AllowNewValidValues = False
-        Me.AtcGridFlow.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridFlow.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridFlow.Fixed3D = False
-        Me.AtcGridFlow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridFlow.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridFlow.LineWidth = 0.0!
-        Me.AtcGridFlow.Location = New System.Drawing.Point(52, 21)
-        Me.AtcGridFlow.Name = "AtcGridFlow"
-        Me.AtcGridFlow.Size = New System.Drawing.Size(89, 28)
-        Me.AtcGridFlow.Source = Nothing
-        Me.AtcGridFlow.TabIndex = 20
-        '
-        'TabPage4
-        '
-        Me.TabPage4.Location = New System.Drawing.Point(4, 26)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(192, 70)
-        Me.TabPage4.TabIndex = 6
-        Me.TabPage4.Text = "Boundaries/Loads"
-        Me.TabPage4.UseVisualStyleBackColor = True
-        '
-        'TabPage6
-        '
-        Me.TabPage6.Controls.Add(Me.GroupBox2)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 26)
-        Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(192, 70)
-        Me.TabPage6.TabIndex = 5
-        Me.TabPage6.Text = "Environmental Time Series"
-        Me.TabPage6.UseVisualStyleBackColor = True
-        '
-        'GroupBox2
-        '
-        Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox2.Controls.Add(Me.txtMetWDMName)
-        Me.GroupBox2.Controls.Add(Me.cmdSelectWDM)
-        Me.GroupBox2.Location = New System.Drawing.Point(21, 20)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(148, 59)
-        Me.GroupBox2.TabIndex = 0
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Met WDM File"
-        '
-        'txtMetWDMName
-        '
-        Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 29)
-        Me.txtMetWDMName.Name = "txtMetWDMName"
-        Me.txtMetWDMName.ReadOnly = True
-        Me.txtMetWDMName.Size = New System.Drawing.Size(20, 23)
-        Me.txtMetWDMName.TabIndex = 2
-        '
-        'cmdSelectWDM
-        '
-        Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(57, 27)
-        Me.cmdSelectWDM.Name = "cmdSelectWDM"
-        Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
-        Me.cmdSelectWDM.TabIndex = 1
-        Me.cmdSelectWDM.Text = "Select"
-        Me.cmdSelectWDM.UseVisualStyleBackColor = True
-        '
         'TabPage5
         '
         Me.TabPage5.Controls.Add(Me.AtcConnectFields)
@@ -595,8 +513,126 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 395)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 392)
         Me.AtcConnectFields.TabIndex = 3
+        '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.cmdGenerate)
+        Me.TabPage2.Controls.Add(Me.AtcGridSegmentation)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Size = New System.Drawing.Size(192, 70)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Segmentation"
+        Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'cmdGenerate
+        '
+        Me.cmdGenerate.Location = New System.Drawing.Point(23, 14)
+        Me.cmdGenerate.Name = "cmdGenerate"
+        Me.cmdGenerate.Size = New System.Drawing.Size(126, 25)
+        Me.cmdGenerate.TabIndex = 1
+        Me.cmdGenerate.Text = "Generate"
+        Me.cmdGenerate.UseVisualStyleBackColor = True
+        '
+        'AtcGridSegmentation
+        '
+        Me.AtcGridSegmentation.AllowHorizontalScrolling = True
+        Me.AtcGridSegmentation.AllowNewValidValues = False
+        Me.AtcGridSegmentation.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridSegmentation.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridSegmentation.Fixed3D = False
+        Me.AtcGridSegmentation.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridSegmentation.LineWidth = 1.0!
+        Me.AtcGridSegmentation.Location = New System.Drawing.Point(23, 74)
+        Me.AtcGridSegmentation.Name = "AtcGridSegmentation"
+        Me.AtcGridSegmentation.Size = New System.Drawing.Size(147, 0)
+        Me.AtcGridSegmentation.Source = Nothing
+        Me.AtcGridSegmentation.TabIndex = 0
+        '
+        'TabPage3
+        '
+        Me.TabPage3.Controls.Add(Me.AtcGridFlow)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage3.Name = "TabPage3"
+        Me.TabPage3.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage3.TabIndex = 2
+        Me.TabPage3.Text = "Flows"
+        Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'AtcGridFlow
+        '
+        Me.AtcGridFlow.AllowHorizontalScrolling = True
+        Me.AtcGridFlow.AllowNewValidValues = False
+        Me.AtcGridFlow.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridFlow.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridFlow.Fixed3D = False
+        Me.AtcGridFlow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridFlow.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridFlow.LineWidth = 0.0!
+        Me.AtcGridFlow.Location = New System.Drawing.Point(23, 74)
+        Me.AtcGridFlow.Name = "AtcGridFlow"
+        Me.AtcGridFlow.Size = New System.Drawing.Size(569, 309)
+        Me.AtcGridFlow.Source = Nothing
+        Me.AtcGridFlow.TabIndex = 20
+        '
+        'TabPage4
+        '
+        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage4.Name = "TabPage4"
+        Me.TabPage4.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage4.TabIndex = 6
+        Me.TabPage4.Text = "Boundaries/Loads"
+        Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'TabPage6
+        '
+        Me.TabPage6.Controls.Add(Me.AtcGridMet)
+        Me.TabPage6.Controls.Add(Me.GroupBox2)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage6.Name = "TabPage6"
+        Me.TabPage6.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage6.TabIndex = 5
+        Me.TabPage6.Text = "Meteorologic Time Series"
+        Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox2.Controls.Add(Me.txtMetWDMName)
+        Me.GroupBox2.Controls.Add(Me.cmdSelectWDM)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 20)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(570, 59)
+        Me.GroupBox2.TabIndex = 0
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Met WDM File"
+        '
+        'txtMetWDMName
+        '
+        Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 32)
+        Me.txtMetWDMName.Name = "txtMetWDMName"
+        Me.txtMetWDMName.ReadOnly = True
+        Me.txtMetWDMName.Size = New System.Drawing.Size(442, 23)
+        Me.txtMetWDMName.TabIndex = 2
+        '
+        'cmdSelectWDM
+        '
+        Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(479, 30)
+        Me.cmdSelectWDM.Name = "cmdSelectWDM"
+        Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
+        Me.cmdSelectWDM.TabIndex = 1
+        Me.cmdSelectWDM.Text = "Select"
+        Me.cmdSelectWDM.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
@@ -629,6 +665,24 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
+        'AtcGridMet
+        '
+        Me.AtcGridMet.AllowHorizontalScrolling = True
+        Me.AtcGridMet.AllowNewValidValues = False
+        Me.AtcGridMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridMet.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridMet.Fixed3D = False
+        Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridMet.LineWidth = 0.0!
+        Me.AtcGridMet.Location = New System.Drawing.Point(21, 99)
+        Me.AtcGridMet.Name = "AtcGridMet"
+        Me.AtcGridMet.Size = New System.Drawing.Size(570, 284)
+        Me.AtcGridMet.Source = Nothing
+        Me.AtcGridMet.TabIndex = 21
+        '
         'frmWASPSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -651,11 +705,12 @@ Public Class frmWASPSetup
         Me.TabPage1.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
+        Me.TabPage5.ResumeLayout(False)
+        Me.TabPage2.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
-        Me.TabPage5.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -663,10 +718,16 @@ Public Class frmWASPSetup
 
 #End Region
 
-    Friend pSegmentFieldMap As New atcUtility.atcCollection
+    Friend pDefaultSegmentFieldMap As New atcUtility.atcCollection
     Friend pPlugIn As PlugIn
     Friend pBasinsFolder As String
-    Friend pFlowStations As atcUtility.atcCollection
+
+    Friend pFlowStations As atcCollection
+    Friend pAirTempStations As atcCollection
+    Friend pWaterTempStations As atcCollection
+    Friend pSolRadStations As atcCollection
+    Friend pWindStations As atcCollection
+
     Private pInitializing As Boolean = True
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
@@ -675,7 +736,6 @@ Public Class frmWASPSetup
 
     Private Sub cboStreams_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboStreams.SelectedIndexChanged
         SetFieldMappingControl()
-        SetFlowStationGrid()
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -725,7 +785,7 @@ Public Class frmWASPSetup
             End If
 
             'add target properties from introspection on the swmm classes
-            AtcConnectFields.lstTarget.Items.Clear()        
+            AtcConnectFields.lstTarget.Items.Clear()
             Dim lSegment As New atcWASP.Segment
             For Each lField As Reflection.FieldInfo In lSegment.GetType.GetFields
                 AtcConnectFields.lstTarget.Items.Add("Segment:" & lField.Name)
@@ -735,8 +795,8 @@ Public Class frmWASPSetup
             AtcConnectFields.lstConnections.Items.Clear()
             Dim lConn As String
             Dim lType As String = "Segment"
-            For lIndex As Integer = 0 To pSegmentFieldMap.Count - 1
-                lConn = lType & ":" & pSegmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pSegmentFieldMap(lIndex)
+            For lIndex As Integer = 0 To pDefaultSegmentFieldMap.Count - 1
+                lConn = lType & ":" & pDefaultSegmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pDefaultSegmentFieldMap(lIndex)
                 AtcConnectFields.AddConnection(lConn, True)
             Next
         End If
@@ -744,31 +804,6 @@ Public Class frmWASPSetup
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Logger.Dbg("Setup WASP input files")
-        'set field mapping as specified in field mapping control
-        pSegmentFieldMap.Clear()
-        For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
-            Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
-            Dim lBaseLen As Integer = 0
-            Dim lBaseName As String = ""
-            If Mid(lTxt, 1, 7) = "Segment" Then
-                lBaseLen = 7
-                lBaseName = "Segment"
-            End If
-            Dim lSpacePos As Integer = InStr(lTxt, " ")
-            Dim lGTPos As Integer = InStr(lTxt, ">")
-            Dim lSrc As String = Mid(lTxt, lBaseLen + 2, lSpacePos - lBaseLen - 2)
-
-            If Mid(lTxt, lGTPos + 2, lBaseLen) = lBaseName Then
-                Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
-                If Mid(lTxt, 1, 7) = "Segment" Then
-                    pSegmentFieldMap.Add(lSrc, lTar)
-                End If
-            End If
-        Next
-
-        'set file names for segments
-        Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-        Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
 
         lblStatus.Text = "Preparing to process"
         Me.Refresh()
@@ -784,27 +819,6 @@ Public Class frmWASPSetup
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
                 .Name = lName
-
-                'populate the SWMM classes from the shapefiles'
-                .Segments.Clear()
-                Dim lTable As New atcUtility.atcTableDBF
-
-                'add only selected segments
-                Dim lTempSegments As New atcWASP.Segments
-                If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
-                    Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
-                    lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap), "Name"))
-                End If
-                Logger.Dbg("SegmentsCount " & lTempSegments.Count)
-                'CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
-
-                'after reading the attribute table, see if any are selected
-                If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
-                    'put only selected segments in .segments 
-                    For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
-                        .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
-                    Next
-                End If
 
                 'save project file and start WASP
                 Logger.Dbg("Save WASP network import file" & lWASPProjectFileName)
@@ -826,7 +840,7 @@ Public Class frmWASPSetup
 
     Private Function PreProcessChecking(ByVal aOutputFileName As String) As Boolean
         Logger.Dbg("PreprocessChecking " & aOutputFileName)
-        
+
         'see if this file already exists
         If FileExists(aOutputFileName) Then  'already exists
             If Logger.Msg("WASP Project '" & FilenameNoPath(aOutputFileName) & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
@@ -846,22 +860,21 @@ Public Class frmWASPSetup
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         pFlowStations = New atcCollection
+        pAirTempStations = New atcCollection
+        pWaterTempStations = New atcCollection
+        pSolRadStations = New atcCollection
+        pWindStations = New atcCollection
 
         'set field mapping for segments
-        pSegmentFieldMap.Clear()
-        pSegmentFieldMap.Add("GNIS_NAME", "Name")
-        pSegmentFieldMap.Add("COMID", "ID")
-        pSegmentFieldMap.Add("LINKNO", "ID")
-        pSegmentFieldMap.Add("LENGTHKM", "Length")
-        pSegmentFieldMap.Add("Length", "Length")
-        pSegmentFieldMap.Add("WIDTH", "Width")
-        pSegmentFieldMap.Add("MeanWidth", "Width")
-        pSegmentFieldMap.Add("DMULT", "Dmult")
-        pSegmentFieldMap.Add("VMULT", "Vmult")
-        pSegmentFieldMap.Add("SLOPE", "Slope")
-        pSegmentFieldMap.Add("ROUGHNESS", "Roughness")
-        pSegmentFieldMap.Add("DSCOMID", "DownID")
-        pSegmentFieldMap.Add("DSLINKNO", "DownID")
+        pDefaultSegmentFieldMap.Clear()
+        pDefaultSegmentFieldMap.Add("GNIS_NAME", "Name")
+        pDefaultSegmentFieldMap.Add("COMID", "ID")
+        pDefaultSegmentFieldMap.Add("LINKNO", "ID")
+        pDefaultSegmentFieldMap.Add("LENGTHKM", "Length")
+        pDefaultSegmentFieldMap.Add("MeanWidth", "Width")
+        pDefaultSegmentFieldMap.Add("DSCOMID", "DownID")
+        pDefaultSegmentFieldMap.Add("DSLINKNO", "DownID")
+        pDefaultSegmentFieldMap.Add("TOCOMID", "DownID")
 
         cboMet.Items.Add("<none>")
 
@@ -870,10 +883,20 @@ Public Class frmWASPSetup
             .AllowHorizontalScrolling = False
         End With
 
+        With AtcGridSegmentation
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+
+        With AtcGridMet
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile 
-                
+
             ElseIf GisUtil.LayerType(lLayerIndex) = 2 Then 'LineShapefile 
                 cboStreams.Items.Add(lLayerName)
                 'see if there are any selected features in this layer, if so assume this is the stream segment layer
@@ -887,7 +910,7 @@ Public Class frmWASPSetup
                     'cboMet.SelectedIndex = cboMet.Items.Count - 1
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 4 Then 'Grid
-                
+
             End If
         Next
 
@@ -919,7 +942,63 @@ Public Class frmWASPSetup
         tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
 
         BuildListofValidStationNames("FLOW", pFlowStations)
-        SetFlowStationGrid()
+
+        AtcGridFlow.Clear()
+        With AtcGridFlow.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+            .CellValue(0, 0) = "Segment"
+            .CellValue(0, 1) = "Input Flow Timeseries"
+        End With
+
+        AtcGridSegmentation.Clear()
+        With AtcGridSegmentation.Source
+            .Columns = 8
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .CellColor(0, 2) = SystemColors.ControlDark
+            .CellColor(0, 3) = SystemColors.ControlDark
+            .CellColor(0, 4) = SystemColors.ControlDark
+            .CellColor(0, 5) = SystemColors.ControlDark
+            .CellColor(0, 6) = SystemColors.ControlDark
+            .CellColor(0, 7) = SystemColors.ControlDark
+            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+            .CellValue(0, 0) = "Segment"
+            .CellValue(0, 1) = "Length"
+            .CellValue(0, 2) = "Width"
+            .CellValue(0, 3) = "DMult"
+            .CellValue(0, 4) = "VMult"
+            .CellValue(0, 5) = "Slope"
+            .CellValue(0, 6) = "Roughness"
+            .CellValue(0, 7) = "DownStream ID"
+        End With
+
+        AtcGridMet.Clear()
+        With AtcGridMet.Source
+            .Columns = 5
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .CellColor(0, 2) = SystemColors.ControlDark
+            .CellColor(0, 3) = SystemColors.ControlDark
+            .CellColor(0, 4) = SystemColors.ControlDark
+            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+            .CellValue(0, 0) = "Segment"
+            .CellValue(0, 1) = "Air Temperature"
+            .CellValue(0, 2) = "Water Temperature"
+            .CellValue(0, 3) = "Solar Radiation"
+            .CellValue(0, 4) = "Wind Speed"
+        End With
 
         pInitializing = False
         SetFieldMappingControl()
@@ -962,14 +1041,129 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
-        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-        EnableControls(True)
+        If Len(txtMetWDMName.Text) > 0 Then
+            lblStatus.Text = "Reading Meteorological Data from WDM File..."
+            Me.Refresh()
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+            EnableControls(False)
+
+            Dim lMetFile As atcWDM.atcDataSourceWDM = GetMetFile(txtMetWDMName.Text)
+            BuildListofValidStationNames("ATMP", pAirTempStations)   'want to do this from only 1 data source
+            BuildListofValidStationNames("WTMP", pWaterTempStations)
+            BuildListofValidStationNames("SOLRAD", pSolRadStations)
+            BuildListofValidStationNames("WIND", pWindStations)
+
+            lblStatus.Text = "Update specifications if desired, then click OK to proceed."
+            Me.Refresh()
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            EnableControls(True)
+        Else
+            'clear lists of met stations
+            pAirTempStations.Clear()
+            pWaterTempStations.Clear()
+            pSolRadStations.Clear()
+            pWindStations.Clear()
+        End If
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
         Logger.Dbg(lblStatus.Text)
+    End Sub
+
+    Private Sub cmdGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdGenerate.Click
+
+        'set field mapping as specified in field mapping control
+        Dim lSegmentFieldMap As New atcCollection
+        lSegmentFieldMap.Clear()
+        For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
+            Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
+            Dim lBaseLen As Integer = 0
+            Dim lBaseName As String = ""
+            If Mid(lTxt, 1, 7) = "Segment" Then
+                lBaseLen = 7
+                lBaseName = "Segment"
+            End If
+            Dim lSpacePos As Integer = InStr(lTxt, " ")
+            Dim lGTPos As Integer = InStr(lTxt, ">")
+            Dim lSrc As String = Mid(lTxt, lBaseLen + 2, lSpacePos - lBaseLen - 2)
+
+            If Mid(lTxt, lGTPos + 2, lBaseLen) = lBaseName Then
+                Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
+                If Mid(lTxt, 1, 7) = "Segment" Then
+                    lSegmentFieldMap.Add(lSrc, lTar)
+                End If
+            End If
+        Next
+
+        'set file names for segments
+        Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+
+        'populate the SWMM classes from the shapefiles'
+        With pPlugIn.WASPProject
+            .Segments.Clear()
+            Dim lTable As New atcUtility.atcTableDBF
+
+            'add only selected segments
+            Dim lTempSegments As New atcWASP.Segments
+            If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
+                Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
+                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, lSegmentFieldMap), "Name"))
+            End If
+            Logger.Dbg("SegmentsCount " & lTempSegments.Count)
+            'CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
+
+            'after reading the attribute table, see if any are selected
+            If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
+                'put only selected segments in .segments 
+                For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
+                    .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
+                Next
+            Else
+                'add all 
+                .Segments = lTempSegments
+            End If
+
+        End With
+
+        SetSegmentationGrid()
+        SetFlowStationGrid()
+        SetMetStationGrid()
+
+    End Sub
+
+    Private Sub SetSegmentationGrid()
+        If AtcGridSegmentation.Source Is Nothing Then
+            Logger.Dbg("No atcGridSegmentation")
+        Else
+            Logger.Dbg("Begin")
+            
+            With AtcGridSegmentation.Source
+                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).Length
+                    .CellEditable(lIndex, 1) = True
+                    .CellValue(lIndex, 2) = pPlugIn.WASPProject.Segments(lIndex - 1).Width
+                    .CellEditable(lIndex, 2) = True
+                    .CellValue(lIndex, 3) = pPlugIn.WASPProject.Segments(lIndex - 1).Dmult
+                    .CellEditable(lIndex, 3) = True
+                    .CellValue(lIndex, 4) = pPlugIn.WASPProject.Segments(lIndex - 1).Vmult
+                    .CellEditable(lIndex, 4) = True
+                    .CellValue(lIndex, 5) = pPlugIn.WASPProject.Segments(lIndex - 1).Slope
+                    .CellEditable(lIndex, 5) = True
+                    .CellValue(lIndex, 6) = pPlugIn.WASPProject.Segments(lIndex - 1).Roughness
+                    .CellEditable(lIndex, 6) = True
+                    .CellValue(lIndex, 7) = pPlugIn.WASPProject.Segments(lIndex - 1).DownID
+                Next
+            End With
+
+            AtcGridSegmentation.SizeAllColumnsToContents()
+            AtcGridSegmentation.Refresh()
+
+            Logger.Dbg("SegmentationGrid refreshed")
+        End If
     End Sub
 
     Private Sub SetFlowStationGrid()
@@ -977,39 +1171,11 @@ Public Class frmWASPSetup
             Logger.Dbg("No atcGridFlow or Streams layer selected")
         Else
             Logger.Dbg("Begin")
-            Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-            Dim lStreamsShapefileName As String = GisUtil.LayerFileName(lStreamsLayerIndex)
 
-            Dim lTempSegments As New atcWASP.Segments
-            Dim lTable As New atcUtility.atcTableDBF
-            If lTable.OpenFile(FilenameSetExt(lStreamsShapefileName, "dbf")) Then
-                lTempSegments.AddRange(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap))
-            End If
-            Logger.Dbg("SegmentsCount " & lTempSegments.Count)
-
-            'after reading the attribute table, see if any are selected
-            If GisUtil.NumSelectedFeatures(lStreamsLayerIndex) > 0 Then
-                Dim lSelectedSegments As New atcWASP.Segments
-                'remove from ltempsegments any that are not selected
-                For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lStreamsLayerIndex) - 1
-                    lSelectedSegments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lStreamsLayerIndex)))
-                Next
-                lTempSegments = lSelectedSegments
-            End If
-
-            AtcGridFlow.Clear()
             With AtcGridFlow.Source
-                .Columns = 2
-                .ColorCells = True
-                .FixedRows = 1
-                .FixedColumns = 1
-                .CellColor(0, 0) = SystemColors.ControlDark
-                .CellColor(0, 1) = SystemColors.ControlDark
-                .Rows = 1 + lTempSegments.Count
-                .CellValue(0, 0) = "Segment"
-                .CellValue(0, 1) = "Input Flow Timeseries"
-                For lIndex As Integer = 1 To lTempSegments.Count
-                    .CellValue(lIndex, 0) = lTempSegments(lIndex - 1).ID & ":" & lTempSegments(lIndex - 1).Name
+                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     If pFlowStations.Count > 0 Then
                         .CellValue(lIndex, 1) = "<none>"
@@ -1028,10 +1194,65 @@ Public Class frmWASPSetup
             AtcGridFlow.SizeAllColumnsToContents()
             AtcGridFlow.Refresh()
 
-            lTempSegments.Clear()
-
             Logger.Dbg("FlowStationGrid refreshed")
         End If
     End Sub
 
+    Private Sub SetMetStationGrid()
+        If AtcGridMet.Source Is Nothing Then
+            Logger.Dbg("No atcGridMet")
+        Else
+            Logger.Dbg("Begin")
+
+            With AtcGridMet.Source
+                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    .CellValue(lIndex, 1) = "<none>"
+                    .CellValue(lIndex, 2) = "<none>"
+                    .CellValue(lIndex, 3) = "<none>"
+                    .CellValue(lIndex, 4) = "<none>"
+                Next
+            End With
+
+            'Logger.Dbg("SetValidValues")
+            'Dim lValidValues As New atcCollection
+            'lValidValues.Add("<none>")
+            'For Each lFlowStation As StationDetails In pFlowStations
+            '    lValidValues.Add(lFlowStation.Description)
+            'Next
+            'AtcGridFlow.ValidValues = lValidValues
+            AtcGridMet.SizeAllColumnsToContents()
+            AtcGridMet.Refresh()
+
+            Logger.Dbg("MetStationGrid refreshed")
+        End If
+    End Sub
+
+    Friend Function GetMetFile(ByRef aMetWDMName As String) As atcWDM.atcDataSourceWDM
+        Logger.Dbg("MetWDMName " & aMetWDMName)
+
+        Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
+        If FileExists(aMetWDMName) Then
+            Dim lFound As Boolean = False
+            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
+                    'found it in the BASINS data sources
+                    lDataSource = lBASINSDataSource
+                    lFound = True
+                    Exit For
+                End If
+            Next
+
+            If Not lFound Then 'need to open it here
+                lDataSource = New atcWDM.atcDataSourceWDM
+                If lDataSource.Open(aMetWDMName) Then
+                    lFound = True
+
+                End If
+            End If
+        End If
+        Return lDataSource
+    End Function
 End Class
