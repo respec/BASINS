@@ -377,146 +377,208 @@ NextRecord:
     End Function
 
     Public Overrides Sub ReadData(ByVal aReadMe As atcDataSet)
-        Dim lField As Integer = aReadMe.Attributes.GetValue("FieldIndex", 0)
+        Dim lField As Integer
         If Not DataSets.Contains(aReadMe) Then
             Logger.Dbg("Dataset not from this source:" & aReadMe.ToString & vbCrLf & _
                        "Source:'" & Specification & "'")
-        ElseIf lField < 1 Then
-            Logger.Dbg("Dataset does not have a field index:" & aReadMe.ToString & vbCrLf & _
-                       "Source:'" & Specification & "'")
         Else
 
-            Dim lTable As atcTable = OpenTable()
-            If lTable Is Nothing Then
-                Logger.Dbg("Unable to open " & Specification)
-            Else
-                Dim lReadTS As atcTimeseries = aReadMe 'atcTimeseries type so we can access Values and Dates
-                Logger.Status("Reading values for " & lReadTS.ToString)
-                Dim lDataLocation As String = lReadTS.Attributes.GetValue("Location")
-                Dim lLocation As String
-                Dim lDate As Double
-                Dim lYear As Integer = pYearBase
-                Dim lYearReading As Integer = 0
-                Dim lMonReading As Integer = 0
-                Dim lDayReading As Integer = 0
-                Dim lMONvalue As Integer
-
-                Dim lValueIndex As Integer = 1
-
-                Dim lVd(pNumValues) As Double 'array of double data values
-                Dim lJd(-1) As Double 'array of julian dates
-
-                Dim lNeedDates As Boolean
-                If pDates.numValues = 0 Then
-                    lNeedDates = True
-                    ReDim lJd(pNumValues)
-                    lJd(0) = pNaN
-                Else
-                    lNeedDates = False
-                End If
-
-                lVd(0) = pNaN
-
-                With lTable
-                    Do
-                        If pTableDelimited Then
-                            lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
+            Dim lReadTS As atcTimeseries
+            Dim lReadThese As New Generic.List(Of atcTimeseries)
+            Dim lReadLocation As New Generic.List(Of String)
+            Dim lReadField As New Generic.List(Of Integer)
+            Dim lReadValues As New Generic.List(Of Double()) 'array of double data values for each timeseries
+            If Me.DataSets.Count < 1000 Then
+                'Reading all datasets at once is much faster than one at a time
+                For Each lReadTS In Me.DataSets
+                    If lReadTS.ValuesNeedToBeRead Then
+                        lField = lReadTS.Attributes.GetValue("FieldIndex", 0)
+                        If lField < 1 Then
+                            Logger.Dbg("Dataset does not have a field index:" & aReadMe.ToString & vbCrLf & _
+                                       "Source:'" & Specification & "'")
                         Else
-                            lLocation = .Value(1)
+                            lReadThese.Add(lReadTS)
+                            lReadLocation.Add(lReadTS.Attributes.GetValue("Location"))
+                            lReadField.Add(lField)
+                            Dim lVd(pNumValues) As Double 'array of double data values
+                            lVd(0) = pNaN
+                            lReadValues.Add(lVd)
+                        End If
+                    End If
+                Next
+            Else
+                lReadTS = aReadMe
+                lField = lReadTS.Attributes.GetValue("FieldIndex", 0)
+                If lField < 1 Then
+                    Logger.Dbg("Dataset does not have a field index:" & aReadMe.ToString & vbCrLf & _
+                               "Source:'" & Specification & "'")
+                Else
+                    lReadThese.Add(lReadTS)
+                    lReadLocation.Add(lReadTS.Attributes.GetValue("Location"))
+                    lReadField.Add(lField)
+                    Logger.Status("Reading values for " & lReadThese.Item(0).ToString)
+                End If
+            End If
+            Dim lLastIndex As Integer = lReadThese.Count - 1
+
+            If lLastIndex < 0 Then
+                Logger.Dbg("No datasets to read")
+            Else
+                Dim lTable As atcTable = OpenTable()
+                If lTable Is Nothing Then
+                    Logger.Dbg("Unable to open " & Specification)
+                Else
+                    Dim lLocation As String
+                    Dim lLocationIndex As Integer
+                    Dim lDate As Double
+                    Dim lYear As Integer = pYearBase
+                    Dim lYearReading As Integer = 0
+                    Dim lMonReading As Integer = 0
+                    Dim lDayReading As Integer = 0
+                    Dim lMONvalue As Integer
+
+                    Dim lValueIndex As Integer = 1
+
+                    Dim lVd() As Double = lReadValues(0)
+                    Dim lJd(-1) As Double 'array of julian dates
+
+                    Dim lNeedDates As Boolean
+                    If pDates.numValues = 0 Then
+                        lNeedDates = True
+                        ReDim lJd(pNumValues)
+                        lJd(0) = pNaN
+                    Else
+                        lNeedDates = False
+                    End If
+
+                    With lTable
+                        Do
+                            If pTableDelimited Then
+                                lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
+                            Else
+                                lLocation = .Value(1)
+                            End If
+
+                            Try
+                                For lLocationIndex = 0 To lLastIndex
+                                    If lReadLocation(lLocationIndex) = lLocation Then
+                                        If lLastIndex > 0 Then
+                                            lReadTS = lReadThese(lLocationIndex)
+                                            lField = lReadField(lLocationIndex)
+                                            lVd = lReadValues(lLocationIndex)
+                                        End If
+                                        If Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
+                                            If lValueIndex > pNumValues Then
+                                                If lNeedDates Then ReDim Preserve lJd(lValueIndex)
+                                                If lLastIndex = 0 Then
+                                                    ReDim Preserve lVd(lValueIndex)
+                                                Else
+                                                    For lIndex As Integer = 0 To lLastIndex
+                                                        lVd = lReadValues(lLocationIndex)
+                                                        ReDim Preserve lVd(lValueIndex)
+                                                    Next
+                                                    lVd = lReadValues(lLocationIndex)
+                                                End If
+                                            End If
+                                            Select Case pMONcontains
+                                                Case 0 'Monthly
+                                                    If lMONvalue < 13 Then
+                                                        If lMONvalue <> lMonReading Then
+                                                            lMonReading = lMONvalue
+                                                            If lMonReading = 1 Then
+                                                                lYear += 1
+                                                            End If
+                                                        End If
+                                                        lDate = atcUtility.Jday(lYear, lMONvalue, daymon(lYear, lMONvalue), 24, 0, 0)
+                                                        If lNeedDates AndAlso lValueIndex = 1 Then lJd(0) = atcUtility.Jday(lYear, lMONvalue, 1, 0, 0, 0)
+                                                    Else 'Skip yearly lines in monthly output
+                                                        GoTo NextRecord
+                                                    End If
+                                                Case 1 'Daily
+                                                    If lDate = 0 Then
+                                                        lDate = atcUtility.Jday(pYearBase, 1, 1, 24, 0, 0)
+                                                        lDayReading = lMONvalue
+                                                        If lNeedDates Then lJd(0) = atcUtility.Jday(pYearBase, 1, 1, 0, 0, 0)
+                                                    ElseIf lMONvalue <> lDayReading Then
+                                                        lDate += 1
+                                                        lDayReading = lMONvalue
+                                                        If lDayReading = 1 Then
+                                                            lYear += 1
+                                                        End If
+                                                    End If
+                                                Case 2 'Yearly
+                                                    lYear = lMONvalue
+                                                    lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
+                                                    If lNeedDates AndAlso lValueIndex = 1 Then lJd(0) = atcUtility.Jday(lYear - 1, 12, 31, 24, 0, 0)
+                                            End Select
+                                            If lYear <> lYearReading Then
+                                                Logger.Status("Reading year " & lYear, True)
+                                                Logger.Flush()
+                                                lYearReading = lYear
+                                                If pYearBase = 0 Then pYearBase = lYear
+                                            End If
+                                            'Debug.Print(lYear & " " & DumpDate(lDate) & " at " & lLocation)
+                                            Dim lFieldName As String = .FieldName(lField).ToString.Replace("""", "")
+                                            If lNeedDates Then lJd(lValueIndex) = lDate
+                                            If Not Double.TryParse(.Value(lField).Trim, lVd(lValueIndex)) Then
+                                                lVd(lValueIndex) = pNaN
+                                            End If
+                                            lValueIndex += 1
+                                        Else 'got to end of run summary, value is number of years as a decimal or we have reached blank line after end
+                                            Exit Do
+                                        End If
+                                    End If
+                                Next
+NextRecord:
+                                .CurrentRecord += 1
+                            Catch ex As FormatException
+                                Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
+                            Catch ex As Exception
+                                Logger.Dbg("Stopping reading SWAT output at record " & .CurrentRecord & ": " & ex.Message)
+                                Exit Do
+                            End Try
+                        Loop
+                        'Logger.Dbg("Read " & Format(lNumTS, "#,##0") & " timeseries From " & Format(.CurrentRecord, "#,##0") & " Records")
+                    End With
+
+                    If lNeedDates Then
+                        If lValueIndex <= pNumValues Then ReDim Preserve lJd(lValueIndex - 1)
+                        pDates.Values = lJd
+                    End If
+
+                    For lIndex As Integer = 0 To lLastIndex
+                        lReadTS = lReadThese(lIndex)
+                        lVd = lReadValues(lIndex)
+
+                        If lValueIndex <= pNumValues Then
+                            ReDim Preserve lVd(lValueIndex - 1)
                         End If
 
-                        Try
-                            If lLocation = lDataLocation Then
-                                If Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
-                                    If lValueIndex > pNumValues Then
-                                        If lNeedDates Then ReDim Preserve lJd(lValueIndex)
-                                        ReDim Preserve lVd(lValueIndex)
-                                    End If
-                                    Select Case pMONcontains
-                                        Case 0 'Monthly
-                                            If lMONvalue < 13 Then
-                                                If lMONvalue <> lMonReading Then
-                                                    lMonReading = lMONvalue
-                                                    If lMonReading = 1 Then
-                                                        lYear += 1
-                                                    End If
-                                                End If
-                                                lDate = atcUtility.Jday(lYear, lMONvalue, daymon(lYear, lMONvalue), 24, 0, 0)
-                                                If lNeedDates AndAlso lValueIndex = 1 Then lJd(0) = atcUtility.Jday(lYear, lMONvalue, 1, 0, 0, 0)
-                                            Else 'Skip yearly lines in monthly output
-                                                GoTo NextRecord
-                                            End If
-                                        Case 1 'Daily
-                                            If lDate = 0 Then
-                                                lDate = atcUtility.Jday(pYearBase, 1, 1, 24, 0, 0)
-                                                lDayReading = lMONvalue
-                                                If lNeedDates Then lJd(0) = atcUtility.Jday(pYearBase, 1, 1, 0, 0, 0)
-                                            ElseIf lMONvalue <> lDayReading Then
-                                                lDate += 1
-                                                lDayReading = lMONvalue
-                                                If lDayReading = 1 Then
-                                                    lYear += 1
-                                                End If
-                                            End If
-                                        Case 2 'Yearly
-                                            lYear = lMONvalue
-                                            lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
-                                            If lNeedDates AndAlso lValueIndex = 1 Then lJd(0) = atcUtility.Jday(lYear - 1, 12, 31, 24, 0, 0)
-                                    End Select
-                                    If lYear <> lYearReading Then
-                                        Logger.Status("Reading year " & lYear, True)
-                                        Logger.Flush()
-                                        lYearReading = lYear
-                                        If pYearBase = 0 Then pYearBase = lYear
-                                    End If
-                                    'Debug.Print(lYear & " " & DumpDate(lDate) & " at " & lLocation)
-                                    Dim lFieldName As String = .FieldName(lField).ToString.Replace("""", "")
-                                    If lNeedDates Then lJd(lValueIndex) = lDate
-                                    If Not Double.TryParse(.Value(lField).Trim, lVd(lValueIndex)) Then
-                                        lVd(lValueIndex) = pNaN
-                                    End If
-                                    lValueIndex += 1
-                                Else 'got to end of run summary, value is number of years as a decimal or we have reached blank line after end
-                                    Exit Do
-                                End If
-                            End If
-NextRecord:
-                            .CurrentRecord += 1
-                        Catch ex As FormatException
-                            Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
-                        Catch ex As Exception
-                            Logger.Dbg("Stopping reading SWAT output at record " & .CurrentRecord & ": " & ex.Message)
-                            Exit Do
-                        End Try
-                    Loop
-                    'Logger.Dbg("Read " & Format(lNumTS, "#,##0") & " timeseries From " & Format(.CurrentRecord, "#,##0") & " Records")
-                End With
+                        lReadTS.ValuesNeedToBeRead = False
 
-                If lValueIndex <= pNumValues Then
-                    If lNeedDates Then ReDim Preserve lJd(lValueIndex - 1)
-                    ReDim Preserve lVd(lValueIndex - 1)
+                        lReadTS.Values = lVd
+                        With lReadTS.Attributes
+                            .SetValue("point", False)
+                            .SetValue("ts", 1)
+                            .SetValue("tu", pTimeUnit)
+                            .SetValue("TSFILL", pNaN)
+                            .SetValue("MVal", pNaN)
+                            .SetValue("MAcc", pNaN)
+                            .AddHistory("Read from " & Specification)
+                            'Do we need to do FillValues? It seems like we already always have them filled, it is faster to skip, and lets us share pDates
+                            'Dim lFilledTS As atcTimeseries = FillValues(lReadTS, .GetValue("tu"), .GetValue("ts"), .GetValue("TSFILL"), .GetValue("MVal"), .GetValue("MAcc"), Me)
+                            'lReadTS.Dates.Values = lFilledTS.Dates.Values
+                            'lReadTS.Values = lFilledTS.Values
+                        End With
+                        Logger.Progress(lIndex, lLastIndex)
+                    Next
+                    Logger.Progress("", 0, 0)
                 End If
-
-                lReadTS.ValuesNeedToBeRead = False
-                If lNeedDates Then
-                    pDates.Values = lJd
-                End If
-                lReadTS.Values = lVd
-                With lReadTS.Attributes
-                    .SetValue("point", False)
-                    .SetValue("ts", 1)
-                    .SetValue("tu", pTimeUnit)
-                    .SetValue("TSFILL", pNaN)
-                    .SetValue("MVal", pNaN)
-                    .SetValue("MAcc", pNaN)
-                    .AddHistory("Read from " & Specification)
-                    'Do we need to do FillValues? It seems like we already always have them filled, it is faster to skip, and lets us share pDates
-                    'Dim lFilledTS As atcTimeseries = FillValues(lReadTS, .GetValue("tu"), .GetValue("ts"), .GetValue("TSFILL"), .GetValue("MVal"), .GetValue("MAcc"), Me)
-                    'lReadTS.Dates.Values = lFilledTS.Dates.Values
-                    'lReadTS.Values = lFilledTS.Values
-                End With
-                Logger.Progress("", 0, 0)
             End If
+            lReadThese.Clear()
+            lReadLocation.Clear()
+            lReadField.Clear()
+            lReadValues.Clear()
         End If
     End Sub
 

@@ -84,7 +84,7 @@ Public Class frmDownload
             End If
         Catch ex As Exception
             Dim lRegionForm As New frmSpecifyRegion
-            lRegion = lRegionForm.AskUser()
+            lRegion = lRegionForm.AskUser(Me.Icon)
             If Not lRegion Is Nothing Then
                 Return lRegion.GetProjected(D4EMDataManager.SpatialOperations.GeographicProjection)
             End If
