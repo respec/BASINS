@@ -174,9 +174,11 @@ Public Class atcTimeseriesSWAT
             Dim lDelim As String = ";" 'Used only inside this routine to delimit fields to process
             Dim lFieldsToProcess As String = ""
             Dim lLocationsToProcess As String = ""
+            Dim lSUBsToProcess As String = ""
             If aAttributes IsNot Nothing Then
                 If aAttributes.ContainsAttribute("FieldName") Then lFieldsToProcess = lDelim & aAttributes.GetValue("FieldName", "") & lDelim
                 If aAttributes.ContainsAttribute("LocationName") Then lLocationsToProcess = lDelim & aAttributes.GetValue("LocationName", "") & lDelim
+                If aAttributes.ContainsAttribute("SUB") Then lSUBsToProcess = lDelim & aAttributes.GetValue("SUB", "") & lDelim
             End If
             Dim lKnowInterval As Boolean = False
             Dim lKnowYearBase As Boolean = False
@@ -186,6 +188,7 @@ Public Class atcTimeseriesSWAT
             Dim lFieldName As String
 
             Dim lLocations As New List(Of String)
+            Dim lSubs As New List(Of String)
             Dim lFieldNums As New List(Of Integer)
             Dim lFieldNames As New List(Of String)
 ReOpenTable:
@@ -276,7 +279,10 @@ ReOpenTable:
                         End If
 
                         If lLocationsToProcess.Length = 0 OrElse lLocationsToProcess.Contains(lDelim & lLocation & lDelim) Then
-                            lLocations.Add(lLocation)
+                            If lSUBsToProcess.Length = 0 OrElse lSUBsToProcess.Contains(lDelim & .Value(pSubIdField).Trim & lDelim) Then
+                                lLocations.Add(lLocation)
+                                If pSaveSubwatershedId Then lSubs.Add(.Value(pSubIdField).Trim)
+                            End If
                         End If
                         .CurrentRecord += 1
                     Loop
@@ -335,7 +341,8 @@ ReOpenTable:
 
                 Logger.Status("Reading " & Format(lTotalDatasets, "#,###") & " datasets from " & Specification, True)
 
-                For Each lLocation In lLocations
+                For lLocationIndex As Integer = 0 To lLocations.Count - 1
+                    lLocation = lLocations(lLocationIndex)
                     Try
                         For Each lFieldIndex In lFieldNums
                             lFieldName = lFieldNames.Item(lFieldIndex).Clone
@@ -346,7 +353,7 @@ ReOpenTable:
                             With lTS.Attributes
                                 .SetValue("FieldIndex", lFieldIndex)
                                 If pSaveSubwatershedId Then
-                                    'TODO: we are not going through table now but need to get SubId: .SetValue("SubId", lTable.Value(pSubIdField).Trim)
+                                    .SetValue("SubId", lSubs(lLocationIndex))
                                     .SetValue("CropId", lLocation.Substring(0, 4).Trim)
                                     .SetValue("HruId", lLocation.Substring(4).Trim)
                                 End If
@@ -416,6 +423,9 @@ NextRecord:
                     lReadThese.Add(lReadTS)
                     lReadLocation.Add(lReadTS.Attributes.GetValue("Location"))
                     lReadField.Add(lField)
+                    Dim lVd(pNumValues) As Double 'array of double data values
+                    lVd(0) = pNaN
+                    lReadValues.Add(lVd)
                     Logger.Status("Reading values for " & lReadThese.Item(0).ToString)
                 End If
             End If
