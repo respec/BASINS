@@ -76,6 +76,7 @@ Public Class frmWASPSetup
     Friend WithEvents cmdGenerate As System.Windows.Forms.Button
     Friend WithEvents AtcGridSegmentation As atcControls.atcGrid
     Friend WithEvents AtcGridMet As atcControls.atcGrid
+    Friend WithEvents AtcGridLoad As atcControls.atcGrid
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -114,19 +115,21 @@ Public Class frmWASPSetup
         Me.AtcGridFlow = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.AtcGridMet = New atcControls.atcGrid
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.txtMetWDMName = New System.Windows.Forms.TextBox
         Me.cmdSelectWDM = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.AtcGridMet = New atcControls.atcGrid
+        Me.AtcGridLoad = New atcControls.atcGrid
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.TabPage5.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
+        Me.TabPage4.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -513,16 +516,16 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 392)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(611, 395)
         Me.AtcConnectFields.TabIndex = 3
         '
         'TabPage2
         '
         Me.TabPage2.Controls.Add(Me.cmdGenerate)
         Me.TabPage2.Controls.Add(Me.AtcGridSegmentation)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(192, 70)
+        Me.TabPage2.Size = New System.Drawing.Size(614, 398)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Segmentation"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -549,7 +552,7 @@ Public Class frmWASPSetup
         Me.AtcGridSegmentation.LineWidth = 1.0!
         Me.AtcGridSegmentation.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridSegmentation.Name = "AtcGridSegmentation"
-        Me.AtcGridSegmentation.Size = New System.Drawing.Size(147, 0)
+        Me.AtcGridSegmentation.Size = New System.Drawing.Size(569, 308)
         Me.AtcGridSegmentation.Source = Nothing
         Me.AtcGridSegmentation.TabIndex = 0
         '
@@ -577,12 +580,13 @@ Public Class frmWASPSetup
         Me.AtcGridFlow.LineWidth = 0.0!
         Me.AtcGridFlow.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridFlow.Name = "AtcGridFlow"
-        Me.AtcGridFlow.Size = New System.Drawing.Size(569, 309)
+        Me.AtcGridFlow.Size = New System.Drawing.Size(569, 310)
         Me.AtcGridFlow.Source = Nothing
         Me.AtcGridFlow.TabIndex = 20
         '
         'TabPage4
         '
+        Me.TabPage4.Controls.Add(Me.AtcGridLoad)
         Me.TabPage4.Location = New System.Drawing.Point(4, 25)
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Size = New System.Drawing.Size(614, 398)
@@ -601,6 +605,24 @@ Public Class frmWASPSetup
         Me.TabPage6.Text = "Meteorologic Time Series"
         Me.TabPage6.UseVisualStyleBackColor = True
         '
+        'AtcGridMet
+        '
+        Me.AtcGridMet.AllowHorizontalScrolling = True
+        Me.AtcGridMet.AllowNewValidValues = False
+        Me.AtcGridMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridMet.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridMet.Fixed3D = False
+        Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridMet.LineWidth = 0.0!
+        Me.AtcGridMet.Location = New System.Drawing.Point(21, 99)
+        Me.AtcGridMet.Name = "AtcGridMet"
+        Me.AtcGridMet.Size = New System.Drawing.Size(570, 281)
+        Me.AtcGridMet.Source = Nothing
+        Me.AtcGridMet.TabIndex = 21
+        '
         'GroupBox2
         '
         Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
@@ -618,7 +640,7 @@ Public Class frmWASPSetup
         '
         Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 32)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 33)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
         Me.txtMetWDMName.Size = New System.Drawing.Size(442, 23)
@@ -627,7 +649,7 @@ Public Class frmWASPSetup
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(479, 30)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(479, 31)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -665,23 +687,23 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
-        'AtcGridMet
+        'AtcGridLoad
         '
-        Me.AtcGridMet.AllowHorizontalScrolling = True
-        Me.AtcGridMet.AllowNewValidValues = False
-        Me.AtcGridMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.AtcGridLoad.AllowHorizontalScrolling = True
+        Me.AtcGridLoad.AllowNewValidValues = False
+        Me.AtcGridLoad.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridMet.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridMet.Fixed3D = False
-        Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridMet.LineWidth = 0.0!
-        Me.AtcGridMet.Location = New System.Drawing.Point(21, 99)
-        Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(570, 284)
-        Me.AtcGridMet.Source = Nothing
-        Me.AtcGridMet.TabIndex = 21
+        Me.AtcGridLoad.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridLoad.Fixed3D = False
+        Me.AtcGridLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridLoad.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridLoad.LineWidth = 0.0!
+        Me.AtcGridLoad.Location = New System.Drawing.Point(24, 70)
+        Me.AtcGridLoad.Name = "AtcGridLoad"
+        Me.AtcGridLoad.Size = New System.Drawing.Size(569, 310)
+        Me.AtcGridLoad.Source = Nothing
+        Me.AtcGridLoad.TabIndex = 21
         '
         'frmWASPSetup
         '
@@ -708,6 +730,7 @@ Public Class frmWASPSetup
         Me.TabPage5.ResumeLayout(False)
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
+        Me.TabPage4.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
@@ -724,11 +747,13 @@ Public Class frmWASPSetup
 
     Friend pFlowStations As atcCollection
     Friend pAirTempStations As atcCollection
-    Friend pWaterTempStations As atcCollection
     Friend pSolRadStations As atcCollection
     Friend pWindStations As atcCollection
+    Friend pWaterTempStations As atcCollection
 
     Private pInitializing As Boolean = True
+    Private pSelectedRow As Integer
+    Private pSelectedColumn As Integer
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
@@ -861,9 +886,9 @@ Public Class frmWASPSetup
 
         pFlowStations = New atcCollection
         pAirTempStations = New atcCollection
-        pWaterTempStations = New atcCollection
         pSolRadStations = New atcCollection
         pWindStations = New atcCollection
+        pWaterTempStations = New atcCollection
 
         'set field mapping for segments
         pDefaultSegmentFieldMap.Clear()
@@ -878,12 +903,17 @@ Public Class frmWASPSetup
 
         cboMet.Items.Add("<none>")
 
+        With AtcGridSegmentation
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+
         With AtcGridFlow
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
 
-        With AtcGridSegmentation
+        With AtcGridLoad
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
@@ -942,19 +972,7 @@ Public Class frmWASPSetup
         tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
 
         BuildListofValidStationNames("FLOW", pFlowStations)
-
-        AtcGridFlow.Clear()
-        With AtcGridFlow.Source
-            .Columns = 2
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-            .CellValue(0, 0) = "Segment"
-            .CellValue(0, 1) = "Input Flow Timeseries"
-        End With
+        BuildListofValidStationNames("WTMP", pWaterTempStations)
 
         AtcGridSegmentation.Clear()
         With AtcGridSegmentation.Source
@@ -981,9 +999,35 @@ Public Class frmWASPSetup
             .CellValue(0, 7) = "DownStream ID"
         End With
 
+        AtcGridFlow.Clear()
+        With AtcGridFlow.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+            .CellValue(0, 0) = "Segment"
+            .CellValue(0, 1) = "Input Flow Timeseries"
+        End With
+
+        AtcGridLoad.Clear()
+        With AtcGridLoad.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+            .CellValue(0, 0) = "Segment"
+            .CellValue(0, 1) = "Water Temp Timeseries"
+        End With
+
         AtcGridMet.Clear()
         With AtcGridMet.Source
-            .Columns = 5
+            .Columns = 4
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
@@ -991,13 +1035,11 @@ Public Class frmWASPSetup
             .CellColor(0, 1) = SystemColors.ControlDark
             .CellColor(0, 2) = SystemColors.ControlDark
             .CellColor(0, 3) = SystemColors.ControlDark
-            .CellColor(0, 4) = SystemColors.ControlDark
             .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .CellValue(0, 0) = "Segment"
             .CellValue(0, 1) = "Air Temperature"
-            .CellValue(0, 2) = "Water Temperature"
-            .CellValue(0, 3) = "Solar Radiation"
-            .CellValue(0, 4) = "Wind Speed"
+            .CellValue(0, 2) = "Solar Radiation"
+            .CellValue(0, 3) = "Wind Speed"
         End With
 
         pInitializing = False
@@ -1048,10 +1090,14 @@ Public Class frmWASPSetup
             EnableControls(False)
 
             Dim lMetFile As atcWDM.atcDataSourceWDM = GetMetFile(txtMetWDMName.Text)
-            BuildListofValidStationNames("ATMP", pAirTempStations)   'want to do this from only 1 data source
-            BuildListofValidStationNames("WTMP", pWaterTempStations)
-            BuildListofValidStationNames("SOLRAD", pSolRadStations)
-            BuildListofValidStationNames("WIND", pWindStations)
+            pAirTempStations.Clear()
+            BuildListofValidStationNamesFromDataSource(lMetFile, "ATMP", pAirTempStations)
+            BuildListofValidStationNamesFromDataSource(lMetFile, "ATEM", pAirTempStations)
+            pSolRadStations.Clear()
+            BuildListofValidStationNamesFromDataSource(lMetFile, "SOLRAD", pSolRadStations)
+            BuildListofValidStationNamesFromDataSource(lMetFile, "SOLR", pSolRadStations)
+            pWindStations.Clear()
+            BuildListofValidStationNamesFromDataSource(lMetFile, "WIND", pWindStations)
 
             lblStatus.Text = "Update specifications if desired, then click OK to proceed."
             Me.Refresh()
@@ -1060,7 +1106,6 @@ Public Class frmWASPSetup
         Else
             'clear lists of met stations
             pAirTempStations.Clear()
-            pWaterTempStations.Clear()
             pSolRadStations.Clear()
             pWindStations.Clear()
         End If
@@ -1128,6 +1173,7 @@ Public Class frmWASPSetup
 
         SetSegmentationGrid()
         SetFlowStationGrid()
+        SetLoadStationGrid()
         SetMetStationGrid()
 
     End Sub
@@ -1177,9 +1223,11 @@ Public Class frmWASPSetup
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    .CellValue(lIndex, 1) = "<none>"
                     If pFlowStations.Count > 0 Then
-                        .CellValue(lIndex, 1) = "<none>"
                         .CellEditable(lIndex, 1) = True
+                    Else
+                        .CellEditable(lIndex, 1) = False
                     End If
                 Next
             End With
@@ -1198,6 +1246,41 @@ Public Class frmWASPSetup
         End If
     End Sub
 
+    Private Sub SetLoadStationGrid()
+        If AtcGridLoad.Source Is Nothing Then
+            Logger.Dbg("No atcGridLoad")
+        Else
+            Logger.Dbg("Begin")
+
+            With AtcGridLoad.Source
+                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    .CellValue(lIndex, 1) = "<none>"
+                    If pWaterTempStations.Count > 0 Then
+                        .CellValue(lIndex, 1) = "<none>"
+                        .CellEditable(lIndex, 1) = True
+                    Else
+                        .CellEditable(lIndex, 1) = False
+                    End If
+                Next
+            End With
+
+            Logger.Dbg("SetValidValues")
+            Dim lValidValues As New atcCollection
+            lValidValues.Add("<none>")
+            For Each lLoadStation As StationDetails In pWaterTempStations
+                lValidValues.Add(lLoadStation.Description)
+            Next
+            AtcGridLoad.ValidValues = lValidValues
+            AtcGridLoad.SizeAllColumnsToContents()
+            AtcGridLoad.Refresh()
+
+            Logger.Dbg("LoadStationGrid refreshed")
+        End If
+    End Sub
+
     Private Sub SetMetStationGrid()
         If AtcGridMet.Source Is Nothing Then
             Logger.Dbg("No atcGridMet")
@@ -1210,19 +1293,14 @@ Public Class frmWASPSetup
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     .CellValue(lIndex, 1) = "<none>"
+                    .CellEditable(lIndex, 1) = True
                     .CellValue(lIndex, 2) = "<none>"
+                    .CellEditable(lIndex, 2) = True
                     .CellValue(lIndex, 3) = "<none>"
-                    .CellValue(lIndex, 4) = "<none>"
+                    .CellEditable(lIndex, 3) = True
                 Next
             End With
 
-            'Logger.Dbg("SetValidValues")
-            'Dim lValidValues As New atcCollection
-            'lValidValues.Add("<none>")
-            'For Each lFlowStation As StationDetails In pFlowStations
-            '    lValidValues.Add(lFlowStation.Description)
-            'Next
-            'AtcGridFlow.ValidValues = lValidValues
             AtcGridMet.SizeAllColumnsToContents()
             AtcGridMet.Refresh()
 
@@ -1249,10 +1327,48 @@ Public Class frmWASPSetup
                 lDataSource = New atcWDM.atcDataSourceWDM
                 If lDataSource.Open(aMetWDMName) Then
                     lFound = True
-
                 End If
             End If
         End If
         Return lDataSource
     End Function
+
+    Private Sub AtcGridMet_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridMet.MouseDownCell
+        pSelectedColumn = aColumn
+        pSelectedRow = aRow
+
+        DoLimitsMet()
+    End Sub
+
+    Private Sub DoLimitsMet()
+
+        With AtcGridMet
+            Dim lValidValues As New Collection
+            If pSelectedColumn = 1 Then 'air temp
+                For Each lStation As StationDetails In pAirTempStations
+                    lValidValues.Add(lStation.Description)
+                Next
+                If lValidValues.Count = 0 Then
+                    .Source.CellEditable(pSelectedRow, 1) = False
+                End If
+            ElseIf pSelectedColumn = 2 Then  'sol rad
+                For Each lStation As StationDetails In pSolRadStations
+                    lValidValues.Add(lStation.Description)
+                Next
+                If lValidValues.Count = 0 Then
+                    .Source.CellEditable(pSelectedRow, 3) = False
+                End If
+            ElseIf pSelectedColumn = 3 Then 'wind
+                For Each lStation As StationDetails In pWindStations
+                    lValidValues.Add(lStation.Description)
+                Next
+                If lValidValues.Count = 0 Then
+                    .Source.CellEditable(pSelectedRow, 4) = False
+                End If
+            End If
+            .ValidValues = lValidValues
+            .AllowNewValidValues = False
+            .Refresh()
+        End With
+    End Sub
 End Class
