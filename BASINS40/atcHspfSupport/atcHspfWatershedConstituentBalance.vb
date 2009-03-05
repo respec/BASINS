@@ -180,7 +180,7 @@ Public Module WatershedConstituentBalance
         Dim lConstituentLandUseTotals As New atcCollection
 
         Dim lLandUses As atcCollection = LandUses(aUci, aOperationTypes, aOutletLocation)
-        Logger.Dbg("LandUsecount:" & lLandUses.Count)
+        Logger.Dbg("LandUseCount:" & lLandUses.Count)
 
         Dim lString As New Text.StringBuilder
         lString.AppendLine(aBalanceType & " Watershed Balance Report For " & aScenario)
@@ -397,7 +397,7 @@ Public Module WatershedConstituentBalance
 
                                 lFieldIndex = 1
                                 .FieldLength(lFieldIndex) = 12
-                                .FieldName(lFieldIndex) = "LandUse".PadRight(12)
+                                .FieldName(lFieldIndex) = "Land Use".PadRight(12)
                                 For Each lLandUse As String In lLandUses.Keys
                                     If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
                                         lFieldIndex += 1
