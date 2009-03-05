@@ -114,6 +114,7 @@ Public Class frmWASPSetup
         Me.TabPage3 = New System.Windows.Forms.TabPage
         Me.AtcGridFlow = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
+        Me.AtcGridLoad = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
         Me.AtcGridMet = New atcControls.atcGrid
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
@@ -122,7 +123,6 @@ Public Class frmWASPSetup
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.AtcGridLoad = New atcControls.atcGrid
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -516,7 +516,7 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
         Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(611, 395)
+        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 395)
         Me.AtcConnectFields.TabIndex = 3
         '
         'TabPage2
@@ -552,7 +552,7 @@ Public Class frmWASPSetup
         Me.AtcGridSegmentation.LineWidth = 1.0!
         Me.AtcGridSegmentation.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridSegmentation.Name = "AtcGridSegmentation"
-        Me.AtcGridSegmentation.Size = New System.Drawing.Size(569, 308)
+        Me.AtcGridSegmentation.Size = New System.Drawing.Size(569, 307)
         Me.AtcGridSegmentation.Source = Nothing
         Me.AtcGridSegmentation.TabIndex = 0
         '
@@ -580,7 +580,7 @@ Public Class frmWASPSetup
         Me.AtcGridFlow.LineWidth = 0.0!
         Me.AtcGridFlow.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridFlow.Name = "AtcGridFlow"
-        Me.AtcGridFlow.Size = New System.Drawing.Size(569, 310)
+        Me.AtcGridFlow.Size = New System.Drawing.Size(569, 307)
         Me.AtcGridFlow.Source = Nothing
         Me.AtcGridFlow.TabIndex = 20
         '
@@ -593,6 +593,24 @@ Public Class frmWASPSetup
         Me.TabPage4.TabIndex = 6
         Me.TabPage4.Text = "Boundaries/Loads"
         Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'AtcGridLoad
+        '
+        Me.AtcGridLoad.AllowHorizontalScrolling = True
+        Me.AtcGridLoad.AllowNewValidValues = False
+        Me.AtcGridLoad.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridLoad.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridLoad.Fixed3D = False
+        Me.AtcGridLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridLoad.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridLoad.LineWidth = 0.0!
+        Me.AtcGridLoad.Location = New System.Drawing.Point(23, 74)
+        Me.AtcGridLoad.Name = "AtcGridLoad"
+        Me.AtcGridLoad.Size = New System.Drawing.Size(569, 307)
+        Me.AtcGridLoad.Source = Nothing
+        Me.AtcGridLoad.TabIndex = 21
         '
         'TabPage6
         '
@@ -617,9 +635,9 @@ Public Class frmWASPSetup
         Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
         Me.AtcGridMet.LineWidth = 0.0!
-        Me.AtcGridMet.Location = New System.Drawing.Point(21, 99)
+        Me.AtcGridMet.Location = New System.Drawing.Point(23, 97)
         Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(570, 281)
+        Me.AtcGridMet.Size = New System.Drawing.Size(570, 283)
         Me.AtcGridMet.Source = Nothing
         Me.AtcGridMet.TabIndex = 21
         '
@@ -640,7 +658,7 @@ Public Class frmWASPSetup
         '
         Me.txtMetWDMName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 33)
+        Me.txtMetWDMName.Location = New System.Drawing.Point(21, 34)
         Me.txtMetWDMName.Name = "txtMetWDMName"
         Me.txtMetWDMName.ReadOnly = True
         Me.txtMetWDMName.Size = New System.Drawing.Size(442, 23)
@@ -649,7 +667,7 @@ Public Class frmWASPSetup
         'cmdSelectWDM
         '
         Me.cmdSelectWDM.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSelectWDM.Location = New System.Drawing.Point(479, 31)
+        Me.cmdSelectWDM.Location = New System.Drawing.Point(479, 32)
         Me.cmdSelectWDM.Name = "cmdSelectWDM"
         Me.cmdSelectWDM.Size = New System.Drawing.Size(80, 27)
         Me.cmdSelectWDM.TabIndex = 1
@@ -686,24 +704,6 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.Filter = "Met WDM files (*.wdm)|*.wdm"
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
-        '
-        'AtcGridLoad
-        '
-        Me.AtcGridLoad.AllowHorizontalScrolling = True
-        Me.AtcGridLoad.AllowNewValidValues = False
-        Me.AtcGridLoad.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridLoad.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridLoad.Fixed3D = False
-        Me.AtcGridLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridLoad.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridLoad.LineWidth = 0.0!
-        Me.AtcGridLoad.Location = New System.Drawing.Point(24, 70)
-        Me.AtcGridLoad.Name = "AtcGridLoad"
-        Me.AtcGridLoad.Size = New System.Drawing.Size(569, 310)
-        Me.AtcGridLoad.Source = Nothing
-        Me.AtcGridLoad.TabIndex = 21
         '
         'frmWASPSetup
         '
