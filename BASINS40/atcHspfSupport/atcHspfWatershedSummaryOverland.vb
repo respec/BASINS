@@ -24,7 +24,19 @@ Public Module WatershedSummaryOverland
         Dim lAllNonpointData As New atcTimeseriesGroup
 
         Dim lPerlndOperations As HspfOperations = aUci.OpnBlks("PERLND").Ids
+        Dim lPerlndLastId As Integer = 0
+        For Each lPerlndOperation As HspfOperation In lPerlndOperations
+            If lPerlndOperation.Id > lPerlndLastId Then
+                lPerlndLastId = lPerlndOperation.Id
+            End If
+        Next
         Dim lImplndOperations As HspfOperations = aUci.OpnBlks("IMPLND").Ids
+        Dim lImplndLastId As Integer = 0
+        For Each lImplndOperation As HspfOperation In lImplndOperations
+            If lImplndOperation.Id > lImplndLastId Then
+                lImplndLastId = lImplndOperation.Id
+            End If
+        Next
         'Dim lPerlndFirstId As Integer
         'Dim lPerlndLastId As Integer
         'Dim lImplndFirstId As Integer
@@ -44,8 +56,12 @@ Public Module WatershedSummaryOverland
         Dim lSegment As Integer
         Dim lSegmentImplnd As Integer
 
-        FindSegmentStarts(lPerlndOperations, aPerlndSegmentStarts, lPerlndColumns)
-        FindSegmentStarts(lImplndOperations, aImplndSegmentStarts, lImplndColumns)
+        Dim lPerlndUniqueIds As ArrayList = Nothing
+        FindSegmentStarts(lPerlndOperations, aPerlndSegmentStarts, lPerlndColumns, lPerlndUniqueIds)
+        lPerlndLastId = lPerlndLastId Mod 50 '+ aPerlndSegmentStarts(0)
+        Dim lImplndUniqueIds As ArrayList = Nothing
+        FindSegmentStarts(lImplndOperations, aImplndSegmentStarts, lImplndColumns, lImplndUniqueIds)
+        lImplndLastId = lImplndLastId Mod 50 '+ aImplndSegmentStarts(0)
 
         Select Case aConstituentType
             Case "Sediment"
@@ -224,8 +240,9 @@ Public Module WatershedSummaryOverland
                         Dim lRowTotalTonsMean As Double = 0
                         Dim lRowTotalTonsMin As Double = 0
                         Dim lRowTotalTonsMax As Double = 0
-                        SetCellsTonsPerAcre(lSummary, aUci, lPerlndOperations, _
-                                            lID, lID + lPerlndColumns.Count - 1, _
+                        Dim lBaseId As Integer = lID - lID Mod 50
+                        SetCellsTonsPerAcre(lSummary, aUci, lPerlndOperations, lPerlndColumns, lPerlndUniqueIds, _
+                                            lID, lBaseId + lPerlndLastId, _
                                             lCurrentNonpointData, _
                                             lOutputTable, lField, _
                                             lRowTotalArea, _
@@ -233,8 +250,8 @@ Public Module WatershedSummaryOverland
                                             lTotalAreaPerColumn, lTotalTonsPerColumn)
 
                         lID = lSegmentImplnd
-                        SetCellsTonsPerAcre(lSummary, aUci, lImplndOperations, _
-                                            lID, lID + lImplndColumns.Count - 1, _
+                        SetCellsTonsPerAcre(lSummary, aUci, lImplndOperations, lImplndColumns, lImplndUniqueIds, _
+                                            lID, lBaseId + lImplndLastId, _
                                             lCurrentNonpointData, _
                                             lOutputTable, lField, _
                                             lRowTotalArea, _
@@ -367,7 +384,8 @@ Public Module WatershedSummaryOverland
         Return 100
     End Function
 
-    Private Sub FindSegmentStarts(ByVal aOperations As HspfOperations, ByRef aStarts As Integer(), ByRef aUniqueOperations As ArrayList)
+    Private Sub FindSegmentStarts(ByVal aOperations As HspfOperations, ByRef aStarts As Integer(), _
+                                  ByRef aUniqueOperations As ArrayList, ByRef aUniqueIds As ArrayList)
         Dim lMinID As Integer = 10000
         Dim lMaxID As Integer = 0
         Dim lMinDescription As String = ""
@@ -382,6 +400,9 @@ Public Module WatershedSummaryOverland
                 If .Id > lMaxID Then lMaxID = .Id
             End With
         Next
+
+        aUniqueIds = New ArrayList
+        aUniqueIds.AddRange(lOperationIds.Keys)
 
         aUniqueOperations = New ArrayList
         aUniqueOperations.AddRange(lOperationIds.Values)
@@ -403,6 +424,8 @@ Public Module WatershedSummaryOverland
     Private Sub SetCellsTonsPerAcre(ByVal aIncludeMinMax As Boolean, _
                                     ByVal aUCI As HspfUci, _
                                     ByVal aOperations As HspfOperations, _
+                                    ByVal aHeaders As ArrayList, _
+                                    ByVal aUniqueIds As ArrayList, _
                                     ByVal aID As Integer, ByVal aLastID As Integer, _
                                     ByVal aData As atcTimeseriesGroup, _
                                     ByVal aTable As atcTable, _
@@ -414,9 +437,9 @@ Public Module WatershedSummaryOverland
                                     ByRef aTotalAreaPerColumn() As Double, _
                                     ByRef aTotalTonsPerColumn() As Double)
         While aID <= aLastID
-            aField += 1
             Dim lKey As String = "K" & aID
             If aOperations.Contains(lKey) Then
+                aField += 1
                 Dim lOperation As HspfOperation = aOperations.Item(lKey)
                 Dim lArea As Double = OperationArea(aUCI, lOperation)
                 Dim lSumAnnual As Double = 0
@@ -453,7 +476,8 @@ Public Module WatershedSummaryOverland
                     aTotalAreaPerColumn(aField) += lArea
                     aTotalTonsPerColumn(aField) += lMaxAnnual
                 End If
-            Else
+            ElseIf aUniqueIds.Contains(aID Mod 50) Then
+                aField += 1
                 aTable.Value(aField) = "--"
                 If aIncludeMinMax Then
                     aField += 1

@@ -234,7 +234,9 @@ Public Module Graph
             Next
             Dim lDate(6) As Integer
             J2Date(lStorm.SDateJ, lDate)
-            GraphTimeseries(lDataGroupStorm, aPaneCount, aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight)
+            GraphTimeseries(lDataGroupStorm, aPaneCount, _
+                            aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2), _
+                            aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, True)
         Next
     End Sub
 
@@ -243,7 +245,8 @@ Public Module Graph
                                 ByVal aOutFileBase As String, _
                                 ByVal aGraphSaveFormat As String, _
                                 ByVal aGraphSaveWidth As Integer, _
-                                ByVal aGraphSaveHeight As Integer)
+                                ByVal aGraphSaveHeight As Integer, _
+                       Optional ByVal aLogPrefix As Boolean = False)
         'timeseries - arith
         Dim lZgc As ZedGraphControl = CreateZgc()
         lZgc.Width = aGraphSaveWidth
@@ -263,7 +266,18 @@ Public Module Graph
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
-        lZgc.SaveIn(aOutFileBase & "_log" & aGraphSaveFormat)
+        Dim lOutFileName As String = ""
+        If aLogPrefix Then
+            Dim lPathIndex As Integer = aOutFileBase.LastIndexOf("\")
+            If lPathIndex > -1 Then
+                lOutFileName = aOutFileBase.Substring(0, lPathIndex + 1) & "log_" & aOutFileBase.Substring(lPathIndex + 1) & aGraphSaveFormat
+            Else
+                lOutFileName = "log_" & aOutFileBase & aGraphSaveFormat
+            End If
+        Else
+            lOutFileName = aOutFileBase & "_log" & aGraphSaveFormat
+        End If
+        lZgc.SaveIn(lOutFileName)
         lGrapher.Dispose()
         lZgc.Dispose()
     End Sub
