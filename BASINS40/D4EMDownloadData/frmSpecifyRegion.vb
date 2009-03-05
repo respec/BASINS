@@ -2,7 +2,8 @@ Public Class frmSpecifyRegion
 
     Private Const pAppName = "BASINS Data Download"
 
-    Public Function AskUser() As D4EMDataManager.Region
+    Public Function AskUser(ByVal aIcon As Drawing.Icon) As D4EMDataManager.Region
+        Me.Icon = aIcon
         txtTop.Text = GetSetting(pAppName, "Defaults", "BoxTop", txtTop.Text)
         txtBottom.Text = GetSetting(pAppName, "Defaults", "BoxBottom", txtBottom.Text)
         txtLeft.Text = GetSetting(pAppName, "Defaults", "BoxLeft", txtLeft.Text)
