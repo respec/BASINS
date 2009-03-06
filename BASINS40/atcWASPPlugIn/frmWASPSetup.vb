@@ -854,36 +854,33 @@ Public Class frmWASPSetup
             pPlugIn.WASPProject.Segments(lIndex - 1).InputTimeseriesCollection.Clear()
         Next
 
-        'rebuild collections of timeseries 
-        'With AtcGridFlow.Source
-        '    For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-        '        If .CellValue(lIndex, 1).Trim.Length = 0 Or .CellValue(lIndex, 1) = "<none>" Then
-        '            pPlugIn.WASPProject.Segments(lIndex - 1).InflowTimeseries = Nothing
-        '        Else
-        '            'need to make sure this timeseries is in the class structure
-        '            Dim lTimeseriesName As String = ""
-        '            Dim lParenPos As Integer = InStr(.CellValue(lIndex, 1), "(")
-        '            If lParenPos > 0 Then
-        '                lTimeseriesName = .CellValue(lIndex, 1).Substring(1, lParenPos)  'take the date portion off the name
-        '            Else
-        '                lTimeseriesName = .CellValue(lIndex, 1)
-        '            End If
-
-        '            If pPlugIn.WASPProject.InputTimeseriesCollection.Contains(lTimeseriesName) Then
-        '                'already in the project, just reference it from this segment
-        '                pPlugIn.WASPProject.Segments(lIndex - 1).InflowTimeseries = pPlugIn.WASPProject.InputTimeseriesCollection(lTimeseriesName)
-        '            Else
-        '                'not yet in the project, add it
-        '                Dim lTimeseries As New atcWASP.WASPTimeseries
-        '                lTimeseries.Type = "FLOW"
-        '                lTimeseries.Identifier = lTimeseriesName
-        '                'lTimeseries.TimeSeries = GetTimeseries(lWDMFileName, "OBSERVED", aGageId, "PREC")
-        '                pPlugIn.WASPProject.InputTimeseriesCollection.Add(lTimeseries)
-        '                pPlugIn.WASPProject.Segments(lIndex - 1).InflowTimeseries = lTimeseries
-        '            End If
-        '        End If
-        '    Next
-        'End With
+        'build collections of timeseries 
+        Dim lSelectedString As String = ""
+        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+            'input flows 
+            lSelectedString = AtcGridFlow.Source.CellValue(lIndex, 1)
+            If lSelectedString.Trim.Length > 0 AndAlso lSelectedString <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lSelectedString, pFlowStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
+            End If
+            'air temp, sol rad, wind 
+            lSelectedString = AtcGridMet.Source.CellValue(lIndex, 1)
+            If lSelectedString.Trim.Length > 0 AndAlso lSelectedString <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lSelectedString, pAirTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
+            End If
+            lSelectedString = AtcGridMet.Source.CellValue(lIndex, 2)
+            If lSelectedString.Trim.Length > 0 AndAlso lSelectedString <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lSelectedString, pSolRadStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
+            End If
+            lSelectedString = AtcGridMet.Source.CellValue(lIndex, 3)
+            If lSelectedString.Trim.Length > 0 AndAlso lSelectedString <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lSelectedString, pWindStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
+            End If
+            'need to add other wq loads
+            lSelectedString = AtcGridLoad.Source.CellValue(lIndex, 1)
+            If lSelectedString.Trim.Length > 0 AndAlso lSelectedString <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lSelectedString, pWindStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
+            End If
+        Next
 
         Dim lName As String = tbxName.Text
         'TODO: still use modelout?
@@ -1207,6 +1204,11 @@ Public Class frmWASPSetup
                 lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, lSegmentFieldMap), "Name"))
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
+
+            Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
+            For Each lSegment As atcWASP.Segment In lTempSegments
+                lSegment.InputTimeseriesCollection = lTimeseriesCollection
+            Next
 
             'after reading the attribute table, see if any are selected
             If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
