@@ -55,5 +55,5 @@ Public Class Segment
     Public Vmult As Double = 0.0
     Public Slope As String = "0.05"
     Public Roughness As Double = 0.0
-    Public InflowTimeseriesID As String = ""
+    Public InputTimeseriesCollection As WASPTimeseriesCollection = Nothing
 End Class

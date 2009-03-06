@@ -4,6 +4,7 @@ Imports MapWinUtility
 Imports atcData
 Imports System.Drawing
 Imports System
+Imports atcWASP
 
 Public Class frmWASPSetup
     Inherits System.Windows.Forms.Form
@@ -745,11 +746,11 @@ Public Class frmWASPSetup
     Friend pPlugIn As PlugIn
     Friend pBasinsFolder As String
 
-    Friend pFlowStations As atcCollection
-    Friend pAirTempStations As atcCollection
-    Friend pSolRadStations As atcCollection
-    Friend pWindStations As atcCollection
-    Friend pWaterTempStations As atcCollection
+    Friend pFlowStationCandidates As WASPTimeseriesCollection
+    Friend pAirTempStationCandidates As WASPTimeseriesCollection
+    Friend pSolRadStationCandidates As WASPTimeseriesCollection
+    Friend pWindStationCandidates As WASPTimeseriesCollection
+    Friend pWaterTempStationCandidates As WASPTimeseriesCollection
 
     Private pInitializing As Boolean = True
     Private pSelectedRow As Integer
@@ -834,6 +835,56 @@ Public Class frmWASPSetup
         Me.Refresh()
         EnableControls(False)
 
+        'put contents of segment class back into structure
+        With AtcGridSegmentation.Source
+            For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                pPlugIn.WASPProject.Segments(lIndex - 1).Length = .CellValue(lIndex, 1)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Width = .CellValue(lIndex, 2)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Dmult = .CellValue(lIndex, 3)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Vmult = .CellValue(lIndex, 4)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Slope = .CellValue(lIndex, 5)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Roughness = .CellValue(lIndex, 6)
+                pPlugIn.WASPProject.Segments(lIndex - 1).DownID = .CellValue(lIndex, 7)
+            Next
+        End With
+
+        'clear out collections of timeseries prior to rebuilding
+        pPlugIn.WASPProject.InputTimeseriesCollection.Clear()
+        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+            pPlugIn.WASPProject.Segments(lIndex - 1).InputTimeseriesCollection.Clear()
+        Next
+
+        'rebuild collections of timeseries 
+        'With AtcGridFlow.Source
+        '    For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+        '        If .CellValue(lIndex, 1).Trim.Length = 0 Or .CellValue(lIndex, 1) = "<none>" Then
+        '            pPlugIn.WASPProject.Segments(lIndex - 1).InflowTimeseries = Nothing
+        '        Else
+        '            'need to make sure this timeseries is in the class structure
+        '            Dim lTimeseriesName As String = ""
+        '            Dim lParenPos As Integer = InStr(.CellValue(lIndex, 1), "(")
+        '            If lParenPos > 0 Then
+        '                lTimeseriesName = .CellValue(lIndex, 1).Substring(1, lParenPos)  'take the date portion off the name
+        '            Else
+        '                lTimeseriesName = .CellValue(lIndex, 1)
+        '            End If
+
+        '            If pPlugIn.WASPProject.InputTimeseriesCollection.Contains(lTimeseriesName) Then
+        '                'already in the project, just reference it from this segment
+        '                pPlugIn.WASPProject.Segments(lIndex - 1).InflowTimeseries = pPlugIn.WASPProject.InputTimeseriesCollection(lTimeseriesName)
+        '            Else
+        '                'not yet in the project, add it
+        '                Dim lTimeseries As New atcWASP.WASPTimeseries
+        '                lTimeseries.Type = "FLOW"
+        '                lTimeseries.Identifier = lTimeseriesName
+        '                'lTimeseries.TimeSeries = GetTimeseries(lWDMFileName, "OBSERVED", aGageId, "PREC")
+        '                pPlugIn.WASPProject.InputTimeseriesCollection.Add(lTimeseries)
+        '                pPlugIn.WASPProject.Segments(lIndex - 1).InflowTimeseries = lTimeseries
+        '            End If
+        '        End If
+        '    Next
+        'End With
+
         Dim lName As String = tbxName.Text
         'TODO: still use modelout?
         Dim lWASPProjectFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".wnf"
@@ -884,11 +935,11 @@ Public Class frmWASPSetup
         pPlugIn = aPlugIn
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
-        pFlowStations = New atcCollection
-        pAirTempStations = New atcCollection
-        pSolRadStations = New atcCollection
-        pWindStations = New atcCollection
-        pWaterTempStations = New atcCollection
+        pFlowStationCandidates = New WASPTimeseriesCollection
+        pAirTempStationCandidates = New WASPTimeseriesCollection
+        pSolRadStationCandidates = New WASPTimeseriesCollection
+        pWindStationCandidates = New WASPTimeseriesCollection
+        pWaterTempStationCandidates = New WASPTimeseriesCollection
 
         'set field mapping for segments
         pDefaultSegmentFieldMap.Clear()
@@ -971,8 +1022,8 @@ Public Class frmWASPSetup
 
         tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
 
-        BuildListofValidStationNames("FLOW", pFlowStations)
-        BuildListofValidStationNames("WTMP", pWaterTempStations)
+        BuildListofValidStationNames("FLOW", pFlowStationCandidates)
+        BuildListofValidStationNames("WTMP", pWaterTempStationCandidates)
 
         AtcGridSegmentation.Clear()
         With AtcGridSegmentation.Source
@@ -1090,14 +1141,14 @@ Public Class frmWASPSetup
             EnableControls(False)
 
             Dim lMetFile As atcWDM.atcDataSourceWDM = GetMetFile(txtMetWDMName.Text)
-            pAirTempStations.Clear()
-            BuildListofValidStationNamesFromDataSource(lMetFile, "ATMP", pAirTempStations)
-            BuildListofValidStationNamesFromDataSource(lMetFile, "ATEM", pAirTempStations)
-            pSolRadStations.Clear()
-            BuildListofValidStationNamesFromDataSource(lMetFile, "SOLRAD", pSolRadStations)
-            BuildListofValidStationNamesFromDataSource(lMetFile, "SOLR", pSolRadStations)
-            pWindStations.Clear()
-            BuildListofValidStationNamesFromDataSource(lMetFile, "WIND", pWindStations)
+            pAirTempStationCandidates.Clear()
+            BuildListofValidStationNamesFromDataSource(lMetFile, "ATMP", pAirTempStationCandidates)
+            BuildListofValidStationNamesFromDataSource(lMetFile, "ATEM", pAirTempStationCandidates)
+            pSolRadStationCandidates.Clear()
+            BuildListofValidStationNamesFromDataSource(lMetFile, "SOLRAD", pSolRadStationCandidates)
+            BuildListofValidStationNamesFromDataSource(lMetFile, "SOLR", pSolRadStationCandidates)
+            pWindStationCandidates.Clear()
+            BuildListofValidStationNamesFromDataSource(lMetFile, "WIND", pWindStationCandidates)
 
             lblStatus.Text = "Update specifications if desired, then click OK to proceed."
             Me.Refresh()
@@ -1105,9 +1156,9 @@ Public Class frmWASPSetup
             EnableControls(True)
         Else
             'clear lists of met stations
-            pAirTempStations.Clear()
-            pSolRadStations.Clear()
-            pWindStations.Clear()
+            pAirTempStationCandidates.Clear()
+            pSolRadStationCandidates.Clear()
+            pWindStationCandidates.Clear()
         End If
     End Sub
 
@@ -1156,7 +1207,6 @@ Public Class frmWASPSetup
                 lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, lSegmentFieldMap), "Name"))
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
-            'CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 
             'after reading the attribute table, see if any are selected
             If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
@@ -1183,7 +1233,7 @@ Public Class frmWASPSetup
             Logger.Dbg("No atcGridSegmentation")
         Else
             Logger.Dbg("Begin")
-            
+
             With AtcGridSegmentation.Source
                 .Rows = 1 + pPlugIn.WASPProject.Segments.Count
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
@@ -1224,7 +1274,7 @@ Public Class frmWASPSetup
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     .CellValue(lIndex, 1) = "<none>"
-                    If pFlowStations.Count > 0 Then
+                    If pFlowStationCandidates.Count > 0 Then
                         .CellEditable(lIndex, 1) = True
                     Else
                         .CellEditable(lIndex, 1) = False
@@ -1235,7 +1285,7 @@ Public Class frmWASPSetup
             Logger.Dbg("SetValidValues")
             Dim lValidValues As New atcCollection
             lValidValues.Add("<none>")
-            For Each lFlowStation As StationDetails In pFlowStations
+            For Each lFlowStation As WASPTimeseries In pFlowStationCandidates
                 lValidValues.Add(lFlowStation.Description)
             Next
             AtcGridFlow.ValidValues = lValidValues
@@ -1258,7 +1308,7 @@ Public Class frmWASPSetup
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     .CellValue(lIndex, 1) = "<none>"
-                    If pWaterTempStations.Count > 0 Then
+                    If pWaterTempStationCandidates.Count > 0 Then
                         .CellValue(lIndex, 1) = "<none>"
                         .CellEditable(lIndex, 1) = True
                     Else
@@ -1270,8 +1320,8 @@ Public Class frmWASPSetup
             Logger.Dbg("SetValidValues")
             Dim lValidValues As New atcCollection
             lValidValues.Add("<none>")
-            For Each lLoadStation As StationDetails In pWaterTempStations
-                lValidValues.Add(lLoadStation.Description)
+            For Each lWaterTempStation As WASPTimeseries In pWaterTempStationCandidates
+                lValidValues.Add(lWaterTempStation.Description)
             Next
             AtcGridLoad.ValidValues = lValidValues
             AtcGridLoad.SizeAllColumnsToContents()
@@ -1345,22 +1395,22 @@ Public Class frmWASPSetup
         With AtcGridMet
             Dim lValidValues As New Collection
             If pSelectedColumn = 1 Then 'air temp
-                For Each lStation As StationDetails In pAirTempStations
-                    lValidValues.Add(lStation.Description)
+                For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
+                    lValidValues.Add(lStationCandidate.Description)
                 Next
                 If lValidValues.Count = 0 Then
                     .Source.CellEditable(pSelectedRow, 1) = False
                 End If
             ElseIf pSelectedColumn = 2 Then  'sol rad
-                For Each lStation As StationDetails In pSolRadStations
-                    lValidValues.Add(lStation.Description)
+                For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
+                    lValidValues.Add(lStationCandidate.Description)
                 Next
                 If lValidValues.Count = 0 Then
                     .Source.CellEditable(pSelectedRow, 3) = False
                 End If
             ElseIf pSelectedColumn = 3 Then 'wind
-                For Each lStation As StationDetails In pWindStations
-                    lValidValues.Add(lStation.Description)
+                For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
+                    lValidValues.Add(lStationCandidate.Description)
                 Next
                 If lValidValues.Count = 0 Then
                     .Source.CellEditable(pSelectedRow, 4) = False

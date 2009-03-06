@@ -4,6 +4,7 @@ Imports atcUtility
 
 Public Class WASPProject
     Public Segments As Segments
+    Public InputTimeseriesCollection As WASPTimeseriesCollection
 
     Public Name As String = ""
     Public WNFFileName As String = ""
@@ -13,6 +14,7 @@ Public Class WASPProject
         WNFFileName = ""
         Segments = New Segments
         Segments.WASPProject = Me
+        InputTimeseriesCollection = New WASPTimeseriesCollection
     End Sub
 
     Public Function Save(ByVal aFileName As String) As Boolean

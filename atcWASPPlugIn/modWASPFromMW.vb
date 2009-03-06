@@ -6,18 +6,18 @@ Imports atcUtility
 
 Module modWASPFromMW
     Friend Sub BuildListofValidStationNames(ByRef aConstituent As String, _
-                                            ByVal aStations As atcCollection)
-        aStations.Clear()
+                                            ByVal aStationCandidates As WASPTimeseriesCollection)
+        aStationCandidates.Clear()
 
         For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-            BuildListofValidStationNamesFromDataSource(lDataSource, aConstituent, aStations)
+            BuildListofValidStationNamesFromDataSource(lDataSource, aConstituent, aStationCandidates)
         Next
 
     End Sub
 
     Friend Sub BuildListofValidStationNamesFromDataSource(ByVal aDataSource As atcTimeseriesSource, _
                                                           ByRef aConstituent As String, _
-                                                          ByVal aStations As atcCollection)
+                                                          ByVal aStationCandidates As WASPTimeseriesCollection)
 
         Dim lTotalCount As Integer = aDataSource.DataSets.Count
         Dim lCounter As Integer = 0
@@ -46,28 +46,23 @@ Module modWASPFromMW
                 J2Date(lSJDay, lSdate)
                 J2Date(lEJDay, lEdate)
                 Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
-                Dim lStationDetails As New StationDetails
-                lStationDetails.Name = lLoc
-                lStationDetails.StartJDate = lSJDay
-                lStationDetails.EndJDate = lEJDay
-                lStationDetails.Description = lLoc & ":" & lStanam & " " & lDateString
+                Dim lCandidateTimeseries As New WASPTimeseries
+                lCandidateTimeseries.Identifier = lLoc & ":" & lStanam
+                lCandidateTimeseries.SDate = lSJDay
+                lCandidateTimeseries.EDate = lEJDay
+                lCandidateTimeseries.Description = lLoc & ":" & lStanam & " " & lDateString
+                lCandidateTimeseries.Type = aConstituent
                 Try
-                    aStations.Add(lStationDetails.Description, lStationDetails)
+                    aStationCandidates.Add(lCandidateTimeseries)
                 Catch
-                    Logger.Dbg("Problem adding " & lStationDetails.Description)
+                    Logger.Dbg("Problem adding " & lCandidateTimeseries.Description)
                 End Try
             End If
             'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
             lDataSet.ValuesNeedToBeRead = True
         Next
 
-        Logger.Dbg("Found " & aStations.Count & " Stations")
+        Logger.Dbg("Found " & aStationCandidates.Count & " Stations")
     End Sub
 
-    Friend Class StationDetails
-        Public Name As String
-        Public StartJDate As Double
-        Public EndJDate As Double
-        Public Description As String
-    End Class
 End Module

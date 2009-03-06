@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="atcWASPProject.vb" />
     <Compile Include="atcWASPSegments.vb" />
+    <Compile Include="atcWASPTimeseries.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\atcData\atcData.vbproj">
