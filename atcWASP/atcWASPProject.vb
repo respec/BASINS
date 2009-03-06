@@ -18,19 +18,22 @@ Public Class WASPProject
     End Sub
 
     Public Function Save(ByVal aFileName As String) As Boolean
-        'write WASP network file first
-        Dim lSW As New IO.StreamWriter(aFileName)
-        WNFFileName = aFileName
 
+        'set file names
+        WNFFileName = aFileName
         Dim lSegmentFileName As String = FilenameSetExt(WNFFileName, "SEG")
 
+        'write WASP network file first
+        Dim lSW As New IO.StreamWriter(aFileName)
         lSW.WriteLine(lSegmentFileName)
         lSW.Close()
 
-        'now write segments file
+        'write segments file
         lSW = New IO.StreamWriter(lSegmentFileName)
         lSW.WriteLine(Segments.ToString)
         lSW.Close()
+
+        'write timeseries files
 
         Return True
     End Function

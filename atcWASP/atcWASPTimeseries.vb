@@ -7,7 +7,7 @@ Imports System.Text
 Public Class WASPTimeseriesCollection
     Inherits KeyedCollection(Of String, WASPTimeseries)
     Protected Overrides Function GetKeyForItem(ByVal aWASPTimeseries As WASPTimeseries) As String
-        Dim lKey As String = aWASPTimeseries.Identifier
+        Dim lKey As String = aWASPTimeseries.Description
         Return lKey
     End Function
 
@@ -21,4 +21,6 @@ Public Class WASPTimeseries
     Public EDate As Double
     Public TimeSeries As atcData.atcTimeseries
     Public Description As String
+    Public ID As Integer
+    Public DataSourceName As String
 End Class
