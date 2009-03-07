@@ -997,6 +997,10 @@ TryAgain:
         Return New clsLinesInFile(aFileReader)
     End Function
 
+    Public Function LinesInFileReadLine(ByVal aFileReader As IO.StreamReader) As IEnumerable
+        Return New clsLinesInFileReadLine(aFileReader)
+    End Function
+
     ''' <summary>
     ''' An enumerable set of lines read from a text file (or other BinaryReader)
     ''' lines in file end with carriage return and/or linefeed
@@ -1078,6 +1082,97 @@ AtEndOfStream:
                     pStreamReader = Nothing
                     pCurrentLine = lSb.ToString
                     Return (lSb.Length > 0)
+                End If
+            End If
+        End Function
+
+        Public Sub Reset() Implements IEnumerator.Reset
+            Throw New NotSupportedException
+        End Sub
+
+        Public Function GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+            Return Me
+        End Function
+
+        Public Sub Dispose() Implements IDisposable.Dispose
+            If Not pStreamReader Is Nothing Then
+                Try
+                    pStreamReader.Close()
+                Catch
+                End Try
+                pStreamReader = Nothing
+            End If
+        End Sub
+
+    End Class
+
+    ''' <summary>
+    ''' An enumerable set of lines read from a text file (or other BinaryReader)
+    ''' lines in file end with carriage return and/or linefeed
+    ''' end of line characters are stripped from enumerated lines returned
+    ''' </summary>
+    Private Class clsLinesInFileReadLine
+        Implements IEnumerable, IEnumerator, IDisposable
+
+        Private pStreamReader As IO.StreamReader
+        Private pCurrentLine As String
+        Private pNextChar As Char = Nothing
+        Private pHaveNextChar As Boolean = False
+        Private pLength As Long = 0
+
+        Public Sub New(ByVal aFileName As String)
+            'NOTE: default buffer size (4096) or larger degrades performance - jlk 10/2008
+            pStreamReader = New IO.StreamReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read), 1024))
+            Clear()
+        End Sub
+
+        Public Sub New(ByVal aStreamReader As IO.StreamReader)
+            pStreamReader = aStreamReader
+            Clear()
+        End Sub
+
+        Private Sub Clear()
+            If pStreamReader.BaseStream.CanSeek Then
+                pLength = pStreamReader.BaseStream.Length
+            End If
+            pHaveNextChar = False
+        End Sub
+
+        ReadOnly Property Current() As Object Implements IEnumerator.Current
+            Get
+                Return pCurrentLine
+            End Get
+        End Property
+
+        Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+            If pStreamReader Is Nothing Then
+                Return False
+            Else
+                Dim lEndOfStream As Boolean = False
+                Try
+                    If pStreamReader.EndOfStream Then
+                        Return False
+                    Else
+                        pCurrentLine = pStreamReader.ReadLine
+                        If pCurrentLine Is Nothing Then
+                            pCurrentLine = ""
+                            Return False
+                        End If
+                        Logger.Progress(pStreamReader.BaseStream.Position / pStreamReader.BaseStream.Length * 1000, 1000)
+                        Return True
+                    End If
+                Catch lEndOfStreamException As IO.EndOfStreamException
+                    lEndOfStream = True
+                End Try
+                If lEndOfStream Then
+                    Try
+                        Logger.Dbg("Closing Stream")
+                        pStreamReader.Close()
+                    Catch
+                    End Try
+                    pStreamReader = Nothing
+                    pCurrentLine = ""
+                    Return False
                 End If
             End If
         End Function

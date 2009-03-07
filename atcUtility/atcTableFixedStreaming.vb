@@ -230,7 +230,7 @@ ErrHand:
     'Read a stream into the table
     Public Function OpenStream(ByVal aStream As Stream) As Boolean
         Try
-            pLinesInFile = LinesInFile(New BinaryReader(aStream))
+            pLinesInFile = LinesInFileReadLine(New StreamReader(aStream))
 
             For iRec As Integer = 1 To NumHeaderRows 'read header rows, ignore for now
                 pLinesInFile.MoveNext()

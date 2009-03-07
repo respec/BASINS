@@ -11,9 +11,11 @@ Module CatRunner
     'Private pCatXMLFile As String = "VaryPrecTempHbnPreparehl.xml"
     'Private pCatXMLFile As String = "zVaryPrecTempHbnPrepare_short.xml"
     'Private pCatXMLFile As String = "VaryPrecTempHbnPrepareFlow2.xml"
-    Private pCatXMLFile As String = "VaryPrecTempHbnPrepareBase.xml"
+    'Private pCatXMLFile As String = "VaryPrecTempHbnPrepareBase.xml"
+    Private pCatXMLFile As String = "VaryPrecTempHbnPrepare.xml"
+
     Private WithEvents pCat As New atcClimateAssessmentTool.clsCat
-    Private pRunModel As Boolean = True
+    Private pRunModel As Boolean = False
     Private pEdit As Boolean = False
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -24,15 +26,15 @@ Module CatRunner
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2bmp")
-        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2bmp")
+        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2bmp")
 
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_10")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_70")
 
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2bmp")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2bmp")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10bmp")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10bmp")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmp")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmpDbg")
 
         For Each pBaseFolder In pBaseFolders
@@ -40,7 +42,8 @@ Module CatRunner
             Logger.StartToFile("CatRunner.Log", , , True)
             Logger.DisplayMessageBoxes = False
             'Dim lResultsFileName As String = "CatRunnerResults70echmF10.txt"
-            Dim lResultsFileName As String = "CatRunnerResultsMonoBMPBase.txt"
+            'Dim lResultsFileName As String = "CatRunnerResultsMono70Base.txt"
+            Dim lResultsFileName As String = "CatRunnerResultsAllBMP.txt"
             With pCat
                 Dim lFrmCat As frmCAT = Nothing
                 If pEdit Then
@@ -54,7 +57,8 @@ Module CatRunner
                 End While
                 If Not pRunModel Then
                     .RunModel = False
-                    lResultsFileName = "CatRunnerResultsLowHighFlow.txt"
+                    'lResultsFileName = "CatRunnerResultsLowHighFlow.txt"
+                    lResultsFileName = "CatRunnerResultsAllBMP.txt"
                 End If
                 .StartRun("Modified")
                 Logger.Dbg("RunsComplete")
