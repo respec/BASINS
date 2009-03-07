@@ -24,6 +24,9 @@ Module SWATRunner
     Private pCropChangeSummarize As Boolean = True
     Private pChangeCropAreas As Boolean = True
     Private pRunModel As Boolean = True
+    Private pRunMonthly As Boolean = True
+    Private pRunDaily As Boolean = False
+    Private pRunYearly As Boolean = False
     Private pScenario As String = "RevCrop"
     Private pDrive As String = "S:"
     Private pBaseFolder As String = pDrive & "\Scratch\UMRB\baseline90"
@@ -51,6 +54,9 @@ Module SWATRunner
             .Add("Start Year", pStartYear)
             .Add("Number of Years", pNumYears)
             .Add("Run Model", pRunModel)
+            .Add("Run Model Monthly", pRunMonthly)
+            .Add("Run Model Yearly", pRunYearly)
+            .Add("Run Model Daily", pRunDaily)
 
             .Add("RefreshDB", pRefreshDB)
             .Add("OutputSummarize", pOutputSummarize)
@@ -76,6 +82,9 @@ Module SWATRunner
                     pStartYear = .ItemByKey("Start Year")
                     pNumYears = .ItemByKey("Number of Years")
                     pRunModel = .ItemByKey("Run Model")
+                    pRunMonthly = .ItemByKey("Run Model Monthly")
+                    pRunYearly = .ItemByKey("Run Model Yearly")
+                    pRunDaily = .ItemByKey("Run Model Daily")
 
                     pRefreshDB = .ItemByKey("RefreshDB")
                     pOutputSummarize = .ItemByKey("OutputSummarize")
@@ -132,7 +141,13 @@ Module SWATRunner
 
             If pStartYear > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", pStartYear)
             If pNumYears > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", pNumYears)
+                If pRunMonthly Then
+                    lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 0)
+                ElseIf pRunYearly Then
             lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
+                ElseIf pRunDaily Then
+                    lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 1)
+                End If
             lSwatInput.CIO.PrintHru = False
 
             If pInputSummarizeBeforeChange Then
@@ -196,7 +211,8 @@ Module SWATRunner
             If pChangeCropAreas Then
                 'baseline corn is  ~ 23.64 M Acres
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10630000 / 247 '2010 12% 247 acres per square kilometer
-                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10450000 / 247 '2010 - 12.76% of existing; 247 acres per square kilometer
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10450000 / 247 '2010 - 12.76% of existing; 247 acres per square kilometer
+                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1410.26 '/ 247 '2010RevP - 12% of existing; 247 acres per square kilometer, only for sub 88 and 89
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 13000000 / 247 '2015 12% 247 acres per square kilometer
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 12640000 / 247 '2015 - 13.55% of existing; 247 acres per square kilometer
                 Logger.Dbg("DesiredFutureCornArea = " & lDesiredFutureCornArea)
@@ -221,6 +237,7 @@ Module SWATRunner
                 lSwatInput.SaveAllTextInput()
                 Logger.Dbg("Launching " & pSWATExe & " in " & pOutputFolder)
                 Logger.Flush()
+                'Exit Sub
                 LaunchProgram(pSWATExe, pOutputFolder)
             End If
 

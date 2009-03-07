@@ -322,13 +322,15 @@ ReOpenTable:
                             Logger.Msg("Unknown time units in SWAT Outupt " & Specification)
                     End Select
 
-                    If Logger.Msg("Found " & Format(lFieldNums.Count, "#,###") & " constituents and " & Format(lLocations.Count, "#,###") & " locations," & vbCrLf _
-                             & "total of " & Format(lFieldNums.Count * lLocations.Count, "#,###") & " data sets. Continue?", vbYesNo, Specification) = MsgBoxResult.Yes Then
-                        'GoTo ReOpenTable 're-open the table to start over, can't set .CurrentRecord back to one with streaming table
-                    Else
-                        Logger.Progress("", 0, 0)
-                        Return False
-                    End If
+                    Logger.Dbg("Found " & Format(lFieldNums.Count, "#,###") & " constituents and " & Format(lLocations.Count, "#,###") & " locations," & vbCrLf _
+                             & "total of " & Format(lFieldNums.Count * lLocations.Count, "#,###") & " data sets.")
+                    'If Logger.Msg("Found " & Format(lFieldNums.Count, "#,###") & " constituents and " & Format(lLocations.Count, "#,###") & " locations," & vbCrLf _
+                    '         & "total of " & Format(lFieldNums.Count * lLocations.Count, "#,###") & " data sets. Continue?", vbYesNo, Specification) = MsgBoxResult.Yes Then
+                    '    'GoTo ReOpenTable 're-open the table to start over, can't set .CurrentRecord back to one with streaming table
+                    'Else
+                    '    Logger.Progress("", 0, 0)
+                    '    Return False
+                    'End If
                 End With
 
                 pDates = New atcTimeseries(Nothing)
@@ -395,7 +397,7 @@ NextRecord:
             Dim lReadLocation As New Generic.List(Of String)
             Dim lReadField As New Generic.List(Of Integer)
             Dim lReadValues As New Generic.List(Of Double()) 'array of double data values for each timeseries
-            If Me.DataSets.Count < 1000 Then
+            If Me.DataSets.Count < 2000 Then
                 'Reading all datasets at once is much faster than one at a time
                 For Each lReadTS In Me.DataSets
                     If lReadTS.ValuesNeedToBeRead Then
