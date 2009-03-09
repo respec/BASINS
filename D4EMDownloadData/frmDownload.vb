@@ -27,6 +27,7 @@ Public Class frmDownload
                 cboRegion.Items.Add("Hydrologic Units")
             End If
         End If
+        cboRegion.Items.Add("Extent of Selected Shapes")
 
         Dim lRegionIndex As Integer = GetSetting("DataDownload", "Defaults", "RegionType", cboRegion.Items.Count - 1)
         If lRegionIndex < 0 OrElse lRegionIndex >= cboRegion.Items.Count Then
@@ -71,10 +72,15 @@ Public Class frmDownload
         Dim lPreferredFormat As String = "box"
         Try
             Dim lExtents As MapWinGIS.Extents = Nothing
-            Select Case cboRegion.SelectedIndex
-                Case 0 : lExtents = pMapWin.View.Extents
-                Case 1 : lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
-                Case 2 : lExtents = pMapWin.Layers(HUC8Index).Extents : lPreferredFormat = "huc8"
+            Select Case cboRegion.SelectedItem
+                Case "View Rectangle" : lExtents = pMapWin.View.Extents
+                Case "Extent of Selected Layer" : lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
+                Case "Extent of Selected Shapes" : lExtents = pMapWin.View.SelectedShapes.SelectBounds
+                Case Else
+                    Dim lHucIndex As Integer = HUC8Index()
+                    If lHucIndex > 0 Then
+                        lExtents = pMapWin.Layers(lHucIndex).Extents : lPreferredFormat = "huc8"
+                    End If
             End Select
             If Not lExtents Is Nothing Then
                 lRegion = New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
@@ -165,6 +171,9 @@ Public Class frmDownload
             End If
             lCacheFolder = "<CacheFolder>" & lCacheFolder & "</CacheFolder>" & vbCrLf
 
+            Dim lCacheOnly As String = ""
+            'If chkCacheOnly.Checked Then lCacheOnly = "<cacheonly>" & chkCacheOnly.Checked & "</cacheonly>" & vbCrLf
+
             Dim lSaveFolder As String = ""
             If Not pMapWin.Project Is Nothing Then
                 If Not pMapWin.Project.ProjectProjection Is Nothing AndAlso pMapWin.Project.ProjectProjection.Length > 0 Then
@@ -196,6 +205,7 @@ Public Class frmDownload
                                      & lRegionXML _
                                      & lStationsXML _
                                      & lWDMfilename _
+                                     & lCacheOnly _
                                      & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                                      & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                                      & "</arguments>" & vbCrLf _
@@ -221,11 +231,13 @@ Public Class frmDownload
                              & lRegionXML _
                              & lStationsXML _
                              & lWDMfilename _
+                             & lCacheOnly _
                              & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                              & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                              & "<joinattributes>true</joinattributes>" & vbCrLf _
                              & "</arguments>" & vbCrLf _
                              & "</function>" & vbCrLf
+
                     End If
                 End If
             Next
@@ -236,6 +248,9 @@ Public Class frmDownload
         End Set
     End Property
 
+    ''' <summary>
+    ''' Returns index in pMapWin.Layers of the HUC8 layer cat.shp, or -1 if not found
+    ''' </summary>
     Private Function HUC8Index() As Integer
         If Not pMapWin Is Nothing AndAlso Not pMapWin.Layers Is Nothing Then
             Dim lIndex As Integer = 0

@@ -281,6 +281,25 @@ EndFound:
     End Function
 
     ''' <summary>
+    ''' Return a new file name in the IO.Path.GetTempPath folder with a given base file name and extension.
+    ''' An integer is inserted between the base file name and extension if needed to avoid conflict with an existing file.
+    ''' (If aBaseFileName.aExtension already exists, 
+    '''     aBaseFileName-1.aExtension is tried, then 
+    '''     aBaseFileName-2.aExtension, ..., until a file name is found for which the file does not yet exist
+    ''' </summary>
+    Public Function GetTemporaryFileName(ByVal aBaseFileName As String, ByVal aExtension As String) As String
+        If aBaseFileName Is Nothing OrElse aBaseFileName.Length = 0 Then aBaseFileName = "temp"
+        Dim lFileName As String = IO.Path.Combine(IO.Path.GetTempPath, aBaseFileName)
+        If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lFileName = IO.Path.ChangeExtension(lFileName, aExtension)
+        Dim lTempIndex As Integer = 0
+        While FileExists(lFileName, True)
+            lTempIndex += 1
+            lFileName = IO.Path.ChangeExtension(IO.Path.Combine(IO.Path.GetTempPath, aBaseFileName & "-" & lTempIndex), aExtension)
+        End While
+        Return lFileName
+    End Function
+
+    ''' <summary>
     ''' Convert a long path name to a short path name
     ''' </summary>
     ''' <param name="aLongPathName">Long path name to convert</param>
