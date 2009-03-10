@@ -22,8 +22,8 @@ Public Class Segments
     Public Overrides Function ToString() As String
         Dim lString As New System.Text.StringBuilder
 
-        lString.Append(";Name            ID               Length     Width      DMult      Vmult      Slope      Roughness  DownSegID        InflowTS        " & vbCrLf)
-        lString.Append(";_______________ ________________ __________ __________ __________ __________ __________ __________ ________________ ________________" & vbCrLf)
+        lString.Append(";Name            ID               Length     Width      Depth      Slope      Roughness  DownSegID        InflowTS        " & vbCrLf)
+        lString.Append(";_______________ ________________ __________ __________ __________ __________ __________ ________________ ________________" & vbCrLf)
 
         For Each lSegment As Segment In Me
             With lSegment
@@ -31,8 +31,7 @@ Public Class Segments
                 lString.Append(.ID.PadRight(16) & " ")
                 lString.Append(Format(.Length, "0.00").PadRight(10) & " ")
                 lString.Append(Format(.Width, "0.00").PadRight(10) & " ")
-                lString.Append(Format(.Dmult, "0.00").PadRight(10) & " ")
-                lString.Append(Format(.Vmult, "0.00").PadRight(10) & " ")
+                lString.Append(Format(.Depth, "0.00").PadRight(10) & " ")
                 lString.Append(.Slope.PadRight(10) & " ")
                 lString.Append(Format(.Roughness, "0.000").PadRight(10) & " ")
                 lString.Append(.DownID.PadRight(16) & " ")
@@ -51,9 +50,9 @@ Public Class Segment
     Public DownID As String = ""
     Public Length As Double = 0.0
     Public Width As Double = 0.0
-    Public Dmult As Double = 0.0
-    Public Vmult As Double = 0.0
+    Public Depth As Double = 0.0
     Public Slope As String = "0.05"
     Public Roughness As Double = 0.0
+    Public Velocity As Double = 0.0
     Public InputTimeseriesCollection As WASPTimeseriesCollection = Nothing
 End Class

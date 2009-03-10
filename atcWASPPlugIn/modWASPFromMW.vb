@@ -7,7 +7,6 @@ Imports atcUtility
 Module modWASPFromMW
     Friend Sub BuildListofValidStationNames(ByRef aConstituent As String, _
                                             ByVal aStationCandidates As WASPTimeseriesCollection)
-        aStationCandidates.Clear()
 
         For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             BuildListofValidStationNamesFromDataSource(lDataSource, aConstituent, aStationCandidates)
@@ -114,6 +113,12 @@ Module modWASPFromMW
         Next
 
         Return lGetTimeseries
+    End Function
+
+    Friend Function TravelTime(ByVal aLengthKM As Double, ByVal aVelocityFPS As Double) As Double
+        Dim lTravelTime As Double
+        lTravelTime = aLengthKM / aVelocityFPS * 3281 / 60  'computes in minutes
+        Return lTravelTime
     End Function
 
 End Module
