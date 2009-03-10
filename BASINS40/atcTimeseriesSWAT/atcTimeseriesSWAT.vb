@@ -117,6 +117,8 @@ Public Class atcTimeseriesSWAT
                             lFieldStart += .FieldLength(lField)
                         Next
                     Case ".hru", ".hrux"
+                       'Default SWAT header is off by one character, we insert a space after first SURQ
+                        lConstituentHeader = "LULC HRU      GIS  SUB  MGT  MON   AREAkm2  PRECIPmm SNOFALLmm SNOMELTmm     IRRmm     PETmm      ETmm SW_INITmm  SW_ENDmm    PERCmm GW_RCHGmm DA_RCHGmm   REVAPmm  SA_IRRmm  DA_IRRmm   SA_STmm   DA_STmm SURQ_GENmmSURQ_CNTmm   TLOSSmm    LATQmm    GW_Qmm    WYLDmm   DAILYCN TMP_AVdgC TMP_MXdgC TMP_MNdgCSOL_TMPdgCSOLARMJ/m2  SYLDt/ha  USLEt/haN_APPkg/haP_APPkg/haNAUTOkg/haPAUTOkg/ha NGRZkg/ha PGRZkg/haNCFRTkg/haPCFRTkg/haNRAINkg/ha NFIXkg/ha F-MNkg/ha A-MNkg/ha A-SNkg/ha F-MPkg/haAO-LPkg/ha L-APkg/ha A-SPkg/ha DNITkg/ha  NUPkg/ha  PUPkg/ha ORGNkg/ha ORGPkg/ha SEDPkg/haNSURQkg/haNLATQkg/ha NO3Lkg/haNO3GWkg/ha SOLPkg/ha P_GWkg/ha    W_STRS  TMP_STRS    N_STRS    P_STRS  BIOMt/ha       LAI   YLDt/ha   BACTPct  BACTLPct"
                         pSaveSubwatershedId = True
                         If Not pTableDelimited Then
                             'First look at first record as all one field to find some field widths
@@ -158,7 +160,7 @@ Public Class atcTimeseriesSWAT
                 If pTableDelimited Then
                     pRecordLength = .CurrentRecordAsDelimitedString().Length
                 Else
-                    pRecordLength = lTableStreaming.FieldStart(.NumFields) + .FieldLength(.NumFields) + 2 'CR/LF = 2 chars                    
+                    pRecordLength = lTableStreaming.FieldStart(.NumFields) + .FieldLength(.NumFields) + 1
                 End If
                 Return lTable
             Else
@@ -397,6 +399,8 @@ NextRecord:
             Dim lReadLocation As New Generic.List(Of String)
             Dim lReadField As New Generic.List(Of Integer)
             Dim lReadValues As New Generic.List(Of Double()) 'array of double data values for each timeseries
+            Dim lReadValueIndex As New Generic.List(Of Integer)
+
             If Me.DataSets.Count < 2000 Then
                 'Reading all datasets at once is much faster than one at a time
                 For Each lReadTS In Me.DataSets
@@ -412,6 +416,7 @@ NextRecord:
                             Dim lVd(pNumValues) As Double 'array of double data values
                             lVd(0) = pNaN
                             lReadValues.Add(lVd)
+                            lReadValueIndex.Add(1)
                         End If
                     End If
                 Next
@@ -448,7 +453,6 @@ NextRecord:
                     Dim lMonReading As Integer = 0
                     Dim lDayReading As Integer = 0
                     Dim lMONvalue As Integer
-
                     Dim lValueIndex As Integer = 1
 
                     Dim lVd() As Double = lReadValues(0)
@@ -475,6 +479,7 @@ NextRecord:
                                 For lLocationIndex = 0 To lLastIndex
                                     If lReadLocation(lLocationIndex) = lLocation Then
                                         If lLastIndex > 0 Then
+                                            lValueIndex = lReadValueIndex(lLocationIndex)
                                             lReadTS = lReadThese(lLocationIndex)
                                             lField = lReadField(lLocationIndex)
                                             lVd = lReadValues(lLocationIndex)
@@ -536,6 +541,7 @@ NextRecord:
                                                 lVd(lValueIndex) = pNaN
                                             End If
                                             lValueIndex += 1
+                                            lReadValueIndex(lLocationIndex) = lValueIndex
                                         Else 'got to end of run summary, value is number of years as a decimal or we have reached blank line after end
                                             Exit Do
                                         End If
