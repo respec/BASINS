@@ -209,12 +209,33 @@ Module SWATRunner
             End If
 
             If pChangeCropAreas Then
+                '******************************
+                'UMRB: whole basin simulations
+                '******************************
                 'baseline corn is  ~ 23.64 M Acres
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10630000 / 247 '2010 12% 247 acres per square kilometer
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 10450000 / 247 '2010 - 12.76% of existing; 247 acres per square kilometer
-                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1410.26 '/ 247 '2010RevP - 12% of existing; 247 acres per square kilometer, only for sub 88 and 89
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 13000000 / 247 '2015 12% 247 acres per square kilometer
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 12640000 / 247 '2015 - 13.55% of existing; 247 acres per square kilometer
+
+                '*****************************************************************
+                'UMRB: Raccoon watersheds simulations (sub 88 [2] and 89 [1] only)
+                '*****************************************************************
+
+                'ScenExistRevPRaccoon: no landuse change
+
+                '2010: 88 difference in corn before_n_after LU changes: 981.7 sq km 89: 428.56 sq km total is: 1410.26 sq km
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1410.26 '2010RevP - 12% of existing; already in square kilometer
+
+                '2015: 88 difference in corn before_n_after LU changes: 1204.44 sq km 89: 525.8 sq km total is: 1730.24 sq km
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1730.24 '2015RevP - 12% of existing; already in square kilometer
+
+                '2020: 88 difference in corn before_n_after LU changes: 1115.75 sq km 89: 487.08 sq km total is: 1602.83 sq km
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1602.83 '2020RevP - 12% of existing; already in square kilometer
+
+                '2022: 88 difference in corn before_n_after LU changes: 1051.48 sq km 89: 472.12 sq km total is: 1523.6 sq km
+                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1523.6 '2022RevP - 12% of existing; already in square kilometer
+
                 Logger.Dbg("DesiredFutureCornArea = " & lDesiredFutureCornArea)
                 Dim lConvertFractionOfAvailable As Double = (lDesiredFutureCornArea - lTotalAreaCornNow) / (lTotalAreaCornFut - lTotalAreaCornNow)
                 Logger.Dbg("ConvertFractionOfAvailable = " & lConvertFractionOfAvailable)
@@ -237,7 +258,6 @@ Module SWATRunner
                 lSwatInput.SaveAllTextInput()
                 Logger.Dbg("Launching " & pSWATExe & " in " & pOutputFolder)
                 Logger.Flush()
-                'Exit Sub
                 LaunchProgram(pSWATExe, pOutputFolder)
             End If
 
@@ -1392,12 +1412,12 @@ Module SWATRunner
                 For Each lLocationId As String In lLocationIdsInSub
                     Dim lLocationIdDataGroup As atcTimeseriesGroup = lSubIdDataGroup.FindData("Location", lLocationId)
                     If lLocationIdDataGroup.Count = 6 Then
-                        Dim lAreaTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "Area").Item(0)
+                        Dim lAreaTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "AREA").Item(0)
                         Dim lNAppliedTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "NAUTO").Item(0)
                         Dim lNUptkTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "NUP").Item(0)
                         Dim lPAppliedTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "PAUTO").Item(0)
                         Dim lPUptkTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "PUP").Item(0)
-                        Dim lYieldTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "Yld").Item(0)
+                        Dim lYieldTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "YLD").Item(0)
 
                         If lYearIndex <= lAreaTimser.numValues Then
                             lArea = lAreaTimser.Value(lYearIndex)
