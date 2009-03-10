@@ -4,6 +4,7 @@ Imports MapWinUtility
 Imports atcData
 Imports System.Drawing
 Imports System
+Imports System.Windows.Forms
 Imports atcWASP
 
 Public Class frmWASPSetup
@@ -71,13 +72,15 @@ Public Class frmWASPSetup
     Friend WithEvents atxEMonth As atcControls.atcText
     Friend WithEvents atxSMonth As atcControls.atcText
     Friend WithEvents atxEYear As atcControls.atcText
-    Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
-    Friend WithEvents AtcConnectFields As atcControls.atcConnectFields
     Friend WithEvents AtcGridFlow As atcControls.atcGrid
     Friend WithEvents cmdGenerate As System.Windows.Forms.Button
     Friend WithEvents AtcGridSegmentation As atcControls.atcGrid
     Friend WithEvents AtcGridMet As atcControls.atcGrid
     Friend WithEvents AtcGridLoad As atcControls.atcGrid
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents rbnDivide As System.Windows.Forms.RadioButton
+    Friend WithEvents atxDivide As atcControls.atcText
+    Friend WithEvents cmdFieldMapping As System.Windows.Forms.Button
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -107,9 +110,10 @@ Public Class frmWASPSetup
         Me.tbxName = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
-        Me.TabPage5 = New System.Windows.Forms.TabPage
-        Me.AtcConnectFields = New atcControls.atcConnectFields
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.atxDivide = New atcControls.atcText
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.rbnDivide = New System.Windows.Forms.RadioButton
         Me.cmdGenerate = New System.Windows.Forms.Button
         Me.AtcGridSegmentation = New atcControls.atcGrid
         Me.TabPage3 = New System.Windows.Forms.TabPage
@@ -124,10 +128,10 @@ Public Class frmWASPSetup
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
+        Me.cmdFieldMapping = New System.Windows.Forms.Button
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
-        Me.TabPage5.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         Me.TabPage4.SuspendLayout()
@@ -200,7 +204,6 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage1)
-        Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
@@ -500,28 +503,12 @@ Public Class frmWASPSetup
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "WASP Project Name:"
         '
-        'TabPage5
-        '
-        Me.TabPage5.Controls.Add(Me.AtcConnectFields)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(614, 398)
-        Me.TabPage5.TabIndex = 7
-        Me.TabPage5.Text = "Field Mapping"
-        Me.TabPage5.UseVisualStyleBackColor = True
-        '
-        'AtcConnectFields
-        '
-        Me.AtcConnectFields.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcConnectFields.Location = New System.Drawing.Point(3, 3)
-        Me.AtcConnectFields.Name = "AtcConnectFields"
-        Me.AtcConnectFields.Size = New System.Drawing.Size(608, 395)
-        Me.AtcConnectFields.TabIndex = 3
-        '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.cmdFieldMapping)
+        Me.TabPage2.Controls.Add(Me.atxDivide)
+        Me.TabPage2.Controls.Add(Me.Label2)
+        Me.TabPage2.Controls.Add(Me.rbnDivide)
         Me.TabPage2.Controls.Add(Me.cmdGenerate)
         Me.TabPage2.Controls.Add(Me.AtcGridSegmentation)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
@@ -530,6 +517,49 @@ Public Class frmWASPSetup
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Segmentation"
         Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'atxDivide
+        '
+        Me.atxDivide.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxDivide.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxDivide.DefaultValue = ""
+        Me.atxDivide.HardMax = -999
+        Me.atxDivide.HardMin = -999
+        Me.atxDivide.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxDivide.Location = New System.Drawing.Point(195, 37)
+        Me.atxDivide.MaxWidth = 20
+        Me.atxDivide.Name = "atxDivide"
+        Me.atxDivide.NumericFormat = "0.#####"
+        Me.atxDivide.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxDivide.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxDivide.SelLength = 1
+        Me.atxDivide.SelStart = 0
+        Me.atxDivide.Size = New System.Drawing.Size(48, 24)
+        Me.atxDivide.SoftMax = -999
+        Me.atxDivide.SoftMin = -999
+        Me.atxDivide.TabIndex = 6
+        Me.atxDivide.ValueDouble = 0
+        Me.atxDivide.ValueInteger = 0
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(249, 37)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(111, 17)
+        Me.Label2.TabIndex = 4
+        Me.Label2.Text = "Equal Segments"
+        '
+        'rbnDivide
+        '
+        Me.rbnDivide.AutoSize = True
+        Me.rbnDivide.Location = New System.Drawing.Point(174, 18)
+        Me.rbnDivide.Name = "rbnDivide"
+        Me.rbnDivide.Size = New System.Drawing.Size(148, 21)
+        Me.rbnDivide.TabIndex = 2
+        Me.rbnDivide.TabStop = True
+        Me.rbnDivide.Text = "Divide Streams into"
+        Me.rbnDivide.UseVisualStyleBackColor = True
         '
         'cmdGenerate
         '
@@ -706,6 +736,15 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
+        'cmdFieldMapping
+        '
+        Me.cmdFieldMapping.Location = New System.Drawing.Point(466, 16)
+        Me.cmdFieldMapping.Name = "cmdFieldMapping"
+        Me.cmdFieldMapping.Size = New System.Drawing.Size(126, 25)
+        Me.cmdFieldMapping.TabIndex = 7
+        Me.cmdFieldMapping.Text = "Field Mapping"
+        Me.cmdFieldMapping.UseVisualStyleBackColor = True
+        '
         'frmWASPSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -728,8 +767,8 @@ Public Class frmWASPSetup
         Me.TabPage1.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
-        Me.TabPage5.ResumeLayout(False)
         Me.TabPage2.ResumeLayout(False)
+        Me.TabPage2.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage4.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
@@ -742,9 +781,10 @@ Public Class frmWASPSetup
 
 #End Region
 
-    Friend pDefaultSegmentFieldMap As New atcUtility.atcCollection
+    Friend pSegmentFieldMap As New atcCollection
     Friend pPlugIn As PlugIn
     Friend pBasinsFolder As String
+    Friend pfrmWASPFieldMapping As frmWASPFieldMapping
 
     Friend pFlowStationCandidates As WASPTimeseriesCollection
     Friend pAirTempStationCandidates As WASPTimeseriesCollection
@@ -758,10 +798,6 @@ Public Class frmWASPSetup
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
-    End Sub
-
-    Private Sub cboStreams_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboStreams.SelectedIndexChanged
-        SetFieldMappingControl()
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -792,39 +828,6 @@ Public Class frmWASPSetup
         If Not pInitializing Then
             cmdHelp.Enabled = aEnabled
             cmdAbout.Enabled = aEnabled
-        End If
-    End Sub
-
-    Private Sub SetFieldMappingControl()
-        If pInitializing Then
-            Logger.Dbg("SetFieldMappingControl Skipped while initializing")
-        Else
-            Logger.Dbg("SetFieldMappingControl Begin")
-
-            'add source fields from dbf
-            AtcConnectFields.lstSource.Items.Clear()
-            If cboStreams.SelectedIndex > -1 Then
-                Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-                For lFieldIndex As Integer = 0 To GisUtil.NumFields(lStreamsLayerIndex) - 1
-                    AtcConnectFields.lstSource.Items.Add("Segment:" & GisUtil.FieldName(lFieldIndex, lStreamsLayerIndex))
-                Next
-            End If
-
-            'add target properties from introspection on the swmm classes
-            AtcConnectFields.lstTarget.Items.Clear()
-            Dim lSegment As New atcWASP.Segment
-            For Each lField As Reflection.FieldInfo In lSegment.GetType.GetFields
-                AtcConnectFields.lstTarget.Items.Add("Segment:" & lField.Name)
-            Next
-
-            'add existing connections from default field maps
-            AtcConnectFields.lstConnections.Items.Clear()
-            Dim lConn As String
-            Dim lType As String = "Segment"
-            For lIndex As Integer = 0 To pDefaultSegmentFieldMap.Count - 1
-                lConn = lType & ":" & pDefaultSegmentFieldMap.Keys(lIndex) & " <-> " & lType & ":" & pDefaultSegmentFieldMap(lIndex)
-                AtcConnectFields.AddConnection(lConn, True)
-            Next
         End If
     End Sub
 
@@ -939,15 +942,15 @@ Public Class frmWASPSetup
         pWaterTempStationCandidates = New WASPTimeseriesCollection
 
         'set field mapping for segments
-        pDefaultSegmentFieldMap.Clear()
-        pDefaultSegmentFieldMap.Add("GNIS_NAME", "Name")
-        pDefaultSegmentFieldMap.Add("COMID", "ID")
-        pDefaultSegmentFieldMap.Add("LINKNO", "ID")
-        pDefaultSegmentFieldMap.Add("LENGTHKM", "Length")
-        pDefaultSegmentFieldMap.Add("MeanWidth", "Width")
-        pDefaultSegmentFieldMap.Add("DSCOMID", "DownID")
-        pDefaultSegmentFieldMap.Add("DSLINKNO", "DownID")
-        pDefaultSegmentFieldMap.Add("TOCOMID", "DownID")
+        pSegmentFieldMap.Clear()
+        pSegmentFieldMap.Add("GNIS_NAME", "Name")
+        pSegmentFieldMap.Add("COMID", "ID")
+        pSegmentFieldMap.Add("LINKNO", "ID")
+        pSegmentFieldMap.Add("LENGTHKM", "Length")
+        pSegmentFieldMap.Add("MeanWidth", "Width")
+        pSegmentFieldMap.Add("DSCOMID", "DownID")
+        pSegmentFieldMap.Add("DSLINKNO", "DownID")
+        pSegmentFieldMap.Add("TOCOMID", "DownID")
 
         cboMet.Items.Add("<none>")
 
@@ -1091,7 +1094,6 @@ Public Class frmWASPSetup
         End With
 
         pInitializing = False
-        SetFieldMappingControl()
         Logger.Dbg("InitializeUI Complete")
     End Sub
 
@@ -1165,29 +1167,6 @@ Public Class frmWASPSetup
 
     Private Sub cmdGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdGenerate.Click
 
-        'set field mapping as specified in field mapping control
-        Dim lSegmentFieldMap As New atcCollection
-        lSegmentFieldMap.Clear()
-        For lIndex As Integer = 0 To AtcConnectFields.lstConnections.Items.Count - 1
-            Dim lTxt As String = AtcConnectFields.lstConnections.Items(lIndex)
-            Dim lBaseLen As Integer = 0
-            Dim lBaseName As String = ""
-            If Mid(lTxt, 1, 7) = "Segment" Then
-                lBaseLen = 7
-                lBaseName = "Segment"
-            End If
-            Dim lSpacePos As Integer = InStr(lTxt, " ")
-            Dim lGTPos As Integer = InStr(lTxt, ">")
-            Dim lSrc As String = Mid(lTxt, lBaseLen + 2, lSpacePos - lBaseLen - 2)
-
-            If Mid(lTxt, lGTPos + 2, lBaseLen) = lBaseName Then
-                Dim lTar As String = Mid(lTxt, lGTPos + lBaseLen + 3)
-                If Mid(lTxt, 1, 7) = "Segment" Then
-                    lSegmentFieldMap.Add(lSrc, lTar)
-                End If
-            End If
-        Next
-
         'set file names for segments
         Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
         Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
@@ -1201,7 +1180,7 @@ Public Class frmWASPSetup
             Dim lTempSegments As New atcWASP.Segments
             If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
                 Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
-                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, lSegmentFieldMap), "Name"))
+                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap), "Name"))
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
 
@@ -1422,5 +1401,23 @@ Public Class frmWASPSetup
             .AllowNewValidValues = False
             .Refresh()
         End With
+    End Sub
+
+    Private Sub cmdFieldMapping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFieldMapping.Click
+        Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        If IsNothing(pfrmWASPFieldMapping) Then
+            pfrmWASPFieldMapping = New frmWASPFieldMapping
+            pfrmWASPFieldMapping.Init(lStreamsLayerIndex, pSegmentFieldMap, Me)
+            pfrmWASPFieldMapping.Show()
+        Else
+            If pfrmWASPFieldMapping.IsDisposed Then
+                pfrmWASPFieldMapping = New frmWASPFieldMapping
+                pfrmWASPFieldMapping.Init(lStreamsLayerIndex, pSegmentFieldMap, Me)
+                pfrmWASPFieldMapping.Show()
+            Else
+                pfrmWASPFieldMapping.WindowState = FormWindowState.Normal
+                pfrmWASPFieldMapping.BringToFront()
+            End If
+        End If
     End Sub
 End Class
