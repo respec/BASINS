@@ -168,7 +168,7 @@ Public Class frmWASPSetup
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(467, 523)
+        Me.cmdHelp.Location = New System.Drawing.Point(752, 523)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(79, 32)
         Me.cmdHelp.TabIndex = 6
@@ -178,7 +178,7 @@ Public Class frmWASPSetup
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(555, 523)
+        Me.cmdAbout.Location = New System.Drawing.Point(840, 523)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(87, 32)
         Me.cmdAbout.TabIndex = 7
@@ -207,7 +207,7 @@ Public Class frmWASPSetup
         Me.TabControl1.Location = New System.Drawing.Point(18, 17)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(622, 427)
+        Me.TabControl1.Size = New System.Drawing.Size(907, 427)
         Me.TabControl1.TabIndex = 8
         '
         'TabPage1
@@ -222,7 +222,7 @@ Public Class frmWASPSetup
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage1.Size = New System.Drawing.Size(899, 398)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -244,7 +244,7 @@ Public Class frmWASPSetup
         Me.GroupBox3.Controls.Add(Me.atxEYear)
         Me.GroupBox3.Location = New System.Drawing.Point(14, 270)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(587, 111)
+        Me.GroupBox3.Size = New System.Drawing.Size(872, 111)
         Me.GroupBox3.TabIndex = 28
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Simulation Dates"
@@ -441,7 +441,7 @@ Public Class frmWASPSetup
         Me.cboMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboMet.Location = New System.Drawing.Point(168, 127)
         Me.cboMet.Name = "cboMet"
-        Me.cboMet.Size = New System.Drawing.Size(434, 25)
+        Me.cboMet.Size = New System.Drawing.Size(719, 25)
         Me.cboMet.TabIndex = 12
         '
         'Label9
@@ -463,7 +463,7 @@ Public Class frmWASPSetup
         Me.cboStreams.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboStreams.Location = New System.Drawing.Point(168, 87)
         Me.cboStreams.Name = "cboStreams"
-        Me.cboStreams.Size = New System.Drawing.Size(434, 25)
+        Me.cboStreams.Size = New System.Drawing.Size(719, 25)
         Me.cboStreams.TabIndex = 9
         '
         'tbxName
@@ -473,7 +473,7 @@ Public Class frmWASPSetup
         Me.tbxName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tbxName.Location = New System.Drawing.Point(168, 40)
         Me.tbxName.Name = "tbxName"
-        Me.tbxName.Size = New System.Drawing.Size(268, 23)
+        Me.tbxName.Size = New System.Drawing.Size(553, 23)
         Me.tbxName.TabIndex = 6
         '
         'Label4
@@ -506,7 +506,7 @@ Public Class frmWASPSetup
         Me.TabPage2.Controls.Add(Me.AtcGridSegmentation)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage2.Size = New System.Drawing.Size(978, 398)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Segmentation"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -583,7 +583,7 @@ Public Class frmWASPSetup
         Me.AtcGridSegmentation.LineWidth = 1.0!
         Me.AtcGridSegmentation.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridSegmentation.Name = "AtcGridSegmentation"
-        Me.AtcGridSegmentation.Size = New System.Drawing.Size(569, 307)
+        Me.AtcGridSegmentation.Size = New System.Drawing.Size(933, 307)
         Me.AtcGridSegmentation.Source = Nothing
         Me.AtcGridSegmentation.TabIndex = 0
         '
@@ -592,7 +592,7 @@ Public Class frmWASPSetup
         Me.TabPage3.Controls.Add(Me.AtcGridFlow)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage3.Size = New System.Drawing.Size(978, 398)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Flows"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -611,7 +611,7 @@ Public Class frmWASPSetup
         Me.AtcGridFlow.LineWidth = 0.0!
         Me.AtcGridFlow.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridFlow.Name = "AtcGridFlow"
-        Me.AtcGridFlow.Size = New System.Drawing.Size(569, 307)
+        Me.AtcGridFlow.Size = New System.Drawing.Size(933, 307)
         Me.AtcGridFlow.Source = Nothing
         Me.AtcGridFlow.TabIndex = 20
         '
@@ -620,7 +620,7 @@ Public Class frmWASPSetup
         Me.TabPage4.Controls.Add(Me.AtcGridLoad)
         Me.TabPage4.Location = New System.Drawing.Point(4, 25)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage4.Size = New System.Drawing.Size(978, 398)
         Me.TabPage4.TabIndex = 6
         Me.TabPage4.Text = "Boundaries/Loads"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -639,7 +639,7 @@ Public Class frmWASPSetup
         Me.AtcGridLoad.LineWidth = 0.0!
         Me.AtcGridLoad.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridLoad.Name = "AtcGridLoad"
-        Me.AtcGridLoad.Size = New System.Drawing.Size(569, 307)
+        Me.AtcGridLoad.Size = New System.Drawing.Size(933, 307)
         Me.AtcGridLoad.Source = Nothing
         Me.AtcGridLoad.TabIndex = 21
         '
@@ -648,7 +648,7 @@ Public Class frmWASPSetup
         Me.TabPage6.Controls.Add(Me.AtcGridMet)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(614, 398)
+        Me.TabPage6.Size = New System.Drawing.Size(978, 398)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Meteorologic Time Series"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -667,7 +667,7 @@ Public Class frmWASPSetup
         Me.AtcGridMet.LineWidth = 0.0!
         Me.AtcGridMet.Location = New System.Drawing.Point(23, 97)
         Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(570, 283)
+        Me.AtcGridMet.Size = New System.Drawing.Size(934, 283)
         Me.AtcGridMet.Source = Nothing
         Me.AtcGridMet.TabIndex = 21
         '
@@ -679,7 +679,7 @@ Public Class frmWASPSetup
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox1.Location = New System.Drawing.Point(18, 451)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(624, 55)
+        Me.GroupBox1.Size = New System.Drawing.Size(909, 55)
         Me.GroupBox1.TabIndex = 9
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Status"
@@ -691,7 +691,7 @@ Public Class frmWASPSetup
         Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblStatus.Location = New System.Drawing.Point(16, 24)
         Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(593, 16)
+        Me.lblStatus.Size = New System.Drawing.Size(878, 16)
         Me.lblStatus.TabIndex = 0
         Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         '
@@ -707,7 +707,7 @@ Public Class frmWASPSetup
         Me.AcceptButton = Me.cmdOK
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(659, 568)
+        Me.ClientSize = New System.Drawing.Size(944, 568)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdAbout)
@@ -1127,11 +1127,43 @@ Public Class frmWASPSetup
             'if a maximum travel time has been set, divide the segments as needed
             Dim lMaxTravelTime As Double = atxTravelTime.Text
             If lMaxTravelTime > 0 Then
-                For Each lSegment As Segment In .Segments
+                Dim lNewSegments As New Segments
+                Dim lNewSegmentPositions As New atcCollection
+                For lIndex As Integer = 1 To .Segments.Count
+                    Dim lSegment As Segment = .Segments(lIndex - 1)
                     If TravelTime(lSegment.Length, lSegment.Velocity) > lMaxTravelTime Then
                         'need to break this segment into multiple
                         Dim lBreakNumber As Integer = Int(TravelTime(lSegment.Length, lSegment.Velocity) / lMaxTravelTime) + 1
+                        'create the new pieces
+                        For lBreakIndex As Integer = 2 To lBreakNumber
+                            Dim lNewSegment As New Segment
+                            lNewSegment = lSegment.Clone
+                            lNewSegment.ID = lSegment.ID & IntegerToAlphabet(lBreakIndex - 1)
+                            If lBreakIndex < lBreakNumber Then
+                                lNewSegment.DownID = lSegment.ID & IntegerToAlphabet(lBreakIndex)
+                            Else
+                                lNewSegment.DownID = lSegment.DownID
+                            End If
+                            lNewSegment.Length = lSegment.Length / lBreakNumber
+                            lNewSegments.Add(lNewSegment)
+                            lNewSegmentPositions.Add(lNewSegment.ID, lIndex)
+                        Next
+                        'reset length and id for the original segment 
+                        Dim lOldID As String = lSegment.ID
+                        lSegment.ID = lOldID & "A"
+                        'if this segment id shows up as a downid anywhere else, change it
+                        For Each lTempSeg As Segment In .Segments
+                            If lTempSeg.DownID = lOldID Then
+                                lTempSeg.DownID = lSegment.ID
+                            End If
+                        Next
+                        lSegment.DownID = lOldID & "B"
+                        lSegment.Length = lSegment.Length / lBreakNumber
                     End If
+                Next
+                'if any new segments, add them now to the segments collection
+                For lIndex As Integer = lNewSegments.Count To 1 Step -1
+                    .Segments.Insert(lNewSegmentPositions(lIndex - 1), lNewSegments(lIndex - 1))
                 Next
             End If
 
@@ -1156,7 +1188,7 @@ Public Class frmWASPSetup
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).Length
+                    .CellValue(lIndex, 1) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Length, 3)
                     .CellEditable(lIndex, 1) = True
                     .CellValue(lIndex, 2) = pPlugIn.WASPProject.Segments(lIndex - 1).Width
                     .CellEditable(lIndex, 2) = True
@@ -1182,6 +1214,7 @@ Public Class frmWASPSetup
             End With
 
             AtcGridSegmentation.SizeAllColumnsToContents()
+            AtcGridSegmentation.ColumnWidth(0) = 180
             AtcGridSegmentation.Refresh()
 
             If pInitializing Then
