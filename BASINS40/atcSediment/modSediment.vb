@@ -964,7 +964,7 @@ Public Module Sediment
                 WriteLine(sw, "Road ID:", .RoadField)
 
                 WriteLine(sw, "DEM layer:", .DEMLayer)
-                WriteLine(sw, "DEM units:", .DEMUnits)
+                WriteLine(sw, "DEM units:", CInt(.DEMUnits))
 
                 WriteLine(sw, "Rainfall factor:", .R_Factor)
 
@@ -1517,7 +1517,7 @@ Public Module Sediment
         Dim sr As IO.StreamReader = Nothing
         Try
             With Project
-                Dim Folder As String = "C:\BASINS\bin\Plugins\Sediment"
+                Dim Folder As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location) & "\Plugins\Sediment"
                 Dim DefaultFilename As String = Folder & "\Default.sediment"
                 If Filename = "" Then Filename = DefaultFilename
                 If Not My.Computer.FileSystem.FileExists(Filename) Then 'create the default file from the file in resources
