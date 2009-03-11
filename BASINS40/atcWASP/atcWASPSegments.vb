@@ -55,4 +55,19 @@ Public Class Segment
     Public Roughness As Double = 0.0
     Public Velocity As Double = 0.0
     Public InputTimeseriesCollection As WASPTimeseriesCollection = Nothing
+
+    Public Function Clone() As Segment
+        Dim lNewSegment As New Segment
+        lNewSegment.Depth = Me.Depth
+        lNewSegment.DownID = Me.DownID
+        lNewSegment.ID = Me.ID
+        lNewSegment.InputTimeseriesCollection = Me.InputTimeseriesCollection
+        lNewSegment.Length = Me.Length
+        lNewSegment.Name = Me.Name
+        lNewSegment.Roughness = Me.Roughness
+        lNewSegment.Slope = Me.Slope
+        lNewSegment.Velocity = Me.Velocity
+        lNewSegment.Width = Me.Width
+        Return lNewSegment
+    End Function
 End Class
