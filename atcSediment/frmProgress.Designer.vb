@@ -29,40 +29,43 @@ Partial Class frmProgress
         '
         'lblProgress
         '
-        Me.lblProgress.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lblProgress.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblProgress.BackColor = System.Drawing.SystemColors.Info
         Me.lblProgress.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.lblProgress.Location = New System.Drawing.Point(12, 9)
+        Me.lblProgress.Location = New System.Drawing.Point(13, 9)
         Me.lblProgress.Name = "lblProgress"
-        Me.lblProgress.Size = New System.Drawing.Size(336, 37)
+        Me.lblProgress.Size = New System.Drawing.Size(358, 39)
         Me.lblProgress.TabIndex = 0
         '
         'barProgress
         '
-        Me.barProgress.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.barProgress.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.barProgress.Location = New System.Drawing.Point(13, 55)
+        Me.barProgress.Location = New System.Drawing.Point(14, 57)
         Me.barProgress.Name = "barProgress"
-        Me.barProgress.Size = New System.Drawing.Size(335, 23)
+        Me.barProgress.Size = New System.Drawing.Size(358, 22)
         Me.barProgress.TabIndex = 1
         '
         'btnCancel
         '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(272, 85)
+        Me.btnCancel.Location = New System.Drawing.Point(291, 86)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(75, 23)
+        Me.btnCancel.Size = New System.Drawing.Size(80, 22)
         Me.btnCancel.TabIndex = 2
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
         'frmProgress
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoSize = True
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(360, 119)
+        Me.ClientSize = New System.Drawing.Size(384, 120)
         Me.ControlBox = False
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.barProgress)

@@ -104,6 +104,11 @@ Public Class PlugIn
     Public Sub MapMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal x As Integer, ByVal y As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseDown
     End Sub
 
+    ''' <summary>
+    ''' Debugging tool that displays value of currently selected grid or all polygon shape file field values as your mouse moves over them
+    ''' This is useful for checking the computed grids and quickly seeing if the grids add up
+    ''' </summary>
+    ''' <remarks>Turn this off for final version</remarks>
     Public Sub MapMouseMove(ByVal ScreenX As Integer, ByVal ScreenY As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseMove
         With pMapWin
             Dim x, y As Double, c, r As Integer
@@ -144,7 +149,6 @@ Public Class PlugIn
             End If
             Dim s As String = String.Format("{0} = {1}", lyr.Name, value)
             .StatusBar(2).Text = s
-            'Debug.Print(s)
         End With
     End Sub
 
