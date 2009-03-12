@@ -55,6 +55,7 @@ Public Class Segment
     Public Roughness As Double = 0.0
     Public Velocity As Double = 0.0
     Public InputTimeseriesCollection As WASPTimeseriesCollection = Nothing
+    Public BaseID As String = ""  'the id of the segment before breaking it up
 
     Public Function Clone() As Segment
         Dim lNewSegment As New Segment
@@ -68,6 +69,7 @@ Public Class Segment
         lNewSegment.Slope = Me.Slope
         lNewSegment.Velocity = Me.Velocity
         lNewSegment.Width = Me.Width
+        lNewSegment.BaseID = Me.BaseID
         Return lNewSegment
     End Function
 End Class

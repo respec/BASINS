@@ -1111,6 +1111,7 @@ Public Class frmWASPSetup
             Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
             For Each lSegment As atcWASP.Segment In lTempSegments
                 lSegment.InputTimeseriesCollection = lTimeseriesCollection
+                lSegment.BaseID = lSegment.ID   'store segment id before breaking up
             Next
 
             'after reading the attribute table, see if any are selected
@@ -1404,6 +1405,95 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cmdCreateShapefile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCreateShapefile.Click
+        Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+
+        'come up with name of new shapefile
+        Dim lOutputPath As String = PathNameOnly(lSegmentShapefileName)
+        Dim lIndex As Integer = 1
+        Dim lWASPShapefileName As String = lOutputPath & "\WASPSegments" & lIndex & ".shp"
+        Do While FileExists(lWASPShapefileName)
+            lIndex += 1
+            lWASPShapefileName = lOutputPath & "\WASPSegments" & lIndex & ".shp"
+        Loop
+
+        'figure out which shapes we want from old shapefile
+        Dim lShapeIds As New atcCollection
+        For Each lSegment As Segment In pPlugIn.WASPProject.Segments
+            If Not lShapeIds.Contains(lSegment.BaseID) Then
+                lShapeIds.Add(lSegment.BaseID)
+            End If
+        Next
+
+        'which field is mapped to the id?
+        Dim lIDFieldIndex As Integer
+        Dim lIDFieldName As String = "ID"
+        For lIndex = 0 To pSegmentFieldMap.Count - 1
+            If pSegmentFieldMap.ItemByIndex(lIndex) = "ID" Then
+                Dim lKey As String = pSegmentFieldMap.Keys(lIndex)
+                If GisUtil.IsField(lSegmentLayerIndex, lKey) Then
+                    lIDFieldIndex = GisUtil.FieldIndex(lSegmentLayerIndex, lKey)
+                    lIDFieldName = lKey
+                End If
+            End If
+        Next
+
+        'create the new empty shapefile
+        GisUtil.CreateEmptyShapefile(lWASPShapefileName, "", "line")
+        GisUtil.AddLayer(lWASPShapefileName, "WASP Segments")
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(lWASPShapefileName)
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+        'add an id field to the new shapefile
+        Dim lNewIDFieldIndex = GisUtil.AddField(lNewLayerIndex, lIDFieldName, 0, 20)
+
+        'find each desired shape
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lSegmentLayerIndex) - 1
+            For Each lShapeId As String In lShapeIds
+                If GisUtil.FieldValue(lSegmentLayerIndex, lFeatureIndex, lIDFieldIndex) = lShapeId Then
+                    'this is one of the shapes we want
+
+                    'how many shapes do we want to break this one into?
+                    Dim lCount As Integer = 0
+                    Dim lPieceIDs As New atcCollection
+                    For Each lSegment As Segment In pPlugIn.WASPProject.Segments
+                        If lSegment.BaseID = lShapeId Then
+                            lCount = lCount + 1
+                            lPieceIDs.Add(lSegment.ID)
+                        End If
+                    Next
+
+                    Dim lX() As Double = Nothing
+                    Dim lY() As Double = Nothing
+                    GisUtil.PointsOfLine(lSegmentLayerIndex, lFeatureIndex, lX, lY)
+
+                    If lCount = 1 Then
+                        'create line from these points in the new shapefile
+                        GisUtil.AddLine(lNewLayerIndex, lX, lY)
+                        GisUtil.SetFeatureValue(lNewLayerIndex, lNewIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lShapeId)
+                    Else
+                        'break this line into lcount pieces
+                        Dim lX2() As Double = Nothing
+                        Dim lY2() As Double = Nothing
+                        Dim lLineEndIndexes(lCount + 1) As Integer
+                        BreakLine(lX, lY, lCount, lX2, lY2, lLineEndIndexes)
+                        For lLineIndex As Integer = 1 To lCount
+                            Dim lXTemp(lLineEndIndexes(lLineIndex + 1) - lLineEndIndexes(lLineIndex)) As Double
+                            Dim lYTemp(lLineEndIndexes(lLineIndex + 1) - lLineEndIndexes(lLineIndex)) As Double
+                            Dim lPointCounter As Integer = -1
+                            For lPoints As Integer = lLineEndIndexes(lLineIndex) To lLineEndIndexes(lLineIndex + 1)
+                                lPointCounter += 1
+                                lXTemp(lPointCounter) = lX2(lPoints)
+                                lYTemp(lPointCounter) = lY2(lPoints)
+                            Next
+                            GisUtil.AddLine(lNewLayerIndex, lXTemp, lYTemp)
+                            GisUtil.SetFeatureValue(lNewLayerIndex, lNewIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lPieceIDs(lLineIndex - 1))
+                        Next
+                    End If
+
+                End If
+            Next
+        Next
+
         Logger.Msg("Create Shapefile option not yet implemented", MsgBoxStyle.OkOnly, "Create Shapefile")
     End Sub
 End Class
