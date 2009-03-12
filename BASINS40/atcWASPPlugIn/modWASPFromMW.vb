@@ -142,4 +142,44 @@ Module modWASPFromMW
         Return lResult
     End Function
 
+    Public Sub BreakLine(ByVal aXOrig() As Double, ByVal aYOrig() As Double, ByVal aNumPieces As Integer, ByRef aXNew() As Double, ByRef aYNew() As Double, ByRef aLineEndIndexes() As Integer)
+        'break a line into specified number of segments
+        'given XY coords of vertices, return XY coords of new vertices and index of endpoints within new xy points
+
+        'first compute total length and distance between points
+        Dim lTotalLength As Double = 0
+        Dim lDistance(aXOrig.GetUpperBound(0)) As Double
+        For lIndex As Integer = 1 To aXOrig.GetUpperBound(0) - 1
+            lDistance(lIndex) = System.Math.Sqrt(((aXOrig(lIndex + 1) - aXOrig(lIndex)) ^ 2) + ((aYOrig(lIndex + 1) - aYOrig(lIndex)) ^ 2))
+            lTotalLength = lTotalLength + lDistance(lIndex)
+        Next
+
+        'find desired length
+        Dim lDesiredLength As Double = lTotalLength / aNumPieces
+
+        'build arrays to store all points including new points
+        ReDim aXNew(aXOrig.GetUpperBound(0) + aNumPieces - 1)
+        ReDim aYNew(aYOrig.GetUpperBound(0) + aNumPieces - 1)
+
+        'fill new array of points
+        Dim lPiece As Integer = 0
+        Dim lCumDist As Double = 0.0
+        For lIndex As Integer = 1 To lDistance.GetUpperBound(0)
+            If lCumDist + lDistance(lIndex) > lDesiredLength Then
+                'would be too much, need to calculate end point for this piece
+                aXNew(lIndex + lPiece) = aXOrig(lIndex - 1) + ((aXOrig(lIndex) - aXOrig(lIndex - 1)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
+                aYNew(lIndex + lPiece) = aYOrig(lIndex - 1) + ((aYOrig(lIndex) - aYOrig(lIndex - 1)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
+                aLineEndIndexes(lPiece + 1) = lIndex + lPiece  'save the index of this endpoint
+                lPiece += 1
+                lCumDist = lDistance(lIndex) * (1 - ((lDesiredLength - lCumDist) / lDistance(lIndex)))
+            Else
+                'not long enough yet, just add point
+                aXNew(lIndex + lPiece) = aXOrig(lIndex)
+                aYNew(lIndex + lPiece) = aYOrig(lIndex)
+                lCumDist = lCumDist + lDistance(lIndex)
+            End If
+        Next
+
+    End Sub
+
 End Module
