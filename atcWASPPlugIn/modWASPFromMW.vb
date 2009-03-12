@@ -67,22 +67,22 @@ Module modWASPFromMW
         Logger.Dbg("Found " & aStationCandidates.Count & " Stations")
     End Sub
 
-    Friend Sub AddSelectedTimeseriesToWASPSegment(ByVal aSelectedString As String, _
+    Friend Sub AddSelectedTimeseriesToWASPSegment(ByVal aKeyString As String, _
                                                   ByRef aStationCandidates As WASPTimeseriesCollection, _
                                                   ByRef aWASPProject As WASPProject, _
                                                   ByRef aSegment As Segment)
 
         'need to make sure this timeseries is in the class structure
-        If aStationCandidates.Contains(aSelectedString) Then
-            If aWASPProject.InputTimeseriesCollection.Contains(aSelectedString) Then
+        If aStationCandidates.Contains(aKeyString) Then
+            If aWASPProject.InputTimeseriesCollection.Contains(aKeyString) Then
                 'already in the project, just reference it from this segment
-                aSegment.InputTimeseriesCollection.Add(aStationCandidates(aSelectedString))
+                aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
             Else
                 'not yet in the project, add it
                 Dim lTimeseries As New atcWASP.WASPTimeseries
-                aStationCandidates(aSelectedString).TimeSeries = GetTimeseries(aStationCandidates(aSelectedString).DataSourceName, aStationCandidates(aSelectedString).ID)
-                aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aSelectedString))
-                aSegment.InputTimeseriesCollection.Add(aStationCandidates(aSelectedString))
+                aStationCandidates(aKeyString).TimeSeries = GetTimeseries(aStationCandidates(aKeyString).DataSourceName, aStationCandidates(aKeyString).ID)
+                aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
             End If
         End If
     End Sub

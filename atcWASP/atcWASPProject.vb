@@ -22,10 +22,12 @@ Public Class WASPProject
         'set file names
         WNFFileName = aFileName
         Dim lSegmentFileName As String = FilenameSetExt(WNFFileName, "SEG")
+        Dim lDirectoryFileName As String = FilenameSetExt(WNFFileName, "TIM")
 
         'write WASP network file first
         Dim lSW As New IO.StreamWriter(aFileName)
         lSW.WriteLine(lSegmentFileName)
+        lSW.WriteLine(lDirectoryFileName)
         lSW.Close()
 
         'write segments file
@@ -33,7 +35,13 @@ Public Class WASPProject
         lSW.WriteLine(Segments.ToString)
         lSW.Close()
 
+        'write timeseries directory file
+        lSW = New IO.StreamWriter(lDirectoryFileName)
+        lSW.WriteLine(Segments.TimeseriesDirectoryToString)
+        lSW.Close()
+
         'write timeseries files
+        Me.InputTimeseriesCollection.TimeSeriesToFile(lDirectoryFileName)
 
         Return True
     End Function
