@@ -817,6 +817,26 @@ Public Class GisUtil
         End If
     End Sub
 
+    Public Shared Function AddLine(ByVal aLayerIndex As Integer, ByVal aX() As Double, ByVal aY() As Double) As Boolean
+        Dim lResult As Boolean
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+
+        Dim lLine As New MapWinGIS.Shape
+        lResult = lLine.Create(MapWinGIS.ShpfileType.SHP_POLYLINE)
+
+        For lPointIndex As Integer = 0 To aX.GetUpperBound(0)
+            Dim lPoint As New MapWinGIS.Point
+            lPoint.x = aX(lPointIndex)
+            lPoint.y = aY(lPointIndex)
+            lResult = lLine.InsertPoint(lPoint, lPointIndex)
+        Next
+
+        lResult = lSf.StartEditingShapes()
+        lResult = lSf.EditInsertShape(lLine, lSf.NumShapes)
+        lResult = lSf.StopEditingShapes
+        pMapWin.View.Redraw()
+    End Function
+
     ''' <summary>Determine first point of a shape</summary>
     ''' <param name="aLayerIndex">
     '''     <para>Index of layer containing ShapeFile</para>
