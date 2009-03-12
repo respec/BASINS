@@ -1474,13 +1474,13 @@ Public Class frmWASPSetup
                         'break this line into lcount pieces
                         Dim lX2() As Double = Nothing
                         Dim lY2() As Double = Nothing
-                        Dim lLineEndIndexes(lCount + 1) As Integer
+                        Dim lLineEndIndexes(lCount) As Integer
                         BreakLine(lX, lY, lCount, lX2, lY2, lLineEndIndexes)
                         For lLineIndex As Integer = 1 To lCount
-                            Dim lXTemp(lLineEndIndexes(lLineIndex + 1) - lLineEndIndexes(lLineIndex)) As Double
-                            Dim lYTemp(lLineEndIndexes(lLineIndex + 1) - lLineEndIndexes(lLineIndex)) As Double
+                            Dim lXTemp(lLineEndIndexes(lLineIndex) - lLineEndIndexes(lLineIndex - 1)) As Double
+                            Dim lYTemp(lLineEndIndexes(lLineIndex) - lLineEndIndexes(lLineIndex - 1)) As Double
                             Dim lPointCounter As Integer = -1
-                            For lPoints As Integer = lLineEndIndexes(lLineIndex) To lLineEndIndexes(lLineIndex + 1)
+                            For lPoints As Integer = lLineEndIndexes(lLineIndex - 1) To lLineEndIndexes(lLineIndex)
                                 lPointCounter += 1
                                 lXTemp(lPointCounter) = lX2(lPoints)
                                 lYTemp(lPointCounter) = lY2(lPoints)
@@ -1494,6 +1494,6 @@ Public Class frmWASPSetup
             Next
         Next
 
-        Logger.Msg("Create Shapefile option not yet implemented", MsgBoxStyle.OkOnly, "Create Shapefile")
+        Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
     End Sub
 End Class

@@ -149,8 +149,8 @@ Module modWASPFromMW
         'first compute total length and distance between points
         Dim lTotalLength As Double = 0
         Dim lDistance(aXOrig.GetUpperBound(0)) As Double
-        For lIndex As Integer = 1 To aXOrig.GetUpperBound(0) - 1
-            lDistance(lIndex) = System.Math.Sqrt(((aXOrig(lIndex + 1) - aXOrig(lIndex)) ^ 2) + ((aYOrig(lIndex + 1) - aYOrig(lIndex)) ^ 2))
+        For lIndex As Integer = 1 To aXOrig.GetUpperBound(0)
+            lDistance(lIndex) = System.Math.Sqrt(((aXOrig(lIndex) - aXOrig(lIndex - 1)) ^ 2) + ((aYOrig(lIndex) - aYOrig(lIndex - 1)) ^ 2))
             lTotalLength = lTotalLength + lDistance(lIndex)
         Next
 
@@ -165,21 +165,26 @@ Module modWASPFromMW
         Dim lPiece As Integer = 0
         Dim lCumDist As Double = 0.0
         For lIndex As Integer = 1 To lDistance.GetUpperBound(0)
-            If lCumDist + lDistance(lIndex) > lDesiredLength Then
+            If (lCumDist + lDistance(lIndex) > lDesiredLength) Then
                 'would be too much, need to calculate end point for this piece
-                aXNew(lIndex + lPiece) = aXOrig(lIndex - 1) + ((aXOrig(lIndex) - aXOrig(lIndex - 1)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-                aYNew(lIndex + lPiece) = aYOrig(lIndex - 1) + ((aYOrig(lIndex) - aYOrig(lIndex - 1)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-                aLineEndIndexes(lPiece + 1) = lIndex + lPiece  'save the index of this endpoint
+                aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 2) + ((aXOrig(lIndex - 1) - aXOrig(lIndex - 2)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
+                aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 2) + ((aYOrig(lIndex - 1) - aYOrig(lIndex - 2)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
+                aLineEndIndexes(lPiece + 1) = lIndex - 1 + lPiece  'save the index of this endpoint
                 lPiece += 1
                 lCumDist = lDistance(lIndex) * (1 - ((lDesiredLength - lCumDist) / lDistance(lIndex)))
+                aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 1)
+                aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 1)
             Else
                 'not long enough yet, just add point
-                aXNew(lIndex + lPiece) = aXOrig(lIndex)
-                aYNew(lIndex + lPiece) = aYOrig(lIndex)
+                aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 1)
+                aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 1)
                 lCumDist = lCumDist + lDistance(lIndex)
             End If
         Next
-
+        'close out the last piece
+        aXNew(aXNew.GetUpperBound(0)) = aXOrig(aXOrig.GetUpperBound(0))
+        aYNew(aYNew.GetUpperBound(0)) = aYOrig(aYOrig.GetUpperBound(0))
+        aLineEndIndexes(aNumPieces) = aXNew.GetUpperBound(0)
     End Sub
 
 End Module
