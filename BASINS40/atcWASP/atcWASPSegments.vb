@@ -22,12 +22,12 @@ Public Class Segments
     Public Overrides Function ToString() As String
         Dim lString As New System.Text.StringBuilder
 
-        lString.Append(";Name            ID               Length     Width      Depth      Slope      Roughness  DownSegID        InflowTS        " & vbCrLf)
-        lString.Append(";_______________ ________________ __________ __________ __________ __________ __________ ________________ ________________" & vbCrLf)
+        lString.Append(";Name                            ID               Length     Width      Depth      Slope      Roughness  DownSegID        " & vbCrLf)
+        lString.Append(";_______________________________ ________________ __________ __________ __________ __________ __________ ________________ " & vbCrLf)
 
         For Each lSegment As Segment In Me
             With lSegment
-                lString.Append(.Name.PadRight(16) & " ")
+                lString.Append(.Name.PadRight(32) & " ")
                 lString.Append(.ID.PadRight(16) & " ")
                 lString.Append(Format(.Length, "0.00").PadRight(10) & " ")
                 lString.Append(Format(.Width, "0.00").PadRight(10) & " ")
@@ -37,6 +37,25 @@ Public Class Segments
                 lString.Append(.DownID.PadRight(16) & " ")
                 lString.Append(vbCrLf)
             End With
+        Next
+
+        Return lString.ToString
+    End Function
+
+    Public Function TimeseriesDirectoryToString() As String
+        Dim lString As New System.Text.StringBuilder
+
+        lString.Append(";Segment Name    Segment ID       Timeseries Type  Timeseries File Name                    " & vbCrLf)
+        lString.Append(";_______________ ________________ ________________ ________________________________________" & vbCrLf)
+
+        For Each lSegment As Segment In Me
+            For Each lTimeseries As WASPTimeseries In lSegment.InputTimeseriesCollection
+                lString.Append(lSegment.Name.PadRight(16) & " ")
+                lString.Append(lSegment.ID.PadRight(16) & " ")
+                lString.Append(lTimeseries.Type.PadRight(16) & " ")
+                lString.Append(lTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value & "." & lTimeseries.Type & ".DAT")
+                lString.Append(vbCrLf)
+            Next
         Next
 
         Return lString.ToString
