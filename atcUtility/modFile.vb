@@ -37,14 +37,14 @@ Public Module modFile
                         lDirectory = IO.Path.GetDirectoryName(lDirectory)
                         IO.Directory.CreateDirectory(lDirectory)
                     End If
-                    TryDelete(aToPath) 'Remove existing file at destination
+                    TryDelete(aToPath, aVerbose) 'Remove existing file at destination
                     IO.File.Move(aFromFilename, aToPath)
                     lTryMove = True
                 Catch exMove As Exception 'If moving didn't work, maybe copying will
                     If aVerbose Then Logger.Dbg("Exception '" & exMove.Message & "' while moving '" & aFromFilename & "' to '" & aToPath & "' attempting copy")
                     IO.File.Copy(aFromFilename, aToPath)
                     lTryMove = True
-                    TryDelete(aFromFilename)
+                    TryDelete(aFromFilename, aVerbose)
                 End Try
                 If aVerbose Then Logger.Dbg("Moved file from '" & aFromFilename & "' to '" & aToPath & "'")
             Catch ex As Exception
@@ -136,6 +136,34 @@ Public Module modFile
     End Function
 
     ''' <summary>
+    ''' Return a new file name in the IO.Path.GetTempPath folder with a given base file name and extension.
+    ''' An integer is inserted between the base file name and extension if needed to avoid conflict with an existing file.
+    ''' If aBaseName.aExtension already exists (as a file or folder), 
+    '''    aBaseName-1.aExtension is tried, then 
+    '''    aBaseName-2.aExtension, ..., until a file name is found for which the file does not yet exist
+    ''' Temporary files/folders found older than one day will be deleted and the name will be reused
+    ''' </summary>
+    ''' <remarks>It is the caller's responsibility to both create and remove this file. Two identical calls will get the same result if the file is not created before the second call.</remarks>
+    Public Function GetTemporaryFileName(ByVal aBaseName As String, ByVal aExtension As String) As String
+        Dim lCounter As Integer = 1
+        Dim lExpirationDate As Double = Date.Now.ToOADate - 1 'Old temporary files/folders expire after one day
+        If aBaseName Is Nothing OrElse aBaseName.Length = 0 Then aBaseName = "temp"
+        Dim lBaseName As String = IO.Path.Combine(IO.Path.GetTempPath, aBaseName)
+        Dim lName As String = lBaseName
+        If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
+        While FileExists(lName, True)
+            'First, see if existing temp file/folder is expired and try deleting it if so.
+            'If not expired, or expired but cannot delete, then try next numbered name
+            If IO.File.GetCreationTime(lName).ToOADate > lExpirationDate OrElse Not TryDelete(lName) Then
+                lCounter += 1
+                lName = lBaseName & "_" & lCounter
+                If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
+            End If
+        End While
+        Return lName
+    End Function
+
+    ''' <summary>
     ''' Create a new empty folder in the user's temporary folder. 
     ''' </summary>
     ''' <param name="aBaseName">String to start temporary folder name with.</param>
@@ -145,25 +173,10 @@ Public Module modFile
     ''' </returns>
     ''' <remarks>It is the caller's responsibility to remove this folder and its contents later.</remarks>
     Public Function NewTempDir(ByVal aBaseName As String) As String
-        Dim lCounter As Integer = 1
-        Dim lExpirationDate As Double = Date.Now.ToOADate - 1 'Old temporary folders expire after one day
-        NewTempDir = IO.Path.GetTempPath & aBaseName & IO.Path.DirectorySeparatorChar
-
-        'If there is already a file or non-empty directory with this name, try another name
-        While (IO.File.Exists(NewTempDir) OrElse _
-               IO.Directory.Exists(NewTempDir) AndAlso _
-               IO.Directory.GetFileSystemEntries(NewTempDir).Length > 0 AndAlso _
-               IO.Directory.GetCreationTime(NewTempDir).ToOADate > lExpirationDate)
-            lCounter += 1
-            NewTempDir = IO.Path.GetTempPath & aBaseName & "_" & lCounter & IO.Path.DirectorySeparatorChar
-        End While
-        If IO.Directory.Exists(NewTempDir) Then
-            Logger.Dbg("Reusing temporary directory '" & NewTempDir & "'")
-            IO.Directory.Delete(NewTempDir, True)
-        Else
-            Logger.Dbg("Creating temporary directory '" & NewTempDir & "'")
-        End If
-        IO.Directory.CreateDirectory(NewTempDir)
+        Dim lName As String = GetTemporaryFileName(aBaseName, Nothing) & IO.Path.DirectorySeparatorChar
+        Logger.Dbg("Creating temporary directory '" & lName & "'")
+        IO.Directory.CreateDirectory(lName)
+        Return lName
     End Function
 
     'if aHelpTopic is a file, set the file to display instead of opening help
@@ -278,25 +291,6 @@ EndFound:
        Public Function GetShortPathName(ByVal lpszLongPath As String, _
                                         ByVal lpszShortPath As StringBuilder, _
                                         ByVal cchBuffer As Integer) As Integer
-    End Function
-
-    ''' <summary>
-    ''' Return a new file name in the IO.Path.GetTempPath folder with a given base file name and extension.
-    ''' An integer is inserted between the base file name and extension if needed to avoid conflict with an existing file.
-    ''' (If aBaseFileName.aExtension already exists, 
-    '''     aBaseFileName-1.aExtension is tried, then 
-    '''     aBaseFileName-2.aExtension, ..., until a file name is found for which the file does not yet exist
-    ''' </summary>
-    Public Function GetTemporaryFileName(ByVal aBaseFileName As String, ByVal aExtension As String) As String
-        If aBaseFileName Is Nothing OrElse aBaseFileName.Length = 0 Then aBaseFileName = "temp"
-        Dim lFileName As String = IO.Path.Combine(IO.Path.GetTempPath, aBaseFileName)
-        If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lFileName = IO.Path.ChangeExtension(lFileName, aExtension)
-        Dim lTempIndex As Integer = 0
-        While FileExists(lFileName, True)
-            lTempIndex += 1
-            lFileName = IO.Path.ChangeExtension(IO.Path.Combine(IO.Path.GetTempPath, aBaseFileName & "-" & lTempIndex), aExtension)
-        End While
-        Return lFileName
     End Function
 
     ''' <summary>

@@ -476,13 +476,19 @@ StartOver:
             End If
 
             'Check to see if chosen data dir already contains any files
-            Dim lNumFiles As Long = System.IO.Directory.GetFiles(lNewDataDir).LongLength
-            Dim lNumDirs As Long = System.IO.Directory.GetDirectories(lNewDataDir).LongLength
-            If lNumFiles + lNumDirs > 0 Then
-                Logger.Msg("The folder '" & lNewDataDir & "'" & vbCr _
-                       & "already contains " & lNumFiles & " files and " & lNumDirs & " folders." & vbCr _
-                       & "The folder must be empty before a new project can be created here.", "New Project")
-                GoTo StartOver
+            If IO.Directory.Exists(lNewDataDir) Then
+                Dim lNumFiles As Long = System.IO.Directory.GetFiles(lNewDataDir).LongLength
+                Dim lNumDirs As Long = System.IO.Directory.GetDirectories(lNewDataDir).LongLength
+                If lNumFiles + lNumDirs > 0 Then
+                    Dim lMessage As String = "The folder '" & lNewDataDir & "'" & vbCr & "already contains "
+                    If lNumFiles > 0 Then
+                        lMessage &= lNumFiles & " files"
+                        If lNumDirs > 0 Then lMessage &= " and "
+                    End If
+                    If lNumDirs > 0 Then lMessage &= lNumDirs & " folders"
+                    Logger.Msg(lMessage & "." & vbCr & "The folder must be empty before a new project can be created here.", "New Project")
+                    GoTo StartOver
+                End If
             End If
 
             lMyProjection = atcProjector.Methods.AskUser
@@ -928,12 +934,7 @@ StartOver:
             End Select
         Next
 
-        'Remove empty groups
-        For lGroupIndex As Integer = g_MapWin.Layers.Groups.Count - 1 To 0 Step -1
-            If g_MapWin.Layers.Groups(lGroupIndex).LayerCount = 0 Then
-                g_MapWin.Layers.Groups.Remove(g_MapWin.Layers.Groups(lGroupIndex).Handle)
-            End If
-        Next
+        RemoveEmptyGroups()
 
         If lLayersAdded.Count = 1 Then
             ProcessDownloadResult &= "Downloaded Layer: " & lLayersAdded(0).ToString
@@ -993,16 +994,18 @@ StartOver:
     End Function
 
     Public Function CreateDefaultNewProjectFileName(ByVal aDataPath As String, ByVal aDefDirName As String) As String
-        Dim lSuffix As Integer
-        If FileExists(aDataPath & aDefDirName, True) Then 'Find a suffix that will make name unique
-            lSuffix = 0
-            Do
-                lSuffix += 1
-            Loop While FileExists(aDataPath & aDefDirName & "-" & lSuffix, True)
-            aDefDirName = aDefDirName & "-" & lSuffix
-        End If
-        CreateDefaultNewProjectFileName = aDataPath & aDefDirName & "\" & aDefDirName & ".mwprj"
-
+        Dim lSuffix As Integer = 1
+        Dim lDirName As String = aDataPath & aDefDirName
+        While FileExists(lDirName, True)  'Find a suffix that will make name unique
+            If IO.Directory.Exists(lDirName) AndAlso _
+               IO.Directory.GetFiles(lDirName).Length = 0 AndAlso _
+               IO.Directory.GetDirectories(lDirName).Length = 0 Then
+                Exit While 'Go ahead and use existing empty directory
+            End If
+            lSuffix += 1
+            lDirName = aDataPath & aDefDirName & "-" & lSuffix
+        End While
+        Return IO.Path.Combine(lDirName, aDefDirName & ".mwprj")
     End Function
 
     Public Function PromptForNewProjectFileName(ByVal aDefDirName As String, ByVal aDefaultProjectFileName As String) As String
@@ -1126,15 +1129,28 @@ StartOver:
             AddAllShapesInDir.Add(Filename, AddShapeToMW(Filename, GetDefaultsFor(Filename, aProjectDir, lDefaultsXML)))
         Next
 
-        'Remove any empty groups (for example, group "Data Layers" should be empty)
-        For iGroup As Integer = g_MapWin.Layers.Groups.Count - 1 To 0 Step -1
-            If g_MapWin.Layers.Groups.ItemByPosition(iGroup).LayerCount = 0 Then
-                g_MapWin.Layers.Groups.Remove(g_MapWin.Layers.Groups.ItemByPosition(iGroup).Handle)
-            End If
-        Next
+        RemoveEmptyGroups()
         g_MapWin.PreviewMap.GetPictureFromMap()
 
     End Function
+
+    ''' <summary>
+    ''' Remove any groups from the legend that do not contain any layers 
+    ''' for example, groups "Data Layers" and "New Group" are often created but then no layers end up in them
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub RemoveEmptyGroups()
+        For lGroupIndex As Integer = g_MapWin.Layers.Groups.Count - 1 To 0 Step -1
+            Dim lGroup As LegendControl.Group = g_MapWin.Layers.Groups.ItemByPosition(lGroupIndex)
+            Try
+                If lGroup IsNot Nothing AndAlso lGroup.LayerCount = 0 Then
+                    g_MapWin.Layers.Groups.Remove(lGroup.Handle)
+                End If
+            Catch e As Exception
+                Logger.Dbg("Could not remove group", e.Message, e.StackTrace)
+            End Try
+        Next
+    End Sub
 
     ''' <summary>
     ''' If the named layer does not have a .mwsr (for shape) or .mwleg (for grid) then look for the default file

@@ -1124,6 +1124,27 @@ TryOldString:
         CountString = retval
     End Function
 
+    Public Function ReadableFromXML(ByVal aXML As String) As String
+        Dim lSB As New System.Text.StringBuilder
+        Dim lIndex As Integer = 0
+        While lIndex < aXML.Length
+            Dim lChar As Char = aXML.Chars(lIndex)
+            Select Case lChar
+                Case "<"
+                    Dim lClose As Integer = aXML.IndexOf(">", lIndex + 1)
+                    If aXML.Chars(lIndex + 1) = "/" Then
+                        lSB.Append(vbLf)
+                    Else
+                        lSB.Append(aXML.Substring(lIndex + 1, lClose - lIndex - 1) & ": ")
+                    End If
+                    lIndex = lClose
+                Case Else : lSB.Append(lChar)
+            End Select
+            lIndex += 1
+        End While
+        Return lSB.ToString.Replace(vbLf & vbLf, vbLf).Replace(vbLf, vbCrLf)
+    End Function
+
     Public Function ReplaceStringNoCase(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
         ' ##SUMMARY Replaces Find in Source with Replace (not case sensitive).
         ' ##SUMMARY Example: ReplaceStringNoCase("He came and he went", "He", "She") = "She came and She went"
