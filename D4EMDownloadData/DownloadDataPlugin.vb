@@ -210,8 +210,12 @@ Public Class DownloadDataPlugin
                         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
                         Dim lResult As String = lDownloadManager.Execute(lQuery)
                         'Logger.Msg(lResult, "Result of Query from DataManager")
-                        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+                        If lResult Is Nothing OrElse lResult.Length = 0 Then
+                            'Nothing to report, no success or error
+                        ElseIf lResult.StartsWith("<success>") Then
                             BASINS.ProcessDownloadResults(lResult)
+                        Else
+                            Logger.Msg(atcUtility.ReadableFromXML(lResult), "Download Result")
                         End If
                         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default 'Logger.Busy = False
                     End If
