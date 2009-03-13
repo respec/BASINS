@@ -2544,6 +2544,14 @@ Public Class GisUtil
         aCentroidY = lPt.y
     End Sub
 
+    Public Shared Sub LineCentroid(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByRef aCentroidX As Double, ByRef aCentroidY As Double)
+        Dim lSf As New MapWinGIS.Shapefile
+        lSf = ShapeFileFromIndex(aLayerIndex)
+        Dim lShape As MapWinGIS.Shape = lSf.Shape(aFeatureIndex)
+        aCentroidX = ((lShape.Extents.xMax - lShape.Extents.xMin) / 2) + lShape.Extents.xMin
+        aCentroidY = ((lShape.Extents.yMax - lShape.Extents.yMin) / 2) + lShape.Extents.yMin
+    End Sub
+
     Public Shared Sub SaveMapAsImage(ByVal aImageFileName As String)
         Dim lImage As New MapWinGIS.Image
 

@@ -47,7 +47,7 @@ Module modWASPFromMW
                 J2Date(lEJDay, lEdate)
                 Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
                 Dim lCandidateTimeseries As New WASPTimeseries
-                lCandidateTimeseries.Identifier = lLoc & ":" & lStanam
+                lCandidateTimeseries.Identifier = lLoc
                 lCandidateTimeseries.SDate = lSJDay
                 lCandidateTimeseries.EDate = lEJDay
                 lCandidateTimeseries.Description = lLoc & ":" & lStanam & " " & lDateString
@@ -192,6 +192,23 @@ Module modWASPFromMW
         aXNew(aXNew.GetUpperBound(0)) = aXOrig(aXOrig.GetUpperBound(0))
         aYNew(aYNew.GetUpperBound(0)) = aYOrig(aYOrig.GetUpperBound(0))
         aLineEndIndexes(aNumPieces) = aXNew.GetUpperBound(0)
+    End Sub
+
+    Friend Sub GetMetStationCoordinates(ByVal aMetLayerIndex As Integer, ByVal aStationCandidates As WASPTimeseriesCollection)
+        Dim lFieldIndex As Integer = 1
+        If GisUtil.IsField(aMetLayerIndex, "LOCATION") Then
+            lFieldIndex = GisUtil.FieldIndex(aMetLayerIndex, "LOCATION")
+        End If
+
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(aMetLayerIndex) - 1
+            Dim lTempID As String = GisUtil.FieldValue(aMetLayerIndex, lFeatureIndex, lFieldIndex)
+            For Each lStationCandidate As WASPTimeseries In aStationCandidates
+                If lStationCandidate.Identifier = lTempID Then
+                    'found a timeseries, add the coordinates
+                    GisUtil.PointXY(aMetLayerIndex, lFeatureIndex, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                End If
+            Next
+        Next
     End Sub
 
 End Module

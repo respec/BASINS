@@ -24,14 +24,16 @@ Public Class WASPTimeseriesCollection
 End Class
 
 Public Class WASPTimeseries
-    Public Identifier As String
+    Public Identifier As String  'location 
     Public Type As String 'flow, air temp, solrad, water temp, etc.
     Public SDate As Double
     Public EDate As Double
     Public TimeSeries As atcData.atcTimeseries
     Public Description As String
-    Public ID As Integer
+    Public ID As Integer  'dsn if wdm
     Public DataSourceName As String
+    Public LocationX As Double
+    Public LocationY As Double
 
     Public Function TimeSeriesToString() As String
         Dim lStartIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(Me.SDate, True)
