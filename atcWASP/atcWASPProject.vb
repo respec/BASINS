@@ -21,8 +21,8 @@ Public Class WASPProject
 
         'set file names
         WNFFileName = aFileName
-        Dim lSegmentFileName As String = FilenameSetExt(WNFFileName, "SEG")
-        Dim lDirectoryFileName As String = FilenameSetExt(WNFFileName, "TIM")
+        Dim lSegmentFileName As String = FilenameSetExt(WNFFileName, "seg")
+        Dim lDirectoryFileName As String = FilenameSetExt(WNFFileName, "tim")
 
         'write WASP network file first
         Dim lSW As New IO.StreamWriter(aFileName)

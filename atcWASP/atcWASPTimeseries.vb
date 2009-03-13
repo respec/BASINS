@@ -41,8 +41,6 @@ Public Class WASPTimeseries
         Dim lEndIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(Me.EDate, True)
         Dim lSB As New StringBuilder
         For lIndex As Integer = lStartIndex To lEndIndex - 1
-            lSB.Append(StrPad(Me.Identifier, 16, " ", False))
-            lSB.Append(" ")
             Dim lJDate As Double = Me.TimeSeries.Dates.Values(lIndex)
             Dim lDate(6) As Integer
             J2Date(lJDate, lDate)

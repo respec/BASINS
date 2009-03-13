@@ -45,12 +45,12 @@ Public Class Segments
     Public Function TimeseriesDirectoryToString() As String
         Dim lString As New System.Text.StringBuilder
 
-        lString.Append(";Segment Name    Segment ID       Timeseries Type  Timeseries File Name                    " & vbCrLf)
-        lString.Append(";_______________ ________________ ________________ ________________________________________" & vbCrLf)
+        lString.Append(";Segment Name                    Segment ID       Timeseries Type  Timeseries File Name                    " & vbCrLf)
+        lString.Append(";_______________________________ ________________ ________________ ________________________________________" & vbCrLf)
 
         For Each lSegment As Segment In Me
             For Each lTimeseries As WASPTimeseries In lSegment.InputTimeseriesCollection
-                lString.Append(lSegment.Name.PadRight(16) & " ")
+                lString.Append(lSegment.Name.PadRight(32) & " ")
                 lString.Append(lSegment.ID.PadRight(16) & " ")
                 lString.Append(lTimeseries.Type.PadRight(16) & " ")
                 lString.Append(lTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value & "." & lTimeseries.Type & ".DAT")
