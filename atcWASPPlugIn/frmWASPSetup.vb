@@ -1086,6 +1086,14 @@ Public Class frmWASPSetup
         BuildListofValidStationNames("SOLR", pSolRadStationCandidates)
         BuildListofValidStationNames("WIND", pWindStationCandidates)
 
+        'set layer index for met stations
+        Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
+        GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
+        GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
+        GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
+        GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
+        GetMetStationCoordinates(lMetLayerIndex, pWindStationCandidates)
+
         'redo to set valid values
         SetFlowStationGrid()
         SetLoadStationGrid()
@@ -1123,10 +1131,13 @@ Public Class frmWASPSetup
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
 
+            Dim lShapeIndex As Integer = -1
             For Each lSegment As atcWASP.Segment In lTempSegments
                 Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
                 lSegment.InputTimeseriesCollection = lTimeseriesCollection
                 lSegment.BaseID = lSegment.ID   'store segment id before breaking up
+                lShapeIndex += 1
+                GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
             Next
 
             'after reading the attribute table, see if any are selected
