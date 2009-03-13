@@ -399,7 +399,7 @@ NextRecord:
             Dim lReadLocation As New Generic.List(Of String)
             Dim lReadField As New Generic.List(Of Integer)
             Dim lReadValues As New Generic.List(Of Double()) 'array of double data values for each timeseries
-            Dim lReadValueIndex As New Generic.List(Of Integer)
+            Dim lValueIndex As Integer
 
             If Me.DataSets.Count < 2000 Then
                 'Reading all datasets at once is much faster than one at a time
@@ -416,7 +416,6 @@ NextRecord:
                             Dim lVd(pNumValues) As Double 'array of double data values
                             lVd(0) = pNaN
                             lReadValues.Add(lVd)
-                            lReadValueIndex.Add(1)
                         End If
                     End If
                 Next
@@ -431,7 +430,9 @@ NextRecord:
                     lReadLocation.Add(lReadTS.Attributes.GetValue("Location"))
                     lReadField.Add(lField)
                     Dim lVd(pNumValues) As Double 'array of double data values
-                    lVd(0) = pNaN
+                    For lValueIndex = 0 To pNumValues
+                        lVd(lValueIndex) = pNaN
+                    Next
                     lReadValues.Add(lVd)
                     Logger.Status("Reading values for " & lReadThese.Item(0).ToString)
                 End If
@@ -448,12 +449,12 @@ NextRecord:
                     Dim lLocation As String
                     Dim lLocationIndex As Integer
                     Dim lDate As Double
+                    Dim lLastDate As Double = 0
                     Dim lYear As Integer = pYearBase
                     Dim lYearReading As Integer = 0
                     Dim lMonReading As Integer = 0
                     Dim lDayReading As Integer = 0
                     Dim lMONvalue As Integer
-                    Dim lValueIndex As Integer = 1
 
                     Dim lVd() As Double = lReadValues(0)
                     Dim lJd(-1) As Double 'array of julian dates
@@ -476,33 +477,21 @@ NextRecord:
                             End If
 
                             Try
+                                lValueIndex = 0
                                 For lLocationIndex = 0 To lLastIndex
                                     If lReadLocation(lLocationIndex) = lLocation Then
                                         If lLastIndex > 0 Then
-                                            lValueIndex = lReadValueIndex(lLocationIndex)
                                             lReadTS = lReadThese(lLocationIndex)
                                             lField = lReadField(lLocationIndex)
                                             lVd = lReadValues(lLocationIndex)
                                         End If
                                         If Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
-                                            If lValueIndex > pNumValues Then
-                                                If lNeedDates Then ReDim Preserve lJd(lValueIndex)
-                                                If lLastIndex = 0 Then
-                                                    ReDim Preserve lVd(lValueIndex)
-                                                Else
-                                                    For lIndex As Integer = 0 To lLastIndex
-                                                        lVd = lReadValues(lLocationIndex)
-                                                        ReDim Preserve lVd(lValueIndex)
-                                                    Next
-                                                    lVd = lReadValues(lLocationIndex)
-                                                End If
-                                            End If
                                             Select Case pMONcontains
                                                 Case 0 'Monthly
                                                     If lMONvalue < 13 Then
                                                         If lMONvalue <> lMonReading Then
                                                             lMonReading = lMONvalue
-                                                            If lMonReading = 1 Then
+                                                            If lMonReading = 1 AndAlso lDate > 0 Then
                                                                 lYear += 1
                                                             End If
                                                         End If
@@ -513,8 +502,8 @@ NextRecord:
                                                     End If
                                                 Case 1 'Daily
                                                     If lDate = 0 Then
-                                                        lDate = atcUtility.Jday(pYearBase, 1, 1, 24, 0, 0)
                                                         lDayReading = lMONvalue
+                                                        lDate = atcUtility.Jday(pYearBase, 1, lMONvalue, 24, 0, 0)
                                                         If lNeedDates Then lJd(0) = atcUtility.Jday(pYearBase, 1, 1, 0, 0, 0)
                                                     ElseIf lMONvalue <> lDayReading Then
                                                         lDate += 1
@@ -528,20 +517,39 @@ NextRecord:
                                                     lDate = atcUtility.Jday(lYear, 12, 31, 24, 0, 0)
                                                     If lNeedDates AndAlso lValueIndex = 1 Then lJd(0) = atcUtility.Jday(lYear - 1, 12, 31, 24, 0, 0)
                                             End Select
-                                            If lYear <> lYearReading Then
-                                                Logger.Status("Reading year " & lYear, True)
-                                                Logger.Flush()
-                                                lYearReading = lYear
-                                                If pYearBase = 0 Then pYearBase = lYear
+
+                                            If lDate > lLastDate Then
+                                                lValueIndex += 1
+                                                If lValueIndex > pNumValues Then
+                                                    Logger.Dbg("Increasing size of value array to " & lValueIndex)
+                                                    If lNeedDates Then ReDim Preserve lJd(lValueIndex)
+                                                    If lLastIndex = 0 Then
+                                                        ReDim Preserve lVd(lValueIndex)
+                                                        lVd(lValueIndex) = pNaN
+                                                    Else
+                                                        For lIndex As Integer = 0 To lLastIndex
+                                                            lVd = lReadValues(lLocationIndex)
+                                                            ReDim Preserve lVd(lValueIndex)
+                                                            lVd(lValueIndex) = pNaN
+                                                        Next
+                                                        lVd = lReadValues(lLocationIndex)
+                                                    End If
+                                                End If
+                                                If lYear <> lYearReading Then
+                                                    Logger.Status("Reading year " & lYear, True)
+                                                    Logger.Flush()
+                                                    lYearReading = lYear
+                                                    If pYearBase = 0 Then pYearBase = lYear
+                                                End If
+
+                                                lLastDate = lDate
+                                                If lNeedDates Then lJd(lValueIndex) = lDate
                                             End If
-                                            'Debug.Print(lYear & " " & DumpDate(lDate) & " at " & lLocation)
-                                            Dim lFieldName As String = .FieldName(lField).ToString.Replace("""", "")
-                                            If lNeedDates Then lJd(lValueIndex) = lDate
+
+                                            Dim lFieldName As String = .FieldName(lField).Replace("""", "")
                                             If Not Double.TryParse(.Value(lField).Trim, lVd(lValueIndex)) Then
                                                 lVd(lValueIndex) = pNaN
                                             End If
-                                            lValueIndex += 1
-                                            lReadValueIndex(lLocationIndex) = lValueIndex
                                         Else 'got to end of run summary, value is number of years as a decimal or we have reached blank line after end
                                             Exit Do
                                         End If

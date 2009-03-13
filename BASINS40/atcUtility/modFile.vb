@@ -8,7 +8,8 @@ Imports MapWinUtility
 
 Public Module modFile
 
-    Private ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
+    Public ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
+    Public TifExtensions() As String = {".tif", ".prj", ".tfw", ".xml", ".tif.xml", ".mwsr", ".mwleg"}
 
     Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
         Return TryMove(aFromFilename, aToPath, False)
@@ -19,6 +20,7 @@ Public Module modFile
     ''' </summary>
     ''' <param name="aFromFilename">Path of file to be moved</param>
     ''' <param name="aToPath">Folder or full path to move to</param>
+    ''' <param name="aVerbose">True to log what happens with Logger.Dbg</param>
     ''' <returns>True if successful, False if unsuccessful</returns>
     ''' <remarks></remarks>
     Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String, ByVal aVerbose As Boolean) As Boolean
@@ -64,10 +66,26 @@ Public Module modFile
     ''' False if any files were present which could not be deleted.</returns>
     ''' <remarks>Most likely cause of failure is shape file is open (currently on a map)</remarks>
     Public Function TryDeleteShapefile(ByVal aShapeFilename As String) As Boolean
-        TryDeleteShapefile = True
-        For Each lFilename As String In ShapeFilenames(aShapeFilename)
-            If FileExists(lFilename) AndAlso Not TryDelete(lFilename) Then TryDeleteShapefile = False
+        Return TryDeleteGroup(aShapeFilename, ShapeExtensions)
+    End Function
+
+    ''' <summary>
+    ''' Delete a group of files with the same base name and different extensions
+    ''' </summary>
+    ''' <param name="aBaseFilename">full path and file name of one file to delete (example: "C:\temp.shp")</param>
+    ''' <param name="aExtensions">all possible extensions to copy, examples are ShapeExtensions and TifExtensions above</param>
+    ''' <param name="aVerbose">True to log what happens with Logger.Dbg</param>
+    ''' <returns>True if all existing files were deleted or already did not exist, 
+    ''' False if any files were present which could not be deleted.</returns>
+    ''' <remarks>Most likely cause of failure is a file is open (for example is currently on a map)</remarks>
+    Public Function TryDeleteGroup(ByVal aBaseFilename As String, ByVal aExtensions() As String, Optional ByVal aVerbose As Boolean = False) As Boolean
+        Dim lSuccess As Boolean = True
+        Dim lFilename As String
+        For Each lExtension As String In aExtensions
+            lFilename = IO.Path.ChangeExtension(aBaseFilename, lExtension)
+            If FileExists(lFilename) AndAlso Not TryDelete(lFilename, aVerbose) Then lSuccess = False
         Next
+        Return lSuccess
     End Function
 
     ''' <summary>
@@ -79,22 +97,36 @@ Public Module modFile
     ''' (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
     ''' <returns>True if all existing files were copied, False if an existing file could not be copied.</returns>
     Public Function TryCopyShapefile(ByVal aShapeFilename As String, ByVal aDestinationPath As String) As Boolean
-        TryCopyShapefile = True
+        Return TryCopyGroup(aShapeFilename, aDestinationPath, ShapeExtensions)
+    End Function
+
+    ''' <summary>
+    ''' Copy a group of files with the same base name and different extensions
+    ''' Log any exceptions and return false rather than raising them
+    ''' </summary>
+    ''' <param name="aBaseFilename">full path and file name of one file to copy (example: "C:\temp.shp")</param>
+    ''' <param name="aDestinationPath">full path of destination folder or file name 
+    ''' (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+    ''' <param name="aExtensions">all possible extensions to copy, examples are ShapeExtensions and TifExtensions above</param>
+    ''' <param name="aVerbose">True to log what happens with Logger.Dbg</param>
+    ''' <returns>True if all existing files were copied, False if an existing file could not be copied.</returns>
+    Public Function TryCopyGroup(ByVal aBaseFilename As String, ByVal aDestinationPath As String, ByVal aExtensions() As String, Optional ByVal aVerbose As Boolean = False) As Boolean
+        TryCopyGroup = True
         Dim lNewBaseName As String
         If IO.Path.GetExtension(aDestinationPath).Length > 0 Then
             lNewBaseName = IO.Path.GetFileNameWithoutExtension(aDestinationPath)
             aDestinationPath = IO.Path.GetDirectoryName(aDestinationPath)
         Else
-            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aShapeFilename)
+            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aBaseFilename)
         End If
 
-        aShapeFilename = IO.Path.ChangeExtension(aShapeFilename, "").TrimEnd(".")
+        aBaseFilename = IO.Path.ChangeExtension(aBaseFilename, "").TrimEnd(".")
         aDestinationPath = IO.Path.Combine(aDestinationPath, lNewBaseName)
 
-        For Each lExtension As String In ShapeExtensions
-            Dim lFilename As String = aShapeFilename & lExtension
-            If FileExists(lFilename) AndAlso Not TryCopy(lFilename, aDestinationPath & lExtension) Then
-                TryCopyShapefile = False
+        For Each lExtension As String In aExtensions
+            Dim lFilename As String = aBaseFilename & lExtension
+            If FileExists(lFilename) AndAlso Not TryCopy(lFilename, aDestinationPath & lExtension, aVerbose) Then
+                TryCopyGroup = False
             End If
         Next
     End Function
@@ -108,30 +140,37 @@ Public Module modFile
     ''' (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
     ''' <returns>True if all existing files were moved, False if an existing file could not be moved.</returns>
     Public Function TryMoveShapefile(ByVal aShapeFilename As String, ByVal aDestinationPath As String) As Boolean
-        TryMoveShapefile = True
+        Return TryMoveGroup(aShapeFilename, aDestinationPath, ShapeExtensions)
+    End Function
+
+    ''' <summary>
+    ''' Move a group of files with the same base name and different extensions
+    ''' Log any exceptions and return false rather than raising them
+    ''' </summary>
+    ''' <param name="aBaseFilename">full path and file name of shape file to move (example: "C:\temp.shp")</param>
+    ''' <param name="aDestinationPath">full path of destination folder or file name 
+    ''' (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+    ''' <param name="aExtensions">all possible extensions to copy, examples are ShapeExtensions and TifExtensions above</param>
+    ''' <param name="aVerbose">True to log what happens with Logger.Dbg</param>
+    ''' <returns>True if all existing files were moved, False if an existing file could not be moved.</returns>
+    Public Function TryMoveGroup(ByVal aBaseFilename As String, ByVal aDestinationPath As String, ByVal aExtensions() As String, Optional ByVal aVerbose As Boolean = False) As Boolean
+        TryMoveGroup = True
         Dim lNewBaseName As String
         If IO.Path.GetExtension(aDestinationPath).Length > 0 Then
             lNewBaseName = IO.Path.GetFileNameWithoutExtension(aDestinationPath)
             aDestinationPath = IO.Path.GetDirectoryName(aDestinationPath)
         Else
-            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aShapeFilename)
+            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aBaseFilename)
         End If
 
-        aShapeFilename = IO.Path.ChangeExtension(aShapeFilename, "").TrimEnd(".")
+        aBaseFilename = IO.Path.ChangeExtension(aBaseFilename, "").TrimEnd(".")
         aDestinationPath = IO.Path.Combine(aDestinationPath, lNewBaseName)
 
-        For Each lExtension As String In ShapeExtensions
-            Dim lFilename As String = aShapeFilename & lExtension
-            If FileExists(lFilename) AndAlso Not TryMove(lFilename, aDestinationPath & lExtension) Then
-                TryMoveShapefile = False
+        For Each lExtension As String In aExtensions
+            Dim lFilename As String = aBaseFilename & lExtension
+            If FileExists(lFilename) AndAlso Not TryMove(lFilename, aDestinationPath & lExtension, aVerbose) Then
+                TryMoveGroup = False
             End If
-        Next
-    End Function
-
-    Private Function ShapeFilenames(ByVal aShapefilename As String) As ArrayList
-        ShapeFilenames = New ArrayList
-        For Each lExtension As String In ShapeExtensions
-            ShapeFilenames.Add(IO.Path.ChangeExtension(aShapefilename, lExtension))
         Next
     End Function
 
