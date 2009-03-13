@@ -1111,35 +1111,49 @@ Module SWATRunner
                 End If
             Next
 
-            Dim lTimserNitrUnitLoad As atcTimeseries = Compute("Add", lTimserNitr)
-            lTimserNitrUnitLoad.Attributes.SetValue("Constituent", "UnitN_Load")
-            lSubDataToList.Add(lTimserNitrUnitLoad)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrUnitLoad.Attributes.GetDefinedValue("Mean").Value))
-            Dim lTimserNitrHucLoad As atcTimeseries = Compute("Multiply", lTimserNitrUnitLoad, lHucAreaFactor)
-            lTimserNitrHucLoad.Attributes.SetValue("Constituent", "HucN_Load")
-            lSubDataToList.Add(lTimserNitrHucLoad)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrHucLoad.Attributes.GetDefinedValue("Mean").Value))
+            If lTimserNitr.Count > 0 Then
+                Dim lTimserNitrUnitLoad As atcTimeseries = Compute("Add", lTimserNitr)
+                lTimserNitrUnitLoad.Attributes.SetValue("Constituent", "UnitN_Load")
+                lSubDataToList.Add(lTimserNitrUnitLoad)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrUnitLoad.Attributes.GetDefinedValue("Mean").Value))
 
-            Dim lTimserPhosUnitLoad As atcTimeseries = Compute("Add", lTimserPhos)
-            lTimserPhosUnitLoad.Attributes.SetValue("Constituent", "UnitP_Load")
-            lSubDataToList.Add(lTimserPhosUnitLoad)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosUnitLoad.Attributes.GetDefinedValue("Mean").Value))
-            Dim lTimserPhosHucLoad As atcTimeseries = Compute("Multiply", lTimserPhosUnitLoad, lHucAreaFactor)
-            lTimserPhosHucLoad.Attributes.SetValue("Constituent", "HucP_Load")
-            lSubDataToList.Add(lTimserPhosHucLoad)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosHucLoad.Attributes.GetDefinedValue("Mean").Value))
+                Dim lTimserNitrHucLoad As atcTimeseries = Compute("Multiply", lTimserNitrUnitLoad, lHucAreaFactor)
+                lTimserNitrHucLoad.Attributes.SetValue("Constituent", "HucN_Load")
+                lSubDataToList.Add(lTimserNitrHucLoad)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserNitrHucLoad.Attributes.GetDefinedValue("Mean").Value))
+            End If
 
-            'sediment
-            Dim lTimserUnitLoad As atcTimeseries = lSubDataToList.FindData("Constituent", "SYLD").ItemByIndex(0)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserUnitLoad.Attributes.GetDefinedValue("Mean").Value))
-            Dim lTimserLoad As atcTimeseries = Compute("Multiply", lTimserUnitLoad, lHucAreaFactor)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserLoad.Attributes.GetDefinedValue("Mean").Value, 16))
+            If lTimserPhos.Count > 0 Then
+                Dim lTimserPhosUnitLoad As atcTimeseries = Compute("Add", lTimserPhos)
+                lTimserPhosUnitLoad.Attributes.SetValue("Constituent", "UnitP_Load")
+                lSubDataToList.Add(lTimserPhosUnitLoad)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosUnitLoad.Attributes.GetDefinedValue("Mean").Value))
+
+                Dim lTimserPhosHucLoad As atcTimeseries = Compute("Multiply", lTimserPhosUnitLoad, lHucAreaFactor)
+                lTimserPhosHucLoad.Attributes.SetValue("Constituent", "HucP_Load")
+                lSubDataToList.Add(lTimserPhosHucLoad)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserPhosHucLoad.Attributes.GetDefinedValue("Mean").Value))
+            End If
+
+            Dim lFind As atcTimeseriesGroup
+            Dim lTimserUnitLoad As atcTimeseries
+            Dim lTimserLoad As atcTimeseries
+            lFind = lSubDataToList.FindData("Constituent", "SYLD")
+            If lFind.Count > 0 Then
+                lTimserUnitLoad = lFind.ItemByIndex(0)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserUnitLoad.Attributes.GetDefinedValue("Mean").Value))
+                lTimserLoad = Compute("Multiply", lTimserUnitLoad, lHucAreaFactor)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserLoad.Attributes.GetDefinedValue("Mean").Value, 16))
+            End If
 
             'H2O
-            lTimserUnitLoad = lSubDataToList.FindData("Constituent", "WYLD").ItemByIndex(0)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserUnitLoad.Attributes.GetDefinedValue("Mean").Value))
-            lTimserLoad = Compute("Multiply", lTimserUnitLoad, lHucAreaFactor)
-            lSBHuc8.Append(vbTab & DecimalAlign(lTimserLoad.Attributes.GetDefinedValue("Mean").Value, 16))
+            lFind = lSubDataToList.FindData("Constituent", "WYLD")
+            If lFind.Count > 0 Then
+                lTimserUnitLoad = lFind.ItemByIndex(0)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserUnitLoad.Attributes.GetDefinedValue("Mean").Value))
+                lTimserLoad = Compute("Multiply", lTimserUnitLoad, lHucAreaFactor)
+                lSBHuc8.Append(vbTab & DecimalAlign(lTimserLoad.Attributes.GetDefinedValue("Mean").Value, 16))
+            End If
 
             lSBHuc8.AppendLine()
 
