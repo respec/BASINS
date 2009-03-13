@@ -449,7 +449,7 @@ NextRecord:
                     Dim lLocation As String
                     Dim lLocationIndex As Integer
                     Dim lDate As Double
-                    Dim lLastDate As Double = 0
+                    Dim lPrevDate As Double = 0
                     Dim lYear As Integer = pYearBase
                     Dim lYearReading As Integer = 0
                     Dim lMonReading As Integer = 0
@@ -458,6 +458,7 @@ NextRecord:
 
                     Dim lVd() As Double = lReadValues(0)
                     Dim lJd(-1) As Double 'array of julian dates
+                    lValueIndex = 0
 
                     Dim lNeedDates As Boolean
                     If pDates.numValues = 0 Then
@@ -477,7 +478,6 @@ NextRecord:
                             End If
 
                             Try
-                                lValueIndex = 0
                                 For lLocationIndex = 0 To lLastIndex
                                     If lReadLocation(lLocationIndex) = lLocation Then
                                         If lLastIndex > 0 Then
@@ -518,7 +518,7 @@ NextRecord:
                                                     If lNeedDates AndAlso lValueIndex = 1 Then lJd(0) = atcUtility.Jday(lYear - 1, 12, 31, 24, 0, 0)
                                             End Select
 
-                                            If lDate > lLastDate Then
+                                            If lDate > lPrevDate Then
                                                 lValueIndex += 1
                                                 If lValueIndex > pNumValues Then
                                                     Logger.Dbg("Increasing size of value array to " & lValueIndex)
@@ -542,7 +542,7 @@ NextRecord:
                                                     If pYearBase = 0 Then pYearBase = lYear
                                                 End If
 
-                                                lLastDate = lDate
+                                                lPrevDate = lDate
                                                 If lNeedDates Then lJd(lValueIndex) = lDate
                                             End If
 
@@ -568,7 +568,7 @@ NextRecord:
                     End With
 
                     If lNeedDates Then
-                        If lValueIndex <= pNumValues Then ReDim Preserve lJd(lValueIndex - 1)
+                        If lValueIndex < pNumValues Then ReDim Preserve lJd(lValueIndex)
                         pDates.Values = lJd
                     End If
 
@@ -576,8 +576,8 @@ NextRecord:
                         lReadTS = lReadThese(lIndex)
                         lVd = lReadValues(lIndex)
 
-                        If lValueIndex <= pNumValues Then
-                            ReDim Preserve lVd(lValueIndex - 1)
+                        If lValueIndex < pNumValues Then
+                            ReDim Preserve lVd(lValueIndex)
                         End If
 
                         lReadTS.ValuesNeedToBeRead = False
@@ -598,6 +598,7 @@ NextRecord:
                         End With
                         Logger.Progress(lIndex, lLastIndex)
                     Next
+                    pNumValues = lValueIndex
                     Logger.Progress("", 0, 0)
                 End If
             End If
