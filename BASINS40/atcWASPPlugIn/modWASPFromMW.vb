@@ -60,8 +60,10 @@ Module modWASPFromMW
                     Logger.Dbg("Problem adding " & lCandidateTimeseries.Description)
                 End Try
             End If
-            'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
-            lDataSet.ValuesNeedToBeRead = True
+            If aDataSource.Name = "Timeseries::WDM" Then
+                'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                lDataSet.ValuesNeedToBeRead = True
+            End If
         Next
 
         Logger.Dbg("Found " & aStationCandidates.Count & " Stations")
@@ -79,10 +81,14 @@ Module modWASPFromMW
                 aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
             Else
                 'not yet in the project, add it
-                Dim lTimeseries As New atcWASP.WASPTimeseries
-                aStationCandidates(aKeyString).TimeSeries = GetTimeseries(aStationCandidates(aKeyString).DataSourceName, aStationCandidates(aKeyString).ID)
-                aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
-                aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                Dim lTimeseries As atcTimeseries = GetTimeseries(aStationCandidates(aKeyString).DataSourceName, aStationCandidates(aKeyString).ID)
+                If lTimeseries Is Nothing Then
+                    Logger.Dbg("Coud not find timeseries " & aKeyString)
+                Else
+                    aStationCandidates(aKeyString).TimeSeries = lTimeseries
+                    aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                    aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                End If
             End If
         End If
     End Sub
@@ -93,6 +99,7 @@ Module modWASPFromMW
 
         For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             lGetTimeseries = GetTimeseriesFromDataSource(lDataSource, aDataSourceName, aID)
+            If Not lGetTimeseries Is Nothing Then Exit For
         Next
 
         Return lGetTimeseries

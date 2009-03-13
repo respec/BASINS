@@ -816,35 +816,35 @@ Public Class frmWASPSetup
         For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
             'input flows 
             lKeyString = "FLOW:" & AtcGridFlow.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso lKeyString <> "<none>" Then
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridFlow.Source.CellValue(lIndex, 1) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, pFlowStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
             End If
             'air temp
             lKeyString = "ATMP:" & AtcGridMet.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso lKeyString <> "<none>" Then
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 1) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
             End If
             lKeyString = "ATEM:" & AtcGridMet.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso lKeyString <> "<none>" Then
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 1) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
             End If
             'sol rad
             lKeyString = "SOLR:" & AtcGridMet.Source.CellValue(lIndex, 2)
-            If lKeyString.Trim.Length > 0 AndAlso lKeyString <> "<none>" Then
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 2) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
             End If
             lKeyString = "SOLRAD:" & AtcGridMet.Source.CellValue(lIndex, 2)
-            If lKeyString.Trim.Length > 0 AndAlso lKeyString <> "<none>" Then
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 2) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
             End If
             'wind 
             lKeyString = "WIND:" & AtcGridMet.Source.CellValue(lIndex, 3)
-            If lKeyString.Trim.Length > 0 AndAlso lKeyString <> "<none>" Then
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 3) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, pWindStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
             End If
             'need to add other wq loads
             lKeyString = "WTMP:" & AtcGridLoad.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso lKeyString <> "<none>" Then
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridLoad.Source.CellValue(lIndex, 1) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, pWaterTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
             End If
         Next
@@ -1123,8 +1123,8 @@ Public Class frmWASPSetup
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
 
-            Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
             For Each lSegment As atcWASP.Segment In lTempSegments
+                Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
                 lSegment.InputTimeseriesCollection = lTimeseriesCollection
                 lSegment.BaseID = lSegment.ID   'store segment id before breaking up
             Next
