@@ -1273,19 +1273,12 @@ Module SWATRunner
         Dim lUnitPApp As Double = 0.0
         Dim lUnitYield As Double = 0.0
 
-        'TODO: check and output all units!
         Dim lSBAreaDebug As New Text.StringBuilder
         lSBAreaDebug.AppendLine("SubId" & lTab & _
                                 "HruId" & lTab & _
                                 "Crop" & lTab & _
                                 "Area".PadLeft(lFieldWidth) & lTab & _
                                 "Fraction".PadLeft(lFieldWidth))
-        'lSBAreaDebug.AppendLine(Space(5) & lTab & _
-        '                        Space(6) & lTab & _
-        '                        Space(4) & lTab & _
-        '                        "km2".PadLeft(lFieldWidth) & lTab & _
-        '                        Space(8).PadLeft(lFieldWidth))
-
         Dim lAreaGroup As atcTimeseriesGroup = aTimeseriesGroup.FindData("Constituent", "AREA")
         Dim lSubIds As atcCollection = lAreaGroup.SortedAttributeValues("SubId")
         Dim lSubIdAreas As New atcCollection
@@ -1294,11 +1287,14 @@ Module SWATRunner
             Dim lSubIdDataGroup As atcTimeseriesGroup = lAreaGroup.FindData("SubId", lSubId)
             Dim lHruIds As atcCollection = lSubIdDataGroup.SortedAttributeValues("HruId")
             Dim lAreaStrings As New atcCollection
+            Dim lunitLine As String = Space(5) & lTab & Space(6) & lTab & Space(4) & lTab
+            Dim lunit As String = ""
             For Each lHruId As String In lHruIds
                 Dim lHruIdDataGroup As atcTimeseriesGroup = lSubIdDataGroup.FindData("HruId", lHruId)
                 Dim lAreaUsed As Boolean = False
                 For Each lAreaTimeseries As atcTimeseries In lHruIdDataGroup
                     lArea = lAreaTimeseries.Value(1)
+                    lunit = lAreaTimeseries.Attributes.GetValue("Units")
                     If Double.IsNaN(lArea) Then
                         'skip
                     ElseIf Not lAreaUsed Then
@@ -1313,6 +1309,9 @@ Module SWATRunner
                     End If
                 Next
             Next
+
+            lunitLine &= lunit.PadLeft(lFieldWidth) & lTab & Space(8).PadLeft(lFieldWidth)
+            lSBAreaDebug.AppendLine(lunitLine)
             For Each lAreaString As String In lAreaStrings
                 lArea = lAreaString.Substring(lAreaString.LastIndexOf(lTab))
                 lSBAreaDebug.AppendLine(lAreaString & lTab & DecimalAlign(lArea / lAreaSubIdTotal, , 10, lSigDigits))
@@ -1322,6 +1321,7 @@ Module SWATRunner
         SaveFileString(IO.Path.Combine(aOutputFolder, "Area.txt"), lSBAreaDebug.ToString)
 
         Dim lMatchingDataGroup As atcTimeseriesGroup = aTimeseriesGroup.FindData("CropId", lCropIds)
+        'Get the first date from the first matching timeseries, e.g 1961/1/1
         Dim lTimserBase As atcTimeseries = lMatchingDataGroup.Item(0)
         Dim lDateBase(5) As Integer
         J2Date(lTimserBase.Dates.Value(0), lDateBase)
@@ -1388,10 +1388,26 @@ Module SWATRunner
         Dim lNUptkTotal As Double = 0.0
         Dim lPAppTotal As Double = 0.0
         Dim lPUptkTotal As Double = 0.0
+
+        'UnitLines
+        Dim lSBDebugUnitLine As String = Space(5) & lTab & Space(4).PadLeft(8) & lTab & Space(4) & lTab 'SubID\tCrop\t\Year\t
+        Dim lSBAverageUnitLine As String = Space(5) & lTab & Space(4).PadLeft(8) & lTab 'SubID\tHUC8\t
+        Dim lSBAnnualUnitLine As String = Space(5) & lTab & Space(4).PadLeft(8) & lTab & Space(4) & lTab 'SubID\tHUC8\t\Year\t
+
+        'Units
+        Dim lAreaUnit As String = ""
+        Dim lYLDUnit As String = ""
+        Dim lNAUTOUnit As String = ""
+        Dim lNUPUnit As String = ""
+        Dim lPAUTOUnit As String = ""
+        Dim lPUPUnit As String = ""
+
         Dim lYieldSummaryHuc8 As New atcCollection
+
+        Dim ldoneUnitLine As Boolean = False
         For Each lSubId As String In lSubIds
             Dim lHuc8 As String = aSubBasin2huc8.ItemByKey(lSubId.Trim)
-            Dim lSubIdDataGroup As atcTimeseriesGroup = lMatchingDataGroup.FindData("SubId", lSubId)
+            Dim lSubIdDataGroup As atcTimeseriesGroup = lMatchingDataGroup.FindData("SubId", lSubId) 'TSs for all targeted Crops (e.g. CCCC) in a given subbasin
             Dim lLocationIdsInSub As atcCollection = lSubIdDataGroup.SortedAttributeValues("Location")
             Dim lNUptkSum As Double = 0.0
             Dim lNAppSum As Double = 0.0
@@ -1399,6 +1415,71 @@ Module SWATRunner
             Dim lPAppSum As Double = 0.0
             Dim lYieldSum As Double = 0.0
             Dim lAreaSum As Double = 0.0
+
+            If Not ldoneUnitLine Then 'Only get the units for the first set of timeseries, assuming they are all the same as raw SWAT outputs' units
+                'Find the units
+                lAreaUnit = lSubIdDataGroup.FindData("Constituent", "AREA").Item(0).Attributes.GetValue("Units")
+                lNAUTOUnit = lSubIdDataGroup.FindData("Constituent", "NAUTO").Item(0).Attributes.GetValue("Units")
+                lNUPUnit = lSubIdDataGroup.FindData("Constituent", "NUP").Item(0).Attributes.GetValue("Units")
+                lPAUTOUnit = lSubIdDataGroup.FindData("Constituent", "PAUTO").Item(0).Attributes.GetValue("Units")
+                lPUPUnit = lSubIdDataGroup.FindData("Constituent", "PUP").Item(0).Attributes.GetValue("Units")
+                lYLDUnit = lSubIdDataGroup.FindData("Constituent", "YLD").Item(0).Attributes.GetValue("Units")
+
+                Dim lYLDAmtUnit As String = lYLDUnit.Substring(0, lYLDUnit.LastIndexOf("/"))
+                Dim lNAUTOAmtUnit As String = lNAUTOUnit.Substring(0, lNAUTOUnit.LastIndexOf("/"))
+                Dim lNUPAmtUnit As String = lNUPUnit.Substring(0, lNUPUnit.LastIndexOf("/"))
+                Dim lPAUTOAmtUnit As String = lPAUTOUnit.Substring(0, lPAUTOUnit.LastIndexOf("/"))
+                Dim lPUPAmtUnit As String = lPUPUnit.Substring(0, lPUPUnit.LastIndexOf("/"))
+
+                'Construct unit lines
+                lSBDebugUnitLine &= lAreaUnit.PadLeft(lFieldWidth) & lTab & _
+                                lYLDUnit.PadLeft(lFieldWidth) & lTab & _
+                                lYLDAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                lNAUTOUnit.PadLeft(lFieldWidth) & lTab & _
+                                lNAUTOAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                lNUPUnit.PadLeft(lFieldWidth) & lTab & _
+                                lNUPAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                lPAUTOUnit.PadLeft(lFieldWidth) & lTab & _
+                                lPAUTOAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                lPUPUnit.PadLeft(lFieldWidth) & lTab & _
+                                lPUPAmtUnit.PadLeft(lFieldWidth)
+
+                lSBAverageUnitLine &= lAreaUnit.PadLeft(lFieldWidth) & lTab _
+                                & lAreaUnit.PadLeft(lFieldWidth) & lTab _
+                                & "%".PadLeft(lFieldWidth) & lTab _
+                                & lYLDUnit.PadLeft(lFieldWidth) & lTab _
+                                & lYLDAmtUnit.PadLeft(lFieldWidth) & lTab _
+                                & lNAUTOUnit.PadLeft(lFieldWidth) & lTab _
+                                & lNAUTOAmtUnit.PadLeft(lFieldWidth) & lTab _
+                                & lNUPUnit.PadLeft(lFieldWidth) & lTab _
+                                & lNUPAmtUnit.PadLeft(lFieldWidth) & lTab _
+                                & lPAUTOUnit.PadLeft(lFieldWidth) & lTab _
+                                & lPAUTOAmtUnit.PadLeft(lFieldWidth) & lTab _
+                                & lPUPUnit.PadLeft(lFieldWidth) & lTab _
+                                & lPUPAmtUnit.PadLeft(lFieldWidth)
+
+                lSBAnnualUnitLine &= lAreaUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lAreaUnit.PadLeft(lFieldWidth) & lTab & _
+                                 "%".PadLeft(lFieldWidth) & lTab & _
+                                 lYLDUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lYLDAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lNAUTOUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lNAUTOAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lNUPUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lNUPAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lPAUTOUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lPAUTOAmtUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lPUPUnit.PadLeft(lFieldWidth) & lTab & _
+                                 lPUPAmtUnit.PadLeft(lFieldWidth)
+
+                ldoneUnitLine = True
+            End If
+
+            'Append to various StringBuilders to the beginning of each subbasin printout
+            lSBDebug.AppendLine(lSBDebugUnitLine)
+            lSBAverage.AppendLine(lSBAverageUnitLine)
+            lSBAnnual.AppendLine(lSBAnnualUnitLine)
+
             Dim lYear As Integer = lDateBase(0)
             Dim lSubIdArea As Double = lSubIdAreas.ItemByKey(lSubId)
             lAreaAllTotal += lSubIdArea
@@ -1410,8 +1491,8 @@ Module SWATRunner
                 Dim lPUptkSub As Double = 0
                 Dim lYieldSub As Double = 0
                 For Each lLocationId As String In lLocationIdsInSub
-                    Dim lLocationIdDataGroup As atcTimeseriesGroup = lSubIdDataGroup.FindData("Location", lLocationId)
-                    If lLocationIdDataGroup.Count = 6 Then
+                    Dim lLocationIdDataGroup As atcTimeseriesGroup = lSubIdDataGroup.FindData("Location", lLocationId) 'TSs for One Hru (e.g. CCCC  115) in a given subbasin
+                    If lLocationIdDataGroup.Count = 6 Then ' The six chosen constituents, no unit conversion (SWAT output unit)
                         Dim lAreaTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "AREA").Item(0)
                         Dim lNAppliedTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "NAUTO").Item(0)
                         Dim lNUptkTimser As atcTimeseries = lLocationIdDataGroup.FindData("Constituent", "NUP").Item(0)
