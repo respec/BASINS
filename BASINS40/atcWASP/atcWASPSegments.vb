@@ -77,13 +77,13 @@ Public Class Segment
     Public BaseID As String = ""  'the id of the segment before breaking it up
     Public CentroidX As Double
     Public CentroidY As Double
+    Public DrainageArea As Double
 
     Public Function Clone() As Segment
         Dim lNewSegment As New Segment
         lNewSegment.Depth = Me.Depth
         lNewSegment.DownID = Me.DownID
         lNewSegment.ID = Me.ID
-        lNewSegment.InputTimeseriesCollection = Me.InputTimeseriesCollection
         lNewSegment.Length = Me.Length
         lNewSegment.Name = Me.Name
         lNewSegment.Roughness = Me.Roughness
@@ -93,6 +93,14 @@ Public Class Segment
         lNewSegment.BaseID = Me.BaseID
         lNewSegment.CentroidX = Me.CentroidX
         lNewSegment.CentroidY = Me.CentroidY
+        lNewSegment.DrainageArea = Me.DrainageArea
+
+        Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
+        lNewSegment.InputTimeseriesCollection = lTimeseriesCollection
+        For Each lWASPTimeseries As WASPTimeseries In Me.InputTimeseriesCollection
+            lNewSegment.InputTimeseriesCollection.Add(lWASPTimeseries)
+        Next
+
         Return lNewSegment
     End Function
 End Class

@@ -211,4 +211,10 @@ Module modWASPFromMW
         Next
     End Sub
 
+    Friend Function CalculateDistance(ByVal aX1 As Double, ByVal aY1 As Double, ByVal aX2 As Double, ByVal aY2 As Double) As Double
+        Dim lDistance As Double
+        lDistance = Math.Sqrt(((aX2 - aX1) ^ 2) + ((aY2 - aY1) ^ 2))
+        Return lDistance
+    End Function
+
 End Module

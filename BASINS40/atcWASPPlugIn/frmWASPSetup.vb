@@ -78,6 +78,11 @@ Public Class frmWASPSetup
     Friend WithEvents atxTravelTime As atcControls.atcText
     Friend WithEvents cmdFieldMapping As System.Windows.Forms.Button
     Friend WithEvents cmdCreateShapefile As System.Windows.Forms.Button
+    Friend WithEvents fraSummary As System.Windows.Forms.GroupBox
+    Friend WithEvents tbxSummary As System.Windows.Forms.TextBox
+    Friend WithEvents cmdSelectConstituents As System.Windows.Forms.Button
+    Friend WithEvents cmdGenerateTimeseries As System.Windows.Forms.Button
+    Friend WithEvents cmdVolumes As System.Windows.Forms.Button
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -108,6 +113,7 @@ Public Class frmWASPSetup
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.cmdVolumes = New System.Windows.Forms.Button
         Me.cmdCreateShapefile = New System.Windows.Forms.Button
         Me.cmdFieldMapping = New System.Windows.Forms.Button
         Me.atxTravelTime = New atcControls.atcText
@@ -115,10 +121,14 @@ Public Class frmWASPSetup
         Me.cmdGenerate = New System.Windows.Forms.Button
         Me.AtcGridSegmentation = New atcControls.atcGrid
         Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.cmdGenerateTimeseries = New System.Windows.Forms.Button
         Me.AtcGridFlow = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
+        Me.cmdSelectConstituents = New System.Windows.Forms.Button
         Me.AtcGridLoad = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.fraSummary = New System.Windows.Forms.GroupBox
+        Me.tbxSummary = New System.Windows.Forms.TextBox
         Me.AtcGridMet = New atcControls.atcGrid
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
@@ -130,6 +140,7 @@ Public Class frmWASPSetup
         Me.TabPage3.SuspendLayout()
         Me.TabPage4.SuspendLayout()
         Me.TabPage6.SuspendLayout()
+        Me.fraSummary.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -498,6 +509,7 @@ Public Class frmWASPSetup
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.cmdVolumes)
         Me.TabPage2.Controls.Add(Me.cmdCreateShapefile)
         Me.TabPage2.Controls.Add(Me.cmdFieldMapping)
         Me.TabPage2.Controls.Add(Me.atxTravelTime)
@@ -506,16 +518,25 @@ Public Class frmWASPSetup
         Me.TabPage2.Controls.Add(Me.AtcGridSegmentation)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(978, 398)
+        Me.TabPage2.Size = New System.Drawing.Size(899, 398)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Segmentation"
         Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'cmdVolumes
+        '
+        Me.cmdVolumes.Location = New System.Drawing.Point(618, 16)
+        Me.cmdVolumes.Name = "cmdVolumes"
+        Me.cmdVolumes.Size = New System.Drawing.Size(137, 25)
+        Me.cmdVolumes.TabIndex = 25
+        Me.cmdVolumes.Text = "Volumes/Depths"
+        Me.cmdVolumes.UseVisualStyleBackColor = True
         '
         'cmdCreateShapefile
         '
         Me.cmdCreateShapefile.Location = New System.Drawing.Point(466, 47)
         Me.cmdCreateShapefile.Name = "cmdCreateShapefile"
-        Me.cmdCreateShapefile.Size = New System.Drawing.Size(126, 25)
+        Me.cmdCreateShapefile.Size = New System.Drawing.Size(137, 25)
         Me.cmdCreateShapefile.TabIndex = 8
         Me.cmdCreateShapefile.Text = "Create Shapefile"
         Me.cmdCreateShapefile.UseVisualStyleBackColor = True
@@ -524,7 +545,7 @@ Public Class frmWASPSetup
         '
         Me.cmdFieldMapping.Location = New System.Drawing.Point(466, 16)
         Me.cmdFieldMapping.Name = "cmdFieldMapping"
-        Me.cmdFieldMapping.Size = New System.Drawing.Size(126, 25)
+        Me.cmdFieldMapping.Size = New System.Drawing.Size(137, 25)
         Me.cmdFieldMapping.TabIndex = 7
         Me.cmdFieldMapping.Text = "Field Mapping"
         Me.cmdFieldMapping.UseVisualStyleBackColor = True
@@ -583,19 +604,29 @@ Public Class frmWASPSetup
         Me.AtcGridSegmentation.LineWidth = 1.0!
         Me.AtcGridSegmentation.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridSegmentation.Name = "AtcGridSegmentation"
-        Me.AtcGridSegmentation.Size = New System.Drawing.Size(933, 307)
+        Me.AtcGridSegmentation.Size = New System.Drawing.Size(854, 307)
         Me.AtcGridSegmentation.Source = Nothing
         Me.AtcGridSegmentation.TabIndex = 0
         '
         'TabPage3
         '
+        Me.TabPage3.Controls.Add(Me.cmdGenerateTimeseries)
         Me.TabPage3.Controls.Add(Me.AtcGridFlow)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(978, 398)
+        Me.TabPage3.Size = New System.Drawing.Size(899, 398)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Flows"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'cmdGenerateTimeseries
+        '
+        Me.cmdGenerateTimeseries.Location = New System.Drawing.Point(23, 22)
+        Me.cmdGenerateTimeseries.Name = "cmdGenerateTimeseries"
+        Me.cmdGenerateTimeseries.Size = New System.Drawing.Size(155, 46)
+        Me.cmdGenerateTimeseries.TabIndex = 23
+        Me.cmdGenerateTimeseries.Text = "Generate New Timeseries"
+        Me.cmdGenerateTimeseries.UseVisualStyleBackColor = True
         '
         'AtcGridFlow
         '
@@ -611,19 +642,29 @@ Public Class frmWASPSetup
         Me.AtcGridFlow.LineWidth = 0.0!
         Me.AtcGridFlow.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridFlow.Name = "AtcGridFlow"
-        Me.AtcGridFlow.Size = New System.Drawing.Size(933, 307)
+        Me.AtcGridFlow.Size = New System.Drawing.Size(854, 307)
         Me.AtcGridFlow.Source = Nothing
         Me.AtcGridFlow.TabIndex = 20
         '
         'TabPage4
         '
+        Me.TabPage4.Controls.Add(Me.cmdSelectConstituents)
         Me.TabPage4.Controls.Add(Me.AtcGridLoad)
         Me.TabPage4.Location = New System.Drawing.Point(4, 25)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(978, 398)
+        Me.TabPage4.Size = New System.Drawing.Size(899, 398)
         Me.TabPage4.TabIndex = 6
         Me.TabPage4.Text = "Boundaries/Loads"
         Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'cmdSelectConstituents
+        '
+        Me.cmdSelectConstituents.Location = New System.Drawing.Point(23, 21)
+        Me.cmdSelectConstituents.Name = "cmdSelectConstituents"
+        Me.cmdSelectConstituents.Size = New System.Drawing.Size(155, 47)
+        Me.cmdSelectConstituents.TabIndex = 22
+        Me.cmdSelectConstituents.Text = "Select Constituents"
+        Me.cmdSelectConstituents.UseVisualStyleBackColor = True
         '
         'AtcGridLoad
         '
@@ -639,19 +680,47 @@ Public Class frmWASPSetup
         Me.AtcGridLoad.LineWidth = 0.0!
         Me.AtcGridLoad.Location = New System.Drawing.Point(23, 74)
         Me.AtcGridLoad.Name = "AtcGridLoad"
-        Me.AtcGridLoad.Size = New System.Drawing.Size(933, 307)
+        Me.AtcGridLoad.Size = New System.Drawing.Size(854, 307)
         Me.AtcGridLoad.Source = Nothing
         Me.AtcGridLoad.TabIndex = 21
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.fraSummary)
         Me.TabPage6.Controls.Add(Me.AtcGridMet)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(978, 398)
+        Me.TabPage6.Size = New System.Drawing.Size(899, 398)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Meteorologic Time Series"
         Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'fraSummary
+        '
+        Me.fraSummary.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.fraSummary.Controls.Add(Me.tbxSummary)
+        Me.fraSummary.Location = New System.Drawing.Point(24, 280)
+        Me.fraSummary.Name = "fraSummary"
+        Me.fraSummary.Size = New System.Drawing.Size(854, 104)
+        Me.fraSummary.TabIndex = 22
+        Me.fraSummary.TabStop = False
+        Me.fraSummary.Text = "Selected Timeseries"
+        '
+        'tbxSummary
+        '
+        Me.tbxSummary.AllowDrop = True
+        Me.tbxSummary.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.tbxSummary.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.tbxSummary.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.tbxSummary.Location = New System.Drawing.Point(23, 22)
+        Me.tbxSummary.Multiline = True
+        Me.tbxSummary.Name = "tbxSummary"
+        Me.tbxSummary.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.tbxSummary.Size = New System.Drawing.Size(825, 76)
+        Me.tbxSummary.TabIndex = 0
         '
         'AtcGridMet
         '
@@ -665,9 +734,9 @@ Public Class frmWASPSetup
         Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
         Me.AtcGridMet.LineWidth = 0.0!
-        Me.AtcGridMet.Location = New System.Drawing.Point(23, 97)
+        Me.AtcGridMet.Location = New System.Drawing.Point(24, 20)
         Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(934, 283)
+        Me.AtcGridMet.Size = New System.Drawing.Size(855, 248)
         Me.AtcGridMet.Source = Nothing
         Me.AtcGridMet.TabIndex = 21
         '
@@ -729,6 +798,8 @@ Public Class frmWASPSetup
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage4.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
+        Me.fraSummary.ResumeLayout(False)
+        Me.fraSummary.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -916,6 +987,8 @@ Public Class frmWASPSetup
         pSegmentFieldMap.Add("DSLINKNO", "DownID")
         pSegmentFieldMap.Add("TOCOMID", "DownID")
         pSegmentFieldMap.Add("MAVELU", "Velocity")
+        pSegmentFieldMap.Add("SLOPE", "Slope")
+        pSegmentFieldMap.Add("CUMDRAINAG", "DrainageArea")
 
         cboMet.Items.Add("<none>")
 
@@ -1023,15 +1096,16 @@ Public Class frmWASPSetup
 
         AtcGridFlow.Clear()
         With AtcGridFlow.Source
-            .Columns = 2
+            .Columns = 3
             .ColorCells = True
             .FixedRows = 1
-            .FixedColumns = 1
+            .FixedColumns = 2
             .CellColor(0, 0) = SystemColors.ControlDark
             .CellColor(0, 1) = SystemColors.ControlDark
             .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .CellValue(0, 0) = "Segment"
-            .CellValue(0, 1) = "Input Flow Timeseries"
+            .CellValue(0, 1) = "Drainage Area (km2)"
+            .CellValue(0, 2) = "Input Flow Timeseries"
         End With
 
         AtcGridLoad.Clear()
@@ -1110,7 +1184,9 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cmdGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdGenerate.Click
+        Windows.Forms.Cursor.Current = Cursors.WaitCursor
         GenerateSegments()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
     End Sub
 
     Private Sub GenerateSegments()
@@ -1263,11 +1339,12 @@ Public Class frmWASPSetup
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = "<none>"
+                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).DrainageArea
+                    .CellValue(lIndex, 2) = "<none>"
                     If pFlowStationCandidates.Count > 0 Then
-                        .CellEditable(lIndex, 1) = True
+                        .CellEditable(lIndex, 2) = True
                     Else
-                        .CellEditable(lIndex, 1) = False
+                        .CellEditable(lIndex, 2) = False
                     End If
                 Next
             End With
@@ -1344,6 +1421,52 @@ Public Class frmWASPSetup
             AtcGridMet.SizeAllColumnsToContents()
             AtcGridMet.Refresh()
 
+            'now set met stations to defaults based on distance
+            With AtcGridMet.Source
+                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                    'for each valid value, find distance
+                    Dim lShortestDistance As Double = 1.0E+28
+                    Dim lDistance As Double = 0.0
+                    Dim lDescriptionClosest As String = ""
+                    For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
+                        lDistance = CalculateDistance(pPlugIn.WASPProject.Segments(lIndex - 1).CentroidX, pPlugIn.WASPProject.Segments(lIndex - 1).CentroidY, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                        If lDistance < lShortestDistance Then
+                            lShortestDistance = lDistance
+                            lDescriptionClosest = lStationCandidate.Description
+                        End If
+                    Next
+                    .CellValue(lIndex, 1) = lDescriptionClosest
+
+                    'for each valid value, find distance
+                    lShortestDistance = 1.0E+28
+                    lDistance = 0.0
+                    lDescriptionClosest = ""
+                    For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
+                        lDistance = CalculateDistance(pPlugIn.WASPProject.Segments(lIndex - 1).CentroidX, pPlugIn.WASPProject.Segments(lIndex - 1).CentroidY, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                        If lDistance < lShortestDistance Then
+                            lShortestDistance = lDistance
+                            lDescriptionClosest = lStationCandidate.Description
+                        End If
+                    Next
+                    .CellValue(lIndex, 2) = lDescriptionClosest
+
+                    'for each valid value, find distance
+                    lShortestDistance = 1.0E+28
+                    lDistance = 0.0
+                    lDescriptionClosest = ""
+                    For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
+                        lDistance = CalculateDistance(pPlugIn.WASPProject.Segments(lIndex - 1).CentroidX, pPlugIn.WASPProject.Segments(lIndex - 1).CentroidY, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                        If lDistance < lShortestDistance Then
+                            lShortestDistance = lDistance
+                            lDescriptionClosest = lStationCandidate.Description
+                        End If
+                    Next
+                    .CellValue(lIndex, 3) = lDescriptionClosest
+                Next
+            End With
+
+            RefreshSummary()
             Logger.Dbg("MetStationGrid refreshed")
         End If
     End Sub
@@ -1372,6 +1495,46 @@ Public Class frmWASPSetup
         End If
         Return lDataSource
     End Function
+
+    Private Sub AtcGridMet_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridMet.CellEdited
+        RefreshSummary()
+    End Sub
+
+    Private Sub RefreshSummary()
+        Dim lKeyString As String = ""
+        Dim lText As String = ""
+
+        'build summary info about selected met timeseries
+        Dim lTimeseriesSelected As New atcCollection
+        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+            lKeyString = "  ATMP:" & AtcGridMet.Source.CellValue(lIndex, 1)
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 1) <> "<none>" Then
+                If Not lTimeseriesSelected.Contains(lKeyString) Then
+                    lTimeseriesSelected.Add(lKeyString)
+                    lText = lText & lKeyString & vbCrLf
+                End If
+            End If
+        Next
+        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+            lKeyString = "  SOLR:" & AtcGridMet.Source.CellValue(lIndex, 2)
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 2) <> "<none>" Then
+                If Not lTimeseriesSelected.Contains(lKeyString) Then
+                    lTimeseriesSelected.Add(lKeyString)
+                    lText = lText & lKeyString & vbCrLf
+                End If
+            End If
+        Next
+        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+            lKeyString = "  WIND:" & AtcGridMet.Source.CellValue(lIndex, 3)
+            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 3) <> "<none>" Then
+                If Not lTimeseriesSelected.Contains(lKeyString) Then
+                    lTimeseriesSelected.Add(lKeyString)
+                    lText = lText & lKeyString & vbCrLf
+                End If
+            End If
+        Next
+        tbxSummary.Text = lText
+    End Sub
 
     Private Sub AtcGridMet_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridMet.MouseDownCell
         pSelectedColumn = aColumn
@@ -1434,6 +1597,7 @@ Public Class frmWASPSetup
         Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
         Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
 
+        Me.Cursor = Cursors.WaitCursor
         'come up with name of new shapefile
         Dim lOutputPath As String = PathNameOnly(lSegmentShapefileName)
         Dim lIndex As Integer = 1
@@ -1520,6 +1684,19 @@ Public Class frmWASPSetup
             Next
         Next
 
+        Me.Cursor = Cursors.Default
         Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
+    End Sub
+
+    Private Sub cmdSelectConstituents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelectConstituents.Click
+        Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Select Constituents")
+    End Sub
+
+    Private Sub cmdGenerateTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdGenerateTimeseries.Click
+        Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Generate New Timeseries")
+    End Sub
+
+    Private Sub cmdVolumes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdVolumes.Click
+        Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Volumes/Depths")
     End Sub
 End Class
