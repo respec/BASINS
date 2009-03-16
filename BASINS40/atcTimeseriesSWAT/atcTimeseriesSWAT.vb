@@ -208,13 +208,10 @@ ReOpenTable:
                 With lTable
                     'Dim lTSBuilders As New atcData.atcTimeseriesGroupBuilder(Me)
                     'Dim lTSBuilder As atcData.atcTimeseriesBuilder
-                    Dim lFirstLocation As String = ""
+                    'Dim lFirstLocation As String = ""
 
                     Logger.Status("Reading " & Format((.NumFields - pBaseDataField + 1), "#,###") & " constituents from " & Specification, True)
                     .CurrentRecord = 1
-                    Dim lYearReading As Integer = 0
-                    Dim lMonReading As Integer = 0
-                    Dim lDayReading As Integer = 0
                     Dim lMONvalue As Integer
                     If Not lKnowInterval AndAlso Not lKnowYearBase Then
                         Try
@@ -245,7 +242,6 @@ ReOpenTable:
                                     pYearBase = lMONvalue
                                 Else 'Could be daily or monthly, have to scan MON column to be sure
 
-
                                 End If
                             End If
                         End If
@@ -264,57 +260,44 @@ ReOpenTable:
                         lFieldNames.Add(lFieldName)
                     Next
 
-                    'Find name of each location in first field of table
+                    'Find name of each location in first field of table, count total number of values in file, and figure out interval if we don't have it yet
                     Do
                         If pTableDelimited Then
-                            lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
+                            lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5).Trim
                         Else
-                            lLocation = .Value(1)
-                        End If
-
-                        lLocation = lLocation.Trim
-
-                        If lFirstLocation.Length = 0 Then
-                            lFirstLocation = lLocation
-                        ElseIf lLocation = lFirstLocation Then 'Found first location again, so we have seen everything once
-                            Exit Do
+                            lLocation = .Value(1).Trim
                         End If
 
                         If lLocationsToProcess.Length = 0 OrElse lLocationsToProcess.Contains(lDelim & lLocation & lDelim) Then
                             If lSUBsToProcess.Length = 0 OrElse lSUBsToProcess.Contains(lDelim & .Value(pSubIdField).Trim & lDelim) Then
-                                lLocations.Add(lLocation)
-                                If pSaveSubwatershedId Then lSubs.Add(.Value(pSubIdField).Trim)
+                                pNumValues += 1
+                                If Not lLocations.Contains(lLocation) Then
+                                    lLocations.Add(lLocation)
+                                    If pSaveSubwatershedId Then lSubs.Add(.Value(pSubIdField).Trim)
+                                End If
                             End If
                         End If
-                        .CurrentRecord += 1
-                    Loop
 
-                    Try
-                        pNumValues = (FileLen(Specification) - .Header.Length) / (pRecordLength * (.CurrentRecord - 1)) - 1
-                    Catch ex As Exception
-                        Logger.Dbg("Unable to determine number of values in " & Specification & vbCrLf & " FileLen=" & FileLen(Specification) & ", .HeaderLength=" & .Header.Length & ", RecordLength=" & pRecordLength & ", CurrentRecord=" & .CurrentRecord)
-                    End Try
-
-                    If Not lKnowInterval Then 'Still need to figure out if it is daily or monthly
-                        Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue)
-                        While lMONvalue <= 12
-                            .CurrentRecord += lLocations.Count
+                        If Not lKnowInterval Then 'Still need to figure out if it is daily or monthly
                             If Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
-                            Else
-                                Logger.Dbg("Could not parse integer in field " & (pBaseDataField - 1) & " = " & .Value(pBaseDataField - 1))
-                                Exit While
+                                If lMONvalue > 366 Then 'must be monthly since we reached a year before going past 12 (detected annual earlier)
+                                    lKnowInterval = True
+                                    pMONcontains = 0
+                                    lKnowYearBase = True
+                                    pYearBase = lMONvalue
+                                ElseIf lMONvalue > 12 Then 'must be daily
+                                    lKnowInterval = True
+                                    pMONcontains = 1
+                                End If
                             End If
-                        End While
-                        If lMONvalue > 1000 Then 'must be monthly since we reached a year before going past 12
-                            lKnowInterval = True
-                            pMONcontains = 0
-                            lKnowYearBase = True
-                            pYearBase = lMONvalue
-                        Else 'must be daily
-                            lKnowInterval = True
-                            pMONcontains = 1
                         End If
-                    End If
+                        Try
+                            .CurrentRecord += 1
+                        Catch e As Exception
+                            Exit Do
+                        End Try
+                    Loop
+                    pNumValues /= lLocations.Count
 
                     Select Case pMONcontains
                         Case 0 : pTimeUnit = atcTimeUnit.TUMonth
