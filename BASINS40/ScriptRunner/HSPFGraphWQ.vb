@@ -60,14 +60,15 @@ Module HSPFGraphWQ
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2bmp")
 
-        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_10")
-        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10bmp")
+        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_10")
+        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10bmp")
 
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2")
+        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2bmp")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2")
-        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_70")
+        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_70")
 
-        'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2bmp")
+        pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2bmp")
         'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmp")
     End Sub
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -92,13 +93,13 @@ Module HSPFGraphWQ
 
         Dim lp As String = ""
 
-        Dim lDatagroupLoadSed As New atcDataGroup
-        Dim lDatagroupLoadNitro As New atcDataGroup
-        Dim lDatagroupLoadPhos As New atcDataGroup
+        Dim lDatagroupLoadSed As New atcTimeseriesGroup
+        Dim lDatagroupLoadNitro As New atcTimeseriesGroup
+        Dim lDatagroupLoadPhos As New atcTimeseriesGroup
 
-        Dim lDatagroupConcSed As New atcDataGroup
-        Dim lDatagroupConcNitro As New atcDataGroup
-        Dim lDatagroupConcPhos As New atcDataGroup
+        Dim lDatagroupConcSed As New atcTimeseriesGroup
+        Dim lDatagroupConcNitro As New atcTimeseriesGroup
+        Dim lDatagroupConcPhos As New atcTimeseriesGroup
 
         Dim lemissionScen As String = ""
         Dim lCurrentWDMSet As New atcCollection
@@ -400,15 +401,16 @@ Module HSPFGraphWQ
             With .XAxis
                 .Scale.MaxAuto = False
                 .Scale.MinAuto = False
-                .Scale.Min = 0.0001
-                .Scale.Max = 0.005
+                '.Scale.Min = 0.0001
+                '.Scale.Max = 0.5
             End With
             .YAxis.Title.Text = aYTitle
             .YAxis.Type = AxisType.Linear
             If .YAxis.Scale.Min < 1 Then
-                .YAxis.Scale.MinAuto = False
-                .YAxis.Scale.Min = 0.0000001
-                .YAxis.Scale.Min = 1
+                '.YAxis.Scale.MinAuto = True
+                '.YAxis.Scale.MaxAuto = True
+                '.YAxis.Scale.Min = 0.0000001
+                '.YAxis.Scale.Min = 1
                 '.YAxis.Scale.Max = 1000000
                 .YAxis.MajorGrid.IsVisible = False
                 .YAxis.MinorGrid.IsVisible = False

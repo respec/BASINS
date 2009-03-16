@@ -69,6 +69,9 @@ Module Graph4Brian
 
                 lDatagroup.Add(lFlow1)
                 lDatagroup.Add(lFlow2)
+                lFlow1.Clear()
+                lFlow2.Clear()
+
             Next
 
             'Do the duration graphs
@@ -79,8 +82,6 @@ Module Graph4Brian
             Dim lYTitle As String = "FLOW (cfs)"
             doDurPlot(lDatagroup, lGraphFilename, lPlotTitle, lYTitle)
 
-            lFlow1.Clear()
-            lFlow2.Clear()
             lOutputWDMNames.Clear()
         Next
 
