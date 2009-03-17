@@ -269,7 +269,7 @@ ReOpenTable:
                         Else
                             If lMONvaluePrev <> lMONvalue Then pNumValues += 1
                             If pTableDelimited Then
-                                lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5).Trim
+                                lLocation = (.Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)).Trim
                             Else
                                 lLocation = .Value(1).Trim
                             End If
@@ -410,7 +410,7 @@ NextRecord:
 
             AddTsToList(aReadMe, lReadThese, lReadLocation, lReadField, lReadValues)
 
-            If Me.DataSets.Count < 2000 Then
+            If Me.DataSets.Count < 3000 Then
                 'Reading all datasets at once is much faster than one at a time
                 For Each lReadTS In Me.DataSets
                     If lReadTS.Serial <> aReadMe.Serial AndAlso lReadTS.ValuesNeedToBeRead Then
@@ -455,12 +455,6 @@ NextRecord:
                             If Not Integer.TryParse(.Value(pBaseDataField - 1).Trim, lMONvalue) Then
                                 Exit Do 'got to end of run summary, value is number of years as a decimal or we have reached blank line after end
                             Else
-                                If pTableDelimited Then
-                                    lLocation = .Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)
-                                Else
-                                    lLocation = .Value(1)
-                                End If
-
                                 Try
                                     Select Case pMONcontains
                                         Case 0 'Monthly
@@ -516,17 +510,24 @@ NextRecord:
                                         If lNeedDates Then lJd(lValueIndex) = lDate
                                     End If
 
-                                    lLocationIndex = lReadLocation.IndexOf(lLocation)
-                                    If lLocationIndex >= 0 Then
-                                        lReadTS = lReadThese(lLocationIndex)
-                                        lField = lReadField(lLocationIndex)
-                                        lVd = lReadValues(lLocationIndex)
-
-                                        Dim lFieldName As String = .FieldName(lField).Replace("""", "")
-                                        If Not Double.TryParse(.Value(lField).Trim, lVd(lValueIndex)) Then
-                                            lVd(lValueIndex) = pNaN
-                                        End If
+                                    If pTableDelimited Then
+                                        lLocation = (.Value(1).ToString.Replace("""", "").PadLeft(4) & .Value(2).ToString.PadLeft(5)).Trim
+                                    Else
+                                        lLocation = .Value(1).Trim
                                     End If
+
+                                    For lLocationIndex = 0 To lFinalReadingIndex
+                                        If lReadLocation(lLocationIndex) = lLocation Then
+                                            If lFinalReadingIndex > 0 Then
+                                                lField = lReadField(lLocationIndex)
+                                                lVd = lReadValues(lLocationIndex)
+                                            End If
+                                            If Not Double.TryParse(.Value(lField).Trim, lVd(lValueIndex)) Then
+                                                lVd(lValueIndex) = pNaN
+                                            End If
+                                            lReadValues(lLocationIndex) = lVd
+                                        End If
+                                    Next
 NextRecord:
                                     .CurrentRecord += 1
                                 Catch ex As FormatException
