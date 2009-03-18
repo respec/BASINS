@@ -17,27 +17,40 @@ Public Class Segments
     ''' <returns>String describing any problems that occured</returns>
     ''' <remarks></remarks>
     Public Function AssignWaspIds() As String
+        Dim lProblem As String = ""
         Dim lDownstreamKey As String = ""
         For Each lSegment As Segment In Me
             lSegment.WASPID = 0
-            If lSegment.DownID.Length = 0 Then
-                lDownstreamKey = lSegment.ID & ":" & lSegment.Name
-            End If
-        Next
-
-        AssignWaspIdAndMoveUpstream(lDownstreamKey)
-
-        Dim lProblem As String = ""
-        For Each lSegment As Segment In Me
-            If lSegment.WASPID = 0 Then
-                If lProblem.Length = 0 Then
-                    lProblem = "ProblemSegments "
-                Else
-                    lProblem &= ", "
+            Dim lDownExists As Boolean = False
+            For Each lDownSegment As Segment In Me
+                If lDownSegment.ID = lSegment.DownID Then
+                    lDownExists = True
+                    Exit For
                 End If
-                lProblem &= lSegment.ID & ":" & lSegment.Name
+            Next
+            If Not lDownExists Then
+                If lDownstreamKey.Length = 0 Then
+                    lDownstreamKey = lSegment.ID & ":" & lSegment.Name
+                Else
+                    lProblem = "Multiple Exits"
+                End If
             End If
         Next
+
+        If lProblem.Length = 0 Then
+            AssignWaspIdAndMoveUpstream(lDownstreamKey)
+
+            For Each lSegment As Segment In Me
+                If lSegment.WASPID = 0 Then
+                    If lProblem.Length = 0 Then
+                        lProblem = "ProblemSegments "
+                    Else
+                        lProblem &= ", "
+                    End If
+                    lProblem &= lSegment.ID & ":" & lSegment.Name
+                End If
+            Next
+        End If
         Return lProblem
     End Function
 
@@ -60,8 +73,7 @@ Public Class Segments
                 lUpSteamSegments.Add(lSegment)
             End If
         Next
-        If lUpSteamSegments.Count > 0 Then
-            'main channel
+        If lUpSteamSegments.Count > 0 Then 'main channel first
             AssignWaspIdAndMoveUpstream(lUpSteamMainSegmentKey)
             If lUpSteamSegments.Count > 1 Then
                 For Each lSegment As Segment In lUpSteamSegments

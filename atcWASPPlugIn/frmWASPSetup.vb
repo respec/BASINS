@@ -72,17 +72,20 @@ Public Class frmWASPSetup
     Friend WithEvents AtcGridFlow As atcControls.atcGrid
     Friend WithEvents cmdGenerate As System.Windows.Forms.Button
     Friend WithEvents AtcGridSegmentation As atcControls.atcGrid
-    Friend WithEvents AtcGridMet As atcControls.atcGrid
     Friend WithEvents AtcGridLoad As atcControls.atcGrid
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents atxTravelTime As atcControls.atcText
     Friend WithEvents cmdFieldMapping As System.Windows.Forms.Button
     Friend WithEvents cmdCreateShapefile As System.Windows.Forms.Button
-    Friend WithEvents fraSummary As System.Windows.Forms.GroupBox
-    Friend WithEvents tbxSummary As System.Windows.Forms.TextBox
     Friend WithEvents cmdSelectConstituents As System.Windows.Forms.Button
     Friend WithEvents cmdGenerateTimeseries As System.Windows.Forms.Button
     Friend WithEvents cmdVolumes As System.Windows.Forms.Button
+    Friend WithEvents cbxWind As System.Windows.Forms.ComboBox
+    Friend WithEvents cbxSolar As System.Windows.Forms.ComboBox
+    Friend WithEvents cbxAir As System.Windows.Forms.ComboBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents lblAir As System.Windows.Forms.Label
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -127,12 +130,15 @@ Public Class frmWASPSetup
         Me.cmdSelectConstituents = New System.Windows.Forms.Button
         Me.AtcGridLoad = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
-        Me.fraSummary = New System.Windows.Forms.GroupBox
-        Me.tbxSummary = New System.Windows.Forms.TextBox
-        Me.AtcGridMet = New atcControls.atcGrid
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
+        Me.lblAir = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.cbxAir = New System.Windows.Forms.ComboBox
+        Me.cbxSolar = New System.Windows.Forms.ComboBox
+        Me.cbxWind = New System.Windows.Forms.ComboBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -140,7 +146,6 @@ Public Class frmWASPSetup
         Me.TabPage3.SuspendLayout()
         Me.TabPage4.SuspendLayout()
         Me.TabPage6.SuspendLayout()
-        Me.fraSummary.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -686,59 +691,18 @@ Public Class frmWASPSetup
         '
         'TabPage6
         '
-        Me.TabPage6.Controls.Add(Me.fraSummary)
-        Me.TabPage6.Controls.Add(Me.AtcGridMet)
+        Me.TabPage6.Controls.Add(Me.cbxWind)
+        Me.TabPage6.Controls.Add(Me.cbxSolar)
+        Me.TabPage6.Controls.Add(Me.cbxAir)
+        Me.TabPage6.Controls.Add(Me.Label5)
+        Me.TabPage6.Controls.Add(Me.Label3)
+        Me.TabPage6.Controls.Add(Me.lblAir)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
         Me.TabPage6.Size = New System.Drawing.Size(899, 398)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Meteorologic Time Series"
         Me.TabPage6.UseVisualStyleBackColor = True
-        '
-        'fraSummary
-        '
-        Me.fraSummary.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.fraSummary.Controls.Add(Me.tbxSummary)
-        Me.fraSummary.Location = New System.Drawing.Point(24, 280)
-        Me.fraSummary.Name = "fraSummary"
-        Me.fraSummary.Size = New System.Drawing.Size(854, 104)
-        Me.fraSummary.TabIndex = 22
-        Me.fraSummary.TabStop = False
-        Me.fraSummary.Text = "Selected Timeseries"
-        '
-        'tbxSummary
-        '
-        Me.tbxSummary.AllowDrop = True
-        Me.tbxSummary.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbxSummary.BackColor = System.Drawing.SystemColors.InactiveCaptionText
-        Me.tbxSummary.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.tbxSummary.Location = New System.Drawing.Point(23, 22)
-        Me.tbxSummary.Multiline = True
-        Me.tbxSummary.Name = "tbxSummary"
-        Me.tbxSummary.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.tbxSummary.Size = New System.Drawing.Size(825, 76)
-        Me.tbxSummary.TabIndex = 0
-        '
-        'AtcGridMet
-        '
-        Me.AtcGridMet.AllowHorizontalScrolling = True
-        Me.AtcGridMet.AllowNewValidValues = False
-        Me.AtcGridMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridMet.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridMet.Fixed3D = False
-        Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridMet.LineWidth = 0.0!
-        Me.AtcGridMet.Location = New System.Drawing.Point(24, 20)
-        Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(855, 248)
-        Me.AtcGridMet.Source = Nothing
-        Me.AtcGridMet.TabIndex = 21
         '
         'GroupBox1
         '
@@ -771,6 +735,60 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
+        'lblAir
+        '
+        Me.lblAir.AutoSize = True
+        Me.lblAir.Location = New System.Drawing.Point(32, 33)
+        Me.lblAir.Name = "lblAir"
+        Me.lblAir.Size = New System.Drawing.Size(111, 17)
+        Me.lblAir.TabIndex = 23
+        Me.lblAir.Text = "Air Temperature"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(32, 64)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(105, 17)
+        Me.Label3.TabIndex = 24
+        Me.Label3.Text = "Solar Radiation"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(32, 95)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(85, 17)
+        Me.Label5.TabIndex = 25
+        Me.Label5.Text = "Wind Speed"
+        '
+        'cbxAir
+        '
+        Me.cbxAir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbxAir.FormattingEnabled = True
+        Me.cbxAir.Location = New System.Drawing.Point(164, 30)
+        Me.cbxAir.Name = "cbxAir"
+        Me.cbxAir.Size = New System.Drawing.Size(707, 25)
+        Me.cbxAir.TabIndex = 26
+        '
+        'cbxSolar
+        '
+        Me.cbxSolar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbxSolar.FormattingEnabled = True
+        Me.cbxSolar.Location = New System.Drawing.Point(164, 61)
+        Me.cbxSolar.Name = "cbxSolar"
+        Me.cbxSolar.Size = New System.Drawing.Size(707, 25)
+        Me.cbxSolar.TabIndex = 27
+        '
+        'cbxWind
+        '
+        Me.cbxWind.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbxWind.FormattingEnabled = True
+        Me.cbxWind.Location = New System.Drawing.Point(164, 92)
+        Me.cbxWind.Name = "cbxWind"
+        Me.cbxWind.Size = New System.Drawing.Size(707, 25)
+        Me.cbxWind.TabIndex = 28
+        '
         'frmWASPSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -798,8 +816,7 @@ Public Class frmWASPSetup
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage4.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
-        Me.fraSummary.ResumeLayout(False)
-        Me.fraSummary.PerformLayout()
+        Me.TabPage6.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -867,58 +884,16 @@ Public Class frmWASPSetup
         'put contents of segment class back into structure
         With AtcGridSegmentation.Source
             For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-                pPlugIn.WASPProject.Segments(lIndex - 1).Length = .CellValue(lIndex, 1)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Width = .CellValue(lIndex, 2)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Depth = .CellValue(lIndex, 3)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Slope = .CellValue(lIndex, 4)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Roughness = .CellValue(lIndex, 5)
-                pPlugIn.WASPProject.Segments(lIndex - 1).DownID = .CellValue(lIndex, 6)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Length = .CellValue(lIndex, 2)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Width = .CellValue(lIndex, 3)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Depth = .CellValue(lIndex, 4)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Slope = .CellValue(lIndex, 5)
+                pPlugIn.WASPProject.Segments(lIndex - 1).Roughness = .CellValue(lIndex, 6)
+                pPlugIn.WASPProject.Segments(lIndex - 1).DownID = .CellValue(lIndex, 7)
             Next
         End With
 
-        'clear out collections of timeseries prior to rebuilding
-        pPlugIn.WASPProject.InputTimeseriesCollection.Clear()
-        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-            pPlugIn.WASPProject.Segments(lIndex - 1).InputTimeseriesCollection.Clear()
-        Next
-
-        'build collections of timeseries 
-        Dim lKeyString As String = ""
-        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-            'input flows 
-            lKeyString = "FLOW:" & AtcGridFlow.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridFlow.Source.CellValue(lIndex, 1) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pFlowStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-            'air temp
-            lKeyString = "ATMP:" & AtcGridMet.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 1) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-            lKeyString = "ATEM:" & AtcGridMet.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 1) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-            'sol rad
-            lKeyString = "SOLR:" & AtcGridMet.Source.CellValue(lIndex, 2)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 2) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-            lKeyString = "SOLRAD:" & AtcGridMet.Source.CellValue(lIndex, 2)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 2) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-            'wind 
-            lKeyString = "WIND:" & AtcGridMet.Source.CellValue(lIndex, 3)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 3) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pWindStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-            'need to add other wq loads
-            lKeyString = "WTMP:" & AtcGridLoad.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridLoad.Source.CellValue(lIndex, 1) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pWaterTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-        Next
+        RebuildTimeseriesCollections()
 
         Dim lName As String = tbxName.Text
         'TODO: still use modelout?
@@ -947,6 +922,49 @@ Public Class frmWASPSetup
             Logger.Dbg("Failed PreProcess Check")
         End If
         Logger.Flush()
+    End Sub
+
+    Friend Sub RebuildTimeseriesCollections()
+        'clear out collections of timeseries prior to rebuilding
+        pPlugIn.WASPProject.InputTimeseriesCollection.Clear()
+        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+            pPlugIn.WASPProject.Segments(lIndex - 1).InputTimeseriesCollection.Clear()
+        Next
+
+        'build collections of timeseries 
+        Dim lKeyString As String = ""
+        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+            'input flows 
+            lKeyString = "FLOW:" & AtcGridFlow.Source.CellValue(lIndex, 1)
+            If AtcGridFlow.Source.CellValue(lIndex, 1) <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lKeyString, pFlowStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
+            End If
+            'need to add other wq loads
+            lKeyString = "WTMP:" & AtcGridLoad.Source.CellValue(lIndex, 1)
+            If AtcGridLoad.Source.CellValue(lIndex, 1) <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lKeyString, pWaterTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
+            End If
+        Next
+        'met timeseries are not segment-specific
+        'air temp
+        If cbxAir.SelectedItem <> "<none>" Then
+            lKeyString = "ATMP:" & cbxAir.SelectedItem
+            AddSelectedTimeseriesToWASPProject(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject)
+            lKeyString = "ATEM:" & cbxAir.SelectedItem
+            AddSelectedTimeseriesToWASPProject(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject)
+        End If
+        'sol rad
+        If cbxSolar.SelectedItem <> "<none>" Then
+            lKeyString = "SOLR:" & cbxSolar.SelectedItem
+            AddSelectedTimeseriesToWASPProject(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject)
+            lKeyString = "SOLRAD:" & cbxSolar.SelectedItem
+            AddSelectedTimeseriesToWASPProject(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject)
+        End If
+        'wind 
+        If cbxWind.SelectedItem <> "<none>" Then
+            lKeyString = "WIND:" & cbxWind.SelectedItem
+            AddSelectedTimeseriesToWASPProject(lKeyString, pWindStationCandidates, pPlugIn.WASPProject)
+        End If
     End Sub
 
     Private Function PreProcessChecking(ByVal aOutputFileName As String) As Boolean
@@ -989,7 +1007,7 @@ Public Class frmWASPSetup
         pSegmentFieldMap.Add("MAVELU", "Velocity")
         pSegmentFieldMap.Add("MAFLOWU", "MeanAnnualFlow")
         pSegmentFieldMap.Add("SLOPE", "Slope")
-        pSegmentFieldMap.Add("CUMDRAINAG", "DrainageArea")
+        pSegmentFieldMap.Add("CUMDRAINAG", "CumulativeDrainageArea")
 
         cboMet.Items.Add("<none>")
 
@@ -1004,11 +1022,6 @@ Public Class frmWASPSetup
         End With
 
         With AtcGridLoad
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
-        End With
-
-        With AtcGridMet
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
@@ -1070,7 +1083,7 @@ Public Class frmWASPSetup
 
         AtcGridSegmentation.Clear()
         With AtcGridSegmentation.Source
-            .Columns = 8
+            .Columns = 9
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
@@ -1083,16 +1096,18 @@ Public Class frmWASPSetup
             .CellColor(0, 6) = SystemColors.ControlDark
             .CellColor(0, 7) = SystemColors.ControlDark
             .CellColor(0, 8) = SystemColors.ControlDark
+            .CellColor(0, 9) = SystemColors.ControlDark
             .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .CellValue(0, 0) = "Segment"
-            .CellValue(0, 1) = "Length (km)"
-            .CellValue(0, 2) = "Width (m)"
-            .CellValue(0, 3) = "Depth (m)"
-            .CellValue(0, 4) = "Slope"
-            .CellValue(0, 5) = "Roughness"
-            .CellValue(0, 6) = "DownStream ID"
-            .CellValue(0, 7) = "Velocity (m/s)"
-            .CellValue(0, 8) = "Travel Time (days)"
+            .CellValue(0, 1) = "WASP ID"
+            .CellValue(0, 2) = "Length (km)"
+            .CellValue(0, 3) = "Width (m)"
+            .CellValue(0, 4) = "Depth (m)"
+            .CellValue(0, 5) = "Slope"
+            .CellValue(0, 6) = "Roughness"
+            .CellValue(0, 7) = "DownStream ID"
+            .CellValue(0, 8) = "Velocity (m/s)"
+            .CellValue(0, 9) = "Travel Time (days)"
         End With
 
         AtcGridFlow.Clear()
@@ -1120,23 +1135,6 @@ Public Class frmWASPSetup
             .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .CellValue(0, 0) = "Segment"
             .CellValue(0, 1) = "Water Temp Timeseries"
-        End With
-
-        AtcGridMet.Clear()
-        With AtcGridMet.Source
-            .Columns = 4
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellColor(0, 2) = SystemColors.ControlDark
-            .CellColor(0, 3) = SystemColors.ControlDark
-            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-            .CellValue(0, 0) = "Segment"
-            .CellValue(0, 1) = "Air Temperature"
-            .CellValue(0, 2) = "Solar Radiation"
-            .CellValue(0, 3) = "Wind Speed"
         End With
 
         pInitializing = True
@@ -1172,7 +1170,7 @@ Public Class frmWASPSetup
         'redo to set valid values
         SetFlowStationGrid()
         SetLoadStationGrid()
-        SetMetStationGrid()
+        SetMetStationValidValues()
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
@@ -1287,12 +1285,13 @@ Public Class frmWASPSetup
                 Next
             End If
 
+            Dim lProblem As String = .Segments.AssignWaspIds()
         End With
+
 
         SetSegmentationGrid()
         SetFlowStationGrid()
         SetLoadStationGrid()
-        SetMetStationGrid()
 
     End Sub
 
@@ -1308,25 +1307,27 @@ Public Class frmWASPSetup
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Length, 3)
-                    .CellEditable(lIndex, 1) = True
-                    .CellValue(lIndex, 2) = pPlugIn.WASPProject.Segments(lIndex - 1).Width
+                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).WASPID
+                    .CellColor(lIndex, 1) = SystemColors.ControlDark
+                    .CellValue(lIndex, 2) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Length, 3)
                     .CellEditable(lIndex, 2) = True
-                    .CellValue(lIndex, 3) = pPlugIn.WASPProject.Segments(lIndex - 1).Depth
+                    .CellValue(lIndex, 3) = pPlugIn.WASPProject.Segments(lIndex - 1).Width
                     .CellEditable(lIndex, 3) = True
-                    .CellValue(lIndex, 4) = pPlugIn.WASPProject.Segments(lIndex - 1).Slope
+                    .CellValue(lIndex, 4) = pPlugIn.WASPProject.Segments(lIndex - 1).Depth
                     .CellEditable(lIndex, 4) = True
-                    .CellValue(lIndex, 5) = pPlugIn.WASPProject.Segments(lIndex - 1).Roughness
+                    .CellValue(lIndex, 5) = pPlugIn.WASPProject.Segments(lIndex - 1).Slope
                     .CellEditable(lIndex, 5) = True
-                    .CellValue(lIndex, 6) = pPlugIn.WASPProject.Segments(lIndex - 1).DownID
-                    .CellValue(lIndex, 7) = pPlugIn.WASPProject.Segments(lIndex - 1).Velocity
-                    .CellEditable(lIndex, 7) = True
+                    .CellValue(lIndex, 6) = pPlugIn.WASPProject.Segments(lIndex - 1).Roughness
+                    .CellEditable(lIndex, 6) = True
+                    .CellValue(lIndex, 7) = pPlugIn.WASPProject.Segments(lIndex - 1).DownID
+                    .CellValue(lIndex, 8) = pPlugIn.WASPProject.Segments(lIndex - 1).Velocity
+                    .CellEditable(lIndex, 8) = True
                     Dim lTravelTime As Double = 0.0
                     If pPlugIn.WASPProject.Segments(lIndex - 1).Velocity > 0 Then
                         lTravelTime = TravelTime(pPlugIn.WASPProject.Segments(lIndex - 1).Length, pPlugIn.WASPProject.Segments(lIndex - 1).Velocity)
                         lTravelTime = SignificantDigits(lTravelTime, 3)
                     End If
-                    .CellValue(lIndex, 8) = lTravelTime
+                    .CellValue(lIndex, 9) = lTravelTime
                     If lTravelTime > lMaxTravelTime Then
                         lMaxTravelTime = lTravelTime
                     End If
@@ -1334,7 +1335,7 @@ Public Class frmWASPSetup
             End With
 
             AtcGridSegmentation.SizeAllColumnsToContents()
-            AtcGridSegmentation.ColumnWidth(0) = 180
+            AtcGridSegmentation.ColumnWidth(0) = 140
             AtcGridSegmentation.Refresh()
 
             If pInitializing Then
@@ -1415,77 +1416,93 @@ Public Class frmWASPSetup
         End If
     End Sub
 
-    Private Sub SetMetStationGrid()
-        If AtcGridMet.Source Is Nothing Then
-            Logger.Dbg("No atcGridMet")
+    Private Sub SetMetStationValidValues()
+
+        cbxAir.Items.Clear()
+        cbxAir.Items.Add("<none>")
+
+        cbxSolar.Items.Clear()
+        cbxSolar.Items.Add("<none>")
+
+        cbxWind.Items.Clear()
+        cbxWind.Items.Add("<none>")
+
+        For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
+            cbxAir.Items.Add(lStationCandidate.Description)
+        Next
+
+        For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
+            cbxSolar.Items.Add(lStationCandidate.Description)
+        Next
+
+        For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
+            cbxWind.Items.Add(lStationCandidate.Description)
+        Next
+
+        'default met stations based on distance
+        Dim lXSum As Double = 0
+        Dim lYSum As Double = 0
+        For Each lSegment As Segment In pPlugIn.WASPProject.Segments
+            'find average segment centroid 
+            lXSum = lXSum + lSegment.CentroidX
+            lYSum = lYSum + lSegment.CentroidY
+        Next
+        Dim lXAvg As Double = 0
+        Dim lYAvg As Double = 0
+        If pPlugIn.WASPProject.Segments.Count > 0 Then
+            lXAvg = lXSum / pPlugIn.WASPProject.Segments.Count
+            lYAvg = lYSum / pPlugIn.WASPProject.Segments.Count
         Else
-            Logger.Dbg("Begin")
-
-            With AtcGridMet.Source
-                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
-                    .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = "<none>"
-                    .CellEditable(lIndex, 1) = True
-                    .CellValue(lIndex, 2) = "<none>"
-                    .CellEditable(lIndex, 2) = True
-                    .CellValue(lIndex, 3) = "<none>"
-                    .CellEditable(lIndex, 3) = True
-                Next
-            End With
-
-            AtcGridMet.SizeAllColumnsToContents()
-            AtcGridMet.Refresh()
-
-            'now set met stations to defaults based on distance
-            With AtcGridMet.Source
-                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-                    'for each valid value, find distance
-                    Dim lShortestDistance As Double = 1.0E+28
-                    Dim lDistance As Double = 0.0
-                    Dim lDescriptionClosest As String = ""
-                    For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
-                        lDistance = CalculateDistance(pPlugIn.WASPProject.Segments(lIndex - 1).CentroidX, pPlugIn.WASPProject.Segments(lIndex - 1).CentroidY, lStationCandidate.LocationX, lStationCandidate.LocationY)
-                        If lDistance < lShortestDistance Then
-                            lShortestDistance = lDistance
-                            lDescriptionClosest = lStationCandidate.Description
-                        End If
-                    Next
-                    .CellValue(lIndex, 1) = lDescriptionClosest
-
-                    'for each valid value, find distance
-                    lShortestDistance = 1.0E+28
-                    lDistance = 0.0
-                    lDescriptionClosest = ""
-                    For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
-                        lDistance = CalculateDistance(pPlugIn.WASPProject.Segments(lIndex - 1).CentroidX, pPlugIn.WASPProject.Segments(lIndex - 1).CentroidY, lStationCandidate.LocationX, lStationCandidate.LocationY)
-                        If lDistance < lShortestDistance Then
-                            lShortestDistance = lDistance
-                            lDescriptionClosest = lStationCandidate.Description
-                        End If
-                    Next
-                    .CellValue(lIndex, 2) = lDescriptionClosest
-
-                    'for each valid value, find distance
-                    lShortestDistance = 1.0E+28
-                    lDistance = 0.0
-                    lDescriptionClosest = ""
-                    For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
-                        lDistance = CalculateDistance(pPlugIn.WASPProject.Segments(lIndex - 1).CentroidX, pPlugIn.WASPProject.Segments(lIndex - 1).CentroidY, lStationCandidate.LocationX, lStationCandidate.LocationY)
-                        If lDistance < lShortestDistance Then
-                            lShortestDistance = lDistance
-                            lDescriptionClosest = lStationCandidate.Description
-                        End If
-                    Next
-                    .CellValue(lIndex, 3) = lDescriptionClosest
-                Next
-            End With
-
-            RefreshSummary()
-            Logger.Dbg("MetStationGrid refreshed")
+            cbxAir.SelectedIndex = 0
+            cbxSolar.SelectedIndex = 0
+            cbxWind.SelectedIndex = 0
         End If
+
+        If pPlugIn.WASPProject.Segments.Count > 0 Then
+            'for each valid value, find distance
+            Dim lShortestDistance As Double = 1.0E+28
+            Dim lDistance As Double = 0.0
+            Dim lClosestIndex As Integer = 0
+            Dim lStationIndex As Integer = 0
+            For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
+                lStationIndex += 1
+                lDistance = CalculateDistance(lXAvg, lYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                If lDistance < lShortestDistance Then
+                    lShortestDistance = lDistance
+                    lClosestIndex = lStationIndex
+                End If
+            Next
+            cbxAir.SelectedIndex = lClosestIndex
+
+            lShortestDistance = 1.0E+28
+            lDistance = 0.0
+            lClosestIndex = 0
+            lStationIndex = 0
+            For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
+                lStationIndex += 1
+                lDistance = CalculateDistance(lXAvg, lYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                If lDistance < lShortestDistance Then
+                    lShortestDistance = lDistance
+                    lClosestIndex = lStationIndex
+                End If
+            Next
+            cbxSolar.SelectedIndex = lClosestIndex
+
+            lShortestDistance = 1.0E+28
+            lDistance = 0.0
+            lClosestIndex = 0
+            lStationIndex = 0
+            For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
+                lStationIndex += 1
+                lDistance = CalculateDistance(lXAvg, lYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                If lDistance < lShortestDistance Then
+                    lShortestDistance = lDistance
+                    lClosestIndex = lStationIndex
+                End If
+            Next
+            cbxWind.SelectedIndex = lClosestIndex
+        End If
+
     End Sub
 
     Friend Function GetMetFile(ByRef aMetWDMName As String) As atcWDM.atcDataSourceWDM
@@ -1512,85 +1529,6 @@ Public Class frmWASPSetup
         End If
         Return lDataSource
     End Function
-
-    Private Sub AtcGridMet_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridMet.CellEdited
-        RefreshSummary()
-    End Sub
-
-    Private Sub RefreshSummary()
-        Dim lKeyString As String = ""
-        Dim lText As String = ""
-
-        'build summary info about selected met timeseries
-        Dim lTimeseriesSelected As New atcCollection
-        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-            lKeyString = "  ATMP:" & AtcGridMet.Source.CellValue(lIndex, 1)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 1) <> "<none>" Then
-                If Not lTimeseriesSelected.Contains(lKeyString) Then
-                    lTimeseriesSelected.Add(lKeyString)
-                    lText = lText & lKeyString & vbCrLf
-                End If
-            End If
-        Next
-        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-            lKeyString = "  SOLR:" & AtcGridMet.Source.CellValue(lIndex, 2)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 2) <> "<none>" Then
-                If Not lTimeseriesSelected.Contains(lKeyString) Then
-                    lTimeseriesSelected.Add(lKeyString)
-                    lText = lText & lKeyString & vbCrLf
-                End If
-            End If
-        Next
-        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-            lKeyString = "  WIND:" & AtcGridMet.Source.CellValue(lIndex, 3)
-            If lKeyString.Trim.Length > 0 AndAlso AtcGridMet.Source.CellValue(lIndex, 3) <> "<none>" Then
-                If Not lTimeseriesSelected.Contains(lKeyString) Then
-                    lTimeseriesSelected.Add(lKeyString)
-                    lText = lText & lKeyString & vbCrLf
-                End If
-            End If
-        Next
-        tbxSummary.Text = lText
-    End Sub
-
-    Private Sub AtcGridMet_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridMet.MouseDownCell
-        pSelectedColumn = aColumn
-        pSelectedRow = aRow
-
-        DoLimitsMet()
-    End Sub
-
-    Private Sub DoLimitsMet()
-
-        With AtcGridMet
-            Dim lValidValues As New Collection
-            If pSelectedColumn = 1 Then 'air temp
-                For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
-                    lValidValues.Add(lStationCandidate.Description)
-                Next
-                If lValidValues.Count = 0 Then
-                    .Source.CellEditable(pSelectedRow, 1) = False
-                End If
-            ElseIf pSelectedColumn = 2 Then  'sol rad
-                For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
-                    lValidValues.Add(lStationCandidate.Description)
-                Next
-                If lValidValues.Count = 0 Then
-                    .Source.CellEditable(pSelectedRow, 3) = False
-                End If
-            ElseIf pSelectedColumn = 3 Then 'wind
-                For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
-                    lValidValues.Add(lStationCandidate.Description)
-                Next
-                If lValidValues.Count = 0 Then
-                    .Source.CellEditable(pSelectedRow, 4) = False
-                End If
-            End If
-            .ValidValues = lValidValues
-            .AllowNewValidValues = False
-            .Refresh()
-        End With
-    End Sub
 
     Private Sub cmdFieldMapping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFieldMapping.Click
         Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
@@ -1705,6 +1643,46 @@ Public Class frmWASPSetup
         Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
     End Sub
 
+    Private Sub SetDates()
+        'set dates on the general tab to the last common year of the selected timeseries       
+
+        Dim lSJDate As Double = 0.0
+        Dim lEJDate As Double = 0.0
+
+        For Each lTimeseries As WASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
+            If lTimeseries.SDate > lSJDate Then
+                lSJDate = lTimeseries.SDate
+            End If
+            If lEJDate = 0.0 Or lTimeseries.EDate < lEJDate Then
+                lEJDate = lTimeseries.EDate
+            End If
+        Next
+
+        Dim lEDate(5) As Integer, lSDate(5) As Integer
+        J2Date(lEJDate, lEDate)
+        J2Date(lSJDate, lSDate)
+
+        'set limits
+        atxSYear.HardMax = lEDate(0)
+        atxSYear.HardMin = lSDate(0)
+        atxEYear.HardMax = lEDate(0)
+        atxEYear.HardMin = lSDate(0)
+
+        'default to last calendar year of data
+        lSDate(0) = lEDate(0) - 1
+        lSDate(1) = 1
+        lSDate(2) = 1
+        lEDate(0) = lSDate(0)
+        lEDate(1) = 12
+        lEDate(2) = 31
+        atxSYear.Text = lSDate(0)
+        atxSMonth.Text = lSDate(1)
+        atxSDay.Text = lSDate(2)
+        atxEYear.Text = lEDate(0)
+        atxEMonth.Text = lEDate(1)
+        atxEDay.Text = lEDate(2)
+    End Sub
+
     Private Sub cmdSelectConstituents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelectConstituents.Click
         Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Select Constituents")
     End Sub
@@ -1715,5 +1693,20 @@ Public Class frmWASPSetup
 
     Private Sub cmdVolumes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdVolumes.Click
         Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Volumes/Depths")
+    End Sub
+
+    Private Sub cbxAir_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxAir.SelectedIndexChanged
+        RebuildTimeseriesCollections()
+        SetDates()
+    End Sub
+
+    Private Sub cbxSolar_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxSolar.SelectedIndexChanged
+        RebuildTimeseriesCollections()
+        SetDates()
+    End Sub
+
+    Private Sub cbxWind_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxWind.SelectedIndexChanged
+        RebuildTimeseriesCollections()
+        SetDates()
     End Sub
 End Class

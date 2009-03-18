@@ -83,11 +83,32 @@ Module modWASPFromMW
                 'not yet in the project, add it
                 Dim lTimeseries As atcTimeseries = GetTimeseries(aStationCandidates(aKeyString).DataSourceName, aStationCandidates(aKeyString).ID)
                 If lTimeseries Is Nothing Then
-                    Logger.Dbg("Coud not find timeseries " & aKeyString)
+                    Logger.Dbg("Could not find timeseries " & aKeyString)
                 Else
                     aStationCandidates(aKeyString).TimeSeries = lTimeseries
                     aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
                     aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                End If
+            End If
+        End If
+    End Sub
+
+    Friend Sub AddSelectedTimeseriesToWASPProject(ByVal aKeyString As String, _
+                                                  ByRef aStationCandidates As WASPTimeseriesCollection, _
+                                                  ByRef aWASPProject As WASPProject)
+
+        'need to make sure this timeseries is in the class structure
+        If aStationCandidates.Contains(aKeyString) Then
+            If aWASPProject.InputTimeseriesCollection.Contains(aKeyString) Then
+                'already in the project, just reference it from this segment
+            Else
+                'not yet in the project, add it
+                Dim lTimeseries As atcTimeseries = GetTimeseries(aStationCandidates(aKeyString).DataSourceName, aStationCandidates(aKeyString).ID)
+                If lTimeseries Is Nothing Then
+                    Logger.Dbg("Could not find timeseries " & aKeyString)
+                Else
+                    aStationCandidates(aKeyString).TimeSeries = lTimeseries
+                    aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
                 End If
             End If
         End If
