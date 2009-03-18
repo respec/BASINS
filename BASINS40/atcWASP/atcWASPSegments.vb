@@ -9,6 +9,69 @@ Public Class Segments
     End Function
 
     Public WASPProject As WASPProject
+    Private pNextKey As Integer = 0
+
+    ''' <summary>
+    ''' Assign Ids to each segment starting at downstream segment
+    ''' </summary>
+    ''' <returns>String describing any problems that occured</returns>
+    ''' <remarks></remarks>
+    Public Function AssignWaspIds() As String
+        Dim lDownstreamKey As String = ""
+        For Each lSegment As Segment In Me
+            lSegment.WASPID = 0
+            If lSegment.DownID.Length = 0 Then
+                lDownstreamKey = lSegment.ID & ":" & lSegment.Name
+            End If
+        Next
+
+        AssignWaspIdAndMoveUpstream(lDownstreamKey)
+
+        Dim lProblem As String = ""
+        For Each lSegment As Segment In Me
+            If lSegment.WASPID = 0 Then
+                If lProblem.Length = 0 Then
+                    lProblem = "ProblemSegments "
+                Else
+                    lProblem &= ", "
+                End If
+                lProblem &= lSegment.ID & ":" & lSegment.Name
+            End If
+        Next
+        Return lProblem
+    End Function
+
+    Private Sub AssignWaspIdAndMoveUpstream(ByVal aDownstreamKey As String)
+        'assign WaspId
+        Dim lDownStreamSegment As Segment = Me.Item(aDownstreamKey)
+        pNextKey += 1
+        lDownStreamSegment.WASPID = pNextKey
+
+        'look for upsteam segments and determine largest one
+        Dim lUpSteamSegments As New ArrayList
+        Dim lUpSteamMaxArea As Double = 0
+        Dim lUpSteamMainSegmentKey As String = ""
+        For Each lSegment As Segment In Me
+            If lSegment.DownID = lDownStreamSegment.ID Then
+                If lSegment.CumulativeDrainageArea > lUpSteamMaxArea Then
+                    lUpSteamMaxArea = lSegment.CumulativeDrainageArea
+                    lUpSteamMainSegmentKey = lSegment.ID & ":" & lSegment.Name
+                End If
+                lUpSteamSegments.Add(lSegment)
+            End If
+        Next
+        If lUpSteamSegments.Count > 0 Then
+            'main channel
+            AssignWaspIdAndMoveUpstream(lUpSteamMainSegmentKey)
+            If lUpSteamSegments.Count > 1 Then
+                For Each lSegment As Segment In lUpSteamSegments
+                    If lSegment.WASPID = 0 Then 'other channel
+                        AssignWaspIdAndMoveUpstream(lSegment.ID & ":" & lSegment.Name)
+                    End If
+                Next
+            End If
+        End If
+    End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
         For Each lSegment As Segment In aEnumerable
