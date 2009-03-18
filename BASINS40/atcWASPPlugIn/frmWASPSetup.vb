@@ -553,12 +553,12 @@ Public Class frmWASPSetup
         'atxTravelTime
         '
         Me.atxTravelTime.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxTravelTime.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxTravelTime.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
         Me.atxTravelTime.DefaultValue = ""
         Me.atxTravelTime.HardMax = -999
         Me.atxTravelTime.HardMin = 0
         Me.atxTravelTime.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxTravelTime.Location = New System.Drawing.Point(204, 16)
+        Me.atxTravelTime.Location = New System.Drawing.Point(215, 16)
         Me.atxTravelTime.MaxWidth = 20
         Me.atxTravelTime.Name = "atxTravelTime"
         Me.atxTravelTime.NumericFormat = "0.#####"
@@ -578,13 +578,13 @@ Public Class frmWASPSetup
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(20, 20)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(181, 17)
+        Me.Label2.Size = New System.Drawing.Size(189, 17)
         Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Maximum Travel Time (min)"
+        Me.Label2.Text = "Maximum Travel Time (days)"
         '
         'cmdGenerate
         '
-        Me.cmdGenerate.Location = New System.Drawing.Point(260, 16)
+        Me.cmdGenerate.Location = New System.Drawing.Point(271, 16)
         Me.cmdGenerate.Name = "cmdGenerate"
         Me.cmdGenerate.Size = New System.Drawing.Size(126, 25)
         Me.cmdGenerate.TabIndex = 1
@@ -987,6 +987,7 @@ Public Class frmWASPSetup
         pSegmentFieldMap.Add("DSLINKNO", "DownID")
         pSegmentFieldMap.Add("TOCOMID", "DownID")
         pSegmentFieldMap.Add("MAVELU", "Velocity")
+        pSegmentFieldMap.Add("MAFLOWU", "MeanAnnualFlow")
         pSegmentFieldMap.Add("SLOPE", "Slope")
         pSegmentFieldMap.Add("CUMDRAINAG", "DrainageArea")
 
@@ -1090,8 +1091,8 @@ Public Class frmWASPSetup
             .CellValue(0, 4) = "Slope"
             .CellValue(0, 5) = "Roughness"
             .CellValue(0, 6) = "DownStream ID"
-            .CellValue(0, 7) = "Velocity (ft/s)"
-            .CellValue(0, 8) = "Travel Time (min)"
+            .CellValue(0, 7) = "Velocity (m/s)"
+            .CellValue(0, 8) = "Travel Time (days)"
         End With
 
         AtcGridFlow.Clear()
@@ -1104,7 +1105,7 @@ Public Class frmWASPSetup
             .CellColor(0, 1) = SystemColors.ControlDark
             .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .CellValue(0, 0) = "Segment"
-            .CellValue(0, 1) = "Drainage Area (km2)"
+            .CellValue(0, 1) = "Cum. Drainage Area (km^2)"
             .CellValue(0, 2) = "Input Flow Timeseries"
         End With
 
@@ -1194,7 +1195,7 @@ Public Class frmWASPSetup
         Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
         Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
 
-        'populate the SWMM classes from the shapefiles'
+        'populate the SWMM classes from the shapefiles
         With pPlugIn.WASPProject
             .Segments.Clear()
             Dim lTable As New atcUtility.atcTableDBF
@@ -1226,6 +1227,22 @@ Public Class frmWASPSetup
                 'add all 
                 .Segments = lTempSegments
             End If
+
+            'calculate depth and width from mean annual flow and mean annual velocity
+            'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
+            For Each lSegment As Segment In .Segments
+                lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
+                lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
+            Next
+
+            'do unit conversions from NHDPlus units to WASP assumed units
+            For Each lSegment As Segment In .Segments
+                lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
+                lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
+                'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
+                lSegment.Depth = SignificantDigits(lSegment.Depth / 3.281, 3)  'convert ft to m
+                lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
+            Next
 
             'if a maximum travel time has been set, divide the segments as needed
             Dim lMaxTravelTime As Double = atxTravelTime.Text
@@ -1339,7 +1356,7 @@ Public Class frmWASPSetup
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).DrainageArea
+                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).CumulativeDrainageArea
                     .CellValue(lIndex, 2) = "<none>"
                     If pFlowStationCandidates.Count > 0 Then
                         .CellEditable(lIndex, 2) = True

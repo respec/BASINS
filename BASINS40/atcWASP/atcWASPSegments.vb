@@ -23,6 +23,7 @@ Public Class Segments
         Dim lString As New System.Text.StringBuilder
 
         lString.Append(";Name                            ID               Length     Width      Depth      Slope      Roughness  DownSegID        " & vbCrLf)
+        lString.Append(";                                                 (km)       (m)        (m)                                               " & vbCrLf)
         lString.Append(";_______________________________ ________________ __________ __________ __________ __________ __________ ________________ " & vbCrLf)
 
         For Each lSegment As Segment In Me
@@ -71,13 +72,15 @@ Public Class Segment
     Public Width As Double = 0.0
     Public Depth As Double = 0.0
     Public Slope As String = "0.05"
-    Public Roughness As Double = 0.0
+    Public Roughness As Double = 0.05
     Public Velocity As Double = 0.0
     Public InputTimeseriesCollection As WASPTimeseriesCollection = Nothing
     Public BaseID As String = ""  'the id of the segment before breaking it up
     Public CentroidX As Double
     Public CentroidY As Double
-    Public DrainageArea As Double
+    Public CumulativeDrainageArea As Double
+    Public MeanAnnualFlow As Double
+    Public WASPID As Integer
 
     Public Function Clone() As Segment
         Dim lNewSegment As New Segment
@@ -93,7 +96,9 @@ Public Class Segment
         lNewSegment.BaseID = Me.BaseID
         lNewSegment.CentroidX = Me.CentroidX
         lNewSegment.CentroidY = Me.CentroidY
-        lNewSegment.DrainageArea = Me.DrainageArea
+        lNewSegment.CumulativeDrainageArea = Me.CumulativeDrainageArea
+        lNewSegment.MeanAnnualFlow = Me.MeanAnnualFlow
+        lNewSegment.WASPID = Me.WASPID
 
         Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
         lNewSegment.InputTimeseriesCollection = lTimeseriesCollection

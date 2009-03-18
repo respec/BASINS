@@ -48,9 +48,10 @@ Public Class WASPProject
 
     Public Sub Run(ByVal aInputFileName As String)
         If IO.File.Exists(aInputFileName) Then
-            Dim lWASPexe As String = atcUtility.FindFile("Please locate the EPA WASP Executable", "\Program Files\EPA WASP\WASP.exe")
+            Dim lWASPDir As String = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\USEPA\WASP\7.0", "DatabaseDir", "") & "..\wasp.exe"
+            Dim lWASPexe As String = atcUtility.FindFile("Please locate the EPA WASP Executable", lWASPDir)
             If IO.File.Exists(lWASPexe) Then
-                LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), "/f " & aInputFileName, False)
+                LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), aInputFileName, False)
                 Logger.Dbg("WASP launched with input " & aInputFileName)
             Else
                 Logger.Msg("Cannot find the EPA WASP Executable", MsgBoxStyle.Critical, "BASINS WASP Problem")

@@ -122,9 +122,9 @@ Module modWASPFromMW
         Return lGetTimeseries
     End Function
 
-    Friend Function TravelTime(ByVal aLengthKM As Double, ByVal aVelocityFPS As Double) As Double
+    Friend Function TravelTime(ByVal aLengthKM As Double, ByVal aVelocityMPS As Double) As Double
         Dim lTravelTime As Double
-        lTravelTime = aLengthKM / aVelocityFPS * 3281 / 60  'computes in minutes
+        lTravelTime = aLengthKM * 1000 / aVelocityMPS / (60 * 60 * 24)  'computes in days
         Return lTravelTime
     End Function
 
