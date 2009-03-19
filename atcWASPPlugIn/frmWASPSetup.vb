@@ -835,7 +835,6 @@ Public Class frmWASPSetup
     Friend pWindStationCandidates As WASPTimeseriesCollection
     Friend pWaterTempStationCandidates As WASPTimeseriesCollection
 
-    Private pInitializing As Boolean = True
     Private pSelectedRow As Integer
     Private pSelectedColumn As Integer
 
@@ -895,6 +894,54 @@ Public Class frmWASPSetup
 
         RebuildTimeseriesCollections()
 
+        'check that specified dates are valid
+        Dim lSJDate As Double = 0.0
+        Dim lEJDate As Double = 0.0
+        Dim lSDate(5) As Integer
+        Dim lEDate(5) As Integer
+        lSDate(0) = atxSYear.Text
+        lSDate(1) = atxSMonth.Text
+        lSDate(2) = atxSDay.Text
+        lEDate(0) = atxEYear.Text
+        lEDate(1) = atxEMonth.Text
+        lEDate(2) = atxEDay.Text
+        lSJDate = Date2J(lSDate)
+        lEJDate = Date2J(lEDate)
+        If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
+            Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS WASP Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        If lSJDate > lEJDate Then 'failed date check
+            Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS WASP Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+
+        'check that time series dates have a common period of record, and that the specified start/end dates 
+        'are within that period
+        Dim lSJDateTS As Double = 0.0
+        Dim lEJDateTS As Double = 0.0
+        For Each lTimeseries As WASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
+            If lTimeseries.SDate > lSJDateTS Then
+                lSJDateTS = lTimeseries.SDate
+            End If
+            If lEJDateTS = 0.0 Or lTimeseries.EDate < lEJDateTS Then
+                lEJDateTS = lTimeseries.EDate
+            End If
+        Next
+        If lSJDateTS > lEJDateTS Then 'failed date check
+            Logger.Msg("The specified time series do not have a common period of record.", vbOKOnly, "BASINS WASP Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        'compare dates from met data with specified start and end dates, make sure they are valid
+        If lSJDate < lSJDateTS Or lEJDateTS < lEJDate Then 'failed date check
+            Logger.Msg("The specified start/end dates are not within the dates of the specified time series.", vbOKOnly, "BASINS WASP Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+
         Dim lName As String = tbxName.Text
         'TODO: still use modelout?
         Dim lWASPProjectFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".wnf"
@@ -903,6 +950,10 @@ Public Class frmWASPSetup
         If PreProcessChecking(lWASPProjectFileName) Then
             With pPlugIn.WASPProject
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
+                'set start and end dates
+                .SJDate = lSJDate
+                .EJDate = lEJDate
 
                 .Name = lName
 
@@ -1137,9 +1188,6 @@ Public Class frmWASPSetup
             .CellValue(0, 1) = "Water Temp Timeseries"
         End With
 
-        pInitializing = True
-        GenerateSegments()
-        pInitializing = False
         Logger.Dbg("InitializeUI Complete")
     End Sub
 
@@ -1188,7 +1236,14 @@ Public Class frmWASPSetup
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
     End Sub
 
-    Private Sub GenerateSegments()
+    Friend Sub GenerateSegments()
+        'this takes some time, show window and then do this
+        Logger.Dbg("Generating Segments")
+        lblStatus.Text = "Reading Segment Data..."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        EnableControls(False)
+
         'set file names for segments
         Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
         Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
@@ -1288,11 +1343,14 @@ Public Class frmWASPSetup
             Dim lProblem As String = .Segments.AssignWaspIds()
         End With
 
-
         SetSegmentationGrid()
         SetFlowStationGrid()
         SetLoadStationGrid()
 
+        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        EnableControls(True)
     End Sub
 
     Private Sub SetSegmentationGrid()
@@ -1338,9 +1396,9 @@ Public Class frmWASPSetup
             AtcGridSegmentation.ColumnWidth(0) = 140
             AtcGridSegmentation.Refresh()
 
-            If pInitializing Then
-                atxTravelTime.Text = lMaxTravelTime
-            End If
+            'If pInitializing Then
+            atxTravelTime.Text = lMaxTravelTime
+            'End If
 
             Logger.Dbg("SegmentationGrid refreshed")
         End If
@@ -1658,29 +1716,31 @@ Public Class frmWASPSetup
             End If
         Next
 
-        Dim lEDate(5) As Integer, lSDate(5) As Integer
-        J2Date(lEJDate, lEDate)
-        J2Date(lSJDate, lSDate)
+        If lEJDate > lSJDate Then
+            Dim lEDate(5) As Integer, lSDate(5) As Integer
+            J2Date(lEJDate, lEDate)
+            J2Date(lSJDate, lSDate)
 
-        'set limits
-        atxSYear.HardMax = lEDate(0)
-        atxSYear.HardMin = lSDate(0)
-        atxEYear.HardMax = lEDate(0)
-        atxEYear.HardMin = lSDate(0)
+            'set limits
+            atxSYear.HardMax = lEDate(0)
+            atxSYear.HardMin = lSDate(0)
+            atxEYear.HardMax = lEDate(0)
+            atxEYear.HardMin = lSDate(0)
 
-        'default to last calendar year of data
-        lSDate(0) = lEDate(0) - 1
-        lSDate(1) = 1
-        lSDate(2) = 1
-        lEDate(0) = lSDate(0)
-        lEDate(1) = 12
-        lEDate(2) = 31
-        atxSYear.Text = lSDate(0)
-        atxSMonth.Text = lSDate(1)
-        atxSDay.Text = lSDate(2)
-        atxEYear.Text = lEDate(0)
-        atxEMonth.Text = lEDate(1)
-        atxEDay.Text = lEDate(2)
+            'default to last calendar year of data
+            lSDate(0) = lEDate(0) - 1
+            lSDate(1) = 1
+            lSDate(2) = 1
+            lEDate(0) = lSDate(0)
+            lEDate(1) = 12
+            lEDate(2) = 31
+            atxSYear.Text = lSDate(0)
+            atxSMonth.Text = lSDate(1)
+            atxSDay.Text = lSDate(2)
+            atxEYear.Text = lEDate(0)
+            atxEMonth.Text = lEDate(1)
+            atxEDay.Text = lEDate(2)
+        End If
     End Sub
 
     Private Sub cmdSelectConstituents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelectConstituents.Click

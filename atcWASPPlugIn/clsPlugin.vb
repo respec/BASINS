@@ -48,6 +48,7 @@ Public Class PlugIn
                 Logger.Dbg("WASPSetup Initialized")
                 .Show()
                 Logger.Dbg("WASPSetup Shown")
+                .GenerateSegments()
                 .InitializeStationLists()
                 .EnableControls(True)
                 aHandled = True

@@ -5,7 +5,8 @@ Imports atcUtility
 Public Class WASPProject
     Public Segments As Segments
     Public InputTimeseriesCollection As WASPTimeseriesCollection
-
+    Public SJDate As Double = 0.0
+    Public EJDate As Double = 0.0
     Public Name As String = ""
     Public WNFFileName As String = ""
 
@@ -24,8 +25,17 @@ Public Class WASPProject
         Dim lSegmentFileName As String = FilenameSetExt(WNFFileName, "seg")
         Dim lDirectoryFileName As String = FilenameSetExt(WNFFileName, "tim")
 
+        Dim lSDate(6) As Integer
+        J2Date(SJDate, lSDate)
+        Dim lEDate(6) As Integer
+        J2Date(EJDate, lEDate)
+        Dim lStartDateString As String = lSDate(1) & "/" & lSDate(2) & "/" & lSDate(0)
+        Dim lEndDateString As String = lEDate(1) & "/" & lEDate(2) & "/" & lEDate(0)
+
         'write WASP network file first
         Dim lSW As New IO.StreamWriter(aFileName)
+        lSW.WriteLine(lStartDateString)
+        lSW.WriteLine(lEndDateString)
         lSW.WriteLine(lSegmentFileName)
         lSW.WriteLine(lDirectoryFileName)
         lSW.Close()
@@ -41,7 +51,7 @@ Public Class WASPProject
         lSW.Close()
 
         'write timeseries files
-        Me.InputTimeseriesCollection.TimeSeriesToFile(lDirectoryFileName)
+        Me.InputTimeseriesCollection.TimeSeriesToFile(lDirectoryFileName, Me.SJDate, Me.EJDate)
 
         Return True
     End Function
