@@ -11,12 +11,12 @@ Public Class WASPTimeseriesCollection
         Return lKey
     End Function
 
-    Public Function TimeSeriesToFile(ByVal aBaseFileName As String) As Boolean
+    Public Function TimeSeriesToFile(ByVal aBaseFileName As String, ByVal aSJDate As Double, ByVal aEJDate As Double) As Boolean
         For Each lWASPTimeseries As WASPTimeseries In Me
             Dim lLocation As String = lWASPTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value
             Dim lFileName As String = PathNameOnly(aBaseFileName) & "\" & lLocation & "." & lWASPTimeseries.Type & ".DAT"
             Dim lSB As New StringBuilder
-            lSB.Append(lWASPTimeseries.TimeSeriesToString)
+            lSB.Append(lWASPTimeseries.TimeSeriesToString(aSJDate, aEJDate))
             SaveFileString(lFileName, lSB.ToString)
         Next
     End Function
@@ -35,12 +35,12 @@ Public Class WASPTimeseries
     Public LocationX As Double
     Public LocationY As Double
 
-    Public Function TimeSeriesToString() As String
-        Dim lStartIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(Me.SDate, True)
-        If Me.SDate = Me.TimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
+    Public Function TimeSeriesToString(ByVal aSJDate As Double, ByVal aEJDate As Double) As String
+        Dim lStartIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(aSJDate, True)
+        If aSJDate = Me.TimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
         End If
-        Dim lEndIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(Me.EDate, True)
+        Dim lEndIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(aEJDate, True)
         Dim lSB As New StringBuilder
         For lIndex As Integer = lStartIndex To lEndIndex - 1
             Dim lJDate As Double = Me.TimeSeries.Dates.Values(lIndex)
