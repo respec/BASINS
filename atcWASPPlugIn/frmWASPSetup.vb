@@ -1208,17 +1208,19 @@ Public Class frmWASPSetup
         BuildListofValidStationNames("WIND", pWindStationCandidates)
 
         'set layer index for met stations
-        Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
-        GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
-        GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
-        GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
-        GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
-        GetMetStationCoordinates(lMetLayerIndex, pWindStationCandidates)
+        If cboMet.SelectedIndex > 0 Then
+            Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
+            GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
+            GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
+            GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
+            GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
+            GetMetStationCoordinates(lMetLayerIndex, pWindStationCandidates)
 
-        'redo to set valid values
-        SetFlowStationGrid()
-        SetLoadStationGrid()
-        SetMetStationValidValues()
+            'redo to set valid values
+            SetFlowStationGrid()
+            SetLoadStationGrid()
+            SetMetStationValidValues()
+        End If
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
@@ -1245,107 +1247,119 @@ Public Class frmWASPSetup
         EnableControls(False)
 
         'set file names for segments
-        Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-        Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+        If cboStreams.SelectedIndex > -1 Then
+            Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+            Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
 
-        'populate the SWMM classes from the shapefiles
-        With pPlugIn.WASPProject
-            .Segments.Clear()
-            Dim lTable As New atcUtility.atcTableDBF
+            'populate the SWMM classes from the shapefiles
+            With pPlugIn.WASPProject
+                .Segments.Clear()
+                Dim lTable As New atcUtility.atcTableDBF
 
-            'add only selected segments
-            Dim lTempSegments As New atcWASP.Segments
-            If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
-                Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
-                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap), "Name"))
-            End If
-            Logger.Dbg("SegmentsCount " & lTempSegments.Count)
+                'add only selected segments
+                Dim lTempSegments As New atcWASP.Segments
+                If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
+                    Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
+                    lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pSegmentFieldMap), "Name"))
+                End If
+                Logger.Dbg("SegmentsCount " & lTempSegments.Count)
 
-            Dim lShapeIndex As Integer = -1
-            For Each lSegment As atcWASP.Segment In lTempSegments
-                Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
-                lSegment.InputTimeseriesCollection = lTimeseriesCollection
-                lSegment.BaseID = lSegment.ID   'store segment id before breaking up
-                lShapeIndex += 1
-                GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
-            Next
-
-            'after reading the attribute table, see if any are selected
-            If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
-                'put only selected segments in .segments 
-                For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
-                    .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
+                Dim lShapeIndex As Integer = -1
+                For Each lSegment As atcWASP.Segment In lTempSegments
+                    Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
+                    lSegment.InputTimeseriesCollection = lTimeseriesCollection
+                    lSegment.BaseID = lSegment.ID   'store segment id before breaking up
+                    lShapeIndex += 1
+                    GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
                 Next
-            Else
-                'add all 
-                .Segments = lTempSegments
-            End If
 
-            'calculate depth and width from mean annual flow and mean annual velocity
-            'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
-            For Each lSegment As Segment In .Segments
-                lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
-                lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
-            Next
+                'after reading the attribute table, see if any are selected
+                If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
+                    'put only selected segments in .segments 
+                    For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
+                        .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
+                    Next
+                Else
+                    'add all 
+                    .Segments = lTempSegments
+                End If
 
-            'do unit conversions from NHDPlus units to WASP assumed units
-            For Each lSegment As Segment In .Segments
-                lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
-                lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
-                'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
-                lSegment.Depth = SignificantDigits(lSegment.Depth / 3.281, 3)  'convert ft to m
-                lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
-            Next
-
-            'if a maximum travel time has been set, divide the segments as needed
-            Dim lMaxTravelTime As Double = atxTravelTime.Text
-            If lMaxTravelTime > 0 Then
-                Dim lNewSegments As New Segments
-                Dim lNewSegmentPositions As New atcCollection
-                For lIndex As Integer = 1 To .Segments.Count
-                    Dim lSegment As Segment = .Segments(lIndex - 1)
-                    If TravelTime(lSegment.Length, lSegment.Velocity) > lMaxTravelTime Then
-                        'need to break this segment into multiple
-                        Dim lBreakNumber As Integer = Int(TravelTime(lSegment.Length, lSegment.Velocity) / lMaxTravelTime) + 1
-                        'create the new pieces
-                        For lBreakIndex As Integer = 2 To lBreakNumber
-                            Dim lNewSegment As New Segment
-                            lNewSegment = lSegment.Clone
-                            lNewSegment.ID = lSegment.ID & IntegerToAlphabet(lBreakIndex - 1)
-                            If lBreakIndex < lBreakNumber Then
-                                lNewSegment.DownID = lSegment.ID & IntegerToAlphabet(lBreakIndex)
-                            Else
-                                lNewSegment.DownID = lSegment.DownID
-                            End If
-                            lNewSegment.Length = lSegment.Length / lBreakNumber
-                            lNewSegments.Add(lNewSegment)
-                            lNewSegmentPositions.Add(lNewSegment.ID, lIndex)
-                        Next
-                        'reset length and id for the original segment 
-                        Dim lOldID As String = lSegment.ID
-                        lSegment.ID = lOldID & "A"
-                        'if this segment id shows up as a downid anywhere else, change it
-                        For Each lTempSeg As Segment In .Segments
-                            If lTempSeg.DownID = lOldID Then
-                                lTempSeg.DownID = lSegment.ID
-                            End If
-                        Next
-                        lSegment.DownID = lOldID & "B"
-                        lSegment.Length = lSegment.Length / lBreakNumber
-                    End If
+                'calculate depth and width from mean annual flow and mean annual velocity
+                'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
+                For Each lSegment As Segment In .Segments
+                    lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
+                    lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
                 Next
-                'if any new segments, add them now to the segments collection
-                For lIndex As Integer = lNewSegments.Count To 1 Step -1
-                    .Segments.Insert(lNewSegmentPositions(lIndex - 1), lNewSegments(lIndex - 1))
+
+                'do unit conversions from NHDPlus units to WASP assumed units
+                For Each lSegment As Segment In .Segments
+                    lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
+                    lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
+                    'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
+                    lSegment.Depth = SignificantDigits(lSegment.Depth / 3.281, 3)  'convert ft to m
+                    lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
                 Next
-            End If
 
-            Dim lProblem As String = .Segments.AssignWaspIds()
-        End With
+                'if a maximum travel time has been set, divide the segments as needed
+                Dim lMaxTravelTime As Double = atxTravelTime.Text
+                If lMaxTravelTime > 0 Then
+                    Dim lNewSegments As New Segments
+                    Dim lNewSegmentPositions As New atcCollection
+                    For lIndex As Integer = 1 To .Segments.Count
+                        Dim lSegment As Segment = .Segments(lIndex - 1)
+                        If TravelTime(lSegment.Length, lSegment.Velocity) > lMaxTravelTime Then
+                            'need to break this segment into multiple
+                            Dim lBreakNumber As Integer = Int(TravelTime(lSegment.Length, lSegment.Velocity) / lMaxTravelTime) + 1
+                            'find cumulative drainage area above this segment
+                            Dim lCumAbove As Double = CumulativeAreaAboveSegment(lSegment.ID)
+                            'create the new pieces
+                            For lBreakIndex As Integer = 2 To lBreakNumber
+                                Dim lNewSegment As New Segment
+                                lNewSegment = lSegment.Clone
+                                lNewSegment.ID = lSegment.ID & IntegerToAlphabet(lBreakIndex - 1)
+                                If lBreakIndex < lBreakNumber Then
+                                    lNewSegment.DownID = lSegment.ID & IntegerToAlphabet(lBreakIndex)
+                                Else
+                                    lNewSegment.DownID = lSegment.DownID
+                                End If
+                                lNewSegment.Length = lSegment.Length / lBreakNumber
+                                lNewSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) * lBreakIndex / lBreakNumber)
+                                lNewSegments.Add(lNewSegment)
+                                lNewSegmentPositions.Add(lNewSegment.ID, lIndex)
+                            Next
+                            'reset length and id for the original segment 
+                            Dim lOldID As String = lSegment.ID
+                            lSegment.ID = lOldID & "A"
+                            'if this segment id shows up as a downid anywhere else, change it
+                            For Each lTempSeg As Segment In .Segments
+                                If lTempSeg.DownID = lOldID Then
+                                    lTempSeg.DownID = lSegment.ID
+                                End If
+                            Next
+                            lSegment.DownID = lOldID & "B"
+                            lSegment.Length = lSegment.Length / lBreakNumber
+                            lSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) / lBreakNumber)
+                        End If
+                    Next
+                    'if any new segments, add them now to the segments collection
+                    For lIndex As Integer = lNewSegments.Count To 1 Step -1
+                        .Segments.Insert(lNewSegmentPositions(lIndex - 1), lNewSegments(lIndex - 1))
+                    Next
+                    'because some keys have changes, clear all out and add back in
+                    lNewSegments.Clear()
+                    For Each lSegment As Segment In .Segments
+                        lNewSegments.Add(lSegment)
+                    Next
+                    .Segments = lNewSegments
+                End If
 
-        SetSegmentationGrid()
-        SetFlowStationGrid()
-        SetLoadStationGrid()
+                Dim lProblem As String = .Segments.AssignWaspIds()
+            End With
+
+            SetSegmentationGrid()
+            SetFlowStationGrid()
+            SetLoadStationGrid()
+        End If
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
@@ -1742,6 +1756,19 @@ Public Class frmWASPSetup
             atxEDay.Text = lEDate(2)
         End If
     End Sub
+
+    Private Function CumulativeAreaAboveSegment(ByVal aSegmentID As String) As Double
+        'find the area above this segment id
+        Dim lArea As Double = 0
+        With pPlugIn.WASPProject
+            For Each lSegment As Segment In .Segments
+                If lSegment.DownID = aSegmentID Then
+                    lArea = lArea + lSegment.CumulativeDrainageArea
+                End If
+            Next
+        End With
+        Return lArea
+    End Function
 
     Private Sub cmdSelectConstituents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelectConstituents.Click
         Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Select Constituents")
