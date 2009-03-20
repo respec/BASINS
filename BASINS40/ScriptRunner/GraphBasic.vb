@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcData
 Imports atcWDM
+Imports atcBasinsObsWQ
 Imports atcGraph
 Imports MapWindow.Interfaces
 Imports ZedGraph
@@ -14,27 +15,27 @@ Module GraphBasic
     Private Const pWorkingDirectory As String = "c:\Basins\modelout\"   'all plot files will be written to this folder
     Private Const pBaseName As String = "basic_sample"                  'used in the name of each output plot file
 
-    Private Const pTimeseries1FileName As String = "c:\Basins\modelout\wq_cal.wdm"
-    Private Const pTimeseries1Id As Integer = 27   'same thing as data set number for a wdm file
+    Private Const pTimeseries1FileName As String = "c:\Basins\modelout\upatoi.wdm"
+    Private Const pTimeseries1Id As Integer = 1   'same thing as data set number for a wdm file
     Private Const pTimeseries1Axis As String = "Aux"
     Private Const pTimeseries1IsPoint As Boolean = False
 
-    Private Const pTimeseries2FileName As String = "c:\Basins\modelout\wq_cal.wdm"
-    Private Const pTimeseries2Id As Integer = 262
+    Private Const pTimeseries2FileName As String = "c:\Basins\modelout\upatoi.wdm"
+    Private Const pTimeseries2Id As Integer = 1043
     Private Const pTimeseries2Axis As String = "Left"
-    Private Const pTimeseries2IsPoint As Boolean = True
+    Private Const pTimeseries2IsPoint As Boolean = False
 
-    Private Const pTimeseries3FileName As String = "c:\Basins\modelout\wq_cal.wdm"
-    Private Const pTimeseries3Id As Integer = 1004
+    Private Const pTimeseries3FileName As String = "c:\Basins\modelout\UpatoiMCB.dbf"
+    Private Const pTimeseries3Id As Integer = 1
     Private Const pTimeseries3Axis As String = "Left"
-    Private Const pTimeseries3IsPoint As Boolean = False
+    Private Const pTimeseries3IsPoint As Boolean = True
 
-    Private Const pStartingYear As Integer = 1986   'starting date of plot
-    Private Const pStartingMonth As Integer = 1
+    Private Const pStartingYear As Integer = 2006   'starting date of plot
+    Private Const pStartingMonth As Integer = 5
     Private Const pStartingDay As Integer = 1
-    Private Const pEndingYear As Integer = 1986     'ending date of plot
-    Private Const pEndingMonth As Integer = 12
-    Private Const pEndingDay As Integer = 31
+    Private Const pEndingYear As Integer = 2006     'ending date of plot
+    Private Const pEndingMonth As Integer = 5
+    Private Const pEndingDay As Integer = 30
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -76,9 +77,9 @@ Module GraphBasic
         End If
 
         'get timeseries 3
-        Dim lDataSource3 As New atcDataSourceWDM
+        Dim lDataSource3 As New atcDataSourceBasinsObsWQ
         If lDataSource3.Open(pTimeseries3FileName) Then
-            Dim lTser3 As atcTimeseries = lDataSource3.DataSets.ItemByKey(pTimeseries3Id)
+            Dim lTser3 As atcTimeseries = lDataSource3.DataSets(pTimeseries3Id)
             lTser3.Attributes.SetValue("YAxis", pTimeseries3Axis)
             lTser3.Attributes.SetValue("Point", pTimeseries3IsPoint)
             lTimeseriesGroup.Add(SubsetByDate(lTser3, _
