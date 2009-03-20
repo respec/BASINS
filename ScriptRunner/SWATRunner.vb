@@ -14,6 +14,9 @@ Imports atcTimeseriesMath.atcTimeseriesMath
 Imports SwatObject
 
 Module SWATRunner
+    'This is the batch SWAT Run code for the UMRB project.
+    'The code currently only works for the SWAT annual run outputs.
+    '
     Private pStartYear As Integer = 0 '1960
     Private pNumYears As Integer = 12
     Private pRefreshDB As Boolean = False ' make a copy of the SWATInput database
@@ -28,7 +31,7 @@ Module SWATRunner
     Private pRunDaily As Boolean = False
     Private pRunYearly As Boolean = False
     Private pScenario As String = "RevCrop"
-    Private pDrive As String = "S:"
+    Private pDrive As String = "C:"
     Private pBaseFolder As String = pDrive & "\Scratch\UMRB\baseline90"
     Private pSWATGDB As String = "c:\Program Files\SWAT 2005 Editor\Databases\SWAT2005.mdb"
     Private pOutGDB As String = "baseline90.mdb"
@@ -45,12 +48,16 @@ Module SWATRunner
     Private pSWATExe As String = "C:\Program Files\SWAT 2005 Editor\swat2005.exe"
     Private CanConvertToCRP() As String = {"AGRR", "RNGE", "PAST", "URHD", "URLD", "URMD", "ALFA", "HAY", "FRSD", "FRSE", "FRST"}
 
+    Private pDoCaseStudySummary As Boolean = False
+    Private predoCaliSummary As Boolean = False
+
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
         Dim lContinue As Boolean = True
         'these defaults are overwritten by registry values set by most recent run
         Dim lUserParms As New atcCollection
         With lUserParms
+            .Add("Summarize Case Study Output", pDoCaseStudySummary)
             .Add("Start Year", pStartYear)
             .Add("Number of Years", pNumYears)
             .Add("Run Model", pRunModel)
@@ -79,6 +86,7 @@ Module SWATRunner
             lContinue = lAsk.AskUser("User Specified Parameters", lUserParms)
             If lContinue Then
                 With lUserParms
+                    pDoCaseStudySummary = .ItemByKey("Summarize Case Study Output")
                     pStartYear = .ItemByKey("Start Year")
                     pNumYears = .ItemByKey("Number of Years")
                     pRunModel = .ItemByKey("Run Model")
@@ -106,6 +114,239 @@ Module SWATRunner
             End If
         End If
 
+        Dim lAllScenarios As New List(Of String)
+        Dim lcases As String() = {"RS", "AFDec", "AFInc"}
+
+        If lContinue And pDoCaseStudySummary Then
+            'Do summary of all case studies' outputs, then end the SWATRunner program
+            'This is assuming all case studies' runs are already done BEFOREHAND!
+            'This is essentially a big loop to go through all case studies
+            'Specifically, the code would create corresponding RS, AFInc, AFDec
+            'report folders under each scenarios' SWAT output directory
+            '
+            'lAllScenarios.Add("Scen2010RevP8889")
+            'lAllScenarios.Add("Scen2015RevP8889")
+            'lAllScenarios.Add("Scen2020RevP8889")
+            'lAllScenarios.Add("Scen2022RevP8889")
+            'lAllScenarios.Add("ScenExistRevP8889")
+
+            'lAllScenarios.Add("Scen2010RevPRaccoon")
+            'lAllScenarios.Add("Scen2015RevPRaccoon")
+            lAllScenarios.Add("Scen2020RevPRaccoon")
+            'lAllScenarios.Add("Scen2022RevPRaccoon")
+            'lAllScenarios.Add("ScenExistRevPRaccoon")
+
+            For Each pScenario In lAllScenarios
+                pInputFolder = IO.Path.Combine(pBaseFolder, "Scenarios" & IO.Path.DirectorySeparatorChar & pScenario)
+                Dim lswatMDB As String = String.Empty
+                If pScenario.Contains("Exist") Then
+                    lswatMDB = "SWAT2005RevP.mdb"
+                ElseIf pScenario.Contains("2010") Then
+                    lswatMDB = "SWAT2010RevP.mdb"
+                ElseIf pScenario.Contains("2015") Then
+                    lswatMDB = "SWAT2015RevP.mdb"
+                ElseIf pScenario.Contains("2020") Then
+                    lswatMDB = "SWAT2020RevP.mdb"
+                ElseIf pScenario.Contains("2022") Then
+                    lswatMDB = "SWAT2022RevP.mdb"
+                End If
+                pSWATGDB = IO.Path.Combine(pBaseFolder, lswatMDB)
+                For Each lzCase As String In lcases
+                    If pScenario.Contains("8889") Then ' no case study runs for original scenarios
+                        lzCase = ""
+                    End If
+                    If predoCaliSummary Then
+                        If pScenario.Contains("RevPRaccoon") Then 'only for redoing the summary of the calibration runs
+                            lzCase = ""
+                        End If
+                    End If
+                    pOutGDBFolder = IO.Path.Combine(pInputFolder, "TablesIn" & lzCase)
+                    pOutputFolder = IO.Path.Combine(pInputFolder, "TxtInOut" & lzCase)
+                    pReportsFolder = IO.Path.Combine(pInputFolder, "TablesOut" & lzCase)
+                    pLogsFolder = IO.Path.Combine(pInputFolder, "logs" & lzCase)
+
+                    ChDriveDir(pInputFolder)
+
+                    'log for swat runner
+                    Logger.StartToFile(IO.Path.Combine(pLogsFolder, "SWATRunner.log"), , , True)
+
+                    For Each lParmKey As String In lUserParms.Keys
+                        Logger.Dbg(lParmKey & " = " & lUserParms.ItemByKey(lParmKey))
+                    Next
+                    Logger.Flush()
+
+                    '****************************************************************************
+                    'The below section is only need if one wants to run SWAT/summarize the SWAT inputs
+                    'before and after crop area changes, this section is just a replicate of the 
+                    'corresponding section down below, if just need to do the outputsummary, then
+                    'can bypass this section altogether
+                    '****************************************************************************
+                    Dim lzOutGDB As String = IO.Path.Combine(pOutGDBFolder, pOutGDB)
+                    If pRefreshDB OrElse Not IO.File.Exists(lzOutGDB) Then 'copy the entire input parameter database for this new scenario
+                        If IO.File.Exists(lzOutGDB) Then
+                            Logger.Dbg("DeleteExisting " & lzOutGDB)
+                            IO.File.Delete(lzOutGDB)
+                        End If
+                        IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lzOutGDB))
+                        IO.File.Copy(IO.Path.Combine(pBaseFolder, pOutGDB), lzOutGDB)
+                        Logger.Dbg("Copied " & lzOutGDB & " from " & pBaseFolder)
+                    End If
+
+                    Logger.Dbg("InitializeSwatInput")
+                    Dim lzSwatInput As New SwatInput(pSWATGDB, lzOutGDB, pBaseFolder, pScenario)
+
+                    If pStartYear > 0 Then
+                        lzSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", pStartYear)
+                    End If
+
+                    If pNumYears > 0 Then
+                        lzSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", pNumYears)
+                    End If
+
+                    If pRunMonthly Then
+                        lzSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 0)
+                    ElseIf pRunYearly Then
+                        lzSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
+                    ElseIf pRunDaily Then
+                        lzSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 1)
+                    End If
+
+                    lzSwatInput.CIO.PrintHru = False
+
+                    If pInputSummarizeBeforeChange Then
+                        SummarizeInput(lzSwatInput, "Before")
+                    End If
+
+                    Dim lzTotalArea As Double = 0.0
+                    Dim lzTotalAreaNotConverted As Double = 0.0
+                    Dim lzTotalAreaConverted As Double = 0.0
+                    Dim lzTotalAreaCornFut As Double = 0.0
+                    Dim lzTotalAreaCornNow As Double = 0.0
+                    Dim lzCropChangesSummaryFilename As String = IO.Path.Combine(pLogsFolder, "CropChanges.txt")
+                    Dim lzCropChangesHruFilename As String = IO.Path.Combine(pLogsFolder, "CropHruChanges.txt")
+                    Dim lzCropConversions As New CropConversions("CORN")
+
+                    If pCropChangeSummarize Then ' This switch has to be set to True in order to set the lTotalAreaCornNow
+                        SummarizeCropChange(lzSwatInput, _
+                                            lzCropConversions, _
+                                            lzCropChangesSummaryFilename, _
+                                            lzCropChangesHruFilename, _
+                                            lzTotalArea, _
+                                            lzTotalAreaNotConverted, _
+                                            lzTotalAreaConverted, _
+                                            lzTotalAreaCornFut, _
+                                            lzTotalAreaCornNow)
+                    Else
+                        For Each lzString As String In LinesInFile(lzCropChangesSummaryFilename)
+                            If lzString.StartsWith("Total") Then
+                                Dim lzFields() As String = lzString.Split(vbTab)
+                                Double.TryParse(lzFields(2), lzTotalArea)
+                                Double.TryParse(lzFields(3), lzTotalAreaCornNow)
+                                Double.TryParse(lzFields(4), lzTotalAreaConverted)
+                                Double.TryParse(lzFields(5), lzTotalAreaNotConverted)
+                                Double.TryParse(lzFields(6), lzTotalAreaCornFut)
+                            End If
+                        Next
+                    End If
+
+                    If pCrpFutureColumn > 1 Then
+                        Dim lzCrpChanges As New atcTableDelimited
+                        lzCrpChanges.Delimiter = vbTab
+                        If lzCrpChanges.OpenFile(pCrpFuture) Then
+                            Dim lzTotalAreaCrp As Double
+                            Dim lzTotalAreaNotConvertedCrp As Double = 0.0
+                            Dim lzTotalAreaConvertedCrp As Double = 0.0
+                            Dim lzTotalAreaCornFutCrp As Double = 0.0
+                            Dim lzTotalAreaCornNowCrp As Double = 0.0
+
+                            SummarizeCRPChange(lzSwatInput, _
+                                        lzCropChangesSummaryFilename & ".crp", _
+                                        lzCropChangesHruFilename & ".crp", _
+                                        lzTotalAreaCrp, _
+                                        lzTotalAreaNotConvertedCrp, _
+                                        lzTotalAreaConvertedCrp, _
+                                        lzTotalAreaCornFutCrp, _
+                                        lzTotalAreaCornNowCrp, _
+                                        lzCrpChanges)
+                        End If
+                    End If
+
+                    If pChangeCropAreas Then
+
+                        'If pChangeCropAreas = True, then pCropChangeSummarize has to be set to True for all except Existing condition
+                        'For explanation of the crop area changes, see the corresponding section below.
+                        Dim lzDesiredFutureCornArea As Double = lzTotalAreaCornNow
+
+                        If pScenario.Contains("Exist") Then
+                            ' No landuse change
+                        ElseIf pScenario.Contains("2010") Then
+                            lzDesiredFutureCornArea += 1410.26
+                        ElseIf pScenario.Contains("2015") Then
+                            lzDesiredFutureCornArea += 1730.24
+                        ElseIf pScenario.Contains("2020") Then
+                            lzDesiredFutureCornArea += 1602.83
+                        ElseIf pScenario.Contains("2022") Then
+                            lzDesiredFutureCornArea += 1523.6
+                        End If
+
+                        Logger.Dbg("DesiredFutureCornArea = " & lzDesiredFutureCornArea)
+                        Dim lzConvertFractionOfAvailable As Double = (lzDesiredFutureCornArea - lzTotalAreaCornNow) / (lzTotalAreaCornFut - lzTotalAreaCornNow)
+                        Logger.Dbg("ConvertFractionOfAvailable = " & lzConvertFractionOfAvailable)
+                        ChangeHRUfractions(lzSwatInput, lzCropConversions, lzCropChangesHruFilename, lzConvertFractionOfAvailable)
+                    End If
+
+                    If pInputSummarizeChanged Then
+                        SummarizeInput(lzSwatInput, "Changed")
+                    End If
+
+                    If IO.File.Exists(pParmChangesTextfile) Then
+                        Logger.Dbg("SWATPreprocess-UpdateParametersAsRequested")
+                        For Each lString As String In LinesInFile(pParmChangesTextfile)
+                            Dim lzParms() As String = lString.Split(";")
+                            lzSwatInput.UpdateInputDB(lzParms(0).Trim, lzParms(1).Trim, lzParms(2).Trim, lzParms(3).Trim, lzParms(4).Trim)
+                        Next
+                    End If
+
+                    If pRunModel Then
+                        'lzSwatInput.SaveAllTextInput()
+                        'Logger.Dbg("Launching " & pSWATExe & " in " & pOutputFolder)
+                        'Logger.Flush()
+                        'LaunchProgram(pSWATExe, pOutputFolder) 'Bypass model run here
+                    End If
+
+                    '*****************************************************************************
+                    'End of Summarize input section and SWAT input creation/Run section
+                    '*****************************************************************************
+
+                    If pOutputSummarize Then
+                        'Delete exising .tsbin for sub hru and rch such as to start fresh
+                        'Dim di As New System.IO.DirectoryInfo(pReportsFolder)
+                        'di.Delete()
+                        If IO.Directory.Exists(pReportsFolder) Then
+                            For Each lfilename As String In System.IO.Directory.GetFiles(pReportsFolder)
+                                If IO.Path.GetExtension(lfilename) = ".tsbin" Then
+                                    System.IO.File.Delete(lfilename)
+                                End If
+                            Next
+                        End If
+                        SummarizeOutputs()
+                    End If
+
+                    If pScenario.Contains("8889") Then ' only do summary once for original scenarios
+                        Exit For
+                    End If
+                    If predoCaliSummary Then
+                        If pScenario.Contains("RevPRaccoon") Then 'only for redoing the summary of the calibration runs
+                            Exit For
+                        End If
+                    End If
+
+                Next ' lcase eg RS AFInc AFDec
+            Next 'lscen eg ScenExistRevPRaccoon Scen2010RevP8889 etc
+            Exit Sub 'Done batch summary, then end the processing here
+        End If
+
+        'Below is the same code section for doing individual scenarios one at a time
         If lContinue Then
             Dim lLogFileName As String = Logger.FileName
 
@@ -139,15 +380,22 @@ Module SWATRunner
             Logger.Dbg("InitializeSwatInput")
             Dim lSwatInput As New SwatInput(pSWATGDB, lOutGDB, pBaseFolder, pScenario)
 
-            If pStartYear > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", pStartYear)
-            If pNumYears > 0 Then lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", pNumYears)
-                If pRunMonthly Then
-                    lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 0)
-                ElseIf pRunYearly Then
-            lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
-                ElseIf pRunDaily Then
-                    lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 1)
-                End If
+            If pStartYear > 0 Then
+                lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IYR", pStartYear)
+            End If
+
+            If pNumYears > 0 Then
+                lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "NBYR", pNumYears)
+            End If
+
+            If pRunMonthly Then
+                lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 0)
+            ElseIf pRunYearly Then
+                lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 2)
+            ElseIf pRunDaily Then
+                lSwatInput.UpdateInputDB("CIO", "OBJECTID", 1, "IPRINT", 1)
+            End If
+
             lSwatInput.CIO.PrintHru = False
 
             If pInputSummarizeBeforeChange Then
@@ -163,7 +411,7 @@ Module SWATRunner
             Dim lCropChangesHruFilename As String = IO.Path.Combine(pLogsFolder, "CropHruChanges.txt")
             Dim lCropConversions As New CropConversions("CORN")
 
-            If pCropChangeSummarize Then
+            If pCropChangeSummarize Then ' This switch has to be set to True in order to set the lTotalAreaCornNow
                 SummarizeCropChange(lSwatInput, _
                                     lCropConversions, _
                                     lCropChangesSummaryFilename, _
@@ -209,6 +457,10 @@ Module SWATRunner
             End If
 
             If pChangeCropAreas Then
+
+                'If pChangeCropAreas = True, then pCropChangeSummarize has to be set to True for all except Existing condition
+                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow
+
                 '******************************
                 'UMRB: whole basin simulations
                 '******************************
@@ -234,7 +486,19 @@ Module SWATRunner
                 'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1602.83 '2020RevP - 12% of existing; already in square kilometer
 
                 '2022: 88 difference in corn before_n_after LU changes: 1051.48 sq km 89: 472.12 sq km total is: 1523.6 sq km
-                Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1523.6 '2022RevP - 12% of existing; already in square kilometer
+                'Dim lDesiredFutureCornArea As Double = lTotalAreaCornNow + 1523.6 '2022RevP - 12% of existing; already in square kilometer
+
+                If pScenario.Contains("Exist") Then
+                    ' No landuse change
+                ElseIf pScenario.Contains("2010") Then
+                    lDesiredFutureCornArea += 1410.26
+                ElseIf pScenario.Contains("2015") Then
+                    lDesiredFutureCornArea += 1730.24
+                ElseIf pScenario.Contains("2020") Then
+                    lDesiredFutureCornArea += 1602.83
+                ElseIf pScenario.Contains("2022") Then
+                    lDesiredFutureCornArea += 1523.6
+                End If
 
                 Logger.Dbg("DesiredFutureCornArea = " & lDesiredFutureCornArea)
                 Dim lConvertFractionOfAvailable As Double = (lDesiredFutureCornArea - lTotalAreaCornNow) / (lTotalAreaCornFut - lTotalAreaCornNow)
@@ -262,13 +526,21 @@ Module SWATRunner
             End If
 
             If pOutputSummarize Then
+                'Delete exising .tsbin for sub hru and rch such as to start fresh
+                If IO.Directory.Exists(pReportsFolder) Then
+                    For Each lfilename As String In System.IO.Directory.GetFiles(pReportsFolder)
+                        If IO.Path.GetExtension(lfilename) = ".tsbin" Then
+                            System.IO.File.Delete(lfilename)
+                        End If
+                    Next
+                End If
                 SummarizeOutputs()
             End If
 
             'back to basins log
             Logger.StartToFile(lLogFileName, True, False, True)
         End If
-        Logger.Msg("SWATRunner finished at " & DateTime.Now)
+        Logger.Msg("SWATRunner finished at " & DateTime.Now, "SWATRunner Message")
     End Sub
 
     Private Sub SummarizeInput(ByVal aSwatInput As SwatInput, ByVal aSuffix As String)
@@ -366,7 +638,7 @@ Module SWATRunner
                         lCornFractionBefore = lCropConversion.Fraction
                         For Each lConvertToName As String In lCropConversion.NameConvertsTo
                             Dim lCornConvertTo As CropConversion = aCropConversions.Item(lConvertToName)
-                            If lCornConvertTo.Fraction > lCropConversion.Fraction Then                                
+                            If lCornConvertTo.Fraction > lCropConversion.Fraction Then
                                 lHruChangeTo = aSwatInput.QueryInputDB("Select * FROM(hru) WHERE LANDUSE='" & lConvertToName & "' AND SOIL='" & .SOIL & "' AND SLOPE_CD='" & .SLOPE_CD & "' AND SUBBASIN=" & .SUBBASIN & ";")
                                 If lHruChangeTo.Rows.Count > 0 Then
                                     lLandUseConvertsTo = lConvertToName
