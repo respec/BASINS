@@ -31,7 +31,7 @@ Public Class frmWASPFieldMapping
             End If
         Next
 
-        pfrmWASPSetup.pSegmentFieldMap = pSegmentFieldMap
+        pfrmWASPSetup.pPlugIn.WASPProject.SegmentFieldMap = pSegmentFieldMap
 
         Me.Dispose()
     End Sub
