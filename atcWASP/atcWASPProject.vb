@@ -17,7 +17,7 @@ Public Class WASPProject
         WNFFileName = ""
         Segments = New Segments
         Segments.WASPProject = Me
-        'set field mapping for segments
+        'set field mapping for segments based on NHDPlus
         SegmentFieldMap.Clear()
         SegmentFieldMap.Add("GNIS_NAME", "Name")
         SegmentFieldMap.Add("COMID", "ID")
@@ -95,8 +95,40 @@ Public Class WASPProject
         Return lTravelTime
     End Function
 
-    Sub GenerateSegments(ByVal aMaxTravelTime As Double)
+    Sub GenerateSegments(ByVal lSegmentLayerIndex As Integer, ByVal aMaxTravelTime As Double)
         With Me
+            'populate the WASP classes from the shapefiles
+            .Segments.Clear()
+            Dim lTable As New atcUtility.atcTableDBF
+
+            'add only selected segments
+            Dim lTempSegments As New atcWASP.Segments
+            Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+            If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
+                Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
+                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, .SegmentFieldMap), "Name"))
+            End If
+            Logger.Dbg("SegmentsCount " & lTempSegments.Count)
+
+            Dim lShapeIndex As Integer = -1
+            For Each lSegment As atcWASP.Segment In lTempSegments
+                Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
+                lSegment.InputTimeseriesCollection = lTimeseriesCollection
+                lSegment.BaseID = lSegment.ID   'store segment id before breaking up
+                lShapeIndex += 1
+                GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
+            Next
+
+            'after reading the attribute table, see if any are selected
+            If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
+                'put only selected segments in .segments 
+                For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
+                    .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
+                Next
+            Else
+                'add all 
+                .Segments = lTempSegments
+            End If
             'calculate depth and width from mean annual flow and mean annual velocity
             'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
             For Each lSegment As Segment In .Segments
@@ -167,8 +199,32 @@ Public Class WASPProject
             End If
 
             Dim lProblem As String = .Segments.AssignWaspIds()
+            If lProblem.Length > 0 Then
+                Logger.Dbg("ProblemInGenerateSegmentsAssignWaspIds " & lProblem)
+            End If
         End With
     End Sub
+
+    Private Function IntegerToAlphabet(ByVal aNumber As Integer) As String
+        'given 1 returns 'A'
+        'given 26 returns 'Z'
+        'given 27 returns 'AA'
+        'given 28 returns 'AB'
+        Dim lResult As String = ""
+
+        If (26 > aNumber) Then
+            lResult = Chr(aNumber + 65)
+        Else
+            Dim lColumn As Integer
+            Do
+                lColumn = aNumber Mod 26
+                aNumber = (aNumber \ 26) - 1
+                lResult = Chr(lColumn + 65) + lResult
+            Loop Until (aNumber < 0)
+        End If
+
+        Return lResult
+    End Function
 
     Private Function CumulativeAreaAboveSegment(ByVal aSegmentID As String) As Double
         'find the area above this segment id

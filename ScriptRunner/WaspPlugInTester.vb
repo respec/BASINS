@@ -1,12 +1,38 @@
-﻿Imports MapWinUtility
+﻿Imports MapWindow.Interfaces
+Imports MapWinUtility
 Imports atcMwGisUtility
 Imports atcUtility
 Imports atcWASP
 
-Module modWaspPlugInTester
-    Dim pBaseFolder As String = "C:\Basins\data\02060006\nhdplus02060006\hydrography"
-    chdriverdir(pbasefolder)
-    logger.ddg("StartWaspPlugInTester " & curdir)
-    Dim lWasp As New WASPProject
+Module WaspPlugInTester
+    Private Const pBaseDrive As String = "D:"
+    Private Const pBaseFolder As String = pBaseDrive & "\Basins\data\02060006\nhdplus02060006\hydrography\"
+    Private pSegmentLayerName As String = pBaseFolder & "nhdflowline.shp"
+    Private pSelectedFeatureIndicesArray() As Integer = {565, 570, 571, 581, 799}
+    Private pSelectedFeatureIndices As New ArrayList(pSelectedFeatureIndicesArray)
+    Private pTravelTime As Double = 0.25 'days???
 
+    Public Sub ScriptMain(ByRef aMapWin As IMapWin)
+        ChDriveDir(pBaseFolder)
+        Logger.Dbg("StartWaspPlugInTester " & CurDir())
+
+        If Not GisUtil.IsLayer(pSegmentLayerName) Then
+            GisUtil.AddLayer(pSegmentLayerName, "FlowLines")
+        End If
+        Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(pSegmentLayerName)
+        For Each lSelectedFeatureIndex As Integer In pSelectedFeatureIndices
+            GisUtil.SetSelectedFeature(lSegmentLayerIndex, lSelectedFeatureIndex)
+        Next
+
+        Dim lWasp As New WASPProject
+        With lWasp
+            .Name = "BatchWASPTest"
+            .SJDate = Jday(2000, 1, 1, 0, 0, 0)
+            .EJDate = Jday(2000, 12, 31, 0, 0, 0)
+
+            .GenerateSegments(lSegmentLayerIndex, pTravelTime)
+
+            .Save("Junk.txt")
+        End With
+    End Sub
 End Module

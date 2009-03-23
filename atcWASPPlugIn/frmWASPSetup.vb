@@ -1233,44 +1233,7 @@ Public Class frmWASPSetup
         'set file names for segments
         If cboStreams.SelectedIndex > -1 Then
             Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-            Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
-
-            'populate the SWMM classes from the shapefiles
-            With pPlugIn.WASPProject
-                .Segments.Clear()
-                Dim lTable As New atcUtility.atcTableDBF
-
-                'add only selected segments
-                Dim lTempSegments As New atcWASP.Segments
-                If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
-                    Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
-                    lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, pPlugIn.WASPProject.SegmentFieldMap), "Name"))
-                End If
-                Logger.Dbg("SegmentsCount " & lTempSegments.Count)
-
-                Dim lShapeIndex As Integer = -1
-                For Each lSegment As atcWASP.Segment In lTempSegments
-                    Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
-                    lSegment.InputTimeseriesCollection = lTimeseriesCollection
-                    lSegment.BaseID = lSegment.ID   'store segment id before breaking up
-                    lShapeIndex += 1
-                    GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
-                Next
-
-                'after reading the attribute table, see if any are selected
-                If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
-                    'put only selected segments in .segments 
-                    For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
-                        .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
-                    Next
-                Else
-                    'add all 
-                    .Segments = lTempSegments
-                End If
-
-                .GenerateSegments(CDbl(atxTravelTime.Text))
-
-            End With
+            pPlugIn.WASPProject.GenerateSegments(lSegmentLayerIndex, CDbl(atxTravelTime.Text))
 
             SetSegmentationGrid()
             SetFlowStationGrid()
