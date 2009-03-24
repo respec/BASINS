@@ -110,25 +110,35 @@ Public Class WASPProject
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
 
-            Dim lShapeIndex As Integer = -1
             For Each lSegment As atcWASP.Segment In lTempSegments
                 Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
                 lSegment.InputTimeseriesCollection = lTimeseriesCollection
                 lSegment.BaseID = lSegment.ID   'store segment id before breaking up
-                lShapeIndex += 1
-                GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
             Next
 
             'after reading the attribute table, see if any are selected
             If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
                 'put only selected segments in .segments 
                 For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
+                    Dim lShapeIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)
+                    Dim lSegment As atcWASP.Segment = lTempSegments(lShapeIndex)
+                    GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
+                    GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
                     .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
                 Next
+                Logger.Dbg("SegmentsCentroidsAndPoints")
             Else
                 'add all 
                 .Segments = lTempSegments
+                Dim lShapeIndex As Integer = -1
+                For Each lSegment As atcWASP.Segment In lTempSegments
+                    lShapeIndex += 1
+                    GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
+                    GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
+                Next
+                Logger.Dbg("SegmentsCentroidsAndPoints")
             End If
+
             'calculate depth and width from mean annual flow and mean annual velocity
             'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
             For Each lSegment As Segment In .Segments
@@ -169,6 +179,7 @@ Public Class WASPProject
                             End If
                             lNewSegment.Length = lSegment.Length / lBreakNumber
                             lNewSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) * lBreakIndex / lBreakNumber)
+                            BreakLineIntoNthPart(lSegment.PtsX, lSegment.PtsY, lBreakIndex, lBreakNumber, lNewSegment.PtsX, lNewSegment.PtsY)
                             lNewSegments.Add(lNewSegment)
                             lNewSegmentPositions.Add(lNewSegment.ID, lIndex)
                         Next
@@ -184,6 +195,11 @@ Public Class WASPProject
                         lSegment.DownID = lOldID & "B"
                         lSegment.Length = lSegment.Length / lBreakNumber
                         lSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) / lBreakNumber)
+                        Dim lPtsX(0) As Double
+                        Dim lPtsY(0) As Double
+                        BreakLineIntoNthPart(lSegment.PtsX, lSegment.PtsY, 1, lBreakNumber, lPtsX, lPtsY)
+                        lSegment.PtsX = lPtsX
+                        lSegment.PtsY = lPtsY
                     End If
                 Next
                 'if any new segments, add them now to the segments collection
@@ -204,27 +220,6 @@ Public Class WASPProject
             End If
         End With
     End Sub
-
-    Private Function IntegerToAlphabet(ByVal aNumber As Integer) As String
-        'given 1 returns 'A'
-        'given 26 returns 'Z'
-        'given 27 returns 'AA'
-        'given 28 returns 'AB'
-        Dim lResult As String = ""
-
-        If (26 > aNumber) Then
-            lResult = Chr(aNumber + 65)
-        Else
-            Dim lColumn As Integer
-            Do
-                lColumn = aNumber Mod 26
-                aNumber = (aNumber \ 26) - 1
-                lResult = Chr(lColumn + 65) + lResult
-            Loop Until (aNumber < 0)
-        End If
-
-        Return lResult
-    End Function
 
     Private Function CumulativeAreaAboveSegment(ByVal aSegmentID As String) As Double
         'find the area above this segment id
@@ -250,128 +245,21 @@ Public Class WASPProject
             lWASPShapefileName = lOutputPath & "\WASPSegments" & lIndex & ".shp"
         Loop
 
-        'figure out which shapes we want from old shapefile
-        Dim lShapeIds As New atcCollection
-        For Each lSegment As Segment In Me.Segments
-            If Not lShapeIds.Contains(lSegment.BaseID) Then
-                lShapeIds.Add(lSegment.BaseID)
-            End If
-        Next
-
-        'which field is mapped to the id?
-        Dim lIDFieldIndex As Integer
-        Dim lIDFieldName As String = "ID"
-        For lIndex = 0 To SegmentFieldMap.Count - 1
-            If SegmentFieldMap.ItemByIndex(lIndex) = "ID" Then
-                Dim lKey As String = SegmentFieldMap.Keys(lIndex)
-                If GisUtil.IsField(lSegmentLayerIndex, lKey) Then
-                    lIDFieldIndex = GisUtil.FieldIndex(lSegmentLayerIndex, lKey)
-                    lIDFieldName = lKey
-                End If
-            End If
-        Next
-
         'create the new empty shapefile
         GisUtil.CreateEmptyShapefile(lWASPShapefileName, "", "line")
         GisUtil.AddLayer(lWASPShapefileName, "WASP Segments")
         Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(lWASPShapefileName)
         GisUtil.LayerVisible(lNewLayerIndex) = True
         'add an id field to the new shapefile
-        Dim lNewIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, lIDFieldName, 0, 20)
+        Dim lNewIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "ID", 0, 20)
+        Dim lNewWASPIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "WASPID", 0, 20)
 
-        'find each desired shape
-        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lSegmentLayerIndex) - 1
-            For Each lShapeId As String In lShapeIds
-                If GisUtil.FieldValue(lSegmentLayerIndex, lFeatureIndex, lIDFieldIndex) = lShapeId Then
-                    'this is one of the shapes we want
-
-                    'how many shapes do we want to break this one into?
-                    Dim lCount As Integer = 0
-                    Dim lPieceIDs As New atcCollection
-                    For Each lSegment As Segment In Me.Segments
-                        If lSegment.BaseID = lShapeId Then
-                            lCount = lCount + 1
-                            lPieceIDs.Add(lSegment.ID)
-                        End If
-                    Next
-
-                    Dim lX() As Double = Nothing
-                    Dim lY() As Double = Nothing
-                    GisUtil.PointsOfLine(lSegmentLayerIndex, lFeatureIndex, lX, lY)
-
-                    If lCount = 1 Then
-                        'create line from these points in the new shapefile
-                        GisUtil.AddLine(lNewLayerIndex, lX, lY)
-                        GisUtil.SetFeatureValue(lNewLayerIndex, lNewIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lShapeId)
-                    Else
-                        'break this line into lcount pieces
-                        Dim lX2() As Double = Nothing
-                        Dim lY2() As Double = Nothing
-                        Dim lLineEndIndexes(lCount) As Integer
-                        BreakLine(lX, lY, lCount, lX2, lY2, lLineEndIndexes)
-                        For lLineIndex As Integer = 1 To lCount
-                            Dim lXTemp(lLineEndIndexes(lLineIndex) - lLineEndIndexes(lLineIndex - 1)) As Double
-                            Dim lYTemp(lLineEndIndexes(lLineIndex) - lLineEndIndexes(lLineIndex - 1)) As Double
-                            Dim lPointCounter As Integer = -1
-                            For lPoints As Integer = lLineEndIndexes(lLineIndex - 1) To lLineEndIndexes(lLineIndex)
-                                lPointCounter += 1
-                                lXTemp(lPointCounter) = lX2(lPoints)
-                                lYTemp(lPointCounter) = lY2(lPoints)
-                            Next
-                            GisUtil.AddLine(lNewLayerIndex, lXTemp, lYTemp)
-                            GisUtil.SetFeatureValue(lNewLayerIndex, lNewIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lPieceIDs(lLineIndex - 1))
-                        Next
-                    End If
-
-                End If
-            Next
+        'now add segments to the shapefile
+        For Each lSegment As Segment In Me.Segments
+            GisUtil.AddLine(lNewLayerIndex, lSegment.PtsX, lSegment.PtsY)
+            GisUtil.SetFeatureValue(lNewLayerIndex, lNewIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lSegment.ID)
+            GisUtil.SetFeatureValue(lNewLayerIndex, lNewWASPIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lSegment.WASPID)
         Next
-    End Sub
-
-    Private Sub BreakLine(ByVal aXOrig() As Double, ByVal aYOrig() As Double, ByVal aNumPieces As Integer, _
-                         ByRef aXNew() As Double, ByRef aYNew() As Double, ByRef aLineEndIndexes() As Integer)
-        'break a line into specified number of segments
-        'given XY coords of vertices, return XY coords of new vertices and index of endpoints within new xy points
-
-        'first compute total length and distance between points
-        Dim lTotalLength As Double = 0
-        Dim lDistance(aXOrig.GetUpperBound(0)) As Double
-        For lIndex As Integer = 1 To aXOrig.GetUpperBound(0)
-            lDistance(lIndex) = System.Math.Sqrt(((aXOrig(lIndex) - aXOrig(lIndex - 1)) ^ 2) + ((aYOrig(lIndex) - aYOrig(lIndex - 1)) ^ 2))
-            lTotalLength = lTotalLength + lDistance(lIndex)
-        Next
-
-        'find desired length
-        Dim lDesiredLength As Double = lTotalLength / aNumPieces
-
-        'build arrays to store all points including new points
-        ReDim aXNew(aXOrig.GetUpperBound(0) + aNumPieces - 1)
-        ReDim aYNew(aYOrig.GetUpperBound(0) + aNumPieces - 1)
-
-        'fill new array of points
-        Dim lPiece As Integer = 0
-        Dim lCumDist As Double = 0.0
-        For lIndex As Integer = 1 To lDistance.GetUpperBound(0)
-            If (lCumDist + lDistance(lIndex) > lDesiredLength) Then
-                'would be too much, need to calculate end point for this piece
-                aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 2) + ((aXOrig(lIndex - 1) - aXOrig(lIndex - 2)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-                aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 2) + ((aYOrig(lIndex - 1) - aYOrig(lIndex - 2)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-                aLineEndIndexes(lPiece + 1) = lIndex - 1 + lPiece  'save the index of this endpoint
-                lPiece += 1
-                lCumDist = lDistance(lIndex) * (1 - ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-                aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 1)
-                aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 1)
-            Else
-                'not long enough yet, just add point
-                aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 1)
-                aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 1)
-                lCumDist = lCumDist + lDistance(lIndex)
-            End If
-        Next
-        'close out the last piece
-        aXNew(aXNew.GetUpperBound(0)) = aXOrig(aXOrig.GetUpperBound(0))
-        aYNew(aYNew.GetUpperBound(0)) = aYOrig(aYOrig.GetUpperBound(0))
-        aLineEndIndexes(aNumPieces) = aXNew.GetUpperBound(0)
     End Sub
 
 End Class
