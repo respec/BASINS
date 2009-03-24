@@ -10,7 +10,8 @@ Module WaspPlugInTester
     Private pSegmentLayerName As String = pBaseFolder & "nhdflowline.shp"
     Private pSelectedFeatureIndicesArray() As Integer = {565, 570, 571, 581, 799}
     Private pSelectedFeatureIndices As New ArrayList(pSelectedFeatureIndicesArray)
-    Private pTravelTime As Double = 0.25 'days???
+    Private pMaxTravelTime As Double = 0.25 'days???
+    Private pMinTravelTime As Double = 0.05 'days???
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pBaseFolder)
@@ -30,7 +31,7 @@ Module WaspPlugInTester
             .SJDate = Jday(2000, 1, 1, 0, 0, 0)
             .EJDate = Jday(2000, 12, 31, 0, 0, 0)
 
-            .GenerateSegments(lSegmentLayerIndex, pTravelTime)
+            .GenerateSegments(lSegmentLayerIndex, pMaxTravelTime, pMinTravelTime)
 
             .Save("Junk.txt")
         End With

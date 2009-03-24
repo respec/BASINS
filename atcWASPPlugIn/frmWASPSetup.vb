@@ -74,7 +74,7 @@ Public Class frmWASPSetup
     Friend WithEvents AtcGridSegmentation As atcControls.atcGrid
     Friend WithEvents AtcGridLoad As atcControls.atcGrid
     Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents atxTravelTime As atcControls.atcText
+    Friend WithEvents atxTravelTimeMax As atcControls.atcText
     Friend WithEvents cmdFieldMapping As System.Windows.Forms.Button
     Friend WithEvents cmdCreateShapefile As System.Windows.Forms.Button
     Friend WithEvents cmdSelectConstituents As System.Windows.Forms.Button
@@ -86,6 +86,8 @@ Public Class frmWASPSetup
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents lblAir As System.Windows.Forms.Label
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents atxTravelTimeMin As atcControls.atcText
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -119,7 +121,7 @@ Public Class frmWASPSetup
         Me.cmdVolumes = New System.Windows.Forms.Button
         Me.cmdCreateShapefile = New System.Windows.Forms.Button
         Me.cmdFieldMapping = New System.Windows.Forms.Button
-        Me.atxTravelTime = New atcControls.atcText
+        Me.atxTravelTimeMax = New atcControls.atcText
         Me.Label2 = New System.Windows.Forms.Label
         Me.cmdGenerate = New System.Windows.Forms.Button
         Me.AtcGridSegmentation = New atcControls.atcGrid
@@ -130,15 +132,17 @@ Public Class frmWASPSetup
         Me.cmdSelectConstituents = New System.Windows.Forms.Button
         Me.AtcGridLoad = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.cbxWind = New System.Windows.Forms.ComboBox
+        Me.cbxSolar = New System.Windows.Forms.ComboBox
+        Me.cbxAir = New System.Windows.Forms.ComboBox
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.lblAir = New System.Windows.Forms.Label
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.lblAir = New System.Windows.Forms.Label
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.cbxAir = New System.Windows.Forms.ComboBox
-        Me.cbxSolar = New System.Windows.Forms.ComboBox
-        Me.cbxWind = New System.Windows.Forms.ComboBox
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.atxTravelTimeMin = New atcControls.atcText
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -514,10 +518,12 @@ Public Class frmWASPSetup
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.atxTravelTimeMin)
+        Me.TabPage2.Controls.Add(Me.Label6)
         Me.TabPage2.Controls.Add(Me.cmdVolumes)
         Me.TabPage2.Controls.Add(Me.cmdCreateShapefile)
         Me.TabPage2.Controls.Add(Me.cmdFieldMapping)
-        Me.TabPage2.Controls.Add(Me.atxTravelTime)
+        Me.TabPage2.Controls.Add(Me.atxTravelTimeMax)
         Me.TabPage2.Controls.Add(Me.Label2)
         Me.TabPage2.Controls.Add(Me.cmdGenerate)
         Me.TabPage2.Controls.Add(Me.AtcGridSegmentation)
@@ -555,28 +561,28 @@ Public Class frmWASPSetup
         Me.cmdFieldMapping.Text = "Field Mapping"
         Me.cmdFieldMapping.UseVisualStyleBackColor = True
         '
-        'atxTravelTime
+        'atxTravelTimeMax
         '
-        Me.atxTravelTime.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxTravelTime.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxTravelTime.DefaultValue = ""
-        Me.atxTravelTime.HardMax = -999
-        Me.atxTravelTime.HardMin = 0
-        Me.atxTravelTime.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxTravelTime.Location = New System.Drawing.Point(215, 16)
-        Me.atxTravelTime.MaxWidth = 20
-        Me.atxTravelTime.Name = "atxTravelTime"
-        Me.atxTravelTime.NumericFormat = "0.#####"
-        Me.atxTravelTime.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxTravelTime.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxTravelTime.SelLength = 1
-        Me.atxTravelTime.SelStart = 0
-        Me.atxTravelTime.Size = New System.Drawing.Size(48, 24)
-        Me.atxTravelTime.SoftMax = -999
-        Me.atxTravelTime.SoftMin = -999
-        Me.atxTravelTime.TabIndex = 6
-        Me.atxTravelTime.ValueDouble = 0
-        Me.atxTravelTime.ValueInteger = 0
+        Me.atxTravelTimeMax.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxTravelTimeMax.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxTravelTimeMax.DefaultValue = ""
+        Me.atxTravelTimeMax.HardMax = -999
+        Me.atxTravelTimeMax.HardMin = 0
+        Me.atxTravelTimeMax.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxTravelTimeMax.Location = New System.Drawing.Point(215, 16)
+        Me.atxTravelTimeMax.MaxWidth = 20
+        Me.atxTravelTimeMax.Name = "atxTravelTimeMax"
+        Me.atxTravelTimeMax.NumericFormat = "0.#####"
+        Me.atxTravelTimeMax.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxTravelTimeMax.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxTravelTimeMax.SelLength = 1
+        Me.atxTravelTimeMax.SelStart = 0
+        Me.atxTravelTimeMax.Size = New System.Drawing.Size(48, 24)
+        Me.atxTravelTimeMax.SoftMax = -999
+        Me.atxTravelTimeMax.SoftMin = -999
+        Me.atxTravelTimeMax.TabIndex = 6
+        Me.atxTravelTimeMax.ValueDouble = 0
+        Me.atxTravelTimeMax.ValueInteger = 0
         '
         'Label2
         '
@@ -589,9 +595,9 @@ Public Class frmWASPSetup
         '
         'cmdGenerate
         '
-        Me.cmdGenerate.Location = New System.Drawing.Point(271, 16)
+        Me.cmdGenerate.Location = New System.Drawing.Point(269, 20)
         Me.cmdGenerate.Name = "cmdGenerate"
-        Me.cmdGenerate.Size = New System.Drawing.Size(126, 25)
+        Me.cmdGenerate.Size = New System.Drawing.Size(126, 44)
         Me.cmdGenerate.TabIndex = 1
         Me.cmdGenerate.Text = "Regenerate"
         Me.cmdGenerate.UseVisualStyleBackColor = True
@@ -704,6 +710,60 @@ Public Class frmWASPSetup
         Me.TabPage6.Text = "Meteorologic Time Series"
         Me.TabPage6.UseVisualStyleBackColor = True
         '
+        'cbxWind
+        '
+        Me.cbxWind.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbxWind.FormattingEnabled = True
+        Me.cbxWind.Location = New System.Drawing.Point(164, 92)
+        Me.cbxWind.Name = "cbxWind"
+        Me.cbxWind.Size = New System.Drawing.Size(707, 25)
+        Me.cbxWind.TabIndex = 28
+        '
+        'cbxSolar
+        '
+        Me.cbxSolar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbxSolar.FormattingEnabled = True
+        Me.cbxSolar.Location = New System.Drawing.Point(164, 61)
+        Me.cbxSolar.Name = "cbxSolar"
+        Me.cbxSolar.Size = New System.Drawing.Size(707, 25)
+        Me.cbxSolar.TabIndex = 27
+        '
+        'cbxAir
+        '
+        Me.cbxAir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbxAir.FormattingEnabled = True
+        Me.cbxAir.Location = New System.Drawing.Point(164, 30)
+        Me.cbxAir.Name = "cbxAir"
+        Me.cbxAir.Size = New System.Drawing.Size(707, 25)
+        Me.cbxAir.TabIndex = 26
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(32, 95)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(85, 17)
+        Me.Label5.TabIndex = 25
+        Me.Label5.Text = "Wind Speed"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(32, 64)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(105, 17)
+        Me.Label3.TabIndex = 24
+        Me.Label3.Text = "Solar Radiation"
+        '
+        'lblAir
+        '
+        Me.lblAir.AutoSize = True
+        Me.lblAir.Location = New System.Drawing.Point(32, 33)
+        Me.lblAir.Name = "lblAir"
+        Me.lblAir.Size = New System.Drawing.Size(111, 17)
+        Me.lblAir.TabIndex = 23
+        Me.lblAir.Text = "Air Temperature"
+        '
         'GroupBox1
         '
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
@@ -735,59 +795,37 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
-        'lblAir
+        'Label6
         '
-        Me.lblAir.AutoSize = True
-        Me.lblAir.Location = New System.Drawing.Point(32, 33)
-        Me.lblAir.Name = "lblAir"
-        Me.lblAir.Size = New System.Drawing.Size(111, 17)
-        Me.lblAir.TabIndex = 23
-        Me.lblAir.Text = "Air Temperature"
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(20, 47)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(186, 17)
+        Me.Label6.TabIndex = 26
+        Me.Label6.Text = "Minimum Travel Time (days)"
         '
-        'Label3
+        'atxTravelTimeMin
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(32, 64)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(105, 17)
-        Me.Label3.TabIndex = 24
-        Me.Label3.Text = "Solar Radiation"
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(32, 95)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(85, 17)
-        Me.Label5.TabIndex = 25
-        Me.Label5.Text = "Wind Speed"
-        '
-        'cbxAir
-        '
-        Me.cbxAir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbxAir.FormattingEnabled = True
-        Me.cbxAir.Location = New System.Drawing.Point(164, 30)
-        Me.cbxAir.Name = "cbxAir"
-        Me.cbxAir.Size = New System.Drawing.Size(707, 25)
-        Me.cbxAir.TabIndex = 26
-        '
-        'cbxSolar
-        '
-        Me.cbxSolar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbxSolar.FormattingEnabled = True
-        Me.cbxSolar.Location = New System.Drawing.Point(164, 61)
-        Me.cbxSolar.Name = "cbxSolar"
-        Me.cbxSolar.Size = New System.Drawing.Size(707, 25)
-        Me.cbxSolar.TabIndex = 27
-        '
-        'cbxWind
-        '
-        Me.cbxWind.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbxWind.FormattingEnabled = True
-        Me.cbxWind.Location = New System.Drawing.Point(164, 92)
-        Me.cbxWind.Name = "cbxWind"
-        Me.cbxWind.Size = New System.Drawing.Size(707, 25)
-        Me.cbxWind.TabIndex = 28
+        Me.atxTravelTimeMin.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxTravelTimeMin.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxTravelTimeMin.DefaultValue = ""
+        Me.atxTravelTimeMin.HardMax = -999
+        Me.atxTravelTimeMin.HardMin = 0
+        Me.atxTravelTimeMin.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxTravelTimeMin.Location = New System.Drawing.Point(215, 44)
+        Me.atxTravelTimeMin.MaxWidth = 20
+        Me.atxTravelTimeMin.Name = "atxTravelTimeMin"
+        Me.atxTravelTimeMin.NumericFormat = "0.#####"
+        Me.atxTravelTimeMin.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxTravelTimeMin.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxTravelTimeMin.SelLength = 1
+        Me.atxTravelTimeMin.SelStart = 0
+        Me.atxTravelTimeMin.Size = New System.Drawing.Size(48, 24)
+        Me.atxTravelTimeMin.SoftMax = -999
+        Me.atxTravelTimeMin.SoftMin = -999
+        Me.atxTravelTimeMin.TabIndex = 27
+        Me.atxTravelTimeMin.ValueDouble = 0
+        Me.atxTravelTimeMin.ValueInteger = 0
         '
         'frmWASPSetup
         '
@@ -1181,7 +1219,7 @@ Public Class frmWASPSetup
         'set file names for segments
         If cboStreams.SelectedIndex > -1 Then
             Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-            pPlugIn.WASPProject.GenerateSegments(lSegmentLayerIndex, CDbl(atxTravelTime.Text))
+            pPlugIn.WASPProject.GenerateSegments(lSegmentLayerIndex, CDbl(atxTravelTimeMax.Text), CDbl(atxTravelTimeMin.Text))
 
             SetSegmentationGrid()
             SetFlowStationGrid()
@@ -1201,6 +1239,7 @@ Public Class frmWASPSetup
             Logger.Dbg("Begin")
 
             Dim lMaxTravelTime As Double = 0
+            Dim lMinTravelTime As Double = 1.0E+28
             With AtcGridSegmentation.Source
                 .Rows = 1 + pPlugIn.WASPProject.Segments.Count
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
@@ -1230,6 +1269,9 @@ Public Class frmWASPSetup
                     If lTravelTime > lMaxTravelTime Then
                         lMaxTravelTime = lTravelTime
                     End If
+                    If lTravelTime < lMinTravelTime Then
+                        lMinTravelTime = lTravelTime
+                    End If
                 Next
             End With
 
@@ -1238,7 +1280,8 @@ Public Class frmWASPSetup
             AtcGridSegmentation.Refresh()
 
             'If pInitializing Then
-            atxTravelTime.Text = lMaxTravelTime
+            atxTravelTimeMax.Text = lMaxTravelTime
+            atxTravelTimeMin.Text = lMinTravelTime
             'End If
 
             Logger.Dbg("SegmentationGrid refreshed")

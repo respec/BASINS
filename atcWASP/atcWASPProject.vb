@@ -103,7 +103,7 @@ Public Class WASPProject
         Return lTravelTime
     End Function
 
-    Sub GenerateSegments(ByVal lSegmentLayerIndex As Integer, ByVal aMaxTravelTime As Double)
+    Sub GenerateSegments(ByVal lSegmentLayerIndex As Integer, ByVal aMaxTravelTime As Double, ByVal aMinTravelTime As Double)
         With Me
             'populate the WASP classes from the shapefiles
             .Segments.Clear()
@@ -163,63 +163,14 @@ Public Class WASPProject
                 lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
             Next
 
+            'if a minimum travel time has been set, combine the segments as needed
+            If aMinTravelTime > 0 Then
+                CombineSegments(aMinTravelTime)
+            End If
+
             'if a maximum travel time has been set, divide the segments as needed
-            Dim lMaxTravelTime As Double = aMaxTravelTime
-            If lMaxTravelTime > 0 Then
-                Dim lNewSegments As New Segments
-                Dim lNewSegmentPositions As New atcCollection
-                For lIndex As Integer = 1 To .Segments.Count
-                    Dim lSegment As Segment = .Segments(lIndex - 1)
-                    If TravelTime(lSegment.Length, lSegment.Velocity) > lMaxTravelTime Then
-                        'need to break this segment into multiple
-                        Dim lBreakNumber As Integer = Int(TravelTime(lSegment.Length, lSegment.Velocity) / lMaxTravelTime) + 1
-                        'find cumulative drainage area above this segment
-                        Dim lCumAbove As Double = CumulativeAreaAboveSegment(lSegment.ID)
-                        'create the new pieces
-                        For lBreakIndex As Integer = 2 To lBreakNumber
-                            Dim lNewSegment As New Segment
-                            lNewSegment = lSegment.Clone
-                            lNewSegment.ID = lSegment.ID & IntegerToAlphabet(lBreakIndex - 1)
-                            If lBreakIndex < lBreakNumber Then
-                                lNewSegment.DownID = lSegment.ID & IntegerToAlphabet(lBreakIndex)
-                            Else
-                                lNewSegment.DownID = lSegment.DownID
-                            End If
-                            lNewSegment.Length = lSegment.Length / lBreakNumber
-                            lNewSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) * lBreakIndex / lBreakNumber)
-                            BreakLineIntoNthPart(lSegment.PtsX, lSegment.PtsY, lBreakIndex, lBreakNumber, lNewSegment.PtsX, lNewSegment.PtsY)
-                            lNewSegments.Add(lNewSegment)
-                            lNewSegmentPositions.Add(lNewSegment.ID, lIndex)
-                        Next
-                        'reset length and id for the original segment 
-                        Dim lOldID As String = lSegment.ID
-                        lSegment.ID = lOldID & "A"
-                        'if this segment id shows up as a downid anywhere else, change it
-                        For Each lTempSeg As Segment In .Segments
-                            If lTempSeg.DownID = lOldID Then
-                                lTempSeg.DownID = lSegment.ID
-                            End If
-                        Next
-                        lSegment.DownID = lOldID & "B"
-                        lSegment.Length = lSegment.Length / lBreakNumber
-                        lSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) / lBreakNumber)
-                        Dim lPtsX(0) As Double
-                        Dim lPtsY(0) As Double
-                        BreakLineIntoNthPart(lSegment.PtsX, lSegment.PtsY, 1, lBreakNumber, lPtsX, lPtsY)
-                        lSegment.PtsX = lPtsX
-                        lSegment.PtsY = lPtsY
-                    End If
-                Next
-                'if any new segments, add them now to the segments collection
-                For lIndex As Integer = lNewSegments.Count To 1 Step -1
-                    .Segments.Insert(lNewSegmentPositions(lIndex - 1), lNewSegments(lIndex - 1))
-                Next
-                'because some keys have changes, clear all out and add back in
-                lNewSegments.Clear()
-                For Each lSegment As Segment In .Segments
-                    lNewSegments.Add(lSegment)
-                Next
-                .Segments = lNewSegments
+            If aMaxTravelTime > 0 Then
+                DivideSegments(aMaxTravelTime)
             End If
 
             Dim lProblem As String = .Segments.AssignWaspIds()
@@ -227,6 +178,67 @@ Public Class WASPProject
                 Logger.Dbg("ProblemInGenerateSegmentsAssignWaspIds " & lProblem)
             End If
         End With
+    End Sub
+
+    Sub CombineSegments(ByVal aMinTravelTime As Double)
+
+    End Sub
+
+    Sub DivideSegments(ByVal aMaxTravelTime As Double)
+        Dim lNewSegments As New Segments
+        Dim lNewSegmentPositions As New atcCollection
+        For lIndex As Integer = 1 To Segments.Count
+            Dim lSegment As Segment = Segments(lIndex - 1)
+            If TravelTime(lSegment.Length, lSegment.Velocity) > aMaxTravelTime Then
+                'need to break this segment into multiple
+                Dim lBreakNumber As Integer = Int(TravelTime(lSegment.Length, lSegment.Velocity) / aMaxTravelTime) + 1
+                'find cumulative drainage area above this segment
+                Dim lCumAbove As Double = CumulativeAreaAboveSegment(lSegment.ID)
+                'create the new pieces
+                For lBreakIndex As Integer = 2 To lBreakNumber
+                    Dim lNewSegment As New Segment
+                    lNewSegment = lSegment.Clone
+                    lNewSegment.ID = lSegment.ID & IntegerToAlphabet(lBreakIndex - 1)
+                    If lBreakIndex < lBreakNumber Then
+                        lNewSegment.DownID = lSegment.ID & IntegerToAlphabet(lBreakIndex)
+                    Else
+                        lNewSegment.DownID = lSegment.DownID
+                    End If
+                    lNewSegment.Length = lSegment.Length / lBreakNumber
+                    lNewSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) * lBreakIndex / lBreakNumber)
+                    BreakLineIntoNthPart(lSegment.PtsX, lSegment.PtsY, lBreakIndex, lBreakNumber, lNewSegment.PtsX, lNewSegment.PtsY)
+                    lNewSegments.Add(lNewSegment)
+                    lNewSegmentPositions.Add(lNewSegment.ID, lIndex)
+                Next
+                'reset length and id for the original segment 
+                Dim lOldID As String = lSegment.ID
+                lSegment.ID = lOldID & "A"
+                'if this segment id shows up as a downid anywhere else, change it
+                For Each lTempSeg As Segment In Segments
+                    If lTempSeg.DownID = lOldID Then
+                        lTempSeg.DownID = lSegment.ID
+                    End If
+                Next
+                lSegment.DownID = lOldID & "B"
+                lSegment.Length = lSegment.Length / lBreakNumber
+                lSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) / lBreakNumber)
+                Dim lPtsX(0) As Double
+                Dim lPtsY(0) As Double
+                BreakLineIntoNthPart(lSegment.PtsX, lSegment.PtsY, 1, lBreakNumber, lPtsX, lPtsY)
+                lSegment.PtsX = lPtsX
+                lSegment.PtsY = lPtsY
+            End If
+        Next
+        'if any new segments, add them now to the segments collection
+        For lIndex As Integer = lNewSegments.Count To 1 Step -1
+            Segments.Insert(lNewSegmentPositions(lIndex - 1), lNewSegments(lIndex - 1))
+        Next
+        'because some keys have changes, clear all out and add back in
+        lNewSegments.Clear()
+        For Each lSegment As Segment In Segments
+            lNewSegments.Add(lSegment)
+        Next
+        Segments = lNewSegments
     End Sub
 
     Private Function CumulativeAreaAboveSegment(ByVal aSegmentID As String) As Double
