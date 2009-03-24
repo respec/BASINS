@@ -828,12 +828,6 @@ Public Class frmWASPSetup
     Friend pBasinsFolder As String
     Friend pfrmWASPFieldMapping As frmWASPFieldMapping
 
-    Friend pFlowStationCandidates As WASPTimeseriesCollection
-    Friend pAirTempStationCandidates As WASPTimeseriesCollection
-    Friend pSolRadStationCandidates As WASPTimeseriesCollection
-    Friend pWindStationCandidates As WASPTimeseriesCollection
-    Friend pWaterTempStationCandidates As WASPTimeseriesCollection
-
     Private pSelectedRow As Integer
     Private pSelectedColumn As Integer
 
@@ -891,7 +885,7 @@ Public Class frmWASPSetup
             Next
         End With
 
-        RebuildTimeseriesCollections()
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
 
         'check that specified dates are valid
         Dim lSJDate As Double = 0.0
@@ -974,49 +968,6 @@ Public Class frmWASPSetup
         Logger.Flush()
     End Sub
 
-    Friend Sub RebuildTimeseriesCollections()
-        'clear out collections of timeseries prior to rebuilding
-        pPlugIn.WASPProject.InputTimeseriesCollection.Clear()
-        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-            pPlugIn.WASPProject.Segments(lIndex - 1).InputTimeseriesCollection.Clear()
-        Next
-
-        'build collections of timeseries 
-        Dim lKeyString As String = ""
-        For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-            'input flows 
-            lKeyString = "FLOW:" & AtcGridFlow.Source.CellValue(lIndex, 1)
-            If AtcGridFlow.Source.CellValue(lIndex, 1) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pFlowStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-            'need to add other wq loads
-            lKeyString = "WTMP:" & AtcGridLoad.Source.CellValue(lIndex, 1)
-            If AtcGridLoad.Source.CellValue(lIndex, 1) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, pWaterTempStationCandidates, pPlugIn.WASPProject, pPlugIn.WASPProject.Segments(lIndex - 1))
-            End If
-        Next
-        'met timeseries are not segment-specific
-        'air temp
-        If cbxAir.SelectedItem <> "<none>" Then
-            lKeyString = "ATMP:" & cbxAir.SelectedItem
-            AddSelectedTimeseriesToWASPProject(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject)
-            lKeyString = "ATEM:" & cbxAir.SelectedItem
-            AddSelectedTimeseriesToWASPProject(lKeyString, pAirTempStationCandidates, pPlugIn.WASPProject)
-        End If
-        'sol rad
-        If cbxSolar.SelectedItem <> "<none>" Then
-            lKeyString = "SOLR:" & cbxSolar.SelectedItem
-            AddSelectedTimeseriesToWASPProject(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject)
-            lKeyString = "SOLRAD:" & cbxSolar.SelectedItem
-            AddSelectedTimeseriesToWASPProject(lKeyString, pSolRadStationCandidates, pPlugIn.WASPProject)
-        End If
-        'wind 
-        If cbxWind.SelectedItem <> "<none>" Then
-            lKeyString = "WIND:" & cbxWind.SelectedItem
-            AddSelectedTimeseriesToWASPProject(lKeyString, pWindStationCandidates, pPlugIn.WASPProject)
-        End If
-    End Sub
-
     Private Function PreProcessChecking(ByVal aOutputFileName As String) As Boolean
         Logger.Dbg("PreprocessChecking " & aOutputFileName)
 
@@ -1037,12 +988,6 @@ Public Class frmWASPSetup
         EnableControls(False)
         pPlugIn = aPlugIn
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-
-        pFlowStationCandidates = New WASPTimeseriesCollection
-        pAirTempStationCandidates = New WASPTimeseriesCollection
-        pSolRadStationCandidates = New WASPTimeseriesCollection
-        pWindStationCandidates = New WASPTimeseriesCollection
-        pWaterTempStationCandidates = New WASPTimeseriesCollection
 
         cboMet.Items.Add("<none>")
 
@@ -1183,28 +1128,31 @@ Public Class frmWASPSetup
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         EnableControls(False)
 
-        BuildListofValidStationNames("FLOW", pFlowStationCandidates)
-        BuildListofValidStationNames("WTMP", pWaterTempStationCandidates)
-        BuildListofValidStationNames("ATMP", pAirTempStationCandidates)
-        BuildListofValidStationNames("ATEM", pAirTempStationCandidates)
-        BuildListofValidStationNames("SOLRAD", pSolRadStationCandidates)
-        BuildListofValidStationNames("SOLR", pSolRadStationCandidates)
-        BuildListofValidStationNames("WIND", pWindStationCandidates)
+        'TODO: move to atcWASP???
+        With pPlugIn.WASPProject
+            .BuildListofValidStationNames("FLOW", .FlowStationCandidates)
+            .BuildListofValidStationNames("WTMP", .WaterTempStationCandidates)
+            .BuildListofValidStationNames("ATMP", .AirTempStationCandidates)
+            .BuildListofValidStationNames("ATEM", .AirTempStationCandidates)
+            .BuildListofValidStationNames("SOLRAD", .SolRadStationCandidates)
+            .BuildListofValidStationNames("SOLR", .SolRadStationCandidates)
+            .BuildListofValidStationNames("WIND", .WindStationCandidates)
 
-        'set layer index for met stations
-        If cboMet.SelectedIndex > 0 Then
-            Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
-            GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
-            GetMetStationCoordinates(lMetLayerIndex, pAirTempStationCandidates)
-            GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
-            GetMetStationCoordinates(lMetLayerIndex, pSolRadStationCandidates)
-            GetMetStationCoordinates(lMetLayerIndex, pWindStationCandidates)
+            'set layer index for met stations
+            If cboMet.SelectedIndex > 0 Then
+                Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
+                .GetMetStationCoordinates(lMetLayerIndex, .AirTempStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .AirTempStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .SolRadStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .SolRadStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .WindStationCandidates)
 
-            'redo to set valid values
-            SetFlowStationGrid()
-            SetLoadStationGrid()
-            SetMetStationValidValues()
-        End If
+                'redo to set valid values
+                SetFlowStationGrid()
+                SetLoadStationGrid()
+                SetMetStationValidValues()
+            End If
+        End With
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
@@ -1310,7 +1258,7 @@ Public Class frmWASPSetup
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).CumulativeDrainageArea
                     .CellValue(lIndex, 2) = "<none>"
-                    If pFlowStationCandidates.Count > 0 Then
+                    If pPlugIn.WASPProject.FlowStationCandidates.Count > 0 Then
                         .CellEditable(lIndex, 2) = True
                     Else
                         .CellEditable(lIndex, 2) = False
@@ -1321,7 +1269,7 @@ Public Class frmWASPSetup
             Logger.Dbg("SetValidValues")
             Dim lValidValues As New atcCollection
             lValidValues.Add("<none>")
-            For Each lFlowStation As WASPTimeseries In pFlowStationCandidates
+            For Each lFlowStation As WASPTimeseries In pPlugIn.WASPProject.FlowStationCandidates
                 lValidValues.Add(lFlowStation.Description)
             Next
             AtcGridFlow.ValidValues = lValidValues
@@ -1344,7 +1292,7 @@ Public Class frmWASPSetup
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     .CellValue(lIndex, 1) = "<none>"
-                    If pWaterTempStationCandidates.Count > 0 Then
+                    If pPlugIn.WASPProject.WaterTempStationCandidates.Count > 0 Then
                         .CellValue(lIndex, 1) = "<none>"
                         .CellEditable(lIndex, 1) = True
                     Else
@@ -1356,7 +1304,7 @@ Public Class frmWASPSetup
             Logger.Dbg("SetValidValues")
             Dim lValidValues As New atcCollection
             lValidValues.Add("<none>")
-            For Each lWaterTempStation As WASPTimeseries In pWaterTempStationCandidates
+            For Each lWaterTempStation As WASPTimeseries In pPlugIn.WASPProject.WaterTempStationCandidates
                 lValidValues.Add(lWaterTempStation.Description)
             Next
             AtcGridLoad.ValidValues = lValidValues
@@ -1368,7 +1316,6 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub SetMetStationValidValues()
-
         cbxAir.Items.Clear()
         cbxAir.Items.Add("<none>")
 
@@ -1378,108 +1325,21 @@ Public Class frmWASPSetup
         cbxWind.Items.Clear()
         cbxWind.Items.Add("<none>")
 
-        For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
+        For Each lStationCandidate As WASPTimeseries In pPlugIn.WASPProject.AirTempStationCandidates
             cbxAir.Items.Add(lStationCandidate.Description)
         Next
 
-        For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
+        For Each lStationCandidate As WASPTimeseries In pPlugIn.WASPProject.SolRadStationCandidates
             cbxSolar.Items.Add(lStationCandidate.Description)
         Next
 
-        For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
+        For Each lStationCandidate As WASPTimeseries In pPlugIn.WASPProject.WindStationCandidates
             cbxWind.Items.Add(lStationCandidate.Description)
         Next
 
-        'default met stations based on distance
-        Dim lXSum As Double = 0
-        Dim lYSum As Double = 0
-        For Each lSegment As Segment In pPlugIn.WASPProject.Segments
-            'find average segment centroid 
-            lXSum = lXSum + lSegment.CentroidX
-            lYSum = lYSum + lSegment.CentroidY
-        Next
-        Dim lXAvg As Double = 0
-        Dim lYAvg As Double = 0
-        If pPlugIn.WASPProject.Segments.Count > 0 Then
-            lXAvg = lXSum / pPlugIn.WASPProject.Segments.Count
-            lYAvg = lYSum / pPlugIn.WASPProject.Segments.Count
-        Else
-            cbxAir.SelectedIndex = 0
-            cbxSolar.SelectedIndex = 0
-            cbxWind.SelectedIndex = 0
-        End If
-
-        If pPlugIn.WASPProject.Segments.Count > 0 Then
-            'for each valid value, find distance
-            Dim lShortestDistance As Double = 1.0E+28
-            Dim lDistance As Double = 0.0
-            Dim lClosestIndex As Integer = 0
-            Dim lStationIndex As Integer = 0
-            For Each lStationCandidate As WASPTimeseries In pAirTempStationCandidates
-                lStationIndex += 1
-                lDistance = CalculateDistance(lXAvg, lYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
-                If lDistance < lShortestDistance Then
-                    lShortestDistance = lDistance
-                    lClosestIndex = lStationIndex
-                End If
-            Next
-            cbxAir.SelectedIndex = lClosestIndex
-
-            lShortestDistance = 1.0E+28
-            lDistance = 0.0
-            lClosestIndex = 0
-            lStationIndex = 0
-            For Each lStationCandidate As WASPTimeseries In pSolRadStationCandidates
-                lStationIndex += 1
-                lDistance = CalculateDistance(lXAvg, lYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
-                If lDistance < lShortestDistance Then
-                    lShortestDistance = lDistance
-                    lClosestIndex = lStationIndex
-                End If
-            Next
-            cbxSolar.SelectedIndex = lClosestIndex
-
-            lShortestDistance = 1.0E+28
-            lDistance = 0.0
-            lClosestIndex = 0
-            lStationIndex = 0
-            For Each lStationCandidate As WASPTimeseries In pWindStationCandidates
-                lStationIndex += 1
-                lDistance = CalculateDistance(lXAvg, lYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
-                If lDistance < lShortestDistance Then
-                    lShortestDistance = lDistance
-                    lClosestIndex = lStationIndex
-                End If
-            Next
-            cbxWind.SelectedIndex = lClosestIndex
-        End If
+        pPlugIn.WASPProject.DefaultClosestMetStation(cbxAir.SelectedIndex, cbxSolar.SelectedIndex, cbxWind.SelectedIndex)
 
     End Sub
-
-    Friend Function GetMetFile(ByRef aMetWDMName As String) As atcWDM.atcDataSourceWDM
-        Logger.Dbg("MetWDMName " & aMetWDMName)
-
-        Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
-        If FileExists(aMetWDMName) Then
-            Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
-                    'found it in the BASINS data sources
-                    lDataSource = lBASINSDataSource
-                    lFound = True
-                    Exit For
-                End If
-            Next
-
-            If Not lFound Then 'need to open it here
-                lDataSource = New atcWDM.atcDataSourceWDM
-                If lDataSource.Open(aMetWDMName) Then
-                    lFound = True
-                End If
-            End If
-        End If
-        Return lDataSource
-    End Function
 
     Private Sub cmdFieldMapping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFieldMapping.Click
         Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
@@ -1562,17 +1422,17 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cbxAir_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxAir.SelectedIndexChanged
-        RebuildTimeseriesCollections()
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
         SetDates()
     End Sub
 
     Private Sub cbxSolar_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxSolar.SelectedIndexChanged
-        RebuildTimeseriesCollections()
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
         SetDates()
     End Sub
 
     Private Sub cbxWind_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxWind.SelectedIndexChanged
-        RebuildTimeseriesCollections()
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
         SetDates()
     End Sub
 End Class

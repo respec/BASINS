@@ -1,6 +1,8 @@
 Imports MapWinUtility
 Imports System.Text
 Imports atcUtility
+Imports atcData
+Imports atcControls
 Imports atcMwGisUtility
 
 Public Class WASPProject
@@ -11,6 +13,12 @@ Public Class WASPProject
     Public Name As String = ""
     Public WNFFileName As String = ""
     Public SegmentFieldMap As New atcCollection
+
+    Public FlowStationCandidates As New WASPTimeseriesCollection
+    Public AirTempStationCandidates As New WASPTimeseriesCollection
+    Public SolRadStationCandidates As New WASPTimeseriesCollection
+    Public WindStationCandidates As New WASPTimeseriesCollection
+    Public WaterTempStationCandidates As New WASPTimeseriesCollection
 
     Public Sub New()
         Name = ""
@@ -262,4 +270,159 @@ Public Class WASPProject
         Next
     End Sub
 
+    Public Sub AddSelectedTimeseriesToWASPSegment(ByVal aKeyString As String, _
+                                                  ByRef aStationCandidates As WASPTimeseriesCollection, _
+                                                  ByRef aWASPProject As WASPProject, _
+                                                  ByRef aSegment As Segment)
+
+        'need to make sure this timeseries is in the class structure
+        If aStationCandidates.Contains(aKeyString) Then
+            If aWASPProject.InputTimeseriesCollection.Contains(aKeyString) Then
+                'already in the project, just reference it from this segment
+                aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+            Else
+                'not yet in the project, add it
+                Dim lTimeseries As atcTimeseries = GetTimeseries(aStationCandidates(aKeyString).DataSourceName, aStationCandidates(aKeyString).ID)
+                If lTimeseries Is Nothing Then
+                    Logger.Dbg("Could not find timeseries " & aKeyString)
+                Else
+                    aStationCandidates(aKeyString).TimeSeries = lTimeseries
+                    aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                    aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                End If
+            End If
+        End If
+    End Sub
+
+    Public Sub AddSelectedTimeseriesToWASPProject(ByVal aKeyString As String, _
+                                                  ByRef aStationCandidates As WASPTimeseriesCollection, _
+                                                  ByRef aWASPProject As WASPProject)
+
+        'need to make sure this timeseries is in the class structure
+        If aStationCandidates.Contains(aKeyString) Then
+            If aWASPProject.InputTimeseriesCollection.Contains(aKeyString) Then
+                'already in the project, just reference it from this segment
+            Else
+                'not yet in the project, add it
+                Dim lTimeseries As atcTimeseries = GetTimeseries(aStationCandidates(aKeyString).DataSourceName, aStationCandidates(aKeyString).ID)
+                If lTimeseries Is Nothing Then
+                    Logger.Dbg("Could not find timeseries " & aKeyString)
+                Else
+                    aStationCandidates(aKeyString).TimeSeries = lTimeseries
+                    aWASPProject.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
+                End If
+            End If
+        End If
+    End Sub
+
+    Public Sub RebuildTimeseriesCollections(ByVal aAirName As String, ByVal aSolarName As String, ByVal aWindName As String, _
+                                            ByVal aGridFlowSource As atcGridSource, ByVal aGridLoadSource As atcGridSource)
+        'clear out collections of timeseries prior to rebuilding
+        InputTimeseriesCollection.Clear()
+        For lIndex As Integer = 1 To Segments.Count
+            Segments(lIndex - 1).InputTimeseriesCollection.Clear()
+        Next
+
+        'build collections of timeseries 
+        Dim lKeyString As String = ""
+        For lIndex As Integer = 1 To Segments.Count
+            'input flows 
+            lKeyString = "FLOW:" & aGridFlowSource.CellValue(lIndex, 1)
+            If aGridFlowSource.CellValue(lIndex, 1) <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lKeyString, FlowStationCandidates, Me, Segments(lIndex - 1))
+            End If
+            'need to add other wq loads
+            lKeyString = "WTMP:" & aGridLoadSource.CellValue(lIndex, 1)
+            If aGridLoadSource.CellValue(lIndex, 1) <> "<none>" Then
+                AddSelectedTimeseriesToWASPSegment(lKeyString, WaterTempStationCandidates, Me, Segments(lIndex - 1))
+            End If
+        Next
+        'met timeseries are not segment-specific
+        'air temp
+        If aAirName <> "<none>" Then
+            lKeyString = "ATMP:" & aAirName
+            AddSelectedTimeseriesToWASPProject(lKeyString, AirTempStationCandidates, Me)
+            lKeyString = "ATEM:" & aAirName
+            AddSelectedTimeseriesToWASPProject(lKeyString, AirTempStationCandidates, Me)
+        End If
+        'sol rad
+        If aSolarName <> "<none>" Then
+            lKeyString = "SOLR:" & aSolarName
+            AddSelectedTimeseriesToWASPProject(lKeyString, SolRadStationCandidates, Me)
+            lKeyString = "SOLRAD:" & aSolarName
+            AddSelectedTimeseriesToWASPProject(lKeyString, SolRadStationCandidates, Me)
+        End If
+        'wind 
+        If aWindName <> "<none>" Then
+            lKeyString = "WIND:" & aWindName
+            AddSelectedTimeseriesToWASPProject(lKeyString, WindStationCandidates, Me)
+        End If
+    End Sub
+
+    Public Sub BuildListofValidStationNames(ByRef aConstituent As String, _
+                                            ByVal aStationCandidates As WASPTimeseriesCollection)
+
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+            BuildListofValidStationNamesFromDataSource(lDataSource, aConstituent, aStationCandidates)
+        Next
+
+    End Sub
+
+    Public Sub GetMetStationCoordinates(ByVal aMetLayerIndex As Integer, ByVal aStationCandidates As WASPTimeseriesCollection)
+        Dim lFieldIndex As Integer = 1
+        If GisUtil.IsField(aMetLayerIndex, "LOCATION") Then
+            lFieldIndex = GisUtil.FieldIndex(aMetLayerIndex, "LOCATION")
+        End If
+
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(aMetLayerIndex) - 1
+            Dim lTempID As String = GisUtil.FieldValue(aMetLayerIndex, lFeatureIndex, lFieldIndex)
+            For Each lStationCandidate As WASPTimeseries In aStationCandidates
+                If lStationCandidate.Identifier = lTempID Then
+                    'found a timeseries, add the coordinates
+                    GisUtil.PointXY(aMetLayerIndex, lFeatureIndex, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                End If
+            Next
+        Next
+    End Sub
+
+    Public Sub DefaultClosestMetStation(ByVal aAirIndex As Integer, ByVal aSolarIndex As Integer, ByVal aWindIndex As Integer)
+        'default met stations based on distance
+        Dim lXSum As Double = 0
+        Dim lYSum As Double = 0
+        For Each lSegment As Segment In Segments
+            'find average segment centroid 
+            lXSum = lXSum + lSegment.CentroidX
+            lYSum = lYSum + lSegment.CentroidY
+        Next
+        Dim lXAvg As Double = 0
+        Dim lYAvg As Double = 0
+        If Segments.Count > 0 Then
+            lXAvg = lXSum / Segments.Count
+            lYAvg = lYSum / Segments.Count
+            aAirIndex = FindClosestMetStation(AirTempStationCandidates, lXAvg, lYAvg)
+            aSolarIndex = FindClosestMetStation(SolRadStationCandidates, lXAvg, lYAvg)
+            aSolarIndex = FindClosestMetStation(WindStationCandidates, lXAvg, lYAvg)
+        Else
+            aAirIndex = 0
+            aSolarIndex = 0
+            aWindIndex = 0
+        End If
+    End Sub
+
+    Private Function FindClosestMetStation(ByVal aStationList As WASPTimeseriesCollection, ByVal aXAvg As Double, ByVal aYAvg As Double) As Integer
+        'for each valid value, find distance
+        Dim lShortestDistance As Double = 1.0E+28
+        Dim lDistance As Double = 0.0
+        Dim lClosestIndex As Integer = 0
+        Dim lStationIndex As Integer = 0
+        For Each lStationCandidate As WASPTimeseries In aStationList
+            lStationIndex += 1
+            lDistance = CalculateDistance(aXAvg, aYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
+            If lDistance < lShortestDistance Then
+                lShortestDistance = lDistance
+                lClosestIndex = lStationIndex
+            End If
+        Next
+        Return lClosestIndex
+    End Function
 End Class
