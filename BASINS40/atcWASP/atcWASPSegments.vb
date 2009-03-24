@@ -153,6 +153,8 @@ Public Class Segment
     Public BaseID As String = ""  'the id of the segment before breaking it up
     Public CentroidX As Double
     Public CentroidY As Double
+    Public PtsX() As Double
+    Public PtsY() As Double
     Public CumulativeDrainageArea As Double
     Public MeanAnnualFlow As Double
     Public WASPID As Integer
@@ -171,6 +173,8 @@ Public Class Segment
         lNewSegment.BaseID = Me.BaseID
         lNewSegment.CentroidX = Me.CentroidX
         lNewSegment.CentroidY = Me.CentroidY
+        lNewSegment.PtsX = Me.PtsX
+        lNewSegment.PtsY = Me.PtsY
         lNewSegment.CumulativeDrainageArea = Me.CumulativeDrainageArea
         lNewSegment.MeanAnnualFlow = Me.MeanAnnualFlow
         lNewSegment.WASPID = Me.WASPID
