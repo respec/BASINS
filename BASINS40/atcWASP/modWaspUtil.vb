@@ -32,8 +32,8 @@ Module modWaspUtil
         'first compute total length and distance between points
         Dim lTotalLength As Double = 0
         Dim lDistance(aOrigX.GetUpperBound(0)) As Double
-        For lIndex As Integer = 1 To aOrigX.GetUpperBound(0)
-            lDistance(lIndex) = System.Math.Sqrt(((aOrigX(lIndex) - aOrigX(lIndex - 1)) ^ 2) + ((aOrigY(lIndex) - aOrigY(lIndex - 1)) ^ 2))
+        For lIndex As Integer = 0 To aOrigX.GetUpperBound(0) - 1
+            lDistance(lIndex) = System.Math.Sqrt(((aOrigX(lIndex + 1) - aOrigX(lIndex)) ^ 2) + ((aOrigY(lIndex + 1) - aOrigY(lIndex)) ^ 2))
             lTotalLength = lTotalLength + lDistance(lIndex)
         Next
 
@@ -50,27 +50,59 @@ Module modWaspUtil
         Dim lPtCount As Integer = 0
         lXNew(0) = aOrigX(0)
         lYNew(0) = aOrigY(0)
-        For lIndex As Integer = 1 To lDistance.GetUpperBound(0)
+        Dim lStartTrimDistance As Double = 0
+        Dim lDistanceToNextPoint As Double = 0
+        Dim lEndingTrimDistance As Double = 0
+        Dim lDistanceToThisPoint As Double = 0
+        For lIndex As Integer = 0 To lDistance.GetUpperBound(0) - 1
             lCumDist = lCumDist + lDistance(lIndex)
-            If lCumDist < lStartingDistance Then
+            If (lStartingDistance = 0 And lIndex = 0) Then
+                'want the very beginning of the line, store this point in first position for future use
+                lXNew(0) = aOrigX(lIndex)
+                lYNew(0) = aOrigY(lIndex)
+            ElseIf lCumDist < lStartingDistance Then
                 'store this point in first position for future use
-                lXNew(0) = aOrigX(lIndex - 1)
-                lYNew(0) = aOrigY(lIndex - 1)
+                lXNew(0) = aOrigX(lIndex)
+                lYNew(0) = aOrigY(lIndex)
+                lStartTrimDistance = lStartingDistance - lCumDist
+                lDistanceToNextPoint = lDistance(lIndex + 1)
             ElseIf lCumDist > lStartingDistance And lCumDist < lEndingDistance Then
                 'store this point and keep going
                 lPtCount += 1
-                lXNew(lPtCount) = aOrigX(lIndex - 1)
-                lYNew(lPtCount) = aOrigY(lIndex - 1)
-            ElseIf lCumDist >= lEndingDistance Then
+                lXNew(lPtCount) = aOrigX(lIndex)
+                lYNew(lPtCount) = aOrigY(lIndex)
+            ElseIf lCumDist > lEndingDistance Then
                 'would be too much, store this point and stop
                 lPtCount += 1
-                lXNew(lPtCount) = aOrigX(lIndex - 1)
-                lYNew(lPtCount) = aOrigY(lIndex - 1)
+                lXNew(lPtCount) = aOrigX(lIndex)
+                lYNew(lPtCount) = aOrigY(lIndex)
+                lEndingTrimDistance = lCumDist - lEndingDistance
+                lDistanceToThisPoint = lDistance(lIndex)
+                Exit For
+            ElseIf lCumDist = lEndingDistance Then
+                'exactly the right amount, store this last line segment and stop
+                lPtCount += 1
+                lXNew(lPtCount) = aOrigX(lIndex)
+                lYNew(lPtCount) = aOrigY(lIndex)
+                lPtCount += 1
+                lXNew(lPtCount) = aOrigX(lIndex + 1)
+                lYNew(lPtCount) = aOrigY(lIndex + 1)
+                lEndingTrimDistance = 0
                 Exit For
             End If
         Next
 
-        'todo: pts 0 and lptcount need to be trimmed down to size
+        'pts 0 and lptcount need to be trimmed down to size
+        If lStartTrimDistance > 0 And lDistanceToNextPoint > 0 Then
+            'trim starting point
+            lXNew(0) = lXNew(0) + ((lXNew(1) - lXNew(0)) * ((lStartTrimDistance) / lDistanceToNextPoint))
+            lYNew(0) = lYNew(0) + ((lYNew(1) - lYNew(0)) * ((lStartTrimDistance) / lDistanceToNextPoint))
+        End If
+        If lEndingTrimDistance > 0 And lDistanceToThisPoint > 0 Then
+            'trim ending point
+            lXNew(lPtCount) = lXNew(lPtCount) - ((lXNew(lPtCount) - lXNew(lPtCount - 1)) * (lEndingTrimDistance / lDistanceToThisPoint))
+            lYNew(lPtCount) = lYNew(lPtCount) - ((lYNew(lPtCount) - lYNew(lPtCount - 1)) * (lEndingTrimDistance / lDistanceToThisPoint))
+        End If
 
         'return an array of the proper size
         ReDim aNewX(lPtCount)
@@ -80,26 +112,6 @@ Module modWaspUtil
             aNewY(lIndex) = lYNew(lIndex)
         Next
 
-        '    If (lCumDist + lDistance(lIndex) > lDesiredLength) Then
-        '        'would be too much, need to calculate end point for this piece
-        '        aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 2) + ((aXOrig(lIndex - 1) - aXOrig(lIndex - 2)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-        '        aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 2) + ((aYOrig(lIndex - 1) - aYOrig(lIndex - 2)) * ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-        '        aLineEndIndexes(lPiece + 1) = lIndex - 1 + lPiece  'save the index of this endpoint
-        '        lPiece += 1
-        '        lCumDist = lDistance(lIndex) * (1 - ((lDesiredLength - lCumDist) / lDistance(lIndex)))
-        '        aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 1)
-        '        aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 1)
-        '    Else
-        '        'not long enough yet, just add point
-        '        aXNew(lIndex - 1 + lPiece) = aXOrig(lIndex - 1)
-        '        aYNew(lIndex - 1 + lPiece) = aYOrig(lIndex - 1)
-        '        lCumDist = lCumDist + lDistance(lIndex)
-        '    End If
-
-        'close out the last piece
-        'aXNew(aXNew.GetUpperBound(0)) = aXOrig(aXOrig.GetUpperBound(0))
-        'aYNew(aYNew.GetUpperBound(0)) = aYOrig(aYOrig.GetUpperBound(0))
-        'aLineEndIndexes(aNumPieces) = aXNew.GetUpperBound(0)
     End Sub
 
     Friend Sub BuildListofValidStationNamesFromDataSource(ByVal aDataSource As atcTimeseriesSource, _
