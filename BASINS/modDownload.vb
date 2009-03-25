@@ -1005,7 +1005,11 @@ StartOver:
             lSuffix += 1
             lDirName = aDataPath & aDefDirName & "-" & lSuffix
         End While
-        Return IO.Path.Combine(lDirName, aDefDirName & ".mwprj")
+        If lSuffix > 1 Then
+            Return IO.Path.Combine(lDirName, aDefDirName & "-" & lSuffix & ".mwprj")
+        Else
+            Return IO.Path.Combine(lDirName, aDefDirName & ".mwprj")
+        End If
     End Function
 
     Public Function PromptForNewProjectFileName(ByVal aDefDirName As String, ByVal aDefaultProjectFileName As String) As String
@@ -1404,7 +1408,7 @@ StartOver:
                     Case Else : Visible = False
                 End Select
                 If LayerName = "" Then LayerName = IO.Path.GetFileNameWithoutExtension(aFilename)
-                If LayerName = "National Elevation Dataset" Or LayerName = "DEM Elevation Model" Then
+                If LayerName = "National Elevation Dataset" OrElse LayerName = "DEM Elevation Model" Then
                     LayerName &= " (" & IO.Path.GetFileNameWithoutExtension(aFilename) & ")"
                 End If
                 g = New MapWinGIS.Grid
@@ -1426,8 +1430,8 @@ StartOver:
                     SetElevationGridColors(MWlay, g)
                 ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
                     SetElevationGridColors(MWlay, g)
-                ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
-                    SetLandUseColorsGrid(MWlay, g)
+                    'ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+                    'SetLandUseColorsGrid(MWlay, g)
                 End If
             End If
 
@@ -1689,125 +1693,6 @@ StartOver:
 
     End Sub
 
-    Private Sub SetLandUseColorsGrid(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
-        Dim colorBreak As MapWinGIS.GridColorBreak
-        Dim colorScheme As MapWinGIS.GridColorScheme
-
-        colorScheme = New MapWinGIS.GridColorScheme
-        colorScheme.LightSourceIntensity = 0
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Water"
-        colorBreak.LowValue = 10
-        colorBreak.HighValue = 12
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 0, 255))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Urban"
-        colorBreak.LowValue = 20
-        colorBreak.HighValue = 23
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 0, 255))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Barren or Mining"
-        colorBreak.LowValue = 30
-        colorBreak.HighValue = 32
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 0, 0))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Transitional"
-        colorBreak.LowValue = 33
-        colorBreak.HighValue = 33
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 128, 128))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Forest"
-        colorBreak.LowValue = 40
-        colorBreak.HighValue = 43
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 128, 0))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Upland Shrub Land"
-        colorBreak.LowValue = 50
-        colorBreak.HighValue = 53
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 255, 0))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Agriculture - Cropland"
-        colorBreak.LowValue = 60
-        colorBreak.HighValue = 61
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Grass Land"
-        colorBreak.LowValue = 70
-        colorBreak.HighValue = 71
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(128, 255, 128))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Agriculture - Cropland"
-        colorBreak.LowValue = 80
-        colorBreak.HighValue = 80
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Agriculture - Pasture"
-        colorBreak.LowValue = 81
-        colorBreak.HighValue = 81
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 128, 0))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Agriculture - Cropland"
-        colorBreak.LowValue = 82
-        colorBreak.HighValue = 85
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        colorBreak = New MapWinGIS.GridColorBreak
-        colorBreak.Caption = "Wetlands"
-        colorBreak.LowValue = 90
-        colorBreak.HighValue = 92
-        colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 255, 255))
-        colorBreak.HighColor = colorBreak.LowColor
-        colorBreak.ColoringType = ColoringType.Random
-        colorScheme.InsertBreak(colorBreak)
-
-        MWlay.ColoringScheme = colorScheme
-
-    End Sub
-
     Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
         Dim colorScheme As MapWinGIS.GridColorScheme
 
@@ -1848,39 +1733,6 @@ StartOver:
 
         g_MapWin.View.UnlockMap() 'let the map redraw again
     End Sub
-
-    'Public Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
-    '    Dim fldCFCC As Integer
-    '    Dim iShape As Integer
-
-    '    If shpFile Is Nothing Then
-    '        shpFile = New MapWinGIS.Shapefile
-    '        shpFile.Open(MWlay.FileName)
-    '    End If
-
-    '    fldCFCC = ShpFieldNumFromName(shpFile, "CFCC")
-
-    '    For iShape = 0 To MWlay.Shapes.NumShapes - 1
-    '        Dim shp As MapWindow.Interfaces.Shape = MWlay.Shapes(iShape)
-    '        Dim iCFCC As Integer = shpFile.CellValue(fldCFCC, iShape).ToString.Substring(1)
-    '        Select Case iCFCC
-    '            Case 1, 11 To 18
-    '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(132, 0, 0)))
-    '                shp.LineOrPointSize = 2
-    '            Case 2, 21 To 28
-    '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(0, 0, 0)))
-    '                shp.LineOrPointSize = 2
-    '            Case 3, 31 To 38
-    '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(122, 122, 122)))
-    '                shp.LineOrPointSize = 2
-    '            Case 4, 41 To 48, 63, 64
-    '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(166, 166, 166)))
-    '            Case Else 'A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
-    '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(200, 200, 200)))
-    '                shp.LineStipple = MapWinGIS.tkLineStipple.lsDotted
-    '        End Select
-    '    Next
-    'End Sub
 
     Private Sub SetCensusColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
         Dim colorBreak As MapWinGIS.ShapefileColorBreak
@@ -1962,13 +1814,13 @@ StartOver:
                                     ByRef aDefaultsXml As Xml.XmlDocument) As Xml.XmlNode
         Dim lName As String = Filename.ToLower
         If lName.StartsWith(aProjectDir.ToLower) Then
-            lName = Filename.Substring(aProjectDir.Length).ToLower
+            lName = lName.Substring(aProjectDir.Length)
         End If
 
         If Not aDefaultsXml Is Nothing Then
             For Each lChild As Xml.XmlNode In aDefaultsXml.FirstChild.ChildNodes
                 'Debug.Print("Testing " & lName & " Like " & "*" & lChild.Attributes.GetNamedItem("Filename").InnerText & "*")
-                If lName Like "*" & lChild.Attributes.GetNamedItem("Filename").InnerText & "*" Then
+                If lName Like "*" & lChild.Attributes.GetNamedItem("Filename").InnerText.ToLower & "*" Then
                     Return lChild
                 End If
             Next

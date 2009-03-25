@@ -139,10 +139,10 @@ Public Class frmWelcomeScreen
         Me.lblProject4.TabStop = True
         Me.lblProject4.UseCompatibleTextRendering = True
         '
-        'pctBasinsLogo
+        'picProgramLogo
         '
-        resources.ApplyResources(Me.picProgramLogo, "pctBasinsLogo")
-        Me.picProgramLogo.Name = "pctBasinsLogo"
+        resources.ApplyResources(Me.picProgramLogo, "picProgramLogo")
+        Me.picProgramLogo.Name = "picProgramLogo"
         Me.picProgramLogo.TabStop = False
         '
         'lbBasinsHelp
@@ -228,8 +228,11 @@ Public Class frmWelcomeScreen
 
         Me.Icon = g_MapWin.ApplicationInfo.FormIcon
         Me.Text = "Welcome to " & g_AppNameLong
-        picProgramLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
-        picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
+
+        If g_MapWin.ApplicationInfo.SplashPicture IsNot Nothing AndAlso g_MapWin.ApplicationInfo.SplashPicture.Width > 32 Then
+            picProgramLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
+            picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
+        End If
 
         cboShowDlg.Checked = lAppInfo.ShowWelcomeScreen
 
