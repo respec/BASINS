@@ -16,6 +16,10 @@ Module ScriptSummarizeTimeseries
         lSeasonNames.Add("JJA")
         lSeasonNames.Add("SON")
 
+        Dim lSeasonalAttributeNames As New ArrayList
+        lSeasonalAttributeNames.Add("Mean")
+        lSeasonalAttributeNames.Add("SumAnnual")
+
         Dim lAttributes As New atcCollection
         With lAttributes
             .Add("ID", True)
@@ -25,45 +29,65 @@ Module ScriptSummarizeTimeseries
             .Add("End Date", True)
             .Add("Count", True)
             .Add("Mean", True)
-            For Each lSeasonName As String In lSeasonNames
-                .Add(lSeasonName & "-Mean", True)
-            Next
             .Add("SumAnnual", True)
-            For Each lSeasonName As String In lSeasonNames
-                .Add(lSeasonName & "-SumAnnual", True)
-            Next
-
             .Add("Geometric Mean", True)
             .Add("Minimum", True)
             .Add("Maximum", True)
         End With
         Dim lAsk As New frmArgs
         If lAsk.AskUser("Attributes", lAttributes) Then
-            Dim lD2SStart As New atcDateFormat
-            lD2SStart.IncludeHours = True
-            lD2SStart.IncludeMinutes = True
-            lD2SStart.Midnight24 = False
-            Dim lD2SEnd As New atcDateFormat
-            lD2SEnd.IncludeHours = True
-            lD2SEnd.IncludeMinutes = True
+            Dim lTimeseriesDataGroup As atcTimeseriesGroup = atcDataManager.DataSets
+            SaveFileString("SummarizeTimeseries.txt", _
+                           SummarizeTimeseries(lAttributes, lTimeseriesDataGroup, True, lSeasonalAttributeNames, lSeasonNames))
+            Logger.Dbg("SummarizeTimeseriesDone")
+        Else
+            Logger.Dbg("SummarizeTimeseriesCancelled")
+        End If
+    End Sub
 
-            Dim lStringBuilder As New Text.StringBuilder
-            Dim lString As String = ""
+    Friend Function SummarizeTimeseries(ByVal aAttributes As atcCollection, _
+                                        ByVal aTimeseriesDatagroup As atcTimeseriesGroup, _
+                               Optional ByVal aIncludeHeader As Boolean = True, _
+                               Optional ByVal aSeasonalAttributeNames As ArrayList = Nothing, _
+                               Optional ByVal aSeasonNames As ArrayList = Nothing, _
+                               Optional ByVal aConstituents As ArrayList = Nothing) As String
+        Dim lAttributes As atcCollection = aAttributes.Clone
+        For Each lSeasonalAttributeName As String In aSeasonalAttributeNames
+            If lAttributes.ItemByKey(lSeasonalAttributeName) Then
+                For Each lSeasonName As String In aSeasonNames
+                    lAttributes.Insert(lAttributes.Keys.IndexOf(lSeasonalAttributeName) + 1, lSeasonName & "-" & lSeasonalAttributeName, True)
+                Next
+            End If
+        Next
+        Dim lD2SStart As New atcDateFormat
+        lD2SStart.IncludeHours = True
+        lD2SStart.IncludeMinutes = True
+        lD2SStart.Midnight24 = False
+        Dim lD2SEnd As New atcDateFormat
+        lD2SEnd.IncludeHours = True
+        lD2SEnd.IncludeMinutes = True
+
+        Dim lStringBuilder As New Text.StringBuilder
+        Dim lString As String = ""
+        If aIncludeHeader Then
             For Each lAttribute As String In lAttributes.Keys
                 lString &= lAttribute & vbTab
             Next
             lString.Trim(vbTab)
             lStringBuilder.AppendLine(lString)
+        End If
 
-            Dim lTimeseriesDataGroup As atcTimeseriesGroup = atcDataManager.DataSets
-            Logger.Dbg("DatasetCount " & lTimeseriesDataGroup.Count)
-            For Each lTimeseries As atcTimeseries In lTimeseriesDataGroup
-                For Each lSeasonName As String In lSeasonNames
+        Logger.Dbg("DatasetCount " & aTimeseriesDatagroup.Count)
+        For Each lTimeseries As atcTimeseries In aTimeseriesDatagroup
+            Dim lConstituent As String = lTimeseries.Attributes.GetValue("CONS", "?")
+            If aConstituents Is Nothing OrElse aConstituents.Contains(lConstituent) Then
+                For Each lSeasonName As String In aSeasonNames
                     Dim lSeasons As atcSeasonBase = SeasonsMonthFromString(lSeasonName)
                     Dim lSeasonTimeseries As atcTimeseries = lSeasons.SplitBySelected(lTimeseries, Nothing)(0)
                     With lTimeseries.Attributes
-                        .SetValue(lSeasonName & "-Mean", lSeasonTimeseries.Attributes.GetValue("Mean"))
-                        .SetValue(lSeasonName & "-SumAnnual", lSeasonTimeseries.Attributes.GetValue("SumAnnual"))
+                        For Each lSeasonalAttributeName As String In aSeasonalAttributeNames
+                            .SetValue(lSeasonName & "-" & lSeasonalAttributeName, lSeasonTimeseries.Attributes.GetValue(lSeasonalAttributeName))
+                        Next
                     End With
                 Next
                 Dim lValueString As String
@@ -94,13 +118,10 @@ Module ScriptSummarizeTimeseries
                 Next
                 lString.Trim(vbTab)
                 lStringBuilder.AppendLine(lString)
-            Next
-            SaveFileString("SummarizeTimeseries.txt", lStringBuilder.ToString)
-            Logger.Dbg("SummarizeTimeseriesDone")
-        Else
-            Logger.Dbg("SummarizeTimeseriesCancelled")
-        End If
-    End Sub
+            End If
+        Next
+        Return lStringBuilder.ToString
+    End Function
 
     Private Function SeasonsMonthFromString(ByVal aSeasonText As String) As atcSeasonBase
         Dim lSeasonsMonth As New atcSeasonsMonth
