@@ -254,21 +254,26 @@ Public Class WASPProject
         Return lArea
     End Function
 
-    Public Sub CreateSegmentShapeFile(ByVal lSegmentLayerIndex As Integer)
+    Public Sub CreateSegmentShapeFile(ByVal lSegmentLayerIndex As Integer, ByRef aWASPShapefileName As String)
         'come up with name of new shapefile
         Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
         Dim lOutputPath As String = PathNameOnly(lSegmentShapefileName)
         Dim lIndex As Integer = 1
-        Dim lWASPShapefileName As String = lOutputPath & "\WASPSegments" & lIndex & ".shp"
-        Do While FileExists(lWASPShapefileName)
+        aWASPShapefileName = lOutputPath & "\WASPSegments" & lIndex & ".shp"
+        Do While FileExists(aWASPShapefileName)
             lIndex += 1
-            lWASPShapefileName = lOutputPath & "\WASPSegments" & lIndex & ".shp"
+            aWASPShapefileName = lOutputPath & "\WASPSegments" & lIndex & ".shp"
         Loop
 
+        'if there is already a layer by this name on the map, remove it
+        If GisUtil.IsLayer("WASP Segments") Then
+            GisUtil.RemoveLayer(GisUtil.LayerIndex("WASP Segments"))
+        End If
+
         'create the new empty shapefile
-        GisUtil.CreateEmptyShapefile(lWASPShapefileName, "", "line")
-        GisUtil.AddLayer(lWASPShapefileName, "WASP Segments")
-        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(lWASPShapefileName)
+        GisUtil.CreateEmptyShapefile(aWASPShapefileName, "", "line")
+        GisUtil.AddLayer(aWASPShapefileName, "WASP Segments")
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(aWASPShapefileName)
         GisUtil.LayerVisible(lNewLayerIndex) = True
         'add an id field to the new shapefile
         Dim lNewIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "ID", 0, 20)
@@ -280,6 +285,29 @@ Public Class WASPProject
             GisUtil.SetFeatureValue(lNewLayerIndex, lNewIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lSegment.ID)
             GisUtil.SetFeatureValue(lNewLayerIndex, lNewWASPIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lSegment.WASPID)
         Next
+    End Sub
+
+    Public Sub CreateBufferedSegmentShapeFile(ByVal aWASPShapefileFilename As String)
+        'come up with name of new shapefile
+        Dim lBufferedShapefileFilename As String = ""
+        Dim lOutputPath As String = PathNameOnly(aWASPShapefileFilename)
+        Dim lIndex As Integer = 1
+        lBufferedShapefileFilename = lOutputPath & "\WASPSegmentsBuffered" & lIndex & ".shp"
+        Do While FileExists(lBufferedShapefileFilename)
+            lIndex += 1
+            lBufferedShapefileFilename = lOutputPath & "\WASPSegmentsBuffered" & lIndex & ".shp"
+        Loop
+        GisUtil.BufferLayer(aWASPShapefileFilename, lBufferedShapefileFilename, 100)
+
+        GisUtil.RemoveLayer(GisUtil.LayerIndex("WASP Segments"))
+        GisUtil.AddLayer(lBufferedShapefileFilename, "WASP Segments")
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(lBufferedShapefileFilename)
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+
+        'add rendering
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(lBufferedShapefileFilename)
+        GisUtil.UniqueValuesRenderer(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "WASPID"))
+        GisUtil.SetLayerLineSize(lLayerIndex, 0)
     End Sub
 
     Public Sub AddSelectedTimeseriesToWASPSegment(ByVal aKeyString As String, _

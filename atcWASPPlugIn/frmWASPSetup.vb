@@ -1404,9 +1404,11 @@ Public Class frmWASPSetup
 
     Private Sub cmdCreateShapefile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCreateShapefile.Click
         Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-        Me.Cursor = Cursors.WaitCursor
-        pPlugIn.WASPProject.CreateSegmentShapeFile(lSegmentLayerIndex)
-        Me.Cursor = Cursors.Default
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Dim lWASPSegmentShapefile As String = ""
+        pPlugIn.WASPProject.CreateSegmentShapeFile(lSegmentLayerIndex, lWASPSegmentShapefile)
+        pPlugIn.WASPProject.CreateBufferedSegmentShapeFile(lWASPSegmentShapefile)
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
     End Sub
 

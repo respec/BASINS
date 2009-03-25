@@ -2371,6 +2371,11 @@ Public Class GisUtil
         lLayer.Visible = True
     End Sub
 
+    Public Shared Sub SetLayerLineSize(ByVal aLayerIndex As String, ByVal aLineSize As Integer)
+        Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
+        lLayer.LineOrPointSize = aLineSize
+    End Sub
+
     Public Shared Sub CreateShapefileOfCurrentMapExtents(ByVal aShapeName As String)
         Dim lShape As New MapWinGIS.Shape
         Dim lExtentsSf As New MapWinGIS.Shapefile
@@ -2613,6 +2618,17 @@ Public Class GisUtil
         Next
         lMWlayer.ColoringScheme = lColorScheme
 
+    End Sub
+
+    Public Shared Sub BufferLayer(ByVal aInputShapefileFilename As String, ByVal aResultShapefileFilename As String, _
+                                  ByVal aBufferDistance As Double)
+        'create a new shapefile as a buffer around the specified layer
+        MapWinGeoProc.SpatialOperations.BufferSF(aInputShapefileFilename, aResultShapefileFilename, aBufferDistance, False)
+
+        Dim lInputProjectionFileName As String = FilenameSetExt(aInputShapefileFilename, "prj")
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameSetExt(aResultShapefileFilename, "prj"))
+        End If
     End Sub
 
     Public Shared Function NearestNeighbor(ByVal aX As Double, ByVal aY As Double, ByVal aPolygonLayerIndex As Integer) As Integer
