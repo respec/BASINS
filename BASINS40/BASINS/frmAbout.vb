@@ -335,9 +335,15 @@ Friend Class frmAbout
 
     Public Sub ShowAbout()
         Try
-            Me.Icon = g_MapWin.ApplicationInfo.FormIcon
-            picProgramLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
-            picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
+            Try
+                Me.Icon = g_MapWin.ApplicationInfo.FormIcon
+            Catch
+            End Try
+            Try
+                picProgramLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
+                picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
+            Catch
+            End Try
 
             lblProgramName.Text = g_AppNameLong
             lblProgramName.Left = picProgramLogo.Left + picProgramLogo.Width + 8
