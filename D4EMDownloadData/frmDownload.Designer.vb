@@ -76,6 +76,7 @@ Partial Class frmDownload
         Me.chkSTORET_Results = New System.Windows.Forms.CheckBox
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
         Me.grpNWISStations = New System.Windows.Forms.GroupBox
+        Me.chkNLCD2001_NED30 = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -345,7 +346,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(236, 432)
+        Me.btnHelp.Location = New System.Drawing.Point(236, 454)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 29
@@ -357,13 +358,14 @@ Partial Class frmDownload
         '
         Me.grpNLCD2001.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_NED30)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_1992)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Canopy)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Impervious)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_LandCover)
         Me.grpNLCD2001.Location = New System.Drawing.Point(12, 328)
         Me.grpNLCD2001.Name = "grpNLCD2001"
-        Me.grpNLCD2001.Size = New System.Drawing.Size(430, 42)
+        Me.grpNLCD2001.Size = New System.Drawing.Size(430, 70)
         Me.grpNLCD2001.TabIndex = 11
         Me.grpNLCD2001.TabStop = False
         Me.grpNLCD2001.Text = "National Land Cover Data 2001"
@@ -560,7 +562,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(124, 436)
+        Me.chkClip.Location = New System.Drawing.Point(124, 458)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 28
@@ -572,7 +574,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(17, 436)
+        Me.chkMerge.Location = New System.Drawing.Point(17, 458)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 27
@@ -583,7 +585,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(366, 432)
+        Me.btnDownload.Location = New System.Drawing.Point(366, 454)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 31
@@ -615,7 +617,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(301, 432)
+        Me.btnCancel.Location = New System.Drawing.Point(301, 454)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 30
@@ -628,7 +630,7 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Results)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
-        Me.grpSTORET.Location = New System.Drawing.Point(12, 376)
+        Me.grpSTORET.Location = New System.Drawing.Point(12, 404)
         Me.grpSTORET.Name = "grpSTORET"
         Me.grpSTORET.Size = New System.Drawing.Size(430, 44)
         Me.grpSTORET.TabIndex = 42
@@ -671,13 +673,23 @@ Partial Class frmDownload
         Me.grpNWISStations.TabStop = False
         Me.grpNWISStations.Text = "Station Locations from US Geological Survey National Water Information System"
         '
+        'chkNLCD2001_NED30
+        '
+        Me.chkNLCD2001_NED30.AutoSize = True
+        Me.chkNLCD2001_NED30.Location = New System.Drawing.Point(6, 42)
+        Me.chkNLCD2001_NED30.Name = "chkNLCD2001_NED30"
+        Me.chkNLCD2001_NED30.Size = New System.Drawing.Size(72, 17)
+        Me.chkNLCD2001_NED30.TabIndex = 27
+        Me.chkNLCD2001_NED30.Text = "NED 30m"
+        Me.chkNLCD2001_NED30.UseVisualStyleBackColor = True
+        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(454, 467)
+        Me.ClientSize = New System.Drawing.Size(454, 489)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.grpNLCD2001)
         Me.Controls.Add(Me.grpSTORET)
@@ -770,4 +782,5 @@ Partial Class frmDownload
     Friend WithEvents chkSTORET_Results As System.Windows.Forms.CheckBox
     Friend WithEvents panelNWISnoStations As System.Windows.Forms.Panel
     Friend WithEvents lblNWISnoStations As System.Windows.Forms.Label
+    Friend WithEvents chkNLCD2001_NED30 As System.Windows.Forms.CheckBox
 End Class
