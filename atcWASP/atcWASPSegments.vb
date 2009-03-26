@@ -1,22 +1,22 @@
 Imports System.Collections.ObjectModel
 Imports MapWinUtility
 
-Public Class Segments
-    Inherits KeyedCollection(Of String, Segment)
-    Protected Overrides Function GetKeyForItem(ByVal aSegment As Segment) As String
+Public Class atcWASPSegments
+    Inherits KeyedCollection(Of String, atcWASPSegment)
+    Protected Overrides Function GetKeyForItem(ByVal aSegment As atcWASPSegment) As String
         Dim lKey As String = aSegment.ID & ":" & aSegment.Name
         Return lKey
     End Function
 
-    Public WASPProject As WASPProject
+    Public WASPProject As atcWASPProject
     Private pNextKey As Integer = 0
 
     Friend Function DownstreamKey(ByRef aProblem As String) As String
         Dim lDownstreamKey As String = ""
-        For Each lSegment As Segment In Me
+        For Each lSegment As atcWASPSegment In Me
             lSegment.WASPID = 0
             Dim lDownExists As Boolean = False
-            For Each lDownSegment As Segment In Me
+            For Each lDownSegment As atcWASPSegment In Me
                 If lDownSegment.ID = lSegment.DownID Then
                     lDownExists = True
                     Exit For
@@ -44,7 +44,7 @@ Public Class Segments
         If lProblem.Length = 0 Then
             AssignWaspIdAndMoveUpstream(lDownstreamKey)
 
-            For Each lSegment As Segment In Me
+            For Each lSegment As atcWASPSegment In Me
                 If lSegment.WASPID = 0 Then
                     If lProblem.Length = 0 Then
                         lProblem = "ProblemSegments "
@@ -60,7 +60,7 @@ Public Class Segments
 
     Private Sub AssignWaspIdAndMoveUpstream(ByVal aDownstreamKey As String)
         'assign WaspId
-        Dim lDownStreamSegment As Segment = Me.Item(aDownstreamKey)
+        Dim lDownStreamSegment As atcWASPSegment = Me.Item(aDownstreamKey)
         pNextKey += 1
         lDownStreamSegment.WASPID = pNextKey
 
@@ -68,7 +68,7 @@ Public Class Segments
         Dim lUpSteamSegments As New ArrayList
         Dim lUpSteamMaxArea As Double = 0
         Dim lUpSteamMainSegmentKey As String = ""
-        For Each lSegment As Segment In Me
+        For Each lSegment As atcWASPSegment In Me
             If lSegment.DownID = lDownStreamSegment.ID Then
                 If lSegment.CumulativeDrainageArea > lUpSteamMaxArea Then
                     lUpSteamMaxArea = lSegment.CumulativeDrainageArea
@@ -80,7 +80,7 @@ Public Class Segments
         If lUpSteamSegments.Count > 0 Then 'main channel first
             AssignWaspIdAndMoveUpstream(lUpSteamMainSegmentKey)
             If lUpSteamSegments.Count > 1 Then
-                For Each lSegment As Segment In lUpSteamSegments
+                For Each lSegment As atcWASPSegment In lUpSteamSegments
                     If lSegment.WASPID = 0 Then 'other channel
                         AssignWaspIdAndMoveUpstream(lSegment.ID & ":" & lSegment.Name)
                     End If
@@ -90,7 +90,7 @@ Public Class Segments
     End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
-        For Each lSegment As Segment In aEnumerable
+        For Each lSegment As atcWASPSegment In aEnumerable
             Try
                 Me.Add(lSegment)
             Catch
@@ -105,7 +105,7 @@ Public Class Segments
         lString.Append(";                                                            (km)       (m)        (m)                                               " & vbCrLf)
         lString.Append(";_______________________________ ________________ __________ __________ __________ __________ __________ __________ ________________ " & vbCrLf)
 
-        For Each lSegment As Segment In Me
+        For Each lSegment As atcWASPSegment In Me
             With lSegment
                 lString.Append(.Name.PadRight(32) & " ")
                 lString.Append(.ID.PadRight(16) & " ")
@@ -129,13 +129,13 @@ Public Class Segments
         lString.Append(";Segment Name                    Segment ID       Timeseries Type  Timeseries File Name                    " & vbCrLf)
         lString.Append(";_______________________________ ________________ ________________ ________________________________________" & vbCrLf)
 
-        For Each lTimeseries As WASPTimeseries In Me.WASPProject.InputTimeseriesCollection
+        For Each lTimeseries As atcWASPTimeseries In Me.WASPProject.InputTimeseriesCollection
             'first write project-wide timeseries
 
             'does any segment use this?
             Dim lUsedBySegment As Boolean = False
-            For Each lSegment As Segment In Me
-                For Each lTempTimeseries As WASPTimeseries In lSegment.InputTimeseriesCollection
+            For Each lSegment As atcWASPSegment In Me
+                For Each lTempTimeseries As atcWASPTimeseries In lSegment.InputTimeseriesCollection
                     If lTempTimeseries.Type = lTimeseries.Type And lTempTimeseries.Description = lTimeseries.Description Then
                         'yes, used by a segment 
                         lUsedBySegment = True
@@ -151,8 +151,8 @@ Public Class Segments
             End If
         Next
 
-        For Each lSegment As Segment In Me
-            For Each lTimeseries As WASPTimeseries In lSegment.InputTimeseriesCollection
+        For Each lSegment As atcWASPSegment In Me
+            For Each lTimeseries As atcWASPTimeseries In lSegment.InputTimeseriesCollection
                 lString.Append(lSegment.Name.PadRight(32) & " ")
                 lString.Append(lSegment.ID.PadRight(16) & " ")
                 lString.Append(lTimeseries.Type.PadRight(16) & " ")
@@ -170,7 +170,7 @@ Public Class Segments
 
 End Class
 
-Public Class Segment
+Public Class atcWASPSegment
     Public Name As String = ""
     Public ID As String = ""
     Public DownID As String = ""
@@ -180,7 +180,7 @@ Public Class Segment
     Public Slope As String = "0.05"
     Public Roughness As Double = 0.05
     Public Velocity As Double = 0.0
-    Public InputTimeseriesCollection As WASPTimeseriesCollection = Nothing
+    Public InputTimeseriesCollection As atcWASPTimeseriesCollection = Nothing
     Public BaseID As String = ""  'the id of the segment before breaking it up
     Public CentroidX As Double
     Public CentroidY As Double
@@ -193,8 +193,8 @@ Public Class Segment
     Friend TooShort As Boolean = False
     Friend CountAbove As Integer = 0
 
-    Public Function Clone() As Segment
-        Dim lNewSegment As New Segment
+    Public Function Clone() As atcWASPSegment
+        Dim lNewSegment As New atcWASPSegment
         lNewSegment.Depth = Me.Depth
         lNewSegment.DownID = Me.DownID
         lNewSegment.ID = Me.ID
@@ -213,9 +213,9 @@ Public Class Segment
         lNewSegment.MeanAnnualFlow = Me.MeanAnnualFlow
         lNewSegment.WASPID = Me.WASPID
 
-        Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
+        Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
         lNewSegment.InputTimeseriesCollection = lTimeseriesCollection
-        For Each lWASPTimeseries As WASPTimeseries In Me.InputTimeseriesCollection
+        For Each lWASPTimeseries As atcWASPTimeseries In Me.InputTimeseriesCollection
             lNewSegment.InputTimeseriesCollection.Add(lWASPTimeseries)
         Next
 

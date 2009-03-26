@@ -57,7 +57,7 @@ Public Class frmWASPFieldMapping
 
         'add target properties from introspection on the swmm classes
         AtcConnectFields.lstTarget.Items.Clear()
-        Dim lSegment As New atcWASP.Segment
+        Dim lSegment As New atcWASP.atcWASPSegment
         For Each lField As Reflection.FieldInfo In lSegment.GetType.GetFields
             AtcConnectFields.lstTarget.Items.Add("Segment:" & lField.Name)
         Next
