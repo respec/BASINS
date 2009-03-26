@@ -953,7 +953,7 @@ Public Class frmWASPSetup
         'are within that period
         Dim lSJDateTS As Double = 0.0
         Dim lEJDateTS As Double = 0.0
-        For Each lTimeseries As WASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
+        For Each lTimeseries As atcWASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
             If lTimeseries.SDate > lSJDateTS Then
                 lSJDateTS = lTimeseries.SDate
             End If
@@ -1264,7 +1264,7 @@ Public Class frmWASPSetup
                     .CellEditable(lIndex, 8) = True
                     Dim lTravelTime As Double = 0.0
                     With pPlugIn.WASPProject
-                        Dim lSegment As Segment = .Segments(lIndex - 1)
+                        Dim lSegment As atcWASPSegment = .Segments(lIndex - 1)
                         lTravelTime = SignificantDigits(.TravelTime(lSegment.Length, lSegment.Velocity), 3)
                     End With
                     .CellValue(lIndex, 9) = lTravelTime
@@ -1312,7 +1312,7 @@ Public Class frmWASPSetup
             Dim lValidValues As New atcCollection
             lValidValues.Add("<none>")
             lValidValues.Add("<mean annual flow>")
-            For Each lFlowStation As WASPTimeseries In pPlugIn.WASPProject.FlowStationCandidates
+            For Each lFlowStation As atcWASPTimeseries In pPlugIn.WASPProject.FlowStationCandidates
                 lValidValues.Add(lFlowStation.Description)
             Next
             AtcGridFlow.ValidValues = lValidValues
@@ -1347,7 +1347,7 @@ Public Class frmWASPSetup
             Logger.Dbg("SetValidValues")
             Dim lValidValues As New atcCollection
             lValidValues.Add("<none>")
-            For Each lWaterTempStation As WASPTimeseries In pPlugIn.WASPProject.WaterTempStationCandidates
+            For Each lWaterTempStation As atcWASPTimeseries In pPlugIn.WASPProject.WaterTempStationCandidates
                 lValidValues.Add(lWaterTempStation.Description)
             Next
             AtcGridLoad.ValidValues = lValidValues
@@ -1368,15 +1368,15 @@ Public Class frmWASPSetup
         cbxWind.Items.Clear()
         cbxWind.Items.Add("<none>")
 
-        For Each lStationCandidate As WASPTimeseries In pPlugIn.WASPProject.AirTempStationCandidates
+        For Each lStationCandidate As atcWASPTimeseries In pPlugIn.WASPProject.AirTempStationCandidates
             cbxAir.Items.Add(lStationCandidate.Description)
         Next
 
-        For Each lStationCandidate As WASPTimeseries In pPlugIn.WASPProject.SolRadStationCandidates
+        For Each lStationCandidate As atcWASPTimeseries In pPlugIn.WASPProject.SolRadStationCandidates
             cbxSolar.Items.Add(lStationCandidate.Description)
         Next
 
-        For Each lStationCandidate As WASPTimeseries In pPlugIn.WASPProject.WindStationCandidates
+        For Each lStationCandidate As atcWASPTimeseries In pPlugIn.WASPProject.WindStationCandidates
             cbxWind.Items.Add(lStationCandidate.Description)
         Next
 
@@ -1418,7 +1418,7 @@ Public Class frmWASPSetup
         Dim lSJDate As Double = 0.0
         Dim lEJDate As Double = 0.0
 
-        For Each lTimeseries As WASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
+        For Each lTimeseries As atcWASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
             If lTimeseries.SDate > lSJDate Then
                 lSJDate = lTimeseries.SDate
             End If

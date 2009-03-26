@@ -5,25 +5,25 @@ Imports atcData
 Imports atcControls
 Imports atcMwGisUtility
 
-Public Class WASPProject
-    Public Segments As Segments
-    Public InputTimeseriesCollection As WASPTimeseriesCollection
+Public Class atcWASPProject
+    Public Segments As atcWASPSegments
+    Public InputTimeseriesCollection As atcWASPTimeseriesCollection
     Public SJDate As Double = 0.0
     Public EJDate As Double = 0.0
     Public Name As String = ""
     Public WNFFileName As String = ""
     Public SegmentFieldMap As New atcCollection
 
-    Public FlowStationCandidates As New WASPTimeseriesCollection
-    Public AirTempStationCandidates As New WASPTimeseriesCollection
-    Public SolRadStationCandidates As New WASPTimeseriesCollection
-    Public WindStationCandidates As New WASPTimeseriesCollection
-    Public WaterTempStationCandidates As New WASPTimeseriesCollection
+    Public FlowStationCandidates As New atcWASPTimeseriesCollection
+    Public AirTempStationCandidates As New atcWASPTimeseriesCollection
+    Public SolRadStationCandidates As New atcWASPTimeseriesCollection
+    Public WindStationCandidates As New atcWASPTimeseriesCollection
+    Public WaterTempStationCandidates As New atcWASPTimeseriesCollection
 
     Public Sub New()
         Name = ""
         WNFFileName = ""
-        Segments = New Segments
+        Segments = New atcWASPSegments
         Segments.WASPProject = Me
         'set field mapping for segments based on NHDPlus
         SegmentFieldMap.Clear()
@@ -40,7 +40,7 @@ Public Class WASPProject
         SegmentFieldMap.Add("SLOPE", "Slope")
         SegmentFieldMap.Add("CUMDRAINAG", "CumulativeDrainageArea")
 
-        InputTimeseriesCollection = New WASPTimeseriesCollection
+        InputTimeseriesCollection = New atcWASPTimeseriesCollection
     End Sub
 
     Public Function Save(ByVal aFileName As String) As Boolean
@@ -110,16 +110,16 @@ Public Class WASPProject
             Dim lTable As New atcUtility.atcTableDBF
 
             'add only selected segments
-            Dim lTempSegments As New Segments
+            Dim lTempSegments As New atcWASPSegments
             Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
             If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
                 Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
-                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.Segment).GetType, .SegmentFieldMap), "Name"))
+                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.atcWASPSegment).GetType, .SegmentFieldMap), "Name"))
             End If
             Logger.Dbg("SegmentsCount " & lTempSegments.Count)
 
-            For Each lSegment As atcWASP.Segment In lTempSegments
-                Dim lTimeseriesCollection As New atcWASP.WASPTimeseriesCollection
+            For Each lSegment As atcWASP.atcWASPSegment In lTempSegments
+                Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
                 lSegment.InputTimeseriesCollection = lTimeseriesCollection
                 lSegment.BaseID = lSegment.ID   'store segment id before breaking up
             Next
@@ -129,7 +129,7 @@ Public Class WASPProject
                 'put only selected segments in .segments 
                 For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
                     Dim lShapeIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)
-                    Dim lSegment As atcWASP.Segment = lTempSegments(lShapeIndex)
+                    Dim lSegment As atcWASP.atcWASPSegment = lTempSegments(lShapeIndex)
                     GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
                     GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
                     .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
@@ -139,7 +139,7 @@ Public Class WASPProject
                 'add all 
                 .Segments = lTempSegments
                 Dim lShapeIndex As Integer = -1
-                For Each lSegment As atcWASP.Segment In lTempSegments
+                For Each lSegment As atcWASP.atcWASPSegment In lTempSegments
                     lShapeIndex += 1
                     GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
                     GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
@@ -149,13 +149,13 @@ Public Class WASPProject
 
             'calculate depth and width from mean annual flow and mean annual velocity
             'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
-            For Each lSegment As Segment In .Segments
+            For Each lSegment As atcWASPSegment In .Segments
                 lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
                 lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
             Next
 
             'do unit conversions from NHDPlus units to WASP assumed units
-            For Each lSegment As Segment In .Segments
+            For Each lSegment As atcWASPSegment In .Segments
                 lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
                 lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
                 'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
@@ -163,44 +163,41 @@ Public Class WASPProject
                 lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
             Next
 
-            'if a minimum travel time has been set, combine the segments as needed
-            If aMinTravelTime > 0 Then
-                Segments = CombineSegments(aMinTravelTime)
+            Dim lProblem As String = ""
+            If aMinTravelTime > 0 Then 'minimum travel time has been set, combine the segments as needed
+                CombineSegments(aMinTravelTime, lProblem)
             End If
 
-            'if a maximum travel time has been set, divide the segments as needed
-            If aMaxTravelTime > 0 Then
+            If aMaxTravelTime > 0 Then 'maximum travel time has been set, divide the segments as needed
                 DivideSegments(aMaxTravelTime)
             End If
 
-            Dim lProblem As String = .Segments.AssignWaspIds()
+            lProblem = .Segments.AssignWaspIds()
             If lProblem.Length > 0 Then
                 Logger.Dbg("ProblemInGenerateSegmentsAssignWaspIds " & lProblem)
             End If
         End With
     End Sub
 
-    Private Function CombineSegments(ByVal aMinTravelTime As Double) As Segments
-        Dim lNewSegments As New Segments
-        Dim lProblem As String = ""
-        Dim lDownstreamKey As String = Segments.DownstreamKey(lProblem)
-        If lProblem.Length = 0 Then
+    Private Sub CombineSegments(ByVal aMinTravelTime As Double, ByRef aProblem As String)
+        Dim lDownstreamKey As String = Segments.DownstreamKey(aProblem)
+        If aProblem.Length = 0 Then
             Dim lShortSegmentCount As Integer = DetermineShortSegments(aMinTravelTime, lDownstreamKey)
             Logger.Dbg("ShortSegmentCount " & lShortSegmentCount)
             If lShortSegmentCount > 0 Then 'fix them
+                Dim lNewSegments As New atcWASPSegments
                 CombineSegmentsDetail(lDownstreamKey, lNewSegments)
-            Else ' no problems
-                lNewSegments = Segments
+                Segments.Clear()
+                Segments = lNewSegments
             End If
         End If
-        Return lNewSegments
-    End Function
+    End Sub
 
     Private Function DetermineShortSegments(ByVal aMinTravelTime As Double, ByVal aDownstreamKey As String) As Integer
         Dim lShortSegmentCount As Integer = 0
-        Dim lDownstreamSegment As Segment = Segments(aDownstreamKey)
+        Dim lDownstreamSegment As atcWASPSegment = Segments(aDownstreamKey)
         lDownstreamSegment.CountAbove = 0
-        For Each lSegment As Segment In Segments
+        For Each lSegment As atcWASPSegment In Segments
             If lSegment.DownID = lDownstreamSegment.ID Then
                 If aMinTravelTime > TravelTime(lSegment.Length, lSegment.Velocity) Then
                     lShortSegmentCount += 1
@@ -213,8 +210,8 @@ Public Class WASPProject
         Return lShortSegmentCount
     End Function
 
-    Private Sub CombineSegmentsDetail(ByVal aDownStreamKey As String, ByRef aNewSegments As Segments)
-        Dim lSegment As Segment = Segments.Item(aDownStreamKey)
+    Private Sub CombineSegmentsDetail(ByVal aDownStreamKey As String, ByRef aNewSegments As atcWASPSegments)
+        Dim lSegment As atcWASPSegment = Segments.Item(aDownStreamKey)
         If lSegment.TooShort Then 'too short - combine with segment up or down
             Dim lUpSegments As ArrayList = UpstreamSegments(lSegment.ID)
             If lUpSegments.Count = 1 Then
@@ -225,8 +222,8 @@ Public Class WASPProject
                     aNewSegments.Add(CombineSegment(Segments(lSegment.DownID), lSegment, True))
                 ElseIf lUpFromDownSegments.Count = 0 Then
                     If lUpSegments.Count > 0 Then
-                        Dim lCombineWithSegment As New Segment
-                        For Each lUpSegment As Segment In lUpSegments
+                        Dim lCombineWithSegment As New atcWASPSegment
+                        For Each lUpSegment As atcWASPSegment In lUpSegments
                             If lUpSegment.CumulativeDrainageArea > lCombineWithSegment.CumulativeDrainageArea Then
                                 lCombineWithSegment = lUpSegment
                             End If
@@ -236,8 +233,8 @@ Public Class WASPProject
                         Logger.Msg("OrphanSegment " & lSegment.ID)
                     End If
                 Else 'check to see if on main channel
-                    Dim lCombineWithSegment As Segment = lSegment
-                    For Each lUpFromDownSegment As Segment In lUpFromDownSegments
+                    Dim lCombineWithSegment As atcWASPSegment = lSegment
+                    For Each lUpFromDownSegment As atcWASPSegment In lUpFromDownSegments
                         If lUpFromDownSegment.CumulativeDrainageArea > lCombineWithSegment.CumulativeDrainageArea Then
                             lCombineWithSegment = lUpFromDownSegment
                         End If
@@ -249,7 +246,7 @@ Public Class WASPProject
 
     Private Function UpstreamSegments(ByVal aSegmentId As String) As ArrayList
         Dim lUpstreamSegments As New ArrayList
-        For Each lSegment As Segment In Segments
+        For Each lSegment As atcWASPSegment In Segments
             If lSegment.DownID = aSegmentId Then
                 lUpstreamSegments.Add(lSegment)
             End If
@@ -257,10 +254,10 @@ Public Class WASPProject
         Return lUpstreamSegments
     End Function
 
-    Private Function CombineSegment(ByVal aSegmentPrimary As Segment, _
-                                    ByVal aSegmentSecondary As Segment, _
-                           Optional ByVal aSecondaryUpstream As Boolean = False) As Segment
-        Dim lSegment As Segment
+    Private Function CombineSegment(ByVal aSegmentPrimary As atcWASPSegment, _
+                                    ByVal aSegmentSecondary As atcWASPSegment, _
+                           Optional ByVal aSecondaryUpstream As Boolean = False) As atcWASPSegment
+        Dim lSegment As atcWASPSegment
         If aSecondaryUpstream Then 'primary downstream
             lSegment = aSegmentPrimary.Clone
         Else 'secondary downstream
@@ -315,10 +312,10 @@ Public Class WASPProject
     End Function
 
     Private Sub DivideSegments(ByVal aMaxTravelTime As Double)
-        Dim lNewSegments As New Segments
+        Dim lNewSegments As New atcWASPSegments
         Dim lNewSegmentPositions As New atcCollection
         For lIndex As Integer = 1 To Segments.Count
-            Dim lSegment As Segment = Segments(lIndex - 1)
+            Dim lSegment As atcWASPSegment = Segments(lIndex - 1)
             If TravelTime(lSegment.Length, lSegment.Velocity) > aMaxTravelTime Then
                 'need to break this segment into multiple
                 Dim lBreakNumber As Integer = Int(TravelTime(lSegment.Length, lSegment.Velocity) / aMaxTravelTime) + 1
@@ -326,7 +323,7 @@ Public Class WASPProject
                 Dim lCumAbove As Double = CumulativeAreaAboveSegment(lSegment.ID)
                 'create the new pieces
                 For lBreakIndex As Integer = 2 To lBreakNumber
-                    Dim lNewSegment As New Segment
+                    Dim lNewSegment As New atcWASPSegment
                     lNewSegment = lSegment.Clone
                     lNewSegment.ID = lSegment.ID & IntegerToAlphabet(lBreakIndex - 1)
                     If lBreakIndex < lBreakNumber Then
@@ -345,7 +342,7 @@ Public Class WASPProject
                 'TODO: should this be hardcoded?
                 lSegment.ID = lOldID & "A"
                 'if this segment id shows up as a downid anywhere else, change it
-                For Each lTempSeg As Segment In Segments
+                For Each lTempSeg As atcWASPSegment In Segments
                     If lTempSeg.DownID = lOldID Then
                         lTempSeg.DownID = lSegment.ID
                     End If
@@ -367,9 +364,10 @@ Public Class WASPProject
         Next
         'because some keys have changes, clear all out and add back in
         lNewSegments.Clear()
-        For Each lSegment As Segment In Segments
+        For Each lSegment As atcWASPSegment In Segments
             lNewSegments.Add(lSegment)
         Next
+        Segments.Clear()
         Segments = lNewSegments
     End Sub
 
@@ -377,7 +375,7 @@ Public Class WASPProject
         'find the area above this segment id
         Dim lArea As Double = 0
         With Me
-            For Each lSegment As Segment In .Segments
+            For Each lSegment As atcWASPSegment In .Segments
                 If lSegment.DownID = aSegmentID Then
                     lArea += lSegment.CumulativeDrainageArea
                 End If
@@ -412,7 +410,7 @@ Public Class WASPProject
         Dim lNewWASPIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "WASPID", 0, 20)
 
         'now add segments to the shapefile
-        For Each lSegment As Segment In Me.Segments
+        For Each lSegment As atcWASPSegment In Me.Segments
             GisUtil.AddLine(lNewLayerIndex, lSegment.PtsX, lSegment.PtsY)
             GisUtil.SetFeatureValue(lNewLayerIndex, lNewIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lSegment.ID)
             GisUtil.SetFeatureValue(lNewLayerIndex, lNewWASPIDFieldIndex, GisUtil.NumFeatures(lNewLayerIndex) - 1, lSegment.WASPID)
@@ -443,9 +441,9 @@ Public Class WASPProject
     End Sub
 
     Public Sub AddSelectedTimeseriesToWASPSegment(ByVal aKeyString As String, _
-                                                  ByRef aStationCandidates As WASPTimeseriesCollection, _
-                                                  ByRef aWASPProject As WASPProject, _
-                                                  ByRef aSegment As Segment)
+                                                  ByRef aStationCandidates As atcWASPTimeseriesCollection, _
+                                                  ByRef aWASPProject As atcWASPProject, _
+                                                  ByRef aSegment As atcWASPSegment)
 
         'need to make sure this timeseries is in the class structure
         If aStationCandidates.Contains(aKeyString) Then
@@ -466,7 +464,7 @@ Public Class WASPProject
         ElseIf aKeyString = "FLOW:<mean annual flow>" Then
             'user wants to use the mean annual flow.
             'the fact that there is no timeseries will be the clue that the mean annual flow should be used.
-            Dim lStationCandidate As New WASPTimeseries
+            Dim lStationCandidate As New atcWASPTimeseries
             With lStationCandidate
                 .Type = "FLOW"
                 .Description = "<mean annual flow> for segment " & aSegment.WASPID
@@ -481,8 +479,8 @@ Public Class WASPProject
     End Sub
 
     Public Sub AddSelectedTimeseriesToWASPProject(ByVal aKeyString As String, _
-                                                  ByRef aStationCandidates As WASPTimeseriesCollection, _
-                                                  ByRef aWASPProject As WASPProject)
+                                                  ByRef aStationCandidates As atcWASPTimeseriesCollection, _
+                                                  ByRef aWASPProject As atcWASPProject)
 
         'need to make sure this timeseries is in the class structure
         If aStationCandidates.Contains(aKeyString) Then
@@ -546,7 +544,7 @@ Public Class WASPProject
     End Sub
 
     Public Sub BuildListofValidStationNames(ByRef aConstituent As String, _
-                                            ByVal aStationCandidates As WASPTimeseriesCollection)
+                                            ByVal aStationCandidates As atcWASPTimeseriesCollection)
 
         For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             BuildListofValidStationNamesFromDataSource(lDataSource, aConstituent, aStationCandidates)
@@ -554,7 +552,7 @@ Public Class WASPProject
 
     End Sub
 
-    Public Sub GetMetStationCoordinates(ByVal aMetLayerIndex As Integer, ByVal aStationCandidates As WASPTimeseriesCollection)
+    Public Sub GetMetStationCoordinates(ByVal aMetLayerIndex As Integer, ByVal aStationCandidates As atcWASPTimeseriesCollection)
         Dim lFieldIndex As Integer = 1
         If GisUtil.IsField(aMetLayerIndex, "LOCATION") Then
             lFieldIndex = GisUtil.FieldIndex(aMetLayerIndex, "LOCATION")
@@ -562,7 +560,7 @@ Public Class WASPProject
 
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(aMetLayerIndex) - 1
             Dim lTempID As String = GisUtil.FieldValue(aMetLayerIndex, lFeatureIndex, lFieldIndex)
-            For Each lStationCandidate As WASPTimeseries In aStationCandidates
+            For Each lStationCandidate As atcWASPTimeseries In aStationCandidates
                 If lStationCandidate.Identifier = lTempID Then
                     'found a timeseries, add the coordinates
                     GisUtil.PointXY(aMetLayerIndex, lFeatureIndex, lStationCandidate.LocationX, lStationCandidate.LocationY)
@@ -575,7 +573,7 @@ Public Class WASPProject
         'default met stations based on distance
         Dim lXSum As Double = 0
         Dim lYSum As Double = 0
-        For Each lSegment As Segment In Segments
+        For Each lSegment As atcWASPSegment In Segments
             'find average segment centroid 
             lXSum = lXSum + lSegment.CentroidX
             lYSum = lYSum + lSegment.CentroidY
@@ -595,13 +593,13 @@ Public Class WASPProject
         End If
     End Sub
 
-    Private Function FindClosestMetStation(ByVal aStationList As WASPTimeseriesCollection, ByVal aXAvg As Double, ByVal aYAvg As Double) As Integer
+    Private Function FindClosestMetStation(ByVal aStationList As atcWASPTimeseriesCollection, ByVal aXAvg As Double, ByVal aYAvg As Double) As Integer
         'for each valid value, find distance
         Dim lShortestDistance As Double = 1.0E+28
         Dim lDistance As Double = 0.0
         Dim lClosestIndex As Integer = 0
         Dim lStationIndex As Integer = 0
-        For Each lStationCandidate As WASPTimeseries In aStationList
+        For Each lStationCandidate As atcWASPTimeseries In aStationList
             lStationIndex += 1
             lDistance = CalculateDistance(aXAvg, aYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
             If lDistance < lShortestDistance Then

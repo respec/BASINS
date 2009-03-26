@@ -4,15 +4,15 @@ Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
 
-Public Class WASPTimeseriesCollection
-    Inherits KeyedCollection(Of String, WASPTimeseries)
-    Protected Overrides Function GetKeyForItem(ByVal aWASPTimeseries As WASPTimeseries) As String
+Public Class atcWASPTimeseriesCollection
+    Inherits KeyedCollection(Of String, atcWASPTimeseries)
+    Protected Overrides Function GetKeyForItem(ByVal aWASPTimeseries As atcWASPTimeseries) As String
         Dim lKey As String = aWASPTimeseries.Type & ":" & aWASPTimeseries.Description
         Return lKey
     End Function
 
     Public Function TimeSeriesToFile(ByVal aBaseFileName As String, ByVal aSJDate As Double, ByVal aEJDate As Double) As Boolean
-        For Each lWASPTimeseries As WASPTimeseries In Me
+        For Each lWASPTimeseries As atcWASPTimeseries In Me
             If lWASPTimeseries.TimeSeries Is Nothing Then
                 Dim lLocation As String = lWASPTimeseries.Identifier
                 Dim lFileName As String = PathNameOnly(aBaseFileName) & "\" & lLocation & "." & lWASPTimeseries.Type & ".DAT"
@@ -31,7 +31,7 @@ Public Class WASPTimeseriesCollection
 
 End Class
 
-Public Class WASPTimeseries
+Public Class atcWASPTimeseries
     Public Identifier As String  'location 
     Public Type As String 'flow, air temp, solrad, water temp, etc.
     Public SDate As Double

@@ -116,7 +116,7 @@ Module modWaspUtil
 
     Friend Sub BuildListofValidStationNamesFromDataSource(ByVal aDataSource As atcTimeseriesSource, _
                                                           ByRef aConstituent As String, _
-                                                          ByVal aStationCandidates As WASPTimeseriesCollection)
+                                                          ByVal aStationCandidates As atcWASPTimeseriesCollection)
 
         Dim lTotalCount As Integer = aDataSource.DataSets.Count
         Dim lCounter As Integer = 0
@@ -146,7 +146,7 @@ Module modWaspUtil
                 J2Date(lSJDay, lSdate)
                 J2Date(lEJDay, lEdate)
                 Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
-                Dim lCandidateTimeseries As New WASPTimeseries
+                Dim lCandidateTimeseries As New atcWASPTimeseries
                 lCandidateTimeseries.Identifier = lLoc
                 lCandidateTimeseries.SDate = lSJDay
                 lCandidateTimeseries.EDate = lEJDay

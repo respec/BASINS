@@ -25,7 +25,7 @@ Module WaspPlugInTester
             GisUtil.SetSelectedFeature(lSegmentLayerIndex, lSelectedFeatureIndex)
         Next
 
-        Dim lWasp As New WASPProject
+        Dim lWasp As New atcWASPProject
         With lWasp
             .Name = "BatchWASPTest"
             .SJDate = Jday(2000, 1, 1, 0, 0, 0)
