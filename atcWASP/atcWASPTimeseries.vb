@@ -13,11 +13,19 @@ Public Class WASPTimeseriesCollection
 
     Public Function TimeSeriesToFile(ByVal aBaseFileName As String, ByVal aSJDate As Double, ByVal aEJDate As Double) As Boolean
         For Each lWASPTimeseries As WASPTimeseries In Me
-            Dim lLocation As String = lWASPTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value
-            Dim lFileName As String = PathNameOnly(aBaseFileName) & "\" & lLocation & "." & lWASPTimeseries.Type & ".DAT"
-            Dim lSB As New StringBuilder
-            lSB.Append(lWASPTimeseries.TimeSeriesToString(aSJDate, aEJDate))
-            SaveFileString(lFileName, lSB.ToString)
+            If lWASPTimeseries.TimeSeries Is Nothing Then
+                Dim lLocation As String = lWASPTimeseries.Identifier
+                Dim lFileName As String = PathNameOnly(aBaseFileName) & "\" & lLocation & "." & lWASPTimeseries.Type & ".DAT"
+                Dim lSB As New StringBuilder
+                lSB.Append(lWASPTimeseries.ConstantToString(aSJDate, aEJDate))
+                SaveFileString(lFileName, lSB.ToString)
+            Else
+                Dim lLocation As String = lWASPTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value
+                Dim lFileName As String = PathNameOnly(aBaseFileName) & "\" & lLocation & "." & lWASPTimeseries.Type & ".DAT"
+                Dim lSB As New StringBuilder
+                lSB.Append(lWASPTimeseries.TimeSeriesToString(aSJDate, aEJDate))
+                SaveFileString(lFileName, lSB.ToString)
+            End If
         Next
     End Function
 
@@ -55,6 +63,39 @@ Public Class WASPTimeseries
             lSB.Append(StrPad(Format(Me.TimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
             lSB.Append(vbCrLf)
         Next
+
+        Return lSB.ToString
+    End Function
+
+    Public Function ConstantToString(ByVal aSJDate As Double, ByVal aEJDate As Double) As String
+        Dim lSB As New StringBuilder
+
+        'for the constant case, the mean annual flow is stored in the Me.DataSourceName
+        Dim lValue As Double = 0.0
+        If IsNumeric(Me.DataSourceName) Then
+            lValue = CDbl(Me.DataSourceName)
+        End If
+
+        Dim lDate(6) As Integer
+        J2Date(aSJDate, lDate)
+        Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+        Dim lTimeString As String = lDate(3).ToString.PadLeft(2, "0") & ":" & lDate(4).ToString.PadLeft(2, "0")
+        lSB.Append(StrPad(lDateString, 10, " ", False))
+        lSB.Append(" ")
+        lSB.Append(StrPad(lTimeString, 10, " ", False))
+        lSB.Append(" ")
+        lSB.Append(StrPad(Format(lValue, "0.000"), 10, " ", False))
+        lSB.Append(vbCrLf)
+
+        J2Date(aEJDate, lDate)
+        lDateString = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+        lTimeString = lDate(3).ToString.PadLeft(2, "0") & ":" & lDate(4).ToString.PadLeft(2, "0")
+        lSB.Append(StrPad(lDateString, 10, " ", False))
+        lSB.Append(" ")
+        lSB.Append(StrPad(lTimeString, 10, " ", False))
+        lSB.Append(" ")
+        lSB.Append(StrPad(Format(lValue, "0.000"), 10, " ", False))
+        lSB.Append(vbCrLf)
 
         Return lSB.ToString
     End Function

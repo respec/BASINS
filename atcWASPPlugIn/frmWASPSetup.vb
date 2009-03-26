@@ -1130,16 +1130,18 @@ Public Class frmWASPSetup
 
         AtcGridFlow.Clear()
         With AtcGridFlow.Source
-            .Columns = 3
+            .Columns = 4
             .ColorCells = True
             .FixedRows = 1
-            .FixedColumns = 2
+            .FixedColumns = 3
             .CellColor(0, 0) = SystemColors.ControlDark
             .CellColor(0, 1) = SystemColors.ControlDark
+            .CellColor(0, 2) = SystemColors.ControlDark
             .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .CellValue(0, 0) = "Segment"
             .CellValue(0, 1) = "Cum. Drainage Area (km^2)"
-            .CellValue(0, 2) = "Input Flow Timeseries"
+            .CellValue(0, 2) = "Mean Annual Flow (cms)"
+            .CellValue(0, 3) = "Input Flow Timeseries"
         End With
 
         AtcGridLoad.Clear()
@@ -1300,18 +1302,16 @@ Public Class frmWASPSetup
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).CumulativeDrainageArea
-                    .CellValue(lIndex, 2) = "<none>"
-                    If pPlugIn.WASPProject.FlowStationCandidates.Count > 0 Then
-                        .CellEditable(lIndex, 2) = True
-                    Else
-                        .CellEditable(lIndex, 2) = False
-                    End If
+                    .CellValue(lIndex, 2) = pPlugIn.WASPProject.Segments(lIndex - 1).MeanAnnualFlow
+                    .CellValue(lIndex, 3) = "<none>"
+                    .CellEditable(lIndex, 3) = True
                 Next
             End With
 
             Logger.Dbg("SetValidValues")
             Dim lValidValues As New atcCollection
             lValidValues.Add("<none>")
+            lValidValues.Add("<mean annual flow>")
             For Each lFlowStation As WASPTimeseries In pPlugIn.WASPProject.FlowStationCandidates
                 lValidValues.Add(lFlowStation.Description)
             Next

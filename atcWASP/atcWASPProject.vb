@@ -463,6 +463,20 @@ Public Class WASPProject
                     aSegment.InputTimeseriesCollection.Add(aStationCandidates(aKeyString))
                 End If
             End If
+        ElseIf aKeyString = "FLOW:<mean annual flow>" Then
+            'user wants to use the mean annual flow.
+            'the fact that there is no timeseries will be the clue that the mean annual flow should be used.
+            Dim lStationCandidate As New WASPTimeseries
+            With lStationCandidate
+                .Type = "FLOW"
+                .Description = "<mean annual flow> for segment " & aSegment.WASPID
+                .SDate = 1
+                .EDate = 100000
+                .Identifier = aSegment.ID
+                .DataSourceName = aSegment.MeanAnnualFlow.ToString  'kludge, but have to store this somewhere
+            End With
+            aWASPProject.InputTimeseriesCollection.Add(lStationCandidate)
+            aSegment.InputTimeseriesCollection.Add(lStationCandidate)
         End If
     End Sub
 
@@ -499,8 +513,8 @@ Public Class WASPProject
         Dim lKeyString As String = ""
         For lIndex As Integer = 1 To Segments.Count
             'input flows 
-            lKeyString = "FLOW:" & aGridFlowSource.CellValue(lIndex, 1)
-            If aGridFlowSource.CellValue(lIndex, 1) <> "<none>" Then
+            lKeyString = "FLOW:" & aGridFlowSource.CellValue(lIndex, 3)
+            If aGridFlowSource.CellValue(lIndex, 3) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, FlowStationCandidates, Me, Segments(lIndex - 1))
             End If
             'need to add other wq loads
@@ -557,7 +571,7 @@ Public Class WASPProject
         Next
     End Sub
 
-    Public Sub DefaultClosestMetStation(ByVal aAirIndex As Integer, ByVal aSolarIndex As Integer, ByVal aWindIndex As Integer)
+    Public Sub DefaultClosestMetStation(ByRef aAirIndex As Integer, ByRef aSolarIndex As Integer, ByRef aWindIndex As Integer)
         'default met stations based on distance
         Dim lXSum As Double = 0
         Dim lYSum As Double = 0
@@ -573,7 +587,7 @@ Public Class WASPProject
             lYAvg = lYSum / Segments.Count
             aAirIndex = FindClosestMetStation(AirTempStationCandidates, lXAvg, lYAvg)
             aSolarIndex = FindClosestMetStation(SolRadStationCandidates, lXAvg, lYAvg)
-            aSolarIndex = FindClosestMetStation(WindStationCandidates, lXAvg, lYAvg)
+            aWindIndex = FindClosestMetStation(WindStationCandidates, lXAvg, lYAvg)
         Else
             aAirIndex = 0
             aSolarIndex = 0
