@@ -133,7 +133,11 @@ Public Class Segments
                 lString.Append(lSegment.Name.PadRight(32) & " ")
                 lString.Append(lSegment.ID.PadRight(16) & " ")
                 lString.Append(lTimeseries.Type.PadRight(16) & " ")
-                lString.Append(lTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value & "." & lTimeseries.Type & ".DAT")
+                If lTimeseries.TimeSeries Is Nothing Then
+                    lString.Append(lTimeseries.Identifier & "." & lTimeseries.Type & ".DAT")
+                Else
+                    lString.Append(lTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value & "." & lTimeseries.Type & ".DAT")
+                End If
                 lString.Append(vbCrLf)
             Next
         Next
