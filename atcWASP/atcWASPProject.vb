@@ -13,6 +13,7 @@ Public Class atcWASPProject
     Public Name As String = ""
     Public WNFFileName As String = ""
     Public SegmentFieldMap As New atcCollection
+    Public WASPConstituents As New atcCollection
 
     Public FlowStationCandidates As New atcWASPTimeseriesCollection
     Public AirTempStationCandidates As New atcWASPTimeseriesCollection

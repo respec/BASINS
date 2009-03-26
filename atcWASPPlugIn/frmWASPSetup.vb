@@ -118,6 +118,8 @@ Public Class frmWASPSetup
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.atxTravelTimeMin = New atcControls.atcText
+        Me.Label6 = New System.Windows.Forms.Label
         Me.cmdVolumes = New System.Windows.Forms.Button
         Me.cmdCreateShapefile = New System.Windows.Forms.Button
         Me.cmdFieldMapping = New System.Windows.Forms.Button
@@ -141,8 +143,6 @@ Public Class frmWASPSetup
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.atxTravelTimeMin = New atcControls.atcText
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -534,6 +534,38 @@ Public Class frmWASPSetup
         Me.TabPage2.Text = "Segmentation"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
+        'atxTravelTimeMin
+        '
+        Me.atxTravelTimeMin.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxTravelTimeMin.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxTravelTimeMin.DefaultValue = ""
+        Me.atxTravelTimeMin.HardMax = -999
+        Me.atxTravelTimeMin.HardMin = 0
+        Me.atxTravelTimeMin.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxTravelTimeMin.Location = New System.Drawing.Point(215, 44)
+        Me.atxTravelTimeMin.MaxWidth = 20
+        Me.atxTravelTimeMin.Name = "atxTravelTimeMin"
+        Me.atxTravelTimeMin.NumericFormat = "0.#####"
+        Me.atxTravelTimeMin.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxTravelTimeMin.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxTravelTimeMin.SelLength = 1
+        Me.atxTravelTimeMin.SelStart = 0
+        Me.atxTravelTimeMin.Size = New System.Drawing.Size(48, 24)
+        Me.atxTravelTimeMin.SoftMax = -999
+        Me.atxTravelTimeMin.SoftMin = -999
+        Me.atxTravelTimeMin.TabIndex = 27
+        Me.atxTravelTimeMin.ValueDouble = 0
+        Me.atxTravelTimeMin.ValueInteger = 0
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(20, 47)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(186, 17)
+        Me.Label6.TabIndex = 26
+        Me.Label6.Text = "Minimum Travel Time (days)"
+        '
         'cmdVolumes
         '
         Me.cmdVolumes.Location = New System.Drawing.Point(618, 16)
@@ -672,7 +704,7 @@ Public Class frmWASPSetup
         '
         Me.cmdSelectConstituents.Location = New System.Drawing.Point(23, 21)
         Me.cmdSelectConstituents.Name = "cmdSelectConstituents"
-        Me.cmdSelectConstituents.Size = New System.Drawing.Size(155, 47)
+        Me.cmdSelectConstituents.Size = New System.Drawing.Size(155, 34)
         Me.cmdSelectConstituents.TabIndex = 22
         Me.cmdSelectConstituents.Text = "Select Constituents"
         Me.cmdSelectConstituents.UseVisualStyleBackColor = True
@@ -795,38 +827,6 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(20, 47)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(186, 17)
-        Me.Label6.TabIndex = 26
-        Me.Label6.Text = "Minimum Travel Time (days)"
-        '
-        'atxTravelTimeMin
-        '
-        Me.atxTravelTimeMin.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxTravelTimeMin.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxTravelTimeMin.DefaultValue = ""
-        Me.atxTravelTimeMin.HardMax = -999
-        Me.atxTravelTimeMin.HardMin = 0
-        Me.atxTravelTimeMin.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxTravelTimeMin.Location = New System.Drawing.Point(215, 44)
-        Me.atxTravelTimeMin.MaxWidth = 20
-        Me.atxTravelTimeMin.Name = "atxTravelTimeMin"
-        Me.atxTravelTimeMin.NumericFormat = "0.#####"
-        Me.atxTravelTimeMin.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxTravelTimeMin.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxTravelTimeMin.SelLength = 1
-        Me.atxTravelTimeMin.SelStart = 0
-        Me.atxTravelTimeMin.Size = New System.Drawing.Size(48, 24)
-        Me.atxTravelTimeMin.SoftMax = -999
-        Me.atxTravelTimeMin.SoftMin = -999
-        Me.atxTravelTimeMin.TabIndex = 27
-        Me.atxTravelTimeMin.ValueDouble = 0
-        Me.atxTravelTimeMin.ValueInteger = 0
-        '
         'frmWASPSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -865,6 +865,7 @@ Public Class frmWASPSetup
     Friend pPlugIn As PlugIn
     Friend pBasinsFolder As String
     Friend pfrmWASPFieldMapping As frmWASPFieldMapping
+    Friend pfrmWASPConstituents As frmWASPConstituents
 
     Private pSelectedRow As Integer
     Private pSelectedColumn As Integer
@@ -1455,7 +1456,20 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cmdSelectConstituents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelectConstituents.Click
-        Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Select Constituents")
+        If IsNothing(pfrmWASPConstituents) Then
+            pfrmWASPConstituents = New frmWASPConstituents
+            pfrmWASPConstituents.Init(pPlugIn.WASPProject.WASPConstituents, Me)
+            pfrmWASPConstituents.Show()
+        Else
+            If pfrmWASPConstituents.IsDisposed Then
+                pfrmWASPConstituents = New frmWASPConstituents
+                pfrmWASPConstituents.Init(pPlugIn.WASPProject.WASPConstituents, Me)
+                pfrmWASPConstituents.Show()
+            Else
+                pfrmWASPConstituents.WindowState = FormWindowState.Normal
+                pfrmWASPConstituents.BringToFront()
+            End If
+        End If
     End Sub
 
     Private Sub cmdGenerateTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdGenerateTimeseries.Click
