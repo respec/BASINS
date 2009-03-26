@@ -112,7 +112,7 @@ Public Class atcWASPSegments
                 lString.Append(Format(.Length, "0.00").PadRight(10) & " ")
                 lString.Append(Format(.Width, "0.00").PadRight(10) & " ")
                 lString.Append(Format(.Depth, "0.00").PadRight(10) & " ")
-                lString.Append(.Slope.PadRight(10) & " ")
+                lString.Append(Format(.Slope, "0.0000").PadRight(10) & " ")
                 lString.Append(Format(.Roughness, "0.000").PadRight(10) & " ")
                 lString.Append(.DownID.PadRight(16) & " ")
                 lString.Append(vbCrLf)
@@ -176,7 +176,7 @@ Public Class atcWASPSegment
     Public Length As Double = 0.0
     Public Width As Double = 0.0
     Public Depth As Double = 0.0
-    Public Slope As String = "0.05"
+    Public Slope As Double = "0.05"
     Public Roughness As Double = 0.05
     Public Velocity As Double = 0.0
     Public InputTimeseriesCollection As atcWASPTimeseriesCollection = Nothing
