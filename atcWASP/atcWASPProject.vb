@@ -105,77 +105,80 @@ Public Class atcWASPProject
 
     Sub GenerateSegments(ByVal lSegmentLayerIndex As Integer, ByVal aMaxTravelTime As Double, ByVal aMinTravelTime As Double)
         With Me
-            'populate the WASP classes from the shapefiles
-            .Segments.Clear()
-            Dim lTable As New atcUtility.atcTableDBF
+            Try
+                'populate the WASP classes from the shapefiles
+                .Segments.Clear()
+                Dim lTable As New atcUtility.atcTableDBF
 
-            'add only selected segments
-            Dim lTempSegments As New atcWASPSegments
-            Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
-            If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
-                Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
-                lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.atcWASPSegment).GetType, .SegmentFieldMap), "Name"))
-            End If
-            Logger.Dbg("SegmentsCount " & lTempSegments.Count)
+                'add only selected segments
+                Dim lTempSegments As New atcWASPSegments
+                Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+                If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
+                    Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
+                    lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.atcWASPSegment).GetType, .SegmentFieldMap), "Name"))
+                End If
+                Logger.Dbg("SegmentsCount " & lTempSegments.Count)
 
-            For Each lSegment As atcWASP.atcWASPSegment In lTempSegments
-                Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
-                lSegment.InputTimeseriesCollection = lTimeseriesCollection
-                lSegment.BaseID = lSegment.ID   'store segment id before breaking up
-            Next
-
-            'after reading the attribute table, see if any are selected
-            If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
-                'put only selected segments in .segments 
-                For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
-                    Dim lShapeIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)
-                    Dim lSegment As atcWASP.atcWASPSegment = lTempSegments(lShapeIndex)
-                    GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
-                    GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
-                    .Segments.Add(lTempSegments(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)))
-                Next
-                Logger.Dbg("SegmentsCentroidsAndPoints")
-            Else
-                'add all 
-                .Segments = lTempSegments
-                Dim lShapeIndex As Integer = -1
                 For Each lSegment As atcWASP.atcWASPSegment In lTempSegments
-                    lShapeIndex += 1
-                    GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
-                    GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
+                    Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
+                    lSegment.InputTimeseriesCollection = lTimeseriesCollection
+                    lSegment.BaseID = lSegment.ID   'store segment id before breaking up
                 Next
-                Logger.Dbg("SegmentsCentroidsAndPoints")
-            End If
 
-            'calculate depth and width from mean annual flow and mean annual velocity
-            'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
-            For Each lSegment As atcWASPSegment In .Segments
-                lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
-                lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
-            Next
+                'after reading the attribute table, see if any are selected
+                If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
+                    'put only selected segments in .segments 
+                    For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
+                        Dim lShapeIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)
+                        Dim lSegment As atcWASP.atcWASPSegment = lTempSegments(lShapeIndex)
+                        GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
+                        GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
+                        Logger.Dbg("Add " & lSegment.ID)
+                        .Segments.Add(lSegment)
+                    Next
+                Else 'add all 
+                    .Segments = lTempSegments
+                    Dim lShapeIndex As Integer = -1
+                    For Each lSegment As atcWASP.atcWASPSegment In lTempSegments
+                        lShapeIndex += 1
+                        GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
+                        GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
+                    Next
+                End If
+                Logger.Dbg("SegmentsCentroidsAndPointsFor " & .Segments.Count & " SegmentsOf " & lTempSegments.Count)
 
-            'do unit conversions from NHDPlus units to WASP assumed units
-            For Each lSegment As atcWASPSegment In .Segments
-                lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
-                lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
-                'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
-                lSegment.Depth = SignificantDigits(lSegment.Depth / 3.281, 3)  'convert ft to m
-                lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
-            Next
+                'calculate depth and width from mean annual flow and mean annual velocity
+                'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
+                For Each lSegment As atcWASPSegment In .Segments
+                    lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
+                    lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
+                Next
 
-            Dim lProblem As String = ""
-            If aMinTravelTime > 0 Then 'minimum travel time has been set, combine the segments as needed
-                CombineSegments(aMinTravelTime, lProblem)
-            End If
+                'do unit conversions from NHDPlus units to WASP assumed units
+                For Each lSegment As atcWASPSegment In .Segments
+                    lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
+                    lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
+                    'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
+                    lSegment.Depth = SignificantDigits(lSegment.Depth / 3.281, 3)  'convert ft to m
+                    lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
+                Next
 
-            If aMaxTravelTime > 0 Then 'maximum travel time has been set, divide the segments as needed
-                DivideSegments(aMaxTravelTime)
-            End If
+                Dim lProblem As String = ""
+                If aMinTravelTime > 0 Then 'minimum travel time has been set, combine the segments as needed
+                    CombineSegments(aMinTravelTime, lProblem)
+                End If
 
-            lProblem = .Segments.AssignWaspIds()
-            If lProblem.Length > 0 Then
-                Logger.Dbg("ProblemInGenerateSegmentsAssignWaspIds " & lProblem)
-            End If
+                If aMaxTravelTime > 0 Then 'maximum travel time has been set, divide the segments as needed
+                    DivideSegments(aMaxTravelTime)
+                End If
+
+                lProblem = .Segments.AssignWaspIds()
+                If lProblem.Length > 0 Then
+                    Logger.Dbg("ProblemInGenerateSegmentsAssignWaspIds " & lProblem)
+                End If
+            Catch lEX As Exception
+                Logger.Dbg(lEX.Message)
+            End Try
         End With
     End Sub
 
@@ -196,6 +199,10 @@ Public Class atcWASPProject
     Private Function DetermineShortSegments(ByVal aMinTravelTime As Double, ByVal aDownstreamKey As String) As Integer
         Dim lShortSegmentCount As Integer = 0
         Dim lDownstreamSegment As atcWASPSegment = Segments(aDownstreamKey)
+        If aMinTravelTime > TravelTime(lDownstreamSegment.Length, lDownstreamSegment.Velocity) Then
+            lShortSegmentCount += 1
+            lDownstreamSegment.TooShort = True
+        End If
         lDownstreamSegment.CountAbove = 0
         For Each lSegment As atcWASPSegment In Segments
             If lSegment.DownID = lDownstreamSegment.ID Then
@@ -214,29 +221,34 @@ Public Class atcWASPProject
         Dim lSegment As atcWASPSegment = Segments(aSegmentKey)
         Logger.Dbg("Combine " & aSegmentKey & " " & lSegment.TooShort)
         If lSegment.TooShort Then 'too short - combine with segment up or down
+            Dim lSegmentCombined As atcWASPSegment = Nothing
+            Dim lSegmentRemoved As atcWASPSegment = Nothing
             Dim lUpStreamSegment As atcWASPSegment = UpstreamMainSegment(lSegment.ID)
             If lUpStreamSegment IsNot Nothing Then 'combine with upstream
-                Dim lSegmentCombined As atcWASPSegment = CombineSegment(lSegment, lUpStreamSegment, True)
-                If aMinTravelTime > TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity) Then
-                    Logger.Dbg("StillToShort!")
-                    lSegmentCombined.TooShort = True
-                    'TODO: what should we do now?
-                End If
-                aNewSegments.Add(lSegmentCombined)
+                lSegmentCombined = CombineSegment(lSegment, lUpStreamSegment, True)
+                lSegmentRemoved = lUpStreamSegment
             Else 'combine with downstream (if possible)
                 Dim lDownStreamSegment As atcWASPSegment = Segments(lSegment.DownID)
                 Dim lDownStreamUpMainSegment As atcWASPSegment = UpstreamMainSegment(lDownStreamSegment.ID)
                 If lDownStreamUpMainSegment.ID = lSegment.ID Then
-                    Dim lSegmentCombined As atcWASPSegment = CombineSegment(lSegment, lDownStreamSegment, False)
-                    If aMinTravelTime > TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity) Then
-                        Logger.Dbg("StillToShort!")
-                        lSegmentCombined.TooShort = True
-                        'TODO: what should we do now?
-                    End If
-                    aNewSegments.Add(lSegmentCombined)
+                    lSegmentCombined = CombineSegment(lSegment, lDownStreamSegment, False)
                 Else
                     Logger.Dbg("Skip " & lSegment.ID & " Nothing up and not MainChannel")
                 End If
+            End If
+            If lSegmentCombined IsNot Nothing Then
+                If aMinTravelTime > TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity) Then
+                    Logger.Dbg("StillToShort " & lSegmentCombined.ID & " " & TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity))
+                    lSegmentCombined.TooShort = True
+                    'TODO: what should we do now?
+                End If
+                aNewSegments.Add(lSegmentCombined)
+                'fix DownIds for upstream segments
+                For Each lSegment In Segments
+                    If lSegment.DownID = lSegmentRemoved.ID Then
+                        lSegment.DownID = lSegmentCombined.ID
+                    End If
+                Next
             End If
         Else 'no problem, use as is
             aNewSegments.Add(lSegment)
@@ -274,48 +286,52 @@ Public Class atcWASPProject
             lSegment.ID = aSegmentPrimary.ID
         End If
 
-        With lSegment
-            'TODO: better algorithm - weighted?
-            .Depth = (aSegmentPrimary.Depth + aSegmentSecondary.Depth) / 2
-            .Length = aSegmentPrimary.Length + aSegmentSecondary.Length
-            '.Name 
-            .Roughness = (aSegmentPrimary.Roughness + aSegmentSecondary.Roughness) / 2
-            .Slope = (aSegmentPrimary.Slope + aSegmentSecondary.Slope) / 2
-            .Velocity = (aSegmentPrimary.Velocity + aSegmentSecondary.Velocity) / 2
-            .Width = (aSegmentPrimary.Width + aSegmentSecondary.Width) / 2
-            '.BaseID 
-            .CentroidX = (aSegmentPrimary.CentroidX + aSegmentSecondary.CentroidX) / 2
-            .CentroidY = (aSegmentPrimary.CentroidY + aSegmentSecondary.CentroidY) / 2
-            Dim lPointCount As Integer = aSegmentPrimary.PtsX.GetLength(0) + aSegmentSecondary.PtsX.GetLength(0)
-            ReDim Preserve .PtsX(lPointCount)
-            ReDim Preserve .PtsY(lPointCount)
-            'TODO: assumes nhdplus convention - up to down, needs to be robust
-            If aSecondaryUpstream Then
-                For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0)
-                    .PtsX(lIndex) = aSegmentSecondary.PtsX(lIndex)
-                    .PtsY(lIndex) = aSegmentSecondary.PtsX(lIndex)
-                Next
-                Dim lBasePoint As Integer = aSegmentSecondary.PtsX.GetLength(0)
-                For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0)
-                    lBasePoint += 1
-                    .PtsX(lBasePoint) = aSegmentPrimary.PtsX(lIndex)
-                    .PtsY(lBasePoint) = aSegmentPrimary.PtsY(lIndex)
-                Next
-            Else
-                For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0)
-                    .PtsX(lIndex) = aSegmentPrimary.PtsX(lIndex)
-                    .PtsY(lIndex) = aSegmentPrimary.PtsX(lIndex)
-                Next
-                Dim lBasePoint As Integer = aSegmentPrimary.PtsX.GetLength(0)
-                For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0)
-                    lBasePoint += 1
-                    .PtsX(lBasePoint) = aSegmentSecondary.PtsX(lIndex)
-                    .PtsY(lBasePoint) = aSegmentSecondary.PtsY(lIndex)
-                Next
-            End If
-            '.MeanAnnualFlow
-            '.WASPID 
-        End With
+        Try
+            With lSegment
+                'TODO: better algorithm - weighted?
+                .Depth = (aSegmentPrimary.Depth + aSegmentSecondary.Depth) / 2
+                .Length = aSegmentPrimary.Length + aSegmentSecondary.Length
+                '.Name 
+                .Roughness = (aSegmentPrimary.Roughness + aSegmentSecondary.Roughness) / 2
+                .Slope = (aSegmentPrimary.Slope + aSegmentSecondary.Slope) / 2
+                .Velocity = (aSegmentPrimary.Velocity + aSegmentSecondary.Velocity) / 2
+                .Width = (aSegmentPrimary.Width + aSegmentSecondary.Width) / 2
+                '.BaseID 
+                .CentroidX = (aSegmentPrimary.CentroidX + aSegmentSecondary.CentroidX) / 2
+                .CentroidY = (aSegmentPrimary.CentroidY + aSegmentSecondary.CentroidY) / 2
+                Dim lPointCount As Integer = aSegmentPrimary.PtsX.GetLength(0) + aSegmentSecondary.PtsX.GetLength(0)
+                ReDim .PtsX(lPointCount)
+                ReDim .PtsY(lPointCount)
+                'TODO: assumes nhdplus convention - up to down, needs to be robust
+                If aSecondaryUpstream Then
+                    For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0) - 1
+                        .PtsX(lIndex) = aSegmentSecondary.PtsX(lIndex)
+                        .PtsY(lIndex) = aSegmentSecondary.PtsX(lIndex)
+                    Next
+                    Dim lBasePoint As Integer = aSegmentSecondary.PtsX.GetLength(0)
+                    For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0) - 1
+                        .PtsX(lBasePoint) = aSegmentPrimary.PtsX(lIndex)
+                        .PtsY(lBasePoint) = aSegmentPrimary.PtsY(lIndex)
+                        lBasePoint += 1
+                    Next
+                Else
+                    For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0)
+                        .PtsX(lIndex) = aSegmentPrimary.PtsX(lIndex)
+                        .PtsY(lIndex) = aSegmentPrimary.PtsX(lIndex)
+                    Next
+                    Dim lBasePoint As Integer = aSegmentPrimary.PtsX.GetLength(0)
+                    For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0)
+                        lBasePoint += 1
+                        .PtsX(lBasePoint) = aSegmentSecondary.PtsX(lIndex)
+                        .PtsY(lBasePoint) = aSegmentSecondary.PtsY(lIndex)
+                    Next
+                End If
+                '.MeanAnnualFlow
+                '.WASPID 
+            End With
+        Catch lEx As Exception
+            Logger.Dbg(lEx.Message)
+        End Try
         Return lSegment
     End Function
 
