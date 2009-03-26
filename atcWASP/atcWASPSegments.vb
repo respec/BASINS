@@ -101,14 +101,15 @@ Public Class Segments
     Public Overrides Function ToString() As String
         Dim lString As New System.Text.StringBuilder
 
-        lString.Append(";Name                            ID               Length     Width      Depth      Slope      Roughness  DownSegID        " & vbCrLf)
-        lString.Append(";                                                 (km)       (m)        (m)                                               " & vbCrLf)
-        lString.Append(";_______________________________ ________________ __________ __________ __________ __________ __________ ________________ " & vbCrLf)
+        lString.Append(";Name                            ID               WASP ID    Length     Width      Depth      Slope      Roughness  DownSegID        " & vbCrLf)
+        lString.Append(";                                                            (km)       (m)        (m)                                               " & vbCrLf)
+        lString.Append(";_______________________________ ________________ __________ __________ __________ __________ __________ __________ ________________ " & vbCrLf)
 
         For Each lSegment As Segment In Me
             With lSegment
                 lString.Append(.Name.PadRight(32) & " ")
                 lString.Append(.ID.PadRight(16) & " ")
+                lString.Append(.WASPID.ToString.PadRight(10) & " ")
                 lString.Append(Format(.Length, "0.00").PadRight(10) & " ")
                 lString.Append(Format(.Width, "0.00").PadRight(10) & " ")
                 lString.Append(Format(.Depth, "0.00").PadRight(10) & " ")
@@ -127,6 +128,28 @@ Public Class Segments
 
         lString.Append(";Segment Name                    Segment ID       Timeseries Type  Timeseries File Name                    " & vbCrLf)
         lString.Append(";_______________________________ ________________ ________________ ________________________________________" & vbCrLf)
+
+        For Each lTimeseries As WASPTimeseries In Me.WASPProject.InputTimeseriesCollection
+            'first write project-wide timeseries
+
+            'does any segment use this?
+            Dim lUsedBySegment As Boolean = False
+            For Each lSegment As Segment In Me
+                For Each lTempTimeseries As WASPTimeseries In lSegment.InputTimeseriesCollection
+                    If lTempTimeseries.Type = lTimeseries.Type And lTempTimeseries.Description = lTimeseries.Description Then
+                        'yes, used by a segment 
+                        lUsedBySegment = True
+                    End If
+                Next
+            Next
+
+            If Not lUsedBySegment Then
+                lString.Append("<all>".PadRight(49) & " ")
+                lString.Append(lTimeseries.Type.PadRight(16) & " ")
+                lString.Append(lTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value & "." & lTimeseries.Type & ".DAT")
+                lString.Append(vbCrLf)
+            End If
+        Next
 
         For Each lSegment As Segment In Me
             For Each lTimeseries As WASPTimeseries In lSegment.InputTimeseriesCollection
