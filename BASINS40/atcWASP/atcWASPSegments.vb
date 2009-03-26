@@ -11,13 +11,7 @@ Public Class Segments
     Public WASPProject As WASPProject
     Private pNextKey As Integer = 0
 
-    ''' <summary>
-    ''' Assign Ids to each segment starting at downstream segment
-    ''' </summary>
-    ''' <returns>String describing any problems that occured</returns>
-    ''' <remarks></remarks>
-    Public Function AssignWaspIds() As String
-        Dim lProblem As String = ""
+    Friend Function DownstreamKey(ByRef aProblem As String) As String
         Dim lDownstreamKey As String = ""
         For Each lSegment As Segment In Me
             lSegment.WASPID = 0
@@ -32,11 +26,21 @@ Public Class Segments
                 If lDownstreamKey.Length = 0 Then
                     lDownstreamKey = lSegment.ID & ":" & lSegment.Name
                 Else
-                    lProblem = "Multiple Exits"
+                    aProblem = "Multiple Exits"
                 End If
             End If
         Next
+        Return lDownstreamKey
+    End Function
 
+    ''' <summary>
+    ''' Assign Ids to each segment starting at downstream segment
+    ''' </summary>
+    ''' <returns>String describing any problems that occured</returns>
+    ''' <remarks></remarks>
+    Public Function AssignWaspIds() As String
+        Dim lProblem As String = ""
+        Dim lDownstreamKey As String = DownstreamKey(lProblem)
         If lProblem.Length = 0 Then
             AssignWaspIdAndMoveUpstream(lDownstreamKey)
 
@@ -158,6 +162,9 @@ Public Class Segment
     Public CumulativeDrainageArea As Double
     Public MeanAnnualFlow As Double
     Public WASPID As Integer
+    'internal variables for atcWASPProject
+    Friend TooShort As Boolean = False
+    Friend CountAbove As Integer = 0
 
     Public Function Clone() As Segment
         Dim lNewSegment As New Segment
