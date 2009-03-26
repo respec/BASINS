@@ -110,7 +110,7 @@ Public Class WASPProject
             Dim lTable As New atcUtility.atcTableDBF
 
             'add only selected segments
-            Dim lTempSegments As New atcWASP.Segments
+            Dim lTempSegments As New Segments
             Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
             If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
                 Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
@@ -165,7 +165,7 @@ Public Class WASPProject
 
             'if a minimum travel time has been set, combine the segments as needed
             If aMinTravelTime > 0 Then
-                CombineSegments(aMinTravelTime)
+                Segments = CombineSegments(aMinTravelTime)
             End If
 
             'if a maximum travel time has been set, divide the segments as needed
@@ -180,11 +180,141 @@ Public Class WASPProject
         End With
     End Sub
 
-    Sub CombineSegments(ByVal aMinTravelTime As Double)
+    Private Function CombineSegments(ByVal aMinTravelTime As Double) As Segments
+        Dim lNewSegments As New Segments
+        Dim lProblem As String = ""
+        Dim lDownstreamKey As String = Segments.DownstreamKey(lProblem)
+        If lProblem.Length = 0 Then
+            Dim lShortSegmentCount As Integer = DetermineShortSegments(aMinTravelTime, lDownstreamKey)
+            Logger.Dbg("ShortSegmentCount " & lShortSegmentCount)
+            If lShortSegmentCount > 0 Then 'fix them
+                CombineSegmentsDetail(lDownstreamKey, lNewSegments)
+            Else ' no problems
+                lNewSegments = Segments
+            End If
+        End If
+        Return lNewSegments
+    End Function
 
+    Private Function DetermineShortSegments(ByVal aMinTravelTime As Double, ByVal aDownstreamKey As String) As Integer
+        Dim lShortSegmentCount As Integer = 0
+        Dim lDownstreamSegment As Segment = Segments(aDownstreamKey)
+        lDownstreamSegment.CountAbove = 0
+        For Each lSegment As Segment In Segments
+            If lSegment.DownID = lDownstreamSegment.ID Then
+                If aMinTravelTime > TravelTime(lSegment.Length, lSegment.Velocity) Then
+                    lShortSegmentCount += 1
+                    lSegment.TooShort = True
+                End If
+                lDownstreamSegment.CountAbove += 1
+                lShortSegmentCount += DetermineShortSegments(aMinTravelTime, lSegment.ID & ":" & lSegment.Name)
+            End If
+        Next
+        Return lShortSegmentCount
+    End Function
+
+    Private Sub CombineSegmentsDetail(ByVal aDownStreamKey As String, ByRef aNewSegments As Segments)
+        Dim lSegment As Segment = Segments.Item(aDownStreamKey)
+        If lSegment.TooShort Then 'too short - combine with segment up or down
+            Dim lUpSegments As ArrayList = UpstreamSegments(lSegment.ID)
+            If lUpSegments.Count = 1 Then
+                aNewSegments.Add(CombineSegment(lSegment, lUpSegments(0), True))
+            Else
+                Dim lUpFromDownSegments As ArrayList = UpstreamSegments(lSegment.DownID)
+                If lUpFromDownSegments.Count = 1 Then
+                    aNewSegments.Add(CombineSegment(Segments(lSegment.DownID), lSegment, True))
+                ElseIf lUpFromDownSegments.Count = 0 Then
+                    If lUpSegments.Count > 0 Then
+                        Dim lCombineWithSegment As New Segment
+                        For Each lUpSegment As Segment In lUpSegments
+                            If lUpSegment.CumulativeDrainageArea > lCombineWithSegment.CumulativeDrainageArea Then
+                                lCombineWithSegment = lUpSegment
+                            End If
+                        Next
+                        aNewSegments.Add(CombineSegment(lSegment, lCombineWithSegment))
+                    Else
+                        Logger.Msg("OrphanSegment " & lSegment.ID)
+                    End If
+                Else 'check to see if on main channel
+                    Dim lCombineWithSegment As Segment = lSegment
+                    For Each lUpFromDownSegment As Segment In lUpFromDownSegments
+                        If lUpFromDownSegment.CumulativeDrainageArea > lCombineWithSegment.CumulativeDrainageArea Then
+                            lCombineWithSegment = lUpFromDownSegment
+                        End If
+                    Next
+                End If
+            End If
+        End If
     End Sub
 
-    Sub DivideSegments(ByVal aMaxTravelTime As Double)
+    Private Function UpstreamSegments(ByVal aSegmentId As String) As ArrayList
+        Dim lUpstreamSegments As New ArrayList
+        For Each lSegment As Segment In Segments
+            If lSegment.DownID = aSegmentId Then
+                lUpstreamSegments.Add(lSegment)
+            End If
+        Next
+        Return lUpstreamSegments
+    End Function
+
+    Private Function CombineSegment(ByVal aSegmentPrimary As Segment, _
+                                    ByVal aSegmentSecondary As Segment, _
+                           Optional ByVal aSecondaryUpstream As Boolean = False) As Segment
+        Dim lSegment As Segment
+        If aSecondaryUpstream Then 'primary downstream
+            lSegment = aSegmentPrimary.Clone
+        Else 'secondary downstream
+            lSegment = aSegmentSecondary.Clone
+        End If
+
+        With lSegment
+            'TODO: better algorithm - weighted?
+            .Depth = (aSegmentPrimary.Depth + aSegmentSecondary.Depth) / 2
+            '.DownID 
+            '.ID
+            .Length = aSegmentPrimary.Length + aSegmentSecondary.Length
+            '.Name 
+            .Roughness = (aSegmentPrimary.Roughness + aSegmentSecondary.Roughness) / 2
+            .Slope = (aSegmentPrimary.Slope + aSegmentSecondary.Slope) / 2
+            .Velocity = (aSegmentPrimary.Velocity + aSegmentSecondary.Velocity) / 2
+            .Width = (aSegmentPrimary.Width + aSegmentSecondary.Width) / 2
+            '.BaseID 
+            .CentroidX = (aSegmentPrimary.CentroidX + aSegmentSecondary.CentroidX) / 2
+            .CentroidY = (aSegmentPrimary.CentroidY + aSegmentSecondary.CentroidY) / 2
+            Dim lPointCount As Integer = aSegmentPrimary.PtsX.GetLength(0) + aSegmentSecondary.PtsX.GetLength(0)
+            ReDim Preserve .PtsX(lPointCount)
+            ReDim Preserve .PtsY(lPointCount)
+            'TODO: assumes nhdplus convention - up to down, needs to be robust
+            If aSecondaryUpstream Then
+                For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0)
+                    .PtsX(lIndex) = aSegmentSecondary.PtsX(lIndex)
+                    .PtsY(lIndex) = aSegmentSecondary.PtsX(lIndex)
+                Next
+                Dim lBasePoint As Integer = aSegmentSecondary.PtsX.GetLength(0)
+                For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0)
+                    lBasePoint += 1
+                    .PtsX(lBasePoint) = aSegmentPrimary.PtsX(lIndex)
+                    .PtsY(lBasePoint) = aSegmentPrimary.PtsY(lIndex)
+                Next
+            Else
+                For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0)
+                    .PtsX(lIndex) = aSegmentPrimary.PtsX(lIndex)
+                    .PtsY(lIndex) = aSegmentPrimary.PtsX(lIndex)
+                Next
+                Dim lBasePoint As Integer = aSegmentPrimary.PtsX.GetLength(0)
+                For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0)
+                    lBasePoint += 1
+                    .PtsX(lBasePoint) = aSegmentSecondary.PtsX(lIndex)
+                    .PtsY(lBasePoint) = aSegmentSecondary.PtsY(lIndex)
+                Next
+            End If
+            '.MeanAnnualFlow
+            '.WASPID 
+        End With
+        Return lSegment
+    End Function
+
+    Private Sub DivideSegments(ByVal aMaxTravelTime As Double)
         Dim lNewSegments As New Segments
         Dim lNewSegmentPositions As New atcCollection
         For lIndex As Integer = 1 To Segments.Count
@@ -212,6 +342,7 @@ Public Class WASPProject
                 Next
                 'reset length and id for the original segment 
                 Dim lOldID As String = lSegment.ID
+                'TODO: should this be hardcoded?
                 lSegment.ID = lOldID & "A"
                 'if this segment id shows up as a downid anywhere else, change it
                 For Each lTempSeg As Segment In Segments
@@ -219,6 +350,7 @@ Public Class WASPProject
                         lTempSeg.DownID = lSegment.ID
                     End If
                 Next
+                'TODO: should this be hardcoded?
                 lSegment.DownID = lOldID & "B"
                 lSegment.Length = lSegment.Length / lBreakNumber
                 lSegment.CumulativeDrainageArea = lCumAbove + ((lSegment.CumulativeDrainageArea - lCumAbove) / lBreakNumber)
