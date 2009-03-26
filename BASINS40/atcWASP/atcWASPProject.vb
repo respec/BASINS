@@ -186,7 +186,7 @@ Public Class atcWASPProject
             Logger.Dbg("ShortSegmentCount " & lShortSegmentCount)
             If lShortSegmentCount > 0 Then 'fix them
                 Dim lNewSegments As New atcWASPSegments
-                CombineSegmentsDetail(lDownstreamKey, lNewSegments)
+                CombineSegmentsDetail(lDownstreamKey, aMinTravelTime, lNewSegments)
                 Segments.Clear()
                 Segments = lNewSegments
             End If
@@ -204,71 +204,79 @@ Public Class atcWASPProject
                     lSegment.TooShort = True
                 End If
                 lDownstreamSegment.CountAbove += 1
-                lShortSegmentCount += DetermineShortSegments(aMinTravelTime, lSegment.ID & ":" & lSegment.Name)
+                lShortSegmentCount += DetermineShortSegments(aMinTravelTime, lSegment.ID)
             End If
         Next
         Return lShortSegmentCount
     End Function
 
-    Private Sub CombineSegmentsDetail(ByVal aDownStreamKey As String, ByRef aNewSegments As atcWASPSegments)
-        Dim lSegment As atcWASPSegment = Segments.Item(aDownStreamKey)
+    Private Sub CombineSegmentsDetail(ByVal aSegmentKey As String, ByVal aMinTravelTime As Double, ByRef aNewSegments As atcWASPSegments)
+        Dim lSegment As atcWASPSegment = Segments(aSegmentKey)
+        Logger.Dbg("Combine " & aSegmentKey & " " & lSegment.TooShort)
         If lSegment.TooShort Then 'too short - combine with segment up or down
-            Dim lUpSegments As ArrayList = UpstreamSegments(lSegment.ID)
-            If lUpSegments.Count = 1 Then
-                aNewSegments.Add(CombineSegment(lSegment, lUpSegments(0), True))
-            Else
-                Dim lUpFromDownSegments As ArrayList = UpstreamSegments(lSegment.DownID)
-                If lUpFromDownSegments.Count = 1 Then
-                    aNewSegments.Add(CombineSegment(Segments(lSegment.DownID), lSegment, True))
-                ElseIf lUpFromDownSegments.Count = 0 Then
-                    If lUpSegments.Count > 0 Then
-                        Dim lCombineWithSegment As New atcWASPSegment
-                        For Each lUpSegment As atcWASPSegment In lUpSegments
-                            If lUpSegment.CumulativeDrainageArea > lCombineWithSegment.CumulativeDrainageArea Then
-                                lCombineWithSegment = lUpSegment
-                            End If
-                        Next
-                        aNewSegments.Add(CombineSegment(lSegment, lCombineWithSegment))
-                    Else
-                        Logger.Msg("OrphanSegment " & lSegment.ID)
+            Dim lUpStreamSegment As atcWASPSegment = UpstreamMainSegment(lSegment.ID)
+            If lUpStreamSegment IsNot Nothing Then 'combine with upstream
+                Dim lSegmentCombined As atcWASPSegment = CombineSegment(lSegment, lUpStreamSegment, True)
+                If aMinTravelTime > TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity) Then
+                    Logger.Dbg("StillToShort!")
+                    lSegmentCombined.TooShort = True
+                    'TODO: what should we do now?
+                End If
+                aNewSegments.Add(lSegmentCombined)
+            Else 'combine with downstream (if possible)
+                Dim lDownStreamSegment As atcWASPSegment = Segments(lSegment.DownID)
+                Dim lDownStreamUpMainSegment As atcWASPSegment = UpstreamMainSegment(lDownStreamSegment.ID)
+                If lDownStreamUpMainSegment.ID = lSegment.ID Then
+                    Dim lSegmentCombined As atcWASPSegment = CombineSegment(lSegment, lDownStreamSegment, False)
+                    If aMinTravelTime > TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity) Then
+                        Logger.Dbg("StillToShort!")
+                        lSegmentCombined.TooShort = True
+                        'TODO: what should we do now?
                     End If
-                Else 'check to see if on main channel
-                    Dim lCombineWithSegment As atcWASPSegment = lSegment
-                    For Each lUpFromDownSegment As atcWASPSegment In lUpFromDownSegments
-                        If lUpFromDownSegment.CumulativeDrainageArea > lCombineWithSegment.CumulativeDrainageArea Then
-                            lCombineWithSegment = lUpFromDownSegment
-                        End If
-                    Next
+                    aNewSegments.Add(lSegmentCombined)
+                Else
+                    Logger.Dbg("Skip " & lSegment.ID & " Nothing up and not MainChannel")
                 End If
             End If
+        Else 'no problem, use as is
+            aNewSegments.Add(lSegment)
         End If
-    End Sub
-
-    Private Function UpstreamSegments(ByVal aSegmentId As String) As ArrayList
-        Dim lUpstreamSegments As New ArrayList
-        For Each lSegment As atcWASPSegment In Segments
-            If lSegment.DownID = aSegmentId Then
-                lUpstreamSegments.Add(lSegment)
+        Logger.Dbg("NewSegmentCount " & aNewSegments.Count)
+        'move on upstream
+        For Each lSegment In Segments
+            If lSegment.DownID = aSegmentKey Then
+                CombineSegmentsDetail(lSegment.ID, aMinTravelTime, aNewSegments)
             End If
         Next
-        Return lUpstreamSegments
+    End Sub
+
+    Private Function UpstreamMainSegment(ByVal aSegmentId As String) As atcWASPSegment
+        Dim lUpstreamMainSegment As atcWASPSegment = Nothing
+        For Each lSegment As atcWASPSegment In Segments
+            If lSegment.DownID = aSegmentId Then
+                If lUpstreamMainSegment Is Nothing OrElse lUpstreamMainSegment.CumulativeDrainageArea < lSegment.CumulativeDrainageArea Then
+                    lUpstreamMainSegment = lSegment
+                End If
+            End If
+        Next
+        Return lUpstreamMainSegment
     End Function
 
     Private Function CombineSegment(ByVal aSegmentPrimary As atcWASPSegment, _
                                     ByVal aSegmentSecondary As atcWASPSegment, _
-                           Optional ByVal aSecondaryUpstream As Boolean = False) As atcWASPSegment
+                                    ByVal aSecondaryUpstream As Boolean) As atcWASPSegment
         Dim lSegment As atcWASPSegment
         If aSecondaryUpstream Then 'primary downstream
             lSegment = aSegmentPrimary.Clone
         Else 'secondary downstream
             lSegment = aSegmentSecondary.Clone
+            lSegment.DownID = aSegmentPrimary.DownID
+            lSegment.ID = aSegmentPrimary.ID
         End If
 
         With lSegment
             'TODO: better algorithm - weighted?
             .Depth = (aSegmentPrimary.Depth + aSegmentSecondary.Depth) / 2
-            '.DownID 
-            '.ID
             .Length = aSegmentPrimary.Length + aSegmentSecondary.Length
             '.Name 
             .Roughness = (aSegmentPrimary.Roughness + aSegmentSecondary.Roughness) / 2

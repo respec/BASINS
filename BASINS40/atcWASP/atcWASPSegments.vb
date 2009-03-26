@@ -4,8 +4,7 @@ Imports MapWinUtility
 Public Class atcWASPSegments
     Inherits KeyedCollection(Of String, atcWASPSegment)
     Protected Overrides Function GetKeyForItem(ByVal aSegment As atcWASPSegment) As String
-        Dim lKey As String = aSegment.ID & ":" & aSegment.Name
-        Return lKey
+        Return aSegment.ID
     End Function
 
     Public WASPProject As atcWASPProject
@@ -24,7 +23,7 @@ Public Class atcWASPSegments
             Next
             If Not lDownExists Then
                 If lDownstreamKey.Length = 0 Then
-                    lDownstreamKey = lSegment.ID & ":" & lSegment.Name
+                    lDownstreamKey = lSegment.ID
                 Else
                     aProblem = "Multiple Exits"
                 End If
@@ -51,7 +50,7 @@ Public Class atcWASPSegments
                     Else
                         lProblem &= ", "
                     End If
-                    lProblem &= lSegment.ID & ":" & lSegment.Name
+                    lProblem &= lSegment.ID
                 End If
             Next
         End If
@@ -72,7 +71,7 @@ Public Class atcWASPSegments
             If lSegment.DownID = lDownStreamSegment.ID Then
                 If lSegment.CumulativeDrainageArea > lUpSteamMaxArea Then
                     lUpSteamMaxArea = lSegment.CumulativeDrainageArea
-                    lUpSteamMainSegmentKey = lSegment.ID & ":" & lSegment.Name
+                    lUpSteamMainSegmentKey = lSegment.ID
                 End If
                 lUpSteamSegments.Add(lSegment)
             End If
@@ -82,7 +81,7 @@ Public Class atcWASPSegments
             If lUpSteamSegments.Count > 1 Then
                 For Each lSegment As atcWASPSegment In lUpSteamSegments
                     If lSegment.WASPID = 0 Then 'other channel
-                        AssignWaspIdAndMoveUpstream(lSegment.ID & ":" & lSegment.Name)
+                        AssignWaspIdAndMoveUpstream(lSegment.ID)
                     End If
                 Next
             End If
