@@ -125,13 +125,14 @@ Module modWaspUtil
             lCounter += 1
             Logger.Progress(lCounter, lTotalCount)
 
-            If lDataSet.Attributes.GetValue("Constituent") = aConstituent Then
+            If lDataSet.Attributes.GetValue("Constituent") = aConstituent Or aConstituent = "" Then
                 Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
                 Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
                 Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
                 Dim lDataSourceName As String = lDataSet.Attributes.GetValue("Data Source")
                 Dim lSJDay As Double
                 Dim lEJDay As Double
+                Dim lConstituent As String = lDataSet.Attributes.GetValue("Constituent")
                 lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
                 lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
                 If lSJDay = 0 Then
@@ -150,8 +151,12 @@ Module modWaspUtil
                 lCandidateTimeseries.Identifier = lLoc
                 lCandidateTimeseries.SDate = lSJDay
                 lCandidateTimeseries.EDate = lEJDay
-                lCandidateTimeseries.Description = lLoc & ":" & lStanam & " " & lDateString
-                lCandidateTimeseries.Type = aConstituent
+                If aConstituent.Length > 0 Then
+                    lCandidateTimeseries.Description = lLoc & ":" & lStanam & " " & lDateString
+                Else
+                    lCandidateTimeseries.Description = lConstituent & ":" & lLoc & ":" & lStanam & " " & lDateString
+                End If
+                lCandidateTimeseries.Type = lConstituent
                 lCandidateTimeseries.ID = lDsn
                 lCandidateTimeseries.DataSourceName = lDataSourceName
                 Try

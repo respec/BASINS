@@ -20,6 +20,7 @@ Public Class atcWASPProject
     Public SolRadStationCandidates As New atcWASPTimeseriesCollection
     Public WindStationCandidates As New atcWASPTimeseriesCollection
     Public WaterTempStationCandidates As New atcWASPTimeseriesCollection
+    Public WQStationCandidates As New atcWASPTimeseriesCollection
 
     Public Sub New()
         Name = ""
@@ -545,11 +546,24 @@ Public Class atcWASPProject
             If aGridFlowSource.CellValue(lIndex, 3) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, FlowStationCandidates, Me, Segments(lIndex - 1))
             End If
-            'need to add other wq loads
+            'water temp
             lKeyString = "WTMP:" & aGridLoadSource.CellValue(lIndex, 1)
             If aGridLoadSource.CellValue(lIndex, 1) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, WaterTempStationCandidates, Me, Segments(lIndex - 1))
             End If
+            For lColumn As Integer = 1 To Me.WASPConstituents.Count
+                'other wq loads
+                'build key string, type is the first part before the colon.
+                Dim lColonPos As Integer = InStr(1, aGridLoadSource.CellValue(lIndex, 1 + lColumn), ":")
+                If lColonPos > 0 Then
+                    lKeyString = Mid(aGridLoadSource.CellValue(lIndex, 1 + lColumn), 1, lColonPos) & aGridLoadSource.CellValue(lIndex, 1 + lColumn)
+                Else
+                    lKeyString = ""
+                End If
+                If aGridLoadSource.CellValue(lIndex, 1 + lColumn) <> "<none>" Then
+                    AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, Segments(lIndex - 1))
+                End If
+            Next
         Next
         'met timeseries are not segment-specific
         'air temp

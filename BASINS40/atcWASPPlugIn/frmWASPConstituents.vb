@@ -16,6 +16,7 @@ Public Class frmWASPConstituents
         Next
 
         pfrmWASPSetup.pPlugIn.WASPProject.WASPConstituents = pWASPConstituents
+        pfrmWASPSetup.SetLoadStationGrid()
 
         Me.Dispose()
     End Sub
