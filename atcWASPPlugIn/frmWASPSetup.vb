@@ -1148,13 +1148,13 @@ Public Class frmWASPSetup
         AtcGridLoad.Clear()
         With AtcGridLoad.Source
             .Columns = 2
+            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
             .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
             .CellValue(0, 0) = "Segment"
+            .CellColor(0, 1) = SystemColors.ControlDark
             .CellValue(0, 1) = "Water Temp Timeseries"
         End With
 
@@ -1178,6 +1178,7 @@ Public Class frmWASPSetup
             .BuildListofValidStationNames("SOLRAD", .SolRadStationCandidates)
             .BuildListofValidStationNames("SOLR", .SolRadStationCandidates)
             .BuildListofValidStationNames("WIND", .WindStationCandidates)
+            .BuildListofValidStationNames("", .WQStationCandidates)
 
             'set layer index for met stations
             If cboMet.SelectedIndex > 0 Then
@@ -1324,11 +1325,19 @@ Public Class frmWASPSetup
         End If
     End Sub
 
-    Private Sub SetLoadStationGrid()
+    Friend Sub SetLoadStationGrid()
         If AtcGridLoad.Source Is Nothing Then
             Logger.Dbg("No atcGridLoad")
         Else
             Logger.Dbg("Begin")
+
+            With AtcGridLoad.Source
+                .Columns = 2 + pPlugIn.WASPProject.WASPConstituents.Count
+                For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
+                    .CellColor(0, 1 + lColumn) = SystemColors.ControlDark
+                    .CellValue(0, 1 + lColumn) = pPlugIn.WASPProject.WASPConstituents(lColumn - 1) & " Timeseries"
+                Next
+            End With
 
             With AtcGridLoad.Source
                 .Rows = 1 + pPlugIn.WASPProject.Segments.Count
@@ -1342,21 +1351,36 @@ Public Class frmWASPSetup
                     Else
                         .CellEditable(lIndex, 1) = False
                     End If
+                    For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
+                        .CellValue(lIndex, 1 + lColumn) = "<none>"
+                        .CellValue(lIndex, 1) = "<none>"
+                        .CellEditable(lIndex, 1 + lColumn) = True
+                    Next
                 Next
             End With
 
-            Logger.Dbg("SetValidValues")
-            Dim lValidValues As New atcCollection
-            lValidValues.Add("<none>")
-            For Each lWaterTempStation As atcWASPTimeseries In pPlugIn.WASPProject.WaterTempStationCandidates
-                lValidValues.Add(lWaterTempStation.Description)
-            Next
-            AtcGridLoad.ValidValues = lValidValues
             AtcGridLoad.SizeAllColumnsToContents()
             AtcGridLoad.Refresh()
 
             Logger.Dbg("LoadStationGrid refreshed")
         End If
+    End Sub
+
+    Private Sub SetLoadStationValidValues()
+        Logger.Dbg("SetValidValues")
+        Dim lValidValues As New atcCollection
+        lValidValues.Add("<none>")
+        If pSelectedColumn = 1 Then
+            For Each lWaterTempStation As atcWASPTimeseries In pPlugIn.WASPProject.WaterTempStationCandidates
+                lValidValues.Add(lWaterTempStation.Description)
+            Next
+        Else
+            For Each lWQStation As atcWASPTimeseries In pPlugIn.WASPProject.WQStationCandidates
+                lValidValues.Add(lWQStation.Description)
+            Next
+        End If
+
+        AtcGridLoad.ValidValues = lValidValues
     End Sub
 
     Private Sub SetMetStationValidValues()
@@ -1493,5 +1517,11 @@ Public Class frmWASPSetup
     Private Sub cbxWind_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxWind.SelectedIndexChanged
         pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
         SetDates()
+    End Sub
+
+    Private Sub AtcGridLoad_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridLoad.MouseDownCell
+        pSelectedColumn = aColumn
+        pSelectedRow = aRow
+        SetLoadStationValidValues()
     End Sub
 End Class
