@@ -189,6 +189,7 @@ Public Class atcWASPSegment
     Public MeanAnnualFlow As Double
     Public WASPID As Integer
     'internal variables for atcWASPProject
+    Friend Removed As Boolean = False
     Friend TooShort As Boolean = False
     Friend CountAbove As Integer = 0
 

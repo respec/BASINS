@@ -220,47 +220,52 @@ Public Class atcWASPProject
 
     Private Sub CombineSegmentsDetail(ByVal aSegmentKey As String, ByVal aMinTravelTime As Double, ByRef aNewSegments As atcWASPSegments)
         Dim lSegment As atcWASPSegment = Segments(aSegmentKey)
-        Logger.Dbg("Combine " & aSegmentKey & " " & lSegment.TooShort)
-        If lSegment.TooShort Then 'too short - combine with segment up or down
-            Dim lSegmentCombined As atcWASPSegment = Nothing
-            Dim lSegmentRemoved As atcWASPSegment = Nothing
-            Dim lUpStreamSegment As atcWASPSegment = UpstreamMainSegment(lSegment.ID)
-            If lUpStreamSegment IsNot Nothing Then 'combine with upstream
-                lSegmentCombined = CombineSegment(lSegment, lUpStreamSegment, True)
-                lSegmentRemoved = lUpStreamSegment
-            Else 'combine with downstream (if possible)
-                Dim lDownStreamSegment As atcWASPSegment = Segments(lSegment.DownID)
-                Dim lDownStreamUpMainSegment As atcWASPSegment = UpstreamMainSegment(lDownStreamSegment.ID)
-                If lDownStreamUpMainSegment.ID = lSegment.ID Then
-                    lSegmentCombined = CombineSegment(lSegment, lDownStreamSegment, False)
-                Else
-                    Logger.Dbg("Skip " & lSegment.ID & " Nothing up and not MainChannel")
-                End If
-            End If
-            If lSegmentCombined IsNot Nothing Then
-                If aMinTravelTime > TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity) Then
-                    Logger.Dbg("StillToShort " & lSegmentCombined.ID & " " & TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity))
-                    lSegmentCombined.TooShort = True
-                    'TODO: what should we do now?
-                End If
-                aNewSegments.Add(lSegmentCombined)
-                'fix DownIds for upstream segments
-                For Each lSegment In Segments
-                    If lSegment.DownID = lSegmentRemoved.ID Then
-                        lSegment.DownID = lSegmentCombined.ID
+        If Not lSegment.Removed Then
+            Logger.Dbg("Combine " & aSegmentKey & " " & lSegment.TooShort)
+            If lSegment.TooShort Then 'too short - combine with segment up or down
+                Dim lSegmentCombined As atcWASPSegment = Nothing
+                Dim lSegmentRemoved As atcWASPSegment = Nothing
+                Dim lUpStreamSegment As atcWASPSegment = UpstreamMainSegment(lSegment.ID)
+                If lUpStreamSegment IsNot Nothing Then 'combine with upstream
+                    lSegmentCombined = CombineSegment(lSegment, lUpStreamSegment, True)
+                    lSegmentRemoved = lUpStreamSegment
+                    lUpStreamSegment.Removed = True
+                Else 'combine with downstream (if possible)
+                    Dim lDownStreamSegment As atcWASPSegment = Segments(lSegment.DownID)
+                    Dim lDownStreamUpMainSegment As atcWASPSegment = UpstreamMainSegment(lDownStreamSegment.ID)
+                    If lDownStreamUpMainSegment.ID = lSegment.ID Then
+                        lSegmentCombined = CombineSegment(lSegment, lDownStreamSegment, False)
+                    Else
+                        Logger.Dbg("Skip " & lSegment.ID & " Nothing up and not MainChannel")
                     End If
-                Next
+                End If
+                If lSegmentCombined IsNot Nothing Then
+                    If aMinTravelTime > TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity) Then
+                        Logger.Dbg("StillToShort " & lSegmentCombined.ID & " " & TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity))
+                        lSegmentCombined.TooShort = True
+                        'TODO: what should we do now?
+                    End If
+                    aNewSegments.Add(lSegmentCombined)
+                    'fix DownIds for upstream segments
+                    For Each lSegment In Segments
+                        If lSegment.DownID = lSegmentRemoved.ID Then
+                            lSegment.DownID = lSegmentCombined.ID
+                        End If
+                    Next
+                End If
+            Else 'no problem, use as is
+                aNewSegments.Add(lSegment)
             End If
-        Else 'no problem, use as is
-            aNewSegments.Add(lSegment)
+            Logger.Dbg("NewSegmentCount " & aNewSegments.Count)
+            'move on upstream
+            For Each lSegment In Segments
+                If lSegment.DownID = aSegmentKey Then
+                    CombineSegmentsDetail(lSegment.ID, aMinTravelTime, aNewSegments)
+                End If
+            Next
+        Else
+            Logger.Dbg("SkipRemovedSegment " & lSegment.ID)
         End If
-        Logger.Dbg("NewSegmentCount " & aNewSegments.Count)
-        'move on upstream
-        For Each lSegment In Segments
-            If lSegment.DownID = aSegmentKey Then
-                CombineSegmentsDetail(lSegment.ID, aMinTravelTime, aNewSegments)
-            End If
-        Next
     End Sub
 
     Private Function UpstreamMainSegment(ByVal aSegmentId As String) As atcWASPSegment
@@ -300,14 +305,14 @@ Public Class atcWASPProject
                 '.BaseID 
                 .CentroidX = (aSegmentPrimary.CentroidX + aSegmentSecondary.CentroidX) / 2
                 .CentroidY = (aSegmentPrimary.CentroidY + aSegmentSecondary.CentroidY) / 2
-                Dim lPointCount As Integer = aSegmentPrimary.PtsX.GetLength(0) + aSegmentSecondary.PtsX.GetLength(0)
+                Dim lPointCount As Integer = aSegmentPrimary.PtsX.GetLength(0) + aSegmentSecondary.PtsX.GetLength(0) - 1
                 ReDim .PtsX(lPointCount)
                 ReDim .PtsY(lPointCount)
                 'TODO: assumes nhdplus convention - up to down, needs to be robust
                 If aSecondaryUpstream Then
                     For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0) - 1
                         .PtsX(lIndex) = aSegmentSecondary.PtsX(lIndex)
-                        .PtsY(lIndex) = aSegmentSecondary.PtsX(lIndex)
+                        .PtsY(lIndex) = aSegmentSecondary.PtsY(lIndex)
                     Next
                     Dim lBasePoint As Integer = aSegmentSecondary.PtsX.GetLength(0)
                     For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0) - 1
