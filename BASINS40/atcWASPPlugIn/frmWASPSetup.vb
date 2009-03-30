@@ -78,8 +78,6 @@ Public Class frmWASPSetup
     Friend WithEvents cmdFieldMapping As System.Windows.Forms.Button
     Friend WithEvents cmdCreateShapefile As System.Windows.Forms.Button
     Friend WithEvents cmdSelectConstituents As System.Windows.Forms.Button
-    Friend WithEvents cmdGenerateTimeseries As System.Windows.Forms.Button
-    Friend WithEvents cmdVolumes As System.Windows.Forms.Button
     Friend WithEvents cbxWind As System.Windows.Forms.ComboBox
     Friend WithEvents cbxSolar As System.Windows.Forms.ComboBox
     Friend WithEvents cbxAir As System.Windows.Forms.ComboBox
@@ -120,7 +118,6 @@ Public Class frmWASPSetup
         Me.TabPage2 = New System.Windows.Forms.TabPage
         Me.atxTravelTimeMin = New atcControls.atcText
         Me.Label6 = New System.Windows.Forms.Label
-        Me.cmdVolumes = New System.Windows.Forms.Button
         Me.cmdCreateShapefile = New System.Windows.Forms.Button
         Me.cmdFieldMapping = New System.Windows.Forms.Button
         Me.atxTravelTimeMax = New atcControls.atcText
@@ -128,7 +125,6 @@ Public Class frmWASPSetup
         Me.cmdGenerate = New System.Windows.Forms.Button
         Me.AtcGridSegmentation = New atcControls.atcGrid
         Me.TabPage3 = New System.Windows.Forms.TabPage
-        Me.cmdGenerateTimeseries = New System.Windows.Forms.Button
         Me.AtcGridFlow = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
         Me.cmdSelectConstituents = New System.Windows.Forms.Button
@@ -520,7 +516,6 @@ Public Class frmWASPSetup
         '
         Me.TabPage2.Controls.Add(Me.atxTravelTimeMin)
         Me.TabPage2.Controls.Add(Me.Label6)
-        Me.TabPage2.Controls.Add(Me.cmdVolumes)
         Me.TabPage2.Controls.Add(Me.cmdCreateShapefile)
         Me.TabPage2.Controls.Add(Me.cmdFieldMapping)
         Me.TabPage2.Controls.Add(Me.atxTravelTimeMax)
@@ -565,15 +560,6 @@ Public Class frmWASPSetup
         Me.Label6.Size = New System.Drawing.Size(186, 17)
         Me.Label6.TabIndex = 26
         Me.Label6.Text = "Minimum Travel Time (days)"
-        '
-        'cmdVolumes
-        '
-        Me.cmdVolumes.Location = New System.Drawing.Point(618, 16)
-        Me.cmdVolumes.Name = "cmdVolumes"
-        Me.cmdVolumes.Size = New System.Drawing.Size(137, 25)
-        Me.cmdVolumes.TabIndex = 25
-        Me.cmdVolumes.Text = "Volumes/Depths"
-        Me.cmdVolumes.UseVisualStyleBackColor = True
         '
         'cmdCreateShapefile
         '
@@ -653,7 +639,6 @@ Public Class frmWASPSetup
         '
         'TabPage3
         '
-        Me.TabPage3.Controls.Add(Me.cmdGenerateTimeseries)
         Me.TabPage3.Controls.Add(Me.AtcGridFlow)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
@@ -661,15 +646,6 @@ Public Class frmWASPSetup
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Flows"
         Me.TabPage3.UseVisualStyleBackColor = True
-        '
-        'cmdGenerateTimeseries
-        '
-        Me.cmdGenerateTimeseries.Location = New System.Drawing.Point(23, 22)
-        Me.cmdGenerateTimeseries.Name = "cmdGenerateTimeseries"
-        Me.cmdGenerateTimeseries.Size = New System.Drawing.Size(155, 46)
-        Me.cmdGenerateTimeseries.TabIndex = 23
-        Me.cmdGenerateTimeseries.Text = "Generate New Timeseries"
-        Me.cmdGenerateTimeseries.UseVisualStyleBackColor = True
         '
         'AtcGridFlow
         '
@@ -871,6 +847,7 @@ Public Class frmWASPSetup
     Private pSelectedColumn As Integer
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
+        WriteWASPConstituentNamesToFile(pBasinsFolder & "\etc\WASPConstituents.txt")
         Me.Close()
     End Sub
 
@@ -996,6 +973,9 @@ Public Class frmWASPSetup
                 .Run(lWASPProjectFileName)
                 Logger.Dbg("BackFromWASP")
             End With
+
+            WriteWASPConstituentNamesToFile(pBasinsFolder & "\etc\WASPConstituents.txt")
+
             lblStatus.Text = ""
             Me.Refresh()
             Me.Dispose()
@@ -1027,6 +1007,8 @@ Public Class frmWASPSetup
         EnableControls(False)
         pPlugIn = aPlugIn
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+
+        ReadWASPConstituentNamesFromFile(pBasinsFolder & "\etc\WASPConstituents.txt")
 
         cboMet.Items.Add("<none>")
 
@@ -1496,13 +1478,13 @@ Public Class frmWASPSetup
         End If
     End Sub
 
-    Private Sub cmdGenerateTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdGenerateTimeseries.Click
-        Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Generate New Timeseries")
-    End Sub
+    'Private Sub cmdGenerateTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Generate New Timeseries")
+    'End Sub
 
-    Private Sub cmdVolumes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdVolumes.Click
-        Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Volumes/Depths")
-    End Sub
+    'Private Sub cmdVolumes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Volumes/Depths")
+    'End Sub
 
     Private Sub cbxAir_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxAir.SelectedIndexChanged
         pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
@@ -1523,5 +1505,23 @@ Public Class frmWASPSetup
         pSelectedColumn = aColumn
         pSelectedRow = aRow
         SetLoadStationValidValues()
+    End Sub
+
+    Public Sub ReadWASPConstituentNamesFromFile(ByVal aFileName As String)
+        If FileExists(aFileName) Then
+            For Each lString As String In LinesInFile(aFileName)
+                If Not lString.StartsWith(";") Then
+                    pPlugIn.WASPProject.WASPConstituents.Add(lString.Trim)
+                End If
+            Next
+        End If
+    End Sub
+
+    Public Sub WriteWASPConstituentNamesToFile(ByVal aFileName As String)
+        Dim lStr As String = ""
+        For Each lItem As String In pPlugIn.WASPProject.WASPConstituents
+            lStr &= lItem.ToString & vbCrLf
+        Next
+        SaveFileString(aFileName, lStr)
     End Sub
 End Class

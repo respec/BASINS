@@ -44,12 +44,34 @@ Public Class atcWASPTimeseries
     Public LocationY As Double
 
     Public Function TimeSeriesToString(ByVal aSJDate As Double, ByVal aEJDate As Double) As String
+        Dim lMult As Double = 1.0
+        Dim lAdd As Double = 0.0
+        Dim lUnits As String = ""
+        If Not Me.TimeSeries.Attributes.GetDefinedValue("Units") Is Nothing Then
+            lUnits = Me.TimeSeries.Attributes.GetDefinedValue("Units").Value.ToString.ToLower.Trim
+        End If
+        If (lUnits = "cubic feet per second" Or lUnits = "cfs" Or lUnits = "ft3/s") Or (lUnits.Length = 0 And Me.Type = "FLOW") Then
+            'have cfs or unspecified flow, want cms
+            lMult = 1 / 35.31
+        ElseIf (lUnits = "degrees f" Or lUnits = "deg f") Or (lUnits.Length = 0 And (Me.Type = "ATMP" Or Me.Type = "ATEM")) Then
+            'have degrees f or unspecified air temp, want degrees C
+            lAdd = -32
+            lMult = 5.0 / 9.0
+        ElseIf lUnits = "mph" Or (lUnits.Length = 0 And Me.Type = "WIND") Then
+            'want m/s
+            lMult = 0.44704
+        ElseIf lUnits = "lbs" Then
+            'want kg
+            lMult = 0.4536
+        End If
+
         Dim lStartIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(aSJDate, True)
         If aSJDate = Me.TimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
         End If
         Dim lEndIndex As Integer = Me.TimeSeries.Dates.IndexOfValue(aEJDate, True)
         Dim lSB As New StringBuilder
+        Dim lValue As Double = 0.0
         For lIndex As Integer = lStartIndex To lEndIndex - 1
             Dim lJDate As Double = Me.TimeSeries.Dates.Values(lIndex)
             Dim lDate(6) As Integer
@@ -60,6 +82,7 @@ Public Class atcWASPTimeseries
             lSB.Append(" ")
             lSB.Append(StrPad(lTimeString, 10, " ", False))
             lSB.Append(" ")
+            lValue = (Me.TimeSeries.Values(lIndex + 1) + lAdd) * lMult
             lSB.Append(StrPad(Format(Me.TimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
             lSB.Append(vbCrLf)
         Next
