@@ -79,7 +79,7 @@ Public Class atcWASPProject
         writeInpIntro(lSW)
         writeInpVars(lSW)
         writeInpSegs(lSW)
-        writeInpPath(lSW)
+        writeInpPath(lSW) 'Debug to here
         writeInpFlowFile(lSW)
         writeInpDispFile(lSW)
         writeInpBoundFile(lSW)
@@ -116,7 +116,8 @@ Public Class atcWASPProject
         lIntroText.AppendLine("      0.00  1.000   Time and Print Interval")
         lIntroText.AppendLine("    333.00  1.000   Time and Print Interval")
         lIntroText.AppendLine("   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0")
-        aSW.WriteLine(lIntroText.ToString)
+        aSW.Write(lIntroText.ToString) 'WriteLine would add an additional \n
+        aSW.Flush()
         Return True
     End Function
 
@@ -206,7 +207,8 @@ Public Class atcWASPProject
         lOutputVarsText.AppendLine("   50 Benthic Algae (removed)                 ")
         lOutputVarsText.AppendLine("   51 Benthic Algae Light Lim (removed)       ")
         lOutputVarsText.AppendLine("   52 Benthic Algae Nutrient Lim (removed)    ")
-        aSW.WriteLine(lOutputVarsText.ToString)
+        aSW.Write(lOutputVarsText.ToString)
+        aSW.Flush()
         Return True
     End Function
 
@@ -221,7 +223,7 @@ Public Class atcWASPProject
         Dim line As String = String.Empty
         Dim i As Integer = 0
         For i = 0 To Segments.Count - 1
-            line = (i + 1).ToString.PadLeft(5) & Space(5) & Segments.Item(i).Name.Substring(0, 40)
+            line = (i + 1).ToString.PadLeft(5) & Space(5) & Segments.Item(i).Name.Substring(0, Segments.Item(i).Name.Length)
             lSegText.AppendLine(line)
         Next
 
@@ -241,16 +243,17 @@ Public Class atcWASPProject
             lsegParams(5) = " 0.000000" ' Vexp
             lsegParams(6) = " 2.23008" 'DMult
             lsegParams(7) = " 0.450000" 'Dexp
-            lsegParams(8) = " " & String.Format("", Segments.Item(i).Length) ' Length 2
-            lsegParams(9) = " " & String.Format("", Segments.Item(i).Slope) ' slope 6
-            lsegParams(10) = " " & String.Format("", Segments.Item(i).Width) 'Width 4
-            lsegParams(11) = " " & String.Format("", Segments.Item(i).Roughness) ' Rough 6
-            lsegParams(12) = " " & String.Format("", Segments.Item(i).Depth) ' Depth_Q0 6
+            lsegParams(8) = " " & String.Format("{0:0.00}", Segments.Item(i).Length) ' Length 2
+            lsegParams(9) = " " & String.Format("{0:0.00000}", Segments.Item(i).Slope) ' slope 6
+            lsegParams(10) = " " & String.Format("{0:0.0000}", Segments.Item(i).Width) 'Width 4
+            lsegParams(11) = " " & String.Format("{0:0.0000}", Segments.Item(i).Roughness) ' Rough 6
+            lsegParams(12) = " " & String.Format("{0:0.0000}", Segments.Item(i).Depth) ' Depth_Q0 6
 
             line = String.Join(" ", lsegParams)
             lSegText.AppendLine(line)
         Next
-        aSW.WriteLine(lSegText)
+        aSW.Write(lSegText.ToString)
+        aSW.Flush()
         Return True
     End Function
 
