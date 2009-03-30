@@ -295,14 +295,15 @@ Public Class atcWASPProject
 
         Try
             With lSegment
-                'TODO: better algorithm - weighted?
-                .Depth = (aSegmentPrimary.Depth + aSegmentSecondary.Depth) / 2
-                .Length = aSegmentPrimary.Length + aSegmentSecondary.Length
+                Dim lLengthP As Double = aSegmentPrimary.Length
+                Dim lLengthS As Double = aSegmentSecondary.Length
+                .Length = lLengthP + lLengthS
+                .Depth = ((aSegmentPrimary.Depth * lLengthP) + (aSegmentSecondary.Depth * lLengthS)) / .Length
                 '.Name 
-                .Roughness = (aSegmentPrimary.Roughness + aSegmentSecondary.Roughness) / 2
-                .Slope = (aSegmentPrimary.Slope + aSegmentSecondary.Slope) / 2
-                .Velocity = (aSegmentPrimary.Velocity + aSegmentSecondary.Velocity) / 2
-                .Width = (aSegmentPrimary.Width + aSegmentSecondary.Width) / 2
+                .Roughness = ((aSegmentPrimary.Roughness * lLengthP) + (aSegmentSecondary.Roughness * lLengthS)) / .Length
+                .Slope = ((aSegmentPrimary.Slope * lLengthP) + (aSegmentSecondary.Slope * lLengthS)) / .Length
+                .Velocity = ((aSegmentPrimary.Velocity * lLengthP) + (aSegmentSecondary.Velocity * lLengthS)) / .Length
+                .Width = ((aSegmentPrimary.Width * lLengthP) + (aSegmentSecondary.Width * lLengthS)) / .Length
                 '.BaseID 
                 .CentroidX = (aSegmentPrimary.CentroidX + aSegmentSecondary.CentroidX) / 2
                 .CentroidY = (aSegmentPrimary.CentroidY + aSegmentSecondary.CentroidY) / 2
