@@ -234,7 +234,7 @@ Public Class atcWASPProject
         Dim lsegParams(12) As String
         For i = 0 To Segments.Count - 1
             'lsegParams(0) = Space(3) & Segments.Item(i).ID  ' the ID is not the kind sequential number we are after
-            Segments.Item(i).WASPID = i + 1 ' This should have been set before getting here!
+            'Segments.Item(i).WASPID = i + 1 ' This should have been set before getting here!
             lsegParams(0) = Space(3) & Segments.Item(i).WASPID
             lsegParams(1) = " 0" ' BotSeg
             lsegParams(2) = " 1" ' iType
@@ -399,8 +399,7 @@ Public Class atcWASPProject
         lPathText.AppendLine("    4               Flow Pathways                                 PATHFILE")
         lPathText.AppendLine("    6               Number of flow fields") ' this can be hardcoded here as only 6 constant fields
         lPathText.AppendLine("     Flow Field   1")
-        lPathText.AppendLine(NumFlowFunc(0).ToString.PadLeft(5) & Space(15) & "Number of Flow Functions for Flow Field")
-
+        
         'Figure out the flowpaths:
         'this flow path is the base flow network that is used later for other things
         Dim lflowfuncfield1 As Generic.Dictionary(Of Integer, String)
@@ -408,6 +407,8 @@ Public Class atcWASPProject
         For i As Integer = 0 To lflowfuncfield1.Count - 1
             lPathText.AppendLine(lflowfuncfield1.Item(i))
         Next
+
+        lPathText.AppendLine(NumFlowFunc(0).ToString.PadLeft(5) & Space(15) & "Number of Flow Functions for Flow Field")
 
         'For now the 2-6 fields' flow func can be hard-coded here, later done by functions
         For lflowField As Integer = 2 To 6
