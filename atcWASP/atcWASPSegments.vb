@@ -13,7 +13,6 @@ Public Class atcWASPSegments
     Friend Function DownstreamKey(ByRef aProblem As String) As String
         Dim lDownstreamKey As String = ""
         For Each lSegment As atcWASPSegment In Me
-            lSegment.WASPID = 0
             Dim lDownExists As Boolean = False
             For Each lDownSegment As atcWASPSegment In Me
                 If lDownSegment.ID = lSegment.DownID Then
@@ -39,6 +38,11 @@ Public Class atcWASPSegments
     ''' <remarks></remarks>
     Public Function AssignWaspIds() As String
         Dim lProblem As String = ""
+
+        For Each lSegment As atcWASPSegment In Me
+            lSegment.WASPID = 0
+        Next
+
         Dim lDownstreamKey As String = DownstreamKey(lProblem)
         If lProblem.Length = 0 Then
             AssignWaspIdAndMoveUpstream(lDownstreamKey)
