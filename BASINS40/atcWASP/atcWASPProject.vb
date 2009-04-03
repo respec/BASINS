@@ -25,7 +25,6 @@ Public Class atcWASPProject
 
     'the following are used in creating the wasp inp file
     Friend NumFlowFunc(5) As Integer
-    Friend Headwaters As New List(Of Integer)  ' headwaters' segment index in the Segments list, 1-based
     Friend FlowPathList As New List(Of Integer) ' subset of Headwaters that actually have flowpath defined, zero-based
     Friend NumTimeSteps As Integer ' set when water flow input is written
 
@@ -666,13 +665,6 @@ Public Class atcWASPProject
         'set inp file name
         INPFileName = aFileName
 
-        Dim lSDate(6) As Integer
-        J2Date(SJDate, lSDate)
-        Dim lEDate(6) As Integer
-        J2Date(EJDate, lEDate)
-        Dim lStartDateString As String = lSDate(1) & "/" & lSDate(2) & "/" & lSDate(0)
-        Dim lEndDateString As String = lEDate(1) & "/" & lEDate(2) & "/" & lEDate(0)
-
         'First get rid of the old existing .inp file
         'because this is going to be an appendable file
         'so need to start fresh
@@ -706,11 +698,16 @@ Public Class atcWASPProject
 
     Private Function writeInpIntro(ByRef aSW As IO.StreamWriter) As Boolean
 
+        Dim lSDate(6) As Integer
+        J2Date(SJDate, lSDate)
+        Dim lStartDateString As String = lSDate(1).ToString.PadLeft(5) & lSDate(2).ToString.PadLeft(5) & lSDate(0).ToString.PadLeft(5)
+        Dim lJulianEnd As String = (EJDate - SJDate).ToString.PadLeft(10)
+
         Dim lIntroText As New System.Text.StringBuilder
         lIntroText.AppendLine("    2               Module type               SYSFILE")
-        lIntroText.AppendLine("    1    1 2007    0    0    0     Start date and time")
-        lIntroText.AppendLine("    1    1 2007    0    0    0     Skip date and time")
-        lIntroText.AppendLine("     333.0          Julian end time")
+        lIntroText.AppendLine(lStartDateString & "    0    0    0     Start date and time")
+        lIntroText.AppendLine(lStartDateString & "    0    0    0     Skip date and time")
+        lIntroText.AppendLine(lJulianEnd & "          Julian end time")
         lIntroText.AppendLine("   16               Number of Systems")
         lIntroText.AppendLine("   15               Mass Balance Table Output")
         lIntroText.AppendLine("    1               Solution Technique Option")
@@ -822,16 +819,15 @@ Public Class atcWASPProject
 
     Private Function writeInpSegs(ByRef aSW As IO.StreamWriter) As Boolean
         Dim lSegText As New System.Text.StringBuilder
-        lSegText.AppendLine(String.Format(" {0:#####}               Number of Segments                            SEGFILE", Segments.Count))
+        lSegText.AppendLine(Segments.Count.ToString.PadLeft(5) & "               Number of Segments                            SEGFILE")
         lSegText.AppendLine("    0               Bed Volume Option")
         lSegText.AppendLine("     0.000          Bed Compaction Time Step")
         lSegText.AppendLine("      1.000000      1.000000  Volume Scale & Conversion Factor")
         lSegText.AppendLine("  Segment   SegName")
         'Write out the segment id number and their names in format: FORMAT(I5,5X,A40)
         Dim line As String = String.Empty
-        Dim i As Integer = 0
-        For i = 0 To Segments.Count - 1
-            line = (i + 1).ToString.PadLeft(5) & Space(5) & Segments.Item(i).Name.Substring(0, Segments.Item(i).Name.Length)
+        For Each lSegment As atcWASPSegment In Segments
+            line = lSegment.WASPID.ToString.PadLeft(5) & Space(5) & lSegment.Name.Substring(0, lSegment.Name.Length)
             lSegText.AppendLine(line)
         Next
 
@@ -840,10 +836,8 @@ Public Class atcWASPProject
         lSegText.AppendLine(line)
 
         Dim lsegParams(12) As String
-        For i = 0 To Segments.Count - 1
-            'lsegParams(0) = Space(3) & Segments.Item(i).ID  ' the ID is not the kind sequential number we are after
-            'Segments.Item(i).WASPID = i + 1 ' This should have been set before getting here!
-            lsegParams(0) = Space(3) & Segments.Item(i).WASPID
+        For Each lSegment As atcWASPSegment In Segments
+            lsegParams(0) = Space(3) & lSegment.WASPID
             lsegParams(1) = " 0" ' BotSeg
             lsegParams(2) = " 1" ' iType
             lsegParams(3) = " 1000.00" ' Volume
@@ -851,11 +845,11 @@ Public Class atcWASPProject
             lsegParams(5) = " 0.000000" ' Vexp
             lsegParams(6) = " 2.23008" 'DMult
             lsegParams(7) = " 0.450000" 'Dexp
-            lsegParams(8) = " " & String.Format("{0:0.00}", Segments.Item(i).Length) ' Length 2
-            lsegParams(9) = " " & String.Format("{0:0.00000}", Segments.Item(i).Slope) ' slope 6
-            lsegParams(10) = " " & String.Format("{0:0.0000}", Segments.Item(i).Width) 'Width 4
-            lsegParams(11) = " " & String.Format("{0:0.0000}", Segments.Item(i).Roughness) ' Rough 6
-            lsegParams(12) = " " & String.Format("{0:0.0000}", Segments.Item(i).Depth) ' Depth_Q0 6
+            lsegParams(8) = " " & String.Format("{0:0.00}", lSegment.Length) ' Length 2
+            lsegParams(9) = " " & String.Format("{0:0.00000}", lSegment.Slope) ' slope 6
+            lsegParams(10) = " " & String.Format("{0:0.0000}", lSegment.Width) 'Width 4
+            lsegParams(11) = " " & String.Format("{0:0.0000}", lSegment.Roughness) ' Rough 6
+            lsegParams(12) = " " & String.Format("{0:0.0000}", lSegment.Depth) ' Depth_Q0 6
 
             line = String.Join(" ", lsegParams)
             lSegText.AppendLine(line)
@@ -881,15 +875,16 @@ Public Class atcWASPProject
         FlowPathList.Clear() 'start anew
         Dim lflowpaths As New Generic.Dictionary(Of Integer, String)
 
-        'Get a list of headwater segments
-        'Dim Headwaters As New List(Of Integer)
+        'Build a list of headwater segments
+        Dim lHeadwatersIndexes As New List(Of Integer)
         For i As Integer = 0 To Segments.Count - 1
             If UpstreamKey(i) = String.Empty Then
-                Headwaters.Add(i + 1)
+                lHeadwatersIndexes.Add(i + 1)
             End If
         Next
+
         'sort the list in assending order
-        Headwaters.Sort() ' assuming by default it is in ascending order
+        lHeadwatersIndexes.Sort() ' assuming by default it is in ascending order
 
         'Set up a collection to hold the from-to pairs
         Dim ldoneFlowpaths As New List(Of String)
@@ -908,26 +903,26 @@ Public Class atcWASPProject
         Dim lflowfraction As String = "1.00"
 
         Dim lthisFlowfunction As New System.Text.StringBuilder
-        lthisFlowfunction.AppendLine(Space(2) & Segments.Item(Headwaters(0) - 1).Name)
+        lthisFlowfunction.AppendLine(Space(2) & Segments.Item(lHeadwatersIndexes(0) - 1).Name)
         Dim ltemp As New System.Text.StringBuilder
-        ltemp.AppendLine(Space(3) & "0  " & Headwaters(0).ToString & Space(11) & lflowfraction)
-        ldoneFlowpaths.Add("0  " & Headwaters(0).ToString)
+        ltemp.AppendLine("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(0) - 1).WASPID.ToString.PadLeft(4) & Space(11) & lflowfraction)
+        ldoneFlowpaths.Add("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(0) - 1).WASPID.ToString.PadLeft(4))
         lnumflowroutes += 1
 
         Dim lend As Boolean = False
-        Dim lthisSeg As atcWASPSegment = Segments.Item(Headwaters(0) - 1)
+        Dim lthisSeg As atcWASPSegment = Segments.Item(lHeadwatersIndexes(0) - 1)
         Dim lthisPair As String = String.Empty
         While Not lend
-            If lthisSeg.DownID = loutletSegID Then
-                lthisPair = lthisSeg.WASPID & "  0"
-                ltemp.AppendLine(Space(3) & lthisPair & Space(11) & lflowfraction)
+            If lthisSeg.ID = loutletSegID Then
+                lthisPair = lthisSeg.WASPID.ToString.PadLeft(4) & "0".PadLeft(4)
+                ltemp.Append(lthisPair & Space(11) & lflowfraction)
                 ldoneFlowpaths.Add(lthisPair)
                 lnumflowroutes += 1
                 lend = True
             Else
                 Dim ldownID As String = lthisSeg.DownID
-                lthisPair = lthisSeg.WASPID & Space(2) & Segments.Item(ldownID).WASPID
-                ltemp.AppendLine(Space(3) & lthisPair & Space(11) & lflowfraction)
+                lthisPair = lthisSeg.WASPID.ToString.PadLeft(4) & Segments.Item(ldownID).WASPID.ToString.PadLeft(4)
+                ltemp.AppendLine(lthisPair & Space(11) & lflowfraction)
                 lthisSeg = Segments.Item(ldownID)
                 ldoneFlowpaths.Add(lthisPair)
                 lnumflowroutes += 1
@@ -941,40 +936,45 @@ Public Class atcWASPProject
             'clear the ltemp content for subsequent flow functions, reset lnumflowroutes
             'Add this flow function to the overall list
             lnumFlowFunc += 1
-            lthisFlowfunction.AppendLine(Space(2) & lnumflowroutes.ToString)
-            lthisFlowfunction.AppendLine(ltemp.ToString)
-            lflowpaths.Add(Headwaters(0), lthisFlowfunction.ToString)
-            FlowPathList.Add(Headwaters(0) - 1)
+            lthisFlowfunction.AppendLine(Space(3) & lnumflowroutes.ToString)
+            lthisFlowfunction.Append(ltemp.ToString)
+            lflowpaths.Add(lHeadwatersIndexes(0), lthisFlowfunction.ToString)
+            FlowPathList.Add(lHeadwatersIndexes(0) - 1)
             lnumflowroutes = 0
             ltemp = New System.Text.StringBuilder
         End If
 
         'Do the rest of the headwaters
-        lend = False
-        For i As Integer = 1 To Headwaters.Count - 1
-            lthisSeg = Segments.Item(Headwaters(i) - 1)
+        For i As Integer = 1 To lHeadwatersIndexes.Count - 1
+            lend = False
+            lthisSeg = Segments.Item(lHeadwatersIndexes(i) - 1)
+            ltemp.AppendLine("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WASPID.ToString.PadLeft(4) & Space(11) & lflowfraction)
+            ldoneFlowpaths.Add("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WASPID.ToString.PadLeft(4))
+            lnumflowroutes += 1
+            lthisFlowfunction = New System.Text.StringBuilder
             While Not lend
-                If lthisSeg.DownID = loutletSegID Then
-                    lthisPair = lthisSeg.WASPID & "  0"
+                If lthisSeg.ID = loutletSegID Then
+                    lthisPair = lthisSeg.WASPID.ToString.PadLeft(4) & "0".PadLeft(4)
                     If ldoneFlowpaths.Contains(lthisPair) Then
+                        lend = True
                         Continue While
                     Else
                         ldoneFlowpaths.Add(lthisPair)
                     End If
-                    ltemp.AppendLine(Space(3) & lthisPair & Space(11) & lflowfraction)
-                    ldoneFlowpaths.Add(lthisSeg.WASPID & "  0")
+                    ltemp.Append(lthisPair & Space(11) & lflowfraction)
+                    ldoneFlowpaths.Add(lthisSeg.WASPID.ToString.PadLeft(4) & "0".PadLeft(4))
                     lnumflowroutes += 1
                     lend = True
                 Else
                     Dim ldownID As String = lthisSeg.DownID
-                    lthisPair = lthisSeg.WASPID & Space(2) & Segments.Item(ldownID).WASPID
+                    lthisPair = lthisSeg.WASPID.ToString.PadLeft(4) & Segments.Item(ldownID).WASPID.ToString.PadLeft(4)
                     If ldoneFlowpaths.Contains(lthisPair) Then
+                        lend = True
                         Continue While
                     Else
                         ldoneFlowpaths.Add(lthisPair)
                     End If
-                    ltemp.AppendLine(Space(3) & lthisSeg.WASPID & Space(2) & Segments.Item(ldownID).WASPID & Space(11) & lflowfraction)
-                    ldoneFlowpaths.Add(lthisSeg.WASPID & Space(2) & Segments.Item(ldownID).WASPID)
+                    ltemp.Append(lthisSeg.WASPID.ToString.PadLeft(4) & Segments.Item(ldownID).WASPID.ToString.PadLeft(4) & Space(11) & lflowfraction)
                     lnumflowroutes += 1
                     lthisSeg = Segments.Item(ldownID)
                     lend = False
@@ -987,11 +987,11 @@ Public Class atcWASPProject
                 'clear the ltemp content for subsequent flow functions
                 'Add this flow function to the overall list
                 lnumFlowFunc += 1
-                lthisFlowfunction.AppendLine(Space(2) & Segments.Item(Headwaters(i) - 1).Name)
-                lthisFlowfunction.AppendLine(Space(2) & lnumflowroutes.ToString)
-                lthisFlowfunction.AppendLine(ltemp.ToString)
-                lflowpaths.Add(Headwaters(i), lthisFlowfunction.ToString)
-                FlowPathList.Add(Headwaters(i) - 1)
+                lthisFlowfunction.AppendLine(Space(2) & Segments.Item(lHeadwatersIndexes(i) - 1).Name)
+                lthisFlowfunction.AppendLine(Space(3) & lnumflowroutes.ToString)
+                lthisFlowfunction.Append(ltemp.ToString)
+                lflowpaths.Add(lHeadwatersIndexes(i), lthisFlowfunction.ToString)
+                FlowPathList.Add(lHeadwatersIndexes(i) - 1)
                 lnumflowroutes = 0
                 ltemp = New System.Text.StringBuilder
             End If
@@ -1012,19 +1012,18 @@ Public Class atcWASPProject
         'this flow path is the base flow network that is used later for other things
         Dim lflowfuncfield1 As Generic.Dictionary(Of Integer, String)
         lflowfuncfield1 = GenerateFlowPaths()
+        lPathText.AppendLine(lflowfuncfield1.Count.ToString.PadLeft(5) & Space(15) & "Number of Flow Functions for Flow Field")
         For Each lString As String In lflowfuncfield1.Values
             lPathText.AppendLine(lString)
         Next
 
-        lPathText.AppendLine(NumFlowFunc(0).ToString.PadLeft(5) & Space(15) & "Number of Flow Functions for Flow Field")
-
         'For now the 2-6 fields' flow func can be hard-coded here, later done by functions
         For lflowField As Integer = 2 To 6
-            lPathText.AppendLine("    Flow Field   " & lflowField.ToString)
+            lPathText.AppendLine("     Flow Field   " & lflowField.ToString)
             lPathText.AppendLine("    0               Number of Flow Functions for Flow Field")
             NumFlowFunc(lflowField - 1) = 0 'TODO: NumFlowFunc when this is done dynamically, this needs to be changed
         Next
-        aSW.WriteLine(lPathText.ToString)
+        aSW.Write(lPathText.ToString)
         aSW.Flush()
         Return True
     End Function
