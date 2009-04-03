@@ -195,29 +195,33 @@ Public Class DownloadDataPlugin
                     Dim lDownloadForm As New frmDownload
                     Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
                     'Logger.Msg(lQuery, "Query from frmDownload")
-                    If lQuery.Length > 0 AndAlso Not lQuery.Equals(frmDownload.CancelString) Then
-                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor 'Logger.Busy = True
-                        Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
-                        Dim lPlugins As New ArrayList
-                        For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
-                            Try
-                                If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
-                                    lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
-                                End If
-                            Catch ex As Exception
-                            End Try
-                        Next
-                        Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
-                        Dim lResult As String = lDownloadManager.Execute(lQuery)
-                        'Logger.Msg(lResult, "Result of Query from DataManager")
-                        If lResult Is Nothing OrElse lResult.Length = 0 Then
-                            'Nothing to report, no success or error
-                        ElseIf lResult.StartsWith("<success>") Then
-                            BASINS.ProcessDownloadResults(lResult)
+                    If lQuery.Length > 0 Then
+                        If lQuery.Equals(frmDownload.CancelString) Then
+                            'User cancelled download form
                         Else
-                            Logger.Msg(atcUtility.ReadableFromXML(lResult), "Download Result")
+                            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor 'Logger.Busy = True
+                            Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
+                            Dim lPlugins As New ArrayList
+                            For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
+                                Try
+                                    If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                                        lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+                                    End If
+                                Catch ex As Exception
+                                End Try
+                            Next
+                            Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+                            Dim lResult As String = lDownloadManager.Execute(lQuery)
+                            'Logger.Msg(lResult, "Result of Query from DataManager")
+                            If lResult Is Nothing OrElse lResult.Length = 0 Then
+                                'Nothing to report, no success or error
+                            ElseIf lResult.StartsWith("<success>") Then
+                                BASINS.ProcessDownloadResults(lResult)
+                            Else
+                                Logger.Msg(atcUtility.ReadableFromXML(lResult), "Download Result")
+                            End If
+                            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default 'Logger.Busy = False
                         End If
-                        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default 'Logger.Busy = False
                     End If
                 End If
         End Select

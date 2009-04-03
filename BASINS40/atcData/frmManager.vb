@@ -48,7 +48,7 @@ Friend Class frmManager
     Friend WithEvents NewToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents OpenToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents toolStripSeparator As System.Windows.Forms.ToolStripSeparator
-    Friend WithEvents SaveAsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SaveInToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents toolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents toolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
@@ -78,9 +78,10 @@ Friend Class frmManager
         Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator
-        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.SaveInToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.toolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.CloseAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.toolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -92,7 +93,6 @@ Friend Class frmManager
         Me.NativeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AnalysisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.CloseAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -114,6 +114,7 @@ Friend Class frmManager
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.treeFiles.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.treeFiles.HideSelection = False
         Me.treeFiles.Location = New System.Drawing.Point(0, 25)
         Me.treeFiles.Name = "treeFiles"
         Me.treeFiles.Size = New System.Drawing.Size(658, 206)
@@ -130,7 +131,7 @@ Friend Class frmManager
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.SaveAsToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.CloseAllToolStripMenuItem, Me.toolStripSeparator2, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.SaveInToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.CloseAllToolStripMenuItem, Me.toolStripSeparator2, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(45, 23)
         Me.FileToolStripMenuItem.Text = "File"
@@ -141,7 +142,7 @@ Friend Class frmManager
         Me.NewToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.NewToolStripMenuItem.Name = "NewToolStripMenuItem"
         Me.NewToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.N), System.Windows.Forms.Keys)
-        Me.NewToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
+        Me.NewToolStripMenuItem.Size = New System.Drawing.Size(195, 24)
         Me.NewToolStripMenuItem.Text = "New"
         '
         'OpenToolStripMenuItem
@@ -150,43 +151,48 @@ Friend Class frmManager
         Me.OpenToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
         Me.OpenToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.O), System.Windows.Forms.Keys)
-        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
+        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(195, 24)
         Me.OpenToolStripMenuItem.Text = "Open"
         '
         'toolStripSeparator
         '
         Me.toolStripSeparator.Name = "toolStripSeparator"
-        Me.toolStripSeparator.Size = New System.Drawing.Size(202, 6)
+        Me.toolStripSeparator.Size = New System.Drawing.Size(192, 6)
         '
-        'SaveAsToolStripMenuItem
+        'SaveInToolStripMenuItem
         '
-        Me.SaveAsToolStripMenuItem.Image = CType(resources.GetObject("SaveAsToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.SaveAsToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.SaveAsToolStripMenuItem.Name = "SaveAsToolStripMenuItem"
-        Me.SaveAsToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
-        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
-        Me.SaveAsToolStripMenuItem.Text = "Save As"
+        Me.SaveInToolStripMenuItem.Image = CType(resources.GetObject("SaveInToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.SaveInToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SaveInToolStripMenuItem.Name = "SaveInToolStripMenuItem"
+        Me.SaveInToolStripMenuItem.Size = New System.Drawing.Size(195, 24)
+        Me.SaveInToolStripMenuItem.Text = "Save In..."
         '
         'toolStripSeparator1
         '
         Me.toolStripSeparator1.Name = "toolStripSeparator1"
-        Me.toolStripSeparator1.Size = New System.Drawing.Size(202, 6)
+        Me.toolStripSeparator1.Size = New System.Drawing.Size(192, 6)
         '
         'CloseToolStripMenuItem
         '
         Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
-        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(195, 24)
         Me.CloseToolStripMenuItem.Text = "Close Selected"
+        '
+        'CloseAllToolStripMenuItem
+        '
+        Me.CloseAllToolStripMenuItem.Name = "CloseAllToolStripMenuItem"
+        Me.CloseAllToolStripMenuItem.Size = New System.Drawing.Size(195, 24)
+        Me.CloseAllToolStripMenuItem.Text = "Close All"
         '
         'toolStripSeparator2
         '
         Me.toolStripSeparator2.Name = "toolStripSeparator2"
-        Me.toolStripSeparator2.Size = New System.Drawing.Size(202, 6)
+        Me.toolStripSeparator2.Size = New System.Drawing.Size(192, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(195, 24)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
         'EditToolStripMenuItem
@@ -245,12 +251,6 @@ Friend Class frmManager
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(53, 23)
         Me.HelpToolStripMenuItem.Text = "Help"
         '
-        'CloseAllToolStripMenuItem
-        '
-        Me.CloseAllToolStripMenuItem.Name = "CloseAllToolStripMenuItem"
-        Me.CloseAllToolStripMenuItem.Size = New System.Drawing.Size(205, 24)
-        Me.CloseAllToolStripMenuItem.Text = "Close All"
-        '
         'frmManager
         '
         Me.AllowDrop = True
@@ -273,6 +273,8 @@ Friend Class frmManager
 
 #End Region
 
+    Private pDelayPopulate As Boolean = False
+
     Public Sub Edit(Optional ByVal aNodeKey As Integer = -1)
         Populate(aNodeKey)
         Me.Show()
@@ -280,111 +282,169 @@ Friend Class frmManager
     End Sub
 
     Private Sub Populate(ByVal aNodeKey As Integer)
-        treeFiles.Nodes.Clear()
-        txtDetails.Text = ""
-        Dim lName As String = ""
-        Dim lCount As String = 0
-        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-            Dim lTypeAndSource() As String = lDataSource.Name.Split(":")
+        If Not pDelayPopulate Then
+            treeFiles.Nodes.Clear()
+            SaveInToolStripMenuItem.DropDownItems.Clear()
+            txtDetails.Text = ""
+            Dim lName As String = ""
+            Dim lCount As String = 0
+            Dim lNode As TreeNode
+            For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                Dim lTypeAndSource() As String = lDataSource.Name.Split(":")
 
-            'TODO: leave code for lTypeAndSource(0) - now only Timeseries, might want to add Model or Table later
+                'TODO: leave code for lTypeAndSource(0) - now only Timeseries, might want to add Model or Table later
 
-            'If Not treeFiles.Nodes.ContainsKey(lTypeAndSource(0)) Then
-            '    treeFiles.Nodes.Add(lTypeAndSource(0), lTypeAndSource(0))
-            'End If
-            'Dim lSourceNodes As TreeNodeCollection = treeFiles.Nodes(lTypeAndSource(0)).Nodes
-            'If Not lSourceNodes.ContainsKey(lTypeAndSource(2)) Then
-            '    lSourceNodes.Add(lTypeAndSource(2), lTypeAndSource(2))
-            'End If
-            If Not treeFiles.Nodes.ContainsKey(lTypeAndSource(2)) Then
-                treeFiles.Nodes.Add(lTypeAndSource(2), lTypeAndSource(2))
+                'If Not treeFiles.Nodes.ContainsKey(lTypeAndSource(0)) Then
+                '    treeFiles.Nodes.Add(lTypeAndSource(0), lTypeAndSource(0))
+                'End If
+                'Dim lSourceNodes As TreeNodeCollection = treeFiles.Nodes(lTypeAndSource(0)).Nodes
+                'If Not lSourceNodes.ContainsKey(lTypeAndSource(2)) Then
+                '    lSourceNodes.Add(lTypeAndSource(2), lTypeAndSource(2))
+                'End If
+                If Not treeFiles.Nodes.ContainsKey(lTypeAndSource(2)) Then
+                    lNode = treeFiles.Nodes.Add(lTypeAndSource(2), lTypeAndSource(2))
+                    lNode.BackColor = treeFiles.BackColor
+                    lNode.ForeColor = treeFiles.ForeColor
+                End If
+
+                lName = lDataSource.Specification & " (" & lDataSource.DataSets.Count & ")"
+                'treeFiles.Nodes(lTypeAndSource(0)).Nodes(lTypeAndSource(2)).Nodes.Add(lCount, lName)
+                lNode = treeFiles.Nodes(lTypeAndSource(2)).Nodes.Add(lCount, lName)
+                lNode.BackColor = treeFiles.BackColor
+                lNode.ForeColor = treeFiles.ForeColor
+
+                If lCount = aNodeKey Then
+                    'treeFiles.SelectedNode = treeFiles.Nodes(lTypeAndSource(0)).Nodes(lTypeAndSource(2)).Nodes(lCount)
+                    treeFiles.SelectedNode = treeFiles.Nodes(lTypeAndSource(2)).Nodes(lCount)
+                    treeFiles.SelectedNode.EnsureVisible()
+                    RefreshDetails(aNodeKey)
+                End If
+                If lDataSource.CanSave Then
+                    SaveInToolStripMenuItem.DropDownItems.Add(lDataSource.Specification, Nothing, AddressOf SaveInHandler)
+                End If
+                lCount += 1
+            Next
+            treeFiles.ExpandAll()
+        End If
+    End Sub
+
+    Private Sub SaveInHandler(ByVal sender As Object, ByVal e As EventArgs)
+        Dim lSaveInSpecification As String = sender.Text
+        Dim lSaveIn As atcTimeseriesSource = Nothing
+        Dim lSaveGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data to Save", SelectedTimeseries)
+        If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
+
+            'If we already have specified data source open, skip asking user
+            If lSaveInSpecification IsNot Nothing AndAlso lSaveInSpecification.Length > 0 Then
+                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                    If lDataSource.Specification = lSaveInSpecification Then
+                        lSaveIn = lDataSource
+                        Exit For
+                    End If
+                Next
             End If
 
-            lName = lDataSource.Specification & " (" & lDataSource.DataSets.Count & ")"
-            'treeFiles.Nodes(lTypeAndSource(0)).Nodes(lTypeAndSource(2)).Nodes.Add(lCount, lName)
-            treeFiles.Nodes(lTypeAndSource(2)).Nodes.Add(lCount, lName)
-            If lCount = aNodeKey Then
-                'treeFiles.SelectedNode = treeFiles.Nodes(lTypeAndSource(0)).Nodes(lTypeAndSource(2)).Nodes(lCount)
-                treeFiles.SelectedNode = treeFiles.Nodes(lTypeAndSource(2)).Nodes(lCount)
-                treeFiles.SelectedNode.EnsureVisible()
-                RefreshDetails(aNodeKey)
+            If lSaveIn Is Nothing Then
+                lSaveIn = atcDataManager.UserOpenDataFile(False, True)
             End If
-            lCount += 1
-        Next
-        treeFiles.ExpandAll()
+
+            If lSaveIn IsNot Nothing AndAlso lSaveIn.Specification.Length > 0 Then
+                For Each lDataSet As atcDataSet In lSaveGroup
+                    lSaveIn.AddDataSet(lDataSet, atcData.atcTimeseriesSource.EnumExistAction.ExistAskUser)
+                Next
+                lSaveIn.Save(lSaveIn.Specification)
+                Populate(-1)
+            End If
+        End If
     End Sub
 
     Private Sub SelectionAction(ByVal aAction As String)
-        If treeFiles.SelectedNode IsNot Nothing Then
-            If IsNumeric(treeFiles.SelectedNode.Name) Then
-                DoAction(aAction, treeFiles.SelectedNode)
+        Dim lSources As Generic.List(Of atcTimeseriesSource) = SelectedSources()
+        Select Case lSources.Count
+            Case 0
+                If treeFiles.Nodes.Count = 0 Then
+                    Logger.Msg("No data sources to " & aAction, aAction & " Problem")
+                Else
+                    Logger.Msg("Choose at least one data source to " & aAction & " before choosing the action", aAction & " Problem")
+                End If
+            Case 1
+                DoAction(aAction, lSources(0))
+            Case Is > 1
+                If Logger.Msg(aAction & " " & lSources.Count & " sources?", vbYesNo, "More than one data source affected") = MsgBoxResult.Yes Then
+                    pDelayPopulate = True
+                    For Each lDataSource As atcDataSource In lSources
+                        DoAction(aAction, lDataSource)
+                    Next
+                    pDelayPopulate = False
+                    Populate(-1)
+                End If
+        End Select
+    End Sub
+
+    Private Function SelectedTimeseries() As atcTimeseriesGroup
+        Dim lTSgroup As New atcTimeseriesGroup
+        Dim lSources As Generic.List(Of atcTimeseriesSource) = SelectedSources()
+        For Each lSource As atcTimeseriesSource In lSources
+            lTSgroup.AddRange(lSource.DataSets)
+        Next
+        Return lTSgroup
+    End Function
+
+    Private Function SelectedSources() As Generic.List(Of atcTimeseriesSource)
+        Dim lSources As New Generic.List(Of atcTimeseriesSource)
+        For Each lSelectedNode As TreeNode In SelectedNodes
+            Dim lDataSourceIndex As Integer
+            If Integer.TryParse(lSelectedNode.Name, lDataSourceIndex) Then
+                lSources.Add(atcDataManager.DataSources.Item(lDataSourceIndex))
             Else
-                If treeFiles.SelectedNode.Nodes IsNot Nothing Then
-                    Select Case treeFiles.SelectedNode.Nodes.Count
+                If lSelectedNode.Nodes IsNot Nothing Then
+                    Select Case lSelectedNode.Nodes.Count
                         Case 1
-                            DoAction(aAction, treeFiles.SelectedNode.Nodes(0))
-                        Case Is > 1
-                            If Logger.Msg(aAction & " " & treeFiles.SelectedNode.Nodes.Count & " sources?", vbYesNo, "More than one data source affected") = MsgBoxResult.Yes Then
-                                Dim lNodes As New ArrayList
-                                For Each lNode As TreeNode In treeFiles.SelectedNode.Nodes
-                                    lNodes.Insert(0, lNode)
-                                Next
-                                'split in two for when tree structure changes during action, for example during Close
-                                For Each lNode As TreeNode In lNodes
-                                    DoAction(aAction, lNode)
-                                Next
-                                Populate(-1)
+                            If Integer.TryParse(lSelectedNode.Nodes(0).Name, lDataSourceIndex) Then
+                                lSources.Add(atcDataManager.DataSources.Item(lDataSourceIndex))
                             End If
-                        Case Else
-                            Logger.Msg("Choose a data source to " & aAction & " before choosing the action", aAction & " Problem")
+                        Case Is > 1
+                            Dim lNodes As New Generic.List(Of Integer)
+                            For Each lNode As TreeNode In lSelectedNode.Nodes
+                                If Integer.TryParse(lNode.Name, lDataSourceIndex) Then
+                                    lSources.Insert(0, atcDataManager.DataSources.Item(lDataSourceIndex))
+                                End If
+                            Next
                     End Select
                 End If
             End If
-        ElseIf treeFiles.Nodes.Count = 0 Then
-            Logger.Msg("No data sources to " & aAction, aAction & " Problem")
-        Else
-            Logger.Msg("Choose a data source to " & aAction, aAction & " Problem")
-        End If
-    End Sub
+        Next
+        Return lSources
+    End Function
 
-    Private Sub DoAction(ByVal aAction As String, ByVal aNode As TreeNode)
-        Dim lDataSourceIndex As Integer = aNode.Name
-        If lDataSourceIndex > -1 AndAlso _
-               lDataSourceIndex < atcDataManager.DataSources.Count Then
-            Dim lDataSource As atcTimeseriesSource = atcDataManager.DataSources.Item(lDataSourceIndex)
-            With lDataSource
-                Logger.Dbg(aAction & ":" & .Specification)
-                Dim lActionArgs() As String = aAction.Split(":")
-                Select Case lActionArgs(0)
-                    Case "Close"
-                        atcDataManager.RemoveDataSource(lDataSourceIndex)
-                        lDataSourceIndex -= 1
-                        If lDataSourceIndex = -1 And atcDataManager.DataSources.Count > 0 Then
-                            lDataSourceIndex = 0
+    Private Sub DoAction(ByVal aAction As String, ByVal aDataSource As atcDataSource)        
+        With aDataSource
+            Logger.Dbg(aAction & ":" & .Specification)
+            Dim lActionArgs() As String = aAction.Split(":")
+            Select Case lActionArgs(0)
+                Case "Close"
+                    atcDataManager.RemoveDataSource(aDataSource)
+                Case "View"
+                    .View()
+                Case "Display"
+                    atcDataManager.UserSelectDisplay(.Specification, .DataSets.Clone)
+                Case "Analysis"
+                    atcDataManager.ShowDisplay(lActionArgs(1), .DataSets)
+                Case "RemoveDatasets"
+                    If .CanRemoveDataset Then
+                        Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
+                            "Select Datasets to remove from " & .Specification, , .DataSets)
+                        If lDataGroup.Count > 0 AndAlso _
+                            Logger.Msg("Remove " & lDataGroup.Count & " datasets from " & vbCrLf & .Specification & "?", _
+                                       MsgBoxStyle.OkCancel, "Confirm Remove") = MsgBoxResult.Ok Then
+                            For Each lDataSet As atcDataSet In lDataGroup
+                                .RemoveDataset(lDataSet)
+                            Next
+                            Populate(atcDataManager.DataSources.IndexOf(aDataSource))
                         End If
-                    Case "View"
-                        .View()
-                    Case "Display"
-                        atcDataManager.UserSelectDisplay(.Specification, .DataSets.Clone)
-                    Case "Analysis"
-                        atcDataManager.ShowDisplay(lActionArgs(1), .DataSets)
-                    Case "RemoveDatasets"
-                        If .CanRemoveDataset Then
-                            Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
-                                "Select Datasets to remove from " & .Specification, , .DataSets)
-                            If lDataGroup.Count > 0 AndAlso _
-                                Logger.Msg("Remove " & lDataGroup.Count & " datasets from " & vbCrLf & .Specification & "?", _
-                                           MsgBoxStyle.OkCancel, "Confirm Remove") = MsgBoxResult.Ok Then
-                                For Each lDataSet As atcDataSet In lDataGroup
-                                    .RemoveDataset(lDataSet)
-                                Next
-                                Populate(aNode.Name)
-                            End If
-                        End If
-                End Select
-            End With
-        End If
-
+                    End If
+            End Select
+        End With
     End Sub
 
     Private Sub ChangedData(ByVal aDataSource As atcTimeseriesSource)
@@ -450,36 +510,43 @@ Friend Class frmManager
     End Sub
 
     ' Draws a node.
-    Private Sub treeFiles_DrawNode(ByVal sender As Object, _
-        ByVal e As DrawTreeNodeEventArgs) Handles treeFiles.DrawNode
+    Private Sub treeFiles_DrawNode(ByVal sender As Object, ByVal e As DrawTreeNodeEventArgs) Handles treeFiles.DrawNode
+        Dim lNode As TreeNode = e.Node
 
-        ' Draw the background and node text for a selected node.
-        If (e.Node.IsSelected) Then 'e.State And TreeNodeStates.Selected) <> 0 Then
+        Dim lBackgroundBrush As Drawing.Brush = Nothing
+        If lNode.BackColor <> treeFiles.BackColor Then
+            lBackgroundBrush = New Drawing.SolidBrush(lNode.BackColor)
+            'ElseIf lNode.IsSelected Then
+            '    lBackgroundBrush = SystemBrushes.Highlight
+        End If
 
+        If lBackgroundBrush IsNot Nothing Then
             ' Draw the background of the selected node. The NodeBounds
             ' method makes the highlight rectangle large enough to
             ' include the text of a node tag, if one is present.
-            e.Graphics.FillRectangle(SystemBrushes.Highlight, NodeBounds(e.Node))
-
-            ' Retrieve the node font. If the node font has not been set,
-            ' use the TreeView font.
-            Dim nodeFont As Font = e.Node.NodeFont
-            If nodeFont Is Nothing Then
-                nodeFont = CType(sender, TreeView).Font
-            End If
-
-            ' Draw the node text.
-            e.Graphics.DrawString(e.Node.Text, nodeFont, Brushes.White, _
-                e.Bounds.Left - 2, e.Bounds.Top)
-
-            ' Use the default background and node text.
-        Else
-            e.DrawDefault = True
+            e.Graphics.FillRectangle(lBackgroundBrush, NodeBounds(e.Node))
         End If
+
+        ' Retrieve the node font. If the node font has not been set,
+        ' use the TreeView font.
+        Dim lNodeFont As Font = e.Node.NodeFont
+        If lNodeFont Is Nothing Then
+            lNodeFont = CType(sender, TreeView).Font
+        End If
+
+        Dim lTextBrush As Drawing.Brush = Nothing
+        If lNode.IsSelected Then
+            lTextBrush = SystemBrushes.HighlightText
+        Else
+            lTextBrush = New SolidBrush(lNode.ForeColor)
+        End If
+
+        ' Draw the node text.
+        e.Graphics.DrawString(e.Node.Text, lNodeFont, lTextBrush, e.Bounds.Left - 2, e.Bounds.Top)
 
         ' If a node tag is present, draw its string representation 
         ' to the right of the label text.
-        If Not (e.Node.Tag Is Nothing) Then
+        If e.Node.Tag IsNot Nothing Then
             e.Graphics.DrawString(e.Node.Tag.ToString(), e.Node.NodeFont, _
                 Brushes.Yellow, e.Bounds.Right + 2, e.Bounds.Top)
         End If
@@ -499,6 +566,7 @@ Friend Class frmManager
             End Try
         End If
     End Sub
+
     Private Function NodeBounds(ByVal e As System.Windows.Forms.TreeNode) As Rectangle
         Return New Rectangle(e.Bounds.Left, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height)
     End Function
@@ -564,11 +632,11 @@ Friend Class frmManager
     End Sub
 
     Private Sub RenumberDatasetsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles RenumberDatasetsToolStripMenuItem.Click
-        'TODO: implement this
+        Logger.Msg("TODO: implement this")
     End Sub
 
     Private Sub AddDatasetsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles AddDatasetsToolStripMenuItem.Click
-        'TODO: implement this
+        Logger.Msg("TODO: implement this")
     End Sub
 
     Private Sub frmManager_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
@@ -580,6 +648,171 @@ Friend Class frmManager
     Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
         ShowHelp("")
     End Sub
+
+    Private Sub SaveAsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveInToolStripMenuItem.Click
+        Logger.Msg("TODO: implement this")
+    End Sub
+
+#Region "TreeViewMultiSelect"
+    'http://www.arstdesign.com/articles/treeviewms.html
+    Protected pSelectedNodes As New ArrayList
+    Protected pFirstNode, pLastNode As TreeNode
+
+    Public Property SelectedNodes() As ArrayList
+        Get
+            Return pSelectedNodes
+        End Get
+        Set(ByVal value As ArrayList)
+            removePaintFromNodes()
+            pSelectedNodes.Clear()
+            pSelectedNodes = value
+            paintSelectedNodes()
+        End Set
+    End Property
+
+    Protected Sub OnBeforeSelect(ByVal sender As Object, ByVal e As TreeViewCancelEventArgs) Handles treeFiles.BeforeSelect
+        ' e.Node is the current node exposed by the base TreeView control
+
+        Dim bControl As Boolean = ModifierKeys = Keys.Control
+        Dim bShift As Boolean = ModifierKeys = Keys.Shift
+
+        ' selecting twice the node while pressing CTRL ?
+        If bControl And pSelectedNodes.Contains(e.Node) Then
+            ' unselect it (let framework know we don't want selection this time)
+            e.Cancel = True
+
+            ' update nodes
+            removePaintFromNodes()
+            pSelectedNodes.Remove(e.Node)
+            paintSelectedNodes()
+            Return
+        End If
+
+        pLastNode = e.Node
+        If Not bShift Then
+            pFirstNode = e.Node ' store begin of shift sequence
+        End If
+    End Sub 'OnBeforeSelect
+
+    Private Function isParent(ByVal aCheckParent As TreeNode, ByVal aDescendant As TreeNode) As Boolean
+        If aDescendant Is Nothing Then
+            Return False
+        Else
+            Return isParent(aCheckParent, aDescendant.Parent)
+        End If
+    End Function
+
+    Protected Sub OnAfterSelect(ByVal sender As Object, ByVal e As TreeViewEventArgs) Handles treeFiles.AfterSelect
+        ' e.Node is the current node exposed by the base TreeView control
+
+        Dim bControl As Boolean = ModifierKeys = Keys.Control
+        Dim bShift As Boolean = ModifierKeys = Keys.Shift
+
+        If bControl Then
+            If Not pSelectedNodes.Contains(e.Node) Then ' new node ?
+                pSelectedNodes.Add(e.Node)
+                ' not new, remove it from the collection
+            Else
+                removePaintFromNodes()
+                pSelectedNodes.Remove(e.Node)
+            End If
+            paintSelectedNodes()
+        Else
+            If bShift Then
+                Dim myQueue As New Queue()
+
+                Dim uppernode As TreeNode = pFirstNode
+                Dim bottomnode As TreeNode = e.Node
+
+                ' case 1 : begin and end nodes are parent
+                Dim bParent As Boolean = isParent(pFirstNode, e.Node) ' is pFirstNode parent (direct or not) of e.Node
+                If Not bParent Then
+                    bParent = isParent(bottomnode, uppernode)
+                    If bParent Then ' swap nodes
+                        Dim t As TreeNode = uppernode
+                        uppernode = bottomnode
+                        bottomnode = t
+                    End If
+                End If
+                If bParent Then
+                    Dim n As TreeNode = bottomnode
+                    While Not n.Equals(uppernode.Parent)
+                        If Not pSelectedNodes.Contains(n) Then ' new node ?
+                            myQueue.Enqueue(n)
+                        End If
+                        n = n.Parent
+                    End While
+                    ' case 2 : nor the begin nor the end node are descendant one another
+                Else
+                    If uppernode.Parent Is Nothing And bottomnode.Parent Is Nothing Or (Not (uppernode.Parent Is Nothing) And uppernode.Parent.Nodes.Contains(bottomnode)) Then ' are they siblings ?
+                        Dim nIndexUpper As Integer = uppernode.Index
+                        Dim nIndexBottom As Integer = bottomnode.Index
+                        If nIndexBottom < nIndexUpper Then ' reversed?
+                            Dim t As TreeNode = uppernode
+                            uppernode = bottomnode
+                            bottomnode = t
+                            nIndexUpper = uppernode.Index
+                            nIndexBottom = bottomnode.Index
+                        End If
+
+                        Dim n As TreeNode = uppernode
+                        While nIndexUpper <= nIndexBottom
+                            If Not pSelectedNodes.Contains(n) Then ' new node ?
+                                myQueue.Enqueue(n)
+                            End If
+                            n = n.NextNode
+
+                            nIndexUpper += 1
+                        End While ' end while
+                    Else
+                        If Not pSelectedNodes.Contains(uppernode) Then
+                            myQueue.Enqueue(uppernode)
+                        End If
+                        If Not pSelectedNodes.Contains(bottomnode) Then
+                            myQueue.Enqueue(bottomnode)
+                        End If
+                    End If
+                End If
+
+                pSelectedNodes.AddRange(myQueue)
+
+                paintSelectedNodes()
+                pFirstNode = e.Node ' let us chain several SHIFTs if we like it
+                ' end if m_bShift
+            Else
+                ' in the case of a simple click, just add this item
+                If Not (pSelectedNodes Is Nothing) And pSelectedNodes.Count > 0 Then
+                    removePaintFromNodes()
+                    pSelectedNodes.Clear()
+                End If
+                pSelectedNodes.Add(e.Node)
+            End If
+        End If
+    End Sub 'OnAfterSelect
+
+    Protected Sub paintSelectedNodes()
+        Dim n As TreeNode
+        For Each n In pSelectedNodes
+            n.BackColor = Drawing.SystemColors.Highlight
+            n.ForeColor = Drawing.SystemColors.HighlightText
+        Next n
+    End Sub 'paintSelectedNodes
+
+    Protected Sub removePaintFromNodes()
+        If pSelectedNodes.Count = 0 Then
+            Return
+        End If
+        Dim n0 As TreeNode = CType(pSelectedNodes(0), TreeNode)
+        Dim back As Drawing.Color = treeFiles.BackColor
+        Dim fore As Drawing.Color = treeFiles.ForeColor
+
+        For Each n As TreeNode In pSelectedNodes
+            n.BackColor = back
+            n.ForeColor = fore
+        Next n
+    End Sub 'removePaintFromNodes
+
+#End Region
 
 End Class
 

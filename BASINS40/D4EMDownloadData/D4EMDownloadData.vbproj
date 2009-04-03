@@ -78,6 +78,12 @@
     <Compile Include="frmSpecifyRegion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmWDM.Designer.vb">
+      <DependentUpon>frmWDM.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmWDM.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -102,6 +108,10 @@
     <EmbeddedResource Include="frmSpecifyRegion.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmSpecifyRegion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmWDM.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmWDM.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
