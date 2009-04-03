@@ -187,7 +187,12 @@ Public Module modFile
         Dim lCounter As Integer = 1
         Dim lExpirationDate As Double = Date.Now.ToOADate - 1 'Old temporary files/folders expire after one day
         If aBaseName Is Nothing OrElse aBaseName.Length = 0 Then aBaseName = "temp"
-        Dim lBaseName As String = IO.Path.Combine(IO.Path.GetTempPath, aBaseName)
+        Dim lBaseName As String
+        If IO.Path.IsPathRooted(aBaseName) Then
+            lBaseName = aBaseName
+        Else
+            lBaseName = IO.Path.Combine(IO.Path.GetTempPath, aBaseName)
+        End If
         Dim lName As String = lBaseName
         If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
         While FileExists(lName, True)

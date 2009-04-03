@@ -708,6 +708,9 @@ Friend Class MapWindowForm
         ShowError(ex)
     End Sub
 
+    Public Sub ShowErrorDialog(ByVal ex As System.Exception, ByVal sendToEmail As String) Implements MapWindow.Interfaces.IMapWin.ShowErrorDialog
+        ShowError(ex)
+    End Sub
 #End Region
 
 End Class

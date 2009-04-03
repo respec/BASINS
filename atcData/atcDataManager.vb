@@ -190,8 +190,7 @@ Public Class atcDataManager
     Public Shared Sub RemoveDataSource(ByVal aIndex As Integer)
         Dim lDataSource As atcTimeseriesSource = DataSources(aIndex)
         DataSources.RemoveAt(aIndex)
-        RaiseEvent ClosedData(lDataSource)
-        lDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+        RemovedDataSource(lDataSource)
     End Sub
 
     Public Shared Sub RemoveDataSource(ByVal aSpecification As String)
@@ -199,10 +198,29 @@ Public Class atcDataManager
         For Each lDataSource As atcTimeseriesSource In DataSources
             If lDataSource.Specification.ToLower.Equals(aSpecification) Then
                 DataSources.Remove(lDataSource)
-                RaiseEvent ClosedData(lDataSource)
+                RemovedDataSource(lDataSource)
                 Exit For
             End If
         Next
+    End Sub
+
+    Public Shared Sub RemoveDataSource(ByVal aDataSource As atcDataSource)
+        Try
+            DataSources.Remove(aDataSource)
+            RemovedDataSource(aDataSource)
+        Catch e As Exception
+            Logger.Dbg("Could not remove data source: " & e.Message)
+            Exit Sub
+        End Try
+    End Sub
+
+    Private Shared Sub RemovedDataSource(ByVal aDataSource As atcDataSource)
+        Try
+            RaiseEvent ClosedData(aDataSource)
+            aDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+        Catch e As Exception
+            Logger.Dbg("RaiseEvent ClosedData: " & e.Message)
+        End Try
     End Sub
 
     ''' <summary>Creates and returns an instance of a data source by name</summary>
@@ -364,6 +382,16 @@ Public Class atcDataManager
         End If
         Return False
     End Function
+
+    'Shared Function UserChooseButton(ByVal aTitle As String, _
+    '                                 ByVal aMessage As String, _
+    '                                 ByVal aButtonLabels As IEnumerable, _
+    '                        Optional ByVal aTimeoutSeconds As Integer = 0, _
+    '                        Optional ByVal aTimeoutLabel As String = "Cancel") As String
+    '    Dim frm As New frmButtons
+    '    frm.Icon = pMapWin.ApplicationInfo.FormIcon
+    '    Return frm.AskUser(aTitle, aMessage, aButtonLabels, aTimeoutSeconds, aTimeoutLabel)
+    'End Function
 #End Region
 
 #Region "MapWindow location selection"
@@ -668,7 +696,7 @@ Public Class atcDataManager
                     Return .AddMenu(aMenuName, aParent, lImage, aMenuText, aAfter)
                 End If
             End With
-            End If
+        End If
     End Function
 #End Region
 
