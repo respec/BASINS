@@ -115,8 +115,8 @@ Module SWATRunner
         End If
 
         Dim lAllScenarios As New List(Of String)
-        Dim lcases As String() = {"RS", "AFDec", "AFInc"}
-
+        'Dim lcases As String() = {"RS", "AFDec", "AFInc"}
+        Dim lcases As String() = {"AFInc50", "PcpInc20", "PcpDec20"}
         If lContinue And pDoCaseStudySummary Then
             'Do summary of all case studies' outputs, then end the SWATRunner program
             'This is assuming all case studies' runs are already done BEFOREHAND!
@@ -132,9 +132,9 @@ Module SWATRunner
 
             'lAllScenarios.Add("Scen2010RevPRaccoon")
             'lAllScenarios.Add("Scen2015RevPRaccoon")
-            lAllScenarios.Add("Scen2020RevPRaccoon")
+            'lAllScenarios.Add("Scen2020RevPRaccoon")
             'lAllScenarios.Add("Scen2022RevPRaccoon")
-            'lAllScenarios.Add("ScenExistRevPRaccoon")
+            lAllScenarios.Add("ScenExistRevPRaccoon")
 
             For Each pScenario In lAllScenarios
                 pInputFolder = IO.Path.Combine(pBaseFolder, "Scenarios" & IO.Path.DirectorySeparatorChar & pScenario)
@@ -1762,9 +1762,9 @@ Module SWATRunner
             End If
 
             'Append to various StringBuilders to the beginning of each subbasin printout
-            lSBDebug.AppendLine(lSBDebugUnitLine)
-            lSBAverage.AppendLine(lSBAverageUnitLine)
-            lSBAnnual.AppendLine(lSBAnnualUnitLine)
+            'lSBDebug.AppendLine(lSBDebugUnitLine)
+            'lSBAverage.AppendLine(lSBAverageUnitLine)
+            'lSBAnnual.AppendLine(lSBAnnualUnitLine)
 
             Dim lYear As Integer = lDateBase(0)
             Dim lSubIdArea As Double = lSubIdAreas.ItemByKey(lSubId)
