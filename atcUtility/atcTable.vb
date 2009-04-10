@@ -55,6 +55,7 @@ Public Class atcTableOpener
 End Class
 
 Public MustInherit Class atcTable
+    Implements IDisposable
     Implements IatcTable
 
     Private pFilename As String
@@ -180,7 +181,7 @@ Public MustInherit Class atcTable
     Public MustOverride Sub ClearData() Implements IatcTable.ClearData
 
     'Forget the current contents of the table and the fields
-    Public MustOverride Sub Clear() Implements IatcTable.Clear
+    Public MustOverride Sub Clear() Implements IatcTable.Clear, IDisposable.Dispose
 
     'Moves CurrentRecord to the beginning of the table
     Public Overridable Sub MoveFirst() Implements IatcTable.MoveFirst
