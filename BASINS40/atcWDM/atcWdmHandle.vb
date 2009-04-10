@@ -29,6 +29,7 @@ Friend Class atcWdmHandle
         pUnit = 0
 
         lFileName = AbsolutePath(aFileName, CurDir())
+TestFileName:
         If lFileName.Length > pMaxFileNameLength Then
             Dim lShortFileName As String
             If FileExists(lFileName) Then
@@ -38,8 +39,24 @@ Friend Class atcWdmHandle
             End If
 
             If lShortFileName.Length > pMaxFileNameLength Then
-                Throw New Exception("File Name '" & lFileName & "'" & vbCrLf & _
-                                    "Length " & lFileName.Length & " Maximum " & pMaxFileNameLength)
+                If Logger.Msg("Cannot open WDM file with total path greater than 64 characters." & vbCrLf _
+                             & aFileName & vbCrLf _
+                             & "Browse for file in another folder?" & vbCrLf _
+                             & "(Hint: you could copy the file to a folder with a shorter path.)", MsgBoxStyle.YesNo, "WDM Path Too Long") = MsgBoxResult.Yes Then
+                    Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+                    With lOpenDialog
+                        .Title = "Find '" & IO.Path.GetFileName(lFileName) & "' in another folder"
+                        .FileName = aFileName
+                        .Filter = "WDM files|*.wdm"
+                        .FilterIndex = 0
+                        If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                            lFileName = .FileName
+                            GoTo TestFileName
+                        End If
+                    End With
+                End If
+                Throw New Exception("File Name Too Long. aFileName= '" & aFileName & "'" & vbCrLf & "lFileName= '" & lFileName & "'" & vbCrLf & _
+                                    "Length " & lFileName.Length & " (and shortend length " & lShortFileName.Length & ") greater than Maximum of " & pMaxFileNameLength)
             Else
                 lFileName = lShortFileName
             End If

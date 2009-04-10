@@ -188,6 +188,8 @@ Public Class frmDownload
                         chkSTORET_Results.Enabled = True
                         chkSTORET_Results.Text = "Results"
                         chkSTORET_Results.Checked = True
+                    Case "met"
+                        chkBASINS_MetData.Enabled = True
                 End Select
             End If
         End If
