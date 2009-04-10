@@ -9,7 +9,6 @@ Imports MapWinUtility
 Imports MapWinGeoProc
 Imports System.Collections.Specialized
 
-
 Module ScriptImportPCStoSWAT
     Enum PCSCOL
         LOCATION = 1
@@ -61,13 +60,15 @@ Module ScriptImportPCStoSWAT
         Dim lPipeColumn As Integer = PCSCOL.PIPE
         Dim lCAVGColumn As Integer = PCSCOL.CAVG
 
+        Dim logFile As String = IO.Path.Combine(lPath, "zConversionLog.txt")
+        Dim lswLog As New IO.StreamWriter(logFile, False)
+
         Dim lPARAM As New Generic.Dictionary(Of String, String)
         lPARAM.Add("dolbd", "00300")
         lPARAM.Add("sslbd", "00530")
         lPARAM.Add("flowmgd", "50050")
         lPARAM.Add("cbodlbd", "80082")
         lPARAM.Add("bodlbd", "00310")
-
 
         Dim lFill As Boolean = False
 
@@ -87,7 +88,7 @@ Module ScriptImportPCStoSWAT
             Dim lTSBuilders As atcData.atcTimeseriesGroupBuilder
             Dim lTSBuilder As atcData.atcTimeseriesBuilder
             Dim lDataSource As New atcTimeseriesSource
-            Dim lValueStr As String
+            Dim lValueStr As String = String.Empty
             Dim location As String = String.Empty
             Dim lValue As Double
             Dim lDate As Double
@@ -102,8 +103,17 @@ Module ScriptImportPCStoSWAT
             Dim lDatePartition(5) As Integer
             Dim lfoundRecord As Boolean = False
 
+            Dim lprevConstituentID As String = String.Empty
+            Dim lthisConstituentID As String = String.Empty
+            Dim lprevConstituentDate As String = String.Empty
+            Dim lthisConstituentDate As String = String.Empty
+
+            Dim lproblem As Boolean = False
+            Dim lPARAMCount As New Generic.Dictionary(Of String, Integer)
+
 
             For Each lFilename As String In IO.Directory.GetFiles(lPath, "*.CSV")
+                lproblem = False
                 'For each point source file, create a new TimeseriesGroupBuilder
                 lTSBuilders = New atcData.atcTimeseriesGroupBuilder(Nothing)
                 location = IO.Path.GetFileName(lFilename).Substring(0, 9) ' e.g. IA0037687 etc
@@ -119,32 +129,79 @@ Module ScriptImportPCStoSWAT
                             lfoundRecord = False
                             .CurrentRecord = lRecord
                             Try
-                                Select Case .Value(PCSCOL.PARAM).Trim()
+                                lthisConstituentID = .Value(PCSCOL.PARAM).Trim()
+
+                                'lDate = Jday(.Value(lYearColumn), .Value(lMonthColumn), .Value(lDayColumn), 24, 0, 0)
+                                lDate = Date.Parse(.Value(PCSCOL.DMRDATE)).ToOADate
+                                lthisConstituentDate = lDate
+                                If Not lthisConstituentID = lprevConstituentID Then
+                                    lprevConstituentID = lthisConstituentID
+                                    lprevConstituentDate = lthisConstituentDate
+                                Else ' the same constituent
+                                    If lthisConstituentDate = lprevConstituentDate Then ' same date, then problem here
+                                        Logger.Dbg("There are duplicate dates in PCS for : " & lthisConstituentID & vbCrLf & lFilename)
+                                        lCSV.Clear() 'release memory
+                                        lswLog.WriteLine("There are duplicate dates in PCS date: " & lthisConstituentID & lFilename)
+                                        lswLog.Flush()
+                                        lproblem = True
+                                        Exit For
+                                    Else
+                                        lprevConstituentDate = lthisConstituentDate
+                                    End If
+                                End If
+
+                                Select Case lthisConstituentID
                                     Case lPARAM("dolbd") ' 00300
                                         lKey = "dolbd"
                                         lConstituent = lPARAM("dolbd")
                                         lDescription = location & "_" & lKey
                                         lfoundRecord = True
+                                        If Not lPARAMCount.ContainsKey(lKey) Then
+                                            lPARAMCount.Add(lKey, 0)
+                                        Else
+                                            lPARAMCount.Item(lKey) += 1
+                                        End If
+
                                     Case lPARAM("bodlbd") ' 00310
                                         lKey = "bodlbd"
                                         lConstituent = lPARAM("bodlbd")
                                         lDescription = location & "_" & lKey
                                         lfoundRecord = True
+                                        If Not lPARAMCount.ContainsKey(lKey) Then
+                                            lPARAMCount.Add(lKey, 0)
+                                        Else
+                                            lPARAMCount.Item(lKey) += 1
+                                        End If
                                     Case lPARAM("sslbd") ' 00530
                                         lKey = "sslbd"
                                         lConstituent = lPARAM("sslbd")
                                         lDescription = location & "_" & lKey
                                         lfoundRecord = True
+                                        If Not lPARAMCount.ContainsKey(lKey) Then
+                                            lPARAMCount.Add(lKey, 0)
+                                        Else
+                                            lPARAMCount.Item(lKey) += 1
+                                        End If
                                     Case lPARAM("flowmgd") ' 50050
                                         lKey = "flowmgd"
                                         lConstituent = lPARAM("flowmgd")
                                         lDescription = location & "_" & lKey
                                         lfoundRecord = True
+                                        If Not lPARAMCount.ContainsKey(lKey) Then
+                                            lPARAMCount.Add(lKey, 0)
+                                        Else
+                                            lPARAMCount.Item(lKey) += 1
+                                        End If
                                     Case lPARAM("cbodlbd") ' 80082
                                         lKey = "cbodlbd"
                                         lConstituent = lPARAM("cbodlbd")
                                         lDescription = location & "_" & lKey
                                         lfoundRecord = True
+                                        If Not lPARAMCount.ContainsKey(lKey) Then
+                                            lPARAMCount.Add(lKey, 0)
+                                        Else
+                                            lPARAMCount.Item(lKey) += 1
+                                        End If
                                 End Select
 
                                 If Not lfoundRecord Then
@@ -167,10 +224,26 @@ Module ScriptImportPCStoSWAT
                                 End If
 
                                 Try
-                                    'lDate = Jday(.Value(lYearColumn), .Value(lMonthColumn), .Value(lDayColumn), 24, 0, 0)
-                                    lDate = Date.Parse(.Value(PCSCOL.DMRDATE)).ToOADate
+
+                                    'Set value and unit
                                     lValueStr = .Value(PCSCOL.QAVG)
-                                    If lValueStr = "" Then lValueStr = .Value(PCSCOL.CAVG)
+
+                                    If lTSBuilder.NumValues = 0 Then
+                                        lTSBuilder.Attributes.SetValue("Unit", "lbd")
+                                    End If
+
+                                    If lValueStr = "" Then
+                                        lValueStr = .Value(PCSCOL.CAVG)
+
+                                        If lTSBuilder.NumValues = 0 Then
+                                            If lKey.StartsWith("flow") Then
+                                                lTSBuilder.Attributes.SetValue("Unit", "mgd")
+                                            Else
+                                                lTSBuilder.Attributes.SetValue("Unit", "mgl")
+                                            End If
+                                        End If
+                                    End If
+
                                     lValue = GetNaN()
                                     If Not Double.TryParse(lValueStr, lValue) Then
                                         If lValueStr.Length = 0 Then
@@ -184,34 +257,36 @@ Module ScriptImportPCStoSWAT
                                 End Try
                                 'DO is concentration, convert unit later
                                 lTSBuilder.AddValue(lDate, lValue)
-
-                                'J2Date(lDate, lDatePartition)
-                                'lyear = lDatePartition(0)
-                                'lmonth = lDatePartition(1)
                             Catch
                                 Logger.Dbg("Error adding value at date " & DumpDate(lDate) & " in " & lFilename)
                             End Try
 
                         Next lRecord
                     Else
-                        Logger.Msg("Unable to open text file: '" & lFilename & "'", "PCS to WDM")
+                        Logger.Msg("Unable to open text file: '" & lFilename & "'", "PCS to SWAT")
                     End If
                 End With
 
+                If lproblem Then ' move onto the next PCS file
+                    Continue For
+                End If
                 'Dim lUpdateReportSB As New Text.StringBuilder
                 'lUpdateReportSB.AppendLine("Description" & vbTab & "Constituent" & vbTab & _
                 '                           "Index" & vbTab & "Month" & vbTab & "Prev" & vbTab & _
                 '                           "Intrp" & vbTab & "Next" & vbTab & "Mean" & vbTab & "MissCnt")
                 'Write out to SWAT point source file
                 writeSWATPointSource(lTSBuilders, lswatTemplate, lswatPCSInputFile, lPARAM)
+                lPARAMCount.Clear()
             Next
         End If
+        lswLog.Flush()
+        lswLog.Close()
     End Sub
 
     Public Sub writeSWATPointSource(ByRef aTSBuilders As atcData.atcTimeseriesGroupBuilder, ByVal aswatTemplate As String, ByVal aswatPCSInputFile As String, ByVal aPARAM As Dictionary(Of String, String))
         Dim lsr As New IO.StreamReader(aswatTemplate)
         Dim lsw As IO.StreamWriter
-        lsw = New IO.StreamWriter(aswatPCSInputFile)
+        lsw = New IO.StreamWriter(aswatPCSInputFile, False)
 
         Dim lStartDates As New Generic.Dictionary(Of String, Double)
         Dim lTSBuilder As atcData.atcTimeseriesBuilder = Nothing
@@ -234,6 +309,18 @@ Module ScriptImportPCStoSWAT
             End If
         Next
 
+        ' If no pcs data available, the simply copy the template file
+        ' to be the new swat input file
+        If learliest = Double.MaxValue Then
+            lsr.Close()
+            lsw.Close()
+            'copy
+            'LaunchProgram("copy.exe /Y", My.Computer.FileSystem.CurrentDirectory, " " & aswatTemplate & " " & aswatPCSInputFile)
+            IO.File.Copy(aswatTemplate, aswatPCSInputFile, True)
+            Exit Sub
+        End If
+
+
         Dim lSimStartYear As Integer = 1960
         Dim lSimStartMon As Integer = 1
         '1960-01-31: 21946
@@ -251,6 +338,7 @@ Module ScriptImportPCStoSWAT
             line = lsr.ReadLine()
             lsw.WriteLine(line)
         Next
+        lsw.Flush()
 
         Dim lpcsCols(19) As String
         Dim lflow As Double
@@ -260,6 +348,8 @@ Module ScriptImportPCStoSWAT
         Dim ldo As Double
 
         'Some how need a better search routine without having to create a new structure while searching!
+        'lTSFlow.Attributes.GetFormattedValue("unit") --> "mgd"
+
         Dim lTSFlow As atcTimeseries = aTSBuilders.Builder("flowmgd").CreateTimeseries()
         Dim lTSSed As atcTimeseries = aTSBuilders.Builder("sslbd").CreateTimeseries()
         Dim lTSCBod As atcTimeseries = aTSBuilders.Builder("cbodlbd").CreateTimeseries()
@@ -281,6 +371,7 @@ Module ScriptImportPCStoSWAT
         Dim lDatePartition(5) As Integer
         Dim lYear As Integer
         Dim lMonth As Integer
+        Dim lnewLine As String = String.Empty
         While Not lsr.EndOfStream
             line = lsr.ReadLine()
             lpcsCols = line.Split(",")
@@ -294,60 +385,67 @@ Module ScriptImportPCStoSWAT
             lbod = Double.NaN
             ldo = Double.NaN
 
-            If lhasFlow Then
-                lflow = findMatchingPCSData(lTSFlow, ldate)
-            End If
-            If lflow = Double.NaN OrElse lflow < 0 Then
-                lflow = 0.0
-            Else
-                lflow = CType((lflow + 0.0005) * 1000, Integer) / 1000.0
-            End If
 
+            'TODO: use the information of lTSFlow etc's Unit attribute to do the unit conversion for SWAT input
+            Try
+                'Need to do the unit conversion and proper formatting
+                If lhasFlow Then
+                    lflow = findMatchingPCSData(lTSFlow, ldate)
+                End If
+                If lflow.ToString = Double.NaN.ToString OrElse lflow < 0 Then
+                    lflow = 0.0
+                Else
+                    'lflow = CType((lflow + 0.0005) * 1000, Integer) / 1000.0
+                End If
 
-            If lhasSed Then
-                lsed = findMatchingPCSData(lTSSed, ldate)
-            End If
-            If lsed.ToString = Double.NaN.ToString OrElse lsed < 0 Then
-                lsed = 0.0
-            Else
-                lsed = CType((lsed + 0.05) * 10, Integer) / 10.0
-            End If
+                If lhasSed Then
+                    lsed = findMatchingPCSData(lTSSed, ldate)
+                End If
+                If lsed.ToString = Double.NaN.ToString OrElse lsed < 0 Then
+                    lsed = 0.0
+                Else
+                    'lsed = CType((lsed + 0.05) * 10, Integer) / 10.0
+                End If
 
-            If lhasBod Then
-                lbod = findMatchingPCSData(lTSBod, ldate)
-            End If
-            If lbod.ToString = Double.NaN.ToString OrElse lbod < 0 Then
-                lbod = 0.0
-            Else
-                lbod = CType((lbod + 0.05) * 10, Integer) / 10.0
-            End If
+                If lhasBod Then
+                    lbod = findMatchingPCSData(lTSBod, ldate)
+                End If
+                If lbod.ToString = Double.NaN.ToString OrElse lbod < 0 Then
+                    lbod = 0.0
+                Else
+                    'lbod = CType((lbod + 0.05) * 10, Integer) / 10.0
+                End If
 
-            If lhasCBod Then
-                lcbod = findMatchingPCSData(lTSCBod, ldate)
-            End If
-            If lcbod.ToString = Double.NaN.ToString OrElse lcbod < 0 Then
-                lcbod = 0.0
-            Else
-                lcbod = CType((lcbod + 0.05) * 10, Integer) / 10.0
-            End If
+                If lhasCBod Then
+                    lcbod = findMatchingPCSData(lTSCBod, ldate)
+                End If
+                If lcbod.ToString = Double.NaN.ToString OrElse lcbod < 0 Then
+                    lcbod = 0.0
+                Else
+                    'lcbod = CType((lcbod + 0.05) * 10, Integer) / 10.0
+                End If
 
-            If lhasDO Then
-                ldo = findMatchingPCSData(lTSDO, ldate)
-            End If
-            If ldo.ToString = Double.NaN.ToString OrElse ldo < 0 Then
-                ldo = 0.0
-            Else
-                ldo = CType((ldo + 0.05) * 10, Integer) / 10.0
-            End If
+                If lhasDO Then
+                    ldo = findMatchingPCSData(lTSDO, ldate)
+                End If
+                If ldo.ToString = Double.NaN.ToString OrElse ldo < 0 Then
+                    ldo = 0.0
+                Else
+                    'ldo = CType((ldo + 0.05) * 10, Integer) / 10.0
+                End If
 
-            lpcsCols(SwatPCSCOL.p2FLOMON) = Str(lflow)
-            lpcsCols(SwatPCSCOL.p3SEDMON) = Str(lsed)
-            lpcsCols(SwatPCSCOL.p10CBODMON) = Str(lcbod)
-            lpcsCols(SwatPCSCOL.p11DISOXYMON) = Str(ldo)
+            Catch ex As Exception
+                Logger.Msg("Problem doing: " & vbCrLf & line, "Problem converting values")
+            End Try
 
-            line = String.Join(",", lpcsCols)
-            lsw.WriteLine(line)
-            line = String.Empty
+            lpcsCols(SwatPCSCOL.p2FLOMON) = DoubleToString(lflow)
+            lpcsCols(SwatPCSCOL.p3SEDMON) = DoubleToString(lsed)
+            lpcsCols(SwatPCSCOL.p10CBODMON) = DoubleToString(lcbod)
+            lpcsCols(SwatPCSCOL.p11DISOXYMON) = DoubleToString(ldo)
+
+            lnewLine = String.Join(",", lpcsCols)
+            lsw.WriteLine(lnewLine)
+            'line = String.Empty
         End While
 
         lsr.Close()
