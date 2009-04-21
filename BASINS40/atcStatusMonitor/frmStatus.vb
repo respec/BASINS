@@ -139,7 +139,7 @@ Public Class frmStatus
         'frmStatus
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(514, 438)
+        Me.ClientSize = New System.Drawing.Size(514, 169)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.lblBottom)
         Me.Controls.Add(Me.lblRight)

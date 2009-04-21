@@ -20,6 +20,7 @@ Public Class clsMonitor
 
     Private Shared pLabelNeedsUpdate As Boolean = False
     Private Shared pProgressNeedsUpdate As Boolean = False
+    Private Shared pProgressOpened As Boolean = False
     Private Shared pProgressStartTime As Double = Double.NaN
     Private Shared pProgressCurrent As Integer
     Private Shared pProgressFinal As Integer
@@ -162,15 +163,16 @@ Public Class clsMonitor
                     If Double.IsNaN(pProgressStartTime) Then 'Progress is finished
                         pfrmStatus.Progress.Visible = False
                         pfrmStatus.Visible = False
+                        pProgressOpened = False
                         For lLabelIndex As Integer = 2 To 5
                             pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
                         Next
                     Else
-                        'If Not pfrmStatus.Progress.Visible Then 'See if we should show it
-                        'If lNowDouble - pProgressStartTime > UpdateInterval * 3 Then
-                        '    Show()
-                        'End If
-                        'End If
+                        If Not pProgressOpened Then
+                            Show()
+                            pProgressOpened = True
+                        End If
+
                         'If pfrmStatus.Progress.Visible Then
                         With pfrmStatus
                             .Progress.Maximum = pProgressFinal
