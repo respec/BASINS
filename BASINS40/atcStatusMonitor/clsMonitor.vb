@@ -52,7 +52,7 @@ Public Class clsMonitor
         'End While
 
         Dim lCommandLine As String = Command()
-        Console.WriteLine("StatusMonitorEntryWith " & lCommandLine)
+        'Console.WriteLine("StatusMonitorEntryWith " & lCommandLine)
 
         pfrmStatus = New frmStatus
         pfrmStatus.Show()
@@ -322,17 +322,17 @@ Public Class clsMonitor
             End If
 
             Select Case lWords(0).ToUpper
-                'Case "BUTTON"
-                '    Select Case UCase(Rest)
-                '        Case "CANCEL" : cmdCancel.Visible = True
-                '        Case "PAUSE" : cmdPause.Visible = True
-                '        Case "DETAILS", "OUTPUT" : cmdDetails.Visible = True
+                'Case "BUTTON"                    
+                '    Select Case lWords(1).ToUpper
+                '        Case "CANCEL" : frmStatus.btnCancel.Visible = True : frmStatus.Refresh() : Application.DoEvents() : MsgBox("BUTTON ", MsgBoxStyle.OkOnly, frmStatus.btnCancel.Visible)
+                '        Case "PAUSE" : frmStatus.btnPause.Visible = True : frmStatus.btnPause.Refresh()
+                '        Case "DETAILS", "OUTPUT" : frmStatus.btnDetails.Visible = True
                 '    End Select
                 'Case "BUTTOFF"
-                '    Select Case UCase(Rest)
-                '        Case "CANCEL" : cmdCancel.Visible = False
-                '        Case "PAUSE" : cmdPause.Visible = False
-                '        Case "DETAILS", "OUTPUT" : cmdDetails.Visible = False
+                '    Select Case lWords(1).ToUpper
+                '        Case "CANCEL" : frmStatus.btnCancel.Visible = False
+                '        Case "PAUSE" : frmStatus.btnPause.Visible = False
+                '        Case "DETAILS", "OUTPUT" : frmStatus.btnDetails.Visible = False
                 '    End Select
                 Case "CLEAR" : ClearLabels()
                     'Case "DBG" 'Debug message, just goes into log

@@ -2,6 +2,8 @@ Public Class frmStatus
     Inherits System.Windows.Forms.Form
 
     Friend WithEvents btnCancel As System.Windows.Forms.Button
+    Friend WithEvents btnPause As System.Windows.Forms.Button
+    Friend WithEvents btnDetails As System.Windows.Forms.Button
     Public Exiting As Boolean = False
 
 #Region " Windows Form Designer generated code "
@@ -49,6 +51,8 @@ Public Class frmStatus
         Me.lblRight = New System.Windows.Forms.Label
         Me.lblBottom = New System.Windows.Forms.Label
         Me.btnCancel = New System.Windows.Forms.Button
+        Me.btnPause = New System.Windows.Forms.Button
+        Me.btnDetails = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'Progress
@@ -136,10 +140,32 @@ Public Class frmStatus
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
+        'btnPause
+        '
+        Me.btnPause.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnPause.Location = New System.Drawing.Point(82, 131)
+        Me.btnPause.Name = "btnPause"
+        Me.btnPause.Size = New System.Drawing.Size(65, 26)
+        Me.btnPause.TabIndex = 8
+        Me.btnPause.Text = "Pause"
+        Me.btnPause.UseVisualStyleBackColor = True
+        '
+        'btnDetails
+        '
+        Me.btnDetails.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnDetails.Location = New System.Drawing.Point(153, 131)
+        Me.btnDetails.Name = "btnDetails"
+        Me.btnDetails.Size = New System.Drawing.Size(65, 26)
+        Me.btnDetails.TabIndex = 9
+        Me.btnDetails.Text = "Details"
+        Me.btnDetails.UseVisualStyleBackColor = True
+        '
         'frmStatus
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(514, 169)
+        Me.Controls.Add(Me.btnDetails)
+        Me.Controls.Add(Me.btnPause)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.lblBottom)
         Me.Controls.Add(Me.lblRight)
@@ -204,16 +230,35 @@ Public Class frmStatus
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         Clear()
         Label(1) = "Cancelling"
-        Console.WriteLine("Cancel")
+        Console.WriteLine("C")
+    End Sub
+
+    Private Sub btnPause_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPause.Click
+        If btnPause.Text = "Pause" Then
+            Console.WriteLine("P")
+            btnPause.Text = "Run"
+        Else
+            btnPause.Text = "Pause"
+            Console.WriteLine("R")
+        End If
+    End Sub
+
+    Private Sub btnDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDetails.Click
+        Dim lHeightHidingDetails As Integer = btnDetails.Top + btnDetails.Height + 46
+        If Me.Height > lHeightHidingDetails Then
+            Me.Height = lHeightHidingDetails
+        Else
+            Me.Height = 700
+        End If
     End Sub
 
     Private Sub frmStatus_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
         Try
             lblRight.Left = Me.ClientRectangle.Width - lblRight.Width - lblLeft.Left
+            Dim lControlWidth As Integer = Me.ClientRectangle.Width - Progress.Left * 2
+            lblMiddle.Width = lControlWidth
+            Progress.Width = lControlWidth
             If Me.Height > txtLog.Top + txtLog.Left * 3 Then
-                Dim lControlWidth As Integer = Me.ClientRectangle.Width - Progress.Left * 2
-                lblMiddle.Width = lControlWidth
-                Progress.Width = lControlWidth
                 txtLog.Width = lControlWidth
                 txtLog.Height = Me.ClientRectangle.Height - txtLog.Top - txtLog.Left
                 txtLog.Visible = True
@@ -223,4 +268,5 @@ Public Class frmStatus
         Catch
         End Try
     End Sub
+
 End Class
