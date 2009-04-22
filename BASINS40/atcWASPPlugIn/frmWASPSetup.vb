@@ -957,7 +957,7 @@ Public Class frmWASPSetup
         Dim lWASPInpFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".inp"
         MkDirPath(PathNameOnly(lWASPProjectFileName))
 
-        If PreProcessChecking(lWASPProjectFileName) Then
+        If PreProcessChecking(lWASPInpFileName) Then
             With pPlugIn.WASPProject
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
@@ -972,7 +972,7 @@ Public Class frmWASPSetup
                 .Save(lWASPProjectFileName)
                 .WriteINP(lWASPInpFileName)
                 Logger.Dbg("Run WASP")
-                .Run(lWASPProjectFileName)
+                .Run(lWASPInpFileName)
                 Logger.Dbg("BackFromWASP")
             End With
 

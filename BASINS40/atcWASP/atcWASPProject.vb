@@ -719,7 +719,7 @@ Public Class atcWASPProject
         lIntroText.AppendLine("0.003000  1.000     Min and Max Timestep")
         lIntroText.AppendLine("    2               Number print intervals")
         lIntroText.AppendLine("      0.00  1.000   Time and Print Interval")
-        lIntroText.AppendLine("    333.00  1.000   Time and Print Interval")
+        lIntroText.AppendLine(lJulianEnd & "  1.000   Time and Print Interval")
         lIntroText.AppendLine("   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0")
         aSW.Write(lIntroText.ToString) 'WriteLine would add an additional \n
         aSW.Flush()
@@ -1056,7 +1056,7 @@ Public Class atcWASPProject
                 aSW.WriteLine(Segments.Item(FlowPathList(j)).Name)
                 'Write out this segment's flow timeseries here
                 For Each lts As atcWASPTimeseries In Segments.Item(FlowPathList(j)).InputTimeseriesCollection
-                    If lts.Type.StartsWith("flow") Then
+                    If lts.Type.StartsWith("FLOW") Then
                         lflowTS = lts
                         Exit For
                     End If
@@ -1069,6 +1069,8 @@ Public Class atcWASPProject
                     For lindex As Integer = 1 To lflowTS.TimeSeries.Values.Length - 1
                         aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lflowTS.TimeSeries.Values(lindex).ToString)
                     Next
+                Else
+                    aSW.WriteLine("    0               Number of time-flow values")
                 End If
             Next
         Next
@@ -1077,137 +1079,148 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpDispFile(ByRef aSW As IO.StreamWriter) As Boolean
-        'TODO: deal with this part later, put place holder here as there is not example for this section
+        'TODO: deal with this part later
         aSW.WriteLine("    0               Number of Exchange Fields                     DISPFILE")
         aSW.Flush()
         Return True
     End Function
 
     Private Function writeInpBoundFile(ByRef aSW As IO.StreamWriter) As Boolean
+        'TODO: deal with this part later
+        aSW.WriteLine("    0               Number of Systems                             BOUNDFILE")
+        aSW.Flush()
+        Return True
+
         'Make sure every concentration timeseries's first and last timesteps' values are 0.000
         'the first time step is always 0.000
 
         'TODO: Please use the following schemes to name the constituent's name or Type
-        Dim lsystem(15) As String
-        lsystem(0) = "ConcAmmonia"
-        lsystem(1) = "ConcNitrate"
-        lsystem(2) = "ConcOrthophosphate"
-        lsystem(3) = "ConcPhytoplankton"
-        lsystem(4) = "ConcCBOD 1"
-        lsystem(5) = "ConcDissolved Oxygen"
-        lsystem(6) = "ConcOrganic Nitrogen"
-        lsystem(7) = "ConcOrganic Phosphorus"
-        lsystem(8) = "ConcSalinity"
-        lsystem(9) = "Conc(not used)"
-        lsystem(10) = "ConcDetrital Carbon"
-        lsystem(11) = "ConcCBOD 2"
-        lsystem(12) = "ConcCBOD 3"
-        lsystem(13) = "ConcDetrital Nitrogen"
-        lsystem(14) = "ConcDetrital Phosphorus"
-        lsystem(15) = "ConcSolids"
+        'Dim lsystem(15) As String
+        'lsystem(0) = "ConcAmmonia"
+        'lsystem(1) = "ConcNitrate"
+        'lsystem(2) = "ConcOrthophosphate"
+        'lsystem(3) = "ConcPhytoplankton"
+        'lsystem(4) = "ConcCBOD 1"
+        'lsystem(5) = "ConcDissolved Oxygen"
+        'lsystem(6) = "ConcOrganic Nitrogen"
+        'lsystem(7) = "ConcOrganic Phosphorus"
+        'lsystem(8) = "ConcSalinity"
+        'lsystem(9) = "Conc(not used)"
+        'lsystem(10) = "ConcDetrital Carbon"
+        'lsystem(11) = "ConcCBOD 2"
+        'lsystem(12) = "ConcCBOD 3"
+        'lsystem(13) = "ConcDetrital Nitrogen"
+        'lsystem(14) = "ConcDetrital Phosphorus"
+        'lsystem(15) = "ConcSolids"
 
-        'Sort the selected segments' WASPID
-        Dim lflowpathsegarray(FlowPathList.Count - 1) As Integer
-        FlowPathList.CopyTo(lflowpathsegarray)
-        System.Array.Sort(lflowpathsegarray) ' Assuming sort order is ascending order
+        ''Sort the selected segments' WASPID
+        'Dim lflowpathsegarray(FlowPathList.Count - 1) As Integer
+        'FlowPathList.CopyTo(lflowpathsegarray)
+        'System.Array.Sort(lflowpathsegarray) ' Assuming sort order is ascending order
 
-        'TODO: need to decide number of systems based on user input
-        aSW.WriteLine("16               Number of Systems                             BOUNDFILE")
-        Dim lconcTS As atcWASPTimeseries = Nothing
-        For i As Integer = 0 To lsystem.Length - 1 ' later need to be loop through "Selected" set of systems
-            aSW.WriteLine(lsystem(i)) ' constituent name
-            aSW.WriteLine((NumFlowFunc(0) + 1).ToString.PadLeft(5) & Space(15) & "Number of boundaries") ' one more than the flow function, the confluence
+        ''TODO: need to decide number of systems based on user input
+        'aSW.WriteLine("16               Number of Systems                             BOUNDFILE")
+        'Dim lconcTS As atcWASPTimeseries = Nothing
+        'For i As Integer = 0 To lsystem.Length - 1 ' later need to be loop through "Selected" set of systems
+        '    aSW.WriteLine(lsystem(i)) ' constituent name
+        '    aSW.WriteLine((NumFlowFunc(0) + 1).ToString.PadLeft(5) & Space(15) & "Number of boundaries") ' one more than the flow function, the confluence
 
-            ' Seems the concentration TS needs to have the same layout as the flow???
-            ' So perhaps no need to check for zero-Number of boundaries case???
+        '    ' Seems the concentration TS needs to have the same layout as the flow???
+        '    ' So perhaps no need to check for zero-Number of boundaries case???
 
-            aSW.WriteLine("      1.000000      0.500000  Boundary Scale & Conversion Factors")
-            aSW.WriteLine("    1               Boundary Segment Number")
-            aSW.WriteLine("    2               Number of time-concentration values")
-            aSW.WriteLine("   0.000000  0.000000")
-            aSW.WriteLine(String.Format("   {0:0.000}  0.000000", NumTimeSteps - 1))
+        '    aSW.WriteLine("      1.000000      0.500000  Boundary Scale & Conversion Factors")
+        '    aSW.WriteLine("    1               Boundary Segment Number")
+        '    aSW.WriteLine("    2               Number of time-concentration values")
+        '    aSW.WriteLine("   0.000000  0.000000")
+        '    aSW.WriteLine(String.Format("   {0:0.000}  0.000000", NumTimeSteps - 1))
 
-            'Start the concentration flow values for the selected segments as in FlowPath section
-            For lsegCtr As Integer = 0 To lflowpathsegarray.Length - 1
-                aSW.WriteLine(lflowpathsegarray(lsegCtr).ToString.PadLeft(5) & Space(15) & "Boundary Segment Number")
-                'Write out this segment's this constituent's concentration timeseries here
-                For Each lts As atcWASPTimeseries In Segments.Item(lflowpathsegarray(lsegCtr)).InputTimeseriesCollection
-                    If lts.Type.StartsWith(lsystem(i)) Then
-                        lconcTS = lts
-                        Exit For
-                    End If
-                Next
-                If lconcTS IsNot Nothing Then
-                    aSW.WriteLine(Space(2) & lconcTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-concentration values")
-                    For lindex As Integer = 1 To lconcTS.TimeSeries.Values.Length - 1
-                        aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lconcTS.TimeSeries.Values(lindex).ToString)
-                    Next
-                End If
-            Next
-        Next
-        aSW.Flush()
-        Return True
+        '    'Start the concentration flow values for the selected segments as in FlowPath section
+        '    For lsegCtr As Integer = 0 To lflowpathsegarray.Length - 1
+        '        aSW.WriteLine(lflowpathsegarray(lsegCtr).ToString.PadLeft(5) & Space(15) & "Boundary Segment Number")
+        '        'Write out this segment's this constituent's concentration timeseries here
+        '        For Each lts As atcWASPTimeseries In Segments.Item(lflowpathsegarray(lsegCtr)).InputTimeseriesCollection
+        '            If lts.Type.StartsWith(lsystem(i)) Then
+        '                lconcTS = lts
+        '                Exit For
+        '            End If
+        '        Next
+        '        If lconcTS IsNot Nothing Then
+        '            aSW.WriteLine(Space(2) & lconcTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-concentration values")
+        '            For lindex As Integer = 1 To lconcTS.TimeSeries.Values.Length - 1
+        '                aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lconcTS.TimeSeries.Values(lindex).ToString)
+        '            Next
+        '        End If
+        '    Next
+        'Next
+        'aSW.Flush()
+        'Return True
     End Function
 
     Private Function writeInpLoadFile(ByRef aSW As IO.StreamWriter) As Boolean
+        'TODO: deal with this part later
+        aSW.WriteLine("    0               NPS Input Option (0=No, 1=Yes)                LOADFILE")
+        aSW.WriteLine("    0               Number of Systems")
+        aSW.Flush()
+        Return True
+
         'Load timeseries for the constituents are for point observations??
         'as they do not share the same flow path scheme
 
         'TODO: Please use the following schemes to name the constituent's name or Type for load in put
-        Dim lsystem(15) As String
-        lsystem(0) = "LoadAmmonia"
-        lsystem(1) = "LoadNitrate"
-        lsystem(2) = "LoadOrthophosphate"
-        lsystem(3) = "LoadPhytoplankton"
-        lsystem(4) = "LoadCBOD 1"
-        lsystem(5) = "LoadDissolved Oxygen"
-        lsystem(6) = "LoadOrganic Nitrogen"
-        lsystem(7) = "LoadOrganic Phosphorus"
-        lsystem(8) = "LoadSalinity"
-        lsystem(9) = "Load(not used)"
-        lsystem(10) = "LoadDetrital Carbon"
-        lsystem(11) = "LoadCBOD 2"
-        lsystem(12) = "LoadCBOD 3"
-        lsystem(13) = "LoadDetrital Nitrogen"
-        lsystem(14) = "LoadDetrital Phosphorus"
-        lsystem(15) = "LoadSolids"
+        'Dim lsystem(15) As String
+        'lsystem(0) = "LoadAmmonia"
+        'lsystem(1) = "LoadNitrate"
+        'lsystem(2) = "LoadOrthophosphate"
+        'lsystem(3) = "LoadPhytoplankton"
+        'lsystem(4) = "LoadCBOD 1"
+        'lsystem(5) = "LoadDissolved Oxygen"
+        'lsystem(6) = "LoadOrganic Nitrogen"
+        'lsystem(7) = "LoadOrganic Phosphorus"
+        'lsystem(8) = "LoadSalinity"
+        'lsystem(9) = "Load(not used)"
+        'lsystem(10) = "LoadDetrital Carbon"
+        'lsystem(11) = "LoadCBOD 2"
+        'lsystem(12) = "LoadCBOD 3"
+        'lsystem(13) = "LoadDetrital Nitrogen"
+        'lsystem(14) = "LoadDetrital Phosphorus"
+        'lsystem(15) = "LoadSolids"
 
-        aSW.WriteLine("    0               NPS Input Option (0=No, 1=Yes)                LOADFILE")
-        aSW.WriteLine("   16               Number of Systems")
-        Dim lloadingSegList As ArrayList = Nothing
-        Dim lloadTS As atcWASPTimeseries = Nothing
-        For i As Integer = 0 To lsystem.Length - 1 ' later need to be loop through "Selected" set of systems
-            lloadingSegList = getInfoLoadings(lsystem(i))
+        'aSW.WriteLine("    0               NPS Input Option (0=No, 1=Yes)                LOADFILE")
+        'aSW.WriteLine("   16               Number of Systems")
+        'Dim lloadingSegList As ArrayList = Nothing
+        'Dim lloadTS As atcWASPTimeseries = Nothing
+        'For i As Integer = 0 To lsystem.Length - 1 ' later need to be loop through "Selected" set of systems
+        '    lloadingSegList = getInfoLoadings(lsystem(i))
 
-            aSW.WriteLine(lsystem(i)) ' constituent name
-            aSW.WriteLine(lloadingSegList.Count.ToString.PadLeft(5) & Space(15) & "Number of Loadings")
+        '    aSW.WriteLine(lsystem(i)) ' constituent name
+        '    aSW.WriteLine(lloadingSegList.Count.ToString.PadLeft(5) & Space(15) & "Number of Loadings")
 
-            If lloadingSegList.Count = 0 Then 'if no loading data, then move on to next constituent
-                Continue For
-            End If
+        '    If lloadingSegList.Count = 0 Then 'if no loading data, then move on to next constituent
+        '        Continue For
+        '    End If
 
-            aSW.WriteLine("      1.000000      1.000000  Loading Scale & Conversion Factors")
+        '    aSW.WriteLine("      1.000000      1.000000  Loading Scale & Conversion Factors")
 
-            'Start the concentration flow values for the selected segments as in FlowPath section
-            For lsegCtr As Integer = 0 To lloadingSegList.Count - 1
-                aSW.WriteLine(lloadingSegList(lsegCtr).ToString.PadLeft(5) & Space(15) & "Loading Segment Number")
-                'Write out this segment's this constituent's loading timeseries here
-                For Each lts As atcWASPTimeseries In Segments.Item(lloadingSegList(lsegCtr)).InputTimeseriesCollection
-                    If lts.Type.StartsWith(lsystem(i)) Then
-                        lloadTS = lts
-                        Exit For
-                    End If
-                Next
-                If lloadTS IsNot Nothing Then
-                    aSW.WriteLine(Space(2) & lloadTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-loading values")
-                    For lindex As Integer = 1 To lloadTS.TimeSeries.Values.Length - 1
-                        aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lloadTS.TimeSeries.Values(lindex).ToString)
-                    Next
-                End If
-            Next
-        Next
-        aSW.Flush()
-        Return True
+        '    'Start the concentration flow values for the selected segments as in FlowPath section
+        '    For lsegCtr As Integer = 0 To lloadingSegList.Count - 1
+        '        aSW.WriteLine(lloadingSegList(lsegCtr).ToString.PadLeft(5) & Space(15) & "Loading Segment Number")
+        '        'Write out this segment's this constituent's loading timeseries here
+        '        For Each lts As atcWASPTimeseries In Segments.Item(lloadingSegList(lsegCtr)).InputTimeseriesCollection
+        '            If lts.Type.StartsWith(lsystem(i)) Then
+        '                lloadTS = lts
+        '                Exit For
+        '            End If
+        '        Next
+        '        If lloadTS IsNot Nothing Then
+        '            aSW.WriteLine(Space(2) & lloadTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-loading values")
+        '            For lindex As Integer = 1 To lloadTS.TimeSeries.Values.Length - 1
+        '                aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lloadTS.TimeSeries.Values(lindex).ToString)
+        '            Next
+        '        End If
+        '    Next
+        'Next
+        'aSW.Flush()
+        'Return True
     End Function
 
     Private Function getInfoLoadings(ByVal aSystem As String) As ArrayList
@@ -1223,111 +1236,122 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpTFuncFile(ByRef aSW As IO.StreamWriter) As Boolean
-
+        'TODO: deal with this part later
         aSW.WriteLine("    0               Number of Time Functions                      TFUNCFILE")
         aSW.Flush()
         Return True
-
     End Function
 
     Private Function writeInpParamInfoFile(ByRef aSW As IO.StreamWriter) As Boolean
-
-        aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & Space(15) & "Number of Segments" & Space(20) & "PARAMINFO")
+        'TODO: deal with this part later
+        aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & Space(15) & "Number of Segments" & Space(28) & "PARAMINFO")
+        aSW.WriteLine("    0               Number of Segment Parameters")
+        aSW.Flush()
+        Return True
 
         'Need a structure in the classes to hold the parameter list
         'so HC here
-        aSW.WriteLine("    2               Number of Segment Parameters")
-        aSW.WriteLine("    9       1.000000     ID and scale factor for: Sediment Oxygen Demand (g/m2/day)")
-        aSW.WriteLine("   12       1.000000     ID and scale factor for: Sediment Oxygen Demand Temperature Correction Factor")
+        'aSW.WriteLine("    2               Number of Segment Parameters")
+        'aSW.WriteLine("    9       1.000000     ID and scale factor for: Sediment Oxygen Demand (g/m2/day)")
+        'aSW.WriteLine("   12       1.000000     ID and scale factor for: Sediment Oxygen Demand Temperature Correction Factor")
 
-        For i As Integer = 0 To Segments.Count - 1
-            aSW.WriteLine((i + 1).ToString.PadLeft(5) & Space(15) & "Segment number")
-            aSW.WriteLine("   9  1.00000")
-            aSW.WriteLine("   12  1.08000")
-        Next
-        aSW.Flush()
-        Return True
+        'For i As Integer = 0 To Segments.Count - 1
+        '    aSW.WriteLine((i + 1).ToString.PadLeft(5) & Space(15) & "Segment number")
+        '    aSW.WriteLine("   9  1.00000")
+        '    aSW.WriteLine("   12  1.08000")
+        'Next
+        'aSW.Flush()
+        'Return True
     End Function
 
     Private Function writeInpConstFile(ByRef aSW As IO.StreamWriter) As Boolean
-        'Need a structure to hold the constant info
-        'HC here
-        aSW.WriteLine("   32               Number of Constants                           CONSTFILE")
-        aSW.WriteLine("   11  0.400000 Nitrification Rate Constant @20 °C (per day)")
-        aSW.WriteLine("   12  1.04000 Nitrification Temperature Coefficient")
-        aSW.WriteLine("   13  2.00000 Half Saturation Constant for Nitrification Oxygen Limit (mg O/L)")
-        aSW.WriteLine("   14  4.00000 Minimum Temperature for Nitrification Reaction, deg C")
-        aSW.WriteLine("   21  0.690000 Denitrification Rate Constant @20 °C (per day)")
-        aSW.WriteLine("   22  1.04000 Denitrification Temperature Coefficient")
-        aSW.WriteLine("   23  1.00000 Half Saturation Constant for Denitrification Oxygen Limit (mg O/L)")
-        aSW.WriteLine("   91  0.100000 Dissolved Organic Nitrogen Mineralization Rate Constant @20 °C (per day)")
-        aSW.WriteLine("   92  1.07000 Dissolved Organic Nitrogen Mineralization Temperature Coefficient")
-        aSW.WriteLine("   100  0.180000 Mineralization Rate Constant for Dissolved Organic P @20 °C (per day)")
-        aSW.WriteLine("   101  1.07000 Dissolved Organic Phosphorus Mineralization Temperature Coefficient")
-        aSW.WriteLine("   41  3.00000 Phytoplankton Maximum Growth Rate Constant @20 °C (per day)")
-        aSW.WriteLine("   42  1.05000 Phytoplankton Growth Temperature Coefficient")
-        aSW.WriteLine("   46  50.0000 Phytoplankton Carbon to Chlorophyll Ratio")
-        aSW.WriteLine("   48  5.000000E-02 Phytoplankton Half-Saturation Constant for Nitrogen Uptake (mg N/L)")
-        aSW.WriteLine("   49  5.000000E-03 Phytoplankton Half-Saturation Constant for Phosphorus Uptake (mg P/L)")
-        aSW.WriteLine("   50  0.100000 Phytoplankton Endogenous Respiration Rate Constant @20 °C (per day)")
-        aSW.WriteLine("   51  1.07000 Phytoplankton Respiration Temperature Coefficient")
-        aSW.WriteLine("   52  0.000000 Phytoplankton Death Rate Constant (Non-Zooplankton Predation) (per day)")
-        aSW.WriteLine("   57  0.240000 Phytoplankton Phosphorus to Carbon Ratio")
-        aSW.WriteLine("   58  0.430000 Phytoplankton Nitrogen to Carbon Ratio")
-        aSW.WriteLine("   43  1.00000 Light Option (1 uses input light;  2 uses calculated diel light)")
-        aSW.WriteLine("   85  4.00000 Calc Reaeration Option (0=Covar, 1=O'Connor, 2=Owens, 3=Churchill, 4=Tsivoglou)")
-        aSW.WriteLine("   86  1.000000E-02 Minimum Reaeration Rate, per day")
-        aSW.WriteLine("   87  1.04700 Theta -- Reaeration Temperature Correction")
-        aSW.WriteLine("   81  2.67000 Oxygen to Carbon Stoichiometric Ratio")
-        aSW.WriteLine("   71  0.400000 BOD (1) Decay Rate Constant @20 °C (per day)")
-        aSW.WriteLine("   72  1.04700 BOD (1) Decay Rate Temperature Correction Coefficient")
-        aSW.WriteLine("   76  1.00000 BOD (2) Decay Rate @20 °C (per day)")
-        aSW.WriteLine("   77  1.04700 BOD (2) Decay Rate Temperature Correction Coefficient")
-        aSW.WriteLine("   131  0.200000 Detritus Dissolution Rate (1/day)")
-        aSW.WriteLine("   132  1.04700 Temperature Correction for detritus dissolution")
+        'TODO: deal with this part later
+        aSW.WriteLine("    0               Number of Constants                           CONSTFILE")
         aSW.Flush()
         Return True
 
+        'Need a structure to hold the constant info
+        'HC here
+        'aSW.WriteLine("   32               Number of Constants                           CONSTFILE")
+        'aSW.WriteLine("   11  0.400000 Nitrification Rate Constant @20 °C (per day)")
+        'aSW.WriteLine("   12  1.04000 Nitrification Temperature Coefficient")
+        'aSW.WriteLine("   13  2.00000 Half Saturation Constant for Nitrification Oxygen Limit (mg O/L)")
+        'aSW.WriteLine("   14  4.00000 Minimum Temperature for Nitrification Reaction, deg C")
+        'aSW.WriteLine("   21  0.690000 Denitrification Rate Constant @20 °C (per day)")
+        'aSW.WriteLine("   22  1.04000 Denitrification Temperature Coefficient")
+        'aSW.WriteLine("   23  1.00000 Half Saturation Constant for Denitrification Oxygen Limit (mg O/L)")
+        'aSW.WriteLine("   91  0.100000 Dissolved Organic Nitrogen Mineralization Rate Constant @20 °C (per day)")
+        'aSW.WriteLine("   92  1.07000 Dissolved Organic Nitrogen Mineralization Temperature Coefficient")
+        'aSW.WriteLine("   100  0.180000 Mineralization Rate Constant for Dissolved Organic P @20 °C (per day)")
+        'aSW.WriteLine("   101  1.07000 Dissolved Organic Phosphorus Mineralization Temperature Coefficient")
+        'aSW.WriteLine("   41  3.00000 Phytoplankton Maximum Growth Rate Constant @20 °C (per day)")
+        'aSW.WriteLine("   42  1.05000 Phytoplankton Growth Temperature Coefficient")
+        'aSW.WriteLine("   46  50.0000 Phytoplankton Carbon to Chlorophyll Ratio")
+        'aSW.WriteLine("   48  5.000000E-02 Phytoplankton Half-Saturation Constant for Nitrogen Uptake (mg N/L)")
+        'aSW.WriteLine("   49  5.000000E-03 Phytoplankton Half-Saturation Constant for Phosphorus Uptake (mg P/L)")
+        'aSW.WriteLine("   50  0.100000 Phytoplankton Endogenous Respiration Rate Constant @20 °C (per day)")
+        'aSW.WriteLine("   51  1.07000 Phytoplankton Respiration Temperature Coefficient")
+        'aSW.WriteLine("   52  0.000000 Phytoplankton Death Rate Constant (Non-Zooplankton Predation) (per day)")
+        'aSW.WriteLine("   57  0.240000 Phytoplankton Phosphorus to Carbon Ratio")
+        'aSW.WriteLine("   58  0.430000 Phytoplankton Nitrogen to Carbon Ratio")
+        'aSW.WriteLine("   43  1.00000 Light Option (1 uses input light;  2 uses calculated diel light)")
+        'aSW.WriteLine("   85  4.00000 Calc Reaeration Option (0=Covar, 1=O'Connor, 2=Owens, 3=Churchill, 4=Tsivoglou)")
+        'aSW.WriteLine("   86  1.000000E-02 Minimum Reaeration Rate, per day")
+        'aSW.WriteLine("   87  1.04700 Theta -- Reaeration Temperature Correction")
+        'aSW.WriteLine("   81  2.67000 Oxygen to Carbon Stoichiometric Ratio")
+        'aSW.WriteLine("   71  0.400000 BOD (1) Decay Rate Constant @20 °C (per day)")
+        'aSW.WriteLine("   72  1.04700 BOD (1) Decay Rate Temperature Correction Coefficient")
+        'aSW.WriteLine("   76  1.00000 BOD (2) Decay Rate @20 °C (per day)")
+        'aSW.WriteLine("   77  1.04700 BOD (2) Decay Rate Temperature Correction Coefficient")
+        'aSW.WriteLine("   131  0.200000 Detritus Dissolution Rate (1/day)")
+        'aSW.WriteLine("   132  1.04700 Temperature Correction for detritus dissolution")
+        'aSW.Flush()
+        'Return True
     End Function
 
     Private Function writeInpIcFile(ByRef aSW As IO.StreamWriter) As Boolean
-
-        aSW.WriteLine("   16               Number of Systems                             ICFILE")
+        'TODO: deal with this part later
+        aSW.WriteLine("    0               Number of Systems                             ICFILE")
         aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & Space(15) & "Number of Segments")
-
-        'TODO: Please use the following schemes to name the constituent's name or Type for load in put
-        Dim lsystem(15) As String
-        lsystem(0) = "IcAmmonia"
-        lsystem(1) = "IcNitrate"
-        lsystem(2) = "IcOrthophosphate"
-        lsystem(3) = "IcPhytoplankton"
-        lsystem(4) = "IcCBOD 1"
-        lsystem(5) = "IcDissolved Oxygen"
-        lsystem(6) = "IcOrganic Nitrogen"
-        lsystem(7) = "IcOrganic Phosphorus"
-        lsystem(8) = "IcSalinity"
-        lsystem(9) = "Ic(not used)"
-        lsystem(10) = "IcDetrital Carbon"
-        lsystem(11) = "IcCBOD 2"
-        lsystem(12) = "IcCBOD 3"
-        lsystem(13) = "IcDetrital Nitrogen"
-        lsystem(14) = "IcDetrital Phosphorus"
-        lsystem(15) = "IcSolids"
-
-        'Need 16 special timeseries to hold these cross-segment IC values
-        For lsysCtr As Integer = 0 To lsystem.Length - 1
-            aSW.WriteLine("     Initial conditions for system  " & lsysCtr + 1 & lsystem(lsysCtr))
-            aSW.WriteLine("    0               Solids Transport Field") 'need a place to hold these
-            aSW.WriteLine("     1.000          Solids Density, g/mL") 'need a place to hold these
-            aSW.WriteLine("     10000.0000     Maximum Allowed Concentration") 'need a place to hold these
-            aSW.WriteLine("  Seg   Conc   DissF")
-
-            For lsegCtr As Integer = 0 To Segments.Count - 1
-                aSW.WriteLine(Space(3) & (lsegCtr + 1) & Space(2) & "0.00000" & Space(2) & "1.00000")
-            Next
-        Next
         aSW.Flush()
         Return True
+
+        'aSW.WriteLine("   16               Number of Systems                             ICFILE")
+        'aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & Space(15) & "Number of Segments")
+
+        ''TODO: Please use the following schemes to name the constituent's name or Type for load in put
+        'Dim lsystem(15) As String
+        'lsystem(0) = "IcAmmonia"
+        'lsystem(1) = "IcNitrate"
+        'lsystem(2) = "IcOrthophosphate"
+        'lsystem(3) = "IcPhytoplankton"
+        'lsystem(4) = "IcCBOD 1"
+        'lsystem(5) = "IcDissolved Oxygen"
+        'lsystem(6) = "IcOrganic Nitrogen"
+        'lsystem(7) = "IcOrganic Phosphorus"
+        'lsystem(8) = "IcSalinity"
+        'lsystem(9) = "Ic(not used)"
+        'lsystem(10) = "IcDetrital Carbon"
+        'lsystem(11) = "IcCBOD 2"
+        'lsystem(12) = "IcCBOD 3"
+        'lsystem(13) = "IcDetrital Nitrogen"
+        'lsystem(14) = "IcDetrital Phosphorus"
+        'lsystem(15) = "IcSolids"
+
+        ''Need 16 special timeseries to hold these cross-segment IC values
+        'For lsysCtr As Integer = 0 To lsystem.Length - 1
+        '    aSW.WriteLine("     Initial conditions for system  " & lsysCtr + 1 & lsystem(lsysCtr))
+        '    aSW.WriteLine("    0               Solids Transport Field") 'need a place to hold these
+        '    aSW.WriteLine("     1.000          Solids Density, g/mL") 'need a place to hold these
+        '    aSW.WriteLine("     10000.0000     Maximum Allowed Concentration") 'need a place to hold these
+        '    aSW.WriteLine("  Seg   Conc   DissF")
+
+        '    For lsegCtr As Integer = 0 To Segments.Count - 1
+        '        aSW.WriteLine(Space(3) & (lsegCtr + 1) & Space(2) & "0.00000" & Space(2) & "1.00000")
+        '    Next
+        'Next
+        'aSW.Flush()
+        'Return True
     End Function
 
     Private Function findTS(ByVal aSystem As String) As atcWASPTimeseries
