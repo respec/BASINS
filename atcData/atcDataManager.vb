@@ -631,21 +631,23 @@ Public Class atcDataManager
         If pMapWin Is Nothing Then
             Return Nothing
         Else
-            Dim lImage As System.Drawing.Bitmap
+            Dim lImage As System.Drawing.Bitmap = Nothing
             If aIcon IsNot Nothing Then
                 lImage = aIcon.ToBitmap
-            Else
+            ElseIf pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then
                 lImage = pMapWin.ApplicationInfo.FormIcon.ToBitmap
             End If
 
-            'make meunu image more transparent using alpha channel
-            For lY As Integer = 0 To lImage.Height - 1
-                For lX As Integer = 0 To lImage.Width - 1
-                    Dim lClr As System.Drawing.Color = lImage.GetPixel(lX, lY)
-                    lImage.SetPixel(lX, lY, _
-                      System.Drawing.Color.FromArgb(96, lClr.R, lClr.G, lClr.B))
+            If lImage IsNot Nothing Then
+                'make meunu image more transparent using alpha channel
+                For lY As Integer = 0 To lImage.Height - 1
+                    For lX As Integer = 0 To lImage.Width - 1
+                        Dim lClr As System.Drawing.Color = lImage.GetPixel(lX, lY)
+                        lImage.SetPixel(lX, lY, _
+                          System.Drawing.Color.FromArgb(96, lClr.R, lClr.G, lClr.B))
+                    Next
                 Next
-            Next
+            End If
 
             With pMapWin.Menus
                 'Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
@@ -696,7 +698,7 @@ Public Class atcDataManager
                     Return .AddMenu(aMenuName, aParent, lImage, aMenuText, aAfter)
                 End If
             End With
-        End If
+            End If
     End Function
 #End Region
 
