@@ -404,7 +404,8 @@ Public Class frmFileGeoReference
         lblStatus.Text = "Click the map to specify the location of this item"
         AddingPoint = True
         While pAddingPoint
-            System.Windows.Forms.Application.DoEvents()
+            Windows.Forms.Application.DoEvents()
+            Threading.Thread.Sleep(10)
         End While
         SetFormFromFields()
         If NumFeatures > lSaveNumFeatures Then 'Added a shape

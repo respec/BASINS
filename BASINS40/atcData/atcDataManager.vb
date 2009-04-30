@@ -698,7 +698,7 @@ Public Class atcDataManager
                     Return .AddMenu(aMenuName, aParent, lImage, aMenuText, aAfter)
                 End If
             End With
-            End If
+        End If
     End Function
 #End Region
 
