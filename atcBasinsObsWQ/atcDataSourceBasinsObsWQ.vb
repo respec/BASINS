@@ -157,6 +157,7 @@ Public Class atcDataSourceBasinsObsWQ
             d(1) = Mid(aDate, l + 1, 2)
             d(2) = Right(aDate, 2)
             If IsNumeric(aTime) Then
+                If aTime.Length < 4 Then aTime = aTime.PadLeft(4, "0")
                 d(3) = Left(aTime, 2)
                 d(4) = Right(aTime, 2)
             End If

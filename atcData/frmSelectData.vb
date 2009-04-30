@@ -398,6 +398,7 @@ Friend Class frmSelectData
         If aModal Then
             While Me.Visible
                 Application.DoEvents()
+                Threading.Thread.Sleep(10)
             End While
             If pSelectedOK Then
                 If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
@@ -406,6 +407,10 @@ Friend Class frmSelectData
             Else 'User clicked Cancel or closed dialog
                 If Not pRevertedToSaved Then pSelectedGroup.ChangeTo(pSaveGroup)
             End If
+            Try
+                Me.Close()
+            Catch
+            End Try
             Return pSelectedGroup
         Else
             Return Nothing
@@ -901,14 +906,14 @@ NextName:
             pSelectedGroup.ChangeTo(pMatchingGroup)
         End If
         pSelectedOK = True
-        Me.Close()
+        Me.Visible = False
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         pSelectedOK = False
         pRevertedToSaved = True
         pSelectedGroup.ChangeTo(pSaveGroup)
-        Me.Close()
+        Me.Visible = False
     End Sub
 
     'Update SelectionAttributes from current set of pcboCriteria

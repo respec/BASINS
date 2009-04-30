@@ -44,8 +44,14 @@ Public Module modTimeseriesMath
             Dim newDates(numNewValues) As Double
             newValues(0) = GetNaN()
 
-            System.Array.Copy(aTimeseries.Dates.Values, lStart, newDates, 0, numNewValues + 1)
-            System.Array.Copy(aTimeseries.Values, lStart + 1, newValues, 1, numNewValues)
+            If aTimeseries.Attributes.GetValue("Point", False) Then
+                newDates(0) = GetNaN()
+                System.Array.Copy(aTimeseries.Dates.Values, lStart, newDates, 1, numNewValues)
+                System.Array.Copy(aTimeseries.Values, lStart, newValues, 1, numNewValues)
+            Else
+                System.Array.Copy(aTimeseries.Dates.Values, lStart, newDates, 0, numNewValues + 1)
+                System.Array.Copy(aTimeseries.Values, lStart + 1, newValues, 1, numNewValues)
+            End If
 
             lnewTS.Values = newValues
             lnewTS.Dates.Values = newDates
