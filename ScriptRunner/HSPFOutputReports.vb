@@ -53,6 +53,7 @@ Module HSPFOutputReports
         pConstituents.Add("Sediment")
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
+        'pConstituents.Add("BOD-PQUAL")
 
         Select Case lTestName
             Case "mono"
@@ -105,14 +106,16 @@ Module HSPFOutputReports
                 pBaseName = "base"
                 pOutputLocations.Add("Lynnwood")
             Case "upatoi"
-                pTestPath = "D:\Basins\modelout\Upatoi"
+                pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
                 'pTestPath = "C:\Basins\data\20710-01\Upatoi"
                 pBaseName = "Upatoi"
                 pOutputLocations.Add("R:14")
                 pOutputLocations.Add("R:34")
+                pOutputLocations.Add("R:36")
+                pOutputLocations.Add("R:45")
                 pOutputLocations.Add("R:46")
-                pOutputLocations.Add("R:62")
-                pOutputLocations.Add("R:74")
+                'pOutputLocations.Add("R:62")
+                'pOutputLocations.Add("R:74")
                 pGraphAnnual = True
                 pCurveStepType = "NonStep" 'Tony's convention 
                 Dim pUpatoiPerlndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701, 801, 901, 951} '{101, 201, 301, 401, 501, 601, 701, 801, 901, 924}
@@ -343,7 +346,7 @@ Module HSPFOutputReports
                         lTimeSeries.Add("Observed", Aggregate(lWdmDataSource.DataSets.ItemByKey(5), atcTimeUnit.TUHour, 1, atcTran.TranAverSame))
 
                         'TODO: dont hard code DSN here
-                        lTimeSeries.Add("Simulated", lWdmDataSource.DataSets.ItemByKey(1109))
+                        lTimeSeries.Add("Simulated", lWdmDataSource.DataSets.ItemByKey(3002))
 
                         lTimeSeries.Add("Prec", lPrecTser)
                         'lTimeSeries.Add("Prec", lWdmDataSource.DataSets.ItemByKey(1010))
