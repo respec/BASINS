@@ -18,6 +18,10 @@ Public Class clsMonitor
     Private Shared pLogDisplayFirstLine As Integer = 0
     Private Shared pLogDisplayLastLine As Integer = 0
 
+    Private Shared pButtonVisibleCancel As Boolean = True
+    Private Shared pButtonVisibleDetails As Boolean = True
+    Private Shared pButtonVisiblePause As Boolean = True
+
     Private Shared pLabelNeedsUpdate As Boolean = False
     Private Shared pProgressNeedsUpdate As Boolean = False
     Private Shared pProgressOpened As Boolean = False
@@ -58,7 +62,7 @@ Public Class clsMonitor
         pfrmStatus.Show()
         pfrmStatus.Visible = False
         pfrmStatus.Clear()
-        Console.WriteLine("StatusMonitorFormCreated")
+        'Console.WriteLine("StatusMonitorFormCreated")
         ClearLabels()
 
         pRedrawCallback = New FormCallback(AddressOf Redraw)
@@ -92,7 +96,7 @@ Public Class clsMonitor
             System.Threading.Thread.Sleep(100)
         End While
 
-        Console.WriteLine("MonitorExitBeginning")
+        'Console.WriteLine("MonitorExitBeginning")
         Try
             lInput.Close()
             pWindowTimer.Dispose()
@@ -103,7 +107,7 @@ Public Class clsMonitor
             pfrmStatus.Close()
             pfrmStatus = Nothing
         End If
-        Console.WriteLine("MonitorExitComplete")
+        'Console.WriteLine("MonitorExitComplete")
     End Sub
 
     Public Shared Sub InputCallback(ByVal asyncResult As IAsyncResult)
@@ -137,6 +141,9 @@ Public Class clsMonitor
     Public Shared Sub Redraw()
         If pfrmStatus IsNot Nothing Then
             Try
+                pfrmStatus.btnCancel.Visible = pButtonVisibleCancel
+                pfrmStatus.btnDetails.Visible = pButtonVisibleDetails
+                pfrmStatus.btnPause.Visible = pButtonVisiblePause
                 If pLabelNeedsUpdate Then
                     For lLabelIndex As Integer = 0 To frmStatus.LastLabel
                         If Not pLabelText(lLabelIndex).Equals(pLabelLast(lLabelIndex)) Then
@@ -251,6 +258,9 @@ Public Class clsMonitor
                         pExiting = True
                         .Exiting = True
                         .Label(0) = "Parent Process Exited"
+                        .btnCancel.Visible = False
+                        .btnPause.Visible = False
+                        .btnDetails.Visible = True
                         Show()
                     End With
                 Else
@@ -322,21 +332,20 @@ Public Class clsMonitor
             End If
 
             Select Case lWords(0).ToUpper
-                'Case "BUTTON"                    
-                '    Select Case lWords(1).ToUpper
-                '        Case "CANCEL" : frmStatus.btnCancel.Visible = True : frmStatus.Refresh() : Application.DoEvents() : MsgBox("BUTTON ", MsgBoxStyle.OkOnly, frmStatus.btnCancel.Visible)
-                '        Case "PAUSE" : frmStatus.btnPause.Visible = True : frmStatus.btnPause.Refresh()
-                '        Case "DETAILS", "OUTPUT" : frmStatus.btnDetails.Visible = True
-                '    End Select
-                'Case "BUTTOFF"
-                '    Select Case lWords(1).ToUpper
-                '        Case "CANCEL" : frmStatus.btnCancel.Visible = False
-                '        Case "PAUSE" : frmStatus.btnPause.Visible = False
-                '        Case "DETAILS", "OUTPUT" : frmStatus.btnDetails.Visible = False
-                '    End Select
+                Case "BUTTON"
+                    Select Case lWords(1).ToUpper
+                        Case "CANCEL" : pButtonVisibleCancel = True
+                        Case "PAUSE" : pButtonVisiblePause = True
+                        Case "DETAILS", "OUTPUT" : pButtonVisibleDetails = True
+                    End Select
+                Case "BUTTOFF"
+                    Select Case lWords(1).ToUpper
+                        Case "CANCEL" : pButtonVisibleCancel = False
+                        Case "PAUSE" : pButtonVisiblePause = False
+                        Case "DETAILS", "OUTPUT" : pButtonVisibleDetails = False
+                    End Select
                 Case "CLEAR" : ClearLabels()
-                    'Case "DBG" 'Debug message, just goes into log
-                    'Console.WriteLine("Debug")
+                Case "DBG" 'Debug message, just goes into log
                 Case "EXIT"
                     pExiting = True
                     Console.WriteLine("pExitingNowTrue")
@@ -407,12 +416,19 @@ FoundProgress:
                     End If
                 Case "SHOW"
                     If Not pIgnoringWindowCommands AndAlso pfrmStatus IsNot Nothing Then
+                        If lAfterFirstWord.Length > 0 Then
+                            pLabelText(0) = lAfterFirstWord
+                            pLabelNeedsUpdate = True
+                        End If
                         pfrmStatus.Invoke(pShowCallback)
                     End If
                 Case "HIDE"
                     If Not pIgnoringWindowCommands AndAlso pfrmStatus IsNot Nothing Then
                         pfrmStatus.Invoke(pHideCallback)
                     End If
+                Case Else
+                    pLabelText(1) = aInputLine
+                    pLabelNeedsUpdate = True
             End Select
         End If
         System.Threading.Thread.Sleep(0)
