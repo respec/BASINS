@@ -30,7 +30,7 @@
     </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\Bin\</OutputPath>
+    <OutputPath>..\Bin\Plugins\Basins\</OutputPath>
     <DocumentationFile>StatusMonitor.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -47,9 +47,10 @@
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032</NoWarn>
     <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\Bin\</OutputPath>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>StatusMonitor.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -66,6 +67,7 @@
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032</NoWarn>
     <DebugType>Full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -114,6 +116,7 @@
     </Content>
     <EmbeddedResource Include="frmStatus.resx">
       <DependentUpon>frmStatus.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
