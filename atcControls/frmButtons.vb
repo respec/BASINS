@@ -112,10 +112,15 @@ Public Class frmButtons
 
         Next
 
-        If lButtonLeft > lblMessage.Width + pMargin Then
+        Dim lMoveButtons As Integer = (lblMessage.Left + lblMessage.Width + pMargin - lButtonLeft) / 2
+        If lMoveButtons < 0 Then
             Me.Width = lButtonLeft
         Else
-            Me.Width = lblMessage.Width + pMargin
+            Me.Width = lblMessage.Left + lblMessage.Width + pMargin
+
+            For Each lButton As Windows.Forms.Button In lButtons
+                lButton.Left += lMoveButtons
+            Next
         End If
 
         Dim lStartTime As Integer = Date.Now.ToOADate
