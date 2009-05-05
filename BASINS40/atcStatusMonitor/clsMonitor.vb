@@ -145,6 +145,7 @@ Public Class clsMonitor
                 pfrmStatus.btnDetails.Visible = pButtonVisibleDetails
                 pfrmStatus.btnPause.Visible = pButtonVisiblePause
                 If pLabelNeedsUpdate Then
+                    Dim lAnyLabel As Boolean = False 'Becomes true if any label has content
                     For lLabelIndex As Integer = 0 To frmStatus.LastLabel
                         If Not pLabelText(lLabelIndex).Equals(pLabelLast(lLabelIndex)) Then
                             'Console.WriteLine("UpdateLabel " & lLabelIndex)
@@ -152,8 +153,9 @@ Public Class clsMonitor
                             pLabelLast(lLabelIndex) = pLabelText(lLabelIndex)
                             pLabelLogged(lLabelIndex) = pLabelText(lLabelIndex)
                         End If
+                        If Not lAnyLabel AndAlso pfrmStatus.Label(lLabelIndex).Length > 0 Then lAnyLabel = True
                     Next
-                    pfrmStatus.Visible = True
+                    pfrmStatus.Visible = lAnyLabel
                     pLabelNeedsUpdate = False
                 End If
                 If pLogDisplayNeedsUpdate Then
