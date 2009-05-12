@@ -16,7 +16,7 @@ Module TauGraphs
     Private Const pTimeseriesAuxAxis As String = "Aux"
     Private Const pTimeseriesAuxIsPoint As Boolean = False
 
-    Private pOutputHBNFileName As String = "H:\upatoitau1-small.hbn"
+    'Private pOutputHBNFileName As String = "H:\Upatoitau4.hbn"
     Private Const pTimeseries1Axis As String = "Left"
     Private Const pTimeseries1IsPoint As Boolean = False
 
@@ -24,41 +24,59 @@ Module TauGraphs
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
         ChDriveDir(pWorkingDirectory)
-
+        Dim TauPercentOutput As String = "AVVEL\AVVEL.txt"
         Dim lTser1 As atcTimeseries
         Dim lTser2 As atcTimeseries
-        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
-        lHspfBinDataSource.Open(pOutputHBNFileName)
-        Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-        For Each lLocation As String In lHspfBinDataSource.DataSets.SortedAttributeValues("Location", "unknown")
-            lTser1 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
-                                FindData("Constituent", "TAU")(0)
-            lTser2 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranMax)
-            'lTser2.Attributes.GetValue("Start Date")
+        
+        Dim i As Integer
+        For i = 1 To 4
 
-            lTser2.Attributes.SetValue("YAxis", pTimeseries1Axis)
-            lTser2.Attributes.SetValue("Point", pTimeseries1IsPoint)
+            Dim pOutputHBNFileName As String = "H:\Upatoitau" & i & ".hbn"
 
-            'lTser1 = lTser1.Values.GetUpperBound()
-            'lTser1 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
-            'FindData("Constituent", "Flow").FindData("Time Unit", 3)(0)
-            Dim lTimeseriesGroup As New atcTimeseriesGroup
-            lTimeseriesGroup.Add(lTser2)
+            Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
+            lHspfBinDataSource.Open(pOutputHBNFileName)
+            Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
-            pBaseName = lLocation & "Tau"
 
-            GraphTimeseriesBatch(lTimeseriesGroup)
+            For Each lLocation As String In lHspfBinDataSource.DataSets.SortedAttributeValues("Location", "unknown")
+                lTser2 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
+                                    FindData("Constituent", "AVVEL")(0)
+                'lTser2 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+                'lTser2.Attributes.GetValue("Start Date")
+
+                lTser2.Attributes.SetValue("YAxis", pTimeseries1Axis)
+                lTser2.Attributes.SetValue("Point", pTimeseries1IsPoint)
+
+                'lTser1 = lTser1.Values.GetUpperBound()
+                'lTser1 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
+                'FindData("Constituent", "Flow").FindData("Time Unit", 3)(0)
+                Dim lTimeseriesGroup As New atcTimeseriesGroup
+                lTimeseriesGroup.Add(lTser2)
+
+                pBaseName = lLocation & "AVVEL"
+                'Dim EightyPercentTau As String = Format(lTser2.Attributes.GetValue("%80"), "##.##")
+                'Dim OnePercentTau As String = Format(lTser2.Attributes.GetValue("%01"), "##.##")
+                'Dim LocationAndPercent As String = lLocation & "," & EightyPercentTau & "," & OnePercentTau & vbCrLf
+                Dim Minimum As String = Format(lTser2.Attributes.GetValue("Minimum"), "##.##")
+                Dim Average As String = Format(lTser2.Attributes.GetValue("Mean"), "##.##")
+                Dim Maximum As String = Format(lTser2.Attributes.GetValue("Maximum"), "##.##")
+                'Dim LocationAndPercent As String = lLocation & "," & EightyPercentTau & "," & OnePercentTau & vbCrLf
+                Dim LocationAndPercent As String = lLocation & "," & Minimum & "," & Average & "," & Maximum & vbCrLf
+                IO.File.AppendAllText(TauPercentOutput, LocationAndPercent)
+
+                'GraphTimeseriesBatch(lTimeseriesGroup)
+                'GraphDurationBatch(lTimeseriesGroup)
+
+            Next
+
+
 
         Next
-
-
-        '
-        '        Next
     End Sub
 
     Sub GraphTimeseriesBatch(ByVal aDataGroup As atcTimeseriesGroup)
         pBaseName = SafeFilename(pBaseName)
-        Dim lOutFileName As String = "Sediment\" & pBaseName
+        Dim lOutFileName As String = "AVVEL\" & pBaseName
         Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         'Dim lPaneAux As GraphPane = lZgc.MasterPane.PaneList(0)
@@ -68,15 +86,13 @@ Module TauGraphs
         lCurve = lZgc.MasterPane.PaneList(0).CurveList.Item(0)
         lCurve.Line.Color = Drawing.Color.Blue
         lCurve.Line.StepType = StepType.NonStep
-        lCurve.Line.Width = 2
 
-        If Not lCurve.Label.Text.Contains(" at ") Then
-            lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
-        End If
-
+        'If Not lCurve.Label.Text.Contains(" at ") Then
+        '    lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
+        'End If
 
         FormatPanes(lZgc)
-        lPaneMain.YAxis.Title.Text = "TAU (lbs/ft-square)"
+        'lPaneMain.YAxis.Title.Text = "TAU (lbs/ft-square)"
         'lPaneAux.YAxis.Title.Text = "Flow (cfs)"
         lZgc.SaveIn(lOutFileName & ".png")
         'lZgc.SaveIn(lOutFileName & ".emf")
@@ -117,12 +133,12 @@ Module TauGraphs
     End Sub
 
     Sub GraphDurationBatch(ByVal aDataGroup As atcTimeseriesGroup)
-        Dim lOutFileName As String = pBaseName & "_dur"
+        Dim lOutFileName As String = "AVVEL\" & pBaseName & "_dur"
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphProbability(aDataGroup, lZgc)
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
         lZgc.SaveIn(lOutFileName & ".png")
-        lZgc.SaveIn(lOutFileName & ".emf")
+        'lZgc.SaveIn(lOutFileName & ".emf")
         lZgc.Dispose()
     End Sub
     <CLSCompliant(False)> _
@@ -137,30 +153,27 @@ Module TauGraphs
         FormatPaneWithDefaults(aPane)
         With aPane
 
-
             With .Legend
                 .Position = LegendPos.Float
                 .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top) 'You can change the legend position here
                 .FontSpec.Size = 12
                 .FontSpec.Border.IsVisible = False
-
             End With
-
             .XAxis.Scale.FontSpec.Size = 14
             .XAxis.Scale.FontSpec.IsBold = True
-            .XAxis.Title.Text = ""
+            '.XAxis.Title.Text = ""
             .YAxis.Scale.FontSpec.Size = 14
             .YAxis.Scale.FontSpec.IsBold = True
             .Border.IsVisible = False
 
-            For Each lCurve As ZedGraph.LineItem In .CurveList
-                lCurve.Label.Text = lCurve.Label.Text.Replace("SIMULATE", "SIMULATED")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("TW", "Water Temperature")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH33", "Sally Branch (Reach 33)")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("DOX", "Dissolved Oxygen")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH35", "Bonham Creek (Reach 35)")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH46", "Upatoi Creek at McBride Bridge (Reach 46)")
-            Next
+            'For Each lCurve As ZedGraph.LineItem In .CurveList
+            '    lCurve.Label.Text = lCurve.Label.Text.Replace("SIMULATE", "SIMULATED")
+            '    lCurve.Label.Text = lCurve.Label.Text.Replace("TW", "Water Temperature")
+            '    lCurve.Label.Text = lCurve.Label.Text.Replace("RCH33", "Sally Branch (Reach 33)")
+            '    lCurve.Label.Text = lCurve.Label.Text.Replace("DOX", "Dissolved Oxygen")
+            '    lCurve.Label.Text = lCurve.Label.Text.Replace("RCH35", "Bonham Creek (Reach 35)")
+            '    lCurve.Label.Text = lCurve.Label.Text.Replace("RCH46", "Upatoi Creek at McBride Bridge (Reach 46)")
+            'Next
         End With
 
     End Sub

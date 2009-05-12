@@ -104,7 +104,7 @@ Module GraphBasic
                     pLeftYAxisLabel = "Dissolved Oxygen (mg/l)"
                 Case "NH4-N"
                     pLeftYAxisLabel = "Ammonia as Nitrogen (mg/l)"
-                Case "PO4"
+                Case "PO4-P"
                     pLeftYAxisLabel = "Phosphate (mg/l)"
             End Select
 
@@ -126,9 +126,10 @@ Module GraphBasic
             If lDataSource1.Open(pTimeseries1FileName) Then
 
                 If pTimeseriesConstituent = "TSS" Then
+
                     If pWQGraphSpecification(lGraphIndex, 0) = "RCH46" Then
                         lTser2 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
-                                            FindData("Constituent", "FLOW").FindData("Time Unit", 3).Finddata("Scenario", "OBSERVED")(0)
+                                            FindData("Constituent", "FLOW").FindData("Time Unit", 2).Finddata("Scenario", "OBSERVED")(0)
                         lTser2.Attributes.SetValue("YAxis", pTimeseries2Axis)
                         lTser2.Attributes.SetValue("Point", pTimeseries2IsPoint)
                         lTimeseriesGroup.Add(SubsetByDate(lTser2, lSDateJ, lEdatej, Nothing))
@@ -136,6 +137,7 @@ Module GraphBasic
 
                     lTser1 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                     FindData("Constituent", "FLOW").FindData("Time Unit", 3).Finddata("Scenario", "SIMULATE")(0)
+
                 Else
                     lTser1 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                     FindData("Constituent", "FLOW").FindData("Time Unit", 4)(0)
@@ -175,15 +177,17 @@ Module GraphBasic
             'get timeseries 4, 5 and 6
             Dim lDataSource4 As New atcDataSourceBasinsObsWQ
             If lDataSource4.Open(pObservedWQBaseFileName) Then
+                Dim lTser4 As atcTimeseries
+                lTser4 = Nothing
 
-                Dim lTser4 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
+                lTser4 = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                                     FindData("Constituent", pTimeseriesConstituent)(0)
                 If lTser4 IsNot Nothing Then
                     lTser4.Attributes.SetValue("YAxis", pTimeseries4Axis)
                     lTser4.Attributes.SetValue("Point", pTimeseries4IsPoint)
                     lTimeseriesGroup.Add(SubsetByDate(lTser4, lSDateJ, lEdatej, Nothing))
                 End If
-              
+
 
                 If (pWQGraphSpecification(lGraphIndex, 8) <> "") Then
 
@@ -192,6 +196,8 @@ Module GraphBasic
                     lTser5.Attributes.SetValue("YAxis", pTimeseries5Axis)
                     lTser5.Attributes.SetValue("Point", pTimeseries5IsPoint)
                     lTimeseriesGroup.Add(SubsetByDate(lTser5, lSDateJ, lEdatej, Nothing))
+                    pBaseName = pBaseName & "_" & pWQGraphSpecification(lGraphIndex, 8)
+
                     If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
 
                         Dim lTser6 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
@@ -199,6 +205,8 @@ Module GraphBasic
                         lTser6.Attributes.SetValue("YAxis", pTimeseries6Axis)
                         lTser6.Attributes.SetValue("Point", pTimeseries6IsPoint)
                         lTimeseriesGroup.Add(SubsetByDate(lTser6, lSDateJ, lEdatej, Nothing))
+
+                        pBaseName = pBaseName & "_" & pWQGraphSpecification(lGraphIndex, 9)
                     End If
 
                 End If
@@ -259,7 +267,14 @@ Module GraphBasic
         Dim lPaneMain As GraphPane = lZgc.MasterPane.PaneList(1)
         Dim lCurve As ZedGraph.LineItem
 
-        lPaneAux.CurveList.Item(0).Color = Drawing.Color.Red
+        lCurve = lPaneAux.CurveList.Item(0)
+        lCurve.Line.StepType = StepType.NonStep
+        lCurve.Line.Width = 2
+        lCurve.Color = Drawing.Color.Red
+        If Not lCurve.Label.Text.Contains(" at ") Then
+            lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
+        End If
+
         If lPaneAux.CurveList.Count > 1 Then
             lCurve = lPaneAux.CurveList.Item(1)
             lCurve.Line.StepType = StepType.NonStep
@@ -271,35 +286,42 @@ Module GraphBasic
             End If
         End If
 
-        lPaneMain.CurveList.Item(0).Color = Drawing.Color.Red
-        lPaneMain.CurveList.Item(1).Color = Drawing.Color.Blue
-
-
-        Dim lObserved As ZedGraph.LineItem = lPaneMain.CurveList.Item(1)
-        lObserved.Symbol.Type = SymbolType.Circle
-        lObserved.Symbol.Fill.IsVisible = True
-
-        If Not lObserved.Label.Text.Contains(" at ") Then
-            lObserved.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
-        End If
 
         lCurve = lPaneMain.CurveList.Item(0)
         lCurve.Line.StepType = StepType.NonStep
         lCurve.Line.Width = 2
-
-
-
+        lCurve.Color = Drawing.Color.Red
         If Not lCurve.Label.Text.Contains(" at ") Then
             lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
         End If
 
-        lCurve = lPaneMain.CurveList.Item(0)
-        lCurve.Line.StepType = StepType.NonStep
-        lCurve.Line.Width = 2
+        Dim lObserved As ZedGraph.LineItem
 
-        If Not lCurve.Label.Text.Contains(" at ") Then
-            lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
-        End If
+        For i As Integer = 1 To lPaneMain.CurveList.Count - 1
+
+            lObserved = lPaneMain.CurveList.Item(i)
+
+            If Not lObserved.Label.Text.Contains(" at ") Then
+                lObserved.Label.Text &= " at " & aDataGroup(i).Attributes.GetValue("Location")
+            End If
+
+            Select Case i
+                Case 1
+                    lObserved.Symbol.Type = SymbolType.Circle
+                    lObserved.Color = Drawing.Color.Blue
+                    lObserved.Symbol.Fill.IsVisible = True
+                Case 2
+                    lObserved.Symbol.Type = SymbolType.Diamond
+                    lObserved.Color = Drawing.Color.Brown
+                    lObserved.Symbol.Fill.IsVisible = True
+                Case 3
+                    lObserved.Symbol.Type = SymbolType.Triangle
+                    lObserved.Color = Drawing.Color.BurlyWood
+                    lObserved.Symbol.Fill.IsVisible = True
+            End Select
+        Next
+
+      
 
         FormatPanes(lZgc)
         lPaneMain.YAxis.Title.Text = pLeftYAxisLabel
