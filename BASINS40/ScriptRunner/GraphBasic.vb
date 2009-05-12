@@ -29,44 +29,61 @@ Module GraphBasic
 
     Private Const pObservedWQBaseFileName As String = "H:\FB_WQData.dbf"
 
-    Private pWQGraphSpecification(,) As Object = {{"RCH35", "DO", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH35", "TW", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH45", "TW", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH14", "DO", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH45", "DO", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH33", "DO", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH14", "TW", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH33", "TW", 2001, 7, 1, 2004, 6, 30}, _
-                                                  {"RCH45", "NO3-N", 2001, 9, 1, 2003, 11, 30}, _
-                                                  {"RCH46", "NO3-N", 2000, 1, 1, 2000, 12, 31}, _
-                                                  {"RCH14", "NO3-N", 2001, 9, 1, 2003, 11, 30}, _
-                                                  {"RCH46", "TSS", 2006, 5, 7, 2006, 5, 10}, _
-                                                  {"RCH46", "TSS", 2006, 5, 10, 2006, 5, 14}, _
-                                                  {"RCH46", "TSS", 2005, 12, 14, 2005, 12, 19}, _
-                                                  {"RCH46", "TSS", 2005, 10, 31, 2005, 11, 6}, _
-                                                  {"RCH639", "TSS", 2006, 6, 23, 2006, 6, 26}, _
-                                                  {"RCH639", "TSS", 2006, 8, 22, 2006, 8, 25}, _
-                                                  {"RCH14", "TSS", 2006, 5, 7, 2006, 5, 11}, _
-                                                  {"RCH14", "TSS", 2005, 11, 1, 2005, 11, 5}, _
-                                                  {"RCH62", "TSS", 2005, 12, 4, 2005, 12, 8}, _
-                                                  {"RCH62", "TSS", 2005, 12, 14, 2005, 12, 18}, _
-                                                  {"RCH30", "TSS", 2006, 5, 10, 2006, 5, 12}, _
-                                                  {"RCH30", "TSS", 2005, 11, 19, 2005, 11, 23}, _
-                                                  {"RCH30", "TSS", 2006, 1, 1, 2006, 1, 4}, _
-                                                  {"RCH33", "TSS", 2006, 5, 28, 2006, 5, 31}, _
-                                                  {"RCH33", "TSS", 2006, 4, 21, 2006, 4, 24}, _
-                                                  {"RCH33", "TSS", 2006, 5, 9, 2006, 5, 13}, _
-                                                  {"RCH33", "TSS", 2006, 4, 26, 2006, 4, 29}, _
-                                                  {"RCH33", "TSS", 2005, 12, 17, 2005, 12, 21}, _
-                                                  {"RCH66", "TSS", 2006, 5, 9, 2006, 5, 12}, _
-                                                  {"RCH66", "TSS", 2006, 6, 1, 2006, 6, 4}}
+    Private pWQGraphSpecification(,) As Object = {{"RCH35", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                  {"RCH35", "TW", 2001, 7, 1, 2004, 6, 30, "D12", "D13"}, _
+                                                  {"RCH35", "TSS", 2001, 5, 1, 2004, 5, 30, "", ""}, _
+                                                  {"RCH35", "NH4-N", 2001, 5, 1, 2004, 5, 30, "D12", "D13"}, _
+                                                  {"RCH35", "NO3-N", 2001, 9, 10, 2004, 9, 10, "D12", "D13"}, _
+                                                  {"RCH35", "PO4-P", 2000, 1, 1, 2003, 12, 31, "D12", "D13"}, _
+                                                  {"RCH45", "TW", 2001, 7, 1, 2004, 6, 30, "O13", ""}, _
+                                                  {"RCH45", "TSS", 2007, 7, 1, 2007, 7, 31, "O13", ""}, _
+                                                  {"RCH14", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                  {"RCH45", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                  {"RCH33", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                  {"RCH14", "TW", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                  {"RCH33", "TW", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                  {"RCH45", "NO3-N", 2001, 9, 1, 2003, 11, 30, "O13", ""}, _
+                                                  {"RCH46", "NO3-N", 2000, 1, 1, 2000, 12, 31, "", ""}, _
+                                                  {"RCH46", "DO", 2000, 1, 1, 2000, 12, 31, "", ""}, _
+                                                  {"RCH14", "NO3-N", 2001, 9, 1, 2003, 11, 30, "", ""}, _
+                                                  {"RCH46", "TSS", 2006, 5, 7, 2006, 5, 10, "", ""}, _
+                                                  {"RCH46", "TSS", 2006, 5, 10, 2006, 5, 14, "", ""}, _
+                                                  {"RCH46", "TSS", 2005, 12, 14, 2005, 12, 19, "", ""}, _
+                                                  {"RCH46", "TSS", 2005, 10, 31, 2005, 11, 6, "", ""}, _
+                                                  {"RCH46", "PO4-P", 1999, 10, 1, 2006, 9, 30, "", ""}, _
+                                                  {"RCH46", "TW", 1999, 10, 1, 2006, 9, 30, "", ""}, _
+                                                  {"RCH639", "TSS", 2006, 6, 23, 2006, 6, 26, "", ""}, _
+                                                  {"RCH639", "TSS", 2006, 8, 22, 2006, 8, 25, "", ""}, _
+                                                  {"RCH14", "TSS", 2006, 5, 7, 2006, 5, 11, "", ""}, _
+                                                  {"RCH14", "TSS", 2005, 11, 1, 2005, 11, 5, "", ""}, _
+                                                  {"RCH62", "TSS", 2005, 12, 4, 2005, 12, 8, "", ""}, _
+                                                  {"RCH62", "TSS", 2005, 12, 14, 2005, 12, 18, "", ""}, _
+                                                  {"RCH30", "TSS", 2006, 5, 10, 2006, 5, 12, "", ""}, _
+                                                  {"RCH30", "TSS", 2005, 11, 19, 2005, 11, 23, "", ""}, _
+                                                  {"RCH30", "TSS", 2006, 1, 1, 2006, 1, 4, "", ""}, _
+                                                  {"RCH33", "TSS", 2006, 5, 28, 2006, 5, 31, "", ""}, _
+                                                  {"RCH33", "TSS", 2006, 4, 21, 2006, 4, 24, "", ""}, _
+                                                  {"RCH33", "TSS", 2006, 5, 9, 2006, 5, 13, "", ""}, _
+                                                  {"RCH33", "TSS", 2006, 4, 26, 2006, 4, 29, "", ""}, _
+                                                  {"RCH33", "TSS", 2005, 12, 17, 2005, 12, 21, "", ""}, _
+                                                  {"RCH66", "TSS", 2006, 5, 9, 2006, 5, 12, "", ""}, _
+                                                  {"RCH66", "TSS", 2006, 6, 1, 2006, 6, 4, "", ""}}
+
+    ''{"RCH35", "TSS", 2001, 5, 1, 2004, 5, 30, "D12", "D13"}, 
 
 
-
-    Private pTimeseries4Const As String
+    Private pTimeseriesConstituent As String
     Private Const pTimeseries4Axis As String = "Left"
     Private Const pTimeseries4IsPoint As Boolean = True
     Private pLastIndex As Integer = pWQGraphSpecification.GetUpperBound(0)
+
+    Private Const pTimeseries5Axis As String = "Left"
+    Private Const pTimeseries5IsPoint As Boolean = True
+    Private Const pTimeseries6Axis As String = "Left"
+    Private Const pTimeseries6IsPoint As Boolean = True
+
+
+
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -74,9 +91,9 @@ Module GraphBasic
 
         For lGraphIndex As Integer = 0 To pLastIndex
 
-            pTimeseries4Const = pWQGraphSpecification(lGraphIndex, 1)
+            pTimeseriesConstituent = pWQGraphSpecification(lGraphIndex, 1)
 
-            Select Case pTimeseries4Const
+            Select Case pTimeseriesConstituent
                 Case "TW"
                     pLeftYAxisLabel = "Water Temperature (" & ChrW(186) & "F)"
                 Case "NO3-N"
@@ -87,6 +104,8 @@ Module GraphBasic
                     pLeftYAxisLabel = "Dissolved Oxygen (mg/l)"
                 Case "NH4-N"
                     pLeftYAxisLabel = "Ammonia as Nitrogen (mg/l)"
+                Case "PO4"
+                    pLeftYAxisLabel = "Phosphate (mg/l)"
             End Select
 
             Dim lSDate(5) As Integer : lSDate(0) = pWQGraphSpecification(lGraphIndex, 2) : lSDate(1) _
@@ -95,7 +114,7 @@ Module GraphBasic
             Dim lEDate(5) As Integer : lEDate(0) = pWQGraphSpecification(lGraphIndex, 5) : lEDate(1) = _
                                         pWQGraphSpecification(lGraphIndex, 6) : lEDate(2) = pWQGraphSpecification(lGraphIndex, 7)
             Dim lEdatej As Double = Date2J(lEDate)
-            pBaseName = pWQGraphSpecification(lGraphIndex, 0) & "_" & pTimeseries4Const & "_" & Format(pWQGraphSpecification(lGraphIndex, 3), "00") & _
+            pBaseName = pWQGraphSpecification(lGraphIndex, 0) & "_" & pTimeseriesConstituent & "_" & Format(pWQGraphSpecification(lGraphIndex, 3), "00") & _
                         Format(pWQGraphSpecification(lGraphIndex, 4), "00") & Right(pWQGraphSpecification(lGraphIndex, 2), 2) & "_to_" & _
                         Format(pWQGraphSpecification(lGraphIndex, 6), "00") & Format(pWQGraphSpecification(lGraphIndex, 7), "00") & Right(pWQGraphSpecification(lGraphIndex, 5), 2)
             Dim lTimeseriesGroup As New atcTimeseriesGroup
@@ -106,7 +125,7 @@ Module GraphBasic
             Dim lTser2 As atcTimeseries
             If lDataSource1.Open(pTimeseries1FileName) Then
 
-                If pTimeseries4Const = "TSS" Then
+                If pTimeseriesConstituent = "TSS" Then
                     If pWQGraphSpecification(lGraphIndex, 0) = "RCH46" Then
                         lTser2 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                                             FindData("Constituent", "FLOW").FindData("Time Unit", 3).Finddata("Scenario", "OBSERVED")(0)
@@ -135,13 +154,13 @@ Module GraphBasic
             Dim lDataSource3 As New atcDataSourceWDM
             Dim lTser3 As atcTimeseries
             If lDataSource3.Open(pOutputWDMFileName) Then
-                If pTimeseries4Const = "TSS" Then
+                If pTimeseriesConstituent = "TSS" Then
                     lTser3 = lDataSource3.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
-                    FindData("Constituent", pTimeseries4Const).FindData("Time Unit", atcTimeUnit.TUHour)(0)
+                    FindData("Constituent", pTimeseriesConstituent).FindData("Time Unit", atcTimeUnit.TUHour)(0)
                 Else
 
                     lTser3 = lDataSource3.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
-                            FindData("Constituent", pTimeseries4Const).FindData("Time Unit", 4)(0)
+                            FindData("Constituent", pTimeseriesConstituent).FindData("Time Unit", 4)(0)
                 End If
                 lTser3.Attributes.SetValue("YAxis", pTimeseries3Axis)
                 lTser3.Attributes.SetValue("Point", pTimeseries3IsPoint)
@@ -153,37 +172,36 @@ Module GraphBasic
             End If
 
 
-            'get timeseries 4
+            'get timeseries 4, 5 and 6
             Dim lDataSource4 As New atcDataSourceBasinsObsWQ
             If lDataSource4.Open(pObservedWQBaseFileName) Then
 
                 Dim lTser4 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
-                    FindData("Constituent", pTimeseries4Const)(0)
-                lTser4.Attributes.SetValue("YAxis", pTimeseries4Axis)
-                lTser4.Attributes.SetValue("Point", pTimeseries4IsPoint)
-                lTimeseriesGroup.Add(SubsetByDate(lTser4, lSDateJ, lEdatej, Nothing))
+                                    FindData("Constituent", pTimeseriesConstituent)(0)
+                If lTser4 IsNot Nothing Then
+                    lTser4.Attributes.SetValue("YAxis", pTimeseries4Axis)
+                    lTser4.Attributes.SetValue("Point", pTimeseries4IsPoint)
+                    lTimeseriesGroup.Add(SubsetByDate(lTser4, lSDateJ, lEdatej, Nothing))
+                End If
+              
 
+                If (pWQGraphSpecification(lGraphIndex, 8) <> "") Then
 
-                'If lGraphIndex = 10 Then
+                    Dim lTser5 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
+                        FindData("Constituent", pTimeseriesConstituent)(0)
+                    lTser5.Attributes.SetValue("YAxis", pTimeseries5Axis)
+                    lTser5.Attributes.SetValue("Point", pTimeseries5IsPoint)
+                    lTimeseriesGroup.Add(SubsetByDate(lTser5, lSDateJ, lEdatej, Nothing))
+                    If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
 
-                '    
-                '        Dim lTser5 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pTimeseries4Location(lGraphIndex)). _
-                '        FindData("Constituent", pTimeseries4Constituent(lGraphIndex))(0)
-                '        lTser5.Attributes.SetValue("YAxis", pTimeseries4Axis)
-                '        lTser5.Attributes.SetValue("Point", pTimeseries4IsPoint)
-                '        lTimeseriesGroup.Add(SubsetByDate(lTser5, lSDateJ, lEdatej, Nothing))
+                        Dim lTser6 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
+                            FindData("Constituent", pTimeseriesConstituent)(0)
+                        lTser6.Attributes.SetValue("YAxis", pTimeseries6Axis)
+                        lTser6.Attributes.SetValue("Point", pTimeseries6IsPoint)
+                        lTimeseriesGroup.Add(SubsetByDate(lTser6, lSDateJ, lEdatej, Nothing))
+                    End If
 
-                '    End If
-
-                'End If
-
-
-
-
-
-
-
-
+                End If
 
             Else
                 Logger.Msg("Unable to Open " & pObservedWQBaseFileName)
@@ -256,6 +274,7 @@ Module GraphBasic
         lPaneMain.CurveList.Item(0).Color = Drawing.Color.Red
         lPaneMain.CurveList.Item(1).Color = Drawing.Color.Blue
 
+
         Dim lObserved As ZedGraph.LineItem = lPaneMain.CurveList.Item(1)
         lObserved.Symbol.Type = SymbolType.Circle
         lObserved.Symbol.Fill.IsVisible = True
@@ -264,17 +283,17 @@ Module GraphBasic
             lObserved.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
         End If
 
-        lCurve = lZgc.MasterPane.PaneList(0).CurveList.Item(0)
+        lCurve = lPaneMain.CurveList.Item(0)
         lCurve.Line.StepType = StepType.NonStep
         lCurve.Line.Width = 2
 
-        
+
 
         If Not lCurve.Label.Text.Contains(" at ") Then
             lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
         End If
 
-        lCurve = lZgc.MasterPane.PaneList(1).CurveList.Item(0)
+        lCurve = lPaneMain.CurveList.Item(0)
         lCurve.Line.StepType = StepType.NonStep
         lCurve.Line.Width = 2
 
