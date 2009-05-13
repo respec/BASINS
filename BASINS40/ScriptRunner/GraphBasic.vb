@@ -31,12 +31,11 @@ Module GraphBasic
 
     Private pWQGraphSpecification(,) As Object = {{"RCH35", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
                                                   {"RCH35", "TW", 2001, 7, 1, 2004, 6, 30, "D12", "D13"}, _
-                                                  {"RCH35", "TSS", 2001, 5, 1, 2004, 5, 30, "", ""}, _
+                                                  {"RCH35", "TSS", 2001, 5, 1, 2004, 5, 30, "D12", "D13"}, _
                                                   {"RCH35", "NH4-N", 2001, 5, 1, 2004, 5, 30, "D12", "D13"}, _
                                                   {"RCH35", "NO3-N", 2001, 9, 10, 2004, 9, 10, "D12", "D13"}, _
                                                   {"RCH35", "PO4-P", 2000, 1, 1, 2003, 12, 31, "D12", "D13"}, _
                                                   {"RCH45", "TW", 2001, 7, 1, 2004, 6, 30, "O13", ""}, _
-                                                  {"RCH45", "TSS", 2007, 7, 1, 2007, 7, 31, "O13", ""}, _
                                                   {"RCH14", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
                                                   {"RCH45", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
                                                   {"RCH33", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
@@ -50,8 +49,8 @@ Module GraphBasic
                                                   {"RCH46", "TSS", 2006, 5, 10, 2006, 5, 14, "", ""}, _
                                                   {"RCH46", "TSS", 2005, 12, 14, 2005, 12, 19, "", ""}, _
                                                   {"RCH46", "TSS", 2005, 10, 31, 2005, 11, 6, "", ""}, _
-                                                  {"RCH46", "PO4-P", 1999, 10, 1, 2006, 9, 30, "", ""}, _
-                                                  {"RCH46", "TW", 1999, 10, 1, 2006, 9, 30, "", ""}, _
+                                                  {"RCH46", "PO4-P", 1999, 10, 1, 2000, 12, 31, "", ""}, _
+                                                  {"RCH46", "TW", 1999, 10, 1, 2000, 12, 31, "", ""}, _
                                                   {"RCH639", "TSS", 2006, 6, 23, 2006, 6, 26, "", ""}, _
                                                   {"RCH639", "TSS", 2006, 8, 22, 2006, 8, 25, "", ""}, _
                                                   {"RCH14", "TSS", 2006, 5, 7, 2006, 5, 11, "", ""}, _
@@ -69,7 +68,8 @@ Module GraphBasic
                                                   {"RCH66", "TSS", 2006, 5, 9, 2006, 5, 12, "", ""}, _
                                                   {"RCH66", "TSS", 2006, 6, 1, 2006, 6, 4, "", ""}}
 
-    ''{"RCH35", "TSS", 2001, 5, 1, 2004, 5, 30, "D12", "D13"}, 
+    '{"RCH35", "TSS", 2001, 5, 1, 2004, 5, 30, "D12", "D13"}, 
+    '{"RCH45", "TSS", 2007, 7, 1, 2007, 7, 31, "O13", ""}, _
 
 
     Private pTimeseriesConstituent As String
@@ -200,7 +200,7 @@ Module GraphBasic
 
                     If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
 
-                        Dim lTser6 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
+                        Dim lTser6 As atcTimeseries = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 9)). _
                             FindData("Constituent", pTimeseriesConstituent)(0)
                         lTser6.Attributes.SetValue("YAxis", pTimeseries6Axis)
                         lTser6.Attributes.SetValue("Point", pTimeseries6IsPoint)
@@ -302,7 +302,7 @@ Module GraphBasic
             lObserved = lPaneMain.CurveList.Item(i)
 
             If Not lObserved.Label.Text.Contains(" at ") Then
-                lObserved.Label.Text &= " at " & aDataGroup(i).Attributes.GetValue("Location")
+                lObserved.Label.Text &= " at " & aDataGroup(1 + i).Attributes.GetValue("Location")
             End If
 
             Select Case i
@@ -310,14 +310,17 @@ Module GraphBasic
                     lObserved.Symbol.Type = SymbolType.Circle
                     lObserved.Color = Drawing.Color.Blue
                     lObserved.Symbol.Fill.IsVisible = True
+                    lObserved.Symbol.Size = 6
                 Case 2
                     lObserved.Symbol.Type = SymbolType.Diamond
                     lObserved.Color = Drawing.Color.Brown
                     lObserved.Symbol.Fill.IsVisible = True
+                    lObserved.Symbol.Size = 8
                 Case 3
                     lObserved.Symbol.Type = SymbolType.Triangle
-                    lObserved.Color = Drawing.Color.BurlyWood
+                    lObserved.Color = Drawing.Color.SeaGreen
                     lObserved.Symbol.Fill.IsVisible = True
+                    lObserved.Symbol.Size = 8
             End Select
         Next
 
