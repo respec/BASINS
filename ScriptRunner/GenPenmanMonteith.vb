@@ -363,116 +363,47 @@ PMETTSPROBLEM:
 
                 ldoneReport = True
 
-                'Write out SWAT met data
-                Dim lprojectFolder As String = IO.Path.GetDirectoryName(lFile)
-                Dim lmetFolder As String = IO.Path.Combine(lprojectFolder, "met")
-                Dim lsaveInFolder As String = IO.Path.Combine(lprojectFolder, lStation)
-                Dim lblankWDMFile As String = IO.Path.Combine(pOutputPath, "metBlank.wdm")
-                If Not IO.Directory.Exists(lmetFolder) Then
-                    MkDir(lmetFolder)
-                End If
-                If Not IO.Directory.Exists(lsaveInFolder) Then
-                    MkDir(lsaveInFolder)
-                End If
+                'Write out SWAT met data for individual station
+                'Dim lprojectFolder As String = IO.Path.GetDirectoryName(lFile)
+                'Dim lmetFolder As String = IO.Path.Combine(lprojectFolder, "met")
+                'Dim lsaveInFolder As String = IO.Path.Combine(lprojectFolder, lStation)
+                ''Dim lblankWDMFile As String = IO.Path.Combine(pOutputPath, "metBlank.wdm")
+                'If Not IO.Directory.Exists(lmetFolder) Then
+                '    MkDir(lmetFolder)
+                'End If
+                'If Not IO.Directory.Exists(lsaveInFolder) Then
+                '    MkDir(lsaveInFolder)
+                'End If
 
-                If IO.File.Exists(IO.Path.Combine(lFile, IO.Path.Combine(lmetFolder, "met.wdm"))) Then
-                    IO.File.Delete(IO.Path.Combine(lFile, IO.Path.Combine(lmetFolder, "met.wdm")))
-                End If
-                IO.File.Copy(lFile, IO.Path.Combine(lmetFolder, "met.wdm"))
-                'IO.File.Copy(lblankWDMFile, IO.Path.Combine(lmetFolder, "met.wdm")) ' make a blank copy
+                ''If IO.File.Exists(IO.Path.Combine(lFile, IO.Path.Combine(lmetFolder, "met.wdm"))) Then
+                '' IO.File.Delete(IO.Path.Combine(lFile, IO.Path.Combine(lmetFolder, "met.wdm")))
+                ''End If
+                ''IO.File.Copy(lFile, IO.Path.Combine(lmetFolder, "met.wdm"))
+                ''IO.File.Copy(lblankWDMFile, IO.Path.Combine(lmetFolder, "met.wdm")) ' make a blank copy
 
-                'Add data into that wdm
-                'Dim lstationWDMFile As New atcDataSource ' atcWDM.atcDataSourceWDM
+                ''Add data into that wdm
+                'Dim lstationWDMFile As New atcDataSource
                 'lstationWDMFile.Specification = "In-memory"
 
-                Dim lstationWDMFile As New atcWDM.atcDataSourceWDM
-                lstationWDMFile.Open(IO.Path.Combine(lmetFolder, "met.wdm"))
-                Dim ldatagroup As New atcData.atcDataGroup
-                For Each lDS As atcDataSet In lstationWDMFile.DataSets
-                    If lDS.Attributes.GetFormattedValue("Location") <> lStation Then
-                        ldatagroup.Add(lDS)
-                    End If
-                Next
-                For Each lDS As atcDataSet In ldatagroup
-                    lstationWDMFile.RemoveDataset(lDS)
-                Next
+                ''Dim lstationWDMFile As New atcWDM.atcDataSourceWDM
+                ''lstationWDMFile.Open(IO.Path.Combine(lmetFolder, "met.wdm"))
+                'lstationWDMFile.DataSets.AddRange(lWDMFile.DataSets.FindData("Location", lStation))
 
-                'If ltsPrec IsNot Nothing Then
-                '    If lstationWDMFile.AddDataset(ltsPrec, atcDataSource.EnumExistAction.ExistReplace) Then
-                '        Logger.Dbg("GenPenmanMonteith:Add PREC:   Wrote Prec to DSN " & 1)
-                '    Else
-                '        Logger.Dbg("GenPenmanMonteith:Add PREC:   PROBLEM writing Prec to DSN " & 1)
-                '    End If
-                'End If
+                'If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "pcp1.pcp")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "pcp1.pcp"))
+                'If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "pet1.pet")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "pet1.pet"))
+                'If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "slr.slr")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "slr.slr"))
+                'If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "tmp1.tmp")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "tmp1.tmp"))
+                'If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "wnd.wnd")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "wnd.wnd"))
 
-                'If ltsAtem IsNot Nothing Then
-                '    If lstationWDMFile.AddDataset(ltsAtem, atcDataSource.EnumExistAction.ExistReplace) Then
-                '        Logger.Dbg("GenPenmanMonteith:Add ATEM:   Wrote DSN " & 3)
-                '    Else
-                '        Logger.Dbg("GenPenmanMonteith:Add ATEM:   PROBLEM writing to DSN " & 3)
-                '    End If
-                'End If
-
-                'ltsTemp = getTS(lWDMFile, lStation, "WIND")
-                'If ltsTemp IsNot Nothing Then
-                '    If lstationWDMFile.AddDataset(ltsTemp, atcDataSource.EnumExistAction.ExistReplace) Then
-                '        Logger.Dbg("GenPenmanMonteith:Add WIND:   Wrote to DSN " & 4)
-                '    Else
-                '        Logger.Dbg("GenPenmanMonteith:Add WIND:   PROBLEM writing to DSN " & 4)
-                '    End If
-                'End If
-
-
-                'ltsTemp = getTS(lWDMFile, lStation, "SOLR")
-                'If ltsTemp IsNot Nothing Then
-                '    If lstationWDMFile.AddDataset(ltsTemp, atcDataSource.EnumExistAction.ExistReplace) Then
-                '        Logger.Dbg("GenPenmanMonteith:Add SOLR:   Wrote to DSN " & 13)
-                '    Else
-                '        Logger.Dbg("GenPenmanMonteith:Add SOLR:   PROBLEM writing to DSN " & 13)
-                '    End If
-                'End If
-
-                'ltsTemp = getTS(lWDMFile, lStation, "PEVT")
-                'If lstationWDMFile.AddDataset(ltsTemp, atcDataSource.EnumExistAction.ExistReplace) Then
-                '    Logger.Dbg("GenPenmanMonteith:Add PEVT:   Wrote to DSN " & 16)
-                'Else
-                '    Logger.Dbg("GenPenmanMonteith:Add PEVT:   PROBLEM writing to DSN " & 16)
-                'End If
-
-                'ltsTemp = getTS(lWDMFile, lStation, "DEWP")
-                'If ltsTemp IsNot Nothing Then
-                '    If lstationWDMFile.AddDataset(ltsTemp, atcDataSource.EnumExistAction.ExistReplace) Then
-                '        Logger.Dbg("GenPenmanMonteith:Add DEWP:   Wrote to DSN " & 17)
-                '    Else
-                '        Logger.Dbg("GenPenmanMonteith:Add DEWP:   PROBLEM writing to DSN " & 17)
-                '    End If
-                'End If
-
-                'ltsTemp = getTS(lWDMFile, lStation, "CLOU")
-                'If ltsTemp IsNot Nothing Then
-                '    If lstationWDMFile.AddDataset(ltsTemp, atcDataSource.EnumExistAction.ExistReplace) Then
-                '        Logger.Dbg("GenPenmanMonteith:Add CLOU:   Wrote to DSN " & 18)
-                '    Else
-                '        Logger.Dbg("GenPenmanMonteith:Add CLOU:   PROBLEM writing to DSN " & 18)
-                '    End If
-                'End If
-
-
-                If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "pcp1.pcp")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "pcp1.pcp"))
-                If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "pet1.pet")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "pet1.pet"))
-                If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "slr.slr")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "slr.slr"))
-                If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "tmp1.tmp")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "tmp1.tmp"))
-                If IO.File.Exists(IO.Path.Combine(lsaveInFolder, "wnd.wnd")) Then IO.File.Delete(IO.Path.Combine(lsaveInFolder, "wnd.wnd"))
-
-                Try
-                    WriteSwatMetInput(lstationWDMFile, Nothing, lprojectFolder, lsaveInFolder, lSJD, lEJD)
-                Catch lEx As Exception
-                    Logger.Dbg("WriteSwatMetInput Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
-                    Logger.Flush()
-                End Try
+                'Try
+                '    WriteSwatMetInput(lstationWDMFile, Nothing, lprojectFolder, lsaveInFolder, lSJD, lEJD)
+                'Catch lEx As Exception
+                '    Logger.Dbg("WriteSwatMetInput Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
+                '    Logger.Flush()
+                'End Try
 
 clearEnd:
-                lstationWDMFile = Nothing
+                'lstationWDMFile = Nothing
                 ltsPrec = Nothing
                 ltsAtem = Nothing
                 ltsPEVT = Nothing 'for report
@@ -488,6 +419,18 @@ clearEnd:
                 lPMETValsMonthly = Nothing
                 lPMETValsYearly = Nothing
             Next ' lPTPairList
+
+
+            'Write out SWAT met data for a group of stations in a given WDM
+            Dim lprojectFolder As String = IO.Path.GetDirectoryName(lFile)
+            Dim lsaveInFolder As String = lprojectFolder
+
+            Try
+                WriteSwatMetInput(lWDMFile, lprojectFolder, lsaveInFolder, lSJD, lEJD)
+            Catch lEx As Exception
+                Logger.Dbg("WriteSwatMetInput Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
+                Logger.Flush()
+            End Try
 
             lWDMFile.DataSets.Clear()
             lWDMFile = Nothing
@@ -623,14 +566,4 @@ clearEnd:
         End If
     End Function
 
-    Public Function getTS(ByVal aWDMFile As atcWDM.atcDataSourceWDM, ByVal aStation As String, ByVal aConstituent As String) As atcTimeseries
-        For i As Integer = 0 To aWDMFile.DataSets.Count - 1
-            If aWDMFile.DataSets.Item(i).Attributes.GetFormattedValue("Constituent") = aConstituent Then
-                If aWDMFile.DataSets.Item(i).Attributes.GetFormattedValue("Location") = aStation Then
-                    Return aWDMFile.DataSets.Item(i)
-                End If
-            End If
-        Next
-        Return Nothing
-    End Function
 End Module
