@@ -35,22 +35,12 @@ Public Module Graph
         lZgc.Height = aGraphSaveHeight
         Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
         With lGraphDur.ZedGraphCtrl.GraphPane
-
             If .YAxis.Scale.Min < 1 Then
                 .YAxis.Scale.MinAuto = False
-                .YAxis.Scale.Min = 10
+                .YAxis.Scale.Min = 1
                 .AxisChange()
             End If
-
-            For Each lCurve As ZedGraph.LineItem In .CurveList
-                lCurve.Label.Text = lCurve.Label.Text.Replace("SIMULATE", "SIMULATED")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("SIMQ", "FLOW")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("02341800", "Upatoi Creek at Mcbride Bridge (Reach 46)")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH46", "Upatoi Creek at Mcbride Bridge (Reach 46)")
-
-            Next
         End With
-
         'TODO: add title 
         lZgc.SaveIn(lOutFileBase & "_dur" & aGraphSaveFormat)
         lGraphDur.Dispose()
