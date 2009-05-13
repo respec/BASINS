@@ -165,6 +165,8 @@ FoundMatch:
         End If
         If lAuxDataSets.Count > 0 Then
             ScaleAxis(lAuxDataSets, aZgc.MasterPane.PaneList(0).YAxis)
+            aZgc.MasterPane.PaneList(0).XAxis.Scale.Min = aZgc.MasterPane.PaneList(1).XAxis.Scale.Min
+            aZgc.MasterPane.PaneList(0).XAxis.Scale.Max = aZgc.MasterPane.PaneList(1).XAxis.Scale.Max
         End If
 
         AxisTitlesFromCommonAttributes(lPaneMain, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
@@ -228,8 +230,8 @@ FoundMatch:
             Case Is < 1 : aTimeUnits = 0 'aTimeStep <= 0 means bad time step, ignore time units and return ""
         End Select
         Select Case aTimeUnits
-            Case 1 : lName &= "SECONDLY"
-            Case 2 : lName &= "MINUTELY"
+            Case 1 : lName &= "SECOND"
+            Case 2 : lName &= "MINUTE"
             Case 3 : lName &= "HOURLY"
             Case 4 : lName &= "DAILY"
             Case 5 : lName &= "MONTHLY"
@@ -485,6 +487,8 @@ FoundMatch:
             .IsFontsScaled = False
             .IsPenWidthScaled = False
             With .XAxis
+                .Scale.FontSpec.Size = 14
+                .Scale.FontSpec.IsBold = True
                 .Scale.IsUseTenPower = False
                 .Title.IsOmitMag = True
                 .Scale.Mag = 0
@@ -513,6 +517,8 @@ FoundMatch:
             End With
             With .YAxis
                 .Scale.IsUseTenPower = False
+                .Scale.FontSpec.Size = 14
+                .Scale.FontSpec.IsBold = True
                 .Title.IsOmitMag = True
                 .Scale.Mag = 0
                 .MajorGrid.IsVisible = True
@@ -565,6 +571,7 @@ FoundMatch:
             .Border.IsVisible = False
         End With
     End Sub
+
 
     <CLSCompliant(False)> _
     Public Sub ScaleAxis(ByVal aDataGroup As atcTimeseriesGroup, ByVal aAxis As Axis)
