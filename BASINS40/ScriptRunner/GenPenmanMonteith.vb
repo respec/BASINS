@@ -17,6 +17,8 @@ Public Module GenPenmanMonteithET
     Private Const pStationPath As String = "C:\BASINSMet\Stations\"
     Private pSWATStnFile As String = IO.Path.Combine(pOutputPath, "statwgn.txt")
 
+    Private pWriteSWATMet As Boolean = False
+    
     'subroutine pmpevt(idmet,istyrZ,istdyZ,nbyrZ,sub_elevZ,sub_latZ,
     '&                 CO2Z,numdata,PrecipZ,TmaxZ,TminZ,PevtPMZ)
     'The last four are 1-d array of real
@@ -404,6 +406,21 @@ PMETTSPROBLEM:
 
 clearEnd:
                 'lstationWDMFile = Nothing
+                If ltsPrec IsNot Nothing Then ltsPrec.Clear()
+                If ltsAtem IsNot Nothing Then ltsAtem.Clear()
+                If ltsPEVT IsNot Nothing Then ltsPEVT.Clear() 'for report
+                If ltsPMET IsNot Nothing Then ltsPMET.Clear()
+                If lAtemVals IsNot Nothing Then Array.Clear(lAtemVals, 0, lAtemVals.Length)
+                If lPrecValsMonthly IsNot Nothing Then Array.Clear(lPrecValsMonthly, 0, lPrecValsMonthly.Length)
+                If lPrecValsYearly IsNot Nothing Then Array.Clear(lPrecValsYearly, 0, lPrecValsYearly.Length)
+                If lAtemValsMonthly IsNot Nothing Then Array.Clear(lAtemValsMonthly, 0, lAtemValsMonthly.Length)
+                If lAtemValsYearly IsNot Nothing Then Array.Clear(lAtemValsYearly, 0, lAtemValsYearly.Length)
+                If lPEVTVals IsNot Nothing Then Array.Clear(lPEVTVals, 0, lPEVTVals.Length)
+                If lPEVTValsMonthly IsNot Nothing Then Array.Clear(lPEVTValsMonthly, 0, lPEVTValsMonthly.Length)
+                If lPEVTValsYearly IsNot Nothing Then Array.Clear(lPEVTValsYearly, 0, lPEVTValsYearly.Length)
+                If lPMETValsMonthly IsNot Nothing Then Array.Clear(lPMETValsMonthly, 0, lPMETValsMonthly.Length)
+                If lPMETValsYearly IsNot Nothing Then Array.Clear(lPMETValsYearly, 0, lPMETValsYearly.Length)
+
                 ltsPrec = Nothing
                 ltsAtem = Nothing
                 ltsPEVT = Nothing 'for report
@@ -425,6 +442,23 @@ clearEnd:
             Dim lprojectFolder As String = IO.Path.GetDirectoryName(lFile)
             Dim lsaveInFolder As String = lprojectFolder
 
+            'Close it to let the added dataset finalize
+            'lWDMFile.DataSets.Clear()
+            lWDMFile.Clear()
+            lWDMFile = Nothing
+
+            If Not pWriteSWATMet Then
+                lWDMFile.Clear()
+                lWDMFile = Nothing
+                Continue For
+            End If
+
+
+            'Reopen for writing swat file
+            lWDMFile = New atcWDM.atcDataSourceWDM
+            lWDMFile.Open(lFile)
+            Logger.Dbg("GenPenmanMonteith: Write SWAT input: Opening WDM file - " & lFile)
+
             Try
                 WriteSwatMetInput(lWDMFile, lprojectFolder, lsaveInFolder, lSJD, lEJD)
             Catch lEx As Exception
@@ -432,7 +466,8 @@ clearEnd:
                 Logger.Flush()
             End Try
 
-            lWDMFile.DataSets.Clear()
+            'lWDMFile.DataSets.Clear()
+            lWDMFile.Clear()
             lWDMFile = Nothing
 
         Next ' lFiles
