@@ -78,7 +78,7 @@ Public Class atcTimeseriesGridSource
         Try
             If pDisplayValues Then
                 If pFilterNoData OrElse pTimeseriesGroup.Count > 1 Then
-                    pAllDates = MergeTimeseries(pTimeseriesGroup, pFilterNoData).Dates
+                    pAllDates = MergeDates(pTimeseriesGroup, pFilterNoData)
                 ElseIf pTimeseriesGroup.Count = 1 Then
                     Dim lTS As atcTimeseries = pTimeseriesGroup.ItemByIndex(0)
                     lTS.EnsureValuesRead()
