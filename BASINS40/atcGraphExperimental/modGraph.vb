@@ -184,11 +184,11 @@ FoundMatch:
             aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
         End If
 
-        If aCommonScenario IsNot Nothing AndAlso aCommonScenario.Length > 0 _
-           AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonScenario) Then
-            If aCommonConstituent.Length > 0 Then
+        If aCommonScenario IsNot Nothing AndAlso aCommonScenario.Length > 0 Then
+            If aCommonConstituent.Length > 0 _
+               AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonScenario) Then
                 aPane.YAxis.Title.Text &= " " & aCommonScenario
-            Else
+            ElseIf Not aPane.XAxis.Title.Text.Contains(aCommonScenario) Then
                 aPane.XAxis.Title.Text &= " " & aCommonScenario
             End If
         End If

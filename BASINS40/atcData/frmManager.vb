@@ -427,13 +427,19 @@ Friend Class frmManager
                 Case "View"
                     .View()
                 Case "Display"
-                    atcDataManager.UserSelectDisplay(.Specification, .DataSets.Clone)
+                    Dim lSelected As atcTimeseriesGroup = .DataSets
+                    lSelected = atcDataManager.UserSelectData("Select data to Display", lSelected.Clone)
+                    atcDataManager.UserSelectDisplay("Select display", lSelected)
                 Case "Analysis"
-                    atcDataManager.ShowDisplay(lActionArgs(1), .DataSets)
+                    Dim lSelected As atcTimeseriesGroup = .DataSets                    
+                    lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected.Clone)
+                    If lSelected.Count > 0 Then
+                        atcDataManager.ShowDisplay(lActionArgs(1), lSelected)
+                    End If
                 Case "RemoveDatasets"
                     If .CanRemoveDataset Then
                         Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
-                            "Select Datasets to remove from " & .Specification, , .DataSets)
+                            "Select Datasets to remove from " & .Specification, , .DataSets.Clone)
                         If lDataGroup.Count > 0 AndAlso _
                             Logger.Msg("Remove " & lDataGroup.Count & " datasets from " & vbCrLf & .Specification & "?", _
                                        MsgBoxStyle.OkCancel, "Confirm Remove") = MsgBoxResult.Ok Then
