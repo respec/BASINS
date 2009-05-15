@@ -5,10 +5,9 @@ Imports MapWinUtility
 ''' <remarks>
 '''     <para>Sharable between different views of the same data.</para>
 '''     <para>
-'''         <br />
 '''         Events are defined to allow different
-'''         <see cref="atcData.atcDataDisplay">displays</see> to remain
-'''         synchronized
+'''         <see cref="atcData.atcDataDisplay">displays</see>
+'''         to remain synchronized
 '''     </para>
 ''' </remarks>
 Public Class atcDataGroup
@@ -22,6 +21,7 @@ Public Class atcDataGroup
     Public Event Added(ByVal aAdded As atcCollection)
 
     ''' <summary>One or more <see cref="atcData.atcDataSet">atcDataSet</see> were just removed</summary>
+    ''' <remarks>aRemoved may contain the dataset(s) removed or may be Nothing</remarks>
     Public Event Removed(ByVal aRemoved As atcCollection)
 
     Private Sub RaiseAddedOne(ByVal aDataSet As atcDataSet)
@@ -126,11 +126,11 @@ Public Class atcDataGroup
 
     ''' <summary>Remove all datasets and selections from this data group.</summary>
     Public Shadows Sub Clear()
-        If Not pSelectedData Is Nothing Then pSelectedData.Clear()
-        If Count > 0 Then
-            Dim lRemoved As atcDataGroup = Me.Clone
+        Dim lNeedEvent As Boolean = (Me.Count > 0)
+        If pSelectedData IsNot Nothing Then pSelectedData.Clear()
+        If lNeedEvent Then
             MyBase.Clear()
-            RaiseEvent Removed(lRemoved)
+            RaiseEvent Removed(Nothing)
         End If
     End Sub
 
@@ -210,7 +210,7 @@ Public Class atcDataGroup
 
     ''' <summary>Remove a set of datasets from this group.</summary>
     Public Shadows Sub Remove(ByVal aRemoveThese As atcCollection)
-        If Not aRemoveThese Is Nothing AndAlso aRemoveThese.Count > 0 Then
+        If aRemoveThese IsNot Nothing AndAlso aRemoveThese.Count > 0 Then
             For Each ts As atcDataSet In aRemoveThese
                 MyBase.Remove(ts)
             Next

@@ -39,10 +39,11 @@ Partial Class frmDefaultTimeInterval
         'lblTimestep
         '
         Me.lblTimestep.AutoSize = True
-        Me.lblTimestep.Location = New System.Drawing.Point(62, 36)
+        Me.lblTimestep.Location = New System.Drawing.Point(23, 31)
+        Me.lblTimestep.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblTimestep.Name = "lblTimestep"
-        Me.lblTimestep.Size = New System.Drawing.Size(70, 17)
-        Me.lblTimestep.TabIndex = 11
+        Me.lblTimestep.Size = New System.Drawing.Size(53, 13)
+        Me.lblTimestep.TabIndex = 0
         Me.lblTimestep.Text = "Time step"
         Me.lblTimestep.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
@@ -50,119 +51,133 @@ Partial Class frmDefaultTimeInterval
         '
         Me.atcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Right
         Me.atcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atcTextTimeStep.DefaultValue = 1
+        Me.atcTextTimeStep.DefaultValue = "1"
         Me.atcTextTimeStep.HardMax = 60
         Me.atcTextTimeStep.HardMin = 1
         Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atcTextTimeStep.Location = New System.Drawing.Point(150, 33)
+        Me.atcTextTimeStep.Location = New System.Drawing.Point(91, 28)
+        Me.atcTextTimeStep.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.atcTextTimeStep.MaxWidth = 0
         Me.atcTextTimeStep.Name = "atcTextTimeStep"
+        Me.atcTextTimeStep.NumericFormat = "0.#####"
         Me.atcTextTimeStep.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.atcTextTimeStep.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atcTextTimeStep.SelLength = 0
-        Me.atcTextTimeStep.SelStart = 1
-        Me.atcTextTimeStep.Size = New System.Drawing.Size(56, 20)
+        Me.atcTextTimeStep.SelLength = 1
+        Me.atcTextTimeStep.SelStart = 0
+        Me.atcTextTimeStep.Size = New System.Drawing.Size(42, 16)
         Me.atcTextTimeStep.SoftMax = 0
         Me.atcTextTimeStep.SoftMin = 0
-        Me.atcTextTimeStep.TabIndex = 10
+        Me.atcTextTimeStep.TabIndex = 1
         Me.atcTextTimeStep.TabStop = False
-        Me.atcTextTimeStep.ValueInteger = CType(1, Long)
+        Me.atcTextTimeStep.ValueDouble = 1
+        Me.atcTextTimeStep.ValueInteger = 1
         '
         'lstTimeUnits
         '
         Me.lstTimeUnits.ColumnWidth = 10
         Me.lstTimeUnits.FormattingEnabled = True
-        Me.lstTimeUnits.ItemHeight = 16
         Me.lstTimeUnits.Items.AddRange(New Object() {"Minutes", "Hours", "Days", "Months"})
-        Me.lstTimeUnits.Location = New System.Drawing.Point(150, 59)
+        Me.lstTimeUnits.Location = New System.Drawing.Point(91, 48)
+        Me.lstTimeUnits.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.lstTimeUnits.Name = "lstTimeUnits"
-        Me.lstTimeUnits.Size = New System.Drawing.Size(98, 52)
-        Me.lstTimeUnits.TabIndex = 9
+        Me.lstTimeUnits.Size = New System.Drawing.Size(74, 56)
+        Me.lstTimeUnits.TabIndex = 3
         '
         'lblTimeUnits
         '
         Me.lblTimeUnits.AutoSize = True
-        Me.lblTimeUnits.Location = New System.Drawing.Point(62, 59)
+        Me.lblTimeUnits.Location = New System.Drawing.Point(23, 48)
+        Me.lblTimeUnits.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblTimeUnits.Name = "lblTimeUnits"
-        Me.lblTimeUnits.Size = New System.Drawing.Size(73, 17)
-        Me.lblTimeUnits.TabIndex = 12
+        Me.lblTimeUnits.Size = New System.Drawing.Size(55, 13)
+        Me.lblTimeUnits.TabIndex = 2
         Me.lblTimeUnits.Text = "Time units"
         Me.lblTimeUnits.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lblInstructions
         '
         Me.lblInstructions.AutoSize = True
-        Me.lblInstructions.Location = New System.Drawing.Point(42, 9)
+        Me.lblInstructions.Location = New System.Drawing.Point(11, 9)
+        Me.lblInstructions.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblInstructions.Name = "lblInstructions"
-        Me.lblInstructions.Size = New System.Drawing.Size(192, 17)
+        Me.lblInstructions.Size = New System.Drawing.Size(145, 13)
         Me.lblInstructions.TabIndex = 13
         Me.lblInstructions.Text = "Set Time Interval for Dataset "
         Me.lblInstructions.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(45, 234)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(11, 209)
+        Me.btnOk.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(75, 23)
-        Me.btnOk.TabIndex = 14
+        Me.btnOk.TabIndex = 6
         Me.btnOk.Text = "OK"
         Me.btnOk.UseVisualStyleBackColor = True
         '
         'btnAll
         '
-        Me.btnAll.Location = New System.Drawing.Point(150, 234)
+        Me.btnAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnAll.Location = New System.Drawing.Point(101, 209)
+        Me.btnAll.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.btnAll.Name = "btnAll"
-        Me.btnAll.Size = New System.Drawing.Size(98, 23)
-        Me.btnAll.TabIndex = 15
-        Me.btnAll.Text = "Use for all"
+        Me.btnAll.Size = New System.Drawing.Size(75, 23)
+        Me.btnAll.TabIndex = 7
+        Me.btnAll.Text = "Ok for All"
         Me.btnAll.UseVisualStyleBackColor = True
         '
         'btnSkip
         '
-        Me.btnSkip.Location = New System.Drawing.Point(45, 263)
+        Me.btnSkip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnSkip.Location = New System.Drawing.Point(191, 209)
+        Me.btnSkip.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.btnSkip.Name = "btnSkip"
         Me.btnSkip.Size = New System.Drawing.Size(75, 23)
-        Me.btnSkip.TabIndex = 16
-        Me.btnSkip.Text = "Skip"
+        Me.btnSkip.TabIndex = 8
+        Me.btnSkip.Text = "Skip Adding"
         Me.btnSkip.UseVisualStyleBackColor = True
         '
         'btnSkipAll
         '
+        Me.btnSkipAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnSkipAll.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnSkipAll.Location = New System.Drawing.Point(150, 263)
+        Me.btnSkipAll.Location = New System.Drawing.Point(281, 209)
+        Me.btnSkipAll.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.btnSkipAll.Name = "btnSkipAll"
-        Me.btnSkipAll.Size = New System.Drawing.Size(98, 23)
-        Me.btnSkipAll.TabIndex = 17
+        Me.btnSkipAll.Size = New System.Drawing.Size(75, 23)
+        Me.btnSkipAll.TabIndex = 9
         Me.btnSkipAll.Text = "Skip All"
         Me.btnSkipAll.UseVisualStyleBackColor = True
         '
         'lstAggregation
         '
         Me.lstAggregation.FormattingEnabled = True
-        Me.lstAggregation.ItemHeight = 16
         Me.lstAggregation.Items.AddRange(New Object() {"Average", "Sum", "Minimum", "Maximum", "First", "Last"})
-        Me.lstAggregation.Location = New System.Drawing.Point(153, 119)
+        Me.lstAggregation.Location = New System.Drawing.Point(91, 108)
+        Me.lstAggregation.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.lstAggregation.Name = "lstAggregation"
-        Me.lstAggregation.Size = New System.Drawing.Size(94, 100)
-        Me.lstAggregation.TabIndex = 18
+        Me.lstAggregation.Size = New System.Drawing.Size(72, 82)
+        Me.lstAggregation.TabIndex = 5
         '
         'lblAggregation
         '
         Me.lblAggregation.AutoSize = True
-        Me.lblAggregation.Location = New System.Drawing.Point(62, 119)
+        Me.lblAggregation.Location = New System.Drawing.Point(23, 108)
+        Me.lblAggregation.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblAggregation.Name = "lblAggregation"
-        Me.lblAggregation.Size = New System.Drawing.Size(85, 17)
-        Me.lblAggregation.TabIndex = 19
+        Me.lblAggregation.Size = New System.Drawing.Size(64, 13)
+        Me.lblAggregation.TabIndex = 4
         Me.lblAggregation.Text = "Aggregation"
         Me.lblAggregation.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'frmDefaultTimeInterval
         '
         Me.AcceptButton = Me.btnOk
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnSkipAll
-        Me.ClientSize = New System.Drawing.Size(291, 302)
+        Me.ClientSize = New System.Drawing.Size(367, 243)
         Me.Controls.Add(Me.lblAggregation)
         Me.Controls.Add(Me.lstAggregation)
         Me.Controls.Add(Me.btnSkipAll)
@@ -174,9 +189,9 @@ Partial Class frmDefaultTimeInterval
         Me.Controls.Add(Me.lblTimestep)
         Me.Controls.Add(Me.atcTextTimeStep)
         Me.Controls.Add(Me.lstTimeUnits)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.HelpButton = True
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.MaximizeBox = False
         Me.Name = "frmDefaultTimeInterval"
         Me.Text = "Set Missing Time Interval"
