@@ -650,6 +650,21 @@ Public Module modTimeseriesMath
                             lNewIndex = lNewIndex + 1
                         End While
 
+                    Case atcTran.TranCountMissing
+                        While lNewIndex <= lNumNewVals
+                            lDateNew = lNewDates(lNewIndex)
+                            lNewVals(lNewIndex) = 0
+                            While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
+                                If Double.IsNaN(lValOld) Then lNewVals(lNewIndex) += 1
+                                lOldIndex = lOldIndex + 1
+                                If lOldIndex <= lNumOldVals Then
+                                    lDateOld = aTimeseries.Dates.Value(lOldIndex)
+                                    lValOld = aTimeseries.Value(lOldIndex)
+                                End If
+                            End While
+                            lNewIndex = lNewIndex + 1
+                        End While
+
                 End Select
                 lNewTSer.Values = lNewVals
                 Return lNewTSer

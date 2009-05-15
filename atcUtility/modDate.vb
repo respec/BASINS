@@ -25,6 +25,7 @@ Public Module modDate
         TranMax = 2
         TranMin = 3
         TranNative = 4
+        TranCountMissing = 5
     End Enum
 
     ''' <summary>one hour as fraction of a day</summary>
