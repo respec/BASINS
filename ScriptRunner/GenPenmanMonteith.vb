@@ -18,7 +18,8 @@ Public Module GenPenmanMonteithET
     Private pSWATStnFile As String = IO.Path.Combine(pOutputPath, "statwgn.txt")
 
     Private pWriteSWATMet As Boolean = True
-    Private pdoPET As Boolean = False
+    Private pdoPET As Boolean = True
+    Private pdoReport As Boolean = False
 
     'subroutine pmpevt(idmet,istyrZ,istdyZ,nbyrZ,sub_elevZ,sub_latZ,
     '&                 CO2Z,numdata,PrecipZ,TmaxZ,TminZ,PevtPMZ)
@@ -126,7 +127,7 @@ Public Module GenPenmanMonteithET
                 For Each lStation As String In lPTPairList.Keys
                     Dim ltsPrecID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(0))
                     Dim ltsAtemID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(1))
-                    Dim ltsPMET As atcTimeseries
+                    Dim ltsPMET As atcTimeseries = Nothing
                     Dim ltsPrec As atcTimeseries
                     Dim ltsAtem As atcTimeseries
                     Dim ltsAtemSub As atcTimeseries
@@ -169,14 +170,21 @@ Public Module GenPenmanMonteithET
                         ltsPevtID = -9999
                     End Try
 
-                    ltsPrec = lWDMFile.DataSets.ItemByKey(ltsPrecID)
-                    ltsAtem = lWDMFile.DataSets.ItemByKey(ltsAtemID)
+                    ltsPrec = TrimTimeseries(lWDMFile.DataSets.ItemByKey(ltsPrecID))
+                    If ltsPrec Is Nothing Then
+                        Logger.Msg("Problem with Precipitation Timeseries: " & lWDMFile.DataSets.ItemByKey(ltsPrecID).Attributes.GetFormattedValue("Location"), "Problem")
+                        Throw New ApplicationException()
+                    End If
+                    ltsAtem = TrimTimeseries(lWDMFile.DataSets.ItemByKey(ltsAtemID))
+                    If ltsAtem Is Nothing Then
+                        Logger.Msg("Problem with Temperature Timeseries: " & lWDMFile.DataSets.ItemByKey(ltsAtemID).Attributes.GetFormattedValue("Location"), "Problem")
+                        Throw New ApplicationException()
+                    End If
                     If ltsPevtID = -9999 Then
                         ltsPEVT = Nothing
                     Else
-                        ltsPEVT = lWDMFile.DataSets.ItemByKey(ltsPevtID) ' For report
+                        ltsPEVT = TrimTimeseries(lWDMFile.DataSets.ItemByKey(ltsPevtID)) ' For report
                     End If
-
 
                     Dim lhasSWATParms As Boolean = False
                     'lswatStnKey = String.Empty
@@ -210,27 +218,29 @@ Public Module GenPenmanMonteithET
                         lTMaxVals = Aggregate(ltsAtemSub, atcTimeUnit.TUDay, 1, atcTran.TranMax).Values
 
                         'More TS for report:
-                        lSJDText = ltsAtemSub.Attributes.GetFormattedValue("start date")
-                        lEJDText = ltsAtemSub.Attributes.GetFormattedValue("end date")
+                        If pdoReport Then
+                            lSJDText = ltsAtemSub.Attributes.GetFormattedValue("start date")
+                            lEJDText = ltsAtemSub.Attributes.GetFormattedValue("end date")
 
-                        lAtemVals = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranAverSame).Values
-                        lPrecValsMonthly = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values
-                        lAtemValsMonthly = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame).Values
-                        lPrecValsYearly = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values
-                        lAtemValsYearly = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranAverSame).Values
+                            lAtemVals = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranAverSame).Values
+                            lPrecValsMonthly = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values
+                            lAtemValsMonthly = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame).Values
+                            lPrecValsYearly = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values
+                            lAtemValsYearly = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranAverSame).Values
 
-                        ldailyDates = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranAverSame).Dates.Values
-                        lmonthDates = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Dates.Values()
-                        lyearDates = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Dates.Values()
+                            ldailyDates = Aggregate((SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranAverSame).Dates.Values
+                            lmonthDates = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Dates.Values()
+                            lyearDates = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Dates.Values()
 
-                        If ltsPEVT IsNot Nothing Then
-                            lPEVTVals = Aggregate((SubsetByDate(ltsPEVT, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv).Values ' For report
-                            lPEVTValsMonthly = Aggregate((SubsetByDate(ltsPEVT, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values
-                            lPEVTValsYearly = Aggregate((SubsetByDate(ltsPEVT, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values
-                        Else
-                            lPEVTVals = Nothing ' For report
-                            lPEVTValsMonthly = Nothing
-                            lPEVTValsYearly = Nothing
+                            If ltsPEVT IsNot Nothing Then
+                                lPEVTVals = Aggregate((SubsetByDate(ltsPEVT, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv).Values ' For report
+                                lPEVTValsMonthly = Aggregate((SubsetByDate(ltsPEVT, lSJD, lEJD, Nothing)), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values
+                                lPEVTValsYearly = Aggregate((SubsetByDate(ltsPEVT, lSJD, lEJD, Nothing)), atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values
+                            Else
+                                lPEVTVals = Nothing ' For report
+                                lPEVTValsMonthly = Nothing
+                                lPEVTValsYearly = Nothing
+                            End If
                         End If
 
                         lNVals = lPrecVals.GetUpperBound(0)
@@ -243,7 +253,7 @@ Public Module GenPenmanMonteithET
                             lJDay = 1
                         End If
                         lNYrs = timdifJ(lSJD, lEJD, atcTimeUnit.TUYear, 1)
-                        lStationDBF.FindFirst(1, lStation)
+                        lStationDBF.FindFirst(1, lStation.Substring(2))
                         lLat = lStationDBF.Value(4) 'in decimal degrees
                         lElev = lStationDBF.Value(6) 'in feet
                         Dim lPMETValsSingle(lNVals) As Single
@@ -285,8 +295,10 @@ Public Module GenPenmanMonteithET
                         End If
                         If lWDMFile.AddDataset(ltsPMET, atcDataSource.EnumExistAction.ExistReplace) Then
                             Logger.Dbg("GenPenmanMonteith:   Wrote Penman-Monteith PET to DSN " & ltsPrecID + 8)
-                            lPMETValsMonthly = Aggregate(ltsPMET, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values ' For report
-                            lPMETValsYearly = Aggregate(ltsPMET, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values  ' For report
+                            If pdoReport Then
+                                lPMETValsMonthly = Aggregate(ltsPMET, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values ' For report
+                                lPMETValsYearly = Aggregate(ltsPMET, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values  ' For report
+                            End If
                         Else
 PMETTSPROBLEM:
                             Logger.Dbg("GenPenmanMonteith:   PROBLEM writing Penman-Monteith PET to DSN " & ltsPrecID + 8)
@@ -295,67 +307,71 @@ PMETTSPROBLEM:
                         Logger.Dbg("GenPenmanMonteith:   No common period available for Precip and Air Temp data")
                     End If
 
-                    'Do report for just the Sherburn 3WSW station
-                    If lStation = "MN217602" Then
-                        ldoneReport = False
-                    Else
+                    If pdoReport Then
+                        'Do report for just the Sherburn 3WSW station: MN217602
+                        If lStation = "XX111111" Then
+                            ldoneReport = False
+                        Else
+                            ldoneReport = True
+                        End If
+                        If ldoneReport Then GoTo clearEnd
+
+                        lsw.WriteLine("============================================================")
+                        lsw.WriteLine("==============  " & lStation & " Starts ====================")
+                        lsw.WriteLine("============================================================")
+                        lsw.WriteLine("StationID,TimeUnit,Date,PREC,ATEM,PMET,PEVT")
+
+                        'Daily first
+                        Dim ldateStr As String = String.Empty
+                        For i As Integer = 1 To lPrecVals.GetUpperBound(0)
+                            J2Date(ldailyDates(i), lDate)
+                            ldateStr = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+                            ldateStr = ldailyDates(i).ToString
+                            line = lStation & ",Daily," & ldateStr & "," & lPrecVals(i).ToString & "," & lAtemVals(i).ToString & "," & ltsPMET.Values(i).ToString
+                            If lPEVTVals IsNot Nothing Then
+                                line &= "," & lPEVTVals(i).ToString
+                            End If
+                            lsw.WriteLine(line)
+                        Next
+                        lsw.Flush()
+
+                        lsw.WriteLine("----------------------------------")
+                        lsw.WriteLine("StationID,TimeUnit,Date,PREC,ATEM,PMET,PEVT")
+
+                        For i As Integer = 1 To lPrecValsMonthly.GetUpperBound(0)
+                            J2Date(lmonthDates(i), lDate)
+                            ldateStr = lDate(0) & "-" & lDate(1)
+                            ldateStr = lmonthDates(i).ToString
+                            line = lStation & ",Monthly," & ldateStr & "," & lPrecValsMonthly(i).ToString & "," & lAtemValsMonthly(i).ToString & "," & lPMETValsMonthly(i).ToString
+                            If lPEVTValsMonthly IsNot Nothing Then
+                                line &= "," & lPEVTValsMonthly(i).ToString
+                            End If
+                            lsw.WriteLine(line)
+                        Next
+                        lsw.Flush()
+
+                        lsw.WriteLine("----------------------------------")
+                        lsw.WriteLine("StationID,TimeUnit,Date,PREC,ATEM,PMET,PEVT")
+
+                        For i As Integer = 1 To lPrecValsYearly.GetUpperBound(0)
+                            J2Date(lyearDates(i), lDate)
+                            ldateStr = lDate(0).ToString
+                            ldateStr = lyearDates(i).ToString
+                            line = lStation & ",Yearly," & ldateStr & "," & lPrecValsYearly(i).ToString & "," & lAtemValsYearly(i).ToString & "," & lPMETValsYearly(i).ToString
+                            If lPEVTValsYearly IsNot Nothing Then
+                                line &= "," & lPEVTValsYearly(i).ToString
+                            End If
+                            lsw.WriteLine(line)
+                        Next
+
+                        lsw.WriteLine("============================================================")
+                        lsw.WriteLine("==============  " & lStation & " Ends ======================")
+                        lsw.WriteLine("============================================================")
+                        lsw.Flush()
+
                         ldoneReport = True
                     End If
-                    If ldoneReport Then GoTo clearEnd
-                    lsw.WriteLine("============================================================")
-                    lsw.WriteLine("==============  " & lStation & " Starts ====================")
-                    lsw.WriteLine("============================================================")
-                    lsw.WriteLine("StationID,TimeUnit,Date,PREC,ATEM,PMET,PEVT")
 
-                    'Daily first
-                    Dim ldateStr As String = String.Empty
-                    For i As Integer = 1 To lPrecVals.GetUpperBound(0)
-                        J2Date(ldailyDates(i), lDate)
-                        ldateStr = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
-                        ldateStr = ldailyDates(i).ToString
-                        line = lStation & ",Daily," & ldateStr & "," & lPrecVals(i).ToString & "," & lAtemVals(i).ToString & "," & ltsPMET.Values(i).ToString
-                        If lPEVTVals IsNot Nothing Then
-                            line &= "," & lPEVTVals(i).ToString
-                        End If
-                        lsw.WriteLine(line)
-                    Next
-                    lsw.Flush()
-
-                    lsw.WriteLine("----------------------------------")
-                    lsw.WriteLine("StationID,TimeUnit,Date,PREC,ATEM,PMET,PEVT")
-
-                    For i As Integer = 1 To lPrecValsMonthly.GetUpperBound(0)
-                        J2Date(lmonthDates(i), lDate)
-                        ldateStr = lDate(0) & "-" & lDate(1)
-                        ldateStr = lmonthDates(i).ToString
-                        line = lStation & ",Monthly," & ldateStr & "," & lPrecValsMonthly(i).ToString & "," & lAtemValsMonthly(i).ToString & "," & lPMETValsMonthly(i).ToString
-                        If lPEVTValsMonthly IsNot Nothing Then
-                            line &= "," & lPEVTValsMonthly(i).ToString
-                        End If
-                        lsw.WriteLine(line)
-                    Next
-                    lsw.Flush()
-
-                    lsw.WriteLine("----------------------------------")
-                    lsw.WriteLine("StationID,TimeUnit,Date,PREC,ATEM,PMET,PEVT")
-
-                    For i As Integer = 1 To lPrecValsYearly.GetUpperBound(0)
-                        J2Date(lyearDates(i), lDate)
-                        ldateStr = lDate(0).ToString
-                        ldateStr = lyearDates(i).ToString
-                        line = lStation & ",Yearly," & ldateStr & "," & lPrecValsYearly(i).ToString & "," & lAtemValsYearly(i).ToString & "," & lPMETValsYearly(i).ToString
-                        If lPEVTValsYearly IsNot Nothing Then
-                            line &= "," & lPEVTValsYearly(i).ToString
-                        End If
-                        lsw.WriteLine(line)
-                    Next
-
-                    lsw.WriteLine("============================================================")
-                    lsw.WriteLine("==============  " & lStation & " Ends ======================")
-                    lsw.WriteLine("============================================================")
-                    lsw.Flush()
-
-                    ldoneReport = True
 
                     'Write out SWAT met data for individual station
                     'Dim lprojectFolder As String = IO.Path.GetDirectoryName(lFile)
@@ -427,12 +443,15 @@ clearEnd:
                     lPEVTValsYearly = Nothing
                     lPMETValsMonthly = Nothing
                     lPMETValsYearly = Nothing
+                    GC.Collect()
+                    System.Threading.Thread.Sleep(30)
                 Next ' lPTPairList
                 'Close it to let the added dataset finalize
                 'lWDMFile.DataSets.Clear()
                 lWDMFile.Clear()
                 lWDMFile = Nothing
-
+                GC.Collect()
+                System.Threading.Thread.Sleep(30)
             End If
 
             If pWriteSWATMet Then
@@ -445,8 +464,11 @@ clearEnd:
 
                 Logger.Dbg("GenPenmanMonteith: Write SWAT input: Opening WDM file - " & lFile)
 
+                lSJD = Jday(1970, 1, 1, 0, 0, 0)
+                lEJD = Jday(2006, 12, 31, 24, 0, 0)
                 Try
-                    WriteSwatMetInput(lWDMFile, lprojectFolder, lsaveInFolder, lSJD, lEJD)
+                    Dim lStationListFile As String = IO.Path.Combine(lprojectFolder, "StationList.txt")
+                    WriteSwatMetInput(lWDMFile, lStationDBF, lprojectFolder, lsaveInFolder, lSJD, lEJD, lStationListFile)
                 Catch lEx As Exception
                     Logger.Dbg("WriteSwatMetInput Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
                     Logger.Flush()
@@ -455,9 +477,13 @@ clearEnd:
                 'lWDMFile.DataSets.Clear()
                 lWDMFile.Clear()
                 lWDMFile = Nothing
+                GC.Collect()
+                System.Threading.Thread.Sleep(30)
             End If
         Next ' lFiles
         lsw.Close()
+        lStationDBF.Clear()
+        lStationDBF = Nothing
 
         'Application.Exit()
     End Sub
@@ -512,7 +538,13 @@ clearEnd:
             If line.StartsWith("location") Then Continue While
             If line.StartsWith("Location") Then Continue While
             larr = line.Split(",")
+            If Integer.Parse(larr(3)) < 0 Then ' if lDSNAtem is -99999, means no temperature data
+                Array.Clear(larr, 0, larr.Length)
+                larr = Nothing
+                Continue While
+            End If
             aPTPairList.Add(larr(0), larr(2) & "," & larr(3) & "," & larr(1)) ' stationID -> PREC_DSN,ATEM_DSN,SWAT_ID
+            Array.Clear(larr, 0, larr.Length)
             larr = Nothing
         End While
         lsr.Close()
@@ -587,4 +619,30 @@ clearEnd:
         End If
     End Function
 
+    Public Function TrimTimeseries(ByVal aTS As atcTimeseries) As atcTimeseries
+        Dim lTS As atcTimeseries = Nothing
+        'Trim extra values not starting at the beginning of a day
+        Dim lDateStart(5) As Integer
+        J2Date(aTS.Dates.Value(0), lDateStart)
+        If lDateStart(3) > 0 Then
+            Logger.Dbg("TrimTimeseries: found fractional day at beginning: " & aTS.Attributes.GetFormattedValue("Location"))
+            lDateStart(3) = 0
+            Dim lDateNewStart(5) As Integer
+            TIMADD(lDateStart, atcTimeUnit.TUDay, 1, 1, lDateNewStart)
+            lTS = SubsetByDate(aTS, Date2J(lDateNewStart), aTS.Dates.Value(aTS.numValues), Nothing)
+        Else
+            lTS = aTS
+        End If
+
+        'Trim extra values not ending at the end of a day
+        Dim lDateEnd(5) As Integer
+        J2Date(lTS.Dates.Value(lTS.numValues), lDateEnd)
+        If lDateEnd(3) > 0 Then
+            Logger.Dbg("TrimTimeseries: found fractional day at the end: " & aTS.Attributes.GetFormattedValue("Location"))
+            lDateEnd(3) = 0
+            lTS = SubsetByDate(lTS, lTS.Dates.Value(0), Date2J(lDateEnd), Nothing)
+        End If
+
+        Return lTS
+    End Function
 End Module
