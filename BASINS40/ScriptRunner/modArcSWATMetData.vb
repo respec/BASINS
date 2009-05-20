@@ -19,13 +19,16 @@ Module modArcSWATMetData
         'The aDateStart and aDateEnd are not used as the full range of dates are written out
         'Later version could enforce user-specified start and ending date
         'Logger.Dbg(MemUsage(), "Before Writing PCP")
-        'WritePCP(aWDMMetFile, aStationLkUpTable, aSaveInFolder, aDateStart, aDateEnd, True, aStationList)
+        WritePCP(aWDMMetFile, aStationLkUpTable, aSaveInFolder, aDateStart, aDateEnd, True, aStationList)
         'Logger.Dbg(MemUsage(), "After Writing PCP")
+        GC.Collect()
+        System.Threading.Thread.Sleep(30)
 
         'Logger.Dbg(MemUsage(), "Before Writing TMP")
         WriteTMP(aWDMMetFile, aStationLkUpTable, aSaveInFolder, aDateStart, aDateEnd, True, aStationList)
         'Logger.Dbg(MemUsage(), "Before Writing TMP")
-
+        GC.Collect()
+        System.Threading.Thread.Sleep(30)
         'Logger.Dbg(MemUsage(), "Before Writing SLR")
         'WriteSLR(aWDMMetFile, aStationLkUpTable, aSaveInFolder, aDateStart, aDateEnd, True)
         'Logger.Dbg(MemUsage(), "Before Writing SLR")
@@ -109,13 +112,39 @@ Module modArcSWATMetData
                 'If lOrigTs.Attributes.GetFormattedValue("Location") = "MN210852" Then
                 '    Logger.Msg("Step throught this one")
                 'End If
+
                 Dim loc As String = lOrigTs.Attributes.GetFormattedValue("Location").Substring(0, 8)
                 If Not Integer.TryParse(loc.Substring(2), lgageID) Then
                     Logger.Msg("Extracting Station ID failed for station: " & loc)
                     Continue For
                 End If
 
-                Dim lDate As Date
+                ''Trim extra values not starting at the beginning of a day
+                'Dim lDateStart(5) As Integer
+                'J2Date(lOrigTs.Dates.Value(0), lDateStart)
+                'If lDateStart(3) > 0 Then
+                '    Logger.Dbg("Write ArcSWAT PCP input: found fractional day at beginning: " & lOrigTs.Attributes.GetFormattedValue("Location"))
+                '    lDateStart(3) = 0
+                '    Dim lDateNewStart(5) As Integer
+                '    TIMADD(lDateStart, atcTimeUnit.TUDay, 1, 1, lDateNewStart)
+                '    lTS = SubsetByDate(lOrigTs, Date2J(lDateNewStart), lOrigTs.Dates.Value(lOrigTs.numValues), Nothing)
+                'Else
+                '    lTS = lOrigTs
+                'End If
+
+                ''Trim extra values not ending at the end of a day
+                'Dim lDateEnd(5) As Integer
+                'J2Date(lTS.Dates.Value(lTS.numValues), lDateEnd)
+                'If lDateEnd(3) > 0 Then
+                '    Logger.Dbg("Write ArcSWAT PCP input: found fractional day at the end: " & lOrigTs.Attributes.GetFormattedValue("Location"))
+                '    lDateEnd(3) = 0
+                '    lTS = SubsetByDate(lTS, lTS.Dates.Value(0), Date2J(lDateEnd), Nothing)
+                'End If
+
+                'lTS = SubsetByDateBoundary(lOrigTs, lDate.Month, lDate.Day, Nothing)
+
+                lTS = TrimTimeseries(lOrigTs)
+
                 aStationLkUpTable.FindFirst(1, loc.Substring(2))
                 Dim lLat As Double = aStationLkUpTable.Value(4) 'in decimal degrees
                 Dim longitude As Double = aStationLkUpTable.Value(5) ' in decimal degrees
@@ -123,7 +152,8 @@ Module modArcSWATMetData
 
                 lStnList.Add(loc, lgageID.ToString & "," & loc & "," & lLat.ToString & "," & longitude.ToString & "," & lElev.ToString)
 
-                lTS = SubsetByDate(lOrigTs, aDateStart, aDateEnd, Nothing)
+
+                'lTS = SubsetByDate(lOrigTs, aDateStart, aDateEnd, Nothing)
                 lTS = atcData.modTimeseriesMath.Aggregate(lTS, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
                 lTS = atcTimeseriesMath.atcTimeseriesMath.Compute("Multiply", lTS, 25.4) 'in to mm
                 lTS.Attributes.SetValue("Units", "mm/day")
@@ -132,6 +162,7 @@ Module modArcSWATMetData
                 Dim lTextFilename As String = IO.Path.Combine(lpathPrec, loc & ".txt")
                 Dim lWriter As New IO.StreamWriter(lTextFilename, False)
 
+                Dim lDate As Date
                 For i As Integer = 1 To lTS.numValues
                     If i = 1 Then
                         lDate = Date.FromOADate(lTS.Dates.Value(i - 1))
@@ -228,8 +259,11 @@ Module modArcSWATMetData
                 lTSGroup = New atcDataGroup
                 Dim lreader As System.IO.StreamReader = New IO.StreamReader(aStationList)
                 lreader.ReadLine() ' rid of title line
+                Dim lDSN As Integer = 0
                 While Not lreader.EndOfStream
-                    lTSGroup.Add(aWDM.DataSets.ItemByKey(Integer.Parse(lreader.ReadLine().Split(",")(3))))
+                    lDSN = Integer.Parse(lreader.ReadLine().Split(",")(3))
+                    If lDSN < 0 Then Continue While
+                    lTSGroup.Add(aWDM.DataSets.ItemByKey(lDSN))
                 End While
                 lreader.Close()
                 lreader = Nothing
@@ -285,7 +319,30 @@ Module modArcSWATMetData
                     Continue For
                 End If
 
-                Dim lDate As Date
+                ''Trim extra values not starting at the beginning of a day
+                'Dim lDateStart(5) As Integer
+                'J2Date(lOrigTs.Dates.Value(0), lDateStart)
+                'If lDateStart(3) > 0 Then
+                '    Logger.Dbg("Write ArcSWAT Tmp input: found fractional day at beginning: " & lOrigTs.Attributes.GetFormattedValue("Location"))
+                '    lDateStart(3) = 0
+                '    Dim lDateNewStart(5) As Integer
+                '    TIMADD(lDateStart, atcTimeUnit.TUDay, 1, 1, lDateNewStart)
+                '    lTS = SubsetByDate(lOrigTs, Date2J(lDateNewStart), lOrigTs.Dates.Value(lOrigTs.numValues), Nothing)
+                'Else
+                '    lTS = lOrigTs
+                'End If
+
+                ''Trim extra values not ending at the end of a day
+                'Dim lDateEnd(5) As Integer
+                'J2Date(lTS.Dates.Value(lTS.numValues), lDateEnd)
+                'If lDateEnd(3) > 0 Then
+                '    Logger.Dbg("Write ArcSWAT Tmp input: found fractional day at ending: " & lOrigTs.Attributes.GetFormattedValue("Location"))
+                '    lDateEnd(3) = 0
+                '    lTS = SubsetByDate(lTS, lTS.Dates.Value(0), Date2J(lDateEnd), Nothing)
+                'End If
+
+                lTS = TrimTimeseries(lOrigTs)
+
                 aStationLkUpTable.FindFirst(1, loc.Substring(2))
                 Dim lLat As Double = aStationLkUpTable.Value(4) 'in decimal degrees
                 Dim longitude As Double = aStationLkUpTable.Value(5) ' in decimal degrees
@@ -293,7 +350,7 @@ Module modArcSWATMetData
 
                 lStnList.Add(loc, lgageID.ToString & "," & loc & "," & lLat.ToString & "," & longitude.ToString & "," & lElev.ToString)
 
-                lTS = SubsetByDate(lOrigTs, aDateStart, aDateEnd, Nothing)
+                'lTS = SubsetByDate(lOrigTs, aDateStart, aDateEnd, Nothing)
 
                 Dim lTsMax As atcTimeseries = atcData.modTimeseriesMath.Aggregate(lTS, atcTimeUnit.TUDay, 1, atcTran.TranMax)
                 lTsMax = atcTimeseriesMath.atcTimeseriesMath.Compute("F to Celsius", lTsMax)
@@ -309,6 +366,7 @@ Module modArcSWATMetData
                 Dim lTextFilename As String = IO.Path.Combine(lpathAtem, loc & ".txt")
                 Dim lWriter As New IO.StreamWriter(lTextFilename, False)
 
+                Dim lDate As Date
                 For i As Integer = 1 To lTsMax.numValues
                     If i = 1 Then
                         lDate = Date.FromOADate(lTsMax.Dates.Value(i - 1))
