@@ -228,10 +228,12 @@ Module ScriptImportPCStoSWAT
                                     'Set value and unit
                                     lValueStr = .Value(PCSCOL.QAVG)
 
+                                    'Set PCS data unit to load by default first
                                     If lTSBuilder.NumValues = 0 Then
                                         lTSBuilder.Attributes.SetValue("Unit", "lbd")
                                     End If
 
+                                    'Then, see if load does not exist, then set to read in concentration instead.
                                     If lValueStr = "" Then
                                         lValueStr = .Value(PCSCOL.CAVG)
 
@@ -385,7 +387,6 @@ Module ScriptImportPCStoSWAT
             lbod = Double.NaN
             ldo = Double.NaN
 
-
             'TODO: use the information of lTSFlow etc's Unit attribute to do the unit conversion for SWAT input
             Try
                 'Need to do the unit conversion and proper formatting
@@ -474,5 +475,36 @@ Module ScriptImportPCStoSWAT
             End If
         Next
         Return lVal
+    End Function
+
+    ''' <summary>
+    ''' Convert PCS point source data to SWAT point source data file unit
+    ''' </summary>
+    ''' <param name="aTS">The original PCS timeseries</param>
+    ''' <param name="aUnitPCS">The original PCS data unit</param>
+    ''' <returns>Boolean (Successful, Yes; Failed, No)</returns>
+    ''' <remarks>The function knows internally the needed SWAT units
+    ''' and convert PCS data accordingly.</remarks>
+
+    Public Function convert2SWATUnit(ByVal aTS As atcTimeseries, ByVal aUnitPCS As String, Optional ByVal aConsName As String = "") As Boolean
+        Dim lFactor As Double = Double.NaN
+
+        Select Case aUnitPCS
+            Case "mgd"
+                lFactor = 3785.41178 ' m3/d = 1 mgd
+            Case "mgl"
+            Case Else
+                Return False
+        End Select
+
+        ' The following search would have to be faster if a long timeseries
+        For i As Integer = 0 To aTS.numValues
+            If aTS.Dates.Value(i) = 332299 Then
+                lFactor = aTS.Value(i)
+                Exit For
+            End If
+        Next
+        Return lFactor
+
     End Function
 End Module

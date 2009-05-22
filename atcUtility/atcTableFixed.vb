@@ -17,7 +17,7 @@ Public Class atcTableFixed
     Private pFields() As clsFieldDescriptor
     Private pNumFields As Integer
     Private pData() As String
-    Private pRecords As New ArrayList
+    Private pRecords As New Generic.List(Of String)
     Private pCurrentRecord As Integer
 
     Public Overrides Property CurrentRecord() As Integer
@@ -177,9 +177,9 @@ Public Class atcTableFixed
                 End If
                 pData(aFieldNumber) = newValue
                 'TODO: test this
-                pRecords(pCurrentRecord) = pRecords(pCurrentRecord).Substring(0, pFields(aFieldNumber).FieldStart) _
+                pRecords(pCurrentRecord) = pRecords(pCurrentRecord).Substring(0, pFields(aFieldNumber).FieldStart - 1) _
                                          & newValue _
-                                         & pRecords(pCurrentRecord).Substring(pFields(aFieldNumber).FieldStart + pFields(aFieldNumber).FieldLength)
+                                         & SafeSubstring(pRecords(pCurrentRecord), pFields(aFieldNumber).FieldStart - 1 + pFields(aFieldNumber).FieldLength)
 
             End If
             Exit Property
@@ -234,7 +234,7 @@ ErrHand:
                 pHeaderLines.Add(lLineReader.Current)
             Next
 
-            pRecords = New ArrayList
+            pRecords = New Generic.List(Of String)
             While lLineReader.MoveNext
                 pRecords.Add(lLineReader.Current)
             End While

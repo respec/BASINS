@@ -687,6 +687,11 @@ Public Module modReflection
         Return lSetSomething
     End Function
 
+    Public Function MemUsage() As String
+        System.GC.WaitForPendingFinalizers()
+        Return "MemoryUsage(MB):" & Process.GetCurrentProcess.PrivateMemorySize64 / (2 ^ 20) & _
+                    " Local(MB):" & System.GC.GetTotalMemory(True) / (2 ^ 20)
+    End Function
 
     'Public Sub ConnectObjects(ByRef aListOfObjects As ArrayList, _
     '                          ByVal aIdFieldName As String, _
