@@ -754,6 +754,20 @@ TryOldString:
         End If
     End Function
 
+    ''' <summary>
+    ''' Like String.Substring but gracefully return an empty or shorter string when it would have thrown an exception
+    ''' </summary>
+    ''' <param name="aSourceString">String to get substring of</param>
+    ''' <param name="aStartIndex">Zero-based start position of substring</param>
+    ''' <remarks>Why could they not have implemented String.Substring more like this?</remarks>
+    Public Function SafeSubstring(ByVal aSourceString As String, ByVal aStartIndex As Integer) As String
+        If aSourceString Is Nothing OrElse aSourceString.Length <= aStartIndex Then
+            Return ""
+        Else
+            Return aSourceString.Substring(aStartIndex)
+        End If
+    End Function
+
     Public Function FirstStringPos(ByVal start As Integer, ByVal Source As String, ByVal ParamArray SearchFor() As Object) As Integer
         ' ##SUMMARY Searches Source for each item in SearchFor array.
         ' ##PARAM start I Position in Source to start search
