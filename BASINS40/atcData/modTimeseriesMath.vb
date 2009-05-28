@@ -691,11 +691,15 @@ Public Module modTimeseriesMath
                                         lPrevDateOld = lDateNew
                                         If aTran = atcTran.TranSumDiv Then lValOld = lValOld - lValOld * lFraction
                                     Else
+NextOldVal:
                                         lPrevDateOld = lDateOld
                                         lOldIndex = lOldIndex + 1
                                         If lOldIndex <= lNumOldVals Then
                                             lDateOld = aTimeseries.Dates.Value(lOldIndex)
                                             lValOld = aTimeseries.Value(lOldIndex)
+                                            If Double.IsNaN(lValOld) Then
+                                                GoTo NextOldVal
+                                            End If
                                         End If
                                         'lCumuFrac = 0
                                     End If
