@@ -663,8 +663,8 @@ Public Module modTimeseriesMath
                 Dim lOverlapStart As Double
                 Dim lOverlapEnd As Double
                 Dim lNumOldVals As Integer = aTimeseries.numValues
-                Dim lFraction As Double
-                Dim lCumuFrac As Double
+                Dim lFraction As Double 'Fraction of the new time step that is being filled by the current old value
+                Dim lCumuFrac As Double 'Cumulative Fraction of the current new time step that has been filled from aTimeseries
 
                 If aTimeseries.numValues > 0 Then
                     lValOld = aTimeseries.Value(1)
@@ -697,7 +697,8 @@ NextOldVal:
                                         If lOldIndex <= lNumOldVals Then
                                             lDateOld = aTimeseries.Dates.Value(lOldIndex)
                                             lValOld = aTimeseries.Value(lOldIndex)
-                                            If Double.IsNaN(lValOld) Then
+                                            If Double.IsNaN(lValOld) AndAlso aTimeseries.ValueAttributesGetValue(lOldIndex, "Inserted", False) Then
+                                                lCumuFrac += (lDateOld - lPrevDateOld) / (lDateNew - lPrevDateNew)
                                                 GoTo NextOldVal
                                             End If
                                         End If
