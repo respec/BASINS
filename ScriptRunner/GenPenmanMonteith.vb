@@ -272,7 +272,7 @@ Public Module GenPenmanMonteithET
                         ltsPMET = ltsAtemSub.Clone
                         ltsPMET.Attributes.SetValue("Constituent", "PMET")
                         ltsPMET.Attributes.SetValue("Location", lStation)
-                        ltsPMET.Attributes.SetValue("ID", ltsPrecID + 8)
+                        ltsPMET.Attributes.SetValue("ID", ltsAtemID + 6)
                         ltsPMET.Attributes.SetValue("TU", atcTimeUnit.TUDay)
                         ltsPMET.Attributes.SetValue("start date", lSJDText)
                         ltsPMET.Attributes.SetValue("end date", lEJDText)
@@ -294,14 +294,14 @@ Public Module GenPenmanMonteithET
                             GoTo PMETTSPROBLEM
                         End If
                         If lWDMFile.AddDataset(ltsPMET, atcDataSource.EnumExistAction.ExistReplace) Then
-                            Logger.Dbg("GenPenmanMonteith:   Wrote Penman-Monteith PET to DSN " & ltsPrecID + 8)
+                            Logger.Dbg("GenPenmanMonteith:   Wrote Penman-Monteith PET to DSN " & ltsAtemID + 6)
                             If pdoReport Then
                                 lPMETValsMonthly = Aggregate(ltsPMET, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values ' For report
                                 lPMETValsYearly = Aggregate(ltsPMET, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values  ' For report
                             End If
                         Else
 PMETTSPROBLEM:
-                            Logger.Dbg("GenPenmanMonteith:   PROBLEM writing Penman-Monteith PET to DSN " & ltsPrecID + 8)
+                            Logger.Dbg("GenPenmanMonteith:   PROBLEM writing Penman-Monteith PET to DSN " & ltsAtemID + 6)
                         End If
                     Else
                         Logger.Dbg("GenPenmanMonteith:   No common period available for Precip and Air Temp data")

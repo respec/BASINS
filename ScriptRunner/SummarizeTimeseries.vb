@@ -16,6 +16,7 @@ Module ScriptSummarizeTimeseries
         lSeasonNames.Add("JJA")
         lSeasonNames.Add("SON")
 
+
         Dim lSeasonalAttributeNames As New ArrayList
         lSeasonalAttributeNames.Add("Mean")
         lSeasonalAttributeNames.Add("SumAnnual")
@@ -50,8 +51,11 @@ Module ScriptSummarizeTimeseries
                                Optional ByVal aIncludeHeader As Boolean = True, _
                                Optional ByVal aSeasonalAttributeNames As ArrayList = Nothing, _
                                Optional ByVal aSeasonNames As ArrayList = Nothing, _
-                               Optional ByVal aConstituents As ArrayList = Nothing) As String
+                               Optional ByVal aConstituents As ArrayList = Nothing, _
+                               Optional ByVal aYearlySeasonalAttributeNames As ArrayList = Nothing) As String
         Dim lAttributes As atcCollection = aAttributes.Clone
+        If aSeasonalAttributeNames Is Nothing Then aSeasonalAttributeNames = New ArrayList
+        If aYearlySeasonalAttributeNames Is Nothing Then aYearlySeasonalAttributeNames = New ArrayList
         For Each lSeasonalAttributeName As String In aSeasonalAttributeNames
             If lAttributes.ItemByKey(lSeasonalAttributeName) Then
                 For Each lSeasonName As String In aSeasonNames
@@ -71,11 +75,25 @@ Module ScriptSummarizeTimeseries
         Dim lString As String = ""
         If aIncludeHeader Then
             For Each lAttribute As String In lAttributes.Keys
-                lString &= lAttribute & vbTab
+                lString &= """" & lAttribute & """" & vbTab
             Next
+            If aYearlySeasonalAttributeNames.Count > 0 Then
+                For Each lSeasonName As String In aSeasonNames
+                    For Each lYearlySeasonalAttributeName As String In aYearlySeasonalAttributeNames
+                        lString &= """" & lSeasonName & "-Yearly" & lYearlySeasonalAttributeName & """" & vbTab
+                    Next
+                Next
+            End If
             lString.Trim(vbTab)
             lStringBuilder.AppendLine(lString)
         End If
+
+        Dim lDate(5) As Integer
+        Dim lSnDays As New atcCollection
+        lSnDays.Add("DJF", 2160)
+        lSnDays.Add("MAM", 2208)
+        lSnDays.Add("JJA", 2208)
+        lSnDays.Add("SON", 2184)
 
         Logger.Dbg("DatasetCount " & aTimeseriesDatagroup.Count)
         For Each lTimeseries As atcTimeseries In aTimeseriesDatagroup
@@ -83,12 +101,91 @@ Module ScriptSummarizeTimeseries
             If aConstituents Is Nothing OrElse aConstituents.Contains(lConstituent) Then
                 For Each lSeasonName As String In aSeasonNames
                     Dim lSeasons As atcSeasonBase = SeasonsMonthFromString(lSeasonName)
-                    Dim lSeasonTimeseries As atcTimeseries = lSeasons.SplitBySelected(lTimeseries, Nothing)(0)
+
+                    Dim lTSAdjust As atcTimeseries = Nothing
+                    If aYearlySeasonalAttributeNames.Count > 0 Then
+                        Dim lSJD As Double
+                        Dim lEJD As Double
+                        Dim lSnStartMonth As Integer = 0
+                        Select Case lSeasonName
+                            Case "DJF"
+                                lSnStartMonth = 12
+                            Case "MAM"
+                                lSnStartMonth = 3
+                            Case "JJA"
+                                lSnStartMonth = 6
+                            Case "SON"
+                                lSnStartMonth = 9
+                        End Select
+                        For i As Integer = 1 To lTimeseries.numValues
+                            J2Date(lTimeseries.Dates.Value(i), lDate)
+                            If lDate(1) = lSnStartMonth Then 'use only values after first month value to ensure correct annual interpretation
+                                lSJD = Date2J(lDate)
+                                lEJD = lTimeseries.Dates.Value(lTimeseries.numValues)
+                                Exit For
+                            End If
+                        Next
+                        lTSAdjust = SubsetByDate(lTimeseries, lSJD, lEJD, Nothing)
+                    Else
+                        lTSAdjust = lTimeseries
+                    End If
+
+                    If lTSAdjust = Nothing Then Continue For
+
+                    Dim lSeasonTimeseries As atcTimeseries = lSeasons.SplitBySelected(lTSAdjust, Nothing)(0)
+
+                    'Populate lSnTimeStepsCtr array with the number of time steps within each season in lSeasonTimeseries
+                    'This array will be used to be divided into the SumDiv of Temperature values
+                    '
+                    Dim ltrueMissingCtr As Integer = 0
+                    Dim lSnTimeStepsCtr(lSeasonTimeseries.Attributes.GetFormattedValue("count missing") + 1) As Integer
+                    lSnTimeStepsCtr(0) = 0
+                    Dim loneSnTimeStepsCtr As Integer = 1
+                    With lSeasonTimeseries
+                        For i As Integer = 1 To .numValues
+                            If Double.IsNaN(.Value(i)) And .ValueAttributesGetValue(i, "Inserted", False) Then
+                                ' Found NaN inserted by season split, which is normal
+                                loneSnTimeStepsCtr += 1
+                            ElseIf Double.IsNaN(.Value(i)) Then
+                                ltrueMissingCtr += 1
+                            End If
+                            lSnTimeStepsCtr(loneSnTimeStepsCtr) += 1
+                            'J2Date(.Dates.Value(i), lDate)
+                            'Logger.Dbg("Year:" & lDate(0) & ",Month:" & lDate(1) & ",Value:" & .Value(i))
+                        Next
+                    End With
+                    'Debug ends
+
                     With lTimeseries.Attributes
                         For Each lSeasonalAttributeName As String In aSeasonalAttributeNames
                             .SetValue(lSeasonName & "-" & lSeasonalAttributeName, lSeasonTimeseries.Attributes.GetValue(lSeasonalAttributeName))
                         Next
+                        If aYearlySeasonalAttributeNames.Count > 0 Then
+
+                            ''Debug starts
+                            'Dim lt As Double = 0
+                            'For i As Integer = 1 To 2159
+                            '    lt += lSeasonTimeseries.Value(i)
+                            'Next
+                            ''Debug ends
+
+                            Dim ltsSn As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv, Nothing)
+                            If lConstituent = "ATMP" Then
+                                For i As Integer = 1 To ltsSn.numValues
+                                    ltsSn.Value(i) /= lSnTimeStepsCtr(i)
+                                Next
+                            End If
+
+                            For Each lYearlySeasonalAttributeName As String In aYearlySeasonalAttributeNames
+                                .SetValue(lSeasonName & "-Yearly" & lYearlySeasonalAttributeName, ltsSn.Attributes.GetFormattedValue(lYearlySeasonalAttributeName))
+                            Next
+                            'For i As Integer = 1 To ltsSn.numValues
+                            '    J2Date(ltsSn.Dates.Value(i), lDate)
+                            '    Logger.Dbg("Year:" & lDate(0) & ",Month:" & lDate(1) & ",Value:" & ltsSn.Value(i))
+                            'Next
+                        End If
                     End With
+
                 Next
                 Dim lValueString As String
                 lString = ""
@@ -115,6 +212,11 @@ Module ScriptSummarizeTimeseries
                         End If
                         lString &= vbTab
                     End If
+                Next
+                For Each lSeasonName As String In aSeasonNames
+                    For Each lYearlySeasonalAttributeName As String In aYearlySeasonalAttributeNames
+                        lString &= lTimeseries.Attributes.GetValue(lSeasonName & "-Yearly" & lYearlySeasonalAttributeName) & vbTab
+                    Next
                 Next
                 lString.Trim(vbTab)
                 lStringBuilder.AppendLine(lString)
