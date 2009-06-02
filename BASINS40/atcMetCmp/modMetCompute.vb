@@ -691,6 +691,10 @@ Public Module modMetCompute
 
         lDisTs.Dates = DisaggDates(aInTs, aDataSource)
         lDisTs.numValues = lDisTs.Dates.numValues
+        If lDisTs.numValues < aInTs.numValues * 24 Then
+            Logger.Dbg("NumValueProblem " & lDisTs.numValues & " " & aInTs.numValues)
+            lDisTs.numValues = aInTs.numValues * 24 'kludge!
+        End If
 
         Dim lOutTs(lDisTs.numValues) As Double
         lHrPos = 0
