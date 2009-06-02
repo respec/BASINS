@@ -17,9 +17,9 @@ Public Module GenPenmanMonteithET
     Private Const pStationPath As String = "C:\BASINSMet\Stations\"
     Private pSWATStnFile As String = IO.Path.Combine(pOutputPath, "statwgn.txt")
 
-    Private pWriteSWATMet As Boolean = True
+    Private pWriteSWATMet As Boolean = False
     Private pdoPET As Boolean = True
-    Private pdoReport As Boolean = False
+    Private pdoReport As Boolean = True
 
     'subroutine pmpevt(idmet,istyrZ,istdyZ,nbyrZ,sub_elevZ,sub_latZ,
     '&                 CO2Z,numdata,PrecipZ,TmaxZ,TminZ,PevtPMZ)
@@ -128,6 +128,7 @@ Public Module GenPenmanMonteithET
                     Dim ltsPrecID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(0))
                     Dim ltsAtemID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(1))
                     Dim ltsPMET As atcTimeseries = Nothing
+                    Dim ltsPMETHour As atcTimeseries = Nothing
                     Dim ltsPrec As atcTimeseries
                     Dim ltsAtem As atcTimeseries
                     Dim ltsAtemSub As atcTimeseries
@@ -293,11 +294,24 @@ Public Module GenPenmanMonteithET
                         If ltsPMET.Attributes.GetDefinedValue("start date").Value > ltsPMET.Attributes.GetDefinedValue("end date").Value Then
                             GoTo PMETTSPROBLEM
                         End If
-                        If lWDMFile.AddDataset(ltsPMET, atcDataSource.EnumExistAction.ExistReplace) Then
-                            Logger.Dbg("GenPenmanMonteith:   Wrote Penman-Monteith PET to DSN " & ltsAtemID + 6)
+                        Dim lLatitudeDefinedValue As atcDefinedValue = ltsPMET.Attributes.GetDefinedValue("Latitude")
+                        Dim lLatitude As Double
+                        If lLatitudeDefinedValue IsNot Nothing Then
+                            lLatitude = lLatitudeDefinedValue.Value
+                            Logger.Dbg("Latitude " & lLatitude)
+                        Else
+                            Logger.Dbg("DEFAULT Latitiude")
+                            lLatitude = 45
+                        End If
+                        ltsPMETHour = atcMetCmp.DisSolPet(ltsPMET, Nothing, 2, lLatitude)
+                        ltsPMETHour.Attributes.SetValue("Constituent", ltsPMET.Attributes.GetDefinedValue("Constituent").Value)
+                        ltsPMETHour.Attributes.SetValue("TSTYPE", ltsPMET.Attributes.GetDefinedValue("TSTYPE").Value)
+
+                        If lWDMFile.AddDataset(ltsPMETHour, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("GenPenmanMonteith:   Wrote Penman-Monteith PET to DSN " & ltsAtemID + 6 & " SumAnnual " & ltsPMETHour.Attributes.GetDefinedValue("SumAnnual").Value)
                             If pdoReport Then
-                                lPMETValsMonthly = Aggregate(ltsPMET, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values ' For report
-                                lPMETValsYearly = Aggregate(ltsPMET, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values  ' For report
+                                lPMETValsMonthly = Aggregate(ltsPMETHour, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values ' For report
+                                lPMETValsYearly = Aggregate(ltsPMETHour, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values  ' For report
                             End If
                         Else
 PMETTSPROBLEM:
@@ -418,6 +432,7 @@ clearEnd:
                     If ltsAtem IsNot Nothing Then ltsAtem.Clear()
                     If ltsPEVT IsNot Nothing Then ltsPEVT.Clear() 'for report
                     If ltsPMET IsNot Nothing Then ltsPMET.Clear()
+                    If ltsPMETHour IsNot Nothing Then ltsPMETHour.clear()
                     If lAtemVals IsNot Nothing Then Array.Clear(lAtemVals, 0, lAtemVals.Length)
                     If lPrecValsMonthly IsNot Nothing Then Array.Clear(lPrecValsMonthly, 0, lPrecValsMonthly.Length)
                     If lPrecValsYearly IsNot Nothing Then Array.Clear(lPrecValsYearly, 0, lPrecValsYearly.Length)
@@ -433,6 +448,7 @@ clearEnd:
                     ltsAtem = Nothing
                     ltsPEVT = Nothing 'for report
                     ltsPMET = Nothing
+                    ltsPMETHour = Nothing
                     lAtemVals = Nothing
                     lPrecValsMonthly = Nothing
                     lPrecValsYearly = Nothing
@@ -445,6 +461,7 @@ clearEnd:
                     lPMETValsYearly = Nothing
                     GC.Collect()
                     System.Threading.Thread.Sleep(30)
+                    Logger.Dbg(MemUsage)
                 Next ' lPTPairList
                 'Close it to let the added dataset finalize
                 'lWDMFile.DataSets.Clear()
