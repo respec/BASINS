@@ -49,7 +49,7 @@ Module HSPFOutputReports
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
 
-        'pConstituents.Add("Water")
+        pConstituents.Add("Water")
         pConstituents.Add("Sediment")
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
@@ -106,7 +106,8 @@ Module HSPFOutputReports
                 pBaseName = "base"
                 pOutputLocations.Add("Lynnwood")
             Case "upatoi"
-                pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
+                pTestPath = "D:\Basins\modelout\Upatoi"
+                'pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
                 'pTestPath = "C:\Basins\data\20710-01\Upatoi"
                 pBaseName = "Upatoi"
                 pOutputLocations.Add("R:14")
@@ -197,6 +198,16 @@ Module HSPFOutputReports
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
         Dim lRunMade As String = lHspfBinFileInfo.LastWriteTime.ToString
 
+        'build collection of operation types to report
+        Dim lOperationTypes As New atcCollection
+        lOperationTypes.Add("P:", "PERLND")
+        lOperationTypes.Add("I:", "IMPLND")
+        lOperationTypes.Add("R:", "RCHRES")
+
+        'area report
+        Dim lStr As String = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations)
+        SaveFileString("outfiles\AreaReport.txt", lStr)
+
         If pConstituents.Contains("Water") Then
             'open WDM file
             Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
@@ -213,7 +224,7 @@ Module HSPFOutputReports
                         lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                     End If
                     lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
-                    Dim lStr As String = lExpertSystem.Report
+                    lStr = lExpertSystem.Report
                     SaveFileString("outfiles\ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
                     SaveFileString("outfiles\" & pBaseName & ".exs", lExpertSystem.AsString)
 
@@ -371,11 +382,6 @@ Module HSPFOutputReports
 
         For Each lConstituent As String In pConstituents
             Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
-            'build collection of operation types to report
-            Dim lOperationTypes As New atcCollection
-            lOperationTypes.Add("P:", "PERLND")
-            lOperationTypes.Add("I:", "IMPLND")
-            lOperationTypes.Add("R:", "RCHRES")
 
             Dim lString As String = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears).ToString
             Dim lOutFileName As String = "outfiles\" & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"

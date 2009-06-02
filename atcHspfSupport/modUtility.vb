@@ -307,8 +307,12 @@ Public Module Utility
                     If lConnection.MFact > 0 Then
                         aLocations.Increment(lLocationKey, lConnection.MFact)
                     End If
-                ElseIf aUpstream AndAlso lSourceVolName = "RCHRES" Then
-                    LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True)
+                ElseIf lSourceVolName = "RCHRES" Then
+                    If aUpstream Then
+                        LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True)
+                    Else
+                        aLocations.Add(lLocationKey, 0)
+                    End If
                 End If
             Next
         End If
@@ -394,5 +398,57 @@ Public Module Utility
                   & DecimalAlign(100 * lResidual / lValue2, 11, 2).PadLeft(11) & "%"
         End If
         Return lStr & vbCrLf
+    End Function
+
+    Public Function AreaReport(ByVal aUci As HspfUci, ByVal aRunMade As String, _
+                               ByVal aOperationTypes As atcCollection, ByVal aLocations As atcCollection) As String
+        Dim lSB As New Text.StringBuilder
+        lSB.AppendLine("Area Summary Report")
+        lSB.AppendLine("   UCI File Name " & aUci.Name)
+        lSB.AppendLine("   Run Made " & aRunMade)
+        lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lSB.AppendLine("")
+
+        lSB.AppendLine("Location" & vbTab & "TotalArea".PadLeft(12) & vbTab & "LocalArea".PadLeft(12) & vbTab & "UpstreamReaches")
+        Dim lLocation As String = aLocations.Item(aLocations.Count - 1)
+        lSB.AppendLine(AreaReportLocation(aUci, aOperationTypes, lLocation))
+
+        Return lSB.ToString
+    End Function
+    Private Function AreaReportLocation(ByVal auci As HspfUci, ByVal aOperationtypes As atcCollection, _
+                                        ByVal aLocation As String) As String
+        Dim lLocations As atcCollection = UpstreamLocations(auci, aOperationtypes, aLocation)
+        Dim lTotalArea As Double = 0.0
+        For lIndex As Integer = 0 To lLocations.Count - 1
+            If lLocations.Item(lIndex) IsNot Nothing Then
+                lTotalArea += lLocations.Item(lIndex)
+            End If
+        Next
+
+        lLocations.Clear()
+        Dim lUpstreamLocations As New atcCollection
+        Dim lUpstreamLocationsString As String = ""
+        Dim lLocalArea As Double = 0.0
+        LocationAreaCalc(auci, aLocation, aOperationtypes, lLocations, False)
+        For lIndex As Integer = 0 To lLocations.Count - 1
+            lLocalArea += lLocations.Item(lIndex)
+            If lLocations.Item(lIndex) < 0.00001 Then
+                lUpstreamLocations.Add(lLocations.Keys(lIndex))
+                lUpstreamLocationsString &= lLocations.Keys(lIndex) & ", "
+            End If
+        Next
+
+        If lUpstreamLocationsString.Length > 0 Then
+            lUpstreamLocationsString = lUpstreamLocationsString.Remove(lUpstreamLocationsString.Length - 2, 2)
+        End If
+        Dim lStr As String = ""
+        For Each lUpstreamLocation As String In lUpstreamLocations
+            lStr &= AreaReportLocation(auci, aOperationtypes, lUpstreamLocation)
+        Next
+        lStr &= aLocation.PadRight(8) & vbTab & _
+                DecimalAlign(lTotalArea, , 2, 7) & vbTab & _
+                DecimalAlign(lLocalArea, , 2, 7) & vbTab & _
+                lUpstreamLocationsString & vbCrLf
+        Return lStr
     End Function
 End Module
