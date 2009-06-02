@@ -306,6 +306,7 @@ Public Module GenPenmanMonteithET
                         ltsPMETHour = atcMetCmp.DisSolPet(ltsPMET, Nothing, 2, lLatitude)
                         ltsPMETHour.Attributes.SetValue("Constituent", ltsPMET.Attributes.GetDefinedValue("Constituent").Value)
                         ltsPMETHour.Attributes.SetValue("TSTYPE", ltsPMET.Attributes.GetDefinedValue("TSTYPE").Value)
+                        ltsPMETHour.Attributes.SetValue("ID", ltsPMET.Attributes.GetDefinedValue("ID").Value)
 
                         If lWDMFile.AddDataset(ltsPMETHour, atcDataSource.EnumExistAction.ExistReplace) Then
                             Logger.Dbg("GenPenmanMonteith:   Wrote Penman-Monteith PET to DSN " & ltsAtemID + 6 & " SumAnnual " & ltsPMETHour.Attributes.GetDefinedValue("SumAnnual").Value)
