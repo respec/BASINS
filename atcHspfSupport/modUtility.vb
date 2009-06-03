@@ -426,24 +426,35 @@ Public Module Utility
             lSB.AppendLine("   Run Made " & aRunMade)
             lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
             lSB.AppendLine("")
-            lSB.AppendLine("Landuse".PadLeft(20) & vbTab & "Area".PadLeft(12))
+            lSB.AppendLine("Landuse".PadLeft(20) & vbTab & _
+                           "PervArea".PadLeft(12) & vbTab & _
+                           "ImpvArea".PadLeft(12) & vbTab & _
+                           "TotalArea".PadLeft(12))
             Dim lLandUses As atcCollection = LandUses(aUci, aOperationtypes, aLocation)
+            Dim lLandUsesCombinePervImpv As atcCollection = LandUsesCombined(lLandUses)
             Dim lTotalAreaFromLandUses As Double = 0
-            For lLandUseIndex As Integer = 0 To lLandUses.Count - 1
-                Dim lLandUse As atcCollection = lLandUses.Item(lLandUseIndex)
-                Dim lLandUseArea As Double = 0.0
-                For lOperationIndex As Integer = 0 To lLandUse.Count - 1
-                    lLandUseArea += lLandUse.Item(lOperationIndex)
-                Next
-                If lLandUseArea > 0 Then
-                    lSB.AppendLine(lLandUses.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & DecimalAlign(lLandUseArea, , 2, 7))
-                    lTotalAreaFromLandUses += lLandUseArea
-                End If
-                lLandUse.Clear()
+            Dim lTotalAreaPerv As Double = 0.0
+            Dim lTotalAreaImpr As Double = 0.0
+            For lLandUseIndex As Integer = 0 To lLandUsesCombinePervImpv.Count - 1
+                Dim lLandUseAreaString As String = lLandUsesCombinePervImpv.Item(lLandUseIndex)
+                Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
+                Dim lPervArea As Double = lLandUseAreaString
+                Dim lLandUseArea As Double = lPervArea + lImprArea
+                lSB.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
+                               DecimalAlign(lPervArea, , 2, 7) & vbTab & _
+                               DecimalAlign(lImprArea, , 2, 7) & vbTab & _
+                               DecimalAlign(lLandUseArea, , 2, 7))
+                lTotalAreaPerv += lPervArea
+                lTotalAreaImpr += lImprArea
+                lTotalAreaFromLandUses += lLandUseArea
             Next
+            lLandUsesCombinePervImpv.Clear()
             lLandUses.Clear()
             lSB.AppendLine("")
-            lSB.AppendLine("Total".PadLeft(20) & vbTab & DecimalAlign(lTotalAreaFromLandUses, , 2, 7))
+            lSB.AppendLine("Total".PadLeft(20) & vbTab & _
+                           DecimalAlign(lTotalAreaPerv, , 2, 7) & vbTab & _
+                           DecimalAlign(lTotalAreaImpr, , 2, 7) & vbTab & _
+                           DecimalAlign(lTotalAreaFromLandUses, , 2, 7))
             SaveFileString(aReportPath & SafeFilename("AreaLanduse_" & aLocation & ".txt"), lSB.ToString)
         End If
 
@@ -484,5 +495,30 @@ Public Module Utility
                 DecimalAlign(lLocalArea, , 2, 7) & vbTab & _
                 lUpstreamLocationsString & vbCrLf
         Return lStr
+    End Function
+    Private Function LandUsesCombined(ByVal aLandUses As atcCollection) As atcCollection
+        Dim lLUCombined As New atcCollection
+        For lIndex As Integer = 0 To aLandUses.Count - 1
+            Dim lLandUseName As String = aLandUses.Keys(lIndex).ToString
+            Dim lLandUse As atcCollection = aLandUses.Item(lIndex)
+            Dim lLandUseArea As Double = 0.0
+            For lOperationIndex As Integer = 0 To lLandUse.Count - 1
+                lLandUseArea += lLandUse.Item(lOperationIndex)
+            Next
+            If lLandUseArea > 0 Then
+                Dim lLandUseKey As Integer = lLUCombined.IndexFromKey(lLandUseName.Remove(0, 2))
+                Dim lLandUseString As String = ""
+                If lLandUseKey = -1 Then
+                    lLandUseString = lLandUseArea
+                    If lLandUseName.StartsWith("P") Then
+                        lLandUseString = "0.0," & lLandUseString
+                    End If
+                    lLUCombined.Add(lLandUseName.Remove(0, 2), lLandUseString)
+                Else
+                    lLUCombined(lLandUseKey) &= "," & lLandUseArea
+                End If
+            End If
+        Next
+        Return lLUCombined
     End Function
 End Module
