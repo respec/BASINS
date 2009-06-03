@@ -205,7 +205,7 @@ Module HSPFOutputReports
         lOperationTypes.Add("R:", "RCHRES")
 
         'area report
-        Dim lStr As String = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations)
+        Dim lStr As String = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, "outfiles\")
         SaveFileString("outfiles\AreaReport.txt", lStr)
 
         If pConstituents.Contains("Water") Then
