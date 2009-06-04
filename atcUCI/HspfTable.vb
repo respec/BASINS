@@ -40,7 +40,8 @@ Public Class HspfTable
     Private pEditAllSimilar As Boolean
     Private pEdited As Boolean
     Private pSuppID As Integer '>0 indicates parms on this record are in supplemental file
-    Private pCombineOK As Boolean
+    'Removed following variable (legacy from VB6???), prh & pbd, 6/4/2009
+    'Private pCombineOK As Boolean
 
     Public Def As New HspfTableDef
     Public OccurCount As Integer 'total number of occurences
@@ -118,7 +119,9 @@ Public Class HspfTable
         MyBase.New()
         OccurCount = 0
         pEditAllSimilar = True
-        pCombineOK = True
+        'initialize public variable instead of legacy (VB6???) variable, prh & pbd, 6/4/2009
+        'pCombineOK = True
+        CombineOK = True
     End Sub
 
     Public Function EditAllSimilarChange(ByRef aEditAllSimilar As Boolean) As Object
