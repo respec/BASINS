@@ -339,10 +339,15 @@ Module ManDelin
                 End If
             End If
         End If
+        Dim i As Integer
         If lLevelFieldIndex = -1 Then
-            Logger.Msg("Cannot find field 'Level' in the streams layer '" & aReachThemeName & "'", MsgBoxStyle.OkOnly, "Stream Network Problem")
-            Logger.Status("")
-            Exit Sub
+            'if level field does not exist, add it with every segment set to level 1
+            lLevelFieldIndex = GisUtil.FieldIndexAddIfMissing(lReachLayerIndex, "LEVEL", 1, 10)
+            GisUtil.StartSetFeatureValue(lReachLayerIndex)
+            For i = 1 To GisUtil.NumFeatures(lReachLayerIndex)
+                GisUtil.SetFeatureValueNoStartStop(lReachLayerIndex, lLevelFieldIndex, i - 1, 1)
+            Next i
+            GisUtil.StopSetFeatureValue(lReachLayerIndex)
         End If
 
         Logger.Status("Clipping...")
@@ -411,7 +416,6 @@ Module ManDelin
         Next lStreamIndex
         GisUtil.StopSetFeatureValue(lStreamsLayerIndex)
 
-        Dim i As Integer
         'assign subbasin numbers to each reach segment
         Dim aIndex(GisUtil.NumFeatures(lStreamsLayerIndex)) As Integer
         GisUtil.AssignContainingPolygons(lStreamsLayerIndex, lSubbasinLayerIndex, aIndex)
@@ -650,7 +654,8 @@ Module ManDelin
             Else 'get grid value at point
                 gmin = GisUtil.GridValueAtPoint(lElevationLayerIndex, x1, y1)
                 gmax = GisUtil.GridValueAtPoint(lElevationLayerIndex, x2, y2)
-                If InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\ned\") > 0 Then
+                If InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\ned\") > 0 Or _
+                   InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\elev_cm\") > 0 Then
                     'this is an ned grid (in cm), convert to meters
                     gmin = gmin / 100
                     gmax = gmax / 100
