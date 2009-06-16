@@ -2307,68 +2307,6 @@ Public Class GisUtil
     End Function
 
     ''' <summary>
-    ''' Merge all shapes in one shape file return merged shape
-    ''' </summary>
-    ''' <param name="aLayerIndexSource">Index of source layer having selected shaped</param>
-    ''' <returns></returns>
-    ''' <remarks>Programmed by LCW for GBMM project</remarks>
-    <CLSCompliant(False)> _
-    Public Shared Function MergeAllShapes(ByVal aLayerIndexSource As Integer) As MapWinGIS.Shape
-        Try
-            'build collection of selected shape indexes
-            Dim lSelectedShapeIndexes As New atcCollection
-            For lIndex As Integer = 1 To NumFeatures(aLayerIndexSource)
-                lSelectedShapeIndexes.Add(lIndex - 1)
-            Next
-            lSelectedShapeIndexes.Sort()
-            If lSelectedShapeIndexes.Count = 0 Then Return Nothing
-
-            'copy source file to temp file
-            Dim tempfile As String = My.Computer.FileSystem.SpecialDirectories.Temp & "\tempfile.shp"
-
-            If Not MapWinGeoProc.DataManagement.CopyShapefile(LayerFileName(aLayerIndexSource), tempfile) Then Return Nothing
-
-            Dim mergeShp As MapWinGIS.Shape
-
-            Dim sfSource As New MapWinGIS.Shapefile
-
-            With sfSource
-                If Not .Open(tempfile) Then Return Nothing
-                If Not .StartEditingShapes(True) Then Return Nothing
-
-                'insert first shape at end
-                If Not .EditInsertShape(.Shape(lSelectedShapeIndexes(0)), .NumShapes) Then Return Nothing
-
-                For i As Integer = 1 To lSelectedShapeIndexes.Count - 1
-                    Dim newShp As New MapWinGIS.Shape
-                    If Not newShp.Create(.ShapefileType) Then Return Nothing
-                    If Not MapWinGeoProc.SpatialOperations.MergeShapes(sfSource, lSelectedShapeIndexes(i), .NumShapes - 1, newShp) Then Return Nothing
-                    'replace last shape with this one
-                    If Not .EditDeleteShape(.NumShapes - 1) Then Return Nothing
-                    If Not .EditInsertShape(newShp, .NumShapes) Then Return Nothing
-                    If pStatusShow Then Logger.Progress("Merging shapes...", i, lSelectedShapeIndexes.Count - 1)
-                    System.Windows.Forms.Application.DoEvents()
-                Next
-
-                'now all selected have been merged into last shape; save it for later
-                mergeShp = .Shape(.NumShapes - 1)
-
-                If Not .StopEditingShapes(False, True) Then Return Nothing
-                If Not .Close() Then Return Nothing
-                My.Computer.FileSystem.DeleteFile(tempfile)
-            End With
-
-            Return mergeShp
-
-        Catch ex As Exception
-            Throw ex
-            Return Nothing
-        Finally
-            Logger.Progress("", 100, 100) 'clear the progressbar
-        End Try
-    End Function
-
-    ''' <summary>
     ''' Remove all vertices that are closer than specified distance
     ''' </summary>
     ''' <param name="shp">Polygon shape to be filtered</param>
