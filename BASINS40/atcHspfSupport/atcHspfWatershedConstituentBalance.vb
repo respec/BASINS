@@ -280,6 +280,18 @@ Public Module WatershedConstituentBalance
                                             Dim lLocationDataGroup As atcTimeseriesGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                             If lLocationDataGroup.Count > 0 Then
                                                 lTempDataSet = lLocationDataGroup.Item(0)
+                                                Dim lMult As Double = 1.0
+                                                Select Case lConstituentKey
+                                                    Case "POQUAL-BOD", "SOQUAL-BOD"
+                                                        'might need another multiplier for bod
+                                                        If aBalanceType = "BOD" Then
+                                                            lMult = 0.4
+                                                        ElseIf aBalanceType = "OrganicN" Or aBalanceType = "TotalN" Then
+                                                            lMult = 0.048
+                                                        ElseIf aBalanceType = "OrganicP" Or aBalanceType = "TotalP" Then
+                                                            lMult = 0.0023
+                                                        End If
+                                                End Select
                                                 Dim lAttribute As atcDefinedValue
                                                 Select Case lConstituentKey
                                                     Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
@@ -290,7 +302,7 @@ Public Module WatershedConstituentBalance
                                                 If lAttribute Is Nothing Then
                                                     lValue = GetNaN()
                                                 Else
-                                                    lValue = lAttribute.Value
+                                                    lValue = lMult * lAttribute.Value
                                                 End If
                                             Else
                                                 lValue = 0.0

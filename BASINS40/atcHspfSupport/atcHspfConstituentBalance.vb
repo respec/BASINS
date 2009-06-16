@@ -132,6 +132,19 @@ Public Module ConstituentBalance
 
                                         Dim lAttribute As atcDefinedValue
                                         Dim lStateVariable As Boolean
+                                        Dim lMult As Double = 1.0
+                                        Select Case lConstituentKey
+                                            Case "POQUAL-BOD", "SOQUAL-BOD"
+                                                'might need another multiplier for bod
+                                                If aBalanceType = "BOD" Then
+                                                    lMult = 0.4
+                                                ElseIf aBalanceType = "OrganicN" Or aBalanceType = "TotalN" Then
+                                                    lMult = 0.048
+                                                ElseIf aBalanceType = "OrganicP" Or aBalanceType = "TotalP" Then
+                                                    lMult = 0.0023
+                                                End If
+                                        End Select
+
                                         Select Case lConstituentKey
                                             Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
                                                 lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
@@ -146,11 +159,11 @@ Public Module ConstituentBalance
                                             If lStateVariable Then 'no value needed for mean column
                                                 .Value(2) = "<NA>".PadLeft(10)
                                             Else
-                                                .Value(2) = DecimalAlign(lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                .Value(2) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             End If
                                             Dim lFieldIndex As Integer = 3
                                             For Each lAttribute In lYearlyAttributes
-                                                .Value(lFieldIndex) = DecimalAlign(lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                .Value(lFieldIndex) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                                 lFieldIndex += 1
                                             Next
                                         Else
