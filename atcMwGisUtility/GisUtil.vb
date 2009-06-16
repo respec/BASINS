@@ -280,7 +280,9 @@ Public Class GisUtil
                                          ByVal aPolygonLayerIndex As Integer, _
                                          ByVal aPolygonIndex As Integer) As Integer
         Dim lLineSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLineLayerIndex)
-        Dim lLineShape As MapWinGIS.Shape = lLineSf.Shape(aLineIndex - 1)
+        '5/26/09 apparent coding error corrected by LCW
+        'Dim lLineShape As MapWinGIS.Shape = lLineSf.Shape(aLineIndex - 1)
+        Dim lLineShape As MapWinGIS.Shape = lLineSf.Shape(aLineIndex)
         Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
         Dim lX As Double, lY As Double
         Dim lLineInPolygon As Integer = False
@@ -404,13 +406,12 @@ Public Class GisUtil
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function FieldIndex(ByVal aLayerIndex As Integer, ByVal aFieldName As String) As Integer
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-        FieldIndex = -1
         For iFieldIndex As Integer = 0 To lSf.NumFields - 1
             If lSf.Field(iFieldIndex).Name.ToUpper = aFieldName.ToUpper Then 'this is the field we want
                 Return iFieldIndex
             End If
         Next
-        'Throw New Exception("GisUtil:FieldIndex:Error:FieldName:" & aFieldName & ":IsNotRecognized")
+        Throw New Exception("GisUtil:FieldIndex:Error:FieldName:" & aFieldName & ":IsNotRecognized")
     End Function
 
     Public Shared Function IsField(ByVal aLayerIndex As Integer, _
@@ -571,21 +572,19 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="System.Exception" caption="GroupNameNameNotRecognized">Group specified by aGroupName does not exist</exception>
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
-    ''' <remarks>Routine modified by LCW 4/7/09 to avoid exception and return more consistent value if group not found (might this break other code?)</remarks>
     Public Shared Function GroupIndex(ByVal aGroupName As String) As Integer
-        'GroupIndex = 0
-        GroupIndex = -1
+        GroupIndex = 0
         For i As Integer = 0 To GetMappingObject.Layers.Groups.Count - 1
             If GetMappingObject.Layers.Groups(i).Text.ToUpper = aGroupName.ToUpper Then
                 Return i
             End If
         Next
 
-        'Throw New Exception("GisUtil:GroupIndex:Error:GroupName:" & aGroupName & ":IsNotRecognized")
+        Throw New Exception("GisUtil:GroupIndex:Error:GroupName:" & aGroupName & ":IsNotRecognized")
     End Function
 
     ''' <summary>
-    ''' Given a layer index, return the associated group it is located in
+    ''' Given a layer index, return the first associated group it is located in
     ''' </summary>
     ''' <param name="aLayerIndex">Index of layer</param>
     ''' <returns>Name of group or empty string if cannot be found</returns>
@@ -625,22 +624,15 @@ Public Class GisUtil
     ''' </summary>
     ''' <param name="aGroupName"></param>
     ''' <returns></returns>
-    ''' <remarks>Modified by LCW 4/7/09 to prevent exception from being thrown</remarks>
     Public Shared Function AddGroup(ByVal aGroupName As String) As Integer
         'given a group name, add it to the map.
         'return true if the group is already there or successfully added.
-        'AddGroup = -1
-        'Try
-        '    AddGroup = GroupIndex(aGroupName)
-        'Catch
-        '    AddGroup = GetMappingObject.Layers.Groups.Add(aGroupName)
-        'End Try
-        Dim lIndex As Integer = GroupIndex(aGroupName)
-        If lIndex = -1 Then
-            Return GetMappingObject.Layers.Groups.Add(aGroupName)
-        Else
-            Return lIndex
-        End If
+        AddGroup = -1
+        Try
+            AddGroup = GroupIndex(aGroupName)
+        Catch
+            AddGroup = GetMappingObject.Layers.Groups.Add(aGroupName)
+        End Try
     End Function
 
     ''' <summary>Number of features from a layer index</summary>
@@ -693,15 +685,12 @@ Public Class GisUtil
     ''' <exception cref="System.Exception" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="System.Exception" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
-    ''' <remarks>Modified by LCW 4/8/09 to prevent exceptions from being thrown (might this break other code?)</remarks>
     Public Shared Function FieldValue(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aFieldIndex As Integer) As String
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
-            'Throw New Exception("GisUtil:FieldValue:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
-            Return Nothing
+            Throw New Exception("GisUtil:FieldValue:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
         ElseIf Not FeatureIndexValid(aFeatureIndex, lSf) Then
-            'Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange")
-            Return Nothing
+            Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange")
         Else
             Dim lCellValue As Object = lSf.CellValue(aFieldIndex, aFeatureIndex)
             If lCellValue.GetType.Name = "DBNull" Then
@@ -2317,6 +2306,107 @@ Public Class GisUtil
         End Try
     End Function
 
+    ''' <summary>
+    ''' Merge all shapes in one shape file return merged shape
+    ''' </summary>
+    ''' <param name="aLayerIndexSource">Index of source layer having selected shaped</param>
+    ''' <returns></returns>
+    ''' <remarks>Programmed by LCW for GBMM project</remarks>
+    <CLSCompliant(False)> _
+    Public Shared Function MergeAllShapes(ByVal aLayerIndexSource As Integer) As MapWinGIS.Shape
+        Try
+            'build collection of selected shape indexes
+            Dim lSelectedShapeIndexes As New atcCollection
+            For lIndex As Integer = 1 To NumFeatures(aLayerIndexSource)
+                lSelectedShapeIndexes.Add(lIndex - 1)
+            Next
+            lSelectedShapeIndexes.Sort()
+            If lSelectedShapeIndexes.Count = 0 Then Return Nothing
+
+            'copy source file to temp file
+            Dim tempfile As String = My.Computer.FileSystem.SpecialDirectories.Temp & "\tempfile.shp"
+
+            If Not MapWinGeoProc.DataManagement.CopyShapefile(LayerFileName(aLayerIndexSource), tempfile) Then Return Nothing
+
+            Dim mergeShp As MapWinGIS.Shape
+
+            Dim sfSource As New MapWinGIS.Shapefile
+
+            With sfSource
+                If Not .Open(tempfile) Then Return Nothing
+                If Not .StartEditingShapes(True) Then Return Nothing
+
+                'insert first shape at end
+                If Not .EditInsertShape(.Shape(lSelectedShapeIndexes(0)), .NumShapes) Then Return Nothing
+
+                For i As Integer = 1 To lSelectedShapeIndexes.Count - 1
+                    Dim newShp As New MapWinGIS.Shape
+                    If Not newShp.Create(.ShapefileType) Then Return Nothing
+                    If Not MapWinGeoProc.SpatialOperations.MergeShapes(sfSource, lSelectedShapeIndexes(i), .NumShapes - 1, newShp) Then Return Nothing
+                    'replace last shape with this one
+                    If Not .EditDeleteShape(.NumShapes - 1) Then Return Nothing
+                    If Not .EditInsertShape(newShp, .NumShapes) Then Return Nothing
+                    If pStatusShow Then Logger.Progress("Merging shapes...", i, lSelectedShapeIndexes.Count - 1)
+                    System.Windows.Forms.Application.DoEvents()
+                Next
+
+                'now all selected have been merged into last shape; save it for later
+                mergeShp = .Shape(.NumShapes - 1)
+
+                If Not .StopEditingShapes(False, True) Then Return Nothing
+                If Not .Close() Then Return Nothing
+                My.Computer.FileSystem.DeleteFile(tempfile)
+            End With
+
+            Return mergeShp
+
+        Catch ex As Exception
+            Throw ex
+            Return Nothing
+        Finally
+            Logger.Progress("", 100, 100) 'clear the progressbar
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Remove all vertices that are closer than specified distance
+    ''' </summary>
+    ''' <param name="shp">Polygon shape to be filtered</param>
+    ''' <param name="FilterSize">Minimum distance between adjacent points</param>
+    ''' <returns>True if successful</returns>
+    ''' <remarks>Programmed by LCW for GBMM project</remarks>
+    <CLSCompliant(False)> _
+    Public Shared Function FilterShape(ByRef shp As MapWinGIS.Shape, ByVal FilterSize As Single) As Boolean
+        Try
+            With shp
+                Dim lstPoints As New Generic.List(Of MapWinGIS.Point)
+                lstPoints.Add(.Point(0))
+                Dim lastPt As MapWinGIS.Point = .Point(0)
+                For i As Integer = 1 To .numPoints - 2
+                    With .Point(i)
+                        Dim dist As Single = Math.Sqrt((.x - lastPt.x) ^ 2 + (.y - lastPt.y) ^ 2)
+                        If dist > FilterSize Then
+                            lstPoints.Add(shp.Point(i))
+                            lastPt = shp.Point(i)
+                        End If
+                    End With
+                Next
+                lstPoints.Add(.Point(.numPoints - 1))
+                Dim shpNew As New MapWinGIS.Shape
+                shpNew.Create(.ShapeType)
+                For i As Integer = 0 To lstPoints.Count - 1
+                    shpNew.InsertPoint(lstPoints(i), i)
+                Next
+                shp = shpNew
+            End With
+            Return True
+
+        Catch ex As Exception
+            Throw ex
+            Return False
+        End Try
+    End Function
+
     Public Shared Function AreaOverlappingPolygons(ByVal aLayer1index As Integer, _
                                                    ByVal aLayer1FeatureIndex As Integer, _
                                                    ByVal aLayer2index As Integer, _
@@ -3139,6 +3229,161 @@ Public Class GisUtil
     End Function
 
     ''' <summary>
+    ''' Can be used to cancel long-running calcs
+    ''' </summary>
+    ''' <remarks>Caller can monitor some event and set this true to cancel routine</remarks>
+    Public Shared Cancel As Boolean
+
+    ''' <summary>
+    ''' Can be used to report progress in long-running routine when logger.progress is not enough
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Shared Event Progress(ByVal Message As String, ByVal ItemNum As Integer, ByVal MaxItemNum As Integer)
+
+    ''' <summary>Given a shapefile (landuse) and polygon (subbasin) layers, calculate the area of each landuse category 
+    '''          within each subbasin polygon.</summary>
+    ''' <remark>This function can be accomplished in MapWindow by 
+    '''         looping through each grid cell and counting the 
+    '''         number of cells of each grid category within each 
+    '''         feature. The MapWinGIS calls to use include the Grid 
+    '''         Property Value, the GridHeader Properties dX, dY, XllCenter, 
+    '''         and YllCenter, and the Shapefile Function PointInShapefile.</remark>
+    ''' <param name="SubbasinLayerName">Name of shapefile (e.g., subbasins)</param>
+    ''' <param name="SubbasinFieldName">Name of field containing subbasin ID or Name</param>
+    ''' <param name="LanduseLayerName">Name of grid file (e.g., landuse)</param>
+    ''' <returns>Output is dictionary (key is polygon ID) of dictionaries (key is grid value, value is area).</returns>
+    ''' <remarks>Added by Chris Wilson 5/24/2009</remarks>
+    Public Shared Function TabulateAreas(ByVal SubbasinLayerName As String, ByVal SubbasinFieldName As String, _
+                                         ByVal LanduseLayerName As String, ByVal LanduseFieldName As String) _
+                                         As Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
+        Cancel = False
+        Dim sfSubbasin As MapWinGIS.Shapefile = Nothing, sfLanduse As MapWinGIS.Shapefile = Nothing
+        Try
+            If Not (IsLayer(LanduseLayerName) AndAlso IsField(LayerIndex(LanduseLayerName), LanduseFieldName) AndAlso IsLayer(SubbasinLayerName) AndAlso IsField(LayerIndex(SubbasinLayerName), SubbasinFieldName)) Then Throw New Exception("Layer or field does not exist.")
+
+            sfSubbasin = New MapWinGIS.Shapefile
+            If Not sfSubbasin.Open(LayerFileName(SubbasinLayerName)) Then Throw New Exception("Unable to open layer: " & SubbasinLayerName)
+            Dim fldSubbasin As Integer = FieldIndex(LayerIndex(SubbasinLayerName), SubbasinFieldName)
+
+            sfLanduse = New MapWinGIS.Shapefile
+            If Not sfLanduse.Open(LayerFileName(LanduseLayerName)) Then Throw New Exception("Unable to open layer: " & LanduseLayerName)
+            Dim fldLanduse As Integer = FieldIndex(LayerIndex(LanduseLayerName), LanduseFieldName)
+
+            Dim dictSubbasin As New Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
+
+            For i As Integer = 0 To sfSubbasin.NumShapes - 1
+                Dim shpSubbasin As MapWinGIS.Shape = sfSubbasin.Shape(i)
+                Dim extSB As MapWinGIS.Extents = sfSubbasin.QuickExtents(i)
+                Dim ID As String = sfSubbasin.CellValue(fldSubbasin, i)
+                If dictSubbasin.ContainsKey(id) Then
+                    Logger.Message(String.Format("Subbasin name field ({0}) contains duplicate values.", SubbasinFieldName), "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+                    Return Nothing
+                End If
+                dictSubbasin.Add(ID, New Generic.SortedDictionary(Of String, Single))
+                Dim jmax As Integer = sfLanduse.NumShapes - 1
+                For j As Integer = 0 To jmax
+                    Dim extLU As MapWinGIS.Extents = sfLanduse.QuickExtents(j)
+
+                    'see if not possible for shapes to intersect
+                    With extSB
+                        If Not (.xMax < extLU.xMin OrElse .xMin > extLU.xMax OrElse .yMax < extLU.yMin OrElse .yMin > extLU.yMax) Then
+                            Dim shpLanduse As MapWinGIS.Shape = sfLanduse.Shape(j)
+                            Dim shpInt As MapWinGIS.Shape = MapWinGeoProc.SpatialOperations.Intersection(shpSubbasin, shpLanduse)
+                            If shpInt.numPoints > 0 Then
+                                Dim LandUse As String = sfLanduse.CellValue(fldLanduse, j)
+                                If Not dictSubbasin(ID).ContainsKey(LandUse) Then dictSubbasin(ID).Add(LandUse, 0.0)
+                                dictSubbasin(ID)(LandUse) += MapWinGeoProc.Utils.Area(shpInt)
+                            End If
+                        End If
+                    End With
+                    Logger.Progress("Tabulating areas...", j, jmax)
+                    RaiseEvent Progress("Tabulating areas...", j, jmax)
+                    If Cancel Then Return Nothing
+                Next
+            Next
+            Return dictSubbasin
+        Catch ex As Exception
+            Throw ex
+        Finally
+            If sfSubbasin IsNot Nothing Then sfSubbasin.Close()
+            If sfLanduse IsNot Nothing Then sfLanduse.Close()
+            Logger.Progress("", 1, 1)
+        End Try
+    End Function
+
+    ''' <summary>Given a grid (landuse) and polygon (subbasin) layers, calculate the area of each grid category 
+    '''          within each polygon.</summary>
+    ''' <remark>This function can be accomplished in MapWindow by 
+    '''         looping through each grid cell and counting the 
+    '''         number of cells of each grid category within each 
+    '''         feature. The MapWinGIS calls to use include the Grid 
+    '''         Property Value, the GridHeader Properties dX, dY, XllCenter, 
+    '''         and YllCenter, and the Shapefile Function PointInShapefile.</remark>
+    ''' <param name="SubbasinLayerName">Name of shapefile (e.g., subbasins)</param>
+    ''' <param name="SubbasinFieldName">Name of field containing subbasin ID or Name</param>
+    ''' <param name="LanduseLayerName">Name of grid file (e.g., landuse)</param>
+    ''' <returns>Output is dictionary (key is polygon ID) of dictionaries (key is grid value, value is area).</returns>
+    ''' <remarks>Added by Chris Wilson 5/24/2009</remarks>
+    Public Shared Function TabulateAreas(ByVal SubbasinLayerName As String, ByVal SubbasinFieldName As String, _
+                                         ByVal LanduseLayerName As String) As Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
+
+        Cancel = False
+        Dim sfSubbasin As New MapWinGIS.Shapefile, gLandUse As New MapWinGIS.Grid
+
+        Try
+            If Not (IsLayer(LanduseLayerName) AndAlso IsLayer(SubbasinLayerName) AndAlso IsField(LayerIndex(SubbasinLayerName), SubbasinFieldName)) Then Throw New Exception("Layer or field does not exist.")
+
+            If Not sfSubbasin.Open(LayerFileName(SubbasinLayerName)) Then Throw New Exception("Unable to open layer: " & SubbasinLayerName)
+            sfSubbasin.BeginPointInShapefile()
+            Dim fldSubbasin As Integer = FieldIndex(LayerIndex(SubbasinLayerName), SubbasinFieldName)
+
+            gLandUse.Open(LayerFileName(LanduseLayerName))
+
+            Dim dictSubbasin As New Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
+
+            With gLandUse.Header
+                Dim x, y, x0, y0 As Double
+                gLandUse.CellToProj(0, 0, x0, y0)
+                Dim dx As Double = .dX
+                Dim dy As Double = .dY
+                Dim gridarea As Double = dx * dy
+                y = y0
+                For r As Integer = 0 To .NumberRows - 1
+                    Dim ar(.NumberCols - 1) As Single
+                    gLandUse.GetRow(r, ar(0))
+                    x = x0
+                    For c As Integer = 0 To .NumberCols - 1
+                        Dim LandUse As String = ar(c)
+                        Dim shpnum As Integer = sfSubbasin.PointInShapefile(x, y)
+                        If shpnum <> -1 Then
+                            Dim ID As String = sfSubbasin.CellValue(fldSubbasin, shpnum)
+                            If Not dictSubbasin.ContainsKey(ID) Then dictSubbasin.Add(ID, New Generic.SortedDictionary(Of String, Single))
+                            With dictSubbasin(ID)
+                                If Not .ContainsKey(LandUse) Then .Add(LandUse, 0.0)
+                                .Item(LandUse) += gridarea
+                            End With
+                        End If
+                        x += dx
+                    Next
+                    Logger.Progress("Tabulating areas...", r, .NumberRows - 1)
+                    RaiseEvent Progress("Tabulating areas...", r, .NumberRows - 1)
+                    If Cancel Then Return Nothing
+                    y -= dy
+                Next
+            End With
+
+            Return dictSubbasin
+        Catch ex As Exception
+            Throw ex
+        Finally
+            sfSubbasin.EndPointInShapefile()
+            sfSubbasin.Close()
+            gLandUse.Close()
+            Logger.Progress("", 1, 1)
+        End Try
+    End Function
+
+    ''' <summary>
     ''' Create unique color scheme for grid layer
     ''' </summary>
     ''' <param name="aLayerIndex"></param>
@@ -3157,31 +3402,36 @@ Public Class GisUtil
         'Get unique values
         Dim lValuesHt As New Hashtable
         Dim lIndex As Integer
-        For r As Integer = 0 To g.Header.NumberRows - 1
-            Dim v(g.Header.NumberCols - 1) As Single
-            g.GetRow(r, v(0))
-            For c As Integer = 0 To g.Header.NumberCols - 1
-                If v(c) <> g.Header.NodataValue AndAlso Not lValuesHt.ContainsKey(v(c)) Then lValuesHt.Add(v(c), v(c))
+        With g.Header
+            Dim NoDataValue As Single = g.Header.NodataValue
+            Dim NumRows As Integer = .NumberRows
+            Dim NumCols As Integer = .NumberCols
+            For r As Integer = 0 To NumRows - 1
+                Dim v(NumCols - 1) As Single
+                g.GetRow(r, v(0))
+                For c As Integer = 0 To NumCols - 1
+                    If v(c) <> NoDataValue AndAlso Not lValuesHt.ContainsKey(v(c)) Then lValuesHt.Add(v(c), v(c))
+                Next
             Next
-        Next
 
-        'Create sorted array
-        Dim lValuesArray() As Single
-        ReDim lValuesArray(lValuesHt.Count - 1)
-        lValuesHt.Values().CopyTo(lValuesArray, 0)
-        Array.Sort(lValuesArray)
+            'Create sorted array
+            Dim lValuesArray() As Single
+            ReDim lValuesArray(lValuesHt.Count - 1)
+            lValuesHt.Values().CopyTo(lValuesArray, 0)
+            Array.Sort(lValuesArray)
 
-        'Create color for each unique value
-        For lIndex = 0 To lValuesArray.Length - 1
-            Dim lBreak As New MapWinGIS.GridColorBreak
-            lBreak.LowColor = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
-            lBreak.HighColor = lBreak.LowColor
-            lBreak.LowValue = lValuesArray(lIndex) - 0.00001
-            lBreak.HighValue = lValuesArray(lIndex) + 0.00001
-            lBreak.Caption = lValuesArray(Math.Round(lIndex, 5))
-            lColorScheme.InsertBreak(lBreak)
-        Next
-        lMWlayer.ColoringScheme = lColorScheme
+            'Create color for each unique value
+            For lIndex = 0 To lValuesArray.Length - 1
+                Dim lBreak As New MapWinGIS.GridColorBreak
+                lBreak.LowColor = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+                lBreak.HighColor = lBreak.LowColor
+                lBreak.LowValue = lValuesArray(lIndex) - 0.00001
+                lBreak.HighValue = lValuesArray(lIndex) + 0.00001
+                lBreak.Caption = lValuesArray(Math.Round(lIndex, 5))
+                lColorScheme.InsertBreak(lBreak)
+            Next
+            lMWlayer.ColoringScheme = lColorScheme
+        End With
     End Sub
 
 #End Region
