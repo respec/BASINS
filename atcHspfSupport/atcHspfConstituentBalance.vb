@@ -190,10 +190,12 @@ Public Module ConstituentBalance
                                         End If
                                 End If
                             Next
-                            If aDateRows Then
-                                lString.Append(.ToStringPivoted)
-                            Else
-                                lString.Append(.ToString)
+                            If lOutputTable.NumFields > 0 Then
+                                If aDateRows Then
+                                    lString.Append(.ToStringPivoted)
+                                Else
+                                    lString.Append(.ToString)
+                                End If
                             End If
                         End With
                     Catch lEx As Exception
