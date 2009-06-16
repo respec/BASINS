@@ -279,7 +279,7 @@ Public Module PollutantLoading
                         lBMPArea = 0.0
                         If lBMPLayerType = 1 Then
                             'point layer
-                            If GisUtil.PointInPolygon(lBMPLayerIndex, k, lSubbasinLayerIndex) = lSelectedAreaIndexes(i + 1) Then
+                            If GisUtil.PointInPolygon(lBMPLayerIndex, k - 1, lSubbasinLayerIndex) = lSelectedAreaIndexes(i + 1) Then
                                 lBMPArea = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPAreaFieldIndex)
                             End If
                         Else
@@ -359,7 +359,7 @@ Public Module PollutantLoading
                 'for each point source feature
                 For k = 1 To GisUtil.NumFeatures(lPointLayerIndex)
                     'is there an intersect?
-                    j = GisUtil.PointInPolygon(lPointLayerIndex, k, lSubbasinLayerIndex)
+                    j = GisUtil.PointInPolygon(lPointLayerIndex, k - 1, lSubbasinLayerIndex)
                     For i = 0 To lSelectedAreaIndexes.Count - 1
                         If j = lSelectedAreaIndexes(i + 1) Then
                             'found it in a selected subbasin

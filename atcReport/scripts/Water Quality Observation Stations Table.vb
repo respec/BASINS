@@ -59,7 +59,7 @@ Public Module WQObservationStationsTable
                 'loop through each selected polygon and wq point looking for overlap
                 For i = 1 To GisUtil.NumFeatures(lWQLayerIndex)
                     System.Windows.Forms.Application.DoEvents()
-                    lPolygonIndex = GisUtil.PointInPolygon(lWQLayerIndex, i, aAreaLayerIndex)
+                    lPolygonIndex = GisUtil.PointInPolygon(lWQLayerIndex, i - 1, aAreaLayerIndex)
                     If lPolygonIndex > -1 Then
                         For j = 1 To aSelectedAreaIndexes.Count
                             If aSelectedAreaIndexes(j) = lPolygonIndex Then

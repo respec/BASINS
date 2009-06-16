@@ -57,7 +57,7 @@ Public Module ListedSegmentsTable
             For j = 1 To aSelectedAreaIndexes.Count
                 For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
                     System.Windows.Forms.Application.DoEvents()
-                    If GisUtil.LineInPolygon(lImpairedLayerIndex, i, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
+                    If GisUtil.LineInPolygon(lImpairedLayerIndex, i - 1, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
                         'these overlap
                         lGridSource.Rows = lGridSource.Rows + 1
                         lGridSource.CellValue(lGridSource.Rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaIDFieldIndex)

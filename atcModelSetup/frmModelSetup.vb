@@ -1717,7 +1717,7 @@ Public Class frmModelSetup
             Me.Refresh()
             Dim i As Integer = GisUtil.LayerIndex(lOutletsThemeName)
             For j As Integer = 1 To GisUtil.NumFeatures(i)
-                Dim k As Integer = GisUtil.PointInPolygon(i, j, lSubbasinLayerIndex)
+                Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
                 If k > -1 Then
                     lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
                 Else
