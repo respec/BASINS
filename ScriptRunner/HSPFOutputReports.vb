@@ -12,7 +12,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
 Module HSPFOutputReports
-    Private pBaseDrive As String = "H:"
+    Private pBaseDrive As String = "d:"
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
     Private pBaseName As String
@@ -42,21 +42,21 @@ Module HSPFOutputReports
         'Dim lTestName As String = "hyd_man"
         'Dim lTestName As String = "shena"
         'Dim lTestName As String = "mono_lu2030a2_base"
-        'Dim lTestName As String = "upatoi"
+        Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "housatonic"
         'Dim lTestName As String = "beaver"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
         'Dim lTestName As String = "SantaClara"
-        Dim lTestName As String = "NonUpatoi"
+        'Dim lTestName As String = "NonUpatoi"
 
         'pConstituents.Add("Water")
-        pConstituents.Add("Sediment")
+        'pConstituents.Add("Sediment")
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
         'pConstituents.Add("BOD-PQUAL")
-        'pConstituents.Add("TotalN")
-        'pConstituents.Add("TotalP")
+        pConstituents.Add("TotalN")
+        pConstituents.Add("TotalP")
 
         Select Case lTestName
             Case "mono"
@@ -109,8 +109,8 @@ Module HSPFOutputReports
                 pBaseName = "base"
                 pOutputLocations.Add("Lynnwood")
             Case "upatoi"
-                'pTestPath = "D:\Basins\modelout\Upatoi"
-                pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
+                pTestPath = "D:\Basins\modelout\Upatoi"
+                'pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
                 'pTestPath = "C:\Basins\data\20710-01\Upatoi"
                 pBaseName = "Upatoi"
                 'pOutputLocations.Add("R:639")
@@ -178,11 +178,7 @@ Module HSPFOutputReports
                 pImplndSegmentStarts = pUpatoiImplndSegmentStarts
                 pCurveStepType = "NonStep" 'Tony's convention 
                 pWaterYears = True 'TODO: figure this out from run
-
         End Select
-
-
-
     End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -223,21 +219,22 @@ Module HSPFOutputReports
         'watershed summary
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
         Dim lRunMade As String = lHspfBinFileInfo.LastWriteTime.ToString
+        Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
+                Format(Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
 
-        Dim lOutfoldername As String = "Reports_" & pBaseName & "_" & Format(Month(lRunMade), "00") & Format(Day(lRunMade), "00") & _
-                Format(Year(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00") & "\"
-        'A folder name is given that has the basename and teh time when the run was made.
-        System.IO.File.Copy(pBaseName & ".uci", lOutfoldername & pBaseName & Format(Month(lRunMade), "00") & _
-                Format(Day(lRunMade), "00") & Format(Year(lRunMade), "00") & Format(Hour(lRunMade), "00") & _
-                Format(Minute(lRunMade), "00") & ".uci")
-        'A copy of uci is made that has the pbasename and the time it was last run.
+        'A folder name is given that has the basename and the time when the run was made.
+        Dim lOutfoldername As String = "Reports_" & pBaseName & "_" & lDateString & "\"
+        TryDelete(lOutfoldername)
+        IO.Directory.CreateDirectory(lOutfoldername)
+        'dont change name of uci - make it easier to compare with others, foldername contains info about which run
+        System.IO.File.Copy(pBaseName & ".uci", lOutfoldername & pBaseName & ".uci")
+        'todo: should other output files be copied too?
 
         'build collection of operation types to report
         Dim lOperationTypes As New atcCollection
         lOperationTypes.Add("P:", "PERLND")
         lOperationTypes.Add("I:", "IMPLND")
         lOperationTypes.Add("R:", "RCHRES")
-
 
         'area report
         Dim lStr As String = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutfoldername & "\")
