@@ -360,10 +360,12 @@ Public Module WatershedConstituentBalance
                                     End If
                                 End If
                             Next lConstituentKey
-                            If aSegmentRows Then
-                                lString.AppendLine(.ToStringPivoted)
-                            Else
-                                lString.AppendLine(.ToString)
+                            If lOutputTable.NumFields > 0 Then
+                                If aSegmentRows Then
+                                    lString.AppendLine(.ToStringPivoted)
+                                Else
+                                    lString.AppendLine(.ToString)
+                                End If
                             End If
                         End With
                     Catch lEx As Exception
