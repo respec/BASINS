@@ -279,13 +279,17 @@ TryAgain:
 
     Public Overrides Function ToString() As String
         Dim lSB As New Text.StringBuilder
-        lSB.Append(Header)
-        lSB.AppendLine(String.Join(Delimiter, pFieldNames, 1, NumFields))
-        Dim lLastRecord As Integer = pRecords.Count - 1
-        For lRecordIndex As Integer = 1 To lLastRecord
-            'For Each lRecord As String In pRecords 'This includes the empty record at index 0
-            lSB.AppendLine(pRecords(lRecordIndex).TrimEnd)
-        Next
+        If pRecords.Count > 0 Then
+            lSB.Append(Header)
+            lSB.AppendLine(String.Join(Delimiter, pFieldNames, 1, NumFields))
+            Dim lLastRecord As Integer = pRecords.Count - 1
+            For lRecordIndex As Integer = 1 To lLastRecord
+                'For Each lRecord As String In pRecords 'This includes the empty record at index 0
+                lSB.AppendLine(pRecords(lRecordIndex).TrimEnd)
+            Next
+        Else
+            'TODO: should this be an exception?
+        End If
         Return lSB.ToString
     End Function
 
