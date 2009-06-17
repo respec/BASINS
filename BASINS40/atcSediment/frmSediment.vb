@@ -119,12 +119,12 @@ Friend Class frmSediment
     End Sub
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSediment))
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.tabSEDIMENT = New System.Windows.Forms.TabControl
         Me.tabGeneral = New System.Windows.Forms.TabPage
         Me.txtOutputName = New System.Windows.Forms.TextBox
@@ -239,7 +239,7 @@ Friend Class frmSediment
         Me.tabSEDIMENT.Location = New System.Drawing.Point(14, 14)
         Me.tabSEDIMENT.Name = "tabSEDIMENT"
         Me.tabSEDIMENT.SelectedIndex = 0
-        Me.tabSEDIMENT.Size = New System.Drawing.Size(739, 409)
+        Me.tabSEDIMENT.Size = New System.Drawing.Size(739, 312)
         Me.tabSEDIMENT.TabIndex = 0
         '
         'tabGeneral
@@ -255,7 +255,7 @@ Friend Class frmSediment
         Me.tabGeneral.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tabGeneral.Location = New System.Drawing.Point(4, 25)
         Me.tabGeneral.Name = "tabGeneral"
-        Me.tabGeneral.Size = New System.Drawing.Size(731, 380)
+        Me.tabGeneral.Size = New System.Drawing.Size(731, 283)
         Me.tabGeneral.TabIndex = 0
         Me.tabGeneral.Text = "General"
         Me.tabGeneral.UseVisualStyleBackColor = True
@@ -266,7 +266,7 @@ Friend Class frmSediment
         Me.HelpProvider1.SetHelpString(Me.txtOutputName, "Enter name of folder where output reports will be stored. This folder will be pla" & _
                 "ced under the BASINS data directory for this project (e.g., C:\Basins\Data\03060" & _
                 "201\Sediment\Report 1)")
-        Me.txtOutputName.Location = New System.Drawing.Point(167, 191)
+        Me.txtOutputName.Location = New System.Drawing.Point(167, 142)
         Me.txtOutputName.Name = "txtOutputName"
         Me.HelpProvider1.SetShowHelp(Me.txtOutputName, True)
         Me.txtOutputName.Size = New System.Drawing.Size(543, 20)
@@ -277,15 +277,15 @@ Friend Class frmSediment
         Me.txtGridSize.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.txtGridSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtGridSize.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.txtGridSize.DefaultValue = 30
+        Me.txtGridSize.DefaultValue = "30"
         Me.txtGridSize.HardMax = 1000
         Me.txtGridSize.HardMin = 0
         Me.HelpProvider1.SetHelpString(Me.txtGridSize, "Enter the desired grid side for all grid layers that will be created.")
         Me.txtGridSize.InsideLimitsBackground = System.Drawing.Color.White
-        Me.txtGridSize.Location = New System.Drawing.Point(167, 217)
-        Me.txtGridSize.MaxDecimal = 0
-        Me.txtGridSize.maxWidth = 20
+        Me.txtGridSize.Location = New System.Drawing.Point(167, 168)
+        Me.txtGridSize.MaxWidth = 20
         Me.txtGridSize.Name = "txtGridSize"
+        Me.txtGridSize.NumericFormat = "0.#####"
         Me.txtGridSize.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.txtGridSize.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
         Me.txtGridSize.SelLength = 0
@@ -295,7 +295,8 @@ Friend Class frmSediment
         Me.txtGridSize.SoftMax = 300
         Me.txtGridSize.SoftMin = 5
         Me.txtGridSize.TabIndex = 4
-        Me.txtGridSize.Value = CType(30, Long)
+        Me.txtGridSize.ValueDouble = 30
+        Me.txtGridSize.ValueInteger = 30
         '
         'Label1
         '
@@ -314,7 +315,7 @@ Friend Class frmSediment
         '
         Me.lblGridSize.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblGridSize.AutoSize = True
-        Me.lblGridSize.Location = New System.Drawing.Point(21, 222)
+        Me.lblGridSize.Location = New System.Drawing.Point(21, 173)
         Me.lblGridSize.Name = "lblGridSize"
         Me.lblGridSize.Size = New System.Drawing.Size(89, 13)
         Me.lblGridSize.TabIndex = 3
@@ -327,7 +328,7 @@ Friend Class frmSediment
         Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.HelpProvider1.SetHelpString(Me.cboSubbasins, "Select the polygon shapefile layer containing one or more subbasins for which you" & _
                 " want erosion and sediment computed.")
-        Me.cboSubbasins.Location = New System.Drawing.Point(167, 289)
+        Me.cboSubbasins.Location = New System.Drawing.Point(167, 240)
         Me.cboSubbasins.Name = "cboSubbasins"
         Me.HelpProvider1.SetShowHelp(Me.cboSubbasins, True)
         Me.cboSubbasins.Size = New System.Drawing.Size(543, 21)
@@ -338,7 +339,7 @@ Friend Class frmSediment
         '
         Me.lblOutput.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblOutput.AutoSize = True
-        Me.lblOutput.Location = New System.Drawing.Point(21, 195)
+        Me.lblOutput.Location = New System.Drawing.Point(21, 146)
         Me.lblOutput.Name = "lblOutput"
         Me.lblOutput.Size = New System.Drawing.Size(105, 13)
         Me.lblOutput.TabIndex = 1
@@ -348,7 +349,7 @@ Friend Class frmSediment
         '
         Me.lblSubbasinsLayer.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblSubbasinsLayer.AutoSize = True
-        Me.lblSubbasinsLayer.Location = New System.Drawing.Point(21, 292)
+        Me.lblSubbasinsLayer.Location = New System.Drawing.Point(21, 243)
         Me.lblSubbasinsLayer.Name = "lblSubbasinsLayer"
         Me.lblSubbasinsLayer.Size = New System.Drawing.Size(88, 13)
         Me.lblSubbasinsLayer.TabIndex = 7
@@ -363,7 +364,7 @@ Friend Class frmSediment
         Me.tabSoils.Controls.Add(Me.lblSoilsLayer)
         Me.tabSoils.Location = New System.Drawing.Point(4, 25)
         Me.tabSoils.Name = "tabSoils"
-        Me.tabSoils.Size = New System.Drawing.Size(512, 289)
+        Me.tabSoils.Size = New System.Drawing.Size(731, 283)
         Me.tabSoils.TabIndex = 1
         Me.tabSoils.Text = "Soil Type"
         Me.tabSoils.UseVisualStyleBackColor = True
@@ -372,7 +373,7 @@ Friend Class frmSediment
         '
         Me.lblSoilIDField.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblSoilIDField.AutoSize = True
-        Me.lblSoilIDField.Location = New System.Drawing.Point(22, 201)
+        Me.lblSoilIDField.Location = New System.Drawing.Point(22, 198)
         Me.lblSoilIDField.Name = "lblSoilIDField"
         Me.lblSoilIDField.Size = New System.Drawing.Size(93, 13)
         Me.lblSoilIDField.TabIndex = 3
@@ -385,10 +386,10 @@ Friend Class frmSediment
         Me.cboSoilIDField.FormattingEnabled = True
         Me.HelpProvider1.SetHelpString(Me.cboSoilIDField, "Select the field containing the soil type identifier (this is used in the Erosion" & _
                 " Coefficients lookup to determine the K factor).")
-        Me.cboSoilIDField.Location = New System.Drawing.Point(168, 197)
+        Me.cboSoilIDField.Location = New System.Drawing.Point(168, 194)
         Me.cboSoilIDField.Name = "cboSoilIDField"
         Me.HelpProvider1.SetShowHelp(Me.cboSoilIDField, True)
-        Me.cboSoilIDField.Size = New System.Drawing.Size(325, 21)
+        Me.cboSoilIDField.Size = New System.Drawing.Size(544, 21)
         Me.cboSoilIDField.Sorted = True
         Me.cboSoilIDField.TabIndex = 4
         '
@@ -400,7 +401,7 @@ Friend Class frmSediment
         Me.Label3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.Label3.Location = New System.Drawing.Point(3, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(506, 115)
+        Me.Label3.Size = New System.Drawing.Size(725, 115)
         Me.Label3.TabIndex = 0
         Me.Label3.Text = resources.GetString("Label3.Text")
         Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -411,10 +412,10 @@ Friend Class frmSediment
         Me.cboSoilLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSoilLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.HelpProvider1.SetHelpString(Me.cboSoilLayer, "Select the polygon shapefile layer defining the soil type distribution.")
-        Me.cboSoilLayer.Location = New System.Drawing.Point(168, 171)
+        Me.cboSoilLayer.Location = New System.Drawing.Point(168, 168)
         Me.cboSoilLayer.Name = "cboSoilLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboSoilLayer, True)
-        Me.cboSoilLayer.Size = New System.Drawing.Size(325, 21)
+        Me.cboSoilLayer.Size = New System.Drawing.Size(544, 21)
         Me.cboSoilLayer.Sorted = True
         Me.cboSoilLayer.TabIndex = 2
         '
@@ -422,7 +423,7 @@ Friend Class frmSediment
         '
         Me.lblSoilsLayer.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblSoilsLayer.AutoSize = True
-        Me.lblSoilsLayer.Location = New System.Drawing.Point(22, 174)
+        Me.lblSoilsLayer.Location = New System.Drawing.Point(22, 171)
         Me.lblSoilsLayer.Name = "lblSoilsLayer"
         Me.lblSoilsLayer.Size = New System.Drawing.Size(83, 13)
         Me.lblSoilsLayer.TabIndex = 1
@@ -441,7 +442,7 @@ Friend Class frmSediment
         Me.tabLanduse.Controls.Add(Me.lblLanduseType)
         Me.tabLanduse.Location = New System.Drawing.Point(4, 25)
         Me.tabLanduse.Name = "tabLanduse"
-        Me.tabLanduse.Size = New System.Drawing.Size(512, 289)
+        Me.tabLanduse.Size = New System.Drawing.Size(731, 283)
         Me.tabLanduse.TabIndex = 2
         Me.tabLanduse.Text = "Land Use"
         Me.tabLanduse.UseVisualStyleBackColor = True
@@ -454,7 +455,7 @@ Friend Class frmSediment
         Me.Label4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.Label4.Location = New System.Drawing.Point(3, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(506, 115)
+        Me.Label4.Size = New System.Drawing.Size(725, 115)
         Me.Label4.TabIndex = 0
         Me.Label4.Text = resources.GetString("Label4.Text")
         Me.Label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -464,9 +465,9 @@ Friend Class frmSediment
         Me.cboRoadLayer.AllowDrop = True
         Me.cboRoadLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboRoadLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboRoadLayer.Location = New System.Drawing.Point(165, 236)
+        Me.cboRoadLayer.Location = New System.Drawing.Point(165, 233)
         Me.cboRoadLayer.Name = "cboRoadLayer"
-        Me.cboRoadLayer.Size = New System.Drawing.Size(324, 21)
+        Me.cboRoadLayer.Size = New System.Drawing.Size(543, 21)
         Me.cboRoadLayer.Sorted = True
         Me.cboRoadLayer.TabIndex = 8
         Me.cboRoadLayer.Visible = False
@@ -475,7 +476,7 @@ Friend Class frmSediment
         '
         Me.lblRoadsLayer.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblRoadsLayer.AutoSize = True
-        Me.lblRoadsLayer.Location = New System.Drawing.Point(19, 239)
+        Me.lblRoadsLayer.Location = New System.Drawing.Point(19, 236)
         Me.lblRoadsLayer.Name = "lblRoadsLayer"
         Me.lblRoadsLayer.Size = New System.Drawing.Size(65, 13)
         Me.lblRoadsLayer.TabIndex = 7
@@ -489,10 +490,10 @@ Friend Class frmSediment
         Me.cboLandUseIDField.FormattingEnabled = True
         Me.HelpProvider1.SetHelpString(Me.cboLandUseIDField, "Select the field containing the land use identifier (this is used in the Erosion " & _
                 "Coefficients lookup to determine the C factor).")
-        Me.cboLandUseIDField.Location = New System.Drawing.Point(186, 191)
+        Me.cboLandUseIDField.Location = New System.Drawing.Point(186, 188)
         Me.cboLandUseIDField.Name = "cboLandUseIDField"
         Me.HelpProvider1.SetShowHelp(Me.cboLandUseIDField, True)
-        Me.cboLandUseIDField.Size = New System.Drawing.Size(280, 21)
+        Me.cboLandUseIDField.Size = New System.Drawing.Size(499, 21)
         Me.cboLandUseIDField.Sorted = True
         Me.cboLandUseIDField.TabIndex = 6
         '
@@ -500,7 +501,7 @@ Friend Class frmSediment
         '
         Me.lblLandUseIDField.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblLandUseIDField.AutoSize = True
-        Me.lblLandUseIDField.Location = New System.Drawing.Point(71, 194)
+        Me.lblLandUseIDField.Location = New System.Drawing.Point(71, 191)
         Me.lblLandUseIDField.Name = "lblLandUseIDField"
         Me.lblLandUseIDField.Size = New System.Drawing.Size(95, 13)
         Me.lblLandUseIDField.TabIndex = 5
@@ -512,10 +513,10 @@ Friend Class frmSediment
         Me.cboLandUseLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.HelpProvider1.SetHelpString(Me.cboLandUseLayer, "Select the shapefile or grid layer containing the land use distribution.")
-        Me.cboLandUseLayer.Location = New System.Drawing.Point(186, 164)
+        Me.cboLandUseLayer.Location = New System.Drawing.Point(186, 161)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboLandUseLayer, True)
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(280, 21)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(499, 21)
         Me.cboLandUseLayer.Sorted = True
         Me.cboLandUseLayer.TabIndex = 4
         '
@@ -523,7 +524,7 @@ Friend Class frmSediment
         '
         Me.lblLandUseLayer.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblLandUseLayer.AutoSize = True
-        Me.lblLandUseLayer.Location = New System.Drawing.Point(71, 167)
+        Me.lblLandUseLayer.Location = New System.Drawing.Point(71, 164)
         Me.lblLandUseLayer.Name = "lblLandUseLayer"
         Me.lblLandUseLayer.Size = New System.Drawing.Size(85, 13)
         Me.lblLandUseLayer.TabIndex = 3
@@ -535,17 +536,17 @@ Friend Class frmSediment
         Me.cboLanduse.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLanduse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.HelpProvider1.SetHelpString(Me.cboLanduse, "Select the type of land use layers you are using for this project.")
-        Me.cboLanduse.Location = New System.Drawing.Point(165, 136)
+        Me.cboLanduse.Location = New System.Drawing.Point(165, 133)
         Me.cboLanduse.Name = "cboLanduse"
         Me.HelpProvider1.SetShowHelp(Me.cboLanduse, True)
-        Me.cboLanduse.Size = New System.Drawing.Size(324, 21)
+        Me.cboLanduse.Size = New System.Drawing.Size(543, 21)
         Me.cboLanduse.TabIndex = 2
         '
         'lblLanduseType
         '
         Me.lblLanduseType.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblLanduseType.AutoSize = True
-        Me.lblLanduseType.Location = New System.Drawing.Point(19, 140)
+        Me.lblLanduseType.Location = New System.Drawing.Point(19, 137)
         Me.lblLanduseType.Name = "lblLanduseType"
         Me.lblLanduseType.Size = New System.Drawing.Size(112, 13)
         Me.lblLanduseType.TabIndex = 1
@@ -560,15 +561,16 @@ Friend Class frmSediment
         Me.tabDEM.Controls.Add(Me.lblDEMLayer)
         Me.tabDEM.Location = New System.Drawing.Point(4, 25)
         Me.tabDEM.Name = "tabDEM"
-        Me.tabDEM.Size = New System.Drawing.Size(512, 289)
+        Me.tabDEM.Size = New System.Drawing.Size(731, 283)
         Me.tabDEM.TabIndex = 3
         Me.tabDEM.Text = "DEM"
         Me.tabDEM.UseVisualStyleBackColor = True
         '
         'Label9
         '
+        Me.Label9.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(19, 200)
+        Me.Label9.Location = New System.Drawing.Point(19, 198)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(130, 13)
         Me.Label9.TabIndex = 3
@@ -582,7 +584,7 @@ Friend Class frmSediment
         Me.Label2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.Label2.Location = New System.Drawing.Point(3, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(506, 115)
+        Me.Label2.Size = New System.Drawing.Size(725, 115)
         Me.Label2.TabIndex = 0
         Me.Label2.Text = resources.GetString("Label2.Text")
         Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -594,7 +596,7 @@ Friend Class frmSediment
         Me.cboDEMUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.HelpProvider1.SetHelpString(Me.cboDEMUnits, "Select the units associated with the values stored in the DEM grid.")
         Me.cboDEMUnits.Items.AddRange(New Object() {"Meters", "Centimeters", "Feet"})
-        Me.cboDEMUnits.Location = New System.Drawing.Point(165, 197)
+        Me.cboDEMUnits.Location = New System.Drawing.Point(165, 195)
         Me.cboDEMUnits.Name = "cboDEMUnits"
         Me.HelpProvider1.SetShowHelp(Me.cboDEMUnits, True)
         Me.cboDEMUnits.Size = New System.Drawing.Size(120, 21)
@@ -607,10 +609,10 @@ Friend Class frmSediment
         Me.cboDEMLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.HelpProvider1.SetHelpString(Me.cboDEMLayer, "Select the digital elevation model (DEM) grid layer containing the elevations in " & _
                 "your area of interest.")
-        Me.cboDEMLayer.Location = New System.Drawing.Point(165, 171)
+        Me.cboDEMLayer.Location = New System.Drawing.Point(165, 168)
         Me.cboDEMLayer.Name = "cboDEMLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboDEMLayer, True)
-        Me.cboDEMLayer.Size = New System.Drawing.Size(324, 21)
+        Me.cboDEMLayer.Size = New System.Drawing.Size(543, 21)
         Me.cboDEMLayer.Sorted = True
         Me.cboDEMLayer.TabIndex = 2
         '
@@ -618,7 +620,7 @@ Friend Class frmSediment
         '
         Me.lblDEMLayer.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblDEMLayer.AutoSize = True
-        Me.lblDEMLayer.Location = New System.Drawing.Point(19, 174)
+        Me.lblDEMLayer.Location = New System.Drawing.Point(19, 171)
         Me.lblDEMLayer.Name = "lblDEMLayer"
         Me.lblDEMLayer.Size = New System.Drawing.Size(63, 13)
         Me.lblDEMLayer.TabIndex = 1
@@ -634,7 +636,7 @@ Friend Class frmSediment
         Me.tabCoef.Controls.Add(Me.txtRainfall)
         Me.tabCoef.Location = New System.Drawing.Point(4, 25)
         Me.tabCoef.Name = "tabCoef"
-        Me.tabCoef.Size = New System.Drawing.Size(512, 289)
+        Me.tabCoef.Size = New System.Drawing.Size(731, 283)
         Me.tabCoef.TabIndex = 4
         Me.tabCoef.Text = "Erosion Coefficients"
         Me.tabCoef.UseVisualStyleBackColor = True
@@ -656,7 +658,7 @@ Friend Class frmSediment
         Me.HelpProvider1.SetHelpString(Me.btnFillTables, "This will add any additional soil type and land use IDs found in your study area " & _
                 "to the tables below; you will need to manually type the description and K/C fact" & _
                 "ors for these items.")
-        Me.btnFillTables.Location = New System.Drawing.Point(351, 125)
+        Me.btnFillTables.Location = New System.Drawing.Point(570, 125)
         Me.btnFillTables.Name = "btnFillTables"
         Me.HelpProvider1.SetShowHelp(Me.btnFillTables, True)
         Me.btnFillTables.Size = New System.Drawing.Size(155, 23)
@@ -682,7 +684,7 @@ Friend Class frmSediment
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(506, 127)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(725, 121)
         Me.TableLayoutPanel1.TabIndex = 5
         '
         'dgSoilType
@@ -693,31 +695,31 @@ Friend Class frmSediment
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgSoilType.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgSoilType.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgSoilType.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle7
         Me.dgSoilType.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgSoilType.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.SoilID, Me.SoilDescription, Me.K})
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgSoilType.DefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgSoilType.DefaultCellStyle = DataGridViewCellStyle8
         Me.HelpProvider1.SetHelpString(Me.dgSoilType, "This contains the standard soil IDs and K factors.")
         Me.dgSoilType.Location = New System.Drawing.Point(3, 16)
         Me.dgSoilType.Name = "dgSoilType"
         Me.dgSoilType.RowTemplate.Height = 24
         Me.dgSoilType.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.HelpProvider1.SetShowHelp(Me.dgSoilType, True)
-        Me.dgSoilType.Size = New System.Drawing.Size(247, 108)
+        Me.dgSoilType.Size = New System.Drawing.Size(356, 102)
         Me.dgSoilType.TabIndex = 2
         '
         'SoilID
@@ -746,31 +748,31 @@ Friend Class frmSediment
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgLandUse.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgLandUse.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle3
+        DataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle9.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgLandUse.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle9
         Me.dgLandUse.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgLandUse.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.LandUseID, Me.LandUseDescription, Me.C})
-        DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgLandUse.DefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgLandUse.DefaultCellStyle = DataGridViewCellStyle10
         Me.HelpProvider1.SetHelpString(Me.dgLandUse, "This contains the land use IDs and C factors for the selected land use type.")
-        Me.dgLandUse.Location = New System.Drawing.Point(256, 16)
+        Me.dgLandUse.Location = New System.Drawing.Point(365, 16)
         Me.dgLandUse.Name = "dgLandUse"
         Me.dgLandUse.RowTemplate.Height = 24
         Me.dgLandUse.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.HelpProvider1.SetShowHelp(Me.dgLandUse, True)
-        Me.dgLandUse.Size = New System.Drawing.Size(247, 108)
+        Me.dgLandUse.Size = New System.Drawing.Size(357, 102)
         Me.dgLandUse.TabIndex = 3
         '
         'LandUseID
@@ -795,7 +797,7 @@ Friend Class frmSediment
         '
         Me.lblSoilType.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.lblSoilType.AutoSize = True
-        Me.lblSoilType.Location = New System.Drawing.Point(56, 0)
+        Me.lblSoilType.Location = New System.Drawing.Point(110, 0)
         Me.lblSoilType.Name = "lblSoilType"
         Me.lblSoilType.Size = New System.Drawing.Size(141, 13)
         Me.lblSoilType.TabIndex = 0
@@ -805,7 +807,7 @@ Friend Class frmSediment
         '
         Me.lblLandUse.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.lblLandUse.AutoSize = True
-        Me.lblLandUse.Location = New System.Drawing.Point(309, 0)
+        Me.lblLandUse.Location = New System.Drawing.Point(473, 0)
         Me.lblLandUse.Name = "lblLandUse"
         Me.lblLandUse.Size = New System.Drawing.Size(141, 13)
         Me.lblLandUse.TabIndex = 1
@@ -828,7 +830,7 @@ Friend Class frmSediment
         Me.Label7.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.Label7.Location = New System.Drawing.Point(3, 0)
         Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(506, 115)
+        Me.Label7.Size = New System.Drawing.Size(725, 115)
         Me.Label7.TabIndex = 0
         Me.Label7.Text = resources.GetString("Label7.Text")
         Me.Label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -854,7 +856,7 @@ Friend Class frmSediment
         Me.tabBMPs.Controls.Add(Me.chkBMPs)
         Me.tabBMPs.Location = New System.Drawing.Point(4, 25)
         Me.tabBMPs.Name = "tabBMPs"
-        Me.tabBMPs.Size = New System.Drawing.Size(512, 289)
+        Me.tabBMPs.Size = New System.Drawing.Size(731, 283)
         Me.tabBMPs.TabIndex = 5
         Me.tabBMPs.Text = "BMPs"
         Me.tabBMPs.UseVisualStyleBackColor = True
@@ -865,30 +867,30 @@ Friend Class frmSediment
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgBMP.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        DataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgBMP.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle5
+        DataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgBMP.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle11
         Me.dgBMP.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgBMP.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.BMPType, Me.BMPDescription, Me.P})
-        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgBMP.DefaultCellStyle = DataGridViewCellStyle6
+        DataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle12.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgBMP.DefaultCellStyle = DataGridViewCellStyle12
         Me.HelpProvider1.SetHelpString(Me.dgBMP, "This is the BMP type to P factor lookup table.")
         Me.dgBMP.Location = New System.Drawing.Point(225, 182)
         Me.dgBMP.Name = "dgBMP"
         Me.dgBMP.RowTemplate.Height = 24
         Me.HelpProvider1.SetShowHelp(Me.dgBMP, True)
-        Me.dgBMP.Size = New System.Drawing.Size(273, 104)
+        Me.dgBMP.Size = New System.Drawing.Size(492, 98)
         Me.dgBMP.TabIndex = 7
         '
         'BMPType
@@ -917,7 +919,7 @@ Friend Class frmSediment
         Me.Label11.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.Label11.Location = New System.Drawing.Point(3, 0)
         Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(506, 115)
+        Me.Label11.Size = New System.Drawing.Size(725, 115)
         Me.Label11.TabIndex = 0
         Me.Label11.Text = resources.GetString("Label11.Text")
         Me.Label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -962,7 +964,7 @@ Friend Class frmSediment
         Me.cboBMPIDField.Location = New System.Drawing.Point(191, 155)
         Me.cboBMPIDField.Name = "cboBMPIDField"
         Me.HelpProvider1.SetShowHelp(Me.cboBMPIDField, True)
-        Me.cboBMPIDField.Size = New System.Drawing.Size(307, 21)
+        Me.cboBMPIDField.Size = New System.Drawing.Size(526, 21)
         Me.cboBMPIDField.Sorted = True
         Me.cboBMPIDField.TabIndex = 5
         '
@@ -976,7 +978,7 @@ Friend Class frmSediment
         Me.cboBMPLayer.Location = New System.Drawing.Point(191, 127)
         Me.cboBMPLayer.Name = "cboBMPLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboBMPLayer, True)
-        Me.cboBMPLayer.Size = New System.Drawing.Size(307, 21)
+        Me.cboBMPLayer.Size = New System.Drawing.Size(526, 21)
         Me.cboBMPLayer.Sorted = True
         Me.cboBMPLayer.TabIndex = 3
         '
@@ -1006,7 +1008,7 @@ Friend Class frmSediment
         Me.tabYield.Location = New System.Drawing.Point(4, 25)
         Me.tabYield.Name = "tabYield"
         Me.tabYield.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabYield.Size = New System.Drawing.Size(512, 289)
+        Me.tabYield.Size = New System.Drawing.Size(731, 283)
         Me.tabYield.TabIndex = 6
         Me.tabYield.Text = "Sediment Yield"
         Me.tabYield.UseVisualStyleBackColor = True
@@ -1015,7 +1017,7 @@ Friend Class frmSediment
         '
         Me.lblThreshold.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblThreshold.AutoSize = True
-        Me.lblThreshold.Location = New System.Drawing.Point(23, 162)
+        Me.lblThreshold.Location = New System.Drawing.Point(23, 159)
         Me.lblThreshold.Name = "lblThreshold"
         Me.lblThreshold.Size = New System.Drawing.Size(119, 13)
         Me.lblThreshold.TabIndex = 4
@@ -1025,7 +1027,7 @@ Friend Class frmSediment
         '
         Me.txtThreshold.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.HelpProvider1.SetHelpString(Me.txtThreshold, resources.GetString("txtThreshold.HelpString"))
-        Me.txtThreshold.Location = New System.Drawing.Point(169, 160)
+        Me.txtThreshold.Location = New System.Drawing.Point(169, 157)
         Me.txtThreshold.Name = "txtThreshold"
         Me.HelpProvider1.SetShowHelp(Me.txtThreshold, True)
         Me.txtThreshold.Size = New System.Drawing.Size(100, 20)
@@ -1035,7 +1037,7 @@ Friend Class frmSediment
         '
         Me.btnMethod.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.HelpProvider1.SetHelpString(Me.btnMethod, "Click this to see a explanatory dialog box.")
-        Me.btnMethod.Location = New System.Drawing.Point(361, 131)
+        Me.btnMethod.Location = New System.Drawing.Point(580, 128)
         Me.btnMethod.Name = "btnMethod"
         Me.HelpProvider1.SetShowHelp(Me.btnMethod, True)
         Me.btnMethod.Size = New System.Drawing.Size(133, 23)
@@ -1049,17 +1051,17 @@ Friend Class frmSediment
         Me.cboSedimentDelivery.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSedimentDelivery.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.HelpProvider1.SetHelpString(Me.cboSedimentDelivery, "Select the method to be used to compute the sediment delivery ratio.")
-        Me.cboSedimentDelivery.Location = New System.Drawing.Point(169, 132)
+        Me.cboSedimentDelivery.Location = New System.Drawing.Point(169, 129)
         Me.cboSedimentDelivery.Name = "cboSedimentDelivery"
         Me.HelpProvider1.SetShowHelp(Me.cboSedimentDelivery, True)
-        Me.cboSedimentDelivery.Size = New System.Drawing.Size(182, 21)
+        Me.cboSedimentDelivery.Size = New System.Drawing.Size(401, 21)
         Me.cboSedimentDelivery.TabIndex = 2
         '
         'Label6
         '
         Me.Label6.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(23, 136)
+        Me.Label6.Location = New System.Drawing.Point(23, 133)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(134, 13)
         Me.Label6.TabIndex = 1
@@ -1073,7 +1075,7 @@ Friend Class frmSediment
         Me.Label5.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.Label5.Location = New System.Drawing.Point(3, 0)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(506, 115)
+        Me.Label5.Size = New System.Drawing.Size(725, 115)
         Me.Label5.TabIndex = 0
         Me.Label5.Text = resources.GetString("Label5.Text")
         Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -1087,7 +1089,7 @@ Friend Class frmSediment
         Me.tabResults.Controls.Add(Me.wbResults)
         Me.tabResults.Location = New System.Drawing.Point(4, 25)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(512, 289)
+        Me.tabResults.Size = New System.Drawing.Size(731, 283)
         Me.tabResults.TabIndex = 7
         Me.tabResults.Text = "Results"
         Me.tabResults.UseVisualStyleBackColor = True
@@ -1097,7 +1099,7 @@ Friend Class frmSediment
         Me.lblGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblGenerate.AutoSize = True
         Me.lblGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblGenerate.Location = New System.Drawing.Point(85, 267)
+        Me.lblGenerate.Location = New System.Drawing.Point(85, 261)
         Me.lblGenerate.Name = "lblGenerate"
         Me.lblGenerate.Size = New System.Drawing.Size(190, 13)
         Me.lblGenerate.TabIndex = 4
@@ -1107,7 +1109,7 @@ Friend Class frmSediment
         '
         Me.btnCopy.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.HelpProvider1.SetHelpString(Me.btnCopy, "Copy the entire HTML report to the clipboard.")
-        Me.btnCopy.Location = New System.Drawing.Point(4, 262)
+        Me.btnCopy.Location = New System.Drawing.Point(4, 256)
         Me.btnCopy.Name = "btnCopy"
         Me.HelpProvider1.SetShowHelp(Me.btnCopy, True)
         Me.btnCopy.Size = New System.Drawing.Size(75, 24)
@@ -1119,7 +1121,7 @@ Friend Class frmSediment
         '
         Me.btnPreview.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.HelpProvider1.SetHelpString(Me.btnPreview, "Display the print preview form.")
-        Me.btnPreview.Location = New System.Drawing.Point(353, 262)
+        Me.btnPreview.Location = New System.Drawing.Point(572, 256)
         Me.btnPreview.Name = "btnPreview"
         Me.HelpProvider1.SetShowHelp(Me.btnPreview, True)
         Me.btnPreview.Size = New System.Drawing.Size(75, 24)
@@ -1131,7 +1133,7 @@ Friend Class frmSediment
         '
         Me.btnPrint.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.HelpProvider1.SetHelpString(Me.btnPrint, "Send the HTML report to the printer.")
-        Me.btnPrint.Location = New System.Drawing.Point(434, 262)
+        Me.btnPrint.Location = New System.Drawing.Point(653, 256)
         Me.btnPrint.Name = "btnPrint"
         Me.HelpProvider1.SetShowHelp(Me.btnPrint, True)
         Me.btnPrint.Size = New System.Drawing.Size(75, 24)
@@ -1147,12 +1149,14 @@ Friend Class frmSediment
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.HelpProvider1.SetHelpString(Me.wbResults, "When the sediment computations are done, this browser will contain the summary re" & _
                 "port.")
+        Me.wbResults.IsWebBrowserContextMenuEnabled = False
         Me.wbResults.Location = New System.Drawing.Point(4, 3)
         Me.wbResults.MinimumSize = New System.Drawing.Size(20, 20)
         Me.wbResults.Name = "wbResults"
         Me.HelpProvider1.SetShowHelp(Me.wbResults, True)
-        Me.wbResults.Size = New System.Drawing.Size(505, 254)
+        Me.wbResults.Size = New System.Drawing.Size(724, 248)
         Me.wbResults.TabIndex = 0
+        Me.wbResults.WebBrowserShortcutsEnabled = False
         '
         'btnOK
         '
@@ -1160,7 +1164,7 @@ Friend Class frmSediment
         Me.btnOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.HelpProvider1.SetHelpString(Me.btnOK, "Compute the sediment generated and delivered to the subbasin outlets, and generat" & _
                 "e a summary report.")
-        Me.btnOK.Location = New System.Drawing.Point(588, 440)
+        Me.btnOK.Location = New System.Drawing.Point(588, 343)
         Me.btnOK.Name = "btnOK"
         Me.HelpProvider1.SetShowHelp(Me.btnOK, True)
         Me.btnOK.Size = New System.Drawing.Size(85, 26)
@@ -1172,7 +1176,7 @@ Friend Class frmSediment
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(678, 440)
+        Me.btnCancel.Location = New System.Drawing.Point(678, 343)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 26)
         Me.btnCancel.TabIndex = 6
@@ -1183,7 +1187,7 @@ Friend Class frmSediment
         Me.btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.btnHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.HelpProvider1.SetHelpString(Me.btnHelp, "Display the help manual.")
-        Me.btnHelp.Location = New System.Drawing.Point(305, 440)
+        Me.btnHelp.Location = New System.Drawing.Point(305, 343)
         Me.btnHelp.Name = "btnHelp"
         Me.HelpProvider1.SetShowHelp(Me.btnHelp, True)
         Me.btnHelp.Size = New System.Drawing.Size(75, 26)
@@ -1196,7 +1200,7 @@ Friend Class frmSediment
         Me.btnAbout.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.HelpProvider1.SetHelpString(Me.btnAbout, "Describe information about this application.")
-        Me.btnAbout.Location = New System.Drawing.Point(385, 440)
+        Me.btnAbout.Location = New System.Drawing.Point(385, 343)
         Me.btnAbout.Name = "btnAbout"
         Me.HelpProvider1.SetShowHelp(Me.btnAbout, True)
         Me.btnAbout.Size = New System.Drawing.Size(75, 26)
@@ -1209,7 +1213,7 @@ Friend Class frmSediment
         Me.HelpProvider1.SetHelpString(Me.btnOpen, "Open an existing sediment scenario file which contains all settings specified on " & _
                 "these tabs. If you do not explicitly open a data file, the default file will aut" & _
                 "omatically be opened and used.")
-        Me.btnOpen.Location = New System.Drawing.Point(12, 440)
+        Me.btnOpen.Location = New System.Drawing.Point(12, 343)
         Me.btnOpen.Name = "btnOpen"
         Me.HelpProvider1.SetShowHelp(Me.btnOpen, True)
         Me.btnOpen.Size = New System.Drawing.Size(75, 26)
@@ -1221,7 +1225,7 @@ Friend Class frmSediment
         '
         Me.btnSaveAs.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.HelpProvider1.SetHelpString(Me.btnSaveAs, "Save all input settings to a named scenario file.")
-        Me.btnSaveAs.Location = New System.Drawing.Point(93, 440)
+        Me.btnSaveAs.Location = New System.Drawing.Point(93, 343)
         Me.btnSaveAs.Name = "btnSaveAs"
         Me.HelpProvider1.SetShowHelp(Me.btnSaveAs, True)
         Me.btnSaveAs.Size = New System.Drawing.Size(75, 26)
@@ -1232,7 +1236,7 @@ Friend Class frmSediment
         'frmSediment
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(765, 483)
+        Me.ClientSize = New System.Drawing.Size(765, 386)
         Me.Controls.Add(Me.btnSaveAs)
         Me.Controls.Add(Me.btnOpen)
         Me.Controls.Add(Me.btnAbout)
@@ -1280,7 +1284,7 @@ Friend Class frmSediment
 
     Private Sub btnAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAbout.Click
         Logger.Msg("BASINS USLE Clean Sediment Estimator" & vbCrLf & vbCrLf & _
-                   "Version " & System.Reflection.Assembly.GetEntryAssembly.GetName.Version.ToString, _
+                   "Version " & System.Reflection.Assembly.GetExecutingAssembly.GetName.Version.ToString, _
                    "BASINS - SEDIMENT")
     End Sub
 
@@ -1290,7 +1294,7 @@ Friend Class frmSediment
     End Sub
 
     Private Sub btnCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCopy.Click
-        Dim Header As String = String.Format("Version:1.0{0}StartHTML:0000000105{0}EndHTML:{1,10:0}{0}StartFragment:0000000105{0}EndFragment:{1,10:0}{0}", vbCrLf, wbResults.DocumentText.Length)
+        Dim Header As String = String.Format("Version:1.0{0}StartHTML:0000000105{0}EndHTML:{1,10:0}{0}StartFragment:0000000105{0}EndFragment:{1,10:0}{0}", vbCrLf, wbResults.DocumentText.Length + 105)
         Clipboard.SetDataObject(New DataObject(DataFormats.Html, Header & wbResults.DocumentText))
     End Sub
 
@@ -1578,6 +1582,11 @@ Friend Class frmSediment
         btnSaveAs.Enabled = b
     End Sub
 
+    Private Sub frmSediment_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+        SedimentForm = Nothing
+        gMapWin.StatusBar(2).Text = ""
+    End Sub
+
     Private Sub frmSediment_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         With Project
             If .Modified Then
@@ -1684,6 +1693,7 @@ Friend Class frmSediment
                 btnOpen.PerformClick()
         End Select
 
+        SedimentForm = Me
     End Sub
 
     ''' <summary>
@@ -1695,7 +1705,7 @@ Friend Class frmSediment
                 Text = "BASINS Sediment Estimator"
                 If .FileName <> "" Then Text &= " - " & IO.Path.GetFileName(.FileName)
                 txtOutputName.Text = .OutputFolder
-                txtGridSize.Value = .GridSize
+                txtGridSize.ValueInteger = .GridSize
                 cboSubbasins.Text = .SubbasinLayer
 
                 cboSoilLayer.Text = .SoilLayer
@@ -1758,7 +1768,7 @@ Friend Class frmSediment
                 Text = "BASINS Sediment Estimator"
                 If .FileName <> "" Then Text &= " - " & IO.Path.GetFileName(.FileName)
                 .OutputFolder = txtOutputName.Text
-                .GridSize = txtGridSize.Value
+                .GridSize = txtGridSize.ValueInteger
                 .SubbasinLayer = cboSubbasins.Text
 
                 .SoilLayer = cboSoilLayer.Text

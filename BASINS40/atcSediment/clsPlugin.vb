@@ -49,6 +49,7 @@ Public Class PlugIn
     <CLSCompliant(False)> _
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
         pMapWin = MapWin
+        gMapWin = MapWin
 
         atcDataManager.AddMenuIfMissing(ParentMenuName, "", ParentMenuString, "mnuFile")
         Dim mnu As MapWindow.Interfaces.MenuItem
@@ -110,6 +111,7 @@ Public Class PlugIn
     ''' </summary>
     ''' <remarks>Turn this off for final version</remarks>
     Public Sub MapMouseMove(ByVal ScreenX As Integer, ByVal ScreenY As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseMove
+        If SedimentForm Is Nothing Then Exit Sub
         With pMapWin
             Dim x, y As Double, c, r As Integer
             Dim value As Object = "No Data"
