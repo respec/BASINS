@@ -216,11 +216,8 @@ Public Class SWMMProject
             Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
             Dim lDate(6) As Integer
             J2Date(lJDate, lDate)
-            Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
-            Dim lTimeString As String = lDate(3).ToString.PadLeft(2, "0") & ":" & lDate(4).ToString.PadLeft(2, "0")
-            lSB.Append(StrPad(lDateString, 10, " ", False))
-            lSB.Append(" ")
-            lSB.Append(StrPad(lTimeString, 10, " ", False))
+            Dim lDateString As String = lDate(0) & "  " & lDate(1) & "  " & lDate(2) & "  " & lDate(3) & "  " & lDate(4)
+            lSB.Append(StrPad(lDateString, 20, " ", False))
             lSB.Append(" ")
             lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
             lSB.Append(vbCrLf)
