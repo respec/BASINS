@@ -155,6 +155,7 @@ Friend Class clsGrid
             'note: ascii grid format for MapWindow is different than ArcGIS (and what is expected by GBMM program); do manual export
             Dim sw As New IO.StreamWriter(ExportFile)
             With g.Header
+                Dim NoDataValue As Single = .NodataValue
                 sw.WriteLine("ncols         {0}", .NumberCols)
                 sw.WriteLine("nrows         {0}", .NumberRows)
                 sw.WriteLine("xllcorner     {0}", .XllCenter)
@@ -165,7 +166,7 @@ Friend Class clsGrid
                 For r As Integer = 0 To .NumberRows - 1
                     g.GetRow(r, ar(0))
                     For c As Integer = 0 To .NumberCols - 1
-                        If ar(c) = .NodataValue Then ar(c) = -9999
+                        If ar(c) = NoDataValue Then ar(c) = -9999
                         If Gridtype = enumGridType.IntegerGrid Then
                             sw.Write(CInt(ar(c)) & " ")
                         Else
@@ -224,7 +225,7 @@ Friend Class clsGrid
         For Each fn As String In ParentFiles
             Dim ext As String = IO.Path.GetExtension(fn).ToLower
             'If (ext = ".shp" Or ext = ".tif") AndAlso Not GisUtil.IsLayerByFileName(fn) Then WarningMsg("Parent file is not loaded as layer: " & fn) : Return False
-            If dt < IO.File.GetLastWriteTime(fn) Then Return False
+            If Not My.Computer.FileSystem.FileExists(fn) OrElse dt < IO.File.GetLastWriteTime(fn) Then Return False
         Next
         Return True
     End Function
@@ -954,6 +955,14 @@ Friend Class clsProject
                 Write(.LSFlag, .MaxSlopeLengthFlag, .MaxSlopeLength, .ConstantSlopeLength)
             End With
 
+            sw.WriteLine("c090 WATERSHED AND STREAM SETTINGS")
+            sw.WriteLine("c")
+            sw.WriteLine("c P2Rainfall    Z1     Z2      Region    AlphaDepth     BetaDepth     AlphaWidth      BetaWidth")
+            sw.WriteLine("c")
+            With StreamParms
+                Write(WatershedParms.P2Rainfall, .Manning, .Z1, .Z2, .Region, .AlphaDepth, .BetaDepth, .AlphaWidth, .BetaWidth)
+            End With
+
             sw.WriteLine("c")
         End With
         sw.WriteLine(Blank)
@@ -986,7 +995,7 @@ Friend Class clsProject
         sw.WriteLine("c")
         sw.WriteLine("c  simstart    simend  startmonth  endmonth    delt")
         With SimPeriods
-            Write(.StartDate, .EndDate, .StartMonth, .EndMonth, .DeltaT)
+            Write(.StartDate.ToString("M/d/yyyy"), .EndDate.ToString("M/d/yyyy"), .StartMonth, .EndMonth, .DeltaT)
         End With
         sw.WriteLine(Blank)
     End Sub
@@ -1007,14 +1016,14 @@ Friend Class clsProject
         sw.WriteLine("c")
         sw.WriteLine("c     dataindex   datastart   dataend")
         With Tables.Climate
-            Write(1, .StartDate, .EndDate)
+            Write(1, .StartDate.ToString("M/d/yyyy"), .EndDate.ToString("M/d/yyyy"))
         End With
         If SimFlags.Mercury And Layers.MercurySta.LayerName <> "" Then
             With Tables.HgDryDep
-                Write(2, .StartDate, .EndDate)
+                Write(2, .StartDate.ToString("M/d/yyyy"), .EndDate.ToString("M/d/yyyy"))
             End With
             With Tables.HgWetDep
-                Write(3, .StartDate, .EndDate)
+                Write(3, .StartDate.ToString("M/d/yyyy"), .EndDate.ToString("M/d/yyyy"))
             End With
         End If
         sw.WriteLine(Blank)
@@ -1450,9 +1459,9 @@ Friend Class clsProject
         sw.WriteLine("c")
         sw.WriteLine("c 'if adfg = 1'")
         sw.WriteLine("c adfg    air deposition mercury flag")
-        sw.WriteLine("c dd_f    daily dry deposition mercury flux (µg/m2/day)")
+        sw.WriteLine("c dd_f    daily dry deposition mercury flux (ug/m2/day)")
         sw.WriteLine("c wdfg    wet deposition mercury flag")
-        sw.WriteLine("c         if = 1 daily wet deposition mercury flux (µg/m2/day)")
+        sw.WriteLine("c         if = 1 daily wet deposition mercury flux (ug/m2/day)")
         sw.WriteLine("c         if = 2 daily precipitation mercury concentration (ng/l)")
         sw.WriteLine("c wd_v    daily wet deposition mercury based on wdfg")
         sw.WriteLine("c")
@@ -1502,7 +1511,7 @@ Friend Class clsProject
         sw.WriteLine("c krs         soil base reduction rate (per day)")
         sw.WriteLine("c ef          pollutant enrichment factor")
         sw.WriteLine("c rd          bedrock density (g/cm3)")
-        sw.WriteLine("c kcw         chemical weathering rate constant (µm/day")
+        sw.WriteLine("c kcw         chemical weathering rate constant (um/day")
         sw.WriteLine("c crock       concentration of mercury in bedrock (ng/g")
         sw.WriteLine("c kd          mercury decay rate in channel (per hour)")
         sw.WriteLine("c fmehg       fraction of methylmercury in total mercury")
@@ -1582,7 +1591,7 @@ Friend Class clsProject
     ''' <remarks>Data are stored in .inp file (read by C++ computational program) and .GBMM file (additional info needed by preprocessor)</remarks>
     Friend Function Load() As Boolean
         Dim LastCard As Integer
-        Dim Line As String
+        Dim Line As String = ""
 
         Try
             sr = New IO.StreamReader(FileName)
@@ -1650,122 +1659,124 @@ Friend Class clsProject
                             End With
                         Case 150
                             Do
-                                Dim gridindex As Integer = Read(Line)
-                                Dim gridtype As enumGridType = Read()
-                                With Grids
-                                    Select Case gridindex
-                                        Case 101
-                                            With .ClimateThiessan
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 102
-                                            With .LandUse
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 103
-                                            With .Soils
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 104
-                                            With .Subbasins
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 105
-                                            With .CNPerv
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 106
-                                            With .CNImperv
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 107
-                                            With .TravelTotal
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 108
-                                            With .TravelStream
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 109
-                                            With .SoilWater
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 110
-                                            With .FlowLength
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 111
-                                            With .AvgRoughness
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 112
-                                            With .AvgSlopeOverland
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                    End Select
-                                End With
+                                'will use names defined by user, not those stored in file
+
+                                'Dim gridindex As Integer = Read(Line)
+                                'Dim gridtype As enumGridType = Read()
+                                'With Grids
+                                '    Select Case gridindex
+                                '        Case 101
+                                '            With .ClimateThiessan
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 102
+                                '            With .LandUse
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 103
+                                '            With .Soils
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 104
+                                '            With .Subbasins
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 105
+                                '            With .CNPerv
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 106
+                                '            With .CNImperv
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 107
+                                '            With .TravelTotal
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 108
+                                '            With .TravelStream
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 109
+                                '            With .SoilWater
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 110
+                                '            With .FlowLength
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 111
+                                '            With .AvgRoughness
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 112
+                                '            With .AvgSlopeOverland
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '    End Select
+                                'End With
                                 Line = sr.ReadLine
                             Loop Until Line.StartsWith("c", StringComparison.OrdinalIgnoreCase) Or sr.EndOfStream
                         Case 160
                             Do
-                                Dim gridindex As Integer = Read(Line)
-                                Dim gridtype As enumGridType = Read()
-                                With Grids
-                                    Select Case gridindex
-                                        Case 201
-                                            With .LSFactor
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                    End Select
-                                End With
+                                'Dim gridindex As Integer = Read(Line)
+                                'Dim gridtype As enumGridType = Read()
+                                'With Grids
+                                '    Select Case gridindex
+                                '        Case 201
+                                '            With .LSFactor
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '    End Select
+                                'End With
                                 Line = sr.ReadLine
                             Loop Until Line.StartsWith("c", StringComparison.OrdinalIgnoreCase) Or sr.EndOfStream
                         Case 170
                             Do
-                                Dim gridindex As Integer = Read(Line)
-                                Dim gridtype As enumGridType = Read()
-                                With Grids
-                                    Select Case gridindex
-                                        Case 301
-                                            With .MercuryLitter
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 302
-                                            With .MercuryThiessan
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 303
-                                            With .MercuryDryDepo
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 304
-                                            With .MercuryWetDepo
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                        Case 305
-                                            With .MercurySoil
-                                                .Gridtype = gridtype
-                                                .LayerName = Read().Replace(".asc", "")
-                                            End With
-                                    End Select
-                                End With
+                                'Dim gridindex As Integer = Read(Line)
+                                'Dim gridtype As enumGridType = Read()
+                                'With Grids
+                                '    Select Case gridindex
+                                '        Case 301
+                                '            With .MercuryLitter
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 302
+                                '            With .MercuryThiessan
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 303
+                                '            With .MercuryDryDepo
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 304
+                                '            With .MercuryWetDepo
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '        Case 305
+                                '            With .MercurySoil
+                                '                .Gridtype = gridtype
+                                '                .LayerName = Read().Replace(".asc", "")
+                                '            End With
+                                '    End Select
+                                'End With
                                 Line = sr.ReadLine
                             Loop Until Line.StartsWith("c", StringComparison.OrdinalIgnoreCase) Or sr.EndOfStream
                         Case 200
@@ -1785,73 +1796,78 @@ Friend Class clsProject
                                 sr.ReadLine()
                             Next
                         Case 220
+                            'don't read-is computed each time
                             Landuses.Clear()
                             For i As Integer = 1 To WatershedCntl.NumLandUses - 1
-                                Dim lu As New clsLandUse
-                                With lu
-                                    Read(Line)
-                                    .LuID = Read()
-                                    .LuType = Read()
-                                    .GrowVcf = Read()
-                                    .NGrowVcf = Read()
-                                    .CFact = Read()
-                                    .PFact = Read()
-                                    .LuName = Read()
-                                    Landuses.Add(.LuID, lu)
-                                End With
+                                'Dim lu As New clsLandUse
+                                'With lu
+                                '    Read(Line)
+                                '    .LuID = Read()
+                                '    .LuType = Read()
+                                '    .GrowVcf = Read()
+                                '    .NGrowVcf = Read()
+                                '    .CFact = Read()
+                                '    .PFact = Read()
+                                '    .LuName = Read()
+                                '    Landuses.Add(.LuID, lu)
+                                'End With
                                 Line = sr.ReadLine()
                             Next
                         Case 230
+                            'don't read-is computed each time
                             Soils.Clear()
                             For i As Integer = 1 To WatershedCntl.NumSoils - 1
-                                Dim soil As New clsSoil
-                                With soil
-                                    Read(Line)
-                                    .SoilID = Read()
-                                    .AWC = Read()
-                                    .BD = Read()
-                                    .ClayFrac = Read()
-                                    .Perm = Read()
-                                    .KFact = Read()
-                                    Soils.Add(.SoilID, soil)
-                                End With
+                                'Dim soil As New clsSoil
+                                'With soil
+                                '    Read(Line)
+                                '    .SoilID = Read()
+                                '    .AWC = Read()
+                                '    .BD = Read()
+                                '    .ClayFrac = Read()
+                                '    .Perm = Read()
+                                '    .KFact = Read()
+                                '    Soils.Add(.SoilID, soil)
+                                'End With
                                 Line = sr.ReadLine()
                             Next
                         Case 240
+                            'don't read-is computed each time
                             ClimateStations.Clear()
                             For i As Integer = 1 To WatershedCntl.NumClimateSta - 1
-                                Dim sta As New clsStation
-                                With sta
-                                    Read(Line)
-                                    .StaID = Read()
-                                    .StaName = Read()
-                                    .Latitude = Read()
-                                End With
+                                'Dim sta As New clsStation
+                                'With sta
+                                '    Read(Line)
+                                '    .StaID = Read()
+                                '    .StaName = Read()
+                                '    .Latitude = Read()
+                                'End With
                                 Line = sr.ReadLine()
                             Next
                         Case 250
+                            'don't read-is computed each time
                             MercuryStations.Clear()
                             For i As Integer = 1 To WatershedCntl.NumMercurySta - 1
-                                Dim sta As New clsStation
-                                With sta
-                                    Read(Line)
-                                    .StaID = Read()
-                                    .StaName = Read()
-                                    MercuryStations.Add(.StaID, sta)
-                                End With
+                                'Dim sta As New clsStation
+                                'With sta
+                                '    Read(Line)
+                                '    .StaID = Read()
+                                '    .StaName = Read()
+                                '    MercuryStations.Add(.StaID, sta)
+                                'End With
                                 Line = sr.ReadLine()
                             Next
                         Case 260
+                            'don't read-is computed each time
                             PointSources.Clear()
                             For i As Integer = 1 To WatershedCntl.NumPointSources - 1
-                                Dim sta As New clsStation
-                                With sta
-                                    Read(Line)
-                                    .StaID = Read()
-                                    .StaName = Read()
-                                    .TravelTime = Read()
-                                    PointSources.Add(.StaID, sta)
-                                End With
+                                'Dim sta As New clsStation
+                                'With sta
+                                '    Read(Line)
+                                '    .StaID = Read()
+                                '    .StaName = Read()
+                                '    .TravelTime = Read()
+                                '    PointSources.Add(.StaID, sta)
+                                'End With
                                 Line = sr.ReadLine()
                             Next
                         Case 270
@@ -1861,7 +1877,6 @@ Friend Class clsProject
                                 Read() 'lake id
                                 Read() 'sub id
                                 Read() 'area  
-                                'todo: must read area threshold elsewhere!!!
                                 .FullDepth = Read()
                                 .Depth = Read()
                                 .SedimentHg = Read()
@@ -1940,7 +1955,11 @@ Friend Class clsProject
                                     Case enumDepoFlag.Constant
                                         .DryDepoFlux = Read()
                                         .WetDepoFlag = Read()
-                                        .WetDepoFlux = Read()
+                                        If .WetDepoFlag = enumWetDepo.WetDepo Then
+                                            .WetDepoFlux = Read()
+                                        Else
+                                            .WetDepoPrecip = Read()
+                                        End If
                                     Case enumDepoFlag.InputGrid
                                         .DryDepoMult = Read()
                                         .WetDepoMult = Read()
@@ -2069,6 +2088,19 @@ Friend Class clsProject
                                     .MaxSlopeLength = Read()
                                     .ConstantSlopeLength = Read()
                                 End With
+                            Case 90
+                                WatershedParms.P2Rainfall = Read(Line)
+                                With StreamParms
+                                    .Manning = Read()
+                                    .Z1 = Read()
+                                    .Z2 = Read()
+                                    .Region = Read()
+                                    .AlphaDepth = Read()
+                                    .BetaDepth = Read()
+                                    .AlphaWidth = Read()
+                                    .BetaWidth = Read()
+                                End With
+
                         End Select
                     End If
                 End While
@@ -2085,35 +2117,52 @@ Friend Class clsProject
                     sr2.Close()
                     sr2.Dispose()
                     With dictInputData
-                        If .TryGetValue("SoilMap", Layers.Soils.LayerName) Then Layers.Soils.FieldName = "MUID"
-                        If .TryGetValue("Landuse", Layers.Landuse.LayerName) Then Layers.Landuse.FieldName = "LUCODE"
+                        '10
+                        '20
                         If .TryGetValue("DEM", Layers.DEM.LayerName) Then
                             If Layers.DEM.LayerName.Contains("30") Then GridSize = 30 Else GridSize = 90
                             DEMUnits = enumDEMUnits.Meters
                         End If
-                        If .TryGetValue("ClimateStation", Layers.ClimateSta.LayerName) Then Layers.ClimateSta.FieldName = "Sta_ID"
-                        If .TryGetValue("PointSources", Layers.PointSources.LayerName) Then Layers.PointSources.FieldName = "Sta_ID"
-                        .TryGetValue("NHD", Layers.Streams.LayerName)
-                        If .TryGetValue("Lakes", Layers.Lakes.LayerName) Then Layers.Lakes.FieldName = "COMID"
-
+                        '30
+                        If .TryGetValue("SoilMap", Layers.Soils.LayerName) Then Layers.Soils.FieldName = "MUID"
+                        If .TryGetValue("SoilProperty", Tables.Soils.TableName) Then Tables.Soils.TableName &= ".dbf"
+                        '40
+                        If .TryGetValue("Landuse", Layers.Landuse.LayerName) Then Layers.Landuse.FieldName = "LUCODE"
                         If .TryGetValue("LuLookupTable", Tables.LandUse.TableName) Then Tables.LandUse.TableName &= ".dbf"
                         If .TryGetValue("LUcodeCNTable", Tables.LandUseCN.TableName) Then Tables.LandUseCN.TableName &= ".dbf"
-                        If .TryGetValue("SoilProperty", Tables.Soils.TableName) Then Tables.Soils.TableName &= ".dbf"
+                        '50
+                        If .TryGetValue("Lakes", Layers.Lakes.LayerName) Then Layers.Lakes.FieldName = "COMID"
+                        .TryGetValue("LakesThreshold", LakeParms.AreaThreshold)
+                        '60
+                        If .TryGetValue("ClimateStation", Layers.ClimateSta.LayerName) Then Layers.ClimateSta.FieldName = "Sta_ID"
+                        If .TryGetValue("PointSources", Layers.PointSources.LayerName) Then Layers.PointSources.FieldName = "Sta_ID"
                         .TryGetValue("ClimateDataTextFile", Tables.Climate.TableName)
                         .TryGetValue("PSdataTable", Tables.PointSource.TableName)
-
-                        .TryGetValue("LakesThreshold", LakeParms.AreaThreshold)
                         If .TryGetValue("HgStation", Layers.MercurySta.LayerName) Then Layers.MercurySta.FieldName = "StaID"
-
+                        '70
                         .TryGetValue("InitialConstantHg", WatershedMercuryParms.InitSoil)
                         .TryGetValue("InitialSoilHgMultiplier", WatershedMercuryParms.GridMult)
-
                         .TryGetValue("HgWetConstant", MercuryDepo.WetDepoFlux)
                         .TryGetValue("HgWetPrcpConc", MercuryDepo.WetDepoPrecip)
-
                         .TryGetValue("HgLandKDcomp1", ForestMercuryParms.LitterDecomp1)
                         .TryGetValue("HgLandKDcomp2", ForestMercuryParms.LitterDecomp2)
                         .TryGetValue("HgLandKDcomp3", ForestMercuryParms.LitterDecomp3)
+                        '80
+                        '90
+                        .TryGetValue("HydroP2Rainfall", WatershedParms.P2Rainfall)
+                        .TryGetValue("HydroManningCoeff", StreamParms.Manning)
+                        .TryGetValue("CrossSectionSlope1", StreamParms.Z1)
+                        .TryGetValue("CrossSectionSlope2", StreamParms.Z2)
+                        Dim s As String = ""
+                        .TryGetValue("listRegions", s)
+                        For i As Integer = 0 To StreamParms.RegionArray.Length - 1
+                            If StreamParms.RegionArray(i) = s Then StreamParms.Region = i : Exit For
+                        Next
+                        .TryGetValue("AlphaDepth", StreamParms.AlphaDepth)
+                        .TryGetValue("BetaDepth", StreamParms.BetaDepth)
+                        .TryGetValue("AlphaWidth", StreamParms.AlphaWidth)
+                        .TryGetValue("BetaWidth", StreamParms.BetaWidth)
+
                     End With
                 End If
             End If

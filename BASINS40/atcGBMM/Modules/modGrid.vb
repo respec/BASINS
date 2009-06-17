@@ -11,100 +11,6 @@ End Class
 
 Friend Module modGrid
 
-
-    '''' <summary>
-    '''' Set values in grid to NoValue if they are less than threshold
-    '''' </summary>
-    '''' <param name="SourceFile">Name of source grid file </param>
-    '''' <param name="DestFile">Name of destination grid file (must already exist)</param>
-    '''' <param name="Threshold">Threshold value</param>
-    'Friend Function LookupGrid(ByVal SourceFile As String, ByVal DestFile As String, ByVal Threshold As Double) As Boolean
-    '    Dim gSource As MapWinGIS.Grid = Nothing
-    '    Dim gDest As MapWinGIS.Grid = Nothing
-
-    '    Try
-    '        gSource = New MapWinGIS.Grid
-    '        If Not gSource.Open(SourceFile, , False) Then Return False
-    '        gDest = New MapWinGIS.Grid
-    '        If Not gDest.Open(DestFile, , False) Then Return False
-    '        Dim Lookup As clsLookup = Nothing
-    '        With gSource.Header
-    '            For r As Integer = 0 To .NumberRows - 1
-    '                Dim arV(.NumberCols - 1) As Single
-    '                gSource.GetRow(r, arV(0))
-    '                For c As Integer = 0 To .NumberCols - 1
-    '                    If arV(c) < Threshold Then arV(c) = gDest.Header.NodataValue
-    '                Next
-    '                gDest.PutRow(r, arV(0))
-    '                If Not ProgressForm.SetProgress(r, .NumberRows - 1) Then Return False
-    '            Next
-    '        End With
-    '        gDest.Save()
-    '        Return True
-    '    Catch ex As Exception
-    '        ErrorMsg(, ex)
-    '        Return False
-    '    Finally
-    '        If gSource IsNot Nothing Then gSource.Close()
-    '        If gDest IsNot Nothing Then gDest.Close()
-    '    End Try
-    'End Function
-
-    '''' <summary>
-    '''' Convert ArcGIS/NHD flow direction grid system to Taudem system
-    '''' </summary>
-    '''' <param name="SourceFile">Name of grid file </param>
-    'Friend Function LookupGrid(ByVal SourceFile As String) As Boolean
-    '    'NHD (ArcGIS):
-    '    '
-    '    '32    64    128
-    '    '16     x      1
-    '    ' 8     4      2
-
-    '    'Taudem:
-    '    '
-    '    ' 4     3      2
-    '    ' 5     x      1
-    '    ' 6     7      8
-    '    Dim g As MapWinGIS.Grid = Nothing
-
-    '    Try
-    '        g = New MapWinGIS.Grid
-    '        If Not g.Open(SourceFile, , False) Then Return False
-    '        With g.Header
-    '            For r As Integer = 0 To .NumberRows - 1
-    '                Dim arV(.NumberCols - 1) As Single
-    '                g.GetRow(r, arV(0))
-    '                For c As Integer = 0 To .NumberCols - 1
-    '                    Select Case arV(c)
-    '                        Case 1 : arV(c) = 1
-    '                        Case 2 : arV(c) = 8
-    '                        Case 4 : arV(c) = 7
-    '                        Case 8 : arV(c) = 6
-    '                        Case 16 : arV(c) = 5
-    '                        Case 32 : arV(c) = 4
-    '                        Case 64 : arV(c) = 3
-    '                        Case 128 : arV(c) = 2
-    '                        Case g.Header.NodataValue : arV(c) = g.Header.NodataValue
-    '                        Case Else
-    '                            WarningMsg("Invalid value found in NHD/ArcGIS flow direction grid: {0}; expected only 1, 2, 4, 8, 16, 32, 64, or 128.", arV(c))
-    '                            Return False
-    '                    End Select
-    '                Next
-    '                g.PutRow(r, arV(0))
-    '                If Not ProgressForm.SetProgress(r, .NumberRows - 1) Then Return False
-    '            Next
-    '        End With
-    '        g.Save()
-    '        Return True
-    '    Catch ex As Exception
-    '        ErrorMsg(, ex)
-    '        Return False
-    '    Finally
-    '        If g IsNot Nothing Then g.Close()
-    '    End Try
-    'End Function
-
     Friend Delegate Function LookupDelegate(ByVal SourceValue As Object) As Object
 
     Friend Enum enumCalcOption
@@ -134,9 +40,9 @@ Friend Module modGrid
     ''' <remarks></remarks>
     Private Function AreGridsCompatible(ByVal g1 As MapWinGIS.Grid, ByVal g2 As MapWinGIS.Grid, Optional ByVal MustMatchExactly As Boolean = False) As Boolean
         With g1.Header
-            If .dX <> g2.Header.dY OrElse .dY <> g2.Header.dY OrElse .NumberCols <> g2.Header.NumberCols OrElse .NumberRows <> g2.Header.NumberRows Then Return False
+            If Math.Round(.dX, 1) <> Math.Round(g2.Header.dX, 1) OrElse Math.Round(.dY, 1) <> Math.Round(g2.Header.dY, 1) OrElse .NumberCols <> g2.Header.NumberCols OrElse .NumberRows <> g2.Header.NumberRows Then Return False
             Dim Offset As Double = .dX / 2
-            If MustMatchExactly Then Offset = 0
+            If MustMatchExactly Then Offset = 0.1
             If Math.Abs(.XllCenter - g2.Header.XllCenter) > Offset OrElse Math.Abs(.YllCenter - g2.Header.YllCenter) > Offset Then Return False
         End With
         Return True
@@ -165,6 +71,7 @@ Friend Module modGrid
             End With
 
             With gSource.Header
+                Dim NoDataValue As Single = .NodataValue
                 'get average value within the larger destination grid from the smaller source grid
                 For r As Integer = 0 To .NumberRows - 1
                     Dim x As Double, y As Double, cc As Integer, rr As Integer
@@ -172,7 +79,7 @@ Friend Module modGrid
                     Dim ar(.NumberCols - 1) As Single
                     gSource.GetRow(r, ar(0))
                     For c As Integer = 0 To .NumberCols - 1
-                        If ar(c) <> .NodataValue Then
+                        If ar(c) <> NoDataValue Then
                             gDest.ProjToCell(x, y, cc, rr)
                             If cc >= 0 AndAlso cc <= arSum.GetUpperBound(0) AndAlso rr >= 0 AndAlso rr <= arSum.GetUpperBound(1) Then
                                 arSum(cc, rr) += ar(c)
@@ -208,7 +115,7 @@ Friend Module modGrid
     End Function
 
     ''' <summary>
-    ''' Given a flow direction grid, average or sum all values in the WeightGrid along the downstream path
+    ''' Given a flow direction grid, average or sum all values in the SourceGrid along the downstream path
     ''' </summary>
     ''' <param name="FlowDirGrid">Grid containing D8 flow directions</param>
     ''' <param name="SourceGrid">Grid containing values to average or sum (ignored if CalcOption is Distance)</param>
@@ -233,9 +140,11 @@ Friend Module modGrid
             If Not gSource.Open(SourceGrid) Then _LastErrorMsg = "Unable to open grid: " & SourceGrid : Return False
             If Not gResult.CreateNew(ResultGrid, gSource.Header, gSource.DataType, gSource.Header.NodataValue) Then _LastErrorMsg = "Unable to create grid: " & ResultGrid : Return False
 
-            If Not GridsIdentical(gFlowDir, gSource, gFlowPath) Then _LastErrorMsg = "Grids are not identical in structure." : Return False
+            If Not GridsIdentical(gFlowDir, gSource, gFlowPath) Then _LastErrorMsg = "Grids are not identical in structure: " & SourceGrid & ", " & FlowPathGrid : Return False
 
             With gFlowDir.Header
+                Dim NoDataValueFD As Single = .NodataValue
+                Dim NoDataValueFP As Single = gFlowPath.Header.NodataValue
                 'store all grid data in 2-D arrays
                 Dim arSum(.NumberRows - 1, .NumberCols - 1) As Single
                 Dim arNum(.NumberRows - 1, .NumberCols - 1) As Integer
@@ -258,7 +167,7 @@ Friend Module modGrid
 
                 For r As Integer = 0 To .NumberRows - 1
                     For c As Integer = 0 To .NumberCols - 1
-                        If arFlowDir(r, c) <> gFlowDir.Header.NodataValue And arNum(r, c) = 0 AndAlso Not (FlowOption = enumFlowOption.Stream And arFlowPath(r, c) = gFlowPath.Header.NodataValue) Then 'hasn't been previously calculated so go ahead
+                        If arFlowDir(r, c) <> NoDataValueFD And arNum(r, c) = 0 AndAlso Not (FlowOption = enumFlowOption.Stream And arFlowPath(r, c) = NoDataValueFP) Then 'hasn't been previously calculated so go ahead
                             'walk downstream, building list of cells touched until get to previously computed cell or d.s. boundary
                             Dim lstCells As New Generic.List(Of Drawing.Point) 'list of downstream cells stepped on (will need to walk back up to get sum)
                             Dim dsr As Integer = r, dsc As Integer = c 'downstream row & column
@@ -273,8 +182,8 @@ Friend Module modGrid
                                 'stop when previously calced cell, no downstream cell (or, if overland or total, stream cell encountered)
 
                                 If arNum(dsr, dsc) <> 0 Then Exit Do 'previously calced cell
-                                If arFlowDir(dsr, dsc) = gFlowDir.Header.NodataValue Then Exit Do 'outlet
-                                If FlowOption = enumFlowOption.Overland AndAlso arFlowPath(dsr, dsc) <> gFlowPath.Header.NodataValue Then Exit Do 'stream grid
+                                If arFlowDir(dsr, dsc) = NoDataValueFD Then Exit Do 'outlet
+                                If FlowOption = enumFlowOption.Overland AndAlso arFlowPath(dsr, dsc) <> NoDataValueFP Then Exit Do 'stream grid
 
                                 'add this new cell and keep going...
 
@@ -316,7 +225,7 @@ Friend Module modGrid
                                     Case enumCalcOption.Sum, enumCalcOption.Average
                                         arSum(rr, cc) += arSource(rr, cc) 'accumulate values from downstream
                                     Case enumCalcOption.TravelTime
-                                        If arFlowPath(rr, cc) <> gFlowPath.Header.NodataValue Then
+                                        If arFlowPath(rr, cc) <> NoDataValueFP Then
                                             arSum(rr, cc) = arSource(rr, cc) 'is stream, so save stream travel time
                                         Else
                                             arSum(rr, cc) = arSum(dsr, dsc) 'just save the downstream stream travel time (will add later)
@@ -330,10 +239,11 @@ Friend Module modGrid
 
                 'store back into result grid
                 Dim ar(.NumberCols - 1) As Single
+                Dim NoDataValue As Single = gResult.Header.NodataValue
                 For r As Integer = 0 To .NumberRows - 1
                     For c As Integer = 0 To .NumberCols - 1
-                        If arNum(r, c) = 0 OrElse (FlowOption = enumFlowOption.Stream And arFlowPath(r, c) = gFlowPath.Header.NodataValue) Then
-                            ar(c) = gResult.Header.NodataValue
+                        If arNum(r, c) = 0 OrElse (FlowOption = enumFlowOption.Stream And arFlowPath(r, c) = NoDataValueFP) Then
+                            ar(c) = NoDataValue
                         Else
                             Select Case CalcOption
                                 Case enumCalcOption.Average
@@ -341,7 +251,7 @@ Friend Module modGrid
                                 Case enumCalcOption.Sum, enumCalcOption.Distance
                                     ar(c) = arSum(r, c) 'store accumulated value
                                 Case enumCalcOption.TravelTime
-                                    If arFlowPath(r, c) <> gFlowPath.Header.NodataValue Then
+                                    If arFlowPath(r, c) <> NoDataValueFP Then
                                         ar(c) = arSource(r, c)
                                     Else
                                         ar(c) = arSource(r, c) + arSum(r, c) 'if not stream, add overland travel time value and stream travel time
@@ -525,7 +435,9 @@ loopagain:
                         Dim minStaID As Integer = Integer.MinValue
                         For Each kv As KeyValuePair(Of Integer, MapWinGIS.Point) In dictSta
                             With kv.Value
-                                Dim dist As Double = Math.Sqrt((.x - x) ^ 2 + (.y - y) ^ 2)
+                                Dim dx As Double = (.x - x)
+                                Dim dy As Double = (.y - y)
+                                Dim dist As Double = Math.Sqrt(dx * dx + dy * dy)
                                 If dist < minDist Then
                                     minDist = dist
                                     minStaID = kv.Key
@@ -549,77 +461,6 @@ loopagain:
         End Try
     End Function
 
-    '''' <summary>
-    '''' Given a stream shapefile, compute flow path grid where on-stream values have flowdirections and off-stream have no-data value
-    '''' </summary>
-    '''' <param name="StreamShapeFile"></param>
-    '''' <param name="FlowDirectionGridFile"></param>
-    '''' <param name="FlowPathGridFile"></param>
-    '''' <returns></returns>
-    '''' <remarks></remarks>
-    'Friend Function CreateFlowPathGrid(ByVal StreamShapeFile As String, ByVal FlowDirectionGridFile As String, ByVal FlowPathGridFile As String) As Boolean
-    '    Dim sfStream As New MapWinGIS.Shapefile
-    '    Dim gFlowDir As New MapWinGIS.Grid
-    '    Dim gFlowPath As New MapWinGIS.Grid
-    '    Try
-    '        If Not sfStream.Open(StreamShapeFile) Then Return False
-    '        If Not gFlowDir.Open(FlowDirectionGridFile) Then Return False
-    '        If Not gFlowPath.Open(FlowPathGridFile) Then Return False
-    '        'If Not sfStream.BeginPointInShapefile Then Return False
-    '        If Not GridsIdentical(gFlowDir, gFlowPath) Then Return False
-    '        With gFlowPath.Header
-    '            Dim arFlowPath(.NumberCols - 1) As Single
-    '            Dim arFlowDir(.NumberCols - 1) As Single
-    '            For r As Integer = 0 To .NumberRows - 1
-    '                Dim x, y As Double
-    '                gFlowDir.CellToProj(0, r, x, y)
-    '                If Not gFlowDir.GetRow(r, arFlowDir(0)) Then Return False
-    '                For c As Integer = 0 To .NumberCols - 1
-    '                    'see if any part of any stream polyline falls within this cell; if it does, set cell to flow direction; otherwise is nodatavalue
-    '                    arFlowPath(c) = .NodataValue
-
-    '                    Dim gridCellShape As New MapWinGIS.Shape
-    '                    gridCellShape.Create(MapWinGIS.ShpfileType.SHP_POLYGON)
-    '                    For i As Integer = 1 To 4
-    '                        Dim pt As New MapWinGIS.Point
-    '                        pt.x = x + .dX / 2 * Choose(i, -1, 1, 1, -1)
-    '                        pt.y = y + .dY / 2 * Choose(i, -1, -1, 1, 1)
-    '                        If Not gridCellShape.InsertPoint(pt, i = 1) Then Return False
-    '                    Next
-
-    '                    Dim gridCell As MapWinGeoProc.NTS.Topology.Geometries.Geometry = MapWinGeoProc.NTS_Adapter.ShapeToGeometry(gridCellShape)
-
-    '                    For s As Integer = 0 To sfStream.NumShapes - 1
-    '                        Dim polyline As MapWinGeoProc.NTS.Topology.Geometries.Geometry = MapWinGeoProc.NTS_Adapter.ShapeToGeometry(sfStream.Shape(s))
-    '                        If polyline.Intersects(gridCell) Then
-    '                            arFlowPath(c) = arFlowDir(c)
-    '                            Exit For
-    '                        End If
-    '                    Next
-    '                    x += .dX
-    '                Next
-    '                gFlowPath.PutRow(r, arFlowPath(0))
-    '                If Not ProgressForm.SetProgress("Creating flow path grid...", r, .NumberRows - 1) Then Return False
-    '            Next
-    '        End With
-    '        gFlowPath.AssignNewProjection(GisUtil.ProjectProjection)
-    '        Return True
-    '    Catch ex As Exception
-    '        ErrorMsg(, ex)
-    '        Return False
-    '    Finally
-    '        sfStream.EndPointInShapefile()
-    '        sfStream.Close()
-    '        sfStream = Nothing
-    '        gFlowDir.Close()
-    '        gFlowDir = Nothing
-    '        gFlowPath.Save()
-    '        gFlowPath.Close()
-    '        gFlowPath = Nothing
-    '    End Try
-    '    Return True
-    'End Function
-
     ''' <summary>
     ''' Given a grid over a large extent, set all values that fall outside of the filter layer shapes to NoData
     ''' If filter layer is grid, will act as mask, setting all grid values to NoData if filter grid is NoData
@@ -640,6 +481,9 @@ loopagain:
                 If Not GridsIdentical(g, gFilter) Then _LastErrorMsg = "Grids are not identical: " & GridFile & " & " & FilterFile : Return False
             End If
             With g.Header
+                Dim NoDataValue As Single = .NodataValue
+                Dim NoDataValueFilter As Single
+                If Not isShapeFile Then NoDataValueFilter = gFilter.Header.NodataValue
                 For r As Integer = 0 To .NumberRows - 1
                     Dim x, y As Double
                     g.CellToProj(0, r, x, y)
@@ -648,9 +492,9 @@ loopagain:
                     If Not isShapeFile AndAlso Not gFilter.GetRow(r, arFilter(0)) Then Return False
                     For c As Integer = 0 To .NumberCols - 1
                         If isShapeFile Then
-                            If sfFilter.PointInShapefile(x, y) = -1 Then ar(c) = .NodataValue
+                            If sfFilter.PointInShapefile(x, y) = -1 Then ar(c) = NoDataValue
                         Else
-                            If arFilter(c) = gFilter.Header.NodataValue Then ar(c) = .NodataValue
+                            If arFilter(c) = NoDataValueFilter Then ar(c) = NoDataValue
                         End If
                         x += .dX
                     Next
@@ -681,11 +525,12 @@ loopagain:
         g.Open(GridFile)
         Dim lst As New Generic.List(Of Single)
         With g.Header
+            Dim NoDataValue As Single = .NodataValue
             For r As Integer = 0 To .NumberRows - 1
                 Dim ar(.NumberCols - 1) As Single
                 g.GetRow(r, ar(0))
                 For c As Integer = 0 To .NumberCols - 1
-                    If Not lst.Contains(ar(c)) And ar(c) <> .NodataValue Then lst.Add(ar(c))
+                    If Not lst.Contains(ar(c)) And ar(c) <> NoDataValue Then lst.Add(ar(c))
                 Next
             Next
         End With
@@ -723,59 +568,6 @@ loopagain:
         Return True
     End Function
 
-    '''' <summary>
-    '''' Set values in grid to factor taken from ID in shape file using lookup table
-    '''' </summary>
-    '''' <param name="SourceFile">Name of source shape file </param>
-    '''' <param name="FieldName">Name of field containing lookup value</param>
-    '''' <param name="DestFile">Name of destination grid file (must already exist)</param>
-    'Friend Function LookupGrid(ByVal SourceFile As String, ByVal FieldName As String, ByVal DestFile As String, ByVal dictLookup As Generic.Dictionary(Of String, clsLookup)) As Boolean
-    '    Dim sfSource As MapWinGIS.Shapefile = Nothing
-    '    Dim gDest As MapWinGIS.Grid = Nothing
-
-    '    Try
-    '        sfSource = New MapWinGIS.Shapefile
-    '        If Not sfSource.Open(SourceFile) Then Return False
-    '        sfSource.BeginPointInShapefile()
-
-    '        gDest = New MapWinGIS.Grid
-    '        If Not gDest.Open(DestFile, , True) Then Return False
-    '        Dim Lookup As clsLookup = Nothing
-    '        Dim lyrIndex As Integer = GisUtil.LayerIndex(SourceFile)
-    '        Dim fldIndex As Integer = GisUtil.FieldIndex(lyrIndex, FieldName)
-    '        With gDest.Header
-    '            For r As Integer = 0 To .NumberRows - 1
-    '                Dim x, y As Double
-    '                gDest.CellToProj(0, r, x, y)
-    '                Dim arV(.NumberCols - 1) As Single
-    '                gDest.GetRow(r, arV(0))
-    '                For c As Integer = 0 To .NumberCols - 1
-    '                    Dim shpIndex As Integer = sfSource.PointInShapefile(x, y)
-    '                    If shpIndex <> -1 Then
-    '                        Dim ID As String = GisUtil.FieldValue(lyrIndex, shpIndex, fldIndex)
-    '                        If dictLookup.TryGetValue(ID, Lookup) Then
-    '                            arV(c) = Lookup.Factor
-    '                        Else
-    '                            arV(c) = .NodataValue
-    '                        End If
-    '                    End If
-    '                    x += .dX
-    '                Next
-    '                gDest.PutRow(r, arV(0))
-    '                If Not ProgressForm.SetProgress(r, .NumberRows - 1) Then Return False
-    '            Next
-    '        End With
-    '        gDest.Save()
-    '        Return True
-    '    Catch ex As Exception
-    '        ErrorMsg(, ex)
-    '        Return False
-    '    Finally
-    '        If sfSource IsNot Nothing Then sfSource.Close()
-    '        If gDest IsNot Nothing Then gDest.Close()
-    '    End Try
-    'End Function
-
     ''' <summary>
     ''' Set values in grid to factor taken from ID in grid file using lookup table
     ''' </summary>
@@ -792,12 +584,15 @@ loopagain:
             If Not gDest.Open(DestFile, , False) Then LastErrorMsg = "Unable to open grid: " & DestFile : Return False
             Dim Lookup As clsLookup = Nothing
             With gSource.Header
-                For r As Integer = 0 To .NumberRows - 1
-                    Dim arL(.NumberCols - 1), arV(.NumberCols - 1) As Single
+                Dim NumRows As Integer = .NumberRows
+                Dim NumCols As Integer = .NumberCols
+                Dim NoDataValue As Single = gDest.Header.NodataValue
+                For r As Integer = 0 To NumRows - 1
+                    Dim arL(NumCols - 1), arV(NumCols - 1) As Single
                     gSource.GetRow(r, arL(0))
-                    For c As Integer = 0 To .NumberCols - 1
+                    For c As Integer = 0 To NumCols - 1
                         Dim ID As String = arL(c)
-                        If ID <> "" AndAlso dictLookup.TryGetValue(ID, Lookup) Then arV(c) = Lookup.Factor Else arV(c) = gDest.Header.NodataValue
+                        If ID <> "" AndAlso dictLookup.TryGetValue(ID, Lookup) Then arV(c) = Lookup.Factor Else arV(c) = NoDataValue
                     Next
                     gDest.PutRow(r, arV(0))
                     If Not ProgressForm.SetProgress("Performing grid lookup...", r, .NumberRows - 1) Then Return False
@@ -841,15 +636,18 @@ loopagain:
             gDest = New MapWinGIS.Grid
             If Not gDest.Open(DestFile, , True) Then _LastErrorMsg = "Unable to open grid: " & DestFile : Return False
 
-            If Not GridsIdentical(gSource, gDest) Then _LastErrorMsg = "Source and destination grids are not identical structure." : Return False
+            If Not GridsIdentical(gSource, gDest) Then _LastErrorMsg = "Source and destination grids are not identical structure: " & SourceFile & ", " & DestFile : Return False
 
             With gSource.Header
+                Dim NoDataValueSource As Single = .NodataValue
+                Dim NoDataValueDest As Single = gDest.Header.NodataValue
+
                 For r As Integer = 0 To .NumberRows - 1
                     Dim arV(.NumberCols - 1) As Single
                     If Not gSource.GetRow(r, arV(0)) Then _LastErrorMsg = "Unable to get row from source grid." : Return False
                     For c As Integer = 0 To .NumberCols - 1
-                        If arV(c) = .NodataValue Then
-                            arV(c) = gDest.Header.NodataValue
+                        If arV(c) = NoDataValueSource Then
+                            arV(c) = NoDataValueDest
                         Else
                             arV(c) = LookupFunction(arV(c))
                         End If
@@ -890,11 +688,12 @@ loopagain:
                         Debug.Assert(gSource.Header.NumberCols = gDest.Header.NumberCols AndAlso gSource.Header.NumberRows = gDest.Header.NumberRows)
                     End If
                     With .Header
+                        Dim NoDataValue As Single = .NodataValue
                         Dim arS(.NumberCols - 1), arD(.NumberCols - 1) As Single
                         For r As Integer = 0 To .NumberRows - 1
                             gSource.GetRow(r, arS(0))
                             For c As Integer = 0 To .NumberCols - 1
-                                If arS(c) <> .NodataValue Then arD(c) = Math.Round(arS(c) * Multiplier, PRECISION) Else arD(c) = .NodataValue
+                                If arS(c) <> NoDataValue Then arD(c) = Math.Round(arS(c) * Multiplier, PRECISION) Else arD(c) = NoDataValue
                             Next
                             If gDest Is Nothing Then gSource.PutRow(r, arD(0)) Else gDest.PutRow(r, arD(0))
                             If Not ProgressForm.SetProgress("Multiplying grid...", r, .NumberRows - 1) Then Return False
@@ -940,12 +739,13 @@ loopagain:
                         Debug.Assert(gSource.Header.NumberCols = gMult.Header.NumberCols AndAlso gSource.Header.NumberRows = gMult.Header.NumberRows)
                     End If
                     With .Header
+                        Dim NoDataValue As Single = .NodataValue
                         For r As Integer = 0 To .NumberRows - 1
                             Dim arS(.NumberCols - 1), arD(.NumberCols - 1), arM(.NumberCols - 1) As Single
                             gSource.GetRow(r, arS(0))
                             gMult.GetRow(r, arM(0))
                             For c As Integer = 0 To .NumberCols - 1
-                                If arS(c) <> .NodataValue And arM(c) <> .NodataValue Then arD(c) = Math.Round(arS(c) * arM(c), PRECISION) Else arD(c) = .NodataValue
+                                If arS(c) <> NoDataValue And arM(c) <> NoDataValue Then arD(c) = Math.Round(arS(c) * arM(c), PRECISION) Else arD(c) = NoDataValue
                             Next
                             If gDest Is Nothing Then gSource.PutRow(r, arD(0)) Else gDest.PutRow(r, arD(0))
                             If Not ProgressForm.SetProgress("Multiplying grid...", r, .NumberRows - 1) Then Return False
@@ -990,11 +790,12 @@ loopagain:
                     End If
                     Debug.Assert(gSource.Header.NumberCols = gDest.Header.NumberCols AndAlso gSource.Header.NumberRows = gDest.Header.NumberRows)
                     With .Header
+                        Dim NoDataValue As Single = .NodataValue
                         For r As Integer = 0 To .NumberRows - 1
                             Dim arS(.NumberCols - 1), arD(.NumberCols - 1), arM(.NumberCols - 1) As Single
                             gSource.GetRow(r, arS(0))
                             For c As Integer = 0 To .NumberCols - 1
-                                If arS(c) <> .NodataValue Then
+                                If arS(c) <> NoDataValue Then
                                     Dim LS As Double
                                     Dim Slope As Double = arS(c)
                                     'Dim SlopeLength As Double = Project.GridSize 'in meters
@@ -1020,7 +821,7 @@ loopagain:
                                     LS = Math.Min(LS, 10)
                                     arD(c) = Math.Round(LS, PRECISION)
                                 Else
-                                    arD(c) = .NodataValue
+                                    arD(c) = NoDataValue
                                 End If
                             Next
                             If gDest Is Nothing Then gSource.PutRow(r, arD(0)) Else gDest.PutRow(r, arD(0))
@@ -1065,31 +866,41 @@ loopagain:
                 sfMask.BeginPointInShapefile()
             End If
 
-            Dim SourceCols, SourceRows As Integer
+            Dim SourceCols, SourceRows, DestCols, DestRows As Integer, SourceNoData, DestNoData, DestDx As Single
             With gSource.Header
                 SourceCols = .NumberCols
                 SourceRows = .NumberRows
+                SourceNoData = .NodataValue
             End With
             With gDest.Header
+                DestCols = .NumberCols
+                DestRows = .NumberRows
+                DestNoData = .NodataValue
+                DestDx = .dX
+
                 'get source grid value at center of destination grid
-                Dim ar(.NumberCols - 1) As Single
-                For r As Integer = 0 To .NumberRows - 1
+                Dim ar(DestCols - 1) As Single
+
+                For r As Integer = 0 To DestRows - 1
                     Dim x As Double, y As Double, cc As Integer, rr As Integer
                     gDest.CellToProj(0, r, x, y)
-                    For c As Integer = 0 To .NumberCols - 1
-                        ar(c) = .NodataValue
+                    For c As Integer = 0 To DestCols - 1
+                        ar(c) = DestNoData
                         gSource.ProjToCell(x, y, cc, rr)
                         If cc >= 0 AndAlso cc <= SourceCols - 1 AndAlso rr >= 0 AndAlso rr <= SourceRows - 1 Then
-                            If gSource.Value(cc, rr) <> gSource.Header.NodataValue Then
-                                If MaskShapeFile = "" OrElse sfMask.PointInShapefile(x, y) <> -1 Then
-                                    ar(c) = gSource.Value(cc, rr)
+                            Dim SourceValue As Single = gSource.Value(cc, rr)
+                            If SourceValue <> SourceNoData Then
+                                If MaskShapeFile <> "" Then
+                                    If sfMask.PointInShapefile(x, y) <> -1 Then ar(c) = SourceValue
+                                Else
+                                    ar(c) = SourceValue
                                 End If
                             End If
                         End If
-                        x += .dX
+                        x += DestDx
                     Next
                     gDest.PutRow(r, ar(0))
-                    If Not ProgressForm.SetProgress("Resampling grid...", r, .NumberRows - 1) Then Return False
+                    If Not ProgressForm.SetProgress("Resampling grid...", r, DestRows - 1) Then Return False
                 Next
             End With
             Return True
@@ -1345,6 +1156,7 @@ loopagain:
             If Not g.Open(GridFile) Then LastErrorMsg = "Unable to open grid file: " & GridFile : Return False
 
             With g.Header
+                Dim NoDataValue As Single = .NodataValue
                 For r As Integer = 0 To .NumberRows - 1
                     Dim x, y As Double
                     g.CellToProj(0, r, x, y)
@@ -1352,7 +1164,9 @@ loopagain:
                     If Not g.GetRow(r, ar(0)) Then Return Nothing
                     For c As Integer = 0 To .NumberCols - 1
                         Dim shapenum As Integer = sf.PointInShapefile(x, y)
-                        If shapenum <> -1 Then
+                        If shapenum = -1 Then
+                            ar(c) = NoDataValue
+                        Else
                             If FieldName = "" Then
                                 ar(c) = shapenum + 1
                             Else
@@ -1376,4 +1190,53 @@ loopagain:
             g.Close()
         End Try
     End Function
-End Module
+
+    ''' <summary>
+    ''' Given a source grid file, clip it to all shapes in a shapefile (setting all clipped grid points to -1) and create new grid file
+    ''' </summary>
+    ''' <param name="GridFile">Source grid file to be clipped</param>
+    ''' <param name="ShapeFile">Shapefile containing shapes to clip to</param>
+    ''' <param name="NewGridFile">New grid file containing clipped grid</param>
+    ''' <returns>True if successful</returns>
+    Friend Function ClipGridWithShapefile(ByVal GridFile As String, ByVal ShapeFile As String, ByVal NewGridFile As String) As Boolean
+        Dim sf As New MapWinGIS.Shapefile
+        If Not sf.Open(ShapeFile) Then Return False
+        Dim u As New MapWinGIS.Utils
+
+        Dim grids(sf.NumShapes - 1) As MapWinGIS.Grid
+
+        For j As Integer = 0 To sf.NumShapes - 1
+            Dim tempgrid As String = My.Computer.FileSystem.SpecialDirectories.Temp & "\tempgrid.tif"
+            If Not MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(GridFile, sf.Shape(j), tempgrid) Then
+                WarningMsg("Unable to clip grid: " & GridFile)
+                Return False
+            End If
+            Dim g As New MapWinGIS.Grid
+            If Not g.Open(tempgrid) Then Return False
+            grids(j) = g
+        Next
+        Dim mergegrid As MapWinGIS.Grid = u.GridMerge(grids, NewGridFile)
+        mergegrid.Header.NodataValue = -1
+
+        'problem with above: all cells outside of polygons are assigned a value of 0, rather than NoDataValue
+        If Not u.GridReplace(mergegrid, 0, -1) Then WarningMsg("Could not replace: " & u.ErrorMsg(u.LastErrorCode)) : Return False
+
+        If Not mergegrid.Save(NewGridFile) Then Return False
+        If Not mergegrid.Close() Then Return False
+
+        For j As Integer = 0 To sf.NumShapes - 1
+            grids(j).Close()
+        Next
+        Return True
+    End Function
+
+    Friend Function ClipGridWithShapefile(ByVal GridFile As String, ByVal ShapeFile As String) As Boolean
+        Dim tempClippedGrid As String = My.Computer.FileSystem.SpecialDirectories.Temp & "\tempclippedgrid.tif"
+        If Not ClipGridWithShapefile(GridFile, ShapeFile, tempClippedGrid) Then Return False
+        If Not MapWinGeoProc.DataManagement.DeleteGrid(GridFile) Then Return False
+        If Not MapWinGeoProc.DataManagement.CopyGrid(tempClippedGrid, GridFile) Then Return False
+        If Not MapWinGeoProc.DataManagement.DeleteGrid(tempClippedGrid) Then Return False
+        Return True
+    End Function
+
+    End Module

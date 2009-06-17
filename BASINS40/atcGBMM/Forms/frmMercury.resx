@@ -120,14 +120,11 @@
   <metadata name="HelpProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>134, 17</value>
   </metadata>
-  <metadata name="HelpProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>134, 17</value>
-  </metadata>
-  <data name="lnkMergeCatchments.HelpString" xml:space="preserve">
-    <value>Click this link to open a form which allows you to select subcatchment shapes (such as those found in the NHD Catchments layer) and combine them into a single subbasin shape. This shape is added to your existing subbasin layer indicated above; if a new subbasin layer is selected, it will be created.</value>
-  </data>
   <data name="txtThreshold.HelpString" xml:space="preserve">
     <value>GBMM analyzes the DEM to create a flow path grid; cell in this grid are considered "streams", and all other cells are "overland". The flow path will be defined downstream of all accumulated flow areas which exceed the stream area threshold you enter here.</value>
+  </data>
+  <data name="lnkMergeCatchments.HelpString" xml:space="preserve">
+    <value>Click this link to open a form which allows you to select subcatchment shapes (such as those found in the NHD Catchments layer) and combine them into a single subbasin shape. This shape is added to your existing subbasin layer indicated above; if a new subbasin layer is selected, it will be created.</value>
   </data>
   <data name="txtInputName.HelpString" xml:space="preserve">
     <value>Specify the name of the folder where input to the GBMM C++ computational program will be placed; note that the GBMM input file (specified by clicking the Save As... button) must also reside in this folder. This path would normally look like: C:\Basins\data\01234567\GBMM\</value>
@@ -1595,7 +1592,4 @@ You can only select previously loaded MapWindow layers from those types presente
         AAAAAAAAAAAAAAAAAAAAAAAA
 </value>
   </data>
-  <metadata name="ToolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>249, 17</value>
-  </metadata>
 </root>

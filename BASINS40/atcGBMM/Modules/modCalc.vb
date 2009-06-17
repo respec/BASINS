@@ -88,7 +88,7 @@ Module modCalc
     Private Function Threshold(ByVal NumCells As Integer) As Double
         With Project
             If NumCells < .StreamThreshold / .CellAreaKm Then
-                Return Integer.MinValue
+                Return -1
             Else
                 Return NumCells
             End If
@@ -445,7 +445,7 @@ Module modCalc
 
                 Dim dt As DataTable
 
-                Project.Soils.Clear()
+                .Soils.Clear()
                 dt = LoadTable(.Tables.Soils.Filename)
                 Try
                     For Each dr As DataRow In dt.Rows
@@ -460,7 +460,7 @@ Module modCalc
 
                 'only want to save land uses that are actually encountered...
                 Dim lstLandUses As Generic.List(Of Single) = GetGridValues(.Grids.LandUse.FileName)
-                Project.Landuses.Clear()
+                .Landuses.Clear()
                 dt = LoadTable(.Tables.LandUse.Filename)
                 Try
                     For Each dr As DataRow In dt.Rows
@@ -503,7 +503,7 @@ Module modCalc
                     Dim arCNImperv(NumCols - 1) As Single 'row of cns to be written-impervious
                     Dim LU As clsLandUse = Nothing
                     sfSoils.BeginPointInShapefile()
-                    Dim lstMissing As New Generic.List(Of Integer)
+                    Dim lstMissing As New Generic.List(Of String)
 
                     For r As Integer = 0 To NumRows - 1
                         gLandUse.GetRow(r, arLU(0))
@@ -521,6 +521,7 @@ Module modCalc
                                     Dim CN As Integer, Soil As clsSoil = Nothing
                                     If Project.Soils.TryGetValue(MUID, Soil) AndAlso _
                                        dictCN.TryGetValue(CInt(Soil.GroupValue + arLU(c)), CN) AndAlso _
+                                       CN <> 0 AndAlso _
                                        Project.Landuses.TryGetValue(arLU(c), LU) Then 'found soil type, combined with lucode, got CN, and imperv ratios
                                         arSoil(c) = Soil.SoilID
                                         arCNPerv(c) = CN
@@ -530,10 +531,11 @@ Module modCalc
                                             Else
                                                 arCNImperv(c) = (CN * (1 - .Imp_Tot) + 98 * .Imp_DCon) / (1 - (.Imp_Tot - .Imp_DCon))
                                             End If
+                                            arCNImperv(c) = Math.Max(Math.Min(arCNImperv(c), 99.99), 0.01)
                                         End With
                                     Else
-                                        If Not lstMissing.Contains(CInt(arLU(c))) Then lstMissing.Add(CInt(arLU(c)))
-                                        'Debug.Assert(False)
+                                        Dim s As String = String.Format("Land Use: {0}; Soil Type: {1}; Land Use/CN Lookup: {2}; CN: {3}", arLU(c), MUID, CInt(Soil.GroupValue + arLU(c)), CN)
+                                        If Not lstMissing.Contains(s) Then lstMissing.Add(s)
                                     End If
                                 End If
                             End If
@@ -546,11 +548,12 @@ Module modCalc
                         y -= dY
                     Next
                     If lstMissing.Count <> 0 Then
+                        lstMissing.Sort()
                         Dim err As String = ""
-                        For Each i As Integer In lstMissing
-                            err &= i & "\n"
+                        For Each LUCode As String In lstMissing
+                            err &= LUCode & "\n"
                         Next
-                        WarningMsg("The following landuse IDs were missing from the LandUse Lookup and/or LandUse_CN tables:\n\n{0}\n\nThe computed CN grids were assigned 'NoDataValue' values at the affected locations.", err)
+                        If Logger.Message(String.Format("The following landuse and soil IDs were missing from the LandUse Lookup and/or LandUse_CN and/or Soil tables, or the lookup value for the CN was 0:\n\n{0}\n\nThe computed CN grids were assigned 'NoDataValue' values at the affected locations.", err).Replace("\n", vbCr), "GBMM Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, DialogResult.Cancel) = DialogResult.Cancel Then Return False
                     End If
                 End With
                 gSoils.Save()
@@ -641,7 +644,7 @@ Module modCalc
                 If Not CreateGrid(.Grids.Roughness.FileName) Then Return False
                 If Not LookupGrid(.Grids.LandUse.FileName, .Grids.Roughness.FileName, dictRoughness) Then Return False
 
-                If Not CalcDownstream(.Grids.FlowDir.FileName, .Grids.Roughness.FileName, .Grids.FlowPath.FileName, .Grids.AvgRoughness.FileName, enumFlowOption.Both, enumCalcOption.Average) Then Return False
+                If Not CalcDownstream(.Grids.FlowDir.FileName, .Grids.Roughness.FileName, .Grids.FlowPath.FileName, .Grids.AvgRoughness.FileName, enumFlowOption.Overland, enumCalcOption.Average) Then Return False
 
                 If Not .Grids.Roughness.AddLayer() Then Return False
                 If GisUtil.IsLayer(.Grids.Roughness.LayerName) Then GisUtil.UniqueValuesRenderer(GisUtil.LayerIndex(.Grids.Roughness.FileName)) '...because default renderer doesn't work correctly for single-precision numbers
@@ -671,8 +674,8 @@ Module modCalc
             With .StreamParms
                 Dim Depth As Double = .AlphaDepth * DrainageArea ^ .BetaDepth
                 Dim Width As Double = .AlphaWidth * DrainageArea ^ .BetaWidth
-                Dim Area As Double = Depth * (Width + Depth / 2 * (1 / .Z1 + 1 / .Z2))
-                Dim Perim As Double = Width + Depth * (Math.Sqrt(1 + (1 / .Z1) ^ 2) + Math.Sqrt(1 + (1 / .Z2) ^ 2))
+                Dim Area As Double = Depth * (Width + Depth / 2 * (.Z1 + .Z2))
+                Dim Perim As Double = Width + Depth * (Math.Sqrt(1 + .Z1 ^ 2) + Math.Sqrt(1 + .Z2 ^ 2))
                 If Perim = 0 Then Return 0 Else Return Area / Perim
             End With
         End With
@@ -683,7 +686,7 @@ Module modCalc
     ''' </summary>
     Private Function CalcHydRad() As Boolean
         With Project.Grids
-            If .HydRadius.IsUpToDate(.FlowAccum.FileName, .FlowPath.FileName) Then Return True
+            If .HydRadius.IsUpToDate(.FlowAccum.FileName, .FlowPath.FileName, .AvgHydRadius.FileName) Then Return True
 
             If .DEM.FileName = "" Then WarningMsg("You must specify a valid DEM layer.") : Return False
             If .FlowAccum.FileName = "" Then WarningMsg("You must specify a valid Flow Accumulation layer.") : Return False
@@ -775,7 +778,8 @@ Module modCalc
 
             'Tch = L/(3600*V), where T is travel time (hr), L is flow length (m), V is channel velocity (m/s)
             'V = 1/n * R^2/3 * S^1/2, where V is velocity (m/s), n is roughness, R is hyd rad (m), S is slope (m/m)
-            'n, R, and S grids already calculated; flow length determined as total downstream flow to outlet
+            'R, and S grids already calculated; for n use constant channel Manning's n input by user
+            'Flow length determined as total downstream flow to outlet
 
             'total travel time:
 
@@ -806,6 +810,13 @@ Module modCalc
 
                 'loop through each cell and compute travel time for overland and stream
                 With gTravelStream.Header
+                    Dim NoDataValueTS As Single = .NodataValue
+                    Dim NoDataValueAR As Single = gAvgRoughness.Header.NodataValue
+                    Dim NoDataValueAH As Single = gAvgHydRad.Header.NodataValue
+                    Dim NoDataValueSS As Single = gAvgSlopeStream.Header.NodataValue
+                    Dim NoDataValueSO As Single = gAvgSlopeOverland.Header.NodataValue
+                    Dim NoDataValueDS As Single = gDistToStream.Header.NodataValue
+                    Dim NoDataValueDO As Single = gDistToOutlet.Header.NodataValue
                     Dim arAvgSlopeOverland(.NumberCols - 1) As Single
                     Dim arAvgSlopeStream(.NumberCols - 1) As Single
                     Dim arAvgRoughness(.NumberCols - 1) As Single
@@ -822,16 +833,16 @@ Module modCalc
                         If Not gDistToStream.GetRow(r, arDistToStream(0)) Then Return False
                         If Not gDistToOutlet.GetRow(r, arDistToOutlet(0)) Then Return False
                         For c As Integer = 0 To .NumberCols - 1
-                            arTravelOverland(c) = .NodataValue
-                            If arDistToStream(c) <> gDistToStream.Header.NodataValue AndAlso arAvgRoughness(c) <> gAvgRoughness.Header.NodataValue AndAlso arAvgRoughness(c) <> 0 Then
+                            arTravelOverland(c) = NoDataValueTS
+                            If arDistToStream(c) <> NoDataValueDS AndAlso arAvgRoughness(c) <> NoDataValueAR AndAlso arAvgRoughness(c) <> 0 Then
                                 Dim L As Double = arDistToStream(c)
                                 Dim S As Double = Math.Max(arAvgSlopeOverland(c), 0.001)
                                 arTravelOverland(c) = 0.0289 * (arAvgRoughness(c) * L) ^ 0.8 / (Project.WatershedParms.P2Rainfall ^ 0.4 * S ^ 0.4)
                             End If
-                            arTravelStream(c) = .NodataValue
-                            If arDistToOutlet(c) <> gDistToOutlet.Header.NodataValue AndAlso arAvgHydRad(c) <> gAvgHydRad.Header.NodataValue AndAlso arAvgSlopeStream(c) <> gAvgSlopeStream.Header.NodataValue Then
+                            arTravelStream(c) = NoDataValueTS
+                            If arDistToOutlet(c) <> NoDataValueDO AndAlso arAvgHydRad(c) <> NoDataValueAH AndAlso arAvgSlopeStream(c) <> NoDataValueSS Then
                                 Dim S As Double = Math.Max(arAvgSlopeStream(c), 0.0001)
-                                Dim V As Double = 1 / arAvgRoughness(c) * arAvgHydRad(c) ^ 0.6667 * Math.Sqrt(S)
+                                Dim V As Double = 1 / Project.StreamParms.Manning * arAvgHydRad(c) ^ 0.6667 * Math.Sqrt(S)
                                 Dim L As Double = arDistToOutlet(c)
                                 If V <> 0 Then
                                     arTravelStream(c) = L / (3600 * V)
@@ -896,9 +907,11 @@ Module modCalc
                     Project.Watersheds.Count > 0 AndAlso _
                     Project.TravelTimes.Count > 0 Then Return True
 
-                If Not CreateGrid(.Subbasins.FileName, MapWinGIS.GridDataType.LongDataType) Then Return False
-                If Not ShapefileToGrid(Project.Layers.Subbasins.Filename, "", .Subbasins.FileName) Then Return False
-                .Subbasins.AddLayer()
+                If Not .Subbasins.IsUpToDate(Project.Layers.Subbasins.Filename) Then
+                    If Not CreateGrid(.Subbasins.FileName, MapWinGIS.GridDataType.LongDataType) Then Return False
+                    If Not ShapefileToGrid(Project.Layers.Subbasins.Filename, "", .Subbasins.FileName) Then Return False
+                    .Subbasins.AddLayer()
+                End If
 
                 'compute travel times from outlet to outlet; outlets will be defined as lowest grid point in the subbasin
                 If Not gDEM.Open(.DEM.FileName) Then LastErrorMsg = "Unable to open: " & .DEM.FileName : Return False
@@ -922,17 +935,20 @@ Module modCalc
 
             Project.AssessmentPoints.Clear()
 
+            Dim NoDataValueDir As Single = gDir.Header.NodataValue
+
             With gDEM.Header
+                Dim NoDataValueDEM As Single = .NodataValue
                 Dim arDEM(.NumberCols - 1) As Single
                 Dim arSub(.NumberCols - 1) As Single
                 For r As Integer = 0 To .NumberRows - 1
                     gDEM.GetRow(r, arDEM(0))
                     gSub.GetRow(r, arSub(0))
                     For c As Integer = 0 To .NumberCols - 1
-                        If arDEM(c) <> .NodataValue Then
+                        If arDEM(c) <> NoDataValueDEM Then
                             Dim AssessPt As clsAssessPt = Nothing
                             If Not Project.AssessmentPoints.TryGetValue(arSub(c), AssessPt) Then AssessPt = New clsAssessPt(arSub(c), Integer.MaxValue, r, c)
-                            If arDEM(c) < AssessPt.MinElev And arDir(r, c) <> gDir.Header.NodataValue Then
+                            If arDEM(c) < AssessPt.MinElev And arDir(r, c) <> NoDataValueDir Then
                                 Project.AssessmentPoints.Remove(arSub(c))
                                 Project.AssessmentPoints.Add(arSub(c), New clsAssessPt(arSub(c), arDEM(c), r, c))
                             End If
@@ -1019,7 +1035,7 @@ Module modCalc
 
                         'stop when no downstream cell get to another assessment point
 
-                        If arDir(dsr, dsc) = gDir.Header.NodataValue Then 'is ds-most outlet, must save special link
+                        If arDir(dsr, dsc) = NodataValuedir Then 'is ds-most outlet, must save special link
                             .TravelTimes.Add(New clsTravelTime(ptSource.SubID, 0, 0.0))
                             Exit Do
                         End If
@@ -1189,7 +1205,7 @@ Module modCalc
 
     Private Function CalcLitter() As Boolean
         With Project.Grids
-            'If .MercuryLitter.IsUpToDate(.LandUse.FileName) Then Return True
+            If .MercuryLitter.IsUpToDate(.LandUse.FileName) Then Return True
             If Not CreateGrid(.MercuryLitter.FileName) Then Return False
             If Not LookupGrid(.LandUse.FileName, .MercuryLitter.FileName, LookupKdComp) Then Return False
             .MercuryLitter.AddLayer()
@@ -1213,6 +1229,14 @@ Module modCalc
     End Function
 
     Private Function SaveGrids() As Boolean
+        'delete all existing .asc files after removing them if loaded in map
+        For Each fn As String In My.Computer.FileSystem.GetFiles(Project.Folders.InputFolder, FileIO.SearchOption.SearchTopLevelOnly, "*.asc")
+            If GisUtil.IsLayerByFileName(fn) Then GisUtil.RemoveLayer(GisUtil.LayerIndex(fn))
+            Try
+                My.Computer.FileSystem.DeleteFile(fn)
+            Catch ex As Exception
+            End Try
+        Next
         With Project.Grids
             If Not ExportGrid(.ClimateThiessan, 18) Then Return False
             If Not ExportGrid(.LandUse) Then Return False

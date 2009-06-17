@@ -289,6 +289,10 @@ Module modGBMM
                     Case ".DBF"
                         .DataSource = IO.Path.GetDirectoryName(TableFileName)
                         TableName = IO.Path.GetFileNameWithoutExtension(TableFileName)
+                        If TableName.Length > 13 Then
+                            WarningMsg("The DBF filename ({0}) must not exceed 8 characters.", TableName)
+                            Return Nothing
+                        End If
                         .Item("Extended Properties") = "DBase III"
                     Case ".TXT", ".CSV"
                         'requires reference to Lumenworks csv reader
