@@ -134,7 +134,7 @@ Public Module ConstituentBalance
                                         Dim lStateVariable As Boolean
                                         Dim lMult As Double = 1.0
                                         Select Case lConstituentKey
-                                            Case "POQUAL-BOD", "SOQUAL-BOD"
+                                            Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD"
                                                 'might need another multiplier for bod
                                                 If aBalanceType = "BOD" Then
                                                     lMult = 0.4

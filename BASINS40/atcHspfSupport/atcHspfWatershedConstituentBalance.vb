@@ -282,7 +282,7 @@ Public Module WatershedConstituentBalance
                                                 lTempDataSet = lLocationDataGroup.Item(0)
                                                 Dim lMult As Double = 1.0
                                                 Select Case lConstituentKey
-                                                    Case "POQUAL-BOD", "SOQUAL-BOD"
+                                                    Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD"
                                                         'might need another multiplier for bod
                                                         If aBalanceType = "BOD" Then
                                                             lMult = 0.4
@@ -314,7 +314,11 @@ Public Module WatershedConstituentBalance
                                                 If lOperationType <> "RCHRES" Then
                                                     lWeightAccum += lValue * lOperationAreas.ItemByKey(lLocation)
                                                 ElseIf lLocation = aOutletLocation Then
-                                                    lValueOutlet = lValue * 12  'feet to inches
+                                                    If aBalanceType = "Water" Then
+                                                        lValueOutlet = lValue * 12  'feet to inches
+                                                    Else
+                                                        lValueOutlet = lValue
+                                                    End If
                                                 End If
                                             End If
                                         Next lLocation
@@ -495,16 +499,27 @@ Public Module WatershedConstituentBalance
                 lTotalArea += lArea
                 lSummarySB.AppendLine(("  " & lOperationType).PadRight(12) & DecimalAlign(lArea, , , 8))
             Next
+
             lSummarySB.AppendLine()
             lSummarySB.AppendLine("  RCHRES".PadRight(12) & DecimalAlign(lTotalArea, , , 8))
+
+            Dim lRowIdLength As Integer = 16
             lSummarySB.AppendLine()
+            lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "OverOperType".PadLeft(12) & _
+                                                        vbTab & "Land".PadRight(12) & _
+                                                        vbTab & "OverAll".PadLeft(12))
             If aBalanceType = "Water" Then
-                lSummarySB.AppendLine(Space(12) & vbTab & "OverOperType".PadLeft(12) & _
-                                                  vbTab & "Land".PadRight(12) & _
-                                                  vbTab & "OverAll".PadLeft(12))
-                lSummarySB.AppendLine(Space(12) & vbTab & "Inches".PadLeft(12) & _
-                                                  vbTab & "Ac-Ft".PadRight(12) & _
-                                                  vbTab & "Inches".PadLeft(12))
+                lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) & _
+                                                            vbTab & "Ac-Ft".PadRight(12) & _
+                                                            vbTab & "Inches".PadLeft(12))
+            ElseIf aBalanceType = "Sediment" Then
+                lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) & _
+                                                            vbTab & "tons".PadRight(12) & _
+                                                            vbTab & "tons/ac".PadLeft(12))
+            Else
+                lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lb/ac".PadLeft(12) & _
+                                                            vbTab & "lbs".PadRight(12) & _
+                                                            vbTab & "lb/ac".PadLeft(12))
             End If
 
             For Each lOperationType As String In aOperationTypes
@@ -515,10 +530,18 @@ Public Module WatershedConstituentBalance
                         If lNeedHeader Then
                             lSummarySB.AppendLine()
                             If lOperationType = "RCHRES" Then
-                                lSummarySB.AppendLine(Space(12) & vbTab & "Reach".PadLeft(12) & _
-                                                                  vbTab & "Outlets".PadRight(12))
-                                lSummarySB.AppendLine(Space(12) & vbTab & "Inches".PadLeft(12) & _
-                                                                  vbTab & "Ac-Ft".PadRight(12))
+                                lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "Reach".PadLeft(12) & _
+                                                                            vbTab & "Outlets".PadRight(12))
+                                If aBalanceType = "Water" Then
+                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) & _
+                                                                                vbTab & "Ac-Ft".PadRight(12))
+                                ElseIf aBalanceType = "Sediment" Then
+                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadRight(12) & _
+                                                                                vbTab & "tons/ac".PadLeft(12))
+                                Else
+                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs".PadLeft(12) & _
+                                                                                vbTab & "lbs/ac".PadRight(12))
+                                End If
                                 lSummarySB.AppendLine("RCHRES") ' & vbTab & vbTab & "Area" & vbTab & DecimalAlign(lTotalArea))
                             Else
                                 lSummarySB.AppendLine(lOperationType) '& vbTab & vbTab & "Area" & vbTab & DecimalAlign(lOperationTypeArea))
@@ -526,18 +549,25 @@ Public Module WatershedConstituentBalance
                             lNeedHeader = False
                         End If
                         Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+                        If lConstituentName.Length > lRowIdLength Then
+                            lConstituentName = lConstituentName.Substring(0, lRowIdLength)
+                        End If
                         Dim lConstituentTotalIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentKey)
                         If lConstituentTotalIndex >= 0 Then
                             Dim lValue As Double = lConstituentTotals.Item(lConstituentTotalIndex)
+                            Dim lUnitsAdjust As Double = 1.0
+                            If aBalanceType = "Water" Then
+                                lUnitsAdjust = 12
+                            End If
                             If Math.Abs(lValue) > 0.00001 Then
                                 If lOperationType = "RCHRES" Then
-                                    lSummarySB.Append(lConstituentName.PadRight(12) & vbTab & _
+                                    lSummarySB.Append(lConstituentName.PadRight(lRowIdLength) & vbTab & _
                                                DecimalAlign(lValue / lTotalArea) & vbTab & _
-                                               DecimalAlign(lValue / 12))
+                                               DecimalAlign(lValue / lUnitsAdjust))
                                 Else
-                                    lSummarySB.Append(lConstituentName.PadRight(12) & vbTab & _
+                                    lSummarySB.Append(lConstituentName.PadRight(lRowIdLength) & vbTab & _
                                                DecimalAlign(lValue / lOperationTypeArea) & vbTab & _
-                                               DecimalAlign(lValue / 12) & vbTab & _
+                                               DecimalAlign(lValue / lUnitsAdjust) & vbTab & _
                                                DecimalAlign(lValue / lTotalArea))
                                 End If
                                 lSummarySB.AppendLine()
@@ -545,12 +575,12 @@ Public Module WatershedConstituentBalance
                                 'Logger.Dbg("SkipNoData:" & lConstituentKey)
                             End If
                         ElseIf Not lConstituentKey.Substring(2).StartsWith("Header") Then
-                            lSummarySB.AppendLine(lConstituentName.PadRight(12) & vbTab & _
+                            lSummarySB.AppendLine(lConstituentName.PadRight(lRowIdLength) & vbTab & _
                                                DecimalAlign(0.0) & vbTab & _
                                                DecimalAlign(0.0))
                         Else
                             lSummarySB.AppendLine()
-                            lSummarySB.AppendLine(lConstituentName.PadRight(12))
+                            lSummarySB.AppendLine(lConstituentName.PadRight(lRowIdLength))
                         End If
                     End If
                 Next
