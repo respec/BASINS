@@ -506,19 +506,19 @@ Public Module WatershedConstituentBalance
             Dim lRowIdLength As Integer = 16
             lSummarySB.AppendLine()
             lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "OverOperType".PadLeft(12) & _
-                                                        vbTab & "Land".PadRight(12) & _
+                                                        vbTab & "Land".PadLeft(12) & _
                                                         vbTab & "OverAll".PadLeft(12))
             If aBalanceType = "Water" Then
                 lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) & _
-                                                            vbTab & "Ac-Ft".PadRight(12) & _
+                                                            vbTab & "Ac-Ft".PadLeft(12) & _
                                                             vbTab & "Inches".PadLeft(12))
             ElseIf aBalanceType = "Sediment" Then
                 lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) & _
-                                                            vbTab & "tons".PadRight(12) & _
+                                                            vbTab & "tons".PadLeft(12) & _
                                                             vbTab & "tons/ac".PadLeft(12))
             Else
                 lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
-                                                            vbTab & "lbs".PadRight(12) & _
+                                                            vbTab & "lbs".PadLeft(12) & _
                                                             vbTab & "lbs/ac".PadLeft(12))
             End If
 
@@ -531,16 +531,16 @@ Public Module WatershedConstituentBalance
                             lSummarySB.AppendLine()
                             If lOperationType = "RCHRES" Then
                                 lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "Reach".PadLeft(12) & _
-                                                                            vbTab & "Outlets".PadRight(12))
+                                                                            vbTab & "Outlets".PadLeft(12))
                                 If aBalanceType = "Water" Then
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) & _
-                                                                                vbTab & "Ac-Ft".PadRight(12))
+                                                                                vbTab & "Ac-Ft".PadLeft(12))
                                 ElseIf aBalanceType = "Sediment" Then
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadRight(12) & _
                                                                                 vbTab & "tons/ac".PadLeft(12))
                                 Else
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
-                                                                                vbTab & "lbs".PadRight(12))
+                                                                                vbTab & "lbs".PadLeft(12))
                                 End If
                                 lSummarySB.AppendLine("RCHRES") ' & vbTab & vbTab & "Area" & vbTab & DecimalAlign(lTotalArea))
                             Else
