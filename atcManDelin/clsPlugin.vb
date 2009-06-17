@@ -252,7 +252,7 @@ Module ManDelin
                 'store in slope field as percent
                 If GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSlopeFieldIndex) <= 0 Then
                     lSlope = GisUtil.GridSlopeInPolygon(lElevationLayerIndex, lSubbasinLayerIndex, lSubbasinIndex - 1)
-                    If Not GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\ned\") > -1 Then
+                    If Not (GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\ned\") > -1 Or GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\elev_cm") > -1) Then
                         lSlope *= 100
                     End If
                     GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
@@ -655,7 +655,7 @@ Module ManDelin
                 gmin = GisUtil.GridValueAtPoint(lElevationLayerIndex, x1, y1)
                 gmax = GisUtil.GridValueAtPoint(lElevationLayerIndex, x2, y2)
                 If InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\ned\") > 0 Or _
-                   InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\elev_cm\") > 0 Then
+                   InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\elev_cm") > 0 Then
                     'this is an ned grid (in cm), convert to meters
                     gmin = gmin / 100
                     gmax = gmax / 100
