@@ -218,8 +218,17 @@ Public Module WatershedConstituentBalance
                             For Each lConstituentKey As String In lConstituentsToOutput.Keys
                                 If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+                                    Dim lConstituentDataName As String = lConstituentKey
+                                    Dim lMultipleIndex As Integer = 0
+                                    If Not lConstituentKey.ToLower.Contains("header") AndAlso Not lConstituentKey.ToLower.Contains("total") Then
+                                        If lConstituentDataName.EndsWith("1") Or lConstituentDataName.EndsWith("2") Then
+                                            lMultipleIndex = lConstituentDataName.Substring(lConstituentDataName.Length - 1)
+                                            lConstituentDataName = lConstituentDataName.Substring(0, lConstituentDataName.Length - 1)
+                                        End If
+                                    End If
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
-                                    lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
+                                    lConstituentDataName = lConstituentDataName.Remove(0, 2)
+                                    lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentDataName)
                                     If lConstituentDataGroup.Count > 0 Then
                                         If lNeedHeader Then
                                             .Delimiter = vbTab
@@ -281,19 +290,27 @@ Public Module WatershedConstituentBalance
                                             If lLocationDataGroup.Count > 0 Then
                                                 lTempDataSet = lLocationDataGroup.Item(0)
                                                 Dim lMult As Double = 1.0
-                                                Select Case lConstituentKey
+                                                Select Case lConstituentDataName
                                                     Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD"
                                                         'might need another multiplier for bod
                                                         If aBalanceType = "BOD" Then
                                                             lMult = 0.4
                                                         ElseIf aBalanceType = "OrganicN" Or aBalanceType = "TotalN" Then
-                                                            lMult = 0.048
+                                                            If lMultipleIndex = 1 Then
+                                                                lMult = 0.048
+                                                            ElseIf lMultipleIndex = 2 Then
+                                                                lMult = 0.05294
+                                                            End If
                                                         ElseIf aBalanceType = "OrganicP" Or aBalanceType = "TotalP" Then
-                                                            lMult = 0.0023
+                                                            If lMultipleIndex = 1 Then
+                                                                lMult = 0.0023
+                                                            ElseIf lMultipleIndex = 2 Then
+                                                                lMult = 0.007326
+                                                            End If
                                                         End If
                                                 End Select
                                                 Dim lAttribute As atcDefinedValue
-                                                Select Case lConstituentKey
+                                                Select Case lConstituentDataName
                                                     Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
                                                         lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
                                                     Case Else
