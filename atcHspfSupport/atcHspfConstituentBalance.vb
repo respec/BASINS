@@ -71,6 +71,13 @@ Public Module ConstituentBalance
                             For Each lConstituentKey As String In lConstituentsToOutput.Keys
                                 If lConstituentKey.StartsWith(lOperationKey) Then
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+                                    Dim lMultipleIndex As Integer = 0
+                                    If Not lConstituentKey.ToLower.Contains("header") AndAlso Not lConstituentKey.ToLower.Contains("total") Then
+                                        If lConstituentKey.EndsWith("1") Or lConstituentKey.EndsWith("2") Then
+                                            lMultipleIndex = lConstituentKey.Substring(lConstituentKey.Length - 1)
+                                            lConstituentKey = lConstituentKey.Substring(0, lConstituentKey.Length - 1)
+                                        End If
+                                    End If
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
                                     Dim lConstituentDataGroup As atcTimeseriesGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
                                     If lConstituentDataGroup.Count > 0 Then
@@ -139,9 +146,17 @@ Public Module ConstituentBalance
                                                 If aBalanceType = "BOD" Then
                                                     lMult = 0.4
                                                 ElseIf aBalanceType = "OrganicN" Or aBalanceType = "TotalN" Then
-                                                    lMult = 0.048
+                                                    If lMultipleIndex = 1 Then
+                                                        lMult = 0.048
+                                                    ElseIf lMultipleIndex = 2 Then
+                                                        lMult = 0.05294
+                                                    End If
                                                 ElseIf aBalanceType = "OrganicP" Or aBalanceType = "TotalP" Then
-                                                    lMult = 0.0023
+                                                    If lMultipleIndex = 1 Then
+                                                        lMult = 0.0023
+                                                    ElseIf lMultipleIndex = 2 Then
+                                                        lMult = 0.007326
+                                                    End If
                                                 End If
                                         End Select
 
@@ -169,38 +184,38 @@ Public Module ConstituentBalance
                                         Else
                                             .Value(2) = "Skip-NoData"
                                         End If
-                                            .CurrentRecord += 1
-                                        ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                               lConstituentKey.Length > 5 AndAlso _
-                                               IsNumeric(lConstituentKey.Substring(5)) Then
-                                            Dim lTotalCount As Integer = lConstituentKey.Substring(5)
-                                            Dim lCurFieldValues(.NumFields) As Double
-                                            Dim lCurrentRecordSave As Integer = .CurrentRecord
-                                            For lCount As Integer = 1 To lTotalCount
-                                                .CurrentRecord -= 1
-                                                For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
-                                                    If IsNumeric(.Value(lFieldPos)) Then
-                                                        lCurFieldValues(lFieldPos) += .Value(lFieldPos)
-                                                    Else
-                                                        Logger.Dbg("Why")
-                                                    End If
-                                                Next
-                                            Next
-                                            .CurrentRecord = lCurrentRecordSave
-                                            .Value(1) = lConstituentName.PadRight(aFieldWidth)
+                                        .CurrentRecord += 1
+                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso _
+                                           lConstituentKey.Length > 5 AndAlso _
+                                           IsNumeric(lConstituentKey.Substring(5)) Then
+                                        Dim lTotalCount As Integer = lConstituentKey.Substring(5)
+                                        Dim lCurFieldValues(.NumFields) As Double
+                                        Dim lCurrentRecordSave As Integer = .CurrentRecord
+                                        For lCount As Integer = 1 To lTotalCount
+                                            .CurrentRecord -= 1
                                             For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
-                                                .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                If IsNumeric(.Value(lFieldPos)) Then
+                                                    lCurFieldValues(lFieldPos) += .Value(lFieldPos)
+                                                Else
+                                                    Logger.Dbg("Why")
+                                                End If
                                             Next
-                                            .CurrentRecord += 1
-                                        Else
-                                            If lPendingOutput.Length > 0 Then
-                                                lPendingOutput &= vbCr
-                                            End If
-                                            If lConstituentKey.StartsWith("Header") Then
-                                                lPendingOutput &= vbCr
-                                            End If
-                                            lPendingOutput &= lConstituentName
+                                        Next
+                                        .CurrentRecord = lCurrentRecordSave
+                                        .Value(1) = lConstituentName.PadRight(aFieldWidth)
+                                        For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
+                                            .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                        Next
+                                        .CurrentRecord += 1
+                                    Else
+                                        If lPendingOutput.Length > 0 Then
+                                            lPendingOutput &= vbCr
                                         End If
+                                        If lConstituentKey.StartsWith("Header") Then
+                                            lPendingOutput &= vbCr
+                                        End If
+                                        lPendingOutput &= lConstituentName
+                                    End If
                                 End If
                             Next
                             If lOutputTable.NumFields > 0 Then
