@@ -517,9 +517,9 @@ Public Module WatershedConstituentBalance
                                                             vbTab & "tons".PadRight(12) & _
                                                             vbTab & "tons/ac".PadLeft(12))
             Else
-                lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lb/ac".PadLeft(12) & _
+                lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
                                                             vbTab & "lbs".PadRight(12) & _
-                                                            vbTab & "lb/ac".PadLeft(12))
+                                                            vbTab & "lbs/ac".PadLeft(12))
             End If
 
             For Each lOperationType As String In aOperationTypes
@@ -539,8 +539,8 @@ Public Module WatershedConstituentBalance
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadRight(12) & _
                                                                                 vbTab & "tons/ac".PadLeft(12))
                                 Else
-                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs".PadLeft(12) & _
-                                                                                vbTab & "lbs/ac".PadRight(12))
+                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
+                                                                                vbTab & "lbs".PadRight(12))
                                 End If
                                 lSummarySB.AppendLine("RCHRES") ' & vbTab & vbTab & "Area" & vbTab & DecimalAlign(lTotalArea))
                             Else

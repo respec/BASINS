@@ -269,6 +269,27 @@ Public Module Utility
                 'lConstituentsToOutput.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
                 'lConstituentsToOutput.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
             Case "TotalP"
+                lConstituentsToOutput.Add("P:Header1", "Ortho P")
+                lConstituentsToOutput.Add("P:SOQUAL-Ortho P", "SOQUAL")
+                lConstituentsToOutput.Add("P:IOQUAL-Ortho P", "IOQUAL")
+                lConstituentsToOutput.Add("P:AOQUAL-Ortho P", "AOQUAL")
+                lConstituentsToOutput.Add("P:POQUAL-Ortho P", "POQUAL")
+
+                lConstituentsToOutput.Add("I:Header5", "Ortho P")
+                lConstituentsToOutput.Add("I:SOQUAL-Ortho P", "SOQUAL")
+
+                lConstituentsToOutput.Add("R:Header11", "PO4")
+                lConstituentsToOutput.Add("R:PO4-INTOT", "  PO4-INTOT")
+                lConstituentsToOutput.Add("R:PO4-INDIS", "  PO4-INDIS")
+                lConstituentsToOutput.Add("R:PO4-INPART-TOT", "  PO4-INPART-TOT")
+                lConstituentsToOutput.Add("R:PO4-PROCFLUX-TOT", "  PO4-PROCFLUX-TOT")
+                lConstituentsToOutput.Add("R:PO4-OUTTOT", "  PO4-OUTTOT")
+                lConstituentsToOutput.Add("R:PO4-OUTDIS", "  PO4-OUTDIS")
+                lConstituentsToOutput.Add("R:PO4-OUTPART-TOT", "  PO4-OUTPART-TOT")
+
+                lConstituentsToOutput.Add("R:Header15", "Totals")
+                lConstituentsToOutput.Add("R:P-TOT-IN", "  P-TOT-IN")
+                lConstituentsToOutput.Add("R:P-TOT-OUT", "  P-TOT-OUT")
         End Select
         Return lConstituentsToOutput
     End Function
