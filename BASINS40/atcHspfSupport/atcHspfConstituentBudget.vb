@@ -68,18 +68,25 @@ Public Module ConstituentBudget
                 LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
                 Dim lNonpointTons As Double = TotalForReach(lID, lAreas, lNonpointData)
+
+                'TODO: actually find point tons
                 Dim lPointTons As Double = 0
-                'If lID.Id = 540 Then lPointTons = 134.3 'TODO: actually find point tons
-                Dim lTotalInflow As Double = TotalForReach(lID, lAreas, lTotalInflowData)
+
                 Dim lUpstreamIn As Double = 0
                 If lUpstreamInflows.Keys.Contains(lID.Id) Then
                     lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
                 End If
-                'lTotalInflow - (lNonpointTons + lPointTons) 'TODO: get from total Outflow of upstream reach(es)
-                Dim lOutflow As Double = TotalForReach(lID, lAreas, lOutflowData)
-                Dim lDepScour As Double = TotalForReach(lID, lAreas, lDepScourData)
+
+                'TODO: these two formulations are slightly different - WHY?
+                Dim lTotalInflow As Double = lNonpointTons + lPointTons + lUpstreamIn
+                'Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData) 'TotalForReach(lID, lAreas, lTotalInflowData)
+
+                Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
+                Dim lDepScour As Double = ValueForReach(lID, lDepScourData) 'TotalForReach(lID, lAreas, lDepScourData)
                 Dim lCumulativePointNonpoint As Double = lNonpointTons + lPointTons
-                If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
+                If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
+                    lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
+                End If
 
                 Dim lReachTrappingEfficiency As Double
                 Try
@@ -130,6 +137,13 @@ Public Module ConstituentBudget
             Next
         Next
         Return lTotal
+    End Function
+
+    Private Function ValueForReach(ByVal aReach As HspfOperation, _
+                                   ByVal aReachData As atcTimeseriesGroup) As Double
+        Dim lReachData As atcTimeseries = aReachData.FindData("Location", "R:" & aReach.Id).Item(0)
+        Dim lOutflow As Double = lReachData.Attributes.GetDefinedValue("SumAnnual").Value
+        Return lOutflow
     End Function
 
 End Module
