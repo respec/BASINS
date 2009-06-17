@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
@@ -30,6 +30,7 @@
     <MyType>Windows</MyType>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\..\Basins\bin\Plugins\Sediment\</OutputPath>
@@ -72,33 +73,43 @@
   <ItemGroup>
     <Reference Include="atcControls, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\Plugins\atcControls.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Plugins\BASINS\atcControls.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="atcData, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\Plugins\atcData.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Plugins\BASINS\atcData.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="atcUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\Plugins\atcUtility.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Plugins\BASINS\atcUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Basins\bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Interop.TKTAUDEMLib, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin\Interop.TKTAUDEMLib.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Interop.TKTAUDEMLib.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MapWinGeoProc, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinGeoProc.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\MapWinGeoProc.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinInterfaces, Version=4.0.2311.37837, Culture=neutral">
+    <Reference Include="MapWinInterfaces, Version=4.3.3034.36587, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\..\Basins\bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
+    <Reference Include="MapWinUtility, Version=1.0.3096.24764, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\..\Basins\bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -112,16 +123,9 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <Reference Include="System.Xml" />
-    <COMReference Include="MapWinGIS">
-      <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
-      <VersionMajor>3</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Private>True</Private>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Import Include="atcMwGisUtility" />
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
@@ -149,6 +153,7 @@
     <Compile Include="frmSelectR.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modGrid.vb" />
     <Compile Include="modSediment.vb" />
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -178,6 +183,7 @@
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility</Name>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="HTMLBuilder\HTMLBuilder.vbproj">
       <Project>{6EA9D463-E649-4371-ADD3-80D2216C189B}</Project>
