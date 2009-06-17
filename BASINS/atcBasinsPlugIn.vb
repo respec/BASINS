@@ -276,7 +276,7 @@ Public Class atcBasinsPlugIn
             Case Else
                 If aItemName.StartsWith(atcDataManager.LaunchMenuName & "_") Then
                     Dim lExeName As String = ""
-                    Select Case aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1).ToLower
+                    Select Case aItemName.Substring(atcDataManager.LaunchMenuName.Length + 1).ToLower
                         Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
                         Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
                     End Select

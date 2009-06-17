@@ -122,6 +122,7 @@
     <ProjectReference Include="..\atcControls\atcControls.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
@@ -141,10 +142,12 @@
     <ProjectReference Include="..\atcWASP\atcWASP.vbproj">
       <Project>{74201F53-B122-40F0-9678-1DCDC45E99BC}</Project>
       <Name>atcWASP</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
