@@ -489,9 +489,9 @@ Num BMP:	37
 503	User Defined BMP 3	1
 504	User Defined BMP 4	1
 505	User Defined BMP 5	1
-Use BMPs?	True
+Use BMPs?	False
 BMP Layer:	BMP
 BMP ID:	BMPType
-Sediment Method:	0
+Sediment Method:	2
 Stream Grid Layer:	D8 Contributing Area Grid (ad8) (03060102demgad8.tif) 
 Stream Threshold:	500
