@@ -60,16 +60,16 @@ Partial Class frmProgress
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
-        'barProgressMajor
+        'barProgressOverall
         '
         Me.barProgressOverall.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.barProgressOverall.Location = New System.Drawing.Point(14, 75)
-        Me.barProgressOverall.Name = "barProgressMajor"
+        Me.barProgressOverall.Name = "barProgressOverall"
         Me.barProgressOverall.Size = New System.Drawing.Size(358, 22)
         Me.barProgressOverall.TabIndex = 1
         '
-        'lblProgressMajor
+        'lblProgressOverall
         '
         Me.lblProgressOverall.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
@@ -77,7 +77,7 @@ Partial Class frmProgress
         Me.lblProgressOverall.BackColor = System.Drawing.SystemColors.Info
         Me.lblProgressOverall.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblProgressOverall.Location = New System.Drawing.Point(12, 9)
-        Me.lblProgressOverall.Name = "lblProgressMajor"
+        Me.lblProgressOverall.Name = "lblProgressOverall"
         Me.lblProgressOverall.Size = New System.Drawing.Size(358, 63)
         Me.lblProgressOverall.TabIndex = 0
         '
@@ -98,7 +98,7 @@ Partial Class frmProgress
         Me.Name = "frmProgress"
         Me.ShowInTaskbar = False
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Computation Progress"
         Me.ResumeLayout(False)
 
