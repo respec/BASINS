@@ -28,7 +28,10 @@ End Class
 ''' <summary>
 ''' This module contains all computational routines for the sediment utility
 ''' </summary>
+<CLSCompliant(False)> _
 Public Module Sediment
+
+    Public Const REGAPP As String = "GBMM"
 
     Friend Structure structProject
         Dim FileName As String
@@ -60,7 +63,6 @@ Public Module Sediment
             LanduseType = enumLandUseType.GIRAS
             R_Factor = 300
             UseBMP = False
-            DeliveryMethod = enumDeliveryMethod.Distance
             dictSoil = New Generic.Dictionary(Of String, clsLookup)
             ReDim dictLandUse(enumLandUseType.UserGrid)
             For i As enumLandUseType = enumLandUseType.GIRAS To enumLandUseType.UserGrid
@@ -71,10 +73,19 @@ Public Module Sediment
             DistFactor = 1.0
             ElevFactor = 1.0
             StreamThreshold = 500
+            DeliveryMethod = enumDeliveryMethod.Area
             Modified = False
             SedimentFolder = IO.Path.GetDirectoryName(GisUtil.ProjectFileName) & "\Sediment"
             If Not My.Computer.FileSystem.DirectoryExists(SedimentFolder) Then My.Computer.FileSystem.CreateDirectory(SedimentFolder)
         End Sub
+
+        ''' <summary>
+        ''' Return the current gridsize expressed as square kilometers
+        ''' </summary>
+        Friend Function CellAreaKm() As Double
+            Return (GridSize / DistFactor / 1000) ^ 2
+        End Function
+
     End Structure
 
     Friend Enum enumDeliveryMethod
@@ -166,7 +177,7 @@ Public Module Sediment
             If tk.Aread8(AngleFile, StreamFile, 0, 0, 0, 1, "", 0, 0) <> 0 Then Return False
 
             ProgressForm.Status = "Computing distances to streams..."
-            Dim DistFile As String = modGrid.CreateGrid(Project.SedimentFolder, "Distances to Streams")
+            Dim DistFile As String = modGrid.CreateGrid(Project.SedimentFolder, "Distances to Streams", Project.SubbasinLayer)
             Dim Threshold As Integer = Project.StreamThreshold / (Project.GridSize / 1000) ^ 2 'convert gridsize to sq. km., then compute number of cells
             tk.Distance(AngleFile, StreamFile, DistFile, Threshold, 0)
 
@@ -175,23 +186,24 @@ Public Module Sediment
             With gUSLE
                 If .Open(ErosionFile) And gDist.Open(DistFile) And gDest.Open(GridFile) Then
                     With .Header
+                        Dim NoDataValue As Single = .NodataValue
                         For r As Integer = 0 To .NumberRows - 1
                             Dim arU(.NumberCols - 1), arD(.NumberCols - 1), arO(.NumberCols - 1) As Single
                             gUSLE.GetRow(r, arU(0))
                             gDist.GetRow(r, arD(0))
                             For c As Integer = 0 To .NumberCols - 1
-                                If arU(c) <> .NodataValue Then
+                                If arU(c) <> NoDataValue Then
                                     Dim D As Double = arD(c) / Project.DistFactor 'convert to meters
                                     Dim M As Double = arU(c) 'USLE erosion in tons/ac/yr
                                     Dim L As Double = 5.1 + 1.79 * M 'meters
                                     Dim DR As Double = Math.Max(0, (1 - 0.97 * D / L)) 'delivery ratio (Md/M)
-                                    If arD(c) <> .NodataValue AndAlso arU(c) <> .NodataValue Then
+                                    If arD(c) <> NoDataValue AndAlso arU(c) <> NoDataValue Then
                                         arO(c) = Math.Round(DR, PRECISION)
                                     Else
-                                        arO(c) = .NodataValue
+                                        arO(c) = NoDataValue
                                     End If
                                 Else
-                                    arO(c) = .NodataValue
+                                    arO(c) = NoDataValue
                                 End If
                             Next
                             gDest.PutRow(r, arO(0))
@@ -218,6 +230,8 @@ Public Module Sediment
     Friend Function GenerateLoads() As Boolean
         Try
             'create a new grid using the specified gridsize, positioned over selected subbasin layer
+            Dim TaskNum As Integer = 0, NumTasks As Integer = 23
+            ProgressForm.SetProgressOverall("Initializing...", TaskNum, NumTasks) : TaskNum += 1
 
             With Project
                 Select Case GisUtil.MapUnits.ToUpper
@@ -256,7 +270,7 @@ Public Module Sediment
                 If Not My.Computer.FileSystem.DirectoryExists(outfolder) Then My.Computer.FileSystem.CreateDirectory(outfolder)
             End With
 
-            Dim ErosionFile As String = CreateGrid(SedimentLayer(enumSedimentLayers.USLE_Erosion))
+            Dim ErosionFile As String = CreateGrid(Project.SedimentFolder, SedimentLayer(enumSedimentLayers.USLE_Erosion), Project.SubbasinLayer)
             Dim GroupName As String = "Sediment Analysis"
 
             Dim BasinFile As String = GisUtil.LayerFileName(Project.SubbasinLayer)
@@ -279,8 +293,8 @@ Public Module Sediment
 
             For i As enumSedimentLayers = enumSedimentLayers.R_Factors To enumSedimentLayers.P_Factors
                 GridName = SedimentLayer(i)
-                GridFile = CreateGrid(GridName)
-                ProgressForm.Status = String.Format("Creating new grid: {0}...", GridName)
+                GridFile = CreateGrid(Project.SedimentFolder, GridName, Project.SubbasinLayer)
+                ProgressForm.SetProgressOverall(String.Format("Creating new grid: {0}...", GridName), TaskNum, NumTasks) : TaskNum += 1
                 With Project
                     Select Case i
                         Case enumSedimentLayers.R_Factors  'R Factors are constant
@@ -298,7 +312,7 @@ Public Module Sediment
                                     If Not GisUtil.AddLayerToGroup(GridFile, SedimentLayer(enumSedimentLayers.Land_Use), GroupName) Then Return False
                                 Else
                                     'resample landuse grid to same resolution as USLE
-                                    .LandUseGridFile = CreateGrid(SedimentLayer(enumSedimentLayers.Land_Use), , MapWinGIS.GridDataType.LongDataType)
+                                    .LandUseGridFile = CreateGrid(Project.SedimentFolder, SedimentLayer(enumSedimentLayers.Land_Use), Project.SubbasinLayer, MapWinGIS.GridDataType.LongDataType)
                                     If Not ResampleGrid(GisUtil.LayerFileName(.LandUseLayer), .LandUseGridFile) Then Return False
                                     If Not FilterGrid(.LandUseGridFile, BasinFile) Then Return False
                                     If Not LookupGrid(.LandUseGridFile, GridFile, .dictLandUse(.LanduseType)) Then Return False
@@ -307,19 +321,19 @@ Public Module Sediment
                             End If
                         Case enumSedimentLayers.LS_Factors  'LS Factors
                             'resample DEM grid to same resolution as USLE
-                            Dim DEMFile As String = CreateGrid(SedimentLayer(enumSedimentLayers.Elevations), , MapWinGIS.GridDataType.LongDataType)
+                            Dim DEMFile As String = CreateGrid(Project.SedimentFolder, SedimentLayer(enumSedimentLayers.Elevations), Project.SubbasinLayer, MapWinGIS.GridDataType.LongDataType)
                             If Not ResampleGrid(GisUtil.LayerFileName(.DEMLayer), DEMFile) Then Return False
                             'create new pit-filled, angle, and slope grids
                             Dim tkCallback As New clsTkCallback
-                            Dim PitFile As String = CreateGrid(SedimentLayer(enumSedimentLayers.Elevations_Filled), , MapWinGIS.GridDataType.LongDataType)
+                            Dim PitFile As String = CreateGrid(Project.SedimentFolder, SedimentLayer(enumSedimentLayers.Elevations_Filled), Project.SubbasinLayer, MapWinGIS.GridDataType.LongDataType)
                             MapWinGeoProc.Hydrology.Fill(DEMFile, PitFile, False)
-                            SlopeFile = CreateGrid(SedimentLayer(enumSedimentLayers.Slopes))
-                            AngleFile = CreateGrid(SedimentLayer(enumSedimentLayers.Flow_Direction))
+                            SlopeFile = CreateGrid(Project.SedimentFolder, SedimentLayer(enumSedimentLayers.Slopes), Project.SubbasinLayer)
+                            AngleFile = CreateGrid(Project.SedimentFolder, SedimentLayer(enumSedimentLayers.Flow_Direction), Project.SubbasinLayer)
                             'note: the D8 routine used by MapWinGeoProc gives slightly different answers than the one in the TauDEM lib (MWGP has some NoData cells scattered about!)
                             'If MapWinGeoProc.Hydrology.D8(PitFile, AngleFile, SlopeFile, tkCallback) <> 0 Then Return False
                             Dim tk As New TKTAUDEMLib.TauDEM
                             If tk.D8(PitFile, AngleFile, SlopeFile, "", 0) <> 0 Then Return False
-                            If Not MultiplyGrid_LS(SlopeFile, GridFile) Then Return False
+                            If Not MultiplyGrid_LS(SlopeFile, GridFile, Project.GridSize) Then Return False
                         Case enumSedimentLayers.P_Factors  'P Factors
                             If .UseBMP Then
                                 If Not SetGrid(GridFile, 1.0) Then Return False
@@ -332,7 +346,7 @@ Public Module Sediment
 
                 If Not FilterGrid(GridFile, BasinFile) Then Return False
 
-                ProgressForm.Status = String.Format("Adding layer: {0} to {1} group...", GridName, GroupName)
+                ProgressForm.SetProgressOverall(String.Format("Adding layer: {0} to {1} group...", GridName, GroupName), TaskNum, NumTasks) : TaskNum += 1
                 If Not GisUtil.AddLayerToGroup(GridFile, GridName, GroupName) Then Return False
                 ApplyColoringScheme(GridName, Choose(i, MapWinGIS.PredefinedColorScheme.Glaciers, MapWinGIS.PredefinedColorScheme.Desert, MapWinGIS.PredefinedColorScheme.FallLeaves, MapWinGIS.PredefinedColorScheme.SummerMountains, MapWinGIS.PredefinedColorScheme.DeadSea))
                 GisUtil.LayerVisible(GridName) = True
@@ -341,7 +355,7 @@ Public Module Sediment
                 GisUtil.SaveMapAsImage(String.Format("{0}\{1}\{2}.jpg", Project.SedimentFolder, Project.OutputFolder, GridName))
 
                 'compute source sheet and rill erosion as product of all factors
-                ProgressForm.Status = "Updating USLE grid..."
+                ProgressForm.SetProgressOverall("Updating USLE grid...", TaskNum, NumTasks) : TaskNum += 1
                 If i = enumSedimentLayers.R_Factors Then
                     If Not MultiplyGrid(GridFile, 1.0, ErosionFile) Then Return False
                 Else
@@ -358,12 +372,12 @@ Public Module Sediment
             'Compute Sediment Delivery Ratios
 
             GridName = SedimentLayer(enumSedimentLayers.Delivery_Ratio)
-            GridFile = CreateGrid(GridName)
-            ProgressForm.Status = String.Format("Creating new grid: {0}...", GridName)
+            GridFile = CreateGrid(Project.SedimentFolder, GridName, Project.SubbasinLayer)
+            ProgressForm.SetProgressOverall(String.Format("Creating new grid: {0}...", GridName), TaskNum, NumTasks) : TaskNum += 1
 
             Select Case Project.DeliveryMethod
                 Case enumDeliveryMethod.Distance
-                    Dim StreamFile As String = CreateGrid(SedimentLayer(enumSedimentLayers.Stream_Grid))
+                    Dim StreamFile As String = CreateGrid(Project.SedimentFolder, SedimentLayer(enumSedimentLayers.Stream_Grid), Project.SubbasinLayer)
                     If Not Delivery_Distance(ErosionFile, AngleFile, GridFile, StreamFile) Then Return False
                     If Not FilterGrid(StreamFile, BasinFile) Then Return False
                     If Not GisUtil.AddLayerToGroup(StreamFile, SedimentLayer(enumSedimentLayers.Stream_Grid), GroupName) Then Return False
@@ -376,25 +390,25 @@ Public Module Sediment
                 Case enumDeliveryMethod.WEPP
             End Select
 
-            ProgressForm.Status = String.Format("Adding layer: {0} to {1} group...", GridName, GroupName)
+            ProgressForm.SetProgressOverall(String.Format("Adding layer: {0} to {1} group...", GridName, GroupName), TaskNum, NumTasks) : TaskNum += 1
             If Not GisUtil.AddLayerToGroup(GridFile, GridName, GroupName) Then Return False
             ApplyColoringScheme(GridName, MapWinGIS.PredefinedColorScheme.Highway1)
             GisUtil.LayerVisible(GridName) = True
             GisUtil.SaveMapAsImage(String.Format("{0}\{1}\{2}.jpg", Project.SedimentFolder, Project.OutputFolder, GridName))
 
             Dim LayerName As String = SedimentLayer(enumSedimentLayers.USLE_Erosion)
-            ProgressForm.Status = String.Format("Adding layer: {0} to {1} group...", LayerName, GroupName)
+            ProgressForm.SetProgressOverall(String.Format("Adding layer: {0} to {1} group...", LayerName, GroupName), TaskNum, NumTasks) : TaskNum += 1
             If Not GisUtil.AddLayerToGroup(ErosionFile, LayerName, GroupName) Then Return False
             ApplyColoringScheme(LayerName, MapWinGIS.PredefinedColorScheme.Meadow)
             GisUtil.LayerVisible(LayerName) = True
             GisUtil.SaveMapAsImage(String.Format("{0}\{1}\{2}.jpg", Project.SedimentFolder, Project.OutputFolder, LayerName))
 
             GridName = SedimentLayer(enumSedimentLayers.USLE_Sediment)
-            ProgressForm.Status = String.Format("Creating new grid: {0}...", GridName)
-            Dim SedimentFile As String = CreateGrid(GridName)
+            ProgressForm.SetProgressOverall(String.Format("Creating new grid: {0}...", GridName), TaskNum, NumTasks) : TaskNum += 1
+            Dim SedimentFile As String = CreateGrid(Project.SedimentFolder, GridName, Project.SubbasinLayer)
 
             If Not MultiplyGrid(ErosionFile, GridFile, SedimentFile) Then Return False
-            ProgressForm.Status = String.Format("Adding layer: {0} to {1} group...", GridName, GroupName)
+            ProgressForm.SetProgressOverall(String.Format("Adding layer: {0} to {1} group...", GridName, GroupName), TaskNum, NumTasks) : TaskNum += 1
             If Not GisUtil.AddLayerToGroup(SedimentFile, GridName, GroupName) Then Return False
             ApplyColoringScheme(LayerName, MapWinGIS.PredefinedColorScheme.ValleyFires)
             GisUtil.LayerVisible(GridName) = True
@@ -569,6 +583,10 @@ Public Module Sediment
     Friend Function SummaryReport() As String
         Try
             With Project
+                Dim TaskNum As Integer = 0, NumTasks As Integer = 5
+
+                ProgressForm.SetProgressOverall("Refreshing Results report...", TaskNum, NumTasks) : TaskNum += 1
+
                 Dim hb As New clsHTMLBuilder
                 hb.AppendHeading(clsHTMLBuilder.enumHeading.Level2, clsHTMLBuilder.enumAlign.Center, "BASINS Clean Sediment Tool")
 
@@ -607,12 +625,15 @@ Public Module Sediment
                 hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "R Factor Map")
                 hb.AppendHorizLine()
 
+                ProgressForm.SetProgressOverall("Appending Soil Type/Erodibility Factors table...", TaskNum, NumTasks) : TaskNum += 1
                 AppendLookupTable(hb, "Soil Type/Erodibility Factors", Project.SoilLayer, Project.SoilField, Project.dictSoil)
 
                 hb.AppendLineBreak()
                 hb.AppendImage("K Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
                 hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "K Factor Map")
                 hb.AppendHorizLine()
+
+                ProgressForm.SetProgressOverall("Appending Land Use/Cropping Factors table...", TaskNum, NumTasks) : TaskNum += 1
 
                 If .LanduseType = enumLandUseType.GIRAS Then
                     Dim lyrList As Generic.List(Of Integer) = GIRASLayers(GisUtil.LayerIndex(.SubbasinLayer))
@@ -646,6 +667,7 @@ Public Module Sediment
                     hb.AppendTableRow("BMP Layer:", .BMPLayer)
                     hb.AppendTableRow("BMP Type Field:", .BMPField)
                     hb.AppendTableEnd()
+                    ProgressForm.SetProgressOverall("Appending BMP Type/Conservation Practice Factors table...", TaskNum, NumTasks) : TaskNum += 1
                     AppendLookupTable(hb, "BMP Type/Conservation Practice Factors", Project.BMPLayer, Project.BMPField, Project.dictBMP)
                     hb.AppendPara(clsHTMLBuilder.enumAlign.Left, "")
                     hb.AppendImage("P Factors.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
@@ -680,6 +702,8 @@ Public Module Sediment
                 hb.AppendImage("USLE Sediment.jpg", 75, clsHTMLBuilder.enumWidthUnits.Percent)
                 hb.AppendHeading(clsHTMLBuilder.enumHeading.Level5, clsHTMLBuilder.enumAlign.Left, "USLE Sediment Map")
                 hb.AppendHorizLine()
+
+                ProgressForm.SetProgressOverall("Appending Erosion and Sediment Calculation Results table...", TaskNum, NumTasks) : TaskNum += 1
 
                 AppendResultsTable(hb, "Erosion and Sediment Calculation Results")
 
@@ -810,6 +834,7 @@ Public Module Sediment
                 'tabulate total area and weighted loads
                 Dim TotalArea As Single = 0, TotalErosion As Single = 0, TotalSediment As Single = 0
                 With gE.Header
+                    Dim NoDataValue As Single = .NodataValue
                     For r As Integer = 0 To .NumberRows - 1
                         Dim x, y As Double
                         gE.CellToProj(0, r, x, y)
@@ -818,7 +843,7 @@ Public Module Sediment
                         gE.GetRow(r, arE(0))
                         gS.GetRow(r, arS(0))
                         For c As Integer = 0 To .NumberCols - 1
-                            If arE(c) <> .NodataValue AndAlso sf.PointInShape(i, x, y) Then
+                            If arE(c) <> NoDataValue AndAlso sf.PointInShape(i, x, y) Then
                                 TotalArea += 1
                                 TotalErosion += arE(c)
                                 TotalSediment += arS(c)
@@ -880,13 +905,14 @@ Public Module Sediment
 
                 Dim CellCount As Single = 0, MeanFactor As Single = 0, MinFactor As Single = Single.MaxValue, MaxFactor As Single = Single.MinValue
                 With g.Header
+                    Dim NoDataValue As Single = .NodataValue
                     For r As Integer = 0 To .NumberRows - 1
                         Dim x, y As Double
                         g.CellToProj(0, r, x, y)
                         Dim ar(.NumberCols - 1) As Single
                         g.GetRow(r, ar(0))
                         For c As Integer = 0 To .NumberCols - 1
-                            If ar(c) <> .NodataValue AndAlso ar(c) <> 0.0 AndAlso sf.PointInShape(SubbasinIndex, x, y) Then
+                            If ar(c) <> NoDataValue AndAlso ar(c) <> 0.0 AndAlso sf.PointInShape(SubbasinIndex, x, y) Then
                                 CellCount += 1
                                 MeanFactor += ar(c)
                                 MinFactor = Math.Min(MinFactor, ar(c))
@@ -1031,7 +1057,206 @@ Public Module Sediment
         sw.WriteLine()
     End Sub
 
-    Private Function CreateGrid(ByVal GridName As String, Optional ByVal gTemplate As MapWinGIS.Grid = Nothing, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.FloatDataType) As String
-        Return modGrid.CreateGrid(Project.SedimentFolder, GridName, gTemplate, DataType)
-    End Function
+#Region "Get and Save Form Window Positions and Sizes and control values"
+
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Public Sub GetWindowPos(ByRef RegAppName As String, ByVal FormName As String, ByRef x As Int16, ByRef y As Int16, ByRef w As Int16, ByRef h As Int16, ByRef WindowState As FormWindowState)
+
+        Dim Index, UpperBound As Int16
+        Dim maxw, maxh As Int16
+
+        'Gets an array of all the screens connected to the system.
+
+        Dim Screens() As System.Windows.Forms.Screen = System.Windows.Forms.Screen.AllScreens
+        UpperBound = Screens.GetUpperBound(0)
+
+        For Index = 0 To UpperBound
+            With Screens(Index).WorkingArea
+                maxw = Math.Max(maxw, .Right)
+                maxh = Math.Max(maxh, .Bottom)
+            End With
+        Next
+
+        If FormName = "" Then FormName = "PrintPreview"
+        w = CInt(GetSetting(RegAppName, FormName, "W", w))
+        h = CInt(GetSetting(RegAppName, FormName, "H", h))
+        x = CInt(GetSetting(RegAppName, FormName, "X", x))
+        y = CInt(GetSetting(RegAppName, FormName, "Y", y))
+        If x + w > maxw Then x = maxw - w
+        x = Math.Max(0, x)
+        If y + h > maxh Then y = maxh - h
+        y = Math.Max(0, y)
+        If CInt(GetSetting(RegAppName, FormName, "Maximized", CStr(0))) = 1 Then WindowState = FormWindowState.Maximized
+    End Sub
+
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Public Sub GetWindowPos(ByRef RegAppName As String, ByRef f As System.Windows.Forms.Form)
+        Dim ws As Windows.Forms.FormWindowState
+        Dim dummy As Integer
+        With f
+            If .IsMdiChild Then 'only set size, not position
+                GetWindowPos(RegAppName, .Name, dummy, dummy, .Width, .Height, ws)
+            Else
+                If f.FormBorderStyle = FormBorderStyle.Sizable Or f.FormBorderStyle = FormBorderStyle.SizableToolWindow Then
+                    GetWindowPos(RegAppName, .Name, .Left, .Top, .Width, .Height, ws)
+                Else
+                    GetWindowPos(RegAppName, .Name, .Left, .Top, dummy, dummy, ws)
+                End If
+            End If
+        End With
+    End Sub
+
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Public Sub SaveWindowPos(ByRef RegAppName As String, ByVal FormName As String, _
+           ByVal x As Int16, ByVal y As Int16, ByVal w As Int16, ByVal h As Int16, _
+           ByRef WindowState As FormWindowState)
+
+        If FormName = "" Then FormName = "PrintPreview"
+
+        If WindowState = vbNormal Then
+            SaveSetting(RegAppName, FormName, "W", w)
+            SaveSetting(RegAppName, FormName, "H", h)
+            SaveSetting(RegAppName, FormName, "X", x)
+            SaveSetting(RegAppName, FormName, "Y", y)
+        End If
+        SaveSetting(RegAppName, FormName, "Maximized", IIf(WindowState = FormWindowState.Maximized, 1, 0))
+    End Sub
+
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Public Sub SaveWindowPos(ByRef RegAppName As String, ByRef f As System.Windows.Forms.Form)
+        With f
+            SaveWindowPos(RegAppName, .Name, .Left, .Top, .Width, .Height, .WindowState)
+        End With
+    End Sub
+
+    ''' <summary>
+    ''' Get last (or default) value for specified control that was saved in the registry
+    ''' </summary>
+    ''' <param name="RegAppName">Name of application</param>
+    ''' <param name="Cntl">Control to retrieve value for</param>
+    ''' <param name="DefaultValue">If not already in registry, will set to this value (text, checked, or selected index)</param>
+    ''' <remarks></remarks>
+    Public Sub GetControlValue(ByVal RegAppName As String, ByRef Cntl As Control, ByVal DefaultValue As String)
+        If Not Cntl.Enabled Then Exit Sub
+        Dim Value As String = GetSetting(RegAppName, Cntl.FindForm.Name, Cntl.Name, DefaultValue)
+        If TypeOf Cntl Is TextBox Then
+            CType(Cntl, TextBox).Text = Value
+        ElseIf TypeOf Cntl Is CheckBox Then
+            If Value = "" Then Value = "False"
+            CType(Cntl, CheckBox).Checked = CBool(Value)
+        ElseIf TypeOf Cntl Is RadioButton Then
+            If Value = "" Then Value = "False"
+            If CBool(Value) Then CType(Cntl, RadioButton).Checked = True 'only set if true, to avoid triggering check-changed
+        ElseIf TypeOf Cntl Is ComboBox Then
+            'first, retrieve list of items
+            Dim ListItems As String = GetSetting(RegAppName, Cntl.FindForm.Name, Cntl.Name & "_Items", "")
+            With CType(Cntl, ComboBox)
+                If .DropDownStyle = ComboBoxStyle.DropDown Then
+                    .Text = Value
+                Else
+                    If Value = "" Then Value = "0"
+                    Dim idx As Integer = Val(Value)
+                    If .Items.Count = 0 Then
+                        For Each s As String In ListItems.Split(";")
+                            .Items.Add(s)
+                        Next
+                    End If
+                    If idx > .Items.Count - 1 Then .SelectedIndex = -1 Else .SelectedIndex = idx
+                End If
+                If .Text = "" And .Items.Count > 0 Then .SelectedIndex = 0
+            End With
+        ElseIf TypeOf Cntl Is ListBox Then
+            If Value = "" Then Value = "-1"
+            Dim idx As Integer = Val(Value)
+            With CType(Cntl, ListBox)
+                If idx > .Items.Count - 1 Then .SelectedIndex = -1 Else .SelectedIndex = idx
+            End With
+        ElseIf TypeOf Cntl Is DateTimePicker Then
+            With CType(Cntl, DateTimePicker)
+                If IsDate(Value) Then
+                    .Value = Value
+                Else
+                    .Value = DateTime.Now
+                End If
+            End With
+        Else
+            'not all control types are supported; if invalid control type is passed, will ignore
+            'Debug.Print("Invalid control in GetControlValue: " & Cntl.GetType.ToString)
+            'Debug.Assert(False)
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Get last values for all controls on a form that was saved in the registry (default values cannot be set explictly, will use defaults from designer)
+    ''' </summary>
+    ''' <param name="RegAppName">Name of application</param>
+    ''' <param name= "Container">Form or control containing controls to set values for</param>
+    ''' <remarks>Want to get and set in order of tag index, as there may be cascading events</remarks>
+    Public Sub GetControlValues(ByVal RegAppName As String, ByRef Container As Control)
+        For Indx As Integer = 0 To Container.Controls.Count - 1
+            For Each Cntl As Control In Container.Controls
+                If Cntl.TabIndex = Indx And Cntl.Visible Then
+                    GetControlValue(RegAppName, Cntl, "")
+                    GetControlValues(RegAppName, Cntl)
+                End If
+            Next
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Save value for specified control to registry
+    ''' </summary>
+    ''' <param name="RegAppName">Name of application</param>
+    ''' <param name="Cntl">Control to set value for</param>
+    ''' <remarks></remarks>
+    Public Sub SaveControlValue(ByVal RegAppName As String, ByRef Cntl As Control)
+        Dim Value As String
+        If TypeOf Cntl Is TextBox Then
+            Value = CType(Cntl, TextBox).Text
+        ElseIf TypeOf Cntl Is CheckBox Then
+            Value = CType(Cntl, CheckBox).Checked.ToString
+        ElseIf TypeOf Cntl Is RadioButton Then
+            Value = CType(Cntl, RadioButton).Checked.ToString
+        ElseIf TypeOf Cntl Is ComboBox Then
+            With CType(Cntl, ComboBox)
+                If .DropDownStyle = ComboBoxStyle.DropDown Then
+                    Value = .Text
+                Else
+                    Value = .SelectedIndex.ToString
+                End If
+                Dim ListItems As String = ""
+                For Each s As String In .Items
+                    ListItems &= IIf(ListItems = "", "", ";") & s
+                Next
+                SaveSetting(RegAppName, Cntl.FindForm.Name, Cntl.Name & "_Items", ListItems)
+            End With
+        ElseIf TypeOf Cntl Is ListBox Then
+            Value = CType(Cntl, ListBox).SelectedIndex.ToString
+        ElseIf TypeOf Cntl Is DateTimePicker Then
+            Value = CType(Cntl, DateTimePicker).Value.ToString
+        Else
+            'Debug.Assert(False)
+            Exit Sub
+        End If
+        SaveSetting(RegAppName, Cntl.FindForm.Name, Cntl.Name, Value)
+    End Sub
+
+    ''' <summary>
+    ''' Save values for all controls on a form to registry
+    ''' </summary>
+    ''' <param name="RegAppName">Name of application</param>
+    ''' <param name= "Container">Form or control containing controls to set values for</param>
+    ''' <remarks>Want to get and set in order of tag index, as there may be cascading events</remarks>
+    Public Sub SaveControlValues(ByVal RegAppName As String, ByRef Container As Control)
+        For Indx As Integer = 0 To Container.Controls.Count - 1
+            For Each Cntl As Control In Container.Controls
+                If Cntl.TabIndex = Indx Then
+                    SaveControlValue(RegAppName, Cntl)
+                    SaveControlValues(RegAppName, Cntl) 'recursively look at controls that may be contained within this control
+                End If
+            Next
+        Next
+    End Sub
+
+#End Region
 End Module
