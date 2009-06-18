@@ -58,7 +58,7 @@ Public Module Utility
                 lConstituentsToOutput.Add("R:VOLEV", "    SurfEvapVol")
             Case "Sediment"
                 lConstituentsToOutput.Add("I:Header0", "Storage(tons/acre)")
-                lConstituentsToOutput.Add("I:SLDS", "  Total")
+                lConstituentsToOutput.Add("I:SLDS", "  All")
                 lConstituentsToOutput.Add("I:Header1", "Washoff(tons/acre)")
                 lConstituentsToOutput.Add("I:SOSLD", "  Total")
 
