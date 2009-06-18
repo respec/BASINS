@@ -271,15 +271,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CNGraph.gif" />
-    <None Include="Docs\GBMM Notes.doc" />
+    <None Include="GBMM Notes.doc" />
     <None Include="Redist\GBMM2_UserGuide.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Redist\GBMM.exe">
+    <Content Include="GBMM.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="InnoSetup\GBMM.iss" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\DataSources\" />

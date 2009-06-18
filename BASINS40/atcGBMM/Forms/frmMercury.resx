@@ -126,8 +126,17 @@
   <data name="lnkMergeCatchments.HelpString" xml:space="preserve">
     <value>Click this link to open a form which allows you to select subcatchment shapes (such as those found in the NHD Catchments layer) and combine them into a single subbasin shape. This shape is added to your existing subbasin layer indicated above; if a new subbasin layer is selected, it will be created.</value>
   </data>
+  <data name="cboSoilTable.HelpString" xml:space="preserve">
+    <value>Select the data table containing soil information; it must contain at a minimum the following fields: (ID field), AWC, KFACT, PERM, BD, CLAYPERC,GROUP, GROUPVALUE. All data tables must reside in the BASINS data folder for the current BASINS project, under GBMM\Data.</value>
+  </data>
+  <data name="cboLanduseTable.HelpString" xml:space="preserve">
+    <value>This table must contain the following fields: LUCODE, LUC, LUP, GETCOVER, NGETCOVER, IMP_DCON, IMP_TOT, TYPE, N. All data tables must reside in the BASINS data folder for the current BASINS project, under GBMM\Data.</value>
+  </data>
   <data name="txtInputName.HelpString" xml:space="preserve">
     <value>Specify the name of the folder where input to the GBMM C++ computational program will be placed; note that the GBMM input file (specified by clicking the Save As... button) must also reside in this folder. This path would normally look like: C:\Basins\data\01234567\GBMM\</value>
+  </data>
+  <data name="cboPointSourceTable.HelpString" xml:space="preserve">
+    <value>This table must contain fields for the date, station ID, flow (cms), sediment load (kg/d), and mercury load (ug/d), in that order. All data tables must reside in the BASINS data folder for the current BASINS project, under GBMM\Data.</value>
   </data>
   <data name="chkForceRebuild.HelpString" xml:space="preserve">
     <value>Normally, input grids are rebuild only when their source grids have been updated (by comparing file dates). In some cases you may need to override this behaviour and force the files to be rebuilt (such as when you change source files outside the preprocessor).</value>

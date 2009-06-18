@@ -278,16 +278,16 @@ Friend Module modGrid
 
     End Function
 
-    '''' <summary>
-    '''' Create a new grid and return new grid file name; will remove layer and delete grid first
-    '''' </summary>
-    '''' <param name="GridName">Name of layer to create</param>
-    '''' <returns>Grid filename</returns>
-    '''' <remarks></remarks>
-    'Friend Function CreateGrid(ByVal GridFolder As String, ByVal GridName As String, Optional ByVal gTemplate As MapWinGIS.Grid = Nothing, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.FloatDataType) As String
-    '    Dim GridFile As String = String.Format("{0}\{1}.tif", GridFolder, GridName)
-    '    If CreateGrid(GridFile) Then Return GridFile Else Return ""
-    'End Function
+    ''' <summary>
+    ''' Create a new grid and return new grid file name; will remove layer and delete grid first
+    ''' </summary>
+    ''' <param name="GridName">Name of layer to create</param>
+    ''' <returns>Grid filename</returns>
+    ''' <remarks></remarks>
+    Friend Function CreateGrid(ByVal GridFolder As String, ByVal GridName As String, ByVal SubbasinsLayer As String, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.FloatDataType) As String
+        Dim GridFile As String = String.Format("{0}\{1}.tif", GridFolder, GridName)
+        If CreateGrid(GridFile, SubbasinsLayer, DataType) Then Return GridFile Else Return ""
+    End Function
 
     ''' <summary>
     ''' Create a new grid and return new grid file name; will remove layer and delete grid first; extents of layer based on Subbasins layer
@@ -295,7 +295,7 @@ Friend Module modGrid
     ''' <param name="GridFile">Name of grid file to create</param>
     ''' <returns>Grid filename</returns>
     ''' <remarks></remarks>
-    Friend Function CreateGrid(ByVal GridFile As String, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.FloatDataType) As Boolean
+    Friend Function CreateGrid(ByVal GridFile As String, ByVal SubbasinsLayer As String, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.FloatDataType) As Boolean
         Try
             Dim hdr As New MapWinGIS.GridHeader
             With hdr
@@ -303,7 +303,7 @@ Friend Module modGrid
                 .dY = .dX
                 .NodataValue = -1  'note: if float type, cannot do direct comparison to this value (round-off) instead compare to >=0.0
                 Dim xmax, xmin, ymax, ymin As Double
-                GisUtil.ExtentsOfLayer(GisUtil.LayerIndex(Project.Layers.Subbasins.LayerName), xmax, xmin, ymax, ymin)
+                GisUtil.ExtentsOfLayer(GisUtil.LayerIndex(SubbasinsLayer), xmax, xmin, ymax, ymin)
                 .NumberCols = (xmax - xmin) / .dX
                 .NumberRows = (ymax - ymin) / .dY
                 .XllCenter = xmin + .dX / 2
@@ -347,7 +347,7 @@ Friend Module modGrid
     ''' <param name="StationsLayer">Name of point layer containing stations</param>
     ''' <param name="StationIDField">Field containing Station ID</param>
     ''' <remarks></remarks>
-    Friend Function CreateThiessanGrid(ByVal GridFile As String, ByVal StationsLayer As String, ByVal StationIDField As String) As Boolean
+    Friend Function CreateThiessanGrid(ByVal GridFile As String, ByVal StationsLayer As String, ByVal StationIDField As String, ByVal SubbasinsLayer As String) As Boolean
         Try
             Dim xmax, xmin, ymax, ymin As Double
             Dim hdr As New MapWinGIS.GridHeader
@@ -355,7 +355,7 @@ Friend Module modGrid
                 .dX = Math.Round(Project.GridSize * Project.DistFactor, 2) 'convert meters to project units
                 .dY = .dX
                 .NodataValue = Integer.MinValue  'note: cannot do direct comparison to this value (round-off) instead compare to >=0.0
-                GisUtil.ExtentsOfLayer(GisUtil.LayerIndex(Project.Layers.Subbasins.LayerName), xmax, xmin, ymax, ymin)
+                GisUtil.ExtentsOfLayer(GisUtil.LayerIndex(SubbasinsLayer), xmax, xmin, ymax, ymin)
                 .NumberCols = (xmax - xmin) / .dX
                 .NumberRows = (ymax - ymin) / .dY
                 .XllCenter = xmin + .dX / 2
@@ -372,7 +372,7 @@ Friend Module modGrid
             g.AssignNewProjection(GisUtil.ProjectProjection)
 
             Dim sfSub As New MapWinGIS.Shapefile
-            sfSub.Open(Project.Layers.Subbasins.Filename)
+            sfSub.Open(GisUtil.LayerFileName(SubbasinsLayer))
             'to speed processing time, only consider points near boundaries of subbasin (+/- 2x extents size)
             With sfSub.Extents
                 xmin = .xMin - (.xMax - .xMin) * 2
@@ -397,15 +397,6 @@ loopagain:
             For i As Integer = 0 To sfSta.NumShapes - 1
                 Dim StaID As String = sfSta.CellValue(fldidx, i)
                 Dim StaNum As Integer = i + 1
-                'For j As Integer = StaID.Length - 1 To 0 Step -1
-                '    If Not IsNumeric(StaID.Substring(j, 1)) Then StaID = StaID.Remove(j, 1)
-                'Next
-                'If IsNumeric(StaID) Then
-                '    StaNum = Val(StaID)
-                'Else
-                '    _LastErrorMsg = "A non-numeric station ID was encountered in CreateThiessanGrid."
-                '    Return False
-                'End If
                 If dictSta.ContainsKey(StaNum) Then
                     _LastErrorMsg = "Station IDs are not unique in CreateTheissanGrid"
                     Return False
@@ -433,7 +424,7 @@ loopagain:
                     For c As Integer = 0 To .NumberCols - 1
                         Dim minDist As Double = Double.MaxValue
                         Dim minStaID As Integer = Integer.MinValue
-                        For Each kv As KeyValuePair(Of Integer, MapWinGIS.Point) In dictSta
+                        For Each kv As Generic.KeyValuePair(Of Integer, MapWinGIS.Point) In dictSta
                             With kv.Value
                                 Dim dx As Double = (.x - x)
                                 Dim dy As Double = (.y - y)
@@ -569,19 +560,82 @@ loopagain:
     End Function
 
     ''' <summary>
+    ''' Set values in grid to factor taken from ID in shape file using lookup table
+    ''' </summary>
+    ''' <param name="SourceShapeFile">Name of source shape file </param>
+    ''' <param name="FieldName">Name of field containing lookup value</param>
+    ''' <param name="DestGridFile">Name of destination grid file (must already exist)</param>
+    Friend Function LookupGrid(ByVal SourceShapeFile As String, ByVal FieldName As String, ByVal DestGridFile As String, ByVal dictLookup As Generic.Dictionary(Of String, clsLookup)) As Boolean
+        Dim sfSource As MapWinGIS.Shapefile = Nothing
+        Dim gDest As MapWinGIS.Grid = Nothing
+
+        Try
+            sfSource = New MapWinGIS.Shapefile
+            If Not sfSource.Open(SourceShapeFile) Then Return False
+            sfSource.BeginPointInShapefile()
+
+            gDest = New MapWinGIS.Grid
+            If Not gDest.Open(DestGridFile, , True) Then Return False
+            Dim Lookup As clsLookup = Nothing
+            Dim lyrIndex As Integer = GisUtil.LayerIndex(SourceShapeFile)
+            Dim fldIndex As Integer = GisUtil.FieldIndex(lyrIndex, FieldName)
+
+            'to speed up routine
+            Dim arFieldValue(GisUtil.NumFeatures(lyrIndex) - 1) As String
+            For i As Integer = 0 To GisUtil.NumFeatures(lyrIndex) - 1
+                arFieldValue(i) = GisUtil.FieldValue(lyrIndex, i, fldIndex)
+            Next
+
+            With gDest.Header
+                Dim NumRows As Integer = .NumberRows
+                Dim NumCols As Integer = .NumberCols
+                Dim NoDataValue As Single = gDest.Header.NodataValue
+                For r As Integer = 0 To NumRows - 1
+                    Dim x, y As Double
+                    gDest.CellToProj(0, r, x, y)
+                    Dim arV(NumCols - 1) As Single
+                    gDest.GetRow(r, arV(0))
+                    For c As Integer = 0 To NumCols - 1
+                        Dim shpIndex As Integer = sfSource.PointInShapefile(x, y)
+                        If shpIndex <> -1 Then
+                            Dim ID As String = arFieldValue(shpIndex)
+                            If dictLookup.TryGetValue(ID, Lookup) Then
+                                arV(c) = Lookup.Factor
+                            Else
+                                arV(c) = NoDataValue
+                            End If
+                        End If
+                        x += .dX
+                    Next
+                    gDest.PutRow(r, arV(0))
+                    If Not ProgressForm.SetProgress(r, NumRows - 1) Then Return False
+                Next
+            End With
+            gDest.Save()
+            Return True
+        Catch ex As Exception
+            ErrorMsg(, ex)
+            Return False
+        Finally
+            If sfSource IsNot Nothing Then sfSource.Close()
+            If gDest IsNot Nothing Then gDest.Close()
+        End Try
+    End Function
+
+    ''' <summary>
     ''' Set values in grid to factor taken from ID in grid file using lookup table
     ''' </summary>
-    ''' <param name="SourceFile">Name of source grid file </param>
-    ''' <param name="DestFile">Name of destination grid file (must already exist)</param>
-    Friend Function LookupGrid(ByVal SourceFile As String, ByVal DestFile As String, ByVal dictLookup As Generic.Dictionary(Of String, clsLookup)) As Boolean
+    ''' <param name="SourceGridFile">Name of source grid file </param>
+    ''' <param name="DestGridFile">Name of destination grid file (must already exist)</param>
+    Friend Function LookupGrid(ByVal SourceGridFile As String, ByVal DestGridFile As String, ByVal dictLookup As Generic.Dictionary(Of String, clsLookup)) As Boolean
         Dim gSource As MapWinGIS.Grid = Nothing
         Dim gDest As MapWinGIS.Grid = Nothing
 
         Try
             gSource = New MapWinGIS.Grid
-            If Not gSource.Open(SourceFile, , False) Then LastErrorMsg = "Unable to open grid: " & SourceFile : Return False
+            If Not gSource.Open(SourceGridFile, , False) Then LastErrorMsg = "Unable to open grid: " & SourceGridFile : Return False
             gDest = New MapWinGIS.Grid
-            If Not gDest.Open(DestFile, , False) Then LastErrorMsg = "Unable to open grid: " & DestFile : Return False
+            If Not gDest.Open(DestGridFile, , False) Then LastErrorMsg = "Unable to open grid: " & DestGridFile : Return False
             Dim Lookup As clsLookup = Nothing
             With gSource.Header
                 Dim NumRows As Integer = .NumberRows
@@ -612,31 +666,31 @@ loopagain:
     ''' <summary>
     ''' Set values in destination grid based on delegate function
     ''' </summary>
-    ''' <param name="SourceFile">Name of source grid file containing key values that will be looked up</param>
-    ''' <param name="DestFile">Name of destination grid file (if doesn't exist, will be created)</param>
+    ''' <param name="SourceGridFile">Name of source grid file containing key values that will be looked up</param>
+    ''' <param name="DestGridFile">Name of destination grid file (if doesn't exist, will be created)</param>
     ''' <param name="LookupFunction">Delegate function that takes source grid value and computes destination grid value</param>
     ''' <param name="DataType">Optional grid data type for grid to be created</param>
-    Friend Function LookupGrid(ByVal SourceFile As String, ByVal DestFile As String, ByVal LookupFunction As LookupDelegate, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.UnknownDataType) As Boolean
+    Friend Function LookupGrid(ByVal SourceGridFile As String, ByVal DestGridFile As String, ByVal LookupFunction As LookupDelegate, Optional ByVal DataType As MapWinGIS.GridDataType = MapWinGIS.GridDataType.UnknownDataType) As Boolean
         Dim gSource As MapWinGIS.Grid = Nothing
         Dim gDest As MapWinGIS.Grid = Nothing
 
         Try
             gSource = New MapWinGIS.Grid
-            If Not gSource.Open(SourceFile, , False) Then _LastErrorMsg = "Unable to open grid: " & SourceFile : Return False
+            If Not gSource.Open(SourceGridFile, , False) Then _LastErrorMsg = "Unable to open grid: " & SourceGridFile : Return False
 
             'if caller wants grid created (type supplied), delete grid if it exists
-            If DataType <> MapWinGIS.GridDataType.UnknownDataType AndAlso Not DeleteGrid(DestFile) Then Return False
+            If DataType <> MapWinGIS.GridDataType.UnknownDataType AndAlso Not DeleteGrid(DestGridFile) Then Return False
 
             'if not found, create
-            If Not My.Computer.FileSystem.FileExists(DestFile) Then
+            If Not My.Computer.FileSystem.FileExists(DestGridFile) Then
                 If DataType = MapWinGIS.GridDataType.UnknownDataType Then _LastErrorMsg = "Destination grid not found and/or invalid grid datatype specified." : Return False
-                If Not CreateGrid(DestFile, DataType) Then _LastErrorMsg = "Unable to create grid: " & DestFile : Return False
+                If Not CreateGrid(DestGridFile, DataType) Then _LastErrorMsg = "Unable to create grid: " & DestGridFile : Return False
             End If
 
             gDest = New MapWinGIS.Grid
-            If Not gDest.Open(DestFile, , True) Then _LastErrorMsg = "Unable to open grid: " & DestFile : Return False
+            If Not gDest.Open(DestGridFile, , True) Then _LastErrorMsg = "Unable to open grid: " & DestGridFile : Return False
 
-            If Not GridsIdentical(gSource, gDest) Then _LastErrorMsg = "Source and destination grids are not identical structure: " & SourceFile & ", " & DestFile : Return False
+            If Not GridsIdentical(gSource, gDest) Then _LastErrorMsg = "Source and destination grids are not identical structure: " & SourceGridFile & ", " & DestGridFile : Return False
 
             With gSource.Header
                 Dim NoDataValueSource As Single = .NodataValue
@@ -656,16 +710,16 @@ loopagain:
                     If Not ProgressForm.SetProgress("Performing grid lookup...", r, .NumberRows - 1) Then Return False
                 Next
             End With
-            If Not gSource.Close() Then _LastErrorMsg = "Unable to close grid: " & SourceFile : Return False
+            If Not gSource.Close() Then _LastErrorMsg = "Unable to close grid: " & SourceGridFile : Return False
             gSource = Nothing
-            If Not gDest.Save() Then _LastErrorMsg = "Unable to save grid: " & DestFile : Return False
+            If Not gDest.Save() Then _LastErrorMsg = "Unable to save grid: " & DestGridFile : Return False
             Return True
         Catch ex As Exception
             ErrorMsg(, ex)
             Return False
         Finally
-            If gSource IsNot Nothing AndAlso Not gSource.Close() Then _LastErrorMsg = "Unable to close grid: " & SourceFile
-            If gDest IsNot Nothing AndAlso Not gDest.Close() Then _LastErrorMsg = "Unable to close grid: " & DestFile
+            If gSource IsNot Nothing AndAlso Not gSource.Close() Then _LastErrorMsg = "Unable to close grid: " & SourceGridFile
+            If gDest IsNot Nothing AndAlso Not gDest.Close() Then _LastErrorMsg = "Unable to close grid: " & DestGridFile
         End Try
     End Function
 
@@ -1208,7 +1262,7 @@ loopagain:
         For j As Integer = 0 To sf.NumShapes - 1
             Dim tempgrid As String = My.Computer.FileSystem.SpecialDirectories.Temp & "\tempgrid.tif"
             If Not MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(GridFile, sf.Shape(j), tempgrid) Then
-                WarningMsg("Unable to clip grid: " & GridFile)
+                _LastErrorMsg = "Unable to clip grid: " & GridFile
                 Return False
             End If
             Dim g As New MapWinGIS.Grid
@@ -1219,7 +1273,7 @@ loopagain:
         mergegrid.Header.NodataValue = -1
 
         'problem with above: all cells outside of polygons are assigned a value of 0, rather than NoDataValue
-        If Not u.GridReplace(mergegrid, 0, -1) Then WarningMsg("Could not replace: " & u.ErrorMsg(u.LastErrorCode)) : Return False
+        If Not u.GridReplace(mergegrid, 0, -1) Then _LastErrorMsg = "Could not replace: " & u.ErrorMsg(u.LastErrorCode) : Return False
 
         If Not mergegrid.Save(NewGridFile) Then Return False
         If Not mergegrid.Close() Then Return False

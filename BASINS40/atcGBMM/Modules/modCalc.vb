@@ -216,7 +216,7 @@ Module modCalc
             'create distance to streams grid (note: could also call following to flowaccum grid and specify threshold or use my own routine)
 
             If Not ProgressForm.SetProgress("Computing overland flow distance to streams...", ProgressBarStyle.Marquee) Then Return False
-            If Not CreateGrid(.DistToStream.FileName) Then Return False
+            If Not CreateGrid(.DistToStream.FileName, Project.Layers.Subbasins.LayerName) Then Return False
             res = tk.Distance(.FlowDir.FileName, .FlowAccum.FileName, .DistToStream.FileName, Project.StreamThreshold / Project.CellAreaKm, 0)
             If res <> 0 Then LastErrorMsg = MakeErrorMsg("Unable to compute distance to stream grid.", tk, res) : Return False
 
@@ -641,7 +641,7 @@ Module modCalc
                 If Not .Grids.Roughness.Delete() Then Return False
                 If Not .Grids.AvgRoughness.Delete() Then Return False
 
-                If Not CreateGrid(.Grids.Roughness.FileName) Then Return False
+                If Not CreateGrid(.Grids.Roughness.FileName, .Layers.Subbasins.LayerName) Then Return False
                 If Not LookupGrid(.Grids.LandUse.FileName, .Grids.Roughness.FileName, dictRoughness) Then Return False
 
                 If Not CalcDownstream(.Grids.FlowDir.FileName, .Grids.Roughness.FileName, .Grids.FlowPath.FileName, .Grids.AvgRoughness.FileName, enumFlowOption.Overland, enumCalcOption.Average) Then Return False
@@ -693,7 +693,7 @@ Module modCalc
 
             If Not .HydRadius.Delete() Then Return False
 
-            If Not CreateGrid(.HydRadius.FileName) Then Return False
+            If Not CreateGrid(.HydRadius.FileName, Project.Layers.Subbasins.LayerName) Then Return False
             If Not LookupGrid(.FlowAccum.FileName, .HydRadius.FileName, LookupHydRad) Then Return False
             If Not FilterGrid(.HydRadius.FileName, .FlowPath.FileName) Then Return False
             If Not CalcDownstream(.FlowDir.FileName, .HydRadius.FileName, .FlowPath.FileName, .AvgHydRadius.FileName, enumFlowOption.Stream, enumCalcOption.Average) Then Return False
@@ -800,10 +800,10 @@ Module modCalc
                 If Not .TravelStream.Delete() Then Return False
 
                 'create new grids
-                If Not CreateGrid(.TravelOverland.FileName) Then Return False
+                If Not CreateGrid(.TravelOverland.FileName, Project.Layers.Subbasins.LayerName) Then Return False
                 If Not gTravelOverland.Open(.TravelOverland.FileName) Then Return False
 
-                If Not CreateGrid(.TravelStream.FileName) Then Return False
+                If Not CreateGrid(.TravelStream.FileName, Project.Layers.Subbasins.LayerName) Then Return False
                 If Not gTravelStream.Open(.TravelStream.FileName) Then Return False
 
                 If Not GridsCompatible(gAvgRoughness, gAvgHydRad, gAvgSlopeOverland, gTravelStream, gTravelOverland) Then Return False
@@ -1085,7 +1085,7 @@ Module modCalc
                 'create climate station theissan polygons; note that FieldName is for field with StationName string; 
                 'grid will use sequentially assigned integer index (item number in shape file)
                 If Not GisUtil.IsLayer(.LayerName) Then WarningMsg("Climate station grid was not found.") : Return False
-                If Not CreateThiessanGrid(Project.Grids.ClimateThiessan.FileName, .LayerName, .FieldName) Then Return False
+                If Not CreateThiessanGrid(Project.Grids.ClimateThiessan.FileName, .LayerName, .FieldName, Project.Layers.Subbasins.LayerName) Then Return False
             End With
             With .Grids.ClimateThiessan
                 FilterGrid(.FileName, Project.Layers.Subbasins.Filename)
@@ -1113,7 +1113,7 @@ Module modCalc
             With .Layers.MercurySta
                 'create mercury station theissan polygons
                 If Not GisUtil.IsLayer(.LayerName) Then WarningMsg("Mercury station grid was not found.") : Return False
-                If Not CreateThiessanGrid(Project.Grids.MercuryThiessan.FileName, .LayerName, .FieldName) Then Return False
+                If Not CreateThiessanGrid(Project.Grids.MercuryThiessan.FileName, .LayerName, .FieldName, Project.Layers.Subbasins.LayerName) Then Return False
             End With
             With .Grids.MercuryThiessan
                 FilterGrid(.FileName, Project.Layers.Subbasins.Filename)
@@ -1206,7 +1206,7 @@ Module modCalc
     Private Function CalcLitter() As Boolean
         With Project.Grids
             If .MercuryLitter.IsUpToDate(.LandUse.FileName) Then Return True
-            If Not CreateGrid(.MercuryLitter.FileName) Then Return False
+            If Not CreateGrid(.MercuryLitter.FileName, Project.Layers.Subbasins.LayerName) Then Return False
             If Not LookupGrid(.LandUse.FileName, .MercuryLitter.FileName, LookupKdComp) Then Return False
             .MercuryLitter.AddLayer()
             If GisUtil.IsLayer(.MercuryLitter.LayerName) Then GisUtil.UniqueValuesRenderer(GisUtil.LayerIndex(.MercuryLitter.LayerName))

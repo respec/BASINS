@@ -61,6 +61,7 @@ Public Class PlugIn
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         pMapWin.Menus.Remove(ParentMenuName & "_GBMM")
         atcDataManager.RemoveMenuIfEmpty(ParentMenuName)
+        pMapWin.StatusBar(2).Text = ""
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
