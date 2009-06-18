@@ -2,6 +2,7 @@ Imports atcUtility
 Imports atcData
 Imports atcSeasons
 Imports MapWinUtility
+Imports System.Collections.ObjectModel
 
 Public Module WatershedConstituentBalance
     Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci, _
@@ -520,7 +521,7 @@ Public Module WatershedConstituentBalance
             lSummarySB.AppendLine()
             lSummarySB.AppendLine("  RCHRES".PadRight(12) & DecimalAlign(lTotalArea, , , 8))
 
-            Dim lRowIdLength As Integer = 16
+            Dim lRowIdLength As Integer = 20
             lSummarySB.AppendLine()
             lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "OverOperType".PadLeft(12) & _
                                                         vbTab & "Land".PadLeft(12) & _
@@ -542,6 +543,7 @@ Public Module WatershedConstituentBalance
             For Each lOperationType As String In aOperationTypes
                 Dim lNeedHeader As String = True
                 Dim lOperationTypeArea As Double = lOperationTypeAreas.ItemByKey(lOperationType)
+                Dim lLoadTotals As New Loads
                 For Each lConstituentKey As String In lConstituentsToOutput.Keys
                     If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                         If lNeedHeader Then
@@ -553,7 +555,7 @@ Public Module WatershedConstituentBalance
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) & _
                                                                                 vbTab & "Ac-Ft".PadLeft(12))
                                 ElseIf aBalanceType = "Sediment" Then
-                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadRight(12) & _
+                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadLeft(12) & _
                                                                                 vbTab & "tons/ac".PadLeft(12))
                                 Else
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
@@ -582,10 +584,16 @@ Public Module WatershedConstituentBalance
                                                DecimalAlign(lValue / lTotalArea) & vbTab & _
                                                DecimalAlign(lValue / lUnitsAdjust))
                                 Else
+                                    Dim lLoadUnit As Double = lValue / lOperationTypeArea
+                                    Dim lLoadTotal As Double = lValue / lUnitsAdjust
+                                    Dim lLoadOverall As Double = lValue / lTotalArea
                                     lSummarySB.Append(lConstituentName.PadRight(lRowIdLength) & vbTab & _
-                                               DecimalAlign(lValue / lOperationTypeArea) & vbTab & _
-                                               DecimalAlign(lValue / lUnitsAdjust) & vbTab & _
-                                               DecimalAlign(lValue / lTotalArea))
+                                               DecimalAlign(lLoadUnit) & vbTab & _
+                                               DecimalAlign(lLoadTotal) & vbTab & _
+                                               DecimalAlign(lLoadOverall))
+                                    If aBalanceType <> "Water" Then
+                                        SumLoads(lLoadTotals, lConstituentName, lLoadUnit, lLoadTotal, lLoadOverall)
+                                    End If
                                 End If
                                 lSummarySB.AppendLine()
                             Else
@@ -601,6 +609,25 @@ Public Module WatershedConstituentBalance
                         End If
                     End If
                 Next
+                'need totals?
+                Dim lNeedTotal As Boolean = False
+                For Each lLoad As Load In lLoadTotals
+                    If lLoad.Count > 1 Then
+                        lNeedTotal = True
+                    End If
+                Next
+                If lNeedTotal Then
+                    lSummarySB.AppendLine()
+                    lSummarySB.AppendLine(aBalanceType)
+                    For Each lLoad As Load In lLoadTotals
+                        If lLoad.Count > 1 Then
+                            lSummarySB.AppendLine(lLoad.Name.PadRight(lRowIdLength) & vbTab & _
+                                               DecimalAlign(lLoad.Unit) & vbTab & _
+                                               DecimalAlign(lLoad.Total) & vbTab & _
+                                               DecimalAlign(lLoad.Overall))
+                        End If
+                    Next
+                End If
             Next
             Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_BalanceSummary.txt")
             SaveFileString(lSummaryFileName, lSummarySB.ToString)
@@ -608,6 +635,45 @@ Public Module WatershedConstituentBalance
         End If
         Return lString
     End Function
+
+    Private Class Loads
+        Inherits KeyedCollection(Of String, Load)
+        Protected Overrides Function GetKeyForItem(ByVal aLoad As Load) As String
+            Return aLoad.Name 
+        End Function
+    End Class
+    Private Class Load
+        Friend Name As String
+        Friend Count As Integer
+        Friend Unit As Double
+        Friend Total As Double
+        Friend Overall As Double
+    End Class
+
+    Private Sub SumLoads(ByVal aLoadTotals As Loads, _
+                         ByVal aConstituentName As String, _
+                         ByVal aLoadUnit As Double, _
+                         ByVal aLoadTotal As Double, _
+                         ByVal aLoadOverall As Double)
+        If aLoadTotals.Contains(aConstituentName) Then
+            With aLoadTotals.Item(aConstituentName)
+                .Unit += aLoadUnit
+                .Total += aLoadTotal
+                .Overall += aLoadOverall
+                .Count += 1
+            End With
+        Else
+            Dim lLoad As New Load
+            With lLoad
+                .Name = aConstituentName
+                .Unit = aLoadUnit
+                .Total = aLoadTotal
+                .Overall = aLoadOverall
+                .Count = 1
+            End With
+            aLoadTotals.Add(lLoad)
+        End If
+    End Sub
 
     Private Function Header(ByVal aBalanceType As String, ByVal aScenario As String, ByVal aRunMade As Date, ByVal auci As atcUCI.HspfUci) As String
         Dim lString As String = "   Run Made " & aRunMade & vbCrLf
