@@ -209,12 +209,15 @@ Public Module WatershedConstituentBalance
         For Each lOperationType As String In aOperationTypes
             Logger.Dbg("ProcessType:" & lOperationType)
             Dim lValueOutlet As Double = 0.0
+
             For Each lLandUse As String In lLandUses.Keys
                 If lOperationType.StartsWith(lLandUse.Substring(0, 1)) Then
                     Try
                         Dim lNeedHeader As Boolean = True
                         Dim lLandUseOperations As atcCollection = lLandUses.ItemByKey(lLandUse)
                         Dim lOutputTable As New atcTableDelimited
+                        Dim lLoadTotals As New Loads
+                        Dim lLoadUnit() As Double = Nothing
                         With lOutputTable
                             For Each lConstituentKey As String In lConstituentsToOutput.Keys
                                 If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
@@ -326,6 +329,8 @@ Public Module WatershedConstituentBalance
                                                 lValue = 0.0
                                                 'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")
                                             End If
+                                            ReDim Preserve lLoadUnit(lFieldIndex - 1)
+                                            lLoadUnit(lFieldIndex - 1) = lValue
                                             lFieldIndex += 1
                                             .Value(lFieldIndex) = DecimalAlign(lValue, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             If lOutletReport Then
@@ -340,6 +345,10 @@ Public Module WatershedConstituentBalance
                                                 End If
                                             End If
                                         Next lLocation
+
+                                        If aBalanceType <> "Water" Then
+                                            SumLoads(lLoadTotals, lConstituentName, lLoadUnit, 0, 0)
+                                        End If
 
                                         If lOutletReport Then
                                             Dim lConstituentTotalKey As String = lOperationType.Substring(0, 1) & ":" & lConstituentKey
@@ -402,6 +411,28 @@ Public Module WatershedConstituentBalance
                                 End If
                             End If
                         End With
+                        'need totals?
+                        Dim lNeedTotal As Boolean = False
+                        For Each lLoad As Load In lLoadTotals
+                            If lLoad.Count > 1 Then
+                                lNeedTotal = True
+                                Exit For
+                            End If
+                        Next
+                        If lNeedTotal Then
+                            lString.Remove(lString.Length - 2, 2)
+                            lString.AppendLine(aBalanceType)
+                            For Each lLoad As Load In lLoadTotals
+                                If lLoad.Count > 1 Then
+                                    Dim lStr As String = ""
+                                    For lIndex As Integer = 0 To lLoad.Unit.GetUpperBound(0)
+                                        lStr &= DecimalAlign(lLoad.Unit(lIndex), aFieldWidth, aDecimalPlaces, aSignificantDigits) & vbTab
+                                    Next
+                                    lString.AppendLine(lLoad.Name.PadRight(12) & vbTab & lStr)
+                                End If
+                            Next
+                            lString.AppendLine()
+                        End If
                     Catch lEx As Exception
                         Logger.Dbg(lEx.Message)
                     End Try
@@ -438,7 +469,7 @@ Public Module WatershedConstituentBalance
                                     If lLandUse.StartsWith(lOperationType.Substring(0, 1)) Then
                                         lFieldIndex += 1
                                         .FieldLength(lFieldIndex) = aFieldWidth
-                                        .FieldName(lFieldIndex) = lLandUse.Substring(2)
+                                        .FieldName(lFieldIndex) = lLandUse.Substring(2).PadLeft(aFieldWidth)
                                     End If
                                 Next
                                 lFieldIndex += 1
@@ -465,8 +496,8 @@ Public Module WatershedConstituentBalance
                                     If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                                         .CurrentRecord += 1
                                         If lConstituentKey.Substring(2).StartsWith("Header") Then
-                                            .Value(1) = lConstituentName.PadRight(12)
                                             .CurrentRecord += 1
+                                            .Value(1) = lConstituentName.PadRight(12)
                                         Else
                                             .Value(1) = lConstituentName.PadRight(12)
                                             'fill in values for each land use
@@ -584,11 +615,12 @@ Public Module WatershedConstituentBalance
                                                DecimalAlign(lValue / lTotalArea) & vbTab & _
                                                DecimalAlign(lValue / lUnitsAdjust))
                                 Else
-                                    Dim lLoadUnit As Double = lValue / lOperationTypeArea
+                                    Dim lLoadUnit(0) As Double
+                                    lLoadUnit(0) = lValue / lOperationTypeArea
                                     Dim lLoadTotal As Double = lValue / lUnitsAdjust
                                     Dim lLoadOverall As Double = lValue / lTotalArea
                                     lSummarySB.Append(lConstituentName.PadRight(lRowIdLength) & vbTab & _
-                                               DecimalAlign(lLoadUnit) & vbTab & _
+                                               DecimalAlign(lLoadUnit(0)) & vbTab & _
                                                DecimalAlign(lLoadTotal) & vbTab & _
                                                DecimalAlign(lLoadOverall))
                                     If aBalanceType <> "Water" Then
@@ -614,6 +646,7 @@ Public Module WatershedConstituentBalance
                 For Each lLoad As Load In lLoadTotals
                     If lLoad.Count > 1 Then
                         lNeedTotal = True
+                        Exit For
                     End If
                 Next
                 If lNeedTotal Then
@@ -622,9 +655,9 @@ Public Module WatershedConstituentBalance
                     For Each lLoad As Load In lLoadTotals
                         If lLoad.Count > 1 Then
                             lSummarySB.AppendLine(lLoad.Name.PadRight(lRowIdLength) & vbTab & _
-                                               DecimalAlign(lLoad.Unit) & vbTab & _
-                                               DecimalAlign(lLoad.Total) & vbTab & _
-                                               DecimalAlign(lLoad.Overall))
+                                                  DecimalAlign(lLoad.Unit(0)) & vbTab & _
+                                                  DecimalAlign(lLoad.Total) & vbTab & _
+                                                  DecimalAlign(lLoad.Overall))
                         End If
                     Next
                 End If
@@ -645,19 +678,22 @@ Public Module WatershedConstituentBalance
     Private Class Load
         Friend Name As String
         Friend Count As Integer
-        Friend Unit As Double
+        Friend Unit() As Double
         Friend Total As Double
         Friend Overall As Double
     End Class
 
     Private Sub SumLoads(ByVal aLoadTotals As Loads, _
                          ByVal aConstituentName As String, _
-                         ByVal aLoadUnit As Double, _
+                         ByVal aLoadUnit() As Double, _
                          ByVal aLoadTotal As Double, _
                          ByVal aLoadOverall As Double)
         If aLoadTotals.Contains(aConstituentName) Then
             With aLoadTotals.Item(aConstituentName)
-                .Unit += aLoadUnit
+                ReDim Preserve .Unit(aLoadUnit.GetUpperBound(0))
+                For lIndex As Integer = 0 To aLoadUnit.GetUpperBound(0)
+                    .Unit(lIndex) += aLoadUnit(lIndex)
+                Next
                 .Total += aLoadTotal
                 .Overall += aLoadOverall
                 .Count += 1
@@ -666,7 +702,10 @@ Public Module WatershedConstituentBalance
             Dim lLoad As New Load
             With lLoad
                 .Name = aConstituentName
-                .Unit = aLoadUnit
+                ReDim .Unit(aLoadUnit.GetUpperBound(0))
+                For lIndex As Integer = 0 To aLoadUnit.GetUpperBound(0)
+                    .Unit = aLoadUnit
+                Next
                 .Total = aLoadTotal
                 .Overall = aLoadOverall
                 .Count = 1
