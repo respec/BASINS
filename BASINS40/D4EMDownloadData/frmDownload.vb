@@ -22,7 +22,7 @@ Public Class frmDownload
         cboRegion.Items.Add(pRegionEnterCoordinates)
         Dim lHucIndex As Integer = HUC8Index()
         If lHucIndex >= 0 Then
-            Dim lHUC8s As ArrayList = HUC8s()
+            Dim lHUC8s As Generic.List(Of String) = HUC8s()
             If lHUC8s.Count = 1 Then
                 cboRegion.Items.Add(pRegionHydrologicUnit & " " & lHUC8s(0))
             ElseIf lHUC8s.Count > 1 Then
@@ -242,6 +242,7 @@ Public Class frmDownload
                                      & lCacheOnly _
                                      & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                                      & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
+                                     & "<joinattributes>true</joinattributes>" & vbCrLf _
                                      & "</arguments>" & vbCrLf _
                                      & "</function>" & vbCrLf
 
@@ -312,9 +313,9 @@ Public Class frmDownload
         Return -1
     End Function
 
-    Private Function HUC8s() As ArrayList
+    Private Function HUC8s() As Generic.List(Of String)
         'First check for a cat layer that contains the list of HUC-8s
-        Dim lHUC8s As New ArrayList
+        Dim lHUC8s As New Generic.List(Of String)
         If pMapWin IsNot Nothing AndAlso pMapWin.Project IsNot Nothing AndAlso pMapWin.Project.FileName IsNot Nothing Then
             Dim lCatDbfName As String = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "cat.dbf")
             If IO.File.Exists(lCatDbfName) Then

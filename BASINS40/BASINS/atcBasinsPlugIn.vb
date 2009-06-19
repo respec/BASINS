@@ -92,6 +92,16 @@ Public Class atcBasinsPlugIn
 
         Logger.StartToFile(g_ProgramDir & "cache\log\" _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
+        Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
+
+        'Logger.MsgCustom("Test Message", "Test Title", "Button One", "2")
+        'For i As Integer = 1 To 10
+        '    If Logger.MsgCustom("Test Message " & i, "Test Title " & i, "Button One", "2", "All") = "All" Then Exit For
+        'Next
+        'For i As Integer = 1 To 10
+        '    If Logger.MsgCustomCheckbox("Test Message " & i, "Test Title " & i, g_AppNameShort, "Test", "Buttons", "Button One", "2", "All") = "All" Then Exit For
+        'Next
+
         'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_ProgramDir & "cache\log\", System.Diagnostics.Process.GetCurrentProcess.Id) Then
         '    Logger.ProgressStatus = New MonitorProgressStatus
         '    SendMonitorMessage("Show")

@@ -43,18 +43,18 @@ namespace ZedGraph
         /// <summary>
         /// Number of standard deviations to display in graph (plus and minus this many are displayed)
         /// </summary>
-        double standardDeviations = 3;
+        public double standardDeviations = 5;
         
         /// <summary>
         /// Percent chance exceeded to label, if there is room
         /// </summary>
-        public double[] Percentages = {0.01, 0.02, 0.05, 
+        public double[] Percentages = {0.0001, 0.001, 0.01, 0.02, 0.05, 
                                        0.1, 0.2, 0.5, 
                                        1, 2, 5,
                                        10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 
                                        95, 98, 99, 
                                        99.5, 99.8, 99.9, 
-                                       99.95, 99.98, 99.99};
+                                       99.95, 99.98, 99.99, 99.999, 99.9999};
     //{ 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50, 70, 80, 90, 95, 98, 99, 99.5, 99.8, 99.9 };
         /// <summary>
         /// Return periods to label, if there is room

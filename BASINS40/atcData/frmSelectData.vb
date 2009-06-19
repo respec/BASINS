@@ -1081,7 +1081,9 @@ NextName:
             groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & ")"
         End If
         Try
-            If mnuSelectMap.Checked Then atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
+            If mnuSelectMap IsNot Nothing AndAlso mnuSelectMap.Checked AndAlso pSelectedGroup IsNot Nothing Then
+                atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
+            End If
         Catch
         End Try
     End Sub
@@ -1226,11 +1228,13 @@ Friend Class ListSource
 
     Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
         Get
-            Try
-                Return pValues.ItemByIndex(aRow)
-            Catch
-                Return ""
-            End Try
+            If pValues IsNot Nothing AndAlso aRow < pValues.Count Then
+                Try
+                    Return pValues.ItemByIndex(aRow)
+                Catch
+                End Try
+            End If
+            Return ""
         End Get
         Set(ByVal Value As String)
         End Set

@@ -12,7 +12,7 @@ Public Class atcDataSourceWDM
     Inherits atcData.atcTimeseriesSource
 
     Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
-    Private pDates As ArrayList 'of atcTimeseries
+    Private pDates As Generic.List(Of atcTimeseries)
     Private pQuick As Boolean = False
     Private pNan As Double
     'Private pEpsilon As Double
@@ -21,14 +21,18 @@ Public Class atcDataSourceWDM
     Private pTs As Integer = 0 'default timestep, default 1 
     Private pAskAboutMissingTuTs As Boolean = True
 
+    'Can be set by user to avoid asking user each time
+    Private pExistAskUserAction As EnumExistAction = ExistAskUser
+
     Public Overrides Sub Clear()
         MyBase.Clear()
         pQuick = False
         If pDates Is Nothing Then
-            pDates = New ArrayList
+            pDates = New Generic.List(Of atcTimeseries)
         Else
             pDates.Clear()
         End If
+        SaveSetting("WDM", "AddDataset", "ExistAskUserAction", "")
     End Sub
 
     Public Sub New()
@@ -54,7 +58,7 @@ Public Class atcDataSourceWDM
         DataSets.Clear()
 
         pDates = Nothing
-        pDates = New ArrayList
+        pDates = New Generic.List(Of atcTimeseries)
 
         lDsn = 1
         While lDsn > 0
@@ -167,7 +171,7 @@ Public Class atcDataSourceWDM
             If lTs = 0 Or lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
                 If pAskAboutMissingTuTs Then
                     Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
-                    pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lDsn, pTu, pTs, lAggr)
+                    pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lTimser.ToString & " #" & lDsn, pTu, pTs, lAggr)
                 End If
                 lTs = pTs
                 lTu = pTu
@@ -270,27 +274,33 @@ Public Class atcDataSourceWDM
             If lDsnExists > 0 Then 'dataset exists, what do we do?
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
                 Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
+                'Change asking user into what the user already chose for all
+                If aExistAction = ExistAskUser Then aExistAction = pExistAskUserAction
                 Select Case aExistAction
                     Case ExistNoAction
                         'Don't add, take no action
                         Logger.Dbg("DSN conflict:ExistNoAction:not added")
                         Return True
                     Case ExistAskUser
-                        If Logger.Msg("Replace existing dataset '" & lExistTimser.ToString & "'" & vbCrLf & "with new dataset '" & lTimser.ToString & "'", MsgBoxStyle.YesNo, "Dataset Number Conflict") = MsgBoxResult.Yes Then
-                            GoTo CaseExistReplace
-                        ElseIf Logger.Msg("Use next available DSN (" & findNextDsn(lDsn) & ") for new dataset '" & lTimser.ToString & "'", MsgBoxStyle.YesNo, "Dataset Number Conflict") = MsgBoxResult.Yes Then
-                            GoTo CaseExistRenumber
-                        Else
-                            Logger.Dbg("Asked user to resolve DSN conflict, chose not to replace or renumber, not added")
-                            Return False
-                        End If
+                        Select Case Logger.MsgCustomCheckbox("Existing dataset '" & lExistTimser.ToString & "'" & vbCrLf _
+                                                           & "has same data set number as" & vbCrLf _
+                                                           & "new dataset '" & lTimser.ToString & "'", _
+                                                             "Dataset Number Conflict", _
+                                                             "Use this answer for all datasets", "WDM", "AddDataset", "ExistAskUserAction", _
+                                                             "Replace Existing", "Renumber New", "Discard New") ', "Append new to Existing")
+                            Case "Replace Existing" : GoTo CaseExistReplace
+                            Case "Renumber New" : GoTo CaseExistRenumber
+                            Case "Discard New"
+                                Logger.Dbg("Asked user to resolve DSN conflict, chose not to replace or renumber, not added")
+                                Return False
+                        End Select
                     Case ExistReplace
 CaseExistReplace:
                         'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
                         Dim lRet As Integer
                         F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
                         'Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
-                        If Not lExistTimser Is Nothing Then
+                        If lExistTimser IsNot Nothing Then
                             DataSets.Remove(lExistTimser)
                         End If
                     Case ExistAppend  'find dataset and try to append to it

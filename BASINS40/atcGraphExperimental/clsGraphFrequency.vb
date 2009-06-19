@@ -78,7 +78,6 @@ Public Class clsGraphFrequency
         'TODO: check to see if this is an NDay timseries, if not then compute one or throw an exception
 
         Dim lDataCount As Integer = aTimeseries.Values.GetUpperBound(0)
-        Dim lX(lDataCount) As Double
         Dim lPane As ZedGraph.GraphPane = pZgc.MasterPane.PaneList(0)
         With lPane.XAxis
             If .Type <> AxisType.Probability Then

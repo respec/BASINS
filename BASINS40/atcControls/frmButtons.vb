@@ -58,24 +58,51 @@ Public Class frmButtons
 
 #End Region
 
+    Public LabelAccept As String = "Ok"
+    Public LabelCancel As String = "Cancel"
+    Public LabelTimeout As String = "Cancel"
+    Public TimeoutSeconds As Integer = 0
+
+    Public RegistryAppName As String = ""
+    Public RegistrySection As String = ""
+    Public RegistryKey As String = ""
+    Public RegistryCheckboxText As String = "Always Use This Answer"
+
     Private pLabelClicked As String
-    Private pLabelCancel As String = "Cancel"
     Private pMargin As Integer = 12
 
     Public Function AskUser(ByVal aTitle As String, _
                             ByVal aMessage As String, _
-                            ByVal aLabels As IEnumerable, _
-                   Optional ByVal aTimeoutSeconds As Integer = 0, _
-                   Optional ByVal aTimeoutLabel As String = "Cancel") As String
+                            ByVal ParamArray aButtonLabels() As String) As String
+        Return AskUser(aTitle, aMessage, Array.AsReadOnly(aButtonLabels))
+    End Function
+
+    Public Function AskUser(ByVal aTitle As String, _
+                            ByVal aMessage As String, _
+                            ByVal aButtonLabels As IEnumerable) As String
+        Dim lButtonLeft As Integer = pMargin
+        Dim lChkAlways As CheckBox = Nothing
+
+        If RegistryAppName.Length > 0 AndAlso RegistrySection.Length > 0 AndAlso RegistryKey.Length > 0 Then
+            Dim lRegistryLabel As String = GetSetting(RegistryAppName, RegistrySection, RegistryKey, "")
+            If lRegistryLabel.Length > 0 Then
+                Return lRegistryLabel
+            Else
+                lChkAlways = New CheckBox
+                lChkAlways.Text = RegistryCheckboxText
+                Me.Controls.Add(lChkAlways)
+                lChkAlways.Left = pMargin
+            End If
+        End If
+
         Text = aTitle
         lblMessage.Text = aMessage
-        Dim lButtonLeft As Integer = pMargin
         Dim lButtons As New Generic.List(Of Windows.Forms.Button)
         Dim lSetHeight As Boolean = False
 
-        For Each curLabel As String In aLabels
+        For Each curLabel As String In aButtonLabels
             Dim btn As Windows.Forms.Button = New Windows.Forms.Button
-            btn.Anchor = AnchorStyles.Bottom
+            btn.Anchor = AnchorStyles.Bottom + AnchorStyles.Left
             btn.AutoSize = True
             btn.Left = lButtonLeft
 
@@ -83,22 +110,25 @@ Public Class frmButtons
             btn.Tag = lLabel
             While lLabel.StartsWith("+") OrElse lLabel.StartsWith("-")
                 If lLabel.StartsWith("+") Then
-                    Me.AcceptButton = btn
-                    btn.DialogResult = Windows.Forms.DialogResult.OK
-                    lLabel = lLabel.Substring(1)
+                    LabelAccept = btn.Tag
+                Else
+                    LabelCancel = btn.Tag
                 End If
-                If lLabel.StartsWith("-") Then
-                    Me.CancelButton = btn
-                    btn.DialogResult = Windows.Forms.DialogResult.Cancel
-                    lLabel = lLabel.Substring(1)
-                    pLabelCancel = btn.Tag
-                End If
+                lLabel = lLabel.Substring(1)
             End While
+
+            If btn.Tag.ToLower = LabelAccept.ToLower Then Me.AcceptButton = btn
+            If btn.Tag.ToLower = LabelCancel.ToLower Then Me.CancelButton = btn
 
             btn.Text = lLabel
 
             If Not lSetHeight Then
                 Me.Height = lblMessage.Top + lblMessage.Height + pMargin + btn.Height + pMargin + Me.Height - Me.ClientSize.Height
+                If lChkAlways IsNot Nothing Then
+                    Me.Height += lChkAlways.Height + pMargin
+                    lChkAlways.Top = Me.ClientSize.Height - btn.Height - pMargin - lChkAlways.Height - pMargin
+                    lChkAlways.Anchor = AnchorStyles.Bottom + AnchorStyles.Left
+                End If
                 lSetHeight = True
             End If
 
@@ -123,15 +153,17 @@ Public Class frmButtons
             Next
         End If
 
-        Dim lStartTime As Integer = Date.Now.ToOADate
-
         Me.Show()
         Me.BringToFront()
 
+        Dim lTimeLimit As Double = Date.Now.AddSeconds(TimeoutSeconds).ToOADate
         pLabelClicked = ""
         While pLabelClicked.Length = 0
             Application.DoEvents()
             System.Threading.Thread.Sleep(100)
+            If TimeoutSeconds > 0 AndAlso Date.Now.ToOADate > lTimeLimit Then
+                pLabelClicked = LabelCancel
+            End If
         End While
 
         Me.Visible = False
@@ -139,6 +171,13 @@ Public Class frmButtons
         For Each lButton As Windows.Forms.Button In lButtons
             Me.Controls.Remove(lButton)
         Next
+
+        If lChkAlways IsNot Nothing Then
+            If lChkAlways.Checked Then
+                SaveSetting(RegistryAppName, RegistrySection, RegistryKey, pLabelClicked)
+            End If
+            Me.Controls.Remove(lChkAlways)
+        End If
 
         Return pLabelClicked
     End Function
@@ -149,7 +188,7 @@ Public Class frmButtons
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
         If pLabelClicked.Length = 0 Then
-            pLabelClicked = pLabelCancel
+            pLabelClicked = LabelCancel
         End If
     End Sub
 End Class
