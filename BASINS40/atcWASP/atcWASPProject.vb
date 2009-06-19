@@ -93,7 +93,7 @@ Public Class atcWASPProject
             Dim lWASPDir As String = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\USEPA\WASP\7.0", "DatabaseDir", "") & "..\wasp.exe"
             Dim lWASPexe As String = atcUtility.FindFile("Please locate the EPA WASP Executable", lWASPDir)
             If IO.File.Exists(lWASPexe) Then
-                LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), aInputFileName, False)
+                LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), "-import " & aInputFileName, False)
                 Logger.Dbg("WASP launched with input " & aInputFileName)
             Else
                 Logger.Msg("Cannot find the EPA WASP Executable", MsgBoxStyle.Critical, "BASINS WASP Problem")
@@ -1061,7 +1061,7 @@ Public Class atcWASPProject
                         Exit For
                     End If
                 Next
-                If lflowTS IsNot Nothing Then
+                If lflowTS.TimeSeries IsNot Nothing Then
                     aSW.WriteLine(Space(2) & lflowTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-flow values")
                     If j = 0 Then
                         NumTimeSteps = lflowTS.TimeSeries.Values.Length
