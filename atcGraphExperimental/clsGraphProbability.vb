@@ -93,6 +93,7 @@ Public Class clsGraphProbability
                 End With
             End If
             lProbScale = .Scale
+            'lProbScale.standardDeviations = 5
             For lXindex As Integer = 0 To lLastIndex
                 lX(lXindex) = 100 * .Scale.DeLinearize(lXindex / CDbl(lLastIndex))
             Next

@@ -442,8 +442,8 @@ Public Class frmProjection
         Me.WindowState = System.Windows.Forms.FormWindowState.Normal
         Me.BringToFront()
 
-        cboCategory.SelectedIndex = CInt(GetSetting("Projection", "LastSelected", "Category", "0"))
-        cboName.SelectedIndex = CInt(GetSetting("Projection", "LastSelected", "Name", "3"))
+        cboCategory.SelectedIndex = CInt(GetSetting("Projection", "LastSelected", "Category", "2"))
+        cboName.SelectedIndex = CInt(GetSetting("Projection", "LastSelected", "Name", "1"))
 
         While Me.Visible
             System.Windows.Forms.Application.DoEvents()

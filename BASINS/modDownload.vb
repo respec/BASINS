@@ -730,7 +730,7 @@ StartOver:
                     If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
                     Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
                     If lLayer Is Nothing Then
-                        Logger.Msg("Failed add grid layer '" & lOutputFileName & "'")
+                        Logger.Msg(lOutputFileName, "Failed add grid layer")
                     Else
                         lLayersAdded.Add(lLayer.Name)
                     End If
