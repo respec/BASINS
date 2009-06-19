@@ -1061,7 +1061,7 @@ Public Class atcWASPProject
                         Exit For
                     End If
                 Next
-                If lflowTS.TimeSeries IsNot Nothing Then
+                If lflowTS IsNot Nothing AndAlso lflowTS.TimeSeries IsNot Nothing Then
                     aSW.WriteLine(Space(2) & lflowTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-flow values")
                     If j = 0 Then
                         NumTimeSteps = lflowTS.TimeSeries.Values.Length
