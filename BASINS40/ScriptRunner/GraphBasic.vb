@@ -9,102 +9,112 @@ Imports MapWinUtility
 Imports System
 
 Module GraphBasic
-    'This script provides an example of how to build a basic timeseries plot from a script.
-    'The data to be displayed is set in these constants, prior to the Sub ScriptMain.
-
-    Private Const pWorkingDirectory As String = "H:\"   'all plot files will be written to this folder
-    Private pBaseName As String
-    Private pLeftYAxisLabel As String
-
-    Private Const pTimeseries1FileName As String = "H:\upatoi.wdm"
+    Private pbasename As String
+    Private pWQGraphSpecification As Object
+    Private Const pWorkingDirectory As String = "H:\"
     Private Const pTimeseries1Axis As String = "Aux"
     Private Const pTimeseries1IsPoint As Boolean = False
-
     Private Const pTimeseries2Axis As String = "Aux"
     Private Const pTimeseries2IsPoint As Boolean = False
-
-    Private pOutputWDMFileName As String = "H:\upatoi.wdm"
     Private Const pTimeseries3Axis As String = "Left"
     Private Const pTimeseries3IsPoint As Boolean = False
-
     Private Const pObservedWQBaseFileName As String = "H:\FB_WQData.dbf"
-
-    Private pWQGraphSpecification(,) As Object = { _
-                                                  {"RCH35", "TSS", 1999, 10, 1, 2004, 5, 30, "D12", "D13"}, _
-                                                  {"RCH46", "TSS", 2006, 5, 7, 2006, 5, 10, "", ""}, _
-                                                  {"RCH46", "TSS", 2006, 5, 10, 2006, 5, 14, "", ""}, _
-                                                  {"RCH46", "TSS", 2005, 12, 14, 2005, 12, 19, "", ""}, _
-                                                  {"RCH46", "TSS", 2005, 10, 31, 2005, 11, 6, "", ""}, _
-                                                  {"RCH639", "TSS", 2006, 6, 23, 2006, 6, 26, "", ""}, _
-                                                  {"RCH639", "TSS", 2006, 8, 22, 2006, 8, 25, "", ""}, _
-                                                  {"RCH614", "TSS", 2006, 5, 7, 2006, 5, 12, "", ""}, _
-                                                  {"RCH614", "TSS", 2005, 11, 1, 2005, 11, 5, "", ""}, _
-                                                  {"RCH662", "TSS", 2005, 12, 4, 2005, 12, 8, "", ""}, _
-                                                  {"RCH662", "TSS", 2005, 12, 14, 2005, 12, 18, "", ""}, _
-                                                  {"RCH626", "TSS", 2005, 11, 19, 2005, 11, 25, "", ""}, _
-                                                  {"RCH626", "TSS", 2006, 1, 1, 2006, 1, 7, "", ""}, _
-                                                  {"RCH626", "TSS", 2006, 5, 10, 2006, 5, 15, "", ""}, _
-                                                  {"RCH30", "TSS", 2006, 5, 10, 2006, 5, 12, "", ""}, _
-                                                  {"RCH30", "TSS", 2005, 11, 19, 2005, 11, 23, "", ""}, _
-                                                  {"RCH30", "TSS", 2006, 1, 1, 2006, 1, 4, "", ""}, _
-                                                  {"RCH33", "TSS", 2006, 5, 28, 2006, 5, 31, "", ""}, _
-                                                  {"RCH33", "TSS", 2006, 4, 21, 2006, 4, 24, "", ""}, _
-                                                  {"RCH33", "TSS", 2006, 5, 9, 2006, 5, 13, "", ""}, _
-                                                  {"RCH33", "TSS", 2006, 4, 26, 2006, 4, 29, "", ""}, _
-                                                  {"RCH33", "TSS", 2005, 12, 23, 2005, 12, 27, "", ""}, _
-                                                  {"RCH666", "TSS", 2006, 5, 9, 2006, 5, 12, "", ""}, _
-                                                  {"RCH666", "TSS", 2006, 6, 1, 2006, 6, 4, "", ""}, _
-                                                  {"RCH35", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
-                                                  {"RCH614", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
-                                                  {"RCH45", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
-                                                  {"RCH33", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
-                                                  {"RCH46", "DO", 2000, 1, 1, 2000, 12, 31, "", ""}, _
-                                                  {"RCH35", "TW", 1999, 10, 1, 2004, 6, 30, "D12", "D13"}, _
-                                                  {"RCH33", "TW", 2001, 7, 1, 2004, 6, 30, "", ""}, _
-                                                  {"RCH614", "TW", 2001, 7, 1, 2004, 6, 30, "", ""}, _
-                                                  {"RCH46", "TW", 1999, 10, 1, 2000, 12, 31, "", ""}, _
-                                                  {"RCH72", "TW", 2004, 11, 1, 2006, 9, 30, "", ""}, _
-                                                  {"RCH45", "TW", 1999, 12, 1, 2004, 6, 30, "O13", ""}, _
-                                                  {"RCH35", "NH4-N", 1999, 10, 1, 2006, 5, 31, "D12", "D13"}, _
-                                                  {"RCH35", "NO3-N", 1999, 10, 1, 2004, 9, 10, "D12", "D13"}, _
-                                                  {"RCH45", "NO3-N", 1999, 12, 1, 2003, 11, 30, "O13", ""}, _
-                                                  {"RCH46", "NO3-N", 2000, 1, 1, 2000, 12, 31, "", ""}, _
-                                                  {"RCH614", "NO3-N", 2001, 9, 1, 2003, 11, 30, "", ""}, _
-                                                  {"RCH35", "PO4-P", 2000, 1, 1, 2003, 12, 31, "D12", "D13"}, _
-                                                  {"RCH46", "PO4-P", 1999, 10, 1, 2000, 12, 31, "", ""} _
-                                                  }
-
-
-    '{"RCH35", "TSS", 2001, 5, 1, 2004, 5, 30, "D12", "D13"}, 
-    '{"RCH45", "TSS", 2007, 7, 1, 2007, 7, 31, "O13", ""}, _
-
-
     Private pTimeseriesConstituent As String
     Private Const pTimeseries4Axis As String = "Left"
     Private Const pTimeseries4IsPoint As Boolean = True
-    Private pLastIndex As Integer = pWQGraphSpecification.GetUpperBound(0)
-
     Private Const pTimeseries5Axis As String = "Left"
     Private Const pTimeseries5IsPoint As Boolean = True
     Private Const pTimeseries6Axis As String = "Left"
     Private Const pTimeseries6IsPoint As Boolean = True
+    Private pLeftYAxisLabel As String
     Private foldername As String
 
+    Private Sub Initialize()
+        'Private pWQGraphSpecification(,) As Object
+        Dim lTestName As String = "upatoi"
+        'Dim lTestName As String = "nonupatoi"
 
+        Select Case lTestName
+            Case "upatoi"
+                pbasename = "upatoi"
+                pWQGraphSpecification(,) = { _
+                                                                  {"RCH35", "TSS", 1999, 10, 1, 2004, 5, 30, "D12", "D13"}, _
+                                                                  {"RCH46", "TSS", 2006, 5, 7, 2006, 5, 10, "", ""}, _
+                                                                  {"RCH46", "TSS", 2006, 5, 10, 2006, 5, 14, "", ""}, _
+                                                                  {"RCH46", "TSS", 2005, 12, 14, 2005, 12, 19, "", ""}, _
+                                                                  {"RCH46", "TSS", 2005, 10, 31, 2005, 11, 6, "", ""}, _
+                                                                  {"RCH639", "TSS", 2006, 6, 23, 2006, 6, 26, "", ""}, _
+                                                                  {"RCH639", "TSS", 2006, 8, 22, 2006, 8, 25, "", ""}, _
+                                                                  {"RCH614", "TSS", 2006, 5, 7, 2006, 5, 12, "", ""}, _
+                                                                  {"RCH614", "TSS", 2005, 11, 1, 2005, 11, 5, "", ""}, _
+                                                                  {"RCH662", "TSS", 2005, 12, 4, 2005, 12, 8, "", ""}, _
+                                                                  {"RCH662", "TSS", 2005, 12, 14, 2005, 12, 18, "", ""}, _
+                                                                  {"RCH626", "TSS", 2005, 11, 19, 2005, 11, 25, "", ""}, _
+                                                                  {"RCH626", "TSS", 2006, 1, 1, 2006, 1, 7, "", ""}, _
+                                                                  {"RCH626", "TSS", 2006, 5, 10, 2006, 5, 15, "", ""}, _
+                                                                  {"RCH30", "TSS", 2006, 5, 10, 2006, 5, 12, "", ""}, _
+                                                                  {"RCH30", "TSS", 2005, 11, 19, 2005, 11, 23, "", ""}, _
+                                                                  {"RCH30", "TSS", 2006, 1, 1, 2006, 1, 4, "", ""}, _
+                                                                  {"RCH33", "TSS", 2006, 5, 28, 2006, 5, 31, "", ""}, _
+                                                                  {"RCH33", "TSS", 2006, 4, 21, 2006, 4, 24, "", ""}, _
+                                                                  {"RCH33", "TSS", 2006, 5, 9, 2006, 5, 13, "", ""}, _
+                                                                  {"RCH33", "TSS", 2006, 4, 26, 2006, 4, 29, "", ""}, _
+                                                                  {"RCH33", "TSS", 2005, 12, 23, 2005, 12, 27, "", ""}, _
+                                                                  {"RCH666", "TSS", 2006, 5, 9, 2006, 5, 12, "", ""}, _
+                                                                  {"RCH666", "TSS", 2006, 6, 1, 2006, 6, 4, "", ""}, _
+                                                                  {"RCH35", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                                  {"RCH614", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                                  {"RCH45", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                                  {"RCH33", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                                  {"RCH46", "DO", 2000, 1, 1, 2000, 12, 31, "", ""}, _
+                                                                  {"RCH35", "TW", 1999, 10, 1, 2004, 6, 30, "D12", "D13"}, _
+                                                                  {"RCH33", "TW", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                                  {"RCH614", "TW", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+                                                                  {"RCH46", "TW", 1999, 10, 1, 2000, 12, 31, "", ""}, _
+                                                                  {"RCH72", "TW", 2004, 11, 1, 2006, 9, 30, "", ""}, _
+                                                                  {"RCH45", "TW", 1999, 12, 1, 2004, 6, 30, "O13", ""}, _
+                                                                  {"RCH35", "NH4-N", 1999, 10, 1, 2006, 5, 31, "D12", "D13"}, _
+                                                                  {"RCH35", "NO3-N", 1999, 10, 1, 2004, 9, 10, "D12", "D13"}, _
+                                                                  {"RCH45", "NO3-N", 1999, 12, 1, 2003, 11, 30, "O13", ""}, _
+                                                                  {"RCH46", "NO3-N", 2000, 1, 1, 2000, 12, 31, "", ""}, _
+                                                                  {"RCH614", "NO3-N", 2001, 9, 1, 2003, 11, 30, "", ""}, _
+                                                                  {"RCH35", "PO4-P", 2000, 1, 1, 2003, 12, 31, "D12", "D13"}, _
+                                                                  {"RCH46", "PO4-P", 1999, 10, 1, 2000, 12, 31, "", ""} _
+                                          }
+
+
+            Case "nonupatoi"
+                pbasename = "nonupatoi"
+                pWQGraphSpecification(,) = { _
+                                                                  {"RCH108", "DO", 1999, 10, 1, 2004, 5, 30, "", ""}, _
+                                                                  {"RCH108", "NH4-N", 2006, 5, 7, 2006, 5, 10, "", ""}, _
+                                                                  {"RCH108", "NO3-N", 2006, 5, 10, 2006, 5, 14, "", ""}, _
+                                                                  {"RCH108", "PO4-P", 2005, 12, 14, 2005, 12, 19, "", ""}, _
+                                                                  {"RCH108", "TW", 2005, 12, 14, 2005, 12, 19, "", ""}, _
+                                                                  {"RCH311", "DO", 1999, 10, 1, 2004, 5, 30, "", ""}, _
+                                                                  {"RCH108", "NO3-N", 2006, 5, 10, 2006, 5, 14, "", ""}, _
+                                                                  {"RCH108", "TW", 2005, 12, 14, 2005, 12, 19, "", ""} _
+                                          }
+
+        End Select
+    End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-
+        Initialize()
+        Dim pTimeseries1FileName As String = "H:\" & pbasename & ".wdm"
+        Dim pOutputWDMFileName As String = "H:\" & pbasename & ".wdm"
+        Dim pLastIndex As Integer = pWQGraphSpecification.GetUpperBound(0)
         ChDriveDir(pWorkingDirectory)
         Dim wdmfileinfo As System.IO.FileInfo = New System.IO.FileInfo(pOutputWDMFileName)
         Dim lRunmade As String = wdmfileinfo.LastWriteTime.ToString
+
         foldername = "H:\WQGraphs_Upatoi_" & Format(Month(lRunmade), "00") & Format(Day(lRunmade), "00") & _
                                   Format(Year(lRunmade), "00") & Format(Hour(lRunmade), "00") & Format(Minute(lRunmade), "00")
-       
 
         For lGraphIndex As Integer = 0 To pLastIndex
 
             pTimeseriesConstituent = pWQGraphSpecification(lGraphIndex, 1)
-
+            'If pTimeseriesConstituent = "DO" Then
             Select Case pTimeseriesConstituent
                 Case "TW"
                     pLeftYAxisLabel = "Water Temperature (" & ChrW(186) & "F)"
@@ -134,9 +144,7 @@ Module GraphBasic
             'get timeseries 1
             Dim lDataSource1 As New atcDataSourceWDM
             Dim lTser1 As atcTimeseries
-            If lGraphIndex = 33 Then
-                lTser1 = Nothing
-            End If
+            
             Dim lTser2 As atcTimeseries
             If lDataSource1.Open(pTimeseries1FileName) Then
 
@@ -168,7 +176,7 @@ Module GraphBasic
             End If
 
             'get timeseries 2
-            
+
 
 
             'get timeseries 4, 5 and 6
@@ -234,6 +242,7 @@ Module GraphBasic
             End If
 
             GraphTimeseriesBatch(lTimeseriesGroup)
+            'End If
         Next
     End Sub
 
@@ -340,9 +349,9 @@ Module GraphBasic
             lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
         End If
 
-        
 
-      
+
+
 
         FormatPanes(lZgc)
         lPaneMain.YAxis.Title.Text = pLeftYAxisLabel
