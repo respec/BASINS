@@ -238,23 +238,28 @@ Public Class SwatInput
 
         For Each lType As Type In a.GetTypes
             Debug.Print(lType.Name)
-            For Each lMethodName As String In lSaveMethodNames
-                Dim lSaveMethod As System.Reflection.MethodInfo = lType.GetMethod(lMethodName)
-                If Not lSaveMethod Is Nothing Then
-                    Try
-                        Dim lObject As Object = lType.InvokeMember("New", Reflection.BindingFlags.CreateInstance _
-                                                                        + Reflection.BindingFlags.NonPublic _
-                                                                        + Reflection.BindingFlags.Instance, Nothing, Nothing, lNewArgs)
-                        Try
-                            lSaveMethod.Invoke(lObject, lSaveArgs1)
-                        Catch
-                            lSaveMethod.Invoke(lObject, lSaveArgs2)
-                        End Try
-                    Catch e As Exception
-                        Logger.Dbg("Could not save " & lType.Name & ": " & e.Message)
-                    End Try
-                End If
-            Next
+            Select Case lType.Name
+                Case "MySettings"
+                Case Else
+                    For Each lMethodName As String In lSaveMethodNames
+                        Dim lSaveMethod As System.Reflection.MethodInfo = lType.GetMethod(lMethodName)
+                        If Not lSaveMethod Is Nothing Then
+                            Try
+                                Dim lObject As Object = lType.InvokeMember("New", Reflection.BindingFlags.CreateInstance _
+                                                                                + Reflection.BindingFlags.NonPublic _
+                                                                                + Reflection.BindingFlags.Instance, Nothing, Nothing, lNewArgs)
+                                Select Case lType.Name
+                                    Case "clsChm", "clsMgt"
+                                        lSaveMethod.Invoke(lObject, lSaveArgs2)
+                                    Case Else
+                                        lSaveMethod.Invoke(lObject, lSaveArgs1)
+                                End Select
+                            Catch e As Exception
+                                Logger.Dbg("Could not save " & lType.Name & ": " & e.Message)
+                            End Try
+                        End If
+                    Next
+            End Select
         Next
     End Sub
 
