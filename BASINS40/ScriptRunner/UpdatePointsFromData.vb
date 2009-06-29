@@ -3,6 +3,7 @@ Imports atcUtility
 Imports MapWindow.Interfaces
 Imports MapWinUtility
 Imports MapWinGIS
+Imports System
 
 Module UpdatePointsFromData
 
@@ -160,90 +161,5 @@ Module UpdatePointsFromData
         Next
         Return lShapeFileNew
     End Function
-
-
-    Private Sub CreatePointShapefile(ByVal aShapefileName As String, _
-                                       ByVal aXPositions As Collection, ByVal aYPositions As Collection, _
-                                       ByVal aAttributeNames As Collection, ByVal aAttributeValues As Collection, _
-                                       ByVal aOutputProjection As String)
-        Dim lShapefile As New MapWinGIS.Shapefile
-        Dim lInputProjection As String = "+proj=longlat +datum=NAD83"
-
-        If Not lShapefile.CreateNew(aShapefileName, MapWinGIS.ShpfileType.SHP_POINT) Then
-            Logger.Dbg("Failed to create new point shapefile " & aShapefileName & " ErrorCode " & lShapefile.LastErrorCode)
-        End If
-        If Not lShapefile.StartEditingShapes(True) Then
-            Logger.Dbg("Failed to start editing new point shapefile " & aShapefileName & " ErrorCode " & lShapefile.LastErrorCode)
-        End If
-
-        Dim lAttributeIdIndex As Integer = -1
-        Dim lAttributeIndex As Integer = 0
-        For Each lAttributeName As String In aAttributeNames
-            lAttributeIndex += 1
-            Dim lField As New MapWinGIS.Field
-            lField.Name = lAttributeName
-            If lAttributeName.ToLower = "id" Then
-                lAttributeIdIndex = lAttributeIndex
-                Logger.Dbg("Id field " & lAttributeIndex)
-            End If
-            lField.Type = MapWinGIS.FieldType.STRING_FIELD
-            lField.Width = 10
-            If Not lShapefile.EditInsertField(lField, lShapefile.NumFields) Then
-                Logger.Dbg("Failed to add new field " & lField.Name & " to shapefile " & aShapefileName & " ErrorCode " & lShapefile.LastErrorCode)
-            End If
-            lField = Nothing
-        Next
-
-        Dim lAttributeCount As Integer = aAttributeNames.Count
-        For lIndex As Integer = 0 To aXPositions.Count - 1
-            Dim lShape As New MapWinGIS.Shape
-            Dim lPoint As New MapWinGIS.Point
-            If Not lShape.Create(MapWinGIS.ShpfileType.SHP_POINT) Then
-                Logger.Dbg("Failed to create new point shape, ErrorCode " & lShape.LastErrorCode)
-            End If
-
-            If IsNumeric(aXPositions(lIndex + 1)) And IsNumeric(aYPositions(lIndex + 1)) Then
-                Dim lXpos As Double = aXPositions(lIndex + 1)
-                Dim lYpos As Double = aYPositions(lIndex + 1)
-                If aOutputProjection.Length > 0 Then
-                    MapWinGeoProc.SpatialReference.ProjectPoint(lXpos, lYpos, lInputProjection, aOutputProjection)
-                End If
-                lPoint.x = lXpos
-                lPoint.y = lYpos
-                Dim lTempIndex As Integer = lIndex '2nd argument in InsertPoint set to 0 for some reason
-                If Not lShape.InsertPoint(lPoint, lTempIndex) Then
-                    Logger.Dbg("Failed to insert point into shape.")
-                End If
-                If Not lShapefile.EditInsertShape(lShape, lShapefile.NumShapes) Then
-                    Logger.Dbg("Failed to insert point shape into shapefile.")
-                End If
-
-                For lAttributeIndex = 1 To lAttributeCount
-                    If Not lShapefile.EditCellValue(lAttributeIndex - 1, lShapefile.NumShapes - 1, aAttributeValues((lIndex * lAttributeCount) + lAttributeIndex)) Then
-                        Logger.Dbg("Failed to edit cell value.")
-                    End If
-                Next
-            Else
-                Logger.Dbg("No Latitude (" & aYPositions(lIndex + 1) & ") or Longitude (" & aXPositions(lIndex + 1) & _
-                           ") set for point with id " & aAttributeValues((lIndex * lAttributeCount) + lAttributeIdIndex))
-            End If
-
-            lPoint = Nothing
-            lShape = Nothing
-        Next
-
-        If Not lShapefile.StopEditingShapes(True, True) Then
-            Logger.Dbg("Failed to stop editing shapes in " & lShapefile.Filename & " ErrorCode " & lShapefile.LastErrorCode)
-        End If
-        If aOutputProjection.Length > 0 Then
-            lShapefile.Projection = aOutputProjection
-        Else
-            lShapefile.Projection = lInputProjection
-        End If
-        If Not lShapefile.Close() Then
-            Logger.Dbg("Failed to close shapefile " & lShapefile.Filename & " ErrorCode " & lShapefile.LastErrorCode)
-        End If
-
-    End Sub
 
 End Module
