@@ -373,7 +373,7 @@ Public Module modMetData
                                     J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
                                     If lCurInd <> lInd Then 'changing station used to fill
                                         Logger.Dbg("    Filling from TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
-                                        If Math.Abs(lFillAdjust + 999) > pEpsilon Then
+                                        If Math.Abs(lFillAdjust + 999) > 0.0001 Then 'pEpsilon Then
                                             Logger.Dbg("      (Adjusting values using historical average of " & lStaAdjust & ")")
                                         End If
                                         lCurInd = lInd
