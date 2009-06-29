@@ -565,6 +565,7 @@ Public Module modTimeseriesMath
     ''' <param name="aOldTSer">Timeseries containing missing values</param>
     ''' <param name="aMaxFillLength">Max span, in Julian Days, over which interpolation is allowed</param>
     ''' <param name="aFillInstances">Array returning length of each missing period filled</param>
+    ''' <param name="aMissingValue">Missing value indicator</param>
     ''' <returns>atcTimeseries clone of original timeseries along with interpolated values</returns>
     ''' <remarks></remarks>
     Public Function FillMissingByInterpolation(ByVal aOldTSer As atcTimeseries, _
@@ -576,7 +577,7 @@ Public Module modTimeseriesMath
         Dim lInd As Integer = 1
         Dim lIndPrevNotMissing As Integer = 1
         Dim lIndNextNotMissing As Integer
-        Logger.Dbg("FillMissingByInterp:NumValues:" & lNewTSer.numValues & ":" & aMaxFillLength)
+        Logger.Dbg("FillMissingByInterp: NumValues:" & lNewTSer.numValues & "  MaxFillLength, days:" & aMaxFillLength)
         While lInd <= lNewTSer.numValues
             If Double.IsNaN(lNewTSer.Values(lInd)) OrElse Math.Abs(lNewTSer.Values(lInd) - aMissingValue) < 0.00001 Then 'look for next good value
                 lIndNextNotMissing = FindNextNotMissing(lNewTSer, lInd, aMissingValue)
