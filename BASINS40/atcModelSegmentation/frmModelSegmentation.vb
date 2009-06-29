@@ -66,8 +66,10 @@ Friend Class frmModelSegmentation
                     For lMetStationIndex As Integer = 0 To lMetStationsSelected.Count - 1
                         GisUtil.PointXY(lMetLayerIndex, lMetStationsSelected(lMetStationIndex), lMetSegX, lMetSegY)
                         'calculate the distance
-                        lDistance = Math.Sqrt(((Math.Abs(lSubBasinX) - Math.Abs(lMetSegX)) ^ 2) + _
-                                              ((Math.Abs(lSubBasinY) - Math.Abs(lMetSegY)) ^ 2))
+                        'lDistance = Math.Sqrt(((Math.Abs(lSubBasinX) - Math.Abs(lMetSegX)) ^ 2) + _
+                        '                      ((Math.Abs(lSubBasinY) - Math.Abs(lMetSegY)) ^ 2))
+                        lDistance = Math.Sqrt(((lSubBasinX - lMetSegX) ^ 2) + _
+                                              ((lSubBasinY - lMetSegY) ^ 2))
                         If lDistance < lShortestDistance Then
                             lShortestDistance = lDistance
                             lClosestMetStationIndex = lMetStationsSelected(lMetStationIndex)
