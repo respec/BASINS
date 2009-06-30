@@ -311,11 +311,11 @@ Friend Class atcFrequencyGridSource
                     Dim lLogString As String = "   "
 
                     'Compile again
-                    If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then
+                    If lAttributes.GetValue("LDIST", "") = "LP3" Then
                         'Get original version of NDayTimeseries (not log version)
                         lIsLog = True
                         lLogString = "(logs)"
-                        lNdayTsNonLog = lNdayTs.Attributes.GetValue("NDayTimeseries")
+                        lNdayTsNonLog = lAttributes.GetValue("NonLogNDayTimeseries")
                     Else
                         lNdayTsNonLog = lNdayTs
                     End If
@@ -417,7 +417,7 @@ Friend Class atcFrequencyGridSource
                         lPositiveNdayTs.numValues = lNumPositive
                         For lIndex = 1 To lNdayTs.numValues
                             If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
-                                lPositiveNdayTs.Value(lCurNewValueIndex) = lNdayTs.Value(lIndex)
+                                lPositiveNdayTs.Value(lCurNewValueIndex) = Log10(lNdayTs.Value(lIndex))
                                 lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTs.Dates.Value(lIndex)
                                 lCurNewValueIndex += 1
                             End If

@@ -478,6 +478,7 @@ Public Class atcTimeseriesNdayHighLow
                     lTsMath.Open("log 10", lArgsMath)
                     'Save non-log timeseries
                     lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNonLogTs)
+                    aAttributesStorage.SetValue("NonLogNDayTimeseries", lNonLogTs)
                     lNdayTs = lTsMath.DataSets(0)
                     'Set log-specific attributes
                     aAttributesStorage.SetValue("MEANDD", lNdayTs.Attributes.GetValue("Mean"))
