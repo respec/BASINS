@@ -19,18 +19,20 @@ Module GraphBasic
     Private Const pTimeseries3Axis As String = "Left"
     Private Const pTimeseries3IsPoint As Boolean = False
     Private Const pObservedWQBaseFileName As String = "H:\FB_WQData.dbf"
-    Private pTimeseriesConstituent As String
     Private Const pTimeseries4Axis As String = "Left"
     Private Const pTimeseries4IsPoint As Boolean = True
     Private Const pTimeseries5Axis As String = "Left"
     Private Const pTimeseries5IsPoint As Boolean = True
     Private Const pTimeseries6Axis As String = "Left"
     Private Const pTimeseries6IsPoint As Boolean = True
-    Private pLeftYAxisLabel As String
-    Private foldername As String
+    Private Const pTimeseries7Axis As String = "Right"
+    Private Const pTimeseries7IsPoint As Boolean = False
+    Private pTimeseriesConstituent, pLeftYAxisLabel, pLeftAuxAxisLabel, foldername As String
+
 
     Private pGraphSpecUpatoi(,) As Object = { _
-        {"RCH35", "TSS", 1999, 10, 1, 2004, 5, 30, "D12", "D13"}, _
+        {"RCH35", "TSS", 1999, 10, 1, 2006, 5, 30, "D12", "D13"}, _
+        {"RCH35", "TSS", 2006, 5, 9, 2006, 5, 13, "", ""}, _
         {"RCH46", "TSS", 2006, 5, 7, 2006, 5, 10, "", ""}, _
         {"RCH46", "TSS", 2006, 5, 10, 2006, 5, 14, "", ""}, _
         {"RCH46", "TSS", 2005, 12, 14, 2005, 12, 19, "", ""}, _
@@ -40,10 +42,6 @@ Module GraphBasic
         {"RCH614", "TSS", 2006, 5, 7, 2006, 5, 12, "", ""}, _
         {"RCH614", "TSS", 2005, 11, 1, 2005, 11, 5, "", ""}, _
         {"RCH662", "TSS", 2005, 12, 4, 2005, 12, 8, "", ""}, _
-        {"RCH662", "TSS", 2005, 12, 14, 2005, 12, 18, "", ""}, _
-        {"RCH626", "TSS", 2005, 11, 19, 2005, 11, 25, "", ""}, _
-        {"RCH626", "TSS", 2006, 1, 1, 2006, 1, 7, "", ""}, _
-        {"RCH626", "TSS", 2006, 5, 10, 2006, 5, 15, "", ""}, _
         {"RCH30", "TSS", 2006, 5, 10, 2006, 5, 12, "", ""}, _
         {"RCH30", "TSS", 2005, 11, 19, 2005, 11, 23, "", ""}, _
         {"RCH30", "TSS", 2006, 1, 1, 2006, 1, 4, "", ""}, _
@@ -66,7 +64,7 @@ Module GraphBasic
         {"RCH72", "TW", 2004, 11, 1, 2006, 9, 30, "", ""}, _
         {"RCH45", "TW", 1999, 12, 1, 2004, 6, 30, "O13", ""}, _
         {"RCH35", "NH4-N", 1999, 10, 1, 2006, 5, 31, "D12", "D13"}, _
-        {"RCH35", "NO3-N", 1999, 10, 1, 2004, 9, 10, "D12", "D13"}, _
+        {"RCH35", "NO3-N", 1999, 10, 1, 2004, 9, 30, "D12", "D13"}, _
         {"RCH45", "NO3-N", 1999, 12, 1, 2003, 11, 30, "O13", ""}, _
         {"RCH46", "NO3-N", 2000, 1, 1, 2000, 12, 31, "", ""}, _
         {"RCH614", "NO3-N", 2001, 9, 1, 2003, 11, 30, "", ""}, _
@@ -75,18 +73,18 @@ Module GraphBasic
         }
 
     Private pGraphSpecNonUpatoi(,) As Object = { _
-        {"RCH108", "DO", 1999, 10, 1, 2004, 5, 30, "", ""}, _
-        {"RCH108", "NH4-N", 2006, 5, 7, 2006, 5, 10, "", ""}, _
-        {"RCH108", "NO3-N", 2006, 5, 10, 2006, 5, 14, "", ""}, _
-        {"RCH108", "PO4-P", 2005, 12, 14, 2005, 12, 19, "", ""}, _
-        {"RCH108", "TW", 2005, 12, 14, 2005, 12, 19, "", ""}, _
-        {"RCH311", "DO", 1999, 10, 1, 2004, 5, 30, "", ""}, _
-        {"RCH108", "NO3-N", 2006, 5, 10, 2006, 5, 14, "", ""}, _
-        {"RCH108", "TW", 2005, 12, 14, 2005, 12, 19, "", ""} _
+        {"RCH108", "DO", 1999, 10, 1, 2000, 12, 31, "", ""}, _
+        {"RCH108", "NH4-N", 1999, 10, 1, 2000, 12, 31, "", ""}, _
+        {"RCH108", "NO3-N", 1999, 10, 1, 2000, 12, 31, "", ""}, _
+        {"RCH108", "PO4-P", 1999, 10, 1, 2000, 12, 31, "", ""}, _
+        {"RCH108", "TW", 2000, 1, 1, 2000, 12, 31, "", ""}, _
+        {"RCH311", "DO", 2001, 7, 1, 2004, 6, 30, "", ""}, _
+        {"RCH311", "NO3-N", 2001, 9, 1, 2003, 9, 30, "", ""}, _
+        {"RCH311", "TW", 2001, 7, 1, 2004, 6, 30, "", ""} _
         }
 
     Private Sub Initialize()
-        'Private pWQGraphSpecification(,) As Object
+
         Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "nonupatoi"
 
@@ -111,8 +109,9 @@ Module GraphBasic
         Dim wdmfileinfo As System.IO.FileInfo = New System.IO.FileInfo(pOutputWDMFileName)
         Dim lRunmade As String = wdmfileinfo.LastWriteTime.ToString
 
-        foldername = "H:\WQGraphs_Upatoi_" & Format(Month(lRunmade), "00") & Format(Day(lRunmade), "00") & _
+        foldername = "H:\WQGraphs_" & pbasename & "_" & Format(Month(lRunmade), "00") & Format(Day(lRunmade), "00") & _
                                   Format(Year(lRunmade), "00") & Format(Hour(lRunmade), "00") & Format(Minute(lRunmade), "00")
+
 
         For lGraphIndex As Integer = 0 To pLastIndex
 
@@ -146,50 +145,51 @@ Module GraphBasic
 
             'get timeseries 1
             Dim lDataSource1 As New atcDataSourceWDM
-            Dim lTser1 As atcTimeseries
-            
-            Dim lTser2 As atcTimeseries
+            Dim lTser1, lTser2, ltser3 As atcTimeseries
+
             If lDataSource1.Open(pTimeseries1FileName) Then
 
                 If pTimeseriesConstituent = "TSS" Then
 
-                    If pWQGraphSpecification(lGraphIndex, 0) = "RCH46" Then
-                        lTser2 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
-                                            FindData("Constituent", "FLOW").FindData("Time Unit", 2).Finddata("Scenario", "OBSERVED")(0)
-                        lTser2.Attributes.SetValue("YAxis", pTimeseries2Axis)
-                        lTser2.Attributes.SetValue("Point", pTimeseries2IsPoint)
-                        lTimeseriesGroup.Add(SubsetByDate(lTser2, lSDateJ, lEdatej, Nothing))
-                    End If
 
-                    lTser1 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
-                    FindData("Constituent", "FLOW").FindData("Time Unit", 3).Finddata("Scenario", "SIMULATE")(0)
+                    'lTser2 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
+                    'FindData("Constituent", "FLOW").FindData("Time Unit", 3).Finddata("Scenario", "SIMULATE")(0)
+                    'lTser2 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
+                    '                    FindData("Constituent", "PREC").FindData("Time Unit", 3)(0)
+                    lTser2 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
+                                        FindData("Constituent", "PREC")(0)
+                    'lTser2 = Aggregate(lTser2, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+
+                    lTser2.Attributes.SetValue("YAxis", pTimeseries2Axis)
+                    lTser2.Attributes.SetValue("Point", pTimeseries2IsPoint)
+                    lTimeseriesGroup.Add(SubsetByDate(lTser2, lSDateJ, lEdatej, Nothing))
+                    pLeftAuxAxisLabel = "PREC (in)"
+
 
                 Else
                     lTser1 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                     FindData("Constituent", "FLOW").FindData("Time Unit", 4)(0)
+                    pLeftAuxAxisLabel = "Flow (cfs)"
 
                 End If
 
-                lTser1.Attributes.SetValue("YAxis", pTimeseries1Axis)
-                lTser1.Attributes.SetValue("Point", pTimeseries1IsPoint)
-                lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
+                If lTser1 IsNot Nothing Then
+                    lTser1.Attributes.SetValue("YAxis", pTimeseries1Axis)
+                    lTser1.Attributes.SetValue("Point", pTimeseries1IsPoint)
+                    lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
+                End If
 
             Else
                 Logger.Msg("Unable to Open " & pTimeseries1FileName)
             End If
 
-            'get timeseries 2
-
-
-
-            'get timeseries 4, 5 and 6
             Dim lDataSource4 As New atcDataSourceBasinsObsWQ
             If lDataSource4.Open(pObservedWQBaseFileName) Then
                 Dim lTser4 As atcTimeseries
                 lTser4 = Nothing
-
                 lTser4 = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                                     FindData("Constituent", pTimeseriesConstituent)(0)
+
                 If lTser4 IsNot Nothing Then
                     lTser4.Attributes.SetValue("YAxis", pTimeseries4Axis)
                     lTser4.Attributes.SetValue("Point", pTimeseries4IsPoint)
@@ -204,7 +204,7 @@ Module GraphBasic
                     lTser5.Attributes.SetValue("YAxis", pTimeseries5Axis)
                     lTser5.Attributes.SetValue("Point", pTimeseries5IsPoint)
                     lTimeseriesGroup.Add(SubsetByDate(lTser5, lSDateJ, lEdatej, Nothing))
-                    pBaseName = pBaseName & "_" & pWQGraphSpecification(lGraphIndex, 8)
+                    pbasename = pbasename & "_" & pWQGraphSpecification(lGraphIndex, 8)
 
                     If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
 
@@ -214,7 +214,20 @@ Module GraphBasic
                         lTser6.Attributes.SetValue("Point", pTimeseries6IsPoint)
                         lTimeseriesGroup.Add(SubsetByDate(lTser6, lSDateJ, lEdatej, Nothing))
 
-                        pBaseName = pBaseName & "_" & pWQGraphSpecification(lGraphIndex, 9)
+                        pbasename = pbasename & "_" & pWQGraphSpecification(lGraphIndex, 9)
+                    End If
+
+                End If
+                If pTimeseriesConstituent = "TSS" Then
+                    Dim lTser7 As atcTimeseries
+                    lTser7 = Nothing
+                    lTser7 = lDataSource4.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
+                                        FindData("Constituent", "Stage_ft")(0)
+                    lTser7 = SubsetByDate(lTser7, lSDateJ, lEdatej, Nothing)
+                    If (lTser7 IsNot Nothing) Then
+                        lTser7.Attributes.SetValue("YAxis", pTimeseries7Axis)
+                        lTser7.Attributes.SetValue("Point", pTimeseries7IsPoint)
+                        lTimeseriesGroup.Add(lTser7)
                     End If
 
                 End If
@@ -224,16 +237,17 @@ Module GraphBasic
             End If
 
             Dim lDataSource3 As New atcDataSourceWDM
-            Dim lTser3 As atcTimeseries
+
             If lDataSource3.Open(pOutputWDMFileName) Then
+
                 If pTimeseriesConstituent = "TSS" Then
-                    lTser3 = lDataSource3.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
+                    ltser3 = lDataSource3.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                     FindData("Constituent", pTimeseriesConstituent).FindData("Time Unit", atcTimeUnit.TUHour)(0)
                 Else
 
-                    lTser3 = lDataSource3.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
+                    ltser3 = lDataSource3.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                             FindData("Constituent", pTimeseriesConstituent)(0)
-                    '.FindData("Time Unit", 4)(0)
+
                 End If
                 lTser3.Attributes.SetValue("YAxis", pTimeseries3Axis)
                 lTser3.Attributes.SetValue("Point", pTimeseries3IsPoint)
@@ -280,10 +294,20 @@ Module GraphBasic
             For Each lCurve As ZedGraph.LineItem In .CurveList
                 lCurve.Label.Text = lCurve.Label.Text.Replace("SIMULATE", "SIMULATED")
                 lCurve.Label.Text = lCurve.Label.Text.Replace("TW", "Water Temperature")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH33", "Sally Branch (Reach 33)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH33", "Sally Br. (RCH 33)")
                 lCurve.Label.Text = lCurve.Label.Text.Replace("DOX", "Dissolved Oxygen")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH35", "Bonham Creek (Reach 35)")
-                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH46", "Upatoi Creek at McBride Bridge (Reach 46)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH35", "Bonham Cr. (RCH 35)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH46", "Upatoi Cr./MCB Bridge (RCH 46)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH614", "Upper Upatoi Cr. (RCH 614)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH639", "Upper Randall Cr. (RCH 639)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH45", "Randall Cr. (RCH 45)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH626", "Pine Knot Cr. (RCH 626)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH30", "Pine Knot Cr. (RCH 30)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH662", "Ochille Cr. (RCH 662)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH666", "Tiger Cr. (RCH 666)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH72", "Upatoi Cr./WWTP (RCH 72)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH311", "Oswichee Cr. (RCH 311)")
+                lCurve.Label.Text = lCurve.Label.Text.Replace("RCH108", "Bull Cr. (RCH 108)")
             Next
         End With
 
@@ -324,42 +348,56 @@ Module GraphBasic
             If Not lObserved.Label.Text.Contains(" at ") Then
                 lObserved.Label.Text &= " at " & aDataGroup(1 + i).Attributes.GetValue("Location")
             End If
+            Dim constituent As String = aDataGroup(i + 1).Attributes.GetValue("Constituent")
+            If constituent <> "Stage_ft" Then
+                Select Case i
+                    Case 0
+                        lObserved.Symbol.Type = SymbolType.Circle
+                        lObserved.Color = Drawing.Color.Blue
+                        lObserved.Symbol.Fill.IsVisible = True
+                        lObserved.Symbol.Size = 6
+                    Case 1
+                        lObserved.Symbol.Type = SymbolType.Diamond
+                        lObserved.Color = Drawing.Color.Brown
+                        lObserved.Symbol.Fill.IsVisible = True
+                        lObserved.Symbol.Size = 8
 
-            Select Case i
-                Case 0
-                    lObserved.Symbol.Type = SymbolType.Circle
-                    lObserved.Color = Drawing.Color.Blue
-                    lObserved.Symbol.Fill.IsVisible = True
-                    lObserved.Symbol.Size = 6
-                Case 1
-                    lObserved.Symbol.Type = SymbolType.Diamond
-                    lObserved.Color = Drawing.Color.Brown
-                    lObserved.Symbol.Fill.IsVisible = True
-                    lObserved.Symbol.Size = 8
-                Case 2
-                    lObserved.Symbol.Type = SymbolType.Triangle
-                    lObserved.Color = Drawing.Color.SeaGreen
-                    lObserved.Symbol.Fill.IsVisible = True
-                    lObserved.Symbol.Size = 8
-            End Select
+                    Case 2
+                        lObserved.Symbol.Type = SymbolType.Triangle
+                        lObserved.Color = Drawing.Color.SeaGreen
+                        lObserved.Symbol.Fill.IsVisible = True
+                        lObserved.Symbol.Size = 8
+                End Select
+            Else
+
+                lObserved.Color = Drawing.Color.Green
+                lObserved.Line.StepType = StepType.NonStep
+                lObserved.Line.Width = 2
+                lPaneMain.Y2Axis.Title.Text = "Stage (ft)"
+
+            End If
+
         Next
+        'lCurve = lPaneMain.CurveList.Item(lPaneMain.CurveList.Count - 2)
+        'lCurve.Line.StepType = StepType.NonStep
+        'lCurve.Line.Width = 2
+        'lCurve.Color = Drawing.Color.Green
+        'If Not lCurve.Label.Text.Contains(" at ") Then
+        '    lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
+        'End If
 
         lCurve = lPaneMain.CurveList.Item(lPaneMain.CurveList.Count - 1)
         lCurve.Line.StepType = StepType.NonStep
-        lCurve.Line.Width = 1
+        lCurve.Line.Width = 2
         lCurve.Color = Drawing.Color.Red
         If Not lCurve.Label.Text.Contains(" at ") Then
             lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
         End If
 
-
-
-
-
         FormatPanes(lZgc)
         lPaneMain.YAxis.Title.Text = pLeftYAxisLabel
 
-        lPaneAux.YAxis.Title.Text = "Flow (cfs)"
+        lPaneAux.YAxis.Title.Text = pLeftAuxAxisLabel
         System.IO.Directory.CreateDirectory(foldername)
         lZgc.SaveIn(lOutFileName & ".png")
         'lZgc.SaveIn(lOutFileName & ".emf")
