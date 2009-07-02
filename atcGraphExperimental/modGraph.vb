@@ -164,9 +164,18 @@ FoundMatch:
             ScaleAxis(lRightDataSets, lPaneMain.Y2Axis)
         End If
         If lAuxDataSets.Count > 0 Then
-            ScaleAxis(lAuxDataSets, aZgc.MasterPane.PaneList(0).YAxis)
-            aZgc.MasterPane.PaneList(0).XAxis.Scale.Min = aZgc.MasterPane.PaneList(1).XAxis.Scale.Min
-            aZgc.MasterPane.PaneList(0).XAxis.Scale.Max = aZgc.MasterPane.PaneList(1).XAxis.Scale.Max
+            Dim lAux As ZedGraph.GraphPane = aZgc.MasterPane.PaneList(0)
+            Dim lMain As ZedGraph.GraphPane = aZgc.MasterPane.PaneList(1)
+
+            ScaleAxis(lAuxDataSets, lAux.YAxis)
+            lAux.XAxis.Scale.Min = lMain.XAxis.Scale.Min
+            lAux.XAxis.Scale.Max = lMain.XAxis.Scale.Max
+
+            'Make sure both graphs line up horizontally
+            Dim lMaxX As Single = Math.Max(lAux.Rect.X, lMain.Rect.X)
+            Dim lMinRight As Single = Math.Max(lAux.Rect.Right, lMain.Rect.Right)
+            lAux.Rect = New RectangleF(lMaxX, lAux.Rect.Y, lMinRight - lMaxX, lAux.Rect.Height)
+            lMain.Rect = New RectangleF(lMaxX, lMain.Rect.Y, lMinRight - lMaxX, lMain.Rect.Height)
         End If
 
         AxisTitlesFromCommonAttributes(lPaneMain, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
