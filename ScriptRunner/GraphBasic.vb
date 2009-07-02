@@ -398,6 +398,13 @@ Module GraphBasic
         lPaneMain.YAxis.Title.Text = pLeftYAxisLabel
 
         lPaneAux.YAxis.Title.Text = pLeftAuxAxisLabel
+
+        'Make sure both graphs line up horizontally
+        Dim lMaxX As Single = Math.Max(lPaneAux.Rect.X, lPaneMain.Rect.X)
+        Dim lMinRight As Single = Math.Max(lPaneAux.Rect.Right, lPaneMain.Rect.Right)
+        lPaneAux.Rect = New Drawing.RectangleF(lMaxX, lPaneAux.Rect.Y, lMinRight - lMaxX, lPaneAux.Rect.Height)
+        lPaneMain.Rect = New Drawing.RectangleF(lMaxX, lPaneMain.Rect.Y, lMinRight - lMaxX, lPaneMain.Rect.Height)
+
         System.IO.Directory.CreateDirectory(foldername)
         lZgc.SaveIn(lOutFileName & ".png")
         'lZgc.SaveIn(lOutFileName & ".emf")
