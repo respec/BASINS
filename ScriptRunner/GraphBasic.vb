@@ -399,14 +399,21 @@ Module GraphBasic
 
         lPaneAux.YAxis.Title.Text = pLeftAuxAxisLabel
 
+        If lOutFileName.EndsWith("RCH614_TSS_110105_to_110505") Then Stop
         'Make sure both graphs line up horizontally
-        Dim lMaxX As Single = Math.Max(lPaneAux.Rect.X, lPaneMain.Rect.X)
-        Dim lMinRight As Single = Math.Max(lPaneAux.Rect.Right, lPaneMain.Rect.Right)
-        lPaneAux.Rect = New Drawing.RectangleF(lMaxX, lPaneAux.Rect.Y, lMinRight - lMaxX, lPaneAux.Rect.Height)
-        lPaneMain.Rect = New Drawing.RectangleF(lMaxX, lPaneMain.Rect.Y, lMinRight - lMaxX, lPaneMain.Rect.Height)
+        lPaneAux.AxisChange()
+        lPaneMain.AxisChange()
+        Dim lMaxX As Single = Math.Max(lPaneAux.Chart.Rect.X, lPaneMain.Chart.Rect.X)
+        Dim lMinRight As Single = Math.Min(lPaneAux.Chart.Rect.Right, lPaneMain.Chart.Rect.Right)
+        lPaneAux.Chart.Rect = New Drawing.RectangleF(lMaxX, lPaneAux.Chart.Rect.Y, lMinRight - lMaxX, lPaneAux.Chart.Rect.Height)
+        lPaneMain.Chart.Rect = New Drawing.RectangleF(lMaxX, lPaneMain.Chart.Rect.Y, lMinRight - lMaxX, lPaneMain.Chart.Rect.Height)
 
         System.IO.Directory.CreateDirectory(foldername)
         lZgc.SaveIn(lOutFileName & ".png")
+        If lOutFileName.EndsWith("RCH614_TSS_110105_to_110505") Then
+            OpenFile(lOutFileName & ".png")
+            Stop
+        End If
         'lZgc.SaveIn(lOutFileName & ".emf")
         'With lPaneAux
         '    .YAxis.Type = ZedGraph.AxisType.Log
