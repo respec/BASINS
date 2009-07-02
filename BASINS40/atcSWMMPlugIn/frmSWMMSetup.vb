@@ -1556,6 +1556,8 @@ Public Class frmSWMMSetup
             With pPlugIn.SWMMProject
                 .Name = lName
                 .Title = "SWMM Project Written from BASINS"
+                .RainGages.Clear()
+                .MetConstituents.Clear()
 
                 Dim lPrecGageNamesByCatchment As New Collection
                 Dim lSelectedStation As StationDetails
