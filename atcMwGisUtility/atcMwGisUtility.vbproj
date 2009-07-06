@@ -1,4 +1,4 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
@@ -82,9 +82,9 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinInterfaces">
-      <Name>MapWinInterfaces</Name>
-      <HintPath>..\..\BASINS\Bin\MapWinInterfaces.dll</HintPath>
+    <Reference Include="MapWinInterfaces, Version=4.7.1.24749, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinUtility, Version=1.0.3433.28607, Culture=neutral, processorArchitecture=MSIL">

@@ -4,7 +4,28 @@ Imports atcSeasons
 Imports MapWinUtility
 Imports System.Collections.ObjectModel
 
+''' <summary>
+''' Build watershed constituent balance reports
+''' </summary>
+''' <remarks></remarks>
 Public Module WatershedConstituentBalance
+    ''' <summary>
+    ''' Build watershed constituent balance reports for watershed above specified output locations
+    ''' </summary>
+    ''' <param name="aUci">HSPF UCI object</param>
+    ''' <param name="aBalanceType">Constituent name - see ConstituentsToOutput in modUtility for valid values</param>
+    ''' <param name="aOperationTypes"></param>
+    ''' <param name="aScenario"></param>
+    ''' <param name="aScenarioResults"></param>
+    ''' <param name="aOutletLocations"></param>
+    ''' <param name="aRunMade"></param>
+    ''' <param name="aOutFilePrefix"></param>
+    ''' <param name="aOutletDetails"></param>
+    ''' <param name="aSegmentRows">true if pivoted report desired</param>
+    ''' <param name="aDecimalPlaces"></param>
+    ''' <param name="aSignificantDigits"></param>
+    ''' <param name="aFieldWidth"></param>
+    ''' <remarks>see HSPFOutputReports script for sample usage</remarks>
     Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci, _
                               ByVal aBalanceType As String, _
                               ByVal aOperationTypes As atcCollection, _
@@ -110,8 +131,8 @@ Public Module WatershedConstituentBalance
                                 lConstituents = lGroups.ItemByKey(lCurrentGroup)
                             End If
                         End If
-                    Next
-                Next
+                    Next lString
+                Next lOutletLocation
 
                 Dim lStringSB As New Text.StringBuilder
                 lStringSB.AppendLine(aBalanceType & " Balance Report For " & aScenario)
@@ -119,14 +140,14 @@ Public Module WatershedConstituentBalance
                 lStringSB.Append("Location".PadLeft(12))
                 For Each lLocation As String In aOutletLocations
                     lStringSB.Append(vbTab & lLocation.PadLeft(12) & vbTab & Space(12))
-                Next
+                Next lLocation
                 lStringSB.AppendLine()
                 lStringSB.Append(Space(12))
                 For Each lLocation As String In aOutletLocations
                     If aBalanceType = "Water" Then
                         lStringSB.Append(vbTab & "in".PadLeft(12) & vbTab & "ac-ft".PadLeft(12))
                     End If
-                Next
+                Next lLocation
                 lStringSB.AppendLine()
                 For Each lGroup As String In lGroups.Keys
                     lStringSB.AppendLine()
@@ -143,7 +164,7 @@ Public Module WatershedConstituentBalance
                         Next
                         lStringSB.AppendLine()
                     Next
-                Next
+                Next lGroup
                 SaveFileString(aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_Mult_BalanceBasin.txt"), lStringSB.ToString)
             Catch lEx As Exception
                 Logger.Dbg("Whoops!")
@@ -156,6 +177,24 @@ Public Module WatershedConstituentBalance
         Friend Mass As Double = 0.0
     End Class
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aUci"></param>
+    ''' <param name="aBalanceType"></param>
+    ''' <param name="aOperationTypes"></param>
+    ''' <param name="aScenario"></param>
+    ''' <param name="aScenarioResults"></param>
+    ''' <param name="aRunMade"></param>
+    ''' <param name="aOutletLocation"></param>
+    ''' <param name="aOutFilePrefix"></param>
+    ''' <param name="aOutletDetails"></param>
+    ''' <param name="aSegmentRows"></param>
+    ''' <param name="aDecimalPlaces"></param>
+    ''' <param name="aSignificantDigits"></param>
+    ''' <param name="aFieldWidth"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
@@ -515,7 +554,7 @@ Public Module WatershedConstituentBalance
                                             .Value(lFieldIndex) = DecimalAlign(lValueTotal / lAreaTotal, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                         End If
                                     End If
-                                Next
+                                Next lConstituentKey
                                 If aSegmentRows Then
                                     lDetailsSB.AppendLine(.ToStringPivoted)
                                 Else
@@ -661,7 +700,7 @@ Public Module WatershedConstituentBalance
                         End If
                     Next
                 End If
-            Next
+            Next lOperationType
             Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_BalanceSummary.txt")
             SaveFileString(lSummaryFileName, lSummarySB.ToString)
             lSummarySB = Nothing
@@ -672,7 +711,7 @@ Public Module WatershedConstituentBalance
     Private Class Loads
         Inherits KeyedCollection(Of String, Load)
         Protected Overrides Function GetKeyForItem(ByVal aLoad As Load) As String
-            Return aLoad.Name 
+            Return aLoad.Name
         End Function
     End Class
     Private Class Load
