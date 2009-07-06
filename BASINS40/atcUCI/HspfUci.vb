@@ -606,7 +606,7 @@ Public Class HspfUci
                         Dim lRFact As Single
                         If lConnection.Target.VolName = "COPY" Then
                             lRFact = 0
-                            For lIndex As Integer = 1 To lConnection.Target.Opn.Targets.Count
+                            For lIndex As Integer = 0 To lConnection.Target.Opn.Targets.Count - 1
                                 If lConnection.Target.Opn.Targets.Item(lIndex).Target.VolName = "RCHRES" Then
                                     lNewPoint = True
                                     'sum up the mfacts (really for septic modeling)
