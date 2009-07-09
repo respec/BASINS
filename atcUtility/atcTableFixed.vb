@@ -13,12 +13,10 @@ Public Class atcTableFixed
         Public FieldStart As Integer  'column number in which field starts
     End Class
 
-    Private pFilename As String
     Private pFields() As clsFieldDescriptor
     Private pNumFields As Integer
     Private pData() As String
     Private pRecords As New Generic.List(Of String)
-    Private pCurrentRecord As Integer
 
     Public Overrides Property CurrentRecord() As Integer
         Get
@@ -26,7 +24,11 @@ Public Class atcTableFixed
         End Get
         Set(ByVal newValue As Integer)
             Try
-                If newValue < 1 Or newValue > pRecords.Count Then
+                pEOF = False
+                If newValue > pRecords.Count Then
+                    pEOF = True
+                    pCurrentRecord = 0
+                ElseIf newValue < 1 Then
                     pCurrentRecord = 0
                 Else
                     pCurrentRecord = newValue - 1

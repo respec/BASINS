@@ -137,7 +137,6 @@ Public Class atcTableDBF
     Private pNumFields As Integer
     Private pData() As Byte
     Private pDataBytes As Integer
-    Private pCurrentRecord As Integer
     Private pCurrentRecordStart As Integer
 
     'Capacity in pData for records. Set to pHeader.NumRecs when data is read from a file
@@ -379,7 +378,12 @@ AllKeys:
         End Get
         Set(ByVal Value As Integer)
             Try
-                If Value > pHeader.NumRecs Then NumRecords = Value
+                If Value > pHeader.NumRecs Then
+                    pEOF = True
+                    NumRecords = Value
+                Else
+                    pEOF = False
+                End If
                 If Value < 1 Or Value > pHeader.NumRecs Then
                     pCurrentRecord = 1
                 Else

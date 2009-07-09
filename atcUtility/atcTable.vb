@@ -19,6 +19,7 @@ Public Interface IatcTable
     Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String
 
     Property CurrentRecord() As Integer
+    Function EOF() As Boolean
     Property FieldLength(ByVal aFieldNumber As Integer) As Integer
     Property FieldName(ByVal aFieldNumber As Integer) As String
     Property FieldType(ByVal aFieldNumber As Integer) As String
@@ -58,9 +59,11 @@ Public MustInherit Class atcTable
     Implements IDisposable
     Implements IatcTable
 
-    Private pFilename As String
-    Friend pHeaderLines As New ArrayList
-    Friend pNumHeaderRows As Integer = -1
+    Protected pFilename As String
+    Protected pHeaderLines As New ArrayList
+    Protected pNumHeaderRows As Integer = -1
+    Protected pCurrentRecord As Integer
+    Protected pEOF As Boolean = False
 
     'Used within FindMatch
     Private Enum ComparisonEnum
@@ -151,6 +154,11 @@ Public MustInherit Class atcTable
 
     'The current record index [1..NumRecords]
     Public MustOverride Property CurrentRecord() As Integer Implements IatcTable.CurrentRecord
+
+    'True if CurrentRecord was attempted to be set beyond the end of file
+    Public Function EOF() As Boolean Implements IatcTable.EOF
+        Return pEOF
+    End Function
 
     'The value of the specified field in the current record
     'aFieldNumber [1..NumFields]

@@ -13,14 +13,12 @@ Imports MapWinUtility
 Public Class atcTableArray
     Inherits atcTable
 
-    Private pFilename As String
-    Friend pFieldNames() As String
+    Protected pFieldNames() As String
     Private pFieldLengths() As Integer
     Private pFieldTypes() As String
     Private pNumFields As Integer
 
     Friend pRecords As New Generic.List(Of String())
-    Private pCurrentRecord As Integer
     Private pDelimiter As Char = Chr(44) 'default to Chr(44) = comma
 
     Public Overrides Property CurrentRecord() As Integer
@@ -34,7 +32,12 @@ Public Class atcTableArray
                 Else
                     pCurrentRecord = newValue
                 End If
-                If pCurrentRecord > pRecords.Count Then NumRecords = pCurrentRecord
+                If pCurrentRecord > pRecords.Count Then
+                    pEOF = True
+                    NumRecords = pCurrentRecord
+                Else
+                    pEOF = False
+                End If
                 Exit Property
             Catch ex As Exception
                 Throw New ApplicationException("atcTableArray: Cannot set CurrentRecord to " & newValue & vbCr & ex.Message)
