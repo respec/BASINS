@@ -295,11 +295,10 @@ ReOpenTable:
                                 End If
                             End If
                             lMONvaluePrev = lMONvalue
-                            Try
-                                .CurrentRecord += 1
-                            Catch e As Exception
+                            .CurrentRecord += 1
+                            If .EOF Then
                                 Exit Do
-                            End Try
+                            End If
                         End If
                     Loop
 
@@ -530,6 +529,10 @@ NextRecord:
                                     Next
 NextRecord:
                                     .CurrentRecord += 1
+                                    If .EOF Then
+                                        Logger.Dbg("Reached EOF at record " & .CurrentRecord)
+                                        Exit Do
+                                    End If
                                 Catch ex As FormatException
                                     Logger.Dbg("FormatException " & .CurrentRecord & ":" & lField & ":" & .Value(lField))
                                 Catch ex As Exception

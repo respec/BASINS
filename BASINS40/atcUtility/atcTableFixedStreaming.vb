@@ -13,12 +13,10 @@ Public Class atcTableFixedStreaming
         Public FieldStart As Integer  'column number in which field starts
     End Class
 
-    Private pFilename As String
     Private pFields() As clsFieldDescriptor
     Private pNumFields As Integer
     Private pData() As String
     Private pDataString As String
-    Private pCurrentRecord As Integer
     Private pCurrentRecordStart As Integer
     Private pLinesInFile As IEnumerator
 
@@ -31,10 +29,10 @@ Public Class atcTableFixedStreaming
                 pCurrentRecord += 1
             End While
             If pCurrentRecord + 1 = newValue Then
+                pEOF = False
                 pDataString = pLinesInFile.Current
-                Exit Property
             Else
-                Throw New ApplicationException("ATCTableFixed: Cannot set CurrentRecord to " & newValue)
+                pEOF = True
             End If
         End Set
     End Property

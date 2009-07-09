@@ -14,14 +14,12 @@ Imports MapWinUtility
 Public Class atcTableDelimited
     Inherits atcTable
 
-    Private pFilename As String
-    Friend pFieldNames() As String
+    Protected pFieldNames() As String
     Private pFieldLengths() As Integer
     Private pFieldTypes() As String
     Private pNumFields As Integer
     Private pCurrentRowValues() As String
-    Friend pRecords As New ArrayList
-    Private pCurrentRecord As Integer
+    Protected pRecords As New ArrayList
     Private pCurrentRecordStart As Integer
     Private pDelimiter As Char = Chr(44) 'default to Chr(44) = comma
 
@@ -36,8 +34,11 @@ Public Class atcTableDelimited
                 Else
                     pCurrentRecord = newValue
                 End If
-                If newValue > NumRecords Then
-                    NumRecords = newValue
+                If pCurrentRecord > NumRecords Then
+                    pEOF = True
+                    NumRecords = pCurrentRecord
+                Else
+                    pEOF = False
                 End If
                 'parse fields values from this record
                 'TODO: test whether prepending pDelimiter slows this down, could change usage of pCurrentRowValues to (index-1) instead
