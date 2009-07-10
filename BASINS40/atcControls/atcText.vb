@@ -420,7 +420,7 @@ Public Class atcText
         If DataType = ATCoDataType.ATCoTxt Then
             If HardMax <> ATCoDataType.NONE Then lToolText = "Max Length: " & HardMax
         ElseIf DataType = ATCoDataType.ATCoInt OrElse DataType = ATCoDataType.ATCoDbl Then
-            If HardMin = ATCoDataType.NONE And HardMax = ATCoDataType.NONE Then
+            If HardMin = ATCoDataType.NONE AndAlso HardMax = ATCoDataType.NONE Then
                 lToolText = ""
             ElseIf HardMin = ATCoDataType.NONE Then
                 lToolText = "Max: " & HardMax
@@ -430,14 +430,17 @@ Public Class atcText
                 lToolText = "Min: " & HardMin & " Max: " & HardMax
             End If
 
-            If SoftMin = ATCoDataType.NONE And SoftMax = ATCoDataType.NONE Then
+            Dim lSoftPrefix As String = "Soft "
+            If lToolText.Length = 0 Then lSoftPrefix = "" 'Just label soft limits Min and Max if there are no hard limits
+
+            If SoftMin = ATCoDataType.NONE AndAlso SoftMax = ATCoDataType.NONE Then
                 lSoftLimits = ""
             ElseIf SoftMin = ATCoDataType.NONE Then
-                lSoftLimits = "Soft Max: " & SoftMax
+                lSoftLimits = lSoftPrefix & "Max: " & SoftMax
             ElseIf SoftMax = ATCoDataType.NONE Then
-                lSoftLimits = "Soft Min: " & SoftMin
+                lSoftLimits = lSoftPrefix & "Min: " & SoftMin
             Else
-                lSoftLimits = "Soft Min: " & SoftMin & " Soft Max: " & SoftMax
+                lSoftLimits = lSoftPrefix & "Min: " & SoftMin & " " & lSoftPrefix & "Max: " & SoftMax
             End If
             If lSoftLimits.Length > 0 Then
                 If lToolText.Length > 0 Then
