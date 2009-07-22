@@ -3210,6 +3210,7 @@ Public Class GisUtil
             Dim dictSubbasin As New Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
 
             For i As Integer = 0 To sfSubbasin.NumShapes - 1
+                Dim NumErrors As Integer = 0
                 Dim shpSubbasin As MapWinGIS.Shape = sfSubbasin.Shape(i)
                 Dim extSB As MapWinGIS.Extents = sfSubbasin.QuickExtents(i)
                 Dim ID As String = sfSubbasin.CellValue(fldSubbasin, i)
@@ -3226,18 +3227,33 @@ Public Class GisUtil
                     With extSB
                         If Not (.xMax < extLU.xMin OrElse .xMin > extLU.xMax OrElse .yMax < extLU.yMin OrElse .yMin > extLU.yMax) Then
                             Dim shpLanduse As MapWinGIS.Shape = sfLanduse.Shape(j)
-                            Dim shpInt As MapWinGIS.Shape = MapWinGeoProc.SpatialOperations.Intersection(shpSubbasin, shpLanduse)
-                            If shpInt.numPoints > 0 Then
-                                Dim LandUse As String = sfLanduse.CellValue(fldLanduse, j)
-                                If Not dictSubbasin(ID).ContainsKey(LandUse) Then dictSubbasin(ID).Add(LandUse, 0.0)
-                                dictSubbasin(ID)(LandUse) += MapWinGeoProc.Utils.Area(shpInt)
-                            End If
+                            Try
+                                Dim shpInt As MapWinGIS.Shape = MapWinGeoProc.SpatialOperations.Intersection(shpSubbasin, shpLanduse)
+                                If shpInt.numPoints > 0 Then
+                                    Dim LandUse As String = sfLanduse.CellValue(fldLanduse, j)
+                                    If Not dictSubbasin(ID).ContainsKey(LandUse) Then dictSubbasin(ID).Add(LandUse, 0.0)
+                                    dictSubbasin(ID)(LandUse) += MapWinGeoProc.Utils.Area(shpInt)
+                                End If
+                            Catch ex As Exception
+                                NumErrors += 1
+                                Debug.Print("Error occurred in TabulateAreas: {0}; land use ID = {1}", ex.Message, sfLanduse.CellValue(fldLanduse, j))
+                            End Try
                         End If
                     End With
                     Logger.Progress("Tabulating areas...", j, jmax)
                     RaiseEvent Progress("Tabulating areas...", j, jmax)
                     If Cancel Then Return Nothing
                 Next
+                Dim subarea As Double = MapWinGeoProc.Utils.Area(shpSubbasin)
+                Dim sumarea As Double = 0
+                For Each area As Single In dictSubbasin(ID).Values
+                    sumarea += area
+                Next
+                Dim pctdiff As Single = (sumarea - subarea) * 100.0 / subarea
+                Logger.Dbg(String.Format("Subbasin: {0}; basin area: {1:0.0}; total LU areas: {2:0.0}; percent error: {3:0.00}", i, subarea, sumarea, pctdiff))
+                If NumErrors > 0 Then
+                    Logger.Message(String.Format("{0} internal errors occurred while tabulating the areas for subbasin {1}; this may be indicative of a malformed shapefile. The error was ignored but resulted in a discrepancy between the subbasin area and total of all landuse areas of {2:0.00}%.", NumErrors, ID, pctdiff), "Warning", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Warning, Windows.Forms.DialogResult.OK)
+                End If
             Next
             Return dictSubbasin
         Catch ex As Exception
