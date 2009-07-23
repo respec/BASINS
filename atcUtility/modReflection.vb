@@ -50,7 +50,7 @@ Public Module modReflection
         System.IO.Directory.CreateDirectory(aSavePath)
 
         s = ReflectAssemblyAsString(a)
-        SaveFileString(aSavePath & "\Reflection.txt", s)
+        SaveFileString(aSavePath & g_PathChar & "Reflection.txt", s)
 
         While Len(s) > 0
             sRec = StrSplit(s, vbCrLf, "")
@@ -94,7 +94,7 @@ Public Module modReflection
         s = s & "CountTests:" & sTest.Count & vbCrLf
         s = s & "CountEntry:" & sEntry.Count & vbCrLf
         s = s & "CountAdd:" & sAdd.Count & vbCrLf
-        SaveFileString(aSavePath & "\TestsToAdd.txt", s)
+        SaveFileString(aSavePath & g_PathChar & "TestsToAdd.txt", s)
 
         s = "Option Strict Off" & vbCrLf & _
             "Option Explicit On" & vbCrLf & _
@@ -129,7 +129,7 @@ Public Module modReflection
                  "  End Sub" & vbCrLf & vbCrLf
         Next
         s = s & "End Class" & vbCrLf
-        aSavePath = aSavePath & "\Test_" & a.GetName.Name & ".vb"
+        aSavePath = aSavePath & g_PathChar & "Test_" & a.GetName.Name & ".vb"
         SaveFileString(aSavePath, s)
 
         If sAdd.Count = 0 Then

@@ -8,6 +8,7 @@ Imports MapWinUtility
 
 Public Module modFile
 
+    Public g_PathChar As String = IO.Path.DirectorySeparatorChar
     Public ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
     Public TifExtensions() As String = {".tif", ".prj", ".tfw", ".xml", ".tif.xml", ".mwsr", ".mwleg"}
 
@@ -178,8 +179,8 @@ Public Module modFile
     ''' Return a new file name in the IO.Path.GetTempPath folder with a given base file name and extension.
     ''' An integer is inserted between the base file name and extension if needed to avoid conflict with an existing file.
     ''' If aBaseName.aExtension already exists (as a file or folder), 
-    '''    aBaseName-1.aExtension is tried, then 
-    '''    aBaseName-2.aExtension, ..., until a file name is found for which the file does not yet exist
+    '''    aBaseName_1.aExtension is tried, then 
+    '''    aBaseName_2.aExtension, ..., until a file name is found for which the file does not yet exist
     ''' Temporary files/folders found older than one day will be deleted and the name will be reused
     ''' </summary>
     ''' <remarks>It is the caller's responsibility to both create and remove this file. Two identical calls will get the same result if the file is not created before the second call.</remarks>
@@ -203,6 +204,32 @@ Public Module modFile
                 lName = lBaseName & "_" & lCounter
                 If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
             End If
+        End While
+        Return lName
+    End Function
+
+    ''' <summary>
+    ''' Return a file name matching the given pattern which does not yet exist.
+    ''' If aBaseName.aExtension already exists (as a file or folder), 
+    '''    aBaseName_1.aExtension is tried, then 
+    '''    aBaseName_2.aExtension, ..., until a file name is found for which the file does not yet exist
+    ''' </summary>
+    ''' <remarks>It is the caller's responsibility to both create and remove this file. Two identical calls will get the same result if the file is not created before the second call.</remarks>
+    Public Function GetNewFileName(ByVal aBaseName As String, ByVal aExtension As String) As String
+        Dim lCounter As Integer = 1
+        If aBaseName Is Nothing OrElse aBaseName.Length = 0 Then aBaseName = "temp"
+        Dim lBaseName As String
+        If IO.Path.IsPathRooted(aBaseName) Then
+            lBaseName = aBaseName
+        Else
+            lBaseName = IO.Path.Combine(CurDir, aBaseName)
+        End If
+        Dim lName As String = lBaseName
+        If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
+        While FileExists(lName, True)
+            lCounter += 1
+            lName = lBaseName & "_" & lCounter
+            If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
         End While
         Return lName
     End Function
@@ -381,14 +408,14 @@ EndFound:
             aFileName = aStartPath & IO.Path.DirectorySeparatorChar & aFileName
         End If
 
-        lSlashposFilename = InStr(aFileName, "\..\")
+        lSlashposFilename = InStr(aFileName, g_PathChar & ".." & g_PathChar)
         While lSlashposFilename > 0
             lSlashposPath = InStrRev(aFileName, IO.Path.DirectorySeparatorChar, lSlashposFilename - 1)
             If lSlashposPath = 0 Then
                 lSlashposFilename = 0
             Else
                 aFileName = Left(aFileName, lSlashposPath) & Mid(aFileName, lSlashposFilename + 4)
-                lSlashposFilename = InStr(aFileName, "\..\")
+                lSlashposFilename = InStr(aFileName, g_PathChar & ".." & g_PathChar)
             End If
         End While
         Return aFileName
@@ -414,21 +441,21 @@ EndFound:
             StartPath = Left(StartPath, Len(StartPath) - 1)
         End If
         If Len(filename) > 2 Then
-            If filename.StartsWith("..\") Then
+            If filename.StartsWith(".." & g_PathChar) Then
                 'Concatenate StartPath and Filename
                 filename = StartPath & IO.Path.DirectorySeparatorChar & filename
             End If
         End If
 
         'Adjust path for Filename as necessary
-        slashposFilename = InStr(filename, "\..\")
+        slashposFilename = InStr(filename, g_PathChar & ".." & g_PathChar)
         While slashposFilename > 0
             slashposPath = InStrRev(filename, IO.Path.DirectorySeparatorChar, slashposFilename - 1)
             If slashposPath = 0 Then
                 slashposFilename = 0
             Else
                 filename = Left(filename, slashposPath) & Mid(filename, slashposFilename + 4)
-                slashposFilename = InStr(filename, "\..\")
+                slashposFilename = InStr(filename, g_PathChar & ".." & g_PathChar)
             End If
         End While
 
@@ -465,7 +492,7 @@ FoundSameUntil:
             If sameUntil < 1 Then sameUntil = 1
             slashposPath = InStr(sameUntil, StartPath, IO.Path.DirectorySeparatorChar)
             While slashposPath > 0
-                filename = "..\" & filename
+                filename = ".." & g_PathChar & filename
                 slashposPath = InStr(slashposPath + 1, StartPath, IO.Path.DirectorySeparatorChar)
             End While
         End If
@@ -712,7 +739,7 @@ ErrorWriting:
                 lFileName = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\VB and VBA Program Settings\FindFile\FoundFiles", lBaseFileName, "")
                 'If lFileName.Length > 0 Then
                 '    If Not FileExists(lFileName) Then 'delete bad name in registry
-                '        My.Computer.Registry.CurrentUser.DeleteValue("FindFile\FoundFiles\" & lBaseFileName)
+                '        My.Computer.Registry.CurrentUser.DeleteValue("FindFile\FoundFiles" & g_PathChar & lBaseFileName)
                 '    End If
                 'End If
 
@@ -737,17 +764,17 @@ ErrorWriting:
                         lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
 
                         'If we are in bin directory, also look in some other BASINS folders
-                        If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+                        If lFileName.Length = 0 AndAlso lExePath.IndexOf(g_PathChar & "bin" & g_PathChar) > 0 Then
                             lFileName = FindRecursive(lBaseFileName, _
-                                                      ReplaceString(lExePath, "\bin\", "\etc\"), _
-                                                      ReplaceString(lExePath, "\bin\", "\models\"), _
-                                                      ReplaceString(lExePath, "\bin\", "\docs\"), _
-                                                      ReplaceString(lExePath, "\bin\", "\apr\"))
+                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "etc" & g_PathChar), _
+                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "models" & g_PathChar), _
+                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "docs" & g_PathChar), _
+                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "apr" & g_PathChar))
                         End If
 
                         'Finally, check in the Windows system folders
-                        'If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
-                        '  lFileName = FindRecursive(lBaseFileName, "c:\winnt\", "c:\windows\")
+                        'If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin" & g_PathChar) > 0 Then
+                        '  lFileName = FindRecursive(lBaseFileName, "c:\winnt" & g_PathChar, "c:\windows\")
                         'End If
                     End If
 
