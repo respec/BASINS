@@ -358,7 +358,7 @@ Public Class atcText
 
             newValue = Valid(newValue)
             txtBox.Text = FormatValue(newValue)
-            txtBox.SelectAll()
+            'txtBox.SelectAll()
         End Set
     End Property
 
@@ -416,7 +416,7 @@ Public Class atcText
 
     Private Sub SetToolTip()
         Dim lToolText As String = ""
-        Dim lSoftLimits As String
+        Dim lSoftLimits As String = ""
         If DataType = ATCoDataType.ATCoTxt Then
             If HardMax <> ATCoDataType.NONE Then lToolText = "Max Length: " & HardMax
         ElseIf DataType = ATCoDataType.ATCoInt OrElse DataType = ATCoDataType.ATCoDbl Then
@@ -433,14 +433,11 @@ Public Class atcText
             Dim lSoftPrefix As String = "Soft "
             If lToolText.Length = 0 Then lSoftPrefix = "" 'Just label soft limits Min and Max if there are no hard limits
 
-            If SoftMin = ATCoDataType.NONE AndAlso SoftMax = ATCoDataType.NONE Then
-                lSoftLimits = ""
-            ElseIf SoftMin = ATCoDataType.NONE Then
-                lSoftLimits = lSoftPrefix & "Max: " & SoftMax
-            ElseIf SoftMax = ATCoDataType.NONE Then
+            If SoftMin <> ATCoDataType.NONE AndAlso SoftMin <> HardMin Then
                 lSoftLimits = lSoftPrefix & "Min: " & SoftMin
-            Else
-                lSoftLimits = lSoftPrefix & "Min: " & SoftMin & " " & lSoftPrefix & "Max: " & SoftMax
+            End If
+            If SoftMax <> ATCoDataType.NONE AndAlso SoftMax <> HardMax Then
+                lSoftLimits &= " " & lSoftPrefix & "Max: " & SoftMax
             End If
             If lSoftLimits.Length > 0 Then
                 If lToolText.Length > 0 Then
@@ -454,16 +451,16 @@ Public Class atcText
     End Sub
 
     Private Sub txtBox_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBox.GotFocus
-        'Logger.Dbg("txtBox:GotFocus")
+        'Logger.Dbg("txtBox:GotFocus " & txtBox.SelectionLength)
         Tag = Text
-        txtBox.SelectionStart = 0
-        txtBox.SelectionLength = Len(txtBox.Text)
+        'txtBox.SelectionStart = 0
+        txtBox.SelectionLength = 0 'Len(txtBox.Text)
         SetToolTip()
     End Sub
 
     Private Sub txtBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtBox.KeyDown
         Dim lKeyCode As Windows.Forms.Keys = e.KeyCode
-        'Logger.Dbg("txtBox:KeyDown: " & KeyCode)
+        'Logger.Dbg("txtBox:KeyDown: " & lKeyCode & " " & txtBox.SelectionLength)
         'Dim newName As String = ""
         'Dim newColor As Integer
         If lKeyCode = Keys.Enter Then
@@ -487,12 +484,14 @@ Public Class atcText
         '  Else
         '    txtBox.ForeColor = System.Drawing.Color.White
         '  End If
+        'Logger.Dbg("txtBox:CommitChangeBef: " & txtBox.SelectionLength)
         RaiseEvent CommitChange()
+        'Logger.Dbg("txtBox:CommitChangeAft: " & txtBox.SelectionLength)
         'End If
     End Sub
 
     Private Sub txtBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBox.LostFocus
-        'Logger.Dbg("txtBox:LostFocus:" & txtBox.Text & " " & DefVal)
+        'Logger.Dbg("txtBox:LostFocus:" & txtBox.Text & " " & txtBox.SelectionLength)
         Dim newValue As String = Valid(txtBox.Text)
         privDefaultValue = newValue
         txtBox.Text = FormatValue(newValue)
@@ -537,13 +536,19 @@ Public Class atcText
 
             ElseIf DataType = ATCoDataType.ATCoInt Then
                 If Not IsNumeric(.Text) Then
-                    If .Text <> "-" Or HardMin >= 0 Then .BackColor = OutsideHardBg
+                    If .Text <> "-" OrElse HardMin >= 0 Then '.BackColor = OutsideHardBg
+                        Logger.Msg("The value '" & .Text & "' is not numeric.", vbOKOnly, Name)
+                        .Text = ""
+                    End If
                     GoTo LeaveSub
                 End If
 
             ElseIf DataType = ATCoDataType.ATCoDbl Then
                 If Not IsNumeric(.Text) Then
-                    If (.Text <> "-" And .Text <> "+" And .Text <> "-." And .Text <> "+." Or HardMin >= 0) And .Text <> "." Then .BackColor = OutsideHardBg
+                    If (.Text <> "-" And .Text <> "+" And .Text <> "-." And .Text <> "+." Or HardMin >= 0) And .Text <> "." Then '.BackColor = OutsideHardBg
+                        Logger.Msg("The value '" & .Text & "' is not numeric.", vbOKOnly, Name)
+                        .Text = ""
+                    End If
                     GoTo LeaveSub
                 End If
             End If
