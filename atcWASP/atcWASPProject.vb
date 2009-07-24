@@ -113,7 +113,7 @@ Public Class atcWASPProject
         Return lTravelTime
     End Function
 
-    Sub GenerateSegments(ByVal lSegmentLayerIndex As Integer, ByVal aMaxTravelTime As Double, ByVal aMinTravelTime As Double)
+    Sub GenerateSegments(ByVal aSegmentLayerIndex As Integer, ByVal aSelectedIndexes As atcCollection, ByVal aMaxTravelTime As Double, ByVal aMinTravelTime As Double)
         With Me
             Try
                 'populate the WASP classes from the shapefiles
@@ -121,41 +121,24 @@ Public Class atcWASPProject
                 Dim lTable As New atcUtility.atcTableDBF
 
                 'add only selected segments
-                Dim lTempSegments As New atcWASPSegments
-                Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+                Dim lSegmentShapefileName As String = GisUtil.LayerFileName(aSegmentLayerIndex)
                 If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
-                    Logger.Dbg("Add " & lTable.NumRecords & " SegmentsFrom " & lSegmentShapefileName)
-                    lTempSegments.AddRange(NumberObjects(lTable.PopulateObjects((New atcWASP.atcWASPSegment).GetType, .SegmentFieldMap), "Name"))
-                End If
-                Logger.Dbg("SegmentsCount " & lTempSegments.Count)
-
-                For Each lSegment As atcWASP.atcWASPSegment In lTempSegments
-                    Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
-                    lSegment.InputTimeseriesCollection = lTimeseriesCollection
-                    lSegment.BaseID = lSegment.ID   'store segment id before breaking up
-                Next
-
-                'after reading the attribute table, see if any are selected
-                If GisUtil.NumSelectedFeatures(lSegmentLayerIndex) > 0 Then
-                    'put only selected segments in .segments 
-                    For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lSegmentLayerIndex) - 1
-                        Dim lShapeIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, lSegmentLayerIndex)
-                        Dim lSegment As atcWASP.atcWASPSegment = lTempSegments(lShapeIndex)
-                        GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
-                        GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
-                        Logger.Dbg("Add " & lSegment.ID)
-                        .Segments.Add(lSegment)
+                    Logger.Dbg("Add " & aSelectedIndexes.Count & " SegmentsFrom " & lSegmentShapefileName)
+                    Dim lSegmentsSelected As New ArrayList '(Of atcWASP.atcWASPSegment)
+                    For Each lShapeIndex As Integer In aSelectedIndexes
+                        lTable.CurrentRecord = lShapeIndex + 1
+                        Dim lSeg As New atcWASP.atcWASPSegment
+                        lTable.PopulateObject(lSeg, .SegmentFieldMap)
+                        Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
+                        lSeg.InputTimeseriesCollection = lTimeseriesCollection
+                        lSeg.BaseID = lSeg.ID   'store segment id before breaking up
+                        GisUtil.LineCentroid(aSegmentLayerIndex, lShapeIndex, lSeg.CentroidX, lSeg.CentroidY) 'store centroid 
+                        GisUtil.PointsOfLine(aSegmentLayerIndex, lShapeIndex, lSeg.PtsX, lSeg.PtsY)  'store point coordinates of vertices
+                        lSegmentsSelected.Add(lSeg)
                     Next
-                Else 'add all 
-                    .Segments = lTempSegments
-                    Dim lShapeIndex As Integer = -1
-                    For Each lSegment As atcWASP.atcWASPSegment In lTempSegments
-                        lShapeIndex += 1
-                        GisUtil.LineCentroid(lSegmentLayerIndex, lShapeIndex, lSegment.CentroidX, lSegment.CentroidY) 'store centroid 
-                        GisUtil.PointsOfLine(lSegmentLayerIndex, lShapeIndex, lSegment.PtsX, lSegment.PtsY)  'store point coordinates of vertices
-                    Next
+                    .Segments.AddRange(NumberObjects(lSegmentsSelected, "Name"))
                 End If
-                Logger.Dbg("SegmentsCentroidsAndPointsFor " & .Segments.Count & " SegmentsOf " & lTempSegments.Count)
+                Logger.Dbg("SegmentsCount " & .Segments.Count)
 
                 'calculate depth and width from mean annual flow and mean annual velocity
                 'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
@@ -425,9 +408,9 @@ Public Class atcWASPProject
         Return lArea
     End Function
 
-    Public Sub CreateSegmentShapeFile(ByVal lSegmentLayerIndex As Integer, ByRef aWASPShapefileName As String)
+    Public Sub CreateSegmentShapeFile(ByVal aSegmentLayerIndex As Integer, ByRef aWASPShapefileName As String)
         'come up with name of new shapefile
-        Dim lSegmentShapefileName As String = GisUtil.LayerFileName(lSegmentLayerIndex)
+        Dim lSegmentShapefileName As String = GisUtil.LayerFileName(aSegmentLayerIndex)
         Dim lOutputPath As String = PathNameOnly(lSegmentShapefileName)
         Dim lIndex As Integer = 1
         aWASPShapefileName = lOutputPath & "\WASPSegments" & lIndex & ".shp"
