@@ -1237,16 +1237,16 @@ Public Class frmWASPSetup
                     .CellColor(lIndex, 1) = SystemColors.ControlDark
                     .CellValue(lIndex, 2) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Length, 3)
                     .CellEditable(lIndex, 2) = True
-                    .CellValue(lIndex, 3) = pPlugIn.WASPProject.Segments(lIndex - 1).Width
+                    .CellValue(lIndex, 3) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Width, 3)
                     .CellEditable(lIndex, 3) = True
-                    .CellValue(lIndex, 4) = pPlugIn.WASPProject.Segments(lIndex - 1).Depth
+                    .CellValue(lIndex, 4) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Depth, 3)
                     .CellEditable(lIndex, 4) = True
-                    .CellValue(lIndex, 5) = pPlugIn.WASPProject.Segments(lIndex - 1).Slope
+                    .CellValue(lIndex, 5) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Slope, 3)
                     .CellEditable(lIndex, 5) = True
                     .CellValue(lIndex, 6) = pPlugIn.WASPProject.Segments(lIndex - 1).Roughness
                     .CellEditable(lIndex, 6) = True
                     .CellValue(lIndex, 7) = pPlugIn.WASPProject.Segments(lIndex - 1).DownID
-                    .CellValue(lIndex, 8) = pPlugIn.WASPProject.Segments(lIndex - 1).Velocity
+                    .CellValue(lIndex, 8) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Velocity, 3)
                     .CellEditable(lIndex, 8) = True
                     Dim lTravelTime As Double = 0.0
                     With pPlugIn.WASPProject

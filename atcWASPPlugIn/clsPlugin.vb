@@ -42,15 +42,10 @@ Public Class PlugIn
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = ModelsMenuName & "_WASP" Then
             pWASPProject = New atcWASPProject
-            Dim lfrmWASPSetup As New frmWASPSetup
-            With lfrmWASPSetup
+            Dim lfrmWASPInitialize As New frmWASPInitialize
+            With lfrmWASPInitialize
                 .InitializeUI(Me)
-                Logger.Dbg("WASPSetup Initialized")
                 .Show()
-                Logger.Dbg("WASPSetup Shown")
-                .GenerateSegments()
-                .InitializeStationLists()
-                .EnableControls(True)
                 aHandled = True
             End With
         End If

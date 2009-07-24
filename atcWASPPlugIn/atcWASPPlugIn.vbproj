@@ -56,6 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsPlugin.vb" />
+    <Compile Include="frmWASPInitialize.Designer.vb">
+      <DependentUpon>frmWASPInitialize.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmWASPInitialize.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmWASPConstituents.Designer.vb">
       <DependentUpon>frmWASPConstituents.vb</DependentUpon>
     </Compile>
@@ -95,6 +101,10 @@
     <EmbeddedResource Include="frmWASPFieldMapping.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmWASPFieldMapping.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmWASPInitialize.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmWASPInitialize.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWASPSetup.resx">
       <SubType>Designer</SubType>
