@@ -14,14 +14,14 @@ Public Class frmWASPInitialize
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Dim lfrmWASPSetup As New frmWASPSetup
         With lfrmWASPSetup
-            .InitializeUI(pPlugIn)
+            .InitializeUI(pPlugIn, pSelectedIndexes, pCurrentLayerIndex)
             Logger.Dbg("WASPSetup Initialized")
             .Show()
             Logger.Dbg("WASPSetup Shown")
+            Me.Close()
             .GenerateSegments()
             .InitializeStationLists()
             .EnableControls(True)
-            Me.Close()
         End With
     End Sub
 

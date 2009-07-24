@@ -46,9 +46,7 @@ Public Class frmWASPSetup
     Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
     Friend WithEvents cboMet As System.Windows.Forms.ComboBox
     Friend WithEvents Label9 As System.Windows.Forms.Label
-    Friend WithEvents cboStreams As System.Windows.Forms.ComboBox
     Friend WithEvents tbxName As System.Windows.Forms.TextBox
-    Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
     Friend WithEvents TabPage6 As System.Windows.Forms.TabPage
@@ -111,9 +109,7 @@ Public Class frmWASPSetup
         Me.atxEYear = New atcControls.atcText
         Me.cboMet = New System.Windows.Forms.ComboBox
         Me.Label9 = New System.Windows.Forms.Label
-        Me.cboStreams = New System.Windows.Forms.ComboBox
         Me.tbxName = New System.Windows.Forms.TextBox
-        Me.Label4 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
         Me.atxTravelTimeMin = New atcControls.atcText
@@ -232,9 +228,7 @@ Public Class frmWASPSetup
         Me.TabPage1.Controls.Add(Me.GroupBox3)
         Me.TabPage1.Controls.Add(Me.cboMet)
         Me.TabPage1.Controls.Add(Me.Label9)
-        Me.TabPage1.Controls.Add(Me.cboStreams)
         Me.TabPage1.Controls.Add(Me.tbxName)
-        Me.TabPage1.Controls.Add(Me.Label4)
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
@@ -470,18 +464,6 @@ Public Class frmWASPSetup
         Me.Label9.TabIndex = 11
         Me.Label9.Text = "Met Stations Layer:"
         '
-        'cboStreams
-        '
-        Me.cboStreams.AllowDrop = True
-        Me.cboStreams.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboStreams.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStreams.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboStreams.Location = New System.Drawing.Point(168, 87)
-        Me.cboStreams.Name = "cboStreams"
-        Me.cboStreams.Size = New System.Drawing.Size(719, 25)
-        Me.cboStreams.TabIndex = 9
-        '
         'tbxName
         '
         Me.tbxName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
@@ -491,16 +473,6 @@ Public Class frmWASPSetup
         Me.tbxName.Name = "tbxName"
         Me.tbxName.Size = New System.Drawing.Size(553, 23)
         Me.tbxName.TabIndex = 6
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(11, 91)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(104, 17)
-        Me.Label4.TabIndex = 3
-        Me.Label4.Text = "Streams Layer:"
         '
         'Label1
         '
@@ -839,6 +811,8 @@ Public Class frmWASPSetup
 #End Region
 
     Friend pPlugIn As PlugIn
+    Friend pSelectedIndexes As atcCollection
+    Friend pSegmentLayerIndex As Integer
     Friend pBasinsFolder As String
     Friend pfrmWASPFieldMapping As frmWASPFieldMapping
     Friend pfrmWASPConstituents As frmWASPConstituents
@@ -1004,10 +978,13 @@ Public Class frmWASPSetup
         Return True
     End Function
 
-    Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
+    Public Sub InitializeUI(ByVal aPlugIn As PlugIn, ByVal aSelectedIndexes As atcCollection, ByVal aSegmentLayerIndex As Integer)
         Logger.Dbg("InitializeUI")
         EnableControls(False)
         pPlugIn = aPlugIn
+        pSelectedIndexes = aSelectedIndexes
+        pSegmentLayerIndex = aSegmentLayerIndex
+
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         ReadWASPConstituentNamesFromFile(pBasinsFolder & "\etc\WASPConstituents.txt")
@@ -1034,11 +1011,7 @@ Public Class frmWASPSetup
             If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile 
 
             ElseIf GisUtil.LayerType(lLayerIndex) = 2 Then 'LineShapefile 
-                cboStreams.Items.Add(lLayerName)
-                'see if there are any selected features in this layer, if so assume this is the stream segment layer
-                If GisUtil.NumSelectedFeatures(lLayerIndex) > 0 Then
-                    cboStreams.SelectedIndex = cboStreams.Items.Count - 1
-                End If
+                
             ElseIf GisUtil.LayerType(lLayerIndex) = 1 Then 'PointShapefile
                 cboMet.Items.Add(lLayerName)
                 If lLayerName.ToUpper.IndexOf("WEATHER STATION SITES 20") > -1 Then
@@ -1050,27 +1023,6 @@ Public Class frmWASPSetup
             End If
         Next
 
-        'if no stream layer selected and there is an nhd layer on the map, make it selected
-        If cboStreams.SelectedIndex < 0 Then
-            For lIndex As Integer = 1 To cboStreams.Items.Count
-                Dim lLayerName As String = cboStreams.Items(lIndex - 1).ToString
-                If lLayerName.ToUpper.IndexOf("FLOWLINE") > -1 Then
-                    cboStreams.SelectedIndex = lIndex - 1
-                End If
-            Next
-        End If
-        If cboStreams.SelectedIndex < 0 Then
-            For lIndex As Integer = 1 To cboStreams.Items.Count
-                Dim lLayerName As String = cboStreams.Items(lIndex - 1).ToString
-                If lLayerName.ToUpper.IndexOf("NHD") > -1 Then
-                    cboStreams.SelectedIndex = lIndex - 1
-                End If
-            Next
-        End If
-
-        If cboStreams.Items.Count > 0 And cboStreams.SelectedIndex < 0 Then
-            cboStreams.SelectedIndex = 0
-        End If
         If cboMet.Items.Count > 0 And cboMet.SelectedIndex < 0 Then
             cboMet.SelectedIndex = 0
         End If
@@ -1204,15 +1156,11 @@ Public Class frmWASPSetup
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         EnableControls(False)
 
-        'set file names for segments
-        If cboStreams.SelectedIndex > -1 Then
-            Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-            pPlugIn.WASPProject.GenerateSegments(lSegmentLayerIndex, CDbl(atxTravelTimeMax.Text), CDbl(atxTravelTimeMin.Text))
+        pPlugIn.WASPProject.GenerateSegments(pSegmentLayerIndex, pSelectedIndexes, CDbl(atxTravelTimeMax.Text), CDbl(atxTravelTimeMin.Text))
 
-            SetSegmentationGrid()
-            SetFlowStationGrid()
-            SetLoadStationGrid()
-        End If
+        SetSegmentationGrid()
+        SetFlowStationGrid()
+        SetLoadStationGrid()
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
@@ -1277,8 +1225,8 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub SetFlowStationGrid()
-        If AtcGridFlow.Source Is Nothing OrElse cboStreams.SelectedIndex = -1 Then
-            Logger.Dbg("No atcGridFlow or Streams layer selected")
+        If AtcGridFlow.Source Is Nothing Then
+            Logger.Dbg("No atcGridFlow")
         Else
             Logger.Dbg("Begin")
 
@@ -1394,15 +1342,14 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cmdFieldMapping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFieldMapping.Click
-        Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
         If IsNothing(pfrmWASPFieldMapping) Then
             pfrmWASPFieldMapping = New frmWASPFieldMapping
-            pfrmWASPFieldMapping.Init(lStreamsLayerIndex, pPlugIn.WASPProject.SegmentFieldMap, Me)
+            pfrmWASPFieldMapping.Init(pSegmentLayerIndex, pPlugIn.WASPProject.SegmentFieldMap, Me)
             pfrmWASPFieldMapping.Show()
         Else
             If pfrmWASPFieldMapping.IsDisposed Then
                 pfrmWASPFieldMapping = New frmWASPFieldMapping
-                pfrmWASPFieldMapping.Init(lStreamsLayerIndex, pPlugIn.WASPProject.SegmentFieldMap, Me)
+                pfrmWASPFieldMapping.Init(pSegmentLayerIndex, pPlugIn.WASPProject.SegmentFieldMap, Me)
                 pfrmWASPFieldMapping.Show()
             Else
                 pfrmWASPFieldMapping.WindowState = FormWindowState.Normal
@@ -1412,10 +1359,9 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cmdCreateShapefile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCreateShapefile.Click
-        Dim lSegmentLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Dim lWASPSegmentShapefile As String = ""
-        pPlugIn.WASPProject.CreateSegmentShapeFile(lSegmentLayerIndex, lWASPSegmentShapefile)
+        pPlugIn.WASPProject.CreateSegmentShapeFile(pSegmentLayerIndex, lWASPSegmentShapefile)
         pPlugIn.WASPProject.CreateBufferedSegmentShapeFile(lWASPSegmentShapefile)
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
