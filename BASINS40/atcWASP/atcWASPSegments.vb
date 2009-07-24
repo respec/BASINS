@@ -45,7 +45,7 @@ Public Class atcWASPSegments
 
         Dim lDownstreamKey As String = DownstreamKey(lProblem)
         If lProblem.Length = 0 Then
-            AssignWaspIdAndMoveUpstream(lDownstreamKey)
+            If lDownstreamKey.Length > 0 Then AssignWaspIdAndMoveUpstream(lDownstreamKey)
 
             For Each lSegment As atcWASPSegment In Me
                 If lSegment.WASPID = 0 Then

@@ -52,6 +52,8 @@ Public Class atcWASPProject
     End Sub
 
     Public Function Save(ByVal aFileName As String) As Boolean
+        Segments.WASPProject = Me
+
         'set file names
         WNFFileName = aFileName
         Dim lSegmentFileName As String = FilenameSetExt(WNFFileName, "seg")
@@ -200,6 +202,7 @@ Public Class atcWASPProject
                 CombineSegmentsDetail(lDownstreamKey, aMinTravelTime, lNewSegments)
                 Segments.Clear()
                 Segments = lNewSegments
+                Segments.WASPProject = Me
             End If
         End If
     End Sub
