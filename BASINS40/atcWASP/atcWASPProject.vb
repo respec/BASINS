@@ -20,7 +20,6 @@ Public Class atcWASPProject
     Public AirTempStationCandidates As New atcWASPTimeseriesCollection
     Public SolRadStationCandidates As New atcWASPTimeseriesCollection
     Public WindStationCandidates As New atcWASPTimeseriesCollection
-    Public WaterTempStationCandidates As New atcWASPTimeseriesCollection
     Public WQStationCandidates As New atcWASPTimeseriesCollection
 
     'the following are used in creating the wasp inp file
@@ -539,13 +538,8 @@ Public Class atcWASPProject
             If aGridFlowSource.CellValue(lIndex, 3) <> "<none>" Then
                 AddSelectedTimeseriesToWASPSegment(lKeyString, FlowStationCandidates, Me, Segments(lIndex - 1))
             End If
-            'water temp
-            lKeyString = "WTMP:" & aGridLoadSource.CellValue(lIndex, 1)
-            If aGridLoadSource.CellValue(lIndex, 1) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, WaterTempStationCandidates, Me, Segments(lIndex - 1))
-            End If
             For lColumn As Integer = 1 To Me.WASPConstituents.Count
-                'other wq loads
+                'wq loads
                 'build key string, type is the first part before the colon.
                 Dim lColonPos As Integer = InStr(1, aGridLoadSource.CellValue(lIndex, 1 + lColumn), ":")
                 If lColonPos > 0 Then

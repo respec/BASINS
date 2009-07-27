@@ -42,8 +42,10 @@ Public Class frmWASPInitialize
             pSelectedIndexes.Add(lIndex, GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, pCurrentLayerIndex))
         Next
 
-        txtInfo.Text = pNumSelected.ToString & " features out of " & pNumFeatures.ToString & " in the '" & _
-                       pCurrentLayerName & "' layer are selected."
+        'txtInfo.Text = pNumSelected.ToString & " features out of " & pNumFeatures.ToString & " in the '" & _
+        '               pCurrentLayerName & "' layer are selected."
+        txtInfo.Text = "Selection Layer: " & pCurrentLayerName & vbCrLf & vbCrLf & _
+                       "Number of Selected Features: " & pNumSelected.ToString & " of " & pNumFeatures.ToString
 
         'does the current layer look like a nhdplus flowlines layer?
         If GisUtil.LayerType(pCurrentLayerIndex) = 2 And _
