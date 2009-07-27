@@ -75,7 +75,6 @@ Public Class frmWASPSetup
     Friend WithEvents atxTravelTimeMax As atcControls.atcText
     Friend WithEvents cmdFieldMapping As System.Windows.Forms.Button
     Friend WithEvents cmdCreateShapefile As System.Windows.Forms.Button
-    Friend WithEvents cmdSelectConstituents As System.Windows.Forms.Button
     Friend WithEvents cbxWind As System.Windows.Forms.ComboBox
     Friend WithEvents cbxSolar As System.Windows.Forms.ComboBox
     Friend WithEvents cbxAir As System.Windows.Forms.ComboBox
@@ -84,6 +83,8 @@ Public Class frmWASPSetup
     Friend WithEvents lblAir As System.Windows.Forms.Label
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents atxTravelTimeMin As atcControls.atcText
+    Friend WithEvents cboModel As System.Windows.Forms.ComboBox
+    Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -95,6 +96,8 @@ Public Class frmWASPSetup
         Me.ofdExisting = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.cboModel = New System.Windows.Forms.ComboBox
+        Me.Label4 = New System.Windows.Forms.Label
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
         Me.lblEnd = New System.Windows.Forms.Label
         Me.lblStart = New System.Windows.Forms.Label
@@ -123,7 +126,6 @@ Public Class frmWASPSetup
         Me.TabPage3 = New System.Windows.Forms.TabPage
         Me.AtcGridFlow = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
-        Me.cmdSelectConstituents = New System.Windows.Forms.Button
         Me.AtcGridLoad = New atcControls.atcGrid
         Me.TabPage6 = New System.Windows.Forms.TabPage
         Me.cbxWind = New System.Windows.Forms.ComboBox
@@ -225,6 +227,8 @@ Public Class frmWASPSetup
         'TabPage1
         '
         Me.TabPage1.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage1.Controls.Add(Me.cboModel)
+        Me.TabPage1.Controls.Add(Me.Label4)
         Me.TabPage1.Controls.Add(Me.GroupBox3)
         Me.TabPage1.Controls.Add(Me.cboMet)
         Me.TabPage1.Controls.Add(Me.Label9)
@@ -236,6 +240,28 @@ Public Class frmWASPSetup
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'cboModel
+        '
+        Me.cboModel.AllowDrop = True
+        Me.cboModel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboModel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboModel.Location = New System.Drawing.Point(167, 79)
+        Me.cboModel.Name = "cboModel"
+        Me.cboModel.Size = New System.Drawing.Size(341, 25)
+        Me.cboModel.TabIndex = 30
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(11, 82)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(94, 17)
+        Me.Label4.TabIndex = 29
+        Me.Label4.Text = "WASP Model:"
         '
         'GroupBox3
         '
@@ -449,7 +475,7 @@ Public Class frmWASPSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboMet.Location = New System.Drawing.Point(168, 127)
+        Me.cboMet.Location = New System.Drawing.Point(168, 151)
         Me.cboMet.Name = "cboMet"
         Me.cboMet.Size = New System.Drawing.Size(719, 25)
         Me.cboMet.TabIndex = 12
@@ -458,7 +484,7 @@ Public Class frmWASPSetup
         '
         Me.Label9.AutoSize = True
         Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label9.Location = New System.Drawing.Point(11, 130)
+        Me.Label9.Location = New System.Drawing.Point(11, 154)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(130, 17)
         Me.Label9.TabIndex = 11
@@ -639,7 +665,6 @@ Public Class frmWASPSetup
         '
         'TabPage4
         '
-        Me.TabPage4.Controls.Add(Me.cmdSelectConstituents)
         Me.TabPage4.Controls.Add(Me.AtcGridLoad)
         Me.TabPage4.Location = New System.Drawing.Point(4, 25)
         Me.TabPage4.Name = "TabPage4"
@@ -647,15 +672,6 @@ Public Class frmWASPSetup
         Me.TabPage4.TabIndex = 6
         Me.TabPage4.Text = "Boundaries/Loads"
         Me.TabPage4.UseVisualStyleBackColor = True
-        '
-        'cmdSelectConstituents
-        '
-        Me.cmdSelectConstituents.Location = New System.Drawing.Point(23, 21)
-        Me.cmdSelectConstituents.Name = "cmdSelectConstituents"
-        Me.cmdSelectConstituents.Size = New System.Drawing.Size(155, 34)
-        Me.cmdSelectConstituents.TabIndex = 22
-        Me.cmdSelectConstituents.Text = "Select Constituents"
-        Me.cmdSelectConstituents.UseVisualStyleBackColor = True
         '
         'AtcGridLoad
         '
@@ -815,13 +831,17 @@ Public Class frmWASPSetup
     Friend pSegmentLayerIndex As Integer
     Friend pBasinsFolder As String
     Friend pfrmWASPFieldMapping As frmWASPFieldMapping
-    Friend pfrmWASPConstituents As frmWASPConstituents
+    Friend pWASPModelsDB As atcCollection
+    Friend pWASPSystemIdsDB As atcCollection
+    Friend pWASPSystemNamesDB As atcCollection
+    Friend pWASPTimeFunctionIdsDB As atcCollection
+    Friend pWASPTimeFunctionNamesDB As atcCollection
 
     Private pSelectedRow As Integer
     Private pSelectedColumn As Integer
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
-        WriteWASPConstituentNamesToFile(pBasinsFolder & "\etc\WASPConstituents.txt")
+        'WriteWASPConstituentNamesToFile(pBasinsFolder & "\etc\WASPConstituents.txt")
         Me.Close()
     End Sub
 
@@ -950,7 +970,7 @@ Public Class frmWASPSetup
                 Logger.Dbg("BackFromWASP")
             End With
 
-            WriteWASPConstituentNamesToFile(pBasinsFolder & "\etc\WASPConstituents.txt")
+            'WriteWASPConstituentNamesToFile(pBasinsFolder & "\etc\WASPConstituents.txt")
 
             lblStatus.Text = ""
             Me.Refresh()
@@ -987,7 +1007,13 @@ Public Class frmWASPSetup
 
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
-        ReadWASPConstituentNamesFromFile(pBasinsFolder & "\etc\WASPConstituents.txt")
+        'ReadWASPConstituentNamesFromFile(pBasinsFolder & "\etc\WASPConstituents.txt")
+        ReadWASPdb(pBasinsFolder & "\etc\")
+
+        For Each lModel As String In pWASPModelsDB
+            cboModel.Items.Add(lModel)
+        Next
+        cboModel.SelectedIndex = 0
 
         cboMet.Items.Add("<none>")
 
@@ -1003,7 +1029,7 @@ Public Class frmWASPSetup
 
         With AtcGridLoad
             .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
+            .AllowHorizontalScrolling = True
         End With
 
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
@@ -1011,7 +1037,7 @@ Public Class frmWASPSetup
             If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile 
 
             ElseIf GisUtil.LayerType(lLayerIndex) = 2 Then 'LineShapefile 
-                
+
             ElseIf GisUtil.LayerType(lLayerIndex) = 1 Then 'PointShapefile
                 cboMet.Items.Add(lLayerName)
                 If lLayerName.ToUpper.IndexOf("WEATHER STATION SITES 20") > -1 Then
@@ -1090,8 +1116,6 @@ Public Class frmWASPSetup
             .FixedColumns = 1
             .CellColor(0, 0) = SystemColors.ControlDark
             .CellValue(0, 0) = "Segment"
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellValue(0, 1) = "Water Temp Timeseries"
         End With
 
         Logger.Dbg("InitializeUI Complete")
@@ -1108,7 +1132,6 @@ Public Class frmWASPSetup
         'TODO: move to atcWASP???
         With pPlugIn.WASPProject
             .BuildListofValidStationNames("FLOW", .FlowStationCandidates)
-            .BuildListofValidStationNames("WTMP", .WaterTempStationCandidates)
             .BuildListofValidStationNames("ATMP", .AirTempStationCandidates)
             .BuildListofValidStationNames("ATEM", .AirTempStationCandidates)
             .BuildListofValidStationNames("SOLRAD", .SolRadStationCandidates)
@@ -1117,19 +1140,12 @@ Public Class frmWASPSetup
             .BuildListofValidStationNames("", .WQStationCandidates)
 
             'set layer index for met stations
-            If cboMet.SelectedIndex > 0 Then
-                Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
-                .GetMetStationCoordinates(lMetLayerIndex, .AirTempStationCandidates)
-                .GetMetStationCoordinates(lMetLayerIndex, .AirTempStationCandidates)
-                .GetMetStationCoordinates(lMetLayerIndex, .SolRadStationCandidates)
-                .GetMetStationCoordinates(lMetLayerIndex, .SolRadStationCandidates)
-                .GetMetStationCoordinates(lMetLayerIndex, .WindStationCandidates)
+            SetStationCoordinates()
 
-                'redo to set valid values
-                SetFlowStationGrid()
-                SetLoadStationGrid()
-                SetMetStationValidValues()
-            End If
+            'set valid values
+            SetFlowStationGrid()
+            SetLoadStationGrid()
+            SetMetStationValidValues()
         End With
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
@@ -1264,10 +1280,10 @@ Public Class frmWASPSetup
             Logger.Dbg("Begin")
 
             With AtcGridLoad.Source
-                .Columns = 2 + pPlugIn.WASPProject.WASPConstituents.Count
+                .Columns = 1 + pPlugIn.WASPProject.WASPConstituents.Count
                 For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
-                    .CellColor(0, 1 + lColumn) = SystemColors.ControlDark
-                    .CellValue(0, 1 + lColumn) = pPlugIn.WASPProject.WASPConstituents(lColumn - 1) & " Timeseries"
+                    .CellColor(0, lColumn) = SystemColors.ControlDark
+                    .CellValue(0, lColumn) = pPlugIn.WASPProject.WASPConstituents(lColumn - 1)
                 Next
             End With
 
@@ -1276,17 +1292,9 @@ Public Class frmWASPSetup
                 For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
                     .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = "<none>"
-                    If pPlugIn.WASPProject.WaterTempStationCandidates.Count > 0 Then
-                        .CellValue(lIndex, 1) = "<none>"
-                        .CellEditable(lIndex, 1) = True
-                    Else
-                        .CellEditable(lIndex, 1) = False
-                    End If
                     For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
-                        .CellValue(lIndex, 1 + lColumn) = "<none>"
-                        .CellValue(lIndex, 1) = "<none>"
-                        .CellEditable(lIndex, 1 + lColumn) = True
+                        .CellValue(lIndex, lColumn) = "<none>"
+                        .CellEditable(lIndex, lColumn) = True
                     Next
                 Next
             End With
@@ -1302,15 +1310,9 @@ Public Class frmWASPSetup
         Logger.Dbg("SetValidValues")
         Dim lValidValues As New atcCollection
         lValidValues.Add("<none>")
-        If pSelectedColumn = 1 Then
-            For Each lWaterTempStation As atcWASPTimeseries In pPlugIn.WASPProject.WaterTempStationCandidates
-                lValidValues.Add(lWaterTempStation.Description)
-            Next
-        Else
-            For Each lWQStation As atcWASPTimeseries In pPlugIn.WASPProject.WQStationCandidates
-                lValidValues.Add(lWQStation.Description)
-            Next
-        End If
+        For Each lWQStation As atcWASPTimeseries In pPlugIn.WASPProject.WQStationCandidates
+            lValidValues.Add(lWQStation.Description)
+        Next
 
         AtcGridLoad.ValidValues = lValidValues
     End Sub
@@ -1409,23 +1411,6 @@ Public Class frmWASPSetup
         End If
     End Sub
 
-    Private Sub cmdSelectConstituents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelectConstituents.Click
-        If IsNothing(pfrmWASPConstituents) Then
-            pfrmWASPConstituents = New frmWASPConstituents
-            pfrmWASPConstituents.Init(pPlugIn.WASPProject.WASPConstituents, Me)
-            pfrmWASPConstituents.Show()
-        Else
-            If pfrmWASPConstituents.IsDisposed Then
-                pfrmWASPConstituents = New frmWASPConstituents
-                pfrmWASPConstituents.Init(pPlugIn.WASPProject.WASPConstituents, Me)
-                pfrmWASPConstituents.Show()
-            Else
-                pfrmWASPConstituents.WindowState = FormWindowState.Normal
-                pfrmWASPConstituents.BringToFront()
-            End If
-        End If
-    End Sub
-
     'Private Sub cmdGenerateTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     '    Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Generate New Timeseries")
     'End Sub
@@ -1455,21 +1440,85 @@ Public Class frmWASPSetup
         SetLoadStationValidValues()
     End Sub
 
-    Public Sub ReadWASPConstituentNamesFromFile(ByVal aFileName As String)
-        If FileExists(aFileName) Then
-            For Each lString As String In LinesInFile(aFileName)
-                If Not lString.StartsWith(";") Then
-                    pPlugIn.WASPProject.WASPConstituents.Add(lString.Trim)
-                End If
+    Private Sub cboMet_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMet.SelectedIndexChanged
+        SetStationCoordinates()
+    End Sub
+
+    'Public Sub ReadWASPConstituentNamesFromFile(ByVal aFileName As String)
+    '    If FileExists(aFileName) Then
+    '        For Each lString As String In LinesInFile(aFileName)
+    '            If Not lString.StartsWith(";") Then
+    '                pPlugIn.WASPProject.WASPConstituents.Add(lString.Trim)
+    '            End If
+    '        Next
+    '    End If
+    'End Sub
+
+    'Public Sub WriteWASPConstituentNamesToFile(ByVal aFileName As String)
+    '    Dim lStr As String = ""
+    '    For Each lItem As String In pPlugIn.WASPProject.WASPConstituents
+    '        lStr &= lItem.ToString & vbCrLf
+    '    Next
+    '    SaveFileString(aFileName, lStr)
+    'End Sub
+
+    Private Sub ReadWASPdb(ByVal aPathName As String)
+        Dim lTable As New atcUtility.atcTableDelimited
+
+        'read wasp models database
+        pWASPModelsDB = New atcCollection
+        If lTable.OpenFile(aPathName & "WASPModels.csv") Then
+            For lRow As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = lRow
+                pWASPModelsDB.Add(lTable.Value(1), ReplaceString(lTable.Value(2), """", ""))
+            Next
+        End If
+
+        'read wasp systems database
+        pWASPSystemIdsDB = New atcCollection
+        pWASPSystemNamesDB = New atcCollection
+        If lTable.OpenFile(aPathName & "WASPSystems.csv") Then
+            For lRow As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = lRow
+                pWASPSystemIdsDB.Add(lRow, lTable.Value(3))
+                pWASPSystemNamesDB.Add(lRow, ReplaceString(lTable.Value(4), """", ""))
+            Next
+        End If
+
+        'read wasp time functions database
+        pWASPTimeFunctionIdsDB = New atcCollection
+        pWASPTimeFunctionNamesDB = New atcCollection
+        If lTable.OpenFile(aPathName & "WASPTimeFunctions.csv") Then
+            For lRow As Integer = 1 To lTable.NumRecords
+                lTable.CurrentRecord = lRow
+                pWASPTimeFunctionIdsDB.Add(lRow, lTable.Value(2))
+                pWASPTimeFunctionNamesDB.Add(lRow, ReplaceString(lTable.Value(4), """", ""))
             Next
         End If
     End Sub
 
-    Public Sub WriteWASPConstituentNamesToFile(ByVal aFileName As String)
-        Dim lStr As String = ""
-        For Each lItem As String In pPlugIn.WASPProject.WASPConstituents
-            lStr &= lItem.ToString & vbCrLf
+    Private Sub SetStationCoordinates()
+        With pPlugIn.WASPProject
+            If cboMet.SelectedIndex > 0 Then
+                Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(cboMet.Items(cboMet.SelectedIndex))
+                .GetMetStationCoordinates(lMetLayerIndex, .AirTempStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .AirTempStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .SolRadStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .SolRadStationCandidates)
+                .GetMetStationCoordinates(lMetLayerIndex, .WindStationCandidates)
+            End If
+        End With
+    End Sub
+
+    Private Sub cboModel_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboModel.SelectedIndexChanged
+        Dim lModelId As String = pWASPModelsDB.Keys(cboModel.SelectedIndex)
+        'set the load constituents to the wasp system names
+        pPlugIn.WASPProject.WASPConstituents.Clear()
+        For lIndex As Integer = 1 To pWASPSystemIdsDB.Count
+            If pWASPSystemIdsDB(lIndex - 1) = lModelId Then
+                pPlugIn.WASPProject.WASPConstituents.Add(pWASPSystemNamesDB(lIndex - 1))
+            End If
         Next
-        SaveFileString(aFileName, lStr)
+        SetLoadStationGrid()
     End Sub
 End Class
