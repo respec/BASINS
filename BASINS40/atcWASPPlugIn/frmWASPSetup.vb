@@ -85,6 +85,8 @@ Public Class frmWASPSetup
     Friend WithEvents atxTravelTimeMin As atcControls.atcText
     Friend WithEvents cboModel As System.Windows.Forms.ComboBox
     Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
+    Friend WithEvents AtcGridBound As atcControls.atcGrid
     Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
@@ -137,6 +139,8 @@ Public Class frmWASPSetup
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
+        Me.TabPage5 = New System.Windows.Forms.TabPage
+        Me.AtcGridBound = New atcControls.atcGrid
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -145,6 +149,7 @@ Public Class frmWASPSetup
         Me.TabPage4.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.TabPage5.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdOK
@@ -213,6 +218,7 @@ Public Class frmWASPSetup
         Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
+        Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage6)
         Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
@@ -670,7 +676,7 @@ Public Class frmWASPSetup
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Size = New System.Drawing.Size(899, 398)
         Me.TabPage4.TabIndex = 6
-        Me.TabPage4.Text = "Boundaries/Loads"
+        Me.TabPage4.Text = "Loads"
         Me.TabPage4.UseVisualStyleBackColor = True
         '
         'AtcGridLoad
@@ -791,6 +797,34 @@ Public Class frmWASPSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
+        'TabPage5
+        '
+        Me.TabPage5.Controls.Add(Me.AtcGridBound)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Size = New System.Drawing.Size(899, 398)
+        Me.TabPage5.TabIndex = 7
+        Me.TabPage5.Text = "Boundaries"
+        Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'AtcGridBound
+        '
+        Me.AtcGridBound.AllowHorizontalScrolling = True
+        Me.AtcGridBound.AllowNewValidValues = False
+        Me.AtcGridBound.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridBound.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridBound.Fixed3D = False
+        Me.AtcGridBound.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridBound.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridBound.LineWidth = 0.0!
+        Me.AtcGridBound.Location = New System.Drawing.Point(23, 74)
+        Me.AtcGridBound.Name = "AtcGridBound"
+        Me.AtcGridBound.Size = New System.Drawing.Size(854, 307)
+        Me.AtcGridBound.Source = Nothing
+        Me.AtcGridBound.TabIndex = 22
+        '
         'frmWASPSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -820,6 +854,7 @@ Public Class frmWASPSetup
         Me.TabPage6.ResumeLayout(False)
         Me.TabPage6.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
+        Me.TabPage5.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -895,7 +930,7 @@ Public Class frmWASPSetup
             Next
         End With
 
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
 
         'check that specified dates are valid
         Dim lSJDate As Double = 0.0
@@ -1027,6 +1062,11 @@ Public Class frmWASPSetup
             .AllowHorizontalScrolling = False
         End With
 
+        With AtcGridBound
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = True
+        End With
+
         With AtcGridLoad
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = True
@@ -1107,6 +1147,17 @@ Public Class frmWASPSetup
             .CellValue(0, 3) = "Input Flow Timeseries"
         End With
 
+        AtcGridBound.Clear()
+        With AtcGridBound.Source
+            .Columns = 2
+            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellValue(0, 0) = "Boundary Segment"
+        End With
+
         AtcGridLoad.Clear()
         With AtcGridLoad.Source
             .Columns = 2
@@ -1145,6 +1196,7 @@ Public Class frmWASPSetup
             'set valid values
             SetFlowStationGrid()
             SetLoadStationGrid()
+            SetBoundaryGrid()
             SetMetStationValidValues()
         End With
 
@@ -1177,6 +1229,7 @@ Public Class frmWASPSetup
         SetSegmentationGrid()
         SetFlowStationGrid()
         SetLoadStationGrid()
+        SetBoundaryGrid()
 
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
@@ -1317,6 +1370,55 @@ Public Class frmWASPSetup
         AtcGridLoad.ValidValues = lValidValues
     End Sub
 
+    Friend Sub SetBoundaryGrid()
+        If AtcGridBound.Source Is Nothing Then
+            Logger.Dbg("No atcGridBound")
+        Else
+            Logger.Dbg("Begin")
+
+            With AtcGridBound.Source
+                .Columns = 1 + pPlugIn.WASPProject.WASPBoundaryFunctions.Count
+                For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPBoundaryFunctions.Count
+                    .CellColor(0, lColumn) = SystemColors.ControlDark
+                    .CellValue(0, lColumn) = pPlugIn.WASPProject.WASPBoundaryFunctions(lColumn - 1)
+                Next
+            End With
+
+            'only load segments that are boundary segments
+            With AtcGridBound.Source
+                Dim lRow As Integer = 0
+                For Each lSegment As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    If pPlugIn.WASPProject.IsBoundary(lSegment) Then
+                        lRow = lRow + 1
+                        .Rows = lRow
+                        .CellValue(lRow, 0) = lSegment.ID & ":" & lSegment.Name
+                        .CellColor(lRow, 0) = SystemColors.ControlDark
+                        For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPBoundaryFunctions.Count
+                            .CellValue(lRow, lColumn) = "<none>"
+                            .CellEditable(lRow, lColumn) = True
+                        Next
+                    End If
+                Next
+            End With
+
+            AtcGridBound.SizeAllColumnsToContents()
+            AtcGridBound.Refresh()
+
+            Logger.Dbg("BoundaryGrid refreshed")
+        End If
+    End Sub
+
+    Private Sub SetBoundaryValidValues()
+        Logger.Dbg("SetValidValues")
+        Dim lValidValues As New atcCollection
+        lValidValues.Add("<none>")
+        For Each lWQStation As atcWASPTimeseries In pPlugIn.WASPProject.WQStationCandidates
+            lValidValues.Add(lWQStation.Description)
+        Next
+
+        AtcGridBound.ValidValues = lValidValues
+    End Sub
+
     Private Sub SetMetStationValidValues()
         cbxAir.Items.Clear()
         cbxAir.Items.Add("<none>")
@@ -1420,17 +1522,17 @@ Public Class frmWASPSetup
     'End Sub
 
     Private Sub cbxAir_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxAir.SelectedIndexChanged
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
         SetDates()
     End Sub
 
     Private Sub cbxSolar_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxSolar.SelectedIndexChanged
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
         SetDates()
     End Sub
 
     Private Sub cbxWind_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbxWind.SelectedIndexChanged
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source)
+        pPlugIn.WASPProject.RebuildTimeseriesCollections(cbxAir.SelectedItem, cbxSolar.SelectedItem, cbxWind.SelectedItem, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
         SetDates()
     End Sub
 
@@ -1438,6 +1540,12 @@ Public Class frmWASPSetup
         pSelectedColumn = aColumn
         pSelectedRow = aRow
         SetLoadStationValidValues()
+    End Sub
+
+    Private Sub AtcGridBound_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridBound.MouseDownCell
+        pSelectedColumn = aColumn
+        pSelectedRow = aRow
+        SetBoundaryValidValues()
     End Sub
 
     Private Sub cboMet_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMet.SelectedIndexChanged
@@ -1512,6 +1620,7 @@ Public Class frmWASPSetup
 
     Private Sub cboModel_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboModel.SelectedIndexChanged
         Dim lModelId As String = pWASPModelsDB.Keys(cboModel.SelectedIndex)
+
         'set the load constituents to the wasp system names
         pPlugIn.WASPProject.WASPConstituents.Clear()
         For lIndex As Integer = 1 To pWASPSystemIdsDB.Count
@@ -1520,5 +1629,15 @@ Public Class frmWASPSetup
             End If
         Next
         SetLoadStationGrid()
+
+        'set the boundary functions to the wasp time function names
+        pPlugIn.WASPProject.WASPBoundaryFunctions.Clear()
+        For lIndex As Integer = 1 To pWASPTimeFunctionIdsDB.Count
+            If pWASPTimeFunctionIdsDB(lIndex - 1) = lModelId Then
+                pPlugIn.WASPProject.WASPBoundaryFunctions.Add(pWASPTimeFunctionNamesDB(lIndex - 1))
+            End If
+        Next
+        SetBoundaryGrid()
     End Sub
+
 End Class
