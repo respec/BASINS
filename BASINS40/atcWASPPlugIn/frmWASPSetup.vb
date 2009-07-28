@@ -1620,6 +1620,7 @@ Public Class frmWASPSetup
 
     Private Sub cboModel_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboModel.SelectedIndexChanged
         Dim lModelId As String = pWASPModelsDB.Keys(cboModel.SelectedIndex)
+        pPlugIn.WASPProject.ModelType = lModelId
 
         'set the load constituents to the wasp system names
         pPlugIn.WASPProject.WASPConstituents.Clear()
