@@ -15,6 +15,7 @@ Public Class atcWASPProject
     Public INPFileName As String = String.Empty
     Public SegmentFieldMap As New atcCollection
     Public WASPConstituents As New atcCollection
+    Public WASPBoundaryFunctions As New atcCollection
 
     Public FlowStationCandidates As New atcWASPTimeseriesCollection
     Public AirTempStationCandidates As New atcWASPTimeseriesCollection
@@ -523,7 +524,7 @@ Public Class atcWASPProject
     End Sub
 
     Public Sub RebuildTimeseriesCollections(ByVal aAirName As String, ByVal aSolarName As String, ByVal aWindName As String, _
-                                            ByVal aGridFlowSource As atcGridSource, ByVal aGridLoadSource As atcGridSource)
+                                            ByVal aGridFlowSource As atcGridSource, ByVal aGridLoadSource As atcGridSource, ByVal aGridBoundSource As atcGridSource)
         'clear out collections of timeseries prior to rebuilding
         InputTimeseriesCollection.Clear()
         For lIndex As Integer = 1 To Segments.Count
@@ -552,6 +553,28 @@ Public Class atcWASPProject
                 End If
             Next
         Next
+
+        'check to see if each segment is a boundary
+        Dim lRow As Integer = 0
+        For Each lSegment As atcWASPSegment In Segments
+            If IsBoundary(lSegment) Then
+                lRow = lRow + 1
+                For lColumn As Integer = 1 To Me.WASPBoundaryFunctions.Count
+                    'boundaries
+                    'build key string, type is the first part before the colon.
+                    Dim lColonPos As Integer = InStr(1, aGridBoundSource.CellValue(lRow, 1 + lColumn), ":")
+                    If lColonPos > 0 Then
+                        lKeyString = Mid(aGridBoundSource.CellValue(lRow, 1 + lColumn), 1, lColonPos) & aGridBoundSource.CellValue(lRow, 1 + lColumn)
+                    Else
+                        lKeyString = ""
+                    End If
+                    If aGridBoundSource.CellValue(lRow, 1 + lColumn) <> "<none>" Then
+                        AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, lSegment)
+                    End If
+                Next
+            End If
+        Next
+
         'met timeseries are not segment-specific
         'air temp
         If aAirName <> "<none>" Then
@@ -573,6 +596,32 @@ Public Class atcWASPProject
             AddSelectedTimeseriesToWASPProject(lKeyString, WindStationCandidates, Me)
         End If
     End Sub
+
+    Public Function IsBoundary(ByVal aSegment As atcWASPSegment) As Boolean
+        Dim lBoundary As Boolean = False
+
+        Dim lDownBoundary As Boolean = True
+        For Each lSegment As atcWASPSegment In Segments
+            If aSegment.DownID = lSegment.ID Then
+                'this segment connects to one downstream
+                lDownBoundary = False
+            End If
+        Next
+
+        Dim lUpBoundary As Boolean = True
+        For Each lSegment As atcWASPSegment In Segments
+            If lSegment.DownID = aSegment.ID Then
+                'an upstream segment connects to this one
+                lUpBoundary = False
+            End If
+        Next
+
+        If lUpBoundary Or lDownBoundary Then
+            lBoundary = True
+        End If
+
+        Return lBoundary
+    End Function
 
     Public Sub BuildListofValidStationNames(ByRef aConstituent As String, _
                                             ByVal aStationCandidates As atcWASPTimeseriesCollection)
