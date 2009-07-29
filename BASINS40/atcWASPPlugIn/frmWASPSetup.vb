@@ -1377,10 +1377,10 @@ Public Class frmWASPSetup
             Logger.Dbg("Begin")
 
             With AtcGridBound.Source
-                .Columns = 1 + pPlugIn.WASPProject.WASPBoundaryFunctions.Count
-                For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPBoundaryFunctions.Count
+                .Columns = 1 + pPlugIn.WASPProject.WASPConstituents.Count
+                For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
                     .CellColor(0, lColumn) = SystemColors.ControlDark
-                    .CellValue(0, lColumn) = pPlugIn.WASPProject.WASPBoundaryFunctions(lColumn - 1)
+                    .CellValue(0, lColumn) = pPlugIn.WASPProject.WASPConstituents(lColumn - 1)
                 Next
             End With
 
@@ -1393,7 +1393,7 @@ Public Class frmWASPSetup
                         .Rows = lRow
                         .CellValue(lRow, 0) = lSegment.ID & ":" & lSegment.Name
                         .CellColor(lRow, 0) = SystemColors.ControlDark
-                        For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPBoundaryFunctions.Count
+                        For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
                             .CellValue(lRow, lColumn) = "<none>"
                             .CellEditable(lRow, lColumn) = True
                         Next
@@ -1630,15 +1630,16 @@ Public Class frmWASPSetup
             End If
         Next
         SetLoadStationGrid()
+        SetBoundaryGrid()
 
-        'set the boundary functions to the wasp time function names
-        pPlugIn.WASPProject.WASPBoundaryFunctions.Clear()
+        'set the time functions to the wasp time function names
+        pPlugIn.WASPProject.WASPTimeFunctions.Clear()
         For lIndex As Integer = 1 To pWASPTimeFunctionIdsDB.Count
             If pWASPTimeFunctionIdsDB(lIndex - 1) = lModelId Then
-                pPlugIn.WASPProject.WASPBoundaryFunctions.Add(pWASPTimeFunctionNamesDB(lIndex - 1))
+                pPlugIn.WASPProject.WASPTimeFunctions.Add(pWASPTimeFunctionNamesDB(lIndex - 1))
             End If
         Next
-        SetBoundaryGrid()
+
     End Sub
 
 End Class

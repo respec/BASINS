@@ -16,7 +16,7 @@ Public Class atcWASPProject
     Public INPFileName As String = String.Empty
     Public SegmentFieldMap As New atcCollection
     Public WASPConstituents As New atcCollection
-    Public WASPBoundaryFunctions As New atcCollection
+    Public WASPTimeFunctions As New atcCollection
 
     Public FlowStationCandidates As New atcWASPTimeseriesCollection
     Public AirTempStationCandidates As New atcWASPTimeseriesCollection
@@ -560,7 +560,7 @@ Public Class atcWASPProject
         For Each lSegment As atcWASPSegment In Segments
             If IsBoundary(lSegment) Then
                 lRow = lRow + 1
-                For lColumn As Integer = 1 To Me.WASPBoundaryFunctions.Count
+                For lColumn As Integer = 1 To Me.WASPConstituents.Count
                     'boundaries
                     'build key string, type is the first part before the colon.
                     Dim lColonPos As Integer = InStr(1, aGridBoundSource.CellValue(lRow, 1 + lColumn), ":")
@@ -705,9 +705,7 @@ Public Class atcWASPProject
         'Declare a brandnew appendable .inp file
         Dim lSW As New IO.StreamWriter(INPFileName, True)
 
-        'write WASP network file first
         writeInpIntro(lSW)
-        writeInpVars(lSW)
         writeInpSegs(lSW)
         writeInpPath(lSW) 'Debug to here
         writeInpFlowFile(lSW)
@@ -755,15 +753,8 @@ Public Class atcWASPProject
             lTemp = lTemp & "  0"
         Next
         lIntroText.AppendLine(lTemp)
+        lIntroText.AppendLine("    0               Number output variables")
         aSW.Write(lIntroText.ToString) 'WriteLine would add an additional \n
-        aSW.Flush()
-        Return True
-    End Function
-
-    Private Function writeInpVars(ByRef aSW As IO.StreamWriter) As Boolean
-        Dim lOutputVarsText As New System.Text.StringBuilder
-        lOutputVarsText.AppendLine("    0               Number output variables")
-        aSW.Write(lOutputVarsText.ToString)
         aSW.Flush()
         Return True
     End Function
@@ -773,7 +764,7 @@ Public Class atcWASPProject
         lSegText.AppendLine(Segments.Count.ToString.PadLeft(5) & "               Number of Segments                            SEGFILE")
         lSegText.AppendLine("    0               Bed Volume Option")
         lSegText.AppendLine("     0.000          Bed Compaction Time Step")
-        lSegText.AppendLine("      1.000000      1.000000  Volume Scale & Conversion Factor")
+        lSegText.AppendLine("   1.000   1.000    Volume Scale & Conversion Factor")
         lSegText.AppendLine("  Segment   SegName")
         'Write out the segment id number and their names in format: FORMAT(I5,5X,A40)
         Dim line As String = String.Empty
@@ -791,11 +782,11 @@ Public Class atcWASPProject
             lsegParams(0) = Space(3) & lSegment.WASPID
             lsegParams(1) = " 0" ' BotSeg
             lsegParams(2) = " 1" ' iType
-            lsegParams(3) = " 1000.00" ' Volume
-            lsegParams(4) = " 1.06000" ' VMult
-            lsegParams(5) = " 0.000000" ' Vexp
-            lsegParams(6) = " 2.23008" 'DMult
-            lsegParams(7) = " 0.450000" 'Dexp
+            lsegParams(3) = " " & String.Format("{0:0.00}", lSegment.Length * lSegment.Width * 0.5) ' crude assumption for Volume  
+            lsegParams(4) = " 0.000000" 'VMult    'need default here
+            lsegParams(5) = " 0.000000" 'Vexp     'need default here
+            lsegParams(6) = " 1.000000" 'DMult    'need default here
+            lsegParams(7) = " 0.000000" 'Dexp     'need default here
             lsegParams(8) = " " & String.Format("{0:0.00}", lSegment.Length) ' Length 2
             lsegParams(9) = " " & String.Format("{0:0.00000}", lSegment.Slope) ' slope 6
             lsegParams(10) = " " & String.Format("{0:0.0000}", lSegment.Width) 'Width 4
@@ -998,7 +989,7 @@ Public Class atcWASPProject
             If NumFlowFunc(i) = 0 Then
                 Continue For
             End If
-            aSW.WriteLine("     24.000000      0.028000  Flow Scale & Conversion Factors")
+            aSW.WriteLine("   1.000   1.000    Flow Scale & Conversion Factors")
 
             'The loop below needs to be expanded to write out different 'type' of flow
             'right now, only the water flow type is assumed to have values
@@ -1006,6 +997,7 @@ Public Class atcWASPProject
             For j As Integer = 0 To FlowPathList.Count - 1
                 aSW.WriteLine(Segments.Item(FlowPathList(j)).Name)
                 'Write out this segment's flow timeseries here
+                lflowTS = Nothing
                 For Each lts As atcWASPTimeseries In Segments.Item(FlowPathList(j)).InputTimeseriesCollection
                     If lts.Type.StartsWith("FLOW") Then
                         lflowTS = lts
@@ -1013,13 +1005,33 @@ Public Class atcWASPProject
                     End If
                 Next
                 If lflowTS IsNot Nothing AndAlso lflowTS.TimeSeries IsNot Nothing Then
-                    aSW.WriteLine(Space(2) & lflowTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-flow values")
+                    'have a full timeseries to write
+                    Dim lValCount As Integer = 0
+                    For lindex As Integer = 1 To lflowTS.TimeSeries.Values.Length - 1
+                        If lflowTS.TimeSeries.Dates.Values(lindex) >= SJDate And lflowTS.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                            lValCount = lValCount + 1
+                        End If
+                    Next
+                    aSW.WriteLine(Space(2) & lValCount & Space(15) & "Number of time-flow values")
                     If j = 0 Then
-                        NumTimeSteps = lflowTS.TimeSeries.Values.Length
+                        NumTimeSteps = lflowTS.TimeSeries.Values.Length   'what does this get used for?
                     End If
                     For lindex As Integer = 1 To lflowTS.TimeSeries.Values.Length - 1
-                        aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lflowTS.TimeSeries.Values(lindex).ToString)
+                        If lflowTS.TimeSeries.Dates.Values(lindex) >= SJDate And lflowTS.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                            aSW.WriteLine(Space(3) & String.Format("{0:0.000}", lflowTS.TimeSeries.Dates.Values(lindex) - SJDate) & Space(2) & String.Format("{0:0.000}", lflowTS.TimeSeries.Values(lindex)))
+                        End If
                     Next
+                ElseIf lflowTS IsNot Nothing Then
+                    'have mean annual flow to write
+                    'the mean annual flow is stored in the Me.DataSourceName
+                    Dim lValue As Double = 0.0
+                    If IsNumeric(lflowTS.DataSourceName) Then
+                        lValue = CDbl(lflowTS.DataSourceName)
+                    End If
+                    Dim lJulianEnd As String = String.Format("{0:0.000}", EJDate - SJDate).PadLeft(10)
+                    aSW.WriteLine("    2               Number of time-flow values")
+                    aSW.WriteLine("     0.000" & "  " & String.Format("{0:0.0000}", lValue))
+                    aSW.WriteLine(lJulianEnd & "  " & String.Format("{0:0.0000}", lValue))
                 Else
                     aSW.WriteLine("    0               Number of time-flow values")
                 End If
@@ -1037,74 +1049,34 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpBoundFile(ByRef aSW As IO.StreamWriter) As Boolean
-        'TODO: deal with this part later
-        aSW.WriteLine("    0               Number of Systems                             BOUNDFILE")
+        aSW.WriteLine(WASPConstituents.Count.ToString.PadLeft(5) & "               Number of Systems                             BOUNDFILE")
+        'figure out the number of boundaries
+        Dim lBoundCount As Integer = 0
+        For Each lSegment As atcWASPSegment In Segments
+            If IsBoundary(lSegment) Then
+                lBoundCount = lBoundCount + 1
+            End If
+        Next
+        For Each lCons As String In WASPConstituents
+            aSW.WriteLine("  " & lCons)
+            aSW.WriteLine(lBoundCount.ToString.PadLeft(5) & Space(15) & "Number of boundaries")
+            aSW.WriteLine("   1.000   1.000    Boundary Scale & Conversion Factors")
+            For Each lSegment As atcWASPSegment In Segments
+                If IsBoundary(lSegment) Then
+                    aSW.WriteLine(lSegment.WASPID.ToString.PadLeft(5) & Space(15) & "Boundary Segment Number")
+                    'If AssociatedTimeseries Then
+
+                    'Else
+                    Dim lJulianEnd As String = String.Format("{0:0.000}", EJDate - SJDate).PadLeft(10)
+                    aSW.WriteLine("    2               Number of time-concentration values")
+                    aSW.WriteLine("     0.000" & "  " & String.Format("{0:0.0000}", 0.0))
+                    aSW.WriteLine(lJulianEnd & "  " & String.Format("{0:0.0000}", 0.0))
+                    'End If
+                End If
+            Next
+        Next
         aSW.Flush()
         Return True
-
-        'Make sure every concentration timeseries's first and last timesteps' values are 0.000
-        'the first time step is always 0.000
-
-        'TODO: Please use the following schemes to name the constituent's name or Type
-        'Dim lsystem(15) As String
-        'lsystem(0) = "ConcAmmonia"
-        'lsystem(1) = "ConcNitrate"
-        'lsystem(2) = "ConcOrthophosphate"
-        'lsystem(3) = "ConcPhytoplankton"
-        'lsystem(4) = "ConcCBOD 1"
-        'lsystem(5) = "ConcDissolved Oxygen"
-        'lsystem(6) = "ConcOrganic Nitrogen"
-        'lsystem(7) = "ConcOrganic Phosphorus"
-        'lsystem(8) = "ConcSalinity"
-        'lsystem(9) = "Conc(not used)"
-        'lsystem(10) = "ConcDetrital Carbon"
-        'lsystem(11) = "ConcCBOD 2"
-        'lsystem(12) = "ConcCBOD 3"
-        'lsystem(13) = "ConcDetrital Nitrogen"
-        'lsystem(14) = "ConcDetrital Phosphorus"
-        'lsystem(15) = "ConcSolids"
-
-        ''Sort the selected segments' WASPID
-        'Dim lflowpathsegarray(FlowPathList.Count - 1) As Integer
-        'FlowPathList.CopyTo(lflowpathsegarray)
-        'System.Array.Sort(lflowpathsegarray) ' Assuming sort order is ascending order
-
-        ''TODO: need to decide number of systems based on user input
-        'aSW.WriteLine("16               Number of Systems                             BOUNDFILE")
-        'Dim lconcTS As atcWASPTimeseries = Nothing
-        'For i As Integer = 0 To lsystem.Length - 1 ' later need to be loop through "Selected" set of systems
-        '    aSW.WriteLine(lsystem(i)) ' constituent name
-        '    aSW.WriteLine((NumFlowFunc(0) + 1).ToString.PadLeft(5) & Space(15) & "Number of boundaries") ' one more than the flow function, the confluence
-
-        '    ' Seems the concentration TS needs to have the same layout as the flow???
-        '    ' So perhaps no need to check for zero-Number of boundaries case???
-
-        '    aSW.WriteLine("      1.000000      0.500000  Boundary Scale & Conversion Factors")
-        '    aSW.WriteLine("    1               Boundary Segment Number")
-        '    aSW.WriteLine("    2               Number of time-concentration values")
-        '    aSW.WriteLine("   0.000000  0.000000")
-        '    aSW.WriteLine(String.Format("   {0:0.000}  0.000000", NumTimeSteps - 1))
-
-        '    'Start the concentration flow values for the selected segments as in FlowPath section
-        '    For lsegCtr As Integer = 0 To lflowpathsegarray.Length - 1
-        '        aSW.WriteLine(lflowpathsegarray(lsegCtr).ToString.PadLeft(5) & Space(15) & "Boundary Segment Number")
-        '        'Write out this segment's this constituent's concentration timeseries here
-        '        For Each lts As atcWASPTimeseries In Segments.Item(lflowpathsegarray(lsegCtr)).InputTimeseriesCollection
-        '            If lts.Type.StartsWith(lsystem(i)) Then
-        '                lconcTS = lts
-        '                Exit For
-        '            End If
-        '        Next
-        '        If lconcTS IsNot Nothing Then
-        '            aSW.WriteLine(Space(2) & lconcTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-concentration values")
-        '            For lindex As Integer = 1 To lconcTS.TimeSeries.Values.Length - 1
-        '                aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lconcTS.TimeSeries.Values(lindex).ToString)
-        '            Next
-        '        End If
-        '    Next
-        'Next
-        'aSW.Flush()
-        'Return True
     End Function
 
     Private Function writeInpLoadFile(ByRef aSW As IO.StreamWriter) As Boolean
