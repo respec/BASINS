@@ -27,7 +27,6 @@ Public Class atcWASPProject
     'the following are used in creating the wasp inp file
     Friend NumFlowFunc(5) As Integer
     Friend FlowPathList As New List(Of Integer) ' subset of Headwaters that actually have flowpath defined, zero-based
-    Friend NumTimeSteps As Integer ' set when water flow input is written
 
     Public Sub New()
         Name = ""
@@ -543,14 +542,18 @@ Public Class atcWASPProject
             For lColumn As Integer = 1 To Me.WASPConstituents.Count
                 'wq loads
                 'build key string, type is the first part before the colon.
-                Dim lColonPos As Integer = InStr(1, aGridLoadSource.CellValue(lIndex, 1 + lColumn), ":")
+                Dim lColonPos As Integer = InStr(1, aGridLoadSource.CellValue(lIndex, lColumn), ":")
                 If lColonPos > 0 Then
-                    lKeyString = Mid(aGridLoadSource.CellValue(lIndex, 1 + lColumn), 1, lColonPos) & aGridLoadSource.CellValue(lIndex, 1 + lColumn)
+                    lKeyString = Mid(aGridLoadSource.CellValue(lIndex, lColumn), 1, lColonPos) & aGridLoadSource.CellValue(lIndex, lColumn)
                 Else
                     lKeyString = ""
                 End If
-                If aGridLoadSource.CellValue(lIndex, 1 + lColumn) <> "<none>" Then
-                    AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, Segments(lIndex - 1))
+                If aGridLoadSource.CellValue(lIndex, lColumn) <> "<none>" Then
+                    If lKeyString.Length > 0 Then
+                        WQStationCandidates(lKeyString).BoundaryOrLoad = "Load"
+                        WQStationCandidates(lKeyString).WASPSystem = WASPConstituents(lColumn - 1)
+                        AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, Segments(lIndex - 1))
+                    End If
                 End If
             Next
         Next
@@ -563,14 +566,18 @@ Public Class atcWASPProject
                 For lColumn As Integer = 1 To Me.WASPConstituents.Count
                     'boundaries
                     'build key string, type is the first part before the colon.
-                    Dim lColonPos As Integer = InStr(1, aGridBoundSource.CellValue(lRow, 1 + lColumn), ":")
+                    Dim lColonPos As Integer = InStr(1, aGridBoundSource.CellValue(lRow, lColumn), ":")
                     If lColonPos > 0 Then
-                        lKeyString = Mid(aGridBoundSource.CellValue(lRow, 1 + lColumn), 1, lColonPos) & aGridBoundSource.CellValue(lRow, 1 + lColumn)
+                        lKeyString = Mid(aGridBoundSource.CellValue(lRow, lColumn), 1, lColonPos) & aGridBoundSource.CellValue(lRow, lColumn)
                     Else
                         lKeyString = ""
                     End If
-                    If aGridBoundSource.CellValue(lRow, 1 + lColumn) <> "<none>" Then
-                        AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, lSegment)
+                    If aGridBoundSource.CellValue(lRow, lColumn) <> "<none>" Then
+                        If lKeyString.Length > 0 Then
+                            WQStationCandidates(lKeyString).BoundaryOrLoad = "Boundary"
+                            WQStationCandidates(lKeyString).WASPSystem = WASPConstituents(lColumn - 1)
+                            AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, lSegment)
+                        End If
                     End If
                 Next
             End If
@@ -1013,9 +1020,6 @@ Public Class atcWASPProject
                         End If
                     Next
                     aSW.WriteLine(Space(2) & lValCount & Space(15) & "Number of time-flow values")
-                    If j = 0 Then
-                        NumTimeSteps = lflowTS.TimeSeries.Values.Length   'what does this get used for?
-                    End If
                     For lindex As Integer = 1 To lflowTS.TimeSeries.Values.Length - 1
                         If lflowTS.TimeSeries.Dates.Values(lindex) >= SJDate And lflowTS.TimeSeries.Dates.Values(lindex) <= EJDate Then
                             aSW.WriteLine(Space(3) & String.Format("{0:0.000}", lflowTS.TimeSeries.Dates.Values(lindex) - SJDate) & Space(2) & String.Format("{0:0.000}", lflowTS.TimeSeries.Values(lindex)))
@@ -1064,14 +1068,33 @@ Public Class atcWASPProject
             For Each lSegment As atcWASPSegment In Segments
                 If IsBoundary(lSegment) Then
                     aSW.WriteLine(lSegment.WASPID.ToString.PadLeft(5) & Space(15) & "Boundary Segment Number")
-                    'If AssociatedTimeseries Then
-
-                    'Else
-                    Dim lJulianEnd As String = String.Format("{0:0.000}", EJDate - SJDate).PadLeft(10)
-                    aSW.WriteLine("    2               Number of time-concentration values")
-                    aSW.WriteLine("     0.000" & "  " & String.Format("{0:0.0000}", 0.0))
-                    aSW.WriteLine(lJulianEnd & "  " & String.Format("{0:0.0000}", 0.0))
-                    'End If
+                    Dim lBoundTS As atcWASPTimeseries = Nothing
+                    For Each lts As atcWASPTimeseries In lSegment.InputTimeseriesCollection
+                        If lts.BoundaryOrLoad = "Boundary" And lts.WASPSystem = lCons Then
+                            lBoundTS = lts
+                            Exit For
+                        End If
+                    Next
+                    If Not lBoundTS Is Nothing Then
+                        'have a full timeseries to write
+                        Dim lValCount As Integer = 0
+                        For lindex As Integer = 1 To lBoundTS.TimeSeries.Values.Length - 1
+                            If lBoundTS.TimeSeries.Dates.Values(lindex) >= SJDate And lBoundTS.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                                lValCount = lValCount + 1
+                            End If
+                        Next
+                        aSW.WriteLine(Space(2) & lValCount & Space(15) & "Number of time-concentration values")
+                        For lindex As Integer = 1 To lBoundTS.TimeSeries.Values.Length - 1
+                            If lBoundTS.TimeSeries.Dates.Values(lindex) >= SJDate And lBoundTS.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                                aSW.WriteLine(Space(3) & String.Format("{0:0.000}", lBoundTS.TimeSeries.Dates.Values(lindex) - SJDate) & Space(2) & String.Format("{0:0.000}", lBoundTS.TimeSeries.Values(lindex)))
+                            End If
+                        Next
+                    Else
+                        Dim lJulianEnd As String = String.Format("{0:0.000}", EJDate - SJDate).PadLeft(10)
+                        aSW.WriteLine("    2               Number of time-concentration values")
+                        aSW.WriteLine("     0.000" & "  " & String.Format("{0:0.0000}", 0.0))
+                        aSW.WriteLine(lJulianEnd & "  " & String.Format("{0:0.0000}", 0.0))
+                    End If
                 End If
             Next
         Next
@@ -1080,82 +1103,45 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpLoadFile(ByRef aSW As IO.StreamWriter) As Boolean
-        'TODO: deal with this part later
         aSW.WriteLine("    0               NPS Input Option (0=No, 1=Yes)                LOADFILE")
-        aSW.WriteLine("    0               Number of Systems")
+        aSW.WriteLine(WASPConstituents.Count.ToString.PadLeft(5) & "               Number of Systems")
+        For Each lCons As String In WASPConstituents
+            aSW.WriteLine("  " & lCons)
+            'figure out the number of loadings
+            Dim lLoadCount As Integer = 0
+            For Each lSegment As atcWASPSegment In Segments
+                For Each lts As atcWASPTimeseries In lSegment.InputTimeseriesCollection
+                    If lts.BoundaryOrLoad = "Load" And lts.WASPSystem = lCons Then
+                        lLoadCount = lLoadCount + 1
+                    End If
+                Next
+            Next
+            aSW.WriteLine(lLoadCount.ToString.PadLeft(5) & Space(15) & "Number of Loadings")
+            If lLoadCount > 0 Then
+                aSW.WriteLine("   1.000   1.000    Loading Scale & Conversion Factors")
+                For Each lSegment As atcWASPSegment In Segments
+                    For Each lts As atcWASPTimeseries In lSegment.InputTimeseriesCollection
+                        If lts.BoundaryOrLoad = "Load" And lts.WASPSystem = lCons Then
+                            aSW.WriteLine(lSegment.WASPID.ToString.PadLeft(5) & Space(15) & "Loading Segment Number")
+                            Dim lValCount As Integer = 0
+                            For lindex As Integer = 1 To lts.TimeSeries.Values.Length - 1
+                                If lts.TimeSeries.Dates.Values(lindex) >= SJDate And lts.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                                    lValCount = lValCount + 1
+                                End If
+                            Next
+                            aSW.WriteLine(Space(2) & lValCount & Space(15) & "Number of time-loading values")
+                            For lindex As Integer = 1 To lts.TimeSeries.Values.Length - 1
+                                If lts.TimeSeries.Dates.Values(lindex) >= SJDate And lts.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                                    aSW.WriteLine(Space(3) & String.Format("{0:0.000}", lts.TimeSeries.Dates.Values(lindex) - SJDate) & Space(2) & String.Format("{0:0.000}", lts.TimeSeries.Values(lindex)))
+                                End If
+                            Next
+                        End If
+                    Next
+                Next
+            End If
+        Next
         aSW.Flush()
         Return True
-
-        'Load timeseries for the constituents are for point observations??
-        'as they do not share the same flow path scheme
-
-        'TODO: Please use the following schemes to name the constituent's name or Type for load in put
-        'Dim lsystem(15) As String
-        'lsystem(0) = "LoadAmmonia"
-        'lsystem(1) = "LoadNitrate"
-        'lsystem(2) = "LoadOrthophosphate"
-        'lsystem(3) = "LoadPhytoplankton"
-        'lsystem(4) = "LoadCBOD 1"
-        'lsystem(5) = "LoadDissolved Oxygen"
-        'lsystem(6) = "LoadOrganic Nitrogen"
-        'lsystem(7) = "LoadOrganic Phosphorus"
-        'lsystem(8) = "LoadSalinity"
-        'lsystem(9) = "Load(not used)"
-        'lsystem(10) = "LoadDetrital Carbon"
-        'lsystem(11) = "LoadCBOD 2"
-        'lsystem(12) = "LoadCBOD 3"
-        'lsystem(13) = "LoadDetrital Nitrogen"
-        'lsystem(14) = "LoadDetrital Phosphorus"
-        'lsystem(15) = "LoadSolids"
-
-        'aSW.WriteLine("    0               NPS Input Option (0=No, 1=Yes)                LOADFILE")
-        'aSW.WriteLine("   16               Number of Systems")
-        'Dim lloadingSegList As ArrayList = Nothing
-        'Dim lloadTS As atcWASPTimeseries = Nothing
-        'For i As Integer = 0 To lsystem.Length - 1 ' later need to be loop through "Selected" set of systems
-        '    lloadingSegList = getInfoLoadings(lsystem(i))
-
-        '    aSW.WriteLine(lsystem(i)) ' constituent name
-        '    aSW.WriteLine(lloadingSegList.Count.ToString.PadLeft(5) & Space(15) & "Number of Loadings")
-
-        '    If lloadingSegList.Count = 0 Then 'if no loading data, then move on to next constituent
-        '        Continue For
-        '    End If
-
-        '    aSW.WriteLine("      1.000000      1.000000  Loading Scale & Conversion Factors")
-
-        '    'Start the concentration flow values for the selected segments as in FlowPath section
-        '    For lsegCtr As Integer = 0 To lloadingSegList.Count - 1
-        '        aSW.WriteLine(lloadingSegList(lsegCtr).ToString.PadLeft(5) & Space(15) & "Loading Segment Number")
-        '        'Write out this segment's this constituent's loading timeseries here
-        '        For Each lts As atcWASPTimeseries In Segments.Item(lloadingSegList(lsegCtr)).InputTimeseriesCollection
-        '            If lts.Type.StartsWith(lsystem(i)) Then
-        '                lloadTS = lts
-        '                Exit For
-        '            End If
-        '        Next
-        '        If lloadTS IsNot Nothing Then
-        '            aSW.WriteLine(Space(2) & lloadTS.TimeSeries.Values.Length - 1 & Space(15) & "Number of time-loading values")
-        '            For lindex As Integer = 1 To lloadTS.TimeSeries.Values.Length - 1
-        '                aSW.WriteLine(Space(3) & String.Format("{0:#.000}", lindex) & Space(2) & lloadTS.TimeSeries.Values(lindex).ToString)
-        '            Next
-        '        End If
-        '    Next
-        'Next
-        'aSW.Flush()
-        'Return True
-    End Function
-
-    Private Function getInfoLoadings(ByVal aSystem As String) As ArrayList
-        Dim lloadingSegList As New ArrayList
-        For Each lseg As atcWASPSegment In Segments
-            For Each lts As atcWASPTimeseries In lseg.InputTimeseriesCollection
-                If lts.Type.StartsWith(aSystem) Then
-                    lloadingSegList.Add(lseg.WASPID)
-                End If
-            Next
-        Next
-        Return lloadingSegList
     End Function
 
     Private Function writeInpTFuncFile(ByRef aSW As IO.StreamWriter) As Boolean
@@ -1233,53 +1219,20 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpIcFile(ByRef aSW As IO.StreamWriter) As Boolean
-        'TODO: deal with this part later
-        aSW.WriteLine("    0               Number of Systems                             ICFILE")
+        aSW.WriteLine(WASPConstituents.Count.ToString.PadLeft(5) & "               Number of Systems                             ICFILE")
         aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & Space(15) & "Number of Segments")
+        For lIndex As Integer = 1 To WASPConstituents.Count
+            aSW.WriteLine("     Initial conditions for system" & lIndex.ToString.PadLeft(3) & " " & WASPConstituents(lIndex - 1))
+            aSW.WriteLine("    0               Solids Transport Field")
+            aSW.WriteLine("     1.000          Solids Density, g/mL")
+            aSW.WriteLine("     10000.0000     Maximum Allowed Concentration")
+            aSW.WriteLine("  Seg   Conc   DissF")
+            For lSegIndex As Integer = 1 To Segments.Count
+                aSW.WriteLine("   " & lSegIndex.ToString & "  0.000000  1.00000")
+            Next
+        Next
         aSW.Flush()
         Return True
-
-        'aSW.WriteLine("   16               Number of Systems                             ICFILE")
-        'aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & Space(15) & "Number of Segments")
-
-        ''TODO: Please use the following schemes to name the constituent's name or Type for load in put
-        'Dim lsystem(15) As String
-        'lsystem(0) = "IcAmmonia"
-        'lsystem(1) = "IcNitrate"
-        'lsystem(2) = "IcOrthophosphate"
-        'lsystem(3) = "IcPhytoplankton"
-        'lsystem(4) = "IcCBOD 1"
-        'lsystem(5) = "IcDissolved Oxygen"
-        'lsystem(6) = "IcOrganic Nitrogen"
-        'lsystem(7) = "IcOrganic Phosphorus"
-        'lsystem(8) = "IcSalinity"
-        'lsystem(9) = "Ic(not used)"
-        'lsystem(10) = "IcDetrital Carbon"
-        'lsystem(11) = "IcCBOD 2"
-        'lsystem(12) = "IcCBOD 3"
-        'lsystem(13) = "IcDetrital Nitrogen"
-        'lsystem(14) = "IcDetrital Phosphorus"
-        'lsystem(15) = "IcSolids"
-
-        ''Need 16 special timeseries to hold these cross-segment IC values
-        'For lsysCtr As Integer = 0 To lsystem.Length - 1
-        '    aSW.WriteLine("     Initial conditions for system  " & lsysCtr + 1 & lsystem(lsysCtr))
-        '    aSW.WriteLine("    0               Solids Transport Field") 'need a place to hold these
-        '    aSW.WriteLine("     1.000          Solids Density, g/mL") 'need a place to hold these
-        '    aSW.WriteLine("     10000.0000     Maximum Allowed Concentration") 'need a place to hold these
-        '    aSW.WriteLine("  Seg   Conc   DissF")
-
-        '    For lsegCtr As Integer = 0 To Segments.Count - 1
-        '        aSW.WriteLine(Space(3) & (lsegCtr + 1) & Space(2) & "0.00000" & Space(2) & "1.00000")
-        '    Next
-        'Next
-        'aSW.Flush()
-        'Return True
     End Function
 
-    Private Function findTS(ByVal aSystem As String) As atcWASPTimeseries
-        'Supposedly a function to get a particular TS
-        Dim lts As atcWASPTimeseries = Nothing
-        Return lts
-    End Function
 End Class

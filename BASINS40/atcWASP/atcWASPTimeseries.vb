@@ -42,6 +42,8 @@ Public Class atcWASPTimeseries
     Public DataSourceName As String
     Public LocationX As Double
     Public LocationY As Double
+    Public BoundaryOrLoad As String = ""
+    Public WASPSystem As String = ""
 
     Public Function TimeSeriesToString(ByVal aSJDate As Double, ByVal aEJDate As Double) As String
         Dim lMult As Double = 1.0
