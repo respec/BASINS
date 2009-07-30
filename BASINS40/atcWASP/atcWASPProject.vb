@@ -17,12 +17,10 @@ Public Class atcWASPProject
     Public SegmentFieldMap As New atcCollection
     Public WASPConstituents As New atcCollection
     Public WASPTimeFunctions As New atcCollection
+    Public WASPTimeFunctionIds As New atcCollection
 
     Public FlowStationCandidates As New atcWASPTimeseriesCollection
-    Public AirTempStationCandidates As New atcWASPTimeseriesCollection
-    Public SolRadStationCandidates As New atcWASPTimeseriesCollection
-    Public WindStationCandidates As New atcWASPTimeseriesCollection
-    Public WQStationCandidates As New atcWASPTimeseriesCollection
+    Public AllStationCandidates As New atcWASPTimeseriesCollection
 
     'the following are used in creating the wasp inp file
     Friend NumFlowFunc(5) As Integer
@@ -523,7 +521,7 @@ Public Class atcWASPProject
         End If
     End Sub
 
-    Public Sub RebuildTimeseriesCollections(ByVal aAirName As String, ByVal aSolarName As String, ByVal aWindName As String, _
+    Public Sub RebuildTimeseriesCollections(ByVal aGridTimeSource As atcGridSource, _
                                             ByVal aGridFlowSource As atcGridSource, ByVal aGridLoadSource As atcGridSource, ByVal aGridBoundSource As atcGridSource)
         'clear out collections of timeseries prior to rebuilding
         InputTimeseriesCollection.Clear()
@@ -550,9 +548,9 @@ Public Class atcWASPProject
                 End If
                 If aGridLoadSource.CellValue(lIndex, lColumn) <> "<none>" Then
                     If lKeyString.Length > 0 Then
-                        WQStationCandidates(lKeyString).BoundaryOrLoad = "Load"
-                        WQStationCandidates(lKeyString).WASPSystem = WASPConstituents(lColumn - 1)
-                        AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, Segments(lIndex - 1))
+                        AllStationCandidates(lKeyString).BoundaryOrLoad = "Load"
+                        AllStationCandidates(lKeyString).WASPSystem = WASPConstituents(lColumn - 1)
+                        AddSelectedTimeseriesToWASPSegment(lKeyString, AllStationCandidates, Me, Segments(lIndex - 1))
                     End If
                 End If
             Next
@@ -574,35 +572,28 @@ Public Class atcWASPProject
                     End If
                     If aGridBoundSource.CellValue(lRow, lColumn) <> "<none>" Then
                         If lKeyString.Length > 0 Then
-                            WQStationCandidates(lKeyString).BoundaryOrLoad = "Boundary"
-                            WQStationCandidates(lKeyString).WASPSystem = WASPConstituents(lColumn - 1)
-                            AddSelectedTimeseriesToWASPSegment(lKeyString, WQStationCandidates, Me, lSegment)
+                            AllStationCandidates(lKeyString).BoundaryOrLoad = "Boundary"
+                            AllStationCandidates(lKeyString).WASPSystem = WASPConstituents(lColumn - 1)
+                            AddSelectedTimeseriesToWASPSegment(lKeyString, AllStationCandidates, Me, lSegment)
                         End If
                     End If
                 Next
             End If
         Next
 
-        'met timeseries are not segment-specific
-        'air temp
-        If aAirName <> "<none>" Then
-            lKeyString = "ATMP:" & aAirName
-            AddSelectedTimeseriesToWASPProject(lKeyString, AirTempStationCandidates, Me)
-            lKeyString = "ATEM:" & aAirName
-            AddSelectedTimeseriesToWASPProject(lKeyString, AirTempStationCandidates, Me)
-        End If
-        'sol rad
-        If aSolarName <> "<none>" Then
-            lKeyString = "SOLR:" & aSolarName
-            AddSelectedTimeseriesToWASPProject(lKeyString, SolRadStationCandidates, Me)
-            lKeyString = "SOLRAD:" & aSolarName
-            AddSelectedTimeseriesToWASPProject(lKeyString, SolRadStationCandidates, Me)
-        End If
-        'wind 
-        If aWindName <> "<none>" Then
-            lKeyString = "WIND:" & aWindName
-            AddSelectedTimeseriesToWASPProject(lKeyString, WindStationCandidates, Me)
-        End If
+        'aGridTimeSource timeseries are not segment-specific
+        For lRow = 1 To aGridTimeSource.Rows - 1
+            If aGridTimeSource.CellValue(lRow, 1) <> "<none>" Then
+                'build key string, type is the first part before the colon.
+                Dim lColonPos As Integer = InStr(1, aGridTimeSource.CellValue(lRow, 1), ":")
+                If lColonPos > 0 Then
+                    lKeyString = Mid(aGridTimeSource.CellValue(lRow, 1), 1, lColonPos) & aGridTimeSource.CellValue(lRow, 1)
+                    AllStationCandidates(lKeyString).BoundaryOrLoad = "TimeFunction"
+                    AllStationCandidates(lKeyString).WASPSystem = WASPTimeFunctions(lRow - 1)
+                    AddSelectedTimeseriesToWASPProject(lKeyString, AllStationCandidates, Me)
+                End If
+            End If
+        Next
     End Sub
 
     Public Function IsBoundary(ByVal aSegment As atcWASPSegment) As Boolean
@@ -671,9 +662,9 @@ Public Class atcWASPProject
         If Segments.Count > 0 Then
             lXAvg = lXSum / Segments.Count
             lYAvg = lYSum / Segments.Count
-            aAirIndex = FindClosestMetStation(AirTempStationCandidates, lXAvg, lYAvg)
-            aSolarIndex = FindClosestMetStation(SolRadStationCandidates, lXAvg, lYAvg)
-            aWindIndex = FindClosestMetStation(WindStationCandidates, lXAvg, lYAvg)
+            aAirIndex = FindClosestMetStation(AllStationCandidates, lXAvg, lYAvg, "ATEM")
+            aSolarIndex = FindClosestMetStation(AllStationCandidates, lXAvg, lYAvg, "SOLR")
+            aWindIndex = FindClosestMetStation(AllStationCandidates, lXAvg, lYAvg, "WIND")
         Else
             aAirIndex = 0
             aSolarIndex = 0
@@ -681,7 +672,7 @@ Public Class atcWASPProject
         End If
     End Sub
 
-    Private Function FindClosestMetStation(ByVal aStationList As atcWASPTimeseriesCollection, ByVal aXAvg As Double, ByVal aYAvg As Double) As Integer
+    Private Function FindClosestMetStation(ByVal aStationList As atcWASPTimeseriesCollection, ByVal aXAvg As Double, ByVal aYAvg As Double, ByVal aConstit As String) As Integer
         'for each valid value, find distance
         Dim lShortestDistance As Double = 1.0E+28
         Dim lDistance As Double = 0.0
@@ -689,10 +680,12 @@ Public Class atcWASPProject
         Dim lStationIndex As Integer = 0
         For Each lStationCandidate As atcWASPTimeseries In aStationList
             lStationIndex += 1
-            lDistance = CalculateDistance(aXAvg, aYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
-            If lDistance < lShortestDistance Then
-                lShortestDistance = lDistance
-                lClosestIndex = lStationIndex
+            If lStationCandidate.Type = aConstit Then
+                lDistance = CalculateDistance(aXAvg, aYAvg, lStationCandidate.LocationX, lStationCandidate.LocationY)
+                If lDistance < lShortestDistance Then
+                    lShortestDistance = lDistance
+                    lClosestIndex = lStationIndex
+                End If
             End If
         Next
         Return lClosestIndex
@@ -714,7 +707,7 @@ Public Class atcWASPProject
 
         writeInpIntro(lSW)
         writeInpSegs(lSW)
-        writeInpPath(lSW) 'Debug to here
+        writeInpPath(lSW)
         writeInpFlowFile(lSW)
         writeInpDispFile(lSW)
         writeInpBoundFile(lSW)
@@ -1145,8 +1138,39 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpTFuncFile(ByRef aSW As IO.StreamWriter) As Boolean
-        'TODO: deal with this part later
-        aSW.WriteLine("    0               Number of Time Functions                      TFUNCFILE")
+        'figure out the number of time functions
+        Dim lTimeCount As Integer = 0
+        For Each lts As atcWASPTimeseries In Me.InputTimeseriesCollection
+            If lts.BoundaryOrLoad = "TimeFunction" Then
+                lTimeCount = lTimeCount + 1
+            End If
+        Next
+        aSW.WriteLine(lTimeCount.ToString.PadLeft(5) & Space(15) & "Number of Time Functions                      TFUNCFILE")
+        Dim lTimeFunctionId As Integer = 0
+        For Each lts As atcWASPTimeseries In Me.InputTimeseriesCollection
+            If lts.BoundaryOrLoad = "TimeFunction" Then
+                'look through time function names to find the associated id
+                For lIndex As Integer = 1 To WASPTimeFunctions.Count
+                    If WASPTimeFunctions(lIndex - 1) = lts.WASPSystem Then
+                        lTimeFunctionId = WASPTimeFunctionIds(lIndex - 1)
+                    End If
+                Next
+                aSW.WriteLine(lTimeFunctionId.ToString.PadLeft(5) & Space(15) & "Time Function ID Number")
+                aSW.WriteLine("  " & lts.WASPSystem)  'use to write time function name
+                Dim lValCount As Integer = 0
+                For lindex As Integer = 1 To lts.TimeSeries.Values.Length - 1
+                    If lts.TimeSeries.Dates.Values(lindex) >= SJDate And lts.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                        lValCount = lValCount + 1
+                    End If
+                Next
+                aSW.WriteLine(lValCount.ToString.PadLeft(5) & Space(15) & "Number of Time Pairs in Function")
+                For lindex As Integer = 1 To lts.TimeSeries.Values.Length - 1
+                    If lts.TimeSeries.Dates.Values(lindex) >= SJDate And lts.TimeSeries.Dates.Values(lindex) <= EJDate Then
+                        aSW.WriteLine(Space(3) & String.Format("{0:0.000}", lts.TimeSeries.Dates.Values(lindex) - SJDate) & Space(2) & String.Format("{0:0.000}", lts.TimeSeries.Values(lindex)))
+                    End If
+                Next
+            End If
+        Next
         aSW.Flush()
         Return True
     End Function
