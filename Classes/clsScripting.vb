@@ -127,6 +127,7 @@ Public Class Scripting
         Dim lSupportCode As String = ""
 
         aLanguage = GetLanguageFromFilename(aLanguage)
+
         Select Case aLanguage
             Case "cs"
                 provider = New Microsoft.CSharp.CSharpCodeProvider
@@ -240,9 +241,12 @@ Public Class Scripting
     End Function
 
     Public Shared Function GetLanguageFromFilename(ByVal aFilename As String) As String
+        'Paul Meems 3 aug 2009: Added, because somehow .cs wasn't changed in cs:
+        aFilename = aFilename.Trim(".")
+
         If aFilename.StartsWith(".") Then
             aFilename.Remove(0, 1)
         End If
-        Return aFilename.ToLower
+        Return aFilename.ToLower()
     End Function
 End Class
