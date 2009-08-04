@@ -1,5 +1,3 @@
-Imports System.Data.OleDb
-
 Partial Class SwatInput
     Private pSol As clsSol = New clsSol(Me)
     ReadOnly Property Sol() As clsSol

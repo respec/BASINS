@@ -75,8 +75,8 @@ Partial Class SwatInput
             Return pSwatInput.QueryGDB("SELECT * FROM " & pTableName & ";")
         End Function
 
-        Public Sub Add(ByVal aItem As clsChmItem)
-            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatInput)
+        Public Sub Add(ByVal aItem As clsPestItem)
+            ExecuteNonQuery(aItem.AddSQL, pSwatInput.CnSwatParm)
         End Sub
 
         Public Function FindPest(ByVal aPestName As String, Optional ByVal aTable As DataTable = Nothing) As clsPestItem
