@@ -155,7 +155,7 @@ Public Class atcTableFixedStreaming
             Else
                 'parse fields values from this record
                 With pFields(aFieldNumber)
-                    Return Mid(pDataString, .FieldStart, .FieldLength)
+                    Return TrimValue(Mid(pDataString, .FieldStart, .FieldLength), FieldType(aFieldNumber))
                 End With
                 'TODO: is substring faster than Mid?
                 'With pFields(i)

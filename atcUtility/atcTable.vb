@@ -174,6 +174,31 @@ Public MustInherit Class atcTable
     'C = Character, D = Date, N = Numeric, L = Logical, M = Memo
     Public MustOverride Property FieldType(ByVal aFieldNumber As Integer) As String Implements IatcTable.FieldType
 
+    ''' <summary>
+    ''' Trim leading and trailing spaces from value.
+    ''' If numeric, also trim trailing zeroes after decimal point and trailing decimal point
+    ''' </summary>
+    ''' <param name="aValue">Value to be trimmed</param>
+    ''' <param name="aType">Type character, N = Numeric</param>
+    Public Overridable Function TrimValue(ByVal aValue As String, ByVal aType As String) As String
+        If aValue Is Nothing Then Return ""
+        If aType = "N" Then
+            aValue = aValue.Trim
+            Dim lDecimalPos As Integer = aValue.IndexOf("."c)
+            Select Case lDecimalPos
+                Case -1 'No decimal, no need to trim trailing zeroes
+                Case 0 'Decimal is first character, trim trailing zeroes
+                    aValue = aValue.TrimEnd("0"c)
+                    If aValue.Length = 1 Then aValue = "0"
+                Case Else 'Decimal is after first character, trim trailing zeroes and decimal
+                    aValue = aValue.TrimEnd("0"c, "."c)
+            End Select
+        Else
+            aValue = aValue.Trim
+        End If
+        Return aValue
+    End Function
+
     'The name of the file used to populate the table
     'File is read by OpenFile and written by WriteFile
     Public Overridable Property FileName() As String Implements IatcTable.FileName
@@ -331,8 +356,9 @@ Public MustInherit Class atcTable
         Else
             If aEndRecord < 1 Then aEndRecord = NumRecords
             CurrentRecord = aStartRecord
+            aFindValue = TrimValue(aFindValue, FieldType(aFieldNumber))
             While CurrentRecord <= aEndRecord
-                If Trim(Value(aFieldNumber)) = Trim(aFindValue) Then
+                If Value(aFieldNumber) = aFindValue Then
                     Return True
                 End If
                 If CurrentRecord < aEndRecord Then
