@@ -160,7 +160,7 @@ Public Class atcTableFixed
             ElseIf aFieldNumber > pNumFields Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
             Else
-                Return pData(aFieldNumber)
+                Return TrimValue(pData(aFieldNumber), FieldType(aFieldNumber))
             End If
         End Get
         Set(ByVal newValue As String)

@@ -35,7 +35,7 @@ TestFileName:
             If FileExists(lFileName) Then
                 lShortFileName = ConvertLongPathToShort(lFileName)
             Else
-                lShortFileName = ConvertLongPathToShort(PathNameOnly(lFileName)) & "\" & FilenameNoPath(lFileName)
+                lShortFileName = ConvertLongPathToShort(PathNameOnly(lFileName)) & g_PathChar & FilenameNoPath(lFileName)
             End If
 
             If lShortFileName.Length > pMaxFileNameLength Then

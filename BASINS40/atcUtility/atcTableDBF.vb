@@ -494,7 +494,6 @@ AllKeys:
         End Set
     End Property
 
-
     Public Overrides Property Value(ByVal aFieldNumber As Integer) As String
         Get
             If pCurrentRecord < 1 Or pCurrentRecord > pHeader.NumRecs Then
@@ -512,15 +511,7 @@ AllKeys:
                         Exit For
                     End If
                 Next
-                Return Trim(strRet)
-                '    If pFields(aFieldNumber).FieldType = "N" Then
-                '      Dim dblval As Double
-                '      dblval = CDbl(strRet)
-                '      If pFields(aFieldNumber).DecimalCount <> 0 Then
-                '        dblval = dblval * 10 ^ pFields(aFieldNumber).DecimalCount
-                '      End If
-                '      Value = dblval
-                '    End If
+                Return TrimValue(strRet, FieldType(aFieldNumber))
             End If
         End Get
         Set(ByVal Value As String)

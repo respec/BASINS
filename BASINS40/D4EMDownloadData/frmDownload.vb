@@ -50,7 +50,8 @@ Public Class frmDownload
             chkMerge.Checked = True
         End If
 
-        Me.SetCheckboxVisibilityFromMap()
+        SetCheckboxVisibilityFromMap()
+        SetColorsFromAvailability()
 
         Do
             Me.ShowDialog()
@@ -201,6 +202,55 @@ Public Class frmDownload
             chkNWIS_GetNWISDischarge.Visible = False
             chkNWIS_GetNWISMeasurements.Visible = False
             chkNWIS_GetNWISWQ.Visible = False
+        End If
+    End Sub
+
+    Private Sub SetColorsFromAvailability()
+        Dim lStatusFilename As String = IO.Path.Combine(IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.MyDocuments, "BASINS"), "status.html")
+        If IO.File.Exists(lStatusFilename) Then
+            Dim lColor As Drawing.Color
+            Dim lGoodColor As Drawing.Color = Drawing.Color.FromArgb(255, 140, 216, 140)
+            Dim lBadColor As Drawing.Color = Drawing.Color.FromArgb(255, 206, 150, 150)
+            For Each lStatusLine As String In IO.File.ReadAllLines(lStatusFilename)
+                If lStatusLine.StartsWith("<tr><td>") Then
+                    Dim lDataType As String = lStatusLine.Substring(8)
+                    Dim lEndField As Integer = lDataType.IndexOf("<")
+                    lDataType = lDataType.Substring(0, lEndField)
+                    If lStatusLine.Contains("a href") Then
+                        lColor = lBadColor
+                    Else
+                        lColor = lGoodColor
+                    End If
+                    Select Case lDataType
+                        Case "BASINS.303d" : chkBASINS_303d.BackColor = lColor
+                        Case "BASINS.Census" : chkBASINS_Census.BackColor = lColor
+                        Case "BASINS.DEM" : chkBASINS_DEM.BackColor = lColor
+                        Case "BASINS.DEMG" : chkBASINS_DEMG.BackColor = lColor
+                        Case "BASINS.GIRAS" : chkBASINS_GIRAS.BackColor = lColor
+                        Case "BASINS.LSTORET" : chkBASINS_LSTORET.BackColor = lColor
+                        Case "BASINS.MetStations" : chkBASINS_MetStations.BackColor = lColor
+                        Case "BASINS.MetData" : chkBASINS_MetData.BackColor = lColor
+                        Case "BASINS.NED" : chkBASINS_NED.BackColor = lColor
+                        Case "BASINS.NHD" : chkBASINS_NHD.BackColor = lColor
+                        Case "NHDPlus.All" : grpNHDplus.BackColor = lColor
+                        Case "NWIS.DischargeStations" : chkNWISStations_discharge.BackColor = lColor
+                        Case "NWIS.WaterQualityStations" : chkNWISStations_qw.BackColor = lColor
+                        Case "NWIS.MeasurementStations" : chkNWISStations_measurement.BackColor = lColor
+                        Case "NWIS.GroundwaterStations" : chkNWISStations_gw.BackColor = lColor
+                        Case "NWIS.DischargeData" : chkNWIS_GetNWISDischarge.BackColor = lColor
+                        Case "NWIS.WaterQualityData" : chkNWIS_GetNWISWQ.BackColor = lColor
+                        Case "NWIS.MeasurementData" : chkNWIS_GetNWISMeasurements.BackColor = lColor
+                        Case "Seamless.NLCD1992LandCover" : chkNLCD2001_1992.BackColor = lColor
+                        Case "Seamless.NLCD2001Canopy" : chkNLCD2001_Canopy.BackColor = lColor
+                        Case "Seamless.NLCD2001Impervious" : chkNLCD2001_Impervious.BackColor = lColor
+                        Case "Seamless.NLCD2001LandCover" : chkNLCD2001_LandCover.BackColor = lColor
+                        Case "STORET.Stations" : chkSTORET_Stations.BackColor = lColor
+                        Case "STORET.Data" : chkSTORET_Results.BackColor = lColor
+                        Case Else
+                            Debug.WriteLine("Case """ & lDataType & """ : chk" & lDataType.Replace(".", "_") & ".BackColor = lColor")
+                    End Select
+                End If
+            Next
         End If
     End Sub
 

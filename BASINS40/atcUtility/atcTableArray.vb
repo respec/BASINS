@@ -167,8 +167,7 @@ Public Class atcTableArray
             ElseIf aFieldNumber > pNumFields Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
             Else
-                Value = pRecords(pCurrentRecord - 1)(aFieldNumber - 1)
-                If Value Is Nothing Then Value = ""
+                Return TrimValue(pRecords(pCurrentRecord - 1)(aFieldNumber - 1), FieldType(aFieldNumber))
             End If
         End Get
         Set(ByVal newValue As String)
