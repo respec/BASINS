@@ -6,7 +6,7 @@ Public Module modLaunch
                                   ByVal aWorkingDirectory As String, _
                          Optional ByVal aArguments As String = "", _
                          Optional ByVal aWait As Boolean = True) As Integer
-        Logger.Dbg("Start " & aExeName & " in " & aWorkingDirectory)
+        Logger.Dbg("LaunchProgram " & aExeName & " in " & aWorkingDirectory)
         Dim lExitCode As Integer = 0
         Try
             Dim lProcess As New System.Diagnostics.Process
@@ -24,21 +24,21 @@ Public Module modLaunch
             lProcess.Start()
             lProcess.BeginErrorReadLine()
             lProcess.BeginOutputReadLine()
+            If aWait Then
 KeepWaiting:
-            Try
-                If aWait Then
+                Try
                     lProcess.WaitForExit()
                     lExitCode = lProcess.ExitCode
-                End If
-            Catch lWaitError As Exception
-                Logger.Dbg(lWaitError.Message)
-            End Try
-            If Not lProcess.HasExited Then GoTo KeepWaiting
+                Catch lWaitError As Exception
+                    Logger.Dbg(lWaitError.Message)
+                End Try
+                If Not lProcess.HasExited Then GoTo KeepWaiting
+                Logger.Dbg("LaunchProgram: " & aExeName & ": Exit code " & lExitCode)
+            End If
         Catch lEx As ApplicationException
-            Logger.Dbg("Problem " & lEx.Message)
+            Logger.Dbg("LaunchProgram: " & aExeName & ": Exception: " & lEx.Message)
             lExitCode = -1
         End Try
-        Logger.Dbg("Done " & lExitCode)
         Return lExitCode
     End Function
 
