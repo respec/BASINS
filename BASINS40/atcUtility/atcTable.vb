@@ -187,11 +187,11 @@ Public MustInherit Class atcTable
             Dim lDecimalPos As Integer = aValue.IndexOf("."c)
             Select Case lDecimalPos
                 Case -1 'No decimal, no need to trim trailing zeroes
-                Case 0 'Decimal is first character, trim trailing zeroes
+                Case 0 'Decimal is first character, trim trailing zeroes, change lone decimal point to 0 if needed
                     aValue = aValue.TrimEnd("0"c)
                     If aValue.Length = 1 Then aValue = "0"
-                Case Else 'Decimal is after first character, trim trailing zeroes and decimal
-                    aValue = aValue.TrimEnd("0"c, "."c)
+                Case Else 'Decimal is after first character, trim trailing zeroes, trim decimal if it is then last
+                    aValue = aValue.TrimEnd("0"c).TrimEnd("."c)
             End Select
         Else
             aValue = aValue.Trim
