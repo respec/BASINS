@@ -16,17 +16,17 @@ Module modFreq
                                                ByRef LOGARH As Integer, _
                                                ByRef ILH As Integer, _
                                                ByRef DBG As Boolean, _
-                                               ByRef SE As Single, _
-                                               ByRef C As Single, _
-                                               ByRef CCPA As Single, _
-                                               ByRef P As Single, _
-                                               ByRef Q As Single, _
-                                               ByRef ADP As Single, _
-                                               ByRef QNEW As Single, _
-                                               ByRef RI As Single, _
-                                               ByRef RSOUT As Single, _
+                                               ByVal SE() As Single, _
+                                               ByVal C() As Single, _
+                                               ByVal CCPA() As Single, _
+                                               ByVal P() As Single, _
+                                               ByVal Q() As Single, _
+                                               ByVal ADP() As Single, _
+                                               ByVal QNEW() As Single, _
+                                               ByVal RI() As Single, _
+                                               ByVal RSOUT() As Single, _
                                                ByRef RETCOD As Integer)
-    Private Declare Sub KENT Lib "usgs_swstats.dll" (ByRef X As Single, _
+    Private Declare Sub KENT Lib "usgs_swstats.dll" (ByVal X() As Single, _
                                               ByRef N As Integer, _
                                               ByRef TAU As Single, _
                                               ByRef PLEVEL As Single, _
@@ -53,7 +53,7 @@ Module modFreq
                 End If
             Next
             Try
-                KENT(lQ(0), lN, lTau, lLevel, lSlope)
+                KENT(lQ, lN, lTau, lLevel, lSlope)
             Catch ex As Exception
                 If pWarned Then
                     Logger.Dbg("Could not compute Kendall Tau: " & ex.Message)
@@ -135,8 +135,8 @@ Module modFreq
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe(0), _
-                       lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
+                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe, _
+                       lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lRetcod)
                 Dim lMsg As String = ""
 
                 Dim lNday As Integer = aTs.Attributes.GetValue("NDay")
