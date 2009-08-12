@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Basic Express 2008
+# Visual Studio 2008
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility", "atcUtility\atcUtility.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcData", "atcData\atcData.vbproj", "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
@@ -92,8 +92,6 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesRDB", "atcTime
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNWISDataExtension", "..\D4EM\DataManager\NWISDataExtension\BASINS-D4EMNWISDataExtension.vbproj", "{A97D1620-BFDE-4733-B2DC-10F32323DF8E}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMSTORETDataExtension", "..\D4EM\DataManager\STORETDataExtension\BASINS-D4EMSTORETDataExtension.vbproj", "{1728A320-3935-4DBC-B62F-EF79669D1007}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNLCD2001", "..\D4EM\DataManager\NLCD2001DataExtension\BASINS-D4EMNLCD2001.vbproj", "{3C3FF908-D16B-4866-9CF1-8A31D1B72F58}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcWASP", "atcWASP\atcWASP.vbproj", "{74201F53-B122-40F0-9678-1DCDC45E99BC}"
@@ -105,6 +103,10 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSWMMPlugIn", "atcSWMMPlugIn\atcSWMMPlugIn.vbproj", "{CF2F19C1-7495-472C-B065-1C4DBE25107E}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HTMLBuilder", "atcSediment\HTMLBuilder\HTMLBuilder.vbproj", "{6EA9D463-E649-4371-ADD3-80D2216C189B}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesSWAT", "atcTimeseriesSWAT\atcTimeseriesSWAT.vbproj", "{8157C92A-68A6-498D-84B7-EF2A299AB7BA}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesD4EM", "atcTimeseriesD4EM\atcTimeseriesD4EM.vbproj", "{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -295,10 +297,6 @@ Global
 		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1728A320-3935-4DBC-B62F-EF79669D1007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1728A320-3935-4DBC-B62F-EF79669D1007}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1728A320-3935-4DBC-B62F-EF79669D1007}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1728A320-3935-4DBC-B62F-EF79669D1007}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C3FF908-D16B-4866-9CF1-8A31D1B72F58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C3FF908-D16B-4866-9CF1-8A31D1B72F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C3FF908-D16B-4866-9CF1-8A31D1B72F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -323,6 +321,14 @@ Global
 		{6EA9D463-E649-4371-ADD3-80D2216C189B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EA9D463-E649-4371-ADD3-80D2216C189B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EA9D463-E649-4371-ADD3-80D2216C189B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8157C92A-68A6-498D-84B7-EF2A299AB7BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8157C92A-68A6-498D-84B7-EF2A299AB7BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8157C92A-68A6-498D-84B7-EF2A299AB7BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8157C92A-68A6-498D-84B7-EF2A299AB7BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
