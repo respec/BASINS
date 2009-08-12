@@ -1,15 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EBAB4B57-1E71-4C28-BF3E-FA3E16D296DF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>atcLookup</RootNamespace>
     <AssemblyName>atcLookup</AssemblyName>
     <MyType>Windows</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +36,11 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MapWindow.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=14ba77d91dae5597, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWindow.Interfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.3.2546.39068, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>

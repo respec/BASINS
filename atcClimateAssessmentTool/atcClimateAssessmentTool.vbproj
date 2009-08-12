@@ -1,7 +1,7 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{F40002FE-5698-4767-8198-997EE31A96A0}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -29,6 +29,8 @@
     <MyType>Windows</MyType>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
@@ -81,6 +83,7 @@
     <Reference Include="SwatObject, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SwatObject\bin\Debug\SwatObject.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -160,9 +163,8 @@
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
-      <Name>atcWDM</Name>
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Name>atcWDM</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

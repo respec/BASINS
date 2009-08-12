@@ -1,8 +1,8 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <MyType>Windows</MyType>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -18,6 +18,10 @@
     <RootNamespace>atcUCI</RootNamespace>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
@@ -44,17 +48,7 @@
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
-      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
-      <Name>atcWDM</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <Reference Include="MapWinInterfaces, Version=4.2.2439.23261, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MapWinUtility, Version=1.0.2442.22516, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinUtility, Version=1.0.3346.16376, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
       <Private>False</Private>
@@ -254,6 +248,11 @@
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
+      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
+      <Name>atcWDM</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

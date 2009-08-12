@@ -30,6 +30,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
@@ -70,9 +71,6 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="atcUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Interop.MapWinGIS">
       <Name>Interop.MapWinGIS</Name>
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
@@ -87,8 +85,9 @@
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=1.0.3433.28607, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
@@ -98,6 +97,12 @@
       <Name>System.Drawing</Name>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
+      <Name>atcUtility</Name>
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />

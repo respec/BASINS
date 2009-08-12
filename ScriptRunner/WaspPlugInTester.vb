@@ -32,11 +32,11 @@ Module WaspPlugInTester
             .SJDate = Jday(2000, 1, 1, 0, 0, 0)
             .EJDate = Jday(2000, 12, 31, 0, 0, 0)
 
-            .GenerateSegments(lSegmentLayerIndex, pMaxTravelTime, pMinTravelTime)
+            '.GenerateSegments(lSegmentLayerIndex, pMaxTravelTime, pMinTravelTime)
             .Save("Junk" & pMinTravelTime & ".txt")
 
             pMinTravelTime = 0.05
-            .GenerateSegments(lSegmentLayerIndex, pMaxTravelTime, pMinTravelTime)
+            '.GenerateSegments(lSegmentLayerIndex, pMaxTravelTime, pMinTravelTime)
             .Save("Junk" & pMinTravelTime & ".txt")
         End With
     End Sub
