@@ -174,11 +174,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
-      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
-      <Name>atcMwGisUtility</Name>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="HTMLBuilder\HTMLBuilder.vbproj">
       <Project>{6EA9D463-E649-4371-ADD3-80D2216C189B}</Project>
       <Name>HTMLBuilder</Name>
