@@ -32,12 +32,18 @@ Module Vb2F90
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, ByRef aMsgUnit As Integer, _
          ByRef aSaind As Integer, ByRef aSalen As Integer, ByRef aVal As Single, _
          ByRef aRetcod As Integer)
+    'Declare Sub F90_WDSAGY Lib "hass_ent.dll" _
+    '    (ByRef aWdmUnit As Integer, ByRef aSaind As Integer, _
+    '     ByRef aLen As Integer, ByRef aType As Integer, _
+    '     ByRef aMin As Single, ByRef aMax As Single, ByRef aDef As Single, _
+    '     ByRef aHLen As Integer, ByRef aHRec As Integer, ByRef aHPos As Integer, _
+    '     ByRef aVLen As Integer, ByVal aIName As String[6], ByVal aIDesc As String, ByVal aIValid As String)
     Declare Sub F90_WDSAGY_XX Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aSaind As Integer, _
          ByRef aLen As Integer, ByRef aType As Integer, _
          ByRef aMin As Single, ByRef aMax As Single, ByRef aDef As Single, _
          ByRef aHLen As Integer, ByRef aHRec As Integer, ByRef aHPos As Integer, _
-         ByRef aVLen As Integer, ByRef aIName As Integer, ByRef aIDesc As Integer, ByRef aIValid As Integer)
+         ByRef aVLen As Integer, ByVal aIName() As Integer, ByVal aIDesc() As Integer, ByVal aIValid() As Integer)
 
     'adwdm:wdmess
     Declare Sub F90_WDLBAX Lib "hass_ent.dll" _
@@ -51,7 +57,7 @@ Module Vb2F90
     Declare Sub F90_GETATT Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
          ByRef aInit As Integer, _
-         ByRef aSaInd As Integer, ByRef aSaVal As Integer)
+         ByRef aSaInd As Integer, ByVal aSaVal() As Integer)
 
     'wdm:wdbtch
     Declare Sub F90_WDBSGI Lib "hass_ent.dll" _
@@ -68,7 +74,7 @@ Module Vb2F90
     Declare Sub F90_WDBSGC_XX Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
          ByRef aSaInd As Integer, ByRef aSaLen As Integer, _
-         ByRef aISaVal As Integer)
+         ByVal aISaVal() As Integer)
     Declare Sub F90_WDLBAD Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
          ByRef aDsType As Integer, ByRef aPsa As Integer)
@@ -84,20 +90,20 @@ Module Vb2F90
     'wdm:wdtms1
     Declare Sub F90_WDTGET Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
-         ByRef aDelt As Integer, ByRef aDates As Integer, ByRef aNval As Integer, _
+         ByRef aDelt As Integer, ByVal aDates() As Integer, ByRef aNval As Integer, _
          ByRef aDtran As Integer, ByRef aQualfg As Integer, ByRef aTunits As Integer, _
-         ByRef aRVal As Single, ByRef aRetcod As Integer)
+         ByVal aRVal() As Single, ByRef aRetcod As Integer)
     Declare Sub F90_WDTPUT Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
-         ByRef aDelt As Integer, ByRef aDates As Integer, ByRef aNval As Integer, _
+         ByRef aDelt As Integer, ByVal aDates() As Integer, ByRef aNval As Integer, _
          ByRef aDtran As Integer, ByRef aQualfg As Integer, ByRef aTunits As Integer, _
-         ByRef aRVal As Single, ByRef aRetcod As Integer)
+         ByVal aRVal() As Single, ByRef aRetcod As Integer)
 
     'wdm:wdtms2
     Declare Sub F90_WTFNDT Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
          ByRef aGpflg As Integer, ByRef aTdsfrc As Integer, _
-         ByRef aSDate As Integer, ByRef aEDate As Integer, _
+         ByVal aSDate() As Integer, ByVal aEDate() As Integer, _
          ByRef aRetcod As Integer)
 
     Public Sub F90_WDBSGC(ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
@@ -105,7 +111,7 @@ Module Vb2F90
                           ByRef aSaVal As String)
         Dim lVal(80) As Integer
 
-        F90_WDBSGC_XX(aWdmUnit, aDsn, aSaInd, aSaLen, lVal(0))
+        F90_WDBSGC_XX(aWdmUnit, aDsn, aSaInd, aSaLen, lVal)
         NumChr(aSaLen, lVal, aSaVal)
         aSaVal = aSaVal.Trim
     End Sub
@@ -132,7 +138,7 @@ Module Vb2F90
                       aLen, aType, _
                       aMin, aMax, aDef, _
                       aHLen, aHRec, aHPos, _
-                      aVLen, lName(0), lDesc(0), lValid(0))
+                      aVLen, lName, lDesc, lValid)
         NumChr(6, lName, aName)
         NumChr(47, lDesc, aDesc)
         NumChr(aVLen, lValid, aValid)
