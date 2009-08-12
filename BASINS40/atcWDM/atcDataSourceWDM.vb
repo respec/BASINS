@@ -342,7 +342,7 @@ CaseExistRenumber:
                 For i As Integer = 1 To lNvals
                     lValue = lTimser.Value(i)
                     If Double.IsNaN(lValue) Then lValue = lTSFill
-                    lV(i) = lValue
+                    lV(i - 1) = lValue
                 Next
 
                 J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
@@ -350,7 +350,8 @@ CaseExistRenumber:
                 '            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
                 '            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
                 If lNvals > 0 Then
-                    F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+                    'F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+                    F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat, lNvals, CInt(1), CInt(0), lTu, lV, lRet)
                 End If
                 If Not lTimserConst Is Nothing Then
                     lTimserConst.Clear() 'TODO: maybe just part?
@@ -816,8 +817,10 @@ CaseExistRenumber:
                             Dim lTimeUnits As Integer = CInt(.GetValue("tu", 0))
                             Dim lTran As Integer = 0 'transformation = aver,same
                             Dim lQual As Integer = 31 'allowed quality code
-                            F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat(0), nVals, _
-                                       lTran, lQual, lTimeUnits, lV(1), lRetcod)
+                            'F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat(0), nVals, _
+                            '           lTran, lQual, lTimeUnits, lV(1), lRetcod)
+                            F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat, nVals, _
+                                       lTran, lQual, lTimeUnits, lV, lRetcod)
                             If lRetcod <> 0 Then
                                 Logger.Dbg("FailedToReadDataFor " & lDsn & " with code " & lRetcod)
                             End If
@@ -835,10 +838,10 @@ CaseExistRenumber:
                             Dim lInterval As Double = .GetValue("interval", 0)
                             Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
                             For iVal As Integer = 1 To nVals
-                                If Math.Abs((lV(iVal) - lTsFill)) < 1.0E-20 Then 'pEpsilon Then
+                                If Math.Abs((lV(iVal - 1) - lTsFill)) < 1.0E-20 Then 'pEpsilon Then
                                     lVd(iVal) = pNan
                                 Else
-                                    lVd(iVal) = lV(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                                    lVd(iVal) = lV(iVal - 1) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
                                 End If
                                 If lConstInterval Then
                                     lJd(iVal) = lSJDay + iVal * lInterval
@@ -886,7 +889,7 @@ CaseExistRenumber:
         Do
             Dim lSaind As Integer
             Dim lSaval(256) As Integer
-            F90_GETATT(aFileUnit, aDsn, lInit, lSaind, lSaval(0))
+            F90_GETATT(aFileUnit, aDsn, lInit, lSaind, lSaval)
             If lSaind > 0 Then 'process attribute
                 If Not (AttrStored(lSaind)) Then
                     Try
@@ -986,7 +989,7 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
         If Not pQuick Then 'get start and end dates for each data set
             Dim lGpFlg As Integer = 1
             Dim lDsfrc As Integer
-            F90_WTFNDT(aFileUnit, lDsn, lGpFlg, lDsfrc, lSdat(0), lEdat(0), lRetcod)
+            F90_WTFNDT(aFileUnit, lDsn, lGpFlg, lDsfrc, lSdat, lEdat, lRetcod)
             If lSdat(0) > 0 Then
                 Dim lDates As atcTimeseries = aDataset.Dates
                 Dim lSJDay As Double = Date2J(lSdat)
