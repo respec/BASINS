@@ -35,6 +35,8 @@ Public Class frmManDelin
     Friend WithEvents cmdDelineate As System.Windows.Forms.Button
     Friend WithEvents cbxCombine As System.Windows.Forms.CheckBox
     Friend WithEvents cmdCombine As System.Windows.Forms.Button
+    Friend WithEvents cboUnits As System.Windows.Forms.ComboBox
+    Friend WithEvents Label4 As System.Windows.Forms.Label
     Dim pPrevHandle As Integer
 
 #Region " Windows Form Designer generated code "
@@ -92,6 +94,8 @@ Public Class frmManDelin
         Me.cmdCommit = New System.Windows.Forms.Button
         Me.cboLayer = New System.Windows.Forms.ComboBox
         Me.Label1 = New System.Windows.Forms.Label
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.cboUnits = New System.Windows.Forms.ComboBox
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -103,7 +107,7 @@ Public Class frmManDelin
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdClose.Location = New System.Drawing.Point(159, 482)
+        Me.cmdClose.Location = New System.Drawing.Point(159, 514)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(104, 25)
         Me.cmdClose.TabIndex = 0
@@ -120,7 +124,7 @@ Public Class frmManDelin
         Me.GroupBox1.Controls.Add(Me.cboReach)
         Me.GroupBox1.Controls.Add(Me.Label3)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(2, 326)
+        Me.GroupBox1.Location = New System.Drawing.Point(2, 358)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(423, 150)
         Me.GroupBox1.TabIndex = 17
@@ -192,6 +196,8 @@ Public Class frmManDelin
         '
         Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox2.Controls.Add(Me.cboUnits)
+        Me.GroupBox2.Controls.Add(Me.Label4)
         Me.GroupBox2.Controls.Add(Me.lblCalc)
         Me.GroupBox2.Controls.Add(Me.cmdCalculate)
         Me.GroupBox2.Controls.Add(Me.cboDEM)
@@ -199,7 +205,7 @@ Public Class frmManDelin
         Me.GroupBox2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox2.Location = New System.Drawing.Point(2, 205)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(423, 115)
+        Me.GroupBox2.Size = New System.Drawing.Size(423, 147)
         Me.GroupBox2.TabIndex = 18
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Subbasin Parameters"
@@ -208,7 +214,7 @@ Public Class frmManDelin
         '
         Me.lblCalc.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblCalc.Location = New System.Drawing.Point(176, 58)
+        Me.lblCalc.Location = New System.Drawing.Point(175, 95)
         Me.lblCalc.Name = "lblCalc"
         Me.lblCalc.Size = New System.Drawing.Size(238, 46)
         Me.lblCalc.TabIndex = 16
@@ -218,7 +224,7 @@ Public Class frmManDelin
         'cmdCalculate
         '
         Me.cmdCalculate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCalculate.Location = New System.Drawing.Point(6, 58)
+        Me.cmdCalculate.Location = New System.Drawing.Point(6, 95)
         Me.cmdCalculate.Name = "cmdCalculate"
         Me.cmdCalculate.Size = New System.Drawing.Size(163, 46)
         Me.cmdCalculate.TabIndex = 15
@@ -340,10 +346,32 @@ Public Class frmManDelin
         Me.Label1.Text = "Subbasin Layer:"
         Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(156, 65)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(95, 17)
+        Me.Label4.TabIndex = 17
+        Me.Label4.Text = "Vertical Units:"
+        Me.Label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboUnits
+        '
+        Me.cboUnits.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboUnits.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboUnits.Location = New System.Drawing.Point(257, 62)
+        Me.cboUnits.Name = "cboUnits"
+        Me.cboUnits.Size = New System.Drawing.Size(125, 25)
+        Me.cboUnits.TabIndex = 18
+        '
         'frmManDelin
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(429, 510)
+        Me.ClientSize = New System.Drawing.Size(429, 542)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
@@ -395,17 +423,21 @@ Public Class frmManDelin
             cboLayer.SelectedIndex = cboLayer.Items.IndexOf("Cataloging Unit Boundaries")
         End If
 
+        'fill choices of units
+        cboUnits.Items.Add("Feet")
+        cboUnits.Items.Add("Meters")
+        cboUnits.Items.Add("Centimeters")
         'set dem layer
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
                 cboDEM.Items.Add(lLayerName)
-                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
+                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 And cboDEM.SelectedIndex = -1 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then
                 cboDEM.Items.Add(lLayerName)
-                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Then
+                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Or GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                 ElseIf GisUtil.LayerFileName(lLayerIndex).IndexOf("\ned\") >= 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
@@ -634,6 +666,14 @@ Public Class frmManDelin
             Else
                 cmdDefine.Enabled = True
             End If
+            'default units 
+            Dim lElevationThemeName As String = cboDEM.Items(cboDEM.SelectedIndex)
+            Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(lElevationThemeName)
+            If (GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\ned\") > -1 Or GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\elev_cm") > -1) Then
+                cboUnits.SelectedIndex = 2
+            Else
+                cboUnits.SelectedIndex = 1
+            End If
         End If
     End Sub
 
@@ -645,8 +685,9 @@ Public Class frmManDelin
         If cboLayer.SelectedIndex > -1 Then
             Dim lSubbasinThemeName As String = cboLayer.Items(cboLayer.SelectedIndex)
             Dim lElevationThemeName As String = cboDEM.Items(cboDEM.SelectedIndex)
+            Dim lElevationUnitsName As String = cboUnits.Items(cboUnits.SelectedIndex)
             pProgressStatus.ProgressLabel = lblCalc
-            CalculateSubbasinParameters(lSubbasinThemeName, lElevationThemeName)
+            CalculateSubbasinParameters(lSubbasinThemeName, lElevationThemeName, lElevationUnitsName)
         Else
             Logger.Msg("No Subbasin Layer to Calculate Paramters for")
         End If
@@ -665,8 +706,9 @@ Public Class frmManDelin
         End If
 
         Dim lOutletShapeFileName As String = ""
+        Dim lElevationUnitsName As String = cboUnits.Items(cboUnits.SelectedIndex)
         CalculateReaches(lSubbasinThemeName, lReachThemeName, cboDEM.Items(cboDEM.SelectedIndex), _
-                         cbxPCS.Checked, cbxCombine.Checked, lOutletShapeFileName)
+                         cbxPCS.Checked, cbxCombine.Checked, lOutletShapeFileName, lElevationUnitsName)
 
         'add outlets layer to the map
         If GisUtil.IsLayer("Outlets") Then

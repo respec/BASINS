@@ -169,9 +169,8 @@ Module modCreateUci
                         lTable = lOperation.Tables.Item("GEN-INFO")
                         lTable.Parms("LSID").Value = lLandUse.Description
                         lTable = lOperation.Tables.Item("PWAT-PARM2")
-                        If lLandUse.Slope > 0 Then
-                            lTable.Parms("SLSUR").Value = lLandUse.Slope
-                        Else
+                        lTable.Parms("SLSUR").Value = SignificantDigits(CompositeSlope(lLandUse.Reach.SegmentId, pWatershed.LandUses), 3)
+                        If lLandUse.Slope <= 0 Then
                             lTable.Parms("SLSUR").Value = 0.001 'must have some slope
                         End If
                         lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value) 'default lsur based on slsur
@@ -190,9 +189,8 @@ Module modCreateUci
                         lTable = lOperation.Tables.Item("GEN-INFO")
                         lTable.Parms("LSID").Value = lLandUse.Description
                         lTable = lOperation.Tables.Item("IWAT-PARM2")
-                        If lLandUse.Slope > 0 Then
-                            lTable.Parms("SLSUR").Value = lLandUse.Slope
-                        Else
+                        lTable.Parms("SLSUR").Value = SignificantDigits(CompositeSlope(lLandUse.Reach.SegmentId, pWatershed.LandUses), 3)
+                        If lLandUse.Slope <= 0 Then
                             lTable.Parms("SLSUR").Value = 0.001 'must have some slope
                         End If
                         lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value) 'default lsur based on slsur
@@ -236,6 +234,27 @@ Module modCreateUci
                                              pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Width / 43560 * 0.75)
         Next lOperation
     End Sub
+
+    Private Function CompositeSlope(ByVal aSegmentId As Integer, ByVal aLandUses As LandUses) As Single
+        'look through all landuses of this model segment, compute composite slope 
+        Dim lCompositeSlope As Single = 0.0
+
+        Dim lTotalArea As Single = 0.0
+        Dim lTotalSlopeTimesArea As Single = 0.0
+
+        For Each lLanduse As LandUse In aLandUses
+            If lLanduse.Reach.SegmentId = aSegmentId Then
+                lTotalArea = lTotalArea + lLanduse.Area
+                lTotalSlopeTimesArea = lTotalSlopeTimesArea + (lLanduse.Area * lLanduse.Slope)
+            End If
+        Next
+
+        If lTotalArea > 0 Then
+            lCompositeSlope = lTotalSlopeTimesArea / lTotalArea
+        End If
+
+        Return lCompositeSlope
+    End Function
 
     Private Sub CreateMassLinks(ByRef aUci As HspfUci)
         Dim lMassLink As HspfMassLink
