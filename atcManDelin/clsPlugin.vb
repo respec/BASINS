@@ -157,7 +157,8 @@ Public Class PlugIn
 End Class
 
 Module ManDelin
-    Public Sub CalculateSubbasinParameters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String)
+    Public Sub CalculateSubbasinParameters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String, _
+                                           Optional ByVal aElevUnits As String = "Meters")
         Logger.Status("Calculating...")
         Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubBasinThemeName)
         Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(aElevationThemeName)
@@ -240,7 +241,12 @@ Module ManDelin
                 Next lElevationShapeIndex
                 'store in slope field as percent
                 'estimate slope as the difference between max and min elevations / square root of subbasin area -- better approx?
-                lSlope = 100 * (lElevMax - lElevMin) / ((GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinIndex - 1)) ^ 0.5)
+                lSlope = (lElevMax - lElevMin) / ((GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinIndex - 1)) ^ 0.5)
+                If aElevUnits = "Meters" Then
+                    lSlope *= 100
+                ElseIf aElevUnits = "Feet" Then
+                    lSlope = lSlope * 100 / 3.281
+                End If
                 GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
             Next lSubbasinIndex
         Else 'grid
@@ -252,8 +258,10 @@ Module ManDelin
                 'store in slope field as percent
                 If GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSlopeFieldIndex) <= 0 Then
                     lSlope = GisUtil.GridSlopeInPolygon(lElevationLayerIndex, lSubbasinLayerIndex, lSubbasinIndex - 1)
-                    If Not (GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\ned\") > -1 Or GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\elev_cm") > -1) Then
+                    If aElevUnits = "Meters" Then
                         lSlope *= 100
+                    ElseIf aElevUnits = "Feet" Then
+                        lSlope = lSlope * 100 / 3.281
                     End If
                     GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
                 End If
@@ -319,7 +327,7 @@ Module ManDelin
 
     Sub CalculateReaches(ByVal aSubbasinThemeName As String, ByVal aReachThemeName As String, _
                          ByVal aElevationThemeName As String, ByVal aPCS As Boolean, ByVal aCombine As Boolean, _
-                         ByRef aOutletThemeName As String)
+                         ByRef aOutletThemeName As String, Optional ByVal aElevUnits As String = "Meters")
         Logger.Status("Calculating...")
 
         'find the level field
@@ -609,7 +617,7 @@ Module ManDelin
         Next i
 
         'set stream width based on upstream area
-        Dim lFieldIndex As Integer= GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "WID2", 2, 10)
+        Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "WID2", 2, 10)
         If lFieldIndex < lMinField Then lMinField = lFieldIndex
         For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
@@ -654,12 +662,13 @@ Module ManDelin
             Else 'get grid value at point
                 gmin = GisUtil.GridValueAtPoint(lElevationLayerIndex, x1, y1)
                 gmax = GisUtil.GridValueAtPoint(lElevationLayerIndex, x2, y2)
-                If InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\ned\") > 0 Or _
-                   InStr(GisUtil.LayerFileName(lElevationLayerIndex), "\elev_cm") > 0 Then
-                    'this is an ned grid (in cm), convert to meters
-                    gmin = gmin / 100
-                    gmax = gmax / 100
-                End If
+            End If
+            If aElevUnits = "Centimeters" Then
+                gmin = gmin / 100  'this is an ned grid (in cm), convert to meters
+                gmax = gmax / 100
+            ElseIf aElevUnits = "Feet" Then
+                gmin = gmin / 3.281  'this is a grid in ft, convert to meters
+                gmax = gmax / 3.281
             End If
             If gmax < gmin Then
                 gtemp = gmin
