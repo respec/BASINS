@@ -141,11 +141,11 @@ Module HSPFGraphWQ
                     Next
                 End If
 
-                Dim lFlow As atcTimeseries
-                Dim lLoadSum As atcTimeseries
-                Dim lLoadSumNewUnit As atcTimeseries
-                Dim lConc As atcTimeseries
-                Dim lConcNewUnit As atcTimeseries
+                Dim lFlow As atcTimeseries = Nothing
+                Dim lLoadSum As atcTimeseries = Nothing
+                Dim lLoadSumNewUnit As atcTimeseries = Nothing
+                Dim lConc As atcTimeseries = Nothing
+                Dim lConcNewUnit As atcTimeseries = Nothing
 
                 Dim lscenid As String = ""
                 For Each lOutputWDMName As String In lCurrentWDMSet
