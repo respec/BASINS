@@ -51,12 +51,22 @@ Module SWATRunner
     Private pDoCaseStudySummary As Boolean = False
     Private predoCaliSummary As Boolean = False
 
+    Private pDoSA As Boolean = False
+    Private pchangePCP As String = String.Empty
+    Private pchangeTemp As String = String.Empty
+    Private pchangeFert As String = String.Empty
+    Private pchangeResRmv As Boolean = False
+
+
+
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
         Dim lContinue As Boolean = True
         'these defaults are overwritten by registry values set by most recent run
         Dim lUserParms As New atcCollection
+
         With lUserParms
+            .Add("Do Sensitivity Analysis?", pDoSA)
             .Add("Summarize Case Study Output", pDoCaseStudySummary)
             .Add("Start Year", pStartYear)
             .Add("Number of Years", pNumYears)
@@ -64,7 +74,6 @@ Module SWATRunner
             .Add("Run Model Monthly", pRunMonthly)
             .Add("Run Model Yearly", pRunYearly)
             .Add("Run Model Daily", pRunDaily)
-
             .Add("RefreshDB", pRefreshDB)
             .Add("OutputSummarize", pOutputSummarize)
             .Add("InputSummarizeBeforeChange", pInputSummarizeBeforeChange)
@@ -80,12 +89,19 @@ Module SWATRunner
             .Add("CrpFutureTextfile", pCrpFuture)
             .Add("CrpFutureColumn", pCrpFutureColumn)
             .Add("SWATExe", pSWATExe)
+
+            .Add("Change Rainfall", pchangePCP)
+            .Add("Change Temperature", pchangeTemp)
+            .Add("Change Fertilization Rate", pchangeFert)
+            .Add("Remove Corn Residue", pchangeResRmv)
+
         End With
         If pUserInteractiveUpdate Then
             Dim lAsk As New frmArgs
             lContinue = lAsk.AskUser("User Specified Parameters", lUserParms)
             If lContinue Then
                 With lUserParms
+                    pDoSA = .ItemByKey("Do Sensitivity Analysis?")
                     pDoCaseStudySummary = .ItemByKey("Summarize Case Study Output")
                     pStartYear = .ItemByKey("Start Year")
                     pNumYears = .ItemByKey("Number of Years")
@@ -110,13 +126,20 @@ Module SWATRunner
                     pCrpFutureColumn = .ItemByKey("CrpFutureColumn")
                     pSWATExe = .ItemByKey("SWATExe")
 
+                    pchangePCP = .ItemByKey("Change Rainfall")
+                    pchangeTemp = .ItemByKey("Change Temperature")
+                    pchangeFert = .ItemByKey("Change Fertilization Rate")
+                    pchangeResRmv = .ItemByKey("Remove Corn Residue")
+
                 End With
             End If
         End If
 
+
+
         Dim lAllScenarios As New List(Of String)
         'Dim lcases As String() = {"RS", "AFDec", "AFInc"}
-        Dim lcases As String() = {"AFInc50", "PcpInc20", "PcpDec20"}
+        'TODO: pDoCaseStudySummary and pDoSA could be used interchangeably here in this program
         If lContinue And pDoCaseStudySummary Then
             'Do summary of all case studies' outputs, then end the SWATRunner program
             'This is assuming all case studies' runs are already done BEFOREHAND!
@@ -134,7 +157,12 @@ Module SWATRunner
             'lAllScenarios.Add("Scen2015RevPRaccoon")
             'lAllScenarios.Add("Scen2020RevPRaccoon")
             'lAllScenarios.Add("Scen2022RevPRaccoon")
-            lAllScenarios.Add("ScenExistRevPRaccoon")
+            'lAllScenarios.Add("ScenExistRevPRaccoon")
+            'lAllScenarios.Add("SA_RS")
+            'lAllScenarios.Add("ScenExistRevP")
+            'lAllScenarios.Add("MetBase")
+            'lAllScenarios.Add("SA_FertInc50")
+            lAllScenarios.Add("SA_FertDec10")
 
             For Each pScenario In lAllScenarios
                 pInputFolder = IO.Path.Combine(pBaseFolder, "Scenarios" & IO.Path.DirectorySeparatorChar & pScenario)
@@ -149,8 +177,20 @@ Module SWATRunner
                     lswatMDB = "SWAT2020RevP.mdb"
                 ElseIf pScenario.Contains("2022") Then
                     lswatMDB = "SWAT2022RevP.mdb"
+                ElseIf pScenario.Contains("SA_") Then
+                    lswatMDB = "SWAT2005RevP.mdb"
                 End If
+
                 pSWATGDB = IO.Path.Combine(pBaseFolder, lswatMDB)
+                'Get a new one
+                If IO.File.Exists(pSWATGDB) Then
+                    IO.File.Delete(pSWATGDB)
+                    IO.File.Copy(IO.Path.Combine(pBaseFolder, "SWAT2005RevPBase\SWAT2005RevP.mdb"), pSWATGDB)
+                End If
+
+                'Here define the cases within a given scenario
+                'Dim lcases As String() = {"AFInc50", "PcpInc20", "PcpDec20"}
+                Dim lcases As String() = {""}
                 For Each lzCase As String In lcases
                     If pScenario.Contains("8889") Then ' no case study runs for original scenarios
                         lzCase = ""
@@ -159,6 +199,9 @@ Module SWATRunner
                         If pScenario.Contains("RevPRaccoon") Then 'only for redoing the summary of the calibration runs
                             lzCase = ""
                         End If
+                    End If
+                    If pDoSA Then 'sensitivity run will be done 'in situ' without creating new folders for everything
+                        lzCase = ""
                     End If
                     pOutGDBFolder = IO.Path.Combine(pInputFolder, "TablesIn" & lzCase)
                     pOutputFolder = IO.Path.Combine(pInputFolder, "TxtInOut" & lzCase)
@@ -190,6 +233,10 @@ Module SWATRunner
                         IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lzOutGDB))
                         IO.File.Copy(IO.Path.Combine(pBaseFolder, pOutGDB), lzOutGDB)
                         Logger.Dbg("Copied " & lzOutGDB & " from " & pBaseFolder)
+                    End If
+
+                    If Not pRunModel Then
+                        GoTo DOSUMMARYONLY
                     End If
 
                     Logger.Dbg("InitializeSwatInput")
@@ -307,17 +354,186 @@ Module SWATRunner
                         Next
                     End If
 
-                    If pRunModel Then
-                        'lzSwatInput.SaveAllTextInput()
-                        'Logger.Dbg("Launching " & pSWATExe & " in " & pOutputFolder)
-                        'Logger.Flush()
-                        'LaunchProgram(pSWATExe, pOutputFolder) 'Bypass model run here
+                    'Do the changes for sensitivity analysis
+                    If pDoSA Then
+                        'If pchangePCP IsNot String.Empty Then
+                        '    changePCP(pOutputFolder & IO.Path.DirectorySeparatorChar & "pcp1.pcp", pchangePCP)
+                        'End If
+                        'If pchangeTemp IsNot String.Empty Then
+                        '    changeTemp(pOutputFolder & IO.Path.DirectorySeparatorChar & "tmp1.tmp", pchangeTemp)
+                        'End If
+                        If pchangeFert IsNot String.Empty Then
+                            'Dim lArgs As Dictionary(Of String, String) = New Dictionary(Of String, String)
+                            ''pSWATGDB, , pBaseFolder, pScenario
+                            'lArgs.Add("InputGDB", lzOutGDB)
+                            'lArgs.Add("FertilizationRate", "")
+                            'changeFert(lArgs)
+
+                            Dim lSQL As String = "SELECT AUTO_NSTRS FROM mgt2 WHERE MGT_OP=11 AND CROP='CORN'"
+                            Dim ltab As DataTable = lzSwatInput.QueryInputDB(lSQL)
+                            Dim lrate As Double = Double.Parse(ltab.Rows(0)("AUTO_NSTRS").ToString)
+
+                            lrate = CType(lrate * (1.0 + pchangeFert / 100.0) * 100.0 + 0.5, Integer) / 100.0
+                            lzSwatInput.UpdateInputDB("MGT2", "MGT_OP=11 AND CROP NOT LIKE 'HAY' AND CROP NOT LIKE 'AGRR'", "AUTO_NSTRS", lrate)
+                            'lzSwatInput.Mgt.Save()
+                            ltab.Clear()
+                            ltab = Nothing
+                        End If
+
+                        If pchangeResRmv Then
+                            ''changeResRmv()
+                            ''Change HI_OVR in baseline90jkRaccoon::mgt2
+                            '' e.g. Change mgt2::subbasin 2::HRU 64::LANDUSE CSC1::SOIL IA110::SLOPE_CD 2-4::CROP CSC1::YEAR 1::HUSC 1.2::MGT_OP 5 -->
+                            ''             mgt2::subbasin 2::HRU 64::LANDUSE CSC1::SOIL IA110::SLOPE_CD 2-4::CROP CSC1::YEAR 1::HUSC 1.2::MGT_OP 7::HI_OVR 0.9
+                            ''             add another Kill only operation 8 for the exactly the same crop (insert another record)
+
+                            ''Two approaches, change default HI or HI_OVR on MGT_OP 7, then MGT_OP 8
+                            'Dim ltab As DataTable = lzSwatInput.Mgt.Table2
+                            'For Each row As DataRow In ltab.Rows
+                            '    Dim lcrop As String = row("CROP").ToString
+                            '    Dim lop As Integer = Integer.Parse(row("MGT_OP").ToString)
+                            '    If lcrop = "CSC1" OrElse lcrop = "CCS1" OrElse lcrop = "CCCC" OrElse lcrop = "CSS1" OrElse lcrop = "CORN" Then
+                            '        If lop = 5 Then ' delete it and add another two records
+                            '            Dim OID As Long = Long.Parse(row("OID").ToString)
+                            '            'Dim SUBBASIN As Double = Double.Parse(row("SUBBASIN").ToString)
+                            '            'Dim HRU As Double = Double.Parse(row("HRU").ToString)
+                            '            'Dim LANDUSE As String = row("LANDUSE").ToString
+                            '            'Dim SOIL As String = row("SOIL").ToString
+                            '            'Dim SLOPE_CD As String = row("SLOPE_CD").ToString
+                            '            'Dim CROP As String = row("CROP").ToString
+                            '            'Dim YEAR As Integer = Integer.Parse(row("YEAR").ToString)
+                            '            'Dim MONTH As Integer = Integer.Parse(row("MONTH").ToString)
+                            '            'Dim DAY As Integer = Integer.Parse(row("DAY").ToString)
+                            '            'Dim HUSC As Single = Single.Parse(row("HUSC").ToString)
+                            '            'Dim MGT_OP As Integer = Integer.Parse(row("MGT_OP").ToString)
+                            '            'Dim HEATUNITS As Single = Single.Parse(row("HEATUNITS").ToString)
+                            '            'Dim PLANT_ID As Integer = Integer.Parse(row("PLANT_ID").ToString)
+                            '            'Dim CURYR_MAT As Integer = Integer.Parse(row("CURYR_MAT").ToString)
+                            '            'Dim LAI_INIT As Single = Single.Parse(row("LAI_INIT").ToString)
+                            '            'Dim BIO_INIT As Single = Single.Parse(row("BIO_INIT").ToString)
+                            '            'Dim HI_TARG As Single = Single.Parse(row("HI_TARG").ToString)
+                            '            'Dim BIO_TARG As Single = Single.Parse(row("BIO_TARG").ToString)
+                            '            'Dim CNOP As Double = Double.Parse(row("CNOP").ToString)
+                            '            'Dim IRR_AMT As Single = Single.Parse(row("IRR_AMT").ToString)
+                            '            'Dim FERT_ID As Integer = Integer.Parse(row("FERT_ID").ToString)
+                            '            'Dim FRT_KG As Single = Single.Parse(row("FRT_KG").ToString)
+                            '            'Dim FRT_SURFACE As Single = Single.Parse(row("FRT_SURFACE").ToString)
+                            '            'Dim PEST_ID As Integer = Integer.Parse(row("PEST_ID").ToString)
+                            '            'Dim PST_KG As Single = Single.Parse(row("PST_KG").ToString)
+                            '            'Dim TILLAGE_ID As Integer = Integer.Parse(row("TILLAGE_ID").ToString)
+                            '            'Dim HARVEFF As Single = Single.Parse(row("HARVEFF").ToString)
+                            '            'Dim HI_OVR As Single = Single.Parse(row("HI_OVR").ToString)
+                            '            'Dim GRZ_DAYS As Integer = Integer.Parse(row("GRZ_DAYS").ToString)
+                            '            'Dim MANURE_ID As Integer = Integer.Parse(row("MANURE_ID").ToString)
+                            '            'Dim BIO_EAT As Single = Single.Parse(row("BIO_EAT").ToString)
+                            '            'Dim BIO_TRMP As Single = Single.Parse(row("BIO_TRMP").ToString)
+                            '            'Dim MANURE_KG As Single = Single.Parse(row("MANURE_KG").ToString)
+                            '            'Dim WSTRS_ID As Integer = Integer.Parse(row("WSTRS_ID").ToString)
+                            '            'Dim AUTO_WSTRS As Single = Single.Parse(row("AUTO_WSTRS").ToString)
+                            '            'Dim AFERT_ID As Integer = Integer.Parse(row("AFERT_ID").ToString)
+                            '            'Dim AUTO_NSTRS As Single = Single.Parse(row("AUTO_NSTRS").ToString)
+                            '            'Dim AUTO_NAPP As Single = Single.Parse(row("AUTO_NAPP").ToString)
+                            '            'Dim AUTO_NYR As Single = Single.Parse(row("AUTO_NYR").ToString)
+                            '            'Dim AUTO_EFF As Single = Single.Parse(row("AUTO_EFF").ToString)
+                            '            'Dim AFRT_SURFACE As Single = Single.Parse(row("AFRT_SURFACE").ToString)
+                            '            'Dim SWEEPEFF As Single = Single.Parse(row("SWEEPEFF").ToString)
+                            '            'Dim FR_CURB As Single = Single.Parse(row("FR_CURB").ToString)
+                            '            'Dim IMP_TRIG As Double = Double.Parse(row("IMP_TRIG").ToString)
+                            '            'Dim FERT_DAYS As Long = Long.Parse(row("FERT_DAYS").ToString)
+                            '            'Dim CFRT_ID As Long = Long.Parse(row("CFRT_ID").ToString)
+                            '            'Dim IFRT_FREQ As Long = Long.Parse(row("IFRT_FREQ").ToString)
+                            '            'Dim CFRT_KG As Single = Single.Parse(row("CFRT_KG").ToString)
+
+                            '            For i As Integer = 0 To row.ItemArray().Length - 1
+                            '                If row.Item(i).ToString = "" Then
+                            '                    row.Item(i) = 0
+                            '                End If
+                            '            Next
+
+                            '            Dim litem2_7 As New SwatObject.SwatInput.clsMgtItem2(row)
+                            '            litem2_7.MGT_OP = 7
+                            '            litem2_7.HI_OVR = 0.9
+                            '            litem2_7.HARVEFF = 0.0
+                            '            lzSwatInput.Mgt.Add2(litem2_7)
+
+                            '            row("HUSC") = 1.201
+                            '            Dim litem2_8 As New SwatObject.SwatInput.clsMgtItem2(row)
+                            '            litem2_8.MGT_OP = 8
+                            '            lzSwatInput.Mgt.Add2(litem2_8)
+
+                            '            'ltab.Rows.Remove(row)
+                            '            lzSwatInput.DeleteRowInputDB("MGT2", "OID", OID)
+
+                            '        End If
+                            '    End If
+                            'Next
+
+                            'change harvest index
+                            lzSwatInput.UpdateSWATGDB("crop", "ICNUM = 19 OR ICNUM = 98 OR ICNUM = 99 OR ICNUM = 100 OR ICNUM = 101", "HVSTI", "0.9")
+                        End If
+
+                        ''Clean up mgt2
+                        ''Dim ldt As DataTable = lzSwatInput.QueryInputDB("SELECT COUNT(*) AS Expr1 FROM mgt2 WHERE (((mgt2.MONTH) Is Not Null));")
+                        ''Dim ldt1 As DataTable = lzSwatInput.QueryInputDB("SELECT COUNT(*) AS Expr2 FROM mgt2 WHERE (((mgt2.HUSC) Is Not Null));")
+                        'Dim ldt As DataTable = lzSwatInput.QueryInputDB("SELECT COUNT(*) AS Expr1 FROM mgt2 WHERE ([MONTH] Is Not Null);")
+                        'Dim ldt1 As DataTable = lzSwatInput.QueryInputDB("SELECT COUNT(*) AS Expr2 FROM mgt2 WHERE (HUSC Is Not Null);")
+
+                        'Dim lSQL As String = String.Empty
+                        ''lzSwatInput.Close()
+                        'If Integer.Parse(ldt.Rows(0).Item(0).ToString) <= Integer.Parse(ldt1.Rows(0).Item(0).ToString) / 2 Then
+                        '    'Doesn't seems that setting anything to Null would work through an OleDB connection here
+                        '    'lSQL = "UPDATE mgt2 SET MONTH = Null WHERE MONTH Is Null"
+                        '    'lzSwatInput.UpdateInputDB("mgt2", "MONTH Is Not Null", "MONTH", "")
+                        '    'lzSwatInput.UpdateInputDB("mgt2", "DAY Is Not Null", "DAY", "")
+
+                        '    'lSQL = "UPDATE mgt2 SET MONTH = Null WHERE MONTH Is Not Null;"
+                        '    'Try
+                        '    '    Dim lConnection As New ADODB.Connection()
+                        '    '    lConnection.ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lzOutGDB
+                        '    '    lConnection.Open()
+
+                        '    '    Dim lcmd As New ADODB.Command()
+                        '    '    lcmd.CommandText = lSQL
+                        '    '    lcmd.ActiveConnection = lConnection
+                        '    '    lcmd.Execute()
+
+                        '    'Catch ex As Exception
+                        '    '    Logger.Msg(ex.Message)
+                        '    'End Try
+
+                        '    'lzSwatInput.UpdateInputDB("mgt2", "MONTH LIKE ''", "MONTH", "0")
+                        '    'lzSwatInput.UpdateInputDB("mgt2", "DAY LIKE ''", "DAY", "0")
+
+                        '    lzSwatInput.UpdateInputDB("mgt2", "[MONTH] Is Not Null", "[MONTH]", "")
+                        '    lzSwatInput.UpdateInputDB("mgt2", "[DAY] Is Not Null", "[DAY]", "")
+
+                        'Else
+                        '    lSQL = "UPDATE mgt2 SET HUSC = Null WHERE HUSC Is Not Null"
+                        '    lzSwatInput.UpdateInputDB("mgt2", "HUSC Is Not Null", "HUSC", "")
+
+
+                        'End If
+
+                        'ldt.Clear()
+                        'ldt1.Clear()
+                        'ldt = Nothing
+                        'ldt1 = Nothing
+
                     End If
+
+                    If pRunModel Then
+                        lzSwatInput.SaveAllTextInput()
+                        Logger.Dbg("Launching " & pSWATExe & " in " & pOutputFolder)
+                        Logger.Flush()
+                        LaunchProgram(pSWATExe, pOutputFolder) 'Bypass model run here
+                    End If
+
+                    lzSwatInput.Close()
 
                     '*****************************************************************************
                     'End of Summarize input section and SWAT input creation/Run section
                     '*****************************************************************************
-
+DOSUMMARYONLY:
                     If pOutputSummarize Then
                         'Delete exising .tsbin for sub hru and rch such as to start fresh
                         'Dim di As New System.IO.DirectoryInfo(pReportsFolder)
@@ -946,7 +1162,7 @@ Module SWATRunner
         'DNITkg/ha  NUPkg/ha  PUPkg/ha ORGNkg/ha ORGPkg/ha SEDPkg/ha
         'NSURQkg/haNLATQkg/ha NO3Lkg/haNO3GWkg/ha SOLPkg/ha P_GWkg/ha    W_STRS  TMP_STRS    N_STRS    P_STRS  
         'BIOMt/ha       LAI   YLDt/ha   BACTPct  BACTLPct
-        lOutputFields.SetValue("FieldName", "AREAkm2;NAUTOkg/ha;PAUTOkg/ha;NUPkg/ha;PUPkg/ha;YLDt/ha")
+        lOutputFields.SetValue("FieldName", "AREAkm2;NAUTOkg/ha;PAUTOkg/ha;NUPkg/ha;PUPkg/ha;YLDt/ha") ' from .hru
         WriteBinaryDatasetsIfNeeded("hru", lOutputFields)
 
         Logger.Dbg("SwatSummaryReports")
@@ -1243,6 +1459,7 @@ Module SWATRunner
         Next
         Return lSB.ToString
     End Function
+
     Private Sub MakeSummary(ByVal aHuc As String, _
                             ByVal aReachOutputTable As atcTable, ByVal aSubBasinOutputTable As atcTable, _
                             ByRef aHucSummary As atcCollection)
@@ -1986,6 +2203,7 @@ Module SWATRunner
         SaveFileString(IO.Path.Combine(aOutputFolder, "Average.txt"), lSBAverage.ToString)
         SaveFileString(IO.Path.Combine(aOutputFolder, "Total.txt"), lSBTotal.ToString)
     End Sub
+
     Private Class YieldSummary
         Public Huc As String
         Public Area As Double
@@ -1996,6 +2214,7 @@ Module SWATRunner
         Public PUptk As Double
         Public Yield As Double
     End Class
+
 End Module
 
 Module SWATArea
@@ -2244,5 +2463,7 @@ Module SWATArea
 
         Return lNewTable
     End Function
+
+
 
 End Module
