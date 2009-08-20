@@ -91,24 +91,34 @@ Public Class frmWASPInitialize
             Next
 
             'loop through each selected segment, see if anything is upstream of it
-            Dim pSegmentIndexesToAdd As New Collection
-            pSegmentIndexesToAdd.Add(0, "X")  'just to prime the loop
-            Do While pSegmentIndexesToAdd.Count > 0
-                pSegmentIndexesToAdd.Clear()
-                For Each lSegIndex As Integer In pSelectedIndexes
+            Dim lSegmentIndexesToCheck As New Collection
+            For Each lSegIndex As Integer In pSelectedIndexes
+                lSegmentIndexesToCheck.Add(lSegIndex)
+            Next
+            Dim lSegmentIndexesToAdd As New Collection
+            lSegmentIndexesToAdd.Add(0, "X")  'just to prime the loop
+            Do While lSegmentIndexesToAdd.Count > 0
+                lSegmentIndexesToAdd.Clear()
+                For Each lSegIndex As Integer In lSegmentIndexesToCheck
                     Dim lSelectedComid As String = lComids(lSegIndex)
                     For lindex As Integer = 0 To lToComids.count - 1
                         If lToComids(lindex) = lSelectedComid Then
                             'see if what is upstream of this one is in the selected index collection
                             If Not pSelectedIndexes.Contains(lindex) Then
-                                pSegmentIndexesToAdd.Add(lindex)
+                                lSegmentIndexesToAdd.Add(lindex)
                             End If
                         End If
                     Next
                 Next
-                For Each lSegIndex As Integer In pSegmentIndexesToAdd
+                Logger.Dbg("Adding " & lSegmentIndexesToAdd.Count & " more selected WASP segments")
+                lSegmentIndexesToCheck.Clear()
+                For Each lSegIndex As Integer In lSegmentIndexesToAdd
                     pSelectedIndexes.Add(pSelectedIndexes.Count, lSegIndex)
+                    lSegmentIndexesToCheck.Add(lSegIndex)
                 Next
+                txtInfo.Text = "Selection Layer: " & pCurrentLayerName & vbCrLf & vbCrLf & _
+                               "Number of Selected Features: " & pSelectedIndexes.Count.ToString & " of " & pNumFeatures.ToString
+                Me.Refresh()
             Loop
 
             'now mark the segments as selected on the map
