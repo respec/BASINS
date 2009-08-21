@@ -139,7 +139,7 @@ Public Class atcWASPProject
                 Logger.Dbg("SegmentsCount " & .Segments.Count)
 
                 'calculate depth and width from mean annual flow and mean annual velocity
-                'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284
+                'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284    -- assumption from GBMM
                 For Each lSegment As atcWASPSegment In .Segments
                     lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
                     lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
@@ -782,12 +782,12 @@ Public Class atcWASPProject
             lsegParams(0) = Space(3) & lSegment.WASPID
             lsegParams(1) = " 0" ' BotSeg
             lsegParams(2) = " 1" ' iType
-            lsegParams(3) = " " & String.Format("{0:0.00}", lSegment.Length * lSegment.Width * 0.5) ' crude assumption for Volume  
+            lsegParams(3) = " " & String.Format("{0:0.00}", lSegment.Length * 1000.0 * lSegment.Width * lSegment.Depth * 0.5) ' crude assumption for Volume in m3
             lsegParams(4) = " 0.000000" 'VMult    'need default here
             lsegParams(5) = " 0.000000" 'Vexp     'need default here
             lsegParams(6) = " 1.000000" 'DMult    'need default here
             lsegParams(7) = " 0.000000" 'Dexp     'need default here
-            lsegParams(8) = " " & String.Format("{0:0.00}", lSegment.Length) ' Length 2
+            lsegParams(8) = " " & String.Format("{0:0.00}", lSegment.Length * 1000.0) ' Length 2, output in meters 
             lsegParams(9) = " " & String.Format("{0:0.00000}", lSegment.Slope) ' slope 6
             lsegParams(10) = " " & String.Format("{0:0.0000}", lSegment.Width) 'Width 4
             lsegParams(11) = " " & String.Format("{0:0.0000}", lSegment.Roughness) ' Rough 6

@@ -123,6 +123,7 @@ Public Class frmWASPInitialize
 
             'now mark the segments as selected on the map
             GisUtil.ClearSelectedFeatures(pCurrentLayerIndex)
+            pSelectedIndexes.SortByValue()
             For Each lSegIndex As Integer In pSelectedIndexes
                 GisUtil.SetSelectedFeature(pCurrentLayerIndex, lSegIndex)
             Next
