@@ -824,7 +824,7 @@ Public Class atcGrid
             Dim lFixedColumns As Integer = pSource.FixedColumns
 
             For lRow As Integer = 0 To aRow - 1
-                If lRow < lFixedRows OrElse lRow >= pRowsScrolled Then
+                If lRow < lFixedRows OrElse lRow > pRowsScrolled Then
                     lY += RowHeight(lRow)
                 ElseIf lRow < pRowsScrolled - 1 Then 'skip rows we can't see
                     lRow = pRowsScrolled - 1

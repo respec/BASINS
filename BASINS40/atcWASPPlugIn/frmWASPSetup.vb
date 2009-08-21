@@ -916,19 +916,19 @@ Public Class frmWASPSetup
                 lEJDateTS = lTimeseries.EDate
             End If
         Next
-        If lSJDateTS > lEJDateTS Then 'failed date check
-            Logger.Msg("The specified time series do not have a common period of record.", vbOKOnly, "BASINS WASP Problem")
-            EnableControls(True)
-            Exit Sub
-        End If
-        If lSJDateTS > 0 And lEJDateTS > 0 Then
-            'compare dates from met data with specified start and end dates, make sure they are valid
-            If lSJDate < lSJDateTS Or lEJDateTS < lEJDate Then 'failed date check
-                Logger.Msg("The specified start/end dates are not within the dates of the specified time series.", vbOKOnly, "BASINS WASP Problem")
-                EnableControls(True)
-                Exit Sub
-            End If
-        End If
+        'If lSJDateTS > lEJDateTS Then 'failed date check
+        '    Logger.Msg("The specified time series do not have a common period of record.", vbOKOnly, "BASINS WASP Problem")
+        '    EnableControls(True)
+        '    Exit Sub
+        'End If
+        'If lSJDateTS > 0 And lEJDateTS > 0 Then
+        '    'compare dates from met data with specified start and end dates, make sure they are valid
+        '    If lSJDate < lSJDateTS Or lEJDateTS < lEJDate Then 'failed date check
+        '        Logger.Msg("The specified start/end dates are not within the dates of the specified time series.", vbOKOnly, "BASINS WASP Problem")
+        '        EnableControls(True)
+        '        Exit Sub
+        '    End If
+        'End If
 
         Dim lName As String = tbxName.Text
         'TODO: still use modelout?
@@ -1495,10 +1495,10 @@ Public Class frmWASPSetup
             J2Date(lSJDate, lSDate)
 
             'set limits
-            atxSYear.HardMax = lEDate(0)
-            atxSYear.HardMin = lSDate(0)
-            atxEYear.HardMax = lEDate(0)
-            atxEYear.HardMin = lSDate(0)
+            'atxSYear.HardMax = lEDate(0)
+            'atxSYear.HardMin = lSDate(0)
+            'atxEYear.HardMax = lEDate(0)
+            'atxEYear.HardMin = lSDate(0)
 
             'default to last calendar year of data
             lSDate(0) = lEDate(0) - 1
