@@ -101,8 +101,12 @@ Public Class Net
 
     Public Shared Function CheckInternetConnection(ByVal CheckAgainstURL As String, Optional ByVal TimeoutMilliseconds As Integer = 2000) As Boolean
         Dim objWebReq As System.Net.WebRequest
-        objWebReq = System.Net.WebRequest.Create(New System.Uri(CheckAgainstURL))
-        objWebReq.Proxy.Credentials = System.Net.CredentialCache.DefaultCredentials
+        Dim myUrl As New System.Uri(CheckAgainstURL)
+        objWebReq = System.Net.WebRequest.Create(myUrl)
+        'Proxy authentication required
+        objWebReq.Proxy.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials 'System.Net.CredentialCache.DefaultCredentials
+        Logger.Dbg("GetProxy: " & objWebReq.Proxy.GetProxy(myUrl).ToString())
+
         objWebReq.Timeout = TimeoutMilliseconds
         Dim objResp As System.Net.WebResponse = Nothing
         Try
@@ -110,10 +114,15 @@ Public Class Net
             objResp.Close()
             objWebReq = Nothing
             Return True
+        Catch ex As System.Net.WebException
+            Logger.Dbg("WebException: " & ex.ToString())
+            Return False
         Catch ex As Exception
+            Logger.Dbg("Exception: " & ex.ToString())
+            Return False
+        Finally
             If Not objResp Is Nothing Then objResp.Close()
             objWebReq = Nothing
-            Return False
         End Try
     End Function
 End Class
