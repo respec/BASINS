@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+# Visual Basic Express 2008
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility", "atcUtility\atcUtility.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcData", "atcData\atcData.vbproj", "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
@@ -107,6 +107,16 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesSWAT", "atcTimeseriesSWAT\atcTimeseriesSWAT.vbproj", "{8157C92A-68A6-498D-84B7-EF2A299AB7BA}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesD4EM", "atcTimeseriesD4EM\atcTimeseriesD4EM.vbproj", "{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcModelSegmentation", "atcModelSegmentation\atcModelSegmentation.vbproj", "{9CE0D790-6663-44B5-9902-4FB85EE36613}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesExcel", "atcTimeseriesExcel\atcTimeseriesExcel.vbproj", "{94048896-37EE-4760-8707-8E5989498943}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesSTORET", "atcTimeseriesSTORET\atcTimeseriesSTORET.vbproj", "{F1FE7C7D-3477-400C-96BE-6BD43C1D7896}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSynopInput", "atcSynopInput\atcSynopInput.vbproj", "{69A2617A-01FB-457D-883E-22BF45EEAD64}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DFLOWAnalysis", "..\DFLOW\DFLOWAnalysis.vbproj", "{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -329,6 +339,26 @@ Global
 		{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CE0D790-6663-44B5-9902-4FB85EE36613}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CE0D790-6663-44B5-9902-4FB85EE36613}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CE0D790-6663-44B5-9902-4FB85EE36613}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CE0D790-6663-44B5-9902-4FB85EE36613}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1FE7C7D-3477-400C-96BE-6BD43C1D7896}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1FE7C7D-3477-400C-96BE-6BD43C1D7896}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1FE7C7D-3477-400C-96BE-6BD43C1D7896}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1FE7C7D-3477-400C-96BE-6BD43C1D7896}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69A2617A-01FB-457D-883E-22BF45EEAD64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69A2617A-01FB-457D-883E-22BF45EEAD64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69A2617A-01FB-457D-883E-22BF45EEAD64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69A2617A-01FB-457D-883E-22BF45EEAD64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
