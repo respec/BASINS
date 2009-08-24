@@ -1262,14 +1262,18 @@ Public Class frmWASPSetup
             Logger.Dbg("Begin")
 
             With AtcGridFlow.Source
-                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
-                    .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).CumulativeDrainageArea
-                    .CellValue(lIndex, 2) = pPlugIn.WASPProject.Segments(lIndex - 1).MeanAnnualFlow
-                    .CellValue(lIndex, 3) = "<none>"
-                    .CellEditable(lIndex, 3) = True
+                Dim lRow As Integer = 0
+                For Each lSegment As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    If pPlugIn.WASPProject.IsBoundary(lSegment) Then
+                        lRow = lRow + 1
+                        .Rows = lRow
+                        .CellValue(lRow, 0) = lSegment.ID & ":" & lSegment.Name
+                        .CellColor(lRow, 0) = SystemColors.ControlDark
+                        .CellValue(lRow, 1) = lSegment.CumulativeDrainageArea
+                        .CellValue(lRow, 2) = lSegment.MeanAnnualFlow
+                        .CellValue(lRow, 3) = "<none>"
+                        .CellEditable(lRow, 3) = True
+                    End If
                 Next
             End With
 
