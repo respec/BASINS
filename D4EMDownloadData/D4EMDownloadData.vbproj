@@ -153,6 +153,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj">
+      <Project>{59E61F35-B014-4D34-8277-63FF6BE40DD6}</Project>
+      <Name>BASINS-D4EMDataManager</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility</Name>
