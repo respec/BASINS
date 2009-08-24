@@ -531,12 +531,20 @@ Public Class atcWASPProject
 
         'build collections of timeseries 
         Dim lKeyString As String = ""
-        For lIndex As Integer = 1 To Segments.Count
-            'input flows 
-            lKeyString = "FLOW:" & aGridFlowSource.CellValue(lIndex, 3)
-            If aGridFlowSource.CellValue(lIndex, 3) <> "<none>" Then
-                AddSelectedTimeseriesToWASPSegment(lKeyString, FlowStationCandidates, Me, Segments(lIndex - 1))
+        Dim lRow As Integer = 0
+        For Each lSegment As atcWASPSegment In Segments
+            If IsBoundary(lSegment) Then
+                lRow = lRow + 1
+                'input flows 
+                lKeyString = "FLOW:" & aGridFlowSource.CellValue(lRow, 3)
+                If aGridFlowSource.CellValue(lRow, 3) <> "<none>" Then
+                    AddSelectedTimeseriesToWASPSegment(lKeyString, FlowStationCandidates, Me, lSegment)
+                End If
             End If
+        Next
+
+        lKeyString = ""
+        For lIndex As Integer = 1 To Segments.Count
             For lColumn As Integer = 1 To Me.WASPConstituents.Count
                 'wq loads
                 'build key string, type is the first part before the colon.
@@ -557,7 +565,7 @@ Public Class atcWASPProject
         Next
 
         'check to see if each segment is a boundary
-        Dim lRow As Integer = 0
+        lRow = 0
         For Each lSegment As atcWASPSegment In Segments
             If IsBoundary(lSegment) Then
                 lRow = lRow + 1
