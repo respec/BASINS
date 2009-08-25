@@ -15,7 +15,8 @@ Public Module Graph
                         ByVal aGraphSaveFormat As String, _
                         ByVal aGraphSaveWidth As Integer, _
                         ByVal aGraphSaveHeight As Integer, _
-                        ByVal aGraphAnnual As Boolean)
+                        ByVal aGraphAnnual As Boolean, _
+                        ByVal loutfoldername As String)
         Dim lDataGroup As New atcTimeseriesGroup
         lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"), _
                                               aSDateJ, _
@@ -26,7 +27,7 @@ Public Module Graph
                                               aEDateJ, Nothing), _
                                  atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
 
-        Dim lOutFileBase As String = "outfiles\" & aCons & "_" & aSite
+        Dim lOutFileBase As String = loutfoldername & aCons & "_" & aSite
         Dim lZgc As ZedGraphControl
 
         'duration plot
@@ -37,7 +38,11 @@ Public Module Graph
         With lGraphDur.ZedGraphCtrl.GraphPane
             If .YAxis.Scale.Min < 1 Then
                 .YAxis.Scale.MinAuto = False
-                .YAxis.Scale.Min = 1
+                .YAxis.Scale.Min = 10
+                .XAxis.Scale.MinAuto = False
+                .XAxis.Scale.Min = 0.001
+                .XAxis.Scale.MaxAuto = False
+                .XAxis.Scale.Max = 0.9998
                 .AxisChange()
             End If
         End With
@@ -227,7 +232,7 @@ Public Module Graph
                            ByVal aGraphSaveWidth As Integer, _
                            ByVal aGraphSaveHeight As Integer, _
                            ByVal aExpSystem As HspfSupport.atcExpertSystem)
-        For Each lStorm As hexStorm In aExpSystem.Storms
+        For Each lStorm As HexStorm In aExpSystem.Storms
             Dim lDataGroupStorm As New atcTimeseriesGroup
             For Each lTimeseries As atcTimeseries In aDataGroup
                 lDataGroupStorm.Add(SubsetByDate(lTimeseries, lStorm.SDateJ, lStorm.EDateJ, Nothing))
@@ -249,6 +254,7 @@ Public Module Graph
                        Optional ByVal aLogPrefix As Boolean = False)
         'timeseries - arith
         Dim lZgc As ZedGraphControl = CreateZgc()
+
         lZgc.Width = aGraphSaveWidth
         lZgc.Height = aGraphSaveHeight
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
@@ -256,7 +262,20 @@ Public Module Graph
             EnableAuxAxis(lZgc.MasterPane, True, 0.2)
             lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
             lZgc.MasterPane.PaneList(1).YAxis.Title.Text = "Flow (cfs)"
+            lZgc.MasterPane.PaneList(1).YAxis.Scale.Min = 0
+            If lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text.Contains(" Weighted Average ") Then
+                lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Observed Precipitation at Upatoi Crk, MCB Bridge (RCH46)"
+            End If
+
+            If lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text.Contains("OBSERVED FLOW at RCH46 ") Then
+                lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = "Observed Flow at Upatoi Crk, MCB Bridge (RCH46)"
+            End If
+
+            If lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text.Contains("SIMULATE SIMQ at RCH46 ") Then
+                lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = "Simulated Flow at Upatoi Crk, MCB Bridge (RCH46)"
+            End If
         End If
+        
         lZgc.SaveIn(aOutFileBase & aGraphSaveFormat)
         'timeseries - log
         With lZgc.MasterPane.PaneList(aPaneCount - 1)
@@ -266,6 +285,9 @@ Public Module Graph
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With
+
+
+
         Dim lOutFileName As String = ""
         If aLogPrefix Then
             Dim lPathIndex As Integer = aOutFileBase.LastIndexOf("\")
