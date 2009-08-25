@@ -33,15 +33,15 @@ Public Module modString
         Return aResult
     End Function
 
-    'Public Function Capitalize(ByVal aStr As String) As String
-    '    If aStr Is Nothing OrElse aStr.Length < 1 Then
-    '        Return ""
-    '    ElseIf aStr.Length = 1 Then
-    '        Return aStr.ToUpper
-    '    Else
-    '        Return aStr.Substring(0, 1).ToUpper & aStr.Substring(1)
-    '    End If
-    'End Function
+    Public Function CapitalizeFirstLetter(ByVal aStr As String) As String
+        If aStr Is Nothing OrElse aStr.Length < 1 Then
+            Return ""
+        ElseIf aStr.Length = 1 Then
+            Return aStr.ToUpper
+        Else
+            Return aStr.Substring(0, 1).ToUpper & aStr.Substring(1).ToLower
+        End If
+    End Function
 
     ''' <summary>
     ''' Log base 10
