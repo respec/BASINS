@@ -635,7 +635,7 @@ Module modModelSetup
                     lDbName = PathNameOnly(GisUtil.LayerFileName(lPcsLayerIndex)) & "\pcs\"
                     For Each lNpdesSite As Object In lNPDESSites
                         Dim lDbfFileName As String = lHucs(i).ToString.Trim & ".dbf"
-                        If IO.File.Exists(lDbName & lDbfFileName) > 0 And lNpdesSite.ToString.Trim.Length > 0 Then
+                        If IO.File.Exists(lDbName & lDbfFileName) And lNpdesSite.ToString.Trim.Length > 0 Then
                             'yes, it exists
                             i += 1
                         Else 'remove from collection
