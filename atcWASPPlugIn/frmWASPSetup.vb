@@ -866,6 +866,8 @@ Public Class frmWASPSetup
         Me.Refresh()
         EnableControls(False)
 
+        pPlugIn.WASPProject.CreateFlowlineShapeFile(pSegmentLayerIndex, pSelectedIndexes)
+
         'put contents of segment class back into structure
         With AtcGridSegmentation.Source
             For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
@@ -1435,7 +1437,7 @@ Public Class frmWASPSetup
                 Next
             End With
             pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-            SetDates()
+            'SetDates()
 
             Logger.Dbg("TimeFunctionGrid refreshed")
         End If
@@ -1522,12 +1524,12 @@ Public Class frmWASPSetup
 
     Private Sub AtcGridLoad_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridLoad.CellEdited
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 
     Private Sub AtcGridLoad_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridLoad.Leave
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 
     'Private Sub cmdGenerateTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -1546,12 +1548,12 @@ Public Class frmWASPSetup
 
     Private Sub AtcGridBound_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridBound.CellEdited
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 
     Private Sub AtcGridBound_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridBound.Leave
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 
     Private Sub AtcGridBound_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridBound.MouseDownCell
@@ -1562,12 +1564,12 @@ Public Class frmWASPSetup
 
     Private Sub AtcGridTime_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridTime.CellEdited
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 
     Private Sub AtcGridTime_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridTime.Leave
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 
     Private Sub AtcGridTime_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridTime.MouseDownCell
@@ -1654,11 +1656,11 @@ Public Class frmWASPSetup
 
     Private Sub AtcGridFlow_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridFlow.CellEdited
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 
     Private Sub AtcGridFlow_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridFlow.Leave
         pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        SetDates()
+        'SetDates()
     End Sub
 End Class

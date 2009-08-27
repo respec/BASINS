@@ -2381,7 +2381,7 @@ Public Class GisUtil
 
     Public Shared Sub SaveSelectedFeatures(ByVal aAreaLayerIndex As Integer, _
                                     ByVal aSelectedAreaIndexes As Collection, _
-                                    ByRef aNewFilename As String)
+                                    ByRef aNewFilename As String, Optional ByVal aType As String = "same")
 
         Dim sf As New MapWinGIS.Shapefile
         Dim tollSF As New MapWinGIS.Shapefile
@@ -2405,12 +2405,16 @@ Public Class GisUtil
             Loop
         End If
 
-        If lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
-            lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POLYGON)
-        ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Then
-            lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POLYLINE)
-        ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile Then
-            lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POINT)
+        If aType = "polylinez" Then
+            lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POLYLINEZ)
+        Else
+            If lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+                lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POLYGON)
+            ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Then
+                lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POLYLINE)
+            ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile Then
+                lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POINT)
+            End If
         End If
 
         Dim lInputProjectionFileName As String = FilenameNoExt(sf.Filename) & ".prj"
