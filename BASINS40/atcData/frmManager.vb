@@ -428,12 +428,14 @@ Friend Class frmManager
                     .View()
                 Case "Display"
                     Dim lSelected As atcTimeseriesGroup = .DataSets
-                    lSelected = atcDataManager.UserSelectData("Select data to Display", lSelected.Clone)
-                    atcDataManager.UserSelectDisplay("Select display", lSelected)
+                    lSelected = atcDataManager.UserSelectData("Select data to Display", lSelected.Clone, Nothing, True, False)
+                    If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
+                        atcDataManager.UserSelectDisplay("Select display", lSelected)
+                    End If
                 Case "Analysis"
                     Dim lSelected As atcTimeseriesGroup = .DataSets                    
-                    lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected.Clone)
-                    If lSelected.Count > 0 Then
+                    lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected.Clone, Nothing, True, False)
+                    If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
                         atcDataManager.ShowDisplay(lActionArgs(1), lSelected)
                     End If
                 Case "RemoveDatasets"

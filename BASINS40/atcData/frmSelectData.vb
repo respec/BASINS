@@ -344,6 +344,13 @@ Friend Class frmSelectData
     Public Function AskUser(Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
         mnuSelectMap.Checked = False
 
+        If aGroup IsNot Nothing AndAlso aGroup.Count > 10 Then
+            Select Case Logger.Msg("Select all " & aGroup.Count & " datasets?", vbYesNoCancel, "Several datasets available")
+                Case vbNo : aGroup = Nothing
+                Case vbCancel : Return New atcTimeseriesGroup
+            End Select
+        End If
+
         If aGroup Is Nothing Then
             pSelectedGroup = New atcTimeseriesGroup
         Else
