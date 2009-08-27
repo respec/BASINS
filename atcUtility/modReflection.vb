@@ -184,382 +184,384 @@ Public Module modReflection
     Private Function NeedToTest(ByVal aMethodName As String) As Boolean
         If pDontNeedTest Is Nothing Then
             pDontNeedTest = New ArrayList
-            pDontNeedTest.Add("<none>")
-            pDontNeedTest.Add("GetHashCode")
-            pDontNeedTest.Add("GetType")
-            pDontNeedTest.Add("set_AutoScaleBaseSize")
-            pDontNeedTest.Add("get_AutoScaleBaseSize")
-            pDontNeedTest.Add("set_ActiveControl")
-            pDontNeedTest.Add("get_ActiveControl")
-            pDontNeedTest.Add("set_AutoScroll")
-            pDontNeedTest.Add("get_AutoScroll")
-            pDontNeedTest.Add("get_Handle")
-            pDontNeedTest.Add("Invoke")
-            pDontNeedTest.Add("EndInvoke")
-            pDontNeedTest.Add("BeginInvoke")
-            pDontNeedTest.Add("get_InvokeRequired")
-            pDontNeedTest.Add("ResetText")
-            pDontNeedTest.Add("Refresh")
-            pDontNeedTest.Add("ResetRightToLeft")
-            pDontNeedTest.Add("ResetForeColor")
-            pDontNeedTest.Add("ResetFont")
-            pDontNeedTest.Add("ResetCursor")
-            pDontNeedTest.Add("ResetBackColor")
-            pDontNeedTest.Add("PreProcessMessage")
-            pDontNeedTest.Add("set_Text")
-            pDontNeedTest.Add("get_Text")
-            pDontNeedTest.Add("set_RightToLeft")
-            pDontNeedTest.Add("get_RightToLeft")
-            pDontNeedTest.Add("set_ForeColor")
-            pDontNeedTest.Add("get_ForeColor")
-            pDontNeedTest.Add("set_Font")
-            pDontNeedTest.Add("get_Font")
-            pDontNeedTest.Add("get_Focused")
-            pDontNeedTest.Add("set_Dock")
-            pDontNeedTest.Add("get_Dock")
-            pDontNeedTest.Add("get_DisplayRectangle")
-            pDontNeedTest.Add("set_Cursor")
-            pDontNeedTest.Add("get_Cursor")
-            pDontNeedTest.Add("set_ContextMenu")
-            pDontNeedTest.Add("get_ContextMenu")
-            pDontNeedTest.Add("set_BindingContext")
-            pDontNeedTest.Add("get_BindingContext")
-            pDontNeedTest.Add("set_BackgroundImage")
-            pDontNeedTest.Add("get_BackgroundImage")
-            pDontNeedTest.Add("set_BackColor")
-            pDontNeedTest.Add("get_BackColor")
-            pDontNeedTest.Add("set_Anchor")
-            pDontNeedTest.Add("get_Anchor")
-            pDontNeedTest.Add("set_AllowDrop")
-            pDontNeedTest.Add("get_AllowDrop")
-            pDontNeedTest.Add("Dispose")
-            pDontNeedTest.Add("remove_Disposed")
-            pDontNeedTest.Add("add_Disposed")
-            pDontNeedTest.Add("set_Site")
-            pDontNeedTest.Add("get_Site")
-            pDontNeedTest.Add("CreateObjRef")
-            pDontNeedTest.Add("InitializeLifetimeService")
-            pDontNeedTest.Add("GetLifetimeService")
-            pDontNeedTest.Add("get_AcceptButton")
-            pDontNeedTest.Add("set_AcceptButton")
-            pDontNeedTest.Add("get_ActiveMdiChild")
-            pDontNeedTest.Add("get_AllowTransparency")
-            pDontNeedTest.Add("set_AllowTransparency")
-            pDontNeedTest.Add("get_AutoScale")
-            pDontNeedTest.Add("set_AutoScale")
-            pDontNeedTest.Add("get_FormBorderStyle")
-            pDontNeedTest.Add("set_FormBorderStyle")
-            pDontNeedTest.Add("get_CancelButton")
-            pDontNeedTest.Add("set_CancelButton")
-            pDontNeedTest.Add("get_ClientSize")
-            pDontNeedTest.Add("set_ClientSize")
-            pDontNeedTest.Add("get_ControlBox")
-            pDontNeedTest.Add("set_ControlBox")
-            pDontNeedTest.Add("get_DesktopBounds")
-            pDontNeedTest.Add("set_DesktopBounds")
-            pDontNeedTest.Add("get_DesktopLocation")
-            pDontNeedTest.Add("set_DesktopLocation")
-            pDontNeedTest.Add("get_DialogResult")
-            pDontNeedTest.Add("set_DialogResult")
-            pDontNeedTest.Add("get_HelpButton")
-            pDontNeedTest.Add("set_HelpButton")
-            pDontNeedTest.Add("get_Icon")
-            pDontNeedTest.Add("set_Icon")
-            pDontNeedTest.Add("get_IsMdiChild")
-            pDontNeedTest.Add("get_IsMdiContainer")
-            pDontNeedTest.Add("set_IsMdiContainer")
-            pDontNeedTest.Add("get_KeyPreview")
-            pDontNeedTest.Add("set_KeyPreview")
-            pDontNeedTest.Add("add_MaximizedBoundsChanged")
-            pDontNeedTest.Add("remove_MaximizedBoundsChanged")
-            pDontNeedTest.Add("get_MaximumSize")
-            pDontNeedTest.Add("set_MaximumSize")
-            pDontNeedTest.Add("add_MaximumSizeChanged")
-            pDontNeedTest.Add("remove_MaximumSizeChanged")
-            pDontNeedTest.Add("get_Menu")
-            pDontNeedTest.Add("set_Menu")
-            pDontNeedTest.Add("get_MinimumSize")
-            pDontNeedTest.Add("set_MinimumSize")
-            pDontNeedTest.Add("add_MinimumSizeChanged")
-            pDontNeedTest.Add("remove_MinimumSizeChanged")
-            pDontNeedTest.Add("get_MaximizeBox")
-            pDontNeedTest.Add("set_MaximizeBox")
-            pDontNeedTest.Add("get_MdiChildren")
-            pDontNeedTest.Add("get_MdiParent")
-            pDontNeedTest.Add("set_MdiParent")
-            pDontNeedTest.Add("get_MergedMenu")
-            pDontNeedTest.Add("get_MinimizeBox")
-            pDontNeedTest.Add("set_MinimizeBox")
-            pDontNeedTest.Add("get_Modal")
-            pDontNeedTest.Add("get_Opacity")
-            pDontNeedTest.Add("set_Opacity")
-            pDontNeedTest.Add("get_OwnedForms")
-            pDontNeedTest.Add("get_Owner")
-            pDontNeedTest.Add("set_Owner")
-            pDontNeedTest.Add("get_ShowInTaskbar")
-            pDontNeedTest.Add("set_ShowInTaskbar")
-            pDontNeedTest.Add("get_Size")
-            pDontNeedTest.Add("set_Size")
-            pDontNeedTest.Add("get_SizeGripStyle")
-            pDontNeedTest.Add("set_SizeGripStyle")
-            pDontNeedTest.Add("get_StartPosition")
-            pDontNeedTest.Add("set_StartPosition")
-            pDontNeedTest.Add("get_TabIndex")
-            pDontNeedTest.Add("set_TabIndex")
-            pDontNeedTest.Add("add_TabIndexChanged")
-            pDontNeedTest.Add("remove_TabIndexChanged")
-            pDontNeedTest.Add("get_TopLevel")
-            pDontNeedTest.Add("set_TopLevel")
-            pDontNeedTest.Add("get_TopMost")
-            pDontNeedTest.Add("set_TopMost")
-            pDontNeedTest.Add("get_TransparencyKey")
-            pDontNeedTest.Add("set_TransparencyKey")
-            pDontNeedTest.Add("get_IsRestrictedWindow")
-            pDontNeedTest.Add("get_WindowState")
-            pDontNeedTest.Add("set_WindowState")
-            pDontNeedTest.Add("Activate")
-            pDontNeedTest.Add("add_Activated")
-            pDontNeedTest.Add("remove_Activated")
-            pDontNeedTest.Add("add_Closing")
-            pDontNeedTest.Add("remove_Closing")
-            pDontNeedTest.Add("add_Closed")
-            pDontNeedTest.Add("remove_Closed")
-            pDontNeedTest.Add("add_Deactivate")
-            pDontNeedTest.Add("remove_Deactivate")
-            pDontNeedTest.Add("add_Load")
-            pDontNeedTest.Add("remove_Load")
-            pDontNeedTest.Add("add_MdiChildActivate")
-            pDontNeedTest.Add("remove_MdiChildActivate")
-            pDontNeedTest.Add("add_MenuComplete")
-            pDontNeedTest.Add("remove_MenuComplete")
-            pDontNeedTest.Add("add_MenuStart")
-            pDontNeedTest.Add("remove_MenuStart")
-            pDontNeedTest.Add("add_InputLanguageChanged")
-            pDontNeedTest.Add("remove_InputLanguageChanged")
-            pDontNeedTest.Add("add_InputLanguageChanging")
-            pDontNeedTest.Add("remove_InputLanguageChanging")
-            pDontNeedTest.Add("AddOwnedForm")
-            pDontNeedTest.Add("Close")
-            pDontNeedTest.Add("LayoutMdi")
-            pDontNeedTest.Add("RemoveOwnedForm")
-            pDontNeedTest.Add("SetDesktopBounds")
-            pDontNeedTest.Add("SetDesktopLocation")
-            pDontNeedTest.Add("ShowDialog")
-            pDontNeedTest.Add("get_ParentForm")
-            pDontNeedTest.Add("Validate")
-            pDontNeedTest.Add("get_AutoScrollMargin")
-            pDontNeedTest.Add("set_AutoScrollMargin")
-            pDontNeedTest.Add("get_AutoScrollPosition")
-            pDontNeedTest.Add("set_AutoScrollPosition")
-            pDontNeedTest.Add("get_AutoScrollMinSize")
-            pDontNeedTest.Add("set_AutoScrollMinSize")
-            pDontNeedTest.Add("get_DockPadding")
-            pDontNeedTest.Add("ScrollControlIntoView")
-            pDontNeedTest.Add("SetAutoScrollMargin")
-            pDontNeedTest.Add("get_AccessibilityObject")
-            pDontNeedTest.Add("get_AccessibleDefaultActionDescription")
-            pDontNeedTest.Add("set_AccessibleDefaultActionDescription")
-            pDontNeedTest.Add("get_AccessibleDescription")
-            pDontNeedTest.Add("set_AccessibleDescription")
-            pDontNeedTest.Add("get_AccessibleName")
-            pDontNeedTest.Add("set_AccessibleName")
-            pDontNeedTest.Add("get_AccessibleRole")
-            pDontNeedTest.Add("set_AccessibleRole")
-            pDontNeedTest.Add("add_BackColorChanged")
-            pDontNeedTest.Add("remove_BackColorChanged")
-            pDontNeedTest.Add("add_BackgroundImageChanged")
-            pDontNeedTest.Add("remove_BackgroundImageChanged")
-            pDontNeedTest.Add("get_DataBindings")
-            pDontNeedTest.Add("ResetBindings")
-            pDontNeedTest.Add("add_BindingContextChanged")
-            pDontNeedTest.Add("remove_BindingContextChanged")
-            pDontNeedTest.Add("get_Bottom")
-            pDontNeedTest.Add("get_Bounds")
-            pDontNeedTest.Add("set_Bounds")
-            pDontNeedTest.Add("get_CanFocus")
-            pDontNeedTest.Add("get_CanSelect")
-            pDontNeedTest.Add("get_Capture")
-            pDontNeedTest.Add("set_Capture")
-            pDontNeedTest.Add("get_CausesValidation")
-            pDontNeedTest.Add("set_CausesValidation")
-            pDontNeedTest.Add("add_CausesValidationChanged")
-            pDontNeedTest.Add("remove_CausesValidationChanged")
-            pDontNeedTest.Add("get_ClientRectangle")
-            pDontNeedTest.Add("get_CompanyName")
-            pDontNeedTest.Add("get_ContainsFocus")
-            pDontNeedTest.Add("add_ContextMenuChanged")
-            pDontNeedTest.Add("remove_ContextMenuChanged")
-            pDontNeedTest.Add("get_Controls")
-            pDontNeedTest.Add("get_Created")
-            pDontNeedTest.Add("add_CursorChanged")
-            pDontNeedTest.Add("remove_CursorChanged")
-            pDontNeedTest.Add("get_IsDisposed")
-            pDontNeedTest.Add("get_Disposing")
-            pDontNeedTest.Add("add_DockChanged")
-            pDontNeedTest.Add("remove_DockChanged")
-            pDontNeedTest.Add("get_Enabled")
-            pDontNeedTest.Add("set_Enabled")
-            pDontNeedTest.Add("add_EnabledChanged")
-            pDontNeedTest.Add("remove_EnabledChanged")
-            pDontNeedTest.Add("add_FontChanged")
-            pDontNeedTest.Add("remove_FontChanged")
-            pDontNeedTest.Add("add_ForeColorChanged")
-            pDontNeedTest.Add("remove_ForeColorChanged")
-            pDontNeedTest.Add("get_HasChildren")
-            pDontNeedTest.Add("get_Height")
-            pDontNeedTest.Add("set_Height")
-            pDontNeedTest.Add("get_IsHandleCreated")
-            pDontNeedTest.Add("get_ImeMode")
-            pDontNeedTest.Add("set_ImeMode")
-            pDontNeedTest.Add("get_IsAccessible")
-            pDontNeedTest.Add("set_IsAccessible")
-            pDontNeedTest.Add("get_Left")
-            pDontNeedTest.Add("set_Left")
-            pDontNeedTest.Add("get_Location")
-            pDontNeedTest.Add("set_Location")
-            pDontNeedTest.Add("add_LocationChanged")
-            pDontNeedTest.Add("remove_LocationChanged")
-            pDontNeedTest.Add("get_Name")
-            pDontNeedTest.Add("set_Name")
-            pDontNeedTest.Add("get_Parent")
-            pDontNeedTest.Add("set_Parent")
-            pDontNeedTest.Add("get_ProductName")
-            pDontNeedTest.Add("get_ProductVersion")
-            pDontNeedTest.Add("get_RecreatingHandle")
-            pDontNeedTest.Add("get_Region")
-            pDontNeedTest.Add("set_Region")
-            pDontNeedTest.Add("get_Right")
-            pDontNeedTest.Add("add_RightToLeftChanged")
-            pDontNeedTest.Add("remove_RightToLeftChanged")
-            pDontNeedTest.Add("add_SizeChanged")
-            pDontNeedTest.Add("remove_SizeChanged")
-            pDontNeedTest.Add("get_TabStop")
-            pDontNeedTest.Add("set_TabStop")
-            pDontNeedTest.Add("add_TabStopChanged")
-            pDontNeedTest.Add("remove_TabStopChanged")
-            pDontNeedTest.Add("get_Tag")
-            pDontNeedTest.Add("set_Tag")
-            pDontNeedTest.Add("add_TextChanged")
-            pDontNeedTest.Add("remove_TextChanged")
-            pDontNeedTest.Add("get_Top")
-            pDontNeedTest.Add("set_Top")
-            pDontNeedTest.Add("get_TopLevelControl")
-            pDontNeedTest.Add("get_Visible")
-            pDontNeedTest.Add("set_Visible")
-            pDontNeedTest.Add("add_VisibleChanged")
-            pDontNeedTest.Add("remove_VisibleChanged")
-            pDontNeedTest.Add("get_Width")
-            pDontNeedTest.Add("set_Width")
-            pDontNeedTest.Add("get_WindowTarget")
-            pDontNeedTest.Add("set_WindowTarget")
-            pDontNeedTest.Add("add_Click")
-            pDontNeedTest.Add("remove_Click")
-            pDontNeedTest.Add("add_ControlAdded")
-            pDontNeedTest.Add("remove_ControlAdded")
-            pDontNeedTest.Add("add_ControlRemoved")
-            pDontNeedTest.Add("remove_ControlRemoved")
-            pDontNeedTest.Add("add_DragDrop")
-            pDontNeedTest.Add("remove_DragDrop")
-            pDontNeedTest.Add("add_DragEnter")
-            pDontNeedTest.Add("remove_DragEnter")
-            pDontNeedTest.Add("add_DragOver")
-            pDontNeedTest.Add("remove_DragOver")
-            pDontNeedTest.Add("add_DragLeave")
-            pDontNeedTest.Add("remove_DragLeave")
-            pDontNeedTest.Add("add_GiveFeedback")
-            pDontNeedTest.Add("remove_GiveFeedback")
-            pDontNeedTest.Add("add_HandleCreated")
-            pDontNeedTest.Add("remove_HandleCreated")
-            pDontNeedTest.Add("add_HandleDestroyed")
-            pDontNeedTest.Add("remove_HandleDestroyed")
-            pDontNeedTest.Add("add_HelpRequested")
-            pDontNeedTest.Add("remove_HelpRequested")
-            pDontNeedTest.Add("add_Invalidated")
-            pDontNeedTest.Add("remove_Invalidated")
-            pDontNeedTest.Add("add_Paint")
-            pDontNeedTest.Add("remove_Paint")
-            pDontNeedTest.Add("add_QueryContinueDrag")
-            pDontNeedTest.Add("remove_QueryContinueDrag")
-            pDontNeedTest.Add("add_QueryAccessibilityHelp")
-            pDontNeedTest.Add("remove_QueryAccessibilityHelp")
-            pDontNeedTest.Add("add_DoubleClick")
-            pDontNeedTest.Add("remove_DoubleClick")
-            pDontNeedTest.Add("add_Enter")
-            pDontNeedTest.Add("remove_Enter")
-            pDontNeedTest.Add("add_GotFocus")
-            pDontNeedTest.Add("remove_GotFocus")
-            pDontNeedTest.Add("add_ImeModeChanged")
-            pDontNeedTest.Add("remove_ImeModeChanged")
-            pDontNeedTest.Add("add_KeyDown")
-            pDontNeedTest.Add("remove_KeyDown")
-            pDontNeedTest.Add("add_KeyPress")
-            pDontNeedTest.Add("remove_KeyPress")
-            pDontNeedTest.Add("add_KeyUp")
-            pDontNeedTest.Add("remove_KeyUp")
-            pDontNeedTest.Add("add_Layout")
-            pDontNeedTest.Add("remove_Layout")
-            pDontNeedTest.Add("add_Leave")
-            pDontNeedTest.Add("remove_Leave")
-            pDontNeedTest.Add("add_LostFocus")
-            pDontNeedTest.Add("remove_LostFocus")
-            pDontNeedTest.Add("add_MouseDown")
-            pDontNeedTest.Add("remove_MouseDown")
-            pDontNeedTest.Add("add_MouseEnter")
-            pDontNeedTest.Add("remove_MouseEnter")
-            pDontNeedTest.Add("add_MouseLeave")
-            pDontNeedTest.Add("remove_MouseLeave")
-            pDontNeedTest.Add("add_MouseHover")
-            pDontNeedTest.Add("remove_MouseHover")
-            pDontNeedTest.Add("add_MouseMove")
-            pDontNeedTest.Add("remove_MouseMove")
-            pDontNeedTest.Add("add_MouseUp")
-            pDontNeedTest.Add("remove_MouseUp")
-            pDontNeedTest.Add("add_MouseWheel")
-            pDontNeedTest.Add("remove_MouseWheel")
-            pDontNeedTest.Add("add_Move")
-            pDontNeedTest.Add("remove_Move")
-            pDontNeedTest.Add("add_Resize")
-            pDontNeedTest.Add("remove_Resize")
-            pDontNeedTest.Add("add_ChangeUICues")
-            pDontNeedTest.Add("remove_ChangeUICues")
-            pDontNeedTest.Add("add_StyleChanged")
-            pDontNeedTest.Add("remove_StyleChanged")
-            pDontNeedTest.Add("add_SystemColorsChanged")
-            pDontNeedTest.Add("remove_SystemColorsChanged")
-            pDontNeedTest.Add("add_Validating")
-            pDontNeedTest.Add("remove_Validating")
-            pDontNeedTest.Add("add_Validated")
-            pDontNeedTest.Add("remove_Validated")
-            pDontNeedTest.Add("add_ParentChanged")
-            pDontNeedTest.Add("remove_ParentChanged")
-            pDontNeedTest.Add("BringToFront")
-            pDontNeedTest.Add("Contains")
-            pDontNeedTest.Add("CreateGraphics")
-            pDontNeedTest.Add("CreateControl")
-            pDontNeedTest.Add("DoDragDrop")
-            pDontNeedTest.Add("FindForm")
-            pDontNeedTest.Add("Focus")
-            pDontNeedTest.Add("GetChildAtPoint")
-            pDontNeedTest.Add("GetContainerControl")
-            pDontNeedTest.Add("GetNextControl")
-            pDontNeedTest.Add("Hide")
-            pDontNeedTest.Add("Invalidate")
-            pDontNeedTest.Add("PerformLayout")
-            pDontNeedTest.Add("PointToClient")
-            pDontNeedTest.Add("PointToScreen")
-            pDontNeedTest.Add("ResetImeMode")
-            pDontNeedTest.Add("RectangleToClient")
-            pDontNeedTest.Add("RectangleToScreen")
-            pDontNeedTest.Add("ResumeLayout")
-            pDontNeedTest.Add("Scale")
-            pDontNeedTest.Add("Select")
-            pDontNeedTest.Add("SelectNextControl")
-            pDontNeedTest.Add("SendToBack")
-            pDontNeedTest.Add("SetBounds")
-            pDontNeedTest.Add("Show")
-            pDontNeedTest.Add("SuspendLayout")
-            pDontNeedTest.Add("Update")
-            pDontNeedTest.Add("get_Container")
+            Dim lDontNeedTest() As String = { _
+            "<none>", _
+            "GetHashCode", _
+            "GetType", _
+            "set_AutoScaleBaseSize", _
+            "get_AutoScaleBaseSize", _
+            "set_ActiveControl", _
+            "get_ActiveControl", _
+            "set_AutoScroll", _
+            "get_AutoScroll", _
+            "get_Handle", _
+            "Invoke", _
+            "EndInvoke", _
+            "BeginInvoke", _
+            "get_InvokeRequired", _
+            "ResetText", _
+            "Refresh", _
+            "ResetRightToLeft", _
+            "ResetForeColor", _
+            "ResetFont", _
+            "ResetCursor", _
+            "ResetBackColor", _
+            "PreProcessMessage", _
+            "set_Text", _
+            "get_Text", _
+            "set_RightToLeft", _
+            "get_RightToLeft", _
+            "set_ForeColor", _
+            "get_ForeColor", _
+            "set_Font", _
+            "get_Font", _
+            "get_Focused", _
+            "set_Dock", _
+            "get_Dock", _
+            "get_DisplayRectangle", _
+            "set_Cursor", _
+            "get_Cursor", _
+            "set_ContextMenu", _
+            "get_ContextMenu", _
+            "set_BindingContext", _
+            "get_BindingContext", _
+            "set_BackgroundImage", _
+            "get_BackgroundImage", _
+            "set_BackColor", _
+            "get_BackColor", _
+            "set_Anchor", _
+            "get_Anchor", _
+            "set_AllowDrop", _
+            "get_AllowDrop", _
+            "Dispose", _
+            "remove_Disposed", _
+            "add_Disposed", _
+            "set_Site", _
+            "get_Site", _
+            "CreateObjRef", _
+            "InitializeLifetimeService", _
+            "GetLifetimeService", _
+            "get_AcceptButton", _
+            "set_AcceptButton", _
+            "get_ActiveMdiChild", _
+            "get_AllowTransparency", _
+            "set_AllowTransparency", _
+            "get_AutoScale", _
+            "set_AutoScale", _
+            "get_FormBorderStyle", _
+            "set_FormBorderStyle", _
+            "get_CancelButton", _
+            "set_CancelButton", _
+            "get_ClientSize", _
+            "set_ClientSize", _
+            "get_ControlBox", _
+            "set_ControlBox", _
+            "get_DesktopBounds", _
+            "set_DesktopBounds", _
+            "get_DesktopLocation", _
+            "set_DesktopLocation", _
+            "get_DialogResult", _
+            "set_DialogResult", _
+            "get_HelpButton", _
+            "set_HelpButton", _
+            "get_Icon", _
+            "set_Icon", _
+            "get_IsMdiChild", _
+            "get_IsMdiContainer", _
+            "set_IsMdiContainer", _
+            "get_KeyPreview", _
+            "set_KeyPreview", _
+            "add_MaximizedBoundsChanged", _
+            "remove_MaximizedBoundsChanged", _
+            "get_MaximumSize", _
+            "set_MaximumSize", _
+            "add_MaximumSizeChanged", _
+            "remove_MaximumSizeChanged", _
+            "get_Menu", _
+            "set_Menu", _
+            "get_MinimumSize", _
+            "set_MinimumSize", _
+            "add_MinimumSizeChanged", _
+            "remove_MinimumSizeChanged", _
+            "get_MaximizeBox", _
+            "set_MaximizeBox", _
+            "get_MdiChildren", _
+            "get_MdiParent", _
+            "set_MdiParent", _
+            "get_MergedMenu", _
+            "get_MinimizeBox", _
+            "set_MinimizeBox", _
+            "get_Modal", _
+            "get_Opacity", _
+            "set_Opacity", _
+            "get_OwnedForms", _
+            "get_Owner", _
+            "set_Owner", _
+            "get_ShowInTaskbar", _
+            "set_ShowInTaskbar", _
+            "get_Size", _
+            "set_Size", _
+            "get_SizeGripStyle", _
+            "set_SizeGripStyle", _
+            "get_StartPosition", _
+            "set_StartPosition", _
+            "get_TabIndex", _
+            "set_TabIndex", _
+            "add_TabIndexChanged", _
+            "remove_TabIndexChanged", _
+            "get_TopLevel", _
+            "set_TopLevel", _
+            "get_TopMost", _
+            "set_TopMost", _
+            "get_TransparencyKey", _
+            "set_TransparencyKey", _
+            "get_IsRestrictedWindow", _
+            "get_WindowState", _
+            "set_WindowState", _
+            "Activate", _
+            "add_Activated", _
+            "remove_Activated", _
+            "add_Closing", _
+            "remove_Closing", _
+            "add_Closed", _
+            "remove_Closed", _
+            "add_Deactivate", _
+            "remove_Deactivate", _
+            "add_Load", _
+            "remove_Load", _
+            "add_MdiChildActivate", _
+            "remove_MdiChildActivate", _
+            "add_MenuComplete", _
+            "remove_MenuComplete", _
+            "add_MenuStart", _
+            "remove_MenuStart", _
+            "add_InputLanguageChanged", _
+            "remove_InputLanguageChanged", _
+            "add_InputLanguageChanging", _
+            "remove_InputLanguageChanging", _
+            "AddOwnedForm", _
+            "Close", _
+            "LayoutMdi", _
+            "RemoveOwnedForm", _
+            "SetDesktopBounds", _
+            "SetDesktopLocation", _
+            "ShowDialog", _
+            "get_ParentForm", _
+            "Validate", _
+            "get_AutoScrollMargin", _
+            "set_AutoScrollMargin", _
+            "get_AutoScrollPosition", _
+            "set_AutoScrollPosition", _
+            "get_AutoScrollMinSize", _
+            "set_AutoScrollMinSize", _
+            "get_DockPadding", _
+            "ScrollControlIntoView", _
+            "SetAutoScrollMargin", _
+            "get_AccessibilityObject", _
+            "get_AccessibleDefaultActionDescription", _
+            "set_AccessibleDefaultActionDescription", _
+            "get_AccessibleDescription", _
+            "set_AccessibleDescription", _
+            "get_AccessibleName", _
+            "set_AccessibleName", _
+            "get_AccessibleRole", _
+            "set_AccessibleRole", _
+            "add_BackColorChanged", _
+            "remove_BackColorChanged", _
+            "add_BackgroundImageChanged", _
+            "remove_BackgroundImageChanged", _
+            "get_DataBindings", _
+            "ResetBindings", _
+            "add_BindingContextChanged", _
+            "remove_BindingContextChanged", _
+            "get_Bottom", _
+            "get_Bounds", _
+            "set_Bounds", _
+            "get_CanFocus", _
+            "get_CanSelect", _
+            "get_Capture", _
+            "set_Capture", _
+            "get_CausesValidation", _
+            "set_CausesValidation", _
+            "add_CausesValidationChanged", _
+            "remove_CausesValidationChanged", _
+            "get_ClientRectangle", _
+            "get_CompanyName", _
+            "get_ContainsFocus", _
+            "add_ContextMenuChanged", _
+            "remove_ContextMenuChanged", _
+            "get_Controls", _
+            "get_Created", _
+            "add_CursorChanged", _
+            "remove_CursorChanged", _
+            "get_IsDisposed", _
+            "get_Disposing", _
+            "add_DockChanged", _
+            "remove_DockChanged", _
+            "get_Enabled", _
+            "set_Enabled", _
+            "add_EnabledChanged", _
+            "remove_EnabledChanged", _
+            "add_FontChanged", _
+            "remove_FontChanged", _
+            "add_ForeColorChanged", _
+            "remove_ForeColorChanged", _
+            "get_HasChildren", _
+            "get_Height", _
+            "set_Height", _
+            "get_IsHandleCreated", _
+            "get_ImeMode", _
+            "set_ImeMode", _
+            "get_IsAccessible", _
+            "set_IsAccessible", _
+            "get_Left", _
+            "set_Left", _
+            "get_Location", _
+            "set_Location", _
+            "add_LocationChanged", _
+            "remove_LocationChanged", _
+            "get_Name", _
+            "set_Name", _
+            "get_Parent", _
+            "set_Parent", _
+            "get_ProductName", _
+            "get_ProductVersion", _
+            "get_RecreatingHandle", _
+            "get_Region", _
+            "set_Region", _
+            "get_Right", _
+            "add_RightToLeftChanged", _
+            "remove_RightToLeftChanged", _
+            "add_SizeChanged", _
+            "remove_SizeChanged", _
+            "get_TabStop", _
+            "set_TabStop", _
+            "add_TabStopChanged", _
+            "remove_TabStopChanged", _
+            "get_Tag", _
+            "set_Tag", _
+            "add_TextChanged", _
+            "remove_TextChanged", _
+            "get_Top", _
+            "set_Top", _
+            "get_TopLevelControl", _
+            "get_Visible", _
+            "set_Visible", _
+            "add_VisibleChanged", _
+            "remove_VisibleChanged", _
+            "get_Width", _
+            "set_Width", _
+            "get_WindowTarget", _
+            "set_WindowTarget", _
+            "add_Click", _
+            "remove_Click", _
+            "add_ControlAdded", _
+            "remove_ControlAdded", _
+            "add_ControlRemoved", _
+            "remove_ControlRemoved", _
+            "add_DragDrop", _
+            "remove_DragDrop", _
+            "add_DragEnter", _
+            "remove_DragEnter", _
+            "add_DragOver", _
+            "remove_DragOver", _
+            "add_DragLeave", _
+            "remove_DragLeave", _
+            "add_GiveFeedback", _
+            "remove_GiveFeedback", _
+            "add_HandleCreated", _
+            "remove_HandleCreated", _
+            "add_HandleDestroyed", _
+            "remove_HandleDestroyed", _
+            "add_HelpRequested", _
+            "remove_HelpRequested", _
+            "add_Invalidated", _
+            "remove_Invalidated", _
+            "add_Paint", _
+            "remove_Paint", _
+            "add_QueryContinueDrag", _
+            "remove_QueryContinueDrag", _
+            "add_QueryAccessibilityHelp", _
+            "remove_QueryAccessibilityHelp", _
+            "add_DoubleClick", _
+            "remove_DoubleClick", _
+            "add_Enter", _
+            "remove_Enter", _
+            "add_GotFocus", _
+            "remove_GotFocus", _
+            "add_ImeModeChanged", _
+            "remove_ImeModeChanged", _
+            "add_KeyDown", _
+            "remove_KeyDown", _
+            "add_KeyPress", _
+            "remove_KeyPress", _
+            "add_KeyUp", _
+            "remove_KeyUp", _
+            "add_Layout", _
+            "remove_Layout", _
+            "add_Leave", _
+            "remove_Leave", _
+            "add_LostFocus", _
+            "remove_LostFocus", _
+            "add_MouseDown", _
+            "remove_MouseDown", _
+            "add_MouseEnter", _
+            "remove_MouseEnter", _
+            "add_MouseLeave", _
+            "remove_MouseLeave", _
+            "add_MouseHover", _
+            "remove_MouseHover", _
+            "add_MouseMove", _
+            "remove_MouseMove", _
+            "add_MouseUp", _
+            "remove_MouseUp", _
+            "add_MouseWheel", _
+            "remove_MouseWheel", _
+            "add_Move", _
+            "remove_Move", _
+            "add_Resize", _
+            "remove_Resize", _
+            "add_ChangeUICues", _
+            "remove_ChangeUICues", _
+            "add_StyleChanged", _
+            "remove_StyleChanged", _
+            "add_SystemColorsChanged", _
+            "remove_SystemColorsChanged", _
+            "add_Validating", _
+            "remove_Validating", _
+            "add_Validated", _
+            "remove_Validated", _
+            "add_ParentChanged", _
+            "remove_ParentChanged", _
+            "BringToFront", _
+            "Contains", _
+            "CreateGraphics", _
+            "CreateControl", _
+            "DoDragDrop", _
+            "FindForm", _
+            "Focus", _
+            "GetChildAtPoint", _
+            "GetContainerControl", _
+            "GetNextControl", _
+            "Hide", _
+            "Invalidate", _
+            "PerformLayout", _
+            "PointToClient", _
+            "PointToScreen", _
+            "ResetImeMode", _
+            "RectangleToClient", _
+            "RectangleToScreen", _
+            "ResumeLayout", _
+            "Scale", _
+            "Select", _
+            "SelectNextControl", _
+            "SendToBack", _
+            "SetBounds", _
+            "Show", _
+            "SuspendLayout", _
+            "Update", _
+            "get_Container"}
+            pDontNeedTest.AddRange(lDontNeedTest)
         End If
         Return Not pDontNeedTest.Contains(aMethodName)
     End Function

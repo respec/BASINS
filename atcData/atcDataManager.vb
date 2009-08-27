@@ -287,40 +287,55 @@ Public Class atcDataManager
         Return lSelectedDataSource
     End Function
 
-    ''' <summary>Ask user to select data</summary>
-    ''' <param name="aTitle">
-    '''     <para>Optional title for dialog window, default is 'Select Data'</para>
-    ''' </param>  
-    ''' <param name="aSelected">
-    '''     <para>Optional pre-selected group of data, default is no data already selected</para>
-    ''' </param>  
-    ''' <param name="aAvailable">
-    '''     <para>Optional group of all data available for selection, default is all open data</para>
-    ''' </param>  
-    ''' <param name="aModal">
-    '''     <para>Optional modality specification for window, default is True</para>
-    ''' </param>  
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aTitle">Optional title for dialog window, default is 'Select Data'</param>
+    ''' <param name="aSelected">Optional pre-selected group of data, default is no data already selected</param>
+    ''' <param name="aAvailable">Optional group of all data available for selection, default is all open data</param>
+    ''' <param name="aModal">Optional modality specification for window, default is True</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Shared Function UserSelectData(Optional ByVal aTitle As String = "", _
                                           Optional ByVal aSelected As atcDataGroup = Nothing, _
                                           Optional ByVal aAvailable As atcDataGroup = Nothing, _
                                           Optional ByVal aModal As Boolean = True) As atcDataGroup
+        Return UserSelectData(aTitle, aSelected, aAvailable, aModal, True)
+    End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aTitle">Title for dialog window</param>
+    ''' <param name="aSelected">pre-selected group of data</param>
+    ''' <param name="aAvailable">group of all data available for selection</param>
+    ''' <param name="aModal">modality specification for window</param>
+    ''' <param name="aCancelReturnsOriginalSelected">choice of whether Cancel returns an empty group or the aSelected that was passed in</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Shared Function UserSelectData(ByVal aTitle As String, _
+                                          ByVal aSelected As atcDataGroup, _
+                                          ByVal aAvailable As atcDataGroup, _
+                                          ByVal aModal As Boolean, _
+                                          ByVal aCancelReturnsOriginalSelected As Boolean) As atcDataGroup
         Dim lForm As New frmSelectData
+        Dim lNonePreSelected As Boolean = (aSelected Is Nothing OrElse aSelected.Count = 0)
         If aTitle.Length > 0 Then lForm.Text = aTitle
         If aAvailable IsNot Nothing Then lForm.AvailableData = aAvailable
 
-        Dim lAutoSelected As Boolean = False
         'Try automatically selecting data based on what is selected on the map
-        If aSelected Is Nothing OrElse aSelected.Count = 0 Then
-            If aSelected Is Nothing Then
-                aSelected = DatasetsAtMapSelectedLocations()
-            Else
-                aSelected.AddRange(DatasetsAtMapSelectedLocations)
-            End If
-            If aSelected.Count > 0 Then lAutoSelected = True
+
+        If aSelected Is Nothing Then
+            aSelected = DatasetsAtMapSelectedLocations()
+        ElseIf aSelected.Count = 0 Then
+            aSelected.AddRange(DatasetsAtMapSelectedLocations)
         End If
+
         aSelected = lForm.AskUser(aSelected, aModal)
-        If lAutoSelected AndAlso Not lForm.SelectedOk AndAlso Not aSelected Is Nothing Then
-            aSelected.Clear() 'We got back our location-selected data but the user didn't click Ok
+        If Not lForm.SelectedOk Then 'User did not click Ok
+            If lNonePreSelected OrElse Not aCancelReturnsOriginalSelected Then
+                aSelected.Clear() 'caller does not want original selection back or there was not an original selection
+            End If
         End If
         Return aSelected
     End Function
@@ -424,7 +439,7 @@ Public Class atcDataManager
     Private Shared Function MapLayerLocationField(ByVal aLayerDBF As atcTableDBF) As Integer
         Dim lLocationField As Integer = 0 'One-based field index. Zero indicates we have not found the index yet.
 
-        Dim lLayerListFilename As String = FindFile("Please locate layers.dbf", "\BASINS\etc\DataDownload\layers.dbf") 'table containing location field for BASINS layers
+        Dim lLayerListFilename As String = FindFile("Please locate layers.dbf", g_PathChar & "BASINS\etc\DataDownload\layers.dbf") 'table containing location field for BASINS layers
         If FileExists(lLayerListFilename) Then
             Try
                 Dim lLayersDBF As New atcTableDBF
