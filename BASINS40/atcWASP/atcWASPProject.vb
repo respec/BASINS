@@ -406,6 +406,22 @@ Public Class atcWASPProject
         Return lArea
     End Function
 
+    Public Sub CreateFlowlineShapeFile(ByVal aSegmentLayerIndex As Integer, ByRef aSelectedIndexes As atcCollection)
+        Dim lNewFileName As String = ""
+        Dim lSelectedIndexCollection As New Collection
+        For Each lSelectedIndex As Object In aSelectedIndexes
+            lSelectedIndexCollection.Add(lSelectedIndex)
+        Next
+        GisUtil.SaveSelectedFeatures(aSegmentLayerIndex, lSelectedIndexCollection, lNewFileName, "polylinez")
+        If GisUtil.IsLayer("Flowlines for WASP Project") Then
+            GisUtil.RemoveLayer(GisUtil.LayerIndex("Flowlines for WASP Project"))
+        End If
+        GisUtil.AddLayer(lNewFileName, "Flowlines for WASP Project")
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(lNewFileName)
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+        GisUtil.SetLayerLineSize(lNewLayerIndex, 2)
+    End Sub
+
     Public Sub CreateSegmentShapeFile(ByVal aSegmentLayerIndex As Integer, ByRef aWASPShapefileName As String)
         'come up with name of new shapefile
         Dim lSegmentShapefileName As String = GisUtil.LayerFileName(aSegmentLayerIndex)
@@ -429,7 +445,7 @@ Public Class atcWASPProject
         GisUtil.LayerVisible(lNewLayerIndex) = True
         'add an id field to the new shapefile
         Dim lNewIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "ID", 0, 20)
-        Dim lNewWASPIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "WASPID", 0, 20)
+        Dim lNewWASPIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "SEGID", 0, 20)
 
         'now add segments to the shapefile
         For Each lSegment As atcWASPSegment In Me.Segments
@@ -458,7 +474,7 @@ Public Class atcWASPProject
 
         'add rendering
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(lBufferedShapefileFilename)
-        GisUtil.UniqueValuesRenderer(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "WASPID"))
+        GisUtil.UniqueValuesRenderer(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "SEGID"))
         GisUtil.SetLayerLineSize(lLayerIndex, 0)
     End Sub
 
@@ -898,7 +914,7 @@ Public Class atcWASPProject
         For i As Integer = 1 To lHeadwatersIndexes.Count - 1
             lend = False
             lthisSeg = Segments.Item(lHeadwatersIndexes(i) - 1)
-            ltemp.AppendLine("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WASPID.ToString.PadLeft(4) & Space(11) & lflowfraction)
+            ltemp.Append("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WASPID.ToString.PadLeft(4) & Space(11) & lflowfraction)
             ldoneFlowpaths.Add("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WASPID.ToString.PadLeft(4))
             lnumflowroutes += 1
             lthisFlowfunction = New System.Text.StringBuilder
@@ -924,6 +940,7 @@ Public Class atcWASPProject
                     Else
                         ldoneFlowpaths.Add(lthisPair)
                     End If
+                    ltemp.Append(vbCrLf)
                     ltemp.Append(lthisSeg.WASPID.ToString.PadLeft(4) & Segments.Item(ldownID).WASPID.ToString.PadLeft(4) & Space(11) & lflowfraction)
                     lnumflowroutes += 1
                     lthisSeg = Segments.Item(ldownID)
@@ -937,7 +954,11 @@ Public Class atcWASPProject
                 'clear the ltemp content for subsequent flow functions
                 'Add this flow function to the overall list
                 lnumFlowFunc += 1
-                lthisFlowfunction.AppendLine(Space(2) & Segments.Item(lHeadwatersIndexes(i) - 1).Name)
+                Dim lPathName As String = Segments.Item(lHeadwatersIndexes(i) - 1).Name
+                If IsNumeric(lPathName) Then
+                    lPathName = "FlowPath " & lnumFlowFunc.ToString
+                End If
+                lthisFlowfunction.AppendLine(Space(2) & lPathName)
                 lthisFlowfunction.AppendLine(Space(3) & lnumflowroutes.ToString)
                 lthisFlowfunction.Append(ltemp.ToString)
                 lflowpaths.Add(lHeadwatersIndexes(i), lthisFlowfunction.ToString)
@@ -1023,7 +1044,9 @@ Public Class atcWASPProject
                     aSW.WriteLine(Space(2) & lValCount & Space(15) & "Number of time-flow values")
                     For lindex As Integer = 1 To lflowTS.TimeSeries.Values.Length - 1
                         If lflowTS.TimeSeries.Dates.Values(lindex) >= SJDate And lflowTS.TimeSeries.Dates.Values(lindex) <= EJDate Then
-                            aSW.WriteLine(Space(3) & String.Format("{0:0.000}", lflowTS.TimeSeries.Dates.Values(lindex) - SJDate) & Space(2) & String.Format("{0:0.000}", lflowTS.TimeSeries.Values(lindex)))
+                            Dim lFlowVal As Single = lflowTS.TimeSeries.Values(lindex)
+                            lFlowVal = lFlowVal / (3.281 ^ 3)  'convert cfs to cms
+                            aSW.WriteLine(Space(3) & String.Format("{0:0.000}", lflowTS.TimeSeries.Dates.Values(lindex) - SJDate) & Space(2) & String.Format("{0:0.000}", lFlowVal))
                         End If
                     Next
                 ElseIf lflowTS IsNot Nothing Then
