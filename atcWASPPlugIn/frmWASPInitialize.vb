@@ -33,14 +33,16 @@ Public Class frmWASPInitialize
     Private Sub RefreshSelectionInfo()
         pCurrentLayerIndex = GisUtil.CurrentLayer
         pCurrentLayerName = GisUtil.LayerName(GisUtil.CurrentLayer)
-        pNumSelected = GisUtil.NumSelectedFeatures(pCurrentLayerIndex)
-        pNumFeatures = GisUtil.NumFeatures(pCurrentLayerIndex)
+        If GisUtil.LayerType(pCurrentLayerIndex) = 2 Then
+            pNumSelected = GisUtil.NumSelectedFeatures(pCurrentLayerIndex)
+            pNumFeatures = GisUtil.NumFeatures(pCurrentLayerIndex)
 
-        'save which features are selected
-        pSelectedIndexes = New atcCollection
-        For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(pCurrentLayerIndex) - 1
-            pSelectedIndexes.Add(lIndex, GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, pCurrentLayerIndex))
-        Next
+            'save which features are selected
+            pSelectedIndexes = New atcCollection
+            For lIndex As Integer = 0 To GisUtil.NumSelectedFeatures(pCurrentLayerIndex) - 1
+                pSelectedIndexes.Add(lIndex, GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex, pCurrentLayerIndex))
+            Next
+        End If
 
         'txtInfo.Text = pNumSelected.ToString & " features out of " & pNumFeatures.ToString & " in the '" & _
         '               pCurrentLayerName & "' layer are selected."
@@ -48,10 +50,10 @@ Public Class frmWASPInitialize
                        "Number of Selected Features: " & pNumSelected.ToString & " of " & pNumFeatures.ToString
 
         'does the current layer look like a nhdplus flowlines layer?
-        If GisUtil.LayerType(pCurrentLayerIndex) = 2 And _
-           GisUtil.IsField(pCurrentLayerIndex, "COMID") And _
-           GisUtil.IsField(pCurrentLayerIndex, "TOCOMID") And _
-           GisUtil.IsField(pCurrentLayerIndex, "MAVELU") And _
+        If GisUtil.LayerType(pCurrentLayerIndex) = 2 AndAlso _
+           GisUtil.IsField(pCurrentLayerIndex, "COMID") AndAlso _
+           GisUtil.IsField(pCurrentLayerIndex, "TOCOMID") AndAlso _
+           GisUtil.IsField(pCurrentLayerIndex, "MAVELU") AndAlso _
            GisUtil.IsField(pCurrentLayerIndex, "CUMDRAINAG") Then
             'yes, looks like nhdplus flowlines
             txtWarning.Text = ""
