@@ -12,9 +12,9 @@ Public Class clsCatModelSWAT
     Private pBaseScenario As String = ""
     Private pSWATDatabaseName As String = ""
     Private pMetWDM As atcWDM.atcDataSourceWDM
-    Private pBaseOutputHruFileName As String
-    Private pBaseOutputRchFileName As String
-    Private pBaseOutputSubFileName As String
+    Private pBaseOutputHruFileName As String = Nothing
+    Private pBaseOutputRchFileName As String = Nothing
+    Private pBaseOutputSubFileName As String = Nothing
 
     Public Property BaseScenario() As String Implements clsCatModel.BaseScenario
         Get
@@ -26,6 +26,12 @@ Public Class clsCatModelSWAT
     End Property
 
     Friend Sub OpenBaseScenario(Optional ByVal aFilename As String = "")
+        If pBaseOutputHruFileName IsNot Nothing AndAlso _
+           pBaseOutputRchFileName IsNot Nothing AndAlso _
+           pBaseOutputSubFileName IsNot Nothing Then
+            GoTo ALREADYSET
+        End If
+
         pBaseOutputHruFileName = Nothing
         pBaseOutputRchFileName = Nothing
         pBaseOutputSubFileName = Nothing
@@ -153,6 +159,7 @@ OpenOutput:
 
             End If
         End If
+ALREADYSET:
     End Sub
 
     Public Property SWATDatabasePath() As String
@@ -187,6 +194,7 @@ OpenOutput:
                 TryCopy(lFigFilename, lTxtInOutFolder & "fig.fig")
             End If
         End If
+
         'write met data
         Dim lCioItem As SwatObject.SwatInput.clsCIOItem = lSwatInput.CIO.Item
         modSwatMetData.WriteSwatMetInput(pMetWDM, aModifiedData, lProjectFolder, lTxtInOutFolder, _
@@ -194,18 +202,32 @@ OpenOutput:
                                          atcUtility.Jday(lCioItem.IYR + lCioItem.NBYR, 1, 1, 0, 0, 0))
         If aRunModel Then
             ChDir(lTxtInOutFolder)
-            Dim lSWATexeTargetPath As String = lTxtInOutFolder & "Swat2005.exe"
-            If Not IO.File.Exists(lSWATexeTargetPath) Then
-                Dim lSWATexePath As String = IO.Path.Combine(SWATProgramBase, "Swat2005.exe")
-                If Not IO.File.Exists(lSWATexePath) Then
-                    lSWATexePath = FindFile("Please Locate Swat2005.exe", lSWATexePath)
-                    If IO.File.Exists(lSWATexePath) Then
-                        SWATProgramBase = IO.Path.GetDirectoryName(lSWATexePath)
-                        IO.File.Copy(lSWATexePath, lSWATexeTargetPath)
-                    End If
+            'Dim lSWATexeTargetPath As String = lTxtInOutFolder & "Swat2005.exe"
+            'If Not IO.File.Exists(lSWATexeTargetPath) Then
+            '    Dim lSWATexePath As String = IO.Path.Combine(SWATProgramBase, "Swat2005.exe")
+            '    If Not IO.File.Exists(lSWATexePath) Then
+            '        lSWATexePath = FindFile("Please Locate Swat2005.exe", lSWATexePath)
+            '        If IO.File.Exists(lSWATexePath) Then
+            '            SWATProgramBase = IO.Path.GetDirectoryName(lSWATexePath)
+            '            IO.File.Copy(lSWATexePath, lSWATexeTargetPath)
+            '        End If
+            '    End If
+            'End If
+            'If IO.File.Exists(lSWATexeTargetPath) Then
+            '    Logger.Dbg("StartModel")
+            '    LaunchProgram(lSWATexeTargetPath, lTxtInOutFolder)
+            '    Logger.Dbg("DoneModelRun")
+            'Else
+            '    Logger.Dbg("SWAT exe not found, skipping model run")
+            'End If
+
+            Dim lSWATExe As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseScenario), "swat2005.exe")
+            Dim lSWATexeTargetPath As String = String.Empty
+            If IO.File.Exists(lSWATExe) Then
+                If TryDelete(lTxtInOutFolder & "swat2005.exe") Then
+                    TryCopy(lSWATExe, lTxtInOutFolder & "swat2005.exe")
                 End If
-            End If
-            If IO.File.Exists(lSWATexeTargetPath) Then
+                lSWATexeTargetPath = IO.Path.Combine(lTxtInOutFolder, "swat2005.exe")
                 Logger.Dbg("StartModel")
                 LaunchProgram(lSWATexeTargetPath, lTxtInOutFolder)
                 Logger.Dbg("DoneModelRun")
