@@ -1705,7 +1705,7 @@ Public Class GisUtil
                             lSf1Ext.yMax < lSf2ShapeExtYmin(k)) Then
                         'look for intersection from overlay of these shapes
                         lShapeNew = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lSf2Shape(k))
-                        If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
+                        If Not lShapeNew Is Nothing AndAlso lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
                             lBsuc = lSfOut.EditInsertShape(lShapeNew, lSfOut.NumShapes)
                             If Not lBsuc Then
                                 Logger.Dbg("Problem Adding Shape") 'TODO:add more details, message box?
@@ -1793,7 +1793,7 @@ Public Class GisUtil
                 lShape1Ext.yMax < lShape2Ext.yMin) Then
             'look for intersection from overlay of these shapes
             lShapeNew = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lShape2)
-            If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
+            If Not lShapeNew Is Nothing AndAlso lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
                 lBsuc = lSfOut.EditInsertShape(lShapeNew, lSfOut.NumShapes)
                 If Not lBsuc Then
                     Logger.Dbg("Problem Adding Shape") 'TODO:add more details, message box?
@@ -1895,7 +1895,7 @@ Public Class GisUtil
                             lSf1Ext.yMax < lSf2ShapeExtYmin(k)) Then
                         'look for intersection from overlay of these shapes
                         lShapeNew = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lSf2Shape(k))
-                        If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
+                        If Not lShapeNew Is Nothing AndAlso lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
                             Dim lArea As Double = Math.Abs(MapWinGeoProc.Utils.Area(lShapeNew))
                             'keep track of field values from both shapefiles
                             Dim lFeature1Id As String = FieldValue(aPolygonLayer1Index, i - 1, aLayer1FieldIndex)
@@ -2372,7 +2372,7 @@ Public Class GisUtil
         Dim lNewShape As MapWinGIS.Shape
 
         lNewShape = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lShape2)
-        If lNewShape.numPoints > 0 Then
+        If Not lNewShape Is Nothing AndAlso lNewShape.numPoints > 0 Then
             lAreaOverlappingPolygons = Math.Abs(MapWinGeoProc.Utils.Area(lNewShape))
         End If
         lNewShape = Nothing
