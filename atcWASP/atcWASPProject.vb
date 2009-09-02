@@ -93,7 +93,7 @@ Public Class atcWASPProject
             Dim lWASPDir As String = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\USEPA\WASP\7.0", "DatabaseDir", "") & "..\wasp.exe"
             Dim lWASPexe As String = atcUtility.FindFile("Please locate the EPA WASP Executable", lWASPDir)
             If IO.File.Exists(lWASPexe) Then
-                LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), "-import " & aInputFileName, False)
+                LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), "-import " & """" & aInputFileName & """", False)
                 Logger.Dbg("WASP launched with input " & aInputFileName)
             Else
                 Logger.Msg("Cannot find the EPA WASP Executable", MsgBoxStyle.Critical, "BASINS WASP Problem")
@@ -238,11 +238,13 @@ Public Class atcWASPProject
                     End If
                     aNewSegments.Add(lSegmentCombined)
                     'fix DownIds for upstream segments
-                    For Each lSegment In Segments
-                        If lSegment.DownID = lSegmentRemoved.ID Then
-                            lSegment.DownID = lSegmentCombined.ID
-                        End If
-                    Next
+                    If Not lSegmentRemoved Is Nothing Then
+                        For Each lSegment In Segments
+                            If lSegment.DownID = lSegmentRemoved.ID Then
+                                lSegment.DownID = lSegmentCombined.ID
+                            End If
+                        Next
+                    End If
                 End If
             Else 'no problem, use as is
                 aNewSegments.Add(lSegment)
@@ -313,12 +315,12 @@ Public Class atcWASPProject
                         lBasePoint += 1
                     Next
                 Else
-                    For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0)
+                    For lIndex As Integer = 0 To aSegmentPrimary.PtsX.GetLength(0) - 1
                         .PtsX(lIndex) = aSegmentPrimary.PtsX(lIndex)
-                        .PtsY(lIndex) = aSegmentPrimary.PtsX(lIndex)
+                        .PtsY(lIndex) = aSegmentPrimary.PtsY(lIndex)
                     Next
-                    Dim lBasePoint As Integer = aSegmentPrimary.PtsX.GetLength(0)
-                    For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0)
+                    Dim lBasePoint As Integer = aSegmentPrimary.PtsX.GetLength(0) - 1
+                    For lIndex As Integer = 0 To aSegmentSecondary.PtsX.GetLength(0) - 1
                         lBasePoint += 1
                         .PtsX(lBasePoint) = aSegmentSecondary.PtsX(lIndex)
                         .PtsY(lBasePoint) = aSegmentSecondary.PtsY(lIndex)
