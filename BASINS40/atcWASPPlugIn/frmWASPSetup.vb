@@ -1472,12 +1472,16 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cmdCreateShapefile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCreateShapefile.Click
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        Dim lWASPSegmentShapefile As String = ""
-        pPlugIn.WASPProject.CreateSegmentShapeFile(pSegmentLayerIndex, lWASPSegmentShapefile)
-        pPlugIn.WASPProject.CreateBufferedSegmentShapeFile(lWASPSegmentShapefile)
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-        Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
+        Try
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+            Dim lWASPSegmentShapefile As String = ""
+            pPlugIn.WASPProject.CreateSegmentShapeFile(pSegmentLayerIndex, lWASPSegmentShapefile)
+            pPlugIn.WASPProject.CreateBufferedSegmentShapeFile(lWASPSegmentShapefile)
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
+        Catch lEX As Exception
+            Logger.Msg(lEX.Message, MsgBoxStyle.Critical, "Problem Creating Shapefile")
+        End Try
     End Sub
 
     Private Sub SetDates()
