@@ -1248,10 +1248,12 @@ Public Class frmWASPSetup
             AtcGridSegmentation.ColumnWidth(0) = 140
             AtcGridSegmentation.Refresh()
 
-            'If pInitializing Then
-            atxTravelTimeMax.Text = lMaxTravelTime
-            atxTravelTimeMin.Text = lMinTravelTime
-            'End If
+            If atxTravelTimeMax.Text = "0" Then
+                atxTravelTimeMax.Text = lMaxTravelTime
+            End If
+            If atxTravelTimeMin.Text = "0" Then
+                atxTravelTimeMin.Text = lMinTravelTime
+            End If
 
             Logger.Dbg("SegmentationGrid refreshed")
         End If
