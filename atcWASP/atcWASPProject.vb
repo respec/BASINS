@@ -93,7 +93,8 @@ Public Class atcWASPProject
             Dim lWASPDir As String = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\USEPA\WASP\7.0", "DatabaseDir", "") & "..\wasp.exe"
             Dim lWASPexe As String = atcUtility.FindFile("Please locate the EPA WASP Executable", lWASPDir)
             If IO.File.Exists(lWASPexe) Then
-                LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), "-import " & """" & aInputFileName & """", False)
+                Process.Start(lWASPexe, "-import " & """" & aInputFileName & """")
+                'LaunchProgram(lWASPexe, IO.Path.GetDirectoryName(aInputFileName), "-import " & """" & aInputFileName & """", False)
                 Logger.Dbg("WASP launched with input " & aInputFileName)
             Else
                 Logger.Msg("Cannot find the EPA WASP Executable", MsgBoxStyle.Critical, "BASINS WASP Problem")
@@ -115,44 +116,46 @@ Public Class atcWASPProject
         With Me
             Try
                 'populate the WASP classes from the shapefiles
-                .Segments.Clear()
-                Dim lTable As New atcUtility.atcTableDBF
+                If .Segments.Count = 0 Then   'dont read these in again if we already have them, we might have already combined/divided them
+                    .Segments.Clear()
+                    Dim lTable As New atcUtility.atcTableDBF
 
-                'add only selected segments
-                Dim lSegmentShapefileName As String = GisUtil.LayerFileName(aSegmentLayerIndex)
-                If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
-                    Logger.Dbg("Add " & aSelectedIndexes.Count & " SegmentsFrom " & lSegmentShapefileName)
-                    Dim lSegmentsSelected As New ArrayList '(Of atcWASP.atcWASPSegment)
-                    For Each lShapeIndex As Integer In aSelectedIndexes
-                        lTable.CurrentRecord = lShapeIndex + 1
-                        Dim lSeg As New atcWASP.atcWASPSegment
-                        lTable.PopulateObject(lSeg, .SegmentFieldMap)
-                        Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
-                        lSeg.InputTimeseriesCollection = lTimeseriesCollection
-                        lSeg.BaseID = lSeg.ID   'store segment id before breaking up
-                        GisUtil.LineCentroid(aSegmentLayerIndex, lShapeIndex, lSeg.CentroidX, lSeg.CentroidY) 'store centroid 
-                        GisUtil.PointsOfLine(aSegmentLayerIndex, lShapeIndex, lSeg.PtsX, lSeg.PtsY)  'store point coordinates of vertices
-                        lSegmentsSelected.Add(lSeg)
+                    'add only selected segments
+                    Dim lSegmentShapefileName As String = GisUtil.LayerFileName(aSegmentLayerIndex)
+                    If lTable.OpenFile(FilenameSetExt(lSegmentShapefileName, "dbf")) Then
+                        Logger.Dbg("Add " & aSelectedIndexes.Count & " SegmentsFrom " & lSegmentShapefileName)
+                        Dim lSegmentsSelected As New ArrayList '(Of atcWASP.atcWASPSegment)
+                        For Each lShapeIndex As Integer In aSelectedIndexes
+                            lTable.CurrentRecord = lShapeIndex + 1
+                            Dim lSeg As New atcWASP.atcWASPSegment
+                            lTable.PopulateObject(lSeg, .SegmentFieldMap)
+                            Dim lTimeseriesCollection As New atcWASP.atcWASPTimeseriesCollection
+                            lSeg.InputTimeseriesCollection = lTimeseriesCollection
+                            lSeg.BaseID = lSeg.ID   'store segment id before breaking up
+                            GisUtil.LineCentroid(aSegmentLayerIndex, lShapeIndex, lSeg.CentroidX, lSeg.CentroidY) 'store centroid 
+                            GisUtil.PointsOfLine(aSegmentLayerIndex, lShapeIndex, lSeg.PtsX, lSeg.PtsY)  'store point coordinates of vertices
+                            lSegmentsSelected.Add(lSeg)
+                        Next
+                        .Segments.AddRange(NumberObjects(lSegmentsSelected, "Name"))
+                    End If
+                    Logger.Dbg("SegmentsCount " & .Segments.Count)
+
+                    'calculate depth and width from mean annual flow and mean annual velocity
+                    'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284    -- assumption from GBMM
+                    For Each lSegment As atcWASPSegment In .Segments
+                        lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
+                        lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
                     Next
-                    .Segments.AddRange(NumberObjects(lSegmentsSelected, "Name"))
+
+                    'do unit conversions from NHDPlus units to WASP assumed units
+                    For Each lSegment As atcWASPSegment In .Segments
+                        lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
+                        lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
+                        'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
+                        lSegment.Depth = SignificantDigits(lSegment.Depth / 3.281, 3)  'convert ft to m
+                        lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
+                    Next
                 End If
-                Logger.Dbg("SegmentsCount " & .Segments.Count)
-
-                'calculate depth and width from mean annual flow and mean annual velocity
-                'Depth (ft)= a*DA^b (english):  a= 1.5; b=0.284    -- assumption from GBMM
-                For Each lSegment As atcWASPSegment In .Segments
-                    lSegment.Depth = 1.5 * (lSegment.CumulativeDrainageArea ^ 0.284)   'gives depth in ft
-                    lSegment.Width = (lSegment.MeanAnnualFlow / lSegment.Velocity) / lSegment.Depth  'gives width in ft
-                Next
-
-                'do unit conversions from NHDPlus units to WASP assumed units
-                For Each lSegment As atcWASPSegment In .Segments
-                    lSegment.Velocity = SignificantDigits(lSegment.Velocity / 3.281, 3)  'convert ft/s to m/s
-                    lSegment.MeanAnnualFlow = SignificantDigits(lSegment.MeanAnnualFlow / (3.281 ^ 3), 3) 'convert cfs to cms
-                    'lSegment.DrainageArea = lSegment.DrainageArea  'already in sq km
-                    lSegment.Depth = SignificantDigits(lSegment.Depth / 3.281, 3)  'convert ft to m
-                    lSegment.Width = SignificantDigits(lSegment.Width / 3.281, 3)  'convert ft to m
-                Next
 
                 Dim lProblem As String = ""
                 If aMinTravelTime > 0 Then 'minimum travel time has been set, combine the segments as needed
@@ -224,10 +227,15 @@ Public Class atcWASPProject
                 Else 'combine with downstream (if possible)
                     Dim lDownStreamSegment As atcWASPSegment = Segments(lSegment.DownID)
                     Dim lDownStreamUpMainSegment As atcWASPSegment = UpstreamMainSegment(lDownStreamSegment.ID)
-                    If lDownStreamUpMainSegment.ID = lSegment.ID Then
-                        lSegmentCombined = CombineSegment(lSegment, lDownStreamSegment, False)
+                    If lDownStreamUpMainSegment.Removed Then
+                        'can't combine with a downstream segment that has already been removed, just keep this one for now
+                        aNewSegments.Add(lSegment)
                     Else
-                        Logger.Dbg("Skip " & lSegment.ID & " Nothing up and not MainChannel")
+                        If lDownStreamUpMainSegment.ID = lSegment.ID Then
+                            lSegmentCombined = CombineSegment(lSegment, lDownStreamSegment, False)
+                        Else
+                            Logger.Dbg("Skip " & lSegment.ID & " Nothing up and not MainChannel")
+                        End If
                     End If
                 End If
                 If lSegmentCombined IsNot Nothing Then
@@ -235,6 +243,9 @@ Public Class atcWASPProject
                         Logger.Dbg("StillToShort " & lSegmentCombined.ID & " " & TravelTime(lSegmentCombined.Length, lSegmentCombined.Velocity))
                         lSegmentCombined.TooShort = True
                         'TODO: what should we do now?
+                    End If
+                    If aNewSegments.Contains(lSegmentCombined.ID) Then
+                        aNewSegments.Remove(lSegmentCombined.ID)
                     End If
                     aNewSegments.Add(lSegmentCombined)
                     'fix DownIds for upstream segments
@@ -281,8 +292,8 @@ Public Class atcWASPProject
             lSegment = aSegmentPrimary.Clone
         Else 'secondary downstream
             lSegment = aSegmentSecondary.Clone
-            lSegment.DownID = aSegmentPrimary.DownID
-            lSegment.ID = aSegmentPrimary.ID
+            'lSegment.DownID = aSegmentPrimary.DownID  'I think this is a bug
+            'lSegment.ID = aSegmentPrimary.ID
         End If
 
         Try
