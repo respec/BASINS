@@ -241,13 +241,7 @@ Public Class atcCollection
 
     Private Function CompareValues(ByVal x As Generic.KeyValuePair(Of Object, Object), _
                                    ByVal y As Generic.KeyValuePair(Of Object, Object)) As Integer
-        If x.Value > y.Value Then
-            Return 1
-        ElseIf x.Value < y.Value Then
-            Return -1
-        Else
-            Return 0
-        End If
+        Return x.Value.CompareTo(y.Value)
     End Function
 
     Public Shadows Sub TrimToSize()
