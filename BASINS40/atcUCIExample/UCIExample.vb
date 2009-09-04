@@ -39,7 +39,7 @@ Public Module UCIExample
         Dim lRunDescription As String = lUci.GlobalBlock.RunInf.Value
 
         'loop thru each file in the files block
-        Dim lFile As atcUCI.HspfData.HspfFile
+        Dim lFile As atcUCI.HspfFile
         Dim lWDMs As New Collection
         Dim lHBNs As New Collection
         For lIndex As Integer = 1 To lUci.FilesBlock.Count
