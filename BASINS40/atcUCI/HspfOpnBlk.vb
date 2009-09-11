@@ -417,7 +417,7 @@ Public Class HspfOpnBlk
         Next vId
     End Sub
 
-    Public Sub AddTableForAll(ByRef aTableName As String, ByRef aOperationName As String)
+    Public Sub AddTableForAll(ByRef aTableName As String, ByRef aOperationName As String, Optional ByVal aOccurIndex As Integer = 1)
         'add a table to the uci object for all operation ids
         Dim lBlockDef As HspfBlockDef = Uci.Msg.BlockDefs(aOperationName)
 
@@ -437,8 +437,13 @@ Public Class HspfOpnBlk
 
             lTable.Def = lBlockDef.TableDefs.Item(lTableName)
             lTable.InitTable("")
-            ltable.OccurCount = lTableOccurNumber
-            ltable.OccurNum = lTableOccurNumber
+            lTable.OccurCount = lTableOccurNumber
+            lTable.OccurNum = lTableOccurNumber
+            Dim lOccurIndex As Integer = aOccurIndex
+            If lOccurIndex = 0 Then
+                lOccurIndex = lTableOccurNumber
+            End If
+            lTable.OccurIndex = lOccurIndex
             If lTableOccurNumber > 1 Then
                 'set occurcounts for previous occurrances
                 If Me.TableExists(lTableName) Then
@@ -450,12 +455,12 @@ Public Class HspfOpnBlk
                     End If
                 Next lTableIndex
             End If
-            ltable.Opn = lOperation
+            lTable.Opn = lOperation
             If Not lOperation.TableExists(aTableName) Then 'add to this id
-                lOperation.Tables.Add(ltable)
+                lOperation.Tables.Add(lTable)
             End If
             If Not Me.TableExists(aTableName) Then 'add to this oper-type block
-                Me.Tables.Add(ltable)
+                Me.Tables.Add(lTable)
             End If
         Next lOperation
     End Sub
@@ -530,10 +535,23 @@ Public Class HspfOpnBlk
                                 If lGroupIndex > 1 And lTable.OccurIndex = 0 Then
                                     'write the comment that applies to this table
                                     Dim lTableKey As String = lTable.Name & ":" & lGroupIndex
-                                    Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
-                                    If lTableX.TableComment.Length > 0 Then
-                                        lSB.AppendLine(lTableX.TableComment)
+                                    Dim lTableIndex As Integer = lGroupIndex
+                                    While Not lOperation.OpnBlk.TableExists(lTableKey)
+                                        lTableIndex -= 1
+                                        If lTableIndex = 0 Then Exit While
+                                        lTableKey = lTable.Name & ":"
+                                    End While
+                                    If lTableIndex > 0 Then
+                                        Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
+                                        If lTableX.TableComment.Length > 0 Then
+                                            lSB.AppendLine(lTableX.TableComment)
+                                        End If
                                     End If
+                                    'Dim lTableKey As String = lTable.Name & ":" & lGroupIndex
+                                    'Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
+                                    'If lTableX.TableComment.Length > 0 Then
+                                    '    lSB.AppendLine(lTableX.TableComment)
+                                    'End If
                                 Else
                                     If lTable.TableComment.Length > 0 Then
                                         lSB.AppendLine(lTable.TableComment)
