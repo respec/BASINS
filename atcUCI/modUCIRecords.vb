@@ -15,6 +15,10 @@ Module modUCIRecords
             pUciRec = Nothing
         End If
         pUciRec = New ArrayList
+
+        For lBlockIndex As Integer = 0 To pBlocks.Count - 1
+            pBlocks(lBlockIndex) = -1
+        Next
         Dim lIndex As Integer = 0
         Logger.Dbg("Reading " & aFileName)
         For Each lCurrentRecord As String In LinesInFile(aFileName)
@@ -75,6 +79,7 @@ Module modUCIRecords
                 aReturnCode = 2
             End If
         End If
+
         If Not aRecord Is Nothing And aRecordType <> -1 Then
             aRecord = aRecord.PadRight(80) 'ensure full record if not a comment 
         End If
