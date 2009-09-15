@@ -2,6 +2,10 @@
 Imports atcUtility
 Imports MapWinUtility
 
+''' <summary>
+''' updates HSPF PERLND parameter tables with values extracted from an ATC standard spreadsheet of parameter values.
+''' </summary>
+''' <remarks></remarks>
 Module modHSPFTableBuilder
     Private g_Project As String = "WILL"
     Private g_BaseFolder As String
@@ -12,9 +16,8 @@ Module modHSPFTableBuilder
     Sub Initialize()
         Select Case g_Project
             Case "WILL"
-                g_BaseFolder = "g:\Projects\TT_GCRP\ProjectsTT\Willamette\"
+                g_BaseFolder = "c:\Projects\TT_GCRP\ProjectsTT\Willamette\"
         End Select
-
     End Sub
 
     Sub main()
@@ -70,11 +73,11 @@ Module modHSPFTableBuilder
             Dim lSlpRecFieldNumber() As Integer = {2, 3}
             Dim lSlpRecFieldOperation() As String = {"=", "="}
             Dim lSlpRecFieldValue(1) As String
-            Dim lPrmUpdFieldNumber() As Integer = {3, 4}
-            Dim lPrmUpdFieldOperation() As String = {"=", "="}
-            Dim lPrmUpdFieldValue(1) As String
-            For Each lOperation As atcUCI.HspfOperation In pUci.OpnSeqBlock.Opns
-                If lOperation.Name = "PERLND" Then
+            Dim lPrmUpdFieldNumber() As Integer = {1, 4, 5}
+            Dim lPrmUpdFieldOperation() As String = {"=", "=", "="}
+            Dim lPrmUpdFieldValue(2) As String
+            For Each lOperationName As String In lOperationNames
+                For Each lOperation As atcUCI.HspfOperation In pUci.OpnSeqBlock.Opns
                     Dim lMetSegmentComment As String = lOperation.MetSeg.Comment
                     Dim lMetSegmentName As String = lMetSegmentComment.Substring(lMetSegmentComment.Length - 8)
                     Dim lLandUseName As String = lOperation.Tables("GEN-INFO").Parms(0).Value
@@ -84,8 +87,9 @@ Module modHSPFTableBuilder
                     If lSlpRecTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
                         lSlopeReclassValue = lSlpRecTable.Value(4)
                         'Logger.Dbg("Met,LU,SlopeReclass:" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
-                        lPrmUpdFieldValue(0) = lLandUseName
-                        lPrmUpdFieldValue(1) = lSlopeReclassValue
+                        lPrmUpdFieldValue(0) = lOperationName
+                        lPrmUpdFieldValue(1) = lLandUseName
+                        lPrmUpdFieldValue(2) = lSlopeReclassValue
                         Dim lRecordStart As Integer = 1
                         Dim lRecordsFound As Integer = 0
                         While lPrmUpdTable.FindMatch(lPrmUpdFieldNumber, lPrmUpdFieldOperation, lPrmUpdFieldValue, , lRecordStart)
@@ -113,8 +117,8 @@ Module modHSPFTableBuilder
                     Else
                         Logger.Dbg("NoSlopeReclassFor " & lMetSegmentName & ":" & lLandUseName)
                     End If
-                End If
-            Next lOperation
+                Next lOperation
+            Next
             pUci.Name = pUci.Name.ToUpper.Replace("REV1", "Rev")
             pUci.Save()
         Catch lEx As Exception
