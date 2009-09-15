@@ -7,6 +7,7 @@ Imports MapWinUtility
 ''' </summary>
 ''' <remarks></remarks>
 Module modHSPFTableBuilder
+    Private g_Debug As Boolean = False
     Private g_Project As String = "WILL"
     Private g_BaseFolder As String
     Private g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
@@ -16,7 +17,7 @@ Module modHSPFTableBuilder
     Sub Initialize()
         Select Case g_Project
             Case "WILL"
-                g_BaseFolder = "c:\Projects\TT_GCRP\ProjectsTT\Willamette\"
+                g_BaseFolder = "g:\Projects\TT_GCRP\ProjectsTT\Willamette\"
         End Select
     End Sub
 
@@ -64,9 +65,18 @@ Module modHSPFTableBuilder
                     If Not lOpnBlk.TableExists(lTableName) Then
                         lOpnBlk.AddTableForAll(lTableName, lOperationName, lTable.OccurIndex)
                     End If
-                    SetDefaultsForTable(pUci, pDefUci, lOperationName, lTableName, False)
+                    If lTableName <> "HYDR-INIT" Then 'TODO: others too?
+                        SetDefaultsForTable(pUci, pDefUci, lOperationName, lTableName, False)
+                    End If
                 Next
             Next
+
+            If pUci.MonthData.MonthDataTables.Count = 0 AndAlso pDefUci.MonthData.MonthDataTables.Count > 0 Then
+                For Each lMonthData As HspfMonthDataTable In pDefUci.MonthData.MonthDataTables
+                    pUci.MonthData.MonthDataTables.Add(lMonthData)
+                Next
+            End If
+
             pUci.Name = pUci.Name.ToUpper.Replace(g_Project, g_Project.ToLower & "Rev1")
             pUci.Save()
 
@@ -77,16 +87,16 @@ Module modHSPFTableBuilder
             Dim lPrmUpdFieldOperation() As String = {"=", "=", "="}
             Dim lPrmUpdFieldValue(2) As String
             For Each lOperationName As String In lOperationNames
-                For Each lOperation As atcUCI.HspfOperation In pUci.OpnSeqBlock.Opns
+                For Each lOperation As atcUCI.HspfOperation In pUci.OpnBlks(lOperationName).Ids
                     Dim lMetSegmentComment As String = lOperation.MetSeg.Comment
                     Dim lMetSegmentName As String = lMetSegmentComment.Substring(lMetSegmentComment.Length - 8)
                     Dim lLandUseName As String = lOperation.Tables("GEN-INFO").Parms(0).Value
                     Dim lSlopeReclassValue As Integer = 1
                     lSlpRecFieldValue(0) = lMetSegmentName
                     lSlpRecFieldValue(1) = lLandUseName
-                    If lSlpRecTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
+                    If lSlpRecmTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
                         lSlopeReclassValue = lSlpRecTable.Value(4)
-                        'Logger.Dbg("Met,LU,SlopeReclass:" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
+                        If g_Debug Then Logger.Dbg("Met,LU,SlopeReclass:" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
                         lPrmUpdFieldValue(0) = lOperationName
                         lPrmUpdFieldValue(1) = lLandUseName
                         lPrmUpdFieldValue(2) = lSlopeReclassValue
@@ -94,15 +104,15 @@ Module modHSPFTableBuilder
                         Dim lRecordsFound As Integer = 0
                         While lPrmUpdTable.FindMatch(lPrmUpdFieldNumber, lPrmUpdFieldOperation, lPrmUpdFieldValue, , lRecordStart)
                             lRecordsFound += 1
-                            Dim lTableName As String = lPrmUpdTable.Value(1)
-                            Dim lParmName As String = lPrmUpdTable.Value(2)
-                            Dim lParmValue As String = lPrmUpdTable.Value(5)
+                            Dim lTableName As String = lPrmUpdTable.Value(2)
+                            Dim lParmName As String = lPrmUpdTable.Value(3)
+                            Dim lParmValue As String = lPrmUpdTable.Value(6)
                             lRecordStart = lPrmUpdTable.CurrentRecord + 1
                             For Each lTable As HspfTable In lOperation.Tables
                                 If lTable.Name = lTableName Then
                                     For Each lParm As HspfParm In lTable.Parms
                                         If lParmName = lParm.Name Then
-                                            'Logger.Dbg("Update:" & lTableName & ":" & lParmName & ":" & lParm.Value & ":" & lParmValue)
+                                            If g_Debug Then Logger.Dbg("Update:" & lTableName & ":" & lParmName & ":" & lParm.Value & ":" & lParmValue)
                                             lParm.Value = lParmValue
                                             Exit For
                                         End If

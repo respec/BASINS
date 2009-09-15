@@ -47,15 +47,11 @@
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>HSPFTableBuilder.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="atcUCI, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\Plugins\BASINS\atcUCI.dll</HintPath>
-    </Reference>
     <Reference Include="atcUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Plugins\BASINS\atcUtility.dll</HintPath>
@@ -64,10 +60,12 @@
     <Reference Include="MapWindow.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=14ba77d91dae5597, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWindow.Interfaces.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.7.2.26671, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="MapWinUtility, Version=1.0.3489.17175, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -170,6 +168,13 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
+      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
+      <Name>atcUCI</Name>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
