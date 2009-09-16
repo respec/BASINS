@@ -204,7 +204,7 @@ ErrHand:
     Public Overrides Function FieldNumber(ByVal aFieldName As String) As Integer
         Dim lField As Integer
         For lField = 1 To pNumFields
-            If pFieldNames(lField) = aFieldName Then
+            If pFieldNames(lField).Trim = aFieldName Then
                 Return lField
             End If
         Next
