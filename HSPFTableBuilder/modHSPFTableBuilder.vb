@@ -7,17 +7,21 @@ Imports MapWinUtility
 ''' </summary>
 ''' <remarks></remarks>
 Module modHSPFTableBuilder
-    Private g_Debug As Boolean = False
-    Private g_Project As String = "WILL"
+    Private g_BaseDrive As String = "G"
+    Private g_Debug As Boolean = True
+    Private g_Project As String = "WILL" '"CentralAZ" 
     Private g_BaseFolder As String
     Private g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
     Private pUci As HspfUci
     Private pDefUci As HspfUci
 
     Sub Initialize()
+        g_BaseFolder = g_BaseDrive & ":\Projects\TT_GCRP\ProjectsTT\"
         Select Case g_Project
             Case "WILL"
-                g_BaseFolder = "g:\Projects\TT_GCRP\ProjectsTT\Willamette\"
+                g_BaseFolder &= "Willamette\"
+            Case Else
+                g_BaseFolder &= g_Project
         End Select
     End Sub
 
@@ -25,14 +29,6 @@ Module modHSPFTableBuilder
         Initialize()
         My.Computer.FileSystem.CurrentDirectory = g_BaseFolder
         Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-HSPFTableBuilderLog.txt", , False)
-
-        Dim lPrmUpdTable As New atcTableDelimited
-        lPrmUpdTable.Delimiter = vbTab
-        lPrmUpdTable.OpenFile("parms\parms.txt")
-
-        Dim lSlpRecTable As New atcTableDelimited
-        lSlpRecTable.Delimiter = vbTab
-        lSlpRecTable.OpenFile("parms\HruSummarizeSubBasin.txt")
 
         Dim lMsg As New HspfMsg("hspfmsg.mdb")
         pUci = New HspfUci
@@ -77,16 +73,34 @@ Module modHSPFTableBuilder
                 Next
             End If
 
-            pUci.Name = pUci.Name.ToUpper.Replace(g_Project, g_Project.ToLower & "Rev1")
+            pUci.Name = FilenameNoExt(pUci.Name) & "Rev1.uci"
             pUci.Save()
+            Logger.Dbg("Save " & pUci.Name)
 
-            Dim lSlpRecFieldNumber() As Integer = {2, 3}
+            'update parameters based on values from ATC standard spreadsheet 
+            Dim lPrmUpdTable As New atcTableDelimited
+            lPrmUpdTable.Delimiter = vbTab
+            lPrmUpdTable.OpenFile("parms\parms.txt")
+
+            Dim lReclassifyTable As New atcTableDelimited
+            lReclassifyTable.Delimiter = vbTab
+            Dim lReclassifyTableName As String = "hrus\HruSummarizeSubBasin.txt"
+            If Not IO.File.Exists(lReclassifyTableName) Then
+                lReclassifyTableName = "parms\HruSummarizeSubBasin.txt"
+            End If
+            lReclassifyTable.OpenFile(lReclassifyTableName)
+            Dim lSlpRecFieldNumber(1) As Integer '= {2, 3}
+            lSlpRecFieldNumber(0) = lReclassifyTable.FieldNumber("SubBasin")
+            lSlpRecFieldNumber(1) = lReclassifyTable.FieldNumber("LandUse")
+            Dim lSlopeReclassifyValueField As Integer = lReclassifyTable.FieldNumber("SlopeReclass")
+
             Dim lSlpRecFieldOperation() As String = {"=", "="}
             Dim lSlpRecFieldValue(1) As String
             Dim lPrmUpdFieldNumber() As Integer = {1, 4, 5}
             Dim lPrmUpdFieldOperation() As String = {"=", "=", "="}
             Dim lPrmUpdFieldValue(2) As String
             For Each lOperationName As String In lOperationNames
+                Logger.Dbg("ParmUpdatesFor " & lOperationName)
                 For Each lOperation As atcUCI.HspfOperation In pUci.OpnBlks(lOperationName).Ids
                     Dim lMetSegmentComment As String = lOperation.MetSeg.Comment
                     Dim lMetSegmentName As String = lMetSegmentComment.Substring(lMetSegmentComment.Length - 8)
@@ -94,9 +108,9 @@ Module modHSPFTableBuilder
                     Dim lSlopeReclassValue As Integer = 1
                     lSlpRecFieldValue(0) = lMetSegmentName
                     lSlpRecFieldValue(1) = lLandUseName
-                    If lSlpRecmTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
-                        lSlopeReclassValue = lSlpRecTable.Value(4)
-                        If g_Debug Then Logger.Dbg("Met,LU,SlopeReclass:" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
+                    If lReclassifyTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
+                        lSlopeReclassValue = lReclassifyTable.Value(lSlopeReclassifyValueField)
+                        If g_Debug Then Logger.Dbg("ID,Met,LU,SlopeReclass:" & lOperation.Id & ":" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
                         lPrmUpdFieldValue(0) = lOperationName
                         lPrmUpdFieldValue(1) = lLandUseName
                         lPrmUpdFieldValue(2) = lSlopeReclassValue
@@ -129,8 +143,9 @@ Module modHSPFTableBuilder
                     End If
                 Next lOperation
             Next
-            pUci.Name = pUci.Name.ToUpper.Replace("REV1", "Rev")
+            pUci.Name = pUci.Name.ToUpper.Replace("Rev1", "Rev")
             pUci.Save()
+            Logger.Dbg("AllDone")
         Catch lEx As Exception
             Logger.Dbg("Error " & lEx.ToString)
         End Try
