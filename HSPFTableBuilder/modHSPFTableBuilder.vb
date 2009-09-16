@@ -24,7 +24,7 @@ Module modHSPFTableBuilder
     Sub main()
         Initialize()
         My.Computer.FileSystem.CurrentDirectory = g_BaseFolder
-        Logger.StartToFile("parms\HSPFTableBuilderLog.txt", , False)
+        Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-HSPFTableBuilderLog.txt", , False)
 
         Dim lPrmUpdTable As New atcTableDelimited
         lPrmUpdTable.Delimiter = vbTab
