@@ -12,6 +12,8 @@ Public Class HspfMetSegRecords
 End Class
 
 Public Class HspfMetSegRecord
+    Implements ICloneable
+
     Public MFactP As Double
     Public MFactR As Double
     Public Name As String
@@ -71,4 +73,17 @@ Public Class HspfMetSegRecord
         Sgapstrg = ""
         Ssystem = ""
     End Sub
+
+    Public Function Clone() As Object Implements System.ICloneable.Clone
+        Dim lNewMetSegRecord As New HspfMetSegRecord
+        With lNewMetSegRecord
+            .Source = Source.Clone
+            .MFactP = MFactP
+            .MFactR = MFactR
+            .Sgapstrg = Sgapstrg
+            .Ssystem = Ssystem
+            .Tran = Tran
+        End With
+        Return lNewMetSegRecord
+    End Function
 End Class

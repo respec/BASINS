@@ -260,6 +260,8 @@ Public Class HspfMetSeg
                             Case "SOLR" : lMember = "SOLRAD"
                             Case "CLOU" : lMember = "CLOUD"
                             Case "PEVT" : lMember = "POTEV"
+                            Case Else
+                                Debug.Print("Why!")
                         End Select
                     Else
                         Select Case .Name
@@ -270,6 +272,8 @@ Public Class HspfMetSeg
                             Case "SOLR" : lMember = "SOLRAD"
                             Case "CLOU" : lMember = "CLOUD"
                             Case "PEVT" : lMember = "PETINP"
+                            Case Else
+                                Debug.Print("Why!")
                         End Select
                         If .Name = "ATEM" Then 'get right air temp member name
                             If AirType = 1 Then
