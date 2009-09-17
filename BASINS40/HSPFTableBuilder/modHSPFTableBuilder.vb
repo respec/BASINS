@@ -7,22 +7,19 @@ Imports MapWinUtility
 ''' </summary>
 ''' <remarks></remarks>
 Module modHSPFTableBuilder
-    Private g_BaseDrive As String = "G"
-    Private g_Debug As Boolean = True
-    Private g_Project As String = "WILL" '"CentralAZ" 
-    Private g_BaseFolder As String
-    Private g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
+    Friend g_MetSegmentBuild As Boolean = True
+    Friend g_BaseDrive As String = "G"
+    Friend g_Debug As Boolean = False
+    Friend g_Project As String = "CentralAZ" '"Willamette"  
+    Friend g_BaseFolder As String
+    Friend g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
+
+    Private pMsg As New HspfMsg("hspfmsg.mdb")
     Private pUci As HspfUci
     Private pDefUci As HspfUci
 
     Sub Initialize()
-        g_BaseFolder = g_BaseDrive & ":\Projects\TT_GCRP\ProjectsTT\"
-        Select Case g_Project
-            Case "WILL"
-                g_BaseFolder &= "Willamette\"
-            Case Else
-                g_BaseFolder &= g_Project
-        End Select
+        g_BaseFolder = g_BaseDrive & ":\Projects\TT_GCRP\ProjectsTT\" & g_Project & "\"
     End Sub
 
     Sub main()
@@ -30,126 +27,126 @@ Module modHSPFTableBuilder
         My.Computer.FileSystem.CurrentDirectory = g_BaseFolder
         Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-HSPFTableBuilderLog.txt", , False)
 
-        Dim lMsg As New HspfMsg("hspfmsg.mdb")
         pUci = New HspfUci
         pDefUci = New HspfUci
 
-        Try
-            pUci.FastReadUciForStarter(lMsg, "parms\" & g_Project & ".uci")
-            Dim lError As String = pUci.ErrorDescription
-            If lError.Length > 0 Then
-                Logger.Dbg("UciReadError " & lError)
-                Exit Sub
-            End If
-            Logger.Dbg("UCI " & pUci.Name & " Opened")
-            pDefUci.FastReadUciForStarter(lMsg, "parms\starter.uci")
-            lError = pDefUci.ErrorDescription
-            If lError.Length > 0 Then
-                Logger.Dbg("StarterUciReadError " & lError)
-                Exit Sub
-            End If
+        pUci.FastReadUciForStarter(pMsg, "parms\" & g_Project & ".uci")
+        Dim lError As String = pUci.ErrorDescription
+        If lError.Length > 0 Then
+            Logger.Dbg("UciReadError " & lError)
+            Exit Sub
+        End If
+        Logger.Dbg("UCI " & pUci.Name & " Opened")
 
-            Dim lOperationNames() As String = {"PERLND", "IMPLND", "RCHRES"}
-            For Each lOperationName As String In lOperationNames
-                Dim lOpnBlkStarter As HspfOpnBlk = pDefUci.OpnBlks(lOperationName)
-                Dim lOpnBlk As HspfOpnBlk = pUci.OpnBlks(lOperationName)
-                For Each lTable As HspfTable In lOpnBlkStarter.Tables
-                    Dim lTableName As String = lTable.Name
-                    If lTable.OccurNum > 1 Then
-                        lTableName &= ":" & lTable.OccurNum
-                    End If
-                    If Not lOpnBlk.TableExists(lTableName) Then
-                        lOpnBlk.AddTableForAll(lTableName, lOperationName, lTable.OccurIndex)
-                    End If
-                    If lTableName <> "HYDR-INIT" Then 'TODO: others too?
-                        SetDefaultsForTable(pUci, pDefUci, lOperationName, lTableName, False)
-                    End If
-                Next
-            Next
-
-            If pUci.MonthData.MonthDataTables.Count = 0 AndAlso pDefUci.MonthData.MonthDataTables.Count > 0 Then
-                For Each lMonthData As HspfMonthDataTable In pDefUci.MonthData.MonthDataTables
-                    pUci.MonthData.MonthDataTables.Add(lMonthData)
-                Next
-            End If
-
-            pUci.Name = FilenameNoExt(pUci.Name) & "Rev1.uci"
+        pUci.Name = FilenameNoExt(pUci.Name) & "Aft.uci"
+        If g_MetSegmentBuild Then
+            FixMetSegments(pUci)
+            pUci.Name = FilenameNoExt(pUci.Name) & "Met.uci"
             pUci.Save()
-            Logger.Dbg("Save " & pUci.Name)
+        End If
 
-            'update parameters based on values from ATC standard spreadsheet 
-            Dim lPrmUpdTable As New atcTableDelimited
-            lPrmUpdTable.Delimiter = vbTab
-            lPrmUpdTable.OpenFile("parms\parms.txt")
+        'update tables based on contents of starter
+        pDefUci.FastReadUciForStarter(pMsg, "parms\starter.uci")
+        lError = pDefUci.ErrorDescription
+        If lError.Length > 0 Then
+            Logger.Dbg("StarterUciReadError " & lError)
+            Exit Sub
+        End If
+        Dim lOperationNames() As String = {"PERLND", "IMPLND", "RCHRES"}
+        For Each lOperationName As String In lOperationNames
+            Dim lOpnBlkStarter As HspfOpnBlk = pDefUci.OpnBlks(lOperationName)
+            Dim lOpnBlk As HspfOpnBlk = pUci.OpnBlks(lOperationName)
+            For Each lTable As HspfTable In lOpnBlkStarter.Tables
+                Dim lTableName As String = lTable.Name
+                If lTable.OccurNum > 1 Then
+                    lTableName &= ":" & lTable.OccurNum
+                End If
+                If Not lOpnBlk.TableExists(lTableName) Then
+                    lOpnBlk.AddTableForAll(lTableName, lOperationName, lTable.OccurIndex)
+                End If
+                If lTableName <> "HYDR-INIT" Then 'TODO: others too?
+                    SetDefaultsForTable(pUci, pDefUci, lOperationName, lTableName, False)
+                End If
+            Next
+        Next
 
-            Dim lReclassifyTable As New atcTableDelimited
-            lReclassifyTable.Delimiter = vbTab
-            Dim lReclassifyTableName As String = "hrus\HruSummarizeSubBasin.txt"
-            If Not IO.File.Exists(lReclassifyTableName) Then
-                lReclassifyTableName = "parms\HruSummarizeSubBasin.txt"
-            End If
-            lReclassifyTable.OpenFile(lReclassifyTableName)
-            Dim lSlpRecFieldNumber(1) As Integer '= {2, 3}
-            lSlpRecFieldNumber(0) = lReclassifyTable.FieldNumber("SubBasin")
-            lSlpRecFieldNumber(1) = lReclassifyTable.FieldNumber("LandUse")
-            Dim lSlopeReclassifyValueField As Integer = lReclassifyTable.FieldNumber("SlopeReclass")
+        If pUci.MonthData.MonthDataTables.Count = 0 AndAlso pDefUci.MonthData.MonthDataTables.Count > 0 Then
+            For Each lMonthData As HspfMonthDataTable In pDefUci.MonthData.MonthDataTables
+                pUci.MonthData.MonthDataTables.Add(lMonthData)
+            Next
+        End If
 
-            Dim lSlpRecFieldOperation() As String = {"=", "="}
-            Dim lSlpRecFieldValue(1) As String
-            Dim lPrmUpdFieldNumber() As Integer = {1, 4, 5}
-            Dim lPrmUpdFieldOperation() As String = {"=", "=", "="}
-            Dim lPrmUpdFieldValue(2) As String
-            For Each lOperationName As String In lOperationNames
-                Logger.Dbg("ParmUpdatesFor " & lOperationName)
-                For Each lOperation As atcUCI.HspfOperation In pUci.OpnBlks(lOperationName).Ids
-                    Dim lMetSegmentComment As String = lOperation.MetSeg.Comment
-                    Dim lMetSegmentName As String = lMetSegmentComment.Substring(lMetSegmentComment.Length - 8)
-                    Dim lLandUseName As String = lOperation.Tables("GEN-INFO").Parms(0).Value
-                    Dim lSlopeReclassValue As Integer = 1
-                    lSlpRecFieldValue(0) = lMetSegmentName
-                    lSlpRecFieldValue(1) = lLandUseName
-                    If lReclassifyTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
-                        lSlopeReclassValue = lReclassifyTable.Value(lSlopeReclassifyValueField)
-                        If g_Debug Then Logger.Dbg("ID,Met,LU,SlopeReclass:" & lOperation.Id & ":" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
-                        lPrmUpdFieldValue(0) = lOperationName
-                        lPrmUpdFieldValue(1) = lLandUseName
-                        lPrmUpdFieldValue(2) = lSlopeReclassValue
-                        Dim lRecordStart As Integer = 1
-                        Dim lRecordsFound As Integer = 0
-                        While lPrmUpdTable.FindMatch(lPrmUpdFieldNumber, lPrmUpdFieldOperation, lPrmUpdFieldValue, , lRecordStart)
-                            lRecordsFound += 1
-                            Dim lTableName As String = lPrmUpdTable.Value(2)
-                            Dim lParmName As String = lPrmUpdTable.Value(3)
-                            Dim lParmValue As String = lPrmUpdTable.Value(6)
-                            lRecordStart = lPrmUpdTable.CurrentRecord + 1
-                            For Each lTable As HspfTable In lOperation.Tables
-                                If lTable.Name = lTableName Then
-                                    For Each lParm As HspfParm In lTable.Parms
-                                        If lParmName = lParm.Name Then
-                                            If g_Debug Then Logger.Dbg("Update:" & lTableName & ":" & lParmName & ":" & lParm.Value & ":" & lParmValue)
-                                            lParm.Value = lParmValue
-                                            Exit For
-                                        End If
-                                    Next
+        pUci.Name = FilenameNoExt(pUci.Name) & "Starter.uci"
+        pUci.Save()
+        Logger.Dbg("Save " & pUci.Name)
+
+        'update PERLND/PWATER parameters based on values from ATC standard spreadsheet 
+        Dim lPrmUpdTable As New atcTableDelimited
+        lPrmUpdTable.Delimiter = vbTab
+        lPrmUpdTable.OpenFile("parms\parms.txt")
+
+        Dim lReclassifyTable As New atcTableDelimited
+        lReclassifyTable.Delimiter = vbTab
+        Dim lReclassifyTableName As String = "hrus\HruSummarizeSubBasin.txt"
+        If Not IO.File.Exists(lReclassifyTableName) Then
+            lReclassifyTableName = "parms\HruSummarizeSubBasin.txt"
+        End If
+        lReclassifyTable.OpenFile(lReclassifyTableName)
+        Dim lSlpRecFieldNumber(1) As Integer
+        lSlpRecFieldNumber(0) = lReclassifyTable.FieldNumber("SubBasin")
+        lSlpRecFieldNumber(1) = lReclassifyTable.FieldNumber("LandUse")
+        Dim lSlopeReclassifyValueField As Integer = lReclassifyTable.FieldNumber("SlopeReclass")
+
+        Dim lSlpRecFieldOperation() As String = {"=", "="}
+        Dim lSlpRecFieldValue(1) As String
+        Dim lPrmUpdFieldNumber() As Integer = {1, 4, 5}
+        Dim lPrmUpdFieldOperation() As String = {"=", "=", "="}
+        Dim lPrmUpdFieldValue(2) As String
+        For Each lOperation As atcUCI.HspfOperation In pUci.OpnBlks("PERLND").Ids
+            Dim lMetSegmentComment As String = lOperation.MetSeg.Comment
+            Dim lMetSegmentName As String = lMetSegmentComment.Substring(lMetSegmentComment.Length - 8)
+            Dim lLandUseName As String = lOperation.Tables("GEN-INFO").Parms(0).Value
+            Dim lSlopeReclassValue As Integer = 1
+            lSlpRecFieldValue(0) = lMetSegmentName
+            lSlpRecFieldValue(1) = lLandUseName
+            If lReclassifyTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
+                lSlopeReclassValue = lReclassifyTable.Value(lSlopeReclassifyValueField)
+                If g_Debug Then Logger.Dbg("ID,Met,LU,SlopeReclass:" & lOperation.Id & ":" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
+                lPrmUpdFieldValue(0) = "PERLND"
+                lPrmUpdFieldValue(1) = lLandUseName
+                lPrmUpdFieldValue(2) = lSlopeReclassValue
+                Dim lRecordStart As Integer = 1
+                Dim lRecordsFound As Integer = 0
+                While lPrmUpdTable.FindMatch(lPrmUpdFieldNumber, lPrmUpdFieldOperation, lPrmUpdFieldValue, , lRecordStart)
+                    lRecordsFound += 1
+                    Dim lTableName As String = lPrmUpdTable.Value(2)
+                    Dim lParmName As String = lPrmUpdTable.Value(3)
+                    Dim lParmValue As String = lPrmUpdTable.Value(6)
+                    lRecordStart = lPrmUpdTable.CurrentRecord + 1
+                    For Each lTable As HspfTable In lOperation.Tables
+                        If lTable.Name = lTableName Then
+                            For Each lParm As HspfParm In lTable.Parms
+                                If lParmName = lParm.Name Then
+                                    If g_Debug Then Logger.Dbg("Update:" & lTableName & ":" & lParmName & ":" & lParm.Value & ":" & lParmValue)
+                                    lParm.Value = lParmValue
                                     Exit For
                                 End If
                             Next
-                        End While
-                        If lRecordsFound = 0 Then
-                            Logger.Dbg("NoParmUpdatesFor " & lMetSegmentName & ":" & lLandUseName)
+                            Exit For
                         End If
-                    Else
-                        Logger.Dbg("NoSlopeReclassFor " & lMetSegmentName & ":" & lLandUseName)
-                    End If
-                Next lOperation
-            Next
-            pUci.Name = pUci.Name.ToUpper.Replace("Rev1", "Rev")
-            pUci.Save()
-            Logger.Dbg("AllDone")
-        Catch lEx As Exception
-            Logger.Dbg("Error " & lEx.ToString)
-        End Try
-
+                    Next
+                End While
+                If lRecordsFound = 0 Then
+                    Logger.Dbg("NoParmUpdatesFor " & lMetSegmentName & ":" & lLandUseName)
+                End If
+            Else
+                Logger.Dbg("NoSlopeReclassFor " & lMetSegmentName & ":" & lLandUseName)
+            End If
+        Next lOperation
+        'Next
+        pUci.Name = FilenameNoExt(pUci.Name) & "Hydparmupd.uci"
+        pUci.Save()
+        Logger.Dbg("AllDone")
     End Sub
 
     '
@@ -185,7 +182,6 @@ Module modHSPFTableBuilder
     End Sub
 
     Public Function DefaultOpnId(ByVal aOpn As HspfOperation, ByVal aDefUCI As HspfUci) As Long
-
         If aOpn.DefOpnId <> 0 Then
             DefaultOpnId = aOpn.DefOpnId
         Else
@@ -196,7 +192,6 @@ Module modHSPFTableBuilder
                 DefaultOpnId = lDOpn.Id
             End If
         End If
-
     End Function
 
     Private Function DefaultThisTable(ByVal aOperName As String, ByVal aTableName As String, Optional ByVal aWinHSPF As Boolean = True) As Boolean
@@ -265,7 +260,6 @@ Module modHSPFTableBuilder
     End Function
 
     Public Function matchOperWithDefault(ByVal aOpTypName As String, ByVal aOpnDesc As String, ByVal aDefUCI As HspfUci) As HspfOperation
-
         For Each lOpn As HspfOperation In aDefUCI.OpnBlks(aOpTypName).Ids
             If lOpn.Description = aOpnDesc Then
                 matchOperWithDefault = lOpn
