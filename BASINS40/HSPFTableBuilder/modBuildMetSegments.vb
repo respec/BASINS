@@ -33,7 +33,6 @@ Module modBuildMetSegments
             Next
             For Each lMetDataTypesKey As String In lMetDataTypesCount.Keys
                 If lMetDataTypesCount.ItemByKey(lMetDataTypesKey) = 0 Then
-                    'TODO: should this be a connection rather than a met segment record?
                     Dim lMetSegRecord As HspfMetSegRecord = lMetSeg.MetSegRecs(0).Clone
                     lMetSegRecord.Name = lMetDataTypesKey
                     lMetSegRecord.Source.Member = lMetDataTypesKey
@@ -59,6 +58,7 @@ Module modBuildMetSegments
             If lStationDsnTable.FindFirst(1, lMetSetLocation) Then
                 For Each lMetSegRec As HspfMetSegRecord In lMetSeg.MetSegRecs
                     lMetSegRec.Source.VolId = lStationDsnTable.Value(Array.IndexOf(lMetDataTypes, lMetSegRec.Source.Member) + 2)
+                    'TODO: if VolId is for a dataset not at same location as PREC, make note in comment
                 Next
             End If
             For lMetSegRecIndex As Integer = 0 To lMetSeg.MetSegRecs.Count - 1

@@ -1078,9 +1078,46 @@ Public Class HspfUci
         Return lFreeDsn
     End Function
 
-    Public Sub AddExpertDsns(ByRef aId As Integer, _
-                             ByRef aLocn As String, _
-                             ByRef aBaseDsn As Integer, _
+    Public Sub AddExpertSystem(ByRef aId As Integer, _
+                               ByRef aLocn As String, _
+                               ByVal aWdmId As atcWDM.atcDataSourceWDM, _
+                               ByRef aBaseDsn As Integer, _
+                               ByRef aDsns() As Integer, _
+                               ByRef aOstr() As String)
+        'TODO: think this through with PaulDuda!!!!!
+        If pWdmCount = 0 Then
+            pWDMObj(1) = aWdmId
+            AddExpertSystem(aId, aLocn, 1, aBaseDsn, aDsns, aOstr)
+        End If
+    End Sub
+
+    Public Sub AddExpertSystem(ByRef aId As Integer, _
+                               ByRef aLocn As String, _
+                               ByVal aWdmId As Integer, _
+                               ByRef aBaseDsn As Integer, _
+                               ByRef aDsns() As Integer, _
+                               ByRef aOstr() As String)
+        'add data sets
+        AddExpertDsns(aId, aLocn, aWdmId, aBaseDsn, aDsns, aOstr)
+        'add to copy block
+        Dim lCopyId As Integer = 1
+        AddOperation("COPY", lCopyId)
+        AddTable("COPY", lCopyId, "TIMESERIES")
+        Dim lTable As HspfTable = OpnBlks("COPY").OperFromID(lCopyId).Tables("TIMESERIES")
+        lTable.Parms("NMN").Value = 7
+        'add to opn seq block
+        OpnSeqBlock.Add(OpnBlks("COPY").OperFromID(lCopyId))
+        'add to ext targets block
+        Dim lContribArea As Double = UpstreamArea(OpnBlks.Item("RCHRES").OperFromID(aId))
+        AddExpertExtTargets(aId, lCopyId, lContribArea, aDsns, aOstr)
+        'add mass-link and schematic copy records
+        AddExpertSchematic(aId, lCopyId)
+    End Sub
+
+    Public Sub AddExpertDsns(ByVal aId As Integer, _
+                             ByVal aLocn As String, _
+                             ByVal aWdmId As Integer, _
+                             ByVal aBaseDsn As Integer, _
                              ByRef aDsn() As Integer, _
                              ByRef aOstr() As String)
         'TODO: make aOstr and aDsn a keyed collection - maybe returned from this routine as a function
@@ -1093,20 +1130,12 @@ Public Class HspfUci
         aOstr(7) = "UZSX    "
         aOstr(8) = "LZSX    "
 
-        Dim lWdmId As Integer = 0
-        For lWdmIndex As Integer = 4 To 1 Step -1
-            If Not pWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
-                lWdmId = lWdmIndex
-                Exit For
-            End If
-        Next lWdmIndex
-
-        If lWdmId > 0 Then 'okay to continue
+        If aWdmId > 0 Then 'okay to continue
             Dim lDsn As Integer = aBaseDsn
             Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(Name)
 
             For lIndex As Integer = 1 To 8 'create each of the expert system dsns
-                lDsn = FindFreeDSN(lWdmId, lDsn)
+                lDsn = FindFreeDSN(aWdmId, lDsn)
                 Dim lGenTs As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
                 With lGenTs.Attributes
                     .SetValue("ID", lDsn)
@@ -1120,7 +1149,7 @@ Public Class HspfUci
                 Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
                 lGenTs.Dates = lTsDate
 
-                Dim lAddedDsn As Boolean = pWDMObj(lWdmId).AddDataset(lGenTs)
+                Dim lAddedDsn As Boolean = pWDMObj(aWdmId).AddDataset(lGenTs)
                 aDsn(lIndex) = lDsn
             Next lIndex
         Else 'no wdm files in this uci
@@ -1492,12 +1521,13 @@ Public Class HspfUci
         'add schematic records
         Dim lOperation As HspfOperation = pOpnBlks.Item("RCHRES").OperFromID(aReachId)
         AddCopyToSchematic(lOperation, aCopyId, lPerlndMassLinkNumber, lImplndMassLinkNumber)
-        Dim lOperations As Collection(Of HspfOperation) = FindUpstreamOpns(lOperation)
+        Dim lOperations As Collection(Of HspfOperation) = FindUpstreamOpns(lOperation, True)
         Do While lOperations.Count > 0
             lOperation = lOperations.Item(0)
             lOperations.RemoveAt(0)
             AddCopyToSchematic(lOperation, aCopyId, lPerlndMassLinkNumber, lImplndMassLinkNumber)
-            lOperations = FindUpstreamOpns(lOperation)
+            'TODO: this overwrote loperations!
+            'lOperations = FindUpstreamOpns(lOperation)
         Loop
     End Sub
 
@@ -1901,13 +1931,19 @@ x:
         Return lUpArea
     End Function
 
-    Private Function FindUpstreamOpns(ByRef aOperation As HspfOperation) As Collection(Of HspfOperation)
+    Private Function FindUpstreamOpns(ByRef aOperation As HspfOperation, _
+                                      Optional ByVal aAllByRecursion As Boolean = False) As Collection(Of HspfOperation)
         Dim lOperations As New Collection(Of HspfOperation)
         For Each lConnection As HspfConnection In aOperation.Sources
             If lConnection.Source.VolName = "RCHRES" Or _
                lConnection.Source.VolName = "BMPRAC" Then
                 'add the source operation to the collection
                 lOperations.Add(lConnection.Source.Opn)
+                If aAllByRecursion Then
+                    For Each lOperation As HspfOperation In FindUpstreamOpns(lConnection.Source.Opn, True)
+                        lOperations.Add(lOperation)
+                    Next
+                End If
             End If
         Next lConnection
         Return lOperations
@@ -1939,12 +1975,15 @@ x:
                     jConn.MFact = jConn.MFact + lSourceConnection.MFact
                 Else 'does not already exist
                     Dim lConn As New HspfConnection
+                    lConn.Uci = Me
                     lConn.Source.VolName = lSourceConnection.Source.VolName
                     lConn.Source.VolId = lSourceConnection.Source.VolId
+                    lConn.Source.Opn = lSourceConnection.Source.Opn
                     lConn.Typ = lSourceConnection.Typ
                     lConn.MFact = lSourceConnection.MFact
                     lConn.Target.VolName = "COPY"
                     lConn.Target.VolId = aCopyId
+                    lConn.Target.Opn = lCopyOpn
                     If lConn.Source.VolName = "PERLND" Then
                         lConn.MassLink = aPerlndMasslink
                     Else
