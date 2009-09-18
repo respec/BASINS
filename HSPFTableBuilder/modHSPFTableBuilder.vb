@@ -1,4 +1,5 @@
-﻿Imports atcUCI
+﻿Imports atcwdm
+Imports atcUCI
 Imports atcUtility
 Imports MapWinUtility
 
@@ -10,13 +11,13 @@ Module modHSPFTableBuilder
     Friend g_MetSegmentBuild As Boolean = True
     Friend g_BaseDrive As String = "G"
     Friend g_Debug As Boolean = False
-    Friend g_Project As String = "CentralAZ" '"Willamette"  
+    Friend g_Project As String = "CentralAZ" '_SALT" '"Willamette"  
     Friend g_BaseFolder As String
     Friend g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
 
     Private pMsg As New HspfMsg("hspfmsg.mdb")
-    Private pUci As HspfUci
-    Private pDefUci As HspfUci
+    Private pUci As New HspfUci
+    Private pDefUci As New HspfUci
 
     Sub Initialize()
         g_BaseFolder = g_BaseDrive & ":\Projects\TT_GCRP\ProjectsTT\" & g_Project & "\"
@@ -26,9 +27,6 @@ Module modHSPFTableBuilder
         Initialize()
         My.Computer.FileSystem.CurrentDirectory = g_BaseFolder
         Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-HSPFTableBuilderLog.txt", , False)
-
-        pUci = New HspfUci
-        pDefUci = New HspfUci
 
         pUci.FastReadUciForStarter(pMsg, "parms\" & g_Project & ".uci")
         Dim lError As String = pUci.ErrorDescription
@@ -146,6 +144,23 @@ Module modHSPFTableBuilder
         'Next
         pUci.Name = FilenameNoExt(pUci.Name) & "Hydparmupd.uci"
         pUci.Save()
+
+        Dim pExpertSystemLocsFileName As String = "parms\ExpertSystemLocs.txt"
+        If IO.File.Exists(pExpertSystemLocsFileName) Then
+            'open or create a wdm file for output as needed
+            Dim lDefaultOutputWdmFileName As String = "parms\" & g_Project & ".wdm"
+            Dim lWdmOutput As New atcWDM.atcDataSourceWDM
+            lWdmOutput.Open(lDefaultOutputWdmFileName)
+            Dim lOstr(28) As String
+            Dim lDsns(28) As Integer
+            For Each lRecord As String In LinesInFile(pExpertSystemLocsFileName)
+                Dim lParms() As String = lRecord.Split(",") 'reachId, location, base dsn
+                pUci.AddExpertSystem(lParms(0), lParms(1), lWdmOutput, lParms(2), lDsns, lOstr)
+            Next
+            pUci.Name = FilenameNoExt(pUci.Name) & "Expert.uci"
+            pUci.Save()
+        End If
+
         Logger.Dbg("AllDone")
     End Sub
 
