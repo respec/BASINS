@@ -121,21 +121,7 @@ Public Class frmAddExpert
                 lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
                 If Not pfrmOutput.IsCalibLocation("RCHRES", lId) Then
                     Me.Cursor = Cursors.WaitCursor
-                    'add data sets
-                    pUCI.AddExpertDsns(lId, lblOperation.Text, atxBase.Text, lDsns, lOstr)
-                    'add to copy block
-                    Dim lCopyId As Integer = 1
-                    pUCI.AddOperation("COPY", lCopyId)
-                    pUCI.AddTable("COPY", lCopyId, "TIMESERIES")
-                    Dim lTable As HspfTable = pUCI.OpnBlks("COPY").OperFromID(lCopyId).Tables("TIMESERIES")
-                    lTable.Parms("NMN").Value = 7
-                    'add to opn seq block
-                    pUCI.OpnSeqBlock.Add(pUCI.OpnBlks("COPY").OperFromID(lCopyId))
-                    'add to ext targets block
-                    Dim lContribArea As Double = pUCI.UpstreamArea(pUCI.OpnBlks.Item("RCHRES").OperFromID(lId))
-                    pUCI.AddExpertExtTargets(lId, lCopyId, lContribArea, lDsns, lOstr)
-                    'add mass-link and schematic copy records
-                    pUCI.AddExpertSchematic(lId, lCopyId)
+                    pUCI.AddExpertSystem(lId, lblOperation.Text, atxBase.Text, lDsns, lOstr)
                     pUCI.Edited = True
                     Me.Cursor = Cursors.Arrow
                 End If
