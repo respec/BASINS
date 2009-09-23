@@ -1,6 +1,8 @@
 Imports atcData
 Imports atcUtility
 Imports atcWDM
+Imports atcSeasons
+Imports MapWinUtility
 
 
 Public Module UCIExample
@@ -10,9 +12,17 @@ Public Module UCIExample
         Dim lWorkingDir As String = "C:\FTB\wdm\"
         ChDir(lWorkingDir)
 
+        Logger.StartToFile("WeppWrapper.log")
+
+        Dim lTimeseriesStatistics As New atcTimeseriesStatistics.atcTimeseriesStatistics
+        For Each lOperation As atcDefinedValue In lTimeseriesStatistics.AvailableOperations
+            atcDataAttributes.AddDefinition(lOperation.Definition)
+        Next
+
         Dim lWDMDataSource As New atcWDM.atcDataSourceWDM
         If lWDMDataSource.Open("FBmet.wdm") Then    'use the WDM file name
             'successfully opened the wdm
+            Logger.Dbg("Opened " & lWDMDataSource.Name)
             Dim lWDMDataSetIndex As Integer = lWDMDataSource.DataSets.IndexFromKey(102)  'use the WDM Dsn
             Dim lWDMDataSet As atcTimeseries = lWDMDataSource.DataSets.ItemByIndex(lWDMDataSetIndex)
 
@@ -21,7 +31,7 @@ Public Module UCIExample
             Dim lDate(5) As Integer
 
             ' Create a file to write to.
-            Dim lsw As System.IO.StreamWriter = System.IO.File.CreateText(lFlattenPath)
+            Dim lSw As System.IO.StreamWriter = System.IO.File.CreateText(lFlattenPath)
 
             'Set arrays of dates for begin/end of model
             'currently designed to work for midnight begin/end
@@ -29,12 +39,12 @@ Public Module UCIExample
             Dim lModelEnd() As Integer = {2006, 9, 30, 24, 0, 0}
             Dim lTableDelimiter As String = "  "
 
-            Dim lDummy As New Collection
-            lDummy.Add(100)
-            lDummy.Add(200)
-            lDummy.Add(300)
+            'Dim lDummy As New Collection
+            'lDummy.Add(100)
+            'lDummy.Add(200)
+            'lDummy.Add(300)
 
-            MsgBox(lDummy.Cast(Of Double)().Average)
+            'Logger.Msg(lDummy.Cast(Of Double)().Average)
 
 
             Dim lMaxTEMPCurrentMonthTab As New Collection
@@ -46,8 +56,24 @@ Public Module UCIExample
 
             'PREC
             Dim lTSPREC As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(107), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
+
             'ATEM
             Dim lTSATEM As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(13), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
+            Dim lSeasons As atcSeasonBase = New atcSeasonsMonth
+            Dim lSeasonalAttributes As New atcDataAttributes
+            lSeasonalAttributes.SetValue("Min", 0)
+            lSeasonalAttributes.SetValue("Max", 0)
+            lSeasonalAttributes.SetValue("Mean", 0)
+            lSeasonalAttributes.SetValue("Sum", 0)
+
+            lSeasons.SetSeasonalAttributes(lTSATEM, lSeasonalAttributes, lTSATEM.Attributes)
+            Dim lAttributeValues As SortedList = lTSATEM.Attributes.ValuesSortedByName
+            For lAttributeIndex As Integer = 0 To lAttributeValues.Count - 1
+                Dim lAttributeName As String = lAttributeValues.GetKey(lAttributeIndex)
+                Dim lAttributeValue As String = lTSATEM.Attributes.GetFormattedValue(lAttributeName)
+                Logger.Dbg(lAttributeName & " = " & lAttributeValue)
+            Next
+
             'DEWP
             Dim lTSDEWP As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(17), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
             'WIND
@@ -138,7 +164,7 @@ Public Module UCIExample
                                   & lTempDayStatResults(5) & lTableDelimiter _
                                   & vbCrLf _
                                   & lDayOutString
-                    lsw.WriteLine(lDayOutString)
+                    lSw.WriteLine(lDayOutString)
                     lDayOutString = ""
 
                     lMaxTEMPCurrentMonthTab.Add(lTempDayStatResults(1))
@@ -160,8 +186,8 @@ Public Module UCIExample
 
 
             'clean up
-            lsw.Flush()
-            lsw.Close()
+            lSw.Flush()
+            lSw.Close()
             lWDMDataSet = Nothing
             lWDMDataSource = Nothing
         End If
