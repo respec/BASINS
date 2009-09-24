@@ -62,6 +62,13 @@ Public Module UCIExample
             lSeasons.SetSeasonalAttributes(lTSPREC, lSeasonalAttributes, lTSPREC.Attributes)
             DumpAttributes(lTSPREC)
 
+            Dim lMathAttributes As New atcDataAttributes
+            lMathAttributes.Add("Timeseries", lTSPREC)
+            Dim lTsPrecCummulative As atcTimeseries = modTimeseriesMath.DoMath("running sum", lMathAttributes)
+            lTsPrecCummulative.Attributes.SetValue("Description", "Cumulative " & lTsPrecCummulative.Attributes.GetValue("Description"))
+            lTsPrecCummulative.Attributes.CalculateAll()
+            DumpAttributes(lTsPrecCummulative)
+
             'ATEM
             Dim lTSATEM As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(13), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
             lSeasonalAttributes.Clear()
