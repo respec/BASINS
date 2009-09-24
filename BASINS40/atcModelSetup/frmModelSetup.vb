@@ -1565,13 +1565,14 @@ Public Class frmModelSetup
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\"
+        Dim lProjectName As String = tbxName.Text.Trim
         If FileExists(lOutputPath) Then
-            lOutputPath &= tbxName.Text
+            lOutputPath &= lProjectName
         Else
             Dim lDriveLetter As String = CurDir().Substring(0, 1)
-            lOutputPath = lDriveLetter & ":\BASINS\modelout\" & tbxName.Text
+            lOutputPath = lDriveLetter & ":\BASINS\modelout\" & lProjectName
         End If
-        Dim lBaseOutputName As String = tbxName.Text
+        Dim lBaseOutputName As String = lProjectName
         Dim lMetWDM As String = txtMetWDMName.Text
 
         If pModelName = "AQUATOX" Then
