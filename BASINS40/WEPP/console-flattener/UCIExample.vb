@@ -56,23 +56,26 @@ Public Module UCIExample
 
             'PREC
             Dim lTSPREC As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(107), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
+            Dim lSeasons As atcSeasonBase = New atcSeasonsMonth
+            Dim lSeasonalAttributes As New atcDataAttributes
+            lSeasonalAttributes.SetValue("SumAnnual", 0)
+            lSeasons.SetSeasonalAttributes(lTSPREC, lSeasonalAttributes, lTSPREC.Attributes)
+            DumpAttributes(lTSPREC)
 
             'ATEM
             Dim lTSATEM As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(13), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
-            Dim lSeasons As atcSeasonBase = New atcSeasonsMonth
-            Dim lSeasonalAttributes As New atcDataAttributes
+            lSeasonalAttributes.Clear()
             lSeasonalAttributes.SetValue("Min", 0)
             lSeasonalAttributes.SetValue("Max", 0)
-            lSeasonalAttributes.SetValue("Mean", 0)
-            lSeasonalAttributes.SetValue("Sum", 0)
-
             lSeasons.SetSeasonalAttributes(lTSATEM, lSeasonalAttributes, lTSATEM.Attributes)
-            Dim lAttributeValues As SortedList = lTSATEM.Attributes.ValuesSortedByName
-            For lAttributeIndex As Integer = 0 To lAttributeValues.Count - 1
-                Dim lAttributeName As String = lAttributeValues.GetKey(lAttributeIndex)
-                Dim lAttributeValue As String = lTSATEM.Attributes.GetFormattedValue(lAttributeName)
-                Logger.Dbg(lAttributeName & " = " & lAttributeValue)
-            Next
+            DumpAttributes(lTSATEM)
+            'too many zero values - get rid of them???
+            Dim lTsAtemFill As atcTimeseries = modTimeseriesMath.FillMissingByInterpolation(lTSATEM, , , 0)
+            lSeasons.SetSeasonalAttributes(lTsAtemFill, lSeasonalAttributes, lTsAtemFill.Attributes)
+            DumpAttributes(lTsAtemFill)
+
+            Dim lTsAtemDayMax As atcTimeseries = modTimeseriesMath.Aggregate(lTsAtemFill, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+            Dim lTsAtemDayMin As atcTimeseries = modTimeseriesMath.Aggregate(lTsAtemFill, atcTimeUnit.TUDay, 1, atcTran.TranMin)
 
             'DEWP
             Dim lTSDEWP As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(17), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
@@ -80,6 +83,11 @@ Public Module UCIExample
             Dim lTSWIND As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(14), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
             'SOLR
             Dim lTSSOLR As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(15), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
+            lSeasonalAttributes.Clear()
+            lSeasonalAttributes.SetValue("Mean", 0)
+            lSeasons.SetSeasonalAttributes(lTSSOLR, lSeasonalAttributes, lTSSOLR.Attributes)
+            DumpAttributes(lTSSOLR)
+
             'PEVT
             Dim lTSPEVT As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(16), Date2J(lModelBegin), Date2J(lModelEnd), lWDMDataSource)
 
@@ -205,6 +213,15 @@ Public Module UCIExample
         Console.SetCursorPosition(intLeftPos, intTopPos)
         Console.Write(intProgress & "/" & intMaxValue & vbCrLf & "(" & intPercent & "%)" & vbCrLf)
         Console.CursorVisible = True
+    End Sub
+
+    Private Sub DumpAttributes(ByVal aTimeSeries As atcTimeseries)
+        Dim lAttributeValues As SortedList = aTimeSeries.Attributes.ValuesSortedByName
+        For lAttributeIndex As Integer = 0 To lAttributeValues.Count - 1
+            Dim lAttributeName As String = lAttributeValues.GetKey(lAttributeIndex)
+            Dim lAttributeValue As String = aTimeSeries.Attributes.GetFormattedValue(lAttributeName)
+            Logger.Dbg(lAttributeName & " = " & lAttributeValue)
+        Next
     End Sub
 
 End Module
