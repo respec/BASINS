@@ -6,10 +6,8 @@ Imports System.Data.OleDb
 ''' </summary>
 Public Class atcMDB
     Private pDataBaseType As String = ""
-
-    Private pConnection As Object
-    'Root object for accessing OpenOffice from VB    
-    Private pServiceManager As Object = CreateObject("com.sun.star.ServiceManager")
+    Private pConnection As Object = Nothing
+    Private pServiceManager As Object = Nothing
 
     ''' <summary>
     ''' Open an MDB file given its filename
@@ -29,6 +27,8 @@ Public Class atcMDB
                 pConnection = New OleDbConnection
                 pConnection.ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & aFilename & ";"
             Case "OO"
+                'Root object for accessing OpenOffice from VB    
+                pServiceManager = CreateObject("com.sun.star.ServiceManager")
                 Dim lDatabaseContext As Object = pServiceManager.createInstance("com.sun.star.sdb.DatabaseContext")
                 Dim lDataSource As Object = lDatabaseContext.getByName("file:///" & IO.Path.ChangeExtension(aFilename, "odb"))
                 'TODO: points to mdb in the OO program folder - now kludged by making a copy there.
