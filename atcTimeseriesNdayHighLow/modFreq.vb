@@ -31,6 +31,22 @@ Module modFreq
                                               ByRef TAU As Single, _
                                               ByRef PLEVEL As Single, _
                                               ByRef SLOPE As Single)
+    Private Declare Sub EMAFITB Lib "usgs_swstats.dll" (ByRef N As Integer, _
+                                               ByRef QL_IN() As Single, _
+                                               ByRef QU_IN() As Single, _
+                                               ByRef TL_IN() As Single, _
+                                               ByRef TU_IN() As Single, _
+                                               ByRef REG_SKEW As Single, _
+                                               ByRef REG_MSE As Single, _
+                                               ByRef NEPS As Integer, _
+                                               ByRef EPS() As Single, _
+                                               ByRef GBTHRSH0 As Single, _
+                                               ByRef PQ As Single, _
+                                               ByVal CMOMS(,) As Single, _
+                                               ByVal YP As Single, _
+                                               ByVal CI_LOW() As Single, _
+                                               ByVal CI_HIGH() As Single, _
+                                               ByVal VAR_EST() As Single)
 
 
     'Kendall Tau Calculation
@@ -125,6 +141,23 @@ Module modFreq
             Dim lCcpa(lIntervalMax) As Single
             Dim lP(lIntervalMax) As Single
             Dim lQ(lIntervalMax) As Single
+            Dim lQL(lIntervalMax) As Single
+            Dim lQU(lIntervalMax) As Single
+            Dim lTL(lIntervalMax) As Single
+            Dim lTU(lIntervalMax) As Single
+            Dim lmse As Single = 100000000000.0
+            Dim lCILow(lIntervalMax) As Single
+            Dim lCIHigh(lIntervalMax) As Single
+            Dim lCILowVal(1) As Single
+            Dim lCIHighVal(1) As Single
+            Dim lVarEst(lIntervalMax) As Single
+            Dim lVarEstVal(1) As Single
+            Dim lCMoms(2, 1) As Single
+            Dim lneps As Integer = 1
+            Dim leps(1) As Single
+            Dim lRegSkew As Single
+            Dim lgbthrsh0 As Single
+            Dim lyp(lIntervalMax) As Single
             Dim lAdp(lIntervalMax) As Single
             Dim lQnew(lIntervalMax) As Single
             Dim lRi(lIntervalMax) As Single
@@ -137,6 +170,22 @@ Module modFreq
             Try
                 LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe, _
                        lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lRetcod)
+                For i As Integer = 1 To lN
+                    'NOTE - need to check how QL/QU should be filled ***
+                    lQL(i) = aTs.Values(i)
+                    lQU(i) = lQL(i)
+                    lTL(i) = -1.0E+21
+                    lTU(i) = 1.0E+21
+                Next
+                leps(0) = 0.95
+                For i As Integer = 0 To lIntervalMax
+                    EMAFITB(lN, lQL, lQU, lTL, lTU, lRegSkew, lmse, _
+                            lneps, leps, lgbthrsh0, lP(i), _
+                             lCMoms, lyp(i), lCILowVal, lCIHighVal, lVarEstVal)
+                    lCILow(i) = lCILowVal(0)
+                    lCIHigh(i) = lCIHighVal(0)
+                    lVarEst(i) = lVarEstVal(0)
+                Next i
                 Dim lMsg As String = ""
 
                 Dim lNday As Integer = aTs.Attributes.GetValue("NDay")
@@ -173,6 +222,14 @@ Module modFreq
                     lArguments.SetValue("NDayTimeseries", lNonLogTS)
 
                     aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
+
+                    Dim lNewAttVarEst As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " Variance of Estimate")
+                    aAttributesStorage.SetValue(lNewAttVarEst, lQ(lIndex), lArguments)
+
+                    Dim lNewAttCILower As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Lower")
+                    aAttributesStorage.SetValue(lNewAttCILower, lQ(lIndex), lArguments)
+                    Dim lNewAttCIUpper As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Upper")
+                    aAttributesStorage.SetValue(lNewAttCIUpper, lQ(lIndex), lArguments)
 
                     If aNumZero > 0 Then
                         lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")
