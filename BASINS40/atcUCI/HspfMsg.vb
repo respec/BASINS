@@ -286,6 +286,8 @@ Public Class HspfMsg
     Private Function FilterNull(ByRef aValue As Object, Optional ByRef aNullReturn As Object = 0) As Object
         If IsDBNull(aValue) Then
             Return aNullReturn
+        ElseIf aValue.ToString.Length = 0 Then
+            Return aNullReturn
         Else
             Return aValue
         End If
