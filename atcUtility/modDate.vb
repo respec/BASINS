@@ -109,7 +109,7 @@ Public Module modDate
     ''' <param name="aTU"></param>
     ''' <param name="aDate"></param>
     ''' <remarks></remarks>
-    Sub J2DateRoundup(ByVal aJDate As Double, ByVal aTU As Integer, ByVal aDate() As Integer)
+    Private Sub J2DateRoundup(ByVal aJDate As Double, ByVal aTU As atcTimeUnit, ByVal aDate() As Integer)
         'round up dates for wdm datasets
         'TODO: needs unit tests!
         J2Date(aJDate, aDate)
@@ -122,6 +122,26 @@ Public Module modDate
             End If
             TIMADD(aDate, aTU, 1, 1, aDate)
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Round down dates to given time unit
+    ''' </summary>
+    ''' <param name="aJDate"></param>
+    ''' <param name="aTU"></param>
+    ''' <param name="aDate"></param>
+    ''' <remarks></remarks>
+    Public Sub J2DateRounddown(ByVal aJDate As Double, ByVal aTU As atcTimeUnit, ByRef aDate() As Integer)
+        'round down dates for wdm datasets
+        'TODO: needs unit tests!
+        J2Date(aJDate, aDate)
+        For lIndex As Integer = (7 - aTU) To 5
+            If lIndex > 2 Then
+                aDate(lIndex) = 0
+            Else
+                aDate(lIndex) = 1
+            End If
+        Next
     End Sub
 
     ''' <summary>

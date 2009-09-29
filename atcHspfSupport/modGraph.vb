@@ -16,7 +16,7 @@ Public Module Graph
                         ByVal aGraphSaveWidth As Integer, _
                         ByVal aGraphSaveHeight As Integer, _
                         ByVal aGraphAnnual As Boolean, _
-                        ByVal loutfoldername As String)
+                        ByVal aOutFolderName As String)
         Dim lDataGroup As New atcTimeseriesGroup
         lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"), _
                                               aSDateJ, _
@@ -27,7 +27,7 @@ Public Module Graph
                                               aEDateJ, Nothing), _
                                  atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
 
-        Dim lOutFileBase As String = loutfoldername & aCons & "_" & aSite
+        Dim lOutFileBase As String = aOutFolderName & aCons & "_" & aSite
         Dim lZgc As ZedGraphControl
 
         'duration plot

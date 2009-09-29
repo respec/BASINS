@@ -216,6 +216,9 @@ Public Class atcTimeseriesStatistics
                     ElseIf lVal > 0 Then
                         lCountPositive += 1
                     End If
+                ElseIf aTimeseries.ValueAttributesGetValue(lIndex, "Was Zero", False) Then
+                    lCount += 1
+                    lCountZero += 1
                 End If
             Next
 
