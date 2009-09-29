@@ -266,9 +266,7 @@ Public Class atcTimeseriesNdayHighLow
                         End If
 
                     Else 'calculate the n-day annual timeseries
-                        Dim newTS As atcTimeseries
-                        Dim newValueAttributes(nYears) As atcDataAttributes
-                        newTS = New atcTimeseries(Me)
+                        Dim newTS As New atcTimeseries(Me)
                         newTS.Dates = New atcTimeseries(Me)
                         newTS.numValues = nYears
 

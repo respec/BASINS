@@ -30,7 +30,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.41 $ $Date: 2007/08/11 19:24:55 $ </version>
+	/// <version> $Revision: 3.41 $ $Date: 2007-08-11 19:24:55 $ </version>
 	[Serializable]
 	public class Legend : ICloneable, ISerializable
 	{

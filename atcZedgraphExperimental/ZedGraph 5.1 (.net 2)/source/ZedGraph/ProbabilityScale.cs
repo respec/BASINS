@@ -44,7 +44,25 @@ namespace ZedGraph
         /// Number of standard deviations to display in graph (plus and minus this many are displayed)
         /// </summary>
         public double standardDeviations = 5;
-        
+
+        /// <summary>
+        /// Probability axis labeling style (Percent, Fraction, or Return Interval)
+        /// </summary>
+        public enum ProbabilityLabelStyle
+        {
+            /// Label using Percent
+            Percent = 0,
+            /// Label using Fraction (Percent/100)
+            Fraction = 1,
+            /// Label using Return Interval (100/Percent)
+            ReturnInterval = 2,
+        }
+
+        /// <summary>
+        /// Style to use for labeling this axis
+        /// </summary>
+        public ProbabilityLabelStyle LabelStyle = ProbabilityLabelStyle.Percent;
+
         /// <summary>
         /// Percent chance exceeded to label, if there is room
         /// </summary>
@@ -55,11 +73,6 @@ namespace ZedGraph
                                        95, 98, 99, 
                                        99.5, 99.8, 99.9, 
                                        99.95, 99.98, 99.99, 99.999, 99.9999};
-    //{ 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50, 70, 80, 90, 95, 98, 99, 99.5, 99.8, 99.9 };
-        /// <summary>
-        /// Return periods to label, if there is room
-        /// </summary>
-        //double[] returnperiods = { 1.001, 1.002, 1.005, 1.01, 1.02, 1.05, 1.1, 1.25, 1.5, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1000 };
 	#region constructors
 
 		/// <summary>
@@ -196,6 +209,16 @@ namespace ZedGraph
             else
                 return 0;
         }
+
+        //internal double Percentage(int index)
+        //{
+        //    if (Exceedance) 
+        //    {
+        //        return Percentages[index];
+        //    } else {
+        //        return Percentages[Percentages.Length - 1 - index]; 
+        //    }
+        //}
 
 		/// <summary>
 		/// Determine the value for any minor tic.
@@ -473,24 +496,33 @@ namespace ZedGraph
         {
             if (_format == null)
                 _format = Scale.Default.Format;
+
+            double lbl = Percentages[index];
+
+            switch (this.LabelStyle)
+            {
+                case ProbabilityLabelStyle.Fraction: lbl /= 100; break;
+                case ProbabilityLabelStyle.Percent: break;
+                case ProbabilityLabelStyle.ReturnInterval: lbl = 100 / lbl; break;
+            }
+
             if (!_formatAuto)
-                return Percentages[index].ToString(_format);
+                return lbl.ToString(_format);
 
             //2/21/08 LCW: modified so that if formatAuto is set, will give variable precision on formatting of labels
-            double pct = Percentages[index];
             string fmt = "0";
-            if (pct < 0.001 || pct > 99.999)
+            if (lbl < 0.001 || lbl > 99.999)
                 fmt="0.0000";
             else
-                if (pct < 0.01 || pct > 99.99)
+                if (lbl < 0.01 || lbl > 99.99)
                     fmt="0.000";
                 else
-                    if (pct < 0.1 || pct > 99.9)
+                    if (lbl < 0.1 || lbl > 99.9)
                         fmt="0.00";
                     else
-                        if (pct < 1 || pct > 99)
+                        if (lbl < 1 || lbl > 99)
                             fmt="0.0";
-            return pct.ToString(fmt);
+            return lbl.ToString(fmt);
         }
 
 	#endregion

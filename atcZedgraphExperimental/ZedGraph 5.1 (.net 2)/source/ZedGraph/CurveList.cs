@@ -30,7 +30,7 @@ namespace ZedGraph
 	/// 
 	/// <author> John Champion
 	/// modified by Jerry Vos</author>
-	/// <version> $Revision: 3.43 $ $Date: 2007/11/03 04:41:28 $ </version>
+	/// <version> $Revision: 3.43 $ $Date: 2007-11-03 04:41:28 $ </version>
 	[Serializable]
 	public class CurveList : List<CurveItem>, ICloneable
 	{

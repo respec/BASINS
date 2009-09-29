@@ -375,7 +375,7 @@ NextIteration:
                     Next
                 End With
                 'TODO: don't assume Model.BaseScenario is a filename, find results another way
-                RaiseEvent UpdateResults(PathNameOnly(Model.BaseScenario) & "\" & lModifiedScenarioName & ".results.txt")
+                RaiseEvent UpdateResults(PathNameOnly(Model.BaseScenario) & g_PathChar & lModifiedScenarioName & ".results.txt")
 
                 'Close any open results
                 For Each lSpecification As String In lResults

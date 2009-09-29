@@ -191,9 +191,11 @@ Public Class atcTimeseriesRDB
                         End If
                     Next
                 Next
+                Dim lTs As atcTimeseries
                 For lValueFieldIndex = 0 To lLastValueField
-                    If lBuilders(lValueFieldIndex) IsNot Nothing Then
-                        DataSets.Add(lBuilders(lValueFieldIndex).CreateTimeseries)
+                    If lBuilders(lValueFieldIndex) IsNot Nothing AndAlso lBuilders(lValueFieldIndex).NumValues > 0 Then
+                        lTs = lBuilders(lValueFieldIndex).CreateTimeseries
+                        If lTs.Attributes.GetValue("Count", 0) > 0 Then DataSets.Add(lTs)
                     End If
                 Next
             Else
@@ -473,7 +475,7 @@ Public Class atcTimeseriesRDB
     '        Logger.Dbg("  clsUsgsDaily GetData entry")
 
     '        'http://waterdata.usgs.gov/nwis/dv?cb_00060=on&format=rdb&begin_date=1800-01-01&end_date=2100-01-01&site_no=01591000&referred_module=sw
-    '        'cache_dir = pManager.CurrentStatusGetString("cache_dir") & pClassName & "\"
+    '        'cache_dir = pManager.CurrentStatusGetString("cache_dir") & pClassName & g_PathChar
     '        'project_dir = pManager.CurrentStatusGetString("project_dir")
     '        '  SHPfilename = project_dir & pManager.CurrentStatusGetString("USGSdailySHPfile", "gage.shp")
     '        'suffix = pManager.CurrentStatusGetString("USGSdailySaveSuffix", "_dv.txt")
@@ -484,7 +486,7 @@ Public Class atcTimeseriesRDB
     '        'If Len(WDMfilename) > 0 Then
     '        '    myDownloadFiles = New Collection
     '        'Else 'Save downloaded RDB files in folder inside project_dir if we are not adding to WDM
-    '        '    project_dir = project_dir & "USGSflow\"
+    '        '    project_dir = project_dir & "USGSflow" & g_PathChar
     '        '    Logger.Dbg("Saving RDB files in " & project_dir)
     '        'End If
     '        MkDirPath(cache_dir)

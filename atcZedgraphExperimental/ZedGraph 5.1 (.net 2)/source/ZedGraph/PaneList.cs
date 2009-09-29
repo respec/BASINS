@@ -34,7 +34,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author>John Champion</author>
-	/// <version> $Revision: 3.6 $ $Date: 2006/06/24 20:26:43 $ </version>
+	/// <version> $Revision: 3.6 $ $Date: 2006-06-24 20:26:43 $ </version>
 	[Serializable]
 	public class PaneList : List<GraphPane>, ICloneable
 	{

@@ -40,7 +40,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 1.7 $ $Date: 2007/01/25 07:56:09 $ </version>
+	/// <version> $Revision: 1.7 $ $Date: 2007-01-25 07:56:09 $ </version>
 	[Serializable]
 	public class StickItem : LineItem, ICloneable, ISerializable
 	{

@@ -49,7 +49,7 @@ namespace ZedGraph
 	/// is assigned with <see cref="BarSettings.Base"/>, and is a
 	/// <see cref="ZedGraph.BarBase"/> enum type.</remarks>
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.19 $ $Date: 2007/04/16 00:03:01 $ </version>
+	/// <version> $Revision: 3.19 $ $Date: 2007-04-16 00:03:01 $ </version>
 	[Serializable]
 	public class ErrorBarItem : CurveItem, ICloneable, ISerializable
 	{

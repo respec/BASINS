@@ -34,7 +34,7 @@ namespace ZedGraph
 	/// clustered, depending on the state of <see cref="BarSettings.Type"/>
 	/// </remarks>
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.27 $ $Date: 2007/11/03 04:41:28 $ </version>
+	/// <version> $Revision: 3.27 $ $Date: 2007-11-03 04:41:28 $ </version>
 	[Serializable]
 	public class BarItem : CurveItem, ICloneable, ISerializable
 	{

@@ -32,7 +32,7 @@ namespace ZedGraph
 	/// <see cref="PieItem"/>s.
 	/// </summary>
 	/// <author> Bob Kaye </author>
-	/// <version> $Revision: 1.32 $ $Date: 2007/07/30 05:26:23 $ </version>
+	/// <version> $Revision: 1.32 $ $Date: 2007-07-30 05:26:23 $ </version>
 	[Serializable]
 	public class PieItem : CurveItem, ICloneable, ISerializable
 	{

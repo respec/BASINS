@@ -37,7 +37,7 @@ namespace ZedGraph
 	/// the <see cref="YAxis"/>, and the <see cref="Y2Axis"/>.
 	/// </remarks>
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.15 $ $Date: 2007/04/16 00:03:07 $ </version>
+	/// <version> $Revision: 3.15 $ $Date: 2007-04-16 00:03:07 $ </version>
 	public class ZoomState : ICloneable
 	{
 		/// <summary>

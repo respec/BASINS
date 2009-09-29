@@ -39,7 +39,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author>John Champion</author>
-	/// <version> $Revision: 3.25 $ $Date: 2007/11/03 04:41:28 $ </version>
+	/// <version> $Revision: 3.26 $ $Date: 2007-11-05 18:28:56 $ </version>
 	[Serializable]
 	public class MasterPane : PaneBase, ICloneable, ISerializable, IDeserializationCallback
 	{

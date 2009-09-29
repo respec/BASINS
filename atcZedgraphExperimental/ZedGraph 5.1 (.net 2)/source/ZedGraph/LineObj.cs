@@ -36,7 +36,7 @@ namespace ZedGraph
 	/// a single line segment, drawn as a "decoration" on the chart.</remarks>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.4 $ $Date: 2007/01/25 07:56:09 $ </version>
+	/// <version> $Revision: 3.4 $ $Date: 2007-01-25 07:56:09 $ </version>
 	[Serializable]
 	public class LineObj : GraphObj, ICloneable, ISerializable
 	{

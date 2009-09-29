@@ -31,7 +31,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.22 $ $Date: 2007/08/10 16:22:54 $ </version>
+	/// <version> $Revision: 3.22 $ $Date: 2007-08-10 16:22:54 $ </version>
 	[Serializable]
 	public class LineItem : CurveItem, ICloneable, ISerializable
 	{

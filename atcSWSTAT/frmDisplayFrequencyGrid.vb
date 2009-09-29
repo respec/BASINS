@@ -6,15 +6,26 @@ Imports System.Windows.Forms
 Friend Class frmDisplayFrequencyGrid
     Inherits System.Windows.Forms.Form
     Private pInitializing As Boolean
+    Friend WithEvents mnuGraph As System.Windows.Forms.MenuItem
     Private WithEvents pFormSpecify As frmSWSTAT
+
+    'The group of atcTimeseries displayed
+    Private WithEvents pDataGroup As atcTimeseriesGroup
+
+    Private pSource As atcFrequencyGridSource
+    Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
+    Private pNday() As Double
+    Private pReturns() As Double
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aHigh As Boolean)
+    Public Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aHigh As Boolean, ByVal aNday() As Double, ByVal aReturns() As Double)
         MyBase.New()
         pInitializing = True
         Me.Visible = False
         pDataGroup = aDataGroup
+        pNday = aNday
+        pReturns = aReturns
 
         InitializeComponent() 'required by Windows Form Designer
 
@@ -88,12 +99,13 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.mnuGraph = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
         Me.SuspendLayout()
         '
         'MainMenu1
         '
-        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp})
+        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp, Me.mnuGraph})
         '
         'mnuFile
         '
@@ -184,6 +196,11 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuHelp.ShowShortcut = False
         Me.mnuHelp.Text = "Help"
         '
+        'mnuGraph
+        '
+        Me.mnuGraph.Index = 5
+        Me.mnuGraph.Text = "Graph"
+        '
         'agdMain
         '
         Me.agdMain.AllowHorizontalScrolling = True
@@ -214,16 +231,10 @@ Friend Class frmDisplayFrequencyGrid
 
 #End Region
 
-    'The group of atcTimeseries displayed
-    Private WithEvents pDataGroup As atcTimeseriesGroup
-
-    Private pSource As atcFrequencyGridSource
-    Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
-
     Private Sub PopulateGrid()
         If Not pInitializing Then
             Dim lContinue As Boolean = True
-            pSource = New atcFrequencyGridSource(pDataGroup)
+            pSource = New atcFrequencyGridSource(pDataGroup, pNday, pReturns)
             'If pSource.Columns < 3 Then
             '    lContinue = UserSpecifyAttributes()
             '    If lContinue Then
@@ -378,5 +389,10 @@ Friend Class frmDisplayFrequencyGrid
 
         Catch 'Ignore error if we can't tell how large to make it, or can't rezise
         End Try
+    End Sub
+
+    Private Sub mnuGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraph.Click
+        Dim lGraphPlugin As New atcGraph.atcGraphPlugin
+        Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
     End Sub
 End Class

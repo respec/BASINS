@@ -35,7 +35,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion  </author>
-	/// <version> $Revision: 1.10 $ $Date: 2007/04/16 00:03:02 $ </version>
+	/// <version> $Revision: 1.10 $ $Date: 2007-04-16 00:03:02 $ </version>
 	[Serializable]
 	class LinearScale : Scale, ISerializable //, ICloneable
 	{

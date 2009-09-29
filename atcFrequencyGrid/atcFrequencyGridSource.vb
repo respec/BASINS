@@ -311,11 +311,11 @@ Friend Class atcFrequencyGridSource
                     Dim lLogString As String = "   "
 
                     'Compile again
-                    If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then
+                    If lAttributes.GetValue("LDIST", "") = "LP3" Then
                         'Get original version of NDayTimeseries (not log version)
                         lIsLog = True
                         lLogString = "(logs)"
-                        lNdayTsNonLog = lNdayTs.Attributes.GetValue("NDayTimeseries")
+                        lNdayTsNonLog = lAttributes.GetValue("NonLogNDayTimeseries")
                     Else
                         lNdayTsNonLog = lNdayTs
                     End If
@@ -452,7 +452,7 @@ Friend Class atcFrequencyGridSource
                     Dim lReverseString As String = ""
                     Dim lThisRow As String
                     For Each lRecurrenceKey As String In pRecurrence.Keys
-                        Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
+                        Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey).ToString.Replace(",", "")
                         Dim lNyears As Double = CDbl(lRecurrence)
 
                         lStr = DoubleToString(1 / lNyears, , "0.0000")

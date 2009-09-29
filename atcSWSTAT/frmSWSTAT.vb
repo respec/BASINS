@@ -1380,7 +1380,7 @@ Friend Class frmSWSTAT
         Calculate("n-day " & HighOrLowString() & " value")
         Me.Cursor = System.Windows.Forms.Cursors.Default
 
-        Dim lFreqForm As New frmDisplayFrequencyGrid(pDataGroup, radioHigh.Checked)
+        Dim lFreqForm As New frmDisplayFrequencyGrid(pDataGroup, radioHigh.Checked, ListToArray(lstNday), ListToArray(lstRecurrence))
     End Sub
 
     Private Sub cboYears_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboYears.SelectedIndexChanged

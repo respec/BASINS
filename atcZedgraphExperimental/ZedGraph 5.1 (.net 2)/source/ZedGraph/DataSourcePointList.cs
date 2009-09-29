@@ -34,7 +34,7 @@ namespace ZedGraph
 	/// <seealso cref="IPointListEdit" /> 
 	///  
 	/// <author>John Champion</author> 
-	/// <version> $Revision: 3.7 $ $Date: 2007/11/05 04:33:26 $ </version> 
+	/// <version> $Revision: 3.7 $ $Date: 2007-11-05 04:33:26 $ </version> 
 	[Serializable]
 	public class DataSourcePointList : IPointList
 	{

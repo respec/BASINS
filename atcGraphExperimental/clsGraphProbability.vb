@@ -80,7 +80,6 @@ Public Class clsGraphProbability
 
         Dim lX(pNumProbabilityPoints) As Double
         Dim lLastIndex As Integer = lX.GetUpperBound(0)
-        Dim lProbScale As ZedGraph.ProbabilityScale
         Dim lPane As ZedGraph.GraphPane = pZgc.MasterPane.PaneList(0)
         With lPane.XAxis
             If .Type <> AxisType.Probability Then
@@ -90,10 +89,13 @@ Public Class clsGraphProbability
                     .IsCrossInside = True
                     .IsOutside = False
                     .IsCrossOutside = False
-                End With
+                End With                
+                'Dim lProbScale As ProbabilityScale = .Scale
+                'lProbScale.standardDeviations = 5
+                'lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
+                'lProbScale.IsReverse = True
             End If
-            lProbScale = .Scale
-            'lProbScale.standardDeviations = 5
+
             For lXindex As Integer = 0 To lLastIndex
                 lX(lXindex) = 100 * .Scale.DeLinearize(lXindex / CDbl(lLastIndex))
             Next
@@ -121,7 +123,7 @@ Public Class clsGraphProbability
             '.Scale.Max = lXFracExceed(0)
             '.Scale.Min = lXFracExceed(lLastIndex)
             .Scale.BaseTic = lXFracExceed(0)
-            .Title.Text = "Percent chance exceeded"
+            .Title.Text = "Percent Exceeded"
         End With
         With lPane.YAxis
             .Type = AxisType.Log

@@ -38,7 +38,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion  </author>
-	/// <version> $Revision: 1.8 $ $Date: 2006/08/25 05:19:09 $ </version>
+	/// <version> $Revision: 1.8 $ $Date: 2006-08-25 05:19:09 $ </version>
 	[Serializable]
 	class TextScale : Scale, ISerializable //, ICloneable
 	{

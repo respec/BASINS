@@ -33,7 +33,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.22 $ $Date: 2007/01/26 09:01:49 $ </version>
+	/// <version> $Revision: 3.22 $ $Date: 2007-01-26 09:01:49 $ </version>
 	[Serializable]
 	public class Fill : ISerializable, ICloneable
 	{

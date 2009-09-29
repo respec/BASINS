@@ -32,7 +32,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.4 $ $Date: 2007/01/25 07:56:08 $ </version>
+	/// <version> $Revision: 3.4 $ $Date: 2007-01-25 07:56:08 $ </version>
 	[Serializable]
 	public class ArrowObj : LineObj, ICloneable, ISerializable
 	{

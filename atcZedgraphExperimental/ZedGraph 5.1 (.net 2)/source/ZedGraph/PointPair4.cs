@@ -31,7 +31,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.3 $ $Date: 2007/03/17 18:43:44 $ </version>
+	/// <version> $Revision: 3.3 $ $Date: 2007-03-17 18:43:44 $ </version>
 	[Serializable]
 	public class PointPair4 : PointPair, ISerializable
 	{

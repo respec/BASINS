@@ -40,7 +40,7 @@ namespace ZedGraph
 	/// interface.
 	/// 
 	/// <author>Colin Green with mods by John Champion</author>
-	/// <version> $Date: 2007/11/05 04:33:26 $ </version>
+	/// <version> $Date: 2007-11-05 04:33:26 $ </version>
 	/// </summary>
 	[Serializable]
 	public class RollingPointPairList : IPointList, ISerializable, IPointListEdit

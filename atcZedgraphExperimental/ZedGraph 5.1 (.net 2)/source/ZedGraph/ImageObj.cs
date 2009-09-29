@@ -37,7 +37,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.2 $ $Date: 2006/09/09 17:32:01 $ </version>
+	/// <version> $Revision: 3.2 $ $Date: 2006-09-09 17:32:01 $ </version>
 	[Serializable]
 	public class ImageObj : GraphObj, ICloneable, ISerializable
 	{
