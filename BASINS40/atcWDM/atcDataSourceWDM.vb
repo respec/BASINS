@@ -345,7 +345,9 @@ CaseExistRenumber:
                     lV(i - 1) = lValue
                 Next
 
-                J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
+                'J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
+                J2DateRoundDown(lTimser.Dates.Value(0), lTu, lSDat)
+
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
                 '            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
                 '            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
@@ -782,6 +784,7 @@ CaseExistRenumber:
         Dim lJd() As Double 'array of julian dates
         Dim lRetcod As Integer
         Dim lSdat(6) As Integer 'starting date
+        Dim lSdatSeasonOffset(6) As Integer 'starting date with seasonal offset
         Dim lEdat(6) As Integer 'ending (or current) date
         Dim lTsFill As Double
 
@@ -802,7 +805,15 @@ CaseExistRenumber:
                         lReadTS.ValuesNeedToBeRead = False
 
                         Dim lSJDay As Double = .GetValue("SJDay", 0)
-                        J2Date(lSJDay, lSdat)
+                        J2Date(lSJDay, lSdat) 'saved starting date as array for wdtget
+                        If .GetValue("TU") = atcUtility.atcTimeUnit.TUYear Then
+                            Dim lStartMonth As Integer = .GetValue("SEASBG", 1)
+                            Dim lStartDay As Integer = .GetValue("SEADBG", 1)
+                            If lStartMonth > 1 OrElse lStartDay > 1 Then
+                                lSJDay = TimAddJ(lSJDay, atcTimeUnit.TUMonth, 1, lStartMonth - 1) + lStartDay - 1
+                            End If
+                        End If
+                        J2Date(lSJDay, lSdatSeasonOffset)
                         Dim nVals As Integer = lReadTS.numValues
                         If nVals = 0 Then 'constant inverval???
                             Dim lEJDay As Double = .GetValue("EJDay", 0)
@@ -846,7 +857,7 @@ CaseExistRenumber:
                                 If lConstInterval Then
                                     lJd(iVal) = lSJDay + iVal * lInterval
                                 Else
-                                    TIMADD(lSdat, lTimeUnits, lTimeStep, iVal, lEdat)
+                                    TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lEdat)
                                     lJd(iVal) = Date2J(lEdat)
                                 End If
                             Next
