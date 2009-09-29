@@ -383,7 +383,7 @@ Module HSPFOutputReports
                                  pGraphSaveFormat, _
                                  pGraphSaveWidth, _
                                  pGraphSaveHeight, _
-                                 pGraphAnnual)
+                                 pGraphAnnual, IO.Path.Combine(My.Computer.FileSystem.CurrentDirectory, "\output\"))
                         lTimeSeries.Clear()
 
                         'TODO: dont hard code DSN here

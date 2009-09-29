@@ -84,6 +84,8 @@
     <Compile Include="frmSelectScript.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="HSPFAreaSummary.vb" />
+    <Compile Include="HSPFOutputReports.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -101,6 +103,7 @@
     </Compile>
     <Compile Include="ScriptDriver.vb" />
     <Compile Include="SummarizeTimeseries.vb" />
+    <Compile Include="USGS_SWSTAT_Test.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmSelectScript.resx">
@@ -136,6 +139,11 @@
       <Name>atcData</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcFrequencyGrid\atcFrequencyGrid.vbproj">
+      <Project>{1E20B43E-B33D-4396-A7E1-498F72EBA5A4}</Project>
+      <Name>atcFrequencyGrid</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcGisUtilities\atcGisUtiliies.vbproj">
       <Project>{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}</Project>
       <Name>atcGisUtiliies</Name>
@@ -169,6 +177,11 @@
     <ProjectReference Include="..\atcSegmentation\atcSegmentation.vbproj">
       <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
       <Name>atcSegmentation</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSWSTAT\atcSWSTAT.vbproj">
+      <Project>{C00718A3-FF1D-46C4-822E-C10964469DE2}</Project>
+      <Name>atcSWSTAT</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
