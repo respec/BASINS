@@ -29,7 +29,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion and JCarpenter </author>
-	/// <version> $Revision: 3.5 $ $Date: 2007/03/11 02:08:16 $ </version>
+	/// <version> $Revision: 3.5 $ $Date: 2007-03-11 02:08:16 $ </version>
 	public class Selection : CurveList
 	{
 		// Revision: JCarpenter 10/06

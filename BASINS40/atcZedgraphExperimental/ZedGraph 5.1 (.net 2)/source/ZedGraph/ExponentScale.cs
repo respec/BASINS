@@ -36,7 +36,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion with contributions by jackply </author>
-	/// <version> $Revision: 1.8 $ $Date: 2007/04/16 00:03:01 $ </version>
+	/// <version> $Revision: 1.8 $ $Date: 2007-04-16 00:03:01 $ </version>
 	[Serializable]
 	class ExponentScale : Scale, ISerializable //, ICloneable
 	{

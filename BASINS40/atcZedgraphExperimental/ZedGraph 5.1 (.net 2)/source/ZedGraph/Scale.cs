@@ -39,7 +39,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion  </author>
-	/// <version> $Revision: 1.33 $ $Date: 2007/09/19 06:41:56 $ </version>
+	/// <version> $Revision: 1.33 $ $Date: 2007-09-19 06:41:56 $ </version>
 	[Serializable]
 	abstract public class Scale : ISerializable
 	{

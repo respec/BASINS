@@ -37,7 +37,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion  </author>
-	/// <version> $Revision: 1.12 $ $Date: 2007/04/16 00:03:02 $ </version>
+	/// <version> $Revision: 1.12 $ $Date: 2007-04-16 00:03:02 $ </version>
 	[Serializable]
 	class LogScale : Scale, ISerializable //, ICloneable
 	{

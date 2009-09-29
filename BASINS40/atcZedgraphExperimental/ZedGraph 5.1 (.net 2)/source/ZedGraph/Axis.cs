@@ -35,7 +35,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion modified by Jerry Vos </author>
-	/// <version> $Revision: 3.73 $ $Date: 2007/05/19 06:06:05 $ </version>
+	/// <version> $Revision: 3.76 $ $Date: 2008-02-16 23:21:48 $ </version>
 	[Serializable]
 	abstract public class Axis : ISerializable, ICloneable
 	{
@@ -899,8 +899,8 @@ namespace ZedGraph
 
 			// Use Linearize here instead of _minLinTemp because this method is called
 			// as part of CalcRect() before scale is fully setup
-			double min = crossAxis._scale.Linearize( _scale._min );
-			double max = crossAxis._scale.Linearize( _scale._max );
+			double min = crossAxis._scale.Linearize( crossAxis._scale._min );
+			double max = crossAxis._scale.Linearize( crossAxis._scale._max );
 
 			if ( _crossAuto )
 			{
@@ -972,8 +972,8 @@ namespace ZedGraph
 			// as part of CalcRect() before scale is fully setup
 			//			double max = crossAxis._scale._maxLinTemp;
 			//			double min = crossAxis._scale._minLinTemp;
-			double max = crossAxis._scale.Linearize( _scale._min );
-			double min = crossAxis._scale.Linearize( _scale._max );
+			double max = crossAxis._scale.Linearize( crossAxis._scale._min );
+			double min = crossAxis._scale.Linearize( crossAxis._scale._max );
 			float frac;
 
 			if ( ( ( this is XAxis || this is YAxis ) && _scale._isLabelsInside == crossAxis._scale.IsReverse ) ||
@@ -1123,7 +1123,8 @@ namespace ZedGraph
 
 				// Only add space for the title if there is one
 				// Axis Title gets actual height
-				if ( str.Length > 0 && _title._isVisible )
+				// if ( str.Length > 0 && _title._isVisible )
+				if ( !string.IsNullOrEmpty( str ) && _title._isVisible )
 				{
 					//tmpSpace += this.TitleFontSpec.BoundingBox( g, str, scaleFactor ).Height;
 					fixedSpace = this.Title.FontSpec.BoundingBox( g, str, scaleFactor ).Height +
@@ -1322,7 +1323,8 @@ namespace ZedGraph
 			string str = MakeTitle();
 
 			// If the Axis is visible, draw the title
-			if ( _isVisible && _title._isVisible && str.Length > 0 )
+			//if ( _isVisible && _title._isVisible && str.Length > 0 )
+			if ( _isVisible && _title._isVisible && !string.IsNullOrEmpty( str ) )
 			{
 				bool hasTic = ( _scale._isLabelsInside ?
 						( this.MajorTic.IsInside || this.MajorTic._isCrossInside ||
@@ -1369,6 +1371,9 @@ namespace ZedGraph
 
 		private string MakeTitle()
 		{
+			if ( _title._text == null )
+				_title._text = "";
+
 			// Revision: JCarpenter 10/06
 			// Allow customization of the modified title when the scale is very large
 			// The event handler can edit the full label.  If the handler returns

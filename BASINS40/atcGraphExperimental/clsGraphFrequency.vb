@@ -2,6 +2,7 @@ Imports System.Drawing
 
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
 Imports ZedGraph
 
 Public Class clsGraphFrequency
@@ -69,97 +70,95 @@ Public Class clsGraphFrequency
                        Optional ByVal aCommonConstituent As String = Nothing, _
                        Optional ByVal aCommonLocation As String = Nothing, _
                        Optional ByVal aCommonUnits As String = Nothing)
+        Dim lPane As ZedGraph.GraphPane = pZgc.MasterPane.PaneList(0)
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
         Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
 
-        'TODO: check to see if this is an NDay timseries, if not then compute one or throw an exception
+        With lPane
+            If .GraphObjList.Count = 0 Then
 
-        Dim lDataCount As Integer = aTimeseries.Values.GetUpperBound(0)
-        Dim lPane As ZedGraph.GraphPane = pZgc.MasterPane.PaneList(0)
-        With lPane.XAxis
-            If .Type <> AxisType.Probability Then
-                .Type = AxisType.Probability
-                With .MajorTic
-                    .IsInside = True
-                    .IsCrossInside = True
-                    .IsOutside = False
-                    .IsCrossOutside = False
+                'Add USGS Peakfq label
+                Dim lUSGSLabel As TextObj = Nothing
+                Dim lStr As String = "run " & Date.Today.ToString() & vbCrLf _
+                                   & "NOTE - Preliminary computation" & vbCrLf _
+                                   & "User is reponsible for assessment and interpretation."
+                lUSGSLabel = New TextObj(lStr, 0.7, 0.7, CoordType.ChartFraction)
+                lUSGSLabel.ZOrder = ZOrder.A_InFront
+                .GraphObjList.Add(lUSGSLabel)
+                lUSGSLabel.IsVisible = True
+
+                With .XAxis
+                    If .Type <> AxisType.Probability Then .Type = AxisType.Probability
+                    With .MajorTic
+                        .IsInside = True
+                        .IsCrossInside = True
+                        .IsOutside = False
+                        .IsCrossOutside = False
+                    End With
+                    .Title.FontSpec.IsBold = False
+                    '.Title.Text = "Percent Exceeded"
+                    .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" & vbCrLf & "Station - " & aTimeseries.ToString()
+                    .Scale.Format = "0.####"
+                    Dim lProbScale As ProbabilityScale = .Scale
+                    lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Percent
+                    lProbScale.IsReverse = True
+                End With
+
+                With .YAxis
+                    .Type = AxisType.Log
+                    .Scale.IsUseTenPower = False
+                    .Title.FontSpec.IsBold = False
+                    .Title.Text = "ANNUAL PEAK DISCHARGE" & vbCrLf & "CUBIC FEET PER SECOND"
+                    If aTimeseries.Attributes.ContainsAttribute("Units") Then
+                        .Title.Text = aTimeseries.Attributes.GetValue("Units")
+                        .Title.IsVisible = True
+                    End If
                 End With
             End If
         End With
 
-        Dim lXFracExceed(lDataCount - 1) As Double
-        Dim lY(lDataCount - 1) As Double
-        aTimeseries.Attributes.SetValue("Bins", MakeBins(aTimeseries))
-        Dim lDataIndex As Integer = 0
-        For Each lBin As ArrayList In aTimeseries.Attributes.GetValue("Bins")
-            For Each lValue As Double In lBin
-                lY(lDataIndex) = lValue
-                lXFracExceed(lDataIndex) = (lDataIndex + 1) / CDbl(lDataCount + 1)
-                lDataIndex += 1
+        'check to see if this is an annual timseries
+        If aTimeseries.Attributes.GetValue("Time Units") <> atcTimeUnit.TUYear Then
+            Dim lAnnualTS As atcTimeseries
+            Dim lAllAnnual As New atcTimeseriesGroup
+            'check to see if any annual timeseries have already been computed by atcTimeseriesNdayHighLow
+            For Each lAttribute As atcDefinedValue In aTimeseries.Attributes
+                If lAttribute.Arguments IsNot Nothing Then
+                    For Each lArgument As atcData.atcDefinedValue In lAttribute.Arguments
+                        If lArgument.Value.GetType.Name = "atcTimeseries" Then
+                            lAnnualTS = lArgument.Value
+                            If lAnnualTS.Attributes.GetValue("Time Units") = atcTimeUnit.TUYear Then
+                                If Not lAllAnnual.Contains(lAnnualTS) Then
+                                    lAllAnnual.Add(lAnnualTS)
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
             Next
-        Next
-        If lDataIndex <> lDataCount Then
-            Debug.Print("big problem with bins")
+
+            'TODO: compute an annual timeseries or throw an exception
+            If lAllAnnual.Count = 0 Then
+
+            End If
+
+            For Each lAnnualTS In lAllAnnual
+                AddDatasetCurve(lAnnualTS)
+            Next
+        Else
+            AddPercentileCurve(aTimeseries, lPane, lCurveLabel, lCurveColor)
+            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "1Low", "")
+            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "30Low", "")
+            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "90Low", "")
+            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "90Low", " CI Lower")
+            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "90Low", " CI Upper")
         End If
 
-        With lPane.XAxis
-            '.Scale.BaseTic = lXFracExceed(0)
-            .Title.Text = "Percent chance exceeded"
-            'TODO - adjust scale to show return periods, also need to reverse labels
-        End With
-        With lPane.YAxis
-            .Type = AxisType.Log
-            .Scale.IsUseTenPower = False
-            If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                .Title.Text = aTimeseries.Attributes.GetValue("Units")
-                .Title.IsVisible = True
-            End If
-        End With
-
-        Dim lCurve As LineItem = lPane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
-        lCurve.Symbol.Type = SymbolType.Circle
-        lCurve.Line.IsVisible = False
-
-        'TODO - additional curves for fitted frequency and adjusted fitted frequency and confidence limits
-        'TODO -   get points from a call to atcTimeseriesNdayHighLow ComputeFreq
-
-        'TODO - if additional curve points are stored as attributes - process them to make the curves here
-        Dim lAttributes As SortedList = aTimeseries.Attributes.ValuesSortedByName
-        Dim lAttributeName As String
-        Dim lAttributeValue As String
-        For lAttributeIndex As Integer = 0 To lAttributes.Count - 1
-            lAttributeName = lAttributes.GetKey(lAttributeIndex)
-            lAttributeValue = aTimeseries.Attributes.GetFormattedValue(lAttributeName)
-        Next
-
-        'TODO - add USGS labeling
-        Dim lUSGSLabel As TextObj = Nothing
-        Dim lStr As String
-        With lPane
-            .XAxis.Title.FontSpec.IsBold = False
-            .YAxis.Title.FontSpec.IsBold = False
-
-            .XAxis.Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" & vbCrLf & "Station - " & aTimeseries.ToString()
-            .YAxis.Title.Text = "ANNUAL PEAK DISCHARGE" & vbCrLf & "CUBIC FEET PER SECOND"
-
-
-            lStr = "Peakfq 5 run " & Date.Today.ToString() & vbCrLf
-            lStr &= "NOTE - Preliminary computation" & vbCrLf & "User is reponsible for assessment and interpretation."
-            'lUSGSLabel = New TextObj(lStr, .Rect.Right - 5.0, .Rect.Bottom - 5.0, CoordType.PaneFraction)
-            lUSGSLabel = New TextObj(lStr, 0.5, 0.6, CoordType.ChartFraction)
-            lUSGSLabel.ZOrder = ZOrder.A_InFront
-            .GraphObjList.Add(lUSGSLabel)
-            lUSGSLabel.IsVisible = True
-            '.GraphObjList.Draw(System.Drawing.Graphics(lUSGSLabel), lPane, 1.0, ZOrder.A_InFront)
-
-        End With
-
-
         SetYRange(lPane) 'TODO: does this do anything?
+
     End Sub
 
     Private Sub SetYRange(ByVal aPane As ZedGraph.GraphPane)
@@ -176,4 +175,67 @@ Public Class clsGraphFrequency
         aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
         aPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Log10(lYMin)))
     End Sub
+
+    Private Function AddPercentileCurve(ByVal aTimeseries As atcTimeseries, _
+                                        ByVal aPane As ZedGraph.GraphPane, _
+                                        ByVal aCurveLabel As String, _
+                                        ByVal aCurveColor As Color) As LineItem
+        Dim lDataCount As Integer = aTimeseries.Values.GetUpperBound(0)
+
+        Dim lXFracExceed(lDataCount - 1) As Double
+        Dim lY(lDataCount - 1) As Double
+        aTimeseries.Attributes.SetValue("Bins", MakeBins(aTimeseries))
+        Dim lDataIndex As Integer = 0
+        For Each lBin As ArrayList In aTimeseries.Attributes.GetValue("Bins")
+            For Each lValue As Double In lBin
+                lY(lDataIndex) = lValue
+                lXFracExceed(lDataIndex) = 1 - ((lDataIndex + 1) / CDbl(lDataCount + 1))
+                lDataIndex += 1
+            Next
+        Next
+        If lDataIndex <> lDataCount Then
+            Debug.Print("big problem with bins")
+        End If
+
+        Dim lCurve As LineItem = aPane.AddCurve(aCurveLabel, lXFracExceed, lY, aCurveColor, SymbolType.None)
+        lCurve.Symbol.Type = SymbolType.Circle
+        lCurve.Line.IsVisible = False
+        Return lCurve
+    End Function
+
+    Private Function AddAttributeCurve(ByVal aTimeseries As atcTimeseries, _
+                                       ByVal aPane As ZedGraph.GraphPane, _
+                                       ByVal aCurveColor As Color, _
+                                       ByVal aAttributePrefix As String, _
+                                       ByVal aAttributeSuffix As String) As LineItem
+        Dim lPreLen As Integer = aAttributePrefix.Length
+        Dim lSufLen As Integer = aAttributeSuffix.Length
+        Dim lReturnStr As String
+        Dim lReturnDbl As Double
+        Dim lPoints As New SortedList
+        For Each lAttribute As atcDefinedValue In aTimeseries.Attributes
+            Dim lName As String = lAttribute.Definition.Name
+            If lName.StartsWith(aAttributePrefix) AndAlso _
+               lName.EndsWith(aAttributeSuffix) Then
+                lReturnStr = lName.Substring(lPreLen, lName.Length - lPreLen - lSufLen)
+                If Double.TryParse(lReturnStr, lReturnDbl) Then
+                    Logger.Dbg("Found Attribute " & lName)
+                    lPoints.Add(lReturnDbl, lAttribute.Value)
+                End If
+            End If
+        Next
+
+        If lPoints.Count > 0 Then
+            Dim lZedGraphPoints As New ZedGraph.PointPairList
+            For Each lPoint As DictionaryEntry In lPoints
+                Dim lX As Double = 1 - 1 / lPoint.Key
+                Logger.Dbg("Add Point " & lPoint.Key & " = " & lPoint.Value)
+                lZedGraphPoints.Add(New ZedGraph.PointPair(lX, lPoint.Value, CStr(lPoint.Key)))
+            Next
+            Return aPane.AddCurve(aAttributePrefix & aAttributeSuffix, lZedGraphPoints, aCurveColor, SymbolType.None)
+        Else
+            Return Nothing
+        End If
+    End Function
+
 End Class

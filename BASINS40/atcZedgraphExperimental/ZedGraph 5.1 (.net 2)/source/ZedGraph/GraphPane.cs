@@ -48,7 +48,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion modified by Jerry Vos </author>
-	/// <version> $Revision: 3.81 $ $Date: 2007/09/30 07:44:11 $ </version>
+	/// <version> $Revision: 3.81 $ $Date: 2007-09-30 07:44:11 $ </version>
 	[Serializable]
 	public class GraphPane : PaneBase, ICloneable, ISerializable
 	{

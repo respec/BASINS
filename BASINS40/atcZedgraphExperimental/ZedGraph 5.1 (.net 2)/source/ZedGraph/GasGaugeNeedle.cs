@@ -30,7 +30,7 @@ namespace ZedGraph
 	/// <see cref="GasGaugeNeedle"/>s.
 	/// </summary>
 	/// <author> Jay Mistry </author>
-	/// <version> $Revision: 1.2 $ $Date: 2007/08/11 14:37:47 $ </version>
+	/// <version> $Revision: 1.2 $ $Date: 2007-08-11 14:37:47 $ </version>
 	[Serializable]
 	public class GasGaugeNeedle : CurveItem, ICloneable, ISerializable
 	{

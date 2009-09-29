@@ -41,7 +41,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.21 $ $Date: 2007/08/10 16:22:54 $ </version>
+	/// <version> $Revision: 3.21 $ $Date: 2007-08-10 16:22:54 $ </version>
 	[Serializable]
 	public class ErrorBar : ICloneable, ISerializable
 	{

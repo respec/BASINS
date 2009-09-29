@@ -118,8 +118,21 @@ Public Class frmGraphEditor
                     radioAxisLogarithmic.Checked = True
                 Case AxisType.Probability
                     radioAxisProbability.Checked = True
+                    panelAxisType.Visible = False
+                    panelProbability.Visible = True
+                    Dim lProbScale As ZedGraph.ProbabilityScale = aAxis.Scale
+                    Select Case lProbScale.LabelStyle
+                        Case ProbabilityScale.ProbabilityLabelStyle.Percent
+                            radioProbablilityPercent.Checked = True
+                        Case ProbabilityScale.ProbabilityLabelStyle.Fraction
+                            radioProbablilityFraction.Checked = True
+                        Case ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
+                            radioProbablilityReturnPeriod.Checked = True
+                    End Select
+                    txtProbabilityDeviations.Text = DoubleToString(lProbScale.standardDeviations)
             End Select
             SetControlsMinMax(aAxis)
+            chkRangeReverse.Checked = aAxis.Scale.IsReverse
             chkAxisMajorGridVisible.Checked = aAxis.MajorGrid.IsVisible
             txtAxisMajorGridColor.BackColor = aAxis.MajorGrid.Color
             chkAxisMajorTicsVisible.Checked = aAxis.MajorTic.IsInside
@@ -149,33 +162,51 @@ Public Class frmGraphEditor
 
 
     Private Sub SetAxisFromControls(ByVal aAxis As Axis)
+        On Error Resume Next 'Set whatever we can legally set
         If Not aAxis Is Nothing Then
             With aAxis
+                Dim lTemp As Double
                 If radioAxisTime.Checked Then
                     'parse min/max date from textboxes
                     aAxis.Scale.Min = StringToJdate(txtAxisDisplayMinimum.Text, True)
                     aAxis.Scale.Max = StringToJdate(txtAxisDisplayMaximum.Text, False)
                 ElseIf radioAxisLinear.Checked Then
-                    If aAxis.Type <> AxisType.Linear Then aAxis.Type = AxisType.Linear
+                    If aAxis.Type <> AxisType.Linear Then .Type = AxisType.Linear
                 ElseIf radioAxisLogarithmic.Checked Then
-                    If aAxis.Type <> AxisType.Log Then aAxis.Type = AxisType.Log
+                    If aAxis.Type <> AxisType.Log Then .Type = AxisType.Log
                 ElseIf radioAxisProbability.Checked Then
-                    'TODO:?           
+                    Dim lProbScale As ZedGraph.ProbabilityScale = aAxis.Scale
+                    If radioProbablilityPercent.Checked Then
+                        lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Percent
+                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Fraction", "Percent")
+                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Return Interval", "Percent")
+                    ElseIf radioProbablilityFraction.Checked Then
+                        lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Fraction
+                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Percent", "Fraction")
+                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Return Interval", "Fraction")
+                    ElseIf radioProbablilityReturnPeriod.Checked Then
+                        lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
+                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Percent", "Return Interval")
+                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Fraction", "Return Interval")
+                    End If
+                    If Double.TryParse(txtProbabilityDeviations.Text, lTemp) Then
+                        lProbScale.standardDeviations = lTemp
+                    End If
                 End If
-                Dim lTemp As Double
                 If Double.TryParse(txtAxisDisplayMinimum.Text, lTemp) Then
-                    aAxis.Scale.Min = lTemp
+                    .Scale.Min = lTemp
                 End If
                 If Double.TryParse(txtAxisDisplayMaximum.Text, lTemp) Then
-                    aAxis.Scale.Max = lTemp
+                    .Scale.Max = lTemp
                 End If
-                aAxis.Title.Text = txtAxisLabel.Text
-                aAxis.MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
-                aAxis.MajorGrid.Color = txtAxisMajorGridColor.BackColor
-                aAxis.MajorTic.IsInside = chkAxisMajorTicsVisible.Checked
-                aAxis.MinorGrid.IsVisible = chkAxisMinorGridVisible.Checked
-                aAxis.MinorGrid.Color = txtAxisMinorGridColor.BackColor
-                aAxis.MinorTic.IsInside = chkAxisMinorTicsVisible.Checked
+                .Title.Text = txtAxisLabel.Text
+                .Scale.IsReverse = chkRangeReverse.Checked
+                .MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
+                .MajorGrid.Color = txtAxisMajorGridColor.BackColor
+                .MajorTic.IsInside = chkAxisMajorTicsVisible.Checked
+                .MinorGrid.IsVisible = chkAxisMinorGridVisible.Checked
+                .MinorGrid.Color = txtAxisMinorGridColor.BackColor
+                .MinorTic.IsInside = chkAxisMinorTicsVisible.Checked
             End With
         End If
     End Sub
@@ -332,7 +363,7 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub txtNumeric_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
-              txtCurveWidth.TextChanged, txtCurveSymbolSize.TextChanged
+              txtCurveWidth.TextChanged, txtCurveSymbolSize.TextChanged, txtProbabilityDeviations.TextChanged
         If chkAutoApply.Checked AndAlso IsNumeric(sender.Text) Then ApplyAll()
     End Sub
 
@@ -343,7 +374,8 @@ Public Class frmGraphEditor
 
     Private Sub radioGeneral_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
             radioAxisLinear.CheckedChanged, radioAxisLogarithmic.CheckedChanged, _
-            radioCurveYaxisLeft.CheckedChanged, radioCurveYaxisRight.CheckedChanged, radioCurveYaxisAuxiliary.CheckedChanged
+            radioCurveYaxisLeft.CheckedChanged, radioCurveYaxisRight.CheckedChanged, radioCurveYaxisAuxiliary.CheckedChanged, _
+            radioProbablilityFraction.CheckedChanged, radioProbablilityPercent.CheckedChanged, radioProbablilityReturnPeriod.CheckedChanged
 
         If chkAutoApply.Checked Then
             Dim lRadio As RadioButton = sender

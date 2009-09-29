@@ -27,7 +27,7 @@ namespace ZedGraph
 	/// </summary>
 	/// 
 	/// <author> Jerry Vos modified by John Champion </author>
-	/// <version> $Revision: 3.4 $ $Date: 2006/06/24 20:26:43 $ </version>
+	/// <version> $Revision: 3.4 $ $Date: 2006-06-24 20:26:43 $ </version>
 	public class ColorSymbolRotator
 	{
 	#region Static fields

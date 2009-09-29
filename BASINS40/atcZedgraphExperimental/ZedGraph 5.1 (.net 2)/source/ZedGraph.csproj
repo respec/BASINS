@@ -208,6 +208,9 @@
     <EmbeddedResource Include="ZedGraph\ZedGraphLocale.ru.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="ZedGraph\ZedGraphLocale.sk.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ZedGraph\ZedGraphLocale.sv.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -226,6 +229,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="zedgraphkey.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Revision_History.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

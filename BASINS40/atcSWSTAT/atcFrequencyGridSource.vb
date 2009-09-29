@@ -1,8 +1,11 @@
 Imports atcData
 Imports atcUtility
 
-Friend Class atcFrequencyGridSource
+Public Class atcFrequencyGridSource
     Inherits atcControls.atcGridSource
+
+    Private pOnlyNdays() As Double
+    Private pOnlyReturns() As Double
 
     Private pDataGroup As atcTimeseriesGroup
     Private pNdays As SortedList
@@ -14,7 +17,14 @@ Friend Class atcFrequencyGridSource
     Private pCalculatedNdays As New ArrayList
     Private pCalculatedRecurrence As New ArrayList
 
-    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup)
+    ''' <summary>
+    ''' Create grid source for displaying N-Day/Return Interval values
+    ''' </summary>
+    ''' <param name="aDataGroup">Timeseries data whose attributes to display</param>
+    ''' <param name="aNdays">Which numbers of days are displayed (Nothing = display all present in attributes)</param>
+    ''' <param name="aNyears">Which return periods are displayed (Nothing = display all present in attributes)</param>
+    ''' <remarks></remarks>
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aNdays() As Double, ByVal aNyears() As Double)
         Dim lAdjStr As String
         Dim lAdjProbStr As String
         Dim lHighLow As String
@@ -25,6 +35,7 @@ Friend Class atcFrequencyGridSource
         pNdays = New SortedList
         pAdj = New SortedList
         pAdjProb = New SortedList
+
         For Each lData As atcDataSet In pDataGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing Then
@@ -35,7 +46,7 @@ Friend Class atcFrequencyGridSource
                     If lAttribute.Arguments.ContainsAttribute("Nday") Then
                         Dim lNdays As String = lAttribute.Arguments.GetFormattedValue("Nday")
                         lKey = Format(lAttribute.Arguments.GetValue("Nday"), "00000.0000")
-                        If Not pNdays.ContainsKey(lKey) Then
+                        If Not pNdays.ContainsKey(lKey) AndAlso IsIn(lNdays, aNdays) Then
                             pNdays.Add(lKey, lNdays)
                         End If
                         lAdjStr &= lNdays & lHighLow
@@ -43,7 +54,7 @@ Friend Class atcFrequencyGridSource
                     If lAttribute.Arguments.ContainsAttribute("Return Period") Then
                         Dim lNyears As String = lAttribute.Arguments.GetFormattedValue("Return Period")
                         lKey = Format(lAttribute.Arguments.GetValue("Return Period"), "00000.0000")
-                        If Not pRecurrence.ContainsKey(lKey) Then
+                        If Not pRecurrence.ContainsKey(lKey) AndAlso IsIn(lNyears, aNyears) Then
                             pRecurrence.Add(lKey, lNyears)
                             lAdjStr &= lNyears
 
@@ -61,7 +72,42 @@ Friend Class atcFrequencyGridSource
                 End If 'Not lAttribute.Arguments Is Nothing
             Next ' lAttribute
         Next ' lData
+
+        If aNdays IsNot Nothing Then
+            For Each lNdays As Double In aNdays
+                lKey = Format(lNdays, "00000.0000")
+                If Not pNdays.ContainsKey(lKey) Then
+                    pNdays.Add(lKey, DoubleToString(lNdays))
+                End If
+            Next
+        End If
+
+        If aNyears IsNot Nothing Then
+            For Each lNYears As Double In aNyears
+                lKey = Format(lNYears, "00000.0000")
+                If Not pRecurrence.ContainsKey(lKey) Then
+                    pRecurrence.Add(lKey, Format(lNYears, "0"))
+                End If
+            Next
+        End If
+
     End Sub
+
+    ''' <summary>
+    ''' Return True if aArray is Nothing or else it contains a number within 1e-30 of aNumber
+    ''' </summary>
+    Private Function IsIn(ByVal aNumber As Double, ByVal aArray() As Double) As Boolean
+        If aArray Is Nothing Then
+            Return True
+        Else
+            For Each lCheck As Double In aArray
+                If Math.Abs(lCheck - aNumber) < 1.0E+30 Then
+                    Return True
+                End If
+            Next
+        End If
+        Return False
+    End Function
 
     Public Property High() As Boolean
         Get
@@ -458,7 +504,7 @@ Friend Class atcFrequencyGridSource
                     Dim lReverseString As String = ""
                     Dim lThisRow As String
                     For Each lRecurrenceKey As String In pRecurrence.Keys
-                        Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
+                        Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey).ToString.Replace(",", "")
                         Dim lNyears As Double = CDbl(lRecurrence)
 
                         lStr = DoubleToString(1 / lNyears, , "0.0000")

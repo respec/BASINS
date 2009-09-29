@@ -32,7 +32,7 @@ namespace ZedGraph
    /// </summary>
    /// 
    /// <author> John Champion </author>
-   /// <version> $Revision: 3.30 $ $Date: 2007/11/03 04:41:28 $ </version>
+   /// <version> $Revision: 3.30 $ $Date: 2007-11-03 04:41:28 $ </version>
    [Serializable]
    public class Bar : ICloneable, ISerializable
    {

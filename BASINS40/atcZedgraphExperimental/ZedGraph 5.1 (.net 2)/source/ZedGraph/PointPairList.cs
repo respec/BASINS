@@ -32,7 +32,7 @@ namespace ZedGraph
 	/// 
 	/// <author> Jerry Vos based on code by John Champion
 	/// modified by John Champion</author>
-	/// <version> $Revision: 3.37 $ $Date: 2007/06/29 15:39:07 $ </version>
+	/// <version> $Revision: 3.37 $ $Date: 2007-06-29 15:39:07 $ </version>
 	[Serializable]
 	public class PointPairList : List<PointPair>, IPointList, IPointListEdit
 	{

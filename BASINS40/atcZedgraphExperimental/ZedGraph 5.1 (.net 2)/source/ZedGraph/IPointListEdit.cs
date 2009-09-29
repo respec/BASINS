@@ -40,7 +40,7 @@ namespace ZedGraph
 	/// <seealso cref="FilteredPointList" />
 	/// 
 	/// <author> John Champion</author>
-	/// <version> $Revision: 3.6 $ $Date: 2006/10/19 04:40:14 $ </version>
+	/// <version> $Revision: 3.6 $ $Date: 2006-10-19 04:40:14 $ </version>
 	public interface IPointListEdit : IPointList
 	{
 		/// <summary>

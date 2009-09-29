@@ -30,7 +30,7 @@ namespace ZedGraph
 	/// <see cref="GasGaugeRegion"/>s.
 	/// </summary>
 	/// <author> Jay Mistry </author>
-	/// <version> $Revision: 1.2 $ $Date: 2007/07/30 05:26:23 $ </version>
+	/// <version> $Revision: 1.2 $ $Date: 2007-07-30 05:26:23 $ </version>
 	[Serializable]
 	public class GasGaugeRegion : CurveItem, ICloneable, ISerializable
 	{

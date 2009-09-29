@@ -226,7 +226,7 @@ Public Class HspfFilesBlk
                 Dim lTempName As String = lHspfFile.Name.Trim
                 Dim lOldLength As Integer = aOldName.Length
                 Dim lTemp As Integer = InStr(1, lTempName.ToUpper, aOldName.ToUpper)
-                Dim lSlashPos As Integer = lTempName.IndexOf("\") + 1
+                Dim lSlashPos As Integer = lTempName.IndexOf(g_PathChar) + 1
                 If ((lTemp > 0 And lSlashPos > 0 And lTemp > lSlashPos) Or _
                     (lTemp > 0 And lSlashPos = 0)) Then
                     'found the old name in this string, replace it
@@ -258,7 +258,7 @@ Public Class HspfFilesBlk
                 Dim lTempName As String = lHspfFile.Name
                 Dim lOldLength As Integer = aOldName.Length
                 Dim lTemp As Integer = InStr(1, UCase(lTempName), UCase(aOldName))
-                Dim lSlashPos As Integer = lTempName.IndexOf("\")
+                Dim lSlashPos As Integer = lTempName.IndexOf(g_PathChar)
                 If ((lTemp > 0 And lSlashPos > 0 And lTemp > lSlashPos) Or _
                     (lTemp > 0 And lSlashPos = 0)) Then
                     'found the old name in this string, replace it

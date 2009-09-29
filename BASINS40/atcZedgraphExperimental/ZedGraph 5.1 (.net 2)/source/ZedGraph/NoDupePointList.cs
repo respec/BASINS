@@ -52,7 +52,7 @@ namespace ZedGraph
 	/// </remarks>
 	/// 
 	/// <author> John Champion </author>
-	/// <version> $Revision: 3.5 $ $Date: 2007/06/02 06:56:03 $ </version>
+	/// <version> $Revision: 3.5 $ $Date: 2007-06-02 06:56:03 $ </version>
 	[Serializable]
 	public class NoDupePointList : List<DataPoint>, IPointList, IPointListEdit
 	{
