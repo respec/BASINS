@@ -6,6 +6,7 @@ Public Class atcGraphPlugin
 
     Private pGraphTypeNames() As String = {"Timeseries", _
                                            "Flow/Duration", _
+                                           "Frequency", _
                                            "Running Sum", _
                                            "Residual (TS2 - TS1)", _
                                            "Cumulative Difference", _
@@ -50,15 +51,16 @@ Public Class atcGraphPlugin
                     .Items.Add(pGraphTypeNames(0))
                     .Items.Add(pGraphTypeNames(1))
                     .Items.Add(pGraphTypeNames(2))
+                    .Items.Add(pGraphTypeNames(3))
                     Dim lNeededTwoSuffix As String
                     If lTimeseriesGroup.Count = 2 Then
                         lNeededTwoSuffix = ""
                     Else
                         lNeededTwoSuffix = " (two datasets needed but " & lTimeseriesGroup.Count & " datasets selected)"
                     End If
-                    .Items.Add(pGraphTypeNames(3) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(4) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(5) & lNeededTwoSuffix)
+                    .Items.Add(pGraphTypeNames(6) & lNeededTwoSuffix)
                 End If
 
                 For Each lCheckedName As String In GetSetting("BASINS4", "Graph", "ChooseGraphs", "").Split(","c)
@@ -73,14 +75,7 @@ Public Class atcGraphPlugin
                     Dim lAllCheckedItemNames As String = ""
                     For Each lGraphTypeName As String In .CheckedItems
                         lAllCheckedItemNames &= lGraphTypeName & ","
-                        Dim lForm As New atcGraphForm()
-                        Dim lGrapher As clsGraphBase = GetGraphType(lGraphTypeName, lTimeseriesGroup, lForm)
-                        If lGrapher Is Nothing Then
-                            lForm.Dispose()
-                        Else
-                            lForm.Grapher = lGrapher
-                            lForm.Show()
-                        End If
+                        Me.Show(lTimeseriesGroup, lGraphTypeName)
                     Next
                     SaveSetting("BASINS4", "Graph", "ChooseGraphs", lAllCheckedItemNames)
                 End If
@@ -88,23 +83,37 @@ Public Class atcGraphPlugin
         End If
     End Function
 
+    Public Overloads Function Show(ByVal aTimeseriesGroup As atcDataGroup, ByVal aGraphTypeName As String) As Object
+        Dim lForm As New atcGraphForm()
+        Dim lGrapher As clsGraphBase = GetGraphType(aGraphTypeName, aTimeseriesGroup, lForm)
+        If lGrapher Is Nothing Then
+            lForm.Dispose()
+            Return Nothing
+        Else
+            lForm.Grapher = lGrapher
+            lForm.Show()
+            Return lForm
+        End If
+    End Function
+
     <CLSCompliant(False)> _
     Private Function GetGraphType(ByVal aGraphTypeName As String, _
                                  ByVal aDataGroup As atcTimeseriesGroup, _
                                  ByVal aGraphForm As atcGraphForm) As clsGraphBase
-        Dim lIndex As Integer = Array.IndexOf(pGraphTypeNames, aGraphTypeName)
-        Select Case lIndex
-            Case 0 : aGraphForm.Text = "Timeseries Graph"
+        Select Case aGraphTypeName
+            Case "Timeseries" : aGraphForm.Text = "Timeseries Graph"
                 Return New clsGraphTime(aDataGroup, aGraphForm.ZedGraphCtrl)
-            Case 1 : aGraphForm.Text = "Flow/Duration Graph"
+            Case "Flow/Duration" : aGraphForm.Text = "Flow/Duration Graph"
                 Return New clsGraphProbability(aDataGroup, aGraphForm.ZedGraphCtrl)
-            Case 2 : aGraphForm.Text = "Running Sum Graph"
+            Case "Frequency" : aGraphForm.Text = "Frequency Graph"
+                Return New clsGraphFrequency(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case "Running Sum" : aGraphForm.Text = "Running Sum Graph"
                 Return New clsGraphRunningSum(aDataGroup, aGraphForm.ZedGraphCtrl)
-            Case 3 : aGraphForm.Text = "Residual Graph"
+            Case "Residual (TS2 - TS1)" : aGraphForm.Text = "Residual Graph"
                 Return New clsGraphResidual(aDataGroup, aGraphForm.ZedGraphCtrl)
-            Case 4 : aGraphForm.Text = "Cumulative Difference Graph"
+            Case "Cumulative Difference" : aGraphForm.Text = "Cumulative Difference Graph"
                 Return New clsGraphCumulativeDifference(aDataGroup, aGraphForm.ZedGraphCtrl)
-            Case 5 : aGraphForm.Text = "Scatter Plot"
+            Case "Scatter (TS2 vs TS1)" : aGraphForm.Text = "Scatter Plot"
                 Return New clsGraphScatter(aDataGroup, aGraphForm.ZedGraphCtrl)
         End Select
         Logger.Dbg("Unable to create graph: " & aGraphTypeName)
