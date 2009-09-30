@@ -1094,28 +1094,16 @@ Friend Class frmSWSTAT
 
     Private Sub btnNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNDay.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-
-        Dim lHiLow As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-        Dim lArgs As New atcDataAttributes
-
-        Dim lselectedData As atcTimeseriesGroup = SelectedData()
-        If lselectedData.Count > 0 Then
-            lArgs.Add("Timeseries", lselectedData)
-
+        Dim lSelectedData As atcTimeseriesGroup = SelectedData()
+        If lSelectedData.Count > 0 Then
             If lstNday.SelectedIndices.Count > 0 Then
-                lArgs.SetValue("NDay", ListToArray(lstNday))
-                lArgs.SetValue("HighFlag", radioHigh.Checked)
-
-                lArgs.SetValue("FirstYear", pFirstYear)
-                lArgs.SetValue("LastYear", pLastYear)
-
-                lArgs.SetValue("BoundaryMonth", pYearStartMonth)
-                lArgs.SetValue("BoundaryDay", pYearStartDay)
-
-                lArgs.SetValue("EndMonth", pYearEndMonth)
-                lArgs.SetValue("EndDay", pYearEndDay)
-
-                If lHiLow.Open("n-day " & HighOrLowString().ToLower & " timeseries", lArgs) Then
+                Dim lRankedAnnual As atcTimeseriesGroup = _
+                   clsSWSTATPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=lSelectedData, _
+                                                                 aNDay:=ListToArray(lstNday), aHighFlag:=radioHigh.Checked, _
+                                                                 aFirstYear:=pFirstYear, aLastYear:=pLastYear, _
+                                                                 aBoundaryMonth:=pYearStartMonth, aBoundaryDay:=pYearStartDay, _
+                                                                 aEndMonth:=pYearEndMonth, aEndDay:=pYearEndDay)
+                If lRankedAnnual.Count > 0 Then
                     Dim lList As New atcList.atcListForm
                     With lList.DateFormat
                         .IncludeDays = False
@@ -1124,10 +1112,7 @@ Friend Class frmSWSTAT
                         .IncludeMonths = False
                     End With
                     lList.Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
-                    For Each lDataset As atcTimeseries In lHiLow.DataSets
-                        ComputeRanks(lDataset, Not radioHigh.Checked, False)
-                    Next
-                    lList.Initialize(lHiLow.DataSets.Clone, pNDayAttributes, True, , )
+                    lList.Initialize(lRankedAnnual.Clone, pNDayAttributes, True, , )
                     lList.DisplayValueAttributes = True
                 End If
             Else
