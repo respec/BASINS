@@ -2,7 +2,7 @@ Imports atcUtility
 Imports atcData
 Imports MapWinUtility
 
-Public Class atcFrequencyGridPlugin
+Public Class clsSWSTATPlugin
     Inherits atcData.atcDataDisplay
 
     Public Overrides ReadOnly Property Name() As String
@@ -69,4 +69,42 @@ Public Class atcFrequencyGridPlugin
             lForm.Dispose()
         End If
     End Sub
+
+    Public Shared Function ComputeRankedAnnualTimeseries(ByVal aTimeseriesGroup As atcTimeseriesGroup, _
+                                                         ByVal aNDay() As Double, _
+                                                         ByVal aHighFlag As Boolean, _
+                                                         ByVal aFirstYear As Integer, _
+                                                         ByVal aLastYear As Integer, _
+                                                         ByVal aBoundaryMonth As Integer, _
+                                                         ByVal aBoundaryDay As Integer, _
+                                                         ByVal aEndMonth As Integer, _
+                                                         ByVal aEndDay As Integer) As atcTimeseriesGroup
+        Dim lArgs As New atcDataAttributes
+        lArgs.SetValue("Timeseries", aTimeseriesGroup)
+
+        lArgs.SetValue("NDay", aNDay)
+        lArgs.SetValue("HighFlag", aHighFlag)
+
+        lArgs.SetValue("FirstYear", aFirstYear)
+        lArgs.SetValue("LastYear", aLastYear)
+
+        lArgs.SetValue("BoundaryMonth", aBoundaryMonth)
+        lArgs.SetValue("BoundaryDay", aBoundaryDay)
+
+        lArgs.SetValue("EndMonth", aEndMonth)
+        lArgs.SetValue("EndDay", aEndDay)
+
+        Dim lHighLow As String = "low"
+        If aHighFlag Then
+            lHighLow = "high"
+        End If
+
+        Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+        If lCalculator.Open("n-day " & lHighLow & " timeseries", lArgs) Then
+            For Each lDataset As atcTimeseries In lCalculator.DataSets
+                ComputeRanks(lDataset, True, False)
+            Next
+        End If
+        Return lCalculator.DataSets
+    End Function
 End Class
