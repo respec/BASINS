@@ -39,15 +39,15 @@
   <ItemGroup>
     <Reference Include="atcWDM, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Dev\BASINS40\Bin\Plugins\BASINS\atcWDM.dll</HintPath>
+      <HintPath>..\..\..\D4EM\Bin\atcWDM.dll</HintPath>
     </Reference>
-    <Reference Include="MapWinInterfaces, Version=4.6.3362.35411, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="MapWinInterfaces, Version=4.7.3.23266, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\..\Bin\Plugins\BASINS\MapWinInterfaces.dll</HintPath>
     </Reference>
-    <Reference Include="MapWinUtility, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinUtility, Version=1.0.3433.28607, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Bin\MapWinUtility.dll</HintPath>
+      <HintPath>..\..\Bin\Plugins\BASINS\MapWinUtility.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
