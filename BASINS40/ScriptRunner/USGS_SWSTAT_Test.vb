@@ -26,6 +26,7 @@ Public Module Script_USGS_SWSTAT_Test
         If lWdmFile.Open(lFileName) Then
             Logger.Dbg("FileOpened " & lFileName)
             Test1(lWdmFile)
+            Test3(lWdmFile)
             Test7(lWdmFile)
         Else
             Logger.Dbg("FileNotOpened " & lFileName)
@@ -38,19 +39,17 @@ Public Module Script_USGS_SWSTAT_Test
 
     Sub Test1(ByVal aWdmFile As atcTimeseriesSource)
         Logger.Dbg("StartTest1")
+        Dim lTimeseriesGroup As atcTimeseriesGroup
+        Dim lRankedAnnual As atcTimeseriesGroup
+        Dim lNDay() As Double
         Dim lSB As New Text.StringBuilder
-
-        'data for test 1.1 
-        Dim lTimeseriesGroup As atcTimeseriesGroup = aWdmFile.DataSets.FindData("ID", 3)
-
-        Dim lNDay() As Double = {7}
-        Dim lRankedAnnual As atcTimeseriesGroup = clsSWSTATPlugin.ComputeRankedAnnualTimeseries( _
-                aTimeseriesGroup:=lTimeseriesGroup, _
-                aNDay:=lNDay, _
-                aHighFlag:=False, _
-                aFirstYear:=1960, aLastYear:=1970, _
-                aBoundaryMonth:=7, aBoundaryDay:=1, _
-                aEndMonth:=7, aEndDay:=31)
+        Dim lList As New atcList.atcListForm
+        With lList.DateFormat
+            .IncludeDays = False
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeMonths = False
+        End With
 
         Dim lNDayAttributes As New ArrayList
         With lNDayAttributes
@@ -59,23 +58,140 @@ Public Module Script_USGS_SWSTAT_Test
             .Add("Constituent")
         End With
 
-        Dim lList As New atcList.atcListForm
-        With lList.DateFormat
-            .IncludeDays = False
-            .IncludeHours = False
-            .IncludeMinutes = False
-            .IncludeMonths = False
-        End With
-        lList.Text = "N-Day Low Annual Time Series and Ranking"
-        lList.Initialize(lRankedAnnual.Clone, lNDayAttributes, , , False)
-        lList.DisplayValueAttributes = True
-        SaveFileString("test1.ot2", lList.ToString)
-        lList.Close()
-        lRankedAnnual.Clear()
+        Dim lDataSetIds() As Integer = {3, 1, 2}
+        For Each lDataSetId As Integer In lDataSetIds
+            lTimeseriesGroup = New atcTimeseriesGroup(aWdmFile.DataSets.FindData("ID", lDataSetId))
+            lNDay = New Double() {7}
+            lRankedAnnual = clsSWSTATPlugin.ComputeRankedAnnualTimeseries( _
+                    aTimeseriesGroup:=lTimeseriesGroup, _
+                    aNDay:=lNDay, _
+                    aHighFlag:=False, _
+                    aFirstYear:=1960, aLastYear:=1970, _
+                    aBoundaryMonth:=7, aBoundaryDay:=1, _
+                    aEndMonth:=8, aEndDay:=1)
+            'TODO: work out end of day convention, this matches 7/31 from original, original seems to assume end of period
+            lList.Text = "N-Day Low Annual Time Series and Ranking"
+            lList.Initialize(lRankedAnnual.Clone, lNDayAttributes, , , False)
+            lList.DisplayValueAttributes = True
+            lSB.AppendLine(lList.ToString)
+
+            lRankedAnnual.Clear()
+            lRankedAnnual = _
+               clsSWSTATPlugin.ComputeRankedAnnualTimeseries( _
+                    aTimeseriesGroup:=lTimeseriesGroup, _
+                    aNDay:=lNDay, _
+                    aHighFlag:=True, _
+                    aFirstYear:=1960, aLastYear:=1970, _
+                    aBoundaryMonth:=5, aBoundaryDay:=1, _
+                    aEndMonth:=6, aEndDay:=1)
+            'TODO: work out end of day convention, this matches 5/31 from original, original seems to assume end of period
+
+            lList.Text = "N-Day High Annual Time Series and Ranking"
+            lList.Initialize(lRankedAnnual.Clone, lNDayAttributes, , , False)
+            lList.DisplayValueAttributes = True
+            lSB.AppendLine(lList.ToString)
+        Next
+        SaveFileString("test1.ot2", lSB.ToString)
+
+        lSB = New Text.StringBuilder
+        For Each lDataSetId As Integer In lDataSetIds
+            lTimeseriesGroup = New atcTimeseriesGroup(aWdmFile.DataSets.FindData("ID", lDataSetId))
+            lNDay = New Double() {7}
+            lRankedAnnual = clsSWSTATPlugin.ComputeRankedAnnualTimeseries( _
+                    aTimeseriesGroup:=lTimeseriesGroup, _
+                    aNDay:=lNDay, _
+                    aHighFlag:=False, _
+                    aFirstYear:=1960, aLastYear:=1970, _
+                    aBoundaryMonth:=6, aBoundaryDay:=15, _
+                    aEndMonth:=9, aEndDay:=16)
+            'TODO: work out end of day convention, this matches 9/15 from original, original seems to assume end of period
+
+            lList.Text = "N-Day Low Annual Time Series and Ranking"
+            lList.Initialize(lRankedAnnual.Clone, lNDayAttributes, , , False)
+            lList.DisplayValueAttributes = True
+            lSB.AppendLine(lList.ToString)
+
+            lRankedAnnual.Clear()
+            lRankedAnnual = clsSWSTATPlugin.ComputeRankedAnnualTimeseries( _
+                    aTimeseriesGroup:=lTimeseriesGroup, _
+                    aNDay:=lNDay, _
+                    aHighFlag:=True, _
+                    aFirstYear:=1960, aLastYear:=1970, _
+                    aBoundaryMonth:=6, aBoundaryDay:=15, _
+                    aEndMonth:=9, aEndDay:=16)
+            'TODO: work out end of day convention, this matches 5/31 from original, original seems to assume end of period
+
+            lList.Text = "N-Day High Annual Time Series and Ranking"
+            lList.Initialize(lRankedAnnual.Clone, lNDayAttributes, , , False)
+            lList.DisplayValueAttributes = True
+            lSB.AppendLine(lList.ToString)
+        Next
+
+        For Each lDataSetId As Integer In lDataSetIds
+            lTimeseriesGroup = New atcTimeseriesGroup(aWdmFile.DataSets.FindData("ID", lDataSetId))
+            lNDay = New Double() {7, 30, 60, 4}
+            lRankedAnnual = clsSWSTATPlugin.ComputeRankedAnnualTimeseries( _
+                            aTimeseriesGroup:=lTimeseriesGroup, _
+                            aNDay:=lNDay, _
+                            aHighFlag:=False, _
+                            aFirstYear:=1960, aLastYear:=1982, _
+                            aBoundaryMonth:=6, aBoundaryDay:=15, _
+                            aEndMonth:=9, aEndDay:=16)
+            'TODO: work out end of day convention, this matches 9/15 from original, original seems to assume end of period
+
+            lList.Text = "N-Day Low Annual Time Series and Ranking"
+            lList.Initialize(lRankedAnnual.Clone, lNDayAttributes, , , False)
+            lList.DisplayValueAttributes = True
+            lSB.AppendLine(lList.ToString)
+
+            lNDay = New Double() {7}
+            lRankedAnnual.Clear()
+            lRankedAnnual = clsSWSTATPlugin.ComputeRankedAnnualTimeseries( _
+                    aTimeseriesGroup:=lTimeseriesGroup, _
+                    aNDay:=lNDay, _
+                    aHighFlag:=True, _
+                    aFirstYear:=1960, aLastYear:=1982, _
+                    aBoundaryMonth:=6, aBoundaryDay:=15, _
+                    aEndMonth:=9, aEndDay:=16)
+            'TODO: work out end of day convention, this matches 5/31 from original, original seems to assume end of period
+
+            lList.Text = "N-Day High Annual Time Series and Ranking"
+            lList.Initialize(lRankedAnnual.Clone, lNDayAttributes, , , False)
+            lList.DisplayValueAttributes = True
+            lSB.AppendLine(lList.ToString)
+        Next
+
+        SaveFileString("test1.ot3", lSB.ToString)
+    End Sub
+
+    Sub Test3(ByVal aWdmFile As atcTimeseriesSource)
+        Logger.Dbg("StartTest3")
+        Dim lSB As New Text.StringBuilder
+        lSB.AppendLine("Computation of Basic statistics." & vbCrLf)
+
+        Dim lDataSetIds() As Integer = {15, 16, 104, 150, 152, 154, 160, 165, 170, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223}
+        Dim lAttributes() As String = {"ID", "Minimum", "Maximum", "Mean", "Standard Deviation"}
+        For Each lAttribute As String In lAttributes
+            lSB.Append(lAttribute & vbTab)
+        Next
+        lSB.AppendLine()
+        For Each lDataSetId As Integer In lDataSetIds
+            Dim lTimeseriesGroup As atcTimeseriesGroup = aWdmFile.DataSets.FindData("ID", lDataSetId)
+            If lTimeseriesGroup.Count = 0 Then
+                Logger.Dbg("Skip " & lDataSetId)
+            Else
+                Dim lTimeseries As atcTimeseries = lTimeseriesGroup.Item(0)
+                For Each lAttribute As String In lAttributes
+                    lSB.Append(lTimeseries.Attributes.GetFormattedValue(lAttribute) & vbTab)
+                Next
+                lSB.AppendLine()
+            End If
+        Next
+        SaveFileString("test3.ot2", lSB.ToString)
     End Sub
 
     Sub Test7(ByVal aWdmFile As atcTimeseriesSource)
-        Logger.Dbg("StartTest1")
+        Logger.Dbg("StartTest7")
         Dim lSB As New Text.StringBuilder
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lArgs As New atcDataAttributes
@@ -83,6 +199,7 @@ Public Module Script_USGS_SWSTAT_Test
         'data for test 7.1 & 7.2
         Dim lTimeseriesGroup As atcTimeseriesGroup = aWdmFile.DataSets.FindData("ID", 3)
         Dim lTimeseries As atcTimeseries = lTimeseriesGroup.ItemByIndex(0)
+        lTimeseries.Attributes.DiscardCalculated()
 
         'test 7.1
         lArgs.SetValue("Timeseries", lTimeseriesGroup)

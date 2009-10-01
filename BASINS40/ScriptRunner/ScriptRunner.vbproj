@@ -139,11 +139,6 @@
       <Name>atcData</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcFrequencyGrid\atcFrequencyGrid.vbproj">
-      <Project>{1E20B43E-B33D-4396-A7E1-498F72EBA5A4}</Project>
-      <Name>atcFrequencyGrid</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcGisUtilities\atcGisUtiliies.vbproj">
       <Project>{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}</Project>
       <Name>atcGisUtiliies</Name>
@@ -162,6 +157,11 @@
     <ProjectReference Include="..\atcHspfSupport\atcHspfSupport.vbproj">
       <Project>{3B2EB97A-A305-4394-9843-72E138815152}</Project>
       <Name>atcHspfSupport</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcList\atcList.vbproj">
+      <Project>{A1A87CB8-8B9E-4C90-9549-C065357E499F}</Project>
+      <Name>atcList</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
