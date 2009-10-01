@@ -15,6 +15,7 @@ Friend Class frmDisplayFrequencyGrid
     Private pSource As atcFrequencyGridSource
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
     Private pNday() As Double
+    Friend WithEvents mnuFileExportResults As System.Windows.Forms.MenuItem
     Private pReturns() As Double
 
 #Region " Windows Form Designer generated code "
@@ -87,6 +88,7 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem
         Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
         Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
+        Me.mnuFileExportResults = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
@@ -110,7 +112,7 @@ Friend Class frmDisplayFrequencyGrid
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSaveGrid, Me.mnuFileSaveReport, Me.mnuFileSaveViewNDay})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSaveGrid, Me.mnuFileSaveReport, Me.mnuFileSaveViewNDay, Me.mnuFileExportResults})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSaveGrid
@@ -128,6 +130,11 @@ Friend Class frmDisplayFrequencyGrid
         '
         Me.mnuFileSaveViewNDay.Index = 2
         Me.mnuFileSaveViewNDay.Text = "Save/View N-Day"
+        '
+        'mnuFileExportResults
+        '
+        Me.mnuFileExportResults.Index = 3
+        Me.mnuFileExportResults.Text = "Export Results"
         '
         'mnuEdit
         '
@@ -394,5 +401,19 @@ Friend Class frmDisplayFrequencyGrid
     Private Sub mnuGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraph.Click
         Dim lGraphPlugin As New atcGraph.atcGraphPlugin
         Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
+    End Sub
+
+    Private Sub mnuFileExportResults_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileExportResults.Click
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+        With lSaveDialog
+            .Title = "Export Frequency Results As"
+            .DefaultExt = ".txt"
+            .FileName = ReplaceString(Me.Text, " ", "_") & "_export.txt"
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                SaveFileString(.FileName, pSource.CreateReport(True))
+                OpenFile(.FileName)
+            End If
+        End With
+
     End Sub
 End Class
