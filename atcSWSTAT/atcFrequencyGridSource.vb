@@ -335,7 +335,7 @@ Public Class atcFrequencyGridSource
         Return lAllNday
     End Function
 
-    Public Function CreateReport() As String
+    Public Function CreateReport(Optional ByVal aExpFmt As Boolean = False) As String
         Dim lStartDate As Date
         Dim lStartDateAnnual As Date
         Dim lEndDate As Date
@@ -377,86 +377,15 @@ Public Class atcFrequencyGridSource
                     Dim lPositiveNdayTs As atcTimeseries
                     Dim lEpsilon As Double = (lNdayTs.Attributes.GetValue("Max") - lNdayTs.Attributes.GetValue("Min")) / Math.Pow(10, 9)
 
-                    lRept.AppendLine()
-                    lRept.AppendLine()
-                    lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq.000.000")
-                    lRept.AppendLine("Ver. 5.0 Beta 1   Log-Pearson & Pearson Type III Statistics   Run Date / Time")
-                    lRept.AppendLine("10/1/2009                based on USGS Program A193           " & System.DateTime.Now.ToString)
-                    lRept.AppendLine()
-                    lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
-                    lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
-                    lRept.AppendLine("           and interpretation.")
-
-
-                    lRept.AppendLine()
-                    lRept.AppendLine()
-                    lRept.AppendLine("       Description:  " & lLocation)
-                    lRept.AppendLine("            Season:  " & lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & " - " & _
-                                                               lEndDate.ToString("MMMM") & lEndDate.Day.ToString.PadLeft(3))
-                    lRept.AppendLine("  Period of Record:  " & lStartDateAnnual.Year & " - " & lEndDate.Year)
-                    lStr = lNdays & "-day "
-                    If pHigh Then lStr &= "high" Else lStr &= "low"
-                    lRept.AppendLine("         Parameter:  " & lStr)
-
                     Dim lNumZero As Integer = lNdayTsNonLog.Attributes.GetValue("Count Zero", -1)
                     Dim lNumMissing As Integer = lNdayTsNonLog.Attributes.GetValue("Count Missing", 0)
                     Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero - lNumMissing
 
-                    lStr = lNumPositive
-                    lRept.AppendLine("   non-zero values:  " & lStr.PadLeft(4))
-                    lStr = lNumZero
-                    lRept.AppendLine("       zero values:  " & lStr.PadLeft(4))
-                    lStr = lNumMissing
-                    lRept.AppendLine("   negative values:  " & lStr.PadLeft(4) & "  (ignored)")
-
-                    If lNumMissing = 0 AndAlso lNumZero = 0 Then
-                        lPositiveNdayTs = lNdayTsNonLog
-                    Else
-                        Dim lCurNewValueIndex As Integer = 1
-                        Dim lNumNewValues As Integer = lNumPositive
-                        lPositiveNdayTs = New atcTimeseries(Nothing)
-                        lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
-                        lPositiveNdayTs.numValues = lNumPositive
-                        For lIndex = 1 To lNdayTsNonLog.numValues
-                            If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
-                                lPositiveNdayTs.Value(lCurNewValueIndex) = lNdayTsNonLog.Value(lIndex)
-                                lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTsNonLog.Dates.Value(lIndex)
-                                lCurNewValueIndex += 1
-                            End If
-                        Next
-                    End If
-
-                    lRept.AppendLine()
-                    lRept.AppendLine("Input time series (zero and negative values not included in listing.)")
-                    lColumn = 9
-                    For lIndex = 1 To lPositiveNdayTs.numValues
-                        If lColumn > 8 Then
-                            lRept.AppendLine()
-                            'lRept.Append("     ")
-                            lColumn = 1
-                        End If
-                        lStr = DoubleToString(lPositiveNdayTs.Value(lIndex), , "0.000")
-                        lRept.Append(lStr.PadLeft(10))
-                        lColumn += 1
-                    Next
-
-                    lRept.AppendLine()
-                    lRept.AppendLine()
-                    lRept.AppendLine()
-                    If lIsLog Then
-                        lRept.AppendLine("  LOG PEARSON TYPE III Frequency Curve Parameters")
-                        lRept.AppendLine("  (based on logs of the non-zero values)")
-                    Else
-                        lRept.AppendLine("  PEARSON TYPE III Frequency Curve Parameters")
-                        lRept.AppendLine("  (based on non-zero values)")
-                    End If
-                    lRept.AppendLine()
-
+                    lPositiveNdayTs = New atcTimeseries(Nothing)
+                    lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
                     If lIsLog Then 'switch back to log version of n-day timeseries for stats
                         Dim lCurNewValueIndex As Integer = 1
                         Dim lNumNewValues As Integer = lNumPositive
-                        lPositiveNdayTs = New atcTimeseries(Nothing)
-                        lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
                         lPositiveNdayTs.numValues = lNumPositive
                         For lIndex = 1 To lNdayTs.numValues
                             If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
@@ -467,63 +396,205 @@ Public Class atcFrequencyGridSource
                         Next
                     End If
 
-                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Mean", lLogString))
-                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Variance", lLogString))
-                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Deviation", lLogString))
-                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Skew", lLogString, "Skewness"))
-                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Error of Skew", lLogString, "Standard Error of Skewness"))
-                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Serial Correlation Coefficient", lLogString))
-                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Coefficient of Variation", lLogString))
-
-                    lRept.AppendLine()
-                    lRept.AppendLine()
-                    lRept.AppendLine("Frequency Curve - Parameter values at selected probabilities")
-                    lRept.AppendLine()
-
-                    If pHigh Then
-                        If lNumZero > 0 Then
-                            lRept.AppendLine("                            Adjusted   Variance    95-Pct Confidence")
+                    If aExpFmt Then 'build tabbed export file
+                        lRept.AppendLine("Identifier" & vbTab & lAttributes.GetValue("STAID", ""))
+                        If pHigh Then
+                            lRept.AppendLine("    Parameter" & vbTab & "H" & StrPad(CStr(lNdays), 3, "0"))
                         Else
-                            lRept.AppendLine("                                       Variance    95-Pct Confidence")
+                            lRept.AppendLine("    Parameter" & vbTab & "L" & StrPad(CStr(lNdays), 3, "0"))
                         End If
-                        lRept.AppendLine(" Exceedence     Recurrence  Parameter     of          Intervals")
+                        lRept.AppendLine("    SeasBg" & vbTab & lStartDate.Month)
+                        lRept.AppendLine("    SeaDBg" & vbTab & lStartDate.Day)
+                        lRept.AppendLine("    SeasNd" & vbTab & lEndDate.Month)
+                        lRept.AppendLine("    SeaDNd" & vbTab & lEndDate.Day)
+                        lRept.AppendLine("    BegYear" & vbTab & lStartDateAnnual.Year)
+                        lRept.AppendLine("    EndYear" & vbTab & lEndDate.Year)
+                        lRept.AppendLine("    NumZro" & vbTab & lNumZero)
+                        lRept.AppendLine("    NonZro" & vbTab & lNumPositive)
+                        lRept.AppendLine("    NumNeg" & vbTab & lNumMissing)
+                        If lIsLog Then
+                            lRept.AppendLine("    Ldist" & vbTab & "LP3")
+                            lRept.AppendLine("    MeanND" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
+                            lRept.AppendLine("    SdNd" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
+                            lRept.AppendLine("    SkwNd" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
+                        Else
+                            lRept.AppendLine("    Ldist" & vbTab & "LP")
+                            lRept.AppendLine("    Meanvl" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
+                            lRept.AppendLine("    StdDev" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
+                            lRept.AppendLine("    Skewcf" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
+                        End If
                     Else
-                        If lNumZero > 0 Then
-                            lRept.AppendLine("   Non-                     Adjusted   Variance    95-Pct Confidence")
+                        lRept.AppendLine()
+                        lRept.AppendLine()
+                        lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq.000.000")
+                        lRept.AppendLine("Ver. 5.0 Beta 1   Log-Pearson & Pearson Type III Statistics   Run Date / Time")
+                        lRept.AppendLine("10/1/2009                based on USGS Program A193           " & System.DateTime.Now.ToString)
+                        lRept.AppendLine()
+                        lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
+                        lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
+                        lRept.AppendLine("           and interpretation.")
+
+
+                        lRept.AppendLine()
+                        lRept.AppendLine()
+                        lRept.AppendLine("       Description:  " & lLocation)
+                        lRept.AppendLine("            Season:  " & lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & " - " & _
+                                                                   lEndDate.ToString("MMMM") & lEndDate.Day.ToString.PadLeft(3))
+                        lRept.AppendLine("  Period of Record:  " & lStartDateAnnual.Year & " - " & lEndDate.Year)
+                        lStr = lNdays & "-day "
+                        If pHigh Then lStr &= "high" Else lStr &= "low"
+                        lRept.AppendLine("         Parameter:  " & lStr)
+
+                        lStr = lNumPositive
+                        lRept.AppendLine("   non-zero values:  " & lStr.PadLeft(4))
+                        lStr = lNumZero
+                        lRept.AppendLine("       zero values:  " & lStr.PadLeft(4))
+                        lStr = lNumMissing
+                        lRept.AppendLine("   negative values:  " & lStr.PadLeft(4) & "  (ignored)")
+
+                        If lNumMissing = 0 AndAlso lNumZero = 0 Then
+                            lPositiveNdayTs = lNdayTsNonLog
                         Else
-                            lRept.AppendLine("   Non-                                Variance    95-Pct Confidence")
+                            Dim lCurNewValueIndex As Integer = 1
+                            Dim lNumNewValues As Integer = lNumPositive
+                            lPositiveNdayTs = New atcTimeseries(Nothing)
+                            lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
+                            lPositiveNdayTs.numValues = lNumPositive
+                            For lIndex = 1 To lNdayTsNonLog.numValues
+                                If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
+                                    lPositiveNdayTs.Value(lCurNewValueIndex) = lNdayTsNonLog.Value(lIndex)
+                                    lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTsNonLog.Dates.Value(lIndex)
+                                    lCurNewValueIndex += 1
+                                End If
+                            Next
                         End If
-                        lRept.AppendLine(" exceedance     Recurrence  Parameter     of          Intervals")
+
+                        lRept.AppendLine()
+                        lRept.AppendLine("Input time series (zero and negative values not included in listing.)")
+                        lColumn = 9
+                        For lIndex = 1 To lPositiveNdayTs.numValues
+                            If lColumn > 8 Then
+                                lRept.AppendLine()
+                                'lRept.Append("     ")
+                                lColumn = 1
+                            End If
+                            lStr = DoubleToString(lPositiveNdayTs.Value(lIndex), , "0.000")
+                            lRept.Append(lStr.PadLeft(10))
+                            lColumn += 1
+                        Next
+
+                        lRept.AppendLine()
+                        lRept.AppendLine()
+                        lRept.AppendLine()
+                        If lIsLog Then
+                            lRept.AppendLine("  LOG PEARSON TYPE III Frequency Curve Parameters")
+                            lRept.AppendLine("  (based on logs of the non-zero values)")
+                        Else
+                            lRept.AppendLine("  PEARSON TYPE III Frequency Curve Parameters")
+                            lRept.AppendLine("  (based on non-zero values)")
+                        End If
+                        lRept.AppendLine()
+
+                        'If lIsLog Then 'switch back to log version of n-day timeseries for stats
+                        '    Dim lCurNewValueIndex As Integer = 1
+                        '    Dim lNumNewValues As Integer = lNumPositive
+                        '    lPositiveNdayTs = New atcTimeseries(Nothing)
+                        '    lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
+                        '    lPositiveNdayTs.numValues = lNumPositive
+                        '    For lIndex = 1 To lNdayTs.numValues
+                        '        If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
+                        '            lPositiveNdayTs.Value(lCurNewValueIndex) = Log10(lNdayTs.Value(lIndex))
+                        '            lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTs.Dates.Value(lIndex)
+                        '            lCurNewValueIndex += 1
+                        '        End If
+                        '    Next
+                        'End If
+
+                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Mean", lLogString))
+                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Variance", lLogString))
+                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Deviation", lLogString))
+                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Skew", lLogString, "Skewness"))
+                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Error of Skew", lLogString, "Standard Error of Skewness"))
+                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Serial Correlation Coefficient", lLogString))
+                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Coefficient of Variation", lLogString))
+
+                        lRept.AppendLine()
+                        lRept.AppendLine()
+                        lRept.AppendLine("Frequency Curve - Parameter values at selected probabilities")
+                        lRept.AppendLine()
+
+                        If pHigh Then
+                            If lNumZero > 0 Then
+                                lRept.AppendLine("                            Adjusted   Variance    95-Pct Confidence")
+                            Else
+                                lRept.AppendLine("                                       Variance    95-Pct Confidence")
+                            End If
+                            lRept.AppendLine(" Exceedence     Recurrence  Parameter     of          Intervals")
+                        Else
+                            If lNumZero > 0 Then
+                                lRept.AppendLine("   Non-                     Adjusted   Variance    95-Pct Confidence")
+                            Else
+                                lRept.AppendLine("   Non-                                Variance    95-Pct Confidence")
+                            End If
+                            lRept.AppendLine(" exceedance     Recurrence  Parameter     of          Intervals")
+                        End If
+                        'If just aligns code
+                        If True Then
+                            lRept.AppendLine(" Probability     Interval     Value    Estimate    Lower      Upper")
+                            lRept.AppendLine(" -----------    ----------  ---------  --------  ---------  ---------")
+                        End If
                     End If
-                    'If just aligns code
-                    If True Then
-                        lRept.AppendLine(" Probability     Interval     Value    Estimate    Lower      Upper")
-                        lRept.AppendLine(" -----------    ----------  ---------  --------  ---------  ---------")
+
+
+                    Dim lExpRows(6) As String
+                    If aExpFmt Then
+                        lExpRows(0) = "    Recur"
+                        lExpRows(1) = "    NonExc"
+                        If pHigh Then
+                            lExpRows(2) = "    " & lNdays & "-Day High"
+                        Else
+                            lExpRows(2) = "    " & lNdays & "-Day Low"
+                        End If
+                        lExpRows(3) = "    K-Value"
+                        lExpRows(4) = "    Variance"
+                        lExpRows(5) = "    CL_Low"
+                        lExpRows(6) = "    CL_Up"
                     End If
 
                     Dim lReverseString As String = ""
-                    Dim lThisRow As String
+                    Dim lThisRow As String = ""
                     For Each lRecurrenceKey As String In pRecurrence.Keys
                         Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey).ToString.Replace(",", "")
                         Dim lNyears As Double = CDbl(lRecurrence)
 
                         lStr = DoubleToString(1 / lNyears, , "0.0000")
-                        lThisRow = ("  " & lStr.PadLeft(10))
-
-                        If lNyears < 1.05 Then
-                            lThisRow &= DoubleToString(lNyears, , "0.000").PadLeft(14)
+                        If aExpFmt Then
+                            lExpRows(0) &= vbTab & DoubleToString(lNyears, , "0.00")
+                            lExpRows(1) &= vbTab & lStr
                         Else
-                            lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(13) & " "
+                            lThisRow = ("  " & lStr.PadLeft(10))
+
+                            If lNyears < 1.05 Then
+                                lThisRow &= DoubleToString(lNyears, , "0.000").PadLeft(14)
+                            Else
+                                lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(13) & " "
+                            End If
                         End If
 
                         If lNumZero > 0 Then 'If there is/are a zero annual event, then display adjusted values 
                             'but, don't display adjusted probs
                             'lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
-                            If pAdj.Item(lRecurrenceKey) Is Nothing Then
-                                lThisRow &= "".PadLeft(11)
+                            If aExpFmt Then
+                                lExpRows(2) &= vbTab & DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000")
                             Else
-                                lThisRow &= DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000").PadLeft(11)
+                                If pAdj.Item(lRecurrenceKey) Is Nothing Then
+                                    lThisRow &= "".PadLeft(11)
+                                Else
+                                    lThisRow &= DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000").PadLeft(11)
+                                End If
                             End If
+                        ElseIf aExpFmt Then
+                            lExpRows(2) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
                         Else
                             lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(11)
                         End If
@@ -536,21 +607,28 @@ Public Class atcFrequencyGridSource
                             lReverseString = lThisRow & vbCrLf & lReverseString
                         End If
                     Next ' for each lRecurrenceKey As String In pRecurrence.Keys
-                    lRept.Append(lReverseString)
 
-                    lRept.AppendLine()
-                    If lNumZero > 0 Then
-                        lRept.AppendLine(" Note -- Conditional Probability Adjustment applied because of zero flow(s),")
-                        lRept.AppendLine("         Adjusted parameter values (column 3) correspond with non-exceedence")
-                        lRept.AppendLine("         probabilities (column 1) and recurrence intervals (column 2).")
+                    If aExpFmt Then
+                        For i As Integer = 0 To UBound(lExpRows)
+                            lRept.AppendLine(lExpRows(i))
+                        Next
+                    Else
+                        lRept.Append(lReverseString)
+
+                        lRept.AppendLine()
+                        If lNumZero > 0 Then
+                            lRept.AppendLine(" Note -- Conditional Probability Adjustment applied because of zero flow(s),")
+                            lRept.AppendLine("         Adjusted parameter values (column 3) correspond with non-exceedence")
+                            lRept.AppendLine("         probabilities (column 1) and recurrence intervals (column 2).")
+                        End If
+                        lRept.AppendLine()
+                        'lRept.AppendLine("    7 statistics were added as attributes to data set   163:")
+                        'lRept.AppendLine()
+                        'lRept.AppendLine("          MEANVL STDDEV SKEWCF NUMZRO NONZRO LDIST ")
+                        'lRept.AppendLine("          L04003")
+
+                        lRept.AppendLine(vbFormFeed)
                     End If
-                    lRept.AppendLine()
-                    'lRept.AppendLine("    7 statistics were added as attributes to data set   163:")
-                    'lRept.AppendLine()
-                    'lRept.AppendLine("          MEANVL STDDEV SKEWCF NUMZRO NONZRO LDIST ")
-                    'lRept.AppendLine("          L04003")
-
-                    lRept.AppendLine(vbFormFeed)
                 Next
             Next
         Catch e As Exception
