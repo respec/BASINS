@@ -75,7 +75,15 @@ Public Class atcDataAttributes
             ElseIf lKey.StartsWith("%") Then
                 lDef = pAllDefinitions.ItemByKey("%*")
             ElseIf lKey.Contains("low") Then
-                lDef = pAllDefinitions.ItemByKey("n-day low value")
+                If lKey.Contains("Variance of Estimate") Then
+                    lDef = pAllDefinitions.ItemByKey("Variance of Estimate")
+                ElseIf lKey.Contains("CI Lower") Then
+                    lDef = pAllDefinitions.ItemByKey("CI Lower")
+                ElseIf lKey.Contains("CI Upper") Then
+                    lDef = pAllDefinitions.ItemByKey("CI Upper")
+                Else
+                    lDef = pAllDefinitions.ItemByKey("n-day low value")
+                End If
             ElseIf lKey.Contains("high") Then
                 lDef = pAllDefinitions.ItemByKey("n-day high value")
             End If
