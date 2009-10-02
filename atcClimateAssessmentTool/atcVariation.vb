@@ -351,7 +351,9 @@ Public Class atcVariation
             End Select
 
             lModifiedTS.Attributes.SetValue("ID", lOriginalData.Attributes.GetValue("ID"))
-            lModifiedGroup.Add(lOriginalData, lModifiedTS)
+            Dim lMostOriginal As atcTimeseries = MostOriginal(lOriginalData)
+            lModifiedGroup.Add(lMostOriginal, lModifiedTS)
+            lModifiedTS.Attributes.SetValue("CAToriginal", lMostOriginal)
 
             If PETdata.Count > lDataSetIndex Then
                 Dim lOldPET As atcDataSet = PETdata(lDataSetIndex)
@@ -378,6 +380,14 @@ Public Class atcVariation
             lDataSetIndex += 1
         Next
         Return lModifiedGroup
+    End Function
+
+    Private Function MostOriginal(ByVal aTimeseries As atcTimeseries) As atcTimeseries
+        Dim lMostOriginal As atcTimeseries = aTimeseries
+        While lMostOriginal.Attributes.ContainsAttribute("CAToriginal")
+            lMostOriginal = lMostOriginal.Attributes.GetValue("CAToriginal")
+        End While
+        Return lMostOriginal
     End Function
 
     ''' <summary>

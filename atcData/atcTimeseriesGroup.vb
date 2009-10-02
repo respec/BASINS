@@ -22,8 +22,7 @@ Public Class atcTimeseriesGroup
         Next
     End Sub
 
-    ''' <summary>Create a new timeseries group and add timeseries
-    ''' to the group with the default key of its serial number</summary>
+    ''' <summary>Create a new group containing the same timeseries as aDataGroup</summary>
     Public Sub New(ByVal aDataGroup As atcDataGroup)
         MyBase.New()
         For lIndex As Integer = 0 To aDataGroup.Count - 1
@@ -31,7 +30,8 @@ Public Class atcTimeseriesGroup
         Next
     End Sub
 
-    ''' <summary>Create a copy of this data group</summary>
+    ''' <summary>Create a copy of this data group containing references to the same group of atcTimeseries</summary>
+    ''' <remarks>Does not create copies of each atcTimeseries, clone refers to same objects as original</remarks>
     Public Shadows Function Clone() As atcTimeseriesGroup
         Dim lClone As New atcTimeseriesGroup
         For lIndex As Integer = 0 To MyBase.Count - 1
@@ -40,7 +40,7 @@ Public Class atcTimeseriesGroup
         Return lClone
     End Function
 
-    ''' <summary>atcDataSet by index</summary>
+    ''' <summary>atcTimeseries by index</summary>
     Default Public Shadows Property Item(ByVal aIndex As Integer) As atcTimeseries
         Get
             Return MyBase.Item(aIndex)
@@ -50,7 +50,7 @@ Public Class atcTimeseriesGroup
         End Set
     End Property
 
-    ''' <summary>atcDataSet by index</summary>
+    ''' <summary>atcTimeseries by index</summary>
     Public Shadows Property ItemByIndex(ByVal aIndex As Integer) As atcTimeseries
         Get
             Return MyBase.Item(aIndex)
@@ -60,7 +60,7 @@ Public Class atcTimeseriesGroup
         End Set
     End Property
 
-    ''' <summary>atcDataSet by key</summary>
+    ''' <summary>atcTimeseries by key</summary>
     Public Shadows Property ItemByKey(ByVal aKey As Object) As atcTimeseries
         Get
             Return MyBase.ItemByKey(aKey)
