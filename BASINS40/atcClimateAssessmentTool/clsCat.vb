@@ -406,44 +406,41 @@ NextIteration:
                     'save how this variation's datasets looked before we modified them
                     Dim lOriginalDatasets As atcTimeseriesGroup = .DataSets.Clone
 
-                    'save version of data modified by an earlier variation if it will also be modified by this one
-                    Dim lReModifiedData As New atcTimeseriesGroup
+                    'data modified before this variation plus data modified by this one
+                    Dim lAllModifiedData As atcTimeseriesGroup = aModifiedData.Clone
 
                     For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
                         Dim lSourceDataSet As atcTimeseries = .DataSets(lDataSetIndex)
-                        Dim lModifiedIndex As Integer = aModifiedData.Keys.IndexOf(lSourceDataSet)
+                        Dim lModifiedIndex As Integer = lAllModifiedData.Keys.IndexOf(lSourceDataSet)
                         If lModifiedIndex >= 0 Then
-                            .DataSets.Item(lDataSetIndex) = aModifiedData.ItemByIndex(lModifiedIndex)
-                            lReModifiedData.Add(lSourceDataSet, aModifiedData.ItemByIndex(lModifiedIndex))
-                            aModifiedData.RemoveAt(lModifiedIndex)
+                            .DataSets.Item(lDataSetIndex) = lAllModifiedData.ItemByIndex(lModifiedIndex)
+                            lAllModifiedData.RemoveAt(lModifiedIndex)
                         End If
                     Next
 
                     'Start varying data
-                    Dim lModifiedGroup As atcTimeseriesGroup = .StartIteration
+                    Dim lNewlyModified As atcTimeseriesGroup = .StartIteration
 
-                    While g_Running And Not lModifiedGroup Is Nothing
+                    While g_Running And Not lNewlyModified Is Nothing
                         'Remove existing modified data also modified by this variation
                         'Most cases of this were handled above when creating lReModifiedData, 
                         'but side-effect computation like PET still needs removing here
-                        For Each lKey As Object In lModifiedGroup.Keys
-                            aModifiedData.RemoveByKey(lKey)
+                        For Each lKey As Object In lNewlyModified.Keys
+                            lAllModifiedData.RemoveByKey(lKey)
                         Next
 
-                        aModifiedData.Add(lModifiedGroup)
+                        lAllModifiedData.Add(lNewlyModified)
 
                         'We have handled a variation, now recursively handle more input variations or run the model
                         Run(aModifiedScenarioName, _
                             aVariations, _
                             aIteration, _
                             aStartVariationIndex + 1, _
-                            aModifiedData)
+                            lAllModifiedData)
 
-                        aModifiedData.Remove(lModifiedGroup)
-                        lModifiedGroup = .NextIteration
+                        lAllModifiedData.Remove(lNewlyModified)
+                        lNewlyModified = .NextIteration
                     End While
-
-                    aModifiedData.Add(lReModifiedData)
 
                     .DataSets = lOriginalDatasets
                 End With
