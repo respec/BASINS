@@ -403,7 +403,9 @@ NextIteration:
             Else 'Need to loop through values for next variation
                 Dim lVariation As atcVariation = aVariations.Item(aStartVariationIndex)
                 With lVariation
+                    'save how this variation's datasets looked before we modified them
                     Dim lOriginalDatasets As atcTimeseriesGroup = .DataSets.Clone
+
                     'save version of data modified by an earlier variation if it will also be modified by this one
                     Dim lReModifiedData As New atcTimeseriesGroup
 
