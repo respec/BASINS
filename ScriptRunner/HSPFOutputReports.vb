@@ -310,15 +310,16 @@ Module HSPFOutputReports
                                 Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
                             End If
 
+                            Dim lPrecSubsetDataGroup As New atctimeseriesgroup
                             For lIndex As Integer = 0 To lPrecDataGroup.Count - 1
-                                lPrecDataGroup(lIndex) = SubsetByDate(lPrecDataGroup(lIndex), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                                lPrecSubsetDataGroup.add(SubsetByDate(lPrecDataGroup(lIndex), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing))
                             Next
 
-                            lMathArgs.SetValue("Timeseries", lPrecDataGroup)
+                            lMathArgs.SetValue("Timeseries", lPrecSubsetDataGroup)
                             lMathArgs.SetValue("Number", lPrecSourceCollection.Item(lSourceIndex))
                             If lMath.Open("Multiply", lMathArgs) Then
                                 Logger.Dbg("SourceIndex " & lSourceIndex & _
-                                           " DSN " & lPrecDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
+                                           " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
                                            " MultBy " & lPrecSourceCollection.Item(lSourceIndex))
                                 If lSourceIndex = 0 Then
                                     lPrecTser = lMath.DataSets(0).Clone
@@ -332,7 +333,7 @@ Module HSPFOutputReports
                                     If lMathAdd.Open("Add", lMathAddArgs) Then
                                         lPrecTser = lMathAdd.DataSets(0).Clone
                                     Else
-                                        Logger.Dbg("Problem With Add")
+                                        Logger.Dbg("ProblemWithAdd")
                                     End If
                                 End If
                             Else
