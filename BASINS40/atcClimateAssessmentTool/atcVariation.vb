@@ -100,11 +100,15 @@ Public Class atcVariation
 
     Public Overridable ReadOnly Property Iterations() As Integer
         Get
-            Try
-                Return (Max - Min) / Increment + 1
-            Catch ex As Exception
+            If Increment = 0 Then
                 Return 1
-            End Try
+            Else
+                Try
+                    Return (Max - Min) / Increment + 1
+                Catch ex As Exception
+                    Return 1
+                End Try
+            End If
         End Get
     End Property
 
