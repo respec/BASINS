@@ -12,7 +12,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
 Module HSPFOutputReports
-    Private pBaseDrive As String = "d:"
+    Private pBaseDrive As String = "v:"
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
     Private pBaseName As String
@@ -55,8 +55,8 @@ Module HSPFOutputReports
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
         'pConstituents.Add("BOD-PQUAL")
-        pConstituents.Add("TotalN")
-        pConstituents.Add("TotalP")
+        'pConstituents.Add("TotalN")
+        'pConstituents.Add("TotalP")
 
         Select Case lTestName
             Case "mono"
@@ -109,9 +109,10 @@ Module HSPFOutputReports
                 pBaseName = "base"
                 pOutputLocations.Add("Lynnwood")
             Case "upatoi"
-                pTestPath = "D:\Basins\modelout\Upatoi"
+                'pTestPath = "D:\Basins\modelout\Upatoi"
                 'pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
                 'pTestPath = "C:\Basins\data\20710-01\Upatoi"
+                pTestPath = "V:\"
                 pBaseName = "Upatoi"
                 'pOutputLocations.Add("R:639")
                 'pOutputLocations.Add("R:614")
@@ -294,6 +295,7 @@ Module HSPFOutputReports
 
                         Dim lPrecSourceCollection As New atcCollection
                         Dim lAreaFromWeight As Double = lHspfUci.WeightedSourceArea(lOperation, "PREC", lPrecSourceCollection)
+                        Logger.Dbg("AreaFromWeight" & lAreaFromWeight)
                         Dim lPrecTser As atcTimeseries = Nothing
                         Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
                         Dim lMathArgs As New atcDataAttributes
@@ -307,6 +309,11 @@ Module HSPFOutputReports
                             Else
                                 Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
                             End If
+
+                            For lIndex As Integer = 0 To lPrecDataGroup.Count - 1
+                                lPrecDataGroup(lIndex) = SubsetByDate(lPrecDataGroup(lIndex), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                            Next
+
                             lMathArgs.SetValue("Timeseries", lPrecDataGroup)
                             lMathArgs.SetValue("Number", lPrecSourceCollection.Item(lSourceIndex))
                             If lMath.Open("Multiply", lMathArgs) Then
@@ -325,7 +332,7 @@ Module HSPFOutputReports
                                     If lMathAdd.Open("Add", lMathAddArgs) Then
                                         lPrecTser = lMathAdd.DataSets(0).Clone
                                     Else
-                                        Logger.Dbg("Problem")
+                                        Logger.Dbg("Problem With Add")
                                     End If
                                 End If
                             Else
@@ -379,20 +386,20 @@ Module HSPFOutputReports
                         lTimeSeries.Add("Observed", lObsTSer)
                         lTimeSeries.Add("Simulated", lSimTSer)
                         lTimeSeries.Add("Precipitation", lPrecTser)
-                        lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(9)))
-                        lTimeSeries.Add("UZS", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(8)))
-                        lTimeSeries.Add("PotET", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(6)))
-                        lTimeSeries.Add("ActET", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(7)))
-                        lTimeSeries.Add("Baseflow", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(4)))
-                        lTimeSeries.Add("Interflow", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(3)))
-                        lTimeSeries.Add("Surface", lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(2)))
+                        lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(9)))
+                        lTimeSeries.Add("UZS", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(8)))
+                        lTimeSeries.Add("PotET", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(6)))
+                        lTimeSeries.Add("ActET", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(7)))
+                        lTimeSeries.Add("Baseflow", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(4)))
+                        lTimeSeries.Add("Interflow", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(3)))
+                        lTimeSeries.Add("Surface", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(2)))
                         GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ, _
                                  lCons, lSiteName, _
                                  lTimeSeries, _
                                  pGraphSaveFormat, _
                                  pGraphSaveWidth, _
                                  pGraphSaveHeight, _
-                                 pGraphAnnual, IO.Path.Combine(My.Computer.FileSystem.CurrentDirectory, "\output\"))
+                                 pGraphAnnual, lOutFolderName)
                         lTimeSeries.Clear()
 
                         'TODO: dont hard code DSN here
