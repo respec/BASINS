@@ -188,6 +188,7 @@ Module HSPFOutputReports
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Initialize()
         ChDriveDir(pTestPath)
+        Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
         If FileExists(pBaseName & "Orig.uci") Then
             IO.File.Copy(pBaseName & "Orig.uci", pBaseName & ".uci")
         End If
@@ -202,6 +203,7 @@ Module HSPFOutputReports
         lMsg.Open("hspfmsg.mdb")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
+        Logger.Dbg("ReadUCI " & lHspfUci.Name)
         If pOutputLocations.Contains("Lynnwood") Then 'special case to check GenScn examples
             With lHspfUci.GlobalBlock
                 .SDate(0) = 1986
@@ -293,9 +295,10 @@ Module HSPFOutputReports
                         End If
                         Dim lOperation As atcUCI.HspfOperation = lHspfUci.OpnBlks("RCHRES").OperFromID(lRchId)
 
+                        Dim lAreaOriginal As Double
                         Dim lPrecSourceCollection As New atcCollection
-                        Dim lAreaFromWeight As Double = lHspfUci.WeightedSourceArea(lOperation, "PREC", lPrecSourceCollection)
-                        Logger.Dbg("AreaFromWeight" & lAreaFromWeight)
+                        Dim lAreaFromWeight As Double = lHspfUci.WeightedSourceArea(lOperation, "PREC", lPrecSourceCollection, lAreaOriginal)
+                        Logger.Dbg("AreaFromWeight" & lAreaFromWeight & " AreaOriginal " & lAreaOriginal)
                         Dim lPrecTser As atcTimeseries = Nothing
                         Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
                         Dim lMathArgs As New atcDataAttributes
@@ -316,11 +319,12 @@ Module HSPFOutputReports
                             Next
 
                             lMathArgs.SetValue("Timeseries", lPrecSubsetDataGroup)
-                            lMathArgs.SetValue("Number", lPrecSourceCollection.Item(lSourceIndex))
+                            Dim lPrecMultiply As Double = lPrecSourceCollection.Item(lSourceIndex)
+                            lMathArgs.SetValue("Number", lPrecMultiply)
                             If lMath.Open("Multiply", lMathArgs) Then
                                 Logger.Dbg("SourceIndex " & lSourceIndex & _
                                            " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
-                                           " MultBy " & lPrecSourceCollection.Item(lSourceIndex))
+                                           " MultBy " & lPrecMultiply)
                                 If lSourceIndex = 0 Then
                                     lPrecTser = lMath.DataSets(0).Clone
                                 Else
@@ -332,6 +336,7 @@ Module HSPFOutputReports
                                     lMathAddArgs.SetValue("Timeseries", lDataGroup)
                                     If lMathAdd.Open("Add", lMathAddArgs) Then
                                         lPrecTser = lMathAdd.DataSets(0).Clone
+                                        Logger.Dbg(" AfterAdd " & lPrecTser.Attributes.GetValue("SumAnnual"))
                                     Else
                                         Logger.Dbg("ProblemWithAdd")
                                     End If
@@ -346,9 +351,10 @@ Module HSPFOutputReports
                         'lMathArgs.SetValue("Number", lSite.Area)
                         lMathArgs.SetValue("Number", lAreaFromWeight)
                         If Not lMath.Open("Divide", lMathArgs) Then
-                            Logger.Dbg("Problem")
+                            Logger.Dbg("ProblemWithDivide")
                         End If
                         lPrecTser = lMath.DataSets(0)
+                        Logger.Dbg(" AfterDivide " & lPrecTser.Attributes.GetValue("SumAnnual"))
                         lPrecTser.Attributes.SetValue("Location", "Weighted Average")
 
                         'Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(5))
