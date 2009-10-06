@@ -37,6 +37,10 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MapWinInterfaces, Version=4.7.3.23445, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="MapWinUtility, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
@@ -121,6 +125,10 @@
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData</Name>
       <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
+      <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
+      <Name>atcTimeseriesMath</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>

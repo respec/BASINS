@@ -128,60 +128,78 @@ Public Class clsCatModelHSPF
             Dim lNewBaseFilename As String = AbsolutePath(pBaseScenario, CurDir)
             Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & "\"
             lNewBaseFilename = lNewFolder & aNewScenarioName & "."
-            Dim lNewUCIfilename As String
+            Dim lNewUCIfilename As String = ""
 
             Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(pBaseScenario), "WDM")
-            If aNewScenarioName.ToLower = "base" Then
-                lNewUCIfilename = pBaseScenario
-                For Each lWDMfilename As String In lWDMFilenames
-                    lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
-                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lWDMfilename.Trim)
-                Next
-            Else
-                lNewUCIfilename = lNewBaseFilename & FilenameNoPath(pBaseScenario)
-                'Copy base UCI, changing base to new scenario name within it
-                CreateModifiedUCI(aNewScenarioName, lNewUCIfilename)
-
-                For Each lWDMfilename As String In lWDMFilenames
-                    lWDMfilename = AbsolutePath(lWDMfilename, CurDir).Trim()
-                    If FilenameNoPath(lWDMfilename).ToLower = FilenameNoPath(aPreparedInput).ToLower Then
-                        lWDMfilename = aPreparedInput
-                    End If
-                    'Copy each base WDM to new WDM only if simulation is to be rerun
-                    Dim lNewWDMfilename As String = lNewFolder & aNewScenarioName & "." & IO.Path.GetFileName(lWDMfilename)
-                    If aRunModel Then
-                        FileCopy(lWDMfilename, lNewWDMfilename)
-                    End If
-                    Dim lWDMResults As New atcWDM.atcDataSourceWDM
-                    If Not lWDMResults.Open(lNewWDMfilename) Then
-                        Logger.Msg("Could not open new scenario WDM file '" & lNewWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
-                        Return Nothing
-                    End If
-
-                    'Key is base file name, value is modified file name
-                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lNewWDMfilename.Trim)
-
-                    'Update scenario name in new WDM
-                    For Each lCurrentTimeseries In aModifiedData
-                        If Not lCurrentTimeseries Is Nothing _
-                           AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) Then
-                            lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
-                            lWDMResults.AddDataset(lCurrentTimeseries)
-                        End If
+            Select aNewScenarioName.ToLower
+                Case "base"
+                    lNewUCIfilename = pBaseScenario
+                    For Each lWDMfilename As String In lWDMFilenames
+                        lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
+                        lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lWDMfilename.Trim)
                     Next
-                    For Each lCurrentTimeseries In lWDMResults.DataSets
-                        Dim lScenario As atcDefinedValue = lCurrentTimeseries.Attributes.GetDefinedValue("scenario")
-                        If lScenario.Value.ToLower = "base" Then
-                            lWDMResults.WriteAttribute(lCurrentTimeseries, lScenario, aNewScenarioName)
-                        End If
-                        If Not aModifiedData.Contains(lCurrentTimeseries) Then
-                            lCurrentTimeseries.ValuesNeedToBeRead = True
-                            lCurrentTimeseries.Attributes.DiscardCalculated()
-                        End If
+                Case "modifyoriginal"
+                    lNewUCIfilename = pBaseScenario
+                    For Each lWDMfilename As String In lWDMFilenames
+                        lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
+                        lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lWDMfilename.Trim)
                     Next
-                    lWDMResults.DataSets.Clear()
-                Next
-            End If
+                    For Each lWDMfilename As String In lWDMFilenames
+                        lWDMfilename = AbsolutePath(lWDMfilename, CurDir).Trim()
+                        Dim lWDMResults As atcWDM.atcDataSourceWDM = atcData.atcDataManager.DataSources(0)
+                        For Each lCurrentTimeseries In aModifiedData
+                            If Not lCurrentTimeseries Is Nothing _
+                               AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) Then
+                                lWDMResults.AddDataset(lCurrentTimeseries)
+                            End If
+                        Next
+                        lWDMResults.DataSets.Clear()
+                    Next
+                Case Else
+                    lNewUCIfilename = lNewBaseFilename & FilenameNoPath(pBaseScenario)
+                    'Copy base UCI, changing base to new scenario name within it
+                    CreateModifiedUCI(aNewScenarioName, lNewUCIfilename)
+
+                    For Each lWDMfilename As String In lWDMFilenames
+                        lWDMfilename = AbsolutePath(lWDMfilename, CurDir).Trim()
+                        If FilenameNoPath(lWDMfilename).ToLower = FilenameNoPath(aPreparedInput).ToLower Then
+                            lWDMfilename = aPreparedInput
+                        End If
+                        'Copy each base WDM to new WDM only if simulation is to be rerun
+                        Dim lNewWDMfilename As String = lNewFolder & aNewScenarioName & "." & IO.Path.GetFileName(lWDMfilename)
+                        If aRunModel Then
+                            FileCopy(lWDMfilename, lNewWDMfilename)
+                        End If
+                        Dim lWDMResults As New atcWDM.atcDataSourceWDM
+                        If Not lWDMResults.Open(lNewWDMfilename) Then
+                            Logger.Msg("Could not open new scenario WDM file '" & lNewWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
+                            Return Nothing
+                        End If
+
+                        'Key is base file name, value is modified file name
+                        lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lNewWDMfilename.Trim)
+
+                        'Update scenario name in new WDM
+                        For Each lCurrentTimeseries In aModifiedData
+                            If Not lCurrentTimeseries Is Nothing _
+                               AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) Then
+                                lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
+                                lWDMResults.AddDataset(lCurrentTimeseries)
+                            End If
+                        Next
+                        For Each lCurrentTimeseries In lWDMResults.DataSets
+                            Dim lScenario As atcDefinedValue = lCurrentTimeseries.Attributes.GetDefinedValue("scenario")
+                            If lScenario.Value.ToLower = "base" Then
+                                lWDMResults.WriteAttribute(lCurrentTimeseries, lScenario, aNewScenarioName)
+                            End If
+                            If Not aModifiedData.Contains(lCurrentTimeseries) Then
+                                lCurrentTimeseries.ValuesNeedToBeRead = True
+                                lCurrentTimeseries.Attributes.DiscardCalculated()
+                            End If
+                        Next
+                        lWDMResults.DataSets.Clear()
+                    Next
+            End Select
 
             If aRunModel Then
                 'Run scenario
