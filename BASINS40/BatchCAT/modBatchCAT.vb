@@ -15,14 +15,23 @@ Module modBatchCAT
             Dim lPath As String = IO.Path.GetDirectoryName(lCatSpecFile)
             My.Computer.FileSystem.CurrentDirectory = lPath
             Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-BatchCAT.txt", , False)
+            Initialize()
 
-            atcData.atcDataManager.Clear()
             Dim lCat As New atcClimateAssessmentTool.clsCat
             With lCat
                 .XML = atcUtility.WholeFileString(lCatSpecFile)
                 .RunModel = False
-                .StartRun("")
+                .StartRun("ModifyOriginal")
             End With
         End If
+    End Sub
+
+    Sub Initialize()
+        atcData.atcDataManager.Clear()
+        Dim lPlugIn As atcData.atcDataPlugin
+        lPlugIn = New atcWDM.atcDataSourceWDM()
+        lPlugIn.Initialize(Nothing, 0)
+        lPlugIn = New atcTimeseriesMath.atcTimeseriesMath
+        lPlugIn.Initialize(Nothing, 0)
     End Sub
 End Module

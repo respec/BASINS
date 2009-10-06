@@ -873,6 +873,14 @@ Public Class atcVariation
                                 'Case "addremoveper" : AddRemovePer = .Content
                             Case "computationsource"
                                 ComputationSource = atcDataManager.DataSourceByName(.InnerText)
+                                If ComputationSource Is Nothing Then
+                                    Select Case .InnerText
+                                        Case "Timeseries::Math"
+                                            ComputationSource = New atcTimeseriesMath.atcTimeseriesMath
+                                        Case Else
+                                            Logger.Msg("UnknownComputationSource " & .InnerText)
+                                    End Select
+                                End If
                             Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .OuterXml)
                             Case "petdata" : SetDataGroupXML(PETdata, "PETdata", .OuterXml)
                             Case "selected"
