@@ -1876,40 +1876,48 @@ x:
 
     Public Function WeightedSourceArea(ByVal aOperation As HspfOperation, _
                                        ByVal aSourceType As String, _
-                                       ByRef aSourceCollection As atcCollection) As Double
+                                       ByRef aSourceCollection As atcCollection, _
+                                       ByRef aOriginalArea As Double) As Double
         If aSourceCollection Is Nothing Then
             aSourceCollection = New atcCollection
         End If
-        Dim lArea As Double = LocalWeightedSource(aSourceType, aOperation, aSourceCollection)
-        Logger.Dbg("Weight" & aOperation.Name & " " & aOperation.Id & " " & lArea)
+        Dim lAreaWeighted As Double = LocalWeightedSource(aSourceType, aOperation, aSourceCollection, aOriginalArea)
+        Logger.Dbg("Weight" & aOperation.Name & " " & aOperation.Id & " " & lAreaWeighted & " OriginalArea " & aOriginalArea)
         For Each lOperationUp As HspfOperation In FindUpstreamOpns(aOperation)
-            lArea += WeightedSourceArea(lOperationUp, aSourceType, aSourceCollection)
+            lAreaWeighted += WeightedSourceArea(lOperationUp, aSourceType, aSourceCollection, aOriginalArea)
         Next
-        Return lArea
+        Return lAreaWeighted
     End Function
 
     Private Function LocalWeightedSource(ByVal aSourceType As String, _
                                          ByVal aOperation As HspfOperation, _
-                                         ByVal aSourceCollection As atcCollection) As Double
-        Dim lAreaTotal As Double = 0.0
+                                         ByVal aSourceCollection As atcCollection, _
+                                         ByRef aOriginalAreaTotal As Double) As Double
+        Dim lAreaWeightedTotal As Double = 0.0
         For Each lConnection As HspfConnection In aOperation.Sources
             If lConnection.Source.VolName = "PERLND" Or _
                lConnection.Source.VolName = "IMPLND" Then
-                Dim lArea As Double = lConnection.MFact
+                Dim lAreaOriginal As Double = lConnection.MFact
                 For Each lMetSegRec As atcUCI.HspfMetSegRecord In lConnection.Source.Opn.MetSeg.MetSegRecs
                     If lMetSegRec.Name = aSourceType Then
                         With lMetSegRec
-                            lArea *= .MFactP
-                            lAreaTotal += lArea
+                            aOriginalAreaTotal += lAreaOriginal
+                            Dim lAreaWeighted As Double = lAreaOriginal * .MFactP
+                            lAreaWeightedTotal += lAreaWeighted
                             Dim lKey As Integer = .Source.VolId
-                            aSourceCollection.Increment(lKey, lArea)
-                            Logger.Dbg("Key " & lKey & " " & lConnection.Target.VolName & lConnection.Target.VolId & " Area " & lArea)
+                            aSourceCollection.Increment(lKey, lAreaWeighted)
+                            Logger.Dbg("Key " & lKey & " " & lConnection.Target.VolName & lConnection.Target.VolId & _
+                                       " AreaWeighted " & lAreaWeighted & _
+                                       " MFact " & .MFactP & _
+                                       " AreaWeightedTotal " & lAreaWeightedTotal & _
+                                       " OriginalArea " & lAreaOriginal & _
+                                       " OriginalAreaTotal " & aOriginalAreaTotal)
                         End With
                     End If
                 Next
             End If
         Next lConnection
-        Return lAreaTotal
+        Return lAreaWeightedTotal
     End Function
 
     Public Function UpstreamArea(ByRef aOperation As HspfOperation) As Double
