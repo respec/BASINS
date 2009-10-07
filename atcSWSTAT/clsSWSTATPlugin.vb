@@ -102,7 +102,7 @@ Public Class clsSWSTATPlugin
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         If lCalculator.Open("n-day " & lHighLow & " timeseries", lArgs) Then
             For Each lDataset As atcTimeseries In lCalculator.DataSets
-                ComputeRanks(lDataset, True, False)
+                ComputeRanks(lDataset, Not aHighFlag, False)
             Next
         End If
         Return lCalculator.DataSets
