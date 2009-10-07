@@ -16,18 +16,22 @@ Module modBatchCAT
                 Dim lPath As String = IO.Path.GetDirectoryName(lCatSpecFile)
                 My.Computer.FileSystem.CurrentDirectory = lPath
                 Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-BatchCAT.txt", , False)
+                Logger.AutoFlush = True
+
                 Initialize()
 
                 Dim lCat As New atcClimateAssessmentTool.clsCat
                 With lCat
                     .XML = atcUtility.WholeFileString(lCatSpecFile)
                     .RunModel = False
+                    Logger.Dbg("StartRunWith " & lCat.Inputs.Count & " Inputs")
                     .StartRun("ModifyOriginal")
                 End With
             Else
                 Logger.Msg("ERROR - CAT specification file '" & lCatSpecFile & "' not found")
             End If
         End If
+        Logger.Dbg("BatchCAT:AllDone")
     End Sub
 
     Sub Initialize()

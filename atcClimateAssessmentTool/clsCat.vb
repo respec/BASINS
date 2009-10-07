@@ -272,7 +272,7 @@ StartOver:
         If Not g_Running Then
             RaiseEvent StatusUpdate("Stopping Run")
         Else
-            Logger.Dbg("Run")
+            Logger.Dbg("RunVariation " & aStartVariationIndex & " of " & aVariations.Count)
             If aModifiedData Is Nothing Then
                 aModifiedData = New atcTimeseriesGroup
             End If
@@ -324,7 +324,6 @@ NextIteration:
                         '.CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
                     End If
                     .CellColor(lRow, 0) = Drawing.SystemColors.Control
-
 
                     For Each lVariation In Endpoints
                         System.GC.Collect()
