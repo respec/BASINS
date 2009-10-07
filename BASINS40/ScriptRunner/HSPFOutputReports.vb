@@ -348,8 +348,10 @@ Module HSPFOutputReports
                             lMathArgs.Clear()
                         Next
                         lMathArgs.SetValue("Timeseries", lPrecTser)
-                        'lMathArgs.SetValue("Number", lSite.Area)
-                        lMathArgs.SetValue("Number", lAreaFromWeight)
+                        If Math.Abs(lSite.area - lAreaOriginal) < 0.01 Then
+                            Logger.Dbg("AreaDiscrepancy " & lSite.area & " " & lAreaOriginal)
+                        End If
+                        lMathArgs.SetValue("Number", lAreaOriginal)
                         If Not lMath.Open("Divide", lMathArgs) Then
                             Logger.Dbg("ProblemWithDivide")
                         End If
