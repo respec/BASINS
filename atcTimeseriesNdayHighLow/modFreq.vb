@@ -47,6 +47,21 @@ Module modFreq
                                                ByVal CI_LOW() As Single, _
                                                ByVal CI_HIGH() As Single, _
                                                ByVal VAR_EST() As Single)
+    Private Declare Sub VAR_EMA Lib "usgs_swstats.dll" (ByRef NT As Integer, _
+                                               ByRef NOBS() As Double, _
+                                               ByRef TL_IN() As Double, _
+                                               ByRef TU_IN() As Double, _
+                                               ByVal CMOMS() As Double, _
+                                               ByRef PQ As Double, _
+                                               ByRef REG_MSE As Double, _
+                                               ByVal YP As Double, _
+                                               ByVal VAR_EST(,) As Double)
+    Private Declare Sub CI_EMA_M3 Lib "usgs_swstats.dll" (ByRef YP As Double, _
+                                               ByVal VAR_EST(,) As Double, _
+                                               ByRef NEPS As Integer, _
+                                               ByRef EPS() As Double, _
+                                               ByVal CI_LOW() As Double, _
+                                               ByVal CI_HIGH() As Double)
 
 
     'Kendall Tau Calculation
@@ -141,22 +156,19 @@ Module modFreq
             Dim lCcpa(lIntervalMax) As Single
             Dim lP(lIntervalMax) As Single
             Dim lQ(lIntervalMax) As Single
-            Dim lQL(lIntervalMax) As Single
-            Dim lQU(lIntervalMax) As Single
-            Dim lTL(lIntervalMax) As Single
-            Dim lTU(lIntervalMax) As Single
-            Dim lmse As Single = 100000000000.0
+            Dim lTL(lN) As Double
+            Dim lTU(lN) As Double
+            Dim lmse As Double = 100000000000.0
             Dim lCILow(lIntervalMax) As Single
             Dim lCIHigh(lIntervalMax) As Single
-            Dim lCILowVal(1) As Single
-            Dim lCIHighVal(1) As Single
+            Dim lCILowVal(1) As Double
+            Dim lCIHighVal(1) As Double
             Dim lVarEst(lIntervalMax) As Single
-            Dim lVarEstVal(1) As Single
-            Dim lCMoms(2, 1) As Single
+            Dim lVarEstArray(1, 1) As Double
+            Dim lCMoms(2) As Double
             Dim lneps As Integer = 1
-            Dim leps(1) As Single
-            Dim lRegSkew As Single
-            Dim lgbthrsh0 As Single
+            Dim leps(1) As Double
+            Dim lNobs(1) As Double
             Dim lyp(lIntervalMax) As Single
             Dim lAdp(lIntervalMax) As Single
             Dim lQnew(lIntervalMax) As Single
@@ -170,21 +182,19 @@ Module modFreq
             Try
                 LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe, _
                        lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lRetcod)
-                For i As Integer = 1 To lN
-                    'NOTE - need to check how QL/QU should be filled ***
-                    lQL(i) = aTs.Values(i)
-                    lQU(i) = lQL(i)
-                    lTL(i) = -1.0E+21
-                    lTU(i) = 1.0E+21
-                Next
+                lNobs(0) = 1
+                lTL(0) = -1.0E+21
+                lTU(0) = 1.0E+21
                 leps(0) = 0.95
+                lCMoms(0) = lMean
+                lCMoms(1) = lStd
+                lCMoms(2) = lSkew
                 For i As Integer = 0 To lIntervalMax
-                    EMAFITB(lN, lQL, lQU, lTL, lTU, lRegSkew, lmse, _
-                            lneps, leps, lgbthrsh0, lP(i), _
-                             lCMoms, lyp(i), lCILowVal, lCIHighVal, lVarEstVal)
+                    VAR_EMA(1, lNobs, lTL, lTU, lCMoms, CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
+                    CI_EMA_M3(CDbl(lyp(i)), lVarEstArray, 1, leps, lCILowVal, lCIHighVal)
                     lCILow(i) = lCILowVal(0)
                     lCIHigh(i) = lCIHighVal(0)
-                    lVarEst(i) = lVarEstVal(0)
+                    lVarEst(i) = lVarEstArray(0, 0)
                 Next i
                 Dim lMsg As String = ""
 
