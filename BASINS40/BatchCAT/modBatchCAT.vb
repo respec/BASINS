@@ -11,6 +11,7 @@ Module modBatchCAT
         Try
             If args.Count = 0 Then
                 Logger.Msg("ERROR - No Command Line Argument Containing CAT Scenario Found", "BatchCAT Problem")
+                Logger.Dbg("ReturnWithCode 1")
                 Return 1
             Else
                 Dim lCatSpecFile As String = args(0)
@@ -28,17 +29,21 @@ Module modBatchCAT
                         Logger.Dbg("StartRunWith " & lCat.Inputs.Count & " Inputs")
                         .StartRun("ModifyOriginal")
                     End With
+                    Logger.Dbg("BatchCAT:AllDone")
+                    Logger.Dbg("ReturnWithCode 0")
                     Return 0
                 Else
                     Logger.Msg("ERROR - CAT specification file '" & lCatSpecFile & "' not found")
+                    Logger.Dbg("ReturnWithCode 2")
                     Return 2
                 End If
             End If
-            Logger.Dbg("BatchCAT:AllDone")
         Catch e As Exception
             Logger.Msg("ERROR - " & e.Message)
+            Logger.Dbg("ReturnWithCode 3")
             Return 3
         End Try
+        Logger.Dbg("ReturnWithCode 4")
         Return 4
     End Function
 
