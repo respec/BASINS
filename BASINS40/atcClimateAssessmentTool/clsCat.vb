@@ -280,6 +280,7 @@ StartOver:
                 ChDriveDir(PathNameOnly((Model.BaseScenario))) 'extra parentheses to avoid setting BaseScenario from ByRef
             Catch
             End Try
+            Logger.Dbg("WorkingDir " & My.Computer.FileSystem.CurrentDirectory)
 
             If aStartVariationIndex >= aVariations.Count Then 'All variations have values, do a model run
 NextIteration:
@@ -402,13 +403,17 @@ NextIteration:
             Else 'Need to loop through values for next variation
                 Dim lVariation As atcVariation = aVariations.Item(aStartVariationIndex)
                 With lVariation
+                    Logger.Dbg("StartVariation " & .Name)
                     'save how this variation's datasets looked before we modified them
                     Dim lOriginalDatasets As atcTimeseriesGroup = .DataSets.Clone
+                    Logger.Dbg("OriginalDatasetsCount " & lOriginalDatasets.Count)
 
                     'data modified before this variation plus data modified by this one
                     Dim lAllModifiedData As atcTimeseriesGroup = aModifiedData.Clone
+                    Logger.Dbg("ModifiedDatasetsCount " & lAllModifiedData.Count)
 
                     For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
+                        Logger.Dbg("Loop " & lDataSetIndex)
                         Dim lSourceDataSet As atcTimeseries = .DataSets(lDataSetIndex)
                         Dim lModifiedIndex As Integer = lAllModifiedData.Keys.IndexOf(lSourceDataSet)
                         If lModifiedIndex >= 0 Then
@@ -418,16 +423,20 @@ NextIteration:
                     Next
 
                     'Start varying data
+                    Logger.Dbg("AboutToStartIteration")
                     Dim lNewlyModified As atcTimeseriesGroup = .StartIteration
+                    Logger.Dbg("DoneStartIteration")
 
                     While g_Running And Not lNewlyModified Is Nothing
                         'Remove existing modified data also modified by this variation
                         'Most cases of this were handled above when creating lReModifiedData, 
                         'but side-effect computation like PET still needs removing here
                         For Each lKey As Object In lNewlyModified.Keys
+                            Logger.Dbg("Remove " & lKey.ToString)
                             lAllModifiedData.RemoveByKey(lKey)
                         Next
 
+                        Logger.Dbg("Add " & lNewlyModified.Count)
                         lAllModifiedData.Add(lNewlyModified)
 
                         'We have handled a variation, now recursively handle more input variations or run the model
