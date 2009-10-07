@@ -32,34 +32,34 @@ Module modFreq
                                               ByRef PLEVEL As Single, _
                                               ByRef SLOPE As Single)
     Private Declare Sub EMAFITB Lib "usgs_swstats.dll" (ByRef N As Integer, _
-                                               ByRef QL_IN() As Single, _
-                                               ByRef QU_IN() As Single, _
-                                               ByRef TL_IN() As Single, _
-                                               ByRef TU_IN() As Single, _
+                                               ByVal QL_IN() As Single, _
+                                               ByVal QU_IN() As Single, _
+                                               ByVal TL_IN() As Single, _
+                                               ByVal TU_IN() As Single, _
                                                ByRef REG_SKEW As Single, _
                                                ByRef REG_MSE As Single, _
                                                ByRef NEPS As Integer, _
-                                               ByRef EPS() As Single, _
+                                               ByVal EPS() As Single, _
                                                ByRef GBTHRSH0 As Single, _
                                                ByRef PQ As Single, _
                                                ByVal CMOMS(,) As Single, _
-                                               ByVal YP As Single, _
+                                               ByRef YP As Single, _
                                                ByVal CI_LOW() As Single, _
                                                ByVal CI_HIGH() As Single, _
                                                ByVal VAR_EST() As Single)
     Private Declare Sub VAR_EMA Lib "usgs_swstats.dll" (ByRef NT As Integer, _
-                                               ByRef NOBS() As Double, _
-                                               ByRef TL_IN() As Double, _
-                                               ByRef TU_IN() As Double, _
+                                               ByVal NOBS() As Double, _
+                                               ByVal TL_IN() As Double, _
+                                               ByVal TU_IN() As Double, _
                                                ByVal CMOMS() As Double, _
                                                ByRef PQ As Double, _
                                                ByRef REG_MSE As Double, _
-                                               ByVal YP As Double, _
+                                               ByRef YP As Double, _
                                                ByVal VAR_EST(,) As Double)
     Private Declare Sub CI_EMA_M3 Lib "usgs_swstats.dll" (ByRef YP As Double, _
                                                ByVal VAR_EST(,) As Double, _
                                                ByRef NEPS As Integer, _
-                                               ByRef EPS() As Double, _
+                                               ByVal EPS() As Double, _
                                                ByVal CI_LOW() As Double, _
                                                ByVal CI_HIGH() As Double)
 
