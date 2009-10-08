@@ -234,12 +234,12 @@ Module modFreq
                     aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
 
                     Dim lNewAttVarEst As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " Variance of Estimate")
-                    aAttributesStorage.SetValue(lNewAttVarEst, lQ(lIndex), lArguments)
+                    aAttributesStorage.SetValue(lNewAttVarEst, lVarEst(lIndex), lArguments)
 
                     Dim lNewAttCILower As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Lower")
-                    aAttributesStorage.SetValue(lNewAttCILower, lQ(lIndex), lArguments)
+                    aAttributesStorage.SetValue(lNewAttCILower, lCILow(lIndex), lArguments)
                     Dim lNewAttCIUpper As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Upper")
-                    aAttributesStorage.SetValue(lNewAttCIUpper, lQ(lIndex), lArguments)
+                    aAttributesStorage.SetValue(lNewAttCIUpper, lCIHigh(lIndex), lArguments)
 
                     If aNumZero > 0 Then
                         lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")
