@@ -272,14 +272,21 @@ StartOver:
         If Not g_Running Then
             RaiseEvent StatusUpdate("Stopping Run")
         Else
-            Logger.Dbg("RunVariation " & aStartVariationIndex & " of " & aVariations.Count)
+            Logger.Dbg("Run Variation " & aStartVariationIndex & " of " & aVariations.Count)
             If aModifiedData Is Nothing Then
                 aModifiedData = New atcTimeseriesGroup
             End If
-            Try
-                ChDriveDir(PathNameOnly((Model.BaseScenario))) 'extra parentheses to avoid setting BaseScenario from ByRef
-            Catch
-            End Try
+            If Model Is Nothing OrElse Model.BaseScenario Is Nothing Then
+                Logger.Dbg("ModelNotSet")
+            Else
+                Dim lCurDir As String = IO.Path.GetDirectoryName(Model.BaseScenario)
+                Logger.Dbg("ChangeCurDirTo " & lCurDir)
+                Try
+                    ChDriveDir(lCurDir)
+                Catch lEx As Exception
+                    Logger.Dbg("UnableToChangeDirectory " & lEx.Message)
+                End Try
+            End If
             Logger.Dbg("WorkingDir " & My.Computer.FileSystem.CurrentDirectory)
 
             If aStartVariationIndex >= aVariations.Count Then 'All variations have values, do a model run
@@ -453,7 +460,7 @@ NextIteration:
                     .DataSets = lOriginalDatasets
                 End With
             End If
-        End If
+            End If
     End Sub
 
     Friend Function MemUsage() As String
