@@ -54,5 +54,8 @@ Module modBatchCAT
         lPlugIn.Initialize(Nothing, 0)
         lPlugIn = New atcTimeseriesMath.atcTimeseriesMath
         lPlugIn.Initialize(Nothing, 0)
+        Logger.Dbg("SetNaN")
+        Dim lNan As Double = GetNaN()
+        Dim lMax As Double = GetMaxValue()
     End Sub
 End Module
