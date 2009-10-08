@@ -7,6 +7,12 @@ Imports System.Collections.Specialized
 Imports MapWinUtility
 
 Public Module modFile
+    <CLSCompliant(False)> _
+    Declare Function _controlfp Lib "msvcrt.dll" (ByVal newControl As UInteger, ByVal mask As UInteger) As UInteger
+    <CLSCompliant(False)> _
+    Declare Sub _fpreset Lib "msvcrt.dll" ()
+    <CLSCompliant(False)> _
+    Declare Function _statusfp Lib "msvcrt.dll" () As UInteger
 
     Public g_PathChar As String = IO.Path.DirectorySeparatorChar
     Public ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
@@ -1318,6 +1324,18 @@ ReadCharacter:
     ''' <returns>Double.NaN</returns>
     ''' <remarks>workaround for mystery bug - program exit without message on first reference to NaN</remarks>
     Public Function GetNaN() As Double
+        Static lFirst As Boolean = True
+        If lFirst Then Logger.Dbg("GetNaN")
+        Dim lStatus As UInteger = _statusfp
+        If lFirst Then
+            Logger.Dbg("StatusB4 " & lStatus)
+            _fpreset()
+            Logger.Dbg("StatusAf " & _statusfp)
+            lFirst = False
+        ElseIf lStatus > 1 Then
+            Logger.Dbg("StatusB4 " & lStatus)
+            _fpreset()
+        End If
         Return GetNaNInternal()
     End Function
 
