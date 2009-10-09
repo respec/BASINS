@@ -5,6 +5,8 @@ Imports MapWinUtility
 Public Class clsSWSTATPlugin
     Inherits atcData.atcDataDisplay
 
+    Private TrendName As String = "Analysis::Trend"
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "Analysis::SWSTAT"
@@ -20,9 +22,13 @@ Public Class clsSWSTATPlugin
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Dim lForm As New frmSWSTAT
+        ShowForm(aTimeseriesGroup, lForm)
+        Return lForm
+    End Function
 
-        Dim pBasicAttributes As New ArrayList
-        With pBasicAttributes
+    Private Sub ShowForm(ByVal aTimeseriesGroup As atcData.atcDataGroup, ByVal aForm As Object)
+        Dim lBasicAttributes As New ArrayList
+        With lBasicAttributes
             .Add("ID")
             .Add("Min")
             .Add("Max")
@@ -32,30 +38,30 @@ Public Class clsSWSTATPlugin
             .Add("Count Missing")
         End With
 
-        Dim pNDayAttributes As New ArrayList
-        With pNDayAttributes
+        Dim lNDayAttributes As New ArrayList
+        With lNDayAttributes
             .Add("STAID")
             .Add("STANAM")
             .Add("Constituent")
         End With
 
-        Dim pTrendAttributes As New ArrayList
-        With pTrendAttributes
+        Dim lTrendAttributes As New ArrayList
+        With lTrendAttributes
             .Add("Original ID")
             .Add("KENTAU")
             .Add("KENPLV")
             .Add("KENSLPL")
+            .Add("From")
+            .Add("To")
             .Add("Count")
-            .Add("CountMissing")
+            .Add("Not Used")
             .Add("Min")
             .Add("Max")
             .Add("Constituent")
             .Add("STAID")
         End With
-
-        lForm.Initialize(aTimeseriesGroup, pBasicAttributes, pNDayAttributes, pTrendAttributes)
-        Return lForm
-    End Function
+        aForm.Initialize(aTimeseriesGroup, lBasicAttributes, lNDayAttributes, lTrendAttributes)
+    End Sub
 
     Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
                               ByVal aFileName As String, _
@@ -67,6 +73,19 @@ Public Class clsSWSTATPlugin
             lForm.Initialize(aTimeseriesGroup)
             atcUtility.SaveFileString(aFileName, lForm.ToString)
             lForm.Dispose()
+        End If
+    End Sub
+
+    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
+        MyBase.Initialize(aMapWin, aParentHandle)
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_" & TrendName, atcDataManager.AnalysisMenuName, TrendName.Substring(10), Me.Icon, , , True))
+    End Sub
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        MyBase.ItemClicked(aItemName, aHandled)
+        If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & TrendName) Then
+            Dim lForm As New frmTrend
+            ShowForm(Nothing, lForm)
         End If
     End Sub
 

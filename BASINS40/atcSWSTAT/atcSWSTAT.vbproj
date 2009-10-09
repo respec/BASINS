@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C00718A3-FF1D-46C4-822E-C10964469DE2}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -15,6 +15,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,12 +46,10 @@
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=1.0.3146.26450, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -63,6 +62,7 @@
     <Import Include="System.Collections.Generic" />
     <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="atcFrequencyGridSource.vb" />
@@ -71,6 +71,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSWSTAT.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTrend.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -98,6 +101,9 @@
       <DependentUpon>frmSWSTAT.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmTrend.resx">
+      <DependentUpon>frmTrend.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
@@ -117,6 +123,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>BASINS-MapWinUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls</Name>
@@ -125,6 +136,11 @@
     <ProjectReference Include="..\atcData\atcData.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph.vbproj">
+      <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
+      <Name>atcGraph</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcList\atcList.vbproj">

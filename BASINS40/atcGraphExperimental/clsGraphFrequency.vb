@@ -149,17 +149,64 @@ Public Class clsGraphFrequency
                 AddDatasetCurve(lAnnualTS)
             Next
         Else
+            Dim lNdays() As Double
             AddPercentileCurve(aTimeseries, lPane, lCurveLabel, lCurveColor)
-            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "1Low", "")
-            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "30Low", "")
-            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "90Low", "")
-            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "90Low", " CI Lower")
-            AddAttributeCurve(aTimeseries, lPane, lCurveColor, "90Low", " CI Upper")
+            AddAttributeCurves(aTimeseries, lPane, lCurveColor, lNdays)
         End If
 
         SetYRange(lPane) 'TODO: does this do anything?
 
     End Sub
+
+    Private Sub AddAttributeCurves(ByVal aTimeseries As atcTimeseries, _
+                                   ByVal aPane As ZedGraph.GraphPane, _
+                                   ByVal aCurveColor As Color, _
+                                   ByVal aNdays() As Double)
+        Dim pNdays As New SortedList
+        Dim lNdays As String
+
+        For Each lData As atcDataSet In pDataGroup
+            For Each lAttribute As atcDefinedValue In lData.Attributes
+                If Not lAttribute.Arguments Is Nothing Then
+                    Dim lKey As String = ""
+                    If lAttribute.Arguments.ContainsAttribute("Nday") Then
+                        lNdays = lAttribute.Arguments.GetFormattedValue("Nday")
+                        lKey = Format(lAttribute.Arguments.GetValue("Nday"), "00000.0000")
+                        If Not pNdays.ContainsKey(lKey) AndAlso IsIn(lNdays, aNdays) Then
+                            pNdays.Add(lKey, lNdays)
+                        End If
+                    End If
+                End If 'Not lAttribute.Arguments Is Nothing
+            Next ' lAttribute
+        Next ' lData
+
+        For Each lNdays In pNdays.Values
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "")
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "")
+
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Lower")
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Lower")
+
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Upper")
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Upper")
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Return True if aArray is Nothing or else it contains a number within 1e-30 of aNumber
+    ''' </summary>
+    Private Function IsIn(ByVal aNumber As Double, ByVal aArray() As Double) As Boolean
+        If aArray Is Nothing Then
+            Return True
+        Else
+            For Each lCheck As Double In aArray
+                If Math.Abs(lCheck - aNumber) < 1.0E+30 Then
+                    Return True
+                End If
+            Next
+        End If
+        Return False
+    End Function
 
     Private Sub SetYRange(ByVal aPane As ZedGraph.GraphPane)
         Dim lYMax As Double = 0.0001
@@ -219,7 +266,7 @@ Public Class clsGraphFrequency
                lName.EndsWith(aAttributeSuffix) Then
                 lReturnStr = lName.Substring(lPreLen, lName.Length - lPreLen - lSufLen)
                 If Double.TryParse(lReturnStr, lReturnDbl) Then
-                    Logger.Dbg("Found Attribute " & lName)
+                    'Logger.Dbg("Found Attribute " & lName)
                     lPoints.Add(lReturnDbl, lAttribute.Value)
                 End If
             End If
@@ -229,7 +276,7 @@ Public Class clsGraphFrequency
             Dim lZedGraphPoints As New ZedGraph.PointPairList
             For Each lPoint As DictionaryEntry In lPoints
                 Dim lX As Double = 1 - 1 / lPoint.Key
-                Logger.Dbg("Add Point " & lPoint.Key & " = " & lPoint.Value)
+                'Logger.Dbg("Add Point " & lPoint.Key & " = " & lPoint.Value)
                 lZedGraphPoints.Add(New ZedGraph.PointPair(lX, lPoint.Value, CStr(lPoint.Key)))
             Next
             Return aPane.AddCurve(aAttributePrefix & aAttributeSuffix, lZedGraphPoints, aCurveColor, SymbolType.None)
