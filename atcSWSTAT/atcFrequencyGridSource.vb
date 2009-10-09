@@ -381,19 +381,39 @@ Public Class atcFrequencyGridSource
                     Dim lNumMissing As Integer = lNdayTsNonLog.Attributes.GetValue("Count Missing", 0)
                     Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero - lNumMissing
 
-                    lPositiveNdayTs = New atcTimeseries(Nothing)
-                    lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
-                    If lIsLog Then 'switch back to log version of n-day timeseries for stats
+                    If lNumMissing = 0 AndAlso lNumZero = 0 Then
+                        lPositiveNdayTs = lNdayTsNonLog
+                    Else
                         Dim lCurNewValueIndex As Integer = 1
                         Dim lNumNewValues As Integer = lNumPositive
+                        lPositiveNdayTs = New atcTimeseries(Nothing)
+                        lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
                         lPositiveNdayTs.numValues = lNumPositive
-                        For lIndex = 1 To lNdayTs.numValues
+                        For lIndex = 1 To lNdayTsNonLog.numValues
                             If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
-                                lPositiveNdayTs.Value(lCurNewValueIndex) = Log10(lNdayTs.Value(lIndex))
-                                lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTs.Dates.Value(lIndex)
+                                lPositiveNdayTs.Value(lCurNewValueIndex) = lNdayTsNonLog.Value(lIndex)
+                                lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTsNonLog.Dates.Value(lIndex)
                                 lCurNewValueIndex += 1
                             End If
                         Next
+                    End If
+
+                    Dim lLogNdayTs As atcTimeseries 'set to log version if using logs, otherwise contains non-log values
+                    If lIsLog Then 'log version of n-day timeseries for stats
+                        lLogNdayTs = New atcTimeseries(Nothing)
+                        lLogNdayTs.Dates = New atcTimeseries(Nothing)
+                        Dim lCurNewValueIndex As Integer = 1
+                        Dim lNumNewValues As Integer = lNumPositive
+                        lLogNdayTs.numValues = lNumPositive
+                        For lIndex = 1 To lNdayTs.numValues
+                            If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
+                                lLogNdayTs.Value(lCurNewValueIndex) = Log10(lNdayTs.Value(lIndex))
+                                lLogNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTs.Dates.Value(lIndex)
+                                lCurNewValueIndex += 1
+                            End If
+                        Next
+                    Else
+                        lLogNdayTs = lPositiveNdayTs
                     End If
 
                     If aExpFmt Then 'build tabbed export file
@@ -414,14 +434,14 @@ Public Class atcFrequencyGridSource
                         lRept.AppendLine("    NumNeg" & vbTab & lNumMissing)
                         If lIsLog Then
                             lRept.AppendLine("    Ldist" & vbTab & "LP3")
-                            lRept.AppendLine("    MeanND" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
-                            lRept.AppendLine("    SdNd" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
-                            lRept.AppendLine("    SkwNd" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
+                            lRept.AppendLine("    MeanND" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
+                            lRept.AppendLine("    SdNd" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
+                            lRept.AppendLine("    SkwNd" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
                         Else
                             lRept.AppendLine("    Ldist" & vbTab & "LP")
-                            lRept.AppendLine("    Meanvl" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
-                            lRept.AppendLine("    StdDev" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
-                            lRept.AppendLine("    Skewcf" & vbTab & DoubleToString(lPositiveNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
+                            lRept.AppendLine("    Meanvl" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
+                            lRept.AppendLine("    StdDev" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
+                            lRept.AppendLine("    Skewcf" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
                         End If
                     Else
                         lRept.AppendLine()
@@ -451,23 +471,7 @@ Public Class atcFrequencyGridSource
                         lRept.AppendLine("       zero values:  " & lStr.PadLeft(4))
                         lStr = lNumMissing
                         lRept.AppendLine("   negative values:  " & lStr.PadLeft(4) & "  (ignored)")
-
-                        If lNumMissing = 0 AndAlso lNumZero = 0 Then
-                            lPositiveNdayTs = lNdayTsNonLog
-                        Else
-                            Dim lCurNewValueIndex As Integer = 1
-                            Dim lNumNewValues As Integer = lNumPositive
-                            lPositiveNdayTs = New atcTimeseries(Nothing)
-                            lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
-                            lPositiveNdayTs.numValues = lNumPositive
-                            For lIndex = 1 To lNdayTsNonLog.numValues
-                                If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
-                                    lPositiveNdayTs.Value(lCurNewValueIndex) = lNdayTsNonLog.Value(lIndex)
-                                    lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTsNonLog.Dates.Value(lIndex)
-                                    lCurNewValueIndex += 1
-                                End If
-                            Next
-                        End If
+                        ''''
 
                         lRept.AppendLine()
                         lRept.AppendLine("Input time series (zero and negative values not included in listing.)")
@@ -494,30 +498,13 @@ Public Class atcFrequencyGridSource
                             lRept.AppendLine("  (based on non-zero values)")
                         End If
                         lRept.AppendLine()
-
-                        'If lIsLog Then 'switch back to log version of n-day timeseries for stats
-                        '    Dim lCurNewValueIndex As Integer = 1
-                        '    Dim lNumNewValues As Integer = lNumPositive
-                        '    lPositiveNdayTs = New atcTimeseries(Nothing)
-                        '    lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
-                        '    lPositiveNdayTs.numValues = lNumPositive
-                        '    For lIndex = 1 To lNdayTs.numValues
-                        '        If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
-                        '            lPositiveNdayTs.Value(lCurNewValueIndex) = Log10(lNdayTs.Value(lIndex))
-                        '            lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTs.Dates.Value(lIndex)
-                        '            lCurNewValueIndex += 1
-                        '        End If
-                        '    Next
-                        'End If
-
-                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Mean", lLogString))
-                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Variance", lLogString))
-                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Deviation", lLogString))
-                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Skew", lLogString, "Skewness"))
-                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Error of Skew", lLogString, "Standard Error of Skewness"))
-                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Serial Correlation Coefficient", lLogString))
-                        lRept.AppendLine(FormatStat(lPositiveNdayTs, "Coefficient of Variation", lLogString))
-
+                        lRept.AppendLine(FormatStat(lLogNdayTs, "Mean", lLogString))
+                        lRept.AppendLine(FormatStat(lLogNdayTs, "Variance", lLogString))
+                        lRept.AppendLine(FormatStat(lLogNdayTs, "Standard Deviation", lLogString))
+                        lRept.AppendLine(FormatStat(lLogNdayTs, "Skew", lLogString, "Skewness"))
+                        lRept.AppendLine(FormatStat(lLogNdayTs, "Standard Error of Skew", lLogString, "Standard Error of Skewness"))
+                        lRept.AppendLine(FormatStat(lLogNdayTs, "Serial Correlation Coefficient", lLogString))
+                        lRept.AppendLine(FormatStat(lLogNdayTs, "Coefficient of Variation", lLogString))
                         lRept.AppendLine()
                         lRept.AppendLine()
                         lRept.AppendLine("Frequency Curve - Parameter values at selected probabilities")
@@ -525,26 +512,25 @@ Public Class atcFrequencyGridSource
 
                         If pHigh Then
                             If lNumZero > 0 Then
-                                lRept.AppendLine("                            Adjusted   Variance    95-Pct Confidence")
+                                lRept.AppendLine("                            Adjusted    Variance    95-Pct Confidence")
                             Else
-                                lRept.AppendLine("                                       Variance    95-Pct Confidence")
+                                lRept.AppendLine("                                        Variance    95-Pct Confidence")
                             End If
-                            lRept.AppendLine(" Exceedence     Recurrence  Parameter     of          Intervals")
+                            lRept.AppendLine(" Exceedence     Recurrence  Parameter      of          Intervals")
                         Else
                             If lNumZero > 0 Then
-                                lRept.AppendLine("   Non-                     Adjusted   Variance    95-Pct Confidence")
+                                lRept.AppendLine("   Non-                     Adjusted    Variance    95-Pct Confidence")
                             Else
-                                lRept.AppendLine("   Non-                                Variance    95-Pct Confidence")
+                                lRept.AppendLine("   Non-                                 Variance    95-Pct Confidence")
                             End If
-                            lRept.AppendLine(" exceedance     Recurrence  Parameter     of          Intervals")
+                            lRept.AppendLine(" exceedance     Recurrence  Parameter      of          Intervals")
                         End If
                         'If just aligns code
                         If True Then
-                            lRept.AppendLine(" Probability     Interval     Value    Estimate    Lower      Upper")
-                            lRept.AppendLine(" -----------    ----------  ---------  --------  ---------  ---------")
+                            lRept.AppendLine(" Probability     Interval     Value     Estimate    Lower      Upper")
+                            lRept.AppendLine(" -----------    ----------  ---------   --------  ---------  ---------")
                         End If
                     End If
-
 
                     Dim lExpRows(6) As String
                     If aExpFmt Then
@@ -599,7 +585,16 @@ Public Class atcFrequencyGridSource
                             lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(11)
                         End If
 
-                        'variance of estimate and confidence intervals go here
+                        'variance of estimate and confidence intervals
+                        If aExpFmt Then
+                            lExpRows(4) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000")
+                            lExpRows(5) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000")
+                            lExpRows(6) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000")
+                        Else
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000").PadLeft(11)
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000").PadLeft(11)
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000").PadLeft(11)
+                        End If
 
                         If pHigh Then
                             lReverseString &= lThisRow & vbCrLf
