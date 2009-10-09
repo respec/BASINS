@@ -6,7 +6,6 @@ Imports System.Windows.Forms
 Friend Class frmDisplayFrequencyGrid
     Inherits System.Windows.Forms.Form
     Private pInitializing As Boolean
-    Friend WithEvents mnuGraph As System.Windows.Forms.MenuItem
     Private WithEvents pFormSpecify As frmSWSTAT
 
     'The group of atcTimeseries displayed
@@ -101,13 +100,12 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.mnuGraph = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
         Me.SuspendLayout()
         '
         'MainMenu1
         '
-        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp, Me.mnuGraph})
+        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp})
         '
         'mnuFile
         '
@@ -203,11 +201,6 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuHelp.ShowShortcut = False
         Me.mnuHelp.Text = "Help"
         '
-        'mnuGraph
-        '
-        Me.mnuGraph.Index = 5
-        Me.mnuGraph.Text = "Graph"
-        '
         'agdMain
         '
         Me.agdMain.AllowHorizontalScrolling = True
@@ -268,7 +261,12 @@ Friend Class frmDisplayFrequencyGrid
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        If sender.Text = "Graph" Then
+            Dim lGraphPlugin As New atcGraph.atcGraphPlugin
+            Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
+        Else
+            atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        End If
     End Sub
 
     Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
@@ -396,11 +394,6 @@ Friend Class frmDisplayFrequencyGrid
 
         Catch 'Ignore error if we can't tell how large to make it, or can't rezise
         End Try
-    End Sub
-
-    Private Sub mnuGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraph.Click
-        Dim lGraphPlugin As New atcGraph.atcGraphPlugin
-        Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
     End Sub
 
     Private Sub mnuFileExportResults_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileExportResults.Click
