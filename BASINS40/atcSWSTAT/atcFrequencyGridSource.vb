@@ -351,6 +351,9 @@ Public Class atcFrequencyGridSource
                     Dim lAttrName As String = lNdays
                     If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
                     Dim lNdayAttribute As atcDefinedValue = lAttributes.GetDefinedValue(lAttrName & pRecurrence.GetByIndex(0))
+                    If lNdayAttribute Is Nothing Then
+                        Debug.Print("why!")
+                    End If
                     Dim lNdayTs As atcTimeseries = lNdayAttribute.Arguments.GetValue("NDayTimeseries")
                     Dim lNdayTsNonLog As atcTimeseries
                     Dim lIsLog As Boolean = False
@@ -458,9 +461,34 @@ Public Class atcFrequencyGridSource
                         lRept.AppendLine()
                         lRept.AppendLine()
                         lRept.AppendLine("       Description:  " & lLocation)
+
+                        'Dates by USGS SWSTAT convention as follows
+                        ' for seasons - if season ends on month boundary - label with last day of previous month - 4/1 -> March 31
+                        '               otherwise - label with day specified - 9/15 -> September 15
+                        ' for years - if 
+                        Dim lEndDateForPrint As Date = lEndDate
+                        Dim lEndYear As Integer = lEndDate.Year
+                        Dim lEndMon As Integer = lEndDate.Month
+                        Dim lEndDay As Integer = lEndDate.Day
+                        If lEndDay = 1 Then
+                            lEndMon = lEndMon - 1
+                            If lEndMon = 0 Then
+                                lEndMon = 12
+                            End If
+                            lEndDay = Date.DaysInMonth(lEndYear, lEndMon)
+                            lEndDateForPrint = New Date(lEndYear, lEndMon, lEndDay)
+                        End If
                         lRept.AppendLine("            Season:  " & lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & " - " & _
-                                                                   lEndDate.ToString("MMMM") & lEndDate.Day.ToString.PadLeft(3))
-                        lRept.AppendLine("  Period of Record:  " & lStartDateAnnual.Year & " - " & lEndDate.Year)
+                                                                   lEndDateForPrint.ToString("MMMM") & lEndDateForPrint.Day.ToString.PadLeft(3))
+
+                        'TODO: verify how the USGS convention for this works
+                        Dim lStartYear As Integer = lStartDateAnnual.Year
+                        If Not pHigh AndAlso lEndMon <= lStartDate.Month Then
+                            lStartYear -= 1
+                            lEndYear -= 1
+                        End If
+                        lRept.AppendLine("  Period of Record:  " & lStartYear & " - " & lEndYear)
+
                         lStr = lNdays & "-day "
                         If pHigh Then lStr &= "high" Else lStr &= "low"
                         lRept.AppendLine("         Parameter:  " & lStr)
