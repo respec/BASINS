@@ -187,7 +187,7 @@ Module modFreq
             Try
                 LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe, _
                        lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lRetcod)
-                lNobs(0) = 1
+                lNobs(0) = lN
                 lTL(0) = -1.0E+21
                 lTU(0) = 1.0E+21
                 leps(0) = 0.95
@@ -197,28 +197,8 @@ Module modFreq
                 For i As Integer = 0 To lIntervalMax
                     lPQ = lP(i)
                     If Math.Abs(lCMoms(2)) > lSkewMin Then
-                        'Logger.Dbg("Before call to VAR_EMA:")
-                        'Logger.Dbg("lneps=" & lneps)
-                        'Logger.Dbg("lNobs=" & lNobs(0))
-                        'Logger.Dbg("lTL=" & lTL(0))
-                        'Logger.Dbg("lTU=" & lTU(0))
-                        'Logger.Dbg("lCMoms(1)=" & lCMoms(0))
-                        'Logger.Dbg("lCMoms(2)=" & lCMoms(1))
-                        'Logger.Dbg("lCMoms(3)=" & lCMoms(2))
-                        'Logger.Dbg("lPQ=" & lPQ)
-                        'Logger.Dbg("lmse=" & lmse)
-                        'Logger.Dbg("Calling: VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)")
                         VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
-                        'Logger.Dbg("lyp=" & lyp)
-                        'Logger.Dbg("lVarEstArray(1,1)=" & lVarEstArray(0, 0))
-                        'Logger.Dbg("lVarEstArray(2,1)=" & lVarEstArray(1, 0))
-                        'Logger.Dbg("lVarEstArray(1,2)=" & lVarEstArray(0, 1))
-                        'Logger.Dbg("lVarEstArray(2,2)=" & lVarEstArray(1, 1))
-                        'Logger.Dbg("Calling: CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)")
                         CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
-                        'Logger.Dbg("lCILowVal=" & lCILowVal(0))
-                        'Logger.Dbg("lCIHighVal=" & lCIHighVal(0))
-                        'Logger.Dbg("")
                         lCILow(i) = lCILowVal(0)
                         lCIHigh(i) = lCIHighVal(0)
                     Else 'for skews close to zero, compute a weighted sum/interpolate values
