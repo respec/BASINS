@@ -156,20 +156,25 @@ Module modFreq
             Dim lCcpa(lIntervalMax) As Single
             Dim lP(lIntervalMax) As Single
             Dim lQ(lIntervalMax) As Single
-            Dim lTL(lN) As Double
-            Dim lTU(lN) As Double
+            Dim lTL(0) As Double
+            Dim lTU(0) As Double
             Dim lmse As Double = 100000000000.0
             Dim lCILow(lIntervalMax) As Single
             Dim lCIHigh(lIntervalMax) As Single
-            Dim lCILowVal(1) As Double
-            Dim lCIHighVal(1) As Double
+            Dim lCILowVal(0) As Double
+            Dim lCIHighVal(0) As Double
+            Dim lCILowVal2(0) As Double
+            Dim lCIHighVal2(0) As Double
             Dim lVarEst(lIntervalMax) As Single
             Dim lVarEstArray(1, 1) As Double
             Dim lCMoms(2) As Double
+            Dim lSkewMin As Single = 0.06324555
+            Dim lWt As Single
+            Dim lPQ As Double
             Dim lneps As Integer = 1
-            Dim leps(1) As Double
-            Dim lNobs(1) As Double
-            Dim lyp(lIntervalMax) As Single
+            Dim leps(0) As Double
+            Dim lNobs(0) As Double
+            Dim lyp As Double
             Dim lAdp(lIntervalMax) As Single
             Dim lQnew(lIntervalMax) As Single
             Dim lRi(lIntervalMax) As Single
@@ -187,13 +192,48 @@ Module modFreq
                 lTU(0) = 1.0E+21
                 leps(0) = 0.95
                 lCMoms(0) = lMean
-                lCMoms(1) = lStd
+                lCMoms(1) = lStd ^ 2 'needs to be variance (std dev squared)
                 lCMoms(2) = lSkew
                 For i As Integer = 0 To lIntervalMax
-                    VAR_EMA(1, lNobs, lTL, lTU, lCMoms, CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
-                    CI_EMA_M3(CDbl(lyp(i)), lVarEstArray, 1, leps, lCILowVal, lCIHighVal)
-                    lCILow(i) = lCILowVal(0)
-                    lCIHigh(i) = lCIHighVal(0)
+                    lPQ = lP(i)
+                    If Math.Abs(lCMoms(2)) > lSkewMin Then
+                        'Logger.Dbg("Before call to VAR_EMA:")
+                        'Logger.Dbg("lneps=" & lneps)
+                        'Logger.Dbg("lNobs=" & lNobs(0))
+                        'Logger.Dbg("lTL=" & lTL(0))
+                        'Logger.Dbg("lTU=" & lTU(0))
+                        'Logger.Dbg("lCMoms(1)=" & lCMoms(0))
+                        'Logger.Dbg("lCMoms(2)=" & lCMoms(1))
+                        'Logger.Dbg("lCMoms(3)=" & lCMoms(2))
+                        'Logger.Dbg("lPQ=" & lPQ)
+                        'Logger.Dbg("lmse=" & lmse)
+                        'Logger.Dbg("Calling: VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)")
+                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
+                        'Logger.Dbg("lyp=" & lyp)
+                        'Logger.Dbg("lVarEstArray(1,1)=" & lVarEstArray(0, 0))
+                        'Logger.Dbg("lVarEstArray(2,1)=" & lVarEstArray(1, 0))
+                        'Logger.Dbg("lVarEstArray(1,2)=" & lVarEstArray(0, 1))
+                        'Logger.Dbg("lVarEstArray(2,2)=" & lVarEstArray(1, 1))
+                        'Logger.Dbg("Calling: CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)")
+                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+                        'Logger.Dbg("lCILowVal=" & lCILowVal(0))
+                        'Logger.Dbg("lCIHighVal=" & lCIHighVal(0))
+                        'Logger.Dbg("")
+                        lCILow(i) = lCILowVal(0)
+                        lCIHigh(i) = lCIHighVal(0)
+                    Else 'for skews close to zero, compute a weighted sum/interpolate values
+                        lCMoms(2) = -lSkewMin
+                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
+                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+
+                        lCMoms(2) = lSkewMin
+                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
+                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal2, lCIHighVal2)
+
+                        lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
+                        lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
+                        lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
+                    End If
                     lVarEst(i) = lVarEstArray(0, 0)
                 Next i
                 Dim lMsg As String = ""
