@@ -490,6 +490,8 @@ Public Class atcTimeseriesNdayHighLow
                     aAttributesStorage.SetValue("SDND", lNdayTs.Attributes.GetValue("Standard Deviation"))
                     aAttributesStorage.SetValue("SKWND", lNdayTs.Attributes.GetValue("Skew"))
                     aAttributesStorage.SetValue("LDIST", "LP3")
+                Else
+                    aAttributesStorage.SetValue("LDIST", "LP")
                 End If
 
                 Try

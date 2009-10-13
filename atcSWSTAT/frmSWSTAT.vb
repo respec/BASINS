@@ -13,94 +13,6 @@ Friend Class frmSWSTAT
         InitializeComponent() 'required by Windows Form Designer
     End Sub
 
-    Private Sub PopulateForm()
-        pDateFormat = New atcDateFormat
-        With pDateFormat
-            .IncludeHours = False
-            .IncludeMinutes = False
-            .IncludeSeconds = False
-        End With
-
-        If GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "High") = "High" Then
-            radioHigh.Checked = True
-        Else
-            radioLow.Checked = True
-        End If
-
-        chkLog.Checked = (GetSetting("atcFrequencyGrid", "Defaults", "Logarithmic", "True") = "True")
-
-        LoadListSettingsOrDefaults(lstNday)
-        LoadListSettingsOrDefaults(lstRecurrence)
-        RepopulateForm()
-    End Sub
-
-    Private Sub RepopulateForm()
-        SeasonsYearsToForm()
-
-        Dim lFirstDate As Double = GetMaxValue()
-        Dim lLastDate As Double = GetMinValue()
-
-        pCommonStart = GetMinValue()
-        pCommonEnd = GetMaxValue()
-
-        Dim lAllText As String = "All"
-        Dim lCommonText As String = "Common"
-
-        For Each lDataset As atcData.atcTimeseries In pDataGroup
-            If lDataset.Dates.numValues > 0 Then
-                Dim lThisDate As Double = lDataset.Dates.Value(1)
-                If lThisDate < lFirstDate Then lFirstDate = lThisDate
-                If lThisDate > pCommonStart Then pCommonStart = lThisDate
-                lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
-                If lThisDate > lLastDate Then lLastDate = lThisDate
-                If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
-            End If
-        Next
-        If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
-            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
-            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
-            lAllText &= ": " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
-        End If
-
-        If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
-            lCommonText &= ": " & pDateFormat.JDateToString(pCommonStart) & " to " & pDateFormat.JDateToString(pCommonEnd)
-        Else
-            lCommonText &= pNoDatesInCommon
-        End If
-
-        Dim lLastSelectedIndex As Integer = cboYears.SelectedIndex
-        If lLastSelectedIndex < 0 Then lLastSelectedIndex = 0
-        With cboYears.Items
-            .Clear()
-            .Add(lAllText)
-            .Add(lCommonText)
-            .Add("Custom")
-        End With
-        cboYears.SelectedIndex = lLastSelectedIndex
-    End Sub
-
-    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
-        Dim lArgName As String = lst.Tag
-        Dim lAvailableArray As String(,) = GetAllSettings("atcFrequencyGrid", "List." & lArgName)
-        Dim lSelected As New ArrayList
-        lst.Items.Clear()
-
-        If Not lAvailableArray Is Nothing AndAlso lAvailableArray.Length > 0 Then
-            Try
-                For lIndex As Integer = 0 To lAvailableArray.GetUpperBound(0)
-                    lst.Items.Add(lAvailableArray(lIndex, 0))
-                    If lAvailableArray(lIndex, 1) = "True" Then
-                        lst.SetSelected(lst.Items.Count - 1, True)
-                    End If
-                Next
-            Catch e As Exception
-                Logger.Dbg("Error retrieving saved settings: " & e.Message)
-            End Try
-        Else
-            LoadListDefaults(lst)
-        End If
-    End Sub
-
     'Form overrides dispose to clean up the component list.
     Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
         If disposing Then
@@ -816,6 +728,94 @@ Friend Class frmSWSTAT
         ShowHelp(pHelpLocation)
     End Sub
 
+    Private Sub PopulateForm()
+        pDateFormat = New atcDateFormat
+        With pDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False
+        End With
+
+        If GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "High") = "High" Then
+            radioHigh.Checked = True
+        Else
+            radioLow.Checked = True
+        End If
+
+        chkLog.Checked = (GetSetting("atcFrequencyGrid", "Defaults", "Logarithmic", "True") = "True")
+
+        LoadListSettingsOrDefaults(lstNday)
+        LoadListSettingsOrDefaults(lstRecurrence)
+        RepopulateForm()
+    End Sub
+
+    Private Sub RepopulateForm()
+        SeasonsYearsToForm()
+
+        Dim lFirstDate As Double = GetMaxValue()
+        Dim lLastDate As Double = GetMinValue()
+
+        pCommonStart = GetMinValue()
+        pCommonEnd = GetMaxValue()
+
+        Dim lAllText As String = "All"
+        Dim lCommonText As String = "Common"
+
+        For Each lDataset As atcData.atcTimeseries In pDataGroup
+            If lDataset.Dates.numValues > 0 Then
+                Dim lThisDate As Double = lDataset.Dates.Value(1)
+                If lThisDate < lFirstDate Then lFirstDate = lThisDate
+                If lThisDate > pCommonStart Then pCommonStart = lThisDate
+                lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
+                If lThisDate > lLastDate Then lLastDate = lThisDate
+                If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
+            End If
+        Next
+        If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
+            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
+            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
+            lAllText &= ": " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
+        End If
+
+        If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
+            lCommonText &= ": " & pDateFormat.JDateToString(pCommonStart) & " to " & pDateFormat.JDateToString(pCommonEnd)
+        Else
+            lCommonText &= pNoDatesInCommon
+        End If
+
+        Dim lLastSelectedIndex As Integer = cboYears.SelectedIndex
+        If lLastSelectedIndex < 0 Then lLastSelectedIndex = 0
+        With cboYears.Items
+            .Clear()
+            .Add(lAllText)
+            .Add(lCommonText)
+            .Add("Custom")
+        End With
+        cboYears.SelectedIndex = lLastSelectedIndex
+    End Sub
+
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
+        Dim lArgName As String = lst.Tag
+        Dim lAvailableArray As String(,) = GetAllSettings("atcFrequencyGrid", "List." & lArgName)
+        Dim lSelected As New ArrayList
+        lst.Items.Clear()
+
+        If Not lAvailableArray Is Nothing AndAlso lAvailableArray.Length > 0 Then
+            Try
+                For lIndex As Integer = 0 To lAvailableArray.GetUpperBound(0)
+                    lst.Items.Add(lAvailableArray(lIndex, 0))
+                    If lAvailableArray(lIndex, 1) = "True" Then
+                        lst.SetSelected(lst.Items.Count - 1, True)
+                    End If
+                Next
+            Catch e As Exception
+                Logger.Dbg("Error retrieving saved settings: " & e.Message)
+            End Try
+        Else
+            LoadListDefaults(lst)
+        End If
+    End Sub
+
     Private Sub frmSWSTAT_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp(pHelpLocation)
@@ -978,19 +978,6 @@ Friend Class frmSWSTAT
             lArray(lIndex) = lCollection.Item(lIndex)
         Next
         Return lArray
-    End Function
-
-    Private Function ListDefaultArray(ByVal aList As Windows.Forms.ListBox) As Double()
-        Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-        Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
-        Dim lArgs As atcDataAttributes = lNDayHi.Arguments
-        Dim lArgName As String = aList.Tag
-        Dim lDefault As Object = lArgs.GetDefinedValue(lArgName).Definition.DefaultValue
-        If IsArray(lDefault) Then
-            Return lDefault
-        Else
-            Return Nothing
-        End If
     End Function
 
     Private Function SelectedData() As atcTimeseriesGroup
@@ -1195,7 +1182,7 @@ Friend Class frmSWSTAT
     End Sub
 
     Private Sub LoadListDefaults(ByVal aList As Windows.Forms.ListBox)
-        Dim lDefault() As Double = ListDefaultArray(aList)
+        Dim lDefault() As Double = clsSWSTATPlugin.ListDefaultArray(aList.Tag)
         If Not lDefault Is Nothing Then
             aList.Items.Clear()
             For Each lNumber As Double In lDefault
@@ -1371,18 +1358,21 @@ Friend Class frmSWSTAT
         Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
         Dim lFreqForm As New frmDisplayFrequencyGrid(pDataGroup, radioHigh.Checked, ListToArray(lstNday), ListToArray(lstRecurrence))
+        lFreqForm.SWSTATform = Me
 
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
     Private Sub btnDoFrequencyGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGraph.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        Calculate("n-day " & HighOrLowString() & " value", ListDefaultArray(lstRecurrence))
+        DoFrequencyGraph()
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+    End Sub
 
+    Public Sub DoFrequencyGraph()
+        Calculate("n-day " & HighOrLowString() & " value", clsSWSTATPlugin.ListDefaultArray("Return Period"))
         Dim lGraphPlugin As New atcGraph.atcGraphPlugin
         Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
-
-        Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
     Private Sub cboYears_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboYears.SelectedIndexChanged

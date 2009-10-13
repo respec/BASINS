@@ -126,4 +126,17 @@ Public Class clsSWSTATPlugin
         End If
         Return lCalculator.DataSets
     End Function
+
+    Public Shared Function ListDefaultArray(ByVal aListTag As String) As Double()
+        Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+        Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
+        Dim lArgs As atcDataAttributes = lNDayHi.Arguments
+        Dim lDefault As Object = lArgs.GetDefinedValue(aListTag).Definition.DefaultValue
+        If IsArray(lDefault) Then
+            Return lDefault
+        Else
+            Return Nothing
+        End If
+    End Function
+
 End Class
