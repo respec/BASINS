@@ -75,7 +75,8 @@ Public Class atcDataSet
             Dim lLastAttribute As Integer = pStringAttributeNames.GetUpperBound(0)
             Dim lAttrValues(lLastAttribute) As String
             For iArg As Integer = 0 To lLastAttribute
-                lAttrValues(iArg) = pAttributes.GetFormattedValue(pStringAttributeNames(iArg), "-")
+                lAttrValues(iArg) = pAttributes.GetFormattedValue(pStringAttributeNames(iArg), "")
+                If lAttrValues(iArg) = "<unk>" Then lAttrValues(iArg) = ""
             Next
             Return String.Format(pStringFormat, lAttrValues)
         Catch ex As Exception
